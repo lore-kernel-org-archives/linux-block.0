@@ -2,189 +2,211 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 783F2EB64DA
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jun 2023 08:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF4EEB64DA
+	for <linux-block@archiver.kernel.org>; Mon, 19 Jun 2023 08:31:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229471AbjFSIKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jun 2023 04:10:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52498 "EHLO
+        id S229874AbjFSIbL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jun 2023 04:31:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230245AbjFSIJw (ORCPT
+        with ESMTP id S229513AbjFSIbK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jun 2023 04:09:52 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 447B51BD5
-        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2023 01:09:24 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230619080903euoutp0116c73f04975c23cfb80c2d3ba7755bfc~qAQfHvsIq3002330023euoutp01U
-        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2023 08:09:03 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230619080903euoutp0116c73f04975c23cfb80c2d3ba7755bfc~qAQfHvsIq3002330023euoutp01U
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1687162143;
-        bh=0RiBzXViYev57qzFaEFn6uZf9JksWi4MG5BSsmyK/ho=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=DRR+MnsOa9JIpssTAxpYyQ0GA0in4MQ6LIrhTzWAjKEUd/Uk+ppjNFh7xvjGwznIx
-         21l4UbLXjGONQjQZr6ToaPhnXNmiZdCw/d70P+PLmlAWTTds9MDxB6o0G8TutEZxVt
-         SC7fcXJwr3louI3FMYrl5rxCiPDXtVZh+N0uncgw=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20230619080902eucas1p1ab7ab9ce51c9d687eedc699f33478518~qAQegsimU1347613476eucas1p1K;
-        Mon, 19 Jun 2023 08:09:02 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 31.19.42423.E1D00946; Mon, 19
-        Jun 2023 09:09:02 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230619080901eucas1p224e67aa31866d2ad8d259b2209c2db67~qAQdMycnx0244102441eucas1p2Y;
-        Mon, 19 Jun 2023 08:09:01 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230619080901eusmtrp2b7cc41676a8ba9a4d0b7c33b2c3ccc1f~qAQdMCURE0117001170eusmtrp2E;
-        Mon, 19 Jun 2023 08:09:01 +0000 (GMT)
-X-AuditID: cbfec7f2-a3bff7000002a5b7-7f-64900d1e46f2
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 9A.E3.14344.D1D00946; Mon, 19
-        Jun 2023 09:09:01 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20230619080900eusmtip25f4fb56d3849cf1e0c88908d39b21a2b~qAQcdmB3w2848728487eusmtip2k;
-        Mon, 19 Jun 2023 08:09:00 +0000 (GMT)
-Received: from localhost (106.110.32.140) by CAMSVWEXC02.scsc.local
-        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Mon, 19 Jun 2023 09:08:58 +0100
-Date:   Mon, 19 Jun 2023 10:08:57 +0200
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     Hannes Reinecke <hare@suse.de>
-CC:     Matthew Wilcox <willy@infradead.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>, <p.raghav@samsung.com>,
-        <gost.dev@samsung.com>
-Subject: Re: [PATCH 6/7] mm/filemap: allocate folios with mapping blocksize
-Message-ID: <20230619080857.qxx5c7uaz6pm4h3m@localhost>
+        Mon, 19 Jun 2023 04:31:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16A2E50
+        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2023 01:30:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687163425;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=fvpOaCsy2vLicgF+Kudzq5ekwLlBVf0D7m6p2H4Y4s0=;
+        b=YFabRzVJCg+05c+wTOUJ4lQzOpgK99LfdusqJj9Mp2K2zhfb/CrkSPMVDP1uCeXhrbRQ7q
+        6k1aHqtd0GWLdeFZFTy85PgXUvxlS5miBgGXcAtrN3Bh0i/wtSid22r/Za74YQi592XUvg
+        a3MqeTWMapOEHLe+/wNJcGk1pxoSEz8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-568-Xl76UVopNoKDFjOlX0GxAQ-1; Mon, 19 Jun 2023 04:30:20 -0400
+X-MC-Unique: Xl76UVopNoKDFjOlX0GxAQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42A2A185A791;
+        Mon, 19 Jun 2023 08:30:19 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B251492C1B;
+        Mon, 19 Jun 2023 08:30:17 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, Jay Shin <jaeshin@redhat.com>,
+        Tejun Heo <tj@kernel.org>, Waiman Long <longman@redhat.com>,
+        mkoutny@suse.com, Yosry Ahmed <yosryahmed@google.com>
+Subject: [PATCH 6.3.y] blk-cgroup: Flush stats before releasing blkcg_gq
+Date:   Mon, 19 Jun 2023 16:30:09 +0800
+Message-Id: <20230619083009.743135-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20230614114637.89759-7-hare@suse.de>
-X-Originating-IP: [106.110.32.140]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUzMcRzHfX+/63e/bu58O9FnpWxHHopE6IyMMa6FiH80ltvdb9V6kDt5
-        Os2x9GjXCalcac2KiuzuxLkLnZREnjlPl7ZiGrYeWHU96Pqd8d/783m/X5+9v9uXJoXVbt50
-        fPJ+RpEsTRRRPE5d0+DThX58rTz4xUd/sa62hhJbyvMJ8ZXqB4S4/n2g2FLfwhHbtF1I7BjQ
-        UWu4EsPlAIm+KpuSPCx0cCTmd2pKYmhVSfr0flupaN4qOZMYf4BRLFq9hxfXbS2lUuqnHzpj
-        M1BqNOqRg9xpwEtBV9qOchCPFuLLCC7kaFxDPwJTegfFDn0IKr70cP4iBkurG2tUIjDr7vxL
-        nT35imQHI4KOoVzSiXCwP3RmqMcRmqZwABzP5jrXnlgEPZlWrjNP4jwCsu12wmlMxRFQ0X5i
-        guXjUKjq+4ZY7QEtRZ0TNdzxEnhy9xmXrSQCteGxq14aPDK+J5xHAX+nocRhQ6yxHtJrvrr0
-        VOhuNrrgGTBmukiwWgVdNgfJwukI8ky1lLM14JWgeZzozJA4Hq7Zv7jurAVtXgdiIwKw/fBg
-        IwLIrztPsms+ZGUI2fQcqLZ/57DrGdDWK9AiUfF/Dyv+7z6rF0CZuZcqHidI7AOVozQr50Pt
-        7UVlyK0KeTGpyqRYRrk4mTkYpJQmKVOTY4Nke5P0aPw/tY42995CJd09QVZE0MiKgCZFnvyo
-        eo1cyJdLDx9hFHtjFKmJjNKKfGiOyIsfGNYiE+JY6X4mgWFSGMVfl6DdvdXElrkH32WGXjpl
-        bbCUWmTReV2mLTAQclVffOP6+mBrXOS9I1tz1bI1GRpf4eusQZFi9/YO0yEYJYeyGpvJt6fD
-        Px17WfRscsxvjPftLv84JdZcXXGd16i7YKz9nJY/FLlxW67vbS23dUOIOcz986bOAu+Zsg85
-        DmNh/Af9WMrcBP25BbtGCnCQ4GVPpKrSUdIwHEEl3Fx48+fszb/8V7y52zTNcDRKP2kkqy36
-        uDGzvF2yzlRT5Kc6MJOalWRriJOc9/49KWr5j1DdPE142vPcOf0R8vu24cbUiD6D3+mmhsYB
-        q2/B8DLBzl8aZWCz6tGttDK7z1jNjo392y0OqX92nVTEUcZJFweQCqX0D9hWA3O+AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrAIsWRmVeSWpSXmKPExsVy+t/xe7qyvBNSDOY0cFjMWb+GzWLPoklM
-        FitXH2Wy2HtL22LP3pMsFjcmPGW0+P1jDpsDu8fmFVoem1Z1snmcmPGbxWP3zQY2j82nqz0+
-        b5ILYIvSsynKLy1JVcjILy6xVYo2tDDSM7S00DMysdQzNDaPtTIyVdK3s0lJzcksSy3St0vQ
-        y/jwcjZTwS/hiosLHzE3MF7h72Lk5JAQMJHYvOc0axcjF4eQwFJGif+LXzBCJGQkNn65ygph
-        C0v8udbFBmILCXxklPh9lQ+iYQujROuuY8wgCRYBVYknbQ1ADRwcbAJaEo2d7CBhEQEliY/t
-        h9hB6pkF+pkkOu/dYwJJCAt4Syy73wTWyytgLrHq80tGiAWREq93djNCxAUlTs58wgJiMwvo
-        SCzY/YkNZD6zgLTE8n8cIGFOASOJs/svsEPcqSTRsPkMC4RdK/H57zPGCYzCs5BMmoVk0iyE
-        SQsYmVcxiqSWFuem5xYb6RUn5haX5qXrJefnbmIERt22Yz+37GBc+eqj3iFGJg7GQ4wSHMxK
-        IrxBe/tShHhTEiurUovy44tKc1KLDzGaAkNiIrOUaHI+MO7zSuINzQxMDU3MLA1MLc2MlcR5
-        PQs6EoUE0hNLUrNTUwtSi2D6mDg4pRqYzG4w+PeefcTuGFx4w9c6P8M6XvflKWmhN7MnKWSI
-        PvJ+OifIcVKq38WNR06bvGoMzTr1ouC214cje6sXzP+4j1e0sP+jkE5mtSmLxxJ/uZ18petD
-        uu9utisQLVy1ccFt6zKuXbK9sRPmqcb5JeyMWpRi8tnBMLxp/bFZr7Qnr/vxt/1p/oQpv3e2
-        yknMWfNoaffTaZfUNSf8Pzil+sdi/p+nxcTWXwmsMp1wyq02Zu4Jzn1nHPn9StKt5B2mrjpR
-        x3rxZVn8689bL9xw7kv58oxDqNd8HldMxf/lvN/lIj7PuuY8ZcedJRdEP/vz5jyas5IpIY4t
-        55jyhk+2NY07S4NiHmw0mrixMb1TdHcyvxJLcUaioRZzUXEiAOyKiElDAwAA
-X-CMS-MailID: 20230619080901eucas1p224e67aa31866d2ad8d259b2209c2db67
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----VNgDLSb4c7ZKb-8DtXAfXWqOiEfz7BS1m7F6.Sab_7Xb42PA=_11bbf7_"
-X-RootMTR: 20230619080901eucas1p224e67aa31866d2ad8d259b2209c2db67
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230619080901eucas1p224e67aa31866d2ad8d259b2209c2db67
-References: <20230614114637.89759-1-hare@suse.de>
-        <20230614114637.89759-7-hare@suse.de>
-        <CGME20230619080901eucas1p224e67aa31866d2ad8d259b2209c2db67@eucas1p2.samsung.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------VNgDLSb4c7ZKb-8DtXAfXWqOiEfz7BS1m7F6.Sab_7Xb42PA=_11bbf7_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+As noted by Michal, the blkg_iostat_set's in the lockless list hold
+reference to blkg's to protect against their removal. Those blkg's
+hold reference to blkcg. When a cgroup is being destroyed,
+cgroup_rstat_flush() is only called at css_release_work_fn() which
+is called when the blkcg reference count reaches 0. This circular
+dependency will prevent blkcg and some blkgs from being freed after
+they are made offline.
 
-Hi Hannes,
-On Wed, Jun 14, 2023 at 01:46:36PM +0200, Hannes Reinecke wrote:
-> The mapping has an underlying blocksize (by virtue of
-> mapping->host->i_blkbits), so if the mapping blocksize
-> is larger than the pagesize we should allocate folios
-> in the correct order.
-> 
-Network filesystems such as 9pfs set the blkbits to be maximum data it
-wants to transfer leading to unnecessary memory pressure as we will try
-to allocate higher order folios(Order 5 in my setup). Isn't it better
-for each filesystem to request the minimum folio order it needs for its
-page cache early on? Block devices can do the same for its block cache.
+It is less a problem if the cgroup to be destroyed also has other
+controllers like memory that will call cgroup_rstat_flush() which will
+clean up the reference count. If block is the only controller that uses
+rstat, these offline blkcg and blkgs may never be freed leaking more
+and more memory over time.
 
-I have prototype along those lines and I will it soon. This is also
-something willy indicated before in a mailing list conversation.
+To prevent this potential memory leak:
 
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> ---
-> diff --git a/mm/readahead.c b/mm/readahead.c
-> index 47afbca1d122..031935b78af7 100644
-> --- a/mm/readahead.c
-> +++ b/mm/readahead.c
-> @@ -245,7 +245,7 @@ void page_cache_ra_unbounded(struct readahead_control *ractl,
->  			continue;
->  		}
->  
-> -		folio = filemap_alloc_folio(gfp_mask, 0);
-> +		folio = filemap_alloc_folio(gfp_mask, mapping_get_order(mapping));
->  		if (!folio)
->  			break;
->  		if (filemap_add_folio(mapping, folio, index + i,
+- flush blkcg per-cpu stats list in __blkg_release(), when no new stat
+can be added
 
-Did you turn on CONFIG_DEBUG_VM while testing? I don't think we are
-incrementing the counter in this function correctly as this function
-assumes order 0. We might need something like this:
+- add global blkg_stat_lock for covering concurrent parent blkg stat
+update
 
--               ractl->_nr_pages++;
-+               ractl->_nr_pages += folio_nr_pages(folio);
-+               i += folio_nr_pages(folio) - 1;
-> @@ -806,7 +806,7 @@ void readahead_expand(struct readahead_control *ractl,
->  		if (folio && !xa_is_value(folio))
->  			return; /* Folio apparently present */
->  
-> -		folio = filemap_alloc_folio(gfp_mask, 0);
-> +		folio = filemap_alloc_folio(gfp_mask, mapping_get_order(mapping));
->  		if (!folio)
->  			return;
->  		if (filemap_add_folio(mapping, folio, index, gfp_mask) < 0) {
-> @@ -833,7 +833,7 @@ void readahead_expand(struct readahead_control *ractl,
->  		if (folio && !xa_is_value(folio))
->  			return; /* Folio apparently present */
-Same here:
--               ractl->_nr_pages++;
-+               ractl->_nr_pages += folio_nr_pages(folio);
+- don't grab bio->bi_blkg reference when adding the stats into blkcg's
+per-cpu stat list since all stats are guaranteed to be consumed before
+releasing blkg instance, and grabbing blkg reference for stats was the
+most fragile part of original patch
 
->  
-> -		folio = filemap_alloc_folio(gfp_mask, 0);
-> +		folio = filemap_alloc_folio(gfp_mask, mapping_get_order(mapping));
->  		if (!folio)
->  			return;
->  		if (filemap_add_folio(mapping, folio, index, gfp_mask) < 0) {
-> -- 
-> 2.35.3
-> 
+Based on Waiman's patch:
 
-------VNgDLSb4c7ZKb-8DtXAfXWqOiEfz7BS1m7F6.Sab_7Xb42PA=_11bbf7_
-Content-Type: text/plain; charset="utf-8"
+https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redhat.com/
+
+Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+Cc: stable@vger.kernel.org
+Reported-by: Jay Shin <jaeshin@redhat.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Cc: Waiman Long <longman@redhat.com>
+Cc: mkoutny@suse.com
+Cc: Yosry Ahmed <yosryahmed@google.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20230609234249.1412858-1-ming.lei@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+Context difference with linus tree: 2c275afeb61d ("block: make blkcg_punt_bio_submit
+optional") adds '#ifdef CONFIG_BLK_CGROUP_PUNT_BIO' in __blkg_release().
 
 
-------VNgDLSb4c7ZKb-8DtXAfXWqOiEfz7BS1m7F6.Sab_7Xb42PA=_11bbf7_--
+ block/blk-cgroup.c | 40 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 9 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 75bad5d60c9f..dd6d1c0117b1 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -35,6 +35,8 @@
+ #include "blk-throttle.h"
+ #include "blk-rq-qos.h"
+ 
++static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu);
++
+ /*
+  * blkcg_pol_mutex protects blkcg_policy[] and policy [de]activation.
+  * blkcg_pol_register_mutex nests outside of it and synchronizes entire
+@@ -58,6 +60,8 @@ static LIST_HEAD(all_blkcgs);		/* protected by blkcg_pol_mutex */
+ bool blkcg_debug_stats = false;
+ static struct workqueue_struct *blkcg_punt_bio_wq;
+ 
++static DEFINE_RAW_SPINLOCK(blkg_stat_lock);
++
+ #define BLKG_DESTROY_BATCH_SIZE  64
+ 
+ /*
+@@ -165,8 +169,18 @@ static void blkg_free(struct blkcg_gq *blkg)
+ static void __blkg_release(struct rcu_head *rcu)
+ {
+ 	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
++	struct blkcg *blkcg = blkg->blkcg;
++	int cpu;
+ 
+ 	WARN_ON(!bio_list_empty(&blkg->async_bios));
++	/*
++	 * Flush all the non-empty percpu lockless lists before releasing
++	 * us, given these stat belongs to us.
++	 *
++	 * blkg_stat_lock is for serializing blkg stat update
++	 */
++	for_each_possible_cpu(cpu)
++		__blkcg_rstat_flush(blkcg, cpu);
+ 
+ 	/* release the blkcg and parent blkg refs this blkg has been holding */
+ 	css_put(&blkg->blkcg->css);
+@@ -888,23 +902,26 @@ static void blkcg_iostat_update(struct blkcg_gq *blkg, struct blkg_iostat *cur,
+ 	u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
+ }
+ 
+-static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
++static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
+ {
+-	struct blkcg *blkcg = css_to_blkcg(css);
+ 	struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
+ 	struct llist_node *lnode;
+ 	struct blkg_iostat_set *bisc, *next_bisc;
+ 
+-	/* Root-level stats are sourced from system-wide IO stats */
+-	if (!cgroup_parent(css->cgroup))
+-		return;
+-
+ 	rcu_read_lock();
+ 
+ 	lnode = llist_del_all(lhead);
+ 	if (!lnode)
+ 		goto out;
+ 
++	/*
++	 * For covering concurrent parent blkg update from blkg_release().
++	 *
++	 * When flushing from cgroup, cgroup_rstat_lock is always held, so
++	 * this lock won't cause contention most of time.
++	 */
++	raw_spin_lock(&blkg_stat_lock);
++
+ 	/*
+ 	 * Iterate only the iostat_cpu's queued in the lockless list.
+ 	 */
+@@ -928,13 +945,19 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
+ 		if (parent && parent->parent)
+ 			blkcg_iostat_update(parent, &blkg->iostat.cur,
+ 					    &blkg->iostat.last);
+-		percpu_ref_put(&blkg->refcnt);
+ 	}
+-
++	raw_spin_unlock(&blkg_stat_lock);
+ out:
+ 	rcu_read_unlock();
+ }
+ 
++static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
++{
++	/* Root-level stats are sourced from system-wide IO stats */
++	if (cgroup_parent(css->cgroup))
++		__blkcg_rstat_flush(css_to_blkcg(css), cpu);
++}
++
+ /*
+  * We source root cgroup stats from the system-wide stats to avoid
+  * tracking the same information twice and incurring overhead when no
+@@ -2063,7 +2086,6 @@ void blk_cgroup_bio_start(struct bio *bio)
+ 
+ 		llist_add(&bis->lnode, lhead);
+ 		WRITE_ONCE(bis->lqueued, true);
+-		percpu_ref_get(&bis->blkg->refcnt);
+ 	}
+ 
+ 	u64_stats_update_end_irqrestore(&bis->sync, flags);
+-- 
+2.40.1
+
