@@ -2,64 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E5BEB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C7D9EB64D8
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:20:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232896AbjFTNTw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:19:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51534 "EHLO
+        id S232667AbjFTNUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:20:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232903AbjFTNSz (ORCPT
+        with ESMTP id S231805AbjFTNS6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:18:55 -0400
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDAEE1BEB
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:18:27 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-1a9fe53e225so725699fac.1
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:18:27 -0700 (PDT)
+        Tue, 20 Jun 2023 09:18:58 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4401994
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:18:28 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-66872dbc2efso759332b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:18:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687267103; x=1689859103;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687267104; x=1689859104;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dINbX+nct4bRAIdqF8UsZ1EWAtvyrgtNpE239fRJIb0=;
-        b=mOFAYbdHOZ53ew0pEEuMFL6nMjhI0STXUf46y3HKgnSz2uYJALwgALZA/BTx4i/YGm
-         PZkB0pcB+N7MBP58zYpX6KHYxKj/Vx1cB3h0MF6xGdcPCZFF4oiLD7BLyn5tXsCFDBJm
-         GJKSQT9hMnr6P8yqjsWTAv3OxB4QfKYxyDft4HsH9njWcGLThND3hZqaIaUBGPh6/zdJ
-         /Lt1y3sXrWdTm0diIBmenpuHTNFxmV92LI4eXBz7kweh8NefKEwhiNUCngL5Vzu5NQ4D
-         XU4ZgRxaBxpym/wcpyLTPIWkXyiNW5rcYqv+cCDnuf5P6YrBHcu6KG/ogU0XIqXJCMGh
-         HA3w==
+        bh=qGyDV6BAlg2AW/b3jzXgRhCmGRr6ZLpwHtOc10fjN3o=;
+        b=j+JSnZaHENkk6/gyOUztdn3Bz7GVJiGgbR2rn91th1p+H5cIq6OskGo/CrHrzH9r0J
+         3Q1kk3beuF8Ihyxzi2rUZMUPd18f9Xb0O0Y9TxLQOYvOky1Ko3gULNob6mFcjeBSc0vb
+         5ANtL2EhMJaAg+0fY1UoylFmGteRl/0e8eV6bcU9L9t/K80CpFtePvT2e94HOplf6w9b
+         OZJymRSOdf+uLxDObA6QxLhzb+gc6CLrf/CBJ4Bj271Ifma7t6oZzp2qPqhDijr90syL
+         tyzXj/Slr11cRhbQt/iMIKclr3q+y1FhNqAcKNhPPq4TH1fzw7E4NNz1d3NAxjupdPXC
+         zgtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687267103; x=1689859103;
+        d=1e100.net; s=20221208; t=1687267104; x=1689859104;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dINbX+nct4bRAIdqF8UsZ1EWAtvyrgtNpE239fRJIb0=;
-        b=Uk8QMiuLzjRxyEq+vaYhEZFQ5xuMIh7Q1kxBJuVylu/7pM6RrnfA0d0NYSP6XjDtDb
-         D0AjiO/4nOVrjJEGz7gKeL8kPd+mwBpl93XvISpsSh7+3xzuDTat933mYqQoj6wCocIe
-         mgHoYoGPTybQPDLNV3t5xF+tLt9qb5kWuDSpd3+0ybocPTn1OokV+nkmbMTqBOwjWWwN
-         nOUeDHIdpNFvW2hUc5lqy6dlG6KWHJMcxK64Dx52g8q2G6ZclqRkzYio4N7ZOT+5Ze+r
-         dGFa4RElbdHyLvMXmIn+aMec8qkQplf91lwvlbGhsscEA7/HsjnfcVxDTGx+lgLOKfZD
-         G/dw==
-X-Gm-Message-State: AC+VfDzTZmhKdDb0dfynWNCdVyY3oEx/a8NTv34EpyWnIzUh/Zf5WNLS
-        nOKidsvCk6U9pfUawxvKOrSDWkwTsnuh2rtv2S8=
-X-Google-Smtp-Source: ACHHUZ5HfHw1X0rhd5eNr37aF+Wj5i6f+oB7fLTJxwwiiTSAzhukoIn+Ckh9uudP6rg91m43Og1iag==
-X-Received: by 2002:a05:6870:6107:b0:199:cae6:3147 with SMTP id s7-20020a056870610700b00199cae63147mr10505407oae.4.1687267102922;
-        Tue, 20 Jun 2023 06:18:22 -0700 (PDT)
+        bh=qGyDV6BAlg2AW/b3jzXgRhCmGRr6ZLpwHtOc10fjN3o=;
+        b=GadSEFqUdlFGBTwTwtetMBrHi8xFrXLx9f+HI/7OWjhfjdL0drWDdBKtFvalpIsaFw
+         Glb46SGoMUQOugMYWjkae3VZiB6BWBkOCOizZCedCb3vvqRRQb2C8TTABy7f3bsi7RKz
+         99F1P0HX/Utk4iPisgMrb4XMvyDPBnXmbZ1f7HB2C/bCZgrla9h0ni9njPJOXUBIg99S
+         o8vP0pemDNxzisBJXM4LUb98KjejvS8bNKtyCj7n28I7WCSDaKvoWpuARgBsVNt8m3lz
+         pBLO9k2iX4Ed6juHgCjzjvqrltZI3fZaO4BRFYaspQgTgu7AnU1sdozMUD4vFXw3uqRn
+         oVdg==
+X-Gm-Message-State: AC+VfDxVlbmarwP1MZic94OIUtSknae3zBBC+epYthzIhQqiGfnIImIP
+        iGRksQD8gyr8EH/sCi017iq2ew==
+X-Google-Smtp-Source: ACHHUZ5gYPvoG00x00nmpR0yqB5Lt+RQG9FPGP61KvB/cZ+yjJBGT7Mb+6dVhaCB8APIEa2UxlxcJQ==
+X-Received: by 2002:a05:6a20:a10d:b0:121:84ce:c629 with SMTP id q13-20020a056a20a10d00b0012184cec629mr8053947pzk.0.1687267104438;
+        Tue, 20 Jun 2023 06:18:24 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id r23-20020a634417000000b005143448896csm1399994pga.58.2023.06.20.06.18.21
+        by smtp.gmail.com with ESMTPSA id r23-20020a634417000000b005143448896csm1399994pga.58.2023.06.20.06.18.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 06:18:22 -0700 (PDT)
+        Tue, 20 Jun 2023 06:18:23 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-In-Reply-To: <20230620043536.707249-1-hch@lst.de>
-References: <20230620043536.707249-1-hch@lst.de>
-Subject: Re: [PATCH] block: document the holder argument to
- blkdev_get_by_path
-Message-Id: <168726710159.3595534.12075619248775419305.b4-ty@kernel.dk>
-Date:   Tue, 20 Jun 2023 07:18:21 -0600
+To:     hch@lst.de, brauner@kernel.org, dsterba@suse.com, hare@suse.de,
+        jinpu.wang@ionos.com, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230618140402.7556-1-yukuai1@huaweicloud.com>
+References: <20230618140402.7556-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH -next v2] block: fix wrong mode for blkdev_get_by_dev()
+ from disk_scan_partitions()
+Message-Id: <168726710308.3595534.13269294720973239157.b4-ty@kernel.dk>
+Date:   Tue, 20 Jun 2023 07:18:23 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -69,14 +70,22 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Tue, 20 Jun 2023 06:35:36 +0200, Christoph Hellwig wrote:
+On Sun, 18 Jun 2023 22:04:02 +0800, Yu Kuai wrote:
+> After commit 2736e8eeb0cc ("block: use the holder as indication for
+> exclusive opens"), blkdev_get_by_dev() will warn if holder is NULL and
+> mode contains 'FMODE_EXCL'.
 > 
-
+> holder from blkdev_get_by_dev() from disk_scan_partitions() is always NULL,
+> hence it should not use 'FMODE_EXCL', which is broben by the commit. For
+> consequence, WARN_ON_ONCE() will be triggered from blkdev_get_by_dev()
+> if user scan partitions with device opened exclusively.
+> 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: document the holder argument to blkdev_get_by_path
-      commit: e89e001f24bf7bc558d9ebccb97fd559443021da
+[1/1] block: fix wrong mode for blkdev_get_by_dev() from disk_scan_partitions()
+      commit: 985958b8584cc143555f1bd735e7ab5066c944a7
 
 Best regards,
 -- 
