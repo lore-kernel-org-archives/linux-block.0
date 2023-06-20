@@ -2,91 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9026CEB64DB
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E270EB64D8
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:25:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232901AbjFTNZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:25:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56324 "EHLO
+        id S232972AbjFTNZl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:25:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233378AbjFTNZ2 (ORCPT
+        with ESMTP id S233392AbjFTNZa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:25:28 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560EB1728;
-        Tue, 20 Jun 2023 06:24:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687267492; x=1718803492;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WcFZ4/tRnJKwxlpGE9cxvnBgRWirStOXaEKgqBUM2Fc=;
-  b=b/XzDVfWsIuqVF+NZPQzShlZh6DF8aTUI2hM6zDVsTMT6gIKRow/ouZo
-   rGFX+SE8GIYD/zbOHJqBYLTogemGAexVRVIKN+TyTY3Xe1jHI+nQsB0xp
-   wGZR0bgiXca01H2Nv4QSqe9Kw/S7ZVaUBl5+RxYdx7jRm64nHerzvleW4
-   8IcHc3AcP93gty5fQ3Z2HJ1QFdfEkaO9BuOQY2YfD7K/k4O2gxVe/MIM4
-   yG/gQFSx6hPPd+DczWarM+8mnHGYaZ31XMIrEzIjS40mcM9gTXFzEnr6b
-   2ZTeNN2sU1DoKqFjn6wVelIOY7A8uhg9VsoB3txS80lHp6Yi1Ts3EKr7x
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="446230259"
-X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="446230259"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 06:24:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="664284550"
-X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="664284550"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga003.jf.intel.com with ESMTP; 20 Jun 2023 06:24:49 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1qBbLk-005ExW-1m;
-        Tue, 20 Jun 2023 16:24:48 +0300
-Date:   Tue, 20 Jun 2023 16:24:48 +0300
-From:   'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
-Message-ID: <ZJGooPbZQq6G2BjI@smile.fi.intel.com>
-References: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
- <9258be5d31104805b63bb1a64317a448@AcuMS.aculab.com>
+        Tue, 20 Jun 2023 09:25:30 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D509F1734
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:24:58 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-25eabe8b5fcso753332a91.1
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:24:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687267498; x=1689859498;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BdzIdsumWt8w6tgcLa7JYNOj4SBOWfYBxidEV06J4CI=;
+        b=lXHAJxXQo1IxWBtyAzKVYQNkyeyShY73a0a1dyt2x8+hwrBcr+Di4YXgEAFePohBXJ
+         c4YhOC8xc/lacMFDqn2bkueiKmew5cZCvXNL4ao5hawEaUHveNZ100NXE07TC9oYmy+G
+         zdmD6SwgneakVwIzYCYVBcH8GSxZTz+ZPvqnoXh7PQeEkCQm+tyTUnmb0QGFGANsXNu8
+         HVB87wzk5a8VUwhteiGbcAXUNr9MZ9nCsSqHa+y8XSLoQqfJO4itluRjSMlZCJjRvP21
+         ws4muT8ppkfoXNR9p5LcUT89EHMHzgZ7UH41In3uxXgbi0romrbROEd0wPBBKexQVu3e
+         HA0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687267498; x=1689859498;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BdzIdsumWt8w6tgcLa7JYNOj4SBOWfYBxidEV06J4CI=;
+        b=dOhagwmgcaFNiNTahsT1rF5dbxvf4Cg1I+9lQZMJ0T9eytsX6PxUeaLWddjyTizzRp
+         tJZwrCL8GCZrB66kZ3ugBHBn+wcgVuKSw29j4dlbWfxoQhwDDlNvS8PNERgl5tgfR+xC
+         ye88ADJ+wurHGXQ23FwkJZwfYuYJJ2WTy7VWF14hyDAaUM06eVKeP8aPrHcAifHpjcES
+         GoZcW6ZVs7gEWjUis+LyODGtu6xndLXE/HauDAdezn+iGsynt1G549rh2GqmRq/G5In1
+         Jowzpu+y1k6NSiLbWmEAPST2787AaZC6nlqLdMSDukl4vFtkMcWAcEt6FS/DrUT8qhFh
+         G1AA==
+X-Gm-Message-State: AC+VfDwLwBlMkypLyagDfC9ZJZCM1Oz6W8c5ztGPJgmrwjnNjYpt3yRl
+        Ru3K+rGd6YcHsjYSDcnmUnYyJY68ZNxCgSY5ISk=
+X-Google-Smtp-Source: ACHHUZ4iXL0ojL9vp6/E8ffxzHW/r8TZGDt8cfJCpsRBDgUZ9HFpqRpY9i8GA4iW/B/A0x8pyi88jw==
+X-Received: by 2002:a17:90a:e7d1:b0:260:d8fe:4de3 with SMTP id kb17-20020a17090ae7d100b00260d8fe4de3mr903505pjb.4.1687267498321;
+        Tue, 20 Jun 2023 06:24:58 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id gm14-20020a17090b100e00b00253311d508esm7342008pjb.27.2023.06.20.06.24.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jun 2023 06:24:57 -0700 (PDT)
+Message-ID: <a7a1dcc3-5aaf-53bc-7527-ba62292c44cd@kernel.dk>
+Date:   Tue, 20 Jun 2023 07:24:56 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9258be5d31104805b63bb1a64317a448@AcuMS.aculab.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 2/3] block: mark bdev files as FMODE_NOWAIT if underlying
+ device supports it
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
+References: <20230509151910.183637-1-axboe@kernel.dk>
+ <20230509151910.183637-3-axboe@kernel.dk> <ZFucWYxUtBvvRJpR@infradead.org>
+ <8d5daf0d-c623-5918-d40e-ab3ad1c508ad@kernel.dk>
+ <ZJFEz2FKuvIf8aCL@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZJFEz2FKuvIf8aCL@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 12:06:49PM +0000, David Laight wrote:
+On 6/20/23 12:18?AM, Christoph Hellwig wrote:
+> So it turns out this gets into the way of my planned cleanup to move
+> all the tatic FMODE_ flags out of this basically full field into a new
+> static one in file_operations.  Do you think it is ok to go back to
+> always claiming FMODE_NOWAIT for block devices and then just punt for
+> the drivers that don't support it like the patch below?
 
-...
+I think we need stronger justification than that, it's much nicer to
+have it in the open path than doing the same check over and over for
+each IO.
 
-> > +		*hi = clamp_val(*hi, 500, 1000000);
-> 
-> (standard rant about minmax.h)
-> 
-> clamp_val() is pretty much broken by design.
-> It MIGHT be ok here but it casts both limits to the
-> type of the value being compared.
-> In general that is just plain wrong.
-> 
-> Like min_t() it is generally ok because the kernel only uses
-> unsigned values between 0 and MAXINT.
-> 
-> If min/max were ok, then using clamp() should also be ok.
-
-Submit a patch to fix it, if you think you can make it better.
-Obviously your comment can be addressed separately if we even
-need that.
+With your new proposed scheme, why can't the check and FMODE_NOWAIT set
+still be in open?
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+Jens Axboe
 
