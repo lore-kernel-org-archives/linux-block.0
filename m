@@ -2,153 +2,165 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5408EEB64DA
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jun 2023 22:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A22EB64DB
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 00:01:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229520AbjFSW5y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jun 2023 18:57:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38928 "EHLO
+        id S229453AbjFTABE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jun 2023 20:01:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbjFSW5x (ORCPT
+        with ESMTP id S229448AbjFTABD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jun 2023 18:57:53 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 415DDE55
-        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2023 15:57:52 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-666e6ecb52dso1509556b3a.2
-        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2023 15:57:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1687215472; x=1689807472;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SjXwtZnJw92XR661FFt1WCJs9pFxmVufx8xRZE1MlmA=;
-        b=fovhd81vHX+kdEyYuyB+Zfu4MO9kROfPT54Lgr7qb8ZoefAX06xHlEhWuKLNw0GIbD
-         oefMv1glR3njUPLJ2AAsUYZMVSYhiBoj8l7BlJXJDpoNtSULk+eJ/qqtVxopuZH+Ud8u
-         4fYpZ1tny/cL+uoxRNXmagyo10ZukGRtywD+alN5avXBzae58IPKZf01g/CcAQ5+Az4v
-         BTLFWAPJ0XnGhQQGQimHCP1iS9J2k+HtXO9HTAyw826Dkshs45DjB25n3EHWEbK00Xdu
-         AnAFC1fFjv38EMT/MbCndQR72fJ6dGdN9CVN7GAr1Vc8wYs/j8cMCI04/XGrAgcr15JT
-         Lobw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687215472; x=1689807472;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SjXwtZnJw92XR661FFt1WCJs9pFxmVufx8xRZE1MlmA=;
-        b=BH0K05njMcflJLAI5Ucw3Wn4V/x5JsHOgTu7Xh8BIqQUJVfCF2fPyMLHRDrexkY2+n
-         TdxSx8xVlNzaSzlL7f/qy7hHz/KOzhboYujFUSUaVjPMBvp8E3hoOrJVfj1qoIoe0tKn
-         GWSLnSVQA9NDECcbw/jmybtdmJGJ7YWdqa4QLp5rjfO/kAnfHYzaKxwzPC87f9w46iXq
-         TdsXxl9r9bnqyej7Yy03z0FNzdLt6Q6eZCPgqxjFFQ0Ijo0UkDyCzavHh33qu0bgud9x
-         Qiaqj0znV5u01hl8larCFYgezSzgbMToDWZVxVT44uDvC3L7i2D17dnTgK6mXziRsd+Y
-         f/zQ==
-X-Gm-Message-State: AC+VfDyyIyibekLkNPMymuYr7+ANOJ4HFnm3YL223h5irrZX74DNukQg
-        11kRlwyDBgDY8V9oHkqig0ZwXA==
-X-Google-Smtp-Source: ACHHUZ4mYODDAn40TIMpC6vCOTcHo8TSKgeWuTVjpTKBzCCzwdkWkEOFRRkg2SNGaBzU0dlGAN+qZQ==
-X-Received: by 2002:a05:6a00:2406:b0:63d:260d:f9dd with SMTP id z6-20020a056a00240600b0063d260df9ddmr7109838pfh.33.1687215471663;
-        Mon, 19 Jun 2023 15:57:51 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-13-202.pa.nsw.optusnet.com.au. [49.180.13.202])
-        by smtp.gmail.com with ESMTPSA id z16-20020aa785d0000000b00643355ff6a6sm155493pfn.99.2023.06.19.15.57.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jun 2023 15:57:50 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qBNoi-00DpLn-0h;
-        Tue, 20 Jun 2023 08:57:48 +1000
-Date:   Tue, 20 Jun 2023 08:57:48 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Pankaj Raghav <p.raghav@samsung.com>,
-        Matthew Wilcox <willy@infradead.org>,
+        Mon, 19 Jun 2023 20:01:03 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81951B6;
+        Mon, 19 Jun 2023 17:01:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=KKEFTk8JRt6auD81VmKR05IrMCjbBWj2nan8iYrIAco=; b=BkOXYWjJMwuH6Zf/knOFxYVi98
+        fd+s04668WzEdHaEN9knVPmhJD88r5Szwp+63svW58n4YWbjfgEe5IUbE/4WcNI6oZPY2i6agFS+W
+        5i7NMU95kpsHnNvQGotvj0CfVzaBAjxuMvkBRIv8u8F/dbtLUDW8bI7qJLuqflpUxilYGUY2S1k7p
+        WYnZLwpdxquK22uwkYZ4u2WREnhvin0OQxu0LqII3DZ++DhdTDswWBJk9j35e0dkhGdbvV68Cj3n8
+        96t48dolFnSI0lvPb64uVXfNLJP9FmSS4bTPQW1frFi5prRSOlsXarDZElqNB72Cb7uv8nthCP4v9
+        edo1OPfg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qBOnn-00CPuf-MT; Tue, 20 Jun 2023 00:00:55 +0000
+Date:   Tue, 20 Jun 2023 01:00:55 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Pankaj Raghav <p.raghav@samsung.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>,
         Christoph Hellwig <hch@lst.de>,
         Luis Chamberlain <mcgrof@kernel.org>, gost.dev@samsung.com
 Subject: Re: [PATCH 6/7] mm/filemap: allocate folios with mapping blocksize
-Message-ID: <ZJDdbPwfXI6eR5vB@dread.disaster.area>
+Message-ID: <ZJDsN3UHphxbFGDq@casper.infradead.org>
 References: <20230614114637.89759-1-hare@suse.de>
  <20230614114637.89759-7-hare@suse.de>
  <CGME20230619080901eucas1p224e67aa31866d2ad8d259b2209c2db67@eucas1p2.samsung.com>
  <20230619080857.qxx5c7uaz6pm4h3m@localhost>
  <b6d982ce-3e7e-e433-8339-28ec8474df03@suse.de>
+ <ZJDdbPwfXI6eR5vB@dread.disaster.area>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="XLFzhUqy5ZX2e7O9"
 Content-Disposition: inline
-In-Reply-To: <b6d982ce-3e7e-e433-8339-28ec8474df03@suse.de>
+In-Reply-To: <ZJDdbPwfXI6eR5vB@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 19, 2023 at 10:42:38AM +0200, Hannes Reinecke wrote:
-> On 6/19/23 10:08, Pankaj Raghav wrote:
-> > Hi Hannes,
-> > On Wed, Jun 14, 2023 at 01:46:36PM +0200, Hannes Reinecke wrote:
-> > > The mapping has an underlying blocksize (by virtue of
-> > > mapping->host->i_blkbits), so if the mapping blocksize
-> > > is larger than the pagesize we should allocate folios
-> > > in the correct order.
-> > > 
-> > Network filesystems such as 9pfs set the blkbits to be maximum data it
-> > wants to transfer leading to unnecessary memory pressure as we will try
-> > to allocate higher order folios(Order 5 in my setup). Isn't it better
-> > for each filesystem to request the minimum folio order it needs for its
-> > page cache early on? Block devices can do the same for its block cache.
 
-Folio size is not a "filesystem wide" thing - it's a per-inode
-configuration. We can have inodes within a filesystem that have
-different "block" sizes. A prime example of this is XFS directories
-- they can have 64kB block sizes on 4kB block size filesystem.
+--XLFzhUqy5ZX2e7O9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Another example is extent size hints in XFS data files - they
-trigger aligned allocation-around similar to using large folios in
-the page cache for small writes. Effectively this gives data files a
-"block size" of the extent size hint regardless of the filesystem
-block size.
+On Tue, Jun 20, 2023 at 08:57:48AM +1000, Dave Chinner wrote:
+> What is needed is a field into the mapping that defines the
+> folio order that all folios allocated for the page cache must be
+> aligned/sized to to allow them to be inserted into the mapping.
 
-Hence in future we might want different sizes of folios for
-different types of inodes and so whatever we do we need to support
-per-inode folio size configuration for the inode mapping tree.
+Attached patch from December 2020 ;-)
 
-> > I have prototype along those lines and I will it soon. This is also
-> > something willy indicated before in a mailing list conversation.
-> > 
-> Well; I _though_ that's why we had things like optimal I/O size and
-> maximal I/O size. But this seem to be relegated to request queue limits,
-> so I guess it's not available from 'struct block_device' or 'struct
-> gendisk'.
+--XLFzhUqy5ZX2e7O9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-fs-Allow-fine-grained-control-of-folio-sizes.patch"
 
-Yes, those are block device constructs to enable block device based
-filesystems to be laid out best for the given block device. They
-don't exist for non-block-based filesystems like network
-filesystems...
+From 1aeee696f4d322af5f34544e39fc00006c399fb8 Mon Sep 17 00:00:00 2001
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Date: Tue, 15 Dec 2020 10:57:34 -0500
+Subject: [PATCH] fs: Allow fine-grained control of folio sizes
 
-> So I've been thinking of adding a flag somewhere (possibly in
-> 'struct address_space') to indicate that blkbits is a hard limit
-> and not just an advisory thing.
+Some filesystems want to be able to limit the maximum size of folios,
+and some want to be able to ensure that folios are at least a certain
+size.  Add mapping_set_folio_orders() to allow this level of control
+(although it is not yet honoured).
 
-This still relies on interpreting inode->i_blkbits repeatedly at
-runtime in some way, in mm code that really has no business looking
-at filesystem block sizes.
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ include/linux/pagemap.h | 41 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 37 insertions(+), 4 deletions(-)
 
-What is needed is a field into the mapping that defines the
-folio order that all folios allocated for the page cache must be
-aligned/sized to to allow them to be inserted into the mapping.
-
-This means the minimum folio order and alignment is maintained
-entirely by the mapping (e.g. it allows truncate to do the right
-thing), and the filesystem/device side code does not need to do
-anything special (except support large folios) to ensure that the
-page cache always contains folios that are block sized and aligned.
-
-We already have mapping_set_large_folios() that we use at
-inode/mapping instantiation time to enable large folios in the page
-cache for that mapping. What we need is a new
-mapping_set_large_folio_order() API to enable the filesystem/device
-to set the base folio order for the mapping tree at instantiation
-time, and for all the page cache instantiation code to align/size to
-the order stored in the mapping...
-
-Cheers,
-
-Dave.
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index cad81db32e61..9cbb8bdbaee7 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -198,9 +198,15 @@ enum mapping_flags {
+ 	AS_EXITING	= 4, 	/* final truncate in progress */
+ 	/* writeback related tags are not used */
+ 	AS_NO_WRITEBACK_TAGS = 5,
+-	AS_LARGE_FOLIO_SUPPORT = 6,
++	AS_FOLIO_ORDER_MIN = 8,
++	AS_FOLIO_ORDER_MAX = 13,
++	/* 8-17 are used for FOLIO_ORDER */
+ };
+ 
++#define AS_FOLIO_ORDER_MIN_MASK	0x00001f00
++#define AS_FOLIO_ORDER_MAX_MASK 0x0002e000
++#define AS_FOLIO_ORDER_MASK (AS_FOLIO_ORDER_MIN_MASK | AS_FOLIO_ORDER_MAX_MASK)
++
+ /**
+  * mapping_set_error - record a writeback error in the address_space
+  * @mapping: the mapping in which an error should be set
+@@ -290,6 +296,29 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
+ 	m->gfp_mask = mask;
+ }
+ 
++/**
++ * mapping_set_folio_orders() - Set the range of folio sizes supported.
++ * @mapping: The file.
++ * @min: Minimum folio order (between 0-31 inclusive).
++ * @max: Maximum folio order (between 0-31 inclusive).
++ *
++ * The filesystem should call this function in its inode constructor to
++ * indicate which sizes of folio the VFS can use to cache the contents
++ * of the file.  This should only be used if the filesystem needs special
++ * handling of folio sizes (ie there is something the core cannot know).
++ * Do not tune it based on, eg, i_size.
++ * 
++ * Context: This should not be called while the inode is active as it
++ * is non-atomic.
++ */
++static inline void mapping_set_folio_orders(struct address_space *mapping,
++		unsigned int min, unsigned int max)
++{
++	mapping->flags = (mapping->flags & ~AS_FOLIO_ORDER_MASK) |
++			(min << AS_FOLIO_ORDER_MIN) |
++			(max << AS_FOLIO_ORDER_MAX);
++}
++
+ /**
+  * mapping_set_large_folios() - Indicate the file supports large folios.
+  * @mapping: The file.
+@@ -303,7 +332,12 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
+  */
+ static inline void mapping_set_large_folios(struct address_space *mapping)
+ {
+-	__set_bit(AS_LARGE_FOLIO_SUPPORT, &mapping->flags);
++	mapping_set_folio_orders(mapping, 0, 31);
++}
++
++static inline unsigned mapping_max_folio_order(struct address_space *mapping)
++{
++	return (mapping->flags & AS_FOLIO_ORDER_MAX_MASK) >> AS_FOLIO_ORDER_MAX;
+ }
+ 
+ /*
+@@ -312,8 +346,7 @@ static inline void mapping_set_large_folios(struct address_space *mapping)
+  */
+ static inline bool mapping_large_folio_support(struct address_space *mapping)
+ {
+-	return IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE) &&
+-		test_bit(AS_LARGE_FOLIO_SUPPORT, &mapping->flags);
++	return mapping_max_folio_order(mapping) > 0;
+ }
+ 
+ static inline int filemap_nr_thps(struct address_space *mapping)
 -- 
-Dave Chinner
-david@fromorbit.com
+2.35.1
+
+
+--XLFzhUqy5ZX2e7O9--
