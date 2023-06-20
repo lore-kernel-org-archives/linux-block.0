@@ -2,128 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9016DEB64D8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 18:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EE94EB64D8
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 18:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230002AbjFTSCD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 14:02:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46530 "EHLO
+        id S229647AbjFTSua (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 14:50:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230415AbjFTSBx (ORCPT
+        with ESMTP id S229595AbjFTSu3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 14:01:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 018961A8;
-        Tue, 20 Jun 2023 11:01:51 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8B22E61359;
-        Tue, 20 Jun 2023 18:01:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DA5AC433C8;
-        Tue, 20 Jun 2023 18:01:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1687284110;
-        bh=mLWzIkB9n6b+IgFjY2oTg9W4Iuvar0Rst5HENnLsKCU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=1OHtgxwIb4ubKzxNV8Ad7uLkzco2kcDk0cCN7fqyXOg71+MYBgDqy5RrSz68BqwJm
-         tMhqCal5n1WhBt1r8en07b9aNXQe/G8x0fXr+rghqJrinhPT2VaDHyJZRjfFyHhiMV
-         InokhMPviNjv72pi4kAXnOUgCB7kdCmlHSwz7umQ=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Ivan Orlov <ivan.orlov0322@gmail.com>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4/4] bsg: make bsg_class a static const structure
-Date:   Tue, 20 Jun 2023 20:01:33 +0200
-Message-ID: <20230620180129.645646-8-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230620180129.645646-5-gregkh@linuxfoundation.org>
-References: <20230620180129.645646-5-gregkh@linuxfoundation.org>
+        Tue, 20 Jun 2023 14:50:29 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D72110F1
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 11:50:27 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id ca18e2360f4ac-77de8cc1370so55639739f.1
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 11:50:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687287026; x=1689879026;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q2oJeKg2295ZW4+oFZd0KhW8kvlNPjdhIaqSYcEhYdE=;
+        b=uEEytb8IfuPMIpeeqxDFwObmfpD4Yur+nfGTc6btAHvnkmpdu6ay+gsclOmuq1KNSZ
+         TLOqIv3fbzwdAzlXYsvt3kav3xVyhJwmQKFjDe3TvukLmcjThXZeoRe3p2nXvMzMTT2c
+         WltTKYG/yz0qjcGj4q6ZHdT50cdzMLbj9kcAtjL+Q3dnJEfD+EjURo0spKTaldvFy8jo
+         uRBi6FTlQ10On7MCHqOfoKVA7OSavZPldVIk0K04fsFX61qKNLWMn1lgzelHtWffY35R
+         W6Ui57qkRo1LRyOOfNU/drSJboP5thh35LXQtPZHkOPnA3Q7E0h7yHtddGaWwK2xQo+5
+         tjbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687287026; x=1689879026;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q2oJeKg2295ZW4+oFZd0KhW8kvlNPjdhIaqSYcEhYdE=;
+        b=Q9goeoes2oXvI93gDu3I6B3ff0/NJrFRE+raEgRPH2adPM7wmQX6K6Dt53oz4ifaA3
+         Z3xT2vA9svKmvWM3RXw187BbkSnvYpP3xrCHK6VWboRSYQeJRLFWrmm7i0gHDhsRoT+K
+         iHps94ppOI4HfMCuUoEPPfY9g3CElO+7c6KhCCZp3fuQ1gYq7Bcd5lkuBrQgvk5yOHZw
+         jRoVEEIjPLlR2Nqy+jbx/SxwY2oPs6tDQ+CEPcJsT+s/20ITYtDGeYhqDXW6+eNAEqOp
+         qYKozxmOhK7/IEIQgVtG4nSCs1ZXziSCYcmiK457TZu9uZzjLK+qwDJcnTiG7NDaRTNh
+         +4iw==
+X-Gm-Message-State: AC+VfDwC0tXKfr/njkcDloGOJI9yZnKSQvFW59fxT1zgKjCklmbjvkPU
+        V43D58MdY3e8/Pe68ysXftCftSbr50xpSjqib7s=
+X-Google-Smtp-Source: ACHHUZ4SczXoEjujWT9H1CzOVupU3UPu0mLyPOkwdGkdTDwEJBLX0ziiS8aXB5fZC9moLR7pK79WLw==
+X-Received: by 2002:a6b:b256:0:b0:77e:3892:1e84 with SMTP id b83-20020a6bb256000000b0077e38921e84mr7172432iof.0.1687287026681;
+        Tue, 20 Jun 2023 11:50:26 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id u24-20020a02aa98000000b0041631393ac9sm809441jai.18.2023.06.20.11.50.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jun 2023 11:50:26 -0700 (PDT)
+Message-ID: <50217644-7acc-dccd-bada-d31dda2d29a4@kernel.dk>
+Date:   Tue, 20 Jun 2023 12:50:25 -0600
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2239; i=gregkh@linuxfoundation.org; h=from:subject; bh=fnHpjCymBCx207w0QsVqcrjVrGR4TQ1EajvXa247ZDU=; b=owGbwMvMwCRo6H6F97bub03G02pJDCkTX1aZuMV9Uo01aZ9zpf7GpkNn1hzxWFobOfWfZH5jQ NSR0rWpHbEsDIJMDLJiiixftvEc3V9xSNHL0PY0zBxWJpAhDFycAjCRaBaG+bnKJ2VNc/cumjQl +2+I3YePdV8fT2JYcEh+u2jVrB7NfE/9AzG1PW7xTmbbAA==
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH] md: use mddev->external to select holder in export_rdev()
+Content-Language: en-US
+To:     Song Liu <song@kernel.org>, linux-raid@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20230617052405.305871-1-song@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230617052405.305871-1-song@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ivan Orlov <ivan.orlov0322@gmail.com>
+On 6/16/23 11:24 PM, Song Liu wrote:
+> mdadm test "10ddf-create-fail-rebuild" triggers warnings like the following
+> 
+> [  215.526357] ------------[ cut here ]------------
+> [  215.527243] WARNING: CPU: 18 PID: 1264 at block/bdev.c:617 blkdev_put+0x269/0x350
+> [  215.528334] Modules linked in:
+> [  215.528806] CPU: 18 PID: 1264 Comm: mdmon Not tainted 6.4.0-rc2+ #768
+> [  215.529863] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> [  215.531464] RIP: 0010:blkdev_put+0x269/0x350
+> [  215.532167] Code: ff ff 49 8d 7d 10 e8 56 bf b8 ff 4d 8b 65 10 49 8d bc
+> 24 58 05 00 00 e8 05 be b8 ff 41 83 ac 24 58 05 00 00 01 e9 44 ff ff ff
+> <0f> 0b e9 52 fe ff ff 0f 0b e9 6b fe ff ff1
+> [  215.534780] RSP: 0018:ffffc900040bfbf0 EFLAGS: 00010283
+> [  215.535635] RAX: ffff888174001000 RBX: ffff88810b1c3b00 RCX: ffffffff819a4061
+> [  215.536645] RDX: dffffc0000000000 RSI: dffffc0000000000 RDI: ffff88810b1c3ba0
+> [  215.537657] RBP: ffff88810dbde800 R08: fffffbfff0fca983 R09: fffffbfff0fca983
+> [  215.538674] R10: ffffc900040bfbf0 R11: fffffbfff0fca982 R12: ffff88810b1c3b38
+> [  215.539687] R13: ffff88810b1c3b10 R14: ffff88810dbdecb8 R15: ffff88810b1c3b00
+> [  215.540833] FS:  00007f2aabdff700(0000) GS:ffff888dfb400000(0000) knlGS:0000000000000000
+> [  215.541961] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  215.542775] CR2: 00007fa19a85d934 CR3: 000000010c076006 CR4: 0000000000370ee0
+> [  215.543814] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [  215.544840] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [  215.545885] Call Trace:
+> [  215.546257]  <TASK>
+> [  215.546608]  export_rdev.isra.63+0x71/0xe0
+> [  215.547338]  mddev_unlock+0x1b1/0x2d0
+> [  215.547898]  array_state_store+0x28d/0x450
+> [  215.548519]  md_attr_store+0xd7/0x150
+> [  215.549059]  ? __pfx_sysfs_kf_write+0x10/0x10
+> [  215.549702]  kernfs_fop_write_iter+0x1b9/0x260
+> [  215.550351]  vfs_write+0x491/0x760
+> [  215.550863]  ? __pfx_vfs_write+0x10/0x10
+> [  215.551445]  ? __fget_files+0x156/0x230
+> [  215.552053]  ksys_write+0xc0/0x160
+> [  215.552570]  ? __pfx_ksys_write+0x10/0x10
+> [  215.553141]  ? ktime_get_coarse_real_ts64+0xec/0x100
+> [  215.553878]  do_syscall_64+0x3a/0x90
+> [  215.554403]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [  215.555125] RIP: 0033:0x7f2aade11847
+> [  215.555696] Code: c3 66 90 41 54 49 89 d4 55 48 89 f5 53 89 fb 48 83 ec
+> 10 e8 1b fd ff ff 4c 89 e2 48 89 ee 89 df 41 89 c0 b8 01 00 00 00 0f 05
+> <48> 3d 00 f0 ff ff 77 35 44 89 c7 48 89 448
+> [  215.558398] RSP: 002b:00007f2aabdfeba0 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+> [  215.559516] RAX: ffffffffffffffda RBX: 0000000000000010 RCX: 00007f2aade11847
+> [  215.560515] RDX: 0000000000000005 RSI: 0000000000438b8b RDI: 0000000000000010
+> [  215.561512] RBP: 0000000000438b8b R08: 0000000000000000 R09: 00007f2aaecf0060
+> [  215.562511] R10: 000000000e3ba40b R11: 0000000000000293 R12: 0000000000000005
+> [  215.563647] R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000c70750
+> [  215.564693]  </TASK>
+> [  215.565029] irq event stamp: 15979
+> [  215.565584] hardirqs last  enabled at (15991): [<ffffffff811a7432>] __up_console_sem+0x52/0x60
+> [  215.566806] hardirqs last disabled at (16000): [<ffffffff811a7417>] __up_console_sem+0x37/0x60
+> [  215.568022] softirqs last  enabled at (15716): [<ffffffff8277a2db>] __do_softirq+0x3eb/0x531
+> [  215.569239] softirqs last disabled at (15711): [<ffffffff810d8f45>] irq_exit_rcu+0x115/0x160
+> [  215.570434] ---[ end trace 0000000000000000 ]---
+> 
+> This means export_rdev() calls blkdev_put with a different holder than the
+> one used by blkdev_get_by_dev(). This is because mddev->major_version == -2
+> is not a good check for external metadata. Fix this by using
+> mddev->external instead.
+> 
+> Also, do not clear mddev->external in md_clean(), as the flag might be used
+> later in export_rdev().
 
-Now that the driver core allows for struct class to be in read-only
-memory, move the bsg_class structure to be declared at build time
-placing it into read-only memory, instead of having to be dynamically
-allocated at boot time.
+Want me to grab this one directly, or is it going into a pull request?
 
-Cc: FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-scsi@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Ivan Orlov <ivan.orlov0322@gmail.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- block/bsg.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/block/bsg.c b/block/bsg.c
-index 7eca43f33d7f..e04fb075d604 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -39,7 +39,7 @@ static inline struct bsg_device *to_bsg_device(struct inode *inode)
- #define BSG_MAX_DEVS		32768
- 
- static DEFINE_IDA(bsg_minor_ida);
--static struct class *bsg_class;
-+static const struct class bsg_class;
- static int bsg_major;
- 
- static unsigned int bsg_timeout(struct bsg_device *bd, struct sg_io_v4 *hdr)
-@@ -206,7 +206,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
- 		return ERR_PTR(ret);
- 	}
- 	bd->device.devt = MKDEV(bsg_major, ret);
--	bd->device.class = bsg_class;
-+	bd->device.class = &bsg_class;
- 	bd->device.parent = parent;
- 	bd->device.release = bsg_device_release;
- 	dev_set_name(&bd->device, "%s", name);
-@@ -240,15 +240,19 @@ static char *bsg_devnode(const struct device *dev, umode_t *mode)
- 	return kasprintf(GFP_KERNEL, "bsg/%s", dev_name(dev));
- }
- 
-+static const struct class bsg_class = {
-+	.name		= "bsg",
-+	.devnode	= bsg_devnode,
-+};
-+
- static int __init bsg_init(void)
- {
- 	dev_t devid;
- 	int ret;
- 
--	bsg_class = class_create("bsg");
--	if (IS_ERR(bsg_class))
--		return PTR_ERR(bsg_class);
--	bsg_class->devnode = bsg_devnode;
-+	ret = class_register(&bsg_class);
-+	if (ret)
-+		return ret;
- 
- 	ret = alloc_chrdev_region(&devid, 0, BSG_MAX_DEVS, "bsg");
- 	if (ret)
-@@ -260,7 +264,7 @@ static int __init bsg_init(void)
- 	return 0;
- 
- destroy_bsg_class:
--	class_destroy(bsg_class);
-+	class_unregister(&bsg_class);
- 	return ret;
- }
- 
 -- 
-2.41.0
+Jens Axboe
+
 
