@@ -2,94 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C7D9EB64D8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9026CEB64DB
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:25:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232667AbjFTNUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:20:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
+        id S232901AbjFTNZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231805AbjFTNS6 (ORCPT
+        with ESMTP id S233378AbjFTNZ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:18:58 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4401994
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:18:28 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-66872dbc2efso759332b3a.0
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:18:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687267104; x=1689859104;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qGyDV6BAlg2AW/b3jzXgRhCmGRr6ZLpwHtOc10fjN3o=;
-        b=j+JSnZaHENkk6/gyOUztdn3Bz7GVJiGgbR2rn91th1p+H5cIq6OskGo/CrHrzH9r0J
-         3Q1kk3beuF8Ihyxzi2rUZMUPd18f9Xb0O0Y9TxLQOYvOky1Ko3gULNob6mFcjeBSc0vb
-         5ANtL2EhMJaAg+0fY1UoylFmGteRl/0e8eV6bcU9L9t/K80CpFtePvT2e94HOplf6w9b
-         OZJymRSOdf+uLxDObA6QxLhzb+gc6CLrf/CBJ4Bj271Ifma7t6oZzp2qPqhDijr90syL
-         tyzXj/Slr11cRhbQt/iMIKclr3q+y1FhNqAcKNhPPq4TH1fzw7E4NNz1d3NAxjupdPXC
-         zgtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687267104; x=1689859104;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qGyDV6BAlg2AW/b3jzXgRhCmGRr6ZLpwHtOc10fjN3o=;
-        b=GadSEFqUdlFGBTwTwtetMBrHi8xFrXLx9f+HI/7OWjhfjdL0drWDdBKtFvalpIsaFw
-         Glb46SGoMUQOugMYWjkae3VZiB6BWBkOCOizZCedCb3vvqRRQb2C8TTABy7f3bsi7RKz
-         99F1P0HX/Utk4iPisgMrb4XMvyDPBnXmbZ1f7HB2C/bCZgrla9h0ni9njPJOXUBIg99S
-         o8vP0pemDNxzisBJXM4LUb98KjejvS8bNKtyCj7n28I7WCSDaKvoWpuARgBsVNt8m3lz
-         pBLO9k2iX4Ed6juHgCjzjvqrltZI3fZaO4BRFYaspQgTgu7AnU1sdozMUD4vFXw3uqRn
-         oVdg==
-X-Gm-Message-State: AC+VfDxVlbmarwP1MZic94OIUtSknae3zBBC+epYthzIhQqiGfnIImIP
-        iGRksQD8gyr8EH/sCi017iq2ew==
-X-Google-Smtp-Source: ACHHUZ5gYPvoG00x00nmpR0yqB5Lt+RQG9FPGP61KvB/cZ+yjJBGT7Mb+6dVhaCB8APIEa2UxlxcJQ==
-X-Received: by 2002:a05:6a20:a10d:b0:121:84ce:c629 with SMTP id q13-20020a056a20a10d00b0012184cec629mr8053947pzk.0.1687267104438;
-        Tue, 20 Jun 2023 06:18:24 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id r23-20020a634417000000b005143448896csm1399994pga.58.2023.06.20.06.18.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 06:18:23 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     hch@lst.de, brauner@kernel.org, dsterba@suse.com, hare@suse.de,
-        jinpu.wang@ionos.com, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20230618140402.7556-1-yukuai1@huaweicloud.com>
-References: <20230618140402.7556-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH -next v2] block: fix wrong mode for blkdev_get_by_dev()
- from disk_scan_partitions()
-Message-Id: <168726710308.3595534.13269294720973239157.b4-ty@kernel.dk>
-Date:   Tue, 20 Jun 2023 07:18:23 -0600
+        Tue, 20 Jun 2023 09:25:28 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560EB1728;
+        Tue, 20 Jun 2023 06:24:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687267492; x=1718803492;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WcFZ4/tRnJKwxlpGE9cxvnBgRWirStOXaEKgqBUM2Fc=;
+  b=b/XzDVfWsIuqVF+NZPQzShlZh6DF8aTUI2hM6zDVsTMT6gIKRow/ouZo
+   rGFX+SE8GIYD/zbOHJqBYLTogemGAexVRVIKN+TyTY3Xe1jHI+nQsB0xp
+   wGZR0bgiXca01H2Nv4QSqe9Kw/S7ZVaUBl5+RxYdx7jRm64nHerzvleW4
+   8IcHc3AcP93gty5fQ3Z2HJ1QFdfEkaO9BuOQY2YfD7K/k4O2gxVe/MIM4
+   yG/gQFSx6hPPd+DczWarM+8mnHGYaZ31XMIrEzIjS40mcM9gTXFzEnr6b
+   2ZTeNN2sU1DoKqFjn6wVelIOY7A8uhg9VsoB3txS80lHp6Yi1Ts3EKr7x
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="446230259"
+X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
+   d="scan'208";a="446230259"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 06:24:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="664284550"
+X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
+   d="scan'208";a="664284550"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga003.jf.intel.com with ESMTP; 20 Jun 2023 06:24:49 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1qBbLk-005ExW-1m;
+        Tue, 20 Jun 2023 16:24:48 +0300
+Date:   Tue, 20 Jun 2023 16:24:48 +0300
+From:   'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
+Message-ID: <ZJGooPbZQq6G2BjI@smile.fi.intel.com>
+References: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
+ <9258be5d31104805b63bb1a64317a448@AcuMS.aculab.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-c6835
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9258be5d31104805b63bb1a64317a448@AcuMS.aculab.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Jun 20, 2023 at 12:06:49PM +0000, David Laight wrote:
 
-On Sun, 18 Jun 2023 22:04:02 +0800, Yu Kuai wrote:
-> After commit 2736e8eeb0cc ("block: use the holder as indication for
-> exclusive opens"), blkdev_get_by_dev() will warn if holder is NULL and
-> mode contains 'FMODE_EXCL'.
+...
+
+> > +		*hi = clamp_val(*hi, 500, 1000000);
 > 
-> holder from blkdev_get_by_dev() from disk_scan_partitions() is always NULL,
-> hence it should not use 'FMODE_EXCL', which is broben by the commit. For
-> consequence, WARN_ON_ONCE() will be triggered from blkdev_get_by_dev()
-> if user scan partitions with device opened exclusively.
+> (standard rant about minmax.h)
 > 
-> [...]
+> clamp_val() is pretty much broken by design.
+> It MIGHT be ok here but it casts both limits to the
+> type of the value being compared.
+> In general that is just plain wrong.
+> 
+> Like min_t() it is generally ok because the kernel only uses
+> unsigned values between 0 and MAXINT.
+> 
+> If min/max were ok, then using clamp() should also be ok.
 
-Applied, thanks!
+Submit a patch to fix it, if you think you can make it better.
+Obviously your comment can be addressed separately if we even
+need that.
 
-[1/1] block: fix wrong mode for blkdev_get_by_dev() from disk_scan_partitions()
-      commit: 985958b8584cc143555f1bd735e7ab5066c944a7
-
-Best regards,
 -- 
-Jens Axboe
-
+With Best Regards,
+Andy Shevchenko
 
 
