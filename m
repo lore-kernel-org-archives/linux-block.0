@@ -2,118 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD47EEB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 10:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB91EB64DB
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 11:29:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229966AbjFTKl0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 06:41:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58626 "EHLO
+        id S231411AbjFTL36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 07:29:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230527AbjFTKlY (ORCPT
+        with ESMTP id S231246AbjFTL35 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 06:41:24 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF90101;
-        Tue, 20 Jun 2023 03:41:13 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0666E21877;
-        Tue, 20 Jun 2023 10:41:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1687257672; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XKKbRxLiK5MjN6DjyshZqib7TaD9MYDDfRwwRT9YtA8=;
-        b=Jp+q+4HyZOYYp945K1qX1fnrs3NUtbB81jfuZV9cVnKbgkoaWeSpWlR8G1ZBZp90D5PovL
-        2Zax+vZx6iyAztNuVuYLYgmSff3LNGkamFmXTfAfyfs/0B8FJIpqS3MnLFqBcXoAJi2FaF
-        TWY29e6pyjAXTLk8gQ4QyKC9PY5ZjSw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1687257672;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XKKbRxLiK5MjN6DjyshZqib7TaD9MYDDfRwwRT9YtA8=;
-        b=aIiT1BnpOztM/uhMdtG68JiZScMq/zFaK63h9zDnaq1S39ORTlSI7tr2Jgjxmhv0j9vftF
-        u1N2cZbduLv9C6Aw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E98651346D;
-        Tue, 20 Jun 2023 10:41:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id VwP9OEeCkWRTYQAAMHmgww
-        (envelope-from <jack@suse.cz>); Tue, 20 Jun 2023 10:41:11 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 776D4A075D; Tue, 20 Jun 2023 12:41:11 +0200 (CEST)
-Date:   Tue, 20 Jun 2023 12:41:11 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
-        Ted Tso <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
-        linux-fsdevel@vger.kernel.org, Kees Cook <keescook@google.com>,
+        Tue, 20 Jun 2023 07:29:57 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B395DFE;
+        Tue, 20 Jun 2023 04:29:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=UKyYq6BGI39qHhF54xUygHPomuDqkxU7QRjFYmovbx4=; b=W1Jc02jkF0C3QoO2PnI6v5v1JO
+        OhhgE+axnAn29hvFgiuVzAQ0n1r8yyQNnk4RFyxJHRHqh1lI/dAet6cDsU/hZ61h0fooilWFVYcXd
+        GchWarvyAtByVmBemboRBS/9Rqjyd6FvP60DGEacPpTUyD6xfuITc9ljdgNLPbthaYdKTerxPbzYy
+        vcLzjAzEAAqD8meSqR/eeOYczecDiqm8vBlq/pi1Bi2oCi9mRsLK/0hDtNGmtOAGflAVeSHen2uGc
+        uHn0+GMSSLWkv+xtXVSiEBc4PuUl1lvk//8uyVTckBK6FZtbXvo51jmRF8cKiB5KKOn1Ba2F1yv+L
+        LyMt4R2A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qBZYX-00B7u9-1X;
+        Tue, 20 Jun 2023 11:29:53 +0000
+Date:   Tue, 20 Jun 2023 04:29:53 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Dmitry Vyukov <dvyukov@google.com>, Ted Tso <tytso@mit.edu>,
+        yebin <yebin@huaweicloud.com>, linux-fsdevel@vger.kernel.org,
+        Kees Cook <keescook@google.com>,
         Alexander Popov <alex.popov@linux.com>,
         Eric Biggers <ebiggers@google.com>
 Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
  devices
-Message-ID: <20230620104111.pnjoouegp2dx6pcp@quack3>
+Message-ID: <ZJGNsVDhZx0Xgs2H@infradead.org>
 References: <20230612161614.10302-1-jack@suse.cz>
  <ZIf6RrbeyZVXBRhm@infradead.org>
  <20230613205614.atlrwst55bpqjzxf@quack3>
  <ZIlqLJ6dFs1P4aj7@infradead.org>
+ <20230620104111.pnjoouegp2dx6pcp@quack3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZIlqLJ6dFs1P4aj7@infradead.org>
+In-Reply-To: <20230620104111.pnjoouegp2dx6pcp@quack3>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Christoph!
-
-On Wed 14-06-23 00:20:12, Christoph Hellwig wrote:
-> On Tue, Jun 13, 2023 at 10:56:14PM +0200, Jan Kara wrote:
-> > Well, as I've mentioned in the changelog there are old setups (without
-> > initrd) that run fsck on root filesystem mounted read-only and fsck
-> > programs tend to open the device with O_RDWR. These would be broken by this
-> > change (for the filesystems that would use BLK_OPEN_ flag).
+On Tue, Jun 20, 2023 at 12:41:11PM +0200, Jan Kara wrote:
+> I can see several solutions but since you've just reworked the code and I'm
+> not 100% certain about the motivation, I figured I'll ask you first before
+> spending significant time on something you won't like:
 > 
-> But that's also a really broken setup that will corrupt data in many
-> cases.  So yes, maybe we need a way to allow it, but it probably would
-> have to be per-file system.
+> 1) Just return the mode argument to blkdev_put().
+> 
+> 2) Only pass to blkdev_put() whether we have write access or not as a
+> separate argument.
+> 
+> 3) Don't track number of opens for writing, instead check whether writes
+> are blocked on each write access. I think this has a number of downsides
+> but I mention it for completeness. One problem is we have to add checks to
+> multiple places (buffered IO, direct IO) and existing mmap in particular
+> will be very hard to deal with (need to add page_mkwrite() handler). All
+> these checks add performance overhead. It is practically impossible
+> (without significant performance overhead or new percpu datastructures) to
+> properly synchronize open that wants to block writers against already
+> running writes.
 
-I was looking into implementing the write hardening support and I've come
-across the following obstacle: Your patch series that is in linux-block.git
-removes the 'mode' argument from blkdev_put() which makes it impossible to
-track how many writers there are for the block device. This is needed so
-that we can check whether the filesystem is safe when mounting the device.
+I think 3 is out for the reasons you mention.  2 feels a bit ugly,
+but so does 1 given that we only really need the write flag.  One thing
+I through about earlier but decided was overkill at that time is to
+return a cookie from blkdev_get_* that needs to be passed back to
+blkdev_put.  That could either be opaque to the caller, or replace the
+bdev ala:
 
-I can see several solutions but since you've just reworked the code and I'm
-not 100% certain about the motivation, I figured I'll ask you first before
-spending significant time on something you won't like:
+struct bdev_handle {
+	struct block_device *bdev;
+	void *holder;
+	bool for_write;
+};
 
-1) Just return the mode argument to blkdev_put().
+Given that fixups we needed to pass the right holder back in, it feels
+like that would be the least error prone API, even if it is a fair
+amount of churn.
 
-2) Only pass to blkdev_put() whether we have write access or not as a
-separate argument.
-
-3) Don't track number of opens for writing, instead check whether writes
-are blocked on each write access. I think this has a number of downsides
-but I mention it for completeness. One problem is we have to add checks to
-multiple places (buffered IO, direct IO) and existing mmap in particular
-will be very hard to deal with (need to add page_mkwrite() handler). All
-these checks add performance overhead. It is practically impossible
-(without significant performance overhead or new percpu datastructures) to
-properly synchronize open that wants to block writers against already
-running writes.
-
-So what would you prefer? Thanks in advance for your input.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
