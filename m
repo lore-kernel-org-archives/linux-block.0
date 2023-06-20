@@ -2,120 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E80E4EB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2EADEB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:41:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233018AbjFTNh0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:37:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37446 "EHLO
+        id S231866AbjFTNk6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:40:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233014AbjFTNhY (ORCPT
+        with ESMTP id S231974AbjFTNk4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:37:24 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9A81BB;
-        Tue, 20 Jun 2023 06:37:23 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E005C1F88F;
-        Tue, 20 Jun 2023 13:37:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1687268241; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W2dcMlco4IaX1eYG+QaSwRA5SCo5zMhvqpPQKpXYteE=;
-        b=G3zNI7xIRS4BGhdLruB4zto97XoVHG4t1yJ94Ic72x1llG3iXjlJNYS1Cl4P64FTeOnkP1
-        ba5PtHYsZL+o2My5IJ0xUsCq06E81go5qx4vB+HiRl3KDWxi/aCBIejWBHTgMX8l/y/z/N
-        kj1SzfeYkb5jqFLobujjdCNlQbr5DIs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1687268241;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W2dcMlco4IaX1eYG+QaSwRA5SCo5zMhvqpPQKpXYteE=;
-        b=QPyaU8DDuLSEf3IezpMohcmGhrB/Vqfa3ck8yQeA3TXeuhIkkmZazyA9Gu3LGLPS6nhgEj
-        PQq9qfg1vqVl2dDg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D1FC8133A9;
-        Tue, 20 Jun 2023 13:37:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id GA0+M5GrkWTKPQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Tue, 20 Jun 2023 13:37:21 +0000
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH v2 5/5] nvme-fc: do no free ctrl opts
-Date:   Tue, 20 Jun 2023 15:37:11 +0200
-Message-ID: <20230620133711.22840-6-dwagner@suse.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230620133711.22840-1-dwagner@suse.de>
-References: <20230620133711.22840-1-dwagner@suse.de>
+        Tue, 20 Jun 2023 09:40:56 -0400
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6E11704
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:40:54 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-3f3284dff6cso11358585e9.0
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:40:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687268452; x=1689860452;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m1OGu2pUm28FpsvyFdHhbo2XJa+AfqIAoqGJyzvHHWk=;
+        b=eG7DCifX6P5p0cYJLMIOWZ6LvbD2pEz1pTtsSKAy238HyUsoiNZGJ3q8nHoZR4kDGm
+         izhmpuUIQgQ5Vm97ntJa50OtvvExj0h0Hc0KWPjUA6IyI3kp6Enok7NlZfYFeUQbrzKv
+         Tgy03s2v5FUXLtus654EOygNF6vZ4C+o1aSOXRnt0VS9WhzXdHnx7SHd7D/lnHOactoJ
+         jf/LRFtYfqfNA5c93rCeDuWOagcr0gAifC817CLnradYjAO76K/gPBWZbcc4QaraK7xF
+         OW18hHCpD4drmUwlZe5eRUNua6cc4OjYH5fs34m8lyfv4Rg0+gbdk3APzfnVj8R54wzS
+         0wYg==
+X-Gm-Message-State: AC+VfDwEtv/qaWtGDRiuxFPocLCVlIkCWuAJU7vntCvYAlYT5Fku2dmP
+        SUc9VmNdPLpqiYtbybUGuTI=
+X-Google-Smtp-Source: ACHHUZ44cJuwkesDtL/NECGnennY0w2wAzhofWrWomZyX6RfBqrcD+4K0hy3nY3ufEffsP7ax+cdDA==
+X-Received: by 2002:a1c:ed05:0:b0:3f5:927:2b35 with SMTP id l5-20020a1ced05000000b003f509272b35mr10919124wmh.1.1687268452542;
+        Tue, 20 Jun 2023 06:40:52 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id n6-20020a7bcbc6000000b003f7e4d143cfsm2399517wmi.15.2023.06.20.06.40.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jun 2023 06:40:52 -0700 (PDT)
+Message-ID: <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
+Date:   Tue, 20 Jun 2023 16:40:49 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
+        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
+References: <20230620013349.906601-1-ming.lei@redhat.com>
+ <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
+ <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since the initial additional of the FC transport
-e399441de911 ("nvme-fabrics: Add host support for FC transport"), the
-transport also freed the options. Since nvme_free_ctrl() is freeing the
-options too commit de41447aac03 ("nvme-fc: avoid memory corruption
-caused by calling nvmf_free_options() twice") was added to avoid double
-frees.
 
-With the change to make the initial connection attempt synchronous
-again, the life time of all object is known also in the error case. All
-resources will be freed in the same context.
+>>> Hello,
+>>>
+>>> The 1st three patch fixes io hang when controller removal interrupts error
+>>> recovery, then queue is left as frozen.
+>>>
+>>> The 4th patch fixes io hang when controller is left as unquiesce.
+>>
+>> Ming, what happened to nvme-tcp/rdma move of freeze/unfreeze to the
+>> connect patches?
+> 
+> I'd suggest to handle all drivers(include nvme-pci) in same logic for avoiding
+> extra maintain burden wrt. error handling, but looks Keith worries about the
+> delay freezing may cause too many requests queued during error handling, and
+> that might cause user report.
 
-The FC transport should not free the options as the generic auth code is
-relying to be able to read the options even in the shutdown path (see
-nvme_auth_free is calling ctrl_max_dhchaps which relies on opts being a
-valid pointer).
+For nvme-tcp/rdma your patch also addresses IO not failing over because
+they block on queue enter. So I definitely want this for fabrics.
 
-TCP and RDMA also avoid freeing the options, so make the FC transport
-behave the same.
-
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- drivers/nvme/host/fc.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index aa2911f07c6c..6f5cfa47fee5 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2413,8 +2413,6 @@ nvme_fc_ctrl_free(struct kref *ref)
- 	nvme_fc_rport_put(ctrl->rport);
- 
- 	ida_free(&nvme_fc_ctrl_cnt, ctrl->cnum);
--	if (ctrl->ctrl.opts)
--		nvmf_free_options(ctrl->ctrl.opts);
- 	kfree(ctrl);
- }
- 
-@@ -3568,8 +3566,6 @@ nvme_fc_init_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
- 	cancel_work_sync(&ctrl->ctrl.reset_work);
- 	cancel_delayed_work_sync(&ctrl->connect_work);
- 
--	ctrl->ctrl.opts = NULL;
--
- 	/* initiate nvme ctrl ref counting teardown */
- 	nvme_uninit_ctrl(&ctrl->ctrl);
- 
--- 
-2.41.0
-
+AFAICT nvme-pci would also want to failover asap for dual-ported
+multipathed devices, not sure if this is something that we are
+interested in optimizing though, as pci either succeeds the reset,
+or removes the gendisk. But the time-frame is different for fabrics
+for sure.
