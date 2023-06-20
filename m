@@ -2,70 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB592EB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 15:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0BBEB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 17:37:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233751AbjFTPUn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 11:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49950 "EHLO
+        id S229652AbjFTRhr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 13:37:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233710AbjFTPUh (ORCPT
+        with ESMTP id S229585AbjFTRhq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 11:20:37 -0400
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 634C91731;
-        Tue, 20 Jun 2023 08:20:21 -0700 (PDT)
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1b516978829so38925465ad.1;
-        Tue, 20 Jun 2023 08:20:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687274420; x=1689866420;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UkZu9jCa+XfTRWAAYoCY/vLwn0a63A/ySsQ0zgyB474=;
-        b=L0x1BAnwFa8BFZQ4hToy/iV50n0NLNAGN7MOypsL4GO1AriFND1yIEozdfCZIctNx/
-         21OTi383nSISxDKCRVbHVpB1ySmJnwNvxSZlluZSU4A6zj2yDerr1CVLU0nSVxXlPe05
-         n4aEa9gPY6VV2U17l1obZsilbmsgHYy4PlwNcI1PgZh1s4mIAsLPYuvkrnyqGoATADT5
-         4tAZ2JTMsKsyDCA714rZZOw7aKWS4Kcn5l49oco3fdeUjiuwwqmthHsc8xxmUQoEoEtl
-         i2nW57UQtJYo+J/u9vxWJSynv+VqeQ0rLr2++P7zxFJ3Ab0sxliT1fTIiNv8tYi1lBCx
-         ia7w==
-X-Gm-Message-State: AC+VfDykkyVwiZBeDcddNgKebKIpVnmphIusevo+CDvFpvzl0Jd2zbj7
-        c8nc0PFmL98jlfAiOSlApg3ugK7IZ+0=
-X-Google-Smtp-Source: ACHHUZ4MBCV85dCRuk8kuCC6OKtP+c8S5PbvkPPSGNSbIMj9FbJf+UpfzIjIHJMl61Q9dF+caejt3Q==
-X-Received: by 2002:a17:902:f693:b0:1b0:577c:2cb with SMTP id l19-20020a170902f69300b001b0577c02cbmr17114944plg.25.1687274420516;
-        Tue, 20 Jun 2023 08:20:20 -0700 (PDT)
-Received: from [192.168.50.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id i1-20020a170902c94100b001ae7fad1598sm1786314pla.29.2023.06.20.08.20.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jun 2023 08:20:19 -0700 (PDT)
-Message-ID: <4c9fea33-9c30-4ab9-c210-95e09d323837@acm.org>
-Date:   Tue, 20 Jun 2023 08:20:16 -0700
+        Tue, 20 Jun 2023 13:37:46 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AC8F4;
+        Tue, 20 Jun 2023 10:37:45 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8D9611F390;
+        Tue, 20 Jun 2023 17:37:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1687282664; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gQMScDX/cvgFRjCGIqLHXDTtERLukXLjwnsLxfJ35pI=;
+        b=rXYzckEAd/l0kJ6YfTeJZg+wCkmRdBLJw+hsF38Y+EoKp8QkwqmTXIGeD2ViXZfzTOTdEq
+        8hTq2EbCpTiZB/mzgnd6hDcKITLPZ5Kifz6/BaILvMXYTFa+bIEBIw2Bb3e7fMXYWm7Cg7
+        OvNH7suvloGx3Cywr5diI5eRlzlwlJY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1687282664;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gQMScDX/cvgFRjCGIqLHXDTtERLukXLjwnsLxfJ35pI=;
+        b=ns9MlZGHKJUhM/aNne/k5Ws/X7/tyzNRTdXuOac/x2eUDnoTTbJ0BAEtPmUfqYluuO+4dx
+        8imqchkZwihWjsAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6C5E21346D;
+        Tue, 20 Jun 2023 17:37:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id TYX+GejjkWSAMAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 20 Jun 2023 17:37:44 +0000
+Date:   Tue, 20 Jun 2023 19:37:43 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+Subject: Re: [PATCH blktests v1 1/3] nvme/048: Check for queue count check
+ directly
+Message-ID: <f6rvvhgim4nk34onfgbwyfctgvgdbdigwbsugjvizgtli46p57@s7c4gkqrpjqy>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-2-dwagner@suse.de>
+ <380cde65-8794-cfbc-237f-30a8d7e9330c@grimberg.me>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH RFC 0/7] blk-mq: improve tag fair sharing
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        Christoph Hellwig <hch@lst.de>
-References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230618160738.54385-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <380cde65-8794-cfbc-237f-30a8d7e9330c@grimberg.me>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/18/23 09:07, Yu Kuai wrote:
-> This is not a formal version and not fully tested, I send this RFC
-> because I want to make sure if people think doing this is meaningful,
-> before I spend too much time on this.
-The approach looks good to me but I'd like to hear from Jens and 
-Christoph what their opinion is about the approach of this patch series 
-before doing an in-depth review.
+On Tue, Jun 20, 2023 at 04:49:45PM +0300, Sagi Grimberg wrote:
+> > +nvmf_wait_for_queue_count() {
+> > +	local subsys_name="$1"
+> > +	local queue_count="$2"
+> > +	local nvmedev
+> > +
+> > +	nvmedev=$(_find_nvme_dev "${subsys_name}")
+> > +
+> > +	queue_count_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/queue_count"
+> > +
+> > +	nvmf_wait_for_state "${subsys_name}" "live" || return 1
+> > +
+> > +	queue_count=$((queue_count + 1))
+> > +	if grep -q "${queue_count}" "${queue_count_file}"; then
+> > +		return 0
+> > +	fi
+> > +
+> > +	echo "expected queue count ${queue_count} not set"
+> > +	return 1
+> > +}
+> > +
+> >   set_nvmet_attr_qid_max() {
+> >   	local nvmet_subsystem="$1"
+> >   	local qid_max="$2"
+> > @@ -56,10 +76,7 @@ set_qid_max() {
+> >   	local qid_max="$3"
+> >   	set_nvmet_attr_qid_max "${subsys_name}" "${qid_max}"
+> > -
+> > -	# Setting qid_max forces a disconnect and the reconntect attempt starts
+> > -	nvmf_wait_for_state "${subsys_name}" "connecting" || return 1
+> > -	nvmf_wait_for_state "${subsys_name}" "live" || return 1
+> > +	nvmf_wait_for_queue_count "${subsys_name}" "${qid_max}" || return 1
+> 
+> Why not simply wait for live? The connecting is obviously racy...
 
-Thanks,
-
-Bart.
+That is what the new version is doing. It's waiting for the live state and then
+checks the queue count.
