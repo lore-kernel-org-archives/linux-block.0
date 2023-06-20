@@ -2,47 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8FEEB64D8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 18:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8D5EB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 18:02:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230306AbjFTSBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 14:01:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46454 "EHLO
+        id S230493AbjFTSCC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 14:02:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230002AbjFTSBo (ORCPT
+        with ESMTP id S230326AbjFTSBs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 14:01:44 -0400
+        Tue, 20 Jun 2023 14:01:48 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7A11712;
-        Tue, 20 Jun 2023 11:01:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E7812C;
+        Tue, 20 Jun 2023 11:01:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2571961335;
-        Tue, 20 Jun 2023 18:01:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31585C433C0;
-        Tue, 20 Jun 2023 18:01:42 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9EB5961344;
+        Tue, 20 Jun 2023 18:01:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0A2FC433C0;
+        Tue, 20 Jun 2023 18:01:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1687284102;
-        bh=8quhV2tbMNIcgNf0FhcdhJPJLP35KK5ja15vVIBxFig=;
-        h=From:To:Cc:Subject:Date:From;
-        b=dJGwm2likr5rT11+8rajKw5U/eZHzuSqZCyiV2suyc1xrg82/ACKXFepTzj0OIj9T
-         nRND2povsk8RV9FaIP66Ot7MiiCUddSyao0ot0Dh5PLQhZIRsjYXQnFnmLXdjm7/2Y
-         iA4GPYwWhZCbALjdLqr/pn9X1Edo125ekomqkvWk=
+        s=korg; t=1687284107;
+        bh=Llf/Ned9bWpyUTNIfPeCq9J4fpBpz1vG2VKuVCLRwac=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Ns+nAnC4eMK5h5ZIz6RjMrmSOWY80bGcgQooJ1EyFVs3c0vbd8t5a1A3pAExv4IPR
+         8rbTypyZQ1jMkTayjKdlg/6APp+1IRhEnIMxC2/3LRAxuQYAlMFmplKiQku5B6M1aq
+         KVGtDAkwXoOzFQxIG5Qn0kDGylBn0vmqjppcKtcE=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-block@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Ivan Orlov <ivan.orlov0322@gmail.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 1/4] block/rnbd: make all 'class' structures const
-Date:   Tue, 20 Jun 2023 20:01:30 +0200
-Message-ID: <20230620180129.645646-5-gregkh@linuxfoundation.org>
+Subject: [PATCH 3/4] ublk: make ublk_chr_class a static const structure
+Date:   Tue, 20 Jun 2023 20:01:32 +0200
+Message-ID: <20230620180129.645646-7-gregkh@linuxfoundation.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230620180129.645646-5-gregkh@linuxfoundation.org>
+References: <20230620180129.645646-5-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4016; i=gregkh@linuxfoundation.org; h=from:subject; bh=N9xk1YXDw7PpnjqnEHXwkGzYSFFfX4Ar5jAK0R5WDu0=; b=owGbwMvMwCRo6H6F97bub03G02pJDCkTX1Z2Xt7isuaT03bzgzPMlk1q09R2SXAQchQ+6te67 m9IwZtdHbEsDIJMDLJiiixftvEc3V9xSNHL0PY0zBxWJpAhDFycAjCR/RIM82Mm7LOJC5nOfu/b P8tNJrvd7yk38TIs2NqVHxtkMe2z2uYXavpfqrZ1Pj/VDgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2002; i=gregkh@linuxfoundation.org; h=from:subject; bh=hLzPZz0rmzh84KgaQgMKacJTL3bxIGNFuZVcbSsrVZE=; b=owGbwMvMwCRo6H6F97bub03G02pJDCkTX1btfqTzUDKi+PEs1czAv1JPi8IEP6ya+y/OXm/u8 Tm9hTPNOmJZGASZGGTFFFm+bOM5ur/ikKKXoe1pmDmsTCBDGLg4BWAiztYM87MOhog8OjxdQP4g v//nzr+WE3wNbzLML72UWhy4llXr0WY19/9N22IT1n24AwA=
 X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -52,128 +53,68 @@ X-Mailing-List: linux-block@vger.kernel.org
 From: Ivan Orlov <ivan.orlov0322@gmail.com>
 
 Now that the driver core allows for struct class to be in read-only
-memory, making all 'class' structures to be declared at build time
-placing them into read-only memory, instead of having to be dynamically
-allocated at load time.
+memory, move the ublk_chr_class structure to be declared at build time
+placing it into read-only memory, instead of having to be dynamically
+allocated at boot time.
 
-Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
-Cc: Jack Wang <jinpu.wang@ionos.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
 Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Ivan Orlov <ivan.orlov0322@gmail.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/block/rnbd/rnbd-clt-sysfs.c | 20 +++++++++++---------
- drivers/block/rnbd/rnbd-srv-sysfs.c | 22 ++++++++++++----------
- 2 files changed, 23 insertions(+), 19 deletions(-)
+ drivers/block/ublk_drv.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
-index 8c6087949794..e84abac04f4f 100644
---- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-@@ -24,7 +24,9 @@
- #include "rnbd-clt.h"
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 33d3298a0da1..f25d93365701 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -183,7 +183,9 @@ struct ublk_params_header {
+ };
  
- static struct device *rnbd_dev;
--static struct class *rnbd_dev_class;
-+static const struct class rnbd_dev_class = {
-+	.name = "rnbd_client",
+ static dev_t ublk_chr_devt;
+-static struct class *ublk_chr_class;
++static const struct class ublk_chr_class = {
++	.name = "ublk-char",
 +};
- static struct kobject *rnbd_devs_kobj;
  
- enum {
-@@ -646,11 +648,11 @@ int rnbd_clt_create_sysfs_files(void)
- {
- 	int err;
+ static DEFINE_IDR(ublk_index_idr);
+ static DEFINE_SPINLOCK(ublk_idr_lock);
+@@ -1547,7 +1549,7 @@ static int ublk_add_chdev(struct ublk_device *ub)
  
--	rnbd_dev_class = class_create("rnbd-client");
--	if (IS_ERR(rnbd_dev_class))
--		return PTR_ERR(rnbd_dev_class);
-+	err = class_register(&rnbd_dev_class);
-+	if (err)
-+		return err;
+ 	dev->parent = ublk_misc.this_device;
+ 	dev->devt = MKDEV(MAJOR(ublk_chr_devt), minor);
+-	dev->class = ublk_chr_class;
++	dev->class = &ublk_chr_class;
+ 	dev->release = ublk_cdev_rel;
+ 	device_initialize(dev);
  
--	rnbd_dev = device_create_with_groups(rnbd_dev_class, NULL,
-+	rnbd_dev = device_create_with_groups(&rnbd_dev_class, NULL,
- 					      MKDEV(0, 0), NULL,
- 					      default_attr_groups, "ctl");
- 	if (IS_ERR(rnbd_dev)) {
-@@ -666,9 +668,9 @@ int rnbd_clt_create_sysfs_files(void)
+@@ -2347,11 +2349,10 @@ static int __init ublk_init(void)
+ 	if (ret)
+ 		goto unregister_mis;
+ 
+-	ublk_chr_class = class_create("ublk-char");
+-	if (IS_ERR(ublk_chr_class)) {
+-		ret = PTR_ERR(ublk_chr_class);
++	ret = class_register(&ublk_chr_class);
++	if (ret)
+ 		goto free_chrdev_region;
+-	}
++
  	return 0;
  
- dev_destroy:
--	device_destroy(rnbd_dev_class, MKDEV(0, 0));
-+	device_destroy(&rnbd_dev_class, MKDEV(0, 0));
- cls_destroy:
--	class_destroy(rnbd_dev_class);
-+	class_unregister(&rnbd_dev_class);
+ free_chrdev_region:
+@@ -2369,7 +2370,7 @@ static void __exit ublk_exit(void)
+ 	idr_for_each_entry(&ublk_index_idr, ub, id)
+ 		ublk_remove(ub);
  
- 	return err;
- }
-@@ -678,6 +680,6 @@ void rnbd_clt_destroy_sysfs_files(void)
- 	sysfs_remove_group(&rnbd_dev->kobj, &default_attr_group);
- 	kobject_del(rnbd_devs_kobj);
- 	kobject_put(rnbd_devs_kobj);
--	device_destroy(rnbd_dev_class, MKDEV(0, 0));
--	class_destroy(rnbd_dev_class);
-+	device_destroy(&rnbd_dev_class, MKDEV(0, 0));
-+	class_unregister(&rnbd_dev_class);
- }
-diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
-index d5d9267e1fa5..5e69c0112e23 100644
---- a/drivers/block/rnbd/rnbd-srv-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
-@@ -20,7 +20,9 @@
- #include "rnbd-srv.h"
+-	class_destroy(ublk_chr_class);
++	class_unregister(&ublk_chr_class);
+ 	misc_deregister(&ublk_misc);
  
- static struct device *rnbd_dev;
--static struct class *rnbd_dev_class;
-+static const struct class rnbd_dev_class = {
-+	.name = "rnbd-server",
-+};
- static struct kobject *rnbd_devs_kobj;
- 
- static void rnbd_srv_dev_release(struct kobject *kobj)
-@@ -215,12 +217,12 @@ int rnbd_srv_create_sysfs_files(void)
- {
- 	int err;
- 
--	rnbd_dev_class = class_create("rnbd-server");
--	if (IS_ERR(rnbd_dev_class))
--		return PTR_ERR(rnbd_dev_class);
-+	err = class_register(&rnbd_dev_class);
-+	if (err)
-+		return err;
- 
--	rnbd_dev = device_create(rnbd_dev_class, NULL,
--				  MKDEV(0, 0), NULL, "ctl");
-+	rnbd_dev = device_create(&rnbd_dev_class, NULL,
-+				 MKDEV(0, 0), NULL, "ctl");
- 	if (IS_ERR(rnbd_dev)) {
- 		err = PTR_ERR(rnbd_dev);
- 		goto cls_destroy;
-@@ -234,9 +236,9 @@ int rnbd_srv_create_sysfs_files(void)
- 	return 0;
- 
- dev_destroy:
--	device_destroy(rnbd_dev_class, MKDEV(0, 0));
-+	device_destroy(&rnbd_dev_class, MKDEV(0, 0));
- cls_destroy:
--	class_destroy(rnbd_dev_class);
-+	class_unregister(&rnbd_dev_class);
- 
- 	return err;
- }
-@@ -245,6 +247,6 @@ void rnbd_srv_destroy_sysfs_files(void)
- {
- 	kobject_del(rnbd_devs_kobj);
- 	kobject_put(rnbd_devs_kobj);
--	device_destroy(rnbd_dev_class, MKDEV(0, 0));
--	class_destroy(rnbd_dev_class);
-+	device_destroy(&rnbd_dev_class, MKDEV(0, 0));
-+	class_unregister(&rnbd_dev_class);
- }
+ 	idr_destroy(&ublk_index_idr);
 -- 
 2.41.0
 
