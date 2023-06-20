@@ -2,97 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE81AEB64D8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFB5EB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:37:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232967AbjFTNfT convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:35:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35874 "EHLO
+        id S232728AbjFTNhX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:37:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231495AbjFTNfS (ORCPT
+        with ESMTP id S232214AbjFTNhW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:35:18 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED121BB
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:35:16 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-308-di_iNizVO7mVDItkyCs4jg-1; Tue, 20 Jun 2023 14:35:13 +0100
-X-MC-Unique: di_iNizVO7mVDItkyCs4jg-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 20 Jun
- 2023 14:35:11 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Tue, 20 Jun 2023 14:35:11 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
-Thread-Topic: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
-Thread-Index: AQHZoF6FIyAIB0qgg0eyK+mA2nZIdK+TnYVAgAAGJgCAABE0AA==
-Date:   Tue, 20 Jun 2023 13:35:11 +0000
-Message-ID: <cd039ed4855c4e78a0867c4b5173e879@AcuMS.aculab.com>
-References: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
- <9258be5d31104805b63bb1a64317a448@AcuMS.aculab.com>
- <ZJGooPbZQq6G2BjI@smile.fi.intel.com>
-In-Reply-To: <ZJGooPbZQq6G2BjI@smile.fi.intel.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Tue, 20 Jun 2023 09:37:22 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAD161BB;
+        Tue, 20 Jun 2023 06:37:20 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 4BADD1F86B;
+        Tue, 20 Jun 2023 13:37:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1687268239; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tpmAWsOWkVyLjoeN9ZUYCoZ3apyl+Ncz6xO/8B0ViJc=;
+        b=Y3wMKyZ+3CXx5qZJo6c2f2fefVkG8IiP6Cnj0amWnLcyYlY8mZMHXfdb/Hv69YDIfat+8W
+        bbt+byqEZprBPDo+NHRbGDxKBNEcmg+7EX89plbz7JBra1vTHqeKNEjNYk2ytbNERFWcIQ
+        Ag4TnJy+Bj8Hi1aKNKVKoehr/0cSItY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1687268239;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tpmAWsOWkVyLjoeN9ZUYCoZ3apyl+Ncz6xO/8B0ViJc=;
+        b=8Kb8nOBPLR9HatRgwT6hlZ51FhKcOO26NJrRN8EHhBsJKKBrrscZFKPrtN2BiQ1k8k/D1E
+        TE3mc70zWN+mlmAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3D27A133A9;
+        Tue, 20 Jun 2023 13:37:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HarbDo+rkWS9PQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 20 Jun 2023 13:37:19 +0000
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH v2 1/5] nvme-fc: Do not wait in vain when unloading module
+Date:   Tue, 20 Jun 2023 15:37:07 +0200
+Message-ID: <20230620133711.22840-2-dwagner@suse.de>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230620133711.22840-1-dwagner@suse.de>
+References: <20230620133711.22840-1-dwagner@suse.de>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: 'Andy Shevchenko'
-> Sent: 20 June 2023 14:25
-> 
-> On Tue, Jun 20, 2023 at 12:06:49PM +0000, David Laight wrote:
-> 
-> ...
-> 
-> > > +		*hi = clamp_val(*hi, 500, 1000000);
-> >
-> > (standard rant about minmax.h)
-> >
-> > clamp_val() is pretty much broken by design.
-> > It MIGHT be ok here but it casts both limits to the
-> > type of the value being compared.
-> > In general that is just plain wrong.
-> >
-> > Like min_t() it is generally ok because the kernel only uses
-> > unsigned values between 0 and MAXINT.
-> >
-> > If min/max were ok, then using clamp() should also be ok.
-> 
-> Submit a patch to fix it, if you think you can make it better.
-> Obviously your comment can be addressed separately if we even
-> need that.
+The module unload code will wait for a controller to be delete even when
+there is no controller and we wait for completion forever to happen.
+Thus only wait for the completion when there is a controller which
+needs to be removed.
 
-Did you try using clamp() ?
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+ drivers/nvme/host/fc.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-To see why clamp_val() is broken consider?
-	unsigned char val = 200;
-	...
-	xxx = clamp_val(val, 10, 300);
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 2ed75923507d..472ed285fd45 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -3932,10 +3932,11 @@ static int __init nvme_fc_init_module(void)
+ 	return ret;
+ }
  
-This sets xxx to 44 - not exactly expected.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+-static void
++static bool
+ nvme_fc_delete_controllers(struct nvme_fc_rport *rport)
+ {
+ 	struct nvme_fc_ctrl *ctrl;
++	bool cleanup = false;
+ 
+ 	spin_lock(&rport->lock);
+ 	list_for_each_entry(ctrl, &rport->ctrl_list, ctrl_list) {
+@@ -3943,21 +3944,28 @@ nvme_fc_delete_controllers(struct nvme_fc_rport *rport)
+ 			"NVME-FC{%d}: transport unloading: deleting ctrl\n",
+ 			ctrl->cnum);
+ 		nvme_delete_ctrl(&ctrl->ctrl);
++		cleanup = true;
+ 	}
+ 	spin_unlock(&rport->lock);
++
++	return cleanup;
+ }
+ 
+-static void
++static bool
+ nvme_fc_cleanup_for_unload(void)
+ {
+ 	struct nvme_fc_lport *lport;
+ 	struct nvme_fc_rport *rport;
++	bool cleanup = false;
+ 
+ 	list_for_each_entry(lport, &nvme_fc_lport_list, port_list) {
+ 		list_for_each_entry(rport, &lport->endp_list, endp_list) {
+-			nvme_fc_delete_controllers(rport);
++			if (nvme_fc_delete_controllers(rport))
++				cleanup = true;
+ 		}
+ 	}
++
++	return cleanup;
+ }
+ 
+ static void __exit nvme_fc_exit_module(void)
+@@ -3967,10 +3975,8 @@ static void __exit nvme_fc_exit_module(void)
+ 
+ 	spin_lock_irqsave(&nvme_fc_lock, flags);
+ 	nvme_fc_waiting_to_unload = true;
+-	if (!list_empty(&nvme_fc_lport_list)) {
+-		need_cleanup = true;
+-		nvme_fc_cleanup_for_unload();
+-	}
++	if (!list_empty(&nvme_fc_lport_list))
++		need_cleanup = nvme_fc_cleanup_for_unload();
+ 	spin_unlock_irqrestore(&nvme_fc_lock, flags);
+ 	if (need_cleanup) {
+ 		pr_info("%s: waiting for ctlr deletes\n", __func__);
+-- 
+2.41.0
 
