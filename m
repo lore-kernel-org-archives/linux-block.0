@@ -2,165 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A22EB64DB
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 00:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFFBEB64DA
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 01:34:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229453AbjFTABE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jun 2023 20:01:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56834 "EHLO
+        id S229478AbjFTBet (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jun 2023 21:34:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjFTABD (ORCPT
+        with ESMTP id S229454AbjFTBet (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jun 2023 20:01:03 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81951B6;
-        Mon, 19 Jun 2023 17:01:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=KKEFTk8JRt6auD81VmKR05IrMCjbBWj2nan8iYrIAco=; b=BkOXYWjJMwuH6Zf/knOFxYVi98
-        fd+s04668WzEdHaEN9knVPmhJD88r5Szwp+63svW58n4YWbjfgEe5IUbE/4WcNI6oZPY2i6agFS+W
-        5i7NMU95kpsHnNvQGotvj0CfVzaBAjxuMvkBRIv8u8F/dbtLUDW8bI7qJLuqflpUxilYGUY2S1k7p
-        WYnZLwpdxquK22uwkYZ4u2WREnhvin0OQxu0LqII3DZ++DhdTDswWBJk9j35e0dkhGdbvV68Cj3n8
-        96t48dolFnSI0lvPb64uVXfNLJP9FmSS4bTPQW1frFi5prRSOlsXarDZElqNB72Cb7uv8nthCP4v9
-        edo1OPfg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qBOnn-00CPuf-MT; Tue, 20 Jun 2023 00:00:55 +0000
-Date:   Tue, 20 Jun 2023 01:00:55 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Hannes Reinecke <hare@suse.de>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>, gost.dev@samsung.com
-Subject: Re: [PATCH 6/7] mm/filemap: allocate folios with mapping blocksize
-Message-ID: <ZJDsN3UHphxbFGDq@casper.infradead.org>
-References: <20230614114637.89759-1-hare@suse.de>
- <20230614114637.89759-7-hare@suse.de>
- <CGME20230619080901eucas1p224e67aa31866d2ad8d259b2209c2db67@eucas1p2.samsung.com>
- <20230619080857.qxx5c7uaz6pm4h3m@localhost>
- <b6d982ce-3e7e-e433-8339-28ec8474df03@suse.de>
- <ZJDdbPwfXI6eR5vB@dread.disaster.area>
+        Mon, 19 Jun 2023 21:34:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A69551A7
+        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2023 18:34:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687224844;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=hnKE0nWEUjeGlqjsFGsu3Do4KMRWEFRQSaAwoffC8eg=;
+        b=G4k8RFtGd82f2l453d/PBHm2A1hwqcRHn9hkJyIKyI1amSPRzEQ1HFTfQ2IFpzTQNGb825
+        icyW00NjfVRx0vFuyM/M5DFxiVSgoue7ra+mCeqQXCf+CpRd/igt2n1byJbJmjOPW+j4IQ
+        drbAGVmsT42V0BiBvuo5wYtyvwf3dKo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-150-6Q6a6IjnMyGE37_4pFG2UA-1; Mon, 19 Jun 2023 21:33:58 -0400
+X-MC-Unique: 6Q6a6IjnMyGE37_4pFG2UA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E20F229ABA25;
+        Tue, 20 Jun 2023 01:33:57 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A7704C1603B;
+        Tue, 20 Jun 2023 01:33:56 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org
+Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        Chunguang Xu <brookxu.cn@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
+Date:   Tue, 20 Jun 2023 09:33:45 +0800
+Message-Id: <20230620013349.906601-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="XLFzhUqy5ZX2e7O9"
-Content-Disposition: inline
-In-Reply-To: <ZJDdbPwfXI6eR5vB@dread.disaster.area>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
---XLFzhUqy5ZX2e7O9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The 1st three patch fixes io hang when controller removal interrupts error
+recovery, then queue is left as frozen.
 
-On Tue, Jun 20, 2023 at 08:57:48AM +1000, Dave Chinner wrote:
-> What is needed is a field into the mapping that defines the
-> folio order that all folios allocated for the page cache must be
-> aligned/sized to to allow them to be inserted into the mapping.
+The 4th patch fixes io hang when controller is left as unquiesce.
 
-Attached patch from December 2020 ;-)
+V2:
+	- don't unfreeze queue which isn't frozen for avoiding warning from
+	percpu_ref_resurrect() 
 
---XLFzhUqy5ZX2e7O9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-fs-Allow-fine-grained-control-of-folio-sizes.patch"
+Ming Lei (4):
+  blk-mq: add API of blk_mq_unfreeze_queue_force
+  nvme: add nvme_unfreeze_force()
+  nvme: unfreeze queues before removing namespaces
+  nvme: unquiesce io queues when removing namespaces
 
-From 1aeee696f4d322af5f34544e39fc00006c399fb8 Mon Sep 17 00:00:00 2001
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Date: Tue, 15 Dec 2020 10:57:34 -0500
-Subject: [PATCH] fs: Allow fine-grained control of folio sizes
+ block/blk-mq.c           | 28 +++++++++++++++++++++++++---
+ block/blk.h              |  3 ++-
+ block/genhd.c            |  2 +-
+ drivers/nvme/host/core.c | 34 ++++++++++++++++++++++++++++------
+ drivers/nvme/host/nvme.h |  1 +
+ include/linux/blk-mq.h   |  1 +
+ 6 files changed, 58 insertions(+), 11 deletions(-)
 
-Some filesystems want to be able to limit the maximum size of folios,
-and some want to be able to ensure that folios are at least a certain
-size.  Add mapping_set_folio_orders() to allow this level of control
-(although it is not yet honoured).
-
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- include/linux/pagemap.h | 41 +++++++++++++++++++++++++++++++++++++----
- 1 file changed, 37 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index cad81db32e61..9cbb8bdbaee7 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -198,9 +198,15 @@ enum mapping_flags {
- 	AS_EXITING	= 4, 	/* final truncate in progress */
- 	/* writeback related tags are not used */
- 	AS_NO_WRITEBACK_TAGS = 5,
--	AS_LARGE_FOLIO_SUPPORT = 6,
-+	AS_FOLIO_ORDER_MIN = 8,
-+	AS_FOLIO_ORDER_MAX = 13,
-+	/* 8-17 are used for FOLIO_ORDER */
- };
- 
-+#define AS_FOLIO_ORDER_MIN_MASK	0x00001f00
-+#define AS_FOLIO_ORDER_MAX_MASK 0x0002e000
-+#define AS_FOLIO_ORDER_MASK (AS_FOLIO_ORDER_MIN_MASK | AS_FOLIO_ORDER_MAX_MASK)
-+
- /**
-  * mapping_set_error - record a writeback error in the address_space
-  * @mapping: the mapping in which an error should be set
-@@ -290,6 +296,29 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
- 	m->gfp_mask = mask;
- }
- 
-+/**
-+ * mapping_set_folio_orders() - Set the range of folio sizes supported.
-+ * @mapping: The file.
-+ * @min: Minimum folio order (between 0-31 inclusive).
-+ * @max: Maximum folio order (between 0-31 inclusive).
-+ *
-+ * The filesystem should call this function in its inode constructor to
-+ * indicate which sizes of folio the VFS can use to cache the contents
-+ * of the file.  This should only be used if the filesystem needs special
-+ * handling of folio sizes (ie there is something the core cannot know).
-+ * Do not tune it based on, eg, i_size.
-+ * 
-+ * Context: This should not be called while the inode is active as it
-+ * is non-atomic.
-+ */
-+static inline void mapping_set_folio_orders(struct address_space *mapping,
-+		unsigned int min, unsigned int max)
-+{
-+	mapping->flags = (mapping->flags & ~AS_FOLIO_ORDER_MASK) |
-+			(min << AS_FOLIO_ORDER_MIN) |
-+			(max << AS_FOLIO_ORDER_MAX);
-+}
-+
- /**
-  * mapping_set_large_folios() - Indicate the file supports large folios.
-  * @mapping: The file.
-@@ -303,7 +332,12 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
-  */
- static inline void mapping_set_large_folios(struct address_space *mapping)
- {
--	__set_bit(AS_LARGE_FOLIO_SUPPORT, &mapping->flags);
-+	mapping_set_folio_orders(mapping, 0, 31);
-+}
-+
-+static inline unsigned mapping_max_folio_order(struct address_space *mapping)
-+{
-+	return (mapping->flags & AS_FOLIO_ORDER_MAX_MASK) >> AS_FOLIO_ORDER_MAX;
- }
- 
- /*
-@@ -312,8 +346,7 @@ static inline void mapping_set_large_folios(struct address_space *mapping)
-  */
- static inline bool mapping_large_folio_support(struct address_space *mapping)
- {
--	return IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE) &&
--		test_bit(AS_LARGE_FOLIO_SUPPORT, &mapping->flags);
-+	return mapping_max_folio_order(mapping) > 0;
- }
- 
- static inline int filemap_nr_thps(struct address_space *mapping)
 -- 
-2.35.1
+2.40.1
 
-
---XLFzhUqy5ZX2e7O9--
