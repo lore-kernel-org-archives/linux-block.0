@@ -2,208 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D0DEB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 14:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DB7EB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 14:56:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232894AbjFTOHv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 10:07:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58652 "EHLO
+        id S231879AbjFTO4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 10:56:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232412AbjFTOHu (ORCPT
+        with ESMTP id S233009AbjFTO4L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 10:07:50 -0400
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD5BE58;
-        Tue, 20 Jun 2023 07:07:48 -0700 (PDT)
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-3f9b38e4e29so4545135e9.0;
-        Tue, 20 Jun 2023 07:07:48 -0700 (PDT)
+        Tue, 20 Jun 2023 10:56:11 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B11C1709
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 07:56:10 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-343a9a89205so619855ab.1
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 07:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687272969; x=1689864969;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gBTGnP1tMNeZ2bBTWd78SpmQMz2nsFLvJUwCiLFmeqE=;
+        b=gPCMY7GK1J14+rOzq1sFeUzGX2GvjFbq5gWouVtXmJlxA0z1QT89lNcJRcKBflk0T3
+         NdVidbKoh0EwUKVevlsSgOqHLQPROVj/68tCWSvMaBOnSJcW+mZhg7Kt9MjkhokD8trn
+         YWt5VEuN/HgLV9+foIAhMJXFs3p/uRCoIfcim3kVtE0vOYmiv3ruND+NGIen/BgRZ+2w
+         eSBoPAi3WU+IZtmpcfd9fuirOmIz4nG3lcECXxFbEUNPK32TU3oTbGlkt0Lem3IhRnkH
+         s5pwJ4axqnZ8umeHnS4x+kgqPzcPjEdOFDUwh5PABkRlY0jvzW2jmxxa0ECEoNYE0xJA
+         Rlmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687270066; x=1689862066;
+        d=1e100.net; s=20221208; t=1687272969; x=1689864969;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HHDvUdN+oRU2iMEgn1t7pRaNmxE6JGuZWiNo/5GWyY4=;
-        b=fanKIq653AXr40+x6WNYh2jKarV/9YzrnxBNkNMyQ8Bs7xN6axcqMEgFBubSYzZDas
-         vaXJtyyKK8d1j10WyluNFmaBecleyKsD7LEX/F4mQRRTQkdomPCCpmcMcBIEHo8MuOhf
-         fDQXmZriSdZxgVgsmrZlUWiPlgqshxHFVy+Kf3UHfIqNq/akMtsVoSomb0yxKt2BtY1Y
-         PJt0JmaKhWEH4tOdJKBCNlgZU+e4gstju63hAw9TMoWmNOzpxgGxB7U1wITaufSzoyot
-         urjgjP9YTu87+ZqiVI6b74oA2uqa0AmD0Aq/f6ocpaJ80o2L3kXquKu1p4ckUrqrshba
-         VRWA==
-X-Gm-Message-State: AC+VfDydjvqT+liM/lvs3WPrIYaPwOPMHqtBQ/gYoQ7l3r9MJ3Ez3TG1
-        cIuaPeJ3QmKAh0zUQX1vP48=
-X-Google-Smtp-Source: ACHHUZ6piCilQNu/uvBXQjuiMjhYHBZ+tN2L+h9TcYR7FRPajQG6f85LOzKioBcz99YGAe6CKWcu1A==
-X-Received: by 2002:a05:600c:6349:b0:3f9:b3f9:fac4 with SMTP id du9-20020a05600c634900b003f9b3f9fac4mr3677814wmb.1.1687270066361;
-        Tue, 20 Jun 2023 07:07:46 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id n6-20020a7bcbc6000000b003f7e4d143cfsm2453909wmi.15.2023.06.20.07.07.44
+        bh=gBTGnP1tMNeZ2bBTWd78SpmQMz2nsFLvJUwCiLFmeqE=;
+        b=JUMVBqYc52jpijur+v3yfFqySxdbdLRcHHreHqEq/Ugzx/YYP8B6xU+I9NJdkjirpf
+         nOFf8NCilTLwh0Cttwc1DGsXyKjFce/YxViNdtXp7aaLRzJLslpInjI7O606U8gA9Utl
+         o6uuuPt0LuOoWB/iXZ2Nww3zA2PA1sVZYl+/qYIjohfol4itsNyQp06cGAoVysonNlak
+         hvsbkRHQmPOTVoNhjU+ZJFJlLBu7sZYeISrD/NNuzJm8veWwvqP2svlEiqKLC7MKxEx0
+         aX01jwPT07QmPgFPlZQLhUr9E1cgvqHHnTv8aSydManIxgo8b9IP/Q0+//8BWELX0ex3
+         tSRQ==
+X-Gm-Message-State: AC+VfDxGDMxxq0AZiqk4FudxL4tYrVbDQhy6WLNXAIEqh0FmXZVFqW5f
+        GkKRhldlqOM8SI6Q8EZ8PIv8WQ==
+X-Google-Smtp-Source: ACHHUZ4p3kn2ROc8tmUhoaWt7ZtkpMZc9vqxKJfYNnZOjURuEKXPZj75PLiZ13Q6zTYTnIJBlghJJQ==
+X-Received: by 2002:a05:6e02:1a8c:b0:330:a1eb:c5a4 with SMTP id k12-20020a056e021a8c00b00330a1ebc5a4mr12977726ilv.1.1687272969224;
+        Tue, 20 Jun 2023 07:56:09 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id q9-20020a920509000000b0032afe23820bsm652157ile.17.2023.06.20.07.56.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jun 2023 07:07:45 -0700 (PDT)
-Message-ID: <af640019-b867-d488-0443-797a75ba4195@grimberg.me>
-Date:   Tue, 20 Jun 2023 17:07:43 +0300
+        Tue, 20 Jun 2023 07:56:08 -0700 (PDT)
+Message-ID: <0eb6721d-2502-4970-bc55-5d809c8113aa@kernel.dk>
+Date:   Tue, 20 Jun 2023 08:56:07 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
- autoconnect
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 2/3] block: mark bdev files as FMODE_NOWAIT if underlying
+ device supports it
 Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>,
-        Martin Belanger <Martin.Belanger@dell.com>
-References: <20230620132703.20648-1-dwagner@suse.de>
- <20230620132703.20648-3-dwagner@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230620132703.20648-3-dwagner@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
+References: <20230509151910.183637-1-axboe@kernel.dk>
+ <20230509151910.183637-3-axboe@kernel.dk> <ZFucWYxUtBvvRJpR@infradead.org>
+ <8d5daf0d-c623-5918-d40e-ab3ad1c508ad@kernel.dk>
+ <ZJFEz2FKuvIf8aCL@infradead.org>
+ <a7a1dcc3-5aaf-53bc-7527-ba62292c44cd@kernel.dk>
+ <ZJGpv4WjadjdBTmN@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZJGpv4WjadjdBTmN@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-> When the host has enabled the udev/systemd autoconnect services for the
-> fc transport it interacts with blktests and make tests break.
+On 6/20/23 7:29?AM, Christoph Hellwig wrote:
+> On Tue, Jun 20, 2023 at 07:24:56AM -0600, Jens Axboe wrote:
+>> I think we need stronger justification than that, it's much nicer to
+>> have it in the open path than doing the same check over and over for
+>> each IO.
+>>
+>> With your new proposed scheme, why can't the check and FMODE_NOWAIT set
+>> still be in open?
 > 
-> nvme-cli learned to ignore connects attemps when using the
-> --context command line option paired with a volatile configuration. Thus
-> we can mark all the resources created by blktests and avoid any
-> interaction with the systemd autoconnect scripts.
+> Because I want to move the by now huge number of static flags out of
+> file->f_mode and into file->f_op.flags.  It's just that with this patch
+> this one flag isn't static anymore for block devices.  We could also
+> do two sets of file operations assuming we never allow run-time changes
+> for QUEUE_FLAG_NOWAIT.  If we care about optimizing fo async I/O on the
+> few drivers not supporting QUEUE_FLAG_NOWAIT that's probably the next
+> best thing.
 
-Hmm... is this hapenning with non-fc as well?
+Doing two sets of fops makes sense to me, and then hopefully down the
+line we can shave it down to 1 again once everything sets FMODE_NOWAIT.
 
-> 
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> ---
->   tests/nvme/rc | 73 ++++++++++++++++++++++++++++++++++++++++++++-------
->   1 file changed, 63 insertions(+), 10 deletions(-)
-> 
-> diff --git a/tests/nvme/rc b/tests/nvme/rc
-> index 191f3e2e0c43..00117d314a38 100644
-> --- a/tests/nvme/rc
-> +++ b/tests/nvme/rc
-> @@ -14,8 +14,8 @@ def_remote_wwnn="0x10001100aa000001"
->   def_remote_wwpn="0x20001100aa000001"
->   def_local_wwnn="0x10001100aa000002"
->   def_local_wwpn="0x20001100aa000002"
-> -def_hostnqn="$(cat /etc/nvme/hostnqn 2> /dev/null)"
-> -def_hostid="$(cat /etc/nvme/hostid 2> /dev/null)"
-> +def_hostnqn="nqn.2014-08.org.nvmexpress:uuid:242d4a24-2484-4a80-8234-d0169409c5e8"
-> +def_hostid="242d4a24-2484-4a80-8234-d0169409c5e8"
->   nvme_trtype=${nvme_trtype:-"loop"}
->   nvme_img_size=${nvme_img_size:-"1G"}
->   nvme_num_iter=${nvme_num_iter:-"1000"}
-> @@ -161,6 +161,50 @@ _nvme_calc_rand_io_size() {
->   	echo "${io_size_kb}k"
->   }
->   
-> +_nvme_cli_supports_context() {
-> +	if ! nvme connect --help 2>&1 | grep -q context > /dev/null; then
-> +		    return 1
-> +	fi
-> +	return 0
-> +}
+-- 
+Jens Axboe
 
-Not a great way to check support.
-
-> +
-> +_setup_nvme_cli() {
-> +	if ! _nvme_cli_supports_context; then
-> +		return
-> +	fi
-> +
-> +	mkdir -p /run/nvme
-> +	cat >> /run/nvme/blktests.json <<-EOF
-> +	[
-> +	  {
-> +	    "hostnqn": "${def_hostnqn}",
-> +	    "hostid": "${def_hostid}",
-> +	    "subsystems": [
-> +	      {
-> +	        "application": "blktests",
-> +	        "nqn": "blktests-subsystem-1",
-> +	        "ports": [
-> +	          {
-> +	            "transport": "fc",
-> +	            "traddr": "nn-${def_remote_wwnn}:pn-${def_remote_wwpn}",
-> +	            "host_traddr": "nn-${def_local_wwnn}:pn-${def_local_wwpn}"
-> +	          }
-> +	        ]
-> +	      }
-> +	    ]
-> +	  }
-> +	]
-> +	EOF
-> +}
-> +
-> +_cleanup_nvme_cli() {
-> +	if ! _nvme_cli_supports_context; then
-> +		return
-> +	fi
-> +
-> +	rm -f /run/nvme/blktests.json
-> +}
-> +
->   _nvme_fcloop_add_rport() {
->   	local local_wwnn="$1"
->   	local local_wwpn="$2"
-> @@ -235,6 +279,8 @@ _cleanup_fcloop() {
->   	_nvme_fcloop_del_lport "${local_wwnn}" "${local_wwpn}"
->   	_nvme_fcloop_del_rport "${local_wwnn}" "${local_wwpn}" \
->   			       "${remote_wwnn}" "${remote_wwpn}"
-> +
-> +	_cleanup_nvme_cli
->   }
->   
->   _cleanup_nvmet() {
-> @@ -337,6 +383,8 @@ _setup_nvmet() {
->   		def_host_traddr=$(printf "nn-%s:pn-%s" \
->   					 "${def_local_wwnn}" \
->   					 "${def_local_wwpn}")
-> +
-> +		_setup_nvme_cli
->   	fi
->   }
->   
-> @@ -436,18 +484,18 @@ _nvme_connect_subsys() {
->   	trtype="$1"
->   	subsysnqn="$2"
->   
-> -	ARGS=(-t "${trtype}" -n "${subsysnqn}")
-> +	ARGS=(-t "${trtype}"
-> +	      -n "${subsysnqn}"
-> +	      --hostnqn="${hostnqn}"
-> +	      --hostid="${hostid}")
-> +	if _nvme_cli_supports_context; then
-> +		ARGS+=(--context="blktests")
-> +	fi
->   	if [[ "${trtype}" == "fc" ]] ; then
->   		ARGS+=(-a "${traddr}" -w "${host_traddr}")
->   	elif [[ "${trtype}" != "loop" ]]; then
->   		ARGS+=(-a "${traddr}" -s "${trsvcid}")
->   	fi
-> -	if [[ "${hostnqn}" != "$def_hostnqn" ]]; then
-> -		ARGS+=(--hostnqn="${hostnqn}")
-> -	fi
-> -	if [[ "${hostid}" != "$def_hostid" ]]; then
-> -		ARGS+=(--hostid="${hostid}")
-> -	fi
->   	if [[ -n "${hostkey}" ]]; then
->   		ARGS+=(--dhchap-secret="${hostkey}")
->   	fi
-> @@ -482,7 +530,12 @@ _nvme_discover() {
->   	local host_traddr="${3:-$def_host_traddr}"
->   	local trsvcid="${3:-$def_trsvcid}"
->   
-> -	ARGS=(-t "${trtype}")
-> +	ARGS=(-t "${trtype}"
-> +	      --hostnqn="${def_hostnqn}"
-> +	      --hostid="${def_hostid}")
-> +	if _nvme_cli_supports_context; then
-> +		ARGS+=(--context="blktests")
-> +	fi
->   	if [[ "${trtype}" = "fc" ]]; then
->   		ARGS+=(-a "${traddr}" -w "${host_traddr}")
->   	elif [[ "${trtype}" != "loop" ]]; then
