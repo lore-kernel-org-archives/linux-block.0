@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB7EEB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:37:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C243BC001B3
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:37:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233015AbjFTNhY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:37:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37424 "EHLO
+        id S232845AbjFTNhZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:37:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229746AbjFTNhW (ORCPT
+        with ESMTP id S233008AbjFTNhX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:37:22 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39848E42;
-        Tue, 20 Jun 2023 06:37:21 -0700 (PDT)
+        Tue, 20 Jun 2023 09:37:23 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8902C10F9;
+        Tue, 20 Jun 2023 06:37:22 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id DE35621870;
-        Tue, 20 Jun 2023 13:37:19 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 3FEA71F88C;
+        Tue, 20 Jun 2023 13:37:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1687268239; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1687268241; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=z2Xs/tcpwU0Uv48eQ0cs8T6HophW0a0CS0HC3EAtVqs=;
-        b=02Xr0NzYnHXIrp8PU6lcbLz1Gyl6qfsqIenmk76l6buD7b6axvSOwi2PwobMz2e/eHn5sH
-        le9bMOuvEt3hWCKghdBRmLiUnii2Jo0rqAEpEXHLH+dWf2jpONURT2wK1Bpyqa80e9IWyN
-        L1tZQ5XflFbOchMOOUaR0BFVEvX74Aw=
+        bh=BjqQt4D7bz3ycKlBkDP6byX+9ncqyQX2u0PfjF3kOqU=;
+        b=bZPMqWQ/ZKEK1kFvUpeCocMqDCRGCEMfHUdlXWEljoX0XBPPiQTfZHTu7rI0SC1/EBEwj2
+        gN9CVEVtyIRqEoyUl4nGMsJqksYol1ZWE3vIuYLKVruYDL7x6TIH1+H5/aB0LHvGU/e9g+
+        8vvMP9014ek2uQBX14/TzdsvHJzNJdY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1687268239;
+        s=susede2_ed25519; t=1687268241;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=z2Xs/tcpwU0Uv48eQ0cs8T6HophW0a0CS0HC3EAtVqs=;
-        b=3+PVtUcCmTR61eH/25G8h4J/cPIG5Rm3qB1jPoe4Y2AzeyDGlOUkytX7Tj5yuVU0T48FSW
-        2chfVwnlXV7e0gAA==
+        bh=BjqQt4D7bz3ycKlBkDP6byX+9ncqyQX2u0PfjF3kOqU=;
+        b=ZdB051TkUH69jvTTCVTUawhCT/PK5HHoGCsBhqqe/FbwrYRR/hnE9PslGO38owzEBC8IYF
+        NDHs8foTLRHjZ3Ag==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CEBF8133A9;
-        Tue, 20 Jun 2023 13:37:19 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 308AB133A9;
+        Tue, 20 Jun 2023 13:37:21 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id O5MfMo+rkWS/PQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Tue, 20 Jun 2023 13:37:19 +0000
+        id fnPKC5GrkWTGPQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 20 Jun 2023 13:37:21 +0000
 From:   Daniel Wagner <dwagner@suse.de>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>,
         James Smart <jsmart2021@gmail.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH v2 2/5] nvme-fcloop: queue work items correctly
-Date:   Tue, 20 Jun 2023 15:37:08 +0200
-Message-ID: <20230620133711.22840-3-dwagner@suse.de>
+Subject: [PATCH v2 4/5] nvme-fc: Make initial connect attempt synchronous
+Date:   Tue, 20 Jun 2023 15:37:10 +0200
+Message-ID: <20230620133711.22840-5-dwagner@suse.de>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230620133711.22840-1-dwagner@suse.de>
 References: <20230620133711.22840-1-dwagner@suse.de>
@@ -70,59 +70,82 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The arguments passed to list_add_tail are reversed. The new element is
-first argument and the queue/list is the second one.
+Commit 4c984154efa1 ("nvme-fc: change controllers first connect to use
+reconnect path") made the connection attempt asynchronous in order to
+make the connection attempt from autoconnect/boot via udev/systemd up
+case a bit more reliable.
 
-Fixes: 38803fcffb5b ("nvme-fcloop: fix deallocation of working context")
-Fixes: 437c0b824dbd ("nvme-fcloop: add target to host LS request support")
+Unfortunately, one side effect of this is that any wrong parameters
+provided from userspace will not be directly reported as invalid, e.g.
+auth keys.
 
-Cc: James Smart <jsmart2021@gmail.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+So instead having the policy code inside the kernel it's better to
+address this in userspace, for example in nvme-cli or nvme-stas.
+
+This aligns the fc transport with tcp and rdma.
+
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
 ---
- drivers/nvme/target/fcloop.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/nvme/host/fc.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/nvme/target/fcloop.c b/drivers/nvme/target/fcloop.c
-index c65a73433c05..4b35bdcac185 100644
---- a/drivers/nvme/target/fcloop.c
-+++ b/drivers/nvme/target/fcloop.c
-@@ -358,7 +358,7 @@ fcloop_h2t_ls_req(struct nvme_fc_local_port *localport,
- 	if (!rport->targetport) {
- 		tls_req->status = -ECONNREFUSED;
- 		spin_lock(&rport->lock);
--		list_add_tail(&rport->ls_list, &tls_req->ls_list);
-+		list_add_tail(&tls_req->ls_list, &rport->ls_list);
- 		spin_unlock(&rport->lock);
- 		queue_work(nvmet_wq, &rport->ls_work);
- 		return ret;
-@@ -391,7 +391,7 @@ fcloop_h2t_xmt_ls_rsp(struct nvmet_fc_target_port *targetport,
- 	if (remoteport) {
- 		rport = remoteport->private;
- 		spin_lock(&rport->lock);
--		list_add_tail(&rport->ls_list, &tls_req->ls_list);
-+		list_add_tail(&tls_req->ls_list, &rport->ls_list);
- 		spin_unlock(&rport->lock);
- 		queue_work(nvmet_wq, &rport->ls_work);
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 472ed285fd45..aa2911f07c6c 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -2943,6 +2943,8 @@ nvme_fc_create_io_queues(struct nvme_fc_ctrl *ctrl)
+ 	/* force put free routine to ignore io queues */
+ 	ctrl->ctrl.tagset = NULL;
+ 
++	if (ret > 0)
++		ret = -EIO;
+ 	return ret;
+ }
+ 
+@@ -3545,21 +3547,15 @@ nvme_fc_init_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
+ 	list_add_tail(&ctrl->ctrl_list, &rport->ctrl_list);
+ 	spin_unlock_irqrestore(&rport->lock, flags);
+ 
+-	if (!nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_RESETTING) ||
+-	    !nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_CONNECTING)) {
++	if (!nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_CONNECTING)) {
+ 		dev_err(ctrl->ctrl.device,
+ 			"NVME-FC{%d}: failed to init ctrl state\n", ctrl->cnum);
+ 		goto fail_ctrl;
  	}
-@@ -446,7 +446,7 @@ fcloop_t2h_ls_req(struct nvmet_fc_target_port *targetport, void *hosthandle,
- 	if (!tport->remoteport) {
- 		tls_req->status = -ECONNREFUSED;
- 		spin_lock(&tport->lock);
--		list_add_tail(&tport->ls_list, &tls_req->ls_list);
-+		list_add_tail(&tls_req->ls_list, &tport->ls_list);
- 		spin_unlock(&tport->lock);
- 		queue_work(nvmet_wq, &tport->ls_work);
- 		return ret;
-@@ -478,7 +478,7 @@ fcloop_t2h_xmt_ls_rsp(struct nvme_fc_local_port *localport,
- 	if (targetport) {
- 		tport = targetport->private;
- 		spin_lock(&tport->lock);
--		list_add_tail(&tport->ls_list, &tls_req->ls_list);
-+		list_add_tail(&tls_req->ls_list, &tport->ls_list);
- 		spin_unlock(&tport->lock);
- 		queue_work(nvmet_wq, &tport->ls_work);
- 	}
+ 
+-	if (!queue_delayed_work(nvme_wq, &ctrl->connect_work, 0)) {
+-		dev_err(ctrl->ctrl.device,
+-			"NVME-FC{%d}: failed to schedule initial connect\n",
+-			ctrl->cnum);
++	ret = nvme_fc_create_association(ctrl);
++	if (ret)
+ 		goto fail_ctrl;
+-	}
+-
+-	flush_delayed_work(&ctrl->connect_work);
+ 
+ 	dev_info(ctrl->ctrl.device,
+ 		"NVME-FC{%d}: new ctrl: NQN \"%s\"\n",
+@@ -3568,7 +3564,6 @@ nvme_fc_init_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
+ 	return &ctrl->ctrl;
+ 
+ fail_ctrl:
+-	nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_DELETING);
+ 	cancel_work_sync(&ctrl->ioerr_work);
+ 	cancel_work_sync(&ctrl->ctrl.reset_work);
+ 	cancel_delayed_work_sync(&ctrl->connect_work);
+@@ -3590,7 +3585,9 @@ nvme_fc_init_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
+ 	 */
+ 	nvme_fc_rport_get(rport);
+ 
+-	return ERR_PTR(-EIO);
++	if (ret > 0)
++		ret = -EIO;
++	return ERR_PTR(ret);
+ 
+ out_free_queues:
+ 	kfree(ctrl->queues);
 -- 
 2.41.0
 
