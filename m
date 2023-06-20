@@ -2,90 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA80EB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 15:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83422EB64DB
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 15:05:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233507AbjFTPEP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 11:04:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35206 "EHLO
+        id S231284AbjFTPFW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 11:05:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233506AbjFTPDs (ORCPT
+        with ESMTP id S233506AbjFTPEh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 11:03:48 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 295BD2132;
-        Tue, 20 Jun 2023 08:03:06 -0700 (PDT)
+        Tue, 20 Jun 2023 11:04:37 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7731BF1;
+        Tue, 20 Jun 2023 08:04:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687273386; x=1718809386;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Hzw44yA3rq4A0NkiNihEuh1kmsiFbLAMHu6FhlLV5CY=;
-  b=dvIOePVKAx/xtC1am05TA9fMEcxZkiSosCtYNJ65Osx2kWmXzh0MGKA7
-   mtUCaTil1LOmw5q6VXagk8QJGroaBK6uqG3WTe/LtKvGra8+B/RXpRyAr
-   +Qr5JbhzbKN/f1bjDNTRbi+GkHvL4RagCAub6+DI7DTHMPkTfgQ04FGZ8
-   ORxNERBsxQAO+vFKvXYfi6w4av7DPDiTRCBzHvFaWOdUuyuBDw+IjbT6C
-   69S2xSL4KuM/S3S4nNAgZUM+9gzaoTnXj6fXNePmPRCtiV7YmSUQMmreT
-   MBe19QlcP/5B+CXCimxPMstoyhiPF+T4v+gWAh8gDRzymMNOEsP/lLG1f
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="358756249"
+  t=1687273444; x=1718809444;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ivrsLAv5ei2pZb4Fe2LCuh5oh+6GLbCVwN4d6QsS9D8=;
+  b=Ls+OE77fthsZ7s/JXh7RdhQD3L6XDslz042uflQhqPqtvD021cTH2Z3H
+   BCVUet9v/HzWkHj2+g4W23VDSrch38e8iVY+kLSK7RmdwXLdb/yM8U6DF
+   9KbozY016ZC1OwFEn9d3HWD0F8PVjjUZYRVjldX7TL6lSJP5aSJ9yppu2
+   p/hqFtajuzq898WvqJ13+fDWJNaLc/bhGb3HYv0pJtkhXqMnlrvbqz+Nl
+   Yta5ATv7vUDj48Uc0tlJRe4KT3e0Shp6zvI0K3uh2FhWNbMBsl1sVmEVs
+   nvSlsYYh3wRCqZOjpa4Na1yRYyYfDdtwBrJOJCrPSe43/G0KO/bvrQrqV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="423546437"
 X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="358756249"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 08:01:53 -0700
+   d="scan'208";a="423546437"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 08:03:21 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="888268694"
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="708309489"
 X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="888268694"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga005.jf.intel.com with ESMTP; 20 Jun 2023 08:01:51 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id 5A6C2413; Tue, 20 Jun 2023 18:02:01 +0300 (EEST)
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Jens Axboe <axboe@kernel.dk>,
+   d="scan'208";a="708309489"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga007.jf.intel.com with ESMTP; 20 Jun 2023 08:03:19 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1qBct4-005Had-02;
+        Tue, 20 Jun 2023 18:03:18 +0300
+Date:   Tue, 20 Jun 2023 18:03:17 +0300
+From:   'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v2 1/1] pktcdvd: Use clamp() instead of min()+max()
-Date:   Tue, 20 Jun 2023 18:01:59 +0300
-Message-Id: <20230620150159.63886-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.40.0.1.gaa8946217a0b
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
+Message-ID: <ZJG/tfh7kKauoMZJ@smile.fi.intel.com>
+References: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
+ <9258be5d31104805b63bb1a64317a448@AcuMS.aculab.com>
+ <ZJGooPbZQq6G2BjI@smile.fi.intel.com>
+ <cd039ed4855c4e78a0867c4b5173e879@AcuMS.aculab.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cd039ed4855c4e78a0867c4b5173e879@AcuMS.aculab.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In a couple of places replace min()+max() pair by clamp().
+On Tue, Jun 20, 2023 at 01:35:11PM +0000, David Laight wrote:
+> From: 'Andy Shevchenko'
+> > Sent: 20 June 2023 14:25
+> > On Tue, Jun 20, 2023 at 12:06:49PM +0000, David Laight wrote:
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
-v2: Switched to clamp() for strict type checking (David)
- drivers/block/pktcdvd.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+...
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index a1428538bda5..2fe56afc53d4 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -208,14 +208,11 @@ static DEVICE_ATTR_RO(size);
- static void init_write_congestion_marks(int* lo, int* hi)
- {
- 	if (*hi > 0) {
--		*hi = max(*hi, 500);
--		*hi = min(*hi, 1000000);
-+		*hi = clamp(*hi, 500, 1000000);
- 		if (*lo <= 0)
- 			*lo = *hi - 100;
--		else {
--			*lo = min(*lo, *hi - 100);
--			*lo = max(*lo, 100);
--		}
-+		else
-+			*lo = clamp(*lo, 100, *hi - 100);
- 	} else {
- 		*hi = -1;
- 		*lo = -1;
+> > > > +		*hi = clamp_val(*hi, 500, 1000000);
+> > >
+> > > (standard rant about minmax.h)
+> > >
+> > > clamp_val() is pretty much broken by design.
+> > > It MIGHT be ok here but it casts both limits to the
+> > > type of the value being compared.
+> > > In general that is just plain wrong.
+> > >
+> > > Like min_t() it is generally ok because the kernel only uses
+> > > unsigned values between 0 and MAXINT.
+> > >
+> > > If min/max were ok, then using clamp() should also be ok.
+> > 
+> > Submit a patch to fix it, if you think you can make it better.
+> > Obviously your comment can be addressed separately if we even
+> > need that.
+> 
+> Did you try using clamp() ?
+> 
+> To see why clamp_val() is broken consider?
+> 	unsigned char val = 200;
+> 	...
+> 	xxx = clamp_val(val, 10, 300);
+>  
+> This sets xxx to 44 - not exactly expected.
+
+Right, clamp_val() has to be improved.
+However this is not the case in this driver.
+
+I have just sent a v2 with clamp().
+
 -- 
-2.40.0.1.gaa8946217a0b
+With Best Regards,
+Andy Shevchenko
+
 
