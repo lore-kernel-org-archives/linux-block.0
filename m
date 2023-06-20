@@ -2,126 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55271EB64D8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 08:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC40AEB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 08:39:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231867AbjFTIWn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 04:22:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40392 "EHLO
+        id S231980AbjFTIjD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 04:39:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231859AbjFTIWm (ORCPT
+        with ESMTP id S231978AbjFTIjB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 04:22:42 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CE22E72;
-        Tue, 20 Jun 2023 01:22:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=aY/GHphTzSqrblGLnT2lqkDfbH0+6FyRO/00GzxaGNc=; b=QOftA5ku4YdAvQ3OxFc0cD/U+l
-        zweN/cuddeShnRLQxdFLX3nOF8C5cnxqLoq/eqDhM4zfJCMbDRJAipiHnHqzgQ7gK6gPauTTbVO4h
-        sg/pu/ifc19KrWxw4V/Tmf1RZV247n/1L1XbdsHBZYhqkfUyGjOn8+EXYtv5HF6GCe2EkI7WjR+ZW
-        sHKaWmkZLp0v4G08kRWMAampnpEos7jFIbGIA6FPOooQQD8IZN+N3r53IlavLG/bAJNUFLRE5F+rs
-        YnutZi94PLjARBevOA8guq4NxA1dzHU3sLrKy0gSTjxD1Wkie1Qa3YWXr56ZkQaA1sPbcyt7u8S0f
-        7N3NTYKg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qBWd2-00AYvy-0k;
-        Tue, 20 Jun 2023 08:22:20 +0000
-Date:   Tue, 20 Jun 2023 01:22:20 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/3] block: mark bdev files as FMODE_NOWAIT if underlying
- device supports it
-Message-ID: <ZJFhvAYlSQfJmQC2@infradead.org>
-References: <20230509151910.183637-1-axboe@kernel.dk>
- <20230509151910.183637-3-axboe@kernel.dk>
- <ZFucWYxUtBvvRJpR@infradead.org>
- <8d5daf0d-c623-5918-d40e-ab3ad1c508ad@kernel.dk>
- <ZJFEz2FKuvIf8aCL@infradead.org>
+        Tue, 20 Jun 2023 04:39:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA27DB
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 01:39:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2B4316108A
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 08:39:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06FA3C433C0;
+        Tue, 20 Jun 2023 08:38:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687250339;
+        bh=jjUcMxYNhNCneqRlZF5iLv7MfScvw8SWroDvMEU+tL0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=OYGS5cHpN3f+NrZZ5orExkj8NNsagzinG6ovnDk1G0AdA+KNV6lhYVXgS1Jml8PrT
+         TZUFDHSzvEQMfSU7p4/abd9b8S6k/4Z8E+Cxe6evUww6Q/BVBOYfa2FMJzzX46TVJh
+         9ajTtDSyG6/GP4tkNTnpJrXbnjH4DF7FOaUV1Mnc7ikI75oW1uFCnIvVvQb6PeNW/2
+         2apBceOJXZq1H+skui8q18HCtc3ZuCr3wV2L2RLXX1s5vE0D8QEIFb3oP1i4rait8S
+         +7gKITbEaCc+dsmYlnmpmnDbGpm97yFN4uxu9iauUr5nXJe5WRajAHEBdTwHxa7K3K
+         tshQCrVao5PuQ==
+From:   Damien Le Moal <dlemoal@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     Suwan Kim <suwan.kim027@gmail.com>,
+        Sam Li <faithilikerun@gmail.com>
+Subject: [PATCH] block: virtio-blk: Fix handling of zone append command completion
+Date:   Tue, 20 Jun 2023 17:38:57 +0900
+Message-Id: <20230620083857.611153-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJFEz2FKuvIf8aCL@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 19, 2023 at 11:18:55PM -0700, Christoph Hellwig wrote:
-> So it turns out this gets into the way of my planned cleanup to move
-> all the tatic FMODE_ flags out of this basically full field into a new
-> static one in file_operations.  Do you think it is ok to go back to
-> always claiming FMODE_NOWAIT for block devices and then just punt for
-> the drivers that don't support it like the patch below?
+The introduction of completion batching with commit 07b679f70d73
+("virtio-blk: support completion batching for the IRQ path") overlloked
+handling correctly the completion of zone append operations, which
+require an update of the request __sector field, as is done in
+virtblk_request_done(): the function virtblk_complete_batch() only
+executes virtblk_unmap_data() and virtblk_cleanup_cmd() without doing
+this update. This causes problems with zone append operations, e.g.
+zonefs complains about invalid zone append locations.
 
-Except that the version I posted if of course completly broken as my
-testing rig told me.  This is the version that actually works:
+Fix this by introducing the function virtblk_end_request(), which is
+almost identicatl to virtblk_request_done() but without the call to
+blk_mq_end_request(). Use this new function to rewrite
+virtblk_request_done() and call it in virtblk_complete_batch() to end
+all request of a batch.
 
+Reported-by: Sam Li <faithilikerun@gmail.com>
+Fixes: 07b679f70d73 ("virtio-blk: support completion batching for the IRQ path")
+Cc: stable@vger.kernel.org
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 ---
-From 7916df7434e1570978b9c81c65aa1ec1f3396b13 Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Tue, 20 Jun 2023 07:53:13 +0200
-Subject: block: always set FMODE_NOWAIT
+ drivers/block/virtio_blk.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-Block devices are the only file_operations that do not set FMODE_NOWAIT
-unconditionall in ->open and thus get in the way of a planned cleanup to
-move this flags into a static field in file_operations.   Switch to
-always set FMODE_NOWAIT and just return -EAGAIN if it isn't actually
-supported.  This just affects minor ->submit_bio based drivers as all
-blk-mq drivers and the important remappers (dm, md, nvme-multipath)
-support nowait I/O.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/fops.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/block/fops.c b/block/fops.c
-index 555b1b9ecd2cb9..58c2f65ae4a57e 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -505,7 +505,7 @@ static int blkdev_open(struct inode *inode, struct file *filp)
- 	 * during an unstable branch.
- 	 */
- 	filp->f_flags |= O_LARGEFILE;
--	filp->f_mode |= FMODE_BUF_RASYNC;
-+	filp->f_mode |= FMODE_BUF_RASYNC | FMODE_NOWAIT;
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 2b918e28acaa..513d8b582aec 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -332,10 +332,9 @@ static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
+ 	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
+ }
  
- 	/*
- 	 * Use the file private data to store the holder for exclusive openes.
-@@ -519,9 +519,6 @@ static int blkdev_open(struct inode *inode, struct file *filp)
- 	if (IS_ERR(bdev))
- 		return PTR_ERR(bdev);
+-static inline void virtblk_request_done(struct request *req)
++static inline blk_status_t virtblk_end_request(struct request *req)
+ {
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+-	blk_status_t status = virtblk_result(virtblk_vbr_status(vbr));
+ 	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
  
--	if (bdev_nowait(bdev))
--		filp->f_mode |= FMODE_NOWAIT;
--
- 	filp->f_mapping = bdev->bd_inode->i_mapping;
- 	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
- 	return 0;
-@@ -563,6 +560,9 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
- 		return -EOPNOTSUPP;
+ 	virtblk_unmap_data(req, vbr);
+@@ -345,17 +344,21 @@ static inline void virtblk_request_done(struct request *req)
+ 		req->__sector = virtio64_to_cpu(vblk->vdev,
+ 						vbr->in_hdr.zone_append.sector);
  
-+	if ((iocb->ki_flags & IOCB_NOWAIT) && !bdev_nowait(bdev))
-+		return -EAGAIN;
+-	blk_mq_end_request(req, status);
++	return virtblk_result(virtblk_vbr_status(vbr));
++}
 +
- 	size -= iocb->ki_pos;
- 	if (iov_iter_count(from) > size) {
- 		shorted = iov_iter_count(from) - size;
-@@ -585,6 +585,9 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	ssize_t ret = 0;
- 	size_t count;
++static inline void virtblk_request_done(struct request *req)
++{
++	blk_mq_end_request(req, virtblk_end_request(req));
+ }
  
-+	if ((iocb->ki_flags & IOCB_NOWAIT) && !bdev_nowait(bdev))
-+		return -EAGAIN;
+ static void virtblk_complete_batch(struct io_comp_batch *iob)
+ {
+ 	struct request *req;
+ 
+-	rq_list_for_each(&iob->req_list, req) {
+-		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
+-		virtblk_cleanup_cmd(req);
+-	}
++	rq_list_for_each(&iob->req_list, req)
++		virtblk_end_request(req);
 +
- 	if (unlikely(pos + iov_iter_count(to) > size)) {
- 		if (pos >= size)
- 			return 0;
+ 	blk_mq_end_request_batch(iob);
+ }
+ 
 -- 
-2.39.2
+2.40.1
 
