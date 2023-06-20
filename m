@@ -2,93 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB91EB64DB
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 11:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F366EB64DB
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 12:07:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231411AbjFTL36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 07:29:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56330 "EHLO
+        id S231649AbjFTMHH convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 08:07:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231246AbjFTL35 (ORCPT
+        with ESMTP id S231978AbjFTMG4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 07:29:57 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B395DFE;
-        Tue, 20 Jun 2023 04:29:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=UKyYq6BGI39qHhF54xUygHPomuDqkxU7QRjFYmovbx4=; b=W1Jc02jkF0C3QoO2PnI6v5v1JO
-        OhhgE+axnAn29hvFgiuVzAQ0n1r8yyQNnk4RFyxJHRHqh1lI/dAet6cDsU/hZ61h0fooilWFVYcXd
-        GchWarvyAtByVmBemboRBS/9Rqjyd6FvP60DGEacPpTUyD6xfuITc9ljdgNLPbthaYdKTerxPbzYy
-        vcLzjAzEAAqD8meSqR/eeOYczecDiqm8vBlq/pi1Bi2oCi9mRsLK/0hDtNGmtOAGflAVeSHen2uGc
-        uHn0+GMSSLWkv+xtXVSiEBc4PuUl1lvk//8uyVTckBK6FZtbXvo51jmRF8cKiB5KKOn1Ba2F1yv+L
-        LyMt4R2A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qBZYX-00B7u9-1X;
-        Tue, 20 Jun 2023 11:29:53 +0000
-Date:   Tue, 20 Jun 2023 04:29:53 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Dmitry Vyukov <dvyukov@google.com>, Ted Tso <tytso@mit.edu>,
-        yebin <yebin@huaweicloud.com>, linux-fsdevel@vger.kernel.org,
-        Kees Cook <keescook@google.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
- devices
-Message-ID: <ZJGNsVDhZx0Xgs2H@infradead.org>
-References: <20230612161614.10302-1-jack@suse.cz>
- <ZIf6RrbeyZVXBRhm@infradead.org>
- <20230613205614.atlrwst55bpqjzxf@quack3>
- <ZIlqLJ6dFs1P4aj7@infradead.org>
- <20230620104111.pnjoouegp2dx6pcp@quack3>
+        Tue, 20 Jun 2023 08:06:56 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D600C6
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 05:06:54 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-212-qWok5JaiM8qFyY53-503-g-1; Tue, 20 Jun 2023 13:06:52 +0100
+X-MC-Unique: qWok5JaiM8qFyY53-503-g-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 20 Jun
+ 2023 13:06:49 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Tue, 20 Jun 2023 13:06:49 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
+Thread-Topic: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
+Thread-Index: AQHZoF6FIyAIB0qgg0eyK+mA2nZIdK+TnYVA
+Date:   Tue, 20 Jun 2023 12:06:49 +0000
+Message-ID: <9258be5d31104805b63bb1a64317a448@AcuMS.aculab.com>
+References: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230620104111.pnjoouegp2dx6pcp@quack3>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 12:41:11PM +0200, Jan Kara wrote:
-> I can see several solutions but since you've just reworked the code and I'm
-> not 100% certain about the motivation, I figured I'll ask you first before
-> spending significant time on something you won't like:
+From: Andy Shevchenko
+> Sent: 16 June 2023 15:26
 > 
-> 1) Just return the mode argument to blkdev_put().
+> In a couple of places replace min()+max() pair by clamp_val().
 > 
-> 2) Only pass to blkdev_put() whether we have write access or not as a
-> separate argument.
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  drivers/block/pktcdvd.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
 > 
-> 3) Don't track number of opens for writing, instead check whether writes
-> are blocked on each write access. I think this has a number of downsides
-> but I mention it for completeness. One problem is we have to add checks to
-> multiple places (buffered IO, direct IO) and existing mmap in particular
-> will be very hard to deal with (need to add page_mkwrite() handler). All
-> these checks add performance overhead. It is practically impossible
-> (without significant performance overhead or new percpu datastructures) to
-> properly synchronize open that wants to block writers against already
-> running writes.
+> diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+> index a1428538bda5..18a960bb6165 100644
+> --- a/drivers/block/pktcdvd.c
+> +++ b/drivers/block/pktcdvd.c
+> @@ -208,14 +208,11 @@ static DEVICE_ATTR_RO(size);
+>  static void init_write_congestion_marks(int* lo, int* hi)
+>  {
+>  	if (*hi > 0) {
+> -		*hi = max(*hi, 500);
+> -		*hi = min(*hi, 1000000);
+> +		*hi = clamp_val(*hi, 500, 1000000);
 
-I think 3 is out for the reasons you mention.  2 feels a bit ugly,
-but so does 1 given that we only really need the write flag.  One thing
-I through about earlier but decided was overkill at that time is to
-return a cookie from blkdev_get_* that needs to be passed back to
-blkdev_put.  That could either be opaque to the caller, or replace the
-bdev ala:
+(standard rant about minmax.h)
 
-struct bdev_handle {
-	struct block_device *bdev;
-	void *holder;
-	bool for_write;
-};
+clamp_val() is pretty much broken by design.
+It MIGHT be ok here but it casts both limits to the
+type of the value being compared.
+In general that is just plain wrong.
 
-Given that fixups we needed to pass the right holder back in, it feels
-like that would be the least error prone API, even if it is a fair
-amount of churn.
+Like min_t() it is generally ok because the kernel only uses
+unsigned values between 0 and MAXINT.
+
+If min/max were ok, then using clamp() should also be ok.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
