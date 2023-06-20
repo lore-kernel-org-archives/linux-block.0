@@ -2,150 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E98EB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 07:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55271EB64D8
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 08:22:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231396AbjFTHnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 03:43:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43372 "EHLO
+        id S231867AbjFTIWn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 04:22:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbjFTHm4 (ORCPT
+        with ESMTP id S231859AbjFTIWm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 03:42:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0C4C1732;
-        Tue, 20 Jun 2023 00:42:55 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7D1CD61052;
-        Tue, 20 Jun 2023 07:42:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE0EBC433C0;
-        Tue, 20 Jun 2023 07:42:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687246974;
-        bh=YerGYPsch1T+BfxemUSZ9eeDg0EC2FKopbOQRfVYmiA=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=Ptm3hpM75VrbDf6TydCCqWsG923n8D/S+lLLWuFaWrbuq8WD6amZWLZCTezmA81A0
-         kmNYvnPpLhvJH+Kw0J8CWCpYBWT0lX1/QLKx3mHpEZk3LgirHlcjAKOOo6tPa8nSKS
-         i6NH7rdHzRqmOcfdf4622aLSFZr3klIfmyShbm++yqnhRbTu9HjiGqxFgwYY51Oqje
-         ZfOTxlcAqzRsBRNpRYSSAY5A6SaXjNG03IMVwDj5bMLK6yMFHtaFFPH/8FO9u+YgR5
-         TdAKtZNHuSp9/AdqFk8q7IC1ApaJx9B0zwCUo6aegPzS5HkzO2lq+K06V4MhIktvKm
-         NtxpZvS3Qpw1A==
-Message-ID: <61f22c1d-6b04-d193-57c9-8cad1c555e4b@kernel.org>
-Date:   Tue, 20 Jun 2023 16:42:52 +0900
+        Tue, 20 Jun 2023 04:22:42 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CE22E72;
+        Tue, 20 Jun 2023 01:22:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=aY/GHphTzSqrblGLnT2lqkDfbH0+6FyRO/00GzxaGNc=; b=QOftA5ku4YdAvQ3OxFc0cD/U+l
+        zweN/cuddeShnRLQxdFLX3nOF8C5cnxqLoq/eqDhM4zfJCMbDRJAipiHnHqzgQ7gK6gPauTTbVO4h
+        sg/pu/ifc19KrWxw4V/Tmf1RZV247n/1L1XbdsHBZYhqkfUyGjOn8+EXYtv5HF6GCe2EkI7WjR+ZW
+        sHKaWmkZLp0v4G08kRWMAampnpEos7jFIbGIA6FPOooQQD8IZN+N3r53IlavLG/bAJNUFLRE5F+rs
+        YnutZi94PLjARBevOA8guq4NxA1dzHU3sLrKy0gSTjxD1Wkie1Qa3YWXr56ZkQaA1sPbcyt7u8S0f
+        7N3NTYKg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qBWd2-00AYvy-0k;
+        Tue, 20 Jun 2023 08:22:20 +0000
+Date:   Tue, 20 Jun 2023 01:22:20 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/3] block: mark bdev files as FMODE_NOWAIT if underlying
+ device supports it
+Message-ID: <ZJFhvAYlSQfJmQC2@infradead.org>
+References: <20230509151910.183637-1-axboe@kernel.dk>
+ <20230509151910.183637-3-axboe@kernel.dk>
+ <ZFucWYxUtBvvRJpR@infradead.org>
+ <8d5daf0d-c623-5918-d40e-ab3ad1c508ad@kernel.dk>
+ <ZJFEz2FKuvIf8aCL@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [linux-next:master] [scsi] eca2040972: ltp.ioprio_set03.fail
-Content-Language: en-US
-To:     kernel test robot <oliver.sang@intel.com>
-Cc:     oe-lkp@lists.linux.dev, lkp@intel.com,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ltp@lists.linux.it
-References: <202306192248.1ece4c29-oliver.sang@intel.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <202306192248.1ece4c29-oliver.sang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJFEz2FKuvIf8aCL@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/20/23 14:58, kernel test robot wrote:
-> 
-> 
-> Hello,
-> 
-> kernel test robot noticed "ltp.ioprio_set03.fail" on:
+On Mon, Jun 19, 2023 at 11:18:55PM -0700, Christoph Hellwig wrote:
+> So it turns out this gets into the way of my planned cleanup to move
+> all the tatic FMODE_ flags out of this basically full field into a new
+> static one in file_operations.  Do you think it is ok to go back to
+> always claiming FMODE_NOWAIT for block devices and then just punt for
+> the drivers that don't support it like the patch below?
 
-LTP maintainers,
+Except that the version I posted if of course completly broken as my
+testing rig told me.  This is the version that actually works:
 
-Patches have been submitted to fix this issue. Were these patches applied ?
+---
+From 7916df7434e1570978b9c81c65aa1ec1f3396b13 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Tue, 20 Jun 2023 07:53:13 +0200
+Subject: block: always set FMODE_NOWAIT
 
-Kernel test robot maintainers,
+Block devices are the only file_operations that do not set FMODE_NOWAIT
+unconditionall in ->open and thus get in the way of a planned cleanup to
+move this flags into a static field in file_operations.   Switch to
+always set FMODE_NOWAIT and just return -EAGAIN if it isn't actually
+supported.  This just affects minor ->submit_bio based drivers as all
+blk-mq drivers and the important remappers (dm, md, nvme-multipath)
+support nowait I/O.
 
-Once the LTP patches are applied, you will need to update LTP.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/fops.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-> 
-> commit: eca2040972b411ec27483bf75dc8b84e730e88ff ("scsi: block: ioprio: Clean up interface definition")
-> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
-> 
-> [test failed on linux-next/master f7efed9f38f886edb450041b82a6f15d663c98f8]
-> [test failed on fix commit 01584c1e233740519d0e11aa20daa323d26bf598]
-> 
-> 
-> in testcase: ltp
-> version: ltp-x86_64-14c1f76-1_20230520
-> with following parameters:
-> 
-> 	disk: 1HDD
-> 	fs: xfs
-> 	test: syscalls-05
-> 
-> 
-> 
-> compiler: gcc-12
-> test machine: 4 threads 1 sockets Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz (Ivy Bridge) with 8G memory
-> 
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
-> 
-> 
-> 
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> | Closes: https://lore.kernel.org/oe-lkp/202306192248.1ece4c29-oliver.sang@intel.com
-> 
-> 
-> 
-> <<<test_start>>>
-> tag=ioprio_set03 stime=1687153195
-> cmdline="ioprio_set03"
-> contacts=""
-> analysis=exit
-> <<<test_output>>>
-> tst_test.c:1558: TINFO: Timeout per run is 0h 02m 30s
-> ioprio_set03.c:39: TFAIL: ioprio_set IOPRIO_CLASS_BE prio 8 should not work
-> ioprio_set03.c:47: TINFO: tested illegal priority with class NONE
-> ioprio_set03.c:50: TPASS: returned correct error for wrong prio: EINVAL (22)
-> 
-> Summary:
-> passed   1
-> failed   1
-> broken   0
-> skipped  0
-> warnings 0
-> <<<execution_status>>>
-> initiation_status="ok"
-> duration=0 termination_type=exited termination_id=1 corefile=no
-> cutime=0 cstime=3
-> <<<test_end>>>
-> 
-> 
-> 
-> To reproduce:
-> 
->         git clone https://github.com/intel/lkp-tests.git
->         cd lkp-tests
->         sudo bin/lkp install job.yaml           # job file is attached in this email
->         bin/lkp split-job --compatible job.yaml # generate the yaml file for lkp run
->         sudo bin/lkp run generated-yaml-file
-> 
->         # if come across any failure that blocks the test,
->         # please remove ~/.lkp and /lkp dir to run from a clean state.
-> 
-> 
-> 
-
+diff --git a/block/fops.c b/block/fops.c
+index 555b1b9ecd2cb9..58c2f65ae4a57e 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -505,7 +505,7 @@ static int blkdev_open(struct inode *inode, struct file *filp)
+ 	 * during an unstable branch.
+ 	 */
+ 	filp->f_flags |= O_LARGEFILE;
+-	filp->f_mode |= FMODE_BUF_RASYNC;
++	filp->f_mode |= FMODE_BUF_RASYNC | FMODE_NOWAIT;
+ 
+ 	/*
+ 	 * Use the file private data to store the holder for exclusive openes.
+@@ -519,9 +519,6 @@ static int blkdev_open(struct inode *inode, struct file *filp)
+ 	if (IS_ERR(bdev))
+ 		return PTR_ERR(bdev);
+ 
+-	if (bdev_nowait(bdev))
+-		filp->f_mode |= FMODE_NOWAIT;
+-
+ 	filp->f_mapping = bdev->bd_inode->i_mapping;
+ 	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
+ 	return 0;
+@@ -563,6 +560,9 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
+ 		return -EOPNOTSUPP;
+ 
++	if ((iocb->ki_flags & IOCB_NOWAIT) && !bdev_nowait(bdev))
++		return -EAGAIN;
++
+ 	size -= iocb->ki_pos;
+ 	if (iov_iter_count(from) > size) {
+ 		shorted = iov_iter_count(from) - size;
+@@ -585,6 +585,9 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 	ssize_t ret = 0;
+ 	size_t count;
+ 
++	if ((iocb->ki_flags & IOCB_NOWAIT) && !bdev_nowait(bdev))
++		return -EAGAIN;
++
+ 	if (unlikely(pos + iov_iter_count(to) > size)) {
+ 		if (pos >= size)
+ 			return 0;
 -- 
-Damien Le Moal
-Western Digital Research
+2.39.2
 
