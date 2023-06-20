@@ -2,79 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 776D3EB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE603EB64DB
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:27:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232951AbjFTN0G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:26:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56844 "EHLO
+        id S231560AbjFTN1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:27:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233003AbjFTNZq (ORCPT
+        with ESMTP id S230466AbjFTN1T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:25:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE1419AD
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:24:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687267433;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+vnjEXreH0/b3cB4UY+FUlsrwX6QWE/ExjGOEW3daVI=;
-        b=Dyd3n99H+AQsCPoKkQGM8NkJ3WLz1L3cYGkiAojLEyK713va3wnujayTBq0tkpUv1uDUwa
-        LF14o1mC9P8YXXuan4Ktz6/3g4e3GzMfkxGo71OD4WFXLMmtz8se+ov/Hw3wk2d5CnfJm0
-        7IDgJpNV0ZHHieI6awisXahEv6jDml4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-AjoKta6FN1SRDXonwpNjKQ-1; Tue, 20 Jun 2023 09:23:49 -0400
-X-MC-Unique: AjoKta6FN1SRDXonwpNjKQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 20 Jun 2023 09:27:19 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A391185;
+        Tue, 20 Jun 2023 06:27:18 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8EED528EC100;
-        Tue, 20 Jun 2023 13:23:45 +0000 (UTC)
-Received: from ovpn-8-23.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 126D7C1ED97;
-        Tue, 20 Jun 2023 13:23:40 +0000 (UTC)
-Date:   Tue, 20 Jun 2023 21:23:36 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
-        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Message-ID: <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
-References: <20230620013349.906601-1-ming.lei@redhat.com>
- <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id DC88E21228;
+        Tue, 20 Jun 2023 13:27:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1687267636; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=wKacNcJVLmesRp8TReg+QyYHTEChm9F06o8ZZWC2XNU=;
+        b=etp644gKfqe6QazNfpm5X5Ns1cefjHGkwJoHwV3juMcvziqq3FoPUXrBunj2J9rbFDsQjj
+        2bG3Pwvu1YURas3RYqwKj5YvUrJ4TSEWxSzB/HgAZeERpUSFJo2QjOaJ7S3mSZpuH5COqU
+        S8mh0cRjFzv2Y0u4FNLQul22WA85S3A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1687267636;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=wKacNcJVLmesRp8TReg+QyYHTEChm9F06o8ZZWC2XNU=;
+        b=BMBGRqQFIOvcvE3Oey9DaN31ZhziAS9EXA9VOjgFljUINLT5vyTbNAhOYPA/6ZBxCWvLO0
+        GXMDyHHavClkOwCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CE1751346D;
+        Tue, 20 Jun 2023 13:27:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id FnxKMjSpkWSaOAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 20 Jun 2023 13:27:16 +0000
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v1 0/3] More fixes for FC enabling
+Date:   Tue, 20 Jun 2023 15:27:00 +0200
+Message-ID: <20230620132703.20648-1-dwagner@suse.de>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 01:04:33PM +0300, Sagi Grimberg wrote:
-> 
-> > Hello,
-> > 
-> > The 1st three patch fixes io hang when controller removal interrupts error
-> > recovery, then queue is left as frozen.
-> > 
-> > The 4th patch fixes io hang when controller is left as unquiesce.
-> 
-> Ming, what happened to nvme-tcp/rdma move of freeze/unfreeze to the
-> connect patches?
+The first patch is addressing the problem, that the FC transport is way faster
+in reconnecting and the test didn't observe all the states from live ->
+resetting -> connecting -> live. Instead trying to see these transitions just
+test for the final state which is live and the correct number of queues. This
+makes this test also a little bit more robust. So this patch is necessary.
 
-I'd suggest to handle all drivers(include nvme-pci) in same logic for avoiding
-extra maintain burden wrt. error handling, but looks Keith worries about the
-delay freezing may cause too many requests queued during error handling, and
-that might cause user report.
+The next two patches are more in RFC state but I think it makes sense to post
+them along side the rest.
 
+The second and the third patch rely on the not yet released nvme-cli features
+'volatile configuration' and 'execution context awareness'. These two feature
+allow nvme-cli to figure out if a 'nvme connect' should actually be done or just
+ignored. If the FC autoconnect udev/systemd rules are enabled on a host, this is
+interfering with blktests. Note, this is also a way to get nvme-stas and
+nvme-cli play nicely with each other.
 
-Thanks, 
-Ming
+In case anyone wants to run blktest with FC as transport needs either to disable
+the autoconnect feature or use the unreleased features of nvme-cli.
+
+Daniel Wagner (3):
+  nvme/048: Check for queue count check directly
+  nvme/rc: Avoid triggering host nvme-cli autoconnect
+  nvme/{041,042,043,044,045}: Use default hostnqn and hostid
+
+ tests/nvme/041 |  8 ++----
+ tests/nvme/042 |  8 ++----
+ tests/nvme/043 |  8 ++----
+ tests/nvme/044 |  8 ++----
+ tests/nvme/045 |  8 ++----
+ tests/nvme/048 | 35 ++++++++++++++++--------
+ tests/nvme/rc  | 73 +++++++++++++++++++++++++++++++++++++++++++-------
+ 7 files changed, 97 insertions(+), 51 deletions(-)
+
+-- 
+2.41.0
 
