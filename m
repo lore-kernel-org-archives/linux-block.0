@@ -2,73 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 697D4EB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 10:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD47EEB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 10:41:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231727AbjFTKFH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 06:05:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38748 "EHLO
+        id S229966AbjFTKl0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 06:41:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231888AbjFTKEt (ORCPT
+        with ESMTP id S230527AbjFTKlY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 06:04:49 -0400
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642AA173B
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 03:04:41 -0700 (PDT)
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-4f740497304so1183129e87.0
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 03:04:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687255476; x=1689847476;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ichHBITtiXbhvg4wtZ1vUsPoopXyJCtdwz3MwN/NO4M=;
-        b=HFC14K38C2iZOKf+IqRB/V++SRcqqRL6flZTV3tZaO93oy5cP9XDz5tQcv6Pagcme+
-         a01B2FTr+1H+oLLRrPL95JHpXUwnGIwoVqQ3hqrR6L/HS+hbQ+HOU9QLYldc2leQND5Q
-         OXzWYz/4Lqgot9j7DZ18qwxB0vVDqEDnFwoSvBodrg4RTIJskIKZeVtoOO5PUo9Kp6D6
-         ZqZmViViKvBqYJJBll5OJFuD51qvRYeTSUxdQ06WtXN2XiRNbA5LbemsnFCu32fu2XvT
-         +c/JRpJKJaaJYajkM11a0sQaRs8CDa793StOZvjjsMh4urY9ea+ahXDAbBYtTcRwueA/
-         drpQ==
-X-Gm-Message-State: AC+VfDynn666JDW6EHEcBPb1qOUWlgMnW99YLMrsJtNauLzUctzWVhhl
-        rNnG4POtsoVrJ3OcywTygtI=
-X-Google-Smtp-Source: ACHHUZ6qIHcwF7r810eKQ1dzX3u1KNsQUMwETDgWdDq4ezsW97apVNbzQO9bDsxCveQXRoE8Sh9CxA==
-X-Received: by 2002:ac2:5101:0:b0:4f7:640c:1847 with SMTP id q1-20020ac25101000000b004f7640c1847mr5089563lfb.6.1687255476104;
-        Tue, 20 Jun 2023 03:04:36 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id r11-20020a5d498b000000b00307a86a4bcesm1631011wrq.35.2023.06.20.03.04.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jun 2023 03:04:35 -0700 (PDT)
-Message-ID: <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
-Date:   Tue, 20 Jun 2023 13:04:33 +0300
+        Tue, 20 Jun 2023 06:41:24 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF90101;
+        Tue, 20 Jun 2023 03:41:13 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0666E21877;
+        Tue, 20 Jun 2023 10:41:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1687257672; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XKKbRxLiK5MjN6DjyshZqib7TaD9MYDDfRwwRT9YtA8=;
+        b=Jp+q+4HyZOYYp945K1qX1fnrs3NUtbB81jfuZV9cVnKbgkoaWeSpWlR8G1ZBZp90D5PovL
+        2Zax+vZx6iyAztNuVuYLYgmSff3LNGkamFmXTfAfyfs/0B8FJIpqS3MnLFqBcXoAJi2FaF
+        TWY29e6pyjAXTLk8gQ4QyKC9PY5ZjSw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1687257672;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XKKbRxLiK5MjN6DjyshZqib7TaD9MYDDfRwwRT9YtA8=;
+        b=aIiT1BnpOztM/uhMdtG68JiZScMq/zFaK63h9zDnaq1S39ORTlSI7tr2Jgjxmhv0j9vftF
+        u1N2cZbduLv9C6Aw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E98651346D;
+        Tue, 20 Jun 2023 10:41:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id VwP9OEeCkWRTYQAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 20 Jun 2023 10:41:11 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 776D4A075D; Tue, 20 Jun 2023 12:41:11 +0200 (CEST)
+Date:   Tue, 20 Jun 2023 12:41:11 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
+        Ted Tso <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
+        linux-fsdevel@vger.kernel.org, Kees Cook <keescook@google.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
+ devices
+Message-ID: <20230620104111.pnjoouegp2dx6pcp@quack3>
+References: <20230612161614.10302-1-jack@suse.cz>
+ <ZIf6RrbeyZVXBRhm@infradead.org>
+ <20230613205614.atlrwst55bpqjzxf@quack3>
+ <ZIlqLJ6dFs1P4aj7@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org
-Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Chunguang Xu <brookxu.cn@gmail.com>
-References: <20230620013349.906601-1-ming.lei@redhat.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230620013349.906601-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZIlqLJ6dFs1P4aj7@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello Christoph!
 
-> Hello,
+On Wed 14-06-23 00:20:12, Christoph Hellwig wrote:
+> On Tue, Jun 13, 2023 at 10:56:14PM +0200, Jan Kara wrote:
+> > Well, as I've mentioned in the changelog there are old setups (without
+> > initrd) that run fsck on root filesystem mounted read-only and fsck
+> > programs tend to open the device with O_RDWR. These would be broken by this
+> > change (for the filesystems that would use BLK_OPEN_ flag).
 > 
-> The 1st three patch fixes io hang when controller removal interrupts error
-> recovery, then queue is left as frozen.
-> 
-> The 4th patch fixes io hang when controller is left as unquiesce.
+> But that's also a really broken setup that will corrupt data in many
+> cases.  So yes, maybe we need a way to allow it, but it probably would
+> have to be per-file system.
 
-Ming, what happened to nvme-tcp/rdma move of freeze/unfreeze to the
-connect patches?
+I was looking into implementing the write hardening support and I've come
+across the following obstacle: Your patch series that is in linux-block.git
+removes the 'mode' argument from blkdev_put() which makes it impossible to
+track how many writers there are for the block device. This is needed so
+that we can check whether the filesystem is safe when mounting the device.
 
-I think that these are patches that should go in regradless because
-they also fix I/O failover blocked on request queue enter.
+I can see several solutions but since you've just reworked the code and I'm
+not 100% certain about the motivation, I figured I'll ask you first before
+spending significant time on something you won't like:
+
+1) Just return the mode argument to blkdev_put().
+
+2) Only pass to blkdev_put() whether we have write access or not as a
+separate argument.
+
+3) Don't track number of opens for writing, instead check whether writes
+are blocked on each write access. I think this has a number of downsides
+but I mention it for completeness. One problem is we have to add checks to
+multiple places (buffered IO, direct IO) and existing mmap in particular
+will be very hard to deal with (need to add page_mkwrite() handler). All
+these checks add performance overhead. It is practically impossible
+(without significant performance overhead or new percpu datastructures) to
+properly synchronize open that wants to block writers against already
+running writes.
+
+So what would you prefer? Thanks in advance for your input.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
