@@ -2,95 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F366EB64DB
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 12:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 188C9EB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 13:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231649AbjFTMHH convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 08:07:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44420 "EHLO
+        id S232040AbjFTNSF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:18:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231978AbjFTMG4 (ORCPT
+        with ESMTP id S231272AbjFTNR7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 08:06:56 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D600C6
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 05:06:54 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-212-qWok5JaiM8qFyY53-503-g-1; Tue, 20 Jun 2023 13:06:52 +0100
-X-MC-Unique: qWok5JaiM8qFyY53-503-g-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 20 Jun
- 2023 13:06:49 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Tue, 20 Jun 2023 13:06:49 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
-Thread-Topic: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
-Thread-Index: AQHZoF6FIyAIB0qgg0eyK+mA2nZIdK+TnYVA
-Date:   Tue, 20 Jun 2023 12:06:49 +0000
-Message-ID: <9258be5d31104805b63bb1a64317a448@AcuMS.aculab.com>
-References: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Tue, 20 Jun 2023 09:17:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 229951BD6
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 06:16:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687266991;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4ogIibVOnLt0486zOB1sPzcKIarKm0lmpYQoT+khdF8=;
+        b=jHe2ykuMs48G6ymcYYJdkyqjgSkQVCdTD4Aufz9IwKdmIYAYBRSJLzs7xvC3etBafcJocp
+        saV/LMyCeCepA4byaW+VZgA+8ctkj9qQqpA9nT/hbJ1WKV3jxM9QP19t9tri4uZRwAdd8Z
+        gbEy8E5zCU0ChHeZj4+XQQTD3OKC3WI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-592-GCAQWWmxOiKw8ZGkanUDUg-1; Tue, 20 Jun 2023 09:16:28 -0400
+X-MC-Unique: GCAQWWmxOiKw8ZGkanUDUg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F11EB88D0F7;
+        Tue, 20 Jun 2023 13:15:37 +0000 (UTC)
+Received: from ovpn-8-23.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9142A1402C06;
+        Tue, 20 Jun 2023 13:15:12 +0000 (UTC)
+Date:   Tue, 20 Jun 2023 21:15:07 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
+        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
+Subject: Re: [PATCH 1/4] blk-mq: add API of blk_mq_unfreeze_queue_force
+Message-ID: <ZJGmW7lEaipT6saa@ovpn-8-23.pek2.redhat.com>
+References: <20230615143236.297456-1-ming.lei@redhat.com>
+ <20230615143236.297456-2-ming.lei@redhat.com>
+ <ZIsrSyEqWMw8/ikq@kbusch-mbp.dhcp.thefacebook.com>
+ <ZIsxt7Q2nmiLNTX2@ovpn-8-16.pek2.redhat.com>
+ <20230616054800.GA28499@lst.de>
+ <ZIwNRu1zodp61PEO@ovpn-8-18.pek2.redhat.com>
+ <20230620054141.GA12626@lst.de>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620054141.GA12626@lst.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Andy Shevchenko
-> Sent: 16 June 2023 15:26
+On Tue, Jun 20, 2023 at 07:41:41AM +0200, Christoph Hellwig wrote:
+> On Fri, Jun 16, 2023 at 03:20:38PM +0800, Ming Lei wrote:
+> > > > GD_DEAD is only set if the device is really dead, then all pending IO
+> > > > will be failed.
+> > > 
+> > > del_gendisk also sets GD_DEAD early on.
+> > 
+> > No.
+> > 
+> > The hang happens in fsync_bdev() of del_gendisk(), and there are IOs pending on
+> > bio_queue_enter().
 > 
-> In a couple of places replace min()+max() pair by clamp_val().
+> IFF we know we can't do I/O by the time del_gendisk is called, we
+> need to call mark_disk_dead first and not paper over the problem.
+
+In theory, device removal can happen any time, when it isn't clear
+if the controller is recovered well at that time, that is why this
+API is added for avoiding to fail IO unnecessarily.
+
+However maybe it is just fine to mark controller as dead in case that
+removal breaks current error recovery given current nvme driver error
+handling isn't very fine-grained control, so how about something like
+the following:
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index c3d72fc677f7..120d98f348de 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -558,6 +558,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+        }
+
+        if (changed) {
++               ctrl->old_state = ctrl->state;
+                ctrl->state = new_state;
+                wake_up_all(&ctrl->state_wq);
+        }
+@@ -4654,7 +4655,7 @@ void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
+         * removing the namespaces' disks; fail all the queues now to avoid
+         * potentially having to clean up the failed sync later.
+         */
+-       if (ctrl->state == NVME_CTRL_DEAD) {
++       if (ctrl->state == NVME_CTRL_DEAD || ctrl->old_state != NVME_CTRL_LIVE) {
+                nvme_mark_namespaces_dead(ctrl);
+                nvme_unquiesce_io_queues(ctrl);
+        }
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 953e59f56139..7da53cc76f11 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -246,8 +246,9 @@ enum nvme_ctrl_flags {
+
+ struct nvme_ctrl {
+        bool comp_seen;
+-       enum nvme_ctrl_state state;
+        bool identified;
++       enum nvme_ctrl_state old_state;
++       enum nvme_ctrl_state state;
+        spinlock_t lock;
+        struct mutex scan_lock;
+        const struct nvme_ctrl_ops *ops;
+
 > 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/block/pktcdvd.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-> index a1428538bda5..18a960bb6165 100644
-> --- a/drivers/block/pktcdvd.c
-> +++ b/drivers/block/pktcdvd.c
-> @@ -208,14 +208,11 @@ static DEVICE_ATTR_RO(size);
->  static void init_write_congestion_marks(int* lo, int* hi)
->  {
->  	if (*hi > 0) {
-> -		*hi = max(*hi, 500);
-> -		*hi = min(*hi, 1000000);
-> +		*hi = clamp_val(*hi, 500, 1000000);
+> An API that force unfreezes is just broken and will leaves us with
+> freezecount mismatches.
 
-(standard rant about minmax.h)
+The freezecount mismatch problem is actually in nvme driver, please
+see the previous patch[1] I posted.
 
-clamp_val() is pretty much broken by design.
-It MIGHT be ok here but it casts both limits to the
-type of the value being compared.
-In general that is just plain wrong.
 
-Like min_t() it is generally ok because the kernel only uses
-unsigned values between 0 and MAXINT.
+[1] https://lore.kernel.org/linux-block/20230613005847.1762378-1-ming.lei@redhat.com/T/#m17ac1aa71056b6517f8aefbae58c301f296f0a73
 
-If min/max were ok, then using clamp() should also be ok.
 
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+Thanks,
+Ming
 
