@@ -2,98 +2,217 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DB7EB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 14:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2541EB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 20 Jun 2023 14:58:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231879AbjFTO4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 10:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59000 "EHLO
+        id S233459AbjFTO60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 10:58:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233009AbjFTO4L (ORCPT
+        with ESMTP id S233250AbjFTO6T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 10:56:11 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B11C1709
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 07:56:10 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-343a9a89205so619855ab.1
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 07:56:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687272969; x=1689864969;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gBTGnP1tMNeZ2bBTWd78SpmQMz2nsFLvJUwCiLFmeqE=;
-        b=gPCMY7GK1J14+rOzq1sFeUzGX2GvjFbq5gWouVtXmJlxA0z1QT89lNcJRcKBflk0T3
-         NdVidbKoh0EwUKVevlsSgOqHLQPROVj/68tCWSvMaBOnSJcW+mZhg7Kt9MjkhokD8trn
-         YWt5VEuN/HgLV9+foIAhMJXFs3p/uRCoIfcim3kVtE0vOYmiv3ruND+NGIen/BgRZ+2w
-         eSBoPAi3WU+IZtmpcfd9fuirOmIz4nG3lcECXxFbEUNPK32TU3oTbGlkt0Lem3IhRnkH
-         s5pwJ4axqnZ8umeHnS4x+kgqPzcPjEdOFDUwh5PABkRlY0jvzW2jmxxa0ECEoNYE0xJA
-         Rlmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687272969; x=1689864969;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gBTGnP1tMNeZ2bBTWd78SpmQMz2nsFLvJUwCiLFmeqE=;
-        b=JUMVBqYc52jpijur+v3yfFqySxdbdLRcHHreHqEq/Ugzx/YYP8B6xU+I9NJdkjirpf
-         nOFf8NCilTLwh0Cttwc1DGsXyKjFce/YxViNdtXp7aaLRzJLslpInjI7O606U8gA9Utl
-         o6uuuPt0LuOoWB/iXZ2Nww3zA2PA1sVZYl+/qYIjohfol4itsNyQp06cGAoVysonNlak
-         hvsbkRHQmPOTVoNhjU+ZJFJlLBu7sZYeISrD/NNuzJm8veWwvqP2svlEiqKLC7MKxEx0
-         aX01jwPT07QmPgFPlZQLhUr9E1cgvqHHnTv8aSydManIxgo8b9IP/Q0+//8BWELX0ex3
-         tSRQ==
-X-Gm-Message-State: AC+VfDxGDMxxq0AZiqk4FudxL4tYrVbDQhy6WLNXAIEqh0FmXZVFqW5f
-        GkKRhldlqOM8SI6Q8EZ8PIv8WQ==
-X-Google-Smtp-Source: ACHHUZ4p3kn2ROc8tmUhoaWt7ZtkpMZc9vqxKJfYNnZOjURuEKXPZj75PLiZ13Q6zTYTnIJBlghJJQ==
-X-Received: by 2002:a05:6e02:1a8c:b0:330:a1eb:c5a4 with SMTP id k12-20020a056e021a8c00b00330a1ebc5a4mr12977726ilv.1.1687272969224;
-        Tue, 20 Jun 2023 07:56:09 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id q9-20020a920509000000b0032afe23820bsm652157ile.17.2023.06.20.07.56.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jun 2023 07:56:08 -0700 (PDT)
-Message-ID: <0eb6721d-2502-4970-bc55-5d809c8113aa@kernel.dk>
-Date:   Tue, 20 Jun 2023 08:56:07 -0600
+        Tue, 20 Jun 2023 10:58:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4D7C1731
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 07:57:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687273033;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XKse4vF5Frqs4bdWsYMKttBmqWRsH1PFiAHwvjH79qA=;
+        b=CMNBpdmQ6p8PQQCFrPt9jtdv4VgtozM6T0RtX4nP7gmcL4L1+66ZmRfQLz+pwMHNYLhE6I
+        CfYdps7sqDiDjEzbazgMVQaUflL5Flfke+w2O/g3+mSLWM6Bp/M46dJp8dmkdYdo4T+50a
+        EMh11wYmieNWKDlTbyKgKUd8F1WUv3A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-620-Q6NvzJ07NxKczalwLXSO3g-1; Tue, 20 Jun 2023 10:57:10 -0400
+X-MC-Unique: Q6NvzJ07NxKczalwLXSO3g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1552E1064B1B;
+        Tue, 20 Jun 2023 14:54:39 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 341B5200A398;
+        Tue, 20 Jun 2023 14:54:37 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH net-next v3 15/18] drdb: Send an entire bio in a single sendmsg
+Date:   Tue, 20 Jun 2023 15:53:34 +0100
+Message-ID: <20230620145338.1300897-16-dhowells@redhat.com>
+In-Reply-To: <20230620145338.1300897-1-dhowells@redhat.com>
+References: <20230620145338.1300897-1-dhowells@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 2/3] block: mark bdev files as FMODE_NOWAIT if underlying
- device supports it
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
-References: <20230509151910.183637-1-axboe@kernel.dk>
- <20230509151910.183637-3-axboe@kernel.dk> <ZFucWYxUtBvvRJpR@infradead.org>
- <8d5daf0d-c623-5918-d40e-ab3ad1c508ad@kernel.dk>
- <ZJFEz2FKuvIf8aCL@infradead.org>
- <a7a1dcc3-5aaf-53bc-7527-ba62292c44cd@kernel.dk>
- <ZJGpv4WjadjdBTmN@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZJGpv4WjadjdBTmN@infradead.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/20/23 7:29?AM, Christoph Hellwig wrote:
-> On Tue, Jun 20, 2023 at 07:24:56AM -0600, Jens Axboe wrote:
->> I think we need stronger justification than that, it's much nicer to
->> have it in the open path than doing the same check over and over for
->> each IO.
->>
->> With your new proposed scheme, why can't the check and FMODE_NOWAIT set
->> still be in open?
-> 
-> Because I want to move the by now huge number of static flags out of
-> file->f_mode and into file->f_op.flags.  It's just that with this patch
-> this one flag isn't static anymore for block devices.  We could also
-> do two sets of file operations assuming we never allow run-time changes
-> for QUEUE_FLAG_NOWAIT.  If we care about optimizing fo async I/O on the
-> few drivers not supporting QUEUE_FLAG_NOWAIT that's probably the next
-> best thing.
+Since _drdb_sendpage() is now using sendmsg to send the pages rather
+sendpage, pass the entire bio in one go using a bvec iterator instead of
+doing it piecemeal.
 
-Doing two sets of fops makes sense to me, and then hopefully down the
-line we can shave it down to 1 again once everything sets FMODE_NOWAIT.
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Philipp Reisner <philipp.reisner@linbit.com>
+cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: drbd-dev@lists.linbit.com
+cc: linux-block@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
 
--- 
-Jens Axboe
+Notes:
+    ver #2)
+     - Use "unsigned int" rather than "unsigned".
+
+ drivers/block/drbd/drbd_main.c | 77 +++++++++++-----------------------
+ 1 file changed, 25 insertions(+), 52 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 8a01a18a2550..beba74ae093b 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -1520,28 +1520,15 @@ static void drbd_update_congested(struct drbd_connection *connection)
+  * As a workaround, we disable sendpage on pages
+  * with page_count == 0 or PageSlab.
+  */
+-static int _drbd_no_send_page(struct drbd_peer_device *peer_device, struct page *page,
+-			      int offset, size_t size, unsigned msg_flags)
+-{
+-	struct socket *socket;
+-	void *addr;
+-	int err;
+-
+-	socket = peer_device->connection->data.socket;
+-	addr = kmap(page) + offset;
+-	err = drbd_send_all(peer_device->connection, socket, addr, size, msg_flags);
+-	kunmap(page);
+-	if (!err)
+-		peer_device->device->send_cnt += size >> 9;
+-	return err;
+-}
+-
+-static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *page,
+-		    int offset, size_t size, unsigned msg_flags)
++static int _drbd_send_pages(struct drbd_peer_device *peer_device,
++			    struct iov_iter *iter, unsigned int msg_flags)
+ {
+ 	struct socket *socket = peer_device->connection->data.socket;
+-	struct bio_vec bvec;
+-	struct msghdr msg = { .msg_flags = msg_flags, };
++	struct msghdr msg = {
++		.msg_flags	= msg_flags | MSG_NOSIGNAL,
++		.msg_iter	= *iter,
++	};
++	size_t size = iov_iter_count(iter);
+ 	int err = -EIO;
+ 
+ 	/* e.g. XFS meta- & log-data is in slab pages, which have a
+@@ -1550,11 +1537,8 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
+ 	 * put_page(); and would cause either a VM_BUG directly, or
+ 	 * __page_cache_release a page that would actually still be referenced
+ 	 * by someone, leading to some obscure delayed Oops somewhere else. */
+-	if (!drbd_disable_sendpage && sendpage_ok(page))
+-		msg.msg_flags |= MSG_NOSIGNAL | MSG_SPLICE_PAGES;
+-
+-	bvec_set_page(&bvec, page, offset, size);
+-	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
++	if (drbd_disable_sendpage)
++		msg.msg_flags &= ~(MSG_NOSIGNAL | MSG_SPLICE_PAGES);
+ 
+ 	drbd_update_congested(peer_device->connection);
+ 	do {
+@@ -1587,39 +1571,22 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
+ 
+ static int _drbd_send_bio(struct drbd_peer_device *peer_device, struct bio *bio)
+ {
+-	struct bio_vec bvec;
+-	struct bvec_iter iter;
++	struct iov_iter iter;
+ 
+-	/* hint all but last page with MSG_MORE */
+-	bio_for_each_segment(bvec, bio, iter) {
+-		int err;
++	iov_iter_bvec(&iter, ITER_SOURCE, bio->bi_io_vec, bio->bi_vcnt,
++		      bio->bi_iter.bi_size);
+ 
+-		err = _drbd_no_send_page(peer_device, bvec.bv_page,
+-					 bvec.bv_offset, bvec.bv_len,
+-					 bio_iter_last(bvec, iter)
+-					 ? 0 : MSG_MORE);
+-		if (err)
+-			return err;
+-	}
+-	return 0;
++	return _drbd_send_pages(peer_device, &iter, 0);
+ }
+ 
+ static int _drbd_send_zc_bio(struct drbd_peer_device *peer_device, struct bio *bio)
+ {
+-	struct bio_vec bvec;
+-	struct bvec_iter iter;
++	struct iov_iter iter;
+ 
+-	/* hint all but last page with MSG_MORE */
+-	bio_for_each_segment(bvec, bio, iter) {
+-		int err;
++	iov_iter_bvec(&iter, ITER_SOURCE, bio->bi_io_vec, bio->bi_vcnt,
++		      bio->bi_iter.bi_size);
+ 
+-		err = _drbd_send_page(peer_device, bvec.bv_page,
+-				      bvec.bv_offset, bvec.bv_len,
+-				      bio_iter_last(bvec, iter) ? 0 : MSG_MORE);
+-		if (err)
+-			return err;
+-	}
+-	return 0;
++	return _drbd_send_pages(peer_device, &iter, MSG_SPLICE_PAGES);
+ }
+ 
+ static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
+@@ -1631,10 +1598,16 @@ static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
+ 
+ 	/* hint all but last page with MSG_MORE */
+ 	page_chain_for_each(page) {
++		struct iov_iter iter;
++		struct bio_vec bvec;
+ 		unsigned l = min_t(unsigned, len, PAGE_SIZE);
+ 
+-		err = _drbd_send_page(peer_device, page, 0, l,
+-				      page_chain_next(page) ? MSG_MORE : 0);
++		bvec_set_page(&bvec, page, 0, l);
++		iov_iter_bvec(&iter, ITER_SOURCE, &bvec, 1, l);
++
++		err = _drbd_send_pages(peer_device, &iter,
++				       MSG_SPLICE_PAGES |
++				       (page_chain_next(page) ? MSG_MORE : 0));
+ 		if (err)
+ 			return err;
+ 		len -= l;
 
