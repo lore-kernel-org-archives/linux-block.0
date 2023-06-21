@@ -2,169 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C0CEB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 14:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A15EB64D8
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 14:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230137AbjFUOIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 10:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53806 "EHLO
+        id S232224AbjFUOJl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 10:09:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230122AbjFUOIb (ORCPT
+        with ESMTP id S232355AbjFUOJa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 10:08:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43D61FC0
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 07:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687356439;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Y0VXle0mWQQDtXBt0Zh+ZRqAUi1Ww/WnndqHkbNtqU4=;
-        b=clahNUmz2tJ81RxB+hkNuzhPUj0nmsmxrtDQueHr7N3wCogWTJS1+qq4ib7qBMRJlJjOwX
-        OV0lAlt8JKx2yKRecb0g25QNQekWavIpwkO2L3eFVA4sPLdq98nRRwEYwoZ14aKdzYZmgO
-        SeRs7w0UPmX2xfQHxLftIbQAsSc92Qk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-320-bOXMgb1EMzOU2WNg0OSAag-1; Wed, 21 Jun 2023 10:07:15 -0400
-X-MC-Unique: bOXMgb1EMzOU2WNg0OSAag-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D5F889F51C;
-        Wed, 21 Jun 2023 14:04:17 +0000 (UTC)
-Received: from ovpn-8-23.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D43C0492B01;
-        Wed, 21 Jun 2023 14:04:13 +0000 (UTC)
-Date:   Wed, 21 Jun 2023 22:04:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Guangwu Zhang <guazhang@redhat.com>, linux-block@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, io-uring@vger.kernel.org
-Subject: Re: [bug report] BUG: KASAN: out-of-bounds in
- io_req_local_work_add+0x3b1/0x4a0
-Message-ID: <ZJMDWIZv5kuJ7nGl@ovpn-8-23.pek2.redhat.com>
-References: <CAGS2=YrvrD0hf7WGjQd4Me772=m9=E6J92aGtG0PAoF4yD6dTw@mail.gmail.com>
- <e92a19fa-74cc-2b9f-3173-6a04557a6534@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e92a19fa-74cc-2b9f-3173-6a04557a6534@kernel.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+        Wed, 21 Jun 2023 10:09:30 -0400
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A10271FFA;
+        Wed, 21 Jun 2023 07:09:13 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.nyi.internal (Postfix) with ESMTP id 0B4C55C0215;
+        Wed, 21 Jun 2023 10:09:13 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Wed, 21 Jun 2023 10:09:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm1; t=1687356553; x=1687442953; bh=dY
+        2wjH1dPAUyXPlv+3pWnq0L8c8fn4MgP9qZzKyqERE=; b=EuqG2xunpquoWrkWcv
+        EeKIsjZ2G1bP3mTutqDHkKl+TK9U9RL6lmE2Ky1sq3knzkkTp9RKgHV5XVHgj7rd
+        k22pYnZgNSzTe5g4bno7u1xUniGLC9NCUgQVPmPLmnAOtnn3YLFxm11CaA1o2Aa2
+        5+T4l3Jc3a1a8029+2nj+h/PCTJjHRY0IUXYY6jVd6f3ldsgbL6Jl9Fae8U1feNe
+        YxZgOejfLiuBn85Fvbu8eUVzIbgf43IpEdwjlTq0Qxulr5BYcKsbVt5lBklioToa
+        RsRX7YrTMxU5SroNNLZyy2uF1aKSe5WTp/V6xpvqOt5VAtsB3rs7kLOUO4MxrAlE
+        o13Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1687356553; x=1687442953; bh=dY2wjH1dPAUyX
+        Plv+3pWnq0L8c8fn4MgP9qZzKyqERE=; b=RODJF+5zQFElZUj9yTx3I0bpynVwr
+        azzDz1bCJ7O/B+nFtBpB8WTPjdP/4lxvovk4xajAm/xqBJmRBRrVbYOZisqRw2r8
+        IumAalEBCOjpjDBE0id0y+V+jvIUCm0A0OitQ8OvVeu8+jHLGVu1r5PuIuYvus+y
+        4R70uPNVHZ1V5yl58kMytZeHWpzlajRdRTI8CAOSBBHVPOCiPF6DkyhlckzOEZNz
+        1UTu+3IaAw0ts5w7IX3ZmMBiwytG3NHlWJ+Ge7gT5teuaDQcbrxtjYj3K8cet4Zm
+        7FO4qNiQ2bcXdyK6JvY9VmLvdz/O8pSnIen3taQrSymse1l5xfQv2Rylw==
+X-ME-Sender: <xms:iASTZCrtnqmTkymsUhAWWEOz6bZgYRT8TzSX_R0SBHEqIPVwsuW-Kw>
+    <xme:iASTZArTbFifVyUzIDbQ6_js3PM1EQoOGqdXwK3uwGH_tlfFQzCtLt1cNnbeeSUee
+    aHPPcgMn1nFYMYPut8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgeefkedggeeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:iASTZHMviZzP9hoCrCy3nIZEIujHdXlpIxNI2mAVMur1Ips6WidB_A>
+    <xmx:iASTZB7y8aPbopri1bV1ftcVbSuMWWWPLsBTOtKPAbvUvWWhyyvYmw>
+    <xmx:iASTZB7PdqGOmEk4PYfhWqb6pG7oaquSQnIxwH6_NfL-C0nII5qsuQ>
+    <xmx:iQSTZATrc-jQP-PCSGGUyWqlRjo20psZPGQlbtBqtbhtUrhBGU_X4A>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 3A1BEB60086; Wed, 21 Jun 2023 10:09:12 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-499-gf27bbf33e2-fm-20230619.001-gf27bbf33
+Mime-Version: 1.0
+Message-Id: <89dfc918-9757-4487-aa72-615f7029f6c1@app.fastmail.com>
+In-Reply-To: <CA+G9fYtKCZeAUTtwe69iK8Xcz1mOKQzwcy49wd+imZrfj6ifXA@mail.gmail.com>
+References: <CA+G9fYtKCZeAUTtwe69iK8Xcz1mOKQzwcy49wd+imZrfj6ifXA@mail.gmail.com>
+Date:   Wed, 21 Jun 2023 16:08:50 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Naresh Kamboju" <naresh.kamboju@linaro.org>,
+        "open list" <linux-kernel@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, lkft-triage@lists.linaro.org,
+        linux-block <linux-block@vger.kernel.org>,
+        "LTP List" <ltp@lists.linux.it>, linux-mm <linux-mm@kvack.org>,
+        "Rahul Rameshbabu" <rrameshbabu@nvidia.com>,
+        "Richard Cochran" <richardcochran@gmail.com>
+Cc:     "Alexander Viro" <viro@zeniv.linux.org.uk>,
+        "Christian Brauner" <brauner@kernel.org>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Dan Carpenter" <dan.carpenter@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Maciek Machnikowski" <maciek@machnikowski.net>,
+        "Richard Cochran" <richardcochran@gmail.com>,
+        "Shuah Khan" <shuah@kernel.org>, "Jakub Kicinski" <kuba@kernel.org>
+Subject: Re: next: ltp: fs: read_all: block sda: the capability attribute has been
+ deprecated. - supervisor instruction fetch in kernel mode
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 07:40:49AM -0600, Jens Axboe wrote:
-> On 6/21/23 1:38?AM, Guangwu Zhang wrote:
-> > HI,
-> > Found the io_req_local_work_add error when run  liburing testing.
-> > 
-> > kernel repo :
-> >     Merge branch 'for-6.5/block' into for-next
-> >     * for-6.5/block:
-> >       reiserfs: fix blkdev_put() warning from release_journal_dev()
-> > 
-> > [ 1733.389012] BUG: KASAN: out-of-bounds in io_req_local_work_add+0x3b1/0x4a0
-> > [ 1733.395900] Read of size 4 at addr ffff888133320458 by task
-> > iou-wrk-97057/97138
-> > [ 1733.403205]
-> > [ 1733.404706] CPU: 4 PID: 97138 Comm: iou-wrk-97057 Kdump: loaded Not
-> > tainted 6.4.0-rc3.kasan+ #1
-> > [ 1733.413404] Hardware name: Dell Inc. PowerEdge R740/06WXJT, BIOS
-> > 2.13.3 12/13/2021
-> > [ 1733.420972] Call Trace:
-> > [ 1733.423425]  <TASK>
-> > [ 1733.425533]  dump_stack_lvl+0x33/0x50
-> > [ 1733.429207]  print_address_description.constprop.0+0x2c/0x3e0
-> > [ 1733.434959]  print_report+0xb5/0x270
-> > [ 1733.438539]  ? kasan_addr_to_slab+0x9/0xa0
-> > [ 1733.442639]  ? io_req_local_work_add+0x3b1/0x4a0
-> > [ 1733.447258]  kasan_report+0xcf/0x100
-> > [ 1733.450839]  ? io_req_local_work_add+0x3b1/0x4a0
-> > [ 1733.455456]  io_req_local_work_add+0x3b1/0x4a0
-> > [ 1733.459903]  ? __pfx_io_req_local_work_add+0x10/0x10
-> > [ 1733.464871]  ? __schedule+0x616/0x1530
-> > [ 1733.468622]  __io_req_task_work_add+0x1bc/0x270
-> > [ 1733.473156]  io_issue_sqe+0x55a/0xe80
-> > [ 1733.476831]  io_wq_submit_work+0x23e/0xa00
-> > [ 1733.480930]  io_worker_handle_work+0x2f5/0xa80
-> > [ 1733.485384]  io_wq_worker+0x6c5/0x9d0
-> > [ 1733.489051]  ? __pfx_io_wq_worker+0x10/0x10
-> > [ 1733.493246]  ? _raw_spin_lock_irq+0x82/0xe0
-> > [ 1733.497430]  ? __pfx_io_wq_worker+0x10/0x10
-> > [ 1733.501616]  ret_from_fork+0x29/0x50
-> > [ 1733.505204]  </TASK>
-> > [ 1733.507396]
-> > [ 1733.508894] Allocated by task 97057:
-> > [ 1733.512475]  kasan_save_stack+0x1e/0x40
-> > [ 1733.516313]  kasan_set_track+0x21/0x30
-> > [ 1733.520068]  __kasan_slab_alloc+0x83/0x90
-> > [ 1733.524080]  kmem_cache_alloc_bulk+0x13a/0x1e0
-> > [ 1733.528526]  __io_alloc_req_refill+0x238/0x510
-> > [ 1733.532971]  io_submit_sqes+0x65a/0xcd0
-> > [ 1733.536810]  __do_sys_io_uring_enter+0x4e9/0x830
-> > [ 1733.541430]  do_syscall_64+0x59/0x90
-> > [ 1733.545010]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> > [ 1733.550071]
-> > [ 1733.551571] The buggy address belongs to the object at ffff8881333203c0
-> > [ 1733.551571]  which belongs to the cache io_kiocb of size 224
-> > [ 1733.563816] The buggy address is located 152 bytes inside of
-> > [ 1733.563816]  224-byte region [ffff8881333203c0, ffff8881333204a0)
-> > [ 1733.575544]
-> > [ 1733.577042] The buggy address belongs to the physical page:
-> > [ 1733.582617] page:00000000edbe178c refcount:1 mapcount:0
-> > mapping:0000000000000000 index:0x0 pfn:0x133320
-> > [ 1733.592011] head:00000000edbe178c order:1 entire_mapcount:0
-> > nr_pages_mapped:0 pincount:0
-> > [ 1733.600096] memcg:ffff88810cd49001
-> > [ 1733.603501] flags:
-> > 0x17ffffc0010200(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
-> > [ 1733.610896] page_type: 0xffffffff()
-> > [ 1733.614390] raw: 0017ffffc0010200 ffff888101222280 ffffea0004473900
-> > 0000000000000002
-> > [ 1733.622128] raw: 0000000000000000 0000000000190019 00000001ffffffff
-> > ffff88810cd49001
-> > [ 1733.629866] page dumped because: kasan: bad access detected
-> > [ 1733.635439]
-> > [ 1733.636938] Memory state around the buggy address:
-> > [ 1733.641731]  ffff888133320300: 00 00 00 00 00 00 00 00 00 00 00 00
-> > fc fc fc fc
-> > [ 1733.648952]  ffff888133320380: fc fc fc fc fc fc fc fc 00 00 00 00
-> > 00 00 00 00
-> > [ 1733.656169] >ffff888133320400: 00 00 00 00 00 00 00 00 00 00 00 00
-> > 00 00 00 00
-> > [ 1733.663389]                                                        ^
-> > [ 1733.669743]  ffff888133320480: 00 00 00 00 fc fc fc fc fc fc fc fc
-> > fc fc fc fc
-> > [ 1733.676961]  ffff888133320500: 00 00 00 00 00 00 00 00 00 00 00 00
-> > 00 00 00 00
-> 
-> I appreciate you running tests and sending in failures, but can you
-> please be more specific about what exactly was run? We seem to need to
-> do this dance every time, which is just wasting time. So:
-> 
-> 1) What test triggered this?
-> 2) Was it invoked with any arguments?
+On Wed, Jun 21, 2023, at 16:01, Naresh Kamboju wrote:
+> While running LTP fs testing on x86_64 device the following kernel BUG:
+> notice with Linux next-20230621.
+>
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>
+> Steps to reproduce:
+>
+> # cd /opt/ltp
+> # ./runltp -f fs
+>
+> Test log:
+> ======
+> read_all.c:687: TPASS: Finished reading files
+> Summary:
+> passed   1
+> failed   0
+> broken   0
+> skipped  0
+> warnings 0
+> tst_test.c:1558: TINFO: Timeout per run is 0h 06m 40s
+> read_all.c:568: TINFO: Worker timeout set to 10% of max_runtime: 1000ms
+> [ 1344.664349] block sda: the capability attribute has been deprecated.
 
-I can see the whole dmesg log, and it seems from "sq-full-cpp.c /dev/sda":
+I think the oops is unrelated to the line above
 
-[ 1340.918880] Running test sq-full-cpp.t:
-[ 1341.009225] Running test sq-full-cpp.t /dev/sda:
-[ 1342.025292] restraintd[1061]: *** Current Time: Tue Jun 20 21:17:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-[ 1402.053433] restraintd[1061]: *** Current Time: Tue Jun 20 21:18:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-[ 1462.047970] restraintd[1061]: *** Current Time: Tue Jun 20 21:19:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-[-- MARK -- Wed Jun 21 01:20:00 2023]
-[ 1522.029598] restraintd[1061]: *** Current Time: Tue Jun 20 21:20:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-[ 1582.029278] restraintd[1061]: *** Current Time: Tue Jun 20 21:21:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-[ 1642.034617] restraintd[1061]: *** Current Time: Tue Jun 20 21:22:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-[ 1702.034344] restraintd[1061]: *** Current Time: Tue Jun 20 21:23:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-[ 1733.381782] ==================================================================
-[ 1733.389012] BUG: KASAN: out-of-bounds in io_req_local_work_add+0x3b1/0x4a0
-[ 1733.395900] Read of size 4 at addr ffff888133320458 by task iou-wrk-97057/97138
+> [ 1344.679885] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [ 1344.686839] #PF: supervisor instruction fetch in kernel mode
+> [ 1344.692490] #PF: error_code(0x0010) - not-present page
+> [ 1344.697620] PGD 8000000105569067 P4D 8000000105569067 PUD 1056ed067 PMD 0
+> [ 1344.704494] Oops: 0010 [#1] PREEMPT SMP PTI
+> [ 1344.708680] CPU: 0 PID: 5649 Comm: read_all Not tainted
+> 6.4.0-rc7-next-20230621 #1
+> [ 1344.716245] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
+> 2.5 11/26/2020
+> [ 1344.723629] RIP: 0010:0x0
+> [ 1344.726257] Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+> [ 1344.732780] RSP: 0018:ffff98d38123bd38 EFLAGS: 00010286
+> [ 1344.737998] RAX: 0000000000000000 RBX: ffffffffbea38720 RCX: 0000000000000000
+> [ 1344.745123] RDX: ffff979e42e31000 RSI: ffffffffbea38720 RDI: ffff979e40371900
+> [ 1344.752246] RBP: ffff98d38123bd48 R08: ffff979e4080a0f0 R09: 0000000000000001
+> [ 1344.759371] R10: ffff979e42e31000 R11: 0000000000000000 R12: ffff979e42e31000
+> [ 1344.766495] R13: 0000000000000001 R14: ffff979e432dd2f8 R15: ffff979e432dd2d0
+> [ 1344.773621] FS:  00007ff745d4b740(0000) GS:ffff97a1a7a00000(0000)
+> knlGS:0000000000000000
+> [ 1344.781704] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 1344.787442] CR2: ffffffffffffffd6 CR3: 000000010563c004 CR4: 00000000003706f0
+> [ 1344.794587] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [ 1344.801733] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [ 1344.808857] Call Trace:
+> [ 1344.811301]  <TASK>
+> [ 1344.813399]  ? show_regs+0x6e/0x80
+> [ 1344.816804]  ? __die+0x29/0x70
+> [ 1344.819857]  ? page_fault_oops+0x154/0x470
+> [ 1344.823957]  ? do_user_addr_fault+0x355/0x6c0
+> [ 1344.828314]  ? exc_page_fault+0x6e/0x170
+> [ 1344.832239]  ? asm_exc_page_fault+0x2b/0x30
+> [ 1344.836420]  max_phase_adjustment_show+0x23/0x50
 
+The function is newly added by commit c3b60ab7a4dff ("ptp: Add 
+getmaxphase callback to ptp_clock_info"), adding everyone from
+that patch to Cc.
 
-Thank,
-Ming
-
+     Arnd
