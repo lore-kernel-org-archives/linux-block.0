@@ -2,151 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC70EEB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 07:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B372EB64DC
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 07:39:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230409AbjFUHhK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 03:37:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33648 "EHLO
+        id S231282AbjFUHjI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 03:39:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229702AbjFUHhI (ORCPT
+        with ESMTP id S231398AbjFUHiu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 03:37:08 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E87899D;
-        Wed, 21 Jun 2023 00:37:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n+5uaQRAsrDUrO9JrAeDQmqN1/T4IPMqp33oqNUuK3xXDzyXNxpQOY5VPrlY3g2oQre3a5He7RC5WLkA5w2z2h28xsefHpviaRuXhZWuKcHgQu2ncfHntWGElCfgu39E+2cmJfQG7zKvM2ZD/U+9bUeTBAGdFfJcTSIvFyQN+VHZrie2DhwKGq/ekit3HwLBFYN8SqPEnKCJsMmrWh+nWhIHxN5+T0dcHCZ6xeAi/LAUrMo/a7VpMdvEf0bkmeMkDSQbaWD/cD0IgU9LxoUDLcRVGnHg9KGLrKKgeLmQRLwHMx0riLjptc73o4K2Bs4yrrD4kNV/f2qYvgBeXlQf9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+yDjyjtdFShmevxTngHxMtPYUVCVmI+HalAidrtRSFE=;
- b=dIez2rGnGkH4MpmH4kWkPtjRfmWSixZiEi1+tbEme5vniaDVxloXKv+IDZHAg94CAcm2EeUyQHkAIxUpAGlEZKz17C3qOdRUyknMhEK64ou6B8dNezfKGXAIot3OzKH/IGfTZzBEdXLvnSOyfJ2kTjyGndfWoUfiPT9YVf0cULCvaMg1z+1n8D7jGK79jVMb1aN2aC0s9M7dm/7LTwS173hmn1uXA1EwvhJRAg1sy3IMNUBWNu5zQqEBcjJDO7VJbuDPNhwCzx60Y6q7RjkALzwwkl1PwqOGIpIpf7DgAdFfTE+5X2o4zOYUMUjbBldrs5rgb/QC8zSAJd7NhtlU3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+yDjyjtdFShmevxTngHxMtPYUVCVmI+HalAidrtRSFE=;
- b=BYDhtWpaNoQJbYkhnpFeKB/ZC3M/eZVlR5l3j5ykOWa88y6FOuSuzMRZLc0Cqk+R6W1Ta/pvbluR5oYhBt3ZyzaVTtG0WqHEUTtAZxlPMo4769V47vpc/nDlq8yrVUZOX7ToBltg8oVpRnPCn5KBKZU7Dh65Nlz7Clqy9Ec5rQMZhtd8yuzyLC1u92bKVKjy6x6IQshwcUhJBS1tMUG+k9mVqKKVASwOdGFviiMv2Ih8VJn+1zBil9uD2gLv8z3CBtNqEZIfGQOOlQs5umR/XK+Oyf+Ryh9mT0ZksOAt4tdKI4wqZ07TwTdIinpR13JdtyikT3OSu0Z5r/0WZQxE/A==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by LV2PR12MB6014.namprd12.prod.outlook.com (2603:10b6:408:170::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.37; Wed, 21 Jun
- 2023 07:37:04 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::92c6:4b21:586d:dabc]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::92c6:4b21:586d:dabc%4]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
- 07:37:04 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "yukuai (C)" <yukuai3@huawei.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: block test failure with scsi_debug
-Thread-Topic: block test failure with scsi_debug
-Thread-Index: AQHZoz4AGlJ6LeG3CU6kLWItstvxmq+UjrIAgABHm4CAAAfFAIAAAcoA
-Date:   Wed, 21 Jun 2023 07:37:04 +0000
-Message-ID: <7d2e0016-91f0-227f-328a-8fd43f3b24d5@nvidia.com>
-References: <1760da91-876d-fc9c-ab51-999a6f66ad50@nvidia.com>
- <zgp4nnbryukbgnv4cdtdnn3hwqvgggeknljmobk4moobiffseu@hiytoqbf7pol>
- <fqix34ny4enu26rqgbohuknosejgn5uikloeam7rbzjyf5zvux@f2uuriyeddhb>
- <35cece9a-0790-c7bf-ffdf-2ba14fb5479d@huaweicloud.com>
-In-Reply-To: <35cece9a-0790-c7bf-ffdf-2ba14fb5479d@huaweicloud.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|LV2PR12MB6014:EE_
-x-ms-office365-filtering-correlation-id: 50c954a3-e7e0-4f1a-064b-08db722a4f2c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: SLPdsRg4r6lbUOQXSMZvc3BdIXu5DbCxGKPLrj1aT/T2EsHMlbtLvXc9JDHc+j0L5wQHaxR1ngE7eIFPR24eGkMdTinZgP++keQLb1uLbkC4YkHi/7m5vT7uszNW02YSdXRJIWOzRLT0PvQZ9TiqJvMatVWs2VaI2xgQ5vIsiI/Rx2vezDJOkeCR8DWafjSEtxXGLhHWu2LalcIdRwMiuh5MFAlj0AlmGf257Qc7d/G6apExND9EcuUsV+MrdEmlskwUMPKKkGSglmV+hDaTJLZoWaoyalghuq6SGewakXgjZQ6zVh5LtTdZkL5KkRLCyPocGjTdUB0KoO2vntfSy5QcZq2RvwPs8CDx+mNoUwsHbzbwcdHWyHApQmdLfa534gLFbETsef/QxWpSyHhDORnzdrp+jc2AxFO60vQrs3NHUKuVSOwXON4R/2HSnCgzaeREv4vGMVa9GYwbUFKIYnSdBo/gVuGtnPqg0Rd14mJOuN96VD/B3i9+S12skTQTzwHDxzPDtyvJzN6UuuZuYisS2R7p5lx4+yQ/mtLnFma4VZzKyYXsh8eNOBIX7XJHtQaovIJicIr4RdHGnjNCY9GbWY9EVTSwQKZD4Jv6/FuMmn9s/aDYYcZGimeuO+EzHWD+KIRrSVJ0gRW0Lte76c3AsELNF/XYTi2gF/TiFvlxDRYTlj+/HfKV0ESYCsZg
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(366004)(376002)(39860400002)(451199021)(31696002)(86362001)(83380400001)(38100700002)(122000001)(31686004)(8936002)(38070700005)(66946007)(41300700001)(8676002)(5660300002)(66446008)(66556008)(64756008)(66476007)(6916009)(316002)(2616005)(6486002)(6506007)(53546011)(6512007)(186003)(478600001)(54906003)(91956017)(71200400001)(4326008)(76116006)(36756003)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?M0RxZHZVdVFhbHUvVW1QelkyUnZCOUJlSzhJazdwWWRoaWUrZE1XR3JLOUtH?=
- =?utf-8?B?cDJKQU9td3BHTzhOQmsyd0JNOCtVakhhckk5YXhBOTVnbUJXN2lDRHNMYmxW?=
- =?utf-8?B?WTRRc1I1dDFOS09QNVNLT3REejJub2xVVWZZdEpsZGZnT3FoKzFlbjVmV1F4?=
- =?utf-8?B?T1BrQTJaVldYNnRENWZKZ2s0YnN3Wm4vQVk2enVVYjR0bUc5RmdWcWZKUjUx?=
- =?utf-8?B?K0UybEpGL3VnZlNZNHFINThVUW05WmxSOWpDQkN1OTMxTm5zbmpGWkxuM21O?=
- =?utf-8?B?RERtQ0JXbHhOL0txNHFpWlVaSXB6d0NWbGZBem9LOHd6N1ZHT0ZlbS9qWVpZ?=
- =?utf-8?B?amdTQi9GVkxRTldqRWk0RVNXejJaaC9VOVNLdDlqNVBiNHVvcFVaejdPSytr?=
- =?utf-8?B?K2k1R3lGSW1qWE44QmlvRmZuQTRSdDZ3ZnUyc2t2NnRLcFpUSWFJYVEzeWxQ?=
- =?utf-8?B?RE5uVGRzdGdsQlZqaWp5SG1ENlhBV3hJT0p6YWlnYmhlSlVNMENtNU0rM3pZ?=
- =?utf-8?B?bTdZak5FRXZnZWFGOUNpajBsVHRiZFdyeWlvQVhONDRVOWU0TTdrN2FKbFJq?=
- =?utf-8?B?Q0lkcHdyM3pXS3p6Z2VCc0JILzAwNXJLVDNqTDV1TlJLVW9JK1ZPYXVpVy9P?=
- =?utf-8?B?bjU1WDk1YlFKMXRhY3hsWSsyVVBlT0Vablp1UnNNcWYvbC9hV0sraWUzdFFG?=
- =?utf-8?B?QWR6WTBUQmNmRFU1WHhPcHEzSE8wQUd6VVZoWEpnUFBveERFMDRHNTdlYWJW?=
- =?utf-8?B?anVvQ0hpMGdmV1k1ajlQWGVkcm9zUXN2VWhLSnQ0WUlFRndydTVpNHhkZnRC?=
- =?utf-8?B?Y2dQdTEyS0VQSkNtdmZVMklkWGtpM1RnM3VJV2ZhYldoZkN5SjE5ZjdDVUxx?=
- =?utf-8?B?a2lwRGtlamNMeTdtN2hxVEVlTEtCSFJwOTVJdzVnNFhVdkNZTFJPdWdRR0pj?=
- =?utf-8?B?aWtVYlp2anJzdTdTQWVZa3BGakJrd2ViTzFCR000Vm9aYWp2bkp1cytCQ0Y1?=
- =?utf-8?B?ZjdvRk1lT2F3eFM5Zm5OS3pSWjhBaEZqZVRDMWtKaG1uS1JOcHlaSStrMnI0?=
- =?utf-8?B?WDdCRmZnaUpNSDNMMEN6dTlRaDg2cnI0ZkVFMU4wSUo5L3VuZHVFU0ptK2N5?=
- =?utf-8?B?OGRzMm0vamNBUXFhZ1VWWnQ4ZlR3THNmQnI1TFNxYm45UEZHUGJFVkpSV2xP?=
- =?utf-8?B?OGY3UURHZThaOW1taXVYSXRSZC9XYWNNaTJoa0FEcTFoSUthWDNOWUdDeTBj?=
- =?utf-8?B?UnpOaTRPTjB3QmthYkhBR1pTS0wzQ3hsOWxDZkhTUCtCOTlHM3l5a0Z6Qk9U?=
- =?utf-8?B?U0lOSXlrUlZQK3h5K3FvTDBlbHpDbWN1SWw1UDhleFhZMUZ2WHRxaXpiVC9u?=
- =?utf-8?B?OXAzMStoUHZIZGliR3dkTnd5eWVQbWgwN0hBU2Fsc2VYeGNrei9MSHl3UUR3?=
- =?utf-8?B?L05zcEFPYXhrcUgxcDlNQUJoZk5VbmpOaUZFQkE2VHJDV1lQT0FKRU1WSEVY?=
- =?utf-8?B?N2NKV0hvY3pjcHdWYS94QjRLRmFtUGcxdGRvSVRZU0xwclY1TGtBT0dnRmcx?=
- =?utf-8?B?MWErbWlrUzFTM2RnNFVWcVB6TDVQSytZSWJDT2t3TUpWL1UyazVGQ0ozUENP?=
- =?utf-8?B?N3paZDlBL1JEMWZhU21uTDRpTDBmR3ZKR0o1ZjlsUGQ1UzM3ZU1aNjNwT0xT?=
- =?utf-8?B?bU8xcDFzVHF0YmY1Z1ZNQkVIazJ2NnhnWEgrakZRRytSN2JNUDV4a1JoSDhO?=
- =?utf-8?B?SG1rK0VCQ002dEtHallJSGlCWnJsQWtjVXdOWkI4djRxUlZ4RXRjY20zT2tF?=
- =?utf-8?B?Nk5yZWp0UXNRcXBXbm1pNnY5TDUzOURyZEM4a0xqREU3dkRNVlQyUk5HWXBV?=
- =?utf-8?B?aEJ2RDlXbzN5eXd0YWFKUjI1RGZEVzhWeFRMellDLzZTQ05BSDNRR0FRbDh4?=
- =?utf-8?B?UEZrbnV2cVZwUDlxWlVHcnl2Ky81RGpFSE56NGdEZDBzeHAyWHViTWxiU1VW?=
- =?utf-8?B?QzhMVUJvR1BDL1pRMWo2dWtESUdjQ0xhNDRiUGxVeEZoVTdBcFk5YzJMQmJX?=
- =?utf-8?B?QnY1TzRlOWx4MitxQmZLSVU0TWFGcGU3ZGZHSU1ncGlUMVlWL0xLSmdLa2FX?=
- =?utf-8?B?bGc1cHJ2UlhWYVdlUTNhQXJFbVZrbmFaNlpxbUMzOEt5cW0rM1paanlmblBm?=
- =?utf-8?Q?a9s95PDugb7nbBD/FOmwl9AyGwSjURKL+/zUjizLiKov?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CC6E76E39E46A641985913412F9A0E91@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 21 Jun 2023 03:38:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4EE71BE6
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 00:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687333070;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=swMWMkFWO58aMTzqNZ9qOICuoXWLw23lCVVmDHXmaj0=;
+        b=Pq3wyYGUvaLCRt6ZOCSlpRoLnmno2Yhu14PbpemxB+g7F8OfA3QoBgdPSrFlOea2Syn3df
+        5PLX6lfRuOaDRwiEh9MnDhiyHfE6vmCtjuUTbA/egFGqSg55IFzKjp8vfs2VKkSx7IUjFC
+        l1TwB1NJkpLX5PGUH9hlmCbZki1NfKU=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-444-8MsuLy8OPfa-r1FPdVAIgw-1; Wed, 21 Jun 2023 03:37:49 -0400
+X-MC-Unique: 8MsuLy8OPfa-r1FPdVAIgw-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-514abe67064so3848195a12.0
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 00:37:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687333067; x=1689925067;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=swMWMkFWO58aMTzqNZ9qOICuoXWLw23lCVVmDHXmaj0=;
+        b=BchcICFrXTRV+LS+STz+CY+E2XfU4QFvLSETWCuju7OmlGN9wCfmiW6H2zHpvJ2Lr8
+         w66lbHVLXna9P+9GaIdMsMSmLvajqTOS5Cu3b3LowNte5rqAMNfhoLhhxtWcrofc1DSC
+         hiyhC7iHU2sunU4dLe8kqyxm3alOpgKtkweRreRWiDvqgvrN8AA3l9bQi5D+4uKJlqg8
+         EB0q9AQDhz2R0myyIjCGq9RRmzZAKMnUQAaYO3lEcdSaFSUesjiv0v5SzWbe3IVp7y4B
+         1eNPYo8gh7wSUIys+NvOSiIHyMp5ukYz6XFwZ+/XjVYej5eqGIPePtYc2HBf5jUkhdkY
+         4uDw==
+X-Gm-Message-State: AC+VfDwSMuYAtAIl+HiBfshgRTWDrIiwhioxij8214J6ZaLgT2UUPiX1
+        M83Vb4OC4q9NDPO08GDdbZisEZtC3aUaZDidZqrXe85AFp7fHQdPFOKNe6hr4UliWWirNQCcGxn
+        PYR/8lu8VstS10dAbBklT2iWdFqpuQnpvkj6+VhGlfvCrVZ3N2Qqp
+X-Received: by 2002:a50:fb0e:0:b0:51a:47d4:f515 with SMTP id d14-20020a50fb0e000000b0051a47d4f515mr7423509edq.27.1687333067695;
+        Wed, 21 Jun 2023 00:37:47 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4lu0rltg6k20uSmMWdahaRCsM/l+Oyn0xdZ3vrVmCzJBVkWNOcWkOtGXDLb4LpLgrQ8n7+Lwn3qwl4+oiKwrM=
+X-Received: by 2002:a50:fb0e:0:b0:51a:47d4:f515 with SMTP id
+ d14-20020a50fb0e000000b0051a47d4f515mr7423497edq.27.1687333067320; Wed, 21
+ Jun 2023 00:37:47 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50c954a3-e7e0-4f1a-064b-08db722a4f2c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jun 2023 07:37:04.5055
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dLETE7OSPPEgbNzrtUUlt8Ip8PBa41+Utv0/Skhnm/++zWZeVElAEWEnuDdIzZ5q126gATSaN7RTwvsDab3r6g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB6014
+From:   Guangwu Zhang <guazhang@redhat.com>
+Date:   Wed, 21 Jun 2023 15:38:54 +0800
+Message-ID: <CAGS2=YrvrD0hf7WGjQd4Me772=m9=E6J92aGtG0PAoF4yD6dTw@mail.gmail.com>
+Subject: [bug report] BUG: KASAN: out-of-bounds in io_req_local_work_add+0x3b1/0x4a0
+To:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Jeff Moyer <jmoyer@redhat.com>, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNi8yMS8yMyAwMDozMCwgWXUgS3VhaSB3cm90ZToNCj4gSGksDQo+DQo+IOWcqCAyMDIzLzA2
-LzIxIDE1OjAyLCBTaGluaWNoaXJvIEthd2FzYWtpIOWGmemBkzoNCj4+IENDKzogWXUgS3VhaSwg
-bGludXgtc2NzaSwNCj4+DQo+PiBPbiBKdW4gMjEsIDIwMjMgLyAwMjo0NiwgU2hpbmljaGlybyBL
-YXdhc2FraSB3cm90ZToNCj4+PiBPbiBKdW4gMjAsIDIwMjMgLyAwNjoxMSwgQ2hhaXRhbnlhIEt1
-bGthcm5pIHdyb3RlOg0KPj4+PiBIaSwNCj4+Pj4NCj4+Pj4gSSBmb3VuZCBmZXcgZmFpbHVyZXMs
-IGFyZSB5b3UgYWxzbyBnZXR0aW5nIHRoZSBzYW1lID8NCj4+Pj4NCj4+Pj4gbGludXgtYmxvY2sv
-Zm9yLW5leHQgb2JzZXJ2ZWQgYmxvY2sgdGVzdCBmYWlsdXJlIDotDQo+Pj4NCj4+PiBZZXMsIEkn
-dmUganRyaWVkIHRoZSBrZXJuZWwgb24gbGludXgtYmxvY2svZm9yLW5leHQgYXQgZ2l0IGhhc2gg
-DQo+Pj4gMzM0YmRiNjFiYmVhLA0KPj4+IGFuZCBzZWUgdGhlIHNhbWUgZmFpbHVyZSBzeW1wdG9t
-cy4gSXQgbG9va3MgdGhhdCB0aGUgZmlyc3QgdGVzdCBjYXNlIA0KPj4+IGJsb2NrLzAwMQ0KPj4+
-IGxlZnQgc2NzaV9kZWJ1ZyBpbiB3ZWlyZCBzdGF0dXMsIGFuZCBmb2xsb3dpbmcgdGVzdCBjYXNl
-cyB3ZXJlIA0KPj4+IGFmZmVjdGVkLg0KPj4+DQo+Pj4gSSB0cmllZCBzaW1wbGUgY29tbWFuZHMg
-YmVsb3cgYW5kIGZvdW5kIHRoYXQgc2NzaV9kZWJ1ZyBtb2R1bGUgDQo+Pj4gdW5sb2FkIGZhaWxz
-Lg0KPj4+DQo+Pj4gwqDCoMKgwqAgIyBtb2Rwcm9iZSBzY3NpX2RlYnVnDQo+Pj4gwqDCoMKgwqAg
-IyBtb2Rwcm9iZSAtciBzY3NpX2RlYnVnDQo+Pj4gwqDCoMKgwqAgbW9kcHJvYmU6IEZBVEFMOiBN
-b2R1bGUgc2NzaV9kZWJ1ZyBpcyBpbiB1c2UuDQo+DQo+IFRoYW5rcyBmb3IgdGhlIHRlc3QsIHRo
-aXMgaXMgYmVjYXVzZSAvZGV2L3NnIHdpbGwgZ3JhYiByZWZlcmVuY2UgZm9yDQo+IHNjc2lfZGV2
-aWNlLCBhbmQgdGhpcyB3aWxsIGJsb2NrIHJlbW92ZSBtb2R1bGUuDQo+DQoNClBsZWFzZSBtYWtl
-IHN1cmUgdG8gcnVuIHRoZSBibGt0ZXN0cyBpbiBvcmRlciB0byB2YWxpZGF0ZSBmb2xsb3dpbmcg
-Y2hhbmdlDQphbmQgYWRkIHRoZSByZXN1bHQgaW50byBjb3Zlci1sZXR0ZXIgd2hlbiB5b3Ugc2Vu
-ZCBhIGZvcm1hbCBwYXRjaCBzbyBpdA0Kd2lsbCBiZSBlYXNpZXIgdG8gZ2l2ZSB5b3UgcmV2aWV3
-LWJ5IGZvciBldmVyeW9uZS4NCg0KLWNrDQoNCg0K
+HI,
+Found the io_req_local_work_add error when run  liburing testing.
+
+kernel repo :
+    Merge branch 'for-6.5/block' into for-next
+    * for-6.5/block:
+      reiserfs: fix blkdev_put() warning from release_journal_dev()
+
+[ 1733.389012] BUG: KASAN: out-of-bounds in io_req_local_work_add+0x3b1/0x4a0
+[ 1733.395900] Read of size 4 at addr ffff888133320458 by task
+iou-wrk-97057/97138
+[ 1733.403205]
+[ 1733.404706] CPU: 4 PID: 97138 Comm: iou-wrk-97057 Kdump: loaded Not
+tainted 6.4.0-rc3.kasan+ #1
+[ 1733.413404] Hardware name: Dell Inc. PowerEdge R740/06WXJT, BIOS
+2.13.3 12/13/2021
+[ 1733.420972] Call Trace:
+[ 1733.423425]  <TASK>
+[ 1733.425533]  dump_stack_lvl+0x33/0x50
+[ 1733.429207]  print_address_description.constprop.0+0x2c/0x3e0
+[ 1733.434959]  print_report+0xb5/0x270
+[ 1733.438539]  ? kasan_addr_to_slab+0x9/0xa0
+[ 1733.442639]  ? io_req_local_work_add+0x3b1/0x4a0
+[ 1733.447258]  kasan_report+0xcf/0x100
+[ 1733.450839]  ? io_req_local_work_add+0x3b1/0x4a0
+[ 1733.455456]  io_req_local_work_add+0x3b1/0x4a0
+[ 1733.459903]  ? __pfx_io_req_local_work_add+0x10/0x10
+[ 1733.464871]  ? __schedule+0x616/0x1530
+[ 1733.468622]  __io_req_task_work_add+0x1bc/0x270
+[ 1733.473156]  io_issue_sqe+0x55a/0xe80
+[ 1733.476831]  io_wq_submit_work+0x23e/0xa00
+[ 1733.480930]  io_worker_handle_work+0x2f5/0xa80
+[ 1733.485384]  io_wq_worker+0x6c5/0x9d0
+[ 1733.489051]  ? __pfx_io_wq_worker+0x10/0x10
+[ 1733.493246]  ? _raw_spin_lock_irq+0x82/0xe0
+[ 1733.497430]  ? __pfx_io_wq_worker+0x10/0x10
+[ 1733.501616]  ret_from_fork+0x29/0x50
+[ 1733.505204]  </TASK>
+[ 1733.507396]
+[ 1733.508894] Allocated by task 97057:
+[ 1733.512475]  kasan_save_stack+0x1e/0x40
+[ 1733.516313]  kasan_set_track+0x21/0x30
+[ 1733.520068]  __kasan_slab_alloc+0x83/0x90
+[ 1733.524080]  kmem_cache_alloc_bulk+0x13a/0x1e0
+[ 1733.528526]  __io_alloc_req_refill+0x238/0x510
+[ 1733.532971]  io_submit_sqes+0x65a/0xcd0
+[ 1733.536810]  __do_sys_io_uring_enter+0x4e9/0x830
+[ 1733.541430]  do_syscall_64+0x59/0x90
+[ 1733.545010]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[ 1733.550071]
+[ 1733.551571] The buggy address belongs to the object at ffff8881333203c0
+[ 1733.551571]  which belongs to the cache io_kiocb of size 224
+[ 1733.563816] The buggy address is located 152 bytes inside of
+[ 1733.563816]  224-byte region [ffff8881333203c0, ffff8881333204a0)
+[ 1733.575544]
+[ 1733.577042] The buggy address belongs to the physical page:
+[ 1733.582617] page:00000000edbe178c refcount:1 mapcount:0
+mapping:0000000000000000 index:0x0 pfn:0x133320
+[ 1733.592011] head:00000000edbe178c order:1 entire_mapcount:0
+nr_pages_mapped:0 pincount:0
+[ 1733.600096] memcg:ffff88810cd49001
+[ 1733.603501] flags:
+0x17ffffc0010200(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
+[ 1733.610896] page_type: 0xffffffff()
+[ 1733.614390] raw: 0017ffffc0010200 ffff888101222280 ffffea0004473900
+0000000000000002
+[ 1733.622128] raw: 0000000000000000 0000000000190019 00000001ffffffff
+ffff88810cd49001
+[ 1733.629866] page dumped because: kasan: bad access detected
+[ 1733.635439]
+[ 1733.636938] Memory state around the buggy address:
+[ 1733.641731]  ffff888133320300: 00 00 00 00 00 00 00 00 00 00 00 00
+fc fc fc fc
+[ 1733.648952]  ffff888133320380: fc fc fc fc fc fc fc fc 00 00 00 00
+00 00 00 00
+[ 1733.656169] >ffff888133320400: 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00
+[ 1733.663389]                                                        ^
+[ 1733.669743]  ffff888133320480: 00 00 00 00 fc fc fc fc fc fc fc fc
+fc fc fc fc
+[ 1733.676961]  ffff888133320500: 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00
+
+-- 
+Guangwu Zhang
+Thanks
+
