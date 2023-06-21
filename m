@@ -2,102 +2,224 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37156EB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 16:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF010EB64D8
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 17:58:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbjFUQvZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 12:51:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40190 "EHLO
+        id S231220AbjFUR6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 13:58:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230020AbjFUQvJ (ORCPT
+        with ESMTP id S231688AbjFUR6G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 12:51:09 -0400
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB21D1BFE
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 09:51:00 -0700 (PDT)
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-668723729c5so2707099b3a.3
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 09:51:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687366260; x=1689958260;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XYtprP5m30Jdts25EMNZrKTbphL4l+vxdtzR8o2UAK4=;
-        b=FJFYPntEw15gWzSPKS2JkEjymiqBrGArv6DeUVwMKyLDCL5PkIgfY/ROcadA3zCN4a
-         jcE5iE0Jjwhu/CeZPjdrc/hN2kab88h5YKKleI1j0ixF16WIBIz687OliOo2BujUirfX
-         jQpAbRwV9eStYwmGKElYe/sKJFjOcBhelQV/rzPMFELebkBcYqAVuRmSLJ5Fu5ubeImi
-         LA5B6l6zio7nxREJQX88rii5rFv57ANy4yDxQ6Vh0uu0he2YYgvRwlNfOD6j8vrUjM74
-         fSG8cm816NGiZy+7ZV4OjtCPy+vJ9hm/Oxd76+5zrPsx8pMn54lu1a4p6ck88D1EUvBK
-         YhHQ==
-X-Gm-Message-State: AC+VfDxCF1MasuMb3RtMEFsEzMZF828OvkF2ORw3Jkc2+9sS3dy8bhDh
-        dz1thB4pW7OPtuG53S7dnRM=
-X-Google-Smtp-Source: ACHHUZ55RNOaGfyMYKbPFxUHzCpLU073/3JDT6r5W5daOlClSNYL4LcsEDv7xr1cu0TGqLuvCjw9ew==
-X-Received: by 2002:a05:6a20:4294:b0:114:c11c:7ad5 with SMTP id o20-20020a056a20429400b00114c11c7ad5mr17063300pzj.52.1687366260101;
-        Wed, 21 Jun 2023 09:51:00 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:c0b7:6a6f:751b:b854])
-        by smtp.gmail.com with ESMTPSA id p23-20020a62ab17000000b00668843bee48sm3108443pff.218.2023.06.21.09.50.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 09:50:59 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH] block: Improve kernel-doc headers
-Date:   Wed, 21 Jun 2023 09:50:54 -0700
-Message-ID: <20230621165054.743815-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
+        Wed, 21 Jun 2023 13:58:06 -0400
+Received: from out-12.mta0.migadu.com (out-12.mta0.migadu.com [91.218.175.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D189A26AF
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 10:57:37 -0700 (PDT)
+Date:   Wed, 21 Jun 2023 13:56:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1687370225;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wZCuC0N5VxiTy0FBGpNcTC3V9UKKDdwQ7mvS3OdFcB8=;
+        b=epmaj8wWDehCMB0UiexoFAAwYJpmmW/Ar7jFnm66ONLUtNvfIe5kDp7ZK6gQX7StwCgdq7
+        g/h4unluYGVUnuE98jT3BC9WSJeYX+foYidD2wTC9qKLpdAHO5wbojCok2h587FjU73lhG
+        PNUqEyNLTRI5+ma4NFOw4hg3kwLuIw8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org
+Subject: Re: [PATCH 1/2] bcache: Alloc holder object before async registration
+Message-ID: <20230621175659.ugkaawkuanlzt736@moria.home.lan>
+References: <20230621162024.29310-1-jack@suse.cz>
+ <20230621162333.30027-1-jack@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621162333.30027-1-jack@suse.cz>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix the documentation of the devt_from_partuuid() return value.
+On Wed, Jun 21, 2023 at 06:23:26PM +0200, Jan Kara wrote:
+> Allocate holder object (cache or cached_dev) before offloading the
+> rest of the startup to async work. This will allow us to open the block
+> block device with proper holder.
 
-Fix the following two recently introduced kernel-doc warnings:
+This is a pretty big change for this fix, and we'd want to retest the
+error paths - that's hard to do, because the fault injection framework I
+was using for that never made it upstream.
 
-block/bdev.c:570: warning: Function parameter or member 'hops' not described in 'bd_finish_claiming'
-block/early-lookup.c:46: warning: Function parameter or member 'devt' not described in 'devt_from_partuuid'
+What about just exposing a proper API for changing the holder? Wouldn't
+that be simpler?
 
-Cc: Christoph Hellwig <hch@lst.de>
-Fixes: 0718afd47f70 ("block: introduce holder ops")
-Fixes: cf056a431215 ("init: improve the name_to_dev_t interface")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/bdev.c         | 1 +
- block/early-lookup.c | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 9bb54d9d02a6..979e28a46b98 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -561,6 +561,7 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
-  * bd_finish_claiming - finish claiming of a block device
-  * @bdev: block device of interest
-  * @holder: holder that has claimed @bdev
-+ * @hops: block device holder operations
-  *
-  * Finish exclusive open of a block device. Mark the device as exlusively
-  * open by the holder and wake up all waiters for exclusive open to finish.
-diff --git a/block/early-lookup.c b/block/early-lookup.c
-index a5be3c68ed07..91002b19d09c 100644
---- a/block/early-lookup.c
-+++ b/block/early-lookup.c
-@@ -32,6 +32,7 @@ static int __init match_dev_by_uuid(struct device *dev, const void *data)
- /**
-  * devt_from_partuuid - looks up the dev_t of a partition by its UUID
-  * @uuid_str:	char array containing ascii UUID
-+ * @devt:	dev_t result
-  *
-  * The function will return the first partition which contains a matching
-  * UUID value in its partition_meta_info struct.  This does not search
-@@ -40,7 +41,7 @@ static int __init match_dev_by_uuid(struct device *dev, const void *data)
-  * If @uuid_str is followed by a "/PARTNROFF=%d", then the number will be
-  * extracted and used as an offset from the partition identified by the UUID.
-  *
-- * Returns the matching dev_t on success or 0 on failure.
-+ * Returns 0 on success or a negative error code on failure.
-  */
- static int __init devt_from_partuuid(const char *uuid_str, dev_t *devt)
- {
+
+
+> 
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>  drivers/md/bcache/super.c | 66 +++++++++++++++------------------------
+>  1 file changed, 25 insertions(+), 41 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index e2a803683105..913dd94353b6 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -2448,6 +2448,7 @@ struct async_reg_args {
+>  	struct cache_sb *sb;
+>  	struct cache_sb_disk *sb_disk;
+>  	struct block_device *bdev;
+> +	void *holder;
+>  };
+>  
+>  static void register_bdev_worker(struct work_struct *work)
+> @@ -2455,22 +2456,13 @@ static void register_bdev_worker(struct work_struct *work)
+>  	int fail = false;
+>  	struct async_reg_args *args =
+>  		container_of(work, struct async_reg_args, reg_work.work);
+> -	struct cached_dev *dc;
+> -
+> -	dc = kzalloc(sizeof(*dc), GFP_KERNEL);
+> -	if (!dc) {
+> -		fail = true;
+> -		put_page(virt_to_page(args->sb_disk));
+> -		blkdev_put(args->bdev, bcache_kobj);
+> -		goto out;
+> -	}
+>  
+>  	mutex_lock(&bch_register_lock);
+> -	if (register_bdev(args->sb, args->sb_disk, args->bdev, dc) < 0)
+> +	if (register_bdev(args->sb, args->sb_disk, args->bdev, args->holder)
+> +	    < 0)
+>  		fail = true;
+>  	mutex_unlock(&bch_register_lock);
+>  
+> -out:
+>  	if (fail)
+>  		pr_info("error %s: fail to register backing device\n",
+>  			args->path);
+> @@ -2485,21 +2477,11 @@ static void register_cache_worker(struct work_struct *work)
+>  	int fail = false;
+>  	struct async_reg_args *args =
+>  		container_of(work, struct async_reg_args, reg_work.work);
+> -	struct cache *ca;
+> -
+> -	ca = kzalloc(sizeof(*ca), GFP_KERNEL);
+> -	if (!ca) {
+> -		fail = true;
+> -		put_page(virt_to_page(args->sb_disk));
+> -		blkdev_put(args->bdev, bcache_kobj);
+> -		goto out;
+> -	}
+>  
+>  	/* blkdev_put() will be called in bch_cache_release() */
+> -	if (register_cache(args->sb, args->sb_disk, args->bdev, ca) != 0)
+> +	if (register_cache(args->sb, args->sb_disk, args->bdev, args->holder))
+>  		fail = true;
+>  
+> -out:
+>  	if (fail)
+>  		pr_info("error %s: fail to register cache device\n",
+>  			args->path);
+> @@ -2520,6 +2502,13 @@ static void register_device_async(struct async_reg_args *args)
+>  	queue_delayed_work(system_wq, &args->reg_work, 10);
+>  }
+>  
+> +static void *alloc_holder_object(struct cache_sb *sb)
+> +{
+> +	if (SB_IS_BDEV(sb))
+> +		return kzalloc(sizeof(struct cached_dev), GFP_KERNEL);
+> +	return kzalloc(sizeof(struct cache), GFP_KERNEL);
+> +}
+> +
+>  static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+>  			       const char *buffer, size_t size)
+>  {
+> @@ -2528,6 +2517,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+>  	struct cache_sb *sb;
+>  	struct cache_sb_disk *sb_disk;
+>  	struct block_device *bdev;
+> +	void *holder;
+>  	ssize_t ret;
+>  	bool async_registration = false;
+>  
+> @@ -2585,6 +2575,13 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+>  	if (err)
+>  		goto out_blkdev_put;
+>  
+> +	holder = alloc_holder_object(sb);
+> +	if (!holder) {
+> +		ret = -ENOMEM;
+> +		err = "cannot allocate memory";
+> +		goto out_put_sb_page;
+> +	}
+> +
+>  	err = "failed to register device";
+>  
+>  	if (async_registration) {
+> @@ -2595,44 +2592,29 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+>  		if (!args) {
+>  			ret = -ENOMEM;
+>  			err = "cannot allocate memory";
+> -			goto out_put_sb_page;
+> +			goto out_free_holder;
+>  		}
+>  
+>  		args->path	= path;
+>  		args->sb	= sb;
+>  		args->sb_disk	= sb_disk;
+>  		args->bdev	= bdev;
+> +		args->holder	= holder;
+>  		register_device_async(args);
+>  		/* No wait and returns to user space */
+>  		goto async_done;
+>  	}
+>  
+>  	if (SB_IS_BDEV(sb)) {
+> -		struct cached_dev *dc = kzalloc(sizeof(*dc), GFP_KERNEL);
+> -
+> -		if (!dc) {
+> -			ret = -ENOMEM;
+> -			err = "cannot allocate memory";
+> -			goto out_put_sb_page;
+> -		}
+> -
+>  		mutex_lock(&bch_register_lock);
+> -		ret = register_bdev(sb, sb_disk, bdev, dc);
+> +		ret = register_bdev(sb, sb_disk, bdev, holder);
+>  		mutex_unlock(&bch_register_lock);
+>  		/* blkdev_put() will be called in cached_dev_free() */
+>  		if (ret < 0)
+>  			goto out_free_sb;
+>  	} else {
+> -		struct cache *ca = kzalloc(sizeof(*ca), GFP_KERNEL);
+> -
+> -		if (!ca) {
+> -			ret = -ENOMEM;
+> -			err = "cannot allocate memory";
+> -			goto out_put_sb_page;
+> -		}
+> -
+>  		/* blkdev_put() will be called in bch_cache_release() */
+> -		ret = register_cache(sb, sb_disk, bdev, ca);
+> +		ret = register_cache(sb, sb_disk, bdev, holder);
+>  		if (ret)
+>  			goto out_free_sb;
+>  	}
+> @@ -2644,6 +2626,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+>  async_done:
+>  	return size;
+>  
+> +out_free_holder:
+> +	kfree(holder);
+>  out_put_sb_page:
+>  	put_page(virt_to_page(sb_disk));
+>  out_blkdev_put:
+> -- 
+> 2.35.3
+> 
