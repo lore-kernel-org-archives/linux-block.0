@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72DD9EB64DD
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59AF9C0015E
 	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 09:22:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231243AbjFUJW3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 05:22:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55848 "EHLO
+        id S230419AbjFUJWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 05:22:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230148AbjFUJW1 (ORCPT
+        with ESMTP id S230471AbjFUJW2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 05:22:27 -0400
+        Wed, 21 Jun 2023 05:22:28 -0400
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB85D10F9;
-        Wed, 21 Jun 2023 02:22:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4ED510D5;
+        Wed, 21 Jun 2023 02:22:25 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QmJ1W2gmNz4f3yYb;
-        Wed, 21 Jun 2023 17:22:23 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QmJ1V3749z4f3yyj;
+        Wed, 21 Jun 2023 17:22:22 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgCHLaFMwZJk+OrGMA--.39130S8;
-        Wed, 21 Jun 2023 17:22:24 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgCHLaFMwZJk+OrGMA--.39130S6;
+        Wed, 21 Jun 2023 17:22:23 +0800 (CST)
 From:   linan666@huaweicloud.com
 To:     axboe@kernel.dk, linan122@huawei.com, dan.j.williams@intel.com,
         vishal.l.verma@intel.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
         yangerkun@huawei.com
-Subject: [PATCH v3 4/4] block/badblocks: fix the bug of reverse order
-Date:   Thu, 22 Jun 2023 01:20:52 +0800
-Message-Id: <20230621172052.1499919-5-linan666@huaweicloud.com>
+Subject: [PATCH v3 2/4] block/badblocks: only set bb->changed/unacked_exist when badblocks changes
+Date:   Thu, 22 Jun 2023 01:20:50 +0800
+Message-Id: <20230621172052.1499919-3-linan666@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230621172052.1499919-1-linan666@huaweicloud.com>
 References: <20230621172052.1499919-1-linan666@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCHLaFMwZJk+OrGMA--.39130S8
-X-Coremail-Antispam: 1UD129KBjvdXoWrKFyruF1kuw1xKr4DWr1UGFg_yoWfAFX_J3
-        4vyFW8Xrn5JFnIkw1SyFy0yF4FvFW5Cr18Kry7Arn7Za1Utan5AwsxKr98Xrn8GFy7G3sI
-        yr93Xryavr4IqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbQ8YFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl82
-        xGYIkIc2x26280x7IE14v26r126s0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC
-        64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM2
-        8EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq
-        3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262
-        IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAF
-        wI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0x
-        vY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwAKzVCY07xG64k0F24l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
-        7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUsVWlDUUUU
+X-CM-TRANSID: gCh0CgCHLaFMwZJk+OrGMA--.39130S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cry8uF1DCr43tFyrAw1UWrg_yoW8Cr15pF
+        98Cw1ftrWjg3Z2gF15Z3ZrKw1FgayfXF48Gr4ay345GryxG3sxtF1vq34Yqa4j9r1avrnI
+        qa4Fgryjva4DC37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUQIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
+        8IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK
+        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
+        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
+        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcx
+        kEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
+        6r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
+        Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAK
+        I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+        xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+        jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
+        0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IUnItC3UUUUU==
 X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -61,36 +61,74 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Li Nan <linan122@huawei.com>
 
-Order of badblocks will be reversed if we set a large area at once. 'hi'
-remains unchanged while adding continuous badblocks is wrong, the next
-setting is greater than 'hi', it should be added to the next position.
-Let 'hi' +1 each cycle.
-
-  # echo 0 2048 > bad_blocks
-  # cat bad_blocks
-    1536 512
-    1024 512
-    512 512
-    0 512
+In badblocks_set(), even if no badblocks changes, bb->changed and
+unacked_exist will still be set. Only set them when badblocks changes.
 
 Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
 Signed-off-by: Li Nan <linan122@huawei.com>
 ---
- block/badblocks.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/badblocks.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/block/badblocks.c b/block/badblocks.c
-index 2c2ef8284a3f..3b816690b940 100644
+index 1b4caa42c5f1..7e6ebe2ac12c 100644
 --- a/block/badblocks.c
 +++ b/block/badblocks.c
-@@ -301,6 +301,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+@@ -166,6 +166,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 	int lo, hi;
+ 	int rv = 0;
+ 	unsigned long flags;
++	bool changed = false;
+ 
+ 	if (bb->shift < 0)
+ 		/* badblocks are disabled */
+@@ -229,6 +230,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 				s = a + BB_MAX_LEN;
+ 			}
+ 			sectors = e - s;
++			changed = true;
+ 		}
+ 	}
+ 	if (sectors && hi < bb->count) {
+@@ -259,6 +261,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 			sectors = e - s;
+ 			lo = hi;
+ 			hi++;
++			changed = true;
+ 		}
+ 	}
+ 	if (sectors == 0 && hi < bb->count) {
+@@ -277,6 +280,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 			memmove(p + hi, p + hi + 1,
+ 				(bb->count - hi - 1) * 8);
+ 			bb->count--;
++			changed = true;
+ 		}
+ 	}
+ 	while (sectors) {
+@@ -299,14 +303,17 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
  			p[hi] = BB_MAKE(s, this_sectors, acknowledged);
  			sectors -= this_sectors;
  			s += this_sectors;
-+			hi++;
- 			changed = true;
++			changed = true;
  		}
  	}
+ 
+-	bb->changed = true;
+-	if (!acknowledged)
+-		bb->unacked_exist = true;
+-	else
+-		badblocks_update_acked(bb);
++	if (changed) {
++		bb->changed = changed;
++		if (!acknowledged)
++			bb->unacked_exist = true;
++		else
++			badblocks_update_acked(bb);
++	}
+ 	write_sequnlock_irqrestore(&bb->lock, flags);
+ 
+ 	return rv;
 -- 
 2.39.2
 
