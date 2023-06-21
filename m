@@ -2,92 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A0EEB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 00:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2700EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 00:35:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229813AbjFUALD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Jun 2023 20:11:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41062 "EHLO
+        id S229709AbjFUAe7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Jun 2023 20:34:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229796AbjFUALC (ORCPT
+        with ESMTP id S229448AbjFUAe7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2023 20:11:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF14810F1
-        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 17:10:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687306214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iH25GN8X3LsVgQP0MS+L84U1GQXae5Y6ao4JIVTErZ4=;
-        b=Uo8gap/Ru7B6lUNTM8vZa9yE4FriRNbsKX2dUEfxJMWqy1EXzAmMdT+qffMNIdnVwStt4J
-        p7KA+xz0SxTMrnZBq45QMJz62xioeon5kqoLsg3TaRdmRzvPfi1+6IqCadQTP8f+LmQNQX
-        axHCTxV9L41fxng7BQbPD3G1xL6rm1Q=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-507-8Adca8xZP8ivkXME51V3PQ-1; Tue, 20 Jun 2023 20:10:10 -0400
-X-MC-Unique: 8Adca8xZP8ivkXME51V3PQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B823809F8F;
-        Wed, 21 Jun 2023 00:10:09 +0000 (UTC)
-Received: from ovpn-8-23.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D5C7D492C13;
-        Wed, 21 Jun 2023 00:10:04 +0000 (UTC)
-Date:   Wed, 21 Jun 2023 08:09:59 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
-        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Message-ID: <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
-References: <20230620013349.906601-1-ming.lei@redhat.com>
- <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
- <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
- <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
+        Tue, 20 Jun 2023 20:34:59 -0400
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52229173F
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 17:34:58 -0700 (PDT)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-543cc9541feso2935500a12.2
+        for <linux-block@vger.kernel.org>; Tue, 20 Jun 2023 17:34:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687307698; x=1689899698;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DzlI3MFX/r7ovZ2N/fAUP6XCzNgOIV+lhVolLoXNEyk=;
+        b=SwgFOK+1S4a10Vue3n93kfxVoLNv1aMUBEDbPOT3G2nzVDDd6HoAwROGXoA/VDcFMb
+         CtYb78ob2398i7TlVtGFSqUAJXfi37YO2t/lydi0LGRi3PXkmYm66+5ML8HXkxA3j1rP
+         3VMQawLMypgREn/IsPrCU34Ta58Xmn16ZFD2cA/EtqqGgTNPf+iBsgm1plcXB6dTb/9y
+         LjOXb/kOUmZnn+0TSgrxWwKqdjx14g7z09VqCQIZptJ4TElq78h86QG423D9RjzpPyKq
+         pTb3jWSy/hwBIU7mjRqgG3osftORgea2pIC1Ik9K9P/hVRGsN7uSQgFepuJitELFC6M0
+         d1jg==
+X-Gm-Message-State: AC+VfDyF1BDhl8AIU728dUE55FPKYcrzXokkpOdoSwRwZmlnXGWoyxVp
+        vGDXWe2wgh30jHVtRHXnZZw=
+X-Google-Smtp-Source: ACHHUZ6hxq30HPwFmhezRQUqG2ri459FLBqBuo4h4F5wEUY7bhCV/ZnH+kW6+RJGep8kaUp5GlEO/w==
+X-Received: by 2002:a17:902:b28c:b0:1b5:2c0b:22d3 with SMTP id u12-20020a170902b28c00b001b52c0b22d3mr11253416plr.14.1687307697640;
+        Tue, 20 Jun 2023 17:34:57 -0700 (PDT)
+Received: from [192.168.50.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id o4-20020a1709026b0400b001b176d96da0sm2149445plk.78.2023.06.20.17.34.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jun 2023 17:34:56 -0700 (PDT)
+Message-ID: <43cc01f3-c1fa-84c4-c3a0-5a1b62982bcd@acm.org>
+Date:   Tue, 20 Jun 2023 17:34:55 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v3 2/7] block: Send requeued requests to the I/O scheduler
+Content-Language: en-US
+To:     Damien Le Moal <dlemoal@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>
+References: <20230522183845.354920-1-bvanassche@acm.org>
+ <20230522183845.354920-3-bvanassche@acm.org>
+ <ZGyBV5W1WxVEzAED@ovpn-8-32.pek2.redhat.com>
+ <1d2fc2c5-18fc-a937-7944-7d7808c00a0b@acm.org>
+ <ZG1a610jtBDPDPip@ovpn-8-17.pek2.redhat.com>
+ <a40b10d9-4e30-438f-2509-28bb0df4a161@acm.org>
+ <bf32b0f9-d85b-367f-e6f4-83d58c418d7a@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <bf32b0f9-d85b-367f-e6f4-83d58c418d7a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 04:40:49PM +0300, Sagi Grimberg wrote:
+On 5/24/23 16:06, Damien Le Moal wrote:
+> When mq-deadline is used, the scheduler lba reordering *may* reorder writes,
+> thus hiding potential bugs in the user write sequence for a zone. That is fine.
+> However, once a write request is dispatched, we should keep the assumption that
+> it is a well formed one, namely directed at the zone write pointer. So any
+> consideration of requeue solving write ordering issues is moot to me.
 > 
-> > > > Hello,
-> > > > 
-> > > > The 1st three patch fixes io hang when controller removal interrupts error
-> > > > recovery, then queue is left as frozen.
-> > > > 
-> > > > The 4th patch fixes io hang when controller is left as unquiesce.
-> > > 
-> > > Ming, what happened to nvme-tcp/rdma move of freeze/unfreeze to the
-> > > connect patches?
-> > 
-> > I'd suggest to handle all drivers(include nvme-pci) in same logic for avoiding
-> > extra maintain burden wrt. error handling, but looks Keith worries about the
-> > delay freezing may cause too many requests queued during error handling, and
-> > that might cause user report.
-> 
-> For nvme-tcp/rdma your patch also addresses IO not failing over because
-> they block on queue enter. So I definitely want this for fabrics.
+> Furthermore, when the requeue happens, the target zone is still locked and the
+> only write request that can be in flight for that target zones is that one being
+> requeued. Add to that the above assumption that the request is the one we must
+> dispatch first, there are absolutely zero chances of seeing a reordering happen
+> for writes to a particular zone. I really do not see the point of requeuing that
+> request through the IO scheduler at all.
 
-The patch in the following link should fix these issues too:
+I will drop the changes from this patch that send requeued dispatched 
+requests to the I/O scheduler instead of back to the dispatch list. It 
+took me considerable effort to find all the potential causes of 
+reordering. As you may have noticed I also came up with some changes 
+that are not essential. I should have realized myself that this change 
+is not essential.
 
-https://lore.kernel.org/linux-block/ZJGmW7lEaipT6saa@ovpn-8-23.pek2.redhat.com/T/#u
+> As long as we keep zone write locking for zoned devices, requeue to the head of
+> the dispatch queue is fine. But maybe this work is preparatory to removing zone
+> write locking ? If that is the case, I would like to see that as well to get the
+> big picture. Otherwise, the latency concerns I raised above are in my opinion, a
+> blocker for this change.
 
-I guess you still want the paired freeze patch because it makes freeze &
-unfreeze more reliable in error handling. If yes, I can make one fabric
-only change for you.
-
+Regarding removing zone write locking, would it be acceptable to 
+implement a solution for SCSI devices before it is clear how to 
+implement a solution for NVMe devices? I think a potential solution for 
+SCSI devices is to send requests that should be requeued to the SCSI 
+error handler instead of to the block layer requeue list. The SCSI error 
+handler waits until all pending requests have timed out or have been 
+sent to the error handler. The SCSI error handler can be modified such 
+that requests are sorted in LBA order before being resubmitted. This 
+would solve the nasty issues that would otherwise arise when requeuing 
+requests if multiple write requests for the same zone are pending.
 
 Thanks,
-Ming
 
+Bart.
