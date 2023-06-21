@@ -2,202 +2,241 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C4E3EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 15:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A020BEB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 16:24:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232727AbjFUP6n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 11:58:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59648 "EHLO
+        id S232468AbjFUQYB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 12:24:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231183AbjFUP6n (ORCPT
+        with ESMTP id S232577AbjFUQXj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 11:58:43 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25053E2;
-        Wed, 21 Jun 2023 08:58:41 -0700 (PDT)
+        Wed, 21 Jun 2023 12:23:39 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C92A199F;
+        Wed, 21 Jun 2023 09:23:35 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C88A01FF04;
-        Wed, 21 Jun 2023 15:58:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1687363119; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=Z1pyl5WK5UaVsChPbUuWx8TlPJRxgAguKY43gUgCHuk=;
-        b=ZLm6WsKQNrxHwRIlJmQhIXDGro4VV6VZwzvYMDOiA1NEIC9vvoYtzyMCz+oS3UF2GgVLw8
-        UZORHIErrCZblVbO0BWccEC0+BIE1G2srApilaOage0oS2pyTZbrNBFMBZQxJNiu0chGlZ
-        EGizsKNvuz30uXVd+T8BaYCIzzC2JPY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1687363119;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3084221F36;
+        Wed, 21 Jun 2023 16:23:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1687364614; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nuxv/JENKp4VItXO7paug/X1cN/wY0He1jTgcAzdBw4=;
+        b=JcMVC1d4QNRntkU1snLWBDCoHGYu8qq29RBVmMb1JQvKgbTUlreeKqaE3bwEXhL4QZCdcE
+        hCs71Ky7t+triqxwQaJon5t3tquL/DfHTlRDcb42YxripRVfroOvliO3qAChJYiTlwEFtW
+        do5a9d7eZKlRffDVJtc5jBQjHSDrAH4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1687364614;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=Z1pyl5WK5UaVsChPbUuWx8TlPJRxgAguKY43gUgCHuk=;
-        b=SIzt9XL3KIo8BUIAkrIE63I9NMOL5gAKOUg0Qd23J2CqaIvvs9brATGGSo2Djcpilsl038
-        GtSZdZAfoNBNIjCQ==
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nuxv/JENKp4VItXO7paug/X1cN/wY0He1jTgcAzdBw4=;
+        b=EK8mRNHdmICT/uZJA3T/cjR/U+Rp7HXuu4pEuSk4duBej9phwRl539H1BjBMpwilif4f7U
+        OlO8AQbNi3ws2aCg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B9378134B1;
-        Wed, 21 Jun 2023 15:58:39 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1D41A13A66;
+        Wed, 21 Jun 2023 16:23:34 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id sRUyLS8ek2RHMgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 21 Jun 2023 15:58:39 +0000
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>,
-        Martin George <Martin.George@netapp.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [RFC blktests v1 0/1] Test case for 'nvme: short-circuit connection retries'
-Date:   Wed, 21 Jun 2023 17:58:24 +0200
-Message-ID: <20230621155825.20146-1-dwagner@suse.de>
-X-Mailer: git-send-email 2.41.0
+        id WFWkBgYkk2TEPQAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 21 Jun 2023 16:23:34 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 8EADDA0762; Wed, 21 Jun 2023 18:23:33 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        <linux-block@vger.kernel.org>, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org, Jan Kara <jack@suse.cz>
+Subject: [PATCH 2/2] bcache: Fix bcache device claiming
+Date:   Wed, 21 Jun 2023 18:23:27 +0200
+Message-Id: <20230621162333.30027-2-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
+In-Reply-To: <20230621162024.29310-1-jack@suse.cz>
+References: <20230621162024.29310-1-jack@suse.cz>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5545; i=jack@suse.cz; h=from:subject; bh=Pti3dkedZN4wX/9P1flYkBVZnMPSkLX3HFuqYwyaiVg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkkyP++cvXYTC1oMaMwvMKOnS/5vaVQargmH8/Pr2b gMNE8QmJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZJMj/gAKCRCcnaoHP2RA2WRkB/ 47Zv5XxIh1n7jPUUTMhGjhIJtDHFzs4lfNAUaiRoSEofhW7wR3ppmejpHbe2NzjI2eAZPOio825Oc6 Pc5dfBF2WFT4qrVPPtkSVcLK5QuYOWTvbdF+9Ee7MVlSMivs95wVM7jVzWDSW+25LvVSBZwonNB/g+ LS7c4oIyNBM16IYpkVKbFjdHqHqVDYhHizGe/0hNAHPiqv9UXOXtME7rtp8Cw7Z2cDI9yOl/RQ9LY/ 8qjmkvo51iTld3NfsN4WXUc/n+hvhZjKN3VG7RErlNXR3LRWKiU7jjpVnwLf08/7oPv/xgpAcH8fOQ jU7BWVdl+mvMJnvwbKcV6VqPoKvOjl
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We had a longer discussion on how to interpret the DNR bit on reconnect attempts
-in [1]. The conclusion was (if I got this right) is we should not try to reconnect
-when the error response had the DNR bit set using the same parameters.
+Commit 2736e8eeb0cc ("block: use the holder as indication for exclusive
+opens") introduced a change that blkdev_put() has to get exclusive
+holder of the bdev as an argument. However it overlooked that
+register_bdev() and register_cache() overwrite the bdev->bd_holder field
+in the block device to point to the real owning object which was not
+available at the time we called blkdev_get_by_path(). Messing with bdev
+internals like this is a layering violation and it also causes
+blkdev_put() to issue warning about mismatching holders.
 
-The FC transport already implemented this behavior with
+Fix bcache to reopen the block device with appropriate holder once it is
+available which also restores the behavior that multiple bcache caches
+cannot claim the same device which was also broken by commit
+2736e8eeb0cc.
 
-  f25f8ef70ce2 ("nvme-fc: short-circuit reconnect retries")
+Fixes: 2736e8eeb0cc ("block: use the holder as indication for exclusive opens")
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/md/bcache/super.c | 63 ++++++++++++++++++++++-----------------
+ 1 file changed, 36 insertions(+), 27 deletions(-)
 
-Hannes also provided patches for TCP and RDMA [2]. With these patches this test
-will pass.
-
-The nvme/050 implements this test case by (ab)using the queue count mechanism to
-trigger a reconnect. Before the reconnect is triggered the tests set the
-allowed_any_host attribute to 0 and forces the reconnect to fail.
-
-[1] https://lore.kernel.org/linux-nvme/20220927143157.3659-1-dwagner@suse.de/
-[2] https://lore.kernel.org/linux-nvme/20220715063356.134124-1-hare@suse.de/
-
-
-This patch is based on top of
-  blktests: https://lore.kernel.org/linux-nvme/20230620132703.20648-1-dwagner@suse.de/
-  linux: https://lore.kernel.org/linux-nvme/20230620133711.22840-1-dwagner@suse.de/
-
-
-fc:
-
-nvme/050 (test DNR is handled on connect attempt with invalid arguments) [passed]
-    runtime  8.845s  ...  3.756s
-
-tcp:
-
-nvme/050 (test DNR is handled on connect attempt with invalid arguments) [failed]
-    runtime  3.756s  ...  8.836s
-    --- tests/nvme/050.out      2023-06-21 11:47:47.767788898 +0200
-    +++ /home/wagi/work/blktests/results/nodev/nvme/050.out.bad 2023-06-21 15:19:08.368414289 +0200
-    @@ -1,2 +1,3 @@
-     Running nvme/050
-    +controller "nvme2" not deleted within 5 seconds
-     Test complete
-
-fc:
-
- run blktests nvme/050 at 2023-06-21 15:11:31
- loop0: detected capacity change from 0 to 32768
- nvmet: adding nsid 1 to subsystem blktests-subsystem-1
- nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN "blktests-subsystem-1"
- (NULL device *): {0:0} Association created
- [7088] nvmet: ctrl 1 start keep-alive timer for 5 secs
- nvmet: creating nvm controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a.
- [6743] nvmet: adding queue 1 to ctrl 1.
- [6312] nvmet: adding queue 2 to ctrl 1.
- [7088] nvmet: adding queue 3 to ctrl 1.
- [6927] nvmet: adding queue 4 to ctrl 1.
- nvme nvme2: NVME-FC{0}: new ctrl: NQN "blktests-subsystem-1"
- nvme nvme2: NVME-FC{0}: io failed due to lldd error 6
- nvme nvme2: NVME-FC{0}: transport association event: transport detected io error
- nvme nvme2: NVME-FC{0}: resetting controller
- [7088] nvmet: ctrl 1 stop keep-alive
- (NULL device *): {0:0} Association deleted
- nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN "blktests-subsystem-1"
- (NULL device *): {0:0} Association freed
- (NULL device *): {0:0} Association created
- (NULL device *): Disconnect LS failed: No Association
- nvmet: connect by host nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a for subsystem blktests-subsystem-1 not allowed
- nvme_fabrics: nvmf_log_connect_error: DNR 1
- nvme nvme2: Connect for subsystem blktests-subsystem-1 is not allowed, hostnqn: nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a
- nvme nvme2: NVME-FC{0}: reset: Reconnect attempt failed (16772)
- nvme nvme2: NVME-FC{0}: reconnect failure
- nvme nvme2: Removing ctrl: NQN "blktests-subsystem-1"
- (NULL device *): {0:0} Association deleted
- (NULL device *): {0:0} Association freed
- (NULL device *): Disconnect LS failed: No Association
-
-tcp:
-
- run blktests nvme/050 at 2023-06-21 15:11:36
- loop0: detected capacity change from 0 to 32768
- nvmet: adding nsid 1 to subsystem blktests-subsystem-1
- nvmet_tcp: enabling port 0 (127.0.0.1:4420)
- [62] nvmet: ctrl 1 start keep-alive timer for 5 secs
- nvmet: creating nvm controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a.
- nvme nvme2: creating 4 I/O queues.
- nvme nvme2: mapped 4/0/0 default/read/poll queues.
- [62] nvmet: adding queue 1 to ctrl 1.
- [214] nvmet: adding queue 2 to ctrl 1.
- [215] nvmet: adding queue 3 to ctrl 1.
- [177] nvmet: adding queue 4 to ctrl 1.
- nvme nvme2: new ctrl: NQN "blktests-subsystem-1", addr 127.0.0.1:4420
- nvme nvme2: starting error recovery
- nvme nvme2: Reconnecting in 1 seconds...
- [6743] nvmet: ctrl 1 stop keep-alive
- nvmet: connect by host nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a for subsystem blktests-subsystem-1 not allowed
- nvme_fabrics: nvmf_log_connect_error: DNR 1
- nvme nvme2: Connect for subsystem blktests-subsystem-1 is not allowed, hostnqn: nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a
- nvme nvme2: failed to connect queue: 0 ret=16772
- nvme nvme2: Failed reconnect attempt 1
- nvme nvme2: Reconnecting in 1 seconds...
- nvmet: connect by host nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a for subsystem blktests-subsystem-1 not allowed
- nvme_fabrics: nvmf_log_connect_error: DNR 1
- nvme nvme2: Connect for subsystem blktests-subsystem-1 is not allowed, hostnqn: nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a
- nvme nvme2: failed to connect queue: 0 ret=16772
- nvme nvme2: Failed reconnect attempt 2
- nvme nvme2: Reconnecting in 1 seconds...
- nvmet: connect by host nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a for subsystem blktests-subsystem-1 not allowed
- nvme_fabrics: nvmf_log_connect_error: DNR 1
- nvme nvme2: Connect for subsystem blktests-subsystem-1 is not allowed, hostnqn: nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a
- nvme nvme2: failed to connect queue: 0 ret=16772
- nvme nvme2: Failed reconnect attempt 3
- nvme nvme2: Reconnecting in 1 seconds...
- nvmet: connect by host nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a for subsystem blktests-subsystem-1 not allowed
- nvme_fabrics: nvmf_log_connect_error: DNR 1
- nvme nvme2: Connect for subsystem blktests-subsystem-1 is not allowed, hostnqn: nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a
- nvme nvme2: failed to connect queue: 0 ret=16772
- nvme nvme2: Failed reconnect attempt 4
- nvme nvme2: Reconnecting in 1 seconds...
- nvmet: connect by host nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a for subsystem blktests-subsystem-1 not allowed
- nvme_fabrics: nvmf_log_connect_error: DNR 1
- nvme nvme2: Connect for subsystem blktests-subsystem-1 is not allowed, hostnqn: nqn.2014-08.org.nvmexpress:uuid:77b49aba-06b4-431a-9af8-75e318740f1a
- nvme nvme2: failed to connect queue: 0 ret=16772
- nvme nvme2: Failed reconnect attempt 5
- nvme nvme2: Reconnecting in 1 seconds...
- nvme nvme2: Removing ctrl: NQN "blktests-subsystem-1"
- nvme nvme2: Property Set error: 880, offset 0x14
-
-Daniel Wagner (1):
-  nvme/050: test DNR handling on reconnect
-
- tests/nvme/050     | 126 +++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/050.out |   2 +
- 2 files changed, 128 insertions(+)
- create mode 100644 tests/nvme/050
- create mode 100644 tests/nvme/050.out
-
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 913dd94353b6..9738e8c0cbfc 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1369,7 +1369,7 @@ static void cached_dev_free(struct closure *cl)
+ 		put_page(virt_to_page(dc->sb_disk));
+ 
+ 	if (!IS_ERR_OR_NULL(dc->bdev))
+-		blkdev_put(dc->bdev, bcache_kobj);
++		blkdev_put(dc->bdev, dc);
+ 
+ 	wake_up(&unregister_wait);
+ 
+@@ -1453,7 +1453,6 @@ static int register_bdev(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 
+ 	memcpy(&dc->sb, sb, sizeof(struct cache_sb));
+ 	dc->bdev = bdev;
+-	dc->bdev->bd_holder = dc;
+ 	dc->sb_disk = sb_disk;
+ 
+ 	if (cached_dev_init(dc, sb->block_size << 9))
+@@ -2218,7 +2217,7 @@ void bch_cache_release(struct kobject *kobj)
+ 		put_page(virt_to_page(ca->sb_disk));
+ 
+ 	if (!IS_ERR_OR_NULL(ca->bdev))
+-		blkdev_put(ca->bdev, bcache_kobj);
++		blkdev_put(ca->bdev, ca);
+ 
+ 	kfree(ca);
+ 	module_put(THIS_MODULE);
+@@ -2345,7 +2344,6 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 
+ 	memcpy(&ca->sb, sb, sizeof(struct cache_sb));
+ 	ca->bdev = bdev;
+-	ca->bdev->bd_holder = ca;
+ 	ca->sb_disk = sb_disk;
+ 
+ 	if (bdev_max_discard_sectors((bdev)))
+@@ -2359,7 +2357,7 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 		 * call blkdev_put() to bdev in bch_cache_release(). So we
+ 		 * explicitly call blkdev_put() here.
+ 		 */
+-		blkdev_put(bdev, bcache_kobj);
++		blkdev_put(bdev, ca);
+ 		if (ret == -ENOMEM)
+ 			err = "cache_alloc(): -ENOMEM";
+ 		else if (ret == -EPERM)
+@@ -2516,10 +2514,11 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	char *path = NULL;
+ 	struct cache_sb *sb;
+ 	struct cache_sb_disk *sb_disk;
+-	struct block_device *bdev;
+-	void *holder;
++	struct block_device *bdev, *bdev2;
++	void *holder = NULL;
+ 	ssize_t ret;
+ 	bool async_registration = false;
++	bool quiet = false;
+ 
+ #ifdef CONFIG_BCACHE_ASYNC_REGISTRATION
+ 	async_registration = true;
+@@ -2548,24 +2547,9 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 
+ 	ret = -EINVAL;
+ 	err = "failed to open device";
+-	bdev = blkdev_get_by_path(strim(path), BLK_OPEN_READ | BLK_OPEN_WRITE,
+-				  bcache_kobj, NULL);
+-	if (IS_ERR(bdev)) {
+-		if (bdev == ERR_PTR(-EBUSY)) {
+-			dev_t dev;
+-
+-			mutex_lock(&bch_register_lock);
+-			if (lookup_bdev(strim(path), &dev) == 0 &&
+-			    bch_is_open(dev))
+-				err = "device already registered";
+-			else
+-				err = "device busy";
+-			mutex_unlock(&bch_register_lock);
+-			if (attr == &ksysfs_register_quiet)
+-				goto done;
+-		}
++	bdev = blkdev_get_by_path(strim(path), BLK_OPEN_READ, NULL, NULL);
++	if (IS_ERR(bdev))
+ 		goto out_free_sb;
+-	}
+ 
+ 	err = "failed to set blocksize";
+ 	if (set_blocksize(bdev, 4096))
+@@ -2582,6 +2566,31 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 		goto out_put_sb_page;
+ 	}
+ 
++	/* Now reopen in exclusive mode with proper holder */
++	bdev2 = blkdev_get_by_dev(bdev->bd_dev, BLK_OPEN_READ | BLK_OPEN_WRITE,
++				  holder, NULL);
++	blkdev_put(bdev, NULL);
++	bdev = bdev2;
++	if (IS_ERR(bdev))
++		ret = PTR_ERR(bdev);
++		if (bdev == ERR_PTR(-EBUSY)) {
++			dev_t dev;
++
++			mutex_lock(&bch_register_lock);
++			if (lookup_bdev(strim(path), &dev) == 0 &&
++			    bch_is_open(dev))
++				err = "device already registered";
++			else
++				err = "device busy";
++			mutex_unlock(&bch_register_lock);
++			if (attr == &ksysfs_register_quiet) {
++				quiet = true;
++				ret = size;
++			}
++		}
++		goto out_free_holder;
++	}
++
+ 	err = "failed to register device";
+ 
+ 	if (async_registration) {
+@@ -2619,7 +2628,6 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 			goto out_free_sb;
+ 	}
+ 
+-done:
+ 	kfree(sb);
+ 	kfree(path);
+ 	module_put(THIS_MODULE);
+@@ -2631,7 +2639,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ out_put_sb_page:
+ 	put_page(virt_to_page(sb_disk));
+ out_blkdev_put:
+-	blkdev_put(bdev, register_bcache);
++	blkdev_put(bdev, holder);
+ out_free_sb:
+ 	kfree(sb);
+ out_free_path:
+@@ -2640,7 +2648,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ out_module_put:
+ 	module_put(THIS_MODULE);
+ out:
+-	pr_info("error %s: %s\n", path?path:"", err);
++	if (!quiet)
++		pr_info("error %s: %s\n", path?path:"", err);
+ 	return ret;
+ }
+ 
 -- 
-2.41.0
+2.35.3
 
