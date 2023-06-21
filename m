@@ -2,202 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23EB8EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 10:11:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC941EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 10:14:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232113AbjFUKL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 06:11:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33040 "EHLO
+        id S232424AbjFUKOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 06:14:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231477AbjFUKLl (ORCPT
+        with ESMTP id S232448AbjFUKNs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 06:11:41 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02FEA1BE7
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 03:10:51 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51bdca52424so525361a12.3
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 03:10:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1687342249; x=1689934249;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a+gXJsHBZudacT2OdDw1EMT2gr0zO7PzQir6flBd7a4=;
-        b=SZ4IOF7guQNWDFS+/+I2pSiHxbetwx7cuBVSLOEsFQ/IvnzHEui5wb4kHwPhH9JJVv
-         zfXP1wiQEWcBKH8qyKz4x1Da1UpA/L3KPTFdDVzb7SavQy+r4h5rmZK3fmDiTM0AiOEI
-         QtOZSWcTvdLMgqWVk/mRzZC6V9AD6PRdZCRMVu2/8gVd/XzUmr+/WHt2rSGpIa/yQKw8
-         mA1gKulD66bM/vDDvRhghKELNyvMSAjI/vCoMQgu//jQKHR+gJcMQBtmIeeetFh92Zg5
-         DeftUjFWzGD35+4n7iGH7fGiYkfB9Xjl5Z/REyAj1fir3EVmd/JGU5Xw2AIZtqJVyV2r
-         tm5w==
+        Wed, 21 Jun 2023 06:13:48 -0400
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A3971BD2
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 03:13:14 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-3f80b192aecso13206245e9.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 03:13:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687342249; x=1689934249;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a+gXJsHBZudacT2OdDw1EMT2gr0zO7PzQir6flBd7a4=;
-        b=L899KrOQLLogr4yp/Qi0QrrGqTTZKaLCQ0lvqdKrIGalh8ke8uhxx3/F6/8RZbZCZ0
-         Mr5Y1N6crYF4KmZBBZm8TfvaujZbDP5v+kPrMTJb9K7t3Z34hauLejOCu2HSiNUWNq6+
-         pVJD1ylQyXKZC+gswF9O9iRZ/gYx7KA4ti7ciktwC6XRGMoGamIwKd9vroIAVP2vdFtV
-         BGQWRv/GUMaH8wXQGsCh6XonmdYbsLnrxHCpCR7/N/Bv2T/RaynU0DDf+LhZ8/3CHKTP
-         okAFyRSQsvov5v8rwZyrf6OKRo7AKlKraV+iQIh69FwK/uKd06H8n0dP9jNz8SxfZshS
-         7a+A==
-X-Gm-Message-State: AC+VfDzqDFBlTxQGYFi81nMjNy0SPGupxQU1eVjVUnn3oDBNSrVkaHvb
-        O9vT4mF3/nqPyE7SpzO9qde/teW3J0x8XRISZhpdIA==
-X-Google-Smtp-Source: ACHHUZ6h7FiMpjQd28y2aHh27nxyL+AYw1iK1IG92bFay3+ZwbW+HwcFS9OE0OEjgnlmR1aAvC6dJzEoZv0SvQV44+0=
-X-Received: by 2002:aa7:de06:0:b0:51b:d4f4:4805 with SMTP id
- h6-20020aa7de06000000b0051bd4f44805mr2115205edv.27.1687342249458; Wed, 21 Jun
- 2023 03:10:49 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687342388; x=1689934388;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z2ziSSDnHmXzqyopdHEpI90tpZriUVyJ27mmVdNAibQ=;
+        b=OkZinQZ7MY+fkQbPisy8O6EF1GGecL86Qsw1m7ikIgObcLJjRjNHBUU1GXW2kg7AlY
+         cKs8OgnyXB56KleO4C8vC509+T8LLEj7vD1Yn27D2NuGcVVrqETQ/k315+B9OQDGG3YY
+         4CHfWR39Ecu5HcPLXOVHKxrgYLdbC9FBZ3o8kcmkLgHqrcc7wmz/LM9Eir3dyhKlo6Dj
+         sLwsHApeF+kgIJpRQPEJBtBIuVx98y7Nhee8s9kWpW2zE3uMbpXO025YN9rCf2qdzhxO
+         vhD0xqi/bRAEE1pTaXB/RHpttVNYJqAz8S5omqlpBqcc+gkMJTu1e5sdmdLxNmWEPN3s
+         e47A==
+X-Gm-Message-State: AC+VfDyc7+W4OzqP2y1UNJEkGqHbtNpXGR3RpePhMxRujVzYOb7/01f8
+        h+u5CGpo8XB3eoARYclw4zE=
+X-Google-Smtp-Source: ACHHUZ51waEdZ8FsyNEQCBlkHeu3MxzAXF5zJdLTOiH5Tcp/JKKq5/qraqY5qK1ij/xekpfSZqA4bg==
+X-Received: by 2002:a1c:ed08:0:b0:3f7:369c:c640 with SMTP id l8-20020a1ced08000000b003f7369cc640mr14201347wmh.1.1687342387986;
+        Wed, 21 Jun 2023 03:13:07 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id t20-20020a1c7714000000b003f900678815sm4517708wmi.39.2023.06.21.03.13.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Jun 2023 03:13:07 -0700 (PDT)
+Message-ID: <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
+Date:   Wed, 21 Jun 2023 13:13:05 +0300
 MIME-Version: 1.0
-References: <20230620180129.645646-5-gregkh@linuxfoundation.org>
-In-Reply-To: <20230620180129.645646-5-gregkh@linuxfoundation.org>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Wed, 21 Jun 2023 12:10:38 +0200
-Message-ID: <CAMGffEm1FJpA5B9iyiieeRVYu=Te+wanauaVBBfx2YFZUozGEw@mail.gmail.com>
-Subject: Re: [PATCH 1/4] block/rnbd: make all 'class' structures const
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ivan Orlov <ivan.orlov0322@gmail.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
+        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
+References: <20230620013349.906601-1-ming.lei@redhat.com>
+ <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
+ <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
+ <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
+ <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 8:01=E2=80=AFPM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> From: Ivan Orlov <ivan.orlov0322@gmail.com>
->
-> Now that the driver core allows for struct class to be in read-only
-> memory, making all 'class' structures to be declared at build time
-> placing them into read-only memory, instead of having to be dynamically
-> allocated at load time.
->
-> Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
-> Cc: Jack Wang <jinpu.wang@ionos.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: linux-block@vger.kernel.org
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ivan Orlov <ivan.orlov0322@gmail.com>
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-lgtm.
-Acked-by: Jack Wang <jinpu.wang@ionos.com>
-> ---
->  drivers/block/rnbd/rnbd-clt-sysfs.c | 20 +++++++++++---------
->  drivers/block/rnbd/rnbd-srv-sysfs.c | 22 ++++++++++++----------
->  2 files changed, 23 insertions(+), 19 deletions(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnb=
-d-clt-sysfs.c
-> index 8c6087949794..e84abac04f4f 100644
-> --- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-> +++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-> @@ -24,7 +24,9 @@
->  #include "rnbd-clt.h"
->
->  static struct device *rnbd_dev;
-> -static struct class *rnbd_dev_class;
-> +static const struct class rnbd_dev_class =3D {
-> +       .name =3D "rnbd_client",
-> +};
->  static struct kobject *rnbd_devs_kobj;
->
->  enum {
-> @@ -646,11 +648,11 @@ int rnbd_clt_create_sysfs_files(void)
->  {
->         int err;
->
-> -       rnbd_dev_class =3D class_create("rnbd-client");
-> -       if (IS_ERR(rnbd_dev_class))
-> -               return PTR_ERR(rnbd_dev_class);
-> +       err =3D class_register(&rnbd_dev_class);
-> +       if (err)
-> +               return err;
->
-> -       rnbd_dev =3D device_create_with_groups(rnbd_dev_class, NULL,
-> +       rnbd_dev =3D device_create_with_groups(&rnbd_dev_class, NULL,
->                                               MKDEV(0, 0), NULL,
->                                               default_attr_groups, "ctl")=
-;
->         if (IS_ERR(rnbd_dev)) {
-> @@ -666,9 +668,9 @@ int rnbd_clt_create_sysfs_files(void)
->         return 0;
->
->  dev_destroy:
-> -       device_destroy(rnbd_dev_class, MKDEV(0, 0));
-> +       device_destroy(&rnbd_dev_class, MKDEV(0, 0));
->  cls_destroy:
-> -       class_destroy(rnbd_dev_class);
-> +       class_unregister(&rnbd_dev_class);
->
->         return err;
->  }
-> @@ -678,6 +680,6 @@ void rnbd_clt_destroy_sysfs_files(void)
->         sysfs_remove_group(&rnbd_dev->kobj, &default_attr_group);
->         kobject_del(rnbd_devs_kobj);
->         kobject_put(rnbd_devs_kobj);
-> -       device_destroy(rnbd_dev_class, MKDEV(0, 0));
-> -       class_destroy(rnbd_dev_class);
-> +       device_destroy(&rnbd_dev_class, MKDEV(0, 0));
-> +       class_unregister(&rnbd_dev_class);
->  }
-> diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnb=
-d-srv-sysfs.c
-> index d5d9267e1fa5..5e69c0112e23 100644
-> --- a/drivers/block/rnbd/rnbd-srv-sysfs.c
-> +++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
-> @@ -20,7 +20,9 @@
->  #include "rnbd-srv.h"
->
->  static struct device *rnbd_dev;
-> -static struct class *rnbd_dev_class;
-> +static const struct class rnbd_dev_class =3D {
-> +       .name =3D "rnbd-server",
-> +};
->  static struct kobject *rnbd_devs_kobj;
->
->  static void rnbd_srv_dev_release(struct kobject *kobj)
-> @@ -215,12 +217,12 @@ int rnbd_srv_create_sysfs_files(void)
->  {
->         int err;
->
-> -       rnbd_dev_class =3D class_create("rnbd-server");
-> -       if (IS_ERR(rnbd_dev_class))
-> -               return PTR_ERR(rnbd_dev_class);
-> +       err =3D class_register(&rnbd_dev_class);
-> +       if (err)
-> +               return err;
->
-> -       rnbd_dev =3D device_create(rnbd_dev_class, NULL,
-> -                                 MKDEV(0, 0), NULL, "ctl");
-> +       rnbd_dev =3D device_create(&rnbd_dev_class, NULL,
-> +                                MKDEV(0, 0), NULL, "ctl");
->         if (IS_ERR(rnbd_dev)) {
->                 err =3D PTR_ERR(rnbd_dev);
->                 goto cls_destroy;
-> @@ -234,9 +236,9 @@ int rnbd_srv_create_sysfs_files(void)
->         return 0;
->
->  dev_destroy:
-> -       device_destroy(rnbd_dev_class, MKDEV(0, 0));
-> +       device_destroy(&rnbd_dev_class, MKDEV(0, 0));
->  cls_destroy:
-> -       class_destroy(rnbd_dev_class);
-> +       class_unregister(&rnbd_dev_class);
->
->         return err;
->  }
-> @@ -245,6 +247,6 @@ void rnbd_srv_destroy_sysfs_files(void)
->  {
->         kobject_del(rnbd_devs_kobj);
->         kobject_put(rnbd_devs_kobj);
-> -       device_destroy(rnbd_dev_class, MKDEV(0, 0));
-> -       class_destroy(rnbd_dev_class);
-> +       device_destroy(&rnbd_dev_class, MKDEV(0, 0));
-> +       class_unregister(&rnbd_dev_class);
->  }
-> --
-> 2.41.0
->
+
+>>>>> Hello,
+>>>>>
+>>>>> The 1st three patch fixes io hang when controller removal interrupts error
+>>>>> recovery, then queue is left as frozen.
+>>>>>
+>>>>> The 4th patch fixes io hang when controller is left as unquiesce.
+>>>>
+>>>> Ming, what happened to nvme-tcp/rdma move of freeze/unfreeze to the
+>>>> connect patches?
+>>>
+>>> I'd suggest to handle all drivers(include nvme-pci) in same logic for avoiding
+>>> extra maintain burden wrt. error handling, but looks Keith worries about the
+>>> delay freezing may cause too many requests queued during error handling, and
+>>> that might cause user report.
+>>
+>> For nvme-tcp/rdma your patch also addresses IO not failing over because
+>> they block on queue enter. So I definitely want this for fabrics.
+> 
+> The patch in the following link should fix these issues too:
+> 
+> https://lore.kernel.org/linux-block/ZJGmW7lEaipT6saa@ovpn-8-23.pek2.redhat.com/T/#u
+> 
+> I guess you still want the paired freeze patch because it makes freeze &
+> unfreeze more reliable in error handling. If yes, I can make one fabric
+> only change for you.
+
+Not sure exactly what reliability is referred here. I agree that there
+is an issue with controller delete during error recovery. The patch
+was a way to side-step it, great. But it addressed I/O blocked on enter
+and not failing over.
+
+So yes, for fabrics we should have it. I would argue that it would be
+the right thing to do for pci as well. But I won't argue if Keith feels
+otherwise.
