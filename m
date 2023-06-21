@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C08EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 14:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BEC7EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 14:17:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232828AbjFUONF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 10:13:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57332 "EHLO
+        id S232690AbjFUOR1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 10:17:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232860AbjFUOMt (ORCPT
+        with ESMTP id S232694AbjFUOR0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 10:12:49 -0400
+        Wed, 21 Jun 2023 10:17:26 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75C8426AF;
-        Wed, 21 Jun 2023 07:12:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA19294;
+        Wed, 21 Jun 2023 07:17:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687356723; x=1718892723;
+  t=1687357045; x=1718893045;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=9QEdUvQrDLjg3arxdysgvHN5B7VgeWjap2iI9K/7yhU=;
-  b=fD1HzSBMcvj6s7z8SPbJUTCVpReS04wup6HFhxHQM6xCjrcQu5i09MCV
-   RmrJkfRtx+aktMmfbpsfIZ0TKAAHJC5VdmxI6n1dHsmVsS+M9ZBs7gU7u
-   yiiWBuVk8j9H8L5pIxDNgJN1nSiALuFN+/vtBZ6nYluDTv3zmmbt2ZZyO
-   Wsmox1YQ+zsdc7z42W8My7tJRMptJVUjQaE6skrADSmEFZdzHpbRhpzWe
-   AfVVMkhCsm9nb3Fcd5LeTaaEKzNOr3iBY9/OKPfN36dqcJpFXL6In7Glf
-   QWr+PaPvkv+bTyTjEALNXrR9z+Sxuf1BK4DUzzOXh7ozI6Dh4Q84gW5/t
+  bh=rqIpWeE4xesI6qrEd6LN7Ec+WOzNpkbsOTd3PZCftzA=;
+  b=Zc6yjTwbWtt9aXwEbSGrCbvL0ZtZ7Isjnu+B9IzUwFaX6Th9Hoqix9xW
+   QHiZhS0zbILmSes9MZ7viH6BFf747mVU4ljQY4n6WwGXeFhpKxzbs5OH7
+   wUKVqjN/R8X9lonODiL45IGWqwlaMvA/vp+/vN7Mcq2+UU17wISCMrZcG
+   SkXzXgU2snq0LqMZ0jo4EyO6cubHyBvvR4Zbg0Ytk5AtF9sFv+uP01g2j
+   aeX8sSUUZZ2q2ZVeRt6hrt5eyEfQMXU3gToBxNi8rqPvN0uq51cZKeBWJ
+   BcfMNx0/eCGX6ES4VbTR263t6q+0pMsG24o8OXEsoBvEPkO/tgUxp/dMM
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="363604495"
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="363606395"
 X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="363604495"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 07:11:34 -0700
+   d="scan'208";a="363606395"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 07:17:19 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="714500912"
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="744186433"
 X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="714500912"
+   d="scan'208";a="744186433"
 Received: from araj-dh-work.jf.intel.com (HELO araj-dh-work) ([10.165.157.158])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 07:11:34 -0700
-Date:   Wed, 21 Jun 2023 07:09:56 -0700
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 07:17:18 -0700
+Date:   Wed, 21 Jun 2023 07:15:40 -0700
 From:   Ashok Raj <ashok_raj@linux.intel.com>
 To:     linan666@huaweicloud.com
 Cc:     axboe@kernel.dk, linan122@huawei.com, dan.j.williams@intel.com,
@@ -47,72 +47,56 @@ Cc:     axboe@kernel.dk, linan122@huawei.com, dan.j.williams@intel.com,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
         yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
         Ashok Raj <ashok.raj@intel.com>
-Subject: Re: [PATCH v3 3/4] block/badblocks: fix badblocks loss when
- badblocks combine
-Message-ID: <ZJMEtGw+FYT8mRG+@araj-dh-work>
+Subject: Re: [PATCH v3 4/4] block/badblocks: fix the bug of reverse order
+Message-ID: <ZJMGDLkRbaVD9VA8@araj-dh-work>
 References: <20230621172052.1499919-1-linan666@huaweicloud.com>
- <20230621172052.1499919-4-linan666@huaweicloud.com>
+ <20230621172052.1499919-5-linan666@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230621172052.1499919-4-linan666@huaweicloud.com>
+In-Reply-To: <20230621172052.1499919-5-linan666@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 01:20:51AM +0800, linan666@huaweicloud.com wrote:
+On Thu, Jun 22, 2023 at 01:20:52AM +0800, linan666@huaweicloud.com wrote:
 > From: Li Nan <linan122@huawei.com>
 > 
-> badblocks will loss if we set it as below:
+> Order of badblocks will be reversed if we set a large area at once. 'hi'
+> remains unchanged while adding continuous badblocks is wrong, the next
+> setting is greater than 'hi', it should be added to the next position.
+> Let 'hi' +1 each cycle.
+
+The commitlog needs more work. 
 > 
->   # echo 1 1 > bad_blocks
->   # echo 3 1 > bad_blocks
->   # echo 1 5 > bad_blocks
+>   # echo 0 2048 > bad_blocks
 >   # cat bad_blocks
->     1 3
-> 
-> In badblocks_set(), if there is an intersection between p[lo] and p[hi],
-> we will combine them. The end of new badblocks is p[hi]'s end now. but
-> p[lo] may cross p[hi] and new end should be the larger of p[lo] and p[hi].
+>     1536 512
+>     1024 512
+>     512 512
+>     0 512
 
-Reconsider rewriting the commit log. It seems you converted code to
-sentence ;-). 
-
-Also it might help to show after the patch how the above example would be
-for cat bad_blocks
+Is the above before or after this patch is applied?
 
 > 
 > Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
 > Signed-off-by: Li Nan <linan122@huawei.com>
 > ---
->  block/badblocks.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
+>  block/badblocks.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
 > diff --git a/block/badblocks.c b/block/badblocks.c
-> index 7e6ebe2ac12c..2c2ef8284a3f 100644
+> index 2c2ef8284a3f..3b816690b940 100644
 > --- a/block/badblocks.c
 > +++ b/block/badblocks.c
-> @@ -267,16 +267,14 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
->  	if (sectors == 0 && hi < bb->count) {
->  		/* we might be able to combine lo and hi */
->  		/* Note: 's' is at the end of 'lo' */
-> -		sector_t a = BB_OFFSET(p[hi]);
-> -		int lolen = BB_LEN(p[lo]);
-> -		int hilen = BB_LEN(p[hi]);
-> -		int newlen = lolen + hilen - (s - a);
-> +		sector_t a = BB_OFFSET(p[lo]);
-> +		int newlen = max(s, BB_OFFSET(p[hi]) + BB_LEN(p[hi])) - a;
->  
-> -		if (s >= a && newlen < BB_MAX_LEN) {
-> +		if (s >= BB_OFFSET(p[hi]) && newlen < BB_MAX_LEN) {
->  			/* yes, we can combine them */
->  			int ack = BB_ACK(p[lo]) && BB_ACK(p[hi]);
->  
-> -			p[lo] = BB_MAKE(BB_OFFSET(p[lo]), newlen, ack);
-> +			p[lo] = BB_MAKE(a, newlen, ack);
->  			memmove(p + hi, p + hi + 1,
->  				(bb->count - hi - 1) * 8);
->  			bb->count--;
+> @@ -301,6 +301,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+>  			p[hi] = BB_MAKE(s, this_sectors, acknowledged);
+>  			sectors -= this_sectors;
+>  			s += this_sectors;
+> +			hi++;
+>  			changed = true;
+>  		}
+>  	}
 > -- 
 > 2.39.2
 > 
