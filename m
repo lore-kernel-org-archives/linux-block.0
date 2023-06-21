@@ -2,90 +2,177 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F37D1EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 13:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C1BEB64DD
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 14:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232172AbjFUNtI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 09:49:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43536 "EHLO
+        id S232199AbjFUOCM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 10:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232183AbjFUNtG (ORCPT
+        with ESMTP id S232758AbjFUOBo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 09:49:06 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2398619AB
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 06:49:01 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-557224e7716so197944a12.0
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 06:49:01 -0700 (PDT)
+        Wed, 21 Jun 2023 10:01:44 -0400
+Received: from mail-vk1-xa29.google.com (mail-vk1-xa29.google.com [IPv6:2607:f8b0:4864:20::a29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA111BE5
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 07:01:42 -0700 (PDT)
+Received: by mail-vk1-xa29.google.com with SMTP id 71dfb90a1353d-47148f11fe6so2314029e0c.2
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 07:01:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687355340; x=1689947340;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BQVfcIqveXsfsK3itMYSQuSztm1ReHSoYZfaAsBALV8=;
-        b=s0kub7Su7/NFRezFTfLSPk+AhS25fiwTQE6haAec7XooNLc9Gf+TXlcKYHs7j4Xyh0
-         8X+pvXNfnSB4Mkr9Kz8/6IsCOV/PiBYRad1VO4QApD39IgacrW+cMWVW89tFDEkayopx
-         SD5iOE0s/RSh6ZypaopyaqONwU41vlIy9+BROKUjIH7A284thEoO2gV6hXO3UMtRRmbY
-         ASrZ0k+y4ol9XVEh1p5X2etJufqJn0gEP7Aow7pHy8LAQueWuYMSpg+8XG4y6BzBM/Tt
-         Ulnm60SnetKCeIJRPWO5YFGgcgmdqB7zEDbCcl0EFDVOuTn3nJwIGlvFeETiLutNM80B
-         7vCw==
+        d=linaro.org; s=google; t=1687356101; x=1689948101;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sQij4wQznsR5F2fxwwkBmYe5wHBeledhlw5RjB1MrFk=;
+        b=NwWhpwZ3uuatMmOugjTDVZU/f79JRrQT/EdiyhkGVUhZoTOqqYUhj+j7+Of42ZxvXY
+         GDXH45Pfnu0sEf3jPzTud1mYefqDEXkT7ZBclg/YI4D/2pzWexdDC/AhnKcUsRV2ZpTR
+         cf0cF9QGd+iGQ5lxF8YNIVtE7WL+K7SD18+YQbTWB0adpXmH9/yq1TZyOMem+0NWXGZu
+         vexZksiGTvSZcHtXH+p7zUCic6cA+Ey+pWsl4Xjl6jpgPLOVOQ1du7mBXLP7LNSypHxD
+         fZtGqN2SMhuXyXXyFa6UEEVuV3ZFFYGdQ0/ECfnKlAnEkVoiqBKMTPVa8HRcFfQHiH5U
+         Azbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687355340; x=1689947340;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BQVfcIqveXsfsK3itMYSQuSztm1ReHSoYZfaAsBALV8=;
-        b=AxW3zEDXunbxVTc7noh/PYXBozTyZtjOl9O0xdFlgLCmORDhgrrfj5i6v47T9EBxLS
-         +5+qdTmmsOoSoWqcOjiGBP4Dey+XIay79OiJ7xUWxl+Nkh1YAN5HhdaYRmv+Hh1+SxsL
-         +WA7hCf3n5r+Ta3erdbpPNF3IMMWutjzUbB1n7frCoU98tkvgMbOLC+F7UKNv7akkvnq
-         3vMZI7E1RLIqB1eN9zzNL47ELDS2QkGtBK0XO5DWihAfmADjtTQM3w3GkIItcsiMyJEE
-         QbsXfPbKQccrFj+zm6edo4ZbMQFGWHSmtd3VpOwBdmdRXhKMo6Oc7MOK1Gjz3pUPTMm4
-         IE8w==
-X-Gm-Message-State: AC+VfDy7luwmBxHvscGUdUu7FBsISgFZa+EudeGACkHZf8qxjqIL7ZUe
-        1ePu26g6zbtkXa3+6n9WehHscw==
-X-Google-Smtp-Source: ACHHUZ7mwfxs1B9qnWlxJCKrjHr0lIx3q7e9uj4FP+M8vJLOlZW66y42WfNCmtL9lmw5ZZA86eAXdQ==
-X-Received: by 2002:a17:90b:1bc2:b0:25c:1ad3:a4a1 with SMTP id oa2-20020a17090b1bc200b0025c1ad3a4a1mr18507169pjb.1.1687355340543;
-        Wed, 21 Jun 2023 06:49:00 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 1-20020a17090a19c100b0025e9519f9e7sm3466163pjj.15.2023.06.21.06.48.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 06:49:00 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Guangwu Zhang <guazhang@redhat.com>
-In-Reply-To: <20230621132208.1142318-1-ming.lei@redhat.com>
-References: <20230621132208.1142318-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] blk-mq: don't insert passthrough request into sw queue
-Message-Id: <168735533970.3923881.12686023221662839779.b4-ty@kernel.dk>
-Date:   Wed, 21 Jun 2023 07:48:59 -0600
+        d=1e100.net; s=20221208; t=1687356101; x=1689948101;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sQij4wQznsR5F2fxwwkBmYe5wHBeledhlw5RjB1MrFk=;
+        b=YjczeTncMiTOMDy+GTU3z9CTlSS1KVqjvnbUuhMhuIr0qrvmHZqVo8YL8cg3j9cnBY
+         y3Dv7H20WH/18dKPtnV4O65VYLPmxj8fqmPQtqEgewpbpNTAC4dEHcDHqTM59DmiiwlK
+         Xs4dRDCd8nasfrletpGOxJ3vpRAurYV3Nrsp9Fin0FVrmT2skZUMf6ViLRjUD9W16f75
+         PGfzpV9Sv1t+BCmrZZXt5SuKuReaG/8plzU3gdefEPKP5QpCawvdmvczc/Z5MyYejyP7
+         3Y3F6EfenoFM4rldDjxKXFQzQhYKhvRUOUDch8HJSW5DLt74sNMNH7LMXL9votZJcbJF
+         0nwQ==
+X-Gm-Message-State: AC+VfDycu65IPevLGjAuC1bumoF2EyLVZRGsF70rUjcrzqTVK8l+cOQ7
+        2vhqp0+eWrV8YnBJo4Gn5i1qV9a/laTEnSo0H5dYJw==
+X-Google-Smtp-Source: ACHHUZ7xdIJUeh4hZ7I54b7bLEO89fpN300504s2wq/4nNI2/3k6dHahRRll87ZLl5WIf6YkM1HJArctWAgSZeTNgT4=
+X-Received: by 2002:a67:f514:0:b0:440:9cda:df51 with SMTP id
+ u20-20020a67f514000000b004409cdadf51mr7209167vsn.28.1687356100440; Wed, 21
+ Jun 2023 07:01:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-c6835
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Wed, 21 Jun 2023 19:31:29 +0530
+Message-ID: <CA+G9fYtKCZeAUTtwe69iK8Xcz1mOKQzwcy49wd+imZrfj6ifXA@mail.gmail.com>
+Subject: next: ltp: fs: read_all: block sda: the capability attribute has been
+ deprecated. - supervisor instruction fetch in kernel mode
+To:     open list <linux-kernel@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, lkft-triage@lists.linaro.org,
+        linux-block <linux-block@vger.kernel.org>,
+        LTP List <ltp@lists.linux.it>, linux-mm <linux-mm@kvack.org>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Dan Carpenter <dan.carpenter@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+While running LTP fs testing on x86_64 device the following kernel BUG:
+notice with Linux next-20230621.
 
-On Wed, 21 Jun 2023 21:22:08 +0800, Ming Lei wrote:
-> In case of real io scheduler, q->elevator is set, so blk_mq_run_hw_queue()
-> may just check if scheduler queue has request to dispatch, see
-> __blk_mq_sched_dispatch_requests(). Then IO hang may be caused because
-> all passthorugh requests may stay in sw queue.
-> 
-> And any passthrough request should have been inserted to hctx->dispatch
-> always.
-> 
-> [...]
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-Applied, thanks!
+Steps to reproduce:
 
-[1/1] blk-mq: don't insert passthrough request into sw queue
-      commit: 2293cae703cda162684ae966db6b1b4a11b5e88f
+# cd /opt/ltp
+# ./runltp -f fs
 
-Best regards,
--- 
-Jens Axboe
+Test log:
+======
+read_all.c:687: TPASS: Finished reading files
+Summary:
+passed   1
+failed   0
+broken   0
+skipped  0
+warnings 0
+tst_test.c:1558: TINFO: Timeout per run is 0h 06m 40s
+read_all.c:568: TINFO: Worker timeout set to 10% of max_runtime: 1000ms
+[ 1344.664349] block sda: the capability attribute has been deprecated.
+[ 1344.679885] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[ 1344.686839] #PF: supervisor instruction fetch in kernel mode
+[ 1344.692490] #PF: error_code(0x0010) - not-present page
+[ 1344.697620] PGD 8000000105569067 P4D 8000000105569067 PUD 1056ed067 PMD 0
+[ 1344.704494] Oops: 0010 [#1] PREEMPT SMP PTI
+[ 1344.708680] CPU: 0 PID: 5649 Comm: read_all Not tainted
+6.4.0-rc7-next-20230621 #1
+[ 1344.716245] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
+2.5 11/26/2020
+[ 1344.723629] RIP: 0010:0x0
+[ 1344.726257] Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+[ 1344.732780] RSP: 0018:ffff98d38123bd38 EFLAGS: 00010286
+[ 1344.737998] RAX: 0000000000000000 RBX: ffffffffbea38720 RCX: 0000000000000000
+[ 1344.745123] RDX: ffff979e42e31000 RSI: ffffffffbea38720 RDI: ffff979e40371900
+[ 1344.752246] RBP: ffff98d38123bd48 R08: ffff979e4080a0f0 R09: 0000000000000001
+[ 1344.759371] R10: ffff979e42e31000 R11: 0000000000000000 R12: ffff979e42e31000
+[ 1344.766495] R13: 0000000000000001 R14: ffff979e432dd2f8 R15: ffff979e432dd2d0
+[ 1344.773621] FS:  00007ff745d4b740(0000) GS:ffff97a1a7a00000(0000)
+knlGS:0000000000000000
+[ 1344.781704] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1344.787442] CR2: ffffffffffffffd6 CR3: 000000010563c004 CR4: 00000000003706f0
+[ 1344.794587] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 1344.801733] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 1344.808857] Call Trace:
+[ 1344.811301]  <TASK>
+[ 1344.813399]  ? show_regs+0x6e/0x80
+[ 1344.816804]  ? __die+0x29/0x70
+[ 1344.819857]  ? page_fault_oops+0x154/0x470
+[ 1344.823957]  ? do_user_addr_fault+0x355/0x6c0
+[ 1344.828314]  ? exc_page_fault+0x6e/0x170
+[ 1344.832239]  ? asm_exc_page_fault+0x2b/0x30
+[ 1344.836420]  max_phase_adjustment_show+0x23/0x50
+[ 1344.841038]  dev_attr_show+0x1e/0x60
+[ 1344.844616]  sysfs_kf_seq_show+0xb5/0x100
+[ 1344.848628]  kernfs_seq_show+0x28/0x40
+[ 1344.852374]  seq_read_iter+0x112/0x4a0
+[ 1344.856125]  ? inode_security+0x27/0x60
+[ 1344.859967]  kernfs_fop_read_iter+0x145/0x1a0
+[ 1344.864325]  ? security_file_permission+0x52/0x60
+[ 1344.869031]  vfs_read+0x1c7/0x310
+[ 1344.872350]  ksys_read+0x6b/0xf0
+[ 1344.875602]  __x64_sys_read+0x1d/0x30
+[ 1344.879274]  do_syscall_64+0x3c/0x90
+[ 1344.882846]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+[ 1344.887898] RIP: 0033:0x7ff745e4a292
+[ 1344.891476] Code: c0 e9 d2 fe ff ff 50 48 8d 3d 6a d5 0b 00 e8 15
+ed 01 00 0f 1f 44 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75
+10 0f 05 <48> 3d 00 f0 ff ff 77 56 c3 0f 1f 44 00 00 48 83 ec 28 48 89
+54 24
+[ 1344.910213] RSP: 002b:00007fff8e8dd828 EFLAGS: 00000246 ORIG_RAX:
+0000000000000000
+[ 1344.917770] RAX: ffffffffffffffda RBX: 00000000008dabc0 RCX: 00007ff745e4a292
+[ 1344.924896] RDX: 00000000000003ff RSI: 00007fff8e8dd8e0 RDI: 0000000000000003
+[ 1344.932029] RBP: 00007ff745d40028 R08: 00000000001b4e6e R09: 00007fff8e903170
+[ 1344.939159] R10: 0000000000000004 R11: 0000000000000246 R12: 0000000000000030
+[ 1344.946283] R13: 0000000000000003 R14: 00007ff745d3c000 R15: 0000000000001611
+[ 1344.953411]  </TASK>
+[ 1344.955617] Modules linked in: tun x86_pkg_temp_thermal
+[ 1344.960836] CR2: 0000000000000000
+[ 1344.964148] ---[ end trace 0000000000000000 ]---
+[ 1344.964149] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[ 1344.968766] RIP: 0010:0x0
+[ 1344.975717] #PF: supervisor instruction fetch in kernel mode
+[ 1344.978334] Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+[ 1344.983983] #PF: error_code(0x0010) - not-present page
+[ 1344.990502] RSP: 0018:ffff98d38123bd38 EFLAGS: 00010286
+[ 1344.995633] PGD 800000011c4c4067 P4D 800000011c4c4067
 
 
+Links:
+https://lkft.validation.linaro.org/scheduler/job/6531405#L2063
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230621/testrun/17701281/suite/log-parser-test/tests/
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230621/testrun/17701281/suite/log-parser-test/test/check-kernel-bug/details/
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230621/testrun/17701281/suite/log-parser-test/test/check-kernel-bug/log
 
+metadata:
+  git_ref: master
+  git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+  git_sha: 15e71592dbae49a674429c618a10401d7f992ac3
+  git_describe: next-20230621
+  kernel_version: 6.4.0-rc7
+  kernel-config:
+    https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVA4HTFTr9mUVGTxGUDk0W0i9b/config
+  artifact-location:
+    https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVA4HTFTr9mUVGTxGUDk0W0i9b/
+
+--
+Linaro LKFT
+https://lkft.linaro.org
