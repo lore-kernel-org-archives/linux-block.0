@@ -2,89 +2,162 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E77EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 09:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B30E4EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 09:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230415AbjFUJCz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 05:02:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45266 "EHLO
+        id S231130AbjFUJW2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 05:22:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230417AbjFUJC1 (ORCPT
+        with ESMTP id S229647AbjFUJW1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 05:02:27 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA6F19B7;
-        Wed, 21 Jun 2023 02:02:26 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B93C221A44;
-        Wed, 21 Jun 2023 09:02:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1687338144; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=C7PPqDZAmzcbcg0rWIZX01hC1JN4/nlDeRusA0hxj38=;
-        b=PVbKK07wbYQLl7N/k95ONxfqybkfrZz3Sd26AdMOljQkkvKs23hIY62UaiM9Yy+Qngxl8n
-        yBiRGjeD0Jc/PbHIpI7bTatZKg8TksnWrmoErbcArSB4teDzgJAE1hYXZhmw0ttzZsMsqi
-        SYGYLE3S4HqNGpkY0m9LMBJFvxE5uGo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1687338144;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=C7PPqDZAmzcbcg0rWIZX01hC1JN4/nlDeRusA0hxj38=;
-        b=2dZQ1LcBI9BComcRh1bGM2eti1X2u0XXMJpg/eBfRfeZmpsO4M+ZXDu7K9iLxfuT+1wVK4
-        yrxg3tEzF7/qjICw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AAA31134B1;
-        Wed, 21 Jun 2023 09:02:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id WzqeKaC8kmQrZAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 21 Jun 2023 09:02:24 +0000
-Date:   Wed, 21 Jun 2023 11:02:24 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>,
-        Martin Belanger <Martin.Belanger@dell.com>
-Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
- autoconnect
-Message-ID: <ouked4rirrquxur3zzkzm2tsnjtdyfme4hqzetd7hyudtneuhl@feetyajbpqcq>
-References: <20230620132703.20648-1-dwagner@suse.de>
- <20230620132703.20648-3-dwagner@suse.de>
- <af640019-b867-d488-0443-797a75ba4195@grimberg.me>
- <vbbbnzcm6r4jzcc54crix7kjsg647w57te7t2weu7vhuwxg54n@u6cwcn62bfbd>
+        Wed, 21 Jun 2023 05:22:27 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB34AE6C;
+        Wed, 21 Jun 2023 02:22:25 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QmJ1T73Bqz4f3yYY;
+        Wed, 21 Jun 2023 17:22:21 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgCHLaFMwZJk+OrGMA--.39130S5;
+        Wed, 21 Jun 2023 17:22:22 +0800 (CST)
+From:   linan666@huaweicloud.com
+To:     axboe@kernel.dk, linan122@huawei.com, dan.j.williams@intel.com,
+        vishal.l.verma@intel.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH v3 1/4] block/badblocks: change some members of badblocks to bool
+Date:   Thu, 22 Jun 2023 01:20:49 +0800
+Message-Id: <20230621172052.1499919-2-linan666@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230621172052.1499919-1-linan666@huaweicloud.com>
+References: <20230621172052.1499919-1-linan666@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <vbbbnzcm6r4jzcc54crix7kjsg647w57te7t2weu7vhuwxg54n@u6cwcn62bfbd>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCHLaFMwZJk+OrGMA--.39130S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxAw45KFW3uryUXw4DGF45KFg_yoW5XF1UpF
+        nxGwnayr4jgr1vqF1DZ3W7Aw109w4xJF48J3y7Jw15K34Utw1xta4kXryrtFWjqr4a9FsI
+        vF1FgrWjvry8C3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUQIb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
+        8IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK
+        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
+        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
+        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcx
+        kEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
+        6r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
+        Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAK
+        I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+        xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+        jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
+        0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0uwZ3UUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 07:43:35PM +0200, Daniel Wagner wrote:
-> On Tue, Jun 20, 2023 at 05:07:43PM +0300, Sagi Grimberg wrote:
-> > Hmm... is this hapenning with non-fc as well?
-> 
-> I haven't seen a problem for TCP or RDMA yet but in principle it should also
-> exists. I can do some tracing to see if we have also problem thern. Two of the
-> udev rule match on the subsystem and the event type.
+From: Li Nan <linan122@huawei.com>
 
-The only udev rule which gets triggered during blktests execution is this one:
+"changed" and "unacked_exist" are used as boolean type. Change the type
+of them to bool. And reorder fields to reduce memory hole.
 
-# nvme-fc transport generated events (old-style for compatibility)
-ACTION=="change", SUBSYSTEM=="fc", ENV{FC_EVENT}=="nvmediscovery", \
-  ENV{NVMEFC_HOST_TRADDR}=="*",  ENV{NVMEFC_TRADDR}=="*", \
-  RUN+="@SYSTEMCTL@ --no-block restart nvmf-connect@--device=none\t--transport=fc\t--traddr=$env{NVMEFC_TRADDR}\t--trsvcid=none\t--host-traddr=$env{NVMEFC_HOST_TRADDR}.service"
+No functional changed intended.
 
-That explain why blktests didn't get disturbed by the autoconnect rule as this
-rule has a match on the fc subsystem.
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ block/badblocks.c         | 14 +++++++-------
+ include/linux/badblocks.h | 10 +++++-----
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/block/badblocks.c b/block/badblocks.c
+index 3afb550c0f7b..1b4caa42c5f1 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -141,7 +141,7 @@ static void badblocks_update_acked(struct badblocks *bb)
+ 	}
+ 
+ 	if (!unacked)
+-		bb->unacked_exist = 0;
++		bb->unacked_exist = false;
+ }
+ 
+ /**
+@@ -302,9 +302,9 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 		}
+ 	}
+ 
+-	bb->changed = 1;
++	bb->changed = true;
+ 	if (!acknowledged)
+-		bb->unacked_exist = 1;
++		bb->unacked_exist = true;
+ 	else
+ 		badblocks_update_acked(bb);
+ 	write_sequnlock_irqrestore(&bb->lock, flags);
+@@ -414,7 +414,7 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
+ 	}
+ 
+ 	badblocks_update_acked(bb);
+-	bb->changed = 1;
++	bb->changed = true;
+ out:
+ 	write_sequnlock_irq(&bb->lock);
+ 	return rv;
+@@ -435,7 +435,7 @@ void ack_all_badblocks(struct badblocks *bb)
+ 		return;
+ 	write_seqlock_irq(&bb->lock);
+ 
+-	if (bb->changed == 0 && bb->unacked_exist) {
++	if (bb->changed == false && bb->unacked_exist) {
+ 		u64 *p = bb->page;
+ 		int i;
+ 
+@@ -447,7 +447,7 @@ void ack_all_badblocks(struct badblocks *bb)
+ 				p[i] = BB_MAKE(start, len, 1);
+ 			}
+ 		}
+-		bb->unacked_exist = 0;
++		bb->unacked_exist = false;
+ 	}
+ 	write_sequnlock_irq(&bb->lock);
+ }
+@@ -493,7 +493,7 @@ ssize_t badblocks_show(struct badblocks *bb, char *page, int unack)
+ 				length << bb->shift);
+ 	}
+ 	if (unack && len == 0)
+-		bb->unacked_exist = 0;
++		bb->unacked_exist = false;
+ 
+ 	if (read_seqretry(&bb->lock, seq))
+ 		goto retry;
+diff --git a/include/linux/badblocks.h b/include/linux/badblocks.h
+index 2426276b9bd3..c2723f97d22d 100644
+--- a/include/linux/badblocks.h
++++ b/include/linux/badblocks.h
+@@ -27,15 +27,15 @@
+ struct badblocks {
+ 	struct device *dev;	/* set by devm_init_badblocks */
+ 	int count;		/* count of bad blocks */
+-	int unacked_exist;	/* there probably are unacknowledged
+-				 * bad blocks.  This is only cleared
+-				 * when a read discovers none
+-				 */
+ 	int shift;		/* shift from sectors to block size
+ 				 * a -ve shift means badblocks are
+ 				 * disabled.*/
++	bool unacked_exist;	/* there probably are unacknowledged
++				 * bad blocks.  This is only cleared
++				 * when a read discovers none
++				 */
++	bool changed;
+ 	u64 *page;		/* badblock list */
+-	int changed;
+ 	seqlock_t lock;
+ 	sector_t sector;
+ 	sector_t size;		/* in sectors */
+-- 
+2.39.2
+
