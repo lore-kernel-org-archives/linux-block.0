@@ -2,112 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA79EEB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 08:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E77EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 09:02:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231317AbjFUI5g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 04:57:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41924 "EHLO
+        id S230415AbjFUJCz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 05:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231145AbjFUI45 (ORCPT
+        with ESMTP id S230417AbjFUJC1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 04:56:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D10251BD2
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 01:54:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687337656;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Wed, 21 Jun 2023 05:02:27 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA6F19B7;
+        Wed, 21 Jun 2023 02:02:26 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B93C221A44;
+        Wed, 21 Jun 2023 09:02:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1687338144; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=tUeqDc8Opf0qvxHmjDxn90zahKMQD9aZkovKepPjZUA=;
-        b=Q7/CSyeT4WR3bdYqNom6ky5d8RcqAzy6ZcemN1tV55YP4DlVQJssHwzmRxDmG97JXzgbsq
-        GYQoTD+QHFfH1w7TVUgBS0WaRAr1nkXaD0x1ioBriFZ0whJs0ndbdB7+yA+iJkTIOeqiO8
-        SOPz0JvnrfSuGR1m08Y/5fz5AaQsoE8=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-gf-aTU8TOyabm0jY6WYf-g-1; Wed, 21 Jun 2023 04:54:14 -0400
-X-MC-Unique: gf-aTU8TOyabm0jY6WYf-g-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-25e81d23fe8so2480096a91.3
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 01:54:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687337653; x=1689929653;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tUeqDc8Opf0qvxHmjDxn90zahKMQD9aZkovKepPjZUA=;
-        b=U46VT4XBATCEKpOS5nsSra1gAYHvXoIRHRgp4L2mu2PiDa5O/OzDFCA2suKAhk9+l5
-         a/LaElqrCF+xOQ8azB80zp7cceokvuWjv8CuUs3U4alKpvz5048pUAlafvWhuYzoT6Wr
-         hrH84n56HSPZCNIih8akQp6K3cqNF9VRwsIjO3kEPb5fFZDXIlTwOZt/MfobE0fnb1J5
-         UnMDZDzdaWJy56EC/oO0PqV3tYQoys6hmH3ebMWuvp0LAne2wjGDoC0xmQllZv6lGs8D
-         gxfUHu3YQ8ryfBfMGatC3YIQM3aEIajcktmq1sidJv/3jqGlLacpRgS/O+Ai+Y7/Iamd
-         FsPQ==
-X-Gm-Message-State: AC+VfDzbJd2U1PIW+ozAJksURrER0lZAvYVA7Uhl5z91xbEtN6ImGjnX
-        qwntelH9IRv8bz044+Iqkz3zWOgE8l8XzZSO5X053oufzeKUvONJdduxsvTY5DEA/+hLUPK72xD
-        ldOm+dnDdDF/rhpf6WHIligvbIVd9XbiOz88V19BmJ8USw2yRrg==
-X-Received: by 2002:a17:90a:7892:b0:259:d0f2:3576 with SMTP id x18-20020a17090a789200b00259d0f23576mr11216612pjk.19.1687337653361;
-        Wed, 21 Jun 2023 01:54:13 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7s0sLYCC/Kgqb7IWgIG55HJgxMIIJsmoaEG2Fbph6Xt57Pt6Zp55wzkhsMm/ccLZ7/a7Zo7dBbpJj7EFn7JHs=
-X-Received: by 2002:a17:90a:7892:b0:259:d0f2:3576 with SMTP id
- x18-20020a17090a789200b00259d0f23576mr11216605pjk.19.1687337653084; Wed, 21
- Jun 2023 01:54:13 -0700 (PDT)
+        bh=C7PPqDZAmzcbcg0rWIZX01hC1JN4/nlDeRusA0hxj38=;
+        b=PVbKK07wbYQLl7N/k95ONxfqybkfrZz3Sd26AdMOljQkkvKs23hIY62UaiM9Yy+Qngxl8n
+        yBiRGjeD0Jc/PbHIpI7bTatZKg8TksnWrmoErbcArSB4teDzgJAE1hYXZhmw0ttzZsMsqi
+        SYGYLE3S4HqNGpkY0m9LMBJFvxE5uGo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1687338144;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=C7PPqDZAmzcbcg0rWIZX01hC1JN4/nlDeRusA0hxj38=;
+        b=2dZQ1LcBI9BComcRh1bGM2eti1X2u0XXMJpg/eBfRfeZmpsO4M+ZXDu7K9iLxfuT+1wVK4
+        yrxg3tEzF7/qjICw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AAA31134B1;
+        Wed, 21 Jun 2023 09:02:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id WzqeKaC8kmQrZAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 21 Jun 2023 09:02:24 +0000
+Date:   Wed, 21 Jun 2023 11:02:24 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Message-ID: <ouked4rirrquxur3zzkzm2tsnjtdyfme4hqzetd7hyudtneuhl@feetyajbpqcq>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-3-dwagner@suse.de>
+ <af640019-b867-d488-0443-797a75ba4195@grimberg.me>
+ <vbbbnzcm6r4jzcc54crix7kjsg647w57te7t2weu7vhuwxg54n@u6cwcn62bfbd>
 MIME-Version: 1.0
-References: <20230617052405.305871-1-song@kernel.org> <CALTww2-f7vSXugM0kMMMG==YgmDOEqSLk+vLf2U_ZyprDKk2+w@mail.gmail.com>
- <2909cd3b-7716-a0ae-1ced-b5c78b0573da@huaweicloud.com>
-In-Reply-To: <2909cd3b-7716-a0ae-1ced-b5c78b0573da@huaweicloud.com>
-From:   Xiao Ni <xni@redhat.com>
-Date:   Wed, 21 Jun 2023 16:54:01 +0800
-Message-ID: <CALTww2_3E2eTCEb86GrK1cdmUsesuNPNFJgf4nPf=RFKmecgBw@mail.gmail.com>
-Subject: Re: [PATCH] md: use mddev->external to select holder in export_rdev()
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Song Liu <song@kernel.org>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <vbbbnzcm6r4jzcc54crix7kjsg647w57te7t2weu7vhuwxg54n@u6cwcn62bfbd>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 4:21=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
-rote:
->
-> Hi,
->
-> =E5=9C=A8 2023/06/21 16:10, Xiao Ni =E5=86=99=E9=81=93:
-> > Hi Song
-> >
-> > After applying your patch, there are still warning messages in the
-> > calltrace. It looks like a deadlock. The test case is
-> > 10ddf-fail-stop-readd.
-> >
-> > [  381.825307] INFO: task md126_raid1:1896 blocked for more than 122 se=
-conds.
-> > [  381.825722]       Tainted: G           OE      6.4.0-rc2+ #1
-> > [  381.826626] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> > disables this message.
-> > [  381.827080] task:md126_raid1     state:D stack:0     pid:1896
-> > ppid:2      flags:0x00004000
-> > [  381.827864] Call Trace:
-> > [  381.828013]  <TASK>
-> > [  381.828514]  __schedule+0x2ad/0x7c0
-> > [  381.829126]  schedule+0x5a/0xd0
-> > [  381.829733]  schedule_preempt_disabled+0x11/0x20
-> > [  381.830396]  __mutex_lock+0x5c8/0xcc0
->
-> Looks like this is the same deadlock that should be fixed by following
-> patch:
->
-> https://lore.kernel.org/linux-raid/20230621142933.1395629-1-yukuai1@huawe=
-icloud.com/
->
-> Thanks,
-> Kuai
+On Tue, Jun 20, 2023 at 07:43:35PM +0200, Daniel Wagner wrote:
+> On Tue, Jun 20, 2023 at 05:07:43PM +0300, Sagi Grimberg wrote:
+> > Hmm... is this hapenning with non-fc as well?
+> 
+> I haven't seen a problem for TCP or RDMA yet but in principle it should also
+> exists. I can do some tracing to see if we have also problem thern. Two of the
+> udev rule match on the subsystem and the event type.
 
-After applying these two patches, the warning messages disappear.
+The only udev rule which gets triggered during blktests execution is this one:
 
-Regards
-Xiao
+# nvme-fc transport generated events (old-style for compatibility)
+ACTION=="change", SUBSYSTEM=="fc", ENV{FC_EVENT}=="nvmediscovery", \
+  ENV{NVMEFC_HOST_TRADDR}=="*",  ENV{NVMEFC_TRADDR}=="*", \
+  RUN+="@SYSTEMCTL@ --no-block restart nvmf-connect@--device=none\t--transport=fc\t--traddr=$env{NVMEFC_TRADDR}\t--trsvcid=none\t--host-traddr=$env{NVMEFC_HOST_TRADDR}.service"
 
+That explain why blktests didn't get disturbed by the autoconnect rule as this
+rule has a match on the fc subsystem.
