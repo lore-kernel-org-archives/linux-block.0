@@ -2,97 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B046C0015E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 14:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC45EB64D8
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 14:58:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232208AbjFUOsF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 10:48:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56772 "EHLO
+        id S232713AbjFUO6q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 10:58:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232118AbjFUOr5 (ORCPT
+        with ESMTP id S233118AbjFUO60 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 10:47:57 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB70F1BCB;
-        Wed, 21 Jun 2023 07:47:46 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 570DA1FECB;
-        Wed, 21 Jun 2023 14:47:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1687358865; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QWUOtp0iwu/9Qa0OVnEO54KvtodKK3z2Yy7Kvf+nwDE=;
-        b=spZwbLy7WTEzmCG4IMRKQcBb3oB/aSMNtEjvoswtRfWZzVDvghsD5pMwYwaZxYquv0jqYf
-        YcAGwzQPCRk3PBncB9u2KOnsFAgy3rxJuwJydd5bw8pFRXy4lzQ+Wz3fp8hSCgE6RCXtAy
-        34vS7wfHeG2WTI41bOoDyjVMQNkpESY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1687358865;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QWUOtp0iwu/9Qa0OVnEO54KvtodKK3z2Yy7Kvf+nwDE=;
-        b=YS9AuQ78ENZBIpT+YMAxs3pUdZCQBG02Y9BNmpyyomSr+5pEuDZlRnut4qwFav1kcoKNJg
-        xrOBheTKgL0AAQCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3FF70133E6;
-        Wed, 21 Jun 2023 14:47:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id ISQRD5ENk2T7EAAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 21 Jun 2023 14:47:45 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id C88E1A0439; Wed, 21 Jun 2023 16:47:44 +0200 (CEST)
-From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     <linux-block@vger.kernel.org>,
+        Wed, 21 Jun 2023 10:58:26 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D555D525A;
+        Wed, 21 Jun 2023 07:53:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=P/S1P3OMvt32FkOL+BS2zKSFIy8MKzwk7N4UYyercEI=; b=1XKsiTjjucNPkB1y4htZ+KeKzl
+        ng924PIgrB8Hr7841puBQKkoiIhrehLLPg6c2Dv1uOly/e5ynDFbtmMStFZrDZeaTg3Bj//kj2h79
+        4glnzbay+OGhzBNoqrRDJJ4SP7c3gt7I3DqWmeluekCMFkhTab6dwyIUYuiGPZ8boj9w8VUYz5FSU
+        01KchMUfQsa+xkQkXEoPHGHEKMdtVS+DDNyNPCNZyeIDqJrtCujgVslNWWnLANhaGCpqDVNubAaXu
+        b6Hwx130i9rfva2YMz39pnK7/5YNWk+0imh8f8Ndd3qGpwYjsUh5+oeGAp/QataEBzLf2HselRgd2
+        PDHmAT0w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qBzC7-00Es1Y-0C;
+        Wed, 21 Jun 2023 14:52:27 +0000
+Date:   Wed, 21 Jun 2023 07:52:27 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
-        <linux-ext4@vger.kernel.org>, <linux-xfs@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/2] ext4: Fix crash in ext4_bdev_mark_dead()
-Date:   Wed, 21 Jun 2023 16:47:42 +0200
-Message-Id: <20230621144744.1580-1-jack@suse.cz>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230621144354.10915-1-jack@suse.cz>
+        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 1/2] ext4: Fix crash in ext4_bdev_mark_dead()
+Message-ID: <ZJMOqynQKadyBOXX@infradead.org>
 References: <20230621144354.10915-1-jack@suse.cz>
+ <20230621144744.1580-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=831; i=jack@suse.cz; h=from:subject; bh=fVkRZ23tC1duoGWpYIOUWQFn7i7gXQuatR9LkqpoylM=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkkw2Nz9dPYRfxuj98FpO6uTFrTKYBBa85oPM//MLy caQyHJuJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZJMNjQAKCRCcnaoHP2RA2XS/CA CUkx2kfMmw1VtFu0zZfSoq9OorFMl6+eWvqt5avVVd9qqI+jUKlzqcJOuJZkufV0dkWnfUN5XKXMha Hh55mhrpH+G5Hq9Pkwcqk4YCAoHCS9GdIMIe6z2RW6mZo5qfEFOFjr7SgaNk2iDikQTRyFYAVxQfft x37meRh8o2HaGqj1bIbRfeqpbMMYP4BacrIfKM0XHSEuYpDZbXdEiYR+IoYZftU6gOp/lr0V9/nBk2 R4C9TIwZcJK2IEYNvFBjZefwBLuriM90kWdeXwZI4BDZJtViF+UOoyhQhnUUgecMSPkUej5L3fcRu7 Zul/dHMFfegtba8HHutOXxoZlahwT8
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621144744.1580-1-jack@suse.cz>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ext4_bdev_mark_dead() passes bdev->bd_holder to ext4_force_shutdown()
-instead of bdev->bd_super leading to crashes. Fix it.
+On Wed, Jun 21, 2023 at 04:47:42PM +0200, Jan Kara wrote:
+> ext4_bdev_mark_dead() passes bdev->bd_holder to ext4_force_shutdown()
+> instead of bdev->bd_super leading to crashes. Fix it.
 
-Fixes: dd2e31afba9e ("ext4: wire up the ->mark_dead holder operation for log devices")
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/ext4/super.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+How does this crash? ext4_blkdev_get passes the sb as holder, and I
+actually tested this code.
 
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 6f43a86ecf16..53d74144ee34 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -1098,7 +1098,7 @@ void ext4_update_dynamic_rev(struct super_block *sb)
- 
- static void ext4_bdev_mark_dead(struct block_device *bdev)
- {
--	ext4_force_shutdown(bdev->bd_holder, EXT4_GOING_FLAGS_NOLOGFLUSH);
-+	ext4_force_shutdown(bdev->bd_super, EXT4_GOING_FLAGS_NOLOGFLUSH);
- }
- 
- static const struct blk_holder_ops ext4_holder_ops = {
--- 
-2.35.3
-
+This is not to be confused with the blkdev_get_by_path in get_tree_bdev,
+but that never ends up in ext4_bdev_mark_dead.
