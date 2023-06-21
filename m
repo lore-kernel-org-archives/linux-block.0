@@ -2,108 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62552C001DB
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 09:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFD4EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 09:51:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230444AbjFUJWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 05:22:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55846 "EHLO
+        id S232215AbjFUJvw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 05:51:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230376AbjFUJW2 (ORCPT
+        with ESMTP id S232113AbjFUJvZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 05:22:28 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A01C10F8;
-        Wed, 21 Jun 2023 02:22:26 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QmJ1W09Xsz4f3pFv;
-        Wed, 21 Jun 2023 17:22:23 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgCHLaFMwZJk+OrGMA--.39130S7;
-        Wed, 21 Jun 2023 17:22:23 +0800 (CST)
-From:   linan666@huaweicloud.com
-To:     axboe@kernel.dk, linan122@huawei.com, dan.j.williams@intel.com,
-        vishal.l.verma@intel.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH v3 3/4] block/badblocks: fix badblocks loss when badblocks combine
-Date:   Thu, 22 Jun 2023 01:20:51 +0800
-Message-Id: <20230621172052.1499919-4-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230621172052.1499919-1-linan666@huaweicloud.com>
-References: <20230621172052.1499919-1-linan666@huaweicloud.com>
+        Wed, 21 Jun 2023 05:51:25 -0400
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 375821728;
+        Wed, 21 Jun 2023 02:50:34 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-31114d47414so1270311f8f.1;
+        Wed, 21 Jun 2023 02:50:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687341033; x=1689933033;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=foLI8oofbou4hrt7TVAkrvJDeJCFo178hS/ZQokH0vY=;
+        b=lWFu5BQrlbd+itODc5zHIy53obAPEc0y+6ptIVyD8qQhCiYiBFD+NLnd8+RFUhlDPQ
+         iBaQg3NX8ohqweNX8ci2ZOgyV9jQhqGybnx4zMXYMbrB7kA2uNFRJtovffVomi58lHiY
+         CK6YTmnaBPOcyIfcrmFxPqSSOqbSydozkhD9l1bohaejzmbe/mmvLTeuLFkw0sx6Sj/Z
+         1uoPXGhRJAFU9MrJkrwLC9vdj0VPB9pFhfZ8U8cdpeQvv6kHQ7cbeXM7iNflhYk/3U+X
+         Tq0OsDiJEUQI7HGbWDsJY4C9K0wU9wsZpfHS9de6CX0vSJicdbSd6Q5LUUmefPctT8SW
+         ecMA==
+X-Gm-Message-State: AC+VfDwIrSPhd0Y4xTAjD2kuwCrTzI9D+VP8Fe7sdwCFCv7BVUbyqbZW
+        UgA49meeNGf6rjY98yWRgSLD/+sScDw=
+X-Google-Smtp-Source: ACHHUZ4Hah7qAiMDMVHWF7ildurOLQasEXFh5ekDJrboVLcvEPHKdYejnUi/v+YlmoRmMei1jMIPWw==
+X-Received: by 2002:adf:f312:0:b0:30e:460b:bede with SMTP id i18-20020adff312000000b0030e460bbedemr12934277wro.5.1687341032561;
+        Wed, 21 Jun 2023 02:50:32 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id h9-20020a5d4fc9000000b0031134bcdacdsm3998202wrw.42.2023.06.21.02.50.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Jun 2023 02:50:31 -0700 (PDT)
+Message-ID: <083e29ff-4ad0-d05f-0521-56ace13629e6@grimberg.me>
+Date:   Wed, 21 Jun 2023 12:50:29 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCHLaFMwZJk+OrGMA--.39130S7
-X-Coremail-Antispam: 1UD129KBjvJXoWxJrW8urW3AryDWw17Kry3urg_yoW8XrW5pw
-        1fZwnIgr1IgFyv9F4UX3WDGF1Sg3Z7JF45Ga1Yqa48uFyDAw1xKF4vq3WYvrW0gF4xXF90
-        va1rWryDZFyfG37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUQIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK
-        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
-        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
-        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcx
-        kEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
-        6r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
-        Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAK
-        I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-        xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-        jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
-        0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0gJ57UUUUU==
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH blktests v1 1/3] nvme/048: Check for queue count check
+ directly
+Content-Language: en-US
+To:     Daniel Wagner <dwagner@suse.de>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-2-dwagner@suse.de>
+ <380cde65-8794-cfbc-237f-30a8d7e9330c@grimberg.me>
+ <f6rvvhgim4nk34onfgbwyfctgvgdbdigwbsugjvizgtli46p57@s7c4gkqrpjqy>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <f6rvvhgim4nk34onfgbwyfctgvgdbdigwbsugjvizgtli46p57@s7c4gkqrpjqy>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Nan <linan122@huawei.com>
 
-badblocks will loss if we set it as below:
+>>> +nvmf_wait_for_queue_count() {
+>>> +	local subsys_name="$1"
+>>> +	local queue_count="$2"
+>>> +	local nvmedev
+>>> +
+>>> +	nvmedev=$(_find_nvme_dev "${subsys_name}")
+>>> +
+>>> +	queue_count_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/queue_count"
+>>> +
+>>> +	nvmf_wait_for_state "${subsys_name}" "live" || return 1
+>>> +
+>>> +	queue_count=$((queue_count + 1))
+>>> +	if grep -q "${queue_count}" "${queue_count_file}"; then
+>>> +		return 0
+>>> +	fi
+>>> +
+>>> +	echo "expected queue count ${queue_count} not set"
+>>> +	return 1
+>>> +}
+>>> +
+>>>    set_nvmet_attr_qid_max() {
+>>>    	local nvmet_subsystem="$1"
+>>>    	local qid_max="$2"
+>>> @@ -56,10 +76,7 @@ set_qid_max() {
+>>>    	local qid_max="$3"
+>>>    	set_nvmet_attr_qid_max "${subsys_name}" "${qid_max}"
+>>> -
+>>> -	# Setting qid_max forces a disconnect and the reconntect attempt starts
+>>> -	nvmf_wait_for_state "${subsys_name}" "connecting" || return 1
+>>> -	nvmf_wait_for_state "${subsys_name}" "live" || return 1
+>>> +	nvmf_wait_for_queue_count "${subsys_name}" "${qid_max}" || return 1
+>>
+>> Why not simply wait for live? The connecting is obviously racy...
+> 
+> That is what the new version is doing. It's waiting for the live state and then
+> checks the queue count.
 
-  # echo 1 1 > bad_blocks
-  # echo 3 1 > bad_blocks
-  # echo 1 5 > bad_blocks
-  # cat bad_blocks
-    1 3
-
-In badblocks_set(), if there is an intersection between p[lo] and p[hi],
-we will combine them. The end of new badblocks is p[hi]'s end now. but
-p[lo] may cross p[hi] and new end should be the larger of p[lo] and p[hi].
-
-Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- block/badblocks.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/block/badblocks.c b/block/badblocks.c
-index 7e6ebe2ac12c..2c2ef8284a3f 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -267,16 +267,14 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
- 	if (sectors == 0 && hi < bb->count) {
- 		/* we might be able to combine lo and hi */
- 		/* Note: 's' is at the end of 'lo' */
--		sector_t a = BB_OFFSET(p[hi]);
--		int lolen = BB_LEN(p[lo]);
--		int hilen = BB_LEN(p[hi]);
--		int newlen = lolen + hilen - (s - a);
-+		sector_t a = BB_OFFSET(p[lo]);
-+		int newlen = max(s, BB_OFFSET(p[hi]) + BB_LEN(p[hi])) - a;
- 
--		if (s >= a && newlen < BB_MAX_LEN) {
-+		if (s >= BB_OFFSET(p[hi]) && newlen < BB_MAX_LEN) {
- 			/* yes, we can combine them */
- 			int ack = BB_ACK(p[lo]) && BB_ACK(p[hi]);
- 
--			p[lo] = BB_MAKE(BB_OFFSET(p[lo]), newlen, ack);
-+			p[lo] = BB_MAKE(a, newlen, ack);
- 			memmove(p + hi, p + hi + 1,
- 				(bb->count - hi - 1) * 8);
- 			bb->count--;
--- 
-2.39.2
-
+Maybe don't fold waiting for live into waiting for queue_count.
