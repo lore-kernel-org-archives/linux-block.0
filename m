@@ -2,168 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0342BEB64DC
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 13:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC04EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 13:46:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229908AbjFUNkx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 09:40:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37608 "EHLO
+        id S231156AbjFUNqq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 09:46:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232403AbjFUNkx (ORCPT
+        with ESMTP id S229699AbjFUNqp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 09:40:53 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04304E59
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 06:40:52 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-66872dbc2efso979012b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 06:40:51 -0700 (PDT)
+        Wed, 21 Jun 2023 09:46:45 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D287819B
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 06:46:44 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1b515ec39feso10993635ad.0
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 06:46:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687354851; x=1689946851;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GDKIhFWuEZ1n7Vcx+7wRMdAo6FU3gV4rV1Nj/5JuAlE=;
-        b=du53aedkjus+302qNWs3qEVB5aRN4QEkwkOHrg61I/TWiM8WPrC6eA4adL51H2Ljmy
-         7ZOrgCA++jBLPugmxeSN3GHhRzxqODdGTsSDXd/iUoacsFtJSebtFw7LlzkEnBQSkdRA
-         m2bUlzQHnQ1ohVh7rpN899B4bmd/fxYK+er3Uc5GCKXW9DQImfqbi8eImIpgvAy+JgWp
-         nKxSK0Ru+LHNo6tr0/nc/qp4Pomw0I5uYEzM1RZLm6OMvtNFYXndeTRqFQElq4fN4hnw
-         piOh7Car2wW8onSCnpOFfZ0a7iYx12DCMqzDXrKYtn3gvTlXreh9C++6V938Adxssmg5
-         L0yA==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687355204; x=1689947204;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kLtSXPBahUMgKQVBn5Rd4J0wNhqqaJSy+CKw/Y/m6tM=;
+        b=p/6bV4ypTW1kiEtExMP1Y77vqeg7zVH2t1J0zdEv4dtxUnvbN0McjCJ9aZ2vSliOJ5
+         2kFNww98CbYdPpGtc71RixBZAQYE6odAVxQtGtyiW99SmFR/OGfsTEcQJCMX5Ap06/Hr
+         zhcSgq/TJFysLI+bYBqFXzTqKIh+ozfgfqxaYgSnU1cuJtTXLdDbI5SSdnT2wd3QcSiG
+         trj8DCd6JLkCiPH2vbLoqUAKbbYDfNSjoeNvNnjwpqZErGldwRfiapwMdwFI0QbMx9vz
+         +EHP4e6v1Dh2GMcXJOAi2hc+QYSpM3kRsjjZ9I/A0C2sbuVrAA0eDAiAV231EUAY4Ofe
+         boyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687354851; x=1689946851;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GDKIhFWuEZ1n7Vcx+7wRMdAo6FU3gV4rV1Nj/5JuAlE=;
-        b=Aupn6AH03Ol0aDfF5PQoKnsWlnF4eQeEbIS62WysfL3JE2OdyW80B/LOS0tKobi8zI
-         +ZWbrnfo7tkHm7e7WdR8D4Qr71DyK/IhGiMczSi+JVDY2cd2sQe5PYDXKYqeE8XRkOmw
-         kjbF5EGzCGQoemoHzUSMrzBlUbsiAYvNInK8Z4uz6c2AI7Q6jEE+6tO9ZiYjdbpKhcJv
-         xa4A9xLoWIkZ/ZGpQF0Mm62B0k7a6P5hGEC6MGuKn5BkDSvSAT3Vb7dovUIoZTMYqPe1
-         F8b56yqqKzrkJKU0GXkD0daO4aa/j5WwhBEbt+POyVKZ+19EMo2EzqfyA89OUAkdM71w
-         RL5Q==
-X-Gm-Message-State: AC+VfDy61JfJFM+9oCZQoEVvi2uXpLHCwX5zB4gFCGTSADAdf3EGc0Kg
-        ZW1qU9MRlisi6HPHXCAQ54Shfg==
-X-Google-Smtp-Source: ACHHUZ6USHq1ptGQzjgdWY1T0ZVzNYU5zNduo0mJwiltjRqTiAHps1EEzHo49GMrjEydGzeOmCzaQA==
-X-Received: by 2002:a05:6a00:4192:b0:668:70af:b5c1 with SMTP id ca18-20020a056a00419200b0066870afb5c1mr11739859pfb.1.1687354851467;
-        Wed, 21 Jun 2023 06:40:51 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j26-20020aa7801a000000b0065980654baasm2932470pfi.130.2023.06.21.06.40.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Jun 2023 06:40:50 -0700 (PDT)
-Message-ID: <e92a19fa-74cc-2b9f-3173-6a04557a6534@kernel.dk>
-Date:   Wed, 21 Jun 2023 07:40:49 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [bug report] BUG: KASAN: out-of-bounds in
- io_req_local_work_add+0x3b1/0x4a0
-Content-Language: en-US
-To:     Guangwu Zhang <guazhang@redhat.com>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Jeff Moyer <jmoyer@redhat.com>,
-        io-uring@vger.kernel.org
-References: <CAGS2=YrvrD0hf7WGjQd4Me772=m9=E6J92aGtG0PAoF4yD6dTw@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1687355204; x=1689947204;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kLtSXPBahUMgKQVBn5Rd4J0wNhqqaJSy+CKw/Y/m6tM=;
+        b=TdIyqNLelCUoiosTsskGa5nvaNFxc2K2zxnOLLSVzzElwovMp7ZSWTG0fpP5LfLATV
+         LSGnvLZ+53ZhXZN282+hWVvlb2TnZA/vrkmwvstKQw8SbQHHUAn8ub+YS2NOjbufa28F
+         OuquD8VXWd4xHJjEZUL8e2t6EGQymw8jn37liQ/YOrzCeZsECsv/5JwD/U3/Hqet6J1L
+         FY8OaCwXc+nItKTF1zjTt0fGhac71Kzjlmh2Gf0EsDCxwt/2xXO4DwlZ3rFjnQBRjoVa
+         iC0LNEnA3Kmrd1vMng3gHpSaZccshwFKmkuhGPUzshHxKJ41XqegcVCfx+zfOY74v+RQ
+         EKfw==
+X-Gm-Message-State: AC+VfDwj+LthHQWnfxgPlAMkDZ4Vo4fB1n28/ukJMH71a9yNghs3+6bU
+        1Es3NgcuYRFNkVDjmcO9gp6WBtbC3CBDHfJ2ZOY=
+X-Google-Smtp-Source: ACHHUZ7OkD4wv0DkpDZydNb4IYO41VvvOdEvmserXM7+mx4U8O/fwa4iq5YczMz/UU+uyqg2Ak8uJQ==
+X-Received: by 2002:a17:903:1ca:b0:1b5:32ec:df97 with SMTP id e10-20020a17090301ca00b001b532ecdf97mr18146080plh.5.1687355203847;
+        Wed, 21 Jun 2023 06:46:43 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id u2-20020a17090282c200b001ac95be5081sm3503549plz.307.2023.06.21.06.46.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 06:46:43 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAGS2=YrvrD0hf7WGjQd4Me772=m9=E6J92aGtG0PAoF4yD6dTw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To:     linux-block@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Ivan Orlov <ivan.orlov0322@gmail.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>
+In-Reply-To: <20230620180129.645646-5-gregkh@linuxfoundation.org>
+References: <20230620180129.645646-5-gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 1/4] block/rnbd: make all 'class' structures const
+Message-Id: <168735520264.3922571.3510429095521254500.b4-ty@kernel.dk>
+Date:   Wed, 21 Jun 2023 07:46:42 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-c6835
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/21/23 1:38?AM, Guangwu Zhang wrote:
-> HI,
-> Found the io_req_local_work_add error when run  liburing testing.
+
+On Tue, 20 Jun 2023 20:01:30 +0200, Greg Kroah-Hartman wrote:
+> Now that the driver core allows for struct class to be in read-only
+> memory, making all 'class' structures to be declared at build time
+> placing them into read-only memory, instead of having to be dynamically
+> allocated at load time.
 > 
-> kernel repo :
->     Merge branch 'for-6.5/block' into for-next
->     * for-6.5/block:
->       reiserfs: fix blkdev_put() warning from release_journal_dev()
 > 
-> [ 1733.389012] BUG: KASAN: out-of-bounds in io_req_local_work_add+0x3b1/0x4a0
-> [ 1733.395900] Read of size 4 at addr ffff888133320458 by task
-> iou-wrk-97057/97138
-> [ 1733.403205]
-> [ 1733.404706] CPU: 4 PID: 97138 Comm: iou-wrk-97057 Kdump: loaded Not
-> tainted 6.4.0-rc3.kasan+ #1
-> [ 1733.413404] Hardware name: Dell Inc. PowerEdge R740/06WXJT, BIOS
-> 2.13.3 12/13/2021
-> [ 1733.420972] Call Trace:
-> [ 1733.423425]  <TASK>
-> [ 1733.425533]  dump_stack_lvl+0x33/0x50
-> [ 1733.429207]  print_address_description.constprop.0+0x2c/0x3e0
-> [ 1733.434959]  print_report+0xb5/0x270
-> [ 1733.438539]  ? kasan_addr_to_slab+0x9/0xa0
-> [ 1733.442639]  ? io_req_local_work_add+0x3b1/0x4a0
-> [ 1733.447258]  kasan_report+0xcf/0x100
-> [ 1733.450839]  ? io_req_local_work_add+0x3b1/0x4a0
-> [ 1733.455456]  io_req_local_work_add+0x3b1/0x4a0
-> [ 1733.459903]  ? __pfx_io_req_local_work_add+0x10/0x10
-> [ 1733.464871]  ? __schedule+0x616/0x1530
-> [ 1733.468622]  __io_req_task_work_add+0x1bc/0x270
-> [ 1733.473156]  io_issue_sqe+0x55a/0xe80
-> [ 1733.476831]  io_wq_submit_work+0x23e/0xa00
-> [ 1733.480930]  io_worker_handle_work+0x2f5/0xa80
-> [ 1733.485384]  io_wq_worker+0x6c5/0x9d0
-> [ 1733.489051]  ? __pfx_io_wq_worker+0x10/0x10
-> [ 1733.493246]  ? _raw_spin_lock_irq+0x82/0xe0
-> [ 1733.497430]  ? __pfx_io_wq_worker+0x10/0x10
-> [ 1733.501616]  ret_from_fork+0x29/0x50
-> [ 1733.505204]  </TASK>
-> [ 1733.507396]
-> [ 1733.508894] Allocated by task 97057:
-> [ 1733.512475]  kasan_save_stack+0x1e/0x40
-> [ 1733.516313]  kasan_set_track+0x21/0x30
-> [ 1733.520068]  __kasan_slab_alloc+0x83/0x90
-> [ 1733.524080]  kmem_cache_alloc_bulk+0x13a/0x1e0
-> [ 1733.528526]  __io_alloc_req_refill+0x238/0x510
-> [ 1733.532971]  io_submit_sqes+0x65a/0xcd0
-> [ 1733.536810]  __do_sys_io_uring_enter+0x4e9/0x830
-> [ 1733.541430]  do_syscall_64+0x59/0x90
-> [ 1733.545010]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> [ 1733.550071]
-> [ 1733.551571] The buggy address belongs to the object at ffff8881333203c0
-> [ 1733.551571]  which belongs to the cache io_kiocb of size 224
-> [ 1733.563816] The buggy address is located 152 bytes inside of
-> [ 1733.563816]  224-byte region [ffff8881333203c0, ffff8881333204a0)
-> [ 1733.575544]
-> [ 1733.577042] The buggy address belongs to the physical page:
-> [ 1733.582617] page:00000000edbe178c refcount:1 mapcount:0
-> mapping:0000000000000000 index:0x0 pfn:0x133320
-> [ 1733.592011] head:00000000edbe178c order:1 entire_mapcount:0
-> nr_pages_mapped:0 pincount:0
-> [ 1733.600096] memcg:ffff88810cd49001
-> [ 1733.603501] flags:
-> 0x17ffffc0010200(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
-> [ 1733.610896] page_type: 0xffffffff()
-> [ 1733.614390] raw: 0017ffffc0010200 ffff888101222280 ffffea0004473900
-> 0000000000000002
-> [ 1733.622128] raw: 0000000000000000 0000000000190019 00000001ffffffff
-> ffff88810cd49001
-> [ 1733.629866] page dumped because: kasan: bad access detected
-> [ 1733.635439]
-> [ 1733.636938] Memory state around the buggy address:
-> [ 1733.641731]  ffff888133320300: 00 00 00 00 00 00 00 00 00 00 00 00
-> fc fc fc fc
-> [ 1733.648952]  ffff888133320380: fc fc fc fc fc fc fc fc 00 00 00 00
-> 00 00 00 00
-> [ 1733.656169] >ffff888133320400: 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00 00
-> [ 1733.663389]                                                        ^
-> [ 1733.669743]  ffff888133320480: 00 00 00 00 fc fc fc fc fc fc fc fc
-> fc fc fc fc
-> [ 1733.676961]  ffff888133320500: 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00 00
 
-I appreciate you running tests and sending in failures, but can you
-please be more specific about what exactly was run? We seem to need to
-do this dance every time, which is just wasting time. So:
+Applied, thanks!
 
-1) What test triggered this?
-2) Was it invoked with any arguments?
+[1/4] block/rnbd: make all 'class' structures const
+      commit: 137380c0ec40710cbaf57c7878726c41a6da81cd
+[2/4] aoe: make aoe_class a static const structure
+      commit: 65d7a37d4e3e226bb4a4ddf73a827d0dbc77f530
+[3/4] ublk: make ublk_chr_class a static const structure
+      commit: 2eefd399d28a52739fdbeebe84775275f016171c
+[4/4] bsg: make bsg_class a static const structure
+      commit: 72ef02b8dfa009029fa713e8a731a92d27d14e35
 
-In general, a good bug report should include exactly HOW you ended
-up there.
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
