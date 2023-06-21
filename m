@@ -2,191 +2,227 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 236EAEB64DC
-	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 15:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C470EB64D8
+	for <linux-block@archiver.kernel.org>; Wed, 21 Jun 2023 15:58:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233714AbjFUP4g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Jun 2023 11:56:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58764 "EHLO
+        id S233752AbjFUP6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Jun 2023 11:58:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233709AbjFUP4g (ORCPT
+        with ESMTP id S231712AbjFUP6n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2023 11:56:36 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193E1186
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 08:56:34 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id ca18e2360f4ac-760dff4b701so84540839f.0
-        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 08:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687362993; x=1689954993;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vYcvp71MTIIOpJpWxL01xl4yqXNwN5gjLptOK3gLd2M=;
-        b=aUZhb/MF8p4ZHsz2FugFfRL2k25+8t7oSsK6wkT6Hxq32wFfdENd4SS1bDT535Df0p
-         vBzf3CQ2V9xJqWwYKSYsxj1ruEX1S2VjOcDSvdDyqGkLP76mZwLbANK3DFlAqTKPULzK
-         utZ3FN4lnqTZT4adeFjqOrM4EcSpDZYkLfXfSxvliyrd8ZKLwHT3rAiAEe8PikMVlexr
-         7Juttzv0wcYw/SgoWXFgsQIaw/ejWWtIjB5H67+Q8rJCKdmcSmgDQ0oc7r3/k7lrV7bB
-         D4BGArfQHZSZf6ni+eWmKh5vvkwKMPOpSsMps/WmhCUSvhScINLRVk+hniRwitrC+gDM
-         lAkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687362993; x=1689954993;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vYcvp71MTIIOpJpWxL01xl4yqXNwN5gjLptOK3gLd2M=;
-        b=HUZJLiog9rD5jUxHPfg1V1H4zPky2yBPZiAZsVfQ1fs6RsH2gXtNiiGGFi2684W+HC
-         +MMqZAvvBa1vSTup4o+4VHG4mJUOGIX1D2jbZrKBXnZwjOZWxrzfuyJiLbigjZvsyFiv
-         5idi10eN+j6i2OCL1E0oL5NMgHF4XdJXggLS5OU5E6yLOqSvgEQrVp1cuMQvykmQQ6NA
-         pFUyoWqHWVPWo8ELZyc+ytgVGSwJevhL7wXEY+ByaUUcAIhZKwYOypHSdZbuy2kP71fw
-         /YHaRbtU72hK1wU9RjyiBPSN93SFACEGCvp/vPdQr55SdxNfZmNDiDRxzaU7/MgoJw+/
-         yVNw==
-X-Gm-Message-State: AC+VfDyrgjLzKewlAENXliLNHiAHmYKCcnk2f403j5zQESgg4qAIWL+I
-        Z+hV57z6q3XOrWO++AGN9kuw/A==
-X-Google-Smtp-Source: ACHHUZ4oIiQGnz4t/noYYVjDaG+JTl41WzWesmgur+BItvfaArB4yoOvxG7SJKxAxd1v1RGOrx+gDg==
-X-Received: by 2002:a05:6602:2acb:b0:77e:23a7:c9eb with SMTP id m11-20020a0566022acb00b0077e23a7c9ebmr508699iov.0.1687362993365;
-        Wed, 21 Jun 2023 08:56:33 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id f15-20020a6bdd0f000000b0077a1b6f73b9sm1446153ioc.41.2023.06.21.08.56.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Jun 2023 08:56:32 -0700 (PDT)
-Message-ID: <e7562fe1-0dd5-a864-cc0d-32701dac943c@kernel.dk>
-Date:   Wed, 21 Jun 2023 09:56:31 -0600
+        Wed, 21 Jun 2023 11:58:43 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E311BF1;
+        Wed, 21 Jun 2023 08:58:42 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 69C4321EF7;
+        Wed, 21 Jun 2023 15:58:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1687363121; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YGOyuozdZEg1rV2jSDdWfg2dvvscaZag+fZjO1LUAHM=;
+        b=i905QhIv+FXqDw8Dz5cOkH/8gXD9yZy0t2H44eD3ePVrn03+4FcEDEsDIc/0ZDDSIlDrFY
+        4CrQY/5qVxYRLd/hXpixOSz3IuYVhgpPBwHcen4ctjbOz+fbw6kdbUkPeLjuadMzu5OSxV
+        +WP+vWlhDgo0ILez/KhAYGABLqaxsV4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1687363121;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YGOyuozdZEg1rV2jSDdWfg2dvvscaZag+fZjO1LUAHM=;
+        b=nEu+0ySm0inoWxM7P5QKVyCQtbi16QpI6LAX7eZzbCgEiKH+oSnBK7XJI3TnatOrlg+n/S
+        ZQFKWWfauw4aeLCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5962D134B1;
+        Wed, 21 Jun 2023 15:58:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id v+FuFTEek2RMMgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 21 Jun 2023 15:58:41 +0000
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin George <Martin.George@netapp.com>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [RFC blktests v1 1/1] nvme/050: test DNR handling on reconnect
+Date:   Wed, 21 Jun 2023 17:58:25 +0200
+Message-ID: <20230621155825.20146-2-dwagner@suse.de>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230621155825.20146-1-dwagner@suse.de>
+References: <20230621155825.20146-1-dwagner@suse.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [bug report] BUG: KASAN: out-of-bounds in
- io_req_local_work_add+0x3b1/0x4a0
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Guangwu Zhang <guazhang@redhat.com>, linux-block@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, io-uring@vger.kernel.org
-References: <CAGS2=YrvrD0hf7WGjQd4Me772=m9=E6J92aGtG0PAoF4yD6dTw@mail.gmail.com>
- <e92a19fa-74cc-2b9f-3173-6a04557a6534@kernel.dk>
- <ZJMDWIZv5kuJ7nGl@ovpn-8-23.pek2.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZJMDWIZv5kuJ7nGl@ovpn-8-23.pek2.redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/21/23 8:04?AM, Ming Lei wrote:
-> On Wed, Jun 21, 2023 at 07:40:49AM -0600, Jens Axboe wrote:
->> On 6/21/23 1:38?AM, Guangwu Zhang wrote:
->>> HI,
->>> Found the io_req_local_work_add error when run  liburing testing.
->>>
->>> kernel repo :
->>>     Merge branch 'for-6.5/block' into for-next
->>>     * for-6.5/block:
->>>       reiserfs: fix blkdev_put() warning from release_journal_dev()
->>>
->>> [ 1733.389012] BUG: KASAN: out-of-bounds in io_req_local_work_add+0x3b1/0x4a0
->>> [ 1733.395900] Read of size 4 at addr ffff888133320458 by task
->>> iou-wrk-97057/97138
->>> [ 1733.403205]
->>> [ 1733.404706] CPU: 4 PID: 97138 Comm: iou-wrk-97057 Kdump: loaded Not
->>> tainted 6.4.0-rc3.kasan+ #1
->>> [ 1733.413404] Hardware name: Dell Inc. PowerEdge R740/06WXJT, BIOS
->>> 2.13.3 12/13/2021
->>> [ 1733.420972] Call Trace:
->>> [ 1733.423425]  <TASK>
->>> [ 1733.425533]  dump_stack_lvl+0x33/0x50
->>> [ 1733.429207]  print_address_description.constprop.0+0x2c/0x3e0
->>> [ 1733.434959]  print_report+0xb5/0x270
->>> [ 1733.438539]  ? kasan_addr_to_slab+0x9/0xa0
->>> [ 1733.442639]  ? io_req_local_work_add+0x3b1/0x4a0
->>> [ 1733.447258]  kasan_report+0xcf/0x100
->>> [ 1733.450839]  ? io_req_local_work_add+0x3b1/0x4a0
->>> [ 1733.455456]  io_req_local_work_add+0x3b1/0x4a0
->>> [ 1733.459903]  ? __pfx_io_req_local_work_add+0x10/0x10
->>> [ 1733.464871]  ? __schedule+0x616/0x1530
->>> [ 1733.468622]  __io_req_task_work_add+0x1bc/0x270
->>> [ 1733.473156]  io_issue_sqe+0x55a/0xe80
->>> [ 1733.476831]  io_wq_submit_work+0x23e/0xa00
->>> [ 1733.480930]  io_worker_handle_work+0x2f5/0xa80
->>> [ 1733.485384]  io_wq_worker+0x6c5/0x9d0
->>> [ 1733.489051]  ? __pfx_io_wq_worker+0x10/0x10
->>> [ 1733.493246]  ? _raw_spin_lock_irq+0x82/0xe0
->>> [ 1733.497430]  ? __pfx_io_wq_worker+0x10/0x10
->>> [ 1733.501616]  ret_from_fork+0x29/0x50
->>> [ 1733.505204]  </TASK>
->>> [ 1733.507396]
->>> [ 1733.508894] Allocated by task 97057:
->>> [ 1733.512475]  kasan_save_stack+0x1e/0x40
->>> [ 1733.516313]  kasan_set_track+0x21/0x30
->>> [ 1733.520068]  __kasan_slab_alloc+0x83/0x90
->>> [ 1733.524080]  kmem_cache_alloc_bulk+0x13a/0x1e0
->>> [ 1733.528526]  __io_alloc_req_refill+0x238/0x510
->>> [ 1733.532971]  io_submit_sqes+0x65a/0xcd0
->>> [ 1733.536810]  __do_sys_io_uring_enter+0x4e9/0x830
->>> [ 1733.541430]  do_syscall_64+0x59/0x90
->>> [ 1733.545010]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
->>> [ 1733.550071]
->>> [ 1733.551571] The buggy address belongs to the object at ffff8881333203c0
->>> [ 1733.551571]  which belongs to the cache io_kiocb of size 224
->>> [ 1733.563816] The buggy address is located 152 bytes inside of
->>> [ 1733.563816]  224-byte region [ffff8881333203c0, ffff8881333204a0)
->>> [ 1733.575544]
->>> [ 1733.577042] The buggy address belongs to the physical page:
->>> [ 1733.582617] page:00000000edbe178c refcount:1 mapcount:0
->>> mapping:0000000000000000 index:0x0 pfn:0x133320
->>> [ 1733.592011] head:00000000edbe178c order:1 entire_mapcount:0
->>> nr_pages_mapped:0 pincount:0
->>> [ 1733.600096] memcg:ffff88810cd49001
->>> [ 1733.603501] flags:
->>> 0x17ffffc0010200(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
->>> [ 1733.610896] page_type: 0xffffffff()
->>> [ 1733.614390] raw: 0017ffffc0010200 ffff888101222280 ffffea0004473900
->>> 0000000000000002
->>> [ 1733.622128] raw: 0000000000000000 0000000000190019 00000001ffffffff
->>> ffff88810cd49001
->>> [ 1733.629866] page dumped because: kasan: bad access detected
->>> [ 1733.635439]
->>> [ 1733.636938] Memory state around the buggy address:
->>> [ 1733.641731]  ffff888133320300: 00 00 00 00 00 00 00 00 00 00 00 00
->>> fc fc fc fc
->>> [ 1733.648952]  ffff888133320380: fc fc fc fc fc fc fc fc 00 00 00 00
->>> 00 00 00 00
->>> [ 1733.656169] >ffff888133320400: 00 00 00 00 00 00 00 00 00 00 00 00
->>> 00 00 00 00
->>> [ 1733.663389]                                                        ^
->>> [ 1733.669743]  ffff888133320480: 00 00 00 00 fc fc fc fc fc fc fc fc
->>> fc fc fc fc
->>> [ 1733.676961]  ffff888133320500: 00 00 00 00 00 00 00 00 00 00 00 00
->>> 00 00 00 00
->>
->> I appreciate you running tests and sending in failures, but can you
->> please be more specific about what exactly was run? We seem to need to
->> do this dance every time, which is just wasting time. So:
->>
->> 1) What test triggered this?
->> 2) Was it invoked with any arguments?
-> 
-> I can see the whole dmesg log, and it seems from "sq-full-cpp.c /dev/sda":
-> 
-> [ 1340.918880] Running test sq-full-cpp.t:
-> [ 1341.009225] Running test sq-full-cpp.t /dev/sda:
-> [ 1342.025292] restraintd[1061]: *** Current Time: Tue Jun 20 21:17:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-> [ 1402.053433] restraintd[1061]: *** Current Time: Tue Jun 20 21:18:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-> [ 1462.047970] restraintd[1061]: *** Current Time: Tue Jun 20 21:19:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-> [-- MARK -- Wed Jun 21 01:20:00 2023]
-> [ 1522.029598] restraintd[1061]: *** Current Time: Tue Jun 20 21:20:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-> [ 1582.029278] restraintd[1061]: *** Current Time: Tue Jun 20 21:21:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-> [ 1642.034617] restraintd[1061]: *** Current Time: Tue Jun 20 21:22:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-> [ 1702.034344] restraintd[1061]: *** Current Time: Tue Jun 20 21:23:57 2023  Localwatchdog at: Wed Jun 21 01:03:56 2023
-> [ 1733.381782] ==================================================================
-> [ 1733.389012] BUG: KASAN: out-of-bounds in io_req_local_work_add+0x3b1/0x4a0
-> [ 1733.395900] Read of size 4 at addr ffff888133320458 by task iou-wrk-97057/97138
+When the host gets disconnected and tries to reconnect,
+it should honor the DNR bit and do not retry to connect
+with the same parameters.
 
-I don't think that's right - sq-full-cpp doesn't do anything if passed
-an argument, and you also have a lot of time passing in between that
-test being run and the warning being spewed. Maybe the tests are run
-both as root and non-root? The root run ones will add the dmesg spew on
-which test is being run, the non-root will not.
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+ tests/nvme/050     | 126 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/050.out |   2 +
+ 2 files changed, 128 insertions(+)
+ create mode 100644 tests/nvme/050
+ create mode 100644 tests/nvme/050.out
 
+diff --git a/tests/nvme/050 b/tests/nvme/050
+new file mode 100644
+index 000000000000..d33eb24e2f13
+--- /dev/null
++++ b/tests/nvme/050
+@@ -0,0 +1,126 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2023 SUSE LLC
++#
++# Test DNR is handled on connnect attempt with invalid arguments.
++
++. tests/nvme/rc
++
++DESCRIPTION="test DNR is handled on connect attempt with invalid arguments"
++
++requires() {
++	_nvme_requires
++	_require_nvme_trtype tcp rdma fc
++	_require_min_cpus 2
++}
++
++nvmf_wait_for_state() {
++	local def_state_timeout=5
++	local subsys_name="$1"
++	local state="$2"
++	local timeout="${3:-$def_state_timeout}"
++	local nvmedev
++	local state_file
++	local start_time
++	local end_time
++
++	nvmedev=$(_find_nvme_dev "${subsys_name}")
++	state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
++
++	start_time=$(date +%s)
++	while ! grep -q "${state}" "${state_file}"; do
++		sleep 1
++		end_time=$(date +%s)
++		if (( end_time - start_time > timeout )); then
++			echo "expected state \"${state}\" not " \
++				"reached within ${timeout} seconds"
++			return 1
++		fi
++	done
++
++	return 0
++}
++
++nvmf_wait_for_ctrl_delete() {
++	local def_state_timeout=5
++	local nvmedev="$1"
++	local timeout="${2:-$def_state_timeout}"
++	local ctrl="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
++	local start_time
++	local end_time
++
++	start_time=$(date +%s)
++	while [ -f "${ctrl}" ]; do
++		sleep 1
++		end_time=$(date +%s)
++		if (( end_time - start_time > timeout )); then
++			echo "controller \"${nvmedev}\" not deleted" \
++				"within ${timeout} seconds"
++			return 1
++		fi
++	done
++
++	return 0
++}
++
++set_nvmet_attr_qid_max() {
++	local nvmet_subsystem="$1"
++	local qid_max="$2"
++	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
++
++	echo "${qid_max}" > "${cfs_path}/attr_qid_max"
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	_setup_nvmet
++
++	local port
++	local loop_dev
++	local file_path="$TMPDIR/img"
++	local subsys_name="blktests-subsystem-1"
++	local hostid="77b49aba-06b4-431a-9af8-75e318740f1a"
++	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	local cfs_path="${NVMET_CFS}/subsystems/${subsys_name}"
++	local nvmedev
++
++	truncate -s "${nvme_img_size}" "${file_path}"
++
++	loop_dev="$(losetup -f --show "${file_path}")"
++
++	_create_nvmet_subsystem "${subsys_name}" "${loop_dev}" \
++		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
++	port="$(_create_nvmet_port "${nvme_trtype}")"
++	_add_nvmet_subsys_to_port "${port}" "${subsys_name}"
++
++	_nvme_connect_subsys "${nvme_trtype}" "${subsys_name}" \
++		--hostnqn "${hostnqn}" \
++		--reconnect-delay 1 \
++		--ctrl-loss-tmo 10
++
++	nvmf_wait_for_state "${subsys_name}" "live"
++	nvmedev=$(_find_nvme_dev "${subsys_name}")
++
++	# Only allow connects from ${def_hostnqn}
++	echo 0 > "${cfs_path}/attr_allow_any_host"
++
++	# Force a reconnect
++	set_nvmet_attr_qid_max "${subsys_name}" 1
++
++	# The reconnect fails with the DNR bit set
++	# Thus the host should remove the controller
++	nvmf_wait_for_ctrl_delete "${nvmedev}"
++
++	_nvme_disconnect_subsys "${subsys_name}" >> "$FULL" 2>&1
++
++	_remove_nvmet_subsystem_from_port "${port}" "${subsys_name}"
++	_remove_nvmet_subsystem "${subsys_name}"
++	_remove_nvmet_port "${port}"
++
++	losetup -d "${loop_dev}"
++
++	rm "${file_path}"
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/050.out b/tests/nvme/050.out
+new file mode 100644
+index 000000000000..b78b05f78424
+--- /dev/null
++++ b/tests/nvme/050.out
+@@ -0,0 +1,2 @@
++Running nvme/050
++Test complete
 -- 
-Jens Axboe
+2.41.0
 
