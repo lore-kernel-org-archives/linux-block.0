@@ -2,110 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC5FEB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 08:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB07EB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 10:10:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231347AbjFVIq6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 04:46:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32994 "EHLO
+        id S230072AbjFVKJ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 06:09:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230323AbjFVIql (ORCPT
+        with ESMTP id S231209AbjFVKJ5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 04:46:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F7E030DB
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 01:44:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687423427;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Hsp1wQu2X2nYe9KSjQosq+KIdmLssGP1CLoUN2sv5ss=;
-        b=hfcIkg4+d08n0SZeINdDWzQwL4w/cfUgaJlsUOH9zxqV/H8h7kWevnNLmGkDjHuaqXT/sK
-        sYQFQfOFc4tfF4gqZOX376aOtF7UgS1CZ24i/xtm4VxrJljz65PZI7mHko1sgbY1JD8v+M
-        m/ck6RvPE4+/JtJMO197qDYivY33xhQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-646-HtCwnymZMPqV7jJbet8iFA-1; Thu, 22 Jun 2023 04:43:41 -0400
-X-MC-Unique: HtCwnymZMPqV7jJbet8iFA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 22 Jun 2023 06:09:57 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B2C1D3;
+        Thu, 22 Jun 2023 03:09:56 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 20AC83C108D2;
-        Thu, 22 Jun 2023 08:43:41 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C20C425359;
-        Thu, 22 Jun 2023 08:43:39 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        stable@vger.kernel.org, Jay Shin <jaeshin@redhat.com>,
-        Tejun Heo <tj@kernel.org>, Waiman Long <longman@redhat.com>
-Subject: [PATCH] block: make sure local irq is disabled when calling __blkcg_rstat_flush
-Date:   Thu, 22 Jun 2023 16:42:49 +0800
-Message-Id: <20230622084249.1208005-1-ming.lei@redhat.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 26D3D2049A;
+        Thu, 22 Jun 2023 10:09:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1687428595; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XRh+EIjE4fnCqVrMHw/oIS85+pMkZumnneIk0Hlcjx0=;
+        b=ci+uh+IzwjDjXiI4b59HDAStIJA9l4prA8H9fBxpXcVwzjOmatUkwd3rIMr9yEYuK/SM0J
+        Sahp1hC4vMHLRGLOUjcSbK6E9JvW/OpC4JE8jRjaRHpQ4FeugsmtS9mIHMsAgzLgx064CW
+        Zmgsr1loDIfNPt1lnmbEAK+I3j+Rcfw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1687428595;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XRh+EIjE4fnCqVrMHw/oIS85+pMkZumnneIk0Hlcjx0=;
+        b=/Zl7yQ8RHzezxHTjIOJJBJysyjKJ4t7KvTuARM1lj5nCQkKgj91I7RUwpoETdoOETtx6n+
+        m6HCnvEm/UsqD1Dw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 18BBA13905;
+        Thu, 22 Jun 2023 10:09:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id fJ4EBvMdlGTFNgAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 22 Jun 2023 10:09:55 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id A2A7EA075D; Thu, 22 Jun 2023 12:09:54 +0200 (CEST)
+Date:   Thu, 22 Jun 2023 12:09:54 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org
+Subject: Re: [PATCH 1/2] bcache: Alloc holder object before async registration
+Message-ID: <20230622100954.6vx7725huqngbubb@quack3>
+References: <20230621162024.29310-1-jack@suse.cz>
+ <20230621162333.30027-1-jack@suse.cz>
+ <20230621175659.ugkaawkuanlzt736@moria.home.lan>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621175659.ugkaawkuanlzt736@moria.home.lan>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When __blkcg_rstat_flush() is called from cgroup_rstat_flush*() code
-path, interrupt is always disabled.
+On Wed 21-06-23 13:56:59, Kent Overstreet wrote:
+> On Wed, Jun 21, 2023 at 06:23:26PM +0200, Jan Kara wrote:
+> > Allocate holder object (cache or cached_dev) before offloading the
+> > rest of the startup to async work. This will allow us to open the block
+> > block device with proper holder.
+> 
+> This is a pretty big change for this fix, and we'd want to retest the
+> error paths - that's hard to do, because the fault injection framework I
+> was using for that never made it upstream.
 
-When we start to flush blkcg per-cpu stats list in __blkg_release()
-for avoiding to leak blkcg_gq's reference in commit 20cb1c2fb756
-("blk-cgroup: Flush stats before releasing blkcg_gq"), local irq
-isn't disabled yet, then lockdep warning may be triggered because
-the dependent cgroup locks may be acquired from irq(soft irq) handler.
+I agree those are somewhat difficult to test. Although with memory
+allocation error injection, we can easily simulate failures in
+alloc_holder_object() or say later in bcache_device_init() if that's what
+you're after to give at least some testing to the error paths. Admittedly,
+I've just tested that registering and unregistering bcache devices works
+without giving warnings. Or are you more worried about the "reopen the
+block device" logic (and error handling) in the second patch?
 
-Fix the issue by disabling local irq always.
+> What about just exposing a proper API for changing the holder? Wouldn't
+> that be simpler?
 
-Fixes: 20cb1c2fb756 ("blk-cgroup: Flush stats before releasing blkcg_gq")
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Closes: https://lore.kernel.org/linux-block/pz2wzwnmn5tk3pwpskmjhli6g3qly7eoknilb26of376c7kwxy@qydzpvt6zpis/T/#u
-Cc: stable@vger.kernel.org
-Cc: Jay Shin <jaeshin@redhat.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Waiman Long <longman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-cgroup.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+It would be doable but frankly I'd prefer to avoid implementing the API for
+changing the holder just for bcache. For all I care bcache can also just
+generate random cookie (or an id from IDA) and pass it as a holder to
+blkdev_get_by_dev(). It would do the job as well and we then don't have to
+play games with changing the holder. It would just need to be propagated to
+the places doing blkdev_put(). Do you find that better?
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index f0b5c9c41cde..dce1548a7a0c 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -970,6 +970,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
- 	struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
- 	struct llist_node *lnode;
- 	struct blkg_iostat_set *bisc, *next_bisc;
-+	unsigned long flags;
- 
- 	rcu_read_lock();
- 
-@@ -983,7 +984,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
- 	 * When flushing from cgroup, cgroup_rstat_lock is always held, so
- 	 * this lock won't cause contention most of time.
- 	 */
--	raw_spin_lock(&blkg_stat_lock);
-+	raw_spin_lock_irqsave(&blkg_stat_lock, flags);
- 
- 	/*
- 	 * Iterate only the iostat_cpu's queued in the lockless list.
-@@ -1009,7 +1010,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
- 			blkcg_iostat_update(parent, &blkg->iostat.cur,
- 					    &blkg->iostat.last);
- 	}
--	raw_spin_unlock(&blkg_stat_lock);
-+	raw_spin_unlock_irqrestore(&blkg_stat_lock, flags);
- out:
- 	rcu_read_unlock();
- }
+I'm now working on a changes that will make blkdev_get_by_dev() return
+bdev_handle (which contains bdev pointer but also other stuff we need to
+propagate to blkdev_put()) so when that is done, the cookie propagation
+will happen automatically.
+
+								Honza
 -- 
-2.40.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
