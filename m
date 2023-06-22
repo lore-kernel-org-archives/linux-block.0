@@ -2,174 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B00EAEB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 17:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D893FEB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 18:47:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230306AbjFVRxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 13:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44512 "EHLO
+        id S231400AbjFVSrY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 14:47:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230060AbjFVRxk (ORCPT
+        with ESMTP id S231414AbjFVSrR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 13:53:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805DB2701
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 10:52:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687456360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=46vg04rCWqnBcEfjOgg6c4cwQ2Em/pBNIxUfI3u2wTo=;
-        b=L9NhGwsUl1myxZUt5yzf7/N7lQCawPXPMcGzFYJ2EiRP6DBMuGQun29ARuaWpalT3hfyuG
-        rvOfMm+RcrpTHEYFYmnF0oya1xjLCOzQTRJG9zbzNlItow/fy/80JBOIF0Xl/V9EJSDVh3
-        AADRBn+6C32xzDHLt4vriBq6DNPtDN0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-GZjgR6M6N0mxKC-0U6a0cA-1; Thu, 22 Jun 2023 13:52:38 -0400
-X-MC-Unique: GZjgR6M6N0mxKC-0U6a0cA-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-987a0365f77so379402166b.1
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 10:52:37 -0700 (PDT)
+        Thu, 22 Jun 2023 14:47:17 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D74026AA
+        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 11:47:07 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3a1a0e5c0ddso179233b6e.1
+        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 11:47:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687459626; x=1690051626;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=iVNPni4QP/CUuDhXuczwXGJMqdDHX8NJGBDa3laWrgM=;
+        b=TPHuwuc406XQlhBAocBecYiAvoGqVNleE3ztd2v02nPxZmjXvgm3/sGtCHVfvqZKsJ
+         z/xoV4I3ekvrSxcRGdnP0IzsM4NI8PJ+X3XlPRTW0uSZ/12x4DinVxN0viZQCT0y39mL
+         1rxred6/Ya/ozh4plaM2hZQw4GgFslUCZzeCtwmRvpAl5rQEdVSUOJJbs1LXzyn8B+rM
+         EZCP0HHTotQf9itgo+xsbNkvZXYLYFlVvtpeqzXdHAmPo5bWlFv1g73udFhPsNME3K+R
+         OpQZHp454ASGbSbvU0KeIFZ3U0kb1MsyfpGjgv2UE9WdAPxzqdOtbZ8I4pBnwgSbFjKv
+         zT0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687456356; x=1690048356;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=46vg04rCWqnBcEfjOgg6c4cwQ2Em/pBNIxUfI3u2wTo=;
-        b=lJLaLx8QrtGT/avN9BQCYqSfhLEBsJSnpmbyIIRAdNYYJBMpNj3jH+4ppfAJxfpOZg
-         /v0r+n5Uqm7dKGMRTyCvKWfsxPx95jXwjfsh/IChKsGqxP5IXZ+GBaogroj87i4SFYmZ
-         X+4a3r5P2Py12BW/xEmd+9cQ4Eq7o3rbUXPq2FivPSCSNIJqp2rOje8w0Ky2bjYj5Dyw
-         H4XLzHh0JZ7cDB3DJd9l5+OJ+vZeUvGKHE/H61yz2O3z/IBKynr6P0ycfcus94iWikHQ
-         2j4cx3fOof0bkzD5GbTZOJdou1q8nY2VOrhd7VMDfz2FK9TwrI6/1IqprStJzGZz72bB
-         V2Tg==
-X-Gm-Message-State: AC+VfDzy0ZEfxlaar2ldeK+MAYIFETbN9QgO9He68PJL88hR0di5GOLa
-        51DVnKbeMZnGOunnngKDsKxjXeFBJ9+NZzUZ0x1dvbXSJN7Z68AgHd585QW51bgNXkujxKkWpXE
-        hwNPBYVJOcqAhyVqP0QDNk6c=
-X-Received: by 2002:a17:907:7e95:b0:987:350e:771a with SMTP id qb21-20020a1709077e9500b00987350e771amr15915302ejc.72.1687456356695;
-        Thu, 22 Jun 2023 10:52:36 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6exKxf71yvlJ+qFOwdh0qxw8LT5S9YrIKwORF8ZM/FRULuUP7x2/Rc12hOO4HPKl6m++Z+jg==
-X-Received: by 2002:a17:907:7e95:b0:987:350e:771a with SMTP id qb21-20020a1709077e9500b00987350e771amr15915291ejc.72.1687456356347;
-        Thu, 22 Jun 2023 10:52:36 -0700 (PDT)
-Received: from redhat.com ([2.52.149.110])
-        by smtp.gmail.com with ESMTPSA id s17-20020a170906bc5100b009889baa6a34sm4864089ejv.48.2023.06.22.10.52.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 10:52:35 -0700 (PDT)
-Date:   Thu, 22 Jun 2023 13:52:32 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Edward Liaw <edliaw@google.com>
-Cc:     linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
-        Suwan Kim <suwan.kim027@gmail.com>,
-        "Roberts, Martin" <martin.roberts@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v2] Revert "virtio-blk: support completion batching for
- the IRQ path"
-Message-ID: <20230622135204-mutt-send-email-mst@kernel.org>
-References: <336455b4f630f329380a8f53ee8cad3868764d5c.1686295549.git.mst@redhat.com>
- <ZJIuG9hyTYIIDbF5@google.com>
+        d=1e100.net; s=20221208; t=1687459626; x=1690051626;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iVNPni4QP/CUuDhXuczwXGJMqdDHX8NJGBDa3laWrgM=;
+        b=F+VuP4nYOZVow49jcocqpEbaVIHC/SE7EVNlaB6X6rsWAPHIVsdkwtfxaKvpk5j48J
+         skobdrGnvvRgdRQ6Sz/MgMc4SM0zWFGBbPYhfSDLAno05IDSHQCMsidUor2mG5uVFQkz
+         hEF9KGAzdt+j/SNa9vhtyoTdcmztDwU4JQLiPG/CKn8UNu4A//Vm8Y8rq9kGtgy4d7Rf
+         221Rn4fzD4gty33R+WtnQAc2qRJXIbaJrluEYe5Mxzupl830TXrxzbqq8WEhVrIGGAjt
+         TvzFOubyf4WCWCj/9OxtIX42KDx2S4NVJxLVvA92cXo7JMejCp6Y8UjrjzX33fGbthB/
+         LeMw==
+X-Gm-Message-State: AC+VfDzqC//hWIqOlm97m2sFP1m0WpWSOTi38df9hEHPARdRI6NgL5QG
+        TqpBrk2gxHdrNCqR7SLnC7wBppmnR4E=
+X-Google-Smtp-Source: ACHHUZ7lPrpAE21ldErbzGaEbzlaTcZwFy7TnKL8AjoaEnQyFSTRFZkz0qk1VMYapXs3QiDhcNRJBg==
+X-Received: by 2002:a05:6808:24b:b0:3a0:83b6:975b with SMTP id m11-20020a056808024b00b003a083b6975bmr1340594oie.48.1687459626608;
+        Thu, 22 Jun 2023 11:47:06 -0700 (PDT)
+Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id z16-20020aa785d0000000b00643355ff6a6sm5010127pfn.99.2023.06.22.11.47.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jun 2023 11:47:05 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <10898b52-aadd-994f-0c62-ab0d85228f1a@roeck-us.net>
+Date:   Thu, 22 Jun 2023 11:47:04 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJIuG9hyTYIIDbF5@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH] block: don't return -EINVAL for not found names in
+ devt_from_devname
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+References: <20230622150644.600327-1-hch@lst.de>
+From:   Guenter Roeck <linux@roeck-us.net>
+In-Reply-To: <20230622150644.600327-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 10:54:19PM +0000, Edward Liaw wrote:
-> On Fri, Jun 09, 2023 at 03:27:24AM -0400, Michael S. Tsirkin wrote:
-> > This reverts commit 07b679f70d73483930e8d3c293942416d9cd5c13.
-> This commit was also breaking kernel tests on a virtual Android device
-> (cuttlefish).  We were seeing hangups like:
+On 6/22/23 08:06, Christoph Hellwig wrote:
+> When we didn't find a device and didn't guess it might be a partition,
+> it might still show up later, so don't disable rootwait for it by
+> returning -EINVAL.
 > 
-> [ 2889.910733] INFO: task kworker/u8:2:6312 blocked for more than 720 seconds.
-> [ 2889.910967]       Tainted: G           OE      6.2.0-mainline-g5c05cafa8df7-ab9969617 #1
-> [ 2889.911143] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> [ 2889.911389] task:kworker/u8:2    state:D stack:12160 pid:6312  ppid:2      flags:0x00004000
-> [ 2889.911567] Workqueue: writeback wb_workfn (flush-254:57)
-> [ 2889.911771] Call Trace:
-> [ 2889.911831]  <TASK>
-> [ 2889.911893]  __schedule+0x55f/0x880
-> [ 2889.912021]  schedule+0x6a/0xc0
-> [ 2889.912110]  schedule_timeout+0x58/0x1a0
-> [ 2889.912200]  wait_for_common+0xf7/0x1b0
-> [ 2889.912289]  wait_for_completion+0x1c/0x40
-> [ 2889.912377]  f2fs_issue_checkpoint+0x14c/0x210
-> [ 2889.912504]  f2fs_sync_fs+0x4c/0xb0
-> [ 2889.912597]  f2fs_balance_fs_bg+0x2f6/0x340
-> [ 2889.912736]  ? can_migrate_task+0x39/0x2b0
-> [ 2889.912872]  f2fs_write_node_pages+0x77/0x240
-> [ 2889.912989]  do_writepages+0xde/0x240
-> [ 2889.913094]  __writeback_single_inode+0x3f/0x360
-> [ 2889.913231]  writeback_sb_inodes+0x320/0x5f0
-> [ 2889.913349]  ? move_expired_inodes+0x58/0x210
-> [ 2889.913470]  __writeback_inodes_wb+0x97/0x100
-> [ 2889.913587]  wb_writeback+0x17e/0x390
-> [ 2889.913682]  wb_workfn+0x35f/0x500
-> [ 2889.913774]  process_one_work+0x1d9/0x3b0
-> [ 2889.913870]  worker_thread+0x251/0x410
-> [ 2889.913960]  kthread+0xeb/0x110
-> [ 2889.914052]  ? __cfi_worker_thread+0x10/0x10
-> [ 2889.914168]  ? __cfi_kthread+0x10/0x10
-> [ 2889.914257]  ret_from_fork+0x29/0x50
-> [ 2889.914364]  </TASK>
-> [ 2889.914565] INFO: task mkdir09:6425 blocked for more than 720 seconds.
-> [ 2889.916065]       Tainted: G           OE      6.2.0-mainline-g5c05cafa8df7-ab9969617 #1
-> [ 2889.916255] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> [ 2889.916450] task:mkdir09         state:D stack:13016 pid:6425  ppid:6423   flags:0x00004000
-> [ 2889.916656] Call Trace:
-> [ 2889.916900]  <TASK>
-> [ 2889.917004]  __schedule+0x55f/0x880
-> [ 2889.917129]  schedule+0x6a/0xc0
-> [ 2889.917273]  schedule_timeout+0x58/0x1a0
-> [ 2889.917425]  wait_for_common+0xf7/0x1b0
-> [ 2889.917535]  wait_for_completion+0x1c/0x40
-> [ 2889.917670]  f2fs_issue_checkpoint+0x14c/0x210
-> [ 2889.917844]  f2fs_sync_fs+0x4c/0xb0
-> [ 2889.917969]  f2fs_do_sync_file+0x3a8/0x8c0
-> [ 2889.918090]  ? mt_find+0xa0/0x1a0
-> [ 2889.918216]  f2fs_sync_file+0x2f/0x60
-> [ 2889.918310]  vfs_fsync_range+0x74/0x90
-> [ 2889.918567]  __se_sys_msync+0x176/0x270
-> [ 2889.918730]  __x64_sys_msync+0x1c/0x40
-> [ 2889.918873]  do_syscall_64+0x53/0xb0
-> [ 2889.918996]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> [ 2889.919178] RIP: 0033:0x7540b08bcf47
-> [ 2889.919297] RSP: 002b:00007fff5fcbeea8 EFLAGS: 00000206 ORIG_RAX: 000000000000001a
-> [ 2889.919496] RAX: ffffffffffffffda RBX: 0000000000001000 RCX: 00007540b08bcf47
-> [ 2889.919828] RDX: 0000000000000004 RSI: 0000000000001000 RDI: 00007540b4ae7000
-> [ 2889.920227] RBP: 0000000000000000 R08: 721e0000010b0016 R09: 0000000000000003
-> [ 2889.920435] R10: 0000000000000100 R11: 0000000000000206 R12: 00005d2f95fd2f08
-> [ 2889.920793] R13: 00005d2f95fbc310 R14: 00007540b08e1bb8 R15: 00005d2f95fbc310
-> [ 2889.921072]  </TASK>
-> 
-> in random tests in the LTP (linux test project) test suite.
-> 
-> > ---
-> > 
-> > Since v1:
-> > 	fix build error
-> > 
-> > Still completely untested as I'm traveling.
-> > Martin, Suwan, could you please test and report?
-> > Suwan if you have a better revert in mind pls post and
-> > I will be happy to drop this.
-> > 
-> > Thanks!
-> > 
-> This revert appears to have resolved the test failures for me.
-> 
-> Tested-by: edliaw@google.com
+> Fixes: 079caa35f786 ("init: clear root_wait on all invalid root= strings")
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 
-Does Android have VIRTIO_BLK_F_ZONED ? Could you list the
-features this device has please? Thanks!
-
--- 
-MST
+> ---
+>   block/early-lookup.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/early-lookup.c b/block/early-lookup.c
+> index a5be3c68ed079c..9e2d5a19de1b3b 100644
+> --- a/block/early-lookup.c
+> +++ b/block/early-lookup.c
+> @@ -174,7 +174,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
+>   	while (p > s && isdigit(p[-1]))
+>   		p--;
+>   	if (p == s || !*p || *p == '0')
+> -		return -EINVAL;
+> +		return -ENODEV;
+>   
+>   	/* try disk name without <part number> */
+>   	part = simple_strtoul(p, NULL, 10);
+> @@ -185,7 +185,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
+>   
+>   	/* try disk name without p<part number> */
+>   	if (p < s + 2 || !isdigit(p[-2]) || p[-1] != 'p')
+> -		return -EINVAL;
+> +		return -ENODEV;
+>   	p[-1] = '\0';
+>   	*devt = blk_lookup_devt(s, part);
+>   	if (*devt)
 
