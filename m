@@ -2,92 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB04BEB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 14:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BABCEB64D8
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 14:36:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229647AbjFVOcn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 10:32:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40862 "EHLO
+        id S231472AbjFVOf7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 10:35:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230229AbjFVOck (ORCPT
+        with ESMTP id S230489AbjFVOfz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 10:32:40 -0400
-Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545FF1BD1
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 07:32:39 -0700 (PDT)
-Received: by mail-vk1-xa2c.google.com with SMTP id 71dfb90a1353d-460eb67244eso2653899e0c.1
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 07:32:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687444358; x=1690036358;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jm+t5PY1z1cjmahFviY03bE+BB5wrL+Uyye59j02Ff4=;
-        b=V3Ke4CwVaS6QxGzWWboyVjYD4suOn2ZJCbYjHj9tWBqFH24HUxhOeHuam3O3JbtUFt
-         3EPzEQf148mdt3v3fhlJdyE3PEggOYsygUeqlQwxVrVbrC7LH47vNVzHfZ8EAZU7zPJG
-         DBvDjJAyxL62XwZA8qHxtImtWjTJu9AvAiABvxVeN8+P/VbiMLDzdltO+hiWlRxygCmT
-         ymGIWojaKdV9Fw4yuzXE6j+c9CR+jQr990ZKganmPO8nHz4b9Pksege0qvBJBGKliW51
-         GnqgLmfPuTQsLArjrtEztdEEu+KHX3NgN55UifE5wRRgYXKmGOHW35u+snUAaG6BNpha
-         xzig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687444358; x=1690036358;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jm+t5PY1z1cjmahFviY03bE+BB5wrL+Uyye59j02Ff4=;
-        b=XiSyFn/Jmey8hDB+N+lOR2uuxHkLZOqC+/c8KRO1qusmOXNYknC/1hg3TvaTjQAYca
-         A/N4gqXdzF76rOTU6Qpab83Mn+DIpT/hEx5kP4uxLaE38ZOZjjO38aR1jHpGD6GR6XLE
-         iwwD7VtUq9/UmoJMWeCH05e6mR82b+KAd8bs4Up1BYHed2Cuz5CFqxCXq4UiG5TgN1jF
-         U5bxJ6ej2sfbotnInf5nLNWou49w3XMFkhz8b7Wyf8K/oUFX8clUE04XHBGJ4od7DBA0
-         MkSGNyIXntdLg0uqpyKF/lvhYFNBvXB1ACphS3blz86plW1EORz19LHfsx0O5LFKuCOy
-         WVkQ==
-X-Gm-Message-State: AC+VfDxNdeMhM3P0sbdHZRQ+Co14KD0IgA/hDTXr1hp2x8ab+nf8cKny
-        lqxratLWktTPwW10S0J5ajYyndv4Kfeqbma3gLs=
-X-Google-Smtp-Source: ACHHUZ47jCc+ImznUK+9lye6xPG5/ZsL6Z9UQwagb4pkDa4tOr14GYKx4mebgUA0hcPYIoAk+Kr8O25nHnaLIIED7Uk=
-X-Received: by 2002:a1f:458e:0:b0:471:cd12:9c6a with SMTP id
- s136-20020a1f458e000000b00471cd129c6amr7168011vka.12.1687444358283; Thu, 22
- Jun 2023 07:32:38 -0700 (PDT)
+        Thu, 22 Jun 2023 10:35:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D875E10F6
+        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 07:35:53 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 59E196187C
+        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 14:35:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB7AC433C8;
+        Thu, 22 Jun 2023 14:35:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687444552;
+        bh=weFsU4zPpYK20MvEp/VVpzz319RtkhdC+B9H6oPzuRU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=P0H7yzCw/63R68axdM9Qp/Lmw2cvzovj9piH6Gwz9L51wqkt3oGUIMbunTxS1liBG
+         B85oQqwH7YwDtpvnfePXdsO04pvOAWfpJxzJ6hbWy5KG7D+zbGf3biLo/CuUaQUtNo
+         nQxUz4vlYbgCAppu/CtFc7z1YfWn1Tc7ttkQERaC9ip8fdBjnQLElNK8l/NW0nd4yv
+         7G8BIsKVC1NoAqz3/yxYksj5XhpkMbTCX4uRUExhNAKzZG29d1wvEyXS5U2H3V2/Dn
+         bg/1FgK4lWhqlae9KATJPVyjq0eKsn20gRYRRigdEKgQzuXRb8L98YwUaKJTLtrpaz
+         Xanf+7uz/LeoA==
+Date:   Thu, 22 Jun 2023 08:35:49 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        Chunguang Xu <brookxu.cn@gmail.com>
+Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
+Message-ID: <ZJRcRWyn7o7lLEDM@kbusch-mbp.dhcp.thefacebook.com>
+References: <20230620013349.906601-1-ming.lei@redhat.com>
+ <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
+ <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
+ <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
+ <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
+ <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
+ <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
+ <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
+ <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
 MIME-Version: 1.0
-References: <20230620083857.611153-1-dlemoal@kernel.org>
-In-Reply-To: <20230620083857.611153-1-dlemoal@kernel.org>
-From:   Suwan Kim <suwan.kim027@gmail.com>
-Date:   Thu, 22 Jun 2023 23:32:27 +0900
-Message-ID: <CAFNWusY41eprBrH-95vp2uZFkxMpLh0iF7NZ8H6FznjQYSv31g@mail.gmail.com>
-Subject: Re: [PATCH] block: virtio-blk: Fix handling of zone append command completion
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Sam Li <faithilikerun@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 5:39=E2=80=AFPM Damien Le Moal <dlemoal@kernel.org>=
- wrote:
->
-> The introduction of completion batching with commit 07b679f70d73
-> ("virtio-blk: support completion batching for the IRQ path") overlloked
-> handling correctly the completion of zone append operations, which
-> require an update of the request __sector field, as is done in
-> virtblk_request_done(): the function virtblk_complete_batch() only
-> executes virtblk_unmap_data() and virtblk_cleanup_cmd() without doing
-> this update. This causes problems with zone append operations, e.g.
-> zonefs complains about invalid zone append locations.
->
+On Thu, Jun 22, 2023 at 09:51:12PM +0800, Ming Lei wrote:
+> On Wed, Jun 21, 2023 at 09:48:49AM -0600, Keith Busch wrote:
+> > The point was to contain requests from entering while the hctx's are
+> > being reconfigured. If you're going to pair up the freezes as you've
+> > suggested, we might as well just not call freeze at all.
+> 
+> blk_mq_update_nr_hw_queues() requires queue to be frozen.
 
-Hi Damien Le Moal,
+It's too late at that point. Let's work through a real example. You'll
+need a system that has more CPU's than your nvme has IO queues.
 
-Unfortunately, this commit was reverted due to io hang.
-(afd384f0dbea2229fd11159efb86a5b41051c4a9)
-You can see the mail thread at the block layer mailing list.
+Boot without any special nvme parameters. Every possible nvme IO queue
+will be assigned "default" hctx type. Now start IO to every queue, then
+run:
 
-We don't have a solution about io hang yet..
-So I have one question.
-Is there any possibility of virtblk-driver io hang on zoned devices
-without this patch?
+  # echo 8 > /sys/modules/nvme/parameters/poll_queues && echo 1 > /sys/class/nvme/nvme0/reset_controller
 
-Regards,
-Suwan Kim
+Today, we freeze prior to tearing down the "default" IO queues, so
+there's nothing entered into them while the driver reconfigures the
+queues.
+
+What you're suggesting will allow IO to queue up in a queisced "default"
+queue, which will become "polled" without an interrupt hanlder on the
+other side of the reset. The application doesn't know that, so the IO
+you're allowing to queue up will time out.
