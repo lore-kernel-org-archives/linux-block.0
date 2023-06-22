@@ -2,107 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 231ACEB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 12:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82BACEB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 13:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbjFVMF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 08:05:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59030 "EHLO
+        id S229916AbjFVNBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 09:01:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbjFVMF5 (ORCPT
+        with ESMTP id S231506AbjFVNBe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 08:05:57 -0400
-Received: from out-5.mta1.migadu.com (out-5.mta1.migadu.com [IPv6:2001:41d0:203:375::5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9D7E7E
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 05:05:56 -0700 (PDT)
-Date:   Thu, 22 Jun 2023 08:05:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1687435554;
+        Thu, 22 Jun 2023 09:01:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0A719AB
+        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 06:00:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687438846;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8rkUE/aSRyT8xu6gUyTqZ5g8F1UXBLPAhf4NAP3fQPE=;
-        b=niJeKL6y9h5TeHJg/SL0zW7OUBQWU2DEhPX1GMwiw6076qgI1yyf+AHfwOb4SO7Tjt0mdH
-        ECmj8rWFLG5agAfS1BpbNQqSJX4uCE7/RSYng2Eey6FMXSzmIw1xigZyyoh2Dv8+8Vy46d
-        RKuH8QJdNPaawLM1GFW9M2ZqbLYAljA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org
-Subject: Re: [PATCH 1/2] bcache: Alloc holder object before async registration
-Message-ID: <20230622120548.molmqze2whj7ykj5@moria.home.lan>
-References: <20230621162024.29310-1-jack@suse.cz>
- <20230621162333.30027-1-jack@suse.cz>
- <20230621175659.ugkaawkuanlzt736@moria.home.lan>
- <20230622100954.6vx7725huqngbubb@quack3>
+        bh=anc3kC3R/ibThGofmp0Z4waKrYa9MHhOjRQqx6Elcuk=;
+        b=ME9eDHvUUUMr1ZX7bSGfseBKCpKMJSeYedikiDMbjpewrO0CEORNGMxDAIyyBOwmA5L9p/
+        EkxsROr+hKM7eCCy3QFlZhVhqHCkzHDEHy6BECAWxGXwfeRBCuh+QGfGcT4MIo+08ByoQg
+        WHA6hfTPmtKbe87/MynOZHoQH5xt+o8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-383-UuE5YYRNNJWAyu5VJDa3MQ-1; Thu, 22 Jun 2023 09:00:42 -0400
+X-MC-Unique: UuE5YYRNNJWAyu5VJDa3MQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 63B8129AA383;
+        Thu, 22 Jun 2023 13:00:35 +0000 (UTC)
+Received: from [10.22.17.29] (unknown [10.22.17.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 01052112132C;
+        Thu, 22 Jun 2023 13:00:34 +0000 (UTC)
+Message-ID: <d46a3ba6-e0d3-686b-063c-9c6ba01a96f3@redhat.com>
+Date:   Thu, 22 Jun 2023 09:00:34 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230622100954.6vx7725huqngbubb@quack3>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH] block: make sure local irq is disabled when calling
+ __blkcg_rstat_flush
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        stable@vger.kernel.org, Jay Shin <jaeshin@redhat.com>,
+        Tejun Heo <tj@kernel.org>
+References: <20230622084249.1208005-1-ming.lei@redhat.com>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <20230622084249.1208005-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 12:09:54PM +0200, Jan Kara wrote:
-> On Wed 21-06-23 13:56:59, Kent Overstreet wrote:
-> > On Wed, Jun 21, 2023 at 06:23:26PM +0200, Jan Kara wrote:
-> > > Allocate holder object (cache or cached_dev) before offloading the
-> > > rest of the startup to async work. This will allow us to open the block
-> > > block device with proper holder.
-> > 
-> > This is a pretty big change for this fix, and we'd want to retest the
-> > error paths - that's hard to do, because the fault injection framework I
-> > was using for that never made it upstream.
-> 
-> I agree those are somewhat difficult to test. Although with memory
-> allocation error injection, we can easily simulate failures in
-> alloc_holder_object() or say later in bcache_device_init() if that's what
-> you're after to give at least some testing to the error paths. Admittedly,
-> I've just tested that registering and unregistering bcache devices works
-> without giving warnings. Or are you more worried about the "reopen the
-> block device" logic (and error handling) in the second patch?
+On 6/22/23 04:42, Ming Lei wrote:
+> When __blkcg_rstat_flush() is called from cgroup_rstat_flush*() code
+> path, interrupt is always disabled.
+>
+> When we start to flush blkcg per-cpu stats list in __blkg_release()
+> for avoiding to leak blkcg_gq's reference in commit 20cb1c2fb756
+> ("blk-cgroup: Flush stats before releasing blkcg_gq"), local irq
+> isn't disabled yet, then lockdep warning may be triggered because
+> the dependent cgroup locks may be acquired from irq(soft irq) handler.
+>
+> Fix the issue by disabling local irq always.
+>
+> Fixes: 20cb1c2fb756 ("blk-cgroup: Flush stats before releasing blkcg_gq")
+> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Closes: https://lore.kernel.org/linux-block/pz2wzwnmn5tk3pwpskmjhli6g3qly7eoknilb26of376c7kwxy@qydzpvt6zpis/T/#u
+> Cc: stable@vger.kernel.org
+> Cc: Jay Shin <jaeshin@redhat.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Waiman Long <longman@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-cgroup.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index f0b5c9c41cde..dce1548a7a0c 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -970,6 +970,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
+>   	struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
+>   	struct llist_node *lnode;
+>   	struct blkg_iostat_set *bisc, *next_bisc;
+> +	unsigned long flags;
+>   
+>   	rcu_read_lock();
+>   
+> @@ -983,7 +984,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
+>   	 * When flushing from cgroup, cgroup_rstat_lock is always held, so
+>   	 * this lock won't cause contention most of time.
+>   	 */
+> -	raw_spin_lock(&blkg_stat_lock);
+> +	raw_spin_lock_irqsave(&blkg_stat_lock, flags);
+>   
+>   	/*
+>   	 * Iterate only the iostat_cpu's queued in the lockless list.
+> @@ -1009,7 +1010,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
+>   			blkcg_iostat_update(parent, &blkg->iostat.cur,
+>   					    &blkg->iostat.last);
+>   	}
+> -	raw_spin_unlock(&blkg_stat_lock);
+> +	raw_spin_unlock_irqrestore(&blkg_stat_lock, flags);
+>   out:
+>   	rcu_read_unlock();
+>   }
+Reviewed-by: Waiman Long <longman@redhat.com>
 
-All error paths need to be tested, yeah.
-
-> > What about just exposing a proper API for changing the holder? Wouldn't
-> > that be simpler?
-> 
-> It would be doable but frankly I'd prefer to avoid implementing the API for
-> changing the holder just for bcache. For all I care bcache can also just
-> generate random cookie (or an id from IDA) and pass it as a holder to
-> blkdev_get_by_dev(). It would do the job as well and we then don't have to
-> play games with changing the holder. It would just need to be propagated to
-> the places doing blkdev_put(). Do you find that better?
-
-Well, looking over the code it doesn't seem like it would really
-simplify the fix, unfortunately.
-
-bcachefs has the same issue, but in bcachefs we've already got a handle
-object where we can allocate and stash a holder - analagous to the
-bdev_handle you're working on.
-
-> I'm now working on a changes that will make blkdev_get_by_dev() return
-> bdev_handle (which contains bdev pointer but also other stuff we need to
-> propagate to blkdev_put()) so when that is done, the cookie propagation
-> will happen automatically.
-
-bdev_handle definitely sounds like the right direction.
-
-Just changing the holder really seems like it should be easiest to me,
-and it can get deleted after bdev_handle lands, but maybe there's a new
-wrinkle I'm not aware of?
-
-Anyways, as the error paths get tested I'm ok with this patchset - it's
-fine if it's done completely by hand (you can just add a goto fail in
-the appropriate place and make sure nothing explodes).
-
-Coli - we should talk about testing at some point. I've been working on
-test infrastructure; it would be great to get the bcache tests in ktest
-updated, I've now got a CI we could point at those tests.
-
-Christoph - you really gotta start CCing people properly, the patch that
-broke this didn't even it linux-bcache. No bueno.
