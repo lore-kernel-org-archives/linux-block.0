@@ -2,85 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BABCEB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 14:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A18EEB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 14:40:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231472AbjFVOf7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 10:35:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43008 "EHLO
+        id S230448AbjFVOkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 10:40:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230489AbjFVOfz (ORCPT
+        with ESMTP id S229990AbjFVOkz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 10:35:55 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D875E10F6
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 07:35:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 59E196187C
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 14:35:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB7AC433C8;
-        Thu, 22 Jun 2023 14:35:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687444552;
-        bh=weFsU4zPpYK20MvEp/VVpzz319RtkhdC+B9H6oPzuRU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=P0H7yzCw/63R68axdM9Qp/Lmw2cvzovj9piH6Gwz9L51wqkt3oGUIMbunTxS1liBG
-         B85oQqwH7YwDtpvnfePXdsO04pvOAWfpJxzJ6hbWy5KG7D+zbGf3biLo/CuUaQUtNo
-         nQxUz4vlYbgCAppu/CtFc7z1YfWn1Tc7ttkQERaC9ip8fdBjnQLElNK8l/NW0nd4yv
-         7G8BIsKVC1NoAqz3/yxYksj5XhpkMbTCX4uRUExhNAKzZG29d1wvEyXS5U2H3V2/Dn
-         bg/1FgK4lWhqlae9KATJPVyjq0eKsn20gRYRRigdEKgQzuXRb8L98YwUaKJTLtrpaz
-         Xanf+7uz/LeoA==
-Date:   Thu, 22 Jun 2023 08:35:49 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Message-ID: <ZJRcRWyn7o7lLEDM@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230620013349.906601-1-ming.lei@redhat.com>
- <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
- <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
- <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
- <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
- <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
- <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
- <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
+        Thu, 22 Jun 2023 10:40:55 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 839511FDD;
+        Thu, 22 Jun 2023 07:40:46 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 4992C67373; Thu, 22 Jun 2023 16:40:42 +0200 (CEST)
+Date:   Thu, 22 Jun 2023 16:40:42 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Joern Engel <joern@lazybastard.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
+Subject: Re: [PATCH 14/24] init: clear root_wait on all invalid root=
+ strings
+Message-ID: <20230622144042.GA21415@lst.de>
+References: <20230523074535.249802-1-hch@lst.de> <20230523074535.249802-15-hch@lst.de> <8c1992bc-110a-4dad-8643-766c14bf6fd4@roeck-us.net> <20230622035149.GA4667@lst.de> <2205ef1e-9bb6-fb1e-9ca3-367c1afe12ac@roeck-us.net> <20230622060001.GA8351@lst.de> <8e6c8365-5c2b-2bad-bf3c-df2d65cc8afa@roeck-us.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
+In-Reply-To: <8e6c8365-5c2b-2bad-bf3c-df2d65cc8afa@roeck-us.net>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 09:51:12PM +0800, Ming Lei wrote:
-> On Wed, Jun 21, 2023 at 09:48:49AM -0600, Keith Busch wrote:
-> > The point was to contain requests from entering while the hctx's are
-> > being reconfigured. If you're going to pair up the freezes as you've
-> > suggested, we might as well just not call freeze at all.
-> 
-> blk_mq_update_nr_hw_queues() requires queue to be frozen.
+On Thu, Jun 22, 2023 at 06:54:41AM -0700, Guenter Roeck wrote:
+> On 6/21/23 23:00, Christoph Hellwig wrote:
+>> Hi Guenter,
+>>
+>> can you try this patch?
+>>
+>> diff --git a/block/early-lookup.c b/block/early-lookup.c
+>> index a5be3c68ed079c..66e4514d671179 100644
+>> --- a/block/early-lookup.c
+>> +++ b/block/early-lookup.c
+>> @@ -174,7 +174,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
+>>   	while (p > s && isdigit(p[-1]))
+>>   		p--;
+>>   	if (p == s || !*p || *p == '0')
+>> -		return -EINVAL;
+>> +		return -ENODEV;
+>>     	/* try disk name without <part number> */
+>>   	part = simple_strtoul(p, NULL, 10);
+>
+> Not completely. Tests with root=/dev/sda still fail.
+>
+> "name" passed to devt_from_devname() is "sda".
+>
+>        for (p = s; *p; p++) {
+>                 if (*p == '/')
+>                         *p = '!';
+>         }
+>
+> advances 'p' to the end of the string.
+>
+>         while (p > s && isdigit(p[-1]))
+> 		p--;
+>
+> moves it back to point to the first digit (if there is one).
+>
+>         if (p == s || !*p || *p == '0')
+> 		return -EINVAL;
+>
+> then fails because *p is 0. In other words, the function only accepts
+> drive names with digits at the end (and the first digit must not be '0').
+>
+> I don't recall how I hit the other condition earlier. I have various
+> "/dev/mmcblkX" in my tests, where X can be any number including 0.
+> Maybe those fail randomly as well.
+>
+> Overall I am not sure though what an "invalid" devicename is supposed
+> to be in this context. I have "sda", "sr0", "vda", "mtdblkX",
+> "nvme0n1", "mmcblkX", and "hda". Why would any of those not be eligible
+> for "rootwait" ?
+>
+> In practice, everything not ending with a digit, or ending with
+> '0', fails the first test. Everything ending with a digit > 0
+> fails the second test. But "humptydump3p4" passes all those tests.
 
-It's too late at that point. Let's work through a real example. You'll
-need a system that has more CPU's than your nvme has IO queues.
 
-Boot without any special nvme parameters. Every possible nvme IO queue
-will be assigned "default" hctx type. Now start IO to every queue, then
-run:
+Yeah.  I guess I should give up on the idea of error out in this
+particular parser.  The idea sounded good, but I guess it doesn't
+work.  So we'll probably want his fix:
 
-  # echo 8 > /sys/modules/nvme/parameters/poll_queues && echo 1 > /sys/class/nvme/nvme0/reset_controller
 
-Today, we freeze prior to tearing down the "default" IO queues, so
-there's nothing entered into them while the driver reconfigures the
-queues.
-
-What you're suggesting will allow IO to queue up in a queisced "default"
-queue, which will become "polled" without an interrupt hanlder on the
-other side of the reset. The application doesn't know that, so the IO
-you're allowing to queue up will time out.
+diff --git a/block/early-lookup.c b/block/early-lookup.c
+index a5be3c68ed079c..9e2d5a19de1b3b 100644
+--- a/block/early-lookup.c
++++ b/block/early-lookup.c
+@@ -174,7 +174,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
+ 	while (p > s && isdigit(p[-1]))
+ 		p--;
+ 	if (p == s || !*p || *p == '0')
+-		return -EINVAL;
++		return -ENODEV;
+ 
+ 	/* try disk name without <part number> */
+ 	part = simple_strtoul(p, NULL, 10);
+@@ -185,7 +185,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
+ 
+ 	/* try disk name without p<part number> */
+ 	if (p < s + 2 || !isdigit(p[-2]) || p[-1] != 'p')
+-		return -EINVAL;
++		return -ENODEV;
+ 	p[-1] = '\0';
+ 	*devt = blk_lookup_devt(s, part);
+ 	if (*devt)
