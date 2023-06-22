@@ -2,239 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC607C001DC
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 16:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79995EB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 16:51:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230512AbjFVQrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 12:47:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39812 "EHLO
+        id S231318AbjFVQvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 12:51:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230522AbjFVQrC (ORCPT
+        with ESMTP id S230256AbjFVQvO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 12:47:02 -0400
+        Thu, 22 Jun 2023 12:51:14 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93038E42;
-        Thu, 22 Jun 2023 09:47:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7458197;
+        Thu, 22 Jun 2023 09:51:13 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B816A21C96;
-        Thu, 22 Jun 2023 16:46:58 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7CC8F21D42;
+        Thu, 22 Jun 2023 16:51:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1687452418; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3LRoZWXHfZd+7dNHbIoqZ0TZe/GD5cIwqG6qzogCaew=;
-        b=fhdd2Q7Gl/yuv5JiYy5REYhkvMz28ip+fbKhg9N7gonX2lwGv7ejO0GRtATEq0gORFOlbc
-        R39meyZeVxtY5U+dsQ+/UOREDFds/3STt9pI9U3DOdqa519Gau3ByGtzLPZA+MoQBAg0DJ
-        Oq0OjyUwg3KRaydhbta+o7cMq0Dn75M=
+        t=1687452672; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=q5bTcwRpOQqDZeBG6wcf8dPs5qbb9VV08OwcH6T8toQ=;
+        b=eHCkflT5BXAUCE9W/2YKkR3mi6WgjkQG8VvT8jOnJ3Ny/UHmNnrCvu5UBhtAPEHwc9omsk
+        aCV7+/oRHsxjBFI7h8Co9uSpdyGuF4QydfnoHbl2C6Ll4sQKM+12j6yx0Nhx4IaegfNnHi
+        m0ZmDCS0AgJlWKozGBXUJdtbAjKZg5Y=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1687452418;
+        s=susede2_ed25519; t=1687452672;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3LRoZWXHfZd+7dNHbIoqZ0TZe/GD5cIwqG6qzogCaew=;
-        b=4zStbAoxmRxEqIvgqGZaGDdTYDEzK2xHKvKVOSKTB32CIkHxzGHsw5HEfkG/PYEeh3b+AM
-        aM20WlBFwnCOdoAw==
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=q5bTcwRpOQqDZeBG6wcf8dPs5qbb9VV08OwcH6T8toQ=;
+        b=6E1se03t/3uAWtYUc88jX7W6o4F1a5x0ATDFOovANabjRIlF1nNgaP2PwggsiQLCVaOmoV
+        Qp1gKpOgSwCTMNAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A908F13A6F;
-        Thu, 22 Jun 2023 16:46:58 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6E76713905;
+        Thu, 22 Jun 2023 16:51:12 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id ciU/KQJ7lGSISwAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 22 Jun 2023 16:46:58 +0000
+        id q3r1GgB8lGRqTQAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 22 Jun 2023 16:51:12 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 26D9DA0660; Thu, 22 Jun 2023 18:46:58 +0200 (CEST)
+        id DE42EA0754; Thu, 22 Jun 2023 18:51:11 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        <linux-block@vger.kernel.org>,
-        Kent Overstreet <kent.overstreet@linux.dev>,
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        <linux-ext4@vger.kernel.org>, <linux-block@vger.kernel.org>,
         Jan Kara <jack@suse.cz>
-Subject: [PATCH v2 1/2] bcache: Alloc holder object before async registration
-Date:   Thu, 22 Jun 2023 18:46:54 +0200
-Message-Id: <20230622164658.12861-1-jack@suse.cz>
+Subject: [PATCH] ext4: Fix warning in blkdev_put()
+Date:   Thu, 22 Jun 2023 18:51:07 +0200
+Message-Id: <20230622165107.13687-1-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230622164149.17134-1-jack@suse.cz>
-References: <20230622164149.17134-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4896; i=jack@suse.cz; h=from:subject; bh=wwP7Ac/wRl4ZCJg9yakql11C47nYllFwsaq5HKY0jlg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBklHr9GJwmLO8dTgAMwbUR+T6DhQB6JEFdktOeDsJ+ aQ+K3suJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZJR6/QAKCRCcnaoHP2RA2folB/ 9eHDXpToaZYE8C4Tlg/brJhjCSPoSzNGNtKc1PRQJXe2Z1pquJNWIGldJM4LWwHmL3w6ne3TOxC2eT lWA2G6gp92EIQ8WCocinIVtZzEvcx2JUKksPT2v/ws47xzp/WDxY9CCnMVfAdEyUVui4Gmkd/q0DGu DS1MJwG62E1FKEKv21XGE6QeF7/kh4SRi+I3iUWK4k7/aba4PQBm+8JI6dL6bL7ppyNDcnVmwTc0Gb hLstx7SMGH+OmAKcwjKqngFaLfVuhD8A8vkr+SBvAyRXDx5gdJnR01fIB3iU+stVvdzSI53x+XFKyM CZC8pZdu5oasKyxkdgA0KijFLmjHY0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=813; i=jack@suse.cz; h=from:subject; bh=i5SQsfEQ6FLHG5qn+W2tiOHApX2mmYuZkyz4E8WBuPc=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBklHv0zj1YyI1UOaRwK54xrTwJ69oc3f05YwPhpmbr wtPU1JuJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZJR79AAKCRCcnaoHP2RA2W+yCA DeXI3YFNgz3v8pkNMAGteyHMiH7a9n+EQwggIWk6UPyOzOl2vPiG1HC63YJpbV1sAPLhXN22jOm+sg 8wtSsZkD6qhwaYsNu1XtA6+Q4L7b+QpCVGJX+xVsDHrYIfu25YfQc08MwiQHKmvXobgH5Bnqev147n XtDmzgxfQd6HBvX0jxsj3S5lcCVVQE0FLzWGH9Q7UmCpJu+A4HEPKaKnG0K9TYn5AnhqUjwHFOQ7xm ih9uFnbLOK5kIh5laurnxt6J2jd39I6cRzI5T6NuCVjhr4wLeTwSZmetdmygjDAd/2jQVEdzNXTwGf A3Xp3UbVrQIiPlMZcVHORFagZRfRW5
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allocate holder object (cache or cached_dev) before offloading the
-rest of the startup to async work. This will allow us to open the block
-block device with proper holder.
+ext4_blkdev_remove() passes a wrong holder pointer to blkdev_put() which
+triggers a warning there. Fix it.
 
+Fixes: 2736e8eeb0cc ("block: use the holder as indication for exclusive opens")
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/md/bcache/super.c | 66 +++++++++++++++------------------------
- 1 file changed, 25 insertions(+), 41 deletions(-)
+ fs/ext4/super.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index e2a803683105..913dd94353b6 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2448,6 +2448,7 @@ struct async_reg_args {
- 	struct cache_sb *sb;
- 	struct cache_sb_disk *sb_disk;
+Jens, this is another fixup of the block device handling series sitting in
+your tree.
+
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 53d74144ee34..d34b4eb90fe8 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -1133,7 +1133,7 @@ static void ext4_blkdev_remove(struct ext4_sb_info *sbi)
  	struct block_device *bdev;
-+	void *holder;
- };
- 
- static void register_bdev_worker(struct work_struct *work)
-@@ -2455,22 +2456,13 @@ static void register_bdev_worker(struct work_struct *work)
- 	int fail = false;
- 	struct async_reg_args *args =
- 		container_of(work, struct async_reg_args, reg_work.work);
--	struct cached_dev *dc;
--
--	dc = kzalloc(sizeof(*dc), GFP_KERNEL);
--	if (!dc) {
--		fail = true;
--		put_page(virt_to_page(args->sb_disk));
--		blkdev_put(args->bdev, bcache_kobj);
--		goto out;
--	}
- 
- 	mutex_lock(&bch_register_lock);
--	if (register_bdev(args->sb, args->sb_disk, args->bdev, dc) < 0)
-+	if (register_bdev(args->sb, args->sb_disk, args->bdev, args->holder)
-+	    < 0)
- 		fail = true;
- 	mutex_unlock(&bch_register_lock);
- 
--out:
- 	if (fail)
- 		pr_info("error %s: fail to register backing device\n",
- 			args->path);
-@@ -2485,21 +2477,11 @@ static void register_cache_worker(struct work_struct *work)
- 	int fail = false;
- 	struct async_reg_args *args =
- 		container_of(work, struct async_reg_args, reg_work.work);
--	struct cache *ca;
--
--	ca = kzalloc(sizeof(*ca), GFP_KERNEL);
--	if (!ca) {
--		fail = true;
--		put_page(virt_to_page(args->sb_disk));
--		blkdev_put(args->bdev, bcache_kobj);
--		goto out;
--	}
- 
- 	/* blkdev_put() will be called in bch_cache_release() */
--	if (register_cache(args->sb, args->sb_disk, args->bdev, ca) != 0)
-+	if (register_cache(args->sb, args->sb_disk, args->bdev, args->holder))
- 		fail = true;
- 
--out:
- 	if (fail)
- 		pr_info("error %s: fail to register cache device\n",
- 			args->path);
-@@ -2520,6 +2502,13 @@ static void register_device_async(struct async_reg_args *args)
- 	queue_delayed_work(system_wq, &args->reg_work, 10);
+ 	bdev = sbi->s_journal_bdev;
+ 	if (bdev) {
+-		blkdev_put(bdev, sbi->s_es);
++		blkdev_put(bdev, sbi->s_sb);
+ 		sbi->s_journal_bdev = NULL;
+ 	}
  }
- 
-+static void *alloc_holder_object(struct cache_sb *sb)
-+{
-+	if (SB_IS_BDEV(sb))
-+		return kzalloc(sizeof(struct cached_dev), GFP_KERNEL);
-+	return kzalloc(sizeof(struct cache), GFP_KERNEL);
-+}
-+
- static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 			       const char *buffer, size_t size)
- {
-@@ -2528,6 +2517,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 	struct cache_sb *sb;
- 	struct cache_sb_disk *sb_disk;
- 	struct block_device *bdev;
-+	void *holder;
- 	ssize_t ret;
- 	bool async_registration = false;
- 
-@@ -2585,6 +2575,13 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 	if (err)
- 		goto out_blkdev_put;
- 
-+	holder = alloc_holder_object(sb);
-+	if (!holder) {
-+		ret = -ENOMEM;
-+		err = "cannot allocate memory";
-+		goto out_put_sb_page;
-+	}
-+
- 	err = "failed to register device";
- 
- 	if (async_registration) {
-@@ -2595,44 +2592,29 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 		if (!args) {
- 			ret = -ENOMEM;
- 			err = "cannot allocate memory";
--			goto out_put_sb_page;
-+			goto out_free_holder;
- 		}
- 
- 		args->path	= path;
- 		args->sb	= sb;
- 		args->sb_disk	= sb_disk;
- 		args->bdev	= bdev;
-+		args->holder	= holder;
- 		register_device_async(args);
- 		/* No wait and returns to user space */
- 		goto async_done;
- 	}
- 
- 	if (SB_IS_BDEV(sb)) {
--		struct cached_dev *dc = kzalloc(sizeof(*dc), GFP_KERNEL);
--
--		if (!dc) {
--			ret = -ENOMEM;
--			err = "cannot allocate memory";
--			goto out_put_sb_page;
--		}
--
- 		mutex_lock(&bch_register_lock);
--		ret = register_bdev(sb, sb_disk, bdev, dc);
-+		ret = register_bdev(sb, sb_disk, bdev, holder);
- 		mutex_unlock(&bch_register_lock);
- 		/* blkdev_put() will be called in cached_dev_free() */
- 		if (ret < 0)
- 			goto out_free_sb;
- 	} else {
--		struct cache *ca = kzalloc(sizeof(*ca), GFP_KERNEL);
--
--		if (!ca) {
--			ret = -ENOMEM;
--			err = "cannot allocate memory";
--			goto out_put_sb_page;
--		}
--
- 		/* blkdev_put() will be called in bch_cache_release() */
--		ret = register_cache(sb, sb_disk, bdev, ca);
-+		ret = register_cache(sb, sb_disk, bdev, holder);
- 		if (ret)
- 			goto out_free_sb;
- 	}
-@@ -2644,6 +2626,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- async_done:
- 	return size;
- 
-+out_free_holder:
-+	kfree(holder);
- out_put_sb_page:
- 	put_page(virt_to_page(sb_disk));
- out_blkdev_put:
 -- 
 2.35.3
 
