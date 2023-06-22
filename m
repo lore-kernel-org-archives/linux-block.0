@@ -2,111 +2,245 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF1EEB64DB
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 15:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F3FCEB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 16:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231663AbjFVPTZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 11:19:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52744 "EHLO
+        id S231281AbjFVQrD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 12:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231501AbjFVPTY (ORCPT
+        with ESMTP id S230381AbjFVQrC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 11:19:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1828E42
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 08:19:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Thu, 22 Jun 2023 12:47:02 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C4E1D3;
+        Thu, 22 Jun 2023 09:47:00 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6D1AE6187F
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 15:19:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A163C433CD;
-        Thu, 22 Jun 2023 15:19:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687447162;
-        bh=5/DP6sm4OvRXNhw3lfTvZLQV1+Agd8hDIBi4tC75pYY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CjJ3s2zoc9UZvDSaZZabIq+PT/GDGFJbbk8ZoJl9UMHjq+nxZvEvQ8lbpdw9t+8NT
-         Wvsd0aneCs7BQnix9hQKL4A2gLHTeVroRjtIwcUcPSvNwQZGKgl2SYT+DnwwZCKrwE
-         eBLTxFdCkbkAQD/9d+bbPIINNJRX1DjuWblp00Dg+o6osAOInuHhXkzLt4svrdW0K5
-         nS6/6eLIWpQesmPu10/GqhjH2O3tVqAXRbONY7yP0drdnDLXGA/TzK78ikw0QuNWlh
-         HKYAaKuIIwUDzVPd1XfMhHxGu/gfwd+kjjLvxzxNTW7myN83Vr+41XyLJeroXKoe8o
-         9tmOt0TJC/38Q==
-Date:   Thu, 22 Jun 2023 09:19:19 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Message-ID: <ZJRmd7bnclaNW3PL@kbusch-mbp.dhcp.thefacebook.com>
-References: <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
- <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
- <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
- <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
- <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
- <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
- <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
- <ZJRcRWyn7o7lLEDM@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRgUXfRuuOoIN1o@ovpn-8-19.pek2.redhat.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id BB93221CBF;
+        Thu, 22 Jun 2023 16:46:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1687452418; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N7F0EKIZlmyobpd43iXvYg9XdRNVHFzLmZDplSjqY9Q=;
+        b=GB+5oAAGUFHqwNtdT07w4Hb8C+UFD9q/cjg02zcr1AqJfApNaPtESisrIhU/2bEdkgJces
+        y6DRx4spV+4HAzIP5M+4PA/2te2r4uCu2/RV1ivyCkEk5cFCZvUqHTi4Q8Z3cxYXFdSKdi
+        B7i/8RZKPmcp1TLbqPMr331f5Ch2vWk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1687452418;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N7F0EKIZlmyobpd43iXvYg9XdRNVHFzLmZDplSjqY9Q=;
+        b=aBYobvqRbKRa30J+/N7xTT6dWFGF9IazeEcUOKmvzfMn+jFOfzSTEWnsTGhJd0a3wVMIs5
+        f2bQXIyaQjoxQgDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id ABC4B13A76;
+        Thu, 22 Jun 2023 16:46:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id zNhwKQJ7lGSJSwAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 22 Jun 2023 16:46:58 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 2C701A0762; Thu, 22 Jun 2023 18:46:58 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        <linux-block@vger.kernel.org>,
+        Kent Overstreet <kent.overstreet@linux.dev>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH v2 2/2] bcache: Fix bcache device claiming
+Date:   Thu, 22 Jun 2023 18:46:55 +0200
+Message-Id: <20230622164658.12861-2-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
+In-Reply-To: <20230622164149.17134-1-jack@suse.cz>
+References: <20230622164149.17134-1-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJRgUXfRuuOoIN1o@ovpn-8-19.pek2.redhat.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5624; i=jack@suse.cz; h=from:subject; bh=S73/rHQIHtjz3aReLeRjgK308IcQMM4/uuTvBKwbiCg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBklHr+E+R5bZdD5Nf/x8WlzxepzWvn1D0NT6Cq0fww 1VeohI6JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZJR6/gAKCRCcnaoHP2RA2Xt+B/ oCduNCwNeMR6jL8FLNxdXI4TTuK4WMVAMwnbjfPds5Kbki9oci6ggFLQN4ptzp0Auet1d83V1xjeWC gmGk+Hb4S3m5XU90ZJqPMQgTwf+tC0OAF41qTliQvOqS/E7I7FPpfXmTn+yZ5eg1KoYgDQwUHKSsuI Xp5pB49SnphPxAchU9bpb/+obZDTGastP50L7j0zdRXsPnXsU2B09AM7QY/yZWQQdV8Eqe2a0tLl+W VgWCrlLbVcwrvqQVGpWGgMiYPO+RRaUCOz+BZ9yQAKbGAkzYfNUUYW6eaeHoZnJDbr2lz4HheVvOSG 6Rc9SwFQcVVoAlSW2ZU3DLZkBJX5oX
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 10:53:05PM +0800, Ming Lei wrote:
-> On Thu, Jun 22, 2023 at 08:35:49AM -0600, Keith Busch wrote:
-> > On Thu, Jun 22, 2023 at 09:51:12PM +0800, Ming Lei wrote:
-> > > On Wed, Jun 21, 2023 at 09:48:49AM -0600, Keith Busch wrote:
-> > > > The point was to contain requests from entering while the hctx's are
-> > > > being reconfigured. If you're going to pair up the freezes as you've
-> > > > suggested, we might as well just not call freeze at all.
-> > > 
-> > > blk_mq_update_nr_hw_queues() requires queue to be frozen.
-> > 
-> > It's too late at that point. Let's work through a real example. You'll
-> > need a system that has more CPU's than your nvme has IO queues.
-> > 
-> > Boot without any special nvme parameters. Every possible nvme IO queue
-> > will be assigned "default" hctx type. Now start IO to every queue, then
-> > run:
-> > 
-> >   # echo 8 > /sys/modules/nvme/parameters/poll_queues && echo 1 > /sys/class/nvme/nvme0/reset_controller
-> > 
-> > Today, we freeze prior to tearing down the "default" IO queues, so
-> > there's nothing entered into them while the driver reconfigures the
-> > queues.
-> 
-> nvme_start_freeze() just prevents new IO from being queued, and old ones
-> may still be entering block layer queue, and what matters here is
-> actually quiesce, which prevents new IO from being queued to
-> driver/hardware.
-> 
-> > 
-> > What you're suggesting will allow IO to queue up in a queisced "default"
-> > queue, which will become "polled" without an interrupt hanlder on the
-> > other side of the reset. The application doesn't know that, so the IO
-> > you're allowing to queue up will time out.
-> 
-> time out only happens after the request is queued to driver/hardware, or after
-> blk_mq_start_request() is called in nvme_queue_rq(), but quiesce actually
-> prevents new IOs from being dispatched to driver or be queued via .queue_rq(),
-> meantime old requests have been canceled, so no any request can be
-> timed out.
+Commit 2736e8eeb0cc ("block: use the holder as indication for exclusive
+opens") introduced a change that blkdev_put() has to get exclusive
+holder of the bdev as an argument. However it overlooked that
+register_bdev() and register_cache() overwrite the bdev->bd_holder field
+in the block device to point to the real owning object which was not
+available at the time we called blkdev_get_by_path(). Messing with bdev
+internals like this is a layering violation and it also causes
+blkdev_put() to issue warning about mismatching holders.
 
-Quiesce doesn't prevent requests from entering an hctx, and you can't
-back it out to put on another hctx later. It doesn't matter that you
-haven't dispatched it to hardware yet. The request's queue was set the
-moment it was allocated, so after you unquiesce and freeze for the new
-queue mapping, the requests previously blocked on quiesce will time out
-in the scenario I've described.
+Fix bcache to reopen the block device with appropriate holder once it is
+available which also restores the behavior that multiple bcache caches
+cannot claim the same device which was broken by commit 29499ab060fe
+("bcache: don't pass a stack address to blkdev_get_by_path").
 
-There are certainly gaps in the existing code where error'ed requests
-can be requeued or stuck elsewhere and hit the exact same problem, but
-the current way at least tries to contain it.
+Fixes: 2736e8eeb0cc ("block: use the holder as indication for exclusive opens")
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/md/bcache/super.c | 65 +++++++++++++++++++++++----------------
+ 1 file changed, 38 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 913dd94353b6..0ae2b3676293 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1369,7 +1369,7 @@ static void cached_dev_free(struct closure *cl)
+ 		put_page(virt_to_page(dc->sb_disk));
+ 
+ 	if (!IS_ERR_OR_NULL(dc->bdev))
+-		blkdev_put(dc->bdev, bcache_kobj);
++		blkdev_put(dc->bdev, dc);
+ 
+ 	wake_up(&unregister_wait);
+ 
+@@ -1453,7 +1453,6 @@ static int register_bdev(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 
+ 	memcpy(&dc->sb, sb, sizeof(struct cache_sb));
+ 	dc->bdev = bdev;
+-	dc->bdev->bd_holder = dc;
+ 	dc->sb_disk = sb_disk;
+ 
+ 	if (cached_dev_init(dc, sb->block_size << 9))
+@@ -2218,7 +2217,7 @@ void bch_cache_release(struct kobject *kobj)
+ 		put_page(virt_to_page(ca->sb_disk));
+ 
+ 	if (!IS_ERR_OR_NULL(ca->bdev))
+-		blkdev_put(ca->bdev, bcache_kobj);
++		blkdev_put(ca->bdev, ca);
+ 
+ 	kfree(ca);
+ 	module_put(THIS_MODULE);
+@@ -2345,7 +2344,6 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 
+ 	memcpy(&ca->sb, sb, sizeof(struct cache_sb));
+ 	ca->bdev = bdev;
+-	ca->bdev->bd_holder = ca;
+ 	ca->sb_disk = sb_disk;
+ 
+ 	if (bdev_max_discard_sectors((bdev)))
+@@ -2359,7 +2357,7 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 		 * call blkdev_put() to bdev in bch_cache_release(). So we
+ 		 * explicitly call blkdev_put() here.
+ 		 */
+-		blkdev_put(bdev, bcache_kobj);
++		blkdev_put(bdev, ca);
+ 		if (ret == -ENOMEM)
+ 			err = "cache_alloc(): -ENOMEM";
+ 		else if (ret == -EPERM)
+@@ -2516,10 +2514,11 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	char *path = NULL;
+ 	struct cache_sb *sb;
+ 	struct cache_sb_disk *sb_disk;
+-	struct block_device *bdev;
+-	void *holder;
++	struct block_device *bdev, *bdev2;
++	void *holder = NULL;
+ 	ssize_t ret;
+ 	bool async_registration = false;
++	bool quiet = false;
+ 
+ #ifdef CONFIG_BCACHE_ASYNC_REGISTRATION
+ 	async_registration = true;
+@@ -2548,24 +2547,9 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 
+ 	ret = -EINVAL;
+ 	err = "failed to open device";
+-	bdev = blkdev_get_by_path(strim(path), BLK_OPEN_READ | BLK_OPEN_WRITE,
+-				  bcache_kobj, NULL);
+-	if (IS_ERR(bdev)) {
+-		if (bdev == ERR_PTR(-EBUSY)) {
+-			dev_t dev;
+-
+-			mutex_lock(&bch_register_lock);
+-			if (lookup_bdev(strim(path), &dev) == 0 &&
+-			    bch_is_open(dev))
+-				err = "device already registered";
+-			else
+-				err = "device busy";
+-			mutex_unlock(&bch_register_lock);
+-			if (attr == &ksysfs_register_quiet)
+-				goto done;
+-		}
++	bdev = blkdev_get_by_path(strim(path), BLK_OPEN_READ, NULL, NULL);
++	if (IS_ERR(bdev))
+ 		goto out_free_sb;
+-	}
+ 
+ 	err = "failed to set blocksize";
+ 	if (set_blocksize(bdev, 4096))
+@@ -2582,6 +2566,32 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 		goto out_put_sb_page;
+ 	}
+ 
++	/* Now reopen in exclusive mode with proper holder */
++	bdev2 = blkdev_get_by_dev(bdev->bd_dev, BLK_OPEN_READ | BLK_OPEN_WRITE,
++				  holder, NULL);
++	blkdev_put(bdev, NULL);
++	bdev = bdev2;
++	if (IS_ERR(bdev)) {
++		ret = PTR_ERR(bdev);
++		bdev = NULL;
++		if (ret == -EBUSY) {
++			dev_t dev;
++
++			mutex_lock(&bch_register_lock);
++			if (lookup_bdev(strim(path), &dev) == 0 &&
++			    bch_is_open(dev))
++				err = "device already registered";
++			else
++				err = "device busy";
++			mutex_unlock(&bch_register_lock);
++			if (attr == &ksysfs_register_quiet) {
++				quiet = true;
++				ret = size;
++			}
++		}
++		goto out_free_holder;
++	}
++
+ 	err = "failed to register device";
+ 
+ 	if (async_registration) {
+@@ -2619,7 +2629,6 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 			goto out_free_sb;
+ 	}
+ 
+-done:
+ 	kfree(sb);
+ 	kfree(path);
+ 	module_put(THIS_MODULE);
+@@ -2631,7 +2640,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ out_put_sb_page:
+ 	put_page(virt_to_page(sb_disk));
+ out_blkdev_put:
+-	blkdev_put(bdev, register_bcache);
++	if (bdev)
++		blkdev_put(bdev, holder);
+ out_free_sb:
+ 	kfree(sb);
+ out_free_path:
+@@ -2640,7 +2650,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ out_module_put:
+ 	module_put(THIS_MODULE);
+ out:
+-	pr_info("error %s: %s\n", path?path:"", err);
++	if (!quiet)
++		pr_info("error %s: %s\n", path?path:"", err);
+ 	return ret;
+ }
+ 
+-- 
+2.35.3
+
