@@ -2,57 +2,55 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADDABEB64DB
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 07:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F36E9EB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 08:00:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbjFVHdC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 03:33:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43116 "EHLO
+        id S230456AbjFVIAJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 04:00:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjFVHdB (ORCPT
+        with ESMTP id S231129AbjFVH7s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 03:33:01 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D051992;
-        Thu, 22 Jun 2023 00:32:59 -0700 (PDT)
+        Thu, 22 Jun 2023 03:59:48 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5D61FDD;
+        Thu, 22 Jun 2023 00:59:37 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 4C3AD228F4;
-        Thu, 22 Jun 2023 07:32:58 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A5C94203F1;
+        Thu, 22 Jun 2023 07:59:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1687419178;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        t=1687420776; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pgboY+1eKS7Q4R+wwxJQMziAyhb5MWJJWPixvdsi6vw=;
-        b=Y+S6cWYXoDMZLa4zgn8fXqN1yVVU4Rc5J3cecl/T4XwUXtc1WEyiOLrpWwehhnLEhKvvNr
-        iJsuZ8lnFtBadV/8KQmFkAtExzARtZdpPgvPY6eZL4741HxpQVG8IqMTneY8xBI7WQL445
-        eFMxsBMBA/qtt1A9qZEW2rm/+Gd1/PQ=
+        bh=Y8UtH7gU84fxdekvJY/AM16EfFJszLpCobK2E/vW70Y=;
+        b=gig58Clv8nLaebHHBdCRN9rz1WvPzyoUwuoPpVS5A/HD2nGeiPZxJih6y25Uzmpt88xTtF
+        4qiWdrFk+SuFZlmBZU0BcK8VK0TihG5Wp+b16oYClCHo6w9/bs2SbCaamPrtCwzm/1QPKj
+        XXam6SrpvlW6owI2k+Hmw+pGdzOJ03Y=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1687419178;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        s=susede2_ed25519; t=1687420776;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pgboY+1eKS7Q4R+wwxJQMziAyhb5MWJJWPixvdsi6vw=;
-        b=pGfxU2eZPdVCvBbg1C/Ohx53ZNQOEgSeTw6YwkthFbsntvmEFx+uZ+uTJQaNElFLRfLkT+
-        nZCDJ83OLBp+BAAw==
+        bh=Y8UtH7gU84fxdekvJY/AM16EfFJszLpCobK2E/vW70Y=;
+        b=zDtqdnK8vDwkTjG6Gw/Q8ahT5J51Ye9akvh733KFwsFJ9CFO61xgfAGFGUt4jIh63cuL5c
+        0iZh/EnsAvw8GtCw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E213D13905;
-        Thu, 22 Jun 2023 07:32:57 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8FF3A13905;
+        Thu, 22 Jun 2023 07:59:36 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 4irjNSn5k2TSZwAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Thu, 22 Jun 2023 07:32:57 +0000
-Date:   Thu, 22 Jun 2023 09:32:56 +0200
-From:   Petr Vorel <pvorel@suse.cz>
+        id Gvq7IWj/k2REcwAAMHmgww
+        (envelope-from <chrubis@suse.cz>); Thu, 22 Jun 2023 07:59:36 +0000
+Date:   Thu, 22 Jun 2023 10:00:40 +0200
+From:   Cyril Hrubis <chrubis@suse.cz>
 To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     Cyril Hrubis <chrubis@suse.cz>,
-        Damien Le Moal <dlemoal@kernel.org>,
+Cc:     Damien Le Moal <dlemoal@kernel.org>,
         kernel test robot <oliver.sang@intel.com>,
         "lkp@intel.com" <lkp@intel.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
@@ -62,11 +60,11 @@ Cc:     Cyril Hrubis <chrubis@suse.cz>,
         Hannes Reinecke <hare@suse.de>,
         "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>,
         Christoph Hellwig <hch@lst.de>,
-        "ltp@lists.linux.it" <ltp@lists.linux.it>
+        "ltp@lists.linux.it" <ltp@lists.linux.it>,
+        Petr Vorel <pvorel@suse.cz>
 Subject: Re: [LTP] [linux-next:master] [scsi] eca2040972:
  ltp.ioprio_set03.fail
-Message-ID: <20230622073256.GA482307@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
+Message-ID: <ZJP_qPeJ37H4qhEN@yuki>
 References: <202306192248.1ece4c29-oliver.sang@intel.com>
  <61f22c1d-6b04-d193-57c9-8cad1c555e4b@kernel.org>
  <ZJLxbwCno-it2xBB@yuki>
@@ -79,78 +77,16 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On Wed, Jun 21, 2023 at 02:47:43PM +0200, Cyril Hrubis wrote:
-> > Hi!
-> > > > kernel test robot noticed "ltp.ioprio_set03.fail" on:
-
-> > > LTP maintainers,
-
-> > > Patches have been submitted to fix this issue. Were these patches applied ?
-
-> > Looks like they are in, at least these two:
-
-> >     ioprio: use ioprio.h kernel header if it exists
-> >     ioprio: Use IOPRIO_PRIO_NUM to check prio range
-
-> > And there does not seem to be anything ioprio related haning in the LTP
-> > patchwork.
-
-Hi Niklas,
-
-> Hello Cyril, Petr, Damien,
-
-
-> I just ran LTP master + linux-next and the test case passes for me.
-
-
-> Although, note that even if you are using LTP master,
-> the way that the LTP header:
-> testcases/kernel/syscalls/ioprio/ioprio.h
-> is written, you will need to run
-
-> make headers_install
-> with linux-next kernel source,
-
-> before running
-> make autotools && ./configure
-> in LTP.
-
-> Otherwise LTP will use the kernel uapi headers from your distro,
-> which does not perform the new checks for the IOPRIO_PRIO_VALUE()
-> macro. (It requires linux uapi headers from linux-next.)
-
-Yes, it should do otherwise more tests would be often broken.
-
-
-> Does the linux kernel test robot not run
-> make headers_install
-> before running
-> make autotools && ./configure
-> in LTP?
-
-I guess that's the question for Damien (I and Cyril have nothing to do with
-kernel test robot). I wonder myself.
-
-> One option, although I'm not sure if we want this,
-> is to change
-> testcases/kernel/syscalls/ioprio/ioprio.h
-> to do something like:
-
-> #ifndef IOPRIO_BAD_VALUE
-> # define IOPRIO_BAD_VALUE(val, max) ((val) < 0 || (val) >= (max))
-> #endif
-
-> such that LTP does not need to be compiled against the kernel uapi
-> headers that match the running kernel.
-
+Hi!
 > But... shouldn't the installed uapi headers match the running kernel?
 
-Yes, whatever kernel version (stable, enterprise, mainline, linux-next, ...) is
-being tested, the tester should make sure LTP is compiled against correct
-headers.
+Genearlly this is tough nut to crack. It's nearly impossible for headers
+to actually match the running kernel in testing environments, since
+quite often the testsuite is compiled beforehand and only retrieved,
+since recompiling for each testrun is wasting too many cycles. I would
+say that the best we can have is that UAPI headers shouldn't be newer
+than running kernel.
 
-Kind regards,
-Petr
-
-> Kind regards,
-> Niklas
+-- 
+Cyril Hrubis
+chrubis@suse.cz
