@@ -2,62 +2,173 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B9EEB64DB
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 06:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D16F9EB64DB
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 06:15:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230217AbjFVGAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 02:00:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38244 "EHLO
+        id S229624AbjFVGP2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 02:15:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjFVGAM (ORCPT
+        with ESMTP id S230235AbjFVGP1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 02:00:12 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39909E2;
-        Wed, 21 Jun 2023 23:00:09 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 4E6A467373; Thu, 22 Jun 2023 08:00:01 +0200 (CEST)
-Date:   Thu, 22 Jun 2023 08:00:01 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Joern Engel <joern@lazybastard.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH 14/24] init: clear root_wait on all invalid root=
- strings
-Message-ID: <20230622060001.GA8351@lst.de>
-References: <20230523074535.249802-1-hch@lst.de> <20230523074535.249802-15-hch@lst.de> <8c1992bc-110a-4dad-8643-766c14bf6fd4@roeck-us.net> <20230622035149.GA4667@lst.de> <2205ef1e-9bb6-fb1e-9ca3-367c1afe12ac@roeck-us.net>
+        Thu, 22 Jun 2023 02:15:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 782751735
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 23:14:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687414479;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6U7Jgyq5pY8OJlZBHmNv7DI17/H9KRKPjBl2RMWjLNY=;
+        b=eQlXRADauHtV6adGbPVg3hhHZh6zV4Oak+znCLKYv4+HNT7a6g/JVXSeZdwEyASVFkrRsc
+        DTyJuJUJuitnDHT8+wM8LTMw1g0g8CJDYPLTOC41f2ybMBgahA7oyKLp6HCM/RvCRcvVnA
+        3jI8tBZjDQblTeL3vmVnRSDZFZ/ZSu8=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-489-4KEmScyYMBSczjVF0Zh4kw-1; Thu, 22 Jun 2023 02:14:38 -0400
+X-MC-Unique: 4KEmScyYMBSczjVF0Zh4kw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-987accb96dbso349456466b.2
+        for <linux-block@vger.kernel.org>; Wed, 21 Jun 2023 23:14:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687414477; x=1690006477;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6U7Jgyq5pY8OJlZBHmNv7DI17/H9KRKPjBl2RMWjLNY=;
+        b=iGKR7BPzxlTPydduAq0v8pIhJ6wdcnSh/OD0BOf3JPwJhaKGIpgyfzxNVVsno3IxSk
+         94ftb7ERUeOR+k7GV6N9tfME68PSAIa7FT0fCrPSxJ4XtXUNW0Sxpt4c+r3POgSQ08US
+         FaT1dfZQX7YdOubY5+5rrc5dqPrYcVtBHVThbVSN7vzfFwGsjGO7mTxN//h98jK5CLI/
+         kqG2hBppfWalomp+6+UtZ3N9HoOiPqUgEMFr892G/lMgLeZs8DqvOmNwqIdfgijODRNf
+         /OZ7fCRT9l5TTar/cY2dSHq6Fo85kD6m6QN4gALE1KxkAauZUOB+VqDYFi+Yft1MzO6Z
+         MeFQ==
+X-Gm-Message-State: AC+VfDwWBxgF0ch9G+ntwZ2hGRYzM50U21IvwObcxOdwdv3cXvgurZRz
+        MbhfPw2gDAHLmZcoohdJC24/KQkX3PnhOybihMOQK2PXF+36+uSY2+Vcyr/Xodw7hiWs6OpJLQ7
+        O2umVy7uHoYg872m3HaONGgY=
+X-Received: by 2002:a17:907:1c07:b0:94f:956:b3f7 with SMTP id nc7-20020a1709071c0700b0094f0956b3f7mr18112720ejc.2.1687414477130;
+        Wed, 21 Jun 2023 23:14:37 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4kiHBugT6iJqkIz8a+U0lLXflhRfdcAKLD7sLp+R33WreQ6sCwEufnpAYyQ9KBgPCLpee+bA==
+X-Received: by 2002:a17:907:1c07:b0:94f:956:b3f7 with SMTP id nc7-20020a1709071c0700b0094f0956b3f7mr18112634ejc.2.1687414475008;
+        Wed, 21 Jun 2023 23:14:35 -0700 (PDT)
+Received: from redhat.com ([2.52.159.126])
+        by smtp.gmail.com with ESMTPSA id i7-20020a170906698700b009745417ca38sm4083600ejr.21.2023.06.21.23.14.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 23:14:34 -0700 (PDT)
+Date:   Thu, 22 Jun 2023 02:14:30 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Edward Liaw <edliaw@google.com>
+Cc:     linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Suwan Kim <suwan.kim027@gmail.com>,
+        "Roberts, Martin" <martin.roberts@intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] Revert "virtio-blk: support completion batching for
+ the IRQ path"
+Message-ID: <20230622021322-mutt-send-email-mst@kernel.org>
+References: <336455b4f630f329380a8f53ee8cad3868764d5c.1686295549.git.mst@redhat.com>
+ <ZJIuG9hyTYIIDbF5@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2205ef1e-9bb6-fb1e-9ca3-367c1afe12ac@roeck-us.net>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <ZJIuG9hyTYIIDbF5@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Guenter,
+On Tue, Jun 20, 2023 at 10:54:19PM +0000, Edward Liaw wrote:
+> On Fri, Jun 09, 2023 at 03:27:24AM -0400, Michael S. Tsirkin wrote:
+> > This reverts commit 07b679f70d73483930e8d3c293942416d9cd5c13.
+> This commit was also breaking kernel tests on a virtual Android device
+> (cuttlefish).  We were seeing hangups like:
+> 
+> [ 2889.910733] INFO: task kworker/u8:2:6312 blocked for more than 720 seconds.
+> [ 2889.910967]       Tainted: G           OE      6.2.0-mainline-g5c05cafa8df7-ab9969617 #1
+> [ 2889.911143] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [ 2889.911389] task:kworker/u8:2    state:D stack:12160 pid:6312  ppid:2      flags:0x00004000
+> [ 2889.911567] Workqueue: writeback wb_workfn (flush-254:57)
+> [ 2889.911771] Call Trace:
+> [ 2889.911831]  <TASK>
+> [ 2889.911893]  __schedule+0x55f/0x880
+> [ 2889.912021]  schedule+0x6a/0xc0
+> [ 2889.912110]  schedule_timeout+0x58/0x1a0
+> [ 2889.912200]  wait_for_common+0xf7/0x1b0
+> [ 2889.912289]  wait_for_completion+0x1c/0x40
+> [ 2889.912377]  f2fs_issue_checkpoint+0x14c/0x210
+> [ 2889.912504]  f2fs_sync_fs+0x4c/0xb0
+> [ 2889.912597]  f2fs_balance_fs_bg+0x2f6/0x340
+> [ 2889.912736]  ? can_migrate_task+0x39/0x2b0
+> [ 2889.912872]  f2fs_write_node_pages+0x77/0x240
+> [ 2889.912989]  do_writepages+0xde/0x240
+> [ 2889.913094]  __writeback_single_inode+0x3f/0x360
+> [ 2889.913231]  writeback_sb_inodes+0x320/0x5f0
+> [ 2889.913349]  ? move_expired_inodes+0x58/0x210
+> [ 2889.913470]  __writeback_inodes_wb+0x97/0x100
+> [ 2889.913587]  wb_writeback+0x17e/0x390
+> [ 2889.913682]  wb_workfn+0x35f/0x500
+> [ 2889.913774]  process_one_work+0x1d9/0x3b0
+> [ 2889.913870]  worker_thread+0x251/0x410
+> [ 2889.913960]  kthread+0xeb/0x110
+> [ 2889.914052]  ? __cfi_worker_thread+0x10/0x10
+> [ 2889.914168]  ? __cfi_kthread+0x10/0x10
+> [ 2889.914257]  ret_from_fork+0x29/0x50
+> [ 2889.914364]  </TASK>
+> [ 2889.914565] INFO: task mkdir09:6425 blocked for more than 720 seconds.
+> [ 2889.916065]       Tainted: G           OE      6.2.0-mainline-g5c05cafa8df7-ab9969617 #1
+> [ 2889.916255] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [ 2889.916450] task:mkdir09         state:D stack:13016 pid:6425  ppid:6423   flags:0x00004000
+> [ 2889.916656] Call Trace:
+> [ 2889.916900]  <TASK>
+> [ 2889.917004]  __schedule+0x55f/0x880
+> [ 2889.917129]  schedule+0x6a/0xc0
+> [ 2889.917273]  schedule_timeout+0x58/0x1a0
+> [ 2889.917425]  wait_for_common+0xf7/0x1b0
+> [ 2889.917535]  wait_for_completion+0x1c/0x40
+> [ 2889.917670]  f2fs_issue_checkpoint+0x14c/0x210
+> [ 2889.917844]  f2fs_sync_fs+0x4c/0xb0
+> [ 2889.917969]  f2fs_do_sync_file+0x3a8/0x8c0
+> [ 2889.918090]  ? mt_find+0xa0/0x1a0
+> [ 2889.918216]  f2fs_sync_file+0x2f/0x60
+> [ 2889.918310]  vfs_fsync_range+0x74/0x90
+> [ 2889.918567]  __se_sys_msync+0x176/0x270
+> [ 2889.918730]  __x64_sys_msync+0x1c/0x40
+> [ 2889.918873]  do_syscall_64+0x53/0xb0
+> [ 2889.918996]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [ 2889.919178] RIP: 0033:0x7540b08bcf47
+> [ 2889.919297] RSP: 002b:00007fff5fcbeea8 EFLAGS: 00000206 ORIG_RAX: 000000000000001a
+> [ 2889.919496] RAX: ffffffffffffffda RBX: 0000000000001000 RCX: 00007540b08bcf47
+> [ 2889.919828] RDX: 0000000000000004 RSI: 0000000000001000 RDI: 00007540b4ae7000
+> [ 2889.920227] RBP: 0000000000000000 R08: 721e0000010b0016 R09: 0000000000000003
+> [ 2889.920435] R10: 0000000000000100 R11: 0000000000000206 R12: 00005d2f95fd2f08
+> [ 2889.920793] R13: 00005d2f95fbc310 R14: 00007540b08e1bb8 R15: 00005d2f95fbc310
+> [ 2889.921072]  </TASK>
+> 
+> in random tests in the LTP (linux test project) test suite.
+> 
+> > ---
+> > 
+> > Since v1:
+> > 	fix build error
+> > 
+> > Still completely untested as I'm traveling.
+> > Martin, Suwan, could you please test and report?
+> > Suwan if you have a better revert in mind pls post and
+> > I will be happy to drop this.
+> > 
+> > Thanks!
+> > 
+> This revert appears to have resolved the test failures for me.
+> 
+> Tested-by: edliaw@google.com
 
-can you try this patch?
+Oh interesting, can you share how to reproduce the failures?
+Then maybe Suwan Kim can take a look at fixing up the patch.
 
-diff --git a/block/early-lookup.c b/block/early-lookup.c
-index a5be3c68ed079c..66e4514d671179 100644
---- a/block/early-lookup.c
-+++ b/block/early-lookup.c
-@@ -174,7 +174,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
- 	while (p > s && isdigit(p[-1]))
- 		p--;
- 	if (p == s || !*p || *p == '0')
--		return -EINVAL;
-+		return -ENODEV;
- 
- 	/* try disk name without <part number> */
- 	part = simple_strtoul(p, NULL, 10);
+-- 
+MST
+
