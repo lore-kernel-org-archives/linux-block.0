@@ -2,122 +2,214 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 331B4EB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 13:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C79BDEB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 13:54:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbjFVNwG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 09:52:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48194 "EHLO
+        id S230116AbjFVNyr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 09:54:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230050AbjFVNwF (ORCPT
+        with ESMTP id S230098AbjFVNyq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 09:52:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD6819AD
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 06:51:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687441884;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+froBx8zvPBtR/eIa8M7bzJNTnSzCJDlFkDT6qHX2Qc=;
-        b=RJDvEd3scWyJIvFtWtrtGjXmL75a6DKNMXMIFwbPfq4QOOYoPT+oZvGXVrEm/qbaV9i8Dn
-        5omihwJCNluQAJHE18y+uqn6oTjQqdAHSG8VQCaD7ypNe1kT2RHxh2YSsTCXUmzwVAqKmY
-        r1uEa5kRVeG8/NjXtVBr5p5+JtSf8UU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-vkccfEBqO3e6dLb-MV3YuA-1; Thu, 22 Jun 2023 09:51:22 -0400
-X-MC-Unique: vkccfEBqO3e6dLb-MV3YuA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D2433C15FA9;
-        Thu, 22 Jun 2023 13:51:22 +0000 (UTC)
-Received: from ovpn-8-19.pek2.redhat.com (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B45B422B0;
-        Thu, 22 Jun 2023 13:51:16 +0000 (UTC)
-Date:   Thu, 22 Jun 2023 21:51:12 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Message-ID: <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
-References: <20230620013349.906601-1-ming.lei@redhat.com>
- <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
- <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
- <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
- <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
- <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
- <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
- <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
+        Thu, 22 Jun 2023 09:54:46 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF5A118;
+        Thu, 22 Jun 2023 06:54:45 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-666e3b15370so4244516b3a.0;
+        Thu, 22 Jun 2023 06:54:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687442085; x=1690034085;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U9uei6ikJRas22Hwp4mZTaUlT0qL8iBQnmHCBvfcXwE=;
+        b=Kw978Z23e+L9swbJ/qPhWDxzJV/G86Wx25DJn0cTKvNiYACrmzp7BPZctuPoub+e7A
+         SzHfOnzp5yXISP7WfuVH7apwXlXoU8dBq93wopAFKfrK5PVe5ABShZf4FdHPVkf0G/5o
+         oUto5fvdibM432uwNFHFOLEQuBPwhbRg5i/mBJQ/KO5gRMtcXB8nuNoNjx66SQoEjU5a
+         qbvyJUojUiTFgAn3KuQ72WAr12vm3uPfSN57MMrQLtBsvX0b2Ao5XzzTJhV9gCwAqTaZ
+         TdI7VmpmMdYjeY+FaqUxH/p8idBD432Qz3d9XcrxyTFIPn14OQGqUpU4mfg8+YmvwVt6
+         M6Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687442085; x=1690034085;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U9uei6ikJRas22Hwp4mZTaUlT0qL8iBQnmHCBvfcXwE=;
+        b=MrwfljWi+uDOTdgueB7tiSZ+aR3M7dE9X7NEe3E42KGzN6Kp1/f3+bzkVepf/yo0Pt
+         t9eaUFWitU87/C6EaqQVrvan0xY8l9XJMRfL9tJBZqeJl1bYkPR1bdQlBYslKa2zCfnE
+         ca/VQQIkkqyBDNSF9ABq+r4sgv2rFMvQi/Xp5rlkO2IaH3om5cmqTlVPDr1nehRCe4Xg
+         tIGjk7oK0mAPkgu/BEZpU5M5i9iTf+8/e32R72X3yLYotSO/rdXumq17S+MPSqhgu0Yn
+         6sE/ONwMyG7SmN4YJW9zEWbKeDWH+mGKRNK4VMEUkyzSUKnVeDc8ze/mWHV066/Qju/1
+         sJuQ==
+X-Gm-Message-State: AC+VfDzYfhs5DrhT4SDorB7TfJ/BKH0gKmG7GcFoQMIlURa1HpEguw/B
+        zP0J768rDf9S0FcErZMybuU=
+X-Google-Smtp-Source: ACHHUZ4VL42ePsHWyAuI2cunIMNJN+2l9+MrvWkXvb25dMA29+z9x10vrON9kyt3JVkzTTwIqmP7Hw==
+X-Received: by 2002:a05:6a00:b83:b0:668:6eed:7c1b with SMTP id g3-20020a056a000b8300b006686eed7c1bmr15157991pfj.14.1687442084782;
+        Thu, 22 Jun 2023 06:54:44 -0700 (PDT)
+Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id n4-20020a635904000000b00553b9e0510esm4778946pgb.60.2023.06.22.06.54.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jun 2023 06:54:43 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <8e6c8365-5c2b-2bad-bf3c-df2d65cc8afa@roeck-us.net>
+Date:   Thu, 22 Jun 2023 06:54:41 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Joern Engel <joern@lazybastard.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
+References: <20230523074535.249802-1-hch@lst.de>
+ <20230523074535.249802-15-hch@lst.de>
+ <8c1992bc-110a-4dad-8643-766c14bf6fd4@roeck-us.net>
+ <20230622035149.GA4667@lst.de>
+ <2205ef1e-9bb6-fb1e-9ca3-367c1afe12ac@roeck-us.net>
+ <20230622060001.GA8351@lst.de>
+From:   Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH 14/24] init: clear root_wait on all invalid root= strings
+In-Reply-To: <20230622060001.GA8351@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 09:48:49AM -0600, Keith Busch wrote:
-> On Wed, Jun 21, 2023 at 09:27:31PM +0800, Ming Lei wrote:
-> > On Wed, Jun 21, 2023 at 01:13:05PM +0300, Sagi Grimberg wrote:
-> > > 
-> > > > > > > > Hello,
-> > > > > > > > 
-> > > > > > > > The 1st three patch fixes io hang when controller removal interrupts error
-> > > > > > > > recovery, then queue is left as frozen.
-> > > > > > > > 
-> > > > > > > > The 4th patch fixes io hang when controller is left as unquiesce.
-> > > > > > > 
-> > > > > > > Ming, what happened to nvme-tcp/rdma move of freeze/unfreeze to the
-> > > > > > > connect patches?
-> > > > > > 
-> > > > > > I'd suggest to handle all drivers(include nvme-pci) in same logic for avoiding
-> > > > > > extra maintain burden wrt. error handling, but looks Keith worries about the
-> > > > > > delay freezing may cause too many requests queued during error handling, and
-> > > > > > that might cause user report.
-> > > > > 
-> > > > > For nvme-tcp/rdma your patch also addresses IO not failing over because
-> > > > > they block on queue enter. So I definitely want this for fabrics.
-> > > > 
-> > > > The patch in the following link should fix these issues too:
-> > > > 
-> > > > https://lore.kernel.org/linux-block/ZJGmW7lEaipT6saa@ovpn-8-23.pek2.redhat.com/T/#u
-> > > > 
-> > > > I guess you still want the paired freeze patch because it makes freeze &
-> > > > unfreeze more reliable in error handling. If yes, I can make one fabric
-> > > > only change for you.
-> > > 
-> > > Not sure exactly what reliability is referred here.
-> > 
-> > freeze and unfreeze have to be called strictly in pair, but nvme calls
-> > the two from different contexts, so unfreeze may easily be missed, and
-> > causes mismatched freeze count. There has many such reports so far.
-> > 
-> > > I agree that there
-> > > is an issue with controller delete during error recovery. The patch
-> > > was a way to side-step it, great. But it addressed I/O blocked on enter
-> > > and not failing over.
-> > > 
-> > > So yes, for fabrics we should have it. I would argue that it would be
-> > > the right thing to do for pci as well. But I won't argue if Keith feels
-> > > otherwise.
-> > 
-> > Keith, can you update with us if you are fine with moving
-> > nvme_start_freeze() into nvme_reset_work() for nvme pci driver?
+On 6/21/23 23:00, Christoph Hellwig wrote:
+> Hi Guenter,
 > 
-> The point was to contain requests from entering while the hctx's are
-> being reconfigured. If you're going to pair up the freezes as you've
-> suggested, we might as well just not call freeze at all.
+> can you try this patch?
+> 
+> diff --git a/block/early-lookup.c b/block/early-lookup.c
+> index a5be3c68ed079c..66e4514d671179 100644
+> --- a/block/early-lookup.c
+> +++ b/block/early-lookup.c
+> @@ -174,7 +174,7 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
+>   	while (p > s && isdigit(p[-1]))
+>   		p--;
+>   	if (p == s || !*p || *p == '0')
+> -		return -EINVAL;
+> +		return -ENODEV;
+>   
+>   	/* try disk name without <part number> */
+>   	part = simple_strtoul(p, NULL, 10);
 
-blk_mq_update_nr_hw_queues() requires queue to be frozen.
+Not completely. Tests with root=/dev/sda still fail.
 
+"name" passed to devt_from_devname() is "sda".
 
-Thanks,
-Ming
+        for (p = s; *p; p++) {
+                 if (*p == '/')
+                         *p = '!';
+         }
+
+advances 'p' to the end of the string.
+
+         while (p > s && isdigit(p[-1]))
+		p--;
+
+moves it back to point to the first digit (if there is one).
+
+         if (p == s || !*p || *p == '0')
+		return -EINVAL;
+
+then fails because *p is 0. In other words, the function only accepts
+drive names with digits at the end (and the first digit must not be '0').
+
+I don't recall how I hit the other condition earlier. I have various
+"/dev/mmcblkX" in my tests, where X can be any number including 0.
+Maybe those fail randomly as well.
+
+Overall I am not sure though what an "invalid" devicename is supposed
+to be in this context. I have "sda", "sr0", "vda", "mtdblkX",
+"nvme0n1", "mmcblkX", and "hda". Why would any of those not be eligible
+for "rootwait" ?
+
+In practice, everything not ending with a digit, or ending with
+'0', fails the first test. Everything ending with a digit > 0
+fails the second test. But "humptydump3p4" passes all those tests.
+
+Guenter
+
+---
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+
+#define EINVAL1	1
+#define EINVAL2	2
+#define EINVAL3	3
+#define ENODEV	4
+
+static int devt_from_devname(const char *name)
+{
+         int part;
+         char s[32];
+         char *p;
+
+         if (strlen(name) > 31)
+                 return EINVAL1;
+
+         strcpy(s, name);
+         for (p = s; *p; p++) {
+                 if (*p == '/')
+                         *p = '!';
+         }
+
+         /*
+          * Try non-existent, but valid partition, which may only exist after
+          * opening the device, like partitioned md devices.
+          */
+         while (p > s && isdigit(p[-1]))
+                 p--;
+         if (p == s || !*p || *p == '0') {
+                 return EINVAL2;
+         }
+
+         /* try disk name without <part number> */
+         part = strtoul(p, NULL, 10);
+         *p = '\0';
+
+         /* try disk name without p<part number> */
+         if (p < s + 2 || !isdigit(p[-2]) || p[-1] != 'p') {
+                 return EINVAL3;
+         }
+         return ENODEV;
+}
+
+char *devnames[] = {
+     "sda",
+     "sda1",
+     "mmcblk0",
+     "mmcblk1",
+     "mtdblk0",
+     "mtdblk1",
+     "vda",
+     "hda",
+     "nvme0n1",
+     "sr0",
+     "sr1",
+     "humptydump3p4",
+     NULL
+};
+
+int main(int argc, char **argv)
+{
+	char *str;
+	int i;
+
+	for (i = 0, str = devnames[0]; str; str = devnames[++i]) {
+	    printf("%s: %d\n", str, devt_from_devname(str));
+	}
+}
 
