@@ -2,81 +2,174 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 310AFEB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 17:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B00EAEB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 17:53:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230186AbjFVRX7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 13:23:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55038 "EHLO
+        id S230306AbjFVRxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 13:53:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230013AbjFVRX4 (ORCPT
+        with ESMTP id S230060AbjFVRxk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 13:23:56 -0400
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD26D1FF6
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 10:23:52 -0700 (PDT)
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2553663f71eso3704665a91.3
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 10:23:52 -0700 (PDT)
+        Thu, 22 Jun 2023 13:53:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805DB2701
+        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 10:52:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687456360;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=46vg04rCWqnBcEfjOgg6c4cwQ2Em/pBNIxUfI3u2wTo=;
+        b=L9NhGwsUl1myxZUt5yzf7/N7lQCawPXPMcGzFYJ2EiRP6DBMuGQun29ARuaWpalT3hfyuG
+        rvOfMm+RcrpTHEYFYmnF0oya1xjLCOzQTRJG9zbzNlItow/fy/80JBOIF0Xl/V9EJSDVh3
+        AADRBn+6C32xzDHLt4vriBq6DNPtDN0=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-632-GZjgR6M6N0mxKC-0U6a0cA-1; Thu, 22 Jun 2023 13:52:38 -0400
+X-MC-Unique: GZjgR6M6N0mxKC-0U6a0cA-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-987a0365f77so379402166b.1
+        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 10:52:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687454632; x=1690046632;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1cIWatiJb15S4YPjXyuCPTSA8kG2aIcuZC8GEmD03k=;
-        b=bMMxOY9Y62OafrcBAAp2aJV9mSVEIZxB8ZMRuSh4hZY3EP0Ls6w+OdP4o6QmzhaTCL
-         3YU8y8ZyTsxzOlgZ901/dCBXjuiyOz7NbvflELzg0Zl9i7rR3bSikFaIeYKYWyNDgIim
-         L4McN2ASN0azGuM+CpCOUQZZrVqrXVZ7fI5sd88ft9TNsWjMdr17s11j/oCuapsbY+Oi
-         ShoF/PQmFCluhvoiN7UwiOS4vwvevXbHRYSK+1CtRxIAtwXsgXEbpYMyEh5MRG+xnGSK
-         xp1k0yQ1ViXMjpOsD46I12khUP/8dl9gzx2E8B5N6x9Z9e3A6SLMC+NitqSFkokhWCV8
-         AyLg==
-X-Gm-Message-State: AC+VfDyqLTjK+Nh7wfF3zXhdSvUI6fvUR2dYRJvjjw4FV3M+xAQkEFq1
-        PyFF+0+PUbitln3MxD4JufA=
-X-Google-Smtp-Source: ACHHUZ7h23g8fsnaUp2SUms4C0Aoq0NMCflNXjW2Q5ObCkUde93VULzkYoBgbl3COTL8a7Rb9jtN2Q==
-X-Received: by 2002:a17:90a:19d:b0:25e:8f0f:a131 with SMTP id 29-20020a17090a019d00b0025e8f0fa131mr12515637pjc.13.1687454631908;
-        Thu, 22 Jun 2023 10:23:51 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:b6a3:63a2:146b:3f29? ([2620:15c:211:201:b6a3:63a2:146b:3f29])
-        by smtp.gmail.com with ESMTPSA id z92-20020a17090a6d6500b0025efaf7a0d3sm26451pjj.14.2023.06.22.10.23.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jun 2023 10:23:51 -0700 (PDT)
-Message-ID: <32a2617a-0c41-fb6c-3cfe-7c832487a6b4@acm.org>
-Date:   Thu, 22 Jun 2023 10:23:47 -0700
+        d=1e100.net; s=20221208; t=1687456356; x=1690048356;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=46vg04rCWqnBcEfjOgg6c4cwQ2Em/pBNIxUfI3u2wTo=;
+        b=lJLaLx8QrtGT/avN9BQCYqSfhLEBsJSnpmbyIIRAdNYYJBMpNj3jH+4ppfAJxfpOZg
+         /v0r+n5Uqm7dKGMRTyCvKWfsxPx95jXwjfsh/IChKsGqxP5IXZ+GBaogroj87i4SFYmZ
+         X+4a3r5P2Py12BW/xEmd+9cQ4Eq7o3rbUXPq2FivPSCSNIJqp2rOje8w0Ky2bjYj5Dyw
+         H4XLzHh0JZ7cDB3DJd9l5+OJ+vZeUvGKHE/H61yz2O3z/IBKynr6P0ycfcus94iWikHQ
+         2j4cx3fOof0bkzD5GbTZOJdou1q8nY2VOrhd7VMDfz2FK9TwrI6/1IqprStJzGZz72bB
+         V2Tg==
+X-Gm-Message-State: AC+VfDzy0ZEfxlaar2ldeK+MAYIFETbN9QgO9He68PJL88hR0di5GOLa
+        51DVnKbeMZnGOunnngKDsKxjXeFBJ9+NZzUZ0x1dvbXSJN7Z68AgHd585QW51bgNXkujxKkWpXE
+        hwNPBYVJOcqAhyVqP0QDNk6c=
+X-Received: by 2002:a17:907:7e95:b0:987:350e:771a with SMTP id qb21-20020a1709077e9500b00987350e771amr15915302ejc.72.1687456356695;
+        Thu, 22 Jun 2023 10:52:36 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6exKxf71yvlJ+qFOwdh0qxw8LT5S9YrIKwORF8ZM/FRULuUP7x2/Rc12hOO4HPKl6m++Z+jg==
+X-Received: by 2002:a17:907:7e95:b0:987:350e:771a with SMTP id qb21-20020a1709077e9500b00987350e771amr15915291ejc.72.1687456356347;
+        Thu, 22 Jun 2023 10:52:36 -0700 (PDT)
+Received: from redhat.com ([2.52.149.110])
+        by smtp.gmail.com with ESMTPSA id s17-20020a170906bc5100b009889baa6a34sm4864089ejv.48.2023.06.22.10.52.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 10:52:35 -0700 (PDT)
+Date:   Thu, 22 Jun 2023 13:52:32 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Edward Liaw <edliaw@google.com>
+Cc:     linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Suwan Kim <suwan.kim027@gmail.com>,
+        "Roberts, Martin" <martin.roberts@intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] Revert "virtio-blk: support completion batching for
+ the IRQ path"
+Message-ID: <20230622135204-mutt-send-email-mst@kernel.org>
+References: <336455b4f630f329380a8f53ee8cad3868764d5c.1686295549.git.mst@redhat.com>
+ <ZJIuG9hyTYIIDbF5@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v4 3/7] block: Send requeued requests to the I/O scheduler
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>
-References: <20230621201237.796902-1-bvanassche@acm.org>
- <20230621201237.796902-4-bvanassche@acm.org>
- <989f9473-c17e-e85d-ab10-313182f7ac3b@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <989f9473-c17e-e85d-ab10-313182f7ac3b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJIuG9hyTYIIDbF5@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/21/23 18:19, Damien Le Moal wrote:
-> Why ? I still do not understand the need for this. There is always only a single
-> in-flight write per sequential zone. Requeuing that in-flight write directly to
-> the dispatch list will not reorder writes and it will be better for the command
-> latency.
-Hi Damien,
+On Tue, Jun 20, 2023 at 10:54:19PM +0000, Edward Liaw wrote:
+> On Fri, Jun 09, 2023 at 03:27:24AM -0400, Michael S. Tsirkin wrote:
+> > This reverts commit 07b679f70d73483930e8d3c293942416d9cd5c13.
+> This commit was also breaking kernel tests on a virtual Android device
+> (cuttlefish).  We were seeing hangups like:
+> 
+> [ 2889.910733] INFO: task kworker/u8:2:6312 blocked for more than 720 seconds.
+> [ 2889.910967]       Tainted: G           OE      6.2.0-mainline-g5c05cafa8df7-ab9969617 #1
+> [ 2889.911143] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [ 2889.911389] task:kworker/u8:2    state:D stack:12160 pid:6312  ppid:2      flags:0x00004000
+> [ 2889.911567] Workqueue: writeback wb_workfn (flush-254:57)
+> [ 2889.911771] Call Trace:
+> [ 2889.911831]  <TASK>
+> [ 2889.911893]  __schedule+0x55f/0x880
+> [ 2889.912021]  schedule+0x6a/0xc0
+> [ 2889.912110]  schedule_timeout+0x58/0x1a0
+> [ 2889.912200]  wait_for_common+0xf7/0x1b0
+> [ 2889.912289]  wait_for_completion+0x1c/0x40
+> [ 2889.912377]  f2fs_issue_checkpoint+0x14c/0x210
+> [ 2889.912504]  f2fs_sync_fs+0x4c/0xb0
+> [ 2889.912597]  f2fs_balance_fs_bg+0x2f6/0x340
+> [ 2889.912736]  ? can_migrate_task+0x39/0x2b0
+> [ 2889.912872]  f2fs_write_node_pages+0x77/0x240
+> [ 2889.912989]  do_writepages+0xde/0x240
+> [ 2889.913094]  __writeback_single_inode+0x3f/0x360
+> [ 2889.913231]  writeback_sb_inodes+0x320/0x5f0
+> [ 2889.913349]  ? move_expired_inodes+0x58/0x210
+> [ 2889.913470]  __writeback_inodes_wb+0x97/0x100
+> [ 2889.913587]  wb_writeback+0x17e/0x390
+> [ 2889.913682]  wb_workfn+0x35f/0x500
+> [ 2889.913774]  process_one_work+0x1d9/0x3b0
+> [ 2889.913870]  worker_thread+0x251/0x410
+> [ 2889.913960]  kthread+0xeb/0x110
+> [ 2889.914052]  ? __cfi_worker_thread+0x10/0x10
+> [ 2889.914168]  ? __cfi_kthread+0x10/0x10
+> [ 2889.914257]  ret_from_fork+0x29/0x50
+> [ 2889.914364]  </TASK>
+> [ 2889.914565] INFO: task mkdir09:6425 blocked for more than 720 seconds.
+> [ 2889.916065]       Tainted: G           OE      6.2.0-mainline-g5c05cafa8df7-ab9969617 #1
+> [ 2889.916255] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [ 2889.916450] task:mkdir09         state:D stack:13016 pid:6425  ppid:6423   flags:0x00004000
+> [ 2889.916656] Call Trace:
+> [ 2889.916900]  <TASK>
+> [ 2889.917004]  __schedule+0x55f/0x880
+> [ 2889.917129]  schedule+0x6a/0xc0
+> [ 2889.917273]  schedule_timeout+0x58/0x1a0
+> [ 2889.917425]  wait_for_common+0xf7/0x1b0
+> [ 2889.917535]  wait_for_completion+0x1c/0x40
+> [ 2889.917670]  f2fs_issue_checkpoint+0x14c/0x210
+> [ 2889.917844]  f2fs_sync_fs+0x4c/0xb0
+> [ 2889.917969]  f2fs_do_sync_file+0x3a8/0x8c0
+> [ 2889.918090]  ? mt_find+0xa0/0x1a0
+> [ 2889.918216]  f2fs_sync_file+0x2f/0x60
+> [ 2889.918310]  vfs_fsync_range+0x74/0x90
+> [ 2889.918567]  __se_sys_msync+0x176/0x270
+> [ 2889.918730]  __x64_sys_msync+0x1c/0x40
+> [ 2889.918873]  do_syscall_64+0x53/0xb0
+> [ 2889.918996]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [ 2889.919178] RIP: 0033:0x7540b08bcf47
+> [ 2889.919297] RSP: 002b:00007fff5fcbeea8 EFLAGS: 00000206 ORIG_RAX: 000000000000001a
+> [ 2889.919496] RAX: ffffffffffffffda RBX: 0000000000001000 RCX: 00007540b08bcf47
+> [ 2889.919828] RDX: 0000000000000004 RSI: 0000000000001000 RDI: 00007540b4ae7000
+> [ 2889.920227] RBP: 0000000000000000 R08: 721e0000010b0016 R09: 0000000000000003
+> [ 2889.920435] R10: 0000000000000100 R11: 0000000000000206 R12: 00005d2f95fd2f08
+> [ 2889.920793] R13: 00005d2f95fbc310 R14: 00007540b08e1bb8 R15: 00005d2f95fbc310
+> [ 2889.921072]  </TASK>
+> 
+> in random tests in the LTP (linux test project) test suite.
+> 
+> > ---
+> > 
+> > Since v1:
+> > 	fix build error
+> > 
+> > Still completely untested as I'm traveling.
+> > Martin, Suwan, could you please test and report?
+> > Suwan if you have a better revert in mind pls post and
+> > I will be happy to drop this.
+> > 
+> > Thanks!
+> > 
+> This revert appears to have resolved the test failures for me.
+> 
+> Tested-by: edliaw@google.com
 
-After having taken a closer look I see that blk_req_zone_write_unlock() 
-is called from inside dd_insert_request() when requeuing a request. 
-Hence, there is no reordering risk when requeuing a zoned write. I will 
-drop this patch.
 
-Do you agree with having one requeue list per hctx instead of per 
-request queue? This change enables eliminating 
-blk_mq_kick_requeue_list(). I think that's an interesting simplification 
-of the block layer API.
+Does Android have VIRTIO_BLK_F_ZONED ? Could you list the
+features this device has please? Thanks!
 
-Thanks,
+-- 
+MST
 
-Bart.
