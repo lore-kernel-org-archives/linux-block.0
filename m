@@ -2,87 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C94EB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 15:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BEEEB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 15:12:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbjFVPJ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 11:09:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46628 "EHLO
+        id S231966AbjFVPM4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 11:12:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbjFVPJy (ORCPT
+        with ESMTP id S232186AbjFVPMr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 11:09:54 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A84EB4
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 08:09:53 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id ca18e2360f4ac-7747cc8bea0so66467239f.1
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 08:09:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687446593; x=1690038593;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n3QcLKxgqXqc9TxaznnA+GDbShUxCQedNAGKPYu4oqM=;
-        b=3QyJ6ywKEGKckxsId+BjZWiDM+GYaX9QLbG3j5wawhxhh6Mt9rRKFCbV67G/k58/hu
-         i7KK/5cJk6aRhjP71gHh8+lw5cqAKg4DzIdFE5sMLXTXBzeDmssfBw7m1B2hlUNOr3pL
-         y1j+bCAEo5an4dk4Cxd0RW+fr2Qb4jrh8Zqe+OQEO0LF/9XH9H5iPJB7jCkeUfXvJIw7
-         Mmcx5uKfKpJMHOyU52h4nOAgX/7A12XtyyVjwEQ73/sqPXbcCkAiPX6BedFibuL5g7f/
-         6FElBiBDDbLRBI7FR8UFB4XNOq1LK4E8Gqppv8+HSlt8eIciu9PN0X5dW1tJBOIqyKf1
-         60vQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687446593; x=1690038593;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n3QcLKxgqXqc9TxaznnA+GDbShUxCQedNAGKPYu4oqM=;
-        b=MB+BA973/V9TRHAQfI3E0bfAhkga2IwGF4MfWYY1wuLFiXdbrCO3cf2xE1UojJV6zT
-         U9G0203rXMDAwkOlNpEHmkJbXXK/hCYWf+qMJlLL5kvf/ZEChyL7REP155I1dPb5ytts
-         Zhr9ed3rl/i3uoUes3v2/9/PotD5s11lTUuv4NI4V91OxyQ3YeDcTcEyJjJRhBBPBl92
-         Rhv/EV3+Pv0KnH777j1qMjYy43ufwief587WHCgQgawYUPapzFjqGsv//OoalCawgOSs
-         UMLmkcaUjQ7ffIbp33IS8TGP3nhORtcvsSeJBhsOCotPw2BcMCVga9p9D/4aaXPFJVnE
-         LMqw==
-X-Gm-Message-State: AC+VfDyWlfPM0pB+uM4vomGtwQpy/jei8Zx83njW3EjLWcoYIkWVOj2G
-        bWP3LWKPEUvgdWFI/NC2b/914hVw+4Dz2/Y3/p0=
-X-Google-Smtp-Source: ACHHUZ5ib9OoyU3EsPuLequVHz9N5n2W44QU/GijCiT6miXuP2tUJoXbIL49ArMqhr0ovZE/qqrUJw==
-X-Received: by 2002:a05:6e02:1207:b0:32a:8792:7248 with SMTP id a7-20020a056e02120700b0032a87927248mr16169123ilq.2.1687446592975;
-        Thu, 22 Jun 2023 08:09:52 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id d13-20020a92d78d000000b0033b27117120sm2105204iln.13.2023.06.22.08.09.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 08:09:52 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Guenter Roeck <linux@roeck-us.net>
-In-Reply-To: <20230622150644.600327-1-hch@lst.de>
-References: <20230622150644.600327-1-hch@lst.de>
-Subject: Re: [PATCH] block: don't return -EINVAL for not found names in
- devt_from_devname
-Message-Id: <168744659235.30871.12393942722171956862.b4-ty@kernel.dk>
-Date:   Thu, 22 Jun 2023 09:09:52 -0600
+        Thu, 22 Jun 2023 11:12:47 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A71C9199F;
+        Thu, 22 Jun 2023 08:12:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=iYO/2fIAfCy2gY0BGu2rVTSyHy9PvUmyfq9b+CT/AHE=; b=ufx4co6UqJ99ag8XLsIR4ALPKw
+        fTDJdNZ+76a3Cw+T38oD5j4wq9z6MWzqKvkqlbJ39z0fQTCJ5NJ0HRAtwxB6KH9dA9uvH0fKINzP7
+        wzMq3+wLFGhMkIxXcxOiNrr1+ImYYh0M09O9KAjJpEw7parxNZx31xjUcYCz0YI1UD20vJqwerzkB
+        Bxx12GvD+gO7G/HmDGts1cQhNwCi53idiZ/qLnCfiNPtavbxTFWC2VMoJ76fzQmCkp1i1XflVAW2x
+        xBNKPcTnzu/Qvhho7WwB5HUV+oYEDzlo6vt5cKYVnNd3sX1BBxR7i9+VoPe5dvsLUKohZILrNvInx
+        7H6X9Bfg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qCLz3-0015xg-2L;
+        Thu, 22 Jun 2023 15:12:29 +0000
+Date:   Thu, 22 Jun 2023 08:12:29 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org
+Subject: Re: [PATCH 2/2] bcache: Fix bcache device claiming
+Message-ID: <ZJRk3Y8LjGhEKqK6@infradead.org>
+References: <20230621162024.29310-1-jack@suse.cz>
+ <20230621162333.30027-2-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-d8b83
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621162333.30027-2-jack@suse.cz>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jun 21, 2023 at 06:23:27PM +0200, Jan Kara wrote:
+> Commit 2736e8eeb0cc ("block: use the holder as indication for exclusive
+> opens") introduced a change that blkdev_put() has to get exclusive
+> holder of the bdev as an argument. However it overlooked that
+> register_bdev() and register_cache() overwrite the bdev->bd_holder field
+> in the block device to point to the real owning object which was not
+> available at the time we called blkdev_get_by_path(). Messing with bdev
+> internals like this is a layering violation and it also causes
+> blkdev_put() to issue warning about mismatching holders.
 
-On Thu, 22 Jun 2023 17:06:44 +0200, Christoph Hellwig wrote:
-> When we didn't find a device and didn't guess it might be a partition,
-> it might still show up later, so don't disable rootwait for it by
-> returning -EINVAL.
-> 
-> 
+Ugg, yes.
 
-Applied, thanks!
+> Fix bcache to reopen the block device with appropriate holder once it is
+> available which also restores the behavior that multiple bcache caches
+> cannot claim the same device which was also broken by commit
+> 2736e8eeb0cc.
 
-[1/1] block: don't return -EINVAL for not found names in devt_from_devname
-      commit: 648fa60fa7de3ca6f6303e1721591ad73def9cf0
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+That was actually an intentional and documented change in commit
+29499ab060fe ("bcache: don't pass a stack address to
+blkdev_get_by_path") because the old behavior was broken already in
+addition to the changing of the block stuff underneath.  Not that I'm
+arguing against your changes here, but the commit log probably needs a
+bit of tweaking.
