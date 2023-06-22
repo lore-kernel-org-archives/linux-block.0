@@ -2,91 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D562DEB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 13:48:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 331B4EB64D8
+	for <linux-block@archiver.kernel.org>; Thu, 22 Jun 2023 13:52:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229914AbjFVNsc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Jun 2023 09:48:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47632 "EHLO
+        id S229628AbjFVNwG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Jun 2023 09:52:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229840AbjFVNsc (ORCPT
+        with ESMTP id S230050AbjFVNwF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Jun 2023 09:48:32 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2A7118
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 06:48:31 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6687b209e5aso1015287b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 06:48:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687441710; x=1690033710;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VFktY9FC/v0cPdpdf64j1Ie2wHP439HGYf6tFxhBVcM=;
-        b=vXUL0VErem8EcKKyP4ApMucyMO2JjPrXXRJsVU2xryjChX4J03icCFflLFaNdfki0L
-         JH6MnDjwbXL5i+kZUrZyko7L2S/6BaQPOXOmwf06sQCvZLNB5YjKSuszufgdRTDamLJ4
-         x+9sy7g6KnKw3DXQoivntkMNjUNwvIKpTgc3/nhW1jJQW0Daf4+DnubJURw26BiUUy00
-         j5je2E97bKaNHeU60nYHlQr5whEpLOsWYNdohaMnBW+t+rMDfYSqNF6u9V7H6ikUVnHl
-         EFSxUK/7XJZoo2ZxxCWX6fq8gkkqLalv0ZQQrc1uJnHmgA/a227sPPGYetDC7GJhxKjD
-         Opxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687441710; x=1690033710;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VFktY9FC/v0cPdpdf64j1Ie2wHP439HGYf6tFxhBVcM=;
-        b=azGJg4gAdlcxCo82J9f1gGlqS+j0G0TBIE3UQG+SNPSyxyA+NmAwJUcGG0bd2ONoUy
-         PF+1JKnWZel2hdW7/vzMcoaB41fUFLZH31EsefS1725i59v5dBi+67CIXQgYx9EAro4/
-         SPN22rbHRgHUvIeB2UCYWkTOObJ1APMHJjz+Y35/okuo3LjgRwGIxGmspV+HP080gf68
-         kqJAEE1tx3MNZovXacQg6nWHJgpMJRgnXhZ5yWR9EszmpSmHCKR0076OiTbv4OGw/ZG/
-         k8FrriAlesTziYd0zzDffZso6jgtOo0ynp/A0Q8l+Rm4Mz5GjIpxOKO6Wct0xizZeDsW
-         sjEw==
-X-Gm-Message-State: AC+VfDwUNpaD0rhMJqe9ThYEhZLNG0DMZCaia3Ys7KJ1T2e7/zcCLcsN
-        TE/mXIZVCdGPG8Pqpo/IKX5xuoZg+AU4ExySTuI=
-X-Google-Smtp-Source: ACHHUZ7i9QJqekc9rx3wLczR8Hh3OyeFRjgzfJafgInhkDo9Om+RdiBa4VnhbLW2z2I8oULQtkZvUg==
-X-Received: by 2002:a05:6a21:7899:b0:11f:c8f4:8418 with SMTP id bf25-20020a056a21789900b0011fc8f48418mr18061498pzc.4.1687441710262;
-        Thu, 22 Jun 2023 06:48:30 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c3-20020a63ef43000000b0054fd46531a1sm4921094pgk.5.2023.06.22.06.48.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 06:48:29 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Phillip Potter <phil@philpotter.co.uk>
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20230617113828.1230-1-phil@philpotter.co.uk>
-References: <20230617113828.1230-1-phil@philpotter.co.uk>
-Subject: Re: [PATCH 0/1] cdrom: spectre-v1 patch for 6.5
-Message-Id: <168744170928.15217.13556349226963095661.b4-ty@kernel.dk>
-Date:   Thu, 22 Jun 2023 07:48:29 -0600
+        Thu, 22 Jun 2023 09:52:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD6819AD
+        for <linux-block@vger.kernel.org>; Thu, 22 Jun 2023 06:51:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687441884;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+froBx8zvPBtR/eIa8M7bzJNTnSzCJDlFkDT6qHX2Qc=;
+        b=RJDvEd3scWyJIvFtWtrtGjXmL75a6DKNMXMIFwbPfq4QOOYoPT+oZvGXVrEm/qbaV9i8Dn
+        5omihwJCNluQAJHE18y+uqn6oTjQqdAHSG8VQCaD7ypNe1kT2RHxh2YSsTCXUmzwVAqKmY
+        r1uEa5kRVeG8/NjXtVBr5p5+JtSf8UU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-553-vkccfEBqO3e6dLb-MV3YuA-1; Thu, 22 Jun 2023 09:51:22 -0400
+X-MC-Unique: vkccfEBqO3e6dLb-MV3YuA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D2433C15FA9;
+        Thu, 22 Jun 2023 13:51:22 +0000 (UTC)
+Received: from ovpn-8-19.pek2.redhat.com (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B45B422B0;
+        Thu, 22 Jun 2023 13:51:16 +0000 (UTC)
+Date:   Thu, 22 Jun 2023 21:51:12 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        Chunguang Xu <brookxu.cn@gmail.com>
+Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
+Message-ID: <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
+References: <20230620013349.906601-1-ming.lei@redhat.com>
+ <86c10889-4d4a-1892-9779-a5f7b4e93392@grimberg.me>
+ <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
+ <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
+ <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
+ <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
+ <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
+ <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-d8b83
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Sat, 17 Jun 2023 12:38:27 +0100, Phillip Potter wrote:
-> Please apply the following patch from Jordy Zomer, which introduces a
-> spectre-v1 mitigation within the CDROM_MEDIA_CHANGED ioctl handler of
-> drivers/cdrom/cdrom.c, to your for-6.5/block branch.
+On Wed, Jun 21, 2023 at 09:48:49AM -0600, Keith Busch wrote:
+> On Wed, Jun 21, 2023 at 09:27:31PM +0800, Ming Lei wrote:
+> > On Wed, Jun 21, 2023 at 01:13:05PM +0300, Sagi Grimberg wrote:
+> > > 
+> > > > > > > > Hello,
+> > > > > > > > 
+> > > > > > > > The 1st three patch fixes io hang when controller removal interrupts error
+> > > > > > > > recovery, then queue is left as frozen.
+> > > > > > > > 
+> > > > > > > > The 4th patch fixes io hang when controller is left as unquiesce.
+> > > > > > > 
+> > > > > > > Ming, what happened to nvme-tcp/rdma move of freeze/unfreeze to the
+> > > > > > > connect patches?
+> > > > > > 
+> > > > > > I'd suggest to handle all drivers(include nvme-pci) in same logic for avoiding
+> > > > > > extra maintain burden wrt. error handling, but looks Keith worries about the
+> > > > > > delay freezing may cause too many requests queued during error handling, and
+> > > > > > that might cause user report.
+> > > > > 
+> > > > > For nvme-tcp/rdma your patch also addresses IO not failing over because
+> > > > > they block on queue enter. So I definitely want this for fabrics.
+> > > > 
+> > > > The patch in the following link should fix these issues too:
+> > > > 
+> > > > https://lore.kernel.org/linux-block/ZJGmW7lEaipT6saa@ovpn-8-23.pek2.redhat.com/T/#u
+> > > > 
+> > > > I guess you still want the paired freeze patch because it makes freeze &
+> > > > unfreeze more reliable in error handling. If yes, I can make one fabric
+> > > > only change for you.
+> > > 
+> > > Not sure exactly what reliability is referred here.
+> > 
+> > freeze and unfreeze have to be called strictly in pair, but nvme calls
+> > the two from different contexts, so unfreeze may easily be missed, and
+> > causes mismatched freeze count. There has many such reports so far.
+> > 
+> > > I agree that there
+> > > is an issue with controller delete during error recovery. The patch
+> > > was a way to side-step it, great. But it addressed I/O blocked on enter
+> > > and not failing over.
+> > > 
+> > > So yes, for fabrics we should have it. I would argue that it would be
+> > > the right thing to do for pci as well. But I won't argue if Keith feels
+> > > otherwise.
+> > 
+> > Keith, can you update with us if you are fine with moving
+> > nvme_start_freeze() into nvme_reset_work() for nvme pci driver?
 > 
-> Many thanks in advance.
-> 
-> Regards,
-> Phil
-> 
-> [...]
+> The point was to contain requests from entering while the hctx's are
+> being reconfigured. If you're going to pair up the freezes as you've
+> suggested, we might as well just not call freeze at all.
 
-Applied, thanks!
-
-[1/1] cdrom: Fix spectre-v1 gadget
-      commit: 8270cb10c0681d52fce508f827dfa1688d3acc3a
-
-Best regards,
--- 
-Jens Axboe
+blk_mq_update_nr_hw_queues() requires queue to be frozen.
 
 
+Thanks,
+Ming
 
