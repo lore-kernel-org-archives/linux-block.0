@@ -2,134 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D07EB64DD
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jun 2023 22:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44F9DEB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jun 2023 23:53:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232521AbjFWW5C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jun 2023 18:57:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37794 "EHLO
+        id S231270AbjFWXxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jun 2023 19:53:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjFWW5B (ORCPT
+        with ESMTP id S231634AbjFWXx2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jun 2023 18:57:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6BA2942
-        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 15:55:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687560949;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WiURs0vKXpYUCqXgawYZgqdOEVHMSUaWINzZV5vrdeY=;
-        b=NnzBFSsD21LmvjXJ5eNMokofQtHixWWBtMamiA4tJsRNqta7191Tnpp6cktmkWhsmaLwkQ
-        poBJBttsrZVL5cSxaID5VVty9cTCLgracSW1AZlTU19oBe/F5L6VQNj3Xh5TUTD7cUNvwJ
-        IYMgPkpWno0rdqNLj5o9aTiGe2PdnPM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-195--BFW1w5BP0WNexEK9_ZAZQ-1; Fri, 23 Jun 2023 18:55:46 -0400
-X-MC-Unique: -BFW1w5BP0WNexEK9_ZAZQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 23 Jun 2023 19:53:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FCF310F1
+        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 16:53:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 43846810BB2;
-        Fri, 23 Jun 2023 22:55:45 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 56CA84087C6D;
-        Fri, 23 Jun 2023 22:55:43 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org
-Subject: [PATCH net-next v5 10/16] drbd: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage()
-Date:   Fri, 23 Jun 2023 23:55:07 +0100
-Message-ID: <20230623225513.2732256-11-dhowells@redhat.com>
-In-Reply-To: <20230623225513.2732256-1-dhowells@redhat.com>
-References: <20230623225513.2732256-1-dhowells@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E3B060B54
+        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 23:53:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 82597C433CD;
+        Fri, 23 Jun 2023 23:53:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687564406;
+        bh=3Q9zDxeGA5JYZBffJc0C3zESYpx6ksvvU1Z7H8AviS0=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=G8zJbdSVO5SPcomA3l5kJbGWTD9dJoNXlX7ZnSCyFvDho9vpaN6F8eIuzNALNnHu+
+         RFvfhkc4FnT5hwX7y6ktu1UNaoST1pB6e+/iHRT/w0vvGcFFAZyg8Siv6RXLd4MSvn
+         Yc4zZofHxUQ7//hLWpuan/yq5EsDBcpmzTt7I8dA7XYIMMJGw8afycJ96Lj4NUPM1K
+         oBYc2VZXu/PpVuRCYRiG4aTqrEOpiyY93hXj49SGqKh6iagX5GoNIQtdmw34F7A7J/
+         dF6Ci16WcQkaES3SIOfYNuK1eksR5cQ6PwhyncPA7GDPXXdkTc3HmZgxE7JCYudpUT
+         PcEDVjHlUX4Og==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 703AAC43143;
+        Fri, 23 Jun 2023 23:53:26 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fix for 6.4-final
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <19981b0a-f3e2-ec8a-f413-5a9697472750@kernel.dk>
+References: <19981b0a-f3e2-ec8a-f413-5a9697472750@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <19981b0a-f3e2-ec8a-f413-5a9697472750@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.4-2023-06-23
+X-PR-Tracked-Commit-Id: 9c39b7a905d84b7da5f59d80f2e455853fea7217
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 9cb38381bac9f629fd4e7eafef27066c23c3eaf9
+Message-Id: <168756440645.22934.1718570757634474636.pr-tracker-bot@kernel.org>
+Date:   Fri, 23 Jun 2023 23:53:26 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use sendmsg() conditionally with MSG_SPLICE_PAGES in _drbd_send_page()
-rather than calling sendpage() or _drbd_no_send_page().
+The pull request you sent on Fri, 23 Jun 2023 12:52:04 -0600:
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Philipp Reisner <philipp.reisner@linbit.com>
-cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: drbd-dev@lists.linbit.com
-cc: linux-block@vger.kernel.org
-cc: netdev@vger.kernel.org
----
+> git://git.kernel.dk/linux.git tags/block-6.4-2023-06-23
 
-Notes:
-    ver #4)
-     - Don't look at msg.msg_iter after calling sendmsg.  There's no guarantee
-       it has changed.
-    
-    ver #2)
-     - Wrap lines at 80.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/9cb38381bac9f629fd4e7eafef27066c23c3eaf9
 
- drivers/block/drbd/drbd_main.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Thank you!
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 83987e7a5ef2..ea82d6733313 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -1540,6 +1540,8 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 		    int offset, size_t size, unsigned msg_flags)
- {
- 	struct socket *socket = peer_device->connection->data.socket;
-+	struct msghdr msg = { .msg_flags = msg_flags, };
-+	struct bio_vec bvec;
- 	int len = size;
- 	int err = -EIO;
- 
-@@ -1549,15 +1551,17 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 	 * put_page(); and would cause either a VM_BUG directly, or
- 	 * __page_cache_release a page that would actually still be referenced
- 	 * by someone, leading to some obscure delayed Oops somewhere else. */
--	if (drbd_disable_sendpage || !sendpage_ok(page))
--		return _drbd_no_send_page(peer_device, page, offset, size, msg_flags);
-+	if (!drbd_disable_sendpage && sendpage_ok(page))
-+		msg.msg_flags |= MSG_NOSIGNAL | MSG_SPLICE_PAGES;
- 
--	msg_flags |= MSG_NOSIGNAL;
- 	drbd_update_congested(peer_device->connection);
- 	do {
- 		int sent;
- 
--		sent = socket->ops->sendpage(socket, page, offset, len, msg_flags);
-+		bvec_set_page(&bvec, page, offset, len);
-+		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, len);
-+
-+		sent = sock_sendmsg(socket, &msg);
- 		if (sent <= 0) {
- 			if (sent == -EAGAIN) {
- 				if (we_should_drop_the_connection(peer_device->connection, socket))
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
