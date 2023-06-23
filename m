@@ -2,86 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEE0C0015E
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jun 2023 14:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25744EB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jun 2023 18:35:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232068AbjFWO1f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jun 2023 10:27:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57200 "EHLO
+        id S231270AbjFWSf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jun 2023 14:35:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231723AbjFWO1e (ORCPT
+        with ESMTP id S231433AbjFWSfM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jun 2023 10:27:34 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4274D1706
-        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 07:27:33 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1b515ec39feso1503575ad.0
-        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 07:27:33 -0700 (PDT)
+        Fri, 23 Jun 2023 14:35:12 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC91A3598
+        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 11:34:44 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3f9b9863bfdso14285e9.1
+        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 11:34:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687530453; x=1690122453;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1687545238; x=1690137238;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LTvsQhQg+h/6sjmrvelSIwmDtg13vMLMA+Amro1Li54=;
-        b=lXpJzgQNWwfs8mxsJzjqqN7vope1utG4AxzgV1/vHoC6RBwrpSRRPtaRCaLP37tdmi
-         797NlhGzETdYlK7zx8zHUhhqrxGCpcZZ5YphrtpNu59sv66LnViLrphqY3FuAcg91JBQ
-         8PEUiRIV/xD09ip0RfazefBvmurY0NWzj4L5q/Hi80PA9/gQlqm6wCmUv8IJ/2lPc08C
-         9njgSPAm7U5ZL/OWAE7lp3sSgMY55+l8DUnVbgMKl/Kg9XEjJ9r8pmkWPEZU2Yxo/4zy
-         rlwgZd3JRYWk/9qwwp2/8mI1qLHVShwVTIQLzAcsbC3PakTOIqEkwg7t+VFYzNdhBARH
-         yaxQ==
+        bh=NFzGjPYdkPeLa580A5dmqXwbEWChWY17BOjGL2B8RbQ=;
+        b=qW6H4KE5B00XuTN5plNqdMOvo2AcsM7NayQk94xU1WS8vp1h1GDa3dQsbIP7eRRlVH
+         6uS4TBIUqy/NN/sSc26InvNG3FU1VPGph1ngIw5hgBsqWA02WEXZXFHSqrnOPoczL4O+
+         hMGuT2psBlfIvbuf2cnN7WGAcAOuWu3/B9ByL1OWhl9+1TRk0Mkpq+SdJIzdibYlXbvy
+         0ujvQiuOWlon9FutKn6ncmUaaIPJ7itQGHLI5W23ZSAy34wnKfIzqw7FipCutnHCoilR
+         K2EoIY1uhzy8zVNHJ1L1vNgU1f8syQuot1r6rGAs6svBZoiKQYmE46moABzwvW+OZs++
+         B2jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687530453; x=1690122453;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1687545238; x=1690137238;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LTvsQhQg+h/6sjmrvelSIwmDtg13vMLMA+Amro1Li54=;
-        b=UQ5I6p/4zy85tLW98W83KosVQYqpcLynWMzibDOGaN09/cZTf75sr7WJNiIb+IzFc0
-         xO6synUo6dyW7lwXlLS54y24FzzJb42nQE9XuqLS6nApiigtoVflDD8sACoECtpg8+k7
-         gkDylgIMVK4hfoS9i7JGJdoE5bnulhHG3QDsvQGAQQrrmKPD4QhJdYrkMcebt17LC4gZ
-         zSVM+uStW9WPpT5PP1HUO0geAh4dJMaa5bx7aAHERlgmrfVXXSGNnw6hQlIF6vJr6RHg
-         jbOm73Lq8ydJjQRC81L+JwSyfb6G1Zh9GRmHn8P6niJtKDKVRKXBafRFhY48z0QZa4Xz
-         k1mw==
-X-Gm-Message-State: AC+VfDye16H3fOjKU06DXreMlfPYl1bVyAd0EsAVjb2CEjKU/6WFrSfX
-        wM86sqs+1aDiPSd8Q0HtE4PCsA==
-X-Google-Smtp-Source: ACHHUZ5/OXC0NppqoOq90GmL+bp8zjgBepblkSqpqUTQkpHQCO7r4kHc5KW2EGmCwT/GphvlPCNmjA==
-X-Received: by 2002:a17:903:230c:b0:1b2:1f12:acf with SMTP id d12-20020a170903230c00b001b21f120acfmr26082569plh.6.1687530452727;
-        Fri, 23 Jun 2023 07:27:32 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id lg13-20020a170902fb8d00b001b3ce619e2esm7291108plb.179.2023.06.23.07.27.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 07:27:31 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org
-In-Reply-To: <20230622165107.13687-1-jack@suse.cz>
-References: <20230622165107.13687-1-jack@suse.cz>
-Subject: Re: [PATCH] ext4: Fix warning in blkdev_put()
-Message-Id: <168753045157.468611.1058915697772264584.b4-ty@kernel.dk>
-Date:   Fri, 23 Jun 2023 08:27:31 -0600
+        bh=NFzGjPYdkPeLa580A5dmqXwbEWChWY17BOjGL2B8RbQ=;
+        b=h6N26DWwRA/NLdcY7NLxDiVv1oo0D06a9sB9gPu/yjPypYcNtk2Nz+zSv9eDuxWvm3
+         6Sza47TXXDXwykfHqL48Ex2YekvHeAZlpUVxo+4KQWu9Yp4dMy35uD6NTksBAT8jX5yA
+         LpZrPSmq0qg6JoiybR4hvxLDM8YIQsVwcJfAf131uAjd8RNIRq4yaBi//23Oa0aAKm5e
+         +VDsOOkO3LWQY6Se1V+kQD3ukPi680zGCwLs8dFVd1TPXsCJpiCXRmtEFHNF8rTn42nF
+         T2I2u3y/x7jkINj8Da+S7FkHGEQdYca6njMfebizrh0rfEgz6QRX/6/hbkocp7Iu2hBJ
+         +HQA==
+X-Gm-Message-State: AC+VfDxP2XNzeSjDHN1G9q4AyD2HPGDCICZBamm5HqhlKqMCiSwR66qH
+        EcvgaoeigJM88P+9lwTpu0EHzNvnS/fYDSHSy44s8A==
+X-Google-Smtp-Source: ACHHUZ7SyfhzGYKjueUbwB9hivD6Fub9obDC2CF5SuQNrl1nrzFpcm6h5ad2Q+GR4NjCSuFyWFC8VN0NLoy5ZAorXtQ=
+X-Received: by 2002:a05:600c:3b84:b0:3f7:3e85:36a with SMTP id
+ n4-20020a05600c3b8400b003f73e85036amr121483wms.7.1687545237987; Fri, 23 Jun
+ 2023 11:33:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-d8b83
+References: <336455b4f630f329380a8f53ee8cad3868764d5c.1686295549.git.mst@redhat.com>
+ <ZJIuG9hyTYIIDbF5@google.com> <20230622135204-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230622135204-mutt-send-email-mst@kernel.org>
+From:   Edward Liaw <edliaw@google.com>
+Date:   Fri, 23 Jun 2023 11:33:31 -0700
+Message-ID: <CAG4es9VgFAcw5cuj8ErD8KqJ8P_eEgA+yXBCUeu_xp9Qp6M0hg@mail.gmail.com>
+Subject: Re: [PATCH v2] Revert "virtio-blk: support completion batching for
+ the IRQ path"
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Suwan Kim <suwan.kim027@gmail.com>,
+        "Roberts, Martin" <martin.roberts@intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jun 21, 2023 at 11:14=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
+> wrote:
+> Oh interesting, can you share how to reproduce the failures?
+> Then maybe Suwan Kim can take a look at fixing up the patch.
 
-On Thu, 22 Jun 2023 18:51:07 +0200, Jan Kara wrote:
-> ext4_blkdev_remove() passes a wrong holder pointer to blkdev_put() which
-> triggers a warning there. Fix it.
-> 
-> 
+I did not have a deterministic way to reproduce the failure.  I ran
+these test suites 5x consecutively and that seemed to fail often
+enough to let me bisect it.
 
-Applied, thanks!
+I checked out the kernel at d645c62fd19af9c9246150a958450ffd26ad0bfa
+Merge 84cc6674b76b ("Merge tag 'for_linus' of
+git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost") into
+android-mainline, built it, and ran cuttlefish with the following
+configuration:
+tools/bazel run
+//common-modules/virtual-device:virtual_device_x86_64_dist  # builds
+the kernel with bazel
+acloud create --local-instance --local-kernel-image
+$ANDROID_MAINLINE/out/virtual_device_x86_64/dist --branch aosp-master
+--build-target aosp_cf_x86_64_phone-userdebug  # run cuttlefish with
+custom kernel
 
-[1/1] ext4: Fix warning in blkdev_put()
-      commit: a42fb5a75ccc37dfd69aa9bde5ba2866e802ff3c
+And ran the following tests:
+atest --rerun-until-failure 5 vab_legacy_tests vts_core_liblp_test
+vts_libdm_test vts_libsnapshot_test vts_ltp_test_x86_64
 
-Best regards,
--- 
-Jens Axboe
+I'm not sure if that will be helpful for you, though.
 
+On Thu, Jun 22, 2023 at 10:53=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com=
+> wrote:
+>
+> Does Android have VIRTIO_BLK_F_ZONED ? Could you list the
+> features this device has please? Thanks!
 
+It does not.
 
+$ cat /sys/block/vda/device/driver/virtio*/features
+001000100100111000000000000001001000000000000000000000000000000
+VIRTIO_BLK_F_SEG_MAX
+VIRTIO_BLK_F_BLK_SIZE
+VIRTIO_BLK_F_FLUSH
+VIRTIO_BLK_F_MQ
+VIRTIO_BLK_F_DISCARD
+VIRTIO_BLK_F_WRITE_ZEROES
