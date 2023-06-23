@@ -2,118 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25744EB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 23 Jun 2023 18:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46DE5EB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 23 Jun 2023 18:52:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231270AbjFWSf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Jun 2023 14:35:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45270 "EHLO
+        id S229484AbjFWSwI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Jun 2023 14:52:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231433AbjFWSfM (ORCPT
+        with ESMTP id S231132AbjFWSwI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jun 2023 14:35:12 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC91A3598
-        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 11:34:44 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3f9b9863bfdso14285e9.1
-        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 11:34:44 -0700 (PDT)
+        Fri, 23 Jun 2023 14:52:08 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C8B8199D
+        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 11:52:07 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1b50a419ab6so1379425ad.1
+        for <linux-block@vger.kernel.org>; Fri, 23 Jun 2023 11:52:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687545238; x=1690137238;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687546326; x=1690138326;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NFzGjPYdkPeLa580A5dmqXwbEWChWY17BOjGL2B8RbQ=;
-        b=qW6H4KE5B00XuTN5plNqdMOvo2AcsM7NayQk94xU1WS8vp1h1GDa3dQsbIP7eRRlVH
-         6uS4TBIUqy/NN/sSc26InvNG3FU1VPGph1ngIw5hgBsqWA02WEXZXFHSqrnOPoczL4O+
-         hMGuT2psBlfIvbuf2cnN7WGAcAOuWu3/B9ByL1OWhl9+1TRk0Mkpq+SdJIzdibYlXbvy
-         0ujvQiuOWlon9FutKn6ncmUaaIPJ7itQGHLI5W23ZSAy34wnKfIzqw7FipCutnHCoilR
-         K2EoIY1uhzy8zVNHJ1L1vNgU1f8syQuot1r6rGAs6svBZoiKQYmE46moABzwvW+OZs++
-         B2jg==
+        bh=0SNxTz1oFauVPvNiVWRIfhE/XRZR9Aw9V331nHi9QOE=;
+        b=XpdGxOmCOvgG7AuF6vqzEceoN6pjR04hvi9mTO3ehwjcTSHi2tLTzKsq61A7MizZdj
+         Y5hDAJnnBhnhkjdShReWFJCX5FwPwQC8AIoG/e9N4slP05Y1qFFocrBs4OEwem5WgrWB
+         vL9GSDx4H8vc8+eNhuRJCRoaCppspAHIECH0ubAiBSgXrhgdxR33RvS2DN6y3vcQpC+l
+         YVj2BBQytadz2EgCUJ1nGCp+1+ZEPnvUR/nPaUZ8w12ckCs/oXLPJc9gxBT9i6qNF6Kg
+         D5/iXTNlZhfiZTh4DbZIhal+k6v2quGCrV6136y06cHps47ZFZLkMnEsn/o6gc6i29+0
+         Opng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687545238; x=1690137238;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NFzGjPYdkPeLa580A5dmqXwbEWChWY17BOjGL2B8RbQ=;
-        b=h6N26DWwRA/NLdcY7NLxDiVv1oo0D06a9sB9gPu/yjPypYcNtk2Nz+zSv9eDuxWvm3
-         6Sza47TXXDXwykfHqL48Ex2YekvHeAZlpUVxo+4KQWu9Yp4dMy35uD6NTksBAT8jX5yA
-         LpZrPSmq0qg6JoiybR4hvxLDM8YIQsVwcJfAf131uAjd8RNIRq4yaBi//23Oa0aAKm5e
-         +VDsOOkO3LWQY6Se1V+kQD3ukPi680zGCwLs8dFVd1TPXsCJpiCXRmtEFHNF8rTn42nF
-         T2I2u3y/x7jkINj8Da+S7FkHGEQdYca6njMfebizrh0rfEgz6QRX/6/hbkocp7Iu2hBJ
-         +HQA==
-X-Gm-Message-State: AC+VfDxP2XNzeSjDHN1G9q4AyD2HPGDCICZBamm5HqhlKqMCiSwR66qH
-        EcvgaoeigJM88P+9lwTpu0EHzNvnS/fYDSHSy44s8A==
-X-Google-Smtp-Source: ACHHUZ7SyfhzGYKjueUbwB9hivD6Fub9obDC2CF5SuQNrl1nrzFpcm6h5ad2Q+GR4NjCSuFyWFC8VN0NLoy5ZAorXtQ=
-X-Received: by 2002:a05:600c:3b84:b0:3f7:3e85:36a with SMTP id
- n4-20020a05600c3b8400b003f73e85036amr121483wms.7.1687545237987; Fri, 23 Jun
- 2023 11:33:57 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687546326; x=1690138326;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0SNxTz1oFauVPvNiVWRIfhE/XRZR9Aw9V331nHi9QOE=;
+        b=jkUnBFHqkhzB16TpW3MQz7g7WdfIYY/HLVtobcWLCQYBOts5Lc4T+rgtYHOs1uRa1N
+         XLphHJ9l+0nOgh82peV/g2i1JJps81kpNPHxlMpP5XtbHfdCzhl16B6mD/Albl7dE+Ve
+         DEWEY3WVStY2VMOcmbVty7/x2VVpfgIKnfcJV2/kvdMaTBv90pjquxxDf0IJ2tPm4Ua8
+         H59s/KaOprzt4NPLt0vhdqhjLXUc87b6MRwFoPMDlfhqLk9FJJH6EKNpJKQwhy67ix/3
+         iqhD/sbuyX7eGpE+IW7Q0T50ULZN712AYfEmwuVmGu+NNWOBjcp1ubYftV6kkaDCYZLG
+         /Tpw==
+X-Gm-Message-State: AC+VfDz6pvMUUH7uOaN49SFiDRbjiB/lwCOUeqDdNKNoTWreajKgwhLE
+        QEm2aptKgI4PRRqs+sY6SBRBITT6k0KcZChfFE8=
+X-Google-Smtp-Source: ACHHUZ5ihnKSReJdhqlKPI9Y7ppOsd5asxe2Jdq2c+n+PTVN/T7AmQGqvj81rVvJMzt9pfbG4lYKBg==
+X-Received: by 2002:a17:903:1105:b0:1b3:ebda:654e with SMTP id n5-20020a170903110500b001b3ebda654emr25711774plh.5.1687546326393;
+        Fri, 23 Jun 2023 11:52:06 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id q8-20020a17090311c800b001ac94b33ab1sm7508385plh.304.2023.06.23.11.52.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jun 2023 11:52:05 -0700 (PDT)
+Message-ID: <19981b0a-f3e2-ec8a-f413-5a9697472750@kernel.dk>
+Date:   Fri, 23 Jun 2023 12:52:04 -0600
 MIME-Version: 1.0
-References: <336455b4f630f329380a8f53ee8cad3868764d5c.1686295549.git.mst@redhat.com>
- <ZJIuG9hyTYIIDbF5@google.com> <20230622135204-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230622135204-mutt-send-email-mst@kernel.org>
-From:   Edward Liaw <edliaw@google.com>
-Date:   Fri, 23 Jun 2023 11:33:31 -0700
-Message-ID: <CAG4es9VgFAcw5cuj8ErD8KqJ8P_eEgA+yXBCUeu_xp9Qp6M0hg@mail.gmail.com>
-Subject: Re: [PATCH v2] Revert "virtio-blk: support completion batching for
- the IRQ path"
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
-        Suwan Kim <suwan.kim027@gmail.com>,
-        "Roberts, Martin" <martin.roberts@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 6.4-final
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 11:14=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
-> Oh interesting, can you share how to reproduce the failures?
-> Then maybe Suwan Kim can take a look at fixing up the patch.
+Hi Linus,
 
-I did not have a deterministic way to reproduce the failure.  I ran
-these test suites 5x consecutively and that seemed to fail often
-enough to let me bisect it.
+It's apparently the week of "fixup something from last week", because
+the same is true for this block pull request.
 
-I checked out the kernel at d645c62fd19af9c9246150a958450ffd26ad0bfa
-Merge 84cc6674b76b ("Merge tag 'for_linus' of
-git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost") into
-android-mainline, built it, and ran cuttlefish with the following
-configuration:
-tools/bazel run
-//common-modules/virtual-device:virtual_device_x86_64_dist  # builds
-the kernel with bazel
-acloud create --local-instance --local-kernel-image
-$ANDROID_MAINLINE/out/virtual_device_x86_64/dist --branch aosp-master
---build-target aosp_cf_x86_64_phone-userdebug  # run cuttlefish with
-custom kernel
+Fix up a lock grab that needs to be IRQ saving, rather than just IRQ
+disabling, in the block cgroup code.
 
-And ran the following tests:
-atest --rerun-until-failure 5 vab_legacy_tests vts_core_liblp_test
-vts_libdm_test vts_libsnapshot_test vts_ltp_test_x86_64
+Please pull!
 
-I'm not sure if that will be helpful for you, though.
 
-On Thu, Jun 22, 2023 at 10:53=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
->
-> Does Android have VIRTIO_BLK_F_ZONED ? Could you list the
-> features this device has please? Thanks!
+The following changes since commit 20cb1c2fb7568a6054c55defe044311397e01ddb:
 
-It does not.
+  blk-cgroup: Flush stats before releasing blkcg_gq (2023-06-11 19:49:29 -0600)
 
-$ cat /sys/block/vda/device/driver/virtio*/features
-001000100100111000000000000001001000000000000000000000000000000
-VIRTIO_BLK_F_SEG_MAX
-VIRTIO_BLK_F_BLK_SIZE
-VIRTIO_BLK_F_FLUSH
-VIRTIO_BLK_F_MQ
-VIRTIO_BLK_F_DISCARD
-VIRTIO_BLK_F_WRITE_ZEROES
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.4-2023-06-23
+
+for you to fetch changes up to 9c39b7a905d84b7da5f59d80f2e455853fea7217:
+
+  block: make sure local irq is disabled when calling __blkcg_rstat_flush (2023-06-22 07:44:00 -0600)
+
+----------------------------------------------------------------
+block-6.4-2023-06-23
+
+----------------------------------------------------------------
+Ming Lei (1):
+      block: make sure local irq is disabled when calling __blkcg_rstat_flush
+
+ block/blk-cgroup.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+-- 
+Jens Axboe
+
