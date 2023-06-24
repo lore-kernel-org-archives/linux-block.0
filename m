@@ -2,111 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48BABEB64DA
-	for <linux-block@archiver.kernel.org>; Sat, 24 Jun 2023 13:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF2EEB64DA
+	for <linux-block@archiver.kernel.org>; Sat, 24 Jun 2023 15:24:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbjFXNCC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Jun 2023 09:02:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56030 "EHLO
+        id S233036AbjFXPYf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Jun 2023 11:24:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjFXNCB (ORCPT
+        with ESMTP id S231407AbjFXPYe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Jun 2023 09:02:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87212F3
-        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 06:01:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687611673;
+        Sat, 24 Jun 2023 11:24:34 -0400
+Received: from out-51.mta1.migadu.com (out-51.mta1.migadu.com [IPv6:2001:41d0:203:375::33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A070BE
+        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 08:24:33 -0700 (PDT)
+Message-ID: <70ade937-1f94-52a3-7add-b43d3b79e471@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1687620269;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=yzQK4nAaXgWnFMPuDqivgdDdDiFxTwgrcvdQj+2zIHA=;
-        b=dwxKA4iTQBZc2savCdtNDAt1YlnU5SgLAF4/j6MdTw+pjORayN3kLNx2u5n0TtyUBIiv2B
-        O+3PYlKmbzYv+wsKmpnnqI9xOGO6P12jOq7nlhYt54TVAToatYTc51vkNL7fM1AB4vxP4v
-        4ICSEkBaoP4IZbp5u+MlUkVCD234BOU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-226--Tnam5mpMc-JgL5P-eF17A-1; Sat, 24 Jun 2023 09:01:10 -0400
-X-MC-Unique: -Tnam5mpMc-JgL5P-eF17A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C73EF8E44E2;
-        Sat, 24 Jun 2023 13:01:09 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E9AD72166B25;
-        Sat, 24 Jun 2023 13:01:08 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Guangwu Zhang <guazhang@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] blk-mq: fix two misuses on RQF_USE_SCHED
-Date:   Sat, 24 Jun 2023 21:01:05 +0800
-Message-Id: <20230624130105.1443879-1-ming.lei@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L847Z/bfhdpzZCa7enwUjky+WHNRgKn/tnqWKrdAgwg=;
+        b=ZBtcsnr7Gxhz9QxbSy4XAeGU/NKIsReDYjrRoLYMn/1nb+CmQYH/V/j0GK6kLMBb+ZeGka
+        b+TVV6plYkNj6pmz3X3uG8GErqiU2WSVALvNU/SIUE7/+cd2u72uZ5U293j2tQ8Ko6d6vE
+        apoxccqIOZK337h0cjTV6F0LlA3CbzE=
+Date:   Sat, 24 Jun 2023 23:24:04 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Subject: Re: [PATCH] blk-mq: fix incorrect rq start_time_ns and alloc_time_ns
+ after throttled
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chengming Zhou <zhouchengming@bytedance.com>
+References: <20230601053919.3639954-1-chengming.zhou@linux.dev>
+ <ZH4p8tqFc57_OYoH@slm.duckdns.org>
+ <c82d6bab-36d0-0403-9304-4415f6ffd972@linux.dev>
+ <ZIJco7_jaVaxpxSR@slm.duckdns.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <ZIJco7_jaVaxpxSR@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Request allocated from sched tags can't be issued via ->queue_rqs()
-directly, since driver tag isn't allocated yet. This is the 1st misuse
-of RQF_USE_SCHED for figuring out plug->has_elevator.
+Hello,
 
-Request allocated from sched tags can't be ended by
-blk_mq_end_request_batch() too, fix the 2nd RQF_USE_SCHED misuse
-in blk_mq_add_to_batch().
+On 2023/6/9 06:56, Tejun Heo wrote:
+> Hello,
+> 
+> On Tue, Jun 06, 2023 at 06:22:28PM +0800, Chengming Zhou wrote:
+> ...
+>> But for plug batched allocation introduced by the commit 47c122e35d7e
+>> ("block: pre-allocate requests if plug is started and is a batch"), we can
+>> rq_qos_throttle() after the allocation of the request. This is what the
+>> blk_mq_get_cached_request() does.
+>>
+>> In this case, the cached request alloc_time_ns or start_time_ns is much ahead
+>> if block in any qos ->throttle().
+> 
+> Ah, okay, that's problematic.
+> 
 
-Without this patch, NVMe uring cmd passthrough IO workload can run into
-hang easily with real io scheduler.
+Thanks for your review!
 
-Fixes: dd6216bb16e8 ("blk-mq: make sure elevator callbacks aren't called for passthrough request")
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Closes: https://lore.kernel.org/linux-block/CAGS2=YrBjpLPOKa-gzcKuuOG60AGth5794PNCDwatdnnscB9ug@mail.gmail.com/
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c         | 6 +++++-
- include/linux/blk-mq.h | 6 +++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+Sorry for my delay, I was out of the office.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1628873d7587..0aba08a9ded6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1302,7 +1302,11 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
- 
- 	if (!plug->multiple_queues && last && last->q != rq->q)
- 		plug->multiple_queues = true;
--	if (!plug->has_elevator && (rq->rq_flags & RQF_USE_SCHED))
-+	/*
-+	 * Any request allocated from sched tags can't be issued to
-+	 * ->queue_rqs() directly
-+	 */
-+	if (!plug->has_elevator && (rq->rq_flags & RQF_SCHED_TAGS))
- 		plug->has_elevator = true;
- 	rq->rq_next = NULL;
- 	rq_list_add(&plug->mq_list, rq);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index fa265e85d753..12103d5654f5 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -852,7 +852,11 @@ static inline bool blk_mq_add_to_batch(struct request *req,
- 				       struct io_comp_batch *iob, int ioerror,
- 				       void (*complete)(struct io_comp_batch *))
- {
--	if (!iob || (req->rq_flags & RQF_USE_SCHED) || ioerror ||
-+	/*
-+	 * blk_mq_end_request_batch() can't end request allocated from
-+	 * sched tags
-+	 */
-+	if (!iob || (req->rq_flags & RQF_SCHED_TAGS) || ioerror ||
- 			(req->end_io && !blk_rq_is_passthrough(req)))
- 		return false;
- 
--- 
-2.40.1
+>>>> This patch add nr_flush counter in blk_plug, so we can tell if the task
+>>>> has throttled in any qos ->throttle(), in which case we need to correct
+>>>> the rq start_time_ns and alloc_time_ns.
+>>>>
+>>>> Another solution may be make rq_qos_throttle() return bool to indicate
+>>>> if it has throttled in any qos ->throttle(). But this need more changes.
+>>>>
+>>>> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+>>>
+>>> Depending on the flush behavior and adjusting alloc_time_ns seems fragile to
+>>> me and will likely confuse other users of alloc_time_ns too.
+>>
+>> I agree with you, this code is not good. My basic idea is to adjust the cached
+>> request alloc_time_ns and start_time_ns when throttled.
+> 
+> Would it make sense to skip setting the alloc_time_ns during pre-allocation
+> and set it later when the pre-allocated rq is actually used? That should
+> jive better.
+> 
 
+Ok, I think it's much clearer that we set the alloc_time_ns and start_time_ns
+to "now" when the pre-allocated rq is actually used.
+
+I will send an updated version later.
+
+Thanks.
