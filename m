@@ -2,135 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 635DEEB64DA
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 01:54:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75236EB64DD
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 04:51:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230169AbjFYBy2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Jun 2023 21:54:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37738 "EHLO
+        id S230458AbjFYEvO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jun 2023 00:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229905AbjFYBy1 (ORCPT
+        with ESMTP id S231128AbjFYEvI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Jun 2023 21:54:27 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E25210C9
-        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 18:54:25 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QpYth54qNz4f3v5R
-        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 09:54:20 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-        by APP4 (Coremail) with SMTP id gCh0CgA30JNJnpdkw_XiMQ--.23029S4;
-        Sun, 25 Jun 2023 09:54:19 +0800 (CST)
-From:   Hou Tao <houtao@huaweicloud.com>
-To:     Dan Williams <dan.j.williams@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Cc:     linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
-        virtualization@lists.linux-foundation.org, houtao1@huawei.com
-Subject: [PATCH v3] virtio_pmem: add the missing REQ_OP_WRITE for flush bio
-Date:   Sun, 25 Jun 2023 10:26:33 +0800
-Message-Id: <20230625022633.2753877-1-houtao@huaweicloud.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <ZJL3+E5P+Yw5jDKy@infradead.org>
-References: <ZJL3+E5P+Yw5jDKy@infradead.org>
+        Sun, 25 Jun 2023 00:51:08 -0400
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3801DE5D
+        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 21:50:42 -0700 (PDT)
+Received: by mail-ot1-x333.google.com with SMTP id 46e09a7af769-6b5d7e60015so2054697a34.0
+        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 21:50:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1687668641; x=1690260641;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WAXKmRxn/lGVEXnXeDsvJ+fu3YmCBSEAvX8M4/5L5VA=;
+        b=bMuj7cwDdoXKISTDkzptBDyzYxrmMPhttiVwFLmhishVLlAo/0wcnWwOOKc5KaDNXp
+         0k1HqVrE8Hx7iR7I7S4xdgjAcc5RhvCF5AELHTGX1kf+O9BpKUzHAOBQSa1iEErhttPG
+         3b8+RInnKIdo158WvXe5DmpQDrKtM/VZ8zy1c1yjNq1BiAywsa7z+uXaapI0WPiNEIN2
+         xYurTWq7Vuo8HrBQaeEzXCMEGA27/vW97vRYC2U9pTOkepUYpTbHjrTJjbKUb4nmrFuu
+         bKGTE90OMX8RqnCmlESML1SKSVkVZ1RzSxXEdsvuOjJYEyq854vI3FsIqHl2KEiBEsFI
+         y2sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687668641; x=1690260641;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WAXKmRxn/lGVEXnXeDsvJ+fu3YmCBSEAvX8M4/5L5VA=;
+        b=Vh10fALvqPpGbscpVyVlgdj/DcHKs8NI+rrkw/8t077Qw7UR8Xe78AsaEIYZmyrLyo
+         iEiaRd4l5HT+34dG4NU7Tj/+E1FAm13jMebOg6anzejl0w7d32ugXv3ucUrYjaztnFxD
+         /o5s8if2jbsDldq2PDYEVr1erbbcBsDf0tJnbrxs1zzJy7G0QF8acI5OPi01WOf4cXKl
+         p0W1desgg3IYu4ofqEbuv3tmTrvjTIHD41Qa5xqBx2U6NxHVxC72Bk6WtPBwKBZ2foaw
+         qkMjNNAllwSY/FeQkkIDGA+Q7svKFaGscWzdy5J25piINLQmiEAecwZdyv6UuJhOMYDq
+         1E3w==
+X-Gm-Message-State: AC+VfDxgJnSxLnZ25jcE6b6yCPMMYvvCqe7Nfxwz3I8045vomWRv4wVc
+        gY0VmsldD5veYPVmmzzUQNY/EA==
+X-Google-Smtp-Source: ACHHUZ5krj7H+JI/eDq82uf9J7X5Pm708dBg2kBu8l29Vrj5oetxbAmav2MRNxB9fkkFEETINthtPQ==
+X-Received: by 2002:a9d:7f89:0:b0:6b7:2420:7b52 with SMTP id t9-20020a9d7f89000000b006b724207b52mr7750977otp.24.1687668641460;
+        Sat, 24 Jun 2023 21:50:41 -0700 (PDT)
+Received: from ?IPV6:2409:8949:3a13:39f5:bd89:ebd9:ff00:5efd? ([2409:8949:3a13:39f5:bd89:ebd9:ff00:5efd])
+        by smtp.gmail.com with ESMTPSA id 21-20020aa79255000000b00665a76a8cfasm1707206pfp.194.2023.06.24.21.50.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Jun 2023 21:50:40 -0700 (PDT)
+Message-ID: <a82fd11d-d346-4cba-fdbb-982359fb9faa@bytedance.com>
+Date:   Sun, 25 Jun 2023 12:50:28 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.0
+Subject: Re: [PATCH v3] blk-throttle: Fix io statistics for cgroup v1
+To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, songmuchun@bytedance.com,
+        andrea.righi@canonical.com
+References: <20230507170631.89607-1-hanjinke.666@bytedance.com>
+From:   hanjinke <hanjinke.666@bytedance.com>
+In-Reply-To: <20230507170631.89607-1-hanjinke.666@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgA30JNJnpdkw_XiMQ--.23029S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxGr1xZw1UKF4xWw17JFW8Zwb_yoW5Xr13pr
-        90kayaqr47GF4I9anFya12gFyfX3WDGrZrKFWfuw4fZFZrAF1DGw1vgFyFqa4DGrW8Gaya
-        yFWkJr1jqryUZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUgKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCj
-        c4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
-        CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1x
-        MIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJV
-        Cq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBI
-        daVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hou Tao <houtao1@huawei.com>
+Hi,Jens
 
-When doing mkfs.xfs on a pmem device, the following warning was
-reported and :
+Can you consider merging this patch？I think this is a fix. It also
+Acked-by Tejun, Muchun Song and Tested-by Andrea Righi.
 
- ------------[ cut here ]------------
- WARNING: CPU: 2 PID: 384 at block/blk-core.c:751 submit_bio_noacct
- Modules linked in:
- CPU: 2 PID: 384 Comm: mkfs.xfs Not tainted 6.4.0-rc7+ #154
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
- RIP: 0010:submit_bio_noacct+0x340/0x520
- ......
- Call Trace:
-  <TASK>
-  ? asm_exc_invalid_op+0x1b/0x20
-  ? submit_bio_noacct+0x340/0x520
-  ? submit_bio_noacct+0xd5/0x520
-  submit_bio+0x37/0x60
-  async_pmem_flush+0x79/0xa0
-  nvdimm_flush+0x17/0x40
-  pmem_submit_bio+0x370/0x390
-  __submit_bio+0xbc/0x190
-  submit_bio_noacct_nocheck+0x14d/0x370
-  submit_bio_noacct+0x1ef/0x520
-  submit_bio+0x55/0x60
-  submit_bio_wait+0x5a/0xc0
-  blkdev_issue_flush+0x44/0x60
-
-The root cause is that submit_bio_noacct() needs bio_op() is either
-WRITE or ZONE_APPEND for flush bio and async_pmem_flush() doesn't assign
-REQ_OP_WRITE when allocating flush bio, so submit_bio_noacct just fail
-the flush bio.
-
-Simply fix it by adding the missing REQ_OP_WRITE for flush bio. And we
-could fix the flush order issue and do flush optimization later.
-
-Fixes: b4a6bb3a67aa ("block: add a sanity check for non-write flush/fua bios")
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
-v3:
- * adjust the overly long lines in both commit message and code
-
-v2: https://lore.kernel.org/linux-block/20230621134340.878461-1-houtao@huaweicloud.com
- * do a minimal fix first (Suggested by Christoph)
-
-v1: https://lore.kernel.org/linux-block/ZJLpYMC8FgtZ0k2k@infradead.org/T/#t
-
-Hi Jens & Dan,
-
-I found Pankaj was working on the optimization of virtio-pmem flush bio
-[0], but considering the last status update was 1/12/2022, so could you
-please pick the patch up for v6.4 and we can do the flush optimization
-later ?
-
-[0]: https://lore.kernel.org/lkml/20220111161937.56272-1-pankaj.gupta.linux@gmail.com/T/
-
- drivers/nvdimm/nd_virtio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-index c6a648fd8744..1f8c667c6f1e 100644
---- a/drivers/nvdimm/nd_virtio.c
-+++ b/drivers/nvdimm/nd_virtio.c
-@@ -105,7 +105,8 @@ int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
- 	 * parent bio. Otherwise directly call nd_region flush.
- 	 */
- 	if (bio && bio->bi_iter.bi_sector != -1) {
--		struct bio *child = bio_alloc(bio->bi_bdev, 0, REQ_PREFLUSH,
-+		struct bio *child = bio_alloc(bio->bi_bdev, 0,
-+					      REQ_OP_WRITE | REQ_PREFLUSH,
- 					      GFP_ATOMIC);
- 
- 		if (!child)
--- 
-2.29.2
-
+在 2023/5/8 上午1:06, Jinke Han 写道:
+> From: Jinke Han <hanjinke.666@bytedance.com>
+> 
+> After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
+> blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
+> the only stable io stats interface of cgroup v1, and these statistics
+> are done in the blk-throttle code. But the current code only counts the
+> bios that are actually throttled. When the user does not add the throttle
+> limit, the io stats for cgroup v1 has nothing. I fix it according to the
+> statistical method of v2, and made it count all ios accurately.
+> 
+> Fixes: a7b36ee6ba29 ("block: move blk-throtl fast path inline")
+> Tested-by: Andrea Righi <andrea.righi@canonical.com>
+> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
+> ---
+>   block/blk-cgroup.c   | 6 ++++--
+>   block/blk-throttle.c | 6 ------
+>   block/blk-throttle.h | 9 +++++++++
+>   3 files changed, 13 insertions(+), 8 deletions(-)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 0ce64dd73cfe..5b29912a0ee2 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -2048,6 +2048,9 @@ void blk_cgroup_bio_start(struct bio *bio)
+>   	struct blkg_iostat_set *bis;
+>   	unsigned long flags;
+>   
+> +	if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
+> +		return;
+> +
+>   	/* Root-level stats are sourced from system-wide IO stats */
+>   	if (!cgroup_parent(blkcg->css.cgroup))
+>   		return;
+> @@ -2079,8 +2082,7 @@ void blk_cgroup_bio_start(struct bio *bio)
+>   	}
+>   
+>   	u64_stats_update_end_irqrestore(&bis->sync, flags);
+> -	if (cgroup_subsys_on_dfl(io_cgrp_subsys))
+> -		cgroup_rstat_updated(blkcg->css.cgroup, cpu);
+> +	cgroup_rstat_updated(blkcg->css.cgroup, cpu);
+>   	put_cpu();
+>   }
+>   
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 9d010d867fbf..7397ff199d66 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -2178,12 +2178,6 @@ bool __blk_throtl_bio(struct bio *bio)
+>   
+>   	rcu_read_lock();
+>   
+> -	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
+> -		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
+> -				bio->bi_iter.bi_size);
+> -		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
+> -	}
+> -
+>   	spin_lock_irq(&q->queue_lock);
+>   
+>   	throtl_update_latency_buckets(td);
+> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+> index ef4b7a4de987..d1ccbfe9f797 100644
+> --- a/block/blk-throttle.h
+> +++ b/block/blk-throttle.h
+> @@ -185,6 +185,15 @@ static inline bool blk_should_throtl(struct bio *bio)
+>   	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
+>   	int rw = bio_data_dir(bio);
+>   
+> +	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
+> +		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
+> +			bio_set_flag(bio, BIO_CGROUP_ACCT);
+> +			blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
+> +					bio->bi_iter.bi_size);
+> +		}
+> +		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
+> +	}
+> +
+>   	/* iops limit is always counted */
+>   	if (tg->has_rules_iops[rw])
+>   		return true;
