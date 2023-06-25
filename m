@@ -2,62 +2,61 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD626EB64DC
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 09:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82630EB64DC
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 09:22:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231654AbjFYJQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jun 2023 05:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40508 "EHLO
+        id S231523AbjFYJWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jun 2023 05:22:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230362AbjFYJQi (ORCPT
+        with ESMTP id S230029AbjFYJWP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jun 2023 05:16:38 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A163D2;
-        Sun, 25 Jun 2023 02:16:37 -0700 (PDT)
+        Sun, 25 Jun 2023 05:22:15 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA516D2;
+        Sun, 25 Jun 2023 02:22:13 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qplhw4sfRz4f4DhZ;
-        Sun, 25 Jun 2023 17:16:32 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QplqN4zBSz4f3kp9;
+        Sun, 25 Jun 2023 17:22:08 +0800 (CST)
 Received: from [10.174.179.247] (unknown [10.174.179.247])
-        by APP4 (Coremail) with SMTP id gCh0CgCnD7PwBZhkKbn6MQ--.46979S3;
-        Sun, 25 Jun 2023 17:16:33 +0800 (CST)
-Message-ID: <1f48c2d9-3e51-d8bf-466a-bb1fe9e07282@huaweicloud.com>
-Date:   Sun, 25 Jun 2023 17:16:32 +0800
+        by APP4 (Coremail) with SMTP id gCh0CgCXaK9AB5hkSAb7MQ--.48063S3;
+        Sun, 25 Jun 2023 17:22:10 +0800 (CST)
+Message-ID: <907bbe2d-9cbf-480c-be57-3289d113c42a@huaweicloud.com>
+Date:   Sun, 25 Jun 2023 17:22:08 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH v3 3/4] block/badblocks: fix badblocks loss when badblocks
- combine
-To:     Ashok Raj <ashok_raj@linux.intel.com>
+Subject: Re: [PATCH v3 4/4] block/badblocks: fix the bug of reverse order
+To:     Ashok Raj <ashok_raj@linux.intel.com>, linan666@huaweicloud.com
 Cc:     axboe@kernel.dk, dan.j.williams@intel.com,
         vishal.l.verma@intel.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
         yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
         Ashok Raj <ashok.raj@intel.com>, linan122@huawei.com
 References: <20230621172052.1499919-1-linan666@huaweicloud.com>
- <20230621172052.1499919-4-linan666@huaweicloud.com>
- <ZJMEtGw+FYT8mRG+@araj-dh-work>
+ <20230621172052.1499919-5-linan666@huaweicloud.com>
+ <ZJMGDLkRbaVD9VA8@araj-dh-work>
 From:   Li Nan <linan666@huaweicloud.com>
-In-Reply-To: <ZJMEtGw+FYT8mRG+@araj-dh-work>
+In-Reply-To: <ZJMGDLkRbaVD9VA8@araj-dh-work>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCnD7PwBZhkKbn6MQ--.46979S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KF18ZFy3tF1DJr18Xw4UXFb_yoW8Zw17pw
-        n5X3Wa9r1Igry09F1UX3WDGF1IganxJF4UGa15t3W5uryq9wn7KFn2qr1Yvry09F4xJFnY
-        va1rWF9xXFy3G37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487
-        Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aV
-        AFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E
-        8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4I
-        kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-        WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-        0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVW3
-        JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8Jr
-        UvcSsGvfC2KfnxnUUI43ZEXa7IUbJ73PUUUUU==
+X-CM-TRANSID: gCh0CgCXaK9AB5hkSAb7MQ--.48063S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFWDWryxuw13Aw1UXF1xuFg_yoW8GFy8pr
+        n8J3Zakr1jgr1jg3WDX3WUKryIg34ftF4UGa1UXF1UCF9xGwn7KF1v9w4YgFy2qrsxGrnY
+        v3W3uryYva4rCa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBa14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+        F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r
+        4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v
+        4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x
+        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+        C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+        04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2js
+        IEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUlQ6LUUUUU=
 X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -66,71 +65,59 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-在 2023/6/21 22:09, Ashok Raj 写道:
-> On Thu, Jun 22, 2023 at 01:20:51AM +0800, linan666@huaweicloud.com wrote:
+在 2023/6/21 22:15, Ashok Raj 写道:
+> On Thu, Jun 22, 2023 at 01:20:52AM +0800, linan666@huaweicloud.com wrote:
 >> From: Li Nan <linan122@huawei.com>
 >>
->> badblocks will loss if we set it as below:
+>> Order of badblocks will be reversed if we set a large area at once. 'hi'
+>> remains unchanged while adding continuous badblocks is wrong, the next
+>> setting is greater than 'hi', it should be added to the next position.
+>> Let 'hi' +1 each cycle.
+> 
+> The commitlog needs more work.
+
+OK, I will improve this.
+
 >>
->>    # echo 1 1 > bad_blocks
->>    # echo 3 1 > bad_blocks
->>    # echo 1 5 > bad_blocks
+>>    # echo 0 2048 > bad_blocks
 >>    # cat bad_blocks
->>      1 3
->>
->> In badblocks_set(), if there is an intersection between p[lo] and p[hi],
->> we will combine them. The end of new badblocks is p[hi]'s end now. but
->> p[lo] may cross p[hi] and new end should be the larger of p[lo] and p[hi].
+>>      1536 512
+>>      1024 512
+>>      512 512
+>>      0 512
 > 
-> Reconsider rewriting the commit log. It seems you converted code to
-> sentence ;-).
+> Is the above before or after this patch is applied?
 
-I will rewrite log.
-
-> 
-> Also it might help to show after the patch how the above example would be
-> for cat bad_blocks
-> 
-
-after patch:
+All badblocks are arranged from small to large. after patch:
 
 # cat bad_blocks
-   1 5
+   0 512
+   512 512
+   1024 512
+   1536 512
 
 I will show it in next version. Thanks for your suggestion.
 
+> 
 >>
 >> Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
 >> Signed-off-by: Li Nan <linan122@huawei.com>
 >> ---
->>   block/badblocks.c | 10 ++++------
->>   1 file changed, 4 insertions(+), 6 deletions(-)
+>>   block/badblocks.c | 1 +
+>>   1 file changed, 1 insertion(+)
 >>
 >> diff --git a/block/badblocks.c b/block/badblocks.c
->> index 7e6ebe2ac12c..2c2ef8284a3f 100644
+>> index 2c2ef8284a3f..3b816690b940 100644
 >> --- a/block/badblocks.c
 >> +++ b/block/badblocks.c
->> @@ -267,16 +267,14 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
->>   	if (sectors == 0 && hi < bb->count) {
->>   		/* we might be able to combine lo and hi */
->>   		/* Note: 's' is at the end of 'lo' */
->> -		sector_t a = BB_OFFSET(p[hi]);
->> -		int lolen = BB_LEN(p[lo]);
->> -		int hilen = BB_LEN(p[hi]);
->> -		int newlen = lolen + hilen - (s - a);
->> +		sector_t a = BB_OFFSET(p[lo]);
->> +		int newlen = max(s, BB_OFFSET(p[hi]) + BB_LEN(p[hi])) - a;
->>   
->> -		if (s >= a && newlen < BB_MAX_LEN) {
->> +		if (s >= BB_OFFSET(p[hi]) && newlen < BB_MAX_LEN) {
->>   			/* yes, we can combine them */
->>   			int ack = BB_ACK(p[lo]) && BB_ACK(p[hi]);
->>   
->> -			p[lo] = BB_MAKE(BB_OFFSET(p[lo]), newlen, ack);
->> +			p[lo] = BB_MAKE(a, newlen, ack);
->>   			memmove(p + hi, p + hi + 1,
->>   				(bb->count - hi - 1) * 8);
->>   			bb->count--;
+>> @@ -301,6 +301,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+>>   			p[hi] = BB_MAKE(s, this_sectors, acknowledged);
+>>   			sectors -= this_sectors;
+>>   			s += this_sectors;
+>> +			hi++;
+>>   			changed = true;
+>>   		}
+>>   	}
 >> -- 
 >> 2.39.2
 >>
