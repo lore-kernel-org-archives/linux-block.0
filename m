@@ -2,147 +2,212 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B32FEB64DC
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 08:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CECAEB64DC
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 09:11:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231932AbjFYIbe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jun 2023 04:31:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
+        id S231249AbjFYJLr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jun 2023 05:11:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231783AbjFYIbY (ORCPT
+        with ESMTP id S230362AbjFYJLq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jun 2023 04:31:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D76A10F2
-        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 01:30:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687681823;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Swn+PxcH0UIWySoZatq2pB89Yb16EqEAu3zpeh14NbU=;
-        b=cHOq26wrUnLbN65kn7cthvcIb92uiStyAJMGnAZMSarFT5RxaEH+M3SAmN1b8WMxDnngUw
-        swhN4vQNv5uWwAH2Se/tQ7pRGFkJrjXtQcX/e7h/SVQ1RmTofwh0dcAFRjxzPht8+UZMyn
-        xCm8oQXVNbnThAl+sETscvXjWt/Z6dA=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-92-Xto3Smq6MeiTfJNcnZUi2w-1; Sun, 25 Jun 2023 04:30:21 -0400
-X-MC-Unique: Xto3Smq6MeiTfJNcnZUi2w-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-94f7a2b21fdso174916466b.2
-        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 01:30:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687681820; x=1690273820;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Swn+PxcH0UIWySoZatq2pB89Yb16EqEAu3zpeh14NbU=;
-        b=W//KNq6nb/WuAfIOCYPpedKuGB7ObsU0ytAOsR9dJJcNe4Yq06DRIB4H2PsJ/TJtbE
-         KWemGYxDx0YmFjpmVg/0f87fJ7CzcRsbb1mxFKsCqaZ0aNH6o/RvGR57py6i+7zGGiQH
-         Zvpxr/5mIbRyno7udUT12ebZnhPEs4/wE4VaNYhO/wsIvtg1EB766+duV6Q+XazRcSbY
-         giYskz4cLQulVQbJfsEX1OILM5IzrwuFRxKcvJeTE6WEt7HIrArgT03UMbr+h9WgKSmN
-         JvAANZ/CJ5X2b45feQjYP2SpJyi6dZR4ATt1q+dRciJOmwls1kSAjHXe5kbsNeg3WFpP
-         NvhA==
-X-Gm-Message-State: AC+VfDzxd6Dp+UP+kO3ulWn2rIq+xMmKsD6VyAZ6lmq6Lh1H0E6+/Xtx
-        sFVswY//e4gjiVK7MEY8bo/MphFpM8eLxNEFHRmbgUVmiUVwqGpmR5izH3WFxypvMnDJIWaT0Am
-        D1gs5Buc63UcHRhjd7C1dc92Ki1AYywbgkSMjYx8=
-X-Received: by 2002:aa7:d319:0:b0:51d:809a:bde5 with SMTP id p25-20020aa7d319000000b0051d809abde5mr2265017edq.15.1687681820330;
-        Sun, 25 Jun 2023 01:30:20 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ73iuATkJ23rvdHZxJ4FCAd0DXHEKu7aWIdIH2Awt4l3tIepSCFXSpAcTIz20FZOV2VlmbmwUuC/piXrqCrtHM=
-X-Received: by 2002:aa7:d319:0:b0:51d:809a:bde5 with SMTP id
- p25-20020aa7d319000000b0051d809abde5mr2265009edq.15.1687681820085; Sun, 25
- Jun 2023 01:30:20 -0700 (PDT)
+        Sun, 25 Jun 2023 05:11:46 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BD91BF;
+        Sun, 25 Jun 2023 02:11:40 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QplbC1H1Yz4f3q36;
+        Sun, 25 Jun 2023 17:11:35 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+        by APP4 (Coremail) with SMTP id gCh0CgCHK5_HBJhkK3T6MQ--.37814S3;
+        Sun, 25 Jun 2023 17:11:37 +0800 (CST)
+Message-ID: <b49f6f7e-16db-e3e0-188a-7ed848a9d43d@huaweicloud.com>
+Date:   Sun, 25 Jun 2023 17:11:35 +0800
 MIME-Version: 1.0
-References: <20230624130105.1443879-1-ming.lei@redhat.com>
-In-Reply-To: <20230624130105.1443879-1-ming.lei@redhat.com>
-From:   Guangwu Zhang <guazhang@redhat.com>
-Date:   Sun, 25 Jun 2023 16:31:26 +0800
-Message-ID: <CAGS2=Yr_xL3ikGuJKg3MrK1pGnmW8MDFmBTDXfLR76moO=wNjA@mail.gmail.com>
-Subject: Re: [PATCH] blk-mq: fix two misuses on RQF_USE_SCHED
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3 1/4] block/badblocks: change some members of badblocks
+ to bool
+To:     Ashok Raj <ashok_raj@linux.intel.com>
+Cc:     axboe@kernel.dk, dan.j.williams@intel.com,
+        vishal.l.verma@intel.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+        Ashok Raj <ashok.raj@intel.com>, linan122@huawei.com
+References: <20230621172052.1499919-1-linan666@huaweicloud.com>
+ <20230621172052.1499919-2-linan666@huaweicloud.com>
+ <ZJMC9rWFRqOTYgVk@araj-dh-work>
+From:   Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <ZJMC9rWFRqOTYgVk@araj-dh-work>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCHK5_HBJhkK3T6MQ--.37814S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAr15Ar45Xw4kJw45uF13XFb_yoWrGr47pF
+        98G3Wayr4jqrn29F1jv3W7Ar10kw4xJF48J3y7Jw15KryDtw1xKa4kWryF9FyYqr4xursa
+        vFyFgFW3Zr1vkrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9qb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487
+        Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aV
+        AFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E
+        8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4I
+        kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+        WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+        0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWr
+        Jr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r
+        4UJbIYCTnIWIevJa73UjIFyTuYvjxUFfHjUUUUU
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Ming
-Could not hit the error after apply your patch. good job!
-
-Ming Lei <ming.lei@redhat.com> =E4=BA=8E2023=E5=B9=B46=E6=9C=8824=E6=97=A5=
-=E5=91=A8=E5=85=AD 21:01=E5=86=99=E9=81=93=EF=BC=9A
-
->
-> Request allocated from sched tags can't be issued via ->queue_rqs()
-> directly, since driver tag isn't allocated yet. This is the 1st misuse
-> of RQF_USE_SCHED for figuring out plug->has_elevator.
->
-> Request allocated from sched tags can't be ended by
-> blk_mq_end_request_batch() too, fix the 2nd RQF_USE_SCHED misuse
-> in blk_mq_add_to_batch().
->
-> Without this patch, NVMe uring cmd passthrough IO workload can run into
-> hang easily with real io scheduler.
->
-> Fixes: dd6216bb16e8 ("blk-mq: make sure elevator callbacks aren't called =
-for passthrough request")
-> Reported-by: Guangwu Zhang <guazhang@redhat.com>
-> Closes: https://lore.kernel.org/linux-block/CAGS2=3DYrBjpLPOKa-gzcKuuOG60=
-AGth5794PNCDwatdnnscB9ug@mail.gmail.com/
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq.c         | 6 +++++-
->  include/linux/blk-mq.h | 6 +++++-
->  2 files changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 1628873d7587..0aba08a9ded6 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1302,7 +1302,11 @@ static void blk_add_rq_to_plug(struct blk_plug *pl=
-ug, struct request *rq)
->
->         if (!plug->multiple_queues && last && last->q !=3D rq->q)
->                 plug->multiple_queues =3D true;
-> -       if (!plug->has_elevator && (rq->rq_flags & RQF_USE_SCHED))
-> +       /*
-> +        * Any request allocated from sched tags can't be issued to
-> +        * ->queue_rqs() directly
-> +        */
-> +       if (!plug->has_elevator && (rq->rq_flags & RQF_SCHED_TAGS))
->                 plug->has_elevator =3D true;
->         rq->rq_next =3D NULL;
->         rq_list_add(&plug->mq_list, rq);
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index fa265e85d753..12103d5654f5 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -852,7 +852,11 @@ static inline bool blk_mq_add_to_batch(struct reques=
-t *req,
->                                        struct io_comp_batch *iob, int ioe=
-rror,
->                                        void (*complete)(struct io_comp_ba=
-tch *))
->  {
-> -       if (!iob || (req->rq_flags & RQF_USE_SCHED) || ioerror ||
-> +       /*
-> +        * blk_mq_end_request_batch() can't end request allocated from
-> +        * sched tags
-> +        */
-> +       if (!iob || (req->rq_flags & RQF_SCHED_TAGS) || ioerror ||
->                         (req->end_io && !blk_rq_is_passthrough(req)))
->                 return false;
->
-> --
-> 2.40.1
->
 
 
---
-Guangwu Zhang
-Thanks
+在 2023/6/21 22:02, Ashok Raj 写道:
+> On Thu, Jun 22, 2023 at 01:20:49AM +0800, linan666@huaweicloud.com wrote:
+>> From: Li Nan <linan122@huawei.com>
+>>
+>> "changed" and "unacked_exist" are used as boolean type. Change the type
+>> of them to bool. And reorder fields to reduce memory hole.
+> 
+> minor nit: If you use a .gitorderfile to list .h before .c it will help review them in
+> order.
+> 
+
+I will config my git.
+
+> I don't know if its even worth doing this manual compaction unless you are
+> storing the entire struct in some flash or its in a sensitive cache
+> thrashing structure.
+> 
+
+Yeah, it is worthless to manual compaction.
+
+> bool is useful that it makes the code easier to read and can eliminate some
+> class of bugs that you would otherwise use !! operator.
+> 
+>>
+>> No functional changed intended.
+>>
+>> Signed-off-by: Li Nan <linan122@huawei.com>
+>> ---
+>>   block/badblocks.c         | 14 +++++++-------
+>>   include/linux/badblocks.h | 10 +++++-----
+>>   2 files changed, 12 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/block/badblocks.c b/block/badblocks.c
+>> index 3afb550c0f7b..1b4caa42c5f1 100644
+>> --- a/block/badblocks.c
+>> +++ b/block/badblocks.c
+>> @@ -141,7 +141,7 @@ static void badblocks_update_acked(struct badblocks *bb)
+>>   	}
+>>   
+>>   	if (!unacked)
+>> -		bb->unacked_exist = 0;
+>> +		bb->unacked_exist = false;
+>>   }
+>>   
+>>   /**
+>> @@ -302,9 +302,9 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+>>   		}
+>>   	}
+>>   
+>> -	bb->changed = 1;
+>> +	bb->changed = true;
+>>   	if (!acknowledged)
+>> -		bb->unacked_exist = 1;
+>> +		bb->unacked_exist = true;
+>>   	else
+>>   		badblocks_update_acked(bb);
+>>   	write_sequnlock_irqrestore(&bb->lock, flags);
+>> @@ -414,7 +414,7 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
+>>   	}
+>>   
+>>   	badblocks_update_acked(bb);
+>> -	bb->changed = 1;
+>> +	bb->changed = true;
+>>   out:
+>>   	write_sequnlock_irq(&bb->lock);
+>>   	return rv;
+>> @@ -435,7 +435,7 @@ void ack_all_badblocks(struct badblocks *bb)
+>>   		return;
+>>   	write_seqlock_irq(&bb->lock);
+>>   
+>> -	if (bb->changed == 0 && bb->unacked_exist) {
+>> +	if (bb->changed == false && bb->unacked_exist) {
+> 
+> 	if (!bb->changed && bb->unacked_exist)
+
+I will change it in next version.
+
+> 
+> 
+>>   		u64 *p = bb->page;
+>>   		int i;
+>>   
+>> @@ -447,7 +447,7 @@ void ack_all_badblocks(struct badblocks *bb)
+>>   				p[i] = BB_MAKE(start, len, 1);
+>>   			}
+>>   		}
+>> -		bb->unacked_exist = 0;
+>> +		bb->unacked_exist = false;
+>>   	}
+>>   	write_sequnlock_irq(&bb->lock);
+>>   }
+>> @@ -493,7 +493,7 @@ ssize_t badblocks_show(struct badblocks *bb, char *page, int unack)
+>>   				length << bb->shift);
+>>   	}
+>>   	if (unack && len == 0)
+>> -		bb->unacked_exist = 0;
+>> +		bb->unacked_exist = false;
+>>   
+>>   	if (read_seqretry(&bb->lock, seq))
+>>   		goto retry;
+>> diff --git a/include/linux/badblocks.h b/include/linux/badblocks.h
+>> index 2426276b9bd3..c2723f97d22d 100644
+>> --- a/include/linux/badblocks.h
+>> +++ b/include/linux/badblocks.h
+>> @@ -27,15 +27,15 @@
+>>   struct badblocks {
+>>   	struct device *dev;	/* set by devm_init_badblocks */
+>>   	int count;		/* count of bad blocks */
+>> -	int unacked_exist;	/* there probably are unacknowledged
+>> -				 * bad blocks.  This is only cleared
+>> -				 * when a read discovers none
+>> -				 */
+>>   	int shift;		/* shift from sectors to block size
+>>   				 * a -ve shift means badblocks are
+>>   				 * disabled.*/
+>> +	bool unacked_exist;	/* there probably are unacknowledged
+>> +				 * bad blocks.  This is only cleared
+>> +				 * when a read discovers none
+> 
+> read of what?
+
+"... when a read of unacknowledged bad blocks discovers none"
+
+Would this be better？
+
+Thank for your suggestion.
+
+> 
+>> +				 */
+>> +	bool changed;
+>>   	u64 *page;		/* badblock list */
+>> -	int changed;
+>>   	seqlock_t lock;
+>>   	sector_t sector;
+>>   	sector_t size;		/* in sectors */
+>> -- 
+>> 2.39.2
+>>
+> 
+> .
+
+-- 
+Thanks,
+Nan
 
