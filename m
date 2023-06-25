@@ -2,156 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75236EB64DD
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 04:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE65EB64DC
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 04:59:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230458AbjFYEvO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jun 2023 00:51:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58268 "EHLO
+        id S231138AbjFYE7D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jun 2023 00:59:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231128AbjFYEvI (ORCPT
+        with ESMTP id S231128AbjFYE7A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jun 2023 00:51:08 -0400
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3801DE5D
-        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 21:50:42 -0700 (PDT)
-Received: by mail-ot1-x333.google.com with SMTP id 46e09a7af769-6b5d7e60015so2054697a34.0
-        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 21:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1687668641; x=1690260641;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WAXKmRxn/lGVEXnXeDsvJ+fu3YmCBSEAvX8M4/5L5VA=;
-        b=bMuj7cwDdoXKISTDkzptBDyzYxrmMPhttiVwFLmhishVLlAo/0wcnWwOOKc5KaDNXp
-         0k1HqVrE8Hx7iR7I7S4xdgjAcc5RhvCF5AELHTGX1kf+O9BpKUzHAOBQSa1iEErhttPG
-         3b8+RInnKIdo158WvXe5DmpQDrKtM/VZ8zy1c1yjNq1BiAywsa7z+uXaapI0WPiNEIN2
-         xYurTWq7Vuo8HrBQaeEzXCMEGA27/vW97vRYC2U9pTOkepUYpTbHjrTJjbKUb4nmrFuu
-         bKGTE90OMX8RqnCmlESML1SKSVkVZ1RzSxXEdsvuOjJYEyq854vI3FsIqHl2KEiBEsFI
-         y2sg==
+        Sun, 25 Jun 2023 00:59:00 -0400
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F1AE5F
+        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 21:58:59 -0700 (PDT)
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3458f079102so3308665ab.0
+        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 21:58:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687668641; x=1690260641;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WAXKmRxn/lGVEXnXeDsvJ+fu3YmCBSEAvX8M4/5L5VA=;
-        b=Vh10fALvqPpGbscpVyVlgdj/DcHKs8NI+rrkw/8t077Qw7UR8Xe78AsaEIYZmyrLyo
-         iEiaRd4l5HT+34dG4NU7Tj/+E1FAm13jMebOg6anzejl0w7d32ugXv3ucUrYjaztnFxD
-         /o5s8if2jbsDldq2PDYEVr1erbbcBsDf0tJnbrxs1zzJy7G0QF8acI5OPi01WOf4cXKl
-         p0W1desgg3IYu4ofqEbuv3tmTrvjTIHD41Qa5xqBx2U6NxHVxC72Bk6WtPBwKBZ2foaw
-         qkMjNNAllwSY/FeQkkIDGA+Q7svKFaGscWzdy5J25piINLQmiEAecwZdyv6UuJhOMYDq
-         1E3w==
-X-Gm-Message-State: AC+VfDxgJnSxLnZ25jcE6b6yCPMMYvvCqe7Nfxwz3I8045vomWRv4wVc
-        gY0VmsldD5veYPVmmzzUQNY/EA==
-X-Google-Smtp-Source: ACHHUZ5krj7H+JI/eDq82uf9J7X5Pm708dBg2kBu8l29Vrj5oetxbAmav2MRNxB9fkkFEETINthtPQ==
-X-Received: by 2002:a9d:7f89:0:b0:6b7:2420:7b52 with SMTP id t9-20020a9d7f89000000b006b724207b52mr7750977otp.24.1687668641460;
-        Sat, 24 Jun 2023 21:50:41 -0700 (PDT)
-Received: from ?IPV6:2409:8949:3a13:39f5:bd89:ebd9:ff00:5efd? ([2409:8949:3a13:39f5:bd89:ebd9:ff00:5efd])
-        by smtp.gmail.com with ESMTPSA id 21-20020aa79255000000b00665a76a8cfasm1707206pfp.194.2023.06.24.21.50.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Jun 2023 21:50:40 -0700 (PDT)
-Message-ID: <a82fd11d-d346-4cba-fdbb-982359fb9faa@bytedance.com>
-Date:   Sun, 25 Jun 2023 12:50:28 +0800
+        d=1e100.net; s=20221208; t=1687669138; x=1690261138;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zh5fpvwsPKvfH2zfGfL3uL4oFqLx29Dszvhlc1s4o3Q=;
+        b=Xi3QaqDKA0zWjGDsfnY+m+xyQZ5wesx9veSUgxyqVbnozyvJE+L161ahf1xvPHCVJq
+         D14JuMavVmThOrdrS7oDOs/sQFAFQ7jM6A4B3S0YpqBqTTpt9AvuaHUDCjQlgGGUKmmF
+         BBS/hZ5ApMu90/aC4VL6uf3iyqHU13sMzu1sfoS1h5kjNkgC0JaeBVo8+pzyRyUPrzaS
+         W7eM92+/vRi/kH9DIbTPEa1PKg+qYhVvkrM7ESmvkyiXzjMjMOa/PbnOiKDSa8cnaTKt
+         ihvpTag3fagmz4G+m+n0vsUpYfFmM1olblnIBwTG09MvCAd52lg3f1B/Btz21dX+6PLa
+         8/hw==
+X-Gm-Message-State: AC+VfDzh8fubXVp24SwOxOW03XkIN+rwhtFpwcy6yUa29Qx65yUeLnv5
+        HRItpE9gb2D6q1MsH4h6FiP9Z8vGsKKuH+hVA6GJV1lPMmV1
+X-Google-Smtp-Source: ACHHUZ6QNHFQpVsYAW1OyDtioJuiu09y0HwMpWW6cIqKQYhzjCiiy74uJDi7On7ItlpKdnWzYqMDf5v2q56qCfsr+3EZGWS/zYFN
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH v3] blk-throttle: Fix io statistics for cgroup v1
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, songmuchun@bytedance.com,
-        andrea.righi@canonical.com
-References: <20230507170631.89607-1-hanjinke.666@bytedance.com>
-From:   hanjinke <hanjinke.666@bytedance.com>
-In-Reply-To: <20230507170631.89607-1-hanjinke.666@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:603:0:b0:340:c135:a371 with SMTP id
+ x3-20020a920603000000b00340c135a371mr9287824ilg.1.1687669138699; Sat, 24 Jun
+ 2023 21:58:58 -0700 (PDT)
+Date:   Sat, 24 Jun 2023 21:58:58 -0700
+In-Reply-To: <000000000000152bee05f8adb94c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000082beb905feed17cf@google.com>
+Subject: Re: [syzbot] [block?] WARNING in wait_til_done (2)
+From:   syzbot <syzbot+9bc4da690ee5334f5d15@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,Jens
+syzbot has found a reproducer for the following issue on:
 
-Can you consider merging this patch？I think this is a fix. It also
-Acked-by Tejun, Muchun Song and Tested-by Andrea Righi.
+HEAD commit:    a92b7d26c743 Merge tag 'drm-fixes-2023-06-23' of git://ano..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13426150a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=24ce1b2abaee24cc
+dashboard link: https://syzkaller.appspot.com/bug?extid=9bc4da690ee5334f5d15
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17e0603b280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=137e080b280000
 
-在 2023/5/8 上午1:06, Jinke Han 写道:
-> From: Jinke Han <hanjinke.666@bytedance.com>
-> 
-> After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
-> blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
-> the only stable io stats interface of cgroup v1, and these statistics
-> are done in the blk-throttle code. But the current code only counts the
-> bios that are actually throttled. When the user does not add the throttle
-> limit, the io stats for cgroup v1 has nothing. I fix it according to the
-> statistical method of v2, and made it count all ios accurately.
-> 
-> Fixes: a7b36ee6ba29 ("block: move blk-throtl fast path inline")
-> Tested-by: Andrea Righi <andrea.righi@canonical.com>
-> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
-> ---
->   block/blk-cgroup.c   | 6 ++++--
->   block/blk-throttle.c | 6 ------
->   block/blk-throttle.h | 9 +++++++++
->   3 files changed, 13 insertions(+), 8 deletions(-)
-> 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 0ce64dd73cfe..5b29912a0ee2 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -2048,6 +2048,9 @@ void blk_cgroup_bio_start(struct bio *bio)
->   	struct blkg_iostat_set *bis;
->   	unsigned long flags;
->   
-> +	if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
-> +		return;
-> +
->   	/* Root-level stats are sourced from system-wide IO stats */
->   	if (!cgroup_parent(blkcg->css.cgroup))
->   		return;
-> @@ -2079,8 +2082,7 @@ void blk_cgroup_bio_start(struct bio *bio)
->   	}
->   
->   	u64_stats_update_end_irqrestore(&bis->sync, flags);
-> -	if (cgroup_subsys_on_dfl(io_cgrp_subsys))
-> -		cgroup_rstat_updated(blkcg->css.cgroup, cpu);
-> +	cgroup_rstat_updated(blkcg->css.cgroup, cpu);
->   	put_cpu();
->   }
->   
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 9d010d867fbf..7397ff199d66 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -2178,12 +2178,6 @@ bool __blk_throtl_bio(struct bio *bio)
->   
->   	rcu_read_lock();
->   
-> -	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-> -		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
-> -				bio->bi_iter.bi_size);
-> -		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
-> -	}
-> -
->   	spin_lock_irq(&q->queue_lock);
->   
->   	throtl_update_latency_buckets(td);
-> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-> index ef4b7a4de987..d1ccbfe9f797 100644
-> --- a/block/blk-throttle.h
-> +++ b/block/blk-throttle.h
-> @@ -185,6 +185,15 @@ static inline bool blk_should_throtl(struct bio *bio)
->   	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
->   	int rw = bio_data_dir(bio);
->   
-> +	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-> +		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
-> +			bio_set_flag(bio, BIO_CGROUP_ACCT);
-> +			blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
-> +					bio->bi_iter.bi_size);
-> +		}
-> +		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
-> +	}
-> +
->   	/* iops limit is always counted */
->   	if (tg->has_rules_iops[rw])
->   		return true;
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-a92b7d26.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/86f5fbd54cd3/vmlinux-a92b7d26.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/72b4c75c41dd/bzImage-a92b7d26.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9bc4da690ee5334f5d15@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5531 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
+WARNING: CPU: 0 PID: 5531 at drivers/block/floppy.c:999 wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
+Modules linked in:
+CPU: 0 PID: 5531 Comm: syz-executor276 Not tainted 6.4.0-rc7-syzkaller-00226-ga92b7d26c743 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
+RIP: 0010:wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
+Code: fc 41 83 fd 01 7e ac e8 3e 49 60 fc 4c 89 e6 48 c7 c7 60 42 46 8d e8 df 0a 3e fc e8 2a 49 60 fc e9 c3 fd ff ff e8 20 49 60 fc <0f> 0b e9 4b fd ff ff e8 64 1f b2 fc e9 0f fe ff ff e8 0a 49 60 fc
+RSP: 0018:ffffc900042ef738 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 1ffff9200085dee7 RCX: 0000000000000000
+RDX: ffff888023961500 RSI: ffffffff85232220 RDI: 0000000000000001
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
+R13: ffffffff8522dea0 R14: 0000000000000006 R15: 0000000000000003
+FS:  00007fbbf86fe700(0000) GS:ffff88806b600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000001ceb0000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ floppy_check_events+0x35e/0x680 drivers/block/floppy.c:4098
+ disk_check_events+0xc2/0x420 block/disk-events.c:193
+ disk_clear_events block/disk-events.c:248 [inline]
+ bdev_check_media_change+0x12a/0x350 block/disk-events.c:279
+ floppy_open+0x873/0xe90 drivers/block/floppy.c:4057
+ blkdev_get_whole+0x93/0x2c0 block/bdev.c:606
+ blkdev_get_by_dev.part.0+0x5e2/0xb80 block/bdev.c:756
+ blkdev_get_by_dev+0x6f/0x90 block/bdev.c:790
+ blkdev_open+0x140/0x2d0 block/fops.c:493
+ do_dentry_open+0x6cc/0x13f0 fs/open.c:920
+ do_open fs/namei.c:3636 [inline]
+ path_openat+0x1baa/0x2750 fs/namei.c:3791
+ do_filp_open+0x1ba/0x410 fs/namei.c:3818
+ do_sys_openat2+0x16d/0x4c0 fs/open.c:1356
+ do_sys_open fs/open.c:1372 [inline]
+ __do_sys_openat fs/open.c:1388 [inline]
+ __se_sys_openat fs/open.c:1383 [inline]
+ __x64_sys_openat+0x143/0x1f0 fs/open.c:1383
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fbbf8f12444
+Code: 84 00 00 00 00 00 44 89 54 24 0c e8 c6 f9 ff ff 44 8b 54 24 0c 44 89 e2 48 89 ee 41 89 c0 bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 34 44 89 c7 89 44 24 0c e8 f8 f9 ff ff 8b 44
+RSP: 002b:00007fbbf86fdd60 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fbbf8f12444
+RDX: 0000000000000000 RSI: 00007fbbf86fdde0 RDI: 00000000ffffff9c
+RBP: 00007fbbf86fdde0 R08: 0000000000000000 R09: 00007fbbf86fe700
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
+R13: 00007ffdc0de869f R14: 00007fbbf86fe300 R15: 0000000000022000
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
