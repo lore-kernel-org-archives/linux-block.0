@@ -2,88 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B640EB64DC
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 08:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B32FEB64DC
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 08:31:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230506AbjFYIN3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jun 2023 04:13:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54826 "EHLO
+        id S231932AbjFYIbe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jun 2023 04:31:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230459AbjFYIN2 (ORCPT
+        with ESMTP id S231783AbjFYIbY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jun 2023 04:13:28 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF799BB;
-        Sun, 25 Jun 2023 01:13:25 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QpkHz3Kgpz4f3rr5;
-        Sun, 25 Jun 2023 16:13:19 +0800 (CST)
-Received: from [10.174.179.247] (unknown [10.174.179.247])
-        by APP4 (Coremail) with SMTP id gCh0CgCH77Ic95dk7kn3MQ--.7333S3;
-        Sun, 25 Jun 2023 16:13:18 +0800 (CST)
-Message-ID: <b2004583-6e9c-9282-b59c-95cae9187378@huaweicloud.com>
-Date:   Sun, 25 Jun 2023 16:13:16 +0800
+        Sun, 25 Jun 2023 04:31:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D76A10F2
+        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 01:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687681823;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Swn+PxcH0UIWySoZatq2pB89Yb16EqEAu3zpeh14NbU=;
+        b=cHOq26wrUnLbN65kn7cthvcIb92uiStyAJMGnAZMSarFT5RxaEH+M3SAmN1b8WMxDnngUw
+        swhN4vQNv5uWwAH2Se/tQ7pRGFkJrjXtQcX/e7h/SVQ1RmTofwh0dcAFRjxzPht8+UZMyn
+        xCm8oQXVNbnThAl+sETscvXjWt/Z6dA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-92-Xto3Smq6MeiTfJNcnZUi2w-1; Sun, 25 Jun 2023 04:30:21 -0400
+X-MC-Unique: Xto3Smq6MeiTfJNcnZUi2w-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-94f7a2b21fdso174916466b.2
+        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 01:30:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687681820; x=1690273820;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Swn+PxcH0UIWySoZatq2pB89Yb16EqEAu3zpeh14NbU=;
+        b=W//KNq6nb/WuAfIOCYPpedKuGB7ObsU0ytAOsR9dJJcNe4Yq06DRIB4H2PsJ/TJtbE
+         KWemGYxDx0YmFjpmVg/0f87fJ7CzcRsbb1mxFKsCqaZ0aNH6o/RvGR57py6i+7zGGiQH
+         Zvpxr/5mIbRyno7udUT12ebZnhPEs4/wE4VaNYhO/wsIvtg1EB766+duV6Q+XazRcSbY
+         giYskz4cLQulVQbJfsEX1OILM5IzrwuFRxKcvJeTE6WEt7HIrArgT03UMbr+h9WgKSmN
+         JvAANZ/CJ5X2b45feQjYP2SpJyi6dZR4ATt1q+dRciJOmwls1kSAjHXe5kbsNeg3WFpP
+         NvhA==
+X-Gm-Message-State: AC+VfDzxd6Dp+UP+kO3ulWn2rIq+xMmKsD6VyAZ6lmq6Lh1H0E6+/Xtx
+        sFVswY//e4gjiVK7MEY8bo/MphFpM8eLxNEFHRmbgUVmiUVwqGpmR5izH3WFxypvMnDJIWaT0Am
+        D1gs5Buc63UcHRhjd7C1dc92Ki1AYywbgkSMjYx8=
+X-Received: by 2002:aa7:d319:0:b0:51d:809a:bde5 with SMTP id p25-20020aa7d319000000b0051d809abde5mr2265017edq.15.1687681820330;
+        Sun, 25 Jun 2023 01:30:20 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ73iuATkJ23rvdHZxJ4FCAd0DXHEKu7aWIdIH2Awt4l3tIepSCFXSpAcTIz20FZOV2VlmbmwUuC/piXrqCrtHM=
+X-Received: by 2002:aa7:d319:0:b0:51d:809a:bde5 with SMTP id
+ p25-20020aa7d319000000b0051d809abde5mr2265009edq.15.1687681820085; Sun, 25
+ Jun 2023 01:30:20 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v3 0/4] block/badblocks: fix badblocks setting error
-To:     Ashok Raj <ashok_raj@linux.intel.com>, linan666@huaweicloud.com
-Cc:     axboe@kernel.dk, dan.j.williams@intel.com,
-        vishal.l.verma@intel.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
-        Ashok Raj <ashok.raj@intel.com>
-References: <20230621172052.1499919-1-linan666@huaweicloud.com>
- <ZJL73Zhyq4d/oaXd@araj-dh-work>
-From:   Li Nan <linan666@huaweicloud.com>
-In-Reply-To: <ZJL73Zhyq4d/oaXd@araj-dh-work>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCH77Ic95dk7kn3MQ--.7333S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruw48AF4DKw1UJrW8ZryDtrb_yoWxKrg_Ca
-        yvk3s8CryrJFnxJ3W3trWUXrsYyF1DGFWrG3y5GrykW3s8tay8GFs5Gr98Z3W3J3W8Ja98
-        Gwn3XrWYvw4jqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbSxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-        1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIF
-        xwACI402YVCY1x02628vn2kIc2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7V
-        AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-        r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-        IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-        w20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-        kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOlksUUUUU
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+References: <20230624130105.1443879-1-ming.lei@redhat.com>
+In-Reply-To: <20230624130105.1443879-1-ming.lei@redhat.com>
+From:   Guangwu Zhang <guazhang@redhat.com>
+Date:   Sun, 25 Jun 2023 16:31:26 +0800
+Message-ID: <CAGS2=Yr_xL3ikGuJKg3MrK1pGnmW8MDFmBTDXfLR76moO=wNjA@mail.gmail.com>
+Subject: Re: [PATCH] blk-mq: fix two misuses on RQF_USE_SCHED
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi, Ming
+Could not hit the error after apply your patch. good job!
+
+Ming Lei <ming.lei@redhat.com> =E4=BA=8E2023=E5=B9=B46=E6=9C=8824=E6=97=A5=
+=E5=91=A8=E5=85=AD 21:01=E5=86=99=E9=81=93=EF=BC=9A
+
+>
+> Request allocated from sched tags can't be issued via ->queue_rqs()
+> directly, since driver tag isn't allocated yet. This is the 1st misuse
+> of RQF_USE_SCHED for figuring out plug->has_elevator.
+>
+> Request allocated from sched tags can't be ended by
+> blk_mq_end_request_batch() too, fix the 2nd RQF_USE_SCHED misuse
+> in blk_mq_add_to_batch().
+>
+> Without this patch, NVMe uring cmd passthrough IO workload can run into
+> hang easily with real io scheduler.
+>
+> Fixes: dd6216bb16e8 ("blk-mq: make sure elevator callbacks aren't called =
+for passthrough request")
+> Reported-by: Guangwu Zhang <guazhang@redhat.com>
+> Closes: https://lore.kernel.org/linux-block/CAGS2=3DYrBjpLPOKa-gzcKuuOG60=
+AGth5794PNCDwatdnnscB9ug@mail.gmail.com/
+> Cc: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq.c         | 6 +++++-
+>  include/linux/blk-mq.h | 6 +++++-
+>  2 files changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 1628873d7587..0aba08a9ded6 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1302,7 +1302,11 @@ static void blk_add_rq_to_plug(struct blk_plug *pl=
+ug, struct request *rq)
+>
+>         if (!plug->multiple_queues && last && last->q !=3D rq->q)
+>                 plug->multiple_queues =3D true;
+> -       if (!plug->has_elevator && (rq->rq_flags & RQF_USE_SCHED))
+> +       /*
+> +        * Any request allocated from sched tags can't be issued to
+> +        * ->queue_rqs() directly
+> +        */
+> +       if (!plug->has_elevator && (rq->rq_flags & RQF_SCHED_TAGS))
+>                 plug->has_elevator =3D true;
+>         rq->rq_next =3D NULL;
+>         rq_list_add(&plug->mq_list, rq);
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index fa265e85d753..12103d5654f5 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -852,7 +852,11 @@ static inline bool blk_mq_add_to_batch(struct reques=
+t *req,
+>                                        struct io_comp_batch *iob, int ioe=
+rror,
+>                                        void (*complete)(struct io_comp_ba=
+tch *))
+>  {
+> -       if (!iob || (req->rq_flags & RQF_USE_SCHED) || ioerror ||
+> +       /*
+> +        * blk_mq_end_request_batch() can't end request allocated from
+> +        * sched tags
+> +        */
+> +       if (!iob || (req->rq_flags & RQF_SCHED_TAGS) || ioerror ||
+>                         (req->end_io && !blk_rq_is_passthrough(req)))
+>                 return false;
+>
+> --
+> 2.40.1
+>
 
 
-在 2023/6/21 21:32, Ashok Raj 写道:
-> On Thu, Jun 22, 2023 at 01:20:48AM +0800, linan666@huaweicloud.com wrote:
->> From: Li Nan <linan122@huawei.com>
->>
->> This patch series fixes some simple bugs of setting badblocks and
->> optimizing struct badblocks. Coly Li has been trying to refactor badblocks
->> in patch series "badblocks improvement for multiple bad block ranges", but
->> the workload is significant. Before that, I will fix some easily triggered
->    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> 
-> You mean the refactor is going to take longer to complete?
-
-Yes, refer to the link:
-https://lore.kernel.org/all/20220721121152.4180-1-colyli@suse.de
-
-> If so, maybe state it that way...
-> 
-> .
-
--- 
-Thanks,
-Nan
+--
+Guangwu Zhang
+Thanks
 
