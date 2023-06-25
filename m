@@ -2,127 +2,136 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE65EB64DC
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 04:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B14BBEB64DC
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 08:09:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231138AbjFYE7D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jun 2023 00:59:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59318 "EHLO
+        id S231173AbjFYIJx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jun 2023 04:09:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231128AbjFYE7A (ORCPT
+        with ESMTP id S230459AbjFYIJw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jun 2023 00:59:00 -0400
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F1AE5F
-        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 21:58:59 -0700 (PDT)
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3458f079102so3308665ab.0
-        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 21:58:59 -0700 (PDT)
+        Sun, 25 Jun 2023 04:09:52 -0400
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A1D610F
+        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 01:09:49 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-31114d47414so618499f8f.1
+        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 01:09:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687669138; x=1690261138;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20221208; t=1687680588; x=1690272588;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zh5fpvwsPKvfH2zfGfL3uL4oFqLx29Dszvhlc1s4o3Q=;
-        b=Xi3QaqDKA0zWjGDsfnY+m+xyQZ5wesx9veSUgxyqVbnozyvJE+L161ahf1xvPHCVJq
-         D14JuMavVmThOrdrS7oDOs/sQFAFQ7jM6A4B3S0YpqBqTTpt9AvuaHUDCjQlgGGUKmmF
-         BBS/hZ5ApMu90/aC4VL6uf3iyqHU13sMzu1sfoS1h5kjNkgC0JaeBVo8+pzyRyUPrzaS
-         W7eM92+/vRi/kH9DIbTPEa1PKg+qYhVvkrM7ESmvkyiXzjMjMOa/PbnOiKDSa8cnaTKt
-         ihvpTag3fagmz4G+m+n0vsUpYfFmM1olblnIBwTG09MvCAd52lg3f1B/Btz21dX+6PLa
-         8/hw==
-X-Gm-Message-State: AC+VfDzh8fubXVp24SwOxOW03XkIN+rwhtFpwcy6yUa29Qx65yUeLnv5
-        HRItpE9gb2D6q1MsH4h6FiP9Z8vGsKKuH+hVA6GJV1lPMmV1
-X-Google-Smtp-Source: ACHHUZ6QNHFQpVsYAW1OyDtioJuiu09y0HwMpWW6cIqKQYhzjCiiy74uJDi7On7ItlpKdnWzYqMDf5v2q56qCfsr+3EZGWS/zYFN
+        bh=qwfLjyoUz3ZDqsKQEVoGFsXw4nHaaBvsnDikn6HJhJo=;
+        b=UEu6ohq+d+1CDNGf1WrzgG0MDuGd8hmG5oBmKVfVuBSyoeuLVOSkVYo3C/OnJTbmaF
+         eBfiDeIUPLK0RjRvtGQoYUQi1VIUv9mHGriTByISUxZMkwAoGXonOje9d80TDD4E7bPf
+         oDLECWBAHQiTRSNiSBRN5cXqpOoGcvB29FxTcGcy1TDrqhqlj1chLtbl7QXHzhrPo1QW
+         R6sDZkUfQ3xBh0rh+xqFaCbB+4Zbu4H6NhGhTQ6kZ8ejV/mqb70MNrZixQRfq/lmLARH
+         tOva57ZN1UfqOOwD2lxqL3lrlzLyOw/YkmJam4SyBCU+1XELGCY0oaHzEHKL+tfuJ7ia
+         Uo0g==
+X-Gm-Message-State: AC+VfDz3Y0HDY/WXxnO5EpyX9vLzVEzUSjL5BLNuNnvshTJR8vSaATeU
+        d5gvaX2shdUD5z2TaRUPBUDKLNVLs/s=
+X-Google-Smtp-Source: ACHHUZ5FjGgKnKoBXfpyo3JNxXwqBqUImEJ7SWTVZRMv+JkraYho9UCyjCeDUcSyrIuSt63wjnkAuA==
+X-Received: by 2002:a5d:468d:0:b0:30a:d0a0:266e with SMTP id u13-20020a5d468d000000b0030ad0a0266emr24109094wrq.2.1687680587578;
+        Sun, 25 Jun 2023 01:09:47 -0700 (PDT)
+Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
+        by smtp.gmail.com with ESMTPSA id f1-20020a5d5681000000b0030647449730sm3980931wrv.74.2023.06.25.01.09.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 25 Jun 2023 01:09:46 -0700 (PDT)
+Message-ID: <643f1f34-e88b-0e79-3834-62884b614008@grimberg.me>
+Date:   Sun, 25 Jun 2023 11:09:45 +0300
 MIME-Version: 1.0
-X-Received: by 2002:a92:603:0:b0:340:c135:a371 with SMTP id
- x3-20020a920603000000b00340c135a371mr9287824ilg.1.1687669138699; Sat, 24 Jun
- 2023 21:58:58 -0700 (PDT)
-Date:   Sat, 24 Jun 2023 21:58:58 -0700
-In-Reply-To: <000000000000152bee05f8adb94c@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000082beb905feed17cf@google.com>
-Subject: Re: [syzbot] [block?] WARNING in wait_til_done (2)
-From:   syzbot <syzbot+9bc4da690ee5334f5d15@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
+        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
+References: <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
+ <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
+ <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
+ <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
+ <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
+ <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
+ <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
+ <ZJRcRWyn7o7lLEDM@kbusch-mbp.dhcp.thefacebook.com>
+ <ZJRgUXfRuuOoIN1o@ovpn-8-19.pek2.redhat.com>
+ <ZJRmd7bnclaNW3PL@kbusch-mbp.dhcp.thefacebook.com>
+ <ZJeJyEnSpVBDd4vb@ovpn-8-16.pek2.redhat.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <ZJeJyEnSpVBDd4vb@ovpn-8-16.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
 
-HEAD commit:    a92b7d26c743 Merge tag 'drm-fixes-2023-06-23' of git://ano..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13426150a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=24ce1b2abaee24cc
-dashboard link: https://syzkaller.appspot.com/bug?extid=9bc4da690ee5334f5d15
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17e0603b280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=137e080b280000
+>>>>>> The point was to contain requests from entering while the hctx's are
+>>>>>> being reconfigured. If you're going to pair up the freezes as you've
+>>>>>> suggested, we might as well just not call freeze at all.
+>>>>>
+>>>>> blk_mq_update_nr_hw_queues() requires queue to be frozen.
+>>>>
+>>>> It's too late at that point. Let's work through a real example. You'll
+>>>> need a system that has more CPU's than your nvme has IO queues.
+>>>>
+>>>> Boot without any special nvme parameters. Every possible nvme IO queue
+>>>> will be assigned "default" hctx type. Now start IO to every queue, then
+>>>> run:
+>>>>
+>>>>    # echo 8 > /sys/modules/nvme/parameters/poll_queues && echo 1 > /sys/class/nvme/nvme0/reset_controller
+>>>>
+>>>> Today, we freeze prior to tearing down the "default" IO queues, so
+>>>> there's nothing entered into them while the driver reconfigures the
+>>>> queues.
+>>>
+>>> nvme_start_freeze() just prevents new IO from being queued, and old ones
+>>> may still be entering block layer queue, and what matters here is
+>>> actually quiesce, which prevents new IO from being queued to
+>>> driver/hardware.
+>>>
+>>>>
+>>>> What you're suggesting will allow IO to queue up in a queisced "default"
+>>>> queue, which will become "polled" without an interrupt hanlder on the
+>>>> other side of the reset. The application doesn't know that, so the IO
+>>>> you're allowing to queue up will time out.
+>>>
+>>> time out only happens after the request is queued to driver/hardware, or after
+>>> blk_mq_start_request() is called in nvme_queue_rq(), but quiesce actually
+>>> prevents new IOs from being dispatched to driver or be queued via .queue_rq(),
+>>> meantime old requests have been canceled, so no any request can be
+>>> timed out.
+>>
+>> Quiesce doesn't prevent requests from entering an hctx, and you can't
+>> back it out to put on another hctx later. It doesn't matter that you
+>> haven't dispatched it to hardware yet. The request's queue was set the
+>> moment it was allocated, so after you unquiesce and freeze for the new
+>> queue mapping, the requests previously blocked on quiesce will time out
+>> in the scenario I've described.
+>>
+>> There are certainly gaps in the existing code where error'ed requests
+>> can be requeued or stuck elsewhere and hit the exact same problem, but
+>> the current way at least tries to contain it.
+> 
+> Yeah, but you can't remove the gap at all with start_freeze, that said
+> the current code has to live with the situation of new mapping change
+> and old request with old mapping.
+> 
+> Actually I considered to handle this kind of situation before, one approach
+> is to reuse the bio steal logic taken in nvme mpath:
+> 
+> 1) for FS IO, re-submit bios, meantime free request
+> 
+> 2) for PT request, simply fail it
+> 
+> It could be a bit violent for 2) even though REQ_FAILFAST_DRIVER is
+> always set for PT request, but not see any better approach for handling
+> PT request.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-a92b7d26.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/86f5fbd54cd3/vmlinux-a92b7d26.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/72b4c75c41dd/bzImage-a92b7d26.xz
+Ming,
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9bc4da690ee5334f5d15@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5531 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 0 PID: 5531 at drivers/block/floppy.c:999 wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
-Modules linked in:
-CPU: 0 PID: 5531 Comm: syz-executor276 Not tainted 6.4.0-rc7-syzkaller-00226-ga92b7d26c743 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
-Code: fc 41 83 fd 01 7e ac e8 3e 49 60 fc 4c 89 e6 48 c7 c7 60 42 46 8d e8 df 0a 3e fc e8 2a 49 60 fc e9 c3 fd ff ff e8 20 49 60 fc <0f> 0b e9 4b fd ff ff e8 64 1f b2 fc e9 0f fe ff ff e8 0a 49 60 fc
-RSP: 0018:ffffc900042ef738 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 1ffff9200085dee7 RCX: 0000000000000000
-RDX: ffff888023961500 RSI: ffffffff85232220 RDI: 0000000000000001
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
-R13: ffffffff8522dea0 R14: 0000000000000006 R15: 0000000000000003
-FS:  00007fbbf86fe700(0000) GS:ffff88806b600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000001ceb0000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- floppy_check_events+0x35e/0x680 drivers/block/floppy.c:4098
- disk_check_events+0xc2/0x420 block/disk-events.c:193
- disk_clear_events block/disk-events.c:248 [inline]
- bdev_check_media_change+0x12a/0x350 block/disk-events.c:279
- floppy_open+0x873/0xe90 drivers/block/floppy.c:4057
- blkdev_get_whole+0x93/0x2c0 block/bdev.c:606
- blkdev_get_by_dev.part.0+0x5e2/0xb80 block/bdev.c:756
- blkdev_get_by_dev+0x6f/0x90 block/bdev.c:790
- blkdev_open+0x140/0x2d0 block/fops.c:493
- do_dentry_open+0x6cc/0x13f0 fs/open.c:920
- do_open fs/namei.c:3636 [inline]
- path_openat+0x1baa/0x2750 fs/namei.c:3791
- do_filp_open+0x1ba/0x410 fs/namei.c:3818
- do_sys_openat2+0x16d/0x4c0 fs/open.c:1356
- do_sys_open fs/open.c:1372 [inline]
- __do_sys_openat fs/open.c:1388 [inline]
- __se_sys_openat fs/open.c:1383 [inline]
- __x64_sys_openat+0x143/0x1f0 fs/open.c:1383
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fbbf8f12444
-Code: 84 00 00 00 00 00 44 89 54 24 0c e8 c6 f9 ff ff 44 8b 54 24 0c 44 89 e2 48 89 ee 41 89 c0 bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 34 44 89 c7 89 44 24 0c e8 f8 f9 ff ff 8b 44
-RSP: 002b:00007fbbf86fdd60 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fbbf8f12444
-RDX: 0000000000000000 RSI: 00007fbbf86fdde0 RDI: 00000000ffffff9c
-RBP: 00007fbbf86fdde0 R08: 0000000000000000 R09: 00007fbbf86fe700
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
-R13: 00007ffdc0de869f R14: 00007fbbf86fe300 R15: 0000000000022000
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+I suggest to submit patches for tcp/rdma and continue the discussion on
+the pci driver.
