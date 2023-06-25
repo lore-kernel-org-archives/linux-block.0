@@ -2,137 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91FBDEB64DA
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 00:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 635DEEB64DA
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 01:54:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbjFYA1v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Jun 2023 20:27:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57498 "EHLO
+        id S230169AbjFYBy2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Jun 2023 21:54:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjFYA1v (ORCPT
+        with ESMTP id S229905AbjFYBy1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Jun 2023 20:27:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E853D10FC
-        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 17:27:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687652821;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=V8s4QvpXwSYPKRFomDkujYHgHMc8jEkRSvTYXcWmxyY=;
-        b=UhrzeXKBk5B0CX3tjdkh2eqBO5wMhw8invopDjDlIHwU/qqKIseSp2sJUJMgFWH7A7jv/p
-        v4Pp2MDQ2AkSrYzC1NKrz9ACKeRR3ziwAfAmeFZezT3Dm9XlknFxJgR02UUhkHxmEOhJNm
-        4Ges59JIhFQyGmmmld5zOfFmIPimNOM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-587-EjYExB4SO7a-6MQS9Xci3A-1; Sat, 24 Jun 2023 20:26:58 -0400
-X-MC-Unique: EjYExB4SO7a-6MQS9Xci3A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 104BC8CC203;
-        Sun, 25 Jun 2023 00:26:58 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2376B492B01;
-        Sun, 25 Jun 2023 00:26:52 +0000 (UTC)
-Date:   Sun, 25 Jun 2023 08:26:48 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Message-ID: <ZJeJyEnSpVBDd4vb@ovpn-8-16.pek2.redhat.com>
-References: <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
- <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
- <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
- <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
- <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
- <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
- <ZJRcRWyn7o7lLEDM@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRgUXfRuuOoIN1o@ovpn-8-19.pek2.redhat.com>
- <ZJRmd7bnclaNW3PL@kbusch-mbp.dhcp.thefacebook.com>
+        Sat, 24 Jun 2023 21:54:27 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E25210C9
+        for <linux-block@vger.kernel.org>; Sat, 24 Jun 2023 18:54:25 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QpYth54qNz4f3v5R
+        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 09:54:20 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP4 (Coremail) with SMTP id gCh0CgA30JNJnpdkw_XiMQ--.23029S4;
+        Sun, 25 Jun 2023 09:54:19 +0800 (CST)
+From:   Hou Tao <houtao@huaweicloud.com>
+To:     Dan Williams <dan.j.williams@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc:     linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+        virtualization@lists.linux-foundation.org, houtao1@huawei.com
+Subject: [PATCH v3] virtio_pmem: add the missing REQ_OP_WRITE for flush bio
+Date:   Sun, 25 Jun 2023 10:26:33 +0800
+Message-Id: <20230625022633.2753877-1-houtao@huaweicloud.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <ZJL3+E5P+Yw5jDKy@infradead.org>
+References: <ZJL3+E5P+Yw5jDKy@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJRmd7bnclaNW3PL@kbusch-mbp.dhcp.thefacebook.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgA30JNJnpdkw_XiMQ--.23029S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxGr1xZw1UKF4xWw17JFW8Zwb_yoW5Xr13pr
+        90kayaqr47GF4I9anFya12gFyfX3WDGrZrKFWfuw4fZFZrAF1DGw1vgFyFqa4DGrW8Gaya
+        yFWkJr1jqryUZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUgKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCj
+        c4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
+        CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1x
+        MIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJV
+        Cq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBI
+        daVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 09:19:19AM -0600, Keith Busch wrote:
-> On Thu, Jun 22, 2023 at 10:53:05PM +0800, Ming Lei wrote:
-> > On Thu, Jun 22, 2023 at 08:35:49AM -0600, Keith Busch wrote:
-> > > On Thu, Jun 22, 2023 at 09:51:12PM +0800, Ming Lei wrote:
-> > > > On Wed, Jun 21, 2023 at 09:48:49AM -0600, Keith Busch wrote:
-> > > > > The point was to contain requests from entering while the hctx's are
-> > > > > being reconfigured. If you're going to pair up the freezes as you've
-> > > > > suggested, we might as well just not call freeze at all.
-> > > > 
-> > > > blk_mq_update_nr_hw_queues() requires queue to be frozen.
-> > > 
-> > > It's too late at that point. Let's work through a real example. You'll
-> > > need a system that has more CPU's than your nvme has IO queues.
-> > > 
-> > > Boot without any special nvme parameters. Every possible nvme IO queue
-> > > will be assigned "default" hctx type. Now start IO to every queue, then
-> > > run:
-> > > 
-> > >   # echo 8 > /sys/modules/nvme/parameters/poll_queues && echo 1 > /sys/class/nvme/nvme0/reset_controller
-> > > 
-> > > Today, we freeze prior to tearing down the "default" IO queues, so
-> > > there's nothing entered into them while the driver reconfigures the
-> > > queues.
-> > 
-> > nvme_start_freeze() just prevents new IO from being queued, and old ones
-> > may still be entering block layer queue, and what matters here is
-> > actually quiesce, which prevents new IO from being queued to
-> > driver/hardware.
-> > 
-> > > 
-> > > What you're suggesting will allow IO to queue up in a queisced "default"
-> > > queue, which will become "polled" without an interrupt hanlder on the
-> > > other side of the reset. The application doesn't know that, so the IO
-> > > you're allowing to queue up will time out.
-> > 
-> > time out only happens after the request is queued to driver/hardware, or after
-> > blk_mq_start_request() is called in nvme_queue_rq(), but quiesce actually
-> > prevents new IOs from being dispatched to driver or be queued via .queue_rq(),
-> > meantime old requests have been canceled, so no any request can be
-> > timed out.
-> 
-> Quiesce doesn't prevent requests from entering an hctx, and you can't
-> back it out to put on another hctx later. It doesn't matter that you
-> haven't dispatched it to hardware yet. The request's queue was set the
-> moment it was allocated, so after you unquiesce and freeze for the new
-> queue mapping, the requests previously blocked on quiesce will time out
-> in the scenario I've described.
-> 
-> There are certainly gaps in the existing code where error'ed requests
-> can be requeued or stuck elsewhere and hit the exact same problem, but
-> the current way at least tries to contain it.
+From: Hou Tao <houtao1@huawei.com>
 
-Yeah, but you can't remove the gap at all with start_freeze, that said
-the current code has to live with the situation of new mapping change
-and old request with old mapping.
+When doing mkfs.xfs on a pmem device, the following warning was
+reported and :
 
-Actually I considered to handle this kind of situation before, one approach
-is to reuse the bio steal logic taken in nvme mpath:
+ ------------[ cut here ]------------
+ WARNING: CPU: 2 PID: 384 at block/blk-core.c:751 submit_bio_noacct
+ Modules linked in:
+ CPU: 2 PID: 384 Comm: mkfs.xfs Not tainted 6.4.0-rc7+ #154
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
+ RIP: 0010:submit_bio_noacct+0x340/0x520
+ ......
+ Call Trace:
+  <TASK>
+  ? asm_exc_invalid_op+0x1b/0x20
+  ? submit_bio_noacct+0x340/0x520
+  ? submit_bio_noacct+0xd5/0x520
+  submit_bio+0x37/0x60
+  async_pmem_flush+0x79/0xa0
+  nvdimm_flush+0x17/0x40
+  pmem_submit_bio+0x370/0x390
+  __submit_bio+0xbc/0x190
+  submit_bio_noacct_nocheck+0x14d/0x370
+  submit_bio_noacct+0x1ef/0x520
+  submit_bio+0x55/0x60
+  submit_bio_wait+0x5a/0xc0
+  blkdev_issue_flush+0x44/0x60
 
-1) for FS IO, re-submit bios, meantime free request
+The root cause is that submit_bio_noacct() needs bio_op() is either
+WRITE or ZONE_APPEND for flush bio and async_pmem_flush() doesn't assign
+REQ_OP_WRITE when allocating flush bio, so submit_bio_noacct just fail
+the flush bio.
 
-2) for PT request, simply fail it
+Simply fix it by adding the missing REQ_OP_WRITE for flush bio. And we
+could fix the flush order issue and do flush optimization later.
 
-It could be a bit violent for 2) even though REQ_FAILFAST_DRIVER is
-always set for PT request, but not see any better approach for handling
-PT request.
+Fixes: b4a6bb3a67aa ("block: add a sanity check for non-write flush/fua bios")
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+---
+v3:
+ * adjust the overly long lines in both commit message and code
 
+v2: https://lore.kernel.org/linux-block/20230621134340.878461-1-houtao@huaweicloud.com
+ * do a minimal fix first (Suggested by Christoph)
 
-Thanks,
-Ming
+v1: https://lore.kernel.org/linux-block/ZJLpYMC8FgtZ0k2k@infradead.org/T/#t
+
+Hi Jens & Dan,
+
+I found Pankaj was working on the optimization of virtio-pmem flush bio
+[0], but considering the last status update was 1/12/2022, so could you
+please pick the patch up for v6.4 and we can do the flush optimization
+later ?
+
+[0]: https://lore.kernel.org/lkml/20220111161937.56272-1-pankaj.gupta.linux@gmail.com/T/
+
+ drivers/nvdimm/nd_virtio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
+index c6a648fd8744..1f8c667c6f1e 100644
+--- a/drivers/nvdimm/nd_virtio.c
++++ b/drivers/nvdimm/nd_virtio.c
+@@ -105,7 +105,8 @@ int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
+ 	 * parent bio. Otherwise directly call nd_region flush.
+ 	 */
+ 	if (bio && bio->bi_iter.bi_sector != -1) {
+-		struct bio *child = bio_alloc(bio->bi_bdev, 0, REQ_PREFLUSH,
++		struct bio *child = bio_alloc(bio->bi_bdev, 0,
++					      REQ_OP_WRITE | REQ_PREFLUSH,
+ 					      GFP_ATOMIC);
+ 
+ 		if (!child)
+-- 
+2.29.2
 
