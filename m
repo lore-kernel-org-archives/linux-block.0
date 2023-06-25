@@ -2,136 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B14BBEB64DC
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 08:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B640EB64DC
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 08:13:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231173AbjFYIJx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jun 2023 04:09:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54068 "EHLO
+        id S230506AbjFYIN3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jun 2023 04:13:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230459AbjFYIJw (ORCPT
+        with ESMTP id S230459AbjFYIN2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jun 2023 04:09:52 -0400
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A1D610F
-        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 01:09:49 -0700 (PDT)
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-31114d47414so618499f8f.1
-        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 01:09:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687680588; x=1690272588;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qwfLjyoUz3ZDqsKQEVoGFsXw4nHaaBvsnDikn6HJhJo=;
-        b=UEu6ohq+d+1CDNGf1WrzgG0MDuGd8hmG5oBmKVfVuBSyoeuLVOSkVYo3C/OnJTbmaF
-         eBfiDeIUPLK0RjRvtGQoYUQi1VIUv9mHGriTByISUxZMkwAoGXonOje9d80TDD4E7bPf
-         oDLECWBAHQiTRSNiSBRN5cXqpOoGcvB29FxTcGcy1TDrqhqlj1chLtbl7QXHzhrPo1QW
-         R6sDZkUfQ3xBh0rh+xqFaCbB+4Zbu4H6NhGhTQ6kZ8ejV/mqb70MNrZixQRfq/lmLARH
-         tOva57ZN1UfqOOwD2lxqL3lrlzLyOw/YkmJam4SyBCU+1XELGCY0oaHzEHKL+tfuJ7ia
-         Uo0g==
-X-Gm-Message-State: AC+VfDz3Y0HDY/WXxnO5EpyX9vLzVEzUSjL5BLNuNnvshTJR8vSaATeU
-        d5gvaX2shdUD5z2TaRUPBUDKLNVLs/s=
-X-Google-Smtp-Source: ACHHUZ5FjGgKnKoBXfpyo3JNxXwqBqUImEJ7SWTVZRMv+JkraYho9UCyjCeDUcSyrIuSt63wjnkAuA==
-X-Received: by 2002:a5d:468d:0:b0:30a:d0a0:266e with SMTP id u13-20020a5d468d000000b0030ad0a0266emr24109094wrq.2.1687680587578;
-        Sun, 25 Jun 2023 01:09:47 -0700 (PDT)
-Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
-        by smtp.gmail.com with ESMTPSA id f1-20020a5d5681000000b0030647449730sm3980931wrv.74.2023.06.25.01.09.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 25 Jun 2023 01:09:46 -0700 (PDT)
-Message-ID: <643f1f34-e88b-0e79-3834-62884b614008@grimberg.me>
-Date:   Sun, 25 Jun 2023 11:09:45 +0300
+        Sun, 25 Jun 2023 04:13:28 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF799BB;
+        Sun, 25 Jun 2023 01:13:25 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QpkHz3Kgpz4f3rr5;
+        Sun, 25 Jun 2023 16:13:19 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+        by APP4 (Coremail) with SMTP id gCh0CgCH77Ic95dk7kn3MQ--.7333S3;
+        Sun, 25 Jun 2023 16:13:18 +0800 (CST)
+Message-ID: <b2004583-6e9c-9282-b59c-95cae9187378@huaweicloud.com>
+Date:   Sun, 25 Jun 2023 16:13:16 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
-        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
-References: <ZJGoWGJ5/fKfIhx+@ovpn-8-23.pek2.redhat.com>
- <27ce75fc-f6c5-7bf3-8448-242ee3e65067@grimberg.me>
- <ZJI/1w8/9pLIyXZ2@ovpn-8-23.pek2.redhat.com>
- <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
- <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
- <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
- <ZJRcRWyn7o7lLEDM@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRgUXfRuuOoIN1o@ovpn-8-19.pek2.redhat.com>
- <ZJRmd7bnclaNW3PL@kbusch-mbp.dhcp.thefacebook.com>
- <ZJeJyEnSpVBDd4vb@ovpn-8-16.pek2.redhat.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <ZJeJyEnSpVBDd4vb@ovpn-8-16.pek2.redhat.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3 0/4] block/badblocks: fix badblocks setting error
+To:     Ashok Raj <ashok_raj@linux.intel.com>, linan666@huaweicloud.com
+Cc:     axboe@kernel.dk, dan.j.williams@intel.com,
+        vishal.l.verma@intel.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+        Ashok Raj <ashok.raj@intel.com>
+References: <20230621172052.1499919-1-linan666@huaweicloud.com>
+ <ZJL73Zhyq4d/oaXd@araj-dh-work>
+From:   Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <ZJL73Zhyq4d/oaXd@araj-dh-work>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCH77Ic95dk7kn3MQ--.7333S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruw48AF4DKw1UJrW8ZryDtrb_yoWxKrg_Ca
+        yvk3s8CryrJFnxJ3W3trWUXrsYyF1DGFWrG3y5GrykW3s8tay8GFs5Gr98Z3W3J3W8Ja98
+        Gwn3XrWYvw4jqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbSxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+        1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIF
+        xwACI402YVCY1x02628vn2kIc2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7V
+        AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+        r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+        IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+        w20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
+        kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOlksUUUUU
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->>>>>> The point was to contain requests from entering while the hctx's are
->>>>>> being reconfigured. If you're going to pair up the freezes as you've
->>>>>> suggested, we might as well just not call freeze at all.
->>>>>
->>>>> blk_mq_update_nr_hw_queues() requires queue to be frozen.
->>>>
->>>> It's too late at that point. Let's work through a real example. You'll
->>>> need a system that has more CPU's than your nvme has IO queues.
->>>>
->>>> Boot without any special nvme parameters. Every possible nvme IO queue
->>>> will be assigned "default" hctx type. Now start IO to every queue, then
->>>> run:
->>>>
->>>>    # echo 8 > /sys/modules/nvme/parameters/poll_queues && echo 1 > /sys/class/nvme/nvme0/reset_controller
->>>>
->>>> Today, we freeze prior to tearing down the "default" IO queues, so
->>>> there's nothing entered into them while the driver reconfigures the
->>>> queues.
->>>
->>> nvme_start_freeze() just prevents new IO from being queued, and old ones
->>> may still be entering block layer queue, and what matters here is
->>> actually quiesce, which prevents new IO from being queued to
->>> driver/hardware.
->>>
->>>>
->>>> What you're suggesting will allow IO to queue up in a queisced "default"
->>>> queue, which will become "polled" without an interrupt hanlder on the
->>>> other side of the reset. The application doesn't know that, so the IO
->>>> you're allowing to queue up will time out.
->>>
->>> time out only happens after the request is queued to driver/hardware, or after
->>> blk_mq_start_request() is called in nvme_queue_rq(), but quiesce actually
->>> prevents new IOs from being dispatched to driver or be queued via .queue_rq(),
->>> meantime old requests have been canceled, so no any request can be
->>> timed out.
->>
->> Quiesce doesn't prevent requests from entering an hctx, and you can't
->> back it out to put on another hctx later. It doesn't matter that you
->> haven't dispatched it to hardware yet. The request's queue was set the
->> moment it was allocated, so after you unquiesce and freeze for the new
->> queue mapping, the requests previously blocked on quiesce will time out
->> in the scenario I've described.
->>
->> There are certainly gaps in the existing code where error'ed requests
->> can be requeued or stuck elsewhere and hit the exact same problem, but
->> the current way at least tries to contain it.
-> 
-> Yeah, but you can't remove the gap at all with start_freeze, that said
-> the current code has to live with the situation of new mapping change
-> and old request with old mapping.
-> 
-> Actually I considered to handle this kind of situation before, one approach
-> is to reuse the bio steal logic taken in nvme mpath:
-> 
-> 1) for FS IO, re-submit bios, meantime free request
-> 
-> 2) for PT request, simply fail it
-> 
-> It could be a bit violent for 2) even though REQ_FAILFAST_DRIVER is
-> always set for PT request, but not see any better approach for handling
-> PT request.
 
-Ming,
+在 2023/6/21 21:32, Ashok Raj 写道:
+> On Thu, Jun 22, 2023 at 01:20:48AM +0800, linan666@huaweicloud.com wrote:
+>> From: Li Nan <linan122@huawei.com>
+>>
+>> This patch series fixes some simple bugs of setting badblocks and
+>> optimizing struct badblocks. Coly Li has been trying to refactor badblocks
+>> in patch series "badblocks improvement for multiple bad block ranges", but
+>> the workload is significant. Before that, I will fix some easily triggered
+>    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> You mean the refactor is going to take longer to complete?
 
-I suggest to submit patches for tcp/rdma and continue the discussion on
-the pci driver.
+Yes, refer to the link:
+https://lore.kernel.org/all/20220721121152.4180-1-colyli@suse.de
+
+> If so, maybe state it that way...
+> 
+> .
+
+-- 
+Thanks,
+Nan
+
