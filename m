@@ -2,129 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82630EB64DC
-	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 09:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24591C0015E
+	for <linux-block@archiver.kernel.org>; Sun, 25 Jun 2023 14:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231523AbjFYJWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jun 2023 05:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41622 "EHLO
+        id S229766AbjFYOB1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Jun 2023 10:01:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230029AbjFYJWP (ORCPT
+        with ESMTP id S229448AbjFYOB0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jun 2023 05:22:15 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA516D2;
-        Sun, 25 Jun 2023 02:22:13 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QplqN4zBSz4f3kp9;
-        Sun, 25 Jun 2023 17:22:08 +0800 (CST)
-Received: from [10.174.179.247] (unknown [10.174.179.247])
-        by APP4 (Coremail) with SMTP id gCh0CgCXaK9AB5hkSAb7MQ--.48063S3;
-        Sun, 25 Jun 2023 17:22:10 +0800 (CST)
-Message-ID: <907bbe2d-9cbf-480c-be57-3289d113c42a@huaweicloud.com>
-Date:   Sun, 25 Jun 2023 17:22:08 +0800
+        Sun, 25 Jun 2023 10:01:26 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4061B1
+        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 07:01:25 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1b8053aece3so22085ad.1
+        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 07:01:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687701684; x=1690293684;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=81hUfeigYJdMFcea0oHNmqYrI7BM6QQbtVqGrjtpVcw=;
+        b=omJ60U9Qa+EzsyrYGCEYVm7rpu9bSuvkuuFwvdy+o9XQXcz6Gn3wNKLQoPwPsKHU/T
+         LLEcea6iFpOYaYujaAt6zQv2cjHlvilSbazMzJSb2CPn2Pd+FS+Z/jkXf/aZGYkmCeVp
+         R4Ox3wKFBv73f8gYU1G+ATs/2DFRCnDjCGHvJ+fAhIh1JER2+kOFZTQILWhlWkjyhhMD
+         uqR+oPbHY+cTdQW0Oz3aeMuZGTHDjhCadDMaQEhQgKaCq/MyUyo0Jrh5cPAvN5a5uXJl
+         NorS5USW7yLstX0sh3xaEPnAso4GSPACcMW7/zF73tdc331xKHrHks1xVMLafI9kzziR
+         ykuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687701684; x=1690293684;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=81hUfeigYJdMFcea0oHNmqYrI7BM6QQbtVqGrjtpVcw=;
+        b=SGTZwLdNFMXM20kpIcgBP6l+YC+T58CIRz4zCP4m9eC3D3a9TC/fSYCaP7fdrRZois
+         8YzFeduDcvAT5NpUORTbovmTYBmjLRME17mZFOm/3qIQRCwyrDlhqqOw3jrzXxo7ieIo
+         xNW4luIXL7LyHb2Yk8+9oXwq1N01XY8ek3KSXIPm/zrbs2IH0ZlTJeuYsS9aSAKMk8LA
+         WNbCNn0JdPkfO7Pp3V6QwzI00SewDGxWJ1bFxpB3k9t5MrCUXGhi24pKVfNLuxt6TR/t
+         o0fdVfdNrUrVqhyKweEI5lzjig89aPeIAQQZKHIM3DTS1I2kjA1+wF2nZlx6K8r+8fwF
+         L1ng==
+X-Gm-Message-State: AC+VfDwn0lJ0pioGXgy2KWEEBe3F8UPbyM8Pcp2MgBZ+JUVKskL2hwss
+        vvBH8NMZlJ2STwqF2nNx2Forlw==
+X-Google-Smtp-Source: ACHHUZ4NtXmYjXC6gk6M/Zcmg980PXGb0bbhzuMJ95KyNK3lhIayA5GEmmuIejXzrzN9S6JbCAmIfg==
+X-Received: by 2002:a17:902:d489:b0:1b4:ddef:841e with SMTP id c9-20020a170902d48900b001b4ddef841emr32828094plg.4.1687701684393;
+        Sun, 25 Jun 2023 07:01:24 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id w24-20020a170902d71800b001b7fa017498sm868215ply.124.2023.06.25.07.01.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 07:01:23 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     tj@kernel.org, josef@toxicpanda.com,
+        Jinke Han <hanjinke.666@bytedance.com>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, andrea.righi@canonical.com,
+        Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230507170631.89607-1-hanjinke.666@bytedance.com>
+References: <20230507170631.89607-1-hanjinke.666@bytedance.com>
+Subject: Re: [PATCH v3] blk-throttle: Fix io statistics for cgroup v1
+Message-Id: <168770168286.14597.14477909506148885094.b4-ty@kernel.dk>
+Date:   Sun, 25 Jun 2023 08:01:22 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v3 4/4] block/badblocks: fix the bug of reverse order
-To:     Ashok Raj <ashok_raj@linux.intel.com>, linan666@huaweicloud.com
-Cc:     axboe@kernel.dk, dan.j.williams@intel.com,
-        vishal.l.verma@intel.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
-        Ashok Raj <ashok.raj@intel.com>, linan122@huawei.com
-References: <20230621172052.1499919-1-linan666@huaweicloud.com>
- <20230621172052.1499919-5-linan666@huaweicloud.com>
- <ZJMGDLkRbaVD9VA8@araj-dh-work>
-From:   Li Nan <linan666@huaweicloud.com>
-In-Reply-To: <ZJMGDLkRbaVD9VA8@araj-dh-work>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCXaK9AB5hkSAb7MQ--.48063S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFWDWryxuw13Aw1UXF1xuFg_yoW8GFy8pr
-        n8J3Zakr1jgr1jg3WDX3WUKryIg34ftF4UGa1UXF1UCF9xGwn7KF1v9w4YgFy2qrsxGrnY
-        v3W3uryYva4rCa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBa14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-        F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r
-        4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v
-        4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x
-        0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-        7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-        C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-        04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2js
-        IEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUlQ6LUUUUU=
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-099c9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-
-在 2023/6/21 22:15, Ashok Raj 写道:
-> On Thu, Jun 22, 2023 at 01:20:52AM +0800, linan666@huaweicloud.com wrote:
->> From: Li Nan <linan122@huawei.com>
->>
->> Order of badblocks will be reversed if we set a large area at once. 'hi'
->> remains unchanged while adding continuous badblocks is wrong, the next
->> setting is greater than 'hi', it should be added to the next position.
->> Let 'hi' +1 each cycle.
+On Mon, 08 May 2023 01:06:31 +0800, Jinke Han wrote:
+> After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
+> blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
+> the only stable io stats interface of cgroup v1, and these statistics
+> are done in the blk-throttle code. But the current code only counts the
+> bios that are actually throttled. When the user does not add the throttle
+> limit, the io stats for cgroup v1 has nothing. I fix it according to the
+> statistical method of v2, and made it count all ios accurately.
 > 
-> The commitlog needs more work.
+> [...]
 
-OK, I will improve this.
+Applied, thanks!
 
->>
->>    # echo 0 2048 > bad_blocks
->>    # cat bad_blocks
->>      1536 512
->>      1024 512
->>      512 512
->>      0 512
-> 
-> Is the above before or after this patch is applied?
+[1/1] blk-throttle: Fix io statistics for cgroup v1
+      commit: ad7c3b41e86b59943a903d23c7b037d820e6270c
 
-All badblocks are arranged from small to large. after patch:
-
-# cat bad_blocks
-   0 512
-   512 512
-   1024 512
-   1536 512
-
-I will show it in next version. Thanks for your suggestion.
-
-> 
->>
->> Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
->> Signed-off-by: Li Nan <linan122@huawei.com>
->> ---
->>   block/badblocks.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/block/badblocks.c b/block/badblocks.c
->> index 2c2ef8284a3f..3b816690b940 100644
->> --- a/block/badblocks.c
->> +++ b/block/badblocks.c
->> @@ -301,6 +301,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
->>   			p[hi] = BB_MAKE(s, this_sectors, acknowledged);
->>   			sectors -= this_sectors;
->>   			s += this_sectors;
->> +			hi++;
->>   			changed = true;
->>   		}
->>   	}
->> -- 
->> 2.39.2
->>
-> 
-> .
-
+Best regards,
 -- 
-Thanks,
-Nan
+Jens Axboe
+
+
 
