@@ -2,116 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9BDC001DD
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 05:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 674C8C0015E
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 06:56:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbjFZFGK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 01:06:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51026 "EHLO
+        id S229681AbjFZG4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 02:56:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229562AbjFZFGI (ORCPT
+        with ESMTP id S229647AbjFZG4m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 01:06:08 -0400
-Received: from out-10.mta0.migadu.com (out-10.mta0.migadu.com [IPv6:2001:41d0:1004:224b::a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 814B1121
-        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 22:06:06 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1687755963;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bQ1f0H8lujgnS2QY9KNbH8M2Bukb16RSvTZHPii0Y5I=;
-        b=lvw7E9knFolsCy1ySMPIvpFMBrc7UR0e6MThfgqnPdjxDNnCU7/EjXABj2lUVUuWS8Coh3
-        RjIsc8pcy0woXf34Kpr/XsRT/oSF6zr1BCff+csDOdEI248UxN68j6UlvH0Nfe1wjVPHS+
-        JrfpuqDXNxNpmkEpLr/jNAqFPuLCBnE=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: [PATCH v2 3/3] blk-mq: fix start_time_ns and alloc_time_ns for pre-allocated rq
-Date:   Mon, 26 Jun 2023 13:04:05 +0800
-Message-Id: <20230626050405.781253-4-chengming.zhou@linux.dev>
-In-Reply-To: <20230626050405.781253-1-chengming.zhou@linux.dev>
-References: <20230626050405.781253-1-chengming.zhou@linux.dev>
+        Mon, 26 Jun 2023 02:56:42 -0400
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173B9AC;
+        Sun, 25 Jun 2023 23:56:42 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1b7fb1a82c4so3799195ad.1;
+        Sun, 25 Jun 2023 23:56:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687762601; x=1690354601;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u58j1CoFhNAAP0kPknc/GhPhE9N5OmJCD1ZWCCtRRgc=;
+        b=WDPKuhXalnGPckp2TpIKynsO8ZnokkfdhiarQXI1U9VrqORX/RqI+YQ6iOzudxuYfh
+         4q6XXJOoyqqR6QwbktPcLn3j/Hia6cNtm2Nrhm3yJiWc7JcKmjD3tVjEuADNSmK2GgDV
+         xk8ovnwV1ONicO1yc5JYu90NJCKD2g0I+aPJlJcB+YR5HHSFgftpBca8XhiVusEZTmu+
+         +qlUGGQiGJiMT1OVUk9z8yv0fpOv85eDrKiCyXaOhKgjcvScYC6P8FrVEMhdjE7n32Sn
+         iHlKwHWwvll89VW7GKPNxJvK15XueSQ8E1WR4TpisHG4FV0/OHjFbqUI8/raDxp23ahg
+         j18A==
+X-Gm-Message-State: AC+VfDzH7/LQdst87G9Hu9Qbm2z58jPxCzQv6It28ppNG805JMr6LwXE
+        0lNQtVHRiUvsINC/V/q86Hk=
+X-Google-Smtp-Source: ACHHUZ6OtbsuuY2aXoeHYGi4XSA3mdaoGOU6p/4pXML9TF8F1ADk58bPj18ptJOfaGu5YjoBFEMRig==
+X-Received: by 2002:a17:903:1250:b0:1b5:3c7f:1b3b with SMTP id u16-20020a170903125000b001b53c7f1b3bmr5150508plh.35.1687762601317;
+        Sun, 25 Jun 2023 23:56:41 -0700 (PDT)
+Received: from localhost (fpd11144dd.ap.nuro.jp. [209.17.68.221])
+        by smtp.gmail.com with ESMTPSA id jg3-20020a17090326c300b001a2104d706fsm2559571plb.225.2023.06.25.23.56.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 23:56:40 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 15:56:39 +0900
+From:   Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Akinobu Mita <akinobu.mita@gmail.com>,
+        Helge Deller <deller@gmx.de>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Henrik Rydberg <rydberg@bitmath.org>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Stafford Horne <shorne@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Daniel Bristot de Oliveira <bristot@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Evgeniy Polyakov <zbr@ioremap.net>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, keyrings@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-trace-devel@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-usb@vger.kernel.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        openrisc@lists.librecores.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
+        x86@kernel.org
+Subject: Re: [PATCH 00/24 v2] Documentation: correct lots of spelling errors
+ (series 1)
+Message-ID: <20230626065639.GA3403711@rocinante>
+References: <20230209071400.31476-1-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230209071400.31476-1-rdunlap@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+Hello,
 
-The iocost rely on rq start_time_ns and alloc_time_ns to tell saturation
-state of the block device. Most of the time request is allocated after
-rq_qos_throttle() and its alloc_time_ns or start_time_ns won't be affected.
+> Correct many spelling errors in Documentation/ as reported by codespell.
+> 
+> Maintainers of specific kernel subsystems are only Cc-ed on their
+> respective patches, not the entire series.
+> 
+> These patches are based on linux-next-20230209.
+> 
+[...]
+>  [PATCH 13/24] Documentation: PCI: correct spelling
+[...]
 
-But for plug batched allocation introduced by the commit 47c122e35d7e
-("block: pre-allocate requests if plug is started and is a batch"), we can
-rq_qos_throttle() after the allocation of the request. This is what the
-blk_mq_get_cached_request() does.
+Applied to misc, thank you!
 
-In this case, the cached request alloc_time_ns or start_time_ns is much
-ahead if blocked in any qos ->throttle().
+[1/1] Documentation: PCI: correct spelling
+      https://git.kernel.org/pci/pci/c/b58d6d89ae02
 
-This patch fix it by setting alloc_time_ns and start_time_ns to now
-when the pre-allocated rq is actually used.
-
-Note we don't skip setting alloc_time_ns and start_time_ns for all
-pre-allocated rq, since the first returned rq still need to be set.
-
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-mq.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8b981d0a868e..6a3f1b8aaad8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -337,6 +337,24 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
- }
- EXPORT_SYMBOL(blk_rq_init);
- 
-+/* Set rq alloc and start time when pre-allocated rq is actually used */
-+static inline void blk_mq_rq_time_init(struct request_queue *q, struct request *rq)
-+{
-+	if (blk_mq_need_time_stamp(rq->rq_flags)) {
-+		u64 now = ktime_get_ns();
-+
-+#ifdef CONFIG_BLK_RQ_ALLOC_TIME
-+		/*
-+		 * alloc time is only used by iocost for now,
-+		 * only possible when blk_mq_need_time_stamp().
-+		 */
-+		if (blk_queue_rq_alloc_time(q))
-+			rq->alloc_time_ns = now;
-+#endif
-+		rq->start_time_ns = now;
-+	}
-+}
-+
- static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		struct blk_mq_tags *tags, unsigned int tag,
- 		u64 alloc_time_ns, u64 start_time_ns)
-@@ -575,6 +593,7 @@ static struct request *blk_mq_alloc_cached_request(struct request_queue *q,
- 			return NULL;
- 
- 		plug->cached_rq = rq_list_next(rq);
-+		blk_mq_rq_time_init(q, rq);
- 	}
- 
- 	rq->cmd_flags = opf;
-@@ -2896,6 +2915,7 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 	plug->cached_rq = rq_list_next(rq);
- 	rq_qos_throttle(q, *bio);
- 
-+	blk_mq_rq_time_init(q, rq);
- 	rq->cmd_flags = (*bio)->bi_opf;
- 	INIT_LIST_HEAD(&rq->queuelist);
- 	return rq;
--- 
-2.39.2
-
+	Krzysztof
