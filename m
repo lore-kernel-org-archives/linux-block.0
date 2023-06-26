@@ -2,65 +2,55 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0479EB64DA
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 07:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8172EB64D7
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 07:54:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229973AbjFZHxc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 03:53:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41596 "EHLO
+        id S229759AbjFZHyP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 03:54:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbjFZHxb (ORCPT
+        with ESMTP id S229573AbjFZHyO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 03:53:31 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A5F6196;
-        Mon, 26 Jun 2023 00:53:30 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 72B8C67373; Mon, 26 Jun 2023 09:53:25 +0200 (CEST)
-Date:   Mon, 26 Jun 2023 09:53:25 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Joern Engel <joern@lazybastard.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Loic Poulain <loic.poulain@linaro.org>, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH 08/24] init: pass root_device_name explicitly
-Message-ID: <20230626075325.GA26851@lst.de>
-References: <20230531125535.676098-1-hch@lst.de> <20230531125535.676098-9-hch@lst.de> <c1391658-d785-4b2f-ba7e-01e4668685d7@roeck-us.net>
+        Mon, 26 Jun 2023 03:54:14 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71CDE10A
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 00:54:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=OTrORPlbKtaN3ARiMValJAU7k9
+        IrlfG5KofT8GcgxXEnXhrNmWJXxJz9safI/qfz+J7XpF856oWnay8+ENcuP2fqCjqQePt7UF7Y5bu
+        27Q89P80Sc5w5iUAX61bw4l40tLqGjZL71gELDXCgd18UmEhnqfSjDg75ot10RFXQftXS0SwCfb/D
+        ayPfvK7kcc6nPa5ncv2LMGfg1EWuzDP8FCOQ+GTcqBs17YcSL7/4Mg/PEitoqTDgfFnzpsAty/P+T
+        51oAWDKiYJaVKQiHVyAAuSiNEvOj+FQB6psDbQNzIKzVRjK+08MPayVLd9/+IA7DVoGq8M+1bbo1Q
+        WSr0idlQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qDh2t-009b7c-35;
+        Mon, 26 Jun 2023 07:53:59 +0000
+Date:   Mon, 26 Jun 2023 00:53:59 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Hou Tao <houtao@huaweicloud.com>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+        virtualization@lists.linux-foundation.org, houtao1@huawei.com
+Subject: Re: [PATCH v3] virtio_pmem: add the missing REQ_OP_WRITE for flush
+ bio
+Message-ID: <ZJlEF6PJE5W2JoQ2@infradead.org>
+References: <ZJL3+E5P+Yw5jDKy@infradead.org>
+ <20230625022633.2753877-1-houtao@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c1391658-d785-4b2f-ba7e-01e4668685d7@roeck-us.net>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20230625022633.2753877-1-houtao@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 23, 2023 at 05:08:59PM -0700, Guenter Roeck wrote:
-> Hi,
-> 
-> On Wed, May 31, 2023 at 02:55:19PM +0200, Christoph Hellwig wrote:
-> > Instead of declaring root_device_name as a global variable pass it as an
-> > argument to the functions using it.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> 
-> This patch results in the following build error when trying to build
-> xtensa:tinyconfig.
-> 
-> WARNING: modpost: vmlinux: section mismatch in reference: strcpy.isra.0+0x14 (section: .text.unlikely) -> initcall_level_names (section: .init.data)
-> ERROR: modpost: Section mismatches detected.
+Looks good:
 
-I can reproduce these with gcc 13.1 on xtensa, but the report makes
-no sense to me.  If I disable CONFIG_CC_OPTIMIZE_FOR_SIZE it now reports
-a similar warning for put_page intead of strcpy which seems just as
-arcance. 
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
