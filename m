@@ -2,81 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7268CEB64D7
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 20:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B59EB64DC
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 20:46:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjFZU01 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 16:26:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37524 "EHLO
+        id S229495AbjFZUqV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 16:46:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230023AbjFZU00 (ORCPT
+        with ESMTP id S230310AbjFZUqS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 16:26:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1417E98
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 13:25:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687811141;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=3GTZUTR7TSN2Pv2rP/zl0U3Y8nn62m39alERRhanbpM=;
-        b=gllMhVmaWtgz4+OqbJNO3j9uUMKJl/zShACVh8l/tg0LW65VZAjddRSYiRVxFijMbqz/it
-        3U99XEt5QL7NTZEDqdKp8KADjxNuuUf1V037oJSCX+/sNpM8mcnyP2W5424o7heJMXu2A6
-        9ZIjxDlLXBaCDL7D9xeN6jjojNIdnWQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-537-byjuLztxMMKAGNaaDCxVnA-1; Mon, 26 Jun 2023 16:25:37 -0400
-X-MC-Unique: byjuLztxMMKAGNaaDCxVnA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8EA838C8101;
-        Mon, 26 Jun 2023 20:25:28 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 835D215230A0;
-        Mon, 26 Jun 2023 20:25:28 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-        id 6EF2030C045B; Mon, 26 Jun 2023 20:25:28 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 66F8A3FB76;
-        Mon, 26 Jun 2023 22:25:28 +0200 (CEST)
-Date:   Mon, 26 Jun 2023 22:25:28 +0200 (CEST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Marc Smith <msmith626@gmail.com>
-Subject: [PATCH] block: flush the disk cache on BLKFLSBUF
-Message-ID: <1a33ace-57f9-9ef9-b967-d6617ca33089@redhat.com>
+        Mon, 26 Jun 2023 16:46:18 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F79173C;
+        Mon, 26 Jun 2023 13:46:16 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6687446eaccso3488598b3a.3;
+        Mon, 26 Jun 2023 13:46:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687812376; x=1690404376;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=abXWxshL/+u8xLEuocBOBOfPh4KOKawZQbGDTC33PZ4=;
+        b=aEm69tH4y2vqT7mMQYdk2zYhVgNmyj+IlFnAcDUNbf7orO46rRaTy4wqhr+nUwASWw
+         26xA2AKIATgkRVCXu/0NJYm0zV1zmprviTuCSbU+zhyTxNG0ae97/26fVKVBX5RqGqpp
+         WL6qn8jnnYV46NCKvPJUE6UmDHxsghh11ttLusz/5A/0cTY+oGg1+by30fWElEo/lnpb
+         fMwtYp6+zeEBCuTBBWi1DZ0x6Y2akNNl3polboTYZhfTfmzO2kaIHwduCUUCVpV9SPWX
+         yUH97BFulz1ASCV45RmPWS+6ddFCwNAK+vEF9ErRkcZhARs4fNOWWKnvDDn4eGOD/Uah
+         U1jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687812376; x=1690404376;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=abXWxshL/+u8xLEuocBOBOfPh4KOKawZQbGDTC33PZ4=;
+        b=STb4BfK9UhD0TUQVlh5f0AGMR8tzk155+iT5uox1dDF6vy/Ty5WQGmC74chVCEc00k
+         LI2W+fSp4KrD7nCggTK5j+AaGa2Sg9sSDfO8AXy42/lNMBm++5jJBeB0CkbOqY2HmrWw
+         2CWhC/q/CyqPjs3X5WmSj2j9IB939e/POOXUNcAg6+HuMut/vk2kar+WlXduB9ZcmHxk
+         HztlJ6PQQPv4SqB0pguhdEt7HZB4n8MLwQt8utyrzj804To3uqGCIGOq/Imt4RU1KyXg
+         w/xzPQIKDxuWgQ8i5DyxNbN35LeDWgyKOJDoGrjGakw0fd2PI8rngnGayvmBEA/PrGFL
+         yjHA==
+X-Gm-Message-State: AC+VfDyKuu/e7TwS6FMTbhe1tp2Nweq4mk6f5Uccq7Co+XSaFphS34qC
+        IEvbBDLPQnHgWbbHgMqMtd0=
+X-Google-Smtp-Source: ACHHUZ6kKDI19PV3gjIP1GxofqDbnPWWJC2aL4PzMWJSHKt/gwspnE1qLDSHSC/3/gnqL4T6MtuXDQ==
+X-Received: by 2002:a05:6a00:2e0e:b0:66b:6021:10fe with SMTP id fc14-20020a056a002e0e00b0066b602110femr12260119pfb.31.1687812375855;
+        Mon, 26 Jun 2023 13:46:15 -0700 (PDT)
+Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
+        by smtp.gmail.com with ESMTPSA id p15-20020aa7860f000000b0064cca73d911sm4206288pfn.103.2023.06.26.13.46.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 13:46:15 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 26 Jun 2023 10:46:15 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     chengming.zhou@linux.dev
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
+Subject: Re: [PATCH v2 3/3] blk-mq: fix start_time_ns and alloc_time_ns for
+ pre-allocated rq
+Message-ID: <ZJn5F4xb6gln0653@slm.duckdns.org>
+References: <20230626050405.781253-1-chengming.zhou@linux.dev>
+ <20230626050405.781253-4-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230626050405.781253-4-chengming.zhou@linux.dev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The BLKFLSBUF ioctl doesn't send the flush bio to the block device, thus
-flushed data may be lurking in the disk cache and they may not be really
-flushed to the stable storage.
+Hello,
 
-This patch adds the call to blkdev_issue_flush to blkdev_flushbuf.
+I only glanced the blk-mq core part but in general this looks a lot better
+than the previous one.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+On Mon, Jun 26, 2023 at 01:04:05PM +0800, chengming.zhou@linux.dev wrote:
+> Note we don't skip setting alloc_time_ns and start_time_ns for all
+> pre-allocated rq, since the first returned rq still need to be set.
 
----
- block/ioctl.c |    1 +
- 1 file changed, 1 insertion(+)
+This part is a bit curious for me tho. Why do we need to set it at batch
+allocation time and then at actual dispensing from the bat later? Who uses
+the alloc time stamp inbetween?
 
-Index: linux-2.6/block/ioctl.c
-===================================================================
---- linux-2.6.orig/block/ioctl.c
-+++ linux-2.6/block/ioctl.c
-@@ -351,6 +351,7 @@ static int blkdev_flushbuf(struct block_
- 		return -EACCES;
- 	fsync_bdev(bdev);
- 	invalidate_bdev(bdev);
-+	blkdev_issue_flush(bdev);
- 	return 0;
- }
- 
+Thanks.
 
+-- 
+tejun
