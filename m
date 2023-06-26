@@ -2,120 +2,335 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D4DEB64DA
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 11:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 254DFEB64DC
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 12:13:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230325AbjFZLdt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 07:33:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35128 "EHLO
+        id S229765AbjFZMNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 08:13:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230200AbjFZLdd (ORCPT
+        with ESMTP id S229573AbjFZMNp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 07:33:33 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6153610DD
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 04:33:26 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3f9c88ac077so40667495e9.1
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 04:33:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687779205; x=1690371205;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qMePQhdtBcD145xWWP6ObKBgPBwVavSA5DCnm+uLPN8=;
-        b=U6qu03h0316pgcKA70DgwCkGBgdWx68jKFZW+1WrRbBsaHb5uHLiy1iibBG3su9pDe
-         n4qg8U1R2B0+Q71zIEflIORXD3QiaQU/DDloPAr7wnCXwOLQVfxhWE7iGBtSuafeHA1n
-         McIfhqj0WwFIQLFFCB5JcbARHZvEHcMCwYDmkVCaIb69S3S73jdmMyOvg1Ryq5NIE35g
-         bWVeYdHid7Dtw2zL/YB69XFYaYIiWbTVnSADSY2s4q1Q+6ArVrR39Axfvui+9+kx/kVd
-         SliSHdJiwBXy5FFLZhNG6iy4Q7jX6afHZbji/zyaJEZJdkHVDnn0gUa+4K5mINDF3AtG
-         UxTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687779205; x=1690371205;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qMePQhdtBcD145xWWP6ObKBgPBwVavSA5DCnm+uLPN8=;
-        b=O/gD8SlsiALeYIIRkL5FVrNq3L9OZEw5li9DRV2HGf2eal8h4YoKQR7ddkZ3gI7Hoe
-         +SyBJS940zlx4Nt+Nnq38JvQFD7ituZ1gnQIspi3nV9nwl1f5xdG5iKMJKgbmOSor37b
-         4d7KX1f6AN7iRrAjlRxfy5wSFyH84Y7Pwq+5Gj4O5jrT6mr1sCMxzJu4uAi2tjjabXUz
-         I/4aWiYcHSPSuvY3qqgVqnEH844PTkN66OtxjU8y30cF478B//qh/eLLFRhpvORUKZ1Q
-         DK1jUa1XaFzOQiutfDFCyXhL2nMYU4K1eDzNNdecE/Ys9tOuB/wHBiA+KbKF5+OHfm3R
-         sTlg==
-X-Gm-Message-State: AC+VfDwiFv5l023emTSmK+mkOyXBV8lbd9tTa/36xcp1HXlSnx+gDiFK
-        kcE+bIpmFCLvnzxHXlwpSnFFI8JGMgb5T4StPsU=
-X-Google-Smtp-Source: ACHHUZ4VqIEYP2PnHQc0NwXfgsVq3bgr+yPFv0RukQVPK2hxMBmZPFYLFUNb0ZpxLDmYzqbgruO3Yg==
-X-Received: by 2002:a7b:cd11:0:b0:3f9:c7b0:4976 with SMTP id f17-20020a7bcd11000000b003f9c7b04976mr10274874wmj.12.1687779204683;
-        Mon, 26 Jun 2023 04:33:24 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id a10-20020a1cf00a000000b003f8fb02c413sm7453169wmb.8.2023.06.26.04.33.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 04:33:23 -0700 (PDT)
-Date:   Mon, 26 Jun 2023 14:33:18 +0300
-From:   Dan Carpenter <dan.carpenter@linaro.org>
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>
-Subject: Re: [PATCH v2 4/5] nvme-fc: Make initial connect attempt synchronous
-Message-ID: <3ea88e87-9b24-4f7a-958c-97e27d94ec30@moroto.mountain>
-References: <20230620133711.22840-1-dwagner@suse.de>
- <20230620133711.22840-5-dwagner@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230620133711.22840-5-dwagner@suse.de>
+        Mon, 26 Jun 2023 08:13:45 -0400
+X-Greylist: delayed 901 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 26 Jun 2023 05:13:41 PDT
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7FE8C1B7;
+        Mon, 26 Jun 2023 05:13:40 -0700 (PDT)
+X-AuditID: a67dfc5b-d85ff70000001748-eb-64997d6b36ff
+From:   Byungchul Park <byungchul@sk.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
+        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+        tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+        sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
+        hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
+        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
+        boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com,
+        her0gyugyu@gmail.com
+Subject: [PATCH v10 06/25] dept: Add proc knobs to show stats and dependency graph
+Date:   Mon, 26 Jun 2023 20:56:41 +0900
+Message-Id: <20230626115700.13873-7-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230626115700.13873-1-byungchul@sk.com>
+References: <20230626115700.13873-1-byungchul@sk.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSXUxTZxjHfc/Hew4dNWed0eNHpulU4scQjZAnmVHjxXwv1Cjc+HHBGns2
+        GguSVvmYuiDUCSgoGgQFGRRTCSDqqQlVaFerYFFBEMLQFDZw6lipxM6iHRVtMd48+eX5/5/f
+        1cPTKgc7j9elHZAMaRq9GisYhS+65lv9kfPauNu9CEpOxkHgTT4DlVcbMXQ3NSBovHGUgtG2
+        zfDHxBiCyc5HNJSVdiOoGR6k4Ub7EAJ7XS6G3r9nQl9gHENH6QkMebVXMfR4QxR4zp2hoEHe
+        Cg9OmylwBl8yUDaKoaIsjwqPfygIWuo5sOQsgZG6CxyEhldDx1A/C/anK+B8lQdDq72DgXbb
+        CAW9tyoxDDV+YOFBu5uB7pIiFq68MmPwTlhosATGOXjsrKbgmiks+jdkp+DX/6ZYuFfkDNOl
+        6xT0PWlB4Mj/iwK5sR/DncAYBVa5lIb/L7chGCn2cXDsZJCDiqPFCE4cO8fAo/f3WDB54mHy
+        XSXe+B25MzZOE5M1k9gnqhly3yySmxcGOWJyPOVItXyQWOuWk9rWUYrU+AMskesLMJH9ZzhS
+        6OujiKe/FZNXXV0ccZdPMtsX7Fas00p6XYZkWLX+B0WK7W4lTh9IyPrNOz8HNa8sRDwvCmtF
+        r/xNIYqaxuMFMhthLMSIAwNBOsKzhEWitehFeK/gaaH2C/Gl+y4XCb4SEsXxKXm6xAhLxIfm
+        iyjCSiFe9Dg76U/ShWLDNec0RwkJYstD83RHFe7kelw4IhWFs1FiUZWL+nQwV7xdN8CcRspq
+        NKMeqXRpGakanX5tbEp2mi4rdu/+VBmFv8pyJLTHhvzdSS4k8EgdrYz7ulyrYjUZxuxUFxJ5
+        Wj1LOftdmVal1Gqyf5YM+5MNB/WS0YXm84x6jnLNRKZWJfykOSDtk6R0yfA5pfioeTno0vM8
+        T5U/vXPns/zJ63MTt+5MOLStOdO3ZXH2nMGKJ8M9K5qv7Pg9Nu7PnpjNW75/C9ZnOSWKArd6
+        MRdjSo622NYl/vi863AzGdNl2d774n2/tJFdvf1JmjVfGuXc2cum6l+fOrRh1WuDWK5LMd53
+        bKIdQ01Lg8XbW2xm/+WQ2/tYzRhTNKuX0waj5iM2ypM5UQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe1CMexjH/d7L792Wbd5ZDW86TmaHYULKKI/RuMyZo5cZBsMYd5t9Rzu1
+        YZfIjJkum1MqZGRD2N2a1VRubyG07JQuq1SUJFu0DNLNpO1IG2fLnH+e+cz3+5nvX4+ElJvo
+        aRJ1zCFBG6OMVmApJV23NGl+1PELqqDEuzMhMz0IXIMpFOTcLMLQeKMQQVFJAgFdleHwaqgH
+        wcizBhIMWY0ITJ3tJJRUdSCw5idiaPrgDc2ufgz2rDQMSbk3MTzvdhPgOH+WgEJxLdSeMRNg
+        G/5EgaELwyVDEuE5nwkYthQwYImfBc78iwy4O4PB3tFCQ8VlOw3Wtrlw4YoDQ5nVTkFVqZOA
+        pgc5GDqKftFQW1VDQWNmBg3X+8wYuocsJFhc/Qy8sBkJuKX3rH1xWwk48e0nDdUZNg/l3Sag
+        +fVDBI9S3hEgFrVgqHD1EFAsZpHw41olAuepXgaS04cZuJRwCkFa8nkKGkaradA7QmDkew5e
+        EcZX9PSTvL74CG8dMlL8UzPH37/YzvD6R20MbxQP88X5AXxuWRfBmwZcNC8WpGJeHDjL8Cd7
+        mwne0VKG+b76eoavyR6h1k/fJg1TCdHqWEG7YNkeaWTpkxx8oDX06NVuv3h0b95J5CXh2EXc
+        P6kiPcaYnc21tg6TY+zDzuCKMz56cqmEZHMncp9qnjBjxWR2I9f/UxyXKHYWV2e+jMZYxoZw
+        Dtsz8veoP1d4yzbOXmwo97DOPO7IPU6ioxyfQVIjmlCAfNQxsRqlOjokUBcVGRejPhq4d79G
+        RJ7HsRx3Z5aiwabwcsRKkGKSLOjPbJWcVsbq4jTliJOQCh/ZlO8GlVymUsYdE7T7d2sPRwu6
+        cuQnoRRTZWu2CHvk7D7lISFKEA4I2v9bQuI1LR69eT99oe9Bjf/OXyl/OJc/NyVcIz/3em9u
+        SKYqe6pHS1X5g6pFC1cGa5MsaQ/ur8m7s91gn7OUg1WJ/9b7LR7YER5n3tC39fUJVl8rjZgc
+        EXau8/HWujeheYFr0YDdbGzXvNq4d/Yu378nznXqUv8qCfB3X/nq/TLZJKzedDr97WjEEgWl
+        i1QGB5BanfI/rX9FNzQDAAA=
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 03:37:10PM +0200, Daniel Wagner wrote:
-> Commit 4c984154efa1 ("nvme-fc: change controllers first connect to use
-> reconnect path") made the connection attempt asynchronous in order to
-> make the connection attempt from autoconnect/boot via udev/systemd up
-> case a bit more reliable.
-> 
-> Unfortunately, one side effect of this is that any wrong parameters
-> provided from userspace will not be directly reported as invalid, e.g.
-> auth keys.
-> 
-> So instead having the policy code inside the kernel it's better to
-> address this in userspace, for example in nvme-cli or nvme-stas.
-> 
-> This aligns the fc transport with tcp and rdma.
-> 
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> ---
->  drivers/nvme/host/fc.c | 19 ++++++++-----------
->  1 file changed, 8 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-> index 472ed285fd45..aa2911f07c6c 100644
-> --- a/drivers/nvme/host/fc.c
-> +++ b/drivers/nvme/host/fc.c
-> @@ -2943,6 +2943,8 @@ nvme_fc_create_io_queues(struct nvme_fc_ctrl *ctrl)
->  	/* force put free routine to ignore io queues */
->  	ctrl->ctrl.tagset = NULL;
->  
-> +	if (ret > 0)
-> +		ret = -EIO;
+It'd be useful to show Dept internal stats and dependency graph on
+runtime via proc for better information. Introduced the knobs.
 
-All these checks for ret > 0 make me unhappy.  I don't understand how
-they are a part of the commit.
+Signed-off-by: Byungchul Park <byungchul@sk.com>
+---
+ kernel/dependency/Makefile        |  1 +
+ kernel/dependency/dept.c          | 24 +++-----
+ kernel/dependency/dept_internal.h | 26 +++++++++
+ kernel/dependency/dept_proc.c     | 95 +++++++++++++++++++++++++++++++
+ 4 files changed, 131 insertions(+), 15 deletions(-)
+ create mode 100644 kernel/dependency/dept_internal.h
+ create mode 100644 kernel/dependency/dept_proc.c
 
-I have tried to look at the context and I think maybe you are working
-around the fact that qla_nvme_ls_req() returns QLA_FUNCTION_FAILED on
-error.
+diff --git a/kernel/dependency/Makefile b/kernel/dependency/Makefile
+index b5cfb8a03c0c..92f165400187 100644
+--- a/kernel/dependency/Makefile
++++ b/kernel/dependency/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+ obj-$(CONFIG_DEPT) += dept.o
++obj-$(CONFIG_DEPT) += dept_proc.o
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index d3b6d2f4cd7b..c5e23e9184b8 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -74,6 +74,7 @@
+ #include <linux/dept.h>
+ #include <linux/utsname.h>
+ #include <linux/kernel.h>
++#include "dept_internal.h"
+ 
+ static int dept_stop;
+ static int dept_per_cpu_ready;
+@@ -261,20 +262,13 @@ static inline bool valid_key(struct dept_key *k)
+  *       have been freed will be placed.
+  */
+ 
+-enum object_t {
+-#define OBJECT(id, nr) OBJECT_##id,
+-	#include "dept_object.h"
+-#undef  OBJECT
+-	OBJECT_NR,
+-};
+-
+ #define OBJECT(id, nr)							\
+ static struct dept_##id spool_##id[nr];					\
+ static DEFINE_PER_CPU(struct llist_head, lpool_##id);
+ 	#include "dept_object.h"
+ #undef  OBJECT
+ 
+-static struct dept_pool pool[OBJECT_NR] = {
++struct dept_pool dept_pool[OBJECT_NR] = {
+ #define OBJECT(id, nr) {						\
+ 	.name = #id,							\
+ 	.obj_sz = sizeof(struct dept_##id),				\
+@@ -304,7 +298,7 @@ static void *from_pool(enum object_t t)
+ 	if (DEPT_WARN_ON(!irqs_disabled()))
+ 		return NULL;
+ 
+-	p = &pool[t];
++	p = &dept_pool[t];
+ 
+ 	/*
+ 	 * Try local pool first.
+@@ -339,7 +333,7 @@ static void *from_pool(enum object_t t)
+ 
+ static void to_pool(void *o, enum object_t t)
+ {
+-	struct dept_pool *p = &pool[t];
++	struct dept_pool *p = &dept_pool[t];
+ 	struct llist_head *h;
+ 
+ 	preempt_disable();
+@@ -2136,7 +2130,7 @@ void dept_map_copy(struct dept_map *to, struct dept_map *from)
+ 	clean_classes_cache(&to->map_key);
+ }
+ 
+-static LIST_HEAD(classes);
++LIST_HEAD(dept_classes);
+ 
+ static inline bool within(const void *addr, void *start, unsigned long size)
+ {
+@@ -2168,7 +2162,7 @@ void dept_free_range(void *start, unsigned int sz)
+ 	while (unlikely(!dept_lock()))
+ 		cpu_relax();
+ 
+-	list_for_each_entry_safe(c, n, &classes, all_node) {
++	list_for_each_entry_safe(c, n, &dept_classes, all_node) {
+ 		if (!within((void *)c->key, start, sz) &&
+ 		    !within(c->name, start, sz))
+ 			continue;
+@@ -2244,7 +2238,7 @@ static struct dept_class *check_new_class(struct dept_key *local,
+ 	c->sub_id = sub_id;
+ 	c->key = (unsigned long)(k->base + sub_id);
+ 	hash_add_class(c);
+-	list_add(&c->all_node, &classes);
++	list_add(&c->all_node, &dept_classes);
+ unlock:
+ 	dept_unlock();
+ caching:
+@@ -2958,8 +2952,8 @@ static void migrate_per_cpu_pool(void)
+ 		struct llist_head *from;
+ 		struct llist_head *to;
+ 
+-		from = &pool[i].boot_pool;
+-		to = per_cpu_ptr(pool[i].lpool, boot_cpu);
++		from = &dept_pool[i].boot_pool;
++		to = per_cpu_ptr(dept_pool[i].lpool, boot_cpu);
+ 		move_llist(to, from);
+ 	}
+ }
+diff --git a/kernel/dependency/dept_internal.h b/kernel/dependency/dept_internal.h
+new file mode 100644
+index 000000000000..007c1eec6bab
+--- /dev/null
++++ b/kernel/dependency/dept_internal.h
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Dept(DEPendency Tracker) - runtime dependency tracker internal header
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (c) 2020 LG Electronics, Inc., Byungchul Park
++ */
++
++#ifndef __DEPT_INTERNAL_H
++#define __DEPT_INTERNAL_H
++
++#ifdef CONFIG_DEPT
++
++enum object_t {
++#define OBJECT(id, nr) OBJECT_##id,
++	#include "dept_object.h"
++#undef  OBJECT
++	OBJECT_NR,
++};
++
++extern struct list_head dept_classes;
++extern struct dept_pool dept_pool[];
++
++#endif
++#endif /* __DEPT_INTERNAL_H */
+diff --git a/kernel/dependency/dept_proc.c b/kernel/dependency/dept_proc.c
+new file mode 100644
+index 000000000000..7d61dfbc5865
+--- /dev/null
++++ b/kernel/dependency/dept_proc.c
+@@ -0,0 +1,95 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Procfs knobs for Dept(DEPendency Tracker)
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (C) 2021 LG Electronics, Inc. , Byungchul Park
++ */
++#include <linux/proc_fs.h>
++#include <linux/seq_file.h>
++#include <linux/dept.h>
++#include "dept_internal.h"
++
++static void *l_next(struct seq_file *m, void *v, loff_t *pos)
++{
++	/*
++	 * XXX: Serialize list traversal if needed. The following might
++	 * give a wrong information on contention.
++	 */
++	return seq_list_next(v, &dept_classes, pos);
++}
++
++static void *l_start(struct seq_file *m, loff_t *pos)
++{
++	/*
++	 * XXX: Serialize list traversal if needed. The following might
++	 * give a wrong information on contention.
++	 */
++	return seq_list_start_head(&dept_classes, *pos);
++}
++
++static void l_stop(struct seq_file *m, void *v)
++{
++}
++
++static int l_show(struct seq_file *m, void *v)
++{
++	struct dept_class *fc = list_entry(v, struct dept_class, all_node);
++	struct dept_dep *d;
++	const char *prefix;
++
++	if (v == &dept_classes) {
++		seq_puts(m, "All classes:\n\n");
++		return 0;
++	}
++
++	prefix = fc->sched_map ? "<sched> " : "";
++	seq_printf(m, "[%p] %s%s\n", (void *)fc->key, prefix, fc->name);
++
++	/*
++	 * XXX: Serialize list traversal if needed. The following might
++	 * give a wrong information on contention.
++	 */
++	list_for_each_entry(d, &fc->dep_head, dep_node) {
++		struct dept_class *tc = d->wait->class;
++
++		prefix = tc->sched_map ? "<sched> " : "";
++		seq_printf(m, " -> [%p] %s%s\n", (void *)tc->key, prefix, tc->name);
++	}
++	seq_puts(m, "\n");
++
++	return 0;
++}
++
++static const struct seq_operations dept_deps_ops = {
++	.start	= l_start,
++	.next	= l_next,
++	.stop	= l_stop,
++	.show	= l_show,
++};
++
++static int dept_stats_show(struct seq_file *m, void *v)
++{
++	int r;
++
++	seq_puts(m, "Availability in the static pools:\n\n");
++#define OBJECT(id, nr)							\
++	r = atomic_read(&dept_pool[OBJECT_##id].obj_nr);		\
++	if (r < 0)							\
++		r = 0;							\
++	seq_printf(m, "%s\t%d/%d(%d%%)\n", #id, r, nr, (r * 100) / (nr));
++	#include "dept_object.h"
++#undef  OBJECT
++
++	return 0;
++}
++
++static int __init dept_proc_init(void)
++{
++	proc_create_seq("dept_deps", S_IRUSR, NULL, &dept_deps_ops);
++	proc_create_single("dept_stats", S_IRUSR, NULL, dept_stats_show);
++	return 0;
++}
++
++__initcall(dept_proc_init);
+-- 
+2.17.1
 
-Also the qla_nvme_ls_req() function EINVAL on error.  I just wrote a
-commit message saying that none of the callers cared but I missed that
-apparently gets returned to nvme_fc_init_ctrl().  :/
-https://lore.kernel.org/all/49866d28-4cfe-47b0-842b-78f110e61aab@moroto.mountain/
-
-Let's just fix qla_nvme_ls_req() instead of working around it here.
-
-And let's add a WARN_ON_ONCE() somewhere to prevent future bugs.
-
-regards,
-dan carpenter
