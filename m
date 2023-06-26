@@ -2,142 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E0BAEB64D7
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 09:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E681EB64D7
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 09:21:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbjFZJM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 05:12:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55986 "EHLO
+        id S230055AbjFZJVf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 05:21:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbjFZJLz (ORCPT
+        with ESMTP id S230063AbjFZJU4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 05:11:55 -0400
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2649A270D;
-        Mon, 26 Jun 2023 02:10:04 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R641e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=mengferry@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VlzLk7o_1687770601;
-Received: from 30.221.129.54(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0VlzLk7o_1687770601)
-          by smtp.aliyun-inc.com;
-          Mon, 26 Jun 2023 17:10:02 +0800
-Message-ID: <34696152-3ae8-138a-d426-aa4fdde4e7ab@linux.alibaba.com>
-Date:   Mon, 26 Jun 2023 17:09:59 +0800
+        Mon, 26 Jun 2023 05:20:56 -0400
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66319E7D
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 02:19:07 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230626091903epoutp03684484476951de29da3d7a51ff6b12d6~sKummQ4og2273422734epoutp03Q
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 09:19:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230626091903epoutp03684484476951de29da3d7a51ff6b12d6~sKummQ4og2273422734epoutp03Q
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1687771143;
+        bh=gq5nfwHqHVfoRrgySJa7rfffjXc4wl5G348+fsTE7ww=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=dBlK4GhYAw/2JrmilOCzU+0GCRYVLQ4N74UDdT9rxM/R8jlaZHwaAMj9IJ83D+Mmp
+         /f9fk/ehC/F/f7C+bG3FJCvdcstMVsHQJEmrQDfE1UBf1w2bmPPCh8ScI2Yahuql3V
+         LVrK74HDN4pBXngITgEaMhrfXXJV0X+Y9zB6Kvws=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20230626091902epcas5p3ca62c27bd08175dfa32226e202b10b1a~sKuluxEpZ0386803868epcas5p3M;
+        Mon, 26 Jun 2023 09:19:02 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.182]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4QqMjJ4TnDz4x9Q7; Mon, 26 Jun
+        2023 09:19:00 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        6A.D8.44250.40859946; Mon, 26 Jun 2023 18:19:00 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230626091207epcas5p2a2957dfe97c4d82e39defa557d7ffd0e~sKojSL2p72645526455epcas5p2z;
+        Mon, 26 Jun 2023 09:12:07 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230626091207epsmtrp1d6a2e428c956d80e379ec357b2aacb82~sKojQqVHQ1964119641epsmtrp1A;
+        Mon, 26 Jun 2023 09:12:07 +0000 (GMT)
+X-AuditID: b6c32a4a-ec1fd7000000acda-16-649958041bbb
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        43.1D.64355.76659946; Mon, 26 Jun 2023 18:12:07 +0900 (KST)
+Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230626091206epsmtip178709a4d491b84066820b57c472a7f6f~sKoiFI-Us0137101371epsmtip1B;
+        Mon, 26 Jun 2023 09:12:06 +0000 (GMT)
+From:   Min Li <min15.li@samsung.com>
+To:     axboe@kernel.dk, willy@infradead.org, hch@lst.de,
+        dlemoal@kernel.org, gregkh@linuxfoundation.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Min Li <min15.li@samsung.com>
+Subject: [PATCH] block: add check that partition length needs to be aligned
+ with block size
+Date:   Mon, 26 Jun 2023 17:10:21 +0000
+Message-Id: <20230626171021.5895-1-min15.li@samsung.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Content-Language: en-US
-To:     io-uring@vger.kernel.org, axboe@kernel.dk
-Cc:     joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org
-From:   Ferry Meng <mengferry@linux.alibaba.com>
-Subject: [bug report] nvme passthrough: request failed when blocksize
- exceeding max_hw_sectors
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDJsWRmVeSWpSXmKPExsWy7bCmpi5LxMwUg0kvlCxW3+1ns3iw396i
+        efF6Nosbx98xW8x9fYnFYuXqo0wWe29pW1zeNYfNYvmqDiaLsxM+sFr8/gHk3lh3lcWBx2Pz
+        Ci2Py2dLPTat6mTz2D93DbvH7psNbB59W1YxenzeJBfAHpVtk5GamJJapJCal5yfkpmXbqvk
+        HRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQN0pZJCWWJOKVAoILG4WEnfzqYov7QkVSEj
+        v7jEVim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO+PXFLOCzxwVZ3evZG1gnMPexcjB
+        ISFgIrFoJ5DJxSEksJtR4trZXhYI5xOjxNm9d1i7GDkhnO+Ly2AaFp/KhKjZySjxY81uZgjn
+        OaPEr0NHwaayCShLbFvqA9IrIpAmsbTjJxuIzSwQJ3Gpq5MdxBYWiJVYM+ML2HwWAVWJyb/W
+        g9XwClhIbF7yjAXElhCQl9h/8CwzRFxQ4uTMJywQc+QlmrfOBtsrIfCVXeLt5MmMEA0uEmde
+        /oSyhSVeHd/CDmFLSbzsb4P6uFji5Y8wiHCNxO5vt5kgbGuJbevXMYGUMAtoSqzfpQ8RlpWY
+        emodE8RaPone30+gynkldsyDsZUk/l44B7VVQmLx/oesELaHxI7Oz2wgI4WA3r0zy3wCo/ws
+        JM/MQvLMLITFCxiZVzFKphYU56anFpsWGOWllsOjNDk/dxMjOJlqee1gfPjgg94hRiYOxkOM
+        EhzMSiK8Yj+mpwjxpiRWVqUW5ccXleakFh9iNAWG8ERmKdHkfGA6zyuJNzSxNDAxMzMzsTQ2
+        M1QS5112pTdFSCA9sSQ1OzW1ILUIpo+Jg1OqgSn1oNniBwfPKjO57RQ5GnGybt+ZePZJJrP8
+        Tp0V5Zkc8PhA8boC9bip7Ip1zLPPHpr14QPzjftlXU9n/5sZMj/q2JSzM2J0ilzm7EvklHth
+        vPym2ua6a/frLj9I3DL37ud649TavSacTy+HcVyyPG993vX+Z69d30+tcpvZ8Spuj0U2l2NW
+        xx2/9v8h3ae++DxNvNKZfnt7+pxTz2cqS0c/vvxktkOc9Jrw+BfbWqdll23gO51h+f2qQptL
+        qIBc4tx7zZZGQm+/Ce84lflrvmbQIgGR6Pqmlfb7HrDE27GKHf14ZaZi4R3mf+LrLnR5rq+c
+        Vui3MnFFrqPxxjkBlyLnn/VYIntnHWcU3/+gxa1CSizFGYmGWsxFxYkAuzP7/S8EAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrGLMWRmVeSWpSXmKPExsWy7bCSnG562MwUg9szxS1W3+1ns3iw396i
+        efF6Nosbx98xW8x9fYnFYuXqo0wWe29pW1zeNYfNYvmqDiaLsxM+sFr8/gHk3lh3lcWBx2Pz
+        Ci2Py2dLPTat6mTz2D93DbvH7psNbB59W1YxenzeJBfAHsVlk5Kak1mWWqRvl8CV8WuKWcFn
+        joqzu1eyNjDOYe9i5OCQEDCRWHwqs4uRi0NIYDujxPNZV1m6GDmB4hIS5+f9YoOwhSVW/nvO
+        DlH0lFFi8+n3LCDNbALKEtuW+oCYIgI5Eiu++4OUMwskSHT8OMQOYgsLREs82HgGzGYRUJWY
+        /Gs92EheAQuJzUueQa2Sl9h/8CwzRFxQ4uTMJywQc+QlmrfOZp7AyDcLSWoWktQCRqZVjKKp
+        BcW56bnJBYZ6xYm5xaV56XrJ+bmbGMFBrRW0g3HZ+r96hxiZOBgPMUpwMCuJ8Ir9mJ4ixJuS
+        WFmVWpQfX1Sak1p8iFGag0VJnFc5pzNFSCA9sSQ1OzW1ILUIJsvEwSnVwDRVulBz74w5hkI3
+        Py9s/zJv7cmUTSsrL4YuFmUunf1yJffUtjiL77uPxht+99zN6WTIf/hRVltv348elrAnPNxq
+        fgKbKxqfRE7l6LsxIUJSTqT0X8Pryl3SMWvy7il+9ntuJqgb9ntXuPzTdRfzrJ9oXKr5qngz
+        Lm3u23Jj1bw5rTes2xsNVL9fzwtec6XE7vCVp2HPG/+YnL2kteHz1436qzOSi9I8WCrk+FmL
+        jmZvs1tlf1Lg4dEd5sw/zDMWyIoVrOpR9BCK/V9m/KWy8cuLZ/uDF4quXNrNMdNv3pLU3Zxd
+        KRIX9r5lUA/u23xv0uz8abuzojgnTy9t+uR1UG673qMVYrcbalfMcJ9vU6DEUpyRaKjFXFSc
+        CADZ7Fh52QIAAA==
+X-CMS-MailID: 20230626091207epcas5p2a2957dfe97c4d82e39defa557d7ffd0e
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230626091207epcas5p2a2957dfe97c4d82e39defa557d7ffd0e
+References: <CGME20230626091207epcas5p2a2957dfe97c4d82e39defa557d7ffd0e@epcas5p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello:
+Before calling add partition or resize partition, there is no check
+on whether the length is aligned with the logical block size.
+If the logical block size of the disk is larger than 512 bytes,
+then the partition size maybe not the multiple of the logical block size,
+and when the last sector is read, bio_truncate() will adjust the bio size,
+resulting in an IO error if the size of the read command is smaller than
+the logical block size.If integrity data is supported, this will also
+result in a null pointer dereference when calling bio_integrity_free.
 
-I'm testing the io-uring nvme passthrough via fio. But I have 
-encountered the following issue:
-When I specify 'blocksize' exceeding 128KB (actually the maximum size 
-per request can send 'max_sectors_kb'), the creation of request failed 
-and directly returned -22 (-EINVAL).
+Signed-off-by: Min Li <min15.li@samsung.com>
+---
+ block/ioctl.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-For example:
-
-# cat fio.job
-
-     [global]
-     ioengine=io_uring_cmd
-     thread=1
-     time_based
-     numjobs=1
-     iodepth=1
-     runtime=120
-     rw=randwrite
-     cmd_type=nvme
-     hipri=1
-
-     [randwrite]
-     bs=132k
-     filename=/dev/ng1n1
-
-# fio fio.job
-randwrite: (g=0): rw=randwrite, bs=(R) 132KiB-132KiB, (W) 132KiB-132KiB, 
-(T) 132KiB-132KiB, ioengine=io_uring_cmd, iodepth=1
-fio-3.34-10-g2fa0-dirty
-Starting 1 thread
-fio: io_u error on file /dev/ng1n1: Invalid argument: write 
-offset=231584956416, buflen=135168
-fio: pid=148989, err=22/file:io_u.c:1889, func=io_u error, error=Invalid 
-argument
-
-I tracked the position that returns the error val in kernel and dumped 
-calltrace.
-
-[   83.352715] nvme nvme1: 15/0/1 default/read/poll queues
-[   83.363273] nvme nvme1: Ignoring bogus Namespace Identifiers
-[   91.578457] CPU: 14 PID: 3993 Comm: fio Not tainted 
-6.4.0-rc7-00014-g692b7dc87ca6-dirty #2
-[   91.578462] Hardware name: Alibaba Cloud Alibaba Cloud ECS, BIOS 
-2221b89 04/01/2014
-[   91.578463] Call Trace:
-[   91.578476]  <TASK>
-[   91.578478]  dump_stack_lvl+0x36/0x50
-[   91.578484]  ll_back_merge_fn+0x20d/0x320
-[   91.578490]  blk_rq_append_bio+0x6d/0xc0
-[   91.578492]  bio_map_user_iov+0x24a/0x3d0
-[   91.578494]  blk_rq_map_user_iov+0x292/0x680
-[   91.578496]  ? blk_mq_get_tag+0x249/0x280
-[   91.578500]  blk_rq_map_user+0x56/0x80
-[   91.578503]  nvme_map_user_request.isra.15+0x90/0x1e0 [nvme_core]
-[   91.578515]  nvme_uring_cmd_io+0x29d/0x2f0 [nvme_core]
-[   91.578522]  io_uring_cmd+0x89/0x110
-[   91.578526]  ? __pfx_io_uring_cmd+0x10/0x10
-[   91.578528]  io_issue_sqe+0x1e0/0x2d0
-[   91.578530]  io_submit_sqes+0x1e3/0x650
-[   91.578532]  __x64_sys_io_uring_enter+0x2da/0x450
-[   91.578534]  do_syscall_64+0x3b/0x90
-[   91.578537]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-
-Here in bio_map_user_iov()->blk_rq_append_bio(), I found the error val 
--EINVAL:
-
-blk_rq_append_bio:
-     ...
-     if (!ll_back_merge_fn(rq, bio, nr_segs))
-         return -EINVAL;
-     rq->biotail->bi_next = bio;
-     ...
-
-And in ll_back_merge_fn(), returns 0 if merge can't happen. It checks 
-the request size:
-ll_back_merge_fn:
-     if (blk_rq_sectors(req) + bio_sectors(bio) >
-         blk_rq_get_max_sectors(req, blk_rq_pos(req))) {
-             req_set_nomerge(req->q, req);
-             return 0;
-     }
-
-The ROOT cause is: In blk_rq_get_max_sectors, it returns 
-'max_hw_sectors' directly(in my device ,it's 256 sector, which means 
-128KB), causing the above inequality to hold true.
-blk_rq_get_max_sectors:
-     ...
-     if (blk_rq_is_passthrough(rq)){
-         return q->limits.max_hw_sectors;
-     }
-     ...
-
-I checked my disk's specs(cat 
-/sys/block/<mydisk>/queue/max_hw_sectors_kb 
-/sys/block/<mydisk>/queue/max_sectors_kb), both are 128KB.So I think 
-this arg causing the issue.
-
-I'm not sure if this is a designed restriction. Or should I have to take 
-care of it in application?
-
-Thanks,
-Ferry Meng
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 9c5f637ff153..aa95b5561169 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -35,6 +35,9 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+ 
+ 	start = p.start >> SECTOR_SHIFT;
+ 	length = p.length >> SECTOR_SHIFT;
++	/*check if length is aligned to blocksize*/
++	if (p.length & (bdev_logical_block_size(bdev) - 1))
++		return -EINVAL;
+ 
+ 	switch (op) {
+ 	case BLKPG_ADD_PARTITION:
+-- 
+2.34.1
 
