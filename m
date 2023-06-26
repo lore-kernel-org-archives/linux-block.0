@@ -2,55 +2,47 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8172EB64D7
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 07:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25876EB64D7
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 08:01:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229759AbjFZHyP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 03:54:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42058 "EHLO
+        id S229562AbjFZIBl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 04:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbjFZHyO (ORCPT
+        with ESMTP id S229520AbjFZIBk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 03:54:14 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71CDE10A
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 00:54:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=OTrORPlbKtaN3ARiMValJAU7k9
-        IrlfG5KofT8GcgxXEnXhrNmWJXxJz9safI/qfz+J7XpF856oWnay8+ENcuP2fqCjqQePt7UF7Y5bu
-        27Q89P80Sc5w5iUAX61bw4l40tLqGjZL71gELDXCgd18UmEhnqfSjDg75ot10RFXQftXS0SwCfb/D
-        ayPfvK7kcc6nPa5ncv2LMGfg1EWuzDP8FCOQ+GTcqBs17YcSL7/4Mg/PEitoqTDgfFnzpsAty/P+T
-        51oAWDKiYJaVKQiHVyAAuSiNEvOj+FQB6psDbQNzIKzVRjK+08MPayVLd9/+IA7DVoGq8M+1bbo1Q
-        WSr0idlQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qDh2t-009b7c-35;
-        Mon, 26 Jun 2023 07:53:59 +0000
-Date:   Mon, 26 Jun 2023 00:53:59 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Hou Tao <houtao@huaweicloud.com>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
-        virtualization@lists.linux-foundation.org, houtao1@huawei.com
-Subject: Re: [PATCH v3] virtio_pmem: add the missing REQ_OP_WRITE for flush
- bio
-Message-ID: <ZJlEF6PJE5W2JoQ2@infradead.org>
-References: <ZJL3+E5P+Yw5jDKy@infradead.org>
- <20230625022633.2753877-1-houtao@huaweicloud.com>
+        Mon, 26 Jun 2023 04:01:40 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC8590
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 01:01:39 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 508BF68AFE; Mon, 26 Jun 2023 10:01:37 +0200 (CEST)
+Date:   Mon, 26 Jun 2023 10:01:36 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>
+Subject: Re: [PATCH v4 5/7] block: Preserve the order of requeued requests
+Message-ID: <20230626080136.GA27039@lst.de>
+References: <20230621201237.796902-1-bvanassche@acm.org> <20230621201237.796902-6-bvanassche@acm.org> <20230623055053.GE9085@lst.de> <6e57f158-a98c-0355-25a4-2d12f3ec0b23@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230625022633.2753877-1-houtao@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <6e57f158-a98c-0355-25a4-2d12f3ec0b23@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Fri, Jun 23, 2023 at 01:08:33PM -0700, Bart Van Assche wrote:
+> Does it matter in this context whether list_empty_careful() or list_empty() 
+> is used? If blk_mq_process_requeue_list() is called concurrently with code 
+> that adds an element to one of these two lists it is guaranteed that the 
+> queue will be run again. This is why I think that it is fine that the list 
+> checks in blk_mq_process_requeue_list() race with concurrent list 
+> additions.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+As far as I can tell we're not holding the relevant lock, so I think we
+need list_empty_careful.  Or am I missing something?
