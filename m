@@ -2,109 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC53BEB64DC
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 02:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C500EB64D7
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 05:06:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229641AbjFZCqX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Jun 2023 22:46:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44908 "EHLO
+        id S229572AbjFZFGJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 01:06:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230189AbjFZCqX (ORCPT
+        with ESMTP id S229529AbjFZFGF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Jun 2023 22:46:23 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7336EFD;
-        Sun, 25 Jun 2023 19:46:18 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QqC062MMfz4f3jZD;
-        Mon, 26 Jun 2023 10:46:14 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBH_rH2+5hkkGAyMg--.42822S3;
-        Mon, 26 Jun 2023 10:46:15 +0800 (CST)
-Subject: Re: [PATCH -next v3 0/5] blk-wbt: minor fix and cleanup
-To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230527010644.647900-1-yukuai1@huaweicloud.com>
- <e33b856f-1874-030f-1b45-3b036e9b17b6@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <00cc4aa8-b725-e7ac-dec9-ccd03dd2fe21@huaweicloud.com>
-Date:   Mon, 26 Jun 2023 10:46:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 26 Jun 2023 01:06:05 -0400
+Received: from out-61.mta0.migadu.com (out-61.mta0.migadu.com [IPv6:2001:41d0:1004:224b::3d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FE6111C
+        for <linux-block@vger.kernel.org>; Sun, 25 Jun 2023 22:06:04 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1687755960;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3XFNAPAH6EuvNrQxjh5kQssWIEiKUAzjh/YE9gXkp8o=;
+        b=tD0d+5qYO6crBNQpQPfSbmc2v9paPknwdcNbwEoyIkGwjSY2Mm6x5YvDxNERPAEVzoNRwi
+        nxxUk8jY8PWlstP/NBG1TVDZN6zd3ucM/b5aFqRi7fuvjMFCphadJNP79M02HjnRm05c69
+        Pvk7oawyS3/6jwLiUdx5sYox438bZlw=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, tj@kernel.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+Subject: [PATCH v2 2/3] blk-mq: ktime_get_ns() only once for batched requests init
+Date:   Mon, 26 Jun 2023 13:04:04 +0800
+Message-Id: <20230626050405.781253-3-chengming.zhou@linux.dev>
+In-Reply-To: <20230626050405.781253-1-chengming.zhou@linux.dev>
+References: <20230626050405.781253-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <e33b856f-1874-030f-1b45-3b036e9b17b6@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBH_rH2+5hkkGAyMg--.42822S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF43Ar17WF1ftrW3AF13urg_yoW8Gr47pr
-        Z3tasIkr4q9r92gr4fJF12qryfJw40qFykJry3tryruw1j9r1Utr48Wr4rur95ZrWxWF47
-        W3WDtrZ5Cr1kZr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWUJwCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUF9a9DU
-        UUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-在 2023/06/08 10:36, Yu Kuai 写道:
-> Hi, Jens
-> 
-> Can you apply this patchset?
+Extend blk_mq_rq_ctx_init() to receive start_time_ns, so we can
+ktime_get_ns() only once for batched requests start_time_ns setting.
 
-The only fix from this patchset is applied separately, so this patchset
-is just simple cleanups now, can you please consider this for the next
-merge window?
+Since data->rq_flags initialization has been moved to the caller
+__blk_mq_alloc_requests(), we can use it to check if time is needed.
 
-Thanks,
-Kuai
-> 
-> Thanks,
-> Kuai
-> 
-> 在 2023/05/27 9:06, Yu Kuai 写道:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Changes in v3:
->>   - patch 1 from v2 is sent separately, and it's removd from this series.
->>   - add review tag for all the patches.
->>
->> Changes in v2:
->>   - make the code more readable for patch 1
->>   - add a new attr_group that is only visible for rq based device
->>   - explain in detail for patch 4
->>   - add review tag for patch 2,3,5
->>
->> Yu Kuai (5):
->>    blk-wbt: don't create wbt sysfs entry if CONFIG_BLK_WBT is disabled
->>    blk-wbt: remove dead code to handle wbt enable/disable with io
->>      inflight
->>    blk-wbt: cleanup rwb_enabled() and wbt_disabled()
->>    blk-iocost: move wbt_enable/disable_default() out of spinlock
->>    blk-sysfs: add a new attr_group for blk_mq
->>
->>   block/blk-iocost.c |   7 +-
->>   block/blk-sysfs.c  | 181 ++++++++++++++++++++++++++-------------------
->>   block/blk-wbt.c    |  21 +-----
->>   block/blk-wbt.h    |  19 -----
->>   4 files changed, 110 insertions(+), 118 deletions(-)
->>
-> 
-> .
-> 
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-mq.c         | 23 ++++++++++++++---------
+ include/linux/blk-mq.h |  6 +++---
+ 2 files changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c50ef953759f..8b981d0a868e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -338,7 +338,8 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+ EXPORT_SYMBOL(blk_rq_init);
+ 
+ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+-		struct blk_mq_tags *tags, unsigned int tag, u64 alloc_time_ns)
++		struct blk_mq_tags *tags, unsigned int tag,
++		u64 alloc_time_ns, u64 start_time_ns)
+ {
+ 	struct blk_mq_ctx *ctx = data->ctx;
+ 	struct blk_mq_hw_ctx *hctx = data->hctx;
+@@ -360,14 +361,11 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	}
+ 	rq->timeout = 0;
+ 
+-	if (blk_mq_need_time_stamp(rq))
+-		rq->start_time_ns = ktime_get_ns();
+-	else
+-		rq->start_time_ns = 0;
+ 	rq->part = NULL;
+ #ifdef CONFIG_BLK_RQ_ALLOC_TIME
+ 	rq->alloc_time_ns = alloc_time_ns;
+ #endif
++	rq->start_time_ns = start_time_ns;
+ 	rq->io_start_time_ns = 0;
+ 	rq->stats_sectors = 0;
+ 	rq->nr_phys_segments = 0;
+@@ -405,11 +403,15 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
+ 	struct request *rq;
+ 	unsigned long tag_mask;
+ 	int i, nr = 0;
++	u64 start_time_ns = 0;
+ 
+ 	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+ 	if (unlikely(!tag_mask))
+ 		return NULL;
+ 
++	if (blk_mq_need_time_stamp(data->rq_flags))
++		start_time_ns = ktime_get_ns();
++
+ 	tags = blk_mq_tags_from_data(data);
+ 	for (i = 0; tag_mask; i++) {
+ 		if (!(tag_mask & (1UL << i)))
+@@ -417,7 +419,7 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
+ 		tag = tag_offset + i;
+ 		prefetch(tags->static_rqs[tag]);
+ 		tag_mask &= ~(1UL << i);
+-		rq = blk_mq_rq_ctx_init(data, tags, tag, alloc_time_ns);
++		rq = blk_mq_rq_ctx_init(data, tags, tag, alloc_time_ns, start_time_ns);
+ 		rq_list_add(data->cached_rq, rq);
+ 		nr++;
+ 	}
+@@ -431,7 +433,7 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
+ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ {
+ 	struct request_queue *q = data->q;
+-	u64 alloc_time_ns = 0;
++	u64 alloc_time_ns = 0, start_time_ns = 0;
+ 	struct request *rq;
+ 	unsigned int tag;
+ 
+@@ -514,8 +516,11 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 		goto retry;
+ 	}
+ 
++	if (blk_mq_need_time_stamp(data->rq_flags))
++		start_time_ns = ktime_get_ns();
++
+ 	return blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag,
+-					alloc_time_ns);
++				  alloc_time_ns, start_time_ns);
+ }
+ 
+ static struct request *blk_mq_rq_cache_fill(struct request_queue *q,
+@@ -1004,7 +1009,7 @@ static inline void __blk_mq_end_request_acct(struct request *rq, u64 now)
+ 
+ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ {
+-	if (blk_mq_need_time_stamp(rq))
++	if (blk_mq_need_time_stamp(rq->rq_flags))
+ 		__blk_mq_end_request_acct(rq, ktime_get_ns());
+ 
+ 	if (rq->end_io) {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index f401067ac03a..e8366e9c3388 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -834,9 +834,9 @@ void blk_mq_end_request_batch(struct io_comp_batch *ib);
+  * Only need start/end time stamping if we have iostat or
+  * blk stats enabled, or using an IO scheduler.
+  */
+-static inline bool blk_mq_need_time_stamp(struct request *rq)
++static inline bool blk_mq_need_time_stamp(req_flags_t rq_flags)
+ {
+-	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_USE_SCHED));
++	return (rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_USE_SCHED));
+ }
+ 
+ static inline bool blk_mq_is_reserved_rq(struct request *rq)
+@@ -860,7 +860,7 @@ static inline bool blk_mq_add_to_batch(struct request *req,
+ 		iob->complete = complete;
+ 	else if (iob->complete != complete)
+ 		return false;
+-	iob->need_ts |= blk_mq_need_time_stamp(req);
++	iob->need_ts |= blk_mq_need_time_stamp(req->rq_flags);
+ 	rq_list_add(&iob->req_list, req);
+ 	return true;
+ }
+-- 
+2.39.2
 
