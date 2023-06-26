@@ -2,118 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B2EC0015E
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 08:10:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0F8EB64DA
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 08:10:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbjFZIKV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 04:10:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50468 "EHLO
+        id S229765AbjFZIKl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 04:10:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230088AbjFZIKN (ORCPT
+        with ESMTP id S230151AbjFZIKY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 04:10:13 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43AAC10DB;
-        Mon, 26 Jun 2023 01:10:06 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QqL9k4m2yz4f4689;
-        Mon, 26 Jun 2023 16:10:02 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgAHcLPWR5lkQbNDMg--.19922S8;
-        Mon, 26 Jun 2023 16:10:03 +0800 (CST)
-From:   linan666@huaweicloud.com
-To:     axboe@kernel.dk, linan122@huawei.com, vishal.l.verma@intel.com,
-        dan.j.williams@intel.com, ashok_raj@linux.intel.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH v4 4/4] block/badblocks: fix the bug of reverse order
-Date:   Mon, 26 Jun 2023 16:09:13 +0800
-Message-Id: <20230626080913.3493135-5-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230626080913.3493135-1-linan666@huaweicloud.com>
-References: <20230626080913.3493135-1-linan666@huaweicloud.com>
+        Mon, 26 Jun 2023 04:10:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E3DAE6F
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 01:09:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687766981;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CjQ7qNGo2v1HEI8QUPhx23BtJ/165v3Z1WNalwOEs8w=;
+        b=ZwMV9RkgxVIOM4QzqhfYCzcUTlN9YdPC2WXknlwZu2FfrkRq72apIKHbnPVeAgbw38lBNt
+        8oF2AtVwaFc/FhffBIve0vc7MPhQQ3LnpBdOa1hUGt7RjTUKGBa6PbyH4KvVcWSYCnBLSQ
+        ezdVLw6xCd+M03MdW6/vQrLkYRD8/Kk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-377-uI8flNvaNnGqJk3iWF5fmA-1; Mon, 26 Jun 2023 04:09:35 -0400
+X-MC-Unique: uI8flNvaNnGqJk3iWF5fmA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 37BE529A9CA0;
+        Mon, 26 Jun 2023 08:09:35 +0000 (UTC)
+Received: from ovpn-8-20.pek2.redhat.com (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CAE682166B25;
+        Mon, 26 Jun 2023 08:09:30 +0000 (UTC)
+Date:   Mon, 26 Jun 2023 16:09:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Mike Snitzer <snitzer@kernel.org>
+Subject: Re: [PATCH v4 4/7] block: One requeue list per hctx
+Message-ID: <ZJlHtQySAAVYLbNy@ovpn-8-20.pek2.redhat.com>
+References: <20230621201237.796902-1-bvanassche@acm.org>
+ <20230621201237.796902-5-bvanassche@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHcLPWR5lkQbNDMg--.19922S8
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF43Kw4rWFy3GrWDtF18Zrb_yoW8Gr4rpF
-        nxJwn3Gryjgr1UZa18Za4UGr4xCa43XF4UGw45Zr1UGasrJw1xJF1kXayYqryjqF43Xw1q
-        v3W5uryUZa48C37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUm2b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-        Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-        rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-        AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-        14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
-        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
-        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxV
-        A2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
-        6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17
-        CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF
-        0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMI
-        IF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVF
-        xhVjvjDU0xZFpf9x07UMa0PUUUUU=
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621201237.796902-5-bvanassche@acm.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Nan <linan122@huawei.com>
+On Wed, Jun 21, 2023 at 01:12:31PM -0700, Bart Van Assche wrote:
+> Prepare for processing the requeue list from inside __blk_mq_run_hw_queue().
 
-Badblocks are arranged from small to large, but order of badblocks will
-be reversed if we set a large area at once as below:
-  $ echo 0 2048 > bad_blocks
-  $ cat bad_blocks
-    1536 512
-    1024 512
-    512 512
-    0 512
+Please add more details about the motivation for this kind of change.
 
-Actually, it should be:
-  $ echo 0 2048 > bad_blocks
-  $ cat bad_blocks
-    0 512
-    512 512
-    1024 512
-    1536 512
+IMO requeue is supposed to be run in slow code path, not see reason why
+it has to be moved to hw queue level.
 
-'hi' remains unchanged while setting continuous badblocks is wrong, the
-next badblocks is greater than 'p[hi]', and it should be added to
-'p[hi+1]'. Let 'hi' +1 each cycle.
-
-  (0 512)				0	 512
-  |_________|				|_________|
-     p[hi]				   p[hi]
-
-  (512 512) (0 512)		 fix	0	 512	   1024
-  |_________|_________|		 ===>	|_________|_________|
-     p[hi]					    p[hi+1]
-
-  (1024 512)(512 512) (0 512)		0	 512	   1024	     1536
-  |_________|_________|_________|	|_________|_________|_________|
-     p[hi]						      p[hi+2]
-
-  ...
-
-Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- block/badblocks.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/badblocks.c b/block/badblocks.c
-index c1745b76d8f1..b79d37a4bf0e 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -301,6 +301,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
- 			p[hi] = BB_MAKE(s, this_sectors, acknowledged);
- 			sectors -= this_sectors;
- 			s += this_sectors;
-+			hi++;
- 			changed = true;
- 		}
- 	}
--- 
-2.39.2
+Thanks,
+Ming
 
