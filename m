@@ -2,102 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EEA4EB64DA
-	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 15:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 260AAEB64DA
+	for <linux-block@archiver.kernel.org>; Mon, 26 Jun 2023 16:42:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231547AbjFZPx4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 11:53:56 -0400
+        id S229849AbjFZQmO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 12:42:14 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231467AbjFZPxz (ORCPT
+        with ESMTP id S229763AbjFZQmN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 11:53:55 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 909E3AA
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 08:53:53 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-3411ea25025so1783045ab.1
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 08:53:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1687794833; x=1690386833;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rxYUiFwhtDVlTAVmP0i5cJapN3iCRWyez54K4Q3M5K0=;
-        b=fdLOwHJv7E9Y9/oI7jGWPCAUo74FJC0T9kGCDMP3eKcy54hd6ejtYByg0NmOoIEdyr
-         gj0afBnKBBbvcnvlJSD3tWZwAQK857zOub5M2aClWt8xZVL1eEu/MH3R3eNfCtShp8NK
-         vzVrZP0lQhR8CvJ5TIK7Cs3q2y2rUoay2IjYw8OpjA7Qwe0AiARj7mTmz2FCvlMzjUnp
-         KOV71fe4ad7eK13d6b8MlCIs0HqJLoGIwBH/rxN2f5CHWqmveJ63YVCcyPay8/+4K32z
-         JnewvYc+JGyJ59T3v0VmPLUuvFOXAeDAPif976GY9jj1VlABIR08gifXKJBP4XXJNKDC
-         cILQ==
+        Mon, 26 Jun 2023 12:42:13 -0400
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1783BE53
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 09:42:12 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1b80f2e6c17so5328765ad.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 09:42:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687794833; x=1690386833;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rxYUiFwhtDVlTAVmP0i5cJapN3iCRWyez54K4Q3M5K0=;
-        b=dY8IQuccrt9mPr8ZX7f7J+6qLoy5TrKhl35un29a4cAFoOYPnehHslbt7O/J+ajvyx
-         bFf6Cp7Xa1i1FOHucPIHQr4nz33smmczX+hi1kdoYBNPT7YDoSEVsry6gDGEsIR72WHw
-         b1LUal+/UrmZ1FfBgbxjQ4l9w7Y67Rl9YukFzKfuZe1AFr1oCO6JSGPBAiB4jsNQVNOF
-         tKPGAf5vJft9etmyo+UDv+VXvofexieoTxGaBS2O153OhSO7Le/sTFAM9eO90imi+IBp
-         j3b+0UG5CUNKOV+8grAQlEA+v6e21GtoRKtd3CE/0TvOYFV3wcUguvGpz7+b2lWKsh4y
-         TVZw==
-X-Gm-Message-State: AC+VfDyHR8CfHrK2aSNB1rTCuufrbancfu5HuxsviV6saK8Dwvt9TFHH
-        09A53wrIcrOAeGEmfJqAAUYxBw==
-X-Google-Smtp-Source: ACHHUZ4nRcSpYBrb6wVzWbwMsFltauZSqk2epQ7Q09VlLGPrMGE/HyQypZzUg+d1X5viDDmbmIOtyg==
-X-Received: by 2002:a05:6e02:2182:b0:343:9470:4ee8 with SMTP id j2-20020a056e02218200b0034394704ee8mr22302967ila.3.1687794832868;
-        Mon, 26 Jun 2023 08:53:52 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id z13-20020a92650d000000b0032afe23820bsm2061980ilb.17.2023.06.26.08.53.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 08:53:51 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     hch@lst.de, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20230527010644.647900-1-yukuai1@huaweicloud.com>
-References: <20230527010644.647900-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH -next v3 0/5] blk-wbt: minor fix and cleanup
-Message-Id: <168779483122.109817.4432808514358640761.b4-ty@kernel.dk>
-Date:   Mon, 26 Jun 2023 09:53:51 -0600
+        d=1e100.net; s=20221208; t=1687797731; x=1690389731;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SHowUz5w3dj3xWyT5r80vaKVlMHOpZgiSFUnNqtTRR4=;
+        b=BZZrr1O7Zsg4ZitA1HY3WBQLb7KUEIAOY/uuFQQIin/e6ehpCoo3K3+Vn1QAl1o0gx
+         iN3v2SwxiBEiDYUYFJxBThpmv67VYnb4IcgJcgY4bvt1mPwqM+APjr0q9e02cb/pxwc1
+         6/4Zt+ZchM5A7GTiWWHoxCIKB4Xi0p7IwtyM+cSeA6TG46G32ZEeh1h4NuXpQF5Rjyap
+         XI8SoNrdH4UUkE2m+kCrVb5Db3eJfMdCvlZCH0Q6t+n71GZPTVgft1r9fflGmdjkPS1g
+         LvXPd0aumRvP+CTCFptMsBq/oGq5jvd5VuepQQIJkC0Fy3/4bH2Urc7eTf05UBWpJ6A4
+         XFHQ==
+X-Gm-Message-State: AC+VfDy2zf58OgdUR0Z3ppuxKiQ043s111c8IoZnBV6umWDQhsJhJCN/
+        +KpPA1/l6IOx9Mo+lA5GqltkjK39msc=
+X-Google-Smtp-Source: ACHHUZ5HrhtJfdQjT4PBlKgxBmOf489w1Z3kvbhDmTQW5xNF1OipBIE9nDsQ95td8Kb/AbqhbHoP6Q==
+X-Received: by 2002:a17:902:e5c1:b0:1b6:b4e5:23a with SMTP id u1-20020a170902e5c100b001b6b4e5023amr9137194plf.26.1687797731049;
+        Mon, 26 Jun 2023 09:42:11 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:ed06:6565:a250:4b59? ([2620:15c:211:201:ed06:6565:a250:4b59])
+        by smtp.gmail.com with ESMTPSA id d7-20020a170902aa8700b001b0358848b0sm4423719plr.161.2023.06.26.09.42.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jun 2023 09:42:10 -0700 (PDT)
+Message-ID: <a6d73e89-7a0c-3173-5f70-cd12cc7ef158@acm.org>
+Date:   Mon, 26 Jun 2023 09:42:08 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: LVM kernel lockup scenario during lvcreate
+Content-Language: en-US
+To:     Jaco Kroon <jaco@uls.co.za>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
+ <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
+ <102b1994-74ff-c099-292c-f5429ce768c3@uls.co.za>
+ <6b066ab5-7806-5a23-72a5-073153259116@acm.org>
+ <544f4434-a32a-1824-b57a-9f7ff12dbb4f@uls.co.za>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <544f4434-a32a-1824-b57a-9f7ff12dbb4f@uls.co.za>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Sat, 27 May 2023 09:06:39 +0800, Yu Kuai wrote:
-> Changes in v3:
->  - patch 1 from v2 is sent separately, and it's removd from this series.
->  - add review tag for all the patches.
+On 6/26/23 01:30, Jaco Kroon wrote:
+> Please find attached updated ps and dmesg too, diskinfo wasn't regenerated but this doesn't generally change.
 > 
-> Changes in v2:
->  - make the code more readable for patch 1
->  - add a new attr_group that is only visible for rq based device
->  - explain in detail for patch 4
->  - add review tag for patch 2,3,5
-> 
-> [...]
+> Not sure how this all works, according to what I can see the only disk with pending activity (queued) is sdw?  Yet, a large number of processes is blocking on IO, and yet again the stack traces in dmesg points at __schedule.  For a change we do not have lvcreate in the 
+> process list! This time that particular script's got a fsck in uninterruptable wait ...
 
-Applied, thanks!
+Hi Jaco,
 
-[1/5] blk-wbt: don't create wbt sysfs entry if CONFIG_BLK_WBT is disabled
-      commit: 645a829e03384a235b3760959d4ebe420a0f2027
-[2/5] blk-wbt: remove dead code to handle wbt enable/disable with io inflight
-      commit: 71b8642e79f277459555629f2bea1a8d1fed307e
-[3/5] blk-wbt: cleanup rwb_enabled() and wbt_disabled()
-      commit: 06257fda83ebfd1c33fb992e41dba7be4e1184d4
-[4/5] blk-iocost: move wbt_enable/disable_default() out of spinlock
-      commit: eebc21d12f56c1e09a163abf91e351fa2a55a938
-[5/5] blk-sysfs: add a new attr_group for blk_mq
-      commit: 6d85ebf95c44e52337ca1d07f0db4b435d1e6762
+I see pending commands for five different SCSI disks:
 
-Best regards,
--- 
-Jens Axboe
+$ zgrep /busy: block.gz
+./sdh/hctx0/busy:00000000affe2ba0 {.op=WRITE, .cmd_flags=SYNC|FUA, .rq_flags=FLUSH_SEQ|MQ_INFLIGHT|DONTPREP|IO_STAT|ELV, .state=in_flight, .tag=2055, .internal_tag=214, .cmd=Write(16) 8a 08 00 00 00 01 d1 c0 b7 88 00 00 00 08 00 00, .retries=0, .result = 0x0, 
+.flags=TAGGED|INITIALIZED|LAST, .timeout=180.000, allocated 0.000 s ago}
+./sda/hctx0/busy:00000000987bb7c7 {.op=WRITE, .cmd_flags=SYNC|FUA, .rq_flags=FLUSH_SEQ|MQ_INFLIGHT|DONTPREP|IO_STAT|ELV, .state=in_flight, .tag=2050, .internal_tag=167, .cmd=Write(16) 8a 08 00 00 00 01 d1 c0 b7 88 00 00 00 08 00 00, .retries=0, .result = 0x0, 
+.flags=TAGGED|INITIALIZED|LAST, .timeout=180.000, allocated 0.010 s ago}
+./sdw/hctx0/busy:00000000aec61b17 {.op=READ, .cmd_flags=META|PRIO, .rq_flags=STARTED|MQ_INFLIGHT|DONTPREP|ELVPRIV|IO_STAT|ELV, .state=in_flight, .tag=2056, .internal_tag=8, .cmd=Read(16) 88 00 00 00 00 00 00 1c 01 a8 00 00 00 08 00 00, .retries=0, .result = 0x0, 
+.flags=TAGGED|INITIALIZED|LAST, .timeout=180.000, allocated 0.000 s ago}
+./sdw/hctx0/busy:0000000087e9a58e {.op=WRITE, .cmd_flags=SYNC|FUA, .rq_flags=FLUSH_SEQ|MQ_INFLIGHT|DONTPREP|IO_STAT|ELV, .state=in_flight, .tag=2058, .internal_tag=102, .cmd=Write(16) 8a 08 00 00 00 01 d1 c0 b7 88 00 00 00 08 00 00, .retries=0, .result = 0x0, 
+.flags=TAGGED|INITIALIZED|LAST, .timeout=180.000, allocated 0.000 s ago}
+./sdaf/hctx0/busy:00000000d8751601 {.op=WRITE, .cmd_flags=SYNC|FUA, .rq_flags=FLUSH_SEQ|MQ_INFLIGHT|DONTPREP|IO_STAT|ELV, .state=in_flight, .tag=2057, .internal_tag=51, .cmd=Write(16) 8a 08 00 00 00 01 d1 c0 b7 88 00 00 00 08 00 00, .retries=0, .result = 0x0, 
+.flags=TAGGED|INITIALIZED|LAST, .timeout=180.000, allocated 0.010 s ago}
 
+All requests have the flag "ELV". So my follow-up questions are:
+* Which I/O scheduler has been configured? If it is BFQ, please try whether
+   mq-deadline or "none" work better.
+* Have any of the cgroup I/O controllers been activated?
+* Are the disks directly connected to the motherboard of the server or are
+   the disks perhaps controlled by a HBA? If so, which HBA? There are multiple
+   lines in dmesg that start with "mpt3sas". Is the firmware of this HBA
+   up-to-date?
 
+Thanks,
 
+Bart.
