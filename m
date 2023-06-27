@@ -2,121 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0398EB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 10:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E27BEB64D9
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 11:32:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230494AbjF0KjG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jun 2023 06:39:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50010 "EHLO
+        id S229501AbjF0Lcy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jun 2023 07:32:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbjF0KjE (ORCPT
+        with ESMTP id S231433AbjF0Lcy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jun 2023 06:39:04 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77BCCE5F;
-        Tue, 27 Jun 2023 03:39:02 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3a0423ea749so3545687b6e.0;
-        Tue, 27 Jun 2023 03:39:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687862341; x=1690454341;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rCgvLgi3BLx22tE+6LcdRjHHTXAUCqzO3DhXE5/At3c=;
-        b=j4V/TgPYZOOMjOgLDAi/Fq1Y8RqRGFE7b4qGJRTHhPIZyNGDGr5yqNQrewztFtf4+H
-         ad9pajr2f7m4EQWCIIZ7UZtZio4GJYgTjDdtTPHRGE4J1sMKSakHqDbNf898iQmg84X0
-         oZdd9dQqPDhhXjPDGdGXik6nfCbkAaHgghtffDg3ccxxkGJQf524luAiz9KkLkiLd579
-         lMYpgQWhUnJhY6/kXmGgYvSBMyPZsdHMrkRhn0njqEixyf3AQPrdjzrW8+zSLjuVEOu1
-         FIRpBegrkGSWtArlAliOUuhNUyJLd7Q/kZI1AwHQBoLKNwl9o8TL/uhfCE7FAt29AuY3
-         GNUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687862341; x=1690454341;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rCgvLgi3BLx22tE+6LcdRjHHTXAUCqzO3DhXE5/At3c=;
-        b=T9JErj7YzEUXHieuFPmwfDGAPn8ndARjFsyv9aRwv+Dioxud26OV/dw12J+96r+ABc
-         l06EWfB5TeldSJX6FH3OZ5KyBhJ3+3te9JSu7mA9bP/5GP3Sp1BnL2bHO9DUDI8N/Dni
-         DAnMw6vFmjKcqJCVHMmQPiUtDIrid8jCS9fVB5Eyjp96zThZcg2zZYLwfdhq9+KuNgqC
-         4olIgUK4fsAtKjeLn8mePAlYM2la8/zBOY07Vn3JmDavIN/Zuu7dsEx4R9n5m6AN7FIU
-         uW7ls5n6z2F8UIDCeZIL/1yiTqUJJIsBnyGxM3ev++LXhmgMp/AOfHPwk/CXaNdjzpem
-         tP4A==
-X-Gm-Message-State: AC+VfDzLSnSmwYBxniSlMWtc+4p8XA6fJYUX5m9LgUBkEfsWwcD4q1xe
-        WR1SB8MJkDRHTGuBHbW5MvFXnVf0uYz36xhSGuWStQNIQqQ=
-X-Google-Smtp-Source: ACHHUZ5H3GRoBym0b9/SiurE+jEIsHMp41/GcQAaG06YOaSsX0tGI2WlPTg+w61l4Kgc2zfz1Xr4qbgyrRqgP6044mA=
-X-Received: by 2002:a05:6808:424d:b0:38e:a824:27d3 with SMTP id
- dp13-20020a056808424d00b0038ea82427d3mr30392455oib.27.1687862341491; Tue, 27
- Jun 2023 03:39:01 -0700 (PDT)
+        Tue, 27 Jun 2023 07:32:54 -0400
+Received: from out-62.mta1.migadu.com (out-62.mta1.migadu.com [IPv6:2001:41d0:203:375::3e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27BA426BC
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 04:32:52 -0700 (PDT)
+Message-ID: <e1da325b-8f16-f4d2-d6bf-65976a4239b4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1687865568;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5AAMGnil1vus66xTAIuI1lIxfQX8aaFDX8sQDFraqX0=;
+        b=eS1vGYD3pvIWNwfllqk4fByrGt+RqENGbMduaSfT6deiKtjk2Gw54VnY/s0C1RbCfKcq9Q
+        phktX+iq9LmCjNOB1IPbCB18N4sM/abS27c7xSewD0hTrHMjZO356eNtdhAUx2jKMYkZgS
+        dbDkSVh8MSGCTEWSYtSznAzZdPh9pDs=
+Date:   Tue, 27 Jun 2023 19:32:42 +0800
 MIME-Version: 1.0
-References: <20230531125535.676098-1-hch@lst.de> <20230531125535.676098-9-hch@lst.de>
- <c1391658-d785-4b2f-ba7e-01e4668685d7@roeck-us.net> <20230626075325.GA26851@lst.de>
- <7e708dfa-4019-fe28-afbd-91ad847fada0@roeck-us.net>
-In-Reply-To: <7e708dfa-4019-fe28-afbd-91ad847fada0@roeck-us.net>
-From:   Max Filippov <jcmvbkbc@gmail.com>
-Date:   Tue, 27 Jun 2023 03:38:50 -0700
-Message-ID: <CAMo8BfLtEw2jdRC-pK4kYuqmgEy-0QgXDodiF+gZEMygNQQBbA@mail.gmail.com>
-Subject: Re: [PATCH 08/24] init: pass root_device_name explicitly
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Joern Engel <joern@lazybastard.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Loic Poulain <loic.poulain@linaro.org>, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 3/3] blk-mq: fix start_time_ns and alloc_time_ns for
+ pre-allocated rq
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
+References: <20230626050405.781253-1-chengming.zhou@linux.dev>
+ <20230626050405.781253-4-chengming.zhou@linux.dev>
+ <ZJn5F4xb6gln0653@slm.duckdns.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <ZJn5F4xb6gln0653@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 26, 2023 at 8:10=E2=80=AFAM Guenter Roeck <linux@roeck-us.net> =
-wrote:
->
-> On 6/26/23 00:53, Christoph Hellwig wrote:
-> > On Fri, Jun 23, 2023 at 05:08:59PM -0700, Guenter Roeck wrote:
-> >> Hi,
-> >>
-> >> On Wed, May 31, 2023 at 02:55:19PM +0200, Christoph Hellwig wrote:
-> >>> Instead of declaring root_device_name as a global variable pass it as=
- an
-> >>> argument to the functions using it.
-> >>>
-> >>> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> >>
-> >> This patch results in the following build error when trying to build
-> >> xtensa:tinyconfig.
-> >>
-> >> WARNING: modpost: vmlinux: section mismatch in reference: strcpy.isra.=
-0+0x14 (section: .text.unlikely) -> initcall_level_names (section: .init.da=
-ta)
-> >> ERROR: modpost: Section mismatches detected.
-> >
-> > I can reproduce these with gcc 13.1 on xtensa, but the report makes
-> > no sense to me.  If I disable CONFIG_CC_OPTIMIZE_FOR_SIZE it now report=
-s
-> > a similar warning for put_page intead of strcpy which seems just as
-> > arcance.
-> >
->
-> I don't see that (I tried 11.3, 11.4, 12.3, and 13.1), but then I am not =
-sure
-> if this is worth tracking down. I just force CONFIG_SECTION_MISMATCH_WARN=
-_ONLY=3Dy
-> for xtensa builds instead.
+On 2023/6/27 04:46, Tejun Heo wrote:
+> Hello,
+> 
+> I only glanced the blk-mq core part but in general this looks a lot better
+> than the previous one.
 
-I believe it's yet another manifestation of the following issue:
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D92938
+Thanks for your review!
 
-Hunting is still on my todo list, but it's quite low, so I guess
-forcing CONFIG_SECTION_MISMATCH_WARN_ONLY=3Dy for xtensa
-is the right thing to do for now.
+> 
+> On Mon, Jun 26, 2023 at 01:04:05PM +0800, chengming.zhou@linux.dev wrote:
+>> Note we don't skip setting alloc_time_ns and start_time_ns for all
+>> pre-allocated rq, since the first returned rq still need to be set.
+> 
+> This part is a bit curious for me tho. Why do we need to set it at batch
+> allocation time and then at actual dispensing from the bat later? Who uses
+> the alloc time stamp inbetween?
+> 
 
---=20
+Yes, this part should need more explanation, and my explanation is not clear.
+
+Now the batched pre-allocation code looks like this:
+
+```
+if (!rq_list_empty(plug->cached_rq))
+
+  get pre-allocated rq from plug cache
+
+  // we set alloc and start time here
+  return rq
+
+else
+  rq = __blk_mq_alloc_requests_batch() do batched allocation (1)
+  (2)
+  return rq
+```
+
+In (1) we alloc some requests and push them in plug list, and pop one request
+to return to use. So this popped one request need to be set time at batch allocation time.
+
+Yes, we can also set this popped request time in (2), just before return it to use.
+
+
+Since all requests in batch allocation use the same alloc and start time, so this patch
+just leave it as it is, and reset it at actual used time.
+
+I think both way is ok, do you think it's better to just set the popped one request, leave
+other requests time to 0 ? If so, I can update to do it.
+
 Thanks.
--- Max
+
