@@ -2,94 +2,161 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56874EB64D9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 01:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE0FEB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 03:26:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbjF0BHr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Jun 2023 21:07:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60486 "EHLO
+        id S229666AbjF0D0Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Jun 2023 23:26:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjF0BHl (ORCPT
+        with ESMTP id S229939AbjF0DYg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2023 21:07:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CE3E6F
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 18:06:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687828013;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=z/QuhCgLfQ0cTt2LHBXFiBZJEoF4b33bRGUoQqh3ooM=;
-        b=WbKIZlziyQf/8JbrKle2qI1VEeB5fhcg/BwnkusaihS3m7KcWrkz2XF0qenH94qaPAXCPP
-        31iKq7PU1vMw3uzqCR1lEQMfmibtk03470MRmxd34EInRA6skt3Pl8R4P7uSliF2kySygq
-        io1U5cT9Q/4Ps6MtqBY1S7weCjyn4CE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-192-FzCbmDjdOSejNpJC3HERSg-1; Mon, 26 Jun 2023 21:06:48 -0400
-X-MC-Unique: FzCbmDjdOSejNpJC3HERSg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F0B3F1C03DA9;
-        Tue, 27 Jun 2023 01:06:47 +0000 (UTC)
-Received: from ovpn-8-21.pek2.redhat.com (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B1F8492B01;
-        Tue, 27 Jun 2023 01:06:37 +0000 (UTC)
-Date:   Tue, 27 Jun 2023 09:06:33 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Mike Snitzer <snitzer@kernel.org>
-Subject: Re: [PATCH v4 4/7] block: One requeue list per hctx
-Message-ID: <ZJo2GfthBQ4QaJ+x@ovpn-8-21.pek2.redhat.com>
-References: <20230621201237.796902-1-bvanassche@acm.org>
- <20230621201237.796902-5-bvanassche@acm.org>
- <ZJlHtQySAAVYLbNy@ovpn-8-20.pek2.redhat.com>
- <79a4bb66-31b5-f383-020c-952541653608@acm.org>
+        Mon, 26 Jun 2023 23:24:36 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABF4D46B0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2023 20:19:45 -0700 (PDT)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230627031943epoutp04495b0c1f658da6e0c4c87a24626cfa34~sZeJpmIS51869218692epoutp04p
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 03:19:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230627031943epoutp04495b0c1f658da6e0c4c87a24626cfa34~sZeJpmIS51869218692epoutp04p
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1687835983;
+        bh=DkBsbbgLtmsEDZwiUlk2kGOzeN7xXEE0fqF3HY7d+/g=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=uHa2SoEfJEDqsvtQHa7kIKOQP8H1APH5gZwgCsq31nll093tdJEwMOjDrg+OcCejZ
+         CS7du58hpRSsvSaoggqbeOjArex0cRH6qeRVeIMUMtyt3ZrvG9foptIMu9EXbk0uZI
+         WeeiMRIzQ3o5GMZa37HtRGSB6VMdh6LZlWdDmBWo=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20230627031942epcas5p1a9e5a82fd4d915ddd0ca6b3c03b0bb9f~sZeI-pv251523715237epcas5p1M;
+        Tue, 27 Jun 2023 03:19:42 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.174]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4QqqhD2C6Dz4x9Px; Tue, 27 Jun
+        2023 03:19:40 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F3.02.44250.C455A946; Tue, 27 Jun 2023 12:19:40 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20230627031105epcas5p3010432ebd447ad865c3ddd986b3ffee0~sZWnI_f2y0954609546epcas5p3K;
+        Tue, 27 Jun 2023 03:11:05 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230627031105epsmtrp104d4bf6ff43d0e94851b2599537dcdbd~sZWnIMauj1415614156epsmtrp1u;
+        Tue, 27 Jun 2023 03:11:05 +0000 (GMT)
+X-AuditID: b6c32a4a-ec1fd7000000acda-3d-649a554c9e4d
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        53.14.30535.9435A946; Tue, 27 Jun 2023 12:11:05 +0900 (KST)
+Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230627031104epsmtip1ef92c610f9e93066c045be8be10ff5c9~sZWl8DSEE3251632516epsmtip11;
+        Tue, 27 Jun 2023 03:11:03 +0000 (GMT)
+From:   Min Li <min15.li@samsung.com>
+To:     axboe@kernel.dk, willy@infradead.org, hch@lst.de,
+        dlemoal@kernel.org, gregkh@linuxfoundation.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Min Li <min15.li@samsung.com>
+Subject: [PATCH v2] block: add check that partition length needs to be
+ aligned with block size
+Date:   Tue, 27 Jun 2023 11:09:18 +0000
+Message-Id: <20230627110918.7608-1-min15.li@samsung.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79a4bb66-31b5-f383-020c-952541653608@acm.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrIJsWRmVeSWpSXmKPExsWy7bCmhq5P6KwUg+uruCxW3+1ns3iw396i
+        efF6Nosbx98xW8x9fYnFYuXqo0wWe29pW1zeNYfNYvmqDiaLsxM+sFr8/gHk3lh3lcWBx2Pz
+        Ci2Py2dLPTat6mTz2D93DbvH7psNbB59W1YxenzeJBfAHpVtk5GamJJapJCal5yfkpmXbqvk
+        HRzvHG9qZmCoa2hpYa6kkJeYm2qr5OIToOuWmQN0pZJCWWJOKVAoILG4WEnfzqYov7QkVSEj
+        v7jEVim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO+Pi2V/sBTf5KubNOsnWwPiVu4uR
+        k0NCwETi3fWDrF2MXBxCArsZJTZs/8YI4XxilOj9vQ0q841R4tfsb2wwLY9730Al9jJKdCw8
+        xgzhPGeU2NNwFCjDwcEmoCyxbakPSIOIQJrE0o6fYM3MAnESl7o62UFsYYEEiWl/poDFWQRU
+        JY4cWw1m8wpYSPQ9a2SBWCYvsf/gWWaIuKDEyZlPWCDmyEs0b50NtldC4Ce7xJSHR6Guc5HY
+        92otVLOwxKvjW9ghbCmJl/1t7CC3SQgUS7z8EQYRrpHY/e02E4RtLbFt/TomkBJmAU2J9bv0
+        IcKyElNPrWOCWMsHDJQnUOW8EjvmwdhKEn8vnGOEsCUkFu9/yAphe0jc3/EC7DIhgViJd4v/
+        sUxglJ+F5JtZSL6ZhbB5ASPzKkbJ1ILi3PTUYtMCo7zUcni8JufnbmIEp1Utrx2MDx980DvE
+        yMTBeIhRgoNZSYRX7Mf0FCHelMTKqtSi/Pii0pzU4kOMpsAgnsgsJZqcD0zseSXxhiaWBiZm
+        ZmYmlsZmhkrivMuu9KYICaQnlqRmp6YWpBbB9DFxcEo1MEUc81nDZPvnbHDOx/Y1W90Up07u
+        WX8h8tXTBsO/2y7v3qe0prhyT+38jy6aKfePXX6XoHRuW86bE1oFJkGeHifanmvPX3m21Uu+
+        K/UE9+JYmXez5z/Q37v7wMfzzuFKkrEPJl5LenS7rVb5xfOFUVdk608+/X5c89zR8y4r38x8
+        etrPykHp6OclaRoNnzjc10qpay6anPLl8ZfHv9bsOxS+7qdWyqJfqssD1v1fbPVF+tfyxUdu
+        W170XXhm4zbjXY+TTK+wJmn1MzYcZZ+9RPHUnZV/TlkJ2Yrc7FDeXVBQtHw7z0V7tivF4aeO
+        KNmHHmr5weXjM2MaJ+/Mk8fl1Lbzf9zQYBD7UFy7Wfsvt86FDiWW4oxEQy3mouJEAJWlmbw0
+        BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNLMWRmVeSWpSXmKPExsWy7bCSnK5n8KwUg53vBSxW3+1ns3iw396i
+        efF6Nosbx98xW8x9fYnFYuXqo0wWe29pW1zeNYfNYvmqDiaLsxM+sFr8/gHk3lh3lcWBx2Pz
+        Ci2Py2dLPTat6mTz2D93DbvH7psNbB59W1YxenzeJBfAHsVlk5Kak1mWWqRvl8CVcfHsL/aC
+        m3wV82adZGtg/MrdxcjJISFgIvG49w1rFyMXh5DAbkaJraevskAkJCTOz/vFBmELS6z895wd
+        ougpo8Ty3ceAijg42ASUJbYt9QExRQRyJFZ89wcpZxZIkOj4cYgdJCwsECfRvFcRJMwioCpx
+        5NhqsIm8AhYSfc8aoTbJS+w/eJYZIi4ocXLmExaIMfISzVtnM09g5JuFJDULSWoBI9MqRsnU
+        guLc9NxiwwKjvNRyveLE3OLSvHS95PzcTYzg8NbS2sG4Z9UHvUOMTByMhxglOJiVRHjFfkxP
+        EeJNSaysSi3Kjy8qzUktPsQozcGiJM777XVvipBAemJJanZqakFqEUyWiYNTqoFpotEReZvU
+        2kfWW9fXzDh57I7ukkVii2Vt0y81VuedPjb5G98B5jdrzP2n7C/lnnf7mntyZYqWr8TZVtG7
+        aVOk8st9nZcfuCuxpOjF8xanWoXELwf/dwWU+viUW2WlLXT9nt63ecXalQGFh0y2rX3LeXxm
+        Ctt19b63qhc8mbtmuH7rihXzeC6rx/brHlv65kMde2ZfFnEydH0s8+Ez//OAabO2csz1ntKb
+        +/X3ztvquXPUxLuzvNfOii3Lb9Ivbu/k+Bq2ZrvgypN1XKcO/46cfuOUzuQTbz4a5fgKXzqc
+        JOfE6XLyfSZLrlG5Q8X2ogI/F7OzUxZ8PhazLG7/3kXb2h2/Vrkssbvx1qiz3EldiaU4I9FQ
+        i7moOBEA9d/g5t4CAAA=
+X-CMS-MailID: 20230627031105epcas5p3010432ebd447ad865c3ddd986b3ffee0
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230627031105epcas5p3010432ebd447ad865c3ddd986b3ffee0
+References: <CGME20230627031105epcas5p3010432ebd447ad865c3ddd986b3ffee0@epcas5p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 26, 2023 at 09:54:01AM -0700, Bart Van Assche wrote:
-> On 6/26/23 01:09, Ming Lei wrote:
-> > On Wed, Jun 21, 2023 at 01:12:31PM -0700, Bart Van Assche wrote:
-> > > Prepare for processing the requeue list from inside __blk_mq_run_hw_queue().
-> > 
-> > Please add more details about the motivation for this kind of change.
-> > 
-> > IMO requeue is supposed to be run in slow code path, not see reason why
-> > it has to be moved to hw queue level.
-> 
-> As Damien explained, the code for sending requeued requests to the I/O
-> scheduler should be dropped because this is not necessary in order to
-> prevent reordering of requeued zoned writes.
-> 
-> The remaining advantages of this patch series are:
-> * Simplification of the block layer API since the
->   blk_mq_{,delay_}kick_requeue_list() functions are removed.
-> * Faster requeuing. Although I don't have any use case that needs
->   faster requeuing, it is interesting to see that this patch series
->   makes the blktest test that tests requeuing run twice as fast.
+Before calling add partition or resize partition, there is no check
+on whether the length is aligned with the logical block size.
+If the logical block size of the disk is larger than 512 bytes,
+then the partition size maybe not the multiple of the logical block size,
+and when the last sector is read, bio_truncate() will adjust the bio size,
+resulting in an IO error if the size of the read command is smaller than
+the logical block size.If integrity data is supported, this will also
+result in a null pointer dereference when calling bio_integrity_free.
 
-Not sure if it is good, cause requeue is supposed to be slow.
+Signed-off-by: Min Li <min15.li@samsung.com>
 
-> 
-> Is there agreement to proceed with this patch series if all review
-> comments are addressed?
+---
+Changes from v1:
 
-One concern is that you added requeue stuff into hctx, which may
-add one extra L1 cache fetch in fast path.
+- Add a space after /* and before */.
+- Move length alignment check before the "start = p.start >> SECTOR_SHIFT"
+- Move check for p.start being aligned together with this length alignment check.
+---
+ block/ioctl.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-
-Thank,
-Ming
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 3be11941fb2d..c40b382dd58f 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -33,14 +33,18 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+ 	if (op == BLKPG_DEL_PARTITION)
+ 		return bdev_del_partition(disk, p.pno);
+ 
++	/* check if partition is aligned to blocksize */
++	if (p.start & (bdev_logical_block_size(bdev) - 1))
++		return -EINVAL;
++	/* check if length is aligned to blocksize */
++	if (p.length & (bdev_logical_block_size(bdev) - 1))
++		return -EINVAL;
++
+ 	start = p.start >> SECTOR_SHIFT;
+ 	length = p.length >> SECTOR_SHIFT;
+ 
+ 	switch (op) {
+ 	case BLKPG_ADD_PARTITION:
+-		/* check if partition is aligned to blocksize */
+-		if (p.start & (bdev_logical_block_size(bdev) - 1))
+-			return -EINVAL;
+ 		return bdev_add_partition(disk, p.pno, start, length);
+ 	case BLKPG_RESIZE_PARTITION:
+ 		return bdev_resize_partition(disk, p.pno, start, length);
+-- 
+2.34.1
 
