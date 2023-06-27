@@ -2,92 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC6BEB64D9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 15:35:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01762EB64D9
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 15:50:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbjF0Pft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jun 2023 11:35:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49536 "EHLO
+        id S229719AbjF0PuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jun 2023 11:50:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231535AbjF0Pfs (ORCPT
+        with ESMTP id S231916AbjF0Ptz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jun 2023 11:35:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7049F297D
-        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 08:34:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687880094;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ou2xGh6t3Up2IrWkudK4YJRKKfn0b5GKukgcNLUdYxo=;
-        b=Utuysmua7M7iFoSwIIPwREC6kmsGhShELMTzJEfa4M13oO5DEShSHlP0BkqAZXzIjj14yT
-        mJ9Gu3Z42q0o+pooymqbRbv64BNKLM1H/fSzrGrN35N7PruGKmL0COk6QZzS2zpQB7jw/J
-        Zap1FdInTosK7kBfxGUvVTso/dhwiTE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-519-cm9xpWogOuegEP3IkKEGTQ-1; Tue, 27 Jun 2023 11:34:10 -0400
-X-MC-Unique: cm9xpWogOuegEP3IkKEGTQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 241C28EDD29;
-        Tue, 27 Jun 2023 15:31:13 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 16DD4C00049;
-        Tue, 27 Jun 2023 15:31:13 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-        id 00E9F30C045B; Tue, 27 Jun 2023 15:31:12 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id F12C73FB76;
-        Tue, 27 Jun 2023 17:31:12 +0200 (CEST)
-Date:   Tue, 27 Jun 2023 17:31:12 +0200 (CEST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        dm-devel@redhat.com, Marc Smith <msmith626@gmail.com>
+        Tue, 27 Jun 2023 11:49:55 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC102D4E
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 08:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=DNhXlMzfKWBgFBkZ30yANyCTFf8Lff96xXL+kn62T6o=; b=iX6/GeMoFYRslacP2Roj1MqwoQ
+        BY6EMiTev06iH8q6mlUhdSPWUrDKWmzPO72YDREfdPaXkIVfEUe3MHLhB30qywcc9P1gNYlPs7gDA
+        AiTcLIG+dKcwSomCahBKsp0GzzuSrKKZVVTsNa9qzx4GMpyV5j+1xLAj5flZBhYA9C3AdXDe8UNVK
+        qS4tzSQ4IIHyMlz3byfm+aCWbQlbmuquDKdk3FSYb432znnM/PFgBmMaki13Sez81qrPbhmTT1sQ4
+        pAzs091WLB3c6wGwKfw4iq1WH+4vyN4iSxiksZ5Duuq7/hboB22F8spYjLMv4WUTEwA21VRElN3wv
+        gSIGu7NQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qEAx0-00DZ76-0y;
+        Tue, 27 Jun 2023 15:49:54 +0000
+Date:   Tue, 27 Jun 2023 08:49:54 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
+        Marc Smith <msmith626@gmail.com>
 Subject: Re: [PATCH] block: flush the disk cache on BLKFLSBUF
-In-Reply-To: <1a33ace-57f9-9ef9-b967-d6617ca33089@redhat.com>
-Message-ID: <f9e830ef-adf7-4196-a46f-ba4e65cbb54d@redhat.com>
+Message-ID: <ZJsFIkpj/+CdrQ1W@infradead.org>
 References: <1a33ace-57f9-9ef9-b967-d6617ca33089@redhat.com>
+ <f9e830ef-adf7-4196-a46f-ba4e65cbb54d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9e830ef-adf7-4196-a46f-ba4e65cbb54d@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Jun 27, 2023 at 05:31:12PM +0200, Mikulas Patocka wrote:
+> Marc Smith reported a bug where he wrote to the dm-writecache target using 
+> O_DIRECT, then reset the machine without proper shutdown and the freshly 
+> written data were lost. It turned out that he didn't use the fsync or 
+> fdatasync syscall (and dm-writecache makes its metadata persistent on a 
+> FLUSH bio).
 
+Which so far is expected.  Even with O_DIRECT you need O_(D)SYNC or
+fsync/fdatasync to persist data.
 
-> On Mon, 26 Jun 2023, Mikulas Patocka wrote:
-> 
-> > The BLKFLSBUF ioctl doesn't send the flush bio to the block device, thus
-> > flushed data may be lurking in the disk cache and they may not be really
-> > flushed to the stable storage.
-> > 
-> > This patch adds the call to blkdev_issue_flush to blkdev_flushbuf.
-> 
-> Umm, why?  This is an ioctl no one should be using, and we certainly
-> should not add new functionality to it.  Can you explain what you're
-> trying to do here?
+> When I was analyzing this issue, it turned out that there is no easy way 
+> how to send the FLUSH bio to a block device from a command line.
 
-Marc Smith reported a bug where he wrote to the dm-writecache target using 
-O_DIRECT, then reset the machine without proper shutdown and the freshly 
-written data were lost. It turned out that he didn't use the fsync or 
-fdatasync syscall (and dm-writecache makes its metadata persistent on a 
-FLUSH bio).
+xfs_io -c fsync /dev/foo
 
-When I was analyzing this issue, it turned out that there is no easy way 
-how to send the FLUSH bio to a block device from a command line.
+> The "blockdev --flushbufs" command also doesn't send the FLUSH bio, but I 
+> would expect it to send it. Without sending the FLUSH bio, "blockdev 
+> --flushbufs" doesn't really guarantee anything.
 
-The sync command synchronizes only filesystems, it doesn't flush cache for 
-unmounted block devices (do you think that it should flush block devices 
-too?).
-
-The "blockdev --flushbufs" command also doesn't send the FLUSH bio, but I 
-would expect it to send it. Without sending the FLUSH bio, "blockdev 
---flushbufs" doesn't really guarantee anything.
-
-Mikulas
-
+I wouldn't expect it.  It's a really weird legacy thing that calls
+back up into the file system, but only if it sets s_bdev to this
+device.  I don't think we should add new users of it that overload the
+semantics.
