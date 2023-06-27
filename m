@@ -2,108 +2,149 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78778EB64D9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 16:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3CDEB64D9
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 16:50:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232447AbjF0Qfd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jun 2023 12:35:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51574 "EHLO
+        id S230161AbjF0QuB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jun 2023 12:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232870AbjF0QfS (ORCPT
+        with ESMTP id S232524AbjF0Qtw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jun 2023 12:35:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91BB4198C
-        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 09:34:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687883630;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=9A6ATY9LqaJSfWJfx2WWx323Pvwd+t487KhiuT9/AfA=;
-        b=c6dlWQylEhhBYJU3WoK1FtBjHgO8IBsOPOySEm1FVbD69zpkhoqbjcb+UjJfdzfG+dfVaL
-        ggPkwrcVeJZtCFGoLL3H/dMyrH+OAQmhuLlzGYaekiyUYuKdxOA4Ktf+DmmKMb5d96sENe
-        Np2HMSzYb5TQq0lWtkhNqZq8vi77U7Y=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-668-lBaZn_7QMkG9hYywaPelsw-1; Tue, 27 Jun 2023 12:33:48 -0400
-X-MC-Unique: lBaZn_7QMkG9hYywaPelsw-1
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1b7d5826f1fso13788325ad.3
-        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 09:33:47 -0700 (PDT)
+        Tue, 27 Jun 2023 12:49:52 -0400
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35B46186
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 09:49:51 -0700 (PDT)
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-78338a235ebso229611039f.0
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 09:49:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687883626; x=1690475626;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9A6ATY9LqaJSfWJfx2WWx323Pvwd+t487KhiuT9/AfA=;
-        b=c0h7Ipi2kV8CMC8mZwmIUca7hZiHDpAp4ET9X9fUhADdTx6q85jz1Xf610wfLdB2ts
-         6FOb8xP/tI7yTg+pfqbx23PRe17/5i0eRFaART5tndICrYfRoZKCzLRuzWNF5urDYqaW
-         W1qaGftEXfAkYnWPPcnWa9HUUq/mtiTX/VGtQ1O7pOUpnBoe1utq4exDTnP9CJnzLc2M
-         lfPaRBwcG6D4kU/3kCjPMOYQpQYc/G3LuHfTnt//h5EygjCZ9BdLFxSyfoMbAD8ZOmgZ
-         2bCxqVMGuc9ug8Drk+YubBwwfkjCqNnqGT/z1gvS5HbAkjWqWnysIqWxtet/MZEnzYYn
-         vG9w==
-X-Gm-Message-State: AC+VfDyCf7qeFyvgh7Z4TJvmA6UkU3dmm3hfjzEqgnoWwb4IIIKOcz5X
-        aYe6Agu+WmQmga97BcXtf9rd/63Ec/ipkqP2PQ4qdKo1cIbpgHUEQUxtugkoWSXUmcHbcKtYbQx
-        OYgjLPOelMjtDifb0k9l9GqIPQ/WU1ImoMGfoNI1uyBZtNEuvlSFl
-X-Received: by 2002:a17:902:e811:b0:1b6:80f0:d97a with SMTP id u17-20020a170902e81100b001b680f0d97amr7578765plg.19.1687883626149;
-        Tue, 27 Jun 2023 09:33:46 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7fxdyZwD/T9HTf1SSNThYAa5VjotAfp4yLFOUFO6NZozSLACNYaRtimkegV2xAvHR+lRGiKcc3Uwp9cyBJgxs=
-X-Received: by 2002:a17:902:e811:b0:1b6:80f0:d97a with SMTP id
- u17-20020a170902e81100b001b680f0d97amr7578754plg.19.1687883625837; Tue, 27
- Jun 2023 09:33:45 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687884590; x=1690476590;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6mpZdZ8TrOnclUhJKMMDYdLhV/Dq74p7v3SXnx8ZNxU=;
+        b=TH6x4mxdQ/Hr3PkXn5uBKP3Kny27Jgy0TzDmGWQ+acQ+BB7a7TD8EzAbJM5w4Aff9c
+         E5IlM1FPdkPH5WdylKEVcjMnIhXDPOmNiZRmKqHfJ91lvJMOSGsPt9vH9jfNOEl0tT6h
+         Lk8usmfgguAV8sSDEXxTiLqJidhVxVhuxH18n7zZeaiONZhv5kpCdGPsRoCrutXdxlAh
+         oZFCkq9CB9rKeh4bvGcL+AK3tgxfMyuB5+Y2yEbWSyfv/AjRCO1YfDnj2EjaWSMxi5fC
+         CuhMz7N2iQ4JiiL7T22N+26bLjPYf1LBorL8bet+YKQEWkF7qoRrCvhjR0rHwlkPyphK
+         E5xg==
+X-Gm-Message-State: AC+VfDwhb8BZHN9LSjZXJqFQnN0bB5amDmgK83pca4ZD6oTcCpXpo+Xt
+        v79Eo/Sh+jetAJ9gfAPZEsOqUaafgoe/BNNxdPZY7Y7FPmw2
+X-Google-Smtp-Source: ACHHUZ6K4fTRg1aJoktZfWUx3piitS706bwAfMtZae9Pg1xcnunjeDo3auk7auRAcwMbD+VzQPdQHMOQazliyLwMu30tgV8tazQI
 MIME-Version: 1.0
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Wed, 28 Jun 2023 00:33:34 +0800
-Message-ID: <CAHj4cs_qUWzetD0203EKbBLNv3KF=qgTLsWLeHN3PY7UE6mzmw@mail.gmail.com>
-Subject: [bug report] most of blktests nvme/ failed on the latest linux tree
-To:     linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>
+X-Received: by 2002:a5e:aa19:0:b0:783:c1b2:3ae0 with SMTP id
+ s25-20020a5eaa19000000b00783c1b23ae0mr621608ioe.0.1687884590538; Tue, 27 Jun
+ 2023 09:49:50 -0700 (PDT)
+Date:   Tue, 27 Jun 2023 09:49:50 -0700
+In-Reply-To: <000000000000b1076405f9818f92@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000070ed0005ff1f4120@google.com>
+Subject: Re: [syzbot] [block?] WARNING in floppy_interrupt (2)
+From:   syzbot <syzbot+aa45f3927a085bc1b242@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello
+syzbot has found a reproducer for the following issue on:
 
-I found this failure on the latest linux tree, and it cannot be
-reproduced on v6.4,
-it should be one regression recently merged to linux tree after v6.4.
-I check the commit recently merged after v6.4, and found below commit
-touched the related code, not sure if it was introduced by this
-commit.
+HEAD commit:    1ef6663a587b Merge tag 'tag-chrome-platform-for-v6.5' of g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=124a5670a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=319f18de2a0a8640
+dashboard link: https://syzkaller.appspot.com/bug?extid=aa45f3927a085bc1b242
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=127d41e0a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=145f1ee0a80000
 
-commit 959ffef13bac792e4e2e3321d6e2bd2b00c0f5f9
-Author: Chaitanya Kulkarni <kch@nvidia.com>
-Date:   Thu Jun 1 23:47:42 2023 -0700
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-1ef6663a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1600540a0cdf/vmlinux-1ef6663a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/36ac12d50d01/bzImage-1ef6663a.xz
 
-    nvme-fabrics: open code __nvmf_host_find()
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+aa45f3927a085bc1b242@syzkaller.appspotmail.com
 
-[  524.706158] run blktests nvme/004 at 2023-06-27 02:00:43
-[  524.779499] loop0: detected capacity change from 0 to 2097152
-[  524.790075] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-[  524.810743] nvme_fabrics: found same hostid
-08dfb4e9-d246-4450-afb6-bc6249f9dc96 but different hostnqn
-nqn.2014-08.org.nvmexpress:uuid:4c4c4544-005a-3010-804b-b4c04f4e3232
-[  525.346603] run blktests nvme/006 at 2023-06-27 02:00:44
-[  525.380421] loop0: detected capacity change from 0 to 2097152
-[  525.391846] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-[  525.901516] run blktests nvme/007 at 2023-06-27 02:00:45
-[  525.934980] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-[  526.412792] run blktests nvme/008 at 2023-06-27 02:00:45
-[  526.446070] loop0: detected capacity change from 0 to 2097152
-[  526.456790] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-[  526.471220] nvme_fabrics: found same hostid
-1cb04df4-a83c-4257-84ad-aa5dab3e961c but different hostnqn
-nqn.2014-08.org.nvmexpress:uuid:4c4c4544-005a-3010-804b-b4c04f4e3232
-[  527.014108] run blktests nvme/009 at 2023-06-27 02:00:46
-[  527.045095] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-[  527.059680] nvme_fabrics: found same hostid
-1584c36e-4a26-4408-a7d6-5608c0197141 but different hostnqn
-nqn.2014-08.org.nvmexpress:uuid:4c4c4544-005a-3010-804b-b4c04f4e3232
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 4921 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
+WARNING: CPU: 1 PID: 4921 at drivers/block/floppy.c:999 floppy_interrupt+0x3cc/0x440 drivers/block/floppy.c:1765
+Modules linked in:
+CPU: 1 PID: 4921 Comm: kworker/u16:2 Not tainted 6.4.0-syzkaller-01224-g1ef6663a587b #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+Workqueue: floppy floppy_work_workfn
+RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
+RIP: 0010:floppy_interrupt+0x3cc/0x440 drivers/block/floppy.c:1765
+Code: 4d d0 8a 89 c6 89 05 73 c4 ea 0c e8 8e 27 ff ff 8b 1d 68 c4 ea 0c e9 9c fd ff ff e8 ce 56 b1 fc e9 66 fd ff ff e8 24 67 5f fc <0f> 0b e9 c9 fe ff ff 48 c7 c7 00 f2 40 8c e8 71 56 b1 fc e9 5a fc
+RSP: 0018:ffffc90000aa8e58 EFLAGS: 00010046
+RAX: 0000000080010000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: ffff888031a98800 RSI: ffffffff852425ac RDI: 0000000000000001
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: ffffc90000aa8ff8 R12: ffffffff85239f60
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000006
+FS:  0000000000000000(0000) GS:ffff88806b700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055cd072ef000 CR3: 000000000c571000 CR4: 0000000000350ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ floppy_hardint+0x1b1/0x200 arch/x86/include/asm/floppy.h:66
+ __handle_irq_event_percpu+0x22b/0x730 kernel/irq/handle.c:158
+ handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
+ handle_irq_event+0xab/0x1e0 kernel/irq/handle.c:210
+ handle_edge_irq+0x263/0xd00 kernel/irq/chip.c:834
+ generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
+ handle_irq arch/x86/kernel/irq.c:238 [inline]
+ __common_interrupt+0xa1/0x220 arch/x86/kernel/irq.c:257
+ common_interrupt+0xa8/0xd0 arch/x86/kernel/irq.c:247
+ </IRQ>
+ <TASK>
+ asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
+RIP: 0010:outb_p arch/x86/include/asm/io.h:296 [inline]
+RIP: 0010:fdc_outb drivers/block/floppy.c:602 [inline]
+RIP: 0010:reset_fdc+0x185/0x400 drivers/block/floppy.c:1817
+Code: ba 00 00 00 00 00 fc ff df 48 89 f9 48 c1 e9 03 80 3c 11 00 0f 85 8a 01 00 00 48 8d 14 9b 48 8b 14 d5 f0 c0 0e 92 83 c2 04 ee <e8> 56 ec ff ff 48 83 c4 08 5b 5d e9 9b 1f 60 fc e8 96 1f 60 fc 48
+RSP: 0018:ffffc9000308fc70 EFLAGS: 00000202
+RAX: 00000000ffffff81 RBX: 0000000000000000 RCX: 1ffffffff241d81e
+RDX: 00000000000003f4 RSI: ffffffff85236c9c RDI: ffffffff920ec0f0
+RBP: 0000000000000062 R08: 0000000000000001 R09: 0000000000000044
+R10: 0000000000000062 R11: 0000000032393454 R12: 0000000000000001
+R13: 0000000000000000 R14: 0000000000000020 R15: 0000ffff88800010
+ floppy_ready+0x67c/0x1b60 drivers/block/floppy.c:1929
+ redo_format+0x545/0x6f0 drivers/block/floppy.c:2214
+ process_one_work+0x99a/0x15e0 kernel/workqueue.c:2408
+ worker_thread+0x67d/0x10c0 kernel/workqueue.c:2555
+ kthread+0x344/0x440 kernel/kthread.c:379
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	ba 00 00 00 00       	mov    $0x0,%edx
+   5:	00 fc                	add    %bh,%ah
+   7:	ff                   	(bad)
+   8:	df 48 89             	fisttps -0x77(%rax)
+   b:	f9                   	stc
+   c:	48 c1 e9 03          	shr    $0x3,%rcx
+  10:	80 3c 11 00          	cmpb   $0x0,(%rcx,%rdx,1)
+  14:	0f 85 8a 01 00 00    	jne    0x1a4
+  1a:	48 8d 14 9b          	lea    (%rbx,%rbx,4),%rdx
+  1e:	48 8b 14 d5 f0 c0 0e 	mov    -0x6df13f10(,%rdx,8),%rdx
+  25:	92
+  26:	83 c2 04             	add    $0x4,%edx
+  29:	ee                   	out    %al,(%dx)
+* 2a:	e8 56 ec ff ff       	callq  0xffffec85 <-- trapping instruction
+  2f:	48 83 c4 08          	add    $0x8,%rsp
+  33:	5b                   	pop    %rbx
+  34:	5d                   	pop    %rbp
+  35:	e9 9b 1f 60 fc       	jmpq   0xfc601fd5
+  3a:	e8 96 1f 60 fc       	callq  0xfc601fd5
+  3f:	48                   	rex.W
 
 
--- 
-Best Regards,
-  Yi Zhang
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
