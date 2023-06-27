@@ -2,159 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85103EB64D9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 06:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3481EB64D9
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 08:13:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbjF0Gvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jun 2023 02:51:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46312 "EHLO
+        id S231130AbjF0INu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jun 2023 04:13:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbjF0Gvw (ORCPT
+        with ESMTP id S230093AbjF0INs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jun 2023 02:51:52 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEE9122;
-        Mon, 26 Jun 2023 23:51:51 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0179621898;
-        Tue, 27 Jun 2023 06:51:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1687848710; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=siNVEFVMJbaY/pqwCdt8cIyoPzgMxgexWD0B44SPTLo=;
-        b=UEbDNx5f0+pil+MzDr8DPuk1QyYOAEKCTGVBCTEPOqP6Un9zNN82B+auHpNkJnO/HOviC9
-        q2Z1QJtA/iR2s8Wbc5K/S7q8LKZwL8QT52UANItmEq6FKkULrci7LoDUc67dP6uZYv1O49
-        wGTW7BoSkeUOpml+sdM55z6D/SMd+xU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1687848710;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=siNVEFVMJbaY/pqwCdt8cIyoPzgMxgexWD0B44SPTLo=;
-        b=lOWUdHCXJzuSBtm1InI3hB8FKT7x/UforKVHDV1gZBw7N2o2/kfv1bhQrJPJfFMH9SVNr3
-        VmVu7JgvZgqw0rAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B3A4013276;
-        Tue, 27 Jun 2023 06:51:49 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id gmLqKQWHmmRYCgAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 27 Jun 2023 06:51:49 +0000
-Message-ID: <9b01b4b3-0beb-4159-1ce9-4ed4b531d7a6@suse.de>
-Date:   Tue, 27 Jun 2023 08:51:49 +0200
+        Tue, 27 Jun 2023 04:13:48 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4034C7
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 01:13:44 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230627081342euoutp02beee6b0fdae597b949d9c447bca99a07~sde051hgY2069820698euoutp02j
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 08:13:42 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230627081342euoutp02beee6b0fdae597b949d9c447bca99a07~sde051hgY2069820698euoutp02j
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1687853622;
+        bh=njysLWEP0e6FF3MtvXFCrxNi9ni9M9hIdPjIuY1RnZ0=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=lpZKCq7KOStTTfpIy7vJwCdqZgXx4EU30b6l83qQZJbi9hCOd6d39LHMr49KwnOe3
+         Vs1XGgxeLnDSXWUIfHaZ8Vm+xmgdxNnl+mWSVJBkA5TgvRPt1s8XGld1JeIV/Bs3kz
+         frj09L2OZNmUFpUHp7qCF5pgtvcVBVAIUbofkR4A=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20230627081341eucas1p1f6aad210e064b7d03b6a6d01c22c6583~sde0p7bbx3249332493eucas1p1y;
+        Tue, 27 Jun 2023 08:13:41 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id F2.CC.42423.53A9A946; Tue, 27
+        Jun 2023 09:13:41 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230627081341eucas1p185627d4dacd7db98ddd624397d82bd01~sde0Sifr_2670026700eucas1p1_;
+        Tue, 27 Jun 2023 08:13:41 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230627081341eusmtrp1061de97063c20e101557bd1caded7778~sde0R6OJR2558825588eusmtrp1J;
+        Tue, 27 Jun 2023 08:13:41 +0000 (GMT)
+X-AuditID: cbfec7f2-a3bff7000002a5b7-4e-649a9a35f6fe
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 74.64.14344.53A9A946; Tue, 27
+        Jun 2023 09:13:41 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230627081341eusmtip2b41b258f9d6bc89a7936d066c1a2b88a~sde0IfJX11115211152eusmtip28;
+        Tue, 27 Jun 2023 08:13:41 +0000 (GMT)
+Received: from localhost (106.110.32.140) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Tue, 27 Jun 2023 09:13:40 +0100
+Date:   Tue, 27 Jun 2023 10:13:39 +0200
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     Damien Le Moal <dlemoal@kernel.org>
+CC:     Min Li <min15.li@samsung.com>, <axboe@kernel.dk>,
+        <willy@infradead.org>, <hch@lst.de>, <gregkh@linuxfoundation.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] block: add check that partition length needs to be
+ aligned with block size
+Message-ID: <20230627081339.fv76swi3srqdfpra@localhost>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 4/5] nvme-fc: Make initial connect attempt synchronous
-Content-Language: en-US
-From:   Hannes Reinecke <hare@suse.de>
-To:     Daniel Wagner <dwagner@suse.de>,
-        Dan Carpenter <dan.carpenter@linaro.org>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <jsmart2021@gmail.com>
-References: <20230620133711.22840-1-dwagner@suse.de>
- <20230620133711.22840-5-dwagner@suse.de>
- <3ea88e87-9b24-4f7a-958c-97e27d94ec30@moroto.mountain>
- <s7ojt6ad3i3t4ddqwxvxsxv4zxisz6skomogwbw3qljbuqkwr6@akwaxv2cyg2d>
- <17321e5d-3744-dd7c-5ed9-cecf055ada39@suse.de>
-In-Reply-To: <17321e5d-3744-dd7c-5ed9-cecf055ada39@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <8ea3bdfb-f2d9-ee5e-f623-02b2b134490d@kernel.org>
+X-Originating-IP: [106.110.32.140]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEKsWRmVeSWpSXmKPExsWy7djP87qms2alGDT/0rNYfbefzeLBfnuL
+        5sXr2SxWrj7KZLH3lrbF5V1z2Cx+/5jD5sDusXmFlsfls6Uem1Z1snnsn7uG3WP3zQY2j8+b
+        5ALYorhsUlJzMstSi/TtErgy3i58wFKwhLNi8p03zA2MK9i7GDk5JARMJK59n8TSxcjFISSw
+        glHi0IbdjBDOF0aJB8dboZzPjBJtN3awwLTMn/ERqmU5UGLvJTa4qncbt7BDOFsYJSa//cME
+        0sIioCrxas0ToAQHB5uAlkRjJ9hyEQF1iamT94CtYBbYxSix7sYOsISwQIpEW8NBsHW8AuYS
+        c+6vZ4KwBSVOznwCFmcW0JFYsPsTG8hMZgFpieX/OEBMTgE7ic89yRCHKkk0bD4DdXStxKkt
+        t5hAVkkIvOCQOHShARoALhJ7Vk2BsoUlXh3fAmXLSJye3APVXC3x9MZvZojmFkaJ/p3rwfZK
+        CFhL9J3JgahxlDh3dAo7RJhP4sZbQYgr+SQmbZvODBHmlehoE4KoVpNYfe8NywRG5VlI/pqF
+        5K9ZCH8tYGRexSieWlqcm55abJiXWq5XnJhbXJqXrpecn7uJEZhsTv87/mkH49xXH/UOMTJx
+        MB5ilOBgVhLhFfsxPUWINyWxsiq1KD++qDQntfgQozQHi5I4r7btyWQhgfTEktTs1NSC1CKY
+        LBMHp1QDk5j9xOX/T+r0F9x7lJRyOStuv9T7VS1v5m7Y/iP0xqr/Te+k8zz1Zc2Nd7/Z+Oi+
+        jG66rPDbeSvkPQvkzebHXNgbKjTzlbqe7Yu2p1kWyUJdxpF3BdcdcGWXfnTowCH1KykXHkvl
+        P7arU8vRZl+64OXjtaIHRX8XGWl9aL7J53zq20aJvLfBx74/Mgk6mPuitvH3UbGnZoa5uhf7
+        52/z1VmUvKCt96n16fA5Ms9atyTUOfc3yLeIW19QX8J9+UThxFvrbKeaPrrwW9lggrJTv7Hu
+        7WfeC60rnt0JNjr6V1lWNfJe6Mz2B6IvKq946oc58U7VeatY3iZQs4tZqX2z4cHupJ3TKt2f
+        m521OTWfV4mlOCPRUIu5qDgRAKMqYjGlAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrAIsWRmVeSWpSXmKPExsVy+t/xe7qms2alGGz7LGax+m4/m8WD/fYW
+        zYvXs1msXH2UyWLvLW2Ly7vmsFn8/jGHzYHdY/MKLY/LZ0s9Nq3qZPPYP3cNu8fumw1sHp83
+        yQWwRenZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq6dvZpKTmZJalFunbJehl
+        vF34gKVgCWfF5DtvmBsYV7B3MXJySAiYSMyf8ZGli5GLQ0hgKaPExIs3WSESMhIbv1yFsoUl
+        /lzrYoMo+sgoMen3aShnC6PEkz/XGEGqWARUJV6teQI0loODTUBLorETbIOIgLrE1Ml7GEHq
+        mQV2MUqsu7EDLCEskCLR1nCQBcTmFTCXmHN/PRPE0AOMEitn3GWHSAhKnJz5BKyIWUBHYsHu
+        T2wgC5gFpCWW/+MAMTkF7CQ+9yRDHKok0bD5DAuEXSvx+e8zxgmMwrOQDJqFZNAshEELGJlX
+        MYqklhbnpucWG+kVJ+YWl+al6yXn525iBEbdtmM/t+xgXPnqo94hRiYOxkOMEhzMSiK8Yj+m
+        pwjxpiRWVqUW5ccXleakFh9iNAWGxERmKdHkfGDc55XEG5oZmBqamFkamFqaGSuJ83oWdCQK
+        CaQnlqRmp6YWpBbB9DFxcEo1MHGU/q2QWnD2RoD3euZ7pl9sokyuOa3b+aP9556eoOnngsU1
+        NxZsvP9dcvmPsLqdJtXBkzKYNJMmd0w0CfxtNzt33u5NYe1X6g0WSiw8uocvtb6I79hW2cNb
+        Tb94sDb+qTL9frk8Ym184oXLyjxCQkfvvreu+nNCqcnndsOJWYaKNYt3/2FPmuZnELVjwdNN
+        dR93OF6+EXdHXfWd6xpB3TcXd99ROLTzuE2brdXlnkDzy2vsH3nHa7q8ZY6/kf/y2Qql8rCv
+        7iLPGfzlLqxtmjMjRuD6t+RLb3k6Z4k7rGVOeLAy7cmhUgnHmDW8Z9jvNZyNv/BwcXDXh9Y3
+        HvNt7mwLktsel7dVa6b8OwaBKdpKLMUZiYZazEXFiQDfySdtQwMAAA==
+X-CMS-MailID: 20230627081341eucas1p185627d4dacd7db98ddd624397d82bd01
+X-Msg-Generator: CA
+X-RootMTR: 20230627031105epcas5p3010432ebd447ad865c3ddd986b3ffee0
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230627031105epcas5p3010432ebd447ad865c3ddd986b3ffee0
+References: <CGME20230627031105epcas5p3010432ebd447ad865c3ddd986b3ffee0@epcas5p3.samsung.com>
+        <20230627110918.7608-1-min15.li@samsung.com>
+        <8ea3bdfb-f2d9-ee5e-f623-02b2b134490d@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/27/23 08:39, Hannes Reinecke wrote:
-> On 6/27/23 08:18, Daniel Wagner wrote:
->> On Mon, Jun 26, 2023 at 02:33:18PM +0300, Dan Carpenter wrote:
->>>> @@ -2943,6 +2943,8 @@ nvme_fc_create_io_queues(struct nvme_fc_ctrl 
->>>> *ctrl)
->>>>       /* force put free routine to ignore io queues */
->>>>       ctrl->ctrl.tagset = NULL;
->>>> +    if (ret > 0)
->>>> +        ret = -EIO;
->>>
->>> All these checks for ret > 0 make me unhappy.  I don't understand how
->>> they are a part of the commit.
->>
->> We have two types of error message types in the nvme subsystem. The 
->> negative
->> values are the usual ones and positive ones are nvme protocol errors.
->>
->> For example if the authentication fails because of invalid credentials 
->> when
->> doing the authentication nvmf_connect_admin_queue() will return a 
->> value of
->> NVME_SC_AUTH_REQUIRED. This is also the value which gets propagated to 
->> this
->> point here. The problem is any positive error code is interpreted as a 
->> valid
->> pointer later in the code, which results in a crash.
->>
->>> I have tried to look at the context and I think maybe you are working
->>> around the fact that qla_nvme_ls_req() returns QLA_FUNCTION_FAILED on
->>> error.
->>
->> The auth blktests are exercising the error path here and that's why I 
->> added
->> this check. BTW, we already use in other places, this is not 
->> completely new in
->> this subsystem.
->>
->>> Also the qla_nvme_ls_req() function EINVAL on error.  I just wrote a
->>> commit message saying that none of the callers cared but I missed that
->>> apparently gets returned to nvme_fc_init_ctrl().  :/
->>> https://lore.kernel.org/all/49866d28-4cfe-47b0-842b-78f110e61aab@moroto.mountain/
->>
->> Thank!
->>
->>> Let's just fix qla_nvme_ls_req() instead of working around it here.
->>>
->>> And let's add a WARN_ON_ONCE() somewhere to prevent future bugs.
->>
->> This makes sense for the driver APIs. Though for the core nvme 
->> subsystem this
->> needs to be discusses/redesigned how to handle the protocol errors first.
->>
-> I would stick with the 'normal' nvme syntax of having negative errors as 
-> internal errors (ie errnos), '0' for no error, and positive numbers as 
-> NVMe protocol errors.
-> As such I would also advocate to not map NVMe protocol errors onto error 
-> numbers but rather fix the callers to not do a pointer conversion.
+On Tue, Jun 27, 2023 at 01:39:26PM +0900, Damien Le Moal wrote:
+> > diff --git a/block/ioctl.c b/block/ioctl.c
+> > index 3be11941fb2d..c40b382dd58f 100644
+> > --- a/block/ioctl.c
+> > +++ b/block/ioctl.c
+> > @@ -33,14 +33,18 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+> >  	if (op == BLKPG_DEL_PARTITION)
+> >  		return bdev_del_partition(disk, p.pno);
+> >  
+> > +	/* check if partition is aligned to blocksize */
+> > +	if (p.start & (bdev_logical_block_size(bdev) - 1))
+> > +		return -EINVAL;
+> > +	/* check if length is aligned to blocksize */
+> > +	if (p.length & (bdev_logical_block_size(bdev) - 1))
+> > +		return -EINVAL;
 > 
-Aw. Now I see it.
+> 	long long blksz_mask = bdev_logical_block_size(bdev) - 1;
+> 
+> 	/* Check that the partition is aligned to the block size */
+> 	if ((p.start & blksz_mask) || (p.length & blksz_mask))
+> 		return -EINVAL;
 
-It's the ->create_ctrl() callback which will always return a controller 
-pointer or an error value.
-If we were to return a protocol error we would need to stick it into the 
-controller structure itself. But if we doing that then we'll be ending 
-up with a non-existing controller, ie we'd be returning a structure for 
-a dead controller. Not exactly pretty, but it would allow us to improve
-the userland API to return the NVMe protocol error by reading from the
-fabrics device; the controller structure itself would be cleaned up when 
-closing that device.
+A Minor nit on top of your comment:
 
-Hmm.
+ 	unsigned int blksz = bdev_logical_block_size(bdev);
+ 
+ 	/* Check that the partition is aligned to the block size */
+ 	if (!IS_ALIGNED(p.start, blksz) || !IS_ALIGNED(p.length, blksz))
+ 		return -EINVAL;
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
-
+> 
+> would be cleaner and avoid the rather redundant comments.
+> 
