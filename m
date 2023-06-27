@@ -2,81 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4000EEB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 10:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00008EB64D9
+	for <linux-block@archiver.kernel.org>; Tue, 27 Jun 2023 10:24:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjF0KPF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Jun 2023 06:15:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37778 "EHLO
+        id S231533AbjF0KYW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Jun 2023 06:24:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231668AbjF0KO1 (ORCPT
+        with ESMTP id S231657AbjF0KX6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jun 2023 06:14:27 -0400
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B49CA8F;
-        Tue, 27 Jun 2023 03:13:52 -0700 (PDT)
+        Tue, 27 Jun 2023 06:23:58 -0400
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3A6C173C;
+        Tue, 27 Jun 2023 03:22:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1687860832; x=1719396832;
+  t=1687861377; x=1719397377;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
-  bh=NKlfNcs5O2hMwp7wgA5GL2bKRl+6Kvkwb9pgL9KKfIY=;
-  b=nhDrWz3uluwmsQKiTnHPqWcpPb5L9grgx94txwfhipt6RFHoW3dB0D5R
-   ED7GSJS941kKDc/TdQwOQYYyH36VVofczGjCvwe/9HV4WNJd9IioEQDF8
-   7KlwzSKi5tvvCUa8Y2BAsVHWgjjl8Vzm6LReCA95Af5HLh3sQRmEkKBJW
-   ySFEdXTFxGdgexX6I6ZqAdXLpBXHdSAuJyF8B+ISHRuV1WgApDnPdugvF
-   QZXRa7uYaqwMSTp1Z8alTXSgMsaiBnUxiDXqRRGVJ5Tk12MCOWW61DxUU
-   m/HdbkaaUsvo+VI2TuKGuuq6XQT1AKFeH6NbOVQ2OLjkwW3SsxryVWGCh
-   g==;
+  bh=AsehjMW9c885cWve08vhOywiXh9nyOASpBspoG9bHV4=;
+  b=dnm0WpPKPMD1EXxoiJdEOxzI3LEIDBdhkbCqMs4TOlWO5u0itPcGBbbz
+   pfrYZuukp8u9pGwpoisZq8QUtRJIDeoGs9+NHh/47Z3m9NBNRUSTgY4N/
+   Kq+7mWuzfQX+nWC77Ppbsptx07FmZyJZsYe2LkLC2Nk9L90VKr+bAP6uZ
+   S1/PPtN1ooIm/mCWb69DRaKLX/BhaOOtkjUFQ2KHVzH8TECDEE5RsFcNI
+   dpNHFKxzo/bXIOGGRakgbP94kjCzwL74GPsOnO4K798y345Xn15H1BwVz
+   T5AcNelPN+VUMUwBBf8G4yOZwV6ruwAf1l1qxwbzQ82a61ou2X2d3kTgs
+   w==;
 X-IronPort-AV: E=Sophos;i="6.01,162,1684771200"; 
-   d="scan'208";a="241316763"
-Received: from mail-bn8nam04lp2042.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.42])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2023 18:13:50 +0800
+   d="scan'208";a="236973506"
+Received: from mail-dm6nam12lp2171.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.171])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jun 2023 18:22:55 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nYY/a3XHDRkegJXdwRww4baHEvDpzE4AfSs+3OH/Yv5w1+sg4+Gus5vZxrNylvW3jHFGqKP4kDiwZf7vLTzWVSf0VSFBGdV4I6k6IRxv+6Ljb88syxHUsL5Ighp4LEMU+Sf/dpQYEPQEwm12RS5RLkybjWWqeBr0fWQFnBGrXDlxo/bxJH0WjD8AhrzBnLkf4qbHzr3ZFGj5h4dG6Z0bGOokUT6QKAVOma7UX2fMU6NGV1DCTh5fzGSD9Cc2nSDqAbBdmQQO/wE0C2m4SbP7buNxoNfSg+4/yDT8uXiYaaYHfqAGjLqlWmub7feTCgqyKmr3uC1YsH0jqR7Gw1W4ug==
+ b=G5pcX6xIe7znRVH9tcjkF9YF98wR7YUppgEorN99IxzaxvEEYsTtkOXswjpwtlJsbVBKd2JPs7XgbrEm8NtnMo9/NkxtEJoe0AWxdE78R/5BcbiILkUtAnig0SM8ECtWdclPzP2U3ESKTYJ7AUxk68eq1PqhIbAEQawXH2Zv+CBTocisIPATPfZodo/uBuiwQ4G1PBMGYa0Iq2vyUoE/iKiB8J/D+6h/Ue6C5YUk3CPfJhYxpJV3L6JQTvgy67W+3zpg59pR9n6qaRmwtpm3iYJLbnw968cpGiTmgvA45BWBOKjbQHdg7jWS3fHa/iB0ZAcGQLwHxTCD2+15/m6pOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MKS+Nj5gSBc4PucfpjbBRW8vq/gXVG7WX/293DPgn2U=;
- b=Hp9R1hqSndKiHVcQs4WC1WCUj6BDXwySDROM6HeHRzdhJdzpc65PJyaQ/uhWZzcDUgjSEr448L7H29d4wtNkmaTRmerEQ7UjxPKOuSkUrWwwO7+l6gWfvp0K0GYq+XX1D/WWbwGruUcXm7NDSPP7nXcosCvbl83l3rHztK+5GOUkPeWDLJmtV711OtnqOz6QT7zFz26sHKpxsug9LmpN3VtO36yh0Y8R7yqmFzSrEQ42ncb4GN7wsmq86x+0w2fyhLqjGGTLUveM8KPdQ7Bc04cwVdwXOWlZ2OD1PbGzW6JBpoP0u+uxL8f7TQk/M4vvtMB1B0unH5a184RBQMhucA==
+ bh=+gSho+aQ2PvGIWLc846f9OkmZ1V1WumuIz2j3QU17s4=;
+ b=f4sdDyp+sIbcfcnziDaY23i1eAbv2ET7oN6UNA7IIJtmbJdv1/eg1dWCajWh7L9FgUFVK/3kpXLwS/bsV0FcbB8kkNC16igBRSQl1JA7+427dQ3I7868wd3FVyCFCG0r8Ej1IRC5q+X4fpUcSDJIAnKlN4J+Sdyvnz3asvmHCz7BkWb3RXilJr7mU0LoWphcRJRHJn66RwlfQmiiWdzuqi4WPT2Or6Sad/BNAnIE8WYdfqPg8dsTUWH9YsLiEWJGk+akiJNFvqsFv9z0S4YSryiT43C3XbzHcNc61EuVvp7gXBaM1xLpjvgAWQFZJBTj5tFtt12A41Gp7xfMYJ8P2w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MKS+Nj5gSBc4PucfpjbBRW8vq/gXVG7WX/293DPgn2U=;
- b=TV5iy12xyDZGommC2gVx1P1QTKzfLWhvbeTNH1dSABTmus00qLIGCcKyGrR2L4ooQr0vEj7aMTI+BdBxWKHs+H1OJmldPWbVG58CX1W9U+/dgBwDWB96PlBHr1yU0o9VXT7aHdrZxNaX9nsw4YRmEzOKIkQ0IEV7M0WPwf6IV4E=
+ bh=+gSho+aQ2PvGIWLc846f9OkmZ1V1WumuIz2j3QU17s4=;
+ b=Mj644OgjPThqkS922BWu/AigtFRyFf02WH4hqXQSxiIIIxGgX/da062DIRfuf+VoZcuMWBudnUxd0ELj0Jqxs0JNF7KEptyJlkOWZUajnzPgcSNiqNregIoV4h/UINUHTcMay8vdV/4Gs5u4ZuO0+viJnfKXz+hZDFZzAwFCrZI=
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SJ0PR04MB7376.namprd04.prod.outlook.com (2603:10b6:a03:295::22) with
+ BY5PR04MB6568.namprd04.prod.outlook.com (2603:10b6:a03:1de::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Tue, 27 Jun
- 2023 10:13:48 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Tue, 27 Jun
+ 2023 10:22:54 +0000
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::bfa:d453:e7e9:8f98]) by DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::bfa:d453:e7e9:8f98%7]) with mapi id 15.20.6521.024; Tue, 27 Jun 2023
- 10:13:48 +0000
+ 10:22:53 +0000
 From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     Daniel Wagner <dwagner@suse.de>
 CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
         Sagi Grimberg <sagi@grimberg.me>,
         Hannes Reinecke <hare@suse.de>,
         James Smart <jsmart2021@gmail.com>,
         Martin Belanger <Martin.Belanger@dell.com>
-Subject: Re: [PATCH blktests v1 1/3] nvme/048: Check for queue count check
- directly
-Thread-Topic: [PATCH blktests v1 1/3] nvme/048: Check for queue count check
- directly
-Thread-Index: AQHZqOAQp/zesDwy002w2k4L06XaGw==
-Date:   Tue, 27 Jun 2023 10:13:48 +0000
-Message-ID: <6he5owg5e6h4vq5uwhw7jo3cncwrrlgjdxnq6csr5wlopbwk5c@l434fr2edukp>
+Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Thread-Topic: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Thread-Index: AQHZqOFVgY2Gv0FVkEOFz0D9X2tsfg==
+Date:   Tue, 27 Jun 2023 10:22:53 +0000
+Message-ID: <oyhlgbqq6pjwln5ly47rt5iyjtai4jeepkascfaskn2z7nu3ks@te7yrwbcpsmi>
 References: <20230620132703.20648-1-dwagner@suse.de>
- <20230620132703.20648-2-dwagner@suse.de>
-In-Reply-To: <20230620132703.20648-2-dwagner@suse.de>
+ <20230620132703.20648-3-dwagner@suse.de>
+In-Reply-To: <20230620132703.20648-3-dwagner@suse.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -84,179 +85,234 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB7376:EE_
-x-ms-office365-filtering-correlation-id: ba43dee9-c5e7-44d8-d330-08db76f7330e
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BY5PR04MB6568:EE_
+x-ms-office365-filtering-correlation-id: fe67b527-4eec-4e12-421b-08db76f877e9
 wdcipoutbound: EOP-TRUE
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: X3/lAfGgemXRPl2STGPxrtqnZDx2Bf+X9EcM2ALSwVby5g1+FagMx5bj7qiPs/PXUhRaistZolIjG8ZtSTxEOEdCDRhKjt2fkyFPYNgpGSdF5sudDCI/r7DmkK2F84v+slTFcNdWoYxfWj9S5J1jVprHsKZ6Lr+mU6TbtFmvTptV/z69Q6u+e9WobYT4ZXSmwSzw/Mh0ipOkEopZyZXmpStOVYRyln4YwaACogmT3ivonxhbifGHR/baPnKXPc6lB7r/VGz78LZTgQ40O4Q3e0xXz3WFb0eB1dwamib0qP75YzPc8WPSGWGcif0OtYPLhDdavJTA+DhSxoHDRt21XD90Krto27fgbiy42Xg9dCa9+KU2m9nK9Kdur2piKMxZ3MyVjXCCqWJe3PzKqnmwIEzcL6Gis1IB3jCEQd+r+Y5fkgm3pTgP9MIUWhvY64/4PZSQzvvJBrYW3ABJLCRlPLHmwF71S/3hFcPlDok5wcXZgbITqWz+9fs1ugTJV/wW5UigqQC4hCusfwPGRlZHZUogOk9Mr462mlyWlefbEp9MJlbQWD6Yazg+XEq45+RjpUuOF3Su+tSuP1QRQfQr6JZ4+B7LwWH756Zq2Pk286LaCv9w3rHZNkxhDepApwLu
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(346002)(136003)(376002)(396003)(39860400002)(366004)(451199021)(54906003)(6486002)(478600001)(83380400001)(38070700005)(82960400001)(86362001)(66446008)(66476007)(64756008)(71200400001)(33716001)(9686003)(6506007)(26005)(186003)(66556008)(66946007)(2906002)(6512007)(122000001)(4326008)(6916009)(41300700001)(76116006)(38100700002)(91956017)(316002)(44832011)(8936002)(8676002)(5660300002);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: JCbszyToCrPMxuS6+fckLqx7vo0gaO1v4ROJZTq9ARE7rmhVnu9+CrZCBkyPaqNZ3XjN9z63CkV9m7ql4UIRZQeIisB5IB7rcXOFM1uPM1ed+MxKFb5PHw0DG1fVrxsUUNKvIcxOMe7bMMvUY3L5rCCtNOyiCqGou+Jphkhs7j4oQtbCT1u6EueB9GYCNwOFLrzO4M5HZW1p0Bvsu0sMYvTEm2dQl1KcNsfRN9VYaty8YjI2lrM/S9nIo6jgIwE9JSzAmPX+4HZ6rSNatUeA152OZAv0n1R6VXdkVUBmEr66Yxm2FxQluS+m7jSHbSmlQ710hK5tHJ5pIDcRdxNxRy/4TPDV3FLJfGZRkZtHhhyV2iEPr1H3Osuws2t5mvr0HRtJZU36e+K8L6tEMrVNJNrbElm1BR7LJ1eLzVGkhF0v1BN88ABj6CPBUU4TrSeghdlmFplL9mRGK3bFUMbRHeSzo6McSkeWkTGlow63rnD3bYILlhvtGZWgYbYtsCPd28YTEBgbyyeRsUPsHGc1seV1ki0hwaWtae7sgRAT3006V+Sc7zBhHdfggGA9HXoDfFEAjzscFl+SMVJuC0GQw6xeyb6kx37NbksKNKUbepcfeOZUcNY4fGehqVI1ZYEi
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(366004)(346002)(136003)(39860400002)(376002)(396003)(451199021)(4326008)(66556008)(66476007)(66446008)(64756008)(6916009)(316002)(54906003)(66946007)(82960400001)(91956017)(122000001)(76116006)(7416002)(71200400001)(83380400001)(44832011)(6506007)(2906002)(86362001)(6486002)(5660300002)(38100700002)(41300700001)(9686003)(26005)(186003)(6512007)(8936002)(8676002)(33716001)(478600001)(38070700005);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TtgPO91U8yQOj4JF+VZSzlGcAqjPMAPUY1sGPgVCS/Qe++Dl55Td+Rmyal14?=
- =?us-ascii?Q?F2ZCpqXDfNsYIz5fv3NkPBTuitoy3kWO1+RVJgvaNVLAsdnDJkblSt2J6GDu?=
- =?us-ascii?Q?qybtdjugzJlaJBthtZjH8tsPwiXCaCKyI5wRd+qY1NnazhJAiKKcaUVy4KJt?=
- =?us-ascii?Q?nIuO+7AMf2QQ1oueQF2aFHhIBjvX4Q0X5eUARDt5hVv3i9OEWqAntnbRjYje?=
- =?us-ascii?Q?OkHFeIDGBKfno5Db0ymHmLUNnvqp6U33A8lRtX7ucZGcIFsTiR5dczFcDOFr?=
- =?us-ascii?Q?fEIfGhDXC6YVhOJ65Tp0oIPSQvYIXByULDGa9WNXAv1Hw4RewD4x84ewpylv?=
- =?us-ascii?Q?+7inUsZlCdpM5aBvqOGZhbq3QV4ZC7Nana2pxIkO1q0S8dWRux33QdbuMKWo?=
- =?us-ascii?Q?AbH+2UCIiqabi0hEzO/kEjs/PEBOrJqQu6Lur+YXT5+F3a10yk/PRF5lGjlO?=
- =?us-ascii?Q?+W2xHjGsTXn6qgwo87YoKPLTdlGLEzJWH7DBDZckibES3XAjIzM1CfZ1BYXj?=
- =?us-ascii?Q?wAzWEAo4oanvX4oVfhe65zgcJLz5FcS+wDIRnOTzsjQZe6qNC8/fPpZhAOJe?=
- =?us-ascii?Q?LLqz3DAyuS9JormZeT8//tF90JD7eotNCeQdv1njTOyn1BWgA9a6YNjMhVfD?=
- =?us-ascii?Q?tEfDAfRnzWnp1SiM5qQy4L6XLNLYe9dv55O9jX5RDKbC4y9H+8ZO6zPgVcrW?=
- =?us-ascii?Q?Ym5e7XN6Ou2G/vNDls3TtBi/jSm3u+JGLkTh4RdzwEes1/WmjVIzVlDuTQJ8?=
- =?us-ascii?Q?fCtywGoZeyrCt0Jz6p0SPDYP+b0IJNt0wessM+FqM98Tkty8dGYFMxlgUfeA?=
- =?us-ascii?Q?IRw35JqiLU0N4+gKNsQFXEP/ojwBHfCrEqbFkKWZ3B1D1Q07cceYaGd79cyi?=
- =?us-ascii?Q?lbI1pzYgC2iQV1rlbVdFJ7neEok6hLQe7BpyaAjsidSlPD7i55VF9PkgSwIH?=
- =?us-ascii?Q?rYN8nWBRzFcNxgFE7CNhzPt3peRgMrRymJKHy4XnZBDkw7NsLQIVHAesfdAw?=
- =?us-ascii?Q?wbcLbLuTDjdQ5hUu2Y6kIhgXj0QgtZWrofzFeiC/AQRV4kgu5DZtgXCcinxd?=
- =?us-ascii?Q?YOlYRFm5gC3OOdJBYVIFcV0SWG7iG61W2OvWweNt5+GS8QXcZOa1VBMBubwv?=
- =?us-ascii?Q?qUUetTzGFJEshSNYQB7lyvJExIJR0BUwg6tSerWZsaGA7zvKZGq2P75HOBOg?=
- =?us-ascii?Q?Vf7OimI71o3ZAh1yAHnQrDxzKopAJCNb5gpDxSiW3cuLxeLIRjReTLvo4HxX?=
- =?us-ascii?Q?VhUhPsPyG5S3rEwcNGBx2tJU/BEwZ5bGEuFKoe6QGvfPMoFyAeSUK4v6KEus?=
- =?us-ascii?Q?LUhC++5Nchy+ct2pkz8amNHwACJL16DRkY90UGKfp1r6wGhiek/3QoXV7Dk3?=
- =?us-ascii?Q?7omRDREhN/ogAXdFep/3EDqCfv/n3BLoRVLplgl5i9Uwel3XYTz9Bzikr9KK?=
- =?us-ascii?Q?MFnpIgr622RbfYVNUrXmBduot9QRsimXaT4L9Sti4Aznaav+7coVCkitZnjX?=
- =?us-ascii?Q?e/uixWjGFXtJPF6vQhjjVIK12DLzdQhbdvWiLV0HyMryogc8Z7BDvK5SfIXG?=
- =?us-ascii?Q?XeihEM8MWBsTDu+B03K5r8dwzGacBeoB8Aa6BqD8yhJV75nDLJGKxvJqBg2n?=
- =?us-ascii?Q?H/cD8KiBt5SxaMpbIaYd1SQ=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?lrRNtgf+SaNSkh51GLs8p1weeqzuKxTSVuzYPaSn9iR0ZfPoI0SnY7+vmDB2?=
+ =?us-ascii?Q?oFQgMwBcHXmKptCpe8EhzatVjleJ1L+x1o3hoffGkKUayMgemfnOQWYjhwVl?=
+ =?us-ascii?Q?VWeZb291zaWOcS6ttny7N+P7AdbMMqsNBdZ7/clgzfkrWF78hXg942NvAGuZ?=
+ =?us-ascii?Q?BMtMtGZVPJCRMmkrSdpxBXLnoF6DZ4nEXiBWM2tf2W3qTwcg6vLzHMskgjKw?=
+ =?us-ascii?Q?x0e5jXQIK/n5m2Bpw252c076qG2IZ09DnfigptfFyQM53Gd7BwalzO+fpGc0?=
+ =?us-ascii?Q?ks4ZR6qFe4ELJWMTo9ZnQwjzW6Lke4Q0JvV4DCNMBtouJVKtk2Bce/R6weZa?=
+ =?us-ascii?Q?rh6or4xZNOIf+zQ6tnCDAukZhAODNGtk3UbQcjUYWDd6XSjCRjkClgEfcRFV?=
+ =?us-ascii?Q?01+f3NXb50M4i8bMQ0bZsTPDo1HCjp1mG5/Ca6tu5IyzDRNl7im/DL6GnPIw?=
+ =?us-ascii?Q?IDh2mYpK/buVeHyGP1V4XMpVoa7wy2uToIum+gXJxXV/smxQUToe8KzmRDw5?=
+ =?us-ascii?Q?gFnJ4rVnzERmL7A4umR0cWicjMp1g66l/eJwuIDMVUqbzLDvznyVol+yZ3iy?=
+ =?us-ascii?Q?sPNW1Z4ZJbzqukULVJp4vBxWfKUa5+7r4Gz63alXvpDUiwBjxGoZSb9WGMf4?=
+ =?us-ascii?Q?0xUccHO859iPIWjH+1n6NJSRbNUotRkACzmwQ2S6U4ltR+Fhbhko3y5g4gJ2?=
+ =?us-ascii?Q?QH52iWvPuQWDG/p0+xcOsAm2IDRStxGjdCmj8cYBe/9cMOtwqyRps+erjr/q?=
+ =?us-ascii?Q?Q1d8O5n074YGyGxB6SmHa86kG5OIFE5LXR4BmeO0e6FTZkOfbsleBmbWiff7?=
+ =?us-ascii?Q?jo9gn1tLFKgiTlQas0IMQSa5Cf4DbdAl/GT9j7CtiMC95O7kOE/Lr2n9urko?=
+ =?us-ascii?Q?6jE/6aZMbL8zTzB5nJyJSFS+eOyf5cOkYRx1oQ9096kjhynBmtlML8YhLQ+h?=
+ =?us-ascii?Q?mtV4o2w8YKxzcyFZOAakS6jfr67eB0d62jHRgaTtA+oOZ8Iu3le11XeDHV+J?=
+ =?us-ascii?Q?Ss3mUq3sg1xESk0kG0kY90wbW4fd6n88X9BEdLnl7wvyVXjFGITXgu7jVms+?=
+ =?us-ascii?Q?+fk5pDcK9tTpbTjxKwDqA2uAOr2heR7K5OVL8urduU9ts5QWKN6kXeVXRcp4?=
+ =?us-ascii?Q?0gUNb95HXsMY49VowPeKu9OSazoKemwWpkxacT73lLF2UgPvgq0eWIG0gc8h?=
+ =?us-ascii?Q?YZ+qsMpjfvrt/PatsCFch/li0MMGhVdFgT2j9w6nST0tp0Xu9g1S6XQK4MKZ?=
+ =?us-ascii?Q?pPBGDiBOU2a2NMttRYYyPGoz3hTWh2S/lY/mpC5jduZ6VDPEg8H98dpDbtTM?=
+ =?us-ascii?Q?MPB3PyBo99AoZrvHBLsOuwwRXntua5XA79NH22E73dyzrdeXQr000rblQqGG?=
+ =?us-ascii?Q?rAwSmemp+2PJqu/ORV93cBQ2kdvm/oteZz3dsu0rTPZU5NEkqJj/PD8u2awm?=
+ =?us-ascii?Q?mRU+LVPTCfYEhsxXN+bwWYCo6gjsOaHdniKggi9Clh+fltk1nD/btYnGBuDR?=
+ =?us-ascii?Q?o86dXx2mUu7FgOm2Tb8uFnajNUK9Dx4AJ3yOUk6IPbswNIec/J7Fh/oKRZWE?=
+ =?us-ascii?Q?kdN1P58NaP585uozw2nVJBaLdvgAILpQqslLtamq7GYP5zku3MNg7p4Z5+O1?=
+ =?us-ascii?Q?PiQWKTsx0jBPsqkK3tp/3zg=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <48B068DF7711C842A8A428FB18C89460@namprd04.prod.outlook.com>
+Content-ID: <E73EA0AE8552DE458E6BD3368ED2A79B@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?ZbL1ekFtHHrBAB2SZIpouC/5JxNnbCb4hKEIYYSxRZA03YMlnAGYvBfT8Jxq?=
- =?us-ascii?Q?SgvSUY3FqlCy/NlLG8GqZOYaGsTJEoVrYSeohYluXZnKrB8CA7VO5AcfOQGL?=
- =?us-ascii?Q?kNXb5nLxJiBAVLXyYaf+M/5m7qqLNHRi0o0FpdG90WQ0FtVqmAmsxcblkvHz?=
- =?us-ascii?Q?8ySg+zcN+KPd36wT0C89qZQNB1VzJVhsSBa4PRESM4eFuUDQpvRpqE2KqsAb?=
- =?us-ascii?Q?fihiGz9d6YSyR2MzPpSyfsgKY2WlVIKkzF+X62eSYo36MURoDCz48cT/MXi2?=
- =?us-ascii?Q?njunTG1xU1Vd7tEdX9xsIORWhQNWumj3UiWujn4wVIx6YfQ150A+OkjbXQdh?=
- =?us-ascii?Q?Lq6pUh/zhSLc/fVwNsgWN5MGQjadhSiHrU6S8xliIdNwoX9/Syjr275p1h41?=
- =?us-ascii?Q?c3rYJbiJhW5kkD3MT2C1nFn/p2qZ/j1B0MdxtTaapzWdn2JSMBirRhKHIAZ3?=
- =?us-ascii?Q?5ANkwmnXI/qpzUZwGy2MTQQvFEBSYPopZo21Lfg2e4/ExuVaes4hH9gFMSs9?=
- =?us-ascii?Q?aWhTGhZPu5fbNN6Va6pY/t2oMCDPeqdxKMKadmuuACJqPbORaZJyVSRow0aG?=
- =?us-ascii?Q?J6VtX+nWi/J3MwDcmDarFbl/LJDyo0tvw0ZGYv7PnT0wZvanaIfCcwtNVh4A?=
- =?us-ascii?Q?NX0W973JwkldOz6Cf5x0VhWAV7aBrxxB9NyCUyHDXNXdlvHzvpf6TZeAyGy5?=
- =?us-ascii?Q?YgYd6TVtTGmAYj98MBYMdexFSeOR8BoSu2fHJ9307rXxlWs0owJ+CM+rsPCG?=
- =?us-ascii?Q?02FAhY/Ol0sM3w2VhhlzRS9UxOB2O6YZUfmCuCoepYzs3fzDe1RvlX1oHC8r?=
- =?us-ascii?Q?2IkjbPxoCXq5YphZU2gO0opldMNFUIcKe1a87AkVkUPuFKLfjIT1vg+bRHZS?=
- =?us-ascii?Q?wSso/JpjfUtFQmId/WUIVknv1fVndEdBNEWdlmq7HOrrnzrp601bgoOJPgM5?=
- =?us-ascii?Q?r/g6kKS32XLYoiOjc0koiQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?Z2CKWTi9LMbEtMb+k+Q4sNGCFoGLr1SDLqNu2iSvBPOS9io8E+IADbrrg1cS?=
+ =?us-ascii?Q?tG/JLDfss2kJ0Yc9Q2eQaYFUyS3O/cT3rm2n5p4x0h23MFS67qTzk1wkBfMG?=
+ =?us-ascii?Q?UUT/uBD0J7C4NvYIo5NTaETf/msISdgIqx0a58nWgY09xfYaAdKNg0QhGYE7?=
+ =?us-ascii?Q?x0eaeBpTx/EUf0cgNTv1ANrJpnDBt/YYU5R+BDvRaepYXU+m08nWUTUe1kOr?=
+ =?us-ascii?Q?fjMJY6f7ZVOYxSotuYOrwSLFub54BFG294RW9fconXxwG47rcy6nVyEe85tq?=
+ =?us-ascii?Q?NV5zCapthx/dHZxfFkoYTjcSw43EYRli5WwXv2u4QKb+HK9Jtjg4z6ZPmkxe?=
+ =?us-ascii?Q?i9o7keIN7yovE3SxIPZ1e+6sEHJ4Ejl547szQLlKv2xG/mDWOzs5m3c49ZS9?=
+ =?us-ascii?Q?jpaucq5vMd8fi1rGY6o1qix6t4OVC8RyAwLJ/xr17ze82EFs40+4Ie29Pk8B?=
+ =?us-ascii?Q?oYfMxYCC802UhSTbkdhzFEr/mdAhr166RFjET8CMXs1yFq1zbUmseJk6x2Hp?=
+ =?us-ascii?Q?m6TaHmikd+BVaRkAuZiepnrq99q2ssPEgUUF55tpx9cOS74JX5trsQFws/5w?=
+ =?us-ascii?Q?VNujJGbJ97etXkslbRXZgznHEvrzFQ7O/H0KcTzGWHV+FjURxJktlORS6vVf?=
+ =?us-ascii?Q?pWvN/nrh50bcIeYhOdoZackXAPuTCJtEgPKXGbj3zKvERV6ScLcz+B8xA7Dt?=
+ =?us-ascii?Q?O9Ud3b0lx7ylyjEiIY2ER5XCCytc8GfvozCedpJ3yZ95L8N63ZGsvMU2a97i?=
+ =?us-ascii?Q?AYFd7IFPMznYSgnLnpOT5KYXdejv+uDcPOcZtgC7hz8tcN9q2hhZuO0V7spk?=
+ =?us-ascii?Q?74KKyyK9bhLSxt0GlhR24xDUMmGHQ9LV0OTDXCH+fWSYqpyEHXZJB5BASPQ7?=
+ =?us-ascii?Q?EEqUjiQDsb/1tw1Dx/jlkXlcrUXluCQSD1VUanNpe38talQtzbvgaYuyo2YV?=
+ =?us-ascii?Q?8Q0aG33ynrf0R0THiYzy/zJN+I5DEfW8Y9cqIp4Yg39Lp17OdJyYJv6XD6hF?=
+ =?us-ascii?Q?PWEg?=
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba43dee9-c5e7-44d8-d330-08db76f7330e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2023 10:13:48.8411
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe67b527-4eec-4e12-421b-08db76f877e9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2023 10:22:53.8606
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KZyx8Hbs1TGDUeYQ0T+CzOqEDgQGz8gRrUk7vpEfbkQH/b0IprS/iodDWY/e37m/LXUtFJ1Nlk8OqF3bdrMQwgOcMSxqo+59AiDRHf9YX2k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB7376
+X-MS-Exchange-CrossTenant-userprincipalname: noSCbdIEl17AP3N/FvRZr/aFw87LM+cPWAqzSLrZbg6lJ1fTB0DFNCB/q8+1pcc9oby5YM2mP+CgDoYfuuePoOYIkKs09cb0VJVeiRctrTw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6568
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On Jun 20, 2023 / 15:27, Daniel Wagner wrote:
-> The test monitored the state changes live -> resetting -> connecting ->
-> live, to figure out the queue count change was successful.
+> When the host has enabled the udev/systemd autoconnect services for the
+> fc transport it interacts with blktests and make tests break.
 >=20
-> The fc transport is reconnecting very fast and the state transitions
-> are not observed by the current approach.
->=20
-> So instead trying to monitor the state changes, let's just wait for the
-> live state and the correct queue number.
->=20
-> As queue count is depending on the number of online CPUs we explicitly
-> use 1 and 2 for the max_queue count. This means the queue_count value
-> needs to reach either 2 or 3 (admin queue included).
+> nvme-cli learned to ignore connects attemps when using the
+> --context command line option paired with a volatile configuration. Thus
+> we can mark all the resources created by blktests and avoid any
+> interaction with the systemd autoconnect scripts.
+
+This sounds a good idea. Question, is "--context" option of the nvme comman=
+d
+mandatory to run nvme test with nvme_trtype=3Dfc? Or is it nice-to-have fea=
+ture
+depending on the test system OS? If it is mandatory, it's the better to che=
+ck
+in _nvme_requires.
+
 >=20
 > Signed-off-by: Daniel Wagner <dwagner@suse.de>
 > ---
->  tests/nvme/048 | 35 ++++++++++++++++++++++++-----------
->  1 file changed, 24 insertions(+), 11 deletions(-)
+>  tests/nvme/rc | 73 ++++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 63 insertions(+), 10 deletions(-)
 >=20
-> diff --git a/tests/nvme/048 b/tests/nvme/048
-> index 81084f0440c2..3dc5169132de 100755
-> --- a/tests/nvme/048
-> +++ b/tests/nvme/048
-> @@ -42,6 +42,26 @@ nvmf_wait_for_state() {
->  	return 0
+> diff --git a/tests/nvme/rc b/tests/nvme/rc
+> index 191f3e2e0c43..00117d314a38 100644
+> --- a/tests/nvme/rc
+> +++ b/tests/nvme/rc
+> @@ -14,8 +14,8 @@ def_remote_wwnn=3D"0x10001100aa000001"
+>  def_remote_wwpn=3D"0x20001100aa000001"
+>  def_local_wwnn=3D"0x10001100aa000002"
+>  def_local_wwpn=3D"0x20001100aa000002"
+> -def_hostnqn=3D"$(cat /etc/nvme/hostnqn 2> /dev/null)"
+> -def_hostid=3D"$(cat /etc/nvme/hostid 2> /dev/null)"
+> +def_hostnqn=3D"nqn.2014-08.org.nvmexpress:uuid:242d4a24-2484-4a80-8234-d=
+0169409c5e8"
+> +def_hostid=3D"242d4a24-2484-4a80-8234-d0169409c5e8"
+>  nvme_trtype=3D${nvme_trtype:-"loop"}
+>  nvme_img_size=3D${nvme_img_size:-"1G"}
+>  nvme_num_iter=3D${nvme_num_iter:-"1000"}
+> @@ -161,6 +161,50 @@ _nvme_calc_rand_io_size() {
+>  	echo "${io_size_kb}k"
 >  }
 > =20
-> +nvmf_wait_for_queue_count() {
-> +	local subsys_name=3D"$1"
-> +	local queue_count=3D"$2"
-> +	local nvmedev
-> +
-> +	nvmedev=3D$(_find_nvme_dev "${subsys_name}")
-> +
-> +	queue_count_file=3D"/sys/class/nvme-fabrics/ctl/${nvmedev}/queue_count"
-
-Nit: queue count file is not declared as a local variable.
-
-> +
-> +	nvmf_wait_for_state "${subsys_name}" "live" || return 1
-> +
-> +	queue_count=3D$((queue_count + 1))
-> +	if grep -q "${queue_count}" "${queue_count_file}"; then
-
-Does this check work when the number in queue_count_file has more digits th=
-an
-queue_count? e.g.) queue_count_file=3D20, queue_count=3D2
-
-> +		return 0
+> +_nvme_cli_supports_context() {
+> +	if ! nvme connect --help 2>&1 | grep -q context > /dev/null; then
+> +		    return 1
 > +	fi
-> +
-> +	echo "expected queue count ${queue_count} not set"
-> +	return 1
+> +	return 0
 > +}
 > +
->  set_nvmet_attr_qid_max() {
->  	local nvmet_subsystem=3D"$1"
->  	local qid_max=3D"$2"
-> @@ -56,10 +76,7 @@ set_qid_max() {
->  	local qid_max=3D"$3"
-> =20
->  	set_nvmet_attr_qid_max "${subsys_name}" "${qid_max}"
-> -
-> -	# Setting qid_max forces a disconnect and the reconntect attempt starts
-> -	nvmf_wait_for_state "${subsys_name}" "connecting" || return 1
-> -	nvmf_wait_for_state "${subsys_name}" "live" || return 1
-> +	nvmf_wait_for_queue_count "${subsys_name}" "${qid_max}" || return 1
-> =20
->  	return 0
+> +_setup_nvme_cli() {
+> +	if ! _nvme_cli_supports_context; then
+> +		return
+> +	fi
+> +
+> +	mkdir -p /run/nvme
+> +	cat >> /run/nvme/blktests.json <<-EOF
+> +	[
+> +	  {
+> +	    "hostnqn": "${def_hostnqn}",
+> +	    "hostid": "${def_hostid}",
+> +	    "subsystems": [
+> +	      {
+> +	        "application": "blktests",
+> +	        "nqn": "blktests-subsystem-1",
+> +	        "ports": [
+> +	          {
+> +	            "transport": "fc",
+> +	            "traddr": "nn-${def_remote_wwnn}:pn-${def_remote_wwpn}",
+> +	            "host_traddr": "nn-${def_local_wwnn}:pn-${def_local_wwpn}"
+> +	          }
+> +	        ]
+> +	      }
+> +	    ]
+> +	  }
+> +	]
+> +	EOF
+> +}
+> +
+> +_cleanup_nvme_cli() {
+> +	if ! _nvme_cli_supports_context; then
+> +		return
+> +	fi
+> +
+> +	rm -f /run/nvme/blktests.json
+> +}
+> +
+>  _nvme_fcloop_add_rport() {
+>  	local local_wwnn=3D"$1"
+>  	local local_wwpn=3D"$2"
+> @@ -235,6 +279,8 @@ _cleanup_fcloop() {
+>  	_nvme_fcloop_del_lport "${local_wwnn}" "${local_wwpn}"
+>  	_nvme_fcloop_del_rport "${local_wwnn}" "${local_wwpn}" \
+>  			       "${remote_wwnn}" "${remote_wwpn}"
+> +
+> +	_cleanup_nvme_cli
 >  }
-> @@ -77,12 +94,8 @@ test() {
 > =20
->  	_setup_nvmet
+>  _cleanup_nvmet() {
+> @@ -337,6 +383,8 @@ _setup_nvmet() {
+>  		def_host_traddr=3D$(printf "nn-%s:pn-%s" \
+>  					 "${def_local_wwnn}" \
+>  					 "${def_local_wwpn}")
+> +
+> +		_setup_nvme_cli
+
+Can we move this _setup_nvme_cli call from _setup_nvmet to _setup_fcloop?
+_cleanup_nvme_cli is called in _cleanup_fcloop. I think it is a bit cleaner
+since those setup/cleanup functions are called at at same level.
+
+>  	fi
+>  }
 > =20
-> -	hostid=3D"$(uuidgen)"
-> -	if [ -z "$hostid" ] ; then
-> -		echo "uuidgen failed"
-> -		return 1
+> @@ -436,18 +484,18 @@ _nvme_connect_subsys() {
+>  	trtype=3D"$1"
+>  	subsysnqn=3D"$2"
+> =20
+> -	ARGS=3D(-t "${trtype}" -n "${subsysnqn}")
+> +	ARGS=3D(-t "${trtype}"
+> +	      -n "${subsysnqn}"
+> +	      --hostnqn=3D"${hostnqn}"
+> +	      --hostid=3D"${hostid}")
+> +	if _nvme_cli_supports_context; then
+> +		ARGS+=3D(--context=3D"blktests")
+> +	fi
+>  	if [[ "${trtype}" =3D=3D "fc" ]] ; then
+>  		ARGS+=3D(-a "${traddr}" -w "${host_traddr}")
+>  	elif [[ "${trtype}" !=3D "loop" ]]; then
+>  		ARGS+=3D(-a "${traddr}" -s "${trsvcid}")
+>  	fi
+> -	if [[ "${hostnqn}" !=3D "$def_hostnqn" ]]; then
+> -		ARGS+=3D(--hostnqn=3D"${hostnqn}")
 > -	fi
-> -	hostnqn=3D"nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-> +	hostid=3D"${def_hostid}"
-> +	hostnqn=3D"${def_hostnqn}"
-
-I guess it's the better to move this hunk to the 3rd patch. Or we can menti=
-on it
-in the commit message of this patch.
-
+> -	if [[ "${hostid}" !=3D "$def_hostid" ]]; then
+> -		ARGS+=3D(--hostid=3D"${hostid}")
+> -	fi
+>  	if [[ -n "${hostkey}" ]]; then
+>  		ARGS+=3D(--dhchap-secret=3D"${hostkey}")
+>  	fi
+> @@ -482,7 +530,12 @@ _nvme_discover() {
+>  	local host_traddr=3D"${3:-$def_host_traddr}"
+>  	local trsvcid=3D"${3:-$def_trsvcid}"
 > =20
->  	truncate -s "${nvme_img_size}" "${file_path}"
-> =20
-> @@ -103,7 +116,7 @@ test() {
->  			echo FAIL
->  		else
->  			set_qid_max "${port}" "${subsys_name}" 1 || echo FAIL
-> -			set_qid_max "${port}" "${subsys_name}" 128 || echo FAIL
-> +			set_qid_max "${port}" "${subsys_name}" 2 || echo FAIL
->  		fi
-> =20
->  		_nvme_disconnect_subsys "${subsys_name}"
+> -	ARGS=3D(-t "${trtype}")
+> +	ARGS=3D(-t "${trtype}"
+> +	      --hostnqn=3D"${def_hostnqn}"
+> +	      --hostid=3D"${def_hostid}")
+> +	if _nvme_cli_supports_context; then
+> +		ARGS+=3D(--context=3D"blktests")
+> +	fi
+>  	if [[ "${trtype}" =3D "fc" ]]; then
+>  		ARGS+=3D(-a "${traddr}" -w "${host_traddr}")
+>  	elif [[ "${trtype}" !=3D "loop" ]]; then
 > --=20
 > 2.41.0
 > =
