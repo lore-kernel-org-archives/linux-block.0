@@ -2,182 +2,343 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDC1EB64DC
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83ED1EB64DC
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:25:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232991AbjF1IYa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 04:24:30 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:14040 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232203AbjF1ISb (ORCPT
+        id S233356AbjF1IZ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 04:25:27 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:42517 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233727AbjF1IXN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 04:18:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1687940311; x=1719476311;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=oZZX+le5v5WF27RNKI41Zxu4q2/Quhoa6yHSxzHRWUk=;
-  b=JZAqBC3d/+CR8cO7zh8/4p5MLTDMR8ry6VC9CjBg/+2s3nnrjhS92m3+
-   PO2u4H6eb0n+dmXEeQLVdX93MOCBOVuV3+hCYUmRx1ahCMthDZ4Lbo642
-   Rqy8Dbu/h9z8CLGWMsxp6cW8/tStWgFwLiYv+GAkEYw/hYAaRl4KvIDfr
-   6wRsLFU+g/ZsKSzeeOcAdwFXBJEPLDPF35X9KCZrsb9oHxehDZaYybiPL
-   Bk3VCJGiQE0P1pfNQ86NuSZmWgRAc7YdqcTqcsD6sJfFfDJI7NeBndMmT
-   TVPU12FkgrFJF0uhlBNxApdmu3jqnKbKraFzNrCIv9LmjnonnVDn8yIdQ
-   w==;
-X-IronPort-AV: E=Sophos;i="6.01,164,1684771200"; 
-   d="scan'208";a="341764712"
-Received: from mail-dm6nam12lp2169.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.169])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jun 2023 12:39:56 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KGP3jToLQaLfUd0laZyo0I/MtizYM+zzPDeAiHFfH1akwOgKZkHkTNKQB+XF6OKOsTGc84WcsviKJM7t1Vy/0L5CIuJ3P91t4cC+P2SRe3rS0RVyZ3+t/NVWKKdM3t4Q8x/Oc9fkoWSbR76hL5QnrigbQXbUPcRJjYucdjs99whvmKrqYXPWSAtDfXaqUbRgA9ka6CahL3ZRV+1QuavoE0LExrtmumGNOUCvyrA7Y1CaXDbb0sg9+gHocgZ0gjSu2V8cULCemYnsZ/+jVI3uIPIkUsMfq0odPRm+YQFEIK1ImfuZIkVhl5Nu3INjT/ZFQGeCgNROEoafvm/Zt3d1zA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=z3ie+ZYkDr6Uux/7Hxj77sXnDS4kWA2HZGd1s+yNmk8=;
- b=LAa4bJRTAgIBRQYkOsbNIEt2Dmsp0x6L2xt9lpsP/YAwcL4lmuu24Y98aZvuIz0HtwKva8kd8Yw9EUqX7s0ZvAZDIfR9rxRizgECeQV1pNSE4aTsdurvKrgxSiLMbaRTWoua6UNMjeyt9aKvLw5tYH/RTC50uy80b5NDnZcfAzv8EHDy2RPwUhrNm2RdnEutSfgZn6S5PUf8bw2c7IAY0mR6K75kJcBmdJOTudRcmRKIK/vpeL4qqWXsOFElvZvF+LQ4Io4wc9OoJ7+u5AB11CpDgU9IZN8Guzg7hcXEdDd3PiszbK+yz0Vvkxp2XqyHRb0+T88r0MxhnPea/EBcFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z3ie+ZYkDr6Uux/7Hxj77sXnDS4kWA2HZGd1s+yNmk8=;
- b=wpjjo0bEyHftypksyQ6o0lY+g984LNcYoYuQmm4u8xZXXnuW+dFhTNTnUjYLrWCu+K3+QNaQHDXKzMBQRGKIfpWcdkGGmBMjLAewl1Vm4sR7UC+3CgauhC65VCncQZ4zt7I4aj3chYZ29tKKAcM49y4Wj31ehZyK/12tGWWxkuc=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SA2PR04MB7658.namprd04.prod.outlook.com (2603:10b6:806:14d::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Wed, 28 Jun
- 2023 04:39:53 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::bfa:d453:e7e9:8f98]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::bfa:d453:e7e9:8f98%7]) with mapi id 15.20.6521.024; Wed, 28 Jun 2023
- 04:39:52 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-CC:     Hannes Reinecke <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: blktests: nvme/auth testcae bug
-Thread-Topic: blktests: nvme/auth testcae bug
-Thread-Index: AQHZqXYKKv0icp4yukWU2n/X8YUTrq+fojqA
-Date:   Wed, 28 Jun 2023 04:39:52 +0000
-Message-ID: <72u6de4wfaxqkrnqw6puc432wvocqlbvpsprkvd6nbt3gltubh@7k6m6z3567ab>
-References: <6dfe85b5-5415-7140-e377-c1448fd7fb8f@nvidia.com>
-In-Reply-To: <6dfe85b5-5415-7140-e377-c1448fd7fb8f@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SA2PR04MB7658:EE_
-x-ms-office365-filtering-correlation-id: ca5396f8-5124-461a-afc8-08db7791b70c
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZeMSDOKZ3v6vfA9WI2bNICVFfX3OQLy7rqNxS/ypRtyZjs8wE2Zo/WIVpF52FFXsOg81TwnCQQkfr072Jfl8TLLi3SyJDe0TpjJxespaQl+AbdjmLRyAweF7pAtWJ80MnKiJHXgZ+Vjc8vPw5z/Y+2PybdwoI7PMyN+JN7PCI1yHUFlmQJrbHwLW75oxEhQ/Ipzcy2QKJDuF5UmagL81lx1KgB+uoG7m6u5ZSCYn7xs9MjhNyvIUdOd4+e0EP8lCJXXREDPqfZ3vfwVaCDoZNLzy7nkyVauD/uUJNVaOn/KaCacPiNXyeCIGNf5rc0Tihq/Lxgj4aR2K5O162Gi9gMhJ5IXVwuYOM8zZGAbXQ9z0k1kE1ZSg5U3nmphUQQAoGqvOyw0YxPzFD537IkRQf54F/G2XwEFaPj2gBjBjfm3YZRzJqt80fvfnAXqAta4sdJhq01aERYxeQEMZEbTS+QozukaWrLhhk9NcNl94FMDm/lMc539oq4BywvbxV0JQyS81cQ+8pte+jGEstFOwcDVWqZBsgwC6jdrDF5Qrfez/s257euLJsodQWNmY9C3XZ/xK7R3sOSyHLXx2cdpfkbGzdj6e6VZtYnBwffSg/9WyqOrcqrbUIqOzEtvJsjYn
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(376002)(39860400002)(366004)(396003)(136003)(346002)(451199021)(122000001)(82960400001)(38100700002)(38070700005)(83380400001)(86362001)(478600001)(54906003)(9686003)(71200400001)(6486002)(91956017)(8936002)(316002)(76116006)(8676002)(66946007)(66476007)(66556008)(4326008)(41300700001)(66446008)(64756008)(6512007)(33716001)(6506007)(26005)(186003)(6916009)(44832011)(5660300002)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?owI/KpwcQuf0kSVckaOBaDJ4PhAPQPGM0IwHoy64O0/2rSOvVpiR/GvDwR?=
- =?iso-8859-1?Q?V5y1qAXQSC4Bc58b0c/HWXTbUBH8M1FGBcEEQscKq5h7sXoz/Q+glUOwqG?=
- =?iso-8859-1?Q?WoJ4ca4pTa0WemyiqJs8U2m3ZwWBBrZ0hAEA2KQNZiY+Zlb5q1XF+hUOGN?=
- =?iso-8859-1?Q?xKXxToTUs9T3M6obh7jSMmXl83qT/HfYDHvIN3BLO0Q+w1yybOP/zOp8mW?=
- =?iso-8859-1?Q?NCsWU3MUmEW61v1KjQxpfT/mUiRtZaPUCSduoA2LnU64XKFGhcacFaPLvW?=
- =?iso-8859-1?Q?fb3o+Pms9UpLqpoaXuc8SIdTzhmz+pF3G2KafZtdPwXtz7mlpVf4HC546c?=
- =?iso-8859-1?Q?scqYINpuC6NJ2dFUCYsQ4g5V3uptDElCfCPJZnEOzSM/CaforkiQbLsx2U?=
- =?iso-8859-1?Q?CFbZNP2WliQ2PByxkpX60t77k8y7QwDILu6hTnoCSkNvNf3NRXiNdSi7Vs?=
- =?iso-8859-1?Q?f774z6mukYtm8r33UjBjCaFsPMswgP1kSXHctsZD5dc3gzL5sOm9aNHinD?=
- =?iso-8859-1?Q?aLX4GSmFE+1NgQJnyc3zQ5a04yUNi9KgiA9qHkR8uv+KIzBWSLwYlGyiMt?=
- =?iso-8859-1?Q?PeC4m881dvw9KIsEUQPjgz9AgSI+w5vPuPwFqjNEsxRMTAo4WU3x5mAl0W?=
- =?iso-8859-1?Q?YLzb1ios9I1soP6TIfyi6iLUJA3+qW7QfmonF+qs1YG7PnPNIPdozZd/+B?=
- =?iso-8859-1?Q?SFsBN1QeNIyc8cb7uIr85KacnoJnm1EuQgMQYFigcFXrA/rVwWR3tzdslc?=
- =?iso-8859-1?Q?SBafzFqDdEy/vVjpKJN8SESLzZ/qNifjcD98dkC2Tuf/g2oXZ8jngIsQcy?=
- =?iso-8859-1?Q?OyjuTwh4JCRL1m5k8T2QVgH0e18oaeXlIc5ML5SCduFz308J8DXXoW+r9a?=
- =?iso-8859-1?Q?B6pPWnk4nDnQIonJ5PTrkCoM34unJJs9xDXI28PBUNfa5a5lz+/QdJbZV4?=
- =?iso-8859-1?Q?MARKk2yYbR6/CPVxXE4rsHLBobZvVSGBJjl1NhPSMzy4pkL3c2gT06rwyI?=
- =?iso-8859-1?Q?eoTlDj73BprbmaVX8g2q+G6vB/2JC3AUSOHZGF3wadl6toaP+XqRe0Ifim?=
- =?iso-8859-1?Q?FppwfxW3r7OmaZ03KgEcD59dorZtoLlT8mOYv/Vb9B1kd6kj+3zlyRNH5L?=
- =?iso-8859-1?Q?mu53F0bU/Pa57VNVxCGSGXvXwsD8/BEjb7yjTVQrMTJI5Tbp28YAEcAR3E?=
- =?iso-8859-1?Q?vc1sGpZh8A+4uSRzcai12+Dazi6vvZbukLjfijJflTJXuNMS0CpxIm1ewz?=
- =?iso-8859-1?Q?csck/dc4b2heOPSV+Vmh9ja5s3eqzuKacp4fHJdhYLxDTZeduAs2OY5UaL?=
- =?iso-8859-1?Q?4UQUGJRGx4p92ui1fvx7hwKPJgsTlgw+kr0C39Tv19fGvj79QtfXDAu4Al?=
- =?iso-8859-1?Q?hXdkF2CwinO8ekBlWVzCKnXle+GQ9/gNvuvnx4cZpWnt4YwAjXSGQUDQa9?=
- =?iso-8859-1?Q?6BViYD4nLG1gwfMP+xNyXRQLMWT3rFx/drHMfQr8Kjyk2TRcbCmkccaI81?=
- =?iso-8859-1?Q?fB+IfUBkupVHrfOFQznpEpa1CD9XmD2kHSTvjznYti+w9pRsfUzKJEAKJJ?=
- =?iso-8859-1?Q?YjRaRQAw8QSKSfBRXZTubtT4FToiz89FZY0QiUIIv7wQj0YWjaFpmqPDEA?=
- =?iso-8859-1?Q?qTZgPw7m50eEIXmxhoaC7iHb6+oBVldOxa3fU9xTGwTE7knJ3P/9H2h/ta?=
- =?iso-8859-1?Q?mkrXAfmQbRooQEWcTIg=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <F9AFCD389DE14144A4F8176D52A76D36@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Wed, 28 Jun 2023 04:23:13 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230628055500epoutp02003bb56a2ef02323c33fc6665c3e64ba~svPBB8oNo0980409804epoutp02B
+        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 05:55:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230628055500epoutp02003bb56a2ef02323c33fc6665c3e64ba~svPBB8oNo0980409804epoutp02B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1687931700;
+        bh=1L497XV2xfkrLQYU8FjUHzfomqpKDzGuWtK2Ad+0obs=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=cBt3IobsNwOF9GzmxLUNVS/Yv11NrXjiKMTvxFIioSNtB29JdxvkIZogIzWMvPQFw
+         iBboqFfNEe9skjlYeNkVw6OedonINBkwS5er3KG/iFkchdh/221xXXORQsbkEM0bbC
+         6sjw3aR8ZTog18Us2sZyHN6y7KSYbtiSn2X4UDmg=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20230628055459epcas5p2212b46d00ee1c65b745f574bb102ffa3~svPAYejX61872218722epcas5p2s;
+        Wed, 28 Jun 2023 05:54:59 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.182]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4QrW4y3zGTz4x9Q9; Wed, 28 Jun
+        2023 05:54:58 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        E9.6E.06099.23BCB946; Wed, 28 Jun 2023 14:54:58 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230627183950epcas5p1b924785633509f612ffa5d9616bfe447~smBhjHt543272832728epcas5p1D;
+        Tue, 27 Jun 2023 18:39:50 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230627183950epsmtrp2b960dbfe342e1c8adc07d1bb712d48b6~smBhhtUpl2845228452epsmtrp2I;
+        Tue, 27 Jun 2023 18:39:50 +0000 (GMT)
+X-AuditID: b6c32a4b-d308d700000017d3-51-649bcb32538c
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        09.39.34491.6FC2B946; Wed, 28 Jun 2023 03:39:50 +0900 (KST)
+Received: from green245.sa.corp.samsungelectronics.net (unknown
+        [107.99.41.245]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230627183946epsmtip218572e571ea16038ddda1594e34e3a6e~smBd8k8en0383803838epsmtip2Y;
+        Tue, 27 Jun 2023 18:39:46 +0000 (GMT)
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>
+Cc:     martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        willy@infradead.org, hare@suse.de, djwong@kernel.org,
+        bvanassche@acm.org, ming.lei@redhat.com, dlemoal@kernel.org,
+        nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH v13 0/9] Implement copy offload support
+Date:   Wed, 28 Jun 2023 00:06:14 +0530
+Message-Id: <20230627183629.26571-1-nj.shetty@samsung.com>
+X-Mailer: git-send-email 2.35.1.500.gb896f729e2
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: z4iHEgDFMcQfPIFPVigv+8f4b87G/p98e4MQP2+kZyHBYGQ0wdyYPIhqS3VofgBKNu9XVPYSnQkrM7FUAKytI0CCTQQDC+Id8naY02Nweh3gbICD/QmE29pDXDedxYkD1v7kFn4zCmt2FNUSn4lK1Ioh+PCnszIdAskFAEK6Pcqg5Dn9C3hKClWjFBNsf7e7lEzyIHwG7WviVLvviE1R9cffIpgh9ve7cU8uCXxK39OQwGpfJFmEymV+7BmfMghU6vXK9eoC9s2uuM+QhGsqTlq2lGYjMN1nqEdmLIRoRtOptdfnp4RQzZSxYLGFSY91lVY5fzm2SeoVEQAwxRH+7PcHlYIsZ2Nf8VNpiXrr2jvOs7kCw275MGtsYSQqScsOuv3byK5p4HcdTXFN8Oz5QilgavfYyvJn2FbnT9PxPcfoi2UTXJ6ZmAZwyAyUOxo+8pjY3dE8zq7IeQojDNTHZbtjaJRImuirI5RI8ZNJMq0WXJNNvkNMNooVvAX+pphtY+2AX+reb4oN0JUyeC0ScqfNWa0Jpixbrvmksjz2MAL4dJzxmi9BXCNDaFdDsif5sFojy52aFd9CBRoIwy90xxB9HjRFzDfqlJvYxX1nuN+OqOWrAfWLweqc0fWbBujlUmCY+y3FzT+oInufLkYiLhxX7y2c4S1QzEEmLEGjfBs/cCJgoBsD89oOs4gCBqYUZo8Xc+QfwW/yxnOz18JzYqo06PSN6NFcEnsDSEM2GJX4NjlZm0Iccg0GHyaC7mrDk0MPTSJiuK8HC3wCwj3ZWa8D8C37UYGjxh+NYafJg291Zl9dYjpKd8TasSxErDvfeCYuBvziImckWR9Y6A8vVAb5/gHG/cqnpbct0Sa8+lMRUbmO7fNTJ16+aJBu6xLv
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca5396f8-5124-461a-afc8-08db7791b70c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2023 04:39:52.7934
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yWTN9eQPKOoUHMiVinsds/Aw8unVJCZWhPas8UPcmdl07fHx6Ormw2cdgfNxbnbiXAQvWnLSqJW2dIptr/8JQd08g7foELF9P0IBJSMSjEU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7658
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTVxzHOfe2t4VZcwEnhxoBazQRhLZa4EBESCTbzSAL6kaWJQvr6B1l
+        QNv1oWMzGayCgcpjICwWImw0QEHA8ZKHFYTJo8yxyQBBcThgQwuIEJiG1yiFzf8+v9f39zg5
+        bNwpj8Vlx8rUtFImjucRDozGziOe3sf6CiSCpXYuqjF34ahyLItAls4FgPLnX+Fosv0SQAOT
+        u9F4WzAyzRUw0Uh7M4Zu/ZCDIWPlXQzldAwBNDWox5Bp1At9n2pgoFumXgYaaCkkUFHpFAvp
+        hpsIVNa9jqGOXC2GmiaTAWpcKcJRteU5A/WM7kP9a91MtPKykAjZRw38HkY168dYVP/jHxlU
+        XbknNXBPQ9VWpBFUneFrqnUkiaBKMnOZVIZ2jqBeTI0yqOe3Bwkqs74CUHV9X1GLtW5U7eQs
+        FkF+GHdCSosltNKDlkXLJbGymCBe2NmoU1G+fgKhtzAA+fM8ZOIEOogXGh7h/VZs/OZheB7n
+        xPGaTVeEWKXi8U+eUMo1atpDKlepg3i0QhKvECl8VOIElUYW4yOj1YFCgeCY72bix3HSefNN
+        hkJ36ovl3mFGErgjTAf2bEiKYNeGGbOyE9kK4NPCd9KBwyYvANj98GdgM5YBHNGNsnYqcmaG
+        WLaACUBLWdW2kYLBJZ2OmQ7YbIL0gn0bbKt/D5mEwxutJVtSOGnAoXFmfivJmfSH9Tc5VlUG
+        eQjmr5YzrcwhA6HuxSXCmgJJPsz6w9HmdoS9VycZVsZJd6htKMCtkpBss4eNww+YtulC4X1D
+        G2ZjZ/isu357ai5cnDMRNj4PjVfKCVvxRQD1w3pgCwTDFHMWbm2Mk0dgTQvf5t4P88zVmK3x
+        bpixMrmtz4FN13b4ILxeU7yt7wqH/kneZgq2l3YxbPf9CGZa0pjZwF3/2j761/bR/9+5GOAV
+        wJVWqBJiaJWv4riMPv/fw0bLE2rB1v/wDGsCf47P+3QAjA06AGTjvD2cvS+/kzhxJOLEL2ml
+        PEqpiadVHcB388bf4tw3o+WbH0ymjhKKAgQiPz8/UcBxPyHPhfPbcIbEiYwRq+k4mlbQyp06
+        jG3PTcLoqtnTWhee9t0wx18dRM9W1/a6Hxi+d8OETUssgw+/ifwspAuU7uplH1VeDPdMrp9e
+        TZqoIvrnP4WLIc2KDGOs3vlzSqwYH/Pq4bZzDRdKLXdcc0LPGX85VJo2/ap67aflsr8f5WSx
+        Ii/wD0hMlgeHP4jkC8bXg8rzmi4XZvbzNfNhj9zWZ0diznyS9UanXaZri2yi+Gp1sGitjb3m
+        Ul3k2njafC2/csXe/6idCfY5p+QqmysWjHaWxPC3/4o3SZ9SopKy1lw/t+sNgQ0th3t7lg4+
+        Lnmy6/aq9MzMWWVS4nveAw3C1qHU7Pttq+93pmpbsi9PGMQbT/bfVVfifaKT/TyGSioWeuJK
+        lfhfO+84AagEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGIsWRmVeSWpSXmKPExsWy7bCSvO43ndkpBh9/a1msP3WM2WL13X42
+        i9eHPzFaTPvwk9niyYF2RovLT/gsHuy3t9j7bjarxc0DO5ks9iyaxGSxcvVRJotJh64xWjy9
+        OovJYu8tbYuFbUtYLPbsPclicXnXHDaL+cueslt0X9/BZrH8+D8mi0OTm5ksdjxpZLTY9ns+
+        s8W61+9ZLE7ckrY4//c4q8XvH3PYHKQ9Ll/x9tg56y67x/l7G1k8Nq/Q8rh8ttRj06pONo/N
+        S+o9dt9sYPNY3DeZ1aO3+R2bx8ent1g83u+7yubRt2UVo8fm09UenzfJeWx68pYpQCCKyyYl
+        NSezLLVI3y6BK+PDqe0sBd3OFd9OXmdpYDxo2MXIySEhYCIx6c019i5GLg4hgd2MErPbFrJC
+        JCQllv09wgxhC0us/PccqqiZSeL2pFdMXYwcHGwC2hKn/3OAxEUEupglOne+YwFxmAW2MUt8
+        +PCFHaRIWMBcYst2XpBBLAKqEtP+rABbwCtgJdH9sZ0NpERCQF+i/74gRFhQ4uTMJywgYWYB
+        dYn184RAwswC8hLNW2czT2Dkn4WkahZC1SwkVQsYmVcxSqYWFOem5xYbFhjmpZbrFSfmFpfm
+        pesl5+duYgRHvZbmDsbtqz7oHWJk4mA8xCjBwawkwiv2Y3qKEG9KYmVValF+fFFpTmrxIUZp
+        DhYlcV7xF70pQgLpiSWp2ampBalFMFkmDk6pBqbFGSEnPmx6rm9xf3nM7jj+yWsnhq0puBwm
+        lsTfUbrF/Rirw/8HLPIezuteSvcx/wuNYdzuFHBVf+J+qWxGnYbOs0delHjxC8vpK39+MYn3
+        Ld8JS9vWPd71Tl1/np7bt5+xkZHj8lfxL0y/f4fdv/4yot1QJnzalv0fOd4wOyqJLz+d+Urh
+        pe/7SZ5nCpfcfDZPZ6LUws1PpzALz50qPN9h3z7f5lXbv20OZf9+84/pQg6eI/oCrrubryyc
+        5/tvxonLSy92Mhxacpdv3e7TfzRbjbc/+FXhvnTJ8YWKh6+vZXd+ub4reeNtKf3dra7tcwVb
+        I7kyRZhlrVzn6217WyG/skVS5X/qwcWl/z2ue/huVGIpzkg01GIuKk4EALJIwBdpAwAA
+X-CMS-MailID: 20230627183950epcas5p1b924785633509f612ffa5d9616bfe447
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230627183950epcas5p1b924785633509f612ffa5d9616bfe447
+References: <CGME20230627183950epcas5p1b924785633509f612ffa5d9616bfe447@epcas5p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jun 28, 2023 / 04:07, Chaitanya Kulkarni wrote:
-> Hi Hannes,
->=20
-> * My compiled the kernel is with git hash :-
->=20
-> linux (master) # uname -r
-> 6.4.0linux-01691-g98be618ad030
->=20
-> * When I try to ran the testcases nvme/auth testcases are not running:-
->=20
-> nvme/041 (Create authenticated connections)=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0 [not run]
->  =A0=A0=A0 runtime=A0 0.440s=A0 ...
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+The patch series covers the points discussed in past and most recently
+in LSFMM'23[0].
+We have covered the initial agreed requirements in this patchset and
+further additional features suggested by community.
 
-Hi Chaitanya,
+This is next iteration of our previous patchset v12[1].
+We have changed the token based approach to request based approach,
+instead of storing the info in token. We now try to merge the copy bio's
+in request layer and send it to driver.
+So this design works only for request based storage drivers.
 
-These messages indicate that _have_kernel_config_file cannot find both
-/proc/config.gz and /boot/config-6.4.0linux-01691-g98be618ad030. Are these
-available in your test environment?
+Overall series supports:
+========================
+	1. Driver
+		- NVMe Copy command (single NS, TP 4065), including support
+		in nvme-target (for block and file backend).
 
-> nvme/042 (Test dhchap key types for authenticated connections) [not run]
->  =A0=A0=A0 runtime=A0 2.712s=A0 ...
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
-> nvme/043 (Test hash and DH group variations for authenticated=20
-> connections) [not run]
->  =A0=A0=A0 runtime=A0 0.731s=A0 ...
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
-> nvme/044 (Test bi-directional authentication)=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0 [not run]
->  =A0=A0=A0 runtime=A0 1.240s=A0 ...
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
-> nvme/045 (Test re-authentication)=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 [not run]
->  =A0=A0=A0 runtime=A0 3.630s=A0 ...
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
->  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
-> common/rc: line 212: 0inux: value too great for base (error token is=20
-> "0inux")
->=20
-> I thoughts it might be useful to share this ...
->=20
-> -ck
->=20
-> =
+	2. Block layer
+		- Block-generic copy (REQ_OP_COPY_DST/SRC), operation with
+                  interface accommodating two block-devs
+                - Merging copy requests in request layer
+		- Emulation, for in-kernel user when offload is natively 
+                absent
+		- dm-linear support (for cases not requiring split)
+
+	3. User-interface
+		- copy_file_range
+
+Testing
+=======
+	Copy offload can be tested on:
+	a. QEMU: NVME simple copy (TP 4065). By setting nvme-ns
+		parameters mssrl,mcl, msrc. For more info [2].
+	b. Null block device
+        c. NVMe Fabrics loopback.
+	d. blktests[3] (tests block/035-038, nvme/050-053)
+
+	Emulation can be tested on any device.
+
+	fio[4].
+
+Infra and plumbing:
+===================
+        We populate copy_file_range callback in def_blk_fops. 
+        For devices that support copy-offload, use __blkdev_copy_offload to
+        achieve in-device copy.
+        However for cases, where device doesn't support offload,
+        fallback to generic_copy_file_range.
+        For in-kernel users (like NVMe fabrics), we use blkdev_issue_copy
+        which implements its own emulation, as fd is not available.
+        Modify checks in generic_copy_file_range to support block-device.
+
+Blktests[3]
+======================
+	tests/block/035,036: Runs copy offload and emulation on block
+                              device.
+	tests/block/037,038: Runs copy offload and emulation on null
+                              block device.
+        tests/nvme/050-053: Create a loop backed fabrics device and
+                              run copy offload and emulation.
+
+Future Work
+===========
+	- loopback device copy offload support
+	- upstream fio to use copy offload
+	- upstream blktest to test copy offload
+
+	These are to be taken up after this minimal series is agreed upon.
+
+Additional links:
+=================
+	[0] https://lore.kernel.org/linux-nvme/CA+1E3rJ7BZ7LjQXXTdX+-0Edz=zT14mmPGMiVCzUgB33C60tbQ@mail.gmail.com/
+            https://lore.kernel.org/linux-nvme/f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com/
+            https://lore.kernel.org/linux-nvme/20230113094648.15614-1-nj.shetty@samsung.com/
+	[1] https://lore.kernel.org/linux-block/20230605121732.28468-1-nj.shetty@samsung.com/T/#m4db1801c86a5490dc736266609f8458fd52b9eb5
+	[2] https://qemu-project.gitlab.io/qemu/system/devices/nvme.html#simple-copy
+	[3] https://github.com/nitesh-shetty/blktests/tree/feat/copy_offload/v13
+	[4] https://github.com/vincentkfu/fio/commits/copyoffload-3.35-v13
+
+Changes since v12:
+=================
+        - block,nvme: Replaced token based approach with request based
+          single namespace capable approach (Christoph Hellwig)
+
+Changes since v11:
+=================
+        - Documentation: Improved documentation (Damien Le Moal)
+        - block,nvme: ssize_t return values (Darrick J. Wong)
+        - block: token is allocated to SECTOR_SIZE (Matthew Wilcox)
+        - block: mem leak fix (Maurizio Lombardi)
+
+Changes since v10:
+=================
+        - NVMeOF: optimization in NVMe fabrics (Chaitanya Kulkarni)
+        - NVMeOF: sparse warnings (kernel test robot)
+
+Changes since v9:
+=================
+        - null_blk, improved documentation, minor fixes(Chaitanya Kulkarni)
+        - fio, expanded testing and minor fixes (Vincent Fu)
+
+Changes since v8:
+=================
+        - null_blk, copy_max_bytes_hw is made config fs parameter
+          (Damien Le Moal)
+        - Negative error handling in copy_file_range (Christian Brauner)
+        - minor fixes, better documentation (Damien Le Moal)
+        - fio upgraded to 3.34 (Vincent Fu)
+
+Changes since v7:
+=================
+        - null block copy offload support for testing (Damien Le Moal)
+        - adding direct flag check for copy offload to block device,
+	  as we are using generic_copy_file_range for cached cases.
+        - Minor fixes
+
+Changes since v6:
+=================
+        - copy_file_range instead of ioctl for direct block device
+        - Remove support for multi range (vectored) copy
+        - Remove ioctl interface for copy.
+        - Remove offload support in dm kcopyd.
+
+Changes since v5:
+=================
+	- Addition of blktests (Chaitanya Kulkarni)
+        - Minor fix for fabrics file backed path
+        - Remove buggy zonefs copy file range implementation.
+
+Changes since v4:
+=================
+	- make the offload and emulation design asynchronous (Hannes
+	  Reinecke)
+	- fabrics loopback support
+	- sysfs naming improvements (Damien Le Moal)
+	- use kfree() instead of kvfree() in cio_await_completion
+	  (Damien Le Moal)
+	- use ranges instead of rlist to represent range_entry (Damien
+	  Le Moal)
+	- change argument ordering in blk_copy_offload suggested (Damien
+	  Le Moal)
+	- removed multiple copy limit and merged into only one limit
+	  (Damien Le Moal)
+	- wrap overly long lines (Damien Le Moal)
+	- other naming improvements and cleanups (Damien Le Moal)
+	- correctly format the code example in description (Damien Le
+	  Moal)
+	- mark blk_copy_offload as static (kernel test robot)
+	
+Changes since v3:
+=================
+	- added copy_file_range support for zonefs
+	- added documentation about new sysfs entries
+	- incorporated review comments on v3
+	- minor fixes
+
+Changes since v2:
+=================
+	- fixed possible race condition reported by Damien Le Moal
+	- new sysfs controls as suggested by Damien Le Moal
+	- fixed possible memory leak reported by Dan Carpenter, lkp
+	- minor fixes
+
+Changes since v1:
+=================
+	- sysfs documentation (Greg KH)
+        - 2 bios for copy operation (Bart Van Assche, Mikulas Patocka,
+          Martin K. Petersen, Douglas Gilbert)
+        - better payload design (Darrick J. Wong)
+
+
+Nitesh Shetty (9):
+  block: Introduce queue limits for copy-offload support
+  block: Add copy offload support infrastructure
+  block: add emulation for copy
+  fs, block: copy_file_range for def_blk_ops for direct block device
+  nvme: add copy offload support
+  nvmet: add copy command support for bdev and file ns
+  dm: Add support for copy offload
+  dm: Enable copy offload for dm-linear target
+  null_blk: add support for copy offload
+
+ Documentation/ABI/stable/sysfs-block |  33 +++
+ Documentation/block/null_blk.rst     |   5 +
+ block/blk-core.c                     |   5 +
+ block/blk-lib.c                      | 384 +++++++++++++++++++++++++++
+ block/blk-map.c                      |   4 +-
+ block/blk-merge.c                    |  21 ++
+ block/blk-settings.c                 |  24 ++
+ block/blk-sysfs.c                    |  63 +++++
+ block/blk.h                          |   9 +
+ block/elevator.h                     |   1 +
+ block/fops.c                         |  20 ++
+ drivers/block/null_blk/main.c        |  85 +++++-
+ drivers/block/null_blk/null_blk.h    |   1 +
+ drivers/md/dm-linear.c               |   1 +
+ drivers/md/dm-table.c                |  41 +++
+ drivers/md/dm.c                      |   7 +
+ drivers/nvme/host/constants.c        |   1 +
+ drivers/nvme/host/core.c             |  79 ++++++
+ drivers/nvme/host/trace.c            |  19 ++
+ drivers/nvme/target/admin-cmd.c      |   9 +-
+ drivers/nvme/target/io-cmd-bdev.c    |  62 +++++
+ drivers/nvme/target/io-cmd-file.c    |  52 ++++
+ drivers/nvme/target/nvmet.h          |   1 +
+ fs/read_write.c                      |   7 +-
+ include/linux/bio.h                  |   4 +-
+ include/linux/blk_types.h            |  26 ++
+ include/linux/blkdev.h               |  23 ++
+ include/linux/device-mapper.h        |   5 +
+ include/linux/nvme.h                 |  43 ++-
+ include/uapi/linux/fs.h              |   3 +
+ 30 files changed, 1025 insertions(+), 13 deletions(-)
+
+
+base-commit: 53cdf865f90ba922a854c65ed05b519f9d728424
+-- 
+2.35.1.500.gb896f729e2
+
