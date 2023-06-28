@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C00E7C25B7C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B3E3C25B77
 	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 21:10:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232646AbjF1VKR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 17:10:17 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:39252 "EHLO
+        id S232274AbjF1VKQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 17:10:16 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:39546 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232297AbjF1VJt (ORCPT
+        with ESMTP id S232420AbjF1VJx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 17:09:49 -0400
+        Wed, 28 Jun 2023 17:09:53 -0400
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 2A50F20C08F5; Wed, 28 Jun 2023 14:09:48 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2A50F20C08F5
+        id D8E6D20ABD96; Wed, 28 Jun 2023 14:09:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D8E6D20ABD96
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
         s=default; t=1687986588;
-        bh=F0uJ5eyJo3LYOyg4D0HXxOlZcJrEKyyXfBbdQHvI218=;
+        bh=cx0zv6rR+qzo8WdhaKLiuQH3326nVtVkIr6dzCROEXU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=eip8RjzP2VR+U/Tj0mijiWJqhp3Ef7m1mmdjIC6JfSkwi5O837SrouCnr/F1mdvMl
-         jOT4pVM6MZIdqsV3MXfMQ4MSl64xLbewCtc+JMzRiM8brDAop9FEu/vYMhVn/RGdbr
-         Hjuvbl/G6OzWmvW7l0lc+aTdXl53RF8GtAW5RZM4=
+        b=DiV9Ntwt+GUlRXrcGO6hXlexvEbI5y/bymVGJXcdBLUCZrPmJtXWaUUzgACXqxtT+
+         /Qron7rAqmkKiXX0oacBwtEqsVMZSdULXQHwLdj7sjLVY9ooawvnG+2foyxH5T+e6M
+         nkx/f+oDRZONJ0+OVs0NsYqQ8zy3gzauHzaZOrz4=
 From:   Fan Wu <wufan@linux.microsoft.com>
 To:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
         serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
@@ -34,9 +34,9 @@ Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
         roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
         Deven Bowers <deven.desai@linux.microsoft.com>,
         Fan Wu <wufan@linux.microsoft.com>
-Subject: [RFC PATCH v10 03/17] ipe: add evaluation loop
-Date:   Wed, 28 Jun 2023 14:09:17 -0700
-Message-Id: <1687986571-16823-4-git-send-email-wufan@linux.microsoft.com>
+Subject: [RFC PATCH v10 15/17] scripts: add boot policy generation program
+Date:   Wed, 28 Jun 2023 14:09:29 -0700
+Message-Id: <1687986571-16823-16-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
 References: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
@@ -46,205 +46,388 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-IPE must have a centralized function to evaluate incoming callers
-against IPE's policy. This iteration of the policy for against the rules
-for that specific caller is known as the evaluation loop.
+Enables an IPE policy to be enforced from kernel start, enabling access
+control based on trust from kernel startup. This is accomplished by
+transforming an IPE policy indicated by CONFIG_IPE_BOOT_POLICY into a
+c-string literal that is parsed at kernel startup as an unsigned policy.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-
 ---
 v2:
-+ Split evaluation loop, access control hooks, and evaluation loop from policy parser and userspace interface to pass mailing list character limit
+  + No Changes
 
 v3:
-+ Move ipe_load_properties to patch 04.
-+ Remove useless 0-initializations Prefix extern variables with ipe_
-+ Remove kernel module parameters, as these are exposed through sysctls.
-+ Add more prose to the IPE base config option help text.
-+ Use GFP_KERNEL for audit_log_start.
-+ Remove unnecessary caching system.
-+ Remove comments from headers
-+ Use rcu_access_pointer for rcu-pointer null check
-+ Remove usage of reqprot; use prot only.
-+Move policy load and activation audit event to 03/12
+  + No Changes
 
 v4:
-+ Remove sysctls in favor of securityfs nodes
-+ Re-add kernel module parameters, as these are now exposed through securityfs.
-+ Refactor property audit loop to a separate function.
+  + No Changes
 
 v5:
-+ fix minor grammatical errors
-+ do not group rule by curly-brace in audit record,
-+ reconstruct the exact rule.
+  + No Changes
 
 v6:
-+ No changes
+  + No Changes
 
 v7:
-+ Further split lsm creation into a separate commit from the evaluation loop and audit system, for easier review.
-+ Propagating changes to support the new ipe_context structure in the evaluation loop.
+  + Move from 01/11 to 14/16
+  + Don't return errno directly.
+  + Make output of script more user-friendly
+  + Add escaping for tab and '?'
+  + Mark argv pointer const
+  + Invert return code check in the boot policy parsing code path.
 
 v8:
-+ Remove ipe_hook enumeration; hooks can be correlated via syscall record.
+  + No significant changes.
 
 v9:
-+ Remove ipe_context related code and simplify the evaluation loop.
+  + no changes
 
 v10:
-+ Split eval part and boot_verified part
+  + Update the init part code for rcu changes in the eval loop patch
 ---
- security/ipe/Makefile |  1 +
- security/ipe/eval.c   | 94 +++++++++++++++++++++++++++++++++++++++++++
- security/ipe/eval.h   | 25 ++++++++++++
- 3 files changed, 120 insertions(+)
- create mode 100644 security/ipe/eval.c
- create mode 100644 security/ipe/eval.h
+ MAINTAINERS                   |   1 +
+ scripts/Makefile              |   1 +
+ scripts/ipe/Makefile          |   2 +
+ scripts/ipe/polgen/.gitignore |   1 +
+ scripts/ipe/polgen/Makefile   |   6 ++
+ scripts/ipe/polgen/polgen.c   | 145 ++++++++++++++++++++++++++++++++++
+ security/ipe/.gitignore       |   1 +
+ security/ipe/Kconfig          |  10 +++
+ security/ipe/Makefile         |  11 +++
+ security/ipe/fs.c             |   8 ++
+ security/ipe/ipe.c            |  17 ++++
+ 11 files changed, 203 insertions(+)
+ create mode 100644 scripts/ipe/Makefile
+ create mode 100644 scripts/ipe/polgen/.gitignore
+ create mode 100644 scripts/ipe/polgen/Makefile
+ create mode 100644 scripts/ipe/polgen/polgen.c
+ create mode 100644 security/ipe/.gitignore
 
-diff --git a/security/ipe/Makefile b/security/ipe/Makefile
-index 16bbe80991f1..d7f2870d7c09 100644
---- a/security/ipe/Makefile
-+++ b/security/ipe/Makefile
-@@ -6,6 +6,7 @@
- #
+diff --git a/MAINTAINERS b/MAINTAINERS
+index ad00887d38ea..fb8d6a16f2a6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10283,6 +10283,7 @@ M:	Fan Wu <wufan@linux.microsoft.com>
+ L:	linux-security-module@vger.kernel.org
+ S:	Supported
+ T:	git git://github.com/microsoft/ipe.git
++F:	scripts/ipe/
+ F:	security/ipe/
  
- obj-$(CONFIG_SECURITY_IPE) += \
-+	eval.o \
- 	hooks.o \
- 	ipe.o \
- 	policy.o \
-diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+ INTEL 810/815 FRAMEBUFFER DRIVER
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 32b6ba722728..18baecdada01 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -46,6 +46,7 @@ targets += module.lds
+ subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
+ subdir-$(CONFIG_MODVERSIONS) += genksyms
+ subdir-$(CONFIG_SECURITY_SELINUX) += selinux
++subdir-$(CONFIG_SECURITY_IPE) += ipe
+ 
+ # Let clean descend into subdirs
+ subdir-	+= basic dtc gdb kconfig mod
+diff --git a/scripts/ipe/Makefile b/scripts/ipe/Makefile
 new file mode 100644
-index 000000000000..59144b2ecdda
+index 000000000000..e87553fbb8d6
 --- /dev/null
-+++ b/security/ipe/eval.c
-@@ -0,0 +1,94 @@
++++ b/scripts/ipe/Makefile
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++subdir-y := polgen
+diff --git a/scripts/ipe/polgen/.gitignore b/scripts/ipe/polgen/.gitignore
+new file mode 100644
+index 000000000000..80f32f25d200
+--- /dev/null
++++ b/scripts/ipe/polgen/.gitignore
+@@ -0,0 +1 @@
++polgen
+diff --git a/scripts/ipe/polgen/Makefile b/scripts/ipe/polgen/Makefile
+new file mode 100644
+index 000000000000..066060c22b4a
+--- /dev/null
++++ b/scripts/ipe/polgen/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0
++hostprogs-always-y	:= polgen
++HOST_EXTRACFLAGS += \
++	-I$(srctree)/include \
++	-I$(srctree)/include/uapi \
++
+diff --git a/scripts/ipe/polgen/polgen.c b/scripts/ipe/polgen/polgen.c
+new file mode 100644
+index 000000000000..40b6fe07f47b
+--- /dev/null
++++ b/scripts/ipe/polgen/polgen.c
+@@ -0,0 +1,145 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) Microsoft Corporation. All rights reserved.
 + */
 +
-+#include <linux/fs.h>
-+#include <linux/types.h>
-+#include <linux/slab.h>
-+#include <linux/file.h>
-+#include <linux/sched.h>
-+#include <linux/rcupdate.h>
++#include <stdlib.h>
++#include <stddef.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <errno.h>
 +
-+#include "ipe.h"
-+#include "eval.h"
-+#include "hooks.h"
-+#include "policy.h"
-+
-+struct ipe_policy __rcu *ipe_active_policy;
-+
-+/**
-+ * evaluate_property - Analyze @ctx against a property.
-+ * @ctx: Supplies a pointer to the context to be evaluated.
-+ * @p: Supplies a pointer to the property to be evaluated.
-+ *
-+ * Return:
-+ * * true	- The current @ctx match the @p
-+ * * false	- The current @ctx doesn't match the @p
-+ */
-+static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
-+			      struct ipe_prop *p)
++static void usage(const char *const name)
 +{
-+	return false;
++	printf("Usage: %s OutputFile (PolicyFile)\n", name);
++	exit(EINVAL);
 +}
 +
-+/**
-+ * ipe_evaluate_event - Analyze @ctx against the current active policy.
-+ * @ctx: Supplies a pointer to the context to be evaluated.
-+ *
-+ * This is the loop where all policy evaluation happens against IPE policy.
-+ *
-+ * Return:
-+ * * 0		- OK
-+ * * -EACCES	- @ctx did not pass evaluation.
-+ * * !0		- Error
-+ */
-+int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
++static int policy_to_buffer(const char *pathname, char **buffer, size_t *size)
 +{
 +	int rc = 0;
-+	bool match = false;
-+	enum ipe_action_type action;
-+	struct ipe_policy *pol = NULL;
-+	const struct ipe_rule *rule = NULL;
-+	const struct ipe_op_table *rules = NULL;
-+	struct ipe_prop *prop = NULL;
++	FILE *fd;
++	char *lbuf;
++	size_t fsize;
++	size_t read;
 +
-+	rcu_read_lock();
++	fd = fopen(pathname, "r");
++	if (!fd) {
++		rc = errno;
++		goto out;
++	}
 +
-+	pol = rcu_dereference(ipe_active_policy);
-+	if (!pol) {
-+		rcu_read_unlock();
++	fseek(fd, 0, SEEK_END);
++	fsize = ftell(fd);
++	rewind(fd);
++
++	lbuf = malloc(fsize);
++	if (!lbuf) {
++		rc = ENOMEM;
++		goto out_close;
++	}
++
++	read = fread((void *)lbuf, sizeof(*lbuf), fsize, fd);
++	if (read != fsize) {
++		rc = -1;
++		goto out_free;
++	}
++
++	*buffer = lbuf;
++	*size = fsize;
++	fclose(fd);
++
++	return rc;
++
++out_free:
++	free(lbuf);
++out_close:
++	fclose(fd);
++out:
++	return rc;
++}
++
++static int write_boot_policy(const char *pathname, const char *buf, size_t size)
++{
++	int rc = 0;
++	FILE *fd;
++	size_t i;
++
++	fd = fopen(pathname, "w");
++	if (!fd) {
++		rc = errno;
++		goto err;
++	}
++
++	fprintf(fd, "/* This file is automatically generated.");
++	fprintf(fd, " Do not edit. */\n");
++	fprintf(fd, "#include <linux/stddef.h>\n");
++	fprintf(fd, "\nextern const char *const ipe_boot_policy;\n\n");
++	fprintf(fd, "const char *const ipe_boot_policy =\n");
++
++	if (!buf || size == 0) {
++		fprintf(fd, "\tNULL;\n");
++		fclose(fd);
 +		return 0;
 +	}
 +
-+	if (ctx->op == __IPE_OP_INVALID) {
-+		action = pol->parsed->global_default_action;
-+		goto eval;
-+	}
++	fprintf(fd, "\t\"");
 +
-+	rules = &pol->parsed->rules[ctx->op];
-+
-+	list_for_each_entry(rule, &rules->rules, next) {
-+		match = true;
-+
-+		list_for_each_entry(prop, &rule->props, next)
-+			match = match && evaluate_property(ctx, prop);
-+
-+		if (match)
++	for (i = 0; i < size; ++i) {
++		switch (buf[i]) {
++		case '"':
++			fprintf(fd, "\\\"");
 +			break;
++		case '\'':
++			fprintf(fd, "'");
++			break;
++		case '\n':
++			fprintf(fd, "\\n\"\n\t\"");
++			break;
++		case '\\':
++			fprintf(fd, "\\\\");
++			break;
++		case '\t':
++			fprintf(fd, "\\t");
++			break;
++		case '\?':
++			fprintf(fd, "\\?");
++			break;
++		default:
++			fprintf(fd, "%c", buf[i]);
++		}
 +	}
++	fprintf(fd, "\";\n");
++	fclose(fd);
 +
-+	if (match)
-+		action = rule->action;
-+	else if (rules->default_action != __IPE_ACTION_INVALID)
-+		action = rules->default_action;
-+	else
-+		action = pol->parsed->global_default_action;
++	return 0;
 +
-+	rcu_read_unlock();
-+eval:
-+	if (action == __IPE_ACTION_DENY)
-+		rc = -EACCES;
-+
++err:
++	if (fd)
++		fclose(fd);
 +	return rc;
 +}
-diff --git a/security/ipe/eval.h b/security/ipe/eval.h
++
++int main(int argc, const char *const argv[])
++{
++	int rc = 0;
++	size_t len = 0;
++	char *policy = NULL;
++
++	if (argc < 2)
++		usage(argv[0]);
++
++	if (argc > 2) {
++		rc = policy_to_buffer(argv[2], &policy, &len);
++		if (rc != 0)
++			goto cleanup;
++	}
++
++	rc = write_boot_policy(argv[1], policy, len);
++cleanup:
++	if (policy)
++		free(policy);
++	if (rc != 0)
++		perror("An error occurred during policy conversion: ");
++	return rc;
++}
+diff --git a/security/ipe/.gitignore b/security/ipe/.gitignore
 new file mode 100644
-index 000000000000..972580dfec15
+index 000000000000..eca22ad5ed22
 --- /dev/null
-+++ b/security/ipe/eval.h
-@@ -0,0 +1,25 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
++++ b/security/ipe/.gitignore
+@@ -0,0 +1 @@
++boot-policy.c
+\ No newline at end of file
+diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+index 9dd5c4769d79..a6c5d48dd0a3 100644
+--- a/security/ipe/Kconfig
++++ b/security/ipe/Kconfig
+@@ -18,6 +18,16 @@ menuconfig SECURITY_IPE
+ 	  If unsure, answer N.
+ 
+ if SECURITY_IPE
++config IPE_BOOT_POLICY
++	string "Integrity policy to apply on system startup"
++	help
++	  This option specifies a filepath to a IPE policy that is compiled
++	  into the kernel. This policy will be enforced until a policy update
++	  is deployed via the $securityfs/ipe/policies/$policy_name/active
++	  interface.
 +
-+#ifndef _IPE_EVAL_H
-+#define _IPE_EVAL_H
++	  If unsure, leave blank.
 +
-+#include <linux/file.h>
-+#include <linux/types.h>
+ menu "IPE Trust Providers"
+ 
+ config IPE_PROP_DM_VERITY
+diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+index ec7f69c34735..b7f0118215da 100644
+--- a/security/ipe/Makefile
++++ b/security/ipe/Makefile
+@@ -5,7 +5,16 @@
+ # Makefile for building the IPE module as part of the kernel tree.
+ #
+ 
++quiet_cmd_polgen = IPE_POL $(2)
++      cmd_polgen = scripts/ipe/polgen/polgen security/ipe/boot-policy.c $(2)
 +
-+#include "hooks.h"
-+#include "policy.h"
++targets += boot-policy.c
 +
-+extern struct ipe_policy __rcu *ipe_active_policy;
++$(obj)/boot-policy.c: scripts/ipe/polgen/polgen $(CONFIG_IPE_BOOT_POLICY) FORCE
++	$(call if_changed,polgen,$(CONFIG_IPE_BOOT_POLICY))
 +
-+struct ipe_eval_ctx {
-+	enum ipe_op_type op;
+ obj-$(CONFIG_SECURITY_IPE) += \
++	boot-policy.o \
+ 	digest.o \
+ 	eval.o \
+ 	fs.o \
+@@ -15,3 +24,5 @@ obj-$(CONFIG_SECURITY_IPE) += \
+ 	policy_fs.o \
+ 	policy_parser.o \
+ 	audit.o \
 +
-+	const struct file *file;
-+};
++clean-files := boot-policy.c \
+diff --git a/security/ipe/fs.c b/security/ipe/fs.c
+index 1761d39e4d04..31d30a58a662 100644
+--- a/security/ipe/fs.c
++++ b/security/ipe/fs.c
+@@ -192,6 +192,7 @@ static const struct file_operations enforce_fops = {
+ static int __init ipe_init_securityfs(void)
+ {
+ 	int rc = 0;
++	struct ipe_policy *ap;
+ 
+ 	if (!ipe_enabled)
+ 		return -EOPNOTSUPP;
+@@ -222,6 +223,13 @@ static int __init ipe_init_securityfs(void)
+ 		goto err;
+ 	}
+ 
++	ap = rcu_access_pointer(ipe_active_policy);
++	if (ap) {
++		rc = ipe_new_policyfs_node(ap);
++		if (rc)
++			goto err;
++	}
 +
-+int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx);
+ 	np = securityfs_create_file("new_policy", 0200, root, NULL, &np_fops);
+ 	if (IS_ERR(np)) {
+ 		rc = PTR_ERR(np);
+diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
+index 1d3d66e1623b..8110fa5ff203 100644
+--- a/security/ipe/ipe.c
++++ b/security/ipe/ipe.c
+@@ -7,6 +7,7 @@
+ #include "hooks.h"
+ #include "eval.h"
+ 
++extern const char *const ipe_boot_policy;
+ bool ipe_enabled;
+ 
+ static struct lsm_blob_sizes ipe_blobs __ro_after_init = {
+@@ -61,11 +62,27 @@ static struct security_hook_list ipe_hooks[] __ro_after_init = {
+ static int __init ipe_init(void)
+ {
+ 	int rc = 0;
++	struct ipe_policy *p = NULL;
+ 
+ 	security_add_hooks(ipe_hooks, ARRAY_SIZE(ipe_hooks), "ipe");
+ 	ipe_enabled = true;
+ 
++	if (ipe_boot_policy) {
++		p = ipe_new_policy(ipe_boot_policy, strlen(ipe_boot_policy),
++				   NULL, 0);
++		if (IS_ERR(p)) {
++			rc = PTR_ERR(p);
++			goto err;
++		}
 +
-+#endif /* _IPE_EVAL_H */
++		rcu_assign_pointer(ipe_active_policy, p);
++	}
++
++out:
+ 	return rc;
++err:
++	ipe_free_policy(p);
++	goto out;
+ }
+ 
+ DEFINE_LSM(ipe) = {
 -- 
 2.25.1
 
