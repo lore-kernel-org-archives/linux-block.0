@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED352C001DE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE78FC001B3
 	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 21:10:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232183AbjF1VKI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 17:10:08 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:39528 "EHLO
+        id S232124AbjF1VKH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 17:10:07 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:39198 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232378AbjF1VJw (ORCPT
+        with ESMTP id S232292AbjF1VJt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 17:09:52 -0400
+        Wed, 28 Jun 2023 17:09:49 -0400
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id BC25920ABD8B; Wed, 28 Jun 2023 14:09:48 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BC25920ABD8B
+        id 0C82620AECBD; Wed, 28 Jun 2023 14:09:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0C82620AECBD
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
         s=default; t=1687986588;
-        bh=wRhA6T1K0rmws6t2UffrMk+s+gndM5chNgTBDkspz9U=;
+        bh=k6fMAW6lEojAvzL7dDUqLan4yua+1n+JQzYEb3ytuaQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=r9c1nPtrZfxwt38hQiji7ANeJ57LWy0J6HK3+3JSCAVwytV/NIRk6SaeIAvT/MmOs
-         vM2m2nm7fMTsEzKhEfDF64fRNbZ2s6fUDV3UXyME87ROtHb8OOZ61UX5zUbuvcmKw1
-         T1OJxY8P1KtyA6eT+m1KgRxQV2O6ioR3TRKSGF6U=
+        b=aoN1pYncmalqRvaF5CZguT9gXUC9+EpHCOHBDEttBtP52iWZevtV//x0FJfvogyNo
+         ecyhxY3KWYhPits81xBq+huiYYD4v5tCcPv4FHjXM1uH4xdHGoJlHsPyqm51GcSqPk
+         PeRBa4h/6vIPROqa2WejO0TJkct/KU+O5b6jZ82s=
 From:   Fan Wu <wufan@linux.microsoft.com>
 To:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
         serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
@@ -32,11 +32,11 @@ Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
         dm-devel@redhat.com, audit@vger.kernel.org,
         roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Fan Wu <wufan@linux.microsoft.com>,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: [RFC PATCH v10 13/17] fsverity: consume builtin signature via LSM hook
-Date:   Wed, 28 Jun 2023 14:09:27 -0700
-Message-Id: <1687986571-16823-14-git-send-email-wufan@linux.microsoft.com>
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Fan Wu <wufan@linux.microsoft.com>
+Subject: [RFC PATCH v10 01/17] security: add ipe lsm
+Date:   Wed, 28 Jun 2023 14:09:15 -0700
+Message-Id: <1687986571-16823-2-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
 References: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
@@ -44,140 +44,251 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-fsverity represents a mechanism to support both integrity and
-authenticity protection of a file, supporting both signed and unsigned
-digests.
+From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-An LSM which controls access to a resource based on authenticity and
-integrity of said resource, can then use this data to make an informed
-decision on the authorization (provided by the LSM's policy) of said
-claim.
+Integrity Policy Enforcement (IPE) is an LSM that provides an
+complimentary approach to Mandatory Access Control than existing LSMs
+today.
 
-This effectively allows the extension of a policy enforcement layer in
-LSM for fsverity, allowing for more granular control of how a
-particular authenticity claim can be used. For example, "all (built-in)
-signed fsverity files should be allowed to execute, but only these
-hashes are allowed to be loaded as kernel modules".
+Existing LSMs have centered around the concept of access to a resource
+should be controlled by the current user's credentials. IPE's approach,
+is that access to a resource should be controlled by the system's trust
+of a current resource.
 
-This enforcement must be done in kernel space, as a userspace only
-solution would fail a simple litmus test: Download a self-contained
-malicious binary that never touches the userspace stack. This
-binary would still be able to execute.
+The basis of this approach is defining a global policy to specify which
+resource can be trusted.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 ---
-v1-v6:
-  + Not present
+v2:
+  + Split evaluation loop, access control hooks,
+    and evaluation loop from policy parser and userspace
+    interface to pass mailing list character limit
 
-v7:
-  Introduced
+v3:
+  + Move ipe_load_properties to patch 04.
+  + Remove useless 0-initializations
+  + Prefix extern variables with ipe_
+  + Remove kernel module parameters, as these are
+    exposed through sysctls.
+  + Add more prose to the IPE base config option
+    help text.
+  + Use GFP_KERNEL for audit_log_start.
+  + Remove unnecessary caching system.
+  + Remove comments from headers
+  + Use rcu_access_pointer for rcu-pointer null check
+  + Remove usage of reqprot; use prot only.
+  + Move policy load and activation audit event to 03/12
 
-v8:
-  + Split fs/verity/ changes and security/ changes into separate patches
-  + Change signature of fsverity_create_info to accept non-const inode
-  + Change signature of fsverity_verify_signature to accept non-const inode
-  + Don't cast-away const from inode.
-  + Digest functionality dropped in favor of:
-    ("fs-verity: define a function to return the integrity protected
-      file digest")
-  + Reworded commit description and title to match changes.
-  + Fix a bug wherein no LSM implements the particular fsverity @name
-    (or LSM is disabled), and returns -EOPNOTSUPP, causing errors.
+v4:
+  + Remove sysctls in favor of securityfs nodes
+  + Re-add kernel module parameters, as these are now
+    exposed through securityfs.
+  + Refactor property audit loop to a separate function.
 
-v9:
+v5:
+  + fix minor grammatical errors
+  + do not group rule by curly-brace in audit record,
+    reconstruct the exact rule.
+
+v6:
   + No changes
 
-v10:
-  + Rename the signature blob key
-  + Cleanup redundant code
-  + Make the hook call depends on CONFIG_FS_VERITY_BUILTIN_SIGNATURES
----
- fs/verity/fsverity_private.h |  2 +-
- fs/verity/open.c             | 26 +++++++++++++++++++++++++-
- include/linux/fsverity.h     |  2 ++
- 3 files changed, 28 insertions(+), 2 deletions(-)
+v7:
+  + Further split lsm creation into a separate commit from the
+    evaluation loop and audit system, for easier review.
 
-diff --git a/fs/verity/fsverity_private.h b/fs/verity/fsverity_private.h
-index 49bf3a1eb2a0..1f06dd6b1c6e 100644
---- a/fs/verity/fsverity_private.h
-+++ b/fs/verity/fsverity_private.h
-@@ -108,7 +108,7 @@ int fsverity_init_merkle_tree_params(struct merkle_tree_params *params,
- 				     unsigned int log_blocksize,
- 				     const u8 *salt, size_t salt_size);
+  + Introduce the concept of an ipe_context, a scoped way to
+    introduce execution policies, used initially for allowing for
+    kunit tests in isolation.
+
+v8:
+  + Follow lsmname_hook_name convention for lsm hooks.
+  + Move LSM blob accessors to ipe.c and mark LSM blobs as static.
+
+v9:
+  + Remove ipe_context for simplification
+
+v10:
+  + Add github url
+---
+ MAINTAINERS           |  7 +++++++
+ security/Kconfig      | 11 ++++++-----
+ security/Makefile     |  1 +
+ security/ipe/Kconfig  | 17 +++++++++++++++++
+ security/ipe/Makefile | 10 ++++++++++
+ security/ipe/ipe.c    | 37 +++++++++++++++++++++++++++++++++++++
+ security/ipe/ipe.h    | 16 ++++++++++++++++
+ 7 files changed, 94 insertions(+), 5 deletions(-)
+ create mode 100644 security/ipe/Kconfig
+ create mode 100644 security/ipe/Makefile
+ create mode 100644 security/ipe/ipe.c
+ create mode 100644 security/ipe/ipe.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a82795114ad4..ad00887d38ea 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10278,6 +10278,13 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/zohar/linux-integrity.git
+ F:	security/integrity/
+ F:	security/integrity/ima/
  
--struct fsverity_info *fsverity_create_info(const struct inode *inode,
-+struct fsverity_info *fsverity_create_info(struct inode *inode,
- 					   struct fsverity_descriptor *desc);
++INTEGRITY POLICY ENFORCEMENT (IPE)
++M:	Fan Wu <wufan@linux.microsoft.com>
++L:	linux-security-module@vger.kernel.org
++S:	Supported
++T:	git git://github.com/microsoft/ipe.git
++F:	security/ipe/
++
+ INTEL 810/815 FRAMEBUFFER DRIVER
+ M:	Antonino Daplas <adaplas@gmail.com>
+ L:	linux-fbdev@vger.kernel.org
+diff --git a/security/Kconfig b/security/Kconfig
+index 97abeb9b9a19..daa4626ea99c 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -202,6 +202,7 @@ source "security/yama/Kconfig"
+ source "security/safesetid/Kconfig"
+ source "security/lockdown/Kconfig"
+ source "security/landlock/Kconfig"
++source "security/ipe/Kconfig"
  
- void fsverity_set_info(struct inode *inode, struct fsverity_info *vi);
-diff --git a/fs/verity/open.c b/fs/verity/open.c
-index 1db5106a9c38..91f632df08b8 100644
---- a/fs/verity/open.c
-+++ b/fs/verity/open.c
-@@ -8,6 +8,7 @@
- #include "fsverity_private.h"
+ source "security/integrity/Kconfig"
  
- #include <linux/mm.h>
-+#include <linux/security.h>
- #include <linux/slab.h>
+@@ -241,11 +242,11 @@ endchoice
  
- static struct kmem_cache *fsverity_info_cachep;
-@@ -172,12 +173,28 @@ static int compute_file_digest(const struct fsverity_hash_alg *hash_alg,
- 	return err;
- }
+ config LSM
+ 	string "Ordered list of enabled LSMs"
+-	default "landlock,lockdown,yama,loadpin,safesetid,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
+-	default "landlock,lockdown,yama,loadpin,safesetid,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
+-	default "landlock,lockdown,yama,loadpin,safesetid,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
+-	default "landlock,lockdown,yama,loadpin,safesetid,bpf" if DEFAULT_SECURITY_DAC
+-	default "landlock,lockdown,yama,loadpin,safesetid,selinux,smack,tomoyo,apparmor,bpf"
++	default "landlock,lockdown,yama,loadpin,safesetid,smack,selinux,tomoyo,apparmor,bpf,ipe" if DEFAULT_SECURITY_SMACK
++	default "landlock,lockdown,yama,loadpin,safesetid,apparmor,selinux,smack,tomoyo,bpf,ipe" if DEFAULT_SECURITY_APPARMOR
++	default "landlock,lockdown,yama,loadpin,safesetid,tomoyo,bpf,ipe" if DEFAULT_SECURITY_TOMOYO
++	default "landlock,lockdown,yama,loadpin,safesetid,bpf,ipe" if DEFAULT_SECURITY_DAC
++	default "landlock,lockdown,yama,loadpin,safesetid,selinux,smack,tomoyo,apparmor,bpf,ipe"
+ 	help
+ 	  A comma-separated list of LSMs, in initialization order.
+ 	  Any LSMs left off this list, except for those with order
+diff --git a/security/Makefile b/security/Makefile
+index 18121f8f85cd..527b1864d96c 100644
+--- a/security/Makefile
++++ b/security/Makefile
+@@ -24,6 +24,7 @@ obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
+ obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
+ obj-$(CONFIG_BPF_LSM)			+= bpf/
+ obj-$(CONFIG_SECURITY_LANDLOCK)		+= landlock/
++obj-$(CONFIG_SECURITY_IPE)		+= ipe/
  
-+#ifdef CONFIG_FS_VERITY_BUILTIN_SIGNATURES
-+static int fsverity_inode_setsecurity(struct inode *inode,
-+				      struct fsverity_descriptor *desc)
+ # Object integrity file lists
+ obj-$(CONFIG_INTEGRITY)			+= integrity/
+diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+new file mode 100644
+index 000000000000..e4875fb04883
+--- /dev/null
++++ b/security/ipe/Kconfig
+@@ -0,0 +1,17 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Integrity Policy Enforcement (IPE) configuration
++#
++
++menuconfig SECURITY_IPE
++	bool "Integrity Policy Enforcement (IPE)"
++	depends on SECURITY && SECURITYFS
++	select PKCS7_MESSAGE_PARSER
++	select SYSTEM_DATA_VERIFICATION
++	help
++	  This option enables the Integrity Policy Enforcement LSM
++	  allowing users to define a policy to enforce a trust-based access
++	  control. A key feature of IPE is a customizable policy to allow
++	  admins to reconfigure trust requirements on the fly.
++
++	  If unsure, answer N.
+diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+new file mode 100644
+index 000000000000..571648579991
+--- /dev/null
++++ b/security/ipe/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Copyright (C) Microsoft Corporation. All rights reserved.
++#
++# Makefile for building the IPE module as part of the kernel tree.
++#
++
++obj-$(CONFIG_SECURITY_IPE) += \
++	hooks.o \
++	ipe.o \
+diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
+new file mode 100644
+index 000000000000..2ee0f5de29d7
+--- /dev/null
++++ b/security/ipe/ipe.c
+@@ -0,0 +1,37 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#include "ipe.h"
++
++static struct lsm_blob_sizes ipe_blobs __ro_after_init = {
++};
++
++static struct security_hook_list ipe_hooks[] __ro_after_init = {
++};
++
++/**
++ * ipe_init - Entry point of IPE.
++ *
++ * This is called at LSM init, which happens occurs early during kernel
++ * start up. During this phase, IPE registers its hooks and loads the
++ * builtin boot policy.
++ * Return:
++ * * 0		- OK
++ * * -ENOMEM	- Out of memory
++ */
++static int __init ipe_init(void)
 +{
-+	return security_inode_setsecurity(inode, FS_VERITY_INODE_SEC_NAME,
-+					  desc->signature,
-+					  le32_to_cpu(desc->sig_size), 0);
++	int rc = 0;
++
++	security_add_hooks(ipe_hooks, ARRAY_SIZE(ipe_hooks), "ipe");
++
++	return rc;
 +}
-+#else
-+static inline int fsverity_inode_setsecurity(struct inode *inode,
-+					     struct fsverity_descriptor *desc)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_IPE_PROP_FS_VERITY*/
 +
- /*
-  * Create a new fsverity_info from the given fsverity_descriptor (with optional
-  * appended builtin signature), and check the signature if present.  The
-  * fsverity_descriptor must have already undergone basic validation.
-  */
--struct fsverity_info *fsverity_create_info(const struct inode *inode,
-+struct fsverity_info *fsverity_create_info(struct inode *inode,
- 					   struct fsverity_descriptor *desc)
- {
- 	struct fsverity_info *vi;
-@@ -242,6 +259,13 @@ struct fsverity_info *fsverity_create_info(const struct inode *inode,
- 		spin_lock_init(&vi->hash_page_init_lock);
- 	}
- 
-+	err = fsverity_inode_setsecurity(inode, desc);
-+	if (err == -EOPNOTSUPP)
-+		err = 0;
++DEFINE_LSM(ipe) = {
++	.name = "ipe",
++	.init = ipe_init,
++	.blobs = &ipe_blobs,
++};
+diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
+new file mode 100644
+index 000000000000..a1c68d0fc2e0
+--- /dev/null
++++ b/security/ipe/ipe.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
 +
-+	if (err)
-+		goto fail;
++#ifndef _IPE_H
++#define _IPE_H
 +
- 	return vi;
- 
- fail:
-diff --git a/include/linux/fsverity.h b/include/linux/fsverity.h
-index 1eb7eae580be..9666721baf15 100644
---- a/include/linux/fsverity.h
-+++ b/include/linux/fsverity.h
-@@ -319,4 +319,6 @@ static inline int fsverity_prepare_setattr(struct dentry *dentry,
- 	return 0;
- }
- 
-+#define FS_VERITY_INODE_SEC_NAME "fsverity.builtin-sig"
++#ifdef pr_fmt
++#undef pr_fmt
++#endif
++#define pr_fmt(fmt) "IPE: " fmt
 +
- #endif	/* _LINUX_FSVERITY_H */
++#include <linux/lsm_hooks.h>
++
++#endif /* _IPE_H */
 -- 
 2.25.1
 
