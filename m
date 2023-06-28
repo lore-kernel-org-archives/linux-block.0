@@ -2,81 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BAAEB64DA
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D546EEB64DC
 	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 09:24:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbjF1JYM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 05:24:12 -0400
-Received: from dfw.source.kernel.org ([139.178.84.217]:34600 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234200AbjF1JEt (ORCPT
+        id S231156AbjF1JYQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 05:24:16 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:34234 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233446AbjF1JV4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 05:04:49 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BEA926130E;
-        Wed, 28 Jun 2023 06:38:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFBDEC433C8;
-        Wed, 28 Jun 2023 06:38:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687934312;
-        bh=hIaK5MMZGhPP0WIwXVhK5SME6ZluWkRCOQFxos9q7yo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=I8ua108wM9nVnxl66nOGDyuQnEeDyCv1Lt9xUx3PvvrSFEyRKVVsoCEhtZe5OkjJj
-         K8PV1w6/2hv7iFGo9RIXX4tJ65+EOyV/k1I5pDcWGlCR1xSfvx++iL7DcAu4Lww9wl
-         4UMPqtN8Mfr+9RAAJ72Oen2S6f9NBtKagv3+F/GbYc9NyuyXDkH8j8pSKsxtmZ53ug
-         cYMwpr9SeoYocFqOd3gccdDDwqFMy4UbNYX88v1uFnfJehK0wgikDju1OEy//LzXLo
-         IpAyRn0Fnyz3YMYboSJJ92ReN/WU6M2Vw8rpeN/oYMZxWucdGEe1xctpK6zN+2bG+5
-         aXhcdu7sDEPbg==
-Date:   Tue, 27 Jun 2023 23:38:30 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Dongsoo Lee <letrhee@nsr.re.kr>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] fscrypt: Add LEA-256-XTS, LEA-256-CTS support
-Message-ID: <20230628063830.GA7920@sol.localdomain>
-References: <20230626084703.907331-1-letrhee@nsr.re.kr>
- <20230626084703.907331-5-letrhee@nsr.re.kr>
+        Wed, 28 Jun 2023 05:21:56 -0400
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230628092154epoutp016332376e21eb49e2b14dc21f5d2edb07~syDqr_KPC3263032630epoutp01L
+        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 09:21:54 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230628092154epoutp016332376e21eb49e2b14dc21f5d2edb07~syDqr_KPC3263032630epoutp01L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1687944114;
+        bh=DFKREYP8QvhqCnLX8kZ+76N8U5RQgg0AMuLWLZkbtsA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XNxFUlCFhN4qnFQIQgfdH306b51wQ3QT7rRR/Adx9O/LiSqfks5AjrRoKSS6rl9ii
+         5fpzqjPcA3eWER2Yzs6QlkfzN6BNEie9/gbQzxFgzNVbXqXfkm9MCMzP/eEYUC+YbZ
+         Ope/APO+AI059mWgtBvjc6eTzf5ajaQXtLruMlgo=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20230628092153epcas5p335202e3cc97de14979ff33d039b0081d~syDqBM0Wy1144611446epcas5p3x;
+        Wed, 28 Jun 2023 09:21:53 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.182]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4Qrbgh2HnSz4x9Py; Wed, 28 Jun
+        2023 09:21:52 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        43.12.44250.0BBFB946; Wed, 28 Jun 2023 18:21:52 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20230628090918epcas5p3a5463f0fc421e435a363192e40d3f649~sx4qtpKOz2835128351epcas5p3c;
+        Wed, 28 Jun 2023 09:09:18 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230628090918epsmtrp1188161c6e054ab06fe1a1cd1ebb43ed9~sx4qs1Gs01903919039epsmtrp1W;
+        Wed, 28 Jun 2023 09:09:18 +0000 (GMT)
+X-AuditID: b6c32a4a-ec1fd7000000acda-51-649bfbb08f4e
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        44.92.34491.EB8FB946; Wed, 28 Jun 2023 18:09:18 +0900 (KST)
+Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230628090917epsmtip1b4c769df6ba3c694345f8eba2e8568b2~sx4pgKZPP2088620886epsmtip1E;
+        Wed, 28 Jun 2023 09:09:17 +0000 (GMT)
+From:   Min Li <min15.li@samsung.com>
+To:     hch@lst.de
+Cc:     axboe@kernel.dk, dlemoal@kernel.org, gregkh@linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        min15.li@samsung.com, stable@kernel.org, willy@infradead.org
+Subject: Re: [PATCH v3] block: add check that partition length needs to be
+ aligned with block size
+Date:   Wed, 28 Jun 2023 17:07:34 +0000
+Message-Id: <20230628170734.2960-1-min15.li@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230628083839.GA26606@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230626084703.907331-5-letrhee@nsr.re.kr>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGJsWRmVeSWpSXmKPExsWy7bCmhu6G37NTDL7sE7BYfbefzeLBfnuL
+        5sXr2Szmvr7EYrFy9VEmi723tC0u75rDZrF8VQeTxdkJH1gtPp2/wGbx+8ccNgduj80rtDwu
+        ny312LSqk81j/9w17B67bzawefRtWcXo8XmTXAB7VLZNRmpiSmqRQmpecn5KZl66rZJ3cLxz
+        vKmZgaGuoaWFuZJCXmJuqq2Si0+ArltmDtCBSgpliTmlQKGAxOJiJX07m6L80pJUhYz84hJb
+        pdSClJwCkwK94sTc4tK8dL281BIrQwMDI1OgwoTsjJsvljEXfGequL70KVMD4wKmLkZODgkB
+        E4mbhxuZuxi5OIQEdjNKLDy7khXC+cQo8envKiYI5xujxJz9Z9hgWvbdvw+V2Mso8XHtGaj+
+        54wSF5/PBHI4ONgElCW2LfUBMUUE+CRu3UoFKWEWOMAosfdlMyPIIGGBFInHv2azgNgsAqoS
+        Bx7OAbuJV8BCYtmT+VDL5CX2HzzLDGJzCuhIrPhzFqpGUOLkzCdgvcxANc1bZ4PdICEwkUPi
+        wrL1rCCLJQRcJF4sz4SYIyzx6vgWdghbSuJlfxs7REmxxMsfYRDhGond325Dg8VaYtv6dUwg
+        JcwCmhLrd+lDhGUlpp5axwSxlU+i9/cTqHJeiR3zYGwlib8XzjFC2BISi/c/hDrGQ+J0ZzRI
+        WEigXuLJgi9sExgVZiH5ZRaSX2YhLF7AyLyKUTK1oDg3PbXYtMAoL7UcHsPJ+bmbGMEJVstr
+        B+PDBx/0DjEycTAeYpTgYFYS4b39ZnaKEG9KYmVValF+fFFpTmrxIUZTYGBPZJYSTc4Hpvi8
+        knhDE0sDEzMzMxNLYzNDJXHeZVd6U4QE0hNLUrNTUwtSi2D6mDg4pRqYLJ6Ea3pziOqJ3/qw
+        ltn2nVfSlPnBTh+nxVyR4lt9yrlFn/VX4PKH1ut73mlfjrzmoJq1QZfxh4bE15f5N3MWyEU3
+        ZRhWpssyJ8VoWy5d17GwpmSayVwlv0Kbp1be5UqHDsxJiP0nxORWndf9bYpAXFNhoKScq2kh
+        P7+Tz8mu/zp3nLo/iZzbImxgJDOtt2vFhdY9R7be+fTyZnr4und7zTYeiVW+wfU3KDKz5cKR
+        Xutny3oj58TtWpJnWDWnLnnX1ceRZTPEWRKaf+kui9P17dzHzP1uRSHLHGHNIpspE96vcpiR
+        e1DKr7nrvj3brx1uU3iUbh7QjePes97tQsDku4ffW7y8N9HO9Z3mBQ4lluKMREMt5qLiRACU
+        /qJ/OQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrPLMWRmVeSWpSXmKPExsWy7bCSnO6+H7NTDJYe0rBYfbefzeLBfnuL
+        5sXr2Szmvr7EYrFy9VEmi723tC0u75rDZrF8VQeTxdkJH1gtPp2/wGbx+8ccNgduj80rtDwu
+        ny312LSqk81j/9w17B67bzawefRtWcXo8XmTXAB7FJdNSmpOZllqkb5dAlfGzRfLmAu+M1Vc
+        X/qUqYFxAVMXIyeHhICJxL7794FsLg4hgd2MEhe+PWKESEhInJ/3iw3CFpZY+e85O4gtJPCU
+        UeLQFosuRg4ONgFliW1LfUBMEQE+iVu3UkHGMAucYpRo/3kerFxYIEni66K5YDaLgKrEgYdz
+        wPbyClhILHsyH2q8vMT+g2eZQWxOAR2JFX/OMkGs0pb4+eg8K0S9oMTJmU9YQGxmoPrmrbOZ
+        JzAKzEKSmoUktYCRaRWjZGpBcW56brFhgWFearlecWJucWleul5yfu4mRnAcaGnuYNy+6oPe
+        IUYmDsZDjBIczEoivLffzE4R4k1JrKxKLcqPLyrNSS0+xCjNwaIkziv+ojdFSCA9sSQ1OzW1
+        ILUIJsvEwSnVwOSWy7d07sP2y7nLOP69VmVvtf3tu0GliEUnqfjxv8Yn7lfMX4v+04g5/Oeb
+        /5rGe3N///va9EVbd5IVV3XzkbOPj81wOrBn4xzhf2WW3uUd9ZFhxasYYn1LkxamXPdeuej4
+        qgM3bi163Xl+7p8JyldrjDb6fHbL1ag5+vXyIbvMkKBj215Hyhcf+Lh9Spbw9685N27Mlefe
+        2SQ7ty/zRO7q4u/3D6zdlxa6TmU6v7b/26gPhWGCP++691VGKi731014JC6986Faubl0Udaf
+        uVcyy2rN58+517HF6PXxHZE5SdefiH9puGWUWG73Pjn1AINLZ/CVFZET/pacXl0qrFElyVfF
+        6P7EQMdw/e4lORuVWIozEg21mIuKEwEpiPY38gIAAA==
+X-CMS-MailID: 20230628090918epcas5p3a5463f0fc421e435a363192e40d3f649
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230628090918epcas5p3a5463f0fc421e435a363192e40d3f649
+References: <20230628083839.GA26606@lst.de>
+        <CGME20230628090918epcas5p3a5463f0fc421e435a363192e40d3f649@epcas5p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 26, 2023 at 05:47:03PM +0900, Dongsoo Lee wrote:
-> when SIMD instructions are available, it performs even faster.
+On Mon, Jun 28, 2023 at 04:48:36PM +0000, Christoph Hellwig  wrote: 
+> They are long long in the UAPI, which is weird but has been that way
+> for a long time.  So I think we need checks for negative values
+> before they are shifted and converted to a sector_t.
 
-This will only be true once there is actually an applicable implementation of
-LEA-XTS and LEA-CTS using SIMD instructions included in the kernel.
+Do you mean that we need to check if p.start and p.length are negative?
 
-Perhaps it is your plan to go through and accelerate LEA-XTS and LEA-CTS for the
-common CPU architectures.  However, it is not included in this patchset yet, so
-it should not be claimed in the documentation yet.
+Thanks for your reply
 
-> Particularly, it outperforms AES when the dedicated crypto
-> +instructions for AES are unavailable, regardless of the presence of SIMD
-> +instructions. However, it is not recommended to use LEA unless there is
-> +a clear reason (such as the absence of dedicated crypto instructions for
-> +AES or a mandatory requirement) to do so. Also, to enable LEA support,
-> +it needs to be enabled in the kernel crypto API.
-
-I think I'd prefer that you omit the mention of the "absence of dedicated crypto
-instructions" use case for now.  fscrypt already supports another algorithm that
-fulfills exactly that use case (Adiantum), and that algorithm already has
-optimized implementations for arm32, arm64, and x86_64.  LEA does not have that
-yet.  So it does not really bring anything new to the table.  I'm also unsure it
-would be appropriate to recommend a "lightweight" cipher at this point...
-
-That would leave "mandatory requirement" as the rationale, at least for now,
-similar to SM4.
-
-- Eric
+Min li
