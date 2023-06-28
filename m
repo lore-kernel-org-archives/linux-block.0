@@ -2,150 +2,425 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5685EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A90EB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:14:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233845AbjF1IMM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 04:12:12 -0400
-Received: from mail-dm6nam12on2080.outbound.protection.outlook.com ([40.107.243.80]:60960
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233843AbjF1IKJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 04:10:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iIBiccq4IhriUZiSBtrfJNcu/2rDTyJkNTLr/kfxIm4WF9YrKAzY5BrE2js/GgRrKXDVH6doOArAt9E7NwHvgAbH/oyxUgc9k2hS3a3Vvl1/GsiwZpIsXuQx4VEbhjMF1C9q2OT1wX8RN+hzn/inRZCSFfCaXrohoFD9BaJYxspP1+eKSnKCxB5MvmfPg7JVZmqKhW17P84jTRCDRFUyg0S9NPYucv1EHj77oLsD3ILo3O6pSqUp6Dg/5scnu/DnXtGDfsss6pf5L+TDhbTWZuRWPV6/dzgsvjpTdsPyti6AIPDrcqgdbgwKIm4VSocvu6B3S+CjUnKsCmSk7i14Ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zXKlgw/qS9o4prODqRIr4gYoDwGoS5nS6e4y6EX7htw=;
- b=JuzKftO8AFOTcYb/lX5UBI5l6C1IOVaGHm3dNjqbnAzxaEPbYflZkh91WcwbMVZclpeaR+iEH6gKCfyyOEF+FNgowRk9QEonjLptT63sND7DklCYkt/hhDUvRydl2Klf/cXbhxquHA8pYeu48TYFmL4t68JockDvP2yCcKecdVbWwIQwakSCmyYh+DakrsYpQ0fs1dIYxPceYFrgEAHwagFXwLH9+VubhYN2TZjbgpkmdCK2pila+p0dgB2dZh+8Z+yVWJFLIVuj7rCzKKR1FvXmBhwISUAdSSxU4R1dQRL9hLnY3Iv/YB2ezIgcox1KCzw7foCgmE5Gjd9pWm0quQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zXKlgw/qS9o4prODqRIr4gYoDwGoS5nS6e4y6EX7htw=;
- b=A7aa6Q25osobT0uWyDmMjy0elHl4GcpGlbjvv7FADp7FCidHtwDJ5MCUb8v/7vubHUp+r1rj2KLrJhcqvd9vwoACo39VXakVe7OmAsrFZIgX0eh3paaRQtNTnvkSJwGa3yCyH8X0SJTJfCsYuqQkyTHlN56ktXP9htubqVluAqFTNLd9zxmg2KCbfQpWP1NGw3mdp//NT/bkFUiYAlcmGeeWV7sISaLUVyp8Xkub7vK6yb5YzJZVuqGg6Zc8HaCl4yph3plYcr94tQJwXuFVZp2XJraNoo26eks77XRgMhwGXqd9wUUHX98GJNRV60atoHpe07i3LUomMiA7cftZQg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
- by SA0PR12MB7089.namprd12.prod.outlook.com (2603:10b6:806:2d5::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 28 Jun
- 2023 08:10:06 +0000
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::5fe3:edc2:ade4:32ea]) by DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::5fe3:edc2:ade4:32ea%7]) with mapi id 15.20.6521.024; Wed, 28 Jun 2023
- 08:10:06 +0000
-Message-ID: <83ef44fb-fcef-4b61-9de1-bc24e3c0f4d2@nvidia.com>
-Date:   Wed, 28 Jun 2023 11:09:59 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [bug report] most of blktests nvme/ failed on the latest linux
- tree
-Content-Language: en-US
-To:     Sagi Grimberg <sagi@grimberg.me>, Yi Zhang <yi.zhang@redhat.com>
-Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <CAHj4cs_qUWzetD0203EKbBLNv3KF=qgTLsWLeHN3PY7UE6mzmw@mail.gmail.com>
- <4b8c1d77-b434-5970-fb1f-8a4059966095@grimberg.me>
- <8a15d10e-f94b-54b7-b080-1887d9c0bdac@nvidia.com>
- <0c4b16a5-17da-02d9-754a-3c7a158daa56@nvidia.com>
- <CAHj4cs9ayQ8J+wDCWVKjmBTWTi7Bc3uqqTCDzL2ZY6JhpdDhsQ@mail.gmail.com>
- <1fda4154-50f4-c09d-dbb1-3b53ed63d341@nvidia.com>
- <CAHj4cs_+yBbs+MgrC8Z8J7X8cKYwwr6wcR5tLfUCcYkftL7N1Q@mail.gmail.com>
- <52df24f1-ebb7-cd24-3aaf-7b946acab3ee@grimberg.me>
- <CAHj4cs9=8fPRtXj4uyjN9MV1OMNNXwcVGte7CDnFxXYYbnnX0A@mail.gmail.com>
- <b3377b27-28de-c8ed-d45a-c3f241c24415@grimberg.me>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <b3377b27-28de-c8ed-d45a-c3f241c24415@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0142.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:98::8) To DM4PR12MB5040.namprd12.prod.outlook.com
- (2603:10b6:5:38b::19)
+        id S233771AbjF1IOk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 04:14:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28586 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233794AbjF1IMD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jun 2023 04:12:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687939872;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N2aTIOvz4XJe57bXOVjFUq29J6D4NLC5k/ZFmIGBHVM=;
+        b=DKQx0ERxfeh71AUp+Fn9uHQ9aKtRXa1o50Nk4lxzTY8+MCzSdJsYohfSrvw4UYqZUGxvBU
+        kqSMpOLnjEysZYUuS5Q0rsNabGhdS4ldcu/gkStkv5mc9wdjSpSkskyYgIhfKcwUO9DksQ
+        TGgT6u1LhgUdTe/Rrqyjh0FHIVrOLKA=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-397-jCLrYI3yNCarWhnV0l-ULQ-1; Wed, 28 Jun 2023 02:09:51 -0400
+X-MC-Unique: jCLrYI3yNCarWhnV0l-ULQ-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-262c77ffb9dso3594807a91.2
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2023 23:09:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687932590; x=1690524590;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N2aTIOvz4XJe57bXOVjFUq29J6D4NLC5k/ZFmIGBHVM=;
+        b=DGpvjtqzc7+36qx7nsDkvkcdLJaL6u8eh3Up66dlM8GGb7mK3VkMyrm/8DOk+LcLj5
+         YfwMGFeLROi3qxt3hNnTo1IGUYOMqD4VKzMbkqSPdHTsGVu9aElltIbrqPw+t0IkZ4id
+         1JHPxFhC/MkbCaYaJOTtuRuCBrqwVslGtFk1BZmHzCZLGcU8JeTN+M/FE2pwhEmmk5hT
+         leHGGFUZsZR1a+yXJSWIuwUZqTOIq05odZynPoxTuYZ79NKeMV4zQIBxW5yV95+wHefz
+         z4si6TanQ514aRqYRLFVK5inY/RPKKGFaw2/4vKcO3hrI3cpRn8NDE8S4l7znrj78n9F
+         EmnQ==
+X-Gm-Message-State: AC+VfDysYl0X7RxjLzI6sL1qBKXUg6YdpGd636eqkG8MK1D8d35hD8wP
+        aPq1xsZYNw2RnIDWNmC5a0AgHemscSjedh+xNKWf5dvfEmA8/mK72n1kOuxEdUS+urKkuglC2Tv
+        9mH/M2QLMUpZZMydZ6hH00D23uqqmmqCb7dxTSsw=
+X-Received: by 2002:a17:90b:23d8:b0:262:ea30:2cc3 with SMTP id md24-20020a17090b23d800b00262ea302cc3mr8289105pjb.2.1687932589958;
+        Tue, 27 Jun 2023 23:09:49 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5s7SyMopRJRZKzSOPgfFd9tQJivRcekGjqP2PGfWNTD2a3NygiB31O+kngtlu8mO2q1D+Is9m115DkQKqGaRY=
+X-Received: by 2002:a17:90b:23d8:b0:262:ea30:2cc3 with SMTP id
+ md24-20020a17090b23d800b00262ea302cc3mr8289092pjb.2.1687932589580; Tue, 27
+ Jun 2023 23:09:49 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|SA0PR12MB7089:EE_
-X-MS-Office365-Filtering-Correlation-Id: 001afc0b-206b-4f36-ebaf-08db77af154a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zW9KbLnmbl/wGDqY29WCoQHZcA1qNUJcAAgeAkritaLRtY68xsVr7b6jRGV3KDMe/AifK2thxEX9CQ7XbHi6sOh9WCQyWBJKuDhRhsOaotdO8dfnDNhoEymLQgxYKoWDUf0x+g3iwdvfeMitWzI1pH5HQZgb35fnS5B+N98WA67szSSlF3JNW07TkXdbtJjL+moRI+BCtJkNC3C3TgPLRN05xgcCs2qeXFQwghHvkFo8c7NA9uKsb665kzzuo0chLSXZ/WzqBQ+FTQR4nhVOhQKdsgqzEctIR/eE5bkNa3D0sP0kTLxKRAgvK/dpqVOLapyn1NUlIe+Zow3iOBfUx6uTUprpl97qkSuJ+uaBLXrDhAN2EFHWz+4Ig1X/plxa4kPmdrt+9VaV1fUowsbpiiEMfIyaAi5acuV+ihMj/KzaKhW/bJCCzZ7HXVlMjytDpiGkjLZ5hUsUYUVprcrNIeF74UmTOWymsA5Dblg0RIudq1wwxr9obteI7C6g+Zdsr+J7S871rMvUKDQkox5wg4oFaDs8L0+epzJUnQHOszS0oK1VPtYBEGYF1zK9PgnbH8lg9AUZ5LPwzaqJ7B708YG0WdEtHJzfa3JNjkowtsYRMm8HAEnMwpWuLrNesOCLzUP0CFt8ZnqVu1AGOifkRQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39860400002)(396003)(366004)(136003)(451199021)(26005)(66476007)(66556008)(6506007)(36756003)(110136005)(6666004)(54906003)(478600001)(2616005)(186003)(2906002)(53546011)(6486002)(4744005)(83380400001)(5660300002)(66946007)(38100700002)(31696002)(86362001)(316002)(8676002)(8936002)(41300700001)(4326008)(31686004)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VEEvZ3R2cG5IVnlRTVo3OWFoUk1RYWNnNE01SFBRaHJ0UktpRVJlQWNvVHVn?=
- =?utf-8?B?N2JXR09XY2JJWEd3M3U0US9jaTlJTUJWWjV5RzFLblFMSGJERGlUbmNIZ2NO?=
- =?utf-8?B?Y1F5VkYzWHZENDNYa3BsNFFvOVhsSnR5dWE4TlZQNGJnN09wTjgycGVCa1N0?=
- =?utf-8?B?TmF5WllULytIKzA5cjAxWXdXMVlwa2IweVozd2cvbWhpTjVsbEtwRGZ5N3Fs?=
- =?utf-8?B?aDNTWi9veHB4dFV2SVhTM291Y1U5TU9oaCtsNkFQU21RRDhyeXFOS1NUNWZr?=
- =?utf-8?B?MElIcEtUZFdKTU1neENIWEgrbHhESGJLK2pCVm83dFA1Y24vQkFrbWNLclBR?=
- =?utf-8?B?MEdBMHEweWNSeXZxRzRLWEZMNE1oR3NIZzIxTGFwRldvNlAwcmdFbng4N3FW?=
- =?utf-8?B?dVlLYTJYc2lDcXg1TkhrRjVGOTdwbVBVMklKVVNJYUdMYldtNTkyLzRSeWxk?=
- =?utf-8?B?MHdyekVGNm93WEJXS3NqbjJEY3oxcXhtQ2xmYi8yV1BhNWw1V3VhZVhTMXRS?=
- =?utf-8?B?UDVlekY3UXJZQzhVVXk4L2R2dkoweUM3eHcxVDZCTUo4LzNHVEZpb2JHcFMr?=
- =?utf-8?B?bUhVbThCd2JsODdRZFlRQmtsSWk0ODZ0YzJDZ2hWQ0psVTJFNXBkTSt1UEpl?=
- =?utf-8?B?NnhLVGdkRm1veXNyMUhwMVpWMkV1VSsvbmtSOTErNjVMaHp5ZXZDdjZTQjND?=
- =?utf-8?B?YTROYko0SDk1Nk1jTFRENUZSVEtRMmpCOTJ5cDN6dkN0YWF1aFJYS2cxSDRM?=
- =?utf-8?B?YjNsZ251TDY0dHpRNXJneDZiM29SSndtN2lVRXpQL3QvZ3lQU0ozM1dkZmg2?=
- =?utf-8?B?a05GVW5icGRIS2NlKzg0R3luaG91dXRtbDNMOVljelJNdFlaUit2V0RYSlgw?=
- =?utf-8?B?MFpzei9HVktIa1lPR2pLTlpEZlAyYWhwT0N5TmFJcHBRUGZtbk9WeWkyS2ZC?=
- =?utf-8?B?YVJmWnFqeGpCcjZlNTNRaGUrRzg0MDFmamxuejRSREZNaWFDN29vZVhPaFhX?=
- =?utf-8?B?Tk9zWFZCSHM1MnhJV1VFZU13cWtoU0tSSGwvVkZmQ0pLOEcyMTVzT0pFTVBy?=
- =?utf-8?B?T2dFc1RUTGhYLzA0aEVkbEhiMktOY2FNa3B4NlJES0RWWUozdjFKbmNHSWR5?=
- =?utf-8?B?VDBkUVRjUE1xSzhaNlAyUjR2ME1BRlJnbGVwYUE1MHVXZVphV0tDdmR5dTRK?=
- =?utf-8?B?VzlyYXpaU1ZkWEU4ek9uODJ5Y1kxVXB5SE1udi9zcGt1RTdvNU9vYm1uL3l3?=
- =?utf-8?B?bHdERzRZWmdHeFBxZUVZeG9wd0VTMUh6cGMvb0pYOG1lcFB2dTRaaXViZ0x5?=
- =?utf-8?B?QnNvT0pKeVBCdkJPNHFBSFJkMkdKNXYvMVdRSy96WGdXMXNTZEo5dlpBaUF5?=
- =?utf-8?B?Uis3YW4yRHVydEFkTi9nVldJeDNFWEJaV2pKQ0h6UjA5QTBKcWN6Uks2OGZD?=
- =?utf-8?B?bVQ0dCtwOCtsM2FJdkFza2haK250Z0VHczk3MEpQQzBmaGFlT0RtTjNPRHFN?=
- =?utf-8?B?Y01XRjl6OUpsK3I4Q1A4NVFjOUM5R0F4SCtnT3lXWkVVTzBUVFEzaWVKTTdB?=
- =?utf-8?B?bCtJTDdRdTErN2RsQnJPTVdCcE4vZVc1V1hJWFQ4TTRleW9NWk4rVHRSV3hB?=
- =?utf-8?B?cHVUQ3NmWHBJSDUwWjBWclJnb1pINDRMemQwVkV0eVF2SFduNEMzZXJUWEdl?=
- =?utf-8?B?NEljbmpoNXpoWjJSb1pwYU1ESTFLcHFSM1hPaHJCOHpKNy9lZHErTHIvV2FP?=
- =?utf-8?B?eWpDWVpTL2Q2OVFzWE5oMW1uWVFqQzdtQnM3RVFuRjVoUGxJM1hEOS9XNW1x?=
- =?utf-8?B?Z0phZDczQWpONm5zZ3pweTMxYkpqb3l4UnU0bEttWUF3Y1lqMVduaTc0QVpO?=
- =?utf-8?B?UDhLMWY4dGVCSXF0am04NmJLNlphSGhsblBJUmRrOTB2WE8wWTllTlNXTnlS?=
- =?utf-8?B?dkVUNzBYTmFzOWlOK0lMUnBRY21TUG8rNVY5Q1dnaWdjTnEyM3VJTHhvcnZN?=
- =?utf-8?B?L1lXa1d5emh0RncrVmFrVklrOEt4UkFxcUQ2SGw1OVBQcU03MmQ0RHNJNzhk?=
- =?utf-8?B?cTRMY3FhMWNsSFBVMHovbS92STNJeXg1QmNVTXRQRGdRdVJGejVEZFZQQUxx?=
- =?utf-8?B?YldqcHplbjhHL1BoSDVyMUpodXNSOEIvY3NyV3ZJNXpLTEdHU0ZWZHlnOUlM?=
- =?utf-8?B?dEE9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 001afc0b-206b-4f36-ebaf-08db77af154a
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 08:10:06.5649
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q+ysh77Yo2BChVwaXAYkz47Az09FxshjchSqRrLdh3ToNUyRfJLqkK7FBw2NKZJqrfLXHIo1Wqf5wFqIh6+/ww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB7089
+References: <CAHj4cs_qUWzetD0203EKbBLNv3KF=qgTLsWLeHN3PY7UE6mzmw@mail.gmail.com>
+ <4b8c1d77-b434-5970-fb1f-8a4059966095@grimberg.me> <8a15d10e-f94b-54b7-b080-1887d9c0bdac@nvidia.com>
+ <0c4b16a5-17da-02d9-754a-3c7a158daa56@nvidia.com> <CAHj4cs9ayQ8J+wDCWVKjmBTWTi7Bc3uqqTCDzL2ZY6JhpdDhsQ@mail.gmail.com>
+ <1fda4154-50f4-c09d-dbb1-3b53ed63d341@nvidia.com>
+In-Reply-To: <1fda4154-50f4-c09d-dbb1-3b53ed63d341@nvidia.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Wed, 28 Jun 2023 14:09:37 +0800
+Message-ID: <CAHj4cs_+yBbs+MgrC8Z8J7X8cKYwwr6wcR5tLfUCcYkftL7N1Q@mail.gmail.com>
+Subject: Re: [bug report] most of blktests nvme/ failed on the latest linux tree
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+So bisect shows it was introduced by the below patch:
+
+commit ae8bd606e09bbdb2607c8249872cc2aeaf2fcc72
+Author: Max Gurtovoy <mgurtovoy@nvidia.com>
+Date:   Fri May 12 18:41:55 2023 +0300
+
+    nvme-fabrics: prevent overriding of existing host
+
+    When first connecting a target using the "default" host parameters,
+    setting the hostid from the command line during a subsequent connection
+    establishment would override the "default" hostid parameter. This would
+    cause an existing connection that is already using the host definitions
+    to lose its hostid.
+
+    To address this issue, the code has been modified to allow only 1:1
+    mapping between hostnqn and hostid. This will maintain unambiguous host
+    identification. Any non 1:1 mapping will be rejected during connection
+    establishment.
+
+    Tested-by: Noam Gottlieb <ngottlieb@nvidia.com>
+    Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+    Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Signed-off-by: Keith Busch <kbusch@kernel.org>
+
+On Wed, Jun 28, 2023 at 12:12=E2=80=AFPM Chaitanya Kulkarni
+<chaitanyak@nvidia.com> wrote:
+>
+> On 6/27/23 19:58, Yi Zhang wrote:
+> > Hi Chaitanya
+> >
+> > Here is the code I used, and I will try to bisect it later today.
+> >
+> > # git remote -v
+> > origin https://github.com/torvalds/linux.git (fetch)
+> > origin https://github.com/torvalds/linux.git (push)
+> > # git log -1 --oneline
+> > 98be618ad030 (HEAD -> master, origin/master, origin/HEAD) Merge tag
+> > 'Smack-for-6.5' of https://github.com/cschaufler/smack-next
+> >
+> >
+>
+> I ran blktests on the above repo and it is still passing for me see [1].
+>
+> The only testcases are not run those are nvme/auth since it seemed to
+> have a bug when kernel is compiled with git hash for the sake of
+> debugging. dmesg log is also clean :-
+>
+> linux (master) #
+> linux (master) # dmesg | grep -i same
+> linux (master) # dmesg | grep -i hostid
+> linux (master) # dmesg | grep -i "found same hostid"
+> linux (master) # dmesg | grep -i "found same hostid"
+> linux (master) #
+>
+> None of the testcases you mentioned in your log are failing :(.
+>
+> Waiting for your bisection result.
+>
+> -ck
+>
+> linux (master) # uname -r
+> 6.4.0linux-01691-g98be618ad030
+>
+> linux (master) # git remote -v
+> origin git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> (fetch)
+> origin git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> (push)
+>
+> linux (master) # git log -1 --oneline
+> 98be618ad030 (HEAD -> master, origin/master, origin/HEAD) Merge tag
+> 'Smack-for-6.5' of https://github.com/cschaufler/smack-next
+>
+> linux (master) # ./compile_nvme.sh
+> + umount /mnt/nvme0n1
+> + clear_dmesg
+> + modprobe -r nvme-fabrics
+> + modprobe -r nvme_loop
+> + modprobe -r nvmet
+> + modprobe -r nvme
+> + sleep 1
+> + modprobe -r nvme-core
+> + lsmod
+> + grep nvme
+> ++ nproc
+> + make -j 48 M=3Ddrivers/nvme/ modules
+> + HOST=3Ddrivers/nvme/host
+> + TARGET=3Ddrivers/nvme/target
+> ++ uname -r
+> +
+> HOST_DEST=3D/lib/modules/6.4.0linux-01691-g98be618ad030/kernel/drivers/nv=
+me/host/
+> ++ uname -r
+> +
+> TARGET_DEST=3D/lib/modules/6.4.0linux-01691-g98be618ad030/kernel/drivers/=
+nvme/target/
+> + cp drivers/nvme/host/nvme-core.ko drivers/nvme/host/nvme-fabrics.ko
+> drivers/nvme/host/nvme-fc.ko drivers/nvme/host/nvme.ko
+> drivers/nvme/host/nvme-rdma.ko drivers/nvme/host/nvme-tcp.ko
+> /lib/modules/6.4.0linux-01691-g98be618ad030/kernel/drivers/nvme/host//
+> + cp drivers/nvme/target/nvme-fcloop.ko drivers/nvme/target/nvme-loop.ko
+> drivers/nvme/target/nvmet-fc.ko drivers/nvme/target/nvmet.ko
+> drivers/nvme/target/nvmet-rdma.ko drivers/nvme/target/nvmet-tcp.ko
+> /lib/modules/6.4.0linux-01691-g98be618ad030/kernel/drivers/nvme/target//
+> + ls -lrth
+> /lib/modules/6.4.0linux-01691-g98be618ad030/kernel/drivers/nvme/host/
+> /lib/modules/6.4.0linux-01691-g98be618ad030/kernel/drivers/nvme/target//
+> /lib/modules/6.4.0linux-01691-g98be618ad030/kernel/drivers/nvme/host/:
+> total 6.6M
+> -rw-r--r--. 1 root root  2.6M Jun 27 20:53 nvme-core.ko
+> -rw-r--r--. 1 root root  491K Jun 27 20:53 nvme-fabrics.ko
+> -rw-r--r--. 1 root root 1000K Jun 27 20:53 nvme-fc.ko
+> -rw-r--r--. 1 root root  780K Jun 27 20:53 nvme.ko
+> -rw-r--r--. 1 root root  928K Jun 27 20:53 nvme-rdma.ko
+> -rw-r--r--. 1 root root  899K Jun 27 20:53 nvme-tcp.ko
+>
+> /lib/modules/6.4.0linux-01691-g98be618ad030/kernel/drivers/nvme/target//:
+> total 6.6M
+> -rw-r--r--. 1 root root 541K Jun 27 20:53 nvme-fcloop.ko
+> -rw-r--r--. 1 root root 471K Jun 27 20:53 nvme-loop.ko
+> -rw-r--r--. 1 root root 826K Jun 27 20:53 nvmet-fc.ko
+> -rw-r--r--. 1 root root 3.1M Jun 27 20:53 nvmet.ko
+> -rw-r--r--. 1 root root 902K Jun 27 20:53 nvmet-rdma.ko
+> -rw-r--r--. 1 root root 760K Jun 27 20:53 nvmet-tcp.ko
+> + modprobe nvme
+> + dmesg -c
+> [   74.521561] nvme nvme0: pci function 0000:00:04.0
+> [   74.545758] nvme nvme0: 48/0/0 default/read/poll queues
+> [   74.548527] nvme nvme0: Ignoring bogus Namespace Identifiers
+>
+> linux (master) # date
+> Tue Jun 27 08:53:51 PM PDT 2023
+>
+> linux (master) # cdblktests
+> blktests (master) # ./check nvme
+> nvme/002 (create many subsystems and test discovery) [passed]
+>      runtime    ...  18.920s
+> nvme/003 (test if we're sending keep-alives to a discovery controller)
+> [passed]
+>      runtime  10.087s  ...  10.080s
+> nvme/004 (test nvme and nvmet UUID NS descriptors) [passed]
+>      runtime  1.471s  ...  1.437s
+> nvme/005 (reset local loopback target) [passed]
+>      runtime  1.210s  ...  1.784s
+> nvme/006 (create an NVMeOF target with a block device-backed ns) [passed]
+>      runtime  0.055s  ...  0.058s
+> nvme/007 (create an NVMeOF target with a file-backed ns) [passed]
+>      runtime  0.045s  ...  0.030s
+> nvme/008 (create an NVMeOF host with a block device-backed ns) [passed]
+>      runtime  1.164s  ...  1.462s
+> nvme/009 (create an NVMeOF host with a file-backed ns) [passed]
+>      runtime  1.120s  ...  1.421s
+> nvme/010 (run data verification fio job on NVMeOF block device-backed
+> ns) [passed]
+>      runtime  93.167s  ...  58.078s
+> nvme/011 (run data verification fio job on NVMeOF file-backed ns) [passed=
+]
+>      runtime  81.600s  ...  89.008s
+> nvme/012 (run mkfs and data verification fio job on NVMeOF block
+> device-backed ns) [passed]
+>      runtime  95.264s  ...  52.273s
+> nvme/013 (run mkfs and data verification fio job on NVMeOF file-backed
+> ns) [passed]
+>      runtime  66.072s  ...  81.176s
+> nvme/014 (flush a NVMeOF block device-backed ns) [passed]
+>      runtime  6.727s  ...  7.060s
+> nvme/015 (unit test for NVMe flush for file backed ns) [passed]
+>      runtime  5.914s  ...  6.356s
+> nvme/016 (create/delete many NVMeOF block device-backed ns and test
+> discovery) [passed]
+>      runtime    ...  12.591s
+> nvme/017 (create/delete many file-ns and test discovery) [passed]
+>      runtime    ...  12.933s
+> nvme/018 (unit test NVMe-oF out of range access on a file backend) [passe=
+d]
+>      runtime  1.121s  ...  1.419s
+> nvme/019 (test NVMe DSM Discard command on NVMeOF block-device ns) [passe=
+d]
+>      runtime  1.161s  ...  1.421s
+> nvme/020 (test NVMe DSM Discard command on NVMeOF file-backed ns) [passed=
+]
+>      runtime  1.122s  ...  1.417s
+> nvme/021 (test NVMe list command on NVMeOF file-backed ns) [passed]
+>      runtime  1.123s  ...  1.404s
+> nvme/022 (test NVMe reset command on NVMeOF file-backed ns) [passed]
+>      runtime  1.172s  ...  1.740s
+> nvme/023 (test NVMe smart-log command on NVMeOF block-device ns) [passed]
+>      runtime  1.144s  ...  1.425s
+> nvme/024 (test NVMe smart-log command on NVMeOF file-backed ns) [passed]
+>      runtime  1.122s  ...  1.427s
+> nvme/025 (test NVMe effects-log command on NVMeOF file-backed ns) [passed=
+]
+>      runtime  1.119s  ...  1.428s
+> nvme/026 (test NVMe ns-descs command on NVMeOF file-backed ns) [passed]
+>      runtime  1.114s  ...  1.424s
+> nvme/027 (test NVMe ns-rescan command on NVMeOF file-backed ns) [passed]
+>      runtime  1.140s  ...  1.417s
+> nvme/028 (test NVMe list-subsys command on NVMeOF file-backed ns) [passed=
+]
+>      runtime  1.117s  ...  1.424s
+> nvme/029 (test userspace IO via nvme-cli read/write interface) [passed]
+>      runtime  1.258s  ...  1.547s
+> nvme/030 (ensure the discovery generation counter is updated
+> appropriately) [passed]
+>      runtime  0.137s  ...  0.207s
+> nvme/031 (test deletion of NVMeOF controllers immediately after setup)
+> [passed]
+>      runtime  0.849s  ...  3.837s
+> nvme/038 (test deletion of NVMeOF subsystem without enabling) [passed]
+>      runtime  0.016s  ...  0.012s
+> nvme/040 (test nvme fabrics controller reset/disconnect operation during
+> I/O) [passed]
+>      runtime  7.273s  ...  8.021s
+> nvme/041 (Create authenticated connections)                  [not run]
+>      runtime  0.440s  ...
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/042 (Test dhchap key types for authenticated connections) [not run]
+>      runtime  2.712s  ...
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/043 (Test hash and DH group variations for authenticated
+> connections) [not run]
+>      runtime  0.731s  ...
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/044 (Test bi-directional authentication)                [not run]
+>      runtime  1.240s  ...
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/045 (Test re-authentication)                            [not run]
+>      runtime  3.630s  ...
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> common/rc: line 212: 0inux: value too great for base (error token is
+> "0inux")
+> nvme/048 (Test queue count changes on reconnect)             [not run]
+>      runtime  6.244s  ...
+>      nvme_trtype=3Dloop is not supported in this test
+> blktests (master) # nvme_trtype=3Dtcp ./check nvme
+> nvme/002 (create many subsystems and test discovery)         [not run]
+>      runtime  18.920s  ...
+>      nvme_trtype=3Dtcp is not supported in this test
+> nvme/003 (test if we're sending keep-alives to a discovery controller)
+> [passed]
+>      runtime  10.080s  ...  10.086s
+> nvme/004 (test nvme and nvmet UUID NS descriptors) [passed]
+>      runtime  1.437s  ...  1.140s
+> nvme/005 (reset local loopback target) [passed]
+>      runtime  1.784s  ...  1.188s
+> nvme/006 (create an NVMeOF target with a block device-backed ns) [passed]
+>      runtime  0.058s  ...  0.060s
+> nvme/007 (create an NVMeOF target with a file-backed ns) [passed]
+>      runtime  0.030s  ...  0.035s
+> nvme/008 (create an NVMeOF host with a block device-backed ns) [passed]
+>      runtime  1.462s  ...  1.152s
+> nvme/009 (create an NVMeOF host with a file-backed ns) [passed]
+>      runtime  1.421s  ...  1.137s
+> nvme/010 (run data verification fio job on NVMeOF block device-backed
+> ns) [passed]
+>      runtime  58.078s  ...  60.132s
+> nvme/011 (run data verification fio job on NVMeOF file-backed ns) [passed=
+]
+>      runtime  89.008s  ...  85.854s
+> nvme/012 (run mkfs and data verification fio job on NVMeOF block
+> device-backed ns) [passed]
+>      runtime  52.273s  ...  54.886s
+> nvme/013 (run mkfs and data verification fio job on NVMeOF file-backed
+> ns) [passed]
+>      runtime  81.176s  ...  80.462s
+> nvme/014 (flush a NVMeOF block device-backed ns) [passed]
+>      runtime  7.060s  ...  6.527s
+> nvme/015 (unit test for NVMe flush for file backed ns) [passed]
+>      runtime  6.356s  ...  5.831s
+> nvme/016 (create/delete many NVMeOF block device-backed ns and test
+> discovery) [not run]
+>      runtime  12.591s  ...
+>      nvme_trtype=3Dtcp is not supported in this test
+> nvme/017 (create/delete many file-ns and test discovery)     [not run]
+>      runtime  12.933s  ...
+>      nvme_trtype=3Dtcp is not supported in this test
+> nvme/018 (unit test NVMe-oF out of range access on a file backend) [passe=
+d]
+>      runtime  1.419s  ...  1.121s
+> nvme/019 (test NVMe DSM Discard command on NVMeOF block-device ns) [passe=
+d]
+>      runtime  1.421s  ...  1.135s
+> nvme/020 (test NVMe DSM Discard command on NVMeOF file-backed ns) [passed=
+]
+>      runtime  1.417s  ...  1.109s
+> nvme/021 (test NVMe list command on NVMeOF file-backed ns) [passed]
+>      runtime  1.404s  ...  1.108s
+> nvme/022 (test NVMe reset command on NVMeOF file-backed ns) [passed]
+>      runtime  1.740s  ...  1.154s
+> nvme/023 (test NVMe smart-log command on NVMeOF block-device ns) [passed]
+>      runtime  1.425s  ...  1.133s
+> nvme/024 (test NVMe smart-log command on NVMeOF file-backed ns) [passed]
+>      runtime  1.427s  ...  1.107s
+> nvme/025 (test NVMe effects-log command on NVMeOF file-backed ns) [passed=
+]
+>      runtime  1.428s  ...  1.115s
+> nvme/026 (test NVMe ns-descs command on NVMeOF file-backed ns) [passed]
+>      runtime  1.424s  ...  1.111s
+> nvme/027 (test NVMe ns-rescan command on NVMeOF file-backed ns) [passed]
+>      runtime  1.417s  ...  1.133s
+> nvme/028 (test NVMe list-subsys command on NVMeOF file-backed ns) [passed=
+]
+>      runtime  1.424s  ...  1.101s
+> nvme/029 (test userspace IO via nvme-cli read/write interface) [passed]
+>      runtime  1.547s  ...  1.239s
+> nvme/030 (ensure the discovery generation counter is updated
+> appropriately) [passed]
+>      runtime  0.207s  ...  0.116s
+> nvme/031 (test deletion of NVMeOF controllers immediately after setup)
+> [passed]
+>      runtime  3.837s  ...  0.767s
+> nvme/038 (test deletion of NVMeOF subsystem without enabling) [passed]
+>      runtime  0.012s  ...  0.015s
+> nvme/040 (test nvme fabrics controller reset/disconnect operation during
+> I/O) [passed]
+>      runtime  8.021s  ...  7.278s
+> nvme/041 (Create authenticated connections)                  [not run]
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/042 (Test dhchap key types for authenticated connections) [not run]
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/043 (Test hash and DH group variations for authenticated
+> connections) [not run]
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/044 (Test bi-directional authentication)                [not run]
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/045 (Test re-authentication)                            [not run]
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+>      kernel 6.4.0linux-01691-g98be618ad030 config not found
+> common/rc: line 212: 0inux: value too great for base (error token is
+> "0inux")
+> nvme/048 (Test queue count changes on reconnect) [passed]
+>      runtime    ...  5.230s
+> blktests (master) #
+>
+>
+>
+>
 
 
-On 28/06/2023 10:24, Sagi Grimberg wrote:
-> 
->>> Yi,
->>>
->>> Do you have hostnqn and hostid files in your /etc/nvme directory?
->>>
->>
->> No, only one discovery.conf there.
->>
->> # ls /etc/nvme/
->> discovery.conf
-> 
-> So the hostid is generated every time if it is not passed.
-> We should probably revert the patch and add it back when
-> blktests are passing.
+--=20
+Best Regards,
+  Yi Zhang
 
-Seems like the patch is doing exactly what it should do - fix wrong 
-behavior of users that override hostid.
-Can we fix the tests instead ?
