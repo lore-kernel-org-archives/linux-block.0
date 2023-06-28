@@ -2,365 +2,182 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0F7EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDC1EB64DC
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:24:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232656AbjF1IY2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 04:24:28 -0400
-Received: from dfw.source.kernel.org ([139.178.84.217]:58889 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233068AbjF1ITt (ORCPT
+        id S232991AbjF1IYa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 04:24:30 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:14040 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232203AbjF1ISb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 04:19:49 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 432A96131D;
-        Wed, 28 Jun 2023 06:40:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A55F8C433C8;
-        Wed, 28 Jun 2023 06:40:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687934415;
-        bh=oLTq+iKrj17LlqKFqM7yyfd7btM7xW9Ms0g9sXkCcbY=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=T5oKMrz5s4Lya00ey+pGe8W728mfu4d6JL3p5TJ4MwKMiW2nPVsQJ6sguljni0uzn
-         s/KOWdJRgJ/9tuYTRItCUhbiuofr0Aevp8UK/HKAT/61ttug8954rIV4mWs4sEhTm9
-         K+hmbdZFCOi3qdFznwL04rC9m75JzBavT1XHr4Rgw/tcbS8/0mqqxnVeqWPIXyA8M6
-         WUDY8NmQcMY4NvocjCw3ik6Ey9HHLLAvYkcUHBOZIIB+QMAm41GGVkDzW2/GmDyfol
-         cMO01CyDc+0Z6K4524H4t7MaSDBHmcZTCtXCnC8xzZotNTl1y1upDdbL+sQYAjO9Di
-         REnD7LeklvfVg==
-Message-ID: <0d05d74e-48c5-2b99-dc28-482dc717e508@kernel.org>
-Date:   Wed, 28 Jun 2023 15:40:11 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v13 1/9] block: Introduce queue limits for copy-offload
- support
+        Wed, 28 Jun 2023 04:18:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1687940311; x=1719476311;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=oZZX+le5v5WF27RNKI41Zxu4q2/Quhoa6yHSxzHRWUk=;
+  b=JZAqBC3d/+CR8cO7zh8/4p5MLTDMR8ry6VC9CjBg/+2s3nnrjhS92m3+
+   PO2u4H6eb0n+dmXEeQLVdX93MOCBOVuV3+hCYUmRx1ahCMthDZ4Lbo642
+   Rqy8Dbu/h9z8CLGWMsxp6cW8/tStWgFwLiYv+GAkEYw/hYAaRl4KvIDfr
+   6wRsLFU+g/ZsKSzeeOcAdwFXBJEPLDPF35X9KCZrsb9oHxehDZaYybiPL
+   Bk3VCJGiQE0P1pfNQ86NuSZmWgRAc7YdqcTqcsD6sJfFfDJI7NeBndMmT
+   TVPU12FkgrFJF0uhlBNxApdmu3jqnKbKraFzNrCIv9LmjnonnVDn8yIdQ
+   w==;
+X-IronPort-AV: E=Sophos;i="6.01,164,1684771200"; 
+   d="scan'208";a="341764712"
+Received: from mail-dm6nam12lp2169.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.169])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Jun 2023 12:39:56 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KGP3jToLQaLfUd0laZyo0I/MtizYM+zzPDeAiHFfH1akwOgKZkHkTNKQB+XF6OKOsTGc84WcsviKJM7t1Vy/0L5CIuJ3P91t4cC+P2SRe3rS0RVyZ3+t/NVWKKdM3t4Q8x/Oc9fkoWSbR76hL5QnrigbQXbUPcRJjYucdjs99whvmKrqYXPWSAtDfXaqUbRgA9ka6CahL3ZRV+1QuavoE0LExrtmumGNOUCvyrA7Y1CaXDbb0sg9+gHocgZ0gjSu2V8cULCemYnsZ/+jVI3uIPIkUsMfq0odPRm+YQFEIK1ImfuZIkVhl5Nu3INjT/ZFQGeCgNROEoafvm/Zt3d1zA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z3ie+ZYkDr6Uux/7Hxj77sXnDS4kWA2HZGd1s+yNmk8=;
+ b=LAa4bJRTAgIBRQYkOsbNIEt2Dmsp0x6L2xt9lpsP/YAwcL4lmuu24Y98aZvuIz0HtwKva8kd8Yw9EUqX7s0ZvAZDIfR9rxRizgECeQV1pNSE4aTsdurvKrgxSiLMbaRTWoua6UNMjeyt9aKvLw5tYH/RTC50uy80b5NDnZcfAzv8EHDy2RPwUhrNm2RdnEutSfgZn6S5PUf8bw2c7IAY0mR6K75kJcBmdJOTudRcmRKIK/vpeL4qqWXsOFElvZvF+LQ4Io4wc9OoJ7+u5AB11CpDgU9IZN8Guzg7hcXEdDd3PiszbK+yz0Vvkxp2XqyHRb0+T88r0MxhnPea/EBcFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z3ie+ZYkDr6Uux/7Hxj77sXnDS4kWA2HZGd1s+yNmk8=;
+ b=wpjjo0bEyHftypksyQ6o0lY+g984LNcYoYuQmm4u8xZXXnuW+dFhTNTnUjYLrWCu+K3+QNaQHDXKzMBQRGKIfpWcdkGGmBMjLAewl1Vm4sR7UC+3CgauhC65VCncQZ4zt7I4aj3chYZ29tKKAcM49y4Wj31ehZyK/12tGWWxkuc=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ SA2PR04MB7658.namprd04.prod.outlook.com (2603:10b6:806:14d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Wed, 28 Jun
+ 2023 04:39:53 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::bfa:d453:e7e9:8f98]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::bfa:d453:e7e9:8f98%7]) with mapi id 15.20.6521.024; Wed, 28 Jun 2023
+ 04:39:52 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+CC:     Hannes Reinecke <hare@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: blktests: nvme/auth testcae bug
+Thread-Topic: blktests: nvme/auth testcae bug
+Thread-Index: AQHZqXYKKv0icp4yukWU2n/X8YUTrq+fojqA
+Date:   Wed, 28 Jun 2023 04:39:52 +0000
+Message-ID: <72u6de4wfaxqkrnqw6puc432wvocqlbvpsprkvd6nbt3gltubh@7k6m6z3567ab>
+References: <6dfe85b5-5415-7140-e377-c1448fd7fb8f@nvidia.com>
+In-Reply-To: <6dfe85b5-5415-7140-e377-c1448fd7fb8f@nvidia.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Cc:     martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        willy@infradead.org, hare@suse.de, djwong@kernel.org,
-        bvanassche@acm.org, ming.lei@redhat.com, nitheshshetty@gmail.com,
-        gost.dev@samsung.com, Kanchan Joshi <joshi.k@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-References: <20230627183629.26571-1-nj.shetty@samsung.com>
- <CGME20230627184000epcas5p1c7cb01eb1c70bc5a19f76ce21f2ec3f8@epcas5p1.samsung.com>
- <20230627183629.26571-2-nj.shetty@samsung.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230627183629.26571-2-nj.shetty@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SA2PR04MB7658:EE_
+x-ms-office365-filtering-correlation-id: ca5396f8-5124-461a-afc8-08db7791b70c
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZeMSDOKZ3v6vfA9WI2bNICVFfX3OQLy7rqNxS/ypRtyZjs8wE2Zo/WIVpF52FFXsOg81TwnCQQkfr072Jfl8TLLi3SyJDe0TpjJxespaQl+AbdjmLRyAweF7pAtWJ80MnKiJHXgZ+Vjc8vPw5z/Y+2PybdwoI7PMyN+JN7PCI1yHUFlmQJrbHwLW75oxEhQ/Ipzcy2QKJDuF5UmagL81lx1KgB+uoG7m6u5ZSCYn7xs9MjhNyvIUdOd4+e0EP8lCJXXREDPqfZ3vfwVaCDoZNLzy7nkyVauD/uUJNVaOn/KaCacPiNXyeCIGNf5rc0Tihq/Lxgj4aR2K5O162Gi9gMhJ5IXVwuYOM8zZGAbXQ9z0k1kE1ZSg5U3nmphUQQAoGqvOyw0YxPzFD537IkRQf54F/G2XwEFaPj2gBjBjfm3YZRzJqt80fvfnAXqAta4sdJhq01aERYxeQEMZEbTS+QozukaWrLhhk9NcNl94FMDm/lMc539oq4BywvbxV0JQyS81cQ+8pte+jGEstFOwcDVWqZBsgwC6jdrDF5Qrfez/s257euLJsodQWNmY9C3XZ/xK7R3sOSyHLXx2cdpfkbGzdj6e6VZtYnBwffSg/9WyqOrcqrbUIqOzEtvJsjYn
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(376002)(39860400002)(366004)(396003)(136003)(346002)(451199021)(122000001)(82960400001)(38100700002)(38070700005)(83380400001)(86362001)(478600001)(54906003)(9686003)(71200400001)(6486002)(91956017)(8936002)(316002)(76116006)(8676002)(66946007)(66476007)(66556008)(4326008)(41300700001)(66446008)(64756008)(6512007)(33716001)(6506007)(26005)(186003)(6916009)(44832011)(5660300002)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?owI/KpwcQuf0kSVckaOBaDJ4PhAPQPGM0IwHoy64O0/2rSOvVpiR/GvDwR?=
+ =?iso-8859-1?Q?V5y1qAXQSC4Bc58b0c/HWXTbUBH8M1FGBcEEQscKq5h7sXoz/Q+glUOwqG?=
+ =?iso-8859-1?Q?WoJ4ca4pTa0WemyiqJs8U2m3ZwWBBrZ0hAEA2KQNZiY+Zlb5q1XF+hUOGN?=
+ =?iso-8859-1?Q?xKXxToTUs9T3M6obh7jSMmXl83qT/HfYDHvIN3BLO0Q+w1yybOP/zOp8mW?=
+ =?iso-8859-1?Q?NCsWU3MUmEW61v1KjQxpfT/mUiRtZaPUCSduoA2LnU64XKFGhcacFaPLvW?=
+ =?iso-8859-1?Q?fb3o+Pms9UpLqpoaXuc8SIdTzhmz+pF3G2KafZtdPwXtz7mlpVf4HC546c?=
+ =?iso-8859-1?Q?scqYINpuC6NJ2dFUCYsQ4g5V3uptDElCfCPJZnEOzSM/CaforkiQbLsx2U?=
+ =?iso-8859-1?Q?CFbZNP2WliQ2PByxkpX60t77k8y7QwDILu6hTnoCSkNvNf3NRXiNdSi7Vs?=
+ =?iso-8859-1?Q?f774z6mukYtm8r33UjBjCaFsPMswgP1kSXHctsZD5dc3gzL5sOm9aNHinD?=
+ =?iso-8859-1?Q?aLX4GSmFE+1NgQJnyc3zQ5a04yUNi9KgiA9qHkR8uv+KIzBWSLwYlGyiMt?=
+ =?iso-8859-1?Q?PeC4m881dvw9KIsEUQPjgz9AgSI+w5vPuPwFqjNEsxRMTAo4WU3x5mAl0W?=
+ =?iso-8859-1?Q?YLzb1ios9I1soP6TIfyi6iLUJA3+qW7QfmonF+qs1YG7PnPNIPdozZd/+B?=
+ =?iso-8859-1?Q?SFsBN1QeNIyc8cb7uIr85KacnoJnm1EuQgMQYFigcFXrA/rVwWR3tzdslc?=
+ =?iso-8859-1?Q?SBafzFqDdEy/vVjpKJN8SESLzZ/qNifjcD98dkC2Tuf/g2oXZ8jngIsQcy?=
+ =?iso-8859-1?Q?OyjuTwh4JCRL1m5k8T2QVgH0e18oaeXlIc5ML5SCduFz308J8DXXoW+r9a?=
+ =?iso-8859-1?Q?B6pPWnk4nDnQIonJ5PTrkCoM34unJJs9xDXI28PBUNfa5a5lz+/QdJbZV4?=
+ =?iso-8859-1?Q?MARKk2yYbR6/CPVxXE4rsHLBobZvVSGBJjl1NhPSMzy4pkL3c2gT06rwyI?=
+ =?iso-8859-1?Q?eoTlDj73BprbmaVX8g2q+G6vB/2JC3AUSOHZGF3wadl6toaP+XqRe0Ifim?=
+ =?iso-8859-1?Q?FppwfxW3r7OmaZ03KgEcD59dorZtoLlT8mOYv/Vb9B1kd6kj+3zlyRNH5L?=
+ =?iso-8859-1?Q?mu53F0bU/Pa57VNVxCGSGXvXwsD8/BEjb7yjTVQrMTJI5Tbp28YAEcAR3E?=
+ =?iso-8859-1?Q?vc1sGpZh8A+4uSRzcai12+Dazi6vvZbukLjfijJflTJXuNMS0CpxIm1ewz?=
+ =?iso-8859-1?Q?csck/dc4b2heOPSV+Vmh9ja5s3eqzuKacp4fHJdhYLxDTZeduAs2OY5UaL?=
+ =?iso-8859-1?Q?4UQUGJRGx4p92ui1fvx7hwKPJgsTlgw+kr0C39Tv19fGvj79QtfXDAu4Al?=
+ =?iso-8859-1?Q?hXdkF2CwinO8ekBlWVzCKnXle+GQ9/gNvuvnx4cZpWnt4YwAjXSGQUDQa9?=
+ =?iso-8859-1?Q?6BViYD4nLG1gwfMP+xNyXRQLMWT3rFx/drHMfQr8Kjyk2TRcbCmkccaI81?=
+ =?iso-8859-1?Q?fB+IfUBkupVHrfOFQznpEpa1CD9XmD2kHSTvjznYti+w9pRsfUzKJEAKJJ?=
+ =?iso-8859-1?Q?YjRaRQAw8QSKSfBRXZTubtT4FToiz89FZY0QiUIIv7wQj0YWjaFpmqPDEA?=
+ =?iso-8859-1?Q?qTZgPw7m50eEIXmxhoaC7iHb6+oBVldOxa3fU9xTGwTE7knJ3P/9H2h/ta?=
+ =?iso-8859-1?Q?mkrXAfmQbRooQEWcTIg=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <F9AFCD389DE14144A4F8176D52A76D36@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: z4iHEgDFMcQfPIFPVigv+8f4b87G/p98e4MQP2+kZyHBYGQ0wdyYPIhqS3VofgBKNu9XVPYSnQkrM7FUAKytI0CCTQQDC+Id8naY02Nweh3gbICD/QmE29pDXDedxYkD1v7kFn4zCmt2FNUSn4lK1Ioh+PCnszIdAskFAEK6Pcqg5Dn9C3hKClWjFBNsf7e7lEzyIHwG7WviVLvviE1R9cffIpgh9ve7cU8uCXxK39OQwGpfJFmEymV+7BmfMghU6vXK9eoC9s2uuM+QhGsqTlq2lGYjMN1nqEdmLIRoRtOptdfnp4RQzZSxYLGFSY91lVY5fzm2SeoVEQAwxRH+7PcHlYIsZ2Nf8VNpiXrr2jvOs7kCw275MGtsYSQqScsOuv3byK5p4HcdTXFN8Oz5QilgavfYyvJn2FbnT9PxPcfoi2UTXJ6ZmAZwyAyUOxo+8pjY3dE8zq7IeQojDNTHZbtjaJRImuirI5RI8ZNJMq0WXJNNvkNMNooVvAX+pphtY+2AX+reb4oN0JUyeC0ScqfNWa0Jpixbrvmksjz2MAL4dJzxmi9BXCNDaFdDsif5sFojy52aFd9CBRoIwy90xxB9HjRFzDfqlJvYxX1nuN+OqOWrAfWLweqc0fWbBujlUmCY+y3FzT+oInufLkYiLhxX7y2c4S1QzEEmLEGjfBs/cCJgoBsD89oOs4gCBqYUZo8Xc+QfwW/yxnOz18JzYqo06PSN6NFcEnsDSEM2GJX4NjlZm0Iccg0GHyaC7mrDk0MPTSJiuK8HC3wCwj3ZWa8D8C37UYGjxh+NYafJg291Zl9dYjpKd8TasSxErDvfeCYuBvziImckWR9Y6A8vVAb5/gHG/cqnpbct0Sa8+lMRUbmO7fNTJ16+aJBu6xLv
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca5396f8-5124-461a-afc8-08db7791b70c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2023 04:39:52.7934
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yWTN9eQPKOoUHMiVinsds/Aw8unVJCZWhPas8UPcmdl07fHx6Ormw2cdgfNxbnbiXAQvWnLSqJW2dIptr/8JQd08g7foELF9P0IBJSMSjEU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7658
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/28/23 03:36, Nitesh Shetty wrote:
-> Add device limits as sysfs entries,
->         - copy_offload (RW)
->         - copy_max_bytes (RW)
->         - copy_max_bytes_hw (RO)
-> 
-> Above limits help to split the copy payload in block layer.
-> copy_offload: used for setting copy offload(1) or emulation(0).
-> copy_max_bytes: maximum total length of copy in single payload.
-> copy_max_bytes_hw: Reflects the device supported maximum limit.
-> 
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> ---
->  Documentation/ABI/stable/sysfs-block | 33 +++++++++++++++
->  block/blk-settings.c                 | 24 +++++++++++
->  block/blk-sysfs.c                    | 63 ++++++++++++++++++++++++++++
->  include/linux/blkdev.h               | 12 ++++++
->  include/uapi/linux/fs.h              |  3 ++
->  5 files changed, 135 insertions(+)
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-> index c57e5b7cb532..3c97303f658b 100644
-> --- a/Documentation/ABI/stable/sysfs-block
-> +++ b/Documentation/ABI/stable/sysfs-block
-> @@ -155,6 +155,39 @@ Description:
->  		last zone of the device which may be smaller.
->  
->  
-> +What:		/sys/block/<disk>/queue/copy_offload
-> +Date:		June 2023
-> +Contact:	linux-block@vger.kernel.org
-> +Description:
-> +		[RW] When read, this file shows whether offloading copy to a
-> +		device is enabled (1) or disabled (0). Writing '0' to this
-> +		file will disable offloading copies for this device.
-> +		Writing any '1' value will enable this feature. If the device
-> +		does not support offloading, then writing 1, will result in an
-> +		error.
+On Jun 28, 2023 / 04:07, Chaitanya Kulkarni wrote:
+> Hi Hannes,
+>=20
+> * My compiled the kernel is with git hash :-
+>=20
+> linux (master) # uname -r
+> 6.4.0linux-01691-g98be618ad030
+>=20
+> * When I try to ran the testcases nvme/auth testcases are not running:-
+>=20
+> nvme/041 (Create authenticated connections)=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 [not run]
+>  =A0=A0=A0 runtime=A0 0.440s=A0 ...
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
 
-I am still not convinced that this one is really necessary. copy_max_bytes_hw !=
-0 indicates that the devices supports copy offload. And setting copy_max_bytes
-to 0 can be used to disable copy offload (which probably should be the default
-for now).
+Hi Chaitanya,
 
-> +
-> +
-> +What:		/sys/block/<disk>/queue/copy_max_bytes
-> +Date:		June 2023
-> +Contact:	linux-block@vger.kernel.org
-> +Description:
-> +		[RW] This is the maximum number of bytes that the block layer
-> +		will allow for a copy request. This will is always smaller or
+These messages indicate that _have_kernel_config_file cannot find both
+/proc/config.gz and /boot/config-6.4.0linux-01691-g98be618ad030. Are these
+available in your test environment?
 
-will is -> is
-
-> +		equal to the maximum size allowed by the hardware, indicated by
-> +		'copy_max_bytes_hw'. An attempt to set a value higher than
-> +		'copy_max_bytes_hw' will truncate this to 'copy_max_bytes_hw'.
-> +
-> +
-> +What:		/sys/block/<disk>/queue/copy_max_bytes_hw
-
-Nit: In keeping with the spirit of attributes like
-max_hw_sectors_kb/max_sectors_kb, I would call this one copy_max_hw_bytes.
-
-> +Date:		June 2023
-> +Contact:	linux-block@vger.kernel.org
-> +Description:
-> +		[RO] This is the maximum number of bytes that the hardware
-> +		will allow for single data copy request.
-> +		A value of 0 means that the device does not support
-> +		copy offload.
-> +
-> +
->  What:		/sys/block/<disk>/queue/crypto/
->  Date:		February 2022
->  Contact:	linux-block@vger.kernel.org
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 4dd59059b788..738cd3f21259 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -59,6 +59,8 @@ void blk_set_default_limits(struct queue_limits *lim)
->  	lim->zoned = BLK_ZONED_NONE;
->  	lim->zone_write_granularity = 0;
->  	lim->dma_alignment = 511;
-> +	lim->max_copy_sectors_hw = 0;
-> +	lim->max_copy_sectors = 0;
->  }
->  
->  /**
-> @@ -82,6 +84,8 @@ void blk_set_stacking_limits(struct queue_limits *lim)
->  	lim->max_dev_sectors = UINT_MAX;
->  	lim->max_write_zeroes_sectors = UINT_MAX;
->  	lim->max_zone_append_sectors = UINT_MAX;
-> +	lim->max_copy_sectors_hw = UINT_MAX;
-> +	lim->max_copy_sectors = UINT_MAX;
->  }
->  EXPORT_SYMBOL(blk_set_stacking_limits);
->  
-> @@ -183,6 +187,22 @@ void blk_queue_max_discard_sectors(struct request_queue *q,
->  }
->  EXPORT_SYMBOL(blk_queue_max_discard_sectors);
->  
-> +/**
-> + * blk_queue_max_copy_sectors_hw - set max sectors for a single copy payload
-> + * @q:  the request queue for the device
-> + * @max_copy_sectors: maximum number of sectors to copy
-> + **/
-> +void blk_queue_max_copy_sectors_hw(struct request_queue *q,
-> +		unsigned int max_copy_sectors)
-> +{
-> +	if (max_copy_sectors > (COPY_MAX_BYTES >> SECTOR_SHIFT))
-> +		max_copy_sectors = COPY_MAX_BYTES >> SECTOR_SHIFT;
-> +
-> +	q->limits.max_copy_sectors_hw = max_copy_sectors;
-> +	q->limits.max_copy_sectors = max_copy_sectors;
-> +}
-> +EXPORT_SYMBOL_GPL(blk_queue_max_copy_sectors_hw);
-> +
->  /**
->   * blk_queue_max_secure_erase_sectors - set max sectors for a secure erase
->   * @q:  the request queue for the device
-> @@ -578,6 +598,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  	t->max_segment_size = min_not_zero(t->max_segment_size,
->  					   b->max_segment_size);
->  
-> +	t->max_copy_sectors = min(t->max_copy_sectors, b->max_copy_sectors);
-> +	t->max_copy_sectors_hw = min(t->max_copy_sectors_hw,
-> +						b->max_copy_sectors_hw);
-> +
->  	t->misaligned |= b->misaligned;
->  
->  	alignment = queue_limit_alignment_offset(b, start);
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index afc797fb0dfc..43551778d035 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -199,6 +199,62 @@ static ssize_t queue_discard_zeroes_data_show(struct request_queue *q, char *pag
->  	return queue_var_show(0, page);
->  }
->  
-> +static ssize_t queue_copy_offload_show(struct request_queue *q, char *page)
-> +{
-> +	return queue_var_show(blk_queue_copy(q), page);
-> +}
-> +
-> +static ssize_t queue_copy_offload_store(struct request_queue *q,
-> +				       const char *page, size_t count)
-> +{
-> +	unsigned long copy_offload;
-> +	ssize_t ret = queue_var_store(&copy_offload, page, count);
-> +
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (copy_offload && !q->limits.max_copy_sectors_hw)
-> +		return -EINVAL;
-> +
-> +	if (copy_offload)
-> +		blk_queue_flag_set(QUEUE_FLAG_COPY, q);
-> +	else
-> +		blk_queue_flag_clear(QUEUE_FLAG_COPY, q);
-> +
-> +	return count;
-> +}
-
-See above. I think we can drop this attribute.
-
-> +
-> +static ssize_t queue_copy_max_hw_show(struct request_queue *q, char *page)
-> +{
-> +	return sprintf(page, "%llu\n", (unsigned long long)
-> +			q->limits.max_copy_sectors_hw << SECTOR_SHIFT);
-> +}
-> +
-> +static ssize_t queue_copy_max_show(struct request_queue *q, char *page)
-> +{
-> +	return sprintf(page, "%llu\n", (unsigned long long)
-> +			q->limits.max_copy_sectors << SECTOR_SHIFT);
-> +}
-> +
-> +static ssize_t queue_copy_max_store(struct request_queue *q,
-> +				       const char *page, size_t count)
-> +{
-> +	unsigned long max_copy;
-> +	ssize_t ret = queue_var_store(&max_copy, page, count);
-> +
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (max_copy & (queue_logical_block_size(q) - 1))
-> +		return -EINVAL;
-> +
-> +	max_copy >>= SECTOR_SHIFT;
-> +	q->limits.max_copy_sectors = min_t(unsigned int, max_copy,
-> +					q->limits.max_copy_sectors_hw);
-> +
-> +	return count;
-> +}
-> +
->  static ssize_t queue_write_same_max_show(struct request_queue *q, char *page)
->  {
->  	return queue_var_show(0, page);
-> @@ -522,6 +578,10 @@ QUEUE_RO_ENTRY(queue_nr_zones, "nr_zones");
->  QUEUE_RO_ENTRY(queue_max_open_zones, "max_open_zones");
->  QUEUE_RO_ENTRY(queue_max_active_zones, "max_active_zones");
->  
-> +QUEUE_RW_ENTRY(queue_copy_offload, "copy_offload");
-> +QUEUE_RO_ENTRY(queue_copy_max_hw, "copy_max_bytes_hw");
-> +QUEUE_RW_ENTRY(queue_copy_max, "copy_max_bytes");
-> +
->  QUEUE_RW_ENTRY(queue_nomerges, "nomerges");
->  QUEUE_RW_ENTRY(queue_rq_affinity, "rq_affinity");
->  QUEUE_RW_ENTRY(queue_poll, "io_poll");
-> @@ -638,6 +698,9 @@ static struct attribute *queue_attrs[] = {
->  	&queue_discard_max_entry.attr,
->  	&queue_discard_max_hw_entry.attr,
->  	&queue_discard_zeroes_data_entry.attr,
-> +	&queue_copy_offload_entry.attr,
-> +	&queue_copy_max_hw_entry.attr,
-> +	&queue_copy_max_entry.attr,
->  	&queue_write_same_max_entry.attr,
->  	&queue_write_zeroes_max_entry.attr,
->  	&queue_zone_append_max_entry.attr,
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index ed44a997f629..6098665953e6 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -309,6 +309,9 @@ struct queue_limits {
->  	unsigned int		discard_alignment;
->  	unsigned int		zone_write_granularity;
->  
-> +	unsigned int		max_copy_sectors_hw;
-> +	unsigned int		max_copy_sectors;
-> +
->  	unsigned short		max_segments;
->  	unsigned short		max_integrity_segments;
->  	unsigned short		max_discard_segments;
-> @@ -554,6 +557,7 @@ struct request_queue {
->  #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
->  #define QUEUE_FLAG_SQ_SCHED     30	/* single queue style io dispatch */
->  #define QUEUE_FLAG_SKIP_TAGSET_QUIESCE	31 /* quiesce_tagset skip the queue*/
-> +#define QUEUE_FLAG_COPY		32	/* enable/disable device copy offload */
->  
->  #define QUEUE_FLAG_MQ_DEFAULT	((1UL << QUEUE_FLAG_IO_STAT) |		\
->  				 (1UL << QUEUE_FLAG_SAME_COMP) |	\
-> @@ -574,6 +578,7 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
->  	test_bit(QUEUE_FLAG_STABLE_WRITES, &(q)->queue_flags)
->  #define blk_queue_io_stat(q)	test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
->  #define blk_queue_add_random(q)	test_bit(QUEUE_FLAG_ADD_RANDOM, &(q)->queue_flags)
-> +#define blk_queue_copy(q)	test_bit(QUEUE_FLAG_COPY, &(q)->queue_flags)
->  #define blk_queue_zone_resetall(q)	\
->  	test_bit(QUEUE_FLAG_ZONE_RESETALL, &(q)->queue_flags)
->  #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
-> @@ -891,6 +896,8 @@ extern void blk_queue_chunk_sectors(struct request_queue *, unsigned int);
->  extern void blk_queue_max_segments(struct request_queue *, unsigned short);
->  extern void blk_queue_max_discard_segments(struct request_queue *,
->  		unsigned short);
-> +extern void blk_queue_max_copy_sectors_hw(struct request_queue *q,
-> +		unsigned int max_copy_sectors);
->  void blk_queue_max_secure_erase_sectors(struct request_queue *q,
->  		unsigned int max_sectors);
->  extern void blk_queue_max_segment_size(struct request_queue *, unsigned int);
-> @@ -1210,6 +1217,11 @@ static inline unsigned int bdev_discard_granularity(struct block_device *bdev)
->  	return bdev_get_queue(bdev)->limits.discard_granularity;
->  }
->  
-> +static inline unsigned int bdev_max_copy_sectors(struct block_device *bdev)
-> +{
-> +	return bdev_get_queue(bdev)->limits.max_copy_sectors;
-> +}
-> +
->  static inline unsigned int
->  bdev_max_secure_erase_sectors(struct block_device *bdev)
->  {
-> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-> index b7b56871029c..dff56813f95a 100644
-> --- a/include/uapi/linux/fs.h
-> +++ b/include/uapi/linux/fs.h
-> @@ -64,6 +64,9 @@ struct fstrim_range {
->  	__u64 minlen;
->  };
->  
-> +/* maximum copy offload length, this is set to 128MB based on current testing */
-> +#define COPY_MAX_BYTES	(1 << 27)
-> +
->  /* extent-same (dedupe) ioctls; these MUST match the btrfs ioctl definitions */
->  #define FILE_DEDUPE_RANGE_SAME		0
->  #define FILE_DEDUPE_RANGE_DIFFERS	1
-
--- 
-Damien Le Moal
-Western Digital Research
-
+> nvme/042 (Test dhchap key types for authenticated connections) [not run]
+>  =A0=A0=A0 runtime=A0 2.712s=A0 ...
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/043 (Test hash and DH group variations for authenticated=20
+> connections) [not run]
+>  =A0=A0=A0 runtime=A0 0.731s=A0 ...
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/044 (Test bi-directional authentication)=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 [not run]
+>  =A0=A0=A0 runtime=A0 1.240s=A0 ...
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+> nvme/045 (Test re-authentication)=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 [not run]
+>  =A0=A0=A0 runtime=A0 3.630s=A0 ...
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+>  =A0=A0=A0 kernel 6.4.0linux-01691-g98be618ad030 config not found
+> common/rc: line 212: 0inux: value too great for base (error token is=20
+> "0inux")
+>=20
+> I thoughts it might be useful to share this ...
+>=20
+> -ck
+>=20
+> =
