@@ -2,90 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC353EB64DC
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 320D7EB64DD
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:59:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235946AbjF1I7V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 04:59:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23325 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234639AbjF1IRJ (ORCPT
+        id S235950AbjF1I7W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 04:59:22 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:21526 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233727AbjF1Icd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 04:17:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687940178;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jOlL3RSz6r/FHa/kJAy/uiAgUQG7pSYnjQgfd6RA4Bg=;
-        b=d2WA5dkkLiEl13IgOJqZ8doRfSRuUMIXx/qxmlPvvHIl+sg7gWUd0lWxRemmTT3X2OGnKz
-        lTR84IUFD/BDiyRJAg0HK0ed+eoIxQV9/2Sa3N0yAM7j2QfNYsc7YB2XSAnWG4ZIwhGp7x
-        SUkUzWwDGi/bC+ngxeLZtwZsLwmYcGI=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-452-38d-dcYzO1uUemG6mEuVCA-1; Wed, 28 Jun 2023 03:15:54 -0400
-X-MC-Unique: 38d-dcYzO1uUemG6mEuVCA-1
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-39ca3e1728fso4954988b6e.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 00:15:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687936554; x=1690528554;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jOlL3RSz6r/FHa/kJAy/uiAgUQG7pSYnjQgfd6RA4Bg=;
-        b=BDAYdJJC1y2nGr54T42Hou+7nJL/yKVmO38hoZ/KFQade+04MfkMnZkAhEyi2u6Ai4
-         aAiyjsbhVuyxIrz16o/G4KaDcrPL9A0391/UyzNoitWVS8p/6I+z8nctGD/TaKKn4fnS
-         iP7OZXlUYoYPSvPZualcnHGFB2k6E5kOD5gDUpnLm/OCpHER9VN3HhtFJ4JZB9tYzsy1
-         jZ/pGP6tUFfkzc+tttJFrlSPpq6/5h87nIA/lPYeYSoJMUx7oydRG4Hg0ScCkVxJM0Am
-         HrNOwcN8GQGRLO3cpUU8C5s5rtS8nW2KPwvJJKbQJLpzPit06mLoMjzUZARjzsMTPuLB
-         t+2Q==
-X-Gm-Message-State: AC+VfDxkP3HiYo0e+v83gkbZHhdPytX83vsFlg2RCA3alkpr5gmDXG8Z
-        B5oTihHgM8hWdE3/G/VTNRtBr0vP9jCeL7m5QhwQMUlGRsqzUGHSQeGiqJkZuaJ/Bqu82jvOUI3
-        p2F5QvfATeIsfYUQkAc8bGj5+LcyOsshwJ/ao7io=
-X-Received: by 2002:a05:6808:178b:b0:3a1:efe6:13c5 with SMTP id bg11-20020a056808178b00b003a1efe613c5mr6372687oib.44.1687936554185;
-        Wed, 28 Jun 2023 00:15:54 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5b1JKXXZr/fxyH6D05v9L+c5/fBm1hVIv8gr4cANfz7s7CdBBTWYKitE4TTX3WfkZ9rc5AiDdkfY6U8UjM1e0=
-X-Received: by 2002:a05:6808:178b:b0:3a1:efe6:13c5 with SMTP id
- bg11-20020a056808178b00b003a1efe613c5mr6372679oib.44.1687936553951; Wed, 28
- Jun 2023 00:15:53 -0700 (PDT)
+        Wed, 28 Jun 2023 04:32:33 -0400
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230628060406epoutp047a3fdee664f3d79856d3456dc254c540~svW9464p62281322813epoutp04b
+        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 06:04:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230628060406epoutp047a3fdee664f3d79856d3456dc254c540~svW9464p62281322813epoutp04b
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1687932246;
+        bh=1J0GA8jA4OUCQy/o7Wr1UV/l6aUJqp3vp4GqzSVMq34=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=gHWPpnzdNaowUfBnb8O12Ax06bsrdSv5UTqpOu/v2/Eipj3ml94JDfujC7cyMrDsH
+         QWU1OY1rDWBwDxMFGP3578ovVOn6E0FIHhzSSTODN3+P2+nBIrgIkmMzuX8hWC+54B
+         m2TBewcIXGc5mKgqZkPmP0UrM6viTufHceFwgTQw=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20230628060406epcas5p1b07b2ffdedda603499d565a0c801a436~svW9hDb5i0452904529epcas5p1Q;
+        Wed, 28 Jun 2023 06:04:06 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.174]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4QrWHS5QZBz4x9Q0; Wed, 28 Jun
+        2023 06:04:04 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        93.51.06099.45DCB946; Wed, 28 Jun 2023 15:04:04 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20230628051122epcas5p45d70f2c36ce91b60863f702de1534321~suo63XkqC1272712727epcas5p4X;
+        Wed, 28 Jun 2023 05:11:22 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230628051122epsmtrp104a14031214eb43558622326ce5397d0~suo62c5y60727707277epsmtrp1R;
+        Wed, 28 Jun 2023 05:11:22 +0000 (GMT)
+X-AuditID: b6c32a4b-cafff700000017d3-e4-649bcd5436b4
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        6A.AE.34491.AF0CB946; Wed, 28 Jun 2023 14:11:22 +0900 (KST)
+Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230628051120epsmtip2557b4491a4e53bf72b782da715fa63f3~suo5chpNN2817628176epsmtip2r;
+        Wed, 28 Jun 2023 05:11:20 +0000 (GMT)
+From:   Min Li <min15.li@samsung.com>
+To:     axboe@kernel.dk, willy@infradead.org, hch@lst.de,
+        dlemoal@kernel.org, gregkh@linuxfoundation.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@kernel.org, Min Li <min15.li@samsung.com>
+Subject: [PATCH v3] block: add check that partition length needs to be
+ aligned with block size
+Date:   Wed, 28 Jun 2023 13:09:41 +0000
+Message-Id: <20230628130941.10690-1-min15.li@samsung.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <CAHj4cs_qUWzetD0203EKbBLNv3KF=qgTLsWLeHN3PY7UE6mzmw@mail.gmail.com>
- <4b8c1d77-b434-5970-fb1f-8a4059966095@grimberg.me> <8a15d10e-f94b-54b7-b080-1887d9c0bdac@nvidia.com>
- <0c4b16a5-17da-02d9-754a-3c7a158daa56@nvidia.com> <CAHj4cs9ayQ8J+wDCWVKjmBTWTi7Bc3uqqTCDzL2ZY6JhpdDhsQ@mail.gmail.com>
- <1fda4154-50f4-c09d-dbb1-3b53ed63d341@nvidia.com> <CAHj4cs_+yBbs+MgrC8Z8J7X8cKYwwr6wcR5tLfUCcYkftL7N1Q@mail.gmail.com>
- <52df24f1-ebb7-cd24-3aaf-7b946acab3ee@grimberg.me>
-In-Reply-To: <52df24f1-ebb7-cd24-3aaf-7b946acab3ee@grimberg.me>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Wed, 28 Jun 2023 15:15:41 +0800
-Message-ID: <CAHj4cs9=8fPRtXj4uyjN9MV1OMNNXwcVGte7CDnFxXYYbnnX0A@mail.gmail.com>
-Subject: Re: [bug report] most of blktests nvme/ failed on the latest linux tree
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrMJsWRmVeSWpSXmKPExsWy7bCmum7I2dkpBhc3qVmsvtvPZvFgv71F
+        8+L1bBY3jr9jtpj7+hKLxcrVR5ks9t7Stri8aw6bxfJVHUwWZyd8YLX4dP4Cm8XvH0CxG+uu
+        sjjwemxeoeVx+Wypx6ZVnWwe++euYffYfbOBzaNvyypGj8+b5ALYo7JtMlITU1KLFFLzkvNT
+        MvPSbZW8g+Od403NDAx1DS0tzJUU8hJzU22VXHwCdN0yc4BOVVIoS8wpBQoFJBYXK+nb2RTl
+        l5akKmTkF5fYKqUWpOQUmBToFSfmFpfmpevlpZZYGRoYGJkCFSZkZ2y+MY2x4KxgxZ89m9gb
+        GGfwdTFyckgImEgcODOfrYuRi0NIYDejxOU/a1hBEkICnxglug+KQyS+MUosfHmUHabj7LbV
+        jBBFexkltl43gyh6ziixZMZloAQHB5uAssS2pT4gNSICaRJLO36ygdjMAoUSP751MIPYwgIJ
+        EvNfbWQCsVkEVCU6z3WCLeYVsJRYu/MoM8QueYn9B88yQ8QFJU7OfMICMUdeonnrbKiaRg6J
+        viMSELaLxMT//6DiwhKvjm+BullK4mV/GzvIaRICxRIvf4RBhGskdn+7zQRhW0tsW7+OCaSE
+        WUBTYv0ufYiwrMTUU+uYILbySfT+fgJVziuxYx6MrSTx98I5RghbQmLx/oesELaHxLl/d1kg
+        IRUrMbXnIMsERvlZSJ6ZheSZWQibFzAyr2KUTC0ozk1PLTYtMM5LLYdHanJ+7iZGcGrV8t7B
+        +OjBB71DjEwcjIcYJTiYlUR4xX5MTxHiTUmsrEotyo8vKs1JLT7EaAoM4YnMUqLJ+cDknlcS
+        b2hiaWBiZmZmYmlsZqgkznvxem+KkEB6YklqdmpqQWoRTB8TB6dUA5O+ceETtv2bi3Q1ZSd1
+        nnqz/LHp5M1HNx/KUfm58DnzusuR5y7+eDRFbcmCv7x2/v/vB/979POH06amS99udCz+b85o
+        9jPk0Irz+yV+tPG/fTHF8d2VO3HCsjW7OGc4uqo2vJzddcj/wi+2+d5f6jJXvVvxwPFb3svw
+        U3NsTQ5lp1RMl/3f4XG7IUWA2ezewz9/DK9P+yn6PmbXbPUd/zUXCik8Tn8fWjdJ+D3L65j+
+        j6vvlzkYRlvETHh4tKX+5fLJ7qlMrFMbDu22P7N78hxWDZMSl48a8k7MJ/9armJl6hTLky6O
+        cpBTj7612mmVnoJz11GLNQd+6U+W9L11Kv9cyO/8K8u/zpW4lvxZ2vkYsxJLcUaioRZzUXEi
+        ANGY6Uw2BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrILMWRmVeSWpSXmKPExsWy7bCSvO6vA7NTDFbvFrFYfbefzeLBfnuL
+        5sXr2SxuHH/HbDH39SUWi5WrjzJZ7L2lbXF51xw2i+WrOpgszk74wGrx6fwFNovfP4BiN9Zd
+        ZXHg9di8Qsvj8tlSj02rOtk89s9dw+6x+2YDm0ffllWMHp83yQWwR3HZpKTmZJalFunbJXBl
+        bL4xjbHgrGDFnz2b2BsYZ/B1MXJySAiYSJzdtpqxi5GLQ0hgN6PEtK5djBAJCYnz836xQdjC
+        Eiv/PWeHKHrKKNF8+D6Qw8HBJqAssW2pD4gpIpAjseK7P0g5s0CpxNbbTewgtrBAHFB4KguI
+        zSKgKtF5rpMVxOYVsJRYu/MoM8R4eYn9B88yQ8QFJU7OfMICMUdeonnrbOYJjHyzkKRmIUkt
+        YGRaxSiZWlCcm55bbFhgmJdarlecmFtcmpeul5yfu4kRHOpamjsYt6/6oHeIkYmD8RCjBAez
+        kgiv2I/pKUK8KYmVValF+fFFpTmpxYcYpTlYlMR5xV/0pggJpCeWpGanphakFsFkmTg4pRqY
+        cl3/3Zhi0nH7hdtxju23HwkdeJ4Ua/ttyrTMnNbny9imbr8nIyP7ZvF2yYlppnemV85TDeOU
+        kNgUs/XX67WBfVn2HDMk95/Z1GpyRVXmDuPFQLkgnXU3gj8vC/56+inXfv3j2/rvXJiZs1FX
+        acM02zO/s+wS/GZdlM60NhGvXcD/t7NbZHaGSOcnm1llYqybnFU3n8jl7473OuCjnv/1ettx
+        Xvu2vcoWXNIpQZmfF+y4/nR2wH61jlUNhp0/yqqX2q1nEQ1ZfXlX1w/esNVNfMvW9hqZCYRe
+        3d599T+/jrGHip3I/7zjx2qNzHITn109dn7itBJF189me7e8flV9okVT8E/kwn2vTZ8+9Ptg
+        rcRSnJFoqMVcVJwIAFGzsWPkAgAA
+X-CMS-MailID: 20230628051122epcas5p45d70f2c36ce91b60863f702de1534321
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230628051122epcas5p45d70f2c36ce91b60863f702de1534321
+References: <CGME20230628051122epcas5p45d70f2c36ce91b60863f702de1534321@epcas5p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 2:47=E2=80=AFPM Sagi Grimberg <sagi@grimberg.me> wr=
-ote:
->
-> Yi,
->
-> Do you have hostnqn and hostid files in your /etc/nvme directory?
->
+Before calling add partition or resize partition, there is no check
+on whether the length is aligned with the logical block size.
+If the logical block size of the disk is larger than 512 bytes,
+then the partition size maybe not the multiple of the logical block size,
+and when the last sector is read, bio_truncate() will adjust the bio size,
+resulting in an IO error if the size of the read command is smaller than
+the logical block size.If integrity data is supported, this will also
+result in a null pointer dereference when calling bio_integrity_free.
 
-No, only one discovery.conf there.
+Signed-off-by: Min Li <min15.li@samsung.com>
 
-# ls /etc/nvme/
-discovery.conf
+---
+Changes from v1:
 
---=20
-Best Regards,
-  Yi Zhang
+- Add a space after /* and before */.
+- Move length alignment check before the "start = p.start >> SECTOR_SHIFT"
+- Move check for p.start being aligned together with this length alignment check.
+
+Changes from v2:
+
+- Add the assignment on the first line and merge the two lines into one.
+- Use IS_ALIGNED function to check alignment.
+---
+ block/ioctl.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 3be11941fb2d..1a351132bf4e 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -16,9 +16,9 @@
+ static int blkpg_do_ioctl(struct block_device *bdev,
+ 			  struct blkpg_partition __user *upart, int op)
+ {
++	long long blksz = bdev_logical_block_size(bdev), start, length;
+ 	struct gendisk *disk = bdev->bd_disk;
+ 	struct blkpg_partition p;
+-	long long start, length;
+ 
+ 	if (!capable(CAP_SYS_ADMIN))
+ 		return -EACCES;
+@@ -33,14 +33,15 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+ 	if (op == BLKPG_DEL_PARTITION)
+ 		return bdev_del_partition(disk, p.pno);
+ 
++	/* Check that the partition is aligned to the block size */
++	if (!IS_ALIGNED(p.start | p.length, blksz))
++		return -EINVAL;
++
+ 	start = p.start >> SECTOR_SHIFT;
+ 	length = p.length >> SECTOR_SHIFT;
+ 
+ 	switch (op) {
+ 	case BLKPG_ADD_PARTITION:
+-		/* check if partition is aligned to blocksize */
+-		if (p.start & (bdev_logical_block_size(bdev) - 1))
+-			return -EINVAL;
+ 		return bdev_add_partition(disk, p.pno, start, length);
+ 	case BLKPG_RESIZE_PARTITION:
+ 		return bdev_resize_partition(disk, p.pno, start, length);
+-- 
+2.34.1
 
