@@ -2,221 +2,300 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDF2EB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 19:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB53AEB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 21:10:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbjF1TK4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 15:10:56 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:59678 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjF1TKy (ORCPT
+        id S231204AbjF1VKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 17:10:04 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:39530 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232381AbjF1VJw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 15:10:54 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E56BD21861;
-        Wed, 28 Jun 2023 19:10:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1687979452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=y163GLXlIY7qQsdU/MbbES2r1FokRyWxT2xQc4IuSco=;
-        b=17CHUniKf0kpKinjDite2jRJXssHfqK40e1/swrE7qF5cXCkgD2qvey1hwhZU8oG00/s0/
-        uyLuQgxHC/ZJ7AD0LS7wn6ws8zEfb4d2MXD89ZLYY0sOLqvdpaySzF2DjU2Zww9LQ+8KtF
-        GmviuAoMpLFTGt0XuYt/dGdbNIU2p+k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1687979452;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=y163GLXlIY7qQsdU/MbbES2r1FokRyWxT2xQc4IuSco=;
-        b=IGpxo9K3rNcAG0ewnJPK+dXjMJIukTj3HK8YG5HtQCL5GCwttnChcPm7gjQoiYCDkZfZpV
-        ixTbk3vzz2h4oNDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D6DF0138EF;
-        Wed, 28 Jun 2023 19:10:52 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id /hEmNLyFnGRzIQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 28 Jun 2023 19:10:52 +0000
-Date:   Wed, 28 Jun 2023 21:10:52 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>
-Subject: Re: [PATCH blktests v2 2/3] nvme/rc: Avoid triggering host nvme-cli
- autoconnect
-Message-ID: <edoiq74rpu6qejs6m3dsvtp73ypjixafp6dsncg7kga7n4uwdr@xc7mgaerwqbk>
-References: <20230628151623.11340-1-dwagner@suse.de>
- <20230628151623.11340-3-dwagner@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628151623.11340-3-dwagner@suse.de>
+        Wed, 28 Jun 2023 17:09:52 -0400
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 9FB0920ABD7E; Wed, 28 Jun 2023 14:09:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9FB0920ABD7E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1687986588;
+        bh=jDAVZfGLcA9i+psEagTOByxNSvZxyShuJvujQY6FoMI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VC/bIisuUI9qsXSEaK7wMsFQ446RGYJ/RPT7yPmV3gwIPTNbYzjRS7hUrbMFUB7P7
+         7/pwtTz7Xzq67eMdPup8vgxmoIuIUR2CXjxaM/8mR/5cdFQq/jZsKv0IjB9gFYFPp4
+         JchWZ70ACL44ssy7f2BgeyXpjp59yJcKf7V+Crrs=
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com
+Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Fan Wu <wufan@linux.microsoft.com>
+Subject: [RFC PATCH v10 11/17] dm-verity: consume root hash digest and signature data via LSM hook
+Date:   Wed, 28 Jun 2023 14:09:25 -0700
+Message-Id: <1687986571-16823-12-git-send-email-wufan@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
+References: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 05:16:22PM +0200, Daniel Wagner wrote:
-> When the host has enabled the udev/systemd autoconnect services for the
-> fc transport it interacts with blktests and make tests break.
-> 
-> nvme-cli learned to ignore connects attemps when using the --context
-> command line option paired with a volatile configuration. Thus we can
-> mark all the resources created by blktests and avoid any interaction
-> with the systemd autoconnect scripts.
-> 
-> Only enabled this for the fc transport.
-> 
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> ---
->  tests/nvme/rc | 81 ++++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 71 insertions(+), 10 deletions(-)
-> 
-> diff --git a/tests/nvme/rc b/tests/nvme/rc
-> index 191f3e2e0c43..06d98f46b471 100644
-> --- a/tests/nvme/rc
-> +++ b/tests/nvme/rc
-> @@ -14,8 +14,8 @@ def_remote_wwnn="0x10001100aa000001"
->  def_remote_wwpn="0x20001100aa000001"
->  def_local_wwnn="0x10001100aa000002"
->  def_local_wwpn="0x20001100aa000002"
-> -def_hostnqn="$(cat /etc/nvme/hostnqn 2> /dev/null)"
-> -def_hostid="$(cat /etc/nvme/hostid 2> /dev/null)"
-> +def_hostnqn="nqn.2014-08.org.nvmexpress:uuid:242d4a24-2484-4a80-8234-d0169409c5e8"
-> +def_hostid="242d4a24-2484-4a80-8234-d0169409c5e8"
->  nvme_trtype=${nvme_trtype:-"loop"}
->  nvme_img_size=${nvme_img_size:-"1G"}
->  nvme_num_iter=${nvme_num_iter:-"1000"}
-> @@ -161,6 +161,57 @@ _nvme_calc_rand_io_size() {
->  	echo "${io_size_kb}k"
->  }
->  
-> +_have_nvme_cli_context() {
-> +	# ignore all non-fc transports
-> +	if [[ "${nvme_trtype}" == "fc" ]] ||
+From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-This should be !=, forgot to merge a fixup to this patch.
+dm-verity provides a strong guarantee of a block device's integrity. As
+a generic way to check the integrity of a block device, it provides
+those integrity guarantees to its higher layers, including the filesystem
+level.
 
-> +	   ! nvme connect --help 2>&1 | grep -q -- '--context=<STR>' > /dev/null; then
-> +		    return 1
-> +	fi
-> +	return 0
-> +}
-> +
-> +_setup_nvme_cli() {
-> +	local local_wwnn="${1}"
-> +	local local_wwpn="${2}"
-> +	local remote_wwnn="${3}"
-> +	local remote_wwpn="${4}"
-> +
-> +	if ! _have_nvme_cli_context; then
-> +		return
-> +	fi
-> +
-> +	mkdir -p /run/nvme
-> +	cat >> /run/nvme/blktests.json <<-EOF
-> +	[
-> +	  {
-> +	    "hostnqn": "${def_hostnqn}",
-> +	    "hostid": "${def_hostid}",
-> +	    "subsystems": [
-> +	      {
-> +	        "application": "blktests",
-> +	        "nqn": "blktests-subsystem-1",
-> +	        "ports": [
-> +	          {
-> +	            "transport": "fc",
-> +	            "traddr": "nn-${remote_wwnn}:pn-${remote_wwpn}",
-> +	            "host_traddr": "nn-${local_wwnn}:pn-${local_wwpn}"
-> +	          }
-> +	        ]
-> +	      }
-> +	    ]
-> +	  }
-> +	]
-> +	EOF
-> +}
-> +
-> +_cleanup_nvme_cli() {
-> +	if ! _have_nvme_cli_context; then
-> +		return
-> +	fi
-> +
-> +	rm -f /run/nvme/blktests.json
-> +}
-> +
->  _nvme_fcloop_add_rport() {
->  	local local_wwnn="$1"
->  	local local_wwpn="$2"
-> @@ -193,6 +244,9 @@ _setup_fcloop() {
->  	local remote_wwnn="${3:-$def_remote_wwnn}"
->  	local remote_wwpn="${4:-$def_remote_wwpn}"
->  
-> +	_setup_nvme_cli "${local_wwnn}" "${local_wwpn}" \
-> +			"${remote_wwnn}" "${remote_wwpn}"
-> +
->  	_nvme_fcloop_add_tport "${remote_wwnn}" "${remote_wwpn}"
->  	_nvme_fcloop_add_lport "${local_wwnn}" "${local_wwpn}"
->  	_nvme_fcloop_add_rport "${local_wwnn}" "${local_wwpn}" \
-> @@ -235,6 +289,8 @@ _cleanup_fcloop() {
->  	_nvme_fcloop_del_lport "${local_wwnn}" "${local_wwpn}"
->  	_nvme_fcloop_del_rport "${local_wwnn}" "${local_wwpn}" \
->  			       "${remote_wwnn}" "${remote_wwpn}"
-> +
-> +	_cleanup_nvme_cli
->  }
->  
->  _cleanup_nvmet() {
-> @@ -436,18 +492,18 @@ _nvme_connect_subsys() {
->  	trtype="$1"
->  	subsysnqn="$2"
->  
-> -	ARGS=(-t "${trtype}" -n "${subsysnqn}")
-> +	ARGS=(-t "${trtype}"
-> +	      -n "${subsysnqn}"
-> +	      --hostnqn="${hostnqn}"
-> +	      --hostid="${hostid}")
-> +	if _have_nvme_cli_context; then
-> +		ARGS+=(--context="blktests")
-> +	fi
->  	if [[ "${trtype}" == "fc" ]] ; then
->  		ARGS+=(-a "${traddr}" -w "${host_traddr}")
->  	elif [[ "${trtype}" != "loop" ]]; then
->  		ARGS+=(-a "${traddr}" -s "${trsvcid}")
->  	fi
-> -	if [[ "${hostnqn}" != "$def_hostnqn" ]]; then
-> -		ARGS+=(--hostnqn="${hostnqn}")
-> -	fi
-> -	if [[ "${hostid}" != "$def_hostid" ]]; then
-> -		ARGS+=(--hostid="${hostid}")
-> -	fi
->  	if [[ -n "${hostkey}" ]]; then
->  		ARGS+=(--dhchap-secret="${hostkey}")
->  	fi
-> @@ -482,7 +538,12 @@ _nvme_discover() {
->  	local host_traddr="${3:-$def_host_traddr}"
->  	local trsvcid="${3:-$def_trsvcid}"
->  
-> -	ARGS=(-t "${trtype}")
-> +	ARGS=(-t "${trtype}"
-> +	      --hostnqn="${def_hostnqn}"
-> +	      --hostid="${def_hostid}")
-> +	if _have_nvme_cli_context; then
-> +		ARGS+=(--context="blktests")
-> +	fi
->  	if [[ "${trtype}" = "fc" ]]; then
->  		ARGS+=(-a "${traddr}" -w "${host_traddr}")
->  	elif [[ "${trtype}" != "loop" ]]; then
-> -- 
-> 2.41.0
-> 
+An LSM that control access to a resource on the system based on the
+available integrity claims can use this transitive property of
+dm-verity, by querying the underlying block_device of a particular
+file.
+
+The digest and signature information need to be stored in the block
+device to fulfill the next requirement of authorization via LSM policy.
+This will enable the LSM to perform revocation of devices that are still
+mounted, prohibiting execution of files that are no longer authorized
+by the LSM in question.
+
+This patch added two security hook calls in dm-verity to save the
+dm-verity roothash and the roothash signature to LSM blobs.
+
+Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+---
+v2:
+  + No Changes
+
+v3:
+  + No changes
+
+v4:
+  + No changes
+
+v5:
+  + No changes
+
+v6:
+  + Fix an improper cleanup that can result in
+    a leak
+
+v7:
+  + Squash patch 08/12, 10/12 to [11/16]
+  + Use part0 for block_device, to retrieve the block_device, when
+    calling security_bdev_setsecurity
+
+v8:
+  + Undo squash of 08/12, 10/12 - separating drivers/md/ from
+    security/ & block/
+  + Use common-audit function for dmverity_signature.
+  + Change implementation for storing the dm-verity digest to use the
+    newly introduced dm_verity_digest structure introduced in patch
+    14/20.
+  + Create new structure, dm_verity_digest, containing digest algorithm,
+    size, and digest itself to pass to the LSM layer. V7 was missing the
+    algorithm.
+  + Create an associated public header containing this new structure and
+    the key values for the LSM hook, specific to dm-verity.
+  + Additional information added to commit, discussing the layering of
+    the changes and how the information passed will be used.
+
+v9:
+  + No changes
+
+v10:
+  + No changes
+---
+ drivers/md/dm-verity-target.c     | 25 +++++++++++++++++++++++--
+ drivers/md/dm-verity-verify-sig.c | 16 +++++++++++++---
+ drivers/md/dm-verity-verify-sig.h | 10 ++++++----
+ include/linux/dm-verity.h         | 19 +++++++++++++++++++
+ 4 files changed, 61 insertions(+), 9 deletions(-)
+ create mode 100644 include/linux/dm-verity.h
+
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index 26adcfea0302..54d46b2f2723 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -13,6 +13,7 @@
+  * access behavior.
+  */
+ 
++#include "dm-core.h"
+ #include "dm-verity.h"
+ #include "dm-verity-fec.h"
+ #include "dm-verity-verify-sig.h"
+@@ -22,6 +23,9 @@
+ #include <linux/scatterlist.h>
+ #include <linux/string.h>
+ #include <linux/jump_label.h>
++#include <linux/security.h>
++#include <linux/dm-verity.h>
++#include <crypto/hash_info.h>
+ 
+ #define DM_MSG_PREFIX			"verity"
+ 
+@@ -1183,6 +1187,8 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	sector_t hash_position;
+ 	char dummy;
+ 	char *root_hash_digest_to_validate;
++	struct block_device *bdev;
++	struct dm_verity_digest root_digest;
+ 
+ 	v = kzalloc(sizeof(struct dm_verity), GFP_KERNEL);
+ 	if (!v) {
+@@ -1225,6 +1231,13 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	}
+ 	v->version = num;
+ 
++	bdev = dm_table_get_md(ti->table)->disk->part0;
++	if (!bdev) {
++		ti->error = "Mapped device lookup failed";
++		r = -ENOMEM;
++		goto bad;
++	}
++
+ 	r = dm_get_device(ti, argv[1], BLK_OPEN_READ, &v->data_dev);
+ 	if (r) {
+ 		ti->error = "Data device lookup failed";
+@@ -1357,7 +1370,7 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	}
+ 
+ 	/* Root hash signature is  a optional parameter*/
+-	r = verity_verify_root_hash(root_hash_digest_to_validate,
++	r = verity_verify_root_hash(bdev, root_hash_digest_to_validate,
+ 				    strlen(root_hash_digest_to_validate),
+ 				    verify_args.sig,
+ 				    verify_args.sig_size);
+@@ -1440,6 +1453,15 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	ti->per_io_data_size = roundup(ti->per_io_data_size,
+ 				       __alignof__(struct dm_verity_io));
+ 
++	root_digest.digest = v->root_digest;
++	root_digest.digest_len = v->digest_size;
++	root_digest.algo = v->alg_name;
++
++	r = security_bdev_setsecurity(bdev, DM_VERITY_ROOTHASH_SEC_NAME, &root_digest,
++				      sizeof(root_digest));
++	if (r)
++		goto bad;
++
+ 	verity_verify_sig_opts_cleanup(&verify_args);
+ 
+ 	dm_audit_log_ctr(DM_MSG_PREFIX, ti, 1);
+@@ -1447,7 +1469,6 @@ static int verity_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	return 0;
+ 
+ bad:
+-
+ 	verity_verify_sig_opts_cleanup(&verify_args);
+ 	dm_audit_log_ctr(DM_MSG_PREFIX, ti, 0);
+ 	verity_dtr(ti);
+diff --git a/drivers/md/dm-verity-verify-sig.c b/drivers/md/dm-verity-verify-sig.c
+index 4836508ea50c..33165dd7470f 100644
+--- a/drivers/md/dm-verity-verify-sig.c
++++ b/drivers/md/dm-verity-verify-sig.c
+@@ -9,6 +9,9 @@
+ #include <linux/verification.h>
+ #include <keys/user-type.h>
+ #include <linux/module.h>
++#include <linux/security.h>
++#include <linux/dm-verity.h>
++#include "dm-core.h"
+ #include "dm-verity.h"
+ #include "dm-verity-verify-sig.h"
+ 
+@@ -97,14 +100,17 @@ int verity_verify_sig_parse_opt_args(struct dm_arg_set *as,
+  * verify_verify_roothash - Verify the root hash of the verity hash device
+  *			     using builtin trusted keys.
+  *
++ * @bdev: block_device representing the device-mapper created block device.
++ *	  Used by the security hook, to set information about the block_device.
+  * @root_hash: For verity, the roothash/data to be verified.
+  * @root_hash_len: Size of the roothash/data to be verified.
+  * @sig_data: The trusted signature that verifies the roothash/data.
+  * @sig_len: Size of the signature.
+  *
+  */
+-int verity_verify_root_hash(const void *root_hash, size_t root_hash_len,
+-			    const void *sig_data, size_t sig_len)
++int verity_verify_root_hash(struct block_device *bdev, const void *root_hash,
++			    size_t root_hash_len, const void *sig_data,
++			    size_t sig_len)
+ {
+ 	int ret;
+ 
+@@ -126,8 +132,12 @@ int verity_verify_root_hash(const void *root_hash, size_t root_hash_len,
+ 				NULL,
+ #endif
+ 				VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
++	if (ret)
++		return ret;
+ 
+-	return ret;
++	return security_bdev_setsecurity(bdev,
++					 DM_VERITY_SIGNATURE_SEC_NAME,
++					 sig_data, sig_len);
+ }
+ 
+ void verity_verify_sig_opts_cleanup(struct dm_verity_sig_opts *sig_opts)
+diff --git a/drivers/md/dm-verity-verify-sig.h b/drivers/md/dm-verity-verify-sig.h
+index f36ea92127bf..5c6023fac97b 100644
+--- a/drivers/md/dm-verity-verify-sig.h
++++ b/drivers/md/dm-verity-verify-sig.h
+@@ -20,8 +20,9 @@ struct dm_verity_sig_opts {
+ 
+ #define DM_VERITY_ROOT_HASH_VERIFICATION_OPTS 2
+ 
+-int verity_verify_root_hash(const void *data, size_t data_len,
+-			    const void *sig_data, size_t sig_len);
++int verity_verify_root_hash(struct block_device *bdev, const void *data,
++			    size_t data_len, const void *sig_data,
++			    size_t sig_len);
+ bool verity_verify_is_sig_opt_arg(const char *arg_name);
+ 
+ int verity_verify_sig_parse_opt_args(struct dm_arg_set *as, struct dm_verity *v,
+@@ -34,8 +35,9 @@ void verity_verify_sig_opts_cleanup(struct dm_verity_sig_opts *sig_opts);
+ 
+ #define DM_VERITY_ROOT_HASH_VERIFICATION_OPTS 0
+ 
+-static inline int verity_verify_root_hash(const void *data, size_t data_len,
+-					  const void *sig_data, size_t sig_len)
++int verity_verify_root_hash(struct block_device *bdev, const void *data,
++			    size_t data_len, const void *sig_data,
++			    size_t sig_len)
+ {
+ 	return 0;
+ }
+diff --git a/include/linux/dm-verity.h b/include/linux/dm-verity.h
+new file mode 100644
+index 000000000000..bb0413d55d72
+--- /dev/null
++++ b/include/linux/dm-verity.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _LINUX_DM_VERITY_H
++#define _LINUX_DM_VERITY_H
++
++#include <linux/types.h>
++#include <crypto/hash_info.h>
++#include <linux/device-mapper.h>
++
++struct dm_verity_digest {
++	const char *algo;
++	const u8 *digest;
++	size_t digest_len;
++};
++
++#define DM_VERITY_SIGNATURE_SEC_NAME DM_NAME	".verity-signature"
++#define DM_VERITY_ROOTHASH_SEC_NAME  DM_NAME	".verity-roothash"
++
++#endif /* _LINUX_DM_VERITY_H */
+-- 
+2.25.1
+
