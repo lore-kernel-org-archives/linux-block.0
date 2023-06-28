@@ -2,71 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4BBEB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 10:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2C2EB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 11:01:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231817AbjF1KhF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 06:37:05 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:27042 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232578AbjF1KfC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 06:35:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1687948502; x=1719484502;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=ulRPa1xfTYGhDqhkh0aKNHIy+gxHgEYWyB2kmNIJ0pE=;
-  b=qXt4zPCl1f7sUtmadN1TYt8e/HKhfp6rQehNRLg2C88GIBG84vrzdjUq
-   1gelLuyAnlwuXy5SLFZXIBfljl7TpCI6bXp2YL6S4e7Q0DRFRThL+1UXO
-   SCU0qXVUJnG8HFSUYeR0CQZG07EIvtORb2dFI8N8oN2BFiBsaEc8eoDHi
-   1T/fYHsucbBHjFtfm+Mc8r+a/5c8948eIl7htbsd/MHrjanQPX0vdYAgA
-   MEHnUWx7+w5qnGfY4XzaC0Lli8GAEOSHxBCyI5h4U1CWmwamJCtQZoeW8
-   qMUkO+VK2lAiWyNMHpEMrD2ltIOl7G+jDCvJqNeLnn1oinB0YIFVF7YRS
-   w==;
-X-IronPort-AV: E=Sophos;i="6.01,165,1684771200"; 
-   d="scan'208";a="241413763"
-Received: from mail-bn1nam02lp2044.outbound.protection.outlook.com (HELO NAM02-BN1-obe.outbound.protection.outlook.com) ([104.47.51.44])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jun 2023 18:35:01 +0800
+        id S231355AbjF1LB3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 07:01:29 -0400
+Received: from mail-bn8nam04on2041.outbound.protection.outlook.com ([40.107.100.41]:5718
+        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231574AbjF1LBJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jun 2023 07:01:09 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PrFYVn45jK5Hn9TTSTLOv9KtuHMMsVbs49HaLzjkJEthir3WEovm2Hbdr5CV000LD80ZiAD6WZArEJ/QkT3bY5bdnfA5YKb7Zv5THz2boDNQtvclLcJ8HUYmKLKVoNhWr0jg/5WDkSUsf/V8F8HZ/QF1qbTFg14cgHNoFsI1EVs7vxsWxVPEdSkHTNGFCihs4X33xcKv/1F2zVWl8iPi/mDFvAnOdFyuypckgnDVahwpCEWimuFeYzbVCuqi0pWGiVzLF9dBnWXkHV+jgQXCNvmDQMBPUXqSs8KoTa4R9K8MHTnOyVdnCQ00WDITwvewUliNsVvutcMhGhFgx2HW6g==
+ b=XAYgd6gSBWlGaANioB0VCK5nDdPD/ERQd5egoHD4z4zh5jBplurYvbrDKJpJXhWp9Qrk2P0Kz2I8Qq1+N06aVXyJmj8nPMXUPMne89D/MDMmDreWx22ofyFJwdWU22THhu8GYyNOvGEf++UMisHFsiExGCJj3BbjOHwbjOcMPR+KaReybHX8xLa3TEXJkirFwzCOB/BGDPqS6AQLh3ehsVLYbBXrOJ/GT1rfePze+u/nubiYF+z1KRa5yugELpi1SymzgjSDReEAe79URO3iKLfepLyKUUOmiM/WgeJmlc22dimitpjZ4Nre8iuM8ZhiBQWmNuocl5JQQLKKOqDOQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EcbySAd9BUggS/0wTnCnEAiurervCXDIorZTRlN4eZ8=;
- b=E3hYH7GtDZrCLXEP+IEF+eamI7v4G3/nri91eTeI42ouMglZKQsDyQ3O6Dzb+7tBF+YpR4dD6sSPSlQkGVhspQ62/dVDaB1bsxz8Z9kXp2QP/3+duSmfCtnaDQMjj6i50bbDKr6+4Lk2YTVrSjUxyw5n9zWOlP7spgZRror7ztK3zvPvbLqN00eK2wYCIjKATTbp72Pl2QbCntT6/L43VH1I2IDqpcBp/RSCnPgebs9iCzXKK9UhkFd1pKApYxq3kBjUN+WcyZRgR0eUbvIv3BNKdXsi+8Jh9QpMM4r8+BU1LvWxyQuUIlWX0oY2EUIJYLvJNOhuHGrz7f0LClFb/w==
+ bh=AQa9iCiLe/BTJrXhZzHNwbm0sVgISblaJgqF/LVg008=;
+ b=TCfjCpyYtlo1TqKcSVvtn2UH5rDZIM/FYQ5ECKUDY2iZq/V/nTc5moBxzuzxa/wmo8crRhIvhvcQVb+j+2pyQQVX/ei/wzBhEosiSAHvZXsrc/2hy3mJb2BkzroDaCd7r2H1nMF8aGe9h37iyF4zSq9AjAlD6OXBrJcDZaIoK3+l7ZkChyhCFMH1gWARLlQ6NFlm72fX50slAv8xbiZzSWll3wml1cgdaC1HfwLVuoAN2BexIsHJDcWUqDXDs/4pAjmNVqIoWl3v673BL6vx7IOtshgtaz1RzFmT55ZonFZpuucUF7E372SC9MkDJHvICWMnvnSc4Ktmk2KzwcwlWQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EcbySAd9BUggS/0wTnCnEAiurervCXDIorZTRlN4eZ8=;
- b=o0XNNc7RrP1iGk343ndyQfauQ0AxaSqq92L4K/YbGof6RooaGOytCQ6R1rjfVz8LqGTJ5IWF4Tai4/6i8gQoNR4phf4ZTbVud+GLa0PrmKJa+E4LfIWxvzwQqS06mqI3ROuVElCurpIfr6CDw/8YyKxR3lkX1KyEPzYg/Hs+aSY=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- BY5PR04MB6916.namprd04.prod.outlook.com (2603:10b6:a03:229::18) with
+ bh=AQa9iCiLe/BTJrXhZzHNwbm0sVgISblaJgqF/LVg008=;
+ b=XhI/Ud4JAja8+GDh2UkvGhB0F+VwkKfzkHpZRJFSwrddYhfi4/CVKV2QRkzWbXdh5joCba98I27HFmZccUg81FiIj4fJsPTZ89ewlydd8KEHYQtYb25aQ7nU3oRhiTr/JhS2inUr1x1RvtwmOD/cM74c2ui3wYesichcfsNl+j5g+3+YIDdX/gykn10NKkfLqIH8w1b+wCJoqobqVK93PiD2PtnzQ9mCs55qQ1Jds0Ud4HZrRR6Wfw7xr8odOhH+SMnRwV++EacDqe+jKWgNWRSR+UWOYyeajyfdFqcGAijSr6bfhWdsMJpguhYr64L90aZjf59as9sMyf5S4HClwA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
+ by CH3PR12MB8329.namprd12.prod.outlook.com (2603:10b6:610:12e::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Wed, 28 Jun
- 2023 10:34:57 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::bfa:d453:e7e9:8f98]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::bfa:d453:e7e9:8f98%7]) with mapi id 15.20.6521.024; Wed, 28 Jun 2023
- 10:34:57 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-CC:     Sagi Grimberg <sagi@grimberg.me>, Yi Zhang <yi.zhang@redhat.com>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Wed, 28 Jun
+ 2023 11:01:04 +0000
+Received: from DM4PR12MB5040.namprd12.prod.outlook.com
+ ([fe80::5fe3:edc2:ade4:32ea]) by DM4PR12MB5040.namprd12.prod.outlook.com
+ ([fe80::5fe3:edc2:ade4:32ea%7]) with mapi id 15.20.6521.024; Wed, 28 Jun 2023
+ 11:01:04 +0000
+Message-ID: <0ad16fbf-6835-50ac-443b-46443c8656e8@nvidia.com>
+Date:   Wed, 28 Jun 2023 14:00:57 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [bug report] most of blktests nvme/ failed on the latest linux
+ tree
+Content-Language: en-US
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Yi Zhang <yi.zhang@redhat.com>,
         Chaitanya Kulkarni <chaitanyak@nvidia.com>,
         "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
         linux-block <linux-block@vger.kernel.org>
-Subject: Re: [bug report] most of blktests nvme/ failed on the latest linux
- tree
-Thread-Topic: [bug report] most of blktests nvme/ failed on the latest linux
- tree
-Thread-Index: AQHZqawtAREYOa2JLUG7L6op2T/M7A==
-Date:   Wed, 28 Jun 2023 10:34:57 +0000
-Message-ID: <7d6m3ha3rqc73q22d4bsxtc4u2cqb4ryp6f4q7ajvazdpek2ko@nh6a6biyryxd>
 References: <CAHj4cs9ayQ8J+wDCWVKjmBTWTi7Bc3uqqTCDzL2ZY6JhpdDhsQ@mail.gmail.com>
  <1fda4154-50f4-c09d-dbb1-3b53ed63d341@nvidia.com>
  <CAHj4cs_+yBbs+MgrC8Z8J7X8cKYwwr6wcR5tLfUCcYkftL7N1Q@mail.gmail.com>
@@ -77,204 +60,212 @@ References: <CAHj4cs9ayQ8J+wDCWVKjmBTWTi7Bc3uqqTCDzL2ZY6JhpdDhsQ@mail.gmail.com>
  <000e3d0c-0022-c199-1f8d-97e191345197@grimberg.me>
  <d5d9bd87-1d5b-d66c-39c4-e35c0e5ddc48@nvidia.com>
  <94785130-4f40-aa29-9232-af8a8f1ca1c9@nvidia.com>
-In-Reply-To: <94785130-4f40-aa29-9232-af8a8f1ca1c9@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BY5PR04MB6916:EE_
-x-ms-office365-filtering-correlation-id: 9591db6d-a18a-49dc-7fde-08db77c351b3
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: v0prOVRs0s+g9eXZB9w9Y3iQKP3S9m/0rGWz1uActVB2EHUzHTFrOAxaEnxWoHoQ2Ueu4WgADcibP2AgUaEHuEq5lYq0Get2ho/MSTy+ZsxZVSjN5tLqYDsHqux3TyYWwFKZFKtmbC0QU5dFtw1RTlmSL4V0sbIeblzat+1XrQBu4e36YvIiGWlDZWaV70H4/5k+OlXKhUdyJTbx0ieIEMHPafyHwLjVGbZvNofUSuUlTd+Q28xz1TKwwnkkcn2Q7yJS7qps33xEr/sLYddGjofIUx0t1k9xyHFyQKC5VQDAFFbH9QMkZVnqzTrwTXFUCMBThe4YmQ6+gwqiUdHzAaoK3aOWaoFSWrSzf6MgAYetbB2hwP9ma1hYXxk+Q/YWRS1j1NDRT20+IFJxYqFBMWG88sNSD3Uooje3pAW00fD8CDNz+EbkHkoXljlm4AEJujtbt0mFCGjatcoCUdKcQNsJbytctur9qBOdJIz1X3dhFJe3RgWUoUaiISxkWkqI101VrnHtThRhtpy20nijMSEsJH9CC5+RN2MOWfl9g9POGTuiQT+P0Iu4uBafc+oHETV4TzD0ghUzlQxjZZ/9YVjFTt0kI+I66gYm58gQhBDekvriWIenbkBIXrB6Q+YO
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(136003)(346002)(396003)(376002)(366004)(39860400002)(451199021)(66946007)(66476007)(6916009)(66446008)(76116006)(64756008)(44832011)(316002)(66556008)(478600001)(38070700005)(4326008)(8936002)(91956017)(8676002)(5660300002)(86362001)(2906002)(54906003)(41300700001)(6486002)(9686003)(53546011)(33716001)(186003)(6506007)(6512007)(38100700002)(26005)(71200400001)(83380400001)(122000001)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?z3EnsTN/Z5t80nV3h2sx5vWT240FY4Y7FIZIhFwOEhiAb7lIJDQxka7zqJhD?=
- =?us-ascii?Q?MDWSIuHfUqtOlxnBiQ8RIYf0Uz1+X8/vVJtxOit/pNqu8dKev/adRJ56LQlN?=
- =?us-ascii?Q?rKcGZg3kt6Sqc2FqGbxM6zwBzi5aLXdwalUi+D/UkcNSoYHb5Y/pJ25SSX4T?=
- =?us-ascii?Q?D1sm17wpn9Ya+r1zvBWSwaUVHveC/Kl0HmVW89FUukyxQO9AQNTinOtvetB/?=
- =?us-ascii?Q?fUEme5ib5T98J2Btlog4cAjRpjsN+9T2f2CyoucIV8H7dZw8kjUWUMHj3KAD?=
- =?us-ascii?Q?Sn8b3QcEsxCsxWV+syNp5u6vbFilO6xNvisitmpfulWV1dthUfMrCM4gTjpi?=
- =?us-ascii?Q?LdLmPCW0S6gN8dZkVroVSWwqNrIdcKVx19lGR4htMTWKtELkZ9W+83ffdvVZ?=
- =?us-ascii?Q?/5wk8WmkSn+9SDHac5FnWjqH1N4juVagFnkDFCIgtyf4cFJiRaJR4iacaEam?=
- =?us-ascii?Q?6dKx1GAd2sGT+LfFdNNTcNi6RzPuoziKYWzRExGa9+yFIOTfhWIjQb6Hv0Yx?=
- =?us-ascii?Q?TZEqtXvRP3+05x9sC89kv0I3RRWAZq9vMQhwM07uZ6cPTWYXQec0LMx+1GIL?=
- =?us-ascii?Q?mrETfnDB9KZ6wI7iB9ztJKirGKyklhlLml6EtwyO0rb9S2114KwNOrmOyhVC?=
- =?us-ascii?Q?oIxNPILfkbF8sZq4Naq6MY5MuEfzrIryWJ0IcaVDuKK+1OEjNNxw1ftbu7Nn?=
- =?us-ascii?Q?4bGDrB0C0YCjp01YdLzed4uLFnJcrk25rAZBaKn4HWFppwP/4Pc6rig/v4Kt?=
- =?us-ascii?Q?ZRofZcC/URgM/gnqD/s7E/CnqruzdGTLsOcmLChI/tJwyLfnWRvlYuQs+ysO?=
- =?us-ascii?Q?asqA+qyKPObvfAROY5i22KAYWdUu77BygodWPHXHpThp43QQ3gSCML8Ce1sI?=
- =?us-ascii?Q?RVq2zzCWlIfjtMFTQJxsdH63fLtz5vji7H37d5dmWGv0NfMD2w3dMVZCWob+?=
- =?us-ascii?Q?niOGlPHRVducK+noAQ1R1udHEZvTqkHW1Q/Jkzhfu/YLNw8UPGD2VSX3DTvi?=
- =?us-ascii?Q?J5g/N0ZTndv+in6qS4KPI4DHU6OJxAR2tZDTTy/yaO1YoJJV+ULr/i8WJATw?=
- =?us-ascii?Q?hqOOTg2+cvmsV/D3AYjEsOLtBibdxU3mRHSUitTdiT3ZqSLwJNBBWdV8t9zk?=
- =?us-ascii?Q?FxZ3x9YlvGVlS/f8BQVftzpEjXpenhnPBU0f71YwvOqzZLS6rFRNcrGPyB54?=
- =?us-ascii?Q?1LXD8G05efvsmwGUXJP341CPPNxzMXBLU5FnZnNbqNKej13Lay41MYqN1H5z?=
- =?us-ascii?Q?Txta/XpUZuqJf4mMIXxFo3nRnxhQu7aYMT+ttPNtlrL3R4FRwfTQSrgnQ1H8?=
- =?us-ascii?Q?jB3X3a8M8n+qOFsB4QlKwtITzdQh0rmorYYCC/3MaGxggUpO+r62Wd0XyYLR?=
- =?us-ascii?Q?ecy9+zAaEQfsp83uZPBTHKy2G5Xi6mjGxbPAQHJkuyq8iRMXKzgMCWk4eAhr?=
- =?us-ascii?Q?/D7T8zLzTKi9b4fjXcWpxw9ShBCULX6WDzf0T6mBXBNLwrdFAsVfdkZfGU6j?=
- =?us-ascii?Q?tqJvfuwUWJsZkx9TJKW60NuijQR4KeKErCv7aJJ4w9tu6gkLtBFNsLTbyI/H?=
- =?us-ascii?Q?eeZoA8w+pA5A8/yXH91DkUWWsB5LrazOiHF4p9ZD+97iTLoHJ240Fp9L+gBH?=
- =?us-ascii?Q?u9lZ4UllaEHwZXKkkgQ054Q=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3155BE5DA2C0044B9F953D2EED0A6DF3@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ <7d6m3ha3rqc73q22d4bsxtc4u2cqb4ryp6f4q7ajvazdpek2ko@nh6a6biyryxd>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+In-Reply-To: <7d6m3ha3rqc73q22d4bsxtc4u2cqb4ryp6f4q7ajvazdpek2ko@nh6a6biyryxd>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0069.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9a::10) To DM4PR12MB5040.namprd12.prod.outlook.com
+ (2603:10b6:5:38b::19)
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 9PKwsjchztceLvMmtNpgNE5MtfBwLcl6qtO927+O/m78A4wUaeO7UyZA/KFb+EU3V4StQ0uzt90oR+ERQ6UbmEZOaPNvqH9eu+VRPWc5j2M4YxCpTqc2IheQzNIQyCDgn2sxOCNfsqq/Y5jWmGb4rVoxcQSwTodaue9DYiHgMA4ckv58tkIT5daxIZsGUr+jhGkD9xOI9JSsrIeMRmhGCgm9fEYjA04KDwGtgeFzmvp6eG9WG4lMzhnAdSMjiWj+O1pk0vEWaf9AwaNidNRyT/Pywv8A5nevrGflfffXDAQ4tkX4mTDp5kRzXJJ79QDvcexr47YPcj9sKOiUsZUepeJLURRDcf58gokwfZsM+4ZtT4e+axhMKnBxqoYLVAY1n4yzxSUEHaG5AO3QDA2rrIeBMYFt/+rARjFCTuZkoc18QzpcLzcfcGpvINDXu/Ztwx53Yrx4YkpJEdiV7FBNTeJWKr/RTeWIEyhhxgFaIdab7yj3VJN8A/NCFadcCyx7G5QHCv8g+Xg/QGWGPHXLi0U2COs7R45AX47s1q5gWOStXO6s8QVTFOm1jU7om2c8Sk9okgrrvlR6RLg5zW4VH4lT5VnnJzFNkefn1KLfqOTwKU2sB9BZqYKraWhKkeHUQ1WIZSQ7zeTYDG7clNJCBDhqVoa2HnfGU7Wdzr2EWeaWveTLswGCFIZMwW+XAE0MM2YAMEb5o3QUIABrxtmxX+ivTAITEMnugPY29knNXdowkf4t+QpiChXuIHjCQHMGM+OT2UInESt1zaBzw/PGqmOtWbA7D0yjdvVCdkpd8bGYA9fZ7wmXZ1xbbXX1UVH6C7RtkqbvMRNvtf9sqdBa9qmSZeACWEndFIndpUpKuQzasVELE2XMDN0IIg4XAxXAlyg7S112ZR7EKShWNkSPYlu24FMkGSmHUS+OImiDVZg=
-X-OriginatorOrg: wdc.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|CH3PR12MB8329:EE_
+X-MS-Office365-Filtering-Correlation-Id: 030cb99b-f834-4290-443e-08db77c6f753
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: NLBUl8s/ebl8iheSwpDnLbk83DA/LKAC7lFA1zY1hc7iA03YGt+mHltpB4iArKxq8qyX7wuSKGqE7CL+2LVgT/3NxMEOFPnn8RQJ5GFfa5TGXHKEx3Jh1cSgI170eRRbMKG7lMULAbcL4NCULWeu0CutdLOC6Sa0bTMXjOQ+SnvOmHToQCc8oRsFEtGCR+Tcv9V3xMDaYQv1sAAz4RuKnFN7/Pel8il9F0H7JUTkFicjtBYTbsdHiRQqQ1PdYVPpDt6N55tZ7ob+xbRnyKimUgdjz6hYhrGXM/UG9CP1JnneBNIpyxQRamn7rmJ2OKbqh6AG+NvOcJKbKGMKOeEADEg+TubpuJC7wzhtIPqHYUCBWrN800E4yIBVZT5vQHDYEW2b/TKt+L8BmmwmR0KBVd1d1smytHKNMGSM5xxy1PznjLlWWYemog7ovTcQNZb+xUDIh9+nbvvalCqxMXrlymeWNEwWJdKxwAmyzoO6yI3xOcyK7lTwQCoX4oWAnCEPwo8nJCpP/R5igrfO4LwXGvLK6r1v6kzxzkgUmbho4KlMOZwG0KoPLCTlZNFwVMT7CCGJSAAb1c/+dYEH0Ht3Ne00P1VnfZKJ/5eY/vayKwMYg1139RPikeEpkikDNpCVYc7sOiYUNOJneyCP/yVEUg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(366004)(346002)(136003)(39860400002)(451199021)(8676002)(83380400001)(8936002)(316002)(66946007)(41300700001)(66556008)(53546011)(6512007)(6506007)(6916009)(4326008)(66476007)(186003)(26005)(2616005)(54906003)(6666004)(6486002)(2906002)(5660300002)(478600001)(38100700002)(31696002)(86362001)(31686004)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Vi9BM09aemFwQVBYVDA5SUZ1aDhERmpjajZPdVN5dUtacEhreHhzU2ppMHND?=
+ =?utf-8?B?UU1KV3hRdE5qeUxYRExUWDNobFhxNWpLY09FZWM1L244K0ZIaWZmd3ZleUJQ?=
+ =?utf-8?B?NWptdG5jSDJXb2x4cHd5UWQ3bVUvV2k0RllHRjNjcEQ0cm9KMUI3TmhBOVJH?=
+ =?utf-8?B?eGlLbE1DNDBZQ0Q1WDFIK0tkYVpRbmNnbjRRTlltaXA3NDFQRVJlREFGS3FP?=
+ =?utf-8?B?enFrY3dZSkVLVjViRy9wOXNtSUFWdGhKT3N5WklNTXJyK1pmTlJiK3c4QmlV?=
+ =?utf-8?B?bFc5OUJmZVh3cXdvay9KMW1RY21hdEZVdWNlTmdlOUl1YjRncFBmaURsbUcv?=
+ =?utf-8?B?K1hQKzlVdFZjYnBrWXNzL2tXWFhHNnp5OEo3Q05pOG5CNFIxb3daRmlySW5H?=
+ =?utf-8?B?Q3JlL0RHbk0wekNEbjMvOEhoM21mdlRJOVJvZzN2TlZnRkxDWE5YektYeTlQ?=
+ =?utf-8?B?dE8rcGQzYnFWcFVPbVVFd085NjgxTUg0SFViUVJQQ0lLb3BKM1pIRFN3ZmVM?=
+ =?utf-8?B?MVk1SXhPd0x4NU0ybEFUQndEZDJkVThRV3JDOE1JbFBVcEQwempuVHRQRUd6?=
+ =?utf-8?B?RVRFTGx5TGhydUhKbmZEQWJPUkFRa3ZKQkEzbmJKMFhrT0p3NncwMWZtVlky?=
+ =?utf-8?B?YkdYMFlzRVpFek9rU2VNenpLQVQvd2diZHNOYnE0S1UvaDFVZHBxRFdXaW1s?=
+ =?utf-8?B?SVRURFE5c0JRbnVISFAvd1NwZnpoNUczNU94aHQvVnlxWllYVkcyRW54anJy?=
+ =?utf-8?B?bVFuRnpvSmRWblFPMSsvYUdreE1wTVlTSGlNOStOM0JPYXFNdzlmS1M3QUJK?=
+ =?utf-8?B?dFRlbng3bGJ3elIzc1ZKaVVHdFZHNXNBVHYwYzU1V0ZRVDFEYVk1Q1NmNEFS?=
+ =?utf-8?B?TlJGREV5TFBzSWplWUs4akpXRVVTWTVSME1OdXE1dlBWNGcxZGIwSzFXU0ZG?=
+ =?utf-8?B?dnBXNk1ka1FrU2tnU2pqQjBOVmhkaWdYdVhUZXdQRWU3VVpsU3p2aFJscXJL?=
+ =?utf-8?B?bEZQK1ZsdnJOY3JnaHJ0dTFhTWo0YnhGcjQ5bTNmNktuOTdRUTJXelFkOU56?=
+ =?utf-8?B?UjAyaEFHWHFtbGhvNnJtelFoWC9NaTVER05IZ0RiY3d0SEp0TTRBbEJJTDBw?=
+ =?utf-8?B?MllMQWVqSklFbzJFNDM3VVBjNjMzTmU5NUN2c2w2UHh0SDVtSlIycGt1MU5a?=
+ =?utf-8?B?RE9JUys2eFM5d1V3Z08rZkl0MUh2QVppWWJqcUVrWlZiUWhLL1U0cVF6OTVO?=
+ =?utf-8?B?eDhQMTl5NGJaY2UxVE1YeWRIaS9tWUxtS1B6djJnSGVSSjdPN3Frc3JHU0lI?=
+ =?utf-8?B?YTd0ZUFFSGdDRDRTU0ZDWlpseWNVOVhpcDNZRkxVaGE2S3B2VTZVeXlyODBi?=
+ =?utf-8?B?K0M1UVBEMWdPUFlQeUZXdW5zRTNQZDFYM0JDWENHUzQzbjlYcXVxYTFtVnow?=
+ =?utf-8?B?bm9JTTBBQWNTOGFSa0lqTUN3SkV0dXV6OTFyb2tyVTZYL0lpa1lzQkc2YTdI?=
+ =?utf-8?B?QndMM1ZnK0JOL0l3Z2RmOHZ2dE5OZndQTU0vcVg1cE1jN242M3hndVdXMk5V?=
+ =?utf-8?B?WE5OQlpFUWVuc0FJcmxPTEtHMTlka0ZWYjhGZW12UVl5ME1wZy9GMjU3d0VR?=
+ =?utf-8?B?YktQRkdQazdFbjJCNjZYVE9WUDlGVmYwazBMMzVFTEdCZFFWTEl3T2tiUHlu?=
+ =?utf-8?B?ZmdKcHJCMmpmUWRJMVhKb0xCSkNHZFAra3lmV2xCbTFoVmxXNDQ4MEpnemJV?=
+ =?utf-8?B?S2JnL2RmdWo5NENhWk5nL2RSU3BKU2NHYndhUlZmbDBGNUtyY2kyVk04ZEt6?=
+ =?utf-8?B?dnpEMUF5S2xhOXc2RFlVdjVreks3djEwd1h4NEpMRi9Iam5XMW5id0NRd3ow?=
+ =?utf-8?B?bG5BSThtalJJaUZNZktNYWswc1B6YUtWNEcyZUFMV1FqaUdydFVXbjV1Y3py?=
+ =?utf-8?B?dXZEbVpTUlRranlVWTh6Mnc4eGhOOUtuaXJjT2V2c1JCK3JaTkxDNDJtNmxD?=
+ =?utf-8?B?elpnd201a3E1anNCYXg5cHRlK1JweDdEOHVNS2t4SDdhN3AwM2s4T3JEZVBV?=
+ =?utf-8?B?cmVoRURtSFVuek92eFpOWS9QUHc2RWFhMEM4Zk9mNFZCcFYxWTVja2tXQmlL?=
+ =?utf-8?B?STYxY1g4UXFaOHYyUVRXeUdNTi9FYzNJdUVTUjZBVlhBaC9BQm8xdUlzUG93?=
+ =?utf-8?B?WFE9PQ==?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 030cb99b-f834-4290-443e-08db77c6f753
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9591db6d-a18a-49dc-7fde-08db77c351b3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2023 10:34:57.5981
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 11:01:04.2110
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6Rpg3IlWMevrkHAKnqzGbJG75Vkry8H0avjKtTw45rpz5f5VvOaOb3XvuqsZbgKQg1TK/cZsct2Ydn/LwdE8L/tWXZJjW9thdkMFiSrM9LM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6916
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3TMN5mLXObR39D9f4ZE0A2HgilyANOQ9Vicid+qjAlB0qKi/nGLrCPCI7kVA2uUkSYRExPPnPIwuDlNFlZveUA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8329
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jun 28, 2023 / 12:52, Max Gurtovoy wrote:
-> Hi Yi,
->=20
-> On 28/06/2023 12:21, Max Gurtovoy wrote:
-> >=20
-> >=20
-> > On 28/06/2023 11:14, Sagi Grimberg wrote:
-> > >=20
-> > > > >=20
-> > > > > > > Yi,
-> > > > > > >=20
-> > > > > > > Do you have hostnqn and hostid files in your /etc/nvme direct=
-ory?
-> > > > > > >=20
-> > > > > >=20
-> > > > > > No, only one discovery.conf there.
-> > > > > >=20
-> > > > > > # ls /etc/nvme/
-> > > > > > discovery.conf
-> > > > >=20
-> > > > > So the hostid is generated every time if it is not passed.
-> > > > > We should probably revert the patch and add it back when
-> > > > > blktests are passing.
-> > > >=20
-> > > > Seems like the patch is doing exactly what it should do - fix
-> > > > wrong behavior of users that override hostid.
-> > > > Can we fix the tests instead ?
-> > >=20
-> > > Right, I got confused between a provided host and the default host...
-> > >=20
-> > > I think we need to add check that /etc/nvme/[hostnqn,hostid] exist
-> > > in the test cases.
-> >=20
-> > Right.
-> > And if one of the files doesn't exist, generate the value.
-> >=20
-> > Should it go to tests/nvme/rc ?
->=20
-> Can you please try adding the bellow un-tested code to blktests and re-ru=
-n:
->=20
-> [root@r-arch-stor03 blktests]# git diff
+
+
+On 28/06/2023 13:34, Shinichiro Kawasaki wrote:
+> On Jun 28, 2023 / 12:52, Max Gurtovoy wrote:
+>> Hi Yi,
+>>
+>> On 28/06/2023 12:21, Max Gurtovoy wrote:
+>>>
+>>>
+>>> On 28/06/2023 11:14, Sagi Grimberg wrote:
+>>>>
+>>>>>>
+>>>>>>>> Yi,
+>>>>>>>>
+>>>>>>>> Do you have hostnqn and hostid files in your /etc/nvme directory?
+>>>>>>>>
+>>>>>>>
+>>>>>>> No, only one discovery.conf there.
+>>>>>>>
+>>>>>>> # ls /etc/nvme/
+>>>>>>> discovery.conf
+>>>>>>
+>>>>>> So the hostid is generated every time if it is not passed.
+>>>>>> We should probably revert the patch and add it back when
+>>>>>> blktests are passing.
+>>>>>
+>>>>> Seems like the patch is doing exactly what it should do - fix
+>>>>> wrong behavior of users that override hostid.
+>>>>> Can we fix the tests instead ?
+>>>>
+>>>> Right, I got confused between a provided host and the default host...
+>>>>
+>>>> I think we need to add check that /etc/nvme/[hostnqn,hostid] exist
+>>>> in the test cases.
+>>>
+>>> Right.
+>>> And if one of the files doesn't exist, generate the value.
+>>>
+>>> Should it go to tests/nvme/rc ?
+>>
+>> Can you please try adding the bellow un-tested code to blktests and re-run:
+>>
+>> [root@r-arch-stor03 blktests]# git diff
+>> diff --git a/tests/nvme/rc b/tests/nvme/rc
+>> index 191f3e2..88e6fa1 100644
+>> --- a/tests/nvme/rc
+>> +++ b/tests/nvme/rc
+>> @@ -14,8 +14,23 @@ def_remote_wwnn="0x10001100aa000001"
+>>   def_remote_wwpn="0x20001100aa000001"
+>>   def_local_wwnn="0x10001100aa000002"
+>>   def_local_wwpn="0x20001100aa000002"
+>> -def_hostnqn="$(cat /etc/nvme/hostnqn 2> /dev/null)"
+>> -def_hostid="$(cat /etc/nvme/hostid 2> /dev/null)"
+>> +
+>> +if [ -f "/etc/nvme/hostid" ]; then
+>> +       def_hostid="$(cat /etc/nvme/hostid 2> /dev/null)"
+>> +else
+>> +       def_hostid="$(uuidgen)"
+>> +fi
+>> +if [ -z "$def_hostid" ] ; then
+>> +       def_hostid="0f01fb42-9f7f-4856-b0b3-51e60b8de349"
+>> +fi
+>> +
+>> +if [ -f "/etc/nvme/hostnqn" ]; then
+>> +       def_hostnqn="$(cat /etc/nvme/hostnqn 2> /dev/null)"
+>> +fi
+>> +if [ -z "$def_hostnqn" ] ; then
+>> +       def_hostnqn="nqn.2014-08.org.nvmexpress:uuid:${def_hostid}"
+>> +fi
+>> +
+>>   nvme_trtype=${nvme_trtype:-"loop"}
+>>   nvme_img_size=${nvme_img_size:-"1G"}
+>>   nvme_num_iter=${nvme_num_iter:-"1000"}
+>>
+> 
+> I tried the patch above, and still see the errors. def_hostnqn and def_hostid
+> were not passed to 'nvme discover' and 'nvme connect'. I added some more change
+> as below patch and confirmed the nvme test group failures were avoided
+> (nvme_trtype=loop).
+> 
 > diff --git a/tests/nvme/rc b/tests/nvme/rc
-> index 191f3e2..88e6fa1 100644
+> index 191f3e2..1c2c2fa 100644
 > --- a/tests/nvme/rc
 > +++ b/tests/nvme/rc
-> @@ -14,8 +14,23 @@ def_remote_wwnn=3D"0x10001100aa000001"
->  def_remote_wwpn=3D"0x20001100aa000001"
->  def_local_wwnn=3D"0x10001100aa000002"
->  def_local_wwpn=3D"0x20001100aa000002"
-> -def_hostnqn=3D"$(cat /etc/nvme/hostnqn 2> /dev/null)"
-> -def_hostid=3D"$(cat /etc/nvme/hostid 2> /dev/null)"
+> @@ -14,8 +14,23 @@ def_remote_wwnn="0x10001100aa000001"
+>   def_remote_wwpn="0x20001100aa000001"
+>   def_local_wwnn="0x10001100aa000002"
+>   def_local_wwpn="0x20001100aa000002"
+> -def_hostnqn="$(cat /etc/nvme/hostnqn 2> /dev/null)"
+> -def_hostid="$(cat /etc/nvme/hostid 2> /dev/null)"
 > +
 > +if [ -f "/etc/nvme/hostid" ]; then
-> +       def_hostid=3D"$(cat /etc/nvme/hostid 2> /dev/null)"
+> +	def_hostid="$(cat /etc/nvme/hostid 2> /dev/null)"
 > +else
-> +       def_hostid=3D"$(uuidgen)"
+> +	def_hostid="$(uuidgen)"
 > +fi
 > +if [ -z "$def_hostid" ] ; then
-> +       def_hostid=3D"0f01fb42-9f7f-4856-b0b3-51e60b8de349"
+> +	def_hostid="0f01fb42-9f7f-4856-b0b3-51e60b8de349"
 > +fi
 > +
 > +if [ -f "/etc/nvme/hostnqn" ]; then
-> +       def_hostnqn=3D"$(cat /etc/nvme/hostnqn 2> /dev/null)"
+> +	def_hostnqn="$(cat /etc/nvme/hostnqn 2> /dev/null)"
 > +fi
 > +if [ -z "$def_hostnqn" ] ; then
-> +       def_hostnqn=3D"nqn.2014-08.org.nvmexpress:uuid:${def_hostid}"
+> +	def_hostnqn="nqn.2014-08.org.nvmexpress:uuid:${def_hostid}"
 > +fi
 > +
->  nvme_trtype=3D${nvme_trtype:-"loop"}
->  nvme_img_size=3D${nvme_img_size:-"1G"}
->  nvme_num_iter=3D${nvme_num_iter:-"1000"}
->=20
+>   nvme_trtype=${nvme_trtype:-"loop"}
+>   nvme_img_size=${nvme_img_size:-"1G"}
+>   nvme_num_iter=${nvme_num_iter:-"1000"}
+> @@ -442,12 +457,8 @@ _nvme_connect_subsys() {
+>   	elif [[ "${trtype}" != "loop" ]]; then
+>   		ARGS+=(-a "${traddr}" -s "${trsvcid}")
+>   	fi
+> -	if [[ "${hostnqn}" != "$def_hostnqn" ]]; then
+> -		ARGS+=(--hostnqn="${hostnqn}")
+> -	fi
+> -	if [[ "${hostid}" != "$def_hostid" ]]; then
+> -		ARGS+=(--hostid="${hostid}")
+> -	fi
+> +	ARGS+=(--hostnqn="${hostnqn}")
+> +	ARGS+=(--hostid="${hostid}")
+>   	if [[ -n "${hostkey}" ]]; then
+>   		ARGS+=(--dhchap-secret="${hostkey}")
+>   	fi
+> @@ -483,6 +494,8 @@ _nvme_discover() {
+>   	local trsvcid="${3:-$def_trsvcid}"
+>   
+>   	ARGS=(-t "${trtype}")
+> +	ARGS+=(--hostnqn="${def_hostnqn}")
+> +	ARGS+=(--hostid="${def_hostid}")
+>   	if [[ "${trtype}" = "fc" ]]; then
+>   		ARGS+=(-a "${traddr}" -w "${host_traddr}")
+>   	elif [[ "${trtype}" != "loop" ]]; then
 
-I tried the patch above, and still see the errors. def_hostnqn and def_host=
-id
-were not passed to 'nvme discover' and 'nvme connect'. I added some more ch=
-ange
-as below patch and confirmed the nvme test group failures were avoided
-(nvme_trtype=3Dloop).
-
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 191f3e2..1c2c2fa 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -14,8 +14,23 @@ def_remote_wwnn=3D"0x10001100aa000001"
- def_remote_wwpn=3D"0x20001100aa000001"
- def_local_wwnn=3D"0x10001100aa000002"
- def_local_wwpn=3D"0x20001100aa000002"
--def_hostnqn=3D"$(cat /etc/nvme/hostnqn 2> /dev/null)"
--def_hostid=3D"$(cat /etc/nvme/hostid 2> /dev/null)"
-+
-+if [ -f "/etc/nvme/hostid" ]; then
-+	def_hostid=3D"$(cat /etc/nvme/hostid 2> /dev/null)"
-+else
-+	def_hostid=3D"$(uuidgen)"
-+fi
-+if [ -z "$def_hostid" ] ; then
-+	def_hostid=3D"0f01fb42-9f7f-4856-b0b3-51e60b8de349"
-+fi
-+
-+if [ -f "/etc/nvme/hostnqn" ]; then
-+	def_hostnqn=3D"$(cat /etc/nvme/hostnqn 2> /dev/null)"
-+fi
-+if [ -z "$def_hostnqn" ] ; then
-+	def_hostnqn=3D"nqn.2014-08.org.nvmexpress:uuid:${def_hostid}"
-+fi
-+
- nvme_trtype=3D${nvme_trtype:-"loop"}
- nvme_img_size=3D${nvme_img_size:-"1G"}
- nvme_num_iter=3D${nvme_num_iter:-"1000"}
-@@ -442,12 +457,8 @@ _nvme_connect_subsys() {
- 	elif [[ "${trtype}" !=3D "loop" ]]; then
- 		ARGS+=3D(-a "${traddr}" -s "${trsvcid}")
- 	fi
--	if [[ "${hostnqn}" !=3D "$def_hostnqn" ]]; then
--		ARGS+=3D(--hostnqn=3D"${hostnqn}")
--	fi
--	if [[ "${hostid}" !=3D "$def_hostid" ]]; then
--		ARGS+=3D(--hostid=3D"${hostid}")
--	fi
-+	ARGS+=3D(--hostnqn=3D"${hostnqn}")
-+	ARGS+=3D(--hostid=3D"${hostid}")
- 	if [[ -n "${hostkey}" ]]; then
- 		ARGS+=3D(--dhchap-secret=3D"${hostkey}")
- 	fi
-@@ -483,6 +494,8 @@ _nvme_discover() {
- 	local trsvcid=3D"${3:-$def_trsvcid}"
-=20
- 	ARGS=3D(-t "${trtype}")
-+	ARGS+=3D(--hostnqn=3D"${def_hostnqn}")
-+	ARGS+=3D(--hostid=3D"${def_hostid}")
- 	if [[ "${trtype}" =3D "fc" ]]; then
- 		ARGS+=3D(-a "${traddr}" -w "${host_traddr}")
- 	elif [[ "${trtype}" !=3D "loop" ]]; then=
+Looks good.
+can you please send a patch with the above ?
+you can add my
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
