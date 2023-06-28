@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB146C10F19
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A93C18E72
 	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 21:10:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232403AbjF1VKM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 17:10:12 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:39520 "EHLO
+        id S232545AbjF1VKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 17:10:14 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:39496 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232345AbjF1VJw (ORCPT
+        with ESMTP id S232328AbjF1VJv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 17:09:52 -0400
+        Wed, 28 Jun 2023 17:09:51 -0400
 Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 9121A20ABD78; Wed, 28 Jun 2023 14:09:48 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9121A20ABD78
+        id 46F1520C091F; Wed, 28 Jun 2023 14:09:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 46F1520C091F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
         s=default; t=1687986588;
-        bh=BIkbDgJE9jT69+pq8dQ6qtt4XglvrY9iBrtL/UpqOMs=;
+        bh=tYKTZZ4ACs74d1+CwxCZmCa7aIYoM5+NPKaACYNqbuE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ngOTK7jG7pm+Qmvf5GBwkHz+dwhDFYCr/Pk74z8Y1O/SodyuUQcJwc/fS2DQMkXr0
-         Zdma5Vnb9IxKmrFdxGRUNPzbM6QkkRzGoARunjWvtxQkAP9855lkZHriFokpQ2Sq2n
-         WSa1kR93HnC8JZtmw2t4irKS//l0EH3XM5ivNz7Q=
+        b=LcUCo1A4B5OwC608I7Vv5HEf3wQ1QWLuTa53J2gNeHsetxXGroM9pZJm6zxGX1CTo
+         beJ1jmYmdi+yIiY0r+pkr9XxrdC5fRBnIAxHlWWJ78nErV+P+WL5XTpH8NFdx7zuGt
+         bbIt6PgEJCAhRT60FIbSb30EaJHig0A7hhWQ6OgM=
 From:   Fan Wu <wufan@linux.microsoft.com>
 To:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
         serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
@@ -34,9 +34,9 @@ Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
         roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
         Deven Bowers <deven.desai@linux.microsoft.com>,
         Fan Wu <wufan@linux.microsoft.com>
-Subject: [RFC PATCH v10 10/17] block|security: add LSM blob to block_device
-Date:   Wed, 28 Jun 2023 14:09:24 -0700
-Message-Id: <1687986571-16823-11-git-send-email-wufan@linux.microsoft.com>
+Subject: [RFC PATCH v10 05/17] ipe: introduce 'boot_verified' as a trust provider
+Date:   Wed, 28 Jun 2023 14:09:19 -0700
+Message-Id: <1687986571-16823-6-git-send-email-wufan@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
 References: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
@@ -46,333 +46,305 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Some block devices have valuable security properties that is only
-accessible during the creation time.
+IPE is designed to provide system level trust guarantees, this usually
+implies that trust starts from bootup with a hardware root of trust,
+which validates the bootloader. After this, the bootloader verifies the
+kernel and the initramfs.
 
-For example, when creating a dm-verity block device, the dm-verity's
-roothash and roothash signature, which are extreme important security
-metadata, are passed to the kernel. However, the roothash will be saved
-privately in dm-verity, which prevents the seucrity subsystem to easily
-access that information. Worse, the roothash signature will be discarded
-after the verification, making it impossible to utilize the roothash
-signature by the security subsystem.
+As there's no currently supported integrity method for initramfs, and
+it's typically already verified by the bootloader, introduce a property
+that causes the first superblock to have an execution to be "pinned",
+which is typically initramfs.
 
-With this patch, an LSM blob is added to the block_device structure.
-This enables the security subsystem to store security-sensitive data
-related to block devices within the security blob. For example, LSM can
-use the new LSM blob to save the roothash signature of a dm-verity,
-and LSM can make access decision based on the data inside the signature,
-like the signer ceritificate.
+When the "pinned" device is unmounted, it will be "unpinned" and
+`boot_verified` property will always evaluate to false afterward.
 
-The implementation follows the same approach used for security blobs in
-other structures like struct file, struct inode, and struct superblock.
-The initialization of the security blob occurs after the creation of the
-struct block_device, performed by the security subsystem. Similarly, the
-security blob is freed by the security subsystem before the struct
-block_device is deallocated or freed.
+We use a pointer with a spin_lock to "pin" the device instead of rcu
+because rcu synchronization may sleep, which is not allowed when
+unmounting a device.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-Reviewed-by: Casey Schaufler <casey@schaufler-ca.com>
+
 ---
 v2:
-  + No Changes
++No Changes
 
 v3:
-  + Minor style changes from checkpatch --strict
++ Remove useless caching system
++ Move ipe_load_properties to this match
++ Minor changes from checkpatch --strict warnings
 
 v4:
-  + No Changes
++ Remove comments from headers that was missed previously.
++ Grammatical corrections.
 
 v5:
-  + Allow multiple callers to call security_bdev_setsecurity
++ No significant changes
 
 v6:
-  + Simplify security_bdev_setsecurity break condition
++ No changes
 
 v7:
-  + Squash all dm-verity related patches to two patches,
-    the additions to dm-verity/fs, and the consumption of
-    the additions.
++ Reword and refactor patch 04/12 to [09/16], based on changes in the underlying system.
++ Add common audit function for boolean values
++ Use common audit function as implementation.
 
 v8:
-  + Split dm-verity related patches squashed in v7 to 3 commits based on
-    topic:
-      + New LSM hook
-      + Consumption of hook outside LSM
-      + Consumption of hook inside LSM.
-
-  + change return of security_bdev_alloc / security_bdev_setsecurity
-    to LSM_RET_DEFAULT instead of 0.
-
-  + Change return code to -EOPNOTSUPP, bring inline with other
-    setsecurity hooks.
++ No changes
 
 v9:
-  + Add Reviewed-by: Casey Schaufler <casey@schaufler-ca.com>
-  + Remove unlikely when calling LSM hook
-  + Make the security field dependent on CONFIG_SECURITY
++ No changes
 
 v10:
-  + No changes
++ Replace struct file with struct super_block
 ---
- block/bdev.c                  |  7 +++
- include/linux/blk_types.h     |  3 ++
- include/linux/lsm_hook_defs.h |  5 ++
- include/linux/lsm_hooks.h     |  1 +
- include/linux/security.h      | 22 ++++++++
- security/security.c           | 99 +++++++++++++++++++++++++++++++++++
- 6 files changed, 137 insertions(+)
+ security/ipe/eval.c          | 72 +++++++++++++++++++++++++++++++++++-
+ security/ipe/eval.h          |  2 +
+ security/ipe/hooks.c         | 12 ++++++
+ security/ipe/hooks.h         |  2 +
+ security/ipe/ipe.c           |  1 +
+ security/ipe/policy.h        |  2 +
+ security/ipe/policy_parser.c | 37 +++++++++++++++++-
+ 7 files changed, 126 insertions(+), 2 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 979e28a46b98..c9b0fb228023 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -24,6 +24,7 @@
- #include <linux/pseudo_fs.h>
- #include <linux/uio.h>
- #include <linux/namei.h>
-+#include <linux/security.h>
- #include <linux/part_stat.h>
- #include <linux/uaccess.h>
- #include <linux/stat.h>
-@@ -318,6 +319,11 @@ static struct inode *bdev_alloc_inode(struct super_block *sb)
- 	if (!ei)
- 		return NULL;
- 	memset(&ei->bdev, 0, sizeof(ei->bdev));
+diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+index 8d0ec7c80f8f..f19a641535c4 100644
+--- a/security/ipe/eval.c
++++ b/security/ipe/eval.c
+@@ -9,6 +9,7 @@
+ #include <linux/file.h>
+ #include <linux/sched.h>
+ #include <linux/rcupdate.h>
++#include <linux/spinlock.h>
+ 
+ #include "ipe.h"
+ #include "eval.h"
+@@ -17,6 +18,44 @@
+ 
+ struct ipe_policy __rcu *ipe_active_policy;
+ 
++static const struct super_block *pinned_sb;
++static DEFINE_SPINLOCK(pin_lock);
++#define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
 +
-+	if (security_bdev_alloc(&ei->bdev)) {
-+		kmem_cache_free(bdev_cachep, ei);
-+		return NULL;
-+	}
- 	return &ei->vfs_inode;
++/**
++ * pin_sb - Pin the underlying superblock of @f, marking it as trusted.
++ * @sb: Supplies a super_block structure to be pinned.
++ */
++static void pin_sb(const struct super_block *sb)
++{
++	if (!sb)
++		return;
++	spin_lock(&pin_lock);
++	if (!pinned_sb)
++		pinned_sb = sb;
++	spin_unlock(&pin_lock);
++}
++
++/**
++ * from_pinned - Determine whether @sb is the pinned super_block.
++ * @sb: Supplies a super_block to check against the pinned super_block.
++ *
++ * Return:
++ * * true	- @sb is the pinned super_block
++ * * false	- @sb is not the pinned super_block
++ */
++static bool from_pinned(const struct super_block *sb)
++{
++	bool rv;
++
++	if (!sb)
++		return false;
++	spin_lock(&pin_lock);
++	rv = !IS_ERR_OR_NULL(pinned_sb) && pinned_sb == sb;
++	spin_unlock(&pin_lock);
++	return rv;
++}
++
+ /**
+  * build_eval_ctx - Build an evaluation context.
+  * @ctx: Supplies a pointer to the context to be populdated.
+@@ -27,8 +66,14 @@ void build_eval_ctx(struct ipe_eval_ctx *ctx,
+ 		    const struct file *file,
+ 		    enum ipe_op_type op)
+ {
++	if (op == __IPE_OP_EXEC && file)
++		pin_sb(FILE_SUPERBLOCK(file));
++
+ 	ctx->file = file;
+ 	ctx->op = op;
++
++	if (file)
++		ctx->from_init_sb = from_pinned(FILE_SUPERBLOCK(file));
  }
  
-@@ -327,6 +333,7 @@ static void bdev_free_inode(struct inode *inode)
+ /**
+@@ -43,7 +88,14 @@ void build_eval_ctx(struct ipe_eval_ctx *ctx,
+ static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
+ 			      struct ipe_prop *p)
+ {
+-	return false;
++	switch (p->type) {
++	case __IPE_PROP_BOOT_VERIFIED_FALSE:
++		return !ctx->from_init_sb;
++	case __IPE_PROP_BOOT_VERIFIED_TRUE:
++		return ctx->from_init_sb;
++	default:
++		return false;
++	}
+ }
  
- 	free_percpu(bdev->bd_stats);
- 	kfree(bdev->bd_meta_info);
-+	security_bdev_free(bdev);
+ /**
+@@ -106,3 +158,21 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
  
- 	if (!bdev_is_partition(bdev)) {
- 		if (bdev->bd_disk && bdev->bd_disk->bdi)
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 752a54e3284b..0baf5ef06a36 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -69,6 +69,9 @@ struct block_device {
- 	struct partition_meta_info *bd_meta_info;
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- 	bool			bd_make_it_fail;
-+#endif
-+#ifdef CONFIG_SECURITY
-+	void			*security;
- #endif
- 	/*
- 	 * keep this out-of-line as it's both big and not needed in the fast
-diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
-index 6bb55e61e8e8..c662e100c666 100644
---- a/include/linux/lsm_hook_defs.h
-+++ b/include/linux/lsm_hook_defs.h
-@@ -417,3 +417,8 @@ LSM_HOOK(int, 0, uring_override_creds, const struct cred *new)
- LSM_HOOK(int, 0, uring_sqpoll, void)
- LSM_HOOK(int, 0, uring_cmd, struct io_uring_cmd *ioucmd)
- #endif /* CONFIG_IO_URING */
+ 	return rc;
+ }
 +
-+LSM_HOOK(int, 0, bdev_alloc_security, struct block_device *bdev)
-+LSM_HOOK(void, LSM_RET_VOID, bdev_free_security, struct block_device *bdev)
-+LSM_HOOK(int, 0, bdev_setsecurity, struct block_device *bdev, const char *name,
-+	 const void *value, size_t size)
-diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
-index ab2b2fafa4a4..7dcf8ece024b 100644
---- a/include/linux/lsm_hooks.h
-+++ b/include/linux/lsm_hooks.h
-@@ -63,6 +63,7 @@ struct lsm_blob_sizes {
- 	int	lbs_ipc;
- 	int	lbs_msg_msg;
- 	int	lbs_task;
-+	int	lbs_bdev;
++/**
++ * ipe_invalidate_pinned_sb - invalidate the ipe pinned super_block.
++ * @mnt_sb: super_block to check against the pinned super_block.
++ *
++ * This function is called a super_block like the initramfs's is freed,
++ * if the super_block is currently pinned by ipe it will be invalided,
++ * so ipe won't consider the block device is boot verified afterward.
++ */
++void ipe_invalidate_pinned_sb(const struct super_block *mnt_sb)
++{
++	spin_lock(&pin_lock);
++
++	if (mnt_sb == pinned_sb)
++		pinned_sb = ERR_PTR(-EIO);
++
++	spin_unlock(&pin_lock);
++}
+diff --git a/security/ipe/eval.h b/security/ipe/eval.h
+index 5abb845d5c4e..88c625d6af97 100644
+--- a/security/ipe/eval.h
++++ b/security/ipe/eval.h
+@@ -18,9 +18,11 @@ struct ipe_eval_ctx {
+ 	enum ipe_op_type op;
+ 
+ 	const struct file *file;
++	bool from_init_sb;
  };
  
- /*
-diff --git a/include/linux/security.h b/include/linux/security.h
-index a88076ebc7b1..f3279180766c 100644
---- a/include/linux/security.h
-+++ b/include/linux/security.h
-@@ -482,6 +482,11 @@ int security_inode_notifysecctx(struct inode *inode, void *ctx, u32 ctxlen);
- int security_inode_setsecctx(struct dentry *dentry, void *ctx, u32 ctxlen);
- int security_inode_getsecctx(struct inode *inode, void **ctx, u32 *ctxlen);
- int security_locked_down(enum lockdown_reason what);
-+int security_bdev_alloc(struct block_device *bdev);
-+void security_bdev_free(struct block_device *bdev);
-+int security_bdev_setsecurity(struct block_device *bdev,
-+			      const char *name, const void *value,
-+			      size_t size);
- #else /* CONFIG_SECURITY */
+ void build_eval_ctx(struct ipe_eval_ctx *ctx, const struct file *file, enum ipe_op_type op);
+ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx);
++void ipe_invalidate_pinned_sb(const struct super_block *mnt_sb);
  
- static inline int call_blocking_lsm_notifier(enum lsm_event event, void *data)
-@@ -1388,6 +1393,23 @@ static inline int security_locked_down(enum lockdown_reason what)
- {
- 	return 0;
+ #endif /* _IPE_EVAL_H */
+diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
+index d896a5a474bc..6f94f5c8a0c3 100644
+--- a/security/ipe/hooks.c
++++ b/security/ipe/hooks.c
+@@ -180,3 +180,15 @@ int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents)
+ 	build_eval_ctx(&ctx, NULL, op);
+ 	return ipe_evaluate_event(&ctx);
  }
 +
-+static inline int security_bdev_alloc(struct block_device *bdev)
-+{
-+	return 0;
-+}
-+
-+static inline void security_bdev_free(struct block_device *bdev)
-+{
-+}
-+
-+static inline int security_bdev_setsecurity(struct block_device *bdev,
-+					    const char *name,
-+					    const void *value, size_t size)
-+{
-+	return 0;
-+}
-+
- #endif	/* CONFIG_SECURITY */
- 
- #if defined(CONFIG_SECURITY) && defined(CONFIG_WATCH_QUEUE)
-diff --git a/security/security.c b/security/security.c
-index d5ff7ff45b77..b211c430c5ab 100644
---- a/security/security.c
-+++ b/security/security.c
-@@ -30,6 +30,7 @@
- #include <linux/string.h>
- #include <linux/msg.h>
- #include <net/flow.h>
-+#include <linux/fs.h>
- 
- #define MAX_LSM_EVM_XATTR	2
- 
-@@ -212,6 +213,7 @@ static void __init lsm_set_blob_sizes(struct lsm_blob_sizes *needed)
- 	lsm_set_blob_size(&needed->lbs_msg_msg, &blob_sizes.lbs_msg_msg);
- 	lsm_set_blob_size(&needed->lbs_superblock, &blob_sizes.lbs_superblock);
- 	lsm_set_blob_size(&needed->lbs_task, &blob_sizes.lbs_task);
-+	lsm_set_blob_size(&needed->lbs_bdev, &blob_sizes.lbs_bdev);
- }
- 
- /* Prepare LSM for initialization. */
-@@ -378,6 +380,7 @@ static void __init ordered_lsm_init(void)
- 	init_debug("msg_msg blob size    = %d\n", blob_sizes.lbs_msg_msg);
- 	init_debug("superblock blob size = %d\n", blob_sizes.lbs_superblock);
- 	init_debug("task blob size       = %d\n", blob_sizes.lbs_task);
-+	init_debug("bdev blob size       = %d\n", blob_sizes.lbs_bdev);
- 
- 	/*
- 	 * Create any kmem_caches needed for blobs
-@@ -698,6 +701,28 @@ static int lsm_msg_msg_alloc(struct msg_msg *mp)
- 	return 0;
- }
- 
 +/**
-+ * lsm_bdev_alloc - allocate a composite block_device blob
-+ * @bdev: the block_device that needs a blob
++ * ipe_sb_free_security - ipe security hook function for super_block.
++ * @mnt_sb: Supplies a pointer to a super_block is about to be freed.
 + *
-+ * Allocate the block_device blob for all the modules
-+ *
-+ * Returns 0, or -ENOMEM if memory can't be allocated.
++ * IPE does not have any structures with mnt_sb, but uses this hook to
++ * invalidate a pinned super_block.
 + */
-+static int lsm_bdev_alloc(struct block_device *bdev)
++void ipe_sb_free_security(struct super_block *mnt_sb)
 +{
-+	if (blob_sizes.lbs_bdev == 0) {
-+		bdev->security = NULL;
-+		return 0;
-+	}
++	ipe_invalidate_pinned_sb(mnt_sb);
++}
+diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
+index 23205452f758..ac0cdfd9877f 100644
+--- a/security/ipe/hooks.h
++++ b/security/ipe/hooks.h
+@@ -22,4 +22,6 @@ int ipe_kernel_read_file(struct file *file, enum kernel_read_file_id id,
+ 
+ int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents);
+ 
++void ipe_sb_free_security(struct super_block *mnt_sb);
 +
-+	bdev->security = kzalloc(blob_sizes.lbs_bdev, GFP_KERNEL);
-+	if (!bdev->security)
+ #endif /* _IPE_HOOKS_H */
+diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
+index 29bedc0b2ad6..8f98ee7b8025 100644
+--- a/security/ipe/ipe.c
++++ b/security/ipe/ipe.c
+@@ -15,6 +15,7 @@ static struct security_hook_list ipe_hooks[] __ro_after_init = {
+ 	LSM_HOOK_INIT(file_mprotect, ipe_file_mprotect),
+ 	LSM_HOOK_INIT(kernel_read_file, ipe_kernel_read_file),
+ 	LSM_HOOK_INIT(kernel_load_data, ipe_kernel_load_data),
++	LSM_HOOK_INIT(sb_free_security, ipe_sb_free_security),
+ };
+ 
+ /**
+diff --git a/security/ipe/policy.h b/security/ipe/policy.h
+index 113a037f0d71..a74856b9966c 100644
+--- a/security/ipe/policy.h
++++ b/security/ipe/policy.h
+@@ -30,6 +30,8 @@ enum ipe_action_type {
+ #define __IPE_ACTION_INVALID __IPE_ACTION_MAX
+ 
+ enum ipe_prop_type {
++	__IPE_PROP_BOOT_VERIFIED_FALSE,
++	__IPE_PROP_BOOT_VERIFIED_TRUE,
+ 	__IPE_PROP_MAX
+ };
+ 
+diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
+index 27e5767480b0..28c14adfe6d2 100644
+--- a/security/ipe/policy_parser.c
++++ b/security/ipe/policy_parser.c
+@@ -265,6 +265,12 @@ static enum ipe_action_type parse_action(char *t)
+ 	return match_token(t, action_tokens, args);
+ }
+ 
++static const match_table_t property_tokens = {
++	{__IPE_PROP_BOOT_VERIFIED_FALSE,	"boot_verified=FALSE"},
++	{__IPE_PROP_BOOT_VERIFIED_TRUE,		"boot_verified=TRUE"},
++	{__IPE_PROP_INVALID,			NULL}
++};
++
+ /**
+  * parse_property - Parse the property type given a token string.
+  * @t: Supplies the token string to be parsed.
+@@ -277,7 +283,36 @@ static enum ipe_action_type parse_action(char *t)
+  */
+ static int parse_property(char *t, struct ipe_rule *r)
+ {
+-	return -EBADMSG;
++	substring_t args[MAX_OPT_ARGS];
++	struct ipe_prop *p = NULL;
++	int rc = 0;
++	int token;
++
++	p = kzalloc(sizeof(*p), GFP_KERNEL);
++	if (!p)
 +		return -ENOMEM;
 +
-+	return 0;
-+}
++	token = match_token(t, property_tokens, args);
 +
- /**
-  * lsm_early_task - during initialization allocate a composite task blob
-  * @task: the task that needs a blob
-@@ -5167,6 +5192,80 @@ int security_locked_down(enum lockdown_reason what)
- }
- EXPORT_SYMBOL(security_locked_down);
- 
-+/**
-+ * security_bdev_alloc() - Allocate a block device LSM blob
-+ * @bdev: block device
-+ *
-+ * Allocate and attach a security structure to @bdev->security.  The
-+ * security field is initialized to NULL when the bdev structure is
-+ * allocated.
-+ *
-+ * Return: Return 0 if operation was successful.
-+ */
-+int security_bdev_alloc(struct block_device *bdev)
-+{
-+	int rc = 0;
-+
-+	rc = lsm_bdev_alloc(bdev);
-+	if (unlikely(rc))
-+		return rc;
-+
-+	rc = call_int_hook(bdev_alloc_security, 0, bdev);
-+	if (unlikely(rc))
-+		security_bdev_free(bdev);
-+
-+	return LSM_RET_DEFAULT(bdev_alloc_security);
-+}
-+EXPORT_SYMBOL(security_bdev_alloc);
-+
-+/**
-+ * security_bdev_free() - Free a block device's LSM blob
-+ * @bdev: block device
-+ *
-+ * Deallocate the bdev security structure and set @bdev->security to NULL.
-+ */
-+void security_bdev_free(struct block_device *bdev)
-+{
-+	if (!bdev->security)
-+		return;
-+
-+	call_void_hook(bdev_free_security, bdev);
-+
-+	kfree(bdev->security);
-+	bdev->security = NULL;
-+}
-+EXPORT_SYMBOL(security_bdev_free);
-+
-+/**
-+ * security_bdev_setsecurity() - Set a security property of a block device
-+ * @bdev: block device
-+ * @name: security property name
-+ * @value: security property value
-+ * @size: length of the property value
-+ *
-+ * Set the security property associated with @name for @bdev from the security
-+ * property value @value. @size indicates the size of the @value in bytes.
-+ * If a @name is not implemented for a hook, it should return -EOPNOTSUPP.
-+ *
-+ * Return: Returns 0 on success.
-+ */
-+int security_bdev_setsecurity(struct block_device *bdev,
-+			      const char *name, const void *value,
-+			      size_t size)
-+{
-+	int rc = 0;
-+	struct security_hook_list *p;
-+
-+	hlist_for_each_entry(p, &security_hook_heads.bdev_setsecurity, list) {
-+		rc = p->hook.bdev_setsecurity(bdev, name, value, size);
-+		if (rc && rc != -EOPNOTSUPP)
-+			return rc;
++	switch (token) {
++	case __IPE_PROP_BOOT_VERIFIED_FALSE:
++	case __IPE_PROP_BOOT_VERIFIED_TRUE:
++		p->type = token;
++		break;
++	case __IPE_PROP_INVALID:
++	default:
++		rc = -EBADMSG;
++		break;
 +	}
++	if (rc)
++		goto err;
++	list_add_tail(&p->next, &r->props);
 +
-+	return LSM_RET_DEFAULT(bdev_setsecurity);
-+}
-+EXPORT_SYMBOL(security_bdev_setsecurity);
-+
- #ifdef CONFIG_PERF_EVENTS
++out:
++	return rc;
++err:
++	kfree(p);
++	goto out;
+ }
+ 
  /**
-  * security_perf_event_open() - Check if a perf event open is allowed
 -- 
 2.25.1
 
