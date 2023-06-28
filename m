@@ -2,95 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 550D3EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 14:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D77C2EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 15:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230233AbjF1OfJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 10:35:09 -0400
-Received: from dfw.source.kernel.org ([139.178.84.217]:60772 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbjF1OfI (ORCPT
+        id S231290AbjF1PAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 11:00:20 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:45710 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231495AbjF1PAT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 10:35:08 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Wed, 28 Jun 2023 11:00:19 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 39AEC61349
-        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 14:35:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13661C433C8;
-        Wed, 28 Jun 2023 14:35:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687962907;
-        bh=SoYEiMCAJ933BAt+0O/4yhFG8Ayk3K3QxicFuOWsNh0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jLBRsUBLAIVRs27Z82I6Ru7Mg3cULGPtveTXNmuqnAvYtRMH98wslkiNROvYc8jjt
-         wfWKToVOhfzNx+5wd4rFwfCzBmpSZxnZr6K4yefzvARXP5ydl+EChRBeYFw8dds/d3
-         TY+pI9/ELHb+onX15X19+uXZUssWrApsJ3eJ64316rqZBFWjQXNWdWN6YdfVqdKfjJ
-         WG2ujISQJ5IMopRf95YyPLEcab97t8Wqql9MU/IHM/XLOP/JG6j/DRtmdDu46iZQPA
-         2lChnWwdDLxNXsH/EiR+eG+FDKKWwtYOjwZ45HjoA/7gRcxaJ0Kp3cmsO11DRjeXvG
-         gO7gLJn9+291Q==
-Date:   Wed, 28 Jun 2023 08:35:04 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Message-ID: <ZJxFGCziTP+0Yb2n@kbusch-mbp.dhcp.thefacebook.com>
-References: <caa80682-3c3e-f709-804a-6ee913e4524f@grimberg.me>
- <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
- <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
- <ZJRcRWyn7o7lLEDM@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRgUXfRuuOoIN1o@ovpn-8-19.pek2.redhat.com>
- <ZJRmd7bnclaNW3PL@kbusch-mbp.dhcp.thefacebook.com>
- <ZJeJyEnSpVBDd4vb@ovpn-8-16.pek2.redhat.com>
- <ZJsaoFtqWIwshYD6@kbusch-mbp.dhcp.thefacebook.com>
- <ZJuNKGy5dXPC6i+H@ovpn-8-21.pek2.redhat.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 65CEF21860;
+        Wed, 28 Jun 2023 15:00:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1687964418; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9CR37uQiwm1asElSZ3bEZlRLiaAveFIzzgBUB68uggQ=;
+        b=e3Re6unHuBiffFAXxG6nuCseD+DgbqVyUv6IQB2qwK3gc8BdA+tzWkQn54L8fISjR7Bf+o
+        SyKjki7jFld3fuMMt5HbJv+2dp07qQuZ1utLfydzHH0MgAe5sNG2sP87scRlkbE1h/ktur
+        Qz9T9ZonsWOOfu1I4fmL9LMVJjnU6/U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1687964418;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9CR37uQiwm1asElSZ3bEZlRLiaAveFIzzgBUB68uggQ=;
+        b=Y76jjcsjy6OxdkD6gogSK2CzIqDbGp+ZwB1ngf4tgTLAJF/lHpBdyM2mWuCCkxQlVhYMBu
+        CV/Ht9uvZQsV+0Aw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 43A7B138EF;
+        Wed, 28 Jun 2023 15:00:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id rp1rDwJLnGSKMQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 28 Jun 2023 15:00:18 +0000
+Date:   Wed, 28 Jun 2023 17:00:17 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Message-ID: <6g53yj5afhhonwf2psf7ft2gkakkwewy7klkix3y3u6uclpa5w@tt2yfzigyxgg>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-3-dwagner@suse.de>
+ <oyhlgbqq6pjwln5ly47rt5iyjtai4jeepkascfaskn2z7nu3ks@te7yrwbcpsmi>
+ <ygfgqglmntpqiopzq44aqegehnlroarteqjtmih7mulan4oukv@jmtupz2jnafv>
+ <c6x53xzjqlmhvxpvrlhkuoclzslcogonznypuqlowcegygemyb@754b3ynn5xfu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZJuNKGy5dXPC6i+H@ovpn-8-21.pek2.redhat.com>
+In-Reply-To: <c6x53xzjqlmhvxpvrlhkuoclzslcogonznypuqlowcegygemyb@754b3ynn5xfu>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 09:30:16AM +0800, Ming Lei wrote:
-> That may not be enough:
-> 
-> - What if nvme_sysfs_delete() is called from sysfs before the 1st check in
-> nvme_reset_work()?
-> 
-> - What if one pending nvme_dev_disable()<-nvme_timeout() comes after
-> the added nvme_unquiesce_io_queues() returns?
+On Wed, Jun 28, 2023 at 10:04:01AM +0000, Shinichiro Kawasaki wrote:
+> > BTW, when the udev rule is active I observed crashes when running blktests. So
+> > there is more to fix, though one thing at the time.
 
-Okay, the following will handle both:
+FTR, this is typical hanger/crash I see when the udev rule is active:
 
----
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index b027e5e3f4acb..c9224d39195e5 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2690,7 +2690,8 @@ static void nvme_reset_work(struct work_struct *work)
- 	if (dev->ctrl.state != NVME_CTRL_RESETTING) {
- 		dev_warn(dev->ctrl.device, "ctrl state %d is not RESETTING\n",
- 			 dev->ctrl.state);
--		return;
-+		result = -ENODEV;
-+		goto out;
- 	}
- 
- 	/*
-@@ -2777,7 +2778,9 @@ static void nvme_reset_work(struct work_struct *work)
- 		 result);
- 	nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DELETING);
- 	nvme_dev_disable(dev, true);
-+	nvme_sync_queues(&dev->ctrl);
- 	nvme_mark_namespaces_dead(&dev->ctrl);
-+	nvme_unquiesce_io_queues(&dev->ctrl);
- 	nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DEAD);
- }
- 
---
+ run blktests nvme/005 at 2023-06-28 16:30:07
+ loop0: detected capacity change from 0 to 32768
+ nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+ nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN "blktests-subsystem-1"
+ (NULL device *): {0:0} Association created
+ [43] nvmet: ctrl 1 start keep-alive timer for 5 secs
+ nvmet: creating nvm controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:242d4a24-2484-4a80-8234-d0169409c5e8.
+ [7] nvmet: adding queue 1 to ctrl 1.
+ [363] nvmet: adding queue 2 to ctrl 1.
+ [43] nvmet: adding queue 3 to ctrl 1.
+ [45] nvmet: adding queue 4 to ctrl 1.
+ nvme nvme2: NVME-FC{0}: new ctrl: NQN "blktests-subsystem-1"
+ nvme nvme3: NVME-FC{1}: create association : host wwpn 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN "nqn.2014-08.org.nvmexpress.discovery"
+ (NULL device *): {0:1} Association created
+ [43] nvmet: ctrl 2 start keep-alive timer for 120 secs
+ nvmet: creating discovery controller 2 for subsystem nqn.2014-08.org.nvmexpress.discovery for NQN nqn.2014-08.org.nvmexpress:uuid:242d4a24-2484-4a80-8234-d0169409c5e8.
+ nvme nvme3: NVME-FC{1}: new ctrl: NQN "nqn.2014-08.org.nvmexpress.discovery"
+ nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN "blktests-subsystem-1"
+ (NULL device *): {0:2} Association created
+ [24] nvmet: ctrl 3 start keep-alive timer for 5 secs
+ nvmet: creating nvm controller 3 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:242d4a24-2484-4a80-8234-d0169409c5e8.
+ [7] nvmet: adding queue 1 to ctrl 3.
+ [24] nvmet: adding queue 2 to ctrl 3.
+ [43] nvmet: adding queue 3 to ctrl 3.
+ [45] nvmet: adding queue 4 to ctrl 3.
+ nvme nvme2: NVME-FC{0}: controller connect complete
+ nvme nvme2: Removing ctrl: NQN "blktests-subsystem-1"
+ block nvme2n1: no available path - failing I/O
+ block nvme2n1: no available path - failing I/O
+ Buffer I/O error on dev nvme2n1, logical block 0, async page read
+ [363] nvmet: ctrl 1 stop keep-alive
+ (NULL device *): {0:0} Association deleted
+ (NULL device *): {0:0} Association freed
+ (NULL device *): Disconnect LS failed: No Association
+ general protection fault, probably for non-canonical address 0xdffffc00000000a4: 0000 [#1] PREEMPT SMP KASAN NOPTI
+ KASAN: null-ptr-deref in range [0x0000000000000520-0x0000000000000527]
+ CPU: 1 PID: 363 Comm: kworker/1:4 Tainted: G    B   W          6.4.0-rc2+ #4 451dee9b3635bb59af0c91bc19227b1b3bbbbf3f
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unknown unknown
+ Workqueue: nvmet-wq fcloop_fcp_recv_work [nvme_fcloop]
+ RIP: 0010:nvmet_execute_disc_get_log_page+0x23f/0x8c0 [nvmet]
+ Code: e8 c6 12 63 e3 4c 89 6c 24 40 48 89 5c 24 08 4c 8b 3b 49 8d 9f 20 05 00 00 48 89 d8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <80> 3c 08 00 74 08 48 89 df e8 93 12 63 e3 4c 89 74 24 30 4c 8b 2b
+ RSP: 0018:ffff88811ab378a0 EFLAGS: 00010202
+ RAX: 00000000000000a4 RBX: 0000000000000520 RCX: dffffc0000000000
+ RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffffffa95d2d70
+ RBP: ffff88811ab37ab0 R08: dffffc0000000000 R09: fffffbfff52ba5af
+ R10: 0000000000000000 R11: dffffc0000000001 R12: 1ffff11023566f20
+ R13: ffff888107db3260 R14: ffff888107db3270 R15: 0000000000000000
+ FS:  0000000000000000(0000) GS:ffff88815a600000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 0000000002394000 CR3: 000000011e5e8006 CR4: 0000000000370ee0
+ Call Trace:
+  <TASK>
+  ? prepare_alloc_pages+0x1c5/0x580
+  ? __cfi_nvmet_execute_disc_get_log_page+0x10/0x10 [nvmet f0c9e080f6cf521f454ee104d12dafd11a5a7613]
+  ? __alloc_pages+0x30e/0x650
+  ? slab_post_alloc_hook+0x67/0x350
+  ? __cfi___alloc_pages+0x10/0x10
+  ? alloc_pages+0x30e/0x530
+  ? sgl_alloc_order+0x118/0x320
+  nvmet_fc_queue_fcp_req+0xa19/0xda0 [nvmet_fc f192e753efa6aca39b2b3b72c07e648aac01348b]
+  ? nvmet_fc_rcv_fcp_req+0x9c0/0x9c0 [nvmet_fc f192e753efa6aca39b2b3b72c07e648aac01348b]
+  ? do_raw_spin_unlock+0x116/0x8a0
+  ? nvmet_fc_rcv_fcp_req+0x4de/0x9c0 [nvmet_fc f192e753efa6aca39b2b3b72c07e648aac01348b]
+  nvmet_fc_rcv_fcp_req+0x4f0/0x9c0 [nvmet_fc f192e753efa6aca39b2b3b72c07e648aac01348b]
+  fcloop_fcp_recv_work+0x173/0x440 [nvme_fcloop dcecfb508887e13f93cf8f37ef42c0fab90cbd00]
+  process_one_work+0x80f/0xfb0
+  ? rescuer_thread+0x1130/0x1130
+  ? do_raw_spin_trylock+0xc9/0x1f0
+  ? lock_acquired+0x4a/0x9a0
+  ? wq_worker_sleeping+0x1e/0x200
+  worker_thread+0x91e/0x1260
+  ? do_raw_spin_unlock+0x116/0x8a0
+  kthread+0x25d/0x2f0
+  ? __cfi_worker_thread+0x10/0x10
+  ? __cfi_kthread+0x10/0x10
+  ret_from_fork+0x29/0x50
+  </TASK>
