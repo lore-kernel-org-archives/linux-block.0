@@ -2,194 +2,264 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21677EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 12:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1452EB64DD
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 12:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbjF1MHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 08:07:03 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:47787 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjF1MHC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 08:07:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1687954022; x=1719490022;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=VxTATcz/xDvtvd1M0IeLkWaax3o5uk8C4fsyBplLJPc=;
-  b=VQJk25wPyXy8L/ChfqQGCsG0JbsxbDeDhgD2uAzINvtX8RmRiTgDN0AJ
-   Bao7oh6F+yaBtuMr/DTBV079MqTS0/W4yesPNJuvWxGpwqnJ8N1jaAWjM
-   lVWFVvCh7uNr8VPm1MnxeDwjkcOeb6uv3FwsiflJPB6lBSakHjS4Xr7y8
-   kKEu2rsV/5zJuaE7lVXVy6uZl9ZJzs1rTJe51xY2iBohi5xRPZxDEtg/Z
-   REmr5VpxCprRXwJKP9PUc+OPuVx8+DaQC68cEl+ujZY/mEF85L+3KnQMP
-   s7/EJy9ZrkhptrK0TUbasbTiLL53VsVplUwF+CxnLtWtKmriX2/ZqbsdO
+        id S230428AbjF1MMI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 08:12:08 -0400
+Received: from mga12.intel.com ([192.55.52.136]:40684 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231853AbjF1MLu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jun 2023 08:11:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687954310; x=1719490310;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SO2aJTQFDpvmS5VCVuSHy31Q+lMPYy3bSbWqJ1yROBw=;
+  b=IM6pjkQPiPEORHdiSh8YUIG3TVT76xcV5G90upt/TuU13THCeZ/Ii3/q
+   a9zdoXXiVLsiF8uf/GMDAc6Kevq0FaeP0/wn/IqofDQLe5IDpGzJxx0x2
+   yUr2JpgUsQzHmULKg6nv0mlOBX9xkus7Tcu4ZZtqIwxqELk8QXOrvB4KL
+   trQhUF4ROuDP4bb7wAgk418y7S1YMWIvLNBguXUGdmzDJedqfunVT13rR
+   8xP5QCwXzhewBLJ3KHw11xwU4wilIPaZvDfrpeJIH9ajJCpxWNH34LV2B
+   gljeFIiffNHrkaqFFIpaaXCPd4YQAdbbLC113xeiGtdidvqn8jqi2Q0Ey
    w==;
-X-IronPort-AV: E=Sophos;i="6.01,165,1684771200"; 
-   d="scan'208";a="237075038"
-Received: from mail-mw2nam10lp2100.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.100])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jun 2023 20:07:01 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OeyZa5bMekMnkV0AOxhn4YN+xmzS6CczSyRLYxJNwcH/PbNzxgfeR/qdciZDlLcvgoflT6xWGuCY2BsnH8D4qq7V5lj8operZFRhrwPjUJ4AsljRQdG1kQMiUa/g6yfDrZXQ1aLXVsey9LaFAzMPRGqQgzCdfBoYs82nVtAVWmEeK96LrFclfOALQR9xOFF1L+lXAa7+7JY1/D3YE1A9Ad/qMmsvuWEcvBVm3iWrCHB8IZZTYGVwtg5h4kUT9C+P7xi3UgwKZdakyj/+BZW/W8WEXMuyeKj/h1Ed7mWdFKNMycBoOcAB5lTqufG6HIyxsF4+aF3MAPSW0wNki2S2tw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VxTATcz/xDvtvd1M0IeLkWaax3o5uk8C4fsyBplLJPc=;
- b=FAXQnEVs7y+/YfBPw6GwoTjllc8CtEfF1k8FScTqzHN6+UWO6zxzarmccEzQ0AtlZSpAtyvW+c9Nb1eAJbWPXnWLxBR4egcHTsT5UOqGPQjNtp2B8sbHw3lzdAJM4n53FyrSA2Wf4yJo7lFZKd0yOw/LYBvZYDddS5TbxWWSN6jIIml++syQKggukFXlrr/nHTOTBXKPaj6UC3Y0DHTB6uwi51sev0QN2Vmky/S4iEV3xCdPKY7Z2b8KovpXjS28Tsypmtfs6nYkNi2wefEWVXJMdHFElXjP3eH9aGPQ8CTtOp2jGQewfytxKDm4hICwlRTMogD3C9LhajovQK6dLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VxTATcz/xDvtvd1M0IeLkWaax3o5uk8C4fsyBplLJPc=;
- b=ZUUajf4i7+kWl1Pfs8QbxQVBbKSOS4eS1sG42/2mR+xT5suM3oObVr+o1OHaTBMZOQQ1CC0byK4JOEgVV0LVXmKg5Pi+dRebZtSVrNopUCmchC7gRly3jbBMq94ep1c2sfmgi2fZUE9W6Mxk0WEF3MVxlDHiHKl5zbzWu5hawjU=
-Received: from BN8PR04MB6417.namprd04.prod.outlook.com (2603:10b6:408:d9::23)
- by CYYPR04MB8790.namprd04.prod.outlook.com (2603:10b6:930:c0::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 28 Jun
- 2023 12:06:59 +0000
-Received: from BN8PR04MB6417.namprd04.prod.outlook.com
- ([fe80::9b77:81ec:d24:5cb9]) by BN8PR04MB6417.namprd04.prod.outlook.com
- ([fe80::9b77:81ec:d24:5cb9%3]) with mapi id 15.20.6521.026; Wed, 28 Jun 2023
- 12:06:59 +0000
-From:   =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <Matias.Bjorling@wdc.com>
-To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
+X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="341413253"
+X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
+   d="scan'208";a="341413253"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 05:11:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="752230431"
+X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
+   d="scan'208";a="752230431"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 28 Jun 2023 05:11:40 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qEU1L-000DFB-2e;
+        Wed, 28 Jun 2023 12:11:39 +0000
+Date:   Wed, 28 Jun 2023 20:11:10 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        willy@infradead.org, hare@suse.de, djwong@kernel.org,
+        bvanassche@acm.org, ming.lei@redhat.com, dlemoal@kernel.org,
+        nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Nitesh Shetty <nj.shetty@samsung.com>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3] block: ublk: enable zoned storage support
-Thread-Topic: [PATCH v3] block: ublk: enable zoned storage support
-Thread-Index: AQHZWBd1sDAZTvUQO0y46n8WBFABra7+u2iAgKICQQCAAAEKMA==
-Date:   Wed, 28 Jun 2023 12:06:59 +0000
-Message-ID: <BN8PR04MB6417B762EA748C0117D6EACCF124A@BN8PR04MB6417.namprd04.prod.outlook.com>
-References: <20230316145539.300523-1-nmi@metaspace.dk>
- <ZBQ3sgoN8oX5HXOJ@x1-carbon> <87edlvhkfe.fsf@metaspace.dk>
-In-Reply-To: <87edlvhkfe.fsf@metaspace.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN8PR04MB6417:EE_|CYYPR04MB8790:EE_
-x-ms-office365-filtering-correlation-id: 3eda8c9a-7178-4949-c4cf-08db77d02cfc
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: BeIDldRAMxHtGg08allZwlx9CdqQjh+9p5yz2lnW5JH/ykHEeyFNu0cCzVoVb04T0Ep5IROIBhbCKsxHHaicfiKI1vkTJMxj2FhpKam7ZrfDjgZU/+FjJoRZgPB07gOSpYL2ctPbMafmBNN0nqPnP6rdLJkBMVpkv3R9QYJfuYLCflCAwlVrhpQn3IKUH3MWPbxwhzJmOl/8wwb7MXbkaFXoepvuNqZzYlcTWvmdQT2c6/3P54hybfu9fVALk/MYBTYl1nlarzQKu95r4uI6+xZ7Qv7I9W7XCuHQnyLtosdsIvgS6eXdlCBhg0BMsvRXiwZgvKDQXHgXzR40w19sM+kDFP1cdi1wawJ3TX+Vytkq/9W0Jmnr14FTi5Z8lmD/M/DWxOAluvrGIOFc9accNj58o5skpX0YDxgYwaUGGQpNKLqkOoT/hsby44Gqac29DXZqg9smOQltb6yzHk8BtHF8XBhuiSARxwEm5XG16oemwYHoEMO8Cg/FCbYDiOPRQmYqFzYvB1oAyzxC/L9RhsIx/SJh1DnDLnCPZaGq5Ypz49vG/6xvmmwOJC/b+iqFd/o/OF36x5dT5ztaZY6TJl+yoG2XI+Y56yjOsdT6sDeGtweUiisB3VEmFxHB6aMP
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR04MB6417.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(39860400002)(136003)(366004)(346002)(451199021)(66574015)(83380400001)(8936002)(52536014)(316002)(7696005)(71200400001)(110136005)(8676002)(54906003)(6636002)(4326008)(41300700001)(85182001)(33656002)(85202003)(55016003)(122000001)(86362001)(82960400001)(38100700002)(64756008)(9686003)(5660300002)(66946007)(66556008)(66446008)(66476007)(478600001)(2906002)(186003)(26005)(76116006)(38070700005)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SDBsS3Z3RFNlanZLVVhPNHNibE5UZlQ5Y082VUNLYXhCU25FWE1DdlZVTFA3?=
- =?utf-8?B?SUhyQ2lEMWRtU3I2cEhzcURYdTh3b3o0YzVjZGt0Y1l6Vmo2VFB6ZzNOUVpC?=
- =?utf-8?B?b05XcE0wMDZzVGN4SWxJVGJJY0xwMStOWE5XazhJVFBYZlZ3U1VFN1ZKSWha?=
- =?utf-8?B?VjhpSC8xaHM2aXBrY3puZlpLZXl3emUxSGM3cVczQnhyYXphcUhsWjUzKzVj?=
- =?utf-8?B?NmJQYVFQMVppOUlhWkdVV3I2b2RmdEprU3pwVHMzaENJR2dwSHNzdnJzclBI?=
- =?utf-8?B?QW5seGVBT1MvQkxIYVZTMVFrRW0zSG5qSjBDb3RsUzNBN3FXNnoxVHlMY2R4?=
- =?utf-8?B?N0htS3VCelhXLzdhb0E2VUxuYkR4QjVkZ1EyM1p1MnJYRWV2Ky9xQ1lYbHM0?=
- =?utf-8?B?Qm9BY3BFTlg4cVdNNmROWHRjZjZUVlBOOVNoYk9mYTlXaE9iUlNRbExsdGcv?=
- =?utf-8?B?ek9kbmg3cXVmQndCa1pCdU12UCtzSU4va3JHeTFySFExMUlhSHE0clZSNkRu?=
- =?utf-8?B?WFBiUkFEM3ZEbFBKMmFQUWsvcGk2Ym1IVDY4dENiWjN4ZHh3L2RDZ25XejRT?=
- =?utf-8?B?QjFlbXZhS012dU05QjE2ZEovajltRGdIWGR5RHR0ajVFYlZDVVZQNXJ3bDZW?=
- =?utf-8?B?VXdETFUxdzgwUWFDaXZyOEY2RGlkakVHWm1Bd20rNWF3WU1PMWE0S3A0dzA2?=
- =?utf-8?B?NjVPNGU2eVBxaGhBVVMrU29rSWIxTVR0RzAvTFBDY2hlYmt5N2haWlVoU25k?=
- =?utf-8?B?YXZDTzZCL3hFUllMKzRnNnpGVnJKWFo3N2FaQXYzVzNibnE5RXJGcTlHTHlF?=
- =?utf-8?B?NUF4b2VENnI3SXVJL3lIVjBudmRzZzFHRHJvRjJDNnQrMVVkYkpsdTRPaXI5?=
- =?utf-8?B?ZDlXQjRaZGcrOWl4ZHdYaWxEaTBvRjl6eTluTVczS2FiS1BVNlpaK3ZXOXA4?=
- =?utf-8?B?dEFEeXlXTERnSVhsSFpvMDFDUkhYZmg5b0labDF6aUltVy9mdUhBWnlSekpL?=
- =?utf-8?B?VjUyVXN1ekcrRUovU2hqdE9xU2hCTWtXdmQ2Ny9sajJIZlVuaWF2V0d2T2pW?=
- =?utf-8?B?ZGtLU01sbEVIWnZVZTNrcGkzL1ZzZzAvQVh1M2Z5WXM0WVAwMUtwNzJaUTlr?=
- =?utf-8?B?TFFYMXkwU1Rjbk5VQklwTE5IRWJFMDVoWXBYR0JFWkNpeHE0ampEUGhmaDhp?=
- =?utf-8?B?Ym1TMGl6THgxZmJCOUlDdkZlSEQ2cEZjY29KTXduMUI3cWhXNTBpc3pOMmIv?=
- =?utf-8?B?a0grb1JPYjhQU1hJVmIzcHJBeTAxa0NST3Nxc3pqdExzM3M0NXkrQTJRL2Zn?=
- =?utf-8?B?clBDdG1HWTM3MzY2RUEyd0FZWnZyQjB0Y2NyLzhzS0ZUQzQzdm1Gazhxc2xF?=
- =?utf-8?B?VkpZZ0FFLzh2NFRGaHZOQkF6Q3JxT0NQY1RVdkJyUVpMRXFGaFcxQU10cGMx?=
- =?utf-8?B?TVFzckxqRjArMGg2bzZHVlR6c3ZRZEF1ZGFGU3daQkZlNm9tSVYvVlNweE9U?=
- =?utf-8?B?SjJ1SmhZVzcrSHU1ZDFRVFJ5ZnlLYnZlL2dxQkl2N0JGSnFXZWY3ZE9ZWVFm?=
- =?utf-8?B?RDFhRDdISGsxTUpseEx2enlEdFhrZFFML3dVU0pLVzRQa0hudVJOazF5aEM1?=
- =?utf-8?B?NTgxa1RRZTJoT0RWdWJOWFdPVE1tZDZ5K3VJejRMUWNlQmdSWFBML2Zxc0Jj?=
- =?utf-8?B?Qm5Bd05tOVJnY3NoUjRJM3k3dDd1RHRtUk8wMVpVSjdranZkb0E5WWVvMkZ2?=
- =?utf-8?B?V3JURDFLYU8zb1ZaQ1NlejZ2Q0RWZ25RdkhZYmYwaFlxNkwvd2dxa2RxakFz?=
- =?utf-8?B?YVZxVmJuOW9IbWRIZk5ZQzBIS3A4TVFDU0NyQVVPcXIwRVBUUXlzOVIwOXBv?=
- =?utf-8?B?WWo2STZ6a3dWN0pNQXhNdk5WVXR6YnF6RFVrWnVnVnFaalFxdWtuY2VRTnBt?=
- =?utf-8?B?TEdZSVBXem1EejRDYm15Nm1wWVZMN3NLRUg3cXdYMlFpYlNQSUw0RTVJeWhs?=
- =?utf-8?B?WjVQeUk0N3ZtNkRGUlROVURCdjk5WnJONmpWc3hYVTJSVC9IY1RwenZOcnNN?=
- =?utf-8?B?NmtuMS9yTjNKUTRJNm1lbnpNK05qMXdYVGU3am5GMWE0WEJ4bVUxbzdsRnd3?=
- =?utf-8?Q?sM0TgJm2vsrIM61bg9j5KkvVj?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Anuj Gupta <anuj20.g@samsung.com>,
+        Vincent Fu <vincent.fu@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v13 9/9] null_blk: add support for copy offload
+Message-ID: <202306281909.TRNCf5eG-lkp@intel.com>
+References: <20230627183629.26571-10-nj.shetty@samsung.com>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: ls4OnaItSm6AtMs0pyMuqWvuELNO1FSCw6NTeRdzAmAoolkL6lFL022hxvLw6/9+qURs+lyp9ZHCto1esywPmzdIgvioddiVGrTLo/oQCpwlLTYQYtife9KmyUDkdSPpxvCBgpgG8JWQGkxZAZw2Aj0IzYwoDKLM4fK/XXmyIgKPJsuakQxc+zZxN4mdt/xVfloCymxh2FGQ4nOFtyAHe/b6DmqSOevLwB9HK3QIJmSGsQfx7br9Mk5JMDp6LRsSzYs2yF5++lyKWraIySIBN9B3+W8SCyxHbuifx0FtbU/9gG9H7HYvuJwdkgYkfWBE84i9jc8X3DdacnHhUcoNb0TIitEX8pmo6xWJBnaXsVyNH07oUjCOJjAsZRdTzDfaQNTujVaGf86aOycCeGgrezLrrNlJUTZQnsmzESyzReGPbcVz67o9c5XK9/LArnDWoSjlF8Vr06mVVO4p6Nki6v9uY7gkzFFm8q9nHePhaBJDNHT7Xm4b+Zr4WV/bskQSeBzgxa65XunWqwA3FnR2GGNjWyxweizd98YW5rxdiSMgM/UZMS3kTb2jjKVCz6Kw6yUYcTHEjVK+ErerNO9+mke18RJt8AbGqkhkYL1VJnqnfMfQwSmbagSMezcF4zbY8RXdfcdlTUoeFNL7oNH9awXepPhuc7XVrm/kgYicuwtFeFUO6fbZ9U/6ItbfDu2WJzaCggn5In8/f/kvTBrBf+ANRAlskQjUPhtfKYs+oCc+oCqo7NlAQnzi292iAiVmducrAS2hzZ3MtQNNfSTuY5fUiPRcYxO6HwrkRvPGo0BNR4gmMdBk8vLdOtt4dhjlF5VzZYJRHQO/iUI61yOYDoh/y7+Mi7NdQNgaAeKNjcm3DWCBF3zHoEaWNCwXenrqDqT1S+Fq2Eop1YBq2zvh3A==
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN8PR04MB6417.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3eda8c9a-7178-4949-c4cf-08db77d02cfc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2023 12:06:59.4523
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fUbZBA1O3yymHPnLBG6S44F+pGll2dfh4I6P01HdUdlkDeAuabkETlcVpAhRVf5vVKDi0CeeMPdSe+Q5ovu2Cw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR04MB8790
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230627183629.26571-10-nj.shetty@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbmRyZWFzIEhpbmRib3JnIChT
-YW1zdW5nKSA8bm1pQG1ldGFzcGFjZS5kaz4NCj4gU2VudDogV2VkbmVzZGF5LCAyOCBKdW5lIDIw
-MjMgMTMuNTINCj4gVG86IE5pa2xhcyBDYXNzZWwgPE5pa2xhcy5DYXNzZWxAd2RjLmNvbT4NCj4g
-Q2M6IGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZzsgSGFucyBIb2xtYmVyZyA8SGFucy5Ib2xt
-YmVyZ0B3ZGMuY29tPjsNCj4gTWF0aWFzIEJqw7hybGluZyA8TWF0aWFzLkJqb3JsaW5nQHdkYy5j
-b20+OyBNaW53b28gSW0NCj4gPG1pbndvby5pbS5kZXZAZ21haWwuY29tPjsgRGFtaWVuIExlIE1v
-YWwNCj4gPGRhbWllbi5sZW1vYWxAb3BlbnNvdXJjZS53ZGMuY29tPjsgSmVucyBBeGJvZSA8YXhi
-b2VAa2VybmVsLmRrPjsNCj4gTWluZyBMZWkgPG1pbmcubGVpQHJlZGhhdC5jb20+OyBvcGVuIGxp
-c3QgPGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
-djNdIGJsb2NrOiB1YmxrOiBlbmFibGUgem9uZWQgc3RvcmFnZSBzdXBwb3J0DQo+IA0KPiANCj4g
-TmlrbGFzIENhc3NlbCA8TmlrbGFzLkNhc3NlbEB3ZGMuY29tPiB3cml0ZXM6DQo+IA0KPiA+IE9u
-IFRodSwgTWFyIDE2LCAyMDIzIGF0IDAzOjU1OjM4UE0gKzAxMDAsIEFuZHJlYXMgSGluZGJvcmcg
-d3JvdGU6DQo+ID4+IEZyb206IEFuZHJlYXMgSGluZGJvcmcgPGEuaGluZGJvcmdAc2Ftc3VuZy5j
-b20+DQo+ID4NCj4gPiBIZWxsbyBBbmRyZWFzLA0KPiA+DQo+ID4NCj4gPiBJIHRoaW5rIHRoYXQg
-dGhpcyBwYXRjaCBpcyBzdGFydGluZyB0byBsb29rIHZlcnkgbmljZSENCj4gDQo+IFRoYW5rcyEN
-Cj4gDQo+ID4NCj4gPg0KPiA8c25pcD4NCj4gPj4gKw0KPiA+PiAraW50IHVibGtfcmVwb3J0X3pv
-bmVzKHN0cnVjdCBnZW5kaXNrICpkaXNrLCBzZWN0b3JfdCBzZWN0b3IsDQo+ID4+ICsJCSAgICAg
-IHVuc2lnbmVkIGludCBucl96b25lcywgcmVwb3J0X3pvbmVzX2NiIGNiLCB2b2lkICpkYXRhKSB7
-DQo+ID4+ICsJdW5zaWduZWQgaW50IGRvbmVfem9uZXMgPSAwOw0KPiA+PiArCXN0cnVjdCB1Ymxr
-X2RldmljZSAqdWIgPSBkaXNrLT5wcml2YXRlX2RhdGE7DQo+ID4+ICsJdW5zaWduZWQgaW50IHpv
-bmVfc2l6ZV9zZWN0b3JzID0gZGlzay0+cXVldWUtPmxpbWl0cy5jaHVua19zZWN0b3JzOw0KPiA+
-PiArCXVuc2lnbmVkIGludCBmaXJzdF96b25lID0gc2VjdG9yID4+IGlsb2cyKHpvbmVfc2l6ZV9z
-ZWN0b3JzKTsNCj4gPj4gKwlzdHJ1Y3QgYmxrX3pvbmUgKmJ1ZmZlcjsNCj4gPj4gKwlzaXplX3Qg
-YnVmZmVyX2xlbmd0aDsNCj4gPj4gKwl1bnNpZ25lZCBpbnQgbWF4X3pvbmVzX3Blcl9yZXF1ZXN0
-Ow0KPiA+DQo+ID4gTml0OiBJIHdvdWxkIHNvcnQgdGhlIHZhcmlhYmxlcyBkaWZmZXJlbnRseS4N
-Cj4gPg0KPiA+IFBlcmhhcHM6DQo+ID4+ICsJc3RydWN0IHVibGtfZGV2aWNlICp1YiA9IGRpc2st
-PnByaXZhdGVfZGF0YTsNCj4gPj4gKwl1bnNpZ25lZCBpbnQgem9uZV9zaXplX3NlY3RvcnMgPSBk
-aXNrLT5xdWV1ZS0+bGltaXRzLmNodW5rX3NlY3RvcnM7DQo+ID4+ICsJdW5zaWduZWQgaW50IGZp
-cnN0X3pvbmUgPSBzZWN0b3IgPj4gaWxvZzIoem9uZV9zaXplX3NlY3RvcnMpOw0KPiA+PiArCXVu
-c2lnbmVkIGludCBkb25lX3pvbmVzID0gMDsNCj4gPj4gKwl1bnNpZ25lZCBpbnQgbWF4X3pvbmVz
-X3Blcl9yZXF1ZXN0Ow0KPiA+PiArCXN0cnVjdCBibGtfem9uZSAqYnVmZmVyOw0KPiA+PiArCXNp
-emVfdCBidWZmZXJfbGVuZ3RoOw0KPiA+DQo+IA0KPiBDYW4gSSBhc2sgd2hhdCBpcyB0aGUgcmVh
-c29uaW5nIGJlaGluZCB0aGlzPyBJIHRoaW5rIHRoZXkgd2F5IHlvdSBwcm9wb3NlIGxvb2tzDQo+
-IGJldHRlciwgYnV0IGFyZSB0aGVyZSBhbnkgcnVsZXMgb25lIGNhbiBmb2xsb3cgZm9yIHRoaXM/
-DQoNClRoZXJlIGFyZW4ndCBtYW55IGhhcmQgcnVsZXMgdG8gbXkga25vd2xlZGdlLiBPbmUgcnVs
-ZSBvZiB0aHVtYiwgd2hpY2ggSSB1c2UsIGlzIHRvIGdyb3VwIHZhcmlhYmxlcyBvZiB0aGUgc2Ft
-ZSBkYXRhIHR5cGUuIEFub3RoZXIgb25lLCBJIHBlcnNvbmFsbHkgcHJlZmVyIGhhdmluZyB0aGUg
-Y29tcGxleCBkYXRhIHN0cnVjdHVyZXMgZmlyc3QsIGZvbGxvd2VkIGJ5IHRoZSBzaW1wbGUgZGF0
-YSB0eXBlcyBhdCB0aGUgZW5kLiBIb3dldmVyLCBpdCBpc24ndCB0aGF0IGVhc3ksIGFzIEkgdXN1
-YWxseSBhbHNvIHRha2UgdGhlIGNvZGUgZmxvdyBvZiB0aGUgZnVuY3Rpb24gaW50byBhY2NvdW50
-LCBzdWNoIHRoYXQgdGhlIGRhdGEgc3RydWN0dXJlcyB0aGF0IGFyZSB1c2VkIHRvZ2V0aGVyIGFy
-ZSBhbHNvIGRlY2xhcmVkIHRvZ2V0aGVyIGFuZCBmb2xsb3dzIHRoZSBmbG93IG9mIHRoZSBjb2Rl
-IChpZiBpdCBpcyBnZXR0aW5nIHRvbyBjb21wbGV4LCBpdHMgcHJvYmFibHkgYmVjYXVzZSB0aGUg
-ZnVuY3Rpb24gbmVlZHMgdG8gYmUgc3BsaXQpLiBGaW5hbGx5LCBpdCBhbHdheXMgaGVscHMga2Vl
-cGluZyB0aGluZ3MgYXMgc2ltcGxlIGFzIHBvc3NpYmxlLiANCg0KT3RoZXIgc3VnZ2VzdGlvbnMg
-bWlnaHQgYmUgdG8gbG9vayBhdCBleGlzdGluZyBjb2RlIGFuZCBnZXQgYSBmZWVsIGZvciBob3cg
-b3RoZXIgc3RydWN0dXJlcyBpdC4gSSd2ZSBmb3VuZCBDb2RlIENvbXBsZXRlIGJ5IFN0ZXZlIE1j
-Q29ubmVsbCBhIGNsYXNzaWMgb24gbWFpbnRhaW5pbmcgZ29vZCBjb2RlIHN0eWxlLiBPYnZpb3Vz
-bHksIGVhY2ggYWR2aWNlIGluIHRoZSBib29rIHNob3VsZCBiZSB3ZWlnaHRlZCB0b3dhcmRzIGhv
-dyBpdHMgdHlwaWNhbGx5IGRvbmUgaW4gdGhlIGtlcm5lbC4NCg0KPiANCj4gQmVzdCByZWdhcmRz
-DQo+IEFuZHJlYXMNCg==
+Hi Nitesh,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on 53cdf865f90ba922a854c65ed05b519f9d728424]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Introduce-queue-limits-for-copy-offload-support/20230628-163126
+base:   53cdf865f90ba922a854c65ed05b519f9d728424
+patch link:    https://lore.kernel.org/r/20230627183629.26571-10-nj.shetty%40samsung.com
+patch subject: [PATCH v13 9/9] null_blk: add support for copy offload
+config: hexagon-randconfig-r045-20230628 (https://download.01.org/0day-ci/archive/20230628/202306281909.TRNCf5eG-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230628/202306281909.TRNCf5eG-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306281909.TRNCf5eG-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from drivers/block/null_blk/main.c:12:
+   In file included from drivers/block/null_blk/null_blk.h:8:
+   In file included from include/linux/blkdev.h:9:
+   In file included from include/linux/blk_types.h:10:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from drivers/block/null_blk/main.c:12:
+   In file included from drivers/block/null_blk/null_blk.h:8:
+   In file included from include/linux/blkdev.h:9:
+   In file included from include/linux/blk_types.h:10:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from drivers/block/null_blk/main.c:12:
+   In file included from drivers/block/null_blk/null_blk.h:8:
+   In file included from include/linux/blkdev.h:9:
+   In file included from include/linux/blk_types.h:10:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+>> drivers/block/null_blk/main.c:1295:2: warning: variable 'rem' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+    1295 |         __rq_for_each_bio(bio, req) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/blk-mq.h:1012:2: note: expanded from macro '__rq_for_each_bio'
+    1012 |         if ((rq->bio))                  \
+         |         ^~~~~~~~~~~~~~
+   include/linux/compiler.h:55:28: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:57:30: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/block/null_blk/main.c:1300:15: note: uninitialized use occurs here
+    1300 |         if (WARN_ON(!rem))
+         |                      ^~~
+   include/asm-generic/bug.h:123:25: note: expanded from macro 'WARN_ON'
+     123 |         int __ret_warn_on = !!(condition);                              \
+         |                                ^~~~~~~~~
+   include/linux/compiler.h:55:47: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                                               ^~~~
+   include/linux/compiler.h:57:52: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                                                    ^~~~
+   drivers/block/null_blk/main.c:1295:2: note: remove the 'if' if its condition is always true
+    1295 |         __rq_for_each_bio(bio, req) {
+         |         ^
+   include/linux/blk-mq.h:1012:2: note: expanded from macro '__rq_for_each_bio'
+    1012 |         if ((rq->bio))                  \
+         |         ^
+   include/linux/compiler.h:55:23: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                       ^
+   drivers/block/null_blk/main.c:1287:12: note: initialize the variable 'rem' to silence this warning
+    1287 |         size_t rem, temp;
+         |                   ^
+         |                    = 0
+   7 warnings generated.
+
+
+vim +1295 drivers/block/null_blk/main.c
+
+  1281	
+  1282	static inline int nullb_setup_copy_write(struct nullb *nullb,
+  1283			struct request *req, bool is_fua)
+  1284	{
+  1285		sector_t sector_in, sector_out;
+  1286		void *in, *out;
+  1287		size_t rem, temp;
+  1288		struct bio *bio;
+  1289		unsigned long offset_in, offset_out;
+  1290		struct nullb_page *t_page_in, *t_page_out;
+  1291		int ret = -EIO;
+  1292	
+  1293		sector_out = blk_rq_pos(req);
+  1294	
+> 1295		__rq_for_each_bio(bio, req) {
+  1296			sector_in = bio->bi_iter.bi_sector;
+  1297			rem = bio->bi_iter.bi_size;
+  1298		}
+  1299	
+  1300		if (WARN_ON(!rem))
+  1301			return BLK_STS_NOTSUPP;
+  1302	
+  1303		spin_lock_irq(&nullb->lock);
+  1304		while (rem > 0) {
+  1305			temp = min_t(size_t, nullb->dev->blocksize, rem);
+  1306			offset_in = (sector_in & SECTOR_MASK) << SECTOR_SHIFT;
+  1307			offset_out = (sector_out & SECTOR_MASK) << SECTOR_SHIFT;
+  1308	
+  1309			if (null_cache_active(nullb) && !is_fua)
+  1310				null_make_cache_space(nullb, PAGE_SIZE);
+  1311	
+  1312			t_page_in = null_lookup_page(nullb, sector_in, false,
+  1313				!null_cache_active(nullb));
+  1314			if (!t_page_in)
+  1315				goto err;
+  1316			t_page_out = null_insert_page(nullb, sector_out,
+  1317				!null_cache_active(nullb) || is_fua);
+  1318			if (!t_page_out)
+  1319				goto err;
+  1320	
+  1321			in = kmap_local_page(t_page_in->page);
+  1322			out = kmap_local_page(t_page_out->page);
+  1323	
+  1324			memcpy(out + offset_out, in + offset_in, temp);
+  1325			kunmap_local(out);
+  1326			kunmap_local(in);
+  1327			__set_bit(sector_out & SECTOR_MASK, t_page_out->bitmap);
+  1328	
+  1329			if (is_fua)
+  1330				null_free_sector(nullb, sector_out, true);
+  1331	
+  1332			rem -= temp;
+  1333			sector_in += temp >> SECTOR_SHIFT;
+  1334			sector_out += temp >> SECTOR_SHIFT;
+  1335		}
+  1336	
+  1337		ret = 0;
+  1338	err:
+  1339		spin_unlock_irq(&nullb->lock);
+  1340		return ret;
+  1341	}
+  1342	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
