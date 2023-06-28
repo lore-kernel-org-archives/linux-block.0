@@ -2,156 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC09EB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DFFEB64DD
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 08:22:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234180AbjF1IWM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 04:22:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55603 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234269AbjF1IP1 (ORCPT
+        id S234224AbjF1IWS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 04:22:18 -0400
+Received: from mail-wr1-f42.google.com ([209.85.221.42]:41041 "EHLO
+        mail-wr1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233684AbjF1IOY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 04:15:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687940076;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z1KUy+mSETB0Ymbiz3MZDrs6ZOWnVr5ABuTlCCBNInE=;
-        b=S3tqJeTclGtKSCj1KDso5UE0hinm13urRDY2nXdqGLYfta4B3Lq+gDI3X4sv/PZoboVyZh
-        zv/hmleOmlkB3l5L9r6s2o+5Wgl3Ml8CMzqbAgIZuXHxdUGb22dkqFcnH7UQWICdd727j3
-        N3HekIW1wT4oDMC9qGPnWO6g7M/nDHg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-398-PNS-UaNNObak31gAYQU7LQ-1; Wed, 28 Jun 2023 00:13:47 -0400
-X-MC-Unique: PNS-UaNNObak31gAYQU7LQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9C1F61C04B55;
-        Wed, 28 Jun 2023 04:13:46 +0000 (UTC)
-Received: from ovpn-8-21.pek2.redhat.com (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C68B8111F3B0;
-        Wed, 28 Jun 2023 04:13:25 +0000 (UTC)
-Date:   Wed, 28 Jun 2023 12:13:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     chengming.zhou@linux.dev
-Cc:     axboe@kernel.dk, tj@kernel.org, hch@lst.de,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: Re: [PATCH 2/4] blk-flush: count inflight flush_data requests
-Message-ID: <ZJuzYMeVhP5cthbC@ovpn-8-21.pek2.redhat.com>
-References: <20230627120854.971475-1-chengming.zhou@linux.dev>
- <20230627120854.971475-3-chengming.zhou@linux.dev>
+        Wed, 28 Jun 2023 04:14:24 -0400
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-313f0ca48c7so896433f8f.0
+        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 01:14:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687940063; x=1690532063;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yhf+D93t2hF5TyQymxDCyCJ2/QdID6WD7JzdyiVmt8s=;
+        b=BUG6d6xYn9wQOCmC2t2of910aJAHr7eysj9r7BYitf1uRhsgYT3tu0Ka8rAITH+y6p
+         /jQw4nPCQaIaRaNyNnHlUzEO/JP6bYMkUewQSZvULFB6RW8obTYv0tGiPl0fOeVh9Noq
+         sN92KSfw6+au2t9jMrkKGf5g+uY8S29QqzvKdkcDkrixerWGwxeuAAp4iRcI/yEE1Jbd
+         I6OjmFsSwat82uGvrroEjtXh/2CeXKIMInxUJok5cSchxpS5MyXKW5q5RFd8dfXFrcgH
+         41cm9f+j1R1G9F16k5V5FmQU8aLLg6aD3ebndEQ/oiX0x0RabSbK6o1IQCN7aPa/btkV
+         6qdw==
+X-Gm-Message-State: AC+VfDwYPO5aZZMSoAh0m/vozB+WtopD3ntWDLFF7IEmQTJnES5jeLt0
+        M0leNlBd3X2KnvvWQNgpcaE=
+X-Google-Smtp-Source: ACHHUZ5R0HhectT5beWOt9I9uEKUEPSmy/YQduSYSGHDvkOnr2U/tjaSRzTDgHU8mjwgRLHaYl1emw==
+X-Received: by 2002:adf:f703:0:b0:313:e9da:772c with SMTP id r3-20020adff703000000b00313e9da772cmr7886230wrp.5.1687940062678;
+        Wed, 28 Jun 2023 01:14:22 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id p12-20020a5d638c000000b00313f61889e9sm6590300wru.36.2023.06.28.01.14.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Jun 2023 01:14:22 -0700 (PDT)
+Message-ID: <000e3d0c-0022-c199-1f8d-97e191345197@grimberg.me>
+Date:   Wed, 28 Jun 2023 11:14:20 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230627120854.971475-3-chengming.zhou@linux.dev>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [bug report] most of blktests nvme/ failed on the latest linux
+ tree
+Content-Language: en-US
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>, Yi Zhang <yi.zhang@redhat.com>
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>
+References: <CAHj4cs_qUWzetD0203EKbBLNv3KF=qgTLsWLeHN3PY7UE6mzmw@mail.gmail.com>
+ <4b8c1d77-b434-5970-fb1f-8a4059966095@grimberg.me>
+ <8a15d10e-f94b-54b7-b080-1887d9c0bdac@nvidia.com>
+ <0c4b16a5-17da-02d9-754a-3c7a158daa56@nvidia.com>
+ <CAHj4cs9ayQ8J+wDCWVKjmBTWTi7Bc3uqqTCDzL2ZY6JhpdDhsQ@mail.gmail.com>
+ <1fda4154-50f4-c09d-dbb1-3b53ed63d341@nvidia.com>
+ <CAHj4cs_+yBbs+MgrC8Z8J7X8cKYwwr6wcR5tLfUCcYkftL7N1Q@mail.gmail.com>
+ <52df24f1-ebb7-cd24-3aaf-7b946acab3ee@grimberg.me>
+ <CAHj4cs9=8fPRtXj4uyjN9MV1OMNNXwcVGte7CDnFxXYYbnnX0A@mail.gmail.com>
+ <b3377b27-28de-c8ed-d45a-c3f241c24415@grimberg.me>
+ <83ef44fb-fcef-4b61-9de1-bc24e3c0f4d2@nvidia.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <83ef44fb-fcef-4b61-9de1-bc24e3c0f4d2@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 08:08:52PM +0800, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
-> 
-> The flush state machine use a double list to link all inflight
-> flush_data requests, to avoid issuing separate post-flushes for
-> these flush_data requests which shared PREFLUSH.
-> 
-> So we can't reuse rq->queuelist, this is why we need rq->flush.list
-> 
-> In preparation of the next patch that reuse rq->queuelist for flush
-> state machine, we change the double linked list to a u64 counter,
-> which count all inflight flush_data requests.
-> 
-> This is ok since we only need to know if there is any inflight
-> flush_data request, so a u64 counter is good. The only problem I can
-> think of is that u64 counter may overflow, which should be unlikely happen.
 
-It won't overflow, q->nr_requests is 'unsigned long', which should have
-been limited to one more reasonable value, such as 2 * BLK_MQ_MAX_DEPTH, so
-u16 should be big enough in theory.
-
+>>
+>>>> Yi,
+>>>>
+>>>> Do you have hostnqn and hostid files in your /etc/nvme directory?
+>>>>
+>>>
+>>> No, only one discovery.conf there.
+>>>
+>>> # ls /etc/nvme/
+>>> discovery.conf
+>>
+>> So the hostid is generated every time if it is not passed.
+>> We should probably revert the patch and add it back when
+>> blktests are passing.
 > 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> ---
->  block/blk-flush.c | 9 +++++----
->  block/blk.h       | 5 ++---
->  2 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/blk-flush.c b/block/blk-flush.c
-> index dba392cf22be..bb7adfc2a5da 100644
-> --- a/block/blk-flush.c
-> +++ b/block/blk-flush.c
-> @@ -187,7 +187,8 @@ static void blk_flush_complete_seq(struct request *rq,
->  		break;
->  
->  	case REQ_FSEQ_DATA:
-> -		list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
-> +		list_del_init(&rq->flush.list);
-> +		fq->flush_data_in_flight++;
->  		spin_lock(&q->requeue_lock);
->  		list_add_tail(&rq->queuelist, &q->flush_list);
->  		spin_unlock(&q->requeue_lock);
-> @@ -299,7 +300,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
->  		return;
->  
->  	/* C2 and C3 */
-> -	if (!list_empty(&fq->flush_data_in_flight) &&
-> +	if (fq->flush_data_in_flight &&
->  	    time_before(jiffies,
->  			fq->flush_pending_since + FLUSH_PENDING_TIMEOUT))
->  		return;
-> @@ -374,6 +375,7 @@ static enum rq_end_io_ret mq_flush_data_end_io(struct request *rq,
->  	 * the comment in flush_end_io().
->  	 */
->  	spin_lock_irqsave(&fq->mq_flush_lock, flags);
-> +	fq->flush_data_in_flight--;
->  	blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error);
->  	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
->  
-> @@ -445,7 +447,7 @@ bool blk_insert_flush(struct request *rq)
->  		blk_rq_init_flush(rq);
->  		rq->flush.seq |= REQ_FSEQ_POSTFLUSH;
->  		spin_lock_irq(&fq->mq_flush_lock);
-> -		list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
-> +		fq->flush_data_in_flight++;
->  		spin_unlock_irq(&fq->mq_flush_lock);
->  		return false;
->  	default:
-> @@ -496,7 +498,6 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
->  
->  	INIT_LIST_HEAD(&fq->flush_queue[0]);
->  	INIT_LIST_HEAD(&fq->flush_queue[1]);
-> -	INIT_LIST_HEAD(&fq->flush_data_in_flight);
->  
->  	return fq;
->  
-> diff --git a/block/blk.h b/block/blk.h
-> index 608c5dcc516b..686712e13835 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -15,15 +15,14 @@ struct elevator_type;
->  extern struct dentry *blk_debugfs_root;
->  
->  struct blk_flush_queue {
-> +	spinlock_t		mq_flush_lock;
->  	unsigned int		flush_pending_idx:1;
->  	unsigned int		flush_running_idx:1;
->  	blk_status_t 		rq_status;
->  	unsigned long		flush_pending_since;
->  	struct list_head	flush_queue[2];
-> -	struct list_head	flush_data_in_flight;
-> +	unsigned long		flush_data_in_flight;
->  	struct request		*flush_rq;
-> -
-> -	spinlock_t		mq_flush_lock;
->  };
+> Seems like the patch is doing exactly what it should do - fix wrong 
+> behavior of users that override hostid.
+> Can we fix the tests instead ?
 
-The part of replacing inflight data rq list with counter looks fine.
+Right, I got confused between a provided host and the default host...
 
-Thanks,
-Ming
-
+I think we need to add check that /etc/nvme/[hostnqn,hostid] exist
+in the test cases.
