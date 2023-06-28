@@ -2,163 +2,189 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 829D5EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 12:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A71EEB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Jun 2023 12:55:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230472AbjF1Mr7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 08:47:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41998 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230147AbjF1MrZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 08:47:25 -0400
-Received: from out-28.mta1.migadu.com (out-28.mta1.migadu.com [IPv6:2001:41d0:203:375::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8263582
-        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 05:46:25 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1687956383;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=v+XqY897Bsd8trRe4zaYsQVNZ9l3mE6f4vuEKbcRGH4=;
-        b=CSTLZSKNj6ys56vnYR2av9Ny99Lqz1lGsQthqeKYSIcQ6AA/1ibqgqVW9kWf815EDeArpi
-        9C1qTXEzPKb0JJNdsulSf4a5ulx+7FvHM42bKdtMAxak2qdoSqhvzC2EOfZVQn+aQOxbcQ
-        CHFXZ5JpciTdAFydsQibQI+8YlT8oIk=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com, ming.lei@redhat.com, hch@lst.de
-Subject: [PATCH v3 3/3] blk-mq: fix start_time_ns and alloc_time_ns for pre-allocated rq
-Date:   Wed, 28 Jun 2023 20:45:46 +0800
-Message-Id: <20230628124546.1056698-4-chengming.zhou@linux.dev>
-In-Reply-To: <20230628124546.1056698-1-chengming.zhou@linux.dev>
-References: <20230628124546.1056698-1-chengming.zhou@linux.dev>
+        id S230259AbjF1MzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 08:55:06 -0400
+Received: from mga07.intel.com ([134.134.136.100]:58763 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231949AbjF1Mww (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jun 2023 08:52:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687956772; x=1719492772;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=V7/fQJ+HZXkDt0pOeY106FEB7wN/9WZJhnYeLYgacr4=;
+  b=QTOXyIeDQJ6w003pbFufKbvW2L00OKKyS8+y8CqQw3JjyCSg/INA092f
+   zRQV8/2ZLkeCShbwT8cYUaZ9ZMQV+41gYhybYPXKQHBGck5/OHMhC5DAT
+   7qRt+PQw/h29vSJnnqNwpp2VOwQpnSc46kCThl9uBFRchkW2HlcbflFj0
+   Y0y+m4kt+ZRL3zYbg4lpnFmiIbkgQ+AZwwY39cH/3hc2DcsUI/aMgmL/S
+   9dFxjvIWF79i6xRSOPTXTkfIC/5exkAyUb/UxSxFx3aKARGnz/V9gj/h2
+   mpt6tv183WzpwGzWo1FLdmEpI5MDdieXrhabf515mORh0bWpHwoaVhoLl
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="427840678"
+X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
+   d="scan'208";a="427840678"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 05:52:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="752247641"
+X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
+   d="scan'208";a="752247641"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 28 Jun 2023 05:52:41 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qEUf2-000DGN-2m;
+        Wed, 28 Jun 2023 12:52:40 +0000
+Date:   Wed, 28 Jun 2023 20:52:40 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        willy@infradead.org, hare@suse.de, djwong@kernel.org,
+        bvanassche@acm.org, ming.lei@redhat.com, dlemoal@kernel.org,
+        nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Anuj Gupta <anuj20.g@samsung.com>,
+        Vincent Fu <vincent.fu@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v13 9/9] null_blk: add support for copy offload
+Message-ID: <202306282001.ba1qWTf0-lkp@intel.com>
+References: <20230627183629.26571-10-nj.shetty@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230627183629.26571-10-nj.shetty@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+Hi Nitesh,
 
-The iocost rely on rq start_time_ns and alloc_time_ns to tell saturation
-state of the block device. Most of the time request is allocated after
-rq_qos_throttle() and its alloc_time_ns or start_time_ns won't be affected.
+kernel test robot noticed the following build warnings:
 
-But for plug batched allocation introduced by the commit 47c122e35d7e
-("block: pre-allocate requests if plug is started and is a batch"), we can
-rq_qos_throttle() after the allocation of the request. This is what the
-blk_mq_get_cached_request() does.
+[auto build test WARNING on 53cdf865f90ba922a854c65ed05b519f9d728424]
 
-In this case, the cached request alloc_time_ns or start_time_ns is much
-ahead if blocked in any qos ->throttle().
+url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Introduce-queue-limits-for-copy-offload-support/20230628-163126
+base:   53cdf865f90ba922a854c65ed05b519f9d728424
+patch link:    https://lore.kernel.org/r/20230627183629.26571-10-nj.shetty%40samsung.com
+patch subject: [PATCH v13 9/9] null_blk: add support for copy offload
+config: i386-randconfig-i006-20230628 (https://download.01.org/0day-ci/archive/20230628/202306282001.ba1qWTf0-lkp@intel.com/config)
+compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
+reproduce: (https://download.01.org/0day-ci/archive/20230628/202306282001.ba1qWTf0-lkp@intel.com/reproduce)
 
-This patch fix it by setting alloc_time_ns and start_time_ns to now
-when the pre-allocated rq is actually used. And we skip setting the
-alloc_time_ns and start_time_ns during pre-allocation, so just pass 0
-in __blk_mq_alloc_requests_batch().
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306282001.ba1qWTf0-lkp@intel.com/
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-mq.c | 35 ++++++++++++++++++++++++++---------
- 1 file changed, 26 insertions(+), 9 deletions(-)
+All warnings (new ones prefixed by >>):
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8b981d0a868e..55a2e600f943 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -337,6 +337,24 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
- }
- EXPORT_SYMBOL(blk_rq_init);
- 
-+/* Set rq alloc and start time when pre-allocated rq is actually used */
-+static inline void blk_mq_rq_time_init(struct request_queue *q, struct request *rq)
-+{
-+	if (blk_mq_need_time_stamp(rq->rq_flags)) {
-+		u64 now = ktime_get_ns();
-+
-+#ifdef CONFIG_BLK_RQ_ALLOC_TIME
-+		/*
-+		 * alloc time is only used by iocost for now,
-+		 * only possible when blk_mq_need_time_stamp().
-+		 */
-+		if (blk_queue_rq_alloc_time(q))
-+			rq->alloc_time_ns = now;
-+#endif
-+		rq->start_time_ns = now;
-+	}
-+}
-+
- static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		struct blk_mq_tags *tags, unsigned int tag,
- 		u64 alloc_time_ns, u64 start_time_ns)
-@@ -395,23 +413,18 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- }
- 
- static inline struct request *
--__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
--		u64 alloc_time_ns)
-+__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
- {
- 	unsigned int tag, tag_offset;
- 	struct blk_mq_tags *tags;
- 	struct request *rq;
- 	unsigned long tag_mask;
- 	int i, nr = 0;
--	u64 start_time_ns = 0;
- 
- 	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
- 	if (unlikely(!tag_mask))
- 		return NULL;
- 
--	if (blk_mq_need_time_stamp(data->rq_flags))
--		start_time_ns = ktime_get_ns();
--
- 	tags = blk_mq_tags_from_data(data);
- 	for (i = 0; tag_mask; i++) {
- 		if (!(tag_mask & (1UL << i)))
-@@ -419,7 +432,7 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
- 		tag = tag_offset + i;
- 		prefetch(tags->static_rqs[tag]);
- 		tag_mask &= ~(1UL << i);
--		rq = blk_mq_rq_ctx_init(data, tags, tag, alloc_time_ns, start_time_ns);
-+		rq = blk_mq_rq_ctx_init(data, tags, tag, 0, 0);
- 		rq_list_add(data->cached_rq, rq);
- 		nr++;
- 	}
-@@ -490,9 +503,11 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
- 	 * Try batched alloc if we want more than 1 tag.
- 	 */
- 	if (data->nr_tags > 1) {
--		rq = __blk_mq_alloc_requests_batch(data, alloc_time_ns);
--		if (rq)
-+		rq = __blk_mq_alloc_requests_batch(data);
-+		if (rq) {
-+			blk_mq_rq_time_init(q, rq);
- 			return rq;
-+		}
- 		data->nr_tags = 1;
- 	}
- 
-@@ -575,6 +590,7 @@ static struct request *blk_mq_alloc_cached_request(struct request_queue *q,
- 			return NULL;
- 
- 		plug->cached_rq = rq_list_next(rq);
-+		blk_mq_rq_time_init(q, rq);
- 	}
- 
- 	rq->cmd_flags = opf;
-@@ -2896,6 +2912,7 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 	plug->cached_rq = rq_list_next(rq);
- 	rq_qos_throttle(q, *bio);
- 
-+	blk_mq_rq_time_init(q, rq);
- 	rq->cmd_flags = (*bio)->bi_opf;
- 	INIT_LIST_HEAD(&rq->queuelist);
- 	return rq;
+>> drivers/block/null_blk/main.c:1295:2: warning: variable 'rem' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+           __rq_for_each_bio(bio, req) {
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/blk-mq.h:1012:6: note: expanded from macro '__rq_for_each_bio'
+           if ((rq->bio))                  \
+               ^~~~~~~~~
+   drivers/block/null_blk/main.c:1300:15: note: uninitialized use occurs here
+           if (WARN_ON(!rem))
+                        ^~~
+   include/asm-generic/bug.h:123:25: note: expanded from macro 'WARN_ON'
+           int __ret_warn_on = !!(condition);                              \
+                                  ^~~~~~~~~
+   drivers/block/null_blk/main.c:1295:2: note: remove the 'if' if its condition is always true
+           __rq_for_each_bio(bio, req) {
+           ^
+   include/linux/blk-mq.h:1012:2: note: expanded from macro '__rq_for_each_bio'
+           if ((rq->bio))                  \
+           ^
+   drivers/block/null_blk/main.c:1287:12: note: initialize the variable 'rem' to silence this warning
+           size_t rem, temp;
+                     ^
+                      = 0
+   1 warning generated.
+
+
+vim +1295 drivers/block/null_blk/main.c
+
+  1281	
+  1282	static inline int nullb_setup_copy_write(struct nullb *nullb,
+  1283			struct request *req, bool is_fua)
+  1284	{
+  1285		sector_t sector_in, sector_out;
+  1286		void *in, *out;
+  1287		size_t rem, temp;
+  1288		struct bio *bio;
+  1289		unsigned long offset_in, offset_out;
+  1290		struct nullb_page *t_page_in, *t_page_out;
+  1291		int ret = -EIO;
+  1292	
+  1293		sector_out = blk_rq_pos(req);
+  1294	
+> 1295		__rq_for_each_bio(bio, req) {
+  1296			sector_in = bio->bi_iter.bi_sector;
+  1297			rem = bio->bi_iter.bi_size;
+  1298		}
+  1299	
+  1300		if (WARN_ON(!rem))
+  1301			return BLK_STS_NOTSUPP;
+  1302	
+  1303		spin_lock_irq(&nullb->lock);
+  1304		while (rem > 0) {
+  1305			temp = min_t(size_t, nullb->dev->blocksize, rem);
+  1306			offset_in = (sector_in & SECTOR_MASK) << SECTOR_SHIFT;
+  1307			offset_out = (sector_out & SECTOR_MASK) << SECTOR_SHIFT;
+  1308	
+  1309			if (null_cache_active(nullb) && !is_fua)
+  1310				null_make_cache_space(nullb, PAGE_SIZE);
+  1311	
+  1312			t_page_in = null_lookup_page(nullb, sector_in, false,
+  1313				!null_cache_active(nullb));
+  1314			if (!t_page_in)
+  1315				goto err;
+  1316			t_page_out = null_insert_page(nullb, sector_out,
+  1317				!null_cache_active(nullb) || is_fua);
+  1318			if (!t_page_out)
+  1319				goto err;
+  1320	
+  1321			in = kmap_local_page(t_page_in->page);
+  1322			out = kmap_local_page(t_page_out->page);
+  1323	
+  1324			memcpy(out + offset_out, in + offset_in, temp);
+  1325			kunmap_local(out);
+  1326			kunmap_local(in);
+  1327			__set_bit(sector_out & SECTOR_MASK, t_page_out->bitmap);
+  1328	
+  1329			if (is_fua)
+  1330				null_free_sector(nullb, sector_out, true);
+  1331	
+  1332			rem -= temp;
+  1333			sector_in += temp >> SECTOR_SHIFT;
+  1334			sector_out += temp >> SECTOR_SHIFT;
+  1335		}
+  1336	
+  1337		ret = 0;
+  1338	err:
+  1339		spin_unlock_irq(&nullb->lock);
+  1340		return ret;
+  1341	}
+  1342	
+
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
