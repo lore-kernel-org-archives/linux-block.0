@@ -2,95 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D0CEB64DC
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 07:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3576FEB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 07:30:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231269AbjF2HXV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jun 2023 03:23:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51996 "EHLO
+        id S232036AbjF2H37 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jun 2023 03:29:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231191AbjF2HXU (ORCPT
+        with ESMTP id S231450AbjF2H36 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2023 03:23:20 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E08E58;
-        Thu, 29 Jun 2023 00:23:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688023399; x=1719559399;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=74L0FNsCDZ5Sbc+RH88Wm9TjQdzKD1PxAYE2xBAuh/8=;
-  b=Tw8mvKK65w+8pUiZEDNBI7rUQVFEyQQspsYT+jjVnsYEXLG0NXBINYPm
-   d48xi/SMK/ks7gQLmZ6sj9Coz622UHEsgjhIGrasdXkRHy7cjmLuqR6oe
-   csdrnuYDX7UJAWBNQfcIei/Qnc1kSANAM1kTfR12BDPCdtC6Hs7UGfctf
-   zq4pVJ6amfoqpIlBSCF0xECkIBP9agW6sZaPt6VLBFkTPY8LOZMeBjljU
-   3vtwjAORSP8x80bgJpVwUMKrVJwLX8lcb4gDX6+tz0b4uuD1cU0pHCs2E
-   pNRid+lQLB3MQ2J22JnMgGhzT7qT1uVy2mOQMZi5AoljnAIC12EfPvNgH
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="425714110"
-X-IronPort-AV: E=Sophos;i="6.01,167,1684825200"; 
-   d="scan'208";a="425714110"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2023 00:23:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="1047687351"
-X-IronPort-AV: E=Sophos;i="6.01,167,1684825200"; 
-   d="scan'208";a="1047687351"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 29 Jun 2023 00:23:15 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qElzm-000Dwj-1p;
-        Thu, 29 Jun 2023 07:23:14 +0000
-Date:   Thu, 29 Jun 2023 15:22:34 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andreas Hindborg <nmi@metaspace.dk>, Ming Lei <ming.lei@redhat.com>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        Thu, 29 Jun 2023 03:29:58 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7B2E58
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 00:29:57 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-992ace062f3so45190866b.2
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 00:29:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688023795; x=1690615795;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=s5nGGw5gvPHiYhCADwmQXV7PL7CPhqenUtZ/ZGNPhyk=;
+        b=FecDdIDCDGjKQnAkDLrNfxBzQgNPyKHtyCp/sXn/Io9r4tUWa8G/pVqxGdKU1Zhhiv
+         4UEDRHX/xSBASiG73ttGLR+OvaxQ/JuzBbH5aT+RTImnKkHKoqEzMSDdueUdcKDWLlcZ
+         lPtbx9DIIik0XUeq+MSwXohACSIqUqCgpWgKh3fuI2szFBaJDs9vrnD/hWaiy+JWYp5u
+         QCdY2FSKiXuTbevAaUOA/Z/ljh90+/XtPnis2HFE1jhZ1SuLUOJJ4Fu+AoQsuOIernV3
+         1qeDFNAb61HHocFkfmOPwe1amncovMFPQKd0clrVtpxlPqhU8W0sZoxkCsU3K/PJaFGW
+         2ALQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688023795; x=1690615795;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s5nGGw5gvPHiYhCADwmQXV7PL7CPhqenUtZ/ZGNPhyk=;
+        b=d/CuqFm2iwDYIhq3AU63GrsQfvF1SFfnPxYw/TXgR81Absqp5fTpeHW2A1ARwVL5Nh
+         5jMEvKm6sEsZ0ylykVPAwhRT++JSnemzJIY112sTtYrEF8U8kPeht9FPCwgrt6TJQe4V
+         a3a1cP9rk0fqRD0XmSLeZ0ACQfBBwOBGTommqiQFxAXyocZRvbr181e3cV3L7IKnocMU
+         CKRhlywztp2KZHOzP1wQ/zkY3Qfw23AJTsdeqzhuYh/N6/GU8PBZ9Rsm1hygq277GIbl
+         4IzYg53J3IFYhiwl5uKwXAEjH9DRqssxx+WaO9jpu44XUVjT7/jSr3oAXnPnmHQgx1fx
+         vG8w==
+X-Gm-Message-State: AC+VfDwhA0T5CbAiD/sNVg7OnG0c/5nUPuKPJ+aBdFnDgw8dAsF/R0Mc
+        haHlh73BeQ2ZKvwtx+Y9ICTekQ==
+X-Google-Smtp-Source: ACHHUZ5kzvNl4uQvDPstO0o4laP2SbJB9IDXUab/0LqsWirbwRZ7JyJlxeuThpTm6cG6qhYj9Ts10A==
+X-Received: by 2002:a17:906:9b86:b0:982:21a1:c4e0 with SMTP id dd6-20020a1709069b8600b0098221a1c4e0mr35643468ejc.56.1688023795459;
+        Thu, 29 Jun 2023 00:29:55 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id br7-20020a170906d14700b009893b06e9e3sm6552996ejb.225.2023.06.29.00.29.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 00:29:55 -0700 (PDT)
+References: <20230628190649.11233-1-nmi@metaspace.dk>
+ <20230628190649.11233-4-nmi@metaspace.dk> <ZJ0ZAmpNpid8Ff08@infradead.org>
+User-agent: mu4e 1.10.4; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Ming Lei <ming.lei@redhat.com>,
         Hans Holmberg <Hans.Holmberg@wdc.com>,
         Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
         Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        linux-kernel@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>,
-        gost.dev@samsung.com, Minwoo Im <minwoo.im.dev@gmail.com>
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>
 Subject: Re: [PATCH v4 3/4] ublk: enable zoned storage support
-Message-ID: <202306291515.z7ox8OTz-lkp@intel.com>
-References: <20230628190649.11233-4-nmi@metaspace.dk>
+Date:   Thu, 29 Jun 2023 09:25:32 +0200
+In-reply-to: <ZJ0ZAmpNpid8Ff08@infradead.org>
+Message-ID: <871qhuzpxr.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628190649.11233-4-nmi@metaspace.dk>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Andreas,
 
-kernel test robot noticed the following build errors:
+Christoph Hellwig <hch@infradead.org> writes:
 
-[auto build test ERROR on 3261ea42710e9665c9151006049411bd23b5411f]
+> What's the point in having a separate file for about 100 lines of
+> actual code?  Especially as that needs a header, intefaces, etc?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/ublk-change-ublk-IO-command-defines-to-enum/20230629-031015
-base:   3261ea42710e9665c9151006049411bd23b5411f
-patch link:    https://lore.kernel.org/r/20230628190649.11233-4-nmi%40metaspace.dk
-patch subject: [PATCH v4 3/4] ublk: enable zoned storage support
-config: i386-randconfig-i006-20230628 (https://download.01.org/0day-ci/archive/20230629/202306291515.z7ox8OTz-lkp@intel.com/config)
-compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-reproduce: (https://download.01.org/0day-ci/archive/20230629/202306291515.z7ox8OTz-lkp@intel.com/reproduce)
+This was suggested by Niklas [1] to make the conditionally compiled code
+more readable. The alternative would be masking out the code with a big
+`#ifdef`.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306291515.z7ox8OTz-lkp@intel.com/
+If you prefer the latter, I can change it back, no problem. But I must
+say I think it comes off cleaner when we move as much as possible of the
+zoned code to a separate translation unit.
 
-All errors (new ones prefixed by >>):
-
->> ld.lld: error: undefined symbol: __udivdi3
-   >>> referenced by ublk_drv-zoned.c:16 (drivers/block/ublk_drv-zoned.c:16)
-   >>>               drivers/block/ublk_drv-zoned.o:(ublk_set_nr_zones) in archive vmlinux.a
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+[1] https://lore.kernel.org/all/Y%2Fy+UFEHn1F1sg4i@x1-carbon/
