@@ -2,250 +2,289 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E93EB64D9
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 09:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23422EB64D9
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 09:41:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbjF2JfH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jun 2023 05:35:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41684 "EHLO
+        id S231179AbjF2Jlk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jun 2023 05:41:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230476AbjF2Je4 (ORCPT
+        with ESMTP id S229739AbjF2Jlj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2023 05:34:56 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF78A1BE1
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 02:34:53 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-98e25fa6f5bso64563266b.3
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 02:34:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688031292; x=1690623292;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+NxgmXX2xIduxBfUkp7Mrc8DoEv4aFObuF1TYwqmn08=;
-        b=XxR6ecbl/YFtilZt3QKzZugeNznYC63gzer275tItQyaXLPRXmpNzqdcVFLaJ8gOuC
-         dJQ5lKRvt0YvKwCCXy9Bbb1XbQo4aKCm04t2rucyuiLy7ixTc3SrZlBHdHJiMSmh+QBt
-         MWzfCxaUZ58cSPdr9/Iqhe/4U7JJvB+M3tdFPyxKmXNXDKos1fWYL650lOCxDHcUETai
-         AtSVdqfkmkMJbhtbhKBaR4inUXX+UKaLtWoIJe5jl3QEXU8MvdjAzR0kXVebpzPzkC9a
-         fFI7Pk6xOE4RkaGAd9/wr5xyBF1yfy/6yG4PcBRxAYNqaYfjheBQ+Vcc8dbY8te9ZEBe
-         xhhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688031292; x=1690623292;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+NxgmXX2xIduxBfUkp7Mrc8DoEv4aFObuF1TYwqmn08=;
-        b=az9HtBfK8qKftJvwXqRdHD2Y7imqmNaH00NIZJao7XzJj6izso+kXGP0WhGD+m5x3/
-         QqHGh3l8yuSvsbq4Sv+4PttiaRXScm+Yzj0lpSoNr0YUv0ExzQ5AwTetq2Up8/POYZ/4
-         WZcI0E+DVgB4biTx9HVA+k2UTfKvqGqfOH8qgqlFINN5jVqNu6cv/PcLzHu8/EijBj7o
-         IGzpcK9TYONdKlkdq9hyncGhcqIhfDCl5tz4B7n8/JIkw0pnEyweXdaE0AlnRpgpEomi
-         kycdX4JF+wyQHDVWrKyRD69su5cKiJbenmzt699IhEPwCjbr5ju9y6oNRnxVaVWFkRFp
-         NjCw==
-X-Gm-Message-State: AC+VfDxc1wqIn2pBlkSfUlULG6f6bUBomE0lvc49wN4TIYYQmigj973X
-        DHB87GQcWoDI4IFqRqQLtkIBng==
-X-Google-Smtp-Source: ACHHUZ64i2MMBMjEy27nWO3IccAcvxFtMGhDkmw/XpsiTIa2OcDx8oydo5jJvQGOcpGRxu8R8U2MYA==
-X-Received: by 2002:a17:907:2bce:b0:98e:2097:f23e with SMTP id gv14-20020a1709072bce00b0098e2097f23emr9512205ejc.77.1688031292229;
-        Thu, 29 Jun 2023 02:34:52 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id d1-20020aa7d5c1000000b0051d9ee1c9d3sm396013eds.84.2023.06.29.02.34.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 02:34:51 -0700 (PDT)
-References: <20230628190649.11233-1-nmi@metaspace.dk>
- <20230628190649.11233-5-nmi@metaspace.dk>
- <ZJzwcG2gIxXh8HbE@ovpn-8-18.pek2.redhat.com>
-User-agent: mu4e 1.10.4; emacs 28.2.50
-From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Thu, 29 Jun 2023 05:41:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A29EED;
+        Thu, 29 Jun 2023 02:41:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8C43161512;
+        Thu, 29 Jun 2023 09:41:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B45C433C8;
+        Thu, 29 Jun 2023 09:41:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688031696;
+        bh=AG1Vpc2SzvPhFBRnc+TAK3CKQHn7Q9axs5f4We/vIfE=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=Lc9ixxhgeNl3hYgKnK6FKXUTdUYfdDkqB+i3UAObW33TjP2gwMFq4h7jtX0iMb8ji
+         +Uw0kPykTmDD28tP1uAr3atW0rU178fCUY01Q/SF0iVFh9P5Wcv9N4egeARXIK25Dx
+         9/VewZVecYMJrEDrRwuRmwGC2C3TNkCq5b9yQAo4CBu3ZaApB0ykI5cqkihe/JIrcs
+         4gMTh4owGZ4S1DbDea4QsQvqzWl3VfHXR176EZTKF5oYT8h1xFL11wCsvZVc3EvoVW
+         cvY4hie7eYIyROOD+/Cz2G55D0ljhCn1i+pqd+byoRVEhSjqwTvTKqHKir9PTaPXyl
+         yQfm88q+gZ75Q==
+Message-ID: <87a03e67-67f0-5ac7-41c7-5ccd393d0b66@kernel.org>
+Date:   Thu, 29 Jun 2023 18:41:34 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v4 3/4] ublk: enable zoned storage support
+Content-Language: en-US
+To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
         Aravind Ramesh <Aravind.Ramesh@wdc.com>,
         Jens Axboe <axboe@kernel.dk>,
         "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>,
         Matias Bjorling <Matias.Bjorling@wdc.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>, gost.dev@samsung.com,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
         Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [PATCH v4 4/4] ublk: add zone append
-Date:   Thu, 29 Jun 2023 11:17:07 +0200
-In-reply-to: <ZJzwcG2gIxXh8HbE@ovpn-8-18.pek2.redhat.com>
-Message-ID: <87edluy5l3.fsf@metaspace.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20230628190649.11233-1-nmi@metaspace.dk>
+ <20230628190649.11233-4-nmi@metaspace.dk>
+ <be52be54-3178-082c-4bfc-7702308a0012@kernel.org>
+ <87ilb6y6j9.fsf@metaspace.dk>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <87ilb6y6j9.fsf@metaspace.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 6/29/23 16:50, Andreas Hindborg (Samsung) wrote:
+>>>  UCLINUX (M68KNOMMU AND COLDFIRE)
+>>> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+>>> index 5b9d4aaebb81..c58dfd035557 100644
+>>> --- a/drivers/block/Kconfig
+>>> +++ b/drivers/block/Kconfig
+>>> @@ -402,6 +402,10 @@ config BLKDEV_UBLK_LEGACY_OPCODES
+>>>  	  suggested to enable N if your application(ublk server) switches to
+>>>  	  ioctl command encoding.
+>>>  
+>>> +config BLK_DEV_UBLK_ZONED
+>>> +	def_bool y
+>>
+>> This can be "bool" only.
+> 
+> I did it like this because I wanted BLK_DEV_UBLK_ZONED to be set
+> automatically to "y" when BLK_DEV_UBLK and BLK_DEV_ZONED are enabled.
+> BLK_DEV_UBLK_ZONED has no menu entry. If we change it to "bool" it will
+> be default "n" and we would have to make it appear in menuconfig to be
+> manually enabled.
+> 
+> Isn't it more sane if it is just unconditionally enabled when
+> BLK_DEV_ZONED and BLK_DEV_UBLK is enabled?
 
-Ming Lei <ming.lei@redhat.com> writes:
+Maybe something like this then:
 
-> On Wed, Jun 28, 2023 at 09:06:49PM +0200, Andreas Hindborg wrote:
->> From: Andreas Hindborg <a.hindborg@samsung.com>
->>=20
->> Add zone append feature to ublk. This feature uses the `addr` field of `=
-struct
->> ublksrv_io_cmd`. Therefore ublk must be used with the user copy
->> feature (UBLK_F_USER_COPY) for zone append to be available. Without this
->> feature, ublk will fail zone append requests.
->
-> Given zone append is a must, please fail to add device in case of zoned
-> and !user_copy, then we can make fast IO code path clean.
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 5b9d4aaebb81..105e1121bf5f 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -370,9 +370,13 @@ config BLK_DEV_RBD
 
-I will squash the patches and reject zone support if not user copy is
-enabled =F0=9F=91=8D
+          If unsure, say N.
 
->
->>=20
->> Suggested-by: Ming Lei <ming.lei@redhat.com>
->> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
->> ---
->>  drivers/block/ublk_drv-zoned.c | 11 +++++++++
->>  drivers/block/ublk_drv.c       | 43 ++++++++++++++++++++++++++++++----
->>  drivers/block/ublk_drv.h       |  1 +
->>  include/uapi/linux/ublk_cmd.h  |  3 ++-
->>  4 files changed, 52 insertions(+), 6 deletions(-)
->>=20
->> diff --git a/drivers/block/ublk_drv-zoned.c b/drivers/block/ublk_drv-zon=
-ed.c
->> index ea86bf4b3681..007e8fc7ff25 100644
->> --- a/drivers/block/ublk_drv-zoned.c
->> +++ b/drivers/block/ublk_drv-zoned.c
->> @@ -16,6 +16,16 @@ void ublk_set_nr_zones(struct ublk_device *ub)
->>  		ub->ub_disk->nr_zones =3D p->dev_sectors / p->chunk_sectors;
->>  }
->>=20=20
->> +int ublk_dev_param_zoned_validate(const struct ublk_device *ub)
->> +{
->> +	const struct ublk_param_zoned *p =3D &ub->params.zoned;
->> +
->> +	if (! p->max_zone_append_sectors)
->> +		return -EINVAL;
->> +
->> +	return 0;
->> +}
->> +
->>  void ublk_dev_param_zoned_apply(struct ublk_device *ub)
->>  {
->>  	const struct ublk_param_zoned *p =3D &ub->params.zoned;
->> @@ -23,6 +33,7 @@ void ublk_dev_param_zoned_apply(struct ublk_device *ub)
->>  	if (ub->dev_info.flags & UBLK_F_ZONED) {
->>  		disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
->>  		disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
->> +		blk_queue_max_zone_append_sectors(ub->ub_disk->queue, p->max_zone_app=
-end_sectors);
->>  	}
->>  }
->>=20=20
->> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
->> index 88fa39853c61..6a949669b47e 100644
->> --- a/drivers/block/ublk_drv.c
->> +++ b/drivers/block/ublk_drv.c
->> @@ -107,6 +107,11 @@ struct ublk_uring_cmd_pdu {
->>   */
->>  #define UBLK_IO_FLAG_NEED_GET_DATA 0x08
->>=20=20
->> +/*
->> + * Set when IO is Zone Append
->> + */
->> +#define UBLK_IO_FLAG_ZONE_APPEND 0x10
->> +
->>  struct ublk_io {
->>  	/* userspace buffer address from io cmd */
->>  	__u64	addr;
->> @@ -230,6 +235,8 @@ static void ublk_dev_param_discard_apply(struct ublk=
-_device *ub)
->>=20=20
->>  static int ublk_validate_params(const struct ublk_device *ub)
->>  {
->> +	int ret =3D 0;
->> +
->>  	/* basic param is the only one which must be set */
->>  	if (ub->params.types & UBLK_PARAM_TYPE_BASIC) {
->>  		const struct ublk_param_basic *p =3D &ub->params.basic;
->> @@ -260,6 +267,13 @@ static int ublk_validate_params(const struct ublk_d=
-evice *ub)
->>  	if (ub->params.types & UBLK_PARAM_TYPE_DEVT)
->>  		return -EINVAL;
->>=20=20
->> +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
->> +	    (ub->params.types & UBLK_PARAM_TYPE_ZONED)) {
->> +		ret =3D ublk_dev_param_zoned_validate(ub);
->> +		if (ret)
->> +			return ret;
->> +	}
->> +
->>  	return 0;
->>  }
->>=20=20
->> @@ -690,6 +704,11 @@ static blk_status_t ublk_setup_iod(struct ublk_queu=
-e *ubq, struct request *req)
->>  			return BLK_STS_IOERR;
->>  		}
->>  	case REQ_OP_ZONE_APPEND:
->> +		if (!(ubq->dev->dev_info.flags & UBLK_F_USER_COPY))
->> +			return BLK_STS_IOERR;
->> +		ublk_op =3D UBLK_IO_OP_ZONE_APPEND;
->> +		io->flags |=3D UBLK_IO_FLAG_ZONE_APPEND;
->> +		break;
->>  	case REQ_OP_ZONE_RESET_ALL:
->>  	case REQ_OP_DRV_OUT:
->>  		/* We do not support zone append or reset_all yet */
->> @@ -1112,6 +1131,12 @@ static void ublk_commit_completion(struct ublk_de=
-vice *ub,
->>  	/* find the io request and complete */
->>  	req =3D blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
->>=20=20
->> +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED)) {
->> +		if (io->flags & UBLK_IO_FLAG_ZONE_APPEND)
->> +			req->__sector =3D ub_cmd->addr;
->> +		io->flags &=3D ~UBLK_IO_FLAG_ZONE_APPEND;
->> +	}
->> +
->>  	if (req && likely(!blk_should_fake_timeout(req->q)))
->>  		ublk_put_req_ref(ubq, req);
->>  }
->> @@ -1411,7 +1436,8 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
- *cmd,
->>  			^ (_IOC_NR(cmd_op) =3D=3D UBLK_IO_NEED_GET_DATA))
->>  		goto out;
->>=20=20
->> -	if (ublk_support_user_copy(ubq) && ub_cmd->addr) {
->> +	if (ublk_support_user_copy(ubq) &&
->> +	    !(io->flags & UBLK_IO_FLAG_ZONE_APPEND) && ub_cmd->addr) {
->>  		ret =3D -EINVAL;
->>  		goto out;
->>  	}
->> @@ -1534,11 +1560,14 @@ static inline bool ublk_check_ubuf_dir(const str=
-uct request *req,
->>  		int ubuf_dir)
->>  {
->>  	/* copy ubuf to request pages */
->> -	if (req_op(req) =3D=3D REQ_OP_READ && ubuf_dir =3D=3D ITER_SOURCE)
->> +	if ((req_op(req) =3D=3D REQ_OP_READ || req_op(req) =3D=3D REQ_OP_DRV_I=
-N) &&
->> +	    ubuf_dir =3D=3D ITER_SOURCE)
->>  		return true;
->>=20=20
->>  	/* copy request pages to ubuf */
->> -	if (req_op(req) =3D=3D REQ_OP_WRITE && ubuf_dir =3D=3D ITER_DEST)
->> +	if ((req_op(req) =3D=3D REQ_OP_WRITE ||
->> +	     req_op(req) =3D=3D REQ_OP_ZONE_APPEND) &&
->> +	    ubuf_dir =3D=3D ITER_DEST)
->>  		return true;
->>=20=20
->>  	return false;
->> @@ -1867,6 +1896,12 @@ static int ublk_ctrl_start_dev(struct ublk_device=
- *ub, struct io_uring_cmd *cmd)
->>  	ub->dev_info.ublksrv_pid =3D ublksrv_pid;
->>  	ub->ub_disk =3D disk;
->>=20=20
->> +	ub->dev_info.state =3D UBLK_S_DEV_LIVE;
->
-> I guess the above line change isn't necessary?
++config BLK_DEV_UBLK_ZONED
++       bool
++
+ config BLK_DEV_UBLK
+        tristate "Userspace block driver (Experimental)"
+        select IO_URING
++       select BLK_DEV_UBLK_ZONED if BLK_DEV_ZONED
+        help
+          io_uring based userspace block driver. Together with ublk server, ublk
+          has been working well, but interface with userspace or command data
+>>> +		ub->ub_disk->nr_zones = p->dev_sectors / p->chunk_sectors;
+>>> +}
+>>> +
+>>> +void ublk_dev_param_zoned_apply(struct ublk_device *ub)
+>>> +{
+>>> +	const struct ublk_param_zoned *p = &ub->params.zoned;
+>>> +
+>>> +	if (ub->dev_info.flags & UBLK_F_ZONED) {
+>>> +		disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
+>>> +		disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
+>>
+>> You do not need to check if the max_active_zones and max_open_zones values are
+>> sensible ? E.g. what if they are larger than the number of zones ?
+> 
+> I don't think it will be a problem. I assume you can set them to 0 to
+> indicate infinite. If user space sets them to more than the actual
+> number of available zones (that user space set up also), user space will
+> have to handle that when it gets a zone request for a zone outside the
+> logical drive LBA space. I don't think the kernel has to care. Will this
+> break anything kernel side?
 
-It needs to go before the call to `ublk_revalidate_disk_zones()` because
-that does IO to the disk in the form of a call to `report_zones()`. So I
-can move it down a little bit.
+zonefs and btrfs look at these limits. So I would rather prefer seeing sensible
+values. 0 == no limit is fine. But seeing maz or moz > nr_zones for the device
+is just too strange and I would prefer an error in that case to let the user
+know it is not doing something right. Getting moz > maz is also nonsense that
+needs to be checked. There is one case we could silently change: if maz ==
+nr_zones or moz == nr_zones, then that essentially means "no limit", so we could
+use 0 to let the in-kernel users that they do not need to care about the limits.
 
-Best regards,
-Andreas
+> 
+>>
+>>> +	}
+>>> +}
+>>> +
+>>> +int ublk_revalidate_disk_zones(struct gendisk *disk)
+>>> +{
+>>> +	return blk_revalidate_disk_zones(disk, NULL);
+>>> +}
+>>
+>> I do not think this helper is needed at all (see below comment on the call site).
+> 
+> This is required because the prototype for `blk_revalidate_disk_zones()`
+> is not defined when BLK_DEV_ZONED is not defined. Without this helper
+> for which the prototype is always defined, we will have a compile error
+> at the call site.
+
+You have this hunk in ublk_ctrl_start_dev:
+
+disk_set_zoned(disk, BLK_ZONED_HM);
+blk_queue_required_elevator_features(disk->queue, ELEVATOR_F_ZBD_SEQ_WRITE);
+ret = ublk_revalidate_disk_zones(disk);
+if (ret)
+	goto out_put_disk;
+
+And that is called under "if (IS_ENABLED(CONFIG_BLK_DEV_ZONED)". So I do not see
+how you can get compile errors using directly blk_revalidate_disk_zones(). The
+entire hunk above should be a helper function I think.
+
+>>> +
+>>> +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>>> +		ublk_set_nr_zones(ub);
+>>
+>> So if the user is attempting to setup a zoned drive but the kernel does not have
+>> CONFIG_BLK_DEV_ZONED=y, the user setup will be silently ignored. Not exactly
+>> nice I think, unless I am missing something.
+> 
+> We have this in `ublk_ctrl_add_dev()`:
+> 
+> 	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+> 		ub->dev_info.flags &= ~UBLK_F_ZONED;
+> 
+> User space is supposed to check the flags after the call to know the
+> kernel capabilities.
+
+And you trust user space to be always correct ? I never do :)
+So definitely, check and error if not supported. No silently clearing the device
+zoned flag.
+
+
+>> Also, repeating that "if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))" for all zone
+>> related functions is very verbose. Stub the functions in ublk_drv.h. That will
+>> make the main C code lighter.
+> 
+> Not sure what you mean "stub the functions". Like so:
+> 
+> @@ -216,8 +216,7 @@ static void ublk_dev_param_basic_apply(struct ublk_device *ub)
+>  
+>  	set_capacity(ub->ub_disk, p->dev_sectors);
+>  
+> -	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+> -		ublk_set_nr_zones(ub);
+> +	ublk_config_nr_zones(ub);
+>  }
+> 
+> And then in the header:
+> 
+> void ublk_config_nr_zones(struct ublk_device *ub)
+> {
+> 	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+> 		ublk_set_nr_zones(ub);
+> }
+> 
+> Or something else?
+
+#ifndef CONFIG_BLK_DEV_ZONED
+static inline void ublk_set_nr_zones() {}
+#endif
+
+That avoid repeating that if (IS_ENABLED(CONFIG_BLK_DEV_ZONED)) all over the
+place. The stubbed functions can be called only for "if (ub->dev_info.flags &
+UBLK_F_ZONED", which is OK since this flag is never supposed to be accepted and
+set for the CONFIG_BLK_DEV_ZONED=n case.
+
+>>> +		disk_set_zoned(disk, BLK_ZONED_HM);
+>>> +		blk_queue_required_elevator_features(disk->queue, ELEVATOR_F_ZBD_SEQ_WRITE);
+>>> +		ret = ublk_revalidate_disk_zones(disk);
+>>> +		if (ret)
+>>> +			goto out_put_disk;
+>>
+>> This should be all a helper ublk_set_zoned() or something.
+> 
+> Ok 👍 Unfortunately this block of code is split up in the zone append
+> patch. I will see what I can do, maybe 2 functions.
+
+Beware that I just posted patches that require zone size (chunk_sectors limit)
+and max append sectors limit to be set *before* calling
+blk_revalidate_disk_zones(). Otherwise, you will get an error.
+
+>>>  	get_device(&ub->cdev_dev);
+>>>  	ub->dev_info.state = UBLK_S_DEV_LIVE;
+>>>  	ret = add_disk(disk);
+>>> @@ -1997,6 +2046,9 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+>>>  	if (ub->dev_info.flags & UBLK_F_USER_COPY)
+>>>  		ub->dev_info.flags &= ~UBLK_F_NEED_GET_DATA;
+>>>  
+>>> +	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>>> +		ub->dev_info.flags &= ~UBLK_F_ZONED;
+>>
+>> Arg, no. The user should be notified with an error that he/she is attempting to
+>> create a zoned device that cannot be supported.
+> 
+> As I wrote above, this is part of the ublk uapi. This is the way user
+> space does kernel capability check. User space will check the flags when
+> this call returns. @Ming did I understand this correctly or did I miss something?
+
+OK. So this is like a virtio capability flags thing ? Negotiation between device
+and driver ?
+
+>>> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+>>> index 471b3b983045..436525afffe8 100644
+>>> --- a/include/uapi/linux/ublk_cmd.h
+>>> +++ b/include/uapi/linux/ublk_cmd.h
+>>> @@ -176,6 +176,11 @@
+>>>  /* Copy between request and user buffer by pread()/pwrite() */
+>>>  #define UBLK_F_USER_COPY	(1UL << 7)
+>>>  
+>>> +/*
+>>> + * Enable zoned device support
+>>
+>> Isn't this for "Indicate that the device is zoned" ?
+> 
+> User space sets this flag when setting up the device to enable zoned
+> storage support. Kernel may reject it. I think the wording is
+> sufficient. Could be updated to:
+> 
+> "User space sets this flag when setting up the device to request zoned
+>  storage support. Kernel may deny the request by clearing the flag
+>  during setup."
+
+I really have a big problem with this. If the user driver does not check that
+the flag was cleared, the user will assume that the device is zoned, but it is
+not. This is not super nice... I would really prefer just failing the devie
+creation if zoned was requested but cannot be satisfied, either because the
+kernel does not support zoned block devices or when the user specified something
+nonsensical.
+
+
+-- 
+Damien Le Moal
+Western Digital Research
+
