@@ -2,85 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56265EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 01:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0CBEB64D7
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 01:14:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230476AbjF2BEp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 21:04:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37336 "EHLO
+        id S231563AbjF2BOe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 21:14:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231356AbjF2BEn (ORCPT
+        with ESMTP id S229524AbjF2BOd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 21:04:43 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 709D0268A;
-        Wed, 28 Jun 2023 18:04:42 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qs0bV1fl8z4f3jq4;
-        Thu, 29 Jun 2023 09:04:38 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCX_7Kj2JxkJTUUMw--.27706S3;
-        Thu, 29 Jun 2023 09:04:37 +0800 (CST)
-Subject: Re: [PATCH v3] block: add check that partition length needs to be
- aligned with block size
-To:     Min Li <min15.li@samsung.com>, hch@lst.de
-Cc:     axboe@kernel.dk, dlemoal@kernel.org, gregkh@linuxfoundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@kernel.org, willy@infradead.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230628083839.GA26606@lst.de>
- <CGME20230628090918epcas5p3a5463f0fc421e435a363192e40d3f649@epcas5p3.samsung.com>
- <20230628170734.2960-1-min15.li@samsung.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <f8a4e061-22ab-e30b-586b-3a569f5a379a@huaweicloud.com>
-Date:   Thu, 29 Jun 2023 09:04:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 28 Jun 2023 21:14:33 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 252E32694;
+        Wed, 28 Jun 2023 18:14:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AE2BD612CA;
+        Thu, 29 Jun 2023 01:14:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC502C433C9;
+        Thu, 29 Jun 2023 01:14:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688001271;
+        bh=OHfV9RkAhi/HBgdNbnfx7GoparhjCrP3HY0+yWmUQgo=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=tEth8uPntBrqzu+8geRiJPwf3br5LIsCMW/mtLPh+X5bqUakudEIGbXWin9DV77Fj
+         JnVZSk8PeVn+M0bpPZEDikBLGOzXJL09uzgPcHkQVZ2ZURW5VF0tGzhCTWOSSGBYd8
+         Y+JS83ULr5af10Hqsyp5Yc1aE8Dj9HDZRPtcHYkWEOguo3pHUZcSZ+QJXQUpqK4yHV
+         3SGe3EkjMDABAdNGIOl3QTYBTZbR8XDMH5sH6uYYU8LljuoqfX1NegxBkkZQPMyNtt
+         j11Q46yPwluXLhpuzluuuP8ZXvG+myMoVjYp/s64jMOtz8BbRN7/61uVUobkVzeHTg
+         3fxr33k+n2AOQ==
+Message-ID: <0f8160eb-f504-5069-5c78-783bce59b214@kernel.org>
+Date:   Thu, 29 Jun 2023 10:14:28 +0900
 MIME-Version: 1.0
-In-Reply-To: <20230628170734.2960-1-min15.li@samsung.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCX_7Kj2JxkJTUUMw--.27706S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYx7kC6x804xWl14x267AKxVW8JVW5JwAF
-        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
-        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
-        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r
-        1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
-        VFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v4 1/4] ublk: change ublk IO command defines to enum
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Andreas Hindborg <nmi@metaspace.dk>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+References: <20230628190649.11233-1-nmi@metaspace.dk>
+ <20230628190649.11233-2-nmi@metaspace.dk>
+ <d23bf48c-5bc9-aab6-4ca2-ebbb24a0878e@kernel.org>
+ <ZJzSjFbzzNxppH7p@ovpn-8-18.pek2.redhat.com>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ZJzSjFbzzNxppH7p@ovpn-8-18.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-在 2023/06/29 1:07, Min Li 写道:
-> On Mon, Jun 28, 2023 at 04:48:36PM +0000, Christoph Hellwig  wrote:
->> They are long long in the UAPI, which is weird but has been that way
->> for a long time.  So I think we need checks for negative values
->> before they are shifted and converted to a sector_t.
+On 6/29/23 09:38, Ming Lei wrote:
+> On Thu, Jun 29, 2023 at 07:47:47AM +0900, Damien Le Moal wrote:
+>> On 6/29/23 04:06, Andreas Hindborg wrote:
+>>> From: Andreas Hindborg <a.hindborg@samsung.com>
+>>>
+>>> This change is in preparation for zoned storage support.
+>>>
+>>> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+>>> ---
+>>>  include/uapi/linux/ublk_cmd.h | 23 +++++++++++++++++------
+>>>  1 file changed, 17 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+>>> index 4b8558db90e1..471b3b983045 100644
+>>> --- a/include/uapi/linux/ublk_cmd.h
+>>> +++ b/include/uapi/linux/ublk_cmd.h
+>>> @@ -229,12 +229,23 @@ struct ublksrv_ctrl_dev_info {
+>>>  	__u64   reserved2;
+>>>  };
+>>>  
+>>> -#define		UBLK_IO_OP_READ		0
+>>> -#define		UBLK_IO_OP_WRITE		1
+>>> -#define		UBLK_IO_OP_FLUSH		2
+>>> -#define		UBLK_IO_OP_DISCARD	3
+>>> -#define		UBLK_IO_OP_WRITE_SAME	4
+>>> -#define		UBLK_IO_OP_WRITE_ZEROES	5
+>>> +enum ublk_op {
+>>> +	UBLK_IO_OP_READ = 0,
+>>> +	UBLK_IO_OP_WRITE = 1,
+>>> +	UBLK_IO_OP_FLUSH = 2,
+>>> +	UBLK_IO_OP_DISCARD = 3,
+>>> +	UBLK_IO_OP_WRITE_SAME = 4,
+>>> +	UBLK_IO_OP_WRITE_ZEROES = 5,
+>>> +	UBLK_IO_OP_ZONE_OPEN = 10,
+>>> +	UBLK_IO_OP_ZONE_CLOSE = 11,
+>>> +	UBLK_IO_OP_ZONE_FINISH = 12,
+>>> +	UBLK_IO_OP_ZONE_APPEND = 13,
+>>> +	UBLK_IO_OP_ZONE_RESET = 15,
+>>> +	__UBLK_IO_OP_DRV_IN_START = 32,
+>>> +	__UBLK_IO_OP_DRV_IN_END = 96,
+>>> +	__UBLK_IO_OP_DRV_OUT_START = __UBLK_IO_OP_DRV_IN_END,
+>>> +	__UBLK_IO_OP_DRV_OUT_END = 160,
+>>> +};
+>>
+>> This patch does not do what the title says. You are also introducing the zone
+>> operations, and the very obscure __UBLK_IO_OP_DRV_XXX operations without an
+>> explanation. Also, why the "__" prefix for these ? I do not see the point...
 > 
-> Do you mean that we need to check if p.start and p.length are negative?
+> It should be to reserve space for ublk passthrough OP.
+
+A comment about that would be nice.
+
+> 
+>> Given that this is a uapi, a comment to explain the less obvious commands would
+>> be nice.
+>>
+>> So I think the change to an enum for the existing ops can be done either in
+>> patch 2 or as a separate patch and the introduction of the zone operations done
+>> in patch 3 or as a separate patch.
+> 
+> Also it might break userspace by changing to enum from macro for existed
+> definition, cause userspace may check something by '#ifdef UBLK_IO_OP_*',
+> so probably it is better to keep these OPs as enum, or at least keep
+> existed definition as macro.
+
+Then let's keep defining things with #define instead of an enum.
+
+> 
+> Thanks,
+> Ming
 > 
 
-Perhaps this patch will make sense.
-
-https://lore.kernel.org/all/20230525072041.3701176-1-zhongjinghua@huawei.com/
-
-Thanks,
-Kuai
-> Thanks for your reply
-> 
-> Min li
-> .
-> 
+-- 
+Damien Le Moal
+Western Digital Research
 
