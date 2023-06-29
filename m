@@ -2,186 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA89EB64D9
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 06:49:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E79EEEB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 07:10:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231777AbjF2Gtp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jun 2023 02:49:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45476 "EHLO
+        id S232036AbjF2HKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jun 2023 03:10:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232100AbjF2GtQ (ORCPT
+        with ESMTP id S232022AbjF2HKu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2023 02:49:16 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BA162705
-        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 23:49:12 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230629064908epoutp02352aa5c102734819d48bf3f0b808f17a~tDnkfOa4N2659226592epoutp02W
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 06:49:08 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230629064908epoutp02352aa5c102734819d48bf3f0b808f17a~tDnkfOa4N2659226592epoutp02W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1688021348;
-        bh=KEpV/SR7y0dLoMKT0bZXWc67BvkeWQIdOruf7uuQ4ZA=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=ZFlwTvt+QAg75S4wkBhao5iElvEXV9mFlH/JmQo6tg7cQ3LlJhcVaX9/a1NOdSj5T
-         StArv0llErKSXLZQbVlW9ElxnT5V832Gk4Dto2/LOKjqykPdja0C0YBKIiRtOmDaSI
-         9bWE/U9bv+hQs9P/8Yiz1QYcSG7aU25UQoHZ4E7Y=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20230629064908epcas5p40d0c100961b82debe6e742d08f3db5ba~tDnkBsHPj1752417524epcas5p4c;
-        Thu, 29 Jun 2023 06:49:08 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.179]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4Qs8Dy2KlJz4x9Px; Thu, 29 Jun
-        2023 06:49:06 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        5F.35.55173.2692D946; Thu, 29 Jun 2023 15:49:06 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230629062728epcas5p2bb48fea42a380039c0eb06c19a44aad1~tDUpsFQG-2800828008epcas5p2I;
-        Thu, 29 Jun 2023 06:27:28 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230629062728epsmtrp2f7f3edcfa873ad996c2bb7067cf9c52a~tDUprEaJV3223132231epsmtrp2d;
-        Thu, 29 Jun 2023 06:27:28 +0000 (GMT)
-X-AuditID: b6c32a50-df1ff7000001d785-74-649d296246d5
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A2.B7.30535.0542D946; Thu, 29 Jun 2023 15:27:28 +0900 (KST)
-Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230629062727epsmtip1ca4ed67758bcd5b83b2a1396a6185aba~tDUoSgo3u1157711577epsmtip1O;
-        Thu, 29 Jun 2023 06:27:27 +0000 (GMT)
-From:   Min Li <min15.li@samsung.com>
-To:     axboe@kernel.dk, willy@infradead.org, hch@lst.de,
-        dlemoal@kernel.org, gregkh@linuxfoundation.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Min Li <min15.li@samsung.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH v5] block: add check that partition length needs to be
- aligned with block size
-Date:   Thu, 29 Jun 2023 14:25:17 +0000
-Message-Id: <20230629142517.121241-1-min15.li@samsung.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 29 Jun 2023 03:10:50 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A8BD2114
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 00:10:48 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-98e109525d6so65841266b.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 00:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688022647; x=1690614647;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=mvBygg2aa08XaO2HSEAFwLjrgCcNfa8tx+XRbswbIi8=;
+        b=CYn4BQ2bQitOEKyuoeRbF1vm3CVE9nOfCrYKNtEyEVpPgmHQXJf7agf1kt6HQq4314
+         wFyBirkA/EeBjG1fN/wNniolJ2ARJBsNe/j+WN+4tyBim4A4ufZaefAkH1ruN0lmyu3s
+         zNums1Yf7LlKq+z6cwK6tyhiIFa/Pzbio3j5qkALChyQG0aWRrfC6/yBqMHbKYaV44oO
+         zPkPPFr3FI/5aMEDWjIH752Wa9ZvZPihbTthq8b4olUPOZYe+4Cd5RdZQed484M6B1Q7
+         u7LCRCtmCLMetYEYx/5+ILHUCT/nikBxWTGFVLJFPOgfl5OJxZiMDnilhik63qFK2kHy
+         13JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688022647; x=1690614647;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mvBygg2aa08XaO2HSEAFwLjrgCcNfa8tx+XRbswbIi8=;
+        b=DWaqDJp2O4g8gb318EJtKCJZzipFApZ6nY34J7Pc6uNlFyK2rMpwDPiUsY2JHlVSwb
+         zO/e9gk8soisb3a6CkISz9fKqI2ngC7pR32OX459uZi7hfH/lQejo4mPsWknIyRLDiYn
+         W8GiTWHaRKk5yxG/ZIntVVymmzsZeTLuAdc1rcIMcmJtoDysRAw14J387SNKJUYTBR4N
+         cRDY5jp/+vkkzlJR6oNUkOixc6v8F0YZp8O9z6U3bUk4UplAs9puxtCqRpfjITGttKpX
+         mNyj4mYcPatCCVqwnsdgEGVf5OiECAWRiKXoC25Tg2b5DHaFC6XPAhEVEKseAeGEORDe
+         GzPw==
+X-Gm-Message-State: AC+VfDxGAtsBfL6Q4VxXwf21qkinqE6pSI/etJMBX3mpWi4fZkILmtl1
+        tXtYhrwYmRMYLt49ccCz0SkqMA==
+X-Google-Smtp-Source: ACHHUZ7UzIjkr8VlmNsWt5MWQnuZXpaVhxM/jqjB5hPC5bq5F0fqbmRT/6N2SczuiwXW59394C/Bug==
+X-Received: by 2002:a17:907:96aa:b0:987:fe18:1c58 with SMTP id hd42-20020a17090796aa00b00987fe181c58mr3087877ejc.35.1688022646904;
+        Thu, 29 Jun 2023 00:10:46 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id bu5-20020a170906a14500b0096f6a131b9fsm6532672ejb.23.2023.06.29.00.10.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 00:10:46 -0700 (PDT)
+References: <20230628190649.11233-1-nmi@metaspace.dk>
+ <20230628190649.11233-2-nmi@metaspace.dk>
+ <d23bf48c-5bc9-aab6-4ca2-ebbb24a0878e@kernel.org>
+ <ZJzSjFbzzNxppH7p@ovpn-8-18.pek2.redhat.com>
+User-agent: mu4e 1.10.4; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Damien Le Moal <dlemoal@kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH v4 1/4] ublk: change ublk IO command defines to enum
+Date:   Thu, 29 Jun 2023 09:09:07 +0200
+In-reply-to: <ZJzSjFbzzNxppH7p@ovpn-8-18.pek2.redhat.com>
+Message-ID: <87a5wizqto.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrIJsWRmVeSWpSXmKPExsWy7bCmpm6S5twUgzl3+S1W3+1ns3iw396i
-        efF6Nosbx98xW8x9fYnFYuXqo0wWT6/OYrLYe0vb4vKuOWwWy1d1MFmcnfCB1WLBxkeMFr9/
-        AMVurLvK4sDnsXmFlsfls6Uem1Z1snnsn7uG3WP3zQY2j97md2wefVtWMXp83iQXwBGVbZOR
-        mpiSWqSQmpecn5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdLSSQlliTilQ
-        KCCxuFhJ386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITtj543p
-        zAUtIhXzmhpZGxhnCXQxcnJICJhI7L53mqmLkYtDSGAPo8SRDTNZIZxPjBKPls6Fcr4xSjw4
-        2MkC09K8ciIjiC0ksJdRYvcaMYii54wSB1oXAs3i4GATUJbYttQHpEZEIE1iacdPNpAaZoG5
-        jBIXF7YxgSSEBRIkNp/+wAZiswioSkx4NA9sAa+AlcT0H+2MEMvkJfYfPMsMEReUODnzCVgN
-        M1C8eetsZpChEgJTOSSOPJnFBNHgIvHy6BRWCFtY4tXxLewQtpTE53d72UCOkxAolnj5Iwwi
-        XCOx+9ttqFZriW3r14HdzyygKbF+lz5EWFZi6ql1TBBr+SR6fz+BKueV2DEPxlaS+HvhHNTJ
-        EhKL9z+EusBDYvvJ86yQsIqV+Db3KusERvlZSL6ZheSbWQibFzAyr2KUSi0ozk1PTTYtMNTN
-        Sy2HR2xyfu4mRnDa1QrYwbh6w1+9Q4xMHIyHGCU4mJVEeG+/mZ0ixJuSWFmVWpQfX1Sak1p8
-        iNEUGMYTmaVEk/OBiT+vJN7QxNLAxMzMzMTS2MxQSZz3nntnipBAemJJanZqakFqEUwfEwen
-        VAPTmso9Ih+OqLE/NJxw/eOb3VdvPbDcu4/rlNOpE4cdTAts3sidvOzi92DB55kaXPO+8yXw
-        uPyTvGNnu3TCdevt8xjeTEu5UuRofHZZ0uw4y5ibe57onGefJ95txu3s0jL3+kWFK11Tl2++
-        4uPu9Co1WLtXUvrtr9YPIRka8+6KKHrYOrxJVI5vCxXnrZ5z5YVOlndUftLuSqu0kzvr7EPF
-        uNrNnf/Iv1r3+viu71yVLoeibWa4sBQfUta83mO9egbb1CN+H9YqzrZb6yTvtvWiw8lpbRzX
-        RUI2fJkdNd3q2CLWh7oHOTydvwrcLzJ/4i/ns3OJ+seLAg5Z60wSP6aGnG5S6fzyQb5hl7zd
-        Z4lIJZbijERDLeai4kQA6EKnVkQEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrNLMWRmVeSWpSXmKPExsWy7bCSnG6AytwUgzlXFCxW3+1ns3iw396i
-        efF6Nosbx98xW8x9fYnFYuXqo0wWT6/OYrLYe0vb4vKuOWwWy1d1MFmcnfCB1WLBxkeMFr9/
-        AMVurLvK4sDnsXmFlsfls6Uem1Z1snnsn7uG3WP3zQY2j97md2wefVtWMXp83iQXwBHFZZOS
-        mpNZllqkb5fAlbHzxnTmghaRinlNjawNjLMEuhg5OSQETCSaV05kBLGFBHYzSmx/bQsRl5A4
-        P+8XG4QtLLHy33P2LkYuoJqnjBLXDt8Fcjg42ASUJbYt9QExRQRyJFZ89wcpYRZYyChxe/pL
-        VpBeYYE4ia9tXWDzWQRUJSY8mscCYvMKWElM/9HOCDFfXmL/wbPMEHFBiZMzn4DVMAPFm7fO
-        Zp7AyDcLSWoWktQCRqZVjJKpBcW56bnFhgVGeanlesWJucWleel6yfm5mxjB4a+ltYNxz6oP
-        eocYmTgYDzFKcDArifDefjM7RYg3JbGyKrUoP76oNCe1+BCjNAeLkjjvt9e9KUIC6Yklqdmp
-        qQWpRTBZJg5OqQamMxeYThjtebJG6d22zQeaZlo3ST9UEPV9PvPX2afbXx+vfcDLteH/TukX
-        OYesLzKlbny16oGypscH7hUFV/gXyHA1l+menG2bc8/3y8+uz73LlCeJ77x2gG1D0JwN/+YI
-        sF7/bn7VJOsVW2J5stDSCeyChlNvTf679NPXcL6yhoUHDHP3njixfkLqVdGU3W+yme+9LZi4
-        /9z1WXoKs/t1H0xrNtofuPtzw59triaFLCx7riZ+ENj9b3lS5gJXjnePWfz9DJ5prrP4kbn5
-        Q9bNI0dn7gq62/xh/fddD1Z6lMfdPz/Z/lppe06KRP0bzY5N7Jl6tlV18VIL/VKLNrpfSoxX
-        dFg/9dn5CWw2zfb5mnlKLMUZiYZazEXFiQD7Hgea7gIAAA==
-X-CMS-MailID: 20230629062728epcas5p2bb48fea42a380039c0eb06c19a44aad1
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230629062728epcas5p2bb48fea42a380039c0eb06c19a44aad1
-References: <CGME20230629062728epcas5p2bb48fea42a380039c0eb06c19a44aad1@epcas5p2.samsung.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Before calling add partition or resize partition, there is no check
-on whether the length is aligned with the logical block size.
-If the logical block size of the disk is larger than 512 bytes,
-then the partition size maybe not the multiple of the logical block size,
-and when the last sector is read, bio_truncate() will adjust the bio size,
-resulting in an IO error if the size of the read command is smaller than
-the logical block size.If integrity data is supported, this will also
-result in a null pointer dereference when calling bio_integrity_free.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Min Li <min15.li@samsung.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Ming Lei <ming.lei@redhat.com> writes:
 
----
-Changes from v1:
+> On Thu, Jun 29, 2023 at 07:47:47AM +0900, Damien Le Moal wrote:
+>> On 6/29/23 04:06, Andreas Hindborg wrote:
+>> > From: Andreas Hindborg <a.hindborg@samsung.com>
+>> > 
+>> > This change is in preparation for zoned storage support.
+>> > 
+>> > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+>> > ---
+>> >  include/uapi/linux/ublk_cmd.h | 23 +++++++++++++++++------
+>> >  1 file changed, 17 insertions(+), 6 deletions(-)
+>> > 
+>> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+>> > index 4b8558db90e1..471b3b983045 100644
+>> > --- a/include/uapi/linux/ublk_cmd.h
+>> > +++ b/include/uapi/linux/ublk_cmd.h
+>> > @@ -229,12 +229,23 @@ struct ublksrv_ctrl_dev_info {
+>> >  	__u64   reserved2;
+>> >  };
+>> >  
+>> > -#define		UBLK_IO_OP_READ		0
+>> > -#define		UBLK_IO_OP_WRITE		1
+>> > -#define		UBLK_IO_OP_FLUSH		2
+>> > -#define		UBLK_IO_OP_DISCARD	3
+>> > -#define		UBLK_IO_OP_WRITE_SAME	4
+>> > -#define		UBLK_IO_OP_WRITE_ZEROES	5
+>> > +enum ublk_op {
+>> > +	UBLK_IO_OP_READ = 0,
+>> > +	UBLK_IO_OP_WRITE = 1,
+>> > +	UBLK_IO_OP_FLUSH = 2,
+>> > +	UBLK_IO_OP_DISCARD = 3,
+>> > +	UBLK_IO_OP_WRITE_SAME = 4,
+>> > +	UBLK_IO_OP_WRITE_ZEROES = 5,
+>> > +	UBLK_IO_OP_ZONE_OPEN = 10,
+>> > +	UBLK_IO_OP_ZONE_CLOSE = 11,
+>> > +	UBLK_IO_OP_ZONE_FINISH = 12,
+>> > +	UBLK_IO_OP_ZONE_APPEND = 13,
+>> > +	UBLK_IO_OP_ZONE_RESET = 15,
+>> > +	__UBLK_IO_OP_DRV_IN_START = 32,
+>> > +	__UBLK_IO_OP_DRV_IN_END = 96,
+>> > +	__UBLK_IO_OP_DRV_OUT_START = __UBLK_IO_OP_DRV_IN_END,
+>> > +	__UBLK_IO_OP_DRV_OUT_END = 160,
+>> > +};
+>> 
+>> This patch does not do what the title says. You are also introducing the zone
+>> operations, and the very obscure __UBLK_IO_OP_DRV_XXX operations without an
+>> explanation. Also, why the "__" prefix for these ? I do not see the point...
+>
+> It should be to reserve space for ublk passthrough OP.
+>
+>> Given that this is a uapi, a comment to explain the less obvious commands would
+>> be nice.
+>> 
+>> So I think the change to an enum for the existing ops can be done either in
+>> patch 2 or as a separate patch and the introduction of the zone operations done
+>> in patch 3 or as a separate patch.
+>
+> Also it might break userspace by changing to enum from macro for existed
+> definition, cause userspace may check something by '#ifdef UBLK_IO_OP_*',
+> so probably it is better to keep these OPs as enum, or at least keep
+> existed definition as macro.
 
-- Add a space after /* and before */.
-- Move length alignment check before the "start = p.start >> SECTOR_SHIFT"
-- Move check for p.start being aligned together with this length alignment check.
+I can change it back to `#define` again, no problem. I only changed it
+to `enum` on request from Ming [1]
 
-Changes from v2:
+Best regards,
+Andreas
 
-- Add the assignment on the first line and merge the two lines into one.
-
-Changes from v3:
-
-- Change the blksz to unsigned int.
-- Add check if p.start and p.length are negative.
-
-Changes from v4:
-
-- Remove the local variable blksz and use bdev_logical_block_size(bdev) directly.
----
- block/ioctl.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 3be11941fb2d..0e8723c1a807 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -18,7 +18,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- {
- 	struct gendisk *disk = bdev->bd_disk;
- 	struct blkpg_partition p;
--	long long start, length;
-+	sector_t start, length;
- 
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
-@@ -33,14 +33,17 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- 	if (op == BLKPG_DEL_PARTITION)
- 		return bdev_del_partition(disk, p.pno);
- 
-+	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
-+		return -EINVAL;
-+	/* Check that the partition is aligned to the block size */
-+	if (!IS_ALIGNED(p.start | p.length, bdev_logical_block_size(bdev)))
-+		return -EINVAL;
-+
- 	start = p.start >> SECTOR_SHIFT;
- 	length = p.length >> SECTOR_SHIFT;
- 
- 	switch (op) {
- 	case BLKPG_ADD_PARTITION:
--		/* check if partition is aligned to blocksize */
--		if (p.start & (bdev_logical_block_size(bdev) - 1))
--			return -EINVAL;
- 		return bdev_add_partition(disk, p.pno, start, length);
- 	case BLKPG_RESIZE_PARTITION:
- 		return bdev_resize_partition(disk, p.pno, start, length);
--- 
-2.34.1
+[1] https://lore.kernel.org/all/ZAHeWieKXtgYUbvz@ovpn-8-18.pek2.redhat.com/
 
