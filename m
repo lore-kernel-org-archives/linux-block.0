@@ -2,101 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3170C001B1
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 10:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACEA4EB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 10:18:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232302AbjF2KEW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jun 2023 06:04:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46622 "EHLO
+        id S230456AbjF2KSK convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jun 2023 06:18:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231395AbjF2KDW (ORCPT
+        with ESMTP id S231281AbjF2KSC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2023 06:03:22 -0400
-Received: from mail.nsr.re.kr (unknown [210.104.33.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 290BCA2;
-        Thu, 29 Jun 2023 03:01:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1688032763; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=Zafm6bhK5+g2pK+OZH6WFKiywi+VCeOoYHGecdFYKnw=; b=aEKRcS33y5MRO4r7i3L8Qk9RgJ4CNG5NED3OSgsQG7NhpbA8b16V2nb9+1gzJ16punKh6SG8mWIzGpqza8YsZb2WBFSC/3ak9OSutv/7g57MGn/DsuuJTAxYOXNPfH1rYSc0jlaQ7l3xh3MtMytZIAen9PlXWq9b5ndf34A3rowFBo+UqMdceMZBhjn4qnpybwFOTMGegYu8fke65tNFB6z7jFZ8cPNB34ETxsuuzBayOVLhT5xwIn+2x/Pr/50vkPEp0LtvnxZWMK8RO4JcMdr3NigSCTmi9N3JrP5DWzP/4/GLNPVrAFjLMIrG/QlWkwDXTngXq/2azBVQtMGnQw==
-Received: from 210.104.33.70 (nsr.re.kr)
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
-        by mail.nsr.re.kr with SMTP; Thu, 29 Jun 2023 18:59:08 +0900
-Received: from 192.168.155.188 ([192.168.155.188])
-          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 209;
-          Thu, 29 Jun 2023 19:01:14 +0900 (KST)
-From:   Dongsoo Lee <letrhee@nsr.re.kr>
-To:     'Eric Biggers' <ebiggers@kernel.org>
-Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
-        "'David S. Miller'" <davem@davemloft.net>,
-        'Jens Axboe' <axboe@kernel.dk>,
-        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
-        'Jaegeuk Kim' <jaegeuk@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230626084703.907331-1-letrhee@nsr.re.kr> <20230626084703.907331-5-letrhee@nsr.re.kr> <20230628063830.GA7920@sol.localdomain>
-In-Reply-To: <20230628063830.GA7920@sol.localdomain>
-Subject: RE: [PATCH v3 4/4] fscrypt: Add LEA-256-XTS, LEA-256-CTS support
-Date:   Thu, 29 Jun 2023 19:01:11 +0900
-Message-ID: <000901d9aa70$a228c420$e67a4c60$@nsr.re.kr>
+        Thu, 29 Jun 2023 06:18:02 -0400
+Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773F119B6;
+        Thu, 29 Jun 2023 03:18:00 -0700 (PDT)
+Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
+          by outpost.zedat.fu-berlin.de (Exim 4.95)
+          with esmtps (TLS1.3)
+          tls TLS_AES_256_GCM_SHA384
+          (envelope-from <glaubitz@zedat.fu-berlin.de>)
+          id 1qEoiq-000SNC-7D; Thu, 29 Jun 2023 12:17:56 +0200
+Received: from p57bd9486.dip0.t-ipconnect.de ([87.189.148.134] helo=[192.168.178.81])
+          by inpost2.zedat.fu-berlin.de (Exim 4.95)
+          with esmtpsa (TLS1.3)
+          tls TLS_AES_256_GCM_SHA384
+          (envelope-from <glaubitz@physik.fu-berlin.de>)
+          id 1qEoip-001qhD-Vp; Thu, 29 Jun 2023 12:17:56 +0200
+Message-ID: <f1a0f2252cc38721e222530dc4026ed3834e3eb8.camel@physik.fu-berlin.de>
+Subject: Re: [FSL P50x0] [PASEMI] The Access to partitions on disks with an
+ Amiga partition table doesn't work anymore after the block updates
+ 2023-06-23
+From:   John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+To:     Christian Zigotzky <chzigotzky@xenosoft.de>, schmitzmic@gmail.com
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-m68k@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Christoph Hellwig <hch@lst.de>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        mad skateman <madskateman@gmail.com>,
+        Darren Stevens <darren@stevens-zone.net>
+Date:   Thu, 29 Jun 2023 12:17:55 +0200
+In-Reply-To: <024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de>
+References: <024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.48.3 
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: ko
-Thread-Index: AQHHxDRlmstc7qqNSJFY4M8BkkyX4gFqzZG4AcdR3rmvq8ZzIA==
+X-Original-Sender: glaubitz@physik.fu-berlin.de
+X-Originating-IP: 87.189.148.134
+X-ZEDAT-Hint: PO
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 23:38:30 -0700, Eric Biggers wrote:
->On Mon, Jun 26, 2023 at 05:47:03PM +0900, Dongsoo Lee wrote:
->> when SIMD instructions are available, it performs even faster.
->
->This will only be true once there is actually an applicable implementation
-of
->LEA-XTS and LEA-CTS using SIMD instructions included in the kernel.
->
->Perhaps it is your plan to go through and accelerate LEA-XTS and LEA-CTS
-for the
->common CPU architectures.  However, it is not included in this patchset
-yet, so
->it should not be claimed in the documentation yet.
->
->> Particularly, it outperforms AES when the dedicated crypto
->> +instructions for AES are unavailable, regardless of the presence of SIMD
->> +instructions. However, it is not recommended to use LEA unless there is
->> +a clear reason (such as the absence of dedicated crypto instructions for
->> +AES or a mandatory requirement) to do so. Also, to enable LEA support,
->> +it needs to be enabled in the kernel crypto API.
->
->I think I'd prefer that you omit the mention of the "absence of dedicated
-crypto
->instructions" use case for now.  fscrypt already supports another algorithm
-that
->fulfills exactly that use case (Adiantum), and that algorithm already has
->optimized implementations for arm32, arm64, and x86_64.  LEA does not have
-that
->yet.  So it does not really bring anything new to the table.  I'm also
-unsure it
->would be appropriate to recommend a "lightweight" cipher at this point...
->
->That would leave "mandatory requirement" as the rationale, at least for
-now,
->similar to SM4.
->
->- Eric
+Hello Christian!
 
-As you might expect, we are working on a SIMD implementation of LEA in a
-general-purpose CPU environment. However, since no such implementation has
-been submitted yet, we agree that it's right to leave it out for now.
+On Thu, 2023-06-29 at 06:59 +0200, Christian Zigotzky wrote:
+> The access  to partitions on disks with an Amiga partition table (via 
+> the Rigid Disk Block RDB) doesn't work anymore on my Cyrus+ board with a 
+> FSL P50x0 PowerPC SoC [1] and on my P.A. Semi Nemo board [2] after the 
+> block updates 2023-06-23 [3].
+> 
+> parted -l
+> 
+> Model: ATA ST2000DM001-9YN1 (scsi)
+> Disk /dev/sda: 2000GB
+> Sector size (logical/physical): 512B/4096B
+> Partition Table: amiga
+> Disk Flags:
+> 
+> Number  Start   End     Size    File system  Name  Flags
+>   1      1057kB  123MB   122MB   affs7        BDH0  hidden
+>   2      123MB   2274MB  2150MB               DH0   boot
+>   3      2274MB  691GB   689GB                DH2
+>   4      691GB   1992GB  1301GB  ext4         dhx   boot
 
-In the next version, we would like to change the description to the
-following:
+What version of AmigaOS is that?
 
-LEA is a South Korean 128-bit block cipher (with 128/192/256-bit keys)
-included in the ISO/IEC 29192-2:2019 standard (Information security -
-Lightweight cryptography - Part 2: Block ciphers). If dedicated cipher
-instructions are available, or other options with performance benefits
-are available, using LEA is likely not a suitable choice. Therefore,
-it is not recommended to use LEA-256-XTS unless there is a clear reason
-to do so, such as if there is a mandate. Also, to enable LEA support,
-it needs to be enabled in the kernel crypto API.
+> dmesg | grep -i sda
+> 
+> [    4.208905] sd 0:0:0:0: [sda] 3907029168 512-byte logical blocks: 
+> (2.00 TB/1.82 TiB)
+> [    4.253995] sd 0:0:0:0: [sda] 4096-byte physical blocks
+> [    4.254826] sd 0:0:0:0: [sda] Write Protect is off
+> [    4.300069] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
+> [    4.486476] sd 0:0:0:0: [sda] Write cache: enabled, read cache: 
+> enabled, doesn't support DPO or FUA
+> [    4.580507] sd 0:0:0:0: [sda] Preferred minimum I/O size 4096 bytes
+> [    4.712624] Dev sda: unable to read partition block 4294967295
+> [    4.761532]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
+> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1) 
+> unable to read partition table
+> [    4.761892] sda: partition table beyond EOD,
+> [    4.861681] Dev sda: unable to read partition block 4294967295
+> [    4.912094]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
+> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1) 
+> unable to read partition table
+> [    4.963387] sda: partition table beyond EOD,
+> [    5.014769] sd 0:0:0:0: [sda] Attached SCSI disk
+
+Maybe the RDB is corrupted? Did you try on a freshly created RDB?
+
+> I created a patch for reverting the commit. [4]
+
+That can be done with just "git revert <commit hash>".
+
+> The access works again with this patch:
+> 
+> [    0.000000] Kernel command line: root=/dev/sda4
+> [    3.987717] sd 0:0:0:0: [sda] 3907029168 512-byte logical blocks: 
+> (2.00 TB/1.82 TiB)
+> [    4.031349] sd 0:0:0:0: [sda] 4096-byte physical blocks
+> [    4.123773] sd 0:0:0:0: [sda] Write Protect is off
+> [    4.168682] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
+> [    4.279304] sd 0:0:0:0: [sda] Write cache: enabled, read cache: 
+> enabled, doesn't support DPO or FUA
+> [    4.463508] sd 0:0:0:0: [sda] Preferred minimum I/O size 4096 bytes
+> [    4.519477]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
+> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1)
+> [    4.720896] sda: p4 size 18446744071956107760 extends beyond EOD,
+> [    4.922550]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
+> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1)
+> [    4.948655] sda: p4 size 18446744071956107760 extends beyond EOD, 
+> truncated
+
+Looks like the old code is complaining about your partition table as well.
+
+> Could you please check your commit?
+
+Please also make sure that your RDB is not corrupted.
+
+Adrian
+
+-- 
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer
+`. `'   Physicist
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
