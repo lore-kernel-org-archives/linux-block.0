@@ -2,141 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACEA4EB64DC
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 10:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F94EB64D9
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 11:07:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230456AbjF2KSK convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jun 2023 06:18:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49604 "EHLO
+        id S232114AbjF2LHQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jun 2023 07:07:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231281AbjF2KSC (ORCPT
+        with ESMTP id S229632AbjF2LHO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2023 06:18:02 -0400
-Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773F119B6;
-        Thu, 29 Jun 2023 03:18:00 -0700 (PDT)
-Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
-          by outpost.zedat.fu-berlin.de (Exim 4.95)
-          with esmtps (TLS1.3)
-          tls TLS_AES_256_GCM_SHA384
-          (envelope-from <glaubitz@zedat.fu-berlin.de>)
-          id 1qEoiq-000SNC-7D; Thu, 29 Jun 2023 12:17:56 +0200
-Received: from p57bd9486.dip0.t-ipconnect.de ([87.189.148.134] helo=[192.168.178.81])
-          by inpost2.zedat.fu-berlin.de (Exim 4.95)
-          with esmtpsa (TLS1.3)
-          tls TLS_AES_256_GCM_SHA384
-          (envelope-from <glaubitz@physik.fu-berlin.de>)
-          id 1qEoip-001qhD-Vp; Thu, 29 Jun 2023 12:17:56 +0200
-Message-ID: <f1a0f2252cc38721e222530dc4026ed3834e3eb8.camel@physik.fu-berlin.de>
-Subject: Re: [FSL P50x0] [PASEMI] The Access to partitions on disks with an
- Amiga partition table doesn't work anymore after the block updates
- 2023-06-23
-From:   John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-To:     Christian Zigotzky <chzigotzky@xenosoft.de>, schmitzmic@gmail.com
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-m68k@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Christoph Hellwig <hch@lst.de>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>,
-        mad skateman <madskateman@gmail.com>,
-        Darren Stevens <darren@stevens-zone.net>
-Date:   Thu, 29 Jun 2023 12:17:55 +0200
-In-Reply-To: <024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de>
-References: <024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.48.3 
+        Thu, 29 Jun 2023 07:07:14 -0400
+Received: from out-11.mta1.migadu.com (out-11.mta1.migadu.com [95.215.58.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB90510CF
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 04:07:12 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1688036830;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=oSLJao9f5JaszPoImqsUvDRSvTMFoJRzT3O/9NnVAD8=;
+        b=qKEKzK9F9eMP5JoByRJSooGFJrjAc4+lsvHOceAaimvo6wrsFv6HRkkH/a86fKdP18B4Va
+        VnHHuaU49jZZtFXJ4P0vWMFs93yY6lSjgcC9OmsFyu3aL1+BHdAWV/iyllaPgaWAvhrKbP
+        1f1N5uVg8OoieHcBjidLRE7dCkiFgL8=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de, tj@kernel.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH v2 0/4] blk-mq: optimize the size of struct request
+Date:   Thu, 29 Jun 2023 19:03:55 +0800
+Message-Id: <20230629110359.1111832-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-X-Original-Sender: glaubitz@physik.fu-berlin.de
-X-Originating-IP: 87.189.148.134
-X-ZEDAT-Hint: PO
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Christian!
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-On Thu, 2023-06-29 at 06:59 +0200, Christian Zigotzky wrote:
-> The access  to partitions on disks with an Amiga partition table (via 
-> the Rigid Disk Block RDB) doesn't work anymore on my Cyrus+ board with a 
-> FSL P50x0 PowerPC SoC [1] and on my P.A. Semi Nemo board [2] after the 
-> block updates 2023-06-23 [3].
-> 
-> parted -l
-> 
-> Model: ATA ST2000DM001-9YN1 (scsi)
-> Disk /dev/sda: 2000GB
-> Sector size (logical/physical): 512B/4096B
-> Partition Table: amiga
-> Disk Flags:
-> 
-> Number  Start   End     Size    File system  Name  Flags
->   1      1057kB  123MB   122MB   affs7        BDH0  hidden
->   2      123MB   2274MB  2150MB               DH0   boot
->   3      2274MB  691GB   689GB                DH2
->   4      691GB   1992GB  1301GB  ext4         dhx   boot
+v2:
+ - Change to use call_single_data_t, which use __aligned() to avoid
+   to use 2 cache lines for 1 csd. Thanks Ming Lei.
+ - [v1] https://lore.kernel.org/all/20230627120854.971475-1-chengming.zhou@linux.dev/
 
-What version of AmigaOS is that?
+Hello,
 
-> dmesg | grep -i sda
-> 
-> [    4.208905] sd 0:0:0:0: [sda] 3907029168 512-byte logical blocks: 
-> (2.00 TB/1.82 TiB)
-> [    4.253995] sd 0:0:0:0: [sda] 4096-byte physical blocks
-> [    4.254826] sd 0:0:0:0: [sda] Write Protect is off
-> [    4.300069] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
-> [    4.486476] sd 0:0:0:0: [sda] Write cache: enabled, read cache: 
-> enabled, doesn't support DPO or FUA
-> [    4.580507] sd 0:0:0:0: [sda] Preferred minimum I/O size 4096 bytes
-> [    4.712624] Dev sda: unable to read partition block 4294967295
-> [    4.761532]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
-> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1) 
-> unable to read partition table
-> [    4.761892] sda: partition table beyond EOD,
-> [    4.861681] Dev sda: unable to read partition block 4294967295
-> [    4.912094]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
-> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1) 
-> unable to read partition table
-> [    4.963387] sda: partition table beyond EOD,
-> [    5.014769] sd 0:0:0:0: [sda] Attached SCSI disk
+After the commit be4c427809b0 ("blk-mq: use the I/O scheduler for
+writes from the flush state machine"), rq->flush can't reuse rq->elv
+anymore, since flush_data requests can go into io scheduler now.
 
-Maybe the RDB is corrupted? Did you try on a freshly created RDB?
+That increased the size of struct request by 24 bytes, but this
+patchset can decrease the size by 40 bytes, which is good I think.
 
-> I created a patch for reverting the commit. [4]
+patch 1 use percpu csd to do remote complete instead of per-rq csd,
+decrease the size by 24 bytes.
 
-That can be done with just "git revert <commit hash>".
+patch 2-3 reuse rq->queuelist in flush state machine pending list,
+and maintain a u64 counter of inflight flush_data requests, decrease
+the size by 16 bytes.
 
-> The access works again with this patch:
-> 
-> [    0.000000] Kernel command line: root=/dev/sda4
-> [    3.987717] sd 0:0:0:0: [sda] 3907029168 512-byte logical blocks: 
-> (2.00 TB/1.82 TiB)
-> [    4.031349] sd 0:0:0:0: [sda] 4096-byte physical blocks
-> [    4.123773] sd 0:0:0:0: [sda] Write Protect is off
-> [    4.168682] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
-> [    4.279304] sd 0:0:0:0: [sda] Write cache: enabled, read cache: 
-> enabled, doesn't support DPO or FUA
-> [    4.463508] sd 0:0:0:0: [sda] Preferred minimum I/O size 4096 bytes
-> [    4.519477]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
-> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1)
-> [    4.720896] sda: p4 size 18446744071956107760 extends beyond EOD,
-> [    4.922550]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
-> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1)
-> [    4.948655] sda: p4 size 18446744071956107760 extends beyond EOD, 
-> truncated
+patch 4 is just cleanup by the way.
 
-Looks like the old code is complaining about your partition table as well.
+Thanks for comments!
 
-> Could you please check your commit?
+Chengming Zhou (4):
+  blk-mq: use percpu csd to remote complete instead of per-rq csd
+  blk-flush: count inflight flush_data requests
+  blk-flush: reuse rq queuelist in flush state machine
+  blk-mq: delete unused completion_data in struct request
 
-Please also make sure that your RDB is not corrupted.
-
-Adrian
+ block/blk-flush.c      | 19 +++++++++----------
+ block/blk-mq.c         | 12 ++++++++----
+ block/blk.h            |  5 ++---
+ include/linux/blk-mq.h | 10 ++--------
+ 4 files changed, 21 insertions(+), 25 deletions(-)
 
 -- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer
-`. `'   Physicist
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+2.39.2
+
