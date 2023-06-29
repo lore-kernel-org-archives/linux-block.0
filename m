@@ -2,55 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9657EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 05:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA78EB64D9
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 06:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231537AbjF2Fom (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jun 2023 01:44:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33138 "EHLO
+        id S231783AbjF2G0K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jun 2023 02:26:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231573AbjF2Fod (ORCPT
+        with ESMTP id S230446AbjF2G0H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2023 01:44:33 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ED1D2D51;
-        Wed, 28 Jun 2023 22:44:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZH2LZio22mQexeVRx+H7ULNKh+Hfj2iXIK15cwYlRjg=; b=hIR4hN4B74sge6G08Zg+Qjk1rl
-        ISOCFeylq83bOt3snrPFKtcEmAHmeq57aNIRevl11V5CG9cN5G/XN8YBGCXEP83isYLUD2qV2WANo
-        amlrQRjGmkV4ldL/Fqa9U1yIjq2WzqAOlo3RbDOQNiKon1Z4Scqgwn57t4s05mxtfB2WJtCqRUpPx
-        ZHfokhkLhi4p0z1GxvwIoL5GKrQIMCZ/LqSzrqQNx/8fLld2gkijRbVCoLt9dzym4n//fQ6IhQIho
-        HJI/2Jn+Q9/wkpolyqxIV2DVhpJLbuyBG28eV1Qq8jhTp5+bqppW+d82eUZvxXOiMUUYAa5QAjexj
-        HPq2bJ6A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qEkRt-0001dI-0L;
-        Thu, 29 Jun 2023 05:44:09 +0000
-Date:   Wed, 28 Jun 2023 22:44:09 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yangtao Li <frank.li@vivo.com>
-Cc:     axboe@kernel.dk, song@kernel.org, viro@zeniv.linux.org.uk,
-        brauner@kernel.org, xiang@kernel.org, chao@kernel.org,
-        huyue2@coolpad.com, jefflexu@linux.alibaba.com, hch@infradead.org,
-        djwong@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 1/7] block: add queue_logical_block_mask() and
- bdev_logical_block_mask()
-Message-ID: <ZJ0aKU2w9xwS/vg1@infradead.org>
-References: <20230628093500.68779-1-frank.li@vivo.com>
+        Thu, 29 Jun 2023 02:26:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89D02D56;
+        Wed, 28 Jun 2023 23:26:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3AF07613F7;
+        Thu, 29 Jun 2023 06:26:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCBE7C433C8;
+        Thu, 29 Jun 2023 06:26:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688019964;
+        bh=8RqCu/onJv58TzXNwEU9CLDkGzmYgA7eGXK/nH0yQEw=;
+        h=From:To:Subject:Date:From;
+        b=IWR+rRSApsvsEe8aMd+mXoYjtjEidNjyRqSyP7XfUavtaUGGwj/fF6BN1cB4ZslAo
+         /AJSlJVRCqyJzdx2lWKOSbQT8rjOGX9Z8aJdljtPiLHiSTKEgSGEpceD4Pkrerf7mw
+         kTb8KsSnG+nqOCel2Gy/ZC+y+2F1V9FkXHEEMl5QTJ0omEOrsE0m+WqB+dIMr54P5B
+         IJ380ynzWz9QMstiWmjakwM6gxJBc+ckkgqconBVD3iCEjv1gJx+A7/qKdKc6p/WuX
+         0lgcXBxgZb2tXP1AlZrcdkQNpB5bk6EtbebRDT+sllWcR8HKCWMZqvgDQOLmui/qJY
+         0d32yvf6hUclw==
+From:   Damien Le Moal <dlemoal@kernel.org>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH 0/5] Improve checks in blk_revalidate_disk_zones()
+Date:   Thu, 29 Jun 2023 15:25:57 +0900
+Message-ID: <20230629062602.234913-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628093500.68779-1-frank.li@vivo.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-What is the value add of this series?
+This series slightly modifies the 4 block device drivers that support
+zoned block devices to ensure that they all call
+blk_revalidate_disk_zones() with the zone size and max zone append
+limits set. This is done in the first 4 patches.
 
+With these changes, the last patch improves blk_revalidate_disk_zones()
+to better check a zoned device zones and the device limits.
+
+Damien Le Moal (5):
+  scsi: sd_zbc: Set zone limits before revalidating zones
+  nvme: zns: Set zone limits before revalidating zones
+  block: nullblk: Set zone limits before revalidating zones
+  block: virtio_blk: Set zone limits before revalidating zones
+  block: improve checks in blk_revalidate_disk_zones()
+
+ block/blk-zoned.c              | 99 +++++++++++++++++++++-------------
+ drivers/block/null_blk/zoned.c | 21 +++-----
+ drivers/block/virtio_blk.c     | 35 ++++++------
+ drivers/nvme/host/zns.c        |  9 ++--
+ drivers/scsi/sd_zbc.c          | 12 ++---
+ 5 files changed, 96 insertions(+), 80 deletions(-)
+
+-- 
+2.41.0
 
