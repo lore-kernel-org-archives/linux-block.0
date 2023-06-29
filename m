@@ -2,193 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 087FDEB64D9
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 20:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC262EB64D9
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 21:23:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbjF2Uye (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jun 2023 16:54:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47038 "EHLO
+        id S230158AbjF2VXo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jun 2023 17:23:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232111AbjF2UxN (ORCPT
+        with ESMTP id S229459AbjF2VXo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2023 16:53:13 -0400
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85BDA3A8F
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 13:52:22 -0700 (PDT)
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-76243a787a7so104947085a.2
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 13:52:22 -0700 (PDT)
+        Thu, 29 Jun 2023 17:23:44 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B09882D4C
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 14:23:42 -0700 (PDT)
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6B7F13F171
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 21:23:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1688073821;
+        bh=RI4vrq5yGYsPdUmTvun8DtN4hoztwswwCj0aAlaqqY4=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=PjhuNpNdr4DddW64oIYLuHdyDQRpI5vr5IH3AbbkFtgTkszXB+Re5FwkUJDu73Fv1
+         ZERw6f+REilTTGAOLqxc645HVWDD4a+I1B1RiJRAOI+H/B5ON8d2Kh574sHQNkNPUh
+         4ugtzgWfW5kFZkUEQPcdzuuHVJwJ518qA7l4DZc+kREnneYKmMUOfBeNYZ+PRkYpy3
+         tyQf+3K9NI2EyskBwctd6Zfh5QuhnzEZrPCPCciItPdTqJj0VW1XZNv8JR7uPaDoXJ
+         HKJ5ZF2eNoUxzWkBTwjZnk2wEMTYiRuc3PkvUKt6EnFJjnOogo755Q+BqElifhwiXR
+         SSEILZ0pRcqfA==
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6b86d2075f0so1537628a34.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2023 14:23:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688071941; x=1690663941;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7d9FeE6aTXB8fD9aXlVOD/C2mJ6jYgFumLfL05JyPP0=;
-        b=JnyEtyV/V1We9duhJGA8yXtQOsR0uYI3g+qf1neNGqbNUuRUqEb3Nub0SG4X6eKF+x
-         WLgYXiGZXFqyzH2yo56LcciAVGSE0XvVY/LT5PW8cUg67ZBq7vZERMgGcd5qYDKdy4bx
-         qHJ6ujZtm41UcmhDC5YKzTvqBsWSalZGpbiFtPqB9ZDgoB4CpY0+yhhrTlI8gMrl3SoT
-         ctmgdGwL5R/gVc1xKkgVRaAdZ0DTebrias2wW/T9Px0vr1o61h2lZU/+zkBi+L5R4F2e
-         P0YsAhuuRfBm7GLQtAgN3wZl9BTQiNtLEtE/0CKRLu/0WjBDCl8cUeVil8izBtivJl00
-         PZ/g==
-X-Gm-Message-State: ABy/qLYNZgaj8EhmgkrQ8Qbl7+4ld8jQJ1jxt5MP0wpSIwMHLgaJtsUG
-        bWiN0sJPB6vU+NVUOSmczer1
-X-Google-Smtp-Source: APBJJlG0rEu2m/z+yAI2XZTQcS505crnEykvGdraPZcoAo7WoA1gxmfc8Yftx51iNuoQsE7uh/NqAA==
-X-Received: by 2002:a05:620a:294b:b0:765:6584:b033 with SMTP id n11-20020a05620a294b00b007656584b033mr449955qkp.50.1688071941611;
-        Thu, 29 Jun 2023 13:52:21 -0700 (PDT)
-Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id h22-20020a05620a13f600b00766f9df4a95sm4119085qkl.112.2023.06.29.13.52.20
+        d=1e100.net; s=20221208; t=1688073820; x=1690665820;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RI4vrq5yGYsPdUmTvun8DtN4hoztwswwCj0aAlaqqY4=;
+        b=cIG1zRDu6jRlw/2oVDCTan1VKfBA5f59BnbOoC1LjZjlzQZ6zqTcM+JRFXInvPorVg
+         tfJd+R2NGmCVehWptQsKVFLo49j3LPNKUiNmbqgxLwG9lF6iiHkX9GRtJQ/m13+6TcYj
+         kBLlUoVPqiEfU+13wml6W6d2o8WNLu32otR9zMNPTb7wVulSVR0aJnPexeQmaUEGWYXl
+         xK3C6mdDfZ+XskUZ3jKCncaU7Q3f5sUQQtKjLJXed+TSbeXYXHnuuAVRlFOTUC6pw2vw
+         g5tOxR7nWBUsGg4MJJ9P0okMpwyeZrETfiovaZm3SWs1CBYj8+eLAU7nOz+Qrmkxoiih
+         Py/A==
+X-Gm-Message-State: AC+VfDyJhm85w9pKopG/a1p6GGxLWZ3TA+wuA/w5yOKERS1zYvQ1mYb1
+        GgIaQfm3DuxshztsQmi9WTtR08E0TQyst7MbovkIlrxdnLuD/cd3hd4Ld737u8k63zGjoA01sB8
+        EPckQimIedOBOyzrGHNImNxxICne3YKhH+dieyy7K
+X-Received: by 2002:a9d:66d9:0:b0:6b7:53df:1db3 with SMTP id t25-20020a9d66d9000000b006b753df1db3mr1324953otm.0.1688073820319;
+        Thu, 29 Jun 2023 14:23:40 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4RJuKxP3PTOwPcoWYtMbpk2lOl27RytpNxFaqdrEnw8uaiA//2INIHK+RGmNiAgbwhY6lrvw==
+X-Received: by 2002:a9d:66d9:0:b0:6b7:53df:1db3 with SMTP id t25-20020a9d66d9000000b006b753df1db3mr1324947otm.0.1688073820127;
+        Thu, 29 Jun 2023 14:23:40 -0700 (PDT)
+Received: from localhost.localdomain ([2804:14c:4e1:83a2:7720:9030:a195:e622])
+        by smtp.gmail.com with ESMTPSA id q6-20020a9d6646000000b006b871010cb1sm2711764otm.46.2023.06.29.14.23.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 13:52:21 -0700 (PDT)
-Date:   Thu, 29 Jun 2023 16:52:20 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Demi Marie Obenour <demi@invisiblethingslab.com>,
-        Li Lingfeng <lilingfeng3@huawei.com>,
-        Li Nan <linan122@huawei.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Russell Harmon <eatnumber1@gmail.com>
-Subject: [git pull] device mapper changes for 6.5
-Message-ID: <ZJ3vBCypvTQ7w9pN@redhat.com>
+        Thu, 29 Jun 2023 14:23:39 -0700 (PDT)
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     "Isaac J. Manjarres" <isaacmanjarres@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] loop: fix regression from max_loop default value change
+Date:   Thu, 29 Jun 2023 18:22:54 -0300
+Message-Id: <20230629212256.918239-1-mfo@canonical.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Apparently, there's an unintended consequence of the improvement for max_loop=0
+in commit 85c50197716c ("loop: Fix the max_loop commandline argument treatment
+when it is set to 0") which might break programs that handle /dev/loop devices.
 
-This pull is based on an earlier subset of changes that you already
-pulled in for 6.5 via the block tree.
+The (deprecated) autoloading path fails (ENXIO) if the requested minor number
+is greater than or equal to the (new) default (CONFIG_BLK_DEV_LOOP_MIN_COUNT),
+when [loop.]max_loop is not specified.  This behavior used to work previously.
 
-The following changes since commit 245165658e1c9f95c0fecfe02b9b1ebd30a1198a:
+Patch 1/2 just notes the loop driver's autoloading path is deprecated/legacy.
+Patch 2/2 detects whether or not max_loop is set to restore default behavior
+as before the regression (and keeps the improvement done by the commit above).
 
-  blk-mq: fix NULL dereference on q->elevator in blk_mq_elv_switch_none (2023-06-16 10:12:25 -0600)
+More details in the commit message. This does not seem to be urgent, as the
+impact is to very specific/custom applications, and most users (eg, losetup)
+should not be impacted, as the dynamic add ioctl() is used.
 
-are available in the Git repository at:
+Thanks,
+Mauricio
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.5/dm-changes
+Mauricio Faria de Oliveira (2):
+  loop: deprecate autoloading callback loop_probe()
+  loop: do not enforce max_loop hard limit by (new) default
 
-for you to fetch changes up to e2c789cab60a493a72b42cb53eb5fbf96d5f1ae3:
+ drivers/block/loop.c | 43 ++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 40 insertions(+), 3 deletions(-)
 
-  dm: get rid of GFP_NOIO workarounds for __vmalloc and kvmalloc (2023-06-27 16:06:54 -0400)
+-- 
+2.39.2
 
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Update DM crypt to allocate compound pages if possible.
-
-- Fix DM crypt target's crypt_ctr_cipher_new return value on invalid
-  AEAD cipher.
-
-- Fix DM flakey testing target's write bio corruption feature to
-  corrupt the data of a cloned bio instead of the original.
-
-- Add random_read_corrupt and random_write_corrupt features to DM
-  flakey target.
-
-- Fix ABBA deadlock in DM thin metadata by resetting associated bufio
-  client rather than destroying and recreating it.
-
-- A couple other small DM thinp cleanups.
-
-- Update DM core to support disabling block core IO stats accounting
-  and optimize away code that isn't needed if stats are disabled.
-
-- Other small DM core cleanups.
-
-- Improve DM integrity target to not require so much memory on 32 bit
-  systems. Also only allocate the recalculate buffer as needed (and
-  increasingly reduce its size on allocation failure).
-
-- Update DM integrity to use %*ph for printing hexdump of a small
-  buffer. Also update DM integrity documentation.
-
-- Various DM core ioctl interface hardening.  Now more careful about
-  alignment of structures and processing of input passed to the kernel
-  from userspace. Also disallow the creation of DM devices named
-  "control", "." or ".."
-
-- Eliminate GFP_NOIO workarounds for __vmalloc and kvmalloc in DM
-  core's ioctl and bufio code.
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEJfWUX4UqZ4x1O2wixSPxCi2dA1oFAmScyjAACgkQxSPxCi2d
-A1pilwgAucNIAB6uN4ke4WZrMVxSFntUkqDTkCs2Ycw+W4Tf1Mtrj/4WeBzFdJaA
-oZMK04LUGaFFXn+halsCDzB354yT9C7V/KfXW8pCM1c9BRz4e8272i2HSN4WwD5n
-BU4gVaOV5BwxynfF3Z5siRraad1AwmdoRGGsqzVRESAKaObXU//1tnO42UhxRVhn
-nzFqhIm0xRcLAd8xIBlMsZQGIloicdDP9wZdWzTEDspQiwR2dFRmH9bUF8OmsS+h
-KwhtDty7aZO+4gJ1ccBImijzQCmbAo7dmFhDfoLXaA5Jt6UwTXMeBHm4aUPMnvQe
-NVXoRZJodDemwM642Q/Tx1SpsX6QmA==
-=4R7u
------END PGP SIGNATURE-----
-
-----------------------------------------------------------------
-Andy Shevchenko (1):
-      dm integrity: Use %*ph for printing hexdump of a small buffer
-
-Christophe JAILLET (1):
-      dm zone: Use the bitmap API to allocate bitmaps
-
-Demi Marie Obenour (6):
-      dm ioctl: Check dm_target_spec is sufficiently aligned
-      dm ioctl: Avoid pointer arithmetic overflow
-      dm ioctl: structs and parameter strings must not overlap
-      dm ioctl: Avoid double-fetch of version
-      dm ioctl: Refuse to create device named "control"
-      dm ioctl: Refuse to create device named "." or ".."
-
-Li Lingfeng (1):
-      dm thin metadata: Fix ABBA deadlock by resetting dm_bufio_client
-
-Li Nan (1):
-      dm: support turning off block-core's io stats accounting
-
-Mike Snitzer (6):
-      dm thin: remove return code variable in pool_map
-      dm thin: update .io_hints methods to not require handling discards last
-      dm: avoid needless dm_io access if all IO accounting is disabled
-      dm: skip dm-stats work in alloc_io() unless needed
-      dm: remove stale/redundant dm_internal_{suspend,resume} prototypes in dm.h
-      dm thin: disable discards for thin-pool if no_discard_passdown
-
-Mikulas Patocka (8):
-      dm crypt: allocate compound pages if possible
-      dm flakey: clone pages on write bio before corrupting them
-      dm flakey: introduce random_read_corrupt and random_write_corrupt options
-      dm crypt: fix crypt_ctr_cipher_new return value on invalid AEAD cipher
-      dm integrity: reduce vmalloc space footprint on 32-bit architectures
-      dm integrity: only allocate recalculate buffer when needed
-      dm integrity: scale down the recalculate buffer if memory allocation fails
-      dm: get rid of GFP_NOIO workarounds for __vmalloc and kvmalloc
-
-Russell Harmon (4):
-      Documentation: dm-integrity: Fix minor grammatical error.
-      Documentation: dm-integrity: Document the meaning of "buffer".
-      Documentation: dm-integrity: Document default values.
-      Documentation: dm-integrity: Document an example of how the tunables relate.
-
- .../admin-guide/device-mapper/dm-flakey.rst        |  10 +
- .../admin-guide/device-mapper/dm-integrity.rst     |  43 +++--
- drivers/md/dm-bufio.c                              |  24 +--
- drivers/md/dm-core.h                               |   3 +-
- drivers/md/dm-crypt.c                              |  51 +++--
- drivers/md/dm-flakey.c                             | 210 ++++++++++++++++++---
- drivers/md/dm-integrity.c                          |  85 ++++-----
- drivers/md/dm-ioctl.c                              |  98 +++++++---
- drivers/md/dm-thin-metadata.c                      |  58 +++---
- drivers/md/dm-thin.c                               |  41 ++--
- drivers/md/dm-zone.c                               |  15 +-
- drivers/md/dm.c                                    |  58 +++---
- drivers/md/dm.h                                    |   3 -
- drivers/md/persistent-data/dm-block-manager.c      |   6 +
- drivers/md/persistent-data/dm-block-manager.h      |   1 +
- drivers/md/persistent-data/dm-space-map.h          |   3 +-
- .../md/persistent-data/dm-transaction-manager.c    |   3 +
- include/linux/dm-bufio.h                           |   2 +
- 18 files changed, 478 insertions(+), 236 deletions(-)
