@@ -2,295 +2,400 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7F9C001DE
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 19:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF140C0015E
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 20:28:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233240AbjF2TCr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Jun 2023 15:02:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37248 "EHLO
+        id S230229AbjF2U2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Jun 2023 16:28:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232210AbjF2TBk (ORCPT
+        with ESMTP id S229972AbjF2U2J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2023 15:01:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B20B170E;
-        Thu, 29 Jun 2023 12:01:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CB6D661620;
-        Thu, 29 Jun 2023 19:01:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1133DC433CB;
-        Thu, 29 Jun 2023 19:01:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688065287;
-        bh=H6YKG9XfWc7Jn+CeznW6soD5x81+1yk1zbbs31/1kwM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=r2OQRy4HmD6sUKORUMth8n8T/l1pqTapwdLoyAO5flwqGAsUkxCYYev3SJAYNbO1n
-         McHUjRWWBrNXx/WIamKnulo8Qow35ywXjAalgiQ9rcveeQnURLGGz0WwlPPib/p3T0
-         q2EVpfj7vZIlVrteCakQKJByfXY5tLERaL9TPVv0EeXgKoOGD5+80FiFfYCsF849GF
-         JTCqOeoznC+7WZsQBquS+kt1GFUERjKm+CnwAEZLwgeHPPwhU54O9by+wmj+Wp63Y8
-         S7xnRaVh/jhr5bMqtgqtm0W+cwCQh0EDzue0FR6Ba9LqCXvsJn5chjc95gp+mwhYlt
-         R9BqBde6VM6rA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        kernel test robot <lkp@intel.com>,
-        Suwan Kim <suwan.kim027@gmail.com>, edliaw@google.com,
-        "Roberts, Martin" <martin.roberts@intel.com>,
-        Sasha Levin <sashal@kernel.org>, jasowang@redhat.com,
-        axboe@kernel.dk, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.3 15/17] Revert "virtio-blk: support completion batching for the IRQ path"
-Date:   Thu, 29 Jun 2023 15:00:44 -0400
-Message-Id: <20230629190049.907558-15-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230629190049.907558-1-sashal@kernel.org>
-References: <20230629190049.907558-1-sashal@kernel.org>
+        Thu, 29 Jun 2023 16:28:09 -0400
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02E1A213D;
+        Thu, 29 Jun 2023 13:28:08 -0700 (PDT)
+Received: by mail-il1-x12c.google.com with SMTP id e9e14a558f8ab-3456fda4ed1so5372535ab.0;
+        Thu, 29 Jun 2023 13:28:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688070487; x=1690662487;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aTJRzDXOSR9H2JlrTJUaNcRjpSn9DWoqSfnLZc/LR0o=;
+        b=NlTUvodW84aqL21iUVO4bY8NuPUtbKuWhA45f1EG5yuoDNWoIWSjayG1QsgUIZdzYC
+         9yK0PuJln7fqlIS1d9yJxM1WJ2OEVOZyCrqNRoFzhJrkqYDZEHt4NOKl9k3bhzjMzyAA
+         qIyQqD8K/ubAEJ5IrV99g6R3CnBH4pU24hSxiwMeYsvzl8dtWsVxWEMjP7DqEwJOy0u1
+         kHZv38rr428LR3NXnxJxp4AJ9ZDZQU1U4UyWUxY+VKpM2oGe5EtDhnkwE7kb6t4MypfV
+         GHRyrW5F4EPI55MOsdcdQqx8LWLbdBtJNhk+XE22AaFEma5ZcHRtomayOhDhjsh2extr
+         pq6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688070487; x=1690662487;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aTJRzDXOSR9H2JlrTJUaNcRjpSn9DWoqSfnLZc/LR0o=;
+        b=a4tro9EPXf62DxqzLXHf0Ujl2lGS2DBeHZWcSC5/Ku2YdKP6DB2SYQm6r8ocPxqKnc
+         79u4xQzbBu58YT8wZHFcL5Je+lnS0MLSx3vBacwXx/XTZRjtlRh+cxKD4xWSXVodaPbS
+         yx2wW0SgRLJALxhwCFXJEoZ4sBp3WiZlxVqJfhwSDEWgMl8xelFodvrKWRI+iumtNHm4
+         ZcYl0f686XXEGD0dI0dAE67bqalwsPcql0mVv8TtPKZm8MDr65AwLBHe3aDT8GavkIL8
+         6sRHMPnKem9K0z0ll2yFtjt9a0Mlw2P20g9okFGQX5ZraS0JzkjNw84ZIlw72FQKQr9w
+         6pdA==
+X-Gm-Message-State: ABy/qLZFbtBoz+BCrQwO8a/gtNmwe3nG46T0yQX0hN1di+URGj6tBJfM
+        MjN0fpLYnfR1dMYkIyp8Jf4=
+X-Google-Smtp-Source: APBJJlGxFqaleiAt4VRyihYyEXSqMQnsQq0RirugbdAW04lHi5su1uGksP/LhOrA+tS+Qd2mS3c3Lg==
+X-Received: by 2002:a05:6e02:690:b0:345:ac3e:9406 with SMTP id o16-20020a056e02069000b00345ac3e9406mr329483ils.9.1688070487179;
+        Thu, 29 Jun 2023 13:28:07 -0700 (PDT)
+Received: from ?IPV6:2001:df0:0:200c:5ec:8707:9aa2:7574? ([2001:df0:0:200c:5ec:8707:9aa2:7574])
+        by smtp.gmail.com with ESMTPSA id u4-20020a634544000000b0052c9d1533b6sm9280415pgk.56.2023.06.29.13.28.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Jun 2023 13:28:06 -0700 (PDT)
+Message-ID: <a113cb83-9f82-fd39-f132-41ba4c259265@gmail.com>
+Date:   Fri, 30 Jun 2023 08:27:59 +1200
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.3.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [FSL P50x0] [PASEMI] The Access to partitions on disks with an
+ Amiga partition table doesn't work anymore after the block updates 2023-06-23
+Content-Language: en-US
+To:     Christian Zigotzky <chzigotzky@xenosoft.de>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-m68k@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Christoph Hellwig <hch@lst.de>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        mad skateman <madskateman@gmail.com>,
+        Darren Stevens <darren@stevens-zone.net>,
+        Martin Steigerwald <martin@lichtvoll.de>
+References: <024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+In-Reply-To: <024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+Hi Christian,
 
-[ Upstream commit afd384f0dbea2229fd11159efb86a5b41051c4a9 ]
+[ added Martin Steigerwald in CC ]
 
-This reverts commit 07b679f70d73483930e8d3c293942416d9cd5c13.
+thanks for your bug report (and of course, for testing the patch in the 
+first instance)!
 
-This change appears to have broken things...
-We now see applications hanging during disk accesses.
-e.g.
-multi-port virtio-blk device running in h/w (FPGA)
-Host running a simple 'fio' test.
-[global]
-thread=1
-direct=1
-ioengine=libaio
-norandommap=1
-group_reporting=1
-bs=4K
-rw=read
-iodepth=128
-runtime=1
-numjobs=4
-time_based
-[job0]
-filename=/dev/vda
-[job1]
-filename=/dev/vdb
-[job2]
-filename=/dev/vdc
-...
-[job15]
-filename=/dev/vdp
+On 29/06/23 16:59, Christian Zigotzky wrote:
+> Hello,
+>
+> The access  to partitions on disks with an Amiga partition table (via 
+> the Rigid Disk Block RDB) doesn't work anymore on my Cyrus+ board with 
+> a FSL P50x0 PowerPC SoC [1] and on my P.A. Semi Nemo board [2] after 
+> the block updates 2023-06-23 [3].
+>
+> parted -l
+>
+> Model: ATA ST2000DM001-9YN1 (scsi)
+> Disk /dev/sda: 2000GB
+> Sector size (logical/physical): 512B/4096B
+> Partition Table: amiga
+> Disk Flags:
+>
+> Number  Start   End     Size    File system  Name  Flags
+>  1      1057kB  123MB   122MB   affs7        BDH0  hidden
+>  2      123MB   2274MB  2150MB               DH0   boot
+>  3      2274MB  691GB   689GB                DH2
+>  4      691GB   1992GB  1301GB  ext4         dhx   boot
+>
+> dmesg | grep -i sda
+>
+> [    4.208905] sd 0:0:0:0: [sda] 3907029168 512-byte logical blocks: 
+> (2.00 TB/1.82 TiB)
+> [    4.253995] sd 0:0:0:0: [sda] 4096-byte physical blocks
+> [    4.254826] sd 0:0:0:0: [sda] Write Protect is off
+> [    4.300069] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
+> [    4.486476] sd 0:0:0:0: [sda] Write cache: enabled, read cache: 
+> enabled, doesn't support DPO or FUA
+> [    4.580507] sd 0:0:0:0: [sda] Preferred minimum I/O size 4096 bytes
+> [    4.712624] Dev sda: unable to read partition block 4294967295
+> [    4.761532]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
+> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1) 
+> unable to read partition table
+> [    4.761892] sda: partition table beyond EOD,
+> [    4.861681] Dev sda: unable to read partition block 4294967295
+> [    4.912094]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
+> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1) 
+> unable to read partition table
+> [    4.963387] sda: partition table beyond EOD,
 
-i.e. 16 disks; 4 queues per disk; simple burst of 4KB reads
-This is repeatedly run in a loop.
+Haven't see this one in any of my tests. I wonder whether your 
+partitioning software used that value of 4294967295 (32 bit unsigned int 
+max.) as marker for the end of the partition list, instead of NULL? It's 
+clearly beyond the end of your disk, so cannot be a legitimate partition 
+block address. (The parted dump above (showing only four partitions) 
+appears to support that notion.)
 
-After a few, normally <10 seconds, fio hangs.
-With 64 queues (16 disks), failure occurs within a few seconds; with 8 queues (2 disks) it may take ~hour before hanging.
-Last message:
-fio-3.19
-Starting 8 threads
-Jobs: 1 (f=1): [_(7),R(1)][68.3%][eta 03h:11m:06s]
-I think this means at the end of the run 1 queue was left incomplete.
+Could you please create a dump of the RDB (first 4 MB of the disk ought 
+to be enough) and send that?
 
-'diskstats' (run while fio is hung) shows no outstanding transactions.
-e.g.
-$ cat /proc/diskstats
-...
-252       0 vda 1843140071 0 14745120568 712568645 0 0 0 0 0 3117947 712568645 0 0 0 0 0 0
-252      16 vdb 1816291511 0 14530332088 704905623 0 0 0 0 0 3117711 704905623 0 0 0 0 0 0
-...
+> [ 5.014769] sd 0:0:0:0: [sda] Attached SCSI disk
+>
+> I created a patch for reverting the commit. [4]
+>
+> The access works again with this patch:
+>
+> [    0.000000] Kernel command line: root=/dev/sda4
+> [    3.987717] sd 0:0:0:0: [sda] 3907029168 512-byte logical blocks: 
+> (2.00 TB/1.82 TiB)
+> [    4.031349] sd 0:0:0:0: [sda] 4096-byte physical blocks
+> [    4.123773] sd 0:0:0:0: [sda] Write Protect is off
+> [    4.168682] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
+> [    4.279304] sd 0:0:0:0: [sda] Write cache: enabled, read cache: 
+> enabled, doesn't support DPO or FUA
+> [    4.463508] sd 0:0:0:0: [sda] Preferred minimum I/O size 4096 bytes
+> [    4.519477]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
+> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1)
+> [    4.720896] sda: p4 size 18446744071956107760 extends beyond EOD,
 
-Other stats (in the h/w, and added to the virtio-blk driver ([a]virtio_queue_rq(), [b]virtblk_handle_req(), [c]virtblk_request_done()) all agree, and show every request had a completion, and that virtblk_request_done() never gets called.
-e.g.
-PF= 0                         vq=0           1           2           3
-[a]request_count     -   839416590   813148916   105586179    84988123
-[b]completion1_count -   839416590   813148916   105586179    84988123
-[c]completion2_count -           0           0           0           0
+That's the 32 bit overflow that the patch series was meant to correct. 
+Parsing the partition table ends before looking at the next partition 
+block in the list, so we never hit the bug you've seen above.
 
-PF= 1                         vq=0           1           2           3
-[a]request_count     -   823335887   812516140   104582672    75856549
-[b]completion1_count -   823335887   812516140   104582672    75856549
-[c]completion2_count -           0           0           0           0
+By reverting my patch, you just reintroduce the old bug, which could 
+result in mis-parsing the partition table in a way that is not detected 
+by inane values of partition sizes as above, and as far as I recall this 
+bug was reported because it did cause data corruption. Do I have that 
+correct, Martin? Do you still have a copy of the problematic RDB from 
+the old bug report around?
 
-i.e. the issue is after the virtio-blk driver.
+> [ 4.922550]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2 
+> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1)
+> [    4.948655] sda: p4 size 18446744071956107760 extends beyond EOD, 
+> truncated
+> [    4.998956] sd 0:0:0:0: [sda] Attached SCSI disk
+> [    8.394695] EXT4-fs (sda4): mounted filesystem 
+> 93cb7dd2-ce1b-4bf5-ba47-818cf8e8c9f4 ro with ordered data mode. Quota 
+> mode: none.
+> [   18.578020] EXT4-fs (sda4): re-mounted 
+> 93cb7dd2-ce1b-4bf5-ba47-818cf8e8c9f4 ro. Quota mode: none.
+> [   23.159524] EXT4-fs (sda4): re-mounted 
+> 93cb7dd2-ce1b-4bf5-ba47-818cf8e8c9f4 r/w. Quota mode: none.
+>
+> Could you please check your commit?
+The patch series has undergone the usual thirteen versions in review, 
+but the reviewers as well as myself may well have missed this point of 
+detail...
 
-This change was introduced in kernel 6.3.0.
-I am seeing this using 6.3.3.
-If I run with an earlier kernel (5.15), it does not occur.
-If I make a simple patch to the 6.3.3 virtio-blk driver, to skip the blk_mq_add_to_batch()call, it does not fail.
-e.g.
-kernel 5.15 - this is OK
-virtio_blk.c,virtblk_done() [irq handler]
-                 if (likely(!blk_should_fake_timeout(req->q))) {
-                          blk_mq_complete_request(req);
-                 }
+Could you please check this (whitespace-damaged) patch?
 
-kernel 6.3.3 - this fails
-virtio_blk.c,virtblk_handle_req() [irq handler]
-                 if (likely(!blk_should_fake_timeout(req->q))) {
-                          if (!blk_mq_complete_request_remote(req)) {
-                                  if (!blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr), virtblk_complete_batch)) {
-                                           virtblk_request_done(req);    //this never gets called... so blk_mq_add_to_batch() must always succeed
-                                   }
-                          }
-                 }
+     block/partitions - Amiga partition overflow fix bugfix
 
-If I do, kernel 6.3.3 - this is OK
-virtio_blk.c,virtblk_handle_req() [irq handler]
-                 if (likely(!blk_should_fake_timeout(req->q))) {
-                          if (!blk_mq_complete_request_remote(req)) {
-                                   virtblk_request_done(req); //force this here...
-                                  if (!blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr), virtblk_complete_batch)) {
-                                           virtblk_request_done(req);    //this never gets called... so blk_mq_add_to_batch() must always succeed
-                                   }
-                          }
-                 }
+     Making 'blk' sector_t (i.e. 64 bit if LBD support is active)
+     fails the 'blk>0' test in the partition block loop if a
+     value of (signed int) -1 is used to mark the end of the
+     partition block list.
 
-Perhaps you might like to fix/test/revert this change...
-Martin
+     Explicitly cast 'blk' to signed int to catch this.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202306090826.C1fZmdMe-lkp@intel.com/
-Cc: Suwan Kim <suwan.kim027@gmail.com>
-Tested-by: edliaw@google.com
-Reported-by: "Roberts, Martin" <martin.roberts@intel.com>
-Message-Id: <336455b4f630f329380a8f53ee8cad3868764d5c.1686295549.git.mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/virtio_blk.c | 82 +++++++++++++++++---------------------
- 1 file changed, 37 insertions(+), 45 deletions(-)
+     Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 2b918e28acaac..b47358da92a23 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -348,63 +348,33 @@ static inline void virtblk_request_done(struct request *req)
- 	blk_mq_end_request(req, status);
- }
- 
--static void virtblk_complete_batch(struct io_comp_batch *iob)
--{
--	struct request *req;
--
--	rq_list_for_each(&iob->req_list, req) {
--		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
--		virtblk_cleanup_cmd(req);
--	}
--	blk_mq_end_request_batch(iob);
--}
--
--static int virtblk_handle_req(struct virtio_blk_vq *vq,
--			      struct io_comp_batch *iob)
--{
--	struct virtblk_req *vbr;
--	int req_done = 0;
--	unsigned int len;
--
--	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
--		struct request *req = blk_mq_rq_from_pdu(vbr);
--
--		if (likely(!blk_should_fake_timeout(req->q)) &&
--		    !blk_mq_complete_request_remote(req) &&
--		    !blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr),
--					 virtblk_complete_batch))
--			virtblk_request_done(req);
--		req_done++;
--	}
--
--	return req_done;
--}
--
- static void virtblk_done(struct virtqueue *vq)
- {
- 	struct virtio_blk *vblk = vq->vdev->priv;
--	struct virtio_blk_vq *vblk_vq = &vblk->vqs[vq->index];
--	int req_done = 0;
-+	bool req_done = false;
-+	int qid = vq->index;
-+	struct virtblk_req *vbr;
- 	unsigned long flags;
--	DEFINE_IO_COMP_BATCH(iob);
-+	unsigned int len;
- 
--	spin_lock_irqsave(&vblk_vq->lock, flags);
-+	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
- 	do {
- 		virtqueue_disable_cb(vq);
--		req_done += virtblk_handle_req(vblk_vq, &iob);
-+		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
-+			struct request *req = blk_mq_rq_from_pdu(vbr);
- 
-+			if (likely(!blk_should_fake_timeout(req->q)))
-+				blk_mq_complete_request(req);
-+			req_done = true;
-+		}
- 		if (unlikely(virtqueue_is_broken(vq)))
- 			break;
- 	} while (!virtqueue_enable_cb(vq));
- 
--	if (req_done) {
--		if (!rq_list_empty(iob.req_list))
--			iob.complete(&iob);
--
--		/* In case queue is stopped waiting for more buffers. */
-+	/* In case queue is stopped waiting for more buffers. */
-+	if (req_done)
- 		blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
--	}
--	spin_unlock_irqrestore(&vblk_vq->lock, flags);
-+	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
- }
- 
- static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
-@@ -1283,15 +1253,37 @@ static void virtblk_map_queues(struct blk_mq_tag_set *set)
- 	}
- }
- 
-+static void virtblk_complete_batch(struct io_comp_batch *iob)
-+{
-+	struct request *req;
-+
-+	rq_list_for_each(&iob->req_list, req) {
-+		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
-+		virtblk_cleanup_cmd(req);
-+	}
-+	blk_mq_end_request_batch(iob);
-+}
-+
- static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- {
- 	struct virtio_blk *vblk = hctx->queue->queuedata;
- 	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
-+	struct virtblk_req *vbr;
- 	unsigned long flags;
-+	unsigned int len;
- 	int found = 0;
- 
- 	spin_lock_irqsave(&vq->lock, flags);
--	found = virtblk_handle_req(vq, iob);
-+
-+	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
-+		struct request *req = blk_mq_rq_from_pdu(vbr);
-+
-+		found++;
-+		if (!blk_mq_complete_request_remote(req) &&
-+		    !blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr),
-+						virtblk_complete_batch))
-+			virtblk_request_done(req);
-+	}
- 
- 	if (found)
- 		blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
--- 
-2.39.2
+diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
+index ed222b9c901b..506921095412 100644
+--- a/block/partitions/amiga.c
++++ b/block/partitions/amiga.c
+@@ -90,7 +90,7 @@ int amiga_partition(struct parsed_partitions *state)
+         }
+         blk = be32_to_cpu(rdb->rdb_PartitionList);
+         put_dev_sector(sect);
+-       for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
++       for (part = 1; (s32) blk>0 && part<=16; part++, 
+put_dev_sector(sect)) {
+                 /* Read in terms partition table understands */
+                 if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
+                         pr_err("Dev %s: overflow calculating partition 
+block %llu! Skipping partitions %u and beyond\n",
 
+Cheers,
+
+     Michael
+
+>
+> Thanks,
+> Christian
+>
+> [1] http://wiki.amiga.org/index.php?title=X5000
+> [2] https://en.wikipedia.org/wiki/AmigaOne_X1000
+> [3] 
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a0433f8cae3ac51f59b4b1863032822aaa2d8164
+> [4] revert_amiga.c.patch:
+>
+> --- a/block/partitions/amiga.c    2023-06-29 04:29:22.947100347 +0200
+> +++ b/block/partitions/amiga.c    2023-06-26 01:29:58.000000000 +0200
+> @@ -11,18 +11,10 @@
+>  #define pr_fmt(fmt) fmt
+>
+>  #include <linux/types.h>
+> -#include <linux/mm_types.h>
+> -#include <linux/overflow.h>
+>  #include <linux/affs_hardblocks.h>
+>
+>  #include "check.h"
+>
+> -/* magic offsets in partition DosEnvVec */
+> -#define NR_HD    3
+> -#define NR_SECT    5
+> -#define LO_CYL    9
+> -#define HI_CYL    10
+> -
+>  static __inline__ u32
+>  checksum_block(__be32 *m, int size)
+>  {
+> @@ -39,12 +31,8 @@ int amiga_partition(struct parsed_partit
+>      unsigned char *data;
+>      struct RigidDiskBlock *rdb;
+>      struct PartitionBlock *pb;
+> -    u64 start_sect, nr_sects;
+> -    sector_t blk, end_sect;
+> -    u32 cylblk;        /* rdb_CylBlocks = nr_heads*sect_per_track */
+> -    u32 nr_hd, nr_sect, lo_cyl, hi_cyl;
+> -    int part, res = 0;
+> -    unsigned int blksize = 1;    /* Multiplier for disk block size */
+> +    int start_sect, nr_sects, blk, part, res = 0;
+> +    int blksize = 1;    /* Multiplier for disk block size */
+>      int slot = 1;
+>
+>      for (blk = 0; ; blk++, put_dev_sector(sect)) {
+> @@ -52,7 +40,7 @@ int amiga_partition(struct parsed_partit
+>              goto rdb_done;
+>          data = read_part_sector(state, blk, &sect);
+>          if (!data) {
+> -            pr_err("Dev %s: unable to read RDB block %llu\n",
+> +            pr_err("Dev %s: unable to read RDB block %d\n",
+>                     state->disk->disk_name, blk);
+>              res = -1;
+>              goto rdb_done;
+> @@ -69,12 +57,12 @@ int amiga_partition(struct parsed_partit
+>          *(__be32 *)(data+0xdc) = 0;
+>          if (checksum_block((__be32 *)data,
+>                  be32_to_cpu(rdb->rdb_SummedLongs) & 0x7F)==0) {
+> -            pr_err("Trashed word at 0xd0 in block %llu ignored in 
+> checksum calculation\n",
+> +            pr_err("Trashed word at 0xd0 in block %d ignored in 
+> checksum calculation\n",
+>                     blk);
+>              break;
+>          }
+>
+> -        pr_err("Dev %s: RDB in block %llu has bad checksum\n",
+> +        pr_err("Dev %s: RDB in block %d has bad checksum\n",
+>                 state->disk->disk_name, blk);
+>      }
+>
+> @@ -91,15 +79,10 @@ int amiga_partition(struct parsed_partit
+>      blk = be32_to_cpu(rdb->rdb_PartitionList);
+>      put_dev_sector(sect);
+>      for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
+> -        /* Read in terms partition table understands */
+> -        if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
+> -            pr_err("Dev %s: overflow calculating partition block 
+> %llu! Skipping partitions %u and beyond\n",
+> -                state->disk->disk_name, blk, part);
+> -            break;
+> -        }
+> +        blk *= blksize;    /* Read in terms partition table 
+> understands */
+>          data = read_part_sector(state, blk, &sect);
+>          if (!data) {
+> -            pr_err("Dev %s: unable to read partition block %llu\n",
+> +            pr_err("Dev %s: unable to read partition block %d\n",
+>                     state->disk->disk_name, blk);
+>              res = -1;
+>              goto rdb_done;
+> @@ -111,70 +94,19 @@ int amiga_partition(struct parsed_partit
+>          if (checksum_block((__be32 *)pb, 
+> be32_to_cpu(pb->pb_SummedLongs) & 0x7F) != 0 )
+>              continue;
+>
+> -        /* RDB gives us more than enough rope to hang ourselves with,
+> -         * many times over (2^128 bytes if all fields max out).
+> -         * Some careful checks are in order, so check for potential
+> -         * overflows.
+> -         * We are multiplying four 32 bit numbers to one sector_t!
+> -         */
+> -
+> -        nr_hd   = be32_to_cpu(pb->pb_Environment[NR_HD]);
+> -        nr_sect = be32_to_cpu(pb->pb_Environment[NR_SECT]);
+> -
+> -        /* CylBlocks is total number of blocks per cylinder */
+> -        if (check_mul_overflow(nr_hd, nr_sect, &cylblk)) {
+> -            pr_err("Dev %s: heads*sects %u overflows u32, skipping 
+> partition!\n",
+> -                state->disk->disk_name, cylblk);
+> -            continue;
+> -        }
+> -
+> -        /* check for consistency with RDB defined CylBlocks */
+> -        if (cylblk > be32_to_cpu(rdb->rdb_CylBlocks)) {
+> -            pr_warn("Dev %s: cylblk %u > rdb_CylBlocks %u!\n",
+> -                state->disk->disk_name, cylblk,
+> -                be32_to_cpu(rdb->rdb_CylBlocks));
+> -        }
+> -
+> -        /* RDB allows for variable logical block size -
+> -         * normalize to 512 byte blocks and check result.
+> -         */
+> -
+> -        if (check_mul_overflow(cylblk, blksize, &cylblk)) {
+> -            pr_err("Dev %s: partition %u bytes per cyl. overflows 
+> u32, skipping partition!\n",
+> -                state->disk->disk_name, part);
+> -            continue;
+> -        }
+> -
+> -        /* Calculate partition start and end. Limit of 32 bit on cylblk
+> -         * guarantees no overflow occurs if LBD support is enabled.
+> -         */
+> -
+> -        lo_cyl = be32_to_cpu(pb->pb_Environment[LO_CYL]);
+> -        start_sect = ((u64) lo_cyl * cylblk);
+> -
+> -        hi_cyl = be32_to_cpu(pb->pb_Environment[HI_CYL]);
+> -        nr_sects = (((u64) hi_cyl - lo_cyl + 1) * cylblk);
+> +        /* Tell Kernel about it */
+>
+> +        nr_sects = (be32_to_cpu(pb->pb_Environment[10]) + 1 -
+> +                be32_to_cpu(pb->pb_Environment[9])) *
+> +               be32_to_cpu(pb->pb_Environment[3]) *
+> +               be32_to_cpu(pb->pb_Environment[5]) *
+> +               blksize;
+>          if (!nr_sects)
+>              continue;
+> -
+> -        /* Warn user if partition end overflows u32 (AmigaDOS limit) */
+> -
+> -        if ((start_sect + nr_sects) > UINT_MAX) {
+> -            pr_warn("Dev %s: partition %u (%llu-%llu) needs 64 bit 
+> device support!\n",
+> -                state->disk->disk_name, part,
+> -                start_sect, start_sect + nr_sects);
+> -        }
+> -
+> -        if (check_add_overflow(start_sect, nr_sects, &end_sect)) {
+> -            pr_err("Dev %s: partition %u (%llu-%llu) needs LBD device 
+> support, skipping partition!\n",
+> -                state->disk->disk_name, part,
+> -                start_sect, end_sect);
+> -            continue;
+> -        }
+> -
+> -        /* Tell Kernel about it */
+> -
+> +        start_sect = be32_to_cpu(pb->pb_Environment[9]) *
+> +                 be32_to_cpu(pb->pb_Environment[3]) *
+> +                 be32_to_cpu(pb->pb_Environment[5]) *
+> +                 blksize;
+>          put_partition(state,slot++,start_sect,nr_sects);
+>          {
+>              /* Be even more informative to aid mounting */
+>
+>
+>
