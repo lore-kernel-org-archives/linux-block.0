@@ -2,109 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4353CEB64D7
-	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 00:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8134EB64D7
+	for <linux-block@archiver.kernel.org>; Thu, 29 Jun 2023 00:39:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231994AbjF2AJj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Jun 2023 20:09:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52410 "EHLO
+        id S231248AbjF2Ajw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Jun 2023 20:39:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231919AbjF2AJh (ORCPT
+        with ESMTP id S230056AbjF2Ajq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2023 20:09:37 -0400
+        Wed, 28 Jun 2023 20:39:46 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFD7C10CF
-        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 17:08:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44AEB10CE
+        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2023 17:38:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687997326;
+        s=mimecast20190719; t=1687999134;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=SN/hlkEtT439556aUYMeyg5okVvO4F8jT/j56Sxlyzo=;
-        b=YcCr6bN0jyKFFB+bbHZ3Brbog1ZSJ6SSXhKVP6F9fhPkIZkcKriN6cWlTsdGtrRn+OQAay
-        Y0/X1whDWXCecwDLnrC/dREjHwqLoReh34VJoX0F2RXsCggUByCfFtdnBp3RfNvKPIVY3b
-        NJ8Rs+hPnO70GWCzeHTk01DD1fas+AE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=OrLmNB2GGh31uhER3PTvDlbj/IyEOeXGRijja43l2Mw=;
+        b=IRnLGQQEE3qw7sAtydufcqIvWsNhv1arbeezSHQHXiZ+9CVQzjo4W9+syyPylQ1eSpkUWF
+        6cNS4Zd/KG5SIWMc0s/gzRszdB0T1o+ky05xKNYd1bHHIDr4T+u89WGM63ASdWYB/3fv2n
+        ABX6PZIWG0CWuP1xzY4ySBeP/+HZRpE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-659-Tnpd1YoXP66rKp5nRexz1w-1; Wed, 28 Jun 2023 20:08:41 -0400
-X-MC-Unique: Tnpd1YoXP66rKp5nRexz1w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-627-7BICcNw7Pw6gz7OW3-gGsA-1; Wed, 28 Jun 2023 20:38:49 -0400
+X-MC-Unique: 7BICcNw7Pw6gz7OW3-gGsA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C3B908E4686;
-        Thu, 29 Jun 2023 00:08:40 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7918E3C01C20;
+        Thu, 29 Jun 2023 00:38:48 +0000 (UTC)
 Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 12DC3111F3B0;
-        Thu, 29 Jun 2023 00:08:35 +0000 (UTC)
-Date:   Thu, 29 Jun 2023 08:08:31 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A527E2166B26;
+        Thu, 29 Jun 2023 00:38:41 +0000 (UTC)
+Date:   Thu, 29 Jun 2023 08:38:36 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH V2 0/4] nvme: fix two kinds of IO hang from removing NSs
-Message-ID: <ZJzLf46lx4SiEfOA@ovpn-8-18.pek2.redhat.com>
-References: <ZJL6w+K6e95WWJzV@ovpn-8-23.pek2.redhat.com>
- <ZJMb4f0i9wm8y4pi@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRR0C9sqLp7zhAv@ovpn-8-19.pek2.redhat.com>
- <ZJRcRWyn7o7lLEDM@kbusch-mbp.dhcp.thefacebook.com>
- <ZJRgUXfRuuOoIN1o@ovpn-8-19.pek2.redhat.com>
- <ZJRmd7bnclaNW3PL@kbusch-mbp.dhcp.thefacebook.com>
- <ZJeJyEnSpVBDd4vb@ovpn-8-16.pek2.redhat.com>
- <ZJsaoFtqWIwshYD6@kbusch-mbp.dhcp.thefacebook.com>
- <ZJuNKGy5dXPC6i+H@ovpn-8-21.pek2.redhat.com>
- <ZJxFGCziTP+0Yb2n@kbusch-mbp.dhcp.thefacebook.com>
+To:     Damien Le Moal <dlemoal@kernel.org>
+Cc:     Andreas Hindborg <nmi@metaspace.dk>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH v4 1/4] ublk: change ublk IO command defines to enum
+Message-ID: <ZJzSjFbzzNxppH7p@ovpn-8-18.pek2.redhat.com>
+References: <20230628190649.11233-1-nmi@metaspace.dk>
+ <20230628190649.11233-2-nmi@metaspace.dk>
+ <d23bf48c-5bc9-aab6-4ca2-ebbb24a0878e@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZJxFGCziTP+0Yb2n@kbusch-mbp.dhcp.thefacebook.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+In-Reply-To: <d23bf48c-5bc9-aab6-4ca2-ebbb24a0878e@kernel.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 08:35:04AM -0600, Keith Busch wrote:
-> On Wed, Jun 28, 2023 at 09:30:16AM +0800, Ming Lei wrote:
-> > That may not be enough:
+On Thu, Jun 29, 2023 at 07:47:47AM +0900, Damien Le Moal wrote:
+> On 6/29/23 04:06, Andreas Hindborg wrote:
+> > From: Andreas Hindborg <a.hindborg@samsung.com>
 > > 
-> > - What if nvme_sysfs_delete() is called from sysfs before the 1st check in
-> > nvme_reset_work()?
+> > This change is in preparation for zoned storage support.
 > > 
-> > - What if one pending nvme_dev_disable()<-nvme_timeout() comes after
-> > the added nvme_unquiesce_io_queues() returns?
+> > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> > ---
+> >  include/uapi/linux/ublk_cmd.h | 23 +++++++++++++++++------
+> >  1 file changed, 17 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> > index 4b8558db90e1..471b3b983045 100644
+> > --- a/include/uapi/linux/ublk_cmd.h
+> > +++ b/include/uapi/linux/ublk_cmd.h
+> > @@ -229,12 +229,23 @@ struct ublksrv_ctrl_dev_info {
+> >  	__u64   reserved2;
+> >  };
+> >  
+> > -#define		UBLK_IO_OP_READ		0
+> > -#define		UBLK_IO_OP_WRITE		1
+> > -#define		UBLK_IO_OP_FLUSH		2
+> > -#define		UBLK_IO_OP_DISCARD	3
+> > -#define		UBLK_IO_OP_WRITE_SAME	4
+> > -#define		UBLK_IO_OP_WRITE_ZEROES	5
+> > +enum ublk_op {
+> > +	UBLK_IO_OP_READ = 0,
+> > +	UBLK_IO_OP_WRITE = 1,
+> > +	UBLK_IO_OP_FLUSH = 2,
+> > +	UBLK_IO_OP_DISCARD = 3,
+> > +	UBLK_IO_OP_WRITE_SAME = 4,
+> > +	UBLK_IO_OP_WRITE_ZEROES = 5,
+> > +	UBLK_IO_OP_ZONE_OPEN = 10,
+> > +	UBLK_IO_OP_ZONE_CLOSE = 11,
+> > +	UBLK_IO_OP_ZONE_FINISH = 12,
+> > +	UBLK_IO_OP_ZONE_APPEND = 13,
+> > +	UBLK_IO_OP_ZONE_RESET = 15,
+> > +	__UBLK_IO_OP_DRV_IN_START = 32,
+> > +	__UBLK_IO_OP_DRV_IN_END = 96,
+> > +	__UBLK_IO_OP_DRV_OUT_START = __UBLK_IO_OP_DRV_IN_END,
+> > +	__UBLK_IO_OP_DRV_OUT_END = 160,
+> > +};
 > 
-> Okay, the following will handle both:
-> 
-> ---
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index b027e5e3f4acb..c9224d39195e5 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -2690,7 +2690,8 @@ static void nvme_reset_work(struct work_struct *work)
->  	if (dev->ctrl.state != NVME_CTRL_RESETTING) {
->  		dev_warn(dev->ctrl.device, "ctrl state %d is not RESETTING\n",
->  			 dev->ctrl.state);
-> -		return;
-> +		result = -ENODEV;
-> +		goto out;
->  	}
->  
->  	/*
-> @@ -2777,7 +2778,9 @@ static void nvme_reset_work(struct work_struct *work)
->  		 result);
->  	nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DELETING);
->  	nvme_dev_disable(dev, true);
-> +	nvme_sync_queues(&dev->ctrl);
->  	nvme_mark_namespaces_dead(&dev->ctrl);
-> +	nvme_unquiesce_io_queues(&dev->ctrl);
->  	nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DEAD);
->  }
+> This patch does not do what the title says. You are also introducing the zone
+> operations, and the very obscure __UBLK_IO_OP_DRV_XXX operations without an
+> explanation. Also, why the "__" prefix for these ? I do not see the point...
 
-This one looks better, but reset may not be scheduled successfully because
-of removal, such as, the removal comes exactly before changing state
-to NVME_CTRL_RESETTING.
+It should be to reserve space for ublk passthrough OP.
+
+> Given that this is a uapi, a comment to explain the less obvious commands would
+> be nice.
+> 
+> So I think the change to an enum for the existing ops can be done either in
+> patch 2 or as a separate patch and the introduction of the zone operations done
+> in patch 3 or as a separate patch.
+
+Also it might break userspace by changing to enum from macro for existed
+definition, cause userspace may check something by '#ifdef UBLK_IO_OP_*',
+so probably it is better to keep these OPs as enum, or at least keep
+existed definition as macro.
 
 Thanks,
 Ming
