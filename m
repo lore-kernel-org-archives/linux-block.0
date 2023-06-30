@@ -2,65 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CC2EB64DA
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 15:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13504EB64DA
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 16:01:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232599AbjF3Pji (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jun 2023 11:39:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52492 "EHLO
+        id S229546AbjF3QBS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jun 2023 12:01:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232348AbjF3Pjg (ORCPT
+        with ESMTP id S232033AbjF3QBQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2023 11:39:36 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78BF2E5C
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 08:39:32 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-34577a22c7cso2132725ab.0
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 08:39:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1688139572; x=1690731572;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GW4hZL9mt4ivrUPperLWHI1+1eLqsC5B64iKsS7Hy+Q=;
-        b=zaYlwpyqR1r+ylRi1/dLp+c0bQERixaHgbimhfhmJNvExYP2eGOgu8XnPw9vM8Hpjs
-         R/UcmdlbZLrh1XM0pnbfSojW6rollvwv0+PNPtVD8UEK5ob7zqGHxllt9cyX7ATSVFVF
-         RXMBYj155B6MqGnnx1zSj/T5+9HhABeQco03tqlI0QEPXLVNyoLvMc/sOEDIIRLSFN7k
-         I6WIAwX+qTU9JsijQBmlKOHfcbxMihndDF9oXu//eGUGLNhp+dwHH+8GlXY+Q+HHaI3z
-         lc7mPJnjoLPyyjLVPHXIsq+ixQj9M3Ee0ouIuB15+t+PBxK0nJlW30ioMK8NB12pwllH
-         RT8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688139572; x=1690731572;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GW4hZL9mt4ivrUPperLWHI1+1eLqsC5B64iKsS7Hy+Q=;
-        b=Nyp9E8ZNdOfczI3Pt6/h0AqAC4pA1dIDCXM857wLdJ+iZFwpATpPugwxbWLHK2sDHN
-         sbV7GREEAjUbQuTI34bK603HuNLpon4Me+l6xWfQIJYslo2tHLBJyEblaGSfyTSUepdp
-         xO1sbMe2Ic7eEQmZo7KC2wdm1iFoL1zHL7qpEy1INCYDgxjW4MeosZAhRnj6Ck5JChSp
-         jq4axhS+fo51pwD/NrgQi3kYtXETjSS5+oFmI01TZveu3417kQzl1JYwMULxgEz+1fbi
-         5STKvnxCOR6FZSaElMWCDHNyn+A0mDLZe3Ztglbd4Amn+f+lNq8Rd+Wsk2PGnGwef2FC
-         KFTw==
-X-Gm-Message-State: ABy/qLZ3o64w3w0AqKICksw1gn8f1kpxDxR4kkvRMUYG/NJjCQlMOBBK
-        qyaL2Ce5g2LaEUe2QvhLYVhpiA==
-X-Google-Smtp-Source: APBJJlGx0U82VVFMbma5VnBcP6dGqi3j+tVO+N0aGevcZzzCTGDk10Waj4U7AeCx8trU4YD9mdXzsQ==
-X-Received: by 2002:a05:6e02:2195:b0:345:ad39:ff3 with SMTP id j21-20020a056e02219500b00345ad390ff3mr3977556ila.3.1688139571782;
-        Fri, 30 Jun 2023 08:39:31 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id c18-20020a92c8d2000000b00345e4c4f53asm633703ilq.40.2023.06.30.08.39.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jun 2023 08:39:31 -0700 (PDT)
-Message-ID: <36eda01e-502e-b93d-9098-77ed5a16f33c@kernel.dk>
-Date:   Fri, 30 Jun 2023 09:39:30 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [RFC PATCH 03/11] vfs: Use init_kiocb() to initialise new IOCBs
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Fri, 30 Jun 2023 12:01:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C9E3C06
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 09:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688140827;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bGGz8DiANSWoI5a6kGLb5e94iILUQVr5jzEPV3uc4I0=;
+        b=EVTtWCilgY5i7whvzAwZzqHOwvuaKUwlSo5duhd5Z9gnfk1oEjDOxHHoKk2S0cnLIjDc6P
+        Knhw9V0EyYRYCDrM1TEtp+hibXNYX+RyyD1w4qAGrBMZxyc0xT67ExxiGvdCo2YkMNRieu
+        U/jxg8KjrsXK5lqCqnb9NYFd5QTq3NI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-173-6IJV-npHPyCrw__XkncbgA-1; Fri, 30 Jun 2023 12:00:23 -0400
+X-MC-Unique: 6IJV-npHPyCrw__XkncbgA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8911138035A6;
+        Fri, 30 Jun 2023 16:00:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A5BE2166B2D;
+        Fri, 30 Jun 2023 16:00:19 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <36eda01e-502e-b93d-9098-77ed5a16f33c@kernel.dk>
+References: <36eda01e-502e-b93d-9098-77ed5a16f33c@kernel.dk> <20230630152524.661208-1-dhowells@redhat.com> <20230630152524.661208-4-dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
@@ -71,65 +58,32 @@ Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
         Christian Brauner <christian@brauner.io>
-References: <20230630152524.661208-1-dhowells@redhat.com>
- <20230630152524.661208-4-dhowells@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230630152524.661208-4-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [RFC PATCH 03/11] vfs: Use init_kiocb() to initialise new IOCBs
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <662383.1688140818.1@warthog.procyon.org.uk>
+Date:   Fri, 30 Jun 2023 17:00:18 +0100
+Message-ID: <662384.1688140818@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/30/23 9:25?AM, David Howells wrote:
-> diff --git a/io_uring/rw.c b/io_uring/rw.c
-> index 1bce2208b65c..1cade1567162 100644
-> --- a/io_uring/rw.c
-> +++ b/io_uring/rw.c
-> @@ -655,12 +655,13 @@ static bool need_complete_io(struct io_kiocb *req)
->  		S_ISBLK(file_inode(req->file)->i_mode);
->  }
->  
-> -static int io_rw_init_file(struct io_kiocb *req, fmode_t mode)
-> +static int io_rw_init_file(struct io_kiocb *req, unsigned int io_direction)
->  {
->  	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
->  	struct kiocb *kiocb = &rw->kiocb;
->  	struct io_ring_ctx *ctx = req->ctx;
->  	struct file *file = req->file;
-> +	fmode_t mode = (io_direction == WRITE) ? FMODE_WRITE : FMODE_READ;
->  	int ret;
->  
->  	if (unlikely(!file || !(file->f_mode & mode)))
+Jens Axboe <axboe@kernel.dk> wrote:
 
-Not ideal to add a branch here, probably better to just pass in both?
+> One concern here is that we're using IOCB_WRITE here to tell if
+> sb_start_write() has been done or not, and hence whether
+> kiocb_end_write() needs to be called. You know set it earlier, which
+> means if we get a failure if we need to setup async data, then we know
+> have IOCB_WRITE set at that point even though we did not call
+> sb_start_write().
 
-> @@ -870,7 +871,7 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
->  		iov_iter_restore(&s->iter, &s->iter_state);
->  		iovec = NULL;
->  	}
-> -	ret = io_rw_init_file(req, FMODE_WRITE);
-> +	ret = io_rw_init_file(req, WRITE);
->  	if (unlikely(ret)) {
->  		kfree(iovec);
->  		return ret;
-> @@ -914,7 +915,6 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
->  		__sb_writers_release(file_inode(req->file)->i_sb,
->  					SB_FREEZE_WRITE);
->  	}
-> -	kiocb->ki_flags |= IOCB_WRITE;
->  
->  	if (likely(req->file->f_op->write_iter))
->  		ret2 = call_write_iter(req->file, kiocb, &s->iter);
-> 
+Hmmm...  It's set earlier in a number of places anyway - __cachefiles_write()
+for example.
 
-One concern here is that we're using IOCB_WRITE here to tell if
-sb_start_write() has been done or not, and hence whether
-kiocb_end_write() needs to be called. You know set it earlier, which
-means if we get a failure if we need to setup async data, then we know
-have IOCB_WRITE set at that point even though we did not call
-sb_start_write().
+Btw, can you please put some comments on the IOCB_* constants?  I have to
+guess at what they mean and how they're meant to be used.  Or better still,
+get Christoph to write Documentation/core-api/iocb.rst describing the API? ;-)
 
--- 
-Jens Axboe
+David
 
