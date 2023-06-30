@@ -2,139 +2,151 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94508EB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 16:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BDAEB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 16:54:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231765AbjF3QpD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jun 2023 12:45:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48730 "EHLO
+        id S232371AbjF3QyT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jun 2023 12:54:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230506AbjF3QpC (ORCPT
+        with ESMTP id S229546AbjF3QyS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2023 12:45:02 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9101D3AA7
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 09:45:00 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-98934f000a5so242791566b.2
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 09:45:00 -0700 (PDT)
+        Fri, 30 Jun 2023 12:54:18 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1FAA3AB2
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 09:54:13 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51d9865b8a2so2194543a12.3
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 09:54:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688143499; x=1690735499;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=uly8V0inPNSOUI8F9O+oiqxKZFBlIL89Wbpe/qhrwdA=;
-        b=DQ0pJ5SlHXJXw/do6YNvrk+6KG4Ojeq0kpwSaSQU1NA22Vh2s7kyFZJjxb+5gZKf4B
-         Kp1GV2DBEmxv1grP2i02HwlldvkRShb5OuIEMhMIy+R4RaSPwUs3Tu7FmkJ0Q16F29pl
-         cC7RHIF+HSdNcXLG1kYAKYoYnzhKL+XpqqNyZwtVVDaycj9xavSRpF37Bl55bRDq4JwS
-         1SFbaMhGjHJ04hVOndFmSd72LErTxotGlt4VYBEqhyvcPjWR8uJrCjerBbWF+5Xaqa6o
-         tHdGGd3MzniQ7CTH6j8lSaXxvkdchj4I+MJ+WsuUyoWcPBxhkktb9ZN3O5sZ0+xhC+Si
-         Zl9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688143499; x=1690735499;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688144052; x=1690736052;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uly8V0inPNSOUI8F9O+oiqxKZFBlIL89Wbpe/qhrwdA=;
-        b=iasEhaZ9u2JX5sDFknzYymsTrgBJjipA9HzaZqx4T44fc1kuM9Xwlrh+4yTr20Oz6t
-         6LXut3n7Wz/uKUbjLfNAP8sHfSIc8GB5S/ZQNqmhFmybF2B2iE/h2wlvBXp58yQBjvwb
-         3YaGY/GnNkBY7yrsMERmUu+f8AsCANcV8J1XSa6CrixicdL81sjYLwafEeJKCNaBdLaW
-         qddW7s7svSCIZvn8LaavC32LJ8kIeiKR4TAzc8gkfqGEGv+bCLgVH2mTSJ0Y5h+nBsYt
-         537RKk0TKnxxGDl/A2nze+2B1GpemEY5VdfNLs/Mx8z+v7OVft1Liakyxw4mPhU1w1qP
-         8XVQ==
-X-Gm-Message-State: ABy/qLYoT6UmFx9Mk62ER1DPVLJQZvy6Y81fKRccNIe0FaJrjVF9cESh
-        EL4JGJKovAH+4MlH5ULUX5ZVpA==
-X-Google-Smtp-Source: APBJJlFVr5MzUl/gmqhp2ghu6mYpY8tGGZi7HglSOqb6J7IbM3U+XEavcujKh3Z1gDhSJxwhAXOscQ==
-X-Received: by 2002:a17:906:b259:b0:969:813c:9868 with SMTP id ce25-20020a170906b25900b00969813c9868mr2277989ejb.18.1688143498794;
-        Fri, 30 Jun 2023 09:44:58 -0700 (PDT)
+        bh=FaNsiiD4Bxi7FstRFg2227ah95lDCZQpkjuVDC175qg=;
+        b=foG67OticlKNVtWaP/A2PzT7D/ta/cw6hluGxBO6+wfz7piVPAFPkPTjQzlEIEccLU
+         mOHomDKOllwVn6lV5FbFJXjLmRYGj6NWX77lsgTW8fH2oX3Sc9VYRz41lfoLGcFLzYZ0
+         fj4iHV/XiD7ALtp8y0zDBDdK0F7CZEUSrufrwVpd97WFth0fTK8rxo7+OAlx6soLJaul
+         12JJMtEunTzqBL91BARznPcMocpPPwZG/ijuWMh8xbwyf6jEF782QnWWch/ifxF1fO8K
+         nUv1ZPuR7ucnNNg0Ra5L2CMp3WQx5LWkiVvMJVUg/z6GRE5vXrv9fsEAxStqt+hM9H3Y
+         /VKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688144052; x=1690736052;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FaNsiiD4Bxi7FstRFg2227ah95lDCZQpkjuVDC175qg=;
+        b=TRMcdz3IlCwqeutSp5FcplzkWvxZ2DIW/nJF2FHOC3c+UEfz+thpse7rdOf7G1wEZt
+         NZNte1o/3l4RRmzMcliV6LDdPXN8BjxT5F34UaiGc3qbuFoCqo3SMouMz40cY7OnI26l
+         fLRT6bScp0HlMpG1999WviQKaULuZtVzpAPOKUxPLc3NfWr1awGK8DX3nQrwuWytkCzK
+         Z4s1wk3AAsa+BS03r3jvCUS01IFyi0j5AzNqDNVBJoYvtnBtDGNya2W2c7BevzWCq9Pd
+         tcVkJ9fytebqbC4fk2/czRcZKL5Ep10NEuVEGL3ajqbk7R5cFMbSB4hDl2PejnVTwUFL
+         A0sg==
+X-Gm-Message-State: ABy/qLZw/LGoEZXe+cQpnO9RuE5t/IWCGxEsUjotOX567PiXFBcn+FBs
+        GIEZmil6Nrkt00q+iKkRRLHpFA==
+X-Google-Smtp-Source: APBJJlEur5ef4S9PQ/MEvKZm99ocQMPnpN602S3NlfDTa4KYWTVgjAT7+hlRf9lTWrI+2Z9/MMlyMQ==
+X-Received: by 2002:aa7:c2c3:0:b0:51b:f669:9df3 with SMTP id m3-20020aa7c2c3000000b0051bf6699df3mr1964918edp.4.1688144052261;
+        Fri, 30 Jun 2023 09:54:12 -0700 (PDT)
 Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id o12-20020a17090637cc00b00993017b64a9sm331568ejc.223.2023.06.30.09.44.58
+        by smtp.gmail.com with ESMTPSA id be28-20020a0564021a3c00b0051bfb7de166sm6892728edb.39.2023.06.30.09.54.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jun 2023 09:44:58 -0700 (PDT)
+        Fri, 30 Jun 2023 09:54:11 -0700 (PDT)
 References: <20230628190649.11233-1-nmi@metaspace.dk>
  <20230628190649.11233-4-nmi@metaspace.dk>
- <62426D68-1E01-4804-9CFC-A1146770F362@wdc.com>
- <623b588e451bb41785375cc0711114c8@opensource.wdc.com>
+ <ZJzu1ECR3Cp+IW+5@ovpn-8-18.pek2.redhat.com>
 User-agent: mu4e 1.10.4; emacs 28.2.50
 From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To:     aravind.ramesh@opensource.wdc.com
-Cc:     Hans.Holmberg@wdc.com, Aravind.Ramesh@wdc.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, hch@infradead.org,
-        Matias.Bjorling@wdc.com, linux-kernel@vger.kernel.org,
-        dlemoal@kernel.org, gost.dev@samsung.com, minwoo.im.dev@gmail.com,
-        ming.lei@redhat.com
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>
 Subject: Re: [PATCH v4 3/4] ublk: enable zoned storage support
-Date:   Fri, 30 Jun 2023 18:37:33 +0200
-In-reply-to: <623b588e451bb41785375cc0711114c8@opensource.wdc.com>
-Message-ID: <87y1k0dhme.fsf@metaspace.dk>
+Date:   Fri, 30 Jun 2023 18:51:32 +0200
+In-reply-to: <ZJzu1ECR3Cp+IW+5@ovpn-8-18.pek2.redhat.com>
+Message-ID: <87ttuodh71.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-aravind.ramesh@opensource.wdc.com writes:
+Ming Lei <ming.lei@redhat.com> writes:
 
->> From: Andreas Hindborg <a.hindborg@samsung.com
->> <mailto:a.hindborg@samsung.com>>
+> On Wed, Jun 28, 2023 at 09:06:48PM +0200, Andreas Hindborg wrote:
+>> From: Andreas Hindborg <a.hindborg@samsung.com>
+>>=20
 >> Add zoned storage support to ublk: report_zones and operations:
->> - REQ_OP_ZONE_OPEN
->> - REQ_OP_ZONE_CLOSE
->> - REQ_OP_ZONE_FINISH
->> - REQ_OP_ZONE_RESET
->> Note: This commit changes the ublk kernel module name from `ublk_drv.ko` to
+>>  - REQ_OP_ZONE_OPEN
+>>  - REQ_OP_ZONE_CLOSE
+>>  - REQ_OP_ZONE_FINISH
+>>  - REQ_OP_ZONE_RESET
+>>=20
+>> Note: This commit changes the ublk kernel module name from `ublk_drv.ko`=
+ to
 >> `ublk.ko` in order to link multiple translation units into the module.
->> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com
->> <mailto:a.hindborg@samsung.com>>
+>>=20
+>> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 >> ---
->> MAINTAINERS | 1 +
->> drivers/block/Kconfig | 4 +
->> drivers/block/Makefile | 4 +-
->> drivers/block/ublk_drv-zoned.c | 144 +++++++++++++++++++++++++++++++++
->> drivers/block/ublk_drv.c | 64 +++++++++++++--
->> drivers/block/ublk_drv.h | 15 ++++
->> include/uapi/linux/ublk_cmd.h | 14 ++++
->> 7 files changed, 239 insertions(+), 7 deletions(-)
->> create mode 100644 drivers/block/ublk_drv-zoned.c
+>>  MAINTAINERS                    |   1 +
+>>  drivers/block/Kconfig          |   4 +
+>>  drivers/block/Makefile         |   4 +-
+>>  drivers/block/ublk_drv-zoned.c | 144 +++++++++++++++++++++++++++++++++
+>>  drivers/block/ublk_drv.c       |  64 +++++++++++++--
+>>  drivers/block/ublk_drv.h       |  15 ++++
+>>  include/uapi/linux/ublk_cmd.h  |  14 ++++
+>>  7 files changed, 239 insertions(+), 7 deletions(-)
+>>  create mode 100644 drivers/block/ublk_drv-zoned.c
+>>=20
 >> diff --git a/MAINTAINERS b/MAINTAINERS
 >> index ace71c90751c..db8a8deb5926 100644
 >> --- a/MAINTAINERS
 >> +++ b/MAINTAINERS
->> @@ -21555,6 +21555,7 @@ S: Maintained
->> F: Documentation/block/ublk.rst
->> F: drivers/block/ublk_drv.c
->> F: drivers/block/ublk_drv.h
->> +F: drivers/block/ublk_drv-zoned.c
->
-> nitpick: checkpatch.pl gives a warning on the ordering of the files.
-> WARNING: Misordered MAINTAINERS entry - list file patterns in alphabetic order
->
->> F: include/uapi/linux/ublk_cmd.h
->> UCLINUX (M68KNOMMU AND COLDFIRE)
+>> @@ -21555,6 +21555,7 @@ S:	Maintained
+>>  F:	Documentation/block/ublk.rst
+>>  F:	drivers/block/ublk_drv.c
+>>  F:	drivers/block/ublk_drv.h
+>> +F:	drivers/block/ublk_drv-zoned.c
+>>  F:	include/uapi/linux/ublk_cmd.h
+>>=20=20
+>>  UCLINUX (M68KNOMMU AND COLDFIRE)
 >> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
 >> index 5b9d4aaebb81..c58dfd035557 100644
 >> --- a/drivers/block/Kconfig
 >> +++ b/drivers/block/Kconfig
 >> @@ -402,6 +402,10 @@ config BLKDEV_UBLK_LEGACY_OPCODES
->> suggested to enable N if your application(ublk server) switches to
->> ioctl command encoding.
+>>  	  suggested to enable N if your application(ublk server) switches to
+>>  	  ioctl command encoding.
+>>=20=20
 >> +config BLK_DEV_UBLK_ZONED
->> + def_bool y
->> + depends on BLK_DEV_UBLK && BLK_DEV_ZONED
+>> +	def_bool y
+>> +	depends on BLK_DEV_UBLK && BLK_DEV_ZONED
 >> +
->> source "drivers/block/rnbd/Kconfig"
->> endif # BLK_DEV
+>>  source "drivers/block/rnbd/Kconfig"
+>>=20=20
+>>  endif # BLK_DEV
 >> diff --git a/drivers/block/Makefile b/drivers/block/Makefile
 >> index 101612cba303..bc1649e20ec2 100644
 >> --- a/drivers/block/Makefile
 >> +++ b/drivers/block/Makefile
->> @@ -37,6 +37,8 @@ obj-$(CONFIG_BLK_DEV_RNBD) += rnbd/
->> obj-$(CONFIG_BLK_DEV_NULL_BLK) += null_blk/
->> -obj-$(CONFIG_BLK_DEV_UBLK) += ublk_drv.o
->> +obj-$(CONFIG_BLK_DEV_UBLK) += ublk.o
->> +ublk-$(CONFIG_BLK_DEV_UBLK) += ublk_drv.o
->> +ublk-$(CONFIG_BLK_DEV_UBLK_ZONED) += ublk_drv-zoned.o
->> swim_mod-y := swim.o swim_asm.o
->> diff --git a/drivers/block/ublk_drv-zoned.c b/drivers/block/ublk_drv-zoned.c
+>> @@ -37,6 +37,8 @@ obj-$(CONFIG_BLK_DEV_RNBD)	+=3D rnbd/
+>>=20=20
+>>  obj-$(CONFIG_BLK_DEV_NULL_BLK)	+=3D null_blk/
+>>=20=20
+>> -obj-$(CONFIG_BLK_DEV_UBLK)			+=3D ublk_drv.o
+>> +obj-$(CONFIG_BLK_DEV_UBLK)		+=3D ublk.o
+>> +ublk-$(CONFIG_BLK_DEV_UBLK)		+=3D ublk_drv.o
+>> +ublk-$(CONFIG_BLK_DEV_UBLK_ZONED)	+=3D ublk_drv-zoned.o
+>>=20=20
+>>  swim_mod-y	:=3D swim.o swim_asm.o
+>> diff --git a/drivers/block/ublk_drv-zoned.c b/drivers/block/ublk_drv-zon=
+ed.c
 >> new file mode 100644
 >> index 000000000000..ea86bf4b3681
 >> --- /dev/null
@@ -142,8 +154,7 @@ aravind.ramesh@opensource.wdc.com writes:
 >> @@ -0,0 +1,144 @@
 >> +// SPDX-License-Identifier: GPL-2.0
 >> +/*
->> + * Copyright 2023 Andreas Hindborg <a.hindborg@samsung.com
->> <mailto:a.hindborg@samsung.com>>
+>> + * Copyright 2023 Andreas Hindborg <a.hindborg@samsung.com>
 >> + */
 >> +#include <linux/blkzoned.h>
 >> +#include <linux/ublk_cmd.h>
@@ -153,469 +164,389 @@ aravind.ramesh@opensource.wdc.com writes:
 >> +
 >> +void ublk_set_nr_zones(struct ublk_device *ub)
 >> +{
->> + const struct ublk_param_basic *p = &ub->params.basic;
+>> +	const struct ublk_param_basic *p =3D &ub->params.basic;
 >> +
->> + if (ub->dev_info.flags & UBLK_F_ZONED && p->chunk_sectors)
->> + ub->ub_disk->nr_zones = p->dev_sectors / p->chunk_sectors;
+>> +	if (ub->dev_info.flags & UBLK_F_ZONED && p->chunk_sectors)
+>> +		ub->ub_disk->nr_zones =3D p->dev_sectors / p->chunk_sectors;
 >> +}
 >> +
 >> +void ublk_dev_param_zoned_apply(struct ublk_device *ub)
 >> +{
->> + const struct ublk_param_zoned *p = &ub->params.zoned;
+>> +	const struct ublk_param_zoned *p =3D &ub->params.zoned;
 >> +
->> + if (ub->dev_info.flags & UBLK_F_ZONED) {
->> + disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
->> + disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
->> + }
+>> +	if (ub->dev_info.flags & UBLK_F_ZONED) {
+>> +		disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
+>> +		disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
+>> +	}
 >> +}
 >> +
 >> +int ublk_revalidate_disk_zones(struct gendisk *disk)
 >> +{
->> + return blk_revalidate_disk_zones(disk, NULL);
+>> +	return blk_revalidate_disk_zones(disk, NULL);
 >> +}
 >> +
 >> +/* Based on virtblk_alloc_report_buffer */
 >> +static void *ublk_alloc_report_buffer(struct ublk_device *ublk,
->> + unsigned int nr_zones,
->> + unsigned int zone_sectors, size_t *buflen)
+>> +				      unsigned int nr_zones,
+>> +				      unsigned int zone_sectors, size_t *buflen)
 >> +{
->> + struct request_queue *q = ublk->ub_disk->queue;
->> + size_t bufsize;
->> + void *buf;
+>> +	struct request_queue *q =3D ublk->ub_disk->queue;
+>> +	size_t bufsize;
+>> +	void *buf;
 >> +
->> + nr_zones = min_t(unsigned int, nr_zones,
->> + get_capacity(ublk->ub_disk) >> ilog2(zone_sectors));
+>> +	nr_zones =3D min_t(unsigned int, nr_zones,
+>> +			 get_capacity(ublk->ub_disk) >> ilog2(zone_sectors));
 >> +
->> + bufsize = nr_zones * sizeof(struct blk_zone);
->> + bufsize =
->> + min_t(size_t, bufsize, queue_max_hw_sectors(q) << SECTOR_SHIFT);
->> + bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
+>> +	bufsize =3D nr_zones * sizeof(struct blk_zone);
+>> +	bufsize =3D
+>> +		min_t(size_t, bufsize, queue_max_hw_sectors(q) << SECTOR_SHIFT);
+>> +	bufsize =3D min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT=
+);
+>
+> This means 'blk_zone'(includes any sub-field type) is reused as part of u=
+blk's UAPI,
+> and it is smart, please document it around UBLK_IO_OP_REPORT_ZONES's defi=
+nition.
+
+Will do =F0=9F=91=8D
+
+>
 >> +
->> + while (bufsize >= sizeof(struct blk_zone)) {
->> + buf = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
->> + if (buf) {
->> + *buflen = bufsize;
->> + return buf;
->> + }
->> + bufsize >>= 1;
->> + }
+>> +	while (bufsize >=3D sizeof(struct blk_zone)) {
+>> +		buf =3D __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
+>> +		if (buf) {
+>> +			*buflen =3D bufsize;
+>> +			return buf;
+>> +		}
+>> +		bufsize >>=3D 1;
+>> +	}
 >> +
->> + bufsize = 0;
->> + return NULL;
+>> +	bufsize =3D 0;
+>> +	return NULL;
 >> +}
 >> +
 >> +int ublk_report_zones(struct gendisk *disk, sector_t sector,
->> + unsigned int nr_zones, report_zones_cb cb, void *data)
+>> +		      unsigned int nr_zones, report_zones_cb cb, void *data)
 >> +{
->> + struct ublk_device *ub = disk->private_data;
->> + unsigned int zone_size_sectors = disk->queue->limits.chunk_sectors;
->> + unsigned int first_zone = sector >> ilog2(zone_size_sectors);
->> + unsigned int done_zones = 0;
->> + unsigned int max_zones_per_request;
->> + struct blk_zone *buffer;
->> + size_t buffer_length;
+>> +	struct ublk_device *ub =3D disk->private_data;
+>> +	unsigned int zone_size_sectors =3D disk->queue->limits.chunk_sectors;
+>> +	unsigned int first_zone =3D sector >> ilog2(zone_size_sectors);
+>> +	unsigned int done_zones =3D 0;
+>> +	unsigned int max_zones_per_request;
+>> +	struct blk_zone *buffer;
+>> +	size_t buffer_length;
 >> +
->> + if (!(ub->dev_info.flags & UBLK_F_ZONED))
->> + return -EOPNOTSUPP;
+>> +	if (!(ub->dev_info.flags & UBLK_F_ZONED))
+>> +		return -EOPNOTSUPP;
 >> +
->> + nr_zones = min_t(unsigned int, ub->ub_disk->nr_zones - first_zone,
->> + nr_zones);
+>> +	nr_zones =3D min_t(unsigned int, ub->ub_disk->nr_zones - first_zone,
+>> +			 nr_zones);
 >> +
->> + buffer = ublk_alloc_report_buffer(ub, nr_zones, zone_size_sectors,
->> + &buffer_length);
->> + if (!buffer)
->> + return -ENOMEM;
+>> +	buffer =3D ublk_alloc_report_buffer(ub, nr_zones, zone_size_sectors,
+>> +					  &buffer_length);
+>> +	if (!buffer)
+>> +		return -ENOMEM;
 >> +
->> + max_zones_per_request = buffer_length / sizeof(struct blk_zone);
+>> +	max_zones_per_request =3D buffer_length / sizeof(struct blk_zone);
 >> +
->> + while (done_zones < nr_zones) {
->> + unsigned int remaining_zones = nr_zones - done_zones;
->> + unsigned int zones_in_request = min_t(
->> + unsigned int, remaining_zones, max_zones_per_request);
->> + int err = 0;
->> + struct request *req;
->> + struct ublk_rq_data *pdu;
->> + blk_status_t status;
+>> +	while (done_zones < nr_zones) {
+>> +		unsigned int remaining_zones =3D nr_zones - done_zones;
+>> +		unsigned int zones_in_request =3D min_t(
+>> +			unsigned int, remaining_zones, max_zones_per_request);
+>> +		int err =3D 0;
+>> +		struct request *req;
+>> +		struct ublk_rq_data *pdu;
+>> +		blk_status_t status;
 >> +
->> + memset(buffer, 0, buffer_length);
+>> +		memset(buffer, 0, buffer_length);
 >> +
->> + req = blk_mq_alloc_request(disk->queue, REQ_OP_DRV_IN, 0);
->> + if (IS_ERR(req))
->> + return PTR_ERR(req);
+>> +		req =3D blk_mq_alloc_request(disk->queue, REQ_OP_DRV_IN, 0);
+>> +		if (IS_ERR(req))
+>> +			return PTR_ERR(req);
 >> +
->> + pdu = blk_mq_rq_to_pdu(req);
->> + pdu->operation = UBLK_IO_OP_REPORT_ZONES;
->> + pdu->sector = sector;
->> + pdu->nr_sectors = remaining_zones * zone_size_sectors;
+>> +		pdu =3D blk_mq_rq_to_pdu(req);
+>> +		pdu->operation =3D UBLK_IO_OP_REPORT_ZONES;
+>> +		pdu->sector =3D sector;
+>> +		pdu->nr_sectors =3D remaining_zones * zone_size_sectors;
 >> +
->> + err = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
->> + GFP_KERNEL);
->> + if (err) {
->> + blk_mq_free_request(req);
->> + kvfree(buffer);
->> + return err;
->> + }
+>> +		err =3D blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
+>> +					GFP_KERNEL);
+>> +		if (err) {
+>> +			blk_mq_free_request(req);
+>> +			kvfree(buffer);
+>> +			return err;
+>> +		}
 >> +
->> + status = blk_execute_rq(req, 0);
->> + err = blk_status_to_errno(status);
->> + blk_mq_free_request(req);
->> + if (err) {
->> + kvfree(buffer);
->> + return err;
->> + }
+>> +		status =3D blk_execute_rq(req, 0);
+>> +		err =3D blk_status_to_errno(status);
+>> +		blk_mq_free_request(req);
+>> +		if (err) {
+>> +			kvfree(buffer);
+>> +			return err;
+>> +		}
 >> +
->> + for (unsigned int i = 0; i < zones_in_request; i++) {
->> + struct blk_zone *zone = buffer + i;
+>> +		for (unsigned int i =3D 0; i < zones_in_request; i++) {
+>> +			struct blk_zone *zone =3D buffer + i;
 >> +
->> + err = cb(zone, i, data);
->> + if (err)
->> + return err;
+>> +			err =3D cb(zone, i, data);
+>> +			if (err)
+>> +				return err;
 >> +
->> + done_zones++;
->> + sector += zone_size_sectors;
+>> +			done_zones++;
+>> +			sector +=3D zone_size_sectors;
 >> +
->> + /* A zero length zone means don't ask for more zones */
->> + if (!zone->len) {
->> + kvfree(buffer);
->> + return done_zones;
->> + }
->> + }
->> + }
+>> +			/* A zero length zone means don't ask for more zones */
+>> +			if (!zone->len) {
+>
+> This way is part of UAPI UBLK_IO_OP_REPORT_ZONES, please document it
+> around UBLK_IO_OP_REPORT_ZONES.
+
+OK =F0=9F=91=8D
+
+>
+>> +				kvfree(buffer);
+>> +				return done_zones;
+>> +			}
+>> +		}
+>> +	}
 >> +
->> + kvfree(buffer);
->> + return done_zones;
+>> +	kvfree(buffer);
+>> +	return done_zones;
 >> +}
 >> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
 >> index e519dc0d9fe7..88fa39853c61 100644
 >> --- a/drivers/block/ublk_drv.c
 >> +++ b/drivers/block/ublk_drv.c
 >> @@ -57,12 +57,13 @@
->> | UBLK_F_USER_RECOVERY_REISSUE \
->> | UBLK_F_UNPRIVILEGED_DEV \
->> | UBLK_F_CMD_IOCTL_ENCODE \
->> - | UBLK_F_USER_COPY)
->> + | UBLK_F_USER_COPY \
->> + | UBLK_F_ZONED)
->> /* All UBLK_PARAM_TYPE_* should be included here */
+>>  		| UBLK_F_USER_RECOVERY_REISSUE \
+>>  		| UBLK_F_UNPRIVILEGED_DEV \
+>>  		| UBLK_F_CMD_IOCTL_ENCODE \
+>> -		| UBLK_F_USER_COPY)
+>> +		| UBLK_F_USER_COPY \
+>> +		| UBLK_F_ZONED)
+>>=20=20
+>>  /* All UBLK_PARAM_TYPE_* should be included here */
 >> -#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
->> - UBLK_PARAM_TYPE_DISCARD | UBLK_PARAM_TYPE_DEVT)
+>> -		UBLK_PARAM_TYPE_DISCARD | UBLK_PARAM_TYPE_DEVT)
 >> -
->> +#define UBLK_PARAM_TYPE_ALL \
->> + (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
->> + UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED)
->> struct ublk_uring_cmd_pdu {
->> struct ublk_queue *ubq;
->> @@ -209,6 +210,9 @@ static void ublk_dev_param_basic_apply(struct
->> ublk_device *ub)
->> set_disk_ro(ub->ub_disk, true);
->> set_capacity(ub->ub_disk, p->dev_sectors);
+>> +#define UBLK_PARAM_TYPE_ALL                                \
+>> +	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
+>> +	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED)
+>>=20=20
+>>  struct ublk_uring_cmd_pdu {
+>>  	struct ublk_queue *ubq;
+>> @@ -209,6 +210,9 @@ static void ublk_dev_param_basic_apply(struct ublk_d=
+evice *ub)
+>>  		set_disk_ro(ub->ub_disk, true);
+>>=20=20
+>>  	set_capacity(ub->ub_disk, p->dev_sectors);
 >> +
->> + if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
->> + ublk_set_nr_zones(ub);
->> }
->> static void ublk_dev_param_discard_apply(struct ublk_device *ub)
+>> +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>> +		ublk_set_nr_zones(ub);
+>>  }
+>>=20=20
+>>  static void ublk_dev_param_discard_apply(struct ublk_device *ub)
 >> @@ -269,6 +273,9 @@ static int ublk_apply_params(struct ublk_device *ub)
->> if (ub->params.types & UBLK_PARAM_TYPE_DISCARD)
->> ublk_dev_param_discard_apply(ub);
->> + if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) && (ub->params.types &
->> UBLK_PARAM_TYPE_ZONED))
->> + ublk_dev_param_zoned_apply(ub);
+>>  	if (ub->params.types & UBLK_PARAM_TYPE_DISCARD)
+>>  		ublk_dev_param_discard_apply(ub);
+>>=20=20
+>> +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) && (ub->params.types & UBLK_PARAM=
+_TYPE_ZONED))
+>> +		ublk_dev_param_zoned_apply(ub);
 >> +
->> return 0;
->> }
->> @@ -439,6 +446,7 @@ static const struct block_device_operations ub_fops = {
->> .owner = THIS_MODULE,
->> .open = ublk_open,
->> .free_disk = ublk_free_disk,
->> + .report_zones = ublk_report_zones,
->> };
->> #define UBLK_MAX_PIN_PAGES 32
->> @@ -553,7 +561,8 @@ static inline bool ublk_need_map_req(const struct
->> request *req)
->> static inline bool ublk_need_unmap_req(const struct request *req)
->> {
->> - return ublk_rq_has_data(req) && req_op(req) == REQ_OP_READ;
->> + return ublk_rq_has_data(req) &&
->> + (req_op(req) == REQ_OP_READ || req_op(req) == REQ_OP_DRV_IN);
->> }
->> static int ublk_map_io(const struct ublk_queue *ubq, const struct request
->> *req,
->> @@ -637,6 +646,7 @@ static blk_status_t ublk_setup_iod(struct
->> ublk_queue *ubq, struct request *req)
->> {
->> struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
->> struct ublk_io *io = &ubq->ios[req->tag];
->> + struct ublk_rq_data *pdu = blk_mq_rq_to_pdu(req);
->> u32 ublk_op;
->> switch (req_op(req)) {
->> @@ -655,6 +665,35 @@ static blk_status_t ublk_setup_iod(struct
->> ublk_queue *ubq, struct request *req)
->> case REQ_OP_WRITE_ZEROES:
->> ublk_op = UBLK_IO_OP_WRITE_ZEROES;
->> break;
->> + case REQ_OP_ZONE_OPEN:
->> + ublk_op = UBLK_IO_OP_ZONE_OPEN;
->> + break;
->> + case REQ_OP_ZONE_CLOSE:
->> + ublk_op = UBLK_IO_OP_ZONE_CLOSE;
->> + break;
->> + case REQ_OP_ZONE_FINISH:
->> + ublk_op = UBLK_IO_OP_ZONE_FINISH;
->> + break;
->> + case REQ_OP_ZONE_RESET:
->> + ublk_op = UBLK_IO_OP_ZONE_RESET;
->> + break;
->> + case REQ_OP_DRV_IN:
->> + ublk_op = pdu->operation;
->> + switch (ublk_op) {
->> + case UBLK_IO_OP_REPORT_ZONES:
->> + iod->op_flags = ublk_op | ublk_req_build_flags(req);
->> + iod->nr_sectors = pdu->nr_sectors;
->> + iod->start_sector = pdu->sector;
->> + iod->addr = io->addr;
->> + return BLK_STS_OK;
->> + default:
->> + return BLK_STS_IOERR;
->> + }
->> + case REQ_OP_ZONE_APPEND:
->> + case REQ_OP_ZONE_RESET_ALL:
->> + case REQ_OP_DRV_OUT:
->> + /* We do not support zone append or reset_all yet */
->> + fallthrough;
->> default:
->> return BLK_STS_IOERR;
->> }
->> @@ -708,7 +747,8 @@ static inline void __ublk_complete_rq(struct request *req)
->> *
->> * Both the two needn't unmap.
->> */
->> - if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE)
->> + if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE &&
->> + req_op(req) != REQ_OP_DRV_IN)
->> goto exit;
->> /* for READ request, writing data in iod->addr to rq buffers */
->> @@ -1835,6 +1875,15 @@ static int ublk_ctrl_start_dev(struct
->> ublk_device *ub, struct io_uring_cmd *cmd)
->> if (ub->nr_privileged_daemon != ub->nr_queues_ready)
->> set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
->> + if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
->> + ub->dev_info.flags & UBLK_F_ZONED) {
->> + disk_set_zoned(disk, BLK_ZONED_HM);
->> + blk_queue_required_elevator_features(disk->queue, ELEVATOR_F_ZBD_SEQ_WRITE);
->> + ret = ublk_revalidate_disk_zones(disk);
->> + if (ret)
->> + goto out_put_disk;
->> + }
+>>  	return 0;
+>>  }
+>>=20=20
+>> @@ -439,6 +446,7 @@ static const struct block_device_operations ub_fops =
+=3D {
+>>  	.owner =3D	THIS_MODULE,
+>>  	.open =3D		ublk_open,
+>>  	.free_disk =3D	ublk_free_disk,
+>> +	.report_zones =3D	ublk_report_zones,
+>>  };
+>>=20=20
+>>  #define UBLK_MAX_PIN_PAGES	32
+>> @@ -553,7 +561,8 @@ static inline bool ublk_need_map_req(const struct re=
+quest *req)
+>>=20=20
+>>  static inline bool ublk_need_unmap_req(const struct request *req)
+>>  {
+>> -	return ublk_rq_has_data(req) && req_op(req) =3D=3D REQ_OP_READ;
+>> +	return ublk_rq_has_data(req) &&
+>> +	       (req_op(req) =3D=3D REQ_OP_READ || req_op(req) =3D=3D REQ_OP_DR=
+V_IN);
+>>  }
+>>=20=20
+>>  static int ublk_map_io(const struct ublk_queue *ubq, const struct reque=
+st *req,
+>> @@ -637,6 +646,7 @@ static blk_status_t ublk_setup_iod(struct ublk_queue=
+ *ubq, struct request *req)
+>>  {
+>>  	struct ublksrv_io_desc *iod =3D ublk_get_iod(ubq, req->tag);
+>>  	struct ublk_io *io =3D &ubq->ios[req->tag];
+>> +	struct ublk_rq_data *pdu =3D blk_mq_rq_to_pdu(req);
+>>  	u32 ublk_op;
+>>=20=20
+>>  	switch (req_op(req)) {
+>> @@ -655,6 +665,35 @@ static blk_status_t ublk_setup_iod(struct ublk_queu=
+e *ubq, struct request *req)
+>>  	case REQ_OP_WRITE_ZEROES:
+>>  		ublk_op =3D UBLK_IO_OP_WRITE_ZEROES;
+>>  		break;
+>> +	case REQ_OP_ZONE_OPEN:
+>> +		ublk_op =3D UBLK_IO_OP_ZONE_OPEN;
+>> +		break;
+>> +	case REQ_OP_ZONE_CLOSE:
+>> +		ublk_op =3D UBLK_IO_OP_ZONE_CLOSE;
+>> +		break;
+>> +	case REQ_OP_ZONE_FINISH:
+>> +		ublk_op =3D UBLK_IO_OP_ZONE_FINISH;
+>> +		break;
+>> +	case REQ_OP_ZONE_RESET:
+>> +		ublk_op =3D UBLK_IO_OP_ZONE_RESET;
+>> +		break;
+>> +	case REQ_OP_DRV_IN:
+>> +		ublk_op =3D pdu->operation;
+>> +		switch (ublk_op) {
+>> +		case UBLK_IO_OP_REPORT_ZONES:
+>> +			iod->op_flags =3D ublk_op | ublk_req_build_flags(req);
+>> +			iod->nr_sectors =3D pdu->nr_sectors;
+>> +			iod->start_sector =3D pdu->sector;
+>> +			iod->addr =3D io->addr;
+>
+> As Damien commented, zone append needs to be moved into this patch,
+> so zoned depends on user copy feature, and you can simply fail to
+> add device if user copy isn't enabled.
+>
+> So the above 'iod->addr =3D io->addr' can be removed.
+
+Thanks =F0=9F=91=8D
+
+>
+>> +			return BLK_STS_OK;
+>> +		default:
+>> +			return BLK_STS_IOERR;
+>> +		}
+>> +	case REQ_OP_ZONE_APPEND:
+>> +	case REQ_OP_ZONE_RESET_ALL:
+>> +	case REQ_OP_DRV_OUT:
+>> +		/* We do not support zone append or reset_all yet */
+>> +		fallthrough;
+>>  	default:
+>>  		return BLK_STS_IOERR;
+>>  	}
+>> @@ -708,7 +747,8 @@ static inline void __ublk_complete_rq(struct request=
+ *req)
+>>  	 *
+>>  	 * Both the two needn't unmap.
+>>  	 */
+>> -	if (req_op(req) !=3D REQ_OP_READ && req_op(req) !=3D REQ_OP_WRITE)
+>> +	if (req_op(req) !=3D REQ_OP_READ && req_op(req) !=3D REQ_OP_WRITE &&
+>> +	    req_op(req) !=3D REQ_OP_DRV_IN)
+>>  		goto exit;
+>>=20=20
+>>  	/* for READ request, writing data in iod->addr to rq buffers */
+>> @@ -1835,6 +1875,15 @@ static int ublk_ctrl_start_dev(struct ublk_device=
+ *ub, struct io_uring_cmd *cmd)
+>>  	if (ub->nr_privileged_daemon !=3D ub->nr_queues_ready)
+>>  		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+>>=20=20
+>> +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+>> +	    ub->dev_info.flags & UBLK_F_ZONED) {
+>> +		disk_set_zoned(disk, BLK_ZONED_HM);
+>> +		blk_queue_required_elevator_features(disk->queue, ELEVATOR_F_ZBD_SEQ_=
+WRITE);
+>> +		ret =3D ublk_revalidate_disk_zones(disk);
+>> +		if (ret)
+>> +			goto out_put_disk;
+>> +	}
 >> +
->> get_device(&ub->cdev_dev);
->> ub->dev_info.state = UBLK_S_DEV_LIVE;
->> ret = add_disk(disk);
->> @@ -1997,6 +2046,9 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
->> if (ub->dev_info.flags & UBLK_F_USER_COPY)
->> ub->dev_info.flags &= ~UBLK_F_NEED_GET_DATA;
->> + if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED))
->> + ub->dev_info.flags &= ~UBLK_F_ZONED;
+>>  	get_device(&ub->cdev_dev);
+>>  	ub->dev_info.state =3D UBLK_S_DEV_LIVE;
+>>  	ret =3D add_disk(disk);
+>> @@ -1997,6 +2046,9 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *=
+cmd)
+>>  	if (ub->dev_info.flags & UBLK_F_USER_COPY)
+>>  		ub->dev_info.flags &=3D ~UBLK_F_NEED_GET_DATA;
+>>=20=20
+>> +	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>> +		ub->dev_info.flags &=3D ~UBLK_F_ZONED;
 >> +
->> /* We are not ready to support zero copy */
->> ub->dev_info.flags &= ~UBLK_F_SUPPORT_ZERO_COPY;
+>>  	/* We are not ready to support zero copy */
+>>  	ub->dev_info.flags &=3D ~UBLK_F_SUPPORT_ZERO_COPY;
+>>=20=20
 >> diff --git a/drivers/block/ublk_drv.h b/drivers/block/ublk_drv.h
 >> index f81e62256456..7242430fd6b9 100644
 >> --- a/drivers/block/ublk_drv.h
 >> +++ b/drivers/block/ublk_drv.h
 >> @@ -50,6 +50,21 @@ struct ublk_rq_data {
->> struct llist_node node;
->> struct kref ref;
->> + enum ublk_op operation;
->> + __u64 sector;
->> + __u32 nr_sectors;
->> };
+>>  	struct llist_node node;
+>>=20=20
+>>  	struct kref ref;
+>> +	enum ublk_op operation;
+>> +	__u64 sector;
+>> +	__u32 nr_sectors;
+>>  };
+>>=20=20
 >> +void ublk_set_nr_zones(struct ublk_device *ub);
 >> +void ublk_dev_param_zoned_apply(struct ublk_device *ub);
 >> +int ublk_revalidate_disk_zones(struct gendisk *disk);
 >> +
 >> +#ifdef CONFIG_BLK_DEV_UBLK_ZONED
 >> +int ublk_report_zones(struct gendisk *disk, sector_t sector,
->> + unsigned int nr_zones, report_zones_cb cb,
->> + void *data);
+>> +		      unsigned int nr_zones, report_zones_cb cb,
+>> +		      void *data);
 >> +#else
 >> +#define ublk_report_zones NULL
 >> +#endif
 >> +
->> #endif
->> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+>>  #endif
+>> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd=
+.h
 >> index 471b3b983045..436525afffe8 100644
 >> --- a/include/uapi/linux/ublk_cmd.h
 >> +++ b/include/uapi/linux/ublk_cmd.h
 >> @@ -176,6 +176,11 @@
->> /* Copy between request and user buffer by pread()/pwrite() */
->> #define UBLK_F_USER_COPY (1UL << 7)
+>>  /* Copy between request and user buffer by pread()/pwrite() */
+>>  #define UBLK_F_USER_COPY	(1UL << 7)
+>>=20=20
 >> +/*
 >> + * Enable zoned device support
 >> + */
 >> +#define UBLK_F_ZONED (1ULL << 8)
 >> +
->> /* device state */
->> #define UBLK_S_DEV_DEAD 0
->> #define UBLK_S_DEV_LIVE 1
+>>  /* device state */
+>>  #define UBLK_S_DEV_DEAD	0
+>>  #define UBLK_S_DEV_LIVE	1
 >> @@ -242,6 +247,7 @@ enum ublk_op {
->> UBLK_IO_OP_ZONE_APPEND = 13,
->> UBLK_IO_OP_ZONE_RESET = 15,
->> __UBLK_IO_OP_DRV_IN_START = 32,
->> + UBLK_IO_OP_REPORT_ZONES = __UBLK_IO_OP_DRV_IN_START,
->> __UBLK_IO_OP_DRV_IN_END = 96,
->> __UBLK_IO_OP_DRV_OUT_START = __UBLK_IO_OP_DRV_IN_END,
->> __UBLK_IO_OP_DRV_OUT_END = 160,
+>>  	UBLK_IO_OP_ZONE_APPEND =3D 13,
+>>  	UBLK_IO_OP_ZONE_RESET =3D 15,
+>>  	__UBLK_IO_OP_DRV_IN_START =3D 32,
+>> +	UBLK_IO_OP_REPORT_ZONES =3D __UBLK_IO_OP_DRV_IN_START,
+>>  	__UBLK_IO_OP_DRV_IN_END =3D 96,
+>>  	__UBLK_IO_OP_DRV_OUT_START =3D __UBLK_IO_OP_DRV_IN_END,
+>>  	__UBLK_IO_OP_DRV_OUT_END =3D 160,
 >> @@ -342,6 +348,12 @@ struct ublk_param_devt {
->> __u32 disk_minor;
->> };
+>>  	__u32   disk_minor;
+>>  };
+>>=20=20
 >> +struct ublk_param_zoned {
->> + __u32 max_open_zones;
->> + __u32 max_active_zones;
->> + __u8 reserved[24];
+>> +	__u32	max_open_zones;
+>> +	__u32	max_active_zones;
+>> +	__u8	reserved[24];
 >> +};
->> +
->> struct ublk_params {
->> /*
->> * Total length of parameters, userspace has to set 'len' for both
->> @@ -353,11 +365,13 @@ struct ublk_params {
->> #define UBLK_PARAM_TYPE_BASIC (1 << 0)
->> #define UBLK_PARAM_TYPE_DISCARD (1 << 1)
->> #define UBLK_PARAM_TYPE_DEVT (1 << 2)
->> +#define UBLK_PARAM_TYPE_ZONED (1 << 3)
->> __u32 types; /* types of parameter included */
->> struct ublk_param_basic basic;
->> struct ublk_param_discard discard;
->> struct ublk_param_devt devt;
->> + struct ublk_param_zoned zoned;
->> };
->> #endif
-> I applied the patches and verified it compiles with and without the
-> CONFIG_BLK_DEV_ZONED flag.
-> Working on creating a ublk device also.
+>
+> Maybe you can simply borrow virtio_blk_zoned_characteristics definition
+> here, and make several reserved words.
+>
+> But that is fine, given six u32 should be flexible enough compared with
+> virtio_blk_zoned_characteristics.
 
-For reference, here are my test scripts:
-
-
-------------------------------------
-test-append.sh:
-
-#!/bin/bash
-set -e
-set -x
-
-/mnt/nullblk.py
-./ublk add -x --usercopy -t loop -f /dev/nullblk -q 8 -d 128
-mkzonefs -f /dev/ublkb0
-mount -t zonefs /dev/ublkb0 /zone
-fio /mnt/append.fio
-umount /zone
-./ublk del 0
-
-
-------------------------------------
-nullblk.py:
-
-#!/usr/bin/env python3
-
-from subprocess import run
-from pathlib import Path
-
-block_size_bytes = 4096
-zone_size_mib = 1024
-num_zones = 32
-
-config_path = Path("/sys/kernel/config/nullb")
-
-# Remove all devices
-for node in config_path.iterdir():
-    if node.is_dir():
-        node.rmdir()
-
-
-device_capacity_mib = zone_size_mib * num_zones
-
-control = config_path / "nullblk"
-control.mkdir()
-
-(control / "blocksize").write_text(str(block_size_bytes))
-(control / "completion_nsec").write_text("0")
-(control / "irqmode").write_text("0")
-(control / "queue_mode").write_text("2")
-(control / "hw_queue_depth").write_text("1024")
-(control / "memory_backed").write_text("1")
-(control / "size").write_text(str(device_capacity_mib))
-
-(control / "zoned").write_text("1")
-(control / "zone_size").write_text(str(zone_size_mib))
-(control / "zone_nr_conv").write_text("0")
-(control / "zone_max_active").write_text("14")
-(control / "zone_max_open").write_text("14")
-
-(control / "power").write_text("1")
-
-------------------------------------
-
-append.fio:
-
-[global]
-ioengine=psync
-do_verify=1
-verify=md5
-random_generator=lfsr
-
-[append0]
-file_append=1
-rw=write
-bs=4k
-direct=1
-size=1024m
-filename=/zone/seq/0
-
-[append1]
-file_append=1
-rw=write
-bs=4k
-direct=1
-size=1024m
-filename=/zone/seq/1
-
-[append2]
-file_append=1
-rw=write
-bs=4k
-direct=1
-size=1024m
-filename=/zone/seq/2
-
-[append3]
-file_append=1
-rw=write
-bs=4k
-direct=1
-size=1024m
-filename=/zone/seq/3
-
-[append4]
-file_append=1
-rw=write
-bs=4k
-direct=1
-size=1024m
-filename=/zone/seq/4
-
-[append5]
-file_append=1
-rw=write
-bs=4k
-direct=1
-size=1024m
-filename=/zone/seq/5
-
-...
-
-Nothing fancy, but it will test the append path. I have been running the
-ZenFS test suite as well, but that does not hit the append path. Maybe
-if you run it against zonefs?
+I agree, this should be enough. One field will go to max append size, so
+20 bytes left.
 
 Best regards,
 Andreas
+
+
+
