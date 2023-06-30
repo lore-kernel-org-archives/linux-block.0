@@ -2,50 +2,63 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13504EB64DA
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 16:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E401AEB64DA
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 16:05:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229546AbjF3QBS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jun 2023 12:01:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59026 "EHLO
+        id S232774AbjF3QFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jun 2023 12:05:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232033AbjF3QBQ (ORCPT
+        with ESMTP id S232080AbjF3QFr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2023 12:01:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C9E3C06
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 09:00:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688140827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bGGz8DiANSWoI5a6kGLb5e94iILUQVr5jzEPV3uc4I0=;
-        b=EVTtWCilgY5i7whvzAwZzqHOwvuaKUwlSo5duhd5Z9gnfk1oEjDOxHHoKk2S0cnLIjDc6P
-        Knhw9V0EyYRYCDrM1TEtp+hibXNYX+RyyD1w4qAGrBMZxyc0xT67ExxiGvdCo2YkMNRieu
-        U/jxg8KjrsXK5lqCqnb9NYFd5QTq3NI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-173-6IJV-npHPyCrw__XkncbgA-1; Fri, 30 Jun 2023 12:00:23 -0400
-X-MC-Unique: 6IJV-npHPyCrw__XkncbgA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8911138035A6;
-        Fri, 30 Jun 2023 16:00:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A5BE2166B2D;
-        Fri, 30 Jun 2023 16:00:19 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <36eda01e-502e-b93d-9098-77ed5a16f33c@kernel.dk>
-References: <36eda01e-502e-b93d-9098-77ed5a16f33c@kernel.dk> <20230630152524.661208-1-dhowells@redhat.com> <20230630152524.661208-4-dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Fri, 30 Jun 2023 12:05:47 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C125C10A
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 09:05:45 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id ca18e2360f4ac-7747cc8bea0so24692439f.1
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 09:05:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1688141145; x=1690733145;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ziU7udbSMUbbWD6WdWUse2LB6xrhtUWIqBeRynGCsik=;
+        b=RBzCO5wIRkOWtsfnLQFTCb2IVyVyMOG6Cgjz1OlGsMmo5IYrjycb6t/iILAkV1Unh1
+         OfEWG7dHahsPBFpwZTR2/L/HqSZBHP52t/SlNzC/9pB8TQSAWwFuu2n/fecl7qMK66uO
+         PBMqINiJds/8FWzdQLWHkgeapFj9eYntFRFLpZ+m9IbvCz7E1O5Pml5B7KSJjUHwBcfg
+         +dfVhkZEDa0jcxTZMYh7+e5/s2T2xD7gXi0TSVUw7jB6DEKrNWvqCUqKDn41L45pvJAk
+         vK/XP6fjpymiAog4QB5FI7tdbGM2NnmvbUivhDMrwnPVlTtl9z+yLkBGSc/vJM2zIF2H
+         x+zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688141145; x=1690733145;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ziU7udbSMUbbWD6WdWUse2LB6xrhtUWIqBeRynGCsik=;
+        b=jiugiKdlCsexy/SoWH828EwPdo5iPwNAXm1KCpMVFF8+DLzBv7MV66VW2DrBkxMgor
+         8Khpwh33jTdfXn1g6TRTEH7AqglUB+h+CPspDbgstlieo1GLlFhfnprdSNEslNJNnH60
+         kpjruiy7KQLEAIUieP1ZhzHs4QOpncVaSrS3l5KwONl7Y7ksmjuMW2Ya53Dme5Igng4W
+         Re+toY2sjxuNypsokE3+BsMjda0juLrKbGZja0dYBxy1QKahCJnsEta28ngJ08yOGAh2
+         D6l4O9jup7/EDUuzsrdAAihuwzb1iHnElZCxnmnW/9vvpYQD1AIdMpayWVyG6flYfeCo
+         ki4Q==
+X-Gm-Message-State: AC+VfDwt7iXapUvY2La9+zSLgnh54ip6Qwk6oLCUKGar9xCd8zuh/0kL
+        NoiRZNaqaPpqLdl6UvRcCysFcA==
+X-Google-Smtp-Source: ACHHUZ76Ofymlhm34XFb34rKtgMlt+vNzniJrH5TSsGc5ozk3JG98tN4+hKciqwUnIJg1Xgew5uBAA==
+X-Received: by 2002:a05:6602:4995:b0:783:617c:a8f0 with SMTP id eg21-20020a056602499500b00783617ca8f0mr4285546iob.2.1688141144768;
+        Fri, 30 Jun 2023 09:05:44 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id r5-20020a6bd905000000b007836a9ca101sm1874871ioc.22.2023.06.30.09.05.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Jun 2023 09:05:44 -0700 (PDT)
+Message-ID: <dc2e8d58-7400-63d6-b76c-7f4f6d29fcb7@kernel.dk>
+Date:   Fri, 30 Jun 2023 10:05:42 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [RFC PATCH 03/11] vfs: Use init_kiocb() to initialise new IOCBs
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
@@ -58,32 +71,47 @@ Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
         Christian Brauner <christian@brauner.io>
-Subject: Re: [RFC PATCH 03/11] vfs: Use init_kiocb() to initialise new IOCBs
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <662383.1688140818.1@warthog.procyon.org.uk>
-Date:   Fri, 30 Jun 2023 17:00:18 +0100
-Message-ID: <662384.1688140818@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+References: <36eda01e-502e-b93d-9098-77ed5a16f33c@kernel.dk>
+ <20230630152524.661208-1-dhowells@redhat.com>
+ <20230630152524.661208-4-dhowells@redhat.com>
+ <662384.1688140818@warthog.procyon.org.uk>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <662384.1688140818@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> wrote:
+On 6/30/23 10:00?AM, David Howells wrote:
+> Jens Axboe <axboe@kernel.dk> wrote:
+> 
+>> One concern here is that we're using IOCB_WRITE here to tell if
+>> sb_start_write() has been done or not, and hence whether
+>> kiocb_end_write() needs to be called. You know set it earlier, which
+>> means if we get a failure if we need to setup async data, then we know
+>> have IOCB_WRITE set at that point even though we did not call
+>> sb_start_write().
+> 
+> Hmmm...  It's set earlier in a number of places anyway -
+> __cachefiles_write() for example.
 
-> One concern here is that we're using IOCB_WRITE here to tell if
-> sb_start_write() has been done or not, and hence whether
-> kiocb_end_write() needs to be called. You know set it earlier, which
-> means if we get a failure if we need to setup async data, then we know
-> have IOCB_WRITE set at that point even though we did not call
-> sb_start_write().
+Not sure how that's relevant, that's a private kiocb and not related to
+the private one that io_uring uses?
 
-Hmmm...  It's set earlier in a number of places anyway - __cachefiles_write()
-for example.
+> Btw, can you please put some comments on the IOCB_* constants?  I have
+> to guess at what they mean and how they're meant to be used.  Or
+> better still, get Christoph to write Documentation/core-api/iocb.rst
+> describing the API? ;-)
 
-Btw, can you please put some comments on the IOCB_* constants?  I have to
-guess at what they mean and how they're meant to be used.  Or better still,
-get Christoph to write Documentation/core-api/iocb.rst describing the API? ;-)
+The ones I have added do have comments, mostly, though it's not a lot of
+commentary for sure... Which ones are confusing and need better
+comments? Would be happy to do that. I do think the comments belong in
+there rather than have a separate doc for the kiocb. Though one thing
+that's confusing is the ki_private ownership. You'd think it belongs to
+the owner of the kiocb, but nope, it has random uses in iomap and ocfs2
+at least.
 
-David
+-- 
+Jens Axboe
 
