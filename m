@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D56BEB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 15:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D2AEB64DA
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 15:28:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233076AbjF3P1Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jun 2023 11:27:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43002 "EHLO
+        id S233059AbjF3P14 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jun 2023 11:27:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233039AbjF3P0i (ORCPT
+        with ESMTP id S232809AbjF3P1R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2023 11:26:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 408A13C1F
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 08:25:47 -0700 (PDT)
+        Fri, 30 Jun 2023 11:27:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D146421B
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 08:26:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688138746;
+        s=mimecast20190719; t=1688138764;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BxhEpe1dWPNZ3l1c5/r0hZMnotB6Lyrh5knFFcDG1mA=;
-        b=HM6m+C3AuYnptEN8blSC112/Z1KLz1/5igWNRoI7EnLIlqaqyR9qkxbtm37PgdSGKdNGBk
-        tNNLj1uYCfG6/gti26VThxtnykqsRrKyFWwCnvzLZbz7fzuASubOG8Jzm2xdtFea102sYM
-        exoiSRqfPc4h0LM+5IdO6qOsENIfxxE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=YvuuosyDox1jyrnioRFOxuFzcr1YzhZJrvdziq8YYeo=;
+        b=N/AzGVwOyg8mSzIf3aw4CFYDcFz3Xgq71qwPA/MwLVhYZMGKg1i3Kkx3ZMvnvwvJhPmc8e
+        6bJCr4+7+duI7u7FwPfrQMGNIxqMAhFTfhV5wLh7s/YqT8PgPAZMTJcc1LN1SJj5UGDMm4
+        +BmQIJ/d4IuSijIDpYvSP0+mS469LfI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-225-mxE03HUqMrK2T8QUGz-gSw-1; Fri, 30 Jun 2023 11:25:43 -0400
-X-MC-Unique: mxE03HUqMrK2T8QUGz-gSw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-142-n-OmuebeNTmap1grquelDQ-1; Fri, 30 Jun 2023 11:26:00 -0400
+X-MC-Unique: n-OmuebeNTmap1grquelDQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 65555858290;
-        Fri, 30 Jun 2023 15:25:42 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5340229AA2CC;
+        Fri, 30 Jun 2023 15:25:59 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 703104087C6A;
-        Fri, 30 Jun 2023 15:25:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B7DBB14682FA;
+        Fri, 30 Jun 2023 15:25:56 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -51,68 +51,220 @@ Cc:     David Howells <dhowells@redhat.com>,
         Christian Brauner <brauner@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>
-Subject: [RFC PATCH 05/11] iov_iter: Use IOMAP_WRITE rather than iterator direction
-Date:   Fri, 30 Jun 2023 16:25:18 +0100
-Message-ID: <20230630152524.661208-6-dhowells@redhat.com>
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        v9fs-developer@lists.sourceforge.net
+Subject: [RFC PATCH 10/11] 9p: Pin pages rather than ref'ing if appropriate
+Date:   Fri, 30 Jun 2023 16:25:23 +0100
+Message-ID: <20230630152524.661208-11-dhowells@redhat.com>
 In-Reply-To: <20230630152524.661208-1-dhowells@redhat.com>
 References: <20230630152524.661208-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If an iomap_iter is available, use the IOMAP_WRITE flag instead of the
-iterator direction.
+Convert the 9p filesystem to use iov_iter_extract_pages() instead of
+iov_iter_get_pages().  This will pin pages or leave them unaltered rather
+than getting a ref on them as appropriate to the iterator.
+
+The pages need to be pinned for DIO-read rather than having refs taken on
+them to prevent VM copy-on-write from malfunctioning during a concurrent
+fork() (the result of the I/O would otherwise end up only visible to the
+child process and not the parent).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christian Brauner <christian@brauner.io>
-cc: Alexander Viro <viro@zeniv.linux.org.uk>
-cc: linux-block@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
+cc: Dominique Martinet <asmadeus@codewreck.org>
+cc: Eric Van Hensbergen <ericvh@gmail.com>
+cc: Latchesar Ionkov <lucho@ionkov.net>
+cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+cc: v9fs-developer@lists.sourceforge.net
 ---
- fs/dax.c             | 4 ++--
- fs/iomap/direct-io.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ net/9p/trans_common.c |  8 ++--
+ net/9p/trans_common.h |  2 +-
+ net/9p/trans_virtio.c | 92 ++++++++++++++-----------------------------
+ 3 files changed, 34 insertions(+), 68 deletions(-)
 
-diff --git a/fs/dax.c b/fs/dax.c
-index 5c6ebe64a3fd..d49480675fc0 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -1438,7 +1438,7 @@ static loff_t dax_iomap_iter(const struct iomap_iter *iomi,
- 	loff_t pos = iomi->pos;
- 	struct dax_device *dax_dev = iomap->dax_dev;
- 	loff_t end = pos + length, done = 0;
--	bool write = iov_iter_rw(iter) == WRITE;
-+	bool write = iomi->flags & IOMAP_WRITE;
- 	bool cow = write && iomap->flags & IOMAP_F_SHARED;
- 	ssize_t ret = 0;
- 	size_t xfer;
-@@ -1498,7 +1498,7 @@ static loff_t dax_iomap_iter(const struct iomap_iter *iomi,
+diff --git a/net/9p/trans_common.c b/net/9p/trans_common.c
+index c827f694551c..4342de18f08b 100644
+--- a/net/9p/trans_common.c
++++ b/net/9p/trans_common.c
+@@ -9,16 +9,16 @@
+ #include "trans_common.h"
  
- 		map_len = dax_direct_access(dax_dev, pgoff, PHYS_PFN(size),
- 				DAX_ACCESS, &kaddr, NULL);
--		if (map_len == -EIO && iov_iter_rw(iter) == WRITE) {
-+		if (map_len == -EIO && write) {
- 			map_len = dax_direct_access(dax_dev, pgoff,
- 					PHYS_PFN(size), DAX_RECOVERY_WRITE,
- 					&kaddr, NULL);
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index a56099470185..3095091af680 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -587,7 +587,7 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	 * Revert iter to a state corresponding to that as some callers (such
- 	 * as the splice code) rely on it.
+ /**
+- * p9_release_pages - Release pages after the transaction.
++ * p9_unpin_pages - Unpin pages after the transaction.
+  * @pages: array of pages to be put
+  * @nr_pages: size of array
+  */
+-void p9_release_pages(struct page **pages, int nr_pages)
++void p9_unpin_pages(struct page **pages, int nr_pages)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < nr_pages; i++)
+ 		if (pages[i])
+-			put_page(pages[i]);
++			unpin_user_page(pages[i]);
+ }
+-EXPORT_SYMBOL(p9_release_pages);
++EXPORT_SYMBOL(p9_unpin_pages);
+diff --git a/net/9p/trans_common.h b/net/9p/trans_common.h
+index 32134db6abf3..fd94c48aba5b 100644
+--- a/net/9p/trans_common.h
++++ b/net/9p/trans_common.h
+@@ -4,4 +4,4 @@
+  * Author Venkateswararao Jujjuri <jvrao@linux.vnet.ibm.com>
+  */
+ 
+-void p9_release_pages(struct page **pages, int nr_pages);
++void p9_unpin_pages(struct page **pages, int nr_pages);
+diff --git a/net/9p/trans_virtio.c b/net/9p/trans_virtio.c
+index 3c27ffb781e3..93569de2bdba 100644
+--- a/net/9p/trans_virtio.c
++++ b/net/9p/trans_virtio.c
+@@ -310,71 +310,35 @@ static int p9_get_mapped_pages(struct virtio_chan *chan,
+ 			       struct iov_iter *data,
+ 			       int count,
+ 			       size_t *offs,
+-			       int *need_drop)
++			       bool *need_unpin,
++			       iov_iter_extraction_t extraction_flags)
+ {
+ 	int nr_pages;
+ 	int err;
++	int n;
+ 
+ 	if (!iov_iter_count(data))
+ 		return 0;
+ 
+-	if (!iov_iter_is_kvec(data)) {
+-		int n;
+-		/*
+-		 * We allow only p9_max_pages pinned. We wait for the
+-		 * Other zc request to finish here
+-		 */
+-		if (atomic_read(&vp_pinned) >= chan->p9_max_pages) {
+-			err = wait_event_killable(vp_wq,
+-			      (atomic_read(&vp_pinned) < chan->p9_max_pages));
+-			if (err == -ERESTARTSYS)
+-				return err;
+-		}
+-		n = iov_iter_get_pages_alloc2(data, pages, count, offs);
+-		if (n < 0)
+-			return n;
+-		*need_drop = 1;
+-		nr_pages = DIV_ROUND_UP(n + *offs, PAGE_SIZE);
+-		atomic_add(nr_pages, &vp_pinned);
+-		return n;
+-	} else {
+-		/* kernel buffer, no need to pin pages */
+-		int index;
+-		size_t len;
+-		void *p;
+-
+-		/* we'd already checked that it's non-empty */
+-		while (1) {
+-			len = iov_iter_single_seg_count(data);
+-			if (likely(len)) {
+-				p = data->kvec->iov_base + data->iov_offset;
+-				break;
+-			}
+-			iov_iter_advance(data, 0);
+-		}
+-		if (len > count)
+-			len = count;
+-
+-		nr_pages = DIV_ROUND_UP((unsigned long)p + len, PAGE_SIZE) -
+-			   (unsigned long)p / PAGE_SIZE;
+-
+-		*pages = kmalloc_array(nr_pages, sizeof(struct page *),
+-				       GFP_NOFS);
+-		if (!*pages)
+-			return -ENOMEM;
+-
+-		*need_drop = 0;
+-		p -= (*offs = offset_in_page(p));
+-		for (index = 0; index < nr_pages; index++) {
+-			if (is_vmalloc_addr(p))
+-				(*pages)[index] = vmalloc_to_page(p);
+-			else
+-				(*pages)[index] = kmap_to_page(p);
+-			p += PAGE_SIZE;
+-		}
+-		iov_iter_advance(data, len);
+-		return len;
++	/*
++	 * We allow only p9_max_pages pinned. We wait for the
++	 * Other zc request to finish here
++	 */
++	if (atomic_read(&vp_pinned) >= chan->p9_max_pages) {
++		err = wait_event_killable(vp_wq,
++					  (atomic_read(&vp_pinned) < chan->p9_max_pages));
++		if (err == -ERESTARTSYS)
++			return err;
+ 	}
++
++	n = iov_iter_extract_pages(data, pages, count, INT_MAX,
++				   extraction_flags, offs);
++	if (n < 0)
++		return n;
++	*need_unpin = iov_iter_extract_will_pin(data);
++	nr_pages = DIV_ROUND_UP(n + *offs, PAGE_SIZE);
++	atomic_add(nr_pages, &vp_pinned);
++	return n;
+ }
+ 
+ static void handle_rerror(struct p9_req_t *req, int in_hdr_len,
+@@ -429,7 +393,7 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
+ 	struct virtio_chan *chan = client->trans;
+ 	struct scatterlist *sgs[4];
+ 	size_t offs;
+-	int need_drop = 0;
++	bool need_unpin;
+ 	int kicked = 0;
+ 
+ 	p9_debug(P9_DEBUG_TRANS, "virtio request\n");
+@@ -437,7 +401,8 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
+ 	if (uodata) {
+ 		__le32 sz;
+ 		int n = p9_get_mapped_pages(chan, &out_pages, uodata,
+-					    outlen, &offs, &need_drop);
++					    outlen, &offs, &need_unpin,
++					    WRITE_FROM_ITER);
+ 		if (n < 0) {
+ 			err = n;
+ 			goto err_out;
+@@ -456,7 +421,8 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
+ 		memcpy(&req->tc.sdata[0], &sz, sizeof(sz));
+ 	} else if (uidata) {
+ 		int n = p9_get_mapped_pages(chan, &in_pages, uidata,
+-					    inlen, &offs, &need_drop);
++					    inlen, &offs, &need_unpin,
++					    READ_INTO_ITER);
+ 		if (n < 0) {
+ 			err = n;
+ 			goto err_out;
+@@ -542,13 +508,13 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
+ 	 * Non kernel buffers are pinned, unpin them
  	 */
--	if (iov_iter_rw(iter) == READ && iomi.pos >= dio->i_size)
-+	if (!(iomi.flags & IOMAP_WRITE) && iomi.pos >= dio->i_size)
- 		iov_iter_revert(iter, iomi.pos - dio->i_size);
- 
- 	if (ret == -EFAULT && dio->size && (dio_flags & IOMAP_DIO_PARTIAL)) {
+ err_out:
+-	if (need_drop) {
++	if (need_unpin) {
+ 		if (in_pages) {
+-			p9_release_pages(in_pages, in_nr_pages);
++			p9_unpin_pages(in_pages, in_nr_pages);
+ 			atomic_sub(in_nr_pages, &vp_pinned);
+ 		}
+ 		if (out_pages) {
+-			p9_release_pages(out_pages, out_nr_pages);
++			p9_unpin_pages(out_pages, out_nr_pages);
+ 			atomic_sub(out_nr_pages, &vp_pinned);
+ 		}
+ 		/* wakeup anybody waiting for slots to pin pages */
 
