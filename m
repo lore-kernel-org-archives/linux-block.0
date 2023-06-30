@@ -2,338 +2,180 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 283FEEB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 10:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 486B5C001B0
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 12:02:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232816AbjF3Kg7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jun 2023 06:36:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36486 "EHLO
+        id S232948AbjF3MCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jun 2023 08:02:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232815AbjF3KgM (ORCPT
+        with ESMTP id S232924AbjF3MCs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2023 06:36:12 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E834208
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 03:35:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1688121324; x=1719657324;
-  h=mime-version:date:from:to:subject:in-reply-to:references:
-   message-id:content-transfer-encoding;
-  bh=Rwl8bqN+21VTh+5p6WqwK9MwtCNb9m3eC9zs925Wdiw=;
-  b=o6FcPyEFf2d1DqjBuYlsgxMtK4r/NC55b6Wya1TSXBodvbYggK/+R1/b
-   BBuKoyTE0bFCXP5AWE3Q9yK9+d4q00y57Bxs0RMKqxKcpqmCN1CtHjIrr
-   QSuL15606l8iUaIUeO9Aff8aJ5s71pTxGWA5PnxROzo/J5YuI2Ccml0Qn
-   0ZZRqrI0NoggPF4B4LJW8BEM1y+xkN/fSEOoUOg+21NWgE+sv4xkuL5av
-   RDaPUfsKbNrDqOaElTvZ/UNS7NnVywGSjMpmYWGhOoEZP2e+gqngjpXtZ
-   ++q8wvdvJ/i2kaalpDekCamf5NbqKBbzRq1PCLectVj63aVJjB19DDzb+
-   g==;
-X-IronPort-AV: E=Sophos;i="6.01,170,1684771200"; 
-   d="scan'208";a="235292497"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Jun 2023 18:35:23 +0800
-IronPort-SDR: 7CNB4VR+/d4pKVGpRrl6BQ0JqcwB8UdrpsK93Nd740hde5n9lWgWKKOSil8fRrfWPzA2uMa0+v
- iz2ckThgSf6WqUE2cG0lOGkjE2xLfM+P3kEY81DMc4uJclvK7AFqe32EWR45SVsKsXu97gxJuX
- D/uFbBMYkua1X8vDV9Pdl6cMdLkGNCZjEIMzyZJx27VYOEI8x4/32m6X+U5BMPOzJzoawvJf+g
- H2+LVFWfTOKBzMsfHd5AP2/bZs1yG5JzGnHviwkz5xPl+NUlBDUZvCpQZ1+HTO3DnSUAS5rAe2
- U+4=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jun 2023 02:49:38 -0700
-IronPort-SDR: ODs331EEE2MPHDAfjNTYuuseGbewVg3i24dyTaUH+ZzMpxYqcZOWKrTpT6Zwym4FGQ5ZVX5wir
- d9RYN/IBHrTujJ9Mf+ajF36jV6q4rphVFlnqFrWtWyEnSExIaVrgRPD82JQIb/JPEQLPPJ9VmN
- qaXddzmV71bD1RZK0SB6JSi3Db/+AcZhD84y8ht6gDU4OWprjspjJUE5ciJucHU/Qh74lRNBun
- 4hD5or6ora/TkRPfVneYjPpfi3CKEJzKCTL21LDyH3Gp9Bv7tYA2jfBmZRPMd45VK+pzoTqRWh
- aBY=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jun 2023 03:35:23 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4QssCZ4hlZz1RtVt
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 03:35:22 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :message-id:user-agent:references:in-reply-to:subject:to:from
-        :date:mime-version; s=dkim; t=1688121307; x=1690713308; bh=Rwl8b
-        qN+21VTh+5p6WqwK9MwtCNb9m3eC9zs925Wdiw=; b=AVcq8nk3xpbH9CJUOEtpY
-        Vz9m69brovLX9N6Nc0T4Addtc7podn7j54MVEKRWohCH2JC1kCv7fVdXRAnTf385
-        Ou1+YcdrjOAM17ng161TviXUNRjaXHWdLDPG2R4iPbnzRxj+BZZHsePXbCx48UR5
-        8+5AA9NZ9n5t+5e9QCvmTJ2DtKJ1plwTSLgllHX2mOGwzJZgRg4OriAcDaGjRszN
-        9j+nsleestCxLi8dJylXRfQPwl4UzGS6LdCIq/s99ck4ywWTxMIiFAvDarh7u5TP
-        ZdcAqpMV1JbP9Wy3E+cERXUFu8aMCrYETPQZ37k8VtQr8dwpSAr7z7GnSaZl9x32
-        w==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Na2CrUwE7biQ for <linux-block@vger.kernel.org>;
-        Fri, 30 Jun 2023 03:35:07 -0700 (PDT)
-Received: from localhost (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4QssCH1gGCz1RtVm;
-        Fri, 30 Jun 2023 03:35:07 -0700 (PDT)
+        Fri, 30 Jun 2023 08:02:48 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 022221FFD
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 05:02:44 -0700 (PDT)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230630120241epoutp0281966a4ade58cf89b55600751105181d~tbin4p0DA2406924069epoutp02l
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 12:02:41 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230630120241epoutp0281966a4ade58cf89b55600751105181d~tbin4p0DA2406924069epoutp02l
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1688126561;
+        bh=zZubjPAKe4tJnP79rh7RaaQDYvtmoDCtXsGDKlJ0uFY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=mfshBycpvotrExq2m0BfCgxTNRVu78AGdZbgkTTKze+GZKQOwRURXGW1hTGfKUrZe
+         zm2oJZqdd/yTj4QLaCbp+j7ZDivfd3I/TcqCAcRAxDI2Pqkk069kLOF0ncu3zjqEXA
+         4hfB2hIz4tFIAr7mfvYYzrMWKwanER58x5e+432M=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20230630120240epcas5p3d08ca980d5065aa551daa2fd10006566~tbim_nHMD0126501265epcas5p3B;
+        Fri, 30 Jun 2023 12:02:40 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4Qsv8H1L2xz4x9Pt; Fri, 30 Jun
+        2023 12:02:39 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4F.E6.06099.F54CE946; Fri, 30 Jun 2023 21:02:39 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230630112545epcas5p1746ef2fc966c04b3a8163e0dff21fb4b~tbCXgpz0S0278302783epcas5p18;
+        Fri, 30 Jun 2023 11:25:45 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230630112545epsmtrp100ac18072070bde82f83c688a8d35218~tbCXeO08n3247532475epsmtrp1R;
+        Fri, 30 Jun 2023 11:25:45 +0000 (GMT)
+X-AuditID: b6c32a4b-cafff700000017d3-cb-649ec45f75e7
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        01.DC.34491.9BBBE946; Fri, 30 Jun 2023 20:25:45 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230630112540epsmtip25264414e861bfa35bbcaec8407f2f7ff~tbCTNRWsE1020410204epsmtip2Y;
+        Fri, 30 Jun 2023 11:25:40 +0000 (GMT)
+Date:   Fri, 30 Jun 2023 16:52:27 +0530
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        willy@infradead.org, hare@suse.de, djwong@kernel.org,
+        bvanassche@acm.org, dlemoal@kernel.org, nitheshshetty@gmail.com,
+        gost.dev@samsung.com, Vincent Fu <vincent.fu@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v13 3/9] block: add emulation for copy
+Message-ID: <20230630112227.6ctls2vt4cy7vbxo@green245>
 MIME-Version: 1.0
-Date:   Fri, 30 Jun 2023 16:05:07 +0530
-From:   aravind.ramesh@opensource.wdc.com
-To:     Hans.Holmberg@wdc.com, Aravind.Ramesh@wdc.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, hch@infradead.org,
-        Matias.Bjorling@wdc.com, a.hindborg@samsung.com,
-        linux-kernel@vger.kernel.org, dlemoal@kernel.org,
-        gost.dev@samsung.com, minwoo.im.dev@gmail.com, ming.lei@redhat.com
-Subject: Re: [PATCH v4 4/4] ublk: add zone append
-In-Reply-To: <39701CAF-7AE2-4C83-A4DD-929A0A4FB8F0@wdc.com>
-References: <20230628190649.11233-1-nmi@metaspace.dk>
- <20230628190649.11233-5-nmi@metaspace.dk>
- <39701CAF-7AE2-4C83-A4DD-929A0A4FB8F0@wdc.com>
-User-Agent: Roundcube Webmail
-Message-ID: <76a4ad50bb79acfe89e7d5d3a354d061@opensource.wdc.com>
-X-Sender: aravind.ramesh@opensource.wdc.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <ZJ1B1k0KifZrGRIp@ovpn-8-26.pek2.redhat.com>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA02TbUxTZxTHee69vS3EumuR+PCikOKyAQGpQPdAYAo6d5fuAwl+GQnild5R
+        BNqmLbJhIqDAFAaoDDIrVFQcbwoIbOF1smIFMYwZBgisDLWgkw0QAnbjZWspLH77nZf/eZ5z
+        Tg4PFzRxXXgJcg2rkjNJQtKB+KHby8s39r5O6n+nioPq+x7g6OzFNRzVGgtJNNO9AFDJ/N84
+        MnV9BdCgaTuavHcAdc5e5aDRrlYMddy4jKHqWgOGLuuHAZoa0mKoc8wHXc+pIFBH50MCDbaV
+        kujad1NclDfSQqLKnnUM6YvOYajFlAlQ3cwcgXrHXNHzvPMADaz1cNCKuZQ86EYP/iqhW7VG
+        Lj0wcZegm6q86cH+FLqx5gJJN1Wk0+2jGSR9s6CIQ+efmyXp11NjBD334xBJFzTXALrp0Wl6
+        sXEP3Wj6C4ukohNDZSwjZVUerDxOIU2Qx4cJJVGxh2KDxP4iX1Ew+kDoIWeS2TDh4U8jfY8k
+        JFmmI/Q4xSSlWFyRjFot3PdhqEqRomE9ZAq1JkzIKqVJykCln5pJVqfI4/3krCZE5O+/P8iS
+        eDxRtpRXzlW2v/NF5YtpbgaY3pYL7HmQCoTmxwOcXODAE1DtAPYuPN40FgBcLMzg2oxlAK/U
+        FHC2JOONGYQt0AngvZf6jYCAmgbQ3MO3MkG9CyuHG7BcwOORlA989C/P6t5JCaHRWLtRFKca
+        SGhu1QFrwJEKgf0tTzeYT4mh4Y6JtPEO+PCKibCyPRUMl1oLNnKcKDf47a0l3FoIUhP2cNE4
+        RNp+dxhWzHUDGzvCVz3NXBu7wD8KczY5FVZ/U0XaxFkAake0m4IDMLuvELcyTslgaVfOZtHd
+        sLivDrP5t8P8FRNm8/Nhi26LPeHt+vLNfGc4/CaTtHYPKRr+PHjINq1ZAMuyzOAicNe+1Zz2
+        redsHAIvzJ/laC1ynHKFles8G3rB+rZ95YBTA5xZpTo5nlUHKQPkbOr/G49TJDeCjevxlrSA
+        Z5PzfnqA8YAeQB4u3Mkf//OqVMCXMl+msSpFrColiVXrQZBlWZdwF6c4heX85JpYUWCwf6BY
+        LA4MDhCLhLv4M9llUgEVz2jYRJZVsqotHcazd8nANA4nRj0V2n9eP2HuS4fpQ8y17OcnigPS
+        QrcB2ctaQ0Xd57WrU8fOdBuIVrl+Ojy8Yeyzto71sdB6CbM3Ji0r3e6ozAeMjTwZdwrnJEDt
+        s5xbxE9NveHQdfrosEi3WMyPaCgZmpw9VimOOZ3/0asju93PVHut+N3NNK7Z0+k6Ea7LFGZH
+        /fbidqFZEfsLmHVE73F6eKsRhvdvzpRN1msT4DixMEDWudn9nvwxJ0CSejI6Ke+kU9GNXMpw
+        3TPMrrtr//n2Zuc9gqf9S4IYgelg+C6qaHnCveT74xE7HpDmiYBTfsuhzXtDRJ9wJZdWdctz
+        jYOi6PT5KMPMG8HXzgNCQi1jRN64Ss38B0n6FerGBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKIsWRmVeSWpSXmKPExsWy7bCSvO7O3fNSDC7d4bBYf+oYs0XThL/M
+        Fqvv9rNZvD78idFi2oefzBZPDrQzWlx+wmfxYL+9xd53s1ktbh7YyWSxZ9EkJouVq48yWUw6
+        dI3R4unVWUwWe29pWyxsW8JisWfvSRaLy7vmsFnMX/aU3aL7+g42i+XH/zFZHJrczGSx40kj
+        o8W61+9ZLE7ckrZ43N3BaHH+73FWi98/5rA5yHhcvuLtsXPWXXaP8/c2snhsXqHlcflsqcem
+        VZ1sHpuX1HvsvtnA5rG4bzKrR2/zOzaPj09vsXi833eVzaNvyypGj82nqz0+b5Lz2PTkLVOA
+        QBSXTUpqTmZZapG+XQJXxvr+e2wFb3kqZu16ztrAuImri5GTQ0LAROL2pgaWLkYuDiGB3YwS
+        Ddu+skEkJCWW/T3CDGELS6z895wdougJo0THuTlgRSwCqhLLr21g6mLk4GAT0JY4/Z8DJCwi
+        oCRx9+5qsHpmgU1sEn/PvWQESQgLWEmc3fEQzOYVMJM4uvYJG8TQd4wSVy41MEEkBCVOznzC
+        AmIzAxXN2/yQGWQBs4C0xPJ/YAs4BSwlvu7sA5sjKiAjMWPpV+YJjIKzkHTPQtI9C6F7ASPz
+        KkbJ1ILi3PTcYsMCw7zUcr3ixNzi0rx0veT83E2M4JShpbmDcfuqD3qHGJk4GA8xSnAwK4nw
+        3n4zO0WINyWxsiq1KD++qDQntfgQozQHi5I4r/iL3hQhgfTEktTs1NSC1CKYLBMHp1QDk7rf
+        o41LXDk7Q6xd7wi3M/Qv4tP0F2fSWcqmyn15Q7P23BkLLn7RWj5p447Ne5/fudDZ+Oxcy8wO
+        g9WNRcznxJeKHvFuuJj113Ll+tIviwL8Vdv3h2+6Wx4S3tAQt/Oq9GUR48nXfjy7sU/deMNN
+        NiWXGl+uqTIT4v5vW8QcrTaxJ4UvvLL5+i1+PqWNhkEzlXfdE/T98ohLVHaGx+xzpnOb5Mv4
+        1Bh2q1YdUgv6/+bXxJPHuW9PE3j/QfKft/JjbW3Fh4G8TtyPFgT1KX4SdJHuEGvhMhLT0/l0
+        ZydPvNA1tetW96z8Z6jUa6fmH3Sc/mcpy+ntC1xqvR7t+Op+1Obws8wE1luBaq//lU6yV2Ip
+        zkg01GIuKk4EAIi1iPiIAwAA
+X-CMS-MailID: 20230630112545epcas5p1746ef2fc966c04b3a8163e0dff21fb4b
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----zUAFM1k0MeHfMyR4CoO9aTysOnQiUYGsRe6BfqD0GhfqR3ws=_26e0b_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230627184020epcas5p13fdcea52edead5ffa3fae444f923439e
+References: <20230627183629.26571-1-nj.shetty@samsung.com>
+        <CGME20230627184020epcas5p13fdcea52edead5ffa3fae444f923439e@epcas5p1.samsung.com>
+        <20230627183629.26571-4-nj.shetty@samsung.com>
+        <ZJ1B1k0KifZrGRIp@ovpn-8-26.pek2.redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> From: Andreas Hindborg <a.hindborg@samsung.com 
-> <mailto:a.hindborg@samsung.com>>
-> 
-> 
-> Add zone append feature to ublk. This feature uses the `addr` field of 
-> `struct
+------zUAFM1k0MeHfMyR4CoO9aTysOnQiUYGsRe6BfqD0GhfqR3ws=_26e0b_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-checkpatch.pl warns on the keeping the line within 75 characters.
-WARNING: Possible unwrapped commit description (prefer a maximum 75 
-chars per line)
+On 23/06/29 04:33PM, Ming Lei wrote:
+>Hi Nitesh,
+>
+>On Wed, Jun 28, 2023 at 12:06:17AM +0530, Nitesh Shetty wrote:
+>> For the devices which does not support copy, copy emulation is added.
+>> It is required for in-kernel users like fabrics, where file descriptor is
+>
+>I can understand copy command does help for FS GC and fabrics storages,
+>but still not very clear why copy emulation is needed for kernel users,
+>is it just for covering both copy command and emulation in single
+>interface? Or other purposes?
+>
+>I'd suggest to add more words about in-kernel users of copy emulation.
+>
 
-> ublksrv_io_cmd`. Therefore ublk must be used with the user copy
-> feature (UBLK_F_USER_COPY) for zone append to be available. Without 
-> this
-> feature, ublk will fail zone append requests.
-> 
-> 
-> Suggested-by: Ming Lei <ming.lei@redhat.com 
-> <mailto:ming.lei@redhat.com>>
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com
-> <mailto:a.hindborg@samsung.com>>
-> ---
-> drivers/block/ublk_drv-zoned.c | 11 +++++++++
-> drivers/block/ublk_drv.c | 43 ++++++++++++++++++++++++++++++----
-> drivers/block/ublk_drv.h | 1 +
-> include/uapi/linux/ublk_cmd.h | 3 ++-
-> 4 files changed, 52 insertions(+), 6 deletions(-)
-> 
-> 
-> diff --git a/drivers/block/ublk_drv-zoned.c 
-> b/drivers/block/ublk_drv-zoned.c
-> index ea86bf4b3681..007e8fc7ff25 100644
-> --- a/drivers/block/ublk_drv-zoned.c
-> +++ b/drivers/block/ublk_drv-zoned.c
-> @@ -16,6 +16,16 @@ void ublk_set_nr_zones(struct ublk_device *ub)
-> ub->ub_disk->nr_zones = p->dev_sectors / p->chunk_sectors;
-> }
-> 
-> 
-> +int ublk_dev_param_zoned_validate(const struct ublk_device *ub)
-> +{
-> + const struct ublk_param_zoned *p = &ub->params.zoned;
-> +
-> + if (! p->max_zone_append_sectors)
+As you mentioned above, we need a single interface for covering both
+copy command and emulation.
+This is needed in fabrics cases, as we expose any non copy command
+supported target device also as copy capable, so we fallback to emulation
+once we recieve copy from host/initator.
+Agreed, we will add more description to covey the same info.
 
-checkpatch.pl errors out here
-ERROR: space prohibited after that '!' (ctx:BxW)
-if (!p->max_zone_append_sectors)
+>> not available and hence they can't use copy_file_range.
+>> Copy-emulation is implemented by reading from source into memory and
+>> writing to the corresponding destination asynchronously.
+>> Also emulation is used, if copy offload fails or partially completes.
+>
+>Per my understanding, this kind of emulation may not be as efficient
+>as doing it in userspace(two linked io_uring SQEs, read & write with
+>shared buffer). But it is fine if there are real in-kernel such users.
+>
 
-> + return -EINVAL;
-> +
-> + return 0;
-> +}
-> +
-> void ublk_dev_param_zoned_apply(struct ublk_device *ub)
-> {
-> const struct ublk_param_zoned *p = &ub->params.zoned;
-> @@ -23,6 +33,7 @@ void ublk_dev_param_zoned_apply(struct ublk_device 
-> *ub)
-> if (ub->dev_info.flags & UBLK_F_ZONED) {
-> disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
-> disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
-> + blk_queue_max_zone_append_sectors(ub->ub_disk->queue,
-> p->max_zone_append_sectors);
-> }
-> }
-> 
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 88fa39853c61..6a949669b47e 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -107,6 +107,11 @@ struct ublk_uring_cmd_pdu {
-> */
-> #define UBLK_IO_FLAG_NEED_GET_DATA 0x08
-> 
-> 
-> +/*
-> + * Set when IO is Zone Append
-> + */
-> +#define UBLK_IO_FLAG_ZONE_APPEND 0x10
-> +
-> struct ublk_io {
-> /* userspace buffer address from io cmd */
-> __u64 addr;
-> @@ -230,6 +235,8 @@ static void ublk_dev_param_discard_apply(struct
-> ublk_device *ub)
-> 
-> 
-> static int ublk_validate_params(const struct ublk_device *ub)
-> {
-> + int ret = 0;
-> +
-> /* basic param is the only one which must be set */
-> if (ub->params.types & UBLK_PARAM_TYPE_BASIC) {
-> const struct ublk_param_basic *p = &ub->params.basic;
-> @@ -260,6 +267,13 @@ static int ublk_validate_params(const struct
-> ublk_device *ub)
-> if (ub->params.types & UBLK_PARAM_TYPE_DEVT)
-> return -EINVAL;
-> 
-> 
-> + if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-> + (ub->params.types & UBLK_PARAM_TYPE_ZONED)) {
-> + ret = ublk_dev_param_zoned_validate(ub);
-> + if (ret)
-> + return ret;
-> + }
-> +
-> return 0;
-> }
-> 
-> 
-> @@ -690,6 +704,11 @@ static blk_status_t ublk_setup_iod(struct
-> ublk_queue *ubq, struct request *req)
-> return BLK_STS_IOERR;
-> }
-> case REQ_OP_ZONE_APPEND:
-> + if (!(ubq->dev->dev_info.flags & UBLK_F_USER_COPY))
-> + return BLK_STS_IOERR;
-> + ublk_op = UBLK_IO_OP_ZONE_APPEND;
-> + io->flags |= UBLK_IO_FLAG_ZONE_APPEND;
-> + break;
-> case REQ_OP_ZONE_RESET_ALL:
-> case REQ_OP_DRV_OUT:
-> /* We do not support zone append or reset_all yet */
-> @@ -1112,6 +1131,12 @@ static void ublk_commit_completion(struct
-> ublk_device *ub,
-> /* find the io request and complete */
-> req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
-> 
-> 
-> + if (IS_ENABLED(CONFIG_BLK_DEV_ZONED)) {
-> + if (io->flags & UBLK_IO_FLAG_ZONE_APPEND)
-> + req->__sector = ub_cmd->addr;
-> + io->flags &= ~UBLK_IO_FLAG_ZONE_APPEND;
-> + }
-> +
-> if (req && likely(!blk_should_fake_timeout(req->q)))
-> ublk_put_req_ref(ubq, req);
-> }
-> @@ -1411,7 +1436,8 @@ static int __ublk_ch_uring_cmd(struct 
-> io_uring_cmd *cmd,
-> ^ (_IOC_NR(cmd_op) == UBLK_IO_NEED_GET_DATA))
-> goto out;
-> 
-> 
-> - if (ublk_support_user_copy(ubq) && ub_cmd->addr) {
-> + if (ublk_support_user_copy(ubq) &&
-> + !(io->flags & UBLK_IO_FLAG_ZONE_APPEND) && ub_cmd->addr) {
-> ret = -EINVAL;
-> goto out;
-> }
-> @@ -1534,11 +1560,14 @@ static inline bool ublk_check_ubuf_dir(const
-> struct request *req,
-> int ubuf_dir)
-> {
-> /* copy ubuf to request pages */
-> - if (req_op(req) == REQ_OP_READ && ubuf_dir == ITER_SOURCE)
-> + if ((req_op(req) == REQ_OP_READ || req_op(req) == REQ_OP_DRV_IN) &&
-> + ubuf_dir == ITER_SOURCE)
-> return true;
-> 
-> 
-> /* copy request pages to ubuf */
-> - if (req_op(req) == REQ_OP_WRITE && ubuf_dir == ITER_DEST)
-> + if ((req_op(req) == REQ_OP_WRITE ||
-> + req_op(req) == REQ_OP_ZONE_APPEND) &&
-> + ubuf_dir == ITER_DEST)
-> return true;
-> 
-> 
-> return false;
-> @@ -1867,6 +1896,12 @@ static int ublk_ctrl_start_dev(struct
-> ublk_device *ub, struct io_uring_cmd *cmd)
-> ub->dev_info.ublksrv_pid = ublksrv_pid;
-> ub->ub_disk = disk;
-> 
-> 
-> + ub->dev_info.state = UBLK_S_DEV_LIVE;
-> + if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-> + ub->dev_info.flags & UBLK_F_ZONED) {
-> + disk_set_zoned(disk, BLK_ZONED_HM);
-> + }
-> +
-> ret = ublk_apply_params(ub);
-> if (ret)
-> goto out_put_disk;
-> @@ -1877,7 +1912,6 @@ static int ublk_ctrl_start_dev(struct
-> ublk_device *ub, struct io_uring_cmd *cmd)
-> 
-> 
-> if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-> ub->dev_info.flags & UBLK_F_ZONED) {
-> - disk_set_zoned(disk, BLK_ZONED_HM);
-> blk_queue_required_elevator_features(disk->queue, 
-> ELEVATOR_F_ZBD_SEQ_WRITE);
-> ret = ublk_revalidate_disk_zones(disk);
-> if (ret)
-> @@ -1885,7 +1919,6 @@ static int ublk_ctrl_start_dev(struct
-> ublk_device *ub, struct io_uring_cmd *cmd)
-> }
-> 
-> 
-> get_device(&ub->cdev_dev);
-> - ub->dev_info.state = UBLK_S_DEV_LIVE;
-> ret = add_disk(disk);
-> if (ret) {
-> /*
-> diff --git a/drivers/block/ublk_drv.h b/drivers/block/ublk_drv.h
-> index 7242430fd6b9..f55e1c25531d 100644
-> --- a/drivers/block/ublk_drv.h
-> +++ b/drivers/block/ublk_drv.h
-> @@ -56,6 +56,7 @@ struct ublk_rq_data {
-> };
-> 
-> 
-> void ublk_set_nr_zones(struct ublk_device *ub);
-> +int ublk_dev_param_zoned_validate(const struct ublk_device *ub);
-> void ublk_dev_param_zoned_apply(struct ublk_device *ub);
-> int ublk_revalidate_disk_zones(struct gendisk *disk);
-> 
-> 
-> diff --git a/include/uapi/linux/ublk_cmd.h 
-> b/include/uapi/linux/ublk_cmd.h
-> index 436525afffe8..4b6ad0b28598 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -351,7 +351,8 @@ struct ublk_param_devt {
-> struct ublk_param_zoned {
-> __u32 max_open_zones;
-> __u32 max_active_zones;
-> - __u8 reserved[24];
-> + __u32 max_zone_append_sectors;
-> + __u8 reserved[20];
-> };
-> 
-> 
-> struct ublk_params {
+We do have plans for uring based copy interface in next phase,
+once curent series is merged.
+With current design we really see the advantage of emulation in fabrics case.
 
-Regards,
-Aravind
+Thank you,
+Nitesh Shetty
+
+------zUAFM1k0MeHfMyR4CoO9aTysOnQiUYGsRe6BfqD0GhfqR3ws=_26e0b_
+Content-Type: text/plain; charset="utf-8"
+
+
+------zUAFM1k0MeHfMyR4CoO9aTysOnQiUYGsRe6BfqD0GhfqR3ws=_26e0b_--
