@@ -2,47 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0AFC0015E
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 15:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CC2EB64DA
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 15:39:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232800AbjF3P2k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jun 2023 11:28:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43146 "EHLO
+        id S232599AbjF3Pji (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jun 2023 11:39:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233025AbjF3P1J (ORCPT
+        with ESMTP id S232348AbjF3Pjg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2023 11:27:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31C823C29
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 08:25:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688138750;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A03JyOO/f7iAqHJBZB+sdm2rxbR0PVujtNmj3kIoBeA=;
-        b=a4IMUGcQDaTPJ9zOPGoHuHcmSl+zGP35moMmgkD3Ghd5F9eroZHIWJdnYNcAuREU57dlat
-        Mseci6OZ1CPEx1PYF9misU/GB+OIb4gUN6AJooXN640nJGjiBT2MFzA/TyISn3UAiwp/cg
-        YKQDZ2kDxaV1/hCVmcsd/n3MXLfcrfE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-601-N6FLg4pXOKyVIzUdiDErog-1; Fri, 30 Jun 2023 11:25:47 -0400
-X-MC-Unique: N6FLg4pXOKyVIzUdiDErog-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2467A185A793;
-        Fri, 30 Jun 2023 15:25:45 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 187E348FB01;
-        Fri, 30 Jun 2023 15:25:43 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Fri, 30 Jun 2023 11:39:36 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78BF2E5C
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 08:39:32 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-34577a22c7cso2132725ab.0
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 08:39:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1688139572; x=1690731572;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GW4hZL9mt4ivrUPperLWHI1+1eLqsC5B64iKsS7Hy+Q=;
+        b=zaYlwpyqR1r+ylRi1/dLp+c0bQERixaHgbimhfhmJNvExYP2eGOgu8XnPw9vM8Hpjs
+         R/UcmdlbZLrh1XM0pnbfSojW6rollvwv0+PNPtVD8UEK5ob7zqGHxllt9cyX7ATSVFVF
+         RXMBYj155B6MqGnnx1zSj/T5+9HhABeQco03tqlI0QEPXLVNyoLvMc/sOEDIIRLSFN7k
+         I6WIAwX+qTU9JsijQBmlKOHfcbxMihndDF9oXu//eGUGLNhp+dwHH+8GlXY+Q+HHaI3z
+         lc7mPJnjoLPyyjLVPHXIsq+ixQj9M3Ee0ouIuB15+t+PBxK0nJlW30ioMK8NB12pwllH
+         RT8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688139572; x=1690731572;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GW4hZL9mt4ivrUPperLWHI1+1eLqsC5B64iKsS7Hy+Q=;
+        b=Nyp9E8ZNdOfczI3Pt6/h0AqAC4pA1dIDCXM857wLdJ+iZFwpATpPugwxbWLHK2sDHN
+         sbV7GREEAjUbQuTI34bK603HuNLpon4Me+l6xWfQIJYslo2tHLBJyEblaGSfyTSUepdp
+         xO1sbMe2Ic7eEQmZo7KC2wdm1iFoL1zHL7qpEy1INCYDgxjW4MeosZAhRnj6Ck5JChSp
+         jq4axhS+fo51pwD/NrgQi3kYtXETjSS5+oFmI01TZveu3417kQzl1JYwMULxgEz+1fbi
+         5STKvnxCOR6FZSaElMWCDHNyn+A0mDLZe3Ztglbd4Amn+f+lNq8Rd+Wsk2PGnGwef2FC
+         KFTw==
+X-Gm-Message-State: ABy/qLZ3o64w3w0AqKICksw1gn8f1kpxDxR4kkvRMUYG/NJjCQlMOBBK
+        qyaL2Ce5g2LaEUe2QvhLYVhpiA==
+X-Google-Smtp-Source: APBJJlGx0U82VVFMbma5VnBcP6dGqi3j+tVO+N0aGevcZzzCTGDk10Waj4U7AeCx8trU4YD9mdXzsQ==
+X-Received: by 2002:a05:6e02:2195:b0:345:ad39:ff3 with SMTP id j21-20020a056e02219500b00345ad390ff3mr3977556ila.3.1688139571782;
+        Fri, 30 Jun 2023 08:39:31 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id c18-20020a92c8d2000000b00345e4c4f53asm633703ilq.40.2023.06.30.08.39.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Jun 2023 08:39:31 -0700 (PDT)
+Message-ID: <36eda01e-502e-b93d-9098-77ed5a16f33c@kernel.dk>
+Date:   Fri, 30 Jun 2023 09:39:30 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [RFC PATCH 03/11] vfs: Use init_kiocb() to initialise new IOCBs
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
@@ -53,43 +71,65 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
         Christian Brauner <christian@brauner.io>
-Subject: [RFC PATCH 06/11] iov_iter: Use op_is_write() rather than iterator direction
-Date:   Fri, 30 Jun 2023 16:25:19 +0100
-Message-ID: <20230630152524.661208-7-dhowells@redhat.com>
-In-Reply-To: <20230630152524.661208-1-dhowells@redhat.com>
 References: <20230630152524.661208-1-dhowells@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+ <20230630152524.661208-4-dhowells@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230630152524.661208-4-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If a request struct is available, use op_is_write() instead of the iterator
-direction.
+On 6/30/23 9:25?AM, David Howells wrote:
+> diff --git a/io_uring/rw.c b/io_uring/rw.c
+> index 1bce2208b65c..1cade1567162 100644
+> --- a/io_uring/rw.c
+> +++ b/io_uring/rw.c
+> @@ -655,12 +655,13 @@ static bool need_complete_io(struct io_kiocb *req)
+>  		S_ISBLK(file_inode(req->file)->i_mode);
+>  }
+>  
+> -static int io_rw_init_file(struct io_kiocb *req, fmode_t mode)
+> +static int io_rw_init_file(struct io_kiocb *req, unsigned int io_direction)
+>  {
+>  	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
+>  	struct kiocb *kiocb = &rw->kiocb;
+>  	struct io_ring_ctx *ctx = req->ctx;
+>  	struct file *file = req->file;
+> +	fmode_t mode = (io_direction == WRITE) ? FMODE_WRITE : FMODE_READ;
+>  	int ret;
+>  
+>  	if (unlikely(!file || !(file->f_mode & mode)))
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christian Brauner <christian@brauner.io>
-cc: Alexander Viro <viro@zeniv.linux.org.uk>
-cc: linux-block@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- block/blk-map.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Not ideal to add a branch here, probably better to just pass in both?
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 44d74a30ddac..f8fe114ae433 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -205,7 +205,7 @@ static int bio_copy_user_iov(struct request *rq, struct rq_map_data *map_data,
- 	/*
- 	 * success
- 	 */
--	if ((iov_iter_rw(iter) == WRITE &&
-+	if ((op_is_write(rq->cmd_flags) &&
- 	     (!map_data || !map_data->null_mapped)) ||
- 	    (map_data && map_data->from_user)) {
- 		ret = bio_copy_from_iter(bio, iter);
+> @@ -870,7 +871,7 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
+>  		iov_iter_restore(&s->iter, &s->iter_state);
+>  		iovec = NULL;
+>  	}
+> -	ret = io_rw_init_file(req, FMODE_WRITE);
+> +	ret = io_rw_init_file(req, WRITE);
+>  	if (unlikely(ret)) {
+>  		kfree(iovec);
+>  		return ret;
+> @@ -914,7 +915,6 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
+>  		__sb_writers_release(file_inode(req->file)->i_sb,
+>  					SB_FREEZE_WRITE);
+>  	}
+> -	kiocb->ki_flags |= IOCB_WRITE;
+>  
+>  	if (likely(req->file->f_op->write_iter))
+>  		ret2 = call_write_iter(req->file, kiocb, &s->iter);
+> 
+
+One concern here is that we're using IOCB_WRITE here to tell if
+sb_start_write() has been done or not, and hence whether
+kiocb_end_write() needs to be called. You know set it earlier, which
+means if we get a failure if we need to setup async data, then we know
+have IOCB_WRITE set at that point even though we did not call
+sb_start_write().
+
+-- 
+Jens Axboe
 
