@@ -2,180 +2,380 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 486B5C001B0
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 12:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C14EB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 13:28:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232948AbjF3MCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jun 2023 08:02:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48532 "EHLO
+        id S232111AbjF3N22 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jun 2023 09:28:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232924AbjF3MCs (ORCPT
+        with ESMTP id S231778AbjF3N21 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2023 08:02:48 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 022221FFD
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 05:02:44 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230630120241epoutp0281966a4ade58cf89b55600751105181d~tbin4p0DA2406924069epoutp02l
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 12:02:41 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230630120241epoutp0281966a4ade58cf89b55600751105181d~tbin4p0DA2406924069epoutp02l
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1688126561;
-        bh=zZubjPAKe4tJnP79rh7RaaQDYvtmoDCtXsGDKlJ0uFY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=mfshBycpvotrExq2m0BfCgxTNRVu78AGdZbgkTTKze+GZKQOwRURXGW1hTGfKUrZe
-         zm2oJZqdd/yTj4QLaCbp+j7ZDivfd3I/TcqCAcRAxDI2Pqkk069kLOF0ncu3zjqEXA
-         4hfB2hIz4tFIAr7mfvYYzrMWKwanER58x5e+432M=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20230630120240epcas5p3d08ca980d5065aa551daa2fd10006566~tbim_nHMD0126501265epcas5p3B;
-        Fri, 30 Jun 2023 12:02:40 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.181]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4Qsv8H1L2xz4x9Pt; Fri, 30 Jun
-        2023 12:02:39 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4F.E6.06099.F54CE946; Fri, 30 Jun 2023 21:02:39 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20230630112545epcas5p1746ef2fc966c04b3a8163e0dff21fb4b~tbCXgpz0S0278302783epcas5p18;
-        Fri, 30 Jun 2023 11:25:45 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230630112545epsmtrp100ac18072070bde82f83c688a8d35218~tbCXeO08n3247532475epsmtrp1R;
-        Fri, 30 Jun 2023 11:25:45 +0000 (GMT)
-X-AuditID: b6c32a4b-cafff700000017d3-cb-649ec45f75e7
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        01.DC.34491.9BBBE946; Fri, 30 Jun 2023 20:25:45 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230630112540epsmtip25264414e861bfa35bbcaec8407f2f7ff~tbCTNRWsE1020410204epsmtip2Y;
-        Fri, 30 Jun 2023 11:25:40 +0000 (GMT)
-Date:   Fri, 30 Jun 2023 16:52:27 +0530
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        willy@infradead.org, hare@suse.de, djwong@kernel.org,
-        bvanassche@acm.org, dlemoal@kernel.org, nitheshshetty@gmail.com,
-        gost.dev@samsung.com, Vincent Fu <vincent.fu@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v13 3/9] block: add emulation for copy
-Message-ID: <20230630112227.6ctls2vt4cy7vbxo@green245>
+        Fri, 30 Jun 2023 09:28:27 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E0DC1BE9
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 06:28:25 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fbc0981743so17096895e9.0
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 06:28:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688131704; x=1690723704;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cSsHR++MOz5mMLvON2+y3Ow7cVC9uhlMql65hDIpGCA=;
+        b=qZ7bgD7Ubj5fsotnD1uP7fB9XKGEHhWz+S+5zIiT+bAvaYlLO8NosSnlZ7GaiXsLQR
+         29OFVwPQve04Jk0zg0qCrSk5/E+ntQ5YQE2XVj6oWXsFbSq9YRC+rje8H5q9CnkrzTUt
+         PGphJv+nl5dY+U+6FivwINt/ec914HBXSQN9p52Nmjr5gKMT9wh0VGZD2QkzyqnKBnl6
+         dr/XgHBRw8umMcKo74hx0v/kPsokrh/m5rCMX9r9/V4exCIbkdF6tsP1s0zQ6WdyRs/x
+         sSnVe+NRUML3VPfRQpHDT5061SVCcTzP1ftnOoqGuDSzvlEf8KPFiO9JhMaybDr+Tw3B
+         oqOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688131704; x=1690723704;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cSsHR++MOz5mMLvON2+y3Ow7cVC9uhlMql65hDIpGCA=;
+        b=kPp6mPlANbc7vAefjKaX2Jbb+DaIePB8V0oKVoA4+KGDuOhWnX9saoOXshyms1pfAj
+         IntjWgVf4Gy9154FdDlNHulEg2V/g6SU+RLExGItBUsqeaRYmXCRNkwdMc3CaCdPz5wr
+         KFF5+mn4COXoP+hCJEGSdu1IlqUvlgD8odaSLdY4U70VJOYsUs74Tgs3/OxSuoJT7b4l
+         T03zhb2Q+v5p8kcV3hfBrY8PG0koX+8GX7M+VxMMF5/Y+w2r/BrCPqYO6/+/hrKcMXpk
+         6wYZM90uo9hThs/vDAOpdNtcdUhsygLhavwdDknZ4rKnd4Ilnbna9LFX/wBKsAOSbkIg
+         zt8g==
+X-Gm-Message-State: AC+VfDyunftYFMAHCy3RHksqlaVrddU4KUR05uEAh0UE5BOGaNatbzUq
+        WpGFk+xFInDiJI/w6rFBDy/K1Q==
+X-Google-Smtp-Source: ACHHUZ50akRrQs3uymW5/8iFg9PFp6xTgRf1QltmVzS5vB1EPAiNo383a3DvCn5X7T9QJ9+pu6x9Wg==
+X-Received: by 2002:a05:600c:2145:b0:3fa:1af8:6ebf with SMTP id v5-20020a05600c214500b003fa1af86ebfmr1985717wml.0.1688131703637;
+        Fri, 30 Jun 2023 06:28:23 -0700 (PDT)
+Received: from localhost ([165.225.194.193])
+        by smtp.gmail.com with ESMTPSA id i7-20020a05600c290700b003fbb346279dsm6345498wmd.38.2023.06.30.06.28.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jun 2023 06:28:23 -0700 (PDT)
+References: <20230628190649.11233-1-nmi@metaspace.dk>
+ <20230628190649.11233-4-nmi@metaspace.dk>
+ <be52be54-3178-082c-4bfc-7702308a0012@kernel.org>
+ <87ilb6y6j9.fsf@metaspace.dk>
+ <87a03e67-67f0-5ac7-41c7-5ccd393d0b66@kernel.org>
+User-agent: mu4e 1.10.4; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Damien Le Moal <dlemoal@kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH v4 3/4] ublk: enable zoned storage support
+Date:   Fri, 30 Jun 2023 13:53:58 +0200
+In-reply-to: <87a03e67-67f0-5ac7-41c7-5ccd393d0b66@kernel.org>
+Message-ID: <87ilb5dqq1.fsf@metaspace.dk>
 MIME-Version: 1.0
-In-Reply-To: <ZJ1B1k0KifZrGRIp@ovpn-8-26.pek2.redhat.com>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA02TbUxTZxTHee69vS3EumuR+PCikOKyAQGpQPdAYAo6d5fuAwl+GQnild5R
-        BNqmLbJhIqDAFAaoDDIrVFQcbwoIbOF1smIFMYwZBgisDLWgkw0QAnbjZWspLH77nZf/eZ5z
-        Tg4PFzRxXXgJcg2rkjNJQtKB+KHby8s39r5O6n+nioPq+x7g6OzFNRzVGgtJNNO9AFDJ/N84
-        MnV9BdCgaTuavHcAdc5e5aDRrlYMddy4jKHqWgOGLuuHAZoa0mKoc8wHXc+pIFBH50MCDbaV
-        kujad1NclDfSQqLKnnUM6YvOYajFlAlQ3cwcgXrHXNHzvPMADaz1cNCKuZQ86EYP/iqhW7VG
-        Lj0wcZegm6q86cH+FLqx5gJJN1Wk0+2jGSR9s6CIQ+efmyXp11NjBD334xBJFzTXALrp0Wl6
-        sXEP3Wj6C4ukohNDZSwjZVUerDxOIU2Qx4cJJVGxh2KDxP4iX1Ew+kDoIWeS2TDh4U8jfY8k
-        JFmmI/Q4xSSlWFyRjFot3PdhqEqRomE9ZAq1JkzIKqVJykCln5pJVqfI4/3krCZE5O+/P8iS
-        eDxRtpRXzlW2v/NF5YtpbgaY3pYL7HmQCoTmxwOcXODAE1DtAPYuPN40FgBcLMzg2oxlAK/U
-        FHC2JOONGYQt0AngvZf6jYCAmgbQ3MO3MkG9CyuHG7BcwOORlA989C/P6t5JCaHRWLtRFKca
-        SGhu1QFrwJEKgf0tTzeYT4mh4Y6JtPEO+PCKibCyPRUMl1oLNnKcKDf47a0l3FoIUhP2cNE4
-        RNp+dxhWzHUDGzvCVz3NXBu7wD8KczY5FVZ/U0XaxFkAake0m4IDMLuvELcyTslgaVfOZtHd
-        sLivDrP5t8P8FRNm8/Nhi26LPeHt+vLNfGc4/CaTtHYPKRr+PHjINq1ZAMuyzOAicNe+1Zz2
-        redsHAIvzJ/laC1ynHKFles8G3rB+rZ95YBTA5xZpTo5nlUHKQPkbOr/G49TJDeCjevxlrSA
-        Z5PzfnqA8YAeQB4u3Mkf//OqVMCXMl+msSpFrColiVXrQZBlWZdwF6c4heX85JpYUWCwf6BY
-        LA4MDhCLhLv4M9llUgEVz2jYRJZVsqotHcazd8nANA4nRj0V2n9eP2HuS4fpQ8y17OcnigPS
-        QrcB2ctaQ0Xd57WrU8fOdBuIVrl+Ojy8Yeyzto71sdB6CbM3Ji0r3e6ozAeMjTwZdwrnJEDt
-        s5xbxE9NveHQdfrosEi3WMyPaCgZmpw9VimOOZ3/0asju93PVHut+N3NNK7Z0+k6Ea7LFGZH
-        /fbidqFZEfsLmHVE73F6eKsRhvdvzpRN1msT4DixMEDWudn9nvwxJ0CSejI6Ke+kU9GNXMpw
-        3TPMrrtr//n2Zuc9gqf9S4IYgelg+C6qaHnCveT74xE7HpDmiYBTfsuhzXtDRJ9wJZdWdctz
-        jYOi6PT5KMPMG8HXzgNCQi1jRN64Ss38B0n6FerGBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKIsWRmVeSWpSXmKPExsWy7bCSvO7O3fNSDC7d4bBYf+oYs0XThL/M
-        Fqvv9rNZvD78idFi2oefzBZPDrQzWlx+wmfxYL+9xd53s1ktbh7YyWSxZ9EkJouVq48yWUw6
-        dI3R4unVWUwWe29pWyxsW8JisWfvSRaLy7vmsFnMX/aU3aL7+g42i+XH/zFZHJrczGSx40kj
-        o8W61+9ZLE7ckrZ43N3BaHH+73FWi98/5rA5yHhcvuLtsXPWXXaP8/c2snhsXqHlcflsqcem
-        VZ1sHpuX1HvsvtnA5rG4bzKrR2/zOzaPj09vsXi833eVzaNvyypGj82nqz0+b5Lz2PTkLVOA
-        QBSXTUpqTmZZapG+XQJXxvr+e2wFb3kqZu16ztrAuImri5GTQ0LAROL2pgaWLkYuDiGB3YwS
-        Ddu+skEkJCWW/T3CDGELS6z895wdougJo0THuTlgRSwCqhLLr21g6mLk4GAT0JY4/Z8DJCwi
-        oCRx9+5qsHpmgU1sEn/PvWQESQgLWEmc3fEQzOYVMJM4uvYJG8TQd4wSVy41MEEkBCVOznzC
-        AmIzAxXN2/yQGWQBs4C0xPJ/YAs4BSwlvu7sA5sjKiAjMWPpV+YJjIKzkHTPQtI9C6F7ASPz
-        KkbJ1ILi3PTcYsMCw7zUcr3ixNzi0rx0veT83E2M4JShpbmDcfuqD3qHGJk4GA8xSnAwK4nw
-        3n4zO0WINyWxsiq1KD++qDQntfgQozQHi5I4r/iL3hQhgfTEktTs1NSC1CKYLBMHp1QDk7rf
-        o41LXDk7Q6xd7wi3M/Qv4tP0F2fSWcqmyn15Q7P23BkLLn7RWj5p447Ne5/fudDZ+Oxcy8wO
-        g9WNRcznxJeKHvFuuJj113Ll+tIviwL8Vdv3h2+6Wx4S3tAQt/Oq9GUR48nXfjy7sU/deMNN
-        NiWXGl+uqTIT4v5vW8QcrTaxJ4UvvLL5+i1+PqWNhkEzlXfdE/T98ohLVHaGx+xzpnOb5Mv4
-        1Bh2q1YdUgv6/+bXxJPHuW9PE3j/QfKft/JjbW3Fh4G8TtyPFgT1KX4SdJHuEGvhMhLT0/l0
-        ZydPvNA1tetW96z8Z6jUa6fmH3Sc/mcpy+ntC1xqvR7t+Op+1Obws8wE1luBaq//lU6yV2Ip
-        zkg01GIuKk4EAIi1iPiIAwAA
-X-CMS-MailID: 20230630112545epcas5p1746ef2fc966c04b3a8163e0dff21fb4b
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----zUAFM1k0MeHfMyR4CoO9aTysOnQiUYGsRe6BfqD0GhfqR3ws=_26e0b_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230627184020epcas5p13fdcea52edead5ffa3fae444f923439e
-References: <20230627183629.26571-1-nj.shetty@samsung.com>
-        <CGME20230627184020epcas5p13fdcea52edead5ffa3fae444f923439e@epcas5p1.samsung.com>
-        <20230627183629.26571-4-nj.shetty@samsung.com>
-        <ZJ1B1k0KifZrGRIp@ovpn-8-26.pek2.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------zUAFM1k0MeHfMyR4CoO9aTysOnQiUYGsRe6BfqD0GhfqR3ws=_26e0b_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
 
-On 23/06/29 04:33PM, Ming Lei wrote:
->Hi Nitesh,
+Damien Le Moal <dlemoal@kernel.org> writes:
+
+> On 6/29/23 16:50, Andreas Hindborg (Samsung) wrote:
+>>>>  UCLINUX (M68KNOMMU AND COLDFIRE)
+>>>> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+>>>> index 5b9d4aaebb81..c58dfd035557 100644
+>>>> --- a/drivers/block/Kconfig
+>>>> +++ b/drivers/block/Kconfig
+>>>> @@ -402,6 +402,10 @@ config BLKDEV_UBLK_LEGACY_OPCODES
+>>>>  	  suggested to enable N if your application(ublk server) switches to
+>>>>  	  ioctl command encoding.
+>>>>=20=20
+>>>> +config BLK_DEV_UBLK_ZONED
+>>>> +	def_bool y
+>>>
+>>> This can be "bool" only.
+>>=20
+>> I did it like this because I wanted BLK_DEV_UBLK_ZONED to be set
+>> automatically to "y" when BLK_DEV_UBLK and BLK_DEV_ZONED are enabled.
+>> BLK_DEV_UBLK_ZONED has no menu entry. If we change it to "bool" it will
+>> be default "n" and we would have to make it appear in menuconfig to be
+>> manually enabled.
+>>=20
+>> Isn't it more sane if it is just unconditionally enabled when
+>> BLK_DEV_ZONED and BLK_DEV_UBLK is enabled?
 >
->On Wed, Jun 28, 2023 at 12:06:17AM +0530, Nitesh Shetty wrote:
->> For the devices which does not support copy, copy emulation is added.
->> It is required for in-kernel users like fabrics, where file descriptor is
+> Maybe something like this then:
 >
->I can understand copy command does help for FS GC and fabrics storages,
->but still not very clear why copy emulation is needed for kernel users,
->is it just for covering both copy command and emulation in single
->interface? Or other purposes?
+> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+> index 5b9d4aaebb81..105e1121bf5f 100644
+> --- a/drivers/block/Kconfig
+> +++ b/drivers/block/Kconfig
+> @@ -370,9 +370,13 @@ config BLK_DEV_RBD
 >
->I'd suggest to add more words about in-kernel users of copy emulation.
+>           If unsure, say N.
+>
+> +config BLK_DEV_UBLK_ZONED
+> +       bool
+> +
+>  config BLK_DEV_UBLK
+>         tristate "Userspace block driver (Experimental)"
+>         select IO_URING
+> +       select BLK_DEV_UBLK_ZONED if BLK_DEV_ZONED
+>         help
+>           io_uring based userspace block driver. Together with ublk serve=
+r, ublk
+>           has been working well, but interface with userspace or command =
+data
+
+OK =F0=9F=91=8D
+
+>>>> +		ub->ub_disk->nr_zones =3D p->dev_sectors / p->chunk_sectors;
+>>>> +}
+>>>> +
+>>>> +void ublk_dev_param_zoned_apply(struct ublk_device *ub)
+>>>> +{
+>>>> +	const struct ublk_param_zoned *p =3D &ub->params.zoned;
+>>>> +
+>>>> +	if (ub->dev_info.flags & UBLK_F_ZONED) {
+>>>> +		disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
+>>>> +		disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
+>>>
+>>> You do not need to check if the max_active_zones and max_open_zones val=
+ues are
+>>> sensible ? E.g. what if they are larger than the number of zones ?
+>>=20
+>> I don't think it will be a problem. I assume you can set them to 0 to
+>> indicate infinite. If user space sets them to more than the actual
+>> number of available zones (that user space set up also), user space will
+>> have to handle that when it gets a zone request for a zone outside the
+>> logical drive LBA space. I don't think the kernel has to care. Will this
+>> break anything kernel side?
+>
+> zonefs and btrfs look at these limits. So I would rather prefer seeing se=
+nsible
+> values. 0 =3D=3D no limit is fine. But seeing maz or moz > nr_zones for t=
+he device
+> is just too strange and I would prefer an error in that case to let the u=
+ser
+> know it is not doing something right. Getting moz > maz is also nonsense =
+that
+> needs to be checked. There is one case we could silently change: if maz =
+=3D=3D
+> nr_zones or moz =3D=3D nr_zones, then that essentially means "no limit", =
+so we could
+> use 0 to let the in-kernel users that they do not need to care about the =
+limits.
+
+OK, will check.
+
+>
+>>=20
+>>>
+>>>> +	}
+>>>> +}
+>>>> +
+>>>> +int ublk_revalidate_disk_zones(struct gendisk *disk)
+>>>> +{
+>>>> +	return blk_revalidate_disk_zones(disk, NULL);
+>>>> +}
+>>>
+>>> I do not think this helper is needed at all (see below comment on the c=
+all site).
+>>=20
+>> This is required because the prototype for `blk_revalidate_disk_zones()`
+>> is not defined when BLK_DEV_ZONED is not defined. Without this helper
+>> for which the prototype is always defined, we will have a compile error
+>> at the call site.
+>
+> You have this hunk in ublk_ctrl_start_dev:
+>
+> disk_set_zoned(disk, BLK_ZONED_HM);
+> blk_queue_required_elevator_features(disk->queue, ELEVATOR_F_ZBD_SEQ_WRIT=
+E);
+> ret =3D ublk_revalidate_disk_zones(disk);
+> if (ret)
+> 	goto out_put_disk;
+>
+> And that is called under "if (IS_ENABLED(CONFIG_BLK_DEV_ZONED)". So I do =
+not see
+> how you can get compile errors using directly blk_revalidate_disk_zones()=
+. The
+> entire hunk above should be a helper function I think.
+
+The prototype for `disk_set_zoned()` is defined independent of
+CONFIG_BLK_DEV_ZONED. The prototype for `blk_revalidate_disk_zones()` is
+only defined when CONFIG_BLK_DEV_ZONED is enabled. It is not the same.
+We can't have a call to `blk_revalidate_disk_zones()` in a translation
+unit when the prototype is not defined, even behind a `if
+(IS_ENABLED())` guard. It would be fine behind an `#ifdef` though.
+
+If we move the entire hunk to a helper for which the prototype is always
+defined, we should be able to call `blk_revalidate_disk_zones()`
+directly =F0=9F=91=8D I'll see if I can do that.
+
+>>>> +
+>>>> +	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>>>> +		ublk_set_nr_zones(ub);
+>>>
+>>> So if the user is attempting to setup a zoned drive but the kernel does=
+ not have
+>>> CONFIG_BLK_DEV_ZONED=3Dy, the user setup will be silently ignored. Not =
+exactly
+>>> nice I think, unless I am missing something.
+>>=20
+>> We have this in `ublk_ctrl_add_dev()`:
+>>=20
+>> 	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>> 		ub->dev_info.flags &=3D ~UBLK_F_ZONED;
+>>=20
+>> User space is supposed to check the flags after the call to know the
+>> kernel capabilities.
+>
+> And you trust user space to be always correct ? I never do :)
+> So definitely, check and error if not supported. No silently clearing the=
+ device
+> zoned flag.
 >
 
-As you mentioned above, we need a single interface for covering both
-copy command and emulation.
-This is needed in fabrics cases, as we expose any non copy command
-supported target device also as copy capable, so we fallback to emulation
-once we recieve copy from host/initator.
-Agreed, we will add more description to covey the same info.
+I'll make it fail instead of just clearing the flag =F0=9F=91=8D
 
->> not available and hence they can't use copy_file_range.
->> Copy-emulation is implemented by reading from source into memory and
->> writing to the corresponding destination asynchronously.
->> Also emulation is used, if copy offload fails or partially completes.
 >
->Per my understanding, this kind of emulation may not be as efficient
->as doing it in userspace(two linked io_uring SQEs, read & write with
->shared buffer). But it is fine if there are real in-kernel such users.
+>>> Also, repeating that "if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))" for all zo=
+ne
+>>> related functions is very verbose. Stub the functions in ublk_drv.h. Th=
+at will
+>>> make the main C code lighter.
+>>=20
+>> Not sure what you mean "stub the functions". Like so:
+>>=20
+>> @@ -216,8 +216,7 @@ static void ublk_dev_param_basic_apply(struct ublk_d=
+evice *ub)
+>>=20=20
+>>  	set_capacity(ub->ub_disk, p->dev_sectors);
+>>=20=20
+>> -	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>> -		ublk_set_nr_zones(ub);
+>> +	ublk_config_nr_zones(ub);
+>>  }
+>>=20
+>> And then in the header:
+>>=20
+>> void ublk_config_nr_zones(struct ublk_device *ub)
+>> {
+>> 	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>> 		ublk_set_nr_zones(ub);
+>> }
+>>=20
+>> Or something else?
 >
+> #ifndef CONFIG_BLK_DEV_ZONED
+> static inline void ublk_set_nr_zones() {}
+> #endif
+>
+> That avoid repeating that if (IS_ENABLED(CONFIG_BLK_DEV_ZONED)) all over =
+the
+> place. The stubbed functions can be called only for "if (ub->dev_info.fla=
+gs &
+> UBLK_F_ZONED", which is OK since this flag is never supposed to be accept=
+ed and
+> set for the CONFIG_BLK_DEV_ZONED=3Dn case.
 
-We do have plans for uring based copy interface in next phase,
-once curent series is merged.
-With current design we really see the advantage of emulation in fabrics case.
+Alright =F0=9F=91=8D
 
-Thank you,
-Nitesh Shetty
+>
+>>>> +		disk_set_zoned(disk, BLK_ZONED_HM);
+>>>> +		blk_queue_required_elevator_features(disk->queue, ELEVATOR_F_ZBD_SE=
+Q_WRITE);
+>>>> +		ret =3D ublk_revalidate_disk_zones(disk);
+>>>> +		if (ret)
+>>>> +			goto out_put_disk;
+>>>
+>>> This should be all a helper ublk_set_zoned() or something.
+>>=20
+>> Ok =F0=9F=91=8D Unfortunately this block of code is split up in the zone=
+ append
+>> patch. I will see what I can do, maybe 2 functions.
+>
+> Beware that I just posted patches that require zone size (chunk_sectors l=
+imit)
+> and max append sectors limit to be set *before* calling
+> blk_revalidate_disk_zones(). Otherwise, you will get an error.
 
-------zUAFM1k0MeHfMyR4CoO9aTysOnQiUYGsRe6BfqD0GhfqR3ws=_26e0b_
-Content-Type: text/plain; charset="utf-8"
+Got it, thanks.
 
+>
+>>>>  	get_device(&ub->cdev_dev);
+>>>>  	ub->dev_info.state =3D UBLK_S_DEV_LIVE;
+>>>>  	ret =3D add_disk(disk);
+>>>> @@ -1997,6 +2046,9 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd=
+ *cmd)
+>>>>  	if (ub->dev_info.flags & UBLK_F_USER_COPY)
+>>>>  		ub->dev_info.flags &=3D ~UBLK_F_NEED_GET_DATA;
+>>>>=20=20
+>>>> +	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED))
+>>>> +		ub->dev_info.flags &=3D ~UBLK_F_ZONED;
+>>>
+>>> Arg, no. The user should be notified with an error that he/she is attem=
+pting to
+>>> create a zoned device that cannot be supported.
+>>=20
+>> As I wrote above, this is part of the ublk uapi. This is the way user
+>> space does kernel capability check. User space will check the flags when
+>> this call returns. @Ming did I understand this correctly or did I miss s=
+omething?
+>
+> OK. So this is like a virtio capability flags thing ? Negotiation between=
+ device
+> and driver ?
 
-------zUAFM1k0MeHfMyR4CoO9aTysOnQiUYGsRe6BfqD0GhfqR3ws=_26e0b_--
+I'm not familiar with that one, but I think you are right we should fail
+the request here. I makes no sense to configure a regular ublk device if
+user space wants to set up a zoned one. Failing is more sensible.
+
+>
+>>>> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_c=
+md.h
+>>>> index 471b3b983045..436525afffe8 100644
+>>>> --- a/include/uapi/linux/ublk_cmd.h
+>>>> +++ b/include/uapi/linux/ublk_cmd.h
+>>>> @@ -176,6 +176,11 @@
+>>>>  /* Copy between request and user buffer by pread()/pwrite() */
+>>>>  #define UBLK_F_USER_COPY	(1UL << 7)
+>>>>=20=20
+>>>> +/*
+>>>> + * Enable zoned device support
+>>>
+>>> Isn't this for "Indicate that the device is zoned" ?
+>>=20
+>> User space sets this flag when setting up the device to enable zoned
+>> storage support. Kernel may reject it. I think the wording is
+>> sufficient. Could be updated to:
+>>=20
+>> "User space sets this flag when setting up the device to request zoned
+>>  storage support. Kernel may deny the request by clearing the flag
+>>  during setup."
+>
+> I really have a big problem with this. If the user driver does not check =
+that
+> the flag was cleared, the user will assume that the device is zoned, but =
+it is
+> not. This is not super nice... I would really prefer just failing the dev=
+ie
+> creation if zoned was requested but cannot be satisfied, either because t=
+he
+> kernel does not support zoned block devices or when the user specified so=
+mething
+> nonsensical.
+
+Changed to:
+
+/*
+ * User space sets this flag when setting up the device to request zoned st=
+orage support. Kernel may
+ * deny the request by returning an error.
+ */
+#define UBLK_F_ZONED (1ULL << 8)
+
+Best regards,
+Andreas
