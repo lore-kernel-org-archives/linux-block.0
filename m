@@ -2,378 +2,164 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1949EB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 13:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9855BEB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 30 Jun 2023 14:33:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232535AbjF3Nea (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Jun 2023 09:34:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52160 "EHLO
+        id S232586AbjF3Odq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Jun 2023 10:33:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232048AbjF3Ne3 (ORCPT
+        with ESMTP id S232527AbjF3Odp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2023 09:34:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 867031FCD
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 06:33:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688132022;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9qwS/nJZGMP8Lt21UZh5+1uA66f33YQA7IfXtY5NVNY=;
-        b=bKuS7nyiiBJmT2XUtH1Ayu7S56NDW7KlPq87fbWjAjFBzNQu8Ms8t/uigK7ExUKDsanAhu
-        VyCoNDzauvVO2Jf4Na3V4WJ38MFiD7Fg88cpepbhtRBBi7ZxqfJlR2CQi4F5mu5vK60MK1
-        N3swaPgLel2oa0PAlIo7qrejvk+JXw4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-LxBZ2c72MhaVq_SfaoSA-Q-1; Fri, 30 Jun 2023 09:33:41 -0400
-X-MC-Unique: LxBZ2c72MhaVq_SfaoSA-Q-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-313eb76e529so1049422f8f.2
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 06:33:40 -0700 (PDT)
+        Fri, 30 Jun 2023 10:33:45 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F313FF
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 07:33:43 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3141140f51bso2289462f8f.1
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2023 07:33:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688135621; x=1690727621;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jsEa83LElgV+AQL5e6o9aSSV0H6S/EdnOsnoqxBROhA=;
+        b=H+Os4B7hYlGqCKP3ZBTL1CfbmQZAnDdA1Ma95DpqUEcPbitEtWpwDZroRvTY/Yd+Qj
+         55yAJTSAzluveA0lcf4cot1uAHJTD5IxVpP3U33+/25vUo2yQRW28xqYUacd7JpKTaQh
+         0VxMG0rwaI0ypKW1awW+rOqc8asLoLz7ciVrdelUHf6oWeLftc1sAUrqENr429lDxrzf
+         FfsT0Dj5SON37+8P+ZGLYBM6o+r9QWBX7Y3/1j5+d5tP1FCetdVBNlx+x/+BbPCyx84n
+         ZquXktVmxqaGYy6LVAUF+PgYVyVwYTx+dhsV6xlnBXXBCPycrfu4P2TfQWio0GPm0uTR
+         DKZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688132020; x=1690724020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9qwS/nJZGMP8Lt21UZh5+1uA66f33YQA7IfXtY5NVNY=;
-        b=k0YXrhMKelD5/hjKAaVd1lp9jDjKwJUwdtkHkzYO8dH4hQG5liOy8gQtpbrDHCiOnn
-         3BsxROzuNlo9lWHPURyJv+W0e6W/H3QuIrtC1nFGuHFvVda0ocH8XO3ioeCZN/6XDgYk
-         ctiicDRAKwN0LgbZ9jfHNzVveHq64WHMeXgoOAwIKxF+9dFFh8667YsVRwf34nPFuRFo
-         yvRmSUcUc59HnhYKyYTRL+zYkExS1nSepJ+sKjUMnaXiCACJ8F5S41sBRLSAeSiFEwMi
-         xVsoowG/6ocAte3/aW+yjPeU2+BHLfRRDWMYufVeylc7q+8gLdGqIHzl66GZ9M/MCh21
-         l/VA==
-X-Gm-Message-State: ABy/qLYRCqwRbKj4EUap1kNaMp4xkq2k6Vke463U3GJbBaqs8OQsvER9
-        DHvuduJFlu6cTq73C2Mpu7tx7z6W/AlN3sNsLOwKqNpztxtUKx7dqVZcB0q+Sta9he0EC+1iYEK
-        F3THEc2ebo77LRFL9QOQuEVvGDvGDdNL+bRL202U=
-X-Received: by 2002:adf:fe8f:0:b0:314:fe8:4df3 with SMTP id l15-20020adffe8f000000b003140fe84df3mr2160782wrr.43.1688132019788;
-        Fri, 30 Jun 2023 06:33:39 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEaKUBlb5wTtfacwxkRc4ZUr+ITlXMNS77Pfa0rZbzyg0YadUwPlxHmE6tWU15Qi3guX4SNTH+ClCldzyd0Foc=
-X-Received: by 2002:adf:fe8f:0:b0:314:fe8:4df3 with SMTP id
- l15-20020adffe8f000000b003140fe84df3mr2160762wrr.43.1688132019432; Fri, 30
- Jun 2023 06:33:39 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688135621; x=1690727621;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jsEa83LElgV+AQL5e6o9aSSV0H6S/EdnOsnoqxBROhA=;
+        b=LJStY3qSpDfiHTOorX3ln3hcXzVQ7VUWh2DXCD/zDknnP00x9AQLj9SlnK9BHbVf3B
+         NMPIr0cPwDBG5QLTv8myaynr7vJ3jyilwlTY/tyZuAw/bK6FgeLB/WKuMnNjSTJfvR46
+         5JkrAWhf0flPcv1aWXxWUk0Zv3AY1E3y7Tg66nk4BGc9RakI5xuosA8Ge4MncUDgp2Bx
+         J1s1vR84NOijTgwCdpdVWk0qi0F5qYuivs3zlQvjOqnruwuxAgwYrAHIYhkeukRQYvgF
+         3gT+iA4Iocf0rbYaKRldDORxQiQevqAtFyQ7IfAzXEjfh9Xy3N7Lsf1zmrL5mlgOyKda
+         MVoA==
+X-Gm-Message-State: ABy/qLahpLgeioudJkvSk7sN2dcL/IhXDATmO/j5jh0QAqCdPsj+W6bK
+        guFGio+3anWZ20i2dbhvUjXH5u+Bq8TZFfyudw0=
+X-Google-Smtp-Source: APBJJlEARPMz2iDUCKng8lbKud0V7d0IOK5so+Rb4Rp4FIFyLs2G3PYHzo7Q0PG2iYHKhBDbiuYT0A==
+X-Received: by 2002:a05:6000:1cb:b0:314:13a6:af20 with SMTP id t11-20020a05600001cb00b0031413a6af20mr2161017wrx.31.1688135621090;
+        Fri, 30 Jun 2023 07:33:41 -0700 (PDT)
+Received: from localhost ([165.225.194.214])
+        by smtp.gmail.com with ESMTPSA id g6-20020a5d6986000000b0031130b9b173sm18354949wru.34.2023.06.30.07.33.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jun 2023 07:33:40 -0700 (PDT)
+References: <20230628190649.11233-1-nmi@metaspace.dk>
+ <5F597343-EC91-4698-ACBE-9111B52FC3FC@wdc.com>
+ <b29f01c287c7469f47fb4b689a3cba68@opensource.wdc.com>
+User-agent: mu4e 1.10.4; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     aravind.ramesh@opensource.wdc.com
+Cc:     Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        hch@infradead.org,
+        Matias =?utf-8?Q?Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v4 0/4] ublk: add zoned storage support
+Date:   Fri, 30 Jun 2023 16:26:28 +0200
+In-reply-to: <b29f01c287c7469f47fb4b689a3cba68@opensource.wdc.com>
+Message-ID: <87edltdnp8.fsf@metaspace.dk>
 MIME-Version: 1.0
-References: <20230620133711.22840-1-dwagner@suse.de>
-In-Reply-To: <20230620133711.22840-1-dwagner@suse.de>
-From:   Ewan Milne <emilne@redhat.com>
-Date:   Fri, 30 Jun 2023 09:33:28 -0400
-Message-ID: <CAGtn9r=cNbNta2iJSianW2aK9r04oSFb3T1KUgufwgX60AqzHA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/5] nvme-fc: Fix blktests hangers
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        "Shin'ichiro Kawasaki" <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We ran this patch series through our regression and NVMe/FC boot from SAN t=
-ests.
-(I think 4/5 will also resolve some instability / race condition with
-kickstart, since the connect
-is now synchronous, but we may need some more time to full validate
-that.  I was going
-to pursue a userspace solution but this may be good enough.)
 
-Notwithstanding the other comments re: error codes, etc. feel free to add:
+aravind.ramesh@opensource.wdc.com writes:
 
-Reviewed-by: Ewan D. Milne <emilne@redhat.com>
-Tested-by: Marco Patalano (mpatalan@redhat.com>
+>> =EF=BB=BFOn 29/06/23, 12:37 AM, "Andreas Hindborg" <nmi@metaspace.dk
+>> <mailto:nmi@metaspace.dk>> wrote:
+>> From: Andreas Hindborg <a.hindborg@samsung.com
+>> <mailto:a.hindborg@samsung.com>>
+>> Hi All,
+>> This patch set adds zoned storage support to `ublk`. The first two patch=
+es
+>> does
+>> some house cleaning in preparation for the last two patches. The third p=
+atch
+>> adds support for report_zones and the following operations:
+>>=20
+>
+> Just to clarify, we do need you ublk user space patches
+> to create a ublk device node (with these patches in kernel), right ?
 
-On Tue, Jun 20, 2023 at 9:39=E2=80=AFAM Daniel Wagner <dwagner@suse.de> wro=
-te:
+I provide an example implementation. I put a link in the cover letter,
+but I think the sentence referring to the link got lost, thanks for
+pointing out.
+
+https://github.com/metaspace/ubdsrv/commit/7de0d901c329fde7dc5a2e998952dd88=
+bf5e668b
+
+This implementation is based on Ming's ubdsrv code. You do not need to
+use this one, you can write your own. I am also working on an
+implementation in Rust, but that is still very early. I think Ming is
+also writing a Rust library for user space ublk devices.
+
+But currently my patched ubdsrv is the only user space implementation
+supporting zoned ublk devices (with the loop and null targets).
+
 >
-> With the additinal 3 patches and the blktests changes [1] I am able to ru=
-n the
-> tests in a loop for a while without failures. I expect there are more pro=
-blems
-> hidden but with these changes the first milesone is reached.
+>> - REQ_OP_ZONE_OPEN
+>> - REQ_OP_ZONE_CLOSE
+>> - REQ_OP_ZONE_FINISH
+>> - REQ_OP_ZONE_RES
 >
-> The first new patch is actually one from a previous attempt. It addresses=
- the
-> problem in unloading path where we dont make any progress more [2].
+> REQ_OP_ZONE_RESET
+
+Thanks!
+
 >
-> The next two patches change the existing initial connection attempt of FC=
- to
-> a synchronous one. Without this the auth test fail [3].
+>> The last patch adds support for REQ_OP_ZONE_APPEND.
+>> v3 [2] -> v4 changes:
+>> - Split up v3 patches
+>> - Add zone append support
+>> - Change order of variables in `ublk_report_zones`
+>> Read/write and zone operations are tested with zenfs [3].
+>> The zone append path is tested with fio -> zonefs -> ublk -> null_blk.
+>> The implementation of zone append requires ublk user copy feature, and
+>> therefore
+>> the series is based on branch for-next (6afa337a3789) of [4].
+>> [1]
+>> https://github.com/metaspace/ubdsrv/commit/7de0d901c329fde7dc5a2e998952d=
+d88bf5e668b
+>> <https://github.com/metaspace/ubdsrv/commit/7de0d901c329fde7dc5a2e998952=
+dd88bf5e668b>
+>> [2]
+>> https://lore.kernel.org/linux-block/20230316145539.300523-1-nmi@metaspac=
+e.dk
+>> <mailto:20230316145539.300523-1-nmi@metaspace.dk>/
+>> [3] https://github.com/westerndigitalcorporation/zenfs
+>> <https://github.com/westerndigitalcorporation/zenfs>
+>> [4] https://git.kernel.dk/linux.git <https://git.kernel.dk/linux.git>
+>> Andreas Hindborg (4):
+>> ublk: change ublk IO command defines to enum
+>> ublk: move types to shared header file
+>> ublk: enable zoned storage support
+>> ublk: add zone append
+>> MAINTAINERS | 2 +
+>> drivers/block/Kconfig | 4 +
+>> drivers/block/Makefile | 4 +-
+>> drivers/block/ublk_drv-zoned.c | 155 +++++++++++++++++++++++++++++++++
+>> drivers/block/ublk_drv.c | 150 +++++++++++++++++++------------
+>> drivers/block/ublk_drv.h | 71 +++++++++++++++
+>> include/uapi/linux/ublk_cmd.h | 38 ++++++--
+>> 7 files changed, 363 insertions(+), 61 deletions(-)
+>> create mode 100644 drivers/block/ublk_drv-zoned.c
+>> create mode 100644 drivers/block/ublk_drv.h
+>> base-commit: 3261ea42710e9665c9151006049411bd23b5411f
 >
-> Daniel
->
->
-> [1] https://lore.kernel.org/linux-nvme/20230620132703.20648-1-dwagner@sus=
-e.de/
-> [2] https://lore.kernel.org/linux-nvme/20230418130159.11075-1-dwagner@sus=
-e.de/
-> [3] https://lore.kernel.org/linux-nvme/j4w7724skjsapgtp6wtll5fgsb4adhpfdt=
-rif52lhc7iql4inf@3mu2gbjrrtcs/
->
-> changes:
->
-> v2:
->   - added RBs
->   - added new patches
->
-> v1:
->   - https://lore.kernel.org/linux-nvme/20230615094356.14878-1-dwagner@sus=
-e.de/
->
->
-> Initial cover letter:
->
-> A couple more fixes to enable blktests for the fc transport.
->
-> 1) Another module unloading hanger which can be triggered with
->    the nvme/048 tests:
->
->    run blktests nvme/048 at 2023-06-06 13:04:49
->    nvmet: adding nsid 1 to subsystem blktests-subsystem-1
->    nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000=
-002  rport wwpn 0x20001100aa000001: NQN "blktests-subsystem-1"
->    (NULL device *): {0:0} Association created
->    [478] nvmet: ctrl 1 start keep-alive timer for 1 secs
->    [478] nvmet: check nqn.2014-08.org.nvmexpress:uuid:3d0c3f5d-cb37-4bc4-=
-af29-2168953bfc0a
->    [478] nvmet: nvmet_setup_dhgroup: ctrl 1 selecting dhgroup 0
->    [478] nvmet: No authentication provided
->    nvmet: creating nvm controller 1 for subsystem blktests-subsystem-1 fo=
-r NQN nqn.2014-08.org.nvmexpress:uuid:3d0c3f5d-cb37-4bc4-af29-2168953bfc0a.
->    [478] nvmet: adding queue 1 to ctrl 1.
->    [407] nvmet: adding queue 2 to ctrl 1.
->    [6549] nvmet: adding queue 3 to ctrl 1.
->    [1760] nvmet: adding queue 4 to ctrl 1.
->    nvme nvme2: NVME-FC{0}: controller connect complete
->    nvme nvme2: NVME-FC{0}: new ctrl: NQN "blktests-subsystem-1"
->    [478] nvmet: ctrl 1 reschedule traffic based keep-alive timer
->    [407] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    nvme nvme2: NVME-FC{0}: io failed due to lldd error 6
->    nvme nvme2: NVME-FC{0}: transport association event: transport detecte=
-d io error
->    nvme nvme2: NVME-FC{0}: resetting controller
->    [478] nvmet: ctrl 1 stop keep-alive
->    (NULL device *): {0:0} Association deleted
->    nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000=
-002  rport wwpn 0x20001100aa000001: NQN "blktests-subsystem-1"
->    (NULL device *): {0:0} Association freed
->    (NULL device *): {0:0} Association created
->    (NULL device *): Disconnect LS failed: No Association
->    [407] nvmet: ctrl 1 start keep-alive timer for 1 secs
->    [407] nvmet: check nqn.2014-08.org.nvmexpress:uuid:3d0c3f5d-cb37-4bc4-=
-af29-2168953bfc0a
->    [407] nvmet: nvmet_setup_dhgroup: ctrl 1 selecting dhgroup 0
->    [407] nvmet: No authentication provided
->    nvmet: creating nvm controller 1 for subsystem blktests-subsystem-1 fo=
-r NQN nqn.2014-08.org.nvmexpress:uuid:3d0c3f5d-cb37-4bc4-af29-2168953bfc0a.
->    nvme nvme2: reconnect: revising io queue count from 4 to 1
->    [478] nvmet: adding queue 1 to ctrl 1.
->    nvme nvme2: NVME-FC{0}: controller connect complete
->    [478] nvmet: ctrl 1 reschedule traffic based keep-alive timer
->    [478] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [478] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [6549] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [6549] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [6549] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [6549] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [407] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    nvme nvme2: NVME-FC{0}: io failed due to lldd error 6
->    nvme nvme2: NVME-FC{0}: transport association event: transport detecte=
-d io error
->    nvme nvme2: NVME-FC{0}: resetting controller
->    [478] nvmet: ctrl 1 stop keep-alive
->    (NULL device *): {0:0} Association deleted
->    (NULL device *): {0:0} Association freed
->    (NULL device *): Disconnect LS failed: No Association
->    nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000=
-002  rport wwpn 0x20001100aa000001: NQN "blktests-subsystem-1"
->    (NULL device *): {0:0} Association created
->    [1760] nvmet: ctrl 1 start keep-alive timer for 1 secs
->    [1760] nvmet: check nqn.2014-08.org.nvmexpress:uuid:3d0c3f5d-cb37-4bc4=
--af29-2168953bfc0a
->    [1760] nvmet: nvmet_setup_dhgroup: ctrl 1 selecting dhgroup 0
->    [1760] nvmet: No authentication provided
->    nvmet: creating nvm controller 1 for subsystem blktests-subsystem-1 fo=
-r NQN nqn.2014-08.org.nvmexpress:uuid:3d0c3f5d-cb37-4bc4-af29-2168953bfc0a.
->    nvme nvme2: reconnect: revising io queue count from 1 to 4
->    [478] nvmet: adding queue 1 to ctrl 1.
->    [407] nvmet: adding queue 2 to ctrl 1.
->    [6549] nvmet: adding queue 3 to ctrl 1.
->    [1760] nvmet: adding queue 4 to ctrl 1.
->    nvme nvme2: NVME-FC{0}: controller connect complete
->    [1760] nvmet: ctrl 1 reschedule traffic based keep-alive timer
->    [478] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [478] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [478] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [478] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [6549] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [6549] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [6549] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [1760] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    [6549] nvmet: ctrl 1 update keep-alive timer for 1 secs
->    nvme nvme2: Removing ctrl: NQN "blktests-subsystem-1"
->    [407] nvmet: ctrl 1 stop keep-alive
->    (NULL device *): {0:0} Association deleted
->    (NULL device *): {0:0} Association freed
->    (NULL device *): Disconnect LS failed: No Association
->    nvme_fc: nvme_fc_exit_module: waiting for ctlr deletes
->    BTRFS info (device vda2): qgroup scan completed (inconsistency flag cl=
-eared)
->    INFO: task modprobe:11758 blocked for more than 491 seconds.
->          Tainted: G        W          6.4.0-rc2+ #3
->    "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messa=
-ge.
->    task:modprobe        state:D stack:0     pid:11758 ppid:11585  flags:0=
-x00004002
->    Call Trace:
->     <TASK>
->     __schedule+0x17b5/0x4870
->     ? finish_lock_switch+0x8f/0x120
->     ? finish_task_switch+0x17f/0x5c0
->     ? __sched_text_start+0x10/0x10
->     ? __schedule+0x17bd/0x4870
->     ? do_raw_spin_trylock+0xc9/0x1f0
->     schedule+0xe6/0x1e0
->     schedule_timeout+0x7e/0x1e0
->     ? __cfi_schedule_timeout+0x10/0x10
->     ? do_raw_spin_trylock+0xc9/0x1f0
->     ? __cfi_lock_release+0x10/0x10
->     ? do_raw_spin_unlock+0x116/0x8a0
->     wait_for_common+0x377/0x600
->     ? wait_for_completion+0x30/0x30
->     cleanup_module+0x222/0x240 [nvme_fc bda1ef6f83d00208ba257c5d0ac34dd6b=
-db58bf9]
->     __se_sys_delete_module+0x388/0x550
->     ? __x64_sys_delete_module+0x50/0x50
->     ? task_work_run+0x236/0x290
->     ? syscall_enter_from_user_mode+0x2e/0x210
->     do_syscall_64+0x6e/0xa0
->     ? syscall_exit_to_user_mode+0x5e/0x220
->     ? do_syscall_64+0x7d/0xa0
->     ? syscall_exit_to_user_mode+0x5e/0x220
->     ? do_syscall_64+0x7d/0xa0
->     ? syscall_exit_to_user_mode+0x5e/0x220
->     ? do_syscall_64+0x7d/0xa0
->     entry_SYSCALL_64_after_hwframe+0x72/0xdc
->    RIP: 0033:0x7fa80811aebb
->    RSP: 002b:00007fff80ea0a88 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
->    RAX: ffffffffffffffda RBX: 000055a0b5acf1f0 RCX: 00007fa80811aebb
->    RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000055a0b5acf258
->    RBP: 0000000000000000 R08: 1999999999999999 R09: 0000000000000000
->    R10: 00007fa808193ac0 R11: 0000000000000206 R12: 00007fff80ea0ad0
->    R13: 000055a0b5acf1f0 R14: 0000000000000000 R15: 0000000000000000
->     </TASK>
->
->
-> 2) When executing blktests nvme/030 in a tight loop, I was able to
->    reproduce a different hanger. In this case the ->done() function
->    was never executed on the host fc side. It turns out we didn't
->    enqueue work items correctly and thus would only process one
->    work item.
->
->    run blktests nvme/030 at 2023-06-13 14:03:52
->    nvmet: adding nsid 1 to subsystem blktests-subsystem-1
->    nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000=
-002  rport wwpn 0x20001100aa000001: NQN "nqn.2014-08.org.nvmexpress.discove=
-ry"
->    (NULL device *): {0:0} Association created
->    [23733] nvmet: ctrl 1 start keep-alive timer for 120 secs
->    nvmet: creating discovery controller 1 for subsystem nqn.2014-08.org.n=
-vmexpress.discovery for NQN nqn.2014-08.org.nvmexpress:uuid:242d4a24-2484-4=
-a80-8234-d0169409c5e8.
->    nvme nvme2: NVME-FC{0}: controller connect complete
->    nvme nvme2: NVME-FC{0}: new ctrl: NQN "nqn.2014-08.org.nvmexpress.disc=
-overy"
->    nvme nvme2: Removing ctrl: NQN "nqn.2014-08.org.nvmexpress.discovery"
->    [23771] nvmet: ctrl 1 stop keep-alive
->    nvmet: adding nsid 1 to subsystem blktests-subsystem-2
->    (NULL device *): {0:0} Association deleted
->    (NULL device *): {0:0} Association freed
->    (NULL device *): Disconnect LS failed: No Association
->    nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000=
-002  rport wwpn 0x20001100aa000001: NQN "nqn.2014-08.org.nvmexpress.discove=
-ry"
->    (NULL device *): {0:0} Association created
->    [27320] nvmet: ctrl 1 start keep-alive timer for 120 secs
->    nvmet: creating discovery controller 1 for subsystem nqn.2014-08.org.n=
-vmexpress.discovery for NQN nqn.2014-08.org.nvmexpress:uuid:242d4a24-2484-4=
-a80-8234-d0169409c5e8.
->    nvme nvme2: NVME-FC{0}: controller connect complete
->    nvme nvme2: NVME-FC{0}: new ctrl: NQN "nqn.2014-08.org.nvmexpress.disc=
-overy"
->    nvme nvme2: Removing ctrl: NQN "nqn.2014-08.org.nvmexpress.discovery"
->    [27320] nvmet: ctrl 1 stop keep-alive
->    nvme nvme2: NVME-FC{0}: create association : host wwpn 0x20001100aa000=
-002  rport wwpn 0x20001100aa000001: NQN "nqn.2014-08.org.nvmexpress.discove=
-ry"
->    (NULL device *): {0:1} Association created
->    (NULL device *): {0:0} Association deleted
->    (NULL device *): {0:0} Association freed
->    (NULL device *): Disconnect LS failed: No Association
->    INFO: task kworker/u8:4:102 blocked for more than 491 seconds.
->          Tainted: G        W          6.4.0-rc2+ #3
->    "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messa=
-ge.
->    task:kworker/u8:4    state:D stack:0     pid:102   ppid:2      flags:0=
-x00004000
->    Workqueue: nvme-wq nvme_fc_connect_ctrl_work [nvme_fc]
->    Call Trace:
->     <TASK>
->     __schedule+0x17b5/0x4870
->     ? try_to_wake_up+0xb5/0xfc0
->     ? __cfi_lock_release+0x10/0x10
->     ? __sched_text_start+0x10/0x10
->     ? _raw_spin_unlock_irqrestore+0x24/0x50
->     ? lock_release+0x2aa/0xd10
->     ? wq_worker_sleeping+0x1e/0x200
->     schedule+0xe6/0x1e0
->     schedule_timeout+0x7e/0x1e0
->     ? __cfi_schedule_timeout+0x10/0x10
->     ? mark_lock+0x94/0x340
->     ? lockdep_hardirqs_on_prepare+0x2aa/0x5e0
->     wait_for_common+0x377/0x600
->     ? queue_work_on+0x57/0xa0
->     ? wait_for_completion+0x30/0x30
->     nvme_fc_connect_ctrl_work+0x7dc/0x1a80 [nvme_fc 39e2bf78272df3a610fb1=
-f9884513e99038af746]
->     process_one_work+0x80f/0xfb0
->     ? rescuer_thread+0x1130/0x1130
->     ? do_raw_spin_trylock+0xc9/0x1f0
->     ? lock_acquired+0x310/0x9a0
->     ? worker_thread+0xd5e/0x1260
->     worker_thread+0xbde/0x1260
->     kthread+0x25d/0x2f0
->     ? __cfi_worker_thread+0x10/0x10
->     ? __cfi_kthread+0x10/0x10
->     ret_from_fork+0x29/0x50
->     </TASK>
->
-> Daniel Wagner (5):
->   nvme-fc: Do not wait in vain when unloading module
->   nvme-fcloop: queue work items correctly
->   nvmet-fcloop: Remove remote port from list when unlinking
->   nvme-fc: Make initial connect attempt synchronous
->   nvme-fc: do no free ctrl opts
->
->  drivers/nvme/host/fc.c       | 43 ++++++++++++++++++------------------
->  drivers/nvme/target/fcloop.c | 15 +++++--------
->  2 files changed, 27 insertions(+), 31 deletions(-)
->
-> --
-> 2.41.0
->
->
+> Regards,
+> Aravind
 
