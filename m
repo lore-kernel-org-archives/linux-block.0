@@ -2,213 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C17B5C0015E
-	for <linux-block@archiver.kernel.org>; Sat,  1 Jul 2023 09:48:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2291AEB64DC
+	for <linux-block@archiver.kernel.org>; Sat,  1 Jul 2023 12:11:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229833AbjGAJsl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Jul 2023 05:48:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50620 "EHLO
+        id S229506AbjGAMLP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Jul 2023 08:11:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjGAJsk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Jul 2023 05:48:40 -0400
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 222BE3C29;
-        Sat,  1 Jul 2023 02:48:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1688204882; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=KdbtNqylftOo1+PbBsC55VutPhxTjNTKGLp2HbuzERO0BqPmB0X0tXpLNeBCxI7V06
-    IU4g7lGfTg7H1tidslsHtnaASa9dojI5SKQ1qDtdZjV4qpgLOkdopIUAbUdwlIY3yuvp
-    4/siEAJ99VMoRaN+59J9Samgca1PtIFwlPTCzsLtCrKJvJqXJv46n7SDgdQYwhcEuQfe
-    r66a7iFFW1g+09K6npXW6BlnHnuNpIERG8W009XetNyBp+UA3y1vnGiSBK54rS9ikF2Y
-    1gUPgDnuUM7LHbpiEHVWTKLb8yx4QOTL3MLTSxyPNahmBN5VFKlUNeJkuUtya1Fc7FuB
-    P2oQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1688204882;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=qvqpM5AoRX2cCiwKz3Sb461vdD3xeoeZK2q+kBPv04g=;
-    b=UQGrMKcjMZv7rhcwx3VmV2SHGm3UfiXbZ8vZTqnym9j2ANoeqmTRVtpOkh2X+Prz4u
-    +ldDStW8ykPcRVzoHTS8o1ezq8KV6jNKUkNBLvWZkwX98ikJYy3JkvSOiQQvB5nVB1UP
-    aei0CgcXG0fFREjUvUFg1vVeOO5/kpOpP2lK8K1m1VTVg2ZUXX6fm4qWA4jjoitHRB3P
-    bLfMLDHKdt6PWebCPLdRu+WPqqCm2OJPmcTQ6bUegLKKRb4QEVXAM8ScT34APMMqMsFN
-    nGUf+9Z0XTYf+i0IiQP00tQbjko/ajlS1XFG+WpAyyc5ltXRoXoRuDPFq+KVEKVMBhlC
-    TuHg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1688204882;
-    s=strato-dkim-0002; d=xenosoft.de;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=qvqpM5AoRX2cCiwKz3Sb461vdD3xeoeZK2q+kBPv04g=;
-    b=eYqf046Al535sFwuIPIweoln2AY2veN+CgyJP1JADGDRSGyxuiApVwJcyR9GEesvwU
-    aM+0HqHv+Or3ixRd3lMKNCXD1ULa4Sqpl7iiG/PYnUVXEkUV8ytCLnUFuqGsQ+tA6b9p
-    is8LuNE7M7PsYwyxF3HEhW5bPCG8d015L5B/apWqxn/Hx4QcUXQGi+b0ZdqFuNtAQ62e
-    t/VC8JoJgrKVDURWLWrdk46lbg05sPA8EcRO/JD2bLb1GoAxRenlT8tcLL9N0GtWF4Z2
-    VwyS+tlP91BHaP5f1wvx+JQYcUj2MNiPRxYhIa7dJAAeqFyLv1NUW3dtZ1uLhp1wVzYh
-    oHVw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1688204882;
-    s=strato-dkim-0003; d=xenosoft.de;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=qvqpM5AoRX2cCiwKz3Sb461vdD3xeoeZK2q+kBPv04g=;
-    b=166uqhK1qpchihhOp46ND9BsxEC6UaR1JJIRQ47pTlRBlR6QId5kAF9Q1jjxtWuLq6
-    yAksTR2D2isbYQxbQADA==
-X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBfio0GngadwjR6CBYqLfA6c5k/Fdf2SzuGLMLzg=="
-Received: from [IPV6:2a02:8109:8980:4474:4196:3fea:dfa5:89da]
-    by smtp.strato.de (RZmta 49.6.0 AUTH)
-    with ESMTPSA id N28a51z619m1sPS
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Sat, 1 Jul 2023 11:48:01 +0200 (CEST)
-Message-ID: <b9600d91-6a25-746e-0769-4d0e31038da5@xenosoft.de>
-Date:   Sat, 1 Jul 2023 11:48:01 +0200
+        with ESMTP id S229480AbjGAMLP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Jul 2023 08:11:15 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149B03AAD;
+        Sat,  1 Jul 2023 05:11:14 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6686c74183cso2205868b3a.1;
+        Sat, 01 Jul 2023 05:11:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688213473; x=1690805473;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f1GyuonBm6IUr0u+r5GEAQVpS0cfgB5k80PSwBGFToY=;
+        b=KfCNmTFBwiLTda6Dm+DznJq70IhnOvAFC/zYQHCxe3keuHYR4JHjK5JzgH4OkDx2yc
+         hXpmbi/rlz80nZG5ufKcxKROcSkcMnBzEzjN+EDQtS3VlvdbOpRBAVlBpgBnv/BYemCc
+         wwjnVDGWI4Qzw2yXTiy3Id8dcsfpr+15qamDPQ7CYGPm1bGG6DTkZaT/j87fsezktniz
+         A78OIPMEG9uotIa/b1AmRA/pcI9ZJVIL51/IaKmIWTytbxVRL9bH6W0wS5KPuWYcgZGT
+         X1X0YWjCoQEJB5G7XGtcQV45Dis4/iB0Rtm+TH4X6Lu0/mQAT7RmcK72eszUsej+8JpZ
+         COiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688213473; x=1690805473;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f1GyuonBm6IUr0u+r5GEAQVpS0cfgB5k80PSwBGFToY=;
+        b=jklLHdAabqjjw6qKK+qdwTrBMNAQm2AZYk22NY+FyTugYyvT6NG55ke28yfZySXGCH
+         I5sRCpuOx/fEe2DFi7XoOu6ykadnzVzDHaGUoQjpfSGEJgBV57xZaJNv8iJbLysz3e1E
+         cJw2OrjR93v9aZQthVkTZoFKNoNPTakKC4+t6mb5A+y52Uu7ft0hH1mF93s0iouQlB3Y
+         LIC1B1lMKaS2hF5B54wUTvJFVWSPIiWjgM/XDlHuZVBOe7AKyizk7hgnFqRCUQz/7f3/
+         Sw2ShMz0/trYIxf6cgOZazo+EOTZU+UozlrLoStHcBe6J91TgUu2O2v/XqRFRo/IHSuc
+         /0wQ==
+X-Gm-Message-State: ABy/qLa9XCeNwRqPBwjAmSBFtN8ctCkrzsrrHw/bXiQ4bJRCBt75EPBV
+        jk0ZGamUWvU0IagA0nva53s=
+X-Google-Smtp-Source: APBJJlFta5cKHhIgxiLxamDAB/Qw2W5giLxoywNe8po2TJMX0I3gw3Sfh3ev9H6ouhWZEi/AI96i4g==
+X-Received: by 2002:a05:6a00:14cc:b0:66f:912b:d6f with SMTP id w12-20020a056a0014cc00b0066f912b0d6fmr7785028pfu.0.1688213473510;
+        Sat, 01 Jul 2023 05:11:13 -0700 (PDT)
+Received: from [192.168.50.210] (ip68-109-79-27.oc.oc.cox.net. [68.109.79.27])
+        by smtp.gmail.com with ESMTPSA id i22-20020aa78b56000000b006687198c3easm11781138pfd.179.2023.07.01.05.11.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 01 Jul 2023 05:11:13 -0700 (PDT)
+Message-ID: <594f73f2-59b0-bbcb-d7a0-6d89e2446830@gmail.com>
+Date:   Sat, 1 Jul 2023 05:11:11 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH] block: bugfix for Amiga partition overflow check patch
-To:     Michael Schmitz <schmitzmic@gmail.com>, linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, linux-m68k@vger.kernel.org, geert@linux-m68k.org,
-        hch@lst.de, martin@lichtvoll.de, stable@vger.kernel.org,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>,
-        Darren Stevens <darren@stevens-zone.net>,
-        mad skateman <madskateman@gmail.com>,
-        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        Christian Zigotzky <info@xenosoft.de>
-References: <20230701023524.7434-1-schmitzmic@gmail.com>
- <3e3ce346-f627-4adf-179d-b8817361e6e3@xenosoft.de>
- <94d46446-97fc-9e92-2585-71c18e65b64a@gmail.com>
-Content-Language: de-DE
-From:   Christian Zigotzky <chzigotzky@xenosoft.de>
-In-Reply-To: <94d46446-97fc-9e92-2585-71c18e65b64a@gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v2 4/5] nvme-fc: Make initial connect attempt synchronous
+Content-Language: en-US
+To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>
+References: <20230620133711.22840-1-dwagner@suse.de>
+ <20230620133711.22840-5-dwagner@suse.de>
+From:   James Smart <jsmart2021@gmail.com>
+In-Reply-To: <20230620133711.22840-5-dwagner@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 01 July 2023 at 10:11 am, Michael Schmitz wrote:
-> Hi Christian,
->
-> Am 01.07.2023 um 18:40 schrieb Christian Zigotzky:
->> On 01 July 2023 at 04:35 am, Michael Schmitz wrote:
->>> Making 'blk' sector_t (i.e. 64 bit if LBD support is active)
->>> fails the 'blk>0' test in the partition block loop if a
->>> value of (signed int) -1 is used to mark the end of the
->>> partition block list.
->>>
->>> This bug was introduced in patch 3 of my prior Amiga partition
->>> support fixes series, and spotted by Christian Zigotzky when
->>> testing the latest block updates.
->>>
->>> Explicitly cast 'blk' to signed int to allow use of -1 to
->>> terminate the partition block linked list.
->>>
->>> Reported-by: Christian Zigotzky <chzigotzky@xenosoft.de>
->>> Fixes: b6f3f28f60 ("Linux 6.4")
->>> Message-ID: 024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de
->>> Cc: <stable@vger.kernel.org> # 6.4
->>> Link:
->>> https://lore.kernel.org/r/024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de 
->>>
->>>
->>> Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
->>> ---
->>>   block/partitions/amiga.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
->>> index ed222b9c901b..506921095412 100644
->>> --- a/block/partitions/amiga.c
->>> +++ b/block/partitions/amiga.c
->>> @@ -90,7 +90,7 @@ int amiga_partition(struct parsed_partitions *state)
->>>       }
->>>       blk = be32_to_cpu(rdb->rdb_PartitionList);
->>>       put_dev_sector(sect);
->>> -    for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
->>> +    for (part = 1; (s32) blk>0 && part<=16; part++,
->>> put_dev_sector(sect)) {
->>>           /* Read in terms partition table understands */
->>>           if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
->>>               pr_err("Dev %s: overflow calculating partition block
->>> %llu! Skipping partitions %u and beyond\n",
->> Hello Michael,
->>
->> Thanks for your patch.
->>
->> I patched the latest git kernel source code with your patch today but
->> unfortunately the kernel has reported a bad geometry. (EXT4-fs (sda4):
->> bad geometry: block count ...)
->>
->> dmesg | grep -i sda
->>
->> [    4.025449] sd 0:0:0:0: [sda] 3907029168 512-byte logical blocks:
->> (2.00 TB/1.82 TiB)
->> [    4.071978] sd 0:0:0:0: [sda] 4096-byte physical blocks
->> [    4.119333] sd 0:0:0:0: [sda] Write Protect is off
->> [    4.165958] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
->> [    4.212921] sd 0:0:0:0: [sda] Write cache: enabled, read cache:
->> enabled, doesn't support DPO or FUA
->> [    4.259469] sd 0:0:0:0: [sda] Preferred minimum I/O size 4096 bytes
->> [    4.502519]  sda: RDSK (512) sda1 (DOS^G)(res 2 spb 2) sda2
->> (SFS^B)(res 2 spb 1) sda3 (SFS^B)(res 2 spb 2) sda4 ((res 2 spb 1)
->
-> Good - all partitions are recognized again as they ought to be.
->
->> [    4.551981] sd 0:0:0:0: [sda] Attached SCSI disk
->> [   82.421727] EXT4-fs (sda4): bad geometry: block count 319655862
->> exceeds size of device (317690430 blocks)
->
-> Now that may be a new bug... or just a filesystem created with 
-> incorrect assumptions about partition size.
->
-> That is the partition that had reported:
->
->> sda: p4 size 18446744071956107760 extends beyond EOD, truncated
->
-> with my patches backed out? I wonder what size mkfs used when creating 
-> the filesystem?
->
-> The calculated size was clearly incorrect, but the truncated size may 
-> also be incorrect. The truncated size is likely that of a partition 
-> extending to the end of the disk, but your actual p4 size may have 
-> been smaller (your parted -l output had 1992GB which is 8 GB shorter 
-> than to EOD).
->
-> On the face of it, this does not look like a new bug in the RDB 
-> partition code, but I'd rather verify that by inspecting the RDB 
-> contents and carrying out the calculations by hand.
->
-> Can you please send a copy of the RDB (first few kB of the disk, 
-> something like dd if=/dev/sda of=rdb-sda.img bs=512 count=16 should 
-> do), and the output of cat /proc/partitions when running a kernel from 
-> before my RDB patches?
->
->
-Copy of the RDB: https://www.xenosoft.de/rdb-sda.img
 
-cat /proc/partitions:
+On 6/20/2023 6:37 AM, Daniel Wagner wrote:
+> Commit 4c984154efa1 ("nvme-fc: change controllers first connect to use
+> reconnect path") made the connection attempt asynchronous in order to
+> make the connection attempt from autoconnect/boot via udev/systemd up
+> case a bit more reliable.
+> 
+> Unfortunately, one side effect of this is that any wrong parameters
+> provided from userspace will not be directly reported as invalid, e.g.
+> auth keys.
+> 
+> So instead having the policy code inside the kernel it's better to
+> address this in userspace, for example in nvme-cli or nvme-stas.
+> 
+> This aligns the fc transport with tcp and rdma.
 
-major minor  #blocks  name
+As much as you want to make this change to make transports "similar", I 
+am dead set against it unless you are completing a long qualification of 
+the change on real FC hardware and FC-NVME devices. There is probably 
+1.5 yrs of testing of different race conditions that drove this change. 
+You cannot declare success from a simplistic toy tool such as fcloop for 
+validation.
 
-    8        0 1953514584 sda
-    8        1     119088 sda1
-    8        2    2100096 sda2
-    8        3  672670920 sda3
-    8        4 1278623448 sda4
-   11        0    1048575 sr0
-    8       32     250880 sdc
-    8       33     249856 sdc1
-    8       16  234431064 sdb
-    8       17  144364512 sdb1
-    8       18          1 sdb2
-    8       19   18500608 sdb3
-    8       20   40717312 sdb4
-    8       21   14684160 sdb5
-    8       22   16161792 sdb6
-    8       48       1440 sdd
-    8       49       1439 sdd1
+The original issues exist, probably have even morphed given the time 
+from the original change, and this will seriously disrupt the transport 
+and any downstream releases.  So I have a very strong NACK on this change.
 
-Thanks
+Yes - things such as the connect failure results are difficult to return 
+back to nvme-cli. I have had many gripes about the nvme-cli's behavior 
+over the years, especially on negative cases due to race conditions 
+which required retries. It still fails this miserably.  The async 
+reconnect path solved many of these issues for fc.
 
+For the auth failure, how do we deal with things if auth fails over time 
+as reconnects fail due to a credential changes ?  I would think 
+commonality of this behavior drives part of the choice.
+
+-- james
