@@ -2,112 +2,165 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2291AEB64DC
-	for <linux-block@archiver.kernel.org>; Sat,  1 Jul 2023 12:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74DF1C001B0
+	for <linux-block@archiver.kernel.org>; Sun,  2 Jul 2023 02:17:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbjGAMLP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Jul 2023 08:11:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37298 "EHLO
+        id S229523AbjGBCRp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Jul 2023 22:17:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjGAMLP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Jul 2023 08:11:15 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149B03AAD;
-        Sat,  1 Jul 2023 05:11:14 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6686c74183cso2205868b3a.1;
-        Sat, 01 Jul 2023 05:11:14 -0700 (PDT)
+        with ESMTP id S229446AbjGBCRo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Jul 2023 22:17:44 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7421703;
+        Sat,  1 Jul 2023 19:17:38 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b7f2239bfdso26142205ad.1;
+        Sat, 01 Jul 2023 19:17:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688213473; x=1690805473;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f1GyuonBm6IUr0u+r5GEAQVpS0cfgB5k80PSwBGFToY=;
-        b=KfCNmTFBwiLTda6Dm+DznJq70IhnOvAFC/zYQHCxe3keuHYR4JHjK5JzgH4OkDx2yc
-         hXpmbi/rlz80nZG5ufKcxKROcSkcMnBzEzjN+EDQtS3VlvdbOpRBAVlBpgBnv/BYemCc
-         wwjnVDGWI4Qzw2yXTiy3Id8dcsfpr+15qamDPQ7CYGPm1bGG6DTkZaT/j87fsezktniz
-         A78OIPMEG9uotIa/b1AmRA/pcI9ZJVIL51/IaKmIWTytbxVRL9bH6W0wS5KPuWYcgZGT
-         X1X0YWjCoQEJB5G7XGtcQV45Dis4/iB0Rtm+TH4X6Lu0/mQAT7RmcK72eszUsej+8JpZ
-         COiQ==
+        d=gmail.com; s=20221208; t=1688264258; x=1690856258;
+        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
+         :message-id:from:cc:references:to:subject:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yJTGw+c9DJrbYqiA04K/2tANXpXGkgOAgtlz124a1Co=;
+        b=YgaK746I+skXxol7AodgRplLh/h4Un1YNEUG7ChHu1aIEwGJM26CThspI00TET9jYU
+         HsOAMzX3opDf+nm8c2SXTrbbjKxmpqCKVpOpKnKbkQeg+0NSo3SsA4M5J6R3f5ACJMwt
+         rdeaSIinHZ9oNhxYSX42yap+UNw04KMfCKliMFuf6CYGoUiG2X3rrsd3X5wlOi9bNzsX
+         2eE6y7nsaCalVlw3RkXeFbDkDzQoQE6MqLWxLFgrTAhyVmjk45LRmEEnNFt4yCqzpffe
+         /qcMz71olL8Rl3sjm/gB9v60k20OnlCfPLiW8sVXzw7Kk/AcxXrBr3kpJ9nI6Ml18cuQ
+         bvig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688213473; x=1690805473;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f1GyuonBm6IUr0u+r5GEAQVpS0cfgB5k80PSwBGFToY=;
-        b=jklLHdAabqjjw6qKK+qdwTrBMNAQm2AZYk22NY+FyTugYyvT6NG55ke28yfZySXGCH
-         I5sRCpuOx/fEe2DFi7XoOu6ykadnzVzDHaGUoQjpfSGEJgBV57xZaJNv8iJbLysz3e1E
-         cJw2OrjR93v9aZQthVkTZoFKNoNPTakKC4+t6mb5A+y52Uu7ft0hH1mF93s0iouQlB3Y
-         LIC1B1lMKaS2hF5B54wUTvJFVWSPIiWjgM/XDlHuZVBOe7AKyizk7hgnFqRCUQz/7f3/
-         Sw2ShMz0/trYIxf6cgOZazo+EOTZU+UozlrLoStHcBe6J91TgUu2O2v/XqRFRo/IHSuc
-         /0wQ==
-X-Gm-Message-State: ABy/qLa9XCeNwRqPBwjAmSBFtN8ctCkrzsrrHw/bXiQ4bJRCBt75EPBV
-        jk0ZGamUWvU0IagA0nva53s=
-X-Google-Smtp-Source: APBJJlFta5cKHhIgxiLxamDAB/Qw2W5giLxoywNe8po2TJMX0I3gw3Sfh3ev9H6ouhWZEi/AI96i4g==
-X-Received: by 2002:a05:6a00:14cc:b0:66f:912b:d6f with SMTP id w12-20020a056a0014cc00b0066f912b0d6fmr7785028pfu.0.1688213473510;
-        Sat, 01 Jul 2023 05:11:13 -0700 (PDT)
-Received: from [192.168.50.210] (ip68-109-79-27.oc.oc.cox.net. [68.109.79.27])
-        by smtp.gmail.com with ESMTPSA id i22-20020aa78b56000000b006687198c3easm11781138pfd.179.2023.07.01.05.11.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Jul 2023 05:11:13 -0700 (PDT)
-Message-ID: <594f73f2-59b0-bbcb-d7a0-6d89e2446830@gmail.com>
-Date:   Sat, 1 Jul 2023 05:11:11 -0700
+        d=1e100.net; s=20221208; t=1688264258; x=1690856258;
+        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
+         :message-id:from:cc:references:to:subject:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yJTGw+c9DJrbYqiA04K/2tANXpXGkgOAgtlz124a1Co=;
+        b=fer6czbEEqdWH8wWcQai61hV4jnrJLbhw9/RjJ1epWYm2d5y3A09TkCwgcKAqMuAZk
+         wKKlXdvx/s8HSkLv7+q2fbKI3wG2m9Q3bTm0W2/YKGVlnxD+zcYMBVXCnATfptB0X0Je
+         RVb54sPvZ1VufW37zYYtpk5XaIWzfzSxpDXuGVj6U/1+xBuRoR+QPop63YhAX2cBZY14
+         BI2fDopdVuXVdIQV4P1GHaydnU7QwKWrmi7ahGv6W80Nw1H7f6+/gXIfVU5KCe/idQMx
+         hJD14GXa7umwyteD6zIlTYjsjIv68ynh5T1Hge30EPe/WVyIxfzeEYAiWJCZqBN3IwCt
+         sLdQ==
+X-Gm-Message-State: ABy/qLbQZFGplW5M09TkVTxEjlA9VoAK1r9xIB2QeSG8y7Gp7jbibdHW
+        3FphxLOqlBYWo7TnkA3I7OQ=
+X-Google-Smtp-Source: APBJJlEHuyOIr+bpMXj6M8qVN84MWrOUnsf0HN46zV15E4B5oVJcSfNCuw0JTj4GKAK40hSTwnrpFw==
+X-Received: by 2002:a17:903:1246:b0:1b4:5697:d991 with SMTP id u6-20020a170903124600b001b45697d991mr8479034plh.15.1688264257789;
+        Sat, 01 Jul 2023 19:17:37 -0700 (PDT)
+Received: from [10.1.1.24] (222-152-184-54-fibre.sparkbb.co.nz. [222.152.184.54])
+        by smtp.gmail.com with ESMTPSA id j23-20020a170902759700b001b53953f306sm12875459pll.178.2023.07.01.19.17.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 01 Jul 2023 19:17:37 -0700 (PDT)
+Subject: Re: [PATCH] block: bugfix for Amiga partition overflow check patch
+To:     Christian Zigotzky <chzigotzky@xenosoft.de>,
+        linux-block@vger.kernel.org
+References: <20230701023524.7434-1-schmitzmic@gmail.com>
+ <3e3ce346-f627-4adf-179d-b8817361e6e3@xenosoft.de>
+ <94d46446-97fc-9e92-2585-71c18e65b64a@gmail.com>
+ <b9600d91-6a25-746e-0769-4d0e31038da5@xenosoft.de>
+Cc:     axboe@kernel.dk, linux-m68k@vger.kernel.org, geert@linux-m68k.org,
+        hch@lst.de, martin@lichtvoll.de, stable@vger.kernel.org,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        Darren Stevens <darren@stevens-zone.net>,
+        mad skateman <madskateman@gmail.com>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        Christian Zigotzky <info@xenosoft.de>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+Message-ID: <afe14b08-7bab-d81b-fce6-e6408741760a@gmail.com>
+Date:   Sun, 2 Jul 2023 14:17:23 +1200
+User-Agent: Mozilla/5.0 (X11; Linux ppc; rv:45.0) Gecko/20100101
+ Icedove/45.4.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v2 4/5] nvme-fc: Make initial connect attempt synchronous
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>
-References: <20230620133711.22840-1-dwagner@suse.de>
- <20230620133711.22840-5-dwagner@suse.de>
-From:   James Smart <jsmart2021@gmail.com>
-In-Reply-To: <20230620133711.22840-5-dwagner@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <b9600d91-6a25-746e-0769-4d0e31038da5@xenosoft.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Christian,
 
-On 6/20/2023 6:37 AM, Daniel Wagner wrote:
-> Commit 4c984154efa1 ("nvme-fc: change controllers first connect to use
-> reconnect path") made the connection attempt asynchronous in order to
-> make the connection attempt from autoconnect/boot via udev/systemd up
-> case a bit more reliable.
-> 
-> Unfortunately, one side effect of this is that any wrong parameters
-> provided from userspace will not be directly reported as invalid, e.g.
-> auth keys.
-> 
-> So instead having the policy code inside the kernel it's better to
-> address this in userspace, for example in nvme-cli or nvme-stas.
-> 
-> This aligns the fc transport with tcp and rdma.
+Am 01.07.2023 um 21:48 schrieb Christian Zigotzky:
+>> Can you please send a copy of the RDB (first few kB of the disk,
+>> something like dd if=/dev/sda of=rdb-sda.img bs=512 count=16 should
+>> do), and the output of cat /proc/partitions when running a kernel from
+>> before my RDB patches?
+>>
+>>
+> Copy of the RDB: https://www.xenosoft.de/rdb-sda.img
 
-As much as you want to make this change to make transports "similar", I 
-am dead set against it unless you are completing a long qualification of 
-the change on real FC hardware and FC-NVME devices. There is probably 
-1.5 yrs of testing of different race conditions that drove this change. 
-You cannot declare success from a simplistic toy tool such as fcloop for 
-validation.
+Thanks, casual inspection of this RDB does show that indeed a value of 
+-1 is used as pb_next in partition slot 4 (and 5).
 
-The original issues exist, probably have even morphed given the time 
-from the original change, and this will seriously disrupt the transport 
-and any downstream releases.  So I have a very strong NACK on this change.
+The disk geometry is defined as 3 heads, 16 sectors per track (48 
+sectors per cylinder) and 81396441 cylinders which matches your 2 TB 
+disk size.
 
-Yes - things such as the connect failure results are difficult to return 
-back to nvme-cli. I have had many gripes about the nvme-cli's behavior 
-over the years, especially on negative cases due to race conditions 
-which required retries. It still fails this miserably.  The async 
-reconnect path solved many of these issues for fc.
+The first partition begins at cylinder 43 and ends at cylinder 5004, 
+matching the 119088 k (k == 1024 bytes) below.
 
-For the auth failure, how do we deal with things if auth fails over time 
-as reconnects fail due to a credential changes ?  I would think 
-commonality of this behavior drives part of the choice.
+Partition 2 begins at cylinder 5005, ends at 92508, size 2100096 again 
+as below.
 
--- james
+Partition 3 begins at cylinder 92509, ends at 28120463, size 672670920 
+as below.
+
+Partition 4 begins at cylinder 28120464, ends at 81068868, size 
+1270041720, different from the size shown in your /proc/partitions log.
+
+The disk ends at cylinder 81396440, so a partition 4 extending to the 
+end of the disk would have size 1278623448, which is what your log shows.
+
+>
+> cat /proc/partitions:
+>
+> major minor  #blocks  name
+>
+>    8        0 1953514584 sda
+>    8        1     119088 sda1
+>    8        2    2100096 sda2
+>    8        3  672670920 sda3
+>    8        4 1278623448 sda4
+
+I have (disk image on sdb, patches applied):
+      8       20 1270761720 sdb4
+
+which matches what I calculated by hand above.
+
+With an old kernel that does not have the RDB fixes, I get the same 
+partition size as you report. That size is the result of truncation to 
+EOD (the miscalculated size of 18446744071956107760 exceeds the device 
+size).
+
+Creating the filesystem on an unpatched kernel will use that incorrect 
+partition size. I'm sorry to say I cannot see a new RDB partition bug 
+her, just the result of undefined behaviour due to overflowing a 32 bit 
+nr_sect size calculation in the old RDB code.
+
+
+If you cannot shrink the filesystem, you will have to edit the partition 
+table to extend p4 to the end of the disk. Just replace the partition 4 
+pb->pb_Environment[10] (at offset 0x8a8, current value 0x04d50344) by 
+0x04da02d8. As far as I can see, there is no adjustment to the partition 
+block checksum required, as the checksummed block of 160 bytes ends just 
+before the location of the partition's low and high cylinder addresses....
+
+I'd best verify that a patched RDB actually works...
+
+Cheers,
+
+	Michael
+
+
+
+>   11        0    1048575 sr0
+>    8       32     250880 sdc
+>    8       33     249856 sdc1
+>    8       16  234431064 sdb
+>    8       17  144364512 sdb1
+>    8       18          1 sdb2
+>    8       19   18500608 sdb3
+>    8       20   40717312 sdb4
+>    8       21   14684160 sdb5
+>    8       22   16161792 sdb6
+>    8       48       1440 sdd
+>    8       49       1439 sdd1
+
