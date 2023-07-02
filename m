@@ -2,93 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDCBEB64DD
-	for <linux-block@archiver.kernel.org>; Sun,  2 Jul 2023 11:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E70ADEB64DD
+	for <linux-block@archiver.kernel.org>; Sun,  2 Jul 2023 19:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjGBL3d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Jul 2023 07:29:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55982 "EHLO
+        id S231860AbjGBTmt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Jul 2023 15:42:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbjGBL3d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Jul 2023 07:29:33 -0400
-Received: from mail.lichtvoll.de (luna.lichtvoll.de [194.150.191.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7187E72;
-        Sun,  2 Jul 2023 04:29:30 -0700 (PDT)
-Received: from 127.0.0.1 (localhost [127.0.0.1])
+        with ESMTP id S231766AbjGBTmT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Jul 2023 15:42:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7DB11BE2;
+        Sun,  2 Jul 2023 12:41:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mail.lichtvoll.de (Postfix) with ESMTPSA id 800BD72B00B;
-        Sun,  2 Jul 2023 13:29:28 +0200 (CEST)
-Authentication-Results: mail.lichtvoll.de;
-        auth=pass smtp.auth=martin smtp.mailfrom=martin@lichtvoll.de
-From:   Martin Steigerwald <martin@lichtvoll.de>
-To:     Christian Zigotzky <chzigotzky@xenosoft.de>, axboe@kernel.dk,
-        Michael Schmitz <schmitzmic@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-m68k@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Christoph Hellwig <hch@lst.de>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>,
-        mad skateman <madskateman@gmail.com>,
-        Darren Stevens <darren@stevens-zone.net>
-Subject: Re: [FSL P50x0] [PASEMI] The Access to partitions on disks with an Amiga
- partition table doesn't work anymore after the block updates 2023-06-23
-Date:   Sun, 02 Jul 2023 13:29:28 +0200
-Message-ID: <3200191.5fSG56mABF@lichtvoll.de>
-In-Reply-To: <48ded6f5-242c-a1b7-39b3-0585be4b848a@gmail.com>
-References: <024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de>
- <0a8cabbf-89c6-a247-dee8-c27e081b9561@gmail.com>
- <48ded6f5-242c-a1b7-39b3-0585be4b848a@gmail.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 52D8B60C96;
+        Sun,  2 Jul 2023 19:40:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA564C433C8;
+        Sun,  2 Jul 2023 19:40:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688326838;
+        bh=sB3H+3BFpVqM9IJlZFM+G0+XNhcWle9yWb7Z753Yb9E=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=f0o2422Pg5y1c2Ph+AUVAU79jhzptSmugguPCq1xizjk3ebp9WYnmS2QpAAYUMYyH
+         It1E4iZArsA9o2/DpKZ1yCn3DmvdrlUc0kjJmIYtGQXgmUXaueoO8sTZqpD3uyP+IM
+         Svx7xuVHrzJskX8nbIIJFZOJtcLlWzIPW2hjlKkk3yF6ASOT22UMr8Ha9u+lT/3Slk
+         Uh7KcIKVyt6OjECOXyFC6o4wg7CN8vi9zqgsxt3WTs9yStRvKZ6TVNPCKALVgAaUyZ
+         IeRelJEjLjTh2LUusGvCoMPppZ2SLzF1Fo5W3ZAq8kdo099W5oTU56Jo95GP6Si/sy
+         +StFaMbKB9N0w==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Zhong Jinghua <zhongjinghua@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, josef@toxicpanda.com,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH AUTOSEL 6.4 06/15] nbd: Add the maximum limit of allocated index in nbd_dev_add
+Date:   Sun,  2 Jul 2023 15:40:11 -0400
+Message-Id: <20230702194020.1776895-6-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230702194020.1776895-1-sashal@kernel.org>
+References: <20230702194020.1776895-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.1
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Michael.
+From: Zhong Jinghua <zhongjinghua@huawei.com>
 
-Michael Schmitz - 01.07.23, 04:05:30 CEST:
-> The RDB format description URL that appears in one of your messages
-> from the 2012 thread has gone dead. I'll try to find it on Wayback
-> later. In the meantime, I will submit a patch to fix the new bug ...
-> We can has out details in the inevitable review process.
+[ Upstream commit f12bc113ce904777fd6ca003b473b427782b3dde ]
 
-Hmm, I think they just went for prettier URLs:
+If the index allocated by idr_alloc greater than MINORMASK >> part_shift,
+the device number will overflow, resulting in failure to create a block
+device.
 
-https://wiki.amigaos.net/wiki/RDB
+Fix it by imiting the size of the max allocation.
 
-But there is not much on it.
+Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20230605122159.2134384-1-zhongjinghua@huaweicloud.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/nbd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-Not sure whether there is a more detailed explanation anywhere on the 
-net. I am pretty sure there is more in the NDK/SDK tough. And indeed 
-there is:
-
-AmigaOS 3.x NDK
-
-https://www.hyperion-entertainment.com/index.php/downloads?
-view=files&parent=40
-
-I found it in: Include_H/devices/hardblocks.h
-
-This is at least an include with the exact structure of the RDB and of 
-the partition blocks. There are some explanations in the comments. Maybe 
-there is something more elsewhere in this NDK.
-
-You can unpack this using lhasa, easily available in Debian based 
-distributions.
-
-AmigaOS 4.x Software Development Kit
-
-https://www.hyperion-entertainment.com/index.php/downloads?
-view=files&parent=30
-
-This is a bit more time consuming to dig through. I skip it for now.
-
-Best,
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 65ecde3e2a5be..6457a094abcc1 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1776,7 +1776,8 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+ 		if (err == -ENOSPC)
+ 			err = -EEXIST;
+ 	} else {
+-		err = idr_alloc(&nbd_index_idr, nbd, 0, 0, GFP_KERNEL);
++		err = idr_alloc(&nbd_index_idr, nbd, 0,
++				(MINORMASK >> part_shift) + 1, GFP_KERNEL);
+ 		if (err >= 0)
+ 			index = err;
+ 	}
 -- 
-Martin
-
+2.39.2
 
