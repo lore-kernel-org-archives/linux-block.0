@@ -2,19 +2,19 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90BD7C04FDF
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 09:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67FADC04E69
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 09:49:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231368AbjGCJtz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jul 2023 05:49:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50184 "EHLO
+        id S231409AbjGCJt5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jul 2023 05:49:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231310AbjGCJtx (ORCPT
+        with ESMTP id S231318AbjGCJtx (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 05:49:53 -0400
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0B00BE;
-        Mon,  3 Jul 2023 02:49:49 -0700 (PDT)
-X-AuditID: a67dfc5b-d85ff70000001748-a6-64a299b3d23d
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 921E6DD;
+        Mon,  3 Jul 2023 02:49:51 -0700 (PDT)
+X-AuditID: a67dfc5b-d85ff70000001748-d8-64a299b373f9
 From:   Byungchul Park <byungchul@sk.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
@@ -40,124 +40,100 @@ Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
         gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
         boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com,
         her0gyugyu@gmail.com
-Subject: [PATCH v10 rebased on v6.4 13/25] dept: Distinguish each work from another
-Date:   Mon,  3 Jul 2023 18:47:40 +0900
-Message-Id: <20230703094752.79269-14-byungchul@sk.com>
+Subject: [PATCH v10 rebased on v6.4 16/25] dept: Apply sdt_might_sleep_{start,end}() to dma fence wait
+Date:   Mon,  3 Jul 2023 18:47:43 +0900
+Message-Id: <20230703094752.79269-17-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230703094752.79269-1-byungchul@sk.com>
 References: <20230703094752.79269-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzXSbUxTZxQHcJ/n3vvcS6XmpmK8ajKXJsbMF9T5dlzmy/yyu8QtTdgHM0xm
-        Y6/S2CIpiKCS4aji0EvQiIiWScF0DXSAt8QgUkUYICJYtUoltZGKYkMRxyyBwWTUzS8nv5xz
-        8s/5cDhKc51ZyBlTMyRLqt6kJSpaNRxvX+kurTCsDjckwpnTqyH67iQNtloXAW9NNQJX/TEM
-        4bavoXcsgmCy+z4FJcVeBPb+ZxTUtwcReJw/E3g0MAd80RECncWnCORV1hJ4MDSFIXD+LIZq
-        5VvoKqrA0DwxSENJmMClkjw8U15jmHBUseDIXQIh50UWpvrXQGfwCQOevuVQ+muAQJOnk4b2
-        hhCGR402AkHXNANd7Xdo8J6RGfj9TQWBoTEHBY7oCAsPm8sx1Flngk789Z6BDrkZw4krVzH4
-        nt5AcPPkcwyK6wmB1mgEg1sppuDv39oQhAqHWTh+eoKFS8cKEZw6fp6G+/90MGANrIfJcRvZ
-        9oXYGhmhRKv7kOgZK6fFuxWCeP3iM1a03uxjxXLloOh2LhMrm8JYtI9GGVGp+oWIyuhZViwY
-        9mHxTU8PK965MEmLA74SrFv0g+pLg2QyZkqWVVt2q1JqXT4q7e3crN76eblI4QtQHCfw64Se
-        1mn80da+Iipmwi8V/P6JD07gPxXc8iumAKk4is+fLTjfdpMCxHFz+SQhMKqJ7dD8EuFesI7E
-        rOY3CPfkMuq/zMVCdV3zB8fN9F+OF6KYNfx6IVAaJLFMgc+PEy44nP8fsUC47fTTRUhdjmZV
-        IY0xNdOsN5rWJaZkpxqzEvccMCto5qEcOVPJDWjUm9SCeA5p49X+I3aDhtFnpmebW5DAUdoE
-        dV7/ZYNGbdBnH5YsB360HDRJ6S1oEUdr56s/Hztk0PD79BnSfklKkywfp5iLW5iLyjZcOzKU
-        ti3UkPTCP7W0K3/+4/jBb7YavVfN/ue2to7tyY2Rz74LfZWhQ59Y92bvf51XI3fvXiFbdf3T
-        8h6ZTTbpQ13D4caE0pxNkd4/R+TNT8eP+qzmnGjNw6adAybdOe+tn8q+r1e2eDYOrvCudQvv
-        dPY/zIPxu+DcjrtZth1aOj1Fv2YZZUnX/wuCRdYFTAMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAAzXSf0yMcRwHcN/v8zzf5+k4e3bCM0x2m5ksMuKzMTP+8Gh++4PxB8/cMx2V
-        dlcpP7bokHStIukH+rXT6ijPNb9Lrl11hOiW5NyU/LgpJS7l8qOYfz577fP+7P3Xh6M0+cw0
-        Th8dKxuipUgtUdGqDcuSQ2y5xbpQx/MpkJkWCr5vKTQUVFoJtFyrQGCtPobB61gDLwZ7EPgf
-        P6UgJ7sFQVHnawqqGzwIasqOE2jtngguXx8BZ/YZAskllQSefRrB4D6fhaFCWQ+PMoox1A1/
-        oCHHSyA/JxmPjo8Yhi3lLFiSZkNXWR4LI50LwelpY6D+opOBmo55kHvJTeBejZOGhltdGFrv
-        FBDwWH8z8KihiYaWTDMDVz8XE/g0aKHA4utj4XldIYYq02jbya+/GGg012E4WXodg+vlXQS1
-        KW8wKNY2AvW+Hgw2JZuCH1ccCLrSe1k4kTbMQv6xdARnTpyn4enPRgZM7jDwDxWQlcvE+p4+
-        SjTZDoo1g4W0+LBYEG/nvWZFU20HKxYqcaKtLFgsuefFYtGAjxGV8tNEVAayWDG114XFz0+e
-        sGLTBT8tdrty8KYZO1TLdXKkPl42LFixWxVRaXVRMf2TEl5UT05CCp+KAjiBXyyYOjKoMRN+
-        jtDePvzXgfwswWZ+z6QiFUfxp8YLZf2PSSriuEn8VsE9oBm7ofnZQrOnioxZzS8Rms0XqX+d
-        QUJFVd1fB4zu3w2lozFr+DDBneshGUhViMaVo0B9dHyUpI8Mm2/cH5EYrU+Yv+dAlIJGX8Zy
-        dCTzFvrWusaOeA5pJ6jbDxfpNIwUb0yMsiOBo7SB6uTOyzqNWiclHpINB3YZ4iJlox1N52jt
-        VHX4Nnm3ht8rxcr7ZTlGNvxPMRcwLQnZpoecqxKCG2/gbrI2LVBf1Ptl/SKFHr/y1PagnQ57
-        f0rczO+umJBmc2f5jY1LH6wuCfLffNvkP12aN9MZvsoy93tFn96/etHygq/VFx5cjr17fZCT
-        t3gd0pDgv9QWOnTEd1Z6F+q1t9xvvLl5X0NWtxcn2Kh4T23GOms4++pqhJY2RkgLgymDUfoD
-        Zj/+/y4DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0xTZxiA/c7lO6fF4rFj8agRtQkhYQx1EfOG6eKPRY8/nCYaY1QinT0b
+        Hde1grLNDCyIk4uIA+QSbSuptRQvbVVEaxiEe4BuNAy1koHoRrhtaDsK6NZi/PPmyfPmfX69
+        LCl/QK9i1anHRU2qMlmBpZR0cqnhY0elUbVx6g0DFwo3gvf1WQpqbloxuG7UIbA6cggYa90J
+        v/smEMz39JFQUeZCYBh+RoKjbQiB03waQ/9oKLi90xg6ywow6K7exPDr+AIBnvJSAupsu6G7
+        xEhAk/9PCirGMFRX6IjA+IsAv8nCgCk7AkbMVQwsDG+CzqEBGpxPPoLKyx4MD52dFLQ1jBDQ
+        31iDYcj6Hw3dbR0UuC4U0VA/ZcQw7jORYPJOM/Bbk56AW7mB0JlXb2loL2oi4EztbQLcjx8g
+        eHT2DwJs1gEMLd4JAuy2MhLmrrUiGCmeZCCv0M9AdU4xgoK8cgr63rTTkOuJhfnZGrw9TmiZ
+        mCaFXPsJwenTU0KXkRfuVz1jhNxHTxhBb8sQ7OYo4erDMUIwzHhpwWb5CQu2mVJGODfpJoSp
+        3l5G6Lg0Twmj7gpi7+pD0q0qMVmdKWo2fJYgTbzo78XpObKTenstk41eSM8hCctzm3nd09Pk
+        ey7/10gHGXOR/OCgf9GHcet4e9HLgJeyJJcfwpv/7sHBxQfcV7y3twsFmeIieEfDDBNkGbeF
+        1+sG0LvoWr7uVtNiSBLwL2aLF72ci+U9lUM4GOW58xI+P3scvztYyf9iHqRKkEyPlliQXJ2a
+        maJUJ2+OScxKVZ+MOZaWYkOBlzKdWjjcgGZc+5oRxyLFUtng9waVnFZmarNSmhHPkoowmW74
+        ikouUymzvhM1aUc1GcmithmtZinFCtknvhMqOfe18riYJIrpoub9lmAlq7JRfNXnU4U6fCDB
+        clkVWlKgPPLPhth78ykHo5e1pW2fK+/pn92fEREZF8nGa/uS7nx599tpSyPVGa0NOSWJ3/Gy
+        fu1ceFfo8lKHZK+zbNl59GO1Yc22n58794S76VHaQlvrLr7u/vCbcCouP/6HhI6IT9eHvK3N
+        W+e7vsulv/RFjGfNcwWlTVRuiiI1WuX/9KM2Pk4DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0xTZxjH977nnPccqjUnFeMJuqDN1MSFWyL6bKjB7IMni87LF40ukWoP
+        0liqaSmXMRJYq3PcIizAuGkppDbQCWshQaENQkBBRByMMVORNjhGRFmYZVaQrXXZlye//P7J
+        79PDUYp6JorT6DIkvU6lVRIZLfsiyRTjqraq44uaYqCsOB4Cr6/SUNfqIDB6qwWBo70Aw1z/
+        Qfh1aR7B8sNHFFRVjCJo8D2loH1gCoHb/g2BsZl1MB5YIDBYUUTA1NhK4PGLFQzeynIMLc7D
+        8OCaFUNPcJaGqjkCtVUmHDp/YAjamlmw5W8Dv72GhRVfAgxOTTDQVz/IgPvJx1B93Uug2z1I
+        w0CnH8PYnToCU45/GHgwcJ+G0bISBn58ZSXwYslGgS2wwMLPPRYMbeZQ7cpfqwzcK+nBcKXp
+        Jwzjv3Uh8FydxuB0TBDoC8xjcDkrKHh7sx+Bv/QlC5eLgyzUFpQiKLpcScOjd/cYMHsTYflN
+        HUlOEvvmFyjR7MoS3UsWWhyyCuLtmqesaPY8YUWL0yi67DvFxu45LDYsBhjR2fwdEZ2L5axY
+        +HIci69GRljx/g/LtDgzXoWPbj4l26uWtJpMSR+3P0WW9n1whFwqkGdbXE1sPnouK0QRnMDv
+        Eir/tjJhJvwOYXIySIU5kt8iuEp+D3kZR/HfrhHsfz4k4WE9nyoERoZQmGl+m9DeuciGWc7v
+        FiymCfRfNFpoaet5H4oI+edvSt97BZ8oeKunyDUks6APmlGkRpeZrtJoE2MNF9JydJrs2HMX
+        050o9DS2vJWyTvR67GAv4jmkXCufzG1QKxhVpiEnvRcJHKWMlJt8N9QKuVqV85Wkv3hGb9RK
+        hl60iaOVG+Wfn5BSFPx5VYZ0QZIuSfr/V8xFROUjpWfN9gPDQnRGF702d3R34UqW23ynaN/M
+        jo67v3gOGdcplnxnU0H+2RZNOXNow9c+fzD32JcdW5OFuGfyJHvjsN8xFj1bU2Jp+TRqOm/2
+        wEd743GdV5F6OsL4iXG140NOtmmotWt/sX86RkeOr1fmbVe7N54sPlJL1fv2eLTJq0rakKZK
+        2EnpDap/ATXR0DQwAwAA
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Workqueue already provides concurrency control. By that, any wait in a
-work doesn't prevents events in other works with the control enabled.
-Thus, each work would better be considered a different context.
-
-So let Dept assign a different context id to each work.
+Makes Dept able to track dma fence waits.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/dept.h     |  2 ++
- kernel/dependency/dept.c | 10 ++++++++++
- kernel/workqueue.c       |  3 +++
- 3 files changed, 15 insertions(+)
+ drivers/dma-buf/dma-fence.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/linux/dept.h b/include/linux/dept.h
-index f62c7b6f42c6..d9ca9dd50219 100644
---- a/include/linux/dept.h
-+++ b/include/linux/dept.h
-@@ -515,6 +515,7 @@ extern void dept_ecxt_exit(struct dept_map *m, unsigned long e_f, unsigned long
- extern void dept_sched_enter(void);
- extern void dept_sched_exit(void);
- extern void dept_kernel_enter(void);
-+extern void dept_work_enter(void);
+diff --git a/drivers/dma-buf/dma-fence.c b/drivers/dma-buf/dma-fence.c
+index f177c56269bb..ad2d7a94c868 100644
+--- a/drivers/dma-buf/dma-fence.c
++++ b/drivers/dma-buf/dma-fence.c
+@@ -16,6 +16,7 @@
+ #include <linux/dma-fence.h>
+ #include <linux/sched/signal.h>
+ #include <linux/seq_file.h>
++#include <linux/dept_sdt.h>
  
- static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
- {
-@@ -567,6 +568,7 @@ struct dept_task { };
- #define dept_sched_enter()				do { } while (0)
- #define dept_sched_exit()				do { } while (0)
- #define dept_kernel_enter()				do { } while (0)
-+#define dept_work_enter()				do { } while (0)
- #define dept_ecxt_enter_nokeep(m)			do { } while (0)
- #define dept_key_init(k)				do { (void)(k); } while (0)
- #define dept_key_destroy(k)				do { (void)(k); } while (0)
-diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index 4165cacf4ebb..6cf17f206b78 100644
---- a/kernel/dependency/dept.c
-+++ b/kernel/dependency/dept.c
-@@ -1977,6 +1977,16 @@ void dept_hardirqs_off_ip(unsigned long ip)
- }
- EXPORT_SYMBOL_GPL(dept_hardirqs_off_ip);
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/dma_fence.h>
+@@ -782,6 +783,7 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
+ 	cb.task = current;
+ 	list_add(&cb.base.node, &fence->cb_list);
  
-+/*
-+ * Assign a different context id to each work.
-+ */
-+void dept_work_enter(void)
-+{
-+	struct dept_task *dt = dept_task();
-+
-+	dt->cxt_id[DEPT_CXT_PROCESS] += 1UL << DEPT_CXTS_NR;
-+}
-+
- void dept_kernel_enter(void)
- {
- 	struct dept_task *dt = dept_task();
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index c913e333cce8..fa23d876a8b5 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -52,6 +52,7 @@
- #include <linux/sched/debug.h>
- #include <linux/nmi.h>
- #include <linux/kvm_para.h>
-+#include <linux/dept.h>
++	sdt_might_sleep_start(NULL);
+ 	while (!test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags) && ret > 0) {
+ 		if (intr)
+ 			__set_current_state(TASK_INTERRUPTIBLE);
+@@ -795,6 +797,7 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
+ 		if (ret > 0 && intr && signal_pending(current))
+ 			ret = -ERESTARTSYS;
+ 	}
++	sdt_might_sleep_end();
  
- #include "workqueue_internal.h"
+ 	if (!list_empty(&cb.base.node))
+ 		list_del(&cb.base.node);
+@@ -884,6 +887,7 @@ dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count,
+ 		}
+ 	}
  
-@@ -2318,6 +2319,8 @@ __acquires(&pool->lock)
++	sdt_might_sleep_start(NULL);
+ 	while (ret > 0) {
+ 		if (intr)
+ 			set_current_state(TASK_INTERRUPTIBLE);
+@@ -898,6 +902,7 @@ dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count,
+ 		if (ret > 0 && intr && signal_pending(current))
+ 			ret = -ERESTARTSYS;
+ 	}
++	sdt_might_sleep_end();
  
- 	lockdep_copy_map(&lockdep_map, &work->lockdep_map);
- #endif
-+	dept_work_enter();
-+
- 	/* ensure we're on the correct CPU */
- 	WARN_ON_ONCE(!(pool->flags & POOL_DISASSOCIATED) &&
- 		     raw_smp_processor_id() != pool->cpu);
+ 	__set_current_state(TASK_RUNNING);
+ 
 -- 
 2.17.1
 
