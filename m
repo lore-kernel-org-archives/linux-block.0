@@ -2,189 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B34BEB64DC
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 09:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D68F7C001DE
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 09:49:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229593AbjGCJQ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jul 2023 05:16:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58662 "EHLO
+        id S229928AbjGCJtr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jul 2023 05:49:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229989AbjGCJQ6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 05:16:58 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF7612E;
-        Mon,  3 Jul 2023 02:16:57 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D6AB51FD75;
-        Mon,  3 Jul 2023 09:16:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1688375815; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=I+8YBrUpE2qb6+lv32u7UaAshwQ/NzzYaAEBiSNLejw=;
-        b=aJmI21XoZATqMcxjej/15bKMZYrd+hA/+VsblssIvVvsNxnaHbEuh69tJAbB3DukWKT0tT
-        HZ8blHsP1mKB8H06vSWCONF0DI+Wm5BTluLIB0ww4qUG/cvqOvbp2+aUTvOhWKu+U3RDFZ
-        squn7W+cBtbkXqTAk4EqLQ3IN7GAjus=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1688375815;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=I+8YBrUpE2qb6+lv32u7UaAshwQ/NzzYaAEBiSNLejw=;
-        b=EFyh0LmGkHJ0/iuIO0GzOGCahFA9hXk1xaPJe68n7OeLUpLX8Cvr/9t0Iuarq2VSnhdoST
-        6urwYVCwcpLUeiBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C9CA613276;
-        Mon,  3 Jul 2023 09:16:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id kRBAMQeSomSLDgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Mon, 03 Jul 2023 09:16:55 +0000
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v3 2/3] nvme/rc: Avoid triggering host nvme-cli autoconnect
-Date:   Mon,  3 Jul 2023 11:16:46 +0200
-Message-ID: <20230703091647.800-3-dwagner@suse.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230703091647.800-1-dwagner@suse.de>
-References: <20230703091647.800-1-dwagner@suse.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S229709AbjGCJtq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 05:49:46 -0400
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 649B518D;
+        Mon,  3 Jul 2023 02:49:40 -0700 (PDT)
+X-AuditID: a67dfc5b-d85ff70000001748-e5-64a299b173bd
+From:   Byungchul Park <byungchul@sk.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
+        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+        tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+        sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+        viro@zeniv.linux.org.uk, jack@suse.cz, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
+        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
+        boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com,
+        her0gyugyu@gmail.com
+Subject: [PATCH v10 rebased on v6.4 01/25] llist: Move llist_{head,node} definition to types.h
+Date:   Mon,  3 Jul 2023 18:47:28 +0900
+Message-Id: <20230703094752.79269-2-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230703094752.79269-1-byungchul@sk.com>
+References: <20230703094752.79269-1-byungchul@sk.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTZxiGec/He04rnSediWdinKvBLZqhLLo9Mc6YYeLrjzkN0R+QqJ09
+        kUZatCgCkwRWREVAIYEKIpSKtWlR8KCbAyGIEUFiqdowZkoHCJsoX0OLdiBKNf65cyX381y/
+        bp5WN7CLeL3xkGQyahM1WMkoR8OrvpZLbbrVLycUUJi3GgIvTzBQXluDwXPFhaDmWhYFw3c2
+        w59TIwim73fRYCn2IKjq76XhWpsfQZPjVwyPBj8Bb2AcQ0fxKQzmC7UYHjyfocBXUkSBS/4R
+        Os/YKGgJ/suAZRjDOYuZmounFATtTg7smZEw4CjjYKY/Gjr83Sw0PV4JpRU+DDebOhhouzFA
+        waOGcgz+mrcsdLa1M+ApzGfh8pgNw/MpOw32wDgHD1usFNRlz4lyXsyycDe/hYKc6qsUeP9q
+        RNB8oo8CuaYbw+3ACAX1cjEN/1+6g2CgYJSDY3lBDs5lFSA4dayEga43d1nI9q2F6dfleOM6
+        cntknCbZ9UdI05SVIfdsIvmjrJcj2c2POWKVD5N6xwpy4eYwRaomAyyRnScxkSeLOJI76qXI
+        mNvNkfaz0wwZ9FqobRFxyvU6KVGfIplWbdijTMh7+IQ9cF6ZOnQFMlEzn4sUvCisEZ91zTIf
+        2f7Ez4UYC1+KPT1BOsQLhKViff4/bC5S8rRwfJ7omLiPQ8Wnwi6x2uljQ8wIkeJIZ857Vglr
+        xcpgO/4g/Vx01bW8FymEb8Wh1wUoxOq5G1+pH4ekomBWiI5XFejDw2fiLUcPcwaprCjMidR6
+        Y4pBq09cE5WQZtSnRu1NMshoblH2jJn4G2jSE9uKBB5pwlU9v1Tp1Kw2JTnN0IpEntYsUJn7
+        K3VqlU6bli6ZknabDidKya0ogmc0C1XfTB3RqYV92kPSfkk6IJk+thSvWJSJzFuXfBHWvefV
+        06wle13blymtqVtjazW5TsvgaXtDmTu6z9U7+3PrdW9dxOjBq0xh386hhTsevIk1zM/4ziDE
+        xE9mbbx+sYCtbkzS/u3+KRD3n21T5PrFF6c3J7nTPVu+Ot4Y9cNveTJZrjoalhG+rNu9IYb7
+        /ft049Cm0t3Pdsbsz2/QMMkJ2ugVtClZ+w4jw7xDTQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0hTYRzGe99zznuOxxaHJXSooFhEYGRWGv8wJOhDx6KIIroQ6WqHNnIW
+        m5p2AWtm3slKTV3lJaaopW0F3RRRvCxpmYppraWWlXkLdebSLq7oy8MPnoffp4ejlGZmMaeL
+        ipYNUepIFeFpfleIac39vGJNYMnnAMhKDwT3ZDIN5qpKAm33KhBUPriAYbBxG7yeGkYw8+Il
+        BbnZbQiK+t5R8KDJhaCm7CKBjo8LoNM9RsCenUbAVFJF4NXQLAZnzlUMFdad0HqlGEOd5zMN
+        uYMECnJNeC6+YPBYylmwJKyE/rJ8Fmb71oHd1cVAw007AzVvVkPeLSeBZzV2Gpoe9WPoeGIm
+        4Kr8zUBrUwsNbVkZDNwdLSYwNGWhwOIeY6G9rhBDdeKcLWniFwPNGXUYku7cx9DZ8xRBbXIv
+        BmtlF4EG9zAGmzWbgh+ljQj6M0dYuJTuYaHgQiaCtEs5NLz82cxAojMYZqbNZEuI1DA8RkmJ
+        ttNSzVQhLT0vFqXH+e9YKbH2DSsVWmMkW5m/VPJsEEtF425GspanEMk6fpWVUkc6sTTqcLBS
+        y40ZWvrYmYt3Lz3Eb9bIkbpY2bA2NILXprd/YE7d5OMG7kECquVSkQ8nCkGi5YOL9TIRVond
+        3R7Ky37CctGW8YlJRTxHCZd9xbJvL4i3WCgcEe+UOxkv08JKcbg16S8rhGDxtqeF/JMuEyuq
+        6/6KfISN4sB0JvKycm7jzHORK4gvRPPKkZ8uKlav1kUGBxhPaOOjdHEBx07qrWjuM5bzs1mP
+        0GTHtnokcEg1X9F9tkijZNSxxnh9PRI5SuWnMPXd1igVGnX8GdlwMtwQEykb69ESjlYtUmzf
+        L0cohePqaPmELJ+SDf9bzPksTkB90Qv4tyNhSdrmLJIibz207HBBqWLTufGlVct7Nuzssc+M
+        Ps8fWu/4NbkiLZRvfMj76bcc2JEW/mUo8NNEjr9HuB42ookBfFQbZH6/uSks4sd3R0pQmH7S
+        kWEP+v1tT7rTpj1t0p7dXr3vScDANd/A61MTmw6GJn/tXejJV+81hqhoo1a9zp8yGNV/AArV
+        ij0vAwAA
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When the host has enabled the udev/systemd autoconnect services for the
-fc transport it interacts with blktests and make tests break.
+llist_head and llist_node can be used by very primitives. For example,
+Dept for tracking dependency uses llist things in its header. To avoid
+header dependency, move those to types.h.
 
-nvme-cli learned to ignore connects attemps when using the --context
-command line option paired with a volatile configuration. Thus we can
-mark all the resources created by blktests and avoid any interaction
-with the systemd autoconnect scripts.
-
-Only enabled this for the fc transport.
-
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
+Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- tests/nvme/rc | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ include/linux/llist.h | 8 --------
+ include/linux/types.h | 8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 1c2c2fab62c1..9b5442b2c07b 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -176,6 +176,57 @@ _nvme_calc_rand_io_size() {
- 	echo "${io_size_kb}k"
- }
+diff --git a/include/linux/llist.h b/include/linux/llist.h
+index 85bda2d02d65..99cc3c30f79c 100644
+--- a/include/linux/llist.h
++++ b/include/linux/llist.h
+@@ -53,14 +53,6 @@
+ #include <linux/stddef.h>
+ #include <linux/types.h>
  
-+_have_nvme_cli_context() {
-+	# ignore all non-fc transports for now
-+	if [[ "${nvme_trtype}" != "fc" ]] ||
-+	   ! nvme connect --help 2>&1 | grep -q -- '--context=<STR>' > /dev/null; then
-+		return 1
-+	fi
-+	return 0
-+}
-+
-+_setup_nvme_cli() {
-+	local local_wwnn="${1}"
-+	local local_wwpn="${2}"
-+	local remote_wwnn="${3}"
-+	local remote_wwpn="${4}"
-+
-+	if ! _have_nvme_cli_context; then
-+		return
-+	fi
-+
-+	mkdir -p /run/nvme
-+	cat >> /run/nvme/blktests.json <<-EOF
-+	[
-+	  {
-+	    "hostnqn": "${def_hostnqn}",
-+	    "hostid": "${def_hostid}",
-+	    "subsystems": [
-+	      {
-+	        "application": "blktests",
-+	        "nqn": "blktests-subsystem-1",
-+	        "ports": [
-+	          {
-+	            "transport": "fc",
-+	            "traddr": "nn-${remote_wwnn}:pn-${remote_wwpn}",
-+	            "host_traddr": "nn-${local_wwnn}:pn-${local_wwpn}"
-+	          }
-+	        ]
-+	      }
-+	    ]
-+	  }
-+	]
-+	EOF
-+}
-+
-+_cleanup_nvme_cli() {
-+	if ! _have_nvme_cli_context; then
-+		return
-+	fi
-+
-+	rm -f /run/nvme/blktests.json
-+}
-+
- _nvme_fcloop_add_rport() {
- 	local local_wwnn="$1"
- 	local local_wwpn="$2"
-@@ -208,6 +259,9 @@ _setup_fcloop() {
- 	local remote_wwnn="${3:-$def_remote_wwnn}"
- 	local remote_wwpn="${4:-$def_remote_wwpn}"
+-struct llist_head {
+-	struct llist_node *first;
+-};
+-
+-struct llist_node {
+-	struct llist_node *next;
+-};
+-
+ #define LLIST_HEAD_INIT(name)	{ NULL }
+ #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
  
-+	_setup_nvme_cli "${local_wwnn}" "${local_wwpn}" \
-+			"${remote_wwnn}" "${remote_wwpn}"
-+
- 	_nvme_fcloop_add_tport "${remote_wwnn}" "${remote_wwpn}"
- 	_nvme_fcloop_add_lport "${local_wwnn}" "${local_wwpn}"
- 	_nvme_fcloop_add_rport "${local_wwnn}" "${local_wwpn}" \
-@@ -250,6 +304,8 @@ _cleanup_fcloop() {
- 	_nvme_fcloop_del_lport "${local_wwnn}" "${local_wwpn}"
- 	_nvme_fcloop_del_rport "${local_wwnn}" "${local_wwpn}" \
- 			       "${remote_wwnn}" "${remote_wwpn}"
-+
-+	_cleanup_nvme_cli
- }
+diff --git a/include/linux/types.h b/include/linux/types.h
+index 688fb943556a..0ddb0d722b3d 100644
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -193,6 +193,14 @@ struct hlist_node {
+ 	struct hlist_node *next, **pprev;
+ };
  
- _cleanup_nvmet() {
-@@ -452,6 +508,9 @@ _nvme_connect_subsys() {
- 	subsysnqn="$2"
- 
- 	ARGS=(-t "${trtype}" -n "${subsysnqn}")
-+	if _have_nvme_cli_context; then
-+		ARGS+=(--context="blktests")
-+	fi
- 	if [[ "${trtype}" == "fc" ]] ; then
- 		ARGS+=(-a "${traddr}" -w "${host_traddr}")
- 	elif [[ "${trtype}" != "loop" ]]; then
-@@ -496,6 +555,9 @@ _nvme_discover() {
- 	ARGS=(-t "${trtype}")
- 	ARGS+=(--hostnqn="${def_hostnqn}")
- 	ARGS+=(--hostid="${def_hostid}")
-+	if _have_nvme_cli_context; then
-+		ARGS+=(--context="blktests")
-+	fi
- 	if [[ "${trtype}" = "fc" ]]; then
- 		ARGS+=(-a "${traddr}" -w "${host_traddr}")
- 	elif [[ "${trtype}" != "loop" ]]; then
++struct llist_head {
++	struct llist_node *first;
++};
++
++struct llist_node {
++	struct llist_node *next;
++};
++
+ struct ustat {
+ 	__kernel_daddr_t	f_tfree;
+ #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
 -- 
-2.41.0
+2.17.1
 
