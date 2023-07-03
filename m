@@ -2,82 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 831F3C001B0
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 18:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EFAC001DD
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 18:26:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229763AbjGCSIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jul 2023 14:08:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34862 "EHLO
+        id S229917AbjGCS0G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jul 2023 14:26:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230098AbjGCSIQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 14:08:16 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E870E5F;
-        Mon,  3 Jul 2023 11:08:16 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-666e5f0d60bso2411706b3a.3;
-        Mon, 03 Jul 2023 11:08:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688407695; x=1690999695;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NdlTq9LuY8/LR/KMjs0dLZRjJIwIbTa797xTBtHD1Qc=;
-        b=BHd2665OQIReDtHLE84UqaobhS39Z+WVHk/KHHZVG2LnleTjQpk9cE6/JoVtdhapRf
-         qUwsRkMnSfDyhTNtaxAShKf9M4DjcntlU3I5XjFWz3fsz/CkIBYjzjwqmf6mFVoiMtbZ
-         1f3IkGyRHpMUQKHLdqt322liwsSZ/+oIWeog1Qre4rtH5J78aVaN80gX+hQ3fSCphOW+
-         hv3kGSVYfDuFW5RLF0PSBQh1WNU4hJO1NCEtk30BupZI/DqTPQqTftb0zYhcj6Lixued
-         qmjOJu/jTQaXIV15HyOXfyjMy+0yQBufp6I8B7wwdhCMV7/WoS6rmAAWmqp21iWKmkJQ
-         M4WA==
-X-Gm-Message-State: ABy/qLazCnVQuz/p3HrR4zgEtkBWxCRhKwQgYpsaffSdr6AQzYe0ZDzZ
-        5Lj7sBfHQYt4T62DUg2plb8=
-X-Google-Smtp-Source: APBJJlFoKToqL63bnEKlbggnBe+x+5CLNZA1xYgpfIjsVakeUx6FT+GZoK4g5lUFk/DKykj66llfPg==
-X-Received: by 2002:a62:1ac9:0:b0:668:7090:bf18 with SMTP id a192-20020a621ac9000000b006687090bf18mr8899924pfa.34.1688407695533;
-        Mon, 03 Jul 2023 11:08:15 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id j18-20020a62e912000000b00660d80087a8sm14191383pfh.187.2023.07.03.11.08.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jul 2023 11:08:14 -0700 (PDT)
-Message-ID: <c4de836a-a2a1-847f-1525-1accb814e45e@acm.org>
-Date:   Mon, 3 Jul 2023 11:08:13 -0700
+        with ESMTP id S229830AbjGCS0F (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 14:26:05 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62576DC
+        for <linux-block@vger.kernel.org>; Mon,  3 Jul 2023 11:26:01 -0700 (PDT)
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 363G82oI025221;
+        Mon, 3 Jul 2023 18:25:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-03-30; bh=S3goOZqeuYoc0I9eekS0pLYTxfPF9T/RelhGiV7wzY8=;
+ b=mNiJusU2lahRoPDyVnjeOiv6DgU9MtMz3ZUvBNrmwn1qhuEuXnvZqRkw5fOivPslCfRo
+ k0VUsvyUw9CdtMdic0E+UtoTpVA5lWzH7qRBFWd2xvGT9K23ofwbzRvTJDEM5/hZmANt
+ TF9qecVrzhNiHnXEL4ZORFaiMz748dcnLnUEJp36f4docJ0tDUyObzqeuDHsPS/YaB9q
+ fy2dxcAE2Mnzo3bLo6LNIowE5ls44ckPB8AH4FlDje82jlpzIC9OkspltB4Di+hxvlld
+ /DbnCf5BD0KTHq4k6FH+gjTDGcSpPzz1GRFEQwVOO+lTjSynRIaGFfuhJ02eZivBg3gY lg== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3rjc6ck8cr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 03 Jul 2023 18:25:51 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 363HARxB009061;
+        Mon, 3 Jul 2023 18:25:50 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3rjak9ddgq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 03 Jul 2023 18:25:50 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 363IPoQ7009914;
+        Mon, 3 Jul 2023 18:25:50 GMT
+Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3rjak9ddgd-1;
+        Mon, 03 Jul 2023 18:25:50 +0000
+From:   Alan Adamson <alan.adamson@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     alan.adamson@oracle.com, linux-nvme@lists.infradead.org,
+        shinichiro.kawasaki@wdc.com
+Subject: [PATCH blktests] nvme/43: use a valid hostkey
+Date:   Mon,  3 Jul 2023 11:25:49 -0700
+Message-Id: <20230703182549.971324-1-alan.adamson@oracle.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH RFC 0/7] blk-mq: improve tag fair sharing
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        Christoph Hellwig <hch@lst.de>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
- <4c9fea33-9c30-4ab9-c210-95e09d323837@acm.org>
- <82d44ba1-4389-079c-935a-cbb49203ca27@huaweicloud.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <82d44ba1-4389-079c-935a-cbb49203ca27@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-03_13,2023-06-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
+ suspectscore=0 bulkscore=0 spamscore=0 mlxscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307030167
+X-Proofpoint-GUID: RHqyIHjbvUVgadGBoUeLuKFB4qvb-R3V
+X-Proofpoint-ORIG-GUID: RHqyIHjbvUVgadGBoUeLuKFB4qvb-R3V
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/3/23 06:29, Yu Kuai wrote:
-> 在 2023/06/20 23:20, Bart Van Assche 写道:
->> On 6/18/23 09:07, Yu Kuai wrote:
->>> This is not a formal version and not fully tested, I send this RFC
->>> because I want to make sure if people think doing this is meaningful,
->>> before I spend too much time on this.
->> The approach looks good to me but I'd like to hear from Jens and 
->> Christoph what their opinion is about the approach of this patch 
->> series before doing an in-depth review.
->>
-> Any suggestions on this topic? It'll be great to hear that if anyone
-> thinks it's meaningful to refactor tag fair sharing.
+The test does not generate a hostkey and uses a NULL when setting
+up and connecting to a target. The test passes, but a valid hotkey
+should be used. This patch generates a valid hostkey and uses it
+when setting up the target.
 
-The cover letter of this patch series says "This is not a formal version 
-and not fully tested". If a fully tested version will be posted, I will 
-help with an in-depth review.
+Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ tests/nvme/043 | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Thanks,
-
-Bart.
+diff --git a/tests/nvme/043 b/tests/nvme/043
+index a030884aa4ed..d498fd7ae885 100755
+--- a/tests/nvme/043
++++ b/tests/nvme/043
+@@ -39,6 +39,11 @@ test() {
+ 		return 1
+ 	fi
+ 	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
++	if [ -z "$hostkey" ] ; then
++		echo "nvme gen-dhchap-key failed"
++		return 1
++	fi
+ 
+ 	_setup_nvmet
+ 
+-- 
+2.31.1
 
