@@ -2,122 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC54EB64DD
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 14:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 831F3C001B0
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 18:08:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229971AbjGCO7l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jul 2023 10:59:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42158 "EHLO
+        id S229763AbjGCSIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jul 2023 14:08:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbjGCO7k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 10:59:40 -0400
-Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [85.215.255.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E80D0E43;
-        Mon,  3 Jul 2023 07:59:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1688396344; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=K/UD3/gCNqzSGb/Dnqe7PCEOtbLIffkqyEwlNhSt6H6Ig9K57pmh/sZYs9l3OcCK8G
-    TVx7jXasBDHswnN5EXMZi+tV567o1Hy0cTK6uaVDEm720AmBkTmVKRdo7HkfUVPS6e+b
-    K8/YHl8VDx1/DwMrSTaTAnGo4SU0iFLuqb0Yf9zKjNAeOysSkfkrt02gj43BNP8LxN+i
-    v2rfaQ17XB0vNS8byOB+KDIRL5lvsQU5bW0qSoKs9+FIhXp5ux+1aQu1gkmJTd3NKU8R
-    klLa/ClwDV8dAV+cNfj5rfVKkwNwyJDIi4EsdzSc0E2v55C9h/j1qV+HoOZmkmnGbF0c
-    GaTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1688396344;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=7jGdreVnyYW1hPkWJoqzItLU51giwP5jp5MAC7wbzHY=;
-    b=LFobwfZLzKk2eGmVQIv08Kg+7+Y8MaOz3/eCknbreaE1A/fiWC5fd6M+Cl/dy+Ih+i
-    n296WGxFk/pgz38Yt/2K2nlAc9GuiWExRMoijlP7HDlhm2WeEjZcKZ02pss4hT5iH/Wn
-    lSLD6LwCwdsyZHLWJ4kwcSKvvpmhNoynPsF3YI4mygoA7PjQJYHn4JakjissXbThFo0Q
-    Du7LFU4hx+SZpb94qjslwpweobebaZXVsZfgMND3L5duohNA5iyGJ79yi4vhi9dK8aVN
-    SPd7uMJjSLiydaYx/49ormYK4YV59q/6gYTs4qt9FG0cq64twxhARykPzjU7vPlrRs5d
-    4UOg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1688396344;
-    s=strato-dkim-0002; d=xenosoft.de;
-    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=7jGdreVnyYW1hPkWJoqzItLU51giwP5jp5MAC7wbzHY=;
-    b=Li/jYcjqja6f+8xy+1DIY/tE+NAZILHiUhQdkpG4fM4RZEEjy4e+5I+qzUxQQJSyQH
-    cjXv3K/VMjzf3pjP2nOA+hXI8JS8k+tdD7cUV/MX8Wn/ml4lH/CZ5JK8xtZqOSPyoQsO
-    aAGugMjlnUa+UgeBrrnCEGUO15vPeKF0PnMAR952xxQw1e8ZldDIFxGn0Q8w7ET7LqW3
-    MiKSZ3Gk36Rsmu6AXqxnDGsyTcJsL9Bk2ZVmK1OKuMb4x5B+3cvAeejrH7PhTuGxfGvU
-    y1FYHN6x8Eeorm3BwpOskaU7EA5kw/UV1jabvjBMbaxXbTlEXkslekZkbh9EM0mDSta6
-    GpUg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1688396344;
-    s=strato-dkim-0003; d=xenosoft.de;
-    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=7jGdreVnyYW1hPkWJoqzItLU51giwP5jp5MAC7wbzHY=;
-    b=GOa4mmTHQEnc0pm7xW/ylqCvKtM0VkYJsayzIivMZgXDDpd0K+HX5jqRBjYRqcsa5K
-    KFsHB8Fs3Bc1OMAynSCw==
-X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHvJzedR4hZ0hbXsch5+//XdlPUGFli4Uk5Nm+QSwfKBN9bg="
-Received: from [IPV6:2a01:599:a10:1e99:7578:5f56:e200:ca72]
-    by smtp.strato.de (RZmta 49.6.0 AUTH)
-    with ESMTPSA id N28a51z63Ex3y0d
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Mon, 3 Jul 2023 16:59:03 +0200 (CEST)
-Message-ID: <80266037-f808-c448-c3c7-9d5d5f4253a7@xenosoft.de>
-Date:   Mon, 3 Jul 2023 16:59:03 +0200
+        with ESMTP id S230098AbjGCSIQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 14:08:16 -0400
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E870E5F;
+        Mon,  3 Jul 2023 11:08:16 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-666e5f0d60bso2411706b3a.3;
+        Mon, 03 Jul 2023 11:08:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688407695; x=1690999695;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NdlTq9LuY8/LR/KMjs0dLZRjJIwIbTa797xTBtHD1Qc=;
+        b=BHd2665OQIReDtHLE84UqaobhS39Z+WVHk/KHHZVG2LnleTjQpk9cE6/JoVtdhapRf
+         qUwsRkMnSfDyhTNtaxAShKf9M4DjcntlU3I5XjFWz3fsz/CkIBYjzjwqmf6mFVoiMtbZ
+         1f3IkGyRHpMUQKHLdqt322liwsSZ/+oIWeog1Qre4rtH5J78aVaN80gX+hQ3fSCphOW+
+         hv3kGSVYfDuFW5RLF0PSBQh1WNU4hJO1NCEtk30BupZI/DqTPQqTftb0zYhcj6Lixued
+         qmjOJu/jTQaXIV15HyOXfyjMy+0yQBufp6I8B7wwdhCMV7/WoS6rmAAWmqp21iWKmkJQ
+         M4WA==
+X-Gm-Message-State: ABy/qLazCnVQuz/p3HrR4zgEtkBWxCRhKwQgYpsaffSdr6AQzYe0ZDzZ
+        5Lj7sBfHQYt4T62DUg2plb8=
+X-Google-Smtp-Source: APBJJlFoKToqL63bnEKlbggnBe+x+5CLNZA1xYgpfIjsVakeUx6FT+GZoK4g5lUFk/DKykj66llfPg==
+X-Received: by 2002:a62:1ac9:0:b0:668:7090:bf18 with SMTP id a192-20020a621ac9000000b006687090bf18mr8899924pfa.34.1688407695533;
+        Mon, 03 Jul 2023 11:08:15 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id j18-20020a62e912000000b00660d80087a8sm14191383pfh.187.2023.07.03.11.08.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jul 2023 11:08:14 -0700 (PDT)
+Message-ID: <c4de836a-a2a1-847f-1525-1accb814e45e@acm.org>
+Date:   Mon, 3 Jul 2023 11:08:13 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH] block: bugfix for Amiga partition overflow check patch
+Subject: Re: [PATCH RFC 0/7] blk-mq: improve tag fair sharing
 Content-Language: en-US
-From:   Christian Zigotzky <chzigotzky@xenosoft.de>
-To:     Martin Steigerwald <martin@lichtvoll.de>,
-        linux-block@vger.kernel.org, Michael Schmitz <schmitzmic@gmail.com>
-Cc:     axboe@kernel.dk, linux-m68k@vger.kernel.org, geert@linux-m68k.org,
-        hch@lst.de, stable@vger.kernel.org,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>,
-        Darren Stevens <darren@stevens-zone.net>,
-        mad skateman <madskateman@gmail.com>,
-        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        Christian Zigotzky <info@xenosoft.de>
-References: <20230701023524.7434-1-schmitzmic@gmail.com>
- <1885875.tdWV9SEqCh@lichtvoll.de>
- <234f57e7-a35f-4406-35ad-a5b9b49e9a5e@gmail.com>
- <4858801.31r3eYUQgx@lichtvoll.de>
- <947340d9-b640-0910-317b-5c8022220a55@xenosoft.de>
-In-Reply-To: <947340d9-b640-0910-317b-5c8022220a55@xenosoft.de>
+To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        Christoph Hellwig <hch@lst.de>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
+ <4c9fea33-9c30-4ab9-c210-95e09d323837@acm.org>
+ <82d44ba1-4389-079c-935a-cbb49203ca27@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <82d44ba1-4389-079c-935a-cbb49203ca27@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03.07.23 16:19, Christian Zigotzky wrote:
-> On 03.07.23 09:05, Martin Steigerwald wrote:
->> So, Christian, unless you can actually enlighten us on a reproducible
->> way how users with those setups end up with incorrect partition tables
->> like this, I consider this case closed. So far you didn't.
+On 7/3/23 06:29, Yu Kuai wrote:
+> 在 2023/06/20 23:20, Bart Van Assche 写道:
+>> On 6/18/23 09:07, Yu Kuai wrote:
+>>> This is not a formal version and not fully tested, I send this RFC
+>>> because I want to make sure if people think doing this is meaningful,
+>>> before I spend too much time on this.
+>> The approach looks good to me but I'd like to hear from Jens and 
+>> Christoph what their opinion is about the approach of this patch 
+>> series before doing an in-depth review.
 >>
->> Ciao,
-> This is a very simple explanation. The first partitions on the RDB 
-> disk were created with Media Toolbox on OS4.1. After that some 
-> additional partitions were created with Linux and formatted with ext4.
-> With the new patched kernel, these can no longer be mounted.
->
-> I will try out, if I can correct them with GParted. If it works, then 
-> I will write some instructions for correcting the partitions via 
-> GParted for the end users.
->
-> GParted is a good tool and suitable for our customers.
->
-> I know, this is a very old bug and no one has noticed this one. I have 
-> not received any error messages because of Linux partitions on RDB 
-> disks in the last 10 years. I am very happy that this bug is fixed now 
-> but we have to explain it to our customers why they can't mount their 
-> Linux partitions on the RDB disk anymore. Booting is of course also 
-> affected. (Mounting the root partition)
->
-> But maybe simple GParted instructions are a good solution.
-You can apply the patch. I will revert this patch until I find a simple 
-solution for our community.
+> Any suggestions on this topic? It'll be great to hear that if anyone
+> thinks it's meaningful to refactor tag fair sharing.
 
-Thank you for fixing this issue!
+The cover letter of this patch series says "This is not a formal version 
+and not fully tested". If a fully tested version will be posted, I will 
+help with an in-depth review.
+
+Thanks,
+
+Bart.
+
