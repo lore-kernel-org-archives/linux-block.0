@@ -2,19 +2,19 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEBCC04FE0
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 09:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 781A5C001E0
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 09:50:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231501AbjGCJuA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jul 2023 05:50:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50248 "EHLO
+        id S231383AbjGCJt4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jul 2023 05:49:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231359AbjGCJtz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 05:49:55 -0400
+        with ESMTP id S231313AbjGCJtx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 05:49:53 -0400
 Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ECF491B2;
-        Mon,  3 Jul 2023 02:49:52 -0700 (PDT)
-X-AuditID: a67dfc5b-d85ff70000001748-fa-64a299b4f969
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 450B11B4;
+        Mon,  3 Jul 2023 02:49:50 -0700 (PDT)
+X-AuditID: a67dfc5b-d85ff70000001748-c7-64a299b31a63
 From:   Byungchul Park <byungchul@sk.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
@@ -40,87 +40,76 @@ Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
         gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
         boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com,
         her0gyugyu@gmail.com
-Subject: [PATCH v10 rebased on v6.4 18/25] dept: Apply timeout consideration to wait_for_completion()/complete()
-Date:   Mon,  3 Jul 2023 18:47:45 +0900
-Message-Id: <20230703094752.79269-19-byungchul@sk.com>
+Subject: [PATCH v10 rebased on v6.4 15/25] locking/lockdep, cpu/hotplus: Use a weaker annotation in AP thread
+Date:   Mon,  3 Jul 2023 18:47:42 +0900
+Message-Id: <20230703094752.79269-16-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230703094752.79269-1-byungchul@sk.com>
 References: <20230703094752.79269-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTZxTHfZ5773NvO+tuqomPkOyl0ZCwqWhgOVsWY5ZsPh9mMFkMifuw
-        dfZmVKE0RRA2t/AmKgoIETqQOaimNsBAbtlSpsUKWmAEZKNxaGgHzM2x8qK4Mhkooyx+Ofnn
-        nN//9+lInN4jxEhmyxHFZjGmGYiW106vdWxtr3GYEh4FNkLFmQSI/H2Sh7rWZgJDLU0Imtvz
-        MUze2gO/zE8hWBy4zYG9aghBw3iQg3Z/CIHXVUBg+P46CERmCfRVnSZQeLGVwE/hJQyj1ZUY
-        mtS90H/WgcG38IAH+ySB8/ZCvDL+xLDgbBTBmbcFJly1IiyN74C+0B0BvPdeg5oLowSueft4
-        8HsmMAz/UEcg1LwsQL+/l4ehilIBvp1xEAjPOzlwRmZF+NlXj+FK0Yqo+PEzAXpKfRiKL7Vh
-        CNy9iqDz5BgGtfkOge7IFAa3WsXBv5dvIZgomxbh+JkFEc7nlyE4fbyah9tPewQoGk2CxSd1
-        ZPdbrHtqlmNF7qPMO1/Psx8dlHXUBkVW1HlPZPVqFnO74tnFa5OYNcxFBKY2niJMnasUWcl0
-        ALOZwUGR9X61yLP7ATveF3tA+7ZJSTNnK7btuz7WptYu20XrBW3O3fw2nIfGpBIkSVROpOVd
-        h55H9TtUgjQSkePoyMgCF80b5Feou/QPoQRpJU4+8QJ1PRwgUX69bKWt4ZQow8tbaMflxtWu
-        Tn6Dnupuw9FM5Zdp0xXfqkezsv/9Sdkqo5eT6GhNiESdVD6hoTf6/hH+L2yiN1wj/Fmkq0dr
-        GpHebMlON5rTErel5lrMOdsOZqSraOWfnF8sfehBc0MfdCFZQoa1upHPG0x6wZidmZvehajE
-        GTboCse/Mel1JmPuZ4ot4yNbVpqS2YViJd6wUbdz/qhJL39qPKIcVhSrYnt+xZImJg8Vv1sz
-        bKndfqg17E/Ud25e12HuyRnTlccNfJl8yTrTsrdg99empEItKzjnjD/2iclCY/e8+vqbNzfF
-        uZU1D67/umxtkVMq1IODnt8ItZY/2p+iO+d/+P2LRl9/wtPkZ1PrvdO9u95Ldr8T3h8az9K8
-        tDO4Naby/X2ev6qDkHHscXCzgc9MNe6I52yZxv8AioNHJUsDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSf0yMcRzHfb/Pz46zxwnP/IqbYklqlA+Zsdk8bMz8oWmTbu6ZburKXSJm
-        SolSTSynOlTsOnVUz4VDWevWj2P9cpWyNDVJ65LFNSk/qs0/7733/rw+77/eLKHIp5ayGm2c
-        qNOqopS0jJQdCEneYM0tUgcMS9shOyMA3D+ukmAss9DQ+rgUgaUyCcNQ3R54N+5CMNnUQoAh
-        pxVBYd8HAirrexFUmy/R4Pw0H9rdozQ4cq7RkHy/jIa24SkMPbduYCiV9sOb60UYaiYGSTAM
-        0ZBvSMbT8gXDhKmEAVOiN/Sb8xiY6gsER28nBfY7Dgqq36+H3Ls9NFRVO0iot/VjcL4w0tBr
-        +UvBm/pGElqzMyl49LWIhuFxEwEm9ygDb2sKMJSnTLelfv9DQUNmDYbUBxUY2rtfInh19SMG
-        ydJJg93twmCVcgj4VVyHoD9rhIHLGRMM5CdlIbh2+RYJLb8bKEjpCYLJn0Z6Z4hgd40SQor1
-        jFA9XkAKr4t44XneB0ZIefWeEQqk04LV7CvcrxrCQuGYmxKkkjRakMZuMEL6SDsWvjY3M0Lj
-        7UlS+NRuwAeXh8m2q8UoTbyo27gjQhaZ99fAxN6Vne1OqsCJ6CObjliW5zbz0hOUjjxYmlvL
-        d3VNEDPek1vFWzM/U+lIxhLclbm8+VsTPcMv5GL5suHQGYbkvPnnxSWzv3IumE+zV+AZz3Ne
-        fGl5zWyPx3Q+8DNrllFwQXxPbi99HckK0JwS5KnRxkerNFFB/vqTkQlazVn/4zHREpqejOnC
-        VLYN/XDuqUUci5Tz5F3nC9UKShWvT4iuRTxLKD3lyX331Aq5WpVwTtTFHNOdjhL1tWgZSyqX
-        yPeFihEK7oQqTjwpirGi7v8Vsx5LExHuDh4wrPxm3Glef6xyQXbrlcUuv7DlY50cLtZ1XLKF
-        707du2XQkmZLOHwo4Gl4sXZ0nbdP7ODR1cbg2z73Bo50OA7abTE31zTvYqrmerlW1J4L8Up6
-        Vqfd5u/niYz6L6ozfMTWlRfSNqx9h5ybFr0+1dDW9/C4x0VnZ8aA79jkeaWS1EeqAn0JnV71
-        D1FprvouAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTZxiG977nnPecVstOKtuO8GOmC1ExIi66PDFmIdmSnS0xMfGPw2Ta
+        rCejSkGLFtlHhit+lUKACB20uFKW0rRVpMVEhpAKEUSDVCRYK54Ic04CCGEWrYDaYvbnyZX7
+        yX39ujlK3cGkcfqCo5KxQJuvIUpaObO6aXOw3qXLDg3uhGprNsSen6HB0eonEL7oQ+BvP4Fh
+        8vpXcG9hGsHi4BAFttowgqbxhxS098kIujy/Ebj7OAVGYrMEBmrLCZibWwncmVrCMFZXg8EX
+        2AW3qlwYQvF/abBNErDbzDhxnmKIu70suEszYMLTwMLS+FYYkEcZ6IpugvrzYwSudg3Q0Hdl
+        AsPdvxwEZP8bBm713aAhXF3BwIVnLgJTC24K3LFZFoZDTgyXyhKiU/+9ZqC/IoTh1J9tGEbu
+        dyLoPvMIQ8A/SqA3No0hGKil4FXLdQQTlTMsnLTGWbCfqERQfrKOhqHlfgbKxrbD4ksHydkh
+        9k7PUmJZsFjsWnDS4k2XIHY0PGTFsu4oKzoDx8SgJ1NsvjqJxab5GCMGvGeJGJivYUXLzAgW
+        n92+zYo3fl+kxccjNrw7PVe5Uyfl602SccvnB5R55+4v48Mt7PG5v+1sKaogFqTgBH6bMHth
+        nLUgboV9tRnJmPDrhUgkTiU5lV8nBCueMBak5Cj+9CrBMze40l3DG4TuHplNMs1nCJGhy3TS
+        o+I/E2Rr8Tv9x4LvUmjFo0jE/7ysRElW89uFsXqZJJ0Cb1MInc9b6HeFtcI1T4SuQiones+L
+        1PoCk0Grz9+WlVdSoD+e9X2hIYASg3L/srTvCpoP7+lBPIc0q1WRn5p0akZrKiox9CCBozSp
+        KvP4Hzq1Sqct+VEyFu43HsuXinpQOkdrPlJ9ulCsU/M/aI9KhyTpsGT8/4s5RVopMqTlmuJr
+        yZeJfSJriRMrvrP79fIna6yNc42p/aacnO4tv0r727znpuOtma/C5lyU5Z4x762L2pt7L0fT
+        czsf1ES+FvZ0TA0PV73/hepnOdr25MNIzr3O0UJux67MNy5HytN9siPF98GEu/Hshm+WU1+0
+        H2l4UV3uvWjZmH3wWw1dlKfdmkkZi7RvAbLwAENMAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTVxzGd86999xLpdu1ot6oi1sTMuMrGDH/6TTGLx4xM/PDMsdisNqb
+        0QDFtFBlZglIdVopAxQRClpgqw2wqbea4EYJQijiW5kQrKY2wpxIADHONnS8OGrilye/PE/y
+        +/QIjMbBLREMxlzZZNRlaYmKVe3eXLTGU1WvT6qNJEJZcRKE35xkoeZyM4He35sQNF8rxDDS
+        tQMeRsYQTN3zM1BZ0YugbvAJA9d8IQRe9zECfc8+hP7wBIGeitMEihouE/hrdBpD8Fw5hibl
+        S7hTWo+hPTrMQuUIAUdlEZ6LFxiirkYeXAWJMOSu5mF6MBl6QgMcdNb2cOB9vAqqLgQJtHp7
+        WPC1DGHo+6OGQKj5LQd3fLdY6C2zc/Dby3oCoxEXA67wBA8P2p0YrljnbCf+neWg296O4cQv
+        VzH0P/oTQdvJpxiU5gECneExDB6lgoH/LnUhGCoZ5+F4cZQHR2EJgtPHz7Hgn+nmwBpMganJ
+        GrJtM+0cm2Co1XOYeiNOlt6ul+iN6ic8tbY95qlTyaMe90ra0DqCad3rMEeVxlOEKq/LeWob
+        78f05f37PL11foqlz/or8VfL0lRf6OUsg0U2rdu6X5Vx9tEMPnSJP/LqbwdfgOzEhgRBEjdI
+        TRWJNhQnEPEzKRCIMjFOED+RPPbnnA2pBEb8aZ7kfnWPxIYFYrbU1hHiY8yKiVLAf52NedTi
+        RilUfDhWS+JyqelK+ztP3Fz9z2QJirFGTJGCVSFSilRO9EEjSjAYLdk6Q1bKWnNmRr7RcGTt
+        wZxsBc1dxvXjdFkLetO3owOJAtLGqwNH6/QaTmcx52d3IElgtAnqosGLeo1ar8v/QTblpJvy
+        smRzB1oqsNrF6tRv5P0a8Xtdrpwpy4dk0/sVC3FLChD1tu1ar3y6rHyvQXc0krZgZsO6uwdW
+        vZ1dfSHV0lKV617jvxmfvzC9c6ez++riYJT2LWrYRSw+33rH7i3eyfmLbGc2/nw7fWCFdbvS
+        OuEfNQ+b6/bZk6ozC7+bOrb329T4j2a6lNk91w8Y0j42GEu/9teO5wU+T/71zKac4YKbs3d9
+        WtacoUteyZjMuv8Bvvgvmy4DAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT was introduced, apply the
-consideration to wait_for_completion()/complete().
+cb92173d1f0 ("locking/lockdep, cpu/hotplug: Annotate AP thread") was
+introduced to make lockdep_assert_cpus_held() work in AP thread.
+
+However, the annotation is too strong for that purpose. We don't have to
+use more than try lock annotation for that.
+
+Furthermore, now that Dept was introduced, false positive alarms was
+reported by that. Replaced it with try lock annotation.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/completion.h | 4 ++--
- kernel/sched/completion.c  | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ kernel/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/completion.h b/include/linux/completion.h
-index 32d535abebf3..15eede01a451 100644
---- a/include/linux/completion.h
-+++ b/include/linux/completion.h
-@@ -41,9 +41,9 @@ do {							\
-  */
- #define init_completion_map(x, m) init_completion(x)
+diff --git a/kernel/cpu.c b/kernel/cpu.c
+index f4a2c5845bcb..19076f798b34 100644
+--- a/kernel/cpu.c
++++ b/kernel/cpu.c
+@@ -356,7 +356,7 @@ int lockdep_is_cpus_held(void)
  
--static inline void complete_acquire(struct completion *x)
-+static inline void complete_acquire(struct completion *x, long timeout)
+ static void lockdep_acquire_cpus_lock(void)
  {
--	sdt_might_sleep_start(&x->dmap);
-+	sdt_might_sleep_start_timeout(&x->dmap, timeout);
+-	rwsem_acquire(&cpu_hotplug_lock.dep_map, 0, 0, _THIS_IP_);
++	rwsem_acquire(&cpu_hotplug_lock.dep_map, 0, 1, _THIS_IP_);
  }
  
- static inline void complete_release(struct completion *x)
-diff --git a/kernel/sched/completion.c b/kernel/sched/completion.c
-index d57a5c1c1cd9..261807fa7118 100644
---- a/kernel/sched/completion.c
-+++ b/kernel/sched/completion.c
-@@ -100,7 +100,7 @@ __wait_for_common(struct completion *x,
- {
- 	might_sleep();
- 
--	complete_acquire(x);
-+	complete_acquire(x, timeout);
- 
- 	raw_spin_lock_irq(&x->wait.lock);
- 	timeout = do_wait_for_common(x, action, timeout, state);
+ static void lockdep_release_cpus_lock(void)
 -- 
 2.17.1
 
