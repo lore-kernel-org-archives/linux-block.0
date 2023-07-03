@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A27B7C001B0
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 09:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE048C001DD
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 09:17:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230149AbjGCJQ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jul 2023 05:16:58 -0400
+        id S229960AbjGCJQ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jul 2023 05:16:59 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229709AbjGCJQ5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 05:16:57 -0400
+        with ESMTP id S230192AbjGCJQ6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 05:16:58 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82CC0191;
-        Mon,  3 Jul 2023 02:16:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA264191;
+        Mon,  3 Jul 2023 02:16:57 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 379731FD72;
-        Mon,  3 Jul 2023 09:16:55 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A8DF11FD76;
+        Mon,  3 Jul 2023 09:16:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1688375815; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1688375816; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=y/IJwReM/uXABoejcS3ER1zTUO2yvPD9h8VV7ZhYdrs=;
-        b=AYN6Xg5ypCLI8zd2oJ/WFghR//Umb+TVkxatu2rqY+riUBTN8uOgJYo72f5tilyspvJmhi
-        XlMGYX8FZRRrASEccYMIfJ11tc/REdDaUt9x072X1oeQdw9uVbZCd2ilDOs392wjBlERwM
-        f3/Y8M8nT8SWQ5CmfqV41Yi+Wv3ygxo=
+        bh=lwQ11ZCMfUbee76s3nRrSEKyCvgmp2Gel3xnxd/kPGE=;
+        b=YbvAdaHs2zQbMAkwg2aFEvUVKke4jx1axyARonpkBkIYq1qZ4JqWQCAMNQmw9l2qq8tATv
+        DSKtOuZ15kVDXqJm4Yfhn6hwwK0ctT7Dd/3nyJsdhJYQq0tdhBQrKsocY5/pM+RUv31VFf
+        bf+veDj8jnaslQsoENzloT3nPW06X0E=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1688375815;
+        s=susede2_ed25519; t=1688375816;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=y/IJwReM/uXABoejcS3ER1zTUO2yvPD9h8VV7ZhYdrs=;
-        b=4IzB3ZJCS0YkTVGdVhkf1yUtpT3iH6mRH45T72e4QNjOLQDYo/Ik3Ll3A33Gnk6HaWYUjh
-        QEvU4exRzv9RxuBQ==
+        bh=lwQ11ZCMfUbee76s3nRrSEKyCvgmp2Gel3xnxd/kPGE=;
+        b=Us5QDSYjGJVTs39nuAyJdKx0428NkKHgJtr73DJDkahqT/agx5kzixI9qR/68S0tuftrZZ
+        LnufDr/rT7avDVBw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 29C2313276;
-        Mon,  3 Jul 2023 09:16:55 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9482613276;
+        Mon,  3 Jul 2023 09:16:56 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 3M7bCQeSomSJDgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Mon, 03 Jul 2023 09:16:55 +0000
+        id zYFoJAiSomSNDgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Mon, 03 Jul 2023 09:16:56 +0000
 From:   Daniel Wagner <dwagner@suse.de>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -57,9 +57,9 @@ Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>,
         James Smart <jsmart2021@gmail.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v3 1/3] nvme/048: Check for queue count check directly
-Date:   Mon,  3 Jul 2023 11:16:45 +0200
-Message-ID: <20230703091647.800-2-dwagner@suse.de>
+Subject: [PATCH blktests v3 3/3] nvme/{041,042,043,044,045,048}: Use default hostnqn and hostid
+Date:   Mon,  3 Jul 2023 11:16:47 +0200
+Message-ID: <20230703091647.800-4-dwagner@suse.de>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230703091647.800-1-dwagner@suse.de>
 References: <20230703091647.800-1-dwagner@suse.de>
@@ -69,74 +69,170 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The test monitored the state changes live -> resetting -> connecting ->
-live, to figure out the queue count change was successful.
+The host might have enabled the udev/systemd auto connect feature.
+This disturbs the blktests for the fc transport. nvme-cli is able
+to distinguish between the different invocations via the --context
+option.
 
-The fc transport is reconnecting very fast and the state transitions
-are not observed by the current approach.
-
-So instead trying to monitor the state changes, let's just wait for the
-live state and the correct queue number.
-
-As queue count is depending on the number of online CPUs we explicitly
-use 1 and 2 for the max_queue count. This means the queue_count value
-needs to reach either 2 or 3 (admin queue included).
+Instead creating random generated IDs or reuse the hostnqn, it's safer
+to always use the same hostnqn to reduce the risk that the matching
+logic doesn't work.
 
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
 ---
- tests/nvme/048 | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+ tests/nvme/041 |  8 ++------
+ tests/nvme/042 |  8 ++------
+ tests/nvme/043 |  8 ++------
+ tests/nvme/044 |  8 ++------
+ tests/nvme/045 |  8 ++------
+ tests/nvme/048 |  8 ++------
+ tests/nvme/rc  | 19 ++-----------------
+ 7 files changed, 14 insertions(+), 53 deletions(-)
 
+diff --git a/tests/nvme/041 b/tests/nvme/041
+index 308655dd6090..5b04b99b128e 100755
+--- a/tests/nvme/041
++++ b/tests/nvme/041
+@@ -30,12 +30,8 @@ test() {
+ 
+ 	echo "Running ${TEST_NAME}"
+ 
+-	hostid="$(uuidgen)"
+-	if [ -z "$hostid" ] ; then
+-		echo "uuidgen failed"
+-		return 1
+-	fi
+-	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	hostid="${def_hostid}"
++	hostnqn="${def_hostnqn}"
+ 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
+ 		echo "nvme gen-dhchap-key failed"
+diff --git a/tests/nvme/042 b/tests/nvme/042
+index fed2efead013..8df5ed37aacc 100755
+--- a/tests/nvme/042
++++ b/tests/nvme/042
+@@ -32,12 +32,8 @@ test() {
+ 
+ 	echo "Running ${TEST_NAME}"
+ 
+-	hostid="$(uuidgen)"
+-	if [ -z "$hostid" ] ; then
+-		echo "uuidgen failed"
+-		return 1
+-	fi
+-	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	hostid="${def_hostid}"
++	hostnqn="${def_hostnqn}"
+ 
+ 	_setup_nvmet
+ 
+diff --git a/tests/nvme/043 b/tests/nvme/043
+index a030884aa4ed..b591e39d0706 100755
+--- a/tests/nvme/043
++++ b/tests/nvme/043
+@@ -33,12 +33,8 @@ test() {
+ 
+ 	echo "Running ${TEST_NAME}"
+ 
+-	hostid="$(uuidgen)"
+-	if [ -z "$hostid" ] ; then
+-		echo "uuidgen failed"
+-		return 1
+-	fi
+-	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	hostid="${def_hostid}"
++	hostnqn="${def_hostnqn}"
+ 
+ 	_setup_nvmet
+ 
+diff --git a/tests/nvme/044 b/tests/nvme/044
+index 9928bcc55397..fca0897af27b 100755
+--- a/tests/nvme/044
++++ b/tests/nvme/044
+@@ -32,12 +32,8 @@ test() {
+ 
+ 	echo "Running ${TEST_NAME}"
+ 
+-	hostid="$(uuidgen)"
+-	if [ -z "$hostid" ] ; then
+-		echo "uuidgen failed"
+-		return 1
+-	fi
+-	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	hostid="${def_hostid}"
++	hostnqn="${def_hostnqn}"
+ 
+ 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
+diff --git a/tests/nvme/045 b/tests/nvme/045
+index 26a55335a92c..eca629a18691 100755
+--- a/tests/nvme/045
++++ b/tests/nvme/045
+@@ -36,12 +36,8 @@ test() {
+ 
+ 	echo "Running ${TEST_NAME}"
+ 
+-	hostid="$(uuidgen)"
+-	if [ -z "$hostid" ] ; then
+-		echo "uuidgen failed"
+-		return 1
+-	fi
+-	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	hostid="${def_hostid}"
++	hostnqn="${def_hostnqn}"
+ 
+ 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
 diff --git a/tests/nvme/048 b/tests/nvme/048
-index 81084f0440c2..bbfb9873b5e8 100755
+index bbfb9873b5e8..a6ebb8927865 100755
 --- a/tests/nvme/048
 +++ b/tests/nvme/048
-@@ -42,6 +42,24 @@ nvmf_wait_for_state() {
- 	return 0
- }
+@@ -93,12 +93,8 @@ test() {
  
-+nvmf_check_queue_count() {
-+	local subsys_name="$1"
-+	local queue_count="$2"
-+	local nvmedev
-+	local queue_count_file
-+
-+	nvmedev=$(_find_nvme_dev "${subsys_name}")
-+	queue_count_file=$(cat /sys/class/nvme-fabrics/ctl/"${nvmedev}"/queue_count)
-+
-+	queue_count=$((queue_count + 1))
-+	if [[ "${queue_count}" -ne "${queue_count_file}" ]]; then
-+		echo "expected queue count ${queue_count} not set"
-+		return 1
-+	fi
-+
-+	return 0
-+}
-+
- set_nvmet_attr_qid_max() {
- 	local nvmet_subsystem="$1"
- 	local qid_max="$2"
-@@ -56,10 +74,8 @@ set_qid_max() {
- 	local qid_max="$3"
+ 	_setup_nvmet
  
- 	set_nvmet_attr_qid_max "${subsys_name}" "${qid_max}"
+-	hostid="$(uuidgen)"
+-	if [ -z "$hostid" ] ; then
+-		echo "uuidgen failed"
+-		return 1
+-	fi
+-	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	hostid="${def_hostid}"
++	hostnqn="${def_hostnqn}"
+ 
+ 	truncate -s "${nvme_img_size}" "${file_path}"
+ 
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 9b5442b2c07b..4f3a994d75ce 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -14,23 +14,8 @@ def_remote_wwnn="0x10001100aa000001"
+ def_remote_wwpn="0x20001100aa000001"
+ def_local_wwnn="0x10001100aa000002"
+ def_local_wwpn="0x20001100aa000002"
 -
--	# Setting qid_max forces a disconnect and the reconntect attempt starts
--	nvmf_wait_for_state "${subsys_name}" "connecting" || return 1
- 	nvmf_wait_for_state "${subsys_name}" "live" || return 1
-+	nvmf_check_queue_count "${subsys_name}" "${qid_max}" || return 1
- 
- 	return 0
- }
-@@ -103,7 +119,7 @@ test() {
- 			echo FAIL
- 		else
- 			set_qid_max "${port}" "${subsys_name}" 1 || echo FAIL
--			set_qid_max "${port}" "${subsys_name}" 128 || echo FAIL
-+			set_qid_max "${port}" "${subsys_name}" 2 || echo FAIL
- 		fi
- 
- 		_nvme_disconnect_subsys "${subsys_name}"
+-if [ -f "/etc/nvme/hostid" ]; then
+-	def_hostid="$(cat /etc/nvme/hostid 2> /dev/null)"
+-else
+-	def_hostid="$(uuidgen)"
+-fi
+-if [ -z "$def_hostid" ] ; then
+-	def_hostid="0f01fb42-9f7f-4856-b0b3-51e60b8de349"
+-fi
+-
+-if [ -f "/etc/nvme/hostnqn" ]; then
+-	def_hostnqn="$(cat /etc/nvme/hostnqn 2> /dev/null)"
+-fi
+-if [ -z "$def_hostnqn" ] ; then
+-	def_hostnqn="nqn.2014-08.org.nvmexpress:uuid:${def_hostid}"
+-fi
+-
++def_hostid="0f01fb42-9f7f-4856-b0b3-51e60b8de349"
++def_hostnqn="nqn.2014-08.org.nvmexpress:uuid:${def_hostid}"
+ nvme_trtype=${nvme_trtype:-"loop"}
+ nvme_img_size=${nvme_img_size:-"1G"}
+ nvme_num_iter=${nvme_num_iter:-"1000"}
 -- 
 2.41.0
 
