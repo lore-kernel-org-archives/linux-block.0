@@ -2,85 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B70BBEB64DD
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 13:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA33AC001B0
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 14:19:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231481AbjGCN3R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jul 2023 09:29:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51802 "EHLO
+        id S229942AbjGCOTj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jul 2023 10:19:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbjGCN3Q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 09:29:16 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73898E3;
-        Mon,  3 Jul 2023 06:29:15 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qvmwj4xc1z4f3tqb;
-        Mon,  3 Jul 2023 21:29:09 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHoZQkzaJkKhx1NA--.35620S3;
-        Mon, 03 Jul 2023 21:29:10 +0800 (CST)
-Subject: Re: [PATCH RFC 0/7] blk-mq: improve tag fair sharing
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        Christoph Hellwig <hch@lst.de>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
- <4c9fea33-9c30-4ab9-c210-95e09d323837@acm.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <82d44ba1-4389-079c-935a-cbb49203ca27@huaweicloud.com>
-Date:   Mon, 3 Jul 2023 21:29:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229844AbjGCOTi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 10:19:38 -0400
+X-Greylist: delayed 103467 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 03 Jul 2023 07:19:36 PDT
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 515A2E54;
+        Mon,  3 Jul 2023 07:19:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1688393945; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=BrTOfOlKBPWc4K7yBdBeJYnEHfycdbapFCQgLLoGE3XFe3IzSb3yKbsIoGbwIrRVT6
+    i7J8hSIxLy1/Cv7+0CrfIPeF5/jv+48e/jVXGlTOI2018g2aq9T2CgV1PJYwb/vheAA1
+    vFK7OKBl8NZkI3LM3KLDfRXzvq1dgRRIHbFDlu+9+5t5UFrJiyOGlFPqxy/r0g16UDIZ
+    yuf47GapLD62Xzu5MhrsEZZYOShnCWfL+jIknprgdpnzj3VS0Lox6xBnW+Cv93V5VS0v
+    KX5V16I2iokT+oHxc74E6nkqGgtjah2Fe3RGFAkqClV6YlVi55Lc6cyFP0eo5ce1PmhM
+    /7Ow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1688393945;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=aZqkftNwGuiIw+qvH524CVwYcvHNKRAS4n56iIq1vcw=;
+    b=ZRtziCBzjcRsbZEVhvuCRvu4OOb9sFb6YhxopTBQUWQsohyNPr2S8PWtrqrSffj4tU
+    /D09pichdSN1clItnDXKoKcHDvXzrWbek2qv6sFPPJyliNiNCFubta7KbwzfrFvQfy50
+    MhUXSyPpxZVhvZwpdGbsa5vavR9Yt7r3QhC9KD2q7yf20xE8qaGuhinhlaOfVALcNUXE
+    wW+kQlcoB8o3ks6VB+TqSUPkacvnXzzgQDdcJMC8I1nF/3OUVbDwCaexXpBxsrWO3IBb
+    qvvMwJgQImYC3QimpfaKaDhLP+xOSzx8nuMMhnBkrfaoeNRZ5dHGnyoxY2A/SbIdpi3+
+    avLQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1688393945;
+    s=strato-dkim-0002; d=xenosoft.de;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=aZqkftNwGuiIw+qvH524CVwYcvHNKRAS4n56iIq1vcw=;
+    b=XZjO6gm1x0W+ta4vU3k+Z2rY+hOqWYfrRf4Vlu+p32VSDRqWXl/+X119/ZAQbyBvNM
+    ooevx2JSf0jGOFGJz7cz7PTemqnBa4b65RGpOaswhwrOC5YrNyA6oArKhXJ3de9b7qqx
+    JnSiTYL1pmSz0+Cqw5+kZEk7abeN1usCijwsT4QMbrC+vMOVdKiSYt/PrTF9wnTZb6vW
+    0aABdMuOodUY0ykmp1wwvalnOdReXYn8hQWj4vlDUU90jePn0WrQlxyIy/BrCyp1xs1k
+    ELwLUEiik1CGE4yIX/KILbFrEXBwDsFt7oDnqWA0Qo+Idz1LoAG8jkKCK1JWetCBxEC/
+    FvOw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1688393945;
+    s=strato-dkim-0003; d=xenosoft.de;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=aZqkftNwGuiIw+qvH524CVwYcvHNKRAS4n56iIq1vcw=;
+    b=NaABkuKF6mjlHA23pbfoYpK0IUOO3flnFOsyzYy4MJ/KWkE4h+vfUDgSqqRBNMq1rh
+    J6OlaYVOx2V+Z2ElYIAw==
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHvJzedR4hZ0hbXsch5+//XdlPUGFli4Uk5Nm+QSwfKBN9bg="
+Received: from [IPV6:2a01:599:a10:1e99:7578:5f56:e200:ca72]
+    by smtp.strato.de (RZmta 49.6.0 AUTH)
+    with ESMTPSA id N28a51z63EJ4xrt
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Mon, 3 Jul 2023 16:19:04 +0200 (CEST)
+Message-ID: <947340d9-b640-0910-317b-5c8022220a55@xenosoft.de>
+Date:   Mon, 3 Jul 2023 16:19:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <4c9fea33-9c30-4ab9-c210-95e09d323837@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHoZQkzaJkKhx1NA--.35620S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrAr4fJF1rurWUGFy8Ar1xAFb_yoWxWrbE93
-        yktr9rKr4qqF1fXF4fKry5ZFZrKayjgryUX3yrJw4xtF9Y9ws8Xayqvrn3Z3W3tFs5GFsa
-        9r4kX3y3uw42qjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
-        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
-        U==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH] block: bugfix for Amiga partition overflow check patch
+To:     Martin Steigerwald <martin@lichtvoll.de>,
+        linux-block@vger.kernel.org, Michael Schmitz <schmitzmic@gmail.com>
+Cc:     axboe@kernel.dk, linux-m68k@vger.kernel.org, geert@linux-m68k.org,
+        hch@lst.de, stable@vger.kernel.org,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        Darren Stevens <darren@stevens-zone.net>,
+        mad skateman <madskateman@gmail.com>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        Christian Zigotzky <info@xenosoft.de>
+References: <20230701023524.7434-1-schmitzmic@gmail.com>
+ <1885875.tdWV9SEqCh@lichtvoll.de>
+ <234f57e7-a35f-4406-35ad-a5b9b49e9a5e@gmail.com>
+ <4858801.31r3eYUQgx@lichtvoll.de>
+Content-Language: en-US
+From:   Christian Zigotzky <chzigotzky@xenosoft.de>
+In-Reply-To: <4858801.31r3eYUQgx@lichtvoll.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Christoph and Jens and anyone who's interested
+On 03.07.23 09:05, Martin Steigerwald wrote:
+> So, Christian, unless you can actually enlighten us on a reproducible
+> way how users with those setups end up with incorrect partition tables
+> like this, I consider this case closed. So far you didn't.
+>
+> Ciao,
+This is a very simple explanation. The first partitions on the RDB disk 
+were created with Media Toolbox on OS4.1. After that some additional 
+partitions were created with Linux and formatted with ext4.
+With the new patched kernel, these can no longer be mounted.
 
-在 2023/06/20 23:20, Bart Van Assche 写道:
-> On 6/18/23 09:07, Yu Kuai wrote:
->> This is not a formal version and not fully tested, I send this RFC
->> because I want to make sure if people think doing this is meaningful,
->> before I spend too much time on this.
-> The approach looks good to me but I'd like to hear from Jens and 
-> Christoph what their opinion is about the approach of this patch series 
-> before doing an in-depth review.
-> 
-Any suggestions on this topic? It'll be great to hear that if anyone
-thinks it's meaningful to refactor tag fair sharing.
+I will try out, if I can correct them with GParted. If it works, then I 
+will write some instructions for correcting the partitions via GParted 
+for the end users.
 
-Thanks,
-Kuai
-> Thanks,
-> 
-> Bart.
-> 
-> .
-> 
+GParted is a good tool and suitable for our customers.
 
+I know, this is a very old bug and no one has noticed this one. I have 
+not received any error messages because of Linux partitions on RDB disks 
+in the last 10 years. I am very happy that this bug is fixed now but we 
+have to explain it to our customers why they can't mount their Linux 
+partitions on the RDB disk anymore. Booting is of course also affected. 
+(Mounting the root partition)
+
+But maybe simple GParted instructions is a good solution.
