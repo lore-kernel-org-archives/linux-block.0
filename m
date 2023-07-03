@@ -2,92 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB77EB64DD
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 06:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67973C001B0
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jul 2023 07:05:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbjGCGTA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jul 2023 02:19:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38364 "EHLO
+        id S229738AbjGCHF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jul 2023 03:05:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230146AbjGCGSm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 02:18:42 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2742B12E;
-        Sun,  2 Jul 2023 23:18:39 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        with ESMTP id S229516AbjGCHFz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jul 2023 03:05:55 -0400
+Received: from mail.lichtvoll.de (lichtvoll.de [IPv6:2001:67c:14c:12f::11:100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B512E44;
+        Mon,  3 Jul 2023 00:05:54 -0700 (PDT)
+Received: from 127.0.0.1 (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A3BD31FD70;
-        Mon,  3 Jul 2023 06:18:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1688365117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GUoBaQDxjkZi1Sem7EpqwhIMMA5Ih8do3OoTKvP4LWw=;
-        b=MtQcbPcdhzin7AFReIh58w+BF26CTYT8jrPqHE+Rm845NDzAQzwbPCvgiFHBPOzGAH6QNE
-        KYl8ANZ7hlETd+MP0AqPJ55A0Tjwb/UsHztNkgEVWinsbLlJiVIVhzkSPT5SC5x4wqG6UA
-        iMY2V/q1flzCFuw9K5pBNKA4WzpcWVA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1688365117;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GUoBaQDxjkZi1Sem7EpqwhIMMA5Ih8do3OoTKvP4LWw=;
-        b=DD0ZzlPyk8Vzs7/j6rh7vTx8Sfq+Yi2XW8geOrAO5zjz+LClrftyp0ZK47ls78snspzfSw
-        3nKxMKiuwxIz+eDQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 94FCE138FC;
-        Mon,  3 Jul 2023 06:18:37 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id fbtTJD1oomSpMwAAMHmgww
-        (envelope-from <dwagner@suse.de>); Mon, 03 Jul 2023 06:18:37 +0000
-Date:   Mon, 3 Jul 2023 08:18:37 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>
-Subject: Re: [PATCH blktests v2 0/3] More fixes for FC enabling
-Message-ID: <exbq2w5c2ny24pxjprhiozbcaftqwumq6o4cvq2sjy6bqi4lvi@nqkeh2vs5seu>
-References: <20230628151623.11340-1-dwagner@suse.de>
- <aji2laz4lypl4lspduoeef4uviuoysl5rweu25zmzplj3psg7f@ryxrnjorfsr2>
+        by mail.lichtvoll.de (Postfix) with ESMTPSA id AEB9772BDDB;
+        Mon,  3 Jul 2023 09:05:50 +0200 (CEST)
+Authentication-Results: mail.lichtvoll.de;
+        auth=pass smtp.auth=martin smtp.mailfrom=martin@lichtvoll.de
+From:   Martin Steigerwald <martin@lichtvoll.de>
+To:     linux-block@vger.kernel.org,
+        Christian Zigotzky <chzigotzky@xenosoft.de>,
+        Michael Schmitz <schmitzmic@gmail.com>
+Cc:     axboe@kernel.dk, linux-m68k@vger.kernel.org, geert@linux-m68k.org,
+        hch@lst.de, stable@vger.kernel.org,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        Darren Stevens <darren@stevens-zone.net>,
+        mad skateman <madskateman@gmail.com>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        Christian Zigotzky <info@xenosoft.de>
+Subject: Re: [PATCH] block: bugfix for Amiga partition overflow check patch
+Date:   Mon, 03 Jul 2023 09:05:50 +0200
+Message-ID: <4858801.31r3eYUQgx@lichtvoll.de>
+In-Reply-To: <234f57e7-a35f-4406-35ad-a5b9b49e9a5e@gmail.com>
+References: <20230701023524.7434-1-schmitzmic@gmail.com>
+ <1885875.tdWV9SEqCh@lichtvoll.de>
+ <234f57e7-a35f-4406-35ad-a5b9b49e9a5e@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aji2laz4lypl4lspduoeef4uviuoysl5rweu25zmzplj3psg7f@ryxrnjorfsr2>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 03, 2023 at 05:43:01AM +0000, Shinichiro Kawasaki wrote:
-> On Jun 28, 2023 / 17:16, Daniel Wagner wrote:
-> > I (think) address all the feedback I got from Sagi and Shinichiro except one.
-> > The _have_nvme_cli_context() (previously _nvme_cli_support_context()) function
-> > is still there. I didn't find any other good way to achieve this and I found in
-> > blktests another function doing the same: _have_fio_zbd_zonemode().
-> 
-> I found that the latest blktests fix for the hostnqn/hostid issue created
-> conflict with the 2nd patch in this series. Sorry about that. (Actually, I guess
-> this series could be enough for the issue...)
+Michael Schmitz - 02.07.23, 22:22:27 CEST:
+> > I have read through the last mails without commenting. I admit: I do
+> > not yet get what is wrong here? A checksum was miscalculated? Is
+> > this a regular thing to happen when using RDB disks with Linux
+> > partitions?
+> I sent instructions to Christian on how to fix his partition table so
+> the size mismatch between partition and filesystem (caused by the old
+> RDB code) can be avoided, and misreading the checksum calculation code
+> I forgot to update the checksum. That's all.
 
-No problem.
+Ah okay. Sure, the checksum needs to be updated then.
 
-> Daniel, I can fix the conflict and repost the series to the list. Or you can fix
-> the conflict by yourself. Please let me know your preference.
+From what I thought I gathered from Christian, I thought that his issue 
+would be something that would automatically be triggered by just using 
+disks Amiga + Linux RDB partitioning setup. And I did not get, how any 
+tool on AmigaOS would create partition tables with errors like too large 
+partitions in them. I am not completely sure about the amiga-fdisk tool 
+for Linux, but even there I would be surprised if it would allow to 
+create such a partition table. Especially given that as I remember back 
+then when I faced the overflow issue amiga-fdisk showed the correct 
+values. I always suggest to use a tool on AmigaOS however.
 
-I'll rebase and fixup the conflict. Also give it another quick test run just to
-make sure all still works.
+So that was it: I did not get how Christian comes to claim that so many 
+users were affected with incorrect partition tables, cause frankly Amiga 
+RDB partitioning tools are not actually famous for creating incorrect 
+partition tables like this. There has been some compatibility issue 
+between some Phase 5 tool with a name I do not remember and the other 
+tools back then I believe, but it was not about partition sizes. 
+Especially if you use a HDToolBox from any AmigaOS version up to 3.x or 
+Media Toolbox from AmigaOS 4.x with automatic geometry calculation, I 
+never heard of such a partition to large error in the partition table. 
+Those tools simply do not allow creating that.
 
-> Other than that, I think the three patches are good enough to apply.
+So, Christian, unless you can actually enlighten us on a reproducible 
+way how users with those setups end up with incorrect partition tables 
+like this, I consider this case closed. So far you didn't.
 
-Great!
+Ciao,
+-- 
+Martin
+
+
