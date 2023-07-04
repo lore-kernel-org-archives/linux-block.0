@@ -2,115 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7690BEB64D9
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 23:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0520FEB64D9
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 23:38:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229951AbjGDXdm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 19:33:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50598 "EHLO
+        id S230439AbjGDXiY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 19:38:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbjGDXdm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 19:33:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A480010E0;
-        Tue,  4 Jul 2023 16:33:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 24B6761403;
-        Tue,  4 Jul 2023 23:33:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C16EC433C8;
-        Tue,  4 Jul 2023 23:33:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688513620;
-        bh=UBFg7jM+nGcOP7aJdMI3jZqzTjbzaLg092QfOy0yvUw=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=HIDaMt+6kJ4YWNGPr1+9fNcesC14qKbQzsBGmljimdmWT9eF91Vf4HC1m8hy4vIVy
-         JoWUICY/teZbXcNfqNDJjde9i0eNqpT3sfB++bBlfYTXaso4m5mXizHOFXEkolP+dH
-         kG1X/noBXGo5PSzGUnZgiR3N32JZHhe6FheHRPtLruYunJ+jcoYfo2ddFAELnhqUWA
-         npD/GJGW1qJxgUEGBtOpSvxt9yMAWrO87yiTzeJh46qO31eU066ZWft95/AbULdisi
-         9AQkLJfu+4pA6li2ZUU+9wTOToTz/CkrkTiUlwWpujQo/Ub7jf7PL6b6cyhryZsrV0
-         IT8KMXaQkD8gA==
-Message-ID: <68cc8239-f1d2-1ff5-796d-0e9b47c92b64@kernel.org>
-Date:   Wed, 5 Jul 2023 08:33:37 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v5 1/5] ublk: add opcode offsets for DRV_IN/DRV_OUT
-To:     Andreas Hindborg <nmi@metaspace.dk>, Ming Lei <ming.lei@redhat.com>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>, gost.dev@samsung.com,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Hindborg <a.hindborg@samsung.com>
-References: <20230704165209.514591-1-nmi@metaspace.dk>
- <20230704165209.514591-2-nmi@metaspace.dk>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230704165209.514591-2-nmi@metaspace.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S230196AbjGDXiX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 19:38:23 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81001BD;
+        Tue,  4 Jul 2023 16:38:22 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b852785a65so1003685ad.0;
+        Tue, 04 Jul 2023 16:38:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688513902; x=1691105902;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ogkOTN/QP2XMJx0kscIbgjlcvmFOVWNpmWQQA/4vWw0=;
+        b=qabU8//NAV+c94p875TZcxTP2R7WLEaMsj+LvvCs9/N4vLWrNDWmS+LhlFqz2NXh6K
+         iOwP7DIy0zSniww7RTUpzGTkGRz9Q1ZipQixQZuxmGsQL8eEiKOpZgfIraf8Q2bzRqfs
+         R8W677ma2L5n5Jk627XMqGD4UZOocQ88emAyztiwVt0Mh/fkPFsVrw9luLG5HR8daJw3
+         Gp6rTddTxfZJyYZESZ33GZxsDhujbI9ey+QXJ0iRfeLKGiDN4f9f4tqANJ3czmUi96b9
+         Q5XoUN+tya3ZCom4NHdLzWw4UnyXX6RUBqrahfXzIzZiZyygaqdMb2ggEJOFfjeXtfbN
+         +rCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688513902; x=1691105902;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ogkOTN/QP2XMJx0kscIbgjlcvmFOVWNpmWQQA/4vWw0=;
+        b=N83BwCxE3ryuqL8hZ7jQX2GJunQx1uyiGxmIRGxQji/pkIKxYB/ZaE0I4Ba11RZTZo
+         GZuLmJDPRkIl0eJvFfXUh/skXa6hJ/YyDavn6gNrKuYCV9OC00plpVhCcTX+7F7DKsHj
+         l5rlDmANKDMFpoicr8OHgy6u/xpl7qRml8mToPtDIDrl5G46k631FEec/oHJtWhtYehj
+         O+AU10MxX+mM05iMqTDhAAjb8tBmkgo2G2NDb8sFwKOUXETF7hDydegBCdKEangAhMRZ
+         uWEPS77Wy/ePJw0w65Ak63UxIeJmTs6HSZlQHeBwq0rcKosNramX6UyzaKlUhE8qKLdf
+         VCeA==
+X-Gm-Message-State: ABy/qLZzp7CEKY9/ugtxDvZ6NGueh1O3LCYm/YWH8nlL0/I7d0/ir8Bo
+        8sGSlCRKRmxt7nFMvRXgLsA=
+X-Google-Smtp-Source: APBJJlE4tcf5QBcndHgRQMPBJFBrzh9QEQI+vGv7HoNhOnH0a3hGIhni0QQR3uHb7iIPVU/kGoZdyw==
+X-Received: by 2002:a17:902:db05:b0:1b8:8682:62fb with SMTP id m5-20020a170902db0500b001b8868262fbmr926641plx.4.1688513901851;
+        Tue, 04 Jul 2023 16:38:21 -0700 (PDT)
+Received: from xplor.waratah.dyndns.org (222-152-184-54-fibre.sparkbb.co.nz. [222.152.184.54])
+        by smtp.gmail.com with ESMTPSA id jj5-20020a170903048500b001b8a1a25e6asm2813419plb.128.2023.07.04.16.38.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jul 2023 16:38:21 -0700 (PDT)
+Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
+        id 6F34D36031A; Wed,  5 Jul 2023 11:38:17 +1200 (NZST)
+From:   Michael Schmitz <schmitzmic@gmail.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     linux-m68k@vger.kernel.org, chzigotzky@xenosoft.de,
+        geert@linux-m68k.org, hch@lst.de, martin@lichtvoll.de,
+        Michael Schmitz <schmitzmic@gmail.com>
+Subject: [PATCH v4 0/1] Bugfix for Amiga partition fixes
+Date:   Wed,  5 Jul 2023 11:38:07 +1200
+Message-Id: <20230704233808.25166-1-schmitzmic@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230620201725.7020-1-schmitzmic@gmail.com>
+References: <20230620201725.7020-1-schmitzmic@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/5/23 01:52, Andreas Hindborg wrote:
-> From: Andreas Hindborg <a.hindborg@samsung.com>
-> 
-> Ublk zoned storage support relies on DRV_IN handling for zone report.
-> Prepare for this change by adding offsets for the DRV_IN/DRV_OUT commands.
-> 
-> Also add parenthesis to existing opcodes for better macro hygiene.
-> 
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
-> ---
->  include/uapi/linux/ublk_cmd.h | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> index 4b8558db90e1..a32810c8ef2b 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -229,12 +229,16 @@ struct ublksrv_ctrl_dev_info {
->  	__u64   reserved2;
->  };
->  
-> -#define		UBLK_IO_OP_READ		0
-> -#define		UBLK_IO_OP_WRITE		1
-> -#define		UBLK_IO_OP_FLUSH		2
-> -#define		UBLK_IO_OP_DISCARD	3
-> -#define		UBLK_IO_OP_WRITE_SAME	4
-> -#define		UBLK_IO_OP_WRITE_ZEROES	5
-> +#define		UBLK_IO_OP_READ			(0)
-> +#define		UBLK_IO_OP_WRITE		(1)
-> +#define		UBLK_IO_OP_FLUSH		(2)
-> +#define		UBLK_IO_OP_DISCARD		(3)
-> +#define		UBLK_IO_OP_WRITE_SAME		(4)
-> +#define		UBLK_IO_OP_WRITE_ZEROES		(5)
+Hi Jens,
 
-I do not think that adding the parenthesis is useful given that the values are
-all constants.
+my (again, hopefully) final version of the bugfix for the
+bug reported by Christian Zigotzky against the Amiga RDB
+partition code currently in linux-block as well as upstream.
 
-> +#define		__UBLK_IO_OP_DRV_IN_START	(32)
-> +#define		__UBLK_IO_OP_DRV_IN_END		(96)
-> +#define		__UBLK_IO_OP_DRV_OUT_START	(__UBLK_IO_OP_DRV_IN_END)
-> +#define		__UBLK_IO_OP_DRV_OUT_END	(160)
+This bug affects any users of RDB disks where the value of
+(signed 32 bit) -1 signals the end of the linked list of
+partitions. One of the popular AmigaOS tools used to
+partition disks (Media Toolbox) uses this value. As a result,
+the last partition is considered invalid and cannot be used.
 
-While the UBLK_IO_OP_XXX definitions are fairly obvious from their name, these
-are much less obvious. A comment before these __UBLK_IO_OP_XXX would be welcome
-to describe what these operations are.
+The bug and this fix have been discussed on linux-block and
+linux-m68k at length.
 
->  
->  #define		UBLK_IO_F_FAILFAST_DEV		(1U << 8)
->  #define		UBLK_IO_F_FAILFAST_TRANSPORT	(1U << 9)
+
+Testing by Christian also exposed another aspect of the old
+bug fixed in commits fc3d092c6b ("block: fix signed int
+overflow in Amiga partition support") and b6f3f28f60
+("block: add overflow checks for Amiga partition support")
+that I document here for future reference:
+
+Partitions that did overflow the disk size (due to 32 bit int
+overflow) were not skipped but truncated to the end of the
+disk. Users who missed the warning message during boot would
+go on to create a filesystem with a size exceeding the
+actual partition size. Now that the 32 bit overflow has been
+corrected, such filesystems may refuse to mount with a
+'filesystem exceeds partition size' error. Users should
+either correct the partition size, or resize the filesystem
+before attempting to boot a kernel with the ealier RDB fixes
+in place.
+
+Note that this is not a new bug in the current code - just
+one particular result of the old overflow bug that has only
+now been noticed.
+
+Cheers,
+
+ Michael
+
+Michael Schmitz (1):
+  block: bugfix for Amiga partition overflow check patch
+
+ block/partitions/amiga.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 -- 
-Damien Le Moal
-Western Digital Research
+2.17.1
 
