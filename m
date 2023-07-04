@@ -2,132 +2,131 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA205EB64DD
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 05:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 091F4EB64DA
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 05:58:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbjGDFuF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 01:50:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40404 "EHLO
+        id S230214AbjGDF6c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 01:58:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbjGDFuE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 01:50:04 -0400
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20B9DEE;
-        Mon,  3 Jul 2023 22:50:03 -0700 (PDT)
-Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-56597d949b1so3548567eaf.1;
-        Mon, 03 Jul 2023 22:50:03 -0700 (PDT)
+        with ESMTP id S229595AbjGDF6b (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 01:58:31 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D114E7C;
+        Mon,  3 Jul 2023 22:58:24 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b852785a65so33057125ad.0;
+        Mon, 03 Jul 2023 22:58:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688449801; x=1691041801;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1688450303; x=1691042303;
+        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
+         :message-id:from:cc:references:to:subject:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zamxSwVQK9aC0g6pMD2q0YTDJfFCe+tp404LSKnDSpo=;
-        b=GNh03kO2ZRUg0YKACbzje2SOnj/s6UsiCTvP4DFJBXfNzgiLYNULDTVN5xT6F9W1C7
-         P0MnLWKMlPqqzI94DjhD867VyIGJzQG+E4noapOnpH9Nbv7O19oliA9WqfEB1WhwIrL9
-         bBs9gpCJ7aQ5zs/Oo9AECNaA++zHkZJ2CoEsRP4wzK+Syl6mOMSdncMq7FA6vFGit0vm
-         Dx2FsXsDhaaulm/1sG/QDWK9mi/JCViBLNem/q/hqkYbzy3c+C2wRnN4ZmZvcUngDAws
-         +OF3+KiA32hgLAEhVbJ3ka1+ttIW36XvXobMnP8Hw+orVDnbmF5upvYOrnQWtK/ooNu+
-         lgyQ==
+        bh=ATup9MSAiia8r0PtsmJ6fJfs+kCCMMLgmiDvGdEfsy0=;
+        b=arFgoN32HO9yV1k3G/3bSbAiXiddbHu7wOiHMHA2XC5cVaDH5WUOMvCMH7nnm+J6kg
+         xJ7TRMxkBDFvN/kNkBoLqQd/qINevlO0KUPl6AgIukZiDF4acDFvg9RxBokF9aeE6q73
+         i5kWAVOSHHIbNI5+a6FewQZe1f5hV1gW8x3uREh616OMJKCiAyytKtYB56phN9JZ3lQ+
+         aP2VF1XNy0/W6qzuqYq5bfOOO0ZTooOiVF3zzwxKFZ/8U5aj4oZaa0AUX55fjNiGGGeY
+         8uqSVP6X17Ry3m8UCS9gC5RGaMF3y9Qq4HdiP+49GH83CWTKUk/TlrKMexMqqsu2NVbG
+         0/KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688449801; x=1691041801;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zamxSwVQK9aC0g6pMD2q0YTDJfFCe+tp404LSKnDSpo=;
-        b=OkdQI0V962augj1I8BdJO/hDJ6784vaXI4N1h/ZNtmsaJ9e7WD9r1EVl91HUShjqUq
-         bo6F6cCa5sDIhrHwabbeayqFPD/VtifVBAZ9R3QLo8yiKIhUF7DnzCnTbEzuHN4FFgw5
-         Aplo5zllpENCV1iw5n618nmj+gRIeLGwPuYshlVP4TzrVaDUXEJaCj4+WSfCFGDdAS0e
-         mWHCykpd1OcS3a8MxvKn5/hW5SwzUk6+fvPIF7biCcw/kfFfCVUXxw6O0qQ/BppyvNnb
-         8h2SjAgl0d0ZsTCaGPmKHISo9rOK8neH5nkAfLhFqL0jldugbJk9cVl2D+ocQYnElLGM
-         /FKw==
-X-Gm-Message-State: ABy/qLYmkIujwL1izKIadVa7I5+Yn2vxNq+oz/H89uxDkJYKTQ7QBfSd
-        Q8FyzNAe1wPu83wF6DAbFh0=
-X-Google-Smtp-Source: APBJJlEi81K1c6bR2jRrcj8oqwrmwWl+90EijZmqG62eZax8j4AvDVFALDlzpky+y9tXVnUbClgx4g==
-X-Received: by 2002:a05:6358:5115:b0:134:e41a:9227 with SMTP id 21-20020a056358511500b00134e41a9227mr7834759rwi.5.1688449800684;
-        Mon, 03 Jul 2023 22:50:00 -0700 (PDT)
-Received: from xplor.waratah.dyndns.org (222-152-184-54-fibre.sparkbb.co.nz. [222.152.184.54])
-        by smtp.gmail.com with ESMTPSA id iz21-20020a170902ef9500b001b807863627sm13627379plb.194.2023.07.03.22.49.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 22:50:00 -0700 (PDT)
-Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
-        id 13E75360319; Tue,  4 Jul 2023 17:49:57 +1200 (NZST)
+        d=1e100.net; s=20221208; t=1688450303; x=1691042303;
+        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
+         :message-id:from:cc:references:to:subject:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ATup9MSAiia8r0PtsmJ6fJfs+kCCMMLgmiDvGdEfsy0=;
+        b=cFhx9tTQDa4PVDJ9hDxWbdNLtLDhlmfjYPZqu+QiwgFyMm0s8Lp5+44YmWEfmbU0Kp
+         dctdkSrDuEwkgs6w4b2uORlc2KYy/qUYGZWrMuNxogdHUxAo8s7U9y2Z4KQ2chLgWgak
+         QwDMrynOkBbEAJbpfEcHj1FrPHZ0oPszG+uXX/W1GCnwNnkQU/FAzy3PGAFL4KD0vzfG
+         G7KWmJValHxApLrf3FowH414m7JnMqE1/kLY4rp75z17CjO1mPu8QFFQgNQ6H83e3QOS
+         xPPuQj/RgJzK2n+89IgVYOBVfFszufnnkM7mZKpnUZ56vcFzeweoh/+1I1NH1oDIFyHH
+         uXig==
+X-Gm-Message-State: ABy/qLawCk8+vBorhckfF4D1Mqlj1UHJZ7PxujDgdQIb1pLxnthc9xDJ
+        q8X23GVfD864txTtaYIUXgRvqC9p5oceaA==
+X-Google-Smtp-Source: APBJJlEP9my588J4NL6/c4AnqL1QQV6B4O9bgqf+d4A89XuILxOWk4DnSIdESHpVYBxTNKy5O342Iw==
+X-Received: by 2002:a17:902:dac9:b0:1b8:865e:44e7 with SMTP id q9-20020a170902dac900b001b8865e44e7mr12587991plx.20.1688450303174;
+        Mon, 03 Jul 2023 22:58:23 -0700 (PDT)
+Received: from [10.1.1.24] (222-152-184-54-fibre.sparkbb.co.nz. [222.152.184.54])
+        by smtp.gmail.com with ESMTPSA id p8-20020a170902b08800b001b8307c81c8sm10274366plr.121.2023.07.03.22.58.15
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 03 Jul 2023 22:58:22 -0700 (PDT)
+Subject: Re: [PATCH] block: bugfix for Amiga partition overflow check patch
+To:     John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        Christian Zigotzky <chzigotzky@xenosoft.de>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20230701023524.7434-1-schmitzmic@gmail.com>
+ <1885875.tdWV9SEqCh@lichtvoll.de>
+ <234f57e7-a35f-4406-35ad-a5b9b49e9a5e@gmail.com>
+ <4858801.31r3eYUQgx@lichtvoll.de>
+ <947340d9-b640-0910-317b-5c8022220a55@xenosoft.de>
+ <80266037-f808-c448-c3c7-9d5d5f4253a7@xenosoft.de>
+ <45d9f890-ebe2-4014-2411-953fd9741c2b@gmail.com>
+ <5dcbbcf69462141ab7cd9679b7577b8047b97f29.camel@physik.fu-berlin.de>
+ <ed0a8dee-0fb2-aa2f-560a-3a521747a767@gmail.com>
+ <d81af6e5bf77d106e02ed2d50e58f6edf2cfed31.camel@physik.fu-berlin.de>
+Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org, hch@lst.de,
+        stable@vger.kernel.org, "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        Darren Stevens <darren@stevens-zone.net>,
+        mad skateman <madskateman@gmail.com>,
+        Christian Zigotzky <info@xenosoft.de>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-block <linux-block@vger.kernel.org>
 From:   Michael Schmitz <schmitzmic@gmail.com>
-To:     linux-block@vger.kernel.org, axboe@kernel.dk
-Cc:     linux-m68k@vger.kernel.org, chzigotzky@xenosoft.de,
-        geert@linux-m68k.org, hch@lst.de, martin@lichtvoll.de,
-        Michael Schmitz <schmitzmic@gmail.com>, stable@vger.kernel.org
-Subject: [PATCH v3] block: bugfix for Amiga partition overflow check patch
-Date:   Tue,  4 Jul 2023 17:49:55 +1200
-Message-Id: <20230704054955.16906-1-schmitzmic@gmail.com>
-X-Mailer: git-send-email 2.17.1
+Message-ID: <11cacce5-8252-c65f-0d41-8d7ad1c17d91@gmail.com>
+Date:   Tue, 4 Jul 2023 17:58:13 +1200
+User-Agent: Mozilla/5.0 (X11; Linux ppc; rv:45.0) Gecko/20100101
+ Icedove/45.4.0
+MIME-Version: 1.0
+In-Reply-To: <d81af6e5bf77d106e02ed2d50e58f6edf2cfed31.camel@physik.fu-berlin.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Making 'blk' sector_t (i.e. 64 bit if LBD support is active)
-fails the 'blk>0' test in the partition block loop if a
-value of (signed int) -1 is used to mark the end of the
-partition block list.
+Hi Adrian,
 
-This bug was introduced in patch 3 of my prior Amiga partition
-support fixes series, and spotted by Christian Zigotzky when
-testing the latest block updates.
+Am 04.07.2023 um 17:48 schrieb John Paul Adrian Glaubitz:
+>>>
+>>> Have we actually agreed now that this is a bug and not just an effect of the
+>>> corrupted RDB that Christian provided?
+>>
+>> The RDB was perfectly fine. Due to 32 bit integer arithmetic overflow,
+>> old RDB code passed an incorrect partition size to put_partition(),
+>> and instead of rejecting a partition that extends past the end of the
+>> disk, put_partition() truncated the size.
+>
+> OK, so using "-1" as an end-of-disk partition marker is fine, but it was just
+> the partition size recorded in Christian's RDB that was incorrect, correct?
 
-Explicitly cast 'blk' to signed int to allow use of -1 to
-terminate the partition block linked list.
+No, the partition size in the RDB was correct (valid, end cylinder 
+before end of disk). The partition size seen by user space tools when 
+running the old kernels was incorrect. That lead to the filesystem size 
+exceeding the partition size, which only came to light once the overflow 
+fixes had gone in.
 
-Testing by Christian also exposed another aspect of the old
-bug fixed in commits fc3d092c6b ("block: fix signed int
-overflow in Amiga partition support") and b6f3f28f60
-("block: add overflow checks for Amiga partition support"):
+I know it does sound like semantic sophism, but we have to be clear that 
+what the user put in the partition block is definite. I haven't had much 
+luck with heuristics in kernel code lately...
 
-Partitions that did overflow the disk size (due to 32 bit int
-overflow) were not skipped but truncated to the end of the
-disk. Users who missed the warning message during boot would
-go on to create a filesystem with a size exceeding the
-actual partition size. Now that the 32 bit overflow has been
-corrected, such filesystems may refuse to mount with a
-'filesystem exceeds partition size' error. Users should
-either correct the partition size, or resize the filesystem
-before attempting to boot a kernel with the RDB fixes in
-place.
+>>>
+>>>> Jens - is the bugfix patch enough, or do you need a new version of the
+>>>> entire series?
+>>>
+>>> But the series has already been applied and released in 6.4, hasn't it?
+>>
+>> That's right - I wasn't sure whether it had already gone upstream (but
+>> even then, squeezing a bugfix in with an accepted patch isn't usually done).
+>
+> It's even released already ;-). That's why Christian ran into the problem in the
+> first place.
 
-Reported-by: Christian Zigotzky <chzigotzky@xenosoft.de>
-Fixes: b6f3f28f60 ("block: add overflow checks for Amiga partition support")
-Message-ID: 024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de
-Cc: <stable@vger.kernel.org> # 6.4
-Link: https://lore.kernel.org/r/024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de
-Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-Tested-by: Christian Zigotzky <chzigotzky@xenosoft.de>
+I had hoped he'd spotted it in linux-block ...
 
---
+Cheers,
 
-Changes since v2:
+	Michael
 
-Adrian Glaubitz:
-- fix typo in commit message
 
-Changes since v1:
-
-- corrected Fixes: tag
-- added Tested-by:
-- reworded commit message to describe filesystem partition
-  size mismatch problem
----
- block/partitions/amiga.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index ed222b9c901b..506921095412 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -90,7 +90,7 @@ int amiga_partition(struct parsed_partitions *state)
- 	}
- 	blk = be32_to_cpu(rdb->rdb_PartitionList);
- 	put_dev_sector(sect);
--	for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
-+	for (part = 1; (s32) blk>0 && part<=16; part++, put_dev_sector(sect)) {
- 		/* Read in terms partition table understands */
- 		if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
- 			pr_err("Dev %s: overflow calculating partition block %llu! Skipping partitions %u and beyond\n",
--- 
-2.17.1
-
+>
+> Adrian
+>
