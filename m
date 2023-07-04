@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 346C6EB64DA
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17276EB64D9
 	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 16:52:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230466AbjGDQwY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 12:52:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51330 "EHLO
+        id S231610AbjGDQwX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 12:52:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231488AbjGDQwU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 12:52:20 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBAE9E41
-        for <linux-block@vger.kernel.org>; Tue,  4 Jul 2023 09:52:18 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-51d80d81d6eso6919574a12.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Jul 2023 09:52:18 -0700 (PDT)
+        with ESMTP id S231463AbjGDQwT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 12:52:19 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A879DD
+        for <linux-block@vger.kernel.org>; Tue,  4 Jul 2023 09:52:17 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51d93425853so6587648a12.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Jul 2023 09:52:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688489537; x=1691081537;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688489536; x=1691081536;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XN7i8sOpMipC40cVjppg9yu+Ps/zil9DAOK5KLDUw0M=;
-        b=YnGaH5q+0mIaDQVxcj8VDtedKRiYHSnb62uFMjDO2iLG4NGLiHnr37a9E/mkOlwqZO
-         kgloe5K90mNkLAHoxxm2I/boPTp3Og+Q21xzBYrOhPZ4W1OH0zlmbMA1R4z9IGn7j6zb
-         Gmoxe2x4OEcQCw1KRgL1BPGouhgFIy9UmxP8RqbYvWq4xHTuW0Ij+nz9bjjx+E2oQIWw
-         Ihbu7uO3ua087o1mZ0W8ShexOzdxsWkljy3b2yTBwq+NwhL/J/hqXUKq/gfb7V0DZg+b
-         CMJORX2P6hCknhGJNGt6vfSBBw/eINF8eKZyE14NSWhLwwM2dr0XozOc/efnuPu0foU/
-         6bLA==
+        bh=QmeNaedvzJG5TN3SYyJwsVgz2v8XaFGPq/mxdzNq3MQ=;
+        b=hsY9Plq6xsZwALy6I424gNrBfMMGHepEgIEhkVotKU8rhkli2WV14MmfZ669RuEkRf
+         gnBL6RSfyJq6J5qlB3haPLuxh9sNaZHNwmypq/Q89rIN4uZZISIJkOnpHxdxxPsAk1Mr
+         JX4i/Ys9YJ5r97psNoKs92oayg/XECLqYfKdDOchU9l4DlPJVsnydN+pi905UAHT5sga
+         W8B4reNoYndKs/4loeHOQYvPUnXKq7TOJpnYVZHe23hiIpjWUw4xwgxEW+GsfGRxY7jk
+         hYIGsFuoLjTgej5fvpGM/EnDKmqyAFqLZ24MQ0lzia6ebVtMFbU8E7uhT9wftvbClbw/
+         hgSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688489537; x=1691081537;
+        d=1e100.net; s=20221208; t=1688489536; x=1691081536;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XN7i8sOpMipC40cVjppg9yu+Ps/zil9DAOK5KLDUw0M=;
-        b=fOafmaqT1Kx2boE+le5Z67ewXNbyxtJbfoMx2vbGQwDBcfoh/Vn6bIMS71LaOz2XyO
-         dzldZduFhpifQh5pkUDMCU+3IpdQX4JzmtUh5AZYlJ1Cb5VP9XLPVetv/qwnuWzUtXx4
-         Rc85rXw0XvcCRu2oY7zrqJkFxLS9osV3b28PDL4tnyiRFjU7KRmFjhtGGPWX58BttYla
-         qdwflfuAeu0PSTVKKICCJ/Up5z+J7gc4cb/jKWE0Uh4mTCU+pTKrxvWcVIgBR0hYt0w7
-         r1+iw4N2roLB3GNSBgJtI+0cRmB6a2HCIHaw0Q0EAZsOd7AGy+5I+QjcJu61r7yV8Q8r
-         busg==
-X-Gm-Message-State: ABy/qLaunTjvN+vhZ2v0rz16NaEMMY9gwXvqCukmgO6XaIg/YUYdvhAy
-        jtyb7k7iInpi7GPeWtUNo9+pYQ==
-X-Google-Smtp-Source: APBJJlGKx4vy34xIBpHc/A5jn10VM2QYpTMPqPR5bUEH3ebXZEdtKg7qV2KbKs0un+Z5iCbNtnQAiw==
-X-Received: by 2002:aa7:c489:0:b0:51d:eb90:4928 with SMTP id m9-20020aa7c489000000b0051deb904928mr10924266edq.30.1688489537566;
-        Tue, 04 Jul 2023 09:52:17 -0700 (PDT)
+        bh=QmeNaedvzJG5TN3SYyJwsVgz2v8XaFGPq/mxdzNq3MQ=;
+        b=jnar89gL4CcwbhunEfOK245uWADdbbDqTczJ1jxE7zeEg7nZS6fewLxjuDNKPVqpp3
+         aKztF02AcO5GcvODyr6CN1PcGLB4Uwv9aiKT7b/VpuzE5FF+OwYdD5cHjYmOGbhAoeQ1
+         PuwKy8Y7JegAZHmBApb2acq7s5bmY08ssQWeG6hpjBHidfmNPxPwX8r8vFfyzPV2rqqd
+         mlazTY7x5+fIzFM/9RlMyNMa1Dpyj0Mejk2qWUxY4i9yp0FSrQz2VkC9MRKuP04XY5wh
+         Z9NqjyIPwg0PyOhsxTKgXYmxo38i0z/Fufv7MfKSfS5OqC4M1IoRLdsrevqjnZHAI1+r
+         cj0w==
+X-Gm-Message-State: ABy/qLZvKwuFbhEs4xeCf6T3ol15/XrPauWHzVJFonvvNEgma6M7G7+z
+        YC8h+gjtVkcAtKmL/4NY2EPOTQ==
+X-Google-Smtp-Source: APBJJlG8GPj0bBbD2hx+Rq69InEGsQahjuI9GyztcbvUv14cy/+RrHzd/jkgBZPeGAUcnM/pQuIoFg==
+X-Received: by 2002:a17:907:20a4:b0:973:9f60:c57e with SMTP id pw4-20020a17090720a400b009739f60c57emr9620153ejb.2.1688489535956;
+        Tue, 04 Jul 2023 09:52:15 -0700 (PDT)
 Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id g25-20020aa7c859000000b0050cc4461fc5sm11872717edt.92.2023.07.04.09.52.17
+        by smtp.gmail.com with ESMTPSA id n5-20020a170906088500b0098963eb0c3dsm13479053eje.26.2023.07.04.09.52.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 09:52:17 -0700 (PDT)
+        Tue, 04 Jul 2023 09:52:15 -0700 (PDT)
 From:   Andreas Hindborg <nmi@metaspace.dk>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     linux-kernel@vger.kernel.org (open list),
@@ -61,9 +61,9 @@ Cc:     linux-kernel@vger.kernel.org (open list),
         Christoph Hellwig <hch@infradead.org>,
         Damien Le Moal <dlemoal@kernel.org>,
         Andreas Hindborg <a.hindborg@samsung.com>
-Subject: [PATCH v5 3/5] ublk: rename driver files to prepare for multiple translation units
-Date:   Tue,  4 Jul 2023 18:52:07 +0200
-Message-ID: <20230704165209.514591-4-nmi@metaspace.dk>
+Subject: [PATCH v5 2/5] ublk: move types to shared header file
+Date:   Tue,  4 Jul 2023 18:52:06 +0200
+Message-ID: <20230704165209.514591-3-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230704165209.514591-1-nmi@metaspace.dk>
 References: <20230704165209.514591-1-nmi@metaspace.dk>
@@ -75,67 +75,259 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
 
-The zoned storage support for ublk adds a translation unit to the module.
-In order to be able to keep the existing name for the module, rename the
-currently only translation unit. Also rename the header to align with the C
-file name.
+This change is in preparation for ublk zoned storage support.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 ---
- MAINTAINERS                          | 4 ++--
- drivers/block/Makefile               | 1 +
- drivers/block/{ublk_drv.c => ublk.c} | 2 +-
- drivers/block/{ublk_drv.h => ublk.h} | 0
- 4 files changed, 4 insertions(+), 3 deletions(-)
- rename drivers/block/{ublk_drv.c => ublk.c} (99%)
- rename drivers/block/{ublk_drv.h => ublk.h} (100%)
+ MAINTAINERS              |   1 +
+ drivers/block/ublk_drv.c |  92 +---------------------------------
+ drivers/block/ublk_drv.h | 103 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 105 insertions(+), 91 deletions(-)
+ create mode 100644 drivers/block/ublk_drv.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index ace71c90751c..1f193cd43958 100644
+index 27ef11624748..ace71c90751c 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -21553,8 +21553,8 @@ M:	Ming Lei <ming.lei@redhat.com>
- L:	linux-block@vger.kernel.org
+@@ -21554,6 +21554,7 @@ L:	linux-block@vger.kernel.org
  S:	Maintained
  F:	Documentation/block/ublk.rst
--F:	drivers/block/ublk_drv.c
--F:	drivers/block/ublk_drv.h
-+F:	drivers/block/ublk.c
-+F:	drivers/block/ublk.h
+ F:	drivers/block/ublk_drv.c
++F:	drivers/block/ublk_drv.h
  F:	include/uapi/linux/ublk_cmd.h
  
  UCLINUX (M68KNOMMU AND COLDFIRE)
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index 101612cba303..38f2229623a8 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -38,5 +38,6 @@ obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
- obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
- 
- obj-$(CONFIG_BLK_DEV_UBLK)			+= ublk_drv.o
-+ublk_drv-$(CONFIG_BLK_DEV_UBLK)			+= ublk.o
- 
- swim_mod-y	:= swim.o swim_asm.o
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk.c
-similarity index 99%
-rename from drivers/block/ublk_drv.c
-rename to drivers/block/ublk.c
-index bca0c4e1cfd8..a0453619bf67 100644
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 1c823750c95a..bca0c4e1cfd8 100644
 --- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk.c
-@@ -45,7 +45,7 @@
++++ b/drivers/block/ublk_drv.c
+@@ -45,6 +45,7 @@
  #include <linux/namei.h>
  #include <linux/kref.h>
  #include <uapi/linux/ublk_cmd.h>
--#include "ublk_drv.h"
-+#include "ublk.h"
++#include "ublk_drv.h"
  
  #define UBLK_MINORS		(1U << MINORBITS)
  
-diff --git a/drivers/block/ublk_drv.h b/drivers/block/ublk.h
-similarity index 100%
-rename from drivers/block/ublk_drv.h
-rename to drivers/block/ublk.h
+@@ -62,63 +63,11 @@
+ #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
+ 		UBLK_PARAM_TYPE_DISCARD | UBLK_PARAM_TYPE_DEVT)
+ 
+-struct ublk_rq_data {
+-	struct llist_node node;
+-
+-	struct kref ref;
+-};
+ 
+ struct ublk_uring_cmd_pdu {
+ 	struct ublk_queue *ubq;
+ };
+ 
+-/*
+- * io command is active: sqe cmd is received, and its cqe isn't done
+- *
+- * If the flag is set, the io command is owned by ublk driver, and waited
+- * for incoming blk-mq request from the ublk block device.
+- *
+- * If the flag is cleared, the io command will be completed, and owned by
+- * ublk server.
+- */
+-#define UBLK_IO_FLAG_ACTIVE	0x01
+-
+-/*
+- * IO command is completed via cqe, and it is being handled by ublksrv, and
+- * not committed yet
+- *
+- * Basically exclusively with UBLK_IO_FLAG_ACTIVE, so can be served for
+- * cross verification
+- */
+-#define UBLK_IO_FLAG_OWNED_BY_SRV 0x02
+-
+-/*
+- * IO command is aborted, so this flag is set in case of
+- * !UBLK_IO_FLAG_ACTIVE.
+- *
+- * After this flag is observed, any pending or new incoming request
+- * associated with this io command will be failed immediately
+- */
+-#define UBLK_IO_FLAG_ABORTED 0x04
+-
+-/*
+- * UBLK_IO_FLAG_NEED_GET_DATA is set because IO command requires
+- * get data buffer address from ublksrv.
+- *
+- * Then, bio data could be copied into this data buffer for a WRITE request
+- * after the IO command is issued again and UBLK_IO_FLAG_NEED_GET_DATA is unset.
+- */
+-#define UBLK_IO_FLAG_NEED_GET_DATA 0x08
+-
+-struct ublk_io {
+-	/* userspace buffer address from io cmd */
+-	__u64	addr;
+-	unsigned int flags;
+-	int res;
+-
+-	struct io_uring_cmd *cmd;
+-};
+-
+ struct ublk_queue {
+ 	int q_id;
+ 	int q_depth;
+@@ -140,45 +89,6 @@ struct ublk_queue {
+ 
+ #define UBLK_DAEMON_MONITOR_PERIOD	(5 * HZ)
+ 
+-struct ublk_device {
+-	struct gendisk		*ub_disk;
+-
+-	char	*__queues;
+-
+-	unsigned int	queue_size;
+-	struct ublksrv_ctrl_dev_info	dev_info;
+-
+-	struct blk_mq_tag_set	tag_set;
+-
+-	struct cdev		cdev;
+-	struct device		cdev_dev;
+-
+-#define UB_STATE_OPEN		0
+-#define UB_STATE_USED		1
+-#define UB_STATE_DELETED	2
+-	unsigned long		state;
+-	int			ub_number;
+-
+-	struct mutex		mutex;
+-
+-	spinlock_t		mm_lock;
+-	struct mm_struct	*mm;
+-
+-	struct ublk_params	params;
+-
+-	struct completion	completion;
+-	unsigned int		nr_queues_ready;
+-	unsigned int		nr_privileged_daemon;
+-
+-	/*
+-	 * Our ubq->daemon may be killed without any notification, so
+-	 * monitor each queue's daemon periodically
+-	 */
+-	struct delayed_work	monitor_work;
+-	struct work_struct	quiesce_work;
+-	struct work_struct	stop_work;
+-};
+-
+ /* header of ublk_params */
+ struct ublk_params_header {
+ 	__u32	len;
+diff --git a/drivers/block/ublk_drv.h b/drivers/block/ublk_drv.h
+new file mode 100644
+index 000000000000..2a4ab721d513
+--- /dev/null
++++ b/drivers/block/ublk_drv.h
+@@ -0,0 +1,103 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _UBLK_DRV_H
++#define _UBLK_DRV_H
++
++#include <uapi/linux/ublk_cmd.h>
++#include <linux/blk-mq.h>
++#include <linux/cdev.h>
++
++/*
++ * io command is active: sqe cmd is received, and its cqe isn't done
++ *
++ * If the flag is set, the io command is owned by ublk driver, and waited
++ * for incoming blk-mq request from the ublk block device.
++ *
++ * If the flag is cleared, the io command will be completed, and owned by
++ * ublk server.
++ */
++#define UBLK_IO_FLAG_ACTIVE	0x01
++
++/*
++ * IO command is completed via cqe, and it is being handled by ublksrv, and
++ * not committed yet
++ *
++ * Basically exclusively with UBLK_IO_FLAG_ACTIVE, so can be served for
++ * cross verification
++ */
++#define UBLK_IO_FLAG_OWNED_BY_SRV 0x02
++
++/*
++ * IO command is aborted, so this flag is set in case of
++ * !UBLK_IO_FLAG_ACTIVE.
++ *
++ * After this flag is observed, any pending or new incoming request
++ * associated with this io command will be failed immediately
++ */
++#define UBLK_IO_FLAG_ABORTED 0x04
++
++/*
++ * UBLK_IO_FLAG_NEED_GET_DATA is set because IO command requires
++ * get data buffer address from ublksrv.
++ *
++ * Then, bio data could be copied into this data buffer for a WRITE request
++ * after the IO command is issued again and UBLK_IO_FLAG_NEED_GET_DATA is unset.
++ */
++#define UBLK_IO_FLAG_NEED_GET_DATA 0x08
++
++
++struct ublk_device {
++	struct gendisk		*ub_disk;
++
++	char	*__queues;
++
++	unsigned int	queue_size;
++	struct ublksrv_ctrl_dev_info	dev_info;
++
++	struct blk_mq_tag_set	tag_set;
++
++	struct cdev		cdev;
++	struct device		cdev_dev;
++
++#define UB_STATE_OPEN		0
++#define UB_STATE_USED		1
++#define UB_STATE_DELETED	2
++	unsigned long		state;
++	int			ub_number;
++
++	struct mutex		mutex;
++
++	spinlock_t		mm_lock;
++	struct mm_struct	*mm;
++
++	struct ublk_params	params;
++
++	struct completion	completion;
++	unsigned int		nr_queues_ready;
++	unsigned int		nr_privileged_daemon;
++
++	/*
++	 * Our ubq->daemon may be killed without any notification, so
++	 * monitor each queue's daemon periodically
++	 */
++	struct delayed_work	monitor_work;
++	struct work_struct	quiesce_work;
++	struct work_struct	stop_work;
++};
++
++struct ublk_rq_data {
++	struct llist_node node;
++
++	struct kref ref;
++};
++
++struct ublk_io {
++	/* userspace buffer address from io cmd */
++	__u64 addr;
++	unsigned int flags;
++	int res;
++
++	struct io_uring_cmd *cmd;
++};
++
++#endif
 -- 
 2.41.0
 
