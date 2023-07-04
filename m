@@ -2,92 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE9EEB64DD
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 22:16:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7690BEB64D9
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 23:33:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230507AbjGDWQH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 18:16:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39668 "EHLO
+        id S229951AbjGDXdm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 19:33:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230458AbjGDWQH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 18:16:07 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BDBCE7B;
-        Tue,  4 Jul 2023 15:16:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688508965; x=1720044965;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rrsQpFl+GGNZIUl7w2QPMDePajMI9KYVgmOy7sty/PU=;
-  b=RJ/NWK7jYRPOZ7+I3W/EZ0p/AFx36IA+rpXdlEZJOte57ILeGwFY2H2u
-   UE7USYo8cOW875vA7F/xVIiiYAVDrkofAopSLVhW2bVZTgATQcKZ8E4v/
-   vlhthoFPJ0x0lDCcMDc+lmDfaFpdyIXxVUTJuL7eT8RuOmJtaEBXQ3keO
-   pzHbNHREP6H+n46yG6sIyAPfRe2kx+XkcFxh0bCxMnxMzoRKXl/S8ZwWr
-   TL9x5PyMx9H9JBn7c633G1RYyHbZftCHnBEGWZ8yDi1fyLt5upfGR2Vt4
-   AGYHFUvDLo1V0bpm/Gly3wtnyeXwS2dmpB/CaKZtQXaAqMMecnBzawiJx
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="365765373"
-X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
-   d="scan'208";a="365765373"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2023 15:16:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="788963010"
-X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
-   d="scan'208";a="788963010"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 04 Jul 2023 15:16:01 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qGoJU-000IaV-1z;
-        Tue, 04 Jul 2023 22:16:00 +0000
-Date:   Wed, 5 Jul 2023 06:15:56 +0800
-From:   kernel test robot <lkp@intel.com>
+        with ESMTP id S229610AbjGDXdm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 19:33:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A480010E0;
+        Tue,  4 Jul 2023 16:33:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 24B6761403;
+        Tue,  4 Jul 2023 23:33:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C16EC433C8;
+        Tue,  4 Jul 2023 23:33:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688513620;
+        bh=UBFg7jM+nGcOP7aJdMI3jZqzTjbzaLg092QfOy0yvUw=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=HIDaMt+6kJ4YWNGPr1+9fNcesC14qKbQzsBGmljimdmWT9eF91Vf4HC1m8hy4vIVy
+         JoWUICY/teZbXcNfqNDJjde9i0eNqpT3sfB++bBlfYTXaso4m5mXizHOFXEkolP+dH
+         kG1X/noBXGo5PSzGUnZgiR3N32JZHhe6FheHRPtLruYunJ+jcoYfo2ddFAELnhqUWA
+         npD/GJGW1qJxgUEGBtOpSvxt9yMAWrO87yiTzeJh46qO31eU066ZWft95/AbULdisi
+         9AQkLJfu+4pA6li2ZUU+9wTOToTz/CkrkTiUlwWpujQo/Ub7jf7PL6b6cyhryZsrV0
+         IT8KMXaQkD8gA==
+Message-ID: <68cc8239-f1d2-1ff5-796d-0e9b47c92b64@kernel.org>
+Date:   Wed, 5 Jul 2023 08:33:37 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v5 1/5] ublk: add opcode offsets for DRV_IN/DRV_OUT
 To:     Andreas Hindborg <nmi@metaspace.dk>, Ming Lei <ming.lei@redhat.com>
-Cc:     oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+Cc:     open list <linux-kernel@vger.kernel.org>,
         Matias Bjorling <Matias.Bjorling@wdc.com>,
         Hans Holmberg <Hans.Holmberg@wdc.com>,
         Jens Axboe <axboe@kernel.dk>,
         Minwoo Im <minwoo.im.dev@gmail.com>,
         Aravind Ramesh <Aravind.Ramesh@wdc.com>, gost.dev@samsung.com,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
         Andreas Hindborg <a.hindborg@samsung.com>
-Subject: Re: [PATCH v5 5/5] ublk: enable zoned storage support
-Message-ID: <202307050609.y0CCTok8-lkp@intel.com>
-References: <20230704165209.514591-6-nmi@metaspace.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230704165209.514591-6-nmi@metaspace.dk>
+References: <20230704165209.514591-1-nmi@metaspace.dk>
+ <20230704165209.514591-2-nmi@metaspace.dk>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20230704165209.514591-2-nmi@metaspace.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Andreas,
+On 7/5/23 01:52, Andreas Hindborg wrote:
+> From: Andreas Hindborg <a.hindborg@samsung.com>
+> 
+> Ublk zoned storage support relies on DRV_IN handling for zone report.
+> Prepare for this change by adding offsets for the DRV_IN/DRV_OUT commands.
+> 
+> Also add parenthesis to existing opcodes for better macro hygiene.
+> 
+> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> ---
+>  include/uapi/linux/ublk_cmd.h | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> index 4b8558db90e1..a32810c8ef2b 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -229,12 +229,16 @@ struct ublksrv_ctrl_dev_info {
+>  	__u64   reserved2;
+>  };
+>  
+> -#define		UBLK_IO_OP_READ		0
+> -#define		UBLK_IO_OP_WRITE		1
+> -#define		UBLK_IO_OP_FLUSH		2
+> -#define		UBLK_IO_OP_DISCARD	3
+> -#define		UBLK_IO_OP_WRITE_SAME	4
+> -#define		UBLK_IO_OP_WRITE_ZEROES	5
+> +#define		UBLK_IO_OP_READ			(0)
+> +#define		UBLK_IO_OP_WRITE		(1)
+> +#define		UBLK_IO_OP_FLUSH		(2)
+> +#define		UBLK_IO_OP_DISCARD		(3)
+> +#define		UBLK_IO_OP_WRITE_SAME		(4)
+> +#define		UBLK_IO_OP_WRITE_ZEROES		(5)
 
-kernel test robot noticed the following build errors:
+I do not think that adding the parenthesis is useful given that the values are
+all constants.
 
-[auto build test ERROR on 3261ea42710e9665c9151006049411bd23b5411f]
+> +#define		__UBLK_IO_OP_DRV_IN_START	(32)
+> +#define		__UBLK_IO_OP_DRV_IN_END		(96)
+> +#define		__UBLK_IO_OP_DRV_OUT_START	(__UBLK_IO_OP_DRV_IN_END)
+> +#define		__UBLK_IO_OP_DRV_OUT_END	(160)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/ublk-add-opcode-offsets-for-DRV_IN-DRV_OUT/20230705-005338
-base:   3261ea42710e9665c9151006049411bd23b5411f
-patch link:    https://lore.kernel.org/r/20230704165209.514591-6-nmi%40metaspace.dk
-patch subject: [PATCH v5 5/5] ublk: enable zoned storage support
-config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20230705/202307050609.y0CCTok8-lkp@intel.com/config)
-compiler: powerpc-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230705/202307050609.y0CCTok8-lkp@intel.com/reproduce)
+While the UBLK_IO_OP_XXX definitions are fairly obvious from their name, these
+are much less obvious. A comment before these __UBLK_IO_OP_XXX would be welcome
+to describe what these operations are.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307050609.y0CCTok8-lkp@intel.com/
-
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "__udivdi3" [drivers/block/ublk_drv.ko] undefined!
+>  
+>  #define		UBLK_IO_F_FAILFAST_DEV		(1U << 8)
+>  #define		UBLK_IO_F_FAILFAST_TRANSPORT	(1U << 9)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Damien Le Moal
+Western Digital Research
+
