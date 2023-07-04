@@ -2,89 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 908C9EB64D9
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 05:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 559A0EB64D9
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 05:48:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbjGDFqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 01:46:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39690 "EHLO
+        id S230240AbjGDFsq convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 01:48:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbjGDFqK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 01:46:10 -0400
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50DCEE49;
-        Mon,  3 Jul 2023 22:46:09 -0700 (PDT)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1a28de15c8aso4845929fac.2;
-        Mon, 03 Jul 2023 22:46:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688449568; x=1691041568;
-        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
-         :message-id:from:cc:references:to:subject:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vcEVFhl1iaF6kMRGfX9TgsXUMpIVaCzfcOfsi1WLm6M=;
-        b=qXcrXdNtelE703zLJCt9HLMHu7p0Y8apvSfHLri3bGNVvO+XD3OGK/3rZTh3LDNPz3
-         D3jqkv7SdXveLlHkVH/BEv2SMQgUxSr9Y76rbxH2at1lsTOErlviAt/ct52vK/gEMcVa
-         P71iac7YdDeJAc1nRGAqm93SeU08zZuhjIW4P9BX/4n/ElUptEcWZ8qcbkQ741e7IN9I
-         KY1m2871Jepbg6a5f7+JzI7Ni0g/i5CvxTCWUACTtZMieyo48Po0J6PCdAqLcytNbICV
-         5Am0P1RUwWliv2q/6recOC/MnKMPbUIn5HpmaIICLmpJ36tfnWe9JJQbxAR4f6UEs1ml
-         nrGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688449568; x=1691041568;
-        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
-         :message-id:from:cc:references:to:subject:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vcEVFhl1iaF6kMRGfX9TgsXUMpIVaCzfcOfsi1WLm6M=;
-        b=Xwud2uiLePoip2wul8a3eHYoqfCklnX1HDv1oxMkJRezRmDlTexRnxU/+cgDpNM5nJ
-         4Hinv3wEIvu1c6bcu1aYUuqZONUsIgGzRoQPAuMcwjpBubjLzJ+jFOw+bauBVRwIbUOA
-         efN9RgeyG4Q+eyC47iZGnoknxNd6FBC1/5le+d0RQB6rNZE2EbY6/HnUm6SZGu/KC5oM
-         58QbJN9NS0hznvMnf2d4YHUUc5PvnLbVd/9StxkYk9SOkRczG8bejHg7Ej3bxuWYVWRZ
-         iuKuyBqA99WZ28j2Lx1SxDRRsheCjjKc0Q9er0bIPpEwxUVCyJQwjzt81Wl1GzdkN0/2
-         oaUA==
-X-Gm-Message-State: AC+VfDz6ceT/LpRd5CIc67IOKPEXK/feC8E642pnk7r8YolpMYPVKjZ5
-        cJbnsAzae1n1JiN8V9nAwIbxnQKFDQ9LAA==
-X-Google-Smtp-Source: APBJJlH9YRejbU5mL6Q3rW7VMOyOVFeOz4EA14+d0zmYbowj3mrlcd/63BI63y8rV8FZi6XINpEVKg==
-X-Received: by 2002:a05:6870:9114:b0:1b0:89e0:114f with SMTP id o20-20020a056870911400b001b089e0114fmr13029386oae.31.1688449568320;
-        Mon, 03 Jul 2023 22:46:08 -0700 (PDT)
-Received: from [10.1.1.24] (222-152-184-54-fibre.sparkbb.co.nz. [222.152.184.54])
-        by smtp.gmail.com with ESMTPSA id fu14-20020a17090ad18e00b00262d079720bsm6595588pjb.29.2023.07.03.22.46.02
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Jul 2023 22:46:07 -0700 (PDT)
-Subject: Re: [PATCH v2] block: bugfix for Amiga partition overflow check patch
-To:     John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-References: <20230703230752.13394-1-schmitzmic@gmail.com>
- <4ca9e263e6042219ee46a1f57642306c6886168a.camel@physik.fu-berlin.de>
-Cc:     linux-m68k@vger.kernel.org, chzigotzky@xenosoft.de,
-        geert@linux-m68k.org, hch@lst.de, martin@lichtvoll.de,
-        stable@vger.kernel.org
-From:   Michael Schmitz <schmitzmic@gmail.com>
-Message-ID: <ceb8d743-cb3e-f813-fc1b-0025de9c7fb3@gmail.com>
-Date:   Tue, 4 Jul 2023 17:46:00 +1200
-User-Agent: Mozilla/5.0 (X11; Linux ppc; rv:45.0) Gecko/20100101
- Icedove/45.4.0
+        with ESMTP id S230252AbjGDFsh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 01:48:37 -0400
+Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72D18E49;
+        Mon,  3 Jul 2023 22:48:35 -0700 (PDT)
+Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
+          by outpost.zedat.fu-berlin.de (Exim 4.95)
+          with esmtps (TLS1.3)
+          tls TLS_AES_256_GCM_SHA384
+          (envelope-from <glaubitz@zedat.fu-berlin.de>)
+          id 1qGYtt-000OLQ-EE; Tue, 04 Jul 2023 07:48:33 +0200
+Received: from p57bd997f.dip0.t-ipconnect.de ([87.189.153.127] helo=suse-laptop.fritz.box)
+          by inpost2.zedat.fu-berlin.de (Exim 4.95)
+          with esmtpsa (TLS1.3)
+          tls TLS_AES_256_GCM_SHA384
+          (envelope-from <glaubitz@physik.fu-berlin.de>)
+          id 1qGYtt-000fVw-6R; Tue, 04 Jul 2023 07:48:33 +0200
+Message-ID: <d81af6e5bf77d106e02ed2d50e58f6edf2cfed31.camel@physik.fu-berlin.de>
+Subject: Re: [PATCH] block: bugfix for Amiga partition overflow check patch
+From:   John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+To:     Michael Schmitz <schmitzmic@gmail.com>,
+        Christian Zigotzky <chzigotzky@xenosoft.de>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org, hch@lst.de,
+        stable@vger.kernel.org, "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        Darren Stevens <darren@stevens-zone.net>,
+        mad skateman <madskateman@gmail.com>,
+        Christian Zigotzky <info@xenosoft.de>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-block <linux-block@vger.kernel.org>
+Date:   Tue, 04 Jul 2023 07:48:27 +0200
+In-Reply-To: <ed0a8dee-0fb2-aa2f-560a-3a521747a767@gmail.com>
+References: <20230701023524.7434-1-schmitzmic@gmail.com>
+         <1885875.tdWV9SEqCh@lichtvoll.de>
+         <234f57e7-a35f-4406-35ad-a5b9b49e9a5e@gmail.com>
+         <4858801.31r3eYUQgx@lichtvoll.de>
+         <947340d9-b640-0910-317b-5c8022220a55@xenosoft.de>
+         <80266037-f808-c448-c3c7-9d5d5f4253a7@xenosoft.de>
+         <45d9f890-ebe2-4014-2411-953fd9741c2b@gmail.com>
+         <5dcbbcf69462141ab7cd9679b7577b8047b97f29.camel@physik.fu-berlin.de>
+         <ed0a8dee-0fb2-aa2f-560a-3a521747a767@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.48.3 
 MIME-Version: 1.0
-In-Reply-To: <4ca9e263e6042219ee46a1f57642306c6886168a.camel@physik.fu-berlin.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Original-Sender: glaubitz@physik.fu-berlin.de
+X-Originating-IP: 87.189.153.127
+X-ZEDAT-Hint: PO
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Adrian,
+On Tue, 2023-07-04 at 17:44 +1200, Michael Schmitz wrote:
+> Hi Adrian,
+> 
+> Am 04.07.2023 um 17:06 schrieb John Paul Adrian Glaubitz:
+> > Hi Michael!
+> > 
+> > On Tue, 2023-07-04 at 09:24 +1200, Michael Schmitz wrote:
+> > > Hi Christian,
+> > > 
+> > > On 4/07/23 02:59, Christian Zigotzky wrote:
+> > > > > I am very happy that this bug is fixed now but we have to explain it
+> > > > > to our customers why they can't mount their Linux partitions on the
+> > > > > RDB disk anymore. Booting is of course also affected. (Mounting the
+> > > > > root partition)
+> > > > > 
+> > > > > But maybe simple GParted instructions are a good solution.
+> > > > You can apply the patch. I will revert this patch until I find a
+> > > > simple solution for our community.
+> > > > 
+> > > > Thank you for fixing this issue!
+> > > 
+> > > Thanks for testing - I'll add your Tested-by: tag now. I have to correct
+> > > the Fixes: tag anyway.
+> > 
+> > Have we actually agreed now that this is a bug and not just an effect of the
+> > corrupted RDB that Christian provided?
+> 
+> The RDB was perfectly fine. Due to 32 bit integer arithmetic overflow, 
+> old RDB code passed an incorrect partition size to put_partition(),
+> and instead of rejecting a partition that extends past the end of the 
+> disk, put_partition() truncated the size.
 
-Am 04.07.2023 um 17:08 schrieb John Paul Adrian Glaubitz:
-> On Tue, 2023-07-04 at 11:07 +1200, Michael Schmitz wrote:
->> Partitons that did overflow the disk size (due to 32 bit int
->   ^^^^^^^^^ typo
+OK, so using "-1" as an end-of-disk partition marker is fine, but it was just
+the partition size recorded in Christian's RDB that was incorrect, correct?
 
-Thanks, that or a dodgy keyboard, meh...
+> > 
+> > > Jens - is the bugfix patch enough, or do you need a new version of the
+> > > entire series?
+> > 
+> > But the series has already been applied and released in 6.4, hasn't it?
+> 
+> That's right - I wasn't sure whether it had already gone upstream (but 
+> even then, squeezing a bugfix in with an accepted patch isn't usually done).
 
-Will send v3 ...
+It's even released already ;-). That's why Christian ran into the problem in the
+first place.
 
-Cheers,
+Adrian
 
-	Michael
-
->
-> Adrian
->
+-- 
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer
+`. `'   Physicist
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
