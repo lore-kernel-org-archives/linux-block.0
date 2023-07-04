@@ -2,322 +2,262 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FF6C001B3
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 169FEC18E72
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:22:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231641AbjGDMWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 08:22:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39158 "EHLO
+        id S231555AbjGDMWp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 08:22:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231555AbjGDMWg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:36 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C0DE7B;
+        with ESMTP id S231575AbjGDMWh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:37 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ACD110EC;
         Tue,  4 Jul 2023 05:22:27 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B70E62286A;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5D9E422868;
         Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1688473345; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZaFB25ne5Ua4y1EAn9zZd4LxjIZC4QBW2lEKwdKwaVY=;
-        b=VQTuunU5c1A2LokcPyAhjqtENwrlAD4JXoebmimae8hFzPdzZnKx27YsCS/Rk1TZexpQ8I
-        5Nt9XZxyDOjW4pHo/LOQsv8jt96lIUGk6oVSbCckdLXN6NjQDQYuHNZeaHXhV14LL++Djf
-        NRMM3g3u9XehijewL6RLsQp9/EoR9cI=
+        bh=Y5Z0PpLwK7LWiMwHAJV3g58wt4Pu7/r/oCMflfsspxI=;
+        b=Yfx9ztWkVatt0fVfNPxdamFDjV837Nu56ImHpS3yWvwdcdXXyeJ1ONnOd+6RA+xJckyxi2
+        Fr1h4BOlDMHKk2yJxxmlop9vtybjvkzPRI8sOxjaR75gWlVSNQjeXkVo/sHlsqPbUV+LJG
+        uG3Fi84JhxR4KPvRm9XoLJxwd0lLAD0=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1688473345;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZaFB25ne5Ua4y1EAn9zZd4LxjIZC4QBW2lEKwdKwaVY=;
-        b=t5+WtErpsKXBhV6Qi03vq3572azJvBcyRqHFizUa74lVhPcnVep2V0JU+URwCRH7rojhW5
-        HDF3xA0QYzFxSpAw==
+        bh=Y5Z0PpLwK7LWiMwHAJV3g58wt4Pu7/r/oCMflfsspxI=;
+        b=vF6CF3OlMOzmEcsCihpnKLEsv6y6u4duYbSxFgbJ4TrA9OaJnML/9G2T1z6YHtiVQ3zwq6
+        zVCIM6qtTQOYAOBg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A8DD1139ED;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 433C713A97;
         Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id fkg1KQEPpGQbMAAAMHmgww
+        id fiTSDwEPpGQQMAAAMHmgww
         (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:25 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id B210FA0768; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
+        id 97B9EA0763; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 06/32] pktcdvd: Convert to blkdev_get_handle_by_dev()
-Date:   Tue,  4 Jul 2023 14:21:33 +0200
-Message-Id: <20230704122224.16257-6-jack@suse.cz>
+        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Alasdair Kergon <agk@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anna Schumaker <anna@kernel.org>, Chao Yu <chao@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com, Gao Xiang <xiang@kernel.org>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        jfs-discussion@lists.sourceforge.net,
+        Joern Engel <joern@lazybastard.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-xfs@vger.kernel.org,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Minchan Kim <minchan@kernel.org>, ocfs2-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Song Liu <song@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        target-devel@vger.kernel.org, Ted Tso <tytso@mit.edu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        xen-devel@lists.xenproject.org
+Subject: [PATCH 01/32] block: Provide blkdev_get_handle_* functions
+Date:   Tue,  4 Jul 2023 14:21:28 +0200
+Message-Id: <20230704122224.16257-1-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8835; i=jack@suse.cz; h=from:subject; bh=sCM3iGJUMTiQzxctzcFbFlDhJQYCYpIS2YN26eWshz8=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7PqIH2xt3B75v1EYr+cv7Nt7+XwdcaRUmK0ssk FFOiOpGJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQOzwAKCRCcnaoHP2RA2U6hB/ 9NRBbmfIpZLxaumoaCe6dq/cwgGK+6IaFePvOVuKcnnRos6ztbnH5Tz0E+NurcShn9ywTFnBwbfcq3 EoJ3AanAGB8nzlCr3gRDWAKMdgfQvUquEAvcqPLVT4LzU+fYoV3R2+yQ6q3bH4Z/D4Cch7VZg6E5Oe szE+JUcmMaeIETOo59mrQD/Q2p+jEJZBUfV4j6GcO+U3KITc6zYxnAzOe4IQB145cbe5K7U6km2ISx kbB6mYTyoTtsgwLYYsp5dxMTfZvqfvxfOrOoxWCNhCeX9fbKVIngOzrCGplWp5wa48l+97xS9bVNH2 g2p/3d3m+heYGNk6pbqqyy/e0YM86X
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5599; i=jack@suse.cz; h=from:subject; bh=repJSb0/C5PfG8Cx5q/n/kNJZOabhc2tYWxiICNNTtg=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGFKW8J3uuK2gorZt+knOzhX81snTGX/57phWXzfXM3w+50Xl rfb7OxmNWRgYORhkxRRZVkde1L42z6hra6iGDMwgViaQKQxcnAIwERsLDobphetsJoi99quKYIut26 wgv/K+lUS+secym02t85epsOp8rtu3acJMN1WFRiX1irKCnSu+LXh+rVyp65RAEGttl+XcP32mOR0n ZJYFm7orF8YFnhVftYzZjm2Rva3I0oqXdap/bUJr8qNjVVfHnBRiFEv0Ocgpck1jlTHfEWUu71NrKu 8EXrbnsfD7wm1qKHDqnnnD21y1n9OFHn8/7qJz4O19panPLvMxrOrNn970IcH6rnhQsq0ZS1v6JUfN RS5ah5XMXNI/c14+vVlVkPVI9n2HQNZlEfdsO13VFx17Z7f0vKnN9UZZ3Zii6WbsWS81/qefFs1Ljl +dK1sZIpSRdXfx+jksz9T4il4AAA==
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert pktcdvd to use blkdev_get_handle_by_dev().
+Create struct bdev_handle that contains all parameters that need to be
+passed to blkdev_put() and provide blkdev_get_handle_* functions that
+return this structure instead of plain bdev pointer. This will
+eventually allow us to pass one more argument to blkdev_put() without
+too much hassle.
 
+CC: Alasdair Kergon <agk@redhat.com>
+CC: Andrew Morton <akpm@linux-foundation.org>
+CC: Anna Schumaker <anna@kernel.org>
+CC: Chao Yu <chao@kernel.org>
+CC: Christian Borntraeger <borntraeger@linux.ibm.com>
+CC: Coly Li <colyli@suse.de
+CC: "Darrick J. Wong" <djwong@kernel.org>
+CC: Dave Kleikamp <shaggy@kernel.org>
+CC: David Sterba <dsterba@suse.com>
+CC: dm-devel@redhat.com
+CC: drbd-dev@lists.linbit.com
+CC: Gao Xiang <xiang@kernel.org>
+CC: Jack Wang <jinpu.wang@ionos.com>
+CC: Jaegeuk Kim <jaegeuk@kernel.org>
+CC: jfs-discussion@lists.sourceforge.net
+CC: Joern Engel <joern@lazybastard.org>
+CC: Joseph Qi <joseph.qi@linux.alibaba.com>
+CC: Kent Overstreet <kent.overstreet@gmail.com>
+CC: linux-bcache@vger.kernel.org
+CC: linux-btrfs@vger.kernel.org
+CC: linux-erofs@lists.ozlabs.org
+CC: <linux-ext4@vger.kernel.org>
+CC: linux-f2fs-devel@lists.sourceforge.net
+CC: linux-mm@kvack.org
+CC: linux-mtd@lists.infradead.org
+CC: linux-nfs@vger.kernel.org
+CC: linux-nilfs@vger.kernel.org
+CC: linux-nvme@lists.infradead.org
+CC: linux-pm@vger.kernel.org
+CC: linux-raid@vger.kernel.org
+CC: linux-s390@vger.kernel.org
+CC: linux-scsi@vger.kernel.org
+CC: linux-xfs@vger.kernel.org
+CC: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
+CC: Mike Snitzer <snitzer@kernel.org>
+CC: Minchan Kim <minchan@kernel.org>
+CC: ocfs2-devel@oss.oracle.com
+CC: reiserfs-devel@vger.kernel.org
+CC: Sergey Senozhatsky <senozhatsky@chromium.org>
+CC: Song Liu <song@kernel.org>
+CC: Sven Schnelle <svens@linux.ibm.com>
+CC: target-devel@vger.kernel.org
+CC: Ted Tso <tytso@mit.edu>
+CC: Trond Myklebust <trond.myklebust@hammerspace.com>
+CC: xen-devel@lists.xenproject.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/pktcdvd.c | 76 ++++++++++++++++++++++-------------------
- include/linux/pktcdvd.h |  4 ++-
- 2 files changed, 44 insertions(+), 36 deletions(-)
+ block/bdev.c           | 47 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h | 10 +++++++++
+ 2 files changed, 57 insertions(+)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index a1428538bda5..c50333ea9c75 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -340,8 +340,8 @@ static ssize_t device_map_show(const struct class *c, const struct class_attribu
- 		n += sysfs_emit_at(data, n, "%s %u:%u %u:%u\n",
- 			pd->disk->disk_name,
- 			MAJOR(pd->pkt_dev), MINOR(pd->pkt_dev),
--			MAJOR(pd->bdev->bd_dev),
--			MINOR(pd->bdev->bd_dev));
-+			MAJOR(pd->bdev_handle->bdev->bd_dev),
-+			MINOR(pd->bdev_handle->bdev->bd_dev));
- 	}
- 	mutex_unlock(&ctl_mutex);
- 	return n;
-@@ -437,7 +437,8 @@ static int pkt_seq_show(struct seq_file *m, void *p)
- 	char *msg;
- 	int states[PACKET_NUM_STATES];
- 
--	seq_printf(m, "Writer %s mapped to %pg:\n", pd->disk->disk_name, pd->bdev);
-+	seq_printf(m, "Writer %s mapped to %pg:\n", pd->disk->disk_name,
-+		   pd->bdev_handle->bdev);
- 
- 	seq_printf(m, "\nSettings:\n");
- 	seq_printf(m, "\tpacket size:\t\t%dkB\n", pd->settings.size / 2);
-@@ -714,7 +715,7 @@ static void pkt_rbtree_insert(struct pktcdvd_device *pd, struct pkt_rb_node *nod
-  */
- static int pkt_generic_packet(struct pktcdvd_device *pd, struct packet_command *cgc)
- {
--	struct request_queue *q = bdev_get_queue(pd->bdev);
-+	struct request_queue *q = bdev_get_queue(pd->bdev_handle->bdev);
- 	struct scsi_cmnd *scmd;
- 	struct request *rq;
- 	int ret = 0;
-@@ -1047,7 +1048,8 @@ static void pkt_gather_data(struct pktcdvd_device *pd, struct packet_data *pkt)
- 			continue;
- 
- 		bio = pkt->r_bios[f];
--		bio_init(bio, pd->bdev, bio->bi_inline_vecs, 1, REQ_OP_READ);
-+		bio_init(bio, pd->bdev_handle->bdev, bio->bi_inline_vecs, 1,
-+			 REQ_OP_READ);
- 		bio->bi_iter.bi_sector = pkt->sector + f * (CD_FRAMESIZE >> 9);
- 		bio->bi_end_io = pkt_end_io_read;
- 		bio->bi_private = pkt;
-@@ -1262,8 +1264,8 @@ static void pkt_start_write(struct pktcdvd_device *pd, struct packet_data *pkt)
- 	struct device *ddev = disk_to_dev(pd->disk);
- 	int f;
- 
--	bio_init(pkt->w_bio, pd->bdev, pkt->w_bio->bi_inline_vecs, pkt->frames,
--		 REQ_OP_WRITE);
-+	bio_init(pkt->w_bio, pd->bdev_handle->bdev, pkt->w_bio->bi_inline_vecs,
-+		 pkt->frames, REQ_OP_WRITE);
- 	pkt->w_bio->bi_iter.bi_sector = pkt->sector;
- 	pkt->w_bio->bi_end_io = pkt_end_io_packet_write;
- 	pkt->w_bio->bi_private = pkt;
-@@ -2160,18 +2162,20 @@ static int pkt_open_dev(struct pktcdvd_device *pd, bool write)
- 	int ret;
- 	long lba;
- 	struct request_queue *q;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 
- 	/*
- 	 * We need to re-open the cdrom device without O_NONBLOCK to be able
- 	 * to read/write from/to it. It is already opened in O_NONBLOCK mode
- 	 * so open should not fail.
- 	 */
--	bdev = blkdev_get_by_dev(pd->bdev->bd_dev, BLK_OPEN_READ, pd, NULL);
--	if (IS_ERR(bdev)) {
--		ret = PTR_ERR(bdev);
-+	bdev_handle = blkdev_get_handle_by_dev(pd->bdev_handle->bdev->bd_dev,
-+					       BLK_OPEN_READ, pd, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		ret = PTR_ERR(bdev_handle);
- 		goto out;
- 	}
-+	pd->open_bdev_handle = bdev_handle;
- 
- 	ret = pkt_get_last_written(pd, &lba);
- 	if (ret) {
-@@ -2180,9 +2184,9 @@ static int pkt_open_dev(struct pktcdvd_device *pd, bool write)
- 	}
- 
- 	set_capacity(pd->disk, lba << 2);
--	set_capacity_and_notify(pd->bdev->bd_disk, lba << 2);
-+	set_capacity_and_notify(pd->bdev_handle->bdev->bd_disk, lba << 2);
- 
--	q = bdev_get_queue(pd->bdev);
-+	q = bdev_get_queue(pd->bdev_handle->bdev);
- 	if (write) {
- 		ret = pkt_open_write(pd);
- 		if (ret)
-@@ -2214,7 +2218,7 @@ static int pkt_open_dev(struct pktcdvd_device *pd, bool write)
- 	return 0;
- 
- out_putdev:
--	blkdev_put(bdev, pd);
-+	blkdev_handle_put(bdev_handle);
- out:
- 	return ret;
+diff --git a/block/bdev.c b/block/bdev.c
+index 979e28a46b98..c75de5cac2bc 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -846,6 +846,24 @@ struct block_device *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
  }
-@@ -2233,7 +2237,8 @@ static void pkt_release_dev(struct pktcdvd_device *pd, int flush)
- 	pkt_lock_door(pd, 0);
+ EXPORT_SYMBOL(blkdev_get_by_dev);
  
- 	pkt_set_speed(pd, MAX_SPEED, MAX_SPEED);
--	blkdev_put(pd->bdev, pd);
-+	blkdev_handle_put(pd->open_bdev_handle);
-+	pd->open_bdev_handle = NULL;
- 
- 	pkt_shrink_pktlist(pd);
++struct bdev_handle *blkdev_get_handle_by_dev(dev_t dev, blk_mode_t mode,
++		void *holder, const struct blk_holder_ops *hops)
++{
++	struct bdev_handle *handle = kmalloc(sizeof(struct bdev_handle),
++					     GFP_KERNEL);
++	struct block_device *bdev;
++
++	if (!handle)
++		return ERR_PTR(-ENOMEM);
++	bdev = blkdev_get_by_dev(dev, mode, holder, hops);
++	if (IS_ERR(bdev))
++		return ERR_CAST(bdev);
++	handle->bdev = bdev;
++	handle->holder = holder;
++	return handle;
++}
++EXPORT_SYMBOL(blkdev_get_handle_by_dev);
++
+ /**
+  * blkdev_get_by_path - open a block device by name
+  * @path: path to the block device to open
+@@ -884,6 +902,28 @@ struct block_device *blkdev_get_by_path(const char *path, blk_mode_t mode,
  }
-@@ -2321,8 +2326,8 @@ static void pkt_end_io_read_cloned(struct bio *bio)
+ EXPORT_SYMBOL(blkdev_get_by_path);
  
- static void pkt_make_request_read(struct pktcdvd_device *pd, struct bio *bio)
++struct bdev_handle *blkdev_get_handle_by_path(const char *path, blk_mode_t mode,
++		void *holder, const struct blk_holder_ops *hops)
++{
++	struct bdev_handle *handle;
++	dev_t dev;
++	int error;
++
++	error = lookup_bdev(path, &dev);
++	if (error)
++		return ERR_PTR(error);
++
++	handle = blkdev_get_handle_by_dev(dev, mode, holder, hops);
++	if (!IS_ERR(handle) && (mode & BLK_OPEN_WRITE) &&
++	    bdev_read_only(handle->bdev)) {
++		blkdev_handle_put(handle);
++		return ERR_PTR(-EACCES);
++	}
++
++	return handle;
++}
++EXPORT_SYMBOL(blkdev_get_handle_by_path);
++
+ void blkdev_put(struct block_device *bdev, void *holder)
  {
--	struct bio *cloned_bio =
--		bio_alloc_clone(pd->bdev, bio, GFP_NOIO, &pkt_bio_set);
-+	struct bio *cloned_bio = bio_alloc_clone(pd->bdev_handle->bdev, bio,
-+		GFP_NOIO, &pkt_bio_set);
- 	struct packet_stacked_data *psd = mempool_alloc(&psd_pool, GFP_NOIO);
+ 	struct gendisk *disk = bdev->bd_disk;
+@@ -920,6 +960,13 @@ void blkdev_put(struct block_device *bdev, void *holder)
+ }
+ EXPORT_SYMBOL(blkdev_put);
  
- 	psd->pd = pd;
-@@ -2492,7 +2497,7 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- {
- 	struct device *ddev = disk_to_dev(pd->disk);
- 	int i;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	struct scsi_device *sdev;
++void blkdev_handle_put(struct bdev_handle *handle)
++{
++	blkdev_put(handle->bdev, handle->holder);
++	kfree(handle);
++}
++EXPORT_SYMBOL(blkdev_handle_put);
++
+ /**
+  * lookup_bdev() - Look up a struct block_device by name.
+  * @pathname: Name of the block device in the filesystem.
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ed44a997f629..a910e9997ddd 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1471,14 +1471,24 @@ struct blk_holder_ops {
+ #define sb_open_mode(flags) \
+ 	(BLK_OPEN_READ | (((flags) & SB_RDONLY) ? 0 : BLK_OPEN_WRITE))
  
- 	if (pd->pkt_dev == dev) {
-@@ -2503,8 +2508,9 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 		struct pktcdvd_device *pd2 = pkt_devs[i];
- 		if (!pd2)
- 			continue;
--		if (pd2->bdev->bd_dev == dev) {
--			dev_err(ddev, "%pg already setup\n", pd2->bdev);
-+		if (pd2->bdev_handle->bdev->bd_dev == dev) {
-+			dev_err(ddev, "%pg already setup\n",
-+				pd2->bdev_handle->bdev);
- 			return -EBUSY;
- 		}
- 		if (pd2->pkt_dev == dev) {
-@@ -2513,13 +2519,13 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 		}
- 	}
++struct bdev_handle {
++	struct block_device *bdev;
++	void *holder;
++};
++
+ struct block_device *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 		const struct blk_holder_ops *hops);
+ struct block_device *blkdev_get_by_path(const char *path, blk_mode_t mode,
+ 		void *holder, const struct blk_holder_ops *hops);
++struct bdev_handle *blkdev_get_handle_by_dev(dev_t dev, blk_mode_t mode,
++		void *holder, const struct blk_holder_ops *hops);
++struct bdev_handle *blkdev_get_handle_by_path(const char *path, blk_mode_t mode,
++		void *holder, const struct blk_holder_ops *hops);
+ int bd_prepare_to_claim(struct block_device *bdev, void *holder,
+ 		const struct blk_holder_ops *hops);
+ void bd_abort_claiming(struct block_device *bdev, void *holder);
+ void blkdev_put(struct block_device *bdev, void *holder);
++void blkdev_handle_put(struct bdev_handle *handle);
  
--	bdev = blkdev_get_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_NDELAY, NULL,
--				 NULL);
--	if (IS_ERR(bdev))
--		return PTR_ERR(bdev);
--	sdev = scsi_device_from_queue(bdev->bd_disk->queue);
-+	bdev_handle = blkdev_get_handle_by_dev(dev,
-+			BLK_OPEN_READ | BLK_OPEN_NDELAY, NULL, NULL);
-+	if (IS_ERR(bdev_handle))
-+		return PTR_ERR(bdev_handle);
-+	sdev = scsi_device_from_queue(bdev_handle->bdev->bd_disk->queue);
- 	if (!sdev) {
--		blkdev_put(bdev, NULL);
-+		blkdev_handle_put(bdev_handle);
- 		return -EINVAL;
- 	}
- 	put_device(&sdev->sdev_gendev);
-@@ -2527,8 +2533,8 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 	/* This is safe, since we have a reference from open(). */
- 	__module_get(THIS_MODULE);
- 
--	pd->bdev = bdev;
--	set_blocksize(bdev, CD_FRAMESIZE);
-+	pd->bdev_handle = bdev_handle;
-+	set_blocksize(bdev_handle->bdev, CD_FRAMESIZE);
- 
- 	pkt_init_queue(pd);
- 
-@@ -2540,11 +2546,11 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 	}
- 
- 	proc_create_single_data(pd->disk->disk_name, 0, pkt_proc, pkt_seq_show, pd);
--	dev_notice(ddev, "writer mapped to %pg\n", bdev);
-+	dev_notice(ddev, "writer mapped to %pg\n", bdev_handle->bdev);
- 	return 0;
- 
- out_mem:
--	blkdev_put(bdev, NULL);
-+	blkdev_handle_put(bdev_handle);
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
- 	return -ENOMEM;
-@@ -2599,9 +2605,9 @@ static unsigned int pkt_check_events(struct gendisk *disk,
- 
- 	if (!pd)
- 		return 0;
--	if (!pd->bdev)
-+	if (!pd->bdev_handle)
- 		return 0;
--	attached_disk = pd->bdev->bd_disk;
-+	attached_disk = pd->bdev_handle->bdev->bd_disk;
- 	if (!attached_disk || !attached_disk->fops->check_events)
- 		return 0;
- 	return attached_disk->fops->check_events(attached_disk, clearing);
-@@ -2686,7 +2692,7 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
- 		goto out_mem2;
- 
- 	/* inherit events of the host device */
--	disk->events = pd->bdev->bd_disk->events;
-+	disk->events = pd->bdev_handle->bdev->bd_disk->events;
- 
- 	ret = add_disk(disk);
- 	if (ret)
-@@ -2751,7 +2757,7 @@ static int pkt_remove_dev(dev_t pkt_dev)
- 	pkt_debugfs_dev_remove(pd);
- 	pkt_sysfs_dev_remove(pd);
- 
--	blkdev_put(pd->bdev, NULL);
-+	blkdev_handle_put(pd->bdev_handle);
- 
- 	remove_proc_entry(pd->disk->disk_name, pkt_proc);
- 	dev_notice(ddev, "writer unmapped\n");
-@@ -2778,7 +2784,7 @@ static void pkt_get_status(struct pkt_ctrl_command *ctrl_cmd)
- 
- 	pd = pkt_find_dev_from_minor(ctrl_cmd->dev_index);
- 	if (pd) {
--		ctrl_cmd->dev = new_encode_dev(pd->bdev->bd_dev);
-+		ctrl_cmd->dev = new_encode_dev(pd->bdev_handle->bdev->bd_dev);
- 		ctrl_cmd->pkt_dev = new_encode_dev(pd->pkt_dev);
- 	} else {
- 		ctrl_cmd->dev = 0;
-diff --git a/include/linux/pktcdvd.h b/include/linux/pktcdvd.h
-index 80cb00db42a4..79594aeb160d 100644
---- a/include/linux/pktcdvd.h
-+++ b/include/linux/pktcdvd.h
-@@ -154,7 +154,9 @@ struct packet_stacked_data
- 
- struct pktcdvd_device
- {
--	struct block_device	*bdev;		/* dev attached */
-+	struct bdev_handle	*bdev_handle;	/* dev attached */
-+	/* handle acquired for bdev during pkt_open_dev() */
-+	struct bdev_handle	*open_bdev_handle;
- 	dev_t			pkt_dev;	/* our dev */
- 	struct packet_settings	settings;
- 	struct packet_stats	stats;
+ /* just for blk-cgroup, don't use elsewhere */
+ struct block_device *blkdev_get_no_open(dev_t dev);
 -- 
 2.35.3
 
