@@ -2,128 +2,342 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA048C001B0
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 23:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE65EB64D9
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 23:42:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231281AbjGDXi1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 19:38:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52400 "EHLO
+        id S231503AbjGDXmL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 19:42:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230196AbjGDXiY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 19:38:24 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E01BD;
-        Tue,  4 Jul 2023 16:38:24 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3a04e5baffcso4678901b6e.3;
-        Tue, 04 Jul 2023 16:38:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688513903; x=1691105903;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=e6fOv3KfpYRgxDp5NnegPjCOw+kqjU07ZSKbfN9Zafw=;
-        b=XUnbSQnr5C6k/HBziBsOf6Gx2Favu7CkdlNpOpQRxw0Kgowx3mUIUL9upitJ8RLoz0
-         WApwn7CE73qZX2NrAzDb/B39IvONmSNdICWbXxMVBWhOOoUDdIMqoGLiknwJ7C0gVLlV
-         RvWM1CtMPIra2uqeDeRVFOukjUNbpA1uK5qR111kfGxthergG869EKQwBkqCDuZ9EXmt
-         Y0TFPhePbhTlqH9a/z5Hbwx1ZOOPmVMtdGCa+THnU+7m5C8LX1nPy6Dejuw5mUY6SdUr
-         4bPr8dvfv51e4A8r+nhyTi3AkVqcGPyOfhihqABD52YFabtDChCEO04/iX8O8NWxlGX0
-         Y6Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688513903; x=1691105903;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6fOv3KfpYRgxDp5NnegPjCOw+kqjU07ZSKbfN9Zafw=;
-        b=keQ2UySaiPyT0MstwcdG/P2QW5lESYSPS/LZ+DjhMysoxrfbgYcdcD0c7/L33kEaUQ
-         BpSbHrcuDpNt6A30ChJsvcY8Kq2SgBTX+VwQQ8PJ4SYVamvVtJzpZTxjR2KXmpt2Y7UL
-         aOeL3RkgDh3Y2hDlhu7GjBTgS3gcTSHnySn31yivgobhZXXQQ8v94PIQ5QDBm9gpRUDL
-         VTxETd30enjI3XfojfGS6ou7wOg4C45XeyjhCrAmZkMvfraaZvyRq/mG2ajqfK8pw3sW
-         yHo6o75izNqOglg0uFd+nhIqkGw/Jn+Cj30Pr/dK3qm8WC9fgYHm9j7P4QQUUoIKX5Vj
-         bm2w==
-X-Gm-Message-State: AC+VfDxtJ6JcvH5V9qoFYrlvSbHAnUWQlvN1qZTY0+zgsW2rQo4lpqcM
-        BsRaTGp9KRloCZxO8ltRMHei9PLYb0YcSA==
-X-Google-Smtp-Source: ACHHUZ5BriiXdRxvI6+OWJnyU1ruKdO37WbqxE3Y+fdZCQOhxWwLy2sVTMZ4um7Uq9d24v3z7bl11g==
-X-Received: by 2002:a05:6808:1294:b0:3a3:82a1:d1e7 with SMTP id a20-20020a056808129400b003a382a1d1e7mr16491226oiw.6.1688513903535;
-        Tue, 04 Jul 2023 16:38:23 -0700 (PDT)
-Received: from xplor.waratah.dyndns.org (222-152-184-54-fibre.sparkbb.co.nz. [222.152.184.54])
-        by smtp.gmail.com with ESMTPSA id a15-20020aa7864f000000b0066883d75932sm14045569pfo.204.2023.07.04.16.38.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 16:38:23 -0700 (PDT)
-Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
-        id C24AA360370; Wed,  5 Jul 2023 11:38:19 +1200 (NZST)
-From:   Michael Schmitz <schmitzmic@gmail.com>
-To:     linux-block@vger.kernel.org, axboe@kernel.dk
-Cc:     linux-m68k@vger.kernel.org, chzigotzky@xenosoft.de,
-        geert@linux-m68k.org, hch@lst.de, martin@lichtvoll.de,
-        Michael Schmitz <schmitzmic@gmail.com>, stable@vger.kernel.org
-Subject: [PATCH v4 1/1] block: bugfix for Amiga partition overflow check patch
-Date:   Wed,  5 Jul 2023 11:38:08 +1200
-Message-Id: <20230704233808.25166-2-schmitzmic@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230704233808.25166-1-schmitzmic@gmail.com>
-References: <20230620201725.7020-1-schmitzmic@gmail.com>
- <20230704233808.25166-1-schmitzmic@gmail.com>
+        with ESMTP id S231478AbjGDXmK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 19:42:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5456110E3;
+        Tue,  4 Jul 2023 16:42:07 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BC86761405;
+        Tue,  4 Jul 2023 23:42:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D175FC433C8;
+        Tue,  4 Jul 2023 23:42:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688514126;
+        bh=LoHznziOQK3TLwWQaWYiVaNHPc+5OCtZ+BNPgM1zTvE=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=ZSW1eRXo/PFaA+Ani9IuYf+FJuJBk9Az9dsuzdoQTCP2h+trJCB2c7UtRUjvaLfn/
+         G95wqe/ds9g6Zhb6rF4voVNA9RrL9vV/BqTUNVrQY7EI1xBLIoWyIpAzEjODvDYi+y
+         FxZ67mFlZVDQLmGCl0WQP6Dpivb2WkDvaqPwcUCpaPiqdOMso6G4s9kpQgQg1YNfCU
+         RCrGC7vi8KbmbwvPsG+ySXJVQpC/gL9Xw2wg7k9Wa0RPfPoafE8HWxSGYSNQE5DwHV
+         70crdDOaPwdl+CyQt+JDS0A1/dbmUCJyLvaVxXQE77fFpcr3TS/2LhGkw0B51sDU0z
+         9UEthwcoq2Fqw==
+Message-ID: <b5dbd5e0-417d-e33b-baf0-b6109882bc3a@kernel.org>
+Date:   Wed, 5 Jul 2023 08:42:04 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v5 2/5] ublk: move types to shared header file
+Content-Language: en-US
+To:     Andreas Hindborg <nmi@metaspace.dk>, Ming Lei <ming.lei@redhat.com>
+Cc:     open list <linux-kernel@vger.kernel.org>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>, gost.dev@samsung.com,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>
+References: <20230704165209.514591-1-nmi@metaspace.dk>
+ <20230704165209.514591-3-nmi@metaspace.dk>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20230704165209.514591-3-nmi@metaspace.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Making 'blk' sector_t (i.e. 64 bit if LBD support is active)
-fails the 'blk>0' test in the partition block loop if a
-value of (signed int) -1 is used to mark the end of the
-partition block list.
+On 7/5/23 01:52, Andreas Hindborg wrote:
+> From: Andreas Hindborg <a.hindborg@samsung.com>
+> 
+> This change is in preparation for ublk zoned storage support.
+> 
+> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 
-This bug was introduced in patch 3 of my prior Amiga partition
-support fixes series, and spotted by Christian Zigotzky when
-testing the latest block updates.
+A couple of nits below. Otherwise looks OK to me.
 
-Explicitly cast 'blk' to signed int to allow use of -1 to
-terminate the partition block linked list.
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Reported-by: Christian Zigotzky <chzigotzky@xenosoft.de>
-Fixes: b6f3f28f60 ("block: add overflow checks for Amiga partition support")
-Message-ID: 024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de
-Cc: <stable@vger.kernel.org> # 5.2
-Link: https://lore.kernel.org/r/024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de
-Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-Reviewed-by: Martin Steigerwald <martin@lichtvoll.de>
-Tested-by: Christian Zigotzky <chzigotzky@xenosoft.de>
+That said, your patch 5 still adds ublk-zoned.c, which Christoph commented that
+this may not be needed given that zone support does not add that much code.
+Without introducing this new file, this patch, as well as patch 3 would not be
+needed and patch 5 would be simplified a little.
 
---
+If you really prefer (or Ming does) having the zone code separated, I would
+suggest moving the ublk driver under its own "ublk" directory under
+drivers/block/ (similarly to nullblk). That would simplify the Kconfig too.
 
-Changes since v1:
+> ---
+>  MAINTAINERS              |   1 +
+>  drivers/block/ublk_drv.c |  92 +---------------------------------
+>  drivers/block/ublk_drv.h | 103 +++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 105 insertions(+), 91 deletions(-)
+>  create mode 100644 drivers/block/ublk_drv.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 27ef11624748..ace71c90751c 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -21554,6 +21554,7 @@ L:	linux-block@vger.kernel.org
+>  S:	Maintained
+>  F:	Documentation/block/ublk.rst
+>  F:	drivers/block/ublk_drv.c
+> +F:	drivers/block/ublk_drv.h
+>  F:	include/uapi/linux/ublk_cmd.h
+>  
+>  UCLINUX (M68KNOMMU AND COLDFIRE)
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 1c823750c95a..bca0c4e1cfd8 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -45,6 +45,7 @@
+>  #include <linux/namei.h>
+>  #include <linux/kref.h>
+>  #include <uapi/linux/ublk_cmd.h>
+> +#include "ublk_drv.h"
+>  
+>  #define UBLK_MINORS		(1U << MINORBITS)
+>  
+> @@ -62,63 +63,11 @@
+>  #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
+>  		UBLK_PARAM_TYPE_DISCARD | UBLK_PARAM_TYPE_DEVT)
+>  
+> -struct ublk_rq_data {
+> -	struct llist_node node;
+> -
+> -	struct kref ref;
+> -};
+>  
+>  struct ublk_uring_cmd_pdu {
+>  	struct ublk_queue *ubq;
+>  };
+>  
+> -/*
+> - * io command is active: sqe cmd is received, and its cqe isn't done
+> - *
+> - * If the flag is set, the io command is owned by ublk driver, and waited
+> - * for incoming blk-mq request from the ublk block device.
+> - *
+> - * If the flag is cleared, the io command will be completed, and owned by
+> - * ublk server.
+> - */
+> -#define UBLK_IO_FLAG_ACTIVE	0x01
+> -
+> -/*
+> - * IO command is completed via cqe, and it is being handled by ublksrv, and
+> - * not committed yet
+> - *
+> - * Basically exclusively with UBLK_IO_FLAG_ACTIVE, so can be served for
+> - * cross verification
+> - */
+> -#define UBLK_IO_FLAG_OWNED_BY_SRV 0x02
+> -
+> -/*
+> - * IO command is aborted, so this flag is set in case of
+> - * !UBLK_IO_FLAG_ACTIVE.
+> - *
+> - * After this flag is observed, any pending or new incoming request
+> - * associated with this io command will be failed immediately
+> - */
+> -#define UBLK_IO_FLAG_ABORTED 0x04
+> -
+> -/*
+> - * UBLK_IO_FLAG_NEED_GET_DATA is set because IO command requires
+> - * get data buffer address from ublksrv.
+> - *
+> - * Then, bio data could be copied into this data buffer for a WRITE request
+> - * after the IO command is issued again and UBLK_IO_FLAG_NEED_GET_DATA is unset.
+> - */
+> -#define UBLK_IO_FLAG_NEED_GET_DATA 0x08
+> -
+> -struct ublk_io {
+> -	/* userspace buffer address from io cmd */
+> -	__u64	addr;
+> -	unsigned int flags;
+> -	int res;
+> -
+> -	struct io_uring_cmd *cmd;
+> -};
+> -
+>  struct ublk_queue {
+>  	int q_id;
+>  	int q_depth;
+> @@ -140,45 +89,6 @@ struct ublk_queue {
+>  
+>  #define UBLK_DAEMON_MONITOR_PERIOD	(5 * HZ)
+>  
+> -struct ublk_device {
+> -	struct gendisk		*ub_disk;
+> -
+> -	char	*__queues;
+> -
+> -	unsigned int	queue_size;
+> -	struct ublksrv_ctrl_dev_info	dev_info;
+> -
+> -	struct blk_mq_tag_set	tag_set;
+> -
+> -	struct cdev		cdev;
+> -	struct device		cdev_dev;
+> -
+> -#define UB_STATE_OPEN		0
+> -#define UB_STATE_USED		1
+> -#define UB_STATE_DELETED	2
+> -	unsigned long		state;
+> -	int			ub_number;
+> -
+> -	struct mutex		mutex;
+> -
+> -	spinlock_t		mm_lock;
+> -	struct mm_struct	*mm;
+> -
+> -	struct ublk_params	params;
+> -
+> -	struct completion	completion;
+> -	unsigned int		nr_queues_ready;
+> -	unsigned int		nr_privileged_daemon;
+> -
+> -	/*
+> -	 * Our ubq->daemon may be killed without any notification, so
+> -	 * monitor each queue's daemon periodically
+> -	 */
+> -	struct delayed_work	monitor_work;
+> -	struct work_struct	quiesce_work;
+> -	struct work_struct	stop_work;
+> -};
+> -
+>  /* header of ublk_params */
+>  struct ublk_params_header {
+>  	__u32	len;
+> diff --git a/drivers/block/ublk_drv.h b/drivers/block/ublk_drv.h
+> new file mode 100644
+> index 000000000000..2a4ab721d513
+> --- /dev/null
+> +++ b/drivers/block/ublk_drv.h
+> @@ -0,0 +1,103 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef _UBLK_DRV_H
+> +#define _UBLK_DRV_H
 
-- corrected Fixes: tag
-- added Tested-by:
-- reworded commit message to describe filesystem partition
-  size mismatch problem
+Nit: I think you can drop the leading "_".
 
-Changes since v2:
+> +
+> +#include <uapi/linux/ublk_cmd.h>
+> +#include <linux/blk-mq.h>
+> +#include <linux/cdev.h>
+> +
+> +/*
+> + * io command is active: sqe cmd is received, and its cqe isn't done
+> + *
+> + * If the flag is set, the io command is owned by ublk driver, and waited
+> + * for incoming blk-mq request from the ublk block device.
+> + *
+> + * If the flag is cleared, the io command will be completed, and owned by
+> + * ublk server.
+> + */
+> +#define UBLK_IO_FLAG_ACTIVE	0x01
+> +
+> +/*
+> + * IO command is completed via cqe, and it is being handled by ublksrv, and
+> + * not committed yet
+> + *
+> + * Basically exclusively with UBLK_IO_FLAG_ACTIVE, so can be served for
+> + * cross verification
+> + */
+> +#define UBLK_IO_FLAG_OWNED_BY_SRV 0x02
+> +
+> +/*
+> + * IO command is aborted, so this flag is set in case of
+> + * !UBLK_IO_FLAG_ACTIVE.
+> + *
+> + * After this flag is observed, any pending or new incoming request
+> + * associated with this io command will be failed immediately
+> + */
+> +#define UBLK_IO_FLAG_ABORTED 0x04
+> +
+> +/*
+> + * UBLK_IO_FLAG_NEED_GET_DATA is set because IO command requires
+> + * get data buffer address from ublksrv.
+> + *
+> + * Then, bio data could be copied into this data buffer for a WRITE request
+> + * after the IO command is issued again and UBLK_IO_FLAG_NEED_GET_DATA is unset.
+> + */
+> +#define UBLK_IO_FLAG_NEED_GET_DATA 0x08
+> +
+> +
 
-Adrian Glaubitz:
-- fix typo in commit message
+Nit: extra blank line not needed.
 
-Changes since v3:
+> +struct ublk_device {
+> +	struct gendisk		*ub_disk;
+> +
+> +	char	*__queues;
+> +
+> +	unsigned int	queue_size;
+> +	struct ublksrv_ctrl_dev_info	dev_info;
+> +
+> +	struct blk_mq_tag_set	tag_set;
+> +
+> +	struct cdev		cdev;
+> +	struct device		cdev_dev;
+> +
+> +#define UB_STATE_OPEN		0
+> +#define UB_STATE_USED		1
+> +#define UB_STATE_DELETED	2
+> +	unsigned long		state;
+> +	int			ub_number;
+> +
+> +	struct mutex		mutex;
+> +
+> +	spinlock_t		mm_lock;
+> +	struct mm_struct	*mm;
+> +
+> +	struct ublk_params	params;
+> +
+> +	struct completion	completion;
+> +	unsigned int		nr_queues_ready;
+> +	unsigned int		nr_privileged_daemon;
+> +
+> +	/*
+> +	 * Our ubq->daemon may be killed without any notification, so
+> +	 * monitor each queue's daemon periodically
+> +	 */
+> +	struct delayed_work	monitor_work;
+> +	struct work_struct	quiesce_work;
+> +	struct work_struct	stop_work;
+> +};
+> +
+> +struct ublk_rq_data {
+> +	struct llist_node node;
+> +
+> +	struct kref ref;
+> +};
+> +
+> +struct ublk_io {
+> +	/* userspace buffer address from io cmd */
+> +	__u64 addr;
+> +	unsigned int flags;
+> +	int res;
+> +
+> +	struct io_uring_cmd *cmd;
+> +};
+> +
+> +#endif
 
-Greg KH:
-- fix stable tag
-
-Geert Uytterhoeven:
-- revert changes to commit message since v1
----
- block/partitions/amiga.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index ed222b9c901b..506921095412 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -90,7 +90,7 @@ int amiga_partition(struct parsed_partitions *state)
- 	}
- 	blk = be32_to_cpu(rdb->rdb_PartitionList);
- 	put_dev_sector(sect);
--	for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
-+	for (part = 1; (s32) blk>0 && part<=16; part++, put_dev_sector(sect)) {
- 		/* Read in terms partition table understands */
- 		if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
- 			pr_err("Dev %s: overflow calculating partition block %llu! Skipping partitions %u and beyond\n",
 -- 
-2.17.1
+Damien Le Moal
+Western Digital Research
 
