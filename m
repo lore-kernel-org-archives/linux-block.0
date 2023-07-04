@@ -2,214 +2,167 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8059DC001E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC04C001DD
 	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:24:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231708AbjGDMYG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 08:24:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39696 "EHLO
+        id S231703AbjGDMYF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 08:24:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231604AbjGDMXN (ORCPT
+        with ESMTP id S231610AbjGDMXN (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:23:13 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D048610DD;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D196410E6;
         Tue,  4 Jul 2023 05:22:38 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 95DEC22875;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 6C71B22874;
         Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1688473346; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CdDrcKTX1r0da/kayrewGT9e3N52Cmm0e41Srkqqemc=;
-        b=ThiS9A/HP6MWFP+C52woq0HT4zB5SHX+jgzHTz2kQHALt0WBe83hFHHzXeW1lGA0a7AQsW
-        zEa+xY5xmtRxrz98nSS1WY/HrNxaBVs5b8to+7nDaCoa5xigGvwe2kELnU9kbtg+MPXra/
-        CeJ5VK06bMMkI4EnFQPKJHU6sdHhs4M=
+        bh=7i8k/5CibSjZ95U3jjtcJsDG4sP3stLS7hsXkBeDpTs=;
+        b=LcIkvCW/U1My5T0vHR8bW5cU/Ne0CsdqMTg8sRu+qy9YQLDzZV/jDsEk57bU7gl+5twFX7
+        nuvll5EDauOPCYKDe8GwnU3bJ3fOVByjkVmnVKcnJEzMDK0cjoi7STdwQLFqH0WydgW1Gj
+        YoXGFDZGpwomW4bW1M3YX6l6SyutujM=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1688473346;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CdDrcKTX1r0da/kayrewGT9e3N52Cmm0e41Srkqqemc=;
-        b=FcgWewcMkfBYa6nos4baYasis0pF4i9iGwZQzd28/0MDBovjIEjTLSMgGjs2V6iZKZRVb0
-        GBG/iB73BjmQO7Aw==
+        bh=7i8k/5CibSjZ95U3jjtcJsDG4sP3stLS7hsXkBeDpTs=;
+        b=HPXHG/JNsoM0EL1ZTFI9BgL6HEOgBYDRTuikCzdUBVSQNxLkgBQa/sBvrsQwbTUnvOlokB
+        nqyr4JcPLiSVi6Dg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8110E1346D;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5EDE11346D;
         Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id DAqTHwIPpGRWMAAAMHmgww
+        id 0/clFwIPpGRKMAAAMHmgww
         (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:26 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 3129CA0789; Tue,  4 Jul 2023 14:22:25 +0200 (CEST)
+        id 1F560A0780; Tue,  4 Jul 2023 14:22:25 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net
-Subject: [PATCH 25/32] jfs: Convert to blkdev_get_handle_by_dev()
-Date:   Tue,  4 Jul 2023 14:21:52 +0200
-Message-Id: <20230704122224.16257-25-jack@suse.cz>
+        Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+        linux-erofs@lists.ozlabs.org
+Subject: [PATCH 22/32] erofs: Convert to use blkdev_get_handle_by_path()
+Date:   Tue,  4 Jul 2023 14:21:49 +0200
+Message-Id: <20230704122224.16257-22-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4906; i=jack@suse.cz; h=from:subject; bh=0cqXo6k1vFQ75NrH6vBJiw/wCaNI5jCy+yxbBHYQjDY=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7gcoqjhgGqh2w7kel9LmNCCoABXJjHUJIhGm/s 8nijY5WJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO4AAKCRCcnaoHP2RA2f7WB/ 9cXz+1VF2Xh1+rD7YPNWB9XuYfTKrs/KNbdv1JVAjCm6upy+uvLsTEIekCWkqFl+PVuH5WqYe1JCyp RvBPyQfOomfVnMKQlseRvEsRyUt2uFKSJ2idkmqozBXXX9MPixKsmNnQ4Rl7Jw1Lt1icvww1+affC7 k8Zyyw+lAjfpT6YHLuakXi4Y/7Dq1a/uUp4weWgmYbNJoC2XkoEJRqlr8QUYuCza/Zf/xq7PBRRq5A OhH4EQJ7PSHNmmal6idxELpsWOueHk7ohiSSsFhLb4Du3vAtnqT3Mg+9ZAK5JPRu1qxKLQvkOXuOas MEMszWaXHGS7DwP8fM8EG+oqGqIp8x
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3316; i=jack@suse.cz; h=from:subject; bh=L3+APebG1bJulJB7poCZtzBNMfx805/C7kKAmw0mQSI=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7damkIliALyswruev6W+uzuF/QlirIJYUNZux0 SqpwCbaJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO3QAKCRCcnaoHP2RA2UOQCA DKcpVYIHX0lIXLo8fkBfJcHyEpkMxTvhw4ENyR9TF4Eno16UzDwEzk1GjAGH2UPGSb+gqvnWThV5Ur 1J/6MLYlKWlpHsd1FYXTI6Lzog/A3GSE+nxuNQiEz8dIYaZJDIzYRIYx7KjNdEoZK9nc2iZJUTvePL 7Jb2Ekr+3ey8J8YOY/dvjq6sZ3rG93Fo7a+jGzuWE55Obm3KPN3uEWm0Awc6Ghg7+m647BeXvjoPqx MB9BLQF6vwIO4qNh8BOrtmdI8j4P/UkoRFs8NmK0d3iDx/TE5P5LvGkX4NocPUkEkjwAG2iQlPiilt AgFWxUgonHGpeHgnNpaCMkXjKal8KK
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert jfs to use blkdev_get_handle_by_dev() and pass the handle
+Convert erofs to use blkdev_get_handle_by_path() and pass the handle
 around.
 
-CC: Dave Kleikamp <shaggy@kernel.org>
-CC: jfs-discussion@lists.sourceforge.net
+CC: Gao Xiang <xiang@kernel.org>
+CC: Chao Yu <chao@kernel.org>
+CC: linux-erofs@lists.ozlabs.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/jfs/jfs_logmgr.c | 29 +++++++++++++++--------------
- fs/jfs/jfs_logmgr.h |  2 +-
- fs/jfs/jfs_mount.c  |  3 ++-
- 3 files changed, 18 insertions(+), 16 deletions(-)
+ fs/erofs/data.c     |  4 ++--
+ fs/erofs/internal.h |  2 +-
+ fs/erofs/super.c    | 20 ++++++++++----------
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
-index e855b8fde76c..9d06323261e6 100644
---- a/fs/jfs/jfs_logmgr.c
-+++ b/fs/jfs/jfs_logmgr.c
-@@ -1058,7 +1058,7 @@ void jfs_syncpt(struct jfs_log *log, int hard_sync)
- int lmLogOpen(struct super_block *sb)
- {
- 	int rc;
+diff --git a/fs/erofs/data.c b/fs/erofs/data.c
+index db5e4b7636ec..1fa60cfff267 100644
+--- a/fs/erofs/data.c
++++ b/fs/erofs/data.c
+@@ -222,7 +222,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
+ 			up_read(&devs->rwsem);
+ 			return 0;
+ 		}
+-		map->m_bdev = dif->bdev;
++		map->m_bdev = dif->bdev_handle->bdev;
+ 		map->m_daxdev = dif->dax_dev;
+ 		map->m_dax_part_off = dif->dax_part_off;
+ 		map->m_fscache = dif->fscache;
+@@ -240,7 +240,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
+ 			if (map->m_pa >= startoff &&
+ 			    map->m_pa < startoff + length) {
+ 				map->m_pa -= startoff;
+-				map->m_bdev = dif->bdev;
++				map->m_bdev = dif->bdev_handle->bdev;
+ 				map->m_daxdev = dif->dax_dev;
+ 				map->m_dax_part_off = dif->dax_part_off;
+ 				map->m_fscache = dif->fscache;
+diff --git a/fs/erofs/internal.h b/fs/erofs/internal.h
+index 36e32fa542f0..fabd3bb0c194 100644
+--- a/fs/erofs/internal.h
++++ b/fs/erofs/internal.h
+@@ -47,7 +47,7 @@ typedef u32 erofs_blk_t;
+ struct erofs_device_info {
+ 	char *path;
+ 	struct erofs_fscache *fscache;
 -	struct block_device *bdev;
 +	struct bdev_handle *bdev_handle;
- 	struct jfs_log *log;
- 	struct jfs_sb_info *sbi = JFS_SBI(sb);
+ 	struct dax_device *dax_dev;
+ 	u64 dax_part_off;
  
-@@ -1070,7 +1070,7 @@ int lmLogOpen(struct super_block *sb)
+diff --git a/fs/erofs/super.c b/fs/erofs/super.c
+index 9d6a3c6158bd..a4742cc05f95 100644
+--- a/fs/erofs/super.c
++++ b/fs/erofs/super.c
+@@ -230,7 +230,7 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
+ 	struct erofs_sb_info *sbi = EROFS_SB(sb);
+ 	struct erofs_fscache *fscache;
+ 	struct erofs_deviceslot *dis;
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	void *ptr;
  
- 	mutex_lock(&jfs_log_mutex);
- 	list_for_each_entry(log, &jfs_external_logs, journal_list) {
--		if (log->bdev->bd_dev == sbi->logdev) {
-+		if (log->bdev_handle->bdev->bd_dev == sbi->logdev) {
- 			if (!uuid_equal(&log->uuid, &sbi->loguuid)) {
- 				jfs_warn("wrong uuid on JFS journal");
- 				mutex_unlock(&jfs_log_mutex);
-@@ -1100,14 +1100,14 @@ int lmLogOpen(struct super_block *sb)
- 	 * file systems to log may have n-to-1 relationship;
- 	 */
- 
--	bdev = blkdev_get_by_dev(sbi->logdev, BLK_OPEN_READ | BLK_OPEN_WRITE,
--				 log, NULL);
--	if (IS_ERR(bdev)) {
--		rc = PTR_ERR(bdev);
-+	bdev_handle = blkdev_get_handle_by_dev(sbi->logdev,
-+			BLK_OPEN_READ | BLK_OPEN_WRITE, log, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		rc = PTR_ERR(bdev_handle);
- 		goto free;
+ 	ptr = erofs_read_metabuf(buf, sb, erofs_blknr(sb, *pos), EROFS_KMAP);
+@@ -254,13 +254,13 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
+ 			return PTR_ERR(fscache);
+ 		dif->fscache = fscache;
+ 	} else if (!sbi->devs->flatdev) {
+-		bdev = blkdev_get_by_path(dif->path, BLK_OPEN_READ, sb->s_type,
+-					  NULL);
+-		if (IS_ERR(bdev))
+-			return PTR_ERR(bdev);
+-		dif->bdev = bdev;
+-		dif->dax_dev = fs_dax_get_by_bdev(bdev, &dif->dax_part_off,
+-						  NULL, NULL);
++		bdev_handle = blkdev_get_handle_by_path(dif->path,
++				BLK_OPEN_READ, sb->s_type, NULL);
++		if (IS_ERR(bdev_handle))
++			return PTR_ERR(bdev_handle);
++		dif->bdev_handle = bdev_handle;
++		dif->dax_dev = fs_dax_get_by_bdev(bdev_handle->bdev,
++				&dif->dax_part_off, NULL, NULL);
  	}
  
--	log->bdev = bdev;
-+	log->bdev_handle = bdev_handle;
- 	uuid_copy(&log->uuid, &sbi->loguuid);
+ 	dif->blocks = le32_to_cpu(dis->blocks);
+@@ -815,8 +815,8 @@ static int erofs_release_device_info(int id, void *ptr, void *data)
+ 	struct erofs_device_info *dif = ptr;
  
- 	/*
-@@ -1141,7 +1141,7 @@ int lmLogOpen(struct super_block *sb)
- 	lbmLogShutdown(log);
- 
-       close:		/* close external log device */
--	blkdev_put(bdev, log);
-+	blkdev_handle_put(bdev_handle);
- 
-       free:		/* free log descriptor */
- 	mutex_unlock(&jfs_log_mutex);
-@@ -1162,7 +1162,7 @@ static int open_inline_log(struct super_block *sb)
- 	init_waitqueue_head(&log->syncwait);
- 
- 	set_bit(log_INLINELOG, &log->flag);
--	log->bdev = sb->s_bdev;
-+	log->bdev_handle = sb->s_bdev_handle;
- 	log->base = addressPXD(&JFS_SBI(sb)->logpxd);
- 	log->size = lengthPXD(&JFS_SBI(sb)->logpxd) >>
- 	    (L2LOGPSIZE - sb->s_blocksize_bits);
-@@ -1436,7 +1436,7 @@ int lmLogClose(struct super_block *sb)
- {
- 	struct jfs_sb_info *sbi = JFS_SBI(sb);
- 	struct jfs_log *log = sbi->log;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	int rc = 0;
- 
- 	jfs_info("lmLogClose: log:0x%p", log);
-@@ -1482,10 +1482,10 @@ int lmLogClose(struct super_block *sb)
- 	 *	external log as separate logical volume
- 	 */
- 	list_del(&log->journal_list);
--	bdev = log->bdev;
-+	bdev_handle = log->bdev_handle;
- 	rc = lmLogShutdown(log);
- 
--	blkdev_put(bdev, log);
-+	blkdev_handle_put(bdev_handle);
- 
- 	kfree(log);
- 
-@@ -1972,7 +1972,7 @@ static int lbmRead(struct jfs_log * log, int pn, struct lbuf ** bpp)
- 
- 	bp->l_flag |= lbmREAD;
- 
--	bio = bio_alloc(log->bdev, 1, REQ_OP_READ, GFP_NOFS);
-+	bio = bio_alloc(log->bdev_handle->bdev, 1, REQ_OP_READ, GFP_NOFS);
- 	bio->bi_iter.bi_sector = bp->l_blkno << (log->l2bsize - 9);
- 	__bio_add_page(bio, bp->l_page, LOGPSIZE, bp->l_offset);
- 	BUG_ON(bio->bi_iter.bi_size != LOGPSIZE);
-@@ -2113,7 +2113,8 @@ static void lbmStartIO(struct lbuf * bp)
- 
- 	jfs_info("lbmStartIO");
- 
--	bio = bio_alloc(log->bdev, 1, REQ_OP_WRITE | REQ_SYNC, GFP_NOFS);
-+	bio = bio_alloc(log->bdev_handle->bdev, 1, REQ_OP_WRITE | REQ_SYNC,
-+			GFP_NOFS);
- 	bio->bi_iter.bi_sector = bp->l_blkno << (log->l2bsize - 9);
- 	__bio_add_page(bio, bp->l_page, LOGPSIZE, bp->l_offset);
- 	BUG_ON(bio->bi_iter.bi_size != LOGPSIZE);
-diff --git a/fs/jfs/jfs_logmgr.h b/fs/jfs/jfs_logmgr.h
-index 805877ce5020..84aa2d253907 100644
---- a/fs/jfs/jfs_logmgr.h
-+++ b/fs/jfs/jfs_logmgr.h
-@@ -356,7 +356,7 @@ struct jfs_log {
- 				 *    before writing syncpt.
- 				 */
- 	struct list_head journal_list; /* Global list */
--	struct block_device *bdev; /* 4: log lv pointer */
-+	struct bdev_handle *bdev_handle; /* 4: log lv pointer */
- 	int serial;		/* 4: log mount serial number */
- 
- 	s64 base;		/* @8: log extent address (inline log ) */
-diff --git a/fs/jfs/jfs_mount.c b/fs/jfs/jfs_mount.c
-index b83aae56a1f2..415eb65a36ff 100644
---- a/fs/jfs/jfs_mount.c
-+++ b/fs/jfs/jfs_mount.c
-@@ -430,7 +430,8 @@ int updateSuper(struct super_block *sb, uint state)
- 
- 	if (state == FM_MOUNT) {
- 		/* record log's dev_t and mount serial number */
--		j_sb->s_logdev = cpu_to_le32(new_encode_dev(sbi->log->bdev->bd_dev));
-+		j_sb->s_logdev = cpu_to_le32(
-+			new_encode_dev(sbi->log->bdev_handle->bdev->bd_dev));
- 		j_sb->s_logserial = cpu_to_le32(sbi->log->serial);
- 	} else if (state == FM_CLEAN) {
- 		/*
+ 	fs_put_dax(dif->dax_dev, NULL);
+-	if (dif->bdev)
+-		blkdev_put(dif->bdev, &erofs_fs_type);
++	if (dif->bdev_handle)
++		blkdev_handle_put(dif->bdev_handle);
+ 	erofs_fscache_unregister_cookie(dif->fscache);
+ 	dif->fscache = NULL;
+ 	kfree(dif->path);
 -- 
 2.35.3
 
