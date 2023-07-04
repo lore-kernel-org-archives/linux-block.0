@@ -2,245 +2,240 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE6BAEB64DD
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F33EB64DA
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:23:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231743AbjGDMXP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 08:23:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39214 "EHLO
+        id S231753AbjGDMXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 08:23:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231618AbjGDMWk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:40 -0400
+        with ESMTP id S231511AbjGDMWl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:41 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7646510D2;
-        Tue,  4 Jul 2023 05:22:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CC2F10D9;
+        Tue,  4 Jul 2023 05:22:35 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id EDF9520566;
-        Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 4140C20567;
+        Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1688473345; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1688473346; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Zf0t2U1lixxVR3sFXqYsJAsTJy40h/GqmQEL+fCE6T8=;
-        b=kvQ38sPO6twM/54HPO8zalsWpgihqedI3lKAAqZYa6hQLCx7KB3H1Mbv8UxkmMwyGAkj/7
-        GkxLuRvssjR5WC35XnSMYJQQUHkR/Y6/+Yx3z45A+Wspxd6kV+4SKcI5Mgtm5APbCswcFc
-        Za+ElTpFuLSs6uFZK3XL3jIg1LHOBk4=
+        bh=Sv6zbBELQNdBo4LWXFyltsCcFrQxbmkTmOjmsQTGqoo=;
+        b=wNxO136vMN5h6P1TOfBUcK/Wq5A9vQIDSWiZKk9Oyyeou8ng+7m4zjV+Mlx8AttK1QDTc6
+        SX7b1KvQAknDbyhlmzkS9L4zX9woHEbBLbaOVs2KljjNERJzG8kkIz2uCRmiLmA6QyV3zk
+        bFJecRtFkN2Iecs9yasuL3IQ7Hpe/7s=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1688473345;
+        s=susede2_ed25519; t=1688473346;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Zf0t2U1lixxVR3sFXqYsJAsTJy40h/GqmQEL+fCE6T8=;
-        b=X5oW4bimh9K7qKyqa2rEbGrAaQURth5RwD8yEIKe7ADzPW8133Y+gYtWSh4osoo5n/FzBI
-        yjyvwxSt4J4Tg6Dw==
+        bh=Sv6zbBELQNdBo4LWXFyltsCcFrQxbmkTmOjmsQTGqoo=;
+        b=BjCS1L+sc54JD5m6ts19mjjoSvkexXFp/mnqw3m61e0rWAk6k/U5iGVXZCm8NUl9phPwra
+        L/3jvwdafzP/RXBw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D83071346D;
-        Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2FE661346D;
+        Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id R6TDNAEPpGQtMAAAMHmgww
-        (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:25 +0000
+        id IQWtCwIPpGQ6MAAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:26 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id DCF14A0770; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
+        id E821EA0774; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Joern Engel <joern@lazybastard.org>,
-        linux-mtd@lists.infradead.org
-Subject: [PATCH 13/32] mtd: block2mtd: Convert to blkdev_get_handle_by_dev/path()
-Date:   Tue,  4 Jul 2023 14:21:40 +0200
-Message-Id: <20230704122224.16257-13-jack@suse.cz>
+        linux-s390@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: [PATCH 15/32] s390/dasd: Convert to blkdev_get_handle_by_path()
+Date:   Tue,  4 Jul 2023 14:21:42 +0200
+Message-Id: <20230704122224.16257-15-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6135; i=jack@suse.cz; h=from:subject; bh=VqUKIGW4i8LFDfj0Ruo3n+bYqi4b5VlC+lPPaHoQKks=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7V3Bw42VfXTVkK81xoE+wLKtoS5UBEfAmYhN/q 5KfbzRqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO1QAKCRCcnaoHP2RA2T7cB/ wNLHUQpFVpvehIktHP0p3GG4Mp3NKC5rR6yVbxp4gRHqcR2N87oUcWO1IOGw5snBMRIiTayPBrI0Lt 7V/tG+zL6iqL2g6G19eTOWvuXISLANcpEan8BvfmaKED85IKOqGTJkO7iviFVfBV2NeJNg7B/ed1Dg 2BOIks6HyEsNGrYDIWWP8sBV6I/D/0yex10tR1rpOodAypymXIkqHT4zgV3jxduV4QSKQH6H/BOx6g d2QphF/QAn+mQBrwiXrfS9XjrZR504QrD6t+Ug7Reft055nwKCI+7t8qwKLyalz81NRuVjmkUztttm bS9VxRqHnOY/1a6iEBAEF6fm8WDgXv
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6108; i=jack@suse.cz; h=from:subject; bh=NBDkzEoul8WWwq8hJesDDPRwVqLkL/nBohAK9k5HjE4=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7XD0swbhIQYEbA5f1M/fHIud1VZj7p+sQqq4RU tc2/xjiJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO1wAKCRCcnaoHP2RA2UjFB/ 40txPIFSoGJmutaVWyd8vT8I45yJe6Sjq5l8XSLfM+gPvzzmqYtBHg7NmQFrMEaZs0Ke8ApH8FtC0y i4TlM1ol63jJwOr6Sv0sFAdvMIL13+HiPUXsZiDh5HMHuT3NVsmvnV+1zh/qcQmUXiEZ4rs5waymaS yMs1YsKhWlvRYCs3Cu4CB241WDWmA4WCIDpDVDJt7o3u3/HziKiHHp0y46btGF6lT4n3bRXtsRrrzO EUUV5tX6i95RbcjgOrvYx+t6B2QqepHFEeaYjXJobgZ3uDTYW653mEcJvRtFeqrAL+9ey60iQxFzsk Sj8hnUDx9vjJlXonQgLcaBFbJC+Na/
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert block2mtd to use blkdev_get_handle_by_dev() and
-blkdev_get_handle_by_path() and pass the handle around.
+Convert dasd to use blkdev_get_handle_by_path() and pass the handle
+around.
 
-CC: Joern Engel <joern@lazybastard.org>
-CC: linux-mtd@lists.infradead.org
+CC: linux-s390@vger.kernel.org
+CC: Christian Borntraeger <borntraeger@linux.ibm.com>
+CC: Sven Schnelle <svens@linux.ibm.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/mtd/devices/block2mtd.c | 52 +++++++++++++++++++--------------
- 1 file changed, 30 insertions(+), 22 deletions(-)
+ drivers/s390/block/dasd.c       | 12 +++++----
+ drivers/s390/block/dasd_genhd.c | 45 ++++++++++++++++-----------------
+ drivers/s390/block/dasd_int.h   |  2 +-
+ drivers/s390/block/dasd_ioctl.c |  2 +-
+ 4 files changed, 31 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/mtd/devices/block2mtd.c b/drivers/mtd/devices/block2mtd.c
-index be106dc20ff3..1614459297d2 100644
---- a/drivers/mtd/devices/block2mtd.c
-+++ b/drivers/mtd/devices/block2mtd.c
-@@ -37,7 +37,7 @@
- /* Info for the block device */
- struct block2mtd_dev {
- 	struct list_head list;
--	struct block_device *blkdev;
-+	struct bdev_handle *bdev_handle;
- 	struct mtd_info mtd;
- 	struct mutex write_mutex;
- };
-@@ -55,7 +55,8 @@ static struct page *page_read(struct address_space *mapping, pgoff_t index)
- /* erase a specified part of the device */
- static int _block2mtd_erase(struct block2mtd_dev *dev, loff_t to, size_t len)
- {
--	struct address_space *mapping = dev->blkdev->bd_inode->i_mapping;
-+	struct address_space *mapping =
-+				dev->bdev_handle->bdev->bd_inode->i_mapping;
- 	struct page *page;
- 	pgoff_t index = to >> PAGE_SHIFT;	// page index
- 	int pages = len >> PAGE_SHIFT;
-@@ -105,6 +106,8 @@ static int block2mtd_read(struct mtd_info *mtd, loff_t from, size_t len,
- 		size_t *retlen, u_char *buf)
- {
- 	struct block2mtd_dev *dev = mtd->priv;
-+	struct address_space *mapping =
-+				dev->bdev_handle->bdev->bd_inode->i_mapping;
- 	struct page *page;
- 	pgoff_t index = from >> PAGE_SHIFT;
- 	int offset = from & (PAGE_SIZE-1);
-@@ -117,7 +120,7 @@ static int block2mtd_read(struct mtd_info *mtd, loff_t from, size_t len,
- 			cpylen = len;	// this page
- 		len = len - cpylen;
+diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+index edcbf77852c3..bd46d37a7c92 100644
+--- a/drivers/s390/block/dasd.c
++++ b/drivers/s390/block/dasd.c
+@@ -412,7 +412,8 @@ dasd_state_ready_to_online(struct dasd_device * device)
+ 					KOBJ_CHANGE);
+ 			return 0;
+ 		}
+-		disk_uevent(device->block->bdev->bd_disk, KOBJ_CHANGE);
++		disk_uevent(device->block->bdev_handle->bdev->bd_disk,
++			    KOBJ_CHANGE);
+ 	}
+ 	return 0;
+ }
+@@ -432,7 +433,8 @@ static int dasd_state_online_to_ready(struct dasd_device *device)
  
--		page = page_read(dev->blkdev->bd_inode->i_mapping, index);
-+		page = page_read(mapping, index);
- 		if (IS_ERR(page))
- 			return PTR_ERR(page);
- 
-@@ -139,7 +142,8 @@ static int _block2mtd_write(struct block2mtd_dev *dev, const u_char *buf,
- 		loff_t to, size_t len, size_t *retlen)
- {
- 	struct page *page;
--	struct address_space *mapping = dev->blkdev->bd_inode->i_mapping;
-+	struct address_space *mapping =
-+				dev->bdev_handle->bdev->bd_inode->i_mapping;
- 	pgoff_t index = to >> PAGE_SHIFT;	// page index
- 	int offset = to & ~PAGE_MASK;	// page offset
- 	int cpylen;
-@@ -194,7 +198,7 @@ static int block2mtd_write(struct mtd_info *mtd, loff_t to, size_t len,
- static void block2mtd_sync(struct mtd_info *mtd)
- {
- 	struct block2mtd_dev *dev = mtd->priv;
--	sync_blockdev(dev->blkdev);
-+	sync_blockdev(dev->bdev_handle->bdev);
- 	return;
+ 	device->state = DASD_STATE_READY;
+ 	if (device->block && !(device->features & DASD_FEATURE_USERAW))
+-		disk_uevent(device->block->bdev->bd_disk, KOBJ_CHANGE);
++		disk_uevent(device->block->bdev_handle->bdev->bd_disk,
++			    KOBJ_CHANGE);
+ 	return 0;
  }
  
-@@ -206,10 +210,10 @@ static void block2mtd_free_device(struct block2mtd_dev *dev)
+@@ -3580,7 +3582,7 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
+ 	 * in the other openers.
+ 	 */
+ 	if (device->block) {
+-		max_count = device->block->bdev ? 0 : -1;
++		max_count = device->block->bdev_handle ? 0 : -1;
+ 		open_count = atomic_read(&device->block->open_count);
+ 		if (open_count > max_count) {
+ 			if (open_count > 0)
+@@ -3626,8 +3628,8 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
+ 		 * so sync bdev first and then wait for our queues to become
+ 		 * empty
+ 		 */
+-		if (device->block) {
+-			rc = fsync_bdev(device->block->bdev);
++		if (device->block && device->block->bdev_handle) {
++			rc = fsync_bdev(device->block->bdev_handle->bdev);
+ 			if (rc != 0)
+ 				goto interrupted;
+ 		}
+diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
+index fe5108a1b332..1c22a5ee2ce7 100644
+--- a/drivers/s390/block/dasd_genhd.c
++++ b/drivers/s390/block/dasd_genhd.c
+@@ -127,15 +127,15 @@ void dasd_gendisk_free(struct dasd_block *block)
+  */
+ int dasd_scan_partitions(struct dasd_block *block)
+ {
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	int rc;
  
- 	kfree(dev->mtd.name);
- 
--	if (dev->blkdev) {
--		invalidate_mapping_pages(dev->blkdev->bd_inode->i_mapping,
--					0, -1);
--		blkdev_put(dev->blkdev, NULL);
-+	if (dev->bdev_handle) {
-+		invalidate_mapping_pages(
-+			dev->bdev_handle->bdev->bd_inode->i_mapping, 0, -1);
-+		blkdev_handle_put(dev->bdev_handle);
+-	bdev = blkdev_get_by_dev(disk_devt(block->gdp), BLK_OPEN_READ, NULL,
+-				 NULL);
+-	if (IS_ERR(bdev)) {
++	bdev_handle = blkdev_get_handle_by_dev(disk_devt(block->gdp),
++				BLK_OPEN_READ, NULL, NULL);
++	if (IS_ERR(bdev_handle)) {
+ 		DBF_DEV_EVENT(DBF_ERR, block->base,
+ 			      "scan partitions error, blkdev_get returned %ld",
+-			      PTR_ERR(bdev));
++			      PTR_ERR(bdev_handle));
+ 		return -ENODEV;
  	}
  
- 	kfree(dev);
-@@ -219,10 +223,10 @@ static void block2mtd_free_device(struct block2mtd_dev *dev)
-  * This function is marked __ref because it calls the __init marked
-  * early_lookup_bdev when called from the early boot code.
-  */
--static struct block_device __ref *mdtblock_early_get_bdev(const char *devname,
-+static struct bdev_handle __ref *mdtblock_early_get_bdev(const char *devname,
- 		blk_mode_t mode, int timeout, struct block2mtd_dev *dev)
- {
--	struct block_device *bdev = ERR_PTR(-ENODEV);
-+	struct bdev_handle *bdev_handle = ERR_PTR(-ENODEV);
- #ifndef MODULE
- 	int i;
- 
-@@ -230,7 +234,7 @@ static struct block_device __ref *mdtblock_early_get_bdev(const char *devname,
- 	 * We can't use early_lookup_bdev from a running system.
- 	 */
- 	if (system_state >= SYSTEM_RUNNING)
--		return bdev;
-+		return bdev_handle;
+@@ -147,16 +147,15 @@ int dasd_scan_partitions(struct dasd_block *block)
+ 				"scan partitions error, rc %d", rc);
  
  	/*
- 	 * We might not have the root device mounted at this point.
-@@ -249,19 +253,21 @@ static struct block_device __ref *mdtblock_early_get_bdev(const char *devname,
- 		wait_for_device_probe();
- 
- 		if (!early_lookup_bdev(devname, &devt)) {
--			bdev = blkdev_get_by_dev(devt, mode, dev, NULL);
--			if (!IS_ERR(bdev))
-+			bdev_handle = blkdev_get_handle_by_dev(devt, mode, dev,
-+							       NULL);
-+			if (!IS_ERR(bdev_handle))
- 				break;
- 		}
- 	}
- #endif
--	return bdev;
-+	return bdev_handle;
+-	 * Since the matching blkdev_put call to the blkdev_get in
+-	 * this function is not called before dasd_destroy_partitions
+-	 * the offline open_count limit needs to be increased from
+-	 * 0 to 1. This is done by setting device->bdev (see
+-	 * dasd_generic_set_offline). As long as the partition
+-	 * detection is running no offline should be allowed. That
+-	 * is why the assignment to device->bdev is done AFTER
+-	 * the BLKRRPART ioctl.
++	 * Since the matching blkdev_handle_put() call to the
++	 * blkdev_get_handle_by_path() in this function is not called before
++	 * dasd_destroy_partitions the offline open_count limit needs to be
++	 * increased from 0 to 1. This is done by setting device->bdev_handle
++	 * (see dasd_generic_set_offline). As long as the partition detection
++	 * is running no offline should be allowed. That is why the assignment
++	 * to block->bdev_handle is done AFTER the BLKRRPART ioctl.
+ 	 */
+-	block->bdev = bdev;
++	block->bdev_handle = bdev_handle;
+ 	return 0;
  }
  
- static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 		char *label, int timeout)
+@@ -166,21 +165,21 @@ int dasd_scan_partitions(struct dasd_block *block)
+  */
+ void dasd_destroy_partitions(struct dasd_block *block)
  {
- 	const blk_mode_t mode = BLK_OPEN_READ | BLK_OPEN_WRITE;
+-	struct block_device *bdev;
 +	struct bdev_handle *bdev_handle;
- 	struct block_device *bdev;
- 	struct block2mtd_dev *dev;
- 	char *name;
-@@ -274,21 +280,23 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
- 		return NULL;
  
- 	/* Get a handle on the device */
--	bdev = blkdev_get_by_path(devname, mode, dev, NULL);
--	if (IS_ERR(bdev))
--		bdev = mdtblock_early_get_bdev(devname, mode, timeout, dev);
--	if (IS_ERR(bdev)) {
-+	bdev_handle = blkdev_get_handle_by_path(devname, mode, dev, NULL);
-+	if (IS_ERR(bdev_handle))
-+		bdev_handle = mdtblock_early_get_bdev(devname, mode, timeout,
-+						      dev);
-+	if (IS_ERR(bdev_handle)) {
- 		pr_err("error: cannot open device %s\n", devname);
- 		goto err_free_block2mtd;
- 	}
--	dev->blkdev = bdev;
-+	dev->bdev_handle = bdev_handle;
-+	bdev = bdev_handle->bdev;
+ 	/*
+-	 * Get the bdev pointer from the device structure and clear
+-	 * device->bdev to lower the offline open_count limit again.
++	 * Get the bdev_handle pointer from the device structure and clear
++	 * device->bdev_handle to lower the offline open_count limit again.
+ 	 */
+-	bdev = block->bdev;
+-	block->bdev = NULL;
++	bdev_handle = block->bdev_handle;
++	block->bdev_handle = NULL;
  
- 	if (MAJOR(bdev->bd_dev) == MTD_BLOCK_MAJOR) {
- 		pr_err("attempting to use an MTD device as a block device\n");
- 		goto err_free_block2mtd;
- 	}
+-	mutex_lock(&bdev->bd_disk->open_mutex);
+-	bdev_disk_changed(bdev->bd_disk, true);
+-	mutex_unlock(&bdev->bd_disk->open_mutex);
++	mutex_lock(&bdev_handle->bdev->bd_disk->open_mutex);
++	bdev_disk_changed(bdev_handle->bdev->bd_disk, true);
++	mutex_unlock(&bdev_handle->bdev->bd_disk->open_mutex);
  
--	if ((long)dev->blkdev->bd_inode->i_size % erase_size) {
-+	if ((long)bdev->bd_inode->i_size % erase_size) {
- 		pr_err("erasesize must be a divisor of device size\n");
- 		goto err_free_block2mtd;
- 	}
-@@ -306,7 +314,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
+ 	/* Matching blkdev_put to the blkdev_get in dasd_scan_partitions. */
+-	blkdev_put(bdev, NULL);
++	blkdev_handle_put(bdev_handle);
+ }
  
- 	dev->mtd.name = name;
+ int dasd_gendisk_init(void)
+diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
+index 0aa56351da72..73c5eb0ae6ad 100644
+--- a/drivers/s390/block/dasd_int.h
++++ b/drivers/s390/block/dasd_int.h
+@@ -646,7 +646,7 @@ struct dasd_block {
+ 	struct gendisk *gdp;
+ 	spinlock_t request_queue_lock;
+ 	struct blk_mq_tag_set tag_set;
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	atomic_t open_count;
  
--	dev->mtd.size = dev->blkdev->bd_inode->i_size & PAGE_MASK;
-+	dev->mtd.size = bdev->bd_inode->i_size & PAGE_MASK;
- 	dev->mtd.erasesize = erase_size;
- 	dev->mtd.writesize = 1;
- 	dev->mtd.writebufsize = PAGE_SIZE;
+ 	unsigned long blocks;	   /* size of volume in blocks */
+diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
+index 513a7e6eee63..2657508349f6 100644
+--- a/drivers/s390/block/dasd_ioctl.c
++++ b/drivers/s390/block/dasd_ioctl.c
+@@ -536,7 +536,7 @@ static int __dasd_ioctl_information(struct dasd_block *block,
+ 	 * This must be hidden from user-space.
+ 	 */
+ 	dasd_info->open_count = atomic_read(&block->open_count);
+-	if (!block->bdev)
++	if (!block->bdev_handle)
+ 		dasd_info->open_count++;
+ 
+ 	/*
 -- 
 2.35.3
 
