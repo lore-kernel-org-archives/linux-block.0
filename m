@@ -2,272 +2,192 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DF2EB64DD
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39810EB64D9
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:24:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231392AbjGDMYB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 08:24:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39682 "EHLO
+        id S231688AbjGDMYE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 08:24:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231726AbjGDMXM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:23:12 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D39331702;
+        with ESMTP id S231731AbjGDMXN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:23:13 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D30151701;
         Tue,  4 Jul 2023 05:22:37 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 947EA2056D;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5EB1B22872;
         Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1688473346; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LO0lP2OUUVNOfhTTtbTWNONPsnXOsrIJo4pCcH/xHpw=;
-        b=zmk/f/dIbCPSemJJw8yNvAivVf6UnAY9RcXRoR3NV3n51gjFqjbijZ0WyyezkBlTZgRsL8
-        kHdBfpu0FfKN3WGhagL+ypDXPXUmEwpKqeDyVItFLcKgQMoG86zoWhDkxQAyFmHQ79BvMu
-        4KU7u4v8Nw8k0GQ1ilDdx8qhVh0Abks=
+        bh=epv0WU7Q4U27et91WPnFbrKixsesCGX2CbQ3cj/tlUI=;
+        b=ZXP60VJFhu+sbSfRhBfyow89T5mRzJLWGXBe9NFLM35Tuy46y6x0lRUby4XKhuc4XytGDg
+        2tKgg2EClD8twEoIDDdlLIhu0B0JFIQArAfb99N22sjDvrFAfqyPg6qp9N3XFveRoBPA9N
+        gu4FcAME0AZuEYY8ZeSTyOt0Kxunk/E=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1688473346;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LO0lP2OUUVNOfhTTtbTWNONPsnXOsrIJo4pCcH/xHpw=;
-        b=i7OXEYiVNa/UQNd76NJFgYLxHHJ3KF8JTp2k+aQQoUezzQrFbQWPXAApzprfHw+6BQF4xw
-        JStcba+ng5fsBeDQ==
+        bh=epv0WU7Q4U27et91WPnFbrKixsesCGX2CbQ3cj/tlUI=;
+        b=5gm/5xDWhgcbVN8H7dqfNn8C4IUWd7ZVounn7/CM22b8Pkrzw9qPc1wkiSsrHnEcyM3d9q
+        sxGy2hfYoxUZ6HAg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 822EB139ED;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5295213A90;
         Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id /WakHwIPpGRYMAAAMHmgww
+        id CLYyFAIPpGRFMAAAMHmgww
         (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:26 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 36B85A0722; Tue,  4 Jul 2023 14:22:25 +0200 (CEST)
+        id 0631BA077C; Tue,  4 Jul 2023 14:22:25 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-nfs@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>
-Subject: [PATCH 26/32] nfs/blocklayout: Convert to use blkdev_get_handle_by_dev/path()
-Date:   Tue,  4 Jul 2023 14:21:53 +0200
-Message-Id: <20230704122224.16257-26-jack@suse.cz>
+        linux-pm@vger.kernel.org
+Subject: [PATCH 18/32] PM: hibernate: Drop unused snapshot_test argument
+Date:   Tue,  4 Jul 2023 14:21:45 +0200
+Message-Id: <20230704122224.16257-18-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6163; i=jack@suse.cz; h=from:subject; bh=zUXhguxHVGC1JvPvmR9WfKOB14B9sMuWcUHkkxGAfg8=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7hFeLjKXt5Qxa9ph1QDMyPHasyaVa+fYJrIh2e UrgiIhOJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO4QAKCRCcnaoHP2RA2cwjB/ 94WrUoxFkVcvylo0GyfciDsPX0kGz1y2Zos71W+bIRj3yTFCaZX9aNV9S4v89vZYE1Do+C4gPJikM3 DtDznTAM8VQUx9wdFR3SVDxlFWXbMOisjKLZm/5a42xejxgpoUnpYM+MH35x8yCtuS3IMm+sbaw3GB JCEP2XcB+6ptWFQjJ9jL57dUrcAczjXxKDNYboWNk0xM985+icne78TxUAngDautmiC7f6hzLW2x3q hAP87GnePLr0qp3WQBVNttfMRlA9b8XfXTuG5t2YBMUt3u/JiwmNpuXh1TRvHAVZqfPlLXPMZFNoPs KdlV8XC1DuAc/pTB5QP+t5363uv4AN
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3450; i=jack@suse.cz; h=from:subject; bh=C34za05j7L6pDZccfR5nhpDFkY9rraFNuB4k5il1A0Q=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7a2u861YBiFQrIuVeFUr8gaAThZWEBvh68q52Z elKrY3qJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO2gAKCRCcnaoHP2RA2cipCA DoMKrSeK3MaPvj+kMStdT1bAcaDBLlafKLWzIsh/zSwrWvV72yLtNPq5hEoLXplmozwcJLoYRvIFPn 8RH/oJaQLXU28DyR5cfikd9ZRCx3OqWfH/mfr1cTPlcZjJrOE64HVYsHIrejEn7HfKCwRGTcnDOxSy 7Ebp0R9WOzlOJGx5dwAEqwIGqkmqeizUT7GTgqvCBPHRkKZ+2T+NIpebOpl4En3lo9lvHyY9qRr+JD HZ6yOUlgXb3+0ciKxsOPIQkjZbNQLoJpbM7Ca7DFRipbapuHY64oOY7k4jLbkuPNnHbUNiZeIh77SK 61XfGa5LEg/ZIQmjeEaxVLtUUmumOR
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert block device handling to use blkdev_get_handle_by_dev/path() and
-pass the handle around.
+snapshot_test argument is now unused in swsusp_close() and
+load_image_and_restore(). Drop it
 
-CC: linux-nfs@vger.kernel.org
-CC: Trond Myklebust <trond.myklebust@hammerspace.com>
-CC: Anna Schumaker <anna@kernel.org>
+CC: linux-pm@vger.kernel.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/nfs/blocklayout/blocklayout.h |  2 +-
- fs/nfs/blocklayout/dev.c         | 76 ++++++++++++++++----------------
- 2 files changed, 38 insertions(+), 40 deletions(-)
+ kernel/power/hibernate.c | 14 +++++++-------
+ kernel/power/power.h     |  2 +-
+ kernel/power/swap.c      |  6 +++---
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/fs/nfs/blocklayout/blocklayout.h b/fs/nfs/blocklayout/blocklayout.h
-index 716bc75e9ed2..b4294a8aa2d4 100644
---- a/fs/nfs/blocklayout/blocklayout.h
-+++ b/fs/nfs/blocklayout/blocklayout.h
-@@ -108,7 +108,7 @@ struct pnfs_block_dev {
- 	struct pnfs_block_dev		*children;
- 	u64				chunk_size;
- 
--	struct block_device		*bdev;
-+	struct bdev_handle		*bdev_handle;
- 	u64				disk_offset;
- 
- 	u64				pr_key;
-diff --git a/fs/nfs/blocklayout/dev.c b/fs/nfs/blocklayout/dev.c
-index 70f5563a8e81..549de8600beb 100644
---- a/fs/nfs/blocklayout/dev.c
-+++ b/fs/nfs/blocklayout/dev.c
-@@ -25,17 +25,17 @@ bl_free_device(struct pnfs_block_dev *dev)
- 	} else {
- 		if (dev->pr_registered) {
- 			const struct pr_ops *ops =
--				dev->bdev->bd_disk->fops->pr_ops;
-+				dev->bdev_handle->bdev->bd_disk->fops->pr_ops;
- 			int error;
- 
--			error = ops->pr_register(dev->bdev, dev->pr_key, 0,
--				false);
-+			error = ops->pr_register(dev->bdev_handle->bdev,
-+				dev->pr_key, 0, false);
- 			if (error)
- 				pr_err("failed to unregister PR key.\n");
- 		}
- 
--		if (dev->bdev)
--			blkdev_put(dev->bdev, NULL);
-+		if (dev->bdev_handle)
-+			blkdev_handle_put(dev->bdev_handle);
- 	}
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index f62e89d0d906..0cde44a850c7 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -684,7 +684,7 @@ static void power_down(void)
+ 		cpu_relax();
  }
  
-@@ -169,7 +169,7 @@ static bool bl_map_simple(struct pnfs_block_dev *dev, u64 offset,
- 	map->start = dev->start;
- 	map->len = dev->len;
- 	map->disk_offset = dev->disk_offset;
--	map->bdev = dev->bdev;
-+	map->bdev = dev->bdev_handle->bdev;
- 	return true;
- }
- 
-@@ -236,28 +236,26 @@ bl_parse_simple(struct nfs_server *server, struct pnfs_block_dev *d,
- 		struct pnfs_block_volume *volumes, int idx, gfp_t gfp_mask)
+-static int load_image_and_restore(bool snapshot_test)
++static int load_image_and_restore(void)
  {
- 	struct pnfs_block_volume *v = &volumes[idx];
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	dev_t dev;
- 
- 	dev = bl_resolve_deviceid(server, v, gfp_mask);
- 	if (!dev)
- 		return -EIO;
- 
--	bdev = blkdev_get_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_WRITE, NULL,
--				 NULL);
--	if (IS_ERR(bdev)) {
-+	bdev_handle = blkdev_get_handle_by_dev(dev,
-+			BLK_OPEN_READ | BLK_OPEN_WRITE, NULL, NULL);
-+	if (IS_ERR(bdev_handle)) {
- 		printk(KERN_WARNING "pNFS: failed to open device %d:%d (%ld)\n",
--			MAJOR(dev), MINOR(dev), PTR_ERR(bdev));
--		return PTR_ERR(bdev);
-+			MAJOR(dev), MINOR(dev), PTR_ERR(bdev_handle));
-+		return PTR_ERR(bdev_handle);
- 	}
--	d->bdev = bdev;
--
--
--	d->len = bdev_nr_bytes(d->bdev);
-+	d->bdev_handle = bdev_handle;
-+	d->len = bdev_nr_bytes(bdev_handle->bdev);
- 	d->map = bl_map_simple;
- 
- 	printk(KERN_INFO "pNFS: using block device %s\n",
--		d->bdev->bd_disk->disk_name);
-+		bdev_handle->bdev->bd_disk->disk_name);
- 	return 0;
- }
- 
-@@ -302,10 +300,10 @@ bl_validate_designator(struct pnfs_block_volume *v)
- 	}
- }
- 
--static struct block_device *
-+static struct bdev_handle *
- bl_open_path(struct pnfs_block_volume *v, const char *prefix)
- {
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	const char *devname;
- 
- 	devname = kasprintf(GFP_KERNEL, "/dev/disk/by-id/%s%*phN",
-@@ -313,15 +311,15 @@ bl_open_path(struct pnfs_block_volume *v, const char *prefix)
- 	if (!devname)
- 		return ERR_PTR(-ENOMEM);
- 
--	bdev = blkdev_get_by_path(devname, BLK_OPEN_READ | BLK_OPEN_WRITE, NULL,
--				  NULL);
--	if (IS_ERR(bdev)) {
-+	bdev_handle = blkdev_get_handle_by_path(devname,
-+			BLK_OPEN_READ | BLK_OPEN_WRITE, NULL, NULL);
-+	if (IS_ERR(bdev_handle)) {
- 		pr_warn("pNFS: failed to open device %s (%ld)\n",
--			devname, PTR_ERR(bdev));
-+			devname, PTR_ERR(bdev_handle));
- 	}
- 
- 	kfree(devname);
--	return bdev;
-+	return bdev_handle;
- }
- 
- static int
-@@ -329,7 +327,7 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
- 		struct pnfs_block_volume *volumes, int idx, gfp_t gfp_mask)
- {
- 	struct pnfs_block_volume *v = &volumes[idx];
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	const struct pr_ops *ops;
  	int error;
- 
-@@ -342,32 +340,32 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
- 	 * On other distributions like Debian, the default SCSI by-id path will
- 	 * point to the dm-multipath device if one exists.
- 	 */
--	bdev = bl_open_path(v, "dm-uuid-mpath-0x");
--	if (IS_ERR(bdev))
--		bdev = bl_open_path(v, "wwn-0x");
--	if (IS_ERR(bdev))
--		return PTR_ERR(bdev);
--	d->bdev = bdev;
--
--	d->len = bdev_nr_bytes(d->bdev);
-+	bdev_handle = bl_open_path(v, "dm-uuid-mpath-0x");
-+	if (IS_ERR(bdev_handle))
-+		bdev_handle = bl_open_path(v, "wwn-0x");
-+	if (IS_ERR(bdev_handle))
-+		return PTR_ERR(bdev_handle);
-+	d->bdev_handle = bdev_handle;
-+
-+	d->len = bdev_nr_bytes(d->bdev_handle->bdev);
- 	d->map = bl_map_simple;
- 	d->pr_key = v->scsi.pr_key;
- 
- 	pr_info("pNFS: using block device %s (reservation key 0x%llx)\n",
--		d->bdev->bd_disk->disk_name, d->pr_key);
-+		d->bdev_handle->bdev->bd_disk->disk_name, d->pr_key);
- 
--	ops = d->bdev->bd_disk->fops->pr_ops;
-+	ops = d->bdev_handle->bdev->bd_disk->fops->pr_ops;
- 	if (!ops) {
- 		pr_err("pNFS: block device %s does not support reservations.",
--				d->bdev->bd_disk->disk_name);
-+				d->bdev_handle->bdev->bd_disk->disk_name);
- 		error = -EINVAL;
- 		goto out_blkdev_put;
- 	}
- 
--	error = ops->pr_register(d->bdev, 0, d->pr_key, true);
-+	error = ops->pr_register(d->bdev_handle->bdev, 0, d->pr_key, true);
+ 	unsigned int flags;
+@@ -694,12 +694,12 @@ static int load_image_and_restore(bool snapshot_test)
+ 	lock_device_hotplug();
+ 	error = create_basic_memory_bitmaps();
  	if (error) {
- 		pr_err("pNFS: failed to register key for block device %s.",
--				d->bdev->bd_disk->disk_name);
-+				d->bdev_handle->bdev->bd_disk->disk_name);
- 		goto out_blkdev_put;
+-		swsusp_close(snapshot_test);
++		swsusp_close();
+ 		goto Unlock;
  	}
  
-@@ -375,7 +373,7 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
- 	return 0;
+ 	error = swsusp_read(&flags);
+-	swsusp_close(snapshot_test);
++	swsusp_close();
+ 	if (!error)
+ 		error = hibernation_restore(flags & SF_PLATFORM_MODE);
  
- out_blkdev_put:
--	blkdev_put(d->bdev, NULL);
-+	blkdev_handle_put(d->bdev_handle);
+@@ -788,7 +788,7 @@ int hibernate(void)
+ 		pm_pr_dbg("Checking hibernation image\n");
+ 		error = swsusp_check(snapshot_test);
+ 		if (!error)
+-			error = load_image_and_restore(snapshot_test);
++			error = load_image_and_restore();
+ 	}
+ 	thaw_processes();
+ 
+@@ -952,7 +952,7 @@ static int software_resume(void)
+ 	/* The snapshot device should not be opened while we're running */
+ 	if (!hibernate_acquire()) {
+ 		error = -EBUSY;
+-		swsusp_close(false);
++		swsusp_close();
+ 		goto Unlock;
+ 	}
+ 
+@@ -973,7 +973,7 @@ static int software_resume(void)
+ 		goto Close_Finish;
+ 	}
+ 
+-	error = load_image_and_restore(false);
++	error = load_image_and_restore();
+ 	thaw_processes();
+  Finish:
+ 	pm_notifier_call_chain(PM_POST_RESTORE);
+@@ -987,7 +987,7 @@ static int software_resume(void)
+ 	pm_pr_dbg("Hibernation image not present or could not be loaded.\n");
+ 	return error;
+  Close_Finish:
+-	swsusp_close(false);
++	swsusp_close();
+ 	goto Finish;
+ }
+ 
+diff --git a/kernel/power/power.h b/kernel/power/power.h
+index 46eb14dc50c3..bebf049a51c1 100644
+--- a/kernel/power/power.h
++++ b/kernel/power/power.h
+@@ -172,7 +172,7 @@ int swsusp_check(bool snapshot_test);
+ extern void swsusp_free(void);
+ extern int swsusp_read(unsigned int *flags_p);
+ extern int swsusp_write(unsigned int flags);
+-void swsusp_close(bool snapshot_test);
++void swsusp_close(void);
+ #ifdef CONFIG_SUSPEND
+ extern int swsusp_unmark(void);
+ #endif
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index fd90ecf15ee1..9ebac878497f 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -444,7 +444,7 @@ static int get_swap_writer(struct swap_map_handle *handle)
+ err_rel:
+ 	release_swap_writer(handle);
+ err_close:
+-	swsusp_close(false);
++	swsusp_close();
+ 	return ret;
+ }
+ 
+@@ -509,7 +509,7 @@ static int swap_writer_finish(struct swap_map_handle *handle,
+ 	if (error)
+ 		free_all_swap_pages(root_swap);
+ 	release_swap_writer(handle);
+-	swsusp_close(false);
++	swsusp_close();
+ 
  	return error;
  }
+@@ -1567,7 +1567,7 @@ int swsusp_check(bool snapshot_test)
+  *	swsusp_close - close swap device.
+  */
  
+-void swsusp_close(bool snapshot_test)
++void swsusp_close(void)
+ {
+ 	if (IS_ERR(hib_resume_bdev_handle)) {
+ 		pr_debug("Image device not initialised\n");
 -- 
 2.35.3
 
