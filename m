@@ -2,237 +2,160 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26C5C001DB
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6052C3DA43
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:22:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230402AbjGDMWn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 08:22:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39110 "EHLO
+        id S231548AbjGDMWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 08:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231548AbjGDMWf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:35 -0400
+        with ESMTP id S231550AbjGDMWg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:36 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B3310E5;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E6D10EA;
         Tue,  4 Jul 2023 05:22:27 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B28A620562;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E8EBF20564;
         Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1688473345; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SjXxlkTuJYC9O1CB4vY+fKgpDsvGnsQPWUV43FQ1Tdo=;
-        b=FC0lehynW/YjkX0ojuNdbE+U9D66n87W4KQcuoNy59QH114XTD3pfMBbvXW/67e58jle4/
-        2gX3l6newBaIImW2H0kx1YzLeYwMGYIMiMfUeVZn22emN17yb2KABPKvsOD80ihiKmNw5+
-        EfGMDnKgGAj1VqOnOjnYCb+7ZPaHS7w=
+        bh=oFpQScuO74Wb/MMo5/PwU0VkkU8xfizCNEX+yBiHYxE=;
+        b=N5jZEMQU6Pgvz3tRd18Yo1/LxhuHRQKFd0K9mY2q+KSbUQbi9Eg6x0DMw3/OSBLSmWxuZV
+        pL1gFQ7rbouWR4ap7tB+Jugsu4tP5YlgaC/WkEboScVZq3SJWgQBZXm5chC4epOO78MO7m
+        JLcZYV2WQIzcI61/B7m4wkUcxhxfR+o=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1688473345;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SjXxlkTuJYC9O1CB4vY+fKgpDsvGnsQPWUV43FQ1Tdo=;
-        b=Uql9A7mi+rgRt+V8JfjtNDfok6N3btHk1/lJXHia+JWxqjEj2gs/AitZVg52HpPQzwI6y7
-        9090X1E+3sh2AECg==
+        bh=oFpQScuO74Wb/MMo5/PwU0VkkU8xfizCNEX+yBiHYxE=;
+        b=Y2qUNGb3VlUD6Uih7oS1QkkbidyX1uLyJ+Sa2cXUj89bHO4eQv6eZK8n4vd1MkSlr15BsG
+        rFqFrHp5jVRO+5DQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A21EE1346D;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CBB8013A97;
         Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id oLGHJwEPpGQYMAAAMHmgww
+        id icy1MQEPpGQnMAAAMHmgww
         (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:25 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id AC301A0767; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
+        id D0754A076D; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        drbd-dev@lists.linbit.com
-Subject: [PATCH 05/32] drdb: Convert to use blkdev_get_handle_by_path()
-Date:   Tue,  4 Jul 2023 14:21:32 +0200
-Message-Id: <20230704122224.16257-5-jack@suse.cz>
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com
+Subject: [PATCH 11/32] dm: Convert to blkdev_get_handle_by_dev()
+Date:   Tue,  4 Jul 2023 14:21:38 +0200
+Message-Id: <20230704122224.16257-11-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6010; i=jack@suse.cz; h=from:subject; bh=J1ZHirxsdmy2SVoKjn/lGSy//cJpDrvl2MOuDCeuX+U=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGFKW8J23N1AJZS/Muvwwp0FewyPJSzvu1+mXzuevS4v6NDj+ nWnSyWjMwsDIwSArpsiyOvKi9rV5Rl1bQzVkYAaxMoFMYeDiFICJXD3F/s9Qy+vadeNKtqtNtZN3LW rMZJdTnybysG1by9KQw4mK7HIi9y5sSKloe3/xmlKr9L7ioK3ZZRPYfmYFnTkdIGIifEUhus2XU06g 6IxFz1+fiXyT8s9Ok90yoXab3d0F25bfV6ipyJDLOiJ8MfOsT2hSU9Kitz85CxceSnop2JBsknzk9u n3ewIK7/+wOPyjUHuJSKqJqNSM0Og4waikdax1bCLsWusNz22RdvprJne20Uy502/mcd75O+ZsrWwx z+e+bmTZ22/pwd0v6iwgoi6dImrh+8Ny51urVy69/RfMyrYL58+R62ZkefrKzcDJ9Nvx1D01f1g/1i hIuH0NasozzA85mdFWalws+QoA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2807; i=jack@suse.cz; h=from:subject; bh=XeDjEIT1p9+MdDtB0DyCNgxyoNTaPF7DUrlNzaXtSIM=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7UHFKsSVynaLOp/FheWju2iEmpkghUNeLrh2gQ MFkgdDKJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO1AAKCRCcnaoHP2RA2ST4CA C9agmaJLWVzqIJPzboONp8Xr/aw4rXGvMeHGLqgMuoAr3T0E26qyrSfkGrdgPfs2tHAzNJFXHMc/wa XgV1DUzYSYWD/s/n9w2wbRF16GvqWxbvL8PGYce+A1xyK8QbbnhmoREk0dOOZc/Mja+mASR8d/T9L/ d0LtJfeK7tdMWr9fu51au5tj5ie6tS1O8eka/XhXuEpG39sVgP34wd6WSnCLxxfEqiKokKVfFextol YAlMeYvfbTIFsp90fa15NkTR8QJd8gq6IQnbop8RKTL7XkZRsudtLs4b6iPtH4kS4hMqayRl3icuOY cHj1ndGNo2WYi+0RkDM70LbDgZ00/z
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert drdb to use blkdev_get_handle_by_path().
+Convert device mapper to use blkdev_get_handle_by_dev() and pass the
+handle around.
 
-CC: drbd-dev@lists.linbit.com
+CC: Alasdair Kergon <agk@redhat.com>
+CC: Mike Snitzer <snitzer@kernel.org>
+CC: dm-devel@redhat.com
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/drbd/drbd_int.h |  2 ++
- drivers/block/drbd/drbd_nl.c  | 65 +++++++++++++++++------------------
- 2 files changed, 34 insertions(+), 33 deletions(-)
+ drivers/md/dm.c               | 20 +++++++++++---------
+ include/linux/device-mapper.h |  1 +
+ 2 files changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index a30a5ed811be..f017e917612b 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -524,7 +524,9 @@ struct drbd_md {
- 
- struct drbd_backing_dev {
- 	struct block_device *backing_bdev;
-+	struct bdev_handle *backing_bdev_handle;
- 	struct block_device *md_bdev;
-+	struct bdev_handle *md_bdev_handle;
- 	struct drbd_md md;
- 	struct disk_conf *disk_conf; /* RCU, for updates: resource->conf_update */
- 	sector_t known_size; /* last known size of that backing device */
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index cddae6f4b00f..4a436a428e12 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -82,7 +82,7 @@ static atomic_t notify_genl_seq = ATOMIC_INIT(2); /* two. */
- 
- DEFINE_MUTEX(notification_mutex);
- 
--/* used blkdev_get_by_path, to claim our meta data device(s) */
-+/* used blkdev_get_handle_by_path, to claim our meta data device(s) */
- static char *drbd_m_holder = "Hands off! this is DRBD's meta data device.";
- 
- static void drbd_adm_send_reply(struct sk_buff *skb, struct genl_info *info)
-@@ -1634,43 +1634,45 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
- 	return 0;
- }
- 
--static struct block_device *open_backing_dev(struct drbd_device *device,
-+static struct bdev_handle *open_backing_dev(struct drbd_device *device,
- 		const char *bdev_path, void *claim_ptr, bool do_bd_link)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index f0f118ab20fa..d73905149bef 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -742,7 +742,7 @@ static struct table_device *open_table_device(struct mapped_device *md,
+ 		dev_t dev, blk_mode_t mode)
  {
+ 	struct table_device *td;
 -	struct block_device *bdev;
-+	struct bdev_handle *handle;
- 	int err = 0;
++	struct bdev_handle *bdev_handle;
+ 	u64 part_off;
+ 	int r;
  
--	bdev = blkdev_get_by_path(bdev_path, BLK_OPEN_READ | BLK_OPEN_WRITE,
--				  claim_ptr, NULL);
+@@ -751,9 +751,9 @@ static struct table_device *open_table_device(struct mapped_device *md,
+ 		return ERR_PTR(-ENOMEM);
+ 	refcount_set(&td->count, 1);
+ 
+-	bdev = blkdev_get_by_dev(dev, mode, _dm_claim_ptr, NULL);
 -	if (IS_ERR(bdev)) {
-+	handle = blkdev_get_handle_by_path(bdev_path,
-+			BLK_OPEN_READ | BLK_OPEN_WRITE, claim_ptr, NULL);
-+	if (IS_ERR(handle)) {
- 		drbd_err(device, "open(\"%s\") failed with %ld\n",
--				bdev_path, PTR_ERR(bdev));
--		return bdev;
-+				bdev_path, PTR_ERR(handle));
-+		return handle;
+-		r = PTR_ERR(bdev);
++	bdev_handle = blkdev_get_handle_by_dev(dev, mode, _dm_claim_ptr, NULL);
++	if (IS_ERR(bdev_handle)) {
++		r = PTR_ERR(bdev_handle);
+ 		goto out_free_td;
  	}
  
- 	if (!do_bd_link)
--		return bdev;
-+		return handle;
- 
--	err = bd_link_disk_holder(bdev, device->vdisk);
-+	err = bd_link_disk_holder(handle->bdev, device->vdisk);
- 	if (err) {
--		blkdev_put(bdev, claim_ptr);
-+		blkdev_handle_put(handle);
- 		drbd_err(device, "bd_link_disk_holder(\"%s\", ...) failed with %d\n",
- 				bdev_path, err);
--		bdev = ERR_PTR(err);
-+		handle = ERR_PTR(err);
- 	}
--	return bdev;
-+	return handle;
- }
- 
- static int open_backing_devices(struct drbd_device *device,
- 		struct disk_conf *new_disk_conf,
- 		struct drbd_backing_dev *nbc)
- {
--	struct block_device *bdev;
-+	struct bdev_handle *handle;
- 
--	bdev = open_backing_dev(device, new_disk_conf->backing_dev, device, true);
--	if (IS_ERR(bdev))
-+	handle = open_backing_dev(device, new_disk_conf->backing_dev, device,
-+				  true);
-+	if (IS_ERR(handle))
- 		return ERR_OPEN_DISK;
--	nbc->backing_bdev = bdev;
-+	nbc->backing_bdev = handle->bdev;
-+	nbc->backing_bdev_handle = handle;
- 
- 	/*
- 	 * meta_dev_idx >= 0: external fixed size, possibly multiple
-@@ -1680,7 +1682,7 @@ static int open_backing_devices(struct drbd_device *device,
- 	 * should check it for you already; but if you don't, or
- 	 * someone fooled it, we need to double check here)
+@@ -763,20 +763,22 @@ static struct table_device *open_table_device(struct mapped_device *md,
+ 	 * called.
  	 */
--	bdev = open_backing_dev(device, new_disk_conf->meta_dev,
-+	handle = open_backing_dev(device, new_disk_conf->meta_dev,
- 		/* claim ptr: device, if claimed exclusively; shared drbd_m_holder,
- 		 * if potentially shared with other drbd minors */
- 			(new_disk_conf->meta_dev_idx < 0) ? (void*)device : (void*)drbd_m_holder,
-@@ -1688,20 +1690,21 @@ static int open_backing_devices(struct drbd_device *device,
- 		 * as would happen with internal metadata. */
- 			(new_disk_conf->meta_dev_idx != DRBD_MD_INDEX_FLEX_INT &&
- 			 new_disk_conf->meta_dev_idx != DRBD_MD_INDEX_INTERNAL));
--	if (IS_ERR(bdev))
-+	if (IS_ERR(handle))
- 		return ERR_OPEN_MD_DISK;
--	nbc->md_bdev = bdev;
-+	nbc->md_bdev = handle->bdev;
-+	nbc->md_bdev_handle = handle;
- 	return NO_ERROR;
- }
- 
--static void close_backing_dev(struct drbd_device *device, struct block_device *bdev,
--		void *claim_ptr, bool do_bd_unlink)
-+static void close_backing_dev(struct drbd_device *device,
-+		struct bdev_handle *handle, bool do_bd_unlink)
- {
--	if (!bdev)
-+	if (!handle)
- 		return;
- 	if (do_bd_unlink)
--		bd_unlink_disk_holder(bdev, device->vdisk);
--	blkdev_put(bdev, claim_ptr);
-+		bd_unlink_disk_holder(handle->bdev, device->vdisk);
-+	blkdev_handle_put(handle);
- }
- 
- void drbd_backing_dev_free(struct drbd_device *device, struct drbd_backing_dev *ldev)
-@@ -1709,11 +1712,9 @@ void drbd_backing_dev_free(struct drbd_device *device, struct drbd_backing_dev *
- 	if (ldev == NULL)
- 		return;
- 
--	close_backing_dev(device, ldev->md_bdev,
--			  ldev->md.meta_dev_idx < 0 ?
--				(void *)device : (void *)drbd_m_holder,
-+	close_backing_dev(device, ldev->md_bdev_handle,
- 			  ldev->md_bdev != ldev->backing_bdev);
--	close_backing_dev(device, ldev->backing_bdev, device, true);
-+	close_backing_dev(device, ldev->backing_bdev_handle, true);
- 
- 	kfree(ldev->disk_conf);
- 	kfree(ldev);
-@@ -2129,11 +2130,9 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
-  fail:
- 	conn_reconfig_done(connection);
- 	if (nbc) {
--		close_backing_dev(device, nbc->md_bdev,
--			  nbc->disk_conf->meta_dev_idx < 0 ?
--				(void *)device : (void *)drbd_m_holder,
-+		close_backing_dev(device, nbc->md_bdev_handle,
- 			  nbc->md_bdev != nbc->backing_bdev);
--		close_backing_dev(device, nbc->backing_bdev, device, true);
-+		close_backing_dev(device, nbc->backing_bdev_handle, true);
- 		kfree(nbc);
+ 	if (md->disk->slave_dir) {
+-		r = bd_link_disk_holder(bdev, md->disk);
++		r = bd_link_disk_holder(bdev_handle->bdev, md->disk);
+ 		if (r)
+ 			goto out_blkdev_put;
  	}
- 	kfree(new_disk_conf);
+ 
+ 	td->dm_dev.mode = mode;
+-	td->dm_dev.bdev = bdev;
+-	td->dm_dev.dax_dev = fs_dax_get_by_bdev(bdev, &part_off, NULL, NULL);
++	td->dm_dev.bdev = bdev_handle->bdev;
++	td->dm_dev.bdev_handle = bdev_handle;
++	td->dm_dev.dax_dev = fs_dax_get_by_bdev(bdev_handle->bdev, &part_off,
++						NULL, NULL);
+ 	format_dev_t(td->dm_dev.name, dev);
+ 	list_add(&td->list, &md->table_devices);
+ 	return td;
+ 
+ out_blkdev_put:
+-	blkdev_put(bdev, _dm_claim_ptr);
++	blkdev_handle_put(bdev_handle);
+ out_free_td:
+ 	kfree(td);
+ 	return ERR_PTR(r);
+@@ -789,7 +791,7 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
+ {
+ 	if (md->disk->slave_dir)
+ 		bd_unlink_disk_holder(td->dm_dev.bdev, md->disk);
+-	blkdev_put(td->dm_dev.bdev, _dm_claim_ptr);
++	blkdev_handle_put(td->dm_dev.bdev_handle);
+ 	put_dax(td->dm_dev.dax_dev);
+ 	list_del(&td->list);
+ 	kfree(td);
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 69d0435c7ebb..772ab4d74d94 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -165,6 +165,7 @@ void dm_error(const char *message);
+ 
+ struct dm_dev {
+ 	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	struct dax_device *dax_dev;
+ 	blk_mode_t mode;
+ 	char name[16];
 -- 
 2.35.3
 
