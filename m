@@ -2,195 +2,267 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1C02C04FE0
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09E12C001DB
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:23:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231831AbjGDMXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S231297AbjGDMXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 4 Jul 2023 08:23:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39158 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230156AbjGDMXI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:23:08 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5396010DF;
-        Tue,  4 Jul 2023 05:22:36 -0700 (PDT)
+        with ESMTP id S230364AbjGDMXL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:23:11 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D157A1700;
+        Tue,  4 Jul 2023 05:22:37 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D918B2286E;
-        Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 954B52056E;
+        Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1688473345; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1688473346; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=77ujRf26Owowh0byfQ67xcMH5ve9C3R8kBJkiqUtyCg=;
-        b=2VKahU1XOySHzEplDs1QltVNOFsTQ4dq8fvJlTW5NcA98HGvzmZtatnXM4OOLuzLkzGZcB
-        uzw2YKZJoIVTmEJpZaCzkUoiAYvRhL8q67B7h52ZNqpk28gtTkFcsSTpiAMcamlusGN/Iq
-        6Vv5l4hSCYlcfiNq++hkUnHBepLv+Yk=
+        bh=QpfUAIuASSqI6SJcixPbWTZZf2TTLJV3nNwNm+rOzZA=;
+        b=CAuwWobqsMMEZWD8NagoqXaBBwkkYr/glO5V0N4xtnNOkN3+vc721WiSw7LSUWghV18VE/
+        A4D9SQR8BofVh/3GTvnJpsp27GKu7PpLK4l8rkPhJ5Kz1hb1AZWstlwT3aRGRYXbe1fYhc
+        t7HVV1bw4MZmIWZp129Ra6puWprZaTY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1688473345;
+        s=susede2_ed25519; t=1688473346;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=77ujRf26Owowh0byfQ67xcMH5ve9C3R8kBJkiqUtyCg=;
-        b=q70p6SToqQrkW/lPtF4AOqrRzb+3ID6V/jBY2/qek+BzpILyPV7MhTw+FIlgjKrCnf1Azh
-        s4eMuB2R65L75hDQ==
+        bh=QpfUAIuASSqI6SJcixPbWTZZf2TTLJV3nNwNm+rOzZA=;
+        b=2VXt+p/a2Vz4yryYdSN/6BCif+SF6GmF8Bt3hgkkqfB/N57zVKxQIEVPNWrqCO0GE0OLup
+        jMeX1PZ0NjRhJcBQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C66DD13A26;
-        Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 834A813A90;
+        Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id txTTLwEPpGQkMAAAMHmgww
-        (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:25 +0000
+        id 7RMMIAIPpGRaMAAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:26 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id C449EA076B; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
+        id 458A9A078C; Tue,  4 Jul 2023 14:22:25 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH 09/32] zram: Convert to use blkdev_get_handle_by_dev()
-Date:   Tue,  4 Jul 2023 14:21:36 +0200
-Message-Id: <20230704122224.16257-9-jack@suse.cz>
+        reiserfs-devel@vger.kernel.org
+Subject: [PATCH 29/32] reiserfs: Convert to blkdev_get_handle_by_dev/path()
+Date:   Tue,  4 Jul 2023 14:21:56 +0200
+Message-Id: <20230704122224.16257-29-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3944; i=jack@suse.cz; h=from:subject; bh=d8xJMtYHgO5YwmVmWWlBkXahD1vV+6JInluTJ/YHmZY=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7SYEWST8T4Q6p2EnRb+G285ejlkmGlLpc0nLak dRhgDHiJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO0gAKCRCcnaoHP2RA2WtvB/ 485waibbQ1HI3VVHKcClB7d3e4aLU+VVjHUx3r/ZjrvHQmh1dgBvtBA2she0Tz5U3xntpGEpm3XAGj dfYLY5p7NA/F7vtQpBt/HGJ91sGtJN6upxh2pqd+zUrGRU9M9fUR2rzo+7oASL4cTfa9pHNLrTAbfp TmOIJxDLZ09cJYuSIM843A91+v5QmVcF1AbLckgQU0UVrEg75WX3NMDaF7TRI2l9FGtJGsfry8bX3V JADS6p+yB4HrAX7Liats6teTTRhzpjy36rn/P/w9kR18gFAbkDpkUp0tPXoKX7Q6Q0qpGu81FJ2YgF YcNC6qkumiwj63rFNl6uldgtL3pGhT
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7551; i=jack@suse.cz; h=from:subject; bh=wB7NcjVTeZRWXEmQXiMlHjAIJr5i5qd17uWGdvxcAXs=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7jhinIe/d4ajM+Q77699FHDfFXJv7hflfPOOQn xg7C/yCJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO4wAKCRCcnaoHP2RA2e8VB/ 9rEF+SiIM01ZZStX7zStOvhwr4NMFyDxBXgBJ24QSavvSc9rq2MiJhl0uB6efVA9kdr2lvTjqpCDDJ BzYYrYZqBbNo+RTvH0gYAb4tD+BQhuK4HWAlPb9IkmsES505SSssbazwZkEWYRp4FyUFdZPIlfObly EvLG36rzUPZhauOsV4TfL0uGeTJqy9zCEtsKQ/shgM1VgheptbYbOt8t3YjSjCJiM2d8RenbGmt03C njxRFxGpd2etmMqeWAFTbtY3lfXwoZwUlt3VmfUj/BNQ+mkTVlCzuHAz6zfes3UTMBLHJ0KERLFkpP hYUwACx1CoUDf6ds+UQw9gSAVeFbpy
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert zram to use blkdev_get_handle_by_dev() and pass the handle
-around.
+Convert reiserfs to use blkdev_get_handle_by_dev/path() and pass the
+handle around.
 
-CC: Minchan Kim <minchan@kernel.org>
-CC: Sergey Senozhatsky <senozhatsky@chromium.org>
+CC: reiserfs-devel@vger.kernel.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/zram/zram_drv.c | 31 ++++++++++++++-----------------
- drivers/block/zram/zram_drv.h |  2 +-
- 2 files changed, 15 insertions(+), 18 deletions(-)
+ fs/reiserfs/journal.c  | 56 +++++++++++++++++++-----------------------
+ fs/reiserfs/procfs.c   |  2 +-
+ fs/reiserfs/reiserfs.h | 11 ++++++---
+ 3 files changed, 33 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 5676e6dd5b16..987e4885956e 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -414,17 +414,14 @@ static ssize_t writeback_limit_show(struct device *dev,
+diff --git a/fs/reiserfs/journal.c b/fs/reiserfs/journal.c
+index 479aa4a57602..9518ff7865f0 100644
+--- a/fs/reiserfs/journal.c
++++ b/fs/reiserfs/journal.c
+@@ -90,8 +90,7 @@ static int flush_commit_list(struct super_block *s,
+ static int can_dirty(struct reiserfs_journal_cnode *cn);
+ static int journal_join(struct reiserfs_transaction_handle *th,
+ 			struct super_block *sb);
+-static void release_journal_dev(struct super_block *super,
+-			       struct reiserfs_journal *journal);
++static void release_journal_dev(struct reiserfs_journal *journal);
+ static void dirty_one_transaction(struct super_block *s,
+ 				 struct reiserfs_journal_list *jl);
+ static void flush_async_commits(struct work_struct *work);
+@@ -1893,7 +1892,7 @@ static void free_journal_ram(struct super_block *sb)
+ 	 * j_header_bh is on the journal dev, make sure
+ 	 * not to release the journal dev until we brelse j_header_bh
+ 	 */
+-	release_journal_dev(sb, journal);
++	release_journal_dev(journal);
+ 	vfree(journal);
+ }
  
- static void reset_bdev(struct zram *zram)
+@@ -2385,7 +2384,7 @@ static int journal_read(struct super_block *sb)
+ 
+ 	cur_dblock = SB_ONDISK_JOURNAL_1st_BLOCK(sb);
+ 	reiserfs_info(sb, "checking transaction log (%pg)\n",
+-		      journal->j_dev_bd);
++		      journal->j_bdev_handle->bdev);
+ 	start = ktime_get_seconds();
+ 
+ 	/*
+@@ -2446,7 +2445,7 @@ static int journal_read(struct super_block *sb)
+ 		 * device and journal device to be the same
+ 		 */
+ 		d_bh =
+-		    reiserfs_breada(journal->j_dev_bd, cur_dblock,
++		    reiserfs_breada(journal->j_bdev_handle->bdev, cur_dblock,
+ 				    sb->s_blocksize,
+ 				    SB_ONDISK_JOURNAL_1st_BLOCK(sb) +
+ 				    SB_ONDISK_JOURNAL_SIZE(sb));
+@@ -2585,17 +2584,11 @@ static void journal_list_init(struct super_block *sb)
+ 	SB_JOURNAL(sb)->j_current_jl = alloc_journal_list(sb);
+ }
+ 
+-static void release_journal_dev(struct super_block *super,
+-			       struct reiserfs_journal *journal)
++static void release_journal_dev(struct reiserfs_journal *journal)
  {
--	struct block_device *bdev;
+-	if (journal->j_dev_bd != NULL) {
+-		void *holder = NULL;
 -
- 	if (!zram->backing_dev)
- 		return;
+-		if (journal->j_dev_bd->bd_dev != super->s_dev)
+-			holder = journal;
+-
+-		blkdev_put(journal->j_dev_bd, holder);
+-		journal->j_dev_bd = NULL;
++	if (journal->j_bdev_handle) {
++		blkdev_handle_put(journal->j_bdev_handle);
++		journal->j_bdev_handle = NULL;
+ 	}
+ }
  
--	bdev = zram->bdev;
--	blkdev_put(bdev, zram);
-+	blkdev_handle_put(zram->bdev_handle);
- 	/* hope filp_close flush all of IO */
- 	filp_close(zram->backing_dev, NULL);
- 	zram->backing_dev = NULL;
--	zram->bdev = NULL;
-+	zram->bdev_handle = NULL;
- 	zram->disk->fops = &zram_devops;
- 	kvfree(zram->bitmap);
- 	zram->bitmap = NULL;
-@@ -470,7 +467,7 @@ static ssize_t backing_dev_store(struct device *dev,
- 	struct address_space *mapping;
- 	unsigned int bitmap_sz;
- 	unsigned long nr_pages, *bitmap = NULL;
--	struct block_device *bdev = NULL;
-+	struct bdev_handle *bdev_handle = NULL;
- 	int err;
- 	struct zram *zram = dev_to_zram(dev);
+@@ -2610,7 +2603,7 @@ static int journal_init_dev(struct super_block *super,
  
-@@ -507,11 +504,11 @@ static ssize_t backing_dev_store(struct device *dev,
- 		goto out;
+ 	result = 0;
+ 
+-	journal->j_dev_bd = NULL;
++	journal->j_bdev_handle = NULL;
+ 	jdev = SB_ONDISK_JOURNAL_DEVICE(super) ?
+ 	    new_decode_dev(SB_ONDISK_JOURNAL_DEVICE(super)) : super->s_dev;
+ 
+@@ -2621,36 +2614,37 @@ static int journal_init_dev(struct super_block *super,
+ 	if ((!jdev_name || !jdev_name[0])) {
+ 		if (jdev == super->s_dev)
+ 			holder = NULL;
+-		journal->j_dev_bd = blkdev_get_by_dev(jdev, blkdev_mode, holder,
+-						      NULL);
+-		if (IS_ERR(journal->j_dev_bd)) {
+-			result = PTR_ERR(journal->j_dev_bd);
+-			journal->j_dev_bd = NULL;
++		journal->j_bdev_handle = blkdev_get_handle_by_dev(jdev,
++					blkdev_mode, holder, NULL);
++		if (IS_ERR(journal->j_bdev_handle)) {
++			result = PTR_ERR(journal->j_bdev_handle);
++			journal->j_bdev_handle = NULL;
+ 			reiserfs_warning(super, "sh-458",
+ 					 "cannot init journal device unknown-block(%u,%u): %i",
+ 					 MAJOR(jdev), MINOR(jdev), result);
+ 			return result;
+ 		} else if (jdev != super->s_dev)
+-			set_blocksize(journal->j_dev_bd, super->s_blocksize);
++			set_blocksize(journal->j_bdev_handle->bdev,
++				      super->s_blocksize);
+ 
+ 		return 0;
  	}
  
--	bdev = blkdev_get_by_dev(inode->i_rdev, BLK_OPEN_READ | BLK_OPEN_WRITE,
--				 zram, NULL);
--	if (IS_ERR(bdev)) {
--		err = PTR_ERR(bdev);
--		bdev = NULL;
-+	bdev_handle = blkdev_get_handle_by_dev(inode->i_rdev,
-+				BLK_OPEN_READ | BLK_OPEN_WRITE, zram, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		err = PTR_ERR(bdev_handle);
-+		bdev_handle = NULL;
- 		goto out;
+-	journal->j_dev_bd = blkdev_get_by_path(jdev_name, blkdev_mode, holder,
+-					       NULL);
+-	if (IS_ERR(journal->j_dev_bd)) {
+-		result = PTR_ERR(journal->j_dev_bd);
+-		journal->j_dev_bd = NULL;
++	journal->j_bdev_handle = blkdev_get_handle_by_path(jdev_name,
++				blkdev_mode, holder, NULL);
++	if (IS_ERR(journal->j_bdev_handle)) {
++		result = PTR_ERR(journal->j_bdev_handle);
++		journal->j_bdev_handle = NULL;
+ 		reiserfs_warning(super, "sh-457",
+ 				 "journal_init_dev: Cannot open '%s': %i",
+ 				 jdev_name, result);
+ 		return result;
  	}
  
-@@ -525,7 +522,7 @@ static ssize_t backing_dev_store(struct device *dev,
+-	set_blocksize(journal->j_dev_bd, super->s_blocksize);
++	set_blocksize(journal->j_bdev_handle->bdev, super->s_blocksize);
+ 	reiserfs_info(super,
+ 		      "journal_init_dev: journal device: %pg\n",
+-		      journal->j_dev_bd);
++		      journal->j_bdev_handle->bdev);
+ 	return 0;
+ }
  
- 	reset_bdev(zram);
+@@ -2808,7 +2802,7 @@ int journal_init(struct super_block *sb, const char *j_dev_name,
+ 				 "journal header magic %x (device %pg) does "
+ 				 "not match to magic found in super block %x",
+ 				 jh->jh_journal.jp_journal_magic,
+-				 journal->j_dev_bd,
++				 journal->j_bdev_handle->bdev,
+ 				 sb_jp_journal_magic(rs));
+ 		brelse(bhjh);
+ 		goto free_and_return;
+@@ -2832,7 +2826,7 @@ int journal_init(struct super_block *sb, const char *j_dev_name,
+ 	reiserfs_info(sb, "journal params: device %pg, size %u, "
+ 		      "journal first block %u, max trans len %u, max batch %u, "
+ 		      "max commit age %u, max trans age %u\n",
+-		      journal->j_dev_bd,
++		      journal->j_bdev_handle->bdev,
+ 		      SB_ONDISK_JOURNAL_SIZE(sb),
+ 		      SB_ONDISK_JOURNAL_1st_BLOCK(sb),
+ 		      journal->j_trans_max,
+diff --git a/fs/reiserfs/procfs.c b/fs/reiserfs/procfs.c
+index 3dba8acf4e83..83cb9402e0f9 100644
+--- a/fs/reiserfs/procfs.c
++++ b/fs/reiserfs/procfs.c
+@@ -354,7 +354,7 @@ static int show_journal(struct seq_file *m, void *unused)
+ 		   "prepare: \t%12lu\n"
+ 		   "prepare_retry: \t%12lu\n",
+ 		   DJP(jp_journal_1st_block),
+-		   SB_JOURNAL(sb)->j_dev_bd,
++		   SB_JOURNAL(sb)->j_bdev_handle->bdev,
+ 		   DJP(jp_journal_dev),
+ 		   DJP(jp_journal_size),
+ 		   DJP(jp_journal_trans_max),
+diff --git a/fs/reiserfs/reiserfs.h b/fs/reiserfs/reiserfs.h
+index 55e85256aae8..8e426392b5c2 100644
+--- a/fs/reiserfs/reiserfs.h
++++ b/fs/reiserfs/reiserfs.h
+@@ -299,7 +299,7 @@ struct reiserfs_journal {
+ 	/* oldest journal block.  start here for traverse */
+ 	struct reiserfs_journal_cnode *j_first;
  
--	zram->bdev = bdev;
-+	zram->bdev_handle = bdev_handle;
- 	zram->backing_dev = backing_dev;
- 	zram->bitmap = bitmap;
- 	zram->nr_pages = nr_pages;
-@@ -538,8 +535,8 @@ static ssize_t backing_dev_store(struct device *dev,
- out:
- 	kvfree(bitmap);
+-	struct block_device *j_dev_bd;
++	struct bdev_handle *j_bdev_handle;
  
--	if (bdev)
--		blkdev_put(bdev, zram);
-+	if (bdev_handle)
-+		blkdev_handle_put(bdev_handle);
+ 	/* first block on s_dev of reserved area journal */
+ 	int j_1st_reserved_block;
+@@ -2809,9 +2809,12 @@ struct reiserfs_journal_header {
+ #define journal_hash(t,sb,block) ((t)[_jhashfn((sb),(block)) & JBH_HASH_MASK])
  
- 	if (backing_dev)
- 		filp_close(backing_dev, NULL);
-@@ -581,7 +578,7 @@ static void read_from_bdev_async(struct zram *zram, struct page *page,
- {
- 	struct bio *bio;
+ /* We need these to make journal.c code more readable */
+-#define journal_find_get_block(s, block) __find_get_block(SB_JOURNAL(s)->j_dev_bd, block, s->s_blocksize)
+-#define journal_getblk(s, block) __getblk(SB_JOURNAL(s)->j_dev_bd, block, s->s_blocksize)
+-#define journal_bread(s, block) __bread(SB_JOURNAL(s)->j_dev_bd, block, s->s_blocksize)
++#define journal_find_get_block(s, block) __find_get_block(\
++		SB_JOURNAL(s)->j_bdev_handle->bdev, block, s->s_blocksize)
++#define journal_getblk(s, block) __getblk(SB_JOURNAL(s)->j_bdev_handle->bdev,\
++		block, s->s_blocksize)
++#define journal_bread(s, block) __bread(SB_JOURNAL(s)->j_bdev_handle->bdev,\
++		block, s->s_blocksize)
  
--	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
-+	bio = bio_alloc(zram->bdev_handle->bdev, 1, parent->bi_opf, GFP_NOIO);
- 	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
- 	__bio_add_page(bio, page, PAGE_SIZE, 0);
- 	bio_chain(bio, parent);
-@@ -697,7 +694,7 @@ static ssize_t writeback_store(struct device *dev,
- 			continue;
- 		}
- 
--		bio_init(&bio, zram->bdev, &bio_vec, 1,
-+		bio_init(&bio, zram->bdev_handle->bdev, &bio_vec, 1,
- 			 REQ_OP_WRITE | REQ_SYNC);
- 		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
- 		__bio_add_page(&bio, page, PAGE_SIZE, 0);
-@@ -779,7 +776,7 @@ static void zram_sync_read(struct work_struct *work)
- 	struct bio_vec bv;
- 	struct bio bio;
- 
--	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
-+	bio_init(&bio, zw->zram->bdev_handle->bdev, &bv, 1, REQ_OP_READ);
- 	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
- 	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
- 	zw->error = submit_bio_wait(&bio);
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index ca7a15bd4845..d090753f97be 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -132,7 +132,7 @@ struct zram {
- 	spinlock_t wb_limit_lock;
- 	bool wb_limit_enable;
- 	u64 bd_wb_limit;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	unsigned long *bitmap;
- 	unsigned long nr_pages;
- #endif
+ enum reiserfs_bh_state_bits {
+ 	BH_JDirty = BH_PrivateStart,	/* buffer is in current transaction */
 -- 
 2.35.3
 
