@@ -2,53 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CFC7EB64DA
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 16:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFDC5EB64D9
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 16:52:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbjGDQwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 12:52:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51304 "EHLO
+        id S229647AbjGDQwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 12:52:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230374AbjGDQwQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 12:52:16 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0061B6
-        for <linux-block@vger.kernel.org>; Tue,  4 Jul 2023 09:52:15 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-51d9c71fb4bso5587932a12.2
-        for <linux-block@vger.kernel.org>; Tue, 04 Jul 2023 09:52:15 -0700 (PDT)
+        with ESMTP id S230156AbjGDQwP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 12:52:15 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD371AC
+        for <linux-block@vger.kernel.org>; Tue,  4 Jul 2023 09:52:13 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51e00695e21so3204097a12.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Jul 2023 09:52:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688489534; x=1691081534;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ajr5DYl9C6qOy7ts63BGAnBwuXR1t1xb9L8MNCWnMcM=;
-        b=ELcA0gKS9JSx9R9qjiLpvMhVbjMHSmx5lrUB94ix+gOFrnfps5pbmDmG98waBqqayS
-         sLoP2JP1w+4strsaZol5otwIl+x73ByHuDTl8YyYMUo1JtdU2L35bZ/kT05v1brDrLRe
-         ti7ETokvmT6vw18s0039eK6WcpQDJJr2INKRskGSKJlDmXWuuJVkddx3a/UWeCzFZdbX
-         tWG5CFlpFMEtkW+uDiHE4vudJtbGje3FJdJCF0uF3hYb7opZ0R3yrW9t9fRGYkK35U0Q
-         cZKgwmhLsxE61ALTpNq6fEXjuXvY5Irpg8bh0XCYxl+Bu1B/xeKt8jF/kS/JawRlNZBu
-         YZZQ==
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688489532; x=1691081532;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NCEuud2npCtaP+WAwUQoRnlKY8hdkU19aLP9Y84PvRg=;
+        b=VI57yG1MiCludDVUSlMzYw8RlbygdCdy7DU1GtAtpp4ZqiXttzsdWHfm0fk/OIyF1K
+         6GRq0T/Hw23jT/wf2JejLA58GHEmUyowJjP92JgIxOM7fdJq+iCsUZprvS3HV0u9PBWH
+         oemiTCPAm6+QgcYQUIHxHTkCpSkDEwM24DTIzucfIAhLQ6pRorQZZd873SMoFgtR9YZL
+         tGx0ZMzuhLwXRX1/m0e/zNLGAyZDVpJ+jcQGbjh27qT+fhjYnD4cpXXJbmIWtNxZRlhu
+         wVI7vuHqkQE+eTtqi8bromcpMh+TzHh/pDx8HEUe1I862SRmUfSqX2bYDhEa4w+OQKnG
+         +tdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688489534; x=1691081534;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ajr5DYl9C6qOy7ts63BGAnBwuXR1t1xb9L8MNCWnMcM=;
-        b=l7MHpTZp222mwERlvv8Jjn25zThaEMqkW0Q1DApkDNSOlIZmqr7cXkYC4puGA3A1Y8
-         f71sxa3wL9hHbIRu1diYWFKi4LL/oncfzxipqMxqrr6fM6axnvCEBE8crzwi8ePagc8x
-         UugKk7kv7xMRBvGDsGGnWA8V0+xOZOBA0ir+spL4OiypcWXgTmRcgaa+0uwHJ1K6wY73
-         hb5E/JZNNDcwJ+cxOT5zj+3Ln2JfTJVmEcPBp6r5EBZPL5PL7VCzRa7wFTkL0ER6phEF
-         qkQaCPDYFfr+8+4ZLHT5flkAcycqaTKY3mSaO6CzNO/7zKb2q1dxMqgVtGL8FyTo2nPV
-         Kuhg==
-X-Gm-Message-State: ABy/qLYdjs18fcUcgbopTnqWDm05Pvttdkcg0yOSJnL3hcNo8wtDI7+s
-        TU2vbMjwEpm27xAfQCqy++MckA==
-X-Google-Smtp-Source: APBJJlFz6Xe2Hj0nxvRbK0CLfvKR4XM2o1nfI59+G1ZVlz8tj7mNlJHEAgX/91uBZEwxcZ6oOmN3yw==
-X-Received: by 2002:a17:906:b294:b0:991:d05c:f065 with SMTP id q20-20020a170906b29400b00991d05cf065mr10489010ejz.52.1688489533683;
-        Tue, 04 Jul 2023 09:52:13 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688489532; x=1691081532;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NCEuud2npCtaP+WAwUQoRnlKY8hdkU19aLP9Y84PvRg=;
+        b=mIEH9zJf3n67axo1Jf0V5S7RiRudWVZwBxgG7z1ErFY9lymL0sp54ZsrXoMCxi+UyD
+         7P2y3g3xTpI6sAjyIj///ZVjTA8lIuUWijMe/3YU8hEDZX8WnwgL2RiTd9N3AiiGy3j6
+         cpmVpSe1CwUY5GFpjMw2EfBo17byoKKJb/v0ox3bDg7Ifve6SXo+IQMpN+QWUZUJwJBl
+         3alTPiihA3YgypXrGMcvbL/vVIZdiIO5N0xEmAPGWmE0NUYQRT2SnHKOKTklZjhpq8mb
+         K6efpqoCbd5j0Ka4jyNlMyTEHnZNKHUX0ogQCVhaMdPKEFkHOShvXuYpiot0MHHAjaMr
+         v6Vg==
+X-Gm-Message-State: ABy/qLZyvu+B+3F7AH/tCNgM5igNWEUt70yNyJwVhlBA7slTFTfmQIEc
+        ZzTpF8pU3zRwcU1d8O0MDwLwtw==
+X-Google-Smtp-Source: APBJJlFmC1hy+2lDGDv/PJFcapa3pXqHpnvzlzeQUFrvLzx32a7XVI0J6/Qfxr3huJyRQP03KgwJMA==
+X-Received: by 2002:aa7:df93:0:b0:51d:a124:62cb with SMTP id b19-20020aa7df93000000b0051da12462cbmr10146841edy.28.1688489531957;
+        Tue, 04 Jul 2023 09:52:11 -0700 (PDT)
 Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id n20-20020a170906725400b0099275c59bc9sm8510947ejk.33.2023.07.04.09.52.13
+        by smtp.gmail.com with ESMTPSA id d17-20020a056402001100b0051a53d7b160sm11969824edu.80.2023.07.04.09.52.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 09:52:13 -0700 (PDT)
+        Tue, 04 Jul 2023 09:52:11 -0700 (PDT)
 From:   Andreas Hindborg <nmi@metaspace.dk>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     linux-kernel@vger.kernel.org (open list),
@@ -61,12 +60,11 @@ Cc:     linux-kernel@vger.kernel.org (open list),
         Christoph Hellwig <hch@infradead.org>,
         Damien Le Moal <dlemoal@kernel.org>,
         Andreas Hindborg <a.hindborg@samsung.com>
-Subject: [PATCH v5 1/5] ublk: add opcode offsets for DRV_IN/DRV_OUT
-Date:   Tue,  4 Jul 2023 18:52:05 +0200
-Message-ID: <20230704165209.514591-2-nmi@metaspace.dk>
+Subject: [PATCH v5 0/5] ublk: enable zoned storage support
+Date:   Tue,  4 Jul 2023 18:52:04 +0200
+Message-ID: <20230704165209.514591-1-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230704165209.514591-1-nmi@metaspace.dk>
-References: <20230704165209.514591-1-nmi@metaspace.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -75,43 +73,71 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Ublk zoned storage support relies on DRV_IN handling for zone report.
-Prepare for this change by adding offsets for the DRV_IN/DRV_OUT commands.
+Hi All,
 
-Also add parenthesis to existing opcodes for better macro hygiene.
+This patch set adds zoned storage support to `ublk`. The first 3 patches do some
+house cleaning in preparation for the last patch. The last patch adds support
+for report_zones and the following operations:
 
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
----
- include/uapi/linux/ublk_cmd.h | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ - REQ_OP_ZONE_OPEN
+ - REQ_OP_ZONE_CLOSE
+ - REQ_OP_ZONE_FINISH
+ - REQ_OP_ZONE_RESET
+ - REQ_OP_ZONE_APPEND
 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 4b8558db90e1..a32810c8ef2b 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -229,12 +229,16 @@ struct ublksrv_ctrl_dev_info {
- 	__u64   reserved2;
- };
- 
--#define		UBLK_IO_OP_READ		0
--#define		UBLK_IO_OP_WRITE		1
--#define		UBLK_IO_OP_FLUSH		2
--#define		UBLK_IO_OP_DISCARD	3
--#define		UBLK_IO_OP_WRITE_SAME	4
--#define		UBLK_IO_OP_WRITE_ZEROES	5
-+#define		UBLK_IO_OP_READ			(0)
-+#define		UBLK_IO_OP_WRITE		(1)
-+#define		UBLK_IO_OP_FLUSH		(2)
-+#define		UBLK_IO_OP_DISCARD		(3)
-+#define		UBLK_IO_OP_WRITE_SAME		(4)
-+#define		UBLK_IO_OP_WRITE_ZEROES		(5)
-+#define		__UBLK_IO_OP_DRV_IN_START	(32)
-+#define		__UBLK_IO_OP_DRV_IN_END		(96)
-+#define		__UBLK_IO_OP_DRV_OUT_START	(__UBLK_IO_OP_DRV_IN_END)
-+#define		__UBLK_IO_OP_DRV_OUT_END	(160)
- 
- #define		UBLK_IO_F_FAILFAST_DEV		(1U << 8)
- #define		UBLK_IO_F_FAILFAST_TRANSPORT	(1U << 9)
+Changes for v5:
+ - Merge zone append patch and zone ops patch
+ - Use defines instead of enum for opcodes
+ - Add a helper `ublk_dev_is_zoned()`
+ - Add a helper `ublk_dev_is_user_copy()`
+ - Fix a leak in `ublk_report_zones()`
+ - Use goto to handle cleanup in `ublk_report_zones()`
+ - Change name of module from `ublk` back to `ublk_drv` and rename source files
+ - Fail to add device if user copy is not supported (implicitly fail to start device under same condition)
+ - Fail to add device if kernel is not compiled with CONFIG_BLK_DEV_ZONED
+ - Fail to apply device parameters if chunk_sectors is not set while zoned support is requested
+ - Change kconfig entry
+ - Check max open/active zones are valid
+ - Document UBLK_IO_OP_REPORT_ZONES buffer format
+ - Use function stubs rather than if(IS_ENABLED(...))
+ - Improve validation of zoned parameters
+
+A user space component based on ubdsrv is available for testing [1] with the
+"loop" target. No changes are required for user space for v4 -> v5.
+
+Read/write and zone operations are tested with zenfs [3].
+
+The zone append path is tested with fio -> zonefs -> ublk -> null_blk.
+
+The implementation of zone append requires ublk user copy feature, and therefore
+the series is based on branch for-next (6afa337a3789) of [4].
+
+[1] https://github.com/metaspace/ubdsrv/commit/7de0d901c329fde7dc5a2e998952dd88bf5e668b
+[2] https://lore.kernel.org/linux-block/20230316145539.300523-1-nmi@metaspace.dk/
+[3] https://github.com/westerndigitalcorporation/zenfs
+[4] https://git.kernel.dk/linux.git
+
+Andreas Hindborg (5):
+  ublk: add opcode offsets for DRV_IN/DRV_OUT
+  ublk: move types to shared header file
+  ublk: rename driver files to prepare for multiple translation units
+  ublk: add helper to check if device supports user copy
+  ublk: enable zoned storage support
+
+ MAINTAINERS                          |   4 +-
+ drivers/block/Kconfig                |   5 +
+ drivers/block/Makefile               |   2 +
+ drivers/block/ublk-zoned.c           | 225 +++++++++++++++++++++++++++
+ drivers/block/{ublk_drv.c => ublk.c} | 186 ++++++++++------------
+ drivers/block/ublk.h                 | 180 +++++++++++++++++++++
+ include/uapi/linux/ublk_cmd.h        |  44 +++++-
+ 7 files changed, 533 insertions(+), 113 deletions(-)
+ create mode 100644 drivers/block/ublk-zoned.c
+ rename drivers/block/{ublk_drv.c => ublk.c} (95%)
+ create mode 100644 drivers/block/ublk.h
+
+
+base-commit: 3261ea42710e9665c9151006049411bd23b5411f
 -- 
 2.41.0
 
