@@ -2,80 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10550EB64DA
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 20:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE9EEB64DD
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 22:16:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbjGDU4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 16:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55290 "EHLO
+        id S230507AbjGDWQH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 18:16:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjGDU4F (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 16:56:05 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC6CE7B
-        for <linux-block@vger.kernel.org>; Tue,  4 Jul 2023 13:56:03 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-102-5.bstnma.fios.verizon.net [173.48.102.5])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 364KtTX5016481
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 4 Jul 2023 16:55:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1688504133; bh=+IHk8YSJoTMTlfyKSqeJRbN0ZDGPNH4j7UG15hoATpY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=KsE/PTPPyIAtzyeQEVRROjWK4C270r6UA8WxxecB3vEiwUx0vkLRY2Nc5Cytin9uw
-         j5+RxqtRgCasXKlCRDkJ+ZjqOkZ2aawBSNmGoekNMEpfGCFDSF5xo3ozSuOBULVH5y
-         MMezXK1KH8Jqqm+xO001ohXUlztNJeEWLBA9l5fCnOkdogaObBEdtQxOzpM2gVrB6j
-         cGXKNxQSW1NOOTyaWMhCc7sHYhyAGfNqfu0gpTl4iqfHdcRlrBwgL1vs7LVkIZPS7v
-         hho8LiIA3ooAxUNWVQWJzURK4nUz2cPcYhydAwlUy00OJEUWyIaYV3+4WS1ZfmshTF
-         sGIoUbYg+B+Uw==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 24F9E15C0280; Tue,  4 Jul 2023 16:55:29 -0400 (EDT)
-Date:   Tue, 4 Jul 2023 16:55:29 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        with ESMTP id S230458AbjGDWQH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 18:16:07 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BDBCE7B;
+        Tue,  4 Jul 2023 15:16:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688508965; x=1720044965;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rrsQpFl+GGNZIUl7w2QPMDePajMI9KYVgmOy7sty/PU=;
+  b=RJ/NWK7jYRPOZ7+I3W/EZ0p/AFx36IA+rpXdlEZJOte57ILeGwFY2H2u
+   UE7USYo8cOW875vA7F/xVIiiYAVDrkofAopSLVhW2bVZTgATQcKZ8E4v/
+   vlhthoFPJ0x0lDCcMDc+lmDfaFpdyIXxVUTJuL7eT8RuOmJtaEBXQ3keO
+   pzHbNHREP6H+n46yG6sIyAPfRe2kx+XkcFxh0bCxMnxMzoRKXl/S8ZwWr
+   TL9x5PyMx9H9JBn7c633G1RYyHbZftCHnBEGWZ8yDi1fyLt5upfGR2Vt4
+   AGYHFUvDLo1V0bpm/Gly3wtnyeXwS2dmpB/CaKZtQXaAqMMecnBzawiJx
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="365765373"
+X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
+   d="scan'208";a="365765373"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2023 15:16:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="788963010"
+X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
+   d="scan'208";a="788963010"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 04 Jul 2023 15:16:01 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qGoJU-000IaV-1z;
+        Tue, 04 Jul 2023 22:16:00 +0000
+Date:   Wed, 5 Jul 2023 06:15:56 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>, Ming Lei <ming.lei@redhat.com>
+Cc:     oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>, gost.dev@samsung.com,
         linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: [PATCH 1/6] block: Add config option to not allow writing to
- mounted devices
-Message-ID: <20230704205529.GH1178919@mit.edu>
-References: <20230704122727.17096-1-jack@suse.cz>
- <20230704125702.23180-1-jack@suse.cz>
- <20230704184416.GE1851@sol.localdomain>
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>
+Subject: Re: [PATCH v5 5/5] ublk: enable zoned storage support
+Message-ID: <202307050609.y0CCTok8-lkp@intel.com>
+References: <20230704165209.514591-6-nmi@metaspace.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230704184416.GE1851@sol.localdomain>
+In-Reply-To: <20230704165209.514591-6-nmi@metaspace.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 04, 2023 at 11:44:16AM -0700, Eric Biggers wrote:
-> Does this prevent the underlying storage from being written to?  Say if the
-> mounted block device is /dev/sda1 and someone tries to write to /dev/sda in the
-> region that contains sda1.
-> 
-> I *think* the answer is no, writes to /dev/sda are still allowed since the goal
-> is just to prevent writes to the buffer cache of mounted block devices, not
-> writes to the underlying storage.  That is really something that should be
-> stated explicitly, though.
+Hi Andreas,
 
-Well, at the risk of giving the Syzbot developers any ideas, we also
-aren't preventing someone from opening the SCSI generic device and
-manually sending raw SCSI commands to modify a mounted block device,
-and then no doubt they would claim that the kernel config
-CONFIG_CHR_DEV_SG is "insecure", and so therefore any kernel that
-could support writing CD or DVD's is by definition "insecure" by their
-lights...
+kernel test robot noticed the following build errors:
 
-Which is why talking about security models without having an agreed
-upon threat model is really a waste of time...
+[auto build test ERROR on 3261ea42710e9665c9151006049411bd23b5411f]
 
-     	    	     	      	       - Ted
-				       
+url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/ublk-add-opcode-offsets-for-DRV_IN-DRV_OUT/20230705-005338
+base:   3261ea42710e9665c9151006049411bd23b5411f
+patch link:    https://lore.kernel.org/r/20230704165209.514591-6-nmi%40metaspace.dk
+patch subject: [PATCH v5 5/5] ublk: enable zoned storage support
+config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20230705/202307050609.y0CCTok8-lkp@intel.com/config)
+compiler: powerpc-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230705/202307050609.y0CCTok8-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307050609.y0CCTok8-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+>> ERROR: modpost: "__udivdi3" [drivers/block/ublk_drv.ko] undefined!
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
