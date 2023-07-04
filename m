@@ -2,105 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA01AEB64DD
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 14:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE18EB64DA
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 14:13:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231131AbjGDOGb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 10:06:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37116 "EHLO
+        id S231603AbjGDON1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 10:13:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230197AbjGDOGb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 10:06:31 -0400
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CB9BF7;
-        Tue,  4 Jul 2023 07:06:30 -0700 (PDT)
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1b8303cd32aso44543055ad.2;
-        Tue, 04 Jul 2023 07:06:30 -0700 (PDT)
+        with ESMTP id S231680AbjGDONV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 10:13:21 -0400
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DC3A1727;
+        Tue,  4 Jul 2023 07:13:19 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6687466137bso3303322b3a.0;
+        Tue, 04 Jul 2023 07:13:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688479590; x=1691071590;
+        d=1e100.net; s=20221208; t=1688479999; x=1691071999;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JV2SCOEdB9t0w6tigDexjJMYhGF54ZwsLlYmJ1gE7wU=;
-        b=bMICWCFC1W076H+YN1lR/nCQau0HbgCI0H4vl8vZYXgociPXrYyV5p2vJwJSn4IvXw
-         X0VdLEzWRujDjUle97qp5ejyEiOTvK9cEwtJF9fXchWUeZ3V4uQSdYUun19YJ76vkPzg
-         EZ1VW7i4f34rBtELVeYa/NvSt/WWf8EGkE3xgRc0FNndIJufTeQZZj1KiqF78g6Qv4BO
-         0X8PwY5ee/rPn2rjRArQ76JDuSpgQ/4XYckAc/yuSHkTasvw/OegnkRz43f6yLq3W0e3
-         rRA6atJmAtXopQDEq1HSeWbL6ASsixUt+la82hfgmJxFH2y2NJEwaZhVIkeu3mm+1ick
-         EadQ==
-X-Gm-Message-State: ABy/qLaMBNDn1rNBaXGQB2u/UKIklMPTeUzdebm00ZhMy9QxeJpBvQHH
-        tDxcOHS51TLWDp/ELdGfDOY=
-X-Google-Smtp-Source: APBJJlEESj5502hCCjnCrW5aNdhMviGxH5NXIz8SFwBF+614aVB6e0+1hJtWMTw8TJzZNuQy8olTNg==
-X-Received: by 2002:a17:903:447:b0:1b8:a31b:ac85 with SMTP id iw7-20020a170903044700b001b8a31bac85mr2719760plb.41.1688479589749;
-        Tue, 04 Jul 2023 07:06:29 -0700 (PDT)
+        bh=MFB8PojU7YpiUakGKwyKSFndjIZIuNwZuyX72fdjf+o=;
+        b=KYDvaxBaML+fhdE/7f1jWEE4Tlvy44egKZ4jJtnxBWXvIaKPSBBu4w4gtQsoxKc4pk
+         x+rNMrZcAR5bfs5Dns6AJWqU/QJ2eJyGxavDhl8s6ruF4F7gqRRontX2oh1FAoh8aV3r
+         jL1j7vaA0GnRcZxss/7krF7dp3tgV5tz7rc4RmoqxF090a3WzlTP2O/ZyHm8EqP9oPyC
+         Zr80stwwKhe9K3vdikBLVON7P2Jtg1bkiJsPInatc1vY9GH+ZrBC0GHzg/AVJST4Ip5B
+         +kv8P9ZJWEOjMSRB5aonT0kSauMBDHVMcGpqBMy2RgTrZcyCBty8dO+MUnMQCyqqvYG8
+         Is1g==
+X-Gm-Message-State: ABy/qLYQTql6CMOjVwckd5+5lvTncY4vyodH0/s+Pz47QA1EKe/ympKc
+        /2zn/oOWsm+tfbBITeC5c1M=
+X-Google-Smtp-Source: APBJJlGhfp3bsWTF9b4mHP2e2ofSZY80jupVTROLcOkaN2MthkZshD6I2kkhZ01NHvbaNOhSKh3EfQ==
+X-Received: by 2002:a05:6a00:99f:b0:62d:8376:3712 with SMTP id u31-20020a056a00099f00b0062d83763712mr11239075pfg.28.1688479998665;
+        Tue, 04 Jul 2023 07:13:18 -0700 (PDT)
 Received: from [192.168.50.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id jk4-20020a170903330400b001b672af624esm13083569plb.164.2023.07.04.07.06.26
+        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b00679a4b56e41sm13131614pfh.43.2023.07.04.07.13.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 07:06:29 -0700 (PDT)
-Message-ID: <bb91e76b-0bd8-a949-f8b9-868f919ebcb9@acm.org>
-Date:   Tue, 4 Jul 2023 07:06:26 -0700
+        Tue, 04 Jul 2023 07:13:18 -0700 (PDT)
+Message-ID: <32dad510-1508-f0dc-ab49-60d56ed2c2d6@acm.org>
+Date:   Tue, 4 Jul 2023 07:13:17 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH 01/32] block: Provide blkdev_get_handle_* functions
+Subject: Re: [PATCH] block: mq-deadline: rename sort_list to sort_rb
 Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anna Schumaker <anna@kernel.org>, Chao Yu <chao@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, Gao Xiang <xiang@kernel.org>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        jfs-discussion@lists.sourceforge.net,
-        Joern Engel <joern@lazybastard.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        linux-bcache@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-xfs@vger.kernel.org,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Minchan Kim <minchan@kernel.org>, ocfs2-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Song Liu <song@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        target-devel@vger.kernel.org, Ted Tso <tytso@mit.edu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        xen-devel@lists.xenproject.org
-References: <20230629165206.383-1-jack@suse.cz>
- <20230704122224.16257-1-jack@suse.cz>
+To:     lipeifeng@oppo.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhangshiming@oppo.com, guojian@oppo.com
+References: <20230704040626.24899-1-lipeifeng@oppo.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230704122224.16257-1-jack@suse.cz>
+In-Reply-To: <20230704040626.24899-1-lipeifeng@oppo.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/4/23 05:21, Jan Kara wrote:
-> +struct bdev_handle {
-> +	struct block_device *bdev;
-> +	void *holder;
-> +};
+On 7/3/23 21:06, lipeifeng@oppo.com wrote:
+> Mq-deadline would store request in list:fifo_list and
+> rb_tree:sort_list, and sort_list should be renamed to
+> sort_rb which is beneficial for understanding.
 
-Please explain in the patch description why a holder pointer is 
-introduced in struct bdev_handle and how it relates to the bd_holder 
-pointer in struct block_device. Is one of the purposes of this patch 
-series perhaps to add support for multiple holders per block device?
-
-Thanks,
+Huh? I think this patch makes the code less readable instead of more 
+readable ...
 
 Bart.
-
