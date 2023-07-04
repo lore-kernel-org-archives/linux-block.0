@@ -2,227 +2,195 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7346C04FDF
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1C02C04FE0
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:23:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231830AbjGDMXg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 08:23:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39436 "EHLO
+        id S231831AbjGDMXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 08:23:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231160AbjGDMWu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:50 -0400
+        with ESMTP id S230156AbjGDMXI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:23:08 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD7E10E0;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5396010DF;
         Tue,  4 Jul 2023 05:22:36 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 59FE522871;
-        Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id D918B2286E;
+        Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1688473346; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1688473345; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=v1q0Ly+TYRzz+Lbzs+DrPFFtN8sDBK0YXsnFAlKqtUI=;
-        b=cPdR/YWBMZtUS1MC+nSSm+Wv9pwVAeD0wQSTHOF/nWt8ti7TofknDxU1cSiuA5lS+QDNh2
-        MQ8pTgWSPL0vVTSSlQ8ZYL0qeyS3J3FOc+rP5LZ/zGOrM49w/KBwmgdxZHtxuNMShEJ0M5
-        DyXeOo+AHb/oEgwLODnEXo33Ty3UEso=
+        bh=77ujRf26Owowh0byfQ67xcMH5ve9C3R8kBJkiqUtyCg=;
+        b=2VKahU1XOySHzEplDs1QltVNOFsTQ4dq8fvJlTW5NcA98HGvzmZtatnXM4OOLuzLkzGZcB
+        uzw2YKZJoIVTmEJpZaCzkUoiAYvRhL8q67B7h52ZNqpk28gtTkFcsSTpiAMcamlusGN/Iq
+        6Vv5l4hSCYlcfiNq++hkUnHBepLv+Yk=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1688473346;
+        s=susede2_ed25519; t=1688473345;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=v1q0Ly+TYRzz+Lbzs+DrPFFtN8sDBK0YXsnFAlKqtUI=;
-        b=+PjF+mi5ltlR0aaOdtaNLHJ8hzb/Vvm7MU3GCPqy6aB9BSL9haAv6StxNk47POovWVIJip
-        jsT5biRekBh9J9Dg==
+        bh=77ujRf26Owowh0byfQ67xcMH5ve9C3R8kBJkiqUtyCg=;
+        b=q70p6SToqQrkW/lPtF4AOqrRzb+3ID6V/jBY2/qek+BzpILyPV7MhTw+FIlgjKrCnf1Azh
+        s4eMuB2R65L75hDQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 48A16139ED;
-        Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C66DD13A26;
+        Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 6oO4EQIPpGRCMAAAMHmgww
-        (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:26 +0000
+        id txTTLwEPpGQkMAAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:25 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id EE9BEA0775; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
+        id C449EA076B; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        target-devel@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 16/32] scsi: target: Convert to blkdev_get_handle_by_path()
-Date:   Tue,  4 Jul 2023 14:21:43 +0200
-Message-Id: <20230704122224.16257-16-jack@suse.cz>
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH 09/32] zram: Convert to use blkdev_get_handle_by_dev()
+Date:   Tue,  4 Jul 2023 14:21:36 +0200
+Message-Id: <20230704122224.16257-9-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5428; i=jack@suse.cz; h=from:subject; bh=vF8qjFI4A/3rD5h/Et69Ec9Qeo6QiVYCndYccNSvPHk=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7YX+6hWorwQoJjZkyQ3dg5LYwJKQg7ih6pPHV5 Jq3sVjeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO2AAKCRCcnaoHP2RA2Wo7B/ 4hD/I8EkJLrLY5uM7AFP9Y/pVXKnrLUk8VHGTW6V3K1ZA6MczawCPX8XapgnrOl4mFfwL5o9iYLnNJ YwsW85NRpZ8zjXGpUg6BgeD3y+G7wFU+yl8jE3WJQMwDLfba/pLXSw0pvFrT9+3tmNN+aKayT5BFC1 IiCkhOYVSCX3ie3p2Q9v8Ar0r4LT+3Wq/Bi4aVi9StU5+uKNHfIlDkgiLafqBcPiWCyxBl5cuJ0Hxq 4c/5P5mvDBOZTX3gT6qPOGubdhVcpwPygZBR/6EJjPVGKv4Ki2A+2+hlnBG4HJMvbfqeB4QLGRv4xp d/ik3OB1Hd1J1+/lbkiJj4AeI3B54P
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3944; i=jack@suse.cz; h=from:subject; bh=d8xJMtYHgO5YwmVmWWlBkXahD1vV+6JInluTJ/YHmZY=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7SYEWST8T4Q6p2EnRb+G285ejlkmGlLpc0nLak dRhgDHiJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO0gAKCRCcnaoHP2RA2WtvB/ 485waibbQ1HI3VVHKcClB7d3e4aLU+VVjHUx3r/ZjrvHQmh1dgBvtBA2she0Tz5U3xntpGEpm3XAGj dfYLY5p7NA/F7vtQpBt/HGJ91sGtJN6upxh2pqd+zUrGRU9M9fUR2rzo+7oASL4cTfa9pHNLrTAbfp TmOIJxDLZ09cJYuSIM843A91+v5QmVcF1AbLckgQU0UVrEg75WX3NMDaF7TRI2l9FGtJGsfry8bX3V JADS6p+yB4HrAX7Liats6teTTRhzpjy36rn/P/w9kR18gFAbkDpkUp0tPXoKX7Q6Q0qpGu81FJ2YgF YcNC6qkumiwj63rFNl6uldgtL3pGhT
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert iblock and pscsi drivers to use blkdev_get_handle_by_path() and
-pass the handle around.
+Convert zram to use blkdev_get_handle_by_dev() and pass the handle
+around.
 
-CC: target-devel@vger.kernel.org
-CC: linux-scsi@vger.kernel.org
+CC: Minchan Kim <minchan@kernel.org>
+CC: Sergey Senozhatsky <senozhatsky@chromium.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/target/target_core_iblock.c | 19 +++++++++++--------
- drivers/target/target_core_iblock.h |  1 +
- drivers/target/target_core_pscsi.c  | 26 +++++++++++++-------------
- drivers/target/target_core_pscsi.h  |  2 +-
- 4 files changed, 26 insertions(+), 22 deletions(-)
+ drivers/block/zram/zram_drv.c | 31 ++++++++++++++-----------------
+ drivers/block/zram/zram_drv.h |  2 +-
+ 2 files changed, 15 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index a3c5f3558a33..979b0cfbea4a 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -91,7 +91,8 @@ static int iblock_configure_device(struct se_device *dev)
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 5676e6dd5b16..987e4885956e 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -414,17 +414,14 @@ static ssize_t writeback_limit_show(struct device *dev,
+ 
+ static void reset_bdev(struct zram *zram)
  {
- 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
- 	struct request_queue *q;
--	struct block_device *bd = NULL;
-+	struct bdev_handle *bdev_handle;
-+	struct block_device *bd;
- 	struct blk_integrity *bi;
- 	blk_mode_t mode = BLK_OPEN_READ;
- 	unsigned int max_write_zeroes_sectors;
-@@ -116,12 +117,14 @@ static int iblock_configure_device(struct se_device *dev)
- 	else
- 		dev->dev_flags |= DF_READ_ONLY;
+-	struct block_device *bdev;
+-
+ 	if (!zram->backing_dev)
+ 		return;
  
--	bd = blkdev_get_by_path(ib_dev->ibd_udev_path, mode, ib_dev, NULL);
--	if (IS_ERR(bd)) {
--		ret = PTR_ERR(bd);
-+	bdev_handle = blkdev_get_handle_by_path(ib_dev->ibd_udev_path, mode,
-+				ib_dev, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		ret = PTR_ERR(bdev_handle);
- 		goto out_free_bioset;
+-	bdev = zram->bdev;
+-	blkdev_put(bdev, zram);
++	blkdev_handle_put(zram->bdev_handle);
+ 	/* hope filp_close flush all of IO */
+ 	filp_close(zram->backing_dev, NULL);
+ 	zram->backing_dev = NULL;
+-	zram->bdev = NULL;
++	zram->bdev_handle = NULL;
+ 	zram->disk->fops = &zram_devops;
+ 	kvfree(zram->bitmap);
+ 	zram->bitmap = NULL;
+@@ -470,7 +467,7 @@ static ssize_t backing_dev_store(struct device *dev,
+ 	struct address_space *mapping;
+ 	unsigned int bitmap_sz;
+ 	unsigned long nr_pages, *bitmap = NULL;
+-	struct block_device *bdev = NULL;
++	struct bdev_handle *bdev_handle = NULL;
+ 	int err;
+ 	struct zram *zram = dev_to_zram(dev);
+ 
+@@ -507,11 +504,11 @@ static ssize_t backing_dev_store(struct device *dev,
+ 		goto out;
  	}
--	ib_dev->ibd_bd = bd;
-+	ib_dev->ibd_bdev_handle = bdev_handle;
-+	ib_dev->ibd_bd = bd = bdev_handle->bdev;
  
- 	q = bdev_get_queue(bd);
+-	bdev = blkdev_get_by_dev(inode->i_rdev, BLK_OPEN_READ | BLK_OPEN_WRITE,
+-				 zram, NULL);
+-	if (IS_ERR(bdev)) {
+-		err = PTR_ERR(bdev);
+-		bdev = NULL;
++	bdev_handle = blkdev_get_handle_by_dev(inode->i_rdev,
++				BLK_OPEN_READ | BLK_OPEN_WRITE, zram, NULL);
++	if (IS_ERR(bdev_handle)) {
++		err = PTR_ERR(bdev_handle);
++		bdev_handle = NULL;
+ 		goto out;
+ 	}
  
-@@ -177,7 +180,7 @@ static int iblock_configure_device(struct se_device *dev)
- 	return 0;
+@@ -525,7 +522,7 @@ static ssize_t backing_dev_store(struct device *dev,
  
- out_blkdev_put:
--	blkdev_put(ib_dev->ibd_bd, ib_dev);
-+	blkdev_handle_put(ib_dev->ibd_bdev_handle);
- out_free_bioset:
- 	bioset_exit(&ib_dev->ibd_bio_set);
+ 	reset_bdev(zram);
+ 
+-	zram->bdev = bdev;
++	zram->bdev_handle = bdev_handle;
+ 	zram->backing_dev = backing_dev;
+ 	zram->bitmap = bitmap;
+ 	zram->nr_pages = nr_pages;
+@@ -538,8 +535,8 @@ static ssize_t backing_dev_store(struct device *dev,
  out:
-@@ -202,8 +205,8 @@ static void iblock_destroy_device(struct se_device *dev)
- {
- 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
+ 	kvfree(bitmap);
  
--	if (ib_dev->ibd_bd != NULL)
--		blkdev_put(ib_dev->ibd_bd, ib_dev);
-+	if (ib_dev->ibd_bdev_handle)
-+		blkdev_handle_put(ib_dev->ibd_bdev_handle);
- 	bioset_exit(&ib_dev->ibd_bio_set);
- }
- 
-diff --git a/drivers/target/target_core_iblock.h b/drivers/target/target_core_iblock.h
-index 8c55375d2f75..683f9a55945b 100644
---- a/drivers/target/target_core_iblock.h
-+++ b/drivers/target/target_core_iblock.h
-@@ -32,6 +32,7 @@ struct iblock_dev {
- 	u32	ibd_flags;
- 	struct bio_set	ibd_bio_set;
- 	struct block_device *ibd_bd;
-+	struct bdev_handle *ibd_bdev_handle;
- 	bool ibd_readonly;
- 	struct iblock_dev_plug *ibd_plug;
- } ____cacheline_aligned;
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index 0d4f09693ef4..9ea2b29e95bf 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -352,7 +352,7 @@ static int pscsi_create_type_disk(struct se_device *dev, struct scsi_device *sd)
- 	struct pscsi_hba_virt *phv = dev->se_hba->hba_ptr;
- 	struct pscsi_dev_virt *pdv = PSCSI_DEV(dev);
- 	struct Scsi_Host *sh = sd->host;
--	struct block_device *bd;
-+	struct bdev_handle *bdev_handle;
- 	int ret;
- 
- 	if (scsi_device_get(sd)) {
-@@ -366,18 +366,18 @@ static int pscsi_create_type_disk(struct se_device *dev, struct scsi_device *sd)
- 	 * Claim exclusive struct block_device access to struct scsi_device
- 	 * for TYPE_DISK and TYPE_ZBC using supplied udev_path
- 	 */
--	bd = blkdev_get_by_path(dev->udev_path, BLK_OPEN_WRITE | BLK_OPEN_READ,
--				pdv, NULL);
--	if (IS_ERR(bd)) {
--		pr_err("pSCSI: blkdev_get_by_path() failed\n");
-+	bdev_handle = blkdev_get_handle_by_path(dev->udev_path,
-+				BLK_OPEN_WRITE | BLK_OPEN_READ, pdv, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		pr_err("pSCSI: blkdev_get_handle_by_path() failed\n");
- 		scsi_device_put(sd);
--		return PTR_ERR(bd);
-+		return PTR_ERR(bdev_handle);
- 	}
--	pdv->pdv_bd = bd;
-+	pdv->pdv_bdev_handle = bdev_handle;
- 
- 	ret = pscsi_add_device_to_list(dev, sd);
- 	if (ret) {
--		blkdev_put(pdv->pdv_bd, pdv);
+-	if (bdev)
+-		blkdev_put(bdev, zram);
++	if (bdev_handle)
 +		blkdev_handle_put(bdev_handle);
- 		scsi_device_put(sd);
- 		return ret;
- 	}
-@@ -564,9 +564,9 @@ static void pscsi_destroy_device(struct se_device *dev)
- 		 * from pscsi_create_type_disk()
- 		 */
- 		if ((sd->type == TYPE_DISK || sd->type == TYPE_ZBC) &&
--		    pdv->pdv_bd) {
--			blkdev_put(pdv->pdv_bd, pdv);
--			pdv->pdv_bd = NULL;
-+		    pdv->pdv_bdev_handle) {
-+			blkdev_handle_put(pdv->pdv_bdev_handle);
-+			pdv->pdv_bdev_handle = NULL;
- 		}
- 		/*
- 		 * For HBA mode PHV_LLD_SCSI_HOST_NO, release the reference
-@@ -994,8 +994,8 @@ static sector_t pscsi_get_blocks(struct se_device *dev)
+ 
+ 	if (backing_dev)
+ 		filp_close(backing_dev, NULL);
+@@ -581,7 +578,7 @@ static void read_from_bdev_async(struct zram *zram, struct page *page,
  {
- 	struct pscsi_dev_virt *pdv = PSCSI_DEV(dev);
+ 	struct bio *bio;
  
--	if (pdv->pdv_bd)
--		return bdev_nr_sectors(pdv->pdv_bd);
-+	if (pdv->pdv_bdev_handle)
-+		return bdev_nr_sectors(pdv->pdv_bdev_handle->bdev);
- 	return 0;
- }
+-	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
++	bio = bio_alloc(zram->bdev_handle->bdev, 1, parent->bi_opf, GFP_NOIO);
+ 	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
+ 	__bio_add_page(bio, page, PAGE_SIZE, 0);
+ 	bio_chain(bio, parent);
+@@ -697,7 +694,7 @@ static ssize_t writeback_store(struct device *dev,
+ 			continue;
+ 		}
  
-diff --git a/drivers/target/target_core_pscsi.h b/drivers/target/target_core_pscsi.h
-index 23d9a6e340d4..b0a3ef136592 100644
---- a/drivers/target/target_core_pscsi.h
-+++ b/drivers/target/target_core_pscsi.h
-@@ -37,7 +37,7 @@ struct pscsi_dev_virt {
- 	int	pdv_channel_id;
- 	int	pdv_target_id;
- 	int	pdv_lun_id;
--	struct block_device *pdv_bd;
-+	struct bdev_handle *pdv_bdev_handle;
- 	struct scsi_device *pdv_sd;
- 	struct Scsi_Host *pdv_lld_host;
- } ____cacheline_aligned;
+-		bio_init(&bio, zram->bdev, &bio_vec, 1,
++		bio_init(&bio, zram->bdev_handle->bdev, &bio_vec, 1,
+ 			 REQ_OP_WRITE | REQ_SYNC);
+ 		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
+ 		__bio_add_page(&bio, page, PAGE_SIZE, 0);
+@@ -779,7 +776,7 @@ static void zram_sync_read(struct work_struct *work)
+ 	struct bio_vec bv;
+ 	struct bio bio;
+ 
+-	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
++	bio_init(&bio, zw->zram->bdev_handle->bdev, &bv, 1, REQ_OP_READ);
+ 	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
+ 	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
+ 	zw->error = submit_bio_wait(&bio);
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index ca7a15bd4845..d090753f97be 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -132,7 +132,7 @@ struct zram {
+ 	spinlock_t wb_limit_lock;
+ 	bool wb_limit_enable;
+ 	u64 bd_wb_limit;
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	unsigned long *bitmap;
+ 	unsigned long nr_pages;
+ #endif
 -- 
 2.35.3
 
