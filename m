@@ -2,128 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC61BC001DF
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B2CC001DD
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:22:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbjGDMWf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 08:22:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39134 "EHLO
+        id S231364AbjGDMWe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 08:22:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230482AbjGDMWe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:34 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9EC910E4;
+        with ESMTP id S231511AbjGDMWd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:22:33 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A979310E0;
         Tue,  4 Jul 2023 05:22:26 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 4C7B022866;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 47B6420561;
         Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1688473345; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l/9tNwICvUuoTLkA/Gy/9VS1sV+XMpAvoque5APHO+Y=;
-        b=hIvXKyHLGq6INpq/5ZMcv1D8Go7SKKHbVm9SfbLZHD7E5lLf6RRKJSA6PiZUZA6xXo5pRk
-        yjZ6P2CXMd0gPQ/kslbbPX5vRbX7bI/+v1O62x3UCQ0f2S1hhVrpbCmYasCbTbJkx943Pj
-        6xKFsURWFEdrTynKCTY+QJhqw1Jq+QE=
+        bh=4Lkbb5Mje0WNsZ/GcMq2E4mZ3VWbelBu2fs1LSzkcPQ=;
+        b=2pLxAh1pRyvyKfHs6iUBjXSEFJCqGi3bSKp53BgNz3VKT2rXaYPb73WM8O6veibfJNDjAv
+        U5gjH49me9Akg1SEHnqTDq/AtUHde9iAC9ufiAwL/Pz6PJw/UWOh21jv21vwX/1/64wkrh
+        NRB1XHp1kxS3+we4024bxGiGCQcolLs=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1688473345;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l/9tNwICvUuoTLkA/Gy/9VS1sV+XMpAvoque5APHO+Y=;
-        b=6EqbD6Z4X0yzKMBmMUuaoRqAyFEwmgpyS6su6syRsBMdNf6YnzxtPX+Qmh22k+p4/YIVc7
-        GlGT/YB0Yo/hPhDw==
+        bh=4Lkbb5Mje0WNsZ/GcMq2E4mZ3VWbelBu2fs1LSzkcPQ=;
+        b=8X8Rm1OIKXZv/4QILit2yZsdQYIFZOLrQ3jfWfDBOL0hbtsXx3diVIZWWDc3nxqC+WPI33
+        RB6bVM5EwPGRDZBA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3BB4013A90;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 38C6C13A26;
         Tue,  4 Jul 2023 12:22:25 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id xSONDgEPpGQPMAAAMHmgww
+        id wvbaDQEPpGQMMAAAMHmgww
         (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:25 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 9C1D2A0764; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
+        id A69A2A0766; Tue,  4 Jul 2023 14:22:24 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 02/32] block: Use file->f_flags for determining exclusive opens in file_to_blk_mode()
-Date:   Tue,  4 Jul 2023 14:21:29 +0200
-Message-Id: <20230704122224.16257-2-jack@suse.cz>
+Subject: [PATCH 04/32] block: Use blkdev_get_handle_by_dev() in disk_scan_partitions() and blkdev_bszset()
+Date:   Tue,  4 Jul 2023 14:21:31 +0200
+Message-Id: <20230704122224.16257-4-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1927; i=jack@suse.cz; h=from:subject; bh=PTBdwG8gfONrGSEGa9q/ZP/2NSFGyJEWjshLi4HwM8M=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7MZiGCgbc9cMHyz7m328ACV4/6aSDyLe/6pWD6 8KPnwoiJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQOzAAKCRCcnaoHP2RA2WRVB/ wLMkALrjdQvw8JJ1YAIkFbjrSf7wmZ1fGYCYGg/i/x3LV8xPntNWlBqLbselAg2rRiIeA8HEKEL3y8 R8GLzy4LHb1a59QE7GHtoVL89o9azj2ZvFo9B5I973lqbPJSq6Hdz9ThhvQUaagClKEut/R5IS82oJ pG6JtIbE3bB/r2fbgT5v0LBAJW1ngMmwUKTkB/mIx7KQaM6PMxhGVuNydOnDrHh/xR7yzIqxBlQGjH RZsmxP62TR8VwiEnfpP+spmhZgUFjDBGCABEl4Ie/Iodt5gNJXQLjFiO3WiEgdza6vp0soCyEAab9M zJtR5ybhQRE6gT8krJiE9Bv4mlbbrJ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2027; i=jack@suse.cz; h=from:subject; bh=reAa4xp+ByCWL4gyc8bkQWtKEMhXKZ0Swr+DGhQCXHA=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7OaCVXB9KY7/IT1z0ojWoBnzT3ileJCfCBx5+e 02X2DTeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQOzgAKCRCcnaoHP2RA2antB/ oD+a76tm9xp4vV+CVPOD/YgGjMpFCURoyQ2UZv+bDW/yH/V9WZyM8hIMNIZ9jhNTaitPGrzcNQ8M7T JN1XY8dVOOXNTw2DUKs6KU/IFxtq0unxAdnMcJ8wFTFJ27vFD7iBDwx3VGk6WljOomGTlFBxZ31hXX lNX5D6RWPomtcCBeOGRpgpftAcYmxlWXBGlDpcumf/xJ0o7ZbYkT5YvhV/l5o6VkfkVdSaxXFvUUnj BHw3WiIHEBsCPXtBgW182+cUhtD+8s+RPW5pirhFTt2XEVaDtFagTB/Oodp2tXKzSyzBl4Smvu849F gMN/td41M0jvKancQCdETvoVeQM3Dj
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use file->f_flags instead of file->private_data for determining whether
-we should set BLK_OPEN_EXCL flag. This allows us to remove somewhat
-awkward setting of file->private_data before calling file_to_blk_mode()
-and it also makes following conversion to blkdev_get_handle_by_dev()
-simpler.
+Convert disk_scan_partitions() and blkdev_bszset() to use
+blkdev_get_handle_by_dev().
 
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/fops.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ block/genhd.c | 12 ++++++------
+ block/ioctl.c |  6 ++++--
+ 2 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/block/fops.c b/block/fops.c
-index a286bf3325c5..b6aa470c09ae 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -478,7 +478,7 @@ blk_mode_t file_to_blk_mode(struct file *file)
- 		mode |= BLK_OPEN_READ;
- 	if (file->f_mode & FMODE_WRITE)
- 		mode |= BLK_OPEN_WRITE;
--	if (file->private_data)
-+	if (file->f_flags & O_EXCL)
- 		mode |= BLK_OPEN_EXCL;
- 	if (file->f_flags & O_NDELAY)
- 		mode |= BLK_OPEN_NDELAY;
-@@ -497,6 +497,7 @@ blk_mode_t file_to_blk_mode(struct file *file)
- static int blkdev_open(struct inode *inode, struct file *filp)
+diff --git a/block/genhd.c b/block/genhd.c
+index 3d287b32d50d..d363ddb8d93a 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -342,7 +342,7 @@ EXPORT_SYMBOL_GPL(disk_uevent);
+ 
+ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
  {
- 	struct block_device *bdev;
-+	blk_mode_t mode;
+-	struct block_device *bdev;
++	struct bdev_handle *handle;
+ 	int ret = 0;
+ 
+ 	if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
+@@ -366,12 +366,12 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+ 	}
+ 
+ 	set_bit(GD_NEED_PART_SCAN, &disk->state);
+-	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~BLK_OPEN_EXCL, NULL,
+-				 NULL);
+-	if (IS_ERR(bdev))
+-		ret =  PTR_ERR(bdev);
++	handle = blkdev_get_handle_by_dev(disk_devt(disk),
++					  mode & ~BLK_OPEN_EXCL, NULL, NULL);
++	if (IS_ERR(handle))
++		ret = PTR_ERR(handle);
+ 	else
+-		blkdev_put(bdev, NULL);
++		blkdev_handle_put(handle);
  
  	/*
- 	 * Preserve backwards compatibility and allow large file access
-@@ -507,18 +508,14 @@ static int blkdev_open(struct inode *inode, struct file *filp)
- 	filp->f_flags |= O_LARGEFILE;
- 	filp->f_mode |= FMODE_BUF_RASYNC;
+ 	 * If blkdev_get_by_dev() failed early, GD_NEED_PART_SCAN is still set,
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 3be11941fb2d..940a7b9284c4 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -458,6 +458,7 @@ static int blkdev_bszset(struct block_device *bdev, blk_mode_t mode,
+ 		int __user *argp)
+ {
+ 	int ret, n;
++	struct bdev_handle *handle;
  
--	/*
--	 * Use the file private data to store the holder for exclusive openes.
--	 * file_to_blk_mode relies on it being present to set BLK_OPEN_EXCL.
--	 */
--	if (filp->f_flags & O_EXCL)
--		filp->private_data = filp;
--
--	bdev = blkdev_get_by_dev(inode->i_rdev, file_to_blk_mode(filp),
--				 filp->private_data, NULL);
-+	mode = file_to_blk_mode(filp);
-+	bdev = blkdev_get_by_dev(inode->i_rdev, mode,
-+				 mode & BLK_OPEN_EXCL ? filp : NULL, NULL);
- 	if (IS_ERR(bdev))
- 		return PTR_ERR(bdev);
+ 	if (!capable(CAP_SYS_ADMIN))
+ 		return -EACCES;
+@@ -469,10 +470,11 @@ static int blkdev_bszset(struct block_device *bdev, blk_mode_t mode,
+ 	if (mode & BLK_OPEN_EXCL)
+ 		return set_blocksize(bdev, n);
  
-+	if (mode & BLK_OPEN_EXCL)
-+		filp->private_data = filp;
- 	if (bdev_nowait(bdev))
- 		filp->f_mode |= FMODE_NOWAIT;
+-	if (IS_ERR(blkdev_get_by_dev(bdev->bd_dev, mode, &bdev, NULL)))
++	handle = blkdev_get_handle_by_dev(bdev->bd_dev, mode, &bdev, NULL);
++	if (IS_ERR(handle))
+ 		return -EBUSY;
+ 	ret = set_blocksize(bdev, n);
+-	blkdev_put(bdev, &bdev);
++	blkdev_handle_put(handle);
  
+ 	return ret;
+ }
 -- 
 2.35.3
 
