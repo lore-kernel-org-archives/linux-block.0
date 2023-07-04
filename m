@@ -2,153 +2,260 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B18C001E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E50B9C04A94
 	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 12:23:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230011AbjGDMXd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 08:23:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39674 "EHLO
+        id S231828AbjGDMXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 08:23:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231593AbjGDMXL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:23:11 -0400
+        with ESMTP id S230477AbjGDMXI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 08:23:08 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4106110E5;
-        Tue,  4 Jul 2023 05:22:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85F510E2;
+        Tue,  4 Jul 2023 05:22:36 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 83D192056C;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 68EFE2056A;
         Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1688473346; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IQwr5UuHNfhTbPltKjuSdQnPV1mAcWzpyJqrIN8BW0I=;
-        b=nOacVS8tJH8o+KaEeK8T7qQ2qZYGpNHZrHdl+D2d/5NBZt18W9D0GubEG33ybqDnC+6s4b
-        woJwgxkqsTmLNCBW6yzXws0T/lFkAzjqGC/Yy8oLTY1XTT79XS0OVHlS+Az39XvC4Fhvf/
-        fTQKQqeL1Cagw+Jr9qukz7p0SJj9fXc=
+        bh=5C0vSf4qpM600jxyFIfSlLovmkCTK8JZv7AB4Hu1hdc=;
+        b=Mow9YLKvqvLqN/5rA++1Up5M63KSxm+emJmTx7HjSfP1+RTQFyCCIZjR5joquFMKeFVTy0
+        8LpLhDUtXJM8Oe4TGUw0JTv2ACvXoahWQ+70izFSOAp2wL3YMmBDK4aSPSZdtimBznZQEU
+        BEUAeWdEKpPom9G5Odsv000vmQiNSQA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1688473346;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IQwr5UuHNfhTbPltKjuSdQnPV1mAcWzpyJqrIN8BW0I=;
-        b=VGVnKUg83uI2bRH7vJbEMJqY/TZfXogwFhtgNjI67oPxV8qlVbBcLGITDC+i2IDdUDpfZL
-        i2qifN45iJK9VYAQ==
+        bh=5C0vSf4qpM600jxyFIfSlLovmkCTK8JZv7AB4Hu1hdc=;
+        b=pUeXGqRMvSOmMgEl035lOROLy3P4LBN8m9yMn7E+Euqp4FJoIVH+6Rxe6RiYr5OIXwhXcu
+        foQ4dkQYDERpx3CQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 70B8913A26;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 53B3A13A97;
         Tue,  4 Jul 2023 12:22:26 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id xUKDGwIPpGRTMAAAMHmgww
+        id 9GNeFAIPpGRIMAAAMHmgww
         (envelope-from <jack@suse.cz>); Tue, 04 Jul 2023 12:22:26 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 3A9F4A078B; Tue,  4 Jul 2023 14:22:25 +0200 (CEST)
+        id 12B54A077E; Tue,  4 Jul 2023 14:22:25 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-block@vger.kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-nilfs@vger.kernel.org
-Subject: [PATCH 27/32] nilfs2: Convert to use blkdev_get_handle_by_path()
-Date:   Tue,  4 Jul 2023 14:21:54 +0200
-Message-Id: <20230704122224.16257-27-jack@suse.cz>
+        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 20/32] fs: Convert to blkdev_get_handle_by_path()
+Date:   Tue,  4 Jul 2023 14:21:47 +0200
+Message-Id: <20230704122224.16257-20-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230629165206.383-1-jack@suse.cz>
 References: <20230629165206.383-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2354; i=jack@suse.cz; h=from:subject; bh=DtdezkZSK/EN7RM1qSQYRSnndqPmr+l0kbPMp17XFJg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7iDlB6QtnlTTlGdMJScOFDAX2JZEdaLV5wnQzq wfPr4T+JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO4gAKCRCcnaoHP2RA2WRuB/ 93sM8/9dGNutmxHoGEwtGYIIHvJjLz0OrPGr/rt39+sF5c9+WtfclsNZKrDE94oblL8T2o3nX5R/LN wiAFHzzgZYgg/12m8Za2axys3zh+uos763PGHIk2KfJ+6Fo+mFYKKZKIRKiviewfu6XgdJv4Qo0+Sb psBZY1rOU3m/HWCVvqcfugnu4hJN3rdUqYbpGcLYB6UEM1PEg+oSPR4kf30dV8D3q48lMGy+1vNmj1 5IRRSUYNFyHdzvBXDpA+Hsis5vX0vfXijjPcmhb2D2Km2OntPST3pnilGdLVKp2XkkBuTbXx29A01B iSQmxGUB40YvRnmZFjGSZXIVogEbjT
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6436; i=jack@suse.cz; h=from:subject; bh=eZ1AlUUvooov2FQ4T5JXo9pU5gTx16tisjY9pDL3yKE=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBkpA7bpicYMH8xk616a0sMk8movLWUni09LtGwLjwY 1kQIVAyJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZKQO2wAKCRCcnaoHP2RA2VfUB/ 0Wqwd8lnvaA6+9ihJrqfwkO4Y5IVNBkIxRPMvo87bmTZwYaGF11ksoPoMIzB9VYluRQmU8nm1SboMs AjW4GGDBI5cn5qLhG1oCZlgop86NRMDroPUCWNJNSiN/HXKVya507GZIWqg9pG/VUaRgVloL7usnIU eSKY69CJSKJ8CbXkg6mH33Y5S2Hp8ZP4h3fITReMA7B4rI7seGn7O/veUDAL763wVEbE8U+TWWvH2U /sPoEsYIjteps7Mw8TDWNhEB+4vQhFRrDgrIacCVjFVcglIYfLQi7I4D4aDZQCdpyeJZO4nn2MYDLH vPEa66rkU00AZl0q+bsZo49Y6WeMTt
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert nilfs2 to use blkdev_get_handle_by_path() and initialize the
-superblock with the handle.
+Convert mount code to use blkdev_get_handle_by_path() and propagate the
+handle around to blkdev_handle_put().
 
-CC: linux-nilfs@vger.kernel.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/nilfs2/super.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ fs/super.c         | 52 ++++++++++++++++++++++++++--------------------
+ include/linux/fs.h |  1 +
+ 2 files changed, 31 insertions(+), 22 deletions(-)
 
-diff --git a/fs/nilfs2/super.c b/fs/nilfs2/super.c
-index 0ef8c71bde8e..0aba0daa06d2 100644
---- a/fs/nilfs2/super.c
-+++ b/fs/nilfs2/super.c
-@@ -1283,14 +1283,15 @@ static int nilfs_identify(char *data, struct nilfs_super_data *sd)
+diff --git a/fs/super.c b/fs/super.c
+index e781226e2880..d35545364c5d 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1228,7 +1228,8 @@ static const struct blk_holder_ops fs_holder_ops = {
  
- static int nilfs_set_bdev_super(struct super_block *s, void *data)
+ static int set_bdev_super(struct super_block *s, void *data)
  {
 -	s->s_bdev = data;
 +	s->s_bdev_handle = data;
 +	s->s_bdev = s->s_bdev_handle->bdev;
  	s->s_dev = s->s_bdev->bd_dev;
- 	return 0;
+ 	s->s_bdi = bdi_get(s->s_bdev->bd_disk->bdi);
+ 
+@@ -1244,7 +1245,8 @@ static int set_bdev_super_fc(struct super_block *s, struct fs_context *fc)
+ 
+ static int test_bdev_super_fc(struct super_block *s, struct fs_context *fc)
+ {
+-	return !(s->s_iflags & SB_I_RETIRED) && s->s_bdev == fc->sget_key;
++	return !(s->s_iflags & SB_I_RETIRED) &&
++		s->s_bdev == ((struct bdev_handle *)fc->sget_key)->bdev;
  }
  
- static int nilfs_test_bdev_super(struct super_block *s, void *data)
+ /**
+@@ -1256,6 +1258,7 @@ int get_tree_bdev(struct fs_context *fc,
+ 		int (*fill_super)(struct super_block *,
+ 				  struct fs_context *))
  {
--	return (void *)s->s_bdev == data;
-+	return s->s_bdev == ((struct bdev_handle *)data)->bdev;
- }
- 
- static struct dentry *
-@@ -1298,15 +1299,17 @@ nilfs_mount(struct file_system_type *fs_type, int flags,
- 	     const char *dev_name, void *data)
- {
- 	struct nilfs_super_data sd;
 +	struct bdev_handle *bdev_handle;
+ 	struct block_device *bdev;
  	struct super_block *s;
- 	struct dentry *root_dentry;
- 	int err, s_new = false;
+ 	int error = 0;
+@@ -1263,12 +1266,14 @@ int get_tree_bdev(struct fs_context *fc,
+ 	if (!fc->source)
+ 		return invalf(fc, "No source specified");
  
--	sd.bdev = blkdev_get_by_path(dev_name, sb_open_mode(flags), fs_type,
--				     NULL);
--	if (IS_ERR(sd.bdev))
--		return ERR_CAST(sd.bdev);
+-	bdev = blkdev_get_by_path(fc->source, sb_open_mode(fc->sb_flags),
+-				  fc->fs_type, &fs_holder_ops);
+-	if (IS_ERR(bdev)) {
++	bdev_handle = blkdev_get_handle_by_path(fc->source,
++			sb_open_mode(fc->sb_flags), fc->fs_type,
++			&fs_holder_ops);
++	if (IS_ERR(bdev_handle)) {
+ 		errorf(fc, "%s: Can't open blockdev", fc->source);
+-		return PTR_ERR(bdev);
++		return PTR_ERR(bdev_handle);
+ 	}
++	bdev = bdev_handle->bdev;
+ 
+ 	/* Once the superblock is inserted into the list by sget_fc(), s_umount
+ 	 * will protect the lockfs code from trying to start a snapshot while
+@@ -1278,16 +1283,16 @@ int get_tree_bdev(struct fs_context *fc,
+ 	if (bdev->bd_fsfreeze_count > 0) {
+ 		mutex_unlock(&bdev->bd_fsfreeze_mutex);
+ 		warnf(fc, "%pg: Can't mount, blockdev is frozen", bdev);
+-		blkdev_put(bdev, fc->fs_type);
++		blkdev_handle_put(bdev_handle);
+ 		return -EBUSY;
+ 	}
+ 
+ 	fc->sb_flags |= SB_NOSEC;
+-	fc->sget_key = bdev;
++	fc->sget_key = bdev_handle;
+ 	s = sget_fc(fc, test_bdev_super_fc, set_bdev_super_fc);
+ 	mutex_unlock(&bdev->bd_fsfreeze_mutex);
+ 	if (IS_ERR(s)) {
+-		blkdev_put(bdev, fc->fs_type);
++		blkdev_handle_put(bdev_handle);
+ 		return PTR_ERR(s);
+ 	}
+ 
+@@ -1296,19 +1301,19 @@ int get_tree_bdev(struct fs_context *fc,
+ 		if ((fc->sb_flags ^ s->s_flags) & SB_RDONLY) {
+ 			warnf(fc, "%pg: Can't mount, would change RO state", bdev);
+ 			deactivate_locked_super(s);
+-			blkdev_put(bdev, fc->fs_type);
++			blkdev_handle_put(bdev_handle);
+ 			return -EBUSY;
+ 		}
+ 
+ 		/*
+ 		 * s_umount nests inside open_mutex during
+-		 * __invalidate_device().  blkdev_put() acquires
++		 * __invalidate_device().  blkdev_handle_put() acquires
+ 		 * open_mutex and can't be called under s_umount.  Drop
+ 		 * s_umount temporarily.  This is safe as we're
+ 		 * holding an active reference.
+ 		 */
+ 		up_write(&s->s_umount);
+-		blkdev_put(bdev, fc->fs_type);
++		blkdev_handle_put(bdev_handle);
+ 		down_write(&s->s_umount);
+ 	} else {
+ 		snprintf(s->s_id, sizeof(s->s_id), "%pg", bdev);
+@@ -1333,21 +1338,24 @@ EXPORT_SYMBOL(get_tree_bdev);
+ 
+ static int test_bdev_super(struct super_block *s, void *data)
+ {
+-	return !(s->s_iflags & SB_I_RETIRED) && (void *)s->s_bdev == data;
++	return !(s->s_iflags & SB_I_RETIRED) &&
++		s->s_bdev == ((struct bdev_handle *)data)->bdev;
+ }
+ 
+ struct dentry *mount_bdev(struct file_system_type *fs_type,
+ 	int flags, const char *dev_name, void *data,
+ 	int (*fill_super)(struct super_block *, void *, int))
+ {
++	struct bdev_handle *bdev_handle;
+ 	struct block_device *bdev;
+ 	struct super_block *s;
+ 	int error = 0;
+ 
+-	bdev = blkdev_get_by_path(dev_name, sb_open_mode(flags), fs_type,
+-				  &fs_holder_ops);
+-	if (IS_ERR(bdev))
+-		return ERR_CAST(bdev);
 +	bdev_handle = blkdev_get_handle_by_path(dev_name, sb_open_mode(flags),
-+				fs_type, NULL);
++				fs_type, &fs_holder_ops);
 +	if (IS_ERR(bdev_handle))
 +		return ERR_CAST(bdev_handle);
++	bdev = bdev_handle->bdev;
  
-+	sd.bdev = bdev_handle->bdev;
- 	sd.cno = 0;
- 	sd.flags = flags;
- 	if (nilfs_identify((char *)data, &sd)) {
-@@ -1326,7 +1329,7 @@ nilfs_mount(struct file_system_type *fs_type, int flags,
- 		goto failed;
+ 	/*
+ 	 * once the super is inserted into the list by sget, s_umount
+@@ -1361,7 +1369,7 @@ struct dentry *mount_bdev(struct file_system_type *fs_type,
+ 		goto error_bdev;
  	}
- 	s = sget(fs_type, nilfs_test_bdev_super, nilfs_set_bdev_super, flags,
--		 sd.bdev);
+ 	s = sget(fs_type, test_bdev_super, set_bdev_super, flags | SB_NOSEC,
+-		 bdev);
 +		 bdev_handle);
- 	mutex_unlock(&sd.bdev->bd_fsfreeze_mutex);
- 	if (IS_ERR(s)) {
- 		err = PTR_ERR(s);
-@@ -1374,7 +1377,7 @@ nilfs_mount(struct file_system_type *fs_type, int flags,
- 	}
+ 	mutex_unlock(&bdev->bd_fsfreeze_mutex);
+ 	if (IS_ERR(s))
+ 		goto error_s;
+@@ -1375,13 +1383,13 @@ struct dentry *mount_bdev(struct file_system_type *fs_type,
  
- 	if (!s_new)
--		blkdev_put(sd.bdev, fs_type);
+ 		/*
+ 		 * s_umount nests inside open_mutex during
+-		 * __invalidate_device().  blkdev_put() acquires
++		 * __invalidate_device().  blkdev_handle_put() acquires
+ 		 * open_mutex and can't be called under s_umount.  Drop
+ 		 * s_umount temporarily.  This is safe as we're
+ 		 * holding an active reference.
+ 		 */
+ 		up_write(&s->s_umount);
+-		blkdev_put(bdev, fs_type);
 +		blkdev_handle_put(bdev_handle);
- 
- 	return root_dentry;
- 
-@@ -1383,7 +1386,7 @@ nilfs_mount(struct file_system_type *fs_type, int flags,
- 
-  failed:
- 	if (!s_new)
--		blkdev_put(sd.bdev, fs_type);
-+		blkdev_handle_put(bdev_handle);
- 	return ERR_PTR(err);
+ 		down_write(&s->s_umount);
+ 	} else {
+ 		snprintf(s->s_id, sizeof(s->s_id), "%pg", bdev);
+@@ -1403,7 +1411,7 @@ struct dentry *mount_bdev(struct file_system_type *fs_type,
+ error_s:
+ 	error = PTR_ERR(s);
+ error_bdev:
+-	blkdev_put(bdev, fs_type);
++	blkdev_handle_put(bdev_handle);
+ error:
+ 	return ERR_PTR(error);
+ }
+@@ -1416,7 +1424,7 @@ void kill_block_super(struct super_block *sb)
+ 	bdev->bd_super = NULL;
+ 	generic_shutdown_super(sb);
+ 	sync_blockdev(bdev);
+-	blkdev_put(bdev, sb->s_type);
++	blkdev_handle_put(sb->s_bdev_handle);
  }
  
+ EXPORT_SYMBOL(kill_block_super);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 6867512907d6..44a224b91570 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1187,6 +1187,7 @@ struct super_block {
+ 	struct hlist_bl_head	s_roots;	/* alternate root dentries for NFS */
+ 	struct list_head	s_mounts;	/* list of mounts; _not_ for fs use */
+ 	struct block_device	*s_bdev;
++	struct bdev_handle	*s_bdev_handle;
+ 	struct backing_dev_info *s_bdi;
+ 	struct mtd_info		*s_mtd;
+ 	struct hlist_node	s_instances;
 -- 
 2.35.3
 
