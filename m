@@ -2,110 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AEDDEB64D9
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jul 2023 23:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD25C0015E
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 00:12:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231539AbjGDXoD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 19:44:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54546 "EHLO
+        id S229532AbjGEAMQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jul 2023 20:12:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230259AbjGDXoC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 19:44:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1998B133;
-        Tue,  4 Jul 2023 16:44:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ABE1861405;
-        Tue,  4 Jul 2023 23:44:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA50FC433C7;
-        Tue,  4 Jul 2023 23:43:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688514241;
-        bh=ceayCKM3+x6ed5rZZm2T8UQm1FTZPyFU9zOczId87uI=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=CKS9UMP+8Jd5GwgH+mtjfRSJQkZ9xonvTumDGZUqoYbJzW/83bsl23P6i2E3Mdou6
-         dyDutVrDe3/IUaypeYZ3FiefL+ruoidHj3gHgV/sHb7rtAG9j3X1tslOmNAYPF3yYq
-         UFpgUDlms0c9IMKFCwfVjjo8+saub4ZvyVD2b5p3QaoZ1dDd6inFuveguWdUsrSlFe
-         cfx9yfknL4jGzQR7O6iLz4eKrCfHP/AZ4Z2LMZuY3XMjeaV+HJCPQNQyZ7b6jn2dG2
-         OK0MTSgMHhkUSR6Ui/Ba0DiO/N9K45urH+eOMppLzTijnbxewdtys+khF9XVPoU7ey
-         4eYO8+Xh2pvWA==
-Message-ID: <451e842b-8233-2d85-00f4-d3a0bae1e694@kernel.org>
-Date:   Wed, 5 Jul 2023 08:43:58 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v5 4/5] ublk: add helper to check if device supports user
- copy
-Content-Language: en-US
+        with ESMTP id S229645AbjGEAMP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 20:12:15 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C2CDD;
+        Tue,  4 Jul 2023 17:12:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688515930; x=1720051930;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QKyagUPboxcpQf0rlrW9d6i0lm4pdk3WkpwbACGjPms=;
+  b=Bj00pZLtpJYVQglaedktltJ7wqAe90ExwceH26AmXUccwhnqpvIPzB+V
+   bLqD+VDGVJiR5jhWYC7noKTMt+RZVo3p+T473OQnr0wIw7b8Z3RrlZpd4
+   2H8IDKWtmUCxs2NZBN9ML83eiuG4lJUsnawowt10hAMFJNN8aBPgccg1u
+   jD0XscW5i1ks/rUu+1wcgNKPlzUennmYzgK6f0X1sVHSXOIvt/SpwvEfc
+   YuppWYhj2qJNnx59XVmPKWHnUfhdbgiiymCEpcT6rrLEqBQVPHRB03vmp
+   nYHIBjn9tKTTk01GVv0k100dDQ6MSWUvA2rcygYk07SrolKlU1nGiBdOW
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="362077347"
+X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
+   d="scan'208";a="362077347"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2023 17:12:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="696283513"
+X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
+   d="scan'208";a="696283513"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 04 Jul 2023 17:12:06 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qGq7p-000Iep-2Q;
+        Wed, 05 Jul 2023 00:12:05 +0000
+Date:   Wed, 5 Jul 2023 08:11:44 +0800
+From:   kernel test robot <lkp@intel.com>
 To:     Andreas Hindborg <nmi@metaspace.dk>, Ming Lei <ming.lei@redhat.com>
-Cc:     open list <linux-kernel@vger.kernel.org>,
+Cc:     oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
         Matias Bjorling <Matias.Bjorling@wdc.com>,
         Hans Holmberg <Hans.Holmberg@wdc.com>,
         Jens Axboe <axboe@kernel.dk>,
         Minwoo Im <minwoo.im.dev@gmail.com>,
         Aravind Ramesh <Aravind.Ramesh@wdc.com>, gost.dev@samsung.com,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
         Andreas Hindborg <a.hindborg@samsung.com>
-References: <20230704165209.514591-1-nmi@metaspace.dk>
- <20230704165209.514591-5-nmi@metaspace.dk>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230704165209.514591-5-nmi@metaspace.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v5 5/5] ublk: enable zoned storage support
+Message-ID: <202307050741.XbpaKP7i-lkp@intel.com>
+References: <20230704165209.514591-6-nmi@metaspace.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230704165209.514591-6-nmi@metaspace.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/5/23 01:52, Andreas Hindborg wrote:
-> From: Andreas Hindborg <a.hindborg@samsung.com>
-> 
-> This will be used by ublk zoned storage support.
-> 
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+Hi Andreas,
 
-Looks good.
+kernel test robot noticed the following build errors:
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+[auto build test ERROR on 3261ea42710e9665c9151006049411bd23b5411f]
 
-> ---
->  drivers/block/ublk.c | 2 +-
->  drivers/block/ublk.h | 5 +++++
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/ublk.c b/drivers/block/ublk.c
-> index a0453619bf67..0b1ec102aaae 100644
-> --- a/drivers/block/ublk.c
-> +++ b/drivers/block/ublk.c
-> @@ -1947,7 +1947,7 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
->  		UBLK_F_URING_CMD_COMP_IN_TASK;
->  
->  	/* GET_DATA isn't needed any more with USER_COPY */
-> -	if (ub->dev_info.flags & UBLK_F_USER_COPY)
-> +	if (ublk_dev_is_user_copy(ub))
->  		ub->dev_info.flags &= ~UBLK_F_NEED_GET_DATA;
->  
->  	/* We are not ready to support zero copy */
-> diff --git a/drivers/block/ublk.h b/drivers/block/ublk.h
-> index 2a4ab721d513..fcbcc6b02aa0 100644
-> --- a/drivers/block/ublk.h
-> +++ b/drivers/block/ublk.h
-> @@ -100,4 +100,9 @@ struct ublk_io {
->  	struct io_uring_cmd *cmd;
->  };
->  
-> +static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
-> +{
-> +	return ub->dev_info.flags & UBLK_F_USER_COPY;
-> +}
-> +
->  #endif
+url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/ublk-add-opcode-offsets-for-DRV_IN-DRV_OUT/20230705-005338
+base:   3261ea42710e9665c9151006049411bd23b5411f
+patch link:    https://lore.kernel.org/r/20230704165209.514591-6-nmi%40metaspace.dk
+patch subject: [PATCH v5 5/5] ublk: enable zoned storage support
+config: mips-allyesconfig (https://download.01.org/0day-ci/archive/20230705/202307050741.XbpaKP7i-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230705/202307050741.XbpaKP7i-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307050741.XbpaKP7i-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   arch/mips/kernel/head.o: in function `_stext':
+   (.text+0x0): relocation truncated to fit: R_MIPS_26 against `kernel_entry'
+   arch/mips/kernel/head.o: in function `smp_bootstrap':
+   (.ref.text+0xd8): relocation truncated to fit: R_MIPS_26 against `start_secondary'
+   init/main.o: in function `set_reset_devices':
+   main.c:(.init.text+0x20): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0x30): relocation truncated to fit: R_MIPS_26 against `__sanitizer_cov_trace_pc'
+   init/main.o: in function `debug_kernel':
+   main.c:(.init.text+0xa4): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0xb4): relocation truncated to fit: R_MIPS_26 against `__sanitizer_cov_trace_pc'
+   init/main.o: in function `quiet_kernel':
+   main.c:(.init.text+0x128): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0x138): relocation truncated to fit: R_MIPS_26 against `__sanitizer_cov_trace_pc'
+   init/main.o: in function `warn_bootconfig':
+   main.c:(.init.text+0x1ac): relocation truncated to fit: R_MIPS_26 against `_mcount'
+   main.c:(.init.text+0x1bc): relocation truncated to fit: R_MIPS_26 against `__sanitizer_cov_trace_pc'
+   init/main.o: in function `init_setup':
+   main.c:(.init.text+0x230): additional relocation overflows omitted from the output
+   mips-linux-ld: drivers/block/ublk-zoned.o: in function `ublk_set_nr_zones':
+>> ublk-zoned.c:(.text.ublk_set_nr_zones+0x17c): undefined reference to `__udivdi3'
+   mips-linux-ld: drivers/block/ublk-zoned.o: in function `ublk_dev_param_zoned_validate':
+>> ublk-zoned.c:(.text.ublk_dev_param_zoned_validate+0x258): undefined reference to `__udivdi3'
 
 -- 
-Damien Le Moal
-Western Digital Research
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
