@@ -2,107 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BECEB64DD
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 09:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDDDEB64DD
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 09:11:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232178AbjGEJIe convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jul 2023 05:08:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41778 "EHLO
+        id S231969AbjGEJLp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jul 2023 05:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231823AbjGEJId (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 05:08:33 -0400
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52B011706;
-        Wed,  5 Jul 2023 02:08:32 -0700 (PDT)
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-c5c03379a76so1906428276.1;
-        Wed, 05 Jul 2023 02:08:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688548111; x=1691140111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E+TNnJonIwEoTpka1YO/KDKKK9gHKhOV507pFmzvVvo=;
-        b=gAYjz5MryJWAeykZs1fl1yyMyFyI+wRQ6dcNjzxp7RSObvB9WHH9RsHEJTpM7mClEX
-         niulX6xvqCg46B2Aluyj/6OaeBNeHq9ipCaxmWaQS8CrG9ItCg6SA/dW7Wtdkdwj4u4r
-         Tx7gK16a3aAUkRFrjhJa0eDtyIykEBWsMsBS+N8s52du5DbjS1QQqQnAVHNTuXW6c6pa
-         EU0FpCX3bAjAEoZy/iM+dMPBriIUnxVZVtvdD6+ipAjeYWoQ1HlBM+fUKaxnf1TK7RoG
-         3NDvxdurBLAxZ5yK+4NHy75Th8SCpUEAysKoibS+5At8o6DNXbMy/7ZUp2ClS+CJlWut
-         d2wg==
-X-Gm-Message-State: ABy/qLbiLio7X4Swd3MGEHC4iZYZ0JKaDBAYZBGFxDLCI+UwI6P0cMMQ
-        A1bnnkYwz9pf/FJhn6HL5jv4lOgto/izEA==
-X-Google-Smtp-Source: APBJJlF2cdFQ/RfTXYI9fun9UP6bBacdF2Oe83rK3eciuHwHnRCu8SziRtjj81RzWWJu2Ew1HH9AbA==
-X-Received: by 2002:a25:ab65:0:b0:c1b:d362:4b4e with SMTP id u92-20020a25ab65000000b00c1bd3624b4emr14470370ybi.43.1688548110951;
-        Wed, 05 Jul 2023 02:08:30 -0700 (PDT)
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com. [209.85.219.174])
-        by smtp.gmail.com with ESMTPSA id q6-20020a258e86000000b00c5cac376dffsm672813ybl.22.2023.07.05.02.08.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jul 2023 02:08:30 -0700 (PDT)
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-c5e76dfcc36so1402582276.2;
-        Wed, 05 Jul 2023 02:08:30 -0700 (PDT)
-X-Received: by 2002:a25:d701:0:b0:c19:df8b:68b with SMTP id
- o1-20020a25d701000000b00c19df8b068bmr14361415ybg.47.1688548110559; Wed, 05
- Jul 2023 02:08:30 -0700 (PDT)
+        with ESMTP id S229901AbjGEJLo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 05:11:44 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B187C10D5
+        for <linux-block@vger.kernel.org>; Wed,  5 Jul 2023 02:11:41 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5E5EC22422;
+        Wed,  5 Jul 2023 09:11:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1688548300; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QUx+G9Ikc1JcrkULELUyJhcCdeD93Kd+JwIOZOQVEPo=;
+        b=wqN58WNBWlHAO9OXbYJtpheItBWrHWGwEo47PaYvozDMyFfbXNwxDC4QeKrufVG+qoba3k
+        da0adc/jyMLYjS5pvcAWDq2HmZlISTg7JHfAnstLV3/ELZDHdBPFKfuicwwRWWn6Ig3135
+        CZrMF2ezCKXl+sbd2oPgorEAi6QtDwU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1688548300;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QUx+G9Ikc1JcrkULELUyJhcCdeD93Kd+JwIOZOQVEPo=;
+        b=bQmoS0BDHSY+2qmHWf9lVBW6yHNjkSodYRrXPggyZl2wCfBRkiza0vH/bRoA2qTAOewIDX
+        YmPVwz7oYfDXLuAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4FBAF134F3;
+        Wed,  5 Jul 2023 09:11:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id UChrE8wzpWTaZAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 05 Jul 2023 09:11:40 +0000
+Date:   Wed, 5 Jul 2023 11:11:39 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Yi Zhang <yi.zhang@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [bug report] most of blktests nvme/ failed on the latest linux
+ tree
+Message-ID: <4rzx7tets37h3tifirq3i63nh5n45cbmiu4xdwvoojhdmqquv2@rwnidq3hbuwg>
+References: <0c4b16a5-17da-02d9-754a-3c7a158daa56@nvidia.com>
+ <CAHj4cs9ayQ8J+wDCWVKjmBTWTi7Bc3uqqTCDzL2ZY6JhpdDhsQ@mail.gmail.com>
+ <1fda4154-50f4-c09d-dbb1-3b53ed63d341@nvidia.com>
+ <CAHj4cs_+yBbs+MgrC8Z8J7X8cKYwwr6wcR5tLfUCcYkftL7N1Q@mail.gmail.com>
+ <52df24f1-ebb7-cd24-3aaf-7b946acab3ee@grimberg.me>
+ <CAHj4cs9=8fPRtXj4uyjN9MV1OMNNXwcVGte7CDnFxXYYbnnX0A@mail.gmail.com>
+ <b3377b27-28de-c8ed-d45a-c3f241c24415@grimberg.me>
+ <lfwwdbrtexufmsjbrw5j36jay2m56kdnuzwcrmcwnickzmgb4i@b5d32kl3oaps>
+ <zftdt4pmjiwnbkje2zpl2kp5oraapsrawpbwf3l5qppmegpylj@so52n3f5zd6u>
+ <l7vk7fnzltpmvkwujsbf2btrzip6wh7ug62iwa3totqcda25l6@siqx7tj6lt3l>
 MIME-Version: 1.0
-References: <20230620201725.7020-1-schmitzmic@gmail.com> <20230704233808.25166-1-schmitzmic@gmail.com>
- <20230704233808.25166-2-schmitzmic@gmail.com> <CAMuHMdUc-mqHC80euFrXLGGJO3gLW3ywu2aG4MDQi5ED=dWFeQ@mail.gmail.com>
- <06995206-5dc5-8008-ef06-c76389ef0dd8@gmail.com>
-In-Reply-To: <06995206-5dc5-8008-ef06-c76389ef0dd8@gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Wed, 5 Jul 2023 11:08:19 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVGNB_aZnDHw_wfDTinDk+LKkP1Lx96Cgm0jM6J1WdACQ@mail.gmail.com>
-Message-ID: <CAMuHMdVGNB_aZnDHw_wfDTinDk+LKkP1Lx96Cgm0jM6J1WdACQ@mail.gmail.com>
-Subject: Re: [PATCH v4 1/1] block: bugfix for Amiga partition overflow check patch
-To:     Michael Schmitz <schmitzmic@gmail.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-m68k@vger.kernel.org, chzigotzky@xenosoft.de, hch@lst.de,
-        martin@lichtvoll.de, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <l7vk7fnzltpmvkwujsbf2btrzip6wh7ug62iwa3totqcda25l6@siqx7tj6lt3l>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Michael,
+On Fri, Jun 30, 2023 at 08:48:55AM +0000, Shinichiro Kawasaki wrote:
+> diff --git a/fabrics.c b/fabrics.c
+> index ac240cad..2eeea48c 100644
+> --- a/fabrics.c
+> +++ b/fabrics.c
+> @@ -677,6 +677,26 @@ static int nvme_read_volatile_config(nvme_root_t r)
+>  	return ret;
+>  }
+>  
+> +char *nvmf_hostid_from_hostnqn(const char *hostnqn)
+> +{
+> +	const char *uuid;
+> +	const char *hostid_from_file;
+> +
+> +	if (!hostnqn)
+> +		return NULL;
+> +
+> +	uuid = strstr(hostnqn, "uuid:");
+> +	if (!uuid)
+> +		return NULL;
+> +	uuid += strlen("uuid:");
+> +
+> +	hostid_from_file = nvmf_hostid_from_file();
+> +	if (hostid_from_file && strcmp(uuid, hostid_from_file))
+> +		fprintf(stderr, "warning: use generated hostid instead of hostid file\n");
+> +
+> +	return strdup(uuid);
+> +}
 
-On Wed, Jul 5, 2023 at 10:53 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
-> Am 05.07.2023 um 19:28 schrieb Geert Uytterhoeven:
-> > On Wed, Jul 5, 2023 at 1:38 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
-> >> Making 'blk' sector_t (i.e. 64 bit if LBD support is active)
-> >> fails the 'blk>0' test in the partition block loop if a
-> >> value of (signed int) -1 is used to mark the end of the
-> >> partition block list.
-> >>
-> >> This bug was introduced in patch 3 of my prior Amiga partition
-> >> support fixes series, and spotted by Christian Zigotzky when
-> >> testing the latest block updates.
-> >>
-> >> Explicitly cast 'blk' to signed int to allow use of -1 to
-> >> terminate the partition block linked list.
-> >>
-> >> Reported-by: Christian Zigotzky <chzigotzky@xenosoft.de>
-> >> Fixes: b6f3f28f60 ("block: add overflow checks for Amiga partition support")
-> >> Message-ID: 024ce4fa-cc6d-50a2-9aae-3701d0ebf668@xenosoft.de
-> >
-> > Please drop this line.
->
-> Because it's redundant, as I've also used Link:?
+Maybe we should move the check after ...
 
-(That, too ;-)
 
-Because the use of the Message-ID: tag in patches is not documented.
-IIRC, it might also cause issues when applying, as the downloaded patch
-will appear to have two Message-IDs.
-I'm not sure the sample git hook in Documentation/maintainer/configure-git.rst
-(and all variants the various maintainers are using) handles this correctly.
+>  int nvmf_discover(const char *desc, int argc, char **argv, bool connect)
+>  {
+>  	char *subsysnqn = NVME_DISC_SUBSYS_NAME;
+> @@ -753,8 +773,10 @@ int nvmf_discover(const char *desc, int argc, char **argv, bool connect)
+>  	hostid_arg = hostid;
+>  	if (!hostnqn)
+>  		hostnqn = hnqn = nvmf_hostnqn_from_file();
+> -	if (!hostnqn)
+> +	if (!hostnqn) {
+>  		hostnqn = hnqn = nvmf_hostnqn_generate();
+> +		hostid = hid = nvmf_hostid_from_hostnqn(hostnqn);
+> +	}
+>  	if (!hostid)
+>  		hostid = hid = nvmf_hostid_from_file();
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+... here so that we also catch the case when the /etc/nvme/hostnqn and /etc/nvme/hostid
+do not match
