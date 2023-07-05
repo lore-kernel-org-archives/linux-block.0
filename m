@@ -2,125 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDDDEB64DD
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 09:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B77EB64DD
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 10:17:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231969AbjGEJLp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jul 2023 05:11:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42698 "EHLO
+        id S231965AbjGEKRe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jul 2023 06:17:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbjGEJLo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 05:11:44 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B187C10D5
-        for <linux-block@vger.kernel.org>; Wed,  5 Jul 2023 02:11:41 -0700 (PDT)
+        with ESMTP id S230255AbjGEKRb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 06:17:31 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F06180;
+        Wed,  5 Jul 2023 03:17:30 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 5E5EC22422;
-        Wed,  5 Jul 2023 09:11:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1688548300; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D55131F889;
+        Wed,  5 Jul 2023 10:17:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1688552248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=QUx+G9Ikc1JcrkULELUyJhcCdeD93Kd+JwIOZOQVEPo=;
-        b=wqN58WNBWlHAO9OXbYJtpheItBWrHWGwEo47PaYvozDMyFfbXNwxDC4QeKrufVG+qoba3k
-        da0adc/jyMLYjS5pvcAWDq2HmZlISTg7JHfAnstLV3/ELZDHdBPFKfuicwwRWWn6Ig3135
-        CZrMF2ezCKXl+sbd2oPgorEAi6QtDwU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1688548300;
+        bh=uA0slXzh1ecbnksiBGBA/IWTYXhmDVwsFY4LrhsCa84=;
+        b=xRwiUXOgWWlZRp3IfLFyGAV1qHoGbTNWMEdzR6SIzKjn+P8bHa3EE/Fu00ncvnEQCdYUtG
+        78CB6ffSBwCO/ShSfUHXWsIHCgxm2IUnB1glWEaRabh/GTkBhK4SQ3iw1tG7QrjOqso8fJ
+        xgnd/+fxA0Mq3EMurPf7nI1+1CwM2Dk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1688552248;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=QUx+G9Ikc1JcrkULELUyJhcCdeD93Kd+JwIOZOQVEPo=;
-        b=bQmoS0BDHSY+2qmHWf9lVBW6yHNjkSodYRrXPggyZl2wCfBRkiza0vH/bRoA2qTAOewIDX
-        YmPVwz7oYfDXLuAw==
+        bh=uA0slXzh1ecbnksiBGBA/IWTYXhmDVwsFY4LrhsCa84=;
+        b=zOCjXb0p+JU9KnRe43Wrd0s0B5a6BDQ2kaUUBXbWTgD4NKjQdL2xmV+eXtq3xD/T8akfSW
+        kxAxszGTHXsmIlBA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4FBAF134F3;
-        Wed,  5 Jul 2023 09:11:40 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C87BD13460;
+        Wed,  5 Jul 2023 10:17:28 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id UChrE8wzpWTaZAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 05 Jul 2023 09:11:40 +0000
-Date:   Wed, 5 Jul 2023 11:11:39 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Yi Zhang <yi.zhang@redhat.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [bug report] most of blktests nvme/ failed on the latest linux
- tree
-Message-ID: <4rzx7tets37h3tifirq3i63nh5n45cbmiu4xdwvoojhdmqquv2@rwnidq3hbuwg>
-References: <0c4b16a5-17da-02d9-754a-3c7a158daa56@nvidia.com>
- <CAHj4cs9ayQ8J+wDCWVKjmBTWTi7Bc3uqqTCDzL2ZY6JhpdDhsQ@mail.gmail.com>
- <1fda4154-50f4-c09d-dbb1-3b53ed63d341@nvidia.com>
- <CAHj4cs_+yBbs+MgrC8Z8J7X8cKYwwr6wcR5tLfUCcYkftL7N1Q@mail.gmail.com>
- <52df24f1-ebb7-cd24-3aaf-7b946acab3ee@grimberg.me>
- <CAHj4cs9=8fPRtXj4uyjN9MV1OMNNXwcVGte7CDnFxXYYbnnX0A@mail.gmail.com>
- <b3377b27-28de-c8ed-d45a-c3f241c24415@grimberg.me>
- <lfwwdbrtexufmsjbrw5j36jay2m56kdnuzwcrmcwnickzmgb4i@b5d32kl3oaps>
- <zftdt4pmjiwnbkje2zpl2kp5oraapsrawpbwf3l5qppmegpylj@so52n3f5zd6u>
- <l7vk7fnzltpmvkwujsbf2btrzip6wh7ug62iwa3totqcda25l6@siqx7tj6lt3l>
+        id TT7lMDhDpWQkCQAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 05 Jul 2023 10:17:28 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 59FD8A0707; Wed,  5 Jul 2023 12:17:28 +0200 (CEST)
+Date:   Wed, 5 Jul 2023 12:17:28 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 03/32] block: Use blkdev_get_handle_by_dev() in
+ blkdev_open()
+Message-ID: <20230705101728.77szc5vpz4shrosl@quack3>
+References: <20230629165206.383-1-jack@suse.cz>
+ <CGME20230704122236epcas5p4f17ed438838d75c8229e4ab0ea009c37@epcas5p4.samsung.com>
+ <20230704122224.16257-3-jack@suse.cz>
+ <20230705050510.GA28287@green245>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <l7vk7fnzltpmvkwujsbf2btrzip6wh7ug62iwa3totqcda25l6@siqx7tj6lt3l>
+In-Reply-To: <20230705050510.GA28287@green245>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 08:48:55AM +0000, Shinichiro Kawasaki wrote:
-> diff --git a/fabrics.c b/fabrics.c
-> index ac240cad..2eeea48c 100644
-> --- a/fabrics.c
-> +++ b/fabrics.c
-> @@ -677,6 +677,26 @@ static int nvme_read_volatile_config(nvme_root_t r)
->  	return ret;
->  }
->  
-> +char *nvmf_hostid_from_hostnqn(const char *hostnqn)
-> +{
-> +	const char *uuid;
-> +	const char *hostid_from_file;
-> +
-> +	if (!hostnqn)
-> +		return NULL;
-> +
-> +	uuid = strstr(hostnqn, "uuid:");
-> +	if (!uuid)
-> +		return NULL;
-> +	uuid += strlen("uuid:");
-> +
-> +	hostid_from_file = nvmf_hostid_from_file();
-> +	if (hostid_from_file && strcmp(uuid, hostid_from_file))
-> +		fprintf(stderr, "warning: use generated hostid instead of hostid file\n");
-> +
-> +	return strdup(uuid);
-> +}
+On Wed 05-07-23 10:35:10, Kanchan Joshi wrote:
+> On Tue, Jul 04, 2023 at 02:21:30PM +0200, Jan Kara wrote:
+> > Convert blkdev_open() to use blkdev_get_handle_by_dev().
+> > 
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> > ---
+> > block/fops.c | 17 +++++++++--------
+> > 1 file changed, 9 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/block/fops.c b/block/fops.c
+> > index b6aa470c09ae..d7f3b6e67a2f 100644
+> > --- a/block/fops.c
+> > +++ b/block/fops.c
+> > @@ -496,7 +496,7 @@ blk_mode_t file_to_blk_mode(struct file *file)
+> > 
+> > static int blkdev_open(struct inode *inode, struct file *filp)
+> > {
+> > -	struct block_device *bdev;
+> > +	struct bdev_handle *handle;
+> > 	blk_mode_t mode;
+> > 
+> > 	/*
+> > @@ -509,24 +509,25 @@ static int blkdev_open(struct inode *inode, struct file *filp)
+> > 	filp->f_mode |= FMODE_BUF_RASYNC;
+> > 
+> > 	mode = file_to_blk_mode(filp);
+> > -	bdev = blkdev_get_by_dev(inode->i_rdev, mode,
+> > -				 mode & BLK_OPEN_EXCL ? filp : NULL, NULL);
+> > -	if (IS_ERR(bdev))
+> > -		return PTR_ERR(bdev);
+> > +	handle = blkdev_get_handle_by_dev(inode->i_rdev, mode,
+> > +			mode & BLK_OPEN_EXCL ? filp : NULL, NULL);
+> > +	if (IS_ERR(handle))
+> > +		return PTR_ERR(handle);
+> > 
+> > 	if (mode & BLK_OPEN_EXCL)
+> > 		filp->private_data = filp;
+> 
+> Is this needed?
+> This is getting overwritten after a couple of lines below.
+> 
+> > -	if (bdev_nowait(bdev))
+> > +	if (bdev_nowait(handle->bdev))
+> > 		filp->f_mode |= FMODE_NOWAIT;
+> > 
+> > -	filp->f_mapping = bdev->bd_inode->i_mapping;
+> > +	filp->f_mapping = handle->bdev->bd_inode->i_mapping;
+> > 	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
+> > +	filp->private_data = handle;
+> 
+> Here.
 
-Maybe we should move the check after ...
+Good point, I'll fix that for the next version. Thanks for review!
 
-
->  int nvmf_discover(const char *desc, int argc, char **argv, bool connect)
->  {
->  	char *subsysnqn = NVME_DISC_SUBSYS_NAME;
-> @@ -753,8 +773,10 @@ int nvmf_discover(const char *desc, int argc, char **argv, bool connect)
->  	hostid_arg = hostid;
->  	if (!hostnqn)
->  		hostnqn = hnqn = nvmf_hostnqn_from_file();
-> -	if (!hostnqn)
-> +	if (!hostnqn) {
->  		hostnqn = hnqn = nvmf_hostnqn_generate();
-> +		hostid = hid = nvmf_hostid_from_hostnqn(hostnqn);
-> +	}
->  	if (!hostid)
->  		hostid = hid = nvmf_hostid_from_file();
-
-... here so that we also catch the case when the /etc/nvme/hostnqn and /etc/nvme/hostid
-do not match
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
