@@ -2,73 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DE4EB64DA
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 15:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDEAEB64DD
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 16:12:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232032AbjGEPZe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jul 2023 11:25:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51356 "EHLO
+        id S231604AbjGEQM3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jul 2023 12:12:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbjGEPZe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 11:25:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D1C9172B
-        for <linux-block@vger.kernel.org>; Wed,  5 Jul 2023 08:24:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688570684;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Go8B2fye6lsvtn92sJ9pJCTHRgcRTAG24v4nf2v9fck=;
-        b=IvKieG+dTg37sZLHYPR1TH8H+W9BuinlIILXESXwjGmGWifej7Hv4Dc+FdOE0ruDQxyMyd
-        CfQnrk4dpmC+D2cqv/+Zqd72mVHc3bUEstm9EavG5zFHzThxpqpJtBSK58Bm3eKK3WW+2y
-        E/X38ych5rjiqyWS2mCCfZylliMCPtc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-442-48x8429NNmCoQQwJEqCS5A-1; Wed, 05 Jul 2023 11:24:41 -0400
-X-MC-Unique: 48x8429NNmCoQQwJEqCS5A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S230286AbjGEQM2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 12:12:28 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805621700;
+        Wed,  5 Jul 2023 09:12:27 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0FE6D185A7A5;
-        Wed,  5 Jul 2023 15:24:41 +0000 (UTC)
-Received: from ovpn-8-34.pek2.redhat.com (ovpn-8-34.pek2.redhat.com [10.72.8.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B0B9207B2DA;
-        Wed,  5 Jul 2023 15:24:38 +0000 (UTC)
-Date:   Wed, 5 Jul 2023 23:24:33 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests] common/ublk: avoid modprobe failure for
- built-in ublk_drv
-Message-ID: <ZKWLMZ2+bBeIofSr@ovpn-8-34.pek2.redhat.com>
-References: <20230705103522.3383196-1-shinichiro.kawasaki@wdc.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CB46921E20;
+        Wed,  5 Jul 2023 16:12:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1688573545; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=laJnl7HhQK/Tv/PqzUYoidR/wXDE+WAIJVPIFf2lcfQ=;
+        b=pVxtRSYxDum30xk4c2JQyuaRHFNvjqGI5pa+1l9TjK2H7ROMjo7EdIGdDlzQXwaIwGyi0D
+        MYHnvgKqRst/eyFC+Okrc961iU1V/Mr8qyrvjiZzwHXWReUpWSrhSFOpe79t3kyTfJeQAV
+        Hf2p1cnNnsYhDEREwuHH1JI7foWXj1M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1688573545;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=laJnl7HhQK/Tv/PqzUYoidR/wXDE+WAIJVPIFf2lcfQ=;
+        b=6GnGLv2MGHnmlspZbI9IPcwZjE0UgNGbJUyuJME/ujhWk8XPp6xGrnnDrvfBxv6bSto5fw
+        0j8hz2dNTzGg/WAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A8D5D134F3;
+        Wed,  5 Jul 2023 16:12:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id p7ssKWmWpWRbQAAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 05 Jul 2023 16:12:25 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 1C3A6A0707; Wed,  5 Jul 2023 18:12:25 +0200 (CEST)
+Date:   Wed, 5 Jul 2023 18:12:25 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anna Schumaker <anna@kernel.org>, Chao Yu <chao@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com, Gao Xiang <xiang@kernel.org>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        jfs-discussion@lists.sourceforge.net,
+        Joern Engel <joern@lazybastard.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-xfs@vger.kernel.org,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Minchan Kim <minchan@kernel.org>, ocfs2-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Song Liu <song@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        target-devel@vger.kernel.org, Ted Tso <tytso@mit.edu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        xen-devel@lists.xenproject.org
+Subject: Re: [PATCH 01/32] block: Provide blkdev_get_handle_* functions
+Message-ID: <20230705161225.cwig5a3mo6oz7lew@quack3>
+References: <20230629165206.383-1-jack@suse.cz>
+ <20230704122224.16257-1-jack@suse.cz>
+ <bb91e76b-0bd8-a949-f8b9-868f919ebcb9@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230705103522.3383196-1-shinichiro.kawasaki@wdc.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+In-Reply-To: <bb91e76b-0bd8-a949-f8b9-868f919ebcb9@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 05, 2023 at 07:35:22PM +0900, Shin'ichiro Kawasaki wrote:
-> When ublk_drv driver is not a loadable module but a built-in module,
-> modprobe for the driver fails in _init_ublk. This results in unexpected
-> test case skips with the message "requires ublk_drv".
+On Tue 04-07-23 07:06:26, Bart Van Assche wrote:
+> On 7/4/23 05:21, Jan Kara wrote:
+> > +struct bdev_handle {
+> > +	struct block_device *bdev;
+> > +	void *holder;
+> > +};
 > 
-> To not skip the test cases with built-in ublk_drv, call modprobe only
-> when the driver is loadable and its module file exists. Also, do not set
-> SKIP_REASONS to handle modprobe failure as test case failure.
-> 
-> Fixes: 840ccf1fc33e ("block/033: add test to cover gendisk leak")
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Please explain in the patch description why a holder pointer is introduced
+> in struct bdev_handle and how it relates to the bd_holder pointer in struct
+> block_device. Is one of the purposes of this patch series perhaps to add
+> support for multiple holders per block device?
 
-Looks fine,
+No. The reason for adding holder to struct bdev_handle is that it is an
+argument blkdev_put() needs. Currently, every user of blkdev_put() has to
+remember what it has passed as 'holder' to blkdev_get_by_*() call and pass
+that to blkdev_put(). With struct bdev_handle this will happen
+automatically. This is already explained in the changelog of this patch:
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+"Create struct bdev_handle that contains all parameters that need to be
+passed to blkdev_put()..."
 
-Thanks,
-Ming
+If it was only about holder, the intrusive patches would not be warranted
+but as the description also says:
 
+"This will eventually allow us to pass one more argument to blkdev_put()
+without too much hassle."
+
+Because we will additionaly need to propagate the 'mode' argument used at
+open to blkdev_put().
+
+								Honza
+
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
