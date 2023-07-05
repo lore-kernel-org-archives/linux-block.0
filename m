@@ -2,108 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C48EB64D9
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 03:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 319F8EB64DD
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 05:08:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229793AbjGEDSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jul 2023 23:18:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35638 "EHLO
+        id S229936AbjGEFIl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jul 2023 01:08:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229772AbjGEDR7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jul 2023 23:17:59 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9D61B6;
-        Tue,  4 Jul 2023 20:17:58 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QwlGN40wVz4f3mK4;
-        Wed,  5 Jul 2023 11:17:48 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHvbDd4KRkFajwNA--.34759S3;
-        Wed, 05 Jul 2023 11:17:50 +0800 (CST)
-Subject: Re: [PATCH RFC 0/7] blk-mq: improve tag fair sharing
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        Christoph Hellwig <hch@lst.de>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
- <4c9fea33-9c30-4ab9-c210-95e09d323837@acm.org>
- <82d44ba1-4389-079c-935a-cbb49203ca27@huaweicloud.com>
- <c4de836a-a2a1-847f-1525-1accb814e45e@acm.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <84f9bfb4-293b-ad55-97e4-e8c611c5e9ca@huaweicloud.com>
-Date:   Wed, 5 Jul 2023 11:17:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229449AbjGEFIk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 01:08:40 -0400
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F25510FA
+        for <linux-block@vger.kernel.org>; Tue,  4 Jul 2023 22:08:38 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230705050836epoutp0323b5fb130b3614172cd314c61360d815~u4HgCp4y41837418374epoutp03l
+        for <linux-block@vger.kernel.org>; Wed,  5 Jul 2023 05:08:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230705050836epoutp0323b5fb130b3614172cd314c61360d815~u4HgCp4y41837418374epoutp03l
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1688533716;
+        bh=4Ewd3gtlsRFOPjxmqq4oPNNNlKps69tnLeCMAL7g76s=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=fHL2+HBO+rENRTAh52BBoUnyH+UfrKCoGp4vmS8HdV6zGo1LqMc2SqeiDynf3Mfqd
+         qTpbfiBydtbVePkxL96nFU46g2jU1U1rdwKMecyyY7EmTv4gDGeA4fGHkW7nurm9H8
+         uB9aV0QMJqeZWOA27nlG5nSpOKL4As2AJLb+mteQ=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20230705050836epcas5p1f1ad4f1ec0602b11a4b0b80cbffab182~u4Hfz3sLf1822118221epcas5p1n;
+        Wed,  5 Jul 2023 05:08:36 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.177]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4Qwnk964Wvz4x9QD; Wed,  5 Jul
+        2023 05:08:33 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        60.A7.57354.ACAF4A46; Wed,  5 Jul 2023 14:08:26 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20230705050825epcas5p3d58c4d83fc8c4768a261e54f56d8e492~u4HWYQfmK2595625956epcas5p3P;
+        Wed,  5 Jul 2023 05:08:25 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230705050825epsmtrp1b023a6b83f8a3b06f1bac5496ff18d94~u4HWXgKu11624916249epsmtrp1N;
+        Wed,  5 Jul 2023 05:08:25 +0000 (GMT)
+X-AuditID: b6c32a44-269fb7000001e00a-bc-64a4facad95f
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        0F.42.34491.9CAF4A46; Wed,  5 Jul 2023 14:08:25 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230705050824epsmtip1fe377366da3ec3f0b1507392955dcf00~u4HVYzcLc0370203702epsmtip1c;
+        Wed,  5 Jul 2023 05:08:24 +0000 (GMT)
+Date:   Wed, 5 Jul 2023 10:35:10 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 03/32] block: Use blkdev_get_handle_by_dev() in
+ blkdev_open()
+Message-ID: <20230705050510.GA28287@green245>
 MIME-Version: 1.0
-In-Reply-To: <c4de836a-a2a1-847f-1525-1accb814e45e@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHvbDd4KRkFajwNA--.34759S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF1kKF1ktFy5AF4kKr13CFg_yoW8Gw17pF
-        WrKas0yw4ktry2kr92gw1DWF4ftrZ3Jr4UZr1rXwn7Awn8KFW2vFWrtas0kasrur4qgF4j
-        9F4vkrZYyF4kJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
-        6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
-        DUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+In-Reply-To: <20230704122224.16257-3-jack@suse.cz>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrHKsWRmVeSWpSXmKPExsWy7bCmuu6pX0tSDBqn61isvtvPZnF6wiIm
+        i9nTm5ks9t7Sttiz9ySLA6vH5hVaHpfPlnqcWXCE3ePzJrkAlqhsm4zUxJTUIoXUvOT8lMy8
+        dFsl7+B453hTMwNDXUNLC3MlhbzE3FRbJRefAF23zBygpUoKZYk5pUChgMTiYiV9O5ui/NKS
+        VIWM/OISW6XUgpScApMCveLE3OLSvHS9vNQSK0MDAyNToMKE7Iz/z+6zFjziq/j3aSdjA+M+
+        ni5GTg4JAROJrrVrWboYuTiEBHYzSsw928cM4XxilHg2+TwThPONUWL98lvsMC13761hg0js
+        ZZR4fXg1I4TzjFHiw5JdTCBVLAIqEgtXrQOaxcHBJqApcWFyKUhYREBaYtaxlWD7mAVaGSUW
+        Xn3OCpIQFgiWeLL0Blgvr4CuxJR1n5ghbEGJkzOfsIDYnAJGEvePTgOLiwooSxzYdhzsPAmB
+        R+wSvX272SDOc5H4uGQDlC0s8er4FqizpSRe9rdB2ckSl2aeY4KwSyQe7zkIZdtLtJ7qB1vA
+        LJAh8f79HiibT6L39xMmkGckBHglOtqEIMoVJe5NesoKYYtLPJyxBMr2kJjXfAMadKsZJU41
+        L2GcwCg3C8k/s5CsgLCtJDo/NLHOAlrBDAyk5f84IExNifW79Bcwsq5ilEwtKM5NT002LTDM
+        Sy2Hx3Jyfu4mRnBC1HLZwXhj/j+9Q4xMHIyHGCU4mJVEeFd8X5wixJuSWFmVWpQfX1Sak1p8
+        iNEUGD8TmaVEk/OBKTmvJN7QxNLAxMzMzMTS2MxQSZz3devcFCGB9MSS1OzU1ILUIpg+Jg5O
+        qQamDT+SDzuJlq/I8DiRN4+7qVpcU9bU46WewpQvha/KT7VtmyfsW3P5TfOfc8fmPjYxMVYx
+        36a4TU7nBrdBkGb1Rh7PGTu45i2+1PDde4Z+10ZZn1XBPSs5HpqV3NSeHebbu6l4jlmixJSd
+        d2ImJqg/npnGcvBtX3gR58tlH8ImtdVddGqY/+voJpN9+udzu1LaJL6rX51tWFu3z9WF8+bt
+        26Xt/jbp+o8stKpjovlt4+/GHzLNyyz3i7hebGfUZM9W8s2PqT/jpZduV/rCf8Gi9TuXr/p4
+        /80Eve8pzjO2LWfpctpeHKy9cp7ht8N/rNPKk/2W73k4K9Oyw+9Nn8Fa56224roLvux8FL/g
+        d6ISS3FGoqEWc1FxIgBoib+LEQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNLMWRmVeSWpSXmKPExsWy7bCSnO7JX0tSDFZeMrNYfbefzeL0hEVM
+        FrOnNzNZ7L2lbbFn70kWB1aPzSu0PC6fLfU4s+AIu8fnTXIBLFFcNimpOZllqUX6dglcGQ8f
+        f2ctmMJTcWymbQNjF1cXIyeHhICJxN17a9i6GLk4hAR2M0o8mPyWGSIhLtF87Qc7hC0ssfLf
+        c3aIoieMErefTGMFSbAIqEgsXLUOqIGDg01AU+LC5FKQsIiAtMSsYytZQOqZBVoZJQ7cf8YC
+        khAWCJZ4svQGE4jNK6ArMWXdJ2aIoasZJc5c+8kKkRCUODnzCVgDs4CZxLzND8EWMANNXf6P
+        AyTMKWAkcf/oNLBDRQWUJQ5sO840gVFwFpLuWUi6ZyF0L2BkXsUomVpQnJueW2xYYJiXWq5X
+        nJhbXJqXrpecn7uJERzeWpo7GLev+qB3iJGJg/EQowQHs5II74rvi1OEeFMSK6tSi/Lji0pz
+        UosPMUpzsCiJ84q/6E0REkhPLEnNTk0tSC2CyTJxcEo1MCW+eGluw+W8aqp6Q3OE5nRNRtG4
+        GwEcaYWWBkcVrObdT/fWYN0oz7PAUirmV3P6syNt5xflZNsduVF33f3GyvDvm9dGulVtX670
+        cd9a+ae7rWfvEWzIuxy24rXhPsPXiznWOSr9/W/3Z12yCPdn56kn7YLfSawW2iVhypI118P6
+        YcSUluxN/pdP6eRzeuv3N+pxPUzVXsFp4H6DdY/yjos/e6sWb+cTvx7KEtxw3HetqUd6r2P5
+        ESnXfYe+35yreNXU1XfiTaOWM6XeX9YseTW91bNVZl9LmsTO/ueTP9xeNvuFiOJHlYT1hblW
+        bVM+Sr/beHK6pqhpdo/yyqSf+dPERWWjl187f2DjET+rc0osxRmJhlrMRcWJAIrlqOXeAgAA
+X-CMS-MailID: 20230705050825epcas5p3d58c4d83fc8c4768a261e54f56d8e492
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----PcSJ1RlEyPKfjXIiTsweH-7MCPtMf9v3nlMrb72LWO-fIHxy=_a6ccd_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
 X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230704122236epcas5p4f17ed438838d75c8229e4ab0ea009c37
+References: <20230629165206.383-1-jack@suse.cz>
+        <CGME20230704122236epcas5p4f17ed438838d75c8229e4ab0ea009c37@epcas5p4.samsung.com>
+        <20230704122224.16257-3-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+------PcSJ1RlEyPKfjXIiTsweH-7MCPtMf9v3nlMrb72LWO-fIHxy=_a6ccd_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-在 2023/07/04 2:08, Bart Van Assche 写道:
-> On 7/3/23 06:29, Yu Kuai wrote:
->> 在 2023/06/20 23:20, Bart Van Assche 写道:
->>> On 6/18/23 09:07, Yu Kuai wrote:
->>>> This is not a formal version and not fully tested, I send this RFC
->>>> because I want to make sure if people think doing this is meaningful,
->>>> before I spend too much time on this.
->>> The approach looks good to me but I'd like to hear from Jens and 
->>> Christoph what their opinion is about the approach of this patch 
->>> series before doing an in-depth review.
->>>
->> Any suggestions on this topic? It'll be great to hear that if anyone
->> thinks it's meaningful to refactor tag fair sharing.
-> 
-> The cover letter of this patch series says "This is not a formal version 
-> and not fully tested". If a fully tested version will be posted, I will 
-> help with an in-depth review.
+On Tue, Jul 04, 2023 at 02:21:30PM +0200, Jan Kara wrote:
+>Convert blkdev_open() to use blkdev_get_handle_by_dev().
+>
+>Signed-off-by: Jan Kara <jack@suse.cz>
+>---
+> block/fops.c | 17 +++++++++--------
+> 1 file changed, 9 insertions(+), 8 deletions(-)
+>
+>diff --git a/block/fops.c b/block/fops.c
+>index b6aa470c09ae..d7f3b6e67a2f 100644
+>--- a/block/fops.c
+>+++ b/block/fops.c
+>@@ -496,7 +496,7 @@ blk_mode_t file_to_blk_mode(struct file *file)
+>
+> static int blkdev_open(struct inode *inode, struct file *filp)
+> {
+>-	struct block_device *bdev;
+>+	struct bdev_handle *handle;
+> 	blk_mode_t mode;
+>
+> 	/*
+>@@ -509,24 +509,25 @@ static int blkdev_open(struct inode *inode, struct file *filp)
+> 	filp->f_mode |= FMODE_BUF_RASYNC;
+>
+> 	mode = file_to_blk_mode(filp);
+>-	bdev = blkdev_get_by_dev(inode->i_rdev, mode,
+>-				 mode & BLK_OPEN_EXCL ? filp : NULL, NULL);
+>-	if (IS_ERR(bdev))
+>-		return PTR_ERR(bdev);
+>+	handle = blkdev_get_handle_by_dev(inode->i_rdev, mode,
+>+			mode & BLK_OPEN_EXCL ? filp : NULL, NULL);
+>+	if (IS_ERR(handle))
+>+		return PTR_ERR(handle);
+>
+> 	if (mode & BLK_OPEN_EXCL)
+> 		filp->private_data = filp;
 
-Thanks for taking time on this patchset, do you think I need to do
-following for the formal version, or these improvements can be done
-later?
+Is this needed?
+This is getting overwritten after a couple of lines below.
 
-- current algorithm to borrow tags in patch 7 is very easy and
-straightforward, it should work fine on simple caces like the case you
-reported for ufs, but this algorithm should be improved for more
-complicated cases.
-- currently borrowed tags will never be returned untill queue is idle,
-I should figure out a way to return borrowed tags if this queue is not
-busy, so that other queues can borrow tag from this queue.
+>-	if (bdev_nowait(bdev))
+>+	if (bdev_nowait(handle->bdev))
+> 		filp->f_mode |= FMODE_NOWAIT;
+>
+>-	filp->f_mapping = bdev->bd_inode->i_mapping;
+>+	filp->f_mapping = handle->bdev->bd_inode->i_mapping;
+> 	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
+>+	filp->private_data = handle;
 
-Thanks,
-Kuai
+Here.
 
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> .
-> 
 
+------PcSJ1RlEyPKfjXIiTsweH-7MCPtMf9v3nlMrb72LWO-fIHxy=_a6ccd_
+Content-Type: text/plain; charset="utf-8"
+
+
+------PcSJ1RlEyPKfjXIiTsweH-7MCPtMf9v3nlMrb72LWO-fIHxy=_a6ccd_--
