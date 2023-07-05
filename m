@@ -2,153 +2,276 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36EC6EB64DD
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 15:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CAEEB64DD
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 15:12:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233131AbjGEPLa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jul 2023 11:11:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45762 "EHLO
+        id S233165AbjGEPM1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jul 2023 11:12:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232418AbjGEPL0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 11:11:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082D3171C
-        for <linux-block@vger.kernel.org>; Wed,  5 Jul 2023 08:10:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688569841;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0oUPF27DN5scCDEZIBj1Evs/zZhcrQVhVD5HGAd52rM=;
-        b=fFmTF2MxXYvnFZX6tOcjL75rXTX4hQULEEPSIdIBp4gjsYS2JEP1qTPkR2FSlVFJ3R7bPx
-        mgi4b3EL5LBfXwxxmtukYhOWCKqp97qG+OjzeWEKDDr2T+FctiaHf/u2QkpG7tQQd9BeKM
-        nVRJsymxnVscziz4KrphL21m3y6BDcM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-395-kGvdzjCnPnSeuW96lJdd5A-1; Wed, 05 Jul 2023 11:10:38 -0400
-X-MC-Unique: kGvdzjCnPnSeuW96lJdd5A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S233146AbjGEPMX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 11:12:23 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12D910EA;
+        Wed,  5 Jul 2023 08:12:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 661B2882389;
-        Wed,  5 Jul 2023 15:10:37 +0000 (UTC)
-Received: from ovpn-8-34.pek2.redhat.com (ovpn-8-34.pek2.redhat.com [10.72.8.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4125F492B01;
-        Wed,  5 Jul 2023 15:10:32 +0000 (UTC)
-Date:   Wed, 5 Jul 2023 23:10:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     chengming.zhou@linux.dev
-Cc:     axboe@kernel.dk, hch@lst.de, tj@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: Re: [PATCH v2 2/4] blk-flush: count inflight flush_data requests
-Message-ID: <ZKWH5ANh/hq3Eyn0@ovpn-8-34.pek2.redhat.com>
-References: <20230629110359.1111832-1-chengming.zhou@linux.dev>
- <20230629110359.1111832-3-chengming.zhou@linux.dev>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4FEA5615DB;
+        Wed,  5 Jul 2023 15:12:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EEBBC433C8;
+        Wed,  5 Jul 2023 15:12:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688569939;
+        bh=9M3W0jvMSHORjdwvhYVllucAG8b5Te1BpjD+BHEHQUM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=D0X+2gWbVDQvenj2EVDuTAux8ELig2SSC53a6H8OazUmgef7tiiRnJxH3AjIVUh7l
+         fX7ESEx+ujNA2eWYpecvIMgX2G+FNkRdEcMvmfkQwF3EQFFSxhSBeXvaipGTYK8FM2
+         c6lm5vWPpmOARpP4wqCmvRLb+tpoizdBsmk/IHNmoPEBOmxjtezhDarZA0S67xNPp8
+         CMXQjKLpFd3a/z4kWtia6MMI2dN3+qz64tqzNlsi1ISYpqSkeh3NXv5zZfLfGHSA8K
+         A0msPWEED96D5MYn7Ib50MepuiSU7cUpuO8A/BFjD8oqdW16cQxTolDX1Z5tWc/Dlw
+         KzsgxqVU1u0Hw==
+Date:   Wed, 5 Jul 2023 08:12:18 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
+        Ted Tso <tytso@mit.edu>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        Eric Biggers <ebiggers@google.com>, linux-xfs@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: [PATCH 1/6] block: Add config option to not allow writing to
+ mounted devices
+Message-ID: <20230705151218.GP11441@frogsfrogsfrogs>
+References: <20230704122727.17096-1-jack@suse.cz>
+ <20230704125702.23180-1-jack@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230629110359.1111832-3-chengming.zhou@linux.dev>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+In-Reply-To: <20230704125702.23180-1-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 29, 2023 at 07:03:57PM +0800, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
+On Tue, Jul 04, 2023 at 02:56:49PM +0200, Jan Kara wrote:
+> Writing to mounted devices is dangerous and can lead to filesystem
+> corruption as well as crashes. Furthermore syzbot comes with more and
+> more involved examples how to corrupt block device under a mounted
+> filesystem leading to kernel crashes and reports we can do nothing
+> about. Add tracking of writers to each block device and a kernel cmdline
+> argument which controls whether writes to block devices open with
+> BLK_OPEN_BLOCK_WRITES flag are allowed. We will make filesystems use
+> this flag for used devices.
 > 
-> The flush state machine use a double list to link all inflight
-> flush_data requests, to avoid issuing separate post-flushes for
-> these flush_data requests which shared PREFLUSH.
+> Syzbot can use this cmdline argument option to avoid uninteresting
+> crashes. Also users whose userspace setup does not need writing to
+> mounted block devices can set this option for hardening.
 > 
-> So we can't reuse rq->queuelist, this is why we need rq->flush.list
-> 
-> In preparation of the next patch that reuse rq->queuelist for flush
-> state machine, we change the double linked list to unsigned long
-> counter, which count all inflight flush_data requests.
-> 
-> This is ok since we only need to know if there is any inflight
-> flush_data request, so unsigned long counter is good.
-> 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> Link: https://lore.kernel.org/all/60788e5d-5c7c-1142-e554-c21d709acfd9@linaro.org
+> Signed-off-by: Jan Kara <jack@suse.cz>
 > ---
->  block/blk-flush.c | 9 +++++----
->  block/blk.h       | 5 ++---
->  2 files changed, 7 insertions(+), 7 deletions(-)
+>  block/Kconfig             | 16 ++++++++++
+>  block/bdev.c              | 63 ++++++++++++++++++++++++++++++++++++++-
+>  include/linux/blk_types.h |  1 +
+>  include/linux/blkdev.h    |  3 ++
+>  4 files changed, 82 insertions(+), 1 deletion(-)
 > 
-> diff --git a/block/blk-flush.c b/block/blk-flush.c
-> index dba392cf22be..bb7adfc2a5da 100644
-> --- a/block/blk-flush.c
-> +++ b/block/blk-flush.c
-> @@ -187,7 +187,8 @@ static void blk_flush_complete_seq(struct request *rq,
->  		break;
+> diff --git a/block/Kconfig b/block/Kconfig
+> index 86122e459fe0..8b4fa105b854 100644
+> --- a/block/Kconfig
+> +++ b/block/Kconfig
+> @@ -77,6 +77,22 @@ config BLK_DEV_INTEGRITY_T10
+>  	select CRC_T10DIF
+>  	select CRC64_ROCKSOFT
 >  
->  	case REQ_FSEQ_DATA:
-> -		list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
-> +		list_del_init(&rq->flush.list);
-> +		fq->flush_data_in_flight++;
->  		spin_lock(&q->requeue_lock);
->  		list_add_tail(&rq->queuelist, &q->flush_list);
->  		spin_unlock(&q->requeue_lock);
-> @@ -299,7 +300,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
->  		return;
+> +config BLK_DEV_WRITE_MOUNTED
+> +	bool "Allow writing to mounted block devices"
+> +	default y
+> +	help
+> +	When a block device is mounted, writing to its buffer cache very likely
+> +	going to cause filesystem corruption. It is also rather easy to crash
+> +	the kernel in this way since the filesystem has no practical way of
+> +	detecting these writes to buffer cache and verifying its metadata
+> +	integrity. However there are some setups that need this capability
+> +	like running fsck on read-only mounted root device, modifying some
+> +	features on mounted ext4 filesystem, and similar. If you say N, the
+> +	kernel will prevent processes from writing to block devices that are
+> +	mounted by filesystems which provides some more protection from runaway
+> +	priviledged processes. If in doubt, say Y. The configuration can be
+> +	overridden with bdev_allow_write_mounted boot option.
+> +
+>  config BLK_DEV_ZONED
+>  	bool "Zoned block device support"
+>  	select MQ_IOSCHED_DEADLINE
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 523ea7289834..346e68dbf0bf 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -30,6 +30,9 @@
+>  #include "../fs/internal.h"
+>  #include "blk.h"
 >  
->  	/* C2 and C3 */
-> -	if (!list_empty(&fq->flush_data_in_flight) &&
-> +	if (fq->flush_data_in_flight &&
->  	    time_before(jiffies,
->  			fq->flush_pending_since + FLUSH_PENDING_TIMEOUT))
->  		return;
-> @@ -374,6 +375,7 @@ static enum rq_end_io_ret mq_flush_data_end_io(struct request *rq,
->  	 * the comment in flush_end_io().
->  	 */
->  	spin_lock_irqsave(&fq->mq_flush_lock, flags);
-> +	fq->flush_data_in_flight--;
->  	blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error);
->  	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
->  
-> @@ -445,7 +447,7 @@ bool blk_insert_flush(struct request *rq)
->  		blk_rq_init_flush(rq);
->  		rq->flush.seq |= REQ_FSEQ_POSTFLUSH;
->  		spin_lock_irq(&fq->mq_flush_lock);
-> -		list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
-> +		fq->flush_data_in_flight++;
->  		spin_unlock_irq(&fq->mq_flush_lock);
->  		return false;
->  	default:
-> @@ -496,7 +498,6 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
->  
->  	INIT_LIST_HEAD(&fq->flush_queue[0]);
->  	INIT_LIST_HEAD(&fq->flush_queue[1]);
-> -	INIT_LIST_HEAD(&fq->flush_data_in_flight);
->  
->  	return fq;
->  
-> diff --git a/block/blk.h b/block/blk.h
-> index 608c5dcc516b..686712e13835 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -15,15 +15,14 @@ struct elevator_type;
->  extern struct dentry *blk_debugfs_root;
->  
->  struct blk_flush_queue {
-> +	spinlock_t		mq_flush_lock;
->  	unsigned int		flush_pending_idx:1;
->  	unsigned int		flush_running_idx:1;
->  	blk_status_t 		rq_status;
->  	unsigned long		flush_pending_since;
->  	struct list_head	flush_queue[2];
-> -	struct list_head	flush_data_in_flight;
-> +	unsigned long		flush_data_in_flight;
->  	struct request		*flush_rq;
-> -
-> -	spinlock_t		mq_flush_lock;
+> +/* Should we allow writing to mounted block devices? */
+> +static bool bdev_allow_write_mounted = IS_ENABLED(CONFIG_BLK_DEV_WRITE_MOUNTED);
 
-Looks fine,
+This might be premature at this point, but I wonder if you've given any
+consideration to adding a lockdown prohibition as well?  e.g.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+static inline bool bdev_allow_write_mounted(void)
+{
+	if (security_locked_down(LOCKDOWN_MOUNTED_BDEV) != 0)
+		return false;
 
-Thanks,
-Ming
+	return __bdev_allow_write_mounted;
+}
 
+--D
+
+>  struct bdev_inode {
+>  	struct block_device bdev;
+>  	struct inode vfs_inode;
+> @@ -744,7 +747,34 @@ void blkdev_put_no_open(struct block_device *bdev)
+>  {
+>  	put_device(&bdev->bd_device);
+>  }
+> -	
+> +
+> +static bool bdev_writes_blocked(struct block_device *bdev)
+> +{
+> +	return bdev->bd_writers == -1;
+> +}
+> +
+> +static void bdev_block_writes(struct block_device *bdev)
+> +{
+> +	bdev->bd_writers = -1;
+> +}
+> +
+> +static void bdev_unblock_writes(struct block_device *bdev)
+> +{
+> +	bdev->bd_writers = 0;
+> +}
+> +
+> +static bool blkdev_open_compatible(struct block_device *bdev, blk_mode_t mode)
+> +{
+> +	if (!bdev_allow_write_mounted) {
+> +		/* Writes blocked? */
+> +		if (mode & BLK_OPEN_WRITE && bdev_writes_blocked(bdev))
+> +			return false;
+> +		if (mode & BLK_OPEN_BLOCK_WRITES && bdev->bd_writers > 0)
+> +			return false;
+> +	}
+> +	return true;
+> +}
+> +
+>  /**
+>   * blkdev_get_by_dev - open a block device by device number
+>   * @dev: device number of block device to open
+> @@ -787,6 +817,10 @@ struct bdev_handle *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+>  	if (ret)
+>  		goto free_handle;
+>  
+> +	/* Blocking writes requires exclusive opener */
+> +	if (mode & BLK_OPEN_BLOCK_WRITES && !holder)
+> +		return ERR_PTR(-EINVAL);
+> +
+>  	bdev = blkdev_get_no_open(dev);
+>  	if (!bdev) {
+>  		ret = -ENXIO;
+> @@ -814,12 +848,21 @@ struct bdev_handle *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+>  		goto abort_claiming;
+>  	if (!try_module_get(disk->fops->owner))
+>  		goto abort_claiming;
+> +	ret = -EBUSY;
+> +	if (!blkdev_open_compatible(bdev, mode))
+> +		goto abort_claiming;
+>  	if (bdev_is_partition(bdev))
+>  		ret = blkdev_get_part(bdev, mode);
+>  	else
+>  		ret = blkdev_get_whole(bdev, mode);
+>  	if (ret)
+>  		goto put_module;
+> +	if (!bdev_allow_write_mounted) {
+> +		if (mode & BLK_OPEN_BLOCK_WRITES)
+> +			bdev_block_writes(bdev);
+> +		else if (mode & BLK_OPEN_WRITE)
+> +			bdev->bd_writers++;
+> +	}
+>  	if (holder) {
+>  		bd_finish_claiming(bdev, holder, hops);
+>  
+> @@ -842,6 +885,7 @@ struct bdev_handle *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+>  		disk_unblock_events(disk);
+>  	handle->bdev = bdev;
+>  	handle->holder = holder;
+> +	handle->mode = mode;
+>  	return handle;
+>  put_module:
+>  	module_put(disk->fops->owner);
+> @@ -914,6 +958,14 @@ void blkdev_put(struct bdev_handle *handle)
+>  		sync_blockdev(bdev);
+>  
+>  	mutex_lock(&disk->open_mutex);
+> +	if (!bdev_allow_write_mounted) {
+> +		/* The exclusive opener was blocking writes? Unblock them. */
+> +		if (handle->mode & BLK_OPEN_BLOCK_WRITES)
+> +			bdev_unblock_writes(bdev);
+> +		else if (handle->mode & BLK_OPEN_WRITE)
+> +			bdev->bd_writers--;
+> +	}
+> +
+>  	if (handle->holder)
+>  		bd_end_claim(bdev, handle->holder);
+>  
+> @@ -1070,3 +1122,12 @@ void bdev_statx_dioalign(struct inode *inode, struct kstat *stat)
+>  
+>  	blkdev_put_no_open(bdev);
+>  }
+> +
+> +static int __init setup_bdev_allow_write_mounted(char *str)
+> +{
+> +	if (kstrtobool(str, &bdev_allow_write_mounted))
+> +		pr_warn("Invalid option string for bdev_allow_write_mounted:"
+> +			" '%s'\n", str);
+> +	return 1;
+> +}
+> +__setup("bdev_allow_write_mounted=", setup_bdev_allow_write_mounted);
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 0bad62cca3d0..5bf0d2d458fd 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -70,6 +70,7 @@ struct block_device {
+>  #ifdef CONFIG_FAIL_MAKE_REQUEST
+>  	bool			bd_make_it_fail;
+>  #endif
+> +	int			bd_writers;
+>  	/*
+>  	 * keep this out-of-line as it's both big and not needed in the fast
+>  	 * path
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 4ae3647a0322..ca467525e6e4 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -124,6 +124,8 @@ typedef unsigned int __bitwise blk_mode_t;
+>  #define BLK_OPEN_NDELAY		((__force blk_mode_t)(1 << 3))
+>  /* open for "writes" only for ioctls (specialy hack for floppy.c) */
+>  #define BLK_OPEN_WRITE_IOCTL	((__force blk_mode_t)(1 << 4))
+> +/* open is exclusive wrt all other BLK_OPEN_WRITE opens to the device */
+> +#define BLK_OPEN_BLOCK_WRITES	((__force blk_mode_t)(1 << 5))
+>  
+>  struct gendisk {
+>  	/*
+> @@ -1474,6 +1476,7 @@ struct blk_holder_ops {
+>  struct bdev_handle {
+>  	struct block_device *bdev;
+>  	void *holder;
+> +	blk_mode_t mode;
+>  };
+>  
+>  struct bdev_handle *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+> -- 
+> 2.35.3
+> 
