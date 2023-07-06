@@ -2,150 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EE4C0015E
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jul 2023 23:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B83C001E0
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 00:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232091AbjGEXy5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jul 2023 19:54:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51240 "EHLO
+        id S232326AbjGFASS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jul 2023 20:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbjGEXy5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 19:54:57 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A2A10F5;
-        Wed,  5 Jul 2023 16:54:56 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b8b32c1dd1so30095ad.0;
-        Wed, 05 Jul 2023 16:54:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688601295; x=1691193295;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JI7G8VKZliJvT8wrQBOaRM/M+f2koQckOLP4AY19Wnw=;
-        b=dOO8/TZKvsFtOSOZ9smn/JIyCXYmCtuywHWOEfLn9bLjMaR81+2xAtCyywI9ct2wPl
-         VpkmwaGm8g3Qo9AJ5pTgj7h/4RwtSndZAPL72irWMha/k6WDquK4qtjiko2M+corz74v
-         GORzdchAJBhH+DUWIhl1d4AQ5Ceuv9u2vEJqy70lCSDlxHKLUwKHo1zJFmENqtueVPpO
-         S+3X1fT0i+p/M9zNk6nc0BXxqWMLvdLNFoSv0dSu5lM3tV00An4juTnQtLZ0kWDhJ/Q+
-         JLFYfZ1/4fPMtCd+87b1GrQpP7fec2zTS8QiayQpwRP9T1HDY9PR/yV6+5afVSHrN+Gm
-         J+YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688601295; x=1691193295;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JI7G8VKZliJvT8wrQBOaRM/M+f2koQckOLP4AY19Wnw=;
-        b=UJWcXGNj1gJZTI3j29rn8NA8zUkaDxrpxSs2prj8k48DzdzA25aktGiGip5qfpyiQK
-         Vhdq4JjnvgtjYVxnuLmKS8g9iVRoEmvC6nUH0uiJ0W7qsCJqmxEHVHqzjA5eOZVaDiRi
-         bVhp0IefxxViysI6lUm89ab0VPlb6AFZgmAdGD/dUPZ1/Ag1EFG0VuTR0/B04NNyhMZA
-         v1AZqVhzVmPUnTaVtWVoeEIAfuZOkWg5jnlL9U23Ji6ZdXI0ev5oHx2cyICp+RI4nk9p
-         0DG8kVtd+zaf7mr3Rng6gXIS1/dcD/9dc/UOmbWeelgA2VVkQaLlpNzGn9JCWZhgUkvU
-         ge0A==
-X-Gm-Message-State: ABy/qLbUIQn1QU7WVsYbCA735VrGsTTiFkEM41LT6NOA89dsPpHIeg88
-        eEeteoljs6eaqSxLFeaq45s=
-X-Google-Smtp-Source: APBJJlGCPm5vP+V750hjMd/G8MliyrZQNXiUg4q5e6pqMUKCJIpRI0Vy0dN7odpn8973xtXSXF40Bw==
-X-Received: by 2002:a17:903:110d:b0:1b3:d6c8:7008 with SMTP id n13-20020a170903110d00b001b3d6c87008mr394660plh.57.1688601295526;
-        Wed, 05 Jul 2023 16:54:55 -0700 (PDT)
-Received: from ?IPV6:2001:df0:0:200c:65c6:1730:4701:8c0b? ([2001:df0:0:200c:65c6:1730:4701:8c0b])
-        by smtp.gmail.com with ESMTPSA id u1-20020a170902b28100b001b87bedcc6fsm48194plr.93.2023.07.05.16.54.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jul 2023 16:54:54 -0700 (PDT)
-Message-ID: <e15fb0c5-d9d2-454d-9741-32dd9bae58b8@gmail.com>
-Date:   Thu, 6 Jul 2023 11:54:49 +1200
+        with ESMTP id S231409AbjGFASR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 20:18:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2788119AD;
+        Wed,  5 Jul 2023 17:18:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7B21D617B6;
+        Thu,  6 Jul 2023 00:18:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C33B1C433C8;
+        Thu,  6 Jul 2023 00:18:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688602694;
+        bh=UCIqkh07H9RodI2FiYHSloPcTyNTNSp1TtLBvzeAlzY=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=XD5s9qgQk+bezWq3JBvoy9wmXJ5ZRyDVTHkpXWgLVO3OxVcBH0YyZg8Gz6rb+KfwN
+         /A+CNNvgWQMrDzOs56n2cEhwU0PkBRXiccPcVu64Aq1yBYBPWYZC4FuTB8N5QK1KQ+
+         MdmDcn18RW7d50qJnG0uAgWsSoPksgnrlWtl7DDURyh0pmkik5uADq73uLJFx1EI+5
+         TxJjuarqz28vf+B0YnRKEqs2EnBb9P4N1MwtPeCMbPEFDapDEj1dai8Lh/Uv6asayt
+         1cEnsHDnrwJGGhdMLNNVih3y+j4HdKbkLcado1IWcst06dccj5qYciZqXhBkSg0rUM
+         /tfAjpbujjdzA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A1405C64459;
+        Thu,  6 Jul 2023 00:18:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v4 1/1] block: bugfix for Amiga partition overflow check
- patch
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     linux-m68k@vger.kernel.org, chzigotzky@xenosoft.de,
-        geert@linux-m68k.org, hch@lst.de, martin@lichtvoll.de,
-        stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
-References: <20230620201725.7020-1-schmitzmic@gmail.com>
- <20230704233808.25166-1-schmitzmic@gmail.com>
- <20230704233808.25166-2-schmitzmic@gmail.com>
- <a84267a2-e353-4401-87d0-e9fdcf4c81a0@kernel.dk>
- <6411e623-8928-3b83-4482-6c1d1b5b2407@gmail.com>
- <f61ba21f-a8a0-756c-2a41-b831a0302395@kernel.dk>
- <01cf1491-a9b3-2342-3fd6-f4cae212bc43@gmail.com>
- <49192b95-8fc8-7dcd-f062-a4876731e347@kernel.dk>
- <1bed3177-4d1f-ae04-7ae2-353afb314cbc@gmail.com>
- <481c0e2a-320c-e53d-2a0e-ba5fa6ea4049@kernel.dk>
- <c9bcd3ca-8260-3f29-26d1-0c00e2b098a3@kernel.dk>
-From:   Michael Schmitz <schmitzmic@gmail.com>
-In-Reply-To: <c9bcd3ca-8260-3f29-26d1-0c00e2b098a3@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [f2fs-dev] [PATCH 01/30] block: also call ->open for incremental
+ partition opens
+From:   patchwork-bot+f2fs@kernel.org
+Message-Id: <168860269464.29151.2364164271547941172.git-patchwork-notify@kernel.org>
+Date:   Thu, 06 Jul 2023 00:18:14 +0000
+References: <20230608110258.189493-2-hch@lst.de>
+In-Reply-To: <20230608110258.189493-2-hch@lst.de>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, vigneshr@ti.com, rafael@kernel.org,
+        linux-nvme@lists.infradead.org, phil@philpotter.co.uk, clm@fb.com,
+        dm-devel@redhat.com, haris.iqbal@ionos.com, pavel@ucw.cz,
+        miquel.raynal@bootlin.com, jinpu.wang@ionos.com,
+        linux-nilfs@vger.kernel.org, linux-scsi@vger.kernel.org,
+        richard@nod.at, linux-pm@vger.kernel.org,
+        linux-um@lists.infradead.org, josef@toxicpanda.com, colyli@suse.de,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        viro@zeniv.linux.org.uk, dsterba@suse.com, brauner@kernel.org,
+        martin.petersen@oracle.com, linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-btrfs@vger.kernel.org, hare@suse.de
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Hello:
 
-thanks for patching this all up!
+This series was applied to jaegeuk/f2fs.git (dev)
+by Jens Axboe <axboe@kernel.dk>:
 
-On 6/07/23 10:38, Jens Axboe wrote:
-> On 7/5/23 4:34?PM, Jens Axboe wrote:
->> On 7/5/23 4:25?PM, Michael Schmitz wrote:
->>> Hi Jens,
->>>
->>> On 6/07/23 10:13, Jens Axboe wrote:
->>>>>> should be enough for it to go into stable from 5.2 and onwards.
->>>>> OK - I wasn't certain whether you wanted the Fixes or stable tag dropped.
->>>>>>> (Greg didn't seem to object to the Fixes: as such, just to the
->>>>>>> incorrect version prereq)
->>>>>> I think it's really confusing... A patch should only have a Fixes tag if
->>>>>> it's fixing a specific bug in that patch. Either it is, in which case
->>>>>> you would not need Cc stable at all since it's only in 6.5-rc, or it
->>>>> It is fixing a bug in b6f3f28f60. I should have checked whether the
->>>>> patch series had already gone to release, not just -rc, instead of
->>>>> just adding the stable tag out of caution.
->>>> But this is the confusion - if it's fixing a bug in b6f3f28f60, then why
->>>> is it marked as needing to get backported much further back, predating
->>>> that commit?
->>> I see - it doesn't need to be backported that far back _alone_. It
->>> only needs to be applied after  b6f3f28f60 once that one has been
->>> backported.
->> OK I see - I think there's some serious misunderstandings here then :-)
-That's probably understating it. I need to reread the patch submission 
-notes.
->> It sounds like it fixes a bug in b6f3f28f60 alone, and it has no
->> business going into stable. The commit should _just_ be marked with it
->> fixing that. If someone were to backport that previous series, then
->> their tooling or diligence should notice this dependency and this
->> current commit should be picked as well.
->>
->> There should be no Cc: stable on this patch at all, I'll fix it up.
-> Here's what I have:
->
-> https://git.kernel.dk/cgit/linux/commit/?h=block-6.5&id=7eb1e47696aa231b1a567846bbe3a1e1befe1854
->
-> which has the following manual edits:
->
-> 1) Change the title/subject line of the patch. "bugfix for Amiga
-> partition overflow check patch" means very little. The fact that this
-> patch is a bug fix for a previous commit is explicit with the Fixes
-> line.
->
-> 2) Break lines at 72-74 chars, yours were very short.
-Somehow a limit of 60 had stuck in my mind.
->
-> 3) Drop message-id
->
-> 4) Drop cc stable tag
->
-> 5) Drop the revision history. This should be behind three '---' lines
-> and then it's dropped automatically.
+On Thu,  8 Jun 2023 13:02:29 +0200 you wrote:
+> For whole devices ->open is called for each open, but for partitions it
+> is only called on the first open of a partition, e.g.:
+> 
+>   open("/dev/vdb", ...)
+>   open("/dev/vdb", ...)
+>     - 2 call to ->open
+> 
+> [...]
 
-Argh - looks like I've made that mistake more often than not in the past 
-few years. I'll remember that now.
+Here is the summary with links:
+  - [f2fs-dev,01/30] block: also call ->open for incremental partition opens
+    https://git.kernel.org/jaegeuk/f2fs/c/9d1c92872e70
+  - [f2fs-dev,02/30] cdrom: remove the unused bdev argument to cdrom_open
+    https://git.kernel.org/jaegeuk/f2fs/c/764b83100b9a
+  - [f2fs-dev,03/30] cdrom: remove the unused mode argument to cdrom_ioctl
+    https://git.kernel.org/jaegeuk/f2fs/c/473399b50de1
+  - [f2fs-dev,04/30] cdrom: remove the unused cdrom_close_write release code
+    https://git.kernel.org/jaegeuk/f2fs/c/a4cec8bc14c0
+  - [f2fs-dev,05/30] cdrom: track if a cdrom_device_info was opened for data
+    https://git.kernel.org/jaegeuk/f2fs/c/8cdf433e2b8e
+  - [f2fs-dev,06/30] cdrom: remove the unused mode argument to cdrom_release
+    https://git.kernel.org/jaegeuk/f2fs/c/7ae24fcee992
+  - [f2fs-dev,07/30] block: pass a gendisk on bdev_check_media_change
+    https://git.kernel.org/jaegeuk/f2fs/c/444aa2c58cb3
+  - [f2fs-dev,08/30] block: pass a gendisk to ->open
+    https://git.kernel.org/jaegeuk/f2fs/c/d32e2bf83791
+  - [f2fs-dev,09/30] block: remove the unused mode argument to ->release
+    https://git.kernel.org/jaegeuk/f2fs/c/ae220766d87c
+  - [f2fs-dev,10/30] block: rename blkdev_close to blkdev_release
+    https://git.kernel.org/jaegeuk/f2fs/c/7ee34cbc291a
+  - [f2fs-dev,11/30] swsusp: don't pass a stack address to blkdev_get_by_path
+    https://git.kernel.org/jaegeuk/f2fs/c/c889d0793d9d
+  - [f2fs-dev,12/30] bcache: don't pass a stack address to blkdev_get_by_path
+    https://git.kernel.org/jaegeuk/f2fs/c/29499ab060fe
+  - [f2fs-dev,13/30] rnbd-srv: don't pass a holder for non-exclusive blkdev_get_by_path
+    https://git.kernel.org/jaegeuk/f2fs/c/5ee607675deb
+  - [f2fs-dev,14/30] btrfs: don't pass a holder for non-exclusive blkdev_get_by_path
+    https://git.kernel.org/jaegeuk/f2fs/c/2ef789288afd
+  - [f2fs-dev,15/30] block: use the holder as indication for exclusive opens
+    https://git.kernel.org/jaegeuk/f2fs/c/2736e8eeb0cc
+  - [f2fs-dev,16/30] block: add a sb_open_mode helper
+    https://git.kernel.org/jaegeuk/f2fs/c/3f0b3e785e8b
+  - [f2fs-dev,17/30] fs: remove sb->s_mode
+    https://git.kernel.org/jaegeuk/f2fs/c/81b1fb7d17c0
+  - [f2fs-dev,18/30] scsi: replace the fmode_t argument to scsi_cmd_allowed with a simple bool
+    https://git.kernel.org/jaegeuk/f2fs/c/5f4eb9d5413f
+  - [f2fs-dev,19/30] scsi: replace the fmode_t argument to scsi_ioctl with a simple bool
+    https://git.kernel.org/jaegeuk/f2fs/c/2e80089c1824
+  - [f2fs-dev,20/30] scsi: replace the fmode_t argument to ->sg_io_fn with a simple bool
+    https://git.kernel.org/jaegeuk/f2fs/c/1991299e49fa
+  - [f2fs-dev,21/30] nvme: replace the fmode_t argument to the nvme ioctl handlers with a simple bool
+    https://git.kernel.org/jaegeuk/f2fs/c/7d9d7d59d44b
+  - [f2fs-dev,22/30] mtd: block: use a simple bool to track open for write
+    https://git.kernel.org/jaegeuk/f2fs/c/658afed19cee
+  - [f2fs-dev,23/30] rnbd-srv: replace sess->open_flags with a "bool readonly"
+    https://git.kernel.org/jaegeuk/f2fs/c/99b07780814e
+  - [f2fs-dev,24/30] ubd: remove commented out code in ubd_open
+    https://git.kernel.org/jaegeuk/f2fs/c/bd6abfc8e789
+  - [f2fs-dev,25/30] block: move a few internal definitions out of blkdev.h
+    https://git.kernel.org/jaegeuk/f2fs/c/cfb425761c79
+  - [f2fs-dev,26/30] block: remove unused fmode_t arguments from ioctl handlers
+    https://git.kernel.org/jaegeuk/f2fs/c/5e4ea834676e
+  - [f2fs-dev,27/30] block: replace fmode_t with a block-specific type for block open flags
+    https://git.kernel.org/jaegeuk/f2fs/c/05bdb9965305
+  - [f2fs-dev,28/30] block: always use I_BDEV on file->f_mapping->host to find the bdev
+    https://git.kernel.org/jaegeuk/f2fs/c/4e762d862344
+  - [f2fs-dev,29/30] block: store the holder in file->private_data
+    https://git.kernel.org/jaegeuk/f2fs/c/ee3249a8ce78
+  - [f2fs-dev,30/30] fs: remove the now unused FMODE_* flags
+    https://git.kernel.org/jaegeuk/f2fs/c/0733ad800291
 
->
-> Let's hope this is it for Amiga partition handling!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I should certainly hope so!
-
-Cheers,
-
-     Michael
 
