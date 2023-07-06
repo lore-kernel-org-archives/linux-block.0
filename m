@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D86AFEB64DC
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 18:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB22EB64D9
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 18:13:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbjGFSBf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 14:01:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49374 "EHLO
+        id S229968AbjGFSNN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 14:13:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbjGFSBe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 14:01:34 -0400
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A15BA;
-        Thu,  6 Jul 2023 11:01:34 -0700 (PDT)
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-55ba5fae2e6so772619a12.0;
-        Thu, 06 Jul 2023 11:01:34 -0700 (PDT)
+        with ESMTP id S229996AbjGFSNM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 14:13:12 -0400
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAE611BEC;
+        Thu,  6 Jul 2023 11:13:11 -0700 (PDT)
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-51452556acdso799877a12.2;
+        Thu, 06 Jul 2023 11:13:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688666493; x=1691258493;
+        d=1e100.net; s=20221208; t=1688667191; x=1691259191;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aXHDTuh6ZUNosNz3ayQBdLzUYKygC6td/C7Cck1x7W8=;
-        b=W2MniBjf4UOQXjZGiynOtinRYLCQzNq5qUUTUmCMDbgohekzUjGWiNe2q26MnIZokK
-         Of9+DOY5KgvfKLVvY2qhwoepYRCHJXuf5ZhwY88s29pSbCT3drW42xed67IgCxrDfv/P
-         ZN1Akjw/mIpdAhVLOXkEM2k33nkcekFcMnUriin1rSEockFyXAF7rOWSpBscCfzkSV4m
-         Jeqe9a/oOyK5oWlVL9X9/hfah7pYzVLsaoDbRcemuhnEGV0Zw6UXL7ZzZioqNOaPlji2
-         z3SmmvHctKrWaMLzZiKUOxEhmSgiCh2x3sSmQJuJodWAk95xD/M4H0QswJsFgnVA9g9g
-         mhog==
-X-Gm-Message-State: ABy/qLai+36kvtABrtQO7pI09BLy1gpuSPSmyn+5uhdHIQOIHj02XeM1
-        Jp/tGOAs+0B4UEqf4SR8QYw=
-X-Google-Smtp-Source: APBJJlHsvmO/G5MNdY6l5DdVoExbjPGQmHlmAjqlg3+naNKX6zzzN+7OHu7b4B/mqN6W98XPS7IOWg==
-X-Received: by 2002:a05:6a20:3d9:b0:12c:567b:2787 with SMTP id 25-20020a056a2003d900b0012c567b2787mr2675243pzu.19.1688666493508;
-        Thu, 06 Jul 2023 11:01:33 -0700 (PDT)
+        bh=nswtB4vZ8VNtDa5BPx00Cl/IjX72X4BUKIHp85uPhUE=;
+        b=lrZsCrizh/TeUdwM6UJI5E5BYAbvVgfc8lJrdM7mRyOzZLEwVLTw7AIfUyk12rE2/N
+         ZuHZ7W/pgAZUBnHon9T6gyldbT4Ay1FyAoi+6VR6Df8gLDRAOtnFQpVwDykyYmaVh4z8
+         zDNF6TYIolP9X2jFdsgPk4IdziPrs1naB2NRryrKDitN8zq4iZAJ0LW3VQ7dcVinj/6T
+         VGHzlbU4wzjr65UIp/5EeW9HZkftfxdoWyiVcSbWGFH4sfdHOpIwRqDMIP4cU4O1wKDj
+         JReBGg+wzTXzmH/7yGxfl0+FltgHNJmwAJDQgw6k78EeMqnzKowSZb1A9SIO9EWueOoF
+         AYUg==
+X-Gm-Message-State: ABy/qLYMHkpV3FDH9RLt1EQpUlN0IRWzfh/PtDdF/oJNGNzkrQ9Ysqn5
+        FMmBDjCqgoB37Bj4wI5OJaw=
+X-Google-Smtp-Source: APBJJlFrf4Nj/8dpztQi6qoWSOuUG6PQVmLxG/Hc9wEsGT5qKBJW2yjRLX4ngRzNWrMwcAk87HXzVg==
+X-Received: by 2002:a05:6a20:324e:b0:12e:3442:32fb with SMTP id hm14-20020a056a20324e00b0012e344232fbmr2028276pzc.16.1688667191107;
+        Thu, 06 Jul 2023 11:13:11 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:a75c:9545:5328:a233? ([2620:15c:211:201:a75c:9545:5328:a233])
-        by smtp.gmail.com with ESMTPSA id k19-20020aa792d3000000b0068277318e6asm1531808pfa.209.2023.07.06.11.01.31
+        by smtp.gmail.com with ESMTPSA id b5-20020a170902d50500b001aae625e422sm1729086plg.37.2023.07.06.11.13.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jul 2023 11:01:33 -0700 (PDT)
-Message-ID: <3c79f013-7bab-d798-b251-b9e3dd620022@acm.org>
-Date:   Thu, 6 Jul 2023 11:01:30 -0700
+        Thu, 06 Jul 2023 11:13:10 -0700 (PDT)
+Message-ID: <3b5caa0e-e63b-3652-cd64-e6cdb9323242@acm.org>
+Date:   Thu, 6 Jul 2023 11:13:07 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH RFC 3/7] blk-mq: support to track active queues from
- blk_mq_tags
+Subject: Re: [PATCH RFC 4/7] blk-mq: precalculate available tags for
+ hctx_may_queue()
 Content-Language: en-US
 To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
 References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
- <20230618160738.54385-4-yukuai1@huaweicloud.com>
+ <20230618160738.54385-5-yukuai1@huaweicloud.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230618160738.54385-4-yukuai1@huaweicloud.com>
+In-Reply-To: <20230618160738.54385-5-yukuai1@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -59,24 +59,26 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/18/23 09:07, Yu Kuai wrote:
-> @@ -737,6 +738,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->   struct tag_sharing_ctl {
->   	unsigned int active_queues;
->   	unsigned int share_queues;
-> +	struct list_head head;
->   };
+> +static void blk_mq_update_available_driver_tags(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct blk_mq_tags *tags = hctx->tags;
+> +	unsigned int nr_tags;
+> +	struct tag_sharing *tag_sharing;
+> +
+> +	if (tags->ctl.share_queues <= 1)
+> +		nr_tags = tags->nr_tags;
+> +	else
+> +		nr_tags = max((tags->nr_tags + tags->ctl.share_queues - 1) /
+> +			       tags->ctl.share_queues, 4U);
+> +
+> +	list_for_each_entry(tag_sharing, &tags->ctl.head, node)
+> +		tag_sharing->available_tags = nr_tags;
+> +}
 
-Please add a comment that explains that 'head' is the head of a list with
-tag_sharing.node entries.
-
-> +struct tag_sharing {
-> +	struct list_head node;
-> +};
-
-Data structure names typically are a noun. Above I see a name that ends with a
-verb. Would "shared_tag_info" or "tag_sharing_info" perhaps be a better name?
+Since READ_ONCE() is used to read the available_tags member, WRITE_ONCE()
+should be used to update that member, even if a spinlock is held around
+the update.
 
 Thanks,
 
 Bart.
-
