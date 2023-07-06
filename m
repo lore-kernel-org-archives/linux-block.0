@@ -2,143 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB27EB64DC
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 15:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C26CEB64DD
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 15:21:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229641AbjGFPQz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 11:16:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57196 "EHLO
+        id S232174AbjGFPVb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 11:21:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbjGFPQy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 11:16:54 -0400
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6071C172B;
-        Thu,  6 Jul 2023 08:16:53 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VmlC6s._1688656603;
-Received: from 192.168.3.2(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0VmlC6s._1688656603)
-          by smtp.aliyun-inc.com;
-          Thu, 06 Jul 2023 23:16:45 +0800
-Message-ID: <88a298eb-eb7d-e03b-99b9-ead385894f95@linux.alibaba.com>
-Date:   Thu, 6 Jul 2023 23:16:42 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH 22/32] erofs: Convert to use blkdev_get_handle_by_path()
-To:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        with ESMTP id S231315AbjGFPVa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 11:21:30 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B891730;
+        Thu,  6 Jul 2023 08:21:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zla1ImuYlSI5ZdeorNKDcqvlZHdC0vro7cklgNetIq4=; b=md2yoQbsnnELLcfX6YH8bFGdgD
+        sVm3mfyQyYUBNSKlDnq01v4epjnSUGYjdn0UcoSP/y4qznjsZ5DVvjb7Ednq5ebTwXF4vGlcRcNND
+        LHM0q+covQuGM7MQUrnz/4r6PTvLDf17t9LKMo0Y6QNTtcD9gSa8AKjWLG+0EX5OMku5iH7jLNtfR
+        TMZay13oaFnWOSnyEOQAeHrFwWMJkHxTimLAEwwF5Sc0FIlDLrpGOFofVyIet7FH6QyCxvzOjElFP
+        o0bo0vZKvhnQjryDZlVlhCzo9+Q5jmy5qcpOp9MZ4LG7iGYUVoJF3xPRmKLbhkyjS/ZyZqGZy/Tqe
+        zW+T7FUA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qHQn6-001zS5-18;
+        Thu, 06 Jul 2023 15:21:08 +0000
+Date:   Thu, 6 Jul 2023 08:21:08 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
-        Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-        linux-erofs@lists.ozlabs.org
-References: <20230629165206.383-1-jack@suse.cz>
- <20230704122224.16257-22-jack@suse.cz>
-From:   Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <20230704122224.16257-22-jack@suse.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christian Brauner <christian@brauner.io>
+Subject: Re: [RFC PATCH 01/11] iov_iter: Fix comment refs to
+ iov_iter_get_pages/pages_alloc()
+Message-ID: <ZKbb5Hawv6XYTAzJ@infradead.org>
+References: <20230630152524.661208-1-dhowells@redhat.com>
+ <20230630152524.661208-2-dhowells@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230630152524.661208-2-dhowells@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Jun 30, 2023 at 04:25:14PM +0100, David Howells wrote:
+>  	/*
+>  	 * FOLL_LONGTERM indicates that the page will be held for an indefinite
+>  	 * time period _often_ under userspace control.  This is in contrast to
+> -	 * iov_iter_get_pages(), whose usages are transient.
+> +	 * iov_iter_get_pages2(), whose usages are transient.
+>  	 */
 
-
-On 2023/7/4 20:21, Jan Kara wrote:
-> Convert erofs to use blkdev_get_handle_by_path() and pass the handle
-> around.
-> 
-> CC: Gao Xiang <xiang@kernel.org>
-> CC: Chao Yu <chao@kernel.org>
-> CC: linux-erofs@lists.ozlabs.org
-> Signed-off-by: Jan Kara <jack@suse.cz>
-
-Thanks for this:
-Acked-by: Gao Xiang <hsiangkao@linux.alibaba.com>
-
-Thanks,
-Gao Xiang
-
-> ---
->   fs/erofs/data.c     |  4 ++--
->   fs/erofs/internal.h |  2 +-
->   fs/erofs/super.c    | 20 ++++++++++----------
->   3 files changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/fs/erofs/data.c b/fs/erofs/data.c
-> index db5e4b7636ec..1fa60cfff267 100644
-> --- a/fs/erofs/data.c
-> +++ b/fs/erofs/data.c
-> @@ -222,7 +222,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
->   			up_read(&devs->rwsem);
->   			return 0;
->   		}
-> -		map->m_bdev = dif->bdev;
-> +		map->m_bdev = dif->bdev_handle->bdev;
->   		map->m_daxdev = dif->dax_dev;
->   		map->m_dax_part_off = dif->dax_part_off;
->   		map->m_fscache = dif->fscache;
-> @@ -240,7 +240,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
->   			if (map->m_pa >= startoff &&
->   			    map->m_pa < startoff + length) {
->   				map->m_pa -= startoff;
-> -				map->m_bdev = dif->bdev;
-> +				map->m_bdev = dif->bdev_handle->bdev;
->   				map->m_daxdev = dif->dax_dev;
->   				map->m_dax_part_off = dif->dax_part_off;
->   				map->m_fscache = dif->fscache;
-> diff --git a/fs/erofs/internal.h b/fs/erofs/internal.h
-> index 36e32fa542f0..fabd3bb0c194 100644
-> --- a/fs/erofs/internal.h
-> +++ b/fs/erofs/internal.h
-> @@ -47,7 +47,7 @@ typedef u32 erofs_blk_t;
->   struct erofs_device_info {
->   	char *path;
->   	struct erofs_fscache *fscache;
-> -	struct block_device *bdev;
-> +	struct bdev_handle *bdev_handle;
->   	struct dax_device *dax_dev;
->   	u64 dax_part_off;
->   
-> diff --git a/fs/erofs/super.c b/fs/erofs/super.c
-> index 9d6a3c6158bd..a4742cc05f95 100644
-> --- a/fs/erofs/super.c
-> +++ b/fs/erofs/super.c
-> @@ -230,7 +230,7 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
->   	struct erofs_sb_info *sbi = EROFS_SB(sb);
->   	struct erofs_fscache *fscache;
->   	struct erofs_deviceslot *dis;
-> -	struct block_device *bdev;
-> +	struct bdev_handle *bdev_handle;
->   	void *ptr;
->   
->   	ptr = erofs_read_metabuf(buf, sb, erofs_blknr(sb, *pos), EROFS_KMAP);
-> @@ -254,13 +254,13 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
->   			return PTR_ERR(fscache);
->   		dif->fscache = fscache;
->   	} else if (!sbi->devs->flatdev) {
-> -		bdev = blkdev_get_by_path(dif->path, BLK_OPEN_READ, sb->s_type,
-> -					  NULL);
-> -		if (IS_ERR(bdev))
-> -			return PTR_ERR(bdev);
-> -		dif->bdev = bdev;
-> -		dif->dax_dev = fs_dax_get_by_bdev(bdev, &dif->dax_part_off,
-> -						  NULL, NULL);
-> +		bdev_handle = blkdev_get_handle_by_path(dif->path,
-> +				BLK_OPEN_READ, sb->s_type, NULL);
-> +		if (IS_ERR(bdev_handle))
-> +			return PTR_ERR(bdev_handle);
-> +		dif->bdev_handle = bdev_handle;
-> +		dif->dax_dev = fs_dax_get_by_bdev(bdev_handle->bdev,
-> +				&dif->dax_part_off, NULL, NULL);
->   	}
->   
->   	dif->blocks = le32_to_cpu(dis->blocks);
-> @@ -815,8 +815,8 @@ static int erofs_release_device_info(int id, void *ptr, void *data)
->   	struct erofs_device_info *dif = ptr;
->   
->   	fs_put_dax(dif->dax_dev, NULL);
-> -	if (dif->bdev)
-> -		blkdev_put(dif->bdev, &erofs_fs_type);
-> +	if (dif->bdev_handle)
-> +		blkdev_handle_put(dif->bdev_handle);
->   	erofs_fscache_unregister_cookie(dif->fscache);
->   	dif->fscache = NULL;
->   	kfree(dif->path);
+I don't think this should refer to iov_iter_get_pages* at all.  The
+flag should document that actual get/pin_user interfaces and not refer
+to a (deprecated) interface built on top of it.
