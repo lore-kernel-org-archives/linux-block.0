@@ -2,80 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734E3EB64D9
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 18:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C11EB64D9
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 20:14:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231508AbjGFSnI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 14:43:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33420 "EHLO
+        id S232317AbjGFUOa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 16:14:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232495AbjGFSnG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 14:43:06 -0400
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 633491BF6;
-        Thu,  6 Jul 2023 11:43:04 -0700 (PDT)
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1b852785a65so7451775ad.0;
-        Thu, 06 Jul 2023 11:43:04 -0700 (PDT)
+        with ESMTP id S231636AbjGFUO3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 16:14:29 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B49C71BFF
+        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 13:14:28 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1b88e5b3834so5119155ad.3
+        for <linux-block@vger.kernel.org>; Thu, 06 Jul 2023 13:14:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688668984; x=1691260984;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YJSqTuA4rxUcVPYnik9uob4hLh1/TwEOZHwAsiup89o=;
-        b=CA/YQYucup3tOBIH5JozXwebx+BrsTBy3fBdruWBqJ1/NcbkQSlH8kGVMDewWXMD+V
-         4kXeuIYO8z2npwWnITOS5pwlVVEU/6plNqiuMOAmvG8APa2BC/DXe1QHH7a2yQD3DOWc
-         4jRxq0bQ0NIwixoA/35mzk+4S1GP+r3VI3hsxbQhhLE5x79tl1EraWjYeoz8R857Mxfx
-         NbscO0OHYVv2G0FGokERxPrfvtQNl6ezjOOI5oYEg2Ka0lMck6uweKK0FgWGRCPxR7id
-         2pquPdP8ma//MP4H1N5jCk6CTU98AaUJnV2uUyY2UFARIvcWtu/0G7Je4i+h2qib11OY
-         +89Q==
-X-Gm-Message-State: ABy/qLbuvXiqgTsktuHtFvpYU0gsy7O2+CJmoojngOU6fgonyimNYTym
-        UFE2KDWwYgDoEZ9IMU/cuS0=
-X-Google-Smtp-Source: APBJJlHBYDfZfzJ5gmKtKg8N+6jJW7hn+N7mquB8h5rdgKOnD90vAzJCoOt8LhOYk0jlFL4f1L/Big==
-X-Received: by 2002:a17:903:32d1:b0:1b8:a67f:1c15 with SMTP id i17-20020a17090332d100b001b8a67f1c15mr9340335plr.25.1688668983758;
-        Thu, 06 Jul 2023 11:43:03 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:a75c:9545:5328:a233? ([2620:15c:211:201:a75c:9545:5328:a233])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b001b8a2edab6asm1737887plg.244.2023.07.06.11.43.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jul 2023 11:43:03 -0700 (PDT)
-Message-ID: <dce8850c-92ee-8519-aa74-dc2d7ecc41e0@acm.org>
-Date:   Thu, 6 Jul 2023 11:43:01 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH RFC 0/7] blk-mq: improve tag fair sharing
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        Christoph Hellwig <hch@lst.de>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
- <4c9fea33-9c30-4ab9-c210-95e09d323837@acm.org>
- <82d44ba1-4389-079c-935a-cbb49203ca27@huaweicloud.com>
- <c4de836a-a2a1-847f-1525-1accb814e45e@acm.org>
- <84f9bfb4-293b-ad55-97e4-e8c611c5e9ca@huaweicloud.com>
+        d=1e100.net; s=20221208; t=1688674468; x=1691266468;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n57SPeezC/tK+OEHVThMjucwjn649VoKhBuNWpVqRYU=;
+        b=PRonJV+H3wWqc2ehqkfSnhC+yvQVf6rK5WBW5UprI+axwNRpjDT99rm/oMioDotxWq
+         75OaGJNV2/oiq6DRm6WqZ8EgeH9AySv2V9s8cnN+b9FLrr4ry05ZMTiWKO5UMaLtic5t
+         WE/JzmUGPzQsKz1dgSr39qXXVm0CPDH6AP550/TOLuVHNOt5HkLAduyiZ1Igrq73ujch
+         5RJI0dMH5yc7Pypr/BZDgLiCC9qpK2OECVjyV8Y5AigayorRluzihxwvLxkRvPee0stY
+         KqgS2UReE3bh1Wune1iY4h2hrfF6douxs8r3r4w2ThxLv2s4i4FNIJp8nVxcL7iGarCh
+         +dIQ==
+X-Gm-Message-State: ABy/qLZHDdar9ZRa6wQC2nQdwy9RLH5p0Bdhot3Zk4yo994BqWbpLEP0
+        jcePvvc43VXPDlMezHHaI5I=
+X-Google-Smtp-Source: APBJJlEY0qTvE40n2UYNY9JRqRim6yf9SAoGCoO1L23iDgcY2CLOy8ps4VufPL70+7ECaNwOhRDUfw==
+X-Received: by 2002:a17:902:d902:b0:1b3:cf98:a20b with SMTP id c2-20020a170902d90200b001b3cf98a20bmr1988234plz.54.1688674468013;
+        Thu, 06 Jul 2023 13:14:28 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:a75c:9545:5328:a233])
+        by smtp.gmail.com with ESMTPSA id i19-20020a170902eb5300b001b9be2e2b3esm208611pli.277.2023.07.06.13.14.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 13:14:27 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <84f9bfb4-293b-ad55-97e4-e8c611c5e9ca@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Shaun Tancheff <shaun.tancheff@seagate.com>,
+        Damien Le Moal <damien.lemoal@hgst.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH] block: Fix a source code comment in include/uapi/linux/blkzoned.h
+Date:   Thu,  6 Jul 2023 13:14:12 -0700
+Message-ID: <20230706201422.3987341-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/4/23 20:17, Yu Kuai wrote:
-> - currently borrowed tags will never be returned untill queue is idle,
-> I should figure out a way to return borrowed tags if this queue is not
-> busy, so that other queues can borrow tag from this queue.
+Fix the symbolic names for zone conditions in the blkzoned.h header
+file.
 
-At least for UFS this is a significant disadvantage. If e.g. one SCSI
-command is sent to the UFS WLUN every 20 seconds and the request queue
-timeout is 30 seconds then borrowed tags will never be returned.
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Fixes: 6a0cb1bc106f ("block: Implement support for zoned block devices")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ include/uapi/linux/blkzoned.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-The complexity of this patch series is a concern to me. The complexity
-of this patch series may be a barrier towards merging this patch series
-in the upstream kernel.
-
-Thanks,
-
-Bart.
-
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+index b80fcc9ea525..f85743ef6e7d 100644
+--- a/include/uapi/linux/blkzoned.h
++++ b/include/uapi/linux/blkzoned.h
+@@ -51,13 +51,13 @@ enum blk_zone_type {
+  *
+  * The Zone Condition state machine in the ZBC/ZAC standards maps the above
+  * deinitions as:
+- *   - ZC1: Empty         | BLK_ZONE_EMPTY
++ *   - ZC1: Empty         | BLK_ZONE_COND_EMPTY
+  *   - ZC2: Implicit Open | BLK_ZONE_COND_IMP_OPEN
+  *   - ZC3: Explicit Open | BLK_ZONE_COND_EXP_OPEN
+- *   - ZC4: Closed        | BLK_ZONE_CLOSED
+- *   - ZC5: Full          | BLK_ZONE_FULL
+- *   - ZC6: Read Only     | BLK_ZONE_READONLY
+- *   - ZC7: Offline       | BLK_ZONE_OFFLINE
++ *   - ZC4: Closed        | BLK_ZONE_COND_CLOSED
++ *   - ZC5: Full          | BLK_ZONE_COND_FULL
++ *   - ZC6: Read Only     | BLK_ZONE_COND_READONLY
++ *   - ZC7: Offline       | BLK_ZONE_COND_OFFLINE
+  *
+  * Conditions 0x5 to 0xC are reserved by the current ZBC/ZAC spec and should
+  * be considered invalid.
