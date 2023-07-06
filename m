@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC10EB64DC
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 15:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72170EB64DD
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 15:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232166AbjGFPWw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 11:22:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60002 "EHLO
+        id S233652AbjGFP3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 11:29:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231237AbjGFPWv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 11:22:51 -0400
+        with ESMTP id S233732AbjGFP3m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 11:29:42 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA79C9;
-        Thu,  6 Jul 2023 08:22:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C5261BF3;
+        Thu,  6 Jul 2023 08:29:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=mVSMSyDkinSgwmw4a950Tp1Dl+
-        O2wr23ZyQmI2EN4qDGP/wuDgUSxVVc+dt4meFnayBZY0b79NqqMrugGe79rYXHQRK2mHBPT7U7Eu5
-        zuUlQpy9+jqs0ZrctYYwEHv1MvVpiz4u4CCHcuQdKt6PsVDPwvKVIaubkFKSzbKDUNxi56k3bnE+7
-        k9kmXOSX0i3R5jJ6wEcKR/cpjJ0hivxVjXwJGOx/4vDnYEITRrSCMnyuL6zMvbTBV/Bfhl9nY6ZDs
-        IpXyf9c7CgU94kcgVym2JL0uAUImLsy8HKgNfT6oEfjFxdu/sda5mc0fa+qdxlLPre0VAR3sJiaJe
-        wMfwbWLg==;
+        bh=VaWrOj7qxCfN/aR/+wlf6fU45vuCjby7Nm0Ri4aQJmw=; b=JaE/0fWXQgO2xj2f3aFJmBZT5Q
+        j6++1w0jrD7V6RkWJs3PDshW7GjlpZfvyQoTTJ1CWgonZ+2AktQ2W0WMpn0QR1xiTmqU319iICsGC
+        64kKXFo/nIsWzCAc8Lw66uKl2P9PtTuqTKQDsMNt7jFOA5TB1a6i1gnN8D7RNImMSYEq1hFweL5NN
+        OsN9HNt3EaMVo61D1E2z8zoD/Yc2hUlbIXLlqAOaYKzR7yZpvUAaLNm+TilvBWp1EB2Cm5KPpvMAz
+        k2dTNjwEazjsUUv4U4jC6XLDA+aFIhco1jmCE66xnS8Evo0WHqgKu3FkOk82Grau21wfT9osTZx/7
+        QTSa18og==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qHQoa-001zdE-25;
-        Thu, 06 Jul 2023 15:22:40 +0000
-Date:   Thu, 6 Jul 2023 08:22:40 -0700
+        id 1qHQv8-0020SQ-2T;
+        Thu, 06 Jul 2023 15:29:26 +0000
+Date:   Thu, 6 Jul 2023 08:29:26 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
@@ -43,20 +43,82 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
         Christian Brauner <christian@brauner.io>
-Subject: Re: [RFC PATCH 02/11] vfs: Set IOCB_WRITE in iocbs that we're going
- to write from
-Message-ID: <ZKbcQBGxqjLgwzHx@infradead.org>
+Subject: Re: [RFC PATCH 03/11] vfs: Use init_kiocb() to initialise new IOCBs
+Message-ID: <ZKbd1vwqeCFnQcjU@infradead.org>
 References: <20230630152524.661208-1-dhowells@redhat.com>
- <20230630152524.661208-3-dhowells@redhat.com>
+ <20230630152524.661208-4-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230630152524.661208-3-dhowells@redhat.com>
+In-Reply-To: <20230630152524.661208-4-dhowells@redhat.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Fri, Jun 30, 2023 at 04:25:16PM +0100, David Howells wrote:
+> A number of places that generate kiocbs didn't use init_sync_kiocb() to
+> initialise the new kiocb.  Fix these to always use init_kiocb().
+> 
+> Note that aio and io_uring pass information in through ki_filp through an
+> overlaid union before I can call init_kiocb(), so that gets reinitialised.
+> I don't think it clobbers anything else.
+> 
+> After this point, IOCB_WRITE is only set by init_kiocb().
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Nothing in this patch touches the VFS, so the subject line is
+wrong.  And I think we're better off splitting it into one per
+subsystem, which also allows documenting the exact changes.
+
+Which includes now setting the flags from f_iocb_flags and setting
+and I/O priority.  Please explain why this is harmless or even useful.
+
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 37511d2b2caf..ea92235c5ba2 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -439,16 +439,17 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  	}
+>  	atomic_set(&cmd->ref, 2);
+>  
+> -	iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
+> +	iov_iter_bvec(&iter, rw == WRITE ? ITER_SOURCE : ITER_DEST,
+> +		      bvec, nr_bvec, blk_rq_bytes(rq));
+
+Given the cover letter I expect this is going to go away, but the
+changes would probably a lot more readable if you had a helper
+to convert from READ/WRITE to the iter flags inbetween.
+
+Or maybe do it the other way - add a helper to init the 
+
+> @@ -490,12 +491,12 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+>  		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
+>  	case REQ_OP_WRITE:
+>  		if (cmd->use_aio)
+> -			return lo_rw_aio(lo, cmd, pos, ITER_SOURCE);
+> +			return lo_rw_aio(lo, cmd, pos, WRITE);
+>  		else
+>  			return lo_write_simple(lo, rq, pos);
+>  	case REQ_OP_READ:
+>  		if (cmd->use_aio)
+> -			return lo_rw_aio(lo, cmd, pos, ITER_DEST);
+> +			return lo_rw_aio(lo, cmd, pos, READ);
+
+I don't think there is any need to pass the rw argument at all,
+lo_rw_aio can just do an op_is_write(req_op(rq))
+
+> -static int io_rw_init_file(struct io_kiocb *req, fmode_t mode)
+> +static int io_rw_init_file(struct io_kiocb *req, unsigned int io_direction)
+>  {
+>  	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
+>  	struct kiocb *kiocb = &rw->kiocb;
+>  	struct io_ring_ctx *ctx = req->ctx;
+>  	struct file *file = req->file;
+> +	fmode_t mode = (io_direction == WRITE) ? FMODE_WRITE : FMODE_READ;
+>  	int ret;
+>  
+>  	if (unlikely(!file || !(file->f_mode & mode)))
+
+I'd just move this check into the two callers, that way you can hard
+code the mode instead of adding a conversion.
+
