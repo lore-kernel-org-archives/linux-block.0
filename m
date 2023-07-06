@@ -2,90 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 409CBEB64D9
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 16:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD1FEB64DC
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 17:43:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231236AbjGFQgG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 12:36:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38754 "EHLO
+        id S232358AbjGFRnZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 13:43:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231627AbjGFQgC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 12:36:02 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2291D1FC6;
-        Thu,  6 Jul 2023 09:35:58 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id BFAA21F85D;
-        Thu,  6 Jul 2023 16:35:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1688661356; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PsVUq4b3rii/qzBSnj09xlS3Zu3xM5oAxCymz1PLAcI=;
-        b=qQw2gPX/jTIYhsu1jUAA2RIbY+AVlAS7JCA0EXgPq6wCCeh2AHG126pv/LGKv5qqOnenGT
-        YZMJhFW3sLdj2COMAwL9/Exm5KHwPxYbDOdLuQRpBPhfnCVN42JfFJJdU0sxDEgtx6Lj4H
-        I4GawAUizK3WZ6sRa+6BudaqarEECnQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1688661356;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PsVUq4b3rii/qzBSnj09xlS3Zu3xM5oAxCymz1PLAcI=;
-        b=IyOmFAh/c3+KYD2WbcdOzi+DsugS7TrcFc/QQ1ClRai8e7FVCq0W6JcOTzhJDjzVSRsTVp
-        DQLYZu4vcTJZisCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B1643138FC;
-        Thu,  6 Jul 2023 16:35:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id xINHK2ztpmQ7NwAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 06 Jul 2023 16:35:56 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 48A27A0707; Thu,  6 Jul 2023 18:35:56 +0200 (CEST)
-Date:   Thu, 6 Jul 2023 18:35:56 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 02/32] block: Use file->f_flags for determining exclusive
- opens in file_to_blk_mode()
-Message-ID: <20230706163556.7ygts5dhfhgj53zl@quack3>
-References: <20230629165206.383-1-jack@suse.cz>
- <20230704122224.16257-2-jack@suse.cz>
- <ZKbfO5eFJ9hVueb/@infradead.org>
+        with ESMTP id S232213AbjGFRnZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 13:43:25 -0400
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21FF9199F;
+        Thu,  6 Jul 2023 10:43:24 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6686c74183cso805067b3a.1;
+        Thu, 06 Jul 2023 10:43:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688665403; x=1691257403;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xvr87+AoFHtLDIGSAaHcjJ1+wzEBB57fnk42Q9ycDPM=;
+        b=iT3cqAUyeddBFL0B6nVA3Pc0XPU+ywwMJdAd1cC4Tdng4DKneYXB2a7GrgdDDlft9v
+         pBvPC77ob9prP0ndf6RksRAGsUxy6O1U7I55XSlYgPxuB04F8qgfN3sQGFHjy0LAFbVX
+         ECaHDdVPbdDdHcgLy1TW7benDS8w95gkz2HNQ3zufHbprz+YyxJ4OPAPig2iIgtBOvHf
+         MIXStGjGg/M02EbpbtvTyQR84gaLGRSROkNgwceRGTAi9wjb59ghn3Q+XtzYwiy438aP
+         F+WFQsJqziG1J8cX9z/e3D7kHObgGe63tMMTB8LWWx4Au1V3R+eKAKSdj4FFxTCSUo7Y
+         xKTQ==
+X-Gm-Message-State: ABy/qLYg5iiF4r3Vts1UosTKi9triyWSc4DtxxEy+wQY79sj74NAtLbx
+        x+dBf0H3Avt6hr6BgmcrCr8YH8IZ+8g=
+X-Google-Smtp-Source: APBJJlFT8+yVY72w0coTpH7C50FL8y6paconZ8kFZwdk59CxZVH3kJ2t3K+PRP0Ctwzz6T+cjMDYuw==
+X-Received: by 2002:a05:6a20:1d0:b0:126:43f7:e270 with SMTP id 16-20020a056a2001d000b0012643f7e270mr2432486pzz.59.1688665403403;
+        Thu, 06 Jul 2023 10:43:23 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:a75c:9545:5328:a233? ([2620:15c:211:201:a75c:9545:5328:a233])
+        by smtp.gmail.com with ESMTPSA id g18-20020aa78752000000b00671eb039b23sm1554122pfo.58.2023.07.06.10.43.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Jul 2023 10:43:22 -0700 (PDT)
+Message-ID: <57406ab6-deb7-1802-dc9b-7c847b0a261a@acm.org>
+Date:   Thu, 6 Jul 2023 10:43:19 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZKbfO5eFJ9hVueb/@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH RFC 1/7] blk-mq: factor out a structure from blk_mq_tags
+ to control tag sharing
+Content-Language: en-US
+To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
+ <20230618160738.54385-2-yukuai1@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230618160738.54385-2-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 06-07-23 08:35:23, Christoph Hellwig wrote:
-> On Tue, Jul 04, 2023 at 02:21:29PM +0200, Jan Kara wrote:
-> > Use file->f_flags instead of file->private_data for determining whether
-> > we should set BLK_OPEN_EXCL flag. This allows us to remove somewhat
-> > awkward setting of file->private_data before calling file_to_blk_mode()
-> > and it also makes following conversion to blkdev_get_handle_by_dev()
-> > simpler.
-> 
-> While this looks a lot nicer, I don't think it actually works given that
-> do_dentry_open clears out O_EXCL, and thus it won't be set when
-> calling into blkdev_ioctl.
+On 6/18/23 09:07, Yu Kuai wrote:
+> Currently tags is fair shared, and the new structure contains only one
+                  ^^^^^^^       ^^^^^^^^^
+                  are fairly    .  The
+> field active_queues. There are no functional changes and prepare to
+                                                       ^^^^^^^^^^^^^^^
+                                               . This patch prepares for
+> refactor tag sharing.
+   ^^^^^^^^
+   refactoring
 
-Aha, good point! So I need to workaround this a bit differently. I think
-the best would be to have file_to_blk_mode() for blkdev_open() only and
-make the other places (which already have bdev_handle available from
-struct file) use bdev_handle->mode. But I have to come up with a sane
-transition to that state :).
+Please make the subject of this patch shorter, e.g. "Refactor struct
+blk_mq_tags". Otherwise this patch looks good to me.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks,
+
+Bart.
