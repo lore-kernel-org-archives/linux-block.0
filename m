@@ -2,106 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D68C04FE0
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 00:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8C2C001DF
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 00:18:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232625AbjGFASU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jul 2023 20:18:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55678 "EHLO
+        id S232750AbjGFASY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jul 2023 20:18:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232372AbjGFASS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 20:18:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD62A19B9;
-        Wed,  5 Jul 2023 17:18:17 -0700 (PDT)
+        with ESMTP id S232678AbjGFASV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2023 20:18:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A268619B6;
+        Wed,  5 Jul 2023 17:18:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 11A55617D8;
-        Thu,  6 Jul 2023 00:18:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F3203C433D9;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9C596617CF;
+        Thu,  6 Jul 2023 00:18:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EC42FC433CC;
         Thu,  6 Jul 2023 00:18:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1688602695;
-        bh=Wq4Kf5jvhnktrqkplac3NbW2zj2tA4epX9jlz+qsmxU=;
+        bh=xIK8FsM0y6IdTXxoj2yUtX8ybh4E/hSNnrTgFUHcmA8=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=FqFLZi+08sYjnqaXYAl7RC8hWusLeRJdeJY3rxkQpMAg2656v3faM7lVBPC47eq9w
-         Ye27mWuDhpMkkbOOWhIfBLD7GWqruxk/n/4E3YevhZscqfl1NYaHhydhD8Y1w7MhOi
-         t72EFVvoOgabyvl1EvnEIHoGc9gW57dQGKiys/9Tt7JEjmdbNnvXszJOzgTHk0ZtGL
-         x5tXDyb7XsDe0FZOuxbCSC80OgwapO1qbNtM21geupHJfgNFOygMaX5FugtGkwYFKR
-         Wljo4GjMOilwWQ+w28lEf2vFPf8rU73LLcFJe/sDPVUCdXPSczpV+xwnaknMRFn8wz
-         t1C0p5ZN3fGPw==
+        b=ksZHAgHMiqjHHNI+HBfmh/tl3uHBBT0nfbChSIFhUHykziJMCSV/dXLYK3T1W2p9U
+         CirRv9+voPPJIwygedt30zAR6PpNsTqJ6iiu3TVFL5TNFBAhEa7XCLXru7Pxe8gh7q
+         g4a2eOmEDNhcCl+xlsMDNsHW2SW6gLnNfgOwk7VSYh7OzpsGT9NjdI+ITbQ/WcG9Wn
+         fIp3qfeQtscPJ+OpOWfQRZh4xECVMU2dlje1Cr3uA9UldOejm8bKH1tP/qXpJ7er3w
+         3jYQGpCyQ1ko5Njz6BZi4VANr+UNx+6bTyfw+gMFEXf+gHhZEkKp+Ojf0kEDAn6G35
+         fB5WZ+CX6Rz1g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C19C0C0C40E;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC72CC6445A;
         Thu,  6 Jul 2023 00:18:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [f2fs-dev] [PATCH 01/13] iomap: update ki_pos a little later in
- iomap_dio_complete
+Subject: Re: [f2fs-dev] [PATCH v21 19/30] f2fs: Provide a splice-read stub
 From:   patchwork-bot+f2fs@kernel.org
-Message-Id: <168860269478.29151.608883953593901827.git-patchwork-notify@kernel.org>
+Message-Id: <168860269483.29151.4192794448591336624.git-patchwork-notify@kernel.org>
 Date:   Thu, 06 Jul 2023 00:18:14 +0000
-References: <20230519093521.133226-2-hch@lst.de>
-In-Reply-To: <20230519093521.133226-2-hch@lst.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     willy@infradead.org, djwong@kernel.org, linux-mm@kvack.org,
-        agruenba@redhat.com, miklos@szeredi.hu, cluster-devel@redhat.com,
-        idryomov@gmail.com, linux-ext4@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-block@vger.kernel.org,
-        dlemoal@kernel.org, viro@zeniv.linux.org.uk, jaegeuk@kernel.org,
-        ceph-devel@vger.kernel.org, xiubli@redhat.com,
-        trond.myklebust@hammerspace.com, axboe@kernel.dk,
-        brauner@kernel.org, tytso@mit.edu,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        anna@kernel.org, linux-fsdevel@vger.kernel.org,
-        akpm@linux-foundation.org
+References: <20230520000049.2226926-20-dhowells@redhat.com>
+In-Reply-To: <20230520000049.2226926-20-dhowells@redhat.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, hch@infradead.org,
+        linux-block@vger.kernel.org, hdanton@sina.com, jack@suse.cz,
+        david@redhat.com, torvalds@linux-foundation.org,
+        jlayton@kernel.org, brauner@kernel.org, willy@infradead.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org, jgg@nvidia.com,
+        linux-fsdevel@vger.kernel.org, jaegeuk@kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, logang@deltatee.com,
+        hch@lst.de
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Hello:
 
-This series was applied to jaegeuk/f2fs.git (dev)
-by Andrew Morton <akpm@linux-foundation.org>:
+This patch was applied to jaegeuk/f2fs.git (dev)
+by Jens Axboe <axboe@kernel.dk>:
 
-On Fri, 19 May 2023 11:35:09 +0200 you wrote:
-> Move the ki_pos update down a bit to prepare for a better common
-> helper that invalidates pages based of an iocb.
+On Sat, 20 May 2023 01:00:38 +0100 you wrote:
+> Provide a splice_read stub for f2fs.  This does some checks and tracing
+> before calling filemap_splice_read() and will update the iostats
+> afterwards.  Direct I/O is handled by the caller.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/iomap/direct-io.c | 21 +++++++++++----------
->  1 file changed, 11 insertions(+), 10 deletions(-)
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Al Viro <viro@zeniv.linux.org.uk>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Jaegeuk Kim <jaegeuk@kernel.org>
+> cc: Chao Yu <chao@kernel.org>
+> cc: linux-f2fs-devel@lists.sourceforge.net
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-block@vger.kernel.org
+> cc: linux-mm@kvack.org
+> 
+> [...]
 
 Here is the summary with links:
-  - [f2fs-dev,01/13] iomap: update ki_pos a little later in iomap_dio_complete
-    https://git.kernel.org/jaegeuk/f2fs/c/936e114a245b
-  - [f2fs-dev,02/13] filemap: update ki_pos in generic_perform_write
-    (no matching commit)
-  - [f2fs-dev,03/13] filemap: assign current->backing_dev_info in generic_perform_write
-    (no matching commit)
-  - [f2fs-dev,04/13] filemap: add a kiocb_write_and_wait helper
-    https://git.kernel.org/jaegeuk/f2fs/c/3c435a0fe35c
-  - [f2fs-dev,05/13] filemap: add a kiocb_invalidate_pages helper
-    https://git.kernel.org/jaegeuk/f2fs/c/e003f74afbd2
-  - [f2fs-dev,06/13] filemap: add a kiocb_invalidate_post_write helper
-    (no matching commit)
-  - [f2fs-dev,07/13] iomap: update ki_pos in iomap_file_buffered_write
-    (no matching commit)
-  - [f2fs-dev,08/13] iomap: assign current->backing_dev_info in iomap_file_buffered_write
-    (no matching commit)
-  - [f2fs-dev,09/13] iomap: use kiocb_write_and_wait and kiocb_invalidate_pages
-    https://git.kernel.org/jaegeuk/f2fs/c/8ee93b4bb626
-  - [f2fs-dev,10/13] fs: factor out a direct_write_fallback helper
-    (no matching commit)
-  - [f2fs-dev,11/13] fuse: update ki_pos in fuse_perform_write
-    (no matching commit)
-  - [f2fs-dev,12/13] fuse: drop redundant arguments to fuse_perform_write
-    (no matching commit)
-  - [f2fs-dev,13/13] fuse: use direct_write_fallback
-    (no matching commit)
+  - [f2fs-dev,v21,19/30] f2fs: Provide a splice-read stub
+    https://git.kernel.org/jaegeuk/f2fs/c/ceb11d0e2da2
 
 You are awesome, thank you!
 -- 
