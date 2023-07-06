@@ -2,93 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B27AEB64D9
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 14:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD0AEB64D9
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 14:24:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232006AbjGFOSD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 10:18:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48394 "EHLO
+        id S232422AbjGFOYV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 10:24:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233108AbjGFORz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 10:17:55 -0400
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E76531BFD
-        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 07:17:49 -0700 (PDT)
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-53feeb13906so1171079a12.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Jul 2023 07:17:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688653069; x=1691245069;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EWHU7qQSpq7jEJZ7piv+O344Wp3pDTZ25crNyt0IquE=;
-        b=YpqImG+aCq4gIXQ7U3S+tS4KJs9GGJgMn1bL0ajJYnHqN5LeEKaX5pIp2SkulW2iZj
-         skjvZSYiLqut/hH1CCJhG4Nyew3Z9hdh53q9tQ4mJQ8N9fStTKKHxdPjshsMYGvAM533
-         vug3injPWC8kNiNd1xjnDY3UwmrE4mmaa+H1a+yKeixftrZBdmfH6nqZvTr8Gx2LlCxH
-         gqU5qqljkX1+JSOqBRzk5UncZ6qLUFn4xQ8OC0ZbmkVSmvkqpNKe2oACqL1SjIgKgcyc
-         QJWed7t4qLLX/YTpfmOGf6ezPk+I4cVqYOIhCZUVtat0CL508TBfJG3Wal0rq+DHnA+j
-         q91A==
-X-Gm-Message-State: ABy/qLbm0LE18JWQ3OJfNgoHy0FO80LiWQekcmmvpJk9X50vbhDD33PR
-        A7Q9sIX3v2VJpl7sND70C5qq684UC2xKddbyMBHJIFTmoguQz8k=
-X-Google-Smtp-Source: APBJJlFnQOv8pcKufgaBpnQIaZTboCZmV5Y7/rYQg0qpVvW3Yd/t1EywnTS6PCcSG+zIswYld+6jwe3nSErbdENbkN9gDmuS96PN
+        with ESMTP id S232108AbjGFOYU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 10:24:20 -0400
+Received: from out-9.mta1.migadu.com (out-9.mta1.migadu.com [95.215.58.9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A45119BD
+        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 07:24:18 -0700 (PDT)
+Message-ID: <f6f52b55-a991-1179-75cb-bf8fce8f6783@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1688653455;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8Y/8f2lfLrDkDpzbIdRTJODIMHeTXUm4sDd+CCLcns8=;
+        b=kR2LSKOSVZBPkevElfkY3NNfjrZ4OLGqrCyp34k+Af+3dbc9oaLe4IgXU4yNN+n845r0Tz
+        T2QOpwr106hAC1hVe1ghZU8n7wprM+DDW49FGftdmkuk/OjokKtttdg7sEthcLnfrAecOn
+        Fhoyz+KzyVan+FQsXSWhp+mHBCaY4/Y=
+Date:   Thu, 6 Jul 2023 22:23:49 +0800
 MIME-Version: 1.0
-X-Received: by 2002:a63:36c8:0:b0:55a:e875:36be with SMTP id
- d191-20020a6336c8000000b0055ae87536bemr1030831pga.8.1688653068977; Thu, 06
- Jul 2023 07:17:48 -0700 (PDT)
-Date:   Thu, 06 Jul 2023 07:17:48 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000053502e05ffd22edb@google.com>
-Subject: [syzbot] Monthly block report (Jul 2023)
-From:   syzbot <syzbot+list131e433296c0242f0025@syzkaller.appspotmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v2 1/4] blk-mq: use percpu csd to remote complete instead
+ of per-rq csd
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, tj@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chengming Zhou <zhouchengming@bytedance.com>
+References: <20230629110359.1111832-1-chengming.zhou@linux.dev>
+ <20230629110359.1111832-2-chengming.zhou@linux.dev>
+ <20230706130735.GA13089@lst.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <20230706130735.GA13089@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello block maintainers/developers,
+On 2023/7/6 21:07, Christoph Hellwig wrote:
+> On Thu, Jun 29, 2023 at 07:03:56PM +0800, chengming.zhou@linux.dev wrote:
+>> From: Chengming Zhou <zhouchengming@bytedance.com>
+>>
+>> If request need to be completed remotely, we insert it into percpu llist,
+>> and smp_call_function_single_async() if llist is empty previously.
+>>
+>> We don't need to use per-rq csd, percpu csd is enough. And the size of
+>> struct request is decreased by 24 bytes.
+>>
+>> This way is cleaner, and looks correct, given block softirq is guaranteed to be
+>> scheduled to consume the list if one new request is added to this percpu list,
+>> either smp_call_function_single_async() returns -EBUSY or 0.
+> 
+> Please trim your commit logs to 73 characters per line so that they
+> are readable in git log output.
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+Ok, will fix in the next version.
 
-During the period, 3 new issues were detected and 2 were fixed.
-In total, 30 issues are still open and 84 have been fixed so far.
+> 
+>>  static void blk_mq_request_bypass_insert(struct request *rq,
+>> @@ -1156,13 +1157,13 @@ static void blk_mq_complete_send_ipi(struct request *rq)
+>>  {
+>>  	struct llist_head *list;
+>>  	unsigned int cpu;
+>> +	call_single_data_t *csd;
+>>  
+>>  	cpu = rq->mq_ctx->cpu;
+>>  	list = &per_cpu(blk_cpu_done, cpu);
+>> -	if (llist_add(&rq->ipi_list, list)) {
+>> -		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
+>> -		smp_call_function_single_async(cpu, &rq->csd);
+>> -	}
+>> +	csd = &per_cpu(blk_cpu_csd, cpu);
+>> +	if (llist_add(&rq->ipi_list, list))
+>> +		smp_call_function_single_async(cpu, csd);
+>>  }
+> 
+> No need for the list and csd variables here as they are only used
+> once.
 
-Some of the still happening issues:
+Yes, should I change like below? Looks like much long code. :-)
 
-Ref  Crashes Repro Title
-<1>  976     Yes   WARNING in copy_page_from_iter
-                   https://syzkaller.appspot.com/bug?extid=63dec323ac56c28e644f
-<2>  386     Yes   INFO: task hung in blkdev_put (4)
-                   https://syzkaller.appspot.com/bug?extid=9a29d5e745bd7523c851
-<3>  179     Yes   INFO: task hung in do_read_cache_folio
-                   https://syzkaller.appspot.com/bug?extid=be946efe33b2d9664348
-<4>  111     Yes   INFO: task hung in __filemap_get_folio
-                   https://syzkaller.appspot.com/bug?extid=0e9dc403e57033a74b1d
-<5>  87      Yes   INFO: task hung in blkdev_fallocate
-                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<6>  33      Yes   INFO: task hung in nbd_add_socket (2)
-                   https://syzkaller.appspot.com/bug?extid=cbb4b1ebc70d0c5a8c29
-<7>  32      Yes   KASAN: use-after-free Read in __dev_queue_xmit (5)
-                   https://syzkaller.appspot.com/bug?extid=b7be9429f37d15205470
-<8>  32      No    KMSAN: kernel-infoleak in copy_page_to_iter (4)
-                   https://syzkaller.appspot.com/bug?extid=17a061f6132066e9fb95
-<9>  21      Yes   INFO: task hung in blkdev_get_by_dev (5)
-                   https://syzkaller.appspot.com/bug?extid=6229476844294775319e
-<10> 10      Yes   WARNING in wait_til_done (2)
-                   https://syzkaller.appspot.com/bug?extid=9bc4da690ee5334f5d15
+if (llist_add(&rq->ipi_list, &per_cpu(blk_cpu_done, cpu)))
+	smp_call_function_single_async(cpu, &per_cpu(blk_cpu_csd, cpu));
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> But I think this code has a rpboem when it is preemptd between
+> the llist_add and smp_call_function_single_async.  We either need a
+> get_cpu/put_cpu around them, or instroduce a structure with the list
+> and csd, and then you can use one pointer from per_cpu and still ensure
+> the list and csd are for the same CPU.
+> 
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+cpu = rq->mq_ctx->cpu; So it's certainly the same CPU, right?
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+Thanks!
 
-You may send multiple commands in a single email message.
