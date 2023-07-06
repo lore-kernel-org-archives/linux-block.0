@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE275EB64DC
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 13:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AE5C001B0
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 13:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232427AbjGFNJl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232355AbjGFNJl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 6 Jul 2023 09:09:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35522 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232055AbjGFNJj (ORCPT
+        with ESMTP id S232427AbjGFNJj (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 09:09:39 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25551BEB
-        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 06:09:33 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3fbc0609cd6so6814085e9.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Jul 2023 06:09:33 -0700 (PDT)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1323D1BF4
+        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 06:09:35 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fbf1b82de7so5631725e9.1
+        for <linux-block@vger.kernel.org>; Thu, 06 Jul 2023 06:09:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688648972; x=1691240972;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688648973; x=1691240973;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1EOry6f369fvQkUnyMG3t5Th65xx1GNMnGXjzZ7Sktk=;
-        b=dfywl8JPlp9ZCl8GxiDO4TDStloyouxD0OECa20lsBhiqESxahTL1UltyGErsPsSrW
-         BgA2s15zimiozXfVDDUZqaJLgrpqT4KL0n5hY8/eP/y/bn6y8DNmoD9e8WiO6iPeGevs
-         twSLcPrQF6G5UmqTLVe3x88w3VKoNXzFJVCcgAlZ30R6J15qbgb6uyxh6cjpsuC0HiS3
-         ZxxcYcf63FlnCp188xLXGfTmU+wZKbz91rLR0EODjORS85x/0yKTxQMQU6njBs7lavnm
-         3EP869ulePPDC/NopKaXUrML9ziS0uQp9c63qdrc2rugGOSw2H1YZg1BRNCMqH8rcla/
-         3fpg==
+        bh=gLXkkNKLC2QFI1E0y4rm62aHVfDJbTTFbFsFl9CT7J4=;
+        b=HCaK+PrqspwGk54iH8oYp3wJQ5uxRgIn42NvEuBjDiaeAAgDfTHkpHQsHMbahhGoH1
+         RKXlQnPU9osRpZE7aC6KqnUcproBMndzGwFm6CQ36CZSudGdOBUiaUs2WMHz/DEZcEis
+         RG53ughv1yul1OJUlwhicAkFdEM0HfLZy9ny5Eq68kSOeMauH4xHljsuZPXmS4IMSK0E
+         M2zUkmMh6pI/62DwdUdVYi0dj8hYARngR0uWYLv6vxm+NnwEw9Pirc/525HDwglhYz1P
+         QvhxtimiOuEb9U0siUR4f/66w8t44Meg+vnvFSKM0PEek2yAKri/mbwPlSJwWq1PYgBG
+         Kp2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688648972; x=1691240972;
+        d=1e100.net; s=20221208; t=1688648973; x=1691240973;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1EOry6f369fvQkUnyMG3t5Th65xx1GNMnGXjzZ7Sktk=;
-        b=ESAru7p7Jv2aooRC++f5SDO7JolzPlcyA0t7+XOXjpLPZvPtXcZPjFlw+xBN3TT7Qr
-         Tnja/I8uRcJ8bNxbDjvhk5fMtJ2s6TeV57D1OS3BTuMQFL8d9SdBVZPwgWdWnk1LsNuk
-         tkExFG9kADqqsdneo+ZscnGlncnGV2o0ddOGw6xP9jnl4jQ9E6fym2HtobDy7Ol77Iq1
-         EKdC8fAJKdX12ggORX6750CgAoUEKureHlYkLgzlpS5P0WtGVYPmTKIGP3C0t609haba
-         NLrERRxJd/dLbOC4tabIreJGddqdsjkQ7cZy6leFnLq8FFGSMRPjhLOzXGK+8iOjGjSA
-         1w0g==
-X-Gm-Message-State: ABy/qLZHvQ0wR/REi3uLQBccpQkgrz34KvP1QhbLLYeTayg5odcMg+TX
-        CS2vX2C//1Xe/Z5TrufRUmrPkQ==
-X-Google-Smtp-Source: APBJJlF28sEGzv3qCuU6Oj80fuFn9epz7A2lwvCAcKMBkp9tmHBgQntxQ/V6rj02mg3WOK89sFEyoQ==
-X-Received: by 2002:a1c:4b18:0:b0:3fb:ab76:164b with SMTP id y24-20020a1c4b18000000b003fbab76164bmr1292940wma.13.1688648972313;
-        Thu, 06 Jul 2023 06:09:32 -0700 (PDT)
+        bh=gLXkkNKLC2QFI1E0y4rm62aHVfDJbTTFbFsFl9CT7J4=;
+        b=LiqOCBr+uYBj+fHzas7Bmirp0DmAzaqsUICPhmHtOJmaDCKMlLg200NBLG2e31vdXQ
+         c+LGYdk4KX4ZsQb5QXGgS48eLagwHLQdmKXb6z3b1+UIvuqWS0bIfMvasLfjMqdx2+mi
+         B9gW/1Gys/u4WUcLLdjUWA6nwKZB8TzGHAoY0uJTJ03n0hn9P9PZ8jgS4kDGl7zpErKh
+         RxzRZvB/Q9UHNTNvbyo/vduM4PzwcC8/ZdMqA8vt2A41fB+LNCh8oJI/QVtUvfwu0SKx
+         ZYYbH2NxDIgwrlJlReJ1RYp5p5gGJDvgamWpcvbMoL5p2UKGbGw/pBL56BieiWGk4TD1
+         T93w==
+X-Gm-Message-State: ABy/qLb7JXO5Cupzk/YxqWn2aIT4jD+Zhm3QGc7rQRHdKalT1nCX9Q/u
+        7eqsEsrEv1vNTRIYWKRplKoI2w==
+X-Google-Smtp-Source: APBJJlFB+qpleKgONzSTxXQuqAVtfXTGpYN1gLVi/RnauHtKMpAXou/EH0Py/ipYIWgRvAZM6J/Ftg==
+X-Received: by 2002:a05:600c:a6a2:b0:3fa:955a:9291 with SMTP id ip34-20020a05600ca6a200b003fa955a9291mr4923212wmb.9.1688648973370;
+        Thu, 06 Jul 2023 06:09:33 -0700 (PDT)
 Received: from localhost ([147.161.155.79])
-        by smtp.gmail.com with ESMTPSA id y4-20020a1c4b04000000b003fa999cefc0sm2062661wma.36.2023.07.06.06.09.31
+        by smtp.gmail.com with ESMTPSA id h16-20020adff4d0000000b0031134bcdacdsm1869763wrp.42.2023.07.06.06.09.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 06:09:32 -0700 (PDT)
+        Thu, 06 Jul 2023 06:09:33 -0700 (PDT)
 From:   Andreas Hindborg <nmi@metaspace.dk>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     linux-kernel@vger.kernel.org (open list),
@@ -62,9 +62,9 @@ Cc:     linux-kernel@vger.kernel.org (open list),
         Hans Holmberg <Hans.Holmberg@wdc.com>,
         Christoph Hellwig <hch@infradead.org>,
         Damien Le Moal <dlemoal@kernel.org>
-Subject: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
-Date:   Thu,  6 Jul 2023 15:09:28 +0200
-Message-ID: <20230706130930.64283-2-nmi@metaspace.dk>
+Subject: [PATCH v6 2/3] ublk: add helper to check if device supports user copy
+Date:   Thu,  6 Jul 2023 15:09:29 +0200
+Message-ID: <20230706130930.64283-3-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230706130930.64283-1-nmi@metaspace.dk>
 References: <20230706130930.64283-1-nmi@metaspace.dk>
@@ -76,47 +76,38 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Ublk zoned storage support relies on DRV_IN handling for zone report.
-Prepare for this change by adding offsets for the DRV_IN/DRV_OUT commands.
-
-Also add parenthesis to existing opcodes for better macro hygiene.
+This will be used by ublk zoned storage support.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 ---
- include/uapi/linux/ublk_cmd.h | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ drivers/block/ublk_drv.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 4b8558db90e1..2ebb8d5d827a 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -229,12 +229,22 @@ struct ublksrv_ctrl_dev_info {
- 	__u64   reserved2;
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 1c823750c95a..8d271901efac 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -185,6 +185,11 @@ struct ublk_params_header {
+ 	__u32	types;
  };
  
--#define		UBLK_IO_OP_READ		0
-+#define		UBLK_IO_OP_READ			0
- #define		UBLK_IO_OP_WRITE		1
- #define		UBLK_IO_OP_FLUSH		2
--#define		UBLK_IO_OP_DISCARD	3
--#define		UBLK_IO_OP_WRITE_SAME	4
--#define		UBLK_IO_OP_WRITE_ZEROES	5
-+#define		UBLK_IO_OP_DISCARD		3
-+#define		UBLK_IO_OP_WRITE_SAME		4
-+#define		UBLK_IO_OP_WRITE_ZEROES		5
-+/*
-+ * Passthrough (driver private) operation codes range between
-+ * __UBLK_IO_OP_DRV_IN_START and __UBLK_IO_OP_DRV_IN_END for REQ_OP_DRV_IN type
-+ * operations and between __UBLK_IO_OP_DRV_OUT_START and
-+ * __UBLK_IO_OP_DRV_OUT_END for REQ_OP_DRV_OUT type operations.
-+ */
-+#define		__UBLK_IO_OP_DRV_IN_START	32
-+#define		__UBLK_IO_OP_DRV_IN_END		96
-+#define		__UBLK_IO_OP_DRV_OUT_START	__UBLK_IO_OP_DRV_IN_END
-+#define		__UBLK_IO_OP_DRV_OUT_END	160
++static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
++{
++	return ub->dev_info.flags & UBLK_F_USER_COPY;
++}
++
+ static inline void __ublk_complete_rq(struct request *req);
+ static void ublk_complete_rq(struct kref *ref);
  
- #define		UBLK_IO_F_FAILFAST_DEV		(1U << 8)
- #define		UBLK_IO_F_FAILFAST_TRANSPORT	(1U << 9)
+@@ -2037,7 +2042,7 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+ 		UBLK_F_URING_CMD_COMP_IN_TASK;
+ 
+ 	/* GET_DATA isn't needed any more with USER_COPY */
+-	if (ub->dev_info.flags & UBLK_F_USER_COPY)
++	if (ublk_dev_is_user_copy(ub))
+ 		ub->dev_info.flags &= ~UBLK_F_NEED_GET_DATA;
+ 
+ 	/* We are not ready to support zero copy */
 -- 
 2.41.0
 
