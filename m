@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD0AEB64D9
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 14:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12022EB64D9
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jul 2023 14:31:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232422AbjGFOYV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 10:24:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51778 "EHLO
+        id S233155AbjGFObi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 10:31:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232108AbjGFOYU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 10:24:20 -0400
-Received: from out-9.mta1.migadu.com (out-9.mta1.migadu.com [95.215.58.9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A45119BD
-        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 07:24:18 -0700 (PDT)
-Message-ID: <f6f52b55-a991-1179-75cb-bf8fce8f6783@linux.dev>
+        with ESMTP id S233148AbjGFObh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 10:31:37 -0400
+Received: from out-57.mta0.migadu.com (out-57.mta0.migadu.com [91.218.175.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9D031726
+        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 07:31:36 -0700 (PDT)
+Message-ID: <9b2a1bdc-0180-2e57-2b79-ab5e9ec0cbe5@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1688653455;
+        t=1688653894;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8Y/8f2lfLrDkDpzbIdRTJODIMHeTXUm4sDd+CCLcns8=;
-        b=kR2LSKOSVZBPkevElfkY3NNfjrZ4OLGqrCyp34k+Af+3dbc9oaLe4IgXU4yNN+n845r0Tz
-        T2QOpwr106hAC1hVe1ghZU8n7wprM+DDW49FGftdmkuk/OjokKtttdg7sEthcLnfrAecOn
-        Fhoyz+KzyVan+FQsXSWhp+mHBCaY4/Y=
-Date:   Thu, 6 Jul 2023 22:23:49 +0800
+        bh=SfS6m33Hx0eD9SR2qYGdsQRQD1bENaHeTDnxa6gjCVE=;
+        b=Mq+QTEozyd2VPyquASqf7zasbFPR2J0OuoILLlEpJQlmyqF+iYsDZwPd5Nqpy1gesYCwc/
+        9pur+khaLQhqgFqtzmSuxr2UHsI6UVp3oxce0Em7dg5z7HF0Siiz2mg9ClHfQeKixKatyb
+        3fEf+BirCwRfZJnMDG2AbEpKVbO0o2Q=
+Date:   Thu, 6 Jul 2023 22:31:09 +0800
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 1/4] blk-mq: use percpu csd to remote complete instead
- of per-rq csd
+Subject: Re: [PATCH v2 4/4] blk-mq: delete unused completion_data in struct
+ request
 Content-Language: en-US
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     axboe@kernel.dk, ming.lei@redhat.com, tj@kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Chengming Zhou <zhouchengming@bytedance.com>
 References: <20230629110359.1111832-1-chengming.zhou@linux.dev>
- <20230629110359.1111832-2-chengming.zhou@linux.dev>
- <20230706130735.GA13089@lst.de>
+ <20230629110359.1111832-5-chengming.zhou@linux.dev>
+ <20230706130858.GD13089@lst.de>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <20230706130735.GA13089@lst.de>
+In-Reply-To: <20230706130858.GD13089@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
@@ -47,61 +47,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/7/6 21:07, Christoph Hellwig wrote:
-> On Thu, Jun 29, 2023 at 07:03:56PM +0800, chengming.zhou@linux.dev wrote:
->> From: Chengming Zhou <zhouchengming@bytedance.com>
->>
->> If request need to be completed remotely, we insert it into percpu llist,
->> and smp_call_function_single_async() if llist is empty previously.
->>
->> We don't need to use per-rq csd, percpu csd is enough. And the size of
->> struct request is decreased by 24 bytes.
->>
->> This way is cleaner, and looks correct, given block softirq is guaranteed to be
->> scheduled to consume the list if one new request is added to this percpu list,
->> either smp_call_function_single_async() returns -EBUSY or 0.
+On 2023/7/6 21:08, Christoph Hellwig wrote:
+> Looks good:
 > 
-> Please trim your commit logs to 73 characters per line so that they
-> are readable in git log output.
-
-Ok, will fix in the next version.
-
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
->>  static void blk_mq_request_bypass_insert(struct request *rq,
->> @@ -1156,13 +1157,13 @@ static void blk_mq_complete_send_ipi(struct request *rq)
->>  {
->>  	struct llist_head *list;
->>  	unsigned int cpu;
->> +	call_single_data_t *csd;
->>  
->>  	cpu = rq->mq_ctx->cpu;
->>  	list = &per_cpu(blk_cpu_done, cpu);
->> -	if (llist_add(&rq->ipi_list, list)) {
->> -		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
->> -		smp_call_function_single_async(cpu, &rq->csd);
->> -	}
->> +	csd = &per_cpu(blk_cpu_csd, cpu);
->> +	if (llist_add(&rq->ipi_list, list))
->> +		smp_call_function_single_async(cpu, csd);
->>  }
-> 
-> No need for the list and csd variables here as they are only used
-> once.
+> Although I'd order it first or even send it separately as it doesn't need
+> any of the other changes.
 
-Yes, should I change like below? Looks like much long code. :-)
+Ok, will order it first in the next version.
 
-if (llist_add(&rq->ipi_list, &per_cpu(blk_cpu_done, cpu)))
-	smp_call_function_single_async(cpu, &per_cpu(blk_cpu_csd, cpu));
+I thought it's too minor to send a separate patch, so put it in this series.
 
-> 
-> But I think this code has a rpboem when it is preemptd between
-> the llist_add and smp_call_function_single_async.  We either need a
-> get_cpu/put_cpu around them, or instroduce a structure with the list
-> and csd, and then you can use one pointer from per_cpu and still ensure
-> the list and csd are for the same CPU.
-> 
-
-cpu = rq->mq_ctx->cpu; So it's certainly the same CPU, right?
-
-Thanks!
+Thanks.
 
