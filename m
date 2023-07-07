@@ -2,148 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA74AEB64DA
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 09:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42874EB64D9
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 09:40:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232716AbjGGJje (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jul 2023 05:39:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53558 "EHLO
+        id S232160AbjGGJkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jul 2023 05:40:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232804AbjGGJjV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jul 2023 05:39:21 -0400
-Received: from out-1.mta0.migadu.com (out-1.mta0.migadu.com [91.218.175.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75C2E2117
-        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 02:39:16 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1688722754;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=znByHfzQSpvrPQaReH7yflCmK5TREu8Z0tH8P3jgNog=;
-        b=k7qzuLrFyLTHZjTplLwK1pIMWbb8ID0RsNUs4Ol1S8PtEC8M5suueKCd3IbrWN5ymFPn7L
-        nJb+qDCU2VhjmBkz7x9+mo5G5TP4+RPaHNpqlbB807FYEBzpT5x7zerC5w8JMfDl0HLH20
-        ZkBK7AQ8c03WwQMbsn4KP4k8L1ZAzrI=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: [PATCH v3 4/4] blk-flush: reuse rq queuelist in flush state machine
-Date:   Fri,  7 Jul 2023 17:37:22 +0800
-Message-ID: <20230707093722.1338589-5-chengming.zhou@linux.dev>
-In-Reply-To: <20230707093722.1338589-1-chengming.zhou@linux.dev>
-References: <20230707093722.1338589-1-chengming.zhou@linux.dev>
+        with ESMTP id S230443AbjGGJkt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jul 2023 05:40:49 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E40D92105
+        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 02:40:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=iNSFWWILdKuyxqqKG9xcEz6tN3PAD56T4ksQ+pt8tdU=; b=aejeKuDT4AdHKinTJ8g3VOt7ts
+        IenIcX2+cZwm6ConRentrZ26tzwHUSmG23uvJ1CYyeCg2plh1DM+SORz5nbZPReCU9RFXluC0Nkiq
+        fzGpoE5QVRdjF+fid2YSbF/yAZV2zUDslh4KPb71vWM4gnuYFzqmzYPT21TxmSwUB7dmhopWByLco
+        Y1gpvB42r84SB7Vfy308ghYi8jOI1Dvg2jBb4HC5BE+MZ+nH6IfZdcM3Qsbyjhzswj+HjZ+hQo4jy
+        kQ+uLdOucjTGpzrMkJvPd/b3mHwOsCh++wUQ6MYQFF6jg5GcDitCqZJgVbyE3RK8l5zkDbuhLzogg
+        f0hkCN4Q==;
+Received: from [89.144.223.112] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qHhxB-0048wu-26;
+        Fri, 07 Jul 2023 09:40:42 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     jaegeuk@kernel.org, chao@kernel.org
+Cc:     linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org
+Subject: [PATCH] f2fs: don't reopen the main block device in f2fs_scan_devices
+Date:   Fri,  7 Jul 2023 11:40:28 +0200
+Message-Id: <20230707094028.107898-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+f2fs_scan_devices reopens the main device since the very beginning, which
+has always been useless, and also means that we don't pass the right
+holder for the reopen, which now leads to a warning as the core super.c
+holder ops aren't passed in for the reopen.
 
-Since we don't need to maintain inflight flush_data requests list
-anymore, we can reuse rq->queuelist for flush pending list.
-
-Note in mq_flush_data_end_io(), we need to re-initialize rq->queuelist
-before reusing it in the state machine when end, since the rq->rq_next
-also reuse it, may have corrupted rq->queuelist by the driver.
-
-This patch decrease the size of struct request by 16 bytes.
-
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Fixes: 3c62be17d4f5 ("f2fs: support multiple devices")
+Fixes: 0718afd47f70 ("block: introduce holder ops")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
-v3:
- - fix a bug report of blktests nvme/012, we need to re-initialize
-   rq->queuelist before reusing it in the state machine when end.
-   Because rq->rq_next reuse may have corrupted it. Thanks Ming Lei.
----
- block/blk-flush.c      | 17 ++++++++++-------
- include/linux/blk-mq.h |  1 -
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ fs/f2fs/super.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index bb7adfc2a5da..4826d2d61a23 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -183,14 +183,13 @@ static void blk_flush_complete_seq(struct request *rq,
- 		/* queue for flush */
- 		if (list_empty(pending))
- 			fq->flush_pending_since = jiffies;
--		list_move_tail(&rq->flush.list, pending);
-+		list_move_tail(&rq->queuelist, pending);
- 		break;
- 
- 	case REQ_FSEQ_DATA:
--		list_del_init(&rq->flush.list);
- 		fq->flush_data_in_flight++;
- 		spin_lock(&q->requeue_lock);
--		list_add_tail(&rq->queuelist, &q->flush_list);
-+		list_move_tail(&rq->queuelist, &q->flush_list);
- 		spin_unlock(&q->requeue_lock);
- 		blk_mq_kick_requeue_list(q);
- 		break;
-@@ -202,7 +201,7 @@ static void blk_flush_complete_seq(struct request *rq,
- 		 * flush data request completion path.  Restore @rq for
- 		 * normal completion and end it.
- 		 */
--		list_del_init(&rq->flush.list);
-+		list_del_init(&rq->queuelist);
- 		blk_flush_restore_request(rq);
- 		blk_mq_end_request(rq, error);
- 		break;
-@@ -258,7 +257,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
- 	fq->flush_running_idx ^= 1;
- 
- 	/* and push the waiting requests to the next stage */
--	list_for_each_entry_safe(rq, n, running, flush.list) {
-+	list_for_each_entry_safe(rq, n, running, queuelist) {
- 		unsigned int seq = blk_flush_cur_seq(rq);
- 
- 		BUG_ON(seq != REQ_FSEQ_PREFLUSH && seq != REQ_FSEQ_POSTFLUSH);
-@@ -292,7 +291,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
+diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+index ca31163da00a55..8d11d4a5ec331d 100644
+--- a/fs/f2fs/super.c
++++ b/fs/f2fs/super.c
+@@ -1560,7 +1560,8 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
  {
- 	struct list_head *pending = &fq->flush_queue[fq->flush_pending_idx];
- 	struct request *first_rq =
--		list_first_entry(pending, struct request, flush.list);
-+		list_first_entry(pending, struct request, queuelist);
- 	struct request *flush_rq = fq->flush_rq;
+ 	int i;
  
- 	/* C1 described at the top of this file */
-@@ -376,6 +375,11 @@ static enum rq_end_io_ret mq_flush_data_end_io(struct request *rq,
- 	 */
- 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
- 	fq->flush_data_in_flight--;
-+	/*
-+	 * May have been corrupted by rq->rq_next reuse, we need to
-+	 * re-initialize rq->queuelist before reusing it here.
-+	 */
-+	INIT_LIST_HEAD(&rq->queuelist);
- 	blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error);
- 	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+-	for (i = 0; i < sbi->s_ndevs; i++) {
++	kvfree(FDEV(0).blkz_seq);
++	for (i = 1; i < sbi->s_ndevs; i++) {
+ 		blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 		kvfree(FDEV(i).blkz_seq);
+@@ -4190,16 +4191,12 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+ 	sbi->aligned_blksize = true;
  
-@@ -386,7 +390,6 @@ static enum rq_end_io_ret mq_flush_data_end_io(struct request *rq,
- static void blk_rq_init_flush(struct request *rq)
- {
- 	rq->flush.seq = 0;
--	INIT_LIST_HEAD(&rq->flush.list);
- 	rq->rq_flags |= RQF_FLUSH_SEQ;
- 	rq->flush.saved_end_io = rq->end_io; /* Usually NULL */
- 	rq->end_io = mq_flush_data_end_io;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 34d400171b3e..ab790eba5fcf 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -176,7 +176,6 @@ struct request {
+ 	for (i = 0; i < max_devices; i++) {
+-
+-		if (i > 0 && !RDEV(i).path[0])
++		if (i == 0)
++			FDEV(0).bdev = sbi->sb->s_bdev;
++		else if (!RDEV(i).path[0])
+ 			break;
  
- 	struct {
- 		unsigned int		seq;
--		struct list_head	list;
- 		rq_end_io_fn		*saved_end_io;
- 	} flush;
- 
+-		if (max_devices == 1) {
+-			/* Single zoned block device mount */
+-			FDEV(0).bdev =
+-				blkdev_get_by_dev(sbi->sb->s_bdev->bd_dev, mode,
+-						  sbi->sb->s_type, NULL);
+-		} else {
++		if (max_devices > 1) {
+ 			/* Multi-device mount */
+ 			memcpy(FDEV(i).path, RDEV(i).path, MAX_PATH_LEN);
+ 			FDEV(i).total_segments =
+@@ -4215,10 +4212,9 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+ 				FDEV(i).end_blk = FDEV(i).start_blk +
+ 					(FDEV(i).total_segments <<
+ 					sbi->log_blocks_per_seg) - 1;
++				FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path,
++					mode, sbi->sb->s_type, NULL);
+ 			}
+-			FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path, mode,
+-							  sbi->sb->s_type,
+-							  NULL);
+ 		}
+ 		if (IS_ERR(FDEV(i).bdev))
+ 			return PTR_ERR(FDEV(i).bdev);
 -- 
-2.41.0
+2.39.2
 
