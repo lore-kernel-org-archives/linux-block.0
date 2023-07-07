@@ -2,82 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39881EB64D9
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 10:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1E2C0015E
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 10:48:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232797AbjGGKHj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jul 2023 06:07:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38086 "EHLO
+        id S231706AbjGGKsl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jul 2023 06:48:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229963AbjGGKHi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jul 2023 06:07:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02B8170F
-        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 03:06:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688724407;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WSvxmo86chuNdo4OZEtSWD076Vkrebseittknh73kpQ=;
-        b=HOCnwj6MGdPt5w9Cyz0ZIINk18beVgb/AKrf0Trwlu2Nm76UiUIFvba8oNq1Msf3LyX5aE
-        uTqaKawhL9LWbqdvI7SSpBs1Xy11uT444lzWugwvw8dZTWXP+Xz94PALrZCMooXmPswZ0b
-        fOnh4oGbQS9+MW60jpAPVag7jvTa8do=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-Rg4ImdXwM9ei7Tx08fjlXg-1; Fri, 07 Jul 2023 06:06:41 -0400
-X-MC-Unique: Rg4ImdXwM9ei7Tx08fjlXg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S231627AbjGGKsk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jul 2023 06:48:40 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FBA1172B;
+        Fri,  7 Jul 2023 03:48:38 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F3C5D185A791;
-        Fri,  7 Jul 2023 10:06:40 +0000 (UTC)
-Received: from ovpn-8-34.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5ED40200BA8B;
-        Fri,  7 Jul 2023 10:06:35 +0000 (UTC)
-Date:   Fri, 7 Jul 2023 18:06:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     chengming.zhou@linux.dev
-Cc:     axboe@kernel.dk, hch@lst.de, tj@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: Re: [PATCH v3 4/4] blk-flush: reuse rq queuelist in flush state
- machine
-Message-ID: <ZKfjpkBmbM8OZIuI@ovpn-8-34.pek2.redhat.com>
-References: <20230707093722.1338589-1-chengming.zhou@linux.dev>
- <20230707093722.1338589-5-chengming.zhou@linux.dev>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 7B91A1FDC8;
+        Fri,  7 Jul 2023 10:48:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1688726917; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=enuhH13GnXclWjZJ+i4stO6tKhPz60ynyGWC6MKXtQo=;
+        b=EFlu3G6lmqUhXGm45GGkzsya1QUA4zFXwdoyU6XvM0c/+/w9KnIn2uNagKIjPxKDzfwPZ8
+        1cfmp4x20mr9XqoOeAKB0i2Ix6vUldoeTDQSqgHnjUbWK7TZ3Moaq7kfkzdB3E4jRrRLP2
+        ir0U4pUuCBtACY4wSyBKVZRP81x1khw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1688726917;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=enuhH13GnXclWjZJ+i4stO6tKhPz60ynyGWC6MKXtQo=;
+        b=POMl/K4vq1JRtTV6QmArkzEPE4BkDFYNV73bea8d1mKE+BMSKYh2Sf16Ei681RABmITHC0
+        iCDazW6c86ZI+rAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 67073139E0;
+        Fri,  7 Jul 2023 10:48:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id hGUYGYXtp2QhBQAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 07 Jul 2023 10:48:37 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id BFA1AA0717; Fri,  7 Jul 2023 12:48:36 +0200 (CEST)
+Date:   Fri, 7 Jul 2023 12:48:36 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
+        Ted Tso <tytso@mit.edu>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        Eric Biggers <ebiggers@google.com>, linux-xfs@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: [PATCH 6/6] fs: Make bind mounts work with
+ bdev_allow_write_mounted=n
+Message-ID: <20230707104836.bgamj6hjgcx745ul@quack3>
+References: <20230704122727.17096-1-jack@suse.cz>
+ <20230704125702.23180-6-jack@suse.cz>
+ <ZKbj5v4VKroW7cFp@infradead.org>
+ <20230706161255.t33v2yb3qrg4swcm@quack3>
+ <20230707-mitangeklagt-erdumlaufbahn-688d4f493451@brauner>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230707093722.1338589-5-chengming.zhou@linux.dev>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+In-Reply-To: <20230707-mitangeklagt-erdumlaufbahn-688d4f493451@brauner>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 07, 2023 at 05:37:22PM +0800, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
+On Fri 07-07-23 09:39:05, Christian Brauner wrote:
+> On Thu, Jul 06, 2023 at 06:12:55PM +0200, Jan Kara wrote:
+> > On Thu 06-07-23 08:55:18, Christoph Hellwig wrote:
+> > > On Tue, Jul 04, 2023 at 02:56:54PM +0200, Jan Kara wrote:
+> > > > When we don't allow opening of mounted block devices for writing, bind
+> > > > mounting is broken because the bind mount tries to open the block device
+> > > > before finding the superblock for it already exists. Reorganize the
+> > > > mounting code to first look whether the superblock for a particular
+> > > > device is already mounted and open the block device only if it is not.
+> > > 
+> > > Warning: this might be a rathole.
+> > > 
+> > > I really hate how mount_bdev / get_tree_bdev try to deal with multiple
+> > > mounts.
+> > > 
+> > > The idea to just open the device and work from there just feels very
+> > > bogus.
+> > > 
+> > > There is really no good reason to have the bdev to find a superblock,
+> > > the dev_t does just fine (and in fact I have a patch to remove
+> > > the bdev based get_super and just use the dev_t based one all the
+> > > time).  So I'd really like to actually turn this around and only
+> > > open when we need to allocate a new super block.  That probably
+> > > means tearning sget_fc apart a bit, so it will turn into a fair
+> > > amount of work, but I think it's the right thing to do.
+> > 
+> > Well, this is exactly what this patch does - we use dev_t to lookup the
+> > superblock in sget_fc() and we open the block device only if we cannot find
+> > matching superblock and need to create a new one...
 > 
-> Since we don't need to maintain inflight flush_data requests list
-> anymore, we can reuse rq->queuelist for flush pending list.
-> 
-> Note in mq_flush_data_end_io(), we need to re-initialize rq->queuelist
-> before reusing it in the state machine when end, since the rq->rq_next
-> also reuse it, may have corrupted rq->queuelist by the driver.
-> 
-> This patch decrease the size of struct request by 16 bytes.
-> 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> ---
-> v3:
->  - fix a bug report of blktests nvme/012, we need to re-initialize
->    rq->queuelist before reusing it in the state machine when end.
->    Because rq->rq_next reuse may have corrupted it. Thanks Ming Lei.
+> Can you do this rework independent of the bdev_handle work that you're
+> doing so this series doesn't depend on the other work and we can get
+> the VFS bits merged for this?
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Yeah, it should be doable. I'll have a look into it.
 
-Thanks,
-Ming
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
