@@ -2,83 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F937EB64D9
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 03:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 649ACEB64D9
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 06:25:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229811AbjGGDfD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 23:35:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43766 "EHLO
+        id S229575AbjGGGZh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jul 2023 02:25:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229802AbjGGDfC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 23:35:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA681FC9
-        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 20:34:57 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D300C6162A
-        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 03:34:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4F18C433C8;
-        Fri,  7 Jul 2023 03:34:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688700896;
-        bh=xQ2YFcODB4eDkuqGlcrGt+RB4lgk/KdPmEt2L/pc6kk=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=L5DwfpV9IjE8REz6n4fLhejNfNGLKRe0UcHZkDZ6j3JXy286TIcyo1zWKiZFDz3Fv
-         qB5tnTcE9cnGlXQ3NF89JhSKO4LsOqGgDitbTjCoVFswTLBUZyJL/WSZDqcErSvCMA
-         o8QQBmMyzej6mjLwVhvG/VPCUZ21HPLn9zRzTQLWk5lziNE/mB0SvB5IIyvBmf/ABR
-         wjWEnWoNAK1NHyJMc4VjYRi2L4tf9koApAolRaCFmqlz7CbQccdpV33BMEsnCUnZ0d
-         SDyXghITNuputwFsCSXhPdBrZz3tYhDzl66j94gZdv4OHmqDgq/nbCsCcq00JBOoaa
-         UB5J5UQCrmvSw==
-Message-ID: <30620d8b-066f-7357-1d4c-2657d445e286@kernel.org>
-Date:   Fri, 7 Jul 2023 12:34:54 +0900
+        with ESMTP id S229559AbjGGGZg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jul 2023 02:25:36 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08EE8F;
+        Thu,  6 Jul 2023 23:25:33 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Qy3Kz2RLsz4f3lY0;
+        Fri,  7 Jul 2023 14:25:27 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP4 (Coremail) with SMTP id gCh0CgCHK5_Xr6dkxLOXNQ--.9805S4;
+        Fri, 07 Jul 2023 14:25:29 +0800 (CST)
+From:   Zhong Jinghua <zhongjinghua@huaweicloud.com>
+To:     josef@toxicpanda.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, zhongjinghua@huaweicloud.com,
+        yi.zhang@huawei.com, yukuai3@huawei.com
+Subject: [PATCH -next] nbd: get config_lock before sock_shutdown
+Date:   Fri,  7 Jul 2023 14:22:56 +0800
+Message-Id: <20230707062256.1271948-1-zhongjinghua@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH] block: Do not merge if merging is disabled
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-References: <20230706201433.3987617-1-bvanassche@acm.org>
- <ZKdebT5VRdr0qxxv@ovpn-8-34.pek2.redhat.com>
- <06034722-621b-e06c-53e6-d2151cc07a64@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <06034722-621b-e06c-53e6-d2151cc07a64@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCHK5_Xr6dkxLOXNQ--.9805S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw1DWw1xGryfWr1UAw1fZwb_yoW8Ww45pF
+        4UCF4DGr4rXa1S9FZ8J34xWr1UJ342gay7GryUZ3Z0vr93CrW7Zrn8KF1fCr1UtwsrXF45
+        XFyrKF95Cas5JrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+        AvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+        xVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: x2kr0wpmlqwxtxd6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/7/23 10:50, Bart Van Assche wrote:
-> On 7/6/23 17:38, Ming Lei wrote:
->> Given blk_mq_sched_try_insert_merge is only called from bfq and
->> deadline, it may not matter to apply this optimization.
-> 
-> Without this patch, the documentation of the "nomerges" sysfs
-> attribute is incorrect. I need this patch because I want the
-> ability to disable merging even if an I/O scheduler has been
-> selected. As mentioned in the patch description, I discovered
-> this while I was writing a shell script that submits various
-> I/O workloads to a block device.
+Config->socks in sock_shutdown may trigger a UAF problem.
+The reason is that sock_shutdown does not hold the config_lock,
+so that nbd_ioctl can release config->socks at this time.
 
-Ming's point still stands I think: blk_queue_nomerges(q) is the first
-thing checked in elv_attempt_insert_merge(). So your patch should be a
-no-op and disabling merging through sysfs should still be effective. Why
-is your patch changing anything ?
+T0: NBD_SET_SOCK
+T1: NBD_DO_IT
 
-Moving blk_mq_sched_try_insert_merge() call to rq_mergeable(rq) inside
-elv_attempt_insert_merge() would also make a lot of sense I think. With
-that, blk_mq_sched_try_insert_merge() would be reduced to calling only
-elv_attempt_insert_merge(), which means that elv_attempt_insert_merge()
-could go away.
+T0						T1
 
+nbd_ioctl
+  mutex_lock(&nbd->config_lock)
+  // get lock
+  __nbd_ioctl
+    nbd_start_device_ioctl
+      nbd_start_device
+       mutex_unlock(&nbd->config_lock)
+         // relase lock
+         wait_event_interruptible
+         (kill, enter sock_shutdown)
+         sock_shutdown
+					nbd_ioctl
+					  mutex_lock(&nbd->config_lock)
+					  // get lock
+					  __nbd_ioctl
+					    nbd_add_socket
+					      krealloc
+						kfree(p)
+					        //config->socks is NULL
+           nbd_sock *nsock = config->socks // error
+
+Fix it by moving config_lock up before sock_shutdown.
+
+Signed-off-by: Zhong Jinghua <zhongjinghua@huaweicloud.com>
+---
+ drivers/block/nbd.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index c410cf29fb0c..accbe99ebb7e 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1428,13 +1428,18 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd)
+ 	mutex_unlock(&nbd->config_lock);
+ 	ret = wait_event_interruptible(config->recv_wq,
+ 					 atomic_read(&config->recv_threads) == 0);
++
++	/*
++	 * recv_work in flush_workqueue will not get this lock, because nbd_open
++	 * will hold nbd->config_refs
++	 */
++	mutex_lock(&nbd->config_lock);
+ 	if (ret) {
+ 		sock_shutdown(nbd);
+ 		nbd_clear_que(nbd);
+ 	}
+ 
+ 	flush_workqueue(nbd->recv_workq);
+-	mutex_lock(&nbd->config_lock);
+ 	nbd_bdev_reset(nbd);
+ 	/* user requested, ignore socket errors */
+ 	if (test_bit(NBD_RT_DISCONNECT_REQUESTED, &config->runtime_flags))
 -- 
-Damien Le Moal
-Western Digital Research
+2.31.1
 
