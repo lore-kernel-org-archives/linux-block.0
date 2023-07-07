@@ -2,77 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE79EB64D9
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 01:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F36BEB64DC
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 01:15:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230196AbjGGBDY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 21:03:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34940 "EHLO
+        id S231545AbjGGBPb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 21:15:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230126AbjGGBDX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 21:03:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 010511BDB
-        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 18:02:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688691756;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1yyqbpHCBj1owppJL9+7IUc8i+R1e/YK0bJp67wQ+M4=;
-        b=WBJwCJLCQ3a1MsQbWVG8FWeYXwl6+JiPcIsVDEQSbiYpqHVjKWuN9pzfT2EIdl0PlXj2B6
-        bVC195wvIfgUFiNzdl8NXvIi9nGzSyjOGIs9lHWmORpavQ03fLFD6ugN1aOhvrc6oxDPXn
-        LHNTpyOQNPMt8izEG6bkEPDalH5Q9QE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-630-YTUVvhpkPzS6e8xMtzWI9Q-1; Thu, 06 Jul 2023 21:02:32 -0400
-X-MC-Unique: YTUVvhpkPzS6e8xMtzWI9Q-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B3B66858F1E;
-        Fri,  7 Jul 2023 01:02:31 +0000 (UTC)
-Received: from ovpn-8-34.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E14F492B02;
-        Fri,  7 Jul 2023 01:02:22 +0000 (UTC)
-Date:   Fri, 7 Jul 2023 09:02:17 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Andreas Hindborg <nmi@metaspace.dk>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Damien Le Moal <dlemoal@kernel.org>
-Subject: Re: [PATCH v6 2/3] ublk: add helper to check if device supports user
- copy
-Message-ID: <ZKdkGZBLINFV8cbj@ovpn-8-34.pek2.redhat.com>
-References: <20230706130930.64283-1-nmi@metaspace.dk>
- <20230706130930.64283-3-nmi@metaspace.dk>
+        with ESMTP id S229470AbjGGBPa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 21:15:30 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0A901FDD;
+        Thu,  6 Jul 2023 18:15:23 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QxwS80TjNz4f3jMD;
+        Fri,  7 Jul 2023 09:15:20 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgBH_rEnZ6dkLseGNQ--.36248S3;
+        Fri, 07 Jul 2023 09:15:20 +0800 (CST)
+Subject: Re: [PATCH RFC 0/7] blk-mq: improve tag fair sharing
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        Christoph Hellwig <hch@lst.de>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
+ <4c9fea33-9c30-4ab9-c210-95e09d323837@acm.org>
+ <82d44ba1-4389-079c-935a-cbb49203ca27@huaweicloud.com>
+ <c4de836a-a2a1-847f-1525-1accb814e45e@acm.org>
+ <84f9bfb4-293b-ad55-97e4-e8c611c5e9ca@huaweicloud.com>
+ <dce8850c-92ee-8519-aa74-dc2d7ecc41e0@acm.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <1f992908-f347-0b87-efee-58eb35b11c9c@huaweicloud.com>
+Date:   Fri, 7 Jul 2023 09:15:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230706130930.64283-3-nmi@metaspace.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+In-Reply-To: <dce8850c-92ee-8519-aa74-dc2d7ecc41e0@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBH_rEnZ6dkLseGNQ--.36248S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrZFWfCw45XFy5Xr1xAF1fZwb_yoWfCFbE9r
+        Wvqa42yr4DGF17Za1fKF1vvrWagFWUJr1rJa1DJa17K340kF15uws0grn5Xa1fJw1vyr95
+        Wws0934xGw42vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb4xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUU
+        UU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 06, 2023 at 03:09:29PM +0200, Andreas Hindborg wrote:
-> From: Andreas Hindborg <a.hindborg@samsung.com>
-> 
-> This will be used by ublk zoned storage support.
-> 
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+Hi,
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+在 2023/07/07 2:43, Bart Van Assche 写道:
+> On 7/4/23 20:17, Yu Kuai wrote:
+>> - currently borrowed tags will never be returned untill queue is idle,
+>> I should figure out a way to return borrowed tags if this queue is not
+>> busy, so that other queues can borrow tag from this queue.
+> 
+> At least for UFS this is a significant disadvantage. If e.g. one SCSI
+> command is sent to the UFS WLUN every 20 seconds and the request queue
+> timeout is 30 seconds then borrowed tags will never be returned.
+
+Ok, thanks for the notice.
+> 
+> The complexity of this patch series is a concern to me. The complexity
+> of this patch series may be a barrier towards merging this patch series
+> in the upstream kernel.
+
+Yeah, I see. Thanks for the review! However, all I have in mind will end
+up make this patch series more complicated, I'll try my best to make the
+code more readable in the next version.
 
 Thanks,
-Ming
+Kuai
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> 
+> .
+> 
 
