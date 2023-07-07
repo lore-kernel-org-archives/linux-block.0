@@ -2,91 +2,130 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8E4EB64D9
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 00:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BC4EB64D9
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 01:00:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbjGGAjj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 20:39:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58994 "EHLO
+        id S230217AbjGGBAL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 21:00:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjGGAjj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 20:39:39 -0400
+        with ESMTP id S229529AbjGGBAL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 21:00:11 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 136DA1FDF
-        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 17:38:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 784A31BDB
+        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 17:59:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688690323;
+        s=mimecast20190719; t=1688691562;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=ro1nJzcln/eYZkAzkMTbLXXcZ5XsFny+Ub1a6wQm7lU=;
-        b=FnSn0oc7IT6lma3yvzuCspN1Du3oQKf7+0rB6esbGSZuaR/Mp7ZiRpamDZinH1ZsA8rE2K
-        77/yXzE44biD9zsQBtxYyQ37MZJpQgrPyRfzlFs8PSX9a9yfGe5n9g4ntMixBOg7otKvCq
-        Pv9V01trtoiTk3lkW9/+IBK0pUbNRGc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=plFvq/1YE9RIKcun0whNCfUMtxt+BsAmK2bAw6JNeBc=;
+        b=PKynqk/4zZfzwOo/NzTV7ojDndChEwbHsUixQHJqZDx67f2ZhWpehIINQXrWHw41wGNqTB
+        N4pZpl7UyJhmqQh8rNb/uNrJnAxzd23iOFGq70A06AKtQ4ed/lt0ZiFdk8M481mI8P7pTS
+        DLRG79Siok5ylu9Nprz5tVSHwswMQy4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-78-11BLZukdNsO-N-IHAkYZtQ-1; Thu, 06 Jul 2023 20:38:40 -0400
-X-MC-Unique: 11BLZukdNsO-N-IHAkYZtQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-210-LCO3QH6hO7ygV79XmCZCcg-1; Thu, 06 Jul 2023 20:59:19 -0400
+X-MC-Unique: LCO3QH6hO7ygV79XmCZCcg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D79B3C0F675;
-        Fri,  7 Jul 2023 00:38:39 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C57E080269A;
+        Fri,  7 Jul 2023 00:59:18 +0000 (UTC)
 Received: from ovpn-8-34.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CEC86F6435;
-        Fri,  7 Jul 2023 00:38:11 +0000 (UTC)
-Date:   Fri, 7 Jul 2023 08:38:05 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E530E145414F;
+        Fri,  7 Jul 2023 00:59:09 +0000 (UTC)
+Date:   Fri, 7 Jul 2023 08:59:03 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>
-Subject: Re: [PATCH] block: Do not merge if merging is disabled
-Message-ID: <ZKdebT5VRdr0qxxv@ovpn-8-34.pek2.redhat.com>
-References: <20230706201433.3987617-1-bvanassche@acm.org>
+To:     Damien Le Moal <dlemoal@kernel.org>
+Cc:     Andreas Hindborg <nmi@metaspace.dk>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>, ming.lei@redhat.com
+Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
+Message-ID: <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
+References: <20230706130930.64283-1-nmi@metaspace.dk>
+ <20230706130930.64283-2-nmi@metaspace.dk>
+ <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230706201433.3987617-1-bvanassche@acm.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+In-Reply-To: <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 06, 2023 at 01:14:33PM -0700, Bart Van Assche wrote:
-> While testing the performance impact of zoned write pipelining, I
-> noticed that merging happens even if merging has been disabled via
-> sysfs. Fix this.
+On Fri, Jul 07, 2023 at 08:50:01AM +0900, Damien Le Moal wrote:
+> On 7/6/23 22:09, Andreas Hindborg wrote:
+> > From: Andreas Hindborg <a.hindborg@samsung.com>
+> > 
+> > Ublk zoned storage support relies on DRV_IN handling for zone report.
+> > Prepare for this change by adding offsets for the DRV_IN/DRV_OUT commands.
+> > 
+> > Also add parenthesis to existing opcodes for better macro hygiene.
+> > 
+> > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> > ---
+> >  include/uapi/linux/ublk_cmd.h | 18 ++++++++++++++----
+> >  1 file changed, 14 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> > index 4b8558db90e1..2ebb8d5d827a 100644
+> > --- a/include/uapi/linux/ublk_cmd.h
+> > +++ b/include/uapi/linux/ublk_cmd.h
+> > @@ -229,12 +229,22 @@ struct ublksrv_ctrl_dev_info {
+> >  	__u64   reserved2;
+> >  };
+> >  
+> > -#define		UBLK_IO_OP_READ		0
+> > +#define		UBLK_IO_OP_READ			0
+> >  #define		UBLK_IO_OP_WRITE		1
+> >  #define		UBLK_IO_OP_FLUSH		2
+> > -#define		UBLK_IO_OP_DISCARD	3
+> > -#define		UBLK_IO_OP_WRITE_SAME	4
+> > -#define		UBLK_IO_OP_WRITE_ZEROES	5
+> > +#define		UBLK_IO_OP_DISCARD		3
+> > +#define		UBLK_IO_OP_WRITE_SAME		4
+> > +#define		UBLK_IO_OP_WRITE_ZEROES		5
+> > +/*
+> > + * Passthrough (driver private) operation codes range between
 > 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/blk-mq-sched.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 67c95f31b15b..8883721f419a 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -375,7 +375,8 @@ bool blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio,
->  bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq,
->  				   struct list_head *free)
->  {
-> -	return rq_mergeable(rq) && elv_attempt_insert_merge(q, rq, free);
-> +	return !blk_queue_nomerges(q) && rq_mergeable(rq) &&
-> +		elv_attempt_insert_merge(q, rq, free);
->  }
->  EXPORT_SYMBOL_GPL(blk_mq_sched_try_insert_merge);
+> This is unclear... Here, what does "driver" refer to ? If it is the ublk
+> kernel driver, than these commands should not be defined in the uapi
+> header file, they should be defined in drivers/block/ublk.h. However, if
+> these are for the user space driver, like all the other operations, then
 
-elv_attempt_insert_merge() does check blk_queue_nomerges() at its entry,
-so this patch fix nothing.
+Like normal IO, these passthrough requests needs userspace to handle too,
+usually they just belong to specific ublk target, such as report zones.,
+so here it is part of UAPI.
 
-Given blk_mq_sched_try_insert_merge is only called from bfq and
-deadline, it may not matter to apply this optimization.
+But yes, we should document it clearly, maybe something below?
 
-Thanks,
+	Ublk passthrough operation code ranges, and each passthrough
+	operation provides generic interface between ublk kernel driver
+	and ublk userspace, and this interface is usually used for handling
+	generic block layer request, such as command of zoned report zones.
+	Passthrough operation is only needed iff ublk kernel driver has to
+	be involved for handling this operation.
+
+> let's clearly state so. But then, I still not understand why these need
+> a different naming pattern using the "__UBLK" prefix...
+
+I think __UBLK just meant we don't suggest userspace to use it directly,
+since the added macros are just for making ranges for DRV_IN and DRV_OUT,
+so we can check command direction easily be using this start/end info in
+both sides.
+
+
+Thanks, 
 Ming
 
