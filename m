@@ -2,130 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D007C001B0
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 03:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F937EB64D9
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 03:35:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232114AbjGGDSZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 23:18:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41352 "EHLO
+        id S229811AbjGGDfD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 23:35:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231911AbjGGDST (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 23:18:19 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 708351FCC;
-        Thu,  6 Jul 2023 20:18:18 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Qxz9q4pV4z4f3nx7;
-        Fri,  7 Jul 2023 11:18:07 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgD3mp7vg6dk0X+NNQ--.406S7;
-        Fri, 07 Jul 2023 11:18:09 +0800 (CST)
-From:   Zhong Jinghua <zhongjinghua@huaweicloud.com>
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, zhongjinghua@huaweicloud.com,
-        yi.zhang@huawei.com, yukuai3@huawei.com
-Subject: [PATCH -next 3/3] nbd: fix null-ptr-dereference while accessing 'nbd->config'
-Date:   Fri,  7 Jul 2023 11:15:36 +0800
-Message-Id: <20230707031536.666482-4-zhongjinghua@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230707031536.666482-1-zhongjinghua@huaweicloud.com>
-References: <20230707031536.666482-1-zhongjinghua@huaweicloud.com>
+        with ESMTP id S229802AbjGGDfC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 23:35:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA681FC9
+        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 20:34:57 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D300C6162A
+        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 03:34:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4F18C433C8;
+        Fri,  7 Jul 2023 03:34:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688700896;
+        bh=xQ2YFcODB4eDkuqGlcrGt+RB4lgk/KdPmEt2L/pc6kk=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=L5DwfpV9IjE8REz6n4fLhejNfNGLKRe0UcHZkDZ6j3JXy286TIcyo1zWKiZFDz3Fv
+         qB5tnTcE9cnGlXQ3NF89JhSKO4LsOqGgDitbTjCoVFswTLBUZyJL/WSZDqcErSvCMA
+         o8QQBmMyzej6mjLwVhvG/VPCUZ21HPLn9zRzTQLWk5lziNE/mB0SvB5IIyvBmf/ABR
+         wjWEnWoNAK1NHyJMc4VjYRi2L4tf9koApAolRaCFmqlz7CbQccdpV33BMEsnCUnZ0d
+         SDyXghITNuputwFsCSXhPdBrZz3tYhDzl66j94gZdv4OHmqDgq/nbCsCcq00JBOoaa
+         UB5J5UQCrmvSw==
+Message-ID: <30620d8b-066f-7357-1d4c-2657d445e286@kernel.org>
+Date:   Fri, 7 Jul 2023 12:34:54 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3mp7vg6dk0X+NNQ--.406S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZF4kXF1fAr1fKry7Ar1UZFb_yoW8tryDpF
-        4UAFy5G3yUJF43GFWkA348Wr15J3Z7AryxGry7G3s5Zr9xCrySyrykK34xXF1UAr9xJF45
-        JFWrGa4IkFy8GFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9m14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JrWl82xGYIkIc2
-        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxGrwCFx2
-        IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
-        6r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
-        AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IY
-        s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr
-        0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd8n5UUUUU=
-X-CM-SenderInfo: x2kr0wpmlqwxtxd6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH] block: Do not merge if merging is disabled
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+References: <20230706201433.3987617-1-bvanassche@acm.org>
+ <ZKdebT5VRdr0qxxv@ovpn-8-34.pek2.redhat.com>
+ <06034722-621b-e06c-53e6-d2151cc07a64@acm.org>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <06034722-621b-e06c-53e6-d2151cc07a64@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhong Jinghua <zhongjinghua@huawei.com>
+On 7/7/23 10:50, Bart Van Assche wrote:
+> On 7/6/23 17:38, Ming Lei wrote:
+>> Given blk_mq_sched_try_insert_merge is only called from bfq and
+>> deadline, it may not matter to apply this optimization.
+> 
+> Without this patch, the documentation of the "nomerges" sysfs
+> attribute is incorrect. I need this patch because I want the
+> ability to disable merging even if an I/O scheduler has been
+> selected. As mentioned in the patch description, I discovered
+> this while I was writing a shell script that submits various
+> I/O workloads to a block device.
 
-nbd->config = config and refcount_set(&nbd->config_refs, 1) in
-nbd_genl_connect may be out of order, causing config_refs to be set to 1
-first, and then nbd_open accessing nbd->config reports a null pointer
-reference.
-   T1                      T2
-vfs_open
-  do_dentry_open
-    blkdev_open
-      blkdev_get
-        __blkdev_get
-          nbd_open
-           nbd_get_config_unlocked
-                        genl_rcv_msg
-                          genl_family_rcv_msg
-                            genl_family_rcv_msg_doit
-                              nbd_genl_connect
-                                nbd_alloc_and_init_config
-                                  // out of order execution
-                                  refcount_set(&nbd->config_refs, 1); // 2
-             nbd->config
-             // null point
-                                  nbd->config = config; // 1
+Ming's point still stands I think: blk_queue_nomerges(q) is the first
+thing checked in elv_attempt_insert_merge(). So your patch should be a
+no-op and disabling merging through sysfs should still be effective. Why
+is your patch changing anything ?
 
-Fix it by adding a cpu memory barrier to guarantee sequential execution.
+Moving blk_mq_sched_try_insert_merge() call to rq_mergeable(rq) inside
+elv_attempt_insert_merge() would also make a lot of sense I think. With
+that, blk_mq_sched_try_insert_merge() would be reduced to calling only
+elv_attempt_insert_merge(), which means that elv_attempt_insert_merge()
+could go away.
 
-Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
----
- drivers/block/nbd.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7186a9a49445..c410cf29fb0c 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -395,8 +395,16 @@ static u32 req_to_nbd_cmd_type(struct request *req)
- 
- static struct nbd_config *nbd_get_config_unlocked(struct nbd_device *nbd)
- {
--	if (refcount_inc_not_zero(&nbd->config_refs))
-+	if (refcount_inc_not_zero(&nbd->config_refs)) {
-+		/*
-+		 * Add smp_mb__after_atomic to ensure that reading nbd->config_refs
-+		 * and reading nbd->config is ordered. The pair is the barrier in
-+		 * nbd_alloc_and_init_config(), avoid nbd->config_refs is set
-+		 * before nbd->config.
-+		 */
-+		smp_mb__after_atomic();
- 		return nbd->config;
-+	}
- 
- 	return NULL;
- }
-@@ -1555,7 +1563,15 @@ static int nbd_alloc_and_init_config(struct nbd_device *nbd)
- 	init_waitqueue_head(&config->conn_wait);
- 	config->blksize_bits = NBD_DEF_BLKSIZE_BITS;
- 	atomic_set(&config->live_connections, 0);
-+
- 	nbd->config = config;
-+	/*
-+	 * Order refcount_set(&nbd->config_refs, 1) and nbd->config assignment,
-+	 * its pair is the barrier in nbd_get_config_unlocked().
-+	 * So nbd_get_config_unlocked() won't see nbd->config as null after
-+	 * refcount_inc_not_zero() succeed.
-+	 */
-+	smp_mb__before_atomic();
- 	refcount_set(&nbd->config_refs, 1);
- 
- 	return 0;
 -- 
-2.31.1
+Damien Le Moal
+Western Digital Research
 
