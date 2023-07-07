@@ -2,145 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C39AEB64D9
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 01:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F56EEB64DC
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jul 2023 01:50:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230501AbjGGBmu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jul 2023 21:42:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45378 "EHLO
+        id S231734AbjGGBub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jul 2023 21:50:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjGGBmt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 21:42:49 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0321BC2;
-        Thu,  6 Jul 2023 18:42:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4A5FD61505;
-        Fri,  7 Jul 2023 01:42:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BCF3C433C8;
-        Fri,  7 Jul 2023 01:42:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688694166;
-        bh=WayhVO+z9gwrgedQ+iZ70/g851bm++tZxVxrPg6wbsM=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=THtkbrlQRP9FydPtyp4+5t5q6NVjoMy7qvt6Ojxzl9gEP5/xU36xy2Wn3DirQiWUU
-         u+4o/cZeKXk56OulHWUUyL46pU7qJEl25cMMfxVclYQ/SXFagJLTpZzMS6z+g4YDeF
-         k2xid1HPr3tK3CmIfL1lDqPEyPhY8HQoW1ZCWn/Tbjp5tVBaNpeIg/PxuXtWIKIEdP
-         58X1tpt/p19ynTfAmcXAyo21qS0tnqL4GnIHfT6ljyeGhPL6t5z2s9L5rm7F0aLw9H
-         9tygE6d4jyH9dG2+MLpogISMybjA2eH49cHWUBuVJcLz+XNnNZy4WvUYQc8uZpZkRH
-         mPUBbiNLwyvJg==
-Message-ID: <8d731372-3fb7-7b76-5e6d-befd8096c922@kernel.org>
-Date:   Fri, 7 Jul 2023 10:42:44 +0900
+        with ESMTP id S229829AbjGGBua (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2023 21:50:30 -0400
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DC9B1FC1
+        for <linux-block@vger.kernel.org>; Thu,  6 Jul 2023 18:50:29 -0700 (PDT)
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-39eab4bcee8so1194157b6e.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Jul 2023 18:50:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688694629; x=1691286629;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wXGBOv42Jj7e1vmh4ItN49buwMFaHnA/gnyUkzyb2ws=;
+        b=FcG7S2hCd+x/32m3NMDmpQqg+KkhMT1dDugApnoQSEvW7GM/DjeCUoDFspCrVudr7/
+         aVv1C2Y/N+twoTS8XCi76a2i8rbOL4vutrE/BHbkj0vTMfnAonKa/dzwz/fUvlvCTAHn
+         eg/PLtYGzqWnjUzKF1116LYkKCBbCw1AsIvSLdeX2RvrggzLYE7jNWknhRRtd/MBaSsZ
+         M6ppdYz42SsBVB6MNe3M6hchrGLC8O+TVzI2plqAyUCGGfo/vZ4MeFiXPtUhacUPk+6U
+         GNQ/AoH/a9Uc9e1+099UX8eIlhvGvZ+3P2cVnIejOMBheZ9wPlDRp5CKZcrClmybel4u
+         qOCA==
+X-Gm-Message-State: ABy/qLbxr2YkZjD9dPC+Cm7FQt4wFZRV+jAVwbDOw0EdLG+uiT1ECQxK
+        J099EnJUxaxlgohR6rhHh5I=
+X-Google-Smtp-Source: APBJJlEM2h29xhjscsjJKHRTem0F1f89zQjamRN5fVAPbVlUyl7U3HJSUbwPy/AjNFZDqFGF4YBJGw==
+X-Received: by 2002:a05:6808:158:b0:3a1:bfda:c6d2 with SMTP id h24-20020a056808015800b003a1bfdac6d2mr3347591oie.11.1688694628634;
+        Thu, 06 Jul 2023 18:50:28 -0700 (PDT)
+Received: from [192.168.50.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id d17-20020aa78691000000b0066a4e561beesm1889027pfo.173.2023.07.06.18.50.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Jul 2023 18:50:27 -0700 (PDT)
+Message-ID: <06034722-621b-e06c-53e6-d2151cc07a64@acm.org>
+Date:   Thu, 6 Jul 2023 18:50:24 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
+Subject: Re: [PATCH] block: Do not merge if merging is disabled
 Content-Language: en-US
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Andreas Hindborg <nmi@metaspace.dk>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>
-References: <20230706130930.64283-1-nmi@metaspace.dk>
- <20230706130930.64283-2-nmi@metaspace.dk>
- <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
- <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <dlemoal@kernel.org>
+References: <20230706201433.3987617-1-bvanassche@acm.org>
+ <ZKdebT5VRdr0qxxv@ovpn-8-34.pek2.redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ZKdebT5VRdr0qxxv@ovpn-8-34.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/7/23 09:59, Ming Lei wrote:
-> On Fri, Jul 07, 2023 at 08:50:01AM +0900, Damien Le Moal wrote:
->> On 7/6/23 22:09, Andreas Hindborg wrote:
->>> From: Andreas Hindborg <a.hindborg@samsung.com>
->>>
->>> Ublk zoned storage support relies on DRV_IN handling for zone report.
->>> Prepare for this change by adding offsets for the DRV_IN/DRV_OUT commands.
->>>
->>> Also add parenthesis to existing opcodes for better macro hygiene.
->>>
->>> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
->>> ---
->>>  include/uapi/linux/ublk_cmd.h | 18 ++++++++++++++----
->>>  1 file changed, 14 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
->>> index 4b8558db90e1..2ebb8d5d827a 100644
->>> --- a/include/uapi/linux/ublk_cmd.h
->>> +++ b/include/uapi/linux/ublk_cmd.h
->>> @@ -229,12 +229,22 @@ struct ublksrv_ctrl_dev_info {
->>>  	__u64   reserved2;
->>>  };
->>>  
->>> -#define		UBLK_IO_OP_READ		0
->>> +#define		UBLK_IO_OP_READ			0
->>>  #define		UBLK_IO_OP_WRITE		1
->>>  #define		UBLK_IO_OP_FLUSH		2
->>> -#define		UBLK_IO_OP_DISCARD	3
->>> -#define		UBLK_IO_OP_WRITE_SAME	4
->>> -#define		UBLK_IO_OP_WRITE_ZEROES	5
->>> +#define		UBLK_IO_OP_DISCARD		3
->>> +#define		UBLK_IO_OP_WRITE_SAME		4
->>> +#define		UBLK_IO_OP_WRITE_ZEROES		5
->>> +/*
->>> + * Passthrough (driver private) operation codes range between
->>
->> This is unclear... Here, what does "driver" refer to ? If it is the ublk
->> kernel driver, than these commands should not be defined in the uapi
->> header file, they should be defined in drivers/block/ublk.h. However, if
->> these are for the user space driver, like all the other operations, then
-> 
-> Like normal IO, these passthrough requests needs userspace to handle too,
-> usually they just belong to specific ublk target, such as report zones.,
-> so here it is part of UAPI.
-> 
-> But yes, we should document it clearly, maybe something below?
-> 
-> 	Ublk passthrough operation code ranges, and each passthrough
-> 	operation provides generic interface between ublk kernel driver
-> 	and ublk userspace, and this interface is usually used for handling
-> 	generic block layer request, such as command of zoned report zones.
-> 	Passthrough operation is only needed iff ublk kernel driver has to
-> 	be involved for handling this operation.
+On 7/6/23 17:38, Ming Lei wrote:
+> Given blk_mq_sched_try_insert_merge is only called from bfq and
+> deadline, it may not matter to apply this optimization.
 
-Yes, that is better.
+Without this patch, the documentation of the "nomerges" sysfs
+attribute is incorrect. I need this patch because I want the
+ability to disable merging even if an I/O scheduler has been
+selected. As mentioned in the patch description, I discovered
+this while I was writing a shell script that submits various
+I/O workloads to a block device.
 
-> 
->> let's clearly state so. But then, I still not understand why these need
->> a different naming pattern using the "__UBLK" prefix...
-> 
-> I think __UBLK just meant we don't suggest userspace to use it directly,
-> since the added macros are just for making ranges for DRV_IN and DRV_OUT,
-> so we can check command direction easily be using this start/end info in
-> both sides.
-
-Personally, I would still prefer to not add this "__" prefix as these
-are operations that the ublk user driver will have to deal with, like
-the other ones. So I do not see the point of that prefix. But no strong
-feeling about that :)
-
-> 
-> 
-> Thanks, 
-> Ming
-> 
-
--- 
-Damien Le Moal
-Western Digital Research
+Bart.
 
