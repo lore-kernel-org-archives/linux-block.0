@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1434DEB64DA
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jul 2023 05:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED24FEB64DA
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jul 2023 05:37:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233066AbjGHFhq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jul 2023 01:37:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43672 "EHLO
+        id S233109AbjGHFh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jul 2023 01:37:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232996AbjGHFhO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Jul 2023 01:37:14 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 048661FF9
-        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 22:36:59 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-63719ad32e7so18116096d6.1
-        for <linux-block@vger.kernel.org>; Fri, 07 Jul 2023 22:36:59 -0700 (PDT)
+        with ESMTP id S229515AbjGHFh2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Jul 2023 01:37:28 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A190D1BDB
+        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 22:37:00 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-403713e7344so20952791cf.2
+        for <linux-block@vger.kernel.org>; Fri, 07 Jul 2023 22:37:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1688794618; x=1691386618;
+        d=paul-moore.com; s=google; t=1688794619; x=1691386619;
         h=in-reply-to:references:subject:cc:to:from:message-id:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=dLpzT15vthbUVO0k71raasVu18kKS27blTVJmNCp9qw=;
-        b=TJeqWacjduwbP6Y+SlQmoAGQHi1lphT6UAEvJNfG8M7m/0FnuH4lofD3tvQHae013R
-         g+kAwyHtWpHISigG4/rbyEzd6fpSmCmFdpqI3eUvmpIpr9NDiKwyDsB7p2lRdYY/qAkP
-         PkrukE7Z5dEBDUbVtA75oqvybWd1JV9qnpP6SM3Zr5QebCmjbU68jnvQbRl0WDdQJ/8C
-         WClvUbL6oPSan2AXFMETYxTuwPuBbRiUYf0EyknQ60FgP+dNrijlvPFt1pax4Az2PMpM
-         6gd3Z0UQjg5Ba4axeUMQN9xQ3CHwGy2GsMJYkmBRfLzybyCLDgybzBWGa37xu+RyDfXa
-         sxWg==
+        bh=tGA1GMuiBFLQbBC9Kx/aFBaGS7w0xHkPHFkJJNA2iSI=;
+        b=H4OjjGgTuSgh0ERbXj1XvS/xTBxkB7UvM7Vfkrh52Yu8LpFcioo23H7LN2pCGL4LW1
+         c0C5P5QmvB1fXe5I8JHSW7o4g1Ajl1MF/4+jjGWAydjxfqGvPpeQnueqoJppxuYX4Tib
+         6hoyeiTFlWTndTuwvK6ZBpbmb3kDElpYHJNNeVJBjWMXxzLWOzeNN55RmVFRtgUieiJS
+         n9eYbXhSBN+H4R2tcet2YEN9vvVt5VousOwqJlNxxiBZVJ8WFLL0sPVVImmpWJYvuSnT
+         MhL7JtJsQDdw8I3gZFN5WtS2gjWSOchAsKTG4rNTzlHCYSShijuEZjZzESlquH/iq7kj
+         ueNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688794618; x=1691386618;
+        d=1e100.net; s=20221208; t=1688794619; x=1691386619;
         h=in-reply-to:references:subject:cc:to:from:message-id:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dLpzT15vthbUVO0k71raasVu18kKS27blTVJmNCp9qw=;
-        b=OlIvly4MGNRk834/2CAWwJS9qM7Kgh32NC02H2spN1DAd8WjZthQ9vSeL0OOO/mzq/
-         iQV638Fvvrm5aySmXj9dlhQgkgxLktKslyY0KeQS+AyKiK9G76iBjf2VSfawa3iE6NCG
-         Rx6NkBcwrimiLTUa2aR9GiEN5PjhyVrSPVm1h5EMMD3EN+8/jAzXsKtNcL2hkmJlgTRO
-         qIUk1fgZ7tmv/QDrDnpLoOWOVdBUADMjPX8+MaSyPnm7lA5HiOWJeXjFTgZZ9nvstWSq
-         5KP181ld8yL2O/d45lmPHzBfIXvXmJ7BZwc2MsIGbhZDgLu79lm/tDOZwhv9EX7UIOoq
-         pC9w==
-X-Gm-Message-State: ABy/qLZIxNrL+9qug8eHMW1RHf2hgsHf+aPNslCsr+771IDNRHkk6Jw3
-        tJFHJoWFwd/kn5jT8Qy+1Oby
-X-Google-Smtp-Source: APBJJlGlLmfhTVjB4mohkDIyT1aO06AiFpA+DVrG9bmKubtLHJbdM9WNxESZ9ZiNvJziNKwf2PnzYA==
-X-Received: by 2002:a0c:df07:0:b0:635:dfe1:c203 with SMTP id g7-20020a0cdf07000000b00635dfe1c203mr6459539qvl.64.1688794618672;
-        Fri, 07 Jul 2023 22:36:58 -0700 (PDT)
+        bh=tGA1GMuiBFLQbBC9Kx/aFBaGS7w0xHkPHFkJJNA2iSI=;
+        b=I4ISScQBxoBYCARseHrK28MQFXYIESIM1Le68odgo3Z3459lqoV+jcysqkDZc/IU5T
+         AAmzM+N+Xjr+D6SScfEoMnk4XAIl7lGwOM5RHNhqDVY315xd3LrzPdeew31AyjuB17e9
+         ST2ivSPDriKE3l7CUC+zGHH7Hk5GrcDli/8ad0t2k4z6Q7gl3uSCM1iZky0ktZtss9+J
+         cwOB77IJG9mhse6/hsn/EbWaoo7nPFMnaimFiCTphae8O33gUiKgezzk0RF6yJo9dC0e
+         o8XRO9hZCKnIHr1uhxG5ScIzztMWAcaAVrWLNx8Qr0JHFUCRBjoe2v9NdI13iZqQMdBB
+         0ITw==
+X-Gm-Message-State: ABy/qLYy4UsI+8jrNynzDMMcHIvLDiLVb0vBojYHu6HO1NyqyTTki11j
+        Flr8+czkzNJ9fI9TJg4igdvR
+X-Google-Smtp-Source: APBJJlFF68xKBlrT8ZUzDF7hUpibBBTXCy89LqgKEgf14OWs8qrR4aAL2DMHEseMAEOpXtlRbrYnOQ==
+X-Received: by 2002:ac8:7dc6:0:b0:3ff:2088:79d8 with SMTP id c6-20020ac87dc6000000b003ff208879d8mr9453816qte.4.1688794619449;
+        Fri, 07 Jul 2023 22:36:59 -0700 (PDT)
 Received: from localhost ([70.22.175.108])
-        by smtp.gmail.com with ESMTPSA id o20-20020a0cf4d4000000b0063007ccaf42sm2971617qvm.57.2023.07.07.22.36.58
+        by smtp.gmail.com with ESMTPSA id a6-20020a0cca86000000b0062df126ca11sm2943696qvk.21.2023.07.07.22.36.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jul 2023 22:36:58 -0700 (PDT)
-Date:   Sat, 08 Jul 2023 01:36:57 -0400
-Message-ID: <2308135fa59ff970ca88649872acf35d.paul@paul-moore.com>
+        Fri, 07 Jul 2023 22:36:59 -0700 (PDT)
+Date:   Sat, 08 Jul 2023 01:36:58 -0400
+Message-ID: <2edaa73fc9457f4a051115863d94b4ff.paul@paul-moore.com>
 From:   Paul Moore <paul@paul-moore.com>
 To:     Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net,
         zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
@@ -59,111 +59,85 @@ Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
         dm-devel@redhat.com, audit@vger.kernel.org,
         roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>,
         Fan Wu <wufan@linux.microsoft.com>
-Subject: Re: [PATCH RFC v10 5/17] ipe: introduce 'boot_verified' as a trust  provider
-References: <1687986571-16823-6-git-send-email-wufan@linux.microsoft.com>
-In-Reply-To: <1687986571-16823-6-git-send-email-wufan@linux.microsoft.com>
+Subject: Re: [PATCH RFC v10 6/17] security: add new securityfs delete function
+References: <1687986571-16823-7-git-send-email-wufan@linux.microsoft.com>
+In-Reply-To: <1687986571-16823-7-git-send-email-wufan@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
 > 
-> IPE is designed to provide system level trust guarantees, this usually
-> implies that trust starts from bootup with a hardware root of trust,
-> which validates the bootloader. After this, the bootloader verifies the
-> kernel and the initramfs.
+> When deleting a directory in the security file system, the existing
+> securityfs_remove requires the directory to be empty, otherwise
+> it will do nothing. This leads to a potential risk that the security
+> file system might be in an unclean state when the intentded deletion
+> did not happen.
 > 
-> As there's no currently supported integrity method for initramfs, and
-> it's typically already verified by the bootloader, introduce a property
-> that causes the first superblock to have an execution to be "pinned",
-> which is typically initramfs.
+> This commit introduces a new function securityfs_recursive_remove
+> to recursively delete a directory without leaving an unclean state.
 > 
-> When the "pinned" device is unmounted, it will be "unpinned" and
-> `boot_verified` property will always evaluate to false afterward.
-> 
-> We use a pointer with a spin_lock to "pin" the device instead of rcu
-> because rcu synchronization may sleep, which is not allowed when
-> unmounting a device.
-> 
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> Co-developed-by: "Christian Brauner (Microsoft)" <brauner@kernel.org>
 > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 > ---
->  security/ipe/eval.c          | 72 +++++++++++++++++++++++++++++++++++-
->  security/ipe/eval.h          |  2 +
->  security/ipe/hooks.c         | 12 ++++++
->  security/ipe/hooks.h         |  2 +
->  security/ipe/ipe.c           |  1 +
->  security/ipe/policy.h        |  2 +
->  security/ipe/policy_parser.c | 37 +++++++++++++++++-
->  7 files changed, 126 insertions(+), 2 deletions(-)
-
-The compilation errors continue into this patch.
-
-> diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
-> index 27e5767480b0..28c14adfe6d2 100644
-> --- a/security/ipe/policy_parser.c
-> +++ b/security/ipe/policy_parser.c
-> @@ -265,6 +265,12 @@ static enum ipe_action_type parse_action(char *t)
->  	return match_token(t, action_tokens, args);
->  }
+>  include/linux/security.h |  1 +
+>  security/inode.c         | 25 +++++++++++++++++++++++++
+>  2 files changed, 26 insertions(+)
+> 
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index e2734e9e44d5..a88076ebc7b1 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -1971,6 +1971,7 @@ struct dentry *securityfs_create_symlink(const char *name,
+>  					 const char *target,
+>  					 const struct inode_operations *iops);
+>  extern void securityfs_remove(struct dentry *dentry);
+> +extern void securityfs_recursive_remove(struct dentry *dentry);
 >  
-> +static const match_table_t property_tokens = {
-> +	{__IPE_PROP_BOOT_VERIFIED_FALSE,	"boot_verified=FALSE"},
-> +	{__IPE_PROP_BOOT_VERIFIED_TRUE,		"boot_verified=TRUE"},
-> +	{__IPE_PROP_INVALID,			NULL}
-> +};
-> +
->  /**
->   * parse_property - Parse the property type given a token string.
->   * @t: Supplies the token string to be parsed.
-> @@ -277,7 +283,36 @@ static enum ipe_action_type parse_action(char *t)
->   */
->  static int parse_property(char *t, struct ipe_rule *r)
->  {
-> -	return -EBADMSG;
-> +	substring_t args[MAX_OPT_ARGS];
-> +	struct ipe_prop *p = NULL;
-> +	int rc = 0;
-> +	int token;
-> +
-> +	p = kzalloc(sizeof(*p), GFP_KERNEL);
-> +	if (!p)
-> +		return -ENOMEM;
-> +
-> +	token = match_token(t, property_tokens, args);
-> +
-> +	switch (token) {
-> +	case __IPE_PROP_BOOT_VERIFIED_FALSE:
-> +	case __IPE_PROP_BOOT_VERIFIED_TRUE:
-> +		p->type = token;
-> +		break;
-> +	case __IPE_PROP_INVALID:
-
-You generally don't need to explicitly specify a case if the code
-immediately falls through to 'default'.
-
-> +	default:
-> +		rc = -EBADMSG;
-> +		break;
-> +	}
-> +	if (rc)
-> +		goto err;
-> +	list_add_tail(&p->next, &r->props);
-> +
-> +out:
-> +	return rc;
-> +err:
-> +	kfree(p);
-> +	goto out;
-
-Once again, don't use a goto when the jump destination simply does a
-return, do the return directly.
-
->  }
+>  #else /* CONFIG_SECURITYFS */
 >  
->  /**
+> diff --git a/security/inode.c b/security/inode.c
+> index 6c326939750d..13358e8547e8 100644
+> --- a/security/inode.c
+> +++ b/security/inode.c
+> @@ -313,6 +313,31 @@ void securityfs_remove(struct dentry *dentry)
+>  }
+>  EXPORT_SYMBOL_GPL(securityfs_remove);
+>  
+> +static void remove_one(struct dentry *victim)
+> +{
+> +	simple_release_fs(&mount, &mount_count);
+> +}
+> +
+> +/**
+> + * securityfs_recursive_remove - recursively removes a file or directory from the securityfs filesystem
+
+I really want to see lines less than or equal to 80 characters; I
+would suggest this:
+
+"securityfs_recursive_remove - recursively removes a file or directory"
+
+> + * @dentry: a pointer to a the dentry of the file or directory to be removed.
+> + *
+> + * This function recursively removes a file or directory in securityfs that was
+> + * previously created with a call to another securityfs function (like
+> + * securityfs_create_file() or variants thereof.)
+> + */
+> +void securityfs_recursive_remove(struct dentry *dentry)
+> +{
+> +	if (IS_ERR_OR_NULL(dentry))
+> +		return;
+> +
+> +	simple_pin_fs(&fs_type, &mount, &mount_count);
+> +	simple_recursive_removal(dentry, remove_one);
+> +	simple_release_fs(&mount, &mount_count);
+> +}
+> +EXPORT_SYMBOL_GPL(securityfs_recursive_remove);
+> +
+>  #ifdef CONFIG_SECURITY
+>  static struct dentry *lsm_dentry;
+>  static ssize_t lsm_read(struct file *filp, char __user *buf, size_t count,
 > -- 
 > 2.25.1
 
