@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16286EB64DD
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jul 2023 05:37:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70ECCC001DE
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jul 2023 05:37:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232483AbjGHFhW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jul 2023 01:37:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43876 "EHLO
+        id S232960AbjGHFhc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jul 2023 01:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232906AbjGHFhK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Jul 2023 01:37:10 -0400
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239782130
-        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 22:36:58 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-635dc2f6ef9so17187966d6.3
+        with ESMTP id S232965AbjGHFhM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Jul 2023 01:37:12 -0400
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5278F2685
+        for <linux-block@vger.kernel.org>; Fri,  7 Jul 2023 22:36:59 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id 6a1803df08f44-634a3682c25so18731226d6.3
         for <linux-block@vger.kernel.org>; Fri, 07 Jul 2023 22:36:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1688794617; x=1691386617;
+        d=paul-moore.com; s=google; t=1688794618; x=1691386618;
         h=in-reply-to:references:subject:cc:to:from:message-id:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Pr9IRZWW9eKpjkAEIe/1R+NHyAjULaMI0VUp/S3+Lu8=;
-        b=cnEGslyQpdnBNLSSp1rxXhTSSkhDwfqUSx/Ul9J71t2DK99oYfA/K6u/Ej+Hv3Wq/r
-         jUDFg555SvEL3MsR4lk83PktHqF36QcKnjNP/seQerubrhFtJsn4xCiIgC5HO2UMbiT0
-         vZAKIKsOjeVtV2JxdN6AALNiDj5ylJgsA2FNCNYuWdqfgnQZBiCTwnHSC2xytauHOuCD
-         ow1E4PvHNMKk6S17+7mrFKmMbQJDzpiaQVbqJcv1af80ac280QUIPZTXrfcRx2Y56eWU
-         f7so5MIVQigRRgcM7IapiXZH+ltrnfRoS3ghDhatYUcW2hsq+J0Q8I3Pyx0wwDeKH5m4
-         Cvcw==
+        bh=v2wkHCwd4vm+IEtkc2nWyRw52RwR9sbRYqSY91RfFRQ=;
+        b=A7TKcyKu/VPh1w1ZbiKg9Zg8sW+vFmOPtftfVKls4QKi1M9IgsF8i1dgygecNhfMRT
+         bZZFCNiIqk77Dhtmm6iE2NgepkEBGBg8woAvioe8aSqCgRmg+4CALt4wUCcdM+OgLOTF
+         tach2LhZStFkxdBYb+Ax/Cx4yB7i7LbshVj0UppsZAor1ljGkqBGcXcVsaD/nQQbASyX
+         ttuPnodpcVGe9Bi/7EE50fSWAPJAnxSdR20LnmhWTIX1atn5eYqFd5X0F4udA5Ue37GS
+         A86+hBiG20f6mEIa37Le0ZYAqWEnzIN2ZqZpg6/30pWeIxxIZpF7ZpkS/VmjEAx8+qgK
+         nwQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688794617; x=1691386617;
+        d=1e100.net; s=20221208; t=1688794618; x=1691386618;
         h=in-reply-to:references:subject:cc:to:from:message-id:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pr9IRZWW9eKpjkAEIe/1R+NHyAjULaMI0VUp/S3+Lu8=;
-        b=Ja/NzrgllcEyYiMCfjx2LRx+WMvm1WYK0O+Rg0I4SzvLOccStxd5giz/+bsIfS7d1f
-         JknutNq5X3ZPxK+pIjoP49a3S0HzN+d1+7uxqkrvFqlUgrg2thkHDSlzbiw+iUVoKPDF
-         izHa5i66Cxxw0bDVnt1GCUJmNp/EU5NpUKzPNurCgDwWnMWIXRCzVMekbt+PQZPCU157
-         9M+XOvOD4ECzc+Q5yVprIXF1u/6cZAVEz726UeiyQqdqlmaMyHhMcIMVOILnoOtY2T8s
-         mD8p/DtRibgyLdi3hRe1UZ40toWzhS9qkFwnA0afBEM5TshJL5ioqi6eBW5Jg6O6UAou
-         545A==
-X-Gm-Message-State: ABy/qLZAOhctirmSspgG2aS7cBiHeVo3vmTPrmPcQDLiYmkBrY/k68Tt
-        7c7KMoxwLdnQ6XIiX961uTKc
-X-Google-Smtp-Source: APBJJlHVEnPnUDGr6mQjbAqrTDHyLKUL8eVo8SubbpUGbeUzE5umQXjhguJpoCwsEuQ9Nx80Dqycqg==
-X-Received: by 2002:a0c:dc01:0:b0:636:836e:8064 with SMTP id s1-20020a0cdc01000000b00636836e8064mr6540486qvk.63.1688794616895;
-        Fri, 07 Jul 2023 22:36:56 -0700 (PDT)
+        bh=v2wkHCwd4vm+IEtkc2nWyRw52RwR9sbRYqSY91RfFRQ=;
+        b=iqkjFZkwrLCa7/paUdwT0ccZBClrOGOEYH3ZNVqZeCe0mfUqZuuvEoBBkT8Rkjyboq
+         Aa7Ok1vvYv2HZ09irNwV+UTfIdCdeG03C9kUb/9wbO+AmHts5EJXPeVyncnVeR2yC7Sf
+         Njwz4AE637n21Zz9mQytXD8mAdA0yz85o36RggMsby1GjHNlTdCWviemsn6c1wrrJusb
+         LaSI+v+nzeMEvJMvr+sLPWjH0OI7AfjnokUnpkPWiAEnHjh9Pr/hXXoFzTaS310wRTtB
+         iFgK8074jTN1z6D7SpduCvqC9IWOG0CeItWUoZKb14q1YsPrgJIRD8zzhx8uPUGbaTNb
+         HvvQ==
+X-Gm-Message-State: ABy/qLa9dtVWT2ja47cCTG11hdD0XIp5ue1IMGi5FuedshK/RXJzG81V
+        kGHEY0h7nJMj282Ed7wVG5XY
+X-Google-Smtp-Source: APBJJlENhuCNF416DPzzrczcaxPIqtcSiA8/0DJvKcPv9Rl2z24HcHNBuekQRsoH+kaIbBJgTJf8+w==
+X-Received: by 2002:a0c:b24a:0:b0:635:abf1:e93e with SMTP id k10-20020a0cb24a000000b00635abf1e93emr5908682qve.29.1688794617762;
+        Fri, 07 Jul 2023 22:36:57 -0700 (PDT)
 Received: from localhost ([70.22.175.108])
-        by smtp.gmail.com with ESMTPSA id t25-20020a0cb399000000b006238f82cde4sm2951181qve.108.2023.07.07.22.36.56
+        by smtp.gmail.com with ESMTPSA id y12-20020a0c8ecc000000b006360778f314sm2940646qvb.105.2023.07.07.22.36.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jul 2023 22:36:56 -0700 (PDT)
-Date:   Sat, 08 Jul 2023 01:36:56 -0400
-Message-ID: <a7ca7bc6780787ab1e2f0d4b93016700.paul@paul-moore.com>
+        Fri, 07 Jul 2023 22:36:57 -0700 (PDT)
+Date:   Sat, 08 Jul 2023 01:36:57 -0400
+Message-ID: <007992aec442cda5d5866e89b0ed5c69.paul@paul-moore.com>
 From:   Paul Moore <paul@paul-moore.com>
 To:     Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net,
         zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
@@ -61,40 +61,44 @@ Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
         roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
         Deven Bowers <deven.desai@linux.microsoft.com>,
         Fan Wu <wufan@linux.microsoft.com>
-Subject: Re: [PATCH RFC v10 3/17] ipe: add evaluation loop
-References: <1687986571-16823-4-git-send-email-wufan@linux.microsoft.com>
-In-Reply-To: <1687986571-16823-4-git-send-email-wufan@linux.microsoft.com>
+Subject: Re: [PATCH RFC v10 4/17] ipe: add LSM hooks on execution and kernel  read
+References: <1687986571-16823-5-git-send-email-wufan@linux.microsoft.com>
+In-Reply-To: <1687986571-16823-5-git-send-email-wufan@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
 > 
-> IPE must have a centralized function to evaluate incoming callers
-> against IPE's policy. This iteration of the policy for against the rules
-> for that specific caller is known as the evaluation loop.
-
-Can you rewrite that second sentence, it reads a bit awkward and I'm
-unclear as to the meaning.
-
+> IPE's initial goal is to control both execution and the loading of
+> kernel modules based on the system's definition of trust. It
+> accomplishes this by plugging into the security hooks for
+> bprm_check_security, file_mprotect, mmap_file, kernel_load_data,
+> and kernel_read_data.
+> 
 > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 > ---
->  security/ipe/Makefile |  1 +
->  security/ipe/eval.c   | 94 +++++++++++++++++++++++++++++++++++++++++++
->  security/ipe/eval.h   | 25 ++++++++++++
->  3 files changed, 120 insertions(+)
->  create mode 100644 security/ipe/eval.c
->  create mode 100644 security/ipe/eval.h
+>  security/ipe/eval.c  |  14 ++++
+>  security/ipe/eval.h  |   1 +
+>  security/ipe/hooks.c | 182 +++++++++++++++++++++++++++++++++++++++++++
+>  security/ipe/hooks.h |  25 ++++++
+>  security/ipe/ipe.c   |   6 ++
+>  5 files changed, 228 insertions(+)
+>  create mode 100644 security/ipe/hooks.c
+>  create mode 100644 security/ipe/hooks.h
 
-...
+Adding the 'hooks.h' header allows for much of code added in the
+previous patches to finally compile and there are a number of errors,
+too many to include here.  Please fix those and ensure that each
+point in the patchset compiles cleanly.
 
-> diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+> diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
 > new file mode 100644
-> index 000000000000..59144b2ecdda
+> index 000000000000..d896a5a474bc
 > --- /dev/null
-> +++ b/security/ipe/eval.c
-> @@ -0,0 +1,94 @@
+> +++ b/security/ipe/hooks.c
+> @@ -0,0 +1,182 @@
 > +// SPDX-License-Identifier: GPL-2.0
 > +/*
 > + * Copyright (C) Microsoft Corporation. All rights reserved.
@@ -102,118 +106,112 @@ unclear as to the meaning.
 > +
 > +#include <linux/fs.h>
 > +#include <linux/types.h>
-> +#include <linux/slab.h>
-> +#include <linux/file.h>
-> +#include <linux/sched.h>
-> +#include <linux/rcupdate.h>
+> +#include <linux/binfmts.h>
+> +#include <linux/mman.h>
 > +
 > +#include "ipe.h"
-> +#include "eval.h"
 > +#include "hooks.h"
-
-There is no "hooks.h" at this point in the patchset.
-
-In order for 'git bisect' to remain useful (and it can be a very handy
-tool), we need to ensure that each point in the patchset compiles
-cleanly.
-
-> +#include "policy.h"
-> +
-> +struct ipe_policy __rcu *ipe_active_policy;
+> +#include "eval.h"
 > +
 > +/**
-> + * evaluate_property - Analyze @ctx against a property.
-> + * @ctx: Supplies a pointer to the context to be evaluated.
-> + * @p: Supplies a pointer to the property to be evaluated.
+> + * ipe_bprm_check_security - ipe security hook function for bprm check.
+> + * @bprm: Supplies a pointer to a linux_binprm structure to source the file
+> + *	  being evaluated.
 > + *
+> + * This LSM hook is called when a binary is loaded through the exec
+> + * family of system calls.
 > + * Return:
-> + * * true	- The current @ctx match the @p
-> + * * false	- The current @ctx doesn't match the @p
+> + * *0	- OK
+> + * *!0	- Error
 > + */
-> +static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
-> +			      struct ipe_prop *p)
+> +int ipe_bprm_check_security(struct linux_binprm *bprm)
 > +{
-> +	return false;
+> +	struct ipe_eval_ctx ctx = { 0 };
+
+It's up to you, but when you have a fequently used initializer like
+this it is often wrapped in a macro:
+
+  #define IPE_EVAL_CTX_INIT ((struct ipe_eval_ctx){ 0 })
+
+... so that you can write the variable decalaration like this:
+
+  struct ipe_eval_ctx ctx = IPE_EVAL_CTX_INIT;
+
+It's not a requirement, it just tends to look a little cleaner and
+should you ever need to change the initializer it makes your life
+a lot easier.
+
+> +	build_eval_ctx(&ctx, bprm->file, __IPE_OP_EXEC);
+> +	return ipe_evaluate_event(&ctx);
 > +}
 > +
 > +/**
-> + * ipe_evaluate_event - Analyze @ctx against the current active policy.
-> + * @ctx: Supplies a pointer to the context to be evaluated.
+> + * ipe_mmap_file - ipe security hook function for mmap check.
+> + * @f: File being mmap'd. Can be NULL in the case of anonymous memory.
+> + * @reqprot: The requested protection on the mmap, passed from usermode.
+> + * @prot: The effective protection on the mmap, resolved from reqprot and
+> + *	  system configuration.
+> + * @flags: Unused.
 > + *
-> + * This is the loop where all policy evaluation happens against IPE policy.
+> + * This hook is called when a file is loaded through the mmap
+> + * family of system calls.
 > + *
 > + * Return:
-> + * * 0		- OK
-> + * * -EACCES	- @ctx did not pass evaluation.
-> + * * !0		- Error
+> + * * 0	- OK
+> + * * !0	- Error
 > + */
-> +int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
+> +int ipe_mmap_file(struct file *f, unsigned long reqprot, unsigned long prot,
+> +		  unsigned long flags)
+
+Since @reqprot is always going to be unused in this function, you
+might want to mark it as such to help prevent compiler
+warnings/errors, for example:
+
+ unsigned long reqprot __always_unused
+
 > +{
-> +	int rc = 0;
-> +	bool match = false;
-> +	enum ipe_action_type action;
-> +	struct ipe_policy *pol = NULL;
-> +	const struct ipe_rule *rule = NULL;
-> +	const struct ipe_op_table *rules = NULL;
-> +	struct ipe_prop *prop = NULL;
+> +	struct ipe_eval_ctx ctx = { 0 };
 > +
-> +	rcu_read_lock();
+> +	if (prot & PROT_EXEC) {
+> +		build_eval_ctx(&ctx, f, __IPE_OP_EXEC);
+> +		return ipe_evaluate_event(&ctx);
+> +	}
 > +
-> +	pol = rcu_dereference(ipe_active_policy);
-> +	if (!pol) {
-> +		rcu_read_unlock();
+> +	return 0;
+> +}
+> +
+> +/**
+> + * ipe_file_mprotect - ipe security hook function for mprotect check.
+> + * @vma: Existing virtual memory area created by mmap or similar.
+> + * @reqprot: The requested protection on the mmap, passed from usermode.
+> + * @prot: The effective protection on the mmap, resolved from reqprot and
+> + *	  system configuration.
+> + *
+> + * This LSM hook is called when a mmap'd region of memory is changing
+> + * its protections via mprotect.
+> + *
+> + * Return:
+> + * * 0	- OK
+> + * * !0	- Error
+> + */
+> +int ipe_file_mprotect(struct vm_area_struct *vma, unsigned long reqprot,
+
+See my comment above about @reqprot.
+
+> +		      unsigned long prot)
+> +{
+> +	struct ipe_eval_ctx ctx = { 0 };
+> +
+> +	/* Already Executable */
+> +	if (vma->vm_flags & VM_EXEC)
 > +		return 0;
+> +
+> +	if (prot & PROT_EXEC) {
+> +		build_eval_ctx(&ctx, vma->vm_file, __IPE_OP_EXEC);
+> +		return ipe_evaluate_event(&ctx);
 > +	}
 > +
-> +	if (ctx->op == __IPE_OP_INVALID) {
-> +		action = pol->parsed->global_default_action;
-> +		goto eval;
-
-It looks like you are missing a rcu_read_unlock() in this case.
-
-Also, given how simplistic the evaluation is in this case, why not
-just do it here, saving the assignment, jump, etc.?
-
-  if (ctx->op == INVALID) {
-    rcu_read_unlock()
-    if (global_action == DENY)
-      return -EACCES;
-    return 0;
-  }
-
-> +	}
-> +
-> +	rules = &pol->parsed->rules[ctx->op];
-> +
-> +	list_for_each_entry(rule, &rules->rules, next) {
-> +		match = true;
-> +
-> +		list_for_each_entry(prop, &rule->props, next)
-> +			match = match && evaluate_property(ctx, prop);
-
-Why not break from this loop once evaluate_property() returns false?
-
-> +
-> +		if (match)
-> +			break;
-> +	}
-> +
-> +	if (match)
-> +		action = rule->action;
-> +	else if (rules->default_action != __IPE_ACTION_INVALID)
-> +		action = rules->default_action;
-> +	else
-> +		action = pol->parsed->global_default_action;
-> +
-> +	rcu_read_unlock();
-> +eval:
-> +	if (action == __IPE_ACTION_DENY)
-> +		rc = -EACCES;
-> +
-> +	return rc;
-
-This can just be 'return 0;' right?
-
+> +	return 0;
 > +}
 
 --
