@@ -2,112 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54477C0015E
-	for <linux-block@archiver.kernel.org>; Sun,  9 Jul 2023 11:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 654FEC001B0
+	for <linux-block@archiver.kernel.org>; Sun,  9 Jul 2023 14:32:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230113AbjGILRz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Jul 2023 07:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59326 "EHLO
+        id S231348AbjGIOcs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Jul 2023 10:32:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230470AbjGILRx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jul 2023 07:17:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0796CB5;
-        Sun,  9 Jul 2023 04:17:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 96B8F60BD8;
-        Sun,  9 Jul 2023 11:17:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CEF3C433C7;
-        Sun,  9 Jul 2023 11:17:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1688901472;
-        bh=N4w+S4FTGNCBgNW4xGflCQ5AKTCHPtzcKBHhGcQ3hMg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ACG3eK7okKZQm3Toik76Ae+3zsT3aWbD8ZGl5MWxpjO3Q06vKkKfgxFfPaZPxDo7n
-         W5HdIrye0Md31gRMEn/aleAtX0Jx/aLpFN0jAoWn13gRG++1XP4hBq58WMPmYpm0gy
-         QLPT8WP+HZd5fqdr3JEELcNrV/5I6a2CjcfsqlFQ=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     stable@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        patches@lists.linux.dev, David Howells <dhowells@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <brauner@kernel.org>,
-        Steve French <stfrench@microsoft.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        David Hildenbrand <david@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.3 005/431] splice: Fix filemap_splice_read() to use the correct inode
-Date:   Sun,  9 Jul 2023 13:09:13 +0200
-Message-ID: <20230709111451.235981246@linuxfoundation.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230709111451.101012554@linuxfoundation.org>
-References: <20230709111451.101012554@linuxfoundation.org>
-User-Agent: quilt/0.67
+        with ESMTP id S229943AbjGIOcr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jul 2023 10:32:47 -0400
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 330DCFF;
+        Sun,  9 Jul 2023 07:32:42 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-3facc7a4e8aso7776065e9.0;
+        Sun, 09 Jul 2023 07:32:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688913160; x=1691505160;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fi8HZWe00as6NY8cKM/Z1+nvL1s7YeXy199NqP9ShII=;
+        b=K89d+UCCzmd42gjQKhzLlm8myEIh70D9xjtth7bSvMqFwV76+wWXN2dP324XJjxchV
+         pzVBPulXjjGospJHccHvbKHIqMCjnXgSn0wxsvnr6VTkUttkhDHvr+RHqZ+80axTkOTc
+         JhCvnYF8JMdNly2e7sHw1wEnSRS6gYxRXJ0arXJmaxKioZn6sr/HQ0kZcMqW/t8xE+0Y
+         HAXXLXGnsIQHzURUWC9zCYaERgj4UuxS+6xngyeMWYVD2QcNukDMHFFYiEkavn1GnmpV
+         sYGzuHeVK+bqMZCi3mTaMnu6CK/hskzrOZpkL+XxEtdljPBZ3SnJL3/f/MWz6Cnkwu2R
+         rrBw==
+X-Gm-Message-State: ABy/qLYnRE1kCsNnPD2svDP4PG5zqm+cPZUk+qrW9O/8tdTurWNQzisk
+        MmEKrzPXDhqbZaoJ9GxpdHOZ3oqwFY8=
+X-Google-Smtp-Source: APBJJlFEIuFofQ1/SqOhdmpRu5JJopAnJyej4izHcf2ZEhE0zRT1k4+hi5QBs39TGI+uQYQcVh3POA==
+X-Received: by 2002:a05:600c:4f56:b0:3fb:f025:9372 with SMTP id m22-20020a05600c4f5600b003fbf0259372mr9988489wmq.4.1688913160303;
+        Sun, 09 Jul 2023 07:32:40 -0700 (PDT)
+Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
+        by smtp.gmail.com with ESMTPSA id m4-20020a05600c280400b003fc07e17d4esm3947099wmb.2.2023.07.09.07.32.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 09 Jul 2023 07:32:39 -0700 (PDT)
+Message-ID: <165eceaa-55d4-f9c7-7e02-18115e6df6fe@grimberg.me>
+Date:   Sun, 9 Jul 2023 17:32:38 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: blktests failures with v6.4
+Content-Language: en-US
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+References: <lkmloyrqpebispffur5udxdiubmevvodtsvnap3jz7tv5ihstr@jg7ejye3bein>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <lkmloyrqpebispffur5udxdiubmevvodtsvnap3jz7tv5ihstr@jg7ejye3bein>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit c37222082f23c456664d1c3182a714670ab8f9a4 ]
+> #3: nvme/003 (fabrics transport)
+> 
+>     When nvme test group is run with trtype=rdma or tcp, the test case fails
+>     due to lockdep WARNING "possible circular locking dependency detected".
+>     Reported in May/2023. Bart suggested a fix for trytpe=rdma [4] but it
+>     needs more discussion.
+> 
+>     [4] https://lore.kernel.org/linux-nvme/20230511150321.103172-1-bvanassche@acm.org/
 
-Fix filemap_splice_read() to use file->f_mapping->host, not file->f_inode,
-as the source of the file size because in the case of a block device,
-file->f_inode points to the block-special file (which is typically 0
-length) and not the backing store.
+This patch is unfortunately incorrect and buggy.
 
-Fixes: 07073eb01c5f ("splice: Add a func to do a splice from a buffered file without ITER_PIPE")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
-cc: Steve French <stfrench@microsoft.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: linux-mm@kvack.org
-cc: linux-block@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-Link: https://lore.kernel.org/r/20230522135018.2742245-2-dhowells@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- mm/filemap.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This will likely make the issue go away, but adds another
+old issue where a client can DDOS a target by bombarding it
+with connect/disconnect. When releases are async and we don't
+have any back-pressure, it is likely to happen.
+--
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index 4597bca43a6d..8b4f4aa48206 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -1582,11 +1582,6 @@ static int nvmet_rdma_queue_connect(struct 
+rdma_cm_id *cm_id,
+                 goto put_device;
+         }
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 2723104cc06a1..8f048e62279a2 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2903,7 +2903,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
- 	do {
- 		cond_resched();
- 
--		if (*ppos >= i_size_read(file_inode(in)))
-+		if (*ppos >= i_size_read(in->f_mapping->host))
- 			break;
- 
- 		iocb.ki_pos = *ppos;
-@@ -2919,7 +2919,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
- 		 * part of the page is not copied back to userspace (unless
- 		 * another truncate extends the file - this is desired though).
- 		 */
--		isize = i_size_read(file_inode(in));
-+		isize = i_size_read(in->f_mapping->host);
- 		if (unlikely(*ppos >= isize))
- 			break;
- 		end_offset = min_t(loff_t, isize, *ppos + len);
--- 
-2.39.2
+-       if (queue->host_qid == 0) {
+-               /* Let inflight controller teardown complete */
+-               flush_workqueue(nvmet_wq);
+-       }
+-
+         ret = nvmet_rdma_cm_accept(cm_id, queue, &event->param.conn);
+         if (ret) {
+                 /*
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index 868aa4de2e4c..c8cfa19e11c7 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -1844,11 +1844,6 @@ static u16 nvmet_tcp_install_queue(struct 
+nvmet_sq *sq)
+         struct nvmet_tcp_queue *queue =
+                 container_of(sq, struct nvmet_tcp_queue, nvme_sq);
 
-
-
+-       if (sq->qid == 0) {
+-               /* Let inflight controller teardown complete */
+-               flush_workqueue(nvmet_wq);
+-       }
+-
+         queue->nr_cmds = sq->size * 2;
+         if (nvmet_tcp_alloc_cmds(queue))
+                 return NVME_SC_INTERNAL;
+--
