@@ -2,102 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49327EB64D9
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 10:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA42EB64D9
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 10:20:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233206AbjGJKGz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 06:06:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46338 "EHLO
+        id S233309AbjGJKUL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 06:20:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229733AbjGJKGl (ORCPT
+        with ESMTP id S233425AbjGJKTz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 06:06:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D9C23AB8
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 03:02:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688983340;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5RWtnBGzn+0ePdy6QMFHOGeDtAhUqtldpZQ55ephF9w=;
-        b=Svd556wUSRIfnJbRnKvoSLeNeNj7vQXB3rpTp2U9L7VHJKOHhLF2uv68kBTojWEHwHp5zO
-        kRfvEMx09qI26Q2saKoagTrgaoni0frSl45EIbn19Hjs5cWsPWl5W0fF4p6XamXvP3+QE1
-        tfffNN6mrCu3FLjOd3NxO1h6z5Ayfyo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-194-U4nCc_i4PK2T1djKD9qHNQ-1; Mon, 10 Jul 2023 06:02:17 -0400
-X-MC-Unique: U4nCc_i4PK2T1djKD9qHNQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 10 Jul 2023 06:19:55 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DB37183;
+        Mon, 10 Jul 2023 03:19:34 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 05BB73844FB3;
-        Mon, 10 Jul 2023 10:02:17 +0000 (UTC)
-Received: from ovpn-8-33.pek2.redhat.com (ovpn-8-33.pek2.redhat.com [10.72.8.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E7B9340C2070;
-        Mon, 10 Jul 2023 10:02:09 +0000 (UTC)
-Date:   Mon, 10 Jul 2023 18:02:04 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Damien Le Moal <dlemoal@kernel.org>,
-        Andreas Hindborg <nmi@metaspace.dk>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>, ming.lei@redhat.com
-Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
-Message-ID: <ZKvXHGBiENbFBL3x@ovpn-8-33.pek2.redhat.com>
-References: <20230706130930.64283-1-nmi@metaspace.dk>
- <20230706130930.64283-2-nmi@metaspace.dk>
- <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
- <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
- <ZKuqt6QAXic3wuRX@infradead.org>
- <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
- <ZKvQPAN9OkS3dZ4d@infradead.org>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 547AF1FE4C;
+        Mon, 10 Jul 2023 10:19:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1688984373; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dOPQVlVl/8vQ//n15Tk8y4R1eYRMJsmZsPzlZqEUlNs=;
+        b=Wp0QUbNf5XaNlRPlG0FB9Zz/3WpMnrs1+b8iNdyU95ruQBihKhwUs2PLtYeSAZOtTSK+PQ
+        dF+kV5V87URc5OHxolj0z8nmgFGS2N/rPU+kqKb5kyMytUAObxYKCW3ywRqsRUMpqFqbjc
+        E2Otgn39N453HG4U7uXxooZrh2mXB6A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1688984373;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dOPQVlVl/8vQ//n15Tk8y4R1eYRMJsmZsPzlZqEUlNs=;
+        b=M1y7Pko3BRJD16IVNvY+R0b+D274u+SqFXOje3G1Pjo7N8uHPwvWSI9RgeXKoNNg74OR1j
+        UIidc8Nvqy7uN/Cw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4269513A05;
+        Mon, 10 Jul 2023 10:19:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Hac1EDXbq2SPPwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Mon, 10 Jul 2023 10:19:33 +0000
+Date:   Mon, 10 Jul 2023 12:19:32 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Message-ID: <jdsoqllqmrqu5j5bt3fudkksmjskgs4ooodynm6yh3b4oc5scn@t3hydrmbb22f>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-3-dwagner@suse.de>
+ <9c07e4f6-2cf5-b53b-6b48-bd4df8798ee9@nvidia.com>
+ <bz2s6nyjwl6l7yfrd4wtjdtousv23ypcdleckibps5lyjpwi4x@wqq6qqesevpk>
+ <39f9977e-b34c-f2dd-d356-8c78414a60d1@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZKvQPAN9OkS3dZ4d@infradead.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+In-Reply-To: <39f9977e-b34c-f2dd-d356-8c78414a60d1@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 02:32:44AM -0700, Christoph Hellwig wrote:
-> On Mon, Jul 10, 2023 at 05:27:23PM +0800, Ming Lei wrote:
-> > Yes, that is exactly what we are doing.
+On Mon, Jul 10, 2023 at 12:53:17PM +0300, Max Gurtovoy wrote:
+ > > Agree on setting the hard coded values for hostnqn and hostid instead of
+> > > reading the /etc/nvme/* files. This should do the work IMO, isn't it ?
 > > 
-> > The added macros of UBLK_IO_OP_DRV_IN_START[END] are just for supporting
-> > more ublk passthrough commands, and the motivation is for running
-> > check(such as buffer direction) in two sides easily.
-> > 
-> > However, I think it is just fine to delay to add it until introducing
-> > the 2nd ublk pt command.
+> > Do you mean that nvme-cli will ignore the udev trigger when a different hostnqn
+> > is invovled? At least for the well-known discover controller the hostqnq
+> > doesn't work. Though not sure if I understood you correctly here.
 > 
-> The concept of a passthrough command just doesn't make sense for an
-> on the wire protocol.  It is a linux concept that distinguished between
-> the Linux synthetic command like REQ_OP_READ/WRITE/DISCARD etc that are
-> well defined and can be used by file systems and other consumers, and
-> ways to pass through arbitrary blobs only known by the driver.
-> 
-> Anything in a wire protocol needs to be very well defined in that
-> protocol completely indpendent of what Linux concept it maps to.
-> Especially as the Linux concepts can change, and fairly frequently do.
+> All I was saying is that your issue would have been fixed easily by 2-3 LOC
+> by removing the usage of /etc/nvme/* files that are usually configured by
+> system administrator and use a default values for blktests hostnqn and
+> hostid.
 
-Yeah, you are right wrt. linux pt command, and here we shouldn't use
-the term of passthrough.
+Okay.
 
-Actually the UAPI is trying to define interface between driver and
-userspace, which is just like interface between driver and hardware, such
-as, how nvme/sd_zbc is dealing with actual hardware wrt. reporting
-zones.
+> The usage of --context in blktests is redundant IMO.
 
-Thanks,
-Ming
-
+Right, I made a bit of a mess with the commit message. Sorry about that.
