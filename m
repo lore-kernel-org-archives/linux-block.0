@@ -2,102 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4270CEB64DA
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 08:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9153AEB64DA
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 09:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232105AbjGJIcW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 04:32:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47610 "EHLO
+        id S231674AbjGJJPT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 05:15:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232987AbjGJIcQ (ORCPT
+        with ESMTP id S230457AbjGJJPS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 04:32:16 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D241C4;
-        Mon, 10 Jul 2023 01:32:13 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 735E521E9B;
-        Mon, 10 Jul 2023 08:32:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1688977931; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Mon, 10 Jul 2023 05:15:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81FA8E
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 02:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688980472;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=IarH4b8vLfFqiQFb6Jf9NwYggi3gPLDXuEcvUpll3og=;
-        b=tNLsvszpSxXGIzZXxdoA58ClQNp5x4HRPGMEu6Ne+XwjmVAAygdRFwl1QBy++tH3CtYGs3
-        ZlKn+0KiVMryHHxSDsjIEonk6tWJffGxD6NIY12YITLqJ7rVLlNGiJfZTPqUd8Z/ARwFeX
-        LvC6YncUM6E0WQi5gecmKpjG1WoJdtY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1688977931;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IarH4b8vLfFqiQFb6Jf9NwYggi3gPLDXuEcvUpll3og=;
-        b=n7gvonMPAYJ/yIBUMmNqT3ZEHCXN7wqIHC0O/oCkd5mVXpM1hBbEaxD6sAktRPt54z3Gdk
-        kPYE3+NyeW+8EtDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=3ZxZGq4D+R9v/uHRHPVTjCJO+HqCh9drWSD3QE0wPss=;
+        b=gq18U63a8jWewdJu02mmdWb9YgJwiViLwJ3P0dqwX4qINFYBNcMkr1PQ8J5hc+ttBNsMcu
+        ZoKcEznhDX0wniPkn460XRYlGFNlkABXxMTpdWxVST13WKFrUsti8ZI0SY7aBUAnH2/8RW
+        kHwGRTZk1hr1MIGmID53ZFkAD+0Vk8k=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-dq1Pi2d5OE2_NXrRq89yKg-1; Mon, 10 Jul 2023 05:14:28 -0400
+X-MC-Unique: dq1Pi2d5OE2_NXrRq89yKg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 650061361C;
-        Mon, 10 Jul 2023 08:32:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 5QmdGAvCq2QWEAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Mon, 10 Jul 2023 08:32:11 +0000
-Date:   Mon, 10 Jul 2023 10:32:10 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>,
-        Martin Belanger <Martin.Belanger@dell.com>
-Subject: Re: [PATCH blktests v1 3/3] nvme/{041,042,043,044,045}: Use default
- hostnqn and hostid
-Message-ID: <5b5immxsatjshetehvdxociibdsh2n5tgvi66fsi2tehnahv3h@nq2yypbrw2zp>
-References: <20230620132703.20648-1-dwagner@suse.de>
- <20230620132703.20648-4-dwagner@suse.de>
- <38a4e188-239c-a0a8-5204-8e8e001f062f@nvidia.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 358492A59568;
+        Mon, 10 Jul 2023 09:14:28 +0000 (UTC)
+Received: from ovpn-8-31.pek2.redhat.com (ovpn-8-33.pek2.redhat.com [10.72.8.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 427E32017DCB;
+        Mon, 10 Jul 2023 09:14:19 +0000 (UTC)
+Date:   Mon, 10 Jul 2023 17:14:15 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Wen Xiong <wenxiong@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Dave Young <dyoung@redhat.com>, kexec@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH 2/2] nvme-pci: use blk_mq_max_nr_hw_queues() to calculate
+ io queues
+Message-ID: <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
+References: <20230708020259.1343736-1-ming.lei@redhat.com>
+ <20230708020259.1343736-3-ming.lei@redhat.com>
+ <20230710064109.GB24519@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <38a4e188-239c-a0a8-5204-8e8e001f062f@nvidia.com>
+In-Reply-To: <20230710064109.GB24519@lst.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 06, 2023 at 07:06:28PM +0300, Max Gurtovoy wrote:
-> 
-> 
-> On 20/06/2023 16:27, Daniel Wagner wrote:
-> > The host might have enabled the udev/systemd auto connect feature.
-> > This disturbs the blktests for the fc transport. nvme-cli is able
-> > to distinguish between the different invocations via the --context
-> > option. In order to get this working we have to use the default
-> > hostnqn and hostid and not randon generated IDs for every single
-> > run.
+On Mon, Jul 10, 2023 at 08:41:09AM +0200, Christoph Hellwig wrote:
+> On Sat, Jul 08, 2023 at 10:02:59AM +0800, Ming Lei wrote:
+> > Take blk-mq's knowledge into account for calculating io queues.
 > > 
+> > Fix wrong queue mapping in case of kdump kernel.
+> > 
+> > On arm and ppc64, 'maxcpus=1' is passed to kdump command line, see
+> > `Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
+> > still returns all CPUs.
 > 
-> In the bellow tests the hostnqn and hostid are randomly generated for each
-> test, so how will it disturb the udev/systemd ?
+> That's simply broken.  Please fix the arch code to make sure
+> it does not return a bogus num_possible_cpus value for these
 
-No, random hostnqn should work as well. The only requirement is that the
-hostnqn(s) used by blktest are unique.
+That is documented in Documentation/admin-guide/kdump/kdump.rst.
 
-> I'm not sure how will this change fix something and not sure why --context
-> is mentioned here.
+On arm and ppc64, 'maxcpus=1' is passed for kdump kernel, and "maxcpu=1"
+simply keep one of CPU cores as online, and others as offline.
 
-Sorry about that. I should have updated the commit message. A left over from a
-earlier version.
+So Cc our arch(arm & ppc64) & kdump guys wrt. passing 'maxcpus=1' for
+kdump kernel.
 
-> Seems like a good explanation to this patch is to used a dedicated hostnqn
-> and hostid for blktests instead of randomly generate it.
+> setups, otherwise you'll have to paper over it in all kind of
+> drivers.
 
-Okay, I'll update the commit message to reflect this. I suppose I could also
-look into getting rid of the local variables in the tests.
+The issue is only triggered for drivers which use managed irq &
+multiple hw queues.
+
+
+Thanks,
+Ming
 
