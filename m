@@ -2,80 +2,60 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B21C001DF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 09:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C013EB64D9
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 09:34:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232635AbjGJJeQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 05:34:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50456 "EHLO
+        id S232661AbjGJJeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 05:34:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232210AbjGJJd7 (ORCPT
+        with ESMTP id S232209AbjGJJd7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 10 Jul 2023 05:33:59 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80AF10CB;
-        Mon, 10 Jul 2023 02:32:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ii09KwfW3lRpdYpHvr6Prko3xiz41Lgu8fucaZRBMPo=; b=swa/UZ4GulajGqc19yN6js2z7R
-        nX8q01dVRORP1UMEH7t2wRRIAwm7TcLnk41BaEi1nNfqSJVHt+mtNrw25uPzb6Y/4i8E2X6xbpZwy
-        3xJJovjOXfjO5++sclzVpTCx/oPg/IvEqm8XQgAR7ERRVEU1BvHp4ihS5LWc9gHhfoqCjHvLd2Khv
-        ePElebdIFIE6FboQ6zdx5+i4VvDI6Lm0qC3skIyeTjyJgWD1/2A5oUo3srVes9RnY4HlGTPXydtUz
-        oW/UyhAqVWyJJO0NGQp5YA96SVKD9Nz8yu/bpQSe7BU8rDne/jdvo0emvDAYM+CIkn0s83/ioWplp
-        hqFFq5GQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qInG8-00B1Go-35;
-        Mon, 10 Jul 2023 09:32:44 +0000
-Date:   Mon, 10 Jul 2023 02:32:44 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andreas Hindborg <nmi@metaspace.dk>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>
-Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
-Message-ID: <ZKvQPAN9OkS3dZ4d@infradead.org>
-References: <20230706130930.64283-1-nmi@metaspace.dk>
- <20230706130930.64283-2-nmi@metaspace.dk>
- <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
- <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
- <ZKuqt6QAXic3wuRX@infradead.org>
- <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C49C810C6
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 02:32:38 -0700 (PDT)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3145fcecef6so897147f8f.0
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 02:32:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688981557; x=1691573557;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=G6NxX5o/AlnMS332qGavg+ZGYNQ/PE2SN3FxkaZIzyFpX+PM1+DbjE+xwXUo/iUrcb
+         ywRjVcRLpwBnJSKvZA1E1D0zJMAmX2l7u4wMz7TVCCKWQ5QJHE7Vrgu+MgarkcuONC9N
+         h/H8vLcKOmhO7xr7k3K725D5NGf+l8R2AeoAyni4jmOrZADelpajt21jRLEVdPqUE6Vs
+         xwfeO/bf1USseeRvXDaLN6ZaaEujjJc0SVOwh6pQO0fpFxCxWtbk65YzbI80mNF0S7c+
+         V6eGsq6h5GVmIpRXImabndgHBTDUvXRvzuupwxPvZ9GHPA7kQGyb09nKxO72XALu1934
+         4Epg==
+X-Gm-Message-State: ABy/qLYNeN47D9tbpI0olOBe4r7wGUQHLCMMDCdzrAfrciLUz0A9NRa6
+        3m5Ut6pFY85BKcBcHCc6Gjk=
+X-Google-Smtp-Source: APBJJlFGa3h1OxjP0fcWsDDpnrcXsCeNBmBLSQFnRSX/QfFKhlMPvuz20SkqEc5eAlm+BA+WYrGazg==
+X-Received: by 2002:a5d:6748:0:b0:313:e9d9:3004 with SMTP id l8-20020a5d6748000000b00313e9d93004mr10433889wrw.0.1688981557217;
+        Mon, 10 Jul 2023 02:32:37 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id q3-20020adfea03000000b003143c6e09ccsm11207863wrm.16.2023.07.10.02.32.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jul 2023 02:32:36 -0700 (PDT)
+Message-ID: <427a5543-ce19-e974-2593-5e8ea96602f3@grimberg.me>
+Date:   Mon, 10 Jul 2023 12:32:35 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 4/4] nvme: simplify the max_discard_segments calculation
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20230707094616.108430-1-hch@lst.de>
+ <20230707094616.108430-5-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230707094616.108430-5-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 05:27:23PM +0800, Ming Lei wrote:
-> Yes, that is exactly what we are doing.
-> 
-> The added macros of UBLK_IO_OP_DRV_IN_START[END] are just for supporting
-> more ublk passthrough commands, and the motivation is for running
-> check(such as buffer direction) in two sides easily.
-> 
-> However, I think it is just fine to delay to add it until introducing
-> the 2nd ublk pt command.
-
-The concept of a passthrough command just doesn't make sense for an
-on the wire protocol.  It is a linux concept that distinguished between
-the Linux synthetic command like REQ_OP_READ/WRITE/DISCARD etc that are
-well defined and can be used by file systems and other consumers, and
-ways to pass through arbitrary blobs only known by the driver.
-
-Anything in a wire protocol needs to be very well defined in that
-protocol completely indpendent of what Linux concept it maps to.
-Especially as the Linux concepts can change, and fairly frequently do.
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
