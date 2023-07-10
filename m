@@ -2,95 +2,200 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4502BEB64D9
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 10:43:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E273AEB64DC
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 10:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230016AbjGJKnc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 06:43:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49840 "EHLO
+        id S230080AbjGJK4S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 06:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230352AbjGJKnb (ORCPT
+        with ESMTP id S229662AbjGJK4S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 06:43:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70AFBD2
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 03:42:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688985771;
+        Mon, 10 Jul 2023 06:56:18 -0400
+Received: from out-57.mta0.migadu.com (out-57.mta0.migadu.com [IPv6:2001:41d0:1004:224b::39])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE8BC3
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 03:56:13 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1688986571;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dcqwH1JHB/zMyfnzLAkQxVrnbSRsy6dRa4E0txqsIQs=;
-        b=Yao5EYyw67DwO4wlyqPOLgjfDoo4z/DN/Q3ZIZXsEsJRsopKba5XFM1j6y8fVnJx8YkPAJ
-        jzVfltJhG6KEXYyHRSmZYrMLaEw/d9owpo0l8qdI9l4g0nPdr6ocXkmBCdJ6soE+6y7cr5
-        a0wjIBcaDhrObzY19t93h1VJJsw/Jxg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-84-NwoKJUS-OB6gnRBBDCzZ2Q-1; Mon, 10 Jul 2023 06:42:46 -0400
-X-MC-Unique: NwoKJUS-OB6gnRBBDCzZ2Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8DEFC2999B20;
-        Mon, 10 Jul 2023 10:42:45 +0000 (UTC)
-Received: from ovpn-8-33.pek2.redhat.com (ovpn-8-33.pek2.redhat.com [10.72.8.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6960FC09A09;
-        Mon, 10 Jul 2023 10:42:41 +0000 (UTC)
-Date:   Mon, 10 Jul 2023 18:42:36 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, ming.lei@redhat.com
-Subject: Re: [PATCH 1/4] block: don't unconditionally set max_discard_sectors
- in blk_queue_max_discard_sectors
-Message-ID: <ZKvgnI5qZ/Z70ycL@ovpn-8-33.pek2.redhat.com>
-References: <20230707094616.108430-1-hch@lst.de>
- <20230707094616.108430-2-hch@lst.de>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JAAcTMTsrAbVSkHrV3Db9f82+9y9+CSUZSusZpOXTxQ=;
+        b=xwELUxx5NzyXo3IUYtBQAxtpHrkwS2foQIMSGnIRGb4fpzUZXqrsl/58qwGy0RWV9aLuW3
+        +A5S2ZbKe6hh7F1nGgFkEJXbY0mDM5XLF4ZuG2UceOGYCDxJAobfJPe8SA35FieYN050C5
+        aO0n7VPxcYyZonSHVWMalC620oP26IE=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, hch@lst.de, tj@kernel.org, ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+Subject: [PATCH v5] blk-mq: fix start_time_ns and alloc_time_ns for pre-allocated rq
+Date:   Mon, 10 Jul 2023 18:55:16 +0800
+Message-ID: <20230710105516.2053478-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230707094616.108430-2-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 07, 2023 at 11:46:13AM +0200, Christoph Hellwig wrote:
-> max_discard_sectors is split into a hardware and a tunable value, but
-> blk_queue_max_discard_sectors sets both unconditionally, thus dropping
-> any user stored value on a rescan.  Fix blk_queue_max_discard_sectors to
-> only set max_discard_sectors if it either wasn't set, or the new hardware
-> limit is smaller than the previous user limit.
-> 
-> Fixes: 0034af036554 ("block: make /sys/block/<dev>/queue/discard_max_bytes writeable")
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-It is hard to say a fix, given discard_max_bytes can still be changed
-by kernel. I'd suggest to document this behavior in Documentation/ABI/stable/sysfs-block.
+The iocost rely on rq start_time_ns and alloc_time_ns to tell saturation
+state of the block device. Most of the time request is allocated after
+rq_qos_throttle() and its alloc_time_ns or start_time_ns won't be affected.
 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-settings.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 0046b447268f91..978d2e1fd67a51 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -179,7 +179,9 @@ void blk_queue_max_discard_sectors(struct request_queue *q,
->  		unsigned int max_discard_sectors)
->  {
->  	q->limits.max_hw_discard_sectors = max_discard_sectors;
-> -	q->limits.max_discard_sectors = max_discard_sectors;
-> +	if (!q->limits.max_discard_sectors ||
-> +	     q->limits.max_discard_sectors > max_discard_sectors)
-> +		q->limits.max_discard_sectors = max_discard_sectors;
->  }
+But for plug batched allocation introduced by the commit 47c122e35d7e
+("block: pre-allocate requests if plug is started and is a batch"), we can
+rq_qos_throttle() after the allocation of the request. This is what the
+blk_mq_get_cached_request() does.
 
-Userspace may write 0 to discard_max_bytes, and this patch still can
-override user setting.
+In this case, the cached request alloc_time_ns or start_time_ns is much
+ahead if blocked in any qos ->throttle().
 
-Thanks,
-Ming
+Fix it by setting alloc_time_ns and start_time_ns to now when the allocated
+request is actually used.
+
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+v5:
+ - Don't reuse __blk_mq_alloc_requests(), which makes it much complex.
+ - Always initialize the time stamps after blk_mq_rq_ctx_init(), which
+   is clearer, as suggested by Christoph Hellwig.
+ - We still need to pass optional alloc_time_ns to blk_mq_rq_time_init(),
+   which includes depth and tag waits time by definition.
+ - [v4] https://lore.kernel.org/all/20230629121302.1124851-1-chengming.zhou@linux.dev/
+
+v4:
+ - Use blk_mq_alloc_data to pass start_time_ns instead of passing down
+   yet another parameter. Thanks Christoph Hellwig.
+ - [v3] https://lore.kernel.org/all/20230628124546.1056698-1-chengming.zhou@linux.dev/
+
+v3:
+ - Skip setting the alloc_time_ns and start_time_ns during pre-allocation,
+   which is clearer, as suggested by Tejun.
+ - [v2] https://lore.kernel.org/all/20230626050405.781253-1-chengming.zhou@linux.dev/
+---
+ block/blk-mq.c | 47 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 30 insertions(+), 17 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index decb6ab2d508..2352fed460f8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -337,8 +337,24 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+ }
+ EXPORT_SYMBOL(blk_rq_init);
+ 
++/* Set start and alloc time when the allocated request is actually used */
++static inline void blk_mq_rq_time_init(struct request *rq, u64 alloc_time_ns)
++{
++	if (blk_mq_need_time_stamp(rq))
++		rq->start_time_ns = ktime_get_ns();
++	else
++		rq->start_time_ns = 0;
++
++#ifdef CONFIG_BLK_RQ_ALLOC_TIME
++	if (blk_queue_rq_alloc_time(rq->q))
++		rq->alloc_time_ns = alloc_time_ns ?: rq->start_time_ns;
++	else
++		rq->alloc_time_ns = 0;
++#endif
++}
++
+ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+-		struct blk_mq_tags *tags, unsigned int tag, u64 alloc_time_ns)
++		struct blk_mq_tags *tags, unsigned int tag)
+ {
+ 	struct blk_mq_ctx *ctx = data->ctx;
+ 	struct blk_mq_hw_ctx *hctx = data->hctx;
+@@ -365,14 +381,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	}
+ 	rq->timeout = 0;
+ 
+-	if (blk_mq_need_time_stamp(rq))
+-		rq->start_time_ns = ktime_get_ns();
+-	else
+-		rq->start_time_ns = 0;
+ 	rq->part = NULL;
+-#ifdef CONFIG_BLK_RQ_ALLOC_TIME
+-	rq->alloc_time_ns = alloc_time_ns;
+-#endif
+ 	rq->io_start_time_ns = 0;
+ 	rq->stats_sectors = 0;
+ 	rq->nr_phys_segments = 0;
+@@ -402,8 +411,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ }
+ 
+ static inline struct request *
+-__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
+-		u64 alloc_time_ns)
++__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
+ {
+ 	unsigned int tag, tag_offset;
+ 	struct blk_mq_tags *tags;
+@@ -422,7 +430,7 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
+ 		tag = tag_offset + i;
+ 		prefetch(tags->static_rqs[tag]);
+ 		tag_mask &= ~(1UL << i);
+-		rq = blk_mq_rq_ctx_init(data, tags, tag, alloc_time_ns);
++		rq = blk_mq_rq_ctx_init(data, tags, tag);
+ 		rq_list_add(data->cached_rq, rq);
+ 		nr++;
+ 	}
+@@ -483,9 +491,11 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 	 * Try batched alloc if we want more than 1 tag.
+ 	 */
+ 	if (data->nr_tags > 1) {
+-		rq = __blk_mq_alloc_requests_batch(data, alloc_time_ns);
+-		if (rq)
++		rq = __blk_mq_alloc_requests_batch(data);
++		if (rq) {
++			blk_mq_rq_time_init(rq, alloc_time_ns);
+ 			return rq;
++		}
+ 		data->nr_tags = 1;
+ 	}
+ 
+@@ -508,8 +518,9 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 		goto retry;
+ 	}
+ 
+-	return blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag,
+-					alloc_time_ns);
++	rq = blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag);
++	blk_mq_rq_time_init(rq, alloc_time_ns);
++	return rq;
+ }
+ 
+ static struct request *blk_mq_rq_cache_fill(struct request_queue *q,
+@@ -564,6 +575,7 @@ static struct request *blk_mq_alloc_cached_request(struct request_queue *q,
+ 			return NULL;
+ 
+ 		plug->cached_rq = rq_list_next(rq);
++		blk_mq_rq_time_init(rq, 0);
+ 	}
+ 
+ 	rq->cmd_flags = opf;
+@@ -665,8 +677,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	tag = blk_mq_get_tag(&data);
+ 	if (tag == BLK_MQ_NO_TAG)
+ 		goto out_queue_exit;
+-	rq = blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag,
+-					alloc_time_ns);
++	rq = blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag);
++	blk_mq_rq_time_init(rq, alloc_time_ns);
+ 	rq->__data_len = 0;
+ 	rq->__sector = (sector_t) -1;
+ 	rq->bio = rq->biotail = NULL;
+@@ -2901,6 +2913,7 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+ 	plug->cached_rq = rq_list_next(rq);
+ 	rq_qos_throttle(q, *bio);
+ 
++	blk_mq_rq_time_init(rq, 0);
+ 	rq->cmd_flags = (*bio)->bi_opf;
+ 	INIT_LIST_HEAD(&rq->queuelist);
+ 	return rq;
+-- 
+2.41.0
 
