@@ -2,90 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0278EB64D9
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 16:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C76EB64DC
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 17:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbjGJQvw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 12:51:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49074 "EHLO
+        id S229558AbjGJR2s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 13:28:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230417AbjGJQvv (ORCPT
+        with ESMTP id S231674AbjGJR2q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 12:51:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B4B9E3;
-        Mon, 10 Jul 2023 09:51:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B0A4A6112C;
-        Mon, 10 Jul 2023 16:51:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 463C9C433C8;
-        Mon, 10 Jul 2023 16:51:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689007906;
-        bh=5z3WsJxJGTtWjrX2KHLkkdeETGptB61J+3QAspj8jBw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mnFzUs11tjzs+9ReI3FmujHvobKv5/wZaFYYlv72apTaj5q+5nJjG3Xvck7oyN0Bb
-         3r44Ru3KtKzPCZgCsOL43nG19l61vH11QqTchheHpnKzoOF/dVEenhPlN7QrlfjL2c
-         FeX3O0mEnPMK13b8PlAUX6IiOnBOVP4/wLoDDuUj4ZMDIksPVrHBzd1QOTy9kmahwx
-         eobFZLlT4bSmSj1mrHmB1i/EikuL3cWQ95AmcH8Dqn1YdcXFE0GbnrJEJjvnJhy8yW
-         ZKEcOl6J/0mSWQsL0oTMC9iBItuU/lUz+vZp71BaggN8U1ScOprjLHgJij04ThusAj
-         TUT5ije+zaq+w==
-Date:   Mon, 10 Jul 2023 10:51:43 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
+        Mon, 10 Jul 2023 13:28:46 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E27FB6;
+        Mon, 10 Jul 2023 10:28:43 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 266BE6732D; Mon, 10 Jul 2023 19:28:40 +0200 (CEST)
+Date:   Mon, 10 Jul 2023 19:28:39 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chuck Lever III <chuck.lever@oracle.com>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Wen Xiong <wenxiong@linux.ibm.com>,
-        Dave Young <dyoung@redhat.com>, kexec@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH 2/2] nvme-pci: use blk_mq_max_nr_hw_queues() to calculate
- io queues
-Message-ID: <ZKw3H2cJzRPZa29N@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230708020259.1343736-1-ming.lei@redhat.com>
- <20230708020259.1343736-3-ming.lei@redhat.com>
- <20230710064109.GB24519@lst.de>
- <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Chuck Lever <cel@kernel.org>
+Subject: Re: NFS workload leaves nfsd threads in D state
+Message-ID: <20230710172839.GA7190@lst.de>
+References: <7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com> <20230710075634.GA30120@lst.de> <3F16A14B-F854-41CC-A3CA-87C7946FC277@oracle.com> <F610D6B3-876F-4E5D-A3C4-A30F1B81D9B5@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
+In-Reply-To: <F610D6B3-876F-4E5D-A3C4-A30F1B81D9B5@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 05:14:15PM +0800, Ming Lei wrote:
-> On Mon, Jul 10, 2023 at 08:41:09AM +0200, Christoph Hellwig wrote:
-> > On Sat, Jul 08, 2023 at 10:02:59AM +0800, Ming Lei wrote:
-> > > Take blk-mq's knowledge into account for calculating io queues.
-> > > 
-> > > Fix wrong queue mapping in case of kdump kernel.
-> > > 
-> > > On arm and ppc64, 'maxcpus=1' is passed to kdump command line, see
-> > > `Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
-> > > still returns all CPUs.
-> > 
-> > That's simply broken.  Please fix the arch code to make sure
-> > it does not return a bogus num_possible_cpus value for these
-> 
-> That is documented in Documentation/admin-guide/kdump/kdump.rst.
-> 
-> On arm and ppc64, 'maxcpus=1' is passed for kdump kernel, and "maxcpu=1"
-> simply keep one of CPU cores as online, and others as offline.
-> 
-> So Cc our arch(arm & ppc64) & kdump guys wrt. passing 'maxcpus=1' for
-> kdump kernel.
-> 
-> > setups, otherwise you'll have to paper over it in all kind of
-> > drivers.
-> 
-> The issue is only triggered for drivers which use managed irq &
-> multiple hw queues.
+Only found a virtualized AHCI setup so far without much success.  Can
+you try this (from Chengming Zhou) in the meantime?
 
-Is the problem that the managed interrupt sets the effective irq
-affinity to an offline CPU? You mentioned observed timeouts; are you
-seeing the "completion polled" nvme message?
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index dba392cf22bec6..5c392a277b9eb2 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -443,7 +443,7 @@ bool blk_insert_flush(struct request *rq)
+ 		 * the post flush, and then just pass the command on.
+ 		 */
+ 		blk_rq_init_flush(rq);
+-		rq->flush.seq |= REQ_FSEQ_POSTFLUSH;
++		rq->flush.seq |= REQ_FSEQ_PREFLUSH;
+ 		spin_lock_irq(&fq->mq_flush_lock);
+ 		list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
+ 		spin_unlock_irq(&fq->mq_flush_lock);
