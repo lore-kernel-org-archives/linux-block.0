@@ -2,94 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9153AEB64DA
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 09:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F12C0015E
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 09:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231674AbjGJJPT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 05:15:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44068 "EHLO
+        id S229940AbjGJJ2q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 05:28:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230457AbjGJJPS (ORCPT
+        with ESMTP id S232049AbjGJJ2e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 05:15:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81FA8E
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 02:14:32 -0700 (PDT)
+        Mon, 10 Jul 2023 05:28:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5362A8E
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 02:27:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688980472;
+        s=mimecast20190719; t=1688981263;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3ZxZGq4D+R9v/uHRHPVTjCJO+HqCh9drWSD3QE0wPss=;
-        b=gq18U63a8jWewdJu02mmdWb9YgJwiViLwJ3P0dqwX4qINFYBNcMkr1PQ8J5hc+ttBNsMcu
-        ZoKcEznhDX0wniPkn460XRYlGFNlkABXxMTpdWxVST13WKFrUsti8ZI0SY7aBUAnH2/8RW
-        kHwGRTZk1hr1MIGmID53ZFkAD+0Vk8k=
+        bh=5kwkHvApEdStfVKInGVUfBcOvlOglFnlYRPePfAzvXw=;
+        b=Z0bEgaqUC11J59aPuw20dIEA4o0f21AEhc0nqy3WU2Ra9JYHW1sVEpL8rReusnEcPlseJG
+        DKSKrXvZi7+vQ13Xo8If4nXuIrXS+A+9tEKPR0tBbDipjt+CbTmDKYXYq/2vvbmDtfxSoz
+        5W/MbPyxqqyJAFdtjVxwy5aO/GOyQk4=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-607-dq1Pi2d5OE2_NXrRq89yKg-1; Mon, 10 Jul 2023 05:14:28 -0400
-X-MC-Unique: dq1Pi2d5OE2_NXrRq89yKg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-368-ibukddyLMGWg4o0lITkHGw-1; Mon, 10 Jul 2023 05:27:36 -0400
+X-MC-Unique: ibukddyLMGWg4o0lITkHGw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 358492A59568;
-        Mon, 10 Jul 2023 09:14:28 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 344FA1C03D8F;
+        Mon, 10 Jul 2023 09:27:36 +0000 (UTC)
 Received: from ovpn-8-31.pek2.redhat.com (ovpn-8-33.pek2.redhat.com [10.72.8.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 427E32017DCB;
-        Mon, 10 Jul 2023 09:14:19 +0000 (UTC)
-Date:   Mon, 10 Jul 2023 17:14:15 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D0B822166B26;
+        Mon, 10 Jul 2023 09:27:28 +0000 (UTC)
+Date:   Mon, 10 Jul 2023 17:27:23 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Wen Xiong <wenxiong@linux.ibm.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Dave Young <dyoung@redhat.com>, kexec@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH 2/2] nvme-pci: use blk_mq_max_nr_hw_queues() to calculate
- io queues
-Message-ID: <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
-References: <20230708020259.1343736-1-ming.lei@redhat.com>
- <20230708020259.1343736-3-ming.lei@redhat.com>
- <20230710064109.GB24519@lst.de>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Damien Le Moal <dlemoal@kernel.org>,
+        Andreas Hindborg <nmi@metaspace.dk>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>, ming.lei@redhat.com
+Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
+Message-ID: <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
+References: <20230706130930.64283-1-nmi@metaspace.dk>
+ <20230706130930.64283-2-nmi@metaspace.dk>
+ <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
+ <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
+ <ZKuqt6QAXic3wuRX@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230710064109.GB24519@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+In-Reply-To: <ZKuqt6QAXic3wuRX@infradead.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 08:41:09AM +0200, Christoph Hellwig wrote:
-> On Sat, Jul 08, 2023 at 10:02:59AM +0800, Ming Lei wrote:
-> > Take blk-mq's knowledge into account for calculating io queues.
+On Sun, Jul 09, 2023 at 11:52:39PM -0700, Christoph Hellwig wrote:
+> On Fri, Jul 07, 2023 at 08:59:03AM +0800, Ming Lei wrote:
+> > > let's clearly state so. But then, I still not understand why these need
+> > > a different naming pattern using the "__UBLK" prefix...
 > > 
-> > Fix wrong queue mapping in case of kdump kernel.
-> > 
-> > On arm and ppc64, 'maxcpus=1' is passed to kdump command line, see
-> > `Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
-> > still returns all CPUs.
+> > I think __UBLK just meant we don't suggest userspace to use it directly,
+> > since the added macros are just for making ranges for DRV_IN and DRV_OUT,
+> > so we can check command direction easily be using this start/end info in
+> > both sides.
 > 
-> That's simply broken.  Please fix the arch code to make sure
-> it does not return a bogus num_possible_cpus value for these
+> Folks, please stop coupling a uapi (or on-disk protocol) too tightly
+> to Linux internals.  Think of what makes sense as a communication
+> protocol, not what is an internal kernel interface.
+> 
+> REPORT_ZONES is a sensible command, and supported in ATA/SCSI/NVMe in
+> one way or another.  In Linux it is a synchronous method call right now
+> for one reason or another, and most implementation map it to a
+> passthrough command - be that the actual protocol command or something
+> internal for virtio.
+> 
+> So for ublk this is just another command like any other, that needs to
+> be defined and documented.  Nothing internal or driver specific.
+ 
+Yes, that is exactly what we are doing.
 
-That is documented in Documentation/admin-guide/kdump/kdump.rst.
+The added macros of UBLK_IO_OP_DRV_IN_START[END] are just for supporting
+more ublk passthrough commands, and the motivation is for running
+check(such as buffer direction) in two sides easily.
 
-On arm and ppc64, 'maxcpus=1' is passed for kdump kernel, and "maxcpu=1"
-simply keep one of CPU cores as online, and others as offline.
+However, I think it is just fine to delay to add it until introducing
+the 2nd ublk pt command.
 
-So Cc our arch(arm & ppc64) & kdump guys wrt. passing 'maxcpus=1' for
-kdump kernel.
-
-> setups, otherwise you'll have to paper over it in all kind of
-> drivers.
-
-The issue is only triggered for drivers which use managed irq &
-multiple hw queues.
-
-
-Thanks,
+Thanks, 
 Ming
 
