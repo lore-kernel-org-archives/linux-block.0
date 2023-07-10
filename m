@@ -2,73 +2,200 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A5FEEB64D9
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 06:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4579BEB64D9
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 07:36:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229670AbjGJGzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 02:55:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54592 "EHLO
+        id S230113AbjGJHgj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 03:36:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230304AbjGJGzF (ORCPT
+        with ESMTP id S230391AbjGJHgi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 02:55:05 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B6DDA;
-        Sun,  9 Jul 2023 23:55:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IuH8LJYvcYtMLcwMqbYORbIhMXRU2KvEfyHfs6OUorc=; b=OVdL0XtjMCVX+22CogqYkdhhyA
-        QiE4e5Z8wApctUXJnJKZ0336tbFQXORdewh908tvLiioSwUuh+C7ZaJ3ZhTbxoWIKycR1De4U3ipL
-        2bN7TkkYz3Ii/9okTSkZ//HCBcJE3KcF3OL08YKC5hyDP8Pdhgvli7hBwSmaF/wJ5TYn6bd5JLLcg
-        yadjKuO32T8li4lSDFZYtyMfEW41eE2hMU7vcbFu1w+j0wE5F4Hm3LgOLqR48V4LgDY7lgmRwZpmk
-        CkZo8gdvtUIz94VEC1RDbqhbeuwWNesjO0AzAvert2a0PuCxgbwjFUPCZly3zSkmhqNg+v4XHx5RA
-        PEb84NSA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qIknR-00Adk7-1N;
-        Mon, 10 Jul 2023 06:54:57 +0000
-Date:   Sun, 9 Jul 2023 23:54:57 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Andreas Hindborg <nmi@metaspace.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Minwoo Im <minwoo.im.dev@gmail.com>, gost.dev@samsung.com,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>
-Subject: Re: [PATCH v7 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
-Message-ID: <ZKurQVJotCwBSHkD@infradead.org>
-References: <20230710064607.155155-1-nmi@metaspace.dk>
- <20230710064607.155155-2-nmi@metaspace.dk>
+        Mon, 10 Jul 2023 03:36:38 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A2EC12E;
+        Mon, 10 Jul 2023 00:36:35 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 963D567373; Mon, 10 Jul 2023 09:36:31 +0200 (CEST)
+Date:   Mon, 10 Jul 2023 09:36:31 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chengming Zhou <zhouchengming@bytedance.com>
+Cc:     Christoph Hellwig <hch@lst.de>, chengming.zhou@linux.dev,
+        axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH v3 1/3] blk-mq: always use __blk_mq_alloc_requests() to
+ alloc and init rq
+Message-ID: <20230710073631.GA29077@lst.de>
+References: <20230628124546.1056698-1-chengming.zhou@linux.dev> <20230628124546.1056698-2-chengming.zhou@linux.dev> <20230629052828.GD16819@lst.de> <f91c32b3-1d3b-b28c-40cb-2edf02448f22@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230710064607.155155-2-nmi@metaspace.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <f91c32b3-1d3b-b28c-40cb-2edf02448f22@bytedance.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 08:46:04AM +0200, Andreas Hindborg wrote:
-> +#define		UBLK_IO_OP_WRITE_ZEROES		5
-> +/*
-> + * Ublk passthrough operation code ranges, and each passthrough operation
-> + * provides generic interface between ublk kernel driver and ublk userspace, and
-> + * this interface is usually used for handling generic block layer request, such
-> + * as command of zoned report zones. Passthrough operation is only needed iff
-> + * ublk kernel driver has to be involved for handling this operation.
-> + */
-> +#define		__UBLK_IO_OP_DRV_IN_START	32
-> +#define		__UBLK_IO_OP_DRV_IN_END		96
-> +#define		__UBLK_IO_OP_DRV_OUT_START	__UBLK_IO_OP_DRV_IN_END
-> +#define		__UBLK_IO_OP_DRV_OUT_END	160
+On Thu, Jun 29, 2023 at 03:40:03PM +0800, Chengming Zhou wrote:
+> Thanks for your review!
+> 
+> Since hctx-specific allocation path always has BLK_MQ_REQ_NOWAIT flag,
+> it won't retry.
+> 
+> But I agree, this makes the general __blk_mq_alloc_requests() more complex.
 
-I guess I was just a little late to catch this before your resend,
-sorry.  Please look at my comment on the last iteration.
+And also very confusing as it pretends to share some code, while almost
+nothing of __blk_mq_alloc_requests is actually used.
 
+> The reason is blk_mq_rq_ctx_init() has some data->rq_flags initialization:
+> 
+> ```
+> if (data->flags & BLK_MQ_REQ_PM)
+> 	data->rq_flags |= RQF_PM;
+> if (blk_queue_io_stat(q))
+> 	data->rq_flags |= RQF_IO_STAT;
+> rq->rq_flags = data->rq_flags;
+> ```
+> 
+> Because we need this data->rq_flags to tell if we need start_time_ns,
+> we need to put these initialization in the callers of blk_mq_rq_ctx_init().
+
+Why can't we just always initialize the time stampts after
+blk_mq_rq_ctx_init? Something like this (untested) variant of your
+patch 2 from the latest iteration:
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5504719b970d59..55bf1009f3e32a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -328,8 +328,26 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+ }
+ EXPORT_SYMBOL(blk_rq_init);
+ 
++/* Set alloc and start time when pre-allocated rq is actually used */
++static inline void blk_mq_rq_time_init(struct request *rq, bool set_alloc_time)
++{
++	if (blk_mq_need_time_stamp(rq)) {
++		u64 now = ktime_get_ns();
++
++#ifdef CONFIG_BLK_RQ_ALLOC_TIME
++		/*
++		 * The alloc time is only used by iocost for now,
++		 * only possible when blk_mq_need_time_stamp().
++		 */
++		if (set_alloc_time)
++			rq->alloc_time_ns = now;
++#endif
++		rq->start_time_ns = now;
++	}
++}
++
+ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+-		struct blk_mq_tags *tags, unsigned int tag, u64 alloc_time_ns)
++		struct blk_mq_tags *tags, unsigned int tag)
+ {
+ 	struct blk_mq_ctx *ctx = data->ctx;
+ 	struct blk_mq_hw_ctx *hctx = data->hctx;
+@@ -356,14 +374,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	}
+ 	rq->timeout = 0;
+ 
+-	if (blk_mq_need_time_stamp(rq))
+-		rq->start_time_ns = ktime_get_ns();
+-	else
+-		rq->start_time_ns = 0;
+ 	rq->part = NULL;
+-#ifdef CONFIG_BLK_RQ_ALLOC_TIME
+-	rq->alloc_time_ns = alloc_time_ns;
+-#endif
+ 	rq->io_start_time_ns = 0;
+ 	rq->stats_sectors = 0;
+ 	rq->nr_phys_segments = 0;
+@@ -393,8 +404,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ }
+ 
+ static inline struct request *
+-__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
+-		u64 alloc_time_ns)
++__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
+ {
+ 	unsigned int tag, tag_offset;
+ 	struct blk_mq_tags *tags;
+@@ -413,7 +423,7 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
+ 		tag = tag_offset + i;
+ 		prefetch(tags->static_rqs[tag]);
+ 		tag_mask &= ~(1UL << i);
+-		rq = blk_mq_rq_ctx_init(data, tags, tag, alloc_time_ns);
++		rq = blk_mq_rq_ctx_init(data, tags, tag);
+ 		rq_list_add(data->cached_rq, rq);
+ 		nr++;
+ 	}
+@@ -427,12 +437,13 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
+ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ {
+ 	struct request_queue *q = data->q;
++	bool set_alloc_time = blk_queue_rq_alloc_time(q);
+ 	u64 alloc_time_ns = 0;
+ 	struct request *rq;
+ 	unsigned int tag;
+ 
+ 	/* alloc_time includes depth and tag waits */
+-	if (blk_queue_rq_alloc_time(q))
++	if (set_alloc_time)
+ 		alloc_time_ns = ktime_get_ns();
+ 
+ 	if (data->cmd_flags & REQ_NOWAIT)
+@@ -474,9 +485,11 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 	 * Try batched alloc if we want more than 1 tag.
+ 	 */
+ 	if (data->nr_tags > 1) {
+-		rq = __blk_mq_alloc_requests_batch(data, alloc_time_ns);
+-		if (rq)
++		rq = __blk_mq_alloc_requests_batch(data);
++		if (rq) {
++			blk_mq_rq_time_init(rq, true);
+ 			return rq;
++		}
+ 		data->nr_tags = 1;
+ 	}
+ 
+@@ -499,8 +512,10 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 		goto retry;
+ 	}
+ 
+-	return blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag,
+-					alloc_time_ns);
++	rq = blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag);
++	if (rq)
++		blk_mq_rq_time_init(rq, set_alloc_time);
++	return rq;
+ }
+ 
+ static struct request *blk_mq_rq_cache_fill(struct request_queue *q,
+@@ -555,6 +570,7 @@ static struct request *blk_mq_alloc_cached_request(struct request_queue *q,
+ 			return NULL;
+ 
+ 		plug->cached_rq = rq_list_next(rq);
++		blk_mq_rq_time_init(rq, blk_queue_rq_alloc_time(rq->q));
+ 	}
+ 
+ 	rq->cmd_flags = opf;
+@@ -656,8 +672,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	tag = blk_mq_get_tag(&data);
+ 	if (tag == BLK_MQ_NO_TAG)
+ 		goto out_queue_exit;
+-	rq = blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag,
+-					alloc_time_ns);
++	rq = blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag);
++	blk_mq_rq_time_init(rq, blk_queue_rq_alloc_time(rq->q));
+ 	rq->__data_len = 0;
+ 	rq->__sector = (sector_t) -1;
+ 	rq->bio = rq->biotail = NULL;
+@@ -2896,6 +2912,7 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+ 	plug->cached_rq = rq_list_next(rq);
+ 	rq_qos_throttle(q, *bio);
+ 
++	blk_mq_rq_time_init(rq, blk_queue_rq_alloc_time(rq->q));
+ 	rq->cmd_flags = (*bio)->bi_opf;
+ 	INIT_LIST_HEAD(&rq->queuelist);
+ 	return rq;
