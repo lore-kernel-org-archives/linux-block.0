@@ -2,40 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32239EB64D9
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 06:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7673DEB64D9
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 06:46:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231816AbjGJGmd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 02:42:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46966 "EHLO
+        id S229655AbjGJGq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 02:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231950AbjGJGmW (ORCPT
+        with ESMTP id S231716AbjGJGqY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 02:42:22 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462F2E40;
-        Sun,  9 Jul 2023 23:42:15 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 673A76732D; Mon, 10 Jul 2023 08:42:12 +0200 (CEST)
-Date:   Mon, 10 Jul 2023 08:42:12 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     chengming.zhou@linux.dev
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de, tj@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: Re: [PATCH v3 2/4] blk-mq: use percpu csd to remote complete
- instead of per-rq csd
-Message-ID: <20230710064212.GC24519@lst.de>
-References: <20230707093722.1338589-1-chengming.zhou@linux.dev> <20230707093722.1338589-3-chengming.zhou@linux.dev>
+        Mon, 10 Jul 2023 02:46:24 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E674B11B
+        for <linux-block@vger.kernel.org>; Sun,  9 Jul 2023 23:46:16 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4f004cc54f4so5630909e87.3
+        for <linux-block@vger.kernel.org>; Sun, 09 Jul 2023 23:46:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1688971575; x=1691563575;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=K3CjRlY+9IwHB/vCT0xsrYeo8Yy/XAul/gGCFGRXgxQ=;
+        b=G6wUuVx2c8HcjAYn+aPkqBi6G+wexpIlQx1W25PUMlBsDFh7Wo/NPUK2L2Jx6UDzwP
+         c3Ldh/h3imqc6IVMlFmRXS9okiC1l3iFRlW9vR0NLzV9Ubo628kp5ZLSZX49QjGi8jYA
+         9hBHJXAU5235xnlQjT/r2G8THovqGE7DYKQdMDd5mVe7eB6i+yhCS0DJSrbi3a5I7rgF
+         q5+Bcglg9Rpm19Q89GmjtqLnuUedxR31S5PPdcFFVq26VtqaV6sZQFNSbZFh1l8W7Dn/
+         HJEAeyh9UBuZG6Rpmbk5wJLQiz06GDx7ZU1NAgsR7pTkCYW+Se+7pHKP6jv6+WUklTeK
+         7D/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688971575; x=1691563575;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K3CjRlY+9IwHB/vCT0xsrYeo8Yy/XAul/gGCFGRXgxQ=;
+        b=l+k+kC0X3PQuST5nOombTFcmv4T1ken/Pkoz1itlcfLpTSIp6Tznd/u3MqOQmPi0m/
+         QuztuWXcuHFavez00/AEOXNI993Qsyk2FJO4OYyXkUIsZtb4bhlo4OLlHst0Qs3hNnut
+         JrFH8fSDzuHKRoGT8izLwbt3Mke3UuRmC/Rr6hfAhqq0pmCAeMXdeGpSXX3+wN0zWrJg
+         /iR9nnITVuwyd8zl1IFV/hcwPix6TqxzfLg1fPiXxQKdvnVthNKZ/zK/hRhQ5rHLqgNh
+         X4+qy4Q71ER5OLpINASMSRVxCuaxYq/bZd3zSuNWajI/uu1HHOXdz00ZFkO6DmmS6YAP
+         La4A==
+X-Gm-Message-State: ABy/qLayjQF6Kku9QT/X+WV9MCwJFneE4S/yTwOMYntMi86hazihWuBZ
+        dKJrj6uY/iItXd4n3ZF1DB7jUg==
+X-Google-Smtp-Source: APBJJlFV/vHNan6v5Tu1SBjCyP3P2neQtUFBv1ZEDhD85R76IffzCYoJ4jivQ0PVpLPy7oSYYpFN1g==
+X-Received: by 2002:ac2:5b9c:0:b0:4f8:565e:f4ae with SMTP id o28-20020ac25b9c000000b004f8565ef4aemr9599418lfn.39.1688971574888;
+        Sun, 09 Jul 2023 23:46:14 -0700 (PDT)
+Received: from localhost ([185.108.254.55])
+        by smtp.gmail.com with ESMTPSA id o3-20020ac24343000000b004fb99acbbe7sm1586725lfl.231.2023.07.09.23.46.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jul 2023 23:46:14 -0700 (PDT)
+From:   Andreas Hindborg <nmi@metaspace.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list),
+        Johannes Thumshirn <jth@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>, gost.dev@samsung.com,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>
+Subject: [PATCH v7 0/3] ublk: enable zoned storage support
+Date:   Mon, 10 Jul 2023 08:46:03 +0200
+Message-ID: <20230710064607.155155-1-nmi@metaspace.dk>
+X-Mailer: git-send-email 2.41.0
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230707093722.1338589-3-chengming.zhou@linux.dev>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Hi All,
+
+This patch set adds zoned storage support to `ublk`. The first two patches do
+some house cleaning in preparation for the last patch. The last patch adds
+support for report_zones and the following operations:
+
+ - REQ_OP_ZONE_OPEN
+ - REQ_OP_ZONE_CLOSE
+ - REQ_OP_ZONE_FINISH
+ - REQ_OP_ZONE_RESET
+ - REQ_OP_ZONE_APPEND
+
+A user space component based on ubdsrv is available for testing [1] with the
+"loop" target.
+
+Read/write and zone operations are tested with zenfs [2].
+
+The zone append path is tested with fio -> zonefs -> ublk -> null_blk.
+
+The implementation of zone append requires ublk user copy feature, and therefore
+the series is based on branch for-next (6afa337a3789) of [3].
+
+Changes for v7
+ - Style fixes
+ - Rework error handling for `ublk_ctrl_start_dev()`
+ - Remove `BLK_DEV_UBLK_ZONED`
+ - Add check for IO command support on command enqueue
+ - Remove check from `ublk_report_zones()`
+ - Hoist check out of `ublk_revalidate_disk_zones()`
+ - Remove check from `ublk_dev_param_zoned_apply()` when !CONFIG_BLK_DEV_ZONED
+ - Rename `get_nr_zones()` -> `ublk_get_nr_zones()`
+ - Open code `set_nr_zones()` in `ublk_param_zoned_apply()`
+ - Reorder fields of `struct ublk_rq_data` to pack better
+ - Remove redundant checks for chunk_sectors
+ - Hoist check for user not setting zoned parameters for zoned ublk device out
+   of `ublk_param_zoned_validate()`
+ - Remove helper `ublk_dev_params_zoned()`
+
+[1] https://github.com/metaspace/ubdsrv/tree/1ac32cf841b07259cf8b075a5c0006803eeb3981
+[2] https://github.com/westerndigitalcorporation/zenfs
+[3] https://git.kernel.dk/linux.git
+
+Andreas Hindborg (3):
+  ublk: add opcode offsets for DRV_IN/DRV_OUT
+  ublk: add helper to check if device supports user copy
+  ublk: enable zoned storage support
+
+ drivers/block/ublk_drv.c      | 321 ++++++++++++++++++++++++++++++++--
+ include/uapi/linux/ublk_cmd.h |  49 +++++-
+ 2 files changed, 349 insertions(+), 21 deletions(-)
+
+
+base-commit: 3261ea42710e9665c9151006049411bd23b5411f
+-- 
+2.41.0
+
