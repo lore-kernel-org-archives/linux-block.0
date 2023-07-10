@@ -2,142 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 766FCEB64D9
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 06:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D72E2EB64DA
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 06:52:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232068AbjGJGrs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 02:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50300 "EHLO
+        id S229617AbjGJGwq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 02:52:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232055AbjGJGrq (ORCPT
+        with ESMTP id S229662AbjGJGwp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 02:47:46 -0400
-Received: from out-24.mta0.migadu.com (out-24.mta0.migadu.com [91.218.175.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E468E
-        for <linux-block@vger.kernel.org>; Sun,  9 Jul 2023 23:47:43 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1688971661;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hFHrBB4bko1T7CcipHLq8zzquXX/o6IDfKwmotZ7GxM=;
-        b=DIySGC8GNDHey1wTOKKSQIMH13DY+utpZiE8x/xYUw9o5HGuPML6lnZyjimxk/DUpvkqyY
-        TXi4E3QDQxoIl3DVh3fzjTK1Z87y4Si/e9X84usuuoHvKlPo5BvCpk1Vm6qDEwUO6uYzNh
-        iWuOIONcFgIAsU1k7wL6i4n1Owzvi30=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: [PATCH 2/2] blk-flush: don't need to end rq twice for non post-flush requests
-Date:   Mon, 10 Jul 2023 14:47:05 +0800
-Message-ID: <20230710064705.1847287-2-chengming.zhou@linux.dev>
-In-Reply-To: <20230710064705.1847287-1-chengming.zhou@linux.dev>
-References: <20230710064705.1847287-1-chengming.zhou@linux.dev>
+        Mon, 10 Jul 2023 02:52:45 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B463B8;
+        Sun,  9 Jul 2023 23:52:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0WJwmYqGqfC5+F7X8O+8MxIciM7Dnfe4X3/zGG+C5NM=; b=iU4lk5jzwQZah8E0ji7rSHbjxI
+        ++1tF3GKKf7Za5Vx+eTSlYJvNobHySd/+D5glJC0omq0h3xJKlFMOIFhjy86yVJmY9hUeezj6Ro12
+        KGnaVeMWzPhgQBsbJPOpBAoyEF0yXAWLAKbKUrqHd+IHv2/22MXOBL4EYg0aK/faTTJUxe1rYepgx
+        XYyRGwZemGjTiCgqDHqWcB7Iph1ybeIxIzxPKiqeLtHYLL2mqBJBYTnqv4fCmfbWTM+0+RpQOaRgL
+        WlOaGUYITW9gOPAwXOLdgP7etwjsWEultGqoJ3iEM76+d3iFeAdY9dhEtOY8SX/jMaIpKmu4n4TFy
+        uIGKFtXQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qIklD-00AdNW-09;
+        Mon, 10 Jul 2023 06:52:39 +0000
+Date:   Sun, 9 Jul 2023 23:52:39 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Damien Le Moal <dlemoal@kernel.org>,
+        Andreas Hindborg <nmi@metaspace.dk>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
+Message-ID: <ZKuqt6QAXic3wuRX@infradead.org>
+References: <20230706130930.64283-1-nmi@metaspace.dk>
+ <20230706130930.64283-2-nmi@metaspace.dk>
+ <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
+ <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+On Fri, Jul 07, 2023 at 08:59:03AM +0800, Ming Lei wrote:
+> > let's clearly state so. But then, I still not understand why these need
+> > a different naming pattern using the "__UBLK" prefix...
+> 
+> I think __UBLK just meant we don't suggest userspace to use it directly,
+> since the added macros are just for making ranges for DRV_IN and DRV_OUT,
+> so we can check command direction easily be using this start/end info in
+> both sides.
 
-Now we unconditionally blk_rq_init_flush() to replace rq->end_io to
-make rq return twice back to the flush state machine for post-flush.
+Folks, please stop coupling a uapi (or on-disk protocol) too tightly
+to Linux internals.  Think of what makes sense as a communication
+protocol, not what is an internal kernel interface.
 
-Obviously, non post-flush requests don't need it, they don't need to
-end request twice, so they don't need to replace rq->end_io callback.
-And the same for requests with the FUA bit on hardware with FUA support.
+REPORT_ZONES is a sensible command, and supported in ATA/SCSI/NVMe in
+one way or another.  In Linux it is a synchronous method call right now
+for one reason or another, and most implementation map it to a
+passthrough command - be that the actual protocol command or something
+internal for virtio.
 
-So we move blk_rq_init_flush() to REQ_FSEQ_DATA stage and only replace
-rq->end_io if it needs post-flush. Otherwise, it can end like normal
-request and doesn't need to return back to the flush state machine.
-
-There are also some other good points:
-1. all requests on hardware with FUA support won't have post-flush, so
-   all of them don't need to end twice.
-
-2. non post-flush requests won't have RQF_FLUSH_SEQ rq_flags set, so
-   they can merge like normal requests.
-
-3. we don't account non post-flush requests in flush_data_in_flight,
-   since there is no point to defer pending flush for these requests.
-
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-flush.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 094a6adb2718..1b92654e8757 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -93,6 +93,7 @@ enum {
- 
- static void blk_kick_flush(struct request_queue *q,
- 			   struct blk_flush_queue *fq, blk_opf_t flags);
-+static void blk_rq_init_flush(struct request *rq);
- 
- static inline struct blk_flush_queue *
- blk_get_flush_queue(struct request_queue *q, struct blk_mq_ctx *ctx)
-@@ -187,7 +188,15 @@ static void blk_flush_complete_seq(struct request *rq,
- 		break;
- 
- 	case REQ_FSEQ_DATA:
--		fq->flush_data_in_flight++;
-+		/*
-+		 * Only for requests that need post-flush,
-+		 * we need to do rq->end_io replacement trick
-+		 * to return back to the flush state machine.
-+		 */
-+		if (!(rq->flush.seq & REQ_FSEQ_POSTFLUSH)) {
-+			blk_rq_init_flush(rq);
-+			fq->flush_data_in_flight++;
-+		}
- 		spin_lock(&q->requeue_lock);
- 		list_move_tail(&rq->queuelist, &q->flush_list);
- 		spin_unlock(&q->requeue_lock);
-@@ -202,7 +211,13 @@ static void blk_flush_complete_seq(struct request *rq,
- 		 * normal completion and end it.
- 		 */
- 		list_del_init(&rq->queuelist);
--		blk_flush_restore_request(rq);
-+		/*
-+		 * Only for requests that had rq->end_io replaced,
-+		 * we need to restore rq->end_io and make it a normal
-+		 * request before the second end.
-+		 */
-+		if (rq->rq_flags & RQF_FLUSH_SEQ)
-+			blk_flush_restore_request(rq);
- 		blk_mq_end_request(rq, error);
- 		break;
- 
-@@ -389,7 +404,6 @@ static enum rq_end_io_ret mq_flush_data_end_io(struct request *rq,
- 
- static void blk_rq_init_flush(struct request *rq)
- {
--	rq->flush.seq = 0;
- 	rq->rq_flags |= RQF_FLUSH_SEQ;
- 	rq->flush.saved_end_io = rq->end_io; /* Usually NULL */
- 	rq->end_io = mq_flush_data_end_io;
-@@ -424,6 +438,7 @@ bool blk_insert_flush(struct request *rq)
- 	 * the request accounting.
- 	 */
- 	rq->cmd_flags |= REQ_SYNC;
-+	rq->flush.seq = 0;
- 
- 	switch (policy) {
- 	case 0:
-@@ -458,7 +473,6 @@ bool blk_insert_flush(struct request *rq)
- 		 * Mark the request as part of a flush sequence and submit it
- 		 * for further processing to the flush state machine.
- 		 */
--		blk_rq_init_flush(rq);
- 		spin_lock_irq(&fq->mq_flush_lock);
- 		blk_flush_complete_seq(rq, fq, REQ_FSEQ_ACTIONS & ~policy, 0);
- 		spin_unlock_irq(&fq->mq_flush_lock);
--- 
-2.41.0
-
+So for ublk this is just another command like any other, that needs to
+be defined and documented.  Nothing internal or driver specific.
