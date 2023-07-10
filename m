@@ -2,65 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1324CEB64DA
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 15:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6365EB64D9
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 15:04:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232981AbjGJPB1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 11:01:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58912 "EHLO
+        id S233423AbjGJPEB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 11:04:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229954AbjGJPB0 (ORCPT
+        with ESMTP id S233421AbjGJPDx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 11:01:26 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1662C7
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 08:01:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Mon, 10 Jul 2023 11:03:53 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8558DE0;
+        Mon, 10 Jul 2023 08:03:50 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 583B96104B
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 15:01:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FB4CC433C7;
-        Mon, 10 Jul 2023 15:01:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689001282;
-        bh=fRniq925/5zOlOsSs3vy00RTNDr5SQ90nOWzhxQwy44=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=goIqko9ctMkpwlHwPBBnArM5z7bEJy+aEkxJEa0sj0f28/6tmmbSnmeWOqhVGEKx4
-         blerIqBKU53ucaBr6UM852wojaFiujKGFl6XKW+ytyOh1enfu6LQ8Sr6m6kM6/M2xA
-         LW2dyijuq3MySWPH/RFFMypJQlXbgbE1+dcGdUaf/wiRQ0+vhbkWB2Ltjoli734L7o
-         7snAA5m0JRC1YVups9uhmtFgNJUULP9OqvlI3bCCUqNJJmnbTlund8pcBZvQz4U4BH
-         RuHEnnwVbdkaIEoen6H+VuZlybCSCvb7LIIBIfYtwn/mebuXRYqZZHE1daUDNVBfV5
-         e+zHMsegSXwPA==
-Date:   Mon, 10 Jul 2023 09:01:20 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 1/4] block: don't unconditionally set max_discard_sectors
- in blk_queue_max_discard_sectors
-Message-ID: <ZKwdQJB3X9OGjr9Y@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230707094616.108430-1-hch@lst.de>
- <20230707094616.108430-2-hch@lst.de>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 035181FDD1;
+        Mon, 10 Jul 2023 15:03:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1689001429; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=n/qf8t736MhnMG6cgOeDWCdeGz1fhgazOeOiizGpyF8=;
+        b=yvfEOh8xCXsPeFjboveHYNYtFBjZ4PxI4cCPf11WU2ffQrVJILoDI4I03maqJRHPi+1wWE
+        2OOt4Dz7nGL+iaiLepNZ6WoXBIdLSKEWut398C94OT00nMKScVeooF8b6kx4fjMg0QGqNk
+        qz3e5AknEMS3ERBbdUu/QtfUCJPeXWo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1689001429;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=n/qf8t736MhnMG6cgOeDWCdeGz1fhgazOeOiizGpyF8=;
+        b=re341B1pPYvrLz9MDRB7/fTJn1PKA7vOV91pL15Ld6o9yKp7rsQTJxYoYEe0MlmsY680KV
+        tOk69sJYluVRJXCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E9A3B13A05;
+        Mon, 10 Jul 2023 15:03:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id wfzpONQdrGQ6VgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Mon, 10 Jul 2023 15:03:48 +0000
+Date:   Mon, 10 Jul 2023 17:03:48 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Message-ID: <cskolyrp3s47gnn4nwtqpfxtafzhpirn3hv7ovhnnzpbb3ll2z@oum3v3n7go6l>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-3-dwagner@suse.de>
+ <9c07e4f6-2cf5-b53b-6b48-bd4df8798ee9@nvidia.com>
+ <bz2s6nyjwl6l7yfrd4wtjdtousv23ypcdleckibps5lyjpwi4x@wqq6qqesevpk>
+ <39f9977e-b34c-f2dd-d356-8c78414a60d1@nvidia.com>
+ <jdsoqllqmrqu5j5bt3fudkksmjskgs4ooodynm6yh3b4oc5scn@t3hydrmbb22f>
+ <972a06e0-6841-043e-fc00-db7596f664c4@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230707094616.108430-2-hch@lst.de>
+In-Reply-To: <972a06e0-6841-043e-fc00-db7596f664c4@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 07, 2023 at 11:46:13AM +0200, Christoph Hellwig wrote:
->  {
->  	q->limits.max_hw_discard_sectors = max_discard_sectors;
-> -	q->limits.max_discard_sectors = max_discard_sectors;
-> +	if (!q->limits.max_discard_sectors ||
-> +	     q->limits.max_discard_sectors > max_discard_sectors)
-> +		q->limits.max_discard_sectors = max_discard_sectors;
+On Mon, Jul 10, 2023 at 03:31:23PM +0300, Max Gurtovoy wrote:
+> I think it is more than just commit message.
 
-Could simplify to min_not_zero().
+Okay, starting to understand what's the problem.
 
-But this only allows you to make the limit smaller. If the user never
-set max_discard_sectors before, and a firmware update allows a larger
-max_hw_discard_sectors, the subsequent rescan won't use the new limit.
+> A lot of code that we can avoid was added regarding the --context cmdline
+> argument.
+
+Correct and it's not optional to get the tests passing for the fc transport.
+
+> Maybe it's worth cleaning it..
+
+It really solves the problem that the autoconnect setup of nvme-cli is
+distrubing the tests (*). The only other way I found to stop the autoconnect is
+by disabling the udev rule completely. If autoconnect isn't enabled the context
+isn't necessary. Though changing system configuration from blktests seems at bit
+excessive.
+
+Another option is to detect if autoconect is enabled and report this when
+starting the tests. In this case we could remove the context part completely.
+Obviously, I would prefer to keep it but I am certaintaly not against dropping
+it and make blktests a bit simpler if this is the preference. I just need to
+remember to disable the autoconnect stuff when using blktests.
+
+(*) Sure we can fix this but at this point. Though I think it's a bit strange
+for a test suite to depend/interact with external components in this way.
