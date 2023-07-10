@@ -2,239 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D742EB64D9
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 11:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C256EB64D9
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 12:11:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230295AbjGJLIU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 07:08:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33082 "EHLO
+        id S229714AbjGJMLm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 08:11:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230358AbjGJLH4 (ORCPT
+        with ESMTP id S231195AbjGJMLl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 07:07:56 -0400
-Received: from out-54.mta0.migadu.com (out-54.mta0.migadu.com [91.218.175.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 676CB100
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 04:07:25 -0700 (PDT)
-Message-ID: <8928ca13-6a21-b2b4-4a19-82caa62088d0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1688987243;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+BxwmB/IVzDHyLZLGoqDjs9171gZUFnngYqFZMutAq4=;
-        b=WRv7ZPTPu2m7PPyDENKW/5UnJFCAwVpmEanVUF8Lfb5zE4oZqCydFXOu7EyN4TOhs71y1t
-        WsfUzJ8gkSVOtPIsbtcOdqxXx63T3LusFve3O5xppmeApI/8dMH2YCVVPx7Jx82qLznB0U
-        uzatbsgLpwJyo8Q5F8pLTTrz3HR0Jhc=
-Date:   Mon, 10 Jul 2023 19:07:13 +0800
+        Mon, 10 Jul 2023 08:11:41 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E8D123;
+        Mon, 10 Jul 2023 05:11:40 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 3FA226732D; Mon, 10 Jul 2023 14:11:36 +0200 (CEST)
+Date:   Mon, 10 Jul 2023 14:11:36 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     chengming.zhou@linux.dev
+Cc:     axboe@kernel.dk, hch@lst.de, tj@kernel.org, ming.lei@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+Subject: Re: [PATCH v5] blk-mq: fix start_time_ns and alloc_time_ns for
+ pre-allocated rq
+Message-ID: <20230710121136.GA17422@lst.de>
+References: <20230710105516.2053478-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 1/3] blk-mq: always use __blk_mq_alloc_requests() to
- alloc and init rq
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
-        Chengming Zhou <zhouchengming@bytedance.com>
-References: <20230628124546.1056698-1-chengming.zhou@linux.dev>
- <20230628124546.1056698-2-chengming.zhou@linux.dev>
- <20230629052828.GD16819@lst.de>
- <f91c32b3-1d3b-b28c-40cb-2edf02448f22@bytedance.com>
- <20230710073631.GA29077@lst.de>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <20230710073631.GA29077@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710105516.2053478-1-chengming.zhou@linux.dev>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/7/10 15:36, Christoph Hellwig wrote:
-> On Thu, Jun 29, 2023 at 03:40:03PM +0800, Chengming Zhou wrote:
->> Thanks for your review!
->>
->> Since hctx-specific allocation path always has BLK_MQ_REQ_NOWAIT flag,
->> it won't retry.
->>
->> But I agree, this makes the general __blk_mq_alloc_requests() more complex.
-> 
-> And also very confusing as it pretends to share some code, while almost
-> nothing of __blk_mq_alloc_requests is actually used.
+As a personal preference I kinda hate the empty ?:, but otherwise this
+looks good;
 
-You are right.
-
-I will not mess with reusing __blk_mq_alloc_requests() in the next version.
-
-> 
->> The reason is blk_mq_rq_ctx_init() has some data->rq_flags initialization:
->>
->> ```
->> if (data->flags & BLK_MQ_REQ_PM)
->> 	data->rq_flags |= RQF_PM;
->> if (blk_queue_io_stat(q))
->> 	data->rq_flags |= RQF_IO_STAT;
->> rq->rq_flags = data->rq_flags;
->> ```
->>
->> Because we need this data->rq_flags to tell if we need start_time_ns,
->> we need to put these initialization in the callers of blk_mq_rq_ctx_init().
-> 
-> Why can't we just always initialize the time stampts after
-> blk_mq_rq_ctx_init? Something like this (untested) variant of your
-> patch 2 from the latest iteration:
-
-I get what you mean: always initialize the two time stamps after blk_mq_rq_ctx_init(),
-so we know whether the time stamps are needed in blk_mq_rq_time_init().
-
-It seems better and clearer indeed, I will try to change as you suggest.
-
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 5504719b970d59..55bf1009f3e32a 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -328,8 +328,26 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
->  }
->  EXPORT_SYMBOL(blk_rq_init);
->  
-> +/* Set alloc and start time when pre-allocated rq is actually used */
-> +static inline void blk_mq_rq_time_init(struct request *rq, bool set_alloc_time)
-
-We need to pass "u64 alloc_time_ns" here, which includes depth and tag waits time by definition.
-
-So:
-1. for non-batched request that need alloc_time_ns: passed alloc_time_ns != 0
-2. for batched request that need alloc_time_ns: passed alloc_time_ns == 0, will be set to start_time_ns
-
-I have just updated the patch:
-https://lore.kernel.org/all/20230710105516.2053478-1-chengming.zhou@linux.dev/
-
-Thanks!
-
-
-> +{
-> +	if (blk_mq_need_time_stamp(rq)) {
-> +		u64 now = ktime_get_ns();
-> +
-> +#ifdef CONFIG_BLK_RQ_ALLOC_TIME
-> +		/*
-> +		 * The alloc time is only used by iocost for now,
-> +		 * only possible when blk_mq_need_time_stamp().
-> +		 */
-> +		if (set_alloc_time)
-> +			rq->alloc_time_ns = now;
-> +#endif
-> +		rq->start_time_ns = now;
-> +	}
-> +}
-> +
->  static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
-> -		struct blk_mq_tags *tags, unsigned int tag, u64 alloc_time_ns)
-> +		struct blk_mq_tags *tags, unsigned int tag)
->  {
->  	struct blk_mq_ctx *ctx = data->ctx;
->  	struct blk_mq_hw_ctx *hctx = data->hctx;
-> @@ -356,14 +374,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->  	}
->  	rq->timeout = 0;
->  
-> -	if (blk_mq_need_time_stamp(rq))
-> -		rq->start_time_ns = ktime_get_ns();
-> -	else
-> -		rq->start_time_ns = 0;
->  	rq->part = NULL;
-> -#ifdef CONFIG_BLK_RQ_ALLOC_TIME
-> -	rq->alloc_time_ns = alloc_time_ns;
-> -#endif
->  	rq->io_start_time_ns = 0;
->  	rq->stats_sectors = 0;
->  	rq->nr_phys_segments = 0;
-> @@ -393,8 +404,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->  }
->  
->  static inline struct request *
-> -__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
-> -		u64 alloc_time_ns)
-> +__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
->  {
->  	unsigned int tag, tag_offset;
->  	struct blk_mq_tags *tags;
-> @@ -413,7 +423,7 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
->  		tag = tag_offset + i;
->  		prefetch(tags->static_rqs[tag]);
->  		tag_mask &= ~(1UL << i);
-> -		rq = blk_mq_rq_ctx_init(data, tags, tag, alloc_time_ns);
-> +		rq = blk_mq_rq_ctx_init(data, tags, tag);
->  		rq_list_add(data->cached_rq, rq);
->  		nr++;
->  	}
-> @@ -427,12 +437,13 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
->  static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
->  {
->  	struct request_queue *q = data->q;
-> +	bool set_alloc_time = blk_queue_rq_alloc_time(q);
->  	u64 alloc_time_ns = 0;
->  	struct request *rq;
->  	unsigned int tag;
->  
->  	/* alloc_time includes depth and tag waits */
-> -	if (blk_queue_rq_alloc_time(q))
-> +	if (set_alloc_time)
->  		alloc_time_ns = ktime_get_ns();
->  
->  	if (data->cmd_flags & REQ_NOWAIT)
-> @@ -474,9 +485,11 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
->  	 * Try batched alloc if we want more than 1 tag.
->  	 */
->  	if (data->nr_tags > 1) {
-> -		rq = __blk_mq_alloc_requests_batch(data, alloc_time_ns);
-> -		if (rq)
-> +		rq = __blk_mq_alloc_requests_batch(data);
-> +		if (rq) {
-> +			blk_mq_rq_time_init(rq, true);
->  			return rq;
-> +		}
->  		data->nr_tags = 1;
->  	}
->  
-> @@ -499,8 +512,10 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
->  		goto retry;
->  	}
->  
-> -	return blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag,
-> -					alloc_time_ns);
-> +	rq = blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag);
-> +	if (rq)
-> +		blk_mq_rq_time_init(rq, set_alloc_time);
-> +	return rq;
->  }
->  
->  static struct request *blk_mq_rq_cache_fill(struct request_queue *q,
-> @@ -555,6 +570,7 @@ static struct request *blk_mq_alloc_cached_request(struct request_queue *q,
->  			return NULL;
->  
->  		plug->cached_rq = rq_list_next(rq);
-> +		blk_mq_rq_time_init(rq, blk_queue_rq_alloc_time(rq->q));
->  	}
->  
->  	rq->cmd_flags = opf;
-> @@ -656,8 +672,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->  	tag = blk_mq_get_tag(&data);
->  	if (tag == BLK_MQ_NO_TAG)
->  		goto out_queue_exit;
-> -	rq = blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag,
-> -					alloc_time_ns);
-> +	rq = blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag);
-> +	blk_mq_rq_time_init(rq, blk_queue_rq_alloc_time(rq->q));
->  	rq->__data_len = 0;
->  	rq->__sector = (sector_t) -1;
->  	rq->bio = rq->biotail = NULL;
-> @@ -2896,6 +2912,7 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
->  	plug->cached_rq = rq_list_next(rq);
->  	rq_qos_throttle(q, *bio);
->  
-> +	blk_mq_rq_time_init(rq, blk_queue_rq_alloc_time(rq->q));
->  	rq->cmd_flags = (*bio)->bi_opf;
->  	INIT_LIST_HEAD(&rq->queuelist);
->  	return rq;
+Reviewed-by: Christoph Hellwig <hch@lst.de>
