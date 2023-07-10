@@ -2,114 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB1F1EB64DC
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 18:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A57FEEB64DA
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 19:05:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230227AbjGJSCw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 14:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35010 "EHLO
+        id S230020AbjGJTFE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 15:05:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230449AbjGJSCw (ORCPT
+        with ESMTP id S229468AbjGJTFE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 14:02:52 -0400
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9557128
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 11:02:50 -0700 (PDT)
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-263036d4bc3so3495438a91.2
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 11:02:50 -0700 (PDT)
+        Mon, 10 Jul 2023 15:05:04 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFAF811A
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 12:05:02 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-66872dbc2efso1265784b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 12:05:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689015902; x=1691607902;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aWV26TGTy3//l4E8aINjjrrFmjWk+bhHVAYRbt8sCmU=;
+        b=ha8s51UziKSy71k2xdq/HxMISTidO5E4MSfVEkbd/2Dmsmt/hzlzlaqyZ3QKafuskq
+         tMvsVykze5yopOTsBYAaCFhBh4/cKOeUEtCcVqj51biTkQ6aQ9Mz5my/LfteY+ggblqQ
+         mqLgXStpUN75A7TGSaXsrZyZ3WnYeB4liYqIGjUZxCbObfD1deu9enytYR+BnATTO0z3
+         e3TMEtcFPsi/V1CSz0c/RG/mtyS1hYHXJTYdfIXQjlRuzXTkUvgCuVDBtE4pjyjBD4bX
+         cIw2LH6DhcZjD31/xHzP9TFyjGnNcazZTQUj9M+4vfnYBLL1aD0iQzQb1kE+ZUBWZ4s5
+         ouow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689012170; x=1691604170;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2EY7/MdXMbHZJmt1qUeo9JN1ygy4O7c3IfbaOSwHr8k=;
-        b=XnWcS9KUONIGx9K8wxPvn11tsnyRYrW6u7kQ61AWlLKEcq03sU3WvpzIVrAFE8jP16
-         tfE+37w6LVqOLNiG6Per9CdaxDKlO2O1XZlRdUsorkLh95bIBh4aZDt1wt6nYAvDdPxS
-         BIqV344uRV1WqHae+batLDq/9mD1D+IcYV/GDnlHlGTpMjEFIudL5yBEpgl9hiv/si4H
-         weh0SZ475egXeQDDWrvUJFgfbr6T69GOsTXEzACGbfsLojW7opq1MdLPtN/N+YGKh58+
-         4GNCGWqwX/zLRgL+ql8SqHdCo+QHQ9toS9y7FiJsW1H8tv3yytZ2rEMWc6F2VzUFn5KQ
-         Bxug==
-X-Gm-Message-State: ABy/qLZ2vUhq0/83hSGP/Rgd+BuBusm3DBasfr1OP9uqPVg7qNn2cI4S
-        ePplr29l3zEG7Zbkk9T3++s=
-X-Google-Smtp-Source: APBJJlGrQQgCP319ix8sUw1znhWbJPNJRoutDjk3xbjqoKuGIdOQy/DSzvAH0IP6G71y/xwEDj4rRQ==
-X-Received: by 2002:a17:90b:283:b0:263:45c3:b17c with SMTP id az3-20020a17090b028300b0026345c3b17cmr14045721pjb.14.1689012170178;
-        Mon, 10 Jul 2023 11:02:50 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:e582:53b1:a691:ab70])
-        by smtp.gmail.com with ESMTPSA id gt4-20020a17090af2c400b00263f446d432sm6531846pjb.43.2023.07.10.11.02.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 11:02:49 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Asutosh Das <quic_asutoshd@quicinc.com>,
-        Bean Huo <beanhuo@micron.com>,
-        Jinyoung Choi <j-young.choi@samsung.com>,
-        Ziqi Chen <quic_ziqichen@quicinc.com>,
-        Arthur Simchaev <Arthur.Simchaev@wdc.com>,
-        Adrien Thierry <athierry@redhat.com>
-Subject: [PATCH v2 5/5] scsi: ufs: Enable zoned write pipelining
-Date:   Mon, 10 Jul 2023 11:01:42 -0700
-Message-ID: <20230710180210.1582299-6-bvanassche@acm.org>
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-In-Reply-To: <20230710180210.1582299-1-bvanassche@acm.org>
-References: <20230710180210.1582299-1-bvanassche@acm.org>
+        d=1e100.net; s=20221208; t=1689015902; x=1691607902;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aWV26TGTy3//l4E8aINjjrrFmjWk+bhHVAYRbt8sCmU=;
+        b=ffucJs2IV1Cd5SU+puWlrwb24WuzoRcvhCqUJsrCnXwNCRa7kXi501D7mt9a/AANmf
+         VErsaHy9c3ugX8qPTGhtQIxnc9pvRKFc/VGXVIdiinf2vsIAUw4WfMv9eSAKxlnAo1GY
+         ARe+XCY1N0xA81vu7g6I1K0/Ixitnq36NKnnlqAEWs3IokyB0hIRekrU47sVCE4ocIHj
+         V1EV8GxpoBt9StIPuGCpCZK+nB23eStL8EDEWbD6ueh/lSMoDO4IXLywq3BoW4Mtms5Q
+         YOZGM980SmXo83V0jE9qt1Qh2OC9mqWZ0uTG34weNbE2Slt0Tx5p73p+vdR4Rz3uFN+d
+         GALg==
+X-Gm-Message-State: ABy/qLYsOlqG6qr/sRfx32CTuN6T2GfSxRtcb7Hz0HkXG4H3+9HOV3ZM
+        JbQRo0sNkUjrHv8r8B8QmlpVM6b81VSW7CudamE=
+X-Google-Smtp-Source: APBJJlEiIWLxcSKnACk8shroBBJlI/U6S4QvWokhBzawLykUkcAHFBh46fnGScu9KFgpew7U4EXhlQ==
+X-Received: by 2002:a17:902:ea0a:b0:1b3:ec39:f42c with SMTP id s10-20020a170902ea0a00b001b3ec39f42cmr17068822plg.5.1689015902396;
+        Mon, 10 Jul 2023 12:05:02 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id c3-20020a170902724300b001b1c3542f57sm241949pll.103.2023.07.10.12.05.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jul 2023 12:05:01 -0700 (PDT)
+Message-ID: <2ade2716-d875-5e4c-82ce-c4c7f00f1bbc@kernel.dk>
+Date:   Mon, 10 Jul 2023 13:05:00 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2 3/4] brd: enable discard
+Content-Language: en-US
+To:     Mikulas Patocka <mpatocka@redhat.com>,
+        Li Nan <linan666@huaweicloud.com>
+Cc:     Zdenek Kabelac <zkabelac@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+References: <alpine.LRH.2.02.2209201350470.26058@file01.intranet.prod.int.rdu2.redhat.com>
+ <alpine.LRH.2.02.2209201358120.26535@file01.intranet.prod.int.rdu2.redhat.com>
+ <ace0451f-b979-be13-cf47-a8cb3656c72e@huaweicloud.com>
+ <4b6788d2-c6e1-948-22d-dbb7cbba657d@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <4b6788d2-c6e1-948-22d-dbb7cbba657d@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
-"The host controller always process transfer requests in-order according
-to the order submitted to the list. In case of multiple commands with
-single doorbell register ringing (batch mode), The dispatch order for
-these transfer requests by host controller will base on their index in
-the List. A transfer request with lower index value will be executed
-before a transfer request with higher index value."
+On 7/10/23 9:24?AM, Mikulas Patocka wrote:
+> 
+> 
+> On Mon, 10 Jul 2023, Li Nan wrote:
+> 
+>> Hi, Mikulas
+>>
+>> The lack of discard in ramdisk can cause some issues related to dm. see:
+>> https://lore.kernel.org/all/20220228141354.1091687-1-luomeng12@huawei.com/
+>>
+>> I noticed that your patch series has already supported discard for brd. But
+>> this patch series has not been applied to mainline at present, may I ask if
+>> you still plan to continue working on it?
+>>
+>> -- 
+>> Thanks,
+>> Nan
+> 
+> Hi
+> 
+> I got no response from ramdisk maintainer Jens Axboe. We should ask him, 
+> whether he doesn't want discard on ramdisk at all or whether he wants it.
 
-From the UFSHCI 4.0 specification, about the MCQ mode:
-"Command Submission
-1. Host SW writes an Entry to SQ
-2. Host SW updates SQ doorbell tail pointer
+When a series is posted and reviewers comment on required changes, I
+always wait for a respin of that series with those addressed. That
+didn't happen, so this didn't get applied.
 
-Command Processing
-3. After fetching the Entry, Host Controller updates SQ doorbell head
-   pointer
-4. Host controller sends COMMAND UPIU to UFS device"
+-- 
+Jens Axboe
 
-In other words, for both legacy and MCQ mode, UFS controllers are
-required to forward commands to the UFS device in the order these
-commands have been received from the host.
-
-Note: for legacy mode this is only correct if the host submits one
-command at a time. The UFS driver does this.
-
-This patch improves small write IOPS by about 150% on my test setup.
-
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc: Avri Altman <avri.altman@wdc.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/ufs/core/ufshcd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index e7e79f515e14..8d0e495ae6fa 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -5146,6 +5146,7 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
- 
- 	ufshcd_hpb_configure(hba, sdev);
- 
-+	blk_queue_flag_set(QUEUE_FLAG_PIPELINE_ZONED_WRITES, q);
- 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
- 	if (hba->quirks & UFSHCD_QUIRK_4KB_DMA_ALIGNMENT)
- 		blk_queue_update_dma_alignment(q, 4096 - 1);
