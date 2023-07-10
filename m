@@ -2,103 +2,61 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F12C0015E
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 09:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25196EB64DC
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 09:33:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229940AbjGJJ2q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 05:28:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49306 "EHLO
+        id S233195AbjGJJdM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 05:33:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232049AbjGJJ2e (ORCPT
+        with ESMTP id S232671AbjGJJcL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 05:28:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5362A8E
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 02:27:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688981263;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5kwkHvApEdStfVKInGVUfBcOvlOglFnlYRPePfAzvXw=;
-        b=Z0bEgaqUC11J59aPuw20dIEA4o0f21AEhc0nqy3WU2Ra9JYHW1sVEpL8rReusnEcPlseJG
-        DKSKrXvZi7+vQ13Xo8If4nXuIrXS+A+9tEKPR0tBbDipjt+CbTmDKYXYq/2vvbmDtfxSoz
-        5W/MbPyxqqyJAFdtjVxwy5aO/GOyQk4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-368-ibukddyLMGWg4o0lITkHGw-1; Mon, 10 Jul 2023 05:27:36 -0400
-X-MC-Unique: ibukddyLMGWg4o0lITkHGw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 344FA1C03D8F;
-        Mon, 10 Jul 2023 09:27:36 +0000 (UTC)
-Received: from ovpn-8-31.pek2.redhat.com (ovpn-8-33.pek2.redhat.com [10.72.8.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D0B822166B26;
-        Mon, 10 Jul 2023 09:27:28 +0000 (UTC)
-Date:   Mon, 10 Jul 2023 17:27:23 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Damien Le Moal <dlemoal@kernel.org>,
-        Andreas Hindborg <nmi@metaspace.dk>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>, ming.lei@redhat.com
-Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
-Message-ID: <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
-References: <20230706130930.64283-1-nmi@metaspace.dk>
- <20230706130930.64283-2-nmi@metaspace.dk>
- <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
- <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
- <ZKuqt6QAXic3wuRX@infradead.org>
+        Mon, 10 Jul 2023 05:32:11 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6CAC1715
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 02:30:45 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3facc7a4e8aso9014175e9.0
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 02:30:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688981370; x=1691573370;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=TUJ0McwBWfefuisHs1dJUs2fOEeDEmLCOetq4CUSnjkjzKsqJnxYNquP5R61GzHJtf
+         JzJr/ly0EygI6c+o9HVAoO7CxQnPuqerdb8TlPif3tnuQLRiwfAV5EGckXZCLA40Nv4S
+         +eKw43l/btEOy2x3tYdb8AOY3pKSTJ3qU8VsxjFVBvPvsxtT/yGzmgbVnTt2Kzqoi16K
+         eC8NJu8thrrDZBcwCO8lMybfSJtX17Pc3oXJgwRpv22aXle4SPn9aqG2+9oZ05aQ9qTy
+         lL19W0vROQKRxC1JdiELG/LlLcc0nP34jxqsmjdWk2rpvqWBmxCJjoto/lRbo18TDFW6
+         aC+g==
+X-Gm-Message-State: ABy/qLYK9KkzAU/apLUyIccvlX+89MrXd+ngsYt3UYy/mhdr2gIoHI1p
+        k4cmTQeCFZU0+x7Fru2uG+E=
+X-Google-Smtp-Source: APBJJlEICPLIIB8HPjX1V78fyHKqZt4Ymy34m8iOn29c0ojF0TgRk/U76vBiUo6Dp3FY9lpoacB2cw==
+X-Received: by 2002:a05:600c:4709:b0:3f6:8a3:8e59 with SMTP id v9-20020a05600c470900b003f608a38e59mr12498101wmo.1.1688981369684;
+        Mon, 10 Jul 2023 02:29:29 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id 11-20020a05600c230b00b003fbaade0735sm9724982wmo.19.2023.07.10.02.29.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jul 2023 02:29:29 -0700 (PDT)
+Message-ID: <5f6ea693-d4b7-8117-9151-3666ea86e59f@grimberg.me>
+Date:   Mon, 10 Jul 2023 12:29:28 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZKuqt6QAXic3wuRX@infradead.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 1/4] block: don't unconditionally set max_discard_sectors
+ in blk_queue_max_discard_sectors
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20230707094616.108430-1-hch@lst.de>
+ <20230707094616.108430-2-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230707094616.108430-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 09, 2023 at 11:52:39PM -0700, Christoph Hellwig wrote:
-> On Fri, Jul 07, 2023 at 08:59:03AM +0800, Ming Lei wrote:
-> > > let's clearly state so. But then, I still not understand why these need
-> > > a different naming pattern using the "__UBLK" prefix...
-> > 
-> > I think __UBLK just meant we don't suggest userspace to use it directly,
-> > since the added macros are just for making ranges for DRV_IN and DRV_OUT,
-> > so we can check command direction easily be using this start/end info in
-> > both sides.
-> 
-> Folks, please stop coupling a uapi (or on-disk protocol) too tightly
-> to Linux internals.  Think of what makes sense as a communication
-> protocol, not what is an internal kernel interface.
-> 
-> REPORT_ZONES is a sensible command, and supported in ATA/SCSI/NVMe in
-> one way or another.  In Linux it is a synchronous method call right now
-> for one reason or another, and most implementation map it to a
-> passthrough command - be that the actual protocol command or something
-> internal for virtio.
-> 
-> So for ublk this is just another command like any other, that needs to
-> be defined and documented.  Nothing internal or driver specific.
- 
-Yes, that is exactly what we are doing.
-
-The added macros of UBLK_IO_OP_DRV_IN_START[END] are just for supporting
-more ublk passthrough commands, and the motivation is for running
-check(such as buffer direction) in two sides easily.
-
-However, I think it is just fine to delay to add it until introducing
-the 2nd ublk pt command.
-
-Thanks, 
-Ming
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
