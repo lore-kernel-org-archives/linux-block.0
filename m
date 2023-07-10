@@ -2,65 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5495C001B0
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 07:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D55D8EB64D9
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jul 2023 08:27:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232260AbjGJH4n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 03:56:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57080 "EHLO
+        id S232907AbjGJI1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 04:27:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232294AbjGJH4k (ORCPT
+        with ESMTP id S232530AbjGJI1X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 03:56:40 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8AB9106;
-        Mon, 10 Jul 2023 00:56:38 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6454D67373; Mon, 10 Jul 2023 09:56:35 +0200 (CEST)
-Date:   Mon, 10 Jul 2023 09:56:34 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Chuck Lever III <chuck.lever@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Chuck Lever <cel@kernel.org>
-Subject: Re: NFS workload leaves nfsd threads in D state
-Message-ID: <20230710075634.GA30120@lst.de>
-References: <7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com>
+        Mon, 10 Jul 2023 04:27:23 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D07124;
+        Mon, 10 Jul 2023 01:27:19 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 24C5021E8D;
+        Mon, 10 Jul 2023 08:27:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1688977638; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UIZvDVy9k/7OMTz4A4x2ug9kFE4VMtfrWhDBOUfK4Mg=;
+        b=D1duItWpVprF4m7rIL37r/2RswiHoIOPBjUPTljv7afso5npmgIyJIhZSxI3AZ0eTshORs
+        /tebehspJiJRXL2HV5l6iJoOUmp82xp00hPCVB+waC4mSljUy1O9bQKZ04cpEMzHTO8+fc
+        xsv7x5IJro01X+CKAIujb3+/2TyKE9c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1688977638;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UIZvDVy9k/7OMTz4A4x2ug9kFE4VMtfrWhDBOUfK4Mg=;
+        b=h9IHnAzUbdOUzsHPmGdRZwgsRo3pBNef5WKps6f8Bm7OFmvWtfW2VYZo9J99N4Td0t7/p5
+        qCgCRAyov7EpJrBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1402E1361C;
+        Mon, 10 Jul 2023 08:27:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Wm0iBObAq2ShDQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Mon, 10 Jul 2023 08:27:18 +0000
+Date:   Mon, 10 Jul 2023 10:27:17 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Message-ID: <bz2s6nyjwl6l7yfrd4wtjdtousv23ypcdleckibps5lyjpwi4x@wqq6qqesevpk>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-3-dwagner@suse.de>
+ <9c07e4f6-2cf5-b53b-6b48-bd4df8798ee9@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <9c07e4f6-2cf5-b53b-6b48-bd4df8798ee9@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 08, 2023 at 06:30:26PM +0000, Chuck Lever III wrote:
-> Hi -
+On Thu, Jul 06, 2023 at 07:11:58PM +0300, Max Gurtovoy wrote:
 > 
-> I have a "standard" test of running the git regression suite with
-> many threads against an NFS mount. I found that with 6.5-rc, the
-> test stalled and several nfsd threads on the server were stuck
-> in D state.
-
-Can you paste the exact reproducer here?
-
-> I can reproduce this stall 100% with both an xfs and an ext4
-> export, so I bisected with both, and both bisects landed on the
-> same commit:
-
-> On system 1: the exports are on top of /dev/mapper and reside on
-> an "INTEL SSDSC2BA400G3" SATA device.
 > 
-> On system 2: the exports are on top of /dev/mapper and reside on
-> an "INTEL SSDSC2KB240G8" SATA device.
+> On 20/06/2023 16:27, Daniel Wagner wrote:
+> > When the host has enabled the udev/systemd autoconnect services for the
+> > fc transport it interacts with blktests and make tests break.
+> > 
+> > nvme-cli learned to ignore connects attemps when using the
+> > --context command line option paired with a volatile configuration. Thus
+> > we can mark all the resources created by blktests and avoid any
+> > interaction with the systemd autoconnect scripts.
 > 
-> System 1 was where I discovered the stall. System 2 is where I ran
-> the bisects.
+> why would we like to ignore connect attempts during blktests ?
 
-Ok. I'd be curious if this reproducers without either device mapper
-or on a non-SATA device.  If you have an easy way to run it in a VM
-that'd be great.  Otherwise I'll try to recreate it in various
-setups if you post the exact reproducer.
+The problem I observed is that there were two connect attempts (one triggered
+via udev and one via the test itself) which disturbed the test. The interference
+resulted into a complete hang of the test case:
 
+https://lore.kernel.org/linux-nvme/6g53yj5afhhonwf2psf7ft2gkakkwewy7klkix3y3u6uclpa5w@tt2yfzigyxgg/
+
+> We define unique nqn/ids/etc. So we never should disturb other running
+> services, unless it uses the same parameters, which shouldn't happen.
+
+Yes, that should do the decoupling between udev and blktests.
+
+> Agree on setting the hard coded values for hostnqn and hostid instead of
+> reading the /etc/nvme/* files. This should do the work IMO, isn't it ?
+
+Do you mean that nvme-cli will ignore the udev trigger when a different hostnqn
+is invovled? At least for the well-known discover controller the hostqnq
+doesn't work. Though not sure if I understood you correctly here.
