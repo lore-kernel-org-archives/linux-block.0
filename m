@@ -2,111 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF58EB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 01:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9DEEB64D9
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 01:52:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230408AbjGKBe1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 21:34:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41900 "EHLO
+        id S229564AbjGKBwn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jul 2023 21:52:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230125AbjGKBe0 (ORCPT
+        with ESMTP id S229532AbjGKBwm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 21:34:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C77E3
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 18:33:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689039217;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2O7OTXUeRoU92HpC9S8grafoZ034oHB9LUwzT8GPQm8=;
-        b=VPwBRk2S7rACcIjARQzYduZM6GuSLRInEA/Z4u5Cv55DtZTFK6SDUzS/FO97Za+8kABy6r
-        W6/izgZ40bOTco++Aq5dWeNqeBqkKZ8eiKJwJzC4Ug9Y0ydqKQT9JhOXYC3RppzVgklRR3
-        s744kRztDj4NwB3MwiE71v358I3xKYc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-92-O6L_ttexNva64r-mu9ol2Q-1; Mon, 10 Jul 2023 21:33:34 -0400
-X-MC-Unique: O6L_ttexNva64r-mu9ol2Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 10 Jul 2023 21:52:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4515F83
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 18:52:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8616F38149A2;
-        Tue, 11 Jul 2023 01:33:33 +0000 (UTC)
-Received: from ovpn-8-26.pek2.redhat.com (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF3FBC09A09;
-        Tue, 11 Jul 2023 01:33:24 +0000 (UTC)
-Date:   Tue, 11 Jul 2023 09:33:18 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Wen Xiong <wenxiong@linux.ibm.com>,
-        Dave Young <dyoung@redhat.com>, kexec@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        Thomas Gleixner <tglx@linutronix.de>, ming.lei@redhat.com
-Subject: Re: [PATCH 2/2] nvme-pci: use blk_mq_max_nr_hw_queues() to calculate
- io queues
-Message-ID: <ZKyxXgJXk0XPBxe2@ovpn-8-26.pek2.redhat.com>
-References: <20230708020259.1343736-1-ming.lei@redhat.com>
- <20230708020259.1343736-3-ming.lei@redhat.com>
- <20230710064109.GB24519@lst.de>
- <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
- <ZKw3H2cJzRPZa29N@kbusch-mbp.dhcp.thefacebook.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CD7C2612B3
+        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 01:52:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1876CC433C7;
+        Tue, 11 Jul 2023 01:52:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689040360;
+        bh=VD4UA3FmBNKe8eY3oREXjE16rkJlGFNi6Yi7HmagwTI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AFBKevx4+IouTLD58JAcDCiExpaRXiX0nczWfXa0tMNtQZyG9L89gWJU35jxAjz8O
+         x+/Y4AvzgetDZHmx3gg9LNvmuzys26u9hIbCKeAaNzabCb5lWbCo6IzEoTKunkPLbs
+         KxtPHM4zFYYij/DgBJGhmpzY3/AnbX74Qburgd9GvPLDZXxBGmUoqYcj9MkdLTrfVj
+         B3Pc1dBQ8VG9MlLIa7Lo6g/c3EvwEXSGIJ4sNdS0CYKoKKOqCcx3uW4T4Nk45LqHmb
+         ag9NlvDe0dUq9tWLv39748ikr44vuKxpNjzENYTWhn384YmVhDJMro+R2bxx+jXR4f
+         IRwhFfUrq1WjQ==
+Date:   Mon, 10 Jul 2023 18:52:38 -0700
+From:   Jaegeuk Kim <jaegeuk@kernel.org>
+To:     Damien Le Moal <dlemoal@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, chao@kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org
+Subject: Re: [PATCH] f2fs: don't reopen the main block device in
+ f2fs_scan_devices
+Message-ID: <ZKy15tpRQjja6s/5@google.com>
+References: <20230707094028.107898-1-hch@lst.de>
+ <ZKx2jVONy35B0/S1@google.com>
+ <c0883104-8472-91b1-b9ad-ec3114bd166c@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZKw3H2cJzRPZa29N@kbusch-mbp.dhcp.thefacebook.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <c0883104-8472-91b1-b9ad-ec3114bd166c@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 10:51:43AM -0600, Keith Busch wrote:
-> On Mon, Jul 10, 2023 at 05:14:15PM +0800, Ming Lei wrote:
-> > On Mon, Jul 10, 2023 at 08:41:09AM +0200, Christoph Hellwig wrote:
-> > > On Sat, Jul 08, 2023 at 10:02:59AM +0800, Ming Lei wrote:
-> > > > Take blk-mq's knowledge into account for calculating io queues.
-> > > > 
-> > > > Fix wrong queue mapping in case of kdump kernel.
-> > > > 
-> > > > On arm and ppc64, 'maxcpus=1' is passed to kdump command line, see
-> > > > `Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
-> > > > still returns all CPUs.
-> > > 
-> > > That's simply broken.  Please fix the arch code to make sure
-> > > it does not return a bogus num_possible_cpus value for these
+On 07/11, Damien Le Moal wrote:
+> On 7/11/23 06:22, Jaegeuk Kim wrote:
+> > Hit a kernel panic with single device.
 > > 
-> > That is documented in Documentation/admin-guide/kdump/kdump.rst.
+> > [  148.003511] BUG: kernel NULL pointer dereference, address: 0000000000000058
+> > [  148.005630] #PF: supervisor read access in kernel mode
+> > [  148.008179] #PF: error_code(0x0000) - not-present page
+> > [  148.010593] PGD 0 P4D 0
+> > [  148.011867] Oops: 0000 [#1] PREEMPT SMP PTI
+> > [  148.014619] CPU: 4 PID: 1905 Comm: umount Tainted: G           OE      6.5.0-rc1-custom #19
+> > [  148.020358] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+> > [  148.024967] RIP: 0010:destroy_device_list+0x18/0x90 [f2fs]
+> > [  148.027688] Code: 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 55 48 89 e5 41 55 41 54 49 89 fc 53 48 8b 87 40 0b 00 00 <48> 8b 78 58 e8 cf 3e 28 cf 41 83 bc 24 3c 0b 00 00 01 7e 4a 41 bd
+> > [  148.038517] RSP: 0018:ffffa24e80be3d28 EFLAGS: 00010202
+> > [  148.040978] RAX: 0000000000000000 RBX: ffff8bd5503bc800 RCX: 0000000080080006
+> > [  148.044292] RDX: 0000000080080007 RSI: ffffdcfe844da200 RDI: ffff8bd55368d000
+> > [  148.047688] RBP: ffffa24e80be3d40 R08: ffff8bd553688000 R09: 0000000080080006
+> > [  148.051317] R10: ffff8bd5580d4e80 R11: ffff8bd57bd00000 R12: ffff8bd55368d000
+> > [  148.054981] R13: 0000000000000000 R14: ffff8bd55368db18 R15: 0000000000000000
+> > [  148.058391] FS:  00007fc247124800(0000) GS:ffff8bd57bd00000(0000) knlGS:0000000000000000
+> > [  148.062549] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [  148.065641] CR2: 0000000000000058 CR3: 0000000001120004 CR4: 0000000000370ee0
+> > [  148.069178] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > [  148.072651] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > [  148.076346] Call Trace:
+> > [  148.077641]  <TASK>
+> > [  148.078839]  ? show_regs+0x6a/0x80
+> > [  148.080475]  ? __die+0x25/0x70
+> > [  148.082045]  ? page_fault_oops+0x160/0x480
+> > [  148.084381]  ? check_preempt_wakeup+0x192/0x2f0
+> > [  148.086840]  ? do_user_addr_fault+0x313/0x680
+> > [  148.088999]  ? exc_page_fault+0x79/0x180
+> > [  148.090899]  ? asm_exc_page_fault+0x27/0x30
+> > [  148.093114]  ? destroy_device_list+0x18/0x90 [f2fs]
+> > [  148.095448]  f2fs_put_super+0x211/0x410 [f2fs]
+> > [  148.097871]  ? fscrypt_destroy_keyring+0x110/0x170
+> > [  148.100313]  generic_shutdown_super+0x84/0x1b0
+> > [  148.102582]  kill_block_super+0x24/0x50
+> > [  148.104697]  kill_f2fs_super+0x83/0x100 [f2fs]
+> > [  148.106974]  deactivate_locked_super+0x35/0xb0
+> > [  148.109978]  deactivate_super+0x44/0x50
+> > [  148.112235]  cleanup_mnt+0x105/0x160
+> > [  148.114407]  __cleanup_mnt+0x12/0x20
+> > [  148.116680]  task_work_run+0x61/0x90
+> > [  148.118961]  exit_to_user_mode_prepare+0x18f/0x1a0
+> > [  148.121812]  syscall_exit_to_user_mode+0x26/0x50
+> > [  148.124595]  do_syscall_64+0x69/0x90
+> > [  148.126616]  ? exc_page_fault+0x8a/0x180
+> > [  148.128742]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> > [  148.131521] RIP: 0033:0x7fc246f24a7b
 > > 
-> > On arm and ppc64, 'maxcpus=1' is passed for kdump kernel, and "maxcpu=1"
-> > simply keep one of CPU cores as online, and others as offline.
+> > On 07/07, Christoph Hellwig wrote:
+> >> f2fs_scan_devices reopens the main device since the very beginning, which
+> >> has always been useless, and also means that we don't pass the right
+> >> holder for the reopen, which now leads to a warning as the core super.c
+> >> holder ops aren't passed in for the reopen.
+> >>
+> >> Fixes: 3c62be17d4f5 ("f2fs: support multiple devices")
+> >> Fixes: 0718afd47f70 ("block: introduce holder ops")
+> >> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> >> ---
+> >>  fs/f2fs/super.c | 20 ++++++++------------
+> >>  1 file changed, 8 insertions(+), 12 deletions(-)
+> >>
+> >> diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+> >> index ca31163da00a55..8d11d4a5ec331d 100644
+> >> --- a/fs/f2fs/super.c
+> >> +++ b/fs/f2fs/super.c
+> >> @@ -1560,7 +1560,8 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
+> >>  {
+> >>  	int i;
+> >>  
+> >> -	for (i = 0; i < sbi->s_ndevs; i++) {
 > > 
-> > So Cc our arch(arm & ppc64) & kdump guys wrt. passing 'maxcpus=1' for
-> > kdump kernel.
+> > #ifdef CONFIG_BLK_DEV_ZONED
 > > 
-> > > setups, otherwise you'll have to paper over it in all kind of
-> > > drivers.
+> >> +	kvfree(FDEV(0).blkz_seq);
 > > 
-> > The issue is only triggered for drivers which use managed irq &
-> > multiple hw queues.
+> > #endif
 > 
-> Is the problem that the managed interrupt sets the effective irq
-> affinity to an offline CPU? You mentioned observed timeouts; are you
+> This should not be needed since for the !CONFIG_BLK_DEV_ZONED case,
+> FDEV(0).blkz_seq should always be NULL. However, what I think may be missing is
+> "FDEV(0).blkz_seq = NULL;" after the kvfree() call. No ?
 
-Yes, the problem is that blk-mq only creates hctx0, so nvme-pci
-translate it into hctx0's nvme_queue, this way is actually wrong, cause
-blk-mq's view on queue topo isn't same with nvme's view.
+I was looking at a glance of this:
+https://lore.kernel.org/linux-f2fs-devel/202307110542.NBAMyZxE-lkp@intel.com/T/#u
 
-> seeing the "completion polled" nvme message?
-
-Yes, "completion polled" can be observed. Meantime the warning in
-__irq_startup_managed() can be triggered from
-nvme_timeout()->nvme_poll_irqdisable()->enable_irq().
-
-
-Thanks,
-Ming
-
+> 
+> > 
+> >> +	for (i = 1; i < sbi->s_ndevs; i++) {
+> >>  		blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
+> >>  #ifdef CONFIG_BLK_DEV_ZONED
+> >>  		kvfree(FDEV(i).blkz_seq);
+> >> @@ -4190,16 +4191,12 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+> >>  	sbi->aligned_blksize = true;
+> >>  
+> >>  	for (i = 0; i < max_devices; i++) {
+> >> -
+> >> -		if (i > 0 && !RDEV(i).path[0])
+> >> +		if (i == 0)
+> >> +			FDEV(0).bdev = sbi->sb->s_bdev;
+> >> +		else if (!RDEV(i).path[0])
+> >>  			break;
+> >>  
+> >> -		if (max_devices == 1) {
+> >> -			/* Single zoned block device mount */
+> >> -			FDEV(0).bdev =
+> >> -				blkdev_get_by_dev(sbi->sb->s_bdev->bd_dev, mode,
+> >> -						  sbi->sb->s_type, NULL);
+> >> -		} else {
+> >> +		if (max_devices > 1) {
+> >>  			/* Multi-device mount */
+> >>  			memcpy(FDEV(i).path, RDEV(i).path, MAX_PATH_LEN);
+> >>  			FDEV(i).total_segments =
+> >> @@ -4215,10 +4212,9 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+> >>  				FDEV(i).end_blk = FDEV(i).start_blk +
+> >>  					(FDEV(i).total_segments <<
+> >>  					sbi->log_blocks_per_seg) - 1;
+> >> +				FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path,
+> >> +					mode, sbi->sb->s_type, NULL);
+> >>  			}
+> >> -			FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path, mode,
+> >> -							  sbi->sb->s_type,
+> >> -							  NULL);
+> >>  		}
+> >>  		if (IS_ERR(FDEV(i).bdev))
+> >>  			return PTR_ERR(FDEV(i).bdev);
+> >> -- 
+> >> 2.39.2
+> 
+> -- 
+> Damien Le Moal
+> Western Digital Research
