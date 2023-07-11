@@ -2,130 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50409C04FDF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 16:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 839CDC001DD
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 16:32:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232943AbjGKQS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 12:18:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51490 "EHLO
+        id S232170AbjGKQcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 12:32:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233386AbjGKQSB (ORCPT
+        with ESMTP id S232082AbjGKQcP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 12:18:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED944B8
-        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 09:18:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 79E1F61564
-        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 16:18:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0E1FC43397;
-        Tue, 11 Jul 2023 16:17:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689092279;
-        bh=9L6KVSpQ52iJPE/W9jY3lrnhEPrff+Z1LTyLQcv3sdo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GjMT73AgXcyF+/wnM61zc+wcm/8+eqcyrwD4iVIc+yIvuT+1V7qmm2MdRA0lKY/WD
-         xdJ9bIgeszZQ6thQC1dB813TOS+iQrY0gKWqpajt4w0UqMTyhIgJcCUXMiuNqoFvgr
-         wnTKYlRQKa4jrojQp05SGNSzG7uNhVVs+BgMkx/U6TNOu8WX1gyvrEsiYs0NfLPOiG
-         N3frObkHFygc1ageTo9HcPRYpB6WWShpwoY0d1lOAkJJ2Et+mbfB3cECwz1PVy80tN
-         9hx8J+DBW/XxqyR1TilaseDsC9Ig0lMUv3olAUi58RZ19k/PcdKY/mt034voSdWvPO
-         xq2nYnt433w4g==
-Date:   Tue, 11 Jul 2023 09:17:57 -0700
-From:   Jaegeuk Kim <jaegeuk@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     chao@kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] f2fs: don't reopen the main block device in
- f2fs_scan_devices
-Message-ID: <ZK2AtW9hLjqpbaPW@google.com>
-References: <20230707094028.107898-1-hch@lst.de>
- <ZKx2jVONy35B0/S1@google.com>
- <20230711050101.GA19128@lst.de>
+        Tue, 11 Jul 2023 12:32:15 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19CA81717;
+        Tue, 11 Jul 2023 09:32:12 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36B9O4D8003075;
+        Tue, 11 Jul 2023 16:32:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2023-03-30;
+ bh=duJo6dFZPc9TZ+zeNFKEGWFdOQH0TAr+ovYMi+zg3Yc=;
+ b=Vlsl8wL/bFboyFYNKXgcRadKw4fZJm8Enf9mLgttkhJZnRVef+opeem0UMQpPXMC2LrN
+ BeJcBTRDggGyJBHzn8sePBnutmVDTx6PxRlQAmrwvhp19wvQ8tvRFs3d4pCfKCflPhli
+ QH5H7/5ssSqVDmevyPSKV4PQ7btmQ75x9sYj5k8koo+9CLtYgQnGBSAFq6rNJTmQ/FhE
+ +6B+CGGnhwK6YWqYzLTXGPYpqM6wDRApQev0VtIPENOzCyppgpDPx6YCAuxWqPG3l9+E
+ SRXU2SodKbDtBLPaVALkAeZ4MgQBj/Iz4JSqvLe+4H66eiQvca2U1k+8Zokap96tSO2B tg== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3rr8xukrx8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jul 2023 16:32:00 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 36BF8eDB007120;
+        Tue, 11 Jul 2023 16:31:59 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3rpx854c9t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jul 2023 16:31:59 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36BGQBXN019529;
+        Tue, 11 Jul 2023 16:31:58 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3rpx854c4h-3;
+        Tue, 11 Jul 2023 16:31:58 +0000
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>, linux-scsi@vger.kernel.org,
+        Damien Le Moal <dlemoal@kernel.org>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v3 0/5] Improve checks in blk_revalidate_disk_zones()
+Date:   Tue, 11 Jul 2023 12:31:44 -0400
+Message-Id: <168909306220.1197987.14432939684729585921.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230703024812.76778-1-dlemoal@kernel.org>
+References: <20230703024812.76778-1-dlemoal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230711050101.GA19128@lst.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-11_08,2023-07-11_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=643
+ adultscore=0 mlxscore=0 spamscore=0 phishscore=0 malwarescore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307110148
+X-Proofpoint-GUID: O48tnqYTQ71yllnqdpl3Xg3Ox4QMLAJx
+X-Proofpoint-ORIG-GUID: O48tnqYTQ71yllnqdpl3Xg3Ox4QMLAJx
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 07/11, Christoph Hellwig wrote:
-> I think that's because it doesn't look at sbi->s_ndevs in
-> destroy_device_list.  Let's try the variant below, which also fixes
-> the buildbot warning for non-zoned configfs:
+On Mon, 03 Jul 2023 11:48:07 +0900, Damien Le Moal wrote:
 
-Thanks. At a glance, this looks better. Let me give it a try.
+> blk_revalidate_disk_zones() implements checks of the zones of a zoned
+> block device, verifying that the zone size is a power of 2 number of
+> sectors, that all zones (except possibly the last one) have the same
+> size and that zones cover the entire addressing space of the device.
+> 
+> While these checks are appropriate to verify that well tested hardware
+> devices have an adequate zone configurations, they lack in certain areas
+> which may result in issues with potentially buggy emulated devices
+> implemented with user drivers such as ublk or tcmu. Specifically, this
+> function does not check if the device driver indicated support for the
+> mandatory zone append writes, that is, if the device
+> max_zone_append_sectors queue limit is set to a non-zero value.
+> Additionally, invalid zones such as a zero length zone with a start
+> sector equal to the device capacity will not be detected and result in
+> out of bounds use of the zone bitmaps prepared with the callback
+> function blk_revalidate_zone_cb().
+> 
+> [...]
 
-> 
-> ---
-> >From 645d8dceaa97b6ee73be067495b111b15b187498 Mon Sep 17 00:00:00 2001
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Fri, 7 Jul 2023 10:31:49 +0200
-> Subject: f2fs: don't reopen the main block device in f2fs_scan_devices
-> 
-> f2fs_scan_devices reopens the main device since the very beginning, which
-> has always been useless, and also means that we don't pass the right
-> holder for the reopen, which now leads to a warning as the core super.c
-> holder ops aren't passed in for the reopen.
-> 
-> Fixes: 3c62be17d4f5 ("f2fs: support multiple devices")
-> Fixes: 0718afd47f70 ("block: introduce holder ops")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-flush.c |  2 +-
->  fs/f2fs/super.c   | 20 ++++++++------------
->  2 files changed, 9 insertions(+), 13 deletions(-)
-> 
-> diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-> index ca31163da00a55..30883beb750a59 100644
-> --- a/fs/f2fs/super.c
-> +++ b/fs/f2fs/super.c
-> @@ -1561,7 +1561,8 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
->  	int i;
->  
->  	for (i = 0; i < sbi->s_ndevs; i++) {
-> -		blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
-> +		if (i > 0)
-> +			blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
->  #ifdef CONFIG_BLK_DEV_ZONED
->  		kvfree(FDEV(i).blkz_seq);
->  #endif
-> @@ -4190,16 +4191,12 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
->  	sbi->aligned_blksize = true;
->  
->  	for (i = 0; i < max_devices; i++) {
-> -
-> -		if (i > 0 && !RDEV(i).path[0])
-> +		if (i == 0)
-> +			FDEV(0).bdev = sbi->sb->s_bdev;
-> +		else if (!RDEV(i).path[0])
->  			break;
->  
-> -		if (max_devices == 1) {
-> -			/* Single zoned block device mount */
-> -			FDEV(0).bdev =
-> -				blkdev_get_by_dev(sbi->sb->s_bdev->bd_dev, mode,
-> -						  sbi->sb->s_type, NULL);
-> -		} else {
-> +		if (max_devices > 1) {
->  			/* Multi-device mount */
->  			memcpy(FDEV(i).path, RDEV(i).path, MAX_PATH_LEN);
->  			FDEV(i).total_segments =
-> @@ -4215,10 +4212,9 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
->  				FDEV(i).end_blk = FDEV(i).start_blk +
->  					(FDEV(i).total_segments <<
->  					sbi->log_blocks_per_seg) - 1;
-> +				FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path,
-> +					mode, sbi->sb->s_type, NULL);
->  			}
-> -			FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path, mode,
-> -							  sbi->sb->s_type,
-> -							  NULL);
->  		}
->  		if (IS_ERR(FDEV(i).bdev))
->  			return PTR_ERR(FDEV(i).bdev);
-> -- 
-> 2.39.2
+Applied to 6.5/scsi-fixes, thanks!
+
+[1/5] scsi: sd_zbc: Set zone limits before revalidating zones
+      https://git.kernel.org/mkp/scsi/c/f79846ca2f04
+[2/5] nvme: zns: Set zone limits before revalidating zones
+      https://git.kernel.org/mkp/scsi/c/d226b0a2b683
+[3/5] block: nullblk: Set zone limits before revalidating zones
+      https://git.kernel.org/mkp/scsi/c/a442b899fe17
+[4/5] block: virtio_blk: Set zone limits before revalidating zones
+      https://git.kernel.org/mkp/scsi/c/a3d96ed21507
+[5/5] block: improve checks in blk_revalidate_disk_zones()
+      https://git.kernel.org/mkp/scsi/c/03e51c4a74b9
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
