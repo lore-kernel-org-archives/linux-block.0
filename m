@@ -2,147 +2,162 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A412EB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 18:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 743F9EB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 22:47:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbjGKSp2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 14:45:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43320 "EHLO
+        id S230504AbjGKWru (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 18:47:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjGKSp1 (ORCPT
+        with ESMTP id S229610AbjGKWru (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 14:45:27 -0400
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F396E8
-        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 11:45:26 -0700 (PDT)
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1b8bd586086so45244435ad.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 11:45:26 -0700 (PDT)
+        Tue, 11 Jul 2023 18:47:50 -0400
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE536E60;
+        Tue, 11 Jul 2023 15:47:48 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a3efee1d44so3508985b6e.3;
+        Tue, 11 Jul 2023 15:47:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689115668; x=1691707668;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BpcCgQS0gXCD+hvSguR3UnFG1qnT0lm+T8n1vVCxIxM=;
+        b=KjTLIEMy/UOKJS1nUesRrgNqETtpUU0ym+GtGAS0nFpmlOsPFT0VC/jMhiTqKwR7x3
+         tfYaqWNaR4ur3HpMyd3W+6YOkE561EpXrBmhhMWYXTBP6LnMYlvWxTzwOFmFqdsnEwcL
+         snkaXVqvV4e1gS6bEc5wMcRFH41l/KzwrKQwnftmp4+xhprfLzdF/PHafuYWzblnuGe5
+         3paEvWudVifKhm1nRSzBUrntu6IUDNQ7HTI0uIKEKGkRJMNXX5Ovimtp460oe/LG+pBA
+         Y8okBDt7o/qGr9yFlfPgtAsXL6pErNaLJzgxtAy+EnUPM/DBWFzas+/8GvI3k96PWhTM
+         W8Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689101126; x=1691693126;
+        d=1e100.net; s=20221208; t=1689115668; x=1691707668;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8UsRC0WLlksxzONYQqoYU5eIC4cHj6Uzu7QwuNHEvDQ=;
-        b=RnOX47Spyg1ov0QBusDuIfpfIM5fVrfNLFYeXnSPrnrMp/1L7XfrUo5A/56oPZ2HeW
-         qx+usUZ5VSyAib+AR+TS8WFfyXbTR13yBDFS1wyYFZZ55oDTjYm0mmnGdzObImk6BmbB
-         fJ6EcBGLNjJYAdqGtuBfOwwQswn0o18m0rRpoqkP3ssuG2o4W0AzBDtvcELj7BpbcIpP
-         KqjVkLazzdz3iybLVHh9x/4zKHy0K+tZyd4RajQH3NmlQ7zs10IFJFWRivryxIayd8f4
-         dPxPXucNnDOAj+OV8LQRkq6K3duDu7ZhK2aAPMe/Ix1vENDMf9lXTYMBlIz7x00TYN3E
-         uQiQ==
-X-Gm-Message-State: ABy/qLY93CD04Ubu28KSJyjmBC9diOBjxROhJfZRkqV+A3rpwEDCSSEJ
-        4dmV4QLV5rolJ0NjrBH9SoDRaadSzQo=
-X-Google-Smtp-Source: APBJJlEVpnyoKx0ljbe1fa0Ny6zTXn1epAcOg+kXq/6oz2O7vhlDUlR0YRMm2Fs4fZ3kaEJhsOA7vg==
-X-Received: by 2002:a17:903:22c6:b0:1b8:72e2:c63 with SMTP id y6-20020a17090322c600b001b872e20c63mr20016993plg.8.1689101125514;
-        Tue, 11 Jul 2023 11:45:25 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:218:86d6:e8cc:733? ([2620:15c:211:201:218:86d6:e8cc:733])
-        by smtp.gmail.com with ESMTPSA id v4-20020a1709029a0400b001b83dc8649dsm2253710plp.250.2023.07.11.11.45.24
+        bh=BpcCgQS0gXCD+hvSguR3UnFG1qnT0lm+T8n1vVCxIxM=;
+        b=Ws/s8Od7gKKUHof1aS6a9pLtnTFiflWWTygt1ay/2KvHcWdG58/O2DXPSPd3UepCDs
+         pJsflMgCz9PO6oFce3OuuRMWmxugC1SvVTNEu1bgPjeE02ZGSP03ftm7rqoAPrNUbo9E
+         EuK3jmsompG+cpc4RGpsyLZY39qo23tqVQhx390EIbieFISHTBR2yMUWCByz4oGLXuQJ
+         zjSoZO3R7qn0f9EIY4nmH5GnZMH/9IgEZkDHASeSk/LTT+JqxozD/WEo3XX45zcg/lGE
+         c+3NY9XZZy1h+HqXDPlqokGPuYOcadmV/hfnCSe5Bw1bTXjvl7sLFMjK6fNBMOjxICBN
+         lypg==
+X-Gm-Message-State: ABy/qLaHlObQRytc23U621Dp8uhg8Xy+nKYI/6eMtORfMudm+QwqxEf4
+        /gxK/Vjt90aargzPLOIv6eEuD4hT4o4=
+X-Google-Smtp-Source: APBJJlHv0PeOyk7BhG/GOv1k9Z29OiBGd6p6xJrUCOn9UGhShD6VDfAqkzbNdM8f7Sm9K9D+9ipTOw==
+X-Received: by 2002:a54:4f8e:0:b0:3a3:ffb7:a28 with SMTP id g14-20020a544f8e000000b003a3ffb70a28mr7749566oiy.45.1689115668098;
+        Tue, 11 Jul 2023 15:47:48 -0700 (PDT)
+Received: from [10.69.46.142] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id bv11-20020a05622a0a0b00b003fdebf1a634sm1580898qtb.75.2023.07.11.15.47.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Jul 2023 11:45:25 -0700 (PDT)
-Message-ID: <75043b78-c1f8-5268-ade6-62a75f25708c@acm.org>
-Date:   Tue, 11 Jul 2023 11:45:24 -0700
+        Tue, 11 Jul 2023 15:47:47 -0700 (PDT)
+Message-ID: <0605ac36-16d5-2026-d3c6-62d346db6dfb@gmail.com>
+Date:   Tue, 11 Jul 2023 15:47:45 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [bug report] EIO of zoned block device writes
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v2 4/5] nvme-fc: Make initial connect attempt synchronous
 Content-Language: en-US
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>
-References: <5zthzi3lppvcdp4nemum6qck4gpqbdhvgy4k3qwguhgzxc4quj@amulvgycq67h>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <5zthzi3lppvcdp4nemum6qck4gpqbdhvgy4k3qwguhgzxc4quj@amulvgycq67h>
+To:     Daniel Wagner <dwagner@suse.de>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>, Ewan Milne <emilne@redhat.com>
+References: <20230620133711.22840-1-dwagner@suse.de>
+ <20230620133711.22840-5-dwagner@suse.de>
+ <594f73f2-59b0-bbcb-d7a0-6d89e2446830@gmail.com>
+ <7kcc75btp5bo5oqjnpqlwwo37l2f4atwfemknbmvqagrqicl2i@njn4tai7e4m7>
+From:   James Smart <jsmart2021@gmail.com>
+In-Reply-To: <7kcc75btp5bo5oqjnpqlwwo37l2f4atwfemknbmvqagrqicl2i@njn4tai7e4m7>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/11/23 00:50, Shinichiro Kawasaki wrote:
-> With kernel version v6.5-rc1, I observed an I/O error during a fio run on zoned
-> block devices. I bisected and found that the commit 0effb390c4ba ("block:
-> mq-deadline: Handle requeued requests correctly") is the trigger. When I revert
-> this commit from v6.5-rc1, the error disappears.
+On 7/6/2023 5:07 AM, Daniel Wagner wrote:
+> Hi James,
 > 
-> At first, the error was observed as a test case failure of fio test script for
-> zoned block devices (t/zbd/test-zbd-support, #34), using a QEMU ZNS emulation
-> device with 4MB zone size. The failure was also observed with a zoned null_blk
-> device with 4MB zone size and memory backed option. The error was observed with
-> real ZNS drives with 2GB zone size as well.
+> On Sat, Jul 01, 2023 at 05:11:11AM -0700, James Smart wrote:
+>> As much as you want to make this change to make transports "similar", I am
+>> dead set against it unless you are completing a long qualification of the
+>> change on real FC hardware and FC-NVME devices. There is probably 1.5 yrs of
+>> testing of different race conditions that drove this change. You cannot
+>> declare success from a simplistic toy tool such as fcloop for validation.
+>>
+>> The original issues exist, probably have even morphed given the time from
+>> the original change, and this will seriously disrupt the transport and any
+>> downstream releases.  So I have a very strong NACK on this change.
+>>
+>> Yes - things such as the connect failure results are difficult to return
+>> back to nvme-cli. I have had many gripes about the nvme-cli's behavior over
+>> the years, especially on negative cases due to race conditions which
+>> required retries. It still fails this miserably.  The async reconnect path
+>> solved many of these issues for fc.
+>>
+>> For the auth failure, how do we deal with things if auth fails over time as
+>> reconnects fail due to a credential changes ?  I would think commonality of
+>> this behavior drives part of the choice.
 > 
-> I simplified the fio test script and confirmed that the short script below [1]
-> recreates the error using the null_blk device with 4MB zone size and memory
-> backed option.
+> Alright, what do you think about the idea to introduce a new '--sync' option to
+> nvme-cli which forwards this info to the kernel that we want to wait for the
+> initial connect to succeed or fail? Obviously, this needs to handle signals too.
 > 
-> The trigger commit modifies the order to dispatch write requests to zones. To
-> check the write requests dispatched to the null_blk device, I took blktrace [2].
-> It shows that 1MB write to the first zone (sector 0) is divided into size of 255
-> sectors. One of the divided write requests was dispatched to the zone but it was
-> not a write at zone start, then it caused the I/O error. I think this I/O error
-> is caused by unaligned write command error on the device. Later on, another
-> write request to the zone start was dispatched. So, it does not look the write
-> requests are well ordered.
-> 
-> I call for a help to resolve this issue. If any actions on my test systems will
-> help, please let me know.
-> 
-> 
-> [1]
-> 
-> #!/bin/bash
-> 
-> dev=$1
-> realdev=$(readlink -f "$dev")
-> basename=$(basename "$realdev")
-> 
-> echo mq-deadline >"/sys/block/$basename/queue/scheduler"
-> blkzone reset $dev
-> 
-> fio --name=job --filename="${dev}" --ioengine=libaio --iodepth=256 \
->      --rw=randwrite --bs=1M --offset=0 --size=16M \
->      --zonemode=zbd --direct=1 --zonesize=4M
-> 
-> [2]
-> 
-> ...
-> 251,0    1      136     0.871020525  1300  Q  WS 0 + 2048 [fio]
-> 251,0    1      137     0.871025680  1300  X  WS 0 / 255 [fio]
-> 251,0    1      138     0.871027679  1300  G  WS 0 + 255 [fio]
-> 251,0    1      139     0.871028675  1300  I  WS 0 + 255 [fio]
-> 251,0    1      140     0.871038432  1300  X  WS 255 / 510 [fio]
-> 251,0    1      141     0.871040086  1300  G  WS 255 + 255 [fio]
-> 251,0    1      142     0.871040949  1300  I  WS 255 + 255 [fio]
-> 251,0    1      143     0.871050035  1300  X  WS 510 / 765 [fio]
-> 251,0    1      144     0.871051688  1300  G  WS 510 + 255 [fio]
-> 251,0    1      145     0.871052551  1300  I  WS 510 + 255 [fio]
-> 251,0    3        8     0.871054865  1115  C  WS 24576 + 765 [0]
-> 251,0    1      146     0.871061570  1300  X  WS 765 / 1020 [fio]
-> 251,0    1      147     0.871063327  1300  G  WS 765 + 255 [fio]
-> 251,0    1      148     0.871064204  1300  I  WS 765 + 255 [fio]
-> 251,0    1      149     0.871073358  1300  X  WS 1020 / 1275 [fio]
-> 251,0    1      150     0.871075004  1300  G  WS 1020 + 255 [fio]
-> 251,0    3        9     0.871075262  1115  D  WS 510 + 255 [kworker/3:2H] ... Write not at zone start
-> 251,0    1      151     0.871075921  1300  I  WS 1020 + 255 [fio]
-> 251,0    3       10     0.871077227  1115  C  WS 0 + 765 [65531]  ... I/O error
-> 251,0    1      152     0.871085051  1300  X  WS 1275 / 1530 [fio]
-> ...
-> 251,0    3      281     0.904191667  1115  D  WS 0 + 255 [kworker/3:2H] ... Write at zone start comes after
-> 251,0    3      282     0.904445591  1115  C  WS 0 + 255 [0]
-> ...
+>  From what I understood this is also what Ewan would like to have
+To me this is not sync vs non-sync option, it's a max_reconnects value 
+tested for in nvmf_should_reconnect(). Which, if set to 0 (or 1), should 
+fail if the initial connect fails.
 
-Thank you for the detailed report. Does this patch help?
+Right now max_reconnects is calculated by the ctrl_loss_tmo and 
+reconnect_delay. So there's already a way via the cli to make sure 
+there's only 1 connect attempt. I wouldn't mind seeing an exact cli 
+option that sets it to 1 connection attempt w/o the user calculation and 
+2 value specification.
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 6aa5daf7ae32..02a916ba62ee 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -176,7 +176,7 @@ static inline struct request 
-*deadline_from_pos(struct dd_per_prio *per_prio,
-  	 * zoned writes, start searching from the start of a zone.
-  	 */
-  	if (blk_rq_is_seq_zoned_write(rq))
--		pos -= round_down(pos, rq->q->limits.chunk_sectors);
-+		pos = round_down(pos, rq->q->limits.chunk_sectors);
+I also assume that this is not something that would be set by default in 
+the auto-connect scripts or automated cli startup scripts.
 
-  	while (node) {
-  		rq = rb_entry_rq(node);
+
+> 
+> Hannes thought it would make sense to use the same initial connect logic in
+> tcp/rdma, because there could also be transient erros (e.g. spanning tree
+> protocol). In short making the tcp/rdma do the same thing as fc?
+
+I agree that the same connect logic makes sense for tcp/rdma. Certainly 
+one connect/teardown path vs one at create and one at reconnect makes 
+sense. The transient errors during 1st connect was the why FC added it 
+and I would assume tcp/rdma has it's own transient errors or timing 
+relationships at initial connection setups, etc.
+
+For FC, we're trying to work around errors to transport commands (FC 
+NVME ELS's) that fail (dropped or timeout) or commands used to 
+initialize the controller which may be dropped/timeout thus fail 
+controller init. Although NVMe-FC does have a retransmission option, it 
+generally doesn't apply to the FC NVME LS's, and few of the FC devices 
+have yet to turn on the retransmission option to deal with the errors. 
+So the general behavior is connection termination and/or association 
+termination which then depends on the reconnect path to retry. It's also 
+critical as connection requests are automated on FC based on 
+connectivity events. If we fail out to the cli due to the fabric 
+dropping some up front command, there's no guarantee there will be 
+another connectivity event to restart the controller create and we end 
+up without device connectivity. The other issue we had to deal with was 
+how long sysadm hung out waiting for the auto-connect script to 
+complete. We couldn't wait the entire multiple retry case, and returning 
+before the 1st attempt was complete was against the spirit of the cli - 
+so we waited for the 1st attempt to try, released sysadm and let the 
+reconnect go on in the background.
+
+
+> 
+> So let's drop the final patch from this series for the time. Could you give some
+> feedback on the rest of the patches?
+> 
+> Thanks,
+> Daniel
+
+I'll look at them.
+
+-- james
+
 
