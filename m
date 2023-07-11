@@ -2,64 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6ADEB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 03:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6921BEB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 04:06:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231268AbjGKD5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jul 2023 23:57:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35196 "EHLO
+        id S229798AbjGKEG0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 00:06:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231420AbjGKD4o (ORCPT
+        with ESMTP id S229655AbjGKEGZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2023 23:56:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA288172A
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 20:55:29 -0700 (PDT)
+        Tue, 11 Jul 2023 00:06:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93EC188
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 21:05:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689047728;
+        s=mimecast20190719; t=1689048337;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=I51Q3nKKNCTWEmMYUHL5yUr4E1b6ZzzA1zlm0zArZHo=;
-        b=e4PmIOL1gy8UHIdAbgiTUTJKgPJ52ZqbbsIsmcDPhHCCaKTBPBArSDpIvjnw9GpI7NUcDo
-        FJg5Cd1v3uOT9OiLWfl/SWDVZK8XxpipmwPIx/CgzSw9/trApP2kZEI8wkRZAxi4udnuwG
-        7XyF573aGl7U0ZbUaO791+EM3mp4gD4=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Sanp52G7qe4emaxcQItrkn4g0y24nEg66UbSkbqz794=;
+        b=e+Z9cLEzq+yZ4M+eUzzHl1G9CV6nL7emo9Qy+kzQciQ9BDP/ymVgNPUOLVUaaisUVpYQED
+        w1yU5zwUEOTdjmAp/6m5g32Y33Y7I3hqd8PZhvt+mTJAExxHB9b2kVvZTUgl94LqRTxsoG
+        JtaYX65U+J+9kvga/ayGgt4vfGpasAI=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-nyTTfR4nMTiRgCLYfiW41Q-1; Mon, 10 Jul 2023 23:55:27 -0400
-X-MC-Unique: nyTTfR4nMTiRgCLYfiW41Q-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6355b301c9dso42211506d6.3
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 20:55:27 -0700 (PDT)
+ us-mta-459-xmW-sF_HPUC0N8f3mbBlpw-1; Tue, 11 Jul 2023 00:05:36 -0400
+X-MC-Unique: xmW-sF_HPUC0N8f3mbBlpw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635dce11cb0so55382156d6.3
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 21:05:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689047726; x=1691639726;
+        d=1e100.net; s=20221208; t=1689048336; x=1691640336;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I51Q3nKKNCTWEmMYUHL5yUr4E1b6ZzzA1zlm0zArZHo=;
-        b=X5OS73VDk0Nu2qkxB4xmbPNzfi8vgYEtS+CL4H4CcoMWeyfi/f+ml8Oe6hPTQrfLJN
-         lRhUIOQ1BDE+cukyjCeOHy3YsO2EKpu+7xMfhg+wuAmYHPdRusNs2VOeXF4LkdKFJ9EA
-         RSoTbmKA9BqWwHkPGqUlN6UeUt0GcEGEIJiCz9Ne9pagZjKJY4CPDH5XsY154kGHGtcu
-         tv1vkpDvX4CsJKYY/wdw8iWM2mM82vPn1Pz/B5UX90mVVJh8NXTkVPToRdbeLHPx8CcG
-         mZYZzJZk7ECqYTDIY5gUw5un+ckxEouMbpVP2/VBnu21Ri3UC2DcRAX9SjVvrPqK7GV+
-         jvZA==
-X-Gm-Message-State: ABy/qLbprSG/Hs2RDbiOuy47Dp+GTdIz5cKhoCUXlF5aOHs/NSrpyycg
-        Z1ubQ64WHEtEvU5FtFrDS3tllIB1m+LcMVJBScIZVvBAhdBqjWohX++0w+Z6tJS1m8DPXqB3Im9
-        jOLzxWWRLunbT4ROFviJRup7hk4XG0lC3tv92lJw=
-X-Received: by 2002:a0c:8d45:0:b0:62f:ec76:f5b7 with SMTP id s5-20020a0c8d45000000b0062fec76f5b7mr11891455qvb.55.1689047726712;
-        Mon, 10 Jul 2023 20:55:26 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHTZhew2EUuIm724AKpM7YWVbIe48FZcuO2pasYKl7L1r04MF0dNfYfUrZnlan7BYQ6w00L0ejYouJH3uMuKwg=
-X-Received: by 2002:a0c:8d45:0:b0:62f:ec76:f5b7 with SMTP id
- s5-20020a0c8d45000000b0062fec76f5b7mr11891446qvb.55.1689047726501; Mon, 10
- Jul 2023 20:55:26 -0700 (PDT)
+        bh=Sanp52G7qe4emaxcQItrkn4g0y24nEg66UbSkbqz794=;
+        b=YCNw4TqS4x7VbJRn2kpcbrS/cr3YnvON66sjwlw5TXKwV9vAf6UQ8kbmDAA5vZvR+r
+         aT7yL+/QIoQwz12wfCFHDaPydNo3Zc37CMoXf0f+1wRwa0hVkBp5FZFS6xdMjSLIp+Po
+         +w/m6JTRTTQJjHry1AFMsogCRB+hnWKn8+XMmHr0ra5JHBL96bWXu38jiu/9jFqIn8ew
+         JUc4B8yIjCpvpzTVIShuheJliGrn0INaKrMRxZTbCCs3jyW7p4iJlf6ENt0xDSnPRorG
+         1VcJXKWHumwfdpgwJH0FJKSU44HPtl+P9sqsxjKYZNnfCLJU80Rmn7na72VfY+mewa6/
+         r2kw==
+X-Gm-Message-State: ABy/qLbr8j7icRl8JBPney/RrVALcZ0XmB0L2ipdYfSC+o7d2ickHf/e
+        tvCKtse9uK6XvM0SdcGCSdOs76qLgDyjQrupjkvujDwtPtGuUHSt27uTRnSe2a1mF6FgULRQkc3
+        zRxn3u1yGcwX6KaRYXrDTP0GTIRixlMo4ySNROcc=
+X-Received: by 2002:a0c:e44d:0:b0:62d:ef66:ff1c with SMTP id d13-20020a0ce44d000000b0062def66ff1cmr12076658qvm.24.1689048335875;
+        Mon, 10 Jul 2023 21:05:35 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEGTtnbv4lplqsuwMA0lcF/2QRhbSnqCLDEDGVhD6GZ6v3vRL7xgj3ixm6UdOxJvERNjVYrT8Aw+QUQlev+2Ls=
+X-Received: by 2002:a0c:e44d:0:b0:62d:ef66:ff1c with SMTP id
+ d13-20020a0ce44d000000b0062def66ff1cmr12076645qvm.24.1689048335643; Mon, 10
+ Jul 2023 21:05:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230708020259.1343736-1-ming.lei@redhat.com> <20230708020259.1343736-3-ming.lei@redhat.com>
  <20230710064109.GB24519@lst.de> <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
 In-Reply-To: <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
 From:   Pingfan Liu <piliu@redhat.com>
-Date:   Tue, 11 Jul 2023 11:55:15 +0800
-Message-ID: <CAF+s44RuqswbosY9kMDx35crviQnxOeuvgNsuE75Bb0Y2Jg2uw@mail.gmail.com>
+Date:   Tue, 11 Jul 2023 12:05:24 +0800
+Message-ID: <CAF+s44T5Hn5ikNq+YMp2Nucb6rBT=e4VHW8WN8YDhZHe9JmqGw@mail.gmail.com>
 Subject: Re: [PATCH 2/2] nvme-pci: use blk_mq_max_nr_hw_queues() to calculate
  io queues
 To:     Ming Lei <ming.lei@redhat.com>
@@ -77,6 +77,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Ming,
+
+Having no [PATCH 1/2] blk-mq: add blk_mq_max_nr_hw_queues() in inbox.
+So I reply here.
+
+At first glance, I think that  the cpu hot plug callback hook should
+be the remedy for the newly introduced blk_mq_max_nr_hw_queues(),
+although it is more complicated.
+
+Consider the scene where nr_cpus=3D4, which can speed up the dumping
+process, the blk_mq_max_nr_hw_queues() can not utilize the other three
+cpus.
+
+
+Thanks,
+
+Pingfan
+
 On Mon, Jul 10, 2023 at 5:16=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
 e:
 >
@@ -93,40 +111,10 @@ e:
 > > That's simply broken.  Please fix the arch code to make sure
 > > it does not return a bogus num_possible_cpus value for these
 >
-
-In fact, num_possible_cpus is not broken.
-
-Quote from admin-guide/kernel-parameters.txt
-       maxcpus=3D        [SMP] Maximum number of processors that an SMP ker=
-nel
-                       will bring up during bootup.  maxcpus=3Dn : n >=3D 0=
- limits
-                       the kernel to bring up 'n' processors. Surely after
-                       bootup you can bring up the other plugged cpu
-by executing
-                       "echo 1 > /sys/devices/system/cpu/cpuX/online".
-So maxcpus
-                       only takes effect during system bootup.
-                       While n=3D0 is a special case, it is equivalent to "=
-nosmp",
-                       which also disables the IO APIC.
-
-Here, as it explained, maxcpus only affects the bootup, later, extra
-cpus can be online.
-
 > That is documented in Documentation/admin-guide/kdump/kdump.rst.
 >
 > On arm and ppc64, 'maxcpus=3D1' is passed for kdump kernel, and "maxcpu=
 =3D1"
-
-On aarch64 and x86, nr_cpus=3D1 is used, while on ppc64, due to the
-implementation, nr_cpus=3D1 can not be supported.
-
-
-Thanks,
-
-Pingfan
-
 > simply keep one of CPU cores as online, and others as offline.
 >
 > So Cc our arch(arm & ppc64) & kdump guys wrt. passing 'maxcpus=3D1' for
