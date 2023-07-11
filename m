@@ -2,109 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 839CDC001DD
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 16:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A412EB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 18:45:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232170AbjGKQcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 12:32:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32898 "EHLO
+        id S229548AbjGKSp2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 14:45:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232082AbjGKQcP (ORCPT
+        with ESMTP id S229509AbjGKSp1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 12:32:15 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19CA81717;
-        Tue, 11 Jul 2023 09:32:12 -0700 (PDT)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36B9O4D8003075;
-        Tue, 11 Jul 2023 16:32:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2023-03-30;
- bh=duJo6dFZPc9TZ+zeNFKEGWFdOQH0TAr+ovYMi+zg3Yc=;
- b=Vlsl8wL/bFboyFYNKXgcRadKw4fZJm8Enf9mLgttkhJZnRVef+opeem0UMQpPXMC2LrN
- BeJcBTRDggGyJBHzn8sePBnutmVDTx6PxRlQAmrwvhp19wvQ8tvRFs3d4pCfKCflPhli
- QH5H7/5ssSqVDmevyPSKV4PQ7btmQ75x9sYj5k8koo+9CLtYgQnGBSAFq6rNJTmQ/FhE
- +6B+CGGnhwK6YWqYzLTXGPYpqM6wDRApQev0VtIPENOzCyppgpDPx6YCAuxWqPG3l9+E
- SRXU2SodKbDtBLPaVALkAeZ4MgQBj/Iz4JSqvLe+4H66eiQvca2U1k+8Zokap96tSO2B tg== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3rr8xukrx8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jul 2023 16:32:00 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 36BF8eDB007120;
-        Tue, 11 Jul 2023 16:31:59 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3rpx854c9t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jul 2023 16:31:59 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36BGQBXN019529;
-        Tue, 11 Jul 2023 16:31:58 GMT
-Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3rpx854c4h-3;
-        Tue, 11 Jul 2023 16:31:58 +0000
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>, linux-scsi@vger.kernel.org,
-        Damien Le Moal <dlemoal@kernel.org>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3 0/5] Improve checks in blk_revalidate_disk_zones()
-Date:   Tue, 11 Jul 2023 12:31:44 -0400
-Message-Id: <168909306220.1197987.14432939684729585921.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230703024812.76778-1-dlemoal@kernel.org>
-References: <20230703024812.76778-1-dlemoal@kernel.org>
+        Tue, 11 Jul 2023 14:45:27 -0400
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F396E8
+        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 11:45:26 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1b8bd586086so45244435ad.2
+        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 11:45:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689101126; x=1691693126;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8UsRC0WLlksxzONYQqoYU5eIC4cHj6Uzu7QwuNHEvDQ=;
+        b=RnOX47Spyg1ov0QBusDuIfpfIM5fVrfNLFYeXnSPrnrMp/1L7XfrUo5A/56oPZ2HeW
+         qx+usUZ5VSyAib+AR+TS8WFfyXbTR13yBDFS1wyYFZZ55oDTjYm0mmnGdzObImk6BmbB
+         fJ6EcBGLNjJYAdqGtuBfOwwQswn0o18m0rRpoqkP3ssuG2o4W0AzBDtvcELj7BpbcIpP
+         KqjVkLazzdz3iybLVHh9x/4zKHy0K+tZyd4RajQH3NmlQ7zs10IFJFWRivryxIayd8f4
+         dPxPXucNnDOAj+OV8LQRkq6K3duDu7ZhK2aAPMe/Ix1vENDMf9lXTYMBlIz7x00TYN3E
+         uQiQ==
+X-Gm-Message-State: ABy/qLY93CD04Ubu28KSJyjmBC9diOBjxROhJfZRkqV+A3rpwEDCSSEJ
+        4dmV4QLV5rolJ0NjrBH9SoDRaadSzQo=
+X-Google-Smtp-Source: APBJJlEVpnyoKx0ljbe1fa0Ny6zTXn1epAcOg+kXq/6oz2O7vhlDUlR0YRMm2Fs4fZ3kaEJhsOA7vg==
+X-Received: by 2002:a17:903:22c6:b0:1b8:72e2:c63 with SMTP id y6-20020a17090322c600b001b872e20c63mr20016993plg.8.1689101125514;
+        Tue, 11 Jul 2023 11:45:25 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:218:86d6:e8cc:733? ([2620:15c:211:201:218:86d6:e8cc:733])
+        by smtp.gmail.com with ESMTPSA id v4-20020a1709029a0400b001b83dc8649dsm2253710plp.250.2023.07.11.11.45.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Jul 2023 11:45:25 -0700 (PDT)
+Message-ID: <75043b78-c1f8-5268-ade6-62a75f25708c@acm.org>
+Date:   Tue, 11 Jul 2023 11:45:24 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-11_08,2023-07-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=643
- adultscore=0 mlxscore=0 spamscore=0 phishscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307110148
-X-Proofpoint-GUID: O48tnqYTQ71yllnqdpl3Xg3Ox4QMLAJx
-X-Proofpoint-ORIG-GUID: O48tnqYTQ71yllnqdpl3Xg3Ox4QMLAJx
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [bug report] EIO of zoned block device writes
+Content-Language: en-US
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>
+References: <5zthzi3lppvcdp4nemum6qck4gpqbdhvgy4k3qwguhgzxc4quj@amulvgycq67h>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <5zthzi3lppvcdp4nemum6qck4gpqbdhvgy4k3qwguhgzxc4quj@amulvgycq67h>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 03 Jul 2023 11:48:07 +0900, Damien Le Moal wrote:
-
-> blk_revalidate_disk_zones() implements checks of the zones of a zoned
-> block device, verifying that the zone size is a power of 2 number of
-> sectors, that all zones (except possibly the last one) have the same
-> size and that zones cover the entire addressing space of the device.
+On 7/11/23 00:50, Shinichiro Kawasaki wrote:
+> With kernel version v6.5-rc1, I observed an I/O error during a fio run on zoned
+> block devices. I bisected and found that the commit 0effb390c4ba ("block:
+> mq-deadline: Handle requeued requests correctly") is the trigger. When I revert
+> this commit from v6.5-rc1, the error disappears.
 > 
-> While these checks are appropriate to verify that well tested hardware
-> devices have an adequate zone configurations, they lack in certain areas
-> which may result in issues with potentially buggy emulated devices
-> implemented with user drivers such as ublk or tcmu. Specifically, this
-> function does not check if the device driver indicated support for the
-> mandatory zone append writes, that is, if the device
-> max_zone_append_sectors queue limit is set to a non-zero value.
-> Additionally, invalid zones such as a zero length zone with a start
-> sector equal to the device capacity will not be detected and result in
-> out of bounds use of the zone bitmaps prepared with the callback
-> function blk_revalidate_zone_cb().
+> At first, the error was observed as a test case failure of fio test script for
+> zoned block devices (t/zbd/test-zbd-support, #34), using a QEMU ZNS emulation
+> device with 4MB zone size. The failure was also observed with a zoned null_blk
+> device with 4MB zone size and memory backed option. The error was observed with
+> real ZNS drives with 2GB zone size as well.
 > 
-> [...]
+> I simplified the fio test script and confirmed that the short script below [1]
+> recreates the error using the null_blk device with 4MB zone size and memory
+> backed option.
+> 
+> The trigger commit modifies the order to dispatch write requests to zones. To
+> check the write requests dispatched to the null_blk device, I took blktrace [2].
+> It shows that 1MB write to the first zone (sector 0) is divided into size of 255
+> sectors. One of the divided write requests was dispatched to the zone but it was
+> not a write at zone start, then it caused the I/O error. I think this I/O error
+> is caused by unaligned write command error on the device. Later on, another
+> write request to the zone start was dispatched. So, it does not look the write
+> requests are well ordered.
+> 
+> I call for a help to resolve this issue. If any actions on my test systems will
+> help, please let me know.
+> 
+> 
+> [1]
+> 
+> #!/bin/bash
+> 
+> dev=$1
+> realdev=$(readlink -f "$dev")
+> basename=$(basename "$realdev")
+> 
+> echo mq-deadline >"/sys/block/$basename/queue/scheduler"
+> blkzone reset $dev
+> 
+> fio --name=job --filename="${dev}" --ioengine=libaio --iodepth=256 \
+>      --rw=randwrite --bs=1M --offset=0 --size=16M \
+>      --zonemode=zbd --direct=1 --zonesize=4M
+> 
+> [2]
+> 
+> ...
+> 251,0    1      136     0.871020525  1300  Q  WS 0 + 2048 [fio]
+> 251,0    1      137     0.871025680  1300  X  WS 0 / 255 [fio]
+> 251,0    1      138     0.871027679  1300  G  WS 0 + 255 [fio]
+> 251,0    1      139     0.871028675  1300  I  WS 0 + 255 [fio]
+> 251,0    1      140     0.871038432  1300  X  WS 255 / 510 [fio]
+> 251,0    1      141     0.871040086  1300  G  WS 255 + 255 [fio]
+> 251,0    1      142     0.871040949  1300  I  WS 255 + 255 [fio]
+> 251,0    1      143     0.871050035  1300  X  WS 510 / 765 [fio]
+> 251,0    1      144     0.871051688  1300  G  WS 510 + 255 [fio]
+> 251,0    1      145     0.871052551  1300  I  WS 510 + 255 [fio]
+> 251,0    3        8     0.871054865  1115  C  WS 24576 + 765 [0]
+> 251,0    1      146     0.871061570  1300  X  WS 765 / 1020 [fio]
+> 251,0    1      147     0.871063327  1300  G  WS 765 + 255 [fio]
+> 251,0    1      148     0.871064204  1300  I  WS 765 + 255 [fio]
+> 251,0    1      149     0.871073358  1300  X  WS 1020 / 1275 [fio]
+> 251,0    1      150     0.871075004  1300  G  WS 1020 + 255 [fio]
+> 251,0    3        9     0.871075262  1115  D  WS 510 + 255 [kworker/3:2H] ... Write not at zone start
+> 251,0    1      151     0.871075921  1300  I  WS 1020 + 255 [fio]
+> 251,0    3       10     0.871077227  1115  C  WS 0 + 765 [65531]  ... I/O error
+> 251,0    1      152     0.871085051  1300  X  WS 1275 / 1530 [fio]
+> ...
+> 251,0    3      281     0.904191667  1115  D  WS 0 + 255 [kworker/3:2H] ... Write at zone start comes after
+> 251,0    3      282     0.904445591  1115  C  WS 0 + 255 [0]
+> ...
 
-Applied to 6.5/scsi-fixes, thanks!
+Thank you for the detailed report. Does this patch help?
 
-[1/5] scsi: sd_zbc: Set zone limits before revalidating zones
-      https://git.kernel.org/mkp/scsi/c/f79846ca2f04
-[2/5] nvme: zns: Set zone limits before revalidating zones
-      https://git.kernel.org/mkp/scsi/c/d226b0a2b683
-[3/5] block: nullblk: Set zone limits before revalidating zones
-      https://git.kernel.org/mkp/scsi/c/a442b899fe17
-[4/5] block: virtio_blk: Set zone limits before revalidating zones
-      https://git.kernel.org/mkp/scsi/c/a3d96ed21507
-[5/5] block: improve checks in blk_revalidate_disk_zones()
-      https://git.kernel.org/mkp/scsi/c/03e51c4a74b9
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 6aa5daf7ae32..02a916ba62ee 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -176,7 +176,7 @@ static inline struct request 
+*deadline_from_pos(struct dd_per_prio *per_prio,
+  	 * zoned writes, start searching from the start of a zone.
+  	 */
+  	if (blk_rq_is_seq_zoned_write(rq))
+-		pos -= round_down(pos, rq->q->limits.chunk_sectors);
++		pos = round_down(pos, rq->q->limits.chunk_sectors);
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+  	while (node) {
+  		rq = rb_entry_rq(node);
+
