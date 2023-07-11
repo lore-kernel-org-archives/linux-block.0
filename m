@@ -2,145 +2,130 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABDFFEB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 16:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50409C04FDF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 16:18:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbjGKQGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 12:06:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40916 "EHLO
+        id S232943AbjGKQS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 12:18:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232250AbjGKQGP (ORCPT
+        with ESMTP id S233386AbjGKQSB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 12:06:15 -0400
-X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 11 Jul 2023 09:05:57 PDT
-Received: from esa3.hc3370-68.iphmx.com (esa3.hc3370-68.iphmx.com [216.71.145.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14741FCB
-        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 09:05:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1689091557;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=CQ07KOad9rBrX25HAdPxBhuEPDkFzDLdIlc2phuivUw=;
-  b=f9yNXNyBqx322S2xNCrys2N8H8wcVl+RAaVeP2S5n1pDBEKtv1ygPMmk
-   gg+P1uTot01JeyDSmecoFhwa0DDFM/xUtHBzfDKUFhNv7TF1/H1lpax/Z
-   U6EVaI8RWeUPiv1ZjvSjtMtYpyIwYRQ2QFKJoEFYl30FdNKmsLrDjzPf3
-   M=;
-Authentication-Results: esa3.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none
-X-SBRS: 4.0
-X-MesageID: 115870688
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.156.123
-X-Policy: $RELAYED
-IronPort-Data: A9a23:TiNRL60c5KI7ha1NBfbD5dpxkn2cJEfYwER7XKvMYLTBsI5bp2YHz
- zYXDTuAOayMZGr0KNt0PNzl9R8AuMDXxodrSQBkpC1hF35El5HIVI+TRqvS04F+DeWYFR46s
- J9OAjXkBJppJpMJjk71atANlVEliefTAOK6ULWeUsxIbVcMYD87jh5+kPIOjIdtgNyoayuAo
- tq3qMDEULOf82cc3lk8teTb8XuDgNyo4GlD5gNnPKgS1LPjvyJ94Kw3dPnZw0TQGuG4LsbiL
- 87fwbew+H/u/htFIrtJRZ6iLyXm6paLVeS/oiI+t5qK23CulQRrukoPD9IOaF8/ttm8t4sZJ
- OOhF3CHYVxB0qXkwIzxWvTDes10FfUuFLTveRBTvSEPpqFvnrSFL/hGVSkL0YMkFulfDSZP6
- qQoNRMxPlOMnsOJ7a68E/BCmZF2RCXrFNt3VnBIyDjYCbAtQIzZQrWM7thdtNsyrpkQR7CEP
- ZNfMGcxKk2aOHWjOX9OYH46tP2vnWK5dzRXpUiKrK4zy2PS0BZwwP7mN9+9ltmiHJwIzhnA+
- DKWl4j/Kg85EvO+7Bq6y3at2eXQsAz5cb0RPqLto5aGh3XMnzdOWXX6T2CTpfi/l177UdZYI
- E885CUjt+4x+VatQ927WAe3yFaAvxgBS59THvc85QWl1KXZ+UCaC3ICQzoHb8Yp3Oc/VTYt2
- 3eKksnvCDgpvL79dJ6G3u7K93XoY3FTdDJcI3ZeFmPp/uUPvqk/yRPQFuZ+M5LlzdLsOA7d3
- zfTtQYh0uB7YdEw60mrwbzWq2vy9smREVVstlu/snGNtV0gOtP8D2C8wR2CtKsbct7EJrWUl
- CJc8/Vy+tziGn1keMalZOwWVI+k6P+eWNE3qQ4+RsJxn9hBFpPKQGyx3N2dDB0zWir8UWW1C
- HI/QCsIjHOpAFOkbLVsf6W6ANkwwK7rGLzND66EP4IXPsEpKFPepUmCgHJ8OEi0wCARfVwXY
- 8/HIa5A815HYUiY8NZGb7hEiuJ6rszP7WjSWYr633yaPUm2PRaopUM+GALWNIgRtfrUyDg5B
- v4Db6NmPT0DCryhCsQWmKZPRW03wY8TXsiu8ZMPL7LYemKL2ggJUpfs/F/oQKQ994w9qwsC1
- ijVtpNwoLYnuUD6FA==
-IronPort-HdrOrdr: A9a23:tr6XYKySOkBc2pY/vLFbKrPxC+gkLtp133Aq2lEZdPULSKylfp
- GV/cjziyWbtN9IYgBcpTnyAtj9fZq8z+8+3WB1B93SPzUO11HYV72KgbGSpwEIeBeOu9K1t5
- 0QCZSWYeeYZTMW4amKgnjcLz9K+qjgzEncv5an854bd3ASV0gP1XYfNi+rVmlNACVWD5swE5
- SRouJBujqbYHwSKuirG3UfWODHhtvT0LbrewQPCRIL4BSHyWrA0s+0LzGomjMlFx9fy7Yr9m
- bI1yT/+6WYqvm+jjPMymPJ6JxSud35jv9OHtaFhMQ5IijlziyoeINicbufuy1dmpDi1H8a1P
- 335zswNcV67H3cOkuvpwH25gXm2DEyr1f/1F6xmxLY0I3EbQN/L/AEqZNScxPf5UZllsp7yr
- h302WQsIcSJQ/cnR76+8PDW3hR5wqJSDsZ4K0uZk5kIM4jgYxq3MgiFYRuYdA99RfBmcIa+S
- 9VfYfhDbhtAAqnhjvizxZSKZSXLwoO91G9MwY/k/3Q6iNRmn9hyUse2YgwolcsnahNEaVs1q
- D8KaJvm6hJTsgKKYRHJMlEb/eWJwX2ME/x2ET7GyW9KEjCAQOUl3b6jY9Fld2CadgGyoA/l4
- /GV04dvWkue1j2AcnLx5FT9AvRKV/NFAgF5/sukKSRgIeMMobDIGmGUhQjgsGgq/IQDonSXO
- uyIotfB7vmIXH1EYhE0gXiU90KQENuG/E9q5I+QRaDs8jLIorluqjSd+vSPqPkFXIhVnnkCn
- UOUTDvLIFL71ytWHX/nB/NMkmdMnDX7NZ1CuzX7uITwI8COslFtRUUk02w4oWRJThLosUNDT
- 9DyXPc49aGTEWNjBT1Bj9SS2pg525ukcbdb08=
-X-Talos-CUID: =?us-ascii?q?9a23=3ANNdYKGtdPU2Zx2LPf5zBR2cE6IspNXzClEfNAHP?=
- =?us-ascii?q?oSmlwaYK4VVjJ4Y17xp8=3D?=
-X-Talos-MUID: =?us-ascii?q?9a23=3AJRVNTw3Arg2tLSRrqGbYl35nojUj/YeIJ2Eosao?=
- =?us-ascii?q?/v8jbPzNdFDW0szedXdpy?=
-X-IronPort-AV: E=Sophos;i="6.01,196,1684814400"; 
-   d="scan'208";a="115870688"
-From:   Ross Lagerwall <ross.lagerwall@citrix.com>
-To:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Ross Lagerwall <ross.lagerwall@citrix.com>
-Subject: [PATCH] blk-mq: Fix stall due to recursive flush plug
-Date:   Tue, 11 Jul 2023 17:04:34 +0100
-Message-ID: <20230711160434.248868-1-ross.lagerwall@citrix.com>
-X-Mailer: git-send-email 2.39.3
+        Tue, 11 Jul 2023 12:18:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED944B8
+        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 09:18:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 79E1F61564
+        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 16:18:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0E1FC43397;
+        Tue, 11 Jul 2023 16:17:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689092279;
+        bh=9L6KVSpQ52iJPE/W9jY3lrnhEPrff+Z1LTyLQcv3sdo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GjMT73AgXcyF+/wnM61zc+wcm/8+eqcyrwD4iVIc+yIvuT+1V7qmm2MdRA0lKY/WD
+         xdJ9bIgeszZQ6thQC1dB813TOS+iQrY0gKWqpajt4w0UqMTyhIgJcCUXMiuNqoFvgr
+         wnTKYlRQKa4jrojQp05SGNSzG7uNhVVs+BgMkx/U6TNOu8WX1gyvrEsiYs0NfLPOiG
+         N3frObkHFygc1ageTo9HcPRYpB6WWShpwoY0d1lOAkJJ2Et+mbfB3cECwz1PVy80tN
+         9hx8J+DBW/XxqyR1TilaseDsC9Ig0lMUv3olAUi58RZ19k/PcdKY/mt034voSdWvPO
+         xq2nYnt433w4g==
+Date:   Tue, 11 Jul 2023 09:17:57 -0700
+From:   Jaegeuk Kim <jaegeuk@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     chao@kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] f2fs: don't reopen the main block device in
+ f2fs_scan_devices
+Message-ID: <ZK2AtW9hLjqpbaPW@google.com>
+References: <20230707094028.107898-1-hch@lst.de>
+ <ZKx2jVONy35B0/S1@google.com>
+ <20230711050101.GA19128@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230711050101.GA19128@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have seen rare IO stalls as follows:
+On 07/11, Christoph Hellwig wrote:
+> I think that's because it doesn't look at sbi->s_ndevs in
+> destroy_device_list.  Let's try the variant below, which also fixes
+> the buildbot warning for non-zoned configfs:
 
-* blk_mq_plug_issue_direct() is entered with an mq_list containing two
-requests.
-* For the first request, it sets last == false and enters the driver's
-queue_rq callback.
-* The driver queue_rq callback indirectly calls schedule() which calls
-blk_flush_plug().
-* blk_flush_plug() handles the remaining request in the mq_list. mq_list
-is now empty.
-* The original call to queue_rq resumes (with last == false).
-* The loop in blk_mq_plug_issue_direct() terminates because there are no
-remaining requests in mq_list.
+Thanks. At a glance, this looks better. Let me give it a try.
 
-The IO is now stalled because the last request submitted to the driver
-had last == false and there was no subsequent call to commit_rqs().
-
-Fix this by returning early in blk_mq_flush_plug_list() if rq_count is 0
-which it will be in the recursive case, rather than checking if the
-mq_list is empty. At the same time, adjust one of the callers to skip
-the mq_list empty check as it is not necessary.
-
-Fixes: dc5fc361d891 ("block: attempt direct issue of plug list")
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
----
-
-I'm not 100% sure if I've got the correct Fixes commit.
-
- block/blk-core.c | 3 +--
- block/blk-mq.c   | 2 +-
- 2 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 99d8b9812b18..90de50082146 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1144,8 +1144,7 @@ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
- {
- 	if (!list_empty(&plug->cb_list))
- 		flush_plug_callbacks(plug, from_schedule);
--	if (!rq_list_empty(plug->mq_list))
--		blk_mq_flush_plug_list(plug, from_schedule);
-+	blk_mq_flush_plug_list(plug, from_schedule);
- 	/*
- 	 * Unconditionally flush out cached requests, even if the unplug
- 	 * event came from schedule. Since we know hold references to the
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5504719b970d..d5a7f36e634f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2742,7 +2742,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- {
- 	struct request *rq;
- 
--	if (rq_list_empty(plug->mq_list))
-+	if (plug->rq_count == 0)
- 		return;
- 	plug->rq_count = 0;
- 
--- 
-2.39.3
-
+> 
+> ---
+> >From 645d8dceaa97b6ee73be067495b111b15b187498 Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Fri, 7 Jul 2023 10:31:49 +0200
+> Subject: f2fs: don't reopen the main block device in f2fs_scan_devices
+> 
+> f2fs_scan_devices reopens the main device since the very beginning, which
+> has always been useless, and also means that we don't pass the right
+> holder for the reopen, which now leads to a warning as the core super.c
+> holder ops aren't passed in for the reopen.
+> 
+> Fixes: 3c62be17d4f5 ("f2fs: support multiple devices")
+> Fixes: 0718afd47f70 ("block: introduce holder ops")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-flush.c |  2 +-
+>  fs/f2fs/super.c   | 20 ++++++++------------
+>  2 files changed, 9 insertions(+), 13 deletions(-)
+> 
+> diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+> index ca31163da00a55..30883beb750a59 100644
+> --- a/fs/f2fs/super.c
+> +++ b/fs/f2fs/super.c
+> @@ -1561,7 +1561,8 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
+>  	int i;
+>  
+>  	for (i = 0; i < sbi->s_ndevs; i++) {
+> -		blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
+> +		if (i > 0)
+> +			blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
+>  #ifdef CONFIG_BLK_DEV_ZONED
+>  		kvfree(FDEV(i).blkz_seq);
+>  #endif
+> @@ -4190,16 +4191,12 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+>  	sbi->aligned_blksize = true;
+>  
+>  	for (i = 0; i < max_devices; i++) {
+> -
+> -		if (i > 0 && !RDEV(i).path[0])
+> +		if (i == 0)
+> +			FDEV(0).bdev = sbi->sb->s_bdev;
+> +		else if (!RDEV(i).path[0])
+>  			break;
+>  
+> -		if (max_devices == 1) {
+> -			/* Single zoned block device mount */
+> -			FDEV(0).bdev =
+> -				blkdev_get_by_dev(sbi->sb->s_bdev->bd_dev, mode,
+> -						  sbi->sb->s_type, NULL);
+> -		} else {
+> +		if (max_devices > 1) {
+>  			/* Multi-device mount */
+>  			memcpy(FDEV(i).path, RDEV(i).path, MAX_PATH_LEN);
+>  			FDEV(i).total_segments =
+> @@ -4215,10 +4212,9 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+>  				FDEV(i).end_blk = FDEV(i).start_blk +
+>  					(FDEV(i).total_segments <<
+>  					sbi->log_blocks_per_seg) - 1;
+> +				FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path,
+> +					mode, sbi->sb->s_type, NULL);
+>  			}
+> -			FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path, mode,
+> -							  sbi->sb->s_type,
+> -							  NULL);
+>  		}
+>  		if (IS_ERR(FDEV(i).bdev))
+>  			return PTR_ERR(FDEV(i).bdev);
+> -- 
+> 2.39.2
