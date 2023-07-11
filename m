@@ -2,37 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0DCEB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 08:22:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF8E8EB64DD
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 09:09:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbjGKIWN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 04:22:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41626 "EHLO
+        id S231537AbjGKJJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 05:09:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbjGKIWM (ORCPT
+        with ESMTP id S231436AbjGKJJZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 04:22:12 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8890191;
-        Tue, 11 Jul 2023 01:22:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Qwuo2cmnOyKWMhs51uip+VVO1uccisKrt4zrIgmUcvQ=; b=jvp1svZdBq8Y4YpYYuoVxg/q8n
-        a9UCIH+MHHb5EXp3PuUPDhv0FhMYQ+wW+pAb2oaf9mijPY66kxtbP9rsiowfWLKrdmoDtmcVDSNOd
-        rNDvx0Sgy46rh9bvIHhshESc/FlazgPHAJY8NJqRKLKFX9mqPVGSiJNbA40UTI9xwgCarfkXXn8pz
-        a5N1EPYo5FrfSPCVg5yw1BmC8Ly5BAwzcRW01/w0QeKMeTdVjQpvk7kg99HLYWrGYChUE4RdZZgvz
-        rreBNt7M11s1ncS93G60LwDE0ndJeX2f3SV9MdsJZyYwSQ2C0SCZWQiHsO3nZwGYSIVyRwA4BeWOL
-        8E44roig==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qJ8dG-00E5jN-1N;
-        Tue, 11 Jul 2023 08:22:02 +0000
-Date:   Tue, 11 Jul 2023 01:22:02 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
+        Tue, 11 Jul 2023 05:09:25 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AA1E12E
+        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 02:09:24 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b717e9d423so30420971fa.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 02:09:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1689066562; x=1691658562;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f1swa4llGSXPw+jbFQXW+RCE6a2/ZAHCllhqOXijpO4=;
+        b=l1t99zHiC+k4/p3uRtVNlxKbiRNR2A7yRQwdHGJPo6VlW2xElMmPrl77gzkkLCgbug
+         vPC86dBrEp1cUW7zPSvoKboT1k+DvM5uJTcX3KUlRyciZy+/3FNwdyBbu1PO7H+byS7B
+         3OW9Dn8zTX/GpPDPalHk+0T6z1SxyywxPbvVOegBSuVxUQhVjemXMOy9sTIddh9Df35K
+         0JaKvEQiK+nnqyhZlxtC764LbzWG5e0ZY9M/ncCCmsHD8W0tbAWVbGamtYj7HdXxWH8n
+         oZC9z9RUjyqc7Lig8u1YNB9WPGZS9vwqDFCn4g9eF84Jc61VDAyUww/cBqB2GSOcX9zo
+         D+cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689066562; x=1691658562;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=f1swa4llGSXPw+jbFQXW+RCE6a2/ZAHCllhqOXijpO4=;
+        b=WtPMQnbn9cROEUSqfriz/jOeWt4B59HwzI+YRj6Bj1eUwge5VVWF06Ws5/Gb7idyle
+         CAFe7yKiE7+8CPscFFXWSHaDlETwcBS/VWB9HVMmNA0GMG9j0R2Py3tHbzBWhtKeSMhU
+         8V7mtmT0RZSuumweZ6q//oVBBicdjLEvrVrYXwX6ddoT7mDFADBGcrAK5H3omLC4iSKq
+         Od6UaicbkkZ8teQC186ddLnrfc6sG2EJkaFHulWtAfqdTCNSirs1ZIILGctY+nD+w4lu
+         B7opmf+hkoY3w8CqfRejZeysMeLvMCB/Ga2e0srsaRJ3F79M62cxWjBRY84DCTjdFz+v
+         GTrg==
+X-Gm-Message-State: ABy/qLZz8OwvW3GIPUP0HpapBOG14a+ceve43LZli2cODS0jbEs7/dz8
+        EpQHXHWw9m2JdCcrxPtoidgVIA==
+X-Google-Smtp-Source: APBJJlFyemvbTSempmrSKpT8WCzWbYTuF/fF0IbXO7M8fwe1Xt21ZQ8MG+1x/z1GNhOnEJTNBRAVaw==
+X-Received: by 2002:a2e:aaa4:0:b0:2b6:ffa4:d6ec with SMTP id bj36-20020a2eaaa4000000b002b6ffa4d6ecmr6967135ljb.4.1689066562420;
+        Tue, 11 Jul 2023 02:09:22 -0700 (PDT)
+Received: from localhost ([185.108.254.55])
+        by smtp.gmail.com with ESMTPSA id f15-20020a2ea0cf000000b002b6f8d07d30sm359557ljm.134.2023.07.11.02.09.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 02:09:22 -0700 (PDT)
+References: <20230706130930.64283-1-nmi@metaspace.dk>
+ <20230706130930.64283-2-nmi@metaspace.dk>
+ <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
+ <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
+ <ZKuqt6QAXic3wuRX@infradead.org>
+ <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
+ <ZKvQPAN9OkS3dZ4d@infradead.org> <87a5w3ymff.fsf@metaspace.dk>
+ <ZK0RKkXFaQSotxVl@infradead.org>
+User-agent: mu4e 1.10.4; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Ming Lei <ming.lei@redhat.com>,
         Damien Le Moal <dlemoal@kernel.org>,
         open list <linux-kernel@vger.kernel.org>,
         "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
@@ -43,36 +72,42 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         Johannes Thumshirn <jth@kernel.org>,
         Hans Holmberg <Hans.Holmberg@wdc.com>
 Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
-Message-ID: <ZK0RKkXFaQSotxVl@infradead.org>
-References: <20230706130930.64283-1-nmi@metaspace.dk>
- <20230706130930.64283-2-nmi@metaspace.dk>
- <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
- <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
- <ZKuqt6QAXic3wuRX@infradead.org>
- <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
- <ZKvQPAN9OkS3dZ4d@infradead.org>
- <87a5w3ymff.fsf@metaspace.dk>
+Date:   Tue, 11 Jul 2023 11:02:15 +0200
+In-reply-to: <ZK0RKkXFaQSotxVl@infradead.org>
+Message-ID: <875y6qzufc.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a5w3ymff.fsf@metaspace.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 08:23:40AM +0200, Andreas Hindborg (Samsung) wrote:
-> Yet most on-the-wire protocols for actual hardware does support this
-> some way or another.
 
-Supports what?  Passthrough?  No.
+Christoph Hellwig <hch@infradead.org> writes:
 
-> I somewhat agree in the sense that for consistency, we should either
-> move zone management commands to the DRV_OUT range OR move report_zones
-> out of this special range and just next to the zone management
-> operations. I like the latter option better, and I would love to see the
-> block layer do the same at some point. It feels backwards that
-> report_zones get special treatment all over the place.
+> On Tue, Jul 11, 2023 at 08:23:40AM +0200, Andreas Hindborg (Samsung) wrot=
+e:
+>> Yet most on-the-wire protocols for actual hardware does support this
+>> some way or another.
+>
+> Supports what?  Passthrough?  No.
 
-DRV_IN/OUT is purely a Linux concept.  It doesn't make any sense for
-a wire protocol.
+Both SCSI and NVMe has command identifier ranges reserved for vendor
+specific commands. I would assume that one use of these is to implement
+passthrough channels to a device for testing out new interfaces. Just
+guessing though.
+
+>
+>> I somewhat agree in the sense that for consistency, we should either
+>> move zone management commands to the DRV_OUT range OR move report_zones
+>> out of this special range and just next to the zone management
+>> operations. I like the latter option better, and I would love to see the
+>> block layer do the same at some point. It feels backwards that
+>> report_zones get special treatment all over the place.
+>
+> DRV_IN/OUT is purely a Linux concept.  It doesn't make any sense for
+> a wire protocol.
+
+Ok =F0=9F=91=8D
+
+BR Andreas
