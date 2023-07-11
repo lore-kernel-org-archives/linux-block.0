@@ -2,48 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEDD7EB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 06:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E33EB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 06:47:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbjGKGWk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 02:22:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52218 "EHLO
+        id S230017AbjGKGrb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 02:47:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231406AbjGKGWi (ORCPT
+        with ESMTP id S229637AbjGKGra (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 02:22:38 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C409BE4B
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 23:22:36 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6E6D66732D; Tue, 11 Jul 2023 08:22:33 +0200 (CEST)
-Date:   Tue, 11 Jul 2023 08:22:33 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        chao@kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] f2fs: don't reopen the main block device in
- f2fs_scan_devices
-Message-ID: <20230711062233.GB20392@lst.de>
-References: <20230707094028.107898-1-hch@lst.de> <ZKx2jVONy35B0/S1@google.com> <20230711050101.GA19128@lst.de> <63766a54-54db-20a7-ba2f-d31fd230623d@suse.de>
+        Tue, 11 Jul 2023 02:47:30 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73977136
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 23:47:28 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4fbaef9871cso8127565e87.0
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 23:47:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1689058047; x=1691650047;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=ADRu1k94Szm9V0evY8U5mOQEsmaGQsPDAea7XrGLJeI=;
+        b=FFxn8NDbk1lxoec1Wakuv80G8tu8rb2Dtr9C84hZPr9TRy5ITcpxR1IYx1jC3HaM+h
+         Kkj9lZr6D35Wzxo8fKA1jlL45BCp2upcrX/sZx4eGjzI7Z4hFUtekH6k/lSc/YfU5SR0
+         RIHdrOZaW55YLsHy7XjpuUv+ce0tVhZUNf9l3hYhTk8qWjFxOP1vvWLpecllmXqa7WEB
+         CZ52wuPGSRsWNH4GT+luUbWOHqQWN7sQNNiKNteyxY1po17tCWKtRm+pZ0hmV1ZZoH93
+         9h5+4J9oncrBEr7UeAiVeQ64cgONZYt8Wr2cVDqHTrSqgW44rsfdMvLQnysoryNzIwcZ
+         Avrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689058047; x=1691650047;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ADRu1k94Szm9V0evY8U5mOQEsmaGQsPDAea7XrGLJeI=;
+        b=Hrlgmkafsxyddr7lHeGLqKm5Kujn1qWLerxZ2CbSrllZrJVmJrhygU+5wTHcbqgRBk
+         wzBHUc3eCt8szOp2K0HzskmGKWLL4vUFGRsgNsSdlFbS215MRdJta4jJ3YCnAaZymVpi
+         mwSI+8F00qJhDYvbSA7xH9/hID7nN1H8n9v4vH0QawQ69nLZJsZ4RdvCadmOxPrSgZQw
+         2I8S1gkgsA/wzbT2VM7PCI6cO9wgUOwMUqgAizl2FZHkEEf2tF4tNo68Ap9/SkzZ3OyQ
+         +ihJbYAEVo2chnwwMEHE3Kt81odWEJoi/UOAHCaG+Og534V1dS/gpbp+FdFjScTEp6JR
+         Kw+A==
+X-Gm-Message-State: ABy/qLZBVRnPOcQN00pDdSkYeKcYaXf5uARDqcJ6ltduYphkW1tT5QuR
+        g+QDeAqRUy8mCoTT3Mgw1aGeLQ==
+X-Google-Smtp-Source: APBJJlHxhvIChcTAwsEU9f19qUxlQmDyBugZNnIlEsKQig5XHaBQ9lHr0WXdhjrIG6brgbIIGeXmbA==
+X-Received: by 2002:ac2:4f06:0:b0:4f6:2a02:fc1a with SMTP id k6-20020ac24f06000000b004f62a02fc1amr12549137lfr.17.1689058046058;
+        Mon, 10 Jul 2023 23:47:26 -0700 (PDT)
+Received: from localhost ([185.108.254.55])
+        by smtp.gmail.com with ESMTPSA id u22-20020ac243d6000000b004fbbf9e58bbsm192834lfl.126.2023.07.10.23.47.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jul 2023 23:47:25 -0700 (PDT)
+References: <20230706130930.64283-1-nmi@metaspace.dk>
+ <20230706130930.64283-2-nmi@metaspace.dk>
+ <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
+ <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
+ <ZKuqt6QAXic3wuRX@infradead.org>
+ <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
+ <ZKvQPAN9OkS3dZ4d@infradead.org>
+User-agent: mu4e 1.10.4; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>
+Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
+Date:   Tue, 11 Jul 2023 08:23:40 +0200
+In-reply-to: <ZKvQPAN9OkS3dZ4d@infradead.org>
+Message-ID: <87a5w3ymff.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <63766a54-54db-20a7-ba2f-d31fd230623d@suse.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 08:19:50AM +0200, Hannes Reinecke wrote:
->>     	for (i = 0; i < sbi->s_ndevs; i++) {
->> -		blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
->> +		if (i > 0)
->> +			blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
-> You could have started the loop at '1', and avoid the curious 'if' clause 
 
-That's what the previous version did, which caused a NULL pointer
-dereference discussed in this thread, as well as a compile error for
-non-zoned builds..
+Christoph Hellwig <hch@infradead.org> writes:
 
+> On Mon, Jul 10, 2023 at 05:27:23PM +0800, Ming Lei wrote:
+>> Yes, that is exactly what we are doing.
+>> 
+>> The added macros of UBLK_IO_OP_DRV_IN_START[END] are just for supporting
+>> more ublk passthrough commands, and the motivation is for running
+>> check(such as buffer direction) in two sides easily.
+>> 
+>> However, I think it is just fine to delay to add it until introducing
+>> the 2nd ublk pt command.
+>
+> The concept of a passthrough command just doesn't make sense for an
+> on the wire protocol.  It is a linux concept that distinguished between
+> the Linux synthetic command like REQ_OP_READ/WRITE/DISCARD etc that are
+> well defined and can be used by file systems and other consumers, and
+> ways to pass through arbitrary blobs only known by the driver.
+
+Yet most on-the-wire protocols for actual hardware does support this
+some way or another. But I agree that for ublk it is probably not
+needed. It would probably be easier to talk to the ublk daemon through
+other means than passthrough in the block layer.
+
+>
+> Anything in a wire protocol needs to be very well defined in that
+> protocol completely indpendent of what Linux concept it maps to.
+> Especially as the Linux concepts can change, and fairly frequently do.
+
+I somewhat agree in the sense that for consistency, we should either
+move zone management commands to the DRV_OUT range OR move report_zones
+out of this special range and just next to the zone management
+operations. I like the latter option better, and I would love to see the
+block layer do the same at some point. It feels backwards that
+report_zones get special treatment all over the place.
+
+Best regards,
+Andreas
