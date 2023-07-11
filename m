@@ -2,62 +2,79 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E9F1EB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 11:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D77EB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 12:01:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231260AbjGKLwX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 07:52:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37200 "EHLO
+        id S229576AbjGKMBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 08:01:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231217AbjGKLwU (ORCPT
+        with ESMTP id S229583AbjGKMBV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 07:52:20 -0400
-Received: from out-50.mta1.migadu.com (out-50.mta1.migadu.com [95.215.58.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B929136
-        for <linux-block@vger.kernel.org>; Tue, 11 Jul 2023 04:52:19 -0700 (PDT)
-Message-ID: <6825f687-9573-51eb-bb89-17eadb60f71b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689076337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xAlCKMbHrJaFchyjxLhK4XN3M9/LmqiAnoNyHkr0+GY=;
-        b=EcPgXd6jVyp0eZFnTWRCJaE4qOA3TO+dNOwpZqCFhTdoSIb4pG5wgivWJtQkYygUMOTwFj
-        UBPjPNqkcRVdiX0cyG9sPd4O6jbu7h0AjRCxENcQWrFEqG8SxTGInP4MYhbI1vQwyKV2gq
-        R8kVaCHJqWKVuy5SryRBTn0jYz1ImKk=
-Date:   Tue, 11 Jul 2023 19:52:11 +0800
+        Tue, 11 Jul 2023 08:01:21 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789B6E67;
+        Tue, 11 Jul 2023 05:01:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=yL09riI3y2n7lRul4VrDuI7HTYzktNv07GtSRsYL7t0=; b=Omnd3pZ13VQdAteE+/Wl+iFWbD
+        4excywY3qxL8o1WqTyXY4FDWTEtJTLxouePME3G33IwRJvYNzGCznkmODhlCqy2NlQzfACxdeDjPm
+        07Uo/JYMEoa+udinX5d+QvhXwp5ebyRLZrqicaS6oLQXD7tET3mXxm+zvYFEIuip4bh2nJYiINHgG
+        URa3jcgXMEQ+axzow1RWPz0KkfgG8/4Eiz4OxCUHhGLmLXHq7lY9V0DegC/FTt1OxWzXKhBBMcFgb
+        wolUm0m8RtdJcv1I8sScDud3bM9sUWEoB2A203kC0akCTyMQPJ54c4Rg/AbdSwtteQhqxG+pzRocn
+        FUt+NvjA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qJC3P-00Eoef-0m;
+        Tue, 11 Jul 2023 12:01:15 +0000
+Date:   Tue, 11 Jul 2023 05:01:15 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        gost.dev@samsung.com, Jens Axboe <axboe@kernel.dk>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>
+Subject: Re: [PATCH v6 1/3] ublk: add opcode offsets for DRV_IN/DRV_OUT
+Message-ID: <ZK1Ei0hHlbQE/bI8@infradead.org>
+References: <51b660f3-8145-d35e-87b4-d9ac0623606d@kernel.org>
+ <ZKdjVxMT/sVUA5BV@ovpn-8-34.pek2.redhat.com>
+ <ZKuqt6QAXic3wuRX@infradead.org>
+ <ZKvO+81b9fAx2L/r@ovpn-8-31.pek2.redhat.com>
+ <ZKvQPAN9OkS3dZ4d@infradead.org>
+ <87a5w3ymff.fsf@metaspace.dk>
+ <ZK0RKkXFaQSotxVl@infradead.org>
+ <875y6qzufc.fsf@metaspace.dk>
+ <ZK0gcj4j/sRWx2Pl@infradead.org>
+ <871qhezr4d.fsf@metaspace.dk>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] blk-flush: fix rq->flush.seq for post-flush requests
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
-References: <20230710064705.1847287-1-chengming.zhou@linux.dev>
- <20230710133024.GA23157@lst.de>
- <4431d779-e6e7-aff1-5cf8-4147de974d8d@linux.dev>
- <20230711113126.GA26978@lst.de>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <20230711113126.GA26978@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871qhezr4d.fsf@metaspace.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/7/11 19:31, Christoph Hellwig wrote:
-> On Tue, Jul 11, 2023 at 07:06:20PM +0800, Chengming Zhou wrote:
->> Ok, will add a Fixes tag and send it as a separate patch since it's a bug fix.
-> 
-> Btw, it's probably not worth resending patch 2 until we've figured out
-> and dealt with the SATA flush regression that Chuck reported.
+On Tue, Jul 11, 2023 at 12:15:18PM +0200, Andreas Hindborg (Samsung) wrote:
+> And yet they are somewhat similar, in the sense that they allow the user
+> of a protocol to express semantics that is not captured in the
+> established protocol. Uring command passthrough -> request passthrough
+> -> vendor specific commands. They sort of map well in terms of what they
+> allow the user to achieve. Or did I misunderstand something completely?
 
-Ok, I will not resend patch 2. As for the patch 1, should I resend it as a separate patch
-or just put it in that series [1] before other flush optimizations ?
+Well, there is a relationship, but it's one way.
 
-I search on the block mail list, find the issue [2] you mentioned, will look into it too.
+Vendor specific command are basically always going to be used through
+a passthrough interface, because they aren't standardized.
 
-[1] https://lore.kernel.org/lkml/20230707093722.1338589-1-chengming.zhou@linux.dev/
-[2] https://lore.kernel.org/linux-block/7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com/
+But most commands used through a passthrough interface are normal
+standardized commands, just either used in a way not supported by
+the normal Linux interface or just in creative ways.
