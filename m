@@ -2,138 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6921BEB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 04:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 951A1EB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 05:01:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229798AbjGKEG0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 00:06:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
+        id S229538AbjGKFBJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 01:01:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbjGKEGZ (ORCPT
+        with ESMTP id S229583AbjGKFBH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 00:06:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93EC188
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 21:05:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689048337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Sanp52G7qe4emaxcQItrkn4g0y24nEg66UbSkbqz794=;
-        b=e+Z9cLEzq+yZ4M+eUzzHl1G9CV6nL7emo9Qy+kzQciQ9BDP/ymVgNPUOLVUaaisUVpYQED
-        w1yU5zwUEOTdjmAp/6m5g32Y33Y7I3hqd8PZhvt+mTJAExxHB9b2kVvZTUgl94LqRTxsoG
-        JtaYX65U+J+9kvga/ayGgt4vfGpasAI=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-459-xmW-sF_HPUC0N8f3mbBlpw-1; Tue, 11 Jul 2023 00:05:36 -0400
-X-MC-Unique: xmW-sF_HPUC0N8f3mbBlpw-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635dce11cb0so55382156d6.3
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 21:05:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689048336; x=1691640336;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Sanp52G7qe4emaxcQItrkn4g0y24nEg66UbSkbqz794=;
-        b=YCNw4TqS4x7VbJRn2kpcbrS/cr3YnvON66sjwlw5TXKwV9vAf6UQ8kbmDAA5vZvR+r
-         aT7yL+/QIoQwz12wfCFHDaPydNo3Zc37CMoXf0f+1wRwa0hVkBp5FZFS6xdMjSLIp+Po
-         +w/m6JTRTTQJjHry1AFMsogCRB+hnWKn8+XMmHr0ra5JHBL96bWXu38jiu/9jFqIn8ew
-         JUc4B8yIjCpvpzTVIShuheJliGrn0INaKrMRxZTbCCs3jyW7p4iJlf6ENt0xDSnPRorG
-         1VcJXKWHumwfdpgwJH0FJKSU44HPtl+P9sqsxjKYZNnfCLJU80Rmn7na72VfY+mewa6/
-         r2kw==
-X-Gm-Message-State: ABy/qLbr8j7icRl8JBPney/RrVALcZ0XmB0L2ipdYfSC+o7d2ickHf/e
-        tvCKtse9uK6XvM0SdcGCSdOs76qLgDyjQrupjkvujDwtPtGuUHSt27uTRnSe2a1mF6FgULRQkc3
-        zRxn3u1yGcwX6KaRYXrDTP0GTIRixlMo4ySNROcc=
-X-Received: by 2002:a0c:e44d:0:b0:62d:ef66:ff1c with SMTP id d13-20020a0ce44d000000b0062def66ff1cmr12076658qvm.24.1689048335875;
-        Mon, 10 Jul 2023 21:05:35 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEGTtnbv4lplqsuwMA0lcF/2QRhbSnqCLDEDGVhD6GZ6v3vRL7xgj3ixm6UdOxJvERNjVYrT8Aw+QUQlev+2Ls=
-X-Received: by 2002:a0c:e44d:0:b0:62d:ef66:ff1c with SMTP id
- d13-20020a0ce44d000000b0062def66ff1cmr12076645qvm.24.1689048335643; Mon, 10
- Jul 2023 21:05:35 -0700 (PDT)
+        Tue, 11 Jul 2023 01:01:07 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6389FE
+        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2023 22:01:06 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 3A0A768B05; Tue, 11 Jul 2023 07:01:02 +0200 (CEST)
+Date:   Tue, 11 Jul 2023 07:01:01 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jaegeuk Kim <jaegeuk@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, chao@kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org
+Subject: Re: [PATCH] f2fs: don't reopen the main block device in
+ f2fs_scan_devices
+Message-ID: <20230711050101.GA19128@lst.de>
+References: <20230707094028.107898-1-hch@lst.de> <ZKx2jVONy35B0/S1@google.com>
 MIME-Version: 1.0
-References: <20230708020259.1343736-1-ming.lei@redhat.com> <20230708020259.1343736-3-ming.lei@redhat.com>
- <20230710064109.GB24519@lst.de> <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
-In-Reply-To: <ZKvL58L58rY3GWnt@ovpn-8-31.pek2.redhat.com>
-From:   Pingfan Liu <piliu@redhat.com>
-Date:   Tue, 11 Jul 2023 12:05:24 +0800
-Message-ID: <CAF+s44T5Hn5ikNq+YMp2Nucb6rBT=e4VHW8WN8YDhZHe9JmqGw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] nvme-pci: use blk_mq_max_nr_hw_queues() to calculate
- io queues
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Wen Xiong <wenxiong@linux.ibm.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Dave Young <dyoung@redhat.com>, kexec@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZKx2jVONy35B0/S1@google.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+I think that's because it doesn't look at sbi->s_ndevs in
+destroy_device_list.  Let's try the variant below, which also fixes
+the buildbot warning for non-zoned configfs:
 
-Having no [PATCH 1/2] blk-mq: add blk_mq_max_nr_hw_queues() in inbox.
-So I reply here.
+---
+From 645d8dceaa97b6ee73be067495b111b15b187498 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 7 Jul 2023 10:31:49 +0200
+Subject: f2fs: don't reopen the main block device in f2fs_scan_devices
 
-At first glance, I think that  the cpu hot plug callback hook should
-be the remedy for the newly introduced blk_mq_max_nr_hw_queues(),
-although it is more complicated.
+f2fs_scan_devices reopens the main device since the very beginning, which
+has always been useless, and also means that we don't pass the right
+holder for the reopen, which now leads to a warning as the core super.c
+holder ops aren't passed in for the reopen.
 
-Consider the scene where nr_cpus=3D4, which can speed up the dumping
-process, the blk_mq_max_nr_hw_queues() can not utilize the other three
-cpus.
+Fixes: 3c62be17d4f5 ("f2fs: support multiple devices")
+Fixes: 0718afd47f70 ("block: introduce holder ops")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-flush.c |  2 +-
+ fs/f2fs/super.c   | 20 ++++++++------------
+ 2 files changed, 9 insertions(+), 13 deletions(-)
 
-
-Thanks,
-
-Pingfan
-
-On Mon, Jul 10, 2023 at 5:16=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> On Mon, Jul 10, 2023 at 08:41:09AM +0200, Christoph Hellwig wrote:
-> > On Sat, Jul 08, 2023 at 10:02:59AM +0800, Ming Lei wrote:
-> > > Take blk-mq's knowledge into account for calculating io queues.
-> > >
-> > > Fix wrong queue mapping in case of kdump kernel.
-> > >
-> > > On arm and ppc64, 'maxcpus=3D1' is passed to kdump command line, see
-> > > `Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
-> > > still returns all CPUs.
-> >
-> > That's simply broken.  Please fix the arch code to make sure
-> > it does not return a bogus num_possible_cpus value for these
->
-> That is documented in Documentation/admin-guide/kdump/kdump.rst.
->
-> On arm and ppc64, 'maxcpus=3D1' is passed for kdump kernel, and "maxcpu=
-=3D1"
-> simply keep one of CPU cores as online, and others as offline.
->
-> So Cc our arch(arm & ppc64) & kdump guys wrt. passing 'maxcpus=3D1' for
-> kdump kernel.
->
-> > setups, otherwise you'll have to paper over it in all kind of
-> > drivers.
->
-> The issue is only triggered for drivers which use managed irq &
-> multiple hw queues.
->
->
-> Thanks,
-> Ming
->
->
-> _______________________________________________
-> kexec mailing list
-> kexec@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kexec
->
+diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+index ca31163da00a55..30883beb750a59 100644
+--- a/fs/f2fs/super.c
++++ b/fs/f2fs/super.c
+@@ -1561,7 +1561,8 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
+ 	int i;
+ 
+ 	for (i = 0; i < sbi->s_ndevs; i++) {
+-		blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
++		if (i > 0)
++			blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 		kvfree(FDEV(i).blkz_seq);
+ #endif
+@@ -4190,16 +4191,12 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+ 	sbi->aligned_blksize = true;
+ 
+ 	for (i = 0; i < max_devices; i++) {
+-
+-		if (i > 0 && !RDEV(i).path[0])
++		if (i == 0)
++			FDEV(0).bdev = sbi->sb->s_bdev;
++		else if (!RDEV(i).path[0])
+ 			break;
+ 
+-		if (max_devices == 1) {
+-			/* Single zoned block device mount */
+-			FDEV(0).bdev =
+-				blkdev_get_by_dev(sbi->sb->s_bdev->bd_dev, mode,
+-						  sbi->sb->s_type, NULL);
+-		} else {
++		if (max_devices > 1) {
+ 			/* Multi-device mount */
+ 			memcpy(FDEV(i).path, RDEV(i).path, MAX_PATH_LEN);
+ 			FDEV(i).total_segments =
+@@ -4215,10 +4212,9 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+ 				FDEV(i).end_blk = FDEV(i).start_blk +
+ 					(FDEV(i).total_segments <<
+ 					sbi->log_blocks_per_seg) - 1;
++				FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path,
++					mode, sbi->sb->s_type, NULL);
+ 			}
+-			FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path, mode,
+-							  sbi->sb->s_type,
+-							  NULL);
+ 		}
+ 		if (IS_ERR(FDEV(i).bdev))
+ 			return PTR_ERR(FDEV(i).bdev);
+-- 
+2.39.2
 
