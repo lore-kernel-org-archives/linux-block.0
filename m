@@ -2,68 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0E3C0015E
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 16:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF367EB64DD
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 17:33:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231836AbjGLQic (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jul 2023 12:38:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41388 "EHLO
+        id S229757AbjGLRd4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jul 2023 13:33:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232814AbjGLQia (ORCPT
+        with ESMTP id S232644AbjGLRdz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2023 12:38:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315D51FC7
-        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 09:38:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BA8B16181E
-        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 16:38:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC06BC433C7;
-        Wed, 12 Jul 2023 16:38:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689179907;
-        bh=yoZl52pqq/xcmMqzWfpmUaMVskUhx3cJbfxJe6IdPe4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=X1oW4GzwhopR8dvLjCn4xYBw0GtX2aafGRzudg4kvbTaecuhZg1FstTJbTvS0skC8
-         aEKPu0j6s62g+HsRMvWCaqOxBQDZfe5SIhHdKzpzj7I1ftE7P9/v6pYBrJdvKxAIhW
-         LOgFcBIjQ9cHegD31IvPWFH8dizja7jXuMxr6OTOKaHzA3Qv1PH3hnaAswdhlRccDo
-         TtAuX5xaOge1L2WjcTv8LA6n5Qm4B2ma+LjN0ebloFM6N46/XZLTK5V/+dCucKtIdU
-         E1hCOsRgo8q25n4GYDSBPMX5HBzLFCnw8lAdvei0id9Z3gMUO7rTwFs90WxTN+Ex8u
-         gPrpZ8CGwXsNw==
-Date:   Wed, 12 Jul 2023 10:38:24 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 1/4] block: don't unconditionally set max_discard_sectors
- in blk_queue_max_discard_sectors
-Message-ID: <ZK7XAGnwU2CLbXiB@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230707094616.108430-1-hch@lst.de>
- <20230707094616.108430-2-hch@lst.de>
- <ZKvgnI5qZ/Z70ycL@ovpn-8-33.pek2.redhat.com>
- <20230712162310.GA29557@lst.de>
+        Wed, 12 Jul 2023 13:33:55 -0400
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 813261991
+        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 10:33:53 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-666ecb21f86so6582666b3a.3
+        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 10:33:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689183233; x=1691775233;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TUeLU1gIrAqM/pIx75Jx2TVyG1ihfpTnVUq6zHmwpbM=;
+        b=GGFTfWPrrNVQDd9zh9eBNCysLQO06cez9tj+oznrXJ4/2/aXd9WMcwSzZcmRWkEy9A
+         nU6+7xA1GEDt+Le3s/MelvCVs3ighM1hnFeZhbEp7+4zxFmhSfuqnR4VbF3Wqn/LehD5
+         afU441VwQkY8DhxCu+xm8KtI3J8iLgvEVo66Zd0mD4cr9TdVjM69mtVZYNoeudH2vG5w
+         g8M6pPy3Ikh9KpGF5UxrO8XaHmzHcU/xQ7LXC1b23vVYmWRYt7m6qG4MsDMqcsih9bDt
+         ZKejTPZcN8nqnG+1ehisd8SYTtVXWXhcOQ+j8hycZ3iqCJk3b9maupQjcG7s2j73SI1o
+         fYmA==
+X-Gm-Message-State: ABy/qLY8VD66O5Ifn8D4OD7vlhuyr+0MAeOr2q7Unyhg+Si4ziedU039
+        Szg5PIiHfbrwB39XvBsObDo=
+X-Google-Smtp-Source: APBJJlFFDGeH+ytdw7i0R52QFow4A6VFC0DHTb1curvmyTrNWimhAu8Gs/XhKDMsGrM+6u3ug04o0w==
+X-Received: by 2002:a05:6a20:8e1a:b0:12f:bc36:4c67 with SMTP id y26-20020a056a208e1a00b0012fbc364c67mr24574659pzj.61.1689183232705;
+        Wed, 12 Jul 2023 10:33:52 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:fc9:1485:272d:134e])
+        by smtp.gmail.com with ESMTPSA id fk25-20020a056a003a9900b00682a0184742sm4007051pfb.148.2023.07.12.10.33.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 10:33:52 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH] block/mq-deadline: Fix a bug in deadline_from_pos()
+Date:   Wed, 12 Jul 2023 10:33:43 -0700
+Message-ID: <20230712173344.2994513-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230712162310.GA29557@lst.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 12, 2023 at 06:23:10PM +0200, Christoph Hellwig wrote:
-> On Mon, Jul 10, 2023 at 06:42:36PM +0800, Ming Lei wrote:
-> > Userspace may write 0 to discard_max_bytes, and this patch still can
-> > override user setting.
-> 
-> True.  Maybe the right thing is to have a user_limit field, and just
-> looks at the min of that and the hw limit everywhere.  These hardware
-> vs user limits are a pain, and we'll probably need some proper
-> infrastructure for them :P
+A bug was introduced in deadline_from_pos() while implementing the
+suggestion to use round_down() in the following code:
 
-Yeah, I had to do something very similiar for the max_sectors limit too:
+	pos -= bdev_offset_from_zone_start(rq->q->disk->part0, pos);
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=c9c77418a98273fe96835c42666f7427b3883f48
+This patch makes deadline_from_pos() use round_down() such that 'pos' is
+rounded down.
+
+Reported-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Closes: https://lore.kernel.org/all/5zthzi3lppvcdp4nemum6qck4gpqbdhvgy4k3qwguhgzxc4quj@amulvgycq67h/
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Fixes: 0effb390c4ba ("block: mq-deadline: Handle requeued requests correctly")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/mq-deadline.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 0bed2bdeed89..f783ed71ae19 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -176,7 +176,7 @@ static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
+ 	 * zoned writes, start searching from the start of a zone.
+ 	 */
+ 	if (blk_rq_is_seq_zoned_write(rq))
+-		pos -= round_down(pos, rq->q->limits.chunk_sectors);
++		pos = round_down(pos, rq->q->limits.chunk_sectors);
+ 
+ 	while (node) {
+ 		rq = rb_entry_rq(node);
