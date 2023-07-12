@@ -2,230 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B98EB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 15:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77448C00528
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 16:06:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233842AbjGLPyY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jul 2023 11:54:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34878 "EHLO
+        id S233221AbjGLQGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jul 2023 12:06:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233853AbjGLPyV (ORCPT
+        with ESMTP id S232506AbjGLQGu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2023 11:54:21 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB8B1FC3
-        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 08:54:19 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b6ff1a637bso115686481fa.3
-        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 08:54:18 -0700 (PDT)
+        Wed, 12 Jul 2023 12:06:50 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB8A1BE2
+        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 09:06:47 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4fa48b5dc2eso11496387e87.1
+        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 09:06:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1689177257; x=1691769257;
+        d=ionos.com; s=google; t=1689178006; x=1691770006;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zEr1zRynxHNwickntlrvpl2Y4hu0Auhj5iPbkdvumTw=;
-        b=iNQRvirxtZvgsZL7mpUkZfJBjCf72RQYRA2zBZVjI7QyzvVv9ibdssDnajmpBS7wVU
-         5020AKwXsSHRoVgCZlnBhWyIbko/26fM7WuDSlfW8NhEgWQ7wQM+UnRHE8F/EXiS717A
-         unmaoTiMBDb/BpjgPTifm0vPjWw/5NVIvT5MVG4smAtBPaoBSIVd3r20RZkA1Ct/h5E1
-         Ny2cbSGaIZ5Swqx7oHIPxGuKDuqNY4HbE+viXaAQjgZpXn/iH3OXkFOTL6Hv5DHj/WkF
-         9UkkFl1jusUOijErP6uDQrKau2f/GRpR+pWfemKdd9Y6Z66fZ2Ub5cYi9JfCatSI5DHe
-         c4/g==
+        bh=8X6ArMXh62A5UxRR3ZN+q1CvObhoeb8ltfmXU1xj+zw=;
+        b=V0Mwyzpfv5NHo344FebMkemb4OkDhqesSJzk3oLJrC1sXingJzi/DqoHJPX3cM7/kU
+         /daZbGumusx7p3ETz9bL+dV7+a249DzrdJ5ucaxUqFs1cH4q4UNK1aBbCP0kRMVezgvK
+         Gb0u18D1omT5qk875/bvJSIuyWWXlLKu5WnA0OT929rTcOY7rHqZVsWOvIcdQTq+Q4TI
+         Xty8IQiQ2uEFjkBqRHhjaYUeIIjdk3TlKuW6ZBNL29/kZI8LKdOXvAAi+FiRNxSMUXsG
+         92h/diWQ5jGfG/Pc/9JTOLcLZ2bS8Hyd3sIfxIs/rFITeR6YjIQmonhcUevYE5m/zN7s
+         SmPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689177257; x=1691769257;
+        d=1e100.net; s=20221208; t=1689178006; x=1691770006;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zEr1zRynxHNwickntlrvpl2Y4hu0Auhj5iPbkdvumTw=;
-        b=dk591mgSbHM8WZISh/Jfr06fi+XxaAsw8MhcD3nXYCVtrYxgjXtwCtG7ZcI/gRn32s
-         mntfgbPCseVYFaq6IscoZk8nxvjePYdtr8LyaxTh1UWbLN5F25TXhTVSxD1ArWxPUht6
-         5AWsVJWDf+CEkvVLE8Fy3GFQ0JqMv/s9MZ00s5RjDwK5mD6/DNGVLmtSl/1J4EtRSeSj
-         oExNIzdUdRam+4UaOPU40lOBunqhpC4bGY5KWFwoqZlHQCwG+oGmbv8ywC2MPiyH1H0d
-         VXXeWHenxKr+ISmfPJUF6nPNBnmBCPeprh59/7RSNZOT75SbiSaeempcrGiPPm/TZ9rx
-         xf8Q==
-X-Gm-Message-State: ABy/qLbjU+mIAMj/60TSVwM4+7eTTVTOPl19OAFI2SbHgc903f/QAWdj
-        DcOOvQYPu0pjq3MFfBXpazrpeB8JeqGQaKODMB6LDQ==
-X-Google-Smtp-Source: APBJJlEsabczpTtCxBdlHiiJme3DJdBqV2h5d8BTykUTfqYXA3ZjFkk3+fAfSEUsyHeSke7YqL1/Ega53Pql3tWo3io=
-X-Received: by 2002:a2e:8909:0:b0:2b6:9f5d:e758 with SMTP id
- d9-20020a2e8909000000b002b69f5de758mr18974978lji.9.1689177257278; Wed, 12 Jul
- 2023 08:54:17 -0700 (PDT)
+        bh=8X6ArMXh62A5UxRR3ZN+q1CvObhoeb8ltfmXU1xj+zw=;
+        b=WZIBiLTKtVTU6MEt2f+r8G7ZZ+cSE0+ipTDP4kfxAnurP+/dtM1DEC9GxZi3GVZYft
+         RAFYAyI5AXYpv1A54o9FSCEatw6aWnJ/zFhg75rp5n0Mxz6fA6qWNTtspUPQ+vT+2Ry9
+         Vs8tPdgUo+LozNEQsREsIdYoA0sPqqoRQcoSR4uzV0dDAA1+LiyPKC5pZ8HMVJxmnZDk
+         JXJWcEcruJ/SX6pGCJSfz9syJ1oqbL1cA7m1CRminB3ePDI/U35/WhzMa33Rj8tNZWyw
+         ssMUqjG/OCMBH7TmBJSvVOy9Q/KVZS899FS9w8pBb19qq42deSFGwfD9XKYz1z8dsXAH
+         hceg==
+X-Gm-Message-State: ABy/qLbFnLylSZAeE5LiDFeFV66PYBFcuHTYKy3zZxWeuU7sQOpa2a8P
+        k40OxJD2IK9AZn6YrtITEMSUNwfKHSKYQjRjbrOXXA==
+X-Google-Smtp-Source: APBJJlHjPtNIqZNhhKZT3JSG1orBAozCwd3+TwwvFjulJuToD7D5iIrA7grwKZQU8Z67qc0UJ0oDxWof6WbkdfMRi3A=
+X-Received: by 2002:ac2:5b1d:0:b0:4fb:7a90:1abe with SMTP id
+ v29-20020ac25b1d000000b004fb7a901abemr15797051lfn.49.1689178006211; Wed, 12
+ Jul 2023 09:06:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230629165206.383-1-jack@suse.cz> <20230704122224.16257-7-jack@suse.cz>
-In-Reply-To: <20230704122224.16257-7-jack@suse.cz>
+References: <20230629165206.383-1-jack@suse.cz> <20230704122224.16257-1-jack@suse.cz>
+ <ZKbgAG5OoHVyUKOG@infradead.org>
+In-Reply-To: <ZKbgAG5OoHVyUKOG@infradead.org>
 From:   Haris Iqbal <haris.iqbal@ionos.com>
-Date:   Wed, 12 Jul 2023 17:54:06 +0200
-Message-ID: <CAJpMwyg-+rKk_2-1bhN5M9pdYiCNusbfe2B+PA1cNOp1uwNJGg@mail.gmail.com>
-Subject: Re: [PATCH 07/32] rnbd-srv: Convert to use blkdev_get_handle_by_path()
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jack Wang <jinpu.wang@ionos.com>
+Date:   Wed, 12 Jul 2023 18:06:35 +0200
+Message-ID: <CAJpMwyiUcw+mH0sZa8f8UJsaSZ7NSE65s2gZDEia+pASyP_gJQ@mail.gmail.com>
+Subject: Re: [PATCH 01/32] block: Provide blkdev_get_handle_* functions
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anna Schumaker <anna@kernel.org>, Chao Yu <chao@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com, Gao Xiang <xiang@kernel.org>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        jfs-discussion@lists.sourceforge.net,
+        Joern Engel <joern@lazybastard.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-xfs@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>,
+        Minchan Kim <minchan@kernel.org>, ocfs2-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Song Liu <song@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        target-devel@vger.kernel.org, Ted Tso <tytso@mit.edu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        xen-devel@lists.xenproject.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 4, 2023 at 2:22=E2=80=AFPM Jan Kara <jack@suse.cz> wrote:
+On Thu, Jul 6, 2023 at 5:38=E2=80=AFPM Christoph Hellwig <hch@infradead.org=
+> wrote:
 >
-> Convert rnbd-srv to use blkdev_get_handle_by_path() and pass the handle
-> around.
+> On Tue, Jul 04, 2023 at 02:21:28PM +0200, Jan Kara wrote:
+> > Create struct bdev_handle that contains all parameters that need to be
+> > passed to blkdev_put() and provide blkdev_get_handle_* functions that
+> > return this structure instead of plain bdev pointer. This will
+> > eventually allow us to pass one more argument to blkdev_put() without
+> > too much hassle.
 >
-> CC: Jack Wang <jinpu.wang@ionos.com>
-> CC: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
-> Signed-off-by: Jan Kara <jack@suse.cz>
-Acked-by: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
+> Can we use the opportunity to come up with better names?  blkdev_get_*
+> was always a rather horrible naming convention for something that
+> ends up calling into ->open.
+>
+> What about:
+>
+> struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *ho=
+lder,
+>                 const struct blk_holder_ops *hops);
+> struct bdev_handle *bdev_open_by_path(dev_t dev, blk_mode_t mode,
+>                 void *holder, const struct blk_holder_ops *hops);
+> void bdev_release(struct bdev_handle *handle);
 
-Thanks
++1 to this.
+Also, if we are removing "handle" from the function, should the name
+of the structure it returns also change? Would something like bdev_ctx
+be better?
 
+(Apologies for the previous non-plaintext email)
 
-> ---
->  drivers/block/rnbd/rnbd-srv.c | 28 +++++++++++++++-------------
->  drivers/block/rnbd/rnbd-srv.h |  2 +-
->  2 files changed, 16 insertions(+), 14 deletions(-)
 >
-> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.=
-c
-> index c186df0ec641..606db77c1238 100644
-> --- a/drivers/block/rnbd/rnbd-srv.c
-> +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -145,7 +145,7 @@ static int process_rdma(struct rnbd_srv_session *srv_=
-sess,
->         priv->sess_dev =3D sess_dev;
->         priv->id =3D id;
->
-> -       bio =3D bio_alloc(sess_dev->bdev, 1,
-> +       bio =3D bio_alloc(sess_dev->bdev_handle->bdev, 1,
->                         rnbd_to_bio_flags(le32_to_cpu(msg->rw)), GFP_KERN=
-EL);
->         if (bio_add_page(bio, virt_to_page(data), datalen,
->                         offset_in_page(data)) !=3D datalen) {
-> @@ -219,7 +219,7 @@ void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *=
-sess_dev, bool keep_id)
->         rnbd_put_sess_dev(sess_dev);
->         wait_for_completion(&dc); /* wait for inflights to drop to zero *=
-/
->
-> -       blkdev_put(sess_dev->bdev, NULL);
-> +       blkdev_handle_put(sess_dev->bdev_handle);
->         mutex_lock(&sess_dev->dev->lock);
->         list_del(&sess_dev->dev_list);
->         if (!sess_dev->readonly)
-> @@ -534,7 +534,7 @@ rnbd_srv_get_or_create_srv_dev(struct block_device *b=
-dev,
->  static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
->                                         struct rnbd_srv_sess_dev *sess_de=
-v)
->  {
-> -       struct block_device *bdev =3D sess_dev->bdev;
-> +       struct block_device *bdev =3D sess_dev->bdev_handle->bdev;
->
->         rsp->hdr.type =3D cpu_to_le16(RNBD_MSG_OPEN_RSP);
->         rsp->device_id =3D cpu_to_le32(sess_dev->device_id);
-> @@ -559,7 +559,7 @@ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_ms=
-g_open_rsp *rsp,
->  static struct rnbd_srv_sess_dev *
->  rnbd_srv_create_set_sess_dev(struct rnbd_srv_session *srv_sess,
->                               const struct rnbd_msg_open *open_msg,
-> -                             struct block_device *bdev, bool readonly,
-> +                             struct bdev_handle *handle, bool readonly,
->                               struct rnbd_srv_dev *srv_dev)
->  {
->         struct rnbd_srv_sess_dev *sdev =3D rnbd_sess_dev_alloc(srv_sess);
-> @@ -571,7 +571,7 @@ rnbd_srv_create_set_sess_dev(struct rnbd_srv_session =
-*srv_sess,
->
->         strscpy(sdev->pathname, open_msg->dev_name, sizeof(sdev->pathname=
-));
->
-> -       sdev->bdev              =3D bdev;
-> +       sdev->bdev_handle       =3D handle;
->         sdev->sess              =3D srv_sess;
->         sdev->dev               =3D srv_dev;
->         sdev->readonly          =3D readonly;
-> @@ -676,7 +676,7 @@ static int process_msg_open(struct rnbd_srv_session *=
-srv_sess,
->         struct rnbd_srv_dev *srv_dev;
->         struct rnbd_srv_sess_dev *srv_sess_dev;
->         const struct rnbd_msg_open *open_msg =3D msg;
-> -       struct block_device *bdev;
-> +       struct bdev_handle *bdev_handle;
->         blk_mode_t open_flags =3D BLK_OPEN_READ;
->         char *full_path;
->         struct rnbd_msg_open_rsp *rsp =3D data;
-> @@ -714,15 +714,16 @@ static int process_msg_open(struct rnbd_srv_session=
- *srv_sess,
->                 goto reject;
->         }
->
-> -       bdev =3D blkdev_get_by_path(full_path, open_flags, NULL, NULL);
-> -       if (IS_ERR(bdev)) {
-> -               ret =3D PTR_ERR(bdev);
-> +       bdev_handle =3D blkdev_get_handle_by_path(full_path, open_flags, =
-NULL,
-> +                                               NULL);
-> +       if (IS_ERR(bdev_handle)) {
-> +               ret =3D PTR_ERR(bdev_handle);
->                 pr_err("Opening device '%s' on session %s failed, failed =
-to open the block device, err: %d\n",
->                        full_path, srv_sess->sessname, ret);
->                 goto free_path;
->         }
->
-> -       srv_dev =3D rnbd_srv_get_or_create_srv_dev(bdev, srv_sess,
-> +       srv_dev =3D rnbd_srv_get_or_create_srv_dev(bdev_handle->bdev, srv=
-_sess,
->                                                   open_msg->access_mode);
->         if (IS_ERR(srv_dev)) {
->                 pr_err("Opening device '%s' on session %s failed, creatin=
-g srv_dev failed, err: %ld\n",
-> @@ -731,7 +732,8 @@ static int process_msg_open(struct rnbd_srv_session *=
-srv_sess,
->                 goto blkdev_put;
->         }
->
-> -       srv_sess_dev =3D rnbd_srv_create_set_sess_dev(srv_sess, open_msg,=
- bdev,
-> +       srv_sess_dev =3D rnbd_srv_create_set_sess_dev(srv_sess, open_msg,
-> +                               bdev_handle,
->                                 open_msg->access_mode =3D=3D RNBD_ACCESS_=
-RO,
->                                 srv_dev);
->         if (IS_ERR(srv_sess_dev)) {
-> @@ -747,7 +749,7 @@ static int process_msg_open(struct rnbd_srv_session *=
-srv_sess,
->          */
->         mutex_lock(&srv_dev->lock);
->         if (!srv_dev->dev_kobj.state_in_sysfs) {
-> -               ret =3D rnbd_srv_create_dev_sysfs(srv_dev, bdev);
-> +               ret =3D rnbd_srv_create_dev_sysfs(srv_dev, bdev_handle->b=
-dev);
->                 if (ret) {
->                         mutex_unlock(&srv_dev->lock);
->                         rnbd_srv_err(srv_sess_dev,
-> @@ -790,7 +792,7 @@ static int process_msg_open(struct rnbd_srv_session *=
-srv_sess,
->         }
->         rnbd_put_srv_dev(srv_dev);
->  blkdev_put:
-> -       blkdev_put(bdev, NULL);
-> +       blkdev_handle_put(bdev_handle);
->  free_path:
->         kfree(full_path);
->  reject:
-> diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.=
-h
-> index 1027656dedb0..343cc682b617 100644
-> --- a/drivers/block/rnbd/rnbd-srv.h
-> +++ b/drivers/block/rnbd/rnbd-srv.h
-> @@ -46,7 +46,7 @@ struct rnbd_srv_dev {
->  struct rnbd_srv_sess_dev {
->         /* Entry inside rnbd_srv_dev struct */
->         struct list_head                dev_list;
-> -       struct block_device             *bdev;
-> +       struct bdev_handle              *bdev_handle;
->         struct rnbd_srv_session         *sess;
->         struct rnbd_srv_dev             *dev;
->         struct kobject                  kobj;
-> --
-> 2.35.3
->
+> ?
