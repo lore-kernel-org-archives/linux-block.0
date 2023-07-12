@@ -2,80 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D044BEB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 12:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A57DEB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 12:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232769AbjGLMdp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jul 2023 08:33:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50438 "EHLO
+        id S232332AbjGLMfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jul 2023 08:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232739AbjGLMdp (ORCPT
+        with ESMTP id S232767AbjGLMfF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2023 08:33:45 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33481134;
-        Wed, 12 Jul 2023 05:33:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Q28lbPibQoRUf1yZd4fvu6bxrGujY0ouRUurZ5rXnSs=; b=j7kRWgylLqK+jYPyG+Dp+9L9cI
-        NYJMrZ7LJsYQHxxEHCt9mIvYYaUA4j/4e2mt2gpgikT6Xtb4elMDlfatkCIVB2glxtc5rTumoTtgA
-        E/WMFzVxBzfJ5dgXJKCGahu4JsY2bLXmzuzlSUoi0VhJiKvSLdihmk4F0actsEVJo48Yqw/fWS1nb
-        EQ4cmqfaLTW8BMF4EWpUmAAR4IiSoLt3Q6gnDu+Z0xQBKlJg9SvkbVzazNzjzy/P5T/TB8SVtLd1T
-        Smjw8Z8hCP+yYKMOMEwQ7Z8L1fKz2k1vMOQqjIhGlhxpirtvvEs2CsJMB0d41qj64s21EEkhoxb2O
-        /V0IKhTg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qJZ2N-00HXix-0L;
-        Wed, 12 Jul 2023 12:33:43 +0000
-Date:   Wed, 12 Jul 2023 05:33:43 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: Fix stall due to recursive flush plug
-Message-ID: <ZK6dpy7w/4YSwbBi@infradead.org>
-References: <20230711160434.248868-1-ross.lagerwall@citrix.com>
+        Wed, 12 Jul 2023 08:35:05 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DAE310F3;
+        Wed, 12 Jul 2023 05:35:03 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4R1HJ11sRdz4f3mn9;
+        Wed, 12 Jul 2023 20:34:57 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgCXaK_xna5klTM2Nw--.23925S3;
+        Wed, 12 Jul 2023 20:34:59 +0800 (CST)
+Subject: Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
+To:     Yu Kuai <yukuai1@huaweicloud.com>,
+        Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+        willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net,
+        jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Donald Buczek <buczek@molgen.mpg.de>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612135228.10702-3-sergei.shtepa@veeam.com>
+ <f935840e-12a7-c37b-183c-27e2d83990ea@huaweicloud.com>
+ <eca5a778-6795-fc03-7ae0-fe06f514af85@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <2ab36e73-a612-76a8-9c20-f5e11c67bcc3@huaweicloud.com>
+Date:   Wed, 12 Jul 2023 20:34:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230711160434.248868-1-ross.lagerwall@citrix.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <eca5a778-6795-fc03-7ae0-fe06f514af85@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCXaK_xna5klTM2Nw--.23925S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KryDGr4fXrWxZry8WFyUZFb_yoW8Ar48pr
+        95XayUJrWUXFn5Ww1qgF1UtFyFvF1UJw1DZryIqa43JrsFyrnFga17Wr9Y93sxCr48GrW7
+        Zr1jvrsxZwsxJFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+        nIWIevJa73UjIFyTuYvjfUOmhFUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 05:04:34PM +0100, Ross Lagerwall wrote:
-> We have seen rare IO stalls as follows:
-> 
-> * blk_mq_plug_issue_direct() is entered with an mq_list containing two
-> requests.
-> * For the first request, it sets last == false and enters the driver's
-> queue_rq callback.
-> * The driver queue_rq callback indirectly calls schedule() which calls
-> blk_flush_plug().
+Hi,
 
--> this assumes BLK_MQ_F_BLOCKING is set, as otherwise ->queue_rq can't
-sleep.
-
-> * blk_flush_plug() handles the remaining request in the mq_list. mq_list
-> is now empty.
-> * The original call to queue_rq resumes (with last == false).
-> * The loop in blk_mq_plug_issue_direct() terminates because there are no
-> remaining requests in mq_list.
+在 2023/07/12 18:04, Yu Kuai 写道:
+> Hi,
 > 
-> The IO is now stalled because the last request submitted to the driver
-> had last == false and there was no subsequent call to commit_rqs().
+> 在 2023/07/11 10:02, Yu Kuai 写道:
 > 
-> Fix this by returning early in blk_mq_flush_plug_list() if rq_count is 0
-> which it will be in the recursive case, rather than checking if the
-> mq_list is empty. At the same time, adjust one of the callers to skip
-> the mq_list empty check as it is not necessary.
+>>> +static bool submit_bio_filter(struct bio *bio)
+>>> +{
+>>> +    if (bio_flagged(bio, BIO_FILTERED))
+>>> +        return false;
+>>> +
+>>> +    bio_set_flag(bio, BIO_FILTERED);
+>>> +    return bio->bi_bdev->bd_filter->ops->submit_bio(bio);
+>>> +}
+>>> +
+>>>   static void __submit_bio(struct bio *bio)
+>>>   {
+>>> +    /*
+>>> +     * If there is a filter driver attached, check if the BIO needs 
+>>> to go to
+>>> +     * the filter driver first, which can then pass on the bio or 
+>>> consume it.
+>>> +     */
+>>> +    if (bio->bi_bdev->bd_filter && submit_bio_filter(bio))
+>>> +        return;
+>>> +
+>>>       if (unlikely(!blk_crypto_bio_prep(&bio)))
+>>>           return;
+> 
+> ...
+> 
+>>> +static void __blkfilter_detach(struct block_device *bdev)
+>>> +{
+>>> +    struct blkfilter *flt = bdev->bd_filter;
+>>> +    const struct blkfilter_operations *ops = flt->ops;
+>>> +
+>>> +    bdev->bd_filter = NULL;
+>>> +    ops->detach(flt);
+>>> +    module_put(ops->owner);
+>>> +}
+>>> +
+>>> +void blkfilter_detach(struct block_device *bdev)
+>>> +{
+>>> +    if (bdev->bd_filter) {
+>>> +        blk_mq_freeze_queue(bdev->bd_queue);
+> 
+> And this is not sate as well, for bio-based device, q_usage_counter is
+> not grabbed while submit_bio_filter() is called, hence there is a risk
+> of uaf from submit_bio_filter().
 
-From what I can tell this looks correct, but at the same time very
-fragile.  At least we need a comment on learing plug->rq_count early
-in blk_mq_flush_plug_list about this recursion potential, probably
-paired with another one where we're checking rq_count instead of the
-list now.  I wonder if there is a better way to do this in a more
-explicit way, but I can't think of one right now.
+And there is another question, can blkfilter_detach() from
+del_gendisk/delete_partiton and ioctl concurrent? I think it's a
+problem.
+
+Thanks,
+Kuai
+> 
+> Thanks,
+> Kuai
+> 
+> .
+> 
 
