@@ -2,162 +2,184 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 743F9EB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jul 2023 22:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DDCC001DE
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 03:43:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230504AbjGKWru (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jul 2023 18:47:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38936 "EHLO
+        id S231750AbjGLDng (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jul 2023 23:43:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbjGKWru (ORCPT
+        with ESMTP id S231753AbjGLDna (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2023 18:47:50 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE536E60;
-        Tue, 11 Jul 2023 15:47:48 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a3efee1d44so3508985b6e.3;
-        Tue, 11 Jul 2023 15:47:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689115668; x=1691707668;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BpcCgQS0gXCD+hvSguR3UnFG1qnT0lm+T8n1vVCxIxM=;
-        b=KjTLIEMy/UOKJS1nUesRrgNqETtpUU0ym+GtGAS0nFpmlOsPFT0VC/jMhiTqKwR7x3
-         tfYaqWNaR4ur3HpMyd3W+6YOkE561EpXrBmhhMWYXTBP6LnMYlvWxTzwOFmFqdsnEwcL
-         snkaXVqvV4e1gS6bEc5wMcRFH41l/KzwrKQwnftmp4+xhprfLzdF/PHafuYWzblnuGe5
-         3paEvWudVifKhm1nRSzBUrntu6IUDNQ7HTI0uIKEKGkRJMNXX5Ovimtp460oe/LG+pBA
-         Y8okBDt7o/qGr9yFlfPgtAsXL6pErNaLJzgxtAy+EnUPM/DBWFzas+/8GvI3k96PWhTM
-         W8Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689115668; x=1691707668;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BpcCgQS0gXCD+hvSguR3UnFG1qnT0lm+T8n1vVCxIxM=;
-        b=Ws/s8Od7gKKUHof1aS6a9pLtnTFiflWWTygt1ay/2KvHcWdG58/O2DXPSPd3UepCDs
-         pJsflMgCz9PO6oFce3OuuRMWmxugC1SvVTNEu1bgPjeE02ZGSP03ftm7rqoAPrNUbo9E
-         EuK3jmsompG+cpc4RGpsyLZY39qo23tqVQhx390EIbieFISHTBR2yMUWCByz4oGLXuQJ
-         zjSoZO3R7qn0f9EIY4nmH5GnZMH/9IgEZkDHASeSk/LTT+JqxozD/WEo3XX45zcg/lGE
-         c+3NY9XZZy1h+HqXDPlqokGPuYOcadmV/hfnCSe5Bw1bTXjvl7sLFMjK6fNBMOjxICBN
-         lypg==
-X-Gm-Message-State: ABy/qLaHlObQRytc23U621Dp8uhg8Xy+nKYI/6eMtORfMudm+QwqxEf4
-        /gxK/Vjt90aargzPLOIv6eEuD4hT4o4=
-X-Google-Smtp-Source: APBJJlHv0PeOyk7BhG/GOv1k9Z29OiBGd6p6xJrUCOn9UGhShD6VDfAqkzbNdM8f7Sm9K9D+9ipTOw==
-X-Received: by 2002:a54:4f8e:0:b0:3a3:ffb7:a28 with SMTP id g14-20020a544f8e000000b003a3ffb70a28mr7749566oiy.45.1689115668098;
-        Tue, 11 Jul 2023 15:47:48 -0700 (PDT)
-Received: from [10.69.46.142] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id bv11-20020a05622a0a0b00b003fdebf1a634sm1580898qtb.75.2023.07.11.15.47.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Jul 2023 15:47:47 -0700 (PDT)
-Message-ID: <0605ac36-16d5-2026-d3c6-62d346db6dfb@gmail.com>
-Date:   Tue, 11 Jul 2023 15:47:45 -0700
+        Tue, 11 Jul 2023 23:43:30 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 75246198B;
+        Tue, 11 Jul 2023 20:43:20 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id D850A21C4255; Tue, 11 Jul 2023 20:43:19 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D850A21C4255
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1689133399;
+        bh=AQSDwVr//PWnanNDVqJOKnFjTzDXsVxMzaz8VzfLX9U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gd86CwrooCUzTzLtcrbfpPja1MDbDSHeRi2drRdRHQKEr7+MeHUdPmo1OYofl8LO5
+         /BxTBXcBx+61KNVGQwmn84+RCmceckkYRqDvUCBubBwyfYCe0o4LvKZoEff8AP92wV
+         PLwJXBucI4r1Hv+6Ky15fLjo3Ox/F0xK3pPqj7RM=
+Date:   Tue, 11 Jul 2023 20:43:19 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, eparis@redhat.com,
+        paul@paul-moore.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v10 11/17] dm-verity: consume root hash digest and
+ signature data via LSM hook
+Message-ID: <20230712034319.GA17642@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
+ <1687986571-16823-12-git-send-email-wufan@linux.microsoft.com>
+ <ZKgm+ffQbdDTxrg9@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v2 4/5] nvme-fc: Make initial connect attempt synchronous
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>, Ewan Milne <emilne@redhat.com>
-References: <20230620133711.22840-1-dwagner@suse.de>
- <20230620133711.22840-5-dwagner@suse.de>
- <594f73f2-59b0-bbcb-d7a0-6d89e2446830@gmail.com>
- <7kcc75btp5bo5oqjnpqlwwo37l2f4atwfemknbmvqagrqicl2i@njn4tai7e4m7>
-From:   James Smart <jsmart2021@gmail.com>
-In-Reply-To: <7kcc75btp5bo5oqjnpqlwwo37l2f4atwfemknbmvqagrqicl2i@njn4tai7e4m7>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZKgm+ffQbdDTxrg9@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/6/2023 5:07 AM, Daniel Wagner wrote:
-> Hi James,
+On Fri, Jul 07, 2023 at 10:53:45AM -0400, Mike Snitzer wrote:
+Thanks for the review!
+
+> On Wed, Jun 28 2023 at  5:09P -0400,
+> Fan Wu <wufan@linux.microsoft.com> wrote:
 > 
-> On Sat, Jul 01, 2023 at 05:11:11AM -0700, James Smart wrote:
->> As much as you want to make this change to make transports "similar", I am
->> dead set against it unless you are completing a long qualification of the
->> change on real FC hardware and FC-NVME devices. There is probably 1.5 yrs of
->> testing of different race conditions that drove this change. You cannot
->> declare success from a simplistic toy tool such as fcloop for validation.
->>
->> The original issues exist, probably have even morphed given the time from
->> the original change, and this will seriously disrupt the transport and any
->> downstream releases.  So I have a very strong NACK on this change.
->>
->> Yes - things such as the connect failure results are difficult to return
->> back to nvme-cli. I have had many gripes about the nvme-cli's behavior over
->> the years, especially on negative cases due to race conditions which
->> required retries. It still fails this miserably.  The async reconnect path
->> solved many of these issues for fc.
->>
->> For the auth failure, how do we deal with things if auth fails over time as
->> reconnects fail due to a credential changes ?  I would think commonality of
->> this behavior drives part of the choice.
+> > From: Deven Bowers <deven.desai@linux.microsoft.com>
+> > 
+> > dm-verity provides a strong guarantee of a block device's integrity. As
+> > a generic way to check the integrity of a block device, it provides
+> > those integrity guarantees to its higher layers, including the filesystem
+> > level.
+> > 
+> > An LSM that control access to a resource on the system based on the
+> > available integrity claims can use this transitive property of
+> > dm-verity, by querying the underlying block_device of a particular
+> > file.
+> > 
+> > The digest and signature information need to be stored in the block
+> > device to fulfill the next requirement of authorization via LSM policy.
+> > This will enable the LSM to perform revocation of devices that are still
+> > mounted, prohibiting execution of files that are no longer authorized
+> > by the LSM in question.
+> > 
+> > This patch added two security hook calls in dm-verity to save the
+> > dm-verity roothash and the roothash signature to LSM blobs.
+> > 
+> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > ---
+...
+> > diff --git a/drivers/md/dm-verity-verify-sig.c b/drivers/md/dm-verity-verify-sig.c
+> > index 4836508ea50c..33165dd7470f 100644
+> > --- a/drivers/md/dm-verity-verify-sig.c
+> > +++ b/drivers/md/dm-verity-verify-sig.c
+> > @@ -9,6 +9,9 @@
+> >  #include <linux/verification.h>
+> >  #include <keys/user-type.h>
+> >  #include <linux/module.h>
+> > +#include <linux/security.h>
+> > +#include <linux/dm-verity.h>
+> > +#include "dm-core.h"
 > 
-> Alright, what do you think about the idea to introduce a new '--sync' option to
-> nvme-cli which forwards this info to the kernel that we want to wait for the
-> initial connect to succeed or fail? Obviously, this needs to handle signals too.
-> 
->  From what I understood this is also what Ewan would like to have
-To me this is not sync vs non-sync option, it's a max_reconnects value 
-tested for in nvmf_should_reconnect(). Which, if set to 0 (or 1), should 
-fail if the initial connect fails.
-
-Right now max_reconnects is calculated by the ctrl_loss_tmo and 
-reconnect_delay. So there's already a way via the cli to make sure 
-there's only 1 connect attempt. I wouldn't mind seeing an exact cli 
-option that sets it to 1 connection attempt w/o the user calculation and 
-2 value specification.
-
-I also assume that this is not something that would be set by default in 
-the auto-connect scripts or automated cli startup scripts.
-
-
-> 
-> Hannes thought it would make sense to use the same initial connect logic in
-> tcp/rdma, because there could also be transient erros (e.g. spanning tree
-> protocol). In short making the tcp/rdma do the same thing as fc?
-
-I agree that the same connect logic makes sense for tcp/rdma. Certainly 
-one connect/teardown path vs one at create and one at reconnect makes 
-sense. The transient errors during 1st connect was the why FC added it 
-and I would assume tcp/rdma has it's own transient errors or timing 
-relationships at initial connection setups, etc.
-
-For FC, we're trying to work around errors to transport commands (FC 
-NVME ELS's) that fail (dropped or timeout) or commands used to 
-initialize the controller which may be dropped/timeout thus fail 
-controller init. Although NVMe-FC does have a retransmission option, it 
-generally doesn't apply to the FC NVME LS's, and few of the FC devices 
-have yet to turn on the retransmission option to deal with the errors. 
-So the general behavior is connection termination and/or association 
-termination which then depends on the reconnect path to retry. It's also 
-critical as connection requests are automated on FC based on 
-connectivity events. If we fail out to the cli due to the fabric 
-dropping some up front command, there's no guarantee there will be 
-another connectivity event to restart the controller create and we end 
-up without device connectivity. The other issue we had to deal with was 
-how long sysadm hung out waiting for the auto-connect script to 
-complete. We couldn't wait the entire multiple retry case, and returning 
-before the 1st attempt was complete was against the spirit of the cli - 
-so we waited for the 1st attempt to try, released sysadm and let the 
-reconnect go on in the background.
-
+> Why are you including dm-core.h here?
+This is used to get the complete definition of struct mapped_device to extract
+the struct block_device from it.
 
 > 
-> So let's drop the final patch from this series for the time. Could you give some
-> feedback on the rest of the patches?
+> >  #include "dm-verity.h"
+> >  #include "dm-verity-verify-sig.h"
+> >  
+> > @@ -97,14 +100,17 @@ int verity_verify_sig_parse_opt_args(struct dm_arg_set *as,
+> >   * verify_verify_roothash - Verify the root hash of the verity hash device
+> >   *			     using builtin trusted keys.
+> >   *
+> > + * @bdev: block_device representing the device-mapper created block device.
+> > + *	  Used by the security hook, to set information about the block_device.
+> >   * @root_hash: For verity, the roothash/data to be verified.
+> >   * @root_hash_len: Size of the roothash/data to be verified.
+> >   * @sig_data: The trusted signature that verifies the roothash/data.
+> >   * @sig_len: Size of the signature.
+> >   *
+> >   */
+> > -int verity_verify_root_hash(const void *root_hash, size_t root_hash_len,
+> > -			    const void *sig_data, size_t sig_len)
+> > +int verity_verify_root_hash(struct block_device *bdev, const void *root_hash,
+> > +			    size_t root_hash_len, const void *sig_data,
+> > +			    size_t sig_len)
+> >  {
+> >  	int ret;
+> >  
+> > @@ -126,8 +132,12 @@ int verity_verify_root_hash(const void *root_hash, size_t root_hash_len,
+> >  				NULL,
+> >  #endif
+> >  				VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
+> > +	if (ret)
+> > +		return ret;
+> >  
+> > -	return ret;
+> > +	return security_bdev_setsecurity(bdev,
+> > +					 DM_VERITY_SIGNATURE_SEC_NAME,
+> > +					 sig_data, sig_len);
+> >  }
+> >  
+> >  void verity_verify_sig_opts_cleanup(struct dm_verity_sig_opts *sig_opts)
 > 
-> Thanks,
-> Daniel
+> Both of your calls to security_bdev_setsecurity() to set your blobs in
+> the bdev are suspect because you're doing so from the verity_ctr().
+> The mapped_device has 2 dm_table slots (active and inactive).  The
+> verity_ctr() becomes part of the inactive slot, there is an extra step
+> to bind the inactive table to the active table.
+> 
+> This leads to you changing the blobs in the global bdev _before_ the
+> table is actually active.  It is possible that the inactive table will
+> simply be removed and the DM verity device put back in service;
+> leaving your blob(s) in the bdev inconsistent.
+> 
+> This issue has parallels to how we need to defer changing the global
+> queue_limits associated with a request_queue until _after_ all table
+> loading is settled and then the update is done just before resuming
+> the DM device (mapped_device) -- see dm_table_set_restrictions().
+> 
+> Unfortunately, this feels like it may require a new hook in the
+> target_type struct (e.g. ->finalize())
+> 
+> Mike
+Thanks for pointing out this issue. We were calling security_bdev_setsecurity()
+because the roothash signature data is only available in verity_ctr()
+and it is discarded after verity_ctr() finishes.
+After digging deeper into the table_load, I realized that we were indeed
+wrong here.
 
-I'll look at them.
+Based on my understanding of your suggestion, it seems that the correct
+approach would be to save the roothash signature into the struct dm_target
+and then invoke security_bdev_setsecurity() before activating
+the inactive table in the __bind function (where dm_table_set_restrictions is called).
 
--- james
+To facilitate this process, it seems appropriate to introduce a new hook
+called finalize() within the struct target_type. This hook would enable
+targets to define tasks that need to be completed before activating
+a new table.
 
+In our specific case, we would add a finalize hook to the dm-verity module,
+allowing us to call security_bdev_setsecurity() and associate the roothash
+information in the struct dm_target with the struct block_device of
+the struct mapped_device. Is this correct?
+
+Thanks,
+- Fan
 
