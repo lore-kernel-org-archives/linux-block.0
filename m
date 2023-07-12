@@ -2,133 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A57DEB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 12:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 590E0EB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 12:55:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232332AbjGLMfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jul 2023 08:35:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51360 "EHLO
+        id S231520AbjGLMzv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jul 2023 08:55:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232767AbjGLMfF (ORCPT
+        with ESMTP id S229993AbjGLMzu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2023 08:35:05 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DAE310F3;
-        Wed, 12 Jul 2023 05:35:03 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4R1HJ11sRdz4f3mn9;
-        Wed, 12 Jul 2023 20:34:57 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCXaK_xna5klTM2Nw--.23925S3;
-        Wed, 12 Jul 2023 20:34:59 +0800 (CST)
-Subject: Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
-        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
-Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-        willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net,
-        jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Donald Buczek <buczek@molgen.mpg.de>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
- <20230612135228.10702-3-sergei.shtepa@veeam.com>
- <f935840e-12a7-c37b-183c-27e2d83990ea@huaweicloud.com>
- <eca5a778-6795-fc03-7ae0-fe06f514af85@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <2ab36e73-a612-76a8-9c20-f5e11c67bcc3@huaweicloud.com>
-Date:   Wed, 12 Jul 2023 20:34:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 12 Jul 2023 08:55:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0311736
+        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 05:55:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689166505;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=5CYqK3Y+IQKFaUkutdkJlO3sotphYax9MRe0AccKI2w=;
+        b=NMF8elJOLN2B6Ld6/MIgP86eUw2w/r1OG6RR6S3xoOvniErJynIclF4R31wRyUTcy5WITq
+        eMqOJ/QJzm1V8wOHMEDq4itk8IAyRTzhv3Uyh6qR5YC0lNL9G707hJYRvvhyuoH+Z+u3xc
+        MRibskSX69dUCqWd1fGe34m6dg6xJ04=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-418-PESh_r3nPIO4H1zgny0CSw-1; Wed, 12 Jul 2023 08:55:03 -0400
+X-MC-Unique: PESh_r3nPIO4H1zgny0CSw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 151EB3C0FC99;
+        Wed, 12 Jul 2023 12:55:03 +0000 (UTC)
+Received: from localhost (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E15D3C1ED96;
+        Wed, 12 Jul 2023 12:55:01 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-nvme@lists.infradead.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Wen Xiong <wenxiong@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/8] blk-mq: fix wrong queue mapping for kdump kernel
+Date:   Wed, 12 Jul 2023 20:54:47 +0800
+Message-Id: <20230712125455.1986455-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <eca5a778-6795-fc03-7ae0-fe06f514af85@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCXaK_xna5klTM2Nw--.23925S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KryDGr4fXrWxZry8WFyUZFb_yoW8Ar48pr
-        95XayUJrWUXFn5Ww1qgF1UtFyFvF1UJw1DZryIqa43JrsFyrnFga17Wr9Y93sxCr48GrW7
-        Zr1jvrsxZwsxJFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjfUOmhFUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Hi,
 
-在 2023/07/12 18:04, Yu Kuai 写道:
-> Hi,
-> 
-> 在 2023/07/11 10:02, Yu Kuai 写道:
-> 
->>> +static bool submit_bio_filter(struct bio *bio)
->>> +{
->>> +    if (bio_flagged(bio, BIO_FILTERED))
->>> +        return false;
->>> +
->>> +    bio_set_flag(bio, BIO_FILTERED);
->>> +    return bio->bi_bdev->bd_filter->ops->submit_bio(bio);
->>> +}
->>> +
->>>   static void __submit_bio(struct bio *bio)
->>>   {
->>> +    /*
->>> +     * If there is a filter driver attached, check if the BIO needs 
->>> to go to
->>> +     * the filter driver first, which can then pass on the bio or 
->>> consume it.
->>> +     */
->>> +    if (bio->bi_bdev->bd_filter && submit_bio_filter(bio))
->>> +        return;
->>> +
->>>       if (unlikely(!blk_crypto_bio_prep(&bio)))
->>>           return;
-> 
-> ...
-> 
->>> +static void __blkfilter_detach(struct block_device *bdev)
->>> +{
->>> +    struct blkfilter *flt = bdev->bd_filter;
->>> +    const struct blkfilter_operations *ops = flt->ops;
->>> +
->>> +    bdev->bd_filter = NULL;
->>> +    ops->detach(flt);
->>> +    module_put(ops->owner);
->>> +}
->>> +
->>> +void blkfilter_detach(struct block_device *bdev)
->>> +{
->>> +    if (bdev->bd_filter) {
->>> +        blk_mq_freeze_queue(bdev->bd_queue);
-> 
-> And this is not sate as well, for bio-based device, q_usage_counter is
-> not grabbed while submit_bio_filter() is called, hence there is a risk
-> of uaf from submit_bio_filter().
+On arm and ppc64, 'maxcpus=1' is required for kdump kernel,
+see `Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
+still returns all CPUs because 'maxcpus=1' just bring up one single
+cpu core during booting.
 
-And there is another question, can blkfilter_detach() from
-del_gendisk/delete_partiton and ioctl concurrent? I think it's a
-problem.
+blk-mq sees single queue in kdump kernel, and in driver's viewpoint
+there are still multiple queues, this inconsistency causes driver to apply
+wrong queue mapping for handling IO, and IO timeout is triggered.
+
+This issue is only triggered on managed irq in case of multiple hw
+queues. Some drivers takes online cpus into account for nr_hw_queues,
+and don't have such issue, such as nvme rdma/tcp.
+
+Meantime, single queue makes much less resource utilization, and reduce
+risk of kernel failure.
+
 
 Thanks,
-Kuai
-> 
-> Thanks,
-> Kuai
-> 
-> .
-> 
+Ming
+
+Ming Lei (8):
+  blk-mq: add blk_mq_max_nr_hw_queues()
+  nvme-pci: use blk_mq_max_nr_hw_queues() to calculate io queues
+  scsi: lpfc: use blk_mq_max_nr_hw_queues() to calculate io vectors
+  scsi: hisi: take blk_mq_max_nr_hw_queues() into account for
+    calculating io vectors
+  scsi: mpi3mr: take blk_mq_max_nr_hw_queues() into account for
+    calculating io vectors
+  scsi: megaraid: take blk_mq_max_nr_hw_queues() into account for
+    calculating io vectors
+  scsi: mpt3sas: take blk_mq_max_nr_hw_queues() into account for
+    calculating io vectors
+  scsi: pm8001: take blk_mq_max_nr_hw_queues() into account for
+    calculating io vectors
+
+ block/blk-mq.c                            | 9 +++++++++
+ drivers/nvme/host/pci.c                   | 2 +-
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c    | 3 +++
+ drivers/scsi/lpfc/lpfc_init.c             | 1 +
+ drivers/scsi/megaraid/megaraid_sas_base.c | 6 +++++-
+ drivers/scsi/mpi3mr/mpi3mr_fw.c           | 3 +++
+ drivers/scsi/mpt3sas/mpt3sas_base.c       | 4 ++--
+ drivers/scsi/pm8001/pm8001_init.c         | 4 +++-
+ include/linux/blk-mq.h                    | 1 +
+ 9 files changed, 28 insertions(+), 5 deletions(-)
+
+-- 
+2.40.1
 
