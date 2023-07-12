@@ -2,82 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E00E3EB64DD
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 14:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34458EB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 15:01:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231260AbjGLOjr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jul 2023 10:39:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40024 "EHLO
+        id S232422AbjGLPBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jul 2023 11:01:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229829AbjGLOjr (ORCPT
+        with ESMTP id S232483AbjGLPBD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2023 10:39:47 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A28819B;
-        Wed, 12 Jul 2023 07:39:45 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id EED0F20313;
-        Wed, 12 Jul 2023 14:39:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1689172781;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        Wed, 12 Jul 2023 11:01:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A947E1BC5
+        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 07:59:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689173995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=lQyH0OZJ2kYggzx+DnOVwqmK6gzaw7pXaSHDRnNsang=;
-        b=Z4Yp/B4I+MnFRk2EjFjzM+8HWSVN0wQjz04519EUrjfNZ+IwOPEKuHQXRAXG31pQTaNXhv
-        zJiDb0IRFFjg9vJ810rGLW+Yda69bk0gG1kWuSBZ1kNjrnzmM56w/HdLbg379eXfk0FoOl
-        pND93VjugQoVvoO/nvKbzOWr2pulo1U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1689172781;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lQyH0OZJ2kYggzx+DnOVwqmK6gzaw7pXaSHDRnNsang=;
-        b=tXE9us2KyR86sTOAOVclHieZanF3ej2qrW4Sch3az49xU3T6EwbtWg6yE0UFSsSV8Q5BYf
-        rzkygKplkne7KoBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=GgLJ4eusXVkn+2KiPoPw0Jwn/b0n/YlKgCsmpR3oN+k=;
+        b=YoWZF2IsvwrFIUPd1TiJZDgG5G1Wcr+NAlqW9fakZB/9tdlIBfinY3nvq0I5fLTfpmdh/E
+        vAaRjtiaayfplN2Vcm4CrL+UzYj9ZATfR90poXQcdb8yIiJ+ajcvptjihIwbnRwax+eTBr
+        uiIs14IBd7YQIXMrbN/PlJAQKa5qq9A=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-230-724vObnAPWe6k5MXk9AEQQ-1; Wed, 12 Jul 2023 10:59:46 -0400
+X-MC-Unique: 724vObnAPWe6k5MXk9AEQQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A81B6133DD;
-        Wed, 12 Jul 2023 14:39:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id pLKXJy27rmT7FQAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Wed, 12 Jul 2023 14:39:41 +0000
-Date:   Wed, 12 Jul 2023 16:33:05 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
-        Ted Tso <tytso@mit.edu>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        Eric Biggers <ebiggers@google.com>, linux-xfs@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: [PATCH 5/6] btrfs: Block writes to seed devices
-Message-ID: <20230712143305.GJ30916@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20230704122727.17096-1-jack@suse.cz>
- <20230704125702.23180-5-jack@suse.cz>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7CC77280460E;
+        Wed, 12 Jul 2023 14:59:45 +0000 (UTC)
+Received: from ovpn-8-25.pek2.redhat.com (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E1853492B01;
+        Wed, 12 Jul 2023 14:59:36 +0000 (UTC)
+Date:   Wed, 12 Jul 2023 22:59:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>
+Cc:     Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>, gost.dev@samsung.com,
+        open list <linux-kernel@vger.kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Johannes Thumshirn <jth@kernel.org>, ming.lei@redhat.com
+Subject: Re: [PATCH v8 1/2] ublk: add helper to check if device supports user
+ copy
+Message-ID: <ZK6/0TKxe2q4/hi9@ovpn-8-25.pek2.redhat.com>
+References: <20230711072353.200873-1-nmi@metaspace.dk>
+ <20230711072353.200873-2-nmi@metaspace.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230704125702.23180-5-jack@suse.cz>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+In-Reply-To: <20230711072353.200873-2-nmi@metaspace.dk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 04, 2023 at 02:56:53PM +0200, Jan Kara wrote:
-> When opening seed devices, ask block layer to not allow other writers to
-> open block device.
+On Tue, Jul 11, 2023 at 09:23:52AM +0200, Andreas Hindborg wrote:
+> From: Andreas Hindborg <a.hindborg@samsung.com>
+> 
+> This will be used by ublk zoned storage support.
+> 
+> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> ---
 
-Makes sense, thanks.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Acked-by: David Sterba <dsterba@suse.com>
+BTW, both Damien and I have reviewed this one, and you can put the
+reviewed-by tag in patch.
+
+Thanks,
+Ming
+
