@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A657DEB64D9
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 12:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A538EB64DD
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 12:56:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232202AbjGLM4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jul 2023 08:56:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34560 "EHLO
+        id S231219AbjGLM4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jul 2023 08:56:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232306AbjGLM4I (ORCPT
+        with ESMTP id S232448AbjGLM4K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2023 08:56:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9FD1981
-        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 05:55:19 -0700 (PDT)
+        Wed, 12 Jul 2023 08:56:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EC23198B
+        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 05:55:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689166518;
+        s=mimecast20190719; t=1689166523;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YJ4imw3iHzN6mbjqWrKiopdQuaapVjZy4MvSNpK4PGw=;
-        b=Zrtac84Bfb/mVVEC1dilDpK4vvypzzqrA3skzGIUIWeekc+o2n8ju5JjzYDVPE7aoNy/HC
-        wOTZtg2QD4Ex7YEumCXnmCOLOuS6SjCaidqizZOOLFKxi0NZTRpa576jSLye/yE18a03Ys
-        fqsYufUh1Gu1F9KG3EjEeGZMHYS4FwY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-139-V3DQFlR7NK6gTouM1E1UAg-1; Wed, 12 Jul 2023 08:55:15 -0400
-X-MC-Unique: V3DQFlR7NK6gTouM1E1UAg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        bh=qRXG76wkhKDOmusO4D8ben9Sp69zHeCOETl4h69/8KI=;
+        b=KLiI0+61R/6CuVOV7OQIfS4bbmUyvSEyn4s8QGleBPTEWA9ecocSCq8tgXkKMaHq22dzs1
+        NOKqXVeNiJ3pHODcKMmzHsi6S1FX8rMsg0v8nSt2ukz3o0v8wXHBsCRc8AEUWjHcupGu03
+        jl0WcWYJcVKSEJ0aI2KUiLW/usNpqVY=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-658-foZJhVnfNHeMWGzZzB-qfg-1; Wed, 12 Jul 2023 08:55:19 -0400
+X-MC-Unique: foZJhVnfNHeMWGzZzB-qfg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB5AC10504AA;
-        Wed, 12 Jul 2023 12:55:14 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 00813299E741;
+        Wed, 12 Jul 2023 12:55:19 +0000 (UTC)
 Received: from localhost (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0338A1454142;
-        Wed, 12 Jul 2023 12:55:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D6381F66C6;
+        Wed, 12 Jul 2023 12:55:17 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         linux-nvme@lists.infradead.org,
@@ -46,15 +46,15 @@ To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
 Cc:     linux-block@vger.kernel.org, Wen Xiong <wenxiong@linux.ibm.com>,
         Keith Busch <kbusch@kernel.org>,
         Ming Lei <ming.lei@redhat.com>,
-        James Smart <james.smart@broadcom.com>
-Subject: [PATCH 3/8] scsi: lpfc: use blk_mq_max_nr_hw_queues() to calculate io vectors
-Date:   Wed, 12 Jul 2023 20:54:50 +0800
-Message-Id: <20230712125455.1986455-4-ming.lei@redhat.com>
+        Xiang Chen <chenxiang66@hisilicon.com>
+Subject: [PATCH 4/8] scsi: hisi: take blk_mq_max_nr_hw_queues() into account for calculating io vectors
+Date:   Wed, 12 Jul 2023 20:54:51 +0800
+Message-Id: <20230712125455.1986455-5-ming.lei@redhat.com>
 In-Reply-To: <20230712125455.1986455-1-ming.lei@redhat.com>
 References: <20230712125455.1986455-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -75,24 +75,26 @@ wrong queue mapping for handling IO, and IO timeout is triggered.
 Meantime, single queue makes much less resource utilization, and reduce
 risk of kernel failure.
 
-Cc: James Smart <james.smart@broadcom.com>
+Cc: Xiang Chen <chenxiang66@hisilicon.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/lpfc/lpfc_init.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/scsi/lpfc/lpfc_init.c b/drivers/scsi/lpfc/lpfc_init.c
-index 3221a934066b..88314c3f1dc1 100644
---- a/drivers/scsi/lpfc/lpfc_init.c
-+++ b/drivers/scsi/lpfc/lpfc_init.c
-@@ -13012,6 +13012,7 @@ lpfc_sli4_enable_msix(struct lpfc_hba *phba)
- 	if (phba->irq_chann_mode != NORMAL_MODE)
- 		aff_mask = &phba->sli4_hba.irq_aff_mask;
+diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+index 20e1607c6282..bbec11220286 100644
+--- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
++++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
+@@ -2550,6 +2550,9 @@ static int interrupt_preinit_v3_hw(struct hisi_hba *hisi_hba)
  
-+	vectors = min_t(unsigned int, vectors, blk_mq_max_nr_hw_queues());
- 	if (aff_mask) {
- 		cpu_cnt = cpumask_weight(aff_mask);
- 		vectors = min(phba->cfg_irq_chann, cpu_cnt);
+ 
+ 	hisi_hba->cq_nvecs = vectors - BASE_VECTORS_V3_HW - hisi_hba->iopoll_q_cnt;
++	if (hisi_hba->cq_nvecs > blk_mq_max_nr_hw_queues())
++		hisi_hba->cq_nvecs = blk_mq_max_nr_hw_queues();
++
+ 	shost->nr_hw_queues = hisi_hba->cq_nvecs + hisi_hba->iopoll_q_cnt;
+ 
+ 	return devm_add_action(&pdev->dev, hisi_sas_v3_free_vectors, pdev);
 -- 
 2.40.1
 
