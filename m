@@ -2,86 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C8EEB64D9
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 10:13:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFE2EB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jul 2023 11:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230126AbjGLKNJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jul 2023 06:13:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41046 "EHLO
+        id S229640AbjGLLfH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jul 2023 07:35:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231615AbjGLKNI (ORCPT
+        with ESMTP id S229506AbjGLLfG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2023 06:13:08 -0400
-Received: from bagheera.iewc.co.za (bagheera.iewc.co.za [IPv6:2c0f:f720:0:3::9a49:2249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9114F1995
-        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 03:13:04 -0700 (PDT)
-Received: from [154.73.32.4] (helo=tauri.local.uls.co.za)
-        by bagheera.iewc.co.za with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <jaco@uls.co.za>)
-        id 1qJWq5-0006CQ-PL; Wed, 12 Jul 2023 12:12:53 +0200
-Received: from [192.168.1.145]
-        by tauri.local.uls.co.za with esmtp (Exim 4.94.2)
-        (envelope-from <jaco@uls.co.za>)
-        id 1qJWq5-0004RS-C8; Wed, 12 Jul 2023 12:12:53 +0200
-Message-ID: <ea29d76f-99c0-fcf2-09a3-4cc2e18f87da@uls.co.za>
-Date:   Wed, 12 Jul 2023 12:12:52 +0200
+        Wed, 12 Jul 2023 07:35:06 -0400
+Received: from out-28.mta0.migadu.com (out-28.mta0.migadu.com [91.218.175.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 716EF8F
+        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 04:35:03 -0700 (PDT)
+Message-ID: <82cb9937-bd11-64a9-2520-bf3cf81ec720@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1689161700;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BeQ2PUPffBPS46ar685O5CqXD4P761piGCzEtpEEO58=;
+        b=VzY6ZkYC4s+BaTNpFoOLnYe/hh7/RC84lZA5ZTqzq8hdDNvueQ3E99HVvDStsER8g9XaPr
+        ORV+WNU5KdyhhKDE7NXdIG4F7Hsgcx6DfpVgf4+eyzLEZQ8mq13KiImtJB8i7BWjmlSGTd
+        PTOoqEMzesOWJkK3IYsB06WaaxSILGU=
+Date:   Wed, 12 Jul 2023 19:34:53 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: LVM kernel lockup scenario during lvcreate
-Content-Language: en-GB
-To:     Bart Van Assche <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
- <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
- <102b1994-74ff-c099-292c-f5429ce768c3@uls.co.za>
- <6b066ab5-7806-5a23-72a5-073153259116@acm.org>
- <544f4434-a32a-1824-b57a-9f7ff12dbb4f@uls.co.za>
- <a6d73e89-7a0c-3173-5f70-cd12cc7ef158@acm.org>
- <18d1c5a6-acd3-88cf-f997-80d97f43ab5c@uls.co.za>
- <0beea79c-af29-9f8f-e1f4-c8deba5a65c8@uls.co.za>
- <07d8b189-9379-560b-3291-3feb66d98e5c@acm.org>
-From:   Jaco Kroon <jaco@uls.co.za>
-Organization: Ultimate Linux Solutions (Pty) Ltd
-In-Reply-To: <07d8b189-9379-560b-3291-3feb66d98e5c@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: NFS workload leaves nfsd threads in D state
+To:     Chuck Lever III <chuck.lever@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, ross.lagerwall@citrix.com
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Chuck Lever <cel@kernel.org>
+References: <7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com>
+ <20230710075634.GA30120@lst.de>
+ <3F16A14B-F854-41CC-A3CA-87C7946FC277@oracle.com>
+ <F610D6B3-876F-4E5D-A3C4-A30F1B81D9B5@oracle.com>
+ <20230710172839.GA7190@lst.de>
+ <0F9A70B1-C6AE-4A8B-8A4B-8DC9ADED73AB@oracle.com>
+ <20230711120137.GA27050@lst.de>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <20230711120137.GA27050@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 2023/7/11 20:01, Christoph Hellwig wrote:
+> On Mon, Jul 10, 2023 at 05:40:42PM +0000, Chuck Lever III wrote:
+>>> blk_rq_init_flush(rq);
+>>> - rq->flush.seq |= REQ_FSEQ_POSTFLUSH;
+>>> + rq->flush.seq |= REQ_FSEQ_PREFLUSH;
+>>> spin_lock_irq(&fq->mq_flush_lock);
+>>> list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
+>>> spin_unlock_irq(&fq->mq_flush_lock);
+>>
+>> Thanks for the quick response. No change.
+> 
+> I'm a bit lost and still can't reprodce.  Below is a patch with the
+> only behavior differences I can find.  It has two "#if 1" blocks,
+> which I'll need to bisect to to find out which made it work (if any,
+> but I hope so).
 
-On 2023/07/11 16:45, Bart Van Assche wrote:
+Hello,
 
-> On 7/11/23 06:22, Jaco Kroon wrote:
->> So *suspected* mq-deadline bug?
->
-> That seems unlikely to me. I have not yet seen mq-deadline causing an
-> I/O lockup. I'm not claiming that it would be impossible that there is a
-> bug in mq-deadline but it seems unlikely to me. However, I have seen it
-> many times that an I/O lockup was caused by a buggy HBA driver and/or
-> HBA firmware so I recommend to start with checking these thoroughly.
-Care to share how or at least point me in a direction please?
->
->> Supermicro has responded with appropriate upgrade options which
->> we've not executed yet, but I'll make time for that over the coming 
->> weekend, or perhaps I should wait a bit longer to give more time for 
->> a similar lockup with the none scheduler?
->
-> If this is possible, verifying whether the lockup can be reproduced 
-> without I/O scheduler sounds like a good idea to me.
+I tried today to reproduce, but can't unfortunately.
 
-If I had a reliable way to trigger this it would help a great deal.  
-Currently we're at 14 days uptime with scheduler set to none rather than 
-mq-deadline, previously we had to hard reboot approximately every 7 days 
-... again, how long is a piece of string?  A lockup proves the presence 
-of an issue, but how long must it not lock up to prove the absence of?
+Could you please also try the fix patch [1] from Ross Lagerwall that fixes
+IO hung problem of plug recursive flush?
 
-Ideas/Suggestions?
+(Since the main difference is that post-flush requests now can go into plug.)
 
-Kind regards,
-Jaco
+[1] https://lore.kernel.org/all/20230711160434.248868-1-ross.lagerwall@citrix.com/
 
+Thanks!
 
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 5504719b970d59..67364e607f2d1d 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2927,6 +2927,7 @@ void blk_mq_submit_bio(struct bio *bio)
+>  	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+>  	struct blk_plug *plug = blk_mq_plug(bio);
+>  	const int is_sync = op_is_sync(bio->bi_opf);
+> +	bool is_flush = op_is_flush(bio->bi_opf);
+>  	struct blk_mq_hw_ctx *hctx;
+>  	struct request *rq;
+>  	unsigned int nr_segs = 1;
+> @@ -2967,16 +2968,23 @@ void blk_mq_submit_bio(struct bio *bio)
+>  		return;
+>  	}
+>  
+> -	if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
+> -		return;
+> -
+> -	if (plug) {
+> -		blk_add_rq_to_plug(plug, rq);
+> -		return;
+> +#if 1	/* Variant 1, the plug is holding us back */
+> +	if (op_is_flush(bio->bi_opf)) {
+> +		if (blk_insert_flush(rq))
+> +			return;
+> +	} else {
+> +		if (plug) {
+> +			blk_add_rq_to_plug(plug, rq);
+> +			return;
+> +		}
+>  	}
+> +#endif
+>  
+>  	hctx = rq->mq_hctx;
+>  	if ((rq->rq_flags & RQF_USE_SCHED) ||
+> +#if 1	/* Variant 2 (unlikely), blk_mq_try_issue_directly causes problems */
+> +	    is_flush || 
+> +#endif
+>  	    (hctx->dispatch_busy && (q->nr_hw_queues == 1 || !is_sync))) {
+>  		blk_mq_insert_request(rq, 0);
+>  		blk_mq_run_hw_queue(hctx, true);
