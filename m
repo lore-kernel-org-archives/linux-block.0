@@ -2,210 +2,226 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99346EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 10:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C14C0015E
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 10:17:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232342AbjGMKOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jul 2023 06:14:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55858 "EHLO
+        id S234008AbjGMKRV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jul 2023 06:17:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231675AbjGMKOQ (ORCPT
+        with ESMTP id S234074AbjGMKRE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jul 2023 06:14:16 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDD71119;
-        Thu, 13 Jul 2023 03:14:15 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 87E1D1F385;
-        Thu, 13 Jul 2023 10:14:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1689243254; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yESZf5o+g8lL/htPSYTth/5qzyYw57M36VTUgeXJiPw=;
-        b=VKWwmDRwJRlT8LxYSbDPb05dHzZEoQvkDWgn6zHRBFZnMwbEs+LjFyiMahZnl1I4owsGVl
-        9Tl6+9WcRwPiKUT1YZGyLf8dugKK9pfns0AibtCcX2YNO2lC0lmfOfvYzanrM05+6bcLSl
-        uk5PhcjStMwP1S4+41xzfIScYKVKnkc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1689243254;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yESZf5o+g8lL/htPSYTth/5qzyYw57M36VTUgeXJiPw=;
-        b=TL0j7/87sulczK7E21raQGt51x52fHWSSE+QeEL8uoL/EXjtnJWyAleAR65lcGFj7uNo2K
-        W+UO2XZgQfQ/JwCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 68FCD133D6;
-        Thu, 13 Jul 2023 10:14:14 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id vEclGXbOr2SCZAAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 13 Jul 2023 10:14:14 +0000
-Message-ID: <875b1903-bca8-8c6e-79d7-506313bbd56d@suse.de>
-Date:   Thu, 13 Jul 2023 12:14:14 +0200
+        Thu, 13 Jul 2023 06:17:04 -0400
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 810552D4E;
+        Thu, 13 Jul 2023 03:16:35 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-31422f20399so134667f8f.1;
+        Thu, 13 Jul 2023 03:16:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689243394; x=1691835394;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8IQtZOX1Fe8N0zPumP1OlY/T7AiPFD7cpIHP1l3EW0U=;
+        b=YnqeXOpdwQ/G016PTNWK6haOVDxfLNeKXJ5Au4O2c0TCKG0+8FPrZGPyXIifEsttcX
+         ErErUnF5LfV1eDVuW3jwNWXFrQ58b3Ts97CpGFik/F/pMAfFCNCyP991QKxYTh+7cyu3
+         UV5NxxSOJ7v+guCpRPfrmqEHYCy43T3pzCIi+Tbny40MqSPdMWXqE7GzKEaIE5dEHAvE
+         KH0PVKGQt5uDSXtnMpcQ3+yJ7ucdC1npKuhH+OzOOZnAQ5Ztx3fHI/oxzPYUG5iliyUO
+         xGb4HDnlofGYtF4ChUohwu4ki51eIMUWt6srdjxK7eZBWnRyB/BPfelVbbGjFXT+2QCV
+         oH7g==
+X-Gm-Message-State: ABy/qLY52maX/WM9LFYi15/wehWYvkBCUh/ByCAy5s8R2nbEq4evrX8C
+        SZxL+fYMFHZ+uMhmruaZTYs=
+X-Google-Smtp-Source: APBJJlGTjbNxG1CjgpAWLT5wgzTx28sLdkefBC44/Di2EyYSUItbCicuxptPZ4CzTUW9F8Kd7vQvfw==
+X-Received: by 2002:a5d:60c8:0:b0:314:1593:9f2 with SMTP id x8-20020a5d60c8000000b00314159309f2mr1149818wrt.4.1689243393795;
+        Thu, 13 Jul 2023 03:16:33 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id b16-20020a5d5510000000b0031417b0d338sm7497880wrv.87.2023.07.13.03.16.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jul 2023 03:16:33 -0700 (PDT)
+Message-ID: <5cb63b10-72ab-4b7c-7574-48583ea8ffd1@grimberg.me>
+Date:   Thu, 13 Jul 2023 13:16:31 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
- autoconnect
+ Thunderbird/102.13.0
+Subject: Re: blktests failures with v6.4
 Content-Language: en-US
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Daniel Wagner <dwagner@suse.de>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <jsmart2021@gmail.com>,
-        Martin Belanger <Martin.Belanger@dell.com>
-References: <20230620132703.20648-1-dwagner@suse.de>
- <20230620132703.20648-3-dwagner@suse.de>
- <9c07e4f6-2cf5-b53b-6b48-bd4df8798ee9@nvidia.com>
- <bz2s6nyjwl6l7yfrd4wtjdtousv23ypcdleckibps5lyjpwi4x@wqq6qqesevpk>
- <39f9977e-b34c-f2dd-d356-8c78414a60d1@nvidia.com>
- <jdsoqllqmrqu5j5bt3fudkksmjskgs4ooodynm6yh3b4oc5scn@t3hydrmbb22f>
- <972a06e0-6841-043e-fc00-db7596f664c4@nvidia.com>
- <cskolyrp3s47gnn4nwtqpfxtafzhpirn3hv7ovhnnzpbb3ll2z@oum3v3n7go6l>
- <6dced1ba-c468-c88e-f861-9c202e803894@nvidia.com>
- <eadl5bkyysdcymgy7ra4hm6cqn6ngcxbyvz2qzg3fdffsssnpo@d3rzegyurzn5>
- <6fa5ec73-e6c6-cf8e-b11f-1a57f0fc34b4@nvidia.com>
- <95210a8a-c70e-c312-2c47-4f5ee9329586@suse.de>
- <bd7c91c4-9528-aaeb-9789-03191dc7761b@nvidia.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <bd7c91c4-9528-aaeb-9789-03191dc7761b@nvidia.com>
+To:     Hannes Reinecke <hare@suse.de>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+References: <lkmloyrqpebispffur5udxdiubmevvodtsvnap3jz7tv5ihstr@jg7ejye3bein>
+ <165eceaa-55d4-f9c7-7e02-18115e6df6fe@grimberg.me>
+ <v3n4k4gk5uhbuh6ijl2pwaysvxzidzhrmjejourfnmobebwbzi@hejuqcryp4nc>
+ <152f0684-4bcd-699f-e0e3-40189be4b80a@grimberg.me>
+ <142962ad-55fc-d193-de7a-949f290d3fdf@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <142962ad-55fc-d193-de7a-949f290d3fdf@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/13/23 10:49, Max Gurtovoy wrote:
-> 
-> 
-> On 13/07/2023 9:00, Hannes Reinecke wrote:
->> On 7/13/23 02:12, Max Gurtovoy wrote:
->>>
->>>
->>> On 12/07/2023 15:04, Daniel Wagner wrote:
->>>> On Mon, Jul 10, 2023 at 07:30:20PM +0300, Max Gurtovoy wrote:
->>>>>
->>>>>
->>>>> On 10/07/2023 18:03, Daniel Wagner wrote:
->>>>>> On Mon, Jul 10, 2023 at 03:31:23PM +0300, Max Gurtovoy wrote:
->>>>>>> I think it is more than just commit message.
->>>>>>
->>>>>> Okay, starting to understand what's the problem.
->>>>>>
->>>>>>> A lot of code that we can avoid was added regarding the --context 
->>>>>>> cmdline
->>>>>>> argument.
->>>>>>
->>>>>> Correct and it's not optional to get the tests passing for the fc 
->>>>>> transport.
->>>>>
->>>>> why the fc needs the --context to pass tests ?
->>>>
->>>> A typical nvme test consists out of following steps (nvme/004):
->>>>
->>>> // nvme target setup (1)
->>>>     _create_nvmet_subsystem "blktests-subsystem-1" "${loop_dev}" \
->>>>         "91fdba0d-f87b-4c25-b80f-db7be1418b9e"
->>>>     _add_nvmet_subsys_to_port "${port}" "blktests-subsystem-1"
->>>>
->>>> // nvme host setup (2)
->>>>     _nvme_connect_subsys "${nvme_trtype}" blktests-subsystem-1
->>>>
->>>>     local nvmedev
->>>>     nvmedev=$(_find_nvme_dev "blktests-subsystem-1")
->>>>     cat "/sys/block/${nvmedev}n1/uuid"
->>>>     cat "/sys/block/${nvmedev}n1/wwid"
->>>>
->>>> // nvme host teardown (3)
->>>>     _nvme_disconnect_subsys blktests-subsystem-1
->>>>
->>>> // nvme target teardown (4)
->>>>     _remove_nvmet_subsystem_from_port "${port}" "blktests-subsystem-1"
->>>>     _remove_nvmet_subsystem "blktests-subsystem-1"
->>>>
->>>>
->>>> The corresponding output with --context
->>>>
->>>>   run blktests nvme/004 at 2023-07-12 13:49:50
->>>> // (1)
->>>>   loop0: detected capacity change from 0 to 32768
->>>>   nvmet: adding nsid 1 to subsystem blktests-subsystem-1
->>>>   nvme nvme2: NVME-FC{0}: create association : host wwpn 
->>>> 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN 
->>>> "blktests-subsystem-1"
->>>>   (NULL device *): {0:0} Association created
->>>>   [174] nvmet: ctrl 1 start keep-alive timer for 5 secs
->>>> // (2)
->>>>   nvmet: creating nvm controller 1 for subsystem 
->>>> blktests-subsystem-1 for NQN 
->>>> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
->>>>   [374] nvmet: adding queue 1 to ctrl 1.
->>>>   [1138] nvmet: adding queue 2 to ctrl 1.
->>>>   [73] nvmet: adding queue 3 to ctrl 1.
->>>>   [174] nvmet: adding queue 4 to ctrl 1.
->>>>   nvme nvme2: NVME-FC{0}: controller connect complete
->>>>   nvme nvme2: NVME-FC{0}: new ctrl: NQN "blktests-subsystem-1"
->>>> // (3)
->>>>   nvme nvme2: Removing ctrl: NQN "blktests-subsystem-1"
->>>> // (4)
->>>>   [1138] nvmet: ctrl 1 stop keep-alive
->>>>   (NULL device *): {0:0} Association deleted
->>>>   (NULL device *): {0:0} Association freed
->>>>   (NULL device *): Disconnect LS failed: No Association
->>>>
->>>>
->>>> and without --context
->>>>
->>>>   run blktests nvme/004 at 2023-07-12 13:50:33
->>>> // (1)
->>>>   loop1: detected capacity change from 0 to 32768
->>>>   nvmet: adding nsid 1 to subsystem blktests-subsystem-1
->>>>   nvme nvme2: NVME-FC{0}: create association : host wwpn 
->>>> 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN 
->>>> "nqn.2014-08.org.nvmexpress.discovery"
->>>
->>> why does this association to discovery controller created ? because 
->>> of some system service ?
->>>
->> Yes. There are nvme-autoconnect udev rules and systemd services 
->> installed per default (in quite some systems now).
->> And it's really hard (if not impossible) to disable these services (as 
->> we cannot be sure how they are named, hence we wouldn't know which 
->> service to disable.
-> 
-> Right. We shouldn't disable them IMO.
-> 
+
+
+On 7/13/23 11:41, Hannes Reinecke wrote:
+> On 7/13/23 09:48, Sagi Grimberg wrote:
 >>
->>> can we configure the blktests subsystem not to be discovered or add 
->>> some access list to it ?
+>>>>> #3: nvme/003 (fabrics transport)
+>>>>>
+>>>>>      When nvme test group is run with trtype=rdma or tcp, the test 
+>>>>> case fails
+>>>>>      due to lockdep WARNING "possible circular locking dependency 
+>>>>> detected".
+>>>>>      Reported in May/2023. Bart suggested a fix for trytpe=rdma [4] 
+>>>>> but it
+>>>>>      needs more discussion.
+>>>>>
+>>>>>      [4] 
+>>>>> https://lore.kernel.org/linux-nvme/20230511150321.103172-1-bvanassche@acm.org/
+>>>>
+>>>> This patch is unfortunately incorrect and buggy.
+>>>>
+>>>> This will likely make the issue go away, but adds another
+>>>> old issue where a client can DDOS a target by bombarding it
+>>>> with connect/disconnect. When releases are async and we don't
+>>>> have any back-pressure, it is likely to happen.
+>>>> -- 
+>>>> diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+>>>> index 4597bca43a6d..8b4f4aa48206 100644
+>>>> --- a/drivers/nvme/target/rdma.c
+>>>> +++ b/drivers/nvme/target/rdma.c
+>>>> @@ -1582,11 +1582,6 @@ static int nvmet_rdma_queue_connect(struct 
+>>>> rdma_cm_id
+>>>> *cm_id,
+>>>>                  goto put_device;
+>>>>          }
+>>>>
+>>>> -       if (queue->host_qid == 0) {
+>>>> -               /* Let inflight controller teardown complete */
+>>>> -               flush_workqueue(nvmet_wq);
+>>>> -       }
+>>>> -
+>>>>          ret = nvmet_rdma_cm_accept(cm_id, queue, &event->param.conn);
+>>>>          if (ret) {
+>>>>                  /*
+>>>> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+>>>> index 868aa4de2e4c..c8cfa19e11c7 100644
+>>>> --- a/drivers/nvme/target/tcp.c
+>>>> +++ b/drivers/nvme/target/tcp.c
+>>>> @@ -1844,11 +1844,6 @@ static u16 nvmet_tcp_install_queue(struct 
+>>>> nvmet_sq
+>>>> *sq)
+>>>>          struct nvmet_tcp_queue *queue =
+>>>>                  container_of(sq, struct nvmet_tcp_queue, nvme_sq);
+>>>>
+>>>> -       if (sq->qid == 0) {
+>>>> -               /* Let inflight controller teardown complete */
+>>>> -               flush_workqueue(nvmet_wq);
+>>>> -       }
+>>>> -
+>>>>          queue->nr_cmds = sq->size * 2;
+>>>>          if (nvmet_tcp_alloc_cmds(queue))
+>>>>                  return NVME_SC_INTERNAL;
+>>>> -- 
 >>>
->> But that's precisely what the '--context' thing is attempting to do ...
+>>> Thanks Sagi, I tried the patch above and confirmed the lockdep WARN 
+>>> disappears
+>>> for both rdma and tcp. It indicates that the flush_workqueue(nvmet_wq)
+>>> introduced the circular lock dependency.
+>>
+>> Thanks for confirming. This was expected.
+>>
+>>> I also found the two commits below
+>>> record why the flush_workqueue(nvmet_wq) was introduced.
+>>>
+>>>   777dc82395de ("nvmet-rdma: occasionally flush ongoing controller 
+>>> teardown")
+>>>   8832cf922151 ("nvmet: use a private workqueue instead of the system 
+>>> workqueue")
+>>
+>> The second patch is unrelated, before we used a global workqueue and
+>> fundamentally had the same issue.
+>>
+>>> The left question is how to avoid both the connect/disconnect 
+>>> bombarding DDOS
+>>> and the circular lock possibility related to the nvmet_wq completion.
+>>
+>> I don't see any way to synchronize connects with releases without 
+>> moving connect sequences to a dedicated thread. Which in my mind is 
+>> undesirable.
+>>
+>> The only solution I can think of is to fail a host connect expecting the
+>> host to reconnect and throttle this way, but that would lead to spurious
+>> connect failures (at least from the host PoV).
+>>
+>> Maybe we can add a NOT_READY connect error code in nvme for that...
+>>
+> You know, I have been seeing the very same lockdep warning during TLS 
+> testing; wasn't sure, though, if it's a generic issue or something I've 
+> introduced with the TLS logic.
 > 
-> I'm not sure it is.
+> I guess we can solve this by adding another NVMET_TCP_Q_INIT state 
+> before NVMET_TCP_Q_CONNECTING; then we can flip the state from INIT to 
+> CONNECTING in nvmet_tcp_alloc_queue():
 > 
-> Exposing the subsystem is from the target configuration side.
-> Additionally, the --context (which is in the initiator/host side), 
-> according to Daniel, is there to distinguish between different 
-> invocations. I proposed that blktests subsystem will not be part of 
-> discoverable fabric or protected somehow by access list. Therefore, no 
-> additional invocation will happen.
+> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+> index ed98df72c76b..e6f699a44128 100644
+> --- a/drivers/nvme/target/tcp.c
+> +++ b/drivers/nvme/target/tcp.c
+> @@ -121,6 +121,7 @@ struct nvmet_tcp_cmd {
+>   };
 > 
-Hmm. Maybe we can tweak blktest to use it's own HostNQN, and always pass 
-that for any nvme-cli call.
-Daniel?
+>   enum nvmet_tcp_queue_state {
+> +       NVMET_TCP_Q_INIT,
+>          NVMET_TCP_Q_CONNECTING,
+>          NVMET_TCP_Q_LIVE,
+>          NVMET_TCP_Q_DISCONNECTING,
+> @@ -1274,7 +1275,8 @@ static int nvmet_tcp_try_recv(struct 
+> nvmet_tcp_queue *queue,
+>   static void nvmet_tcp_schedule_release_queue(struct nvmet_tcp_queue 
+> *queue)
+>   {
+>          spin_lock(&queue->state_lock);
+> -       if (queue->state != NVMET_TCP_Q_DISCONNECTING) {
+> +       if (queue->state != NVMET_TCP_Q_INIT &&
+> +           queue->state != NVMET_TCP_Q_DISCONNECTING) {
+>                  queue->state = NVMET_TCP_Q_DISCONNECTING;
+>                  queue_work(nvmet_wq, &queue->release_work);
+>          }
+> @@ -1625,7 +1627,7 @@ static int nvmet_tcp_alloc_queue(struct 
+> nvmet_tcp_port *port,
+>          queue->port = port;
+>          queue->nr_cmds = 0;
+>          spin_lock_init(&queue->state_lock);
+> -       queue->state = NVMET_TCP_Q_CONNECTING;
+> +       queue->state = NVMET_TCP_Q_INIT;
+>          INIT_LIST_HEAD(&queue->free_list);
+>          init_llist_head(&queue->resp_list);
+>          INIT_LIST_HEAD(&queue->resp_send_list);
+> @@ -1832,10 +1834,12 @@ static u16 nvmet_tcp_install_queue(struct 
+> nvmet_sq *sq)
+>          struct nvmet_tcp_queue *queue =
+>                  container_of(sq, struct nvmet_tcp_queue, nvme_sq);
+> 
+> -       if (sq->qid == 0) {
+> -               /* Let inflight controller teardown complete */
+> -               flush_workqueue(nvmet_wq);
+> +       spin_lock(&queue->state_lock);
+> +       if (queue->state != NVMET_TCP_Q_INIT) {
+> +               spin_unlock(&queue->state_lock);
+> +               return NVME_SC_NOT_READY;
+>          }
+> +       spin_unlock(&queue->state_lock);
+> 
+>          queue->nr_cmds = sq->size * 2;
+>          if (nvmet_tcp_alloc_cmds(queue))
+> 
+> With that we'll return 'not ready' whenever we hit this condition, but 
+> that should be fine as we would've crashed anyway with the old code.
+> 
+> Hmm?
 
-Cheers,
-
-Hannes
-
+I don't understand what this patch is doing... Nor how it solves
+anything.
