@@ -2,130 +2,210 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B46EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 09:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99346EB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 10:14:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233978AbjGMJQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jul 2023 05:16:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45304 "EHLO
+        id S232342AbjGMKOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jul 2023 06:14:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233050AbjGMJQb (ORCPT
+        with ESMTP id S231675AbjGMKOQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jul 2023 05:16:31 -0400
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2093.outbound.protection.outlook.com [40.107.215.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAD311FF7;
-        Thu, 13 Jul 2023 02:16:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mRreXphAdyN5tJ0V7gkic0Ppuo/qzRkXaiJ2lwVFUGjW2xUREQIOCrcrvtMDYZ3SAUxzg2+EyEPguhUXoMglhv/N/eyYXdd/pKpYIPF6n1FgNPERddcpHMF0kFJzRfdDOWoZCHTMWpXQG8HJOZLzDGFj7BJc6ARPwZMiFDY9Y2ROqWZAdOzXEw+cnJQ74X96GMYakoNMZ3M1G0Zx1Irj7nIU+HfIobuTjrSwCc/4gP+dMBswK8GJG/oBI9ggpWeKqDU6fJNzrgi3KcpOIIbUxpaYE6yrjHoIKKpSzPPlJOmN9YrmKT23J3k/DrSewaqNf0mu8Fpxvs9aU+EGIgUJIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AfYpq+IE4hFbCk72pVldbrrIxv1BugRqam0dFq+0RdM=;
- b=dGE4ZQp8Z5a8A3uBbXI3yEBnbzcILbp7HSd+H0QRxdTdA1yMLXFXzC4eAO8hGuWjSQ8ycJEODggb8YjAPD378VvfrpZghSGAWFTknX2/BJ7Jk5NEfO0CaTq1149dmONoF3CtqjFJAJFGPOQTG5jFVOMpCwlpAkRcNt/jlZ41taBTc7Vup+ZguDp7UxhugjHD3IEhU6JWBH/9bPgxMGqkPv3XBVLTzw77fqenDEiXyc72GkBCq7kaTLdViriqkYbCZ3CUphs3hoE0KXcP7AUJdNOkglCAwQ/6ahoFKf6ahlDVn2/v5LkgOVPzK/m0Sz7wapn+NBEfv8XEBx/KqZfCbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AfYpq+IE4hFbCk72pVldbrrIxv1BugRqam0dFq+0RdM=;
- b=F5l2MvsVQG2PeIfPPFAaIKd5sWCG8Bg3ofoSYAe5YvM2oY/qb03Xq9dp62PekKjad1rb6GGa6EwOshh0cEAF85wWJiEIxyw9A2X+Burc3nCy0YIRszDrTOBKFCk6oz3tcV53F7RKtaI79BIJmi/U5G9irxrF0eSG03zvXhtTCE5nW7JxXbR5pZ2YEwojklw4GkJUyijnPR2PatB6K84OmyXBxnDXwncp8JJoqvMa4q6MRXflExuKzeSUEb9VQ1pa0/7+sdXn5NSTHnBNfMhTCbKTUlgNGRWJC3HmywwU99XuDutcSk+IzWgpoYtQ/cegdFFRsA7mFwK0kGAbuJJcmw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
- TY0PR06MB5612.apcprd06.prod.outlook.com (2603:1096:400:31f::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6565.30; Thu, 13 Jul 2023 09:16:17 +0000
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6588.024; Thu, 13 Jul 2023
- 09:16:16 +0000
-From:   Wang Ming <machel@vivo.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org
-Cc:     opensource.kernel@vivo.com, gregkh@linuxfoundation.org,
-        Wang Ming <machel@vivo.com>
-Subject: [PATCH v1] block: Remove error checking for debugfs_create_dir()
-Date:   Thu, 13 Jul 2023 17:14:39 +0800
-Message-Id: <20230713091452.3997-1-machel@vivo.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR04CA0191.apcprd04.prod.outlook.com
- (2603:1096:4:14::29) To SG2PR06MB3743.apcprd06.prod.outlook.com
- (2603:1096:4:d0::18)
+        Thu, 13 Jul 2023 06:14:16 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDD71119;
+        Thu, 13 Jul 2023 03:14:15 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 87E1D1F385;
+        Thu, 13 Jul 2023 10:14:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1689243254; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yESZf5o+g8lL/htPSYTth/5qzyYw57M36VTUgeXJiPw=;
+        b=VKWwmDRwJRlT8LxYSbDPb05dHzZEoQvkDWgn6zHRBFZnMwbEs+LjFyiMahZnl1I4owsGVl
+        9Tl6+9WcRwPiKUT1YZGyLf8dugKK9pfns0AibtCcX2YNO2lC0lmfOfvYzanrM05+6bcLSl
+        uk5PhcjStMwP1S4+41xzfIScYKVKnkc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1689243254;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yESZf5o+g8lL/htPSYTth/5qzyYw57M36VTUgeXJiPw=;
+        b=TL0j7/87sulczK7E21raQGt51x52fHWSSE+QeEL8uoL/EXjtnJWyAleAR65lcGFj7uNo2K
+        W+UO2XZgQfQ/JwCw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 68FCD133D6;
+        Thu, 13 Jul 2023 10:14:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vEclGXbOr2SCZAAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 13 Jul 2023 10:14:14 +0000
+Message-ID: <875b1903-bca8-8c6e-79d7-506313bbd56d@suse.de>
+Date:   Thu, 13 Jul 2023 12:14:14 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|TY0PR06MB5612:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8ccfc38f-65e0-47f1-a4e9-08db8381cf44
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: txwyOIcr4GEqvWO5J86gtq7qT1pefJVEAHM4ocmRciKBHebgUJNoRBqFEVvfDboMa5lYth3Ii08NNrE8V7RGO2M+z8aqhtkzlwWuO78AspEJX/270FCYMThL6V7/0e6IoGQsammQp6XP0mXWO/PJASZNOFp7xhaatl5Dh1Ws/3ED7nPaKZEtHr8HAxU6DaMKaSvZkSkABwDY8kgbfimmiUcqyU9Sq0kGsYOXfmEqkFq3K+WIjJBRYVMYDaXO241AJQqvdD/fOYCSURhl1H6Vv2xfnAk6KLqH4Ahz7pU94p6xJV4PgYOUSlz7OZ1Q3sS2zHr7NT2FISn1+4YF3nxpV3VUlTBdDHCSVtCVRe3WwCOadiUTyXle6A7Tw4ZIUPgZOWrr0I5BUiirpRbJ6uci1JvpwBRLu0BUi8UyiIjGRmIqk4j/Cmu6bKeJ6t5dTQdCDsChDf3NHyqMwHkHSqaBet97SPMBrO10UFaB5XO4Km4PW3V5AiPFvG9zOZdYw0kYQ7+QxPLUeMDxCGe9Q/phnCyB0fxLuhk1oMnVujVN7BsuilGRxLJNSMS7SIG5O0MGsv/FlnKF1BAPDy7m8rCfJsYFS5mrc3zXvaxdA7Il47hVd+0WeSqA5hBIxfH39ZU3
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(136003)(376002)(366004)(396003)(451199021)(186003)(1076003)(26005)(2616005)(6512007)(2906002)(478600001)(107886003)(83380400001)(4744005)(4326008)(41300700001)(66556008)(66476007)(5660300002)(316002)(8676002)(8936002)(66946007)(6486002)(52116002)(6666004)(36756003)(6506007)(38350700002)(86362001)(38100700002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g4xL1ED7w8axDigEnmxbP2Gy5wJHzkyhW/QnI3k4gUbQvG5sdczsOVfRSJGp?=
- =?us-ascii?Q?QmjymD5TRbc8t8EYjHlAApJlChn3c9ixWike19a/59LrIVsFC6ReAZQil8Wf?=
- =?us-ascii?Q?1qswNqBIpLzXFUkYlXaEZiu7WfgWR7qNUn3Xgg3DDv95kYwx0Z6UmGoD+I4L?=
- =?us-ascii?Q?CqQ6sBnYGE8wFkqNWXdLnwFeKFJ3ndbRxos0SRskFo14s2axoNmrUpif+Am6?=
- =?us-ascii?Q?2wSmNYR0EOpCgGIKPxKJXd+AGFJAYpSh70vCZjVT09n9rBRITsh/AsKzGlj5?=
- =?us-ascii?Q?fJ9SYqNJGSa/jRlqhegj6MckWC9uF23OqedJvqRKDxYohocxh2y83xsORXir?=
- =?us-ascii?Q?/kk4OLd0huYDkuOd2X/q3uyDYi8TLyov3F00rJi5LcpI5r3iZlhoU98Y44o8?=
- =?us-ascii?Q?lDuiV+x00P6eTPCLV5DwhrurrlxSi/1II6dFAUoepjcUDt8HD+3gusYOfMZB?=
- =?us-ascii?Q?qTqQpKfdwhAHTp85zDL9Kqxqc0SqK+znU9oIBl0Yi2reNMWF+EBhWyz8y6vm?=
- =?us-ascii?Q?WxX+aFdi4zdW9tU/7G0jMfs1SIywkmiaxE57Qz4vd8zCzo71/M8j1W04m0Q6?=
- =?us-ascii?Q?uPngs/+2MUdEYK9DLpWac1yblU6xa0o93LUkw+toy/TaPlLyBwswGCmERLNp?=
- =?us-ascii?Q?Rw5sSzQyhHqZGvoFHspfMwBp6DA48JeaPqvpLyvi/JWJolw1uMB/49pzVlDw?=
- =?us-ascii?Q?4Xti/1G7lROsGJ45l+29W4hFhbi1q1I/xDphINx/cL9oeyIj5xjpD8Y5JVTa?=
- =?us-ascii?Q?oWzygeYoI6+972mwq9Le0Z6e+hdyhrijKX/jj5SEsYDrGjUcCjpT394ehIxo?=
- =?us-ascii?Q?IwGk52VEWGvj4SPrc2/hzToeF2G2hqLmOlzlORBi3KpXUYoTPSe2hVzDqJfG?=
- =?us-ascii?Q?O5JVECpfeLx5Zfq+T8WgnRUvUjLjuc+ij1WGlS7XcobULWQkP1wRPAmrDVTC?=
- =?us-ascii?Q?EkkQRQh7ZwLG4kyugetp35GXouUZOzTuKekavsJzdxE/udeB7d7YVindLag3?=
- =?us-ascii?Q?AJpGO2FCn0BNoHqc5m7J8JpvgSFdrp+Do9leFbGu7gjG8qdVHjYd0biaBQcB?=
- =?us-ascii?Q?vuxA4mvpPGH6UfKN/W4qqIPddJ3vQdaDyuSgfdICfXsUgN12KkFZXrm/nAy7?=
- =?us-ascii?Q?hB1QxWUAIUn0gc7adsvYGnIrJG6Cf8gxJPRaHNLqwslvHqE2XEZRTZMiC/IT?=
- =?us-ascii?Q?TaaQi6zCCwcu1UiGa5b6le8xDVuj1HwV9HuV3+lPNHp9JTarh/NYT0zE4sf5?=
- =?us-ascii?Q?WmbPEGB+PpF+4bXwh4Sxcw4ZVdFZ+YmG66Q9zoBUs3gIBX2hqLMDe6q21/gS?=
- =?us-ascii?Q?FLirrjl6f4VbjoLohM9f3w1PLZSLaG0+erqXOwPrFQzmvhAVUTytrBPpBnZH?=
- =?us-ascii?Q?tnL9gYktV2VjZhnhxVp0X1OIQaQ64Lzq0YGqXY8YL5CeWEkQR5bA5wNDwY8i?=
- =?us-ascii?Q?Put6qZm01ELxMAgxSehfeZvaAWUPP4Fr/gJctNs69ujYuA5XXiL+CLCSl0cF?=
- =?us-ascii?Q?LQXX9c/86gNPkYhveQBoEtJbGDWjK+ilY3Cpo+GHCUgaiUMbTTe+CDCh8vQt?=
- =?us-ascii?Q?lFDMkF2fACRcmvyKhm5s+LkRLpSUEulfHbcgt987?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ccfc38f-65e0-47f1-a4e9-08db8381cf44
-X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 09:16:15.7754
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 08CPA6n7oTIo58d46yGdleKHX+x2bYXWmAxdY2m3KKuMskNCv4JRq/P5O9CoszKL4AOK0cr2mLW6e8eMFPu1Eg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR06MB5612
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Content-Language: en-US
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Daniel Wagner <dwagner@suse.de>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-3-dwagner@suse.de>
+ <9c07e4f6-2cf5-b53b-6b48-bd4df8798ee9@nvidia.com>
+ <bz2s6nyjwl6l7yfrd4wtjdtousv23ypcdleckibps5lyjpwi4x@wqq6qqesevpk>
+ <39f9977e-b34c-f2dd-d356-8c78414a60d1@nvidia.com>
+ <jdsoqllqmrqu5j5bt3fudkksmjskgs4ooodynm6yh3b4oc5scn@t3hydrmbb22f>
+ <972a06e0-6841-043e-fc00-db7596f664c4@nvidia.com>
+ <cskolyrp3s47gnn4nwtqpfxtafzhpirn3hv7ovhnnzpbb3ll2z@oum3v3n7go6l>
+ <6dced1ba-c468-c88e-f861-9c202e803894@nvidia.com>
+ <eadl5bkyysdcymgy7ra4hm6cqn6ngcxbyvz2qzg3fdffsssnpo@d3rzegyurzn5>
+ <6fa5ec73-e6c6-cf8e-b11f-1a57f0fc34b4@nvidia.com>
+ <95210a8a-c70e-c312-2c47-4f5ee9329586@suse.de>
+ <bd7c91c4-9528-aaeb-9789-03191dc7761b@nvidia.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <bd7c91c4-9528-aaeb-9789-03191dc7761b@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It is expected that most callers should _ignore_ the errors
-return by debugfs_create_dir() in pkt_debugfs_dev_new().
+On 7/13/23 10:49, Max Gurtovoy wrote:
+> 
+> 
+> On 13/07/2023 9:00, Hannes Reinecke wrote:
+>> On 7/13/23 02:12, Max Gurtovoy wrote:
+>>>
+>>>
+>>> On 12/07/2023 15:04, Daniel Wagner wrote:
+>>>> On Mon, Jul 10, 2023 at 07:30:20PM +0300, Max Gurtovoy wrote:
+>>>>>
+>>>>>
+>>>>> On 10/07/2023 18:03, Daniel Wagner wrote:
+>>>>>> On Mon, Jul 10, 2023 at 03:31:23PM +0300, Max Gurtovoy wrote:
+>>>>>>> I think it is more than just commit message.
+>>>>>>
+>>>>>> Okay, starting to understand what's the problem.
+>>>>>>
+>>>>>>> A lot of code that we can avoid was added regarding the --context 
+>>>>>>> cmdline
+>>>>>>> argument.
+>>>>>>
+>>>>>> Correct and it's not optional to get the tests passing for the fc 
+>>>>>> transport.
+>>>>>
+>>>>> why the fc needs the --context to pass tests ?
+>>>>
+>>>> A typical nvme test consists out of following steps (nvme/004):
+>>>>
+>>>> // nvme target setup (1)
+>>>>     _create_nvmet_subsystem "blktests-subsystem-1" "${loop_dev}" \
+>>>>         "91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+>>>>     _add_nvmet_subsys_to_port "${port}" "blktests-subsystem-1"
+>>>>
+>>>> // nvme host setup (2)
+>>>>     _nvme_connect_subsys "${nvme_trtype}" blktests-subsystem-1
+>>>>
+>>>>     local nvmedev
+>>>>     nvmedev=$(_find_nvme_dev "blktests-subsystem-1")
+>>>>     cat "/sys/block/${nvmedev}n1/uuid"
+>>>>     cat "/sys/block/${nvmedev}n1/wwid"
+>>>>
+>>>> // nvme host teardown (3)
+>>>>     _nvme_disconnect_subsys blktests-subsystem-1
+>>>>
+>>>> // nvme target teardown (4)
+>>>>     _remove_nvmet_subsystem_from_port "${port}" "blktests-subsystem-1"
+>>>>     _remove_nvmet_subsystem "blktests-subsystem-1"
+>>>>
+>>>>
+>>>> The corresponding output with --context
+>>>>
+>>>>   run blktests nvme/004 at 2023-07-12 13:49:50
+>>>> // (1)
+>>>>   loop0: detected capacity change from 0 to 32768
+>>>>   nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>>>   nvme nvme2: NVME-FC{0}: create association : host wwpn 
+>>>> 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN 
+>>>> "blktests-subsystem-1"
+>>>>   (NULL device *): {0:0} Association created
+>>>>   [174] nvmet: ctrl 1 start keep-alive timer for 5 secs
+>>>> // (2)
+>>>>   nvmet: creating nvm controller 1 for subsystem 
+>>>> blktests-subsystem-1 for NQN 
+>>>> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+>>>>   [374] nvmet: adding queue 1 to ctrl 1.
+>>>>   [1138] nvmet: adding queue 2 to ctrl 1.
+>>>>   [73] nvmet: adding queue 3 to ctrl 1.
+>>>>   [174] nvmet: adding queue 4 to ctrl 1.
+>>>>   nvme nvme2: NVME-FC{0}: controller connect complete
+>>>>   nvme nvme2: NVME-FC{0}: new ctrl: NQN "blktests-subsystem-1"
+>>>> // (3)
+>>>>   nvme nvme2: Removing ctrl: NQN "blktests-subsystem-1"
+>>>> // (4)
+>>>>   [1138] nvmet: ctrl 1 stop keep-alive
+>>>>   (NULL device *): {0:0} Association deleted
+>>>>   (NULL device *): {0:0} Association freed
+>>>>   (NULL device *): Disconnect LS failed: No Association
+>>>>
+>>>>
+>>>> and without --context
+>>>>
+>>>>   run blktests nvme/004 at 2023-07-12 13:50:33
+>>>> // (1)
+>>>>   loop1: detected capacity change from 0 to 32768
+>>>>   nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>>>   nvme nvme2: NVME-FC{0}: create association : host wwpn 
+>>>> 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN 
+>>>> "nqn.2014-08.org.nvmexpress.discovery"
+>>>
+>>> why does this association to discovery controller created ? because 
+>>> of some system service ?
+>>>
+>> Yes. There are nvme-autoconnect udev rules and systemd services 
+>> installed per default (in quite some systems now).
+>> And it's really hard (if not impossible) to disable these services (as 
+>> we cannot be sure how they are named, hence we wouldn't know which 
+>> service to disable.
+> 
+> Right. We shouldn't disable them IMO.
+> 
+>>
+>>> can we configure the blktests subsystem not to be discovered or add 
+>>> some access list to it ?
+>>>
+>> But that's precisely what the '--context' thing is attempting to do ...
+> 
+> I'm not sure it is.
+> 
+> Exposing the subsystem is from the target configuration side.
+> Additionally, the --context (which is in the initiator/host side), 
+> according to Daniel, is there to distinguish between different 
+> invocations. I proposed that blktests subsystem will not be part of 
+> discoverable fabric or protected somehow by access list. Therefore, no 
+> additional invocation will happen.
+> 
+Hmm. Maybe we can tweak blktest to use it's own HostNQN, and always pass 
+that for any nvme-cli call.
+Daniel?
 
-Signed-off-by: Wang Ming <machel@vivo.com>
----
- drivers/block/pktcdvd.c | 2 --
- 1 file changed, 2 deletions(-)
+Cheers,
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index a1428538bda5..1d07208faeeb 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -497,8 +497,6 @@ static void pkt_debugfs_dev_new(struct pktcdvd_device *pd)
- 	if (!pkt_debugfs_root)
- 		return;
- 	pd->dfs_d_root = debugfs_create_dir(pd->disk->disk_name, pkt_debugfs_root);
--	if (!pd->dfs_d_root)
--		return;
- 
- 	pd->dfs_f_info = debugfs_create_file("info", 0444, pd->dfs_d_root,
- 					     pd, &pkt_seq_fops);
--- 
-2.25.1
+Hannes
 
