@@ -2,94 +2,178 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 357D7C0015E
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 20:38:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C58FC001DE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 23:31:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234071AbjGMUiE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jul 2023 16:38:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58376 "EHLO
+        id S233932AbjGMXbi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jul 2023 19:31:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234046AbjGMUiD (ORCPT
+        with ESMTP id S230138AbjGMXbh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jul 2023 16:38:03 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D682D54
-        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 13:38:01 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b89b0c73d7so1495205ad.1
-        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 13:38:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689280680; x=1689885480;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M1Q3QVXuA3e+9GjXcm3jtTXFaZS47K/0EuW+3XlNfNc=;
-        b=Su8Wda2t8a9fyq+mKQcL/x7F/nORxih5QNN3QcI8gU6tafMcFTpXJ/JwTC+hoKIAet
-         UZMsZJb96148P+d+aPws2YjRiYEf/edVpyjk4+wpEJ9M1XzqIucAg9yImocZFmYK9wJK
-         xaE29kKpjDeCOxxq0rQ+6whCvhArs3pZ84vH3p/ZLNWFeACVq7oihBFPE5g9PWRpVt62
-         m/+T4BW1NQTA7qrHOcSd4KuKrl9Spcm6bLiz8E7RZ/f+rVQrLrv9scU9gZNQlE9kebGZ
-         0RGTY3HPcbhwteIksfVKa0OxCoVWRm5KTkbDlcno5Uv52JGfmdZij+dF0jwVK882tSpc
-         Hovw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689280680; x=1689885480;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M1Q3QVXuA3e+9GjXcm3jtTXFaZS47K/0EuW+3XlNfNc=;
-        b=W5D4DGTMN6u1TeD1xIiLTJ6M5jfOySQP7MubTQGzAePbtm5KfaOSbP7s5bpTNUMibl
-         g1DhbgknBNKp9GBqasy0e+PJ++jI3CCfUF6ygZDooQqPurVAFQl6j4GzToSwFRRwiwuo
-         Q9e3w3JZ2vUbamwYUtwxjOHnKAeowgqoDkBifhYcXVNpDm7juEFG5LoOEunt9wV8JAO8
-         TGCvtHmpDwCMblKICGwaKkt7E+VYC+xB/zh5+8sv/AzL/uJvXNUbK9ilW8n9BFnfpNV0
-         WoCJp8+jMEPsjahvIq+SmrtZb8C5vO6jVIFmVakNFaWPHR88GFPd6+5V9qm9zzbApCJw
-         JHUQ==
-X-Gm-Message-State: ABy/qLYp6l1pm2kgtcBFOUqhgOTSRfDqivm8Y4iOvlBXkoCXhOpKU51z
-        FD+qyVcHlQrvLr7ksA6MpApMfISYKbkHp3LR5IY=
-X-Google-Smtp-Source: APBJJlFtDbDfCH1QZYudWC+aygAHdxLHIdPeg2AQ0LHcswNN+FtzghG6W1WdomahIOIyN5rpCIt89g==
-X-Received: by 2002:a17:902:e549:b0:1b8:a8e5:e8bc with SMTP id n9-20020a170902e54900b001b8a8e5e8bcmr3342583plf.6.1689280680481;
-        Thu, 13 Jul 2023 13:38:00 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s10-20020a170902988a00b001b89045ff03sm6258074plp.233.2023.07.13.13.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 13:37:59 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Josef Bacik <josef@toxicpanda.com>,
-        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20230713-b4-nbd-genl-v3-1-226cbddba04b@weissschuh.net>
-References: <20230713-b4-nbd-genl-v3-1-226cbddba04b@weissschuh.net>
-Subject: Re: [PATCH v3] nbd: automatically load module on genl access
-Message-Id: <168928067935.580122.1235240259614744275.b4-ty@kernel.dk>
-Date:   Thu, 13 Jul 2023 14:37:59 -0600
+        Thu, 13 Jul 2023 19:31:37 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 33A85269D;
+        Thu, 13 Jul 2023 16:31:36 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 4D4A221C450A; Thu, 13 Jul 2023 16:31:35 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4D4A221C450A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1689291095;
+        bh=RL+a/gvtQRcDwaoV7SYgH/JAWrvPiZ941LY3UGXpd+s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KnYf/qNYjVOfMXTsuhjiVAi4/SyVcO2iNL0wLlN1dLTqlrob5wrXmz1m+a0qZM0MT
+         t1JoTcoUoCdw5aRtjHPovyWUh1ZFSfHvvpl2zDoOL8IICpVDDaO+6JDWvHhfipi9EC
+         ADhDruEL1rxlB+wtAxBRlZYV+bOMMQvIc9TihJKo=
+Date:   Thu, 13 Jul 2023 16:31:35 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [PATCH RFC v10 1/17] security: add ipe lsm
+Message-ID: <20230713233135.GA11480@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1687986571-16823-2-git-send-email-wufan@linux.microsoft.com>
+ <ffd5c67f4a9bf45df0ce95a8fe0932a3.paul@paul-moore.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.13-dev-099c9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ffd5c67f4a9bf45df0ce95a8fe0932a3.paul@paul-moore.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Thu, 13 Jul 2023 21:29:35 +0200, Thomas Weißschuh wrote:
-> Add a module alias to nbd.ko that allows the generic netlink core to
-> automatically load the module when netlink messages for nbd are
-> received.
+On Sat, Jul 08, 2023 at 12:22:59AM -0400, Paul Moore wrote:
+> On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+> > 
+> > Integrity Policy Enforcement (IPE) is an LSM that provides an
+> > complimentary approach to Mandatory Access Control than existing LSMs
+> > today.
+> > 
+> > Existing LSMs have centered around the concept of access to a resource
+> > should be controlled by the current user's credentials. IPE's approach,
+> > is that access to a resource should be controlled by the system's trust
+> > of a current resource.
+> > 
+> > The basis of this approach is defining a global policy to specify which
+> > resource can be trusted.
+> > 
+> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > ---
+> >  MAINTAINERS           |  7 +++++++
+> >  security/Kconfig      | 11 ++++++-----
+> >  security/Makefile     |  1 +
+> >  security/ipe/Kconfig  | 17 +++++++++++++++++
+> >  security/ipe/Makefile | 10 ++++++++++
+> >  security/ipe/ipe.c    | 37 +++++++++++++++++++++++++++++++++++++
+> >  security/ipe/ipe.h    | 16 ++++++++++++++++
+> >  7 files changed, 94 insertions(+), 5 deletions(-)
+> >  create mode 100644 security/ipe/Kconfig
+> >  create mode 100644 security/ipe/Makefile
+> >  create mode 100644 security/ipe/ipe.c
+> >  create mode 100644 security/ipe/ipe.h
 > 
-> This frees the user from manually having to load the module before using
-> nbd functionality via netlink.
-> If the system policy allows it this can even be used to load the nbd
-> module from containers which would otherwise not have access to the
-> necessary module files to do a normal "modprobe nbd".
+> ...
 > 
-> [...]
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index a82795114ad4..ad00887d38ea 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -10278,6 +10278,13 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/zohar/linux-integrity.git
+> >  F:	security/integrity/
+> >  F:	security/integrity/ima/
+> >  
+> > +INTEGRITY POLICY ENFORCEMENT (IPE)
+> > +M:	Fan Wu <wufan@linux.microsoft.com>
+> > +L:	linux-security-module@vger.kernel.org
+> > +S:	Supported
+> > +T:	git git://github.com/microsoft/ipe.git
+> 
+> Using the raw git protocol doesn't seem to work with GH, I think you
+> need to refernce the git/https URL:
+> 
+>  https://github.com/microsoft/ipe.git
+> 
+Sure I can change it.
 
-Applied, thanks!
+> > +F:	security/ipe/
+> > +
+> >  INTEL 810/815 FRAMEBUFFER DRIVER
+> >  M:	Antonino Daplas <adaplas@gmail.com>
+> >  L:	linux-fbdev@vger.kernel.org
+> > diff --git a/security/Kconfig b/security/Kconfig
+> > index 97abeb9b9a19..daa4626ea99c 100644
+> > --- a/security/Kconfig
+> > +++ b/security/Kconfig
+> > @@ -202,6 +202,7 @@ source "security/yama/Kconfig"
+> >  source "security/safesetid/Kconfig"
+> >  source "security/lockdown/Kconfig"
+> >  source "security/landlock/Kconfig"
+> > +source "security/ipe/Kconfig"
+> >  
+> >  source "security/integrity/Kconfig"
+> >  
+> > @@ -241,11 +242,11 @@ endchoice
+> >  
+> >  config LSM
+> >  	string "Ordered list of enabled LSMs"
+> > -	default "landlock,lockdown,yama,loadpin,safesetid,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
+> > -	default "landlock,lockdown,yama,loadpin,safesetid,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
+> > -	default "landlock,lockdown,yama,loadpin,safesetid,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
+> > -	default "landlock,lockdown,yama,loadpin,safesetid,bpf" if DEFAULT_SECURITY_DAC
+> > -	default "landlock,lockdown,yama,loadpin,safesetid,selinux,smack,tomoyo,apparmor,bpf"
+> > +	default "landlock,lockdown,yama,loadpin,safesetid,smack,selinux,tomoyo,apparmor,bpf,ipe" if DEFAULT_SECURITY_SMACK
+> > +	default "landlock,lockdown,yama,loadpin,safesetid,apparmor,selinux,smack,tomoyo,bpf,ipe" if DEFAULT_SECURITY_APPARMOR
+> > +	default "landlock,lockdown,yama,loadpin,safesetid,tomoyo,bpf,ipe" if DEFAULT_SECURITY_TOMOYO
+> > +	default "landlock,lockdown,yama,loadpin,safesetid,bpf,ipe" if DEFAULT_SECURITY_DAC
+> > +	default "landlock,lockdown,yama,loadpin,safesetid,selinux,smack,tomoyo,apparmor,bpf,ipe"
+> 
+> Generally speaking the BPF LSM should be the last entry in the LSM
+> list to help prevent issues caused by a BPF LSM returning an improper
+> error and shortcutting a LSM after it.
+> 
+Thanks for the insight, I will update this part.
 
-[1/1] nbd: automatically load module on genl access
-      commit: 82e37f43c37845b69955a0dfa5e0d1a2a830bdb7
+> >  	help
+> >  	  A comma-separated list of LSMs, in initialization order.
+> >  	  Any LSMs left off this list, except for those with order
+> 
+> ...
+> 
+> > diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+> > new file mode 100644
+> > index 000000000000..571648579991
+> > --- /dev/null
+> > +++ b/security/ipe/Makefile
+> > @@ -0,0 +1,10 @@
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +#
+> > +# Copyright (C) Microsoft Corporation. All rights reserved.
+> > +#
+> > +# Makefile for building the IPE module as part of the kernel tree.
+> > +#
+> > +
+> > +obj-$(CONFIG_SECURITY_IPE) += \
+> > +	hooks.o \
+> > +	ipe.o \
+> 
+> It doesn't look like security/ipe/hook.c is included in this patch.
+> 
+> It is important to ensure that each patch compiles after it is
+> applied.
+Sorry this was accidentally added during a rebase, I will try to avoid such a mistake in the future.
 
-Best regards,
--- 
-Jens Axboe
+-Fan
 
-
-
+> 
+> --
+> paul-moore.com
