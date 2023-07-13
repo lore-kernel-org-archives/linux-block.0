@@ -2,158 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 507D8C0015E
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 20:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 357D7C0015E
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 20:38:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231537AbjGMUge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jul 2023 16:36:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57538 "EHLO
+        id S234071AbjGMUiE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jul 2023 16:38:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbjGMUge (ORCPT
+        with ESMTP id S234046AbjGMUiD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jul 2023 16:36:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF352117
-        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 13:35:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689280547;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WVgpZ8lQKOwdGxh2onlmjRJMoFI1HaOmtUktQySa1w4=;
-        b=brAghUeEi5zm7m+NPYv9vZQ0dwGQRnDouoQDfN1E1wZMIVXlIukP9Yd0R21SknFIXiKQ8x
-        qo+6Eq08ZpXY+06e6x8L1P1YZAmgUhlu4+6hNtsKNCQU4yBVy3HVlfhwWW5Q/2dacI/zp5
-        ldab4W6esPZp9rYpMImkaKKmz7E41Bw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-6RWEtflcOuqUdoalR2E08g-1; Thu, 13 Jul 2023 16:35:45 -0400
-X-MC-Unique: 6RWEtflcOuqUdoalR2E08g-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-314291caa91so722057f8f.2
-        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 13:35:45 -0700 (PDT)
+        Thu, 13 Jul 2023 16:38:03 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D682D54
+        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 13:38:01 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b89b0c73d7so1495205ad.1
+        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 13:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689280680; x=1689885480;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M1Q3QVXuA3e+9GjXcm3jtTXFaZS47K/0EuW+3XlNfNc=;
+        b=Su8Wda2t8a9fyq+mKQcL/x7F/nORxih5QNN3QcI8gU6tafMcFTpXJ/JwTC+hoKIAet
+         UZMsZJb96148P+d+aPws2YjRiYEf/edVpyjk4+wpEJ9M1XzqIucAg9yImocZFmYK9wJK
+         xaE29kKpjDeCOxxq0rQ+6whCvhArs3pZ84vH3p/ZLNWFeACVq7oihBFPE5g9PWRpVt62
+         m/+T4BW1NQTA7qrHOcSd4KuKrl9Spcm6bLiz8E7RZ/f+rVQrLrv9scU9gZNQlE9kebGZ
+         0RGTY3HPcbhwteIksfVKa0OxCoVWRm5KTkbDlcno5Uv52JGfmdZij+dF0jwVK882tSpc
+         Hovw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689280544; x=1691872544;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1689280680; x=1689885480;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WVgpZ8lQKOwdGxh2onlmjRJMoFI1HaOmtUktQySa1w4=;
-        b=DMj/Puol+voZ2XWAUtAIhCJDkbW+P/MAJBXbKouVMqFMRDEm4nnFUhybEOAkNr44Xf
-         wKx5kffi6KGM+uLj9hxtzYgKxSAA0L1UIZFBf4/BPKLGGCrweH+CqpvJ6XfJF2aJUlo9
-         qAEY9m38gAfj2hmcaO8VZ7JsQZ7UNfi87sl4uBB5R/ZlUOaM2PW9aIwX3yCOclyrBsYd
-         KmLO7URyFVqHKMVLkWuPE8uJw9UUPriEMmGWj1p5XStIUKq2r9vlX2zSpdTPm2Ij96Oi
-         zqFAGF4CutViJbIJXswg8OIqTj9/jqujzaAQQ8I8OFOue0xuzvGe8Qk6g7pv5DPq7GlF
-         aavw==
-X-Gm-Message-State: ABy/qLbuiGa6CIFExK/eZCveclic5EBmbLUkrMy1FDXoFVBN2LcpvZOh
-        +a7Z3Ycj04UEl7Dqo6EloEYcf+euCep74ePlh2GtmKwyTeMDBNg4MuZdjc/aXtJF1puY3WGeMjN
-        +I7AhTWPDekh1mWLtjm3JvfoEbOjfWivIdQbmwUU=
-X-Received: by 2002:adf:e60f:0:b0:314:1ad7:2ea8 with SMTP id p15-20020adfe60f000000b003141ad72ea8mr2264244wrm.54.1689280544728;
-        Thu, 13 Jul 2023 13:35:44 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHOrNFSNqO2ibgNG8U5/2UOpb0BAv2NtxVH0GEXiTL3/xlDsfILHX94fg3ANCKRsk4V/3fsHjacWFA3C9imx4A=
-X-Received: by 2002:adf:e60f:0:b0:314:1ad7:2ea8 with SMTP id
- p15-20020adfe60f000000b003141ad72ea8mr2264232wrm.54.1689280544417; Thu, 13
- Jul 2023 13:35:44 -0700 (PDT)
+        bh=M1Q3QVXuA3e+9GjXcm3jtTXFaZS47K/0EuW+3XlNfNc=;
+        b=W5D4DGTMN6u1TeD1xIiLTJ6M5jfOySQP7MubTQGzAePbtm5KfaOSbP7s5bpTNUMibl
+         g1DhbgknBNKp9GBqasy0e+PJ++jI3CCfUF6ygZDooQqPurVAFQl6j4GzToSwFRRwiwuo
+         Q9e3w3JZ2vUbamwYUtwxjOHnKAeowgqoDkBifhYcXVNpDm7juEFG5LoOEunt9wV8JAO8
+         TGCvtHmpDwCMblKICGwaKkt7E+VYC+xB/zh5+8sv/AzL/uJvXNUbK9ilW8n9BFnfpNV0
+         WoCJp8+jMEPsjahvIq+SmrtZb8C5vO6jVIFmVakNFaWPHR88GFPd6+5V9qm9zzbApCJw
+         JHUQ==
+X-Gm-Message-State: ABy/qLYp6l1pm2kgtcBFOUqhgOTSRfDqivm8Y4iOvlBXkoCXhOpKU51z
+        FD+qyVcHlQrvLr7ksA6MpApMfISYKbkHp3LR5IY=
+X-Google-Smtp-Source: APBJJlFtDbDfCH1QZYudWC+aygAHdxLHIdPeg2AQ0LHcswNN+FtzghG6W1WdomahIOIyN5rpCIt89g==
+X-Received: by 2002:a17:902:e549:b0:1b8:a8e5:e8bc with SMTP id n9-20020a170902e54900b001b8a8e5e8bcmr3342583plf.6.1689280680481;
+        Thu, 13 Jul 2023 13:38:00 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170902988a00b001b89045ff03sm6258074plp.233.2023.07.13.13.37.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 13:37:59 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Josef Bacik <josef@toxicpanda.com>,
+        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20230713-b4-nbd-genl-v3-1-226cbddba04b@weissschuh.net>
+References: <20230713-b4-nbd-genl-v3-1-226cbddba04b@weissschuh.net>
+Subject: Re: [PATCH v3] nbd: automatically load module on genl access
+Message-Id: <168928067935.580122.1235240259614744275.b4-ty@kernel.dk>
+Date:   Thu, 13 Jul 2023 14:37:59 -0600
 MIME-Version: 1.0
-References: <20230620133711.22840-1-dwagner@suse.de> <20230620133711.22840-5-dwagner@suse.de>
- <594f73f2-59b0-bbcb-d7a0-6d89e2446830@gmail.com> <7kcc75btp5bo5oqjnpqlwwo37l2f4atwfemknbmvqagrqicl2i@njn4tai7e4m7>
-In-Reply-To: <7kcc75btp5bo5oqjnpqlwwo37l2f4atwfemknbmvqagrqicl2i@njn4tai7e4m7>
-From:   Ewan Milne <emilne@redhat.com>
-Date:   Thu, 13 Jul 2023 16:35:33 -0400
-Message-ID: <CAGtn9rmDDqXKH2XfqKXww7aOKmNG6vwuPEsy6bXmABaWvHvd7Q@mail.gmail.com>
-Subject: Re: [PATCH v2 4/5] nvme-fc: Make initial connect attempt synchronous
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     James Smart <jsmart2021@gmail.com>, linux-nvme@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Shin'ichiro Kawasaki" <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.13-dev-099c9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The basic issue I am trying to solve with NVMe/FC is that we cannot get sys=
-tems
-to boot reliably from NVMe/FC (boot from SAN) because we don't know how lon=
-g
-the connect is going to take, and we have seen spurious failures in our tes=
-ting.
 
-In general, I think the whole business of a userspace syscall() -> asynchro=
-nous
-work in the kernel is problematic because the syscall can return a good sta=
-tus
-even if the connect is never going to work due to a condition that is
-not going to
-clear.  It is difficult and cumbersome to script around this reliably.
+On Thu, 13 Jul 2023 21:29:35 +0200, Thomas Weißschuh wrote:
+> Add a module alias to nbd.ko that allows the generic netlink core to
+> automatically load the module when netlink messages for nbd are
+> received.
+> 
+> This frees the user from manually having to load the module before using
+> nbd functionality via netlink.
+> If the system policy allows it this can even be used to load the nbd
+> module from containers which would otherwise not have access to the
+> necessary module files to do a normal "modprobe nbd".
+> 
+> [...]
 
-So what I am saying is the current mechanism doesn't work completely
-right anyway.
+Applied, thanks!
 
-We also encounter the problem Daniel is addressing trying to get
-blktests and other
-internal tests to work, for similar reasons.
+[1/1] nbd: automatically load module on genl access
+      commit: 82e37f43c37845b69955a0dfa5e0d1a2a830bdb7
 
--Ewan
+Best regards,
+-- 
+Jens Axboe
 
-On Thu, Jul 6, 2023 at 8:07=E2=80=AFAM Daniel Wagner <dwagner@suse.de> wrot=
-e:
->
-> Hi James,
->
-> On Sat, Jul 01, 2023 at 05:11:11AM -0700, James Smart wrote:
-> > As much as you want to make this change to make transports "similar", I=
- am
-> > dead set against it unless you are completing a long qualification of t=
-he
-> > change on real FC hardware and FC-NVME devices. There is probably 1.5 y=
-rs of
-> > testing of different race conditions that drove this change. You cannot
-> > declare success from a simplistic toy tool such as fcloop for validatio=
-n.
-> >
-> > The original issues exist, probably have even morphed given the time fr=
-om
-> > the original change, and this will seriously disrupt the transport and =
-any
-> > downstream releases.  So I have a very strong NACK on this change.
-> >
-> > Yes - things such as the connect failure results are difficult to retur=
-n
-> > back to nvme-cli. I have had many gripes about the nvme-cli's behavior =
-over
-> > the years, especially on negative cases due to race conditions which
-> > required retries. It still fails this miserably.  The async reconnect p=
-ath
-> > solved many of these issues for fc.
-> >
-> > For the auth failure, how do we deal with things if auth fails over tim=
-e as
-> > reconnects fail due to a credential changes ?  I would think commonalit=
-y of
-> > this behavior drives part of the choice.
->
-> Alright, what do you think about the idea to introduce a new '--sync' opt=
-ion to
-> nvme-cli which forwards this info to the kernel that we want to wait for =
-the
-> initial connect to succeed or fail? Obviously, this needs to handle signa=
-ls too.
->
-> From what I understood this is also what Ewan would like to have.
->
-> Hannes thought it would make sense to use the same initial connect logic =
-in
-> tcp/rdma, because there could also be transient erros (e.g. spanning tree
-> protocol). In short making the tcp/rdma do the same thing as fc?
->
-> So let's drop the final patch from this series for the time. Could you gi=
-ve some
-> feedback on the rest of the patches?
->
-> Thanks,
-> Daniel
->
+
 
