@@ -2,96 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE94EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 12:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC05C001DD
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 13:24:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233809AbjGMMZ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jul 2023 08:25:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48458 "EHLO
+        id S235323AbjGMNYH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jul 2023 09:24:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233192AbjGMMZ7 (ORCPT
+        with ESMTP id S235534AbjGMNXd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jul 2023 08:25:59 -0400
-Received: from out-24.mta1.migadu.com (out-24.mta1.migadu.com [95.215.58.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7E2F19A6
-        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 05:25:57 -0700 (PDT)
-Message-ID: <63f93f1c-98da-4c09-b3d8-711f6953d8b7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689251155;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1pT5gzRWG2j71kUTP52MyHpy3Xj9s5R8Kq7vtVkKcyk=;
-        b=hqrn3IjuaTPDdopSEj23hT+duceKEWNlGAHhABfOq4cux/X12gVtahhQNXocja/rWaXWeW
-        UlTRMR+CUvTsjW3HccYEQcasZGcZpUxnII/KmpuC+QkhwM+z8rXJoEAwi5ShXAJPriXN5w
-        bde2Gzy5XxTS5pXXqsflV/5JBZUuqac=
-Date:   Thu, 13 Jul 2023 20:25:50 +0800
+        Thu, 13 Jul 2023 09:23:33 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32B103A99
+        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 06:22:38 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4R1wHx2z9mz4f3mKs
+        for <linux-block@vger.kernel.org>; Thu, 13 Jul 2023 21:22:05 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP4 (Coremail) with SMTP id gCh0CgBH_rF6+q9kCg2GNw--.20068S4;
+        Thu, 13 Jul 2023 21:22:03 +0800 (CST)
+From:   Hou Tao <houtao@huaweicloud.com>
+To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+        virtualization@lists.linux-foundation.org, houtao1@huawei.com
+Subject: [PATCH v4] virtio_pmem: add the missing REQ_OP_WRITE for flush bio
+Date:   Thu, 13 Jul 2023 21:54:13 +0800
+Message-Id: <20230713135413.2946622-1-houtao@huaweicloud.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <CAM9Jb+g5rrvmw8xCcwe3REK4x=RymrcqQ8cZavwWoWu7BH+8wA@mail.gmail.com>
+References: <CAM9Jb+g5rrvmw8xCcwe3REK4x=RymrcqQ8cZavwWoWu7BH+8wA@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v5] blk-mq: fix start_time_ns and alloc_time_ns for
- pre-allocated rq
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, tj@kernel.org, hch@lst.de
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, zhouchengming@bytedance.com
-References: <20230710105516.2053478-1-chengming.zhou@linux.dev>
- <aa813164-9a6a-53bd-405b-ba4cc1f1b656@kernel.dk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <aa813164-9a6a-53bd-405b-ba4cc1f1b656@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBH_rF6+q9kCg2GNw--.20068S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxGr1xZw1UKF4xWw17JFW8Zwb_yoW5Gw48pr
+        13Ca4agr47GF4IkanrXa129F92qa1DGr9rWFWfuw1fZFW7AF1UKw1vgFyFqa4DtrW8Gaya
+        yF97Jr1jq34DZFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUk2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
+        c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
+        026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF
+        0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0x
+        vE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+        87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/7/11 03:47, Jens Axboe wrote:
-> On 7/10/23 4:55?AM, chengming.zhou@linux.dev wrote:
->> From: Chengming Zhou <zhouchengming@bytedance.com>
->>
->> The iocost rely on rq start_time_ns and alloc_time_ns to tell
->> saturation state of the block device. Most of the time request is
->> allocated after rq_qos_throttle() and its alloc_time_ns or
->> start_time_ns won't be affected.
->>
->> But for plug batched allocation introduced by the commit 47c122e35d7e
->> ("block: pre-allocate requests if plug is started and is a batch"), we
->> can rq_qos_throttle() after the allocation of the request. This is
->> what the blk_mq_get_cached_request() does.
->>
->> In this case, the cached request alloc_time_ns or start_time_ns is
->> much ahead if blocked in any qos ->throttle().
->>
->> Fix it by setting alloc_time_ns and start_time_ns to now when the
->> allocated request is actually used.
-> 
-> One of the single most costly things we do in the io path is the crazy
-> amount of time stamping that's done or added without attention to what
-> else is doing it or where. And this is why we have a ton of them, and
-> why the batched time stamping made sense.
-> 
-> I'd much rather see this just get the saved timestamp updated when
-> necessary. If we block, that's certainly one such case.
-> 
+From: Hou Tao <houtao1@huawei.com>
 
-Ok, this version will only get time stamp once for one request, it's actually
-not worse than the current code, which will get start time stamp once for each
-request even in the batch allocation.
+When doing mkfs.xfs on a pmem device, the following warning was
+reported:
 
-But yes, maybe we can also set the start time stamp in the batch mode, and only
-update the time stamp in the block case, like you said, has better performance.
+ ------------[ cut here ]------------
+ WARNING: CPU: 2 PID: 384 at block/blk-core.c:751 submit_bio_noacct
+ Modules linked in:
+ CPU: 2 PID: 384 Comm: mkfs.xfs Not tainted 6.4.0-rc7+ #154
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
+ RIP: 0010:submit_bio_noacct+0x340/0x520
+ ......
+ Call Trace:
+  <TASK>
+  ? submit_bio_noacct+0xd5/0x520
+  submit_bio+0x37/0x60
+  async_pmem_flush+0x79/0xa0
+  nvdimm_flush+0x17/0x40
+  pmem_submit_bio+0x370/0x390
+  __submit_bio+0xbc/0x190
+  submit_bio_noacct_nocheck+0x14d/0x370
+  submit_bio_noacct+0x1ef/0x520
+  submit_bio+0x55/0x60
+  submit_bio_wait+0x5a/0xc0
+  blkdev_issue_flush+0x44/0x60
 
-The first version [1] I posted actually just did this, in which use a nr_flush counter
-in plug to indicate that we blocked & flushed plug. Tejun and I think it seems fragile.
-So go to this way that only set time stamp once when the request actually used.
+The root cause is that submit_bio_noacct() needs bio_op() is either
+WRITE or ZONE_APPEND for flush bio and async_pmem_flush() doesn't assign
+REQ_OP_WRITE when allocating flush bio, so submit_bio_noacct just fail
+the flush bio.
 
-[1] https://lore.kernel.org/all/20230601053919.3639954-1-chengming.zhou@linux.dev/
+Simply fix it by adding the missing REQ_OP_WRITE for flush bio. And we
+could fix the flush order issue and do flush optimization later.
 
-Another way I can think of is to make rq_qos_throttle() return a bool to indicate
-if it blocked. Tejun and Jens, how do you think about this way?
+Cc: stable@vger.kernel.org # 6.3+
+Fixes: b4a6bb3a67aa ("block: add a sanity check for non-write flush/fua bios")
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
+Tested-by: Pankaj Gupta <pankaj.gupta@amd.com>
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+---
+v4:
+ * add stable Cc
+ * collect Rvb and Tested-by tags
 
-Although it's better performance, in case of preemption, the time stamp maybe not accurate.
+v3: https://lore.kernel.org/linux-block/20230625022633.2753877-1-houtao@huaweicloud.com
+ * adjust the overly long lines in both commit message and code
 
-Thanks.
+v2: https://lore.kernel.org/linux-block/20230621134340.878461-1-houtao@huaweicloud.com
+ * do a minimal fix first (Suggested by Christoph)
+
+v1: https://lore.kernel.org/linux-block/ZJLpYMC8FgtZ0k2k@infradead.org/T/#t
+
+ drivers/nvdimm/nd_virtio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
+index c6a648fd8744..1f8c667c6f1e 100644
+--- a/drivers/nvdimm/nd_virtio.c
++++ b/drivers/nvdimm/nd_virtio.c
+@@ -105,7 +105,8 @@ int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
+ 	 * parent bio. Otherwise directly call nd_region flush.
+ 	 */
+ 	if (bio && bio->bi_iter.bi_sector != -1) {
+-		struct bio *child = bio_alloc(bio->bi_bdev, 0, REQ_PREFLUSH,
++		struct bio *child = bio_alloc(bio->bi_bdev, 0,
++					      REQ_OP_WRITE | REQ_PREFLUSH,
+ 					      GFP_ATOMIC);
+ 
+ 		if (!child)
+-- 
+2.29.2
 
