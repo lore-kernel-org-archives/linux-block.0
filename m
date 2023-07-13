@@ -2,93 +2,229 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13DE9EB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 01:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B2B9C001DD
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jul 2023 06:00:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231298AbjGMBnO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jul 2023 21:43:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34618 "EHLO
+        id S233828AbjGMGAg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jul 2023 02:00:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231888AbjGMBnO (ORCPT
+        with ESMTP id S232430AbjGMGAf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2023 21:43:14 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE4FF1FC9
-        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 18:43:12 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1b898cfa6a1so357145ad.1
-        for <linux-block@vger.kernel.org>; Wed, 12 Jul 2023 18:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689212592; x=1689817392;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SGT0tKKHMMw4Wl9tT/nwV3u2hoHFKfnsdNNPLl4wC68=;
-        b=qQpqFerGWuXSvt+8poH6Xx3xZMcHUkj4wJo3BILsU9QLzzRklIFcFH5FS7smL1npcT
-         avGOo+/S00y6RgopLKTu5ihLy4ftcFNFNKQivsPJCU2Jt7fmf3ZUpkeqTKW0OJ2NSzvp
-         sduGFy2UCMONJvaxCLw0eMJ6vII7TXOQrHtExV216Gsn9nwk2BwQACse3eScktfjZT35
-         dcr8NXqvH/TZ8GyhdD+wjqMmdjceA0aJ7Bia+O2lwstaS+0ynX3l7Dl4mWYXrIsDP8Fl
-         CqbRq/zCWqRp1mdqe2jf39HcP2YTfL+oFQyXBgVp8fl7BoZEXNlzP80MZdQDSPcD8ZrS
-         CcdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689212592; x=1689817392;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SGT0tKKHMMw4Wl9tT/nwV3u2hoHFKfnsdNNPLl4wC68=;
-        b=DMCtg6UNtsqLPSTLhT+2x3P9LnsGnGZvTx/w+pdZHq1DGXL1saAahXZmM6CuzDS4vg
-         LoxR5ce1qC5vlMq0WFgDzaGLliPq67Fvkwnk0KhIULnenwbepOPWBzTXFdF800iDwyJN
-         8BtXECVWE6gzUoGyCUOnXP06j+KZV+ZHwsnR6xLGzaKVRp5+qMQ1GhOlVQ72prtjTRvz
-         VrG/LVT/hOoGeD2D0OMW1sdaW15J/zF3Cef6KoEUB9UNwsbwyTe+B8GjR+rL/8xX8ouS
-         R7JLvZD4AzSUtoOvWuG1irwzdzdkiQ+V3mBDT7tDY+qprnCB3bYIQ31vd/H5IBS0SL2o
-         ysrA==
-X-Gm-Message-State: ABy/qLYOnS5MhRwDH8GZLFnNRAkIF6uE/JdLpADjz3HgcrfqoSpzJ6nV
-        z2Gl3svDc/VA05ZIZkiYfH4slIlkwtWNgWHHXfs=
-X-Google-Smtp-Source: APBJJlEHzBlIBzCEVlM1rGx5IzuKFQcplBDRTogMCp/5EGZIKWLW/W9FlpXcoZDmIOSAGw8MqoYbXg==
-X-Received: by 2002:a17:902:ce84:b0:1b3:ec39:f42c with SMTP id f4-20020a170902ce8400b001b3ec39f42cmr391255plg.5.1689212592339;
-        Wed, 12 Jul 2023 18:43:12 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id p16-20020a170902b09000b001b8422f1000sm4617080plr.201.2023.07.12.18.43.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jul 2023 18:43:11 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230712173344.2994513-1-bvanassche@acm.org>
-References: <20230712173344.2994513-1-bvanassche@acm.org>
-Subject: Re: [PATCH] block/mq-deadline: Fix a bug in deadline_from_pos()
-Message-Id: <168921259077.435341.4877413237858137000.b4-ty@kernel.dk>
-Date:   Wed, 12 Jul 2023 19:43:10 -0600
+        Thu, 13 Jul 2023 02:00:35 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E831FDE;
+        Wed, 12 Jul 2023 23:00:34 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 50B3322205;
+        Thu, 13 Jul 2023 06:00:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1689228031; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hsg1G5joSPJI39OwuWt4sG6XYjzgYlB2WIUDA6Hfziw=;
+        b=h/k4GM0Bw0b1rZ3bHgXzM3qAgQ+iMIvhchdQEtHxKXkvOxvrPeytyE6EySvB/17uJzFTAr
+        yTFy7eln71yVzOrrF6xVZt+k/vTZAg81FYq19dAis7ePaArW8m7tH4qWLAmeW3bczQz+uK
+        Pwo+M2lRFbQkdC1FXqFxMN4WDIJ0lD4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1689228031;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hsg1G5joSPJI39OwuWt4sG6XYjzgYlB2WIUDA6Hfziw=;
+        b=6p00FFMzv6Z/xSs4pTs2QI5obAK2fFt5cbNGOz6BaCSMXwWU7bjf5g5u0p1aRJYXl/Q+DO
+        Ca1UXh/rDTqZyBCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AD5791390D;
+        Thu, 13 Jul 2023 06:00:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id CUuCKP6Sr2QaNgAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 13 Jul 2023 06:00:30 +0000
+Message-ID: <95210a8a-c70e-c312-2c47-4f5ee9329586@suse.de>
+Date:   Thu, 13 Jul 2023 08:00:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH blktests v1 2/3] nvme/rc: Avoid triggering host nvme-cli
+ autoconnect
+Content-Language: en-US
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Daniel Wagner <dwagner@suse.de>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <jsmart2021@gmail.com>,
+        Martin Belanger <Martin.Belanger@dell.com>
+References: <20230620132703.20648-1-dwagner@suse.de>
+ <20230620132703.20648-3-dwagner@suse.de>
+ <9c07e4f6-2cf5-b53b-6b48-bd4df8798ee9@nvidia.com>
+ <bz2s6nyjwl6l7yfrd4wtjdtousv23ypcdleckibps5lyjpwi4x@wqq6qqesevpk>
+ <39f9977e-b34c-f2dd-d356-8c78414a60d1@nvidia.com>
+ <jdsoqllqmrqu5j5bt3fudkksmjskgs4ooodynm6yh3b4oc5scn@t3hydrmbb22f>
+ <972a06e0-6841-043e-fc00-db7596f664c4@nvidia.com>
+ <cskolyrp3s47gnn4nwtqpfxtafzhpirn3hv7ovhnnzpbb3ll2z@oum3v3n7go6l>
+ <6dced1ba-c468-c88e-f861-9c202e803894@nvidia.com>
+ <eadl5bkyysdcymgy7ra4hm6cqn6ngcxbyvz2qzg3fdffsssnpo@d3rzegyurzn5>
+ <6fa5ec73-e6c6-cf8e-b11f-1a57f0fc34b4@nvidia.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <6fa5ec73-e6c6-cf8e-b11f-1a57f0fc34b4@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Wed, 12 Jul 2023 10:33:43 -0700, Bart Van Assche wrote:
-> A bug was introduced in deadline_from_pos() while implementing the
-> suggestion to use round_down() in the following code:
+On 7/13/23 02:12, Max Gurtovoy wrote:
 > 
-> 	pos -= bdev_offset_from_zone_start(rq->q->disk->part0, pos);
 > 
-> This patch makes deadline_from_pos() use round_down() such that 'pos' is
-> rounded down.
+> On 12/07/2023 15:04, Daniel Wagner wrote:
+>> On Mon, Jul 10, 2023 at 07:30:20PM +0300, Max Gurtovoy wrote:
+>>>
+>>>
+>>> On 10/07/2023 18:03, Daniel Wagner wrote:
+>>>> On Mon, Jul 10, 2023 at 03:31:23PM +0300, Max Gurtovoy wrote:
+>>>>> I think it is more than just commit message.
+>>>>
+>>>> Okay, starting to understand what's the problem.
+>>>>
+>>>>> A lot of code that we can avoid was added regarding the --context 
+>>>>> cmdline
+>>>>> argument.
+>>>>
+>>>> Correct and it's not optional to get the tests passing for the fc 
+>>>> transport.
+>>>
+>>> why the fc needs the --context to pass tests ?
+>>
+>> A typical nvme test consists out of following steps (nvme/004):
+>>
+>> // nvme target setup (1)
+>>     _create_nvmet_subsystem "blktests-subsystem-1" "${loop_dev}" \
+>>         "91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+>>     _add_nvmet_subsys_to_port "${port}" "blktests-subsystem-1"
+>>
+>> // nvme host setup (2)
+>>     _nvme_connect_subsys "${nvme_trtype}" blktests-subsystem-1
+>>
+>>     local nvmedev
+>>     nvmedev=$(_find_nvme_dev "blktests-subsystem-1")
+>>     cat "/sys/block/${nvmedev}n1/uuid"
+>>     cat "/sys/block/${nvmedev}n1/wwid"
+>>
+>> // nvme host teardown (3)
+>>     _nvme_disconnect_subsys blktests-subsystem-1
+>>
+>> // nvme target teardown (4)
+>>     _remove_nvmet_subsystem_from_port "${port}" "blktests-subsystem-1"
+>>     _remove_nvmet_subsystem "blktests-subsystem-1"
+>>
+>>
+>> The corresponding output with --context
+>>
+>>   run blktests nvme/004 at 2023-07-12 13:49:50
+>> // (1)
+>>   loop0: detected capacity change from 0 to 32768
+>>   nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>   nvme nvme2: NVME-FC{0}: create association : host wwpn 
+>> 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN 
+>> "blktests-subsystem-1"
+>>   (NULL device *): {0:0} Association created
+>>   [174] nvmet: ctrl 1 start keep-alive timer for 5 secs
+>> // (2)
+>>   nvmet: creating nvm controller 1 for subsystem blktests-subsystem-1 
+>> for NQN 
+>> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+>>   [374] nvmet: adding queue 1 to ctrl 1.
+>>   [1138] nvmet: adding queue 2 to ctrl 1.
+>>   [73] nvmet: adding queue 3 to ctrl 1.
+>>   [174] nvmet: adding queue 4 to ctrl 1.
+>>   nvme nvme2: NVME-FC{0}: controller connect complete
+>>   nvme nvme2: NVME-FC{0}: new ctrl: NQN "blktests-subsystem-1"
+>> // (3)
+>>   nvme nvme2: Removing ctrl: NQN "blktests-subsystem-1"
+>> // (4)
+>>   [1138] nvmet: ctrl 1 stop keep-alive
+>>   (NULL device *): {0:0} Association deleted
+>>   (NULL device *): {0:0} Association freed
+>>   (NULL device *): Disconnect LS failed: No Association
+>>
+>>
+>> and without --context
+>>
+>>   run blktests nvme/004 at 2023-07-12 13:50:33
+>> // (1)
+>>   loop1: detected capacity change from 0 to 32768
+>>   nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>>   nvme nvme2: NVME-FC{0}: create association : host wwpn 
+>> 0x20001100aa000002  rport wwpn 0x20001100aa000001: NQN 
+>> "nqn.2014-08.org.nvmexpress.discovery"
 > 
-> [...]
+> why does this association to discovery controller created ? because of 
+> some system service ?
+> 
+Yes. There are nvme-autoconnect udev rules and systemd services 
+installed per default (in quite some systems now).
+And it's really hard (if not impossible) to disable these services (as 
+we cannot be sure how they are named, hence we wouldn't know which 
+service to disable.
 
-Applied, thanks!
+> can we configure the blktests subsystem not to be discovered or add some 
+> access list to it ?
+> 
+But that's precisely what the '--context' thing is attempting to do ...
 
-[1/1] block/mq-deadline: Fix a bug in deadline_from_pos()
-      (no commit info)
+[ .. ]
+>>>>
+>>>> It really solves the problem that the autoconnect setup of nvme-cli is
+>>>> distrubing the tests (*). The only other way I found to stop the 
+>>>> autoconnect is by disabling the udev rule completely. If autoconnect 
+>>>> isn't enabled the context isn't necessary.
+>>>> Though changing system configuration from blktests seems at bit 
+>>>> excessive.
+>>>
+>>> we should not stop any autoconnect during blktests. The autoconnect 
+>>> and all the system admin services should run normally.
+>>
+>> I do not agree here. The current blktests are not designed for run as
+>> intergration tests. Sure we should also tests this but currently 
+>> blktests is just not there and tcp/rdma are not actually covered anyway.
+> 
+> what do you mean tcp/rdma not covered ?
+> 
+Because there is no autoconnect functionality for tcp/rdma.
+For FC we have full topology information, and the driver can emit udev 
+messages whenever a NVMe port appears in the fabrics (and the systemd 
+machinery will then start autoconnect).
+For TCP/RDMA we do not have this, so really there's nothing which could 
+send udev events (discounting things like mDNS and nvme-stas for now).
 
-Best regards,
+> And maybe we should make several changes in the blktests to make it 
+> standalone without interfering the existing configuration make by some 
+> system administrator.
+> 
+??
+But this is what we are trying with this patches.
+The '--context' flag only needs to be set for the blktests, to inform 
+the rest of the system that these subsystems/configuration is special 
+and should be exempted from 'normal' system processing.
+
+Cheers,
+
+Hannes
 -- 
-Jens Axboe
-
-
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
