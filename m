@@ -2,645 +2,164 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F6BEB64DC
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 07:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A459C001B0
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 10:01:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231959AbjGNHZb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jul 2023 03:25:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33722 "EHLO
+        id S235689AbjGNKBU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jul 2023 06:01:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233975AbjGNHZa (ORCPT
+        with ESMTP id S234972AbjGNKBR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2023 03:25:30 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD6D2733
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 00:25:28 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b6ff1a637bso23288611fa.3
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 00:25:28 -0700 (PDT)
+        Fri, 14 Jul 2023 06:01:17 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B237235A5;
+        Fri, 14 Jul 2023 03:01:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1689328866; x=1720864866;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=frcCV1k9oG9oKj3dpUqdJg1PxRT2RSN/XKdLCPjaYaY=;
+  b=mXI9UeUYqNskBhhz2mKZZ9iJX1pVRRLVaQXYJrMaIdmt8omo8NKEnsfP
+   AQ81v4J2C89PNlO766DJAiVRmxElflLw6z0f+wt9bg78WERCHp+iBUSQp
+   JoHwSfbL1ezJdvcoZ+5BN0tXB2DhChqBqKTPb+04lW50NI35dUn7gxT1V
+   7Mb1Vczt3FTSZv+ZDUGgPA+SrOFK0oozyTNHDJJTiMGBjwqdT7/Ktowdc
+   kcSZ18r/atmjA0ZO/dPGy14wYGyvsVU9K6VwDjmD8hTBYER4ODPkfQWnD
+   9TwiZBgDB1xhGa/Q9FLCitryE0+OrJKzSNNrDQdXMOOfXd6frwtqHMhd4
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.01,204,1684771200"; 
+   d="scan'208";a="349958354"
+Received: from mail-bn7nam10lp2101.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.101])
+  by ob1.hgst.iphmx.com with ESMTP; 14 Jul 2023 18:00:52 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EuXTJBxo9baIjhrL6KJzLr3SOiwj/xK8rp/ntHJtabyP64V7HJG0C1H+ix7cD+gP3CFYRr/YMaFuRfDuOO8RcuJ7QsMvDZskH6jYQ0Vzwrts4j2L1NnB9jtgoHfOlwEcI0mlb+QgEkqY1+7KK3a0aqFsMiaVUUU6pIw95JvMbk7o6AsmLRHMSel8uUJbk+nAu3eFIyhDm4UWuSsjEw6dUEry/keAzj+gUvl+zQXiwg8KYJypEk6rjmdNPCOIJRfK5r5OeHx3UU6gge6UHugxB6WJG8VGt0hZNg4q48ZVLdWHfVEt2uFYe+RgVG5c3U3OTHLI5HpNsxpF8LVo4UzhmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+ b=fjztMnGS/NInU5CtufFcPWVaY2fG0NEU78atlUcO8rC0PJg35fv4DWf94CjGl7z/YI44dl9+KTDLho+0bJdJfLhHwFKzmqMxDWpfsz15xTas66pic4ow1SiD6ZvHPBxiTvzG39Qlwa/BxhCl+pD/F1ew1+zcpV2JEC/Hr/DmJifVyLHfTjUv+4QGi44tG/J47DqCx8PEKmX1VzLCGcvH5FSyI9cLIFTr8z4G9NQ7TwLKWnwf10PmFvHjkOWc8apF/8LU5etvBRLgzZX3P4tTC9O+m1fAvhHzZuGiJiWj+6q7gqIxbFUG9lPemMya3N/OzDFUV9m3/RBl9dyZsrZyXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1689319526; x=1689924326;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=INc/TS7QOh9fQC5c+QqVp/zFHtW2y0nMgCcHWWOJr2I=;
-        b=F1WdcPAx1MP7oylmsiOp45N20VyTWpc3DBEph1KZ7tuRk7P3fucJTfDFqr3ughzMls
-         s7CyHzVdWTdsLLAm8+Z02rDW5a3sZBJIbuGY0uMbwF395u10g4Q3GSKhTN3fyM5DKk63
-         9yhmzsZxkVwasrm9t1hBcEwW9KtdLiy/jayP9CCjA4Nqxhy1Eoz7OpBv1ucXg/6jU3hB
-         4snSDy9QI1v2UIEZK7bC1Bhevd0IsiD7179Xr3ih/SVHGKyAI3ahZF64zQ572j7JmYk3
-         DTr9YAr5opEUPdJBXSz5gZuiRs6Zmu6G1F5SZHq6QaRvODhByIwRIiEDfNHtbVEsq/MR
-         odjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689319526; x=1689924326;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=INc/TS7QOh9fQC5c+QqVp/zFHtW2y0nMgCcHWWOJr2I=;
-        b=fdPxohqf3FreR32aquHvEhPIIIXyoVROjcfaHebVCILGGswjoNEbnO/R2YPxmrc84T
-         J7+gLzkIbNmzTW2ISRw76I0Rd9RFpgK5NOHXG8CElUuaRQ0vW3zGMkKBECMfyv3nKRLJ
-         35M/+s4zLE8wZaIUFItKk2i66l7eJ/YrEO9hP3wANXdjSLVWrMI0D16PBftbnE0a0Bpu
-         b56erdQQPvc9udUMWuj56ibqt4FNC4wB6bLXo4+VUoB2lyFMVtAPixvqgtkdyjv0rrdF
-         4wJQ7LX8GrTp+SOIoq8YyijuWFdfMfBkyd5FFzgm48ma6IPGkDPQWduhNdflxnTWZu44
-         OSHg==
-X-Gm-Message-State: ABy/qLaBpeEUsF41KEbRUBMxiVxr13dUv0M2EEL54qvNPB5REUv66nIl
-        vLmHTu3LRWYpfHdy4K0kkiC0wQ==
-X-Google-Smtp-Source: APBJJlEzT831mYin6z0TZotV9ghyjNDb6VGW+JTp2i1O91U+n3+mg7iubP2IG+xEPAi+sp7chD5EBQ==
-X-Received: by 2002:a2e:8810:0:b0:2b6:d2c5:4d54 with SMTP id x16-20020a2e8810000000b002b6d2c54d54mr3726013ljh.18.1689319526283;
-        Fri, 14 Jul 2023 00:25:26 -0700 (PDT)
-Received: from localhost ([185.108.254.55])
-        by smtp.gmail.com with ESMTPSA id p2-20020a2e8042000000b002b6b60c14besm1869415ljg.29.2023.07.14.00.25.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 00:25:25 -0700 (PDT)
-From:   Andreas Hindborg <nmi@metaspace.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Matias Bjorling <Matias.Bjorling@wdc.com>,
-        linux-kernel@vger.kernel.org (open list),
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+ b=XuBqBpkxIDRai5iaBeAU4kbB1ppVUfZRn5AFrRS+b5twGbRaXyv+6vlkK8QfC0qqMIH3iqWhCaY8Yr13VG5pukH3OkeQ4t6LnyUAH+tGoUZfvmeFT3X59che9zTY5FXnClH8BpqYBOzmgWvj1QIIYkFpaLr5IQg9tTpkh3UL9Jk=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by MN2PR04MB6431.namprd04.prod.outlook.com (2603:10b6:208:1ae::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.27; Fri, 14 Jul
+ 2023 10:00:50 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::d10e:18ac:726d:ffe0]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::d10e:18ac:726d:ffe0%4]) with mapi id 15.20.6588.027; Fri, 14 Jul 2023
+ 10:00:50 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>, Ming Lei <ming.lei@redhat.com>
+CC:     =?iso-8859-1?Q?Matias_Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        open list <linux-kernel@vger.kernel.org>,
         Damien Le Moal <dlemoal@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, gost.dev@samsung.com,
-        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        "hch@infradead.org" <hch@infradead.org>,
         Andreas Hindborg <a.hindborg@samsung.com>,
         Johannes Thumshirn <jth@kernel.org>,
         Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
         Hans Holmberg <Hans.Holmberg@wdc.com>,
         Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: [PATCH v9 2/2] ublk: enable zoned storage support
-Date:   Fri, 14 Jul 2023 09:25:10 +0200
-Message-ID: <20230714072510.47770-3-nmi@metaspace.dk>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230714072510.47770-1-nmi@metaspace.dk>
+Subject: Re: [PATCH v9 1/2] ublk: add helper to check if device supports user
+ copy
+Thread-Topic: [PATCH v9 1/2] ublk: add helper to check if device supports user
+ copy
+Thread-Index: AQHZtiRn8ykWGlFi00yWssXHYCKmPQ==
+Date:   Fri, 14 Jul 2023 10:00:50 +0000
+Message-ID: <PH0PR04MB74162DD9A22DC6CC609436AE9B34A@PH0PR04MB7416.namprd04.prod.outlook.com>
 References: <20230714072510.47770-1-nmi@metaspace.dk>
+ <20230714072510.47770-2-nmi@metaspace.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|MN2PR04MB6431:EE_
+x-ms-office365-filtering-correlation-id: 0da0dfc7-ea10-4ffa-7774-08db8451342d
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yIxwFvkd7xKiKyCF0RB+kB6cW65DlTLRmvf/yNDXCyCb/4+enGMFKl0MoOyHT8F+VISDSImnjIqu7YgTGBShe0iZroT9iLv0N1hbvS2R/R6LrSTB84C8fD6c39OIxQucYiOcPTygZacUGIDV8OeOo+yNIBgkKqxOOx5n8M5OtDjPvFS5z/cb6/y8o3uDEwmPyDaJvGJxcjot2zzB3WLbnSRDCSWM95aI1+PpyWazSkV99OCpuOrxDwWku/+V//nhG7U0Hv3tB6k6zD8VVqup8BXhQq7bnVmg18F7PnjSDf6+nOLXyr2Y+7iuggVjajNNtmcImSQs7SRO8I0BOGKuyOao7xtqlrVIeZAU8gVEres=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(346002)(39860400002)(376002)(136003)(451199021)(55016003)(86362001)(33656002)(122000001)(38070700005)(82960400001)(38100700002)(478600001)(2906002)(71200400001)(7696005)(110136005)(6506007)(9686003)(26005)(8676002)(8936002)(316002)(41300700001)(7416002)(66946007)(66556008)(76116006)(54906003)(91956017)(52536014)(4326008)(66476007)(66446008)(64756008)(73894004)(621065003)(186003)(4270600006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?wVi/Lm4YQ4gb4PLS+P4nSoXqSHvHQ/WoXorVvJZa25wlrJT+Nkbayn/kTE?=
+ =?iso-8859-1?Q?aph9gHZYYNM+Ug0orPHppwAbUBjQFpKDvdN64dQp3FK5tFtcylOezjn1eh?=
+ =?iso-8859-1?Q?G2MCTbmBn+r40A9RMjXrTStlL/vCFLqXj80hqs/Wbw7+SMO6TeKg7/ir9f?=
+ =?iso-8859-1?Q?ilKg8edv5bhYOxW2UYKzc0zCaSB0VhY8vKTQ6aCBczfv2a7nIv6/Do1uba?=
+ =?iso-8859-1?Q?bRdxpzM41NrAkRLvjKC0XWJ76ZDOQ1dZIhppBiaWSLHsL8+YzLgeImvrzJ?=
+ =?iso-8859-1?Q?H4BXAwcEWSnj1vv3vbWusD5SH29EJaMXIIOKkKZCFjFQfXYtFnuqp1N1zY?=
+ =?iso-8859-1?Q?65WV958ZLNxqFp7NU7onQ2/XIu5nWLlQTq19g4prFYucmPoomW+wpXR+qc?=
+ =?iso-8859-1?Q?ZH3QTnK2Z6723MNQkbjP0LQOznR2LrjyGhQUCAPz+GRG9bzGwSgWX18C8/?=
+ =?iso-8859-1?Q?t/Vn0VfdNP+G8hRM8Jc0SygzPvOrruedPCUQkNV2paSGLWa4t66Z2C9KIt?=
+ =?iso-8859-1?Q?GmkJX9lGxEq9+u323PHaANhNDMxw0u9BGZ2KPictc1LTDvlfG3ltyqauFD?=
+ =?iso-8859-1?Q?IlnNiw+LC/hfmxRNyVr0bpyIxgV3vo40W4VYFmc6bnryq28YmIMCpGnapy?=
+ =?iso-8859-1?Q?EMTUBGJoMhfdlFZvD72+otdxfEYqedDWiVK2tCCgqdkfAUKJtFHwT006fo?=
+ =?iso-8859-1?Q?up+AvUBpnrsY5y1kHXiq7CxiJisWSldQxAMYsxsGXDumlBw3PJciQeaH/1?=
+ =?iso-8859-1?Q?D9MWxrxkmr7TYVv2QB3zbyUI9A9CeHl9crBAstL8NLWU1i8/d7z/CT8Tt6?=
+ =?iso-8859-1?Q?DWl9eV0xUW2oQESW6LpsafwlsoT2qLJmjRUcqDveUg5e37i5zTk6Aa2TYe?=
+ =?iso-8859-1?Q?RFT9so177Ki9phr8v51BPSJOxztOT68PvpZSCVkJbERuak05kHOdbWDFOT?=
+ =?iso-8859-1?Q?PUbOvYclksR9R8thyvhtasTBZczozJEtv7MoXzeksZznZCxbVIRqBePCjg?=
+ =?iso-8859-1?Q?tiogKvzsGkclOVsaunoQXKRywgWAwPYeY9hu1mnswPqsQhRwAOhUgVguF4?=
+ =?iso-8859-1?Q?dIWNCwcPbNWdYfi0qnq/yxbXOYBPZMeYRAVcu0jqnV2qtzk4iagKnykSJa?=
+ =?iso-8859-1?Q?Ef2gLbB7rnPd4D6HJCxC93XUlJNrGNv4hr1tnpK3Xin/XngdKx+KFfikB6?=
+ =?iso-8859-1?Q?uLVJ+pQEpM8uCJk/h92TXXejvvxoy8m3mfD9lGphDNmPwVh8fkc2cFWFnZ?=
+ =?iso-8859-1?Q?ThdZ+II4uhbsj3JSWhLMa3AKQEEVIEVkye6EWpBuWddThgQ5TbTjuOFk+X?=
+ =?iso-8859-1?Q?QZyQJFevPMBaMpfyu1acc0MEqX9kwqX+P4xvzdIpGHQSz6Ih2jlEslK5tz?=
+ =?iso-8859-1?Q?KVNOuKRR5KEsD5MNoDUnciStM3PM9996HRE2zFWls6369zCm6Z5AdrWUpL?=
+ =?iso-8859-1?Q?IXZHYh1sN2l0sSmK64XIuw87gMFNw5uDfIbvR1BmGa9Pw55utP3tlKiTwY?=
+ =?iso-8859-1?Q?HwhQWpcpq4pzzHLu3DaczpYDaito2a5L4T+uEAulJxWEXA7vsg8oKgS14l?=
+ =?iso-8859-1?Q?Gj+C3EqxUofqU0C4bpM0gZxcB/eUJFxr8gXvZ2VGYVEy/CFODP4tvzD8rr?=
+ =?iso-8859-1?Q?3bWsU099I/OtGePTXqCIz/jE5AuaD52EvEzaXrI+IPYqBxS32YptgNzw?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?iso-8859-1?Q?e3rh334ZWb6IwY8D4Fh/dghcEMGSjyvJEE8f6vnupof13x5we8TQSa9aV5?=
+ =?iso-8859-1?Q?kpxRkJELnSlQXM2N8W24aUBvzK3t2ZRO43bNxfcpi+t3shlt1LHtgdGG4c?=
+ =?iso-8859-1?Q?Y6ziHEWy4+DoW5wQtUjVv5KzhhopRFzVzBGRXAxuMGDh36OVo52tqHh3tR?=
+ =?iso-8859-1?Q?DW7TRMGI1krgLREYcpQXAvBxDlnhwnYG+fH47OotfHt8sWAainvGhe4jhK?=
+ =?iso-8859-1?Q?MfAzEeDaxVng0GzQJeHClo7YuqUOC4yiASmU2UZnG5wVgEnkUwe4hBUBGv?=
+ =?iso-8859-1?Q?A/jsNERzh2JL+bO/zu5FrenS/iMORwt0PJ+Qm1oiiasJL3VKJzcFIbOvfe?=
+ =?iso-8859-1?Q?GKHJwlkSw9TpoeCeraZI/ILjYLteKgIefIgRxgxHhk11Z2N07ENKKBasfP?=
+ =?iso-8859-1?Q?9pbbAk5W2z8PX7gHOimS99aCoX3iPYqsLDvUfsmJoKOIS6zth0/mB/id6a?=
+ =?iso-8859-1?Q?LSgG9cj4HU7NxdtWTh8QmkY0pJauFOnjdnaP6vQSQb5CZ/94jbzq6BGX2w?=
+ =?iso-8859-1?Q?m5om9emzyGS0K1+rf/46ODRFWzJuFNR8gzVNxS0F+Lip1NOWhPVDNBBZ1Z?=
+ =?iso-8859-1?Q?1pqpou/rmDtPMvxFStIgxbohCKpirqNOP9/0lEEJRqKN814zO+u6PN9SXv?=
+ =?iso-8859-1?Q?T/a3qwXTAeopTdegiHvbcPa594FJfUWaajfbBPvm3PWpREFzsv4NLW1GFa?=
+ =?iso-8859-1?Q?Nb2Is8e7OR5zarXR5Ee3s4kSWubkbDxBEGYf0vabKaotBM0b3iSqExRTcq?=
+ =?iso-8859-1?Q?6bQCT3jSOYhvSpjL2hG4ja2FUivgZUMBtuAaMBkYWK2Aka7/G+M/ydjuDW?=
+ =?iso-8859-1?Q?TMMKj99rfXmquPVT9XojMc4GIYPT6eB2XpbnWa7xdukXeutwF6rtlDe43d?=
+ =?iso-8859-1?Q?sa38Wy5c/7yw9FbkPvkFmpO4FyBRf1w2MVAnYsqy84wUrX005QhooYHoR8?=
+ =?iso-8859-1?Q?chapnRAc7XfhsV/eFaxmD3FegIlhlKi7lPQngxxWZJVjYFmC+p+gVysafd?=
+ =?iso-8859-1?Q?W12OY6S9A8rQlZsRmBm709FcrBVxdjFBMyPalf?=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0da0dfc7-ea10-4ffa-7774-08db8451342d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jul 2023 10:00:50.5332
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ySmkmn9TIuBQtR70VKKS88AnzQL9lSsIZhuYSj4MlOCcu3Ba0v7Ie0lNG/yhLilwpgUTvGFX14sX6hjAdBgN8pnE+XwfovNkylkBFwDBvxo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6431
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Andreas Hindborg <a.hindborg@samsung.com>
-
-Add zoned storage support to ublk: report_zones and operations:
- - REQ_OP_ZONE_OPEN
- - REQ_OP_ZONE_CLOSE
- - REQ_OP_ZONE_FINISH
- - REQ_OP_ZONE_RESET
- - REQ_OP_ZONE_APPEND
-
-The zone append feature uses the `addr` field of `struct ublksrv_io_cmd` to
-communicate ALBA back to the kernel. Therefore ublk must be used with the
-user copy feature (UBLK_F_USER_COPY) for zoned storage support to be
-available. Without this feature, ublk will not allow zoned storage support.
-
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
----
- drivers/block/ublk_drv.c      | 335 ++++++++++++++++++++++++++++++++--
- include/uapi/linux/ublk_cmd.h |  36 +++-
- 2 files changed, 354 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 8d271901efac..5698f4575e05 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -56,16 +56,21 @@
- 		| UBLK_F_USER_RECOVERY_REISSUE \
- 		| UBLK_F_UNPRIVILEGED_DEV \
- 		| UBLK_F_CMD_IOCTL_ENCODE \
--		| UBLK_F_USER_COPY)
-+		| UBLK_F_USER_COPY \
-+		| UBLK_F_ZONED)
- 
- /* All UBLK_PARAM_TYPE_* should be included here */
--#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
--		UBLK_PARAM_TYPE_DISCARD | UBLK_PARAM_TYPE_DEVT)
-+#define UBLK_PARAM_TYPE_ALL                                \
-+	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
-+	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED)
- 
- struct ublk_rq_data {
- 	struct llist_node node;
- 
- 	struct kref ref;
-+	__u64 sector;
-+	__u32 operation;
-+	__u32 nr_sectors;
- };
- 
- struct ublk_uring_cmd_pdu {
-@@ -110,6 +115,11 @@ struct ublk_uring_cmd_pdu {
-  */
- #define UBLK_IO_FLAG_NEED_GET_DATA 0x08
- 
-+/*
-+ * Set when IO is Zone Append
-+ */
-+#define UBLK_IO_FLAG_ZONE_APPEND 0x10
-+
- struct ublk_io {
- 	/* userspace buffer address from io cmd */
- 	__u64	addr;
-@@ -185,11 +195,264 @@ struct ublk_params_header {
- 	__u32	types;
- };
- 
-+static inline unsigned int ublk_req_build_flags(struct request *req);
-+static inline struct ublksrv_io_desc *ublk_get_iod(struct ublk_queue *ubq,
-+						   int tag);
-+
- static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
- {
- 	return ub->dev_info.flags & UBLK_F_USER_COPY;
- }
- 
-+static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
-+{
-+	return ub->dev_info.flags & UBLK_F_ZONED;
-+}
-+
-+static inline bool ublk_queue_is_zoned(struct ublk_queue *ubq)
-+{
-+	return ubq->flags & UBLK_F_ZONED;
-+}
-+
-+#ifdef CONFIG_BLK_DEV_ZONED
-+
-+static int ublk_get_nr_zones(const struct ublk_device *ub)
-+{
-+	const struct ublk_param_basic *p = &ub->params.basic;
-+
-+	/* Zone size is a power of 2 */
-+	return p->dev_sectors >> ilog2(p->chunk_sectors);
-+}
-+
-+static int ublk_revalidate_disk_zones(struct ublk_device *ub)
-+{
-+	return blk_revalidate_disk_zones(ub->ub_disk, NULL);
-+}
-+
-+static int ublk_dev_param_zoned_validate(const struct ublk_device *ub)
-+{
-+	const struct ublk_param_zoned *p = &ub->params.zoned;
-+	int nr_zones;
-+
-+	if (!ublk_dev_is_zoned(ub))
-+		return -EINVAL;
-+
-+	if (!p->max_zone_append_sectors)
-+		return -EINVAL;
-+
-+	nr_zones = ublk_get_nr_zones(ub);
-+
-+	if (p->max_active_zones > nr_zones)
-+		return -EINVAL;
-+
-+	if (p->max_open_zones > nr_zones)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int ublk_dev_param_zoned_apply(struct ublk_device *ub)
-+{
-+	const struct ublk_param_zoned *p = &ub->params.zoned;
-+
-+	disk_set_zoned(ub->ub_disk, BLK_ZONED_HM);
-+	blk_queue_required_elevator_features(ub->ub_disk->queue,
-+					     ELEVATOR_F_ZBD_SEQ_WRITE);
-+	disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
-+	disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
-+	blk_queue_max_zone_append_sectors(ub->ub_disk->queue, p->max_zone_append_sectors);
-+
-+	ub->ub_disk->nr_zones = ublk_get_nr_zones(ub);
-+
-+	return 0;
-+}
-+
-+/* Based on virtblk_alloc_report_buffer */
-+static void *ublk_alloc_report_buffer(struct ublk_device *ublk,
-+				      unsigned int nr_zones, size_t *buflen)
-+{
-+	struct request_queue *q = ublk->ub_disk->queue;
-+	size_t bufsize;
-+	void *buf;
-+
-+	nr_zones = min_t(unsigned int, nr_zones,
-+			 ublk->ub_disk->nr_zones);
-+
-+	bufsize = nr_zones * sizeof(struct blk_zone);
-+	bufsize =
-+		min_t(size_t, bufsize, queue_max_hw_sectors(q) << SECTOR_SHIFT);
-+
-+	while (bufsize >= sizeof(struct blk_zone)) {
-+		buf = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
-+		if (buf) {
-+			*buflen = bufsize;
-+			return buf;
-+		}
-+		bufsize >>= 1;
-+	}
-+
-+	*buflen = 0;
-+	return NULL;
-+}
-+
-+static int ublk_report_zones(struct gendisk *disk, sector_t sector,
-+		      unsigned int nr_zones, report_zones_cb cb, void *data)
-+{
-+	struct ublk_device *ub = disk->private_data;
-+	unsigned int zone_size_sectors = disk->queue->limits.chunk_sectors;
-+	unsigned int first_zone = sector >> ilog2(zone_size_sectors);
-+	unsigned int done_zones = 0;
-+	unsigned int max_zones_per_request;
-+	int ret;
-+	struct blk_zone *buffer;
-+	size_t buffer_length;
-+
-+	nr_zones = min_t(unsigned int, ub->ub_disk->nr_zones - first_zone,
-+			 nr_zones);
-+
-+	buffer = ublk_alloc_report_buffer(ub, nr_zones, &buffer_length);
-+	if (!buffer)
-+		return -ENOMEM;
-+
-+	max_zones_per_request = buffer_length / sizeof(struct blk_zone);
-+
-+	while (done_zones < nr_zones) {
-+		unsigned int remaining_zones = nr_zones - done_zones;
-+		unsigned int zones_in_request =
-+			min_t(unsigned int, remaining_zones, max_zones_per_request);
-+		struct request *req;
-+		struct ublk_rq_data *pdu;
-+		blk_status_t status;
-+
-+		memset(buffer, 0, buffer_length);
-+
-+		req = blk_mq_alloc_request(disk->queue, REQ_OP_DRV_IN, 0);
-+		if (IS_ERR(req)) {
-+			ret = PTR_ERR(req);
-+			goto out;
-+		}
-+
-+		pdu = blk_mq_rq_to_pdu(req);
-+		pdu->operation = UBLK_IO_OP_REPORT_ZONES;
-+		pdu->sector = sector;
-+		pdu->nr_sectors = zones_in_request * zone_size_sectors;
-+
-+		ret = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
-+					GFP_KERNEL);
-+		if (ret) {
-+			blk_mq_free_request(req);
-+			goto out;
-+		}
-+
-+		status = blk_execute_rq(req, 0);
-+		ret = blk_status_to_errno(status);
-+		blk_mq_free_request(req);
-+		if (ret)
-+			goto out;
-+
-+		for (unsigned int i = 0; i < zones_in_request; i++) {
-+			struct blk_zone *zone = buffer + i;
-+
-+			/* A zero length zone means no more zones in this response */
-+			if (!zone->len)
-+				break;
-+
-+			ret = cb(zone, i, data);
-+			if (ret)
-+				goto out;
-+
-+			done_zones++;
-+			sector += zone_size_sectors;
-+
-+		}
-+	}
-+
-+	ret = done_zones;
-+
-+out:
-+	kvfree(buffer);
-+	return ret;
-+}
-+
-+static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
-+					 struct request *req)
-+{
-+	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
-+	struct ublk_io *io = &ubq->ios[req->tag];
-+	struct ublk_rq_data *pdu = blk_mq_rq_to_pdu(req);
-+	u32 ublk_op;
-+
-+	switch (req_op(req)) {
-+	case REQ_OP_ZONE_OPEN:
-+		ublk_op = UBLK_IO_OP_ZONE_OPEN;
-+		break;
-+	case REQ_OP_ZONE_CLOSE:
-+		ublk_op = UBLK_IO_OP_ZONE_CLOSE;
-+		break;
-+	case REQ_OP_ZONE_FINISH:
-+		ublk_op = UBLK_IO_OP_ZONE_FINISH;
-+		break;
-+	case REQ_OP_ZONE_RESET:
-+		ublk_op = UBLK_IO_OP_ZONE_RESET;
-+		break;
-+	case REQ_OP_ZONE_APPEND:
-+		ublk_op = UBLK_IO_OP_ZONE_APPEND;
-+		io->flags |= UBLK_IO_FLAG_ZONE_APPEND;
-+		break;
-+	case REQ_OP_DRV_IN:
-+		ublk_op = pdu->operation;
-+		switch (ublk_op) {
-+		case UBLK_IO_OP_REPORT_ZONES:
-+			iod->op_flags = ublk_op | ublk_req_build_flags(req);
-+			iod->nr_sectors = pdu->nr_sectors;
-+			iod->start_sector = pdu->sector;
-+			return BLK_STS_OK;
-+		default:
-+			return BLK_STS_IOERR;
-+		}
-+	case REQ_OP_ZONE_RESET_ALL:
-+	case REQ_OP_DRV_OUT:
-+		/* We do not support reset_all and drv_out */
-+		return BLK_STS_NOTSUPP;
-+	default:
-+		return BLK_STS_IOERR;
-+	}
-+
-+	iod->op_flags = ublk_op | ublk_req_build_flags(req);
-+	iod->nr_sectors = blk_rq_sectors(req);
-+	iod->start_sector = blk_rq_pos(req);
-+	iod->addr = io->addr;
-+
-+	return BLK_STS_OK;
-+}
-+
-+#else
-+
-+#define ublk_report_zones (NULL)
-+
-+static int ublk_dev_param_zoned_validate(const struct ublk_device *ub)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int ublk_dev_param_zoned_apply(struct ublk_device *ub)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static int ublk_revalidate_disk_zones(struct ublk_device *ub)
-+{
-+	return 0;
-+}
-+
-+static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
-+					 struct request *req)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+#endif
-+
- static inline void __ublk_complete_rq(struct request *req);
- static void ublk_complete_rq(struct kref *ref);
- 
-@@ -286,6 +549,9 @@ static int ublk_validate_params(const struct ublk_device *ub)
- 
- 		if (p->max_sectors > (ub->dev_info.max_io_buf_bytes >> 9))
- 			return -EINVAL;
-+
-+		if (ublk_dev_is_zoned(ub) && !p->chunk_sectors)
-+			return -EINVAL;
- 	} else
- 		return -EINVAL;
- 
-@@ -304,6 +570,11 @@ static int ublk_validate_params(const struct ublk_device *ub)
- 	if (ub->params.types & UBLK_PARAM_TYPE_DEVT)
- 		return -EINVAL;
- 
-+	if (ub->params.types & UBLK_PARAM_TYPE_ZONED)
-+		return ublk_dev_param_zoned_validate(ub);
-+	else if (ublk_dev_is_zoned(ub))
-+		return -EINVAL;
-+
- 	return 0;
- }
- 
-@@ -317,6 +588,9 @@ static int ublk_apply_params(struct ublk_device *ub)
- 	if (ub->params.types & UBLK_PARAM_TYPE_DISCARD)
- 		ublk_dev_param_discard_apply(ub);
- 
-+	if (ub->params.types & UBLK_PARAM_TYPE_ZONED)
-+		return ublk_dev_param_zoned_apply(ub);
-+
- 	return 0;
- }
- 
-@@ -487,6 +761,7 @@ static const struct block_device_operations ub_fops = {
- 	.owner =	THIS_MODULE,
- 	.open =		ublk_open,
- 	.free_disk =	ublk_free_disk,
-+	.report_zones =	ublk_report_zones,
- };
- 
- #define UBLK_MAX_PIN_PAGES	32
-@@ -601,7 +876,8 @@ static inline bool ublk_need_map_req(const struct request *req)
- 
- static inline bool ublk_need_unmap_req(const struct request *req)
- {
--	return ublk_rq_has_data(req) && req_op(req) == REQ_OP_READ;
-+	return ublk_rq_has_data(req) &&
-+	       (req_op(req) == REQ_OP_READ || req_op(req) == REQ_OP_DRV_IN);
- }
- 
- static int ublk_map_io(const struct ublk_queue *ubq, const struct request *req,
-@@ -685,8 +961,13 @@ static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
- {
- 	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
- 	struct ublk_io *io = &ubq->ios[req->tag];
-+	enum req_op op = req_op(req);
- 	u32 ublk_op;
- 
-+	if (!ublk_queue_is_zoned(ubq) &&
-+	    (op_is_zone_mgmt(op) || op == REQ_OP_ZONE_APPEND))
-+		return -EIO;
-+
- 	switch (req_op(req)) {
- 	case REQ_OP_READ:
- 		ublk_op = UBLK_IO_OP_READ;
-@@ -704,6 +985,8 @@ static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
- 		ublk_op = UBLK_IO_OP_WRITE_ZEROES;
- 		break;
- 	default:
-+		if (ublk_queue_is_zoned(ubq))
-+			return ublk_setup_iod_zoned(ubq, req);
- 		return BLK_STS_IOERR;
- 	}
- 
-@@ -756,7 +1039,8 @@ static inline void __ublk_complete_rq(struct request *req)
- 	 *
- 	 * Both the two needn't unmap.
- 	 */
--	if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE)
-+	if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE &&
-+	    req_op(req) != REQ_OP_DRV_IN)
- 		goto exit;
- 
- 	/* for READ request, writing data in iod->addr to rq buffers */
-@@ -1120,6 +1404,11 @@ static void ublk_commit_completion(struct ublk_device *ub,
- 	/* find the io request and complete */
- 	req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
- 
-+	if (io->flags & UBLK_IO_FLAG_ZONE_APPEND) {
-+		req->__sector = ub_cmd->addr;
-+		io->flags &= ~UBLK_IO_FLAG_ZONE_APPEND;
-+	}
-+
- 	if (req && likely(!blk_should_fake_timeout(req->q)))
- 		ublk_put_req_ref(ubq, req);
- }
-@@ -1419,7 +1708,8 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 			^ (_IOC_NR(cmd_op) == UBLK_IO_NEED_GET_DATA))
- 		goto out;
- 
--	if (ublk_support_user_copy(ubq) && ub_cmd->addr) {
-+	if (ublk_support_user_copy(ubq) &&
-+	    !(io->flags & UBLK_IO_FLAG_ZONE_APPEND) && ub_cmd->addr) {
- 		ret = -EINVAL;
- 		goto out;
- 	}
-@@ -1542,11 +1832,14 @@ static inline bool ublk_check_ubuf_dir(const struct request *req,
- 		int ubuf_dir)
- {
- 	/* copy ubuf to request pages */
--	if (req_op(req) == REQ_OP_READ && ubuf_dir == ITER_SOURCE)
-+	if ((req_op(req) == REQ_OP_READ || req_op(req) == REQ_OP_DRV_IN) &&
-+	    ubuf_dir == ITER_SOURCE)
- 		return true;
- 
- 	/* copy request pages to ubuf */
--	if (req_op(req) == REQ_OP_WRITE && ubuf_dir == ITER_DEST)
-+	if ((req_op(req) == REQ_OP_WRITE ||
-+	     req_op(req) == REQ_OP_ZONE_APPEND) &&
-+	    ubuf_dir == ITER_DEST)
- 		return true;
- 
- 	return false;
-@@ -1885,17 +2178,24 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
- 
- 	get_device(&ub->cdev_dev);
- 	ub->dev_info.state = UBLK_S_DEV_LIVE;
-+
-+	if (ublk_dev_is_zoned(ub)) {
-+		ret = ublk_revalidate_disk_zones(ub);
-+		if (ret)
-+			goto out_put_cdev;
-+	}
-+
- 	ret = add_disk(disk);
-+	if (ret)
-+		goto out_put_cdev;
-+
-+	set_bit(UB_STATE_USED, &ub->state);
-+
-+out_put_cdev:
- 	if (ret) {
--		/*
--		 * Has to drop the reference since ->free_disk won't be
--		 * called in case of add_disk failure.
--		 */
- 		ub->dev_info.state = UBLK_S_DEV_DEAD;
- 		ublk_put_device(ub);
--		goto out_put_disk;
- 	}
--	set_bit(UB_STATE_USED, &ub->state);
- out_put_disk:
- 	if (ret)
- 		put_disk(disk);
-@@ -2045,6 +2345,13 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	if (ublk_dev_is_user_copy(ub))
- 		ub->dev_info.flags &= ~UBLK_F_NEED_GET_DATA;
- 
-+	/* Zoned storage support requires user copy feature */
-+	if (ublk_dev_is_zoned(ub) &&
-+	    (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) || !ublk_dev_is_user_copy(ub))) {
-+		ret = -EINVAL;
-+		goto out_free_dev_number;
-+	}
-+
- 	/* We are not ready to support zero copy */
- 	ub->dev_info.flags &= ~UBLK_F_SUPPORT_ZERO_COPY;
- 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 4b8558db90e1..4d97eb0f7d13 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -176,6 +176,12 @@
- /* Copy between request and user buffer by pread()/pwrite() */
- #define UBLK_F_USER_COPY	(1UL << 7)
- 
-+/*
-+ * User space sets this flag when setting up the device to request zoned storage support. Kernel may
-+ * deny the request by returning an error.
-+ */
-+#define UBLK_F_ZONED (1ULL << 8)
-+
- /* device state */
- #define UBLK_S_DEV_DEAD	0
- #define UBLK_S_DEV_LIVE	1
-@@ -232,9 +238,24 @@ struct ublksrv_ctrl_dev_info {
- #define		UBLK_IO_OP_READ		0
- #define		UBLK_IO_OP_WRITE		1
- #define		UBLK_IO_OP_FLUSH		2
--#define		UBLK_IO_OP_DISCARD	3
--#define		UBLK_IO_OP_WRITE_SAME	4
--#define		UBLK_IO_OP_WRITE_ZEROES	5
-+#define		UBLK_IO_OP_DISCARD		3
-+#define		UBLK_IO_OP_WRITE_SAME		4
-+#define		UBLK_IO_OP_WRITE_ZEROES		5
-+#define		UBLK_IO_OP_ZONE_OPEN		10
-+#define		UBLK_IO_OP_ZONE_CLOSE		11
-+#define		UBLK_IO_OP_ZONE_FINISH		12
-+#define		UBLK_IO_OP_ZONE_APPEND		13
-+#define		UBLK_IO_OP_ZONE_RESET		15
-+/*
-+ * Construct a zone report. The report request is carried in `struct
-+ * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
-+ * and shall indicate the first zone of the report. The `nr_sectors` shall
-+ * indicate how many zones should be reported (divide by zone size to get number
-+ * of zones in the report) and must be an integer multiple of the zone size. The
-+ * report shall be delivered as a `struct blk_zone` array. To report fewer zones
-+ * than requested, zero the last entry of the returned array.
-+ */
-+#define		UBLK_IO_OP_REPORT_ZONES		18
- 
- #define		UBLK_IO_F_FAILFAST_DEV		(1U << 8)
- #define		UBLK_IO_F_FAILFAST_TRANSPORT	(1U << 9)
-@@ -331,6 +352,13 @@ struct ublk_param_devt {
- 	__u32   disk_minor;
- };
- 
-+struct ublk_param_zoned {
-+	__u32	max_open_zones;
-+	__u32	max_active_zones;
-+	__u32	max_zone_append_sectors;
-+	__u8	reserved[20];
-+};
-+
- struct ublk_params {
- 	/*
- 	 * Total length of parameters, userspace has to set 'len' for both
-@@ -342,11 +370,13 @@ struct ublk_params {
- #define UBLK_PARAM_TYPE_BASIC           (1 << 0)
- #define UBLK_PARAM_TYPE_DISCARD         (1 << 1)
- #define UBLK_PARAM_TYPE_DEVT            (1 << 2)
-+#define UBLK_PARAM_TYPE_ZONED           (1 << 3)
- 	__u32	types;			/* types of parameter included */
- 
- 	struct ublk_param_basic		basic;
- 	struct ublk_param_discard	discard;
- 	struct ublk_param_devt		devt;
-+	struct ublk_param_zoned	zoned;
- };
- 
- #endif
--- 
-2.41.0
 
