@@ -2,97 +2,209 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA998EB64DC
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 21:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B7BC001DE
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 21:47:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235609AbjGNVJP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jul 2023 17:09:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40862 "EHLO
+        id S229873AbjGNVrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jul 2023 17:47:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235531AbjGNVJO (ORCPT
+        with ESMTP id S229574AbjGNVrG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2023 17:09:14 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F8F2707
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 14:09:12 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-992b66e5affso314292766b.3
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 14:09:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1689368950; x=1689973750;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=XsdnU0b3Xz0Mjt+aMv9seQBfoJzz9nd8YW05GuB4KP4=;
-        b=byc6vYPDZvu+iuG3FZ7LWYeIggSvJNcpnUIBmmqPKWbUaVdEFqHG65cQRX+unHMnb7
-         O+pYY20v7lGF/5y9kNef+ohQyV4uh7QnX6CbdLGrSFGv448+Uxu8PJU9+uFD5NDoCWjF
-         N/lQwQvO0//kRkJA7zS17LVue1JuLArMcyuMxNLdeP7I+DbjOU6gU2tVBP6QgKcaANKc
-         t6bdYoeusWTRS7I4DX7wQK94QgMmOq06GThlH0eta70cNBksIk61lugSNtzyL/OGE20N
-         cTgt6IxNrEe57bYBu0U3ZoGaDd/wJ+ffOoqFQemKQaTSXDQaqXZfT7dK/m+rzJc847hm
-         oeww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689368950; x=1689973750;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XsdnU0b3Xz0Mjt+aMv9seQBfoJzz9nd8YW05GuB4KP4=;
-        b=LOKS9PbCPnLjFEbhXRPh9pJHcJJIRgDBKXLEEB9M7k7xyDuiR389C5IgE3WuZmJt9l
-         +tDws/UTzxnSi/Id7fjFsomCdHuyoDVR+qbjU73bo7AY2Ns2Q+Sqtc/QM7Pv2NOO0uHu
-         HuzlM3jXDsKTYn+HvIV8Zn7rAyvgT+xDD/HUeY1NpfhDPuiJkvdC7OZw8Gm5Of0WlQh4
-         f5WFw1X+7U+oxDNruOGPeIiJItkCO6agjG/n638SlsnhGpR++5Hbd6mKfJup1B1y5pWI
-         tWdxkJwlc8RqtKJ0UdvAMmjZKj86jTI+ZV0jeQWVQw3cjgPPMPuLHiH/axLf2AnAqNPh
-         WGxg==
-X-Gm-Message-State: ABy/qLavtS6H6Mgx08KvU1nJv51XfQZJqxG6XbDOdEXbfo9KPPsYHqtE
-        XsIJn+QYbhCwPWtpH3UN4T0Ad7SxEB/R9+gILs4=
-X-Google-Smtp-Source: APBJJlF/O/P26+uPSb0iX05TbtDl/PwANwRiKVzvMH3q+qOWyIHb5Q4YAV+YZ5wEwYTBmFqJWhCLGQ==
-X-Received: by 2002:a17:906:1d8:b0:993:d7c4:1a78 with SMTP id 24-20020a17090601d800b00993d7c41a78mr4532830ejj.10.1689368950525;
-        Fri, 14 Jul 2023 14:09:10 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id h14-20020a170906110e00b009829dc0f2a0sm5950050eja.111.2023.07.14.14.09.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 14:09:10 -0700 (PDT)
-References: <20230711072353.200873-1-nmi@metaspace.dk>
- <20230711072353.200873-2-nmi@metaspace.dk>
- <ZK6/0TKxe2q4/hi9@ovpn-8-25.pek2.redhat.com>
-User-agent: mu4e 1.10.5; emacs 28.2.50
-From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, gost.dev@samsung.com,
-        open list <linux-kernel@vger.kernel.org>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Johannes Thumshirn <jth@kernel.org>
-Subject: Re: [PATCH v8 1/2] ublk: add helper to check if device supports
- user copy
-Date:   Fri, 14 Jul 2023 23:08:05 +0200
-In-reply-to: <ZK6/0TKxe2q4/hi9@ovpn-8-25.pek2.redhat.com>
-Message-ID: <87wmz2w68n.fsf@metaspace.dk>
+        Fri, 14 Jul 2023 17:47:06 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 514B335A8;
+        Fri, 14 Jul 2023 14:47:03 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id B253220ABD64; Fri, 14 Jul 2023 14:47:02 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B253220ABD64
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1689371222;
+        bh=217tuDpVmoLrkkGoJqoyVlAua3WGHBs8gt+hDtlnBd4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ussi8JyOA+xtDdpRzNY9B5oZVy3yuTvi/fnM4AOv1VV3uHn6NlSKNB5+9JxM4ruvn
+         jo/kQBU8khVpAFaOcEwhkjZfkxwjHKzZc/B/xDo9kfU1d0QD0MrsJe2TZ2nrmWxgmf
+         mjNf6BZjR3nnivTzw6I8BsijyiefH+c8Evc1/DS4=
+Date:   Fri, 14 Jul 2023 14:47:02 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [PATCH RFC v10 4/17] ipe: add LSM hooks on execution and kernel
+  read
+Message-ID: <20230714214702.GC15267@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1687986571-16823-5-git-send-email-wufan@linux.microsoft.com>
+ <cbe877b3905033d2b8c7c92e6d0cad4e.paul@paul-moore.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cbe877b3905033d2b8c7c92e6d0cad4e.paul@paul-moore.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Sat, Jul 08, 2023 at 12:23:02AM -0400, Paul Moore wrote:
+> On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+> > 
+> > IPE's initial goal is to control both execution and the loading of
+> > kernel modules based on the system's definition of trust. It
+> > accomplishes this by plugging into the security hooks for
+> > bprm_check_security, file_mprotect, mmap_file, kernel_load_data,
+> > and kernel_read_data.
+> > 
+> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > ---
+> >  security/ipe/eval.c  |  14 ++++
+> >  security/ipe/eval.h  |   1 +
+> >  security/ipe/hooks.c | 182 +++++++++++++++++++++++++++++++++++++++++++
+> >  security/ipe/hooks.h |  25 ++++++
+> >  security/ipe/ipe.c   |   6 ++
+> >  5 files changed, 228 insertions(+)
+> >  create mode 100644 security/ipe/hooks.c
+> >  create mode 100644 security/ipe/hooks.h
+> 
+> Adding the 'hooks.h' header allows for much of code added in the
+> previous patches to finally compile and there are a number of errors,
+> too many to include here.  Please fix those and ensure that each
+> point in the patchset compiles cleanly.
+> 
+Sorry again for the mistake I made here.
 
-Ming Lei <ming.lei@redhat.com> writes:
+> > diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
+> > new file mode 100644
+> > index 000000000000..d896a5a474bc
+> > --- /dev/null
+> > +++ b/security/ipe/hooks.c
+> > @@ -0,0 +1,182 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (C) Microsoft Corporation. All rights reserved.
+> > + */
+> > +
+> > +#include <linux/fs.h>
+> > +#include <linux/types.h>
+> > +#include <linux/binfmts.h>
+> > +#include <linux/mman.h>
+> > +
+> > +#include "ipe.h"
+> > +#include "hooks.h"
+> > +#include "eval.h"
+> > +
+> > +/**
+> > + * ipe_bprm_check_security - ipe security hook function for bprm check.
+> > + * @bprm: Supplies a pointer to a linux_binprm structure to source the file
+> > + *	  being evaluated.
+> > + *
+> > + * This LSM hook is called when a binary is loaded through the exec
+> > + * family of system calls.
+> > + * Return:
+> > + * *0	- OK
+> > + * *!0	- Error
+> > + */
+> > +int ipe_bprm_check_security(struct linux_binprm *bprm)
+> > +{
+> > +	struct ipe_eval_ctx ctx = { 0 };
+> 
+> It's up to you, but when you have a fequently used initializer like
+> this it is often wrapped in a macro:
+> 
+>   #define IPE_EVAL_CTX_INIT ((struct ipe_eval_ctx){ 0 })
+> 
+> ... so that you can write the variable decalaration like this:
+> 
+>   struct ipe_eval_ctx ctx = IPE_EVAL_CTX_INIT;
+> 
+> It's not a requirement, it just tends to look a little cleaner and
+> should you ever need to change the initializer it makes your life
+> a lot easier.
+> 
+Yes I agree this looks way better, I will update all the context init.
 
-> On Tue, Jul 11, 2023 at 09:23:52AM +0200, Andreas Hindborg wrote:
->> From: Andreas Hindborg <a.hindborg@samsung.com>
->> 
->> This will be used by ublk zoned storage support.
->> 
->> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
->> ---
->
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
->
-> BTW, both Damien and I have reviewed this one, and you can put the
-> reviewed-by tag in patch.
+> > +	build_eval_ctx(&ctx, bprm->file, __IPE_OP_EXEC);
+> > +	return ipe_evaluate_event(&ctx);
+> > +}
+> > +
+> > +/**
+> > + * ipe_mmap_file - ipe security hook function for mmap check.
+> > + * @f: File being mmap'd. Can be NULL in the case of anonymous memory.
+> > + * @reqprot: The requested protection on the mmap, passed from usermode.
+> > + * @prot: The effective protection on the mmap, resolved from reqprot and
+> > + *	  system configuration.
+> > + * @flags: Unused.
+> > + *
+> > + * This hook is called when a file is loaded through the mmap
+> > + * family of system calls.
+> > + *
+> > + * Return:
+> > + * * 0	- OK
+> > + * * !0	- Error
+> > + */
+> > +int ipe_mmap_file(struct file *f, unsigned long reqprot, unsigned long prot,
+> > +		  unsigned long flags)
+> 
+> Since @reqprot is always going to be unused in this function, you
+> might want to mark it as such to help prevent compiler
+> warnings/errors, for example:
+> 
+>  unsigned long reqprot __always_unused
+> 
+Thanks for telling me this useful mark! I will add it.
 
-Argh, I knew there was something I forgot for v9. Sorry.
-
-BR Andreas
-
+-Fan
+> > +{
+> > +	struct ipe_eval_ctx ctx = { 0 };
+> > +
+> > +	if (prot & PROT_EXEC) {
+> > +		build_eval_ctx(&ctx, f, __IPE_OP_EXEC);
+> > +		return ipe_evaluate_event(&ctx);
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +/**
+> > + * ipe_file_mprotect - ipe security hook function for mprotect check.
+> > + * @vma: Existing virtual memory area created by mmap or similar.
+> > + * @reqprot: The requested protection on the mmap, passed from usermode.
+> > + * @prot: The effective protection on the mmap, resolved from reqprot and
+> > + *	  system configuration.
+> > + *
+> > + * This LSM hook is called when a mmap'd region of memory is changing
+> > + * its protections via mprotect.
+> > + *
+> > + * Return:
+> > + * * 0	- OK
+> > + * * !0	- Error
+> > + */
+> > +int ipe_file_mprotect(struct vm_area_struct *vma, unsigned long reqprot,
+> 
+> See my comment above about @reqprot.
+> 
+> > +		      unsigned long prot)
+> > +{
+> > +	struct ipe_eval_ctx ctx = { 0 };
+> > +
+> > +	/* Already Executable */
+> > +	if (vma->vm_flags & VM_EXEC)
+> > +		return 0;
+> > +
+> > +	if (prot & PROT_EXEC) {
+> > +		build_eval_ctx(&ctx, vma->vm_file, __IPE_OP_EXEC);
+> > +		return ipe_evaluate_event(&ctx);
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> 
+> --
+> paul-moore.com
