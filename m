@@ -2,157 +2,162 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC07EB64DC
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 22:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E6FC001DF
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 23:57:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229808AbjGNWkH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jul 2023 18:40:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34648 "EHLO
+        id S229930AbjGNX47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jul 2023 19:56:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjGNWkG (ORCPT
+        with ESMTP id S229455AbjGNX46 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2023 18:40:06 -0400
-Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF52E30DC
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 15:40:04 -0700 (PDT)
-Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-3a426e7058cso4231432b6e.3
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 15:40:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689374404; x=1691966404;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=llNDf15h0Ng/lAbxlfYqhFIc9QU2naRT7j7be5rEF/4=;
-        b=N8Yc8ayHvPi/jCBLEm7vNUU6yn2AVsY7bOvN4Gud/MVbT9HQhAxM5ppN7hQK+kWf1G
-         F6Ma/TlkzxfjR7MXvlaDqCL6snIiiP9A+RJZWEJITQ1CIE6bftdcCGQCDGp1cPtI+ybt
-         Sizp31GXAY7QXXtRmdCPwwMyieAcJt4YuZxCcme8vrQcbxOWwAl0uQUkvM1teGO+1JYl
-         VhhbidynWeiOl7uTsE3m8KGS3LHnsdHPOWLhVC+n0FhOT39zqESBiZqjqkkKnR+KiycE
-         3vDHYtuJluT5SITFWiGXIvYoMxtJS9jZAKj8g1xkGrHR+SfMOAu180tQ9YaHTRrTacJW
-         TbHQ==
-X-Gm-Message-State: ABy/qLYxTwykCe+mTporCYqrb8VpfTTSlGsupv5r3p9NKx7CZ0SP2Xm+
-        kXFEU8KBi7uXKq3uMMvZvdmlr5C69qSBxPtTmqfNStiIoHeT
-X-Google-Smtp-Source: APBJJlFQ3P0JAhTaITjvkcNUEPadRNV7A2PcsUDTELFmB8eD6J0bNviY9pHIzqugKPl0xKcuwixpSGxXHUZAjhorsU/I8DkoCtUD
+        Fri, 14 Jul 2023 19:56:58 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 317573A95;
+        Fri, 14 Jul 2023 16:56:57 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 7335221C4688; Fri, 14 Jul 2023 16:56:56 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7335221C4688
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1689379016;
+        bh=55GL66P8Iq71LDl/wSLZ+IYTZ6btVclWUBP4727ThRM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AKVTgQCUWoa+NO1kegUiZiU3vjAzVsrbk+5FDPZI3It2c1vylgnJYSBa47ruMgJnL
+         w6yL2PZSPw5z6/2js00CimaEgCQTc8kqGyDTHgJXT74S+x4epf9KEj8ajgO7MsuqPE
+         O2sBiqkUBD047ZJkwQ81OnXZ7aDN1pjUo7X57ozQ=
+Date:   Fri, 14 Jul 2023 16:56:56 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [PATCH RFC v10 5/17] ipe: introduce 'boot_verified' as a trust
+  provider
+Message-ID: <20230714235656.GD15267@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1687986571-16823-6-git-send-email-wufan@linux.microsoft.com>
+ <7b0f16fd49fb3490af1018eba986d0e4.paul@paul-moore.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:2190:b0:3a4:1082:9e5 with SMTP id
- be16-20020a056808219000b003a4108209e5mr7585902oib.2.1689374404196; Fri, 14
- Jul 2023 15:40:04 -0700 (PDT)
-Date:   Fri, 14 Jul 2023 15:40:04 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000413f1506007a2183@google.com>
-Subject: [syzbot] [block?] WARNING in invalidate_drive
-From:   syzbot <syzbot+3254e329ee1f252d4915@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7b0f16fd49fb3490af1018eba986d0e4.paul@paul-moore.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Sat, Jul 08, 2023 at 12:23:02AM -0400, Paul Moore wrote:
+> On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+> > 
+> > IPE is designed to provide system level trust guarantees, this usually
+> > implies that trust starts from bootup with a hardware root of trust,
+> > which validates the bootloader. After this, the bootloader verifies the
+> > kernel and the initramfs.
+> > 
+> > As there's no currently supported integrity method for initramfs, and
+> > it's typically already verified by the bootloader, introduce a property
+> > that causes the first superblock to have an execution to be "pinned",
+> > which is typically initramfs.
+> > 
+> > When the "pinned" device is unmounted, it will be "unpinned" and
+> > `boot_verified` property will always evaluate to false afterward.
+> > 
+> > We use a pointer with a spin_lock to "pin" the device instead of rcu
+> > because rcu synchronization may sleep, which is not allowed when
+> > unmounting a device.
+> > 
+> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > ---
+> >  security/ipe/eval.c          | 72 +++++++++++++++++++++++++++++++++++-
+> >  security/ipe/eval.h          |  2 +
+> >  security/ipe/hooks.c         | 12 ++++++
+> >  security/ipe/hooks.h         |  2 +
+> >  security/ipe/ipe.c           |  1 +
+> >  security/ipe/policy.h        |  2 +
+> >  security/ipe/policy_parser.c | 37 +++++++++++++++++-
+> >  7 files changed, 126 insertions(+), 2 deletions(-)
+> 
+> The compilation errors continue into this patch.
+> 
+Sorry again for the header file problem.
 
-syzbot found the following issue on:
+> > diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
+> > index 27e5767480b0..28c14adfe6d2 100644
+> > --- a/security/ipe/policy_parser.c
+> > +++ b/security/ipe/policy_parser.c
+> > @@ -265,6 +265,12 @@ static enum ipe_action_type parse_action(char *t)
+> >  	return match_token(t, action_tokens, args);
+> >  }
+> >  
+> > +static const match_table_t property_tokens = {
+> > +	{__IPE_PROP_BOOT_VERIFIED_FALSE,	"boot_verified=FALSE"},
+> > +	{__IPE_PROP_BOOT_VERIFIED_TRUE,		"boot_verified=TRUE"},
+> > +	{__IPE_PROP_INVALID,			NULL}
+> > +};
+> > +
+> >  /**
+> >   * parse_property - Parse the property type given a token string.
+> >   * @t: Supplies the token string to be parsed.
+> > @@ -277,7 +283,36 @@ static enum ipe_action_type parse_action(char *t)
+> >   */
+> >  static int parse_property(char *t, struct ipe_rule *r)
+> >  {
+> > -	return -EBADMSG;
+> > +	substring_t args[MAX_OPT_ARGS];
+> > +	struct ipe_prop *p = NULL;
+> > +	int rc = 0;
+> > +	int token;
+> > +
+> > +	p = kzalloc(sizeof(*p), GFP_KERNEL);
+> > +	if (!p)
+> > +		return -ENOMEM;
+> > +
+> > +	token = match_token(t, property_tokens, args);
+> > +
+> > +	switch (token) {
+> > +	case __IPE_PROP_BOOT_VERIFIED_FALSE:
+> > +	case __IPE_PROP_BOOT_VERIFIED_TRUE:
+> > +		p->type = token;
+> > +		break;
+> > +	case __IPE_PROP_INVALID:
+> 
+> You generally don't need to explicitly specify a case if the code
+> immediately falls through to 'default'.
+> 
+Got it, I will remove this line.
 
-HEAD commit:    3f01e9fed845 Merge tag 'linux-watchdog-6.5-rc2' of git://w..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13914acca80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=150188feee7071a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=3254e329ee1f252d4915
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: i386
+> > +	default:
+> > +		rc = -EBADMSG;
+> > +		break;
+> > +	}
+> > +	if (rc)
+> > +		goto err;
+> > +	list_add_tail(&p->next, &r->props);
+> > +
+> > +out:
+> > +	return rc;
+> > +err:
+> > +	kfree(p);
+> > +	goto out;
+> 
+> Once again, don't use a goto when the jump destination simply does a
+> return, do the return directly.
+> 
+Sure, I will replace the goto with return.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-3f01e9fe.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ed16bd50e54f/vmlinux-3f01e9fe.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2bda39f6b871/bzImage-3f01e9fe.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3254e329ee1f252d4915@syzkaller.appspotmail.com
-
-WARNING: CPU: 0 PID: 7350 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 0 PID: 7350 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
-WARNING: CPU: 0 PID: 7350 at drivers/block/floppy.c:999 invalidate_drive+0xf5/0x110 drivers/block/floppy.c:3217
-Modules linked in:
-CPU: 0 PID: 7350 Comm: syz-executor.0 Not tainted 6.5.0-rc1-syzkaller-00006-g3f01e9fed845 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
-RIP: 0010:invalidate_drive+0xf5/0x110 drivers/block/floppy.c:3217
-Code: 84 db 75 0a e8 0c 84 57 fc 31 c0 5b 5d c3 e8 02 84 57 fc 48 89 ef e8 ca e4 ff ff e8 f5 83 57 fc 31 c0 5b 5d c3 e8 eb 83 57 fc <0f> 0b eb 97 e8 92 b9 aa fc e9 29 ff ff ff 66 66 2e 0f 1f 84 00 00
-RSP: 0018:ffffc900289efa20 EFLAGS: 00010216
-RAX: 000000000000073b RBX: 0000000000000001 RCX: ffffc9000d0d4000
-RDX: 0000000000040000 RSI: ffffffff852d5dd5 RDI: 0000000000000001
-RBP: ffff88801dd7e000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000249
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000008
-FS:  0000000000000000(0000) GS:ffff88802c600000(0063) knlGS:00000000f7f4fb40
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 00000000f7f46db0 CR3: 000000001c15c000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- fd_locked_ioctl+0xbaf/0x19f0 drivers/block/floppy.c:3508
- fd_ioctl drivers/block/floppy.c:3576 [inline]
- fd_compat_ioctl+0x8a8/0x1bd0 drivers/block/floppy.c:3890
- compat_blkdev_ioctl+0x329/0x7d0 block/ioctl.c:677
- __do_compat_sys_ioctl+0x25b/0x2b0 fs/ioctl.c:968
- do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
- __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
- do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:203
- entry_SYSENTER_compat_after_hwframe+0x70/0x82
-RIP: 0023:0xf7f75579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000f7f4f5cc EFLAGS: 00000296 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000000249
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-----------------
-Code disassembly (best guess), 2 bytes skipped:
-   0:	10 06                	adc    %al,(%rsi)
-   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
-   6:	10 07                	adc    %al,(%rdi)
-   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
-   c:	10 08                	adc    %cl,(%rax)
-   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-  1e:	00 51 52             	add    %dl,0x52(%rcx)
-  21:	55                   	push   %rbp
-  22:	89 e5                	mov    %esp,%ebp
-  24:	0f 34                	sysenter
-  26:	cd 80                	int    $0x80
-* 28:	5d                   	pop    %rbp <-- trapping instruction
-  29:	5a                   	pop    %rdx
-  2a:	59                   	pop    %rcx
-  2b:	c3                   	retq
-  2c:	90                   	nop
-  2d:	90                   	nop
-  2e:	90                   	nop
-  2f:	90                   	nop
-  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-Fan
+> >  }
+> >  
+> >  /**
+> > -- 
+> > 2.25.1
+> 
+> --
+> paul-moore.com
