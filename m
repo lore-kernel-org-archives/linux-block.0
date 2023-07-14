@@ -2,98 +2,222 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11535EB64DC
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 19:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1439C001DF
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 20:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236374AbjGNTos (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jul 2023 15:44:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46130 "EHLO
+        id S236047AbjGNU2s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jul 2023 16:28:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbjGNTos (ORCPT
+        with ESMTP id S235472AbjGNU2r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2023 15:44:48 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32A02D57
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 12:44:47 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-780c89d1998so16013239f.1
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 12:44:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689363887; x=1689968687;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=veFKUMZBQrX/Dj8inbuI++veCSXQIqVt2O+DqAlAqSY=;
-        b=nI/ZAOQV+22/fvMKdASmAS2SLR9eTK2unZNTUpvZw/A/zJidy+4aCVns6AEKtElt0C
-         TI90FTvp67Dbr9Qp8foTg3k/whZFGH3wrHjcTpGaM+5A01LFuZnaMxuNqH+fvGUN+ftT
-         2Zg24dm1e2Zmn6JCnTLUZnM3si7Dy+ctAWpZP86X2l72fqt/Mj7pStO4ak6Bh85zmuXG
-         TtUPdpVwoQ9qT5vXxmRUs7+T+imGLj7dKZblJT6G9YRE03zswHcVrH5OjViWr/PSZJCc
-         qr6J7Ntj7aWafAKtoe9HYjXrtTpYbSJFsrvEn/cw3vxvOS0O5z2aEoQlfWwbdhKKoFIb
-         oHIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689363887; x=1689968687;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=veFKUMZBQrX/Dj8inbuI++veCSXQIqVt2O+DqAlAqSY=;
-        b=iwtz1iVfWXR+5F1Vd2fOMTH4QeFz654qkoHOp8u+bxL6linryhtphXJgPdR37WSGmw
-         PNIW3H4O6oy8wcCLtJZ9gaJH3a0b42kcM905KPCRKdZuV0H0fxCOvEzSFRWUa9xZgB0T
-         6uZlw+73Fj1gFd9VVFPWhH7twizWCOu8D82aUrSL46OloBluJX3u8YVoygxE6x+RPY8E
-         2EKKfw5tqDYhn6x+cvLTyOhMIheCdtHKPvcHAmYUZt5L/DDOMfn0vwVLb4l8JlhwUFLM
-         yzqNymNYf+Z9M2lrlUI9hjmf3Ii5j7o8sUVDLipxD7tMpxKWBaUmCvKKlHRYwDkNqTSG
-         K4xA==
-X-Gm-Message-State: ABy/qLasYh4PjhVY4kYZXpmBrAT0HSFqP6AimdPnixG7BXpSC16inMtR
-        2pGvh/vcfVRbqyaiMu5VjD9s8fgykTtYRkRFg44=
-X-Google-Smtp-Source: APBJJlG27kU39KKaVWGTaq5CRYEHuODaHBkyLwAjTzymnofWUm93qrBD6npjvYvi1P7RfNjMUISuhQ==
-X-Received: by 2002:a05:6602:2c93:b0:780:d6ef:160 with SMTP id i19-20020a0566022c9300b00780d6ef0160mr197778iow.1.1689363887060;
-        Fri, 14 Jul 2023 12:44:47 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id o27-20020a056602125b00b00777b94e8efasm2880017iou.18.2023.07.14.12.44.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 12:44:46 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@infradead.org>,
-        Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20230714101106.3635611-1-ross.lagerwall@citrix.com>
-References: <20230714101106.3635611-1-ross.lagerwall@citrix.com>
-Subject: Re: [PATCH v2] blk-mq: Fix stall due to recursive flush plug
-Message-Id: <168936388618.743920.17372805107217904539.b4-ty@kernel.dk>
-Date:   Fri, 14 Jul 2023 13:44:46 -0600
+        Fri, 14 Jul 2023 16:28:47 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D57831995;
+        Fri, 14 Jul 2023 13:28:45 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 353B820ABD64; Fri, 14 Jul 2023 13:28:45 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 353B820ABD64
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1689366525;
+        bh=P3inuFi0gMXqoY/7xlKkhztUrimCDUfNFGSqCXwgTfw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Y9xCGTHAMzWx55C7H1MErPQE+n5ghx5PbMvaBnwI0vs8CCBaJ5VU9tOOqs/Jg36+p
+         wycIU9OWZ8tR0M5Yitid06KA4Yk3IPi5PSM32luz0EIsXBdKDL1X3jGYf4zsWPrIvt
+         JpNuiSLgROZLx0DdvUXKjEhBMKE7PX/6muWF71q4=
+Date:   Fri, 14 Jul 2023 13:28:45 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [PATCH RFC v10 3/17] ipe: add evaluation loop
+Message-ID: <20230714202845.GB15267@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1687986571-16823-4-git-send-email-wufan@linux.microsoft.com>
+ <309cfd62a474a7e93be6a0886a3d5aa8.paul@paul-moore.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <309cfd62a474a7e93be6a0886a3d5aa8.paul@paul-moore.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Fri, 14 Jul 2023 11:11:06 +0100, Ross Lagerwall wrote:
-> We have seen rare IO stalls as follows:
+On Sat, Jul 08, 2023 at 12:23:01AM -0400, Paul Moore wrote:
+> On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+> > 
+> > IPE must have a centralized function to evaluate incoming callers
+> > against IPE's policy. This iteration of the policy for against the rules
+> > for that specific caller is known as the evaluation loop.
 > 
-> * blk_mq_plug_issue_direct() is entered with an mq_list containing two
-> requests.
-> * For the first request, it sets last == false and enters the driver's
-> queue_rq callback.
-> * The driver queue_rq callback indirectly calls schedule() which calls
-> blk_flush_plug(). This may happen if the driver has the
-> BLK_MQ_F_BLOCKING flag set and is allowed to sleep in ->queue_rq.
-> * blk_flush_plug() handles the remaining request in the mq_list. mq_list
-> is now empty.
-> * The original call to queue_rq resumes (with last == false).
-> * The loop in blk_mq_plug_issue_direct() terminates because there are no
-> remaining requests in mq_list.
+> Can you rewrite that second sentence, it reads a bit awkward and I'm
+> unclear as to the meaning.
 > 
-> [...]
+Sure, it is indeed not clear, I might rewrite the whole message in the next version.
 
-Applied, thanks!
+> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > ---
+> >  security/ipe/Makefile |  1 +
+> >  security/ipe/eval.c   | 94 +++++++++++++++++++++++++++++++++++++++++++
+> >  security/ipe/eval.h   | 25 ++++++++++++
+> >  3 files changed, 120 insertions(+)
+> >  create mode 100644 security/ipe/eval.c
+> >  create mode 100644 security/ipe/eval.h
+> 
+> ...
+> 
+> > diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+> > new file mode 100644
+> > index 000000000000..59144b2ecdda
+> > --- /dev/null
+> > +++ b/security/ipe/eval.c
+> > @@ -0,0 +1,94 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (C) Microsoft Corporation. All rights reserved.
+> > + */
+> > +
+> > +#include <linux/fs.h>
+> > +#include <linux/types.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/file.h>
+> > +#include <linux/sched.h>
+> > +#include <linux/rcupdate.h>
+> > +
+> > +#include "ipe.h"
+> > +#include "eval.h"
+> > +#include "hooks.h"
+> 
+> There is no "hooks.h" at this point in the patchset.
+> 
+> In order for 'git bisect' to remain useful (and it can be a very handy
+> tool), we need to ensure that each point in the patchset compiles
+> cleanly.
+> 
+Sorry for the mistake here, I will avoid this kind of problems in the future.
 
-[1/1] blk-mq: Fix stall due to recursive flush plug
-      commit: 70904263512a74a3b8941dd9e6e515ca6fc57821
+> > +#include "policy.h"
+> > +
+> > +struct ipe_policy __rcu *ipe_active_policy;
+> > +
+> > +/**
+> > + * evaluate_property - Analyze @ctx against a property.
+> > + * @ctx: Supplies a pointer to the context to be evaluated.
+> > + * @p: Supplies a pointer to the property to be evaluated.
+> > + *
+> > + * Return:
+> > + * * true	- The current @ctx match the @p
+> > + * * false	- The current @ctx doesn't match the @p
+> > + */
+> > +static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
+> > +			      struct ipe_prop *p)
+> > +{
+> > +	return false;
+> > +}
+> > +
+> > +/**
+> > + * ipe_evaluate_event - Analyze @ctx against the current active policy.
+> > + * @ctx: Supplies a pointer to the context to be evaluated.
+> > + *
+> > + * This is the loop where all policy evaluation happens against IPE policy.
+> > + *
+> > + * Return:
+> > + * * 0		- OK
+> > + * * -EACCES	- @ctx did not pass evaluation.
+> > + * * !0		- Error
+> > + */
+> > +int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
+> > +{
+> > +	int rc = 0;
+> > +	bool match = false;
+> > +	enum ipe_action_type action;
+> > +	struct ipe_policy *pol = NULL;
+> > +	const struct ipe_rule *rule = NULL;
+> > +	const struct ipe_op_table *rules = NULL;
+> > +	struct ipe_prop *prop = NULL;
+> > +
+> > +	rcu_read_lock();
+> > +
+> > +	pol = rcu_dereference(ipe_active_policy);
+> > +	if (!pol) {
+> > +		rcu_read_unlock();
+> > +		return 0;
+> > +	}
+> > +
+> > +	if (ctx->op == __IPE_OP_INVALID) {
+> > +		action = pol->parsed->global_default_action;
+> > +		goto eval;
+> 
+> It looks like you are missing a rcu_read_unlock() in this case.
+> 
+Thanks for pointing that out. I will add the unlock. 
+> Also, given how simplistic the evaluation is in this case, why not
+> just do it here, saving the assignment, jump, etc.?
+> 
+>   if (ctx->op == INVALID) {
+>     rcu_read_unlock()
+>     if (global_action == DENY)
+>       return -EACCES;
+>     return 0;
+>   }
+> 
+The jump is actually for auditing the decision in the next patch, while
+it does make more sense to not jump when the auditing is not introduced. 
+I will make the return here then switch to jump in the auditing patch.
 
-Best regards,
--- 
-Jens Axboe
+> > +	}
+> > +
+> > +	rules = &pol->parsed->rules[ctx->op];
+> > +
+> > +	list_for_each_entry(rule, &rules->rules, next) {
+> > +		match = true;
+> > +
+> > +		list_for_each_entry(prop, &rule->props, next)
+> > +			match = match && evaluate_property(ctx, prop);
+> 
+> Why not break from this loop once evaluate_property() returns false?
+> 
+Yes we can break when one property evals to false, thanks for the advice.
 
+> > +
+> > +		if (match)
+> > +			break;
+> > +	}
+> > +
+> > +	if (match)
+> > +		action = rule->action;
+> > +	else if (rules->default_action != __IPE_ACTION_INVALID)
+> > +		action = rules->default_action;
+> > +	else
+> > +		action = pol->parsed->global_default_action;
+> > +
+> > +	rcu_read_unlock();
+> > +eval:
+> > +	if (action == __IPE_ACTION_DENY)
+> > +		rc = -EACCES;
+> > +
+> > +	return rc;
+> 
+> This can just be 'return 0;' right?
+> 
+For this patch, if we just return on error, then yes the end of the function
+could just return 0. But when auditing(audit rc) and permissive switch(overwrite rc)
+are introduced then return on error might not be the clean way. So I kept
+the rc variable in this patch. I can change the style in this patch then
+switch to use rc when auditing and permissive switch are introduced.
 
+-Fan
 
+> > +}
+> 
+> --
+> paul-moore.com
