@@ -2,98 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52283EB64DC
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 14:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 349B7EB64DC
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 16:04:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235734AbjGNOtp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jul 2023 10:49:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57338 "EHLO
+        id S235993AbjGNQEJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jul 2023 12:04:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235543AbjGNOto (ORCPT
+        with ESMTP id S235396AbjGNQEI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2023 10:49:44 -0400
-Received: from out-30.mta1.migadu.com (out-30.mta1.migadu.com [95.215.58.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ADFF2691
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 07:49:41 -0700 (PDT)
-Message-ID: <8631f3e6-fef1-bff1-a793-b6e7410802b1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689346179;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jNvYQmJsQDwLhpPtJsjHCKzbrGa1338Fhf7Ke/A5vME=;
-        b=kvZPY1hUQNc1/e3a70dR5t4yOP1b8V1BkJHZz7ZUjXmORtlMZ9OzICY3+hpc+3/8GROxFR
-        HbJbPtan5hvTHVoCjkgy3BqbZXgUTQBVwnzuyiptALmQgQnU+mh9Y0xC1nRkeXDDNyw9IL
-        EuyW4qtgzTqgh019qQZtYrmKi31m0sE=
-Date:   Fri, 14 Jul 2023 22:49:13 +0800
+        Fri, 14 Jul 2023 12:04:08 -0400
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CBAA272E;
+        Fri, 14 Jul 2023 09:04:08 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-67ef5af0ce8so2001792b3a.2;
+        Fri, 14 Jul 2023 09:04:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689350647; x=1691942647;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AnUrl6Q/Hto3//n85eF7eIeo3rvuQaf3jDZjE91G6t8=;
+        b=jSYrZYxSTnPqWqPJoTSh8bednthSu00uSK/qWCzSewUFh3wj+icWl4hr5I8g4h2W1f
+         NUQtbiPjxRIZm+EJdxbtlXe+7HQaL2+LgR1+cqtHGoDpl7pe8kJ72pZmCM2BXoUtQIIP
+         YLPrTasggMjkV5FU7z7p66E1BvNV+KXm3OX/v6ByzKZuG31Di9b/yVlVHzTPTuwcQu5J
+         bAO/7aCCCTY848O3LI4KhTr0bLEUGvAw8M4Yc0FH5Jk/bwkNZ/cfAsMPBk6YMGD0gpog
+         Gd18difk4oZClDfYfuCW0JM9S6SSMnii81HtAyOuuzD1W8a5NvolOqADJtrEpYKhsqdD
+         ljsg==
+X-Gm-Message-State: ABy/qLY77NOhWSkRypBZeBm9R8w1R/hcCbmDSS/JGQubbWmsIPqWBgLQ
+        Axi8g07qubxmbXGG4PVASsw=
+X-Google-Smtp-Source: APBJJlHwEDQHVQ/R2PNFfinFvfMnsI7qs49uwmzjZ43FdR+sbiA7Vjf2Eivs7Yj7NlOJga2sI7qZ9w==
+X-Received: by 2002:a17:90a:5916:b0:263:e122:a692 with SMTP id k22-20020a17090a591600b00263e122a692mr3807022pji.49.1689350647303;
+        Fri, 14 Jul 2023 09:04:07 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:a59b:27e7:a062:fd32? ([2620:15c:211:201:a59b:27e7:a062:fd32])
+        by smtp.gmail.com with ESMTPSA id jx17-20020a17090b46d100b00265d023c233sm1278686pjb.6.2023.07.14.09.04.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jul 2023 09:04:06 -0700 (PDT)
+Message-ID: <4399bb4f-8127-f9fb-fe47-ab02ec3566c9@acm.org>
+Date:   Fri, 14 Jul 2023 09:04:05 -0700
 MIME-Version: 1.0
-Subject: Re: [PATCH v5] blk-mq: fix start_time_ns and alloc_time_ns for
- pre-allocated rq
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2] blk-mq: Fix stall due to recursive flush plug
 Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
-Cc:     hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
-        zhouchengming@bytedance.com
-References: <20230710105516.2053478-1-chengming.zhou@linux.dev>
- <aa813164-9a6a-53bd-405b-ba4cc1f1b656@kernel.dk>
- <63f93f1c-98da-4c09-b3d8-711f6953d8b7@linux.dev>
- <ZLA7QAfSojxu_FMW@slm.duckdns.org>
- <5be1cba6-b141-3a05-f801-3af7d2092674@linux.dev>
- <4dc89f6c-ab93-d3e7-5b5a-4b2f34e2fcac@kernel.dk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <4dc89f6c-ab93-d3e7-5b5a-4b2f34e2fcac@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
+To:     Ross Lagerwall <ross.lagerwall@citrix.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230714101106.3635611-1-ross.lagerwall@citrix.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230714101106.3635611-1-ross.lagerwall@citrix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/7/14 22:43, Jens Axboe wrote:
-> On 7/14/23 5:31?AM, Chengming Zhou wrote:
->> On 2023/7/14 01:58, Tejun Heo wrote:
->>> Hello,
->>>
->>> On Thu, Jul 13, 2023 at 08:25:50PM +0800, Chengming Zhou wrote:
->>>> Ok, this version will only get time stamp once for one request, it's actually
->>>> not worse than the current code, which will get start time stamp once for each
->>>> request even in the batch allocation.
->>>>
->>>> But yes, maybe we can also set the start time stamp in the batch mode, and only
->>>> update the time stamp in the block case, like you said, has better performance.
->>>>
->>>> The first version [1] I posted actually just did this, in which use a nr_flush counter
->>>> in plug to indicate that we blocked & flushed plug. Tejun and I think it seems fragile.
->>>> So go to this way that only set time stamp once when the request actually used.
->>>>
->>>> [1] https://lore.kernel.org/all/20230601053919.3639954-1-chengming.zhou@linux.dev/
->>>>
->>>> Another way I can think of is to make rq_qos_throttle() return a bool to indicate
->>>> if it blocked. Tejun and Jens, how do you think about this way?
->>>>
->>>> Although it's better performance, in case of preemption, the time stamp maybe not accurate.
->>>
->>> Trying to manually optimized timestamp reads seems like a bit of fool's
->>> errand to me. I don't think anyone cares about nanosec accuracy, so there
->>> are ample opportunities for generically caching timestamp so that we don't
->>> have to contort code to optimzie timestamp calls.
->>>
->>> It's a bit out of scope for this patchset but I think it might make sense to
->>> build a timestamp caching infrastructure. The cached timestamp can be
->>> invalidated on context switches (block layer already hooks into them) and
->>> issue and other path boundaries (e.g. at the end of plug flush).
->>>
->>
->> Yes, this is a really great idea. It has better performance and is
->> more generic.
-> 
-> Do you want to work on that approach? I pretty much outlined how I think
-> it'd work in the previous reply.
-> 
+On 7/14/23 03:11, Ross Lagerwall wrote:
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 99d8b9812b18..90de50082146 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1144,8 +1144,7 @@ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
+>   {
+>   	if (!list_empty(&plug->cb_list))
+>   		flush_plug_callbacks(plug, from_schedule);
+> -	if (!rq_list_empty(plug->mq_list))
+> -		blk_mq_flush_plug_list(plug, from_schedule);
+> +	blk_mq_flush_plug_list(plug, from_schedule);
+>   	/*
+>   	 * Unconditionally flush out cached requests, even if the unplug
+>   	 * event came from schedule. Since we know hold references to the
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 5504719b970d..e6bd9c5f42bb 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2742,7 +2742,14 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+>   {
+>   	struct request *rq;
+>   
+> -	if (rq_list_empty(plug->mq_list))
+> +	/*
+> +	 * We may have been called recursively midway through handling
+> +	 * plug->mq_list via a schedule() in the driver's queue_rq() callback.
+> +	 * To avoid mq_list changing under our feet, clear rq_count early and
+> +	 * bail out specifically if rq_count is 0 rather than checking
+> +	 * whether the mq_list is empty.
+> +	 */
+> +	if (plug->rq_count == 0)
+>   		return;
+>   	plug->rq_count = 0;
 
-Ok, I want to do it. Your outline is clear, will implement and test it.
-
-Thanks!
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
