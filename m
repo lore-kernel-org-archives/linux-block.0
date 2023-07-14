@@ -2,222 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1439C001DF
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 20:28:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA998EB64DC
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 21:09:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236047AbjGNU2s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jul 2023 16:28:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58636 "EHLO
+        id S235609AbjGNVJP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jul 2023 17:09:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235472AbjGNU2r (ORCPT
+        with ESMTP id S235531AbjGNVJO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2023 16:28:47 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D57831995;
-        Fri, 14 Jul 2023 13:28:45 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 353B820ABD64; Fri, 14 Jul 2023 13:28:45 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 353B820ABD64
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1689366525;
-        bh=P3inuFi0gMXqoY/7xlKkhztUrimCDUfNFGSqCXwgTfw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Y9xCGTHAMzWx55C7H1MErPQE+n5ghx5PbMvaBnwI0vs8CCBaJ5VU9tOOqs/Jg36+p
-         wycIU9OWZ8tR0M5Yitid06KA4Yk3IPi5PSM32luz0EIsXBdKDL1X3jGYf4zsWPrIvt
-         JpNuiSLgROZLx0DdvUXKjEhBMKE7PX/6muWF71q4=
-Date:   Fri, 14 Jul 2023 13:28:45 -0700
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, audit@vger.kernel.org,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH RFC v10 3/17] ipe: add evaluation loop
-Message-ID: <20230714202845.GB15267@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1687986571-16823-4-git-send-email-wufan@linux.microsoft.com>
- <309cfd62a474a7e93be6a0886a3d5aa8.paul@paul-moore.com>
+        Fri, 14 Jul 2023 17:09:14 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F8F2707
+        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 14:09:12 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-992b66e5affso314292766b.3
+        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 14:09:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1689368950; x=1689973750;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=XsdnU0b3Xz0Mjt+aMv9seQBfoJzz9nd8YW05GuB4KP4=;
+        b=byc6vYPDZvu+iuG3FZ7LWYeIggSvJNcpnUIBmmqPKWbUaVdEFqHG65cQRX+unHMnb7
+         O+pYY20v7lGF/5y9kNef+ohQyV4uh7QnX6CbdLGrSFGv448+Uxu8PJU9+uFD5NDoCWjF
+         N/lQwQvO0//kRkJA7zS17LVue1JuLArMcyuMxNLdeP7I+DbjOU6gU2tVBP6QgKcaANKc
+         t6bdYoeusWTRS7I4DX7wQK94QgMmOq06GThlH0eta70cNBksIk61lugSNtzyL/OGE20N
+         cTgt6IxNrEe57bYBu0U3ZoGaDd/wJ+ffOoqFQemKQaTSXDQaqXZfT7dK/m+rzJc847hm
+         oeww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689368950; x=1689973750;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XsdnU0b3Xz0Mjt+aMv9seQBfoJzz9nd8YW05GuB4KP4=;
+        b=LOKS9PbCPnLjFEbhXRPh9pJHcJJIRgDBKXLEEB9M7k7xyDuiR389C5IgE3WuZmJt9l
+         +tDws/UTzxnSi/Id7fjFsomCdHuyoDVR+qbjU73bo7AY2Ns2Q+Sqtc/QM7Pv2NOO0uHu
+         HuzlM3jXDsKTYn+HvIV8Zn7rAyvgT+xDD/HUeY1NpfhDPuiJkvdC7OZw8Gm5Of0WlQh4
+         f5WFw1X+7U+oxDNruOGPeIiJItkCO6agjG/n638SlsnhGpR++5Hbd6mKfJup1B1y5pWI
+         tWdxkJwlc8RqtKJ0UdvAMmjZKj86jTI+ZV0jeQWVQw3cjgPPMPuLHiH/axLf2AnAqNPh
+         WGxg==
+X-Gm-Message-State: ABy/qLavtS6H6Mgx08KvU1nJv51XfQZJqxG6XbDOdEXbfo9KPPsYHqtE
+        XsIJn+QYbhCwPWtpH3UN4T0Ad7SxEB/R9+gILs4=
+X-Google-Smtp-Source: APBJJlF/O/P26+uPSb0iX05TbtDl/PwANwRiKVzvMH3q+qOWyIHb5Q4YAV+YZ5wEwYTBmFqJWhCLGQ==
+X-Received: by 2002:a17:906:1d8:b0:993:d7c4:1a78 with SMTP id 24-20020a17090601d800b00993d7c41a78mr4532830ejj.10.1689368950525;
+        Fri, 14 Jul 2023 14:09:10 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id h14-20020a170906110e00b009829dc0f2a0sm5950050eja.111.2023.07.14.14.09.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jul 2023 14:09:10 -0700 (PDT)
+References: <20230711072353.200873-1-nmi@metaspace.dk>
+ <20230711072353.200873-2-nmi@metaspace.dk>
+ <ZK6/0TKxe2q4/hi9@ovpn-8-25.pek2.redhat.com>
+User-agent: mu4e 1.10.5; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>, gost.dev@samsung.com,
+        open list <linux-kernel@vger.kernel.org>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Johannes Thumshirn <jth@kernel.org>
+Subject: Re: [PATCH v8 1/2] ublk: add helper to check if device supports
+ user copy
+Date:   Fri, 14 Jul 2023 23:08:05 +0200
+In-reply-to: <ZK6/0TKxe2q4/hi9@ovpn-8-25.pek2.redhat.com>
+Message-ID: <87wmz2w68n.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <309cfd62a474a7e93be6a0886a3d5aa8.paul@paul-moore.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 08, 2023 at 12:23:01AM -0400, Paul Moore wrote:
-> On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
-> > 
-> > IPE must have a centralized function to evaluate incoming callers
-> > against IPE's policy. This iteration of the policy for against the rules
-> > for that specific caller is known as the evaluation loop.
-> 
-> Can you rewrite that second sentence, it reads a bit awkward and I'm
-> unclear as to the meaning.
-> 
-Sure, it is indeed not clear, I might rewrite the whole message in the next version.
 
-> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> > ---
-> >  security/ipe/Makefile |  1 +
-> >  security/ipe/eval.c   | 94 +++++++++++++++++++++++++++++++++++++++++++
-> >  security/ipe/eval.h   | 25 ++++++++++++
-> >  3 files changed, 120 insertions(+)
-> >  create mode 100644 security/ipe/eval.c
-> >  create mode 100644 security/ipe/eval.h
-> 
-> ...
-> 
-> > diff --git a/security/ipe/eval.c b/security/ipe/eval.c
-> > new file mode 100644
-> > index 000000000000..59144b2ecdda
-> > --- /dev/null
-> > +++ b/security/ipe/eval.c
-> > @@ -0,0 +1,94 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (C) Microsoft Corporation. All rights reserved.
-> > + */
-> > +
-> > +#include <linux/fs.h>
-> > +#include <linux/types.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/file.h>
-> > +#include <linux/sched.h>
-> > +#include <linux/rcupdate.h>
-> > +
-> > +#include "ipe.h"
-> > +#include "eval.h"
-> > +#include "hooks.h"
-> 
-> There is no "hooks.h" at this point in the patchset.
-> 
-> In order for 'git bisect' to remain useful (and it can be a very handy
-> tool), we need to ensure that each point in the patchset compiles
-> cleanly.
-> 
-Sorry for the mistake here, I will avoid this kind of problems in the future.
+Ming Lei <ming.lei@redhat.com> writes:
 
-> > +#include "policy.h"
-> > +
-> > +struct ipe_policy __rcu *ipe_active_policy;
-> > +
-> > +/**
-> > + * evaluate_property - Analyze @ctx against a property.
-> > + * @ctx: Supplies a pointer to the context to be evaluated.
-> > + * @p: Supplies a pointer to the property to be evaluated.
-> > + *
-> > + * Return:
-> > + * * true	- The current @ctx match the @p
-> > + * * false	- The current @ctx doesn't match the @p
-> > + */
-> > +static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
-> > +			      struct ipe_prop *p)
-> > +{
-> > +	return false;
-> > +}
-> > +
-> > +/**
-> > + * ipe_evaluate_event - Analyze @ctx against the current active policy.
-> > + * @ctx: Supplies a pointer to the context to be evaluated.
-> > + *
-> > + * This is the loop where all policy evaluation happens against IPE policy.
-> > + *
-> > + * Return:
-> > + * * 0		- OK
-> > + * * -EACCES	- @ctx did not pass evaluation.
-> > + * * !0		- Error
-> > + */
-> > +int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
-> > +{
-> > +	int rc = 0;
-> > +	bool match = false;
-> > +	enum ipe_action_type action;
-> > +	struct ipe_policy *pol = NULL;
-> > +	const struct ipe_rule *rule = NULL;
-> > +	const struct ipe_op_table *rules = NULL;
-> > +	struct ipe_prop *prop = NULL;
-> > +
-> > +	rcu_read_lock();
-> > +
-> > +	pol = rcu_dereference(ipe_active_policy);
-> > +	if (!pol) {
-> > +		rcu_read_unlock();
-> > +		return 0;
-> > +	}
-> > +
-> > +	if (ctx->op == __IPE_OP_INVALID) {
-> > +		action = pol->parsed->global_default_action;
-> > +		goto eval;
-> 
-> It looks like you are missing a rcu_read_unlock() in this case.
-> 
-Thanks for pointing that out. I will add the unlock. 
-> Also, given how simplistic the evaluation is in this case, why not
-> just do it here, saving the assignment, jump, etc.?
-> 
->   if (ctx->op == INVALID) {
->     rcu_read_unlock()
->     if (global_action == DENY)
->       return -EACCES;
->     return 0;
->   }
-> 
-The jump is actually for auditing the decision in the next patch, while
-it does make more sense to not jump when the auditing is not introduced. 
-I will make the return here then switch to jump in the auditing patch.
+> On Tue, Jul 11, 2023 at 09:23:52AM +0200, Andreas Hindborg wrote:
+>> From: Andreas Hindborg <a.hindborg@samsung.com>
+>> 
+>> This will be used by ublk zoned storage support.
+>> 
+>> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+>> ---
+>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+>
+> BTW, both Damien and I have reviewed this one, and you can put the
+> reviewed-by tag in patch.
 
-> > +	}
-> > +
-> > +	rules = &pol->parsed->rules[ctx->op];
-> > +
-> > +	list_for_each_entry(rule, &rules->rules, next) {
-> > +		match = true;
-> > +
-> > +		list_for_each_entry(prop, &rule->props, next)
-> > +			match = match && evaluate_property(ctx, prop);
-> 
-> Why not break from this loop once evaluate_property() returns false?
-> 
-Yes we can break when one property evals to false, thanks for the advice.
+Argh, I knew there was something I forgot for v9. Sorry.
 
-> > +
-> > +		if (match)
-> > +			break;
-> > +	}
-> > +
-> > +	if (match)
-> > +		action = rule->action;
-> > +	else if (rules->default_action != __IPE_ACTION_INVALID)
-> > +		action = rules->default_action;
-> > +	else
-> > +		action = pol->parsed->global_default_action;
-> > +
-> > +	rcu_read_unlock();
-> > +eval:
-> > +	if (action == __IPE_ACTION_DENY)
-> > +		rc = -EACCES;
-> > +
-> > +	return rc;
-> 
-> This can just be 'return 0;' right?
-> 
-For this patch, if we just return on error, then yes the end of the function
-could just return 0. But when auditing(audit rc) and permissive switch(overwrite rc)
-are introduced then return on error might not be the clean way. So I kept
-the rc variable in this patch. I can change the style in this patch then
-switch to use rc when auditing and permissive switch are introduced.
+BR Andreas
 
--Fan
-
-> > +}
-> 
-> --
-> paul-moore.com
