@@ -2,209 +2,157 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B7BC001DE
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 21:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC07EB64DC
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 22:40:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbjGNVrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jul 2023 17:47:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49082 "EHLO
+        id S229808AbjGNWkH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jul 2023 18:40:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbjGNVrG (ORCPT
+        with ESMTP id S229494AbjGNWkG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2023 17:47:06 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 514B335A8;
-        Fri, 14 Jul 2023 14:47:03 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id B253220ABD64; Fri, 14 Jul 2023 14:47:02 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B253220ABD64
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1689371222;
-        bh=217tuDpVmoLrkkGoJqoyVlAua3WGHBs8gt+hDtlnBd4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Ussi8JyOA+xtDdpRzNY9B5oZVy3yuTvi/fnM4AOv1VV3uHn6NlSKNB5+9JxM4ruvn
-         jo/kQBU8khVpAFaOcEwhkjZfkxwjHKzZc/B/xDo9kfU1d0QD0MrsJe2TZ2nrmWxgmf
-         mjNf6BZjR3nnivTzw6I8BsijyiefH+c8Evc1/DS4=
-Date:   Fri, 14 Jul 2023 14:47:02 -0700
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, audit@vger.kernel.org,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH RFC v10 4/17] ipe: add LSM hooks on execution and kernel
-  read
-Message-ID: <20230714214702.GC15267@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1687986571-16823-5-git-send-email-wufan@linux.microsoft.com>
- <cbe877b3905033d2b8c7c92e6d0cad4e.paul@paul-moore.com>
+        Fri, 14 Jul 2023 18:40:06 -0400
+Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF52E30DC
+        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 15:40:04 -0700 (PDT)
+Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-3a426e7058cso4231432b6e.3
+        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 15:40:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689374404; x=1691966404;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=llNDf15h0Ng/lAbxlfYqhFIc9QU2naRT7j7be5rEF/4=;
+        b=N8Yc8ayHvPi/jCBLEm7vNUU6yn2AVsY7bOvN4Gud/MVbT9HQhAxM5ppN7hQK+kWf1G
+         F6Ma/TlkzxfjR7MXvlaDqCL6snIiiP9A+RJZWEJITQ1CIE6bftdcCGQCDGp1cPtI+ybt
+         Sizp31GXAY7QXXtRmdCPwwMyieAcJt4YuZxCcme8vrQcbxOWwAl0uQUkvM1teGO+1JYl
+         VhhbidynWeiOl7uTsE3m8KGS3LHnsdHPOWLhVC+n0FhOT39zqESBiZqjqkkKnR+KiycE
+         3vDHYtuJluT5SITFWiGXIvYoMxtJS9jZAKj8g1xkGrHR+SfMOAu180tQ9YaHTRrTacJW
+         TbHQ==
+X-Gm-Message-State: ABy/qLYxTwykCe+mTporCYqrb8VpfTTSlGsupv5r3p9NKx7CZ0SP2Xm+
+        kXFEU8KBi7uXKq3uMMvZvdmlr5C69qSBxPtTmqfNStiIoHeT
+X-Google-Smtp-Source: APBJJlFQ3P0JAhTaITjvkcNUEPadRNV7A2PcsUDTELFmB8eD6J0bNviY9pHIzqugKPl0xKcuwixpSGxXHUZAjhorsU/I8DkoCtUD
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cbe877b3905033d2b8c7c92e6d0cad4e.paul@paul-moore.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Received: by 2002:a05:6808:2190:b0:3a4:1082:9e5 with SMTP id
+ be16-20020a056808219000b003a4108209e5mr7585902oib.2.1689374404196; Fri, 14
+ Jul 2023 15:40:04 -0700 (PDT)
+Date:   Fri, 14 Jul 2023 15:40:04 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000413f1506007a2183@google.com>
+Subject: [syzbot] [block?] WARNING in invalidate_drive
+From:   syzbot <syzbot+3254e329ee1f252d4915@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 08, 2023 at 12:23:02AM -0400, Paul Moore wrote:
-> On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
-> > 
-> > IPE's initial goal is to control both execution and the loading of
-> > kernel modules based on the system's definition of trust. It
-> > accomplishes this by plugging into the security hooks for
-> > bprm_check_security, file_mprotect, mmap_file, kernel_load_data,
-> > and kernel_read_data.
-> > 
-> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> > ---
-> >  security/ipe/eval.c  |  14 ++++
-> >  security/ipe/eval.h  |   1 +
-> >  security/ipe/hooks.c | 182 +++++++++++++++++++++++++++++++++++++++++++
-> >  security/ipe/hooks.h |  25 ++++++
-> >  security/ipe/ipe.c   |   6 ++
-> >  5 files changed, 228 insertions(+)
-> >  create mode 100644 security/ipe/hooks.c
-> >  create mode 100644 security/ipe/hooks.h
-> 
-> Adding the 'hooks.h' header allows for much of code added in the
-> previous patches to finally compile and there are a number of errors,
-> too many to include here.  Please fix those and ensure that each
-> point in the patchset compiles cleanly.
-> 
-Sorry again for the mistake I made here.
+Hello,
 
-> > diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
-> > new file mode 100644
-> > index 000000000000..d896a5a474bc
-> > --- /dev/null
-> > +++ b/security/ipe/hooks.c
-> > @@ -0,0 +1,182 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (C) Microsoft Corporation. All rights reserved.
-> > + */
-> > +
-> > +#include <linux/fs.h>
-> > +#include <linux/types.h>
-> > +#include <linux/binfmts.h>
-> > +#include <linux/mman.h>
-> > +
-> > +#include "ipe.h"
-> > +#include "hooks.h"
-> > +#include "eval.h"
-> > +
-> > +/**
-> > + * ipe_bprm_check_security - ipe security hook function for bprm check.
-> > + * @bprm: Supplies a pointer to a linux_binprm structure to source the file
-> > + *	  being evaluated.
-> > + *
-> > + * This LSM hook is called when a binary is loaded through the exec
-> > + * family of system calls.
-> > + * Return:
-> > + * *0	- OK
-> > + * *!0	- Error
-> > + */
-> > +int ipe_bprm_check_security(struct linux_binprm *bprm)
-> > +{
-> > +	struct ipe_eval_ctx ctx = { 0 };
-> 
-> It's up to you, but when you have a fequently used initializer like
-> this it is often wrapped in a macro:
-> 
->   #define IPE_EVAL_CTX_INIT ((struct ipe_eval_ctx){ 0 })
-> 
-> ... so that you can write the variable decalaration like this:
-> 
->   struct ipe_eval_ctx ctx = IPE_EVAL_CTX_INIT;
-> 
-> It's not a requirement, it just tends to look a little cleaner and
-> should you ever need to change the initializer it makes your life
-> a lot easier.
-> 
-Yes I agree this looks way better, I will update all the context init.
+syzbot found the following issue on:
 
-> > +	build_eval_ctx(&ctx, bprm->file, __IPE_OP_EXEC);
-> > +	return ipe_evaluate_event(&ctx);
-> > +}
-> > +
-> > +/**
-> > + * ipe_mmap_file - ipe security hook function for mmap check.
-> > + * @f: File being mmap'd. Can be NULL in the case of anonymous memory.
-> > + * @reqprot: The requested protection on the mmap, passed from usermode.
-> > + * @prot: The effective protection on the mmap, resolved from reqprot and
-> > + *	  system configuration.
-> > + * @flags: Unused.
-> > + *
-> > + * This hook is called when a file is loaded through the mmap
-> > + * family of system calls.
-> > + *
-> > + * Return:
-> > + * * 0	- OK
-> > + * * !0	- Error
-> > + */
-> > +int ipe_mmap_file(struct file *f, unsigned long reqprot, unsigned long prot,
-> > +		  unsigned long flags)
-> 
-> Since @reqprot is always going to be unused in this function, you
-> might want to mark it as such to help prevent compiler
-> warnings/errors, for example:
-> 
->  unsigned long reqprot __always_unused
-> 
-Thanks for telling me this useful mark! I will add it.
+HEAD commit:    3f01e9fed845 Merge tag 'linux-watchdog-6.5-rc2' of git://w..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13914acca80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=150188feee7071a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=3254e329ee1f252d4915
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+userspace arch: i386
 
--Fan
-> > +{
-> > +	struct ipe_eval_ctx ctx = { 0 };
-> > +
-> > +	if (prot & PROT_EXEC) {
-> > +		build_eval_ctx(&ctx, f, __IPE_OP_EXEC);
-> > +		return ipe_evaluate_event(&ctx);
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +/**
-> > + * ipe_file_mprotect - ipe security hook function for mprotect check.
-> > + * @vma: Existing virtual memory area created by mmap or similar.
-> > + * @reqprot: The requested protection on the mmap, passed from usermode.
-> > + * @prot: The effective protection on the mmap, resolved from reqprot and
-> > + *	  system configuration.
-> > + *
-> > + * This LSM hook is called when a mmap'd region of memory is changing
-> > + * its protections via mprotect.
-> > + *
-> > + * Return:
-> > + * * 0	- OK
-> > + * * !0	- Error
-> > + */
-> > +int ipe_file_mprotect(struct vm_area_struct *vma, unsigned long reqprot,
-> 
-> See my comment above about @reqprot.
-> 
-> > +		      unsigned long prot)
-> > +{
-> > +	struct ipe_eval_ctx ctx = { 0 };
-> > +
-> > +	/* Already Executable */
-> > +	if (vma->vm_flags & VM_EXEC)
-> > +		return 0;
-> > +
-> > +	if (prot & PROT_EXEC) {
-> > +		build_eval_ctx(&ctx, vma->vm_file, __IPE_OP_EXEC);
-> > +		return ipe_evaluate_event(&ctx);
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> 
-> --
-> paul-moore.com
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-3f01e9fe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ed16bd50e54f/vmlinux-3f01e9fe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2bda39f6b871/bzImage-3f01e9fe.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3254e329ee1f252d4915@syzkaller.appspotmail.com
+
+WARNING: CPU: 0 PID: 7350 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
+WARNING: CPU: 0 PID: 7350 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
+WARNING: CPU: 0 PID: 7350 at drivers/block/floppy.c:999 invalidate_drive+0xf5/0x110 drivers/block/floppy.c:3217
+Modules linked in:
+CPU: 0 PID: 7350 Comm: syz-executor.0 Not tainted 6.5.0-rc1-syzkaller-00006-g3f01e9fed845 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
+RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
+RIP: 0010:invalidate_drive+0xf5/0x110 drivers/block/floppy.c:3217
+Code: 84 db 75 0a e8 0c 84 57 fc 31 c0 5b 5d c3 e8 02 84 57 fc 48 89 ef e8 ca e4 ff ff e8 f5 83 57 fc 31 c0 5b 5d c3 e8 eb 83 57 fc <0f> 0b eb 97 e8 92 b9 aa fc e9 29 ff ff ff 66 66 2e 0f 1f 84 00 00
+RSP: 0018:ffffc900289efa20 EFLAGS: 00010216
+RAX: 000000000000073b RBX: 0000000000000001 RCX: ffffc9000d0d4000
+RDX: 0000000000040000 RSI: ffffffff852d5dd5 RDI: 0000000000000001
+RBP: ffff88801dd7e000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000249
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000008
+FS:  0000000000000000(0000) GS:ffff88802c600000(0063) knlGS:00000000f7f4fb40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: 00000000f7f46db0 CR3: 000000001c15c000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ fd_locked_ioctl+0xbaf/0x19f0 drivers/block/floppy.c:3508
+ fd_ioctl drivers/block/floppy.c:3576 [inline]
+ fd_compat_ioctl+0x8a8/0x1bd0 drivers/block/floppy.c:3890
+ compat_blkdev_ioctl+0x329/0x7d0 block/ioctl.c:677
+ __do_compat_sys_ioctl+0x25b/0x2b0 fs/ioctl.c:968
+ do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+ __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
+ do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:203
+ entry_SYSENTER_compat_after_hwframe+0x70/0x82
+RIP: 0023:0xf7f75579
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f7f4f5cc EFLAGS: 00000296 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000000249
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+----------------
+Code disassembly (best guess), 2 bytes skipped:
+   0:	10 06                	adc    %al,(%rsi)
+   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
+   6:	10 07                	adc    %al,(%rdi)
+   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+   c:	10 08                	adc    %cl,(%rax)
+   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+  1e:	00 51 52             	add    %dl,0x52(%rcx)
+  21:	55                   	push   %rbp
+  22:	89 e5                	mov    %esp,%ebp
+  24:	0f 34                	sysenter
+  26:	cd 80                	int    $0x80
+* 28:	5d                   	pop    %rbp <-- trapping instruction
+  29:	5a                   	pop    %rdx
+  2a:	59                   	pop    %rcx
+  2b:	c3                   	retq
+  2c:	90                   	nop
+  2d:	90                   	nop
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
