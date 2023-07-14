@@ -2,176 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C44CC001DE
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 19:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11535EB64DC
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jul 2023 19:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236491AbjGNTnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jul 2023 15:43:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45504 "EHLO
+        id S236374AbjGNTos (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jul 2023 15:44:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235997AbjGNTnS (ORCPT
+        with ESMTP id S229698AbjGNTos (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2023 15:43:18 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADD9B3A98
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 12:43:11 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id ca18e2360f4ac-7835bbeb6a0so16012639f.0
-        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 12:43:11 -0700 (PDT)
+        Fri, 14 Jul 2023 15:44:48 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32A02D57
+        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 12:44:47 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-780c89d1998so16013239f.1
+        for <linux-block@vger.kernel.org>; Fri, 14 Jul 2023 12:44:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689363791; x=1689968591;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689363887; x=1689968687;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oymtYFl7v7Qm5MJMHbCwpneRuMQ5D6lvTCH/yN2BJZg=;
-        b=RWmIaWvTEIC56P5GAVs4E29tMuLgmgmWBVmrBrUERFixXk1x6abitxgeysd0vOoV1H
-         yfgjp5/HyleS3En7EgAiKWax8xdfHxjz1W8JJkiqk0Tm5yNM03AIUjx5ej0HhD4A8sJ/
-         Su18lN42L4Z5BccLfkriteQa+BGju6zZHB+6pza+7OP8+rvy3bViglUuZIuaLlHNzIer
-         28nyYByNczC+NBmHT4nxHCShVWWMUhjMYfotDAwxAAucVD33D5Y83QEi8oa1s5nZ3R7o
-         xpw61VZVLcAT/vV3arvx1vU2I6Udfn07HbBWDPVt6l0Nc3wi6yUwUJUxy/utsvs/az+4
-         J0eg==
+        bh=veFKUMZBQrX/Dj8inbuI++veCSXQIqVt2O+DqAlAqSY=;
+        b=nI/ZAOQV+22/fvMKdASmAS2SLR9eTK2unZNTUpvZw/A/zJidy+4aCVns6AEKtElt0C
+         TI90FTvp67Dbr9Qp8foTg3k/whZFGH3wrHjcTpGaM+5A01LFuZnaMxuNqH+fvGUN+ftT
+         2Zg24dm1e2Zmn6JCnTLUZnM3si7Dy+ctAWpZP86X2l72fqt/Mj7pStO4ak6Bh85zmuXG
+         TtUPdpVwoQ9qT5vXxmRUs7+T+imGLj7dKZblJT6G9YRE03zswHcVrH5OjViWr/PSZJCc
+         qr6J7Ntj7aWafAKtoe9HYjXrtTpYbSJFsrvEn/cw3vxvOS0O5z2aEoQlfWwbdhKKoFIb
+         oHIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689363791; x=1689968591;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oymtYFl7v7Qm5MJMHbCwpneRuMQ5D6lvTCH/yN2BJZg=;
-        b=iEyQxSPtzfbNKcA5wh0DMcerZAeFtcMNPOhAdnK3nCM+XYM+aepkq/e92fHNuq9DSh
-         fpZDo/KPd5sUxaTRmL7VDy4PMgO3gQ/EfL67J8ysQ9tGOQf3y8R2N8D/BbjDVTwvv5D7
-         eVECKogCgdmgU78Mxk7z29FSRaU7GsXregerIvMabtrJdKmNURZ3Y0GbUT+LJ/WgM059
-         JVKnIJw80ByHWsva9Qp3xsinrw5z9quobjUaIqdCY4IgfzRUbFUwhIDNmofGNR4Jg/Rz
-         HRQlR8T9VY/cRbPbCKeXUAegh1KLPoXQLVlRpnDWjJ51LYHWYGKSoPz+95I5ckVv5h9E
-         WkXg==
-X-Gm-Message-State: ABy/qLZfBo/xudyxBjKazGtYggrc9vq0GI5Bc0C8lzYQLdXUFxgPsStI
-        FaazLA7ocFc40QOs2pvnw/8Idg==
-X-Google-Smtp-Source: APBJJlG4MqTXIB5SGTFXI4aYkHv2sQ/qw1OU/nm4E80qg0sA/FaL3n+UHtsFBKU5KATdM0dxsgNJkg==
-X-Received: by 2002:a05:6602:164e:b0:783:6e76:6bc7 with SMTP id y14-20020a056602164e00b007836e766bc7mr176483iow.2.1689363791018;
-        Fri, 14 Jul 2023 12:43:11 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id l8-20020a02cd88000000b0042036f06b24sm2756941jap.163.2023.07.14.12.43.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jul 2023 12:43:10 -0700 (PDT)
-Message-ID: <cdb24723-26a4-3634-024f-239f380db6bf@kernel.dk>
-Date:   Fri, 14 Jul 2023 13:43:09 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1689363887; x=1689968687;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=veFKUMZBQrX/Dj8inbuI++veCSXQIqVt2O+DqAlAqSY=;
+        b=iwtz1iVfWXR+5F1Vd2fOMTH4QeFz654qkoHOp8u+bxL6linryhtphXJgPdR37WSGmw
+         PNIW3H4O6oy8wcCLtJZ9gaJH3a0b42kcM905KPCRKdZuV0H0fxCOvEzSFRWUa9xZgB0T
+         6uZlw+73Fj1gFd9VVFPWhH7twizWCOu8D82aUrSL46OloBluJX3u8YVoygxE6x+RPY8E
+         2EKKfw5tqDYhn6x+cvLTyOhMIheCdtHKPvcHAmYUZt5L/DDOMfn0vwVLb4l8JlhwUFLM
+         yzqNymNYf+Z9M2lrlUI9hjmf3Ii5j7o8sUVDLipxD7tMpxKWBaUmCvKKlHRYwDkNqTSG
+         K4xA==
+X-Gm-Message-State: ABy/qLasYh4PjhVY4kYZXpmBrAT0HSFqP6AimdPnixG7BXpSC16inMtR
+        2pGvh/vcfVRbqyaiMu5VjD9s8fgykTtYRkRFg44=
+X-Google-Smtp-Source: APBJJlG27kU39KKaVWGTaq5CRYEHuODaHBkyLwAjTzymnofWUm93qrBD6npjvYvi1P7RfNjMUISuhQ==
+X-Received: by 2002:a05:6602:2c93:b0:780:d6ef:160 with SMTP id i19-20020a0566022c9300b00780d6ef0160mr197778iow.1.1689363887060;
+        Fri, 14 Jul 2023 12:44:47 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id o27-20020a056602125b00b00777b94e8efasm2880017iou.18.2023.07.14.12.44.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jul 2023 12:44:46 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.5-rc2
-Content-Type: text/plain; charset=UTF-8
+To:     Christoph Hellwig <hch@infradead.org>,
+        Ross Lagerwall <ross.lagerwall@citrix.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20230714101106.3635611-1-ross.lagerwall@citrix.com>
+References: <20230714101106.3635611-1-ross.lagerwall@citrix.com>
+Subject: Re: [PATCH v2] blk-mq: Fix stall due to recursive flush plug
+Message-Id: <168936388618.743920.17372805107217904539.b4-ty@kernel.dk>
+Date:   Fri, 14 Jul 2023 13:44:46 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-099c9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
 
-Fixes for the block area for the 6.5 kernel release. This pull request
-contains:
+On Fri, 14 Jul 2023 11:11:06 +0100, Ross Lagerwall wrote:
+> We have seen rare IO stalls as follows:
+> 
+> * blk_mq_plug_issue_direct() is entered with an mq_list containing two
+> requests.
+> * For the first request, it sets last == false and enters the driver's
+> queue_rq callback.
+> * The driver queue_rq callback indirectly calls schedule() which calls
+> blk_flush_plug(). This may happen if the driver has the
+> BLK_MQ_F_BLOCKING flag set and is allowed to sleep in ->queue_rq.
+> * blk_flush_plug() handles the remaining request in the mq_list. mq_list
+> is now empty.
+> * The original call to queue_rq resumes (with last == false).
+> * The loop in blk_mq_plug_issue_direct() terminates because there are no
+> remaining requests in mq_list.
+> 
+> [...]
 
-- NVMe pull request via Keith
-	- Don't require quirk to use duplicate namespace identifiers
-          (Christoph, Sagi)
-	- One more BOGUS_NID quirk (Pankaj)
-	- IO timeout and error hanlding fixes for PCI (Keith)
-	- Enhanced metadata format mask fix (Ankit)
-	- Association race condition fix for fibre channel (Michael)
-	- Correct debugfs error checks (Minjie)
-	- Use PAGE_SECTORS_SHIFT where needed (Damien)
-	- Reduce kernel logs for legacy nguid attribute (Keith)
-	- Use correct dma direction when unmapping metadata (Ming)
+Applied, thanks!
 
-- Fix for a flush handling regression in this release (Christoph)
+[1/1] blk-mq: Fix stall due to recursive flush plug
+      commit: 70904263512a74a3b8941dd9e6e515ca6fc57821
 
-- Fix for batched request time stamping (Chengming)
-
-- Fix for a regression in the mq-deadline position calculation (Bart)
-
-- Lockdep fix for blk-crypto (Eric)
-
-- Fix for a regression in the Amiga partition handling changes (Michael)
-
-Please pull!
-
-
-The following changes since commit 6cd06ab12d1afdab3847e7981f301bd0404aaa5c:
-
-  gup: make the stack expansion warning a bit more targeted (2023-07-05 09:33:31 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.5-2023-07-14
-
-for you to fetch changes up to 9f87fc4d72f52b26ac3e19df5e4584227fe6740c:
-
-  block: queue data commands from the flush state machine at the head (2023-07-14 08:42:58 -0600)
-
-----------------------------------------------------------------
-block-6.5-2023-07-14
-
-----------------------------------------------------------------
-Ankit Kumar (1):
-      nvme: fix the NVME_ID_NS_NVM_STS_MASK definition
-
-Bart Van Assche (1):
-      block/mq-deadline: Fix a bug in deadline_from_pos()
-
-Chengming Zhou (1):
-      blk-mq: fix start_time_ns and alloc_time_ns for pre-allocated rq
-
-Christoph Hellwig (2):
-      nvme: don't reject probe due to duplicate IDs for single-ported PCIe devices
-      block: queue data commands from the flush state machine at the head
-
-Damien Le Moal (1):
-      nvmet: use PAGE_SECTORS_SHIFT
-
-Eric Biggers (1):
-      blk-crypto: use dynamic lock class for blk_crypto_profile::lock
-
-Jens Axboe (2):
-      block: remove dead struc request->completion_data field
-      Merge tag 'nvme-6.5-2023-07-13' of git://git.infradead.org/nvme into block-6.5
-
-Keith Busch (2):
-      nvme: warn only once for legacy uuid attribute
-      nvme: ensure disabling pairs with unquiesce
-
-Michael Liang (2):
-      nvme-fc: return non-zero status code when fails to create association
-      nvme-fc: fix race between error recovery and creating association
-
-Michael Schmitz (1):
-      block/partition: fix signedness issue for Amiga partitions
-
-Ming Lei (1):
-      nvme-pci: fix DMA direction of unmapping integrity data
-
-Minjie Du (1):
-      nvme: fix parameter check in nvme_fault_inject_init()
-
-Pankaj Raghav (1):
-      nvme: add BOGUS_NID quirk for Samsung SM953
-
- block/blk-crypto-profile.c         | 12 ++++++++--
- block/blk-flush.c                  |  2 +-
- block/blk-mq.c                     | 47 ++++++++++++++++++++++++--------------
- block/mq-deadline.c                |  2 +-
- block/partitions/amiga.c           |  2 +-
- drivers/nvme/host/core.c           | 36 ++++++++++++++++++++++++++---
- drivers/nvme/host/fault_inject.c   |  2 +-
- drivers/nvme/host/fc.c             | 37 ++++++++++++++++++++++++------
- drivers/nvme/host/pci.c            | 29 +++++++++++++++--------
- drivers/nvme/host/sysfs.c          |  2 +-
- drivers/nvme/target/loop.c         |  2 +-
- drivers/nvme/target/passthru.c     |  4 ++--
- include/linux/blk-crypto-profile.h |  1 +
- include/linux/blk-mq.h             |  6 ++---
- include/linux/nvme.h               |  2 +-
- 15 files changed, 136 insertions(+), 50 deletions(-)
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
