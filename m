@@ -2,142 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F119CC001B0
-	for <linux-block@archiver.kernel.org>; Sat, 15 Jul 2023 04:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EF8C0015E
+	for <linux-block@archiver.kernel.org>; Sat, 15 Jul 2023 15:50:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbjGOEAb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Jul 2023 00:00:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41550 "EHLO
+        id S229632AbjGOPug (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Jul 2023 11:50:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbjGOEAa (ORCPT
+        with ESMTP id S229441AbjGOPug (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Jul 2023 00:00:30 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 891473588;
-        Fri, 14 Jul 2023 21:00:29 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 1139721C4693; Fri, 14 Jul 2023 21:00:29 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1139721C4693
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1689393629;
-        bh=T+rS0NBXQ8rmZa6Pv6GYhkR4sFygUmWyBqsbSsfgTyA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cDoM/dayOIqXlO5WYELh4VdXzsOuz+zQzAmUzPjeRkz74duW+/HbrgjuR4td7uHih
-         PVSGFalEqGe64dK1ZYcaRiC6fsORYlkGjN4De35/Ao89rB7a04pqDfuE6QFAViLyWy
-         hli//fs1rJYxaYI1i1Q0crJXB84OXHw+TuLF/L9s=
-Date:   Fri, 14 Jul 2023 21:00:29 -0700
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, audit@vger.kernel.org,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [PATCH RFC v10 9/17] ipe: add permissive toggle
-Message-ID: <20230715040029.GH15267@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1687986571-16823-10-git-send-email-wufan@linux.microsoft.com>
- <85af33c02638ebb501b40fd0f3785b12.paul@paul-moore.com>
+        Sat, 15 Jul 2023 11:50:36 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F99C2691
+        for <linux-block@vger.kernel.org>; Sat, 15 Jul 2023 08:50:35 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-682b1768a0bso749613b3a.0
+        for <linux-block@vger.kernel.org>; Sat, 15 Jul 2023 08:50:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689436235; x=1692028235;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=viRF83/9E8yMhnLxGklSJSnZzAPuw2fcP7Wt8WOYpf0=;
+        b=Qq7Df1Jjn+F0xZPWGHz38dvOGuQyt0QYLLfEcr9IPQNwaoEeVwUF2M2bYVZ/Ov6wBp
+         dmQwuh0+lOvzkNgOAgDHB5+7GlS24+pP6r0miMLPOKjdEww958jC1chGZo9KVmn8aaYy
+         atzN1uhDR6HXyPRvnV4K3TAZbwXSGyK+X8/rJ809Gv4Grb7yD5mDqNMxY4xd9Rh3Z+z0
+         f67lQPUPzu5rG922aYXqeAtp4K3gL7VYruq6I7g8V2uOYWHj/rnal411+J6XZ+7RRkw9
+         z6vdGDMS5ZH7/0R26KxGbTNIrwxzOVR9cqidMmW93ugN9qiY9RsY7+8jsCzIH4QnSx6/
+         ZbeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689436235; x=1692028235;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=viRF83/9E8yMhnLxGklSJSnZzAPuw2fcP7Wt8WOYpf0=;
+        b=gotozo7AEU09LupwXhf/qe2FaKA2Jnt5jlc3VjHGzpQQTHpJ/O23qO9i8+DWoW9DBm
+         aXZHIuSZaSPuaLB6xOwExvJtyMYC1MS/BHnh4rwq874WhqDJOP0RxIT8mjEZoKdxXlye
+         99aEWhwcpyhJUzE9TGd9l0cfMnDTyyvArD95BwE4eZ2gtXJJmNPFvu3MdshRgacf3C6n
+         eG11rHrWYs5mnu3Axsr6uHU0hJGuR5etqBjEozuEywtcv3SlRDSVDpOAJUeyuCMAY91v
+         f65YOySrm1436hN6SiXfXkzruSgIw7cVgAzPWdRjO3oIxE3tA1Wi5clTVldmhkxsH2Vl
+         4Zog==
+X-Gm-Message-State: ABy/qLYk759b06yBxuLL/OqEHUL5O+Q/ge4Dzp3ZSoEcvaQPjRvnycX4
+        ZBze88RZQF0PIuWQwpCh6aWJ9oO0+iHbed9hzM8=
+X-Google-Smtp-Source: APBJJlHqtmXr2msJpXcbmI1N7JaX9U47XULXWgKOJ8PwpoWSnEEiuick4/e02lD4ykQyy5IKL4An9A==
+X-Received: by 2002:a17:902:c945:b0:1b1:9272:55e2 with SMTP id i5-20020a170902c94500b001b1927255e2mr2673250pla.3.1689436234708;
+        Sat, 15 Jul 2023 08:50:34 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id n13-20020a17090a928d00b00262d9b4b527sm2604748pjo.52.2023.07.15.08.50.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 15 Jul 2023 08:50:33 -0700 (PDT)
+Message-ID: <631beb86-7bb2-29e7-44a1-515bd0dd9571@kernel.dk>
+Date:   Sat, 15 Jul 2023 09:50:32 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <85af33c02638ebb501b40fd0f3785b12.paul@paul-moore.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: don't allow enabling a write back cache on devices that don't
+ support it
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20230707094239.107968-1-hch@lst.de>
+ <20230713134303.GA25950@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230713134303.GA25950@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 08, 2023 at 12:23:06AM -0400, Paul Moore wrote:
-> On Jun 28, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
-> > 
-> > IPE, like SELinux, supports a permissive mode. This mode allows policy
-> > authors to test and evaluate IPE policy without it effecting their
-> > programs. When the mode is changed, a 1404 AUDIT_MAC_STATUS
-> > be reported.
-> > 
-> > This patch adds the following audit records:
-> > 
-> >     audit: MAC_STATUS enforcing=0 old_enforcing=1 auid=4294967295
-> >       ses=4294967295 enabled=1 old-enabled=1 lsm=ipe res=1
-> >     audit: MAC_STATUS enforcing=1 old_enforcing=0 auid=4294967295
-> >       ses=4294967295 enabled=1 old-enabled=1 lsm=ipe res=1
-> > 
-> > The audit record only emit when the value from the user input is
-> > different from the current enforce value.
-> > 
-> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> > ---
-> >  security/ipe/audit.c | 22 ++++++++++++++
-> >  security/ipe/audit.h |  1 +
-> >  security/ipe/eval.c  |  9 ++++++
-> >  security/ipe/eval.h  |  1 +
-> >  security/ipe/fs.c    | 69 ++++++++++++++++++++++++++++++++++++++++++++
-> >  5 files changed, 102 insertions(+)
-> 
-> ...
-> 
-> > diff --git a/security/ipe/fs.c b/security/ipe/fs.c
-> > index 6bd2aa84831b..1761d39e4d04 100644
-> > --- a/security/ipe/fs.c
-> > +++ b/security/ipe/fs.c
-> > @@ -16,6 +16,7 @@ static struct dentry *np __ro_after_init;
-> >  static struct dentry *root __ro_after_init;
-> >  struct dentry *policy_root __ro_after_init;
-> >  static struct dentry *audit_node __ro_after_init;
-> > +static struct dentry *enforce_node __ro_after_init;
-> >  
-> >  /**
-> >   * setaudit - Write handler for the securityfs node, "ipe/success_audit"
-> > @@ -68,6 +69,61 @@ static ssize_t getaudit(struct file *f, char __user *data,
-> >  	return simple_read_from_buffer(data, len, offset, result, 1);
-> >  }
-> >  
-> > +/**
-> > + * setenforce - Write handler for the securityfs node, "ipe/enforce"
-> > + * @f: Supplies a file structure representing the securityfs node.
-> > + * @data: Supplies a buffer passed to the write syscall.
-> > + * @len: Supplies the length of @data.
-> > + * @offset: unused.
-> > + *
-> > + * Return:
-> > + * * >0	- Success, Length of buffer written
-> > + * * <0	- Error
-> > + */
-> > +static ssize_t setenforce(struct file *f, const char __user *data,
-> > +			  size_t len, loff_t *offset)
-> > +{
-> > +	int rc = 0;
-> > +	bool new_value, old_value;
-> > +
-> > +	if (!file_ns_capable(f, &init_user_ns, CAP_MAC_ADMIN))
-> > +		return -EPERM;
-> > +
-> > +	old_value = READ_ONCE(enforce);
-> > +	new_value = old_value;
-> 
-> Why set @new_value equal to @old_value here?
-> 
-Sorry this mistake is the same as the one for audit switch. 
-kstrtobool_from_user will return error if new_value is not set,
-I will remove the above line.
+On 7/13/23 7:43?AM, Christoph Hellwig wrote:
+> Jens, does this make sense to you?  Without this we can deliver
+> flush requests to drivers not supporting them, which is a bit nasty
+> even if it's not exploitable without root-equivalent access.
 
--Fan
-> > +	rc = kstrtobool_from_user(data, len, &new_value);
-> > +	if (rc)
-> > +		return rc;
-> > +
-> > +	if (new_value != old_value) {
-> > +		ipe_audit_enforce(new_value, old_value);
-> > +		WRITE_ONCE(enforce, new_value);
-> > +	}
-> > +
-> > +	return len;
-> > +}
-> 
-> --
-> paul-moore.com
+Yeah I think so, I'll queue it up for 6.6.
+
+-- 
+Jens Axboe
+
