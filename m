@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B0C2EB64DC
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 04:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 199D8C001DC
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 04:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230515AbjGQEBy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jul 2023 00:01:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50930 "EHLO
+        id S230214AbjGQEBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jul 2023 00:01:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230396AbjGQEBp (ORCPT
+        with ESMTP id S230406AbjGQEBv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jul 2023 00:01:45 -0400
-Received: from out-5.mta0.migadu.com (out-5.mta0.migadu.com [IPv6:2001:41d0:1004:224b::5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD5EE46
-        for <linux-block@vger.kernel.org>; Sun, 16 Jul 2023 21:01:43 -0700 (PDT)
+        Mon, 17 Jul 2023 00:01:51 -0400
+Received: from out-54.mta0.migadu.com (out-54.mta0.migadu.com [91.218.175.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7060E4E
+        for <linux-block@vger.kernel.org>; Sun, 16 Jul 2023 21:01:45 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689566501;
+        t=1689566504;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pFXxdBNitgVGeb7jBJprwYc2SHfcR9ZpmuG2rofSs+Y=;
-        b=aS4UxvHW74aNMeRLZvydKEju8QtYZX1rq7sUBQyrdw3ssRMah0U3Ms/FhSKdxr95m8UelC
-        vvhsbRDT0jZse4zpCCnho2PyeLd7OduBgtBI3TyYuXW/WKAQWkpD/lHoT66Hx8WAHO8ulG
-        zwfulZcJCFUrhltkkZkq/xBWyVjG3LQ=
+        bh=XhULMMQy5GVi2OU0Ad6+wHzsWWfxFQNSA1oYnzcztlU=;
+        b=lPOIEuBY1mU/WbJfF2rw4P8sXiym+C3cSXl0kNPZNRT90H6I/FvAu+UzHTynqe+69gD0KN
+        cHfJK3HBQQC6Gh+LnCz5YdMsNCcw114I2TMNiaHhJD7j2R5/C0+sBirkICF2EV7/U3WbSe
+        ghsduXyN6K2AawbReid6mQHSJ5U0dcM=
 From:   chengming.zhou@linux.dev
 To:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de,
         bvanassche@acm.org
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         zhouchengming@bytedance.com
-Subject: [PATCH v4 1/4] blk-mq: use percpu csd to remote complete instead of per-rq csd
-Date:   Mon, 17 Jul 2023 12:00:55 +0800
-Message-ID: <20230717040058.3993930-2-chengming.zhou@linux.dev>
+Subject: [PATCH v4 2/4] blk-flush: fix rq->flush.seq for post-flush requests
+Date:   Mon, 17 Jul 2023 12:00:56 +0800
+Message-ID: <20230717040058.3993930-3-chengming.zhou@linux.dev>
 In-Reply-To: <20230717040058.3993930-1-chengming.zhou@linux.dev>
 References: <20230717040058.3993930-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
@@ -45,80 +45,33 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chengming Zhou <zhouchengming@bytedance.com>
 
-If request need to be completed remotely, we insert it into percpu llist,
-and smp_call_function_single_async() if llist is empty previously.
+If the policy == (REQ_FSEQ_DATA | REQ_FSEQ_POSTFLUSH), it means that the
+data sequence and post-flush sequence need to be done for this request.
 
-We don't need to use per-rq csd, percpu csd is enough. And the size of
-struct request is decreased by 24 bytes.
+The rq->flush.seq should record what sequences have been done (or don't
+need to be done). So in this case, pre-flush doesn't need to be done,
+we should init rq->flush.seq to REQ_FSEQ_PREFLUSH not REQ_FSEQ_POSTFLUSH.
 
-This way is cleaner, and looks correct, given block softirq is guaranteed
-to be scheduled to consume the list if one new request is added to this
-percpu list, either smp_call_function_single_async() returns -EBUSY or 0.
-
+Fixes: 615939a2ae73 ("blk-mq: defer to the normal submission path for post-flush requests")
 Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c         | 12 ++++++------
- include/linux/blk-mq.h |  5 +----
- 2 files changed, 7 insertions(+), 10 deletions(-)
+ block/blk-flush.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d50b1d62a3d9..d98654869615 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -43,6 +43,7 @@
- #include "blk-ioprio.h"
- 
- static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
-+static DEFINE_PER_CPU(call_single_data_t, blk_cpu_csd);
- 
- static void blk_mq_insert_request(struct request *rq, blk_insert_t flags);
- static void blk_mq_request_bypass_insert(struct request *rq,
-@@ -1157,15 +1158,11 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
- 
- static void blk_mq_complete_send_ipi(struct request *rq)
- {
--	struct llist_head *list;
- 	unsigned int cpu;
- 
- 	cpu = rq->mq_ctx->cpu;
--	list = &per_cpu(blk_cpu_done, cpu);
--	if (llist_add(&rq->ipi_list, list)) {
--		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
--		smp_call_function_single_async(cpu, &rq->csd);
--	}
-+	if (llist_add(&rq->ipi_list, &per_cpu(blk_cpu_done, cpu)))
-+		smp_call_function_single_async(cpu, &per_cpu(blk_cpu_csd, cpu));
- }
- 
- static void blk_mq_raise_softirq(struct request *rq)
-@@ -4829,6 +4826,9 @@ static int __init blk_mq_init(void)
- 
- 	for_each_possible_cpu(i)
- 		init_llist_head(&per_cpu(blk_cpu_done, i));
-+	for_each_possible_cpu(i)
-+		INIT_CSD(&per_cpu(blk_cpu_csd, i),
-+			 __blk_mq_complete_request_remote, NULL);
- 	open_softirq(BLOCK_SOFTIRQ, blk_done_softirq);
- 
- 	cpuhp_setup_state_nocalls(CPUHP_BLOCK_SOFTIRQ_DEAD,
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index b96e00499f9e..67f810857634 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -182,10 +182,7 @@ struct request {
- 		rq_end_io_fn		*saved_end_io;
- 	} flush;
- 
--	union {
--		struct __call_single_data csd;
--		u64 fifo_time;
--	};
-+	u64 fifo_time;
- 
- 	/*
- 	 * completion callback.
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 8220517c2d67..fdc489e0ea16 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -443,7 +443,7 @@ bool blk_insert_flush(struct request *rq)
+ 		 * the post flush, and then just pass the command on.
+ 		 */
+ 		blk_rq_init_flush(rq);
+-		rq->flush.seq |= REQ_FSEQ_POSTFLUSH;
++		rq->flush.seq |= REQ_FSEQ_PREFLUSH;
+ 		spin_lock_irq(&fq->mq_flush_lock);
+ 		list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
+ 		spin_unlock_irq(&fq->mq_flush_lock);
 -- 
 2.41.0
 
