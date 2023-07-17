@@ -2,77 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE4DBC001DF
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 15:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8794EC0015E
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 16:23:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231286AbjGQPQs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jul 2023 11:16:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50008 "EHLO
+        id S230109AbjGQQXR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jul 2023 12:23:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231239AbjGQPQs (ORCPT
+        with ESMTP id S231736AbjGQQXH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jul 2023 11:16:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A63B10A
-        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 08:16:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        Mon, 17 Jul 2023 12:23:07 -0400
+Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ADBE130;
+        Mon, 17 Jul 2023 09:23:04 -0700 (PDT)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2807061121
-        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 15:16:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7149C433C8;
-        Mon, 17 Jul 2023 15:16:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689607006;
-        bh=nXX5U3Wy/uzuYdNNloz6mHy7t8LtYCxpWlLoF99FxDQ=;
-        h=Date:To:Cc:References:From:Subject:In-Reply-To:From;
-        b=CsjRT3HQRDgaDIOwyPR3PRm91KqKsTsOBhJbjXmP4wPTlSVBg3Iom2xz1NeDZ1L13
-         DpgBvAQSgFn8/b4aiGaH42Mi8rOpl3p7oK70uQvCTN/hWtsquGJhhVwegkhNj/gW1r
-         iXeTkdbKbzKmfEDw3NZldNiu31dB0GvTet7OENFbJp5H3WIA+zpzAwuJx7BNIRaT4p
-         EDKV8c+I/JJBDSVb+dV5dT7TR69xICNxzsTNWS3kyBF0lw+WeNoEU9Dv7WWSNjICr4
-         HtQoqI2ZDo8qAQY1hnr26O6XPbUJ5IUU2UdxGGlIJ0cKD4JLjNZ+I8FIVZHs4lNjAE
-         WKaEnGG50dgPw==
-Message-ID: <bb6503f1-30a0-dc63-5b28-527bfe722135@kernel.org>
-Date:   Mon, 17 Jul 2023 23:16:43 +0800
+        by mx1.veeam.com (Postfix) with ESMTPS id 5AB254248A;
+        Mon, 17 Jul 2023 12:23:00 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx1-2022; t=1689610980;
+        bh=Yvy6JirBoMjCFBuNJLeE1/fak8zms1mE164qX049iOs=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=TxOAaz9utzv3vgLwP/d5AdxUc+oj3HgXCI1WvZ4f6kDSrmSSsRYOAJTkP+7pwJ1sC
+         6F77S0wSUR2lJL7Jxgp/kZtOAlEMmxKnxck584Z1rU0/IijB9yUKAyr8ho+lQj9z9h
+         0iKPkvu6rABYMy1wNhO/J7xcLTpjMntbRfq/rIt3IlbUWzJ7Ri6z7VstWRrr9E41Mf
+         dCjgtAdvUHMGhS7mi9LXhajB/lS6vrbnCrPArFt+Zgxw1ZbmOWkeffDsIy5WWZBgso
+         G9MT7cO9SQCJ6OYaxStB5PLB+fLcnqgKRIKvaO4FagdjfPFBWU1TwTfeRh6+g7JxyY
+         rqcteokc0hxmA==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.16; Mon, 17 Jul
+ 2023 18:22:53 +0200
+Message-ID: <3a86aa81-83ff-6245-bc10-304bde8c200d@veeam.com>
+Date:   Mon, 17 Jul 2023 18:22:46 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
 Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jaegeuk Kim <jaegeuk@kernel.org>
-Cc:     linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org
-References: <20230707094028.107898-1-hch@lst.de> <ZKx2jVONy35B0/S1@google.com>
- <20230711050101.GA19128@lst.de>
-From:   Chao Yu <chao@kernel.org>
-Subject: Re: [PATCH] f2fs: don't reopen the main block device in
- f2fs_scan_devices
-In-Reply-To: <20230711050101.GA19128@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>,
+        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
+CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <dchinner@redhat.com>, <willy@infradead.org>, <dlemoal@kernel.org>,
+        <linux@weissschuh.net>, <jack@suse.cz>, <ming.lei@redhat.com>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        Donald Buczek <buczek@molgen.mpg.de>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612135228.10702-3-sergei.shtepa@veeam.com>
+ <f935840e-12a7-c37b-183c-27e2d83990ea@huaweicloud.com>
+ <eca5a778-6795-fc03-7ae0-fe06f514af85@huaweicloud.com>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <eca5a778-6795-fc03-7ae0-fe06f514af85@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: colmbx01.amust.local (172.31.112.31) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A292403155B677461
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/7/11 13:01, Christoph Hellwig wrote:
-> I think that's because it doesn't look at sbi->s_ndevs in
-> destroy_device_list.  Let's try the variant below, which also fixes
-> the buildbot warning for non-zoned configfs:
-> 
-> ---
->  From 645d8dceaa97b6ee73be067495b111b15b187498 Mon Sep 17 00:00:00 2001
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Fri, 7 Jul 2023 10:31:49 +0200
-> Subject: f2fs: don't reopen the main block device in f2fs_scan_devices
-> 
-> f2fs_scan_devices reopens the main device since the very beginning, which
-> has always been useless, and also means that we don't pass the right
-> holder for the reopen, which now leads to a warning as the core super.c
-> holder ops aren't passed in for the reopen.
-> 
-> Fixes: 3c62be17d4f5 ("f2fs: support multiple devices")
-> Fixes: 0718afd47f70 ("block: introduce holder ops")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Reviewed-by: Chao Yu <chao@kernel.org>
 
-Thanks,
+On 7/12/23 12:04, Yu Kuai wrote:
+> Subject:
+> Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
+> From:
+> Yu Kuai <yukuai1@huaweicloud.com>
+> Date:
+> 7/12/23, 12:04
+> 
+> To:
+> Yu Kuai <yukuai1@huaweicloud.com>, Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+> CC:
+> viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net, jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>, "yukuai (C)" <yukuai3@huawei.com>
+> 
+> 
+> Hi,
+> 
+> 在 2023/07/11 10:02, Yu Kuai 写道:
+> 
+>>> +static bool submit_bio_filter(struct bio *bio)
+>>> +{
+>>> +    if (bio_flagged(bio, BIO_FILTERED))
+>>> +        return false;
+>>> +
+>>> +    bio_set_flag(bio, BIO_FILTERED);
+>>> +    return bio->bi_bdev->bd_filter->ops->submit_bio(bio);
+>>> +}
+>>> +
+>>>   static void __submit_bio(struct bio *bio)
+>>>   {
+>>> +    /*
+>>> +     * If there is a filter driver attached, check if the BIO needs to go to
+>>> +     * the filter driver first, which can then pass on the bio or consume it.
+>>> +     */
+>>> +    if (bio->bi_bdev->bd_filter && submit_bio_filter(bio))
+>>> +        return;
+>>> +
+>>>       if (unlikely(!blk_crypto_bio_prep(&bio)))
+>>>           return;
+> 
+> ...
+> 
+>>> +static void __blkfilter_detach(struct block_device *bdev)
+>>> +{
+>>> +    struct blkfilter *flt = bdev->bd_filter;
+>>> +    const struct blkfilter_operations *ops = flt->ops;
+>>> +
+>>> +    bdev->bd_filter = NULL;
+>>> +    ops->detach(flt);
+>>> +    module_put(ops->owner);
+>>> +}
+>>> +
+>>> +void blkfilter_detach(struct block_device *bdev)
+>>> +{
+>>> +    if (bdev->bd_filter) {
+>>> +        blk_mq_freeze_queue(bdev->bd_queue);
+> 
+> And this is not sate as well, for bio-based device, q_usage_counter is
+> not grabbed while submit_bio_filter() is called, hence there is a risk
+> of uaf from submit_bio_filter().
+> 
+> Thanks,
+> Kuai
+> 
+
+Hi Kuai.
+
+Indeed, the filter call is performed before calling bio_queue_enter().
+I must admit, you are very attentive. 
+
+I didn't keep track of the change in the position of the
+bio_queue_enter() function deeper on the stack.
+
+I think I need to add a check for q_usage_counter, for the debug build.
+So that I don't miss it in the future. 
+
