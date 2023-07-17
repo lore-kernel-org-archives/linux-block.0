@@ -2,113 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFC0C001DE
-	for <linux-block@archiver.kernel.org>; Sun, 16 Jul 2023 19:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA968C0015E
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 04:01:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230211AbjGPTxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Jul 2023 15:53:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54612 "EHLO
+        id S230448AbjGQEBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jul 2023 00:01:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjGPTxj (ORCPT
+        with ESMTP id S229564AbjGQEBo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Jul 2023 15:53:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0593C199;
-        Sun, 16 Jul 2023 12:53:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 97EED60EB2;
-        Sun, 16 Jul 2023 19:53:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77CABC433C8;
-        Sun, 16 Jul 2023 19:53:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1689537218;
-        bh=K5rHq1LfKc4VZBVAHSnPR42oWNHNTxIJfGEJlkEBi4Y=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WlTeRr3nQnyKkp6WCG8HyBdjR4h29WNNlwSta4f1Cv3798vWcznKPgqckh5Oa+VqS
-         HIJi3AgJQpAQk4zah9chWfRQAPPPAZ/0c5Hpwjhf8nZSYOv7k1JbqAfGTM1a4jm5Td
-         MzGmapLYg8XK0CRjzryjo0oIW843j5w9/eMZm7EQ=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     stable@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        patches@lists.linux.dev, David Howells <dhowells@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <brauner@kernel.org>,
-        Steve French <stfrench@microsoft.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        David Hildenbrand <david@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.4 018/800] splice: Fix filemap_splice_read() to use the correct inode
-Date:   Sun, 16 Jul 2023 21:37:51 +0200
-Message-ID: <20230716194949.527681049@linuxfoundation.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230716194949.099592437@linuxfoundation.org>
-References: <20230716194949.099592437@linuxfoundation.org>
-User-Agent: quilt/0.67
+        Mon, 17 Jul 2023 00:01:44 -0400
+Received: from out-37.mta0.migadu.com (out-37.mta0.migadu.com [91.218.175.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECFA11B8
+        for <linux-block@vger.kernel.org>; Sun, 16 Jul 2023 21:01:40 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1689566498;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=26hmSG3cG2qMCZKRMNmjIWTmveuGKUdShNQ0HXNAgXQ=;
+        b=KT4Rcz6CdcyuiL90HQra1ibRCSc7FHSuWb9BOasmWz3ts1PocJEODxPlSJyVe+qCmWHfDj
+        QPzUrxCYjH1fO34VkW1lk6xW4cEmZBwoDRji8kvBLKE6RQhe0xNQ9eD1aKITbnAEAiR8bL
+        B4XWxTNnO9MShteo3pKdWZnSotdyXSU=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de,
+        bvanassche@acm.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+Subject: [PATCH v4 0/4] blk-mq: optimize flush and request size
+Date:   Mon, 17 Jul 2023 12:00:54 +0800
+Message-ID: <20230717040058.3993930-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Howells <dhowells@redhat.com>
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-[ Upstream commit c37222082f23c456664d1c3182a714670ab8f9a4 ]
+v4:
+ - Rebase on the updated block/master branch, which include a flush bugfix
+   from Christoph. Please help to check patch 04. Thanks!
+ - Add a bugfix patch 02 for post-flush requests, put before other flush optimizations.
+ - Collect Reviewed-by tags from Ming and Christoph. Thanks!
+ - [v3] https://lore.kernel.org/lkml/20230707093722.1338589-1-chengming.zhou@linux.dev/
 
-Fix filemap_splice_read() to use file->f_mapping->host, not file->f_inode,
-as the source of the file size because in the case of a block device,
-file->f_inode points to the block-special file (which is typically 0
-length) and not the backing store.
+v3:
+ - Collect Reviewed-by tags from Ming and Christoph. Thanks!
+ - Remove the list and csd variables which are only used once.
+ - Fix a bug report of blktests nvme/012 by re-initialization of
+   rq->queuelist, which maybe corrupted by rq->rq_next reuse.
+ - [v2] https://lore.kernel.org/all/20230629110359.1111832-1-chengming.zhou@linux.dev/
 
-Fixes: 07073eb01c5f ("splice: Add a func to do a splice from a buffered file without ITER_PIPE")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
-cc: Steve French <stfrench@microsoft.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: linux-mm@kvack.org
-cc: linux-block@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-Link: https://lore.kernel.org/r/20230522135018.2742245-2-dhowells@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- mm/filemap.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v2:
+ - Change to use call_single_data_t, which use __aligned() to avoid
+   to use 2 cache lines for 1 csd. Thanks Ming Lei.
+ - [v1] https://lore.kernel.org/all/20230627120854.971475-1-chengming.zhou@linux.dev/
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 83dda76d1fc36..8abce63b259c9 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2906,7 +2906,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
- 	do {
- 		cond_resched();
- 
--		if (*ppos >= i_size_read(file_inode(in)))
-+		if (*ppos >= i_size_read(in->f_mapping->host))
- 			break;
- 
- 		iocb.ki_pos = *ppos;
-@@ -2922,7 +2922,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
- 		 * part of the page is not copied back to userspace (unless
- 		 * another truncate extends the file - this is desired though).
- 		 */
--		isize = i_size_read(file_inode(in));
-+		isize = i_size_read(in->f_mapping->host);
- 		if (unlikely(*ppos >= isize))
- 			break;
- 		end_offset = min_t(loff_t, isize, *ppos + len);
+Hello,
+
+After the commit be4c427809b0 ("blk-mq: use the I/O scheduler for
+writes from the flush state machine"), rq->flush can't reuse rq->elv
+anymore, since flush_data requests can go into io scheduler now.
+
+That increased the size of struct request by 24 bytes, but this
+patchset can decrease the size by 40 bytes, which is good I think.
+
+patch 1 use percpu csd to do remote complete instead of per-rq csd,
+decrease the size by 24 bytes.
+
+patch 2 fixes a bug in blk-flush for post-flush requests.
+
+patch 3-4 reuse rq->queuelist in flush state machine pending list,
+and maintain unsigned long counter of inflight flush_data requests,
+decrease the size by 16 bytes.
+
+Thanks for comments!
+
+Chengming Zhou (4):
+  blk-mq: use percpu csd to remote complete instead of per-rq csd
+  blk-flush: fix rq->flush.seq for post-flush requests
+  blk-flush: count inflight flush_data requests
+  blk-flush: reuse rq queuelist in flush state machine
+
+ block/blk-flush.c      | 26 +++++++++++++++-----------
+ block/blk-mq.c         | 12 ++++++------
+ block/blk.h            |  5 ++---
+ include/linux/blk-mq.h |  6 +-----
+ 4 files changed, 24 insertions(+), 25 deletions(-)
+
 -- 
-2.39.2
-
-
+2.41.0
 
