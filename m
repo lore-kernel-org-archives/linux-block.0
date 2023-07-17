@@ -2,37 +2,40 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA968C0015E
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 04:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B0C2EB64DC
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 04:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230448AbjGQEBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jul 2023 00:01:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50914 "EHLO
+        id S230515AbjGQEBy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jul 2023 00:01:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbjGQEBo (ORCPT
+        with ESMTP id S230396AbjGQEBp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jul 2023 00:01:44 -0400
-Received: from out-37.mta0.migadu.com (out-37.mta0.migadu.com [91.218.175.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECFA11B8
-        for <linux-block@vger.kernel.org>; Sun, 16 Jul 2023 21:01:40 -0700 (PDT)
+        Mon, 17 Jul 2023 00:01:45 -0400
+Received: from out-5.mta0.migadu.com (out-5.mta0.migadu.com [IPv6:2001:41d0:1004:224b::5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD5EE46
+        for <linux-block@vger.kernel.org>; Sun, 16 Jul 2023 21:01:43 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689566498;
+        t=1689566501;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=26hmSG3cG2qMCZKRMNmjIWTmveuGKUdShNQ0HXNAgXQ=;
-        b=KT4Rcz6CdcyuiL90HQra1ibRCSc7FHSuWb9BOasmWz3ts1PocJEODxPlSJyVe+qCmWHfDj
-        QPzUrxCYjH1fO34VkW1lk6xW4cEmZBwoDRji8kvBLKE6RQhe0xNQ9eD1aKITbnAEAiR8bL
-        B4XWxTNnO9MShteo3pKdWZnSotdyXSU=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pFXxdBNitgVGeb7jBJprwYc2SHfcR9ZpmuG2rofSs+Y=;
+        b=aS4UxvHW74aNMeRLZvydKEju8QtYZX1rq7sUBQyrdw3ssRMah0U3Ms/FhSKdxr95m8UelC
+        vvhsbRDT0jZse4zpCCnho2PyeLd7OduBgtBI3TyYuXW/WKAQWkpD/lHoT66Hx8WAHO8ulG
+        zwfulZcJCFUrhltkkZkq/xBWyVjG3LQ=
 From:   chengming.zhou@linux.dev
 To:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de,
         bvanassche@acm.org
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         zhouchengming@bytedance.com
-Subject: [PATCH v4 0/4] blk-mq: optimize flush and request size
-Date:   Mon, 17 Jul 2023 12:00:54 +0800
-Message-ID: <20230717040058.3993930-1-chengming.zhou@linux.dev>
+Subject: [PATCH v4 1/4] blk-mq: use percpu csd to remote complete instead of per-rq csd
+Date:   Mon, 17 Jul 2023 12:00:55 +0800
+Message-ID: <20230717040058.3993930-2-chengming.zhou@linux.dev>
+In-Reply-To: <20230717040058.3993930-1-chengming.zhou@linux.dev>
+References: <20230717040058.3993930-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
@@ -42,57 +45,80 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chengming Zhou <zhouchengming@bytedance.com>
 
-v4:
- - Rebase on the updated block/master branch, which include a flush bugfix
-   from Christoph. Please help to check patch 04. Thanks!
- - Add a bugfix patch 02 for post-flush requests, put before other flush optimizations.
- - Collect Reviewed-by tags from Ming and Christoph. Thanks!
- - [v3] https://lore.kernel.org/lkml/20230707093722.1338589-1-chengming.zhou@linux.dev/
+If request need to be completed remotely, we insert it into percpu llist,
+and smp_call_function_single_async() if llist is empty previously.
 
-v3:
- - Collect Reviewed-by tags from Ming and Christoph. Thanks!
- - Remove the list and csd variables which are only used once.
- - Fix a bug report of blktests nvme/012 by re-initialization of
-   rq->queuelist, which maybe corrupted by rq->rq_next reuse.
- - [v2] https://lore.kernel.org/all/20230629110359.1111832-1-chengming.zhou@linux.dev/
+We don't need to use per-rq csd, percpu csd is enough. And the size of
+struct request is decreased by 24 bytes.
 
-v2:
- - Change to use call_single_data_t, which use __aligned() to avoid
-   to use 2 cache lines for 1 csd. Thanks Ming Lei.
- - [v1] https://lore.kernel.org/all/20230627120854.971475-1-chengming.zhou@linux.dev/
+This way is cleaner, and looks correct, given block softirq is guaranteed
+to be scheduled to consume the list if one new request is added to this
+percpu list, either smp_call_function_single_async() returns -EBUSY or 0.
 
-Hello,
-
-After the commit be4c427809b0 ("blk-mq: use the I/O scheduler for
-writes from the flush state machine"), rq->flush can't reuse rq->elv
-anymore, since flush_data requests can go into io scheduler now.
-
-That increased the size of struct request by 24 bytes, but this
-patchset can decrease the size by 40 bytes, which is good I think.
-
-patch 1 use percpu csd to do remote complete instead of per-rq csd,
-decrease the size by 24 bytes.
-
-patch 2 fixes a bug in blk-flush for post-flush requests.
-
-patch 3-4 reuse rq->queuelist in flush state machine pending list,
-and maintain unsigned long counter of inflight flush_data requests,
-decrease the size by 16 bytes.
-
-Thanks for comments!
-
-Chengming Zhou (4):
-  blk-mq: use percpu csd to remote complete instead of per-rq csd
-  blk-flush: fix rq->flush.seq for post-flush requests
-  blk-flush: count inflight flush_data requests
-  blk-flush: reuse rq queuelist in flush state machine
-
- block/blk-flush.c      | 26 +++++++++++++++-----------
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
  block/blk-mq.c         | 12 ++++++------
- block/blk.h            |  5 ++---
- include/linux/blk-mq.h |  6 +-----
- 4 files changed, 24 insertions(+), 25 deletions(-)
+ include/linux/blk-mq.h |  5 +----
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d50b1d62a3d9..d98654869615 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -43,6 +43,7 @@
+ #include "blk-ioprio.h"
+ 
+ static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
++static DEFINE_PER_CPU(call_single_data_t, blk_cpu_csd);
+ 
+ static void blk_mq_insert_request(struct request *rq, blk_insert_t flags);
+ static void blk_mq_request_bypass_insert(struct request *rq,
+@@ -1157,15 +1158,11 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
+ 
+ static void blk_mq_complete_send_ipi(struct request *rq)
+ {
+-	struct llist_head *list;
+ 	unsigned int cpu;
+ 
+ 	cpu = rq->mq_ctx->cpu;
+-	list = &per_cpu(blk_cpu_done, cpu);
+-	if (llist_add(&rq->ipi_list, list)) {
+-		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
+-		smp_call_function_single_async(cpu, &rq->csd);
+-	}
++	if (llist_add(&rq->ipi_list, &per_cpu(blk_cpu_done, cpu)))
++		smp_call_function_single_async(cpu, &per_cpu(blk_cpu_csd, cpu));
+ }
+ 
+ static void blk_mq_raise_softirq(struct request *rq)
+@@ -4829,6 +4826,9 @@ static int __init blk_mq_init(void)
+ 
+ 	for_each_possible_cpu(i)
+ 		init_llist_head(&per_cpu(blk_cpu_done, i));
++	for_each_possible_cpu(i)
++		INIT_CSD(&per_cpu(blk_cpu_csd, i),
++			 __blk_mq_complete_request_remote, NULL);
+ 	open_softirq(BLOCK_SOFTIRQ, blk_done_softirq);
+ 
+ 	cpuhp_setup_state_nocalls(CPUHP_BLOCK_SOFTIRQ_DEAD,
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index b96e00499f9e..67f810857634 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -182,10 +182,7 @@ struct request {
+ 		rq_end_io_fn		*saved_end_io;
+ 	} flush;
+ 
+-	union {
+-		struct __call_single_data csd;
+-		u64 fifo_time;
+-	};
++	u64 fifo_time;
+ 
+ 	/*
+ 	 * completion callback.
 -- 
 2.41.0
 
