@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2066C001DC
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 20:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD67C001DF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 20:53:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbjGQUxQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jul 2023 16:53:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43572 "EHLO
+        id S229886AbjGQUxR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jul 2023 16:53:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbjGQUxP (ORCPT
+        with ESMTP id S229658AbjGQUxP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 17 Jul 2023 16:53:15 -0400
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE6810FE
-        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 13:52:32 -0700 (PDT)
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2674d0e10c4so2617101a91.3
-        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 13:52:32 -0700 (PDT)
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4BF21725
+        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 13:52:31 -0700 (PDT)
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5577900c06bso3772733a12.2
+        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 13:52:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689627152; x=1692219152;
+        d=1e100.net; s=20221208; t=1689627151; x=1692219151;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DH+74KMTL+L9e/FPJJhBQz9M6cjA6jC0gGOvpB2jAmc=;
-        b=CuslUpiddDiFhafVdkKe9Dy9tPlaefwNgDAfrjQeWdRqYkrYgD/rK1jj9TkFWdf3nS
-         V0DmWawtcpFWfsuBDtlw7fUX2sPSP2ws0wwCnoyY8O9rC3ztczWZ1e9BXiD6LZvDyrsI
-         sz92h7PNBrC4bJXk+qJuCf/EDkfObK7IgrGpczpzgP+KSU/bS0h/PwzpYDIXWNnk/Vzm
-         Wwe1MDKBaPRCV2S1S4qtE+fbfJ5A/UAjqN7mIZMNfcvry5It+C9OxbuQAGVzfVvcC0hD
-         LxdGOAuMoQbup/tqD5BiWo5lk21qOEYD8MTmpY7iQnYNintdgE/j5ar48CA6Q1UZHgdx
-         8XDQ==
-X-Gm-Message-State: ABy/qLZlcKA4bDO3abWK6OkntPKVzinAQvnSkJAP2mhpP6+ceM+PYrzB
-        si/nf/T3QU4XsWhmYxHeJWX4hptvMx0=
-X-Google-Smtp-Source: APBJJlE0MrMC2wiJqc4A2PixPJLclEPbgbnkga1Ii5YHp/GF6UUsQaWiLzDMiU6TTyMF7FDWPPYecA==
-X-Received: by 2002:a17:90a:9307:b0:262:df58:2411 with SMTP id p7-20020a17090a930700b00262df582411mr9460711pjo.18.1689627152155;
-        Mon, 17 Jul 2023 13:52:32 -0700 (PDT)
+        bh=nVSZbVbHnYr4oPJtre+peVtx9ULfxBAErKcKzg0bkGo=;
+        b=bwmgYrGxumBZZqaT2xGEE6poTEv8MbZTvdwqAMz6o241uftyy+VL+8KjtOM5rMD8hf
+         UwA/+bfq1WDaLcRFnoi0xJ6nZaSG/siZXfVe7xNOk9OcGn8kKmhiBxNKughgJOFUevQi
+         sYlrD6R87qQMMMTHdwmapZy17JK/mFJidAH+YexdcTnoxlqIHxwt7FCrAw8TD7JG9Upz
+         Aze58rWkQoAHHph45wmPgdWXjrl6CR/ANTe8TPEtq725916MSbYwM47zySEA0FzvF2Xp
+         MAErYTZcPwfpJjyqiYMBLS4xSkjVQiD+poKrCdZVFcAsoHXApkXPAGdzCYM+NJlt3iEx
+         0I0g==
+X-Gm-Message-State: ABy/qLbgKwLiMvBdcgm23LJZdDEGdEoHEbHYcRteX/M8h2+nkV1p0SQy
+        ztenSng/R7VIxIRcGM56tlg=
+X-Google-Smtp-Source: APBJJlHhebQiAEEp/s+2qZtNhZeSgejD+aqeb4F5EKr0V25ZS3YmkT1iD08aHoFUtJR0cpcDBKNDKQ==
+X-Received: by 2002:a17:90a:b00d:b0:259:b065:da4f with SMTP id x13-20020a17090ab00d00b00259b065da4fmr12266934pjq.36.1689627150877;
+        Mon, 17 Jul 2023 13:52:30 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:ac3:b183:3725:4b8f])
-        by smtp.gmail.com with ESMTPSA id v17-20020a17090abb9100b0025645ce761dsm5222403pjr.35.2023.07.17.13.52.31
+        by smtp.gmail.com with ESMTPSA id v17-20020a17090abb9100b0025645ce761dsm5222403pjr.35.2023.07.17.13.52.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 13:52:31 -0700 (PDT)
+        Mon, 17 Jul 2023 13:52:30 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Bart Van Assche <bvanassche@acm.org>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: [PATCH 2/3] scsi: Remove a blk_mq_run_hw_queues() call
-Date:   Mon, 17 Jul 2023 13:52:14 -0700
-Message-ID: <20230717205216.2024545-3-bvanassche@acm.org>
+Subject: [PATCH 1/3] scsi: Inline scsi_kick_queue()
+Date:   Mon, 17 Jul 2023 13:52:13 -0700
+Message-ID: <20230717205216.2024545-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
 In-Reply-To: <20230717205216.2024545-1-bvanassche@acm.org>
 References: <20230717205216.2024545-1-bvanassche@acm.org>
@@ -56,26 +56,46 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_kick_requeue_list() calls blk_mq_run_hw_queues() asynchronously.
-Leave out the direct blk_mq_run_hw_queues() call since it is
-superfluous. Note: scsi_run_queue() is not called from the hot I/O
-submission path so there is no performance concern.
+scsi_kick_queue() is too short to keep it as a separate function. Hence
+inline it.
 
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/scsi_lib.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/scsi/scsi_lib.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 414d29eef968..7043ca0f4da9 100644
+index ad9afae49544..414d29eef968 100644
 --- a/drivers/scsi/scsi_lib.c
 +++ b/drivers/scsi/scsi_lib.c
-@@ -448,7 +448,6 @@ static void scsi_run_queue(struct request_queue *q)
- 		scsi_starved_list_run(sdev->host);
- 
- 	blk_mq_kick_requeue_list(q);
--	blk_mq_run_hw_queues(q, false);
+@@ -300,11 +300,6 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
+ 	cmd->budget_token = -1;
  }
  
- void scsi_requeue_run_queue(struct work_struct *work)
+-static void scsi_kick_queue(struct request_queue *q)
+-{
+-	blk_mq_run_hw_queues(q, false);
+-}
+-
+ /*
+  * Kick the queue of SCSI device @sdev if @sdev != current_sdev. Called with
+  * interrupts disabled.
+@@ -340,7 +335,7 @@ static void scsi_single_lun_run(struct scsi_device *current_sdev)
+ 	 * but in most cases, we will be first. Ideally, each LU on the
+ 	 * target would get some limited time or requests on the target.
+ 	 */
+-	scsi_kick_queue(current_sdev->request_queue);
++	blk_mq_run_hw_queues(current_sdev->request_queue, false);
+ 
+ 	spin_lock_irqsave(shost->host_lock, flags);
+ 	if (!starget->starget_sdev_user)
+@@ -427,7 +422,7 @@ static void scsi_starved_list_run(struct Scsi_Host *shost)
+ 			continue;
+ 		spin_unlock_irqrestore(shost->host_lock, flags);
+ 
+-		scsi_kick_queue(slq);
++		blk_mq_run_hw_queues(slq, false);
+ 		blk_put_queue(slq);
+ 
+ 		spin_lock_irqsave(shost->host_lock, flags);
