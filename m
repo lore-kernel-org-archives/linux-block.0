@@ -2,83 +2,136 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B23EB64DC
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 18:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80574C001B0
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 18:57:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231292AbjGQStI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jul 2023 14:49:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44140 "EHLO
+        id S231473AbjGQS5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jul 2023 14:57:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230225AbjGQStG (ORCPT
+        with ESMTP id S231455AbjGQS5j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jul 2023 14:49:06 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1637499;
-        Mon, 17 Jul 2023 11:49:05 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id ca18e2360f4ac-783698a37beso285029739f.0;
-        Mon, 17 Jul 2023 11:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689619744; x=1692211744;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pup51R7CH2ewXgPiiOoeKchEJYQ5CnfcD4TroSAHdfw=;
-        b=HbtHz8LpTaLbUyiGKVmkJ3yx78q/6EOH/BHoCgVNYefT47cfEiX4eFj5RLZ3FU01gz
-         H2iPj3N8WFS+D742JGqnELJtE1A6i1+T4VMNihUqrzcMr2ytbFpCGsT1JT7pNgXqxLyd
-         dP6AIjxWfAhib7dl9V2oGhir76M7Z7VT1uiu19AahY4+Ve1rP8un56rBniEvGk6GFf7L
-         Q9LRqBfUKdzfxyz87WOdZKYZvgxpkMNkY/8l7wvtJCep/JEMcKQ3om+flvX9mIECNk4i
-         sxdaOWT0boghIB/XRn7bu3J4Zsy5gnuLR2xnuTyVKhmpFUTpza143v9d6XD6x8UNprtZ
-         RixQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689619744; x=1692211744;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pup51R7CH2ewXgPiiOoeKchEJYQ5CnfcD4TroSAHdfw=;
-        b=ZtU9lsM4oifldrxC+hPrYd3HeHvCKUi3ZOR4da+/4pMpS96CQ4aLCW72CC5Tw1m+3s
-         ZOKg4lybXPfzF2qV7mzYB8sK2KlK7zI+/cbRP2SZzcSfeBTPsYUaTvSjI4Ix5t6KAu7k
-         JkKwQVvROjR4GZzoPFH26XCFD26xPrXp+cquJIMlR1snJNvug9hELk8tgel+99cSq1sp
-         Be0tGeQVTALpT6KxlALiLbEYSNCN2G2LT9FSuNspM8V/X62YsZ/FkqEQ4lRQI8yIogjk
-         YR3/JN2YWhyApPk09JeaXO7rO0rGQgmo/1tqIZVxLT7b3RKfWu8i8BA1mc8YqM4MXVw0
-         AnGw==
-X-Gm-Message-State: ABy/qLagT58Ye51daLpq79gh6VALxPFcu+5R7v/jcnbH+3F3xRUZbW+a
-        mC60T7DOgjozKYCenDItRJo=
-X-Google-Smtp-Source: APBJJlFmSDDkJdfs3wbDfi2KzEcqLIt0VONezBNx2D/EgTao9rbKdEV+NE0fcA8w50CwiaA5OodZwQ==
-X-Received: by 2002:a6b:dd0b:0:b0:787:8f3:65e7 with SMTP id f11-20020a6bdd0b000000b0078708f365e7mr450415ioc.10.1689619744260;
-        Mon, 17 Jul 2023 11:49:04 -0700 (PDT)
-Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
-        by smtp.gmail.com with ESMTPSA id v12-20020a5d948c000000b00786450bb4edsm35098ioj.35.2023.07.17.11.49.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 11:49:04 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 17 Jul 2023 08:49:02 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Carlos Bilbao <carlos.bilbao@amd.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        amd <amd@localhost.localdomain>
-Subject: Re: [PATCH] blk-iocost: fix seq_printf compile type mismatch error
-Message-ID: <ZLWNHuTGk0fy8pjE@slm.duckdns.org>
-References: <20230717141852.153965-1-carlos.bilbao@amd.com>
+        Mon, 17 Jul 2023 14:57:39 -0400
+Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03FB0A6;
+        Mon, 17 Jul 2023 11:57:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=t-8ch.de; s=mail;
+        t=1689620255; bh=QjarRr5INc1/uxBbtmYZtobDq1CXveXr5bGBIPDVF4U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kPKqI1qnUradqvDXY/avvWONP/9Ze67ruR6b0ZwL4zShoT/uWQPCbz617dIp11tlL
+         ea/fsf3n2wn4KmmU92EGRMF1wV/lDvKj8MTQkl5vb0Ffkme8Cr5OUNKHHfy5vRHm3/
+         V28DJR3CIEs2WXGaHJBcABrzwjIbwelBUJ8cAeKE=
+Date:   Mon, 17 Jul 2023 20:57:34 +0200
+From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     axboe@kernel.dk, hch@infradead.org, corbet@lwn.net,
+        snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+        dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org,
+        jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>
+Subject: Re: [PATCH v5 04/11] blksnap: header file of the module interface
+Message-ID: <822909b0-abd6-4e85-b739-41f8efa6feff@t-8ch.de>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612135228.10702-5-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230717141852.153965-1-carlos.bilbao@amd.com>
+In-Reply-To: <20230612135228.10702-5-sergei.shtepa@veeam.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 17, 2023 at 09:18:52AM -0500, Carlos Bilbao wrote:
-> From: amd <amd@localhost.localdomain>
-> 
-> Fix two type mismatch errors encountered while compiling blk-iocost.c with
-> GCC version 13.1.1 that involved constant operator WEIGHT_ONE. Cast the
-> result of the division operation to (unsigned int) to match the expected
-> format specifier %u in two seq_printf invocations.
+On 2023-06-12 15:52:21+0200, Sergei Shtepa wrote:
 
-Can you detail the warnings? Was that on 32bit compiles?
+> [..]
 
-Thanks.
+> diff --git a/include/uapi/linux/blksnap.h b/include/uapi/linux/blksnap.h
+> new file mode 100644
+> index 000000000000..2fe3f2a43bc5
+> --- /dev/null
+> +++ b/include/uapi/linux/blksnap.h
+> @@ -0,0 +1,421 @@
 
--- 
-tejun
+> [..]
+
+> +/**
+> + * struct blksnap_snapshotinfo - Result for the command
+> + *	&blkfilter_ctl_blksnap.blkfilter_ctl_blksnap_snapshotinfo.
+> + *
+> + * @error_code:
+> + *	Zero if there were no errors while holding the snapshot.
+> + *	The error code -ENOSPC means that while holding the snapshot, a snapshot
+> + *	overflow situation has occurred. Other error codes mean other reasons
+> + *	for failure.
+> + *	The error code is reset when the device is added to a new snapshot.
+> + * @image:
+> + *	If the snapshot was taken, it stores the block device name of the
+> + *	image, or empty string otherwise.
+> + */
+> +struct blksnap_snapshotinfo {
+> +	__s32 error_code;
+> +	__u8 image[IMAGE_DISK_NAME_LEN];
+
+Nitpick:
+
+Seems a bit weird to have a signed error code that is always negative.
+Couldn't this be an unsigned number or directly return the error from
+the ioctl() itself?
+
+> +};
+> +
+> +/**
+> + * DOC: Interface for managing snapshots
+> + *
+> + * Control commands that are transmitted through the blksnap module interface.
+> + */
+> +enum blksnap_ioctl {
+> +	blksnap_ioctl_version,
+> +	blksnap_ioctl_snapshot_create,
+> +	blksnap_ioctl_snapshot_destroy,
+> +	blksnap_ioctl_snapshot_append_storage,
+> +	blksnap_ioctl_snapshot_take,
+> +	blksnap_ioctl_snapshot_collect,
+> +	blksnap_ioctl_snapshot_wait_event,
+> +};
+> +
+> +/**
+> + * struct blksnap_version - Module version.
+> + *
+> + * @major:
+> + *	Version major part.
+> + * @minor:
+> + *	Version minor part.
+> + * @revision:
+> + *	Revision number.
+> + * @build:
+> + *	Build number. Should be zero.
+> + */
+> +struct blksnap_version {
+> +	__u16 major;
+> +	__u16 minor;
+> +	__u16 revision;
+> +	__u16 build;
+> +};
+> +
+> +/**
+> + * define IOCTL_BLKSNAP_VERSION - Get module version.
+> + *
+> + * The version may increase when the API changes. But linking the user space
+> + * behavior to the version code does not seem to be a good idea.
+> + * To ensure backward compatibility, API changes should be made by adding new
+> + * ioctl without changing the behavior of existing ones. The version should be
+> + * used for logs.
+> + *
+> + * Return: 0 if succeeded, negative errno otherwise.
+> + */
+> +#define IOCTL_BLKSNAP_VERSION							\
+> +	_IOW(BLKSNAP, blksnap_ioctl_version, struct blksnap_version)
+
+Shouldn't this be _IOR()?
+
+  "_IOW means userland is writing and kernel is reading. _IOR
+  means userland is reading and kernel is writing."
+
+The other ioctl definitions seem to need a review, too.
