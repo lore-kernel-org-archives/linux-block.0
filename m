@@ -2,98 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40182EB64DA
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 06:47:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5150EB64DA
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 07:12:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229926AbjGRGrU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jul 2023 02:47:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50142 "EHLO
+        id S229862AbjGRHMS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jul 2023 03:12:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbjGRGrT (ORCPT
+        with ESMTP id S229678AbjGRHMS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jul 2023 02:47:19 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A63FB2
-        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 23:47:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D70361482
-        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 06:47:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF6CCC433C8;
-        Tue, 18 Jul 2023 06:47:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689662837;
-        bh=cFxL+nUI5sVBg3EK7GP0AOGQKSHG4QIvN5VtaihNYBo=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=sQ/BmKNDC9R1zt/7bMfJh2Qmodx0495w1xtfAjeNzxHZ70/d2Q9mPbWTiLP/8AoUn
-         WBhs3Xg35qR16WM0KDaQuiEKcw/MJtvRMSJQKUI99D/uglYxFM6KriM1HiGze3s/Ut
-         8pNyVOP5KCCGOtF0wDOfI+K7HgCKD1hiUNN/RmokG5f28LwCyR+xuDnSTxPmP9mWQV
-         jfFQ4+3feffN4JVZuvLnxG6DzhMOW0Gx9YZJ/Ti9Ostme9Aom1hiuC7BW7YzNi5viL
-         XCUYAPY0izJ08PjwceUcFEhGc9pFnYoMKmIWQFUvTR91+99cXGCP3n3fIhdjDIJeCD
-         mKo6dQaRWkwsg==
-Message-ID: <52d41b27-f429-fc4c-c522-a963f67114bd@kernel.org>
-Date:   Tue, 18 Jul 2023 15:47:15 +0900
+        Tue, 18 Jul 2023 03:12:18 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715D510B;
+        Tue, 18 Jul 2023 00:12:17 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-666ed230c81so5476747b3a.0;
+        Tue, 18 Jul 2023 00:12:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689664337; x=1692256337;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=J+3/4KtrV8kbephpJ22EviWFdjs0YaC3yiKObYCwqJM=;
+        b=RlI9I82l/kFy2u6fnTKaU7c/oVV126yW9wTkZvV9hAL5qomkuipM4CPaxdAc/YkVpR
+         ReFgM728Vx2U5eq95VDoE6Nes/QaGYvnhtafQGVEji2C4KkLctoYfI9KLLUmcr4AqkY1
+         zPie+6yy4vcEB6RwmYCwbqHkBrws4w14pCzpw3c2f271D++XZmgW6ReOrmY0hNmDsBj1
+         mtWGdL28PFdgKK2Ngpmfcimc5xw2n3rMsoGoz4DIUwlABkk/56pR16ByctEoGpCsIpig
+         SGed/mNdI56m3t0mCj4g7D/Pi8SiQHRHWCJywoLBYqGLu7p/nwXzyVyIb2z2aElbhZEm
+         vDKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689664337; x=1692256337;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J+3/4KtrV8kbephpJ22EviWFdjs0YaC3yiKObYCwqJM=;
+        b=UINwORi0JvEHvbfMhrLtIAo1HPRe4L8m7CvU5kKTW8X3ohw0sZSvmxrBsCxJJBdxLZ
+         Ysvac+jECSfNFOLAIMabAsUIAeoaQNyetynGDMTLUrYrz8VMPcy4W63QDxeSdxD+NOin
+         hmg5fOmoU7x82faZ/53OYTqpO6LqqryQwEJ+8li2Ime6qMyXN0kz31FzqUDad4KukP/7
+         zMICUjuZEytEnlVRJcs+bja9ulDzP2gIqFLHT26U0XvV/anmDXFNAnVAfQ4SkrfWPGud
+         mdm1GdVKesLFY+62FiEAXDR2WAmnM43OUSCR0y5dB7e3R3ZMz08HBcA6BUGP0SobU+zR
+         NeZg==
+X-Gm-Message-State: ABy/qLbX9OgrRK2DhuxIzuz+KjaCSakMyagqWJrEybP9Su8MguMq0Y/4
+        SiZXOaj8HCshbytVJ1r8sPU=
+X-Google-Smtp-Source: APBJJlGwiWAMaxnx4OaS4h4d1wbAsEImE3dOadjpjGzazMe54xvo1BYqIpVFwkiwpZJmVp0ks+6mvw==
+X-Received: by 2002:a05:6a00:1acc:b0:668:81c5:2f8d with SMTP id f12-20020a056a001acc00b0066881c52f8dmr18984419pfv.3.1689664336896;
+        Tue, 18 Jul 2023 00:12:16 -0700 (PDT)
+Received: from mi-HP-ProDesk-680-G4-MT.mioffice.cn ([43.224.245.251])
+        by smtp.gmail.com with ESMTPSA id l23-20020a62be17000000b00682a8e600f0sm879553pff.35.2023.07.18.00.12.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 00:12:16 -0700 (PDT)
+From:   Huanpeng Xin <xinhuanpeng9@gmail.com>
+To:     minchan@kernel.org, ngupta@vflare.org, axboe@kernel.dk
+Cc:     senozhatsky@chromium.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, xinhuanpeng <xinhuanpeng@xiaomi.com>
+Subject: [PATCH] zram: set zram bio priority to REQ_PRIO.
+Date:   Tue, 18 Jul 2023 15:11:54 +0800
+Message-Id: <20230718071154.21566-1-xinhuanpeng9@gmail.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 4/5] scsi: Retry unaligned zoned writes
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230710180210.1582299-1-bvanassche@acm.org>
- <20230710180210.1582299-5-bvanassche@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230710180210.1582299-5-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/11/23 03:01, Bart Van Assche wrote:
-> From ZBC-2: "The device server terminates with CHECK CONDITION status, with
-> the sense key set to ILLEGAL REQUEST, and the additional sense code set to
-> UNALIGNED WRITE COMMAND a write command, other than an entire medium write
-> same command, that specifies: a) the starting LBA in a sequential write
-> required zone set to a value that is not equal to the write pointer for that
-> sequential write required zone; or b) an ending LBA that is not equal to the
-> last logical block within a physical block (see SBC-5)."
-> 
-> I am not aware of any other conditions that may trigger the UNALIGNED
-> WRITE COMMAND response.
+From: xinhuanpeng <xinhuanpeng@xiaomi.com>
 
-Trying to write less than 4KB on a 4Kn drive. But that should not ever happen
-for kernel issued commands.
+When the system memory pressure is high, set zram bio priority
+to REQ_PRIO can quickly swap zarm's memory to backing device,
+freeing up more space for zram.
 
-> 
-> Send commands that failed with an unaligned write error to the SCSI error
-> handler. Let the SCSI error handler sort SCSI commands per LBA before
-> resubmitting these.
-> 
-> Increase the number of retries for write commands sent to a sequential
-> zone to the maximum number of outstanding commands.
+Signed-off-by: xinhuanpeng <xinhuanpeng@xiaomi.com>
+---
+ drivers/block/zram/zram_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I think I mentioned this before. When we started btrfs work, we did something
-similar (but at the IO scheduler level) to try to avoid adding a big lock in
-btrfs to serialize (and thus order) writes. What we discovered is that it was
-extremely easy to fall into a situation were the maximum number of possible
-outstanding request is already issued, but they all are behind a "hole" and
-indefinitely delayed because the missing request cannot be issued due to the max
-nr request limit being reached. No forward progress and deadlock.
-
-I do not see how your change addresses this problem. The same will happen with
-this and I do not have any suggestion how to solve this. For btrfs, we ended up
-using cone append emulation for scsi to avoid the big lock and avoid the FS from
-having to order writes. That solution guarantees forward progress. Delaying
-already issued writes that are not sequential has no such guarantees.
-
-
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index b8549c61ff2c..af56766a036b 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -616,7 +616,7 @@ static int read_from_bdev_async(struct zram *zram, struct bio_vec *bvec,
+ {
+ 	struct bio *bio;
+ 
+-	bio = bio_alloc(zram->bdev, 1, parent ? parent->bi_opf : REQ_OP_READ,
++	bio = bio_alloc(zram->bdev, 1, parent ? parent->bi_opf : REQ_OP_READ | REQ_PRIO,
+ 			GFP_NOIO);
+ 	if (!bio)
+ 		return -ENOMEM;
+@@ -746,7 +746,7 @@ static ssize_t writeback_store(struct device *dev,
+ 		}
+ 
+ 		bio_init(&bio, zram->bdev, &bio_vec, 1,
+-			 REQ_OP_WRITE | REQ_SYNC);
++			 REQ_OP_WRITE | REQ_SYNC | REQ_PRIO);
+ 		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
+ 
+ 		bio_add_page(&bio, bvec.bv_page, bvec.bv_len,
 -- 
-Damien Le Moal
-Western Digital Research
+2.37.2
 
