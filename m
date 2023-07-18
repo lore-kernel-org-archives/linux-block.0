@@ -2,324 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4C3C04FDF
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 13:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 803A1EB64DA
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 14:25:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbjGRNDU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jul 2023 09:03:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40380 "EHLO
+        id S231441AbjGROZO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jul 2023 10:25:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232488AbjGRNCu (ORCPT
+        with ESMTP id S230206AbjGROZN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jul 2023 09:02:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E019D212F;
-        Tue, 18 Jul 2023 06:01:10 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 31C0B614FB;
-        Tue, 18 Jul 2023 13:01:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C1ECC433C7;
-        Tue, 18 Jul 2023 13:01:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689685268;
-        bh=pBS4evmuojvGZNpkpvZA6FWxaaRdlIHQ6sTGa/XNWCs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GAgLfbJOtr+4I7rn52XFmVGRiSEZGY7xOoxXJ1EQxCHe8l/oD5LehpTXCm3JdU8ET
-         00euiRXw07Qk3I4eEEdfmMMjTsSPj2ml/HIpJxGiPqIQrY14+lOMg2eLmflyiEB6Dq
-         375ucDgl6JZJKZwqAQOJ4H1ZjCdq7n20z4QrRVb0Pb3ms7M/rRB5Hq3VfKVdi2+QWD
-         ygHX4ro1tUjT04KIb23Tj92+dxSmjILwUZng92A1L7nibXGC2cKf03Nwf+VJQCSna8
-         2Of8CuSbkv+f6mVIZm433GfUcB2FXO3yZKza0xpOc1TWl8OJhk1XlMee6YU++ijUqC
-         5L4T/+H8ExINw==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Haren Myneni <haren@us.ibm.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Subject: [RFC PATCH 21/21] crypto: scompress - Drop the use of per-cpu scratch buffers
-Date:   Tue, 18 Jul 2023 14:58:47 +0200
-Message-Id: <20230718125847.3869700-22-ardb@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230718125847.3869700-1-ardb@kernel.org>
-References: <20230718125847.3869700-1-ardb@kernel.org>
+        Tue, 18 Jul 2023 10:25:13 -0400
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4106A123
+        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 07:25:13 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-666edfc50deso3574559b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 07:25:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689690313; x=1692282313;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uabr8qn/OI3ZUPYBMNbKYHaxrGP3u3n5gl5kTIATcIU=;
+        b=LQ/5BYO1iOyQ7bdJ6n1WmCoBpNpSxe16DOh1JqzGSN0gu1u1Ett46FFE5Uh0dN6e74
+         U7UaDGCbGgslijxCEeE+lgLwmS5Cx/+xgtva7hh8Nyf+MKVoKjHlUI84UnxWunMrbPqo
+         YEd35B9oWSJklqlfIM8w9lVtO/YLFn1g5O2aBOpsQYMyJIS+qd6dwdhb0Bpsf2OFNqkw
+         8UVbsXmn5G4DBP13YvjRXl5z3yImzswDmtKfA3VV4wNOqMA5Dqbpa8KL4C4Jw9KKGGjG
+         FEadh7CV+0cNUQyGtDpfGWW3uqh6YVRpH9GlXWymyVUJE63qh5nSPWEkCKNcSRcR4NNU
+         t1cA==
+X-Gm-Message-State: ABy/qLYcQyOkvJQA2ncAxYaxdKA3ywZkNC31zWXnpFxrsBkaU8uf4obq
+        AljRfG0AoUvo3EkntkB5+tU=
+X-Google-Smtp-Source: APBJJlEfb2v3Fuk2aF0iKrw+1nJ+kVg9LLjUOCIxtadKEaUh14a2Y0QWT7fEZdgRtddjsFiugL7f3w==
+X-Received: by 2002:a05:6a00:8ce:b0:681:919f:bf69 with SMTP id s14-20020a056a0008ce00b00681919fbf69mr17649402pfu.0.1689690312585;
+        Tue, 18 Jul 2023 07:25:12 -0700 (PDT)
+Received: from ?IPV6:2601:642:4c05:546a:1fd9:c19f:bd9a:ab8e? ([2601:642:4c05:546a:1fd9:c19f:bd9a:ab8e])
+        by smtp.gmail.com with ESMTPSA id a22-20020aa78656000000b006828ee9fdaesm1601650pfo.127.2023.07.18.07.25.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jul 2023 07:25:12 -0700 (PDT)
+Message-ID: <3d459260-724f-810b-b94a-9e8da28a1085@acm.org>
+Date:   Tue, 18 Jul 2023 07:25:09 -0700
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7664; i=ardb@kernel.org; h=from:subject; bh=pBS4evmuojvGZNpkpvZA6FWxaaRdlIHQ6sTGa/XNWCs=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIWVbT3tLmkjv/s0bnUUz6+YWqHyfYPrt30PrH4wvXi9gu zB/Y2xYRykLgxgHg6yYIovA7L/vdp6eKFXrPEsWZg4rE8gQBi5OAZiIRz7DX9kVFbWr6oI67P7v F1mXlcX/zKa5g+2W38JQdYu2A2ZBpxkZrpf3PBfVDpm+YdPJA28zyi5tefKQvYLzLLfrcyn7Rsa DLAA=
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 3/3] block: Improve performance for BLK_MQ_F_BLOCKING
+ drivers
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230717205216.2024545-1-bvanassche@acm.org>
+ <20230717205216.2024545-4-bvanassche@acm.org> <20230718045439.GA8781@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230718045439.GA8781@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The scomp to acomp adaptation layer allocates 256k of scratch buffers
-per CPU in order to be able to present the input provided by the caller
-via scatterlists as linear byte arrays to the underlying synchronous
-compression drivers, most of which are thin wrappers around the various
-compression algorithm library implementations we have in the kernel.
+On 7/17/23 21:54, Christoph Hellwig wrote:
+> On Mon, Jul 17, 2023 at 01:52:15PM -0700, Bart Van Assche wrote:
+>> --- a/drivers/scsi/scsi_lib.c
+>> +++ b/drivers/scsi/scsi_lib.c
+>> @@ -329,6 +329,9 @@ static void scsi_single_lun_run(struct scsi_device *current_sdev)
+>>   	starget->starget_sdev_user = NULL;
+>>   	spin_unlock_irqrestore(shost->host_lock, flags);
+>>   
+>> +	/* Combining BLIST_SINGLELUN with BLK_MQ_F_BLOCKING is not supported. */
+>> +	WARN_ON_ONCE(shost->tag_set.flags & BLK_MQ_F_BLOCKING);
+> 
+> .. but it must work.  BLIST_SINGLELUN is set for specific targets
+> based on the identification string while BLK_MQ_F_BLOCKING is set by
+> the LLDD.  Also the blist flags can be set from userspace through
+> /proc/scsi/device_info.
 
-This sucks. With high core counts and SMT, this easily adds up to
-multiple megabytes that are permanently tied up for this purpose, and
-given that all acomp users pass either single pages or contiguous
-buffers in lowmem, we can optimize for this pattern and just pass the
-buffer directly if we can. This removes the need for scratch buffers,
-and along with it, the arbitrary 128k upper bound on the input and
-output size of the acomp API when the implementation happens to be scomp
-based.
+Hi Christoph,
 
-So add a scomp_map_sg() helper to try and obtain the virtual addresses
-associated with the scatterlists, which is guaranteed to be successful
-100% of the time given the existing users, which all fit the prerequisite
-pattern. And as a fallback for other cases, use kvmalloc with GFP_KERNEL
-to allocate buffers on the fly and free them again right after.
+I think that support for BLIST_SINGLELUN devices can be realized with the
+change shown below. I had not yet looked into this because my understanding
+is that BLIST_SINGLELUN devices are all CD-ROM devices that are probably
+rare these days.
 
-This puts the burden on future callers to either use a contiguous
-buffer, or deal with the potentially blocking nature of GFP_KERNEL.
-For IPcomp in particular, the only relevant compression algorithm is
-'deflate' which is no longer implemented as an scomp, and so this change
-will not affect it even if we decide to convert it to take advantage of
-the ability to pass discontiguous scatterlists.
+Bart.
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- crypto/scompress.c                  | 159 ++++++++++----------
- include/crypto/internal/scompress.h |   2 -
- 2 files changed, 76 insertions(+), 85 deletions(-)
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 197942db8016..84fb0feb047f 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -329,16 +329,14 @@ static void scsi_single_lun_run(struct scsi_device *current_sdev)
+  	starget->starget_sdev_user = NULL;
+  	spin_unlock_irqrestore(shost->host_lock, flags);
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 3155cdce9116e092..1c050aa864bd604d 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -18,24 +18,11 @@
- #include <linux/seq_file.h>
- #include <linux/slab.h>
- #include <linux/string.h>
--#include <linux/vmalloc.h>
- #include <net/netlink.h>
- 
- #include "compress.h"
- 
--struct scomp_scratch {
--	spinlock_t	lock;
--	void		*src;
--	void		*dst;
--};
+-	/* Combining BLIST_SINGLELUN with BLK_MQ_F_BLOCKING is not supported. */
+-	WARN_ON_ONCE(shost->tag_set.flags & BLK_MQ_F_BLOCKING);
 -
--static DEFINE_PER_CPU(struct scomp_scratch, scomp_scratch) = {
--	.lock = __SPIN_LOCK_UNLOCKED(scomp_scratch.lock),
--};
--
- static const struct crypto_type crypto_scomp_type;
--static int scomp_scratch_users;
--static DEFINE_MUTEX(scomp_lock);
- 
- static int __maybe_unused crypto_scomp_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
-@@ -58,56 +45,45 @@ static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
- 	seq_puts(m, "type         : scomp\n");
- }
- 
--static void crypto_scomp_free_scratches(void)
--{
--	struct scomp_scratch *scratch;
--	int i;
--
--	for_each_possible_cpu(i) {
--		scratch = per_cpu_ptr(&scomp_scratch, i);
--
--		vfree(scratch->src);
--		vfree(scratch->dst);
--		scratch->src = NULL;
--		scratch->dst = NULL;
--	}
--}
--
--static int crypto_scomp_alloc_scratches(void)
--{
--	struct scomp_scratch *scratch;
--	int i;
--
--	for_each_possible_cpu(i) {
--		void *mem;
--
--		scratch = per_cpu_ptr(&scomp_scratch, i);
--
--		mem = vmalloc_node(SCOMP_SCRATCH_SIZE, cpu_to_node(i));
--		if (!mem)
--			goto error;
--		scratch->src = mem;
--		mem = vmalloc_node(SCOMP_SCRATCH_SIZE, cpu_to_node(i));
--		if (!mem)
--			goto error;
--		scratch->dst = mem;
--	}
--	return 0;
--error:
--	crypto_scomp_free_scratches();
--	return -ENOMEM;
--}
--
- static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
- {
--	int ret = 0;
-+	return 0;
-+}
- 
--	mutex_lock(&scomp_lock);
--	if (!scomp_scratch_users++)
--		ret = crypto_scomp_alloc_scratches();
--	mutex_unlock(&scomp_lock);
-+/**
-+ * scomp_map_sg - Return virtual address of memory described by a scatterlist
-+ *
-+ * @sg:		The address of the scatterlist in memory
-+ * @len:	The length of the buffer described by the scatterlist
-+ *
-+ * If the memory region described by scatterlist @sg consists of @len
-+ * contiguous bytes in memory and is accessible via the linear mapping or via a
-+ * single kmap(), return its virtual address.  Otherwise, return NULL.
-+ */
-+static void *scomp_map_sg(struct scatterlist *sg, unsigned int len)
-+{
-+	struct page *page;
-+	unsigned int offset;
- 
--	return ret;
-+	while (sg_is_chain(sg))
-+		sg = sg_next(sg);
-+
-+	if (!sg || sg_nents_for_len(sg, len) != 1)
-+		return NULL;
-+
-+	page   = sg_page(sg) + (sg->offset >> PAGE_SHIFT);
-+	offset = offset_in_page(sg->offset);
-+
-+	if (PageHighMem(page) && (offset + sg->length) > PAGE_SIZE)
-+		return NULL;
-+
-+	return kmap_local_page(page) + offset;
-+}
-+
-+static void scomp_unmap_sg(const void *addr)
-+{
-+	if (is_kmap_addr(addr))
-+		kunmap_local(addr);
- }
- 
- static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
-@@ -116,30 +92,52 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	void **tfm_ctx = acomp_tfm_ctx(tfm);
- 	struct crypto_scomp *scomp = *tfm_ctx;
- 	void **ctx = acomp_request_ctx(req);
--	struct scomp_scratch *scratch;
-+	void *src_alloc = NULL;
-+	void *dst_alloc = NULL;
-+	const u8 *src;
-+	u8 *dst;
- 	int ret;
- 
--	if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
-+	if (!req->src || !req->slen || !req->dst || !req->dlen)
- 		return -EINVAL;
- 
--	if (!req->dst || !req->dlen || req->dlen > SCOMP_SCRATCH_SIZE)
--		return -EINVAL;
--
--	scratch = raw_cpu_ptr(&scomp_scratch);
--	spin_lock(&scratch->lock);
--
--	scatterwalk_map_and_copy(scratch->src, req->src, 0, req->slen, 0);
--	if (dir)
--		ret = crypto_scomp_compress(scomp, scratch->src, req->slen,
--					    scratch->dst, &req->dlen, *ctx);
--	else
--		ret = crypto_scomp_decompress(scomp, scratch->src, req->slen,
--					      scratch->dst, &req->dlen, *ctx);
--	if (!ret) {
--		scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->dlen,
--					 1);
-+	dst = scomp_map_sg(req->dst, req->dlen);
-+	if (!dst) {
-+		dst = dst_alloc = kvmalloc(req->dlen, GFP_KERNEL);
-+		if (!dst_alloc)
-+			return -ENOMEM;
- 	}
--	spin_unlock(&scratch->lock);
-+
-+	src = scomp_map_sg(req->src, req->slen);
-+	if (!src) {
-+		src = src_alloc = kvmalloc(req->slen, GFP_KERNEL);
-+		if (!src_alloc) {
-+			ret = -ENOMEM;
-+			goto out;
-+		}
-+		scatterwalk_map_and_copy(src_alloc, req->src, 0, req->slen, 0);
-+	}
-+
-+	if (dir)
-+		ret = crypto_scomp_compress(scomp, src, req->slen, dst,
-+					    &req->dlen, *ctx);
-+	else
-+		ret = crypto_scomp_decompress(scomp, src, req->slen, dst,
-+					      &req->dlen, *ctx);
-+
-+	if (src_alloc)
-+		kvfree(src_alloc);
-+	else
-+		scomp_unmap_sg(src);
-+
-+	if (!ret && dst == dst_alloc)
-+		scatterwalk_map_and_copy(dst, req->dst, 0, req->dlen, 1);
-+out:
-+	if (dst_alloc)
-+		kvfree(dst_alloc);
-+	else
-+		scomp_unmap_sg(dst);
-+
- 	return ret;
- }
- 
-@@ -158,11 +156,6 @@ static void crypto_exit_scomp_ops_async(struct crypto_tfm *tfm)
- 	struct crypto_scomp **ctx = crypto_tfm_ctx(tfm);
- 
- 	crypto_free_scomp(*ctx);
--
--	mutex_lock(&scomp_lock);
--	if (!--scomp_scratch_users)
--		crypto_scomp_free_scratches();
--	mutex_unlock(&scomp_lock);
- }
- 
- int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
-diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index 858fe3965ae347ef..69e593d72cbdaa99 100644
---- a/include/crypto/internal/scompress.h
-+++ b/include/crypto/internal/scompress.h
-@@ -12,8 +12,6 @@
- #include <crypto/acompress.h>
- #include <crypto/algapi.h>
- 
--#define SCOMP_SCRATCH_SIZE	131072
--
- struct acomp_req;
- 
- struct crypto_scomp {
--- 
-2.39.2
+  	/*
+  	 * Call blk_run_queue for all LUNs on the target, starting with
+  	 * current_sdev. We race with others (to set starget_sdev_user),
+  	 * but in most cases, we will be first. Ideally, each LU on the
+  	 * target would get some limited time or requests on the target.
+  	 */
+-	blk_mq_run_hw_queues(current_sdev->request_queue, false);
++	blk_mq_run_hw_queues(current_sdev->request_queue,
++			     shost->queuecommand_may_block);
+
+  	spin_lock_irqsave(shost->host_lock, flags);
+  	if (!starget->starget_sdev_user)
 
