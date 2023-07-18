@@ -2,231 +2,207 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4600BEB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 16:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FAC2C001DF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 16:34:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232995AbjGRQCw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jul 2023 12:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54538 "EHLO
+        id S232983AbjGRQeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jul 2023 12:34:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232464AbjGRQCv (ORCPT
+        with ESMTP id S233009AbjGRQeQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jul 2023 12:02:51 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2069.outbound.protection.outlook.com [40.107.93.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCA791985
-        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 09:02:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S/ZXpTBdX8lFt8uWBpZNsUmAmLia49w2A5MEnm9A+4ueBm5pCb8ZxGgFez5WE87Q3/d59o+TrNMx5VwJcsVuNJpPK7C5Dgj10ry7605Ip+nf2ratKB/PLJkRnzLs5rMguJeH94Tk68uYu4JlI7/eC3buqegvhyjF5/SqXQtxmcFLCDLDB6wEG/eShlMUPRydfcrJVkVWlsS7B0AATWNzPcMKh3nUf/R22sdaS+TxYZMbqsxJr6/4iLMV4aEKbvShIlNvzkiZ3rYhpd2EL0RP5kftdrSfYqTpGBGAtaOO7pc5hHkKqIF758cALXtzjuEjhrQ6fEBEsWmAwLmqy5HJUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gT4DpBgR9epnJ4bwNkODuk8f+NBhhxrC3Sb2BaIJIHo=;
- b=MlozPNjSnEwBevHWsFXOFAtbvW+UB4pZ3vFRlfS8mWvpsclrgIci++6x8RcrVzFClDIeCMefpjNes4CEmszGamhbQkiL2NzyzQ9JnifYL6Kd3nvfFmTj7ZEtINmVvie8J9goIfA0H0Lk9os0QVkcZqZgSXZ+X8NjsAwZR3voBX2wZQLrlMhb5/l8/69pD7gHEGYFLm0Qr1ztFP4kc9YXNvmsX7mkOSsRVdPgDjQMLz2wD5ag1/koV7g+wvD3WL6bF84Y9Mq4xrPW03H6JnpDYPy/0KecOA+iFHjl69G8FbF4Vmf6pMhQCAi7c8uRLbsteAEubQ8MnDvT2FJAvkm6tA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gT4DpBgR9epnJ4bwNkODuk8f+NBhhxrC3Sb2BaIJIHo=;
- b=MhumZaK5gORFGp8kdz+is3TuP+iIjzLDHy+XkGSwLX6J9q7+l5Yna6GEcMjGVoxC/eGs+kgzJRF3Xs+jjE/L/bThNFOHQauh53P3ZQMxgEZwbZXfmTqHD9glMF0HWccYggTFOlUoP0guFi4a7/Ui4pNhgCU8CuHZdYJFsI91wwk6FdWyC7rOB1b11W2waYT2DwDDKZkhJK/iJ57t++sa4F+KqftqS1Fq42dBmZbLbmRowMXLqgJ2xUrQXph9zw+oMfCvabN53MnBDswgbfJvlHQ8d64ENvH0PDOFVqdWEUimxQu01sfilzeevhZ8T5nlVMVVJM8XiT1pd2jnF5o9Cg==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by MW4PR12MB7311.namprd12.prod.outlook.com (2603:10b6:303:227::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Tue, 18 Jul
- 2023 16:02:38 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::f1c3:add0:836f:cf90]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::f1c3:add0:836f:cf90%6]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
- 16:02:38 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Subject: Re: [bug report] Unable to handle kernel paging request observed
- during blktest nvme/047
-Thread-Topic: [bug report] Unable to handle kernel paging request observed
- during blktest nvme/047
-Thread-Index: AQHZuXbTFOmyzj2K/02Hhol76fsD9K+/r52A
-Date:   Tue, 18 Jul 2023 16:02:38 +0000
-Message-ID: <30784603-c958-6d39-6b85-6b8ec6be7b75@nvidia.com>
-References: <CAHj4cs96VFJoncjaam1u4JT4PWZEJxWxR3BhJVRH6p0uCBvd5g@mail.gmail.com>
-In-Reply-To: <CAHj4cs96VFJoncjaam1u4JT4PWZEJxWxR3BhJVRH6p0uCBvd5g@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|MW4PR12MB7311:EE_
-x-ms-office365-filtering-correlation-id: 9ec35b58-dceb-4ff8-58e9-08db87a868c8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xitKmRTYmp3RG/bqSe02ovYNwPgKyJCXH69k2h/3hHvoC2bZaacSVolQQwVCFcyDdHtDNLDyFEKCNovti9zDfR/QUk7ed5tj0If6wrw6mb1rYG+T6gCIdFEEMbrVBYYWhlmidAQ+RWcjYwHb5Jq8PjKkHRzszcZtdKe35n1pZtmWZN9F/HIU/5bNcQZlY91FTNh9tqEi8jNNk6JewJpuCD7r5stgJPXH9dTO0UH7j7/cdZwbJ4XsILRuEbKXf9nRer9NO486QPe8aTkAmfOQro48SdqZ3njtdvJzYTVqg2UMeylWjSM9ON8rXvyibTqvqwCl2FLTr/xyocH5pHAxD4992pD+h7WK4eYy7zYFyU46cqhdbtiwTuLBztL3Y2YnlP/TVJlFkmqD+lQoVzOku4e2oHZq0e+XklH3xWfLurwxOzzJd1mMQ10FwCAn70FKOAkXf6m4oSo2kYq06c5mocJ4k/KTf8DwzQ4+ziyBfTauUzyBo4WVeZ8rbpcJKIqGvq+YeDOKPw9ZYUkv7mOaw0oby6QqGF+MrxLbfvB7QrNKNI8IEJjpdQVce18/BzumKGFTSgsG74lTyOiY1lWAFg/LUFldbDZ7mfRlaEGrF5RVrGk92mE7mKqKxBymkT8uCdWr/+yT/DWrta/QLs8lbHrpZFLZ0QBjxLv4WQ8PJuP32bOxl2o/jBvM9pCtkPM+VHkGu7W2wBtfPu88XgFn1OQh7kZdsyVMazBy7gq+sh0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(346002)(376002)(366004)(136003)(451199021)(122000001)(6486002)(110136005)(71200400001)(45080400002)(478600001)(76116006)(41300700001)(8676002)(8936002)(5660300002)(66476007)(66446008)(64756008)(66556008)(66946007)(91956017)(6512007)(316002)(2616005)(83380400001)(186003)(53546011)(6506007)(38100700002)(86362001)(31696002)(36756003)(38070700005)(2906002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YWc5N2xLMVo4VHZjYlFRL2w5NmZiUjVsZDYzRG5VWFpVaStVWFcrdlRyalMz?=
- =?utf-8?B?eE5DN0NoNHEwdk56K21pTlNPWW13MVJLUnQ0RTlpWmtHWkYxSFJQdHhkRGZT?=
- =?utf-8?B?bXA3ejNIWklNdDNQc3NnandjZ3FhSkNHcDNHa3I0T2U4aXJ1MXFLM3cxN3Q0?=
- =?utf-8?B?ZUxpVkYyd213TUsydFRyV0s5aE44T05aOXByQlZHR2tZc1lvdFA5SjBrWXMz?=
- =?utf-8?B?ZlJkMkNpajZXdmVPeGgrQkpvNlpHd2lyTTliVzBJV242Y1B3RUE5emhWRzlm?=
- =?utf-8?B?R1U3OUR4Nm1wdmRUa3RFUDhidTRuSVhrK0lETWVETUcxWDBUUzlxcWNsQnJK?=
- =?utf-8?B?OGl3Q1JMZkNXUDgySWhjanNVUmZENmFTRkxmUFg2V3h2bXo3dC83WjF5L3NQ?=
- =?utf-8?B?Q1o5MHgzNHZNS3J3VHBRWHI3UFVyVDNBY3FMUHFyZStlcEd3cm5VZGV2aWh4?=
- =?utf-8?B?UnBweEhMYjEwNFJSYStoZG1QbjA0WHoxKzQ3MjZSZG50S3lHdVd5RWxsb3Vu?=
- =?utf-8?B?bHNLSHBHN1RXb2JIUTdmWnJySWRPZHdSajBuclNBNmtCNmxPRGJlOHdvbjJ2?=
- =?utf-8?B?cEZacVVEUWR2K1NxK25wMTZRWlh5dXlJazN3aXBsVnpmZ3M2VFA5WUh4MDl5?=
- =?utf-8?B?bHkxbkZEdGtzL1ZGcmI4VEZLUUJQRnBQQUxteFBuM3lsRDRLNWZWRVllcnJR?=
- =?utf-8?B?bk96M0lLUFZOSHFaa2ZBbE1RamEwTm1HZ1JUOVZHK2c2TjdvQ3RpTEduM0lJ?=
- =?utf-8?B?MmRxd3g4YjVMMWc1UThSVWN4R2lGZ3U4UzdpZHgyRHNsaTNnNnVqZVBXcVVO?=
- =?utf-8?B?dkZuMlZEVzNwZ0xmdHd0bnZ5bnJiZWRTTlphVzdvQ3Erckg2QXFLcFd5d21a?=
- =?utf-8?B?YTNGbTQyRlhZdVc0SlBMRE5vL2ZZc3hYNExCS2NSdzdobjNPbnNzY3dnR0l4?=
- =?utf-8?B?eitTV2hPbVAwbkJLTDBOK0dvaC84UU9wc3h4S3NlR0pjTVhqby9wV3pSd1FZ?=
- =?utf-8?B?QlNLbGJDNzBRQUpGMGgraGRoSG9lWG5rSTVrcHdrajh0b0djMU5DaDJLQnNI?=
- =?utf-8?B?eWpQS0YvMnFaRTRSMTZKSFNlZnNsdWFBaUN2SGlvQmROdHpKZ3Q3VzU4bktN?=
- =?utf-8?B?Z2c0ZmtOc0E3YThzR0JabG5ya2hXbjdZSDRVTkJNVWVySC9heGpjdEJnMXZD?=
- =?utf-8?B?czRZY0VFNU9YNkFBdS9rQUx3OHllY2dGbTd0T2p0MXBqRjQ5R3ZtYVhqVWRG?=
- =?utf-8?B?SVRFTzlQTmNoalVTZE1XeThWSEYrdzZHVytCL1JKV01PSGVsakdsU3FDZHFF?=
- =?utf-8?B?NEZpNlJjV3g4UXo3cmRSUjRuNHh2N25wdUlWZFNnUC9oYUZXSzQ0ZE9rVjJk?=
- =?utf-8?B?LzJyYUtxdFRRYkViS25WY2FkaFE4SVI1TVg5M0xEdnhDRUF5QUxrWFhYSi9Q?=
- =?utf-8?B?bjNXUTFhbko1WCtFNjJJNnN6c2xXdUJNempXRjBMSWk4WDRRbWQvVFdVeXRK?=
- =?utf-8?B?VWxPN0duWnlKeUwxYWc5d2EzN2V0QURxdC9qWHhIeGN3aTFtVkczRWc5T0xn?=
- =?utf-8?B?ckMyemVkUnJBZFBzZWtJY0hVNFRyUS91Q2VraktldmQzRzcwcFppZkNDc1FT?=
- =?utf-8?B?RU05VkVvR1U0eUZyMGN2Y2crZkFaeG1hRVlqYS82bWRNMGxsUFhXWnZMbHd6?=
- =?utf-8?B?Nm5HZUFYdzg2a2ZrYzdRKzBrYmY4Vy9RN3QxaFNXeU5iMW0wZys1TnZxYjgx?=
- =?utf-8?B?c0d1SFdOQkp2RFF2aFhXQ1phUDljeEIxc2pQYkNTY3VQVnRFeEVuTU9KUkU3?=
- =?utf-8?B?RU8yUG1pb2hOdXdkMmhmSldOUnhObnhyNk1rTndJUktyWTNGY3hlaE9LNU9l?=
- =?utf-8?B?a0VmblZ6WWQwYlIrYmhMNTVYeDFWVHEwcGJCaFVyS01wUnU3bG9YdlIrQjdp?=
- =?utf-8?B?QzkzNDlSWnNCMG1GMWFFbUk5NDFwNnZaUzFKRWNpMUdPTGltRUQybkdlSXl4?=
- =?utf-8?B?dHoxRnJZanRjMC8xWjEvV09DZ0RZK3VDV3VJOGF0WXpFbHVpZ1QvcG45Q1VJ?=
- =?utf-8?B?U1pqY1h3bVVzeDVjR3Z1blhpMXUrQ3BCOFZvZDJ5eFpRNmJCTmNqN0FORFZu?=
- =?utf-8?B?SlB5UlJqMC9ZT3ZSWm1Ua1RnZkJjZjJjRmQvbllHT2dPdVVGUEtlOFpYYlZm?=
- =?utf-8?Q?yHSh6i4688eMLa0Ds5tAIOrmEq2o4CIA64LjRpmoK2zL?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BEEF178FBFE50D4C8AF92D566EEE22B8@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Tue, 18 Jul 2023 12:34:16 -0400
+Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3153124;
+        Tue, 18 Jul 2023 09:34:14 -0700 (PDT)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id 4A31041087;
+        Tue, 18 Jul 2023 12:34:12 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx2-2022; t=1689698052;
+        bh=HupSvzm2vncOrOzzRtgKkwQ3ecploXR1dUcOc8VjTcY=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=Xfr8MtO0+Zi2DaBlCSpzeAykKnjx/XsIpmvblMY3k28janKsB5HiuMje4LAIaIbw5
+         06gEUAijroubdt4JN02gRmhyIx7LbR32zkCEs0XSi/LXTxhl003VbRKan84J2ddFsk
+         xt/F6ECKvcuYnhGrsvGSed2GcI3RPEd8wsztZHMcbytBGfkjsBCd9EOeZrWhiZNwtP
+         lQ28p2prZeN+aytMKbHjh1KTyhp3tlkd2CEPc6Q2AyLOfzpw/qSw+waj/zgMc42nc5
+         AFzm2arV/NPfColw9+5vzXg7ckh6NMkvQTVkOOBwJDf1Dw2X3RdGlQ59D9Jjfclatj
+         ++27WJliivqfQ==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.16; Tue, 18 Jul
+ 2023 18:34:05 +0200
+Message-ID: <fdebc267-249a-2345-ba60-476240c8cf63@veeam.com>
+Date:   Tue, 18 Jul 2023 18:33:58 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9ec35b58-dceb-4ff8-58e9-08db87a868c8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jul 2023 16:02:38.5248
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XVC/eLa05vDr2y3Ck7hV8w7FsNznNRsaye5wSt5+Jv47wIXutatVKQJg0aRWZIOWz6gigVq/rDEJBLbsspTq6A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7311
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
+Content-Language: en-US
+To:     Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>,
+        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
+CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <dchinner@redhat.com>, <willy@infradead.org>, <dlemoal@kernel.org>,
+        <linux@weissschuh.net>, <jack@suse.cz>, <ming.lei@redhat.com>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        Donald Buczek <buczek@molgen.mpg.de>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612135228.10702-3-sergei.shtepa@veeam.com>
+ <f935840e-12a7-c37b-183c-27e2d83990ea@huaweicloud.com>
+ <90f79cf3-86a2-02c0-1887-d3490f9848bb@veeam.com>
+ <d929eaa7-61d6-c4c4-aabc-0124c3693e10@huaweicloud.com>
+ <686b9999-c903-cff1-48ba-21324031da17@veeam.com>
+ <fc740cf1-93a7-e438-e784-5209808981dc@huaweicloud.com>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <fc740cf1-93a7-e438-e784-5209808981dc@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: colmbx01.amust.local (172.31.112.31) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A292403155B677765
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNy8xOC8yMDIzIDU6NTIgQU0sIFlpIFpoYW5nIHdyb3RlOg0KPiBIZWxsbw0KPiANCj4gSSBj
-b25uZWN0ZWQgb25lIHJlbW90ZSB0ZXN0aW5nIHNlcnZlciBhbmQgcnVubmluZyBzdHJlc3MgYmxr
-dGVzdHMNCj4gbnZtZS90Y3AgbnZtZS8wNDcsIG15IGxvY2FsIFBDJ3MgbmV0d29yayBzdWRkZW5s
-eSBkaXNjb25uZWN0LA0KPiB3aGVuIEkgY29ubmVjdCB0aGUgcmVtb3RlIHRlc3Qgc2VydmVyIGFn
-YWluLCBmb3VuZCB0aGUgc2VydmVyIHBhbmljLA0KPiBoZXJlIGlzIHRoZSBmdWxsIGxvZy4NCj4g
-DQo+IFsgMjc3NS4wNTk3NTJdIHJ1biBibGt0ZXN0cyBudm1lLzA0NyBhdCAyMDIzLTA3LTE4IDA3
-OjE0OjM1DQo+IFsgMjc3NS4wNzc5MTZdIGxvb3AwOiBkZXRlY3RlZCBjYXBhY2l0eSBjaGFuZ2Ug
-ZnJvbSAwIHRvIDIwOTcxNTINCj4gWyAyNzc1LjA4NjkwNV0gbnZtZXQ6IGFkZGluZyBuc2lkIDEg
-dG8gc3Vic3lzdGVtIGJsa3Rlc3RzLXN1YnN5c3RlbS0xDQo+IFsgMjc3NS4wOTcyMjhdIG52bWV0
-X3RjcDogZW5hYmxpbmcgcG9ydCAwICgxMjcuMC4wLjE6NDQyMCkNCj4gWyAyNzc1LjEwNzY1NF0g
-bnZtZXQ6IGNyZWF0aW5nIG52bSBjb250cm9sbGVyIDEgZm9yIHN1YnN5c3RlbQ0KPiBibGt0ZXN0
-cy1zdWJzeXN0ZW0tMSBmb3IgTlFODQo+IG5xbi4yMDE0LTA4Lm9yZy5udm1leHByZXNzOnV1aWQ6
-MGYwMWZiNDItOWY3Zi00ODU2LWIwYjMtNTFlNjBiOGRlMzQ5Lg0KPiBbIDI3NzUuMTIyMjE0XSBu
-dm1lIG52bWUxOiBjcmVhdGluZyAxMjggSS9PIHF1ZXVlcy4NCj4gWyAyNzc1LjEzMTMyMF0gbnZt
-ZSBudm1lMTogbWFwcGVkIDEyOC8wLzAgZGVmYXVsdC9yZWFkL3BvbGwgcXVldWVzLg0KPiBbIDI3
-NzUuMTU2Nzc0XSBudm1lIG52bWUxOiBuZXcgY3RybDogTlFOICJibGt0ZXN0cy1zdWJzeXN0ZW0t
-MSIsIGFkZHINCj4gMTI3LjAuMC4xOjQ0MjANCj4gWyAyNzc2LjQ1NzAxNV0gbnZtZSBudm1lMTog
-UmVtb3ZpbmcgY3RybDogTlFOICJibGt0ZXN0cy1zdWJzeXN0ZW0tMSINCj4gWyAyNzc2LjgxOTg4
-NV0gbnZtZXQ6IGNyZWF0aW5nIG52bSBjb250cm9sbGVyIDIgZm9yIHN1YnN5c3RlbQ0KPiBibGt0
-ZXN0cy1zdWJzeXN0ZW0tMSBmb3IgTlFODQo+IG5xbi4yMDE0LTA4Lm9yZy5udm1leHByZXNzOnV1
-aWQ6MGYwMWZiNDItOWY3Zi00ODU2LWIwYjMtNTFlNjBiOGRlMzQ5Lg0KPiBbIDI3NzYuODM0NDY5
-XSBudm1lIG52bWUxOiBjcmVhdGluZyAxMjggSS9PIHF1ZXVlcy4NCj4gWyAyNzc2Ljg0MzU4N10g
-bnZtZSBudm1lMTogbWFwcGVkIDEyOC8wLzAgZGVmYXVsdC9yZWFkL3BvbGwgcXVldWVzLg0KPiBb
-IDI3NzYuODY4MTg4XSBudm1lIG52bWUxOiBuZXcgY3RybDogTlFOICJibGt0ZXN0cy1zdWJzeXN0
-ZW0tMSIsIGFkZHINCj4gMTI3LjAuMC4xOjQ0MjANCj4gWyAyNzc3LjEzMDc0Ml0gbnZtZSBudm1l
-MTogUmVtb3ZpbmcgY3RybDogTlFOICJibGt0ZXN0cy1zdWJzeXN0ZW0tMSINCj4gWyAyNzc4LjAw
-ODc5OV0gcnVuIGJsa3Rlc3RzIG52bWUvMDQ3IGF0IDIwMjMtMDctMTggMDc6MTQ6MzgNCj4gWyAy
-Nzc4LjAyNjY1Ml0gbG9vcDA6IGRldGVjdGVkIGNhcGFjaXR5IGNoYW5nZSBmcm9tIDAgdG8gMjA5
-NzE1Mg0KPiBbIDI3NzguMDM1NjAxXSBudm1ldDogYWRkaW5nIG5zaWQgMSB0byBzdWJzeXN0ZW0g
-YmxrdGVzdHMtc3Vic3lzdGVtLTENCj4gWyAyNzc4LjA0NjM5MV0gbnZtZXRfdGNwOiBlbmFibGlu
-ZyBwb3J0IDAgKDEyNy4wLjAuMTo0NDIwKQ0KPiBbIDI3NzguMDU3MDE3XSBudm1ldDogY3JlYXRp
-bmcgbnZtIGNvbnRyb2xsZXIgMSBmb3Igc3Vic3lzdGVtDQo+IGJsa3Rlc3RzLXN1YnN5c3RlbS0x
-IGZvciBOUU4NCj4gbnFuLjIwMTQtMDgub3JnLm52bWV4cHJlc3M6dXVpZDowZjAxZmI0Mi05Zjdm
-LTQ4NTYtYjBiMy01MWU2MGI4ZGUzNDkuDQo+IFsgMjc3OC4wNzE1OTNdIG52bWUgbnZtZTE6IGNy
-ZWF0aW5nIDEyOCBJL08gcXVldWVzLg0KPiBbIDI3NzguMDgwNzE5XSBudm1lIG52bWUxOiBtYXBw
-ZWQgMTI4LzAvMCBkZWZhdWx0L3JlYWQvcG9sbCBxdWV1ZXMuDQo+IFsgMjc3OC4xMDYxNTBdIG52
-bWUgbnZtZTE6IG5ldyBjdHJsOiBOUU4gImJsa3Rlc3RzLXN1YnN5c3RlbS0xIiwgYWRkcg0KPiAx
-MjcuMC4wLjE6NDQyMA0KPiBbIDI3NzkuNDA5MDA4XSBudm1lIG52bWUxOiBSZW1vdmluZyBjdHJs
-OiBOUU4gImJsa3Rlc3RzLXN1YnN5c3RlbS0xIg0KPiBbIDI3NzkuNzQ5NzQzXSBudm1ldDogY3Jl
-YXRpbmcgbnZtIGNvbnRyb2xsZXIgMiBmb3Igc3Vic3lzdGVtDQo+IGJsa3Rlc3RzLXN1YnN5c3Rl
-bS0xIGZvciBOUU4NCj4gbnFuLjIwMTQtMDgub3JnLm52bWV4cHJlc3M6dXVpZDowZjAxZmI0Mi05
-ZjdmLTQ4NTYtYjBiMy01MWU2MGI4ZGUzNDkuDQo+IFsgMjc3OS43NjQzMDNdIG52bWUgbnZtZTE6
-IGNyZWF0aW5nIDEyOCBJL08gcXVldWVzLg0KPiBbIDI3NzkuNzczMzU5XSBudm1lIG52bWUxOiBt
-YXBwZWQgMTI4LzAvMCBkZWZhdWx0L3JlYWQvcG9sbCBxdWV1ZXMuDQo+IFsgMjc3OS43OTc3NDVd
-IG52bWUgbnZtZTE6IG5ldyBjdHJsOiBOUU4gImJsa3Rlc3RzLXN1YnN5c3RlbS0xIiwgYWRkcg0K
-PiAxMjcuMC4wLjE6NDQyMA0KPiBbIDI3ODAuMDUzOTU4XSBudm1lIG52bWUxOiBSZW1vdmluZyBj
-dHJsOiBOUU4gImJsa3Rlc3RzLXN1YnN5c3RlbS0xIg0KPiBbIDI3ODAuMzUwMDQ5XSAtLS0tLS0t
-LS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0tLS0tLS0NCj4gWyAyNzgwLjM1NDY1OF0gV0FSTklORzog
-Q1BVOiAxMTggUElEOiAxODc0IGF0IGtlcm5lbC93b3JrcXVldWUuYzoxNjM1DQo+IF9fcXVldWVf
-d29yaysweDNjYy8weDQ2MA0KPiBbIDI3ODAuMzYyOTk5XSBNb2R1bGVzIGxpbmtlZCBpbjogbnZt
-ZXRfdGNwIG52bWV0IG52bWVfZmFicmljcyBsb29wDQo+IHJma2lsbCBzdW5ycGMgdmZhdCBmYXQg
-YXN0IGFjcGlfaXBtaSBkcm1fc2htZW1faGVscGVyIGlwbWlfc3NpZg0KPiBhcm1fc3BlX3BtdSBk
-cm1fa21zX2hlbHBlciBpcG1pX2RldmludGYgaXBtaV9tc2doYW5kbGVyIGFybV9jbW4NCj4gYXJt
-X2RtYzYyMF9wbXUgYXJtX2RzdV9wbXUgY3BwY19jcHVmcmVxIGZ1c2UgZHJtIHhmcyBsaWJjcmMz
-MmMNCj4gY3JjdDEwZGlmX2NlIG52bWUgZ2hhc2hfY2UgaWdiIHNoYTJfY2UgbnZtZV9jb3JlIHNo
-YTI1Nl9hcm02NCBzaGExX2NlDQo+IHNic2FfZ3dkdCBpMmNfZGVzaWdud2FyZV9wbGF0Zm9ybSBu
-dm1lX2NvbW1vbiBpMmNfYWxnb19iaXQNCj4gaTJjX2Rlc2lnbndhcmVfY29yZSB4Z2VuZV9od21v
-biBkbV9taXJyb3IgZG1fcmVnaW9uX2hhc2ggZG1fbG9nIGRtX21vZA0KPiBbbGFzdCB1bmxvYWRl
-ZDogbnZtZV90Y3BdDQo+IFsgMjc4MC40MDUyMTldIENQVTogMTE4IFBJRDogMTg3NCBDb21tOiBr
-d29ya2VyLzExODoxSCBLZHVtcDogbG9hZGVkDQo+IE5vdCB0YWludGVkIDYuNS4wLXJjMisgIzEN
-Cj4gWyAyNzgwLjQxMzU1N10gSGFyZHdhcmUgbmFtZTogR0lHQUJZVEUgUjE1Mi1QMzEtMDAvTVAz
-Mi1BUjEtMDAsIEJJT1MNCj4gRjMxbiAoU0NQOiAyLjEwLjIwMjIwODEwKSAwOS8zMC8yMDIyDQo+
-IFsgMjc4MC40MjI4NDhdIFdvcmtxdWV1ZToga2Jsb2NrZCBibGtfbXFfcnVuX3dvcmtfZm4NCj4g
-WyAyNzgwLjQyNzU0Ml0gcHN0YXRlOiAyMDQwMDBjOSAobnpDdiBkYUlGICtQQU4gLVVBTyAtVENP
-IC1ESVQgLVNTQlMgQlRZUEU9LS0pDQo+IFsgMjc4MC40MzQ0OTBdIHBjIDogX19xdWV1ZV93b3Jr
-KzB4M2NjLzB4NDYwDQo+IFsgMjc4MC40Mzg0ODddIGxyIDogX19xdWV1ZV93b3JrKzB4NDA4LzB4
-NDYwDQo+IFsgMjc4MC40NDI0ODRdIHNwIDogZmZmZjgwMDA4NmVjM2JhMA0KPiBbIDI3ODAuNDQ1
-Nzg1XSB4Mjk6IGZmZmY4MDAwODZlYzNiYTAgeDI4OiBmZmZmMDdmZmI4YTRkNmMwIHgyNzogZmZm
-ZjA3ZmZmN2JmMTQwMA0KPiBbIDI3ODAuNDUyOTA4XSB4MjY6IGZmZmYwN2ZmZTUyZTBhZjggeDI1
-OiBmZmZmMDdmZmI4YTRkNzA4IHgyNDogMDAwMDAwMDAwMDAwMDAwMA0KPiBbIDI3ODAuNDYwMDMw
-XSB4MjM6IGZmZmY4MDAwODZlYzNjZDggeDIyOiBmZmZmMDdmZjk0ZDcwMDAwIHgyMTogMDAwMDAw
-MDAwMDAwMDAwMA0KPiBbIDI3ODAuNDY3MTUyXSB4MjA6IGZmZmYwODAwODE0ZjI0MDAgeDE5OiBm
-ZmZmMDdmZjk0ZDcwMDA4IHgxODogMDAwMDAwMDAwMDAwMDAwMA0KPiBbIDI3ODAuNDc0Mjc1XSB4
-MTc6IDAwMDAwMDAwMDAwMDAwMDAgeDE2OiBmZmZmZDNlYjYwZTdhNWUwIHgxNTogMDAwMDAwMDAw
-MDAwMDAwMA0KPiBbIDI3ODAuNDgxMzk3XSB4MTQ6IDAwMDAwMDAwMDAwMDAwMDAgeDEzOiAwMDAw
-MDAwMDAwMDAwMDM4IHgxMjogMDEwMTAxMDEwMTAxMDEwMQ0KPiBbIDI3ODAuNDg4NTE5XSB4MTE6
-IDdmN2Y3ZjdmN2Y3ZjdmN2YgeDEwOiBmZWZlZmVmZWZlZmVmZWZmIHg5IDogZmZmZmQzZWI2MGU3
-YTU4OA0KPiBbIDI3ODAuNDk1NjQxXSB4OCA6IGZlZmVmZWZlZmVmZWZlZmYgeDcgOiAwMDAwMDAw
-MDAwMDAwMDA4IHg2IDogMDAwMDAwMDEwMDAzYzhlNA0KPiBbIDI3ODAuNTAyNzYzXSB4NSA6IGZm
-ZmYwN2ZmZTUyZTRkYjAgeDQgOiAwMDAwMDAwMDAwMDAwMDAwIHgzIDogMDAwMDAwMDAwMDAwMDAw
-MA0KPiBbIDI3ODAuNTA5ODg1XSB4MiA6IDAwMDAwMDAwMDAwMDAwMDAgeDEgOiAwMDAwMDAwMDA0
-MjA4MDYwIHgwIDogZmZmZjA3ZmY4NGM2N2UwMA0KPiBbIDI3ODAuNTE3MDA4XSBDYWxsIHRyYWNl
-Og0KPiBbIDI3ODAuNTE5NDQxXSAgX19xdWV1ZV93b3JrKzB4M2NjLzB4NDYwDQo+IFsgMjc4MC41
-MjMwOTFdICBxdWV1ZV93b3JrX29uKzB4NzAvMHhjMA0KPiBbIDI3ODAuNTI2NjU0XSAgMHhmZmZm
-ZDNlYjM4OTNmZjc0DQo+IFsgMjc4MC41Mjk3ODRdICBibGtfbXFfZGlzcGF0Y2hfcnFfbGlzdCsw
-eDE0OC8weDU3OA0KPiBbIDI3ODAuNTM0Mzg5XSAgX19ibGtfbXFfc2NoZWRfZGlzcGF0Y2hfcmVx
-dWVzdHMrMHhiNC8weDFiOA0KPiBbIDI3ODAuNTM5Njg5XSAgYmxrX21xX3NjaGVkX2Rpc3BhdGNo
-X3JlcXVlc3RzKzB4NDAvMHg4MA0KPiBbIDI3ODAuNTQ0NzI3XSAgYmxrX21xX3J1bl93b3JrX2Zu
-KzB4NDQvMHg5OA0KPiBbIDI3ODAuNTQ4NzIzXSAgcHJvY2Vzc19vbmVfd29yaysweDFmNC8weDQ4
-OA0KPiBbIDI3ODAuNTUyNzIwXSAgd29ya2VyX3RocmVhZCsweDc0LzB4NDIwDQo+IFsgMjc4MC41
-NTYzNjldICBrdGhyZWFkKzB4MTAwLzB4MTEwDQo+IFsgMjc4MC41NTk1ODVdICByZXRfZnJvbV9m
-b3JrKzB4MTAvMHgyMA0KPiBbIDI3ODAuNTYzMTQ4XSAtLS1bIGVuZCB0cmFjZSAwMDAwMDAwMDAw
-MDAwMDAwIF0tLS0NCj4gWyAyNzg5LjgyNTExMF0gbnZtZXQ6IGN0cmwgMiBrZWVwLWFsaXZlIHRp
-bWVyICg1IHNlY29uZHMpIGV4cGlyZWQhDQo+IFsgMjc4OS44MzEwNTRdIG52bWV0OiBjdHJsIDIg
-ZmF0YWwgZXJyb3Igb2NjdXJyZWQhDQo+IFsgMjc4OS44MzU1ODVdIFVuYWJsZSB0byBoYW5kbGUg
-a2VybmVsIHBhZ2luZyByZXF1ZXN0IGF0IHZpcnR1YWwNCj4gYWRkcmVzcyBmZmZmZDNlYjM4OTNl
-NDQ4DQo+IFsgMjc4OS44NDM0ODldIE1lbSBhYm9ydCBpbmZvOg0KPiBbIDI3ODkuODQ2MjcyXSAg
-IEVTUiA9IDB4MDAwMDAwMDA4NjAwMDAwNw0KPiBbIDI3ODkuODUwMDA3XSAgIEVDID0gMHgyMTog
-SUFCVCAoY3VycmVudCBFTCksIElMID0gMzIgYml0cw0KPiBbIDI3ODkuODU1MzA5XSAgIFNFVCA9
-IDAsIEZuViA9IDANCj4gWyAyNzg5Ljg1ODM1MF0gICBFQSA9IDAsIFMxUFRXID0gMA0KPiBbIDI3
-ODkuODYxNDc4XSAgIEZTQyA9IDB4MDc6IGxldmVsIDMgdHJhbnNsYXRpb24gZmF1bHQNCj4gWyAy
-Nzg5Ljg2NjM0NF0gc3dhcHBlciBwZ3RhYmxlOiA0ayBwYWdlcywgNDgtYml0IFZBcywgcGdkcD0w
-MDAwMDgwNDU3NTE1MDAwDQo+IFsgMjc4OS44NzMwMzJdIFtmZmZmZDNlYjM4OTNlNDQ4XSBwZ2Q9
-MTAwMDA4MGZmZmZmZjAwMywNCj4NCg0KQ2FuIHlvdSBiaXNlY3QgdGhlIGlzc3VlID8NCg0KLWNr
-DQoNCg0K
+
+
+On 7/18/23 14:32, Yu Kuai wrote:
+> Subject:
+> Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
+> From:
+> Yu Kuai <yukuai1@huaweicloud.com>
+> Date:
+> 7/18/23, 14:32
+> 
+> To:
+> Sergei Shtepa <sergei.shtepa@veeam.com>, Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+> CC:
+> viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net, jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>, "yukuai (C)" <yukuai3@huawei.com>
+> 
+> 
+> Hi,
+> 
+> 在 2023/07/18 19:25, Sergei Shtepa 写道:
+>> Hi.
+>>
+>> On 7/18/23 03:37, Yu Kuai wrote:
+>>> Subject:
+>>> Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
+>>> From:
+>>> Yu Kuai <yukuai1@huaweicloud.com>
+>>> Date:
+>>> 7/18/23, 03:37
+>>>
+>>> To:
+>>> Sergei Shtepa <sergei.shtepa@veeam.com>, Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+>>> CC:
+>>> viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net, jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>, "yukuai (C)" <yukuai3@huawei.com>
+>>>
+>>>
+>>> Hi,
+>>>
+>>> 在 2023/07/17 22:39, Sergei Shtepa 写道:
+>>>>
+>>>>
+>>>> On 7/11/23 04:02, Yu Kuai wrote:
+>>>>> bdev_disk_changed() is not handled, where delete_partition() and
+>>>>> add_partition() will be called, this means blkfilter for partiton will
+>>>>> be removed after partition rescan. Am I missing something?
+>>>>
+>>>> Yes, when the bdev_disk_changed() is called, all disk block devices
+>>>> are deleted and new ones are re-created. Therefore, the information
+>>>> about the attached filters will be lost. This is equivalent to
+>>>> removing the disk and adding it back.
+>>>>
+>>>> For the blksnap module, partition rescan will mean the loss of the
+>>>> change trackers data. If a snapshot was created, then such
+>>>> a partition rescan will cause the snapshot to be corrupted.
+>>>>
+>>>
+>>> I haven't review blksnap code yet, but this sounds like a problem.
+>>
+>> I can't imagine a case where this could be a problem.
+>> Partition rescan is possible only if the file system has not been
+>> mounted on any of the disk partitions. Ioctl BLKRRPART will return
+>> -EBUSY. Therefore, during normal operation of the system, rescan is
+>> not performed.
+>> And if the file systems have not been mounted, it is possible that
+>> the disk partition structure has changed or the disk in the media
+>> device has changed. In this case, it is better to detach the
+>> filter, otherwise it may lead to incorrect operation of the module.
+>>
+>> We can add prechange/postchange callback functions so that the
+>> filter can track rescan process. But at the moment, this is not
+>> necessary for the blksnap module.
+> 
+> So you mean that blkfilter is only used for the case that partition
+> is mounted? (Or you mean that partition is opened)
+> 
+> Then, I think you mean that filter should only be used for the partition
+> that is opended? Otherwise, filter can be gone at any time since
+> partition rescan can be gone.
+> 
+> //user
+> 1. attach filter
+>         // other context rescan partition
+> 2. mount fs
+> // user will found filter is gone.
+
+Mmm...  The fact is that at the moment the user of the filter is the
+blksnap module. There are no other filter users yet. The blksnap module
+solves the problem of creating snapshots, primarily for backup purposes.
+Therefore, the main use case is to attach a filter for an already running
+system, where all partitions are marked up, file systems are mounted.
+
+If the server is being serviced, during which the disk is being
+re-partitioned, then disabling the filter is normal. In this case, the
+change tracker will be reset, and at the next backup, the filter will be
+attached again.
+
+But if I were still solving the problem of saving the filter when rescanning,
+then it is necessary to take into account the UUID and name of the partition
+(struct partition_meta_info). It is unacceptable that due to a change in the
+structure of partitions, the filter is attached to another partition by mistake.
+The changed() callback would also be good to add so that the filter receives
+a notification that the block device has been updated.
+
+But I'm not sure that this should be done, since if some code is not used in
+the kernel, then it should not be in the kernel.
+
+> 
+> Thanks,
+> Kuai
+> 
+>>
+>> Therefore, I will refrain from making changes for now.
+>>
+>>>
+>>> possible solutions I have in mind:
+>>>
+>>> 1. Store blkfilter for each partition from bdev_disk_changed() before
+>>> delete_partition(), and add blkfilter back after add_partition().
+>>>
+>>> 2. Store blkfilter from gendisk as a xarray, and protect it by
+>>> 'open_mutex' like 'part_tbl', block_device can keep the pointer to
+>>> reference blkfilter so that performance from fast path is ok, and the
+>>> lifetime of blkfiter can be managed separately.
+>>>
+>>>> There was an idea to do filtering at the disk level,
+>>>> but I abandoned it.
+>>>> .
+>>>>
+>>> I think it's better to do filtering at the partition level as well.
+>>>
+>>> Thanks,
+>>> Kuai
+>>>
+>> .
+>>
+> 
