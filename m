@@ -2,91 +2,181 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D052AEB64DA
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 07:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AAAEB64DD
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 09:55:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbjGRHtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jul 2023 03:49:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55124 "EHLO
+        id S231696AbjGRJzZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jul 2023 05:55:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbjGRHti (ORCPT
+        with ESMTP id S229883AbjGRJyx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jul 2023 03:49:38 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E9310E3
-        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 00:49:34 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-666e6541c98so5449001b3a.2
-        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 00:49:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1689666574; x=1692258574;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUjFu5dPruXh3TEHR0+I/1mPzXw99ve0GbxQPgZtdKo=;
-        b=kGJ93Hcc1PZfJTKke9iC3Knd6sVtXpPMTK6oZxNZMlAygny1++zKP5qubQajsp394D
-         +QCwne5/74y3f+THbcppvdLpCg2dW2b4qkdAtQ3Gl4bZSrdL1DOqndZ7Ykw3fp4GNE41
-         OLn8/k/PlpJYj4XSHhZlDygSflydSm+/tmnWc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689666574; x=1692258574;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IUjFu5dPruXh3TEHR0+I/1mPzXw99ve0GbxQPgZtdKo=;
-        b=CM46To93qH0BwfVwkisDpyZuGysx+sH5N2xLOjtkmF1FU0qGYBTcnzMkaZkaBrXTnx
-         3luQyZyV4DDeqUz3CbmcsM0ujKGtodtJpvJ2CmAspQ0SAHQAoThUgsTuO+IQ7R0aQtZ9
-         FwnB1PDN4IyVShtXiw9avZGWOHylJ3ANnY4dzu9msFnl4frKKYTIBwoA45sr0aPeVHqO
-         TVpTV2UpD21uj2NYDwnvEMDAxsHc9rv7/0wdYeuS+Iip5xF1dvJP3TLmrpBtiuF6qK5i
-         MlsOnbdtBx6GWEDeHHCNUXd5FUvMARqmTYfb7P+fFBVq8F+DanbPQKHWEfhLjk3I0fSg
-         uIZg==
-X-Gm-Message-State: ABy/qLbEQNIJhlGFu+zJaSp8XZGn1aWWm/TJvUk8UBeyeSqrZXZhi93b
-        bwvgADqDnoScZyq+VG/jMc+WsQ==
-X-Google-Smtp-Source: APBJJlGzb4kvOBD37QRatvVBuDMLQ7D0f9v4owIcA9Qds5BrBTQ1+3yjQigBXLe83zRFdmnQeOW6sA==
-X-Received: by 2002:a05:6a00:3995:b0:67e:18c6:d2c6 with SMTP id fi21-20020a056a00399500b0067e18c6d2c6mr20307992pfb.5.1689666574197;
-        Tue, 18 Jul 2023 00:49:34 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:49d1:35f7:f76f:e7b1])
-        by smtp.gmail.com with ESMTPSA id t14-20020a62ea0e000000b00680af5e4184sm932816pfh.160.2023.07.18.00.49.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 00:49:33 -0700 (PDT)
-Date:   Tue, 18 Jul 2023 16:49:29 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Huanpeng Xin <xinhuanpeng9@gmail.com>
-Cc:     minchan@kernel.org, ngupta@vflare.org, axboe@kernel.dk,
-        senozhatsky@chromium.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, xinhuanpeng <xinhuanpeng@xiaomi.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] zram: set zram bio priority to REQ_PRIO.
-Message-ID: <20230718074929.GD955071@google.com>
-References: <20230718071154.21566-1-xinhuanpeng9@gmail.com>
+        Tue, 18 Jul 2023 05:54:53 -0400
+Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98DB19B1;
+        Tue, 18 Jul 2023 02:54:10 -0700 (PDT)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.veeam.com (Postfix) with ESMTPS id 9297E42563;
+        Tue, 18 Jul 2023 05:54:07 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx1-2022; t=1689674047;
+        bh=Sg246O/TazSM39iHd05ZU6o4U+k3CZNhb15fFZTECkc=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=O5/LvrqGtPjO9zdpddRv5hZhBDAY6nztKsaUA2ByiobCDu1a0Hx7x0ZVNsBjeDNCk
+         88Mmfjg+2vnpVViPsuB+380QwlD/KMd4TCimlFOmwH/NCdu96LBi/T2DHBU6G0y26d
+         cM7DB/ysNImUpG44scEitw683MilHOVC3zsXu5iALEasNZR81XZrp1l3MD0/7uNVkf
+         fGm5sBJzBesGJB0Tjbk3BfFH73Ae4muR96O8tgLYNFI0pZfYVRZlFNYtY0VuboXNb3
+         5zsmICeqI5zrXNNtteaPS1MqCzgq8Km3NAo2vQH4ZCZyIk7ZQPvM5gQ4uvIQv6SNI5
+         S0qjMOSR+ojWA==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.16; Tue, 18 Jul
+ 2023 11:54:01 +0200
+Message-ID: <6168e4d5-efc3-0c84-66c7-aea460c9fcaa@veeam.com>
+Date:   Tue, 18 Jul 2023 11:53:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718071154.21566-1-xinhuanpeng9@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v5 04/11] blksnap: header file of the module interface
+Content-Language: en-US
+To:     =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <thomas@t-8ch.de>
+CC:     <axboe@kernel.dk>, <hch@infradead.org>, <corbet@lwn.net>,
+        <snitzer@kernel.org>, <viro@zeniv.linux.org.uk>,
+        <brauner@kernel.org>, <dchinner@redhat.com>, <willy@infradead.org>,
+        <dlemoal@kernel.org>, <jack@suse.cz>, <ming.lei@redhat.com>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        Donald Buczek <buczek@molgen.mpg.de>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612135228.10702-5-sergei.shtepa@veeam.com>
+ <822909b0-abd6-4e85-b739-41f8efa6feff@t-8ch.de>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <822909b0-abd6-4e85-b739-41f8efa6feff@t-8ch.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: colmbx01.amust.local (172.31.112.31) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A292403155B677763
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Cc-ing Christoph
+Hi!
+Thanks for the review.
 
-On (23/07/18 15:11), Huanpeng Xin wrote:
+On 7/17/23 20:57, Thomas Weißschuh wrote:
+> Subject:
+> Re: [PATCH v5 04/11] blksnap: header file of the module interface
+> From:
+> Thomas Weißschuh <thomas@t-8ch.de>
+> Date:
+> 7/17/23, 20:57
 > 
-> When the system memory pressure is high, set zram bio priority
-> to REQ_PRIO can quickly swap zarm's memory to backing device,
+> To:
+> Sergei Shtepa <sergei.shtepa@veeam.com>
+> CC:
+> axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org, jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>
+> 
+> 
+> On 2023-06-12 15:52:21+0200, Sergei Shtepa wrote:
+> 
+>> [..]
+>> diff --git a/include/uapi/linux/blksnap.h b/include/uapi/linux/blksnap.h
+>> new file mode 100644
+>> index 000000000000..2fe3f2a43bc5
+>> --- /dev/null
+>> +++ b/include/uapi/linux/blksnap.h
+>> @@ -0,0 +1,421 @@
+>> [..]
+>> +/**
+>> + * struct blksnap_snapshotinfo - Result for the command
+>> + *	&blkfilter_ctl_blksnap.blkfilter_ctl_blksnap_snapshotinfo.
+>> + *
+>> + * @error_code:
+>> + *	Zero if there were no errors while holding the snapshot.
+>> + *	The error code -ENOSPC means that while holding the snapshot, a snapshot
+>> + *	overflow situation has occurred. Other error codes mean other reasons
+>> + *	for failure.
+>> + *	The error code is reset when the device is added to a new snapshot.
+>> + * @image:
+>> + *	If the snapshot was taken, it stores the block device name of the
+>> + *	image, or empty string otherwise.
+>> + */
+>> +struct blksnap_snapshotinfo {
+>> +	__s32 error_code;
+>> +	__u8 image[IMAGE_DISK_NAME_LEN];
+> Nitpick:
+> 
+> Seems a bit weird to have a signed error code that is always negative.
+> Couldn't this be an unsigned number or directly return the error from
+> the ioctl() itself?
 
-read_from_bdev_async() does the opposite.
+Yes, it's a good idea to pass the error code as an unsigned value.
+And this positive value can be passed in case of successful execution
+of ioctl(), but I would not like to put different error signs in one value.
 
-[..]
-> @@ -616,7 +616,7 @@ static int read_from_bdev_async(struct zram *zram, struct bio_vec *bvec,
->  {
-> +	bio = bio_alloc(zram->bdev, 1, parent ? parent->bi_opf : REQ_OP_READ | REQ_PRIO,
->  			GFP_NOIO);
+> 
+>> +};
+>> +
+>> +/**
+>> + * DOC: Interface for managing snapshots
+>> + *
+>> + * Control commands that are transmitted through the blksnap module interface.
+>> + */
+>> +enum blksnap_ioctl {
+>> +	blksnap_ioctl_version,
+>> +	blksnap_ioctl_snapshot_create,
+>> +	blksnap_ioctl_snapshot_destroy,
+>> +	blksnap_ioctl_snapshot_append_storage,
+>> +	blksnap_ioctl_snapshot_take,
+>> +	blksnap_ioctl_snapshot_collect,
+>> +	blksnap_ioctl_snapshot_wait_event,
+>> +};
+>> +
+>> +/**
+>> + * struct blksnap_version - Module version.
+>> + *
+>> + * @major:
+>> + *	Version major part.
+>> + * @minor:
+>> + *	Version minor part.
+>> + * @revision:
+>> + *	Revision number.
+>> + * @build:
+>> + *	Build number. Should be zero.
+>> + */
+>> +struct blksnap_version {
+>> +	__u16 major;
+>> +	__u16 minor;
+>> +	__u16 revision;
+>> +	__u16 build;
+>> +};
+>> +
+>> +/**
+>> + * define IOCTL_BLKSNAP_VERSION - Get module version.
+>> + *
+>> + * The version may increase when the API changes. But linking the user space
+>> + * behavior to the version code does not seem to be a good idea.
+>> + * To ensure backward compatibility, API changes should be made by adding new
+>> + * ioctl without changing the behavior of existing ones. The version should be
+>> + * used for logs.
+>> + *
+>> + * Return: 0 if succeeded, negative errno otherwise.
+>> + */
+>> +#define IOCTL_BLKSNAP_VERSION							\
+>> +	_IOW(BLKSNAP, blksnap_ioctl_version, struct blksnap_version)
+> Shouldn't this be _IOR()?
+> 
+>   "_IOW means userland is writing and kernel is reading. _IOR
+>   means userland is reading and kernel is writing."
+> 
+> The other ioctl definitions seem to need a review, too.
+> 
 
-[..]
-
-> @@ -746,7 +746,7 @@ static ssize_t writeback_store(struct device *dev,
-> ...
->  		bio_init(&bio, zram->bdev, &bio_vec, 1,
-> -			 REQ_OP_WRITE | REQ_SYNC);
-> +			 REQ_OP_WRITE | REQ_SYNC | REQ_PRIO);
-
-In general, zram writeback is not for situations when the system
-is critically low on memory; performance there is not that important,
-so I'm not sure whether we want to boost requests' priorities.
+Yeah. I need to replace _IOR and _IOW in all ioctl.
+Thanks!
