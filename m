@@ -2,197 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97351EB64DC
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jul 2023 20:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 317A6C001DE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 01:21:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231292AbjGQUxS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jul 2023 16:53:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43580 "EHLO
+        id S230246AbjGRBVe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jul 2023 21:21:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230376AbjGQUxP (ORCPT
+        with ESMTP id S229562AbjGRBVd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jul 2023 16:53:15 -0400
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7925F1703
-        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 13:52:34 -0700 (PDT)
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-78666f06691so208853539f.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2023 13:52:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689627153; x=1692219153;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oKt7u9+EufxKoWSvSSwWfFwZSG4OcmiYT019qH8A3aE=;
-        b=MrrcOkKa3AVM/uaApXpZgcxfUhxy+02Kr64nL5K3A6DfbYZXw0IBPnEky7slqPtDhA
-         Gum+LaGXZ//31dxrD6HRF7Wy4XcGGhKAJWKJRSq9AEC8UgXkD63ZAhJQmAqhpCyeAtDU
-         6ydIyQv9Ovd6dzRDWcaY+ypwbhCbBshtW0jbL6Cta5SnxcLx28pW/SBI73l29gBYWhNS
-         t2M/t/QFfSPdOs4kihmLfSP5R5YMnGk8JOhhEiZDX6b7iBcpXtbO1jFjQAVRKu9J0Pnk
-         WjqIA/UZZa68HFGXb9Wnf6fcd/mUNP/pIuUke8xp6EprOiuIL8MKQ4S2kSdczSvOK87R
-         XHNg==
-X-Gm-Message-State: ABy/qLZSO7Zfo88g0HKuzS/vgRoLxHH9bBWfhkbs7qPtTlY3aLR9SEmX
-        089RNj+OmNXGAgzjPKX5opE=
-X-Google-Smtp-Source: APBJJlFxUGJZcq3xL1IGEUtqf/igiOMLmdPxmULzYW92d67CYEezI/P9MB0isVyVAj9xtAwMexPFiw==
-X-Received: by 2002:a92:ca0c:0:b0:347:7603:6865 with SMTP id j12-20020a92ca0c000000b0034776036865mr870869ils.11.1689627153482;
-        Mon, 17 Jul 2023 13:52:33 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:ac3:b183:3725:4b8f])
-        by smtp.gmail.com with ESMTPSA id v17-20020a17090abb9100b0025645ce761dsm5222403pjr.35.2023.07.17.13.52.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jul 2023 13:52:33 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: [PATCH 3/3] block: Improve performance for BLK_MQ_F_BLOCKING drivers
-Date:   Mon, 17 Jul 2023 13:52:15 -0700
-Message-ID: <20230717205216.2024545-4-bvanassche@acm.org>
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-In-Reply-To: <20230717205216.2024545-1-bvanassche@acm.org>
-References: <20230717205216.2024545-1-bvanassche@acm.org>
+        Mon, 17 Jul 2023 21:21:33 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791F2A6;
+        Mon, 17 Jul 2023 18:21:31 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4R4h476Xklz4f3tpr;
+        Tue, 18 Jul 2023 09:21:27 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAHvbAW6bVkzqLiOA--.59429S3;
+        Tue, 18 Jul 2023 09:21:28 +0800 (CST)
+Subject: Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>,
+        Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
+        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+        willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net,
+        jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Donald Buczek <buczek@molgen.mpg.de>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612135228.10702-3-sergei.shtepa@veeam.com>
+ <f935840e-12a7-c37b-183c-27e2d83990ea@huaweicloud.com>
+ <eca5a778-6795-fc03-7ae0-fe06f514af85@huaweicloud.com>
+ <2ab36e73-a612-76a8-9c20-f5e11c67bcc3@huaweicloud.com>
+ <b19b4c51-c769-84f9-7eae-b555ae51d692@veeam.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <4ab4ba31-6eb3-9d8c-9bd5-376e192f3ba2@huaweicloud.com>
+Date:   Tue, 18 Jul 2023 09:21:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <b19b4c51-c769-84f9-7eae-b555ae51d692@veeam.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAHvbAW6bVkzqLiOA--.59429S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxZF18XryUJF4fZry3ZF45GFg_yoW5tFW7pF
+        Z5XayjyrWDXF1kXw4qgw1UAF92qw1DGw1UZryftay5Jr4DtrnFgw47Wr909wn5Ar48WFyj
+        vr1jqrWIv3s8JFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbQVy7UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_run_queue() runs the queue asynchronously if BLK_MQ_F_BLOCKING
-has been set. This is suboptimal since running the queue asynchronously
-is slower than running the queue synchronously. This patch modifies
-blk_mq_run_queue() as follows if BLK_MQ_F_BLOCKING has been set:
-- Run the queue synchronously if it is allowed to sleep.
-- Run the queue asynchronously if it is not allowed to sleep.
-Additionally, blk_mq_run_hw_queue(hctx, false) calls are modified into
-blk_mq_run_hw_queue(hctx, hctx->flags & BLK_MQ_F_BLOCKING) if the caller
-may be invoked from atomic context.
+Hi,
 
-The following caller chains have been reviewed:
+在 2023/07/18 1:39, Sergei Shtepa 写道:
+> Hi.
+> 
+> On 7/12/23 14:34, Yu Kuai wrote:
+>> Subject:
+>> Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
+>> From:
+>> Yu Kuai <yukuai1@huaweicloud.com>
+>> Date:
+>> 7/12/23, 14:34
+>>
+>> To:
+>> Yu Kuai <yukuai1@huaweicloud.com>, Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+>> CC:
+>> viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net, jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>, "yukuai (C)" <yukuai3@huawei.com>
+>>
+>>
+>> Hi,
+>>
+>> 在 2023/07/12 18:04, Yu Kuai 写道:
+>>> Hi,
+>>>
+>>> 在 2023/07/11 10:02, Yu Kuai 写道:
+>>>
+>>>>> +static bool submit_bio_filter(struct bio *bio)
+>>>>> +{
+>>>>> +    if (bio_flagged(bio, BIO_FILTERED))
+>>>>> +        return false;
+>>>>> +
+>>>>> +    bio_set_flag(bio, BIO_FILTERED);
+>>>>> +    return bio->bi_bdev->bd_filter->ops->submit_bio(bio);
+>>>>> +}
+>>>>> +
+>>>>>    static void __submit_bio(struct bio *bio)
+>>>>>    {
+>>>>> +    /*
+>>>>> +     * If there is a filter driver attached, check if the BIO needs to go to
+>>>>> +     * the filter driver first, which can then pass on the bio or consume it.
+>>>>> +     */
+>>>>> +    if (bio->bi_bdev->bd_filter && submit_bio_filter(bio))
+>>>>> +        return;
+>>>>> +
+>>>>>        if (unlikely(!blk_crypto_bio_prep(&bio)))
+>>>>>            return;
+>>>
+>>> ...
+>>>
+>>>>> +static void __blkfilter_detach(struct block_device *bdev)
+>>>>> +{
+>>>>> +    struct blkfilter *flt = bdev->bd_filter;
+>>>>> +    const struct blkfilter_operations *ops = flt->ops;
+>>>>> +
+>>>>> +    bdev->bd_filter = NULL;
+>>>>> +    ops->detach(flt);
+>>>>> +    module_put(ops->owner);
+>>>>> +}
+>>>>> +
+>>>>> +void blkfilter_detach(struct block_device *bdev)
+>>>>> +{
+>>>>> +    if (bdev->bd_filter) {
+>>>>> +        blk_mq_freeze_queue(bdev->bd_queue);
+>>>
+>>> And this is not sate as well, for bio-based device, q_usage_counter is
+>>> not grabbed while submit_bio_filter() is called, hence there is a risk
+>>> of uaf from submit_bio_filter().
+>>
+>> And there is another question, can blkfilter_detach() from
+>> del_gendisk/delete_partiton and ioctl concurrent? I think it's a
+>> problem.
+>>
+> 
+> Yes, it looks like if two threads execute the blkfilter_detach() function,
+> then a problem is possible. The blk_mq_freeze_queue() function does not
+> block threads.
+> But for this, it is necessary that the IOCTL for the block device and
+> its removal are performed simultaneously. Is this possible?
 
-blk_mq_run_hw_queue(hctx, false)
-  blk_mq_get_tag()      /* may sleep, hence the functions it calls may also sleep */
-  blk_execute_rq_nowait()
-    nvme_*()            /* the NVMe driver does not set BLK_MQ_F_BLOCKING */
-    scsi_eh_lock_door() /* may sleep */
-    sg_common_write()   /* implements an ioctl and hence may sleep */
-    st_scsi_execute()   /* may sleep */
-    pscsi_execute_cmd() /* may sleep */
-    ufshpb_execute_umap_req()  /* A request to remove HPB has been submitted. */
-    ufshbp_execute_map_req()   /* A request to remove HPB has been submitted. */
-  blk_execute_rq()             /* may sleep */
-  blk_mq_run_hw_queues(q, async=false)
-    blk_freeze_queue_start()   /* may sleep */
-    blk_mq_requeue_work()      /* may sleep */
-    scsi_kick_queue()
-      scsi_requeue_run_queue() /* may sleep */
-      scsi_run_host_queues()
-        scsi_ioctl_reset()     /* may sleep */
-  blk_mq_insert_requests(hctx, ctx, list, run_queue_async=false)
-    blk_mq_dispatch_plug_list(plug, from_sched=false)
-      blk_mq_flush_plug_list(plug, from_schedule=false)
-        __blk_flush_plug(plug, from_schedule=false)
-	blk_add_rq_to_plug()
-	  blk_execute_rq_nowait() /* see above */
-	  blk_mq_submit_bio()  /* may sleep if REQ_NOWAIT has not been set */
-  blk_mq_plug_issue_direct()
-    blk_mq_flush_plug_list()   /* see above */
-  blk_mq_dispatch_plug_list(plug, from_sched=false)
-    blk_mq_flush_plug_list()   /* see above */
-  blk_mq_try_issue_directly()
-    blk_mq_submit_bio()        /* may sleep if REQ_NOWAIT has not been set */
-  blk_mq_try_issue_list_directly(hctx, list)
-    blk_mq_insert_requests() /* see above */
+I think it's possible, ioctl only requires to open the disk/partition,
+and it won't block disk removal:
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-mq.c          | 17 +++++++++++------
- drivers/scsi/scsi_lib.c |  3 +++
- 2 files changed, 14 insertions(+), 6 deletions(-)
+t1:			t2:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5504719b970d..d5ab0bd8b472 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1289,7 +1289,8 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
-  *
-  * Description:
-  *    Insert a fully prepared request at the back of the I/O scheduler queue
-- *    for execution.  Don't wait for completion.
-+ *    for execution. Don't wait for completion. May sleep if BLK_MQ_F_BLOCKING
-+ *    has been set.
-  *
-  * Note:
-  *    This function will invoke @done directly if the queue is dead.
-@@ -2213,6 +2214,8 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 	 */
- 	WARN_ON_ONCE(!async && in_interrupt());
- 
-+	might_sleep_if(!async && hctx->flags & BLK_MQ_F_BLOCKING);
-+
- 	/*
- 	 * When queue is quiesced, we may be switching io scheduler, or
- 	 * updating nr_hw_queues, or other things, and we can't run queue
-@@ -2228,8 +2231,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 	if (!need_run)
- 		return;
- 
--	if (async || (hctx->flags & BLK_MQ_F_BLOCKING) ||
--	    !cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
-+	if (async || !cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
- 		blk_mq_delay_run_hw_queue(hctx, 0);
- 		return;
- 	}
-@@ -2364,7 +2366,7 @@ void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
- 
--	blk_mq_run_hw_queue(hctx, false);
-+	blk_mq_run_hw_queue(hctx, hctx->flags & BLK_MQ_F_BLOCKING);
- }
- EXPORT_SYMBOL(blk_mq_start_hw_queue);
- 
-@@ -2394,7 +2396,8 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- 	unsigned long i;
- 
- 	queue_for_each_hw_ctx(q, hctx, i)
--		blk_mq_start_stopped_hw_queue(hctx, async);
-+		blk_mq_start_stopped_hw_queue(hctx, async ||
-+					(hctx->flags & BLK_MQ_F_BLOCKING));
- }
- EXPORT_SYMBOL(blk_mq_start_stopped_hw_queues);
- 
-@@ -2452,6 +2455,8 @@ static void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx,
- 	list_for_each_entry(rq, list, queuelist) {
- 		BUG_ON(rq->mq_ctx != ctx);
- 		trace_block_rq_insert(rq);
-+		if (rq->cmd_flags & REQ_NOWAIT)
-+			run_queue_async = true;
- 	}
- 
- 	spin_lock(&ctx->lock);
-@@ -2612,7 +2617,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 
- 	if ((rq->rq_flags & RQF_USE_SCHED) || !blk_mq_get_budget_and_tag(rq)) {
- 		blk_mq_insert_request(rq, 0);
--		blk_mq_run_hw_queue(hctx, false);
-+		blk_mq_run_hw_queue(hctx, rq->cmd_flags & REQ_NOWAIT);
- 		return;
- 	}
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 7043ca0f4da9..197942db8016 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -329,6 +329,9 @@ static void scsi_single_lun_run(struct scsi_device *current_sdev)
- 	starget->starget_sdev_user = NULL;
- 	spin_unlock_irqrestore(shost->host_lock, flags);
- 
-+	/* Combining BLIST_SINGLELUN with BLK_MQ_F_BLOCKING is not supported. */
-+	WARN_ON_ONCE(shost->tag_set.flags & BLK_MQ_F_BLOCKING);
-+
- 	/*
- 	 * Call blk_run_queue for all LUNs on the target, starting with
- 	 * current_sdev. We race with others (to set starget_sdev_user),
+open dev
+ioctl
+			remove dev
+			 del_gendisk
+  blkfilter_detach	  blkfilter_detach
+
+> 
+> I suppose that using mutex bdev->bd_disk->open_mutex in
+> blkfilter_ioctl_attach(), blkfilter_ioctl_detach() and
+> blkfilter_ioctl_ctl() can fix the problem. What do you think?
+
+I think it's ok, and blkfilter ioctl must check disk_live() while
+holding the lock.
+
+Thanks,
+Kuai
+
+> 
+> 
+>> Thanks,
+>> Kuai
+>>>
+>>> Thanks,
+>>> Kuai
+>>>
+>>> .
+>>>
+>>
+> .
+> 
+
