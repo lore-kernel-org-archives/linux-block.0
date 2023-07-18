@@ -2,181 +2,144 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AAAEB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 09:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABC1EB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 11:25:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231696AbjGRJzZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jul 2023 05:55:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49154 "EHLO
+        id S230466AbjGRLZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jul 2023 07:25:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229883AbjGRJyx (ORCPT
+        with ESMTP id S230046AbjGRLZg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jul 2023 05:54:53 -0400
-Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98DB19B1;
-        Tue, 18 Jul 2023 02:54:10 -0700 (PDT)
+        Tue, 18 Jul 2023 07:25:36 -0400
+Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3354134;
+        Tue, 18 Jul 2023 04:25:34 -0700 (PDT)
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.veeam.com (Postfix) with ESMTPS id 9297E42563;
-        Tue, 18 Jul 2023 05:54:07 -0400 (EDT)
+        by mx4.veeam.com (Postfix) with ESMTPS id 9A21E2B574;
+        Tue, 18 Jul 2023 14:25:31 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx1-2022; t=1689674047;
-        bh=Sg246O/TazSM39iHd05ZU6o4U+k3CZNhb15fFZTECkc=;
+        s=mx4-2022; t=1689679531;
+        bh=0HxCwL7XClDj65r1twmCt4r20koEqWHsoKc1IxOESRU=;
         h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=O5/LvrqGtPjO9zdpddRv5hZhBDAY6nztKsaUA2ByiobCDu1a0Hx7x0ZVNsBjeDNCk
-         88Mmfjg+2vnpVViPsuB+380QwlD/KMd4TCimlFOmwH/NCdu96LBi/T2DHBU6G0y26d
-         cM7DB/ysNImUpG44scEitw683MilHOVC3zsXu5iALEasNZR81XZrp1l3MD0/7uNVkf
-         fGm5sBJzBesGJB0Tjbk3BfFH73Ae4muR96O8tgLYNFI0pZfYVRZlFNYtY0VuboXNb3
-         5zsmICeqI5zrXNNtteaPS1MqCzgq8Km3NAo2vQH4ZCZyIk7ZQPvM5gQ4uvIQv6SNI5
-         S0qjMOSR+ojWA==
+        b=BfjxBu9FQIOFK6WtkjLQAN6Scoilhc6Eenjq8FiSTRx2yI8jjz9537XC5lSqmsVpM
+         OWxsf8bvRstmFDpvYngxNohd9XjQicBP0omr/Jn+wK2Qkogaxwlsp3e58dCYCtR1UT
+         OEBHOYqA36HSOoRjJXb9hA/2ud/KJq7uErGUFPIYISIyUVd48DHq5+LNdJXxAKEFk/
+         7qjGm9z7CUsjNJY0knr8HTcM54AiFJj4lRHCRpPjB80r15r5Hp8lsmV4ZIveJpfmI6
+         nYk5I019CBHXjq4xvH/nFwDPwgsu9JCR0wP/gcAfY03hShN9LPdH+33MqCDPOc27lq
+         cYLhLjVXaSHjQ==
 Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
  (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.16; Tue, 18 Jul
- 2023 11:54:01 +0200
-Message-ID: <6168e4d5-efc3-0c84-66c7-aea460c9fcaa@veeam.com>
-Date:   Tue, 18 Jul 2023 11:53:54 +0200
+ 2023 13:25:25 +0200
+Message-ID: <686b9999-c903-cff1-48ba-21324031da17@veeam.com>
+Date:   Tue, 18 Jul 2023 13:25:16 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH v5 04/11] blksnap: header file of the module interface
+Subject: Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
 Content-Language: en-US
-To:     =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <thomas@t-8ch.de>
-CC:     <axboe@kernel.dk>, <hch@infradead.org>, <corbet@lwn.net>,
-        <snitzer@kernel.org>, <viro@zeniv.linux.org.uk>,
-        <brauner@kernel.org>, <dchinner@redhat.com>, <willy@infradead.org>,
-        <dlemoal@kernel.org>, <jack@suse.cz>, <ming.lei@redhat.com>,
+To:     Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>,
+        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
+CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <dchinner@redhat.com>, <willy@infradead.org>, <dlemoal@kernel.org>,
+        <linux@weissschuh.net>, <jack@suse.cz>, <ming.lei@redhat.com>,
         <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        Donald Buczek <buczek@molgen.mpg.de>
+        Donald Buczek <buczek@molgen.mpg.de>,
+        "yukuai (C)" <yukuai3@huawei.com>
 References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
- <20230612135228.10702-5-sergei.shtepa@veeam.com>
- <822909b0-abd6-4e85-b739-41f8efa6feff@t-8ch.de>
+ <20230612135228.10702-3-sergei.shtepa@veeam.com>
+ <f935840e-12a7-c37b-183c-27e2d83990ea@huaweicloud.com>
+ <90f79cf3-86a2-02c0-1887-d3490f9848bb@veeam.com>
+ <d929eaa7-61d6-c4c4-aabc-0124c3693e10@huaweicloud.com>
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <822909b0-abd6-4e85-b739-41f8efa6feff@t-8ch.de>
+In-Reply-To: <d929eaa7-61d6-c4c4-aabc-0124c3693e10@huaweicloud.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [172.24.10.107]
 X-ClientProxiedBy: colmbx01.amust.local (172.31.112.31) To
  prgmbx01.amust.local (172.24.128.102)
 X-EsetResult: clean, is OK
-X-EsetId: 37303A292403155B677763
+X-EsetId: 37303A292403155B677761
 X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
-Thanks for the review.
+Hi.
 
-On 7/17/23 20:57, Thomas Weißschuh wrote:
+On 7/18/23 03:37, Yu Kuai wrote:
 > Subject:
-> Re: [PATCH v5 04/11] blksnap: header file of the module interface
+> Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
 > From:
-> Thomas Weißschuh <thomas@t-8ch.de>
+> Yu Kuai <yukuai1@huaweicloud.com>
 > Date:
-> 7/17/23, 20:57
+> 7/18/23, 03:37
 > 
 > To:
-> Sergei Shtepa <sergei.shtepa@veeam.com>
+> Sergei Shtepa <sergei.shtepa@veeam.com>, Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
 > CC:
-> axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org, jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>
+> viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net, jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>, "yukuai (C)" <yukuai3@huawei.com>
 > 
 > 
-> On 2023-06-12 15:52:21+0200, Sergei Shtepa wrote:
+> Hi,
 > 
->> [..]
->> diff --git a/include/uapi/linux/blksnap.h b/include/uapi/linux/blksnap.h
->> new file mode 100644
->> index 000000000000..2fe3f2a43bc5
->> --- /dev/null
->> +++ b/include/uapi/linux/blksnap.h
->> @@ -0,0 +1,421 @@
->> [..]
->> +/**
->> + * struct blksnap_snapshotinfo - Result for the command
->> + *	&blkfilter_ctl_blksnap.blkfilter_ctl_blksnap_snapshotinfo.
->> + *
->> + * @error_code:
->> + *	Zero if there were no errors while holding the snapshot.
->> + *	The error code -ENOSPC means that while holding the snapshot, a snapshot
->> + *	overflow situation has occurred. Other error codes mean other reasons
->> + *	for failure.
->> + *	The error code is reset when the device is added to a new snapshot.
->> + * @image:
->> + *	If the snapshot was taken, it stores the block device name of the
->> + *	image, or empty string otherwise.
->> + */
->> +struct blksnap_snapshotinfo {
->> +	__s32 error_code;
->> +	__u8 image[IMAGE_DISK_NAME_LEN];
-> Nitpick:
+> 在 2023/07/17 22:39, Sergei Shtepa 写道:
+>>
+>>
+>> On 7/11/23 04:02, Yu Kuai wrote:
+>>> bdev_disk_changed() is not handled, where delete_partition() and
+>>> add_partition() will be called, this means blkfilter for partiton will
+>>> be removed after partition rescan. Am I missing something?
+>>
+>> Yes, when the bdev_disk_changed() is called, all disk block devices
+>> are deleted and new ones are re-created. Therefore, the information
+>> about the attached filters will be lost. This is equivalent to
+>> removing the disk and adding it back.
+>>
+>> For the blksnap module, partition rescan will mean the loss of the
+>> change trackers data. If a snapshot was created, then such
+>> a partition rescan will cause the snapshot to be corrupted.
+>>
 > 
-> Seems a bit weird to have a signed error code that is always negative.
-> Couldn't this be an unsigned number or directly return the error from
-> the ioctl() itself?
+> I haven't review blksnap code yet, but this sounds like a problem.
 
-Yes, it's a good idea to pass the error code as an unsigned value.
-And this positive value can be passed in case of successful execution
-of ioctl(), but I would not like to put different error signs in one value.
+I can't imagine a case where this could be a problem.
+Partition rescan is possible only if the file system has not been
+mounted on any of the disk partitions. Ioctl BLKRRPART will return
+-EBUSY. Therefore, during normal operation of the system, rescan is
+not performed.
+And if the file systems have not been mounted, it is possible that
+the disk partition structure has changed or the disk in the media
+device has changed. In this case, it is better to detach the
+filter, otherwise it may lead to incorrect operation of the module.
+
+We can add prechange/postchange callback functions so that the
+filter can track rescan process. But at the moment, this is not
+necessary for the blksnap module. 
+
+Therefore, I will refrain from making changes for now.
 
 > 
->> +};
->> +
->> +/**
->> + * DOC: Interface for managing snapshots
->> + *
->> + * Control commands that are transmitted through the blksnap module interface.
->> + */
->> +enum blksnap_ioctl {
->> +	blksnap_ioctl_version,
->> +	blksnap_ioctl_snapshot_create,
->> +	blksnap_ioctl_snapshot_destroy,
->> +	blksnap_ioctl_snapshot_append_storage,
->> +	blksnap_ioctl_snapshot_take,
->> +	blksnap_ioctl_snapshot_collect,
->> +	blksnap_ioctl_snapshot_wait_event,
->> +};
->> +
->> +/**
->> + * struct blksnap_version - Module version.
->> + *
->> + * @major:
->> + *	Version major part.
->> + * @minor:
->> + *	Version minor part.
->> + * @revision:
->> + *	Revision number.
->> + * @build:
->> + *	Build number. Should be zero.
->> + */
->> +struct blksnap_version {
->> +	__u16 major;
->> +	__u16 minor;
->> +	__u16 revision;
->> +	__u16 build;
->> +};
->> +
->> +/**
->> + * define IOCTL_BLKSNAP_VERSION - Get module version.
->> + *
->> + * The version may increase when the API changes. But linking the user space
->> + * behavior to the version code does not seem to be a good idea.
->> + * To ensure backward compatibility, API changes should be made by adding new
->> + * ioctl without changing the behavior of existing ones. The version should be
->> + * used for logs.
->> + *
->> + * Return: 0 if succeeded, negative errno otherwise.
->> + */
->> +#define IOCTL_BLKSNAP_VERSION							\
->> +	_IOW(BLKSNAP, blksnap_ioctl_version, struct blksnap_version)
-> Shouldn't this be _IOR()?
+> possible solutions I have in mind:
 > 
->   "_IOW means userland is writing and kernel is reading. _IOR
->   means userland is reading and kernel is writing."
+> 1. Store blkfilter for each partition from bdev_disk_changed() before
+> delete_partition(), and add blkfilter back after add_partition().
 > 
-> The other ioctl definitions seem to need a review, too.
+> 2. Store blkfilter from gendisk as a xarray, and protect it by
+> 'open_mutex' like 'part_tbl', block_device can keep the pointer to
+> reference blkfilter so that performance from fast path is ok, and the
+> lifetime of blkfiter can be managed separately.
 > 
-
-Yeah. I need to replace _IOR and _IOW in all ioctl.
-Thanks!
+>> There was an idea to do filtering at the disk level,
+>> but I abandoned it.
+>> .
+>>
+> I think it's better to do filtering at the partition level as well.
+> 
+> Thanks,
+> Kuai
+> 
