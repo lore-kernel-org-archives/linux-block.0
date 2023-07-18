@@ -2,144 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABC1EB64DC
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 11:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 443BCEB64DD
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 11:51:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230466AbjGRLZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jul 2023 07:25:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41212 "EHLO
+        id S231222AbjGRLvq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jul 2023 07:51:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230046AbjGRLZg (ORCPT
+        with ESMTP id S229800AbjGRLvq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jul 2023 07:25:36 -0400
-Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3354134;
-        Tue, 18 Jul 2023 04:25:34 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 9A21E2B574;
-        Tue, 18 Jul 2023 14:25:31 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx4-2022; t=1689679531;
-        bh=0HxCwL7XClDj65r1twmCt4r20koEqWHsoKc1IxOESRU=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=BfjxBu9FQIOFK6WtkjLQAN6Scoilhc6Eenjq8FiSTRx2yI8jjz9537XC5lSqmsVpM
-         OWxsf8bvRstmFDpvYngxNohd9XjQicBP0omr/Jn+wK2Qkogaxwlsp3e58dCYCtR1UT
-         OEBHOYqA36HSOoRjJXb9hA/2ud/KJq7uErGUFPIYISIyUVd48DHq5+LNdJXxAKEFk/
-         7qjGm9z7CUsjNJY0knr8HTcM54AiFJj4lRHCRpPjB80r15r5Hp8lsmV4ZIveJpfmI6
-         nYk5I019CBHXjq4xvH/nFwDPwgsu9JCR0wP/gcAfY03hShN9LPdH+33MqCDPOc27lq
-         cYLhLjVXaSHjQ==
-Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
- (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.16; Tue, 18 Jul
- 2023 13:25:25 +0200
-Message-ID: <686b9999-c903-cff1-48ba-21324031da17@veeam.com>
-Date:   Tue, 18 Jul 2023 13:25:16 +0200
+        Tue, 18 Jul 2023 07:51:46 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 852BA18D
+        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 04:51:45 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6b9d68a7abaso1461898a34.3
+        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 04:51:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1689681105; x=1692273105;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bt8R0yrtkT9HdCJnGP8rK8VrJeyWRFxqKQi//6Da7GE=;
+        b=YJJ7K/0vmJz/f04xwiyuKk8kOag7W4TZdVLfbvYI5skR6c9qDRXJf3IBzhvfNdTKpG
+         QDOG9ERkhsPmY7HObV4nRjWRAs5JHSN0IH9jujsPACREffEOySDcNeJB9c6vgHKTNBNC
+         pYlCYG6LLBBectUmpi+AiEP4U68mTQDH2bZkc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689681105; x=1692273105;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bt8R0yrtkT9HdCJnGP8rK8VrJeyWRFxqKQi//6Da7GE=;
+        b=FGON0pvzIA/jtnSx1mrPhOnETgQiWqvxIq1Zp/7pxcIJ4x+ANsA2cUKpgimginSDeu
+         XnBbxNGACX1Q9uHsMVGHKB/uX8pB1DWcLKJZhyZ4VcW37yB19tVAnyt10/2EMENlpIZD
+         64cmCMgaFoupUIntJ+U0Azk5Ru6fPaJKwybmcChO32nkYUmkCuIYjEIE5LcTrnJ2GG8k
+         pRYL8ADYy1ydeQ9j4+liJSwnF61dOr0oiElN54OQgfRRerY/fCcU48A6qS+9G2s9C9/R
+         juTReoCw+a/relchwICO5h9YM/khYZs/n7+mZnakMXeSyONcVtQ0OAFvC8PNTrY48Q66
+         uGxA==
+X-Gm-Message-State: ABy/qLYq4ukly+4EzombCGqBmkPUoQSj1ugvig8E2MmgcdAIMyBHP//U
+        rfcGel+OYo2ykawHhmBbvBpV9w==
+X-Google-Smtp-Source: APBJJlGSwNzDZ/D1eNN/xuYf2/U12n4u2seCb7p9PhhFw0d5UTDFarbRz1lof9iuLAPo5qBk1Cw1ig==
+X-Received: by 2002:a05:6358:94a1:b0:131:46b:3953 with SMTP id i33-20020a05635894a100b00131046b3953mr12476851rwb.13.1689681104734;
+        Tue, 18 Jul 2023 04:51:44 -0700 (PDT)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id ck23-20020a17090afe1700b00263fd82106asm1258194pjb.35.2023.07.18.04.51.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 04:51:44 -0700 (PDT)
+Date:   Tue, 18 Jul 2023 20:51:39 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Huanpeng Xin <xinhuanpeng9@gmail.com>
+Cc:     minchan@kernel.org, ngupta@vflare.org, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        xinhuanpeng <xinhuanpeng@xiaomi.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH] zram: set zram bio priority to REQ_PRIO.
+Message-ID: <20230718115139.GC57770@google.com>
+References: <20230718071154.21566-1-xinhuanpeng9@gmail.com>
+ <20230718074929.GD955071@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>,
-        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
-CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-        <dchinner@redhat.com>, <willy@infradead.org>, <dlemoal@kernel.org>,
-        <linux@weissschuh.net>, <jack@suse.cz>, <ming.lei@redhat.com>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        Donald Buczek <buczek@molgen.mpg.de>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
- <20230612135228.10702-3-sergei.shtepa@veeam.com>
- <f935840e-12a7-c37b-183c-27e2d83990ea@huaweicloud.com>
- <90f79cf3-86a2-02c0-1887-d3490f9848bb@veeam.com>
- <d929eaa7-61d6-c4c4-aabc-0124c3693e10@huaweicloud.com>
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <d929eaa7-61d6-c4c4-aabc-0124c3693e10@huaweicloud.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: colmbx01.amust.local (172.31.112.31) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A292403155B677761
-X-Veeam-MMEX: True
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230718074929.GD955071@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi.
+On (23/07/18 16:49), Sergey Senozhatsky wrote:
+> On (23/07/18 15:11), Huanpeng Xin wrote:
+> > 
+> > When the system memory pressure is high, set zram bio priority
+> > to REQ_PRIO can quickly swap zarm's memory to backing device,
+> > freeing up more space for zram.
 
-On 7/18/23 03:37, Yu Kuai wrote:
-> Subject:
-> Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
-> From:
-> Yu Kuai <yukuai1@huaweicloud.com>
-> Date:
-> 7/18/23, 03:37
-> 
-> To:
-> Sergei Shtepa <sergei.shtepa@veeam.com>, Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
-> CC:
-> viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net, jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>, "yukuai (C)" <yukuai3@huawei.com>
-> 
-> 
-> Hi,
-> 
-> 在 2023/07/17 22:39, Sergei Shtepa 写道:
->>
->>
->> On 7/11/23 04:02, Yu Kuai wrote:
->>> bdev_disk_changed() is not handled, where delete_partition() and
->>> add_partition() will be called, this means blkfilter for partiton will
->>> be removed after partition rescan. Am I missing something?
->>
->> Yes, when the bdev_disk_changed() is called, all disk block devices
->> are deleted and new ones are re-created. Therefore, the information
->> about the attached filters will be lost. This is equivalent to
->> removing the disk and adding it back.
->>
->> For the blksnap module, partition rescan will mean the loss of the
->> change trackers data. If a snapshot was created, then such
->> a partition rescan will cause the snapshot to be corrupted.
->>
-> 
-> I haven't review blksnap code yet, but this sounds like a problem.
 
-I can't imagine a case where this could be a problem.
-Partition rescan is possible only if the file system has not been
-mounted on any of the disk partitions. Ioctl BLKRRPART will return
--EBUSY. Therefore, during normal operation of the system, rescan is
-not performed.
-And if the file systems have not been mounted, it is possible that
-the disk partition structure has changed or the disk in the media
-device has changed. In this case, it is better to detach the
-filter, otherwise it may lead to incorrect operation of the module.
-
-We can add prechange/postchange callback functions so that the
-filter can track rescan process. But at the moment, this is not
-necessary for the blksnap module. 
-
-Therefore, I will refrain from making changes for now.
-
-> 
-> possible solutions I have in mind:
-> 
-> 1. Store blkfilter for each partition from bdev_disk_changed() before
-> delete_partition(), and add blkfilter back after add_partition().
-> 
-> 2. Store blkfilter from gendisk as a xarray, and protect it by
-> 'open_mutex' like 'part_tbl', block_device can keep the pointer to
-> reference blkfilter so that performance from fast path is ok, and the
-> lifetime of blkfiter can be managed separately.
-> 
->> There was an idea to do filtering at the disk level,
->> but I abandoned it.
->> .
->>
-> I think it's better to do filtering at the partition level as well.
-> 
-> Thanks,
-> Kuai
-> 
+This is not how zram writeback works. The only time you can be sure
+that writeback frees memory is when you writeback ZRAM_HUGE objects,
+because each such object uses a whole physical page on the zsmalloc
+side. In any other case, compressed objects share physical pages that
+zsmalloc pages consist of, so writeback simply punches wholes in zspages,
+without actually freeing any memory immediately. You either need zspages
+to becomes empty after writeback or pool compaction, otherwise writeback
+does not save any memory, no matter how fast it works.
