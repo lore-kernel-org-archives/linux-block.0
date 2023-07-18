@@ -2,106 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FF3EB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 22:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 565CDEB64DC
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 22:37:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231317AbjGRWdD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jul 2023 18:33:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50898 "EHLO
+        id S229658AbjGRWhM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jul 2023 18:37:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230046AbjGRWdC (ORCPT
+        with ESMTP id S229614AbjGRWhL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jul 2023 18:33:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E34BB19A1;
-        Tue, 18 Jul 2023 15:32:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 77B5E61298;
-        Tue, 18 Jul 2023 22:32:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41861C433C7;
-        Tue, 18 Jul 2023 22:32:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689719561;
-        bh=7Gbf5E8xcaK5OEKWGb4CHdLczRMlJnuQEgylfRoJijU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ufuwLPWCK8dWV8FkCqtCEz1epizX5iOUu9r0pzjEB8rAo3vv70aUHG7DaVTyC0KRg
-         9GffXUB6RPQfiH4Pwwly5QDNxRzp24n52b7+3LD9ARpF8rJiXrkrBeyyZXIPCRwCL3
-         YnFduPkPfkN/Xgp87N8DLRjyb4cFcZH/W6xsrlYbCUBOsPO7LPaSINVyNCf7nN7z43
-         VbtnrwxtgFI9aorRlk+A+3KII5/Vn0DPycSXnFotjqn6aFg9SWYv2fXiVGJgnhvXsX
-         jEkhDeNqSzOymSxwFCvBFlJkeTEmz1CT/UJjdF6RKWm+b8SD1lfeb02J5lyYQ8cZJU
-         KTXuktmKYxzVQ==
-Date:   Tue, 18 Jul 2023 15:32:39 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kees Cook <keescook@chromium.org>,
-        Haren Myneni <haren@us.ibm.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 01/21] crypto: scomp - Revert "add support for
- deflate rfc1950 (zlib)"
-Message-ID: <20230718223239.GB1005@sol.localdomain>
-References: <20230718125847.3869700-1-ardb@kernel.org>
- <20230718125847.3869700-2-ardb@kernel.org>
+        Tue, 18 Jul 2023 18:37:11 -0400
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C48DC1992
+        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 15:37:10 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-66872d4a141so4134551b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 15:37:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689719830; x=1692311830;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B3I20rAFuenPVzIVGjvWBJIVUhTHVMUayu8+fWJvgg8=;
+        b=ffpF3YoqN81UYU59BFFBa0R0RhZ64Em5+bIgkFocUgx9MYKypIvw7VtLz3/Xiuv9gb
+         eCpu0PlvPsmVAxNPRJRNJNhX7bt0lfrIZNCqAEcOiHNnhvv4Hr4VmsUcD6MJ3YOzqtYU
+         LzDMm03m6dGmQQWEJ3KrN7jNlheN9T/jM1wSl7gD6rGTLX8KPQA/4sNfiQWEi4LkegmK
+         sLgx/AfoblBjvwFm9fnb1h/svzs8+3HtVRmar72313+Di9FicS6C8HyBO1fa+n/rxya0
+         HbqGtlFpcu/6S1/p00qz7fDAwABNA5X5Reqx87E/yB0C2N9LFrKD/slSlTC/FNcjoxmX
+         JD/w==
+X-Gm-Message-State: ABy/qLaUVGPgsHFXE25xnruIfkD+GlrE4kNAVK2EpWe64fEwB9fAJf30
+        xuCO1V5btIoYMFjR/l8WpDEG5vcqPdQ=
+X-Google-Smtp-Source: APBJJlHZ7yitUfP4LRnWG29Pf6Up6DDNTkEJKjKqh4Dp0tsXLa968ULO89UtqaFmAXN2RrLJV5jAEQ==
+X-Received: by 2002:a05:6a20:12c2:b0:134:a8a1:3bf with SMTP id v2-20020a056a2012c200b00134a8a103bfmr690161pzg.30.1689719830044;
+        Tue, 18 Jul 2023 15:37:10 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:3cb6:9d30:79d0:90cc? ([2620:15c:211:201:3cb6:9d30:79d0:90cc])
+        by smtp.gmail.com with ESMTPSA id m15-20020a170902db0f00b001b02bd00c61sm2349008plx.237.2023.07.18.15.37.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jul 2023 15:37:09 -0700 (PDT)
+Message-ID: <e1af3db6-0614-d0f2-a8c4-eb2a1de82e85@acm.org>
+Date:   Tue, 18 Jul 2023 15:37:08 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718125847.3869700-2-ardb@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2 1/5] block: Introduce a request queue flag for
+ pipelining zoned writes
+Content-Language: en-US
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+References: <20230710180210.1582299-1-bvanassche@acm.org>
+ <20230710180210.1582299-2-bvanassche@acm.org>
+ <9feab737-acb6-9e03-effb-8b130fdfa12a@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <9feab737-acb6-9e03-effb-8b130fdfa12a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 02:58:27PM +0200, Ard Biesheuvel wrote:
-> This reverts commit a368f43d6e3a001e684e9191a27df384fbff12f5.
+On 7/17/23 23:34, Damien Le Moal wrote:
+> On 7/11/23 03:01, Bart Van Assche wrote:
+>> +/* Writes for sequential write required zones may be pipelined. */
+>> +#define QUEUE_FLAG_PIPELINE_ZONED_WRITES 8
 > 
-> "zlib-deflate" was introduced 6 years ago, but it does not have any
-> users. So let's remove the generic implementation and the test vectors,
-> but retain the "zlib-deflate" entry in the testmgr code to avoid
-> introducing warning messages on systems that implement zlib-deflate in
-> hardware.
-> 
-> Note that RFC 1950 which forms the basis of this algorithm dates back to
-> 1996, and predates RFC 1951, on which the existing IPcomp is based and
-> which we have supported in the kernel since 2003. So it seems rather
-> unlikely that we will ever grow the need to support zlib-deflate.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  crypto/deflate.c | 61 +++++-----------
->  crypto/testmgr.c |  8 +--
->  crypto/testmgr.h | 75 --------------------
->  3 files changed, 18 insertions(+), 126 deletions(-)
+> I am not a big fan of this name as "pipeline" does not necessarily imply "high
+> queue depth write". What about simply calling this
+> QUEUE_FLAG_NO_ZONE_WRITE_LOCK, indicating that there is no need to write-lock
+> zones ?
 
-So if this is really unused, it's probably fair to remove it on that basis.
-However, it's not correct to claim that DEFLATE is obsoleted by zlib (the data
-format).  zlib is just DEFLATE plus a checksum, as is gzip.
+Hi Damien,
 
-Many users of zlib or gzip use an external checksum and therefore would be
-better served by DEFLATE, avoiding a redundant builtin checksum.  Typically,
-people have chosen zlib or gzip simply because their compression library
-defaulted to it, they didn't understand the difference, and they overlooked that
-they're paying the price for a redundant builtin checksum.
+I'm not a big fan of names with negative words like "no" or "not" embedded.
+Isn't pipelining standard computer science terminology? See also
+https://en.wikipedia.org/wiki/Pipeline_(computing).
 
-An example of someone doing it right is EROFS, which is working on adding
-DEFLATE support (not zlib or gzip!):
-https://lore.kernel.org/r/20230713001441.30462-1-hsiangkao@linux.alibaba.com
+Thanks,
 
-Of course, they are using the library API instead of the clumsy crypto API.
+Bart.
 
-- Eric
