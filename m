@@ -2,146 +2,629 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA0EEB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 15:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0AFEB64DA
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jul 2023 15:52:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232186AbjGRPha (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jul 2023 11:37:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36940 "EHLO
+        id S233700AbjGRPwK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jul 2023 11:52:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231739AbjGRPh3 (ORCPT
+        with ESMTP id S232077AbjGRPwJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jul 2023 11:37:29 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2060.outbound.protection.outlook.com [40.107.243.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E684DD;
-        Tue, 18 Jul 2023 08:37:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PGypn2GJfjrThRwwVX/IXSwHtdT10wA/FUkhqWuO0eHBfGxcfJe9a5j14hVI8i3VPWAeEH5bOY5t9zURDMN2jMSirfd4mG/rkdHMaU+2KnFfNkN9dZyhMlfn2Fa8kvfFsjuy1VGSFsCRTZ/y/4C3xdjK1vDky+ewsItQr9tg6dHw0EMwJwjE7UOOgZozyCCxACz1Qq+QfAcyu+Z00t7oLyMfbTKukFGj0dI4mGLVvgoVGK0IYazVOcuS8qvEz9JILWbulyeOL6UO5/er3j6wZZZE2DFHNHdgZvaNtmWia93IC4JQ/wafr1G4yxAvr4BESS0DAOt3VdCBcA6nf42kRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V7XHEmfyWtTbSEl7bLivWOkRxdzNXEMVg3qG+Go3LlA=;
- b=FiJb0CL56rH05Rc/J7Ysihlxr4ybkrIV2e8qxkdm7Oqpy+1pZUCnoK9v+HrSV1ur0i3+UAmqMTo/BCZEi0DOfLRfEPOb7YeGKnsJ1QT9cKtK0dUaHHOPte5AnTqEJc0Pcs/d4iCw15EzmYtJuZegpxbWVW9YsNM0Xx3+src/cjGH/xT1TY6Jg8vI67eU/TAWZFGaiEea1GSvw01uAY+3jJau1j/3wh9p63uO4NZ15LJJ/jxA/5lEXN9UL+X2Ah1o9JQJEmuyZ0l+wVV76x4zhh2VHHR4CbcZ+NCQgbSmemjVKC+RsfCf5EGX4QA4bY6scsIqeSV6hDOaQ13gzAgP4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V7XHEmfyWtTbSEl7bLivWOkRxdzNXEMVg3qG+Go3LlA=;
- b=fPW+EOBC/QjKl1LI2/ls5Bs5At/UQRyTrGyrmFeCq4Jx/+53vLVvBjb2WJhb1MKeU80j0FozOFHu+d+D6Cy/f4SFVeJ62E9sqEVmMcml8hMCIMTKjn+4YQ231loQj6u9Dy77SMOtMQkfIQ4HhxLnowPr5/ycKqKzojCdZRtM/4A=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5874.namprd12.prod.outlook.com (2603:10b6:208:396::17)
- by PH7PR12MB8038.namprd12.prod.outlook.com (2603:10b6:510:27c::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 18 Jul
- 2023 15:37:26 +0000
-Received: from BL1PR12MB5874.namprd12.prod.outlook.com
- ([fe80::b7a4:9183:7942:5936]) by BL1PR12MB5874.namprd12.prod.outlook.com
- ([fe80::b7a4:9183:7942:5936%4]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
- 15:37:26 +0000
-Message-ID: <7044d6b3-a5d1-572d-a755-74f8d4fd31c5@amd.com>
-Date:   Tue, 18 Jul 2023 10:37:23 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] blk-iocost: fix seq_printf compile type mismatch error
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        amd <amd@localhost.localdomain>
-References: <20230717141852.153965-1-carlos.bilbao@amd.com>
- <ZLWNHuTGk0fy8pjE@slm.duckdns.org>
-From:   Carlos Bilbao <carlos.bilbao@amd.com>
-In-Reply-To: <ZLWNHuTGk0fy8pjE@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA9PR13CA0078.namprd13.prod.outlook.com
- (2603:10b6:806:23::23) To BL1PR12MB5874.namprd12.prod.outlook.com
- (2603:10b6:208:396::17)
+        Tue, 18 Jul 2023 11:52:09 -0400
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86281A9
+        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 08:51:18 -0700 (PDT)
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-44350ef5831so1997181137.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Jul 2023 08:51:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689695477; x=1692287477;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PEsrKwQ0yBQPJi1sFyHx3Lu43C4VlNpiatAnbsXOgTk=;
+        b=c3kHjGkoJq8R8KK9jC7DpvPm/EoKVJH8KelN9cI979MJqikuJidH8wIKqKc03YLT0m
+         BE45DIunFJd0zkuoZr9ShR03LBKqbX05pG//e/mezbGM9bEGSA/GjiFUq+6anAIvgdfo
+         W9vTPP3Ieb1EXoZpdo63tOrbMg7QAnOwb8Mrw0IPhKogyEnkD3eAAMoVMS9rJKw0uUvz
+         +YQlQNeLnyvdS2BEAO5iWdFPsTWLRR4jTPeXE0iruFk4Wt3UTVSI/8wvm4z+I2K54ZZg
+         Qa6OrSNtEUjmzqGGtFN9+kv5hctA35a5LzJfwMwhB4UNsMo59APTmsG7WYdmrQbZkQ0N
+         C+1w==
+X-Gm-Message-State: ABy/qLYggHX70OepFOSmmC79W2MvK7F2Dvbz9bvS9QR9f2KbY5d9init
+        jvNHXnIWCHqCYfB2kGKfRZ35
+X-Google-Smtp-Source: APBJJlFhNEO6a6HZw8k5gmiU+d2l9Dfd3aB0eRVl9hv59Ymtkls9VcNrmss+29PjjXtY47fe8dIMjw==
+X-Received: by 2002:a67:ba0d:0:b0:443:3d62:77a with SMTP id l13-20020a67ba0d000000b004433d62077amr8529253vsn.1.1689695477373;
+        Tue, 18 Jul 2023 08:51:17 -0700 (PDT)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id e13-20020a0cf74d000000b0062626bd3683sm815010qvo.59.2023.07.18.08.51.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 08:51:16 -0700 (PDT)
+Date:   Tue, 18 Jul 2023 11:51:15 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        vdo-devel@redhat.com
+Cc:     msakai@redhat.com, tj@kernel.org, ebiggers@kernel.org
+Subject: Re: [PATCH v2 00/39] Add the dm-vdo deduplication and compression
+ device mapper target.
+Message-ID: <ZLa086NuWiMkJKJE@redhat.com>
+References: <20230523214539.226387-1-corwin@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5874:EE_|PH7PR12MB8038:EE_
-X-MS-Office365-Filtering-Correlation-Id: 80e1bc97-5345-4c8b-6ec0-08db87a4e318
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qP2KqbL+PSpZ9t4vxpmNQpY0sj7d/VOJi2c/Ie0OVX8PzsrALrjDzCZF5aXMknbIzI1JW7hM5GZV6EQ8psGND730Z5UIpXAkSjCUHBLu/euQ9XGs1Ijn/w0Wyxt5UgKPyDhByggm+jRxQNPOcsqxxO6ha4Cu4NiIacYK7BgEffpa8YE1mjYnL7Cs4TgStVYs+D/5Zq+ju4FwIKBTy0cR5gy/Erm4aP4H2+0amwNSlORkDxnNZc0krbhBrZRljC9YS0hP1To+OGDqYSac+fFxjqRBLDH2amLBD1hXcorlnh1Ofy+cCrl/hnD2CnKC8Gk4NT84mNiTAlH0YNdzyynpsgbEOjhxSE9/i0K2EEfNToscfRyw2K9nesP0VCmsF30W4++VrVzq/DxzBd0uSZX/vFBBh82oBZPokBXfDWmKxRU58rSD+WwctL2v5mUd1wgbgWWq/t+J4vsEgk40Tthb0OacEzmbttj9vvOzf7gWhh9N2MDOSrmIov7Hy6inadB8FLdHKxuLv5JmpeS7UgJ0lBdgTTs8VJiIuVRqqexUPyId1+nnFHdTcWz3Kyg6+Vk9N8ZqY8CISfOihx46+8LKvgszivaqwsexjNovIhdw+OdhWL8lGSjWYn4PKDcifnPFX+p77sGRd/ehXgUa8VJdgA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5874.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(346002)(396003)(136003)(366004)(451199021)(31686004)(478600001)(6486002)(6666004)(2616005)(83380400001)(31696002)(86362001)(186003)(4744005)(2906002)(6506007)(53546011)(6512007)(36756003)(26005)(44832011)(66556008)(38100700002)(4326008)(66946007)(41300700001)(6916009)(5660300002)(66476007)(8936002)(316002)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bTVoTEJKUGplcHJXRkRUTTdOVUdtS3I1L2E2MjZnUGJ5TSt1Mjg1OFlCMHN5?=
- =?utf-8?B?dnNrRUNjd3lFL3JUQ2RNVWZxdlRPbDc1TEpXSkFFd0JYYWxzbE9tZEFRa2tS?=
- =?utf-8?B?WktUamdqVlc1d3lrSGQ5b3JjVVhIdEtScTdKVVBpRVpiamo4UVNkWGpGaHVh?=
- =?utf-8?B?L0ZsRVhJajBCTlNJSUluaUpmZnVmdEJSdCtiTWcyTng3RHVPRDNKczdNU1hD?=
- =?utf-8?B?bXRxdW9qdDNEeVRJVXNDZmpldmNIR1Z5YXBmYTYrN0R0MjhzRkh6emRKczJr?=
- =?utf-8?B?Y3Z5Wk03eU50Sk5JRzJQSEtzY3J2M2o0ak1UTHpMeEI4WXZBZldHVUVWT3dU?=
- =?utf-8?B?SzRtSUhoTTM3eVlrd2pmZXZkSVpkbVNQMXRzemlBSkpPZEJWeUNWRzV6QmFr?=
- =?utf-8?B?SkN6NW1UV1AybUNBV1dVclo1RFZGcDJvb3hYcjV1L2o4RU5iSWEyTmFXcWN3?=
- =?utf-8?B?c1JuTHU1UU1KMlhLWUtlMU52VUZBRVBPMzNzb3gxTWxPejVmdE4ydXJ0UDZa?=
- =?utf-8?B?M3RaQlBoaEs5TlpFWFk5dW9UdjlxZDUwd3g1UDZqTGxCK05DUHNzbUxjK0Rl?=
- =?utf-8?B?K04vT0lENzd5SGRJQm0xUDErWTZZbUI4T0E4OElDcTMzTFdQRS90ZFJhTHdD?=
- =?utf-8?B?aHZjY0J5K3JZZGJWZ1dVVGVPUFlDUnJjOC9FTjQ4TExSb3NkYXI2RVFwb2hm?=
- =?utf-8?B?dXRmTkk5OElzQzJJTUU4TTQzL1FRRzBabUVNRWZoYVNiRGFZRjdxOUhaZ2dU?=
- =?utf-8?B?YkEzWlpNaEJkQ3FXVjcxaUNPMGIybllkQlZMNDNvWUNWTWVoT3pZb0FBMGlY?=
- =?utf-8?B?WCt5eit1ZmNLK2xITk40bU5mRTM1L1VjNmpvVUl2OGhVSkdzMFV0Zk55dnpa?=
- =?utf-8?B?UUtmeTh2UjA0bmlySXJEOGM3elhiR3N1dU14VFpWSzFTbDR2QmtEamF3T0ls?=
- =?utf-8?B?bExmTEJ2QmJBODZ5UGVQMERLQXdQTmVSN2IyY3FpK2JNaDRNZjBQVWxyT2d5?=
- =?utf-8?B?UHQwTnRyY3Z5MDBobW5YdGxFTXBtS29kc29RRXVHRG9MenE4RTEwZzFGK3hu?=
- =?utf-8?B?SjBGRjUvMkdvbFhLdlZoWGU4MnZ0K3hsMm9YRnlIbXAycWlMN2NCaFk2N0ox?=
- =?utf-8?B?UU1MamNoczZ3RHFvemZKTjdjalA3SXJzSmxjVjY2N3o3eDMxTnNHdlhHZy9p?=
- =?utf-8?B?cmtIUkFHc0hFRFk4ZERSNmRLZ1BJLzhOZjdxeXNTdm5JUFNYdytGcDczOG5V?=
- =?utf-8?B?SWsrREZ3U0xsc29sMURCUW5qMGNFc05tM2p4YWhFemdLczRPRUpwWkJlVWZn?=
- =?utf-8?B?SFl1VE5ZbGRtazZGUE5DK0VSbm1tRVFIbWNYZU55VmR5bXg0YUNDSTV6STdJ?=
- =?utf-8?B?RmFkSnRnQUJFbkZDNExjaWF4ekxxYS95Q0s0N3VMWERLQ0pYVjBjUUozYVdh?=
- =?utf-8?B?SkFuanpZT1BwRUdpeFlxNU9zaHdOOEhoUnlKSGVidFUxbGtLOUFpbkhxQ1g2?=
- =?utf-8?B?WGFFRktvUC9vTTZoNEQzeEJtZFIzQXR2NEJrbnJ5K2JBS3dGdUE0bUhGMW4r?=
- =?utf-8?B?TFJLOUZZZDBFMDl6WXBESngxbjFvY3dDUmJxR2hMVmdlZEw1aXF1TkJ1RGo4?=
- =?utf-8?B?YUVnTEhYQmRGWHBNNGJKczdFZHlGWDF1QWZXbWZySmRHdFhPeEJZQUwvbGFG?=
- =?utf-8?B?TllobFUzQUxCSWExN0R3aVA2eVlCcmt6YmhVbWlONG80OUNtR3J1UEt0OHNB?=
- =?utf-8?B?ZVU3T1Y5ejZUSGd5UzNBMTFRZ0kyTEVFUElvMEZRSnBUK2VMUjVjbU9IVTlZ?=
- =?utf-8?B?ZnZ5cXBmUVViS1huYjFWTjJaSG0vYm5xT0Zobm9wSlFVSi91OUVGMmM4dytv?=
- =?utf-8?B?dGlIellNdVBQN1g0Wno4cE1uYXBFZUNTOG9qWThjTnQ0SjhSOXhGanZkbDdH?=
- =?utf-8?B?aWc3NUE3TFhFNlUzS0V5Mk0zTzc4dlBsUGxZV0hYVFNQSVpjeFVxdjR0VGpq?=
- =?utf-8?B?QXQvWkszWitTOEpWdm5xdlFLNVBSVWRlUjQwTDRYVHE5ajQyNXUvbHYzWDJY?=
- =?utf-8?B?R3FTVXRRR0RjYnZtT3JGSVFPbVE1STJxa1Bob0poWFl5VkF6VDNMYlBQSmY3?=
- =?utf-8?Q?EkOHPt+vlMmDNrotLaY+BNEFQ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80e1bc97-5345-4c8b-6ec0-08db87a4e318
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5874.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 15:37:25.9464
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6tPX7fDNnLaF91q1NvPO161OCtpj7bWVytPs9Ce6yV1l83EG7fS1wLF5QMXJ6WNWAHxlRNS7U+6CE/o1MVs95A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8038
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230523214539.226387-1-corwin@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/17/23 13:49, Tejun Heo wrote:
-> On Mon, Jul 17, 2023 at 09:18:52AM -0500, Carlos Bilbao wrote:
->> From: amd <amd@localhost.localdomain>
->>
->> Fix two type mismatch errors encountered while compiling blk-iocost.c with
->> GCC version 13.1.1 that involved constant operator WEIGHT_ONE. Cast the
->> result of the division operation to (unsigned int) to match the expected
->> format specifier %u in two seq_printf invocations.
+[Top-posting to provide general update and historic context]
+
+Hi all,
+
+Corwin has decided to leave Red Hat, I want to thank Corwin for his
+efforts in developing and/or leading the development of changes to the
+VDO codebase (including those that were a prereq for VDO's upstream
+submission).
+
+Matt Sakai (cc'd) and I will be meeting regularly to continue the work
+of driving VDO changes needed for the code to be what I consider
+"ready" for upstream Linux inclusion.  Matt has a lot of learning to
+do about Linux kernel development (most of his work was in userspace
+since VDO can be compiled and used in userspace).  Conversely, I
+still have much to learn about the VDO codebase.  Hopefully we get
+over our respective learning curves quicker by working together.
+
+My following email is nearly 6 years old and reflects the list of
+VDO changes initially determined to be needed soon after Red Hat
+acquired Permabit:
+
+On Wed, Aug 30 2017 at 11:52P -0400,
+Mike Snitzer <snitzer@redhat.com> wrote:
+
+> The following list covers what Joe and I feel is a good first step at
+> starting to prepare the permabit kernel code for upstream.  This will be
+> an iterative process but working through these issues is a start:
 > 
-> Can you detail the warnings? Was that on 32bit compiles?
-
-The concrete error was: "format ‘%u’ expects argument of type ‘unsigned
-int’, but argument 3 has type ‘long unsigned int’". If I run:
-
-$ echo | cpp -dM | grep __LP64__
-#define __LP64__ 1
-
-which makes me believe it is not 32 bits.
-
+> 1) coding style must adhere to the Linux kernel coding style, see
+>    Documentation/process/coding-style.rst
+>    - camelCase needs to be converted to lower_case_with_under_scores
+>    - spaces must be converted to tabs with tab-width of 8
+>    - those are the 2 big style issues but scripts/checkpatch.pl will
+>      obviously complain about many other issues that will likely need
+>      addressing.
 > 
-> Thanks.
+> 2) use GPL interfaces that the permabit kernel code previously was
+>    unable to use due to licensing
+>    - please work through the ones you are aware of
+>    - but other more complex data structures will need to be gone over at
+>      some point (e.g. Permabit's workqueue, rcu, linked-list, etc)
 > 
+> 3) the test harness abstraction code needs to be removed
+>    - this obviously will require engineering an alternative to having an
+>      in kernel abstraction for compiling in userspace.  That could take
+>      the form of just switching test coverage to more traditional DM
+>      tests against the permabit device interfaces with IO workloads and
+>      ioctls (e.g. device-mapper-test-suite's testing for dm-thinp and
+>      dm-cache).
+>      Or some new novel way to elevate the kernel code up to userspace
+>      for userspace testing.  In any case, this level of test harness is
+>      _not_ going to fly in the context of upstream inclusion.
+>    - the intermediate data type wrappers must be removed; native kernel
+>      types must be used
+> 
+> 4) rename the Permabit DM target
+>    - switch from dm-dedupe to dm-vdo?
+>    - dm-vdo would seem to reduce renaming throughout the DM target given
+>      "VDO" is used extensively
+> 
+> bonus for the first round of work items:
+> 
+> 5) the ioctl interfaces need to be reviewed/refactored
+>    - not aware why the Permabit DM target cannot just use the ioctl
+>      interfaces that every other kernel DM target uses.
+>    - though obviously the traditional DM status output is less than
+>      ideal given it is positional rather than name=value pairs, etc.
+>    - it could be that we can compromise by adding name=value pair
+>      support to aide this effort
+> 
+> 6) extensive in-kernel code comment blocks need to be reduced/removed
+>    - quite a few ramble without _really_ saying much
+> 
+> Obviously some of the above work items are more involved than others
+> (e.g. item #3 above).  We're happy to discuss.
+> 
+> Thanks,
+> Mike
+
+The bulk of the above list (and more that wasn't on it) has been
+resolved.  It took ~6 years because corwin and the VDO team were also
+supporting the VDO in production, with historic and new customers,
+while also working on incrementally addressing the above list (and
+more).
+
+But the long-standing dependency on VDO's work-queue data
+struct is still lingering (drivers/md/dm-vdo/work-queue.c). At a
+minimum we need to work toward pinning down _exactly_ why that is, and
+I think the best way to answer that is by simply converting the VDO
+code over to using Linux's workqueues.  If doing so causes serious
+inherent performance (or functionality) loss then we need to
+understand why -- and fix Linux's workqueue code accordingly. (I've
+cc'd Tejun so he is aware).
+
+Also, VDO's historic use of murmurhash3 predates there being any
+alternative hash that met their requirements.  There was discussion of
+valid alternatives briefly, see:
+https://listman.redhat.com/archives/dm-devel/2023-May/054267.html
+So improving the interface so that the chosen hash is selectable
+(while still allowing murmurhash3 to be selected for backward compat)
+would be ideal.
+
+Lastly, one of the most challenging problems that VDO currently has
+is: discard performance is very slow.  VDO isn't a fast target in
+general (born out of its need for 4K IO to achieve best dedup results)
+but the discard support is a well-known VDO pain-point that I need to
+understand more clearly.
+
+I'm sure there will be other things that elevate to needing further
+review and scrutiny.  This will _not_ be a _quick_ process.
+
+But I've always wanted the VDO team to be extremely successful and
+look forward to working closer with them on trying to prepare VDO for
+upstream inclusion so it can stick the landing.
+
+All said, I really would welcome review for others on the dm-devel and
+linux-block mailing list.  I'll take any and all technical concerns
+under advisement and work through them.
 
 Thanks,
-Carlos
+Mike
+
+
+On Tue, May 23 2023 at  5:45P -0400,
+J. corwin Coburn <corwin@redhat.com> wrote:
+
+> The dm-vdo target provides inline deduplication, compression, zero-block
+> elimination, and thin provisioning. A dm-vdo target can be backed by up to
+> 256TB of storage, and can present a logical size of up to 4PB. This target
+> was originally developed at Permabit Technology Corp. starting in 2009. It
+> was first released in 2013 and has been used in production environments
+> ever since. It was made open-source in 2017 after Permabit was acquired by
+> Red Hat.
+> 
+> Because deduplication rates fall drastically as the block size increases, a
+> vdo target has a maximum block size of 4KB. However, it can achieve
+> deduplication rates of 254:1, i.e. up to 254 copies of a given 4KB block
+> can reference a single 4KB of actual storage. It can achieve compression
+> rates of 14:1. All zero blocks consume no storage at all.
+> 
+> Design Summary
+> --------------
+> 
+> This is a high-level summary of the ideas behind dm-vdo. For details about
+> the implementation and various design choices, refer to vdo-design.rst
+> included in this patch set.
+> 
+> Deduplication is a two-part problem. The first part is recognizing
+> duplicate data; the second part is avoiding multiple copies of the
+> duplicated data. Therefore, vdo has two main sections: a deduplication
+> index that is used to discover potential duplicate data, and a data store
+> with a reference counted block map that maps from logical block addresses
+> to the actual storage location of the data.
+> 
+> Hashing:
+> 
+> In order to identify blocks, vdo hashes each 4KB block to produce a 128-bit
+> block name. Since vdo only requires these names to be evenly distributed,
+> it uses MurmurHash3, a non-cryptographic hash algorithm which is faster
+> than cryptographic hashes.
+> 
+> The Deduplication Index:
+> 
+> The index is a set of mappings between a block name (the hash of its
+> contents) and a hint indicating where the block might be stored. These
+> mappings are stored in temporal order because groups of blocks that are
+> written together (such as a large file) tend to be rewritten together as
+> well. The index uses a least-recently-used (LRU) scheme to keep frequently
+> used names in the index while older names are discarded.
+> 
+> The index uses a structure called a delta-index to store its mappings,
+> which is more space-efficient than using a hashtable. It uses a variable
+> length encoding with the property that the average size of an entry
+> decreases as the number of entries increases, resulting in a roughly
+> constant size as the index fills.
+> 
+> Because storing hashes along with the data, or rehashing blocks on
+> overwrite is expensive, entries are never explicitly deleted from the
+> index. Instead, the vdo must always check the data at the physical location
+> provided by the index to ensure that the hint is still valid.
+> 
+> The Data Store:
+> 
+> The data store is implemented by three main data structures: the block map,
+> the slab depot, and the recovery journal. These structures work in concert
+> to amortize metadata updates across as many data writes as possible.
+> 
+> The block map contains the mapping from logical addresses to physical
+> locations. For each logical address it indicates whether that address is
+> unused, all zeros, or which physical block holds its contents and whether
+> or not it is compressed. The array of mappings is represented as a tree,
+> with nodes that are allocated as needed from the available physical space.
+> 
+> The slab depot tracks the physical space available for storing user data.
+> The depot also maintains a reference count for each physical block. Each
+> block can have up to 254 logical references.
+> 
+> The recovery journal is a transaction log of the logical-to-physical
+> mappings made by data writes. Committing this journal regularly allows a
+> vdo to reduce the frequency of other metadata writes and allows it to
+> reconstruct its metadata in the event of a crash.
+> 
+> Zones and Threading:
+> 
+> Due to the complexity of deduplication, the number of metadata structures
+> involved in a single write operation to a vdo target is larger than most
+> other targets. Furthermore, because vdo operates on small block sizes in
+> order to achieve good deduplication rates, parallelism is key to good
+> performance. The deduplication index, the block map, and the slab depot are
+> all designed to be easily divided into disjoint zones such that any piece
+> of metadata is handled by a single zone. Each zone is then assigned to a
+> single thread so that all metadata operations in that zone can proceed
+> without locking. Each bio is associated with a request object which can be
+> enqueued on each zone thread it needs to access. The zone divisions are not
+> reflected in the on-disk representation of the data structures, so the
+> number of zones, and hence the number of threads, can be configured each
+> time a vdo target is started.
+> 
+> Existing facilities
+> -------------------
+> 
+> In a few cases, we found that existing kernel facilities did not meet vdo's
+> needs, either because of performance or due to a mismatch of semantics.
+> These are detailed here:
+> 
+> Work Queues:
+> 
+> Handling a single bio requires a number of small operations across a number
+> of zones. The per-zone worker threads can be very busy, often using upwards
+> of 30% CPU time. Kernel work queues seem targeted for lighter work loads.
+> They do not let us easily prioritize individual tasks within a zone, and
+> make CPU affinity control at a per-thread level more difficult.
+> 
+> The threads scanning and updating the in-memory portion of the
+> deduplication index process a large number of queries through a single
+> function. It uses its own "request queue" mechanism to process these
+> efficiently in dedicated threads. In experiments using kernel work queues
+> for the index lookups, we observed an overall throughput drop of up to
+> almost 10%. In the following table, randwrite% and write% represent the
+> change in throughput when switching to kernel work queues for random and
+> sequential write workloads, respectively.
+> 
+> | compression% | deduplication% | randwrite% | write% |
+> |--------------+----------------+------------+--------|
+> |            0 |              0 |       -8.3 |   -6.4 |
+> |           55 |              0 |       -7.9 |   -8.5 |
+> |           90 |              0 |       -9.3 |   -8.9 |
+> |            0 |             50 |       -4.9 |   -4.5 |
+> |           55 |             50 |       -4.4 |   -4.4 |
+> |           90 |             50 |       -4.2 |   -4.7 |
+> |            0 |             90 |       -1.0 |    0.7 |
+> |           55 |             90 |        0.2 |   -0.4 |
+> |           90 |             90 |       -0.5 |    0.2 |
+> 
+> Mempools:
+> 
+> There are two types of object pools in the vdo implementation for which the
+> existing mempool structure was not appropriate. The first of these are
+> pools of structures wrapping the bios used for vdo's metadata I/O. Since
+> each of these pools is only accessed from a single thread, the locking done
+> by mempool is a needless cost. The second of these, the single pool of the
+> wrappers for incoming bios, has more complicated locking semantics than
+> mempool provides. When a thread attempts to submit a bio to vdo, but the
+> pool is exhausted, the thread is put to sleep. The pool is designed to only
+> wake that thread once, when it is certain that that thread's bio will be
+> processed. It is not desirable to merely allocate more wrappers as a number
+> of other vdo structures are designed to handle only a fixed number of
+> concurrent requests. This limit is also necessary to bound the amount of
+> work needed when recovering after a crash.
+> 
+> MurmurHash:
+> 
+> MurmurHash3 was selected for its hash quality, performance on 4KB blocks,
+> and its 128-bit output size (vdo needs significantly more than 64 uniformly
+> distributed bits for its in-memory and on-disk indexing). For
+> cross-platform compatibility, vdo uses a modified version which always
+> produces the same output as the original x64 variant, rather than being
+> optimized per platform. There is no such hash function already in the
+> kernel.
+> 
+> J. corwin Coburn (39):
+>   Add documentation for dm-vdo.
+>   Add the MurmurHash3 fast hashing algorithm.
+>   Add memory allocation utilities.
+>   Add basic logging and support utilities.
+>   Add vdo type declarations, constants, and simple data structures.
+>   Add thread and synchronization utilities.
+>   Add specialized request queueing functionality.
+>   Add basic data structures.
+>   Add deduplication configuration structures.
+>   Add deduplication index storage interface.
+>   Implement the delta index.
+>   Implement the volume index.
+>   Implement the open chapter and chapter indexes.
+>   Implement the chapter volume store.
+>   Implement top-level deduplication index.
+>   Implement external deduplication index interface.
+>   Add administrative state and scheduling for vdo.
+>   Add vio, the request object for vdo metadata.
+>   Add data_vio, the request object which services incoming bios.
+>   Add flush support to vdo.
+>   Add the vdo io_submitter.
+>   Add hash locks and hash zones.
+>   Add use of the deduplication index in hash zones.
+>   Add the compressed block bin packer.
+>   Add vdo_slab.
+>   Add the slab summary.
+>   Add the block allocators and physical zones.
+>   Add the slab depot itself.
+>   Add the vdo block map.
+>   Implement the vdo block map page cache.
+>   Add the vdo recovery journal.
+>   Add repair (crash recovery and read-only rebuild) of damaged vdos.
+>   Add the vdo structure itself.
+>   Add the on-disk formats and marshalling of vdo structures.
+>   Add statistics tracking.
+>   Add sysfs support for setting vdo parameters and fetching statistics.
+>   Add vdo debugging support.
+>   Add dm-vdo-target.c
+>   Enable configuration and building of dm-vdo.
+> 
+>  .../admin-guide/device-mapper/vdo-design.rst  |  390 ++
+>  .../admin-guide/device-mapper/vdo.rst         |  386 ++
+>  drivers/md/Kconfig                            |   16 +
+>  drivers/md/Makefile                           |    2 +
+>  drivers/md/dm-vdo-target.c                    | 2983 ++++++++++
+>  drivers/md/dm-vdo/action-manager.c            |  410 ++
+>  drivers/md/dm-vdo/action-manager.h            |  117 +
+>  drivers/md/dm-vdo/admin-state.c               |  512 ++
+>  drivers/md/dm-vdo/admin-state.h               |  180 +
+>  drivers/md/dm-vdo/block-map.c                 | 3381 +++++++++++
+>  drivers/md/dm-vdo/block-map.h                 |  392 ++
+>  drivers/md/dm-vdo/chapter-index.c             |  304 +
+>  drivers/md/dm-vdo/chapter-index.h             |   66 +
+>  drivers/md/dm-vdo/completion.c                |  141 +
+>  drivers/md/dm-vdo/completion.h                |  155 +
+>  drivers/md/dm-vdo/config.c                    |  389 ++
+>  drivers/md/dm-vdo/config.h                    |  125 +
+>  drivers/md/dm-vdo/constants.c                 |   15 +
+>  drivers/md/dm-vdo/constants.h                 |  102 +
+>  drivers/md/dm-vdo/cpu.h                       |   58 +
+>  drivers/md/dm-vdo/data-vio.c                  | 2076 +++++++
+>  drivers/md/dm-vdo/data-vio.h                  |  683 +++
+>  drivers/md/dm-vdo/dedupe.c                    | 3073 ++++++++++
+>  drivers/md/dm-vdo/dedupe.h                    |  119 +
+>  drivers/md/dm-vdo/delta-index.c               | 2018 +++++++
+>  drivers/md/dm-vdo/delta-index.h               |  292 +
+>  drivers/md/dm-vdo/dump.c                      |  288 +
+>  drivers/md/dm-vdo/dump.h                      |   17 +
+>  drivers/md/dm-vdo/encodings.c                 | 1523 +++++
+>  drivers/md/dm-vdo/encodings.h                 | 1307 +++++
+>  drivers/md/dm-vdo/errors.c                    |  316 +
+>  drivers/md/dm-vdo/errors.h                    |   83 +
+>  drivers/md/dm-vdo/flush.c                     |  563 ++
+>  drivers/md/dm-vdo/flush.h                     |   44 +
+>  drivers/md/dm-vdo/funnel-queue.c              |  169 +
+>  drivers/md/dm-vdo/funnel-queue.h              |  110 +
+>  drivers/md/dm-vdo/geometry.c                  |  205 +
+>  drivers/md/dm-vdo/geometry.h                  |  137 +
+>  drivers/md/dm-vdo/hash-utils.h                |   66 +
+>  drivers/md/dm-vdo/index-layout.c              | 1775 ++++++
+>  drivers/md/dm-vdo/index-layout.h              |   42 +
+>  drivers/md/dm-vdo/index-page-map.c            |  181 +
+>  drivers/md/dm-vdo/index-page-map.h            |   54 +
+>  drivers/md/dm-vdo/index-session.c             |  815 +++
+>  drivers/md/dm-vdo/index-session.h             |   84 +
+>  drivers/md/dm-vdo/index.c                     | 1403 +++++
+>  drivers/md/dm-vdo/index.h                     |   83 +
+>  drivers/md/dm-vdo/int-map.c                   |  710 +++
+>  drivers/md/dm-vdo/int-map.h                   |   40 +
+>  drivers/md/dm-vdo/io-factory.c                |  458 ++
+>  drivers/md/dm-vdo/io-factory.h                |   66 +
+>  drivers/md/dm-vdo/io-submitter.c              |  483 ++
+>  drivers/md/dm-vdo/io-submitter.h              |   52 +
+>  drivers/md/dm-vdo/logger.c                    |  304 +
+>  drivers/md/dm-vdo/logger.h                    |  112 +
+>  drivers/md/dm-vdo/logical-zone.c              |  378 ++
+>  drivers/md/dm-vdo/logical-zone.h              |   87 +
+>  drivers/md/dm-vdo/memory-alloc.c              |  447 ++
+>  drivers/md/dm-vdo/memory-alloc.h              |  181 +
+>  drivers/md/dm-vdo/message-stats.c             | 1222 ++++
+>  drivers/md/dm-vdo/message-stats.h             |   13 +
+>  drivers/md/dm-vdo/murmurhash3.c               |  175 +
+>  drivers/md/dm-vdo/murmurhash3.h               |   15 +
+>  drivers/md/dm-vdo/numeric.h                   |   78 +
+>  drivers/md/dm-vdo/open-chapter.c              |  433 ++
+>  drivers/md/dm-vdo/open-chapter.h              |   79 +
+>  drivers/md/dm-vdo/packer.c                    |  794 +++
+>  drivers/md/dm-vdo/packer.h                    |  123 +
+>  drivers/md/dm-vdo/permassert.c                |   35 +
+>  drivers/md/dm-vdo/permassert.h                |   65 +
+>  drivers/md/dm-vdo/physical-zone.c             |  650 ++
+>  drivers/md/dm-vdo/physical-zone.h             |  115 +
+>  drivers/md/dm-vdo/pointer-map.c               |  691 +++
+>  drivers/md/dm-vdo/pointer-map.h               |   81 +
+>  drivers/md/dm-vdo/pool-sysfs-stats.c          | 2063 +++++++
+>  drivers/md/dm-vdo/pool-sysfs.c                |  193 +
+>  drivers/md/dm-vdo/pool-sysfs.h                |   19 +
+>  drivers/md/dm-vdo/priority-table.c            |  226 +
+>  drivers/md/dm-vdo/priority-table.h            |   48 +
+>  drivers/md/dm-vdo/radix-sort.c                |  349 ++
+>  drivers/md/dm-vdo/radix-sort.h                |   28 +
+>  drivers/md/dm-vdo/recovery-journal.c          | 1772 ++++++
+>  drivers/md/dm-vdo/recovery-journal.h          |  313 +
+>  drivers/md/dm-vdo/release-versions.h          |   20 +
+>  drivers/md/dm-vdo/repair.c                    | 1775 ++++++
+>  drivers/md/dm-vdo/repair.h                    |   14 +
+>  drivers/md/dm-vdo/request-queue.c             |  284 +
+>  drivers/md/dm-vdo/request-queue.h             |   30 +
+>  drivers/md/dm-vdo/slab-depot.c                | 5210 +++++++++++++++++
+>  drivers/md/dm-vdo/slab-depot.h                |  594 ++
+>  drivers/md/dm-vdo/sparse-cache.c              |  595 ++
+>  drivers/md/dm-vdo/sparse-cache.h              |   49 +
+>  drivers/md/dm-vdo/statistics.h                |  279 +
+>  drivers/md/dm-vdo/status-codes.c              |  126 +
+>  drivers/md/dm-vdo/status-codes.h              |  112 +
+>  drivers/md/dm-vdo/string-utils.c              |   28 +
+>  drivers/md/dm-vdo/string-utils.h              |   23 +
+>  drivers/md/dm-vdo/sysfs.c                     |   84 +
+>  drivers/md/dm-vdo/thread-cond-var.c           |   46 +
+>  drivers/md/dm-vdo/thread-device.c             |   35 +
+>  drivers/md/dm-vdo/thread-device.h             |   19 +
+>  drivers/md/dm-vdo/thread-registry.c           |   93 +
+>  drivers/md/dm-vdo/thread-registry.h           |   33 +
+>  drivers/md/dm-vdo/time-utils.h                |   28 +
+>  drivers/md/dm-vdo/types.h                     |  403 ++
+>  drivers/md/dm-vdo/uds-sysfs.c                 |  185 +
+>  drivers/md/dm-vdo/uds-sysfs.h                 |   12 +
+>  drivers/md/dm-vdo/uds-threads.c               |  189 +
+>  drivers/md/dm-vdo/uds-threads.h               |  126 +
+>  drivers/md/dm-vdo/uds.h                       |  334 ++
+>  drivers/md/dm-vdo/vdo.c                       | 1846 ++++++
+>  drivers/md/dm-vdo/vdo.h                       |  381 ++
+>  drivers/md/dm-vdo/vio.c                       |  525 ++
+>  drivers/md/dm-vdo/vio.h                       |  221 +
+>  drivers/md/dm-vdo/volume-index.c              | 1272 ++++
+>  drivers/md/dm-vdo/volume-index.h              |  192 +
+>  drivers/md/dm-vdo/volume.c                    | 1792 ++++++
+>  drivers/md/dm-vdo/volume.h                    |  174 +
+>  drivers/md/dm-vdo/wait-queue.c                |  223 +
+>  drivers/md/dm-vdo/wait-queue.h                |  129 +
+>  drivers/md/dm-vdo/work-queue.c                |  659 +++
+>  drivers/md/dm-vdo/work-queue.h                |   53 +
+>  122 files changed, 58741 insertions(+)
+>  create mode 100644 Documentation/admin-guide/device-mapper/vdo-design.rst
+>  create mode 100644 Documentation/admin-guide/device-mapper/vdo.rst
+>  create mode 100644 drivers/md/dm-vdo-target.c
+>  create mode 100644 drivers/md/dm-vdo/action-manager.c
+>  create mode 100644 drivers/md/dm-vdo/action-manager.h
+>  create mode 100644 drivers/md/dm-vdo/admin-state.c
+>  create mode 100644 drivers/md/dm-vdo/admin-state.h
+>  create mode 100644 drivers/md/dm-vdo/block-map.c
+>  create mode 100644 drivers/md/dm-vdo/block-map.h
+>  create mode 100644 drivers/md/dm-vdo/chapter-index.c
+>  create mode 100644 drivers/md/dm-vdo/chapter-index.h
+>  create mode 100644 drivers/md/dm-vdo/completion.c
+>  create mode 100644 drivers/md/dm-vdo/completion.h
+>  create mode 100644 drivers/md/dm-vdo/config.c
+>  create mode 100644 drivers/md/dm-vdo/config.h
+>  create mode 100644 drivers/md/dm-vdo/constants.c
+>  create mode 100644 drivers/md/dm-vdo/constants.h
+>  create mode 100644 drivers/md/dm-vdo/cpu.h
+>  create mode 100644 drivers/md/dm-vdo/data-vio.c
+>  create mode 100644 drivers/md/dm-vdo/data-vio.h
+>  create mode 100644 drivers/md/dm-vdo/dedupe.c
+>  create mode 100644 drivers/md/dm-vdo/dedupe.h
+>  create mode 100644 drivers/md/dm-vdo/delta-index.c
+>  create mode 100644 drivers/md/dm-vdo/delta-index.h
+>  create mode 100644 drivers/md/dm-vdo/dump.c
+>  create mode 100644 drivers/md/dm-vdo/dump.h
+>  create mode 100644 drivers/md/dm-vdo/encodings.c
+>  create mode 100644 drivers/md/dm-vdo/encodings.h
+>  create mode 100644 drivers/md/dm-vdo/errors.c
+>  create mode 100644 drivers/md/dm-vdo/errors.h
+>  create mode 100644 drivers/md/dm-vdo/flush.c
+>  create mode 100644 drivers/md/dm-vdo/flush.h
+>  create mode 100644 drivers/md/dm-vdo/funnel-queue.c
+>  create mode 100644 drivers/md/dm-vdo/funnel-queue.h
+>  create mode 100644 drivers/md/dm-vdo/geometry.c
+>  create mode 100644 drivers/md/dm-vdo/geometry.h
+>  create mode 100644 drivers/md/dm-vdo/hash-utils.h
+>  create mode 100644 drivers/md/dm-vdo/index-layout.c
+>  create mode 100644 drivers/md/dm-vdo/index-layout.h
+>  create mode 100644 drivers/md/dm-vdo/index-page-map.c
+>  create mode 100644 drivers/md/dm-vdo/index-page-map.h
+>  create mode 100644 drivers/md/dm-vdo/index-session.c
+>  create mode 100644 drivers/md/dm-vdo/index-session.h
+>  create mode 100644 drivers/md/dm-vdo/index.c
+>  create mode 100644 drivers/md/dm-vdo/index.h
+>  create mode 100644 drivers/md/dm-vdo/int-map.c
+>  create mode 100644 drivers/md/dm-vdo/int-map.h
+>  create mode 100644 drivers/md/dm-vdo/io-factory.c
+>  create mode 100644 drivers/md/dm-vdo/io-factory.h
+>  create mode 100644 drivers/md/dm-vdo/io-submitter.c
+>  create mode 100644 drivers/md/dm-vdo/io-submitter.h
+>  create mode 100644 drivers/md/dm-vdo/logger.c
+>  create mode 100644 drivers/md/dm-vdo/logger.h
+>  create mode 100644 drivers/md/dm-vdo/logical-zone.c
+>  create mode 100644 drivers/md/dm-vdo/logical-zone.h
+>  create mode 100644 drivers/md/dm-vdo/memory-alloc.c
+>  create mode 100644 drivers/md/dm-vdo/memory-alloc.h
+>  create mode 100644 drivers/md/dm-vdo/message-stats.c
+>  create mode 100644 drivers/md/dm-vdo/message-stats.h
+>  create mode 100644 drivers/md/dm-vdo/murmurhash3.c
+>  create mode 100644 drivers/md/dm-vdo/murmurhash3.h
+>  create mode 100644 drivers/md/dm-vdo/numeric.h
+>  create mode 100644 drivers/md/dm-vdo/open-chapter.c
+>  create mode 100644 drivers/md/dm-vdo/open-chapter.h
+>  create mode 100644 drivers/md/dm-vdo/packer.c
+>  create mode 100644 drivers/md/dm-vdo/packer.h
+>  create mode 100644 drivers/md/dm-vdo/permassert.c
+>  create mode 100644 drivers/md/dm-vdo/permassert.h
+>  create mode 100644 drivers/md/dm-vdo/physical-zone.c
+>  create mode 100644 drivers/md/dm-vdo/physical-zone.h
+>  create mode 100644 drivers/md/dm-vdo/pointer-map.c
+>  create mode 100644 drivers/md/dm-vdo/pointer-map.h
+>  create mode 100644 drivers/md/dm-vdo/pool-sysfs-stats.c
+>  create mode 100644 drivers/md/dm-vdo/pool-sysfs.c
+>  create mode 100644 drivers/md/dm-vdo/pool-sysfs.h
+>  create mode 100644 drivers/md/dm-vdo/priority-table.c
+>  create mode 100644 drivers/md/dm-vdo/priority-table.h
+>  create mode 100644 drivers/md/dm-vdo/radix-sort.c
+>  create mode 100644 drivers/md/dm-vdo/radix-sort.h
+>  create mode 100644 drivers/md/dm-vdo/recovery-journal.c
+>  create mode 100644 drivers/md/dm-vdo/recovery-journal.h
+>  create mode 100644 drivers/md/dm-vdo/release-versions.h
+>  create mode 100644 drivers/md/dm-vdo/repair.c
+>  create mode 100644 drivers/md/dm-vdo/repair.h
+>  create mode 100644 drivers/md/dm-vdo/request-queue.c
+>  create mode 100644 drivers/md/dm-vdo/request-queue.h
+>  create mode 100644 drivers/md/dm-vdo/slab-depot.c
+>  create mode 100644 drivers/md/dm-vdo/slab-depot.h
+>  create mode 100644 drivers/md/dm-vdo/sparse-cache.c
+>  create mode 100644 drivers/md/dm-vdo/sparse-cache.h
+>  create mode 100644 drivers/md/dm-vdo/statistics.h
+>  create mode 100644 drivers/md/dm-vdo/status-codes.c
+>  create mode 100644 drivers/md/dm-vdo/status-codes.h
+>  create mode 100644 drivers/md/dm-vdo/string-utils.c
+>  create mode 100644 drivers/md/dm-vdo/string-utils.h
+>  create mode 100644 drivers/md/dm-vdo/sysfs.c
+>  create mode 100644 drivers/md/dm-vdo/thread-cond-var.c
+>  create mode 100644 drivers/md/dm-vdo/thread-device.c
+>  create mode 100644 drivers/md/dm-vdo/thread-device.h
+>  create mode 100644 drivers/md/dm-vdo/thread-registry.c
+>  create mode 100644 drivers/md/dm-vdo/thread-registry.h
+>  create mode 100644 drivers/md/dm-vdo/time-utils.h
+>  create mode 100644 drivers/md/dm-vdo/types.h
+>  create mode 100644 drivers/md/dm-vdo/uds-sysfs.c
+>  create mode 100644 drivers/md/dm-vdo/uds-sysfs.h
+>  create mode 100644 drivers/md/dm-vdo/uds-threads.c
+>  create mode 100644 drivers/md/dm-vdo/uds-threads.h
+>  create mode 100644 drivers/md/dm-vdo/uds.h
+>  create mode 100644 drivers/md/dm-vdo/vdo.c
+>  create mode 100644 drivers/md/dm-vdo/vdo.h
+>  create mode 100644 drivers/md/dm-vdo/vio.c
+>  create mode 100644 drivers/md/dm-vdo/vio.h
+>  create mode 100644 drivers/md/dm-vdo/volume-index.c
+>  create mode 100644 drivers/md/dm-vdo/volume-index.h
+>  create mode 100644 drivers/md/dm-vdo/volume.c
+>  create mode 100644 drivers/md/dm-vdo/volume.h
+>  create mode 100644 drivers/md/dm-vdo/wait-queue.c
+>  create mode 100644 drivers/md/dm-vdo/wait-queue.h
+>  create mode 100644 drivers/md/dm-vdo/work-queue.c
+>  create mode 100644 drivers/md/dm-vdo/work-queue.h
+> 
+> -- 
+> 2.40.1
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://listman.redhat.com/mailman/listinfo/dm-devel
+> 
