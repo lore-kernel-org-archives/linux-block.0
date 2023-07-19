@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47165C001DE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA2CEC001E0
 	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 07:15:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229660AbjGSHPW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jul 2023 03:15:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49000 "EHLO
+        id S229689AbjGSHPX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jul 2023 03:15:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbjGSHPQ (ORCPT
+        with ESMTP id S229697AbjGSHPR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jul 2023 03:15:16 -0400
+        Wed, 19 Jul 2023 03:15:17 -0400
 Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1CA1E47
-        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 00:15:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF88E1735
+        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 00:15:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1689750914; x=1721286914;
+  t=1689750916; x=1721286916;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=3fF1NGMIcRWVjBOewH3fuROA4CJqtnPUQFzIkVwHVm8=;
-  b=cQMqrSHdrMGIoxbVQbHRzDEryM+0FkvabRAn4jDsUd8CBvm9ERb+S3ZJ
-   w1cY8PYNeaeKRNnlsmYO78ZTDby8GQHnZhjDylq1Tf1+9cSonQ61hCnta
-   uaWNkKSRQQVDabNax7Ow7Sk1jZUw8uxz5fK09PIadFtdj32jyKYi54zdY
-   kDaxbGIFvr87xH8l0zsnEFx6CW/fSgYMBWHQHUyh1VEv9Q7sP+SI4gfuY
-   y/2CkdK4B0DGHjSDfGWj32kWWlUbxtjRQnqHPyJbHZB44NNHoTOZTcNBa
-   Sd5kOljEeTxBMFv2N1U1mdMYuvxwyGqpncaLS0GRTaEs0a15KGmRrzfdh
-   Q==;
+  bh=Muv7okmANNU+PV9/u8DFacQ6U9dpbwAvw/i9eTSpfm4=;
+  b=WwknIPsWl1gM6q0ts4HTAQT7uNa+5DA5/7Nj14Y/UbN//LZOdU09hRo6
+   HUBE399pErcX07poaKG52qjH2IanzrJ95fox1IDlI10Ni+LqUY/ly407A
+   yja3WQSs/1ru8wKp/gksFmBD3RPIBfE91QKED4B9WL9bnlRdNCw46waFp
+   uuUrf9cRtBzWhIcdO8CjaRUbp0ZkwS5V4ESKA0J/W73VvLx7MNxhNvgmX
+   UyR3V2G2NtIJx9XJRygxguZXfoGnOqEQQ0LoPD++vjLhSnx1aQHpkUaja
+   R7n0BbFR9TALuf7EKDIy7o5Klp9yxrNyzN2FtnbkKOZfg7OY7U0xH39lf
+   g==;
 X-IronPort-AV: E=Sophos;i="6.01,216,1684771200"; 
-   d="scan'208";a="238846517"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Jul 2023 15:15:12 +0800
-IronPort-SDR: T5ashRWuF20qy9+30nKI+IMmv8UiOmdy+iS/2GsnJMbXljtKANAXlFcNuvU84bADz7ssA9Us3H
- 3RtPTAk6IGqR/fCQpPEXJaJ8+ANKRjIU+uEjtaCoyEHwCTOTmymvz5oS77HjWyBhcedxn4kOaY
- ahzdI9SsCLugn4raZzy4SAH37EAh1rKhLjfbowNepeqQQlIQehj6oB5JN+L0/XMjqVdO0Ajzpi
- OK8OkHb1eRR3HE9UPIRJYQgWG+N2GKvWZHjkrW/hKYQC151bTOZs+ojkJS+ZelqT3V7qXt9zxZ
- INc=
+   d="scan'208";a="238846523"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Jul 2023 15:15:16 +0800
+IronPort-SDR: nVMZeeTDWSjGqb9mReecdvFWV4HAwZMG9mPQ0QjdmRMIFtWLDWHPD3fQPf9ezwSPKA2aYybzQA
+ 64ge7gZjC3n+B+m9rudRLyj9LOjbhpjO18RCo6UXBti3RUWiZmPiynXS50qHiuDJ/J8bNazUCE
+ P0yPGq+soOWKCBcK2hHVZ+TPY/Tk9Ol7OH3tRlmr6B7KM2MnDokGl2uuD0qEWXZWujnkcnjJjw
+ iKBrBZn+3yVuy6XntW6WYUZpg2k5gpRQxLVFqKdtUTgA6zx+QVtvhpPs+wAUSuyw+DL5j8dHGF
+ s5U=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Jul 2023 23:23:24 -0700
-IronPort-SDR: jIcVTulS4JZ487tzqYQdpZ/JGLIYXAGGYvKxyB9Tj7/R6DfUZ16Pqbz6rBKSHZgbVxVglpE0u2
- 1N4BnTLOm/XZqBgVWYbZ+82YRsw/IVWFUI1B3NVc4sdK7t2QC/JXd4Qt6mXkqgcqovq9VoPXU3
- ZImBRVv/ede1wCcXw39s/FD/A5K3kwLuOfx0JyoBKmO4EnN/Qaa95gv6/Qmpy1PJTaf5N1m4jL
- 9z77eCVpS7Rlv6M9+kJgiRpdMKe1hILTI2SbmdEqPhHZV5LQSC6oqG7cpS9syajikidbUdbsvJ
- 2h8=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Jul 2023 23:29:08 -0700
+IronPort-SDR: Le8lJIjP92WtraEW9tHcNbFnaSZkNo7oGorcH6OlGtsKvelIawnRWStoYYKCwK1f44B5ZiQ9qQ
+ 2vWfU3xGnKvnIK5n3AYHs7ne4lUOAtP+EzxlQgkVmuJyEWkk3aztqw+NgQpsvY4tby57xDzk3f
+ 1WyzGNdeVNmU+279v47ey/9Rv9G6Qoe0cSomLMw8u+/uGn+/qTIDNyDubXjITxdTpHFrwSLXUt
+ q3CEPLTcnrLsLzAmo0RSW7jc9y1NKqdBf4dlv00VRfmORRiGjG0oqGYX4xVAWrRLb2vO4k9pdm
+ 58s=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
-  by uls-op-cesaip01.wdc.com with ESMTP; 19 Jul 2023 00:15:12 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 19 Jul 2023 00:15:14 -0700
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 2/6] common/dm: add script file for device-mapper functions
-Date:   Wed, 19 Jul 2023 16:15:06 +0900
-Message-Id: <20230719071510.530623-3-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 5/6] block/004, zbd/{005,006}: call _test_dev_set_scheduler
+Date:   Wed, 19 Jul 2023 16:15:09 +0900
+Message-Id: <20230719071510.530623-6-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230719071510.530623-1-shinichiro.kawasaki@wdc.com>
 References: <20230719071510.530623-1-shinichiro.kawasaki@wdc.com>
@@ -62,89 +62,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Create a new script file common/dm and move two helper functions for
-device-mapper from tests/zbd/rc.
+The test cases block/004, zbd/005 and zbd/006 do write to zoned block
+devices which require mq-deadline scheduler. When TEST_DEV is a bio
+based device-mapper, mq-deadline scheduler shall be set to destination
+devices. For this purpose, call _test_dev_set_scheduler instead of
+_test_dev_queue_set.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- common/dm    | 23 +++++++++++++++++++++++
- tests/zbd/rc | 19 +------------------
- 2 files changed, 24 insertions(+), 18 deletions(-)
- create mode 100644 common/dm
+ tests/block/004 | 2 +-
+ tests/zbd/005   | 2 +-
+ tests/zbd/006   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/common/dm b/common/dm
-new file mode 100644
-index 0000000..85e1ed9
---- /dev/null
-+++ b/common/dm
-@@ -0,0 +1,23 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Western Digital Corporation or its affiliates.
-+#
-+# scsi_debug helper functions.
-+
-+_test_dev_is_dm() {
-+	[[ -r "${TEST_DEV_SYSFS}/dm/name" ]]
-+}
-+
-+# Get device file path from the device ID "major:minor".
-+_get_dev_path_by_id() {
-+	for d in /sys/block/* /sys/block/*/*; do
-+		if [[ ! -r "${d}/dev" ]]; then
-+			continue
-+		fi
-+		if [[ "${1}" == "$(<"${d}/dev")" ]]; then
-+			echo "/dev/${d##*/}"
-+			return 0
-+		fi
-+	done
-+	return 1
-+}
-diff --git a/tests/zbd/rc b/tests/zbd/rc
-index 2e370f0..ffe3f6c 100644
---- a/tests/zbd/rc
-+++ b/tests/zbd/rc
-@@ -6,6 +6,7 @@
+diff --git a/tests/block/004 b/tests/block/004
+index a7cec95..63484a4 100755
+--- a/tests/block/004
++++ b/tests/block/004
+@@ -24,7 +24,7 @@ test_device() {
+ 	local -a opts=()
  
- . common/rc
- . common/null_blk
-+. common/dm
+ 	if _test_dev_is_zoned; then
+-		_test_dev_queue_set scheduler deadline
++		_test_dev_set_scheduler deadline
+ 		opts+=("--direct=1" "--zonemode=zbd")
+ 		opts+=("--max_open_zones=$(_test_dev_max_open_active_zones)")
+ 	fi
+diff --git a/tests/zbd/005 b/tests/zbd/005
+index a7fb175..4aa1ab5 100755
+--- a/tests/zbd/005
++++ b/tests/zbd/005
+@@ -48,7 +48,7 @@ test_device() {
  
- #
- # Test requirement check functions
-@@ -281,10 +282,6 @@ _find_two_contiguous_seq_zones() {
- 	return 1
- }
+ 	blkzone reset -o "${ZONE_STARTS[zone_idx]}" "${TEST_DEV}"
  
--_test_dev_is_dm() {
--	[[ -r "${TEST_DEV_SYSFS}/dm/name" ]]
--}
--
- _require_test_dev_is_logical() {
- 	if ! _test_dev_is_partition && ! _test_dev_is_dm; then
- 		SKIP_REASONS+=("$TEST_DEV is not a logical device")
-@@ -307,20 +304,6 @@ _test_dev_has_dm_map() {
- 	return 0
- }
+-	_test_dev_queue_set scheduler deadline
++	_test_dev_set_scheduler deadline
  
--# Get device file path from the device ID "major:minor".
--_get_dev_path_by_id() {
--	for d in /sys/block/* /sys/block/*/*; do
--		if [[ ! -r "${d}/dev" ]]; then
--			continue
--		fi
--		if [[ "${1}" == "$(<"${d}/dev")" ]]; then
--			echo "/dev/${d##*/}"
--			return 0
--		fi
--	done
--	return 1
--}
--
- # Given sector of TEST_DEV, return the device which contain the sector and
- # corresponding sector of the container device.
- _get_dev_container_and_sector() {
+ 	: "${TIMEOUT:=30}"
+ 	FIO_PERF_FIELDS=("write io" "write iops")
+diff --git a/tests/zbd/006 b/tests/zbd/006
+index b745acd..2db0e9b 100755
+--- a/tests/zbd/006
++++ b/tests/zbd/006
+@@ -38,7 +38,7 @@ test_device() {
+ 
+ 	blkzone reset -o "${ZONE_STARTS[zone_idx]}" "${TEST_DEV}"
+ 
+-	_test_dev_queue_set scheduler deadline
++	_test_dev_set_scheduler deadline
+ 
+ 	: "${TIMEOUT:=30}"
+ 	FIO_PERF_FIELDS=("write io" "write iops")
 -- 
 2.40.1
 
