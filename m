@@ -2,186 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0F4EB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 09:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05556EB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 09:58:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbjGSJ1l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jul 2023 05:27:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38664 "EHLO
+        id S229997AbjGSJ63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jul 2023 05:58:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjGSJ1k (ORCPT
+        with ESMTP id S229530AbjGSJ6Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jul 2023 05:27:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB4C1FFC
-        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 02:26:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689758788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/f0NTUat3Qw0nEGYdWCuhe31jBdzjtLNwY7Efuzq/OI=;
-        b=G0xNX7A9aB5Av2TaHvuKXdX+CyVQEsyFI1zwj6Zt7na+8wTm7NpN9YjkhoR7TSC7WwGUq3
-        X0SMYcvJuJHn2tkrURJ1Nu9+BDLdWDmIb+NEmuBWrsZNuiVbJUIvkaE3cD7qer5ujbZx38
-        UHssidiPnz7kARYgG6YsqccXHer4QqA=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-297-L7h32KX3MbSV5tDk-NQLpg-1; Wed, 19 Jul 2023 05:26:24 -0400
-X-MC-Unique: L7h32KX3MbSV5tDk-NQLpg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 19 Jul 2023 05:58:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D503EC
+        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 02:58:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EFD8B28EC10C;
-        Wed, 19 Jul 2023 09:26:23 +0000 (UTC)
-Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 828DC492B01;
-        Wed, 19 Jul 2023 09:26:15 +0000 (UTC)
-Date:   Wed, 19 Jul 2023 17:26:11 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Andreas Hindborg <nmi@metaspace.dk>
-Cc:     Matias Bjorling <Matias.Bjorling@wdc.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, gost.dev@samsung.com,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>, ming.lei@redhat.com
-Subject: Re: [PATCH v9 2/2] ublk: enable zoned storage support
-Message-ID: <ZLesM5flOn2aet8p@ovpn-8-17.pek2.redhat.com>
-References: <20230714072510.47770-1-nmi@metaspace.dk>
- <20230714072510.47770-3-nmi@metaspace.dk>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EACBB61361
+        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 09:58:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9205DC433C9;
+        Wed, 19 Jul 2023 09:58:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689760703;
+        bh=LNaU7AsCWhM7fjN460KnXXlK9YWtQtGTOH9hZWQGGl4=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=Ww3lOhXLL0U3enCbhdgJFjUATW/04UmGHgL3aJdIuybkvl7R00unaWdK7NpjGcd/B
+         T/L5iYW1F0BXO8JDFq72zBI+j5JNFXDz08YFQp7SdWhdoOm0o4fj6NpSeDBboAsQ1D
+         MdZZ3pMjoTCSWF52zuNcoATy9/P2iCSmM+rknPrt6Pf6PhRkTm3yjHHkWY/yCzTWZi
+         qi/xXU4COqeIiCqtEQoBVeprE2bCWITDSGcPayPcI7xR7Ej2p3HbGrUyS71ZPASnpj
+         c2ORD/WEEY1d1kYLjBIskLNTZjJAKJeSYQic9+nuWW9I1Ob/NL7PgwSmZdHk12VBMk
+         Do6puPkkz8L/A==
+Message-ID: <83a90168-bd06-9247-bada-d4889ba4aece@kernel.org>
+Date:   Wed, 19 Jul 2023 18:58:21 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230714072510.47770-3-nmi@metaspace.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 1/5] block: Introduce a request queue flag for
+ pipelining zoned writes
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+References: <20230710180210.1582299-1-bvanassche@acm.org>
+ <20230710180210.1582299-2-bvanassche@acm.org>
+ <9feab737-acb6-9e03-effb-8b130fdfa12a@kernel.org>
+ <e1af3db6-0614-d0f2-a8c4-eb2a1de82e85@acm.org>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <e1af3db6-0614-d0f2-a8c4-eb2a1de82e85@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 14, 2023 at 09:25:10AM +0200, Andreas Hindborg wrote:
-> From: Andreas Hindborg <a.hindborg@samsung.com>
+On 7/19/23 07:37, Bart Van Assche wrote:
+> On 7/17/23 23:34, Damien Le Moal wrote:
+>> On 7/11/23 03:01, Bart Van Assche wrote:
+>>> +/* Writes for sequential write required zones may be pipelined. */
+>>> +#define QUEUE_FLAG_PIPELINE_ZONED_WRITES 8
+>>
+>> I am not a big fan of this name as "pipeline" does not necessarily
+>> imply "high
+>> queue depth write". What about simply calling this
+>> QUEUE_FLAG_NO_ZONE_WRITE_LOCK, indicating that there is no need to
+>> write-lock
+>> zones ?
 > 
-> Add zoned storage support to ublk: report_zones and operations:
->  - REQ_OP_ZONE_OPEN
->  - REQ_OP_ZONE_CLOSE
->  - REQ_OP_ZONE_FINISH
->  - REQ_OP_ZONE_RESET
->  - REQ_OP_ZONE_APPEND
+> Hi Damien,
 > 
-> The zone append feature uses the `addr` field of `struct ublksrv_io_cmd` to
-> communicate ALBA back to the kernel. Therefore ublk must be used with the
-> user copy feature (UBLK_F_USER_COPY) for zoned storage support to be
-> available. Without this feature, ublk will not allow zoned storage support.
-> 
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
-> ---
+> I'm not a big fan of names with negative words like "no" or "not" embedded.
+> Isn't pipelining standard computer science terminology? See also
+> https://en.wikipedia.org/wiki/Pipeline_(computing).
 
-...
+Sure, pipeline is a well known term. But I do not think it is synonymous
+with "high queue depth write" :) A "pipeline" for zoned write may still
+operate at write qd=1 per zone...
 
-> +/*
-> + * Construct a zone report. The report request is carried in `struct
-> + * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
-> + * and shall indicate the first zone of the report. The `nr_sectors` shall
-> + * indicate how many zones should be reported (divide by zone size to get number
-> + * of zones in the report) and must be an integer multiple of the zone size. The
-> + * report shall be delivered as a `struct blk_zone` array. To report fewer zones
-> + * than requested, zero the last entry of the returned array.
-> + */
-> +#define		UBLK_IO_OP_REPORT_ZONES		18
+Given that the default is using zone write locking, I would prefer a
+flag name that indicates a change to this default. What about something
+like QUEUE_FLAG_UNRESTRICTED_ZONE_WRITE ?
 
-Actually, I meant the following delta change in V8 comment, then the UAPI
-looks more clean & readable wrt. reporting how many zones in UBLK_IO_OP_REPORT_ZONES
-and reusing ublksrv_io_cmd->addr.
+But tht is beside the point as I still have reservations on this
+approach anyway. See my reply to patch 4.
 
-Otherwise, this patchset looks fine.
-
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 5698f4575e05..454c852ed328 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -70,7 +70,7 @@ struct ublk_rq_data {
- 	struct kref ref;
- 	__u64 sector;
- 	__u32 operation;
--	__u32 nr_sectors;
-+	__u32 nr_zones;
- };
- 
- struct ublk_uring_cmd_pdu {
-@@ -335,7 +335,7 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
- 		pdu = blk_mq_rq_to_pdu(req);
- 		pdu->operation = UBLK_IO_OP_REPORT_ZONES;
- 		pdu->sector = sector;
--		pdu->nr_sectors = zones_in_request * zone_size_sectors;
-+		pdu->nr_zones = zones_in_request;
- 
- 		ret = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
- 					GFP_KERNEL);
-@@ -404,7 +404,7 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
- 		switch (ublk_op) {
- 		case UBLK_IO_OP_REPORT_ZONES:
- 			iod->op_flags = ublk_op | ublk_req_build_flags(req);
--			iod->nr_sectors = pdu->nr_sectors;
-+			iod->nr_zones = pdu->nr_zones;
- 			iod->start_sector = pdu->sector;
- 			return BLK_STS_OK;
- 		default:
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 4d97eb0f7d13..602a788a650e 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -249,11 +249,13 @@ struct ublksrv_ctrl_dev_info {
- /*
-  * Construct a zone report. The report request is carried in `struct
-  * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
-- * and shall indicate the first zone of the report. The `nr_sectors` shall
-- * indicate how many zones should be reported (divide by zone size to get number
-- * of zones in the report) and must be an integer multiple of the zone size. The
-- * report shall be delivered as a `struct blk_zone` array. To report fewer zones
-- * than requested, zero the last entry of the returned array.
-+ * and shall indicate the first zone of the report. The `nr_zones` shall
-+ * indicate how many zones should be reported at most. The report shall be
-+ * delivered as a `struct blk_zone` array. To report fewer zones than
-+ * requested, zero the last entry of the returned array.
-+ *
-+ * So related definitions(blk_zone, blk_zone_cond, blk_zone_type, ...) in
-+ * include/uapi/linux/blkzoned.h are part of ublk UAPI.
-  */
- #define		UBLK_IO_OP_REPORT_ZONES		18
- 
-@@ -276,7 +278,10 @@ struct ublksrv_io_desc {
- 	/* op: bit 0-7, flags: bit 8-31 */
- 	__u32		op_flags;
- 
--	__u32		nr_sectors;
-+	union {
-+		__u32		nr_sectors;
-+		__u32		nr_zones; /* for UBLK_IO_OP_REPORT_ZONES only */
-+	};
- 
- 	/* start sector for this io */
- 	__u64		start_sector;
-@@ -308,6 +313,12 @@ struct ublksrv_io_cmd {
- 	/*
- 	 * userspace buffer address in ublksrv daemon process, valid for
- 	 * FETCH* command only
-+	 *
-+	 * This field shouldn't be used if UBLK_F_USER_COPY is enabled,
-+	 * because userspace deals with data copy by pread()/pwrite() over
-+	 * /dev/ublkcN. But in case of UBLK_F_ZONED, 'addr' is re-used to
-+	 * pass back the allocated LBA for UBLK_IO_OP_ZONE_APPEND which
-+	 * actually depends on UBLK_F_USER_COPY
- 	 */
- 	__u64	addr;
- };
-
-Thanks,
-Ming
+-- 
+Damien Le Moal
+Western Digital Research
 
