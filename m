@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1ECC001DE
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 22:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABED8C001DE
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 22:03:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230140AbjGSWD1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jul 2023 18:03:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42852 "EHLO
+        id S230158AbjGSWDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jul 2023 18:03:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbjGSWDY (ORCPT
+        with ESMTP id S229574AbjGSWDp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jul 2023 18:03:24 -0400
+        Wed, 19 Jul 2023 18:03:45 -0400
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88BDA2122;
-        Wed, 19 Jul 2023 15:03:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDBB2213D;
+        Wed, 19 Jul 2023 15:03:29 -0700 (PDT)
 Received: from local
         by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
          (Exim 4.96)
         (envelope-from <daniel@makrotopia.org>)
-        id 1qMFG1-0008Ji-2q;
-        Wed, 19 Jul 2023 22:02:53 +0000
-Date:   Wed, 19 Jul 2023 23:02:45 +0100
+        id 1qMFGL-0008Kc-1x;
+        Wed, 19 Jul 2023 22:03:13 +0000
+Date:   Wed, 19 Jul 2023 23:03:05 +0100
 From:   Daniel Golle <daniel@makrotopia.org>
 To:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
@@ -45,8 +45,8 @@ To:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
         =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
-Subject: [RFC PATCH 2/6] mmc: block: set fwnode of disk devices
-Message-ID: <1ce5f56df546cec25ef741f381286f1d7c33d000.1689802933.git.daniel@makrotopia.org>
+Subject: [RFC PATCH 3/6] block: add new genhd flag GENHD_FL_NO_NVMEM
+Message-ID: <96510d925cb0ca1a3a132f8f8affd4bbdafd8fc9.1689802933.git.daniel@makrotopia.org>
 References: <cover.1689802933.git.daniel@makrotopia.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -56,40 +56,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Set fwnode of disk devices to 'block', 'boot0' and 'boot1' subnodes of
-the mmc-card. This is done in preparation for having the eMMC act as
-NVMEM provider.
+Add new flag to destinguish block devices which should not act as an
+NVMEM provider, such as for example an emulated block device on top of
+an MTD partition which already acts as an NVMEM provider itself.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/mmc/core/block.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ include/linux/blkdev.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index f701efb1fa785..fc1a9f31bd253 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2413,6 +2413,8 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 					      int area_type,
- 					      unsigned int part_type)
- {
-+	struct fwnode_handle *fwnode;
-+	struct device *ddev;
- 	struct mmc_blk_data *md;
- 	int devidx, ret;
- 	char cap_str[10];
-@@ -2509,6 +2511,12 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 2f5371b8482c0..e853d1815be15 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -80,11 +80,14 @@ struct partition_meta_info {
+  * ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not
+  * scan for partitions from add_disk, and users can't add partitions manually.
+  *
++ * ``GENHD_FL_NO_NVMEM``: NVMEM emulation is disabled.  The kernel will not
++ * emulate an NVMEM device on top of this disk.
+  */
+ enum {
+ 	GENHD_FL_REMOVABLE			= 1 << 0,
+ 	GENHD_FL_HIDDEN				= 1 << 1,
+ 	GENHD_FL_NO_PART			= 1 << 2,
++	GENHD_FL_NO_NVMEM			= 1 << 3,
+ };
  
- 	blk_queue_write_cache(md->queue.queue, cache_enabled, fua_enabled);
- 
-+	ddev = disk_to_dev(md->disk);
-+	fwnode = device_get_named_child_node(subname ? md->parent->parent :
-+						       md->parent,
-+					     subname ? subname : "block");
-+	ddev->fwnode = fwnode;
-+
- 	string_get_size((u64)size, 512, STRING_UNITS_2,
- 			cap_str, sizeof(cap_str));
- 	pr_info("%s: %s %s %s%s\n",
+ enum {
 -- 
 2.41.0
