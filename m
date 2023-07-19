@@ -2,136 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55038C001B0
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 14:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A76CEC0015E
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 16:31:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbjGSOig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jul 2023 10:38:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
+        id S229447AbjGSQbJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jul 2023 12:31:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231684AbjGSOi2 (ORCPT
+        with ESMTP id S229452AbjGSQbJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jul 2023 10:38:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA1A3C7;
-        Wed, 19 Jul 2023 07:38:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 292816171E;
-        Wed, 19 Jul 2023 14:38:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A69AC433C8;
-        Wed, 19 Jul 2023 14:38:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689777506;
-        bh=GezNb42kEpgmegboqOOBAyzMgqyuAvFtS/mLgu3jRUg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=JQGGh5TFecokR/YKhLaMZWg52yo4ZZ3M1avMllGsOMgEUKzc/OUk3I392cKcffGbF
-         OMwzv1r99z3uGG/O+qT0B88iGlu5vx56jVkkni5i8KUC2HPPZ3p90oE1s4nYFjg/0L
-         yhZ34YIsrHnwHZH6L6D59sGcRpi1RG33m+tXVrMD6gDQlHRQMf1wAKXtKsQoF683rg
-         dVYJ9CKiNUKdy92GNh8DmNn8MpQZoqlGhP5kq2k8jJR36tDit2xDdksKkszaf/mOpu
-         JjZQdo5olGWa1rCh677vPUAak9wQVdTqxZdO2AyOyg9Hobi8BzRyS9L781CjQ/Edy1
-         ibmQ54otiiz/A==
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2b701e1ca63so108065781fa.1;
-        Wed, 19 Jul 2023 07:38:26 -0700 (PDT)
-X-Gm-Message-State: ABy/qLaNdY6QrmIO68C8tGl5L7tBqy01RaI07ts6nY0vsB+JPSmd6VNJ
-        DuEWA6HxIdx4LguZDAA2VYb1Jpn2NKbAbyx+VQo=
-X-Google-Smtp-Source: APBJJlED2jiKRWrm/tbkjsu0sNov4aKWyhqBk9Z1aEui4cjKtLxhvU+nz2Q0ttRwt0rpd3EDFIeTI764n9rYrpoAI4M=
-X-Received: by 2002:a2e:7a09:0:b0:2b5:95a8:4126 with SMTP id
- v9-20020a2e7a09000000b002b595a84126mr23133ljc.52.1689777504291; Wed, 19 Jul
- 2023 07:38:24 -0700 (PDT)
+        Wed, 19 Jul 2023 12:31:09 -0400
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D5681734
+        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 09:31:08 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-676f16e0bc4so4790213b3a.0
+        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 09:31:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689784268; x=1692376268;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=weh9SpV+dJziJ/05efyq871yN+ft5SqAvneUY9I4U54=;
+        b=jHkZwzqAe7fkDOAHOpSTWxlxYknjUUI/plFHTvKGIGHhElwSI8+R2f8ESAJivZBROa
+         5qyl411vZUTKUkQxJAfBEwPbKDL3VYxJGZQAV14rU04AIQujZEpMsKavKDvkKhQ3mAZi
+         ALiCOz5fILxMDeXEHkjZSXzAykAmjInhJJVJmZhSH07r8JR5zdD2pYn694fMYBGIZE7n
+         liMgWRSsOzLodn5zmloHqAH/Eqw/lmagWj4ZQzZVbLzyrg14hDm+8APcq2WcCRAOPcGK
+         /e5OagZPjpGt+Tq1k8gLwifVP8AVf3qI3EQFaO69aUcHzrApbgQEkaCnXHR820PuEtxb
+         XwHA==
+X-Gm-Message-State: ABy/qLbAfudwIM2xfh+iN1iKA8poZtDVQHZ6yzKu3X9hpJ0UIaApvmy8
+        eC8S+S9vKQb7BjLj5X837sf3mZbu9nQ=
+X-Google-Smtp-Source: APBJJlFoeQI4XnnodeIqsAnpQ4bp8wpUAC5tyPU8YpeROPBCsuJ5lAonGBZhZER9PodWEjNOVWXfAw==
+X-Received: by 2002:a05:6a00:b47:b0:653:de9a:d933 with SMTP id p7-20020a056a000b4700b00653de9ad933mr21453311pfo.17.1689784267726;
+        Wed, 19 Jul 2023 09:31:07 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:a2ab:183f:c76c:d30d? ([2620:15c:211:201:a2ab:183f:c76c:d30d])
+        by smtp.gmail.com with ESMTPSA id j7-20020a62e907000000b00673e652985esm3180854pfh.44.2023.07.19.09.31.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Jul 2023 09:31:06 -0700 (PDT)
+Message-ID: <42402057-3806-3930-5ff8-d68816c79ca5@acm.org>
+Date:   Wed, 19 Jul 2023 09:31:05 -0700
 MIME-Version: 1.0
-References: <20230718125847.3869700-1-ardb@kernel.org> <20230718125847.3869700-6-ardb@kernel.org>
- <20230718223813.GC1005@sol.localdomain> <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
- <3330004f-acac-81b4-e382-a17221a0a128@huawei.com>
-In-Reply-To: <3330004f-acac-81b4-e382-a17221a0a128@huawei.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 19 Jul 2023 16:38:13 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGq=WiJXsQG6R0jEFYu_Mdom_KY+DE=NGqVSF6QmqhKeA@mail.gmail.com>
-Message-ID: <CAMj1kXGq=WiJXsQG6R0jEFYu_Mdom_KY+DE=NGqVSF6QmqhKeA@mail.gmail.com>
-Subject: Re: [RFC PATCH 05/21] ubifs: Pass worst-case buffer size to
- compression routines
-To:     Zhihao Cheng <chengzhihao1@huawei.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kees Cook <keescook@chromium.org>,
-        Haren Myneni <haren@us.ibm.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2 4/5] scsi: Retry unaligned zoned writes
+Content-Language: en-US
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230710180210.1582299-1-bvanassche@acm.org>
+ <20230710180210.1582299-5-bvanassche@acm.org>
+ <52d41b27-f429-fc4c-c522-a963f67114bd@kernel.org>
+ <fb8b1b7e-4054-6598-8204-eb252395227d@acm.org>
+ <fd64fa90-1227-6d4d-8f0b-fc67d8c42a7e@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <fd64fa90-1227-6d4d-8f0b-fc67d8c42a7e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 19 Jul 2023 at 16:23, Zhihao Cheng <chengzhihao1@huawei.com> wrote:
->
-> =E5=9C=A8 2023/7/19 16:33, Ard Biesheuvel =E5=86=99=E9=81=93:
-> > On Wed, 19 Jul 2023 at 00:38, Eric Biggers <ebiggers@kernel.org> wrote:
-> >>
-> >> On Tue, Jul 18, 2023 at 02:58:31PM +0200, Ard Biesheuvel wrote:
-> >>> Currently, the ubifs code allocates a worst case buffer size to
-> >>> recompress a data node, but does not pass the size of that buffer to =
-the
-> >>> compression code. This means that the compression code will never use
->
-> I think you mean the 'out_len' which describes the lengh of 'buf' is
-> passed into ubifs_decompress, which effects the result of
-> decompressor(eg. lz4 uses length to calculate the buffer end pos).
-> So, we should pass the real lenghth of 'buf'.
->
+On 7/19/23 02:59, Damien Le Moal wrote:
+> On 7/19/23 07:53, Bart Van Assche wrote:
+>> I think what has been explained above is a scenario in which the filesystem
+>> allocates requests per zone in another order than the LBA order. How about
+>> requiring that the filesystem allocates and submits zoned writes in LBA
+>> order
+>> per zone? I think that this is how F2FS supports zoned storage.
+> 
+> Sure. But what if an application uses the drive directly ? You loose
+> guarantees of forward progress then. Given that an application has to
+> use direct IO for writes to sequential zones, this is unlikely to happen
+> in a "good" scenario, but it also would not be hard to write an
+> application that can deadlock the drive forever by simply missing one
+> write in a sequence of writes for a zone... That is my concern. While
+> f2fs would likely be OK, the delay approach is not solid enough for all
+> cases.
 
-Yes, that is what I meant.
+Hi Damien,
 
-But Eric makes a good point, and looking a bit more closely, there is
-really no need for the multiplication here: we know the size of the
-decompressed data, so we don't need the additional space.
+This patch series increases the number of retries for zoned writes
+submitted by a filesystem. Direct I/O from user space is not affected
+since the code that increases the number of retries occurs in
+sd_setup_read_write_cmnd(). As you know scsi_prepare_cmd() only calls
+sd_setup_read_write_cmnd() for requests that come from a filesystem
+and not for pass-through requests.
 
-I intend to drop this patch, and replace it with the following:
+Does this address your concern?
 
-----------------8<--------------
+Thanks,
 
-Currently, when truncating a data node, a decompression buffer is
-allocated that is twice the size of the data node's uncompressed size.
-However, the fact that this space is available is not communicated to
-the compression routines, as out_len itself is not updated.
+Bart.
 
-The additional space is not needed even in the theoretical worst case
-where compression might lead to inadvertent expansion: first of all,
-increasing the size of the input buffer does not help mitigate that
-issue. And given the truncation of the data node and the fact that the
-original data compressed well enough to pass the UBIFS_MIN_COMPRESS_DIFF
-test, there is no way on this particular code path that compression
-could result in expansion beyond the original decompressed size, and so
-no mitigation is necessary to begin with.
-
-So let's just drop WORST_COMPR_FACTOR here.
-
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-
-diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
-index dc52ac0f4a345f30..0b55cbfe0c30505e 100644
---- a/fs/ubifs/journal.c
-+++ b/fs/ubifs/journal.c
-@@ -1489,7 +1489,7 @@ static int truncate_data_node(const struct
-ubifs_info *c, const struct inode *in
-        int err, dlen, compr_type, out_len, data_size;
-
-        out_len =3D le32_to_cpu(dn->size);
--       buf =3D kmalloc_array(out_len, WORST_COMPR_FACTOR, GFP_NOFS);
-+       buf =3D kmalloc(out_len, GFP_NOFS);
-        if (!buf)
-                return -ENOMEM;
