@@ -2,142 +2,196 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FA1EB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 12:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B1AEB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 12:43:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbjGSMgj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jul 2023 08:36:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52268 "EHLO
+        id S229756AbjGSMnM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jul 2023 08:43:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjGSMgi (ORCPT
+        with ESMTP id S230513AbjGSMnA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jul 2023 08:36:38 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90603136
-        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 05:36:36 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230719123633epoutp04ccdabc89f78835edf743d8d4f5ec10d4~zRQnDJmUW1120811208epoutp042
-        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 12:36:33 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230719123633epoutp04ccdabc89f78835edf743d8d4f5ec10d4~zRQnDJmUW1120811208epoutp042
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1689770193;
-        bh=Hif75bRAzib4zYxvClP6M+ybRL/9J1vZwD85Go2NhRs=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=eRQRSRTz0WoCIhWatmDoGxo8TjguANR+61vKjEGV717kNUMfXdLknKM3ezhJ1GCEK
-         BQDfG47JmQRfUMRfUiqJisubjwFB5dDwLmHgMdNwtDEmtDSe6iHZNBm3cZNt8hTqrC
-         c2lc4+FElUK2ObDRlrA7s8+PfLWMDUeTLsig9FuE=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20230719123632epcas5p4d3509481ff7a12ce4f36369b322b0687~zRQmMq6It0655806558epcas5p4g;
-        Wed, 19 Jul 2023 12:36:32 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.176]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4R5b0Z6YQSz4x9Pv; Wed, 19 Jul
-        2023 12:36:30 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C3.CA.57354.DC8D7B46; Wed, 19 Jul 2023 21:36:29 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20230719121928epcas5p3c2af8016b8ffd5d4cb53238a5528eec8~zRBstlAip3080830808epcas5p3Q;
-        Wed, 19 Jul 2023 12:19:28 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230719121928epsmtrp246371f8757919d0dab71fa5e9d6c4bb4~zRBss9kdp0378803788epsmtrp2h;
-        Wed, 19 Jul 2023 12:19:28 +0000 (GMT)
-X-AuditID: b6c32a44-007ff7000001e00a-85-64b7d8cd8dd9
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        72.78.64355.0D4D7B46; Wed, 19 Jul 2023 21:19:28 +0900 (KST)
-Received: from green245.sa.corp.samsungelectronics.net (unknown
-        [107.99.41.245]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20230719121927epsmtip2a78974ac8469e31b8bd2ea71f8f36d25~zRBrus1er1907719077epsmtip2f;
-        Wed, 19 Jul 2023 12:19:27 +0000 (GMT)
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     martin.petersen@oracle.com, gost.dev@samsung.com,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] block: refactor to use helper
-Date:   Wed, 19 Jul 2023 17:46:08 +0530
-Message-Id: <20230719121608.32105-1-nj.shetty@samsung.com>
-X-Mailer: git-send-email 2.35.1.500.gb896f729e2
+        Wed, 19 Jul 2023 08:43:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9287F2118
+        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 05:41:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689770510;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h7cZqOet9l9CehRQj8JmzBtLZNOyNN3MqFZcZrA8nbA=;
+        b=WqRst/qkUpL2k7PtkAlyaSkgbhKsi5482cEZTtCYvAdireu/BK96Dln34hWOSf9ntXlFsZ
+        uKp4DIaow6lLEP5T8qDSrje6zwL5iz1yLBz5ZVI/CKCr/FXW5XaEcTHprVXsWa38o1+CPA
+        IEHkRcQDRXaZUrFCkgeB8Y59VTpzhUI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-433-d2Oe2vODPemeXDl1aFAWYg-1; Wed, 19 Jul 2023 08:41:45 -0400
+X-MC-Unique: d2Oe2vODPemeXDl1aFAWYg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5D8E5936D30;
+        Wed, 19 Jul 2023 12:41:44 +0000 (UTC)
+Received: from ovpn-8-21.pek2.redhat.com (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 54B0A40C6CCC;
+        Wed, 19 Jul 2023 12:41:36 +0000 (UTC)
+Date:   Wed, 19 Jul 2023 20:41:32 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>
+Cc:     Matias Bjorling <Matias.Bjorling@wdc.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, gost.dev@samsung.com,
+        Christoph Hellwig <hch@infradead.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>, ming.lei@redhat.com
+Subject: Re: [PATCH v9 2/2] ublk: enable zoned storage support
+Message-ID: <ZLfZ/I2O3d7V9v7d@ovpn-8-21.pek2.redhat.com>
+References: <20230714072510.47770-1-nmi@metaspace.dk>
+ <20230714072510.47770-3-nmi@metaspace.dk>
+ <ZLesM5flOn2aet8p@ovpn-8-17.pek2.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOKsWRmVeSWpSXmKPExsWy7bCmlu7ZG9tTDDr3cFqsvtvPZnHzwE4m
-        i723tC0u75rDZrH8+D8mi22/5zM7sHlcPlvq8fHpLRaPvi2rGD0+b5ILYInKtslITUxJLVJI
-        zUvOT8nMS7dV8g6Od443NTMw1DW0tDBXUshLzE21VXLxCdB1y8wBWq2kUJaYUwoUCkgsLlbS
-        t7Mpyi8tSVXIyC8usVVKLUjJKTAp0CtOzC0uzUvXy0stsTI0MDAyBSpMyM7Yu2gNe0EnR8Wc
-        zu1sDYyn2LoYOTkkBEwkXn05y9jFyMUhJLCbUeLeqSMsEM4nRomFGxsRnDUTngI5HGAty8+p
-        Q8R3Mkp0bVvEDOG0Mkn8bzgFVsQmoC1x+j8HyAoRAQWJnt8r2UBqmAVmMUoc7J7NCJIQFtCT
-        OHfrEZjNIqAqsWg5hM0rYCXRP/sDG8QyfYn++4IQYUGJkzOfsIDYzALyEs1bZ4PtlRDYxS5x
-        ZPVOFoh/XCSW7vvIDmELS7w6vgXKlpL4/G4v1M/lEiunrGCDaG5hlJh1fRYjRMJeovVUPzPI
-        YmYBTYn1u/QhwrISU0+tY4JYzCfR+/sJE0ScV2LHPBhbWWLN+gVQ8yUlrn1vhLI9JC7e7GIG
-        sYUEYiV+PD3PMoFRfhaSf2Yh+WcWwuYFjMyrGCVTC4pz01OTTQsM81LL4RGbnJ+7iRGcArVc
-        djDemP9P7xAjEwfjIUYJDmYlEd5Hl7elCPGmJFZWpRblxxeV5qQWH2I0BYbxRGYp0eR8YBLO
-        K4k3NLE0MDEzMzOxNDYzVBLnfd06N0VIID2xJDU7NbUgtQimj4mDU6qB6UaX3s7C52f5U5/8
-        PnnpgyzHi3Vf8+aIzuquWXWXuePM5Vvpyl6fhPfJ3I5asev0p0551jf9J4/9s1vC66xlFbnL
-        N+edoZqSnu8l/hbWDXJPJ6/VPlG+e9rEew9mfr7evZq/jaeove+Gf06Bg1PZwSV3F/56oHJS
-        fmFrB8utzjeNP764mhUHlTF8SY1Tej4jrXt2Al/r2z4uleJvgoH2p90nZO3JfmPrM5FN8vvF
-        Z5wKvT6s1q7yod9b1qmFOZxICNIpd+nf9IDp8QO9u9eer+/qZLnWoiOqd0li/qL19jL3PiwR
-        /xvkZFy85aBH8C2+Q6WM7Fyftrq78gW95UyQm8PqpP6y6NiCguY/ptKtSizFGYmGWsxFxYkA
-        QHg29AoEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDLMWRmVeSWpSXmKPExsWy7bCSvO6FK9tTDG6/UbVYfbefzeLmgZ1M
-        FntvaVtc3jWHzWL58X9MFtt+z2d2YPO4fLbU4+PTWywefVtWMXp83iQXwBLFZZOSmpNZllqk
-        b5fAlbF30Rr2gk6Oijmd29kaGE+xdTFycEgImEgsP6fexcjJISSwnVGi62MliC0hICmx7O8R
-        ZghbWGLlv+fsXYxcQDXNTBL/zoA4HBxsAtoSp/9zgNSICChI9PxeyQZSwywwj1Fi34z9YM3C
-        AnoS5249YgSxWQRUJRYth7B5Bawk+md/gLpBX6L/viBEWFDi5MwnLCA2s4C8RPPW2cwTGPlm
-        IUnNQpJawMi0ilE0taA4Nz03ucBQrzgxt7g0L10vOT93EyM4ALWCdjAuW/9X7xAjEwfjIUYJ
-        DmYlEd5Hl7elCPGmJFZWpRblxxeV5qQWH2KU5mBREudVzulMERJITyxJzU5NLUgtgskycXBK
-        NTBFuhvflzWLWN94X11mT/ffL6u66m9vYl79qvGFM/O+69ee2sW8kOmIFZat31bEG5sdIWtU
-        3e1azJHaNmPRkjaO4hNHS76xirNGfG0957Km5Kjx55dO994f8T2+tCVSv0Zhqt+r3Swqf+3/
-        W/21iPFQW636vrF6h7+Q9ewLT9W4X4m9/FixbtbhtY3T39vZC355Xzlr+UNe1+mnrjMpRe+K
-        uJ/y9Ua4wvcp6nsu7lH1K/Re05v6yW8Xt/ZJ1cYEG5c2rfsrnvxbL5gpsEQwrSX90uq57kfF
-        nFQ9/934bfTkCquE/VKxDVqeMb9ncd3cfjPhfe/hiyLLdza9D+C5c/lbZf6FCbvuay0+kNB6
-        xyZfiaU4I9FQi7moOBEAKFkBLK8CAAA=
-X-CMS-MailID: 20230719121928epcas5p3c2af8016b8ffd5d4cb53238a5528eec8
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230719121928epcas5p3c2af8016b8ffd5d4cb53238a5528eec8
-References: <CGME20230719121928epcas5p3c2af8016b8ffd5d4cb53238a5528eec8@epcas5p3.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLesM5flOn2aet8p@ovpn-8-17.pek2.redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reduce some code by making use of bio_integrity_bytes().
+On Wed, Jul 19, 2023 at 05:26:11PM +0800, Ming Lei wrote:
+> On Fri, Jul 14, 2023 at 09:25:10AM +0200, Andreas Hindborg wrote:
+> > From: Andreas Hindborg <a.hindborg@samsung.com>
+> > 
+> > Add zoned storage support to ublk: report_zones and operations:
+> >  - REQ_OP_ZONE_OPEN
+> >  - REQ_OP_ZONE_CLOSE
+> >  - REQ_OP_ZONE_FINISH
+> >  - REQ_OP_ZONE_RESET
+> >  - REQ_OP_ZONE_APPEND
+> > 
+> > The zone append feature uses the `addr` field of `struct ublksrv_io_cmd` to
+> > communicate ALBA back to the kernel. Therefore ublk must be used with the
+> > user copy feature (UBLK_F_USER_COPY) for zoned storage support to be
+> > available. Without this feature, ublk will not allow zoned storage support.
+> > 
+> > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> > ---
+> 
+> ...
+> 
+> > +/*
+> > + * Construct a zone report. The report request is carried in `struct
+> > + * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
+> > + * and shall indicate the first zone of the report. The `nr_sectors` shall
+> > + * indicate how many zones should be reported (divide by zone size to get number
+> > + * of zones in the report) and must be an integer multiple of the zone size. The
+> > + * report shall be delivered as a `struct blk_zone` array. To report fewer zones
+> > + * than requested, zero the last entry of the returned array.
+> > + */
+> > +#define		UBLK_IO_OP_REPORT_ZONES		18
+> 
+> Actually, I meant the following delta change in V8 comment, then the UAPI
+> looks more clean & readable wrt. reporting how many zones in UBLK_IO_OP_REPORT_ZONES
+> and reusing ublksrv_io_cmd->addr.
+> 
+> Otherwise, this patchset looks fine.
+> 
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 5698f4575e05..454c852ed328 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -70,7 +70,7 @@ struct ublk_rq_data {
+>  	struct kref ref;
+>  	__u64 sector;
+>  	__u32 operation;
+> -	__u32 nr_sectors;
+> +	__u32 nr_zones;
+>  };
+>  
+>  struct ublk_uring_cmd_pdu {
+> @@ -335,7 +335,7 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+>  		pdu = blk_mq_rq_to_pdu(req);
+>  		pdu->operation = UBLK_IO_OP_REPORT_ZONES;
+>  		pdu->sector = sector;
+> -		pdu->nr_sectors = zones_in_request * zone_size_sectors;
+> +		pdu->nr_zones = zones_in_request;
+>  
+>  		ret = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
+>  					GFP_KERNEL);
+> @@ -404,7 +404,7 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
+>  		switch (ublk_op) {
+>  		case UBLK_IO_OP_REPORT_ZONES:
+>  			iod->op_flags = ublk_op | ublk_req_build_flags(req);
+> -			iod->nr_sectors = pdu->nr_sectors;
+> +			iod->nr_zones = pdu->nr_zones;
+>  			iod->start_sector = pdu->sector;
+>  			return BLK_STS_OK;
+>  		default:
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> index 4d97eb0f7d13..602a788a650e 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -249,11 +249,13 @@ struct ublksrv_ctrl_dev_info {
+>  /*
+>   * Construct a zone report. The report request is carried in `struct
+>   * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
+> - * and shall indicate the first zone of the report. The `nr_sectors` shall
+> - * indicate how many zones should be reported (divide by zone size to get number
+> - * of zones in the report) and must be an integer multiple of the zone size. The
+> - * report shall be delivered as a `struct blk_zone` array. To report fewer zones
+> - * than requested, zero the last entry of the returned array.
+> + * and shall indicate the first zone of the report. The `nr_zones` shall
+> + * indicate how many zones should be reported at most. The report shall be
+> + * delivered as a `struct blk_zone` array. To report fewer zones than
+> + * requested, zero the last entry of the returned array.
+> + *
+> + * So related definitions(blk_zone, blk_zone_cond, blk_zone_type, ...) in
+> + * include/uapi/linux/blkzoned.h are part of ublk UAPI.
+>   */
+>  #define		UBLK_IO_OP_REPORT_ZONES		18
+>  
+> @@ -276,7 +278,10 @@ struct ublksrv_io_desc {
+>  	/* op: bit 0-7, flags: bit 8-31 */
+>  	__u32		op_flags;
+>  
+> -	__u32		nr_sectors;
+> +	union {
+> +		__u32		nr_sectors;
+> +		__u32		nr_zones; /* for UBLK_IO_OP_REPORT_ZONES only */
+> +	};
+>  
+>  	/* start sector for this io */
+>  	__u64		start_sector;
+> @@ -308,6 +313,12 @@ struct ublksrv_io_cmd {
+>  	/*
+>  	 * userspace buffer address in ublksrv daemon process, valid for
+>  	 * FETCH* command only
+> +	 *
+> +	 * This field shouldn't be used if UBLK_F_USER_COPY is enabled,
+> +	 * because userspace deals with data copy by pread()/pwrite() over
+> +	 * /dev/ublkcN. But in case of UBLK_F_ZONED, 'addr' is re-used to
+> +	 * pass back the allocated LBA for UBLK_IO_OP_ZONE_APPEND which
+> +	 * actually depends on UBLK_F_USER_COPY
+>  	 */
+>  	__u64	addr;
 
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
----
- block/bio-integrity.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Or use union to cover zoned_append_lba, and we still need above
+document about UBLK_F_USER_COPY & UBLK_F_ZONED uses.
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 4533eb491661..8f0af7ac8573 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -199,7 +199,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	unsigned long start, end;
- 	unsigned int len, nr_pages;
- 	unsigned int bytes, offset, i;
--	unsigned int intervals;
- 	blk_status_t status;
- 
- 	if (!bi)
-@@ -224,10 +223,9 @@ bool bio_integrity_prep(struct bio *bio)
- 		    !(bi->flags & BLK_INTEGRITY_GENERATE))
- 			return true;
- 	}
--	intervals = bio_integrity_intervals(bi, bio_sectors(bio));
- 
- 	/* Allocate kernel buffer for protection data */
--	len = intervals * bi->tuple_size;
-+	len = bio_integrity_bytes(bi, bio_sectors(bio));
- 	buf = kmalloc(len, GFP_NOIO);
- 	status = BLK_STS_RESOURCE;
- 	if (unlikely(buf == NULL)) {
--- 
-2.34.1
+	union {
+		__u64	addr;
+		__u64	zoned_append_lba;
+	}
+
+
+Thanks,
+Ming
 
