@@ -2,83 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89115EB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 08:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0F4EB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jul 2023 09:27:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230370AbjGSI5i convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jul 2023 04:57:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47142 "EHLO
+        id S229554AbjGSJ1l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jul 2023 05:27:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbjGSI5h (ORCPT
+        with ESMTP id S229451AbjGSJ1k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jul 2023 04:57:37 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462B2136
-        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 01:57:36 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-199-JcrrCbdbNSik7gdKJemqkQ-1; Wed, 19 Jul 2023 09:57:33 +0100
-X-MC-Unique: JcrrCbdbNSik7gdKJemqkQ-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 19 Jul
- 2023 09:57:32 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 19 Jul 2023 09:57:32 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Tejun Heo' <tj@kernel.org>, Carlos Bilbao <carlos.bilbao@amd.com>
-CC:     "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        amd <amd@localhost.localdomain>
-Subject: RE: [PATCH] blk-iocost: fix seq_printf compile type mismatch error
-Thread-Topic: [PATCH] blk-iocost: fix seq_printf compile type mismatch error
-Thread-Index: AQHZuN9gMxBfo8Y4UkeL32HKckyYqK/Ay+LQ
-Date:   Wed, 19 Jul 2023 08:57:32 +0000
-Message-ID: <2b4540aadc3c4449a192aeed6211f232@AcuMS.aculab.com>
-References: <20230717141852.153965-1-carlos.bilbao@amd.com>
- <ZLWNHuTGk0fy8pjE@slm.duckdns.org>
-In-Reply-To: <ZLWNHuTGk0fy8pjE@slm.duckdns.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Wed, 19 Jul 2023 05:27:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB4C1FFC
+        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 02:26:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689758788;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/f0NTUat3Qw0nEGYdWCuhe31jBdzjtLNwY7Efuzq/OI=;
+        b=G0xNX7A9aB5Av2TaHvuKXdX+CyVQEsyFI1zwj6Zt7na+8wTm7NpN9YjkhoR7TSC7WwGUq3
+        X0SMYcvJuJHn2tkrURJ1Nu9+BDLdWDmIb+NEmuBWrsZNuiVbJUIvkaE3cD7qer5ujbZx38
+        UHssidiPnz7kARYgG6YsqccXHer4QqA=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-297-L7h32KX3MbSV5tDk-NQLpg-1; Wed, 19 Jul 2023 05:26:24 -0400
+X-MC-Unique: L7h32KX3MbSV5tDk-NQLpg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EFD8B28EC10C;
+        Wed, 19 Jul 2023 09:26:23 +0000 (UTC)
+Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 828DC492B01;
+        Wed, 19 Jul 2023 09:26:15 +0000 (UTC)
+Date:   Wed, 19 Jul 2023 17:26:11 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>
+Cc:     Matias Bjorling <Matias.Bjorling@wdc.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, gost.dev@samsung.com,
+        Christoph Hellwig <hch@infradead.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>, ming.lei@redhat.com
+Subject: Re: [PATCH v9 2/2] ublk: enable zoned storage support
+Message-ID: <ZLesM5flOn2aet8p@ovpn-8-17.pek2.redhat.com>
+References: <20230714072510.47770-1-nmi@metaspace.dk>
+ <20230714072510.47770-3-nmi@metaspace.dk>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230714072510.47770-3-nmi@metaspace.dk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Tejun Heo
-> Sent: 17 July 2023 19:49
+On Fri, Jul 14, 2023 at 09:25:10AM +0200, Andreas Hindborg wrote:
+> From: Andreas Hindborg <a.hindborg@samsung.com>
 > 
-> On Mon, Jul 17, 2023 at 09:18:52AM -0500, Carlos Bilbao wrote:
-> > From: amd <amd@localhost.localdomain>
-> >
-> > Fix two type mismatch errors encountered while compiling blk-iocost.c with
-> > GCC version 13.1.1 that involved constant operator WEIGHT_ONE. Cast the
-> > result of the division operation to (unsigned int) to match the expected
-> > format specifier %u in two seq_printf invocations.
+> Add zoned storage support to ublk: report_zones and operations:
+>  - REQ_OP_ZONE_OPEN
+>  - REQ_OP_ZONE_CLOSE
+>  - REQ_OP_ZONE_FINISH
+>  - REQ_OP_ZONE_RESET
+>  - REQ_OP_ZONE_APPEND
 > 
-> Can you detail the warnings? Was that on 32bit compiles?
+> The zone append feature uses the `addr` field of `struct ublksrv_io_cmd` to
+> communicate ALBA back to the kernel. Therefore ublk must be used with the
+> user copy feature (UBLK_F_USER_COPY) for zoned storage support to be
+> available. Without this feature, ublk will not allow zoned storage support.
+> 
+> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+> ---
 
-The problem is caused by gcc 13 changing the types of the
-constants inside an enum to be all the same.
+...
 
-The best fix is (probably) to replace all the enum used to
-define unrelated constants with #defines.
+> +/*
+> + * Construct a zone report. The report request is carried in `struct
+> + * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
+> + * and shall indicate the first zone of the report. The `nr_sectors` shall
+> + * indicate how many zones should be reported (divide by zone size to get number
+> + * of zones in the report) and must be an integer multiple of the zone size. The
+> + * report shall be delivered as a `struct blk_zone` array. To report fewer zones
+> + * than requested, zero the last entry of the returned array.
+> + */
+> +#define		UBLK_IO_OP_REPORT_ZONES		18
 
-	David
+Actually, I meant the following delta change in V8 comment, then the UAPI
+looks more clean & readable wrt. reporting how many zones in UBLK_IO_OP_REPORT_ZONES
+and reusing ublksrv_io_cmd->addr.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+Otherwise, this patchset looks fine.
+
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 5698f4575e05..454c852ed328 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -70,7 +70,7 @@ struct ublk_rq_data {
+ 	struct kref ref;
+ 	__u64 sector;
+ 	__u32 operation;
+-	__u32 nr_sectors;
++	__u32 nr_zones;
+ };
+ 
+ struct ublk_uring_cmd_pdu {
+@@ -335,7 +335,7 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+ 		pdu = blk_mq_rq_to_pdu(req);
+ 		pdu->operation = UBLK_IO_OP_REPORT_ZONES;
+ 		pdu->sector = sector;
+-		pdu->nr_sectors = zones_in_request * zone_size_sectors;
++		pdu->nr_zones = zones_in_request;
+ 
+ 		ret = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
+ 					GFP_KERNEL);
+@@ -404,7 +404,7 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
+ 		switch (ublk_op) {
+ 		case UBLK_IO_OP_REPORT_ZONES:
+ 			iod->op_flags = ublk_op | ublk_req_build_flags(req);
+-			iod->nr_sectors = pdu->nr_sectors;
++			iod->nr_zones = pdu->nr_zones;
+ 			iod->start_sector = pdu->sector;
+ 			return BLK_STS_OK;
+ 		default:
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index 4d97eb0f7d13..602a788a650e 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -249,11 +249,13 @@ struct ublksrv_ctrl_dev_info {
+ /*
+  * Construct a zone report. The report request is carried in `struct
+  * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
+- * and shall indicate the first zone of the report. The `nr_sectors` shall
+- * indicate how many zones should be reported (divide by zone size to get number
+- * of zones in the report) and must be an integer multiple of the zone size. The
+- * report shall be delivered as a `struct blk_zone` array. To report fewer zones
+- * than requested, zero the last entry of the returned array.
++ * and shall indicate the first zone of the report. The `nr_zones` shall
++ * indicate how many zones should be reported at most. The report shall be
++ * delivered as a `struct blk_zone` array. To report fewer zones than
++ * requested, zero the last entry of the returned array.
++ *
++ * So related definitions(blk_zone, blk_zone_cond, blk_zone_type, ...) in
++ * include/uapi/linux/blkzoned.h are part of ublk UAPI.
+  */
+ #define		UBLK_IO_OP_REPORT_ZONES		18
+ 
+@@ -276,7 +278,10 @@ struct ublksrv_io_desc {
+ 	/* op: bit 0-7, flags: bit 8-31 */
+ 	__u32		op_flags;
+ 
+-	__u32		nr_sectors;
++	union {
++		__u32		nr_sectors;
++		__u32		nr_zones; /* for UBLK_IO_OP_REPORT_ZONES only */
++	};
+ 
+ 	/* start sector for this io */
+ 	__u64		start_sector;
+@@ -308,6 +313,12 @@ struct ublksrv_io_cmd {
+ 	/*
+ 	 * userspace buffer address in ublksrv daemon process, valid for
+ 	 * FETCH* command only
++	 *
++	 * This field shouldn't be used if UBLK_F_USER_COPY is enabled,
++	 * because userspace deals with data copy by pread()/pwrite() over
++	 * /dev/ublkcN. But in case of UBLK_F_ZONED, 'addr' is re-used to
++	 * pass back the allocated LBA for UBLK_IO_OP_ZONE_APPEND which
++	 * actually depends on UBLK_F_USER_COPY
+ 	 */
+ 	__u64	addr;
+ };
+
+Thanks,
+Ming
 
