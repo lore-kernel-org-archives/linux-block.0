@@ -2,134 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD84FC001DC
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 18:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D518EB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 18:19:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231293AbjGTSEp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 14:04:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50556 "EHLO
+        id S230027AbjGTSTE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 14:19:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229897AbjGTSEp (ORCPT
+        with ESMTP id S229488AbjGTSTD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 14:04:45 -0400
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E3152709;
-        Thu, 20 Jul 2023 11:04:43 -0700 (PDT)
-Received: from local
-        by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.96)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1qMY0H-0005Hr-29;
-        Thu, 20 Jul 2023 18:03:53 +0000
-Date:   Thu, 20 Jul 2023 19:03:37 +0100
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
-        Christian Loehle <CLoehle@hyperstone.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ye Bin <yebin10@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
-Subject: Re: [RFC PATCH 0/6] nvmem: add block device NVMEM provider
-Message-ID: <ZLl2-TW982oKXMnN@makrotopia.org>
-References: <cover.1689802933.git.daniel@makrotopia.org>
- <352167df-34fc-ddff-def9-902873796536@acm.org>
+        Thu, 20 Jul 2023 14:19:03 -0400
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FBDA135
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 11:19:02 -0700 (PDT)
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3465bd756afso5788955ab.3
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 11:19:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689877141; x=1690481941;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AZGav5W1juXnv3EG46iWpR48CtLcE4/moZR3p7qd9rI=;
+        b=jMTweRfjbKCiokwvPDUPhKHIm4hRWwyyhfQOrBwDgceAm7R2U0zxAsb3r7ruFBya0N
+         /suGOsA7MCAsHVs2H+g4Fo/+/h2cBfrdA6F4/bJgUdlbZAe7smtCt3IJNkcMoOZD9+rv
+         f6EqyR7PBYIyAHGUKTw5B3IyfptnCV0KsZD8kSpGfG9+wIO9RJy6goElt8ZIU9XqbYMJ
+         4+84YZ+xc+xpA+mD5PyLvy2zwl7qq4ZxWWykiYeTQqHoxR/NqQcUlJmW8HkrFdDihwuC
+         /yf+E/tCdJYysap3oVrT3oQmUdR5NPIUnnxK3oJHPxtkDEPhUQvpN2pbgbfwmzc4IkmB
+         wGSw==
+X-Gm-Message-State: ABy/qLbQUmXcXokd0MGF/iJ4om8SNCWibJC1h/0Rdf/+tfYYfdvkBv56
+        EGf0fBsQeHLY1E5TfumHy0c=
+X-Google-Smtp-Source: APBJJlGHLv17nD5YHzKTrOSShtmmACpEzV2hLqizTOIrSaU40Au/S/7tIoLVkIzabI5sezXCScVKkQ==
+X-Received: by 2002:a92:d483:0:b0:345:a3c6:87ba with SMTP id p3-20020a92d483000000b00345a3c687bamr6368271ilg.22.1689877141361;
+        Thu, 20 Jul 2023 11:19:01 -0700 (PDT)
+Received: from ?IPV6:2620:0:1000:2514:2b58:b717:21d3:3537? ([2620:0:1000:2514:2b58:b717:21d3:3537])
+        by smtp.gmail.com with ESMTPSA id c1-20020a63a401000000b0055c3e8c922dsm1503240pgf.90.2023.07.20.11.19.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Jul 2023 11:19:00 -0700 (PDT)
+Message-ID: <075b8a01-d219-89d1-bb38-c5868fafaa1d@acm.org>
+Date:   Thu, 20 Jul 2023 11:18:59 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <352167df-34fc-ddff-def9-902873796536@acm.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2 4/5] scsi: Retry unaligned zoned writes
+Content-Language: en-US
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230710180210.1582299-1-bvanassche@acm.org>
+ <20230710180210.1582299-5-bvanassche@acm.org>
+ <52d41b27-f429-fc4c-c522-a963f67114bd@kernel.org>
+ <fb8b1b7e-4054-6598-8204-eb252395227d@acm.org>
+ <fd64fa90-1227-6d4d-8f0b-fc67d8c42a7e@kernel.org>
+ <42402057-3806-3930-5ff8-d68816c79ca5@acm.org>
+ <c4498ce0-d04d-c8d0-800e-d856d8ed8a8c@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <c4498ce0-d04d-c8d0-800e-d856d8ed8a8c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 08:30:39AM -0700, Bart Van Assche wrote:
-> On 7/19/23 15:01, Daniel Golle wrote:
-> > On embedded devices using an eMMC it is common that one or more (hw/sw)
-> > partitions on the eMMC are used to store MAC addresses and Wi-Fi
-> > calibration EEPROM data.
-> > 
-> > Implement an NVMEM provider backed by block devices as typically the
-> > NVMEM framework is used to have kernel drivers read and use binary data
-> > from EEPROMs, efuses, flash memory (MTD), ...
-> > 
-> > In order to be able to reference hardware partitions on an eMMC, add code
-> > to bind each hardware partition to a specific firmware subnode.
-> > 
-> > This series is meant to open the discussion on how exactly the device tree
-> > schema for block devices and partitions may look like, and even if using
-> > the block layer to back the NVMEM device is at all the way to go -- to me
-> > it seemed to be a good solution because it will be reuable e.g. for NVMe.
-> 
-> Is my understanding correct that these devices boot from eMMC and not over
-> Wi-Fi?
+On 7/19/23 16:07, Damien Le Moal wrote:
+> Not really. I was not thinking about passthrough requests but rather write
+> syscalls to /dev/sdX by applications. sd_setup_read_write_cmnd() is used for
+> these too. After all, /dev/sdX *is* a file system too, albeit the simplest possible.
 
-Yes, that's right.
+How about introducing a new request flag (REQ_*) such that f2fs can disable
+zone locking while it remains enabled for all other users (BTRFS and direct
+I/O)?
 
-> If so, why does this calibration data have to be stored on a raw
-> block device?
+Thanks,
 
-It's just how many vendors decided to implement it in their firmware.
+Bart.
 
-I reckon this happened mostly out of habbit and in order to avoid any
-potential complexities in their manufacturing and QA processes -- most
-of those processes have been created in a time when NOR flash was the
-most common way to store firmware on embedded devices with Wi-Fi.
-
-The occurance of raw NAND and SPI-NAND didn't change much about that,
-most vendors still just use a raw MTD partition to store all that
-per-device 'factory' data. Very few have have started to use raw data
-inside UBI volumes (and I've been working on a UBI NVMEM driver as
-well).
-
-Also when it comes to eMMC they just keep doing things how they were
-always doing them, just that instead of a raw NOR flash, some devices
-nowadays come with an eMMC. Some vendors use the 'boot1' hardware
-partition to store things like MAC addresses at raw offsets there
-(GL.iNet for example [1]), others use small GPT or MBR partitions on
-the main hardware partition of the eMMC to store MAC addresses and
-calibration blobs (for example Adtran [2]).
-
-> Why can't this information be loaded from a file on a
-> filesystem?
-
-Having this information stored in a file on a filesystem is also an
-option, of course, but out in the wild you will hardly find it being
-done like that, for the reason stated above and also because having
-the OS pull the Ethernet MAC addresses somewhere from a filesystem
-while in early user-space will require the OS to even know about the
-individual hardware and how this should be done, so it's not exactly
-beautiful, may need fsck, mounting, ... all before the machine can
-become available with it's assigned MAC address on Ethernet.
-
-The RaspberryPi and other brcmfmac-based systems are the exception to
-the rule, here a simple text file stored on the root filesystem serves
-the Wi-Fi calibration. This file hence needs to be shipped with the OS
-instead of being stored on the device, and e.g. Raspbian does so. I
-suppose this is mostly because there just isn't any permanent on-board
-storage large enough and being a low-barrier DYI system they wanted to
-make it easy for users designing systems besed on that (as in: not
-having to mess with raw offsets or partitions, but rather just use
-tools like Etcher on Windows and edit CR-LF terminated text files on a
-FAT filesystem inside notepad...).
-
-However, practically all Qualcomm and MediaTek Wi-Fi AP/Routers which
-come with an eMMC come with their MAC addresses and Wi-Fi EEPROM data
-stored as raw data inside a hardware or software partition.
-
-[1]: https://github.com/dangowrt/linux/commit/8a24f03efb6b1dd7d8fdf68558146bacc71c2c1b
-[2]: https://github.com/dangowrt/linux/commit/b14c0215641047d0447956b40bd344049a11becb
