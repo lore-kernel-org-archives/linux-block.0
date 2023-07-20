@@ -2,118 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0145BEB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 12:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2744EEB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 13:48:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230511AbjGTMQu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 08:16:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36548 "EHLO
+        id S229777AbjGTNst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 09:48:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbjGTMQt (ORCPT
+        with ESMTP id S229663AbjGTNst (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 08:16:49 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FBB1BC6;
-        Thu, 20 Jul 2023 05:16:46 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 311FA22BEC;
-        Thu, 20 Jul 2023 12:16:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1689855405; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qJeevWCTbOxeUOBTAxfygV2zVKl4pRNiVV/Sn4Vc5g8=;
-        b=Y7xfme4rPrCF5hEC5pbUvdrHOtse6c2XE5dQH4ofisst0BxXhq5fzSvvvudIq0qb1fgAZ3
-        nvIjKrBX9SBniQArDMHq3Eo1F5gHSAGQmoz/tE4t4qxq6hUdsPyEUo9DVqT6M2kkkhHlFw
-        wusKJBAY7+a0/4rdZ8XEmsB7vqMiu20=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1689855405;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qJeevWCTbOxeUOBTAxfygV2zVKl4pRNiVV/Sn4Vc5g8=;
-        b=FfN5Vi6mxKPEw3x2oCzsXOategHapN8ngq0O/mlx3Dt3iIlpkGc1UcEnhLUPz5UTPIunq7
-        Q/g7Z3f9m59q7UAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 17569138EC;
-        Thu, 20 Jul 2023 12:16:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id V/cVBa0luWQKJgAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 20 Jul 2023 12:16:45 +0000
-Message-ID: <2fda17af-ed88-2332-27a1-61496f943e91@suse.de>
-Date:   Thu, 20 Jul 2023 14:16:44 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 16/17] block: use iomap for writes to block devices
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
+        Thu, 20 Jul 2023 09:48:49 -0400
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B4CA2;
+        Thu, 20 Jul 2023 06:48:48 -0700 (PDT)
+Received: from local
+        by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.96)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1qMU0Q-000496-0I;
+        Thu, 20 Jul 2023 13:47:46 +0000
+Date:   Thu, 20 Jul 2023 14:47:37 +0100
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Dave Chinner <dchinner@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-References: <20230424054926.26927-1-hch@lst.de>
- <20230424054926.26927-17-hch@lst.de>
- <b96b397e-2f5e-7910-3bb3-7405d0e293a7@suse.de>
- <20230720120650.GA13266@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230720120650.GA13266@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
+        Christian Loehle <CLoehle@hyperstone.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ye Bin <yebin10@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
+Subject: Re: [RFC PATCH 3/6] block: add new genhd flag GENHD_FL_NO_NVMEM
+Message-ID: <ZLk6-aARrlAGenk3@makrotopia.org>
+References: <cover.1689802933.git.daniel@makrotopia.org>
+ <96510d925cb0ca1a3a132f8f8affd4bbdafd8fc9.1689802933.git.daniel@makrotopia.org>
+ <0592e021-237d-6d41-7faf-e5b93aefbeea@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0592e021-237d-6d41-7faf-e5b93aefbeea@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/20/23 14:06, Christoph Hellwig wrote:
-> On Fri, May 19, 2023 at 04:22:01PM +0200, Hannes Reinecke wrote:
->> I'm hitting this during booting:
->> [    5.016324]  <TASK>
->> [    5.030256]  iomap_iter+0x11a/0x350
->> [    5.030264]  iomap_readahead+0x1eb/0x2c0
->> [    5.030272]  read_pages+0x5d/0x220
->> [    5.030279]  page_cache_ra_unbounded+0x131/0x180
->> [    5.030284]  filemap_get_pages+0xff/0x5a0
->> [    5.030292]  filemap_read+0xca/0x320
->> [    5.030296]  ? aa_file_perm+0x126/0x500
->> [    5.040216]  ? touch_atime+0xc8/0x150
->> [    5.040224]  blkdev_read_iter+0xb0/0x150
->> [    5.040228]  vfs_read+0x226/0x2d0
->> [    5.040234]  ksys_read+0xa5/0xe0
->> [    5.040238]  do_syscall_64+0x5b/0x80
->>
->> Maybe we should consider this patch:
-> 
-> As willy said this should be taken care of by the i_size check.
-> Did you run with just this patch set or some of the large block
-> size experiments on top which might change the variables?
-> 
-> I'll repost the series today without any chances in the area, and
-> if you can reproduce it with just that series we need to root
-> cause it, so please send your kernel and VM config along for the
-> next report.
+On Thu, Jul 20, 2023 at 10:24:18AM +0200, Hannes Reinecke wrote:
+> On 7/20/23 00:03, Daniel Golle wrote:
+> > Add new flag to destinguish block devices which should not act as an
+> > NVMEM provider, such as for example an emulated block device on top of
+> > an MTD partition which already acts as an NVMEM provider itself.
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >   include/linux/blkdev.h | 3 +++
+> >   1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index 2f5371b8482c0..e853d1815be15 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -80,11 +80,14 @@ struct partition_meta_info {
+> >    * ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not
+> >    * scan for partitions from add_disk, and users can't add partitions manually.
+> >    *
+> > + * ``GENHD_FL_NO_NVMEM``: NVMEM emulation is disabled.  The kernel will not
+> > + * emulate an NVMEM device on top of this disk.
+> >    */
+> >   enum {
+> >   	GENHD_FL_REMOVABLE			= 1 << 0,
+> >   	GENHD_FL_HIDDEN				= 1 << 1,
+> >   	GENHD_FL_NO_PART			= 1 << 2,
+> > +	GENHD_FL_NO_NVMEM			= 1 << 3,
+> >   };
+> >   enum {
+> Please reverse this flag. Most of the devices will not have an NVMEM
+> partition, and we shouldn't require each and every driver to tag their
+> devices.
+> So please use GENHD_FL_NVMEM and only set this flag on devices which really
+> have an NVMEM partition.
 
-I _think_ it's been resolve now; I've rewritten my patchset (and the 
-patches where it's based upon) several times now, so it might be a stale 
-issue now.
+The idea here was to exclude all those devices which already implement
+an NVMEM provider on a lower layer themselves, such as MTD.
+In this cases it would be ambigous if the OF node represents the
+NVMEM device registered by the MTD framework or if blk-nvmem should be
+used.
 
-Eagerly awaiting your patchset.
+In all other cases device tree can unambigously indicate whether a
+block device should serve as NVMEM provider (and right, most of them
+never will).
 
-Cheers,
-
-Hannes
-
+However, reversing the logic seems fine just as well.
