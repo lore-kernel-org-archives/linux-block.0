@@ -2,88 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D846EB64DC
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 08:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9ECBC04FE0
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 09:48:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229819AbjGTIlO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 04:41:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35526 "EHLO
+        id S229553AbjGTJsd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 05:48:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232171AbjGTIah (ORCPT
+        with ESMTP id S231389AbjGTJsK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 04:30:37 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2174BFD
-        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 01:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=QC9DirWmKDSO1e/ljLAnzvbzTAa+Sx967kBwtx0OJ4E=; b=rI68IIqs4q3Kf8pVwYkd8Lmltv
-        33dJnkE9N4auSov1R9C96SOUyeZ3mdN2irgt9d9bYsbLgxsCayi+OpCex8sOeaZkZWnD/9/NZa4Hw
-        RX3uTXAKr7QQMlGMbl3Nk4nb/NPHcTEWITsdBiBJfTTiV9vKkf3VntQosPhl653ru1Q4Tp47Fr+j6
-        cm/4UUt+M8RUgOoIpuBEIC8k6oF3Gn/Ilb08HKGk1z0Wx2LRPbexNdeRdatrRVJ57OfJlinB/XWCO
-        8IXFaSTA+VuIp4qtdxQJwCpPPs6tjHrkj2hgnqaI6EH4weeGHQRK5SIlmGiweNKVcdW/mnPEmsupp
-        A4XUdZsA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qMP3U-00AJpb-16;
-        Thu, 20 Jul 2023 08:30:36 +0000
-Date:   Thu, 20 Jul 2023 01:30:36 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mauricio Faria de Oliveira <mfo@canonical.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Isaac J. Manjarres" <isaacmanjarres@google.com>
-Subject: Re: [PATCH RESEND 1/2] loop: deprecate autoloading callback
- loop_probe()
-Message-ID: <ZLjwrNntqIEb7QQe@infradead.org>
-References: <20230717191628.582363-1-mfo@canonical.com>
- <20230717191628.582363-2-mfo@canonical.com>
+        Thu, 20 Jul 2023 05:48:10 -0400
+Received: from out-54.mta0.migadu.com (out-54.mta0.migadu.com [IPv6:2001:41d0:1004:224b::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E9092701
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 02:47:16 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1689846435;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dQrUdY1vRsj8E+dCm96975wE2JF9r7J+GLmQavXqC6U=;
+        b=ppP0xq24ptj/OlMY3SPOuHL6Ff4dQYJc12lo4pwlHFUru/0kT+yUO+nGANDCOXMijpY0zh
+        0xRV/YP9illwyEGWdRzcnR+C2a2oqd4/o3nAXfqCCcJ3QCVAM4J4lj3lf7TdGBwhgX25Kc
+        aqsmNNgQe9Mnd4K/gYhs9jp73e9/KfE=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, osandov@fb.com, ming.lei@redhat.com,
+        kbusch@kernel.org, krisman@suse.de
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        zhouchengming@bytedance.com
+Subject: [PATCH 1/6] sbitmap: fix hint wrap in the failure case
+Date:   Thu, 20 Jul 2023 17:45:50 +0800
+Message-ID: <20230720094555.1397621-2-chengming.zhou@linux.dev>
+In-Reply-To: <20230720094555.1397621-1-chengming.zhou@linux.dev>
+References: <20230720094555.1397621-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230717191628.582363-2-mfo@canonical.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 17, 2023 at 04:16:27PM -0300, Mauricio Faria de Oliveira wrote:
-> The 'probe' callback in __register_blkdev() is only used
-> under the CONFIG_BLOCK_LEGACY_AUTOLOAD deprecation guard.
-> 
-> The loop_probe() function is only used for that callback,
-> so guard it too, accordingly.
-> 
-> See commit fbdee71bb5d8 ("block: deprecate autoloading based on dev_t").
-> 
-> Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
-> ---
->  drivers/block/loop.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 37511d2b2caf..7268ff71c92c 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -2093,6 +2093,7 @@ static void loop_remove(struct loop_device *lo)
->  	put_disk(lo->lo_disk);
->  }
->  
-> +#ifdef CONFIG_BLOCK_LEGACY_AUTOLOAD
->  static void loop_probe(dev_t dev)
->  {
->  	int idx = MINOR(dev) >> part_shift;
-> @@ -2101,6 +2102,7 @@ static void loop_probe(dev_t dev)
->  		return;
->  	loop_add(idx);
->  }
-> +#endif
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-Turn this into..
+```
+hint = nr + 1;
+if (hint >= depth - 1)
+	hint = 0;
+```
 
-#else
-#define loop_probe	NULL
-#endif /* !CONFIG_BLOCK_LEGACY_AUTOLOAD */
+Now we wrap the hint to 0 in the failure case, but:
+1. hint == depth - 1, is actually an available offset hint, which
+   we shouldn't wrap hint to 0.
+2. In the strict round_robin non-wrap case, we shouldn't wrap at all.
 
-and you can skip the pretty ugly second hunk.
+```
+wrap = wrap && hint;
+```
+
+We only need to check wrap based on the original hint ( > 0), don't need
+to recheck the new hint which maybe updated in the failure case.
+Also delete the mismatched comments by the way.
+
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ lib/sbitmap.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index eff4e42c425a..5ed6c2adf58e 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -144,12 +144,7 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 	while (1) {
+ 		nr = find_next_zero_bit(word, depth, hint);
+ 		if (unlikely(nr >= depth)) {
+-			/*
+-			 * We started with an offset, and we didn't reset the
+-			 * offset to 0 in a failure case, so start from 0 to
+-			 * exhaust the map.
+-			 */
+-			if (hint && wrap) {
++			if (wrap) {
+ 				hint = 0;
+ 				continue;
+ 			}
+@@ -160,8 +155,13 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 			break;
+ 
+ 		hint = nr + 1;
+-		if (hint >= depth - 1)
+-			hint = 0;
++		if (hint >= depth) {
++			if (wrap) {
++				hint = 0;
++				continue;
++			}
++			return -1;
++		}
+ 	}
+ 
+ 	return nr;
+-- 
+2.41.0
 
