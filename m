@@ -2,94 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F9BEB64DC
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 14:45:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FA3EB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 14:52:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232272AbjGTOpW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 10:45:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35152 "EHLO
+        id S230034AbjGTOwb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 10:52:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232099AbjGTOpU (ORCPT
+        with ESMTP id S231872AbjGTOwZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 10:45:20 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E59F326BF;
-        Thu, 20 Jul 2023 07:45:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8WAJT9WDMLEvcf61yGGorsrPggYGaOW5RZCuMk69rE0=; b=SkOAYLLGGTGtbots/O5bylvoXP
-        UuDt0Y4Ba3M4eyPVgki65V6/Q96dGxf4yFNLZwAWQQGhKg/0i0qLxC1FMe/fANdxhnIf+wlegGmro
-        FsueXRs0/J3HyF3Mlj2/GX9ZC8gIJnj0yy1QuObbvJEU2ef2XWIRhHtFZyZCnYxuiok+sSydyMgNQ
-        ByvNAHFOU2XlGG/EY5WrMjTYuOU2AZjRrRNIbRlLiKqQKtfZSBMKYGExCsxAKdxBdj2P31sqvGnM+
-        0oCT81YxqelH0PK1vI3K9foHjgfzBAEJ3s1Y6rw5c3kxuQT4kIBHLhwYmBE+Ni3308Dz6KXjHTxc3
-        aKA+eivg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qMUtz-000BQQ-Om; Thu, 20 Jul 2023 14:45:11 +0000
-Date:   Thu, 20 Jul 2023 15:45:11 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
+        Thu, 20 Jul 2023 10:52:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EA62713
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 07:51:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689864694;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AkiNNvhZXBOhwappo5DsNfWFblN13jxPHvb5/iriC0Y=;
+        b=VocUckPowaQyB9yrnL79v6fwLPnFNx4VQiVbf1dzJRob3jMWqtemnaB7O5Oe+pcpHidqoq
+        Ees2sRGi/r8AVZhPD/kJmMYOorJCli1BhQZKSr1DRU2JMInwQOBelIYpwk3Vab2a5O2fpd
+        Tu4LKrs1KvAoGdOEQWA3+PopAMMX6SQ=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-537-7hz3kwGiPiKOA4fhkmnQgQ-1; Thu, 20 Jul 2023 10:51:33 -0400
+X-MC-Unique: 7hz3kwGiPiKOA4fhkmnQgQ-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635e664d2f8so11053696d6.3
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 07:51:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689864692; x=1690469492;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AkiNNvhZXBOhwappo5DsNfWFblN13jxPHvb5/iriC0Y=;
+        b=Ecp+QOJhqIr0PgOnGl7NOhPIuFHIDBkpAtdwbFaBh1DyXivHl1MqxpLT+4UQ6cJh7L
+         FCJnLLbfN8lp3Kr3bCLcPZUwX4LHPS7JpGUi2d0YSSnLdCsIMp2Mnfk/893Iimo3vLch
+         fOc+G5sFeGKonHhBcNMDaVXzZeFP6ScdLQnNwn0AxnHlbmLdp0BpT4eApqZCRjB+FaKv
+         +xCm6tnAddthRjzxRlSJPcMvpdNVH9qejHWc+/jUtdyvI+zwMtCSuhuyOWQW2WPUvRXy
+         y1CRt6pWmbFcn7l+0nQ5MZTSiMixKBXbkqvWVETvPBx/HszVUxN6BmYpcn6FC8rIeTq7
+         BVKQ==
+X-Gm-Message-State: ABy/qLa/FR0IcsSthLixkS6AvAp249agKsX+R74m5plwOP1Xj6rg8H40
+        K4ogRgJImgt3DHus7excfEBzQV7dj191qAafnqQCelt3VlQPPDO67NFTKyKnjgxG47Dpb3Fl965
+        tWmyGgnt16UU5TlbGm5xjcFhZkl5y+VgfIA==
+X-Received: by 2002:a0c:e012:0:b0:63c:c041:ef7c with SMTP id j18-20020a0ce012000000b0063cc041ef7cmr4998993qvk.16.1689864692600;
+        Thu, 20 Jul 2023 07:51:32 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGG9WiVjMAJC0jyp6FJ1iLPNYyic/lNvrnvPP6HMAfS4d7vXSpGs/eQms+dzXXL9v8chg2XyA==
+X-Received: by 2002:a0c:e012:0:b0:63c:c041:ef7c with SMTP id j18-20020a0ce012000000b0063cc041ef7cmr4998979qvk.16.1689864692339;
+        Thu, 20 Jul 2023 07:51:32 -0700 (PDT)
+Received: from [172.16.0.7] ([209.73.90.46])
+        by smtp.gmail.com with ESMTPSA id u4-20020a0cf1c4000000b006375f9fd170sm429007qvl.34.2023.07.20.07.51.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Jul 2023 07:51:31 -0700 (PDT)
+Message-ID: <251d9862-e335-243e-d65a-c5538b4df253@redhat.com>
+Date:   Thu, 20 Jul 2023 09:51:30 -0500
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: allow building a kernel without buffer_heads
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
         Christian Brauner <christian@brauner.io>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/6] fs: add CONFIG_BUFFER_HEAD
-Message-ID: <ZLlId9+kXl5Tb7wj@casper.infradead.org>
+        linux-kernel@vger.kernel.org,
+        cluster-devel <cluster-devel@redhat.com>
 References: <20230720140452.63817-1-hch@lst.de>
- <20230720140452.63817-7-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230720140452.63817-7-hch@lst.de>
+Content-Language: en-US
+From:   Bob Peterson <rpeterso@redhat.com>
+In-Reply-To: <20230720140452.63817-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 04:04:52PM +0200, Christoph Hellwig wrote:
-> @@ -400,7 +391,8 @@ static int blkdev_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
->  	iomap->type = IOMAP_MAPPED;
->  	iomap->addr = iomap->offset;
->  	iomap->length = isize - iomap->offset;
-> -	iomap->flags |= IOMAP_F_BUFFER_HEAD;
-> +	if (IS_ENABLED(CONFIG_BUFFER_HEAD))
-> +		iomap->flags |= IOMAP_F_BUFFER_HEAD;
+On 7/20/23 9:04 AM, Christoph Hellwig wrote:
+> Hi all,
+> 
+> This series allows to build a kernel without buffer_heads, which I
+> think is useful to show where the dependencies are, and maybe also
+> for some very much limited environments, where people just needs
+> xfs and/or btrfs and some of the read-only block based file systems.
+> 
+> It first switches buffered writes (but not writeback) for block devices
+> to use iomap unconditionally, but still using buffer_heads, and then
+> adds a CONFIG_BUFFER_HEAD selected by all file systems that need it
+> (which is most block based file systems), makes the buffer_head support
+> in iomap optional, and adds an alternative implementation of the block
+> device address_operations using iomap.  This latter implementation
+> will also be useful to support block size > PAGE_SIZE for block device
+> nodes as buffer_heads won't work very well for that.
+> 
+> Note that for now the md software raid drivers is also disabled as it has
+> some (rather questionable) buffer_head usage in the unconditionally built
+> bitmap code.  I have a series pending to make the bitmap code conditional
+> and deprecated it, but it hasn't been merged yet.
+> 
+> Changes since v1:
+>   - drop the already merged prep patches
+>   - depend on FS_IOMAP not IOMAP
+>   - pick a better new name for block_page_mkwrite_return
+> 
+Hi Christoph,
 
-Wouldn't it be simpler to do ...
+Gfs2 still uses buffer_heads to manage the metadata being pushed through 
+its journals. We've been reducing our dependency on them but eliminating 
+them altogether is a large and daunting task. We can still work toward 
+that goal, but it will take time.
 
-+#ifdef CONFIG_BUFFER_HEAD
- #define IOMAP_F_BUFFER_HEAD     (1U << 4)
-+#else
-+#define IOMAP_F_BUFFER_HEAD	0
-+#endif
-
-in include/linux/iomap.h ?
-
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index 0607790827b48a..6dc585c010c020 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
-> @@ -41,6 +41,12 @@ static inline struct iomap_page *to_iomap_page(struct folio *folio)
->  	return NULL;
->  }
->  
-> +static inline bool iomap_use_buffer_heads(const struct iomap *iomap)
-> +{
-> +	return IS_ENABLED(CONFIG_BUFFER_HEAD) &&
-> +		(iomap->flags & IOMAP_F_BUFFER_HEAD);
-> +}
-
-... because this function then goes away.
-
-> @@ -675,7 +681,7 @@ static int iomap_write_begin(struct iomap_iter *iter, loff_t pos,
->  
->  	if (srcmap->type == IOMAP_INLINE)
->  		status = iomap_write_begin_inline(iter, folio);
-> -	else if (srcmap->flags & IOMAP_F_BUFFER_HEAD)
-> +	else if (iomap_use_buffer_heads(srcmap))
-
-... as this will be optimised away.
+Bob Peterson
 
