@@ -2,72 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7A5EB64DC
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 05:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2570EB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 06:04:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjGTFyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 01:54:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51424 "EHLO
+        id S229758AbjGTGEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 02:04:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjGTFyp (ORCPT
+        with ESMTP id S229733AbjGTGEW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 01:54:45 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7F01724
-        for <linux-block@vger.kernel.org>; Wed, 19 Jul 2023 22:54:42 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BCACD67373; Thu, 20 Jul 2023 07:54:37 +0200 (CEST)
-Date:   Thu, 20 Jul 2023 07:54:37 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: Re: [PATCH v2 3/3] block: Improve performance for
- BLK_MQ_F_BLOCKING drivers
-Message-ID: <20230720055437.GA2665@lst.de>
-References: <20230719182243.2810134-1-bvanassche@acm.org> <20230719182243.2810134-4-bvanassche@acm.org>
+        Thu, 20 Jul 2023 02:04:22 -0400
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E081724;
+        Wed, 19 Jul 2023 23:04:19 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D74F2C0004;
+        Thu, 20 Jul 2023 06:04:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1689833057;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nUFL7/Mm7BPR8kB+przAb0OhEflLuBBseviQ3BJv9XI=;
+        b=KLwUNU/HXgYZnteyxoUn5AmohuBdHXzopujfXCbx8cF44Qz8QJTIJGrYik1WRX3aR27zOb
+        JtlcjxSq75x4l/MjKwgsYNdnr4bEnhFGgj3l3Hiy3/r+1jNkURLVTCRjjpQkBwjFWUlnt1
+        MBy3ltHjeUuOL1+oLq5NnJai9KKIYdArGGrJXMzWHePNpa03aFKj86L+Sw6I5fHi69NWBh
+        NKa0Pn4Pasn1VUKcUZ7n29qCtN6jQ2lVhnD/JWLE0prgAvJWG1bTer0gkUa16TcrbQRHJ8
+        TGB2/o8DFmVblY79u7kO1qX7XwCIzeJls0LFCpaxm4cca19aXESw87rZwzit4Q==
+Date:   Thu, 20 Jul 2023 08:04:09 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Daniel Golle <daniel@makrotopia.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?= <linux@weissschuh.net>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
+        Christian Loehle <CLoehle@hyperstone.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ye Bin <yebin10@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
+Subject: Re: [RFC PATCH 4/6] mtd: blkdevs: set GENHD_FL_NO_NVMEM
+Message-ID: <20230720080409.734a312f@xps-13>
+In-Reply-To: <65171d5da3daba24315ecdfef6727442baae5bbf.1689802933.git.daniel@makrotopia.org>
+References: <cover.1689802933.git.daniel@makrotopia.org>
+        <65171d5da3daba24315ecdfef6727442baae5bbf.1689802933.git.daniel@makrotopia.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230719182243.2810134-4-bvanassche@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 19, 2023 at 11:22:42AM -0700, Bart Van Assche wrote:
-> blk_mq_run_queue() runs the queue asynchronously if BLK_MQ_F_BLOCKING
-> has been set.
+Hi Daniel,
 
-Maybe something like:
+daniel@makrotopia.org wrote on Wed, 19 Jul 2023 23:03:24 +0100:
 
-blk_mq_run_queue() always runs the queue asynchronously if
-BLK_MQ_F_BLOCKING is set on the tag_set.
+> As the MTD subsystem already acts as an NVMEM provider, emulated mtdblock
+> devices should not be considered NVMEM providers.
+>=20
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  drivers/mtd/mtd_blkdevs.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+> index ff18636e08897..82d5afba6a25a 100644
+> --- a/drivers/mtd/mtd_blkdevs.c
+> +++ b/drivers/mtd/mtd_blkdevs.c
+> @@ -362,6 +362,7 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+>  		gd->flags |=3D GENHD_FL_NO_PART;
+>  	}
+> =20
+> +	gd->flags |=3D GENHD_FL_NO_NVMEM;
+>  	set_capacity(gd, ((u64)new->size * tr->blksize) >> 9);
+> =20
+>  	/* Create the request queue */
 
-> + *    for execution. Don't wait for completion. May sleep if BLK_MQ_F_BLOCKING
-> + *    has been set.
->   *
->   * Note:
->   *    This function will invoke @done directly if the queue is dead.
-> @@ -2213,6 +2214,8 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
->  	 */
->  	WARN_ON_ONCE(!async && in_interrupt());
->  
-> +	might_sleep_if(!async && hctx->flags & BLK_MQ_F_BLOCKING);
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-This is some odd an very complex calling conventions.  I suspect most
-!BLK_MQ_F_BLOCKING could also deal with the may sleep if not async,
-and that would give us a much easier to audit change as we could
-remove the WARN_ON_ONCE above and just do a:
-
-	might_sleep_if(!async);
-
-In fact this might be a good time to split up blk_mq_run_hw_queue
-into blk_mq_run_hw_queue and blk_mq_run_hw_queue_async and do
-away with the bool and have cristal clear calling conventions.
-
-If we really need !async calles than can sleep we can add a specific
-blk_mq_run_hw_queue_atomic.
+Thanks,
+Miqu=C3=A8l
