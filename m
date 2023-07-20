@@ -2,66 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81557EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 06:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9313DEB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 07:06:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230041AbjGTGQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 02:16:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60628 "EHLO
+        id S229716AbjGTHGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 03:06:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbjGTGQx (ORCPT
+        with ESMTP id S229720AbjGTHGC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 02:16:53 -0400
+        Thu, 20 Jul 2023 03:06:02 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8513C1734;
-        Wed, 19 Jul 2023 23:16:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D72326A5;
+        Thu, 20 Jul 2023 00:05:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=11xMnwQRwvXHQT5a/YEI+VXa6HL9U2T3MXAdwDg1m5U=; b=hHFssfszejeHiVIAZ0Ab+bcULg
-        kEmmb3iv1Q5fiKeZIxK9g7yIe65iGCmaTZZVNVsH9Pd1eSlT+fZSuUxdULBY8MYG3vBYWtEeuX9QW
-        FSgz2zjuHz9r9QQMAhWtZqnpp+QUEodjoOP+3SIVpQCvlZhKqh+6f8lVNnIV21yOvkVhTQF0CohzC
-        OT/tP2MTnXXP/6EkTAgcjqyPCWn6352KlJBkED4haprYzZdJxYZ6UU1OrPRXIwuF/pry0MSp0T+Fs
-        pCCnCCRhOLIGcPal1Nx6H+5p0NqXv9zq81y5Qk0zcfE87sqhIdgGNNmXD0XAjvdWfmLfV+Ooko1jf
-        6kJBqFLw==;
+        bh=sEd+sy2amDGgLLugpD3SukQrlvn/3nTuy6vZTRpyND0=; b=RVHwsLzjkQi2vE+rIbn74ECoA7
+        Ti6U29xIQvJhuMHIFPzDXlUg+3Wwrxj5azQwdebGMxo27KyE0CQxM1w6Cq4Y7vr5sHwrq4u+q1Lxd
+        usOQb7MUyHDZSVKTj/PtISXeZvLFrxUbyLH1XBbbzwC6ughDOSRFXAZHA1lwV8s9rl/L6m0MRXxuo
+        TVXOnfcCbgPrF8xS26V/hx6pJyB6768r+yilmfkwjt5n7R2O+jJr3m8S8BDDVTlUG2mddEkCpjX+0
+        QW79ExSdsXRt5KdsE4Vc1r+JV7czr6tQEZDwbOOF1TJ+e6CE983cqMawwnwQM4gS2RVHSyaBgwoWx
+        PGD3A5Rw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qMMxr-009ulL-04;
-        Thu, 20 Jul 2023 06:16:39 +0000
-Date:   Wed, 19 Jul 2023 23:16:39 -0700
+        id 1qMNiO-00A2qs-00;
+        Thu, 20 Jul 2023 07:04:44 +0000
+Date:   Thu, 20 Jul 2023 00:04:43 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas@t-8ch.de>,
-        axboe@kernel.dk, hch@infradead.org, corbet@lwn.net,
-        snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
-        dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org,
-        jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>
-Subject: Re: [PATCH v5 04/11] blksnap: header file of the module interface
-Message-ID: <ZLjRR0xJZUWXXRf/@infradead.org>
-References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
- <20230612135228.10702-5-sergei.shtepa@veeam.com>
- <822909b0-abd6-4e85-b739-41f8efa6feff@t-8ch.de>
- <6168e4d5-efc3-0c84-66c7-aea460c9fcaa@veeam.com>
+To:     Daniel Golle <daniel@makrotopia.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
+        Christian Loehle <CLoehle@hyperstone.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ye Bin <yebin10@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
+Subject: Re: [RFC PATCH 6/6] block: implement NVMEM provider
+Message-ID: <ZLjci5bHzTI+/Kxs@infradead.org>
+References: <cover.1689802933.git.daniel@makrotopia.org>
+ <e5b709e15739dc0563e9497a2dbbe63050381db0.1689802933.git.daniel@makrotopia.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6168e4d5-efc3-0c84-66c7-aea460c9fcaa@veeam.com>
+In-Reply-To: <e5b709e15739dc0563e9497a2dbbe63050381db0.1689802933.git.daniel@makrotopia.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 11:53:54AM +0200, Sergei Shtepa wrote:
-> > Seems a bit weird to have a signed error code that is always negative.
-> > Couldn't this be an unsigned number or directly return the error from
-> > the ioctl() itself?
-> 
-> Yes, it's a good idea to pass the error code as an unsigned value.
-> And this positive value can be passed in case of successful execution
-> of ioctl(), but I would not like to put different error signs in one value.
-
-Linux tends to use negative error values in basically all interfaces.
-I think it will be less confusing to stick to that.
+The layering here is exactly the wrong way around.  This block device
+as nvmem provide has not business sitting in the block layer and being
+keyed ff the gendisk registration.  Instead you should create a new
+nvmem backed that opens the block device as needed if it fits your
+OF description without any changes to the core block layer.
 
