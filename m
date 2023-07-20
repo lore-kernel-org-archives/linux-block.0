@@ -2,103 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1038EB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 15:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A70D5EB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 15:37:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232209AbjGTPax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 11:30:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36172 "EHLO
+        id S232818AbjGTPhS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 11:37:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232453AbjGTPav (ORCPT
+        with ESMTP id S232788AbjGTPg6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 11:30:51 -0400
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2B22718;
-        Thu, 20 Jul 2023 08:30:43 -0700 (PDT)
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-262e89a3ee2so473237a91.1;
-        Thu, 20 Jul 2023 08:30:43 -0700 (PDT)
+        Thu, 20 Jul 2023 11:36:58 -0400
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 703C52D63;
+        Thu, 20 Jul 2023 08:36:25 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-666ed230c81so826886b3a.0;
+        Thu, 20 Jul 2023 08:36:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689867043; x=1690471843;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20221208; t=1689867385; x=1690472185;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VDNz4+C3Ia+UJJWOL2yYRO78JT/eW+cEwJdo8jSL20g=;
-        b=j24kvBWwDfKqiI7V3bmAeDZ5ZnDfNQZLCeyyVHncofp6D55zjXVwXWSU+Afjz4+tlb
-         IhZK7p8rsDbgglhVpFPiNNSLtPx6YGeFYk+fPsfgQo/G2NyU2c6hhJiyTH8M2qnMpA1Z
-         S74UpLZMBdapuVFe9KZcO27vuZ2LX1qEoCZwVWUcpnV+URA+77WDH1zZmQdMRwX1OB/V
-         hUf4fTVIx9F4//uzYbdKiwhzWN8eYB3tqnDGiM7HBmI6Ax8KuzWQHczF7JdgaPVrlE/q
-         CI5R6E1bpY7MHLQ7aCf8pyUHu4imp6WuA9vuL/SoUFZeWHgGRJNf5CKPti7fzFmIMZLo
-         FjpQ==
-X-Gm-Message-State: ABy/qLbbKYxQUNvCyrh/29X3C3/Zlr4NuMBvPpM6ZTGd5RczNFFtML2A
-        29PZ4vAWlVrgcmc3UzP1QgI=
-X-Google-Smtp-Source: APBJJlEp60fdkh+BwPlnxV7BskYrzw4J3Aqy8/DijBF1o7Ei41aAzfcXecHcQpUp58++ywm58NVt+g==
-X-Received: by 2002:a17:90b:23c5:b0:263:409d:6ef2 with SMTP id md5-20020a17090b23c500b00263409d6ef2mr6275576pjb.24.1689867042556;
-        Thu, 20 Jul 2023 08:30:42 -0700 (PDT)
+        bh=WAH5uVbj4cISjvxjDJ8RnYVMFAN3vFg4rHluAx9qI60=;
+        b=UwuSxxnzmEITuF1/K26bbXtkGU0eZa7BFQoPnCyEQbZOITbSYiME9trU0y5mtjKX3y
+         TKJ9fxHS70QbJoVhZYFVpa8aFyIRR3lfySU5Ze9/0qIyLOdlvmHyAFOysof7kqEbzS2G
+         juqHH8cq1Lo2HH5dZCH+/I29r9EAbMBcyIGm0yrNXXLzDaO5Fg5BKS/vV5KAjniPToVZ
+         aogZPFuBWnPTEAMcdx1KHBzXZWEgqhjLS7u7h1ooMUal+kFOQhgRXBAcJX2Zo5yNQPgM
+         la28xia5pS6Cfn/Zn0DrsNQlD7hVzUSBSFpBCnOsh02Hi0pTjI2b1jbwpEJjJxAk3YSb
+         8YJQ==
+X-Gm-Message-State: ABy/qLbA0estmU/qZ+8E6Jr8B3fU5EjcNpMLRBo/9qSlFou0ESRlLUgM
+        ixCOTMRm1K98s8DND89sN3vHkWO6N08=
+X-Google-Smtp-Source: APBJJlEaxCOtZgwuFqogIkZt/M9p/MnAUBwhOu42B4PqtG2v43BlHbpYyuEZAMmwOrsG7lcwGGeKOg==
+X-Received: by 2002:a05:6a20:8403:b0:137:3803:332 with SMTP id c3-20020a056a20840300b0013738030332mr7409969pzd.22.1689867384687;
+        Thu, 20 Jul 2023 08:36:24 -0700 (PDT)
 Received: from ?IPV6:2601:642:4c05:35c7:a9f2:f55:cb5b:263a? ([2601:642:4c05:35c7:a9f2:f55:cb5b:263a])
-        by smtp.gmail.com with ESMTPSA id l15-20020a17090a384f00b00267b7c5d232sm2993691pjf.48.2023.07.20.08.30.39
+        by smtp.gmail.com with ESMTPSA id y8-20020a62b508000000b00663b712bfbdsm1343280pfe.57.2023.07.20.08.36.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jul 2023 08:30:41 -0700 (PDT)
-Message-ID: <352167df-34fc-ddff-def9-902873796536@acm.org>
-Date:   Thu, 20 Jul 2023 08:30:39 -0700
+        Thu, 20 Jul 2023 08:36:24 -0700 (PDT)
+Message-ID: <c2d10567-cfc6-de6b-cc08-21ab00604d51@acm.org>
+Date:   Thu, 20 Jul 2023 08:36:22 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [RFC PATCH 0/6] nvmem: add block device NVMEM provider
+Subject: Re: [PATCH] blk-mq: delete dead struct blk_mq_hw_ctx->queued field
 Content-Language: en-US
-To:     Daniel Golle <daniel@makrotopia.org>, Jens Axboe <axboe@kernel.dk>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <linux@weissschuh.net>,
-        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
-        Christian Loehle <CLoehle@hyperstone.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ye Bin <yebin10@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
-References: <cover.1689802933.git.daniel@makrotopia.org>
+To:     chengming.zhou@linux.dev, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+References: <20230720095512.1403123-1-chengming.zhou@linux.dev>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <cover.1689802933.git.daniel@makrotopia.org>
+In-Reply-To: <20230720095512.1403123-1-chengming.zhou@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/19/23 15:01, Daniel Golle wrote:
-> On embedded devices using an eMMC it is common that one or more (hw/sw)
-> partitions on the eMMC are used to store MAC addresses and Wi-Fi
-> calibration EEPROM data.
+On 7/20/23 02:55, chengming.zhou@linux.dev wrote:
+> From: Chengming Zhou <zhouchengming@bytedance.com>
 > 
-> Implement an NVMEM provider backed by block devices as typically the
-> NVMEM framework is used to have kernel drivers read and use binary data
-> from EEPROMs, efuses, flash memory (MTD), ...
+> This counter is not used anywhere, so delete it.
 > 
-> In order to be able to reference hardware partitions on an eMMC, add code
-> to bind each hardware partition to a specific firmware subnode.
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> ---
+>   include/linux/blk-mq.h | 2 --
+>   1 file changed, 2 deletions(-)
 > 
-> This series is meant to open the discussion on how exactly the device tree
-> schema for block devices and partitions may look like, and even if using
-> the block layer to back the NVMEM device is at all the way to go -- to me
-> it seemed to be a good solution because it will be reuable e.g. for NVMe.
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index 01e8c31db665..958ed7e89b30 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -393,8 +393,6 @@ struct blk_mq_hw_ctx {
+>   	 */
+>   	struct blk_mq_tags	*sched_tags;
+>   
+> -	/** @queued: Number of queued requests. */
+> -	unsigned long		queued;
+>   	/** @run: Number of dispatched requests. */
+>   	unsigned long		run;
 
-Is my understanding correct that these devices boot from eMMC and not over
-Wi-Fi? If so, why does this calibration data have to be stored on a raw
-block device? Why can't this information be loaded from a file on a
-filesystem?
-
-Thanks,
-
-Bart.
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
