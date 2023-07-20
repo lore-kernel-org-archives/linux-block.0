@@ -2,144 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B6D8EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 15:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD251EB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 16:04:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232124AbjGTPyH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 11:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56454 "EHLO
+        id S230007AbjGTQEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 12:04:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233022AbjGTPyF (ORCPT
+        with ESMTP id S229563AbjGTQEb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 11:54:05 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 902F710D2;
-        Thu, 20 Jul 2023 08:53:55 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 50DCD1F8AC;
-        Thu, 20 Jul 2023 15:53:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1689868434; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AoIWfvcodiImdazBtF4GP+aiM7iZUlDUJHwoVwx2l0M=;
-        b=f+NQtXBWukxnOBTDhSu4fMxYZbJGWo2G92hXZqJKiip03vBFzW0tsuUtbAzkcra1ua0QrZ
-        ekgFv0gWb9JwZj2Ylfejs2aisDz77JLB5BtnaSwE0dXtRZBCTrRTWXVTYws5hZ18jkb5/t
-        Jus7bV+kZA5bV/x2bylo/OHVpL8yltg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1689868434;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AoIWfvcodiImdazBtF4GP+aiM7iZUlDUJHwoVwx2l0M=;
-        b=/7gRpa2GQeDZgmtYTQRDFpsjs2y7Q3HMtLsVINALgujmycG22P+Fzu+ByJ1hn5i0xlMlB/
-        FZy8w6o8SwtSYADQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 63352133DD;
-        Thu, 20 Jul 2023 15:53:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id iOCeFpFYuWRkJQAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 20 Jul 2023 15:53:53 +0000
-Message-ID: <80507f03-86b4-6406-5ab1-5687b6d12d93@suse.de>
-Date:   Thu, 20 Jul 2023 17:53:52 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 6/6] fs: add CONFIG_BUFFER_HEAD
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
+        Thu, 20 Jul 2023 12:04:31 -0400
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1956FCE;
+        Thu, 20 Jul 2023 09:04:31 -0700 (PDT)
+Received: from local
+        by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.96)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1qMW70-0004pa-2K;
+        Thu, 20 Jul 2023 16:02:42 +0000
+Date:   Thu, 20 Jul 2023 17:02:32 +0100
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Dave Chinner <dchinner@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
-        Christian Brauner <christian@brauner.io>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-References: <20230720140452.63817-1-hch@lst.de>
- <20230720140452.63817-7-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230720140452.63817-7-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
+        Christian Loehle <CLoehle@hyperstone.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ye Bin <yebin10@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
+Subject: Re: [RFC PATCH 6/6] block: implement NVMEM provider
+Message-ID: <ZLlaOB1sb8wSd7Aq@makrotopia.org>
+References: <cover.1689802933.git.daniel@makrotopia.org>
+ <e5b709e15739dc0563e9497a2dbbe63050381db0.1689802933.git.daniel@makrotopia.org>
+ <ZLjci5bHzTI+/Kxs@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLjci5bHzTI+/Kxs@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/20/23 16:04, Christoph Hellwig wrote:
-> Add a new config option that controls building the buffer_head code, and
-> select it from all file systems and stacking drivers that need it.
+On Thu, Jul 20, 2023 at 12:04:43AM -0700, Christoph Hellwig wrote:
+> The layering here is exactly the wrong way around.  This block device
+> as nvmem provide has not business sitting in the block layer and being
+> keyed ff the gendisk registration.  Instead you should create a new
+> nvmem backed that opens the block device as needed if it fits your
+> OF description without any changes to the core block layer.
 > 
-> For the block device nodes and alternative iomap based buffered I/O path
-> is provided when buffer_head support is not enabled, and iomap needs a
-> little tweak to be able to compile out the buffer_head based code path.
-> 
-> Otherwise this is just Kconfig and ifdef changes.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/fops.c                 | 71 +++++++++++++++++++++++++++++++-----
->   drivers/md/Kconfig           |  1 +
->   fs/Kconfig                   |  4 ++
->   fs/Makefile                  |  2 +-
->   fs/adfs/Kconfig              |  1 +
->   fs/affs/Kconfig              |  1 +
->   fs/befs/Kconfig              |  1 +
->   fs/bfs/Kconfig               |  1 +
->   fs/efs/Kconfig               |  1 +
->   fs/exfat/Kconfig             |  1 +
->   fs/ext2/Kconfig              |  1 +
->   fs/ext4/Kconfig              |  1 +
->   fs/f2fs/Kconfig              |  1 +
->   fs/fat/Kconfig               |  1 +
->   fs/freevxfs/Kconfig          |  1 +
->   fs/gfs2/Kconfig              |  1 +
->   fs/hfs/Kconfig               |  1 +
->   fs/hfsplus/Kconfig           |  1 +
->   fs/hpfs/Kconfig              |  1 +
->   fs/iomap/buffered-io.c       | 12 ++++--
->   fs/isofs/Kconfig             |  1 +
->   fs/jfs/Kconfig               |  1 +
->   fs/minix/Kconfig             |  1 +
->   fs/nilfs2/Kconfig            |  1 +
->   fs/ntfs/Kconfig              |  1 +
->   fs/ntfs3/Kconfig             |  1 +
->   fs/ocfs2/Kconfig             |  1 +
->   fs/omfs/Kconfig              |  1 +
->   fs/qnx4/Kconfig              |  1 +
->   fs/qnx6/Kconfig              |  1 +
->   fs/reiserfs/Kconfig          |  1 +
->   fs/sysv/Kconfig              |  1 +
->   fs/udf/Kconfig               |  1 +
->   fs/ufs/Kconfig               |  1 +
->   include/linux/buffer_head.h  | 32 ++++++++--------
->   include/trace/events/block.h |  2 +
->   mm/migrate.c                 |  4 +-
->   37 files changed, 125 insertions(+), 32 deletions(-)
-> 
-Hmm.
 
-I actually have a patchset which _does_ allow for large I/O blocksizes 
-with buffer_heads. (And even ltp/fsx is happy on xfs...)
-
-Can we modify this to not have a compile-time option but rather a 
-setting somewhere? EG kernel option or flag in struct address_space?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
-
+Ok. I will use a class_interface instead.
