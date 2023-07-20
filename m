@@ -2,177 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7804AEB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 14:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD22EB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 14:45:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232025AbjGTOen (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 10:34:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59268 "EHLO
+        id S232180AbjGTOpO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 10:45:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230487AbjGTOem (ORCPT
+        with ESMTP id S231761AbjGTOpO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 10:34:42 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1270310FC;
-        Thu, 20 Jul 2023 07:34:40 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id AF67B22BD9;
-        Thu, 20 Jul 2023 14:34:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1689863679; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Thu, 20 Jul 2023 10:45:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594F2C6
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 07:44:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689864265;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/6ff9/xbMepFzo0u5wSH1LXPdzZwFF8kXNP7KYOumW0=;
-        b=qJbxkSu+Z/pld8ZDnozSN6/06j3CWTxvtPLYu9WNVqVnQYD1RI5PVainHToQGk4VJlA8o9
-        08RqGEh7TmfWw0zpKdWPzd5NQgcsjDUdsX7EP9Afe96ZipgSN96XINuxW2H1O0lYVpjW6B
-        K1AfDAllBtV5XnZeo1WSkFqrE7Hl/g4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1689863679;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/6ff9/xbMepFzo0u5wSH1LXPdzZwFF8kXNP7KYOumW0=;
-        b=BfGCMyGUKemTNPoT/D7uFthLN/z5ova38Nj3q++Mq22svLYcCfPNhIS17nOKCvDfTHV4Hr
-        d45COpmtTCV8NqDg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 71F49138EC;
-        Thu, 20 Jul 2023 14:34:39 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id ZBd0G/9FuWTBdwAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 20 Jul 2023 14:34:39 +0000
-Message-ID: <944562e5-1923-5f7d-6a2d-5f648389cadf@suse.de>
-Date:   Thu, 20 Jul 2023 16:34:39 +0200
+        bh=1kKh3ryYLjboicz3qdOo//FhVYG5xef6YwWGQv6sHMs=;
+        b=h8CRMd+E2jhNXE7pj36dYVE9bisx3HPT9UkPxDxBZN85988vMByqWol7XFqjSMyrAdAZ8Y
+        Z7+jQkHWMqL+LgmsfAq8D1phE1P8t425Dh1up5qjGkcd6uvu2MK0jdpqkuFajZXqNp2s3V
+        GlOoDYycZY+iznBhcVEQmSFgr6xRG+I=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-443-xMMdLPyHPdqiGoOo8c4sTw-1; Thu, 20 Jul 2023 10:44:21 -0400
+X-MC-Unique: xMMdLPyHPdqiGoOo8c4sTw-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4fdbd94e735so883605e87.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 07:44:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689864259; x=1690469059;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1kKh3ryYLjboicz3qdOo//FhVYG5xef6YwWGQv6sHMs=;
+        b=DiP/StHO3+Nxe2K8t30N2VDj0EDozPnCQP1sbvQA+HadJzHiD2117xfR/M+CfdXA0m
+         J3gw4OAQgQqsZ84Iqk+t2cmLGRYX3MudPDggaBjXTsS3Ge1xDv3mc57DK/Sr2RS3WUaM
+         NJa9GkewFztj10U0lMAP83YtsWdRLvSzgKr+692Wc5FmSH6Xs+mj35jTvFwKN4aDHSx4
+         /V4NW+93tTGyc5j7m7IXb+VW6oXxUH28S8vlM1wHdU4z0U6MM2Y+p7R/3k5GYU1hgDHP
+         JYfQCZJH8jZgZC7pYDZ+y2nOA+IVCEhOlyf9F3HZT0E3jkT++7OPTnJl6oCK2wVD4oEc
+         jYGQ==
+X-Gm-Message-State: ABy/qLamjWkLsmIECbNDlcYuAw3jlG5BcNcjthRZAcvrC3d/2flrjNO3
+        1pKouEG86B5lAUe43TXtVWbY2vD48+W2Lke2QbpeO7aTEI+NP6F4cZZwPRkqIJAMwXR9jGHEl03
+        bfJ2iZgtfpOfsIy1AQZV+sYwgbIxM5Pmk4+EK91Q=
+X-Received: by 2002:a19:381d:0:b0:4fb:774f:9a84 with SMTP id f29-20020a19381d000000b004fb774f9a84mr1426872lfa.13.1689864259475;
+        Thu, 20 Jul 2023 07:44:19 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGqvlF3Q31UhqKnGyjEkAoD/0l/LO23yIEAtVwebEaJHCvn+qXZRHZYHSxLw/ZVMK1EPHAFbFyNn1LErGl7vCY=
+X-Received: by 2002:a19:381d:0:b0:4fb:774f:9a84 with SMTP id
+ f29-20020a19381d000000b004fb774f9a84mr1426855lfa.13.1689864259104; Thu, 20
+ Jul 2023 07:44:19 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [RFC PATCH 3/6] block: add new genhd flag GENHD_FL_NO_NVMEM
-Content-Language: en-US
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <linux@weissschuh.net>,
-        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
-        Christian Loehle <CLoehle@hyperstone.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ye Bin <yebin10@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
-References: <cover.1689802933.git.daniel@makrotopia.org>
- <96510d925cb0ca1a3a132f8f8affd4bbdafd8fc9.1689802933.git.daniel@makrotopia.org>
- <0592e021-237d-6d41-7faf-e5b93aefbeea@suse.de>
- <ZLk6-aARrlAGenk3@makrotopia.org>
- <f6256c2c-0fd5-764b-92ec-343b99e79c36@suse.de>
- <ZLlEhxspjyMPl29b@makrotopia.org>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <ZLlEhxspjyMPl29b@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230609180805.736872-1-jpittman@redhat.com> <ZIfIZWthJptVsQ6q@ovpn-8-16.pek2.redhat.com>
+ <CA+RJvhx0G7cLeQ1krpD8Noc7iZYcC4bMaVNzVsrcOrXE=yCdNQ@mail.gmail.com>
+ <yq1edm6rxgy.fsf@ca-mkp.ca.oracle.com> <CA+RJvhwaEnj0Yk3MW75+nQsOjVFEQQxCj2DcO2EQ-jpCL_ec-g@mail.gmail.com>
+ <yq1lefb8iev.fsf@ca-mkp.ca.oracle.com>
+In-Reply-To: <yq1lefb8iev.fsf@ca-mkp.ca.oracle.com>
+From:   John Pittman <jpittman@redhat.com>
+Date:   Thu, 20 Jul 2023 10:43:42 -0400
+Message-ID: <CA+RJvhz+i59+fMZPjuD2XZNS9rW=Un7RN_qB6n2diwvKHH3pXQ@mail.gmail.com>
+Subject: Re: [PATCH] block: set reasonable default for discard max
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     axboe@kernel.dk, djeffery@redhat.com, loberman@redhat.com,
+        emilne@redhat.com, minlei@redhat.com, linux-block@vger.kernel.org,
+        ming.lei@redhat.com, Mike Snitzer <msnitzer@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/20/23 16:28, Daniel Golle wrote:
-> On Thu, Jul 20, 2023 at 04:03:22PM +0200, Hannes Reinecke wrote:
->> On 7/20/23 15:47, Daniel Golle wrote:
->>> On Thu, Jul 20, 2023 at 10:24:18AM +0200, Hannes Reinecke wrote:
->>>> On 7/20/23 00:03, Daniel Golle wrote:
->>>>> Add new flag to destinguish block devices which should not act as an
->>>>> NVMEM provider, such as for example an emulated block device on top of
->>>>> an MTD partition which already acts as an NVMEM provider itself.
->>>>>
->>>>> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
->>>>> ---
->>>>>     include/linux/blkdev.h | 3 +++
->>>>>     1 file changed, 3 insertions(+)
->>>>>
->>>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->>>>> index 2f5371b8482c0..e853d1815be15 100644
->>>>> --- a/include/linux/blkdev.h
->>>>> +++ b/include/linux/blkdev.h
->>>>> @@ -80,11 +80,14 @@ struct partition_meta_info {
->>>>>      * ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not
->>>>>      * scan for partitions from add_disk, and users can't add partitions manually.
->>>>>      *
->>>>> + * ``GENHD_FL_NO_NVMEM``: NVMEM emulation is disabled.  The kernel will not
->>>>> + * emulate an NVMEM device on top of this disk.
->>>>>      */
->>>>>     enum {
->>>>>     	GENHD_FL_REMOVABLE			= 1 << 0,
->>>>>     	GENHD_FL_HIDDEN				= 1 << 1,
->>>>>     	GENHD_FL_NO_PART			= 1 << 2,
->>>>> +	GENHD_FL_NO_NVMEM			= 1 << 3,
->>>>>     };
->>>>>     enum {
->>>> Please reverse this flag. Most of the devices will not have an NVMEM
->>>> partition, and we shouldn't require each and every driver to tag their
->>>> devices.
->>>> So please use GENHD_FL_NVMEM and only set this flag on devices which really
->>>> have an NVMEM partition.
->>>
->>> The idea here was to exclude all those devices which already implement
->>> an NVMEM provider on a lower layer themselves, such as MTD.
->>> In this cases it would be ambigous if the OF node represents the
->>> NVMEM device registered by the MTD framework or if blk-nvmem should be
->>> used.
->>>
->> Hmm; not sure if I follow.
->> In the end, it doesn't really matter whether you check for
->> GENHD_FL_NO_NVMEM or !GENHD_FL_NVMEM.
->> With the difference being that in the former case you have to
->> tag 99% of all existing block devices, and in the latter you
->> have to tag 1%.
-> 
-> That's not exactly true. In the current case I only have to flag MTD
-> (and UBI in future, I'm working on a UBI NVMEM provider as well) with
-> GENHD_FL_NO_NVMEM, so a 'compatible = "nvmem-cells"' in the
-> corresponding device tree node should not result in blk-nvmem creating
-> an NVMEM device based on the (mtd/ubi)block device, simply because the
-> MTD framework (and UBI in future) will already have created their own
-> NVMEM device attached to the very same device tree node.
-> 
-> In all other cases of block devices, the compatible string can be used
-> to unambigously decide whether an NVMEM device should be created or
-> not. blk-nvmem is opt-in, so unless the device is flagged by
-> 'compatible = "nvmem-cells"' it will not do anything.
-> 
-> For all devices which anyway do not have any device tree representation
-> it won't do anything (think: loop, nbd, ...), we would not need to opt
-> them out using GENHD_FL_NO_NVMEM. Also all other drivers which do not
-> already bring their own NVMEM implementation won't need GENHD_FL_NO_NVMEM,
-> the absence of 'compatible = "nvmem-cells"' is enough to indicate that
-> they should not be considered as NVMEM providers.
-> 
-> The way you are suggesting will require that, in addition to selecting
-> the targetted block device in device tree, the block driver will also
-> have to set GENHD_FL_NVMEM. Hence we will need changes in MMC, NVMe
-> and potentially also SATA disk drivers setting GENHD_FL_NVMEM when
-> registering the disk.
-> 
-That is absolutely correct, and was my intention all along.
-Drivers which can (and do) supply an NVMEM partition should be required 
-to set this flag, yes.
+Thanks again Martin.  We're going to try to engage the hardware folks now.
 
-Cheers,
-
-Hannes
+On Wed, Jul 19, 2023 at 9:58=E2=80=AFPM Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>
+>
+> John,
+>
+> > Sorry for the wait; it took a while for the user to respond. They
+> > don't have scsi devs but rather nvme devs. The sg_vpd command failed
+> > b/c there was no bl page available. I asked them to provide the
+> > supported vpd pages that are there. I do have some nvme data though
+> > from a sosreport. I'll send you that in a separate email.
+>
+> The device vendor should be fixing their firmware to report a suitable
+> set of DMRL/DMRSL/DMSL values which align with the expected performance
+> of the device.
+>
+> --
+> Martin K. Petersen      Oracle Linux Engineering
+>
 
