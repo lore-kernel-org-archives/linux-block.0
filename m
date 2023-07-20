@@ -2,118 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FA3EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 14:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1038EB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 15:30:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230034AbjGTOwb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 10:52:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39840 "EHLO
+        id S232209AbjGTPax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 11:30:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231872AbjGTOwZ (ORCPT
+        with ESMTP id S232453AbjGTPav (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 10:52:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EA62713
-        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 07:51:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689864694;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AkiNNvhZXBOhwappo5DsNfWFblN13jxPHvb5/iriC0Y=;
-        b=VocUckPowaQyB9yrnL79v6fwLPnFNx4VQiVbf1dzJRob3jMWqtemnaB7O5Oe+pcpHidqoq
-        Ees2sRGi/r8AVZhPD/kJmMYOorJCli1BhQZKSr1DRU2JMInwQOBelIYpwk3Vab2a5O2fpd
-        Tu4LKrs1KvAoGdOEQWA3+PopAMMX6SQ=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-537-7hz3kwGiPiKOA4fhkmnQgQ-1; Thu, 20 Jul 2023 10:51:33 -0400
-X-MC-Unique: 7hz3kwGiPiKOA4fhkmnQgQ-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635e664d2f8so11053696d6.3
-        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 07:51:33 -0700 (PDT)
+        Thu, 20 Jul 2023 11:30:51 -0400
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2B22718;
+        Thu, 20 Jul 2023 08:30:43 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-262e89a3ee2so473237a91.1;
+        Thu, 20 Jul 2023 08:30:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689864692; x=1690469492;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1689867043; x=1690471843;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AkiNNvhZXBOhwappo5DsNfWFblN13jxPHvb5/iriC0Y=;
-        b=Ecp+QOJhqIr0PgOnGl7NOhPIuFHIDBkpAtdwbFaBh1DyXivHl1MqxpLT+4UQ6cJh7L
-         FCJnLLbfN8lp3Kr3bCLcPZUwX4LHPS7JpGUi2d0YSSnLdCsIMp2Mnfk/893Iimo3vLch
-         fOc+G5sFeGKonHhBcNMDaVXzZeFP6ScdLQnNwn0AxnHlbmLdp0BpT4eApqZCRjB+FaKv
-         +xCm6tnAddthRjzxRlSJPcMvpdNVH9qejHWc+/jUtdyvI+zwMtCSuhuyOWQW2WPUvRXy
-         y1CRt6pWmbFcn7l+0nQ5MZTSiMixKBXbkqvWVETvPBx/HszVUxN6BmYpcn6FC8rIeTq7
-         BVKQ==
-X-Gm-Message-State: ABy/qLa/FR0IcsSthLixkS6AvAp249agKsX+R74m5plwOP1Xj6rg8H40
-        K4ogRgJImgt3DHus7excfEBzQV7dj191qAafnqQCelt3VlQPPDO67NFTKyKnjgxG47Dpb3Fl965
-        tWmyGgnt16UU5TlbGm5xjcFhZkl5y+VgfIA==
-X-Received: by 2002:a0c:e012:0:b0:63c:c041:ef7c with SMTP id j18-20020a0ce012000000b0063cc041ef7cmr4998993qvk.16.1689864692600;
-        Thu, 20 Jul 2023 07:51:32 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGG9WiVjMAJC0jyp6FJ1iLPNYyic/lNvrnvPP6HMAfS4d7vXSpGs/eQms+dzXXL9v8chg2XyA==
-X-Received: by 2002:a0c:e012:0:b0:63c:c041:ef7c with SMTP id j18-20020a0ce012000000b0063cc041ef7cmr4998979qvk.16.1689864692339;
-        Thu, 20 Jul 2023 07:51:32 -0700 (PDT)
-Received: from [172.16.0.7] ([209.73.90.46])
-        by smtp.gmail.com with ESMTPSA id u4-20020a0cf1c4000000b006375f9fd170sm429007qvl.34.2023.07.20.07.51.31
+        bh=VDNz4+C3Ia+UJJWOL2yYRO78JT/eW+cEwJdo8jSL20g=;
+        b=j24kvBWwDfKqiI7V3bmAeDZ5ZnDfNQZLCeyyVHncofp6D55zjXVwXWSU+Afjz4+tlb
+         IhZK7p8rsDbgglhVpFPiNNSLtPx6YGeFYk+fPsfgQo/G2NyU2c6hhJiyTH8M2qnMpA1Z
+         S74UpLZMBdapuVFe9KZcO27vuZ2LX1qEoCZwVWUcpnV+URA+77WDH1zZmQdMRwX1OB/V
+         hUf4fTVIx9F4//uzYbdKiwhzWN8eYB3tqnDGiM7HBmI6Ax8KuzWQHczF7JdgaPVrlE/q
+         CI5R6E1bpY7MHLQ7aCf8pyUHu4imp6WuA9vuL/SoUFZeWHgGRJNf5CKPti7fzFmIMZLo
+         FjpQ==
+X-Gm-Message-State: ABy/qLbbKYxQUNvCyrh/29X3C3/Zlr4NuMBvPpM6ZTGd5RczNFFtML2A
+        29PZ4vAWlVrgcmc3UzP1QgI=
+X-Google-Smtp-Source: APBJJlEp60fdkh+BwPlnxV7BskYrzw4J3Aqy8/DijBF1o7Ei41aAzfcXecHcQpUp58++ywm58NVt+g==
+X-Received: by 2002:a17:90b:23c5:b0:263:409d:6ef2 with SMTP id md5-20020a17090b23c500b00263409d6ef2mr6275576pjb.24.1689867042556;
+        Thu, 20 Jul 2023 08:30:42 -0700 (PDT)
+Received: from ?IPV6:2601:642:4c05:35c7:a9f2:f55:cb5b:263a? ([2601:642:4c05:35c7:a9f2:f55:cb5b:263a])
+        by smtp.gmail.com with ESMTPSA id l15-20020a17090a384f00b00267b7c5d232sm2993691pjf.48.2023.07.20.08.30.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jul 2023 07:51:31 -0700 (PDT)
-Message-ID: <251d9862-e335-243e-d65a-c5538b4df253@redhat.com>
-Date:   Thu, 20 Jul 2023 09:51:30 -0500
+        Thu, 20 Jul 2023 08:30:41 -0700 (PDT)
+Message-ID: <352167df-34fc-ddff-def9-902873796536@acm.org>
+Date:   Thu, 20 Jul 2023 08:30:39 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: allow building a kernel without buffer_heads
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christian Brauner <christian@brauner.io>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        cluster-devel <cluster-devel@redhat.com>
-References: <20230720140452.63817-1-hch@lst.de>
+ Thunderbird/102.12.0
+Subject: Re: [RFC PATCH 0/6] nvmem: add block device NVMEM provider
 Content-Language: en-US
-From:   Bob Peterson <rpeterso@redhat.com>
-In-Reply-To: <20230720140452.63817-1-hch@lst.de>
+To:     Daniel Golle <daniel@makrotopia.org>, Jens Axboe <axboe@kernel.dk>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <linux@weissschuh.net>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
+        Christian Loehle <CLoehle@hyperstone.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ye Bin <yebin10@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
+References: <cover.1689802933.git.daniel@makrotopia.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <cover.1689802933.git.daniel@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/20/23 9:04 AM, Christoph Hellwig wrote:
-> Hi all,
+On 7/19/23 15:01, Daniel Golle wrote:
+> On embedded devices using an eMMC it is common that one or more (hw/sw)
+> partitions on the eMMC are used to store MAC addresses and Wi-Fi
+> calibration EEPROM data.
 > 
-> This series allows to build a kernel without buffer_heads, which I
-> think is useful to show where the dependencies are, and maybe also
-> for some very much limited environments, where people just needs
-> xfs and/or btrfs and some of the read-only block based file systems.
+> Implement an NVMEM provider backed by block devices as typically the
+> NVMEM framework is used to have kernel drivers read and use binary data
+> from EEPROMs, efuses, flash memory (MTD), ...
 > 
-> It first switches buffered writes (but not writeback) for block devices
-> to use iomap unconditionally, but still using buffer_heads, and then
-> adds a CONFIG_BUFFER_HEAD selected by all file systems that need it
-> (which is most block based file systems), makes the buffer_head support
-> in iomap optional, and adds an alternative implementation of the block
-> device address_operations using iomap.  This latter implementation
-> will also be useful to support block size > PAGE_SIZE for block device
-> nodes as buffer_heads won't work very well for that.
+> In order to be able to reference hardware partitions on an eMMC, add code
+> to bind each hardware partition to a specific firmware subnode.
 > 
-> Note that for now the md software raid drivers is also disabled as it has
-> some (rather questionable) buffer_head usage in the unconditionally built
-> bitmap code.  I have a series pending to make the bitmap code conditional
-> and deprecated it, but it hasn't been merged yet.
-> 
-> Changes since v1:
->   - drop the already merged prep patches
->   - depend on FS_IOMAP not IOMAP
->   - pick a better new name for block_page_mkwrite_return
-> 
-Hi Christoph,
+> This series is meant to open the discussion on how exactly the device tree
+> schema for block devices and partitions may look like, and even if using
+> the block layer to back the NVMEM device is at all the way to go -- to me
+> it seemed to be a good solution because it will be reuable e.g. for NVMe.
 
-Gfs2 still uses buffer_heads to manage the metadata being pushed through 
-its journals. We've been reducing our dependency on them but eliminating 
-them altogether is a large and daunting task. We can still work toward 
-that goal, but it will take time.
+Is my understanding correct that these devices boot from eMMC and not over
+Wi-Fi? If so, why does this calibration data have to be stored on a raw
+block device? Why can't this information be loaded from a file on a
+filesystem?
 
-Bob Peterson
+Thanks,
+
+Bart.
 
