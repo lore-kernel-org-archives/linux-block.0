@@ -2,117 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE5DEB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 15:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 748E2C3DA40
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 15:45:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232905AbjGTPo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 11:44:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49478 "EHLO
+        id S232911AbjGTPpf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 11:45:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232876AbjGTPoz (ORCPT
+        with ESMTP id S232907AbjGTPpe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 11:44:55 -0400
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0274C123
-        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 08:44:54 -0700 (PDT)
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1b89cfb4571so6923825ad.3
-        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 08:44:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689867894; x=1690472694;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kU0CQ24Eq35ykrcIjcOAgW1d3TQm0JahTjly7//d6Hs=;
-        b=Bi6GA7KAjNRGv9C6VpjQ7bZtxQYfwK+QTMmd213S6xqLSfhujkZsXJGWM0FhcQAzDv
-         vX1p0XRtL9zxNR8uCVh8plZkRr0b27q6AZ4QIQMjHXv/yf0OnDABloAzsVda7VWZf6Q9
-         amPq0ru5diS2dZYxeL0b0UKVFkB3t1gCUuCF+mYby5ayI0poKBajv+0tGj8HNbFI63U2
-         dam4A5UVmjlaghpi/Orl+sWjCW29T2Boq6cO3k0IrDSKD8p8I6QxeBAIMpMcQmnQZAJl
-         cED8FWzI0rOT5KDk5fmJbxMpkoPR4RZ6pCS+56NhtMlP31Q7XBVJkxHzgm/vadLSg56y
-         QFHQ==
-X-Gm-Message-State: ABy/qLZiM7aPOyBxQd2S2mnKLUK8VGQ/H6lIkVSoBEmPsGiG52oHDDdv
-        gaexNeBC4FMysWBsiEWyPh+p4wTaCtY=
-X-Google-Smtp-Source: APBJJlHn3b8YdDObDJtNJJcSiOCGvjOONmEbp2OEMkD0h1Sre/rlzQYG1GaV0lUttxqOhYJdi9pKFA==
-X-Received: by 2002:a17:903:22c1:b0:1b8:ae8c:7d88 with SMTP id y1-20020a17090322c100b001b8ae8c7d88mr7637731plg.7.1689867894395;
-        Thu, 20 Jul 2023 08:44:54 -0700 (PDT)
-Received: from ?IPV6:2601:642:4c05:35c7:a9f2:f55:cb5b:263a? ([2601:642:4c05:35c7:a9f2:f55:cb5b:263a])
-        by smtp.gmail.com with ESMTPSA id i17-20020a17090332d100b001b86dd825e7sm1563688plr.108.2023.07.20.08.44.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jul 2023 08:44:53 -0700 (PDT)
-Message-ID: <2c4f838c-aabc-1ef1-45eb-961114da643b@acm.org>
-Date:   Thu, 20 Jul 2023 08:44:52 -0700
+        Thu, 20 Jul 2023 11:45:34 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2A68CE;
+        Thu, 20 Jul 2023 08:45:33 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 80E0E22BD5;
+        Thu, 20 Jul 2023 15:45:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1689867932; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aTba3o2kPyRQo+UGixsLvGCxMe88Bb3EA6h99cQRtps=;
+        b=qwJKksOHdTuFkyFwhRtlp1LxANP966bXCKrJEG+5m9/hdDiiLELUR8k5SWL+g+17AMoMtK
+        PqZyd/GAZJVC3YADkrIKx2an4UXF5kowEwhjx7a5uCVUI7ReM58aktrYbnoxz9Lk0r4uIg
+        WB/GEV9X7fnfP3XzO1YaywemMkiupKY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1689867932;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aTba3o2kPyRQo+UGixsLvGCxMe88Bb3EA6h99cQRtps=;
+        b=q+mWssqwkd56oXHR8sXORz3ZI/rQgTF4jkb5FtlroAYjyypjl+qRCJT/9jX7clWCW5PTxq
+        1ZsMm3v6IGYwm6DQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4689A133DD;
+        Thu, 20 Jul 2023 15:45:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id GrMgEJxWuWTvIAAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 20 Jul 2023 15:45:32 +0000
+Message-ID: <e7c306c1-4e5f-afb1-8d26-857f6884e87b@suse.de>
+Date:   Thu, 20 Jul 2023 17:45:31 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH v2 3/3] block: Improve performance for BLK_MQ_F_BLOCKING
- drivers
+Subject: Re: [PATCH 2/6] fs: rename and move block_page_mkwrite_return
 Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230719182243.2810134-1-bvanassche@acm.org>
- <20230719182243.2810134-4-bvanassche@acm.org> <20230720055437.GA2665@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230720055437.GA2665@lst.de>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christian Brauner <christian@brauner.io>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+References: <20230720140452.63817-1-hch@lst.de>
+ <20230720140452.63817-3-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230720140452.63817-3-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/19/23 22:54, Christoph Hellwig wrote:
-> On Wed, Jul 19, 2023 at 11:22:42AM -0700, Bart Van Assche wrote:
->> + *    for execution. Don't wait for completion. May sleep if BLK_MQ_F_BLOCKING
->> + *    has been set.
->>    *
->>    * Note:
->>    *    This function will invoke @done directly if the queue is dead.
->> @@ -2213,6 +2214,8 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
->>   	 */
->>   	WARN_ON_ONCE(!async && in_interrupt());
->>   
->> +	might_sleep_if(!async && hctx->flags & BLK_MQ_F_BLOCKING);
+On 7/20/23 16:04, Christoph Hellwig wrote:
+> block_page_mkwrite_return is neither block nor mkwrite specific, and
+> should not be under CONFIG_BLOCK.  Move it to mm.h and rename it to
+> vmf_fs_error.
 > 
-> This is some odd an very complex calling conventions.  I suspect most
-> !BLK_MQ_F_BLOCKING could also deal with the may sleep if not async,
-> and that would give us a much easier to audit change as we could
-> remove the WARN_ON_ONCE above and just do a:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   fs/ext4/inode.c             |  2 +-
+>   fs/f2fs/file.c              |  2 +-
+>   fs/gfs2/file.c              | 16 ++++++++--------
+>   fs/iomap/buffered-io.c      |  2 +-
+>   fs/nilfs2/file.c            |  2 +-
+>   fs/udf/file.c               |  2 +-
+>   include/linux/buffer_head.h | 12 ------------
+>   include/linux/mm.h          | 18 ++++++++++++++++++
+>   8 files changed, 31 insertions(+), 25 deletions(-)
 > 
-> 	might_sleep_if(!async);
-> 
-> In fact this might be a good time to split up blk_mq_run_hw_queue
-> into blk_mq_run_hw_queue and blk_mq_run_hw_queue_async and do
-> away with the bool and have cristal clear calling conventions.
-> 
-> If we really need !async calles than can sleep we can add a specific
-> blk_mq_run_hw_queue_atomic.
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Hi Christoph,
+Cheers,
 
-blk_mq_run_hw_queue(hctx, false) is called from inside the block layer
-with an RCU lock held if BLK_MQ_F_BLOCKING and with an SRCU lock held if
-BLK_MQ_F_BLOCKING is not set. So I'm not sure whether it is possible to
-simplify the above might_sleep_if() statement. From block/blk-mq.h:
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
-/* run the code block in @dispatch_ops with rcu/srcu read lock held */
-#define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
-do {								\
-	if ((q)->tag_set->flags & BLK_MQ_F_BLOCKING) {		\
-		struct blk_mq_tag_set *__tag_set = (q)->tag_set; \
-		int srcu_idx;					\
-								\
-		might_sleep_if(check_sleep);			\
-		srcu_idx = srcu_read_lock(__tag_set->srcu);	\
-		(dispatch_ops);					\
-		srcu_read_unlock(__tag_set->srcu, srcu_idx);	\
-	} else {						\
-		rcu_read_lock();				\
-		(dispatch_ops);					\
-		rcu_read_unlock();				\
-	}							\
-} while (0)
-
-Thanks,
-
-Bart.
