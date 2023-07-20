@@ -2,147 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 543EEEB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 14:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3FEEB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 14:31:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232012AbjGTO3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 10:29:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56852 "EHLO
+        id S232020AbjGTObW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 10:31:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231702AbjGTO3D (ORCPT
+        with ESMTP id S232245AbjGTObV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 10:29:03 -0400
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54D231BF7;
-        Thu, 20 Jul 2023 07:29:02 -0700 (PDT)
-Received: from local
-        by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.96)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1qMUds-0004Lw-39;
-        Thu, 20 Jul 2023 14:28:33 +0000
-Date:   Thu, 20 Jul 2023 15:28:23 +0100
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
-        Christian Loehle <CLoehle@hyperstone.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ye Bin <yebin10@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
-Subject: Re: [RFC PATCH 3/6] block: add new genhd flag GENHD_FL_NO_NVMEM
-Message-ID: <ZLlEhxspjyMPl29b@makrotopia.org>
-References: <cover.1689802933.git.daniel@makrotopia.org>
- <96510d925cb0ca1a3a132f8f8affd4bbdafd8fc9.1689802933.git.daniel@makrotopia.org>
- <0592e021-237d-6d41-7faf-e5b93aefbeea@suse.de>
- <ZLk6-aARrlAGenk3@makrotopia.org>
- <f6256c2c-0fd5-764b-92ec-343b99e79c36@suse.de>
+        Thu, 20 Jul 2023 10:31:21 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA701BF7
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 07:31:20 -0700 (PDT)
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 1E4CA3F0F8
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 14:31:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1689863478;
+        bh=WyXPvm6GnRts3mVrmKERRd4ZFmqdxtmESBoZHU6EXmk=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=nSGu8EAc05FHsYyiLq8mn+c172Gm84v3u4B4o96KD257E+1yudyppS2IOYx0mPpfG
+         o7e+Gyx7nfszyG7sq+ooS+rKyT5FrfIS6iSLpYM+UFEM3NGUxqsCcG6JcjV+ttzg/m
+         q/7yR9O7NGn8NCCszBSrmCNwlq7LIF6VIiYpo/VwaTzr1jdKNqoqmOaZib30exzNsF
+         UBqUUxGl2b/jgCVDbyiNDC1F9RgHZ3vIXalMvMKvmPwUGUn6ssl5jQw2aI7nYcVN8K
+         1fktEPqlc6k34U0CvA2ustYuLU5A6+cSwZxoiPW4eBigBdegkxBqNg2Czt62IKM5ko
+         cDJ0w/qMTA8FQ==
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-566ed76d87cso2768419eaf.0
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 07:31:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689863477; x=1690468277;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WyXPvm6GnRts3mVrmKERRd4ZFmqdxtmESBoZHU6EXmk=;
+        b=enhtKNfDWVYsYn0iEkXbvDBJhCah7nI2zxGIZwo5eYL1tBGNEp0Lz1dgXc/pXrXEOt
+         YWC9WPqBpeDaqHGvNrTWRyj9huPUj8SRagAhJNwFekeibazrLsgIu80YMFh89dViqUa1
+         U7ADVxJ0orI6GhIPYlz8On+h1ye+zgNSE9hsKRIN+xyObCyybKbaMQa9IS1l6UbvxuoF
+         LfG29lWaQUF69h7si3CpyjeMdkHUa4bvJRk3SrjTfVUWaC86JUNX8V2p0nnqE0TXd1uM
+         1UI/7ewMWPkqXx0v19u0AO5No8i5ghGC9nbLuBbntPTCE7PG19dof+Tv1NjWaGQfrphW
+         BmTg==
+X-Gm-Message-State: ABy/qLY4wDmXC1MlpFXZTpUfHjF1JX76CcGQWoN1DUJF9jZHwAObEJLJ
+        06GtcOzLLz8/vpFC6YhxYc1AL2Kw2AQof66xFfmiN3H543uKAp82/cFWqAMfXbyTfUm4tacjOkA
+        nH/mzp5yNy70tJYGbHaEDgQwfp4MjnubUQYZUQZW4
+X-Received: by 2002:a05:6808:206:b0:38e:e0d2:6080 with SMTP id l6-20020a056808020600b0038ee0d26080mr1168834oie.19.1689863477044;
+        Thu, 20 Jul 2023 07:31:17 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlE4XWHFSWZJ8DMRWnbsPy+VQ0600AWJTXgC2vZJg8pxD66z5yJYEG/nEFZ5PCPgua3T6OoSrA==
+X-Received: by 2002:a05:6808:206:b0:38e:e0d2:6080 with SMTP id l6-20020a056808020600b0038ee0d26080mr1168816oie.19.1689863476668;
+        Thu, 20 Jul 2023 07:31:16 -0700 (PDT)
+Received: from localhost.localdomain ([2804:14c:4e1:8296:c121:4d01:95b0:7009])
+        by smtp.gmail.com with ESMTPSA id bg28-20020a056808179c00b003a4646e0896sm415543oib.32.2023.07.20.07.31.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jul 2023 07:31:16 -0700 (PDT)
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org
+Cc:     "Isaac J. Manjarres" <isaacmanjarres@google.com>
+Subject: [PATCH v2 0/2] loop: fix regression from max_loop default value change
+Date:   Thu, 20 Jul 2023 11:30:31 -0300
+Message-Id: <20230720143033.841001-1-mfo@canonical.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f6256c2c-0fd5-764b-92ec-343b99e79c36@suse.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 04:03:22PM +0200, Hannes Reinecke wrote:
-> On 7/20/23 15:47, Daniel Golle wrote:
-> > On Thu, Jul 20, 2023 at 10:24:18AM +0200, Hannes Reinecke wrote:
-> > > On 7/20/23 00:03, Daniel Golle wrote:
-> > > > Add new flag to destinguish block devices which should not act as an
-> > > > NVMEM provider, such as for example an emulated block device on top of
-> > > > an MTD partition which already acts as an NVMEM provider itself.
-> > > > 
-> > > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > > > ---
-> > > >    include/linux/blkdev.h | 3 +++
-> > > >    1 file changed, 3 insertions(+)
-> > > > 
-> > > > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > > > index 2f5371b8482c0..e853d1815be15 100644
-> > > > --- a/include/linux/blkdev.h
-> > > > +++ b/include/linux/blkdev.h
-> > > > @@ -80,11 +80,14 @@ struct partition_meta_info {
-> > > >     * ``GENHD_FL_NO_PART``: partition support is disabled.  The kernel will not
-> > > >     * scan for partitions from add_disk, and users can't add partitions manually.
-> > > >     *
-> > > > + * ``GENHD_FL_NO_NVMEM``: NVMEM emulation is disabled.  The kernel will not
-> > > > + * emulate an NVMEM device on top of this disk.
-> > > >     */
-> > > >    enum {
-> > > >    	GENHD_FL_REMOVABLE			= 1 << 0,
-> > > >    	GENHD_FL_HIDDEN				= 1 << 1,
-> > > >    	GENHD_FL_NO_PART			= 1 << 2,
-> > > > +	GENHD_FL_NO_NVMEM			= 1 << 3,
-> > > >    };
-> > > >    enum {
-> > > Please reverse this flag. Most of the devices will not have an NVMEM
-> > > partition, and we shouldn't require each and every driver to tag their
-> > > devices.
-> > > So please use GENHD_FL_NVMEM and only set this flag on devices which really
-> > > have an NVMEM partition.
-> > 
-> > The idea here was to exclude all those devices which already implement
-> > an NVMEM provider on a lower layer themselves, such as MTD.
-> > In this cases it would be ambigous if the OF node represents the
-> > NVMEM device registered by the MTD framework or if blk-nvmem should be
-> > used.
-> > 
-> Hmm; not sure if I follow.
-> In the end, it doesn't really matter whether you check for
-> GENHD_FL_NO_NVMEM or !GENHD_FL_NVMEM.
-> With the difference being that in the former case you have to
-> tag 99% of all existing block devices, and in the latter you
-> have to tag 1%.
+Apparently, there's an unintended consequence of the improvement for max_loop=0
+in commit 85c50197716c ("loop: Fix the max_loop commandline argument treatment
+when it is set to 0") which might break programs that handle /dev/loop devices.
 
-That's not exactly true. In the current case I only have to flag MTD
-(and UBI in future, I'm working on a UBI NVMEM provider as well) with
-GENHD_FL_NO_NVMEM, so a 'compatible = "nvmem-cells"' in the
-corresponding device tree node should not result in blk-nvmem creating
-an NVMEM device based on the (mtd/ubi)block device, simply because the
-MTD framework (and UBI in future) will already have created their own
-NVMEM device attached to the very same device tree node.
+The (deprecated) autoloading path fails (ENXIO) if the requested minor number
+is greater than or equal to the (new) default (CONFIG_BLK_DEV_LOOP_MIN_COUNT),
+when [loop.]max_loop is not specified.  This behavior used to work previously.
 
-In all other cases of block devices, the compatible string can be used
-to unambigously decide whether an NVMEM device should be created or
-not. blk-nvmem is opt-in, so unless the device is flagged by
-'compatible = "nvmem-cells"' it will not do anything.
+Patch 1/2 just notes the loop driver's autoloading path is deprecated/legacy.
+Patch 2/2 detects whether or not max_loop is set to restore default behavior
+as before the regression (and keeps the improvement done by the commit above).
 
-For all devices which anyway do not have any device tree representation
-it won't do anything (think: loop, nbd, ...), we would not need to opt
-them out using GENHD_FL_NO_NVMEM. Also all other drivers which do not
-already bring their own NVMEM implementation won't need GENHD_FL_NO_NVMEM,
-the absence of 'compatible = "nvmem-cells"' is enough to indicate that
-they should not be considered as NVMEM providers.
+Tested on v6.5-rc2.
 
-The way you are suggesting will require that, in addition to selecting
-the targetted block device in device tree, the block driver will also
-have to set GENHD_FL_NVMEM. Hence we will need changes in MMC, NVMe
-and potentially also SATA disk drivers setting GENHD_FL_NVMEM when
-registering the disk.
+v2:
+ - 1/2: simpler change per Christoph's suggestion.
+        same test results (specially the last one), as expected.
+ - 2/2: added Reviewed-by: Christoph.
 
-> 
-> > In all other cases device tree can unambigously indicate whether a
-> > block device should serve as NVMEM provider (and right, most of them
-> > never will).
-> > 
-> > However, reversing the logic seems fine just as well.
-> 
-> Thanks. Please do.
+Thanks,
+Mauricio
 
-Either way is fine with me, just 99% vs. 1% is not the right argument
-in this case.
+Mauricio Faria de Oliveira (2):
+  loop: deprecate autoloading callback loop_probe()
+  loop: do not enforce max_loop hard limit by (new) default
+
+ drivers/block/loop.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
+
+-- 
+2.39.2
+
