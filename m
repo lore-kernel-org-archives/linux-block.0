@@ -2,103 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85845EB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 20:06:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE222EB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 22:28:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229768AbjGTUG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 16:06:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55316 "EHLO
+        id S230247AbjGTW2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 18:28:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbjGTUG5 (ORCPT
+        with ESMTP id S230100AbjGTW2O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 16:06:57 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453842118;
-        Thu, 20 Jul 2023 13:06:57 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1b8b4749013so8939045ad.2;
-        Thu, 20 Jul 2023 13:06:57 -0700 (PDT)
+        Thu, 20 Jul 2023 18:28:14 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D6010D2
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 15:28:13 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6862d4a1376so282882b3a.0
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 15:28:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689883617; x=1690488417;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zRzMPL6a/BSNtiQ7PJzND7IfnG5RjjKshq+ayDJRwvE=;
-        b=kZIq9ybemRD+z70zrt95FXrBHFPHV9z/ZL6uhkUy+NMiMeb1ftSsvyQesVG3rung/8
-         StKvGhzKm87e0EmDAArGi/OpQRYaBX+ijkyxRDwREw4WO3X3HDnALsNzYZqcx5Sd6QOc
-         iWEVrUthWYQCvOKLAo3ODL8Pl9vUglt3E4qiHVwNbLXnFmj8aJCwpmZaaWZLoKn/mJiB
-         Ovi+Zy45y62uqB0h4m29zNjzHs7UitPpt+kYNHyLYVEIJAvO3JuTUzbjSB/BaEeodbnI
-         Zj/AeMIOXUGtWYEs/nE8rLZUXzAEfnHm7xpk1IuVAsdG5NsWCk5BwlL0fo+ioKeQuWY5
-         1yYw==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689892093; x=1690496893;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ER64QQYHsUjwnG72el4kyuwJDiqUwTkcoHvph6BDruY=;
+        b=xvnxeikI4preGoplg4GJa2wMcpwX156LfaLr8H24NbeffloJZcxZ79aZcYtr3mITgR
+         J3SBSJ4LeXPYFbhe91Z0vaDGcAyXlTZf5tXCmRzOBCpy7n3NtPOf7HIr2lzT+ShELXLd
+         C3Sbk0INLRfUrb5HCB9ayySAPcoatZ2wF5LstdPXuVWobEPNOV1iHKqyw6ZJcCmmxVbs
+         E0ty3dIfkDANo1MPs9ZAKju5ZQy2F1bHqVxTca5GYUMJJzQNvfLot9kZ3k1Z20R4KOVy
+         LQmKKwgSfWkJU/hVi2kEoJasJvfst55olSEhnUFyOHfj7wNkqiBT+sB+OHZU3Cxks0cd
+         0egA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689883617; x=1690488417;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1689892093; x=1690496893;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zRzMPL6a/BSNtiQ7PJzND7IfnG5RjjKshq+ayDJRwvE=;
-        b=GjcV4kZ+kivLH130KjDnCbB0IHe/Fppd1Hj1xcNKv6jxDaoRR3w46Ny3I91nbQ26yM
-         gIpshXPJRbZEbTFhqvMITiRSI6ndkaWJLFZN9GNZOpEwxcj9DiIGYKkuAJlA/zl6ZsHa
-         nNYSmIX2tYVU7Ph6vOluwxD5nIvYJtxdGHv1+Vc9DL+hxjBPS5Qe7G6ope2zPx2c0evE
-         wZlQdmZnXElKHrTkoqPXCVc9jfQcJnn25nhOPV0qoBDqHOJLEPoOPgaYf6o/trOHxt+1
-         7xOZ7Y2VJM9Rpcnnmm7Fl+bkubwm3I42MNdX2RkcQaWEDSR7mLWAp9+zzYWFkwT1KhLZ
-         ixlw==
-X-Gm-Message-State: ABy/qLbkrh8h+YmD5a+6wBDrsActp1MuL1HJCk2DKQc3I9BmxaUw2d+k
-        DvIb5dhYhYfGTfE9u5zXuzQ=
-X-Google-Smtp-Source: APBJJlHRyNzSlmZk1gO0I4KgaFJfKwcCiGrlMaE9Y6r8Y2/J8zvtUfOH8dB947pcEUNUBxJs0cIa6g==
-X-Received: by 2002:a17:903:22c4:b0:1b6:6b03:10cd with SMTP id y4-20020a17090322c400b001b66b0310cdmr4453plg.67.1689883616584;
-        Thu, 20 Jul 2023 13:06:56 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:fbd8])
-        by smtp.gmail.com with ESMTPSA id jh6-20020a170903328600b001aad714400asm1795608plb.229.2023.07.20.13.06.55
+        bh=ER64QQYHsUjwnG72el4kyuwJDiqUwTkcoHvph6BDruY=;
+        b=EpSY/VkhpcpoA9mq1J39WM9w0mtjd6TIznv7QQ6OK7Q+6fbrtyE6RswrWC6TrmJx/m
+         3RhoLaVXJQRI9qtRt3a2SSMxoEQIkp0krTWZ9OQhexk/VFHS1owChB1AbqBj7zeagcWu
+         14NPVfWOC6a2iz38ntZXrCHeV3umzsrhjldudt/Nrnq7H8Pge+xX7ZWMcu6zbPtczsXe
+         +G+wjOHg7NDY39bL8K2xHVZcR1mJua2ljrFwl6VyUxBNcI2yxc6m4d2rCWUHsoktUu+V
+         FHSOEArxYVMINn9z1M++ROBAhOTrzXSGXvTBwIJ7Xj/GiNGqG/3zr0hveEHGLl7OopBI
+         uarg==
+X-Gm-Message-State: ABy/qLbCzsTNqMYIJIRK6VTJO7Qla49Q7iZWhckBfr7lEpbzm6my+LTK
+        nJTsplHLdG89ftg4gU7AwcBkHA==
+X-Google-Smtp-Source: APBJJlGb5KbDm3ra3A6zcXjXBrySFNfNSVxxeSzp8vPmQrISvsnUWmY7D8a8kPz7CxMAemHOYr+xMg==
+X-Received: by 2002:a17:90a:304b:b0:262:c2a1:c01f with SMTP id q11-20020a17090a304b00b00262c2a1c01fmr30777pjl.3.1689892093322;
+        Thu, 20 Jul 2023 15:28:13 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id gv20-20020a17090b11d400b0025bf1ea918asm1409443pjb.55.2023.07.20.15.28.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 13:06:56 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 20 Jul 2023 10:06:54 -1000
-From:   'Tejun Heo' <tj@kernel.org>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     Carlos Bilbao <carlos.bilbao@amd.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        amd <amd@localhost.localdomain>
-Subject: Re: [PATCH] blk-iocost: fix seq_printf compile type mismatch error
-Message-ID: <ZLmT3mXuDlYY61w0@slm.duckdns.org>
-References: <20230717141852.153965-1-carlos.bilbao@amd.com>
- <ZLWNHuTGk0fy8pjE@slm.duckdns.org>
- <2b4540aadc3c4449a192aeed6211f232@AcuMS.aculab.com>
+        Thu, 20 Jul 2023 15:28:12 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     martin.petersen@oracle.com, gost.dev@samsung.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20230719121608.32105-1-nj.shetty@samsung.com>
+References: <CGME20230719121928epcas5p3c2af8016b8ffd5d4cb53238a5528eec8@epcas5p3.samsung.com>
+ <20230719121608.32105-1-nj.shetty@samsung.com>
+Subject: Re: [PATCH] block: refactor to use helper
+Message-Id: <168989209223.138604.5420894293792909192.b4-ty@kernel.dk>
+Date:   Thu, 20 Jul 2023 16:28:12 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2b4540aadc3c4449a192aeed6211f232@AcuMS.aculab.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-099c9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 19, 2023 at 08:57:32AM +0000, David Laight wrote:
-> From: Tejun Heo
-> > Sent: 17 July 2023 19:49
-> > 
-> > On Mon, Jul 17, 2023 at 09:18:52AM -0500, Carlos Bilbao wrote:
-> > > From: amd <amd@localhost.localdomain>
-> > >
-> > > Fix two type mismatch errors encountered while compiling blk-iocost.c with
-> > > GCC version 13.1.1 that involved constant operator WEIGHT_ONE. Cast the
-> > > result of the division operation to (unsigned int) to match the expected
-> > > format specifier %u in two seq_printf invocations.
-> > 
-> > Can you detail the warnings? Was that on 32bit compiles?
+
+On Wed, 19 Jul 2023 17:46:08 +0530, Nitesh Shetty wrote:
+> Reduce some code by making use of bio_integrity_bytes().
 > 
-> The problem is caused by gcc 13 changing the types of the
-> constants inside an enum to be all the same.
 > 
-> The best fix is (probably) to replace all the enum used to
-> define unrelated constants with #defines.
 
-Yeah, but then you end up without any way to read that value from outside
-the kernel for BPF, drgn or any other tools which use debug info. That
-actually matters.
+Applied, thanks!
 
-Thanks.
+[1/1] block: refactor to use helper
+      commit: 8f63fef5867fb5e8c29d9c14b6d739bfc1869d32
 
+Best regards,
 -- 
-tejun
+Jens Axboe
+
+
+
