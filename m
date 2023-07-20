@@ -2,139 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFD2EB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 19:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F907EB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 19:29:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229533AbjGTTHI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 15:07:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54304 "EHLO
+        id S230357AbjGTT3n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 15:29:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230082AbjGTTHH (ORCPT
+        with ESMTP id S229690AbjGTT3n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 15:07:07 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D622719;
-        Thu, 20 Jul 2023 12:07:02 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6C54C22C8B;
-        Thu, 20 Jul 2023 19:07:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1689880021; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mQnVQG0q9VVm8UuQ6nnXG9ncuTRurJ8jeV6JO3bPO7w=;
-        b=dHn9dnqz9JSek/gmyfpDHzzdj8FbSMF6ZOoM0sYdkS70bTwWMfsCiPtasUYVerbZOJCwuw
-        3GyOAHI6RsM3MdMiQ13FO3v0ny1LnG10HYosfOo5fFlo9aFxoT4OgQlN9zL3RjtQ2o3iHK
-        bH2UFCrvlf9VUwSI8SdZu6Jz3yiZCO4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1689880021;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mQnVQG0q9VVm8UuQ6nnXG9ncuTRurJ8jeV6JO3bPO7w=;
-        b=Xpyr/kcbASNlPiEYokGoGexQCErIE4MJIDylmSIM/14CJerJOjby3Pj/hvaYeGJvV0bzsn
-        D+azY3e/AudeRIDg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 336A1138EC;
-        Thu, 20 Jul 2023 19:07:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id +DLjBtWFuWRmfAAAMHmgww
-        (envelope-from <krisman@suse.de>); Thu, 20 Jul 2023 19:07:01 +0000
-From:   Gabriel Krisman Bertazi <krisman@suse.de>
+        Thu, 20 Jul 2023 15:29:43 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5180E1724
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 12:29:41 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-785d3a53ed6so15034639f.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 12:29:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689881380; x=1690486180;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U6EPe9CKzSess5IGZS9/zarMFMwQLlIFSDbX+RR9h8I=;
+        b=aWwdjxzLe8UQTuinjOdE/RaORTrgWSS+tJUStZMWSCuTGUocGzJfPMDFggwMrMAyup
+         PmpG9WzHPLE71dd1sqEDRVtR0wTeS6qXtA7HNY77JSM9aKIWAdbimeldoKWH3T9gUphZ
+         T9RfqNwp7KF5i4X7muppFm/bSsfXvlkwcVgkZj33/+Zg68haFkini3v0Wx6p/HaOtXUf
+         HweVRFOeiWlQrxa4orkyepH+lU7fO9O5hBpeV5ErsUD6NqJrmAD1xUpsH12HjzdSQ6aV
+         72y9NNGonZXMjaxPUf50DxyRh29f3GuP74ybPdXa6YNrDhrR3Ou3Mvv6zSQOJgRJFxs3
+         5bZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689881380; x=1690486180;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U6EPe9CKzSess5IGZS9/zarMFMwQLlIFSDbX+RR9h8I=;
+        b=F5GX8ScArkIpxprOB5KCiTDWCE14WQ5AgW98SMIoC6aSOkseheo/0nNlb8a7DrI8rV
+         37vhik00WrVokVKbnj8qYx2XlfdCr3FoZv+/RUSdOVobH3Lswc4ysOBWl/3dRCQ9RElw
+         LY6vhmDs/uetIEA1cd6rMyTGrBLRc7ntHgDDX1jnliAh2PftaaRZEreFqtFjAJrC0Dox
+         B0VAr0IAxqZcLm2C9mvqDQ0v6oHQBlOGJOPOVMc5M5bbYco2WnkmFCVwW1Aq4CNM1yuD
+         jA+39K45u7iouFogd+Rr92SNCP629ShlXDFtBQVbjf+jcvW7bvBNb5YxTuvWCDsen9W4
+         byAg==
+X-Gm-Message-State: ABy/qLZVvbGCBkEFpzusphTboAwUsLbnvOOpbXuO/oX3w9djV9c4jglS
+        iBS1dZiraxWfbOvKh/0+HfIh8g==
+X-Google-Smtp-Source: APBJJlGA7R3/equ2bBUMJ8Kkqg8rfcu4hag98cml2ZNmdagaHpgjf6OhPoxNf0YMowttsd06JFG9bQ==
+X-Received: by 2002:a05:6602:3423:b0:780:d65c:d78f with SMTP id n35-20020a056602342300b00780d65cd78fmr4831718ioz.2.1689881380773;
+        Thu, 20 Jul 2023 12:29:40 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id m18-20020a02c892000000b0041d859c5721sm515494jao.64.2023.07.20.12.29.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jul 2023 12:29:39 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
 To:     chengming.zhou@linux.dev
-Cc:     axboe@kernel.dk, osandov@fb.com, ming.lei@redhat.com,
-        kbusch@kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, zhouchengming@bytedance.com
-Subject: Re: [PATCH 1/6] sbitmap: fix hint wrap in the failure case
-Organization: SUSE
-References: <20230720094555.1397621-1-chengming.zhou@linux.dev>
-        <20230720094555.1397621-2-chengming.zhou@linux.dev>
-Date:   Thu, 20 Jul 2023 15:06:58 -0400
-In-Reply-To: <20230720094555.1397621-2-chengming.zhou@linux.dev> (chengming
-        zhou's message of "Thu, 20 Jul 2023 17:45:50 +0800")
-Message-ID: <87r0p24d2l.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+In-Reply-To: <20230720095512.1403123-1-chengming.zhou@linux.dev>
+References: <20230720095512.1403123-1-chengming.zhou@linux.dev>
+Subject: Re: [PATCH] blk-mq: delete dead struct blk_mq_hw_ctx->queued field
+Message-Id: <168988137961.115425.9247701067643903062.b4-ty@kernel.dk>
+Date:   Thu, 20 Jul 2023 13:29:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-099c9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-chengming.zhou@linux.dev writes:
 
-> From: Chengming Zhou <zhouchengming@bytedance.com>
->
-> ```
-> hint = nr + 1;
-> if (hint >= depth - 1)
-> 	hint = 0;
-> ```
->
-> Now we wrap the hint to 0 in the failure case, but:
-> 1. hint == depth - 1, is actually an available offset hint, which
->    we shouldn't wrap hint to 0.
-> 2. In the strict round_robin non-wrap case, we shouldn't wrap at all.
->
-> ```
-> wrap = wrap && hint;
-> ```
->
-> We only need to check wrap based on the original hint ( > 0), don't need
-> to recheck the new hint which maybe updated in the failure case.
-> Also delete the mismatched comments by the way.
->
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> ---
->  lib/sbitmap.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index eff4e42c425a..5ed6c2adf58e 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -144,12 +144,7 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
->  	while (1) {
->  		nr = find_next_zero_bit(word, depth, hint);
->  		if (unlikely(nr >= depth)) {
-> -			/*
-> -			 * We started with an offset, and we didn't reset the
-> -			 * offset to 0 in a failure case, so start from 0 to
-> -			 * exhaust the map.
-> -			 */
-> -			if (hint && wrap) {
-> +			if (wrap) {
->  				hint = 0;
->  				continue;
+On Thu, 20 Jul 2023 17:55:12 +0800, chengming.zhou@linux.dev wrote:
+> This counter is not used anywhere, so delete it.
+> 
+> 
 
-I think this is wrong.  If you start with an offset in the wrap case and
-the bitmap is completely full this will become busy wait until a bit is
-available. The hint check is what make you break out of the loop early,
-after wrapping, re-walking the entire bitmap and failing to find any
-available space.
+Applied, thanks!
 
-> @@ -160,8 +155,13 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
->  			break;
->  
->  		hint = nr + 1;
-> -		if (hint >= depth - 1)
-> -			hint = 0;
-> +		if (hint >= depth) {
-> +			if (wrap) {
-> +				hint = 0;
-> +				continue;
-> +			}
-> +			return -1;
-> +		}
->  	}
->  
->  	return nr;
+[1/1] blk-mq: delete dead struct blk_mq_hw_ctx->queued field
+      commit: 3641c90c4e369c8d0af5483e879174400a152cf8
 
+Best regards,
 -- 
-Gabriel Krisman Bertazi
+Jens Axboe
+
+
+
