@@ -2,82 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A70D5EB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 15:37:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28802C001DC
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 15:43:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232818AbjGTPhS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 11:37:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41990 "EHLO
+        id S232892AbjGTPnp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 11:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232788AbjGTPg6 (ORCPT
+        with ESMTP id S232876AbjGTPno (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 11:36:58 -0400
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 703C52D63;
-        Thu, 20 Jul 2023 08:36:25 -0700 (PDT)
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-666ed230c81so826886b3a.0;
-        Thu, 20 Jul 2023 08:36:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689867385; x=1690472185;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WAH5uVbj4cISjvxjDJ8RnYVMFAN3vFg4rHluAx9qI60=;
-        b=UwuSxxnzmEITuF1/K26bbXtkGU0eZa7BFQoPnCyEQbZOITbSYiME9trU0y5mtjKX3y
-         TKJ9fxHS70QbJoVhZYFVpa8aFyIRR3lfySU5Ze9/0qIyLOdlvmHyAFOysof7kqEbzS2G
-         juqHH8cq1Lo2HH5dZCH+/I29r9EAbMBcyIGm0yrNXXLzDaO5Fg5BKS/vV5KAjniPToVZ
-         aogZPFuBWnPTEAMcdx1KHBzXZWEgqhjLS7u7h1ooMUal+kFOQhgRXBAcJX2Zo5yNQPgM
-         la28xia5pS6Cfn/Zn0DrsNQlD7hVzUSBSFpBCnOsh02Hi0pTjI2b1jbwpEJjJxAk3YSb
-         8YJQ==
-X-Gm-Message-State: ABy/qLbA0estmU/qZ+8E6Jr8B3fU5EjcNpMLRBo/9qSlFou0ESRlLUgM
-        ixCOTMRm1K98s8DND89sN3vHkWO6N08=
-X-Google-Smtp-Source: APBJJlEaxCOtZgwuFqogIkZt/M9p/MnAUBwhOu42B4PqtG2v43BlHbpYyuEZAMmwOrsG7lcwGGeKOg==
-X-Received: by 2002:a05:6a20:8403:b0:137:3803:332 with SMTP id c3-20020a056a20840300b0013738030332mr7409969pzd.22.1689867384687;
-        Thu, 20 Jul 2023 08:36:24 -0700 (PDT)
-Received: from ?IPV6:2601:642:4c05:35c7:a9f2:f55:cb5b:263a? ([2601:642:4c05:35c7:a9f2:f55:cb5b:263a])
-        by smtp.gmail.com with ESMTPSA id y8-20020a62b508000000b00663b712bfbdsm1343280pfe.57.2023.07.20.08.36.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jul 2023 08:36:24 -0700 (PDT)
-Message-ID: <c2d10567-cfc6-de6b-cc08-21ab00604d51@acm.org>
-Date:   Thu, 20 Jul 2023 08:36:22 -0700
+        Thu, 20 Jul 2023 11:43:44 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A2BCE;
+        Thu, 20 Jul 2023 08:43:39 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B0B7121D0A;
+        Thu, 20 Jul 2023 15:43:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1689867818; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GLVTadNi7bTXVBcDl/cwSrd8poc5Q5ydPWjUCcKc5wk=;
+        b=eJRtX3isUEhimDA7h39PUqquydaDqngRUihnC4pLF5TWgigz70fusjzeMThW78IxVbYwiU
+        YJoGwJJ5+mjlK+m2YTO8BnmMrB2G5ziZR5MbaoD2SkCY/17wzKqGkOF+4NCdlfWje3Gk8+
+        aTMrB6yb0YECd84dlUNcM23PJOYQMEg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1689867818;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GLVTadNi7bTXVBcDl/cwSrd8poc5Q5ydPWjUCcKc5wk=;
+        b=ktMk4ZMaP9GIO2Gpo1XVnYvYGaAT4wXqHCOKZPZ86XAytEWDRXWZHzjo1D1Hn1MPwcBwpY
+        /kncyKAlASbIYYDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4D1A7133DD;
+        Thu, 20 Jul 2023 15:43:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id /QiBDypWuWT5HwAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 20 Jul 2023 15:43:38 +0000
+Message-ID: <c31aa1f6-948a-b45e-eb9b-ed61f5efac06@suse.de>
+Date:   Thu, 20 Jul 2023 17:43:37 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH] blk-mq: delete dead struct blk_mq_hw_ctx->queued field
+Subject: Re: [PATCH 1/6] fs: remove emergency_thaw_bdev
 Content-Language: en-US
-To:     chengming.zhou@linux.dev, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-References: <20230720095512.1403123-1-chengming.zhou@linux.dev>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230720095512.1403123-1-chengming.zhou@linux.dev>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christian Brauner <christian@brauner.io>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+References: <20230720140452.63817-1-hch@lst.de>
+ <20230720140452.63817-2-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230720140452.63817-2-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/20/23 02:55, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
+On 7/20/23 16:04, Christoph Hellwig wrote:
+> Fold emergency_thaw_bdev into it's only caller, to prepare for buffer.c
+> to be built only when buffer_head support is enabled.
 > 
-> This counter is not used anywhere, so delete it.
-> 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   include/linux/blk-mq.h | 2 --
->   1 file changed, 2 deletions(-)
+>   fs/buffer.c   | 6 ------
+>   fs/internal.h | 6 ------
+>   fs/super.c    | 4 +++-
+>   3 files changed, 3 insertions(+), 13 deletions(-)
 > 
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 01e8c31db665..958ed7e89b30 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -393,8 +393,6 @@ struct blk_mq_hw_ctx {
->   	 */
->   	struct blk_mq_tags	*sched_tags;
->   
-> -	/** @queued: Number of queued requests. */
-> -	unsigned long		queued;
->   	/** @run: Number of dispatched requests. */
->   	unsigned long		run;
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
+
