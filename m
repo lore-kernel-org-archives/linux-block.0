@@ -2,97 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2570EB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 06:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7373C001DE
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 06:15:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229758AbjGTGEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 02:04:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53944 "EHLO
+        id S229938AbjGTGPX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 02:15:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229733AbjGTGEW (ORCPT
+        with ESMTP id S229451AbjGTGPW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 02:04:22 -0400
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E081724;
-        Wed, 19 Jul 2023 23:04:19 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D74F2C0004;
-        Thu, 20 Jul 2023 06:04:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1689833057;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nUFL7/Mm7BPR8kB+przAb0OhEflLuBBseviQ3BJv9XI=;
-        b=KLwUNU/HXgYZnteyxoUn5AmohuBdHXzopujfXCbx8cF44Qz8QJTIJGrYik1WRX3aR27zOb
-        JtlcjxSq75x4l/MjKwgsYNdnr4bEnhFGgj3l3Hiy3/r+1jNkURLVTCRjjpQkBwjFWUlnt1
-        MBy3ltHjeUuOL1+oLq5NnJai9KKIYdArGGrJXMzWHePNpa03aFKj86L+Sw6I5fHi69NWBh
-        NKa0Pn4Pasn1VUKcUZ7n29qCtN6jQ2lVhnD/JWLE0prgAvJWG1bTer0gkUa16TcrbQRHJ8
-        TGB2/o8DFmVblY79u7kO1qX7XwCIzeJls0LFCpaxm4cca19aXESw87rZwzit4Q==
-Date:   Thu, 20 Jul 2023 08:04:09 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?= <linux@weissschuh.net>,
-        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
-        Christian Loehle <CLoehle@hyperstone.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ye Bin <yebin10@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
-Subject: Re: [RFC PATCH 4/6] mtd: blkdevs: set GENHD_FL_NO_NVMEM
-Message-ID: <20230720080409.734a312f@xps-13>
-In-Reply-To: <65171d5da3daba24315ecdfef6727442baae5bbf.1689802933.git.daniel@makrotopia.org>
-References: <cover.1689802933.git.daniel@makrotopia.org>
-        <65171d5da3daba24315ecdfef6727442baae5bbf.1689802933.git.daniel@makrotopia.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Thu, 20 Jul 2023 02:15:22 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F1919B2;
+        Wed, 19 Jul 2023 23:15:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=z8bMcYL2sfItal6IPN1MaB7xzF8i69WDSnHwMDnwZ2A=; b=iCftUFPYgfzlWh7j3fpyVulRXo
+        ba4PcyoOflOzDAEsmAZv96NBFLZKtt9i6/HxH6cktJPdkgDWm8jJ5w8TquEBW3dYmxQNZxR8LOz3J
+        9kdB7IRUvPKYHLXTAAdhCQLz5Ux13wtOjtXuseNEDLVvqOQUB9kAXvC27L791ckcJS5Dqjh8laT8d
+        2fiuDjLMqnOxXvsCAhrFY0ClDR7ARN9aGZCw2wDvcHyJKEquXCzkLMb0CAxd8FG9Ug3vB29G1lkg7
+        6xUZG29bDDGCOhSfITFLVEYxZdZ0ZhpUYHRk/gef+6Hr2LP0+yeBijY5QVk/scwD3ASrcyZ67hLxE
+        9CKqaO5w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qMMvx-009uI8-1n;
+        Thu, 20 Jul 2023 06:14:41 +0000
+Date:   Wed, 19 Jul 2023 23:14:41 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org,
+        viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
+        willy@infradead.org, dlemoal@kernel.org, linux@weissschuh.net,
+        jack@suse.cz, ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Donald Buczek <buczek@molgen.mpg.de>,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v5 02/11] block: Block Device Filtering Mechanism
+Message-ID: <ZLjQ0YfH7JyQyMyJ@infradead.org>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612135228.10702-3-sergei.shtepa@veeam.com>
+ <f935840e-12a7-c37b-183c-27e2d83990ea@huaweicloud.com>
+ <90f79cf3-86a2-02c0-1887-d3490f9848bb@veeam.com>
+ <d929eaa7-61d6-c4c4-aabc-0124c3693e10@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d929eaa7-61d6-c4c4-aabc-0124c3693e10@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Daniel,
+On Tue, Jul 18, 2023 at 09:37:33AM +0800, Yu Kuai wrote:
+> I haven't review blksnap code yet, but this sounds like a problem.
+> 
+> possible solutions I have in mind:
+> 
+> 1. Store blkfilter for each partition from bdev_disk_changed() before
+> delete_partition(), and add blkfilter back after add_partition().
+> 
+> 2. Store blkfilter from gendisk as a xarray, and protect it by
+> 'open_mutex' like 'part_tbl', block_device can keep the pointer to
+> reference blkfilter so that performance from fast path is ok, and the
+> lifetime of blkfiter can be managed separately.
 
-daniel@makrotopia.org wrote on Wed, 19 Jul 2023 23:03:24 +0100:
-
-> As the MTD subsystem already acts as an NVMEM provider, emulated mtdblock
-> devices should not be considered NVMEM providers.
->=20
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/mtd/mtd_blkdevs.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-> index ff18636e08897..82d5afba6a25a 100644
-> --- a/drivers/mtd/mtd_blkdevs.c
-> +++ b/drivers/mtd/mtd_blkdevs.c
-> @@ -362,6 +362,7 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
->  		gd->flags |=3D GENHD_FL_NO_PART;
->  	}
-> =20
-> +	gd->flags |=3D GENHD_FL_NO_NVMEM;
->  	set_capacity(gd, ((u64)new->size * tr->blksize) >> 9);
-> =20
->  	/* Create the request queue */
-
-Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
-Thanks,
-Miqu=C3=A8l
+The whole point of bdev_disk_changed is that the partitions might not
+be the same ones as before..
