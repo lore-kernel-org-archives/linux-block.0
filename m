@@ -2,85 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F907EB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 19:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E467EB64DA
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 19:59:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230357AbjGTT3n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 15:29:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39480 "EHLO
+        id S230140AbjGTT7o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 15:59:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbjGTT3n (ORCPT
+        with ESMTP id S229488AbjGTT7n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 15:29:43 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5180E1724
-        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 12:29:41 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-785d3a53ed6so15034639f.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 12:29:41 -0700 (PDT)
+        Thu, 20 Jul 2023 15:59:43 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0891BE2;
+        Thu, 20 Jul 2023 12:59:39 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-666ecf9a081so1038090b3a.2;
+        Thu, 20 Jul 2023 12:59:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689881380; x=1690486180;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U6EPe9CKzSess5IGZS9/zarMFMwQLlIFSDbX+RR9h8I=;
-        b=aWwdjxzLe8UQTuinjOdE/RaORTrgWSS+tJUStZMWSCuTGUocGzJfPMDFggwMrMAyup
-         PmpG9WzHPLE71dd1sqEDRVtR0wTeS6qXtA7HNY77JSM9aKIWAdbimeldoKWH3T9gUphZ
-         T9RfqNwp7KF5i4X7muppFm/bSsfXvlkwcVgkZj33/+Zg68haFkini3v0Wx6p/HaOtXUf
-         HweVRFOeiWlQrxa4orkyepH+lU7fO9O5hBpeV5ErsUD6NqJrmAD1xUpsH12HjzdSQ6aV
-         72y9NNGonZXMjaxPUf50DxyRh29f3GuP74ybPdXa6YNrDhrR3Ou3Mvv6zSQOJgRJFxs3
-         5bZA==
+        d=gmail.com; s=20221208; t=1689883179; x=1690487979;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tpeVGMhDTTLTNxyLLa2NKiBDsv0lT8EhjxwFV8Gr564=;
+        b=EDWl9x9JvIOHXr/ppBs9v45am5RKoK6X0M5l44abzq0D1tr8D8PIkNwZeC/PqSi6WH
+         YD3n+GNQRZy8Gi+yCC205qQi85U+E1oUyb8+RvY/JE0aMdjfi6epzsirkOam66+9jB/m
+         99uSEzozms/v79GnfGNSXzCytVjnuX/RTCZk+xPaDB1GyaEHYuNCzL/WzDXXdwkAXcs5
+         f2AiluX6q+j/emZ4IwVLbwa3tT6JqKJCrJX/ESblrMBLO5r/lr4GAKz/OD2fglW8t1le
+         bWS6GchQrRTZ2Rzua3+4e5vDWdYHKGfITIh496bFSs13I2xEK3MjSbSkm1NZB5ARk4Tc
+         jsQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689881380; x=1690486180;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1689883179; x=1690487979;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U6EPe9CKzSess5IGZS9/zarMFMwQLlIFSDbX+RR9h8I=;
-        b=F5GX8ScArkIpxprOB5KCiTDWCE14WQ5AgW98SMIoC6aSOkseheo/0nNlb8a7DrI8rV
-         37vhik00WrVokVKbnj8qYx2XlfdCr3FoZv+/RUSdOVobH3Lswc4ysOBWl/3dRCQ9RElw
-         LY6vhmDs/uetIEA1cd6rMyTGrBLRc7ntHgDDX1jnliAh2PftaaRZEreFqtFjAJrC0Dox
-         B0VAr0IAxqZcLm2C9mvqDQ0v6oHQBlOGJOPOVMc5M5bbYco2WnkmFCVwW1Aq4CNM1yuD
-         jA+39K45u7iouFogd+Rr92SNCP629ShlXDFtBQVbjf+jcvW7bvBNb5YxTuvWCDsen9W4
-         byAg==
-X-Gm-Message-State: ABy/qLZVvbGCBkEFpzusphTboAwUsLbnvOOpbXuO/oX3w9djV9c4jglS
-        iBS1dZiraxWfbOvKh/0+HfIh8g==
-X-Google-Smtp-Source: APBJJlGA7R3/equ2bBUMJ8Kkqg8rfcu4hag98cml2ZNmdagaHpgjf6OhPoxNf0YMowttsd06JFG9bQ==
-X-Received: by 2002:a05:6602:3423:b0:780:d65c:d78f with SMTP id n35-20020a056602342300b00780d65cd78fmr4831718ioz.2.1689881380773;
-        Thu, 20 Jul 2023 12:29:40 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id m18-20020a02c892000000b0041d859c5721sm515494jao.64.2023.07.20.12.29.39
+        bh=tpeVGMhDTTLTNxyLLa2NKiBDsv0lT8EhjxwFV8Gr564=;
+        b=d2KOszQuPpebBKdK/BjrLE3286mcJDayA0EwHAirATbJcmrf49oAjbawH0QJmxv/iN
+         XJ8mKXyJfnAZhYwo991SFXo5Bc/E4JXhM6Soq9pHxCygUjafHYiAbZsSoQAbb/PO38ox
+         jAFNEMdQDTL8F3HJUuBH/YcqY3//ILnx6/mNto7m5lPdMGyWYSQwmqR7qe0eHH+pW3mv
+         vzEYcj7GjcantrKn8bgig6W0PtmjyZY1mHcXMqyuElMS/Fop7mVEcepK6KENtcOMRuGK
+         bo1LE/+N4a4XIrpXbu9B39H2jibsrm6EPuT4iKeFUGKsanTABnLU60wkg0cQY7Ydko6u
+         5/7A==
+X-Gm-Message-State: ABy/qLYLi99bWn4lNfsPWKIF/TlBIO86WfSVzkxuGiy24rADA9YR/l77
+        VijaJXigUL6KrFLzZgbeHh0=
+X-Google-Smtp-Source: APBJJlHcLupOt7KHNIGlzbYgALPp13j7zdxBLtipHDt5sfyesKFDTOSyJc46zww2Hy8bSJ3qU2k+kA==
+X-Received: by 2002:a05:6a20:491:b0:137:2204:4ea6 with SMTP id 17-20020a056a20049100b0013722044ea6mr153159pzc.27.1689883178825;
+        Thu, 20 Jul 2023 12:59:38 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:fbd8])
+        by smtp.gmail.com with ESMTPSA id 22-20020aa79256000000b0068338b6667asm1528056pfp.212.2023.07.20.12.59.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 12:29:39 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
+        Thu, 20 Jul 2023 12:59:38 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 20 Jul 2023 09:59:37 -1000
+From:   Tejun Heo <tj@kernel.org>
 To:     chengming.zhou@linux.dev
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         zhouchengming@bytedance.com
-In-Reply-To: <20230720095512.1403123-1-chengming.zhou@linux.dev>
-References: <20230720095512.1403123-1-chengming.zhou@linux.dev>
-Subject: Re: [PATCH] blk-mq: delete dead struct blk_mq_hw_ctx->queued field
-Message-Id: <168988137961.115425.9247701067643903062.b4-ty@kernel.dk>
-Date:   Thu, 20 Jul 2023 13:29:39 -0600
+Subject: Re: [PATCH] blk-iocost: skip empty flush bio in iocost
+Message-ID: <ZLmSKdW5wTx0dAlz@slm.duckdns.org>
+References: <20230720121441.1408522-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230720121441.1408522-1-chengming.zhou@linux.dev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Thu, 20 Jul 2023 17:55:12 +0800, chengming.zhou@linux.dev wrote:
-> This counter is not used anywhere, so delete it.
+On Thu, Jul 20, 2023 at 08:14:41PM +0800, chengming.zhou@linux.dev wrote:
+> From: Chengming Zhou <zhouchengming@bytedance.com>
 > 
+> The flush bio may have data, may have no data (empty flush), we couldn't
+> calculate cost for empty flush bio. So we'd better just skip it for now.
 > 
+> Another side effect is that empty flush bio's bio_end_sector() is 0, cause
+> iocg->cursor reset to 0, may break the cost calculation of other bios.
+> 
+> This isn't good enough, since flush bio still consume the device bandwidth,
+> but flush request is special, can be merged randomly in the flush state
+> machine, we don't know how to calculate cost for it for now.
+> 
+> Its completion time also has flaws, which may include the pre-flush or
+> post-flush completion time, but I don't know if we need to fix that and
+> how to fix it.
+> 
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
 
-Applied, thanks!
+It's unlikely that this will change behaviors in an observable way in most
+cases. That said, yeah, ignoring it in terms of cost calculation is likely
+the better thing to do.
 
-[1/1] blk-mq: delete dead struct blk_mq_hw_ctx->queued field
-      commit: 3641c90c4e369c8d0af5483e879174400a152cf8
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Best regards,
+Thanks.
+
 -- 
-Jens Axboe
-
-
-
+tejun
