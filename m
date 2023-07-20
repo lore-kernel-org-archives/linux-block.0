@@ -2,80 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9083EB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 12:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0145BEB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jul 2023 12:16:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229680AbjGTMQE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jul 2023 08:16:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35934 "EHLO
+        id S230511AbjGTMQu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jul 2023 08:16:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbjGTMQD (ORCPT
+        with ESMTP id S229628AbjGTMQt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2023 08:16:03 -0400
-Received: from out-57.mta1.migadu.com (out-57.mta1.migadu.com [95.215.58.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 575532106
-        for <linux-block@vger.kernel.org>; Thu, 20 Jul 2023 05:16:01 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689855359;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1qUoKI3SbOAj4JugO0eFEKpo/XtZkaAZd4jHbDGRCXI=;
-        b=UYRVGSJeMWgVT/Cmj35t2ZweiX0f74MUBaOSw4MLtDmMy3IiuQrHv8RU4qRm/+sTXZG3zj
-        +eK1+VPGThdCpfSCGWbopKgw5Dw3dyzfnI+h4Dk0lnIiYvGH6rNedI6u3cchFohjzDfaRp
-        UtcGfRKuKFeW1oGmtQWsxdDyRcpHit4=
-From:   chengming.zhou@linux.dev
-To:     tj@kernel.org, josef@toxicpanda.com
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: [PATCH] blk-iocost: skip empty flush bio in iocost
-Date:   Thu, 20 Jul 2023 20:14:41 +0800
-Message-ID: <20230720121441.1408522-1-chengming.zhou@linux.dev>
+        Thu, 20 Jul 2023 08:16:49 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FBB1BC6;
+        Thu, 20 Jul 2023 05:16:46 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 311FA22BEC;
+        Thu, 20 Jul 2023 12:16:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1689855405; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qJeevWCTbOxeUOBTAxfygV2zVKl4pRNiVV/Sn4Vc5g8=;
+        b=Y7xfme4rPrCF5hEC5pbUvdrHOtse6c2XE5dQH4ofisst0BxXhq5fzSvvvudIq0qb1fgAZ3
+        nvIjKrBX9SBniQArDMHq3Eo1F5gHSAGQmoz/tE4t4qxq6hUdsPyEUo9DVqT6M2kkkhHlFw
+        wusKJBAY7+a0/4rdZ8XEmsB7vqMiu20=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1689855405;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qJeevWCTbOxeUOBTAxfygV2zVKl4pRNiVV/Sn4Vc5g8=;
+        b=FfN5Vi6mxKPEw3x2oCzsXOategHapN8ngq0O/mlx3Dt3iIlpkGc1UcEnhLUPz5UTPIunq7
+        Q/g7Z3f9m59q7UAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 17569138EC;
+        Thu, 20 Jul 2023 12:16:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id V/cVBa0luWQKJgAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 20 Jul 2023 12:16:45 +0000
+Message-ID: <2fda17af-ed88-2332-27a1-61496f943e91@suse.de>
+Date:   Thu, 20 Jul 2023 14:16:44 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 16/17] block: use iomap for writes to block devices
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+References: <20230424054926.26927-1-hch@lst.de>
+ <20230424054926.26927-17-hch@lst.de>
+ <b96b397e-2f5e-7910-3bb3-7405d0e293a7@suse.de>
+ <20230720120650.GA13266@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230720120650.GA13266@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+On 7/20/23 14:06, Christoph Hellwig wrote:
+> On Fri, May 19, 2023 at 04:22:01PM +0200, Hannes Reinecke wrote:
+>> I'm hitting this during booting:
+>> [    5.016324]  <TASK>
+>> [    5.030256]  iomap_iter+0x11a/0x350
+>> [    5.030264]  iomap_readahead+0x1eb/0x2c0
+>> [    5.030272]  read_pages+0x5d/0x220
+>> [    5.030279]  page_cache_ra_unbounded+0x131/0x180
+>> [    5.030284]  filemap_get_pages+0xff/0x5a0
+>> [    5.030292]  filemap_read+0xca/0x320
+>> [    5.030296]  ? aa_file_perm+0x126/0x500
+>> [    5.040216]  ? touch_atime+0xc8/0x150
+>> [    5.040224]  blkdev_read_iter+0xb0/0x150
+>> [    5.040228]  vfs_read+0x226/0x2d0
+>> [    5.040234]  ksys_read+0xa5/0xe0
+>> [    5.040238]  do_syscall_64+0x5b/0x80
+>>
+>> Maybe we should consider this patch:
+> 
+> As willy said this should be taken care of by the i_size check.
+> Did you run with just this patch set or some of the large block
+> size experiments on top which might change the variables?
+> 
+> I'll repost the series today without any chances in the area, and
+> if you can reproduce it with just that series we need to root
+> cause it, so please send your kernel and VM config along for the
+> next report.
 
-The flush bio may have data, may have no data (empty flush), we couldn't
-calculate cost for empty flush bio. So we'd better just skip it for now.
+I _think_ it's been resolve now; I've rewritten my patchset (and the 
+patches where it's based upon) several times now, so it might be a stale 
+issue now.
 
-Another side effect is that empty flush bio's bio_end_sector() is 0, cause
-iocg->cursor reset to 0, may break the cost calculation of other bios.
+Eagerly awaiting your patchset.
 
-This isn't good enough, since flush bio still consume the device bandwidth,
-but flush request is special, can be merged randomly in the flush state
-machine, we don't know how to calculate cost for it for now.
+Cheers,
 
-Its completion time also has flaws, which may include the pre-flush or
-post-flush completion time, but I don't know if we need to fix that and
-how to fix it.
-
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-iocost.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 6084a9519883..e735b3e9997c 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2516,6 +2516,10 @@ static void calc_vtime_cost_builtin(struct bio *bio, struct ioc_gq *iocg,
- 	u64 seek_pages = 0;
- 	u64 cost = 0;
- 
-+	/* Can't calculate cost for empty bio */
-+	if (!bio->bi_iter.bi_size)
-+		goto out;
-+
- 	switch (bio_op(bio)) {
- 	case REQ_OP_READ:
- 		coef_seqio	= ioc->params.lcoefs[LCOEF_RSEQIO];
--- 
-2.41.0
+Hannes
 
