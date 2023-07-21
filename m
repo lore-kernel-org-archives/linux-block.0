@@ -2,46 +2,46 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7136CEB64DD
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD6BEB64DC
 	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 13:52:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230005AbjGUNwc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 09:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46538 "EHLO
+        id S230104AbjGUNwb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 09:52:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231197AbjGUNwP (ORCPT
+        with ESMTP id S230005AbjGUNwP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 21 Jul 2023 09:52:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18944207
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502E84206
         for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 06:50:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1689947439;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=DFZfta1Dkz5uHfY7xFhL8GUbEtZUeV/8ON46xLaAkC0=;
-        b=PjrN20dMJ/aklZnbH+4svWRPU+MT5YuHbT5h5WEJxEA7A7SiNPQXHF5v1x03i6/c/acoMO
-        sX6LPFbDdIuM7b6PEjSVXOuCsycYX6jyJs4Lk9cDM8qDObsiRoWajXBMPHscW8ct57tekB
-        JYEpb+iZDYcZNXgHFxHZhhnz4jqA4yQ=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-21-Kmn7xXFSO5S86QoaDQhaqw-1; Fri, 21 Jul 2023 09:50:36 -0400
-X-MC-Unique: Kmn7xXFSO5S86QoaDQhaqw-1
+        bh=cCBusrI2LRu7ze2Ol7FPMTfGYIgbj51wqVSrdkfXcqA=;
+        b=LknPupNkQvIqnOGMwlgKER75TEkBtBje7VmVqZvVhl9R2fQBLlCh1+gtuvPUqKQfw5Kic5
+        Rp9/cKYupEWebzGT3Zfq1lgn5gN/Ua81AQcpZDSW6PQiHYbulSmzU1++TyDGUi2QlMO8lv
+        /6AUZzvLUtqJ5DzUNiM5VLfkA9hb1FQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-120-kvK9oESDPx26mErX2iaSKw-1; Fri, 21 Jul 2023 09:50:36 -0400
+X-MC-Unique: kvK9oESDPx26mErX2iaSKw-1
 Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9935E299E758;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ACD948564EF;
         Fri, 21 Jul 2023 13:50:35 +0000 (UTC)
 Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 896A7492B02;
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A158F492B02;
         Fri, 21 Jul 2023 13:50:35 +0000 (UTC)
 Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-        id 327CD30C0457; Fri, 21 Jul 2023 13:50:11 +0000 (UTC)
+        id D2BD730C0458; Fri, 21 Jul 2023 13:50:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 319AE3FB76;
-        Fri, 21 Jul 2023 15:50:11 +0200 (CEST)
-Date:   Fri, 21 Jul 2023 15:50:11 +0200 (CEST)
+        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id D1D5C3FB76;
+        Fri, 21 Jul 2023 15:50:29 +0200 (CEST)
+Date:   Fri, 21 Jul 2023 15:50:29 +0200 (CEST)
 From:   Mikulas Patocka <mpatocka@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 cc:     Li Nan <linan666@huaweicloud.com>,
@@ -49,8 +49,8 @@ cc:     Li Nan <linan666@huaweicloud.com>,
         Christoph Hellwig <hch@infradead.org>,
         Chaitanya Kulkarni <chaitanyak@nvidia.com>,
         linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH v2 2/3] brd: enable discard
-Message-ID: <5ae07138-8840-26b1-12a3-bab2ad57c558@redhat.com>
+Subject: [PATCH v2 3/3] brd: implement write zeroes
+Message-ID: <3bcf643-5eef-9537-6def-17de279f1e4e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
@@ -58,253 +58,142 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch implements discard in the brd driver. We use RCU to free the
-page, so that if there are any concurrent readers or writes, they won't
-touch the page after it is freed.
-
-Calling "call_rcu" for each page is inefficient, so we attempt to batch
-multiple pages to a single "call_rcu" call.
-
-Note that we replace "BUG_ON(!page);" with "if (page) ..." in copy_to_brd
-- the page can't be NULL under normal circumstances, it can only be NULL
-if REQ_OP_WRITE races with REQ_OP_DISCARD. If these two bios race with
-each other on the same page, the result is undefined, so we can handle
-this race condition just by skipping the copying.
+This patch implements REQ_OP_WRITE_ZEROES on brd. Write zeroes will free
+the pages just like discard, but the difference is that it writes zeroes
+to the preceding and following page if the range is not aligned on page
+boundary.
 
 Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 
 ---
- drivers/block/brd.c |  150 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 136 insertions(+), 14 deletions(-)
+ drivers/block/brd.c |   78 +++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 50 insertions(+), 28 deletions(-)
 
 Index: linux-2.6/drivers/block/brd.c
 ===================================================================
 --- linux-2.6.orig/drivers/block/brd.c
 +++ linux-2.6/drivers/block/brd.c
-@@ -46,6 +46,8 @@ struct brd_device {
- 	u64			brd_nr_pages;
- };
- 
-+static bool discard;
-+
- /*
-  * Look up and return a brd's page for a given sector.
-  */
-@@ -100,6 +102,54 @@ static int brd_insert_page(struct brd_de
- 	return ret;
- }
- 
-+struct free_page_batch {
-+	struct rcu_head rcu;
-+	struct list_head list;
-+};
-+
-+static void brd_free_page_rcu(struct rcu_head *head)
-+{
-+	__free_page(container_of(head, struct page, rcu_head));
-+}
-+
-+static void brd_free_pages_rcu(struct rcu_head *head)
-+{
-+	struct free_page_batch *batch = container_of(head, struct free_page_batch, rcu);
-+
-+	while (!list_empty(&batch->list)) {
-+		struct page *page = list_entry(batch->list.prev, struct page, lru);
-+
-+		list_del(&page->lru);
-+
-+		__free_page(page);
-+	}
-+
-+	kfree(batch);
-+}
-+
-+static void brd_free_page(struct brd_device *brd, sector_t sector,
-+			  struct free_page_batch **batch)
-+{
-+	struct page *page;
-+	pgoff_t idx;
-+
-+	idx = sector >> PAGE_SECTORS_SHIFT;
-+	page = xa_erase(&brd->brd_pages, idx);
-+
-+	if (page) {
-+		BUG_ON(page->index != idx);
-+		if (!*batch) {
-+			*batch = kmalloc(sizeof(struct free_page_batch), GFP_NOIO);
-+			if (unlikely(!*batch)) {
-+				call_rcu(&page->rcu_head, brd_free_page_rcu);
-+				return;
-+			} 
-+			INIT_LIST_HEAD(&(*batch)->list);
-+		}
-+		list_add(&page->lru, &(*batch)->list);
-+	}
-+}
-+
- /*
-  * Free all backing store pages and xarray. This must only be called when
-  * there are no other users of the device.
-@@ -152,11 +202,11 @@ static void copy_to_brd(struct brd_devic
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
- 	rcu_read_lock();
- 	page = brd_lookup_page(brd, sector);
--	BUG_ON(!page);
--
--	dst = kmap_atomic(page);
--	memcpy(dst + offset, src, copy);
--	kunmap_atomic(dst);
-+	if (page) {
-+		dst = kmap_atomic(page);
-+		memcpy(dst + offset, src, copy);
-+		kunmap_atomic(dst);
-+	}
- 	rcu_read_unlock();
- 
- 	if (copy < n) {
-@@ -165,11 +215,11 @@ static void copy_to_brd(struct brd_devic
- 		copy = n - copy;
- 		rcu_read_lock();
- 		page = brd_lookup_page(brd, sector);
--		BUG_ON(!page);
--
--		dst = kmap_atomic(page);
--		memcpy(dst, src, copy);
--		kunmap_atomic(dst);
-+		if (page) {
-+			dst = kmap_atomic(page);
-+			memcpy(dst, src, copy);
-+			kunmap_atomic(dst);
-+		}
- 		rcu_read_unlock();
- 	}
- }
-@@ -248,13 +298,47 @@ out:
- 	return err;
- }
- 
-+void brd_do_discard(struct brd_device *brd, struct bio *bio)
-+{
-+	struct free_page_batch *batch = NULL;
-+	sector_t sector, len, front_pad;
-+
-+	if (unlikely(!discard)) {
-+		bio->bi_status = BLK_STS_NOTSUPP;
-+		return;
-+	}
-+
-+	sector = bio->bi_iter.bi_sector;
-+	len = bio_sectors(bio);
-+	front_pad = -sector & (PAGE_SECTORS - 1);
-+	sector += front_pad;
-+	if (unlikely(len <= front_pad))
-+		return;
-+	len -= front_pad;
-+	len = round_down(len, PAGE_SECTORS);
-+	while (len) {
-+		brd_free_page(brd, sector, &batch);
-+		sector += PAGE_SECTORS;
-+		len -= PAGE_SECTORS;
-+		cond_resched();
-+	}
-+	if (batch)
-+		call_rcu(&batch->rcu, brd_free_pages_rcu);
-+}
-+
- static void brd_submit_bio(struct bio *bio)
+@@ -301,7 +301,8 @@ out:
+ void brd_do_discard(struct brd_device *brd, struct bio *bio)
  {
- 	struct brd_device *brd = bio->bi_bdev->bd_disk->private_data;
--	sector_t sector = bio->bi_iter.bi_sector;
-+	sector_t sector;
+ 	struct free_page_batch *batch = NULL;
+-	sector_t sector, len, front_pad;
++	bool zero_padding = bio_op(bio) == REQ_OP_WRITE_ZEROES;
++	sector_t sector, len, front_pad, end_pad;
+ 
+ 	if (unlikely(!discard)) {
+ 		bio->bi_status = BLK_STS_NOTSUPP;
+@@ -311,11 +312,22 @@ void brd_do_discard(struct brd_device *b
+ 	sector = bio->bi_iter.bi_sector;
+ 	len = bio_sectors(bio);
+ 	front_pad = -sector & (PAGE_SECTORS - 1);
++
++	if (zero_padding && unlikely(front_pad != 0))
++		copy_to_brd(brd, page_address(ZERO_PAGE(0)),
++			    sector, min(len, front_pad) << SECTOR_SHIFT);
++
+ 	sector += front_pad;
+ 	if (unlikely(len <= front_pad))
+ 		return;
+ 	len -= front_pad;
+-	len = round_down(len, PAGE_SECTORS);
++
++	end_pad = len & (PAGE_SECTORS - 1);
++	if (zero_padding && unlikely(end_pad != 0))
++		copy_to_brd(brd, page_address(ZERO_PAGE(0)),
++			    sector + len - end_pad, end_pad << SECTOR_SHIFT);
++	len -= end_pad;
++
+ 	while (len) {
+ 		brd_free_page(brd, sector, &batch);
+ 		sector += PAGE_SECTORS;
+@@ -333,34 +345,42 @@ static void brd_submit_bio(struct bio *b
  	struct bio_vec bvec;
  	struct bvec_iter iter;
  
-+	if (bio_op(bio) == REQ_OP_DISCARD) {
-+		brd_do_discard(brd, bio);
-+		goto endio;
-+	}
+-	if (bio_op(bio) == REQ_OP_DISCARD) {
+-		brd_do_discard(brd, bio);
+-		goto endio;
+-	}
+-
+-	sector = bio->bi_iter.bi_sector;
+-	bio_for_each_segment(bvec, bio, iter) {
+-		unsigned int len = bvec.bv_len;
+-		int err;
+-
+-		/* Don't support un-aligned buffer */
+-		WARN_ON_ONCE((bvec.bv_offset & (SECTOR_SIZE - 1)) ||
+-				(len & (SECTOR_SIZE - 1)));
+-
+-		err = brd_do_bvec(brd, bvec.bv_page, len, bvec.bv_offset,
+-				  bio->bi_opf, sector);
+-		if (err) {
+-			if (err == -ENOMEM && bio->bi_opf & REQ_NOWAIT) {
+-				bio_wouldblock_error(bio);
+-				return;
++	switch (bio_op(bio)) {
++		case REQ_OP_DISCARD:
++		case REQ_OP_WRITE_ZEROES:
++			brd_do_discard(brd, bio);
++			break;
 +
-+	sector = bio->bi_iter.bi_sector;
- 	bio_for_each_segment(bvec, bio, iter) {
- 		unsigned int len = bvec.bv_len;
- 		int err;
-@@ -276,6 +360,7 @@ static void brd_submit_bio(struct bio *b
- 		sector += len >> SECTOR_SHIFT;
++		case REQ_OP_READ:
++		case REQ_OP_WRITE:
++			sector = bio->bi_iter.bi_sector;
++			bio_for_each_segment(bvec, bio, iter) {
++				unsigned int len = bvec.bv_len;
++				int err;
++
++				/* Don't support un-aligned buffer */
++				WARN_ON_ONCE((bvec.bv_offset & (SECTOR_SIZE - 1)) ||
++						(len & (SECTOR_SIZE - 1)));
++
++				err = brd_do_bvec(brd, bvec.bv_page, len, bvec.bv_offset,
++						  bio->bi_opf, sector);
++				if (err) {
++					if (err == -ENOMEM && bio->bi_opf & REQ_NOWAIT) {
++						bio_wouldblock_error(bio);
++						return;
++					}
++					bio_io_error(bio);
++					return;
++				}
++				sector += len >> SECTOR_SHIFT;
+ 			}
+-			bio_io_error(bio);
+-			return;
+-		}
+-		sector += len >> SECTOR_SHIFT;
++			break;
++
++		default:
++			bio->bi_status = BLK_STS_NOTSUPP;
++			break;
  	}
  
-+endio:
+-endio:
  	bio_endio(bio);
  }
  
-@@ -284,6 +369,40 @@ static const struct block_device_operati
- 	.submit_bio =		brd_submit_bio,
- };
+@@ -378,9 +398,11 @@ static void brd_set_discard_limits(struc
+ 	if (discard) {
+ 		queue->limits.discard_granularity = PAGE_SIZE;
+ 		blk_queue_max_discard_sectors(queue, round_down(UINT_MAX, PAGE_SECTORS));
++		blk_queue_max_write_zeroes_sectors(queue, round_down(UINT_MAX, PAGE_SECTORS));
+ 	} else {
+ 		queue->limits.discard_granularity = 0;
+ 		blk_queue_max_discard_sectors(queue, 0);
++		blk_queue_max_write_zeroes_sectors(queue, 0);
+ 	}
+ }
  
-+static LIST_HEAD(brd_devices);
-+static struct dentry *brd_debugfs_dir;
-+
-+static void brd_set_discard_limits(struct brd_device *brd)
-+{
-+	struct request_queue *queue = brd->brd_disk->queue;
-+	if (discard) {
-+		queue->limits.discard_granularity = PAGE_SIZE;
-+		blk_queue_max_discard_sectors(queue, round_down(UINT_MAX, PAGE_SECTORS));
-+	} else {
-+		queue->limits.discard_granularity = 0;
-+		blk_queue_max_discard_sectors(queue, 0);
-+	}
-+}
-+
-+static int discard_set_bool(const char *val, const struct kernel_param *kp)
-+{
-+	struct brd_device *brd;
-+
-+	int r = param_set_bool(val, kp);
-+	if (r)
-+		return r;
-+
-+	list_for_each_entry(brd, &brd_devices, brd_list)
-+		brd_set_discard_limits(brd);
-+
-+	return 0;
-+}
-+
-+static const struct kernel_param_ops discard_ops = {
-+	.set = discard_set_bool,
-+	.get = param_get_bool,
-+};
-+
- /*
-  * And now the modules code and kernel interface.
-  */
-@@ -299,6 +418,10 @@ static int max_part = 1;
- module_param(max_part, int, 0444);
- MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
+@@ -420,7 +442,7 @@ MODULE_PARM_DESC(max_part, "Num Minors t
  
-+static bool discard = false;
-+module_param_cb(discard, &discard_ops, &discard, 0644);
-+MODULE_PARM_DESC(discard, "Support discard");
-+
+ static bool discard = false;
+ module_param_cb(discard, &discard_ops, &discard, 0644);
+-MODULE_PARM_DESC(discard, "Support discard");
++MODULE_PARM_DESC(discard, "Support discard and write zeroes");
+ 
  MODULE_LICENSE("GPL");
  MODULE_ALIAS_BLOCKDEV_MAJOR(RAMDISK_MAJOR);
- MODULE_ALIAS("rd");
-@@ -317,9 +440,6 @@ __setup("ramdisk_size=", ramdisk_size);
-  * The device scheme is derived from loop.c. Keep them in synch where possible
-  * (should share code eventually).
-  */
--static LIST_HEAD(brd_devices);
--static struct dentry *brd_debugfs_dir;
--
- static int brd_alloc(int i)
- {
- 	struct brd_device *brd;
-@@ -364,6 +484,8 @@ static int brd_alloc(int i)
- 	 */
- 	blk_queue_physical_block_size(disk->queue, PAGE_SIZE);
- 
-+	brd_set_discard_limits(brd);
-+
- 	/* Tell the block layer that this is not a rotational device */
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
- 	blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, disk->queue);
 
