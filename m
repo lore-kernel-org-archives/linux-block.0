@@ -2,127 +2,225 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F189C001DE
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 19:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D687C001DE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 21:15:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbjGUT4e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 15:56:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60114 "EHLO
+        id S229677AbjGUVP4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 17:15:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbjGUT4d (ORCPT
+        with ESMTP id S229536AbjGUVPz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 15:56:33 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5494E171A;
-        Fri, 21 Jul 2023 12:56:32 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36LJrNQu028287;
-        Fri, 21 Jul 2023 19:56:31 GMT
+        Fri, 21 Jul 2023 17:15:55 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6255A123;
+        Fri, 21 Jul 2023 14:15:54 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36LL8A6s006742;
+        Fri, 21 Jul 2023 21:15:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=+JwHQunyzK2hQJhuOtWsEn4WW3M8KPcxrbRUu0RMVNg=;
- b=jjf2lAaLKl/0wcoUS+z7dqay7cfwXaPr8l8briUh5HF1Kb7QqX6QzXZmU42B0OurPaBY
- 1pU16n6mCEqTXf6inH5KRGSpFJqAa6offM/cZS9mHvCS8FqM6shmwrXts7QJ3vbZKHOK
- kyHvis3G8bbj/Jm8mGREBCWs4hr8nN59SxbdfBRIcOLNRtdSc5VQ/8FOYv3Xgnz8j7RA
- RgvFNhYFk9mrlUdW+OHur/Dr2Hbyum1ow4Lmyq8yHEnorYh0XDUgr7yZDrobBh6pzIHm
- v1q4qO7MjYXv799vHBRZicr5G6CXUG38hqe+2tYEwkYrZvfAsC+v11bqPjApASfP86uS 5A== 
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s00jt8275-1
+ bh=Vdtjy7KMBO+X9Z7rUqm5H88eVKYCvsbAqEigHgRUlN8=;
+ b=AL/SW/duLMyXuAnBbV2t9KEBI6UoUS1fvuIY8Y7GWn/mwWLwX4l3RXkiEihuppBjT2Xj
+ okqzU0AucTLWY3+C2OXMZ1RcXVp1YAX8BdqSKJhA821dmrOy3NteTwQuOHt7Mnr3rKt8
+ WBAQCDf9elzG+VTe9eTGtsMfMYjF6OxSZaToCW/F4sKI3rm7HUVYM2Ux60BxICI32MEk
+ wuD1NHg47VET1rJMGI1Q6OY8Ls54hbSiGO+HTb/erdJDxHSFyIcUFvJO4H9IbMfa7Edg
+ jsd6xtZ7PdPUUOxXGTyuiiknpWCKuF7BO2IaEnEQcOb/E+SCtbeb6SZTGiWCwAbJp649 8Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rypxsypv6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Jul 2023 19:56:30 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36LIC7xB029129;
-        Fri, 21 Jul 2023 19:36:53 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3rv6sn14wv-1
+        Fri, 21 Jul 2023 21:15:38 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36LLFb9O024887;
+        Fri, 21 Jul 2023 21:15:37 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rypxsypum-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Jul 2023 19:36:53 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36LJan7w57475462
+        Fri, 21 Jul 2023 21:15:37 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36LKA0ZP017218;
+        Fri, 21 Jul 2023 21:15:36 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3rv5ssanyj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jul 2023 21:15:36 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36LLFZlI31916792
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Jul 2023 19:36:49 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83D1720043;
-        Fri, 21 Jul 2023 19:36:49 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6FABC20040;
-        Fri, 21 Jul 2023 19:36:49 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Fri, 21 Jul 2023 19:36:49 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
-        id CDB83E26F8; Fri, 21 Jul 2023 21:36:48 +0200 (CEST)
-From:   Stefan Haberland <sth@linux.ibm.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH 4/4] s390/dasd: print copy pair message only for the correct error
-Date:   Fri, 21 Jul 2023 21:36:47 +0200
-Message-Id: <20230721193647.3889634-5-sth@linux.ibm.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230721193647.3889634-1-sth@linux.ibm.com>
-References: <20230721193647.3889634-1-sth@linux.ibm.com>
+        Fri, 21 Jul 2023 21:15:36 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9BB6558059;
+        Fri, 21 Jul 2023 21:15:35 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 618BD5805D;
+        Fri, 21 Jul 2023 21:15:35 +0000 (GMT)
+Received: from rhel-laptop.ibm.com (unknown [9.61.29.102])
+        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Jul 2023 21:15:35 +0000 (GMT)
+From:   gjoyce@linux.vnet.ibm.com
+To:     linux-block@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
+        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
+        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
+        gjoyce@linux.vnet.ibm.com, keyrings@vger.kernel.org,
+        okozina@redhat.com, dkeefe@redhat.com
+Subject: [PATCH v5 1/3 RESEND] block: sed-opal: Implement IOC_OPAL_DISCOVERY
+Date:   Fri, 21 Jul 2023 16:15:32 -0500
+Message-Id: <20230721211534.3437070-2-gjoyce@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20230721211534.3437070-1-gjoyce@linux.vnet.ibm.com>
+References: <20230721211534.3437070-1-gjoyce@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: O742j87j6jgn9Tyuvq1-E9X7SZOYD7ES
-X-Proofpoint-GUID: O742j87j6jgn9Tyuvq1-E9X7SZOYD7ES
+X-Proofpoint-GUID: bJX79HL7hX46QJ1GxeuktM0ELpkm9uMP
+X-Proofpoint-ORIG-GUID: xzA5Xjx1kZadHkDWems-Ffy7qygn69bI
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-21_11,2023-07-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- mlxscore=0 bulkscore=0 mlxlogscore=999 suspectscore=0 malwarescore=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307210172
+ definitions=2023-07-21_12,2023-07-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 adultscore=0 suspectscore=0 mlxlogscore=999 spamscore=0
+ lowpriorityscore=0 impostorscore=0 mlxscore=0 bulkscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307210186
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The DASD driver has certain types of requests that might be rejected by
-the storage server or z/VM because they are not supported. Since the
-missing support of the command is not a real issue there is no user
-visible kernel error message for this.
+From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
 
-For copy pair setups  there is a specific error that IO is not allowed on
-secondary devices. This error case is explicitly handled and an error
-message is printed.
+Add IOC_OPAL_DISCOVERY ioctl to return raw discovery data to a SED Opal
+application. This allows the application to display drive capabilities
+and state.
 
-The code checking for the error did use a bitwise 'and' that is used to
-check for specific bits. But in this case the whole sense byte has to
-match.
-
-This leads to the problem that the copy pair related error message is
-erroneously printed for other error cases that are usually not reported.
-This might heavily confuse users and lead to follow on actions that might
-disrupt application processing.
-
-Fix by checking the sense byte for the exact value and not single bits.
-
-Cc: <stable@vger.kernel.org> # 6.1+
-Fixes: 1fca631a1185 ("s390/dasd: suppress generic error messages for PPRC secondary devices")
-Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
-Reviewed-by: Jan Hoeppner <hoeppner@linux.ibm.com>
+Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
 ---
- drivers/s390/block/dasd_3990_erp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/sed-opal.c              | 38 ++++++++++++++++++++++++++++++++---
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h |  6 ++++++
+ 3 files changed, 42 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/s390/block/dasd_3990_erp.c b/drivers/s390/block/dasd_3990_erp.c
-index 91e9a17b848e..89957bb7244d 100644
---- a/drivers/s390/block/dasd_3990_erp.c
-+++ b/drivers/s390/block/dasd_3990_erp.c
-@@ -1050,7 +1050,7 @@ dasd_3990_erp_com_rej(struct dasd_ccw_req * erp, char *sense)
- 		dev_err(&device->cdev->dev, "An I/O request was rejected"
- 			" because writing is inhibited\n");
- 		erp = dasd_3990_erp_cleanup(erp, DASD_CQR_FAILED);
--	} else if (sense[7] & SNS7_INVALID_ON_SEC) {
-+	} else if (sense[7] == SNS7_INVALID_ON_SEC) {
- 		dev_err(&device->cdev->dev, "An I/O request was rejected on a copy pair secondary device\n");
- 		/* suppress dump of sense data for this error */
- 		set_bit(DASD_CQR_SUPPRESS_CR, &erp->refers->flags);
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index c18339446ef3..67c6c4f2b4b0 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -463,8 +463,11 @@ static int execute_steps(struct opal_dev *dev,
+ 	return error;
+ }
+ 
+-static int opal_discovery0_end(struct opal_dev *dev)
++static int opal_discovery0_end(struct opal_dev *dev, void *data)
+ {
++	struct opal_discovery *discv_out = data; /* may be NULL */
++	u8 __user *buf_out;
++	u64 len_out;
+ 	bool found_com_id = false, supported = true, single_user = false;
+ 	const struct d0_header *hdr = (struct d0_header *)dev->resp;
+ 	const u8 *epos = dev->resp, *cpos = dev->resp;
+@@ -480,6 +483,15 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 		return -EFAULT;
+ 	}
+ 
++	if (discv_out) {
++		buf_out = (u8 __user *)(uintptr_t)discv_out->data;
++		len_out = min_t(u64, discv_out->size, hlen);
++		if (buf_out && copy_to_user(buf_out, dev->resp, len_out))
++			return -EFAULT;
++
++		discv_out->size = hlen; /* actual size of data */
++	}
++
+ 	epos += hlen; /* end of buffer */
+ 	cpos += sizeof(*hdr); /* current position on buffer */
+ 
+@@ -565,13 +577,13 @@ static int opal_discovery0(struct opal_dev *dev, void *data)
+ 	if (ret)
+ 		return ret;
+ 
+-	return opal_discovery0_end(dev);
++	return opal_discovery0_end(dev, data);
+ }
+ 
+ static int opal_discovery0_step(struct opal_dev *dev)
+ {
+ 	const struct opal_step discovery0_step = {
+-		opal_discovery0,
++		opal_discovery0, NULL
+ 	};
+ 
+ 	return execute_step(dev, &discovery0_step, 0);
+@@ -2435,6 +2447,22 @@ static int opal_secure_erase_locking_range(struct opal_dev *dev,
+ 	return ret;
+ }
+ 
++static int opal_get_discv(struct opal_dev *dev, struct opal_discovery *discv)
++{
++	const struct opal_step discovery0_step = {
++		opal_discovery0, discv
++	};
++	int ret = 0;
++
++	mutex_lock(&dev->dev_lock);
++	setup_opal_dev(dev);
++	ret = execute_step(dev, &discovery0_step, 0);
++	mutex_unlock(&dev->dev_lock);
++	if (ret)
++		return ret;
++	return discv->size; /* modified to actual length of data */
++}
++
+ static int opal_erase_locking_range(struct opal_dev *dev,
+ 				    struct opal_session_info *opal_session)
+ {
+@@ -3056,6 +3084,10 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 	case IOC_OPAL_GET_GEOMETRY:
+ 		ret = opal_get_geometry(dev, arg);
+ 		break;
++	case IOC_OPAL_DISCOVERY:
++		ret = opal_get_discv(dev, p);
++		break;
++
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
+index bbae1e52ab4f..ef65f589fbeb 100644
+--- a/include/linux/sed-opal.h
++++ b/include/linux/sed-opal.h
+@@ -47,6 +47,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	case IOC_OPAL_GET_STATUS:
+ 	case IOC_OPAL_GET_LR_STATUS:
+ 	case IOC_OPAL_GET_GEOMETRY:
++	case IOC_OPAL_DISCOVERY:
+ 		return true;
+ 	}
+ 	return false;
+diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+index dc2efd345133..7f5732c5bdc5 100644
+--- a/include/uapi/linux/sed-opal.h
++++ b/include/uapi/linux/sed-opal.h
+@@ -173,6 +173,11 @@ struct opal_geometry {
+ 	__u8  __align[3];
+ };
+ 
++struct opal_discovery {
++	__u64 data;
++	__u64 size;
++};
++
+ #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
+ #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
+ #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
+@@ -192,5 +197,6 @@ struct opal_geometry {
+ #define IOC_OPAL_GET_STATUS         _IOR('p', 236, struct opal_status)
+ #define IOC_OPAL_GET_LR_STATUS      _IOW('p', 237, struct opal_lr_status)
+ #define IOC_OPAL_GET_GEOMETRY       _IOR('p', 238, struct opal_geometry)
++#define IOC_OPAL_DISCOVERY          _IOW('p', 239, struct opal_discovery)
+ 
+ #endif /* _UAPI_SED_OPAL_H */
 -- 
-2.39.2
+gjoyce@linux.vnet.ibm.com
 
