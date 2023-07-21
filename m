@@ -2,86 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94992EB64DD
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 14:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F69BEB64DD
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 15:12:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231229AbjGUOAr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 10:00:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57316 "EHLO
+        id S231635AbjGUPMZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 11:12:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230443AbjGUOAq (ORCPT
+        with ESMTP id S231480AbjGUPMV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 10:00:46 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1FFE273C
-        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 07:00:44 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-760dff4b701so28477239f.0
-        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 07:00:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689948044; x=1690552844;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yowB+SDYz3WsGB5u3KbSB7coFl3FEU+ho0O0+py0Ukc=;
-        b=2ziMtz9YyzgfSBLhUc1oOXKhL9AKaqop1axLHbKTYlFB+2Dr2Dl07WL468pS2SisaE
-         udSJ78TBuZeK6W9WH1dyNYdGBLU9Cjb0v39zWgq+q2nluI5eK94Pf0DvfOL7eUu+uHjP
-         eq4LM5/aRMSp38ls+YtCK3sfk4dYQy0elqlGSdlFWqCVjyAJuhpxzZwuGJkouo70sQi6
-         n8TXnpULDukNmpOktdv+wl6Dt1sDHKxGxe3E21vXbgXMXTxnBjD7gL38uEV4Owy0rapG
-         ONHgxm8ZMhiLbvorVjYeSWpqyLsbEesmAL9UP1z6N800PUwsy5ns+m46+wmRBBaKwSNy
-         jxGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689948044; x=1690552844;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yowB+SDYz3WsGB5u3KbSB7coFl3FEU+ho0O0+py0Ukc=;
-        b=OsiLgs8YflFRzu7fKfa7W7FahLJunWOAH65usQobfZsD9Nhjm/FmoCpzJFYPgrKKIh
-         ZjcIPStxO73R8EkKlGV9vs4fUUWtDefMJP3yErdafRgHplPsKBXG/rzeTeGb/8/Kkz1N
-         3xbb1PX896qzmDOhXUPuszuViAVZCJy3HdhTCqwosSU04pvN2C09sLo/Tk0tyc22FVTt
-         r6qsGaEUJOziP/ouN/Y/yTa4I6Q9Kgrxaigz3zlcqTT1Y+7lyQuWNY8BTWxyn0Aaak0G
-         5ltKsjfguy4lCH1JR8ZzQ3rEGxdESqZWriRLMiK1Q9fX9qZNy9zUsSaEg7SHRmHt7+QJ
-         vZeg==
-X-Gm-Message-State: ABy/qLbl8lN6SvHbBxmZ8gqZWNriTFh1xdYmbFk1oo0Q7AsrEjr0E4+R
-        eHQgQ3N1aa6IZbl2lpuVL9Kclg==
-X-Google-Smtp-Source: APBJJlHMT+rxz7f5suX2hWoG4yc3KEkLf1UJ5Q0KxS+wamMFFlkkxKHrGWKDrLBg9z5MlQwuTgUyMQ==
-X-Received: by 2002:a6b:b789:0:b0:787:1926:54ed with SMTP id h131-20020a6bb789000000b00787192654edmr1799444iof.1.1689948044181;
-        Fri, 21 Jul 2023 07:00:44 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id b10-20020a5ea70a000000b0078337cd3b3csm1065191iod.54.2023.07.21.07.00.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Jul 2023 07:00:43 -0700 (PDT)
-Message-ID: <6f0b9cbb-6752-6dd8-c184-10798533dfed@kernel.dk>
-Date:   Fri, 21 Jul 2023 08:00:42 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 0/3] brd discard patches
-Content-Language: en-US
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Li Nan <linan666@huaweicloud.com>,
+        Fri, 21 Jul 2023 11:12:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0890E3A8F
+        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 08:11:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689952262;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6I/TR9khe0tvgU1kgdVsTvGXvVg17ybDMF1EKA4LK4k=;
+        b=gzcJV+zG8gN3gcyTDMp21LgHB7UbTgkC4hcH1tRbKKLcjKQhkxxuvfcvwk852AysU0TJCi
+        iIlzoo05CIp2bBnTU8oi0fghFChe7e0BmWDfAmNRyU8XiOrqSrv6MsiWBCEdQFj/yCbbDG
+        gr/pC2CEYq1uDZ8GZR5ZTdQj88MYc58=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-626-Bt1tuMdjN1G3JK__evfSWA-1; Fri, 21 Jul 2023 11:10:59 -0400
+X-MC-Unique: Bt1tuMdjN1G3JK__evfSWA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F657936D26;
+        Fri, 21 Jul 2023 15:10:58 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E15F2166B25;
+        Fri, 21 Jul 2023 15:10:58 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+        id A75C33096A42; Fri, 21 Jul 2023 15:10:56 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id A635C3F7CF;
+        Fri, 21 Jul 2023 17:10:56 +0200 (CEST)
+Date:   Fri, 21 Jul 2023 17:10:56 +0200 (CEST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+cc:     Li Nan <linan666@huaweicloud.com>,
         Zdenek Kabelac <zkabelac@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
         Chaitanya Kulkarni <chaitanyak@nvidia.com>,
         linux-block@vger.kernel.org, dm-devel@redhat.com
-References: <9933f5df-dd43-3447-dce3-f513368578@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <9933f5df-dd43-3447-dce3-f513368578@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v2 0/3] brd discard patches
+In-Reply-To: <6f0b9cbb-6752-6dd8-c184-10798533dfed@kernel.dk>
+Message-ID: <67d28762-d41a-4f67-7e11-de7040bfb369@redhat.com>
+References: <9933f5df-dd43-3447-dce3-f513368578@redhat.com> <6f0b9cbb-6752-6dd8-c184-10798533dfed@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/21/23 7:48?AM, Mikulas Patocka wrote:
-> This is a new version of the brd discard patches.
 
-Can you please:
 
-1) Ensure that your postings thread properly, it's all separate emails
-   and the patches don't nest under the cover letter parent.
+On Fri, 21 Jul 2023, Jens Axboe wrote:
 
-2) Include a changelog. What changed since v1?
+> On 7/21/23 7:48?AM, Mikulas Patocka wrote:
+> > This is a new version of the brd discard patches.
+> 
+> Can you please:
+> 
+> 1) Ensure that your postings thread properly, it's all separate emails
+>    and the patches don't nest under the cover letter parent.
 
--- 
-Jens Axboe
+I use alpine. I was testing it - and it turns out that when I delete the 
+last character in the "Subject" field, it deletes the field "In-Reply-To" 
+from the header. This must be some new bug/feature - it didn't do it in 
+the past.
+
+I'll try to be more careful to not make the "Subject" field empty when 
+sending patches.
+
+> 2) Include a changelog. What changed since v1?
+> 
+> -- 
+> Jens Axboe
+
+ChangeLog:
+
+* Batch discarded pages into the "free_page_batch" structure and free all 
+  of them with just one "call_rcu" call. In case of allocation failure, 
+  fall back to per-page "call_rcu" calls. (suggested by Christoph Hellwig)
+
+* Make the module parameter "/sys/module/brd/parameters/discard"  
+  changeable at runtime. Changing it will iterate over all ramdisk devices 
+  and call brd_set_discard_limits on them to enable or disable discard.
+  (suggested by Christoph Hellwig)
+
+* Use "switch (bio_op(bio))" in brd_submit_bio, so that the code looks 
+  better. (suggested by Chaitanya Kulkarni)
+
+* do "bio->bi_status = BLK_STS_NOTSUPP" in brd_submit_bio if unknown type 
+  of bio is received.
+
+Mikulas
 
