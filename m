@@ -2,94 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E06EB64DD
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 17:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B828EB64DD
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 17:58:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229709AbjGURkr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 13:40:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45732 "EHLO
+        id S230226AbjGUR6a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 13:58:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjGURkq (ORCPT
+        with ESMTP id S229707AbjGUR63 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 13:40:46 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C4DB30D0
-        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 10:40:41 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-77dcff76e35so31767339f.1
-        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 10:40:41 -0700 (PDT)
+        Fri, 21 Jul 2023 13:58:29 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4B610D2;
+        Fri, 21 Jul 2023 10:58:28 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b8b318c5a7so16397125ad.3;
+        Fri, 21 Jul 2023 10:58:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1689961240; x=1690566040;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E/RbUCEoLmLDcFVkwHPRFgVNwiHhTsraSaHqdd7+qPQ=;
-        b=vQSz/cqm1UOZN57WZQpCPvjmNsgP/DjJ0pEqIVkao/dCv6TzMtu8z8EL1QlB3wfxLo
-         9bBgW1DLwafgiPMbUOmfFc1uOd75J6tgi42M6OpmL18BmufL2zE+3mO7iO/hGqFqZ9f+
-         QDee1VUEJcFv4Mslbo1wnW5Ohg4fNGzg8ydj71tJ2JTajDHdTEEVGcEpmIUYHWDWKmGn
-         6EiisVOuQ1wciWJ4//BjYPGcmNCszNNd+8ZwYbNTZlwmwlDTZbc11wYvqb3cWvnfTggN
-         VzWZ1Smgwotj/+uGy+ODivmVxAIjDfmx5UB5gXZ2fWerk4jUXRdQ4rCnRGpWW0Ip+gZw
-         p5lA==
+        d=gmail.com; s=20221208; t=1689962308; x=1690567108;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MMbeZmEn/swkwXIwhi1G20TJgN07f15MbpFEH7XJldc=;
+        b=MZVVaJCSJBESRhr44VQl7fRqn1vS0H3bwcrQB8k9au2IGSxCbBIJeZSaUnZyczg1We
+         ceJ9z12LH/pQVCq1gfMKMxVNw7QDr2/EXK8ksWcab4fIbflvH0CYdK4JEUz/lg8UTisF
+         tiFLFaTAAy7ddvrVD1Xqb9inzgg5zxAhJ1Rwdmsll7XFF4uPTNd7GoqahY5GwCzcn3YS
+         aZacoedWo8fACF6ntfMjyh8skU5gM0mWEwz7hkKZ6PCEs/JjzBIfybibTCnf4qmVmc0j
+         0kuSq7AMF4GPNJhMro4tyVSsGyhkHMxNIkFkobQs8pnD2Cz9a3TgWpX2od2nUd7LGafq
+         Fjdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689961240; x=1690566040;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1689962308; x=1690567108;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E/RbUCEoLmLDcFVkwHPRFgVNwiHhTsraSaHqdd7+qPQ=;
-        b=fcOxFOninMbcLwufqg5ddI4HxJRegbEGuCyjNHzWJBml1Ik6n+DUQEGvgLbmehLnMG
-         TMRpaLDrM5BFSvlCGgKvqqpJtF+gAJNjIml3dcKSgdLb8o2faOSYW5IFE2F+K+a8cUUE
-         jfGAp1vOcJd8TZrl5TSbTTsUDqHISsVycS7Vy5IK8XNfZ7cwqG+Rkbv6aGR4PtpqGRd3
-         sd2A5nCTbu1zO1B2MfOSso/PXQOMqoNUtZaecG6knJ590mAJkFS29Z4hEix9lcdhcEt+
-         DUCWX+erLMuyl9AWVfPLLu2+KT4VrOFysTRfqs+Dn/PdqpUnjXng1GqU+LaLoG0UPG2p
-         GNQA==
-X-Gm-Message-State: ABy/qLbc0fj/G2SHL8YlXcc4AMogW8689uUzB5yJE0EUJ7sUxQyN70uh
-        TM7iXLI3REQKZsQ2n8cVT2zTF5qsdejtUSocRZA=
-X-Google-Smtp-Source: APBJJlHDHSdIy/PiqQN8ik29UNj44Nqx5Rg5xNcGHuwZPpB9fUd4S8kA6VebtGHRMgmu/tRColQUtw==
-X-Received: by 2002:a92:908:0:b0:345:e438:7381 with SMTP id y8-20020a920908000000b00345e4387381mr2017728ilg.2.1689961240500;
-        Fri, 21 Jul 2023 10:40:40 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id o9-20020a92dac9000000b00348abdfad8esm1053067ilq.32.2023.07.21.10.40.39
+        bh=MMbeZmEn/swkwXIwhi1G20TJgN07f15MbpFEH7XJldc=;
+        b=Df+MQqL/ERd+4KhdfzTHylvQj4Pi3MUjKPrEgnB/ZSO0T4uv+ouj25BfAOCqdsGPhc
+         yCf7didZNdkS73ylSPuInLXXLGSyH7KzSq80bEOXLFqx6VtVCStXAFdL7WRUTZjLVrPs
+         /cbPj0oAzjuqq8oazIlZxLedMjpyQwcDsn9Z0f4K89SmS123jd8J70tgQ69d+2vLTNij
+         qUHMjlGhL2mmOuzyHVb2GitKYdhw3UzHAhUGBuioCPULzcwKWF38sWkNJ6NI0mIo7kYY
+         p4ZtN60Ihj89tnTvKSqyFvobTRX662iqDQ45xDgvPhcuWYBsQ+0InLv3OPgBQhfL9a79
+         SYTA==
+X-Gm-Message-State: ABy/qLaZV4I0Hh4rWn3L4/BGUgpHAePx3y73IJIy9f++qdKo+2ryy5WG
+        r/3L+tcMh29wkWf6N7+ODf4=
+X-Google-Smtp-Source: APBJJlFZOxA85hb2alsHxftA/O54YBS4xLQYPlm4wLRgmBlKtHl4K87dLtCcuzdTj3L5ZeuP44pv6A==
+X-Received: by 2002:a17:902:d512:b0:1b6:c229:c350 with SMTP id b18-20020a170902d51200b001b6c229c350mr3400923plg.18.1689962308024;
+        Fri, 21 Jul 2023 10:58:28 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:fbd8])
+        by smtp.gmail.com with ESMTPSA id e13-20020a17090301cd00b001b83dc8649dsm3767352plh.250.2023.07.21.10.58.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 10:40:39 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, David Jeffery <djeffery@redhat.com>,
-        Kemeng Shi <shikemeng@huaweicloud.com>,
-        Gabriel Krisman Bertazi <krisman@suse.de>,
-        Chengming Zhou <zhouchengming@bytedance.com>,
-        Jan Kara <jack@suse.cz>
-In-Reply-To: <20230721095715.232728-1-ming.lei@redhat.com>
-References: <20230721095715.232728-1-ming.lei@redhat.com>
-Subject: Re: [RFC PATCH] sbitmap: fix batching wakeup
-Message-Id: <168996123953.417562.6869632973039501170.b4-ty@kernel.dk>
-Date:   Fri, 21 Jul 2023 11:40:39 -0600
+        Fri, 21 Jul 2023 10:58:27 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 21 Jul 2023 07:58:26 -1000
+From:   'Tejun Heo' <tj@kernel.org>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     Carlos Bilbao <carlos.bilbao@amd.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        amd <amd@localhost.localdomain>
+Subject: Re: [PATCH] blk-iocost: fix seq_printf compile type mismatch error
+Message-ID: <ZLrHQgIb8jnm5biX@slm.duckdns.org>
+References: <20230717141852.153965-1-carlos.bilbao@amd.com>
+ <ZLWNHuTGk0fy8pjE@slm.duckdns.org>
+ <2b4540aadc3c4449a192aeed6211f232@AcuMS.aculab.com>
+ <ZLmT3mXuDlYY61w0@slm.duckdns.org>
+ <fd89f72848da4569a19ec8a1ac9ec94e@AcuMS.aculab.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fd89f72848da4569a19ec8a1ac9ec94e@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
-On Fri, 21 Jul 2023 17:57:15 +0800, Ming Lei wrote:
-> Current code supposes that it is enough to provide forward progress by just
-> waking up one wait queue after one completion batch is done.
-> 
-> Unfortunately this way isn't enough, cause waiter can be added to
-> wait queue just after it is woken up.
-> 
-> Follows one example(64 depth, wake_batch is 8)
-> 
-> [...]
+On Fri, Jul 21, 2023 at 08:05:59AM +0000, David Laight wrote:
+> In any case it is enough to split the enum.
+> If you really need unrelated constants to be defined in an enum
+> them maybe use a separate enum for each.
+> Using (on one line):
+> 	enum { name = constant };
 
-Applied, thanks!
+Yeah, I'm hoping it won't come down to that. Hopefully, we can limp along
+like this until we can always assume the new behavior. Right now, the
+problem is that both gcc<13 and gcc=13 have to supported when the two assign
+different types to the same enum definitions.
 
-[1/1] sbitmap: fix batching wakeup
-      commit: 106397376c0369fcc01c58dd189ff925a2724a57
+Thanks.
 
-Best regards,
 -- 
-Jens Axboe
-
-
-
+tejun
