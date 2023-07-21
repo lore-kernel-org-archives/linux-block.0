@@ -2,106 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F69BEB64DD
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 15:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB265C001DE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 16:37:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbjGUPMZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 11:12:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46714 "EHLO
+        id S229503AbjGUQhL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 12:37:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231480AbjGUPMV (ORCPT
+        with ESMTP id S232434AbjGUQgV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 11:12:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0890E3A8F
-        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 08:11:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689952262;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6I/TR9khe0tvgU1kgdVsTvGXvVg17ybDMF1EKA4LK4k=;
-        b=gzcJV+zG8gN3gcyTDMp21LgHB7UbTgkC4hcH1tRbKKLcjKQhkxxuvfcvwk852AysU0TJCi
-        iIlzoo05CIp2bBnTU8oi0fghFChe7e0BmWDfAmNRyU8XiOrqSrv6MsiWBCEdQFj/yCbbDG
-        gr/pC2CEYq1uDZ8GZR5ZTdQj88MYc58=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-626-Bt1tuMdjN1G3JK__evfSWA-1; Fri, 21 Jul 2023 11:10:59 -0400
-X-MC-Unique: Bt1tuMdjN1G3JK__evfSWA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 21 Jul 2023 12:36:21 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B23453A8C
+        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 09:35:47 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F657936D26;
-        Fri, 21 Jul 2023 15:10:58 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E15F2166B25;
-        Fri, 21 Jul 2023 15:10:58 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-        id A75C33096A42; Fri, 21 Jul 2023 15:10:56 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id A635C3F7CF;
-        Fri, 21 Jul 2023 17:10:56 +0200 (CEST)
-Date:   Fri, 21 Jul 2023 17:10:56 +0200 (CEST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-cc:     Li Nan <linan666@huaweicloud.com>,
-        Zdenek Kabelac <zkabelac@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH v2 0/3] brd discard patches
-In-Reply-To: <6f0b9cbb-6752-6dd8-c184-10798533dfed@kernel.dk>
-Message-ID: <67d28762-d41a-4f67-7e11-de7040bfb369@redhat.com>
-References: <9933f5df-dd43-3447-dce3-f513368578@redhat.com> <6f0b9cbb-6752-6dd8-c184-10798533dfed@kernel.dk>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D51A91F7AB;
+        Fri, 21 Jul 2023 16:35:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1689957344; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=I8N8UPzdHsXt8zyD+0Iu4lzNtBkmFQ10QLkyHs69xaA=;
+        b=07PFlsoE2qTfQ/8nL4pluvELLRPAuRcTiTjCUG5Br7M2xClmV5QndZz1QAg/Ul0a4Ts3EP
+        Ph26liK1v3mzX3fdIVAhtb9gOe9DjXitTFt0TO00h8Xu1GMF+CKNGO0/Qht3+ryPFVvz+P
+        EvqHxvYpax2NNSXsBDSHrsXhtmdcs70=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1689957344;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=I8N8UPzdHsXt8zyD+0Iu4lzNtBkmFQ10QLkyHs69xaA=;
+        b=onBiKn7tifUIK+Y8PXoV5Pf9M3c9bW0c4UCcEi6260TBqdkE8mVa0VOZAf8F/2tKDbIXH8
+        Tz1CY8UO8swx44CA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9DEAC134BA;
+        Fri, 21 Jul 2023 16:35:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id WXHnIOCzumSiSQAAMHmgww
+        (envelope-from <krisman@suse.de>); Fri, 21 Jul 2023 16:35:44 +0000
+From:   Gabriel Krisman Bertazi <krisman@suse.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        David Jeffery <djeffery@redhat.com>,
+        Kemeng Shi <shikemeng@huaweicloud.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        Jan Kara <jack@suse.cz>
+Subject: Re: [RFC PATCH] sbitmap: fix batching wakeup
+Organization: SUSE
+References: <20230721095715.232728-1-ming.lei@redhat.com>
+Date:   Fri, 21 Jul 2023 12:35:43 -0400
+In-Reply-To: <20230721095715.232728-1-ming.lei@redhat.com> (Ming Lei's message
+        of "Fri, 21 Jul 2023 17:57:15 +0800")
+Message-ID: <87jzut43z4.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Ming Lei <ming.lei@redhat.com> writes:
 
+> From: David Jeffery <djeffery@redhat.com>
+>
+> Current code supposes that it is enough to provide forward progress by just
+> waking up one wait queue after one completion batch is done.
+>
+> Unfortunately this way isn't enough, cause waiter can be added to
+> wait queue just after it is woken up.
+>
+> Follows one example(64 depth, wake_batch is 8)
+>
+> 1) all 64 tags are active
+>
+> 2) in each wait queue, there is only one single waiter
+>
+> 3) each time one completion batch(8 completions) wakes up just one waiter in each wait
+> queue, then immediately one new sleeper is added to this wait queue
+>
+> 4) after 64 completions, 8 waiters are wakeup, and there are still 8 waiters in each
+> wait queue
+>
+> 5) after another 8 active tags are completed, only one waiter can be wakeup, and the other 7
+> can't be waken up anymore.
+>
+> Turns out it isn't easy to fix this problem, so simply wakeup enough waiters for
+> single batch.
 
-On Fri, 21 Jul 2023, Jens Axboe wrote:
+yes, I think this makes sense. When working on this algorithm I remember
+I considered it (thus wake_up_nr being ready), but ended up believing it
+wasn't needed.  please take:
 
-> On 7/21/23 7:48?AM, Mikulas Patocka wrote:
-> > This is a new version of the brd discard patches.
-> 
-> Can you please:
-> 
-> 1) Ensure that your postings thread properly, it's all separate emails
->    and the patches don't nest under the cover letter parent.
+Reviewed-by: Gabriel Krisman Bertazi <krisman@suse.de>
 
-I use alpine. I was testing it - and it turns out that when I delete the 
-last character in the "Subject" field, it deletes the field "In-Reply-To" 
-from the header. This must be some new bug/feature - it didn't do it in 
-the past.
+I wonder how likely it is to reach it.  Did you get a bug report?
 
-I'll try to be more careful to not make the "Subject" field empty when 
-sending patches.
+Thanks,
 
-> 2) Include a changelog. What changed since v1?
-> 
-> -- 
-> Jens Axboe
-
-ChangeLog:
-
-* Batch discarded pages into the "free_page_batch" structure and free all 
-  of them with just one "call_rcu" call. In case of allocation failure, 
-  fall back to per-page "call_rcu" calls. (suggested by Christoph Hellwig)
-
-* Make the module parameter "/sys/module/brd/parameters/discard"  
-  changeable at runtime. Changing it will iterate over all ramdisk devices 
-  and call brd_set_discard_limits on them to enable or disable discard.
-  (suggested by Christoph Hellwig)
-
-* Use "switch (bio_op(bio))" in brd_submit_bio, so that the code looks 
-  better. (suggested by Chaitanya Kulkarni)
-
-* do "bio->bi_status = BLK_STS_NOTSUPP" in brd_submit_bio if unknown type 
-  of bio is received.
-
-Mikulas
-
+-- 
+Gabriel Krisman Bertazi
