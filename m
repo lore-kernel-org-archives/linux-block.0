@@ -2,31 +2,29 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77516EB64DD
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 13:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D26ABEB64DC
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 13:32:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230287AbjGUNEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 09:04:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52828 "EHLO
+        id S229907AbjGUNce (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 09:32:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229992AbjGUNED (ORCPT
+        with ESMTP id S229790AbjGUNcd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 09:04:03 -0400
+        Fri, 21 Jul 2023 09:32:33 -0400
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C91186;
-        Fri, 21 Jul 2023 06:04:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E781711;
+        Fri, 21 Jul 2023 06:32:32 -0700 (PDT)
 Received: from local
         by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
          (Exim 4.96)
         (envelope-from <daniel@makrotopia.org>)
-        id 1qMpmy-0001ws-1J;
-        Fri, 21 Jul 2023 13:03:20 +0000
-Date:   Fri, 21 Jul 2023 14:03:08 +0100
+        id 1qMqEZ-00024i-03;
+        Fri, 21 Jul 2023 13:31:51 +0000
+Date:   Fri, 21 Jul 2023 14:31:42 +0100
 From:   Daniel Golle <daniel@makrotopia.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
         Richard Weinberger <richard@nod.at>,
         Vignesh Raghavendra <vigneshr@ti.com>,
@@ -43,140 +41,62 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
         Hans de Goede <hdegoede@redhat.com>,
         Ye Bin <yebin10@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
 Subject: Re: [RFC PATCH 6/6] block: implement NVMEM provider
-Message-ID: <ZLqCDCTTx9GcLqDd@makrotopia.org>
+Message-ID: <ZLqIvuK2EX2hROJo@makrotopia.org>
 References: <cover.1689802933.git.daniel@makrotopia.org>
  <e5b709e15739dc0563e9497a2dbbe63050381db0.1689802933.git.daniel@makrotopia.org>
- <ZLjci5bHzTI+/Kxs@infradead.org>
- <ZLlaOB1sb8wSd7Aq@makrotopia.org>
- <ZLomKmNe+EhpjI1K@infradead.org>
- <ZLpgs-aZVHCQooi0@makrotopia.org>
- <2023072128-shadow-system-1903@gregkh>
- <ZLpsQg3tDj2gEelv@makrotopia.org>
- <2023072106-partly-thank-8657@gregkh>
+ <ZLonS7QXLj2lg4Zg@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2023072106-partly-thank-8657@gregkh>
+In-Reply-To: <ZLonS7QXLj2lg4Zg@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 21, 2023 at 01:39:18PM +0200, Greg Kroah-Hartman wrote:
-> On Fri, Jul 21, 2023 at 12:30:10PM +0100, Daniel Golle wrote:
-> > On Fri, Jul 21, 2023 at 01:11:40PM +0200, Greg Kroah-Hartman wrote:
-> > > On Fri, Jul 21, 2023 at 11:40:51AM +0100, Daniel Golle wrote:
-> > > > On Thu, Jul 20, 2023 at 11:31:06PM -0700, Christoph Hellwig wrote:
-> > > > > On Thu, Jul 20, 2023 at 05:02:32PM +0100, Daniel Golle wrote:
-> > > > > > On Thu, Jul 20, 2023 at 12:04:43AM -0700, Christoph Hellwig wrote:
-> > > > > > > The layering here is exactly the wrong way around.  This block device
-> > > > > > > as nvmem provide has not business sitting in the block layer and being
-> > > > > > > keyed ff the gendisk registration.  Instead you should create a new
-> > > > > > > nvmem backed that opens the block device as needed if it fits your
-> > > > > > > OF description without any changes to the core block layer.
-> > > > > > > 
-> > > > > > 
-> > > > > > Ok. I will use a class_interface instead.
-> > > > > 
-> > > > > I'm not sure a class_interface makes much sense here.  Why does the
-> > > > > block layer even need to know about you using a device a nvmem provider?
-> > > > 
-> > > > It doesn't. But it has to notify the nvmem providing driver about the
-> > > > addition of new block devices. This is what I'm using class_interface
-> > > > for, simply to hook into .add_dev of the block_class.
-> > > 
-> > > Why is this single type of block device special to require this, yet all
-> > > others do not?  Encoding this into the block layer feels like a huge
-> > > layering violation to me, why not do it how all other block drivers do
-> > > it instead?
-> > 
-> > I was thinkng of this as a generic solution in no way tied to one specific
-> > type of block device. *Any* internal block device which can be used to
-> > boot from should also be usable as NVMEM provider imho.
+On Thu, Jul 20, 2023 at 11:35:55PM -0700, Christoph Hellwig wrote:
+> > +static int blk_nvmem_reg_read(void *priv, unsigned int from,
+> > +			      void *val, size_t bytes)
+> > +{
+> > +	pgoff_t f_index = from >> PAGE_SHIFT;
+> > +	struct address_space *mapping;
+> > +	struct blk_nvmem *bnv = priv;
+> > +	size_t bytes_left = bytes;
+> > +	struct folio *folio;
+> > +	unsigned long offs, to_read;
+> > +	void *p;
 > 
-> Define "internal" :)
+> Btw, this function really should be using kern_read on a file
+> using filp_open instead of poking into block device internals.
 
-Exactly, it could be anything, MMC, SATA, even USB. As long as there is
-a device tree node associated with the device, it could be referenced
-as an NVMEM provider. And that's what this series tries to implement.
+Unfortunately filp_open requires a device inode on a filesystem to be
+able to open a block device. What if the root filesystem has not yet
+been mounted, or even requires NVMEM (let's say for the Ethernet MAC
+address to be known for a nfsroot, nbd or iSCSI to work) to be
+available first?
 
+Can you imagine we could implement something like filp_open_bdev which
+takes a (struct block_device *) as parameter instead of (const char *)?
+
+That would allow the driver to open and read from the block device
+before any filesystems (incl. /dev) become ready.
+
+> That way you can even have a generic file provider that works
+> on anything that can be read from.
 > 
-> And that's all up to the boot process in userspace, the kernel doesn't
-> care about this.
 
-So lets look at any random embedded Linux router or Wi-Fi AP:
+While this could also be useful, it doesn't fulfil the requirement of
+making NVMEM available as early as possible for other drivers to use,
+e.g. for the Ethernet MAC address.
 
-Typically we got some kind of NAND or NOR flash memory with a
-hard-coded partitioning dedicating different areas in the flash to be
-used for the bootloader, bootloader environment, factory data (such as
-MAC addresses and Wi-Fi EEPROMs), a linux kernel, a root filesystem and
-some way to store user data.
+And it would also heavily deviate from how things work with other types
+of flash storage typically used in embedded Linux devices such as SPI
+NOR or NAND flash which is represented as MTD device.
 
-And things are not that different when using an eMMC instead of NOR
-flash, from the perspective of the OS the main difference is just that
-the eMMC is larger and represented as a block device and typically
-MBR or GPT partitioning is used.
-
-> 
-> > > > > As far as I can tell your provider should layer entirely above the
-> > > > > block layer and not have to be integrated with it.
-> > > > 
-> > > > My approach using class_interface doesn't require any changes to be
-> > > > made to existing block code. However, it does use block_class. If
-> > > > you see any other good option to implement matching off and usage of
-> > > > block devices by in-kernel users, please let me know.
-> > > 
-> > > Do not use block_class, again, that should only be for the block core to
-> > > touch.  Individual block drivers should never be poking around in it.
-> > 
-> > Do I have any other options to coldplug and be notified about newly
-> > added block devices, so the block-device-consuming driver can know
-> > about them?
-> 
-> What other options do you need?
-
-Either calls for adding/removing the NVMEM devices need to be added to
-block/genhd.c and block/partitions/core.c, and if that's not acceptable
-(see below), then we'd need something like register_mtd_user() would be
-for MTD:
-A way for a driver to cold-plug existing block devices and be notified
-about newly added ones.
-
-> 
-> > This is not a rhetoric question, I've been looking for other ways
-> > and haven't found anything better than class_find_device or
-> > class_interface.
-> 
-> Never use that, sorry, that's not for a driver to touch.
-> 
-> > Using those also prevents blk-nvmem to be built as
-> > a module, so I'd really like to find alternatives.
-> > E.g. for MTD we got struct mtd_notifier and register_mtd_user().
-> 
-> Your storage/hardware driver should be the thing that "finds block
-> devices" and registers them with the block class core, right?  After
-> that, what matters?
-
-Well, I'd say: Make the device available as NVMEM provider, as it could
-be needed for e.g. the Ethernet driver to know the MAC address to be
-used.
-
-This is how it is done for MTD devices here:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/mtd/mtdcore.c#n723
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/mtd/mtdcore.c#n804
-
-... and then used for example here:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/arch/arm64/boot/dts/marvell/armada-3720-gl-mv1000.dts#n227
-
-The idea to use a class_interface at all is a result of the criticism
-by Christoph Hellwig that the series requires changes to be made to the
-block subsystem, ie. calls to register and unregister the NVMEM
-provider.
-
-Yet another way would obviously be to let the block-device-providing
-driver (eg. drivers/mmc/core/block.c) register the NVMEM provider, but
-that would then have to be re-implemented for every relevant block
-driver which also seems wrong.
+Sidenote: block2mtd is also not an option because one cannot reference
+block2mtd devices in device tree, hence they cannot serve as NVMEM
+providers.
