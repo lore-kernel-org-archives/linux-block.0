@@ -2,82 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7114BEB64DC
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 06:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A389EB64DC
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 08:06:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231226AbjGUGgn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 02:36:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34926 "EHLO
+        id S231251AbjGUIGG convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 04:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231168AbjGUGgc (ORCPT
+        with ESMTP id S230403AbjGUIGF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 02:36:32 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55CC730C0;
-        Thu, 20 Jul 2023 23:36:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=dNj9HqDsh0etQFD7jEaoC/caRXY3w0DSveX/n+3VHl4=; b=4p6T2id0FidHtcx3NOENyCPePm
-        Z3I2YToRlMfoa5NXVaq3fxELj//CxCV4hu3dntZFCb5YMC4EyxnxmepXmnrQnNqA1OoEyrxK2E7Iq
-        5TrmdWDBAqXhrc7t4c3X5pmKZPeO2x68/HOIzjAF9lUO7nZRstoNY3vZ6HgYd9XSRz0OaeIRQ5sfw
-        3OLawY/RiOuwBka8po6tIqM46jCHJerAUKpyabW8YJObfwwQGDcQ8+DZXM84reE43Yy+pxEAZ1lBB
-        0YQYRWrfgOMEIpwNDOfpJKHfTD3Wv9nsh/wMdN/9ufm0nyNr0vJ9l08ZGSAcSEPaaWj5tqWML84bX
-        0tD/I02A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qMjk3-00D37H-0b;
-        Fri, 21 Jul 2023 06:35:55 +0000
-Date:   Thu, 20 Jul 2023 23:35:55 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
-        Christian Loehle <CLoehle@hyperstone.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ye Bin <yebin10@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
-Subject: Re: [RFC PATCH 6/6] block: implement NVMEM provider
-Message-ID: <ZLonS7QXLj2lg4Zg@infradead.org>
-References: <cover.1689802933.git.daniel@makrotopia.org>
- <e5b709e15739dc0563e9497a2dbbe63050381db0.1689802933.git.daniel@makrotopia.org>
+        Fri, 21 Jul 2023 04:06:05 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E512708
+        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 01:06:03 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-287-XvO-OBw_MAGyU5uoyZk6iw-1; Fri, 21 Jul 2023 09:06:01 +0100
+X-MC-Unique: XvO-OBw_MAGyU5uoyZk6iw-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 21 Jul
+ 2023 09:06:00 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 21 Jul 2023 09:05:59 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Tejun Heo' <tj@kernel.org>
+CC:     Carlos Bilbao <carlos.bilbao@amd.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        amd <amd@localhost.localdomain>
+Subject: RE: [PATCH] blk-iocost: fix seq_printf compile type mismatch error
+Thread-Topic: [PATCH] blk-iocost: fix seq_printf compile type mismatch error
+Thread-Index: AQHZuN9gMxBfo8Y4UkeL32HKckyYqK/Ay+LQgAI9EACAANgLUA==
+Date:   Fri, 21 Jul 2023 08:05:59 +0000
+Message-ID: <fd89f72848da4569a19ec8a1ac9ec94e@AcuMS.aculab.com>
+References: <20230717141852.153965-1-carlos.bilbao@amd.com>
+ <ZLWNHuTGk0fy8pjE@slm.duckdns.org>
+ <2b4540aadc3c4449a192aeed6211f232@AcuMS.aculab.com>
+ <ZLmT3mXuDlYY61w0@slm.duckdns.org>
+In-Reply-To: <ZLmT3mXuDlYY61w0@slm.duckdns.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5b709e15739dc0563e9497a2dbbe63050381db0.1689802933.git.daniel@makrotopia.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +static int blk_nvmem_reg_read(void *priv, unsigned int from,
-> +			      void *val, size_t bytes)
-> +{
-> +	pgoff_t f_index = from >> PAGE_SHIFT;
-> +	struct address_space *mapping;
-> +	struct blk_nvmem *bnv = priv;
-> +	size_t bytes_left = bytes;
-> +	struct folio *folio;
-> +	unsigned long offs, to_read;
-> +	void *p;
+From: Tejun Heo
+> Sent: 20 July 2023 21:07
+> 
+> On Wed, Jul 19, 2023 at 08:57:32AM +0000, David Laight wrote:
+> > From: Tejun Heo
+> > > Sent: 17 July 2023 19:49
+> > >
+> > > On Mon, Jul 17, 2023 at 09:18:52AM -0500, Carlos Bilbao wrote:
+> > > > From: amd <amd@localhost.localdomain>
+> > > >
+> > > > Fix two type mismatch errors encountered while compiling blk-iocost.c with
+> > > > GCC version 13.1.1 that involved constant operator WEIGHT_ONE. Cast the
+> > > > result of the division operation to (unsigned int) to match the expected
+> > > > format specifier %u in two seq_printf invocations.
+> > >
+> > > Can you detail the warnings? Was that on 32bit compiles?
+> >
+> > The problem is caused by gcc 13 changing the types of the
+> > constants inside an enum to be all the same.
+> >
+> > The best fix is (probably) to replace all the enum used to
+> > define unrelated constants with #defines.
+> 
+> Yeah, but then you end up without any way to read that value from outside
+> the kernel for BPF, drgn or any other tools which use debug info. That
+> actually matters.
 
-Btw, this function really should be using kern_read on a file
-using filp_open instead of poking into block device internals.
-That way you can even have a generic file provider that works
-on anything that can be read from.
+Some of those constants (probably including the one that forces
+the enum to 'long' are very boring.
+I don't remember which one caused the change, but some were
+similar to 'microseconds in a second'.
+
+In any case it is enough to split the enum.
+If you really need unrelated constants to be defined in an enum
+them maybe use a separate enum for each.
+Using (on one line):
+	enum { name = constant };
+may work best.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
