@@ -2,176 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C92AEB64DD
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 11:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82BDCEB64DD
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 11:31:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjGULS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 07:18:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35322 "EHLO
+        id S229736AbjGULbE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 07:31:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231210AbjGULSN (ORCPT
+        with ESMTP id S229451AbjGULbC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 07:18:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205E61715;
-        Fri, 21 Jul 2023 04:18:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 768BC61A32;
-        Fri, 21 Jul 2023 11:18:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 961CAC433CA;
-        Fri, 21 Jul 2023 11:18:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689938290;
-        bh=+1pRznIJZVGaXfyHrneWrC6bYAtsOlit/tS0KrtG2yM=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ZkemUooeRUEBMXoT+eZuwXtiItz8nm/fDLuhMM6XoA0+EU916wGv+BgIRm9/xgMuX
-         SHioymbBApSyxanIRzsRJlh1H1xIrmrEecxMCb2eiIpMa2MDza+a4Lq7s8MEmglIDe
-         ez4c8dEMJ4yU8fNNE27hJRQDS67tU5s8hkkkchIZQ2TJUr2H0Pp5kPNTLBrZ7BE1tE
-         XtM4lvoh9Le7pYU5tDl1ZWsi1wmd04lf2V4ROGk/Ku3L6+VkMgVjYdls3FN1H/kiR2
-         xtTShhij+hbZh33BcJIHIG5mmO1W021HSeM9yzvPFkgCtgYQYflWAvK86K6XkJEDCq
-         e88ULpSvyQglQ==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-4fcd615d7d6so2891849e87.3;
-        Fri, 21 Jul 2023 04:18:10 -0700 (PDT)
-X-Gm-Message-State: ABy/qLb6/q4WRjT4XwdfpkRnqdmVnGhq3BwMzyUEwNPjp3RI6y+k+JvW
-        V37nq1skh4rnl+G7VU76euusfgRNlpu94+0Gjsk=
-X-Google-Smtp-Source: APBJJlGgzNV4bS4ZImEmRoMMfW0jhmUui+8qThAJBRzr+dpV1Qj1REJCRGaubl5KmDySuU4gh04KMBTQZciuHQWvik4=
-X-Received: by 2002:a05:6512:6d4:b0:4f9:58ed:7bba with SMTP id
- u20-20020a05651206d400b004f958ed7bbamr1221034lff.16.1689938288556; Fri, 21
- Jul 2023 04:18:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230718125847.3869700-1-ardb@kernel.org> <20230718125847.3869700-21-ardb@kernel.org>
- <ZLpoDumeF/+xax/V@corigine.com>
-In-Reply-To: <ZLpoDumeF/+xax/V@corigine.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 21 Jul 2023 13:17:57 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXE4BFjracdzsM87Kq40t683RnT4VXEZjU0d0gRVwso=vA@mail.gmail.com>
-Message-ID: <CAMj1kXE4BFjracdzsM87Kq40t683RnT4VXEZjU0d0gRVwso=vA@mail.gmail.com>
-Subject: Re: [RFC PATCH 20/21] crypto: deflate - implement acomp API directly
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Haren Myneni <haren@us.ibm.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Fri, 21 Jul 2023 07:31:02 -0400
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B92E0;
+        Fri, 21 Jul 2023 04:31:01 -0700 (PDT)
+Received: from local
+        by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.96)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1qMoKx-0001XQ-0A;
+        Fri, 21 Jul 2023 11:30:19 +0000
+Date:   Fri, 21 Jul 2023 12:30:10 +0100
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
         Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
         Richard Weinberger <richard@nod.at>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
+        Christian Loehle <CLoehle@hyperstone.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ye Bin <yebin10@huawei.com>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
+Subject: Re: [RFC PATCH 6/6] block: implement NVMEM provider
+Message-ID: <ZLpsQg3tDj2gEelv@makrotopia.org>
+References: <cover.1689802933.git.daniel@makrotopia.org>
+ <e5b709e15739dc0563e9497a2dbbe63050381db0.1689802933.git.daniel@makrotopia.org>
+ <ZLjci5bHzTI+/Kxs@infradead.org>
+ <ZLlaOB1sb8wSd7Aq@makrotopia.org>
+ <ZLomKmNe+EhpjI1K@infradead.org>
+ <ZLpgs-aZVHCQooi0@makrotopia.org>
+ <2023072128-shadow-system-1903@gregkh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2023072128-shadow-system-1903@gregkh>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 21 Jul 2023 at 13:12, Simon Horman <simon.horman@corigine.com> wrote:
->
-> On Tue, Jul 18, 2023 at 02:58:46PM +0200, Ard Biesheuvel wrote:
->
-> ...
->
-> > -static int deflate_comp_init(struct deflate_ctx *ctx)
-> > +static int deflate_process(struct acomp_req *req, struct z_stream_s *stream,
-> > +                        int (*process)(struct z_stream_s *, int))
-> >  {
-> > -     int ret = 0;
-> > -     struct z_stream_s *stream = &ctx->comp_stream;
-> > +     unsigned int slen = req->slen;
-> > +     unsigned int dlen = req->dlen;
-> > +     struct scatter_walk src, dst;
-> > +     unsigned int scur, dcur;
-> > +     int ret;
-> >
-> > -     stream->workspace = vzalloc(zlib_deflate_workspacesize(
-> > -                             -DEFLATE_DEF_WINBITS, DEFLATE_DEF_MEMLEVEL));
-> > -     if (!stream->workspace) {
-> > -             ret = -ENOMEM;
-> > -             goto out;
-> > -     }
-> > +     stream->avail_in = stream->avail_out = 0;
-> > +
-> > +     scatterwalk_start(&src, req->src);
-> > +     scatterwalk_start(&dst, req->dst);
-> > +
-> > +     scur = dcur = 0;
-> > +
-> > +     do {
-> > +             if (stream->avail_in == 0) {
-> > +                     if (scur) {
-> > +                             slen -= scur;
-> > +
-> > +                             scatterwalk_unmap(stream->next_in - scur);
-> > +                             scatterwalk_advance(&src, scur);
-> > +                             scatterwalk_done(&src, 0, slen);
-> > +                     }
-> > +
-> > +                     scur = scatterwalk_clamp(&src, slen);
-> > +                     if (scur) {
-> > +                             stream->next_in = scatterwalk_map(&src);
-> > +                             stream->avail_in = scur;
-> > +                     }
-> > +             }
-> > +
-> > +             if (stream->avail_out == 0) {
-> > +                     if (dcur) {
-> > +                             dlen -= dcur;
-> > +
-> > +                             scatterwalk_unmap(stream->next_out - dcur);
-> > +                             scatterwalk_advance(&dst, dcur);
-> > +                             scatterwalk_done(&dst, 1, dlen);
-> > +                     }
-> > +
-> > +                     dcur = scatterwalk_clamp(&dst, dlen);
-> > +                     if (!dcur)
-> > +                             break;
->
-> Hi Ard,
->
-> I'm unsure if this can happen. But if this break occurs in the first
-> iteration of this do loop, then ret will be used uninitialised below.
->
-> Smatch noticed this.
->
+On Fri, Jul 21, 2023 at 01:11:40PM +0200, Greg Kroah-Hartman wrote:
+> On Fri, Jul 21, 2023 at 11:40:51AM +0100, Daniel Golle wrote:
+> > On Thu, Jul 20, 2023 at 11:31:06PM -0700, Christoph Hellwig wrote:
+> > > On Thu, Jul 20, 2023 at 05:02:32PM +0100, Daniel Golle wrote:
+> > > > On Thu, Jul 20, 2023 at 12:04:43AM -0700, Christoph Hellwig wrote:
+> > > > > The layering here is exactly the wrong way around.  This block device
+> > > > > as nvmem provide has not business sitting in the block layer and being
+> > > > > keyed ff the gendisk registration.  Instead you should create a new
+> > > > > nvmem backed that opens the block device as needed if it fits your
+> > > > > OF description without any changes to the core block layer.
+> > > > > 
+> > > > 
+> > > > Ok. I will use a class_interface instead.
+> > > 
+> > > I'm not sure a class_interface makes much sense here.  Why does the
+> > > block layer even need to know about you using a device a nvmem provider?
+> > 
+> > It doesn't. But it has to notify the nvmem providing driver about the
+> > addition of new block devices. This is what I'm using class_interface
+> > for, simply to hook into .add_dev of the block_class.
+> 
+> Why is this single type of block device special to require this, yet all
+> others do not?  Encoding this into the block layer feels like a huge
+> layering violation to me, why not do it how all other block drivers do
+> it instead?
 
-Thanks.
+I was thinkng of this as a generic solution in no way tied to one specific
+type of block device. *Any* internal block device which can be used to
+boot from should also be usable as NVMEM provider imho.
+Just like all MTD devices also act as NVMEM providers (just in case of
+block devices I'd make that opt-in via device tree).
 
-This should not happen - it would mean req->dlen == 0, which is
-rejected before this function is even called.
+> 
+> > > As far as I can tell your provider should layer entirely above the
+> > > block layer and not have to be integrated with it.
+> > 
+> > My approach using class_interface doesn't require any changes to be
+> > made to existing block code. However, it does use block_class. If
+> > you see any other good option to implement matching off and usage of
+> > block devices by in-kernel users, please let me know.
+> 
+> Do not use block_class, again, that should only be for the block core to
+> touch.  Individual block drivers should never be poking around in it.
 
-Whether or not it might ever happen in practice is a different matter,
-of course, so I should probably initialize 'ret' to something sane.
-
-
-
-> > +
-> > +                     stream->next_out = scatterwalk_map(&dst);
-> > +                     stream->avail_out = dcur;
-> > +             }
-> > +
-> > +             ret = process(stream, (slen == scur) ? Z_FINISH : Z_SYNC_FLUSH);
-> > +     } while (ret == Z_OK);
-> > +
-> > +     if (scur)
-> > +             scatterwalk_unmap(stream->next_in - scur);
-> > +     if (dcur)
-> > +             scatterwalk_unmap(stream->next_out - dcur);
-> > +
-> > +     if (ret != Z_STREAM_END)
-> > +             return -EINVAL;
-> > +
-> > +     req->dlen = stream->total_out;
-> > +     return 0;
-> > +}
->
-> ...
+Do I have any other options to coldplug and be notified about newly
+added block devices, so the block-device-consuming driver can know
+about them?
+This is not a rhetoric question, I've been looking for other ways
+and haven't found anything better than class_find_device or
+class_interface. Using those also prevents blk-nvmem to be built as
+a module, so I'd really like to find alternatives.
+E.g. for MTD we got struct mtd_notifier and register_mtd_user().
