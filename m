@@ -2,29 +2,39 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C36EB64DC
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 11:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14126EB64DD
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 11:11:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231222AbjGULLY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 07:11:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56788 "EHLO
+        id S231745AbjGULLh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 07:11:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231273AbjGULLI (ORCPT
+        with ESMTP id S229591AbjGULLN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 07:11:08 -0400
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4F673586;
-        Fri, 21 Jul 2023 04:10:28 -0700 (PDT)
-Received: from local
-        by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.96)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1qMo0O-0001P2-1P;
-        Fri, 21 Jul 2023 11:09:04 +0000
-Date:   Fri, 21 Jul 2023 12:08:56 +0100
-From:   Daniel Golle <daniel@makrotopia.org>
+        Fri, 21 Jul 2023 07:11:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DF23A92;
+        Fri, 21 Jul 2023 04:10:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 73246618E5;
+        Fri, 21 Jul 2023 11:10:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29F39C433C8;
+        Fri, 21 Jul 2023 11:10:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1689937811;
+        bh=myaPf1oyhAil/xlKJLpDYHkXcaR6WPBFmD+B4wkU+kg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FQ9XT91I62CH2cogbMjmf8eDfG6SRipgBPNykRuxTWkN75Ln4SmW914w52lOO540A
+         8n4Q3BDqaLkQV+sXhj3uZJ3Hr2RZtUq+ud0mjkGmfQVOEZSnH/YBlebfT7DZXwYVvA
+         H8hWIss+8QUC2XC5OJJk32DECJHj2l0W4VGXAn/s=
+Date:   Fri, 21 Jul 2023 13:10:09 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+Cc:     Daniel Golle <daniel@makrotopia.org>, Jens Axboe <axboe@kernel.dk>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
         Richard Weinberger <richard@nod.at>,
         Vignesh Raghavendra <vigneshr@ti.com>,
@@ -41,12 +51,11 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
         Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
         Hans de Goede <hdegoede@redhat.com>,
         Ye Bin <yebin10@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
 Subject: Re: [RFC PATCH 0/6] nvmem: add block device NVMEM provider
-Message-ID: <ZLpnSK8sfZnEkcgj@makrotopia.org>
+Message-ID: <2023072118-flyable-aspect-060f@gregkh>
 References: <cover.1689802933.git.daniel@makrotopia.org>
  <ZLpCscTMc8h16Tyd@ovpn-8-26.pek2.redhat.com>
 MIME-Version: 1.0
@@ -78,35 +87,14 @@ On Fri, Jul 21, 2023 at 04:32:49PM +0800, Ming Lei wrote:
 > Just wondering why you don't use request_firmware() in drivers which consume
 > the data, then the logic can be moved out of kernel, and you needn't to deal
 > with device tree & block device.
-
-The thing is: Why should the OS need to know about how to read
-calibration to be fed into a wireless driver on a specific
-hardware/firmware?
-
-Or even worse: The MAC address of the main Ethernet interface? What if
-for one of many possible reasons the extraction script in userland gets
-broken and you would need to recover the system via SSH (because it's a
-router or switch and doesn't even have any local console)?
-
-Having information about the location of firmware artifacts be supplied
-by the firmware (via device tree) seems to be the natural choice, and
-also how it is done for devices booting off NOR or NAND flash by using
-the NVMEM framework. Why should eMMC be the exception?
-
 > 
 > Or Android doesn't support udev and initrd?
 
-Yes, sure, but then the OS ROM needs to know about and handle a lot of
-very device-specific details in userland and if (unlike Android) the
-same OS ROM should run on many devices that would mean it will have to
-ship all of them in a huge initrd or root filesystem.
+It does support initrd, but not really udev last I looked.
 
-Also using userspace mechanics to acquire things as basic as a MAC
-address seems overly complex and much more fragile than having the
-firmware instruct the kernel via device tree to do so.
+But it does allow request_firmware() to be called at boot time, so yes,
+finding out why that isn't used here would be good.
 
-Hence, within the OpenWrt project, we've been working for years now to
-push for Device Tree and lately for use of the NVMEM framework, exactly
-to **reduce** the amount of hardware-specific knowledge in userland and
-get rid of shell scripts acting as hotplug handlers for firmware
-requests and such.
+thanks,
+
+greg k-h
