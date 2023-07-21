@@ -2,38 +2,39 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14126EB64DD
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 11:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D9FBC001DC
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jul 2023 11:12:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231745AbjGULLh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 07:11:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55812 "EHLO
+        id S231599AbjGULMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 07:12:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbjGULLN (ORCPT
+        with ESMTP id S229836AbjGULME (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 07:11:13 -0400
+        Fri, 21 Jul 2023 07:12:04 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DF23A92;
-        Fri, 21 Jul 2023 04:10:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F02D435BD;
+        Fri, 21 Jul 2023 04:11:42 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 73246618E5;
-        Fri, 21 Jul 2023 11:10:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29F39C433C8;
-        Fri, 21 Jul 2023 11:10:11 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CB4EE619D9;
+        Fri, 21 Jul 2023 11:11:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE5FC433A9;
+        Fri, 21 Jul 2023 11:11:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1689937811;
-        bh=myaPf1oyhAil/xlKJLpDYHkXcaR6WPBFmD+B4wkU+kg=;
+        s=korg; t=1689937902;
+        bh=I58DE02W75JENI7wvpCmMlxNMuQJdNNvbHEHShKWliE=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FQ9XT91I62CH2cogbMjmf8eDfG6SRipgBPNykRuxTWkN75Ln4SmW914w52lOO540A
-         8n4Q3BDqaLkQV+sXhj3uZJ3Hr2RZtUq+ud0mjkGmfQVOEZSnH/YBlebfT7DZXwYVvA
-         H8hWIss+8QUC2XC5OJJk32DECJHj2l0W4VGXAn/s=
-Date:   Fri, 21 Jul 2023 13:10:09 +0200
+        b=qo8QN4Jivo8oSXRmnvMhHpX+PJypAmSsY6slaACodVGVzfVDs6D1SESVA0hEfgtNd
+         r9+b9D5Fmi2v9vXGNZpIXfS3lGEZd5N4RtxI9bJzFYyHPMR/bq5x/CP2X92VdYuaxU
+         6NMnJwUzBoLL9CZEJcfXNe//kg18zrH85AEQI+Ak=
+Date:   Fri, 21 Jul 2023 13:11:40 +0200
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Daniel Golle <daniel@makrotopia.org>, Jens Axboe <axboe@kernel.dk>,
+To:     Daniel Golle <daniel@makrotopia.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
         Ulf Hansson <ulf.hansson@linaro.org>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
         Richard Weinberger <richard@nod.at>,
@@ -42,7 +43,7 @@ Cc:     Daniel Golle <daniel@makrotopia.org>, Jens Axboe <axboe@kernel.dk>,
         Matthew Wilcox <willy@infradead.org>,
         Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
         Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
-        Min Li <min15.li@samsung.com>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
         Christian Loehle <CLoehle@hyperstone.com>,
         Adrian Hunter <adrian.hunter@intel.com>,
         Hannes Reinecke <hare@suse.de>,
@@ -54,46 +55,57 @@ Cc:     Daniel Golle <daniel@makrotopia.org>, Jens Axboe <axboe@kernel.dk>,
         =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
-Subject: Re: [RFC PATCH 0/6] nvmem: add block device NVMEM provider
-Message-ID: <2023072118-flyable-aspect-060f@gregkh>
+Subject: Re: [RFC PATCH 6/6] block: implement NVMEM provider
+Message-ID: <2023072128-shadow-system-1903@gregkh>
 References: <cover.1689802933.git.daniel@makrotopia.org>
- <ZLpCscTMc8h16Tyd@ovpn-8-26.pek2.redhat.com>
+ <e5b709e15739dc0563e9497a2dbbe63050381db0.1689802933.git.daniel@makrotopia.org>
+ <ZLjci5bHzTI+/Kxs@infradead.org>
+ <ZLlaOB1sb8wSd7Aq@makrotopia.org>
+ <ZLomKmNe+EhpjI1K@infradead.org>
+ <ZLpgs-aZVHCQooi0@makrotopia.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZLpCscTMc8h16Tyd@ovpn-8-26.pek2.redhat.com>
+In-Reply-To: <ZLpgs-aZVHCQooi0@makrotopia.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 21, 2023 at 04:32:49PM +0800, Ming Lei wrote:
-> On Wed, Jul 19, 2023 at 11:01:14PM +0100, Daniel Golle wrote:
-> > On embedded devices using an eMMC it is common that one or more (hw/sw)
-> > partitions on the eMMC are used to store MAC addresses and Wi-Fi
-> > calibration EEPROM data.
+On Fri, Jul 21, 2023 at 11:40:51AM +0100, Daniel Golle wrote:
+> On Thu, Jul 20, 2023 at 11:31:06PM -0700, Christoph Hellwig wrote:
+> > On Thu, Jul 20, 2023 at 05:02:32PM +0100, Daniel Golle wrote:
+> > > On Thu, Jul 20, 2023 at 12:04:43AM -0700, Christoph Hellwig wrote:
+> > > > The layering here is exactly the wrong way around.  This block device
+> > > > as nvmem provide has not business sitting in the block layer and being
+> > > > keyed ff the gendisk registration.  Instead you should create a new
+> > > > nvmem backed that opens the block device as needed if it fits your
+> > > > OF description without any changes to the core block layer.
+> > > > 
+> > > 
+> > > Ok. I will use a class_interface instead.
 > > 
-> > Implement an NVMEM provider backed by block devices as typically the
-> > NVMEM framework is used to have kernel drivers read and use binary data
-> > from EEPROMs, efuses, flash memory (MTD), ...
-> > 
-> > In order to be able to reference hardware partitions on an eMMC, add code
-> > to bind each hardware partition to a specific firmware subnode.
-> > 
-> > This series is meant to open the discussion on how exactly the device tree
-> > schema for block devices and partitions may look like, and even if using
-> > the block layer to back the NVMEM device is at all the way to go -- to me
-> > it seemed to be a good solution because it will be reuable e.g. for NVMe.
+> > I'm not sure a class_interface makes much sense here.  Why does the
+> > block layer even need to know about you using a device a nvmem provider?
 > 
-> Just wondering why you don't use request_firmware() in drivers which consume
-> the data, then the logic can be moved out of kernel, and you needn't to deal
-> with device tree & block device.
+> It doesn't. But it has to notify the nvmem providing driver about the
+> addition of new block devices. This is what I'm using class_interface
+> for, simply to hook into .add_dev of the block_class.
+
+Why is this single type of block device special to require this, yet all
+others do not?  Encoding this into the block layer feels like a huge
+layering violation to me, why not do it how all other block drivers do
+it instead?
+
+> > As far as I can tell your provider should layer entirely above the
+> > block layer and not have to be integrated with it.
 > 
-> Or Android doesn't support udev and initrd?
+> My approach using class_interface doesn't require any changes to be
+> made to existing block code. However, it does use block_class. If
+> you see any other good option to implement matching off and usage of
+> block devices by in-kernel users, please let me know.
 
-It does support initrd, but not really udev last I looked.
-
-But it does allow request_firmware() to be called at boot time, so yes,
-finding out why that isn't used here would be good.
+Do not use block_class, again, that should only be for the block core to
+touch.  Individual block drivers should never be poking around in it.
 
 thanks,
 
