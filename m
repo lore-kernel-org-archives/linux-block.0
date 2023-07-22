@@ -2,116 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9D2C001DC
-	for <linux-block@archiver.kernel.org>; Sat, 22 Jul 2023 17:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E0DC001E0
+	for <linux-block@archiver.kernel.org>; Sat, 22 Jul 2023 18:16:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229771AbjGVR2x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Jul 2023 13:28:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37418 "EHLO
+        id S229707AbjGVSQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Jul 2023 14:16:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229668AbjGVR2w (ORCPT
+        with ESMTP id S229682AbjGVSQh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Jul 2023 13:28:52 -0400
+        Sat, 22 Jul 2023 14:16:37 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A36B1BE4;
-        Sat, 22 Jul 2023 10:28:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9871BB
+        for <linux-block@vger.kernel.org>; Sat, 22 Jul 2023 11:16:36 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E96260677;
-        Sat, 22 Jul 2023 17:28:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A88A8C433C8;
-        Sat, 22 Jul 2023 17:28:46 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DED4460677
+        for <linux-block@vger.kernel.org>; Sat, 22 Jul 2023 18:16:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4BC72C433C7;
+        Sat, 22 Jul 2023 18:16:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690046927;
-        bh=wcFmUIMjwJZeiaQDW1AaPEaA+ItdJws367HkwgwmmUU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VN+o5Idy5pxttg3qLmqjT3ZQDwejlEsk/YDPmwEg4JVpkBW9BG5iF1qOjVV7deqfj
-         egq7bZcdeANBw41yh9pv8DBSybCB7AnA5CALPr1mho3NITuc8rPeGJCeqBSfmFc4t9
-         rccTQGyZntOm8LWektFk7zYEtqbHbXRQALZc7p8fH17gECD0OKRWZvZ4j4WDi4E6Ov
-         nLBEi8DdZObfkrmPwOhS2tQI5xuylP9dmqztcvY4RXRw5l6TL0e9pEeg5rhMKT/JYE
-         /7NBdgozSt5PRBp18o//jeBdjq0Cku4UHn8XPxoREDxGRv1EmPvsFMS+uLd4WznGBM
-         xATAiAn+vwZ5Q==
-Date:   Sat, 22 Jul 2023 10:32:05 -0700
-From:   Bjorn Andersson <andersson@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
-        quic_psodagud@quicinc.com, avmenon@quicinc.com,
-        abel.vesa@linaro.org, quic_spuppala@quicinc.com
-Subject: Re: [PATCH v2 07/10] qcom_scm: scm call for create, prepare and
- import keys
-Message-ID: <tt32ddxngmobvvqcnl7jhwtgl7l7pptdmyieidoq6hmzi3ywvi@z67jsuowq5lb>
-References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
- <20230719170423.220033-8-quic_gaurkash@quicinc.com>
- <uezt2yq7i4msohz27g2j6apngjp6frvxlj2qt46vg7hnds5hrs@quyhskyzui4b>
- <20230722041113.GA5660@sol.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230722041113.GA5660@sol.localdomain>
+        s=k20201202; t=1690049795;
+        bh=8LhxWxoHRRPz1nuA3gC56hk3EgmIMqeqU0W/KXukJvQ=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=hYerlBnyT0lHIBjmSX8ZCBh2EhVFjPbKXf/wkDmfrwfH+1pPOqhGRGM/J4c7v4RAk
+         a2OrGG3/Uu3K/nK+SDTtHcYP/MybG9U6RxvLTTtcJWS/bfl/I9nnh+oUmICgiowa0P
+         ODLE1ebB41ecpi2xZFw8zgyQFnbdcT32msPqXvFma5FQjv/oMrcX4MAlOk+mQjtg3K
+         TazeQY421NgZ32crN85RbPpzI7aGadfGDcsxvziVuTJ6sJ4Uxut9yNPzEA7yhwG72O
+         y91ea0hzGi1i6EG3fW273+s2HGrgRf2FKUspdWBJusRClm0QBHxZGaQ1fP4TehhhZS
+         pJfAaDeNhGhPw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3550EC595C0;
+        Sat, 22 Jul 2023 18:16:35 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.5-rc3
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <4f37fe3b-7c26-742a-1fe9-f869b6303f79@kernel.dk>
+References: <4f37fe3b-7c26-742a-1fe9-f869b6303f79@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <4f37fe3b-7c26-742a-1fe9-f869b6303f79@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.5-2023-07-21
+X-PR-Tracked-Commit-Id: bb5faa99f0ce40756ab7bbbce4f16c01ca5ebd5a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: f036d67c02b6f6966b0d45e9a16c9f2e7ede80a3
+Message-Id: <169004979521.7625.7167701761776780882.pr-tracker-bot@kernel.org>
+Date:   Sat, 22 Jul 2023 18:16:35 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 21, 2023 at 09:11:13PM -0700, Eric Biggers wrote:
-> On Fri, Jul 21, 2023 at 08:40:32PM -0700, Bjorn Andersson wrote:
-> > On Wed, Jul 19, 2023 at 10:04:21AM -0700, Gaurav Kashyap wrote:
-> > > Storage encryption has two IOCTLs for creating, importing
-> > > and preparing keys for encryption. For wrapped keys, these
-> > > IOCTLs need to interface with the secure environment, which
-> > > require these SCM calls.
-> > > 
-> > > generate_key: This is used to generate and return a longterm
-> > >               wrapped key. Trustzone achieves this by generating
-> > > 	      a key and then wrapping it using hwkm, returning
-> > > 	      a wrapped keyblob.
-> > > import_key:   The functionality is similar to generate, but here,
-> > >               a raw key is imported into hwkm and a longterm wrapped
-> > > 	      keyblob is returned.
-> > > prepare_key:  The longterm wrapped key from import or generate
-> > >               is made further secure by rewrapping it with a per-boot
-> > > 	      ephemeral wrapped key before installing it to the linux
-> > > 	      kernel for programming to ICE.
-> > > 
-> > > Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> > > ---
-> > >  drivers/firmware/qcom_scm.c            | 222 +++++++++++++++++++++++++
-> > >  drivers/firmware/qcom_scm.h            |   3 +
-> > >  include/linux/firmware/qcom/qcom_scm.h |  10 ++
-> > >  3 files changed, 235 insertions(+)
-> > > 
-> > > diff --git a/drivers/firmware/qcom_scm.c b/drivers/firmware/qcom_scm.c
-> > > index 51062d5c7f7b..44dd1857747b 100644
-> > > --- a/drivers/firmware/qcom_scm.c
-> > > +++ b/drivers/firmware/qcom_scm.c
-> > > @@ -1210,6 +1210,228 @@ int qcom_scm_derive_sw_secret(const u8 *wrapped_key, u32 wrapped_key_size,
-> > >  }
-> > >  EXPORT_SYMBOL(qcom_scm_derive_sw_secret);
-> > >  
-> > > +/**
-> > > + * qcom_scm_generate_ice_key() - Generate a wrapped key for encryption.
-> > > + * @longterm_wrapped_key: the wrapped key returned after key generation
-> > 
-> > "longterm" was long enough that you didn't feel it made sense in the
-> > description ;)
-> > 
-> > Jokes aside, please follow the convention described in:
-> > https://www.kernel.org/doc/html/v4.10/process/coding-style.html#naming
-> > 
-> > "key" or "wrapped_key" sounds sufficient to me.
-> 
-> The naming I use in my most recent patchset that adds support for
-> hardware-wrapped inline encryption keys to the block layer and fscrypt
-> (https://lore.kernel.org/linux-block/20221216203636.81491-1-ebiggers@kernel.org/),
-> which this patchset is based on, is 'lt_key' for a longterm wrapped key and
-> 'eph_key' for an ephemerally-wrapped key.
-> 
+The pull request you sent on Fri, 21 Jul 2023 13:34:16 -0600:
 
-Excellent, using familiar names is good!
+> git://git.kernel.dk/linux.git tags/block-6.5-2023-07-21
 
-Regards,
-Bjorn
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/f036d67c02b6f6966b0d45e9a16c9f2e7ede80a3
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
