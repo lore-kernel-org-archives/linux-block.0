@@ -2,113 +2,373 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4CFEB64DD
-	for <linux-block@archiver.kernel.org>; Sat, 22 Jul 2023 02:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 957C2C001B0
+	for <linux-block@archiver.kernel.org>; Sat, 22 Jul 2023 03:37:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229677AbjGVCn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jul 2023 22:43:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33582 "EHLO
+        id S229752AbjGVDhR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jul 2023 23:37:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjGVCn2 (ORCPT
+        with ESMTP id S229534AbjGVDhQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2023 22:43:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C644112F
-        for <linux-block@vger.kernel.org>; Fri, 21 Jul 2023 19:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689993761;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XoAqQtUgiRccRqvkYTsuV7fDTMH3g1ndC77oGk3IOhs=;
-        b=WCnpb3hHYLk7v/1p0YQgdp4uUOncbnt7bgHVhKfo9vJMEnFdKdNXSS7uScJ5R3JmsGQosG
-        tvHLSeM5B9ruzRtunSideecU9l6LdUswToTn2wp9JHW5WK8XSdsLEHM7sKo9Txkrc906i8
-        ry9EYxsaXQrvWLdMrAQP2VrdKQ/uyvM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-29-fNxjkRqKN0Wt1GoJxLZfhQ-1; Fri, 21 Jul 2023 22:42:37 -0400
-X-MC-Unique: fNxjkRqKN0Wt1GoJxLZfhQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 21 Jul 2023 23:37:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1BC359C;
+        Fri, 21 Jul 2023 20:37:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2C60F101A528;
-        Sat, 22 Jul 2023 02:42:37 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C92C61454142;
-        Sat, 22 Jul 2023 02:42:31 +0000 (UTC)
-Date:   Sat, 22 Jul 2023 10:42:26 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Gabriel Krisman Bertazi <krisman@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        David Jeffery <djeffery@redhat.com>,
-        Kemeng Shi <shikemeng@huaweicloud.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>,
-        Jan Kara <jack@suse.cz>, ming.lei@redhat.com
-Subject: Re: [RFC PATCH] sbitmap: fix batching wakeup
-Message-ID: <ZLtCEjZtbgCDcwwt@ovpn-8-16.pek2.redhat.com>
-References: <20230721095715.232728-1-ming.lei@redhat.com>
- <87jzut43z4.fsf@suse.de>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 639C261DA6;
+        Sat, 22 Jul 2023 03:37:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2525C433C7;
+        Sat, 22 Jul 2023 03:37:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689997033;
+        bh=YcMmx76O+AbG3FqQogXCowvd6U6/PqPiFJRuS8CopFU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PLUEXC3aWRLHdVgxvyF73gFRrDdMaVHbQvEU5vQSG1GsdolPOdPO327093w+joqg/
+         c8Y6m2EgkIVcJaMjxPW0tpY6kC+V3/6GuDeniaX4mH+PFUHX6iFwv0tsSWesZWnDpN
+         bWQjKUBCQxg1GMJIy9dVN9QaYYR1s0YUVi5zkhoHPWLOOJI2D6xSNDkKogTXikVmG8
+         +zwawE9RGvvLsby84r2ENftPNtCDAX14TJ7kLD90jsoXS6Skugy5TPnxSGW8xQjOTv
+         4wnx7oSml54m7ET+b+YXBYzn1cwmICy2ooObdbWvFzj3RLDNVgxP7hnerfGfhhuKcW
+         7Hkdmo9A645pg==
+Date:   Fri, 21 Jul 2023 20:40:32 -0700
+From:   Bjorn Andersson <andersson@kernel.org>
+To:     Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Cc:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        ebiggers@google.com, linux-mmc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        omprsing@qti.qualcomm.com, quic_psodagud@quicinc.com,
+        avmenon@quicinc.com, abel.vesa@linaro.org,
+        quic_spuppala@quicinc.com
+Subject: Re: [PATCH v2 07/10] qcom_scm: scm call for create, prepare and
+ import keys
+Message-ID: <uezt2yq7i4msohz27g2j6apngjp6frvxlj2qt46vg7hnds5hrs@quyhskyzui4b>
+References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
+ <20230719170423.220033-8-quic_gaurkash@quicinc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87jzut43z4.fsf@suse.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+In-Reply-To: <20230719170423.220033-8-quic_gaurkash@quicinc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 21, 2023 at 12:35:43PM -0400, Gabriel Krisman Bertazi wrote:
-> Ming Lei <ming.lei@redhat.com> writes:
+On Wed, Jul 19, 2023 at 10:04:21AM -0700, Gaurav Kashyap wrote:
+> Storage encryption has two IOCTLs for creating, importing
+> and preparing keys for encryption. For wrapped keys, these
+> IOCTLs need to interface with the secure environment, which
+> require these SCM calls.
 > 
-> > From: David Jeffery <djeffery@redhat.com>
-> >
-> > Current code supposes that it is enough to provide forward progress by just
-> > waking up one wait queue after one completion batch is done.
-> >
-> > Unfortunately this way isn't enough, cause waiter can be added to
-> > wait queue just after it is woken up.
-> >
-> > Follows one example(64 depth, wake_batch is 8)
-> >
-> > 1) all 64 tags are active
-> >
-> > 2) in each wait queue, there is only one single waiter
-> >
-> > 3) each time one completion batch(8 completions) wakes up just one waiter in each wait
-> > queue, then immediately one new sleeper is added to this wait queue
-> >
-> > 4) after 64 completions, 8 waiters are wakeup, and there are still 8 waiters in each
-> > wait queue
-> >
-> > 5) after another 8 active tags are completed, only one waiter can be wakeup, and the other 7
-> > can't be waken up anymore.
-> >
-> > Turns out it isn't easy to fix this problem, so simply wakeup enough waiters for
-> > single batch.
+> generate_key: This is used to generate and return a longterm
+>               wrapped key. Trustzone achieves this by generating
+> 	      a key and then wrapping it using hwkm, returning
+> 	      a wrapped keyblob.
+> import_key:   The functionality is similar to generate, but here,
+>               a raw key is imported into hwkm and a longterm wrapped
+> 	      keyblob is returned.
+> prepare_key:  The longterm wrapped key from import or generate
+>               is made further secure by rewrapping it with a per-boot
+> 	      ephemeral wrapped key before installing it to the linux
+> 	      kernel for programming to ICE.
 > 
-> yes, I think this makes sense. When working on this algorithm I remember
-> I considered it (thus wake_up_nr being ready), but ended up believing it
-> wasn't needed.  please take:
+> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> ---
+>  drivers/firmware/qcom_scm.c            | 222 +++++++++++++++++++++++++
+>  drivers/firmware/qcom_scm.h            |   3 +
+>  include/linux/firmware/qcom/qcom_scm.h |  10 ++
+>  3 files changed, 235 insertions(+)
 > 
-> Reviewed-by: Gabriel Krisman Bertazi <krisman@suse.de>
-> 
-> I wonder how likely it is to reach it.  Did you get a bug report?
+> diff --git a/drivers/firmware/qcom_scm.c b/drivers/firmware/qcom_scm.c
+> index 51062d5c7f7b..44dd1857747b 100644
+> --- a/drivers/firmware/qcom_scm.c
+> +++ b/drivers/firmware/qcom_scm.c
+> @@ -1210,6 +1210,228 @@ int qcom_scm_derive_sw_secret(const u8 *wrapped_key, u32 wrapped_key_size,
+>  }
+>  EXPORT_SYMBOL(qcom_scm_derive_sw_secret);
+>  
+> +/**
+> + * qcom_scm_generate_ice_key() - Generate a wrapped key for encryption.
+> + * @longterm_wrapped_key: the wrapped key returned after key generation
 
-It was reported from one RH customer, and I am also hit once
-when running dbench on loop(bfq) over scsi_debug in my routine test.
+"longterm" was long enough that you didn't feel it made sense in the
+description ;)
 
-David figured out the idea, and we discussed other solutions too, but
-turns out others can't work, and the above (extreme)example seems easier
-to follow, from me.
+Jokes aside, please follow the convention described in:
+https://www.kernel.org/doc/html/v4.10/process/coding-style.html#naming
 
-Per David's early analysis, it should be easier to trigger since commit
-26edb30dd1c0 ("sbitmap: Try each queue to wake up at least one waiter")
-because 'wake_index' isn't updated before calling wake_up_nr(), then
-multiple completion batch may only wakeup one same wait queue, meantime
-multiple sleepers are added to same wait queue.
+"key" or "wrapped_key" sounds sufficient to me.
 
+> + * @longterm_wrapped_key_size: size of the wrapped key to be returned.
+> + *
+> + * Qualcomm wrapped keys need to be generated in a trusted environment.
+> + * A generate key  IOCTL call is used to achieve this. These are longterm
+> + * in nature as they need to be generated and wrapped only once per
+> + * requirement.
+> + *
+> + * This SCM calls adds support for the generate key IOCTL to interface
+> + * with the secure environment to generate and return a wrapped key..
 
-Thanks, 
-Ming
+I'm afraid I don't fully understand this sentence, please rework it.
 
+> + *
+> + * Return: 0 on success; -errno on failure.
+> + */
+> +int qcom_scm_generate_ice_key(u8 *longterm_wrapped_key,
+> +			    u32 longterm_wrapped_key_size)
+> +{
+> +	struct qcom_scm_desc desc = {
+> +		.svc = QCOM_SCM_SVC_ES,
+> +		.cmd =  QCOM_SCM_ES_GENERATE_ICE_KEY,
+> +		.arginfo = QCOM_SCM_ARGS(2, QCOM_SCM_RW,
+> +					 QCOM_SCM_VAL),
+
+Leaving this line unwrapped brings you to 71 characters, you have 80
+(with stretch of 100) as the limit.
+
+> +		.args[1] = longterm_wrapped_key_size,
+> +		.owner = ARM_SMCCC_OWNER_SIP,
+> +	};
+> +
+> +	void *longterm_wrapped_keybuf;
+
+"buf" or "tmp" sounds sufficient.
+
+> +	dma_addr_t longterm_wrapped_key_phys;
+
+"phys" or "addr"
+
+> +	int ret;
+> +
+> +	/*
+> +	 * Like qcom_scm_ice_set_key(), we use dma_alloc_coherent() to properly
+> +	 * get a physical address, while guaranteeing that we can zeroize the
+> +	 * key material later using memzero_explicit().
+> +	 *
+> +	 */
+> +	longterm_wrapped_keybuf = dma_alloc_coherent(__scm->dev,
+> +				  longterm_wrapped_key_size,
+> +				  &longterm_wrapped_key_phys, GFP_KERNEL);
+> +	if (!longterm_wrapped_keybuf)
+> +		return -ENOMEM;
+> +
+> +	desc.args[0] = longterm_wrapped_key_phys;
+> +
+> +	ret = qcom_scm_call(__scm->dev, &desc, NULL);
+> +	memcpy(longterm_wrapped_key, longterm_wrapped_keybuf,
+> +	       longterm_wrapped_key_size);
+
+The idiomatic way is to not touch the output buffer if the call fails,
+any particular reason for you to not follow this here?
+
+> +
+> +	memzero_explicit(longterm_wrapped_keybuf, longterm_wrapped_key_size);
+> +	dma_free_coherent(__scm->dev, longterm_wrapped_key_size,
+> +			  longterm_wrapped_keybuf, longterm_wrapped_key_phys);
+
+With better choice of variable names you might be able to leave this
+unwrapped (remember the guideline is 80, but you can go over that
+slightly if it benefits readability)
+
+> +
+> +	if (!ret)
+> +		return longterm_wrapped_key_size;
+
+It's also idiomatic to return early on errors. So please swap this
+around to make the successful exit at the end.
+
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(qcom_scm_generate_ice_key);
+> +
+> +/**
+> + * qcom_scm_prepare_ice_key() - Get per boot ephemeral wrapped key
+> + * @longterm_wrapped_key: the wrapped key
+> + * @longterm_wrapped_key_size: size of the wrapped key
+> + * @ephemeral_wrapped_key: ephemeral wrapped key to be returned
+> + * @ephemeral_wrapped_key_size: size of the ephemeral wrapped key
+> + *
+> + * Qualcomm wrapped keys (longterm keys) are rewrapped with a per-boot
+> + * ephemeral key for added protection. These are ephemeral in nature as
+> + * they are valid only for that boot. A create key IOCTL is used to
+> + * achieve this. These are the keys that are installed into the kernel
+> + * to be then unwrapped and programmed into ICE.
+> + *
+> + * This SCM call adds support for the create key IOCTL to interface
+> + * with the secure environment to rewrap the wrapped key with an
+> + * ephemeral wrapping key.
+> + *
+> + * Return: 0 on success; -errno on failure.
+> + */
+> +int qcom_scm_prepare_ice_key(const u8 *longterm_wrapped_key,
+> +			     u32 longterm_wrapped_key_size,
+> +			     u8 *ephemeral_wrapped_key,
+> +			     u32 ephemeral_wrapped_key_size)
+
+wrapped, wrapped_size, ephemeral, ephemeral_size perhaps?
+
+> +{
+> +	struct qcom_scm_desc desc = {
+> +		.svc = QCOM_SCM_SVC_ES,
+> +		.cmd =  QCOM_SCM_ES_PREPARE_ICE_KEY,
+> +		.arginfo = QCOM_SCM_ARGS(4, QCOM_SCM_RO,
+> +					 QCOM_SCM_VAL, QCOM_SCM_RW,
+> +					 QCOM_SCM_VAL),
+> +		.args[1] = longterm_wrapped_key_size,
+> +		.args[3] = ephemeral_wrapped_key_size,
+> +		.owner = ARM_SMCCC_OWNER_SIP,
+> +	};
+> +
+> +	void *longterm_wrapped_keybuf, *ephemeral_wrapped_keybuf;
+> +	dma_addr_t longterm_wrapped_key_phys, ephemeral_wrapped_key_phys;
+> +	int ret;
+> +
+> +	/*
+> +	 * Like qcom_scm_ice_set_key(), we use dma_alloc_coherent() to properly
+> +	 * get a physical address, while guaranteeing that we can zeroize the
+> +	 * key material later using memzero_explicit().
+> +	 *
+> +	 */
+> +	longterm_wrapped_keybuf = dma_alloc_coherent(__scm->dev,
+> +				  longterm_wrapped_key_size,
+> +				  &longterm_wrapped_key_phys, GFP_KERNEL);
+> +	if (!longterm_wrapped_keybuf)
+> +		return -ENOMEM;
+> +	ephemeral_wrapped_keybuf = dma_alloc_coherent(__scm->dev,
+> +				   ephemeral_wrapped_key_size,
+> +				   &ephemeral_wrapped_key_phys, GFP_KERNEL);
+> +	if (!ephemeral_wrapped_keybuf) {
+> +		ret = -ENOMEM;
+> +		goto bail_keybuf;
+> +	}
+> +
+> +	memcpy(longterm_wrapped_keybuf, longterm_wrapped_key,
+> +	       longterm_wrapped_key_size);
+> +	desc.args[0] = longterm_wrapped_key_phys;
+> +	desc.args[2] = ephemeral_wrapped_key_phys;
+> +
+> +	ret = qcom_scm_call(__scm->dev, &desc, NULL);
+> +	if (!ret)
+> +		memcpy(ephemeral_wrapped_key, ephemeral_wrapped_keybuf,
+> +		       ephemeral_wrapped_key_size);
+> +
+> +	memzero_explicit(ephemeral_wrapped_keybuf, ephemeral_wrapped_key_size);
+> +	dma_free_coherent(__scm->dev, ephemeral_wrapped_key_size,
+> +			  ephemeral_wrapped_keybuf,
+> +			  ephemeral_wrapped_key_phys);
+> +
+> +bail_keybuf:
+
+Which "key"?
+
+Perhaps
+
+err_free_longterm_buf:
+
+> +	memzero_explicit(longterm_wrapped_keybuf, longterm_wrapped_key_size);
+
+I don't see a reason to memzero_explicit(longterm_buf) in the
+bail_keybuf. Move this up and memzero_explicit() both buffers at the
+same time, then dma_free_coherent() them.
+
+> +	dma_free_coherent(__scm->dev, longterm_wrapped_key_size,
+> +			  longterm_wrapped_keybuf, longterm_wrapped_key_phys);
+> +
+> +	if (!ret)
+> +		return ephemeral_wrapped_key_size;
+
+As above, flip the two cases.
+
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(qcom_scm_prepare_ice_key);
+> +
+> +/**
+> + * qcom_scm_import_ice_key() - Import a wrapped key for encryption
+> + * @imported_key: the raw key that is imported
+> + * @imported_key_size: size of the key to be imported
+> + * @longterm_wrapped_key: the wrapped key to be returned
+> + * @longterm_wrapped_key_size: size of the wrapped key
+> + *
+> + * Conceptually, this is very similar to generate, the difference being,
+> + * here we want to import a raw key and return a longterm wrapped key
+> + * from it. THe same create key IOCTL is used to achieve this.
+> + *
+> + * This SCM call adds support for the create key IOCTL to interface with
+> + * the secure environment to import a raw key and generate a longterm
+> + * wrapped key.
+> + *
+> + * Return: 0 on success; -errno on failure.
+> + */
+> +int qcom_scm_import_ice_key(const u8 *imported_key, u32 imported_key_size,
+> +			    u8 *longterm_wrapped_key,
+> +			    u32 longterm_wrapped_key_size)
+
+Same thing with naming here, please.
+
+> +{
+> +	struct qcom_scm_desc desc = {
+> +		.svc = QCOM_SCM_SVC_ES,
+> +		.cmd =  QCOM_SCM_ES_IMPORT_ICE_KEY,
+> +		.arginfo = QCOM_SCM_ARGS(4, QCOM_SCM_RO,
+> +					 QCOM_SCM_VAL, QCOM_SCM_RW,
+> +					 QCOM_SCM_VAL),
+> +		.args[1] = imported_key_size,
+> +		.args[3] = longterm_wrapped_key_size,
+> +		.owner = ARM_SMCCC_OWNER_SIP,
+> +	};
+> +
+> +	void *imported_keybuf, *longterm_wrapped_keybuf;
+> +	dma_addr_t imported_key_phys, longterm_wrapped_key_phys;
+> +	int ret;
+
+Declaration above and comment below are two separate "paragraphs", so a
+empty line between them would be good.
+
+> +	/*
+> +	 * Like qcom_scm_ice_set_key(), we use dma_alloc_coherent() to properly
+> +	 * get a physical address, while guaranteeing that we can zeroize the
+> +	 * key material later using memzero_explicit().
+> +	 *
+> +	 */
+> +	imported_keybuf = dma_alloc_coherent(__scm->dev, imported_key_size,
+> +			  &imported_key_phys, GFP_KERNEL);
+> +	if (!imported_keybuf)
+> +		return -ENOMEM;
+> +	longterm_wrapped_keybuf = dma_alloc_coherent(__scm->dev,
+> +				  longterm_wrapped_key_size,
+> +				  &longterm_wrapped_key_phys, GFP_KERNEL);
+> +	if (!longterm_wrapped_keybuf) {
+> +		ret = -ENOMEM;
+> +		goto bail_keybuf;
+> +	}
+> +
+> +	memcpy(imported_keybuf, imported_key, imported_key_size);
+> +	desc.args[0] = imported_key_phys;
+> +	desc.args[2] = longterm_wrapped_key_phys;
+> +
+> +	ret = qcom_scm_call(__scm->dev, &desc, NULL);
+> +	if (!ret)
+> +		memcpy(longterm_wrapped_key, longterm_wrapped_keybuf,
+> +		       longterm_wrapped_key_size);
+> +
+> +	memzero_explicit(longterm_wrapped_keybuf, longterm_wrapped_key_size);
+> +	dma_free_coherent(__scm->dev, longterm_wrapped_key_size,
+> +			  longterm_wrapped_keybuf, longterm_wrapped_key_phys);
+> +bail_keybuf:
+> +	memzero_explicit(imported_keybuf, imported_key_size);
+
+As above, please move this together with the other memzero_explicit().
+
+> +	dma_free_coherent(__scm->dev, imported_key_size, imported_keybuf,
+> +			  imported_key_phys);
+> +
+> +	if (!ret)
+
+And flip these.
+
+Regards,
+Bjorn
