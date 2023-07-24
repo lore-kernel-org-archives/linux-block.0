@@ -2,141 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DE8C001B0
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jul 2023 18:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E2DC001DF
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jul 2023 19:05:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbjGXSEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jul 2023 14:04:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33544 "EHLO
+        id S230171AbjGXTFn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jul 2023 15:05:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjGXSEh (ORCPT
+        with ESMTP id S229479AbjGXTFn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jul 2023 14:04:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF7293
-        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 11:03:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690221830;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=h1iA/74VQWfwLwNThFZsLp7nijUvl29CDijMQU67cx0=;
-        b=JtgySdGtvJzvAl/8XlQ0oRwxq6e2Vs5MnTa5SA4LeSDkZYiZA6R5mIUyE2htQhaXypf8mn
-        pX4jbf5Vh+UIrGjOX5oNqVdrgJySfTEvnp/+4as9d5AVVjL+Bh7VZ8W1vEhbWHJsPSetNh
-        T/s1N49EB055xieYo+Uixaz5l4lQaXs=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-d2a4geNEPx-PxnfBeXESNg-1; Mon, 24 Jul 2023 14:03:48 -0400
-X-MC-Unique: d2a4geNEPx-PxnfBeXESNg-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-63cfe46bbb6so17162226d6.2
-        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 11:03:48 -0700 (PDT)
+        Mon, 24 Jul 2023 15:05:43 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5F9F10E3
+        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 12:05:41 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-346434c7793so4818365ab.0
+        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 12:05:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1690225541; x=1690830341;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=91UKxlfTSnaMbaW/apnz0nI/lJIYybDgXR1NhSsktZk=;
+        b=cDQElZRNq87SQfCS9Dne+S7r9rLW42GDYXw5tSMycErKtNWyKthcnMpirNMVQ/rCk8
+         gXLJ+yPlEZGfQ98tu5xlzJuWzGQSZxSW80bSwOVwEUV9wLa8Q7MYG96SO5HgmcpGnqd0
+         58TYTfEQajhQFpcI0iXKGzzQwlB8hvdSTbAxRjbqkJJnXnbbIkG4/xCFBzPOXQz9EXOQ
+         eRTvjOmrEW4LTzU99edjO+IKP7FrTbIkvUBkK3o4s/ZzWmW6WxVXYrMzU8PG2ttITTJW
+         b4sZ7VMI5FFhleDzbcm6eYVjbXlYD7/FTl8NQ9BlqH47VoRj2hjCTg8OtVRHk0dM1SPt
+         F/Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690221828; x=1690826628;
-        h=content-transfer-encoding:mime-version:user-agent:message-id
-         :in-reply-to:date:references:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=h1iA/74VQWfwLwNThFZsLp7nijUvl29CDijMQU67cx0=;
-        b=hAnvBke8BBImWF+wB2HMqHV+9lwfVJibM3Hu+Bgi75oCP+aC+gxttn30YevBTf25/P
-         K3rwyu/SL+gV0YwgCx8ShOUGmi1D9FjNAb3/+tYH3kyz5QzO03spqE3ijjMjJaFv0XyO
-         /idh0vsZNGxAqneAQA+d3Mt3NvTqVksuGnOZqmvxtX4oRtALqYArJV1gH7mLPkp3baqw
-         iKLjGInvn0nEtp03lDaWBfr2Gn4/dKZ45DKxMoagqmn0bnejk9LJVG56UjKD3JGqtQAO
-         ZKFBh1nwBh+VySnzdqE2Xm47bNq1PgnIi8J40BW6nbC3VUL99KUj0qUEOmM5xp2xlxs1
-         Jz+A==
-X-Gm-Message-State: ABy/qLb9nzsDNIwLJDANDjrHE5ioljZPQVppsb5kwtiZ9Gh4lR8E0lRH
-        FLztViXb2oFqPZ6rnkNsSQSa7O647f+ndVCo8InFhBzOKKHg+FhaiheVaZ/iT2nI1uZrobjzULl
-        0YiBtLu/oUIu4N3nH9V7IIEk=
-X-Received: by 2002:a0c:c541:0:b0:63c:7459:b24c with SMTP id y1-20020a0cc541000000b0063c7459b24cmr486057qvi.1.1690221827703;
-        Mon, 24 Jul 2023 11:03:47 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGDoVlS3FFXlpjdmnCPWfX8LPgwXcskuVzu4G58Z3n/2etCM1/Y+5M6HfC8yhSVC2CdnaBipg==
-X-Received: by 2002:a0c:c541:0:b0:63c:7459:b24c with SMTP id y1-20020a0cc541000000b0063c7459b24cmr486039qvi.1.1690221827407;
-        Mon, 24 Jul 2023 11:03:47 -0700 (PDT)
-Received: from crash (c-24-218-80-208.hsd1.ma.comcast.net. [24.218.80.208])
-        by smtp.gmail.com with ESMTPSA id f8-20020ac84708000000b00403ff38d855sm3500178qtp.4.2023.07.24.11.03.46
+        d=1e100.net; s=20221208; t=1690225541; x=1690830341;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=91UKxlfTSnaMbaW/apnz0nI/lJIYybDgXR1NhSsktZk=;
+        b=GN4EGnxJcW3Pr4D33ZszYz2fDgBV+3wOrGK9MINxJdz4jDQWHmlbE4XhmvPQHxSurQ
+         /7x0RwyYOhWEBtRDlzHyawG16j063ocRJmY7Id2FskJCKVntHpAtM1X5AkW/I75X/ns/
+         EHA8ERC4MdOUKSkrahwejD6Cb+4pNqRd0YJ/qQFEp4fmhnHCsogMS9h4q8Vy5W9kSmVp
+         CF0Tna3U04CPKLPLDBvNqKCAQ8sWFIIMIzxOoy7vVH4N+v6WYCc2z6/jDNJHmBOpjuBQ
+         lwKKK0QhRICKK1T5h+s8qK/OVXV3KU8aphIs1hiN4FKTM78ne384zobld6vtszef8/Jg
+         NmuQ==
+X-Gm-Message-State: ABy/qLamcb0ZWtoTjUuynoDmFogyIwgcaGG3ZMrUQudhqbL9nAM0HTGL
+        KOPKQuZx5C2+EhsCqAqoOT07LdAAzRJ56ait+JQ=
+X-Google-Smtp-Source: APBJJlFUfkHlhGh3mSIkfzh9CqDHODwY7OAbqHHbAELgK1Nf9+2y8hOsB7RyVkymzplCpcxfKZXIJg==
+X-Received: by 2002:a05:6e02:111:b0:346:3173:2374 with SMTP id t17-20020a056e02011100b0034631732374mr6872673ilm.0.1690225541041;
+        Mon, 24 Jul 2023 12:05:41 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id s16-20020a92d910000000b003425eeb2e17sm3216856iln.26.2023.07.24.12.05.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 11:03:46 -0700 (PDT)
-From:   Ken Raeburn <raeburn@redhat.com>
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        vdo-devel@redhat.com, tj@kernel.org, ebiggers@kernel.org
-Subject: Re: [vdo-devel] [PATCH v2 00/39] Add the dm-vdo deduplication and
- compression device mapper target.
-References: <20230523214539.226387-1-corwin@redhat.com>
-        <ZLa086NuWiMkJKJE@redhat.com>
-Date:   Mon, 24 Jul 2023 14:03:45 -0400
-In-Reply-To: <ZLa086NuWiMkJKJE@redhat.com> (Mike Snitzer's message of "Tue, 18
-        Jul 2023 11:51:15 -0400")
-Message-ID: <87mszl9ofy.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+        Mon, 24 Jul 2023 12:05:40 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20230721193647.3889634-1-sth@linux.ibm.com>
+References: <20230721193647.3889634-1-sth@linux.ibm.com>
+Subject: Re: [PATCH 0/4] dasd fixes
+Message-Id: <169022554025.491471.2398286190331067754.b4-ty@kernel.dk>
+Date:   Mon, 24 Jul 2023 13:05:40 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-099c9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-(Apologies for the re-send ... I neglected to turn of HTML and so
-linux-block bounced the email as spam.)
+On Fri, 21 Jul 2023 21:36:43 +0200, Stefan Haberland wrote:
+> please apply the following patches that fix some errors in the DASD device
+> driver. Thanks.
+> 
+> regards,
+> Stefan
+> 
+> Stefan Haberland (4):
+>   s390/dasd: fix hanging device after quiesce/resume
+>   s390/dasd: use correct number of retries for ERP requests
+>   s390/dasd: fix hanging device after request requeue
+>   s390/dasd: print copy pair message only for the correct error
+> 
+> [...]
 
-On Tue, Jul 18, 2023 at 11:51=E2=80=AFAM Mike Snitzer <snitzer@kernel.org> =
-wrote:
+Applied, thanks!
 
- But the long-standing dependency on VDO's work-queue data
- struct is still lingering (drivers/md/dm-vdo/work-queue.c). At a
- minimum we need to work toward pinning down _exactly_ why that is, and
- I think the best way to answer that is by simply converting the VDO
- code over to using Linux's workqueues.  If doing so causes serious
- inherent performance (or functionality) loss then we need to
- understand why -- and fix Linux's workqueue code accordingly. (I've
- cc'd Tejun so he is aware).
+[1/4] s390/dasd: fix hanging device after quiesce/resume
+      commit: 05f1d8ed03f547054efbc4d29bb7991c958ede95
+[2/4] s390/dasd: use correct number of retries for ERP requests
+      commit: acea28a6b74f458defda7417d2217b051ba7d444
+[3/4] s390/dasd: fix hanging device after request requeue
+      commit: 8a2278ce9c25048d999fe1a3561def75d963f471
+[4/4] s390/dasd: print copy pair message only for the correct error
+      commit: 856d8e3c633b183df23549ce760ae84478a7098d
 
-We tried this experiment and did indeed see some significant
-performance differences. Nearly a 7x slowdown in some cases.
+Best regards,
+-- 
+Jens Axboe
 
-VDO can be pretty CPU-intensive. In addition to hashing and
-compression, it scans some big in-memory data structures as part of
-the deduplication process. Some data structures are split across one
-or more "zones" to enable concurrency (usually split based on bits of
-an address or something like that), but some are not, and a couple of
-those threads can sometimes exceed 50% CPU utilization, even 90%
-depending on the system and test data configuration. (Usually this is
-while pushing over 1GB/s through the deduplication and compression
-processing on a system with fast storage. On a slow VM with spinning
-storage, the CPU load is much smaller.)
 
-We use a sort of message-passing arrangement where a worker thread is
-responsible for updating certain data structures as needed for the
-I/Os in progress, rather than having the processing of each I/O
-contend for locks on the data structures. It gives us some good
-throughput under load but it does mean upwards of a dozen handoffs per
-4kB write, depending on compressibility, whether the block is a
-duplicate, and various other factors. So processing 1 GB/s means
-handling over 3M messages per second, though each step of processing
-is generally lightweight. For our dedicated worker threads, it's not
-unusual for a thread to wake up and process a few tens or even
-hundreds of updates to its data structures (likely benefiting from CPU
-caching of the data structures) before running out of available work
-and going back to sleep.
-
-The experiment I ran was to create an ordered workqueue instead of
-each dedicated thread where we need serialization, and unordered
-workqueues when concurrency is allowed. On our slower test systems (>
-10y old Supermicro Xeon E5-1650 v2, RAID-0 storage using SSDs or
-HDDs), the slowdown was less significant (under 2x), but on our faster
-system (4-5? year old Supermicro 1029P-WTR, 2x Xeon Gold 6128 =3D 12
-cores, NVMe storage) we got nearly a 7x slowdown overall. I haven't
-yet dug deeply into _why_ the kernel work queues are slower in this
-sort of setup. I did run "perf top" briefly during one test with
-kernel work queues, and the largest single use of CPU cycles was in
-spin lock acquisition, but I didn't get call graphs.
-
-(This was with Fedora 37 6.2.12-200 and 6.2.15-200 kernels, without
-the latest submissions from Tejun, which look interesting. Though I
-suspect we care more about cache locality for some of our
-thread-specific data structures than for accessing the I/O
-structures.)
-
-Ken
 
