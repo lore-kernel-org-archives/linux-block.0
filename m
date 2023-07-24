@@ -2,41 +2,40 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 114A8C001DF
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jul 2023 16:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AC2C0015E
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jul 2023 16:54:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbjGXQyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jul 2023 12:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44092 "EHLO
+        id S231292AbjGXQyk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jul 2023 12:54:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231230AbjGXQyg (ORCPT
+        with ESMTP id S231228AbjGXQyj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jul 2023 12:54:36 -0400
+        Mon, 24 Jul 2023 12:54:39 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F71B1
-        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 09:54:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED0F10F5
+        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 09:54:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=vetIgRUHufwzeRnjuJRycXGyA7SLucCmRaJ2A15U1u8=; b=xSkP9s5cnMw2rm25qOatBP0QlI
-        se9gm7sy3SBWozr3rlLVXieAGQnHKRnzID/YgcLLs/b1VLKHs5RCZDiZBT+H+xLxrfS/JSU9zGjbV
-        2idcuJfhVgMBqd7wAav2OynKlQ+ERyubjCWToA1xvVnZLKCn5Y61e1iQofYI4yV8KiGnxv27Om1Lb
-        97/CwqLkAxINcCaJbp1fiO2V3N/NOftuJXkdkCbVSD9EI/C2N6zEHDSk5UjAGnu1Fo0CXEXTN+KEX
-        z2oICr2dnUENcr8QgixWbjXQxS12gfWlnWOKMM5q47Pe9ffs+ior/+l+GPrsbs2LSVdtnur37gVPz
-        HrHfSk4g==;
+        bh=+wZ6RZIImLBGbn4gu+hmurcknkaqcxp6cNAZ4SE8xjs=; b=bwaSONhL3b8YYZoKbwAnmCQFB7
+        bHxzp2mzcJauWLwMxetkGm8b0fUrNX6RRgW+bA+vBlUJUlHH23p8K2lB66gk+t72T3Gy2I5DRQgjw
+        nTeJukBiqZ1HOVIQF2mTiACya0e68CT/sStfUAbb1WERFG1xdue/jyiTGfT3ziq3ZhcCjigxHiI4l
+        /AHbJWGqVFmrltEUVEoOKSUC75LpRAWNKS77zeCv+4OUhC4y1MnuTJ4AgpqPsLJga4OMoMHYVr+57
+        xjqTWJIH/Ejok6W/+NC1xnatVWxy9tlB/1z8eDGBNYs5XkEew15BkJZxoulbp5ch15WRLsNJUX1Bh
+        SBu4JmMQ==;
 Received: from 67-207-104-238.static.wiline.com ([67.207.104.238] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qNypO-004vuJ-0a;
-        Mon, 24 Jul 2023 16:54:34 +0000
+        id 1qNypP-004vvB-0B;
+        Mon, 24 Jul 2023 16:54:37 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Jinyoung Choi <j-young.choi@samsung.com>,
-        linux-block@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 4/8] block: move the bi_vcnt check out of __bio_try_merge_page
-Date:   Mon, 24 Jul 2023 09:54:29 -0700
-Message-Id: <20230724165433.117645-5-hch@lst.de>
+        linux-block@vger.kernel.org
+Subject: [PATCH 8/8] block: don't pass a bio to bio_try_merge_hw_seg
+Date:   Mon, 24 Jul 2023 09:54:33 -0700
+Message-Id: <20230724165433.117645-9-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230724165433.117645-1-hch@lst.de>
 References: <20230724165433.117645-1-hch@lst.de>
@@ -47,89 +46,65 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move the bi_vcnt out of __bio_try_merge_page and into the two callers
-that don't already have it in preparation for additional changes to
-__bio_try_merge_page.
+There is no good reason to pass the bio to bio_try_merge_hw_seg.  Just
+pass the current bvec and rename the function to bvec_try_merge_hw_page.
+This will allow reusing this function for supporting multi-page integrity
+payload bvecs.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jinyoung Choi <j-young.choi@samsung.com>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/bio.c | 45 ++++++++++++++++++++++-----------------------
- 1 file changed, 22 insertions(+), 23 deletions(-)
+ block/bio.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 3ac72e60e7f11c..3dcbe98580dcef 100644
+index 23b7a001b5005d..c92dda962449b0 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -945,20 +945,17 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
- static bool __bio_try_merge_page(struct bio *bio, struct page *page,
- 		unsigned int len, unsigned int off, bool *same_page)
+@@ -934,11 +934,10 @@ static bool bvec_try_merge_page(struct bio_vec *bv, struct page *page,
+  * size limit.  This is not for normal read/write bios, but for passthrough
+  * or Zone Append operations that we can't split.
+  */
+-static bool bio_try_merge_hw_seg(struct request_queue *q, struct bio *bio,
+-				 struct page *page, unsigned len,
+-				 unsigned offset, bool *same_page)
++static bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
++		struct page *page, unsigned len, unsigned offset,
++		bool *same_page)
  {
--	if (bio->bi_vcnt > 0) {
--		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+-	struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+ 	unsigned long mask = queue_segment_boundary(q);
+ 	phys_addr_t addr1 = page_to_phys(bv->bv_page) + bv->bv_offset;
+ 	phys_addr_t addr2 = page_to_phys(page) + offset + len - 1;
+@@ -967,8 +966,6 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
+ 		struct page *page, unsigned int len, unsigned int offset,
+ 		unsigned int max_sectors, bool *same_page)
+ {
+-	struct bio_vec *bvec;
 -
--		if (page_is_mergeable(bv, page, len, off, same_page)) {
--			if (bio->bi_iter.bi_size > UINT_MAX - len) {
--				*same_page = false;
--				return false;
--			}
--			bv->bv_len += len;
--			bio->bi_iter.bi_size += len;
--			return true;
--		}
-+	struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
-+
-+	if (!page_is_mergeable(bv, page, len, off, same_page))
-+		return false;
-+	if (bio->bi_iter.bi_size > UINT_MAX - len) {
-+		*same_page = false;
-+		return false;
- 	}
--	return false;
-+	bv->bv_len += len;
-+	bio->bi_iter.bi_size += len;
-+	return true;
- }
- 
- /*
-@@ -1127,11 +1124,13 @@ int bio_add_page(struct bio *bio, struct page *page,
  	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
  		return 0;
  
--	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
--		if (bio_full(bio, len))
--			return 0;
--		__bio_add_page(bio, page, len, offset);
--	}
-+	if (bio->bi_vcnt > 0 &&
-+	    __bio_try_merge_page(bio, page, len, offset, &same_page))
-+		return len;
-+
-+	if (bio_full(bio, len))
-+		return 0;
-+	__bio_add_page(bio, page, len, offset);
- 	return len;
- }
- EXPORT_SYMBOL(bio_add_page);
-@@ -1205,13 +1204,13 @@ static int bio_iov_add_page(struct bio *bio, struct page *page,
- {
- 	bool same_page = false;
- 
--	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
--		__bio_add_page(bio, page, len, offset);
-+	if (bio->bi_vcnt > 0 &&
-+	    __bio_try_merge_page(bio, page, len, offset, &same_page)) {
-+		if (same_page)
-+			bio_release_page(bio, page);
+@@ -976,7 +973,9 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
  		return 0;
+ 
+ 	if (bio->bi_vcnt > 0) {
+-		if (bio_try_merge_hw_seg(q, bio, page, len, offset,
++		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
++
++		if (bvec_try_merge_hw_page(q, bv, page, len, offset,
+ 				same_page)) {
+ 			bio->bi_iter.bi_size += len;
+ 			return len;
+@@ -990,8 +989,7 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
+ 		 * If the queue doesn't support SG gaps and adding this segment
+ 		 * would create a gap, disallow it.
+ 		 */
+-		bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
+-		if (bvec_gap_to_prev(&q->limits, bvec, offset))
++		if (bvec_gap_to_prev(&q->limits, bv, offset))
+ 			return 0;
  	}
--
--	if (same_page)
--		bio_release_page(bio, page);
-+	__bio_add_page(bio, page, len, offset);
- 	return 0;
- }
  
 -- 
 2.39.2
