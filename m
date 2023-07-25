@@ -2,146 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64595EB64DD
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 05:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9ABC001DE
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 09:58:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbjGYFSt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jul 2023 01:18:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41042 "EHLO
+        id S233476AbjGYJ6I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jul 2023 05:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjGYFSs (ORCPT
+        with ESMTP id S233616AbjGYJ6G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jul 2023 01:18:48 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51741736
-        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 22:18:44 -0700 (PDT)
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230725051840epoutp04a1d71a20a7e0659d21bd849fb1b3fea5~1BKAf7yID0196601966epoutp041
-        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 05:18:40 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230725051840epoutp04a1d71a20a7e0659d21bd849fb1b3fea5~1BKAf7yID0196601966epoutp041
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1690262320;
-        bh=+rtM1aYdkwBMTDQFePMCBtN59+CcRMnrphsS+pdR4Kc=;
-        h=Subject:Reply-To:From:To:CC:Date:References:From;
-        b=FblWcX20dUOQtMjzgQUzH7AFasKoPk7Wk6UL7fjReIApxQ5a0jXWL7Kk6/jMnqdwA
-         SPBp2mH+n5TQGedit8B/CeQ3r+MVyVhXP2tBrkZbtRNG5ynKh5ZAsX40f2fx/LP9kf
-         X7uYTuPILNuj1t+HzfqclkIi4mLYX6T3W+g99apI=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
-        20230725051840epcas2p310fa83ea1083369015ccb5e13d45a280~1BKAO7b0d0386503865epcas2p31;
-        Tue, 25 Jul 2023 05:18:40 +0000 (GMT)
-Received: from epsmges2p2.samsung.com (unknown [182.195.36.70]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4R950c1jfwz4x9Py; Tue, 25 Jul
-        2023 05:18:40 +0000 (GMT)
-X-AuditID: b6c32a46-6fdfa70000009cc5-66-64bf5b30ec94
-Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
-        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C7.26.40133.03B5FB46; Tue, 25 Jul 2023 14:18:40 +0900 (KST)
-Mime-Version: 1.0
-Subject: [PATCH] block: cleanup bio_integrity_prep
-Reply-To: j-young.choi@samsung.com
-Sender: Jinyoung Choi <j-young.choi@samsung.com>
-From:   Jinyoung Choi <j-young.choi@samsung.com>
-To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        Tue, 25 Jul 2023 05:58:06 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DD1910F8;
+        Tue, 25 Jul 2023 02:57:58 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1qOEni-0000Af-Ig; Tue, 25 Jul 2023 11:57:54 +0200
+Message-ID: <5ce5b89e-3ea7-318a-1234-279ec92ffb8b@leemhuis.info>
+Date:   Tue, 25 Jul 2023 11:57:53 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: NFS workload leaves nfsd threads in D state
+Content-Language: en-US, de-DE
+To:     Chuck Lever III <chuck.lever@oracle.com>,
+        Chengming Zhou <chengming.zhou@linux.dev>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa@epcms2p8>
-Date:   Tue, 25 Jul 2023 14:18:39 +0900
-X-CMS-MailID: 20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Chuck Lever <cel@kernel.org>,
+        Linux kernel regressions list <regressions@lists.linux.dev>
+References: <7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com>
+ <20230710075634.GA30120@lst.de>
+ <3F16A14B-F854-41CC-A3CA-87C7946FC277@oracle.com>
+ <F610D6B3-876F-4E5D-A3C4-A30F1B81D9B5@oracle.com>
+ <20230710172839.GA7190@lst.de>
+ <0F9A70B1-C6AE-4A8B-8A4B-8DC9ADED73AB@oracle.com>
+ <20230711120137.GA27050@lst.de>
+ <82cb9937-bd11-64a9-2520-bf3cf81ec720@linux.dev>
+ <92CC9151-0309-41E9-920E-A549E2A73BE4@oracle.com>
+From:   "Linux regression tracking (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+In-Reply-To: <92CC9151-0309-41E9-920E-A549E2A73BE4@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpkk+LIzCtJLcpLzFFi42LZdljTVNcgen+KwZFDnBar7/azWbw8pGmx
-        cvVRJove/q1sFntvaVtc3jWHzWL58X9MDuwel8+Weuy+2cDm8fHpLRaPvi2rGD0+b5ILYI3K
-        tslITUxJLVJIzUvOT8nMS7dV8g6Od443NTMw1DW0tDBXUshLzE21VXLxCdB1y8wBukFJoSwx
-        pxQoFJBYXKykb2dTlF9akqqQkV9cYquUWpCSU2BeoFecmFtcmpeul5daYmVoYGBkClSYkJ1x
-        cOdS1oJe3opDH7exNzAe5upi5OSQEDCRuHjlKWMXIxeHkMAORomNR6+xdzFycPAKCEr83SEM
-        UiMsYCTRv3cRC4gtJKAkcW7NLEaIuIFEy+02sDibgJ7Ejue72UHmiAgsZ5Q4vP4mWBGzQJTE
-        2kNH2SGW8UrMaH/KAmFLS2xfvpURwtaQ+LGslxnCFpW4ufotO4z9/th8qBoRidZ7Z6FqBCUe
-        /NwNFZeUOHToKxvIzRIC+RIbDgRChGsk2n69hyrXl7jWsRFsLa+Ar8S5/QfB4iwCqhJTdn+F
-        GuMi8eXrYlaIk+Ultr+dwwwykllAU2L9Ln2I6coSR26xQFTwSXQc/gv3VMPG31jZO+Y9YYJo
-        VZNY1GQEEZaR+Hp4PvsERqVZiGCehWTtLIS1CxiZVzGKpRYU56anFhsVGMFjNjk/dxMjOC1q
-        ue1gnPL2g94hRiYOxkOMEhzMSiK8hjH7UoR4UxIrq1KL8uOLSnNSiw8xmgI9PJFZSjQ5H5iY
-        80riDU0sDUzMzAzNjUwNzJXEee+1zk0REkhPLEnNTk0tSC2C6WPi4JRqYJpb9urN9Pp0Wfbt
-        5pGvJ++fzHPjV+vMy/Wc+7pudD9tfLie4XpYfnGU1IQTs75/W/AtWmlNnGDfyh3fO+K/TU1m
-        6X0V13LfZG+P8JTyr6vMrNbs9z20e95mfgaRkzdfzmNe+nmvQfZ6xaZce+3qgne5hS7y7n+n
-        TPquUP0oN413+SOuKU9nGq5becq4O8Yr8l1PTBxr4YIAj97H1x5qfatquvMnbYKgf9ct0ewd
-        HJK7NKb6Vf3LTjZ+8P3TLweLAwrLz8X16M5cqxnF4TnBWi5Yr/BI4lbG0Ek8NedOrGFSmLlr
-        Uf1pqUSW+5Jdt6cVGMf3tviz3H992rrznlC1UO1i7Vu+Wgu9KuQm3eqb+VSJpTgj0VCLuag4
-        EQAbn+gIFAQAAA==
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa
-References: <CGME20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa@epcms2p8>
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1690279078;391d52a8;
+X-HE-SMSGID: 1qOEni-0000Af-Ig
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If a problem occurs in the process of creating an integrity payload, the
-status of bio is always BLK_STS_RESOURCE.
+On 12.07.23 15:29, Chuck Lever III wrote:
+>> On Jul 12, 2023, at 7:34 AM, Chengming Zhou <chengming.zhou@linux.dev> wrote:
+>> On 2023/7/11 20:01, Christoph Hellwig wrote:
+>>> On Mon, Jul 10, 2023 at 05:40:42PM +0000, Chuck Lever III wrote:
+>>>>> blk_rq_init_flush(rq);
+>>>>> - rq->flush.seq |= REQ_FSEQ_POSTFLUSH;
+>>>>> + rq->flush.seq |= REQ_FSEQ_PREFLUSH;
+>>>>> spin_lock_irq(&fq->mq_flush_lock);
+>>>>> list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
+>>>>> spin_unlock_irq(&fq->mq_flush_lock);
+>>>>
+>>>> Thanks for the quick response. No change.
+>>> I'm a bit lost and still can't reprodce.  Below is a patch with the
+>>> only behavior differences I can find.  It has two "#if 1" blocks,
+>>> which I'll need to bisect to to find out which made it work (if any,
+>>> but I hope so).
+>>
+>> I tried today to reproduce, but can't unfortunately.
+>>
+>> Could you please also try the fix patch [1] from Ross Lagerwall that fixes
+>> IO hung problem of plug recursive flush?
+>>
+>> (Since the main difference is that post-flush requests now can go into plug.)
+>>
+>> [1] https://lore.kernel.org/all/20230711160434.248868-1-ross.lagerwall@citrix.com/
+> 
+> Thanks for the suggestion. No change, unfortunately.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
----
- block/bio-integrity.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+Chuck, what's the status here? This thread looks stalled, that's why I
+wonder.
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 8f0af7ac8573..045553a164e0 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -199,7 +199,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	unsigned long start, end;
- 	unsigned int len, nr_pages;
- 	unsigned int bytes, offset, i;
--	blk_status_t status;
- 
- 	if (!bi)
- 		return true;
-@@ -227,7 +226,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	/* Allocate kernel buffer for protection data */
- 	len = bio_integrity_bytes(bi, bio_sectors(bio));
- 	buf = kmalloc(len, GFP_NOIO);
--	status = BLK_STS_RESOURCE;
- 	if (unlikely(buf == NULL)) {
- 		printk(KERN_ERR "could not allocate integrity buffer\n");
- 		goto err_end_io;
-@@ -242,7 +240,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	if (IS_ERR(bip)) {
- 		printk(KERN_ERR "could not allocate data integrity bioset\n");
- 		kfree(buf);
--		status = BLK_STS_RESOURCE;
- 		goto err_end_io;
- 	}
- 
-@@ -270,7 +267,6 @@ bool bio_integrity_prep(struct bio *bio)
- 
- 		if (ret == 0) {
- 			printk(KERN_ERR "could not attach integrity payload\n");
--			status = BLK_STS_RESOURCE;
- 			goto err_end_io;
- 		}
- 
-@@ -292,7 +288,7 @@ bool bio_integrity_prep(struct bio *bio)
- 	return true;
- 
- err_end_io:
--	bio->bi_status = status;
-+	bio->bi_status = BLK_STS_RESOURCE;
- 	bio_endio(bio);
- 	return false;
- 
--- 
-2.34.1
+FWIW, I noticed a commit with a Fixes: tag for your culprit in next (see
+28b24123747098 ("blk-flush: fix rq->flush.seq for post-flush
+requests")). But unless I missed something you are not CCed, so I guess
+that's a different issue?
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
+
+#regzbot poke
