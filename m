@@ -2,89 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C03C0015E
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 13:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E7A7C001DF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 14:10:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230482AbjGYNeq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jul 2023 09:34:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60588 "EHLO
+        id S230154AbjGYOKK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jul 2023 10:10:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230484AbjGYNep (ORCPT
+        with ESMTP id S231226AbjGYOKK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jul 2023 09:34:45 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC791BC3;
-        Tue, 25 Jul 2023 06:34:43 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qOIBR-000258-7S; Tue, 25 Jul 2023 15:34:37 +0200
-Message-ID: <da198f52-f699-00f6-cd77-366adc4bbdc9@leemhuis.info>
-Date:   Tue, 25 Jul 2023 15:34:36 +0200
+        Tue, 25 Jul 2023 10:10:10 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194341FC9;
+        Tue, 25 Jul 2023 07:10:07 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.55])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4R9Jmb2zpXz1GDLD;
+        Tue, 25 Jul 2023 22:09:03 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 25 Jul
+ 2023 22:09:54 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <philipp.reisner@linbit.com>, <lars.ellenberg@linbit.com>,
+        <christoph.boehmwalder@linbit.com>, <axboe@kernel.dk>
+CC:     <drbd-dev@lists.linbit.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] drbd: Remove unsued extern declarations
+Date:   Tue, 25 Jul 2023 22:09:44 +0800
+Message-ID: <20230725140944.21300-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: NFS workload leaves nfsd threads in D state
-Content-Language: en-US, de-DE
-To:     Chuck Lever III <chuck.lever@oracle.com>,
-        Linux regressions mailing list <regressions@lists.linux.dev>
-Cc:     Chengming Zhou <chengming.zhou@linux.dev>,
-        Christoph Hellwig <hch@lst.de>,
-        "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Chuck Lever <cel@kernel.org>
-References: <7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com>
- <20230710075634.GA30120@lst.de>
- <3F16A14B-F854-41CC-A3CA-87C7946FC277@oracle.com>
- <F610D6B3-876F-4E5D-A3C4-A30F1B81D9B5@oracle.com>
- <20230710172839.GA7190@lst.de>
- <0F9A70B1-C6AE-4A8B-8A4B-8DC9ADED73AB@oracle.com>
- <20230711120137.GA27050@lst.de>
- <82cb9937-bd11-64a9-2520-bf3cf81ec720@linux.dev>
- <92CC9151-0309-41E9-920E-A549E2A73BE4@oracle.com>
- <5ce5b89e-3ea7-318a-1234-279ec92ffb8b@leemhuis.info>
- <73D6DC23-297A-4802-9925-1C94BB14FFF8@oracle.com>
-From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <73D6DC23-297A-4802-9925-1C94BB14FFF8@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1690292083;5fa3955d;
-X-HE-SMSGID: 1qOIBR-000258-7S
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25.07.23 15:21, Chuck Lever III wrote:
->> On Jul 25, 2023, at 5:57 AM, Linux regression tracking (Thorsten Leemhuis) <regressions@leemhuis.info> wrote:
->>
->> On 12.07.23 15:29, Chuck Lever III wrote:
->>>> On Jul 12, 2023, at 7:34 AM, Chengming Zhou <chengming.zhou@linux.dev> wrote:
->>>> On 2023/7/11 20:01, Christoph Hellwig wrote:
->>>>> On Mon, Jul 10, 2023 at 05:40:42PM +0000, Chuck Lever III wrote:
->>
->> Chuck, what's the status here? This thread looks stalled, that's why I
->> wonder.
->>
->> FWIW, I noticed a commit with a Fixes: tag for your culprit in next (see
->> 28b24123747098 ("blk-flush: fix rq->flush.seq for post-flush
->> requests")). But unless I missed something you are not CCed, so I guess
->> that's a different issue?
-> 
-> This issue was fixed in 6.5-rc2 by commit
-> 
-> 9f87fc4d72f5 ("block: queue data commands from the flush state machine at the head")
+These are not used anymore, so remove it.
 
-Ahh, many thx for the update, it lacked a proper Link:/Closes: tag and
-mentioned another culprit, so I had missed that!
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/block/drbd/drbd_int.h | 6 ------
+ 1 file changed, 6 deletions(-)
 
-#regzbot fix: 9f87fc4d72f5
-#regzbot ignore-activity
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index a30a5ed811be..11619b648598 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -1388,9 +1388,6 @@ extern void conn_free_crypto(struct drbd_connection *connection);
+ extern void do_submit(struct work_struct *ws);
+ extern void __drbd_make_request(struct drbd_device *, struct bio *);
+ void drbd_submit_bio(struct bio *bio);
+-extern int drbd_read_remote(struct drbd_device *device, struct drbd_request *req);
+-extern int is_valid_ar_handle(struct drbd_request *, sector_t);
+-
+ 
+ /* drbd_nl.c */
+ 
+@@ -1472,7 +1469,6 @@ extern int w_resync_timer(struct drbd_work *, int);
+ extern int w_send_write_hint(struct drbd_work *, int);
+ extern int w_send_dblock(struct drbd_work *, int);
+ extern int w_send_read_req(struct drbd_work *, int);
+-extern int w_e_reissue(struct drbd_work *, int);
+ extern int w_restart_disk_io(struct drbd_work *, int);
+ extern int w_send_out_of_sync(struct drbd_work *, int);
+ 
+@@ -1486,7 +1482,6 @@ extern int drbd_issue_discard_or_zero_out(struct drbd_device *device,
+ 		sector_t start, unsigned int nr_sectors, int flags);
+ extern int drbd_receiver(struct drbd_thread *thi);
+ extern int drbd_ack_receiver(struct drbd_thread *thi);
+-extern void drbd_send_ping_wf(struct work_struct *ws);
+ extern void drbd_send_acks_wf(struct work_struct *ws);
+ extern bool drbd_rs_c_min_rate_throttle(struct drbd_device *device);
+ extern bool drbd_rs_should_slow_down(struct drbd_peer_device *peer_device, sector_t sector,
+@@ -1502,7 +1497,6 @@ extern void __drbd_free_peer_req(struct drbd_device *, struct drbd_peer_request
+ #define drbd_free_peer_req(m,e) __drbd_free_peer_req(m, e, 0)
+ #define drbd_free_net_peer_req(m,e) __drbd_free_peer_req(m, e, 1)
+ extern struct page *drbd_alloc_pages(struct drbd_peer_device *, unsigned int, bool);
+-extern void drbd_set_recv_tcq(struct drbd_device *device, int tcq_enabled);
+ extern void _drbd_clear_done_ee(struct drbd_device *device, struct list_head *to_be_freed);
+ extern int drbd_connected(struct drbd_peer_device *);
+ 
+-- 
+2.34.1
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
