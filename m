@@ -2,93 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1EBC001B0
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 01:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90FD8EB64DD
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 01:55:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbjGYBlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jul 2023 21:41:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51910 "EHLO
+        id S229483AbjGYBzg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jul 2023 21:55:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjGYBlr (ORCPT
+        with ESMTP id S229475AbjGYBzf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jul 2023 21:41:47 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BFDF171E
-        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 18:41:44 -0700 (PDT)
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230725014141epoutp042a1674f41c8c53e77aa6aa4f02e86f9b~0_MjaDIQh2604426044epoutp04v
-        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 01:41:41 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230725014141epoutp042a1674f41c8c53e77aa6aa4f02e86f9b~0_MjaDIQh2604426044epoutp04v
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1690249301;
-        bh=oOF8MuPYOH2An8FWy5GwcVNNVNFi8i99I8IMaZDpLXQ=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=CyNJCmxztUx95u5gXUWHC7b9++9vIKpouFeJgThXR474Ne9clfpYvKxM70MGwZPqz
-         MKYjeUNj4lCK+fD2cbxKWHl58xhvtYbnm7QqTLj9heNXnPuQMcHlkcdDUk00Aiw8di
-         Wgoiwl4q0NzVv4n+fr4w0gweDE5Np+Va3XhDrznM=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20230725014141epcas2p2cb1a8a0265705d37b1bd68ccac92858f~0_MjHakEO2590825908epcas2p2z;
-        Tue, 25 Jul 2023 01:41:41 +0000 (GMT)
-Received: from epsmges2p4.samsung.com (unknown [182.195.36.88]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4R90BF0Twdz4x9Q0; Tue, 25 Jul
-        2023 01:41:41 +0000 (GMT)
-X-AuditID: b6c32a48-87fff70000007e89-f7-64bf2854e9b8
-Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
-        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
-        15.0E.32393.4582FB46; Tue, 25 Jul 2023 10:41:40 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE: [PATCH 1/8] block: tidy up the bio full checks in
- bio_add_hw_page
-Reply-To: j-young.choi@samsung.com
-Sender: Jinyoung Choi <j-young.choi@samsung.com>
-From:   Jinyoung Choi <j-young.choi@samsung.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20230724165433.117645-2-hch@lst.de>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20230725014140epcms2p85f29d559a650738c209603e77862b145@epcms2p8>
-Date:   Tue, 25 Jul 2023 10:41:40 +0900
-X-CMS-MailID: 20230725014140epcms2p85f29d559a650738c209603e77862b145
-Content-Transfer-Encoding: 7bit
+        Mon, 24 Jul 2023 21:55:35 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A941B3
+        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 18:55:34 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6862d4a1376so1315849b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 18:55:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1690250134; x=1690854934;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6cBepQv2rYb+u+PtN89bpiMsnePTkqZHLxrrc/RMIDE=;
+        b=h4+CnGyMb2DcLlUz2t1TQXHRikkkEjKtgHao96gjDQwfhlQsk8JEfp1fPmkcjWQJiG
+         oruYQQrsB1XnTx7dX8EzWNhLezhmGq2k0l4UFtvzXXt/Ogjqoxg86e2gF2WLV34RKGLP
+         5QZD2uAa4Hb3L6qAjq7f6g8TBpJdi9dHBtSdIpXtjLHXwKu81QYjWPqFByxCY50gnEdw
+         Zmh2oQShNbRKRHcjsooKq44JlCyKkm/0JPm1SCtdEhIQqAK51qjrCXVk/9uAcHHYmHh4
+         nGvT82uAhMC2BOJHbctL2UM7D4fjVzWdG9HoEF6BTpTTvFqbBzSWzm7wQklSQeKvBRy9
+         6sOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690250134; x=1690854934;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6cBepQv2rYb+u+PtN89bpiMsnePTkqZHLxrrc/RMIDE=;
+        b=Nh6TVQaVrwyDcN5UKlCHMPxv2AO9BAXGE0ZtqloW/SCfHRemI6M+XqestcuBYPvUNO
+         cC5cgREy/JWfiwzlFj/W9JPcyUzqO049grvczd0Yi97ghPl5VvF2zC5wenHLlyfsLHBq
+         pOv5+pVytSfamBIs24+edw69PQOkA+FEjQ4yIw1Wp4Dtyd90sBmVHEjbKVisLd05mvCM
+         ue2mtEGUtpkM6xudcnnL5qAX+xDhOdHcZW2hoqNnboLto9pqNmip+TpQegok69xRFg8a
+         adiwKP9WAWUQKhu647d++W8qT2aupua6SLdxZ7dFZ9s7UecIBnZSIv/fsnhz9adgpfGC
+         xruQ==
+X-Gm-Message-State: ABy/qLYdK+YYdfTjuTCC6JBiIhEhpcS6+BJNhLRst5r5asT85Hc7r9p/
+        Sxfh2HGiPGBjIxfyAl4LVlIInQ==
+X-Google-Smtp-Source: APBJJlHhe4wdVKxIBHZfXJfyifsd5/u4IVcrnldQs8jNao2U7ThOL4AWQ/iy3otPHcXBzbhMljoA3g==
+X-Received: by 2002:a05:6a00:a29:b0:681:9fe0:b543 with SMTP id p41-20020a056a000a2900b006819fe0b543mr13917969pfh.2.1690250133755;
+        Mon, 24 Jul 2023 18:55:33 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id q23-20020a62e117000000b00682af93093csm8318563pfh.80.2023.07.24.18.55.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 18:55:33 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jinyoung Choi <j-young.choi@samsung.com>,
+        linux-block@vger.kernel.org
+In-Reply-To: <20230724165433.117645-1-hch@lst.de>
+References: <20230724165433.117645-1-hch@lst.de>
+Subject: Re: rationalize the flow in bio_add_page and friends v2
+Message-Id: <169025013296.651134.9648547388592226654.b4-ty@kernel.dk>
+Date:   Mon, 24 Jul 2023 19:55:32 -0600
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrJKsWRmVeSWpSXmKPExsWy7bCmhW6Ixv4Ug6v3rC1W3+1ns3h5SNNi
-        5eqjTBZ7b2k7sHhcPlvqsftmA5tH35ZVjB6fN8kFsERl22SkJqakFimk5iXnp2TmpdsqeQfH
-        O8ebmhkY6hpaWpgrKeQl5qbaKrn4BOi6ZeYA7VNSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX
-        2CqlFqTkFJgX6BUn5haX5qXr5aWWWBkaGBiZAhUmZGdcfnWZscCnYkbTROYGRocuRk4OCQET
-        iWXzljJ3MXJxCAnsYJQ4e3YeYxcjBwevgKDE3x3CIKawQIDEk8uMIOVCAkoS59bMArOFBQwk
-        Wm63sYDYbAJ6Ejue72YHsUUEHCRmb1jKBmIzC9hL7L3dygixildiRvtTFghbWmL78q1gcU4B
-        Q4nbt1azQ8Q1JH4s62WGsEUlbq5+yw5jvz82H2qOiETrvbNQNYISD37uhopLShw69JUN5GQJ
-        gXyJDQcCIcI1Em2/3kOV60tc69gIdgKvgK/ErZNTwFpZBFQldsyexARR4yKx5e4tZojz5SW2
-        v53DDDKSWUBTYv0ufYjpyhJHbrFAVPBJdBz+yw7zYMPG31jZO+Y9YYJoVZNY1GQ0gVF5FiKQ
-        ZyFZNQth1QJG5lWMYqkFxbnpqcVGBSbwWE3Oz93ECE5zWh47GGe//aB3iJGJg/EQowQHs5II
-        r2HMvhQh3pTEyqrUovz4otKc1OJDjKZAT05klhJNzgcm2rySeEMTSwMTMzNDcyNTA3Mlcd57
-        rXNThATSE0tSs1NTC1KLYPqYODilGph68+bnPtnzPXXVgSXWH29W/T0Rs/zegoOTNwp/3my5
-        4th/c+trnnFMwhGL95geman08XRuXulr0buXl4VclTB8zPbvw/2s604JThzvNla/1bXR3Gt2
-        pjd99r8fht5v1SQ/RGr23f3+POXQG2PVtrSN+yf/XPGr/PGlZ7c37rBfJWW01l76T03r/12q
-        KhOO9xjNKZfIvRbkvmlKifHFCys2PMsOZbsbsfu0vc3kxfpZNssqvL6eveNq8nj+BfmCLx37
-        V8pNDgkR2HPggZcn463vs75aKCzoW2nr+ujYI7bjy0QuVxwSZwnoM5eePo/7/5mAA+KXX8wQ
-        ac8Tij86f+qexVdnfnN7OeuVX4p8uf9OdT0lluKMREMt5qLiRAAuHN6j/AMAAA==
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230724165440epcas2p1f17d8a23f72ff5016eed8cdbd28005cb
-References: <20230724165433.117645-2-hch@lst.de>
-        <20230724165433.117645-1-hch@lst.de>
-        <CGME20230724165440epcas2p1f17d8a23f72ff5016eed8cdbd28005cb@epcms2p8>
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-099c9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good to me,
 
-Reviewed-by: Jinyoung Choi <j-young.choi@samsung.com>
+On Mon, 24 Jul 2023 09:54:25 -0700, Christoph Hellwig wrote:
+> when reviewing v2 of Jinyoung's "Change the integrity configuration
+> method in block" series I noticed that someone made a complete mess of
+> the bio_add_page flow, so this untangles this to make the code better
+> reusable for adding integrity payloads.  (I'll also have a word with
+> younger me when I get the chance about this..)
+> 
+> Changes since v1:
+>  - rebased against the current for-6.6/block tree
+> 
+> [...]
+
+Applied, thanks!
+
+[1/8] block: tidy up the bio full checks in bio_add_hw_page
+      commit: cd1d83e24e689f25de7e34bea697971750138d5f
+[2/8] block: use SECTOR_SHIFT bio_add_hw_page
+      commit: 6850b2dd5c25f27f7b74414553f047d4c12dd66c
+[3/8] block: move the BIO_CLONED checks out of __bio_try_merge_page
+      commit: 939e1a370330841b2c0292a483d7b38f3ee45f88
+[4/8] block: move the bi_vcnt check out of __bio_try_merge_page
+      commit: 0eca8b6f97ac705c5806f7d062207379094fb114
+[5/8] block: move the bi_size overflow check in __bio_try_merge_page
+      commit: 613699050a49760f1d70c74f71bd0b013ca3c356
+[6/8] block: downgrade a bio_full call in bio_add_page
+      commit: 80232b520314214d846eb0a65faef8b51b702fa7
+[7/8] block: move the bi_size update out of __bio_try_merge_page
+      commit: 858c708d9efb7e8e5c6320793b778cc17cf8368a
+[8/8] block: don't pass a bio to bio_try_merge_hw_seg
+      commit: ae42f0b3bf65912e122fc2e8d5f6d94b51156dba
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
