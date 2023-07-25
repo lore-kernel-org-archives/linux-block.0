@@ -2,70 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFCCC001B0
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 03:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64595EB64DD
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 05:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231472AbjGYDAu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jul 2023 23:00:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54894 "EHLO
+        id S230398AbjGYFSt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jul 2023 01:18:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230144AbjGYDAp (ORCPT
+        with ESMTP id S229522AbjGYFSs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jul 2023 23:00:45 -0400
-Received: from out-19.mta1.migadu.com (out-19.mta1.migadu.com [IPv6:2001:41d0:203:375::13])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6656F1
-        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 20:00:43 -0700 (PDT)
-Date:   Mon, 24 Jul 2023 23:00:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690254040;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=q7+t6JGgjNA4srPAzMo98NzDSt2aKwb5Cbcib1WcjJM=;
-        b=qOkfgLMsqd8UvX0fEhUXY2j3afh1S4GVEQM7LfgmYCfW4QzrKi0buH1nYnbQE9yCCnBoLN
-        nw6UqzTjFUi37nyOeyJCqMmaNW2h6+Y9WuCrYYWKqaWqFKSNkvMgkI40DiH0ljCu1rL3lM
-        D0JrzMwWir2854jKvwSTymA6T/f+AKM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-bcachefs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 04/20] block: Add some exports for bcachefs
-Message-ID: <20230725030037.minycb3oxubajuqw@moria.home.lan>
-References: <20230712211115.2174650-1-kent.overstreet@linux.dev>
- <20230712211115.2174650-5-kent.overstreet@linux.dev>
- <ZL61WIpYp/tJ6XH1@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZL61WIpYp/tJ6XH1@infradead.org>
-X-Migadu-Flow: FLOW_OUT
+        Tue, 25 Jul 2023 01:18:48 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51741736
+        for <linux-block@vger.kernel.org>; Mon, 24 Jul 2023 22:18:44 -0700 (PDT)
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230725051840epoutp04a1d71a20a7e0659d21bd849fb1b3fea5~1BKAf7yID0196601966epoutp041
+        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 05:18:40 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230725051840epoutp04a1d71a20a7e0659d21bd849fb1b3fea5~1BKAf7yID0196601966epoutp041
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1690262320;
+        bh=+rtM1aYdkwBMTDQFePMCBtN59+CcRMnrphsS+pdR4Kc=;
+        h=Subject:Reply-To:From:To:CC:Date:References:From;
+        b=FblWcX20dUOQtMjzgQUzH7AFasKoPk7Wk6UL7fjReIApxQ5a0jXWL7Kk6/jMnqdwA
+         SPBp2mH+n5TQGedit8B/CeQ3r+MVyVhXP2tBrkZbtRNG5ynKh5ZAsX40f2fx/LP9kf
+         X7uYTuPILNuj1t+HzfqclkIi4mLYX6T3W+g99apI=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
+        20230725051840epcas2p310fa83ea1083369015ccb5e13d45a280~1BKAO7b0d0386503865epcas2p31;
+        Tue, 25 Jul 2023 05:18:40 +0000 (GMT)
+Received: from epsmges2p2.samsung.com (unknown [182.195.36.70]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4R950c1jfwz4x9Py; Tue, 25 Jul
+        2023 05:18:40 +0000 (GMT)
+X-AuditID: b6c32a46-6fdfa70000009cc5-66-64bf5b30ec94
+Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
+        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        C7.26.40133.03B5FB46; Tue, 25 Jul 2023 14:18:40 +0900 (KST)
+Mime-Version: 1.0
+Subject: [PATCH] block: cleanup bio_integrity_prep
+Reply-To: j-young.choi@samsung.com
+Sender: Jinyoung Choi <j-young.choi@samsung.com>
+From:   Jinyoung Choi <j-young.choi@samsung.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa@epcms2p8>
+Date:   Tue, 25 Jul 2023 14:18:39 +0900
+X-CMS-MailID: 20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-CPGSPASS: Y
+X-CPGSPASS: Y
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpkk+LIzCtJLcpLzFFi42LZdljTVNcgen+KwZFDnBar7/azWbw8pGmx
+        cvVRJove/q1sFntvaVtc3jWHzWL58X9MDuwel8+Weuy+2cDm8fHpLRaPvi2rGD0+b5ILYI3K
+        tslITUxJLVJIzUvOT8nMS7dV8g6Od443NTMw1DW0tDBXUshLzE21VXLxCdB1y8wBukFJoSwx
+        pxQoFJBYXKykb2dTlF9akqqQkV9cYquUWpCSU2BeoFecmFtcmpeul5daYmVoYGBkClSYkJ1x
+        cOdS1oJe3opDH7exNzAe5upi5OSQEDCRuHjlKWMXIxeHkMAORomNR6+xdzFycPAKCEr83SEM
+        UiMsYCTRv3cRC4gtJKAkcW7NLEaIuIFEy+02sDibgJ7Ejue72UHmiAgsZ5Q4vP4mWBGzQJTE
+        2kNH2SGW8UrMaH/KAmFLS2xfvpURwtaQ+LGslxnCFpW4ufotO4z9/th8qBoRidZ7Z6FqBCUe
+        /NwNFZeUOHToKxvIzRIC+RIbDgRChGsk2n69hyrXl7jWsRFsLa+Ar8S5/QfB4iwCqhJTdn+F
+        GuMi8eXrYlaIk+Ultr+dwwwykllAU2L9Ln2I6coSR26xQFTwSXQc/gv3VMPG31jZO+Y9YYJo
+        VZNY1GQEEZaR+Hp4PvsERqVZiGCehWTtLIS1CxiZVzGKpRYU56anFhsVGMFjNjk/dxMjOC1q
+        ue1gnPL2g94hRiYOxkOMEhzMSiK8hjH7UoR4UxIrq1KL8uOLSnNSiw8xmgI9PJFZSjQ5H5iY
+        80riDU0sDUzMzAzNjUwNzJXEee+1zk0REkhPLEnNTk0tSC2C6WPi4JRqYJpb9urN9Pp0Wfbt
+        5pGvJ++fzHPjV+vMy/Wc+7pudD9tfLie4XpYfnGU1IQTs75/W/AtWmlNnGDfyh3fO+K/TU1m
+        6X0V13LfZG+P8JTyr6vMrNbs9z20e95mfgaRkzdfzmNe+nmvQfZ6xaZce+3qgne5hS7y7n+n
+        TPquUP0oN413+SOuKU9nGq5becq4O8Yr8l1PTBxr4YIAj97H1x5qfatquvMnbYKgf9ct0ewd
+        HJK7NKb6Vf3LTjZ+8P3TLweLAwrLz8X16M5cqxnF4TnBWi5Yr/BI4lbG0Ek8NedOrGFSmLlr
+        Uf1pqUSW+5Jdt6cVGMf3tviz3H992rrznlC1UO1i7Vu+Wgu9KuQm3eqb+VSJpTgj0VCLuag4
+        EQAbn+gIFAQAAA==
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa
+References: <CGME20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa@epcms2p8>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 24, 2023 at 10:31:04AM -0700, Christoph Hellwig wrote:
-> On Wed, Jul 12, 2023 at 05:10:59PM -0400, Kent Overstreet wrote:
-> > From: Kent Overstreet <kent.overstreet@gmail.com>
-> > 
-> >  - bio_set_pages_dirty(), bio_check_pages_dirty() - dio path
-> 
-> Why?  We've so far have been able to get away without file systems
-> reinventing their own DIO path.  I'd really like to keep it that way,
-> so if you think the iomap dio code should be improved please explain
-> why.  And please also cycle the fsdevel list in.
+If a problem occurs in the process of creating an integrity payload, the
+status of bio is always BLK_STS_RESOURCE.
 
-It's been discussed at length why bcachefs doesn't use iomap.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
+---
+ block/bio-integrity.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-In short, iomap is heavily callback based, the bcachefs io paths are
-not - we pass around data structures instead. I discussed this with
-people when iomap was first being written, but iomap ended up being a
-much more conservative approach, more in line with the old buffer heads
-code where the generic code calls into the filesystem to obtain
-mappings.
-
-I'm gradually convincing people of the merits of the bcachefs approach -
-in particular reducing indirect function calls is getting more attention
-these days.
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 8f0af7ac8573..045553a164e0 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -199,7 +199,6 @@ bool bio_integrity_prep(struct bio *bio)
+ 	unsigned long start, end;
+ 	unsigned int len, nr_pages;
+ 	unsigned int bytes, offset, i;
+-	blk_status_t status;
+ 
+ 	if (!bi)
+ 		return true;
+@@ -227,7 +226,6 @@ bool bio_integrity_prep(struct bio *bio)
+ 	/* Allocate kernel buffer for protection data */
+ 	len = bio_integrity_bytes(bi, bio_sectors(bio));
+ 	buf = kmalloc(len, GFP_NOIO);
+-	status = BLK_STS_RESOURCE;
+ 	if (unlikely(buf == NULL)) {
+ 		printk(KERN_ERR "could not allocate integrity buffer\n");
+ 		goto err_end_io;
+@@ -242,7 +240,6 @@ bool bio_integrity_prep(struct bio *bio)
+ 	if (IS_ERR(bip)) {
+ 		printk(KERN_ERR "could not allocate data integrity bioset\n");
+ 		kfree(buf);
+-		status = BLK_STS_RESOURCE;
+ 		goto err_end_io;
+ 	}
+ 
+@@ -270,7 +267,6 @@ bool bio_integrity_prep(struct bio *bio)
+ 
+ 		if (ret == 0) {
+ 			printk(KERN_ERR "could not attach integrity payload\n");
+-			status = BLK_STS_RESOURCE;
+ 			goto err_end_io;
+ 		}
+ 
+@@ -292,7 +288,7 @@ bool bio_integrity_prep(struct bio *bio)
+ 	return true;
+ 
+ err_end_io:
+-	bio->bi_status = status;
++	bio->bi_status = BLK_STS_RESOURCE;
+ 	bio_endio(bio);
+ 	return false;
+ 
+-- 
+2.34.1
