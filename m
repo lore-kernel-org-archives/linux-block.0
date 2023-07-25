@@ -2,99 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9ABC001DE
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 09:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCE9C001DE
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jul 2023 13:16:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233476AbjGYJ6I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jul 2023 05:58:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56866 "EHLO
+        id S229596AbjGYNQK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jul 2023 09:16:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233616AbjGYJ6G (ORCPT
+        with ESMTP id S229597AbjGYNQJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jul 2023 05:58:06 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DD1910F8;
-        Tue, 25 Jul 2023 02:57:58 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qOEni-0000Af-Ig; Tue, 25 Jul 2023 11:57:54 +0200
-Message-ID: <5ce5b89e-3ea7-318a-1234-279ec92ffb8b@leemhuis.info>
-Date:   Tue, 25 Jul 2023 11:57:53 +0200
+        Tue, 25 Jul 2023 09:16:09 -0400
+Received: from out-14.mta0.migadu.com (out-14.mta0.migadu.com [IPv6:2001:41d0:1004:224b::e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9B29173F
+        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 06:16:06 -0700 (PDT)
+Message-ID: <d9792de8-aaea-e848-9108-323e8e66a429@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1690290965;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hDKCYqmLWyHXFEhC5Nj4kCjQ8+MggR2zRPLevzxTPPg=;
+        b=AT6j2pP3iTuXIwEM6ohKAGMBJoX9RDzGMkQr+qnHxMi4Du1eG9ubu7oHFYfiiF72gxgxyt
+        tFS5P3V3EOA0VLvwDcQZGACZHkPq3hsTMzTLlQHRkeV01S/wnbFiFZc4/PIRMexRNP4V78
+        2r61ZVk3kzJrbVZxTcJeKlZd0dnUUQw=
+Date:   Tue, 25 Jul 2023 21:15:59 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: NFS workload leaves nfsd threads in D state
-Content-Language: en-US, de-DE
-To:     Chuck Lever III <chuck.lever@oracle.com>,
-        Chengming Zhou <chengming.zhou@linux.dev>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Chuck Lever <cel@kernel.org>,
-        Linux kernel regressions list <regressions@lists.linux.dev>
-References: <7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com>
- <20230710075634.GA30120@lst.de>
- <3F16A14B-F854-41CC-A3CA-87C7946FC277@oracle.com>
- <F610D6B3-876F-4E5D-A3C4-A30F1B81D9B5@oracle.com>
- <20230710172839.GA7190@lst.de>
- <0F9A70B1-C6AE-4A8B-8A4B-8DC9ADED73AB@oracle.com>
- <20230711120137.GA27050@lst.de>
- <82cb9937-bd11-64a9-2520-bf3cf81ec720@linux.dev>
- <92CC9151-0309-41E9-920E-A549E2A73BE4@oracle.com>
-From:   "Linux regression tracking (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-In-Reply-To: <92CC9151-0309-41E9-920E-A549E2A73BE4@oracle.com>
+Subject: Re: [PATCH 2/2] blk-flush: don't need to end rq twice for non
+ post-flush requests
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
+References: <20230710064705.1847287-1-chengming.zhou@linux.dev>
+ <20230710064705.1847287-2-chengming.zhou@linux.dev>
+ <20230710133308.GB23157@lst.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <20230710133308.GB23157@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1690279078;391d52a8;
-X-HE-SMSGID: 1qOEni-0000Af-Ig
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12.07.23 15:29, Chuck Lever III wrote:
->> On Jul 12, 2023, at 7:34 AM, Chengming Zhou <chengming.zhou@linux.dev> wrote:
->> On 2023/7/11 20:01, Christoph Hellwig wrote:
->>> On Mon, Jul 10, 2023 at 05:40:42PM +0000, Chuck Lever III wrote:
->>>>> blk_rq_init_flush(rq);
->>>>> - rq->flush.seq |= REQ_FSEQ_POSTFLUSH;
->>>>> + rq->flush.seq |= REQ_FSEQ_PREFLUSH;
->>>>> spin_lock_irq(&fq->mq_flush_lock);
->>>>> list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
->>>>> spin_unlock_irq(&fq->mq_flush_lock);
->>>>
->>>> Thanks for the quick response. No change.
->>> I'm a bit lost and still can't reprodce.  Below is a patch with the
->>> only behavior differences I can find.  It has two "#if 1" blocks,
->>> which I'll need to bisect to to find out which made it work (if any,
->>> but I hope so).
+On 2023/7/10 21:33, Christoph Hellwig wrote:
+> On Mon, Jul 10, 2023 at 02:47:05PM +0800, chengming.zhou@linux.dev wrote:
+>> From: Chengming Zhou <zhouchengming@bytedance.com>
 >>
->> I tried today to reproduce, but can't unfortunately.
+>> Now we unconditionally blk_rq_init_flush() to replace rq->end_io to
+>> make rq return twice back to the flush state machine for post-flush.
 >>
->> Could you please also try the fix patch [1] from Ross Lagerwall that fixes
->> IO hung problem of plug recursive flush?
+>> Obviously, non post-flush requests don't need it, they don't need to
+>> end request twice, so they don't need to replace rq->end_io callback.
+>> And the same for requests with the FUA bit on hardware with FUA support.
 >>
->> (Since the main difference is that post-flush requests now can go into plug.)
->>
->> [1] https://lore.kernel.org/all/20230711160434.248868-1-ross.lagerwall@citrix.com/
+>> So we move blk_rq_init_flush() to REQ_FSEQ_DATA stage and only replace
+>> rq->end_io if it needs post-flush. Otherwise, it can end like normal
+>> request and doesn't need to return back to the flush state machine.
 > 
-> Thanks for the suggestion. No change, unfortunately.
+> I really like the idea behind this optimization, but I kinda hate
+> adding more magic to the already way too magic flush sequence.
 
-Chuck, what's the status here? This thread looks stalled, that's why I
-wonder.
+Yes, agree.
 
-FWIW, I noticed a commit with a Fixes: tag for your culprit in next (see
-28b24123747098 ("blk-flush: fix rq->flush.seq for post-flush
-requests")). But unless I missed something you are not CCed, so I guess
-that's a different issue?
+> 
+> I wonder if a better idea would be to kill the flush sequence entirely,
+> and just split the flush_queue into a preflush and a postflush queue.
+> This would remove a field from struct request and lead to more readable
+> code as well.
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+I have thought about this for some time, it seems feasible. So I implement it
+today and test it using blktests, it works.
 
-#regzbot poke
+I will send the patchset soon.
+
+Thanks.
