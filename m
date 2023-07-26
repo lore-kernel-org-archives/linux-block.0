@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF3EC001E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1BB5C001DC
 	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 19:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbjGZTfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S230112AbjGZTfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 26 Jul 2023 15:35:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37552 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230154AbjGZTfE (ORCPT
+        with ESMTP id S229454AbjGZTfG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2023 15:35:04 -0400
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C0001BE3
-        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 12:35:03 -0700 (PDT)
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6687466137bso199314b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 12:35:03 -0700 (PDT)
+        Wed, 26 Jul 2023 15:35:06 -0400
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91E5212D
+        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 12:35:04 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-686f0d66652so53245b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 12:35:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690400103; x=1691004903;
+        d=1e100.net; s=20221208; t=1690400104; x=1691004904;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SRbmBTjr8uNkUCS+MmlXaDe5TIY3it4ulF691kaB6aA=;
-        b=I23imBklO8Sob93UDKsgy3SUBdVyicuHu8zEF3uWilJl/Vy4J9+1ofci2DOf+pPiDO
-         +oRzJNPPXIDhAuVOMmWq27P8278ePi6TyKxK1KqdxS9NPr+1TO5mss1SG646D+atJYxE
-         +AHIzyBFAyMsLzZc5lpL9U7TA8a+/AWMqt+zZOkgHNhrErVLEi1Wix39yDO5XTgqfxta
-         Wq0SpOw20hcVvIp09XFBie6yMpIQeXxFvk2TEaat9rbElxmAbh+3q56fTQ1dd7oDcB8+
-         GGha8P/6Yr/gHc1odrFrZW8jwJ1bq8GEp96C8lEJqUiF+kbz3PHQ21r612YpttjJzGZJ
-         YKLA==
-X-Gm-Message-State: ABy/qLbPL8AWYT7WYdOR8pHGZbK/zuU5QBryYIUew8IKjNnkci95ZxbV
-        3SaJZ7/XJWxvGBXb4SL21vk=
-X-Google-Smtp-Source: APBJJlHw5dCGZMqy8PYK9aNa8fLWNecqEk1y46e/Od/tm+rMRhAis2mlPbG83XhJkBDIJqAzwX85LQ==
-X-Received: by 2002:a05:6a00:994:b0:64f:7a9c:cb15 with SMTP id u20-20020a056a00099400b0064f7a9ccb15mr3573711pfg.11.1690400102601;
-        Wed, 26 Jul 2023 12:35:02 -0700 (PDT)
+        bh=i3oGvYfH0cU7md9y+FMhEYGBL6XNBYy8/TQQQlpG39Q=;
+        b=ZAfGeQ7FPty9vbmrE2rhkFdf1noUSwD0N9/bHDjm6swKHD6GKxD/IBuyE4DF2ja2lV
+         KLp0T8xP0n9pMx2VUlSBVHzmKoXTPL2E2jGBUP6nOyMiTnjegtAtGgjn2WjHuERdZ81T
+         2RZLjCBZ7ZeCtixJ5//phC9d4gXaZV0cCaaxALbwb1DYQk9n94tBxQcZ1rH85c0UIggc
+         o5gCpVld7AGMouCMXmCbLTPLmhK380ZNOZ7Qh/xcfIyGi5q0yRCISZlzFkYRHgptlRCM
+         7Tp+Ps1CfI1L7EpB0AK+pZa1R43vtr02L/hk52bIBH9fP3hMaJjCytJjhhiChfH6cvAz
+         fVCA==
+X-Gm-Message-State: ABy/qLYPIJHxvg+YjNVq5d1yiq1D6gusMmrfpHgRnqdQyVervvw9MK11
+        rU3My2Rq8llDXCzMelEXlys=
+X-Google-Smtp-Source: APBJJlFelBAEVPoBu10uzOA25sUJObjVXGPmSfPjcBVgY5zC51qyNlBAeBM8vmeDeAiFsuXK0twn6Q==
+X-Received: by 2002:a05:6a00:1ad3:b0:682:5634:3df1 with SMTP id f19-20020a056a001ad300b0068256343df1mr3721388pfv.10.1690400103909;
+        Wed, 26 Jul 2023 12:35:03 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:32d2:d535:b137:7ba3])
-        by smtp.gmail.com with ESMTPSA id x52-20020a056a000bf400b00682ba300cd1sm11846685pfu.29.2023.07.26.12.35.01
+        by smtp.gmail.com with ESMTPSA id x52-20020a056a000bf400b00682ba300cd1sm11846685pfu.29.2023.07.26.12.35.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 12:35:02 -0700 (PDT)
+        Wed, 26 Jul 2023 12:35:03 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -46,9 +46,9 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Damien Le Moal <dlemoal@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v4 1/7] block: Introduce the flag QUEUE_FLAG_NO_ZONE_WRITE_LOCK
-Date:   Wed, 26 Jul 2023 12:34:05 -0700
-Message-ID: <20230726193440.1655149-2-bvanassche@acm.org>
+Subject: [PATCH v4 2/7] block: Introduce the flag REQ_NO_ZONE_WRITE_LOCK
+Date:   Wed, 26 Jul 2023 12:34:06 -0700
+Message-ID: <20230726193440.1655149-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
 In-Reply-To: <20230726193440.1655149-1-bvanassche@acm.org>
 References: <20230726193440.1655149-1-bvanassche@acm.org>
@@ -58,49 +58,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Writes in sequential write required zones must happen at the write
-pointer. Even if the submitter of the write commands (e.g. a filesystem)
-submits writes for sequential write required zones in order, the block
-layer or the storage controller may reorder these write commands.
+Not all software that supports zoned storage allocates and submits zoned
+writes in LBA order per zone. Introduce the REQ_NO_WRITE_LOCK flag such
+that submitters of zoned writes can indicate that zoned writes are
+allocated and submitted in LBA order per zone.
 
-The zone locking mechanism in the mq-deadline I/O scheduler serializes
-write commands for sequential zones. Some but not all storage controllers
-require this serialization. Introduce a new flag such that block drivers
-can request that zone write locking is disabled.
+Introduce the blk_no_zone_write_lock() function to make it easy to test
+whether both QUEUE_FLAG_NO_ZONE_WRITE_LOCK and REQ_NO_ZONE_WRITE_LOCK
+are set.
+
+Make flush requests inherit the REQ_NO_ZONE_WRITE_LOCK flag from the
+request they are derived from.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Damien Le Moal <dlemoal@kernel.org>
 Cc: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- include/linux/blkdev.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/blk-flush.c         |  3 ++-
+ include/linux/blk-mq.h    | 11 +++++++++++
+ include/linux/blk_types.h |  8 ++++++++
+ 3 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 2f5371b8482c..066ac395f62f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -534,6 +534,11 @@ struct request_queue {
- #define QUEUE_FLAG_NONROT	6	/* non-rotational device (SSD) */
- #define QUEUE_FLAG_VIRT		QUEUE_FLAG_NONROT /* paravirt device */
- #define QUEUE_FLAG_IO_STAT	7	/* do disk/partitions IO accounting */
-+/*
-+ * Do not use the zone write lock for sequential writes for sequential write
-+ * required zones.
-+ */
-+#define QUEUE_FLAG_NO_ZONE_WRITE_LOCK 8
- #define QUEUE_FLAG_NOXMERGES	9	/* No extended merges */
- #define QUEUE_FLAG_ADD_RANDOM	10	/* Contributes to random pool */
- #define QUEUE_FLAG_SYNCHRONOUS	11	/* always completes in submit context */
-@@ -597,6 +602,11 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- #define blk_queue_skip_tagset_quiesce(q) \
- 	test_bit(QUEUE_FLAG_SKIP_TAGSET_QUIESCE, &(q)->queue_flags)
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index e73dc22d05c1..038350ed7cce 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -336,7 +336,8 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
+ 		flush_rq->internal_tag = first_rq->internal_tag;
  
-+static inline bool blk_queue_no_zone_write_lock(struct request_queue *q)
+ 	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
+-	flush_rq->cmd_flags |= (flags & REQ_DRV) | (flags & REQ_FAILFAST_MASK);
++	flush_rq->cmd_flags |= flags &
++		(REQ_FAILFAST_MASK | REQ_NO_ZONE_WRITE_LOCK | REQ_DRV);
+ 	flush_rq->rq_flags |= RQF_FLUSH_SEQ;
+ 	flush_rq->end_io = flush_end_io;
+ 	/*
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 01e8c31db665..dc8ec26ba2d0 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -1170,6 +1170,12 @@ static inline bool blk_rq_is_seq_zoned_write(struct request *rq)
+ 		blk_rq_zone_is_seq(rq);
+ }
+ 
++static inline bool blk_no_zone_write_lock(struct request *rq)
 +{
-+	return test_bit(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, &q->queue_flags);
++	return blk_queue_no_zone_write_lock(rq->q) &&
++		rq->cmd_flags & REQ_NO_ZONE_WRITE_LOCK;
 +}
 +
- extern void blk_set_pm_only(struct request_queue *q);
- extern void blk_clear_pm_only(struct request_queue *q);
+ bool blk_req_needs_zone_write_lock(struct request *rq);
+ bool blk_req_zone_write_trylock(struct request *rq);
+ void __blk_req_zone_write_lock(struct request *rq);
+@@ -1205,6 +1211,11 @@ static inline bool blk_rq_is_seq_zoned_write(struct request *rq)
+ 	return false;
+ }
  
++static inline bool blk_no_zone_write_lock(struct request *rq)
++{
++	return true;
++}
++
+ static inline bool blk_req_needs_zone_write_lock(struct request *rq)
+ {
+ 	return false;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 0bad62cca3d0..68f7934d8fa6 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -416,6 +416,12 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
++	/*
++	 * Do not use zone write locking. Setting this flag is only safe if
++	 * the request submitter allocates and submit requests in LBA order per
++	 * zone.
++	 */
++	__REQ_NO_ZONE_WRITE_LOCK,
+ 	__REQ_NOWAIT,           /* Don't wait if request will block */
+ 	__REQ_POLLED,		/* caller polls for completion using bio_poll */
+ 	__REQ_ALLOC_CACHE,	/* allocate IO from cache if available */
+@@ -448,6 +454,8 @@ enum req_flag_bits {
+ #define REQ_PREFLUSH	(__force blk_opf_t)(1ULL << __REQ_PREFLUSH)
+ #define REQ_RAHEAD	(__force blk_opf_t)(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND	(__force blk_opf_t)(1ULL << __REQ_BACKGROUND)
++#define REQ_NO_ZONE_WRITE_LOCK	\
++			(__force blk_opf_t)(1ULL << __REQ_NO_ZONE_WRITE_LOCK)
+ #define REQ_NOWAIT	(__force blk_opf_t)(1ULL << __REQ_NOWAIT)
+ #define REQ_POLLED	(__force blk_opf_t)(1ULL << __REQ_POLLED)
+ #define REQ_ALLOC_CACHE	(__force blk_opf_t)(1ULL << __REQ_ALLOC_CACHE)
