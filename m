@@ -2,106 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8864FC04E69
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 15:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E30CC001DE
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 15:30:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234602AbjGZPDU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jul 2023 11:03:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45944 "EHLO
+        id S233677AbjGZPaJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jul 2023 11:30:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234691AbjGZPDG (ORCPT
+        with ESMTP id S232934AbjGZPaI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2023 11:03:06 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B74D32688
-        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 08:02:58 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-666e6541c98so6376556b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 08:02:58 -0700 (PDT)
+        Wed, 26 Jul 2023 11:30:08 -0400
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5A0268B;
+        Wed, 26 Jul 2023 08:30:03 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-58451ecf223so5360817b3.1;
+        Wed, 26 Jul 2023 08:30:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690385403; x=1690990203;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lrg+45f8OyZpsYrZsCtiNxFu62qT5zsFL2TVU9KzV9Y=;
+        b=IfQOikjTb54JcoQOnhR/3Fq0FlEKu8EnycAFmIQLw1zLeRNxqDoNAwmyVIhZkPF/QT
+         +JKHfyxiDvW04jhJpcOFcj0C2PKdMmWCrunMR2AzxG0XfyRJJBMCaQhTRoLGmYm3IYXd
+         lGIO55xgdc1kvjTJ6XJE1yNt1XIOO0MtUoCMwigMn0OAQWsmSvhujLJ15v6B0t2yd6pw
+         X0MidQmtlMJG6RVSarnypuX/llFdlPvZ6IDlkQkBN9OSZUjnDHzhCWSbuvBlNcp7FRAP
+         sfVGXpcdfaxj9zK9FMZMTyJODEA5x5SDojiVCcamwVuuOafYQuYqurs6a8cIWKqW1bCF
+         zRVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690383778; x=1690988578;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fzom1BMlrJ48cQurHlgiCWfwm/e5GGsUChmkHVBXMcA=;
-        b=JnnX0/O2+/LEPaZ4Wa2m0vH7hRo+2BYcAMrKii4gI4GguPDWcC1z8LqCjApToUtGb7
-         Q86GDvex8lWVWBq6QthgzswmnA/G3UbED2cfrTSXF4S4nN8QJz7DAuOW1vRzennCYBCT
-         D2yxsW4lYmirUwP4yXCEXFfOggkpEkFHQ6nnjZkv2CHXF9QXywKJthGrhkkaVvEM41Ni
-         FxMYL3LM6KkvgETYPISrkzuz+UOMb1Aol1kVlsXpfzNEVRd5F0E/hxB8QYXO0vA61UUV
-         sp3r6gwV13KH3ToW5YoQtIBz7NtCos32abK1/HFIHiiIANaRcqtW4ZVwu/MeHgPwwFM1
-         yBwg==
-X-Gm-Message-State: ABy/qLbgEtg2YQEn9gpSo4NHcF3MOMENTJWCtzt/ZaHRfYwTexe5sC51
-        yvINQ26zKuQwKgNZ3sQyBmg=
-X-Google-Smtp-Source: APBJJlE3tABXKvGJTCEnCtChEp3SsVkF/rykkHCFUzw1Syx945vhSGXLEIKXHrKkYBg5DVdEcLSoVQ==
-X-Received: by 2002:a05:6a20:a122:b0:132:bdba:5500 with SMTP id q34-20020a056a20a12200b00132bdba5500mr2720322pzk.39.1690383777936;
-        Wed, 26 Jul 2023 08:02:57 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:7ecb:b0e6:dc38:b05f? ([2620:15c:211:201:7ecb:b0e6:dc38:b05f])
-        by smtp.gmail.com with ESMTPSA id j20-20020aa78d14000000b006866a293e58sm9474605pfe.176.2023.07.26.08.02.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 08:02:56 -0700 (PDT)
-Message-ID: <15c27150-a4fb-9c93-377a-6a462f3565c1@acm.org>
-Date:   Wed, 26 Jul 2023 08:02:53 -0700
+        d=1e100.net; s=20221208; t=1690385403; x=1690990203;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lrg+45f8OyZpsYrZsCtiNxFu62qT5zsFL2TVU9KzV9Y=;
+        b=G2ESgXcmeAZgIp9K1GKDJJ4qF4wwuf8kt8xqhwzMHznmcIXejYoiVFyGei4yfHc4NP
+         LvISr7TtR2akSqwbWIdDQcsjcsxhBZqlxFJu3iqxPQEmyBJ7ozuLlsAUaSPEFj2rpVRr
+         EVjyndX54eSzOvZB+Cje+L8xP+RvJYWrjfLE3f7KBPfNbkEKFTfacBP1KvRY7t+hzg17
+         LHKwGeB3vRZdyNPN5KN+uaimZutbcoSwh8C6q1KW12rl81nF48mRItwaYli8V1anOsiL
+         ShTH38TKExzEhsJcyRsSG9S2zA5iUYJpKuEc0Sj8qUKCtJj1tYEx11k/YdGAv2hVYirD
+         Sd4w==
+X-Gm-Message-State: ABy/qLbGFRo5doVjFaOdHucpLh5kj+CwB0sICi/+ZOkJSGHjk16zXged
+        L3y3N2+YKJ+Y2itt3G4Xm8iW6qPl8PYTb/aBdxI=
+X-Google-Smtp-Source: APBJJlH9c/Cm1Gn1k/bqGcIifEtT5WA6JYO4NWDRh17eGkNuN//LPGYMjb5PrsKWtVwk5jtZLub4b2CzwC+F8JFg/Zw=
+X-Received: by 2002:a81:a151:0:b0:584:5e7e:40c1 with SMTP id
+ y78-20020a81a151000000b005845e7e40c1mr533351ywg.28.1690385402927; Wed, 26 Jul
+ 2023 08:30:02 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v3 4/6] scsi: Retry unaligned zoned writes
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230726005742.303865-1-bvanassche@acm.org>
- <20230726005742.303865-5-bvanassche@acm.org>
- <e9cfd243-4b2d-a2f5-2d34-b0012470117a@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <e9cfd243-4b2d-a2f5-2d34-b0012470117a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <4919.1690365747@warthog.procyon.org.uk>
+In-Reply-To: <4919.1690365747@warthog.procyon.org.uk>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Wed, 26 Jul 2023 23:29:51 +0800
+Message-ID: <CACVXFVM8rcGJu-f+6zOgY8t4KPPR0J=giYD5dnCLL8_XVo234w@mail.gmail.com>
+Subject: Re: [dm-devel] Processes hung in "D" state in ext4, mm, md and dmcrypt
+To:     David Howells <dhowells@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     "Theodore Ts'o" <tytso@mit.edu>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Song Liu <song@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Alasdair Kergon <agk@redhat.com>, linux-raid@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, linux-ext4@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/26/23 01:47, Damien Le Moal wrote:
-> On 7/26/23 09:57, Bart Van Assche wrote:
->> +/*
->> + * Returns a negative value if @_a has a lower LBA than @_b, zero if
->> + * both have the same LBA and a positive value otherwise.
->> + */
->> +static int scsi_cmp_lba(void *priv, const struct list_head *_a,
->> +			const struct list_head *_b)
-> 
-> The argument priv is unused.
+On Wed, Jul 26, 2023 at 6:02=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> Hi,
+>
+> With 6.5-rc2 (6.5.0-0.rc2.20230721gitf7e3a1bafdea.20.fc39.x86_64), I'm se=
+eing
+> a bunch of processes getting stuck in the D state on my desktop after a f=
+ew
+> hours of reading email and compiling stuff.  It's happened every day this=
+ week
+> so far and I managed to grab stack traces of the stuck processes this mor=
+ning
+> (see attached).
+>
+> There are two blockdevs involved below, /dev/md2 and /dev/md3.  md3 is a =
+raid1
+> array with two partitions with an ext4 partition on it.  md2 is similar b=
+ut
+> it's dm-crypted and ext4 is on top of that.
+>
+...
 
-I cannot remove the 'priv' argument. From include/linux/list_sort.h:
+> =3D=3D=3D117547=3D=3D=3D
+>     PID TTY      STAT   TIME COMMAND
+>  117547 ?        D      5:12 [kworker/u16:8+flush-9:3]
+> [<0>] blk_mq_get_tag+0x11e/0x2b0
+> [<0>] __blk_mq_alloc_requests+0x1bc/0x350
+> [<0>] blk_mq_submit_bio+0x2c7/0x680
+> [<0>] __submit_bio+0x8b/0x170
+> [<0>] submit_bio_noacct_nocheck+0x159/0x370
+> [<0>] __block_write_full_folio+0x1e1/0x400
+> [<0>] writepage_cb+0x1a/0x70
+> [<0>] write_cache_pages+0x144/0x3b0
+> [<0>] do_writepages+0x164/0x1e0
+> [<0>] __writeback_single_inode+0x3d/0x360
+> [<0>] writeback_sb_inodes+0x1ed/0x4b0
+> [<0>] __writeback_inodes_wb+0x4c/0xf0
+> [<0>] wb_writeback+0x298/0x310
+> [<0>] wb_workfn+0x35b/0x510
+> [<0>] process_one_work+0x1de/0x3f0
+> [<0>] worker_thread+0x51/0x390
+> [<0>] kthread+0xe5/0x120
+> [<0>] ret_from_fork+0x31/0x50
+> [<0>] ret_from_fork_asm+0x1b/0x30
 
-typedef int __attribute__((nonnull(2,3))) (*list_cmp_func_t)(void *,
-		const struct list_head *, const struct list_head *);
+BTW, -rc3 fixes one similar issue on the above code path, so please try -rc=
+3.
 
-__attribute__((nonnull(2,3)))
-void list_sort(void *priv, struct list_head *head, list_cmp_func_t cmp);
-
->>   /**
->>    * scsi_unjam_host - Attempt to fix a host which has a cmd that failed.
->>    * @shost:	Host to unjam.
->> @@ -2258,6 +2289,12 @@ static void scsi_unjam_host(struct Scsi_Host *shost)
->>   
->>   	SCSI_LOG_ERROR_RECOVERY(1, scsi_eh_prt_fail_stats(shost, &eh_work_q));
->>   
->> +	/*
->> +	 * Sort pending SCSI commands in LBA order. This is important if zone
->> +	 * write locking is disabled for a zoned SCSI device.
->> +	 */
->> +	list_sort(NULL, &eh_work_q, scsi_cmp_lba);
-> 
-> Should we do this only for zoned devices ?
-
-I'm not sure this is possible. Error handling happens per SCSI host. 
-Some of the logical units associated with a host may be zoned while 
-others may represent conventional storage or have no storage associated 
-with them (WLUN).
+106397376c03 sbitmap: fix batching wakeup
 
 Thanks,
-
-Bart.
+Ming Lei
