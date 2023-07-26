@@ -2,53 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5567BC0015E
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 12:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 221A5C00528
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 12:47:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234031AbjGZMrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jul 2023 08:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49490 "EHLO
+        id S233910AbjGZMrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jul 2023 08:47:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234041AbjGZMrE (ORCPT
+        with ESMTP id S234043AbjGZMrE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 26 Jul 2023 08:47:04 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F1B81BD6;
-        Wed, 26 Jul 2023 05:47:00 -0700 (PDT)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B8819BE;
+        Wed, 26 Jul 2023 05:46:59 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 12D0521D67;
-        Wed, 26 Jul 2023 12:46:59 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 184D11F85D;
+        Wed, 26 Jul 2023 12:46:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1690375619; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rbDYNVvlsfmPp7vHYHFE4FO2z3fiEokDrLA+6DaLKtM=;
-        b=IVpoEmzB618sHE+gXRxUAfpUC+adllHxmEgT/42LjijRnplRIRMd4A4XKcm90hrzoauAd/
-        nv6TaYDg4TOXegey4m/rzH5Oi66WUukIq2YepAVdzudxpX/8dBz8Ze5pgT80AQvhIP/tMz
-        Gf9pXGIiHB4lJaymmjhZhx+ZNNZC3z8=
+        t=1690375612; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=EiMntcZNL9Bmmzjn0NGwCc0QnLuebbsVshrPJM/t5TE=;
+        b=XeWhdRRh/c1oBzGA94U2MbTAqQ3lq1XXWVOCZFJ8QqFWdcx4lPSDPCjoM4sVWHpnZ6cA/M
+        IpaTpqKudLV3Go8k2jCqSWU3o6B3Yf66VsfYBeF0h6W3czjm/NTLLdeNqPvtYMF31QyRWo
+        bK/au2TkDqGpKpwKCgHzxiBo4YvNfU4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1690375619;
+        s=susede2_ed25519; t=1690375612;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rbDYNVvlsfmPp7vHYHFE4FO2z3fiEokDrLA+6DaLKtM=;
-        b=zRg8nVC28ELOyWnGUF/wx3Q6cPY3R3jxTLgqsgJjHY2FisvuZ4A9zMYJ5+ORm4tKGUhKCq
-        wdl+9umcw/NZsKAg==
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=EiMntcZNL9Bmmzjn0NGwCc0QnLuebbsVshrPJM/t5TE=;
+        b=91S1RSdUqtTwR7+CDUjSgkAZzbSOl+9/gsfFOPMHbnelanUebSDBLTI2InkbRV/m8esg0H
+        ohNISCoa7jCsCICA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 04982139BD;
-        Wed, 26 Jul 2023 12:46:59 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F2B41139BD;
+        Wed, 26 Jul 2023 12:46:51 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id n+8bAcMVwWRFUAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 26 Jul 2023 12:46:59 +0000
+        id sMI2O7sVwWQdUAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 26 Jul 2023 12:46:51 +0000
 From:   Daniel Wagner <dwagner@suse.de>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -59,64 +55,96 @@ Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         Sagi Grimberg <sagi@grimberg.me>,
         James Smart <jsmart2021@gmail.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v1 10/11] nvme/rc: Add helper for adding/removing to allow list
-Date:   Wed, 26 Jul 2023 14:46:43 +0200
-Message-ID: <20230726124644.12619-11-dwagner@suse.de>
+Subject: [PATCH blktests v1 00/11] Switch to allowed_host 
+Date:   Wed, 26 Jul 2023 14:46:33 +0200
+Message-ID: <20230726124644.12619-1-dwagner@suse.de>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230726124644.12619-1-dwagner@suse.de>
-References: <20230726124644.12619-1-dwagner@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add two helpers to add or remove the host from the allow list of the
-subsystem.
+Max asked me to replace replace the 'nvme/rc: Avoid triggering host nvme-cli
+autoconnect' feature with using allowed_host on the target side [1]
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- tests/nvme/rc | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+So while looking into this new feature, I first started to refactor existing
+code so that it looks a bit more consistent. I think there is even more
+potential to make it smaller, by introducing something similiar to
+_nvmet_passthru_target_setup() and _nvmet_passthru_target_cleanup() for non
+passthru tests. A lot of duplicated setup/cleanup code in many tests.
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 7f5829a2e58d..706f95d74a4b 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -612,6 +612,23 @@ _create_nvmet_subsystem() {
- 	_create_nvmet_ns "${nvmet_subsystem}" "1" "${blkdev}" "${uuid}"
- }
- 
-+_add_nvmet_allow_hosts() {
-+	local nvmet_subsystem="$1"
-+	local nvmet_hostnqn="$2"
-+	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
-+	local host_path="${NVMET_CFS}/hosts/${nvmet_hostnqn}"
-+
-+	ln -s "${host_path}" "${cfs_path}/allowed_hosts/${nvmet_hostnqn}"
-+}
-+
-+_remove_nvmet_allow_hosts() {
-+	local nvmet_subsystem="$1"
-+	local nvmet_hostnqn="$2"
-+	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
-+
-+	rm "${cfs_path}/allowed_hosts/${nvmet_hostnqn}"
-+}
-+
- _create_nvmet_host() {
- 	local nvmet_subsystem="$1"
- 	local nvmet_hostnqn="$2"
-@@ -621,8 +638,7 @@ _create_nvmet_host() {
- 	local host_path="${NVMET_CFS}/hosts/${nvmet_hostnqn}"
- 
- 	mkdir "${host_path}"
--	echo 0 > "${cfs_path}/attr_allow_any_host"
--	ln -s "${host_path}" "${cfs_path}/allowed_hosts/${nvmet_hostnqn}"
-+	_add_nvmet_allow_hosts "${nvmet_subsystem}" "${nvmet_hostnqn}"
- 	if [[ "${nvmet_hostkey}" ]] ; then
- 		echo "${nvmet_hostkey}" > "${host_path}/dhchap_key"
- 	fi
+Except the last two patches are just refactoring patches. So if we decide to use
+common target setup/cleanup helpers, I think we could add them before the last
+two patches, which would make the last patch way smaller.
+
+Daniel
+
+[1] https://lore.kernel.org/all/4b17be94-d068-f026-756f-59208075e254@nvidia.com/
+
+Daniel Wagner (11):
+  nvme/{003,004,005,013,046,049}: Group all variables declarations
+  nvme: Reorganize test preamble code section
+  nvme/rc: Add common subsystem nqn define
+  nvme: Use def_subsysnqn variable instead local variable
+  nvme/{041,042,043,044,045,048}: Remove local variable hostnqn and
+    hostid
+  nvme/rc: Add common file_path name define
+  nvme: Use def_file_path variable instead local variable
+  nvme/rc: Add common def_subsys_uuid define
+  nvme: Use def_subsys_uuid variable
+  nvme/rc: Add helper for adding/removing to allow list
+  nvme: Add explicitly host to allow_host list
+
+ tests/nvme/003 | 11 ++++----
+ tests/nvme/004 | 27 +++++++++++---------
+ tests/nvme/005 | 27 +++++++++++---------
+ tests/nvme/006 | 21 ++++++++-------
+ tests/nvme/007 | 20 ++++++---------
+ tests/nvme/008 | 26 +++++++++----------
+ tests/nvme/009 | 24 +++++++++---------
+ tests/nvme/010 | 26 +++++++++----------
+ tests/nvme/011 | 25 +++++++++---------
+ tests/nvme/012 | 26 +++++++++----------
+ tests/nvme/013 | 25 +++++++++---------
+ tests/nvme/014 | 26 +++++++++----------
+ tests/nvme/015 | 24 +++++++++---------
+ tests/nvme/016 | 17 ++++++-------
+ tests/nvme/017 | 26 ++++++++-----------
+ tests/nvme/018 | 24 +++++++++---------
+ tests/nvme/019 | 26 +++++++++----------
+ tests/nvme/020 | 24 +++++++++---------
+ tests/nvme/021 | 24 +++++++++---------
+ tests/nvme/022 | 24 +++++++++---------
+ tests/nvme/023 | 26 +++++++++----------
+ tests/nvme/024 | 24 +++++++++---------
+ tests/nvme/025 | 24 +++++++++---------
+ tests/nvme/026 | 24 +++++++++---------
+ tests/nvme/027 | 24 +++++++++---------
+ tests/nvme/028 | 24 +++++++++---------
+ tests/nvme/029 | 26 +++++++++----------
+ tests/nvme/030 | 19 +++++++-------
+ tests/nvme/031 | 14 +++++-----
+ tests/nvme/033 |  9 ++++---
+ tests/nvme/034 |  9 ++++---
+ tests/nvme/035 |  9 ++++---
+ tests/nvme/036 |  9 ++++---
+ tests/nvme/037 |  8 +++---
+ tests/nvme/038 |  6 ++---
+ tests/nvme/039 |  4 +--
+ tests/nvme/040 | 30 ++++++++++++----------
+ tests/nvme/041 | 50 ++++++++++++++++--------------------
+ tests/nvme/042 | 55 ++++++++++++++++++----------------------
+ tests/nvme/043 | 52 +++++++++++++++++--------------------
+ tests/nvme/044 | 69 +++++++++++++++++++++++---------------------------
+ tests/nvme/045 | 61 ++++++++++++++++++++------------------------
+ tests/nvme/046 |  1 +
+ tests/nvme/047 | 30 +++++++++++-----------
+ tests/nvme/048 | 46 +++++++++++++++------------------
+ tests/nvme/049 |  1 +
+ tests/nvme/rc  | 30 +++++++++++++++++++---
+ 47 files changed, 572 insertions(+), 585 deletions(-)
+
 -- 
 2.41.0
 
