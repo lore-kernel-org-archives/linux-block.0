@@ -2,87 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA15EB64DD
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 02:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E27CC001DC
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 07:45:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230049AbjGZCbK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jul 2023 22:31:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57050 "EHLO
+        id S232277AbjGZHpU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jul 2023 03:45:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjGZCbJ (ORCPT
+        with ESMTP id S232236AbjGZHoX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jul 2023 22:31:09 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF122688
-        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 19:31:08 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-682b1768a0bso1482478b3a.0
-        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 19:31:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1690338667; x=1690943467;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/pE4L/Xm3kLoI9HrD29L7K7aTmuDXrHPhtqkNw6IBbE=;
-        b=PP7ylOiR4Y79Htdcg5A3hJw/5wDtFQF+3iOv654e2CF9cX30H4cPrnu5NXn4p4x8NT
-         ASYJaTJK1ptUe1p0dPvHCvxaj3nwUg5kjrB5jn2E5Ry5VSz3XuVTwTWt+Dsk6oKjvoRH
-         4EiIcHjw3hVjkubi8Naj0v73pdG9eVD5nfxgAVtGT7RnSZXDg0Gee0JGI09b3ZYdCbBP
-         Ow3M1LaULfiBu5R9viG8XFf45DlF5SgTPztpbWJ1ng6yN41k15sDs9CXc6dAmPrar+or
-         CxXbUFObKJt3HSoANB4Jpy6K/OS55dv55K6OchX7zsbNEXKjr2te6KVk7i/3MzDIstcn
-         WtQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690338667; x=1690943467;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/pE4L/Xm3kLoI9HrD29L7K7aTmuDXrHPhtqkNw6IBbE=;
-        b=IhIDrL1oQCM3xjOEXIDKupFWeiBbxeoyHtky/F2b6F4mz4by4iEcBzYCwjZbC4FyKA
-         RYqOrN8v/lP0f3XwXPHqWhbyHq7e90A3jJ+9VQW/v+9+mm4R0PUG7mxs+cgJuwISOGmZ
-         32/m0JwFfSKrygyEvMru5/u8MRhWWDqpWGn3S58dn7PD/XTBIXSd1D1uzEjxqnBVFPRM
-         8ERupkKBm0JsBhefmu1lIe68WQI+c42OACoeLqw8IjMoQurk3cyBeHfimVtfjbLOgGfX
-         5/70GsHHmjCYP5We/IiOUe4OEUfOKbWCfefT+uBbNA9ranvsKYr0Bhhh42RRscquZk24
-         8YxA==
-X-Gm-Message-State: ABy/qLa02ILDfRY6g5dbVC9PcAAaoY49jFbzrqpgMAaJnOutzUT4USSu
-        1GpRyQAi3NH6nsStPhIcBux4Zg==
-X-Google-Smtp-Source: APBJJlESzRrQMirYjq1n8EmHX8b287gHfS/qwbjZK569Ys7+IMy/+sEP8iskIkH09yqzZ4ELfIPkeA==
-X-Received: by 2002:a05:6a21:6da6:b0:137:3eba:b808 with SMTP id wl38-20020a056a216da600b001373ebab808mr964035pzb.5.1690338667623;
-        Tue, 25 Jul 2023 19:31:07 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id p20-20020a637414000000b00563de16d60esm679198pgc.82.2023.07.25.19.31.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 19:31:07 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jinyoung Choi <j-young.choi@samsung.com>
-Cc:     hch@lst.de, martin.petersen@oracle.com
-In-Reply-To: <20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa@epcms2p8>
-References: <CGME20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa@epcms2p8>
- <20230725051839epcms2p8e4d20ad6c51326ad032e8406f59d0aaa@epcms2p8>
-Subject: Re: [PATCH] block: cleanup bio_integrity_prep
-Message-Id: <169033866680.863387.15476130342413439533.b4-ty@kernel.dk>
-Date:   Tue, 25 Jul 2023 20:31:06 -0600
+        Wed, 26 Jul 2023 03:44:23 -0400
+Received: from mail.strategicvision.pl (mail.strategicvision.pl [217.61.105.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124A749D0
+        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 00:40:03 -0700 (PDT)
+Received: by mail.strategicvision.pl (Postfix, from userid 1002)
+        id DF47B84505; Wed, 26 Jul 2023 09:37:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strategicvision.pl;
+        s=mail; t=1690357125;
+        bh=Z0N5VlX9/JlryGOL5I747Le9USomZJCRNNGRT3LbbKc=;
+        h=Date:From:To:Subject:From;
+        b=pwDWoFiZXdGZAMK1DwATM83iQt4kq/FLz3q9gQHxwmN6HtpQigDis0BWcBxlnQ+ki
+         RfpIxJYh+MxzDHTkDL+ZZupWC4uIfDz2jV9r7g7vpBjSGfH+nhZVeYbfHnDxCQmTk6
+         Y55VbrtETqQxzesw1AR9/aCCnTWETLUb4ILf0o4L/E0ZHNObt9GIU2iJYAqIPoN1OE
+         tVMbInSIRPyvCtD0gHeuGsWrcQeo/JLqOCh16FZsIy8dzvH7LpHuHe0mhqHshufqpe
+         ko9KjYx2CU0oEf4CQwi925YkGMQRwwj+TcmRGTk1VR1nkhCYfXqw3HcQSspeSXfxxw
+         gOd67C4gDBHug==
+Received: by mail.strategicvision.pl for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 07:35:40 GMT
+Message-ID: <20230726084502-0.1.k.8n0v.0.p2jbam5280@strategicvision.pl>
+Date:   Wed, 26 Jul 2023 07:35:40 GMT
+From:   "Adam Charachuta" <adam.charachuta@strategicvision.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
+X-Mailer: mail.strategicvision.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Dzie=C5=84 dobry,
 
-On Tue, 25 Jul 2023 14:18:39 +0900, Jinyoung Choi wrote:
-> If a problem occurs in the process of creating an integrity payload, the
-> status of bio is always BLK_STS_RESOURCE.
-> 
-> 
+zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
+=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
+o dalszych rozm=C3=B3w.=20
 
-Applied, thanks!
+Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
+=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
+=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
+strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
 
-[1/1] block: cleanup bio_integrity_prep
-      commit: 51d74ec9b62f5813767a60226acaf943e26e7d7a
-
-Best regards,
--- 
-Jens Axboe
+Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
 
 
-
+Pozdrawiam
+Adam Charachuta
