@@ -2,87 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D906BC001DF
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 14:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE867C001DC
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 14:54:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232389AbjGZOqL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jul 2023 10:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34614 "EHLO
+        id S233976AbjGZOya (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jul 2023 10:54:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231690AbjGZOqL (ORCPT
+        with ESMTP id S233967AbjGZOy3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2023 10:46:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0BF51FC4
-        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 07:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690382722;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B2CSks647K74F8OgrfUZLcugtKavDMhi7yN3N8fBdzE=;
-        b=YdwSNWpqw6UQRH+OhXMd0tDwJIXhgADxWKDYLcyOBRhtv0oC4wZxB7UP400xpp/RA99dm4
-        Yd9jer0VKXhTcC93GooqPtB1CSkfZzjHCXnsCIHDcun7uWzfq1MV2eEuPmLgqZD3g/HhQr
-        UQ7fKOBrJ6AUVzRMF5LVTkQSRdjwhgM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-84-jmnmFOEJOqCBRECw5Gh41Q-1; Wed, 26 Jul 2023 10:45:21 -0400
-X-MC-Unique: jmnmFOEJOqCBRECw5Gh41Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CCBD6185A791;
-        Wed, 26 Jul 2023 14:45:20 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6F841121330;
-        Wed, 26 Jul 2023 14:45:19 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        German Maglione <gmaglione@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 2/3] ublk: fail to recover device if queue setup is interrupted
-Date:   Wed, 26 Jul 2023 22:45:01 +0800
-Message-Id: <20230726144502.566785-3-ming.lei@redhat.com>
-In-Reply-To: <20230726144502.566785-1-ming.lei@redhat.com>
-References: <20230726144502.566785-1-ming.lei@redhat.com>
+        Wed, 26 Jul 2023 10:54:29 -0400
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58FD810F3;
+        Wed, 26 Jul 2023 07:54:28 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6862842a028so3993400b3a.0;
+        Wed, 26 Jul 2023 07:54:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690383268; x=1690988068;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UuWS2k+JCf/SgvTmKSTe79OiavDylfF6Nt3w3ojyWpk=;
+        b=PtzMfJDQkIWOIa6U9nbWN7kT+7YZLNwB7xabAY/YJtPj8ifglB5GSB+uqTthTeonD7
+         S9VOi8ZyFlRF89BjZ5La8MYNXV75XsIr6eA7swUZ5B3RmzRMNNhT+JfcQbx9ldvdXkZ5
+         zpoPtGnANSlls164U8iboWUP5XNo83Dbr5XAF71R+yQj6V9OlS4jUssq2ugnC9QU1bSi
+         nWxt4EnNeP77/1D6DJq14pOOM8OiO3KfLhcHahTiXL/K4AJPu//RzSUFmwjH8sjNEBbN
+         q8LlQFo4uZtezQ9g/4NRccd60oSXpnEFKx37/la/tJUHWeabi/yrnpjpiIfUUi36WOGd
+         86Mw==
+X-Gm-Message-State: ABy/qLbulgKjMF9jcrf2WSGIPfe8h0JzkXnyvBHKLHttrZJVp8T/pago
+        At4HCwTbE8eV9ceoaacWEpQ=
+X-Google-Smtp-Source: APBJJlEOjtuRs+yoPYTIYSKyIRh5TosXj3onTsKaVnOJp3v0HP4gI8BK5fv4FbwBZFrJ8xlLo2ziuA==
+X-Received: by 2002:a05:6a20:3ca3:b0:132:1e76:6f02 with SMTP id b35-20020a056a203ca300b001321e766f02mr2350185pzj.34.1690383267614;
+        Wed, 26 Jul 2023 07:54:27 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:7ecb:b0e6:dc38:b05f? ([2620:15c:211:201:7ecb:b0e6:dc38:b05f])
+        by smtp.gmail.com with ESMTPSA id k11-20020aa792cb000000b0067aea93af40sm11587369pfa.2.2023.07.26.07.54.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 07:54:27 -0700 (PDT)
+Message-ID: <7e4f6c51-43f4-c039-07bc-6724748a1d3e@acm.org>
+Date:   Wed, 26 Jul 2023 07:54:24 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH blktests v1 01/11] nvme/{003,004,005,013,046,049}: Group
+ all variables declarations
+Content-Language: en-US
+To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <jsmart2021@gmail.com>
+References: <20230726124644.12619-1-dwagner@suse.de>
+ <20230726124644.12619-2-dwagner@suse.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230726124644.12619-2-dwagner@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In ublk_ctrl_end_recovery(), if wait_for_completion_interruptible() is
-interrupted by signal, queues aren't setup successfully yet, so we
-have to fail UBLK_CMD_END_USER_RECOVERY, otherwise kernel oops can be
-triggered.
+On 7/26/23 05:46, Daniel Wagner wrote:
+> Group all variable declarations together at the beginning of the
+> function.
 
-Fixes: c732a852b419 ("ublk_drv: add START_USER_RECOVERY and END_USER_RECOVERY support")
-Reported-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+An explanation of why this change has been proposed is missing from the 
+patch description.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 7938221f4f7e..9fcba3834e8d 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -2324,7 +2324,9 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
- 	pr_devel("%s: Waiting for new ubq_daemons(nr: %d) are ready, dev id %d...\n",
- 			__func__, ub->dev_info.nr_hw_queues, header->dev_id);
- 	/* wait until new ubq_daemon sending all FETCH_REQ */
--	wait_for_completion_interruptible(&ub->completion);
-+	if (wait_for_completion_interruptible(&ub->completion))
-+		return -EINTR;
-+
- 	pr_devel("%s: All new ubq_daemons(nr: %d) are ready, dev id %d\n",
- 			__func__, ub->dev_info.nr_hw_queues, header->dev_id);
- 
--- 
-2.40.1
+I think the current style, with variable declarations occurring just 
+before the first use of a variable, is on purpose. I like that style.
+
+Bart.
 
