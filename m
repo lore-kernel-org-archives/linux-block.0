@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02305C0015E
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 09:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 926B5C0015E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 09:42:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233753AbjGZJmN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jul 2023 05:42:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58144 "EHLO
+        id S232802AbjGZJmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jul 2023 05:42:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232700AbjGZJly (ORCPT
+        with ESMTP id S233728AbjGZJl7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2023 05:41:54 -0400
+        Wed, 26 Jul 2023 05:41:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61507128
-        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 02:41:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F0FF12C
+        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 02:41:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690364466;
+        s=mimecast20190719; t=1690364468;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ketWVMOak+Jss00Ni7DMSRSVvfoPSxigoCA6y+QxH1E=;
-        b=O1rZcirrwg1Nq1/Tj8XGkV72zmz2e4n0GkTJaXkGdneqRZJJ+lqY7aYk568IlBU/O8NnkR
-        qjDRetuN5rIlmTfEu6aiI7Zyj2lFq+eL9zYFUd8CV34akMRZ+tJ8iNbsTgjctlr23+xgAZ
-        tlDdLykWm6Im/twloSrh1e5PUDTHHGo=
+        bh=jmP+yqN1CMl4seuzyOdC4zCzUZWNFx4ZDmn6s0/7WWk=;
+        b=IyjQwog0BosDhpjUoTgSYjckrLdMUjkHM+picU2vm4rC+18mTZtI0adedMaKwTB5nz0W37
+        qLproKOpK6e4azhjJr2jaVSxfzsMKwopC+s28R501gzPn1M1t+BuwFf1tZh6U29krRlrBY
+        bWVJBfAAnp4zZUjyG2oNhwM12uD7uuk=
 Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-88-QbZBECAnMwK9prNNVi7zDQ-1; Wed, 26 Jul 2023 05:41:01 -0400
-X-MC-Unique: QbZBECAnMwK9prNNVi7zDQ-1
+ us-mta-492-8sZ-sCqpOy-Gs1sNG80Ajw-1; Wed, 26 Jul 2023 05:41:04 -0400
+X-MC-Unique: 8sZ-sCqpOy-Gs1sNG80Ajw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E55D29AB3E3;
-        Wed, 26 Jul 2023 09:41:00 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80B303815F65;
+        Wed, 26 Jul 2023 09:41:03 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B13A200B41D;
-        Wed, 26 Jul 2023 09:40:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BF7D9200B41D;
+        Wed, 26 Jul 2023 09:41:02 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         linux-nvme@lists.infradead.org,
@@ -46,13 +46,13 @@ To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
 Cc:     linux-block@vger.kernel.org, Wen Xiong <wenxiong@linux.ibm.com>,
         Keith Busch <kbusch@kernel.org>,
         Ming Lei <ming.lei@redhat.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
         Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>
-Subject: [PATCH V2 7/9] scsi: megaraid: take blk_mq_max_nr_hw_queues() into account for calculating io vectors
-Date:   Wed, 26 Jul 2023 17:40:25 +0800
-Message-Id: <20230726094027.535126-8-ming.lei@redhat.com>
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>
+Subject: [PATCH V2 8/9] scsi: mpt3sas: take blk_mq_max_nr_hw_queues() into account for calculating io vectors
+Date:   Wed, 26 Jul 2023 17:40:26 +0800
+Message-Id: <20230726094027.535126-9-ming.lei@redhat.com>
 In-Reply-To: <20230726094027.535126-1-ming.lei@redhat.com>
 References: <20230726094027.535126-1-ming.lei@redhat.com>
 MIME-Version: 1.0
@@ -78,39 +78,29 @@ wrong queue mapping for handling IO, and IO timeout is triggered.
 Meantime, single queue makes much less resource utilization, and reduce
 risk of kernel failure.
 
+Cc: Sathya Prakash <sathya.prakash@broadcom.com>
 Cc: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
-Cc: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Sumit Saxena <sumit.saxena@broadcom.com>
+Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/megaraid/megaraid_sas_base.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/scsi/mpt3sas/mpt3sas_base.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
-index 050eed8e2684..587ccbc1ec92 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -5921,6 +5921,10 @@ __megasas_alloc_irq_vectors(struct megasas_instance *instance)
- 	int i, irq_flags;
- 	struct irq_affinity desc = { .pre_vectors = instance->low_latency_index_start };
- 	struct irq_affinity *descp = &desc;
-+	unsigned max_vecs = instance->msix_vectors - instance->iopoll_q_count;
-+
-+	if (max_vecs > scsi_max_nr_hw_queues())
-+		max_vecs = scsi_max_nr_hw_queues();
- 
- 	irq_flags = PCI_IRQ_MSIX;
- 
-@@ -5934,7 +5938,7 @@ __megasas_alloc_irq_vectors(struct megasas_instance *instance)
+diff --git a/drivers/scsi/mpt3sas/mpt3sas_base.c b/drivers/scsi/mpt3sas/mpt3sas_base.c
+index 53f5492579cb..d238e0275edd 100644
+--- a/drivers/scsi/mpt3sas/mpt3sas_base.c
++++ b/drivers/scsi/mpt3sas/mpt3sas_base.c
+@@ -3332,8 +3332,8 @@ _base_alloc_irq_vectors(struct MPT3SAS_ADAPTER *ioc)
+ 	 * Don't allocate msix vectors for poll_queues.
+ 	 * msix_vectors is always within a range of FW supported reply queue.
  	 */
- 	i = pci_alloc_irq_vectors_affinity(instance->pdev,
- 		instance->low_latency_index_start,
--		instance->msix_vectors - instance->iopoll_q_count, irq_flags, descp);
-+		max_vecs, irq_flags, descp);
+-	int nr_msix_vectors = ioc->iopoll_q_start_index;
+-
++	int nr_msix_vectors = min_t(unsigned int, ioc->iopoll_q_start_index,
++			scsi_max_nr_hw_queues());
  
- 	return i;
- }
+ 	if (ioc->smp_affinity_enable)
+ 		irq_flags |= PCI_IRQ_AFFINITY | PCI_IRQ_ALL_TYPES;
 -- 
 2.40.1
 
