@@ -2,61 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E87F7EB64DD
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 00:58:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA5BEC001DF
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jul 2023 00:58:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229959AbjGZA6E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jul 2023 20:58:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33136 "EHLO
+        id S229835AbjGZA6F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jul 2023 20:58:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjGZA6D (ORCPT
+        with ESMTP id S229498AbjGZA6F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jul 2023 20:58:03 -0400
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36C612E
-        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 17:58:01 -0700 (PDT)
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-666ecb21f86so5753262b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 17:58:01 -0700 (PDT)
+        Tue, 25 Jul 2023 20:58:05 -0400
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D37D19BD
+        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 17:58:04 -0700 (PDT)
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5636425bf98so2895179eaf.1
+        for <linux-block@vger.kernel.org>; Tue, 25 Jul 2023 17:58:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690333081; x=1690937881;
+        d=1e100.net; s=20221208; t=1690333083; x=1690937883;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uuKws2rBoncGscGCPbcpPhXe4qyr3T65eDTeSQZyG68=;
-        b=LZgK5FZu2ySzQ/gv0HmQZDsvTsZntZRXgztUG9e05ZCNP7buhMnSAypVfUAwRZDkjc
-         JHBqh0fhZPs/c/MbEPkIoKIHfFlFhpOO5WNzYJiRGGk77a+n1GGMb3DRg0iAiALc4q+Q
-         WxgspM6ihVAdUJAZruKAPCz6sqdEEAUZ+Pcsh78btem8h7SQdl+6x/yMn7Wl5Rtf1KKe
-         EdPy51CZ8HgavAigoUTpzUk1lY1u6xdEhf+MhZYTlKihdsHjKxgeM4Nm5XFtdG6R9YHZ
-         +rnLMtCJ2aGIos0/LJ0CwQQfzxNOOpBnAb8OmDp383MtN8Ew5Wtbet9HQcMaV7jUKJ+x
-         q3iQ==
-X-Gm-Message-State: ABy/qLbJtIOQqshyL9tro99pCjkiWWxLE/50/0ENk2LmmhGnW5HvWEPa
-        wal5dF64B48yNBb3wdiZzD0=
-X-Google-Smtp-Source: APBJJlG34VH3g6xF1HXezotWfbdYQa9II/4DmCAZ+w6xZjq5GBhLcetlMboWFzv0Wmk1klJ/pPV/pA==
-X-Received: by 2002:a05:6a00:a06:b0:64c:4f2f:a235 with SMTP id p6-20020a056a000a0600b0064c4f2fa235mr1103214pfh.30.1690333081316;
-        Tue, 25 Jul 2023 17:58:01 -0700 (PDT)
+        bh=U9CpW92TOYCG8FstgGSEwmGuSAGeDeWCDg7oNyAimTY=;
+        b=BGApggMnm8s/Kn7Zdl03ce8/3D/rjgdRAFIow1UlO4hraFqi6H6DQ03IS1N90NN03C
+         WVoeQHSS+md9EWBV9TWJzxTaZ8Tus0BhZIvx9raXEmIt3Pi5+vxngWWLmf3vE1xXqR0w
+         qRpgCUDkebEEOF7TbZjWkqMr5N5YHdct3jSkrmYzTJUgjUGQ4EnnaSCe772oB3etgY9l
+         epEyZpT30i0zyrjou/1R9a9+2o/9nxGjXotld2NRpD3Nces3DDszD3QKN+PZLc94oeLl
+         thjWmr43vnHnc2n2S+5fSjiLq+4o3w3QbFnEPBJyfWrwiFd8zzC+0cFSFwbdqVfEYxGf
+         Ecrg==
+X-Gm-Message-State: ABy/qLZnb0204rt/9snLktTRSwz/G9AgDX9SS79KwKM/Wb1XK1osfeTe
+        0PGnOqJ8TnryUWu3ABn1DKA=
+X-Google-Smtp-Source: APBJJlFdWL1WRCpP2Ucy3rwo+xD4/5Scbp59zRTTMjx6Q8mECfuK6LB73ldDAeV0Mulqn22UGLDV9g==
+X-Received: by 2002:a05:6358:6383:b0:133:ac7:c84b with SMTP id k3-20020a056358638300b001330ac7c84bmr216105rwh.12.1690333083147;
+        Tue, 25 Jul 2023 17:58:03 -0700 (PDT)
 Received: from bvanassche-glaptop2.roam.corp.google.com ([2601:642:4c05:4a8d:dbda:6b13:2798:9795])
-        by smtp.gmail.com with ESMTPSA id t10-20020a63954a000000b005634bd81331sm11090138pgn.72.2023.07.25.17.57.59
+        by smtp.gmail.com with ESMTPSA id t10-20020a63954a000000b005634bd81331sm11090138pgn.72.2023.07.25.17.58.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 17:58:00 -0700 (PDT)
+        Tue, 25 Jul 2023 17:58:02 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Ming Lei <ming.lei@redhat.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Akinobu Mita <akinobu.mita@gmail.com>,
-        "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH v3 3/6] block/null_blk: Support disabling zone write locking
-Date:   Tue, 25 Jul 2023 17:57:27 -0700
-Message-ID: <20230726005742.303865-4-bvanassche@acm.org>
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+Subject: [PATCH v3 4/6] scsi: Retry unaligned zoned writes
+Date:   Tue, 25 Jul 2023 17:57:28 -0700
+Message-ID: <20230726005742.303865-5-bvanassche@acm.org>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
 In-Reply-To: <20230726005742.303865-1-bvanassche@acm.org>
 References: <20230726005742.303865-1-bvanassche@acm.org>
@@ -66,118 +59,137 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a new configfs attribute for disabling zone write locking. The test
-script below reports 250 K IOPS with no I/O scheduler, 6 K IOPS with
-mq-deadline and write locking enabled and 123 K IOPS with mq-deadline
-and write locking disabled. This shows that disabling write locking
-results in about 20 times more IOPS for this particular test case.
+From ZBC-2: "The device server terminates with CHECK CONDITION status, with
+the sense key set to ILLEGAL REQUEST, and the additional sense code set to
+UNALIGNED WRITE COMMAND a write command, other than an entire medium write
+same command, that specifies: a) the starting LBA in a sequential write
+required zone set to a value that is not equal to the write pointer for
+that sequential write required zone; or b) an ending LBA that is not equal
+to the last logical block within a physical block (see SBC-5)."
 
-    #!/bin/bash
+Send commands that failed with an unaligned write error to the SCSI error
+handler. Let the SCSI error handler sort SCSI commands per LBA before
+resubmitting these.
 
-    for mode in "none 0" "mq-deadline 0" "mq-deadline 1"; do
-        set +e
-        for d in /sys/kernel/config/nullb/*; do
-            [ -d "$d" ] && rmdir "$d"
-        done
-        modprobe -r null_blk
-        set -e
-        read -r iosched no_write_locking <<<"$mode"
-        modprobe null_blk nr_devices=0
-        (
-            cd /sys/kernel/config/nullb
-            mkdir nullb0
-            cd nullb0
-            params=(
-                completion_nsec=100000
-                hw_queue_depth=64
-                irqmode=2                # NULL_IRQ_TIMER
-                max_sectors=$((4096/512))
-                memory_backed=1
-                no_zone_write_lock="${no_write_locking}"
-                size=1
-                submit_queues=1
-                zone_size=1
-                zoned=1
-                power=1
-            )
-            for p in "${params[@]}"; do
-                echo "${p//*=}" > "${p//=*}"
-            done
-        )
-        udevadm settle
-        dev=/dev/nullb0
-        [ -b "${dev}" ]
-        params=(
-            --direct=1
-            --filename="${dev}"
-            --iodepth=64
-            --iodepth_batch=16
-            --ioengine=io_uring
-            --ioscheduler="${iosched}"
-            --gtod_reduce=1
-            --hipri=0
-            --name=nullb0
-            --runtime=30
-            --rw=write
-            --time_based=1
-            --zonemode=zbd
-        )
-        fio "${params[@]}"
-    done
+Increase the number of retries for write commands sent to a sequential
+zone to the maximum number of outstanding commands.
 
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/null_blk/main.c     | 2 ++
- drivers/block/null_blk/null_blk.h | 1 +
- drivers/block/null_blk/zoned.c    | 3 +++
- 3 files changed, 6 insertions(+)
+ drivers/scsi/scsi_error.c | 37 +++++++++++++++++++++++++++++++++++++
+ drivers/scsi/scsi_lib.c   |  1 +
+ drivers/scsi/sd.c         |  3 +++
+ include/scsi/scsi.h       |  1 +
+ 4 files changed, 42 insertions(+)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 864013019d6b..5c0578137f51 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -424,6 +424,7 @@ NULLB_DEVICE_ATTR(zone_capacity, ulong, NULL);
- NULLB_DEVICE_ATTR(zone_nr_conv, uint, NULL);
- NULLB_DEVICE_ATTR(zone_max_open, uint, NULL);
- NULLB_DEVICE_ATTR(zone_max_active, uint, NULL);
-+NULLB_DEVICE_ATTR(no_zone_write_lock, bool, NULL);
- NULLB_DEVICE_ATTR(virt_boundary, bool, NULL);
- NULLB_DEVICE_ATTR(no_sched, bool, NULL);
- NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
-@@ -569,6 +570,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_zone_max_active,
- 	&nullb_device_attr_zone_readonly,
- 	&nullb_device_attr_zone_offline,
-+	&nullb_device_attr_no_zone_write_lock,
- 	&nullb_device_attr_virt_boundary,
- 	&nullb_device_attr_no_sched,
- 	&nullb_device_attr_shared_tag_bitmap,
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index 929f659dd255..b521096bcc3f 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -117,6 +117,7 @@ struct nullb_device {
- 	bool memory_backed; /* if data is stored in memory */
- 	bool discard; /* if support discard */
- 	bool zoned; /* if device is zoned */
-+	bool no_zone_write_lock;
- 	bool virt_boundary; /* virtual boundary on/off for the device */
- 	bool no_sched; /* no IO scheduler for the device */
- 	bool shared_tag_bitmap; /* use hostwide shared tags */
-diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index 55c5b48bc276..31c8364a63e9 100644
---- a/drivers/block/null_blk/zoned.c
-+++ b/drivers/block/null_blk/zoned.c
-@@ -96,6 +96,9 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
+index c67cdcdc3ba8..2b9aec05dc36 100644
+--- a/drivers/scsi/scsi_error.c
++++ b/drivers/scsi/scsi_error.c
+@@ -27,6 +27,7 @@
+ #include <linux/blkdev.h>
+ #include <linux/delay.h>
+ #include <linux/jiffies.h>
++#include <linux/list_sort.h>
  
- 	spin_lock_init(&dev->zone_res_lock);
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_cmnd.h>
+@@ -698,6 +699,17 @@ enum scsi_disposition scsi_check_sense(struct scsi_cmnd *scmd)
+ 		fallthrough;
  
-+	if (dev->no_zone_write_lock)
-+		blk_queue_flag_set(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, q);
+ 	case ILLEGAL_REQUEST:
++		/*
++		 * Unaligned write command. This indicates that zoned writes
++		 * have been received by the device in the wrong order. If zone
++		 * write locking is disabled, retry after all pending commands
++		 * have completed.
++		 */
++		if (sshdr.asc == 0x21 && sshdr.ascq == 0x04 &&
++		    blk_queue_no_zone_write_lock(sdev->request_queue) &&
++		    !scsi_noretry_cmd(scmd) && scsi_cmd_retry_allowed(scmd))
++			return NEEDS_DELAYED_RETRY;
 +
- 	if (dev->zone_nr_conv >= dev->nr_zones) {
- 		dev->zone_nr_conv = dev->nr_zones - 1;
- 		pr_info("changed the number of conventional zones to %u",
+ 		if (sshdr.asc == 0x20 || /* Invalid command operation code */
+ 		    sshdr.asc == 0x21 || /* Logical block address out of range */
+ 		    sshdr.asc == 0x22 || /* Invalid function */
+@@ -2223,6 +2235,25 @@ void scsi_eh_flush_done_q(struct list_head *done_q)
+ }
+ EXPORT_SYMBOL(scsi_eh_flush_done_q);
+ 
++/*
++ * Returns a negative value if @_a has a lower LBA than @_b, zero if
++ * both have the same LBA and a positive value otherwise.
++ */
++static int scsi_cmp_lba(void *priv, const struct list_head *_a,
++			const struct list_head *_b)
++{
++	struct scsi_cmnd *a = list_entry(_a, typeof(*a), eh_entry);
++	struct scsi_cmnd *b = list_entry(_b, typeof(*b), eh_entry);
++	const sector_t pos_a = blk_rq_pos(scsi_cmd_to_rq(a));
++	const sector_t pos_b = blk_rq_pos(scsi_cmd_to_rq(b));
++
++	if (pos_a < pos_b)
++		return -1;
++	if (pos_a > pos_b)
++		return 1;
++	return 0;
++}
++
+ /**
+  * scsi_unjam_host - Attempt to fix a host which has a cmd that failed.
+  * @shost:	Host to unjam.
+@@ -2258,6 +2289,12 @@ static void scsi_unjam_host(struct Scsi_Host *shost)
+ 
+ 	SCSI_LOG_ERROR_RECOVERY(1, scsi_eh_prt_fail_stats(shost, &eh_work_q));
+ 
++	/*
++	 * Sort pending SCSI commands in LBA order. This is important if zone
++	 * write locking is disabled for a zoned SCSI device.
++	 */
++	list_sort(NULL, &eh_work_q, scsi_cmp_lba);
++
+ 	if (!scsi_eh_get_sense(&eh_work_q, &eh_done_q))
+ 		scsi_eh_ready_devs(shost, &eh_work_q, &eh_done_q);
+ 
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 59176946ab56..69da8aee13df 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1443,6 +1443,7 @@ static void scsi_complete(struct request *rq)
+ 	case ADD_TO_MLQUEUE:
+ 		scsi_queue_insert(cmd, SCSI_MLQUEUE_DEVICE_BUSY);
+ 		break;
++	case NEEDS_DELAYED_RETRY:
+ 	default:
+ 		scsi_eh_scmd_add(cmd);
+ 		break;
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 68b12afa0721..27b9ebe05b90 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -1235,6 +1235,9 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
+ 	cmd->transfersize = sdp->sector_size;
+ 	cmd->underflow = nr_blocks << 9;
+ 	cmd->allowed = sdkp->max_retries;
++	if (blk_queue_no_zone_write_lock(rq->q) &&
++	    blk_rq_is_seq_zoned_write(rq))
++		cmd->allowed += rq->q->nr_requests;
+ 	cmd->sdb.length = nr_blocks * sdp->sector_size;
+ 
+ 	SCSI_LOG_HLQUEUE(1,
+diff --git a/include/scsi/scsi.h b/include/scsi/scsi.h
+index ec093594ba53..6600db046227 100644
+--- a/include/scsi/scsi.h
++++ b/include/scsi/scsi.h
+@@ -93,6 +93,7 @@ static inline int scsi_status_is_check_condition(int status)
+  * Internal return values.
+  */
+ enum scsi_disposition {
++	NEEDS_DELAYED_RETRY	= 0x2000,
+ 	NEEDS_RETRY		= 0x2001,
+ 	SUCCESS			= 0x2002,
+ 	FAILED			= 0x2003,
