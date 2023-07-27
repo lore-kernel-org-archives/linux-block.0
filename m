@@ -2,85 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80089C04A6A
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 15:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC3EC0015E
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 15:21:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234130AbjG0PTH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jul 2023 11:19:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33086 "EHLO
+        id S234560AbjG0PVo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jul 2023 11:21:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234536AbjG0PTB (ORCPT
+        with ESMTP id S234445AbjG0PVm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jul 2023 11:19:01 -0400
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B302A35A8;
-        Thu, 27 Jul 2023 08:18:44 -0700 (PDT)
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1bba48b0bd2so6616425ad.3;
-        Thu, 27 Jul 2023 08:18:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690471124; x=1691075924;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F0vvwsh2rxMF2ShvbYgqpo5URMyKXI0NTlXbCxD/+r0=;
-        b=OJMEagHZlltshrpNvB0cP9IZYZDEKxFCzK1m7MZt2AIVJv2h7HAO1KjYV9qZtKtRqc
-         csATaTvBR4cASw0nWAISGQZiBJiAPGG1g3Bp3zDGoBiHcce5nKOp5opx6NjehHSma7y/
-         G/N+LHcv0IYzPrOSytHTOAZ7wcDrpzQMawCKlrXPqW0s0FwvbW2PksTt2IvoC+iz7F9c
-         hhsdxA+jLU9m6kc8q0iG/Vkl1ZLcPODNAOxLjYhsKRv3oBVv31An4fa4jeYkyAOMUCLE
-         m7eJEb8RRzQlAbiAEcCxMrJuQgOdMilytZ/PNBCDYvyyt9B9xgtLcpLtHw6jXvYuTzEI
-         Rtdg==
-X-Gm-Message-State: ABy/qLakebZ2N7Shi1TxXBEFHj3qgqBTwl1c1jDWbi2V2+vdcixw87Td
-        D9hwhce9v02pjFHz5FwfRdE=
-X-Google-Smtp-Source: APBJJlG+bh/RGLvfVKFEqRfijkNNCjs6JeTHl2tGDJdRVSJtDHktXPCXP8zZXKWwmTtRjnw0V8qL1Q==
-X-Received: by 2002:a17:902:e550:b0:1b5:5a5f:369b with SMTP id n16-20020a170902e55000b001b55a5f369bmr5439261plf.65.1690471124010;
-        Thu, 27 Jul 2023 08:18:44 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:32d2:d535:b137:7ba3? ([2620:15c:211:201:32d2:d535:b137:7ba3])
-        by smtp.gmail.com with ESMTPSA id d10-20020a170902ceca00b001b872695c1csm1748294plg.256.2023.07.27.08.18.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 08:18:43 -0700 (PDT)
-Message-ID: <c3bff0d9-957a-fbb7-a433-4cab457c62bf@acm.org>
-Date:   Thu, 27 Jul 2023 08:18:41 -0700
+        Thu, 27 Jul 2023 11:21:42 -0400
+Received: from out-111.mta0.migadu.com (out-111.mta0.migadu.com [91.218.175.111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BFCC30CA
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 08:21:37 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1690471295;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=IlwsvGNRJnMmWnx4X81rM4zHsMyVpGxID3lfp4Wm+1A=;
+        b=UnKls/jjqZcZzftvuk3ljzIPLwoprqIWOu7LoFbkkVSAIBhLiG4rj7MDXbC/wSvtMI359l
+        N6V7bn3EnXoWjtBGCXe0jAO/FTTa0piMOgDtLsfDpCDWkAJsdhdkz/EHKYdP3PVjE+UdzQ
+        hRtC43R6653je6/DHV9wtgV6FW0mNXk=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, osandov@fb.com, ming.lei@redhat.com,
+        kbusch@kernel.org, krisman@suse.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+Subject: [PATCH v2 1/3] sbitmap: fix hint wrap in the failure case
+Date:   Thu, 27 Jul 2023 23:20:18 +0800
+Message-ID: <20230727152020.3633009-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH blktests v1 01/11] nvme/{003,004,005,013,046,049}: Group
- all variables declarations
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <jsmart2021@gmail.com>
-References: <20230726124644.12619-1-dwagner@suse.de>
- <20230726124644.12619-2-dwagner@suse.de>
- <7e4f6c51-43f4-c039-07bc-6724748a1d3e@acm.org>
- <kya2ayzcgz7iemknkx6xuef4m37f2ms7rt3uxamtxr2w7zbwfc@onladguxa7bk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <kya2ayzcgz7iemknkx6xuef4m37f2ms7rt3uxamtxr2w7zbwfc@onladguxa7bk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/23 00:11, Daniel Wagner wrote:
-> On Wed, Jul 26, 2023 at 07:54:24AM -0700, Bart Van Assche wrote:
->> On 7/26/23 05:46, Daniel Wagner wrote:
->>> Group all variable declarations together at the beginning of the
->>> function.
->>
->> An explanation of why this change has been proposed is missing from the
->> patch description.
-> 
-> Sure, I'll add one. The coding style to declare all local variables at the
-> beginning of the function.
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-Isn't declaring local variables just before their first use a better style?
+```
+hint = nr + 1;
+if (hint >= depth - 1)
+	hint = 0;
+```
 
-Thanks,
+Now we wrap the hint to 0 in the failure case, but has two problems:
+1. hint == depth - 1, is actually an available offset hint, in which
+   case we shouldn't wrap hint to 0.
+2. In the strict round_robin non-wrap case, we shouldn't wrap at all.
 
-Bart.
+```
+wrap = wrap && hint;
+```
+
+We only need to check wrap based on the original hint ( > 0), don't need
+to recheck the new hint which maybe updated in the failure case, which
+may cause second wrap. We set wrap to false after we wrap once to avoid
+repeated wrap, which is clearer than rechecking the hint.
+
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ lib/sbitmap.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index d0a5081dfd12..ac4027884765 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -149,7 +149,8 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 			 * offset to 0 in a failure case, so start from 0 to
+ 			 * exhaust the map.
+ 			 */
+-			if (hint && wrap) {
++			if (wrap) {
++				wrap = false;
+ 				hint = 0;
+ 				continue;
+ 			}
+@@ -160,8 +161,14 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 			break;
+ 
+ 		hint = nr + 1;
+-		if (hint >= depth - 1)
+-			hint = 0;
++		if (unlikely(hint >= depth)) {
++			if (wrap) {
++				wrap = false;
++				hint = 0;
++				continue;
++			}
++			return -1;
++		}
+ 	}
+ 
+ 	return nr;
+-- 
+2.41.0
 
