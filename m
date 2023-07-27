@@ -2,83 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D7B3C0015E
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 01:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 530FDC0015E
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 01:07:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbjG0BD1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jul 2023 21:03:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48066 "EHLO
+        id S230109AbjG0BHx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jul 2023 21:07:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbjG0BD0 (ORCPT
+        with ESMTP id S229642AbjG0BHw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2023 21:03:26 -0400
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C79A1BC1
-        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 18:03:25 -0700 (PDT)
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6687466137bso376769b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 18:03:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690419805; x=1691024605;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UqjxyiI6qShi5Vt5FP0iFEDvw0jixw/cgz0KCSDD87o=;
-        b=GHVfZVi2jt6oxcdARvmydpLQJAZIMsFU7Dl3sI7R72PBds/qgS0k1L8oEm++uM2/Dg
-         vG3jwTBcRK2qZrt0GmjHZkyL8JKASyBZ/+ULn7cpVa51K3TWyMVw02PjFJs+prNtBokJ
-         eheCQOtuaYQ0TN7wViX1i2t99mSzVZDK8AmFlpydZ3NfRnBeKgMs3cJJirRPRfnRigld
-         P+5qVhbKVsG/BvbgusPXYpFklo+kJJZHON8SKLYx4OajAFlg7xxM/8I7qLjSGf7xKWq8
-         CDMKzj3ZwdgirXT48n2BV2Xg6hAhtA4/0AXAPMStPWb1wOEmVz0XcCnxXTqziGqOzll6
-         nZYA==
-X-Gm-Message-State: ABy/qLZ9tNDlaQFlQ813FPQrRLQFOICEM/kkwc6FoQCB3jXIQqPAvZ4j
-        5M7uf3EBcJp7lrGGxTRt6/M=
-X-Google-Smtp-Source: APBJJlHB5iPsc66gpNcIQI9RpFQ05k0X5oXK8zHCIcaPft7CC9OG6cwDFBai3MuiIYapMBEq19WEDw==
-X-Received: by 2002:a05:6a20:b70a:b0:134:409f:41f4 with SMTP id fg10-20020a056a20b70a00b00134409f41f4mr2651591pzb.24.1690419804870;
-        Wed, 26 Jul 2023 18:03:24 -0700 (PDT)
-Received: from ?IPV6:2601:642:4c05:8a41:caaa:de57:fc15:500c? ([2601:642:4c05:8a41:caaa:de57:fc15:500c])
-        by smtp.gmail.com with ESMTPSA id g6-20020aa78746000000b0067aea93af40sm223804pfo.2.2023.07.26.18.03.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 18:03:24 -0700 (PDT)
-Message-ID: <8f2000c0-e9fb-0c7b-5dfa-6807230688a0@acm.org>
-Date:   Wed, 26 Jul 2023 18:03:21 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v4 5/7] scsi: Retry unaligned zoned writes
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Wed, 26 Jul 2023 21:07:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D0B26A6
+        for <linux-block@vger.kernel.org>; Wed, 26 Jul 2023 18:07:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690420027;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ep/tgo1JF7kq+mSuQqf46nxDpvZxtSkMn2UHXJJVSFE=;
+        b=IWqLpSHkBF6QOx8vnw5yAwrKr5sRYAWyl9uXGH36T5O3rUnoU0B8Q1/pa1+6hKvOxHJTvG
+        u1tSChaqvP0U/ibu6N0Z3LvL7jzAD8cJZJB25DA+JWNqW49nS6WWuZYNLKxGhQMoTTDjWJ
+        ZXx4gC4+znIUMVIDwiPL0aQ6CH4uxCc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-577-HTE6F5RpM4i9E-KzSY3P5w-1; Wed, 26 Jul 2023 21:07:02 -0400
+X-MC-Unique: HTE6F5RpM4i9E-KzSY3P5w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 874D7185A78F;
+        Thu, 27 Jul 2023 01:07:01 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 008CFC2C7D3;
+        Thu, 27 Jul 2023 01:06:55 +0000 (UTC)
+Date:   Thu, 27 Jul 2023 09:06:50 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.g.garry@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-nvme@lists.infradead.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230726193440.1655149-1-bvanassche@acm.org>
- <20230726193440.1655149-6-bvanassche@acm.org>
- <c4e4b310-c6c6-e7e7-b5e3-ff44dc63097f@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <c4e4b310-c6c6-e7e7-b5e3-ff44dc63097f@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Wen Xiong <wenxiong@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, ming.lei@redhat.com
+Subject: Re: [PATCH V2 1/9] blk-mq: add blk_mq_max_nr_hw_queues()
+Message-ID: <ZMHDKkFDISWAJrdC@ovpn-8-16.pek2.redhat.com>
+References: <20230726094027.535126-1-ming.lei@redhat.com>
+ <20230726094027.535126-2-ming.lei@redhat.com>
+ <b7818133-6d1e-457d-a62f-360523e936c8@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b7818133-6d1e-457d-a62f-360523e936c8@oracle.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/26/23 17:33, Damien Le Moal wrote:
->  From all this, and given that for (3) REQ_NO_ZONE_WRITE_LOCK is set
-> unconditionally, it now seems to me that this request flag is useless...
-> Thoughts ?
+On Wed, Jul 26, 2023 at 05:36:34PM +0100, John Garry wrote:
+> On 26/07/2023 10:40, Ming Lei wrote:
+> 
+> Hi Ming,
+> 
+> > blk_mq_alloc_tag_set() may override set->nr_hw_queues as 1 in case of kdump
+> > kernel. This way causes trouble for driver, because blk-mq and driver see
+> > different queue mapping. Especially the only online CPU may not be 1 for
+> > kdump kernel, in which 'maxcpus=1' is passed from kernel command line,
+> 
+> "the only online CPU may not be 1 for kdump kernel, in which 'maxcpus=1'
+> ..." - this seems inconsistent with the cover letter, where we have
+> "'maxcpus=1' just bring up one single cpu core during booting."
 
-Hi Damien,
+OK, looks I should have mentioned "the only online CPU may not be 1 for
+maxcpus=1" in cover letter.
 
-Thanks for having taken a close look at this patch series.
+> > then driver may map hctx0 into one inactive real hw queue which cpu
+> > affinity is 0(offline).
+> > 
+> > The issue exists on all drivers which use managed irq and support
+> > multiple hw queue.
+> > 
+> > Prepare for fixing this kind of issue by applying the added helper, so
+> > driver can take blk-mq max nr_hw_queues knowledge into account when
+> > calculating io queues.
+> 
+> Could you alternatively solve in blk_mq_pci_map_queues() by fixing the
+> mappings in case of kdump to have all per-CPU mappings point at the HW queue
+> associated with cpu0 (which I assume would be active)? It ain't pretty ...
 
-The flag REQ_NO_ZONE_WRITE_LOCK was introduced based on earlier review
-feedback. Removing that flag again would help me because that would
-allow me to develop a test for the blktest suite that submits I/O
-directly to the block device instead of an F2FS filesystem. I like
-F2FS but it's probably good to minimize the number of layers when
-writing blktest tests.
+cpu0 mapping isn't correct, as I mentioned that 'maxcpus=1' doesn't
+mean the only online cpu is cpu0, such as, on ppc64, the only online
+cpu could be selected at random during booting.
+
+> 
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >   block/blk-mq.c         | 16 ++++++++++++++++
+> >   include/linux/blk-mq.h |  1 +
+> >   2 files changed, 17 insertions(+)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index b04ff6f56926..617d6f849a7b 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -140,6 +140,22 @@ void blk_mq_freeze_queue_wait(struct request_queue *q)
+> >   }
+> >   EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait);
+> > +/*
+> > + * Return the max supported nr_hw_queues for each hw queue type
+> > + *
+> > + * blk_mq_alloc_tag_set() may change nr_hw_queues for kdump kernel, so
+> > + * driver has to take blk-mq max supported nr_hw_queues into account
+> > + * when figuring out nr_hw_queues from hardware info, for avoiding
+> > + * inconsistency between driver and blk-mq.
+> > + */
+> > +unsigned int blk_mq_max_nr_hw_queues(void)
+> > +{
+> > +	if (is_kdump_kernel())
+> > +		return 1;
+> > +	return nr_cpu_ids;
+> > +}
+> 
+> We rely on the driver having set->nr_hw_queues == 1 for kdump, right?
+> 
+> If so, how about enforcing it then, like:
+> 
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -4426,7 +4426,8 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+>         * 64 tags to prevent using too much memory.
+>         */
+>        if (is_kdump_kernel()) {
+> -               set->nr_hw_queues = 1;
+> +               if (set->nr_hw_queues != 1)
+> +                       return -EINVAL;
+>                set->nr_maps = 1;
+>                set->queue_depth = min(64U, set->queue_depth);
+>        }
+
+In theory, this way should be ideal approach, but it needs all MQ drivers
+to get converted with blk_mq_max_nr_hw_queues().
+
+However, it shouldn't be one issue for non-managed irq given non-managed
+irq can be migrated to the only online cpu.
+
 
 Thanks,
-
-Bart.
+Ming
 
