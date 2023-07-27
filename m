@@ -2,93 +2,163 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B26C0015E
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 19:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C396C0015E
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 19:23:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231612AbjG0TG3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jul 2023 15:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47274 "EHLO
+        id S231248AbjG0TXw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jul 2023 15:23:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231910AbjG0TG3 (ORCPT
+        with ESMTP id S229498AbjG0TXv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jul 2023 15:06:29 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D7002126
-        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 12:06:28 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-d16639e16e6so1155810276.3
-        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 12:06:28 -0700 (PDT)
+        Thu, 27 Jul 2023 15:23:51 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081BBE2
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 12:23:50 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id 3f1490d57ef6-d0a8ae5f8a6so1266433276.0
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 12:23:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690484787; x=1691089587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CNYthtO4coM06VkbXgx9FdQgyCEMdHOnZ22oxjM3Xjg=;
-        b=a8IWofjDACYMVcn80SR2YyQCFsbM4e9NrjKSMVQggbZR3cEj+HXQn0H7BlYpfA5YGk
-         Yr8njb/IG8EASJiEmUq/pS+S2hu+MFFu9TRQiQ+ctVH5lCHiExOP3YBNwoDpydyP2kyt
-         rOAAPyBLzu85ONENaoe6cz6fRfoW1XDqQuxT4RrGSx6Xg/MQwX6KHqQWuz0XrBYWmX1r
-         aMGoldpyaGjXt3mH7fACZzRyaDHppR8DhB5IR8fjvnIFvjREe+m/yw+/BVf5QohNaH/y
-         LOzPHshU1bKTAIkeGvzsCmSPXl0zS6g9t3o72hqoheMBfqzGd49tvRfG6RoEfMQcN6Q/
-         Zigw==
+        d=google.com; s=20221208; t=1690485829; x=1691090629;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3p55Sq7jOPOyztMgwNy28i6gxdMWDYbV2zRCVkaZOto=;
+        b=Wj44Om9rKG337qfaoqNek+dwsW6frepjR1UGJOMg/1FCMzqBFifNdPcPRBDFpRsC+r
+         SWWlcSfWx4A39OvqV8Fzs0i6HEBcBLtqv+jj7oms/GxCe5D3QAICKVlc4Q4xiXyXd7Bh
+         HDmP7jiSSAfsp1QdKpksw4CJOCcT6DZ/DXPn6hD4XdXjL1fIlE9XixdqqLB+fsqmB6a8
+         QQQEugaI34wzJTOX5tOC4ZFDdun96gc60Khp3ZZumpXuwKLHH1GLC8oVlOGnmsnI75T9
+         4YJLXKFkte2bKZPAmdiWpRY9eKwH4uLEhjMrqI7UTGuYdagkrJz3Yod2HVz88u5g22vd
+         Rd9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690484787; x=1691089587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CNYthtO4coM06VkbXgx9FdQgyCEMdHOnZ22oxjM3Xjg=;
-        b=QWnhaA3RQ5r9EXoYXT2JXLcStPx54AHTYUi7tThJI9Bb3aBOOvC/H8orwSp/ekJMKs
-         J9MwlFyf0ctIeYyHEHXXI8UEw0vW4ZbzNk86JssqR+7DDSSpG/CWH1EG5RqMNyEXDyAf
-         RlZ1YvqBEv5Y24zdV51LWWuojPda5C8qkI/i/1ZHliGIA7CYXb0f/GRZ/nqUhwcYUzIO
-         DtEHSZr+6fj50mXNPz+tZ0PiqKtC6mWs6oU8pv4jNbBF4pmx7QiYJxTpgsEySjho4X9T
-         /bImlVH6WjVwWx8T0omZS4A76ZOW8VB09em80KAQ3CVgaCY9V10J+CXgcO/e1o22JZoa
-         z3QQ==
-X-Gm-Message-State: ABy/qLa33gysn7LeP269UDzKOPNroi//risOeFnwwjrobAAQL0HWNPeO
-        lGFdQRpyK7ewN+IYJ4Zlkh1noBzCV5i8KssggUA=
-X-Google-Smtp-Source: APBJJlEdzetiUWH4bqS3KM5O1DtIEE6U9JhilLXxYz7rsM+b4iZR1CkAzuSffnKWT9pnMDnUFheWjfoa3k9j0iNy38o=
-X-Received: by 2002:a25:234b:0:b0:d00:7d6d:4767 with SMTP id
- j72-20020a25234b000000b00d007d6d4767mr286102ybj.44.1690484787145; Thu, 27 Jul
- 2023 12:06:27 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690485829; x=1691090629;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3p55Sq7jOPOyztMgwNy28i6gxdMWDYbV2zRCVkaZOto=;
+        b=kkwZTJ11KNxJWmCGmt1X41A/6WgsGTdqEWCEJosQdipHVvKxsCo8/gVFBp//qFGSN0
+         XljamyMiPRDyD9cv1a1z+YaRByVURNHJP25nfs7Oifuuvvf9rbPfDgEdF41gQ/36wRbK
+         g057Jz6Jp4cvGe0UUEcDHS82L0hwSNH34wUGf/7rEb56TsVHq8zkGW5Vcke8GZykBo8f
+         9hBmGLfBCK7RE4J7V14rsVXG2Pw7dQRoqtFg3it8XGj8YxKf4xWSh3qcHpER1tbL+prm
+         Hq3ZHpshjOHRQ7RSFVf+cAY0MsdzsXgRcwIB1kWUQmrRJfpa1srCksZFxYf7VEbOA4Sz
+         fdOg==
+X-Gm-Message-State: ABy/qLYnxrfnxjKwi4ysYVUrYS14oDjt7xYbH2P9hyguBq75iuYQwl4c
+        z+Dir/JVKzh3L1zivuIFklprzw==
+X-Google-Smtp-Source: APBJJlHy7zEq/TtzCz5Zjkh2FW+fxbAj2FT57ApWwlXXwTCIV6gmpUv/jH1vywotXR7udrz7isqt/w==
+X-Received: by 2002:a25:260d:0:b0:d25:129e:8766 with SMTP id m13-20020a25260d000000b00d25129e8766mr311316ybm.29.1690485829111;
+        Thu, 27 Jul 2023 12:23:49 -0700 (PDT)
+Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id f11-20020a5b0d4b000000b00d13b72fae3esm433941ybr.2.2023.07.27.12.23.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 12:23:48 -0700 (PDT)
+Date:   Thu, 27 Jul 2023 12:23:46 -0700 (PDT)
+From:   Hugh Dickins <hughd@google.com>
+X-X-Sender: hugh@ripple.attlocal.net
+To:     David Howells <dhowells@redhat.com>
+cc:     Hugh Dickins <hughd@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        John Hubbard <jhubbard@nvidia.com>,
+        David Hildenbrand <david@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 2/2] shmem: Apply a couple of filemap_splice_read() fixes
+ to shmem_splice_read()
+In-Reply-To: <20230727161016.169066-3-dhowells@redhat.com>
+Message-ID: <bd497349-1cce-7c29-8b8f-d95f10e534e6@google.com>
+References: <20230727161016.169066-1-dhowells@redhat.com> <20230727161016.169066-3-dhowells@redhat.com>
 MIME-Version: 1.0
-References: <20230726193440.1655149-1-bvanassche@acm.org> <20230726193440.1655149-2-bvanassche@acm.org>
- <CAOSviJ0uBynC9M16cRusttU1OaB4HJS8=xmjCGP7bUCMicmiOA@mail.gmail.com> <0880328d-f2ab-beca-a3d4-a7db04123edc@acm.org>
-In-Reply-To: <0880328d-f2ab-beca-a3d4-a7db04123edc@acm.org>
-From:   Nitesh Shetty <nitheshshetty@gmail.com>
-Date:   Fri, 28 Jul 2023 00:36:15 +0530
-Message-ID: <CAOSviJ06=avhG=Ww2E=LoNj+P56yuim_2i0sKkbRsCGj5ZYRKA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/7] block: Introduce the flag QUEUE_FLAG_NO_ZONE_WRITE_LOCK
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 8:13=E2=80=AFPM Bart Van Assche <bvanassche@acm.org=
-> wrote:
->
-> On 7/27/23 03:59, Nitesh Shetty wrote:
-> > On Thu, Jul 27, 2023 at 1:39=E2=80=AFAM Bart Van Assche <bvanassche@acm=
-.org> wrote:
-> >> + * Do not use the zone write lock for sequential writes for sequentia=
-l write
-> >> + * required zones.
-> >> + */
-> >> +#define QUEUE_FLAG_NO_ZONE_WRITE_LOCK 8
-> >
-> > Instead of QUEUE_FLAG_NO_ZONE_WRITE_LOCK I feel
-> > QUEUE_FLAG_SKIP_ZONE_WRITE_LOCK is better.
->
-> Hmm ... this patch series makes it possible to use an UFS storage
-> controller and a zoned UFS device with no I/O scheduler attached. If no
-> I/O scheduler is active, there is no zone write locking to skip so I
-> think that the former name is better.
+On Thu, 27 Jul 2023, David Howells wrote:
 
-Okay, I missed no I/O scheduler.
+> Fix shmem_splice_read() to use the inode from in->f_mapping->host rather
+> than file_inode(in) and to skip the splice if it starts after s_maxbytes,
+> analogously with fixes to filemap_splice_read().
+> 
+> Fixes: bd194b187115 ("shmem: Implement splice-read")
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-Thanks,
-Nitesh Shetty
+Thanks for trying to keep them in synch, but I already had to look into
+both of these two "fixes" before sending my patch to Andrew, and neither
+appears to be needed.
+
+Neither of them does any harm either, but I think I'd prefer Andrew to
+drop this patch from mm-unstable, just because it changes nothing.
+
+Comment on each below...
+
+> cc: Hugh Dickins <hughd@google.com>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Al Viro <viro@zeniv.linux.org.uk>
+> cc: John Hubbard <jhubbard@nvidia.com>
+> cc: David Hildenbrand <david@redhat.com>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Chuck Lever <chuck.lever@oracle.com>
+> cc: linux-block@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>  mm/shmem.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/mm/shmem.c b/mm/shmem.c
+> index 0164cccdcd71..8a16d4c7092b 100644
+> --- a/mm/shmem.c
+> +++ b/mm/shmem.c
+> @@ -2780,13 +2780,16 @@ static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
+>  				      struct pipe_inode_info *pipe,
+>  				      size_t len, unsigned int flags)
+>  {
+> -	struct inode *inode = file_inode(in);
+> +	struct inode *inode = in->f_mapping->host;
+
+Haha, it's years and years since I had to worry about that distinction:
+I noticed you'd made that change in filemap, and had to refresh old
+memories, before concluding that this change is not needed.
+
+shmem_file_splice_read() is specified only in shmem_file_operations,
+and shmem_file_operations is connected up only when S_IFREG; so block
+and char device nodes will not ever arrive at shmem_file_splice_read().
+
+And shmem does not appear to be out of step there: I did not search
+through many filesystems, but it appeared to be normal that only the
+regular files reach the splice_read.
+
+Which made me wonder whether the file_inode -> f_mapping->host
+change was appropriate elsewhere.  Wouldn't the splice_read always
+get called on the bd_inode?  Ah, perhaps not: init_special_inode()
+sets i_fop to def_blk_fops (for shmem and everyone else), and that
+points to filemap_splice_read(), which explains why just that one
+needs to pivot to f_mapping->host (I think).
+
+>  	struct address_space *mapping = inode->i_mapping;
+>  	struct folio *folio = NULL;
+>  	size_t total_spliced = 0, used, npages, n, part;
+>  	loff_t isize;
+>  	int error = 0;
+>  
+> +	if (unlikely(*ppos >= inode->i_sb->s_maxbytes))
+> +		return 0;
+> +
+>  	/* Work out how much data we can actually add into the pipe */
+>  	used = pipe_occupancy(pipe->head, pipe->tail);
+>  	npages = max_t(ssize_t, pipe->max_usage - used, 0);
+	len = min_t(size_t, len, npages * PAGE_SIZE);
+
+	do {
+		if (*ppos >= i_size_read(inode))
+			break;
+
+I've added to the context there, to show that the very first thing the
+do loop does is check *ppos against i_size: so there's no need for that
+preliminary check against s_maxbytes - something would be wrong already
+if the file has grown beyond s_maxbytes.
+
+So, thanks for the patch, but shmem does not need it.
+
+Hugh
