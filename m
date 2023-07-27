@@ -2,49 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC89DEB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 20:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA8EEB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 20:27:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229861AbjG0UUG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jul 2023 16:20:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47362 "EHLO
+        id S230098AbjG0U1z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jul 2023 16:27:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjG0UUF (ORCPT
+        with ESMTP id S229822AbjG0U1x (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jul 2023 16:20:05 -0400
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A848213F
-        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 13:20:04 -0700 (PDT)
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-68706b39c4cso463970b3a.2
-        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 13:20:04 -0700 (PDT)
+        Thu, 27 Jul 2023 16:27:53 -0400
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5925E2D71
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 13:27:22 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-686ba29ccb1so868894b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 13:27:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690489203; x=1691094003;
+        d=1e100.net; s=20221208; t=1690489569; x=1691094369;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S/96a3zHkJjvv20RvXBqEv1QB41ltihCxTy9kgfLSNg=;
-        b=AhxVULBZRAeBhVnIZAbpx81RruHLCjjhJ34oScBWU+95+LZVIuIum33Af+O92rCQWB
-         sbZVweiVtU20UDggePIExDukXr8LcVp21FdyHRxTLR7Q/HaeksKvafqHchuMyTiHaA+4
-         7VIG/ewaR7NIKana/XQE7+MZmQlkA91LMKB1PtGfLDYW1W+G1xb/AYT91LkpOzJgakWa
-         1zO9ZTW/IEJK6B+iPJSgk+mkKcqCDjMGiXBnJdsecnFg2SeqwMz12OBWI3lqGTyFFFMz
-         +4+V8eV8dM7aVMTREZeDSPbXUbeJ9O/jWpmtSMc/Tvy6Tj2b27/aJWRJLfaymnfPBK4p
-         upuQ==
-X-Gm-Message-State: ABy/qLb0xKacOzqpnFQGjKnIaUg8thX3g5inKbRKIoMOJMJt0pTMdSHt
-        Uk3aFycYtW1t8eyU1dugteA=
-X-Google-Smtp-Source: APBJJlEgw8lBDL7YXe9GttZE6fd6EUOOlj/5ds1/L0WRzyi7yhrLdbjbYB3nXSkJx1AVMDYokpYFxg==
-X-Received: by 2002:a05:6a00:ad2:b0:682:4de1:adcc with SMTP id c18-20020a056a000ad200b006824de1adccmr212632pfl.12.1690489203518;
-        Thu, 27 Jul 2023 13:20:03 -0700 (PDT)
+        bh=3xJzUgKrN9MvGtgNhxuFzT7GY4BxHPqBw/mUX/0thAQ=;
+        b=UE/oA3h6S4MDORrKnCS93bvgcJAt0qXzvVBL+jZtqBty6vJMhz7Gqy9+i3BOwtA2ri
+         Q4E3Ay3zMErGVMEyM6S+N4NcwTTfg0Z+2l8d6z17rihQzMFTQkhYoRDNrQvju5SLxY3L
+         yPmMuzeGVdGLIJeIL23P3Vqjvn2+LDKbfNZw+/TSP/mFQMJHEeZo8ZuFb4Z3cIHbMsdz
+         ILG1j0TQeCyUeD2lAc+CKhDLFl/rp2bx5hS5KugBV/Gu3PHzeUFX6/gaXaPUoEX2FJ+x
+         Zvg7YmzDDSFsYCTDcXWDouBD4jHr/G0w6kN4DXG90oe2ygQ8vSLxjnGysyW17uW6UV1h
+         LYFQ==
+X-Gm-Message-State: ABy/qLZSvhvXBUo2fX+JRFPmGOMcWoAsjqP2MTLmJ8z4l10YIF1/JxwJ
+        2Erj6fzatxWDDodKsOpoVLk=
+X-Google-Smtp-Source: APBJJlE+XaoL6OsYi/yO8n6HgonH09shNpszrxTz4rzCSDaRaz/3fRGmtM8IqSFo4aGjPr+QIHZNEQ==
+X-Received: by 2002:a05:6a20:4425:b0:133:38cb:2b93 with SMTP id ce37-20020a056a20442500b0013338cb2b93mr549859pzb.9.1690489569151;
+        Thu, 27 Jul 2023 13:26:09 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:607:27ba:91cb:68ee? ([2620:15c:211:201:607:27ba:91cb:68ee])
-        by smtp.gmail.com with ESMTPSA id m3-20020aa78a03000000b00686e8b00a50sm162375pfa.104.2023.07.27.13.20.02
+        by smtp.gmail.com with ESMTPSA id f20-20020aa782d4000000b0066f37665a6asm1858939pfn.117.2023.07.27.13.26.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 13:20:03 -0700 (PDT)
-Message-ID: <d3193436-4e16-693d-f69a-f2d21cac11f3@acm.org>
-Date:   Thu, 27 Jul 2023 13:20:01 -0700
+        Thu, 27 Jul 2023 13:26:08 -0700 (PDT)
+Message-ID: <dc61d570-4957-c6c4-0328-1358419212b0@acm.org>
+Date:   Thu, 27 Jul 2023 13:26:06 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH v4 1/7] block: Introduce the flag
- QUEUE_FLAG_NO_ZONE_WRITE_LOCK
+Subject: Re: [PATCH v4 4/7] block/null_blk: Support disabling zone write
+ locking
 Content-Language: en-US
 To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -52,42 +52,46 @@ Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Vincent Fu <vincent.fu@samsung.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Akinobu Mita <akinobu.mita@gmail.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 References: <20230726193440.1655149-1-bvanassche@acm.org>
- <20230726193440.1655149-2-bvanassche@acm.org>
- <65bb97ce-f0e4-8174-0d27-64a8543d4bbb@nvidia.com>
+ <20230726193440.1655149-5-bvanassche@acm.org>
+ <0d4e873c-199f-3c47-7c27-3ebd5624fee6@nvidia.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <65bb97ce-f0e4-8174-0d27-64a8543d4bbb@nvidia.com>
+In-Reply-To: <0d4e873c-199f-3c47-7c27-3ebd5624fee6@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/26/23 17:54, Chaitanya Kulkarni wrote:
+On 7/26/23 17:36, Chaitanya Kulkarni wrote:
 > On 7/26/2023 12:34 PM, Bart Van Assche wrote:
->> +/*
->> + * Do not use the zone write lock for sequential writes for sequential write
->> + * required zones.
->> + */
+>> Add a new configfs attribute for disabling zone write locking. Tests
+>> show a performance of 250 K IOPS with no I/O scheduler, 6 K IOPS with
+>> mq-deadline and write locking enabled and 123 K IOPS with mq-deadline
+>> and write locking disabled. This shows that disabling write locking
+>> results in about 20 times more IOPS for this particular test case.
+>>
+>> Cc: Christoph Hellwig <hch@lst.de>
+>> Cc: Damien Le Moal <dlemoal@kernel.org>
+>> Cc: Ming Lei <ming.lei@redhat.com>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>> ---
 > 
-> In first go I got little confused with above comment, how about :-
+> This patch looks good to me, perhaps a blktests would be nice in zbd
+> category ?
 > 
-> /*
->    * When issuing sequential writes on zone type
->    * BLK_ZONE_TYPE_SEQWRITE_REQ, don't use zone write locking.
->    */
-> 
-> It makes it easier to search in code with BLK_ZONE_TYPE_SEQWRITE_REQ
-> but if everyone else is okay with original comment or if it is not
-> correct suggestion feel free to ignore my suggestion ...
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 
-How about this comment?
+Hi Chaitanya,
 
-/*
-  * Do not serialize sequential writes sent to a sequential write
-  * required zone (BLK_ZONE_TYPE_SEQWRITE_REQ).
-  */
+I will work on adding a blktest test that runs with zone write locking 
+disabled.
 
 Thanks,
 
