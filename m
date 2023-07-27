@@ -2,76 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E7DC00528
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 19:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC89DEB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 20:20:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbjG0TwC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jul 2023 15:52:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33494 "EHLO
+        id S229861AbjG0UUG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jul 2023 16:20:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjG0TwB (ORCPT
+        with ESMTP id S229487AbjG0UUF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jul 2023 15:52:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27673AB6
-        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 12:50:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690487453;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/nw8whqMcC5WOFFNcrWxqOQTv8DnzLwL5HhkU05t3og=;
-        b=B2L/OcCYgC4Olkh8MRU7OhzXVb5mIlRkVLNUDRJI5deFQAzV8GM7ykpDFSsWt9VWUtHvxY
-        LCFVuGIup9Soo5NjptrnOqnK8uIV2RykcXg1wCOzWir4LUZASKZ81Bsu/irbt/6oSN1pYf
-        aC4HctxUdfJl9vV0cTdXeUukOKJCQp8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-609-USy43ND5Ooy4YgNf-hLNXQ-1; Thu, 27 Jul 2023 15:50:47 -0400
-X-MC-Unique: USy43ND5Ooy4YgNf-hLNXQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 72F801044589;
-        Thu, 27 Jul 2023 19:50:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 05C7E4094DC0;
-        Thu, 27 Jul 2023 19:50:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <bd497349-1cce-7c29-8b8f-d95f10e534e6@google.com>
-References: <bd497349-1cce-7c29-8b8f-d95f10e534e6@google.com> <20230727161016.169066-1-dhowells@redhat.com> <20230727161016.169066-3-dhowells@redhat.com>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     dhowells@redhat.com, Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        John Hubbard <jhubbard@nvidia.com>,
-        David Hildenbrand <david@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 2/2] shmem: Apply a couple of filemap_splice_read() fixes to shmem_splice_read()
+        Thu, 27 Jul 2023 16:20:05 -0400
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A848213F
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 13:20:04 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-68706b39c4cso463970b3a.2
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 13:20:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690489203; x=1691094003;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S/96a3zHkJjvv20RvXBqEv1QB41ltihCxTy9kgfLSNg=;
+        b=AhxVULBZRAeBhVnIZAbpx81RruHLCjjhJ34oScBWU+95+LZVIuIum33Af+O92rCQWB
+         sbZVweiVtU20UDggePIExDukXr8LcVp21FdyHRxTLR7Q/HaeksKvafqHchuMyTiHaA+4
+         7VIG/ewaR7NIKana/XQE7+MZmQlkA91LMKB1PtGfLDYW1W+G1xb/AYT91LkpOzJgakWa
+         1zO9ZTW/IEJK6B+iPJSgk+mkKcqCDjMGiXBnJdsecnFg2SeqwMz12OBWI3lqGTyFFFMz
+         +4+V8eV8dM7aVMTREZeDSPbXUbeJ9O/jWpmtSMc/Tvy6Tj2b27/aJWRJLfaymnfPBK4p
+         upuQ==
+X-Gm-Message-State: ABy/qLb0xKacOzqpnFQGjKnIaUg8thX3g5inKbRKIoMOJMJt0pTMdSHt
+        Uk3aFycYtW1t8eyU1dugteA=
+X-Google-Smtp-Source: APBJJlEgw8lBDL7YXe9GttZE6fd6EUOOlj/5ds1/L0WRzyi7yhrLdbjbYB3nXSkJx1AVMDYokpYFxg==
+X-Received: by 2002:a05:6a00:ad2:b0:682:4de1:adcc with SMTP id c18-20020a056a000ad200b006824de1adccmr212632pfl.12.1690489203518;
+        Thu, 27 Jul 2023 13:20:03 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:607:27ba:91cb:68ee? ([2620:15c:211:201:607:27ba:91cb:68ee])
+        by smtp.gmail.com with ESMTPSA id m3-20020aa78a03000000b00686e8b00a50sm162375pfa.104.2023.07.27.13.20.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jul 2023 13:20:03 -0700 (PDT)
+Message-ID: <d3193436-4e16-693d-f69a-f2d21cac11f3@acm.org>
+Date:   Thu, 27 Jul 2023 13:20:01 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <178917.1690487444.1@warthog.procyon.org.uk>
-Date:   Thu, 27 Jul 2023 20:50:44 +0100
-Message-ID: <178918.1690487444@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v4 1/7] block: Introduce the flag
+ QUEUE_FLAG_NO_ZONE_WRITE_LOCK
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+References: <20230726193440.1655149-1-bvanassche@acm.org>
+ <20230726193440.1655149-2-bvanassche@acm.org>
+ <65bb97ce-f0e4-8174-0d27-64a8543d4bbb@nvidia.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <65bb97ce-f0e4-8174-0d27-64a8543d4bbb@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hugh Dickins <hughd@google.com> wrote:
+On 7/26/23 17:54, Chaitanya Kulkarni wrote:
+> On 7/26/2023 12:34 PM, Bart Van Assche wrote:
+>> +/*
+>> + * Do not use the zone write lock for sequential writes for sequential write
+>> + * required zones.
+>> + */
+> 
+> In first go I got little confused with above comment, how about :-
+> 
+> /*
+>    * When issuing sequential writes on zone type
+>    * BLK_ZONE_TYPE_SEQWRITE_REQ, don't use zone write locking.
+>    */
+> 
+> It makes it easier to search in code with BLK_ZONE_TYPE_SEQWRITE_REQ
+> but if everyone else is okay with original comment or if it is not
+> correct suggestion feel free to ignore my suggestion ...
 
-> Which made me wonder whether the file_inode -> f_mapping->host
-> change was appropriate elsewhere.
+How about this comment?
 
-It's sometimes confusing.  There are several (potentially) different inodes
-available at some points.
+/*
+  * Do not serialize sequential writes sent to a sequential write
+  * required zone (BLK_ZONE_TYPE_SEQWRITE_REQ).
+  */
 
-David
+Thanks,
+
+Bart.
 
