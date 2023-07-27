@@ -2,193 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 993EDC0015E
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 15:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C04BC001DC
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jul 2023 15:30:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234561AbjG0PV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jul 2023 11:21:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35676 "EHLO
+        id S229555AbjG0PaQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jul 2023 11:30:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234573AbjG0PVx (ORCPT
+        with ESMTP id S231423AbjG0P35 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jul 2023 11:21:53 -0400
-Received: from out-68.mta0.migadu.com (out-68.mta0.migadu.com [IPv6:2001:41d0:1004:224b::44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2145D30E1
-        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 08:21:46 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690471303;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MHEGgdVdHj4vY18bdOXyRtJoqYQZlvIgYxDQJPuL59w=;
-        b=Vv/FGX69XOHCDVN28FE8R9XfgBkvYOjRJ9IrvFT4uw+lvzw0cVFHnWmhOhZGe5DGQq4Vm6
-        xenzswl7kJ31dEbx9wuTzt3TmK2vDnonf0xi2V8MGao8+9SF3mSueeizHrtPzSG04Vm5+Z
-        hNGBLEjRgjptwa72wdpo33hUSoujnnA=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, osandov@fb.com, ming.lei@redhat.com,
-        kbusch@kernel.org, krisman@suse.de
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: [PATCH v2 3/3] sbitmap: drop wrap logic in __sbitmap_get_word()
-Date:   Thu, 27 Jul 2023 23:20:20 +0800
-Message-ID: <20230727152020.3633009-3-chengming.zhou@linux.dev>
-In-Reply-To: <20230727152020.3633009-1-chengming.zhou@linux.dev>
-References: <20230727152020.3633009-1-chengming.zhou@linux.dev>
+        Thu, 27 Jul 2023 11:29:57 -0400
+Received: from box.fidei.email (box.fidei.email [71.19.144.250])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 690F31BE4
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 08:29:54 -0700 (PDT)
+Received: from authenticated-user (box.fidei.email [71.19.144.250])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+        (No client certificate requested)
+        by box.fidei.email (Postfix) with ESMTPSA id 391C983618;
+        Thu, 27 Jul 2023 11:29:52 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dorminy.me; s=mail;
+        t=1690471793; bh=EAIF5K7fLXgJUjG8uJaxVI7wJVdzXdwKiDhuCYySz9o=;
+        h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+        b=vQOPuSUlVrN/zz7kZTq6jjNePgcrc/0CLVzWduJVxhXFrN/uw39WxKQ2/pYxzfpxc
+         /h0049AE2SMN+7LS8j8vq9z+PNkvJd5ROgQODveVjTwPH0tUp7FTCAPaIKlMYsaCKO
+         ZLXHl3OJT5mztQj55kDFbv+GAUcCYDezuTA73jjmvrysssiPmQ1Lds1eepjZC1kKqJ
+         tzutFPz4oubGGSL7ccTFVkkkeP8gfWIz5BlKwqmQjBa08+xbOG5eD1MafOxLASdS3n
+         Fjfyb0Bw6eMlUOO/GNPkBjdo41i8ZQjEBElVkDb2gzlYr/Pr6kCaBBrld9PgrXS3Cj
+         DGkhbW0VfWEhQ==
+Message-ID: <f62c9dd4-08e6-4b00-a05d-4071e87405a7@dorminy.me>
+Date:   Thu, 27 Jul 2023 11:29:51 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From:   Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Subject: Re: [vdo-devel] [PATCH v2 00/39] Add the dm-vdo deduplication and
+ compression device mapper target.
+To:     Ken Raeburn <raeburn@redhat.com>
+Cc:     Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org,
+        vdo-devel@redhat.com, dm-devel@redhat.com, ebiggers@kernel.org,
+        tj@kernel.org
+References: <20230523214539.226387-1-corwin@redhat.com>
+ <ZLa086NuWiMkJKJE@redhat.com>
+ <CAK1Ur396ThV5AAZx2336uAW3FqSY+bHiiwEPofHB_Kwwr4ag5A@mail.gmail.com>
+ <509f4916-a95f-216e-b0ab-7b7a108a48a0@dorminy.me> <87bkfy9riw.fsf@redhat.com>
+Content-Language: en-US
+In-Reply-To: <87bkfy9riw.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
 
-The complex wrap logic in __sbitmap_get_word() seems unnecessary:
+> 
+>> If kernel workqueues have higher overhead per item for the lightweight
+>> work VDO currently does in each step, perhaps the dual of the current
+>> scheme would let more work get done per fixed queuing overhead, and
+>> thus perform better? VIOs could take locks on sections of structures,
+>> and operate on multiple structures before requeueing.
+> 
+> Can you suggest a little more specifically what the "dual" is you're
+> picturing?
 
-1. Strict round-robin mode: wrap == false
-   1.1 hint == 0: we search sb->map_nr words, won't wrap
-   1.2 hint > 0: we search (sb->map_nr + 1) words, won't wrap
+It sounds like your experiment consisted of one kernel workqueue per 
+existing thread, with VIOs queueing on each thread in turn precisely as 
+they do at present, so that when the VIO work item is running it's 
+guaranteed to be the unique actor on a particular set of structures 
+(e.g. for a physical thread the physical zone and slabs).
 
-2. Non round-robin mode: wrap == true
-   2.1 hint == 0: we search sb->map_nr words, don't need wrap
-   2.2 hint > 0: we search sb->map_nr words, need wrap
+I am thinking of an alternate scheme where e.g. each slab, each block 
+map zone, each packer would be protected by a lock instead of owned by a 
+thread. There would be one workqueue with concurrency allowed where all 
+VIOs would operate.
 
-So 2.2 is the only reason we need wrap logic in __sbitmap_get_word(),
-the only user like 2.2 is __sbitmap_get_shallow().
+VIOs would do an initial queuing on a kernel workqueue, and then when 
+the VIO work item would run, they'd take and hold the appropriate locks 
+while they operated on each structure. So they'd take and release slab 
+locks until they found a free block; send off to UDS and get requeued 
+when it came back or the timer expired; try to compress and take/release 
+a lock on the packer while adding itself to a bin and get requeued if 
+appropriate when the packer released it; write and requeue when the 
+write finishes if relevant. Then I think the 'make whatever modification 
+to structures is relevant' part can be done without any requeue: take 
+and release the recovery journal lock; ditto on the relevant slab; again 
+the journal; again the other slab; then the part of the block map; etc.
 
-__sbitmap_get_shallow() always set wrap == true no matter the sbitmap
-is round-robin or not, seems that it doesn't want strict round-robin
-tag in this limited case.
+Yes, there's the intriguing ordering requirements to work through, but 
+maybe as an initial performance experiment the ordering can be ignored 
+to get an idea of whether this scheme could provide acceptable performance.
 
-We can remove 2.2 case by setting hint == 0 in __sbitmap_get_shallow(),
-since there is no point in looping twice in find_next_zero_bit() if we
-don't want strict round-robin tag for this case.
+> There are also occasionally non-VIO objects which get queued to invoke
+> actions on various threads, which I expect might further complicate the
+> experiment.
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- lib/sbitmap.c | 47 +++++++++++++----------------------------------
- 1 file changed, 13 insertions(+), 34 deletions(-)
-
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 6e098a46be26..d042dc5d53c3 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -134,41 +134,21 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth)
- EXPORT_SYMBOL_GPL(sbitmap_resize);
- 
- static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
--			      unsigned int hint, bool wrap)
-+			      unsigned int hint)
- {
- 	int nr;
- 
--	/* don't wrap if starting from 0 */
--	wrap = wrap && hint;
--
- 	while (1) {
- 		nr = find_next_zero_bit(word, depth, hint);
--		if (unlikely(nr >= depth)) {
--			/*
--			 * We started with an offset, and we didn't reset the
--			 * offset to 0 in a failure case, so start from 0 to
--			 * exhaust the map.
--			 */
--			if (wrap) {
--				wrap = false;
--				hint = 0;
--				continue;
--			}
-+		if (unlikely(nr >= depth))
- 			return -1;
--		}
- 
- 		if (!test_and_set_bit_lock(nr, word))
- 			break;
- 
- 		hint = nr + 1;
--		if (unlikely(hint >= depth)) {
--			if (wrap) {
--				wrap = false;
--				hint = 0;
--				continue;
--			}
-+		if (unlikely(hint >= depth))
- 			return -1;
--		}
- 	}
- 
- 	return nr;
-@@ -176,14 +156,13 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
- 
- static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
- 				    unsigned int depth,
--				    unsigned int alloc_hint,
--				    bool wrap)
-+				    unsigned int alloc_hint)
- {
- 	int nr;
- 
- 	do {
- 		nr = __sbitmap_get_word(&map->word, depth,
--					alloc_hint, wrap);
-+					alloc_hint);
- 		if (nr != -1)
- 			break;
- 		if (!sbitmap_deferred_clear(map))
-@@ -196,8 +175,7 @@ static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
- static int sbitmap_find_bit(struct sbitmap *sb,
- 			    unsigned int depth,
- 			    unsigned int index,
--			    unsigned int alloc_hint,
--			    bool wrap)
-+			    unsigned int alloc_hint)
- {
- 	unsigned int map_nr = sb->map_nr;
- 	unsigned int i;
-@@ -207,7 +185,7 @@ static int sbitmap_find_bit(struct sbitmap *sb,
- 	 * If we have alloc_hint > 0 and don't wrap, we need to
- 	 * recheck sb->map[index] with hint == 0 to exhaust the map.
- 	 */
--	if (alloc_hint && !wrap)
-+	if (alloc_hint)
- 		map_nr += 1;
- 
- 	for (i = 0; i < map_nr; i++) {
-@@ -215,7 +193,7 @@ static int sbitmap_find_bit(struct sbitmap *sb,
- 					      min_t(unsigned int,
- 						    __map_depth(sb, index),
- 						    depth),
--					      alloc_hint, wrap);
-+					      alloc_hint);
- 
- 		if (nr != -1) {
- 			nr += index << sb->shift;
-@@ -247,8 +225,7 @@ static int __sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint)
- 	else
- 		alloc_hint = 0;
- 
--	return sbitmap_find_bit(sb, UINT_MAX, index, alloc_hint,
--				!sb->round_robin);
-+	return sbitmap_find_bit(sb, UINT_MAX, index, alloc_hint);
- }
- 
- int sbitmap_get(struct sbitmap *sb)
-@@ -275,9 +252,11 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
- 	unsigned int index;
- 
- 	index = SB_NR_TO_INDEX(sb, alloc_hint);
--	alloc_hint = SB_NR_TO_BIT(sb, alloc_hint);
- 
--	return sbitmap_find_bit(sb, shallow_depth, index, alloc_hint, true);
-+	/* No point in looping twice in find_next_zero_bit() for this case. */
-+	alloc_hint = 0;
-+
-+	return sbitmap_find_bit(sb, shallow_depth, index, alloc_hint);
- }
- 
- int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth)
--- 
-2.41.0
-
+I think that's the easy part -- queueing a work item to grab a lock and 
+Do Something seems to me a pretty common thing in the kernel code. 
+Unless there are ordering requirements among the non-vios I'm not 
+calling to mind.
