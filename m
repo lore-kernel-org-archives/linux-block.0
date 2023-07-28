@@ -2,94 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E23FC001E0
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 08:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44376C001E0
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 09:56:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233462AbjG1I76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jul 2023 04:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53390 "EHLO
+        id S234141AbjG1J40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jul 2023 05:56:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233289AbjG1I75 (ORCPT
+        with ESMTP id S234678AbjG1J4Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2023 04:59:57 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55126B6;
-        Fri, 28 Jul 2023 01:59:56 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 13BD3219B8;
-        Fri, 28 Jul 2023 08:59:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1690534795; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+1yAQj2+drdxOg7W1xMMihj39vdtsCy+k9dgFHWRk9A=;
-        b=N0rVU+qUJPLE+5c9Fe2qfiQ4QbEZQ7uOazDWiF4qTaPR4NpWdkKkS8jI1Ck9Zwe6bae+mr
-        im99wL/jnP6faUX3Uo+ijZIgeoz6KKw7xaNAQ915XLzDNdTC3uQAKTpq9JFAvSll8YZiD7
-        G2jza5/bdosUUSWdRG9M5kbJdc7MUAM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1690534795;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+1yAQj2+drdxOg7W1xMMihj39vdtsCy+k9dgFHWRk9A=;
-        b=XmNFzsCzeT8aHQNyOZo67JTXE5Qr3GO1uEDjLw+BvbWChknTYmwEHmuilIIvi327JDHha2
-        NIeacs1hzD+6y8AA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 04B0D133F7;
-        Fri, 28 Jul 2023 08:59:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 3oH3AIuDw2SleQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 28 Jul 2023 08:59:55 +0000
-Date:   Fri, 28 Jul 2023 10:59:54 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <jsmart2021@gmail.com>
-Subject: Re: [PATCH blktests v1 00/11] Switch to allowed_host
-Message-ID: <ldlkosfmplhb4cqunws5nknpxrgcenbgytlabszl547vygxtbh@xsd7pzil6nk4>
-References: <20230726124644.12619-1-dwagner@suse.de>
- <hqi4yxhc3jc7v7ywf5qvy3u2th676irollqngbsh62rrlitkyy@rhl6axqsve5s>
+        Fri, 28 Jul 2023 05:56:25 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D532430E1;
+        Fri, 28 Jul 2023 02:56:19 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qPKBs-0011CA-9u; Fri, 28 Jul 2023 17:55:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jul 2023 17:55:20 +0800
+Date:   Fri, 28 Jul 2023 17:55:20 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Haren Myneni <haren@us.ibm.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 00/21] crypto: consolidate and clean up compression
+ APIs
+Message-ID: <ZMOQiPadP2jggZ2i@gondor.apana.org.au>
+References: <20230718125847.3869700-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <hqi4yxhc3jc7v7ywf5qvy3u2th676irollqngbsh62rrlitkyy@rhl6axqsve5s>
+In-Reply-To: <20230718125847.3869700-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 08:20:55AM +0000, Shinichiro Kawasaki wrote:
-> > Except the last two patches are just refactoring patches. So if we decide to use
-> > common target setup/cleanup helpers, I think we could add them before the last
-> > two patches, which would make the last patch way smaller.
-> 
-> I ran 'make check' and saw shellecheck complaints below. I added 'export' to the
-> variables then they disappeared.
-> 
-> tests/nvme/rc:19:1: warning: def_subsysnqn appears unused. Verify use (or export if used externally). [SC2034]
-> tests/nvme/rc:20:1: warning: def_file_path appears unused. Verify use (or export if used externally). [SC2034]
-> tests/nvme/rc:21:1: warning: def_file_path appears unused. Verify use (or export if used externally). [SC2034]
+On Tue, Jul 18, 2023 at 02:58:26PM +0200, Ard Biesheuvel wrote:
+>
+> Patch #2 removes the support for on-the-fly allocation of destination
+> buffers and scatterlists from the Intel QAT driver. This is never used,
+> and not even implemented by all drivers (the HiSilicon ZIP driver does
+> not support it). The diffstat of this patch makes a good case why the
+> caller should be in charge of allocating the memory, not the driver.
 
-These variables are not used in nvme/rc at the point I introduce them. Only in
-the tests. I could add the nvmet setup/cleanup helpers with the variables which
-would make those warnings go away. But these helpers would then add the end of
-the series. Also not really good. I don't what is best here.
+The implementation in qat may not be optimal, but being able to
+allocate memory in the algorithm is a big plus for IPComp at least.
 
-> I also ran nvme tests with the export fixes and saw no regression. Looks good
-> from test run point of view.
+Being able to allocate memory page by page as you decompress
+means that:
 
-Thanks!
+1. We're not affected by memory fragmentation.
+2. We don't waste memory by always allocating for the worst case.
 
-BTW, I am off next week, so I don't think I send soon an update.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
