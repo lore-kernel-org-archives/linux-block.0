@@ -2,69 +2,198 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9026C001DE
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 18:39:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F362C0015E
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 20:15:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233883AbjG1Sj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jul 2023 14:39:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48658 "EHLO
+        id S233142AbjG1UPt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jul 2023 16:15:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231486AbjG1Sj1 (ORCPT
+        with ESMTP id S233172AbjG1UPs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2023 14:39:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327B6423C
-        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 11:39:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BCAC4621DD
-        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 18:39:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 308F6C433C9;
-        Fri, 28 Jul 2023 18:39:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690569565;
-        bh=PPXD+1IpFMaf04lizdH1J9hZ2lEd6A9GIQmYlPZucPU=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=cBU5Vfs1wFz8uNNbK2Cpd92IGnisswfOOSGDM/oQU5KivDR67IYDQ3wjTelIoEzgy
-         WlHU2/kNp+dFub1FeaTD8ZLzMrz+NJv43KPotAoV+REs9T56nca6I5HseR4FBoXuJ+
-         2QAoCklaKLZiL8qjXqocGuAZhvAYZB/fCSkhjki9uBf1lYU4rcpmDNN+ySZeya7OwC
-         SCV0Ooa8a8/EsE6gRVyQhiUnyKV4NR2Emt/BUioEiBXGz2bEKrnzZkbqzOetwKESWj
-         ABtiNbV/IqMerkY6q31IvH+9qwrQGau9G8cDF5sEU70wymeHhzyP+bleuTI/gtYbiq
-         JmCzMJuOWOIzw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19DA6C43169;
-        Fri, 28 Jul 2023 18:39:25 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.5-rc4
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <7ffe03ab-339e-be10-c6e8-7294e4c35bb4@kernel.dk>
-References: <7ffe03ab-339e-be10-c6e8-7294e4c35bb4@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <7ffe03ab-339e-be10-c6e8-7294e4c35bb4@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.5-2023-07-28
-X-PR-Tracked-Commit-Id: 3e9dce80dbf91972aed972c743f539c396a34312
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 818680d154170b4e41dc0c1a10e20bc03ca14a00
-Message-Id: <169056956510.21363.16449823541247932697.pr-tracker-bot@kernel.org>
-Date:   Fri, 28 Jul 2023 18:39:25 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Fri, 28 Jul 2023 16:15:48 -0400
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 565F74487
+        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 13:15:47 -0700 (PDT)
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36SJPOmK018669
+        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 13:15:46 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=HdLTZx3ywuV58VYqToINJa02yzTgr3TXTJwla58Xm/4=;
+ b=AeVpb8S/iPtsZsbESzhMlmiY4YHyMmYmUnnCzXTJZpAsMgwkYcpQ6o7cZ10n6LH+6uKX
+ JNqe5/IhXJ5/FnpRZKGCHvENGlo0yM3FtWbJfUChf0cXlBtlWKftEzkR3Dp5al1ivS4Y
+ Cu7CdrEqGSZItpKoCMjDLK7NdkTC8GeVHN/bS0fiTaANdFkQdRUBCzqbVFJnUggERfqx
+ N+dPJsJpGK4yZuwoLlK24wing7buEPukmm/98PILpUHwM+J8/nOcPINYSwYgr0oT/NUC
+ 7wEKFCnXoTu0Iy6epGDAQ0SuAmDGZK4iJYIctcY7w7nFuKtv4ZRVXcl0+Np6vH6idoj5 wQ== 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3s49wdwhjh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 13:15:46 -0700
+Received: from twshared10975.09.ash9.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:21d::7) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 28 Jul 2023 13:15:45 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id B3C801C47B2B5; Fri, 28 Jul 2023 13:14:50 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <axboe@kernel.dk>, <asml.silence@gmail.com>,
+        <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>
+CC:     Keith Busch <kbusch@kernel.org>
+Subject: [PATCH 1/3] io_uring: split req init from submit
+Date:   Fri, 28 Jul 2023 13:14:47 -0700
+Message-ID: <20230728201449.3350962-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: _nzRXP5sVgTjv5v9xAm7EoGn44qLKbSG
+X-Proofpoint-ORIG-GUID: _nzRXP5sVgTjv5v9xAm7EoGn44qLKbSG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 28 Jul 2023 09:08:56 -0600:
+From: Keith Busch <kbusch@kernel.org>
 
-> git://git.kernel.dk/linux.git tags/block-6.5-2023-07-28
+Split the req initialization and link handling from the submit. This
+simplifies the submit path since everything that can fail is separate
+from it, and makes it easier to create batched submissions later.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/818680d154170b4e41dc0c1a10e20bc03ca14a00
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ io_uring/io_uring.c | 66 +++++++++++++++++++++++++--------------------
+ 1 file changed, 37 insertions(+), 29 deletions(-)
 
-Thank you!
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index d585171560ce5..818b2d1661c5e 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -2279,18 +2279,20 @@ static __cold int io_submit_fail_init(const struc=
+t io_uring_sqe *sqe,
+ 	return 0;
+ }
+=20
+-static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb=
+ *req,
+-			 const struct io_uring_sqe *sqe)
+-	__must_hold(&ctx->uring_lock)
++static inline void io_submit_sqe(struct io_kiocb *req)
+ {
+-	struct io_submit_link *link =3D &ctx->submit_state.link;
+-	int ret;
++	trace_io_uring_submit_req(req);
+=20
+-	ret =3D io_init_req(ctx, req, sqe);
+-	if (unlikely(ret))
+-		return io_submit_fail_init(sqe, req, ret);
++	if (unlikely(req->flags & (REQ_F_FORCE_ASYNC | REQ_F_FAIL)))
++		io_queue_sqe_fallback(req);
++	else
++		io_queue_sqe(req);
++}
+=20
+-	trace_io_uring_submit_req(req);
++static int io_setup_link(struct io_submit_link *link, struct io_kiocb **=
+orig)
++{
++	struct io_kiocb *req =3D *orig;
++	int ret;
+=20
+ 	/*
+ 	 * If we already have a head request, queue this one for async
+@@ -2300,35 +2302,28 @@ static inline int io_submit_sqe(struct io_ring_ct=
+x *ctx, struct io_kiocb *req,
+ 	 * conditions are true (normal request), then just queue it.
+ 	 */
+ 	if (unlikely(link->head)) {
++		*orig =3D NULL;
++
+ 		ret =3D io_req_prep_async(req);
+ 		if (unlikely(ret))
+-			return io_submit_fail_init(sqe, req, ret);
++			return ret;
+=20
+ 		trace_io_uring_link(req, link->head);
+ 		link->last->link =3D req;
+ 		link->last =3D req;
+-
+ 		if (req->flags & IO_REQ_LINK_FLAGS)
+ 			return 0;
++
+ 		/* last request of the link, flush it */
+-		req =3D link->head;
++		*orig =3D link->head;
+ 		link->head =3D NULL;
+-		if (req->flags & (REQ_F_FORCE_ASYNC | REQ_F_FAIL))
+-			goto fallback;
+-
+-	} else if (unlikely(req->flags & (IO_REQ_LINK_FLAGS |
+-					  REQ_F_FORCE_ASYNC | REQ_F_FAIL))) {
+-		if (req->flags & IO_REQ_LINK_FLAGS) {
+-			link->head =3D req;
+-			link->last =3D req;
+-		} else {
+-fallback:
+-			io_queue_sqe_fallback(req);
+-		}
+-		return 0;
++	} else if (unlikely(req->flags & IO_REQ_LINK_FLAGS)) {
++	        link->head =3D req;
++	        link->last =3D req;
++		*orig =3D NULL;
++	        return 0;
+ 	}
+=20
+-	io_queue_sqe(req);
+ 	return 0;
+ }
+=20
+@@ -2412,9 +2407,10 @@ static bool io_get_sqe(struct io_ring_ctx *ctx, co=
+nst struct io_uring_sqe **sqe)
+ int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr)
+ 	__must_hold(&ctx->uring_lock)
+ {
++	struct io_submit_link *link =3D &ctx->submit_state.link;
+ 	unsigned int entries =3D io_sqring_entries(ctx);
+ 	unsigned int left;
+-	int ret;
++	int ret, err;
+=20
+ 	if (unlikely(!entries))
+ 		return 0;
+@@ -2434,12 +2430,24 @@ int io_submit_sqes(struct io_ring_ctx *ctx, unsig=
+ned int nr)
+ 			break;
+ 		}
+=20
++		err =3D io_init_req(ctx, req, sqe);
++		if (unlikely(err))
++			goto error;
++
++		err =3D io_setup_link(link, &req);
++		if (unlikely(err))
++			goto error;
++
++		if (likely(req))
++			io_submit_sqe(req);
++		continue;
++error:
+ 		/*
+ 		 * Continue submitting even for sqe failure if the
+ 		 * ring was setup with IORING_SETUP_SUBMIT_ALL
+ 		 */
+-		if (unlikely(io_submit_sqe(ctx, req, sqe)) &&
+-		    !(ctx->flags & IORING_SETUP_SUBMIT_ALL)) {
++		err =3D io_submit_fail_init(sqe, req, err);
++		if (err && !(ctx->flags & IORING_SETUP_SUBMIT_ALL)) {
+ 			left--;
+ 			break;
+ 		}
+--=20
+2.34.1
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
