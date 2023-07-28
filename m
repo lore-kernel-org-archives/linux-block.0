@@ -2,129 +2,139 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5CEC001E0
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 06:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B79DEB64DD
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 06:54:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbjG1Gqr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jul 2023 02:46:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57810 "EHLO
+        id S230439AbjG1Gyj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jul 2023 02:54:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233094AbjG1Gqq (ORCPT
+        with ESMTP id S229632AbjG1Gyi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2023 02:46:46 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05CD93588;
-        Thu, 27 Jul 2023 23:46:44 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 0EB851F8A4;
-        Fri, 28 Jul 2023 06:46:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1690526803; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=S5giWyTtDSEtQi4DuN3fhPiwQDgrsnA/JVYekHS77BM=;
-        b=TuKomdKprX/dXy6LnQsmLi4pdePyGUA9YUZ/lkylC2nTDmu3d2vuJUUOX3Lhm75Ir2zr20
-        c2GzyFmGJmH9pRurEZNJibeJDpQaPuKSDtbYHun7N3OTGiwxDgeQOsOHYw0b0H5BMl4V+7
-        3B9CAVdQQtsCxzx6VEddm7zLHkC7CBc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1690526803;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=S5giWyTtDSEtQi4DuN3fhPiwQDgrsnA/JVYekHS77BM=;
-        b=vIeNRmLWyLkE+kz4IiPq/HPCVYiMYqLwabVHnbSigZ/gVVho9Q3eTx7eykScgN/Y/R36Zj
-        4rRvJTnwADSfWQBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F390B133F7;
-        Fri, 28 Jul 2023 06:46:42 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id bfSQOlJkw2QVNQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 28 Jul 2023 06:46:42 +0000
-Date:   Fri, 28 Jul 2023 08:46:42 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Fri, 28 Jul 2023 02:54:38 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4FFB1B8
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 23:54:35 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-5221f193817so2259030a12.3
+        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2023 23:54:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1690527274; x=1691132074;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=jbLVZA6GLdYVOmzJTJTIy97G+xSErqL2fwBMteHvG6U=;
+        b=ME8bUHPXmCp2WyNtI7fWv/WvfvPz6H8bKBcPDxs24TfyA0qZz3pUF+5UYfdseXt9bJ
+         PS5Am3gaf3WY+164knk9n4DiWAoAuJQSdfn9ZdhlrGVuwd5BWxQljCw1qO3qtYwkFhcb
+         0qgPfc0BvWgHPwxIFToLSnVNKC7yQYzcyYvh6aC8E4Iha+bCR/kBZi3Gp5UVGhAU4H1R
+         SVHsxCZqDE6VblfdrtN4ZgYspiQqYOYYguxYNvuczbskl0sdsf3tQ0VLkin/PqHVL+jW
+         MsQsd9ZwdDwgVz8c0MzuoLTx2jJ2cAzUYMATkGHWnrqTqFTjVfSJHGjik4/xmlie+Uov
+         YlCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690527274; x=1691132074;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jbLVZA6GLdYVOmzJTJTIy97G+xSErqL2fwBMteHvG6U=;
+        b=b+MAjIf9WS7AZ63vpKqeaHsfzLPZbAzNPtYEE6XUSaUxrrc9LbUU0gmMo6sI4yXWbB
+         tSDoZ6FDcozGP+5fQ2yqk2uJQIT1OzhbkXn37WGfpjSorevwPFh/hqojk5la/ZpfGTJp
+         tAzzFDA5fNLvRUuMEXybXIU+iHMn48IaoNYyFxmk6CuO/uO3LNNz3Q85RAsNJlW01JOs
+         voXFWj1Uu9APa7BC1Javj3UbzhtHCjtLZTC51s7W2nKd2ILPNs6XEnJhDy41rz0mM4VQ
+         wz+pwG0L0M6oOgrGhYNg1wHV7OA71n0FqeEFnBbI9KmVzaJOVXSlMmfURdkDOwxf05eq
+         kCCQ==
+X-Gm-Message-State: ABy/qLaorJ2d/xkYSI4YtIT22Qqb60xfcGcLVjRgl2V+mQOg/AV1Y0AN
+        SZNfwQ7L5JgcqMJjruCkdfRGig==
+X-Google-Smtp-Source: APBJJlFwFT1CYbfHt9QePH98wDjc7kgS385mF3cKczDnQtT19F22NlsjwvcOxEyT3VqGtVnHNorAAg==
+X-Received: by 2002:aa7:d311:0:b0:522:30d5:6065 with SMTP id p17-20020aa7d311000000b0052230d56065mr953242edq.21.1690527274073;
+        Thu, 27 Jul 2023 23:54:34 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id d15-20020a056402516f00b00521f4ee396fsm1448246ede.12.2023.07.27.23.54.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 23:54:33 -0700 (PDT)
+References: <20230503090708.2524310-1-nmi@metaspace.dk>
+ <2B3CA5F1CCCFEAB2+20230727034517.GB126117@1182282462>
+User-agent: mu4e 1.10.5; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Yexuan Yang <1182282462@bupt.edu.cn>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
         Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <jsmart2021@gmail.com>
-Subject: Re: [PATCH blktests v1 01/11] nvme/{003,004,005,013,046,049}: Group
- all variables declarations
-Message-ID: <mg3z32g6kzxhlazrq6akjdm3ggbdqswz4jfeetazwuzcdfrfug@63a7rd47q32v>
-References: <20230726124644.12619-1-dwagner@suse.de>
- <20230726124644.12619-2-dwagner@suse.de>
- <7e4f6c51-43f4-c039-07bc-6724748a1d3e@acm.org>
- <kya2ayzcgz7iemknkx6xuef4m37f2ms7rt3uxamtxr2w7zbwfc@onladguxa7bk>
- <c3bff0d9-957a-fbb7-a433-4cab457c62bf@acm.org>
- <ky32xyzyii2c5fr7kknyx5z6fikvh674v4sw2s4yux52l4vu7w@4nqmrmyxkwmw>
+        lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
+        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        Bj??rn Roy Baron <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com
+Subject: Re: [RFC PATCH 00/11] Rust null block driver
+Date:   Fri, 28 Jul 2023 08:49:53 +0200
+In-reply-to: <2B3CA5F1CCCFEAB2+20230727034517.GB126117@1182282462>
+Message-ID: <87bkfwr0ew.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ky32xyzyii2c5fr7kknyx5z6fikvh674v4sw2s4yux52l4vu7w@4nqmrmyxkwmw>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 05:06:34AM +0000, Shinichiro Kawasaki wrote:
-> On Jul 27, 2023 / 08:18, Bart Van Assche wrote:
-> > On 7/27/23 00:11, Daniel Wagner wrote:
-> > > On Wed, Jul 26, 2023 at 07:54:24AM -0700, Bart Van Assche wrote:
-> > > > On 7/26/23 05:46, Daniel Wagner wrote:
-> > > > > Group all variable declarations together at the beginning of the
-> > > > > function.
-> > > > 
-> > > > An explanation of why this change has been proposed is missing from the
-> > > > patch description.
-> > > 
-> > > Sure, I'll add one. The coding style to declare all local variables at the
-> > > beginning of the function.
-> > 
-> > Isn't declaring local variables just before their first use a better style?
-> 
-> IMO both styles have pros and cons. Declarations at "beginning of functions"
-> helps to understand what the function uses as its local data (pros), but the
-> declaration and the usage are separated and makes it difficult to understand
-> (cons). Declarations at "just before first use" have the opposite pros and cons.
-> This style is easier to read especially when a function is rather long.
 
-FWIW, if I keep going with the refactoring (providing helper function to
-setup/cleanpup the complete target in one step), most of the tests will be very
-short. Thus there are far less variables to declare anyway.
+Hi,
 
-> In the past, I preferred declarations at the beginning functions and requested
-> it in my review comments [1], but I learned that this guide is not so widely
-> applied: xfstests scripts, or even blktests 'check' scripts have declarations in
-> the middle of the functions. So I think both styles are okay at this moment.
+Yexuan Yang <1182282462@bupt.edu.cn> writes:
 
-Okay, I wasn't aware of this.
+>> Over the 432 benchmark configurations, the relative performance of the Rust
+>> driver to the C driver (in terms of IOPS) is between 6.8 and -11.8 percent with
+>> an average of 0.2 percent better for reads. For writes the span is 16.8 to -4.5
+>> percent with an average of 0.9 percent better.
+>> 
+>> For each measurement the drivers are loaded, a drive is configured with memory
+>> backing and a size of 4 GiB. C null_blk is configured to match the implemented
+>> modes of the Rust driver: `blocksize` is set to 4 KiB, `completion_nsec` to 0,
+>> `irqmode` to 0 (IRQ_NONE), `queue_mode` to 2 (MQ), `hw_queue_depth` to 256 and
+>> `memory_backed` to 1. For both the drivers, the queue scheduler is set to
+>> `none`. These measurements are made using 30 second runs of `fio` with the
+>> `PSYNC` IO engine with workers pinned to separate CPU cores. The measurements
+>> are done inside a virtual machine (qemu/kvm) on an Intel Alder Lake workstation
+>> (i5-12600).
+>
+> Hi All!
+> I have some problems about your benchmark test.
+> In Ubuntu 22.02, I compiled an RFL kernel with both C null_blk driver and Rust
+> null_blk_driver as modules. For the C null_blk driver, I used the `modprobe`
+> command to set relevant parameters, while for the Rust null_blk_driver, I simply
+> started it. I used the following two commands to start the drivers:
+>
+> ```bash
+> sudo modprobe null_blk \
+>     queue_mode=2 irqmode=0 hw_queue_depth=256 \
+>     memory_backed=1 bs=4096 completion_nsec=0 \
+>     no_sched=1 gb=4;
+> sudo modprobe rnull_mod
+> ```
+>
+> After that, I tested their performance in `randread` with the fio command, specifying the first parameter as 4 and the second parameter as 1:
+>
+> ```bash
+> fio --filename=/dev/nullb0 --iodepth=64 --ioengine=psync --direct=1 --rw=randread --bs=$1k --numjobs=$2 --runtime=30 --group_reporting --name=test-rand-read --output=test_c_randread.log
+> fio --filename=/dev/rnullb0 --iodepth=64 --ioengine=psync --direct=1 --rw=randread --bs=$1k --numjobs=$2 --runtime=30 --group_reporting --name=test-rand-read --output=test_rust_randread.log
+> ```
+>
+> The test results showed a significant performance difference between the two
+> drivers, which was drastically different from the data you tested in the
+> community. Specifically, for `randread`, the C driver had a bandwidth of
+> 487MiB/s and IOPS of 124.7k, while the Rust driver had a bandwidth of 264MiB/s
+> and IOPS of 67.7k. However, for other I/O types, the performance of the C and
+> Rust drivers was more similar. Could you please provide more information about
+> the actual bandwidth and IOPS data from your tests, rather than just the
+> performance difference between the C and Rust drivers? Additionally, if you
+> could offer possible reasons for this abnormality, I would greatly appreciate
+> it!
 
->   [1] https://github.com/osandov/blktests/pull/99
-> 
-> More importantly, this discussion maybe going towards "too strict" guidelines,
-> which will discourage contributions. Similar topic is [[ ]] vs [ ]. Once I was
-> requesting strictly to use [[ ]], but it did not seem productive. Now I no
-> longer request to replace [ ] with [[ ]]. In same manner, I suggest not to be
-> strict on the local variable declaration position either.
-> 
-> As for this patch, it is not required to follow guidelines. Does it make
-> Daniel's refactoring work easier? If so, I guess it will be valuable.
+Thanks for trying out the code! I am not sure why you get these numbers.
+I am currently out of office, but I will rerun the benchmarks next week
+when I get back in. Maybe I can provide you with some scripts and my
+kernel configuration. Hopefully we can figure out the difference in our
+setups.
 
-IMO, this is the case, because you can way easier identify odd balls in the
-large bulk changes where I have to touch almost all tests cases for a change.
-
-So ideally, after these refactoring most of the tests will be shorter. Thinking
-about this, I could first introduce these helpers and update the callsides.
-Though I find this harder to review because all the tests look slightly
-different. But hey there are more one road to reach Rome. I suspect this
-approach would reduce the code churn a bit. Anyway, let me know what you prefer.
+Best regards,
+Andreas
