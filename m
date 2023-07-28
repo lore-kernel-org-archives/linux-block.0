@@ -2,191 +2,149 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D556C001DE
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 08:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF50C001DE
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 08:31:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234879AbjG1IWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jul 2023 04:22:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56852 "EHLO
+        id S235027AbjG1Ibs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jul 2023 04:31:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233803AbjG1IWG (ORCPT
+        with ESMTP id S233378AbjG1IbT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2023 04:22:06 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 925EE3C38;
-        Fri, 28 Jul 2023 01:20:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1690532459; x=1722068459;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=cBdvg0VOmnJEtDtAzdfUuqPh8cDdGK098Ve/cyyOmRE=;
-  b=JK/2UkFDgZfj4wjT4aGYYY2G6OB5b1RPkzziSDiLYAnit6qPkqsqfNrq
-   Py637xsKYQVZCS8Rthj2dPjoxT/mzdXwVTieLiJakNKytpMHuTLPPYEMt
-   q+I/n9DZnyDmP/17asdcua9fA2B8bLe/2fOmJznp2zcclyypvUIK2ULks
-   FV3XdEHCuC2EkD9VqzqAq0cH5iP/Qqvjejme8/UVdl/24CQHFJoje/DiQ
-   0yVIv71GI0UxDxYYjgTi+Ujk3Di61jkthpTDdBA74KR6XAwX5WWKrHhTE
-   oaJw4eIDVz9zfjD205b4hDVg8/GMZjN9+kse2qliaB/DDAHLGHE27H+Jb
-   g==;
-X-IronPort-AV: E=Sophos;i="6.01,236,1684771200"; 
-   d="scan'208";a="344470862"
-Received: from mail-mw2nam10lp2100.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.100])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jul 2023 16:20:57 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iKvel9V3c/Dkgjt10OaD2XBDMksiM8sZdEcdb+BPoieyqgROIkA/W9znmwN0K4Rpy7EH6n0/UJoGEkGUe/KIwaND7hSYH06KFMnO8JdqZcTr1um82NDsW94VFaqCmyCoSuVol/XzmG13PfkiMO/MSua5EqOoiAujatSdCqqth3uudHnqBMJWCcMfKK3A7rwWOn0UNu5CJ0h96Xpgj+nCW93s+hFODi1jZpJNeAig5SQEeyuSLZkC87YC/UZ8dW3hyUq9plkKoeKFlwKSeBJFBfIY0AqkvURrHEfqVokl44CHWTLaG1/U3mqDmC3vGuwIyR48ocwIdY6ebh//OSumWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cBdvg0VOmnJEtDtAzdfUuqPh8cDdGK098Ve/cyyOmRE=;
- b=aDYHlEkq519MDK62Zu7F8seH12HC1sP/UkapNkwWAF7OuYow/n/HS2W5h1NIRlgCcDLUAlKo5Iqj/IH4Rx6zMwYb4ihdkxKY2fWxtnTFShC0gwGph/IZuwh4oldUP7M/z3HRYWvRcUeBBly7WTHetIv0YF8rCJ6fKDkmdTfbiAJxgILLrEhcNrg+FZ/1UJB5x1GZEbYkFRjVaGsTt1v4y4IUjB0rJB5wVJMSHfeY192uJCVuV+jPmucpuS3lkPKXZfAJIUAYZl1li1weFuVtF6A9LOQCG53hc6V3+cb2+1ze07/+yKNdUswbIJiaKzXQWz83WmeEiVUZYYV9+J1mWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cBdvg0VOmnJEtDtAzdfUuqPh8cDdGK098Ve/cyyOmRE=;
- b=YN3JW4wbjYcCeFaqJ4/CZPxfiVpTmpasJUXJo5YSHRUAjEQfGnHmzvdFHSmlk+2VWeOWR8l/S1Zy4k5+yCnkTHHWPTxoXgYiBfp8RYlVHo8fg16yQ3N8XnhSRol4QRYOhh480ZA2n53os2AMjArirrXQTcWkwT/42UPqQfemRig=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- BN0PR04MB8173.namprd04.prod.outlook.com (2603:10b6:408:15c::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
- 2023 08:20:56 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::f92a:6d40:fe94:34e9]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::f92a:6d40:fe94:34e9%7]) with mapi id 15.20.6631.026; Fri, 28 Jul 2023
- 08:20:55 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Daniel Wagner <dwagner@suse.de>
-CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <jsmart2021@gmail.com>
-Subject: Re: [PATCH blktests v1 00/11] Switch to allowed_host
-Thread-Topic: [PATCH blktests v1 00/11] Switch to allowed_host
-Thread-Index: AQHZv79H0kZo7ej1zEeDwLGQZvn0C6/O2VsA
-Date:   Fri, 28 Jul 2023 08:20:55 +0000
-Message-ID: <hqi4yxhc3jc7v7ywf5qvy3u2th676irollqngbsh62rrlitkyy@rhl6axqsve5s>
-References: <20230726124644.12619-1-dwagner@suse.de>
-In-Reply-To: <20230726124644.12619-1-dwagner@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BN0PR04MB8173:EE_
-x-ms-office365-filtering-correlation-id: 33b2e2b9-71c9-4d59-5d4b-08db8f4390bd
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: sBhvsvbNMQVnbwWaLU5q1KfkEN8QwdOm6yYWcmxDb2VzAOJohGLn1JwU2LoXM8nhhHO7wfWygXvWp09Q9Nh5Mrexx3YzhFOElLsB4n/TDdCkGC/x5xVhFsB5Hv8Cs/MKDzvxFviq/HI9/f2uwAUwSB6koiNS5xpmVDsZrSFH9IuB+E5lyljhBM2jiGykHjyUBrQHdwHBi/FctxS+5+B18CpRpBS+906W5vt8MzO+NjK7b/zaLQDJmeOvHstBQnI81eUHxoM/pQfNAq9x1RWkO4xWY9z0g3i5/1MH6QM4ZirR2CfYScsdsSG9g+M3PozApansWEew3PxNdwoVYhzGXb6RXpc5pE4Q4n5v5Oapag559OjN7jYoPDBoa4oDzK0bl46Aaz6aych56g3ABLjv3ihDzz7UkS5VUYkJiXd6yv6P4sNl7+TI0SfZ8gDKtUeuc26ZNaMPrVnvvM36VXaH0iEJIzYWUBbFdqgMx284TxNPVwghlQE2kKIqmDgRr+uS+ForQNODE1vd+fFD429IsC/ZAxa2Par7uFa16MNDyim1NI8rPaeFkfiIc1sPyEvosyVlWTUrkhUUQM/gPqifgSuSR1SkEv7g0gC5mdGd3T555ATB4dcBK8accnqWYMC9
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(39860400002)(396003)(136003)(346002)(376002)(366004)(451199021)(9686003)(478600001)(54906003)(6512007)(6486002)(6506007)(71200400001)(66476007)(6916009)(26005)(2906002)(66556008)(66446008)(33716001)(8936002)(316002)(91956017)(76116006)(8676002)(5660300002)(41300700001)(44832011)(66946007)(82960400001)(64756008)(38100700002)(122000001)(86362001)(38070700005)(83380400001)(4326008)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hYMFnLrvW43PgdfSJyI4Um4CQ7eRcrZGJNBpi4Un6GiZ0bpkhDb6BroJtoKO?=
- =?us-ascii?Q?d9k26ymFoIFF6H0lqvqiu2mzgzDJ/EPE56TWLjqEWkj3oPPrYcd12kpvA2dg?=
- =?us-ascii?Q?TlbHjx3sooUydzaPR8g0ivNL92GCqWfTOzvQLCCeOPuSFiXxCcMiivVJ9o7s?=
- =?us-ascii?Q?Fc13M5iXnrFytOhibn7DnYWfkA3zjfaN8U3Z/zSnVXx703Dbx+s6LK6C9YuY?=
- =?us-ascii?Q?azkkLERci8gduzwAZ/CNzVYfFYX8AXHiToPtq/Hlc5VNQ+WACtNoRdUEtVs3?=
- =?us-ascii?Q?exeKwiZCLHgtADakEbfi8YIe7xhOoubPb8sWc6lDZ/qydwNeojyQNFIIy8ss?=
- =?us-ascii?Q?4jeVqPn4aoFbQdjsJKlzSsTmPadkNpnjT1RJ0uXxtP6TQTksYYWiE/NFiYz7?=
- =?us-ascii?Q?cEex7raAdoLlahtXa8g2KUBP3V2JSqIu/5DcMNQ4A9Lhoh0wLtmGVnVNGDpd?=
- =?us-ascii?Q?yFb2QtCeXUPW3Egzsgml8SE4jnPQiqztJgiQEIdC/u5Lg4Mf0Ur14n2L0Npk?=
- =?us-ascii?Q?w8a9iSZhCvhVFoChGqrfqtumw64QJM9JNUzv2Lk1NBnKeazckNkoIVYCSBSz?=
- =?us-ascii?Q?mS6idCX3hGzflmooownpadqiZHqkG2MBmalVljRaNO0hglGR988UXBWNHTcc?=
- =?us-ascii?Q?j0Ozik6KU2UplJ79RNq0Lw9UgTujxqP8fdFEIjOmZR3IULZJrEskyRbW7Y9a?=
- =?us-ascii?Q?peLArLtxdtYgyK/Z2sCl2iB/E8FOpPzApkbAgRdLj6T6vbsjJzIyEab6OKdq?=
- =?us-ascii?Q?Mkrt1hjeln9IL7q7xrO2ZNTFA+5LQA1ypSFaJKYm4CjGOQn44qshn1JHWG0c?=
- =?us-ascii?Q?CKBe5Pte6OC09Ni9wf72Fx2AT9FjUVcs52IKumpsuWmriQmnkkiAEiUUWFer?=
- =?us-ascii?Q?o0VBOFH7OEdOXlPMfHYwVDhwmTxcmxyZnW4BXk/I8ZMneRy8vfX/7MDgFQ0p?=
- =?us-ascii?Q?j3NPDqEk5QW5Ph1H/tF7dk4GR9si2mEBDQetQJk9YAHBDM9Gi2E/XMIQrdU2?=
- =?us-ascii?Q?m1KX/voUnW1vrsQAlPl1ju/MOvBaV0QWTgvXCYLcclR/e4nfJp59DNCbY/dn?=
- =?us-ascii?Q?sEq+1rhxkZ00P+2klhzNNXsH78apIltg7rnsOhP5OVx3OSaHZ6mIykWtJmtB?=
- =?us-ascii?Q?AypTALxO01qwWisniv6xTSszuRVoBkZYv5ch2+OqUdAcK7spj7yfxriBGoOv?=
- =?us-ascii?Q?rWaFzD8XBfBPRI4MmItYsP5go3H59i11Q9uQqgDK8ZkAljBp536xOW4v/5xk?=
- =?us-ascii?Q?WRB9NkxdEWaEwTQDmD90g8C8CRBDfTrswuLZkn2FbpvZWKTCjA+HcGY/1jmZ?=
- =?us-ascii?Q?Ngf6313UuNAkBIia9iv9Fx8TP2tt2CHM8zGs58lOUZm+nP0mfk4nd5wQXva/?=
- =?us-ascii?Q?9W4pOkFo5TsDBAEg9KAnKIl9Nj5VqmhhwCxIGwNPsmF80Bj8NO3qDbga0E4n?=
- =?us-ascii?Q?qbf2dKtMxqjhmQpCt15Oee+jPJ5PeHT/Gew5kUnFJly/Lp1no/Q1U6i+ttka?=
- =?us-ascii?Q?+kTQNA2T/AbvN3W394mLVkD+eVpuc47G2uJKoRekJKTuz9mhKqKNlAelXn4f?=
- =?us-ascii?Q?doWGBiamiLZfikwhgYgT1oF8jfvQrxB6ekxUNxenYlP28mkXNyHKXIzexVLW?=
- =?us-ascii?Q?GPG3tp+yKAmaJWpQlQhMwWE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <208E308F6039734D93A2BE8883CC827B@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 28 Jul 2023 04:31:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9246E3C28
+        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 01:28:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690532936;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=leIkqAudEGz78/ipkbxeymQs0lqhSaqKZ/Eo5h7Uujg=;
+        b=CNm+Cr3ET/HUZ9OIy9niT0q1Kt7x1FGWdAUaI6I9Ky9gwhRqBrE77E2luG5LYTuKyYF7kL
+        j58sPf5rz0RPZNCuHMuWXa4dvD8g5RNmryxMEryo0xt7DLewcHjoDolJCQrVRpIBbqFwpz
+        VdAkJGyTfT9CcLqEZgIGHxlwwVlKHbs=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-386-U6SlPeYjNLKzYQ-kEcpwng-1; Fri, 28 Jul 2023 04:28:55 -0400
+X-MC-Unique: U6SlPeYjNLKzYQ-kEcpwng-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7656c94fc4eso217585585a.2
+        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 01:28:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690532934; x=1691137734;
+        h=mime-version:user-agent:message-id:in-reply-to:date:references
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=leIkqAudEGz78/ipkbxeymQs0lqhSaqKZ/Eo5h7Uujg=;
+        b=FS5btd2A55+kLLzN07UQyL/Izr9U1X1oOyp5tELS663MXeTt8MVVVeyo59jHYQtgju
+         YIA9PdMBPa90MfHEbIeirh3Ag7pP9kywd2r8In5JinPYpNPZuJlMv3ihsEkw04ludANI
+         iaMlfH/q0HIEpBl6BWH1RFcMYkMzbewa5urVmu3Unaa8tXRe3yFMfB7ibN+WH/OEj8cZ
+         K3U0SbUFWl6vHlUVPWVE6ZkDDfMfYHsH7IptxXe8JTNdsrbGoP7/6sn5Q56W5Pr+0Eqk
+         dw79uno/fmhYc5nAYXWbYo+EWQjSDjNOIav0o8Wx93NWNmtWQy6txIIHG95djf41g2t6
+         5zag==
+X-Gm-Message-State: ABy/qLbFkeLEv06wn97UPEwE1fVddfkrHqULHiP9rcj6Nx+ggSThow5j
+        glECVoxPU75m7CFeLXOOZpsgumCqNV+eNMMVlKWCjyAzRAz+vxqZNRzLP7Pfp9MNAdeZR4uhvR5
+        KWkiYYcO6ZUl/k7/j2p2zT0+7DRryeTRswQ==
+X-Received: by 2002:a05:620a:4586:b0:767:f1f5:9986 with SMTP id bp6-20020a05620a458600b00767f1f59986mr2165212qkb.24.1690532934365;
+        Fri, 28 Jul 2023 01:28:54 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFJx/es0sujNTznp15UzhUi8RG+M8r9OGkm9Esn3oXJml0Fbp/KxtFMXuuT+zYZDctWoQQU4Q==
+X-Received: by 2002:a05:620a:4586:b0:767:f1f5:9986 with SMTP id bp6-20020a05620a458600b00767f1f59986mr2165199qkb.24.1690532934021;
+        Fri, 28 Jul 2023 01:28:54 -0700 (PDT)
+Received: from crash (c-24-218-80-208.hsd1.ma.comcast.net. [24.218.80.208])
+        by smtp.gmail.com with ESMTPSA id 27-20020a05620a079b00b00767da9b6ae9sm975473qka.11.2023.07.28.01.28.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jul 2023 01:28:53 -0700 (PDT)
+From:   Ken Raeburn <raeburn@redhat.com>
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        vdo-devel@redhat.com, tj@kernel.org, ebiggers@kernel.org
+Subject: Re: [PATCH v2 00/39] Add the dm-vdo deduplication and compression
+ device mapper target.
+References: <20230523214539.226387-1-corwin@redhat.com>
+        <ZLa086NuWiMkJKJE@redhat.com>
+        <CAK1Ur396ThV5AAZx2336uAW3FqSY+bHiiwEPofHB_Kwwr4ag5A@mail.gmail.com>
+        <87cz0e9rkn.fsf@redhat.com> <ZMKF24poWyKdeRHO@redhat.com>
+Date:   Fri, 28 Jul 2023 04:28:52 -0400
+In-Reply-To: <ZMKF24poWyKdeRHO@redhat.com> (Mike Snitzer's message of "Thu, 27
+        Jul 2023 10:57:31 -0400")
+Message-ID: <874jloa18b.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?0D43FeAAmnDltIp/FKryKXoybMPh/tTdrrFgFERGD50SKAVyEAP9YC8t32an?=
- =?us-ascii?Q?8XkeBWGLYGhiMxOBARQ/VwBTjLLHqmUAejxXQPWeSX69c/0KhPV/vig9Ewb1?=
- =?us-ascii?Q?WxfyTyTsOtlmzn2bZd0pekpqZ8CmfbmVXSs/sBA+IAavanQdWBncs59iRbGx?=
- =?us-ascii?Q?NpY7NbI8J8yMvIjtd/0rNF3OEErh+tX4H3JAsH5Rj484TA1ejfpGWptRANU1?=
- =?us-ascii?Q?z1rPxA3NcoKfk0H7tpV5znbgc/vrLlPRDkexEpvO4NKgjgXnmpu5LKAlCHlm?=
- =?us-ascii?Q?XyVRAd39rydCGsjRWlKUvS3DpVNnMZPrhpqFdLq7esWZGjmhuxWnkHS6F2KL?=
- =?us-ascii?Q?YrHDs0Gkneln5lbvM8TBfbcYxPBL6ZEAIPfkHVsq0IyWt0WvxXcSjhBWOdRv?=
- =?us-ascii?Q?N8BPQJZPZY7jwN6P2irhlnqlMzleNsL8EqSeTvSSLzg/Be/aV5FuvQ45Ngv8?=
- =?us-ascii?Q?MPsaRU4Y0ahTftw8q3W4uVjc2u1yfvPpF+UdnDxhNCUD4jSePW0wOxLs1vGv?=
- =?us-ascii?Q?JGfyyyGGBdSwzMWik0+ixZ/wsavJSn0WK6picM258KkPPOROzaF6EpgRnv0F?=
- =?us-ascii?Q?RFcoqHSdaxKM0mhk7qThy9/8JhEH+TOVN7SEpSNWedjiEO4sa6ewJRe3ykyt?=
- =?us-ascii?Q?1mSoClDYQgDjHmAw50C1FkDXj7T55R320TuNIYqJKbI/Gji5Ey0DvSwpwoun?=
- =?us-ascii?Q?awLTQ3mp0lon11owH0krEXhIu8OC8IbrXyvk4ztcbRBhikQoBTn8BCuRroOt?=
- =?us-ascii?Q?40sWbug2i4Ri/ngi8FmIHcu83WW6nfDALzr0CXAuFM7OXhkJbou5tFpkmT73?=
- =?us-ascii?Q?wSm2q/QxXbXUqM+UbBFs4hH1tfe8oWTTuHFAyBdiPUIl5d7nFMziYMBZhWAW?=
- =?us-ascii?Q?ODUPu3uPFP9M/iT0UyWXiCDLr1AMjHc9mc3jH5ilbb01Pq++v+FDaZlk7FlF?=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33b2e2b9-71c9-4d59-5d4b-08db8f4390bd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jul 2023 08:20:55.6793
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1vkP8JMEY5uxV1kUBZ8o2nGW5OH7JW4m9C3Mw+PE1FWm4MBnZWxy/5wEDrjy3LmYePxW50wrgeTy2YjJSm5aXB587vrWlnE3Nlcj7fc0+Mk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR04MB8173
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jul 26, 2023 / 14:46, Daniel Wagner wrote:
-> Max asked me to replace replace the 'nvme/rc: Avoid triggering host nvme-=
-cli
-> autoconnect' feature with using allowed_host on the target side [1]
->=20
-> So while looking into this new feature, I first started to refactor exist=
-ing
-> code so that it looks a bit more consistent. I think there is even more
-> potential to make it smaller, by introducing something similiar to
-> _nvmet_passthru_target_setup() and _nvmet_passthru_target_cleanup() for n=
-on
-> passthru tests. A lot of duplicated setup/cleanup code in many tests.
 
-Thanks for this action :)
+Mike Snitzer <snitzer@kernel.org> writes:
+> Thanks for the extra context, but a _big_ elephant in the room for
+> this line of discussion is that: the Linux workqueue code has
+> basically always been only available for use by GPL'd code.  Given
+> VDO's historic non-GPL origins, it seems _to me_ that an alternative
+> to Linux's workqueues had to be created to allow VDO to drive its
+> work.  While understandable, I gave guidance 6 years ago that VDO
+> engineering should work to definitively reconcile if using Linux
+> workqueues viable now that VDO has been GPL'd.
 
->=20
-> Except the last two patches are just refactoring patches. So if we decide=
- to use
-> common target setup/cleanup helpers, I think we could add them before the=
- last
-> two patches, which would make the last patch way smaller.
+Yes, initially that was a significant reason.
 
-I ran 'make check' and saw shellecheck complaints below. I added 'export' t=
-o the
-variables then they disappeared.
+More recently, when we've tried switching, the performance loss made it
+appear not worth the change. Especially since we also needed to ship a
+usable version at the same time.
 
-tests/nvme/rc:19:1: warning: def_subsysnqn appears unused. Verify use (or e=
-xport if used externally). [SC2034]
-tests/nvme/rc:20:1: warning: def_file_path appears unused. Verify use (or e=
-xport if used externally). [SC2034]
-tests/nvme/rc:21:1: warning: def_file_path appears unused. Verify use (or e=
-xport if used externally). [SC2034]
+> But it appears there wasn't much in the way of serious effort put to
+> completely converting to using Linux workqueues. That is a problem
+> because all of the work item strategy deployed by VDO is quite
+> bespoke.  I don't think the code lends itself to being properly
+> maintained by more than a 1 or 2 engineers (if we're lucky at this
+> point).
 
-I also ran nvme tests with the export fixes and saw no regression. Looks go=
-od
-from test run point of view.=
+By "work item strategy" are you referring to the lower level handling of
+queueing and executing the work items? Because I've done that. Well, the
+first 90%, by making the VDO work queues function as a shim on top of
+the kernel ones instead of creating their own threads. It would also
+need the kernel workqueues modified to support the SYSFS and ORDERED
+options together, because on NUMA systems the VDO performance really
+tanks without tweaking CPU affinity, and one or two other small
+additions. If we were to actually commit to that version there might be
+additional work like tweaking some data structures and eliding some shim
+functions if appropriate, but given the performance loss, we decided to
+stop there.
+
+Or do you mean the use of executing all actions affecting a data
+structure in a single thread/queue via message passing to serialize
+access to data structures instead of having a thread serially lock,
+modify, and unlock the various different data structures on behalf of a
+single I/O request, while another thread does the same for another I/O
+request? The model we use can certainly make things more difficult to
+follow. It reads like continuation-passing style code, not the
+straight-line code many of us are more accustomed to.
+
+"Converting to using Linux workqueues" really doesn't say the latter to
+me, it says the former. But I thought I'd already mentioned I'd tried
+the former out. (Perhaps not very clearly?)
+
+> I would like to see a patch crafted that allows branching between the
+> use of Linux and VDO workqueues. Initially have a dm-vdo modparam
+> (e.g. use_vdo_wq or vice-versa: use_linux_wq).  And have a wrapping
+> interface and associated data struct(s) that can bridge between work
+> being driven/coordinated by either (depending on disposition of
+> modparam).
+
+If we're talking about the lower level handling, I don't think it would
+be terribly hard.
+
+> This work isn't trivial, I get that. But it serves to clearly showcase
+> shortcomings, areas for improvement, while pivoting to more standard
+> Linux interfaces that really should've been used from VDO's inception.
+>
+> Is this work that you feel you could focus on with urgency?
+>
+> Thanks,
+> Mike
+
+I think so, once we're clear on exactly what we're talking about...
+
+Ken
+
