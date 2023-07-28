@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2E0C0015E
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 08:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E23FC001E0
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 08:59:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232552AbjG1I4i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jul 2023 04:56:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49094 "EHLO
+        id S233462AbjG1I76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jul 2023 04:59:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233537AbjG1I4R (ORCPT
+        with ESMTP id S233289AbjG1I75 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2023 04:56:17 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C689BA0;
-        Fri, 28 Jul 2023 01:55:29 -0700 (PDT)
+        Fri, 28 Jul 2023 04:59:57 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55126B6;
+        Fri, 28 Jul 2023 01:59:56 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 801261F854;
-        Fri, 28 Jul 2023 08:55:28 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 13BD3219B8;
+        Fri, 28 Jul 2023 08:59:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1690534528; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1690534795; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=uAWKzqRAwM9WVlQh+HXjiVoc+9cES0KQ8DeLucaBVgg=;
-        b=fnJ3zXeJfj3bLH3le16xDYUsOQ79o2TzjmECfwDbGR2i2gJ4lN7aph8XqyEcpjSdlwl6wA
-        ZgTlxrRLGTOC8EYB7PAyL+QVHQqITh1pY0x+qOoonIVXl6AM56K0ia3s1BVk2oaEQPbrpv
-        1lliJKDjRh1ysVQ97gwSoLU90kdjILk=
+        bh=+1yAQj2+drdxOg7W1xMMihj39vdtsCy+k9dgFHWRk9A=;
+        b=N0rVU+qUJPLE+5c9Fe2qfiQ4QbEZQ7uOazDWiF4qTaPR4NpWdkKkS8jI1Ck9Zwe6bae+mr
+        im99wL/jnP6faUX3Uo+ijZIgeoz6KKw7xaNAQ915XLzDNdTC3uQAKTpq9JFAvSll8YZiD7
+        G2jza5/bdosUUSWdRG9M5kbJdc7MUAM=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1690534528;
+        s=susede2_ed25519; t=1690534795;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=uAWKzqRAwM9WVlQh+HXjiVoc+9cES0KQ8DeLucaBVgg=;
-        b=D6SUtbiY3lYQSIKNFOL90txpnKb4VrD41xFd1UFe3P8ZGgA6s0uJYHFicmtlOX54XL0sNz
-        pgPJd5qjEBkevsBQ==
+        bh=+1yAQj2+drdxOg7W1xMMihj39vdtsCy+k9dgFHWRk9A=;
+        b=XmNFzsCzeT8aHQNyOZo67JTXE5Qr3GO1uEDjLw+BvbWChknTYmwEHmuilIIvi327JDHha2
+        NIeacs1hzD+6y8AA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6F4DD133F7;
-        Fri, 28 Jul 2023 08:55:28 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 04B0D133F7;
+        Fri, 28 Jul 2023 08:59:55 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id fw0hG4CCw2RidwAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 28 Jul 2023 08:55:28 +0000
-Date:   Fri, 28 Jul 2023 10:55:27 +0200
+        id 3oH3AIuDw2SleQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 28 Jul 2023 08:59:55 +0000
+Date:   Fri, 28 Jul 2023 10:59:54 +0200
 From:   Daniel Wagner <dwagner@suse.de>
 To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
@@ -58,64 +58,38 @@ Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         Hannes Reinecke <hare@suse.de>,
         Sagi Grimberg <sagi@grimberg.me>,
         James Smart <jsmart2021@gmail.com>
-Subject: Re: [PATCH blktests v1 11/11] nvme: Add explicitly host to
- allow_host list
-Message-ID: <tgchxlramrmairlqojfw5tim2hqgvwu3iug532lyu2lzrjk4pw@geegddpo3zqw>
+Subject: Re: [PATCH blktests v1 00/11] Switch to allowed_host
+Message-ID: <ldlkosfmplhb4cqunws5nknpxrgcenbgytlabszl547vygxtbh@xsd7pzil6nk4>
 References: <20230726124644.12619-1-dwagner@suse.de>
- <20230726124644.12619-12-dwagner@suse.de>
- <4eztk7hhup2le6nqd4u4udvdrek3sngrljfr22b7rnhaqcr4of@aoe2j52jfwzb>
+ <hqi4yxhc3jc7v7ywf5qvy3u2th676irollqngbsh62rrlitkyy@rhl6axqsve5s>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4eztk7hhup2le6nqd4u4udvdrek3sngrljfr22b7rnhaqcr4of@aoe2j52jfwzb>
+In-Reply-To: <hqi4yxhc3jc7v7ywf5qvy3u2th676irollqngbsh62rrlitkyy@rhl6axqsve5s>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 08:15:45AM +0000, Shinichiro Kawasaki wrote:
-> On Jul 26, 2023 / 14:46, Daniel Wagner wrote:
-> > Only allow to connect to our setup target with the correct hostnqn.
-> > 
-> > Thus we have to explicitly add the test hostnqn to the test subsysnqn
-> > allow_host list.
+On Fri, Jul 28, 2023 at 08:20:55AM +0000, Shinichiro Kawasaki wrote:
+> > Except the last two patches are just refactoring patches. So if we decide to use
+> > common target setup/cleanup helpers, I think we could add them before the last
+> > two patches, which would make the last patch way smaller.
 > 
-> [...]
+> I ran 'make check' and saw shellecheck complaints below. I added 'export' to the
+> variables then they disappeared.
 > 
-> > --- a/tests/nvme/030
-> > +++ b/tests/nvme/030
-> > @@ -28,6 +28,7 @@ test() {
-> >  
-> >  	_create_nvmet_subsystem "${subsys}1" "$(losetup -f)"
-> >  	_add_nvmet_subsys_to_port "${port}" "${subsys}1"
-> > +	_create_nvmet_host "${subsys}1" "${def_hostnqn}"
-> >  
-> >  	genctr=$(_discovery_genctr)
-> >  
-> > @@ -36,13 +37,13 @@ test() {
-> >  
-> >  	genctr=$(_check_genctr "${genctr}" "adding a subsystem to a port")
-> >  
-> > -	echo 0 > "${NVMET_CFS}/subsystems/${subsys}2/attr_allow_any_host"
-> > +	_add_nvmet_allow_hosts "${subsys}2" "${def_hostnqn}"
-> >  
-> > -	genctr=$(_check_genctr "${genctr}" "clearing attr_allow_any_host")
-> > +	genctr=$(_check_genctr "${genctr}" "adding host to allow_hosts")
-> >  
-> > -	echo 1 > "${NVMET_CFS}/subsystems/${subsys}2/attr_allow_any_host"
-> > +	_remove_nvmet_allow_hosts "${subsys}2" "${def_hostnqn}"
-> >  
-> > -	genctr=$(_check_genctr "${genctr}" "setting attr_allow_any_host")
-> > +	genctr=$(_check_genctr "${genctr}" "removing host from allow_hosts")
-> >  
-> >  	_remove_nvmet_subsystem_from_port "${port}" "${subsys}2"
-> >  	_remove_nvmet_subsystem "${subsys}2"
-> 
-> The hunk above looks different from other changes. Is it changing test
-> content slightly to meet request by Max? If so, it would be good to note
-> in the commit message.
+> tests/nvme/rc:19:1: warning: def_subsysnqn appears unused. Verify use (or export if used externally). [SC2034]
+> tests/nvme/rc:20:1: warning: def_file_path appears unused. Verify use (or export if used externally). [SC2034]
+> tests/nvme/rc:21:1: warning: def_file_path appears unused. Verify use (or export if used externally). [SC2034]
 
-I should have explained this change in the commit message. When we use
-allowed_hosts, the attr_allow_any_host feature is disabled and thus has no side
-effects like updating the genctr. This makes the test fail. I opted to use
-_[add|remove]_nvmet_allow_hosts to trigger the same side effect. While at it, I
-also updated the logging info.
+These variables are not used in nvme/rc at the point I introduce them. Only in
+the tests. I could add the nvmet setup/cleanup helpers with the variables which
+would make those warnings go away. But these helpers would then add the end of
+the series. Also not really good. I don't what is best here.
+
+> I also ran nvme tests with the export fixes and saw no regression. Looks good
+> from test run point of view.
+
+Thanks!
+
+BTW, I am off next week, so I don't think I send soon an update.
