@@ -2,128 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4E7C001E0
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 07:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A02C0015E
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jul 2023 07:55:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233996AbjG1HL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jul 2023 03:11:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43632 "EHLO
+        id S230128AbjG1Hzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jul 2023 03:55:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233950AbjG1HLJ (ORCPT
+        with ESMTP id S234489AbjG1Hzn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2023 03:11:09 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240F744BB;
-        Fri, 28 Jul 2023 00:10:44 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RBzLQ4yTmz4f3kpl;
-        Fri, 28 Jul 2023 15:10:38 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHoZTuacNknej3Ow--.21788S3;
-        Fri, 28 Jul 2023 15:10:39 +0800 (CST)
-Subject: Re: [PATCH -next] nbd: get config_lock before sock_shutdown
-To:     Zhong Jinghua <zhongjinghua@huaweicloud.com>, josef@toxicpanda.com,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230707062256.1271948-1-zhongjinghua@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <779966af-844a-3dba-93f8-9daabde8c85b@huaweicloud.com>
-Date:   Fri, 28 Jul 2023 15:10:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20230707062256.1271948-1-zhongjinghua@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHoZTuacNknej3Ow--.21788S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7CrWkCFWkuFWruw47uw45KFg_yoW8Cry3pF
-        4UCF4DCr4rWa1S9FZ5G34xWr1UG343Ka17Gry8Zw1qvr93CrWI93WDKF1fCFyUKwnrJr4S
-        qFyrKF95C3y3JrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IUbPEf5UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+        Fri, 28 Jul 2023 03:55:43 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B9E3580
+        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 00:55:41 -0700 (PDT)
+Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230728075539epoutp043e6cec199733d493c1e93fb3aa8223e0~1_O6zPOLp2199021990epoutp04Y
+        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2023 07:55:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230728075539epoutp043e6cec199733d493c1e93fb3aa8223e0~1_O6zPOLp2199021990epoutp04Y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1690530939;
+        bh=yUpcGFL91ifhUTlYDbflLFZWGIFU3cqbPQ0gntPnnws=;
+        h=Subject:Reply-To:From:To:Date:References:From;
+        b=sEm+KUr0/EH2VM/Vba+UHITaNHG6jgJePErXX/O5ZP2jaePAccdYNVAXGF7ChmEia
+         l+H10U1COujtbnYqsgTaEDJQjCKSnvt3VGFKPCXSzyOmuVXEFyKbyGcWSvIlCGjFjj
+         nqvHZzhGMPSu5QbOAMGhhfxH1SlIktTuPfseJqhk=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
+        20230728075538epcas2p4eb05711ca66a592463cce43b3f885deb~1_O6MzqiS2694026940epcas2p4E;
+        Fri, 28 Jul 2023 07:55:38 +0000 (GMT)
+Received: from epsmgec2p1.samsung.com (unknown [182.195.36.92]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4RC0LL0ZZJz4x9QK; Fri, 28 Jul
+        2023 07:55:38 +0000 (GMT)
+X-AuditID: b6c32a43-2f3ff7000001d7ef-8e-64c3747909ff
+Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
+        epsmgec2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        7E.D1.55279.97473C46; Fri, 28 Jul 2023 16:55:37 +0900 (KST)
+Mime-Version: 1.0
+Subject: [PATCH 0/2] multi-page bvec configuration for integrity payload
+Reply-To: j-young.choi@samsung.com
+Sender: Jinyoung Choi <j-young.choi@samsung.com>
+From:   Jinyoung Choi <j-young.choi@samsung.com>
+To:     "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "chaitanya.kulkarni@wdc.com" <chaitanya.kulkarni@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20230728075537epcms2p194154023a4cdbe37c0346ef1102d1d63@epcms2p1>
+Date:   Fri, 28 Jul 2023 16:55:37 +0900
+X-CMS-MailID: 20230728075537epcms2p194154023a4cdbe37c0346ef1102d1d63
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-CPGSPASS: Y
+X-CPGSPASS: Y
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHJsWRmVeSWpSXmKPExsWy7bCmqW5lyeEUg2fNlhar7/azWcy6/ZrF
+        4uUhTYuVq48yWfT2b2WzmHToGqPF3lvaFpd3zWGzWH78H5PFutfvWRy4PM7f28jicflsqcem
+        VZ1sHrtvNrB5fHx6i8Wjb8sqRo/Pm+Q82g90MwVwRGXbZKQmpqQWKaTmJeenZOal2yp5B8c7
+        x5uaGRjqGlpamCsp5CXmptoqufgE6Lpl5gBdqKRQlphTChQKSCwuVtK3synKLy1JVcjILy6x
+        VUotSMkpMC/QK07MLS7NS9fLSy2xMjQwMDIFKkzIztg6tZu14JJQxZ6jig2MP/i6GDk5JARM
+        JP7372LuYuTiEBLYwShxdvN+1i5GDg5eAUGJvzuEQWqEBTwktj04xwxiCwkoSZxbM4sRIm4g
+        0XK7jQXEZhPQk9jxfDc7yBwRgQnMEps33WaGWMArMaP9KQuELS2xfflWRghbQ+LHsl6oGlGJ
+        m6vfssPY74/Nh6oRkWi9dxaqRlDiwc/dUHFJiUOHvrKB3CkhkC+x4UAgRLhGou3Xe6hyfYlr
+        HRvB1vIK+EpsmjcNrJVFQFVi9o6TrBA1LhIr2nvA4swC8hLb385hBhnJLKApsX6XPsR0ZYkj
+        t1ggKvgkOg7/ZYd5qmHjb6zsHfOeMEG0qkksajKCCMtIfD08H6rEQ2LJrfmMExgVZyGCeRaS
+        E2YhnLCAkXkVo1hqQXFuemqyUYEhPGKT83M3MYITqpbzDsYr8//pHWJk4mA8xCjBwawkwnsq
+        4FCKEG9KYmVValF+fFFpTmrxIUZToOcnMkuJJucDU3peSbyhiaWBiZmZobmRqYG5kjjvvda5
+        KUIC6YklqdmpqQWpRTB9TBycUg1MM0+YfNK67aCWlHBop8qVFZem5T5UjZsitWjjkyNdNq8k
+        D834Y9ga9nV19pqby45kzFNnWbOpXs/7weHct6sONOyQ4rhs4VCzziXr1bz4pcaK+6PnLn3r
+        skhQesp9c661kUuUlgl/We03eUmZ1rrWBYKv5Ja/2af9NdHb8v4B77PP/b6WfpzRa/Brxpye
+        JJ2btoEvtwvyW5/8v02Hf1248ZQ3uw96FKzxZLL0n9Bkunbprw1n0zfwO7jMZZt4MFaFR2hp
+        ikvv8d3vBXqi+mfauMyQXrTR/szfvWZz7xqdy0tmntb90HDJFE7eaMfjc/c4FF09eM64NzF9
+        Bz+Hi8iykNK9lj+Ea46+3zrR0FJy8UMlluKMREMt5qLiRABojWzqMQQAAA==
+DLP-Filter: Pass
 X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230728075537epcms2p194154023a4cdbe37c0346ef1102d1d63
+References: <CGME20230728075537epcms2p194154023a4cdbe37c0346ef1102d1d63@epcms2p1>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2023/07/07 14:22, Zhong Jinghua Ð´µÀ:
-> Config->socks in sock_shutdown may trigger a UAF problem.
-> The reason is that sock_shutdown does not hold the config_lock,
-> so that nbd_ioctl can release config->socks at this time.
-> 
-> T0: NBD_SET_SOCK
-> T1: NBD_DO_IT
-> 
-> T0						T1
-> 
-> nbd_ioctl
->    mutex_lock(&nbd->config_lock)
->    // get lock
->    __nbd_ioctl
->      nbd_start_device_ioctl
->        nbd_start_device
->         mutex_unlock(&nbd->config_lock)
->           // relase lock
->           wait_event_interruptible
->           (kill, enter sock_shutdown)
->           sock_shutdown
-> 					nbd_ioctl
-> 					  mutex_lock(&nbd->config_lock)
-> 					  // get lock
-> 					  __nbd_ioctl
-> 					    nbd_add_socket
-> 					      krealloc
-> 						kfree(p)
-> 					        //config->socks is NULL
->             nbd_sock *nsock = config->socks // error
-> 
-> Fix it by moving config_lock up before sock_shutdown.
+In the case of NVMe, it has an integrity payload consisting of one segment.
+So, rather than configuring SG_LIST, it was changed by direct DMA mapping.
 
-LGTM
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+The page-merge is not performed for the struct bio_vec when creating 
+a integrity payload in block.
+As a result, when creating an integrity paylaod beyond one page, each 
+struct bio_vec is generated, and its bv_len does not exceed the PAGESIZE.
 
-> 
-> Signed-off-by: Zhong Jinghua <zhongjinghua@huaweicloud.com>
-> ---
->   drivers/block/nbd.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index c410cf29fb0c..accbe99ebb7e 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -1428,13 +1428,18 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd)
->   	mutex_unlock(&nbd->config_lock);
->   	ret = wait_event_interruptible(config->recv_wq,
->   					 atomic_read(&config->recv_threads) == 0);
-> +
-> +	/*
-> +	 * recv_work in flush_workqueue will not get this lock, because nbd_open
-> +	 * will hold nbd->config_refs
-> +	 */
-> +	mutex_lock(&nbd->config_lock);
->   	if (ret) {
->   		sock_shutdown(nbd);
->   		nbd_clear_que(nbd);
->   	}
->   
->   	flush_workqueue(nbd->recv_workq);
-> -	mutex_lock(&nbd->config_lock);
->   	nbd_bdev_reset(nbd);
->   	/* user requested, ignore socket errors */
->   	if (test_bit(NBD_RT_DISCONNECT_REQUESTED, &config->runtime_flags))
-> 
+To solve it, bio_integrity_add_page() should just add to the existing 
+bvec, similar to bio_add_page() and friends. 
+As the bip configuration changed, the code related to sg_list was
+also modified.
 
+(ref: https://lore.kernel.org/linux-nvme/yq18rewbmay.fsf@ca-mkp.ca.oracle.com/T/#t)
+
+
+Tested like this:
+
+- Format (support pi)
+$ sudo nvme format /dev/nvme2n1 --force -n 1 -i 1 -p 0 -m 0 -l 1 -r
+
+- Run FIO
+[global]
+ioengine=libaio
+group_reporting
+
+[job]
+bs=512k
+iodepth=256
+rw=write
+numjobs=8
+direct=1
+runtime=10s
+filename=/dev/nvme2n1
+
+- Result
+...
+[   93.496218] nvme2n1: I/O Cmd(0x1) @ LBA 62464, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
+[   93.496227] protection error, dev nvme2n1, sector 62464 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+[   93.538788] nvme2n1: I/O Cmd(0x1) @ LBA 6144, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
+[   93.538798] protection error, dev nvme2n1, sector 6144 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+[   93.566231] nvme2n1: I/O Cmd(0x1) @ LBA 124928, 1024 blocks, I/O Error (sct 0x0 / sc 0x4)
+[   93.566241] I/O error, dev nvme2n1, sector 124928 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+[   93.694147] nvme2n1: I/O Cmd(0x1) @ LBA 64512, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
+[   93.694155] protection error, dev nvme2n1, sector 64512 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+[   93.694299] nvme2n1: I/O Cmd(0x1) @ LBA 5120, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
+[   93.694305] protection error, dev nvme2n1, sector 5120 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+...
+
+Jinyoung Choi (2):
+  block: make bvec_try_merge_hw_page() non-static
+  bio-integrity: create multi-page bvecs in bio_integrity_add_page()
+
+ block/bio-integrity.c | 50 ++++++++++++++++++++++++-------------------
+ block/bio.c           |  2 +-
+ block/blk.h           |  4 ++++
+ 3 files changed, 33 insertions(+), 23 deletions(-)
+
+-- 
+2.34.1
