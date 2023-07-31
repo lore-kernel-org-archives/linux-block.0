@@ -2,64 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11003C001DF
-	for <linux-block@archiver.kernel.org>; Mon, 31 Jul 2023 06:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8363BC04A94
+	for <linux-block@archiver.kernel.org>; Mon, 31 Jul 2023 06:16:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229577AbjGaGKC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jul 2023 02:10:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40666 "EHLO
+        id S230121AbjGaGQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Jul 2023 02:16:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229833AbjGaGKC (ORCPT
+        with ESMTP id S229660AbjGaGQR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2023 02:10:02 -0400
+        Mon, 31 Jul 2023 02:16:17 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67DE0CA;
-        Sun, 30 Jul 2023 23:10:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EEF51713;
+        Sun, 30 Jul 2023 23:15:57 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id A156E67373; Mon, 31 Jul 2023 08:09:57 +0200 (CEST)
-Date:   Mon, 31 Jul 2023 08:09:57 +0200
+        id 736AE67373; Mon, 31 Jul 2023 08:15:21 +0200 (CEST)
+Date:   Mon, 31 Jul 2023 08:15:21 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     chengming.zhou@linux.dev
 Cc:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com, hare@suse.de
-Subject: Re: [PATCH v2 1/4] blk-flush: flush_rq should inherit first_rq's
- cmd_flags
-Message-ID: <20230731060957.GA30409@lst.de>
-References: <20230725130102.3030032-1-chengming.zhou@linux.dev> <20230725130102.3030032-2-chengming.zhou@linux.dev>
+        zhouchengming@bytedance.com
+Subject: Re: [PATCH v2 2/4] blk-flush: split queues for preflush and
+ postflush requests
+Message-ID: <20230731061521.GB30409@lst.de>
+References: <20230725130102.3030032-1-chengming.zhou@linux.dev> <20230725130102.3030032-3-chengming.zhou@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230725130102.3030032-2-chengming.zhou@linux.dev>
+In-Reply-To: <20230725130102.3030032-3-chengming.zhou@linux.dev>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 25, 2023 at 09:00:59PM +0800, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
-> 
-> The cmd_flags in blk_kick_flush() should inherit the original request's
-> cmd_flags, but the current code looks buggy to me:
+> -	list_for_each_entry_safe(rq, n, running, queuelist) {
+> +	list_for_each_entry_safe(rq, n, preflush_running, queuelist) {
+> +		unsigned int seq = blk_flush_cur_seq(rq);
+> +
+> +		BUG_ON(seq != REQ_FSEQ_PREFLUSH && seq != REQ_FSEQ_POSTFLUSH);
+> +		blk_flush_complete_seq(rq, fq, seq, error);
+> +	}
+> +
+> +	list_for_each_entry_safe(rq, n, postflush_running, queuelist) {
+>  		unsigned int seq = blk_flush_cur_seq(rq);
+>  
+>  		BUG_ON(seq != REQ_FSEQ_PREFLUSH && seq != REQ_FSEQ_POSTFLUSH);
 
-Should it?  I know the code is kinda trying to do it, but does it really
-make sense?  Adding Hannes who originally added this inheritance and
-discussing the details below:
+Shouldn't the BUG_ON be split into one that only checks for PREFLUSH and
+one only for POSTFLUSH?
 
->  	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
-> -	flush_rq->cmd_flags |= (flags & REQ_DRV) | (flags & REQ_FAILFAST_MASK);
-> +	flush_rq->cmd_flags |= (first_rq->cmd_flags & REQ_DRV) |
-> +			       (first_rq->cmd_flags & REQ_FAILFAST_MASK);
+> +	if (fq->flush_pending_idx != fq->flush_running_idx)
+> +		return;
+> +
+> +	if (!list_empty(preflush_pending))
+> +		first_rq = list_first_entry(preflush_pending, struct request, queuelist);
+> +	else if (!list_empty(postflush_pending))
+> +		first_rq = list_first_entry(postflush_pending, struct request, queuelist);
+> +	else
+>  		return;
 
-Two cases here:
+Hmm, I don't think both lists can be empty here?
 
- 1) REQ_FAILFAST_MASK:  I don't think this is actually set on flush request
-    currently, and even if it was applying it to the flush that serves more
-    than a single originating command seems wrong to me.
- 2) REQ_DRV is only set by drivers that have seen a bio.  For dm this
-    is used as REQ_DM_POLL_LIST which should never be set for a flush/fua
-    request.  For nvme-mpath it is REQ_NVME_MPATH, which is set in the
-    bio based driver and used for decision making in the I/O completion
-    handler.  So I guess this one actually does need to get passed
-    through.
+I'd simplify this and avoid the overly long lines as:
+
+	first_rq = list_first_entry_or_null(preflush_pending, struct request,
+					    queuelist);
+	if (!first_rq)
+		first_rq = list_first_entry_or_null(postflush_pending,
+						    struct request, queuelist);
 
