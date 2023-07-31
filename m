@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6065C001E0
-	for <linux-block@archiver.kernel.org>; Mon, 31 Jul 2023 22:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F32C001E0
+	for <linux-block@archiver.kernel.org>; Mon, 31 Jul 2023 22:15:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbjGaWP0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jul 2023 18:15:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43726 "EHLO
+        id S229913AbjGaWPa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Jul 2023 18:15:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229913AbjGaWPZ (ORCPT
+        with ESMTP id S229932AbjGaWP3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2023 18:15:25 -0400
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13004B2
-        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 15:15:25 -0700 (PDT)
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1bb81809ca8so39789075ad.3
-        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 15:15:25 -0700 (PDT)
+        Mon, 31 Jul 2023 18:15:29 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 902D01724
+        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 15:15:27 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1bb893e6365so31671595ad.2
+        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 15:15:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690841724; x=1691446524;
+        d=1e100.net; s=20221208; t=1690841727; x=1691446527;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=52d6Yv2j3msvKUoHhQfE+78n/6sSy14S5P1th7+0tyg=;
-        b=HUAQrLdqX0lIg7plFNmt+hyt67iEHOO9L6QqhNtRduPHV1Y/Np1AagKid9X1G3jKvw
-         27LG/SfQraOol8m5yqtd4xZA2s7k/6iWx6F06pMsHYnMMhl4WxeMIr76W2t9CD4riqxB
-         55PYanSbF2FzwsGNliwuvDPVh1b2b7iMCIkpsLItIEoDltkjlskbnLizNz3fNJKKZHmm
-         HXNhHe8DGb5TY1jEpBHqd28knNte7ZJBTL2TTej0bHJ5x4p09PxWmgaPFtIuK9qLEebw
-         JNyuLMiLxE0ilqfYaGwVIhGFTkbuz7pWvh+iQlmc5ZxgqnAuYbQkydGBhEuILli48R5d
-         mQDA==
-X-Gm-Message-State: ABy/qLb8UWJvzg/FgNixxwrdj2q7Ev5YW44958i1/n7s8Zq6l+yjA7Vm
-        LP3gZd2Nr+2CkPj/WZYXslA=
-X-Google-Smtp-Source: APBJJlHGPY6DTsfCodAnX1Trs1U2GLvB9BRXH4h2kiHW+gB7EV8bsy/whwMrkchE1L06K5UteK2qhg==
-X-Received: by 2002:a17:903:22c1:b0:1b8:b2c6:7e8d with SMTP id y1-20020a17090322c100b001b8b2c67e8dmr13054253plg.66.1690841724371;
-        Mon, 31 Jul 2023 15:15:24 -0700 (PDT)
+        bh=iKserUc7+qK0U76dK5VQGcFoPHl5fU7xJij7hQDUDFE=;
+        b=d0BXnw9rRF5DrZeENVGCsq/SjoGckxND3kQevTw8C2xSdPCUpVGrPpbpY3Ziiinqm+
+         Fv1BnJMNTmQAcCGg0ipSNTFRq6gkUvD3gd0e90ERLInJMCghF+BAA+NSTQEOtT+5FIvb
+         Ep3uRUd8aJjNFmEFJiCEIwArF7JiE+wjVvr7UMiY0yx2TAZdzmWbsBWBt9XXEmNOUzaU
+         16lt8cBcskr8kLNgVyPV5CMeEEYXCfoD8udhWQDnfzyCnYec6Z+liuXVl+S0SV7Pvdwe
+         AxosNsKq2mvFTsytmcZuqPN/n+vex3QX9M/bDj9XPGaOnW+Daj/5gkMvHMIxXvqCwZ9g
+         324Q==
+X-Gm-Message-State: ABy/qLZRHYemCY9e7UyhoEG8zYGyo/QYAnUwOPxlfO0saAxE89y5qf8H
+        iT/ZBOSegs1aXF6iCh5uDCQ=
+X-Google-Smtp-Source: APBJJlFYo6Yv4sGqTfEtAHxyPuUIhMy/TRgtk7hqlmrhaNqPvxMCt8gfS+S4sKo7YMdWSisAUqYKLQ==
+X-Received: by 2002:a17:903:11d0:b0:1b6:bced:1dd6 with SMTP id q16-20020a17090311d000b001b6bced1dd6mr11851749plh.35.1690841726941;
+        Mon, 31 Jul 2023 15:15:26 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9346:70e3:158a:281c])
-        by smtp.gmail.com with ESMTPSA id jn13-20020a170903050d00b001b895a18472sm9000888plb.117.2023.07.31.15.15.23
+        by smtp.gmail.com with ESMTPSA id jn13-20020a170903050d00b001b895a18472sm9000888plb.117.2023.07.31.15.15.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 15:15:24 -0700 (PDT)
+        Mon, 31 Jul 2023 15:15:26 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 2/7] block/mq-deadline: Only use zone locking if necessary
-Date:   Mon, 31 Jul 2023 15:14:38 -0700
-Message-ID: <20230731221458.437440-3-bvanassche@acm.org>
+        Douglas Gilbert <dgilbert@interlog.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+Subject: [PATCH v5 4/7] scsi: scsi_debug: Support disabling zone write locking
+Date:   Mon, 31 Jul 2023 15:14:40 -0700
+Message-ID: <20230731221458.437440-5-bvanassche@acm.org>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
 In-Reply-To: <20230731221458.437440-1-bvanassche@acm.org>
 References: <20230731221458.437440-1-bvanassche@acm.org>
@@ -57,92 +57,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Measurements have shown that limiting the queue depth to one per zone for
-zoned writes has a significant negative performance impact on zoned UFS
-devices. Hence this patch that disables zone locking by the mq-deadline
-scheduler if the storage controller preserves the command order. This
-patch is based on the following assumptions:
-- It happens infrequently that zoned write requests are reordered by the
-  block layer.
-- The I/O priority of all write requests is the same per zone.
-- Either no I/O scheduler is used or an I/O scheduler is used that
-  submits write requests per zone in LBA order.
+Make it easier to test handling of QUEUE_FLAG_NO_ZONE_WRITE_LOCK by
+adding support for setting this flag for scsi_debug request queues.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Douglas Gilbert <dgilbert@interlog.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/mq-deadline.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
+ drivers/scsi/scsi_debug.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 02a916ba62ee..1f4124dd4a0b 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -338,6 +338,16 @@ static struct request *deadline_skip_seq_writes(struct deadline_data *dd,
- 	return rq;
- }
+diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+index 9c0af50501f9..57c6242bfb26 100644
+--- a/drivers/scsi/scsi_debug.c
++++ b/drivers/scsi/scsi_debug.c
+@@ -832,6 +832,7 @@ static int dix_reads;
+ static int dif_errors;
  
-+/*
-+ * Use write locking if either QUEUE_FLAG_NO_ZONE_WRITE_LOCK has not been set.
-+ * Not using zone write locking is only safe if the block driver preserves the
-+ * request order.
-+ */
-+static bool dd_use_zone_write_locking(struct request_queue *q)
-+{
-+	return blk_queue_is_zoned(q) && !blk_queue_no_zone_write_lock(q);
-+}
+ /* ZBC global data */
++static bool sdeb_no_zwrl;
+ static bool sdeb_zbc_in_use;	/* true for host-aware and host-managed disks */
+ static int sdeb_zbc_zone_cap_mb;
+ static int sdeb_zbc_zone_size_mb;
+@@ -5138,9 +5139,13 @@ static struct sdebug_dev_info *find_build_dev_info(struct scsi_device *sdev)
+ 
+ static int scsi_debug_slave_alloc(struct scsi_device *sdp)
+ {
++	struct request_queue *q = sdp->request_queue;
 +
- /*
-  * For the specified data direction, return the next request to
-  * dispatch using arrival ordered lists.
-@@ -353,7 +363,7 @@ deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
- 		return NULL;
- 
- 	rq = rq_entry_fifo(per_prio->fifo_list[data_dir].next);
--	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
-+	if (data_dir == DD_READ || !dd_use_zone_write_locking(rq->q))
- 		return rq;
- 
- 	/*
-@@ -398,7 +408,7 @@ deadline_next_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
- 	if (!rq)
- 		return NULL;
- 
--	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
-+	if (data_dir == DD_READ || !dd_use_zone_write_locking(rq->q))
- 		return rq;
- 
- 	/*
-@@ -526,8 +536,9 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
- 	}
- 
- 	/*
--	 * For a zoned block device, if we only have writes queued and none of
--	 * them can be dispatched, rq will be NULL.
-+	 * For a zoned block device that requires write serialization, if we
-+	 * only have writes queued and none of them can be dispatched, rq will
-+	 * be NULL.
- 	 */
- 	if (!rq)
- 		return NULL;
-@@ -552,7 +563,8 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
- 	/*
- 	 * If the request needs its target zone locked, do it.
- 	 */
--	blk_req_zone_write_lock(rq);
-+	if (dd_use_zone_write_locking(rq->q))
-+		blk_req_zone_write_lock(rq);
- 	rq->rq_flags |= RQF_STARTED;
- 	return rq;
+ 	if (sdebug_verbose)
+ 		pr_info("slave_alloc <%u %u %u %llu>\n",
+ 		       sdp->host->host_no, sdp->channel, sdp->id, sdp->lun);
++	if (sdeb_no_zwrl)
++		blk_queue_flag_set(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, q);
+ 	return 0;
  }
-@@ -933,7 +945,7 @@ static void dd_finish_request(struct request *rq)
  
- 	atomic_inc(&per_prio->stats.completed);
- 
--	if (blk_queue_is_zoned(q)) {
-+	if (dd_use_zone_write_locking(rq->q)) {
- 		unsigned long flags;
- 
- 		spin_lock_irqsave(&dd->zone_lock, flags);
+@@ -5738,6 +5743,7 @@ module_param_named(ndelay, sdebug_ndelay, int, S_IRUGO | S_IWUSR);
+ module_param_named(no_lun_0, sdebug_no_lun_0, int, S_IRUGO | S_IWUSR);
+ module_param_named(no_rwlock, sdebug_no_rwlock, bool, S_IRUGO | S_IWUSR);
+ module_param_named(no_uld, sdebug_no_uld, int, S_IRUGO);
++module_param_named(no_zone_write_lock, sdeb_no_zwrl, bool, S_IRUGO);
+ module_param_named(num_parts, sdebug_num_parts, int, S_IRUGO);
+ module_param_named(num_tgts, sdebug_num_tgts, int, S_IRUGO | S_IWUSR);
+ module_param_named(opt_blks, sdebug_opt_blks, int, S_IRUGO);
+@@ -5812,6 +5818,8 @@ MODULE_PARM_DESC(ndelay, "response delay in nanoseconds (def=0 -> ignore)");
+ MODULE_PARM_DESC(no_lun_0, "no LU number 0 (def=0 -> have lun 0)");
+ MODULE_PARM_DESC(no_rwlock, "don't protect user data reads+writes (def=0)");
+ MODULE_PARM_DESC(no_uld, "stop ULD (e.g. sd driver) attaching (def=0))");
++MODULE_PARM_DESC(no_zone_write_lock,
++		 "Disable serialization of zoned writes (def=0)");
+ MODULE_PARM_DESC(num_parts, "number of partitions(def=0)");
+ MODULE_PARM_DESC(num_tgts, "number of targets per host to simulate(def=1)");
+ MODULE_PARM_DESC(opt_blks, "optimal transfer length in blocks (def=1024)");
