@@ -2,155 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66703C001DE
-	for <linux-block@archiver.kernel.org>; Mon, 31 Jul 2023 12:55:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB26FC41513
+	for <linux-block@archiver.kernel.org>; Mon, 31 Jul 2023 12:56:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231276AbjGaMzF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jul 2023 08:55:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40562 "EHLO
+        id S231374AbjGaM4K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Jul 2023 08:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbjGaMzE (ORCPT
+        with ESMTP id S229820AbjGaM4K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2023 08:55:04 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B811AD
-        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 05:55:03 -0700 (PDT)
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230731125501epoutp048134de1800bcee49df0197255b2d2fed~29QJ_ltUi0971409714epoutp04h
-        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 12:55:01 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230731125501epoutp048134de1800bcee49df0197255b2d2fed~29QJ_ltUi0971409714epoutp04h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1690808101;
-        bh=eu93vIczw2e7uVoLZPyx1ldXyXlxA+VenRHpGew8cYQ=;
-        h=Subject:Reply-To:From:To:In-Reply-To:Date:References:From;
-        b=WMSYarM8NRIIIYT0bwJlrKKmTR824Y7jkYcZ3mqIUiuCjTHSWxHTZ5s4TBCzDv2fz
-         I+034GqRx4tHrdKbrXSkKhLEsgNUFsxIEJB8ruEv2zgS+cGEl04C8Dm+eATAl+WlGa
-         nIT3z7FDlloV+W8AaBLf2srmR8Q0+cswYYmXe5O8=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-        20230731125500epcas2p1498de3fa02baa044d925f0fca88a4219~29QJsh3jz2209822098epcas2p1R;
-        Mon, 31 Jul 2023 12:55:00 +0000 (GMT)
-Received: from epsmgec2p1.samsung.com (unknown [182.195.36.88]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4RDyrN2SDCz4x9Q0; Mon, 31 Jul
-        2023 12:55:00 +0000 (GMT)
-X-AuditID: b6c32a43-557fb7000001d7ef-b9-64c7af24bcb8
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmgec2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A0.A1.55279.42FA7C46; Mon, 31 Jul 2023 21:55:00 +0900 (KST)
-Mime-Version: 1.0
-Subject: [PATCH v2 3/4] bio-integrity: cleanup adding integrity pages to
- bip's bvec
-Reply-To: j-young.choi@samsung.com
-Sender: Jinyoung Choi <j-young.choi@samsung.com>
-From:   Jinyoung Choi <j-young.choi@samsung.com>
-To:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "chaitanya.kulkarni@wdc.com" <chaitanya.kulkarni@wdc.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5@epcms2p5>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20230731125459epcms2p177a5cc5caa7ef0a9de35689e96558f43@epcms2p1>
-Date:   Mon, 31 Jul 2023 21:54:59 +0900
-X-CMS-MailID: 20230731125459epcms2p177a5cc5caa7ef0a9de35689e96558f43
+        Mon, 31 Jul 2023 08:56:10 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3B6E46;
+        Mon, 31 Jul 2023 05:56:08 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-991da766865so711102966b.0;
+        Mon, 31 Jul 2023 05:56:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690808167; x=1691412967;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ziq8GvakOgPiU2KBprCo4YVywArPvGqYAyVmhmNh8fY=;
+        b=UcDTpgC20rz+CPCBA+mx0Y2sF8mKohFoZC/KF7TBEQXY5NABf8IGgsnLSiCSxf9gnw
+         HEI06mujtUFBVtpqf+uD4rWOIKth0JsrU9sWfI+N/L1O3jQTF+683o7Nl4IdVs79CEJK
+         TgqI2ooPTsOD4SmZyw2BXMCRYskfKuqSJal3u4fHlqho2In9wf2nYJ7Zg2bUCxn6thX0
+         zSP2RrOhy696Wrzs7of4udkf1xMEQzRqcoiCPpo7DzVeUetvvQOj8+T2n/SrkC0WO6q1
+         1Q6hEEkXx2EVdTIpripBB3k9shuiaiKyR6WxF0t8FnSGcFT68eT5CJDp1FaU2js9PxZE
+         4obA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690808167; x=1691412967;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ziq8GvakOgPiU2KBprCo4YVywArPvGqYAyVmhmNh8fY=;
+        b=PFgajf7uyKmxiPYKiQeq4m2qrnoi0XVBNuguMnaQO7sabBMfXet7cwQykr09p/85cd
+         eEHCiF0Scq3W4qKzadFvJpK2Z/wZMsHney/cfZTRnkNeeTdNupnjs887XjDZ1Tj6GI5T
+         BTcDbOQRaX85pmz2e4caUshTZ2ia/GOahb2IoEzXBA34HTOuu68R/F3tpeea6iEOAZAr
+         vtmvCbZm1DpEfXFMpwxXRKjFbnsGq0NbIb1SCu0336K27DBxCuFdc0GNJqQ0usdkyHip
+         A6IuHX5/5XNGYbILzj2UHnYL0jy9aDa6LEKKMMyHtpqCvXQCrSdSem6FLwOyQPFuXIH7
+         xRTA==
+X-Gm-Message-State: ABy/qLb5MTpW2953pb0GZxne9IQRwhvc6tsaEec8su96S4qNZn3ibQNo
+        r4zzHs3KTkjceg8ocjW2pS2TfRkL3Ng=
+X-Google-Smtp-Source: APBJJlFs3w3m21J9qxYLgIZmFxZdxdMS8UQzoFRxPFirCiuOXaNldCtwsezfUSLaTZIjmHSecJoJEA==
+X-Received: by 2002:a17:906:f252:b0:99b:dfd7:b0d3 with SMTP id gy18-20020a170906f25200b0099bdfd7b0d3mr6850941ejb.56.1690808167046;
+        Mon, 31 Jul 2023 05:56:07 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:310::2eef? ([2620:10d:c092:600::2:94b])
+        by smtp.gmail.com with ESMTPSA id ci18-20020a170906c35200b0099bd682f317sm6059419ejb.206.2023.07.31.05.56.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jul 2023 05:56:06 -0700 (PDT)
+Message-ID: <9a360c1f-dc9a-e8b4-dbb0-39c99509bb8d@gmail.com>
+Date:   Mon, 31 Jul 2023 13:53:54 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] io_uring: split req init from submit
+To:     Keith Busch <kbusch@meta.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Cc:     Keith Busch <kbusch@kernel.org>
+References: <20230728201449.3350962-1-kbusch@meta.com>
+Content-Language: en-US
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20230728201449.3350962-1-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphk+LIzCtJLcpLzFFi42LZdljTXFdl/fEUg3/f+CxW3+1ns5h1+zWL
-        xctDmhaTDl1jtNh7S9vi8q45bBbLj/9jslj3+j2LA4fH+XsbWTwuny312LSqk83j49NbLB59
-        W1YxenzeJOfRfqCbKYA9KtsmIzUxJbVIITUvOT8lMy/dVsk7ON453tTMwFDX0NLCXEkhLzE3
-        1VbJxSdA1y0zB+gkJYWyxJxSoFBAYnGxkr6dTVF+aUmqQkZ+cYmtUmpBSk6BeYFecWJucWle
-        ul5eaomVoYGBkSlQYUJ2xpaFigW7eSq2vPBrYLzB2cXIwSEhYCLx94F2FyMXh5DADkaJntP3
-        2EHivAKCEn93CHcxcnIIC4RKvLizig3EFhJQkji3ZhYjRNxAouV2GwuIzSagJ7Hj+W52kDki
-        Ap+ZJC7/+MAKkpAQ4JWY0f6UBcKWlti+fCtYM6eAn8TU62+ZIOIaEj+W9TJD2KISN1e/ZYex
-        3x+bzwhhi0i03jsLVSMo8eDnbqi4pMShQ1/ZIH7Jl9hwIBAiXCPR9us9VLm+xLWOjWAn8Ar4
-        Slye+w3sFxYBVYkLs44wQ7S6SBzpkAEJMwvIS2x/OwcszCygKbF+lz5EhbLEkVssEBV8Eh2H
-        /7LD/New8TdW9o55T5ggWtUkFjUZQYRlJL4ens8+gVFpFiKUZyFZOwth7QJG5lWMYqkFxbnp
-        qclGBYbwWE3Oz93ECE6WWs47GK/M/6d3iJGJg/EQowQHs5II76mAQylCvCmJlVWpRfnxRaU5
-        qcWHGE2B/p3ILCWanA9M13kl8YYmlgYmZmaG5kamBuZK4rz3WuemCAmkJ5akZqemFqQWwfQx
-        cXBKNTDJer00Yc2Nlk5jOrT5eMnqLye4DnVsS8ou/Kyspzn1YfKP7XWBt4IMV9m9UFiaPnWj
-        /ot95lM+3p7MfKzxc761VdkDwTthz3SzfCxeJ67Nfrh+xSHN0/YRy8wUvy/47vrwR962cPWn
-        Ttahsoc2vAy/dXax2NNH7wWSYncvtp4UYfjxQ5KY0GTVxoV/smM9vq1+zvhwS2znISvlNfXb
-        3kz8oCv3ri+EMXKZ5455U16FaT85MNs74ZuscalZeIHkXvXr/3Z/+XKZ/Zvip8ob7q9MErRV
-        //1eJj1h0Qdbi6sXnFsW3lN3jlBgVPcTb31heKdob2qV9qLnAZHZm+askFuaYycnvoxhoXCn
-        1udExy8xSizFGYmGWsxFxYkAXlAquR8EAAA=
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5
-References: <20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5@epcms2p5>
-        <CGME20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5@epcms2p1>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bio_integrity_add_page() returns the set length if the execution
-result is successful. Otherwise, return 0.
+On 7/28/23 21:14, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Split the req initialization and link handling from the submit. This
+> simplifies the submit path since everything that can fail is separate
+> from it, and makes it easier to create batched submissions later.
 
-Unnecessary if statement was removed. And when the result value was less
-than the set value, it was changed to failed.
+Keith, I don't think this prep patch does us any good, I'd rather
+shove the link assembling code further out of the common path. I like
+the first version more (see [1]). I'd suggest to merge it, and do
+cleaning up after.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
+I'll also say that IMHO the overhead is well justified. It's not only
+about having multiple nvmes, the problem slows down cases mixing storage
+with net and the rest of IO in a single ring.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
----
- block/bio-integrity.c | 16 +++-------------
- 1 file changed, 3 insertions(+), 13 deletions(-)
+[1] https://lore.kernel.org/io-uring/20230504162427.1099469-1-kbusch@meta.com/
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 6220a99977a4..c6b3bc86e1f9 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -252,27 +252,18 @@ bool bio_integrity_prep(struct bio *bio)
- 
- 	/* Map it */
- 	offset = offset_in_page(buf);
--	for (i = 0 ; i < nr_pages ; i++) {
--		int ret;
-+	for (i = 0; i < nr_pages && len > 0; i++) {
- 		bytes = PAGE_SIZE - offset;
- 
--		if (len <= 0)
--			break;
--
- 		if (bytes > len)
- 			bytes = len;
- 
--		ret = bio_integrity_add_page(bio, virt_to_page(buf),
--					     bytes, offset);
--
--		if (ret == 0) {
-+		if (bio_integrity_add_page(bio, virt_to_page(buf),
-+					   bytes, offset) < bytes) {
- 			printk(KERN_ERR "could not attach integrity payload\n");
- 			goto err_end_io;
- 		}
- 
--		if (ret < bytes)
--			break;
--
- 		buf += bytes;
- 		len -= bytes;
- 		offset = 0;
-@@ -291,7 +282,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	bio->bi_status = BLK_STS_RESOURCE;
- 	bio_endio(bio);
- 	return false;
--
- }
- EXPORT_SYMBOL(bio_integrity_prep);
- 
 -- 
-2.34.1
+Pavel Begunkov
