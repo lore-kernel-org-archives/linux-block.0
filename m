@@ -2,190 +2,143 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18189C001DF
-	for <linux-block@archiver.kernel.org>; Mon, 31 Jul 2023 22:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A19C04E69
+	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 00:28:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230416AbjGaWPv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jul 2023 18:15:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44096 "EHLO
+        id S229379AbjHAA2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Jul 2023 20:28:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230007AbjGaWPt (ORCPT
+        with ESMTP id S231450AbjHAA2B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2023 18:15:49 -0400
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E45E41723
-        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 15:15:44 -0700 (PDT)
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1bbbbb77b38so29383015ad.3
-        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 15:15:44 -0700 (PDT)
+        Mon, 31 Jul 2023 20:28:01 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE521716
+        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 17:27:59 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bba9539a23so6744905ad.1
+        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 17:27:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1690849679; x=1691454479;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NF/EZl9ssiFsilyYni0qa8S7le0pWtfJhEYQNYvUAjE=;
+        b=PrAT7ua2gCGDJhhlzzFedFjOQ1rgS5iQPOz6SH/WQxrs18n2SgKhu8IFVp3TOh99A/
+         wZD4PLISKHdZRXzRStEC4NAW38Lao4WhpC7U4Ox4YMfcugKDAv21KjtBqFf2u3j56g0l
+         FBqZkDxqxH10HNmR5p8NnvuBabifIvb27GuzKe+8XoWi1MuQ5mtqWtRU061YHulMjOUt
+         NzF6StfZ27iqeVy+6V4vlbFHJlqEhdMk4QJUtswPuAVwCC6b9/01XFUYtJgQbC/KyhYf
+         yBzgyvvaaGh+6xGTi8CgUomxzR6wMgV35diqln94FsRlMN95Mem5RCjpqJZPgLnVU/sh
+         mVUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690841744; x=1691446544;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KQtAnIArA9iV45Y4VwwqcwMGiJtLwJXQ9EsDGHUi6lM=;
-        b=ODkjrn0UEwyCaK3gzuAnaqXSEZB9upwBk4quPtJhWyYDxDoxX20dJZLFd9Ob1KyD6U
-         hR4C7R1xkUdNjz/IQz1EqoJfaaTwsobIeKJ62BjkoScwRsec212dBFpq8x/96TemVPEj
-         AuTUwQdgwXFzFFd1y+tmmk0D5HD0+Grg52Ha7zcUQFFXNzSO4ib32GmvzyVGhMtM9a6E
-         65g4JpfhEDmgzLbe2ZraVfyIakGOSTGxDuaNUdD7ob79foWQyZ06Ur8ZhVggkzQqeY0q
-         5mRolOokCf8EC9PJTwkZaqXydWyx3IbLeaJom1teoWo10BGy4qZ3cxrJ8nGzys2LVvE3
-         VBAA==
-X-Gm-Message-State: ABy/qLbFTEfPeVXoADT3hCjvErNafOvVfvLGrPGDNoN9HvVdwKtOtP17
-        0lsxEhmsXlkWQZJdr0KawT4=
-X-Google-Smtp-Source: APBJJlF7CgFdHK5tpjnQAIh20WScB+UvdUsa5oHDiGqf/SEFV6daYoUboVIwMK4bpnBljtOZn40sTQ==
-X-Received: by 2002:a17:903:1107:b0:1b8:5a32:2345 with SMTP id n7-20020a170903110700b001b85a322345mr10736203plh.22.1690841744360;
-        Mon, 31 Jul 2023 15:15:44 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9346:70e3:158a:281c])
-        by smtp.gmail.com with ESMTPSA id jn13-20020a170903050d00b001b895a18472sm9000888plb.117.2023.07.31.15.15.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 15:15:44 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Avri Altman <avri.altman@wdc.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Can Guo <quic_cang@quicinc.com>, Bean Huo <beanhuo@micron.com>,
-        Asutosh Das <quic_asutoshd@quicinc.com>,
-        "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
-        Arthur Simchaev <Arthur.Simchaev@wdc.com>
-Subject: [PATCH v5 7/7] scsi: ufs: Disable zone write locking
-Date:   Mon, 31 Jul 2023 15:14:43 -0700
-Message-ID: <20230731221458.437440-8-bvanassche@acm.org>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-In-Reply-To: <20230731221458.437440-1-bvanassche@acm.org>
-References: <20230731221458.437440-1-bvanassche@acm.org>
+        d=1e100.net; s=20221208; t=1690849679; x=1691454479;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NF/EZl9ssiFsilyYni0qa8S7le0pWtfJhEYQNYvUAjE=;
+        b=Z719q14K3WiT+gj8JfViAw/egZuJjpfr0BGrRIDa9KcoRwjaDoRVqPKrr/uByjPmQX
+         fvQjtBlDSdGq92JaNdU391FrgU/7G8vpH21i44wFLpOkm8G4nuN9hraAB698MrF2C2ot
+         pksS9569CqxMeU7tIXURuhGWbeZsMfMafdCwLRJlJnmJJ60NajsVXJnVDfzDhfHREE29
+         I1YN/k1f+R1kq8PtFhuLGCenDKTSs+gXYS++xUznG/4Cd9qTl01V81KlpCjwpDvKTS3h
+         Z0sHddFN1nX7eqmBKA+TsaXSdkTz+8OChe8tGgFMKnnHG7smqRtPkUXmjKrPNf9DRwLp
+         TxSQ==
+X-Gm-Message-State: ABy/qLZ9ejzcQZ3w4MviE0yj1zLqce7bRmH76+pIN8BF1+Ggqpf1MNzh
+        l1e9KWPwy7X31RJyqDzYe0CVgQ==
+X-Google-Smtp-Source: APBJJlH2P/5iANAMJoJKWLbhhq7n9F8dLn8jScovcsOH2t8Kn7FLvtHkglJN8cWwsKNDVrbHuwcEOw==
+X-Received: by 2002:a17:902:db0f:b0:1b8:b0c4:2e3d with SMTP id m15-20020a170902db0f00b001b8b0c42e3dmr10066614plx.4.1690849679397;
+        Mon, 31 Jul 2023 17:27:59 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id iw14-20020a170903044e00b001bb54abfc07sm9083987plb.252.2023.07.31.17.27.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jul 2023 17:27:58 -0700 (PDT)
+Message-ID: <1b67a9dd-c28a-661a-3a46-dab509d4c34e@kernel.dk>
+Date:   Mon, 31 Jul 2023 18:27:57 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH -next] nbd: get config_lock before sock_shutdown
+Content-Language: en-US
+To:     Zhong Jinghua <zhongjinghua@huaweicloud.com>, josef@toxicpanda.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yukuai3@huawei.com
+References: <20230707062256.1271948-1-zhongjinghua@huaweicloud.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230707062256.1271948-1-zhongjinghua@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
-"The host controller always process transfer requests in-order according
-to the order submitted to the list. In case of multiple commands with
-single doorbell register ringing (batch mode), The dispatch order for
-these transfer requests by host controller will base on their index in
-the List. A transfer request with lower index value will be executed
-before a transfer request with higher index value."
+On 7/7/23 12:22?AM, Zhong Jinghua wrote:
+> Config->socks in sock_shutdown may trigger a UAF problem.
+> The reason is that sock_shutdown does not hold the config_lock,
+> so that nbd_ioctl can release config->socks at this time.
+> 
+> T0: NBD_SET_SOCK
+> T1: NBD_DO_IT
+> 
+> T0						T1
+> 
+> nbd_ioctl
+>   mutex_lock(&nbd->config_lock)
+>   // get lock
+>   __nbd_ioctl
+>     nbd_start_device_ioctl
+>       nbd_start_device
+>        mutex_unlock(&nbd->config_lock)
+>          // relase lock
+>          wait_event_interruptible
+>          (kill, enter sock_shutdown)
+>          sock_shutdown
+> 					nbd_ioctl
+> 					  mutex_lock(&nbd->config_lock)
+> 					  // get lock
+> 					  __nbd_ioctl
+> 					    nbd_add_socket
+> 					      krealloc
+> 						kfree(p)
+> 					        //config->socks is NULL
+>            nbd_sock *nsock = config->socks // error
+> 
+> Fix it by moving config_lock up before sock_shutdown.
+> 
+> Signed-off-by: Zhong Jinghua <zhongjinghua@huaweicloud.com>
+> ---
+>  drivers/block/nbd.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index c410cf29fb0c..accbe99ebb7e 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1428,13 +1428,18 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd)
+>  	mutex_unlock(&nbd->config_lock);
+>  	ret = wait_event_interruptible(config->recv_wq,
+>  					 atomic_read(&config->recv_threads) == 0);
+> +
+> +	/*
+> +	 * recv_work in flush_workqueue will not get this lock, because nbd_open
+> +	 * will hold nbd->config_refs
+> +	 */
+> +	mutex_lock(&nbd->config_lock);
+>  	if (ret) {
+>  		sock_shutdown(nbd);
+>  		nbd_clear_que(nbd);
+>  	}
+>  
+>  	flush_workqueue(nbd->recv_workq);
+> -	mutex_lock(&nbd->config_lock);
 
-From the UFSHCI 4.0 specification, about the MCQ mode:
-"Command Submission
-1. Host SW writes an Entry to SQ
-2. Host SW updates SQ doorbell tail pointer
+Feels pretty iffy to hold config_lock over the flush. If anything off
+recv_work() ever grabs it, we'd be stuck. Your comment assumes that the
+only case this will currently happen is if we drop the last ref, or at
+least that's the case that'd do it even if you don't mention it
+explicitly.
 
-Command Processing
-3. After fetching the Entry, Host Controller updates SQ doorbell head
-   pointer
-4. Host controller sends COMMAND UPIU to UFS device"
+Maybe this is all fine, but recv_work() should have a comment matching
+this one, and this comment should be more descriptive as well.
 
-In other words, for both legacy and MCQ mode, UFS controllers are
-required to forward commands to the UFS device in the order these
-commands have been received from the host.
+-- 
+Jens Axboe
 
-Notes:
-- For legacy mode this is only correct if the host submits one
-  command at a time. The UFS driver does this.
-- Also in legacy mode, the command order is not preserved if
-  auto-hibernation is enabled in the UFS controller. Hence, enable
-  zone write locking if auto-hibernation is enabled.
-
-This patch improves performance as follows on my test setup:
-- With the mq-deadline scheduler: 2.5x more IOPS for small writes.
-- When not using an I/O scheduler compared to using mq-deadline with
-  zone locking: 4x more IOPS for small writes.
-
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Avri Altman <avri.altman@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/ufs/core/ufshcd.c | 40 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index ae7b868f9c26..3c99516c38fa 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -4337,23 +4337,53 @@ int ufshcd_uic_hibern8_exit(struct ufs_hba *hba)
- }
- EXPORT_SYMBOL_GPL(ufshcd_uic_hibern8_exit);
- 
-+static void ufshcd_update_no_zone_write_lock(struct ufs_hba *hba,
-+					     bool set_no_zone_write_lock)
-+{
-+	struct scsi_device *sdev;
-+
-+	shost_for_each_device(sdev, hba->host)
-+		blk_freeze_queue_start(sdev->request_queue);
-+	shost_for_each_device(sdev, hba->host) {
-+		struct request_queue *q = sdev->request_queue;
-+
-+		blk_mq_freeze_queue_wait(q);
-+		if (set_no_zone_write_lock)
-+			blk_queue_flag_set(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, q);
-+		else
-+			blk_queue_flag_clear(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, q);
-+		blk_mq_unfreeze_queue(q);
-+	}
-+}
-+
- void ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
- {
- 	unsigned long flags;
--	bool update = false;
-+	bool prev_state, new_state, update = false;
- 
- 	if (!ufshcd_is_auto_hibern8_supported(hba))
- 		return;
- 
- 	spin_lock_irqsave(hba->host->host_lock, flags);
-+	prev_state = ufshcd_is_auto_hibern8_enabled(hba);
- 	if (hba->ahit != ahit) {
- 		hba->ahit = ahit;
- 		update = true;
- 	}
-+	new_state = ufshcd_is_auto_hibern8_enabled(hba);
- 	spin_unlock_irqrestore(hba->host->host_lock, flags);
- 
- 	if (!update)
- 		return;
-+	if (!is_mcq_enabled(hba) && !prev_state && new_state) {
-+		/*
-+		 * Auto-hibernation will be enabled. Enable write locking for
-+		 * zoned writes since auto-hibernation may cause reordering of
-+		 * zoned writes when using the legacy mode of the UFS host
-+		 * controller.
-+		 */
-+		ufshcd_update_no_zone_write_lock(hba, false);
-+	}
- 	if (!pm_runtime_suspended(&hba->ufs_device_wlun->sdev_gendev)) {
- 		ufshcd_rpm_get_sync(hba);
- 		ufshcd_hold(hba);
-@@ -4361,6 +4391,13 @@ void ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
- 		ufshcd_release(hba);
- 		ufshcd_rpm_put_sync(hba);
- 	}
-+	if (!is_mcq_enabled(hba) && prev_state && !new_state) {
-+		/*
-+		 * Auto-hibernation has been disabled. Disable write locking
-+		 * for zoned writes.
-+		 */
-+		ufshcd_update_no_zone_write_lock(hba, true);
-+	}
- }
- EXPORT_SYMBOL_GPL(ufshcd_auto_hibern8_update);
- 
-@@ -5140,6 +5177,7 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
- 
- 	ufshcd_hpb_configure(hba, sdev);
- 
-+	blk_queue_flag_set(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, q);
- 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
- 	if (hba->quirks & UFSHCD_QUIRK_4KB_DMA_ALIGNMENT)
- 		blk_queue_update_dma_alignment(q, SZ_4K - 1);
