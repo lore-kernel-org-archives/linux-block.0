@@ -2,62 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CE2C04A94
-	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 19:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CF8C04A94
+	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 19:06:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232180AbjHATFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Aug 2023 15:05:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42060 "EHLO
+        id S229708AbjHATGa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Aug 2023 15:06:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232146AbjHATFv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 15:05:51 -0400
-Received: from out-123.mta1.migadu.com (out-123.mta1.migadu.com [IPv6:2001:41d0:203:375::7b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E521F1BD
-        for <linux-block@vger.kernel.org>; Tue,  1 Aug 2023 12:05:49 -0700 (PDT)
-Date:   Tue, 1 Aug 2023 15:05:41 -0400
+        with ESMTP id S232214AbjHATGS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 15:06:18 -0400
+X-Greylist: delayed 390 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 01 Aug 2023 12:06:17 PDT
+Received: from out-86.mta0.migadu.com (out-86.mta0.migadu.com [91.218.175.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D9BB115
+        for <linux-block@vger.kernel.org>; Tue,  1 Aug 2023 12:06:17 -0700 (PDT)
+Date:   Tue, 1 Aug 2023 14:59:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690916746;
+        t=1690916384;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=ubgLwd+hMlZdsduA9ofiwuiDejvJ/EDMtYsrpjdDbWc=;
-        b=oN3KEtYF/DC6U/4Z8RF+/oPyqvyX+f7zsgMTBMsYUJk+GH2QeRfY/DfAq0QcK2ll4twaXF
-        1BLP1XSOg1ZsMLtOUMvc4BhpQXbBmJUCJqrpsRqGV8CtiSTxQP3N1pupZ24a5g8hpPdCZU
-        CPP/0kI9X5Ba1Ib7PKmRSE8yf/QtoZg=
+        bh=IC+hkFzsraORVL28A/kjM0OytUDIOrQlr7SfFeohqy8=;
+        b=c2RD5mZRt+9NuyWas53Mgwnpp+VIhPCcbfY6GEax8AgF9MRqweC6dyjeiGAS2hUNb+xO4L
+        MfR1rncIoVyDfLJQ5ojrCE4x+JmyTPldISLsk+X4ubRnesBhI4kWaFJBbT6Og+bsefSjDH
+        LkvBWXPu05W12WWSRhtXe4/Y9bePJOY=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Kent Overstreet <kent.overstreet@linux.dev>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     linux-bcachefs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Kent Overstreet <kent.overstreet@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 06/20] block: Bring back zero_fill_bio_iter
-Message-ID: <20230801190541.gaoq45jkffcrm3cp@moria.home.lan>
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 04/20] block: Add some exports for bcachefs
+Message-ID: <20230801185940.b4vsd62fjxwzv7ft@moria.home.lan>
 References: <20230712211115.2174650-1-kent.overstreet@linux.dev>
- <20230712211115.2174650-7-kent.overstreet@linux.dev>
- <ZL62cVmeI6t7o+G9@infradead.org>
- <20230725024553.bqwoyz4ywqx6fypb@moria.home.lan>
- <ZMEd08XCNFE1SwoU@infradead.org>
+ <20230712211115.2174650-5-kent.overstreet@linux.dev>
+ <ZL61WIpYp/tJ6XH1@infradead.org>
+ <20230725030037.minycb3oxubajuqw@moria.home.lan>
+ <ZMEdqvzAUbQPs0io@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZMEd08XCNFE1SwoU@infradead.org>
+In-Reply-To: <ZMEdqvzAUbQPs0io@infradead.org>
 X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 26, 2023 at 06:21:23AM -0700, Christoph Hellwig wrote:
-> On Mon, Jul 24, 2023 at 10:45:53PM -0400, Kent Overstreet wrote:
-> > And yet, we've had a subtle bug introduced in that code that took quite
-> > awhile to be fixed - I'm not pro code duplication in general and I don't
-> > think this is a good place to start.
+On Wed, Jul 26, 2023 at 06:20:42AM -0700, Christoph Hellwig wrote:
+> On Mon, Jul 24, 2023 at 11:00:37PM -0400, Kent Overstreet wrote:
+> > In short, iomap is heavily callback based, the bcachefs io paths are
+> > not - we pass around data structures instead. I discussed this with
+> > people when iomap was first being written, but iomap ended up being a
+> > much more conservative approach, more in line with the old buffer heads
+> > code where the generic code calls into the filesystem to obtain
+> > mappings.
+> > 
+> > I'm gradually convincing people of the merits of the bcachefs approach -
+> > in particular reducing indirect function calls is getting more attention
+> > these days.
 > 
-> I'm not sure arguing for adding a helper your can triviall implement
-> yourself really helps to streamline your upstreaming process.
+> FYI, Matthew has had patches that convert iomap to be an iterator,
+> and I've massage the first half of them and actuall got them in
+> before.  I'd much rather finish off that work (even if only for
+> direct I/O initially) than adding another direct I/O code.  But
+> even with out that we should be able to easily pass more private
+> data, in fact btrfs makes pretty heavy use of that.
 
-I gave you my engineering reasons, you're the one who's arguing.
+That's wonderful, but getting iomap up to the level of what bcachefs
+needs is still going to be a pretty big project and it's not going to be
+my highest priority.
 
-And to make everything perfectly clear: this is code that I originally
-wrote, and then you started changing without CCing me - your patch that
-deleted zero_fill_bio_iter() never should've gone in.
+bcachefs also hangs more state off of the pagecache, in bcachefs's
+equivvalent of iomap_page - we store reservations for dirty data there
+and a few other things, which means the buffered IO paths don't have to
+walk any other data structures.
+
+I think that's another idea you guys will want to steal, but a higher
+priority for me is getting a proper FUSE port done - and making bcachefs
+more tightly weddded to VFS library code is not likely to make that
+process any easier.
+
+Once a proper fuse port is done and we know what that looks like will be
+a better time for some consolidation.
