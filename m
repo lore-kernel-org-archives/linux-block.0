@@ -2,160 +2,245 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A74BC04A94
-	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 02:30:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CE3C04FE2
+	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 09:45:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232094AbjHACaN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jul 2023 22:30:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60570 "EHLO
+        id S233545AbjHAJpT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Aug 2023 05:45:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232110AbjHACaK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2023 22:30:10 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2046.outbound.protection.outlook.com [40.107.237.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F1871BF6
-        for <linux-block@vger.kernel.org>; Mon, 31 Jul 2023 19:30:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ctVE8iqtLEt8CY5JshmrkmrcTygIkj2jmJj1eoerPThlGeDGzuEx3Vdkvz8MUaPuq6nvMS87nipwEwp89ZCcUTO+21/XfcDsOEGSF+GNLbC6ZSmvZOSFeZtX7kBHM/pjvBmw3MCDEaw/xIk51YSEeXZPwEZnRCgGu371PEfdlmW0s1t/ybITdYJdYlp5dF0Lz0uWpzUB73JPaKvWH3Tw2totjGNMlYWazW4Ux21P7oRXQkjbuOldiK1Qx5HZVF8osizCtmgv1l0bdYidSyiLMasYpe8q3lpsWzwNFAkqagCXSJ1oBTqdBFTXB/luADT41nXuFWCBzGVKkahCzUvE9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HwR5HQTwfjmKIpXFARLUCH8D4pz1yHtqhl5x2o/FX9E=;
- b=YyWqCPehtYiVTXKmNErUIe26wMHPWczenfj1UmRt0tcILgLuAOweVzt2cSvs3X0xKod3gQ8CclUlJmpl5BKzCc/eZV2nEtmSi3dZby+KJdnOPFu9ij7NcwoYEdNCQ77j4S38w4O/D9VqAHNlC5FM8yXG/KU0RUkndFDWTI+O2RpacshVvXdNhBY9KMgeKTP0fb4tNxPd/Q04vpgu3aV14rbAAM+x/KWgQFkihEpC2EUgYxk7Rifd7q6nHT2Imld6A8oA3221drtW6N2ClCQSqEwHIQvZ7AgE+Pv40/kh2Cjf1kUS/lcv9yMdtRWdVyX1ZHk49fy9J2yDMl6bMV7qqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HwR5HQTwfjmKIpXFARLUCH8D4pz1yHtqhl5x2o/FX9E=;
- b=eKZVjz4nAAit/BfDEZ2qagdaJLy+J3mp0QT+lzsysFkOSyGOF5fSU0eFAcSvTBqlAZ1GVUey5Xb0TByKJR4GrV6RErHPwhiumrdzEIw+hFmMDhi1SQlwuSnBb/fm6+NJL2lPE04NsP5WYxjcscCcP1x+JKPeo5MWZUuo2F5iTMf0rXxXeBvLaiDtiOjsHgpwSAYvXOCvFBb+YSud8+GFfOvG5M7sfuba6MSp/klwQ9Oc5QEfKJnJKAi2acAtbwSmFMXRMUB+35sqXbopzTQMEIvWMfBJw44K+OdAOez1FgK2QU8CUvLzh3yxb/r4o4hsv6SNT3MnJEHN7S9jlvg25A==
-Received: from SA1PR02CA0002.namprd02.prod.outlook.com (2603:10b6:806:2cf::6)
- by PH0PR12MB7814.namprd12.prod.outlook.com (2603:10b6:510:288::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.43; Tue, 1 Aug
- 2023 02:30:07 +0000
-Received: from SN1PEPF000252A1.namprd05.prod.outlook.com
- (2603:10b6:806:2cf:cafe::3) by SA1PR02CA0002.outlook.office365.com
- (2603:10b6:806:2cf::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44 via Frontend
- Transport; Tue, 1 Aug 2023 02:30:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF000252A1.mail.protection.outlook.com (10.167.242.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.22 via Frontend Transport; Tue, 1 Aug 2023 02:30:07 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 31 Jul 2023
- 19:29:58 -0700
-Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 31 Jul
- 2023 19:29:58 -0700
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <linux-block@vger.kernel.org>
-CC:     <axboe@kernel.dk>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH 2/2] brd: remove redundent prefix with pr_fmt macro
-Date:   Mon, 31 Jul 2023 19:29:29 -0700
-Message-ID: <20230801022929.8972-3-kch@nvidia.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230801022929.8972-1-kch@nvidia.com>
-References: <20230801022929.8972-1-kch@nvidia.com>
+        with ESMTP id S233549AbjHAJpF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 05:45:05 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABD07E7C
+        for <linux-block@vger.kernel.org>; Tue,  1 Aug 2023 02:43:17 -0700 (PDT)
+Received: from dggpemm500016.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RFVVh2yz3zVjwJ;
+        Tue,  1 Aug 2023 17:41:32 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by dggpemm500016.china.huawei.com
+ (7.185.36.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 1 Aug
+ 2023 17:43:15 +0800
+From:   Chen Jiahao <chenjiahao16@huawei.com>
+To:     <philipp.reisner@linbit.com>, <lars.ellenberg@linbit.com>,
+        <christoph.boehmwalder@linbit.com>, <axboe@kernel.dk>,
+        <drbd-dev@lists.linbit.com>, <linux-block@vger.kernel.org>
+CC:     <chenjiahao16@huawei.com>
+Subject: [PATCH -next] drbd: Annotate RCU pointers as __rcu to fix sparse errors
+Date:   Tue, 1 Aug 2023 17:42:45 +0800
+Message-ID: <20230801094245.4145708-1-chenjiahao16@huawei.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A1:EE_|PH0PR12MB7814:EE_
-X-MS-Office365-Filtering-Correlation-Id: 53163846-18fe-4125-06f8-08db923738b7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FqBSDxH6UqIklj7y0tYos2iccj86P0WMbVgAw9CBpqcQpQ7Vqqo9fGtuhjRmikNLT+hni7vWNHMYun7gQGRx7qpgjsYEtTwPnc20Rh6LL8DlvXHmL4bB0FAgrOWzHySiIU0VBcbDZ6ptEaWFcwfwEdmyZyppNY6Pp/PLeZSCsqCNawdIXKXVIOpMh+qqwm4s8sw9ptE/6fMCD8ZtJBml8zRmZG+XcGXJiMW0Vf6K/aHHcdAJBsQQjWAaMITyjtzKSuCZbHnet5NHgUuywp3rt8yRzukasgiIfIGvdXvCgHHia+wuF3GplFQsnGUsCn33juWsm48Ld9vRyKwgFtsG0YBE8/Y7UFiwUYDk/WFHMb/TxakZmgDhBTblWiLJatPsOkZkoiNB7opTgKwRuoJeQMH61RndgzmR7XXNl4KD4sNP3IxVV1tyy5v2QOCzeZATy90bYEHuUrOuoNjFV0YCLnEAyZFqYkipUpDBXglTTBzeKHz00/ug+vfXeUasg4sb2BXL7R1iXoT7KKA3yTsDtAtzZ8Z7Yq2DFWTX1s/OJ8C/lQD9poF5d/QnPavNBMjyHzCIwT+iHB0usVJemDeKsGGvN1jLaK0lYUR6WDfehfvQGgbdooBnYbVzKWW9MnuyzXCd3AMmc0XyZhLtHLGxUtICl7JDK7cOUD58fDQ4K/xHrFkqrq35g9KelZTb76YljsaibEu0Jq9gpJlQtq0EsWp6+PCZfRNI1wobzwWjAzIjSehd7cFy7VhluT21F2XNPJjaTBramNYUsLWLECyC5A==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(396003)(376002)(136003)(82310400008)(451199021)(36840700001)(46966006)(40470700004)(47076005)(36860700001)(7696005)(36756003)(16526019)(40480700001)(2616005)(40460700003)(26005)(1076003)(83380400001)(107886003)(336012)(186003)(426003)(70586007)(70206006)(7636003)(41300700001)(356005)(54906003)(82740400003)(316002)(4326008)(5660300002)(8936002)(6916009)(8676002)(2906002)(6666004)(478600001)(21314003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 02:30:07.4026
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 53163846-18fe-4125-06f8-08db923738b7
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF000252A1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7814
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500016.china.huawei.com (7.185.36.25)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Define pr_fmt to "brd: " in order to remove the duplicate brd prefix
-that makes pr_xxx() longer than it's needed. Note that this practice
-is been followed in most of the kernel module for the consistency of
-the driver messages so they become easy to grep/debug and not duplicate
-driver name in the pr_xxx() messages,
+This patch adds __rcu annotation to RCU protected pointers,
+in order to fix following sparse errors:
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+drbd_state.c:1908:30: error: incompatible types in comparison expression
+drbd_state.c:834:22: error: incompatible types in comparison expression
+drbd_state.c:838:14: error: incompatible types in comparison expression
+drbd_state.c:1064:22: error: incompatible types in comparison expression
+drbd_state.c:2075:17: error: incompatible types in comparison expression
+drbd_nl.c:454:33: error: incompatible types in comparison expression
+drbd_nl.c:691:38: error: incompatible types in comparison expression
+drbd_nl.c:983:18: error: incompatible types in comparison expression
+drbd_nl.c:1285:22: error: incompatible types in comparison expression
+drbd_nl.c:1577:17: error: incompatible types in comparison expression
+drbd_nl.c:1587:17: error: incompatible types in comparison expression
+drbd_nl.c:1812:14: error: incompatible types in comparison expression
+drbd_nl.c:2072:39: error: incompatible types in comparison expression
+drbd_nl.c:2080:13: error: incompatible types in comparison expression
+drbd_nl.c:2265:50: error: incompatible types in comparison expression
+drbd_nl.c:2288:45: error: incompatible types in comparison expression
+drbd_nl.c:2433:9: error: incompatible types in comparison expression
+drbd_nl.c:2596:9: error: incompatible types in comparison expression
+drbd_nl.c:2829:18: error: incompatible types in comparison expression
+drbd_nl.c:2869:17: error: incompatible types in comparison expression
+drbd_nl.c:3407:33: error: incompatible types in comparison expression
+drbd_nl.c:3532:28: error: incompatible types in comparison expression
+drbd_nl.c:3745:29: error: incompatible types in comparison expression
+drbd_nl.c:3751:22: error: incompatible types in comparison expression
+drbd_nl.c:3941:38: error: incompatible types in comparison expression
+...
+
+Also, introducing rcu_assign_pointer() and rcu_dereference()
+to properly use these RCU protected pointers.
+
+Signed-off-by: Chen Jiahao <chenjiahao16@huawei.com>
 ---
- drivers/block/brd.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ drivers/block/drbd/drbd_int.h   |  6 +++---
+ drivers/block/drbd/drbd_nl.c    | 26 +++++++++++++-------------
+ drivers/block/drbd/drbd_state.c |  2 +-
+ 3 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index d878a7dc616b..23eea3a35438 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -27,6 +27,9 @@
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index a30a5ed811be..f97020cd5052 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -526,7 +526,7 @@ struct drbd_backing_dev {
+ 	struct block_device *backing_bdev;
+ 	struct block_device *md_bdev;
+ 	struct drbd_md md;
+-	struct disk_conf *disk_conf; /* RCU, for updates: resource->conf_update */
++	struct disk_conf __rcu *disk_conf; /* RCU, for updates: resource->conf_update */
+ 	sector_t known_size; /* last known size of that backing device */
+ };
  
- #include <linux/uaccess.h>
+@@ -629,7 +629,7 @@ struct drbd_connection {
+ 	unsigned int connect_cnt;	/* Inc each time a connection is established */
  
-+#undef pr_fmt
-+#define pr_fmt(fmt)	"brd: " fmt
-+
- /*
-  * Each block ramdisk device has a xarray brd_pages of pages that stores
-  * the pages containing the block device's contents. A brd page's ->index is
-@@ -397,7 +400,7 @@ static inline void brd_check_and_reset_par(void)
- 		max_part = 1UL << fls(max_part);
+ 	unsigned long flags;
+-	struct net_conf *net_conf;	/* content protected by rcu */
++	struct net_conf __rcu *net_conf;	/* content protected by rcu */
+ 	wait_queue_head_t ping_wait;	/* Woken upon reception of a ping, and a state change */
  
- 	if (max_part > DISK_MAX_PARTS) {
--		pr_info("brd: max_part can't be larger than %d, reset max_part = %d.\n",
-+		pr_info("max_part can't be larger than %d, reset max_part = %d.\n",
- 			DISK_MAX_PARTS, DISK_MAX_PARTS);
- 		max_part = DISK_MAX_PARTS;
+ 	struct sockaddr_storage my_addr;
+@@ -889,7 +889,7 @@ struct drbd_device {
+ 	int rs_last_events;  /* counter of read or write "events" (unit sectors)
+ 			      * on the lower level device when we last looked. */
+ 	int c_sync_rate; /* current resync rate after syncer throttle magic */
+-	struct fifo_buffer *rs_plan_s; /* correction values of resync planer (RCU, connection->conn_update) */
++	struct fifo_buffer __rcu *rs_plan_s; /* correction values of resync planer (RCU, connection->conn_update) */
+ 	int rs_in_flight; /* resync sectors in flight (to proxy, in proxy and from proxy) */
+ 	atomic_t ap_in_flight; /* App sectors in flight (waiting for ack) */
+ 	unsigned int peer_max_bio_size;
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index cddae6f4b00f..a63f1b4aae5b 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -722,7 +722,7 @@ drbd_set_role(struct drbd_device *const device, enum drbd_role new_role, int for
+ 		}
+ 	} else {
+ 		mutex_lock(&device->resource->conf_update);
+-		nc = connection->net_conf;
++		nc = rcu_dereference(connection->net_conf);
+ 		if (nc)
+ 			nc->discard_my_data = 0; /* without copy; single bit op is atomic */
+ 		mutex_unlock(&device->resource->conf_update);
+@@ -1531,7 +1531,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
  	}
-@@ -437,13 +440,13 @@ static int __init brd_init(void)
- 		goto out_free;
+ 
+ 	mutex_lock(&device->resource->conf_update);
+-	old_disk_conf = device->ldev->disk_conf;
++	old_disk_conf = rcu_dereference(device->ldev->disk_conf);
+ 	*new_disk_conf = *old_disk_conf;
+ 	if (should_set_defaults(info))
+ 		set_disk_conf_defaults(new_disk_conf);
+@@ -1552,7 +1552,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
+ 		new_disk_conf->c_plan_ahead = DRBD_C_PLAN_AHEAD_MAX;
+ 
+ 	fifo_size = (new_disk_conf->c_plan_ahead * 10 * SLEEP_TIME) / HZ;
+-	if (fifo_size != device->rs_plan_s->size) {
++	if (fifo_size != rcu_dereference(device->rs_plan_s)->size) {
+ 		new_plan = fifo_alloc(fifo_size);
+ 		if (!new_plan) {
+ 			drbd_err(device, "kmalloc of fifo_buffer failed");
+@@ -1583,7 +1583,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
+ 		goto fail_unlock;
+ 
+ 	if (new_plan) {
+-		old_plan = device->rs_plan_s;
++		old_plan = rcu_dereference(device->rs_plan_s);
+ 		rcu_assign_pointer(device->rs_plan_s, new_plan);
  	}
  
--	pr_info("brd: module loaded\n");
-+	pr_info("module loaded\n");
- 	return 0;
+@@ -1715,7 +1715,7 @@ void drbd_backing_dev_free(struct drbd_device *device, struct drbd_backing_dev *
+ 			  ldev->md_bdev != ldev->backing_bdev);
+ 	close_backing_dev(device, ldev->backing_bdev, device, true);
  
- out_free:
- 	brd_cleanup();
- 
--	pr_info("brd: module NOT loaded !!!\n");
-+	pr_info("module NOT loaded !!!\n");
- 	return err;
+-	kfree(ldev->disk_conf);
++	kfree(rcu_dereference(ldev->disk_conf));
+ 	kfree(ldev);
  }
  
-@@ -453,7 +456,7 @@ static void __exit brd_exit(void)
- 	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
- 	brd_cleanup();
+@@ -1784,7 +1784,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
+ 		retcode = ERR_NOMEM;
+ 		goto fail;
+ 	}
+-	nbc->disk_conf = new_disk_conf;
++	rcu_assign_pointer(nbc->disk_conf, new_disk_conf);
  
--	pr_info("brd: module unloaded\n");
-+	pr_info("module unloaded\n");
- }
+ 	set_disk_conf_defaults(new_disk_conf);
+ 	err = disk_conf_from_attrs(new_disk_conf, info);
+@@ -1934,10 +1934,10 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
  
- module_init(brd_init);
+ 	/* Prevent shrinking of consistent devices ! */
+ 	{
+-	unsigned long long nsz = drbd_new_dev_size(device, nbc, nbc->disk_conf->disk_size, 0);
++	unsigned long long nsz = drbd_new_dev_size(device, nbc, rcu_dereference(nbc->disk_conf)->disk_size, 0);
+ 	unsigned long long eff = nbc->md.la_size_sect;
+ 	if (drbd_md_test_flag(nbc, MDF_CONSISTENT) && nsz < eff) {
+-		if (nsz == nbc->disk_conf->disk_size) {
++		if (nsz == rcu_dereference(nbc->disk_conf)->disk_size) {
+ 			drbd_warn(device, "truncating a consistent device during attach (%llu < %llu)\n", nsz, eff);
+ 		} else {
+ 			drbd_warn(device, "refusing to truncate a consistent device (%llu < %llu)\n", nsz, eff);
+@@ -1971,7 +1971,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
+ 	D_ASSERT(device, device->ldev == NULL);
+ 	device->ldev = nbc;
+ 	device->resync = resync_lru;
+-	device->rs_plan_s = new_plan;
++	rcu_assign_pointer(device->rs_plan_s, new_plan);
+ 	nbc = NULL;
+ 	resync_lru = NULL;
+ 	new_disk_conf = NULL;
+@@ -2130,7 +2130,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
+ 	conn_reconfig_done(connection);
+ 	if (nbc) {
+ 		close_backing_dev(device, nbc->md_bdev,
+-			  nbc->disk_conf->meta_dev_idx < 0 ?
++			  rcu_dereference(nbc->disk_conf)->meta_dev_idx < 0 ?
+ 				(void *)device : (void *)drbd_m_holder,
+ 			  nbc->md_bdev != nbc->backing_bdev);
+ 		close_backing_dev(device, nbc->backing_bdev, device, true);
+@@ -2389,7 +2389,7 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	mutex_lock(&connection->data.mutex);
+ 	mutex_lock(&connection->resource->conf_update);
+-	old_net_conf = connection->net_conf;
++	old_net_conf = rcu_dereference(connection->net_conf);
+ 
+ 	if (!old_net_conf) {
+ 		drbd_msg_put_info(adm_ctx.reply_skb, "net conf missing, try connect");
+@@ -2587,7 +2587,7 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
+ 	drbd_flush_workqueue(&connection->sender_work);
+ 
+ 	mutex_lock(&adm_ctx.resource->conf_update);
+-	old_net_conf = connection->net_conf;
++	old_net_conf = rcu_dereference(connection->net_conf);
+ 	if (old_net_conf) {
+ 		retcode = ERR_NET_CONFIGURED;
+ 		mutex_unlock(&adm_ctx.resource->conf_update);
+@@ -2863,7 +2863,7 @@ int drbd_adm_resize(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	if (new_disk_conf) {
+ 		mutex_lock(&device->resource->conf_update);
+-		old_disk_conf = device->ldev->disk_conf;
++		old_disk_conf = rcu_dereference(device->ldev->disk_conf);
+ 		*new_disk_conf = *old_disk_conf;
+ 		new_disk_conf->disk_size = (sector_t)rs.resize_size;
+ 		rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf);
+diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
+index 287a8d1d3f70..e9fa2dfe0dd8 100644
+--- a/drivers/block/drbd/drbd_state.c
++++ b/drivers/block/drbd/drbd_state.c
+@@ -2069,7 +2069,7 @@ static int w_after_conn_state_ch(struct drbd_work *w, int unused)
+ 		mutex_unlock(&notification_mutex);
+ 
+ 		mutex_lock(&connection->resource->conf_update);
+-		old_conf = connection->net_conf;
++		old_conf = rcu_dereference(connection->net_conf);
+ 		connection->my_addr_len = 0;
+ 		connection->peer_addr_len = 0;
+ 		RCU_INIT_POINTER(connection->net_conf, NULL);
 -- 
-2.40.0
+2.34.1
 
