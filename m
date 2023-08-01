@@ -2,245 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CE3C04FE2
-	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 09:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD94C001DF
+	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 09:59:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233545AbjHAJpT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Aug 2023 05:45:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45426 "EHLO
+        id S231637AbjHAJ7U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Aug 2023 05:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233549AbjHAJpF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 05:45:05 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABD07E7C
-        for <linux-block@vger.kernel.org>; Tue,  1 Aug 2023 02:43:17 -0700 (PDT)
-Received: from dggpemm500016.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RFVVh2yz3zVjwJ;
-        Tue,  1 Aug 2023 17:41:32 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by dggpemm500016.china.huawei.com
- (7.185.36.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 1 Aug
- 2023 17:43:15 +0800
-From:   Chen Jiahao <chenjiahao16@huawei.com>
-To:     <philipp.reisner@linbit.com>, <lars.ellenberg@linbit.com>,
-        <christoph.boehmwalder@linbit.com>, <axboe@kernel.dk>,
-        <drbd-dev@lists.linbit.com>, <linux-block@vger.kernel.org>
-CC:     <chenjiahao16@huawei.com>
-Subject: [PATCH -next] drbd: Annotate RCU pointers as __rcu to fix sparse errors
-Date:   Tue, 1 Aug 2023 17:42:45 +0800
-Message-ID: <20230801094245.4145708-1-chenjiahao16@huawei.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S234094AbjHAJ7O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 05:59:14 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096F492;
+        Tue,  1 Aug 2023 02:59:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=e/cM7pOb8V89NpAzMZKFrg3KLMzh7PzjRGacn60nwMo=; b=qMSX/esFTnAxyNgoPrP7jADKIJ
+        9wYBblso7ibaqsO4XPGhMXQl/u8gSIsx8I/5u6dg/GaVIIrLMqfefa84XJ0heq2jUXxRhBvjXFLGi
+        Y/rblK29yQR3cUoMbWfzUO60DbS17t2UtdJKcmKeyWjjGdQ9oBxMnq/Ze3+OCkpbh8QYF4sPLVEOE
+        vveGaxTDW+ZWK+Wpe7x0ZYCgCXogjrVnJJ5rKZj8gNhLocGXvNHPH2JIO1ywOmgp2Ya54Go+nNX+/
+        kV4RSB9CZZTzDfRQbZSfnOhA4i1IDHD6PSy+upS4BiftCsv21OKxuaAaTUvrmr/js+hxTR8BoEhzx
+        MncecfbQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qQm9i-001i00-28;
+        Tue, 01 Aug 2023 09:59:06 +0000
+Date:   Tue, 1 Aug 2023 02:59:06 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jinyoung Choi <j-young.choi@samsung.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "chaitanya.kulkarni@wdc.com" <chaitanya.kulkarni@wdc.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2 2/4] bio-integrity: Sets the payload size in
+ bio_integrity_add_page()
+Message-ID: <ZMjXarxCV8f/SC5+@infradead.org>
+References: <20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5@epcms2p5>
+ <CGME20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5@epcms2p7>
+ <20230731125224epcms2p7e3c5bbe1fd544c0fd586520b2d155872@epcms2p7>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500016.china.huawei.com (7.185.36.25)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230731125224epcms2p7e3c5bbe1fd544c0fd586520b2d155872@epcms2p7>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds __rcu annotation to RCU protected pointers,
-in order to fix following sparse errors:
+s/Sets/update/ in the subject line.
 
-drbd_state.c:1908:30: error: incompatible types in comparison expression
-drbd_state.c:834:22: error: incompatible types in comparison expression
-drbd_state.c:838:14: error: incompatible types in comparison expression
-drbd_state.c:1064:22: error: incompatible types in comparison expression
-drbd_state.c:2075:17: error: incompatible types in comparison expression
-drbd_nl.c:454:33: error: incompatible types in comparison expression
-drbd_nl.c:691:38: error: incompatible types in comparison expression
-drbd_nl.c:983:18: error: incompatible types in comparison expression
-drbd_nl.c:1285:22: error: incompatible types in comparison expression
-drbd_nl.c:1577:17: error: incompatible types in comparison expression
-drbd_nl.c:1587:17: error: incompatible types in comparison expression
-drbd_nl.c:1812:14: error: incompatible types in comparison expression
-drbd_nl.c:2072:39: error: incompatible types in comparison expression
-drbd_nl.c:2080:13: error: incompatible types in comparison expression
-drbd_nl.c:2265:50: error: incompatible types in comparison expression
-drbd_nl.c:2288:45: error: incompatible types in comparison expression
-drbd_nl.c:2433:9: error: incompatible types in comparison expression
-drbd_nl.c:2596:9: error: incompatible types in comparison expression
-drbd_nl.c:2829:18: error: incompatible types in comparison expression
-drbd_nl.c:2869:17: error: incompatible types in comparison expression
-drbd_nl.c:3407:33: error: incompatible types in comparison expression
-drbd_nl.c:3532:28: error: incompatible types in comparison expression
-drbd_nl.c:3745:29: error: incompatible types in comparison expression
-drbd_nl.c:3751:22: error: incompatible types in comparison expression
-drbd_nl.c:3941:38: error: incompatible types in comparison expression
-...
+Otherwise looks good:
 
-Also, introducing rcu_assign_pointer() and rcu_dereference()
-to properly use these RCU protected pointers.
-
-Signed-off-by: Chen Jiahao <chenjiahao16@huawei.com>
----
- drivers/block/drbd/drbd_int.h   |  6 +++---
- drivers/block/drbd/drbd_nl.c    | 26 +++++++++++++-------------
- drivers/block/drbd/drbd_state.c |  2 +-
- 3 files changed, 17 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index a30a5ed811be..f97020cd5052 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -526,7 +526,7 @@ struct drbd_backing_dev {
- 	struct block_device *backing_bdev;
- 	struct block_device *md_bdev;
- 	struct drbd_md md;
--	struct disk_conf *disk_conf; /* RCU, for updates: resource->conf_update */
-+	struct disk_conf __rcu *disk_conf; /* RCU, for updates: resource->conf_update */
- 	sector_t known_size; /* last known size of that backing device */
- };
- 
-@@ -629,7 +629,7 @@ struct drbd_connection {
- 	unsigned int connect_cnt;	/* Inc each time a connection is established */
- 
- 	unsigned long flags;
--	struct net_conf *net_conf;	/* content protected by rcu */
-+	struct net_conf __rcu *net_conf;	/* content protected by rcu */
- 	wait_queue_head_t ping_wait;	/* Woken upon reception of a ping, and a state change */
- 
- 	struct sockaddr_storage my_addr;
-@@ -889,7 +889,7 @@ struct drbd_device {
- 	int rs_last_events;  /* counter of read or write "events" (unit sectors)
- 			      * on the lower level device when we last looked. */
- 	int c_sync_rate; /* current resync rate after syncer throttle magic */
--	struct fifo_buffer *rs_plan_s; /* correction values of resync planer (RCU, connection->conn_update) */
-+	struct fifo_buffer __rcu *rs_plan_s; /* correction values of resync planer (RCU, connection->conn_update) */
- 	int rs_in_flight; /* resync sectors in flight (to proxy, in proxy and from proxy) */
- 	atomic_t ap_in_flight; /* App sectors in flight (waiting for ack) */
- 	unsigned int peer_max_bio_size;
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index cddae6f4b00f..a63f1b4aae5b 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -722,7 +722,7 @@ drbd_set_role(struct drbd_device *const device, enum drbd_role new_role, int for
- 		}
- 	} else {
- 		mutex_lock(&device->resource->conf_update);
--		nc = connection->net_conf;
-+		nc = rcu_dereference(connection->net_conf);
- 		if (nc)
- 			nc->discard_my_data = 0; /* without copy; single bit op is atomic */
- 		mutex_unlock(&device->resource->conf_update);
-@@ -1531,7 +1531,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- 	mutex_lock(&device->resource->conf_update);
--	old_disk_conf = device->ldev->disk_conf;
-+	old_disk_conf = rcu_dereference(device->ldev->disk_conf);
- 	*new_disk_conf = *old_disk_conf;
- 	if (should_set_defaults(info))
- 		set_disk_conf_defaults(new_disk_conf);
-@@ -1552,7 +1552,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
- 		new_disk_conf->c_plan_ahead = DRBD_C_PLAN_AHEAD_MAX;
- 
- 	fifo_size = (new_disk_conf->c_plan_ahead * 10 * SLEEP_TIME) / HZ;
--	if (fifo_size != device->rs_plan_s->size) {
-+	if (fifo_size != rcu_dereference(device->rs_plan_s)->size) {
- 		new_plan = fifo_alloc(fifo_size);
- 		if (!new_plan) {
- 			drbd_err(device, "kmalloc of fifo_buffer failed");
-@@ -1583,7 +1583,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
- 		goto fail_unlock;
- 
- 	if (new_plan) {
--		old_plan = device->rs_plan_s;
-+		old_plan = rcu_dereference(device->rs_plan_s);
- 		rcu_assign_pointer(device->rs_plan_s, new_plan);
- 	}
- 
-@@ -1715,7 +1715,7 @@ void drbd_backing_dev_free(struct drbd_device *device, struct drbd_backing_dev *
- 			  ldev->md_bdev != ldev->backing_bdev);
- 	close_backing_dev(device, ldev->backing_bdev, device, true);
- 
--	kfree(ldev->disk_conf);
-+	kfree(rcu_dereference(ldev->disk_conf));
- 	kfree(ldev);
- }
- 
-@@ -1784,7 +1784,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
- 		retcode = ERR_NOMEM;
- 		goto fail;
- 	}
--	nbc->disk_conf = new_disk_conf;
-+	rcu_assign_pointer(nbc->disk_conf, new_disk_conf);
- 
- 	set_disk_conf_defaults(new_disk_conf);
- 	err = disk_conf_from_attrs(new_disk_conf, info);
-@@ -1934,10 +1934,10 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
- 
- 	/* Prevent shrinking of consistent devices ! */
- 	{
--	unsigned long long nsz = drbd_new_dev_size(device, nbc, nbc->disk_conf->disk_size, 0);
-+	unsigned long long nsz = drbd_new_dev_size(device, nbc, rcu_dereference(nbc->disk_conf)->disk_size, 0);
- 	unsigned long long eff = nbc->md.la_size_sect;
- 	if (drbd_md_test_flag(nbc, MDF_CONSISTENT) && nsz < eff) {
--		if (nsz == nbc->disk_conf->disk_size) {
-+		if (nsz == rcu_dereference(nbc->disk_conf)->disk_size) {
- 			drbd_warn(device, "truncating a consistent device during attach (%llu < %llu)\n", nsz, eff);
- 		} else {
- 			drbd_warn(device, "refusing to truncate a consistent device (%llu < %llu)\n", nsz, eff);
-@@ -1971,7 +1971,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
- 	D_ASSERT(device, device->ldev == NULL);
- 	device->ldev = nbc;
- 	device->resync = resync_lru;
--	device->rs_plan_s = new_plan;
-+	rcu_assign_pointer(device->rs_plan_s, new_plan);
- 	nbc = NULL;
- 	resync_lru = NULL;
- 	new_disk_conf = NULL;
-@@ -2130,7 +2130,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
- 	conn_reconfig_done(connection);
- 	if (nbc) {
- 		close_backing_dev(device, nbc->md_bdev,
--			  nbc->disk_conf->meta_dev_idx < 0 ?
-+			  rcu_dereference(nbc->disk_conf)->meta_dev_idx < 0 ?
- 				(void *)device : (void *)drbd_m_holder,
- 			  nbc->md_bdev != nbc->backing_bdev);
- 		close_backing_dev(device, nbc->backing_bdev, device, true);
-@@ -2389,7 +2389,7 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct genl_info *info)
- 
- 	mutex_lock(&connection->data.mutex);
- 	mutex_lock(&connection->resource->conf_update);
--	old_net_conf = connection->net_conf;
-+	old_net_conf = rcu_dereference(connection->net_conf);
- 
- 	if (!old_net_conf) {
- 		drbd_msg_put_info(adm_ctx.reply_skb, "net conf missing, try connect");
-@@ -2587,7 +2587,7 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
- 	drbd_flush_workqueue(&connection->sender_work);
- 
- 	mutex_lock(&adm_ctx.resource->conf_update);
--	old_net_conf = connection->net_conf;
-+	old_net_conf = rcu_dereference(connection->net_conf);
- 	if (old_net_conf) {
- 		retcode = ERR_NET_CONFIGURED;
- 		mutex_unlock(&adm_ctx.resource->conf_update);
-@@ -2863,7 +2863,7 @@ int drbd_adm_resize(struct sk_buff *skb, struct genl_info *info)
- 
- 	if (new_disk_conf) {
- 		mutex_lock(&device->resource->conf_update);
--		old_disk_conf = device->ldev->disk_conf;
-+		old_disk_conf = rcu_dereference(device->ldev->disk_conf);
- 		*new_disk_conf = *old_disk_conf;
- 		new_disk_conf->disk_size = (sector_t)rs.resize_size;
- 		rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf);
-diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
-index 287a8d1d3f70..e9fa2dfe0dd8 100644
---- a/drivers/block/drbd/drbd_state.c
-+++ b/drivers/block/drbd/drbd_state.c
-@@ -2069,7 +2069,7 @@ static int w_after_conn_state_ch(struct drbd_work *w, int unused)
- 		mutex_unlock(&notification_mutex);
- 
- 		mutex_lock(&connection->resource->conf_update);
--		old_conf = connection->net_conf;
-+		old_conf = rcu_dereference(connection->net_conf);
- 		connection->my_addr_len = 0;
- 		connection->peer_addr_len = 0;
- 		RCU_INIT_POINTER(connection->net_conf, NULL);
--- 
-2.34.1
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
