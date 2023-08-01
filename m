@@ -2,130 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFA1C04A94
-	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 16:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B91C04A94
+	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 17:22:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234040AbjHAQIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Aug 2023 12:08:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45998 "EHLO
+        id S232806AbjHARWO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Aug 2023 13:22:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233742AbjHAQIR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 12:08:17 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 486F11727;
-        Tue,  1 Aug 2023 09:08:15 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-977e0fbd742so814064966b.2;
-        Tue, 01 Aug 2023 09:08:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690906094; x=1691510894;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dm0S5N5nNRyhMSfQrHUdCAaT/Y7WRmsF/K23ENIMIFE=;
-        b=MV2ovpB5GUaqs1kinTdOTIYLpfVD5VHaHjAmVuWX+MrhM+bnOHh9TBvV9UM8TrNKyS
-         5e3ZPEOik80Dy0it6kgfhlbrkMlowbgXyY8IQWsAlkYEBwAfIsBrYpmbHdqb875j2S4X
-         BgfiKzpPeGm8Tk69RviVqFvOk644XSlpUGFQFmFl3zYXT/e3FgUy1p1wNrChWaEdFmj4
-         egSo8DJPSagEZVYtd/Ka3tRZ1h6ZRvpUUWjyob35GC/dpu/8Xi2bL6FjU18jtj0xQadL
-         r/c4q/3K01xtZ1VOcUcgHS2KhxfMYf3GrA7KV+0h7SfJQiqZW/+NN5/gOLX7R3gu2W4M
-         dKkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690906094; x=1691510894;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dm0S5N5nNRyhMSfQrHUdCAaT/Y7WRmsF/K23ENIMIFE=;
-        b=QnKOOAjvvFbvpbRRC50nkh/eiOzPMG5GpKFEqAPKA2iwb29/yFytCEosvEpAl1kWmA
-         xthL8FqWSXyWvsavTYehKeEDfz4DCjuwHM5ea9mTqWef75T25jB/g2xe3ZCSdRbUNPpz
-         QiU6F3VheihYCOgMLMfxsVKtwxAUm/nwziQHAO6ZuWyOU2g8RyIsNyya163KJQqlvCGW
-         fh4mCvbbvUENFSraLxkqxIPnb44PS2+Nlu62kCf6vQllsiurCaKDYeGl8Qp9rPcJnBgx
-         6r7ayjFPdCZ7ol3iRNJ9eTdr1MhagJsoPI8dFTO+RLOY24CFUHQGLDxCgU/JRJ7UVm7y
-         wSRw==
-X-Gm-Message-State: ABy/qLZ4+lm6N4Wo6xm9KeV3KjTNKpUbNnNK5oL43q0vaUlMgXKyWE7W
-        +/iDE2sArPSbcPmYwmQT5Sc=
-X-Google-Smtp-Source: APBJJlEhJLmDMeDuTpBA9ApKtdXMe4/obO/ZoSW7sy8z1dsaqvi6FloHPUL4+kNpAT4Ne4SMm04ftA==
-X-Received: by 2002:a17:906:64c5:b0:99b:e04d:307d with SMTP id p5-20020a17090664c500b0099be04d307dmr2795655ejn.57.1690906093445;
-        Tue, 01 Aug 2023 09:08:13 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:310::2eef? ([2620:10d:c092:600::2:d658])
-        by smtp.gmail.com with ESMTPSA id g24-20020a1709064e5800b0099316c56db9sm7810903ejw.127.2023.08.01.09.08.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Aug 2023 09:08:13 -0700 (PDT)
-Message-ID: <dd4e7013-b4fc-4135-51a7-806127c2013b@gmail.com>
-Date:   Tue, 1 Aug 2023 17:05:28 +0100
+        with ESMTP id S234485AbjHARWM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 13:22:12 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 634E7213E;
+        Tue,  1 Aug 2023 10:22:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=KI7aWHvSDXmhxzHfaalEHg4CqR1G5kysSfQhkQhMeeQ=; b=qLtl8QrLHzZR3bYK8L7GyySX8I
+        ui/iPrQEaxDZ2ZfzYU1SSMTdWMhYkH2FZalEJBLrDXxNFoxLyiD+GaUFKCZtShgsGlroNSM1mewkz
+        +K/5Jr4SSllO2UPuk94IptV+69fj7W5EzAdX/LSLm+iTyTRDAoc9qtXJQ+EMnVvG7gkK9vU9FkQ0r
+        NaOSrDyin3BImtyOJRNdcR2ARCfAsk+XaJq0t65rk7g31lgKcxWP7BClvjbC1USYJoOzx2Bkv7Jqb
+        s/Fj+GkFQtVxuKUX/FEtRMkAUM2OUYp0VnZF8342fy2gBxlRZw8VAauLrGHX/slpc1KmP7X/xB17c
+        1PuKU2JQ==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qQt4P-002uSp-2j;
+        Tue, 01 Aug 2023 17:22:06 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christian Brauner <christian@brauner.io>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: allow building a kernel without buffer_heads v3
+Date:   Tue,  1 Aug 2023 19:21:55 +0200
+Message-Id: <20230801172201.1923299-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] io_uring: split req init from submit
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@meta.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <20230728201449.3350962-1-kbusch@meta.com>
- <9a360c1f-dc9a-e8b4-dbb0-39c99509bb8d@gmail.com>
- <22d99997-8626-024d-fae2-791bb0a094c3@kernel.dk>
- <ce3e1cf4-40a0-adde-e66b-487048b3871d@gmail.com>
- <ZMkiHoVbdBoUSxLy@kbusch-mbp.dhcp.thefacebook.com>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZMkiHoVbdBoUSxLy@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/1/23 16:17, Keith Busch wrote:
-> On Tue, Aug 01, 2023 at 03:13:59PM +0100, Pavel Begunkov wrote:
->> On 7/31/23 22:00, Jens Axboe wrote:
->>> On 7/31/23 6:53?AM, Pavel Begunkov wrote:
->>>> On 7/28/23 21:14, Keith Busch wrote:
->>>>> From: Keith Busch <kbusch@kernel.org>
->>>>>
->>>>> Split the req initialization and link handling from the submit. This
->>>>> simplifies the submit path since everything that can fail is separate
->>>>> from it, and makes it easier to create batched submissions later.
->>>>
->>>> Keith, I don't think this prep patch does us any good, I'd rather
->>>> shove the link assembling code further out of the common path. I like
->>>> the first version more (see [1]). I'd suggest to merge it, and do
->>>> cleaning up after.
->>>>
->>>> I'll also say that IMHO the overhead is well justified. It's not only
->>>> about having multiple nvmes, the problem slows down cases mixing storage
->>>> with net and the rest of IO in a single ring.
->>>>
->>>> [1] https://lore.kernel.org/io-uring/20230504162427.1099469-1-kbusch@meta.com/
->>>
->>> The downside of that one, to me, is that it just serializes all of it
->>> and we end up looping over the submission list twice.
->>
->> Right, and there is nothing can be done if we want to know about all
->> requests in advance, at least without changing uapi and/or adding
->> userspace hints.
->>
->>> With alloc+init
->>> split, at least we get some locality wins by grouping the setup side of
->>> the requests.
->>
->> I don't think I follow, what grouping do you mean? As far as I see, v1
->> and v2 are essentially same with the difference of whether you have a
->> helper for setting up links or not, see io_setup_link() from v2. In both
->> cases it's executed in the same sequence:
->>
->> 1) init (generic init + opcode init + link setup) each request and put
->>     into a temporary list.
->> 2) go go over the list and submit them one by one
->>
->> And after inlining they should look pretty close.
-> 
-> The main difference in this one compared to the original version is that
-> everything in the 2nd loop is just for the final dispatch. Anything that
-> can fail, fallback, or defer to async happens in the first loop. I'm not
-> sure that makes a difference in runtime, but having the 2nd loop handle
-> only fast-path requests was what I set out to do for this version.
+Hi all,
 
-For performance it doesn't matter, it's a very slow path and we should
-not be hitting it. And it only smears single req submission over multiple
-places, for instance it won't be legal to use io_submit_sqe() without
-those extra checks. Those are all minor points, but I don't think it's
-anyhow better than v1 in this aspect.
+This series allows to build a kernel without buffer_heads, which I
+think is useful to show where the dependencies are, and maybe also
+for some very much limited environments, where people just needs
+xfs and/or btrfs and some of the read-only block based file systems.
 
--- 
-Pavel Begunkov
+It first switches buffered writes (but not writeback) for block devices
+to use iomap unconditionally, but still using buffer_heads, and then
+adds a CONFIG_BUFFER_HEAD selected by all file systems that need it
+(which is most block based file systems), makes the buffer_head support
+in iomap optional, and adds an alternative implementation of the block
+device address_operations using iomap.  This latter implementation
+will also be useful to support block size > PAGE_SIZE for block device
+nodes as buffer_heads won't work very well for that.
+
+Note that for now the md software raid drivers is also disabled as it has
+some (rather questionable) buffer_head usage in the unconditionally built
+bitmap code.  I have a series pending to make the bitmap code conditional
+and deprecated it, but it hasn't been merged yet.
+
+This series is against Jens' for-6.6/block branch.
+
+Changes since v2:
+ - fix handling of a negative return value from blkdev_direct_IO
+ - drop a WARN_ON that can happen when resizing block devices
+ - define away IOMAP_F_BUFFER_HEAD to keep the intrusions to the
+   iomap code minimal (even if that's not quite my preferred style)
+
+Changes since v1:
+ - drop the already merged prep patches
+ - depend on FS_IOMAP not IOMAP
+ - pick a better new name for block_page_mkwrite_return
