@@ -2,750 +2,203 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3844FC41513
-	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 17:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ADBFC04E69
+	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 17:32:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234180AbjHARYw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Aug 2023 13:24:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32820 "EHLO
+        id S231521AbjHARcH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Aug 2023 13:32:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234904AbjHARWm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 13:22:42 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F3ED2D5E;
-        Tue,  1 Aug 2023 10:22:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=RVck6qCQYZJFvfbDxhURfMxlRTpWL9DSWv+8pYGJghA=; b=St88yfD0BiY/mwCLZiQtcLnaj6
-        gp+l+AMiJCQl7c77Efk7yNLnGHadC8kCMpI0mv+TG1YiwVwapJn8Nwi8NDrhcmdHRuJ2V92HuT82S
-        dxAlv3hWz0pOIN6Z9vmGZSNEGWMCWSvoJzER1sCOWu7mgqW5JYXtzLiukg1G8YAXQ77MfjMmQCUsI
-        HaxU9T92MFhgDesn49Qokozcrw1ji87n4PQuYmaC4Z9b6zU/Kkc9SHdjbsE6zcKzfJIizQez5zENb
-        fASbg+K3pJqgJe0jnk7Ec9JSqH18BSpjqAvMOfJGcIAozkkhfTqB31CK9FH0gNyGuRmNmyHR9tTyu
-        7Bg7Z8jw==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qQt4k-002uaV-1s;
-        Tue, 01 Aug 2023 17:22:27 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christian Brauner <christian@brauner.io>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 6/6] fs: add CONFIG_BUFFER_HEAD
-Date:   Tue,  1 Aug 2023 19:22:01 +0200
-Message-Id: <20230801172201.1923299-7-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230801172201.1923299-1-hch@lst.de>
-References: <20230801172201.1923299-1-hch@lst.de>
+        with ESMTP id S232136AbjHARcG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 13:32:06 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A4A9F5;
+        Tue,  1 Aug 2023 10:32:04 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 371GA2kK001406;
+        Tue, 1 Aug 2023 17:32:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=qcppdkim1;
+ bh=Q0zQgRy1fF8lD/XmdYNJfM4tnpsCfZTsWpnSrfRcajY=;
+ b=gjhpkX+1dEGa2VffzW/khy6jFURA4E5PUtk8XMrv/PHRLzL9aSh+8DJ9tji9kcEf9257
+ v8DNWGfo/9E/zzh3EURer/SMsTP2HZiqaVfidTf0Qwbvr8XKzpzRcPrgZSHJdzEM9na2
+ 0r1vVKLJOUddzlxf47rNzgpWvEfAKYnslWSq0xBljUDF0RNUjcw00955BwFHUQAxjrCH
+ EdEXx8gCPi+6YbhVxpQyUVIky/kNLS4yxqPufCxzQorLPDnUexnzFGTy2lB7swOwJIaB
+ dQFWDwq9G+UHVToFYn3QflxjTjN5w967AhikA8bxTD5l/+oYMcejfVtBZhrEGbSiuthd 2g== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s75b305wr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Aug 2023 17:32:00 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 371HVxeK028158
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 1 Aug 2023 17:31:59 GMT
+Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 1 Aug 2023 10:31:59 -0700
+Received: from nalasex01a.na.qualcomm.com ([fe80::25d0:9235:354f:5fa9]) by
+ nalasex01a.na.qualcomm.com ([fe80::25d0:9235:354f:5fa9%4]) with mapi id
+ 15.02.1118.030; Tue, 1 Aug 2023 10:31:59 -0700
+From:   "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "Om Prakash Singh" <omprsing@qti.qualcomm.com>,
+        "Prasad Sodagudi (QUIC)" <quic_psodagud@quicinc.com>,
+        "Arun Menon (SSG)" <avmenon@quicinc.com>,
+        "abel.vesa@linaro.org" <abel.vesa@linaro.org>,
+        "Seshu Madhavi Puppala (QUIC)" <quic_spuppala@quicinc.com>
+Subject: RE: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
+ ufs
+Thread-Topic: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
+ ufs
+Thread-Index: AQHZumN+a5RI3WgcJ0CO2LlDH5s476/Ca+iAgBIbBxA=
+Date:   Tue, 1 Aug 2023 17:31:59 +0000
+Message-ID: <ca11701e403f48b6839b26c47a1b537f@quicinc.com>
+References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
+ <20230720025541.GA2607@sol.localdomain>
+In-Reply-To: <20230720025541.GA2607@sol.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.110.47.159]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: rEOTZeAVO7KVUd7mTmyYXt70nJ9OESWH
+X-Proofpoint-ORIG-GUID: rEOTZeAVO7KVUd7mTmyYXt70nJ9OESWH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-01_14,2023-08-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ suspectscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501
+ mlxscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 clxscore=1011
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308010157
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a new config option that controls building the buffer_head code, and
-select it from all file systems and stacking drivers that need it.
+Hey Eric, thanks for your reply. Pleasure working with you again.
 
-For the block device nodes and alternative iomap based buffered I/O path
-is provided when buffer_head support is not enabled, and iomap needs a
-a small tweak to define the IOMAP_F_BUFFER_HEAD flag to 0 to not call
-into the buffer_head code when it doesn't exist.
+Please find answers inline
 
-Otherwise this is just Kconfig and ifdef changes.
+-----Original Message-----
+From: Eric Biggers <ebiggers@kernel.org>=20
+Sent: Wednesday, July 19, 2023 7:56 PM
+To: Gaurav Kashyap (QUIC) <quic_gaurkash@quicinc.com>
+Cc: linux-scsi@vger.kernel.org; linux-arm-msm@vger.kernel.org; linux-mmc@vg=
+er.kernel.org; linux-block@vger.kernel.org; linux-fscrypt@vger.kernel.org; =
+Om Prakash Singh <omprsing@qti.qualcomm.com>; Prasad Sodagudi (QUIC) <quic_=
+psodagud@quicinc.com>; Arun Menon (SSG) <avmenon@quicinc.com>; abel.vesa@li=
+naro.org; Seshu Madhavi Puppala (QUIC) <quic_spuppala@quicinc.com>
+Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and=
+ ufs
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
----
- block/fops.c                 | 70 ++++++++++++++++++++++++++++++------
- drivers/md/Kconfig           |  1 +
- fs/Kconfig                   |  4 +++
- fs/Makefile                  |  2 +-
- fs/adfs/Kconfig              |  1 +
- fs/affs/Kconfig              |  1 +
- fs/befs/Kconfig              |  1 +
- fs/bfs/Kconfig               |  1 +
- fs/efs/Kconfig               |  1 +
- fs/exfat/Kconfig             |  1 +
- fs/ext2/Kconfig              |  1 +
- fs/ext4/Kconfig              |  1 +
- fs/f2fs/Kconfig              |  1 +
- fs/fat/Kconfig               |  1 +
- fs/freevxfs/Kconfig          |  1 +
- fs/gfs2/Kconfig              |  1 +
- fs/hfs/Kconfig               |  1 +
- fs/hfsplus/Kconfig           |  1 +
- fs/hpfs/Kconfig              |  1 +
- fs/isofs/Kconfig             |  1 +
- fs/jfs/Kconfig               |  1 +
- fs/minix/Kconfig             |  1 +
- fs/nilfs2/Kconfig            |  1 +
- fs/ntfs/Kconfig              |  1 +
- fs/ntfs3/Kconfig             |  1 +
- fs/ocfs2/Kconfig             |  1 +
- fs/omfs/Kconfig              |  1 +
- fs/qnx4/Kconfig              |  1 +
- fs/qnx6/Kconfig              |  1 +
- fs/reiserfs/Kconfig          |  1 +
- fs/sysv/Kconfig              |  1 +
- fs/udf/Kconfig               |  1 +
- fs/ufs/Kconfig               |  1 +
- include/linux/buffer_head.h  | 32 ++++++++---------
- include/linux/iomap.h        |  4 +++
- include/trace/events/block.h |  2 ++
- mm/migrate.c                 |  4 +--
- 37 files changed, 119 insertions(+), 29 deletions(-)
+Hi Gaurav,
 
-diff --git a/block/fops.c b/block/fops.c
-index 063ece37d44e44..eaa98a987213d2 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -24,15 +24,6 @@ static inline struct inode *bdev_file_inode(struct file *file)
- 	return file->f_mapping->host;
- }
- 
--static int blkdev_get_block(struct inode *inode, sector_t iblock,
--		struct buffer_head *bh, int create)
--{
--	bh->b_bdev = I_BDEV(inode);
--	bh->b_blocknr = iblock;
--	set_buffer_mapped(bh);
--	return 0;
--}
--
- static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
- {
- 	blk_opf_t opf = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
-@@ -400,7 +391,7 @@ static int blkdev_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 	iomap->type = IOMAP_MAPPED;
- 	iomap->addr = iomap->offset;
- 	iomap->length = isize - iomap->offset;
--	iomap->flags |= IOMAP_F_BUFFER_HEAD;
-+	iomap->flags |= IOMAP_F_BUFFER_HEAD; /* noop for !CONFIG_BUFFER_HEAD */
- 	return 0;
- }
- 
-@@ -408,6 +399,16 @@ static const struct iomap_ops blkdev_iomap_ops = {
- 	.iomap_begin		= blkdev_iomap_begin,
- };
- 
-+#ifdef CONFIG_BUFFER_HEAD
-+static int blkdev_get_block(struct inode *inode, sector_t iblock,
-+		struct buffer_head *bh, int create)
-+{
-+	bh->b_bdev = I_BDEV(inode);
-+	bh->b_blocknr = iblock;
-+	set_buffer_mapped(bh);
-+	return 0;
-+}
-+
- static int blkdev_writepage(struct page *page, struct writeback_control *wbc)
- {
- 	return block_write_full_page(page, blkdev_get_block, wbc);
-@@ -453,6 +454,55 @@ const struct address_space_operations def_blk_aops = {
- 	.migrate_folio	= buffer_migrate_folio_norefs,
- 	.is_dirty_writeback = buffer_check_dirty_writeback,
- };
-+#else /* CONFIG_BUFFER_HEAD */
-+static int blkdev_read_folio(struct file *file, struct folio *folio)
-+{
-+	return iomap_read_folio(folio, &blkdev_iomap_ops);
-+}
-+
-+static void blkdev_readahead(struct readahead_control *rac)
-+{
-+	iomap_readahead(rac, &blkdev_iomap_ops);
-+}
-+
-+static int blkdev_map_blocks(struct iomap_writepage_ctx *wpc,
-+		struct inode *inode, loff_t offset)
-+{
-+	loff_t isize = i_size_read(inode);
-+
-+	if (WARN_ON_ONCE(offset >= isize))
-+		return -EIO;
-+	if (offset >= wpc->iomap.offset &&
-+	    offset < wpc->iomap.offset + wpc->iomap.length)
-+		return 0;
-+	return blkdev_iomap_begin(inode, offset, isize - offset,
-+				  IOMAP_WRITE, &wpc->iomap, NULL);
-+}
-+
-+static const struct iomap_writeback_ops blkdev_writeback_ops = {
-+	.map_blocks		= blkdev_map_blocks,
-+};
-+
-+static int blkdev_writepages(struct address_space *mapping,
-+		struct writeback_control *wbc)
-+{
-+	struct iomap_writepage_ctx wpc = { };
-+
-+	return iomap_writepages(mapping, wbc, &wpc, &blkdev_writeback_ops);
-+}
-+
-+const struct address_space_operations def_blk_aops = {
-+	.dirty_folio	= filemap_dirty_folio,
-+	.release_folio		= iomap_release_folio,
-+	.invalidate_folio	= iomap_invalidate_folio,
-+	.read_folio		= blkdev_read_folio,
-+	.readahead		= blkdev_readahead,
-+	.writepages		= blkdev_writepages,
-+	.is_partially_uptodate  = iomap_is_partially_uptodate,
-+	.error_remove_page	= generic_error_remove_page,
-+	.migrate_folio		= filemap_migrate_folio,
-+};
-+#endif /* CONFIG_BUFFER_HEAD */
- 
- /*
-  * for a block special file file_inode(file)->i_size is zero
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index 444517d1a2336a..2a8b081bce7dd8 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -15,6 +15,7 @@ if MD
- config BLK_DEV_MD
- 	tristate "RAID support"
- 	select BLOCK_HOLDER_DEPRECATED if SYSFS
-+	select BUFFER_HEAD
- 	# BLOCK_LEGACY_AUTOLOAD requirement should be removed
- 	# after relevant mdadm enhancements - to make "names=yes"
- 	# the default - are widely available.
-diff --git a/fs/Kconfig b/fs/Kconfig
-index 18d034ec79539f..e8b17c81b83a8e 100644
---- a/fs/Kconfig
-+++ b/fs/Kconfig
-@@ -18,8 +18,12 @@ config VALIDATE_FS_PARSER
- config FS_IOMAP
- 	bool
- 
-+config BUFFER_HEAD
-+	bool
-+
- # old blockdev_direct_IO implementation.  Use iomap for new code instead
- config LEGACY_DIRECT_IO
-+	depends on BUFFER_HEAD
- 	bool
- 
- if BLOCK
-diff --git a/fs/Makefile b/fs/Makefile
-index e513aaee0603a0..f9541f40be4e08 100644
---- a/fs/Makefile
-+++ b/fs/Makefile
-@@ -17,7 +17,7 @@ obj-y :=	open.o read_write.o file_table.o super.o \
- 		fs_types.o fs_context.o fs_parser.o fsopen.o init.o \
- 		kernel_read_file.o mnt_idmapping.o remap_range.o
- 
--obj-$(CONFIG_BLOCK)		+= buffer.o mpage.o
-+obj-$(CONFIG_BUFFER_HEAD)	+= buffer.o mpage.o
- obj-$(CONFIG_PROC_FS)		+= proc_namespace.o
- obj-$(CONFIG_LEGACY_DIRECT_IO)	+= direct-io.o
- obj-y				+= notify/
-diff --git a/fs/adfs/Kconfig b/fs/adfs/Kconfig
-index 44738fed66251f..1b97058f0c4a92 100644
---- a/fs/adfs/Kconfig
-+++ b/fs/adfs/Kconfig
-@@ -2,6 +2,7 @@
- config ADFS_FS
- 	tristate "ADFS file system support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	help
- 	  The Acorn Disc Filing System is the standard file system of the
- 	  RiscOS operating system which runs on Acorn's ARM-based Risc PC
-diff --git a/fs/affs/Kconfig b/fs/affs/Kconfig
-index 962b86374e1c15..1ae432d266c32f 100644
---- a/fs/affs/Kconfig
-+++ b/fs/affs/Kconfig
-@@ -2,6 +2,7 @@
- config AFFS_FS
- 	tristate "Amiga FFS file system support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	select LEGACY_DIRECT_IO
- 	help
- 	  The Fast File System (FFS) is the common file system used on hard
-diff --git a/fs/befs/Kconfig b/fs/befs/Kconfig
-index 9550b6462b8147..5fcfc4024ffe6f 100644
---- a/fs/befs/Kconfig
-+++ b/fs/befs/Kconfig
-@@ -2,6 +2,7 @@
- config BEFS_FS
- 	tristate "BeOS file system (BeFS) support (read only)"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	select NLS
- 	help
- 	  The BeOS File System (BeFS) is the native file system of Be, Inc's
-diff --git a/fs/bfs/Kconfig b/fs/bfs/Kconfig
-index 3a757805b58568..8e7ef866b62a62 100644
---- a/fs/bfs/Kconfig
-+++ b/fs/bfs/Kconfig
-@@ -2,6 +2,7 @@
- config BFS_FS
- 	tristate "BFS file system support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	help
- 	  Boot File System (BFS) is a file system used under SCO UnixWare to
- 	  allow the bootloader access to the kernel image and other important
-diff --git a/fs/efs/Kconfig b/fs/efs/Kconfig
-index 2df1bac8b375b1..0833e533df9d53 100644
---- a/fs/efs/Kconfig
-+++ b/fs/efs/Kconfig
-@@ -2,6 +2,7 @@
- config EFS_FS
- 	tristate "EFS file system support (read only)"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	help
- 	  EFS is an older file system used for non-ISO9660 CD-ROMs and hard
- 	  disk partitions by SGI's IRIX operating system (IRIX 6.0 and newer
-diff --git a/fs/exfat/Kconfig b/fs/exfat/Kconfig
-index 147edeb044691d..cbeca8e44d9b38 100644
---- a/fs/exfat/Kconfig
-+++ b/fs/exfat/Kconfig
-@@ -2,6 +2,7 @@
- 
- config EXFAT_FS
- 	tristate "exFAT filesystem support"
-+	select BUFFER_HEAD
- 	select NLS
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/ext2/Kconfig b/fs/ext2/Kconfig
-index 77393fda99af09..74d98965902e16 100644
---- a/fs/ext2/Kconfig
-+++ b/fs/ext2/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config EXT2_FS
- 	tristate "Second extended fs support"
-+	select BUFFER_HEAD
- 	select FS_IOMAP
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/ext4/Kconfig b/fs/ext4/Kconfig
-index 86699c8cab281c..e20d59221fc05b 100644
---- a/fs/ext4/Kconfig
-+++ b/fs/ext4/Kconfig
-@@ -28,6 +28,7 @@ config EXT3_FS_SECURITY
- 
- config EXT4_FS
- 	tristate "The Extended 4 (ext4) filesystem"
-+	select BUFFER_HEAD
- 	select JBD2
- 	select CRC16
- 	select CRYPTO
-diff --git a/fs/f2fs/Kconfig b/fs/f2fs/Kconfig
-index 03ef087537c7c4..68a1e23e1557c7 100644
---- a/fs/f2fs/Kconfig
-+++ b/fs/f2fs/Kconfig
-@@ -2,6 +2,7 @@
- config F2FS_FS
- 	tristate "F2FS filesystem support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	select NLS
- 	select CRYPTO
- 	select CRYPTO_CRC32
-diff --git a/fs/fat/Kconfig b/fs/fat/Kconfig
-index afe83b4e717280..25fae1c83725bc 100644
---- a/fs/fat/Kconfig
-+++ b/fs/fat/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config FAT_FS
- 	tristate
-+	select BUFFER_HEAD
- 	select NLS
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/freevxfs/Kconfig b/fs/freevxfs/Kconfig
-index 0e2fc08f7de492..912107ebea6f40 100644
---- a/fs/freevxfs/Kconfig
-+++ b/fs/freevxfs/Kconfig
-@@ -2,6 +2,7 @@
- config VXFS_FS
- 	tristate "FreeVxFS file system support (VERITAS VxFS(TM) compatible)"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	help
- 	  FreeVxFS is a file system driver that support the VERITAS VxFS(TM)
- 	  file system format.  VERITAS VxFS(TM) is the standard file system
-diff --git a/fs/gfs2/Kconfig b/fs/gfs2/Kconfig
-index 03c966840422ec..be7f87a8e11ae1 100644
---- a/fs/gfs2/Kconfig
-+++ b/fs/gfs2/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config GFS2_FS
- 	tristate "GFS2 file system support"
-+	select BUFFER_HEAD
- 	select FS_POSIX_ACL
- 	select CRC32
- 	select LIBCRC32C
-diff --git a/fs/hfs/Kconfig b/fs/hfs/Kconfig
-index d985066006d588..5ea5cd8ecea9c0 100644
---- a/fs/hfs/Kconfig
-+++ b/fs/hfs/Kconfig
-@@ -2,6 +2,7 @@
- config HFS_FS
- 	tristate "Apple Macintosh file system support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	select NLS
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/hfsplus/Kconfig b/fs/hfsplus/Kconfig
-index 8034e7827a690b..8ce4a33a9ac788 100644
---- a/fs/hfsplus/Kconfig
-+++ b/fs/hfsplus/Kconfig
-@@ -2,6 +2,7 @@
- config HFSPLUS_FS
- 	tristate "Apple Extended HFS file system support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	select NLS
- 	select NLS_UTF8
- 	select LEGACY_DIRECT_IO
-diff --git a/fs/hpfs/Kconfig b/fs/hpfs/Kconfig
-index ec975f4668775f..ac1e9318e65a4a 100644
---- a/fs/hpfs/Kconfig
-+++ b/fs/hpfs/Kconfig
-@@ -2,6 +2,7 @@
- config HPFS_FS
- 	tristate "OS/2 HPFS file system support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	select FS_IOMAP
- 	help
- 	  OS/2 is IBM's operating system for PC's, the same as Warp, and HPFS
-diff --git a/fs/isofs/Kconfig b/fs/isofs/Kconfig
-index 08ffd37b9bb8f6..51434f2a471b0f 100644
---- a/fs/isofs/Kconfig
-+++ b/fs/isofs/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config ISO9660_FS
- 	tristate "ISO 9660 CDROM file system support"
-+	select BUFFER_HEAD
- 	help
- 	  This is the standard file system used on CD-ROMs.  It was previously
- 	  known as "High Sierra File System" and is called "hsfs" on other
-diff --git a/fs/jfs/Kconfig b/fs/jfs/Kconfig
-index 51e856f0e4b8d6..17488440eef1a9 100644
---- a/fs/jfs/Kconfig
-+++ b/fs/jfs/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config JFS_FS
- 	tristate "JFS filesystem support"
-+	select BUFFER_HEAD
- 	select NLS
- 	select CRC32
- 	select LEGACY_DIRECT_IO
-diff --git a/fs/minix/Kconfig b/fs/minix/Kconfig
-index de2003974ff0d0..90ddfad2a75e8f 100644
---- a/fs/minix/Kconfig
-+++ b/fs/minix/Kconfig
-@@ -2,6 +2,7 @@
- config MINIX_FS
- 	tristate "Minix file system support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	help
- 	  Minix is a simple operating system used in many classes about OS's.
- 	  The minix file system (method to organize files on a hard disk
-diff --git a/fs/nilfs2/Kconfig b/fs/nilfs2/Kconfig
-index 7d59567465e121..7dae168e346e30 100644
---- a/fs/nilfs2/Kconfig
-+++ b/fs/nilfs2/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config NILFS2_FS
- 	tristate "NILFS2 file system support"
-+	select BUFFER_HEAD
- 	select CRC32
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/ntfs/Kconfig b/fs/ntfs/Kconfig
-index f93e69a612833f..7b2509741735a9 100644
---- a/fs/ntfs/Kconfig
-+++ b/fs/ntfs/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config NTFS_FS
- 	tristate "NTFS file system support"
-+	select BUFFER_HEAD
- 	select NLS
- 	help
- 	  NTFS is the file system of Microsoft Windows NT, 2000, XP and 2003.
-diff --git a/fs/ntfs3/Kconfig b/fs/ntfs3/Kconfig
-index 96cc236f7f7bd3..cdfdf51e55d797 100644
---- a/fs/ntfs3/Kconfig
-+++ b/fs/ntfs3/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config NTFS3_FS
- 	tristate "NTFS Read-Write file system support"
-+	select BUFFER_HEAD
- 	select NLS
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/ocfs2/Kconfig b/fs/ocfs2/Kconfig
-index 3123da7cfb301f..2514d36cbe0157 100644
---- a/fs/ocfs2/Kconfig
-+++ b/fs/ocfs2/Kconfig
-@@ -2,6 +2,7 @@
- config OCFS2_FS
- 	tristate "OCFS2 file system support"
- 	depends on INET && SYSFS && CONFIGFS_FS
-+	select BUFFER_HEAD
- 	select JBD2
- 	select CRC32
- 	select QUOTA
-diff --git a/fs/omfs/Kconfig b/fs/omfs/Kconfig
-index 42b2ec35a05bfb..8470f6c3e64e6a 100644
---- a/fs/omfs/Kconfig
-+++ b/fs/omfs/Kconfig
-@@ -2,6 +2,7 @@
- config OMFS_FS
- 	tristate "SonicBlue Optimized MPEG File System support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	select CRC_ITU_T
- 	help
- 	  This is the proprietary file system used by the Rio Karma music
-diff --git a/fs/qnx4/Kconfig b/fs/qnx4/Kconfig
-index 45b5b98376c436..a2eb826e76c602 100644
---- a/fs/qnx4/Kconfig
-+++ b/fs/qnx4/Kconfig
-@@ -2,6 +2,7 @@
- config QNX4FS_FS
- 	tristate "QNX4 file system support (read only)"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	help
- 	  This is the file system used by the real-time operating systems
- 	  QNX 4 and QNX 6 (the latter is also called QNX RTP).
-diff --git a/fs/qnx6/Kconfig b/fs/qnx6/Kconfig
-index 6a9d6bce158622..8e865d72204e75 100644
---- a/fs/qnx6/Kconfig
-+++ b/fs/qnx6/Kconfig
-@@ -2,6 +2,7 @@
- config QNX6FS_FS
- 	tristate "QNX6 file system support (read only)"
- 	depends on BLOCK && CRC32
-+	select BUFFER_HEAD
- 	help
- 	  This is the file system used by the real-time operating systems
- 	  QNX 6 (also called QNX RTP).
-diff --git a/fs/reiserfs/Kconfig b/fs/reiserfs/Kconfig
-index 4d22ecfe0fab65..0e6fe26458fede 100644
---- a/fs/reiserfs/Kconfig
-+++ b/fs/reiserfs/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config REISERFS_FS
- 	tristate "Reiserfs support (deprecated)"
-+	select BUFFER_HEAD
- 	select CRC32
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/sysv/Kconfig b/fs/sysv/Kconfig
-index b4e23e03fbeba3..67b3f90afbfd67 100644
---- a/fs/sysv/Kconfig
-+++ b/fs/sysv/Kconfig
-@@ -2,6 +2,7 @@
- config SYSV_FS
- 	tristate "System V/Xenix/V7/Coherent file system support"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	help
- 	  SCO, Xenix and Coherent are commercial Unix systems for Intel
- 	  machines, and Version 7 was used on the DEC PDP-11. Saying Y
-diff --git a/fs/udf/Kconfig b/fs/udf/Kconfig
-index 82e8bfa2dfd989..8f7ce30d47fdce 100644
---- a/fs/udf/Kconfig
-+++ b/fs/udf/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config UDF_FS
- 	tristate "UDF file system support"
-+	select BUFFER_HEAD
- 	select CRC_ITU_T
- 	select NLS
- 	select LEGACY_DIRECT_IO
-diff --git a/fs/ufs/Kconfig b/fs/ufs/Kconfig
-index 6d30adb6b890fc..9301e7ecd09210 100644
---- a/fs/ufs/Kconfig
-+++ b/fs/ufs/Kconfig
-@@ -2,6 +2,7 @@
- config UFS_FS
- 	tristate "UFS file system support (read only)"
- 	depends on BLOCK
-+	select BUFFER_HEAD
- 	help
- 	  BSD and derivate versions of Unix (such as SunOS, FreeBSD, NetBSD,
- 	  OpenBSD and NeXTstep) use a file system called UFS. Some System V
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index 7002a9ff63a3da..c89ef50d5112fc 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -16,8 +16,6 @@
- #include <linux/wait.h>
- #include <linux/atomic.h>
- 
--#ifdef CONFIG_BLOCK
--
- enum bh_state_bits {
- 	BH_Uptodate,	/* Contains valid data */
- 	BH_Dirty,	/* Is dirty */
-@@ -198,7 +196,6 @@ void set_bh_page(struct buffer_head *bh,
- 		struct page *page, unsigned long offset);
- void folio_set_bh(struct buffer_head *bh, struct folio *folio,
- 		  unsigned long offset);
--bool try_to_free_buffers(struct folio *);
- struct buffer_head *folio_alloc_buffers(struct folio *folio, unsigned long size,
- 					bool retry);
- struct buffer_head *alloc_page_buffers(struct page *page, unsigned long size,
-@@ -213,10 +210,6 @@ void end_buffer_async_write(struct buffer_head *bh, int uptodate);
- 
- /* Things to do with buffers at mapping->private_list */
- void mark_buffer_dirty_inode(struct buffer_head *bh, struct inode *inode);
--int inode_has_buffers(struct inode *);
--void invalidate_inode_buffers(struct inode *);
--int remove_inode_buffers(struct inode *inode);
--int sync_mapping_buffers(struct address_space *mapping);
- int generic_buffers_fsync_noflush(struct file *file, loff_t start, loff_t end,
- 				  bool datasync);
- int generic_buffers_fsync(struct file *file, loff_t start, loff_t end,
-@@ -240,9 +233,6 @@ void __bforget(struct buffer_head *);
- void __breadahead(struct block_device *, sector_t block, unsigned int size);
- struct buffer_head *__bread_gfp(struct block_device *,
- 				sector_t block, unsigned size, gfp_t gfp);
--void invalidate_bh_lrus(void);
--void invalidate_bh_lrus_cpu(void);
--bool has_bh_in_lru(int cpu, void *dummy);
- struct buffer_head *alloc_buffer_head(gfp_t gfp_flags);
- void free_buffer_head(struct buffer_head * bh);
- void unlock_buffer(struct buffer_head *bh);
-@@ -258,8 +248,6 @@ int __bh_read(struct buffer_head *bh, blk_opf_t op_flags, bool wait);
- void __bh_read_batch(int nr, struct buffer_head *bhs[],
- 		     blk_opf_t op_flags, bool force_lock);
- 
--extern int buffer_heads_over_limit;
--
- /*
-  * Generic address_space_operations implementations for buffer_head-backed
-  * address_spaces.
-@@ -304,8 +292,6 @@ extern int buffer_migrate_folio_norefs(struct address_space *,
- #define buffer_migrate_folio_norefs NULL
- #endif
- 
--void buffer_init(void);
--
- /*
-  * inline definitions
-  */
-@@ -465,7 +451,20 @@ __bread(struct block_device *bdev, sector_t block, unsigned size)
- 
- bool block_dirty_folio(struct address_space *mapping, struct folio *folio);
- 
--#else /* CONFIG_BLOCK */
-+#ifdef CONFIG_BUFFER_HEAD
-+
-+void buffer_init(void);
-+bool try_to_free_buffers(struct folio *folio);
-+int inode_has_buffers(struct inode *inode);
-+void invalidate_inode_buffers(struct inode *inode);
-+int remove_inode_buffers(struct inode *inode);
-+int sync_mapping_buffers(struct address_space *mapping);
-+void invalidate_bh_lrus(void);
-+void invalidate_bh_lrus_cpu(void);
-+bool has_bh_in_lru(int cpu, void *dummy);
-+extern int buffer_heads_over_limit;
-+
-+#else /* CONFIG_BUFFER_HEAD */
- 
- static inline void buffer_init(void) {}
- static inline bool try_to_free_buffers(struct folio *folio) { return true; }
-@@ -473,9 +472,10 @@ static inline int inode_has_buffers(struct inode *inode) { return 0; }
- static inline void invalidate_inode_buffers(struct inode *inode) {}
- static inline int remove_inode_buffers(struct inode *inode) { return 1; }
- static inline int sync_mapping_buffers(struct address_space *mapping) { return 0; }
-+static inline void invalidate_bh_lrus(void) {}
- static inline void invalidate_bh_lrus_cpu(void) {}
- static inline bool has_bh_in_lru(int cpu, void *dummy) { return false; }
- #define buffer_heads_over_limit 0
- 
--#endif /* CONFIG_BLOCK */
-+#endif /* CONFIG_BUFFER_HEAD */
- #endif /* _LINUX_BUFFER_HEAD_H */
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index e2b836c2e119ae..54f50d34fd9d4f 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -58,7 +58,11 @@ struct vm_fault;
- #define IOMAP_F_DIRTY		(1U << 1)
- #define IOMAP_F_SHARED		(1U << 2)
- #define IOMAP_F_MERGED		(1U << 3)
-+#ifdef CONFIG_BUFFER_HEAD
- #define IOMAP_F_BUFFER_HEAD	(1U << 4)
-+#else
-+#define IOMAP_F_BUFFER_HEAD	0
-+#endif /* CONFIG_BUFFER_HEAD */
- #define IOMAP_F_XATTR		(1U << 5)
- 
- /*
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 40e60c33cc6f3d..0e128ad5146015 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -12,6 +12,7 @@
- 
- #define RWBS_LEN	8
- 
-+#ifdef CONFIG_BUFFER_HEAD
- DECLARE_EVENT_CLASS(block_buffer,
- 
- 	TP_PROTO(struct buffer_head *bh),
-@@ -61,6 +62,7 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
- 
- 	TP_ARGS(bh)
- );
-+#endif /* CONFIG_BUFFER_HEAD */
- 
- /**
-  * block_rq_requeue - place block IO request back on a queue
-diff --git a/mm/migrate.c b/mm/migrate.c
-index 24baad2571e314..fe6f8d454aff83 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -684,7 +684,7 @@ int migrate_folio(struct address_space *mapping, struct folio *dst,
- }
- EXPORT_SYMBOL(migrate_folio);
- 
--#ifdef CONFIG_BLOCK
-+#ifdef CONFIG_BUFFER_HEAD
- /* Returns true if all buffers are successfully locked */
- static bool buffer_migrate_lock_buffers(struct buffer_head *head,
- 							enum migrate_mode mode)
-@@ -837,7 +837,7 @@ int buffer_migrate_folio_norefs(struct address_space *mapping,
- 	return __buffer_migrate_folio(mapping, dst, src, mode, true);
- }
- EXPORT_SYMBOL_GPL(buffer_migrate_folio_norefs);
--#endif
-+#endif /* CONFIG_BUFFER_HEAD */
- 
- int filemap_migrate_folio(struct address_space *mapping,
- 		struct folio *dst, struct folio *src, enum migrate_mode mode)
--- 
-2.39.2
+On Wed, Jul 19, 2023 at 10:04:14AM -0700, Gaurav Kashyap wrote:
+> These patches add support to Qualcomm ICE (Inline Crypto Enginr) for=20
+> hardware wrapped keys using Qualcomm Hardware Key Manager (HWKM) and=20
+> are made on top of a rebased version  Eric Bigger's set of changes to=20
+> support wrapped keys in fscrypt and block below:
+> https://git.kernel.org/pub/scm/fs/fscrypt/linux.git/log/?h=3Dwrapped-key
+> s-v7 (The rebased patches are not uploaded here)
+>=20
+> Ref v1 here:
+> https://lore.kernel.org/linux-scsi/20211206225725.77512-1-quic_gaurkas
+> h@quicinc.com/
+>=20
+> Explanation and use of hardware-wrapped-keys can be found here:
+> Documentation/block/inline-encryption.rst
+>=20
+> This patch is organized as follows:
+>=20
+> Patch 1 - Prepares ICE and storage layers (UFS and EMMC) to pass around w=
+rapped keys.
+> Patch 2 - Adds a new SCM api to support deriving software secret when=20
+> wrapped keys are used Patch 3-4 - Adds support for wrapped keys in the=20
+> ICE driver. This includes adding HWKM support Patch 5-6 - Adds support=20
+> for wrapped keys in UFS Patch 7-10 - Supports generate, prepare and=20
+> import functionality in ICE and UFS
+>=20
+> NOTE: MMC will have similar changes to UFS and will be uploaded in a diff=
+erent patchset
+>       Patch 3, 4, 8, 10 will have MMC equivalents.
+>=20
+> Testing:
+> Test platform: SM8550 MTP
+> Engineering trustzone image is required to test this feature only for=20
+> SM8550. For SM8650 onwards, all trustzone changes to support this will=20
+> be part of the released images.
+> The engineering changes primarily contain hooks to generate, import=20
+> and prepare keys for HW wrapped disk encryption.
+>=20
+> The changes were tested by mounting initramfs and running the=20
+> fscryptctl tool (Ref:=20
+> https://github.com/ebiggers/fscryptctl/tree/wip-wrapped-keys) to=20
+> generate and prepare keys, as well as to set policies on folders, which c=
+onsequently invokes disk encryption flows through UFS.
+>=20
+> Gaurav Kashyap (10):
+>   ice, ufs, mmc: use blk_crypto_key for program_key
+>   qcom_scm: scm call for deriving a software secret
+>   soc: qcom: ice: add hwkm support in ice
+>   soc: qcom: ice: support for hardware wrapped keys
+>   ufs: core: support wrapped keys in ufs core
+>   ufs: host: wrapped keys support in ufs qcom
+>   qcom_scm: scm call for create, prepare and import keys
+>   ufs: core: add support for generate, import and prepare keys
+>   soc: qcom: support for generate, import and prepare key
+>   ufs: host: support for generate, import and prepare key
+>=20
+>  drivers/firmware/qcom_scm.c            | 292 +++++++++++++++++++++++
+>  drivers/firmware/qcom_scm.h            |   4 +
+>  drivers/mmc/host/cqhci-crypto.c        |   7 +-
+>  drivers/mmc/host/cqhci.h               |   2 +
+>  drivers/mmc/host/sdhci-msm.c           |   6 +-
+>  drivers/soc/qcom/ice.c                 | 309 +++++++++++++++++++++++--
+>  drivers/ufs/core/ufshcd-crypto.c       |  92 +++++++-
+>  drivers/ufs/host/ufs-qcom.c            |  63 ++++-
+>  include/linux/firmware/qcom/qcom_scm.h |  13 ++
+>  include/soc/qcom/ice.h                 |  18 +-
+>  include/ufs/ufshcd.h                   |  25 ++
+>  11 files changed, 797 insertions(+), 34 deletions(-)
 
+
+Thank you for continuing to work on this!
+
+According to your cover letter, this feature requires a custom TrustZone im=
+age to work on SM8550.  Will that image be made available outside Qualcomm?
+--> Unfortunately, I don't think there is a way to do that. You can still r=
+equest for one through our customer engineering team like before.
+
+Also according to your cover letter, this feature will work on SM8650 out o=
+f the box.  That's great to hear.  However, SM8650 does not appear to be pu=
+blicly available yet or have any upstream kernel support.  Do you know appr=
+oximately when a SM8650 development board will become available to the gene=
+ral public?
+--> I meant it will be available in the future releases. As of today, I don=
+'t have any information on the timelines
+
+Also, can you please make available a git branch somewhere that contains yo=
+ur patchset?  It sounds like this depends on https://git.kernel.org/pub/scm=
+/fs/fscrypt/linux.git/log/?h=3Dwrapped-keys-v7, but actually a version of i=
+t that you've rebased, which I don't have access to.
+Without being able to apply your patchset, I can't properly review it.
+--> As for the fscrypt patches,
+      I have not changed much functionally from the v7 patch, just merge co=
+nflicts.
+      I will update this thread once I figure out a git location.
+
+Thanks!
+
+- Eric
