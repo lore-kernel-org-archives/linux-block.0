@@ -2,103 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53301C001E0
-	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 12:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04EF9C001E0
+	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 14:16:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231392AbjHAM7Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Aug 2023 08:59:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54132 "EHLO
+        id S234510AbjHAOQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Aug 2023 10:16:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbjHAM7W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 08:59:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E202111
-        for <linux-block@vger.kernel.org>; Tue,  1 Aug 2023 05:58:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690894718;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qCe2p2QN9kRBjT/3kMdEzmYcq2EYKmnX7BhNzQuR/cY=;
-        b=VmI/hpXSwrDBdLOa4ieNxjkO7AyfGVNK1JH+kZOIlgmNdY5KwXt13Br3teGwwnIUtTbntM
-        t5r6ned+ndjDrSG8FMSLijUyJXDegSelEwXSFSR7CzYo7zlNKplpv1SdcojgnjonPL8zDh
-        ykSNq51KIULNhlr476eANjHtUaRxC1Q=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-607-yAUigt5fM2WwXlu__pkf3g-1; Tue, 01 Aug 2023 08:58:34 -0400
-X-MC-Unique: yAUigt5fM2WwXlu__pkf3g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0CE671C2BD62;
-        Tue,  1 Aug 2023 12:58:34 +0000 (UTC)
-Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4767040C6CCC;
-        Tue,  1 Aug 2023 12:58:26 +0000 (UTC)
-Date:   Tue, 1 Aug 2023 20:58:22 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-Cc:     Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [PATCH v9 2/2] ublk: enable zoned storage support
-Message-ID: <ZMkBbvb7EFyT/zGX@ovpn-8-18.pek2.redhat.com>
-References: <20230714072510.47770-1-nmi@metaspace.dk>
- <20230714072510.47770-3-nmi@metaspace.dk>
- <ZLfQjNK5j5lB68C/@x1-carbon>
- <87il9zot9c.fsf@metaspace.dk>
+        with ESMTP id S234458AbjHAOQk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 10:16:40 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1E84193;
+        Tue,  1 Aug 2023 07:16:34 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9936b3d0286so888471266b.0;
+        Tue, 01 Aug 2023 07:16:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690899393; x=1691504193;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MS3FrAwxdHTx2tcLvzU7qgxEoR9kVyoORHvrr8ChlbE=;
+        b=owneU93TDsctA0Qv8w+LA+V3D/ITFrHuxDdfPlMKgjOXjZriegSV8nzS9XFicVicjF
+         B2OIHWXcrUmpUxd0izWle3vqvm2TaxBSXZ6QLINBaiSzJBMHJuwp2V9/dtIfm4Ai0MPY
+         K9ih4RozFCwQ+uEzfBmpkgdQhz9yfXn3rM0/M4Vhve4BI27obxT9P77gs4Qs29ct0PYq
+         UXn9k3HFGITMvNChEbIy88ML6jJT14TLQAe2EEnUlVR4quOp1wtSZjVe3BCKuqQF5ppi
+         PAAkyjA+FElRdrF00xjmBnILJ819N5zfs0mO/aSnwK6ysSkvL8ZtlI2TUI3mNiv8Tpi/
+         lJmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690899393; x=1691504193;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MS3FrAwxdHTx2tcLvzU7qgxEoR9kVyoORHvrr8ChlbE=;
+        b=i0zCJb7kgkkLB/3YO+V6Pnlf3Iy34FSswVxYeQfSHZLAKMKFRWNsopOS6uhGvStM9/
+         RjpASWuQvZzoBzFdy2shwoeLeZz4ILn7gjMJemcrirJEIkJnYCrMWjG8kd8P55NNThOm
+         1nEu3OlqQPwQDpbfS2S/vp1gkQPy+J1ADb6Nf1A+wHQIqswtzv8ujZjYG6O9b2/KsUpE
+         K5fbSh+9VOV4iWKoN4YltNHdJHV4jFp/D56LxnacsEk2TlzHB9u8EYpgC8VZSrtEyeND
+         153lhWokoUOgRfIi0Mf7gDlZd12kMVqJv2dfUWI5MC6Ce5SO31QlIHJPL4Dlpa6PgsNM
+         Qcrw==
+X-Gm-Message-State: ABy/qLa9Bc0KvoaFLZDtGn27wr5Y34Q9n3vIycVkXxiyNlpz9Com4ti5
+        2K0OxiS0MnYLk5jpSTyNXvs=
+X-Google-Smtp-Source: APBJJlEmnJXGn4pxS1gM9Dw+XGVCxrc3ga3hDlEOCqiOj9PNPWsITeS+eJcT5Hcmp4pcU/y8GObeXQ==
+X-Received: by 2002:a17:906:db:b0:99b:66eb:2162 with SMTP id 27-20020a17090600db00b0099b66eb2162mr2451109eji.5.1690899392876;
+        Tue, 01 Aug 2023 07:16:32 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:310::2eef? ([2620:10d:c092:600::2:d658])
+        by smtp.gmail.com with ESMTPSA id pv24-20020a170907209800b009920e9a3a73sm7701306ejb.115.2023.08.01.07.16.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Aug 2023 07:16:32 -0700 (PDT)
+Message-ID: <ce3e1cf4-40a0-adde-e66b-487048b3871d@gmail.com>
+Date:   Tue, 1 Aug 2023 15:13:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87il9zot9c.fsf@metaspace.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] io_uring: split req init from submit
+To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@meta.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Cc:     Keith Busch <kbusch@kernel.org>
+References: <20230728201449.3350962-1-kbusch@meta.com>
+ <9a360c1f-dc9a-e8b4-dbb0-39c99509bb8d@gmail.com>
+ <22d99997-8626-024d-fae2-791bb0a094c3@kernel.dk>
+Content-Language: en-US
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <22d99997-8626-024d-fae2-791bb0a094c3@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 01, 2023 at 02:11:56PM +0200, Andreas Hindborg (Samsung) wrote:
+On 7/31/23 22:00, Jens Axboe wrote:
+> On 7/31/23 6:53?AM, Pavel Begunkov wrote:
+>> On 7/28/23 21:14, Keith Busch wrote:
+>>> From: Keith Busch <kbusch@kernel.org>
+>>>
+>>> Split the req initialization and link handling from the submit. This
+>>> simplifies the submit path since everything that can fail is separate
+>>> from it, and makes it easier to create batched submissions later.
+>>
+>> Keith, I don't think this prep patch does us any good, I'd rather
+>> shove the link assembling code further out of the common path. I like
+>> the first version more (see [1]). I'd suggest to merge it, and do
+>> cleaning up after.
+>>
+>> I'll also say that IMHO the overhead is well justified. It's not only
+>> about having multiple nvmes, the problem slows down cases mixing storage
+>> with net and the rest of IO in a single ring.
+>>
+>> [1] https://lore.kernel.org/io-uring/20230504162427.1099469-1-kbusch@meta.com/
 > 
-> Niklas Cassel <Niklas.Cassel@wdc.com> writes:
-> 
-> > On Fri, Jul 14, 2023 at 09:25:10AM +0200, Andreas Hindborg wrote:
-> >> From: Andreas Hindborg <a.hindborg@samsung.com>
-> >
-> > Hello Andreas!
-> >
-> 
-> <snip>
-> 
-> >>  	/* for READ request, writing data in iod->addr to rq buffers */
-> >> @@ -1120,6 +1404,11 @@ static void ublk_commit_completion(struct ublk_device *ub,
-> >>  	/* find the io request and complete */
-> >>  	req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
-> >>  
-> >> +	if (io->flags & UBLK_IO_FLAG_ZONE_APPEND) {
-> >
-> > Do we really need to introduce a completely new flag just for this?
-> >
-> > if (req_op(req) == REQ_OP_ZONE_APPEND)
-> >
-> > should work just as well, no?
-> 
-> Makes sense, thanks.
+> The downside of that one, to me, is that it just serializes all of it
+> and we end up looping over the submission list twice.
 
-The above one can be replaced with req_op().
+Right, and there is nothing can be done if we want to know about all
+requests in advance, at least without changing uapi and/or adding
+userspace hints.
 
-But extra cost is added when retrieving request for the check in
-__ublk_ch_uring_cmd().
+> With alloc+init
+> split, at least we get some locality wins by grouping the setup side of
+> the requests.
 
+I don't think I follow, what grouping do you mean? As far as I see, v1
+and v2 are essentially same with the difference of whether you have a
+helper for setting up links or not, see io_setup_link() from v2. In both
+cases it's executed in the same sequence:
 
-Thanks,
-Ming
+1) init (generic init + opcode init + link setup) each request and put
+    into a temporary list.
+2) go go over the list and submit them one by one
 
+And after inlining they should look pretty close.
+
+-- 
+Pavel Begunkov
