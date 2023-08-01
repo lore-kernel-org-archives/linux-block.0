@@ -2,62 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 992CBC04A94
-	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 18:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD71C04A6A
+	for <linux-block@archiver.kernel.org>; Tue,  1 Aug 2023 19:04:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231178AbjHASLS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Aug 2023 14:11:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60134 "EHLO
+        id S232041AbjHATE6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Aug 2023 15:04:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbjHASLR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 14:11:17 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C58103;
-        Tue,  1 Aug 2023 11:11:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=tLRRDrRiHVSZcYboxyBTX+0f8b+FQnZsFjIe9Je9qAI=; b=sROSMwu0eoG2tz8B1dlMOxqxza
-        2BAyBGb6tB2Hzp+EyV51tlBMT6J7hS7ChV4M1q2UcuZ19V5K6C6Pjth+EadWmUmrAZB74T/qozKbU
-        4X3Qkamzqo6W6edygntqeh7Q5Yx/QZxh1IfszR451TSZ8At46FlOyx+1h/qAaiuNo537IpqUOG251
-        ycujEig8G0KsK8t6XS/j4kpEKlTrQxA5WE6XRuKg6mTz9+/H+b6pKhAu8sV5uuMuAAZJgQmzkWA+T
-        S7uYWwlO1TDL640NnX+dybwKDktwghFMNjPyEQJ7iq4+/IXvW8i692de6DCGL8Fp3Qd6i5aclCZpy
-        d6MyR54Q==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qQtpw-002zws-0q;
-        Tue, 01 Aug 2023 18:11:12 +0000
-Date:   Tue, 1 Aug 2023 11:11:12 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christian Brauner <christian@brauner.io>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/6] block: open code __generic_file_write_iter for
- blkdev writes
-Message-ID: <ZMlKwEXj2q6JmDeo@bombadil.infradead.org>
-References: <20230801172201.1923299-1-hch@lst.de>
- <20230801172201.1923299-4-hch@lst.de>
+        with ESMTP id S229495AbjHATE4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2023 15:04:56 -0400
+X-Greylist: delayed 307 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 01 Aug 2023 12:04:55 PDT
+Received: from out-87.mta0.migadu.com (out-87.mta0.migadu.com [IPv6:2001:41d0:1004:224b::57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4171B6
+        for <linux-block@vger.kernel.org>; Tue,  1 Aug 2023 12:04:55 -0700 (PDT)
+Date:   Tue, 1 Aug 2023 15:04:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1690916693;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jfWGV5dMuNA+1k/g0x2HPi2H3e0sQoZ0G+P7Z3UTKNQ=;
+        b=QQrRaj1ammrSYgVJVT6ObcpMXwgOV38s9kvPJfy82b5gHdJMp1WAsVtgLGKa65gpyvlcag
+        WTqlG597lqZ+dZnqsaAGv3dUX4pFNtyr1eKaQyX/U5G9WR9ZUOPM6Ex+UFnw08PMzAzCLM
+        kSbNMBV/jcYfsAtS0ja5nm2uT1jxcqQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-bcachefs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 05/20] block: Allow bio_iov_iter_get_pages() with
+ bio->bi_bdev unset
+Message-ID: <20230801190450.3lbr2hjdi7t52anx@moria.home.lan>
+References: <20230712211115.2174650-1-kent.overstreet@linux.dev>
+ <20230712211115.2174650-6-kent.overstreet@linux.dev>
+ <ZL62HKrAJapXfcaR@infradead.org>
+ <20230725024312.alq7df33ckede2gb@moria.home.lan>
+ <ZMEeOZZcOu2p0SDP@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230801172201.1923299-4-hch@lst.de>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <ZMEeOZZcOu2p0SDP@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 01, 2023 at 07:21:58PM +0200, Christoph Hellwig wrote:
-> Open code __generic_file_write_iter to remove the indirect call into
-> ->direct_IO and to prepare using the iomap based write code.
+On Wed, Jul 26, 2023 at 06:23:05AM -0700, Christoph Hellwig wrote:
+> On Mon, Jul 24, 2023 at 10:43:12PM -0400, Kent Overstreet wrote:
+> > Doing the blk-cgroup association at bio alloc time sounds broken to me,
+> > because of stacking block devices - why was the association not done at
+> > generic_make_request() time?
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Because blk-cgroup not only works at the lowest level in the stack,
+> but also for stackable block devices.  It's not a design decision I
+> particularly agree with, but it's been there forever.
 
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+You're setting the association only to the highest block device in the
+stack - how on earth is it supposed to work with anything lower?
 
-  Luis
+And looking at bio_associate_blkg(), this code looks completely broken.
+It's checking bio->bi_blkg, but that's just been set to NULL in
+bio_init().
+
+And this is your code, so I think you need to go over this again.
+
+Anyways, bio_associate_blkg() is also called by bio_set_dev(), which
+means passing the block device to bio_init() was a completely pointless
+change. bcachefs uses bio_set_dev(), so everything is fine.
