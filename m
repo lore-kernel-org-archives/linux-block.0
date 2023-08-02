@@ -2,94 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C18C2C001DE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 06:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E96C1C41513
+	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 07:21:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232410AbjHBGbk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 02:31:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60872 "EHLO
+        id S232838AbjHBHVu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 03:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232400AbjHBGbj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 02:31:39 -0400
-Received: from out-85.mta0.migadu.com (out-85.mta0.migadu.com [91.218.175.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 099512701
-        for <linux-block@vger.kernel.org>; Tue,  1 Aug 2023 23:31:36 -0700 (PDT)
-Date:   Wed, 2 Aug 2023 02:31:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690957893;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IK3aEBELlq1x3phTcf/ZsaDVc7hT1k6rf0vBkIgEPXc=;
-        b=Pr473z+oXbzMZnI8H/I7LVvXQV9wG8U4dZbKBe3GO0clA6n4ufvTxLMl7tbSVxVExQcRo8
-        E2SQPidb8c3SQ9nSKJk5xAX3p5AwQD8J2yu+jrf6U177qpC8Zvi0ZKsaUnioprO3HsnSoR
-        XqACV00ARwzJ1G94/gTOP41ZZ9rVOVI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     Nitesh Shetty <nj.shetty@samsung.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        willy@infradead.org, hare@suse.de, djwong@kernel.org,
-        bvanassche@acm.org, ming.lei@redhat.com, dlemoal@kernel.org,
-        nitheshshetty@gmail.com, gost.dev@samsung.com,
-        Vincent Fu <vincent.fu@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v13 3/9] block: add emulation for copy
-Message-ID: <20230802063124.4652m3gfbhdmghlt@moria.home.lan>
-References: <20230627183629.26571-1-nj.shetty@samsung.com>
- <CGME20230627184020epcas5p13fdcea52edead5ffa3fae444f923439e@epcas5p1.samsung.com>
- <20230627183629.26571-4-nj.shetty@samsung.com>
- <20230720075050.GB5042@lst.de>
- <20230801130702.2taecrgn4v66ehtx@green245>
+        with ESMTP id S232812AbjHBHVp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 03:21:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DD6130FA;
+        Wed,  2 Aug 2023 00:21:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5631761840;
+        Wed,  2 Aug 2023 07:21:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A38CCC433C8;
+        Wed,  2 Aug 2023 07:21:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690960892;
+        bh=Nuc/mkQcFbT+qq6WbVCMS0uOPBaToluNS15lNjlmtbo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fX2LDoLkGRTnhIml6tUkMP4MKxondefkuQce3CRrVmCjXjBpHPvfwVJaFXw4O3RKw
+         tEGzcuiLmjhICH28WXwB82J1AIuBWcYUM0g9NYbViWbMw2hIEPguMGiGn5yumbczjg
+         pfl9DosQicI2RZFaBwvVuBt8BTRqR20b6fNbd8CCIzd8Jnhvm7TXzWbWPhxMTwlxeR
+         VV1+5DB7fkhn73pBaXovdpQruDf/WmodPI2WqgEOal+VdDUZA+qAsuE3xx0254MFJN
+         djiuc41Cg72bn/yNxQbF/R5Fb/+3lqCf68GRJKF5bFkyAqRToLnhqWcB/KvhGooXNm
+         KevpzFzbEvLFw==
+Date:   Wed, 2 Aug 2023 09:21:26 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christian Brauner <christian@brauner.io>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: Re: [PATCH 1/6] fs: remove emergency_thaw_bdev
+Message-ID: <20230802-rekultivieren-ansatz-fcda568f591a@brauner>
+References: <20230801172201.1923299-1-hch@lst.de>
+ <20230801172201.1923299-2-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230801130702.2taecrgn4v66ehtx@green245>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20230801172201.1923299-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 01, 2023 at 06:37:02PM +0530, Nitesh Shetty wrote:
-> On 23/07/20 09:50AM, Christoph Hellwig wrote:
-> > > +static void *blkdev_copy_alloc_buf(sector_t req_size, sector_t *alloc_size,
-> > > +		gfp_t gfp_mask)
-> > > +{
-> > > +	int min_size = PAGE_SIZE;
-> > > +	void *buf;
-> > > +
-> > > +	while (req_size >= min_size) {
-> > > +		buf = kvmalloc(req_size, gfp_mask);
-> > > +		if (buf) {
-> > > +			*alloc_size = req_size;
-> > > +			return buf;
-> > > +		}
-> > > +		/* retry half the requested size */
-> > > +		req_size >>= 1;
-> > > +	}
-> > > +
-> > > +	return NULL;
-> > 
-> > Is there any good reason for using vmalloc instead of a bunch
-> > of distcontiguous pages?
-> > 
+On Tue, Aug 01, 2023 at 07:21:56PM +0200, Christoph Hellwig wrote:
+> Fold emergency_thaw_bdev into it's only caller, to prepare for buffer.c
+> to be built only when buffer_head support is enabled.
 > 
-> kvmalloc seemed convenient for the purpose. We will need to call alloc_page
-> in a loop to guarantee discontigous pages. Do you prefer that over kvmalloc?
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> ---
 
-No, kvmalloc should be the preferred approach here now: with large
-folios, we're now getting better about doing more large memory
-allocations and avoiding fragmentation, so in practice this won't be a
-vmalloc allocation except in exceptional circumstances, and performance
-will be better and the code will be simpler doing a single large
-allocation.
+Reviewed-by: Christian Brauner <brauner@kernel.org>
