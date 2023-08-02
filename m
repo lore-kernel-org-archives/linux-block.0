@@ -2,110 +2,159 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D120EC001E0
-	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 15:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92278C04A6A
+	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 16:05:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232568AbjHBPou (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 11:44:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34968 "EHLO
+        id S232818AbjHBQF5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 12:05:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235312AbjHBPmf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 11:42:35 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4627D2695;
-        Wed,  2 Aug 2023 08:42:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=i4RVxh7cqcfhStKnrFuIVUqPlurNIlyMZ1NDN212nv0=; b=m9OaeC94Czmbb5hPBahN8SXBqI
-        HNi7Mt4xq8QD0KfNROKtIz4cWo24dWSBz7X8e50X0RB4sQ5tkio4jz+r4r8ZXafkW2ww175yxfozT
-        NCUZO2qzsSFjl3BFFlIRN3Wfa2mzIAi3PGZkD8Cd957ycv8VcxS6B+Gl86ETq6tCRKfhACSRqvwK7
-        ZdYNXIQB/XHcCPAEwZsU/ppTsd8l/Kd7bPks6ODFCghe5WMh0L9iLVh6NfcG8q01AnZzhLKiyX/4B
-        4MY4Wr/7eVJVJE1UTa4EMeC4cbXZti0JxzrFZGHMr43Ix5mWyHHev/cZbWwF9pp4HCsk18N+iH6el
-        wjXcrqPw==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qRDzN-005GOT-0f;
-        Wed, 02 Aug 2023 15:42:17 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 12/12] xfs use fs_holder_ops for the log and RT devices
-Date:   Wed,  2 Aug 2023 17:41:31 +0200
-Message-Id: <20230802154131.2221419-13-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230802154131.2221419-1-hch@lst.de>
-References: <20230802154131.2221419-1-hch@lst.de>
+        with ESMTP id S235379AbjHBQF4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 12:05:56 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 085051717
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 09:05:54 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8BC211F37C;
+        Wed,  2 Aug 2023 16:05:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1690992353; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kqi9YBGYn9nvAOhtQwL08OVhTuphxSAzwlTF3Q9+mPg=;
+        b=BwHRPRWjLyClOS3tSA5tEgPQKsiLjdO0uJotzCS1eVe6X0Zdfkbu/RoIGkloDBndOkKV84
+        R7g+rW46IoJSQ1Q7aBp305RpSkycn7EEFQLgLdpQ18Ph9teX7OTps5VPEVS+jt7W45a5d9
+        JGa13grimFQGoVXTkGJ7iCg8I/Fkiyk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1690992353;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kqi9YBGYn9nvAOhtQwL08OVhTuphxSAzwlTF3Q9+mPg=;
+        b=fxWCJL0R9cmhwF464ufNNQN20NqvrYO2QZfPU/yuOhhKJBQgDkU6UDINcZ1EApFlXsWrqJ
+        ZadhLfHAohMEdrBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7870F13909;
+        Wed,  2 Aug 2023 16:05:53 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 51FiHeF+ymSsQAAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 02 Aug 2023 16:05:53 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 0A544A076B; Wed,  2 Aug 2023 18:05:53 +0200 (CEST)
+Date:   Wed, 2 Aug 2023 18:05:53 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        David Jeffery <djeffery@redhat.com>,
+        Kemeng Shi <shikemeng@huaweicloud.com>,
+        Gabriel Krisman Bertazi <krisman@suse.de>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        Jan Kara <jack@suse.cz>
+Subject: Re: [RFC PATCH] sbitmap: fix batching wakeup
+Message-ID: <20230802160553.uv5wn6nfjseniyxx@quack3>
+References: <20230721095715.232728-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230721095715.232728-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the generic fs_holder_ops to shut down the file system when the
-log or RT device goes away instead of duplicating the logic.
+On Fri 21-07-23 17:57:15, Ming Lei wrote:
+> From: David Jeffery <djeffery@redhat.com>
+> 
+> Current code supposes that it is enough to provide forward progress by just
+> waking up one wait queue after one completion batch is done.
+> 
+> Unfortunately this way isn't enough, cause waiter can be added to
+> wait queue just after it is woken up.
+> 
+> Follows one example(64 depth, wake_batch is 8)
+> 
+> 1) all 64 tags are active
+> 
+> 2) in each wait queue, there is only one single waiter
+> 
+> 3) each time one completion batch(8 completions) wakes up just one waiter in each wait
+> queue, then immediately one new sleeper is added to this wait queue
+> 
+> 4) after 64 completions, 8 waiters are wakeup, and there are still 8 waiters in each
+> wait queue
+> 
+> 5) after another 8 active tags are completed, only one waiter can be wakeup, and the other 7
+> can't be waken up anymore.
+> 
+> Turns out it isn't easy to fix this problem, so simply wakeup enough waiters for
+> single batch.
+> 
+> Cc: David Jeffery <djeffery@redhat.com>
+> Cc: Kemeng Shi <shikemeng@huaweicloud.com>
+> Cc: Gabriel Krisman Bertazi <krisman@suse.de>
+> Cc: Chengming Zhou <zhouchengming@bytedance.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_super.c | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
+I'm sorry for the delay - I was on vacation. I can see the patch got
+already merged and I'm not strictly against that (although I think Gabriel
+was experimenting with this exact wakeup scheme and as far as I remember
+the more eager waking up was causing performance decrease for some
+configurations). But let me challenge the analysis above a bit. For the
+sleeper to be added to a waitqueue in step 3), blk_mq_mark_tag_wait() must
+fail the blk_mq_get_driver_tag() call. Which means that all tags were used
+at that moment. To summarize, anytime we add any new waiter to the
+waitqueue, all tags are used and thus we should eventually receive enough
+wakeups to wake all of them. What am I missing?
 
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index d5042419ed9997..338eba71ff8667 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -377,17 +377,6 @@ xfs_setup_dax_always(
- 	return 0;
- }
- 
--static void
--xfs_bdev_mark_dead(
--	struct block_device	*bdev)
--{
--	xfs_force_shutdown(bdev->bd_holder, SHUTDOWN_DEVICE_REMOVED);
--}
--
--static const struct blk_holder_ops xfs_holder_ops = {
--	.mark_dead		= xfs_bdev_mark_dead,
--};
--
- STATIC int
- xfs_blkdev_get(
- 	xfs_mount_t		*mp,
-@@ -396,8 +385,8 @@ xfs_blkdev_get(
- {
- 	int			error = 0;
- 
--	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE, mp,
--				    &xfs_holder_ops);
-+	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
-+				    mp->m_super, &fs_holder_ops);
- 	if (IS_ERR(*bdevp)) {
- 		error = PTR_ERR(*bdevp);
- 		xfs_warn(mp, "Invalid device [%s], error=%d", name, error);
-@@ -412,7 +401,7 @@ xfs_blkdev_put(
- 	struct block_device	*bdev)
- {
- 	if (bdev)
--		blkdev_put(bdev, mp);
-+		blkdev_put(bdev, mp->m_super);
- }
- 
- STATIC void
+								Honza
+
+> ---
+>  lib/sbitmap.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index eff4e42c425a..d0a5081dfd12 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -550,7 +550,7 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_min_shallow_depth);
+>  
+>  static void __sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
+>  {
+> -	int i, wake_index;
+> +	int i, wake_index, woken;
+>  
+>  	if (!atomic_read(&sbq->ws_active))
+>  		return;
+> @@ -567,13 +567,12 @@ static void __sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
+>  		 */
+>  		wake_index = sbq_index_inc(wake_index);
+>  
+> -		/*
+> -		 * It is sufficient to wake up at least one waiter to
+> -		 * guarantee forward progress.
+> -		 */
+> -		if (waitqueue_active(&ws->wait) &&
+> -		    wake_up_nr(&ws->wait, nr))
+> -			break;
+> +		if (waitqueue_active(&ws->wait)) {
+> +			woken = wake_up_nr(&ws->wait, nr);
+> +			if (woken == nr)
+> +				break;
+> +			nr -= woken;
+> +		}
+>  	}
+>  
+>  	if (wake_index != atomic_read(&sbq->wake_index))
+> -- 
+> 2.40.1
+> 
 -- 
-2.39.2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
