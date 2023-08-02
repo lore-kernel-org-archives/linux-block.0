@@ -2,120 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0608C04A6A
-	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 16:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52256C04A6A
+	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 16:44:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232445AbjHBQdX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 12:33:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38104 "EHLO
+        id S230102AbjHBQop (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 12:44:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232394AbjHBQdW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 12:33:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93BF12101;
-        Wed,  2 Aug 2023 09:33:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 329C761A24;
-        Wed,  2 Aug 2023 16:33:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8773FC433C7;
-        Wed,  2 Aug 2023 16:33:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690994000;
-        bh=U5pXU2c37LOZ29omq1nYjOha2+PkFnv5cZZI28wk6xI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VbhXgLKwgsrsAQ9lKMSn42pa4Ylk6IKQnzpDE7eTo6XWu8QXA8ASoiiWUp5vePHa4
-         rqKYL37JGUX9BYkCAq6Qa8f7fGtfFLzcMqz+eu6fI8dgYR1AAcKZIwk67k6sSHEK5a
-         Njz82jH8Ug+YQ2Q1h4sDTGfhQcEv4iGu0G/SVUWQa2Pt/MuSQ64lm77P0GczVG9m1Q
-         DKM8m4hoED2p4UVsLydshoE+nAb2SHTV3Q+EDW0nZpH+Ge1CA1glHR2oD3mFU2ZrFO
-         Onx7JmBXl+uQCY9uDiWr6KaBHqsgZYWYOWiRpEIGfLcVhIwvH7UOPO/1IFtwzm3fow
-         kufdy4/TMWpFw==
-Date:   Wed, 2 Aug 2023 09:33:20 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 12/12] xfs use fs_holder_ops for the log and RT devices
-Message-ID: <20230802163320.GX11352@frogsfrogsfrogs>
-References: <20230802154131.2221419-1-hch@lst.de>
- <20230802154131.2221419-13-hch@lst.de>
+        with ESMTP id S229992AbjHBQoo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 12:44:44 -0400
+Received: from out-75.mta1.migadu.com (out-75.mta1.migadu.com [IPv6:2001:41d0:203:375::4b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F7A1AC
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 09:44:43 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 12:44:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1690994681;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pZgu6VYBtVmDJxB8/yQqdmC5ll//zvqWRVFeO9x8huE=;
+        b=fce+OLsEemL82w3gvvoTSKcithaQm7VhHQwGW1Rlpuf7kw3knwpOdgJ+tuUuunjiijUxHa
+        5N6DI50igXJhCvKGa5fTTo9x5aho5jo0/fXftHomHmeD0u0LvDU2NigvOpU2xEFPcGEWQ5
+        lZzSqKR+IqsPHWoPCg0YnnvAh13JbEc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-bcachefs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 05/20] block: Allow bio_iov_iter_get_pages() with
+ bio->bi_bdev unset
+Message-ID: <20230802164437.jskidimw32dofxpi@moria.home.lan>
+References: <20230712211115.2174650-1-kent.overstreet@linux.dev>
+ <20230712211115.2174650-6-kent.overstreet@linux.dev>
+ <ZL62HKrAJapXfcaR@infradead.org>
+ <20230725024312.alq7df33ckede2gb@moria.home.lan>
+ <ZMEeOZZcOu2p0SDP@infradead.org>
+ <20230801190450.3lbr2hjdi7t52anx@moria.home.lan>
+ <ZMpCRpNyt0EJpg9G@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230802154131.2221419-13-hch@lst.de>
+In-Reply-To: <ZMpCRpNyt0EJpg9G@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 02, 2023 at 05:41:31PM +0200, Christoph Hellwig wrote:
-> Use the generic fs_holder_ops to shut down the file system when the
-> log or RT device goes away instead of duplicating the logic.
+On Wed, Aug 02, 2023 at 04:47:18AM -0700, Christoph Hellwig wrote:
+> On Tue, Aug 01, 2023 at 03:04:50PM -0400, Kent Overstreet wrote:
+> > > Because blk-cgroup not only works at the lowest level in the stack,
+> > > but also for stackable block devices.  It's not a design decision I
+> > > particularly agree with, but it's been there forever.
+> > 
+> > You're setting the association only to the highest block device in the
+> > stack - how on earth is it supposed to work with anything lower?
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Nice cleanup,
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
-
---D
-
-> ---
->  fs/xfs/xfs_super.c | 17 +++--------------
->  1 file changed, 3 insertions(+), 14 deletions(-)
+> Hey, ask the cgroup folks as they come up with it.  I'm not going to
+> defend the logic here.
 > 
-> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-> index d5042419ed9997..338eba71ff8667 100644
-> --- a/fs/xfs/xfs_super.c
-> +++ b/fs/xfs/xfs_super.c
-> @@ -377,17 +377,6 @@ xfs_setup_dax_always(
->  	return 0;
->  }
->  
-> -static void
-> -xfs_bdev_mark_dead(
-> -	struct block_device	*bdev)
-> -{
-> -	xfs_force_shutdown(bdev->bd_holder, SHUTDOWN_DEVICE_REMOVED);
-> -}
-> -
-> -static const struct blk_holder_ops xfs_holder_ops = {
-> -	.mark_dead		= xfs_bdev_mark_dead,
-> -};
-> -
->  STATIC int
->  xfs_blkdev_get(
->  	xfs_mount_t		*mp,
-> @@ -396,8 +385,8 @@ xfs_blkdev_get(
->  {
->  	int			error = 0;
->  
-> -	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE, mp,
-> -				    &xfs_holder_ops);
-> +	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
-> +				    mp->m_super, &fs_holder_ops);
->  	if (IS_ERR(*bdevp)) {
->  		error = PTR_ERR(*bdevp);
->  		xfs_warn(mp, "Invalid device [%s], error=%d", name, error);
-> @@ -412,7 +401,7 @@ xfs_blkdev_put(
->  	struct block_device	*bdev)
->  {
->  	if (bdev)
-> -		blkdev_put(bdev, mp);
-> +		blkdev_put(bdev, mp->m_super);
->  }
->  
->  STATIC void
-> -- 
-> 2.39.2
+> > And looking at bio_associate_blkg(), this code looks completely broken.
+> > It's checking bio->bi_blkg, but that's just been set to NULL in
+> > bio_init().
 > 
+> It's checking bi_blkg because it can also be called from bio_set_dev.
+
+So bio_set_dev() has subtly different behaviour than passing the block
+device to bio_init()?
+
+That's just broken.
+
+> 
+> > And this is your code, so I think you need to go over this again.
+> 
+> It's "my code" in the sene of that I did one big round of unwinding
+> the even bigger mess that was there.  There is another few rounds needed
+> for the code to vaguely make sense.
+
+Well, I'll watch for those patches then...
