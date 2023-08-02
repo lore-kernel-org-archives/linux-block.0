@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C88C001DE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 09:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A96C00528
+	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 09:12:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233889AbjHBJMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 05:12:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33844 "EHLO
+        id S234010AbjHBJM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 05:12:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234002AbjHBJMT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 05:12:19 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54F5C2D4E
-        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 02:12:18 -0700 (PDT)
+        with ESMTP id S234007AbjHBJMY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 05:12:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E1652D49
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 02:12:23 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C260D618B8
-        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 09:12:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FDC0C433C8;
-        Wed,  2 Aug 2023 09:12:16 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C0DAC618C1
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 09:12:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FD9FC433D9;
+        Wed,  2 Aug 2023 09:12:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690967537;
-        bh=UTxARlk7ZzXtrJK2zj2BkEzYy5IvjFv8aDaq/qtlTts=;
+        s=k20201202; t=1690967542;
+        bh=pVAyY1ySzAS+PG0JJtNfXD8KkxEQplMaB9ot2jF0iEE=;
         h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=nz3abdTpKf6f9XcXYgVFjNGu3zhjGjox9AlATBpGULGqNltBm0jem/lQFUZ5cYHEX
-         6m8kGFuAxAv5H+wgmuBHIyjspu9Lu17KzUqH+qr4ZU5vs7w2lwOvDxbAvDNN13r0on
-         S+Gy8nCcrwugzBKnU1lzL9vmFHbDc/CvJD8WeMUsyjuXKDi9ozLdzzImzQa1o6Fwj7
-         oRd8GXe4s0HfmVXuAb0wPlsMd6PDzy3CJnpJjMZgIe1py6l17JwArHsB8ti/hdFvtX
-         JI5UGlrsGV/046EO6laW55CULfegWTocqun/TD09qhJvZhASNikYRIPsbLvbgDg2vY
-         5mxjEK+IeBbgA==
-Message-ID: <b07c0809-26ba-ab28-9c6c-8d0438fbbeb4@kernel.org>
-Date:   Wed, 2 Aug 2023 18:12:15 +0900
+        b=qv1RNe+t1xACIgBzHXl48CThQCVmMN+p16VEx4tAmOWO2oPWQ6dgbGiAKV7dM7rRc
+         VU1JPKzaM3jKtzGOu3uKecMDXTju6spnFrH8QujQUrdm2leL4Q3tODABIuDsNJAfRx
+         ywU6meOGrvsLr+z0M8Mrw/PrGz2IZWtVUWMVZ1R3F0kSPp4UAowXvJbu1yoDrZYMz4
+         StYx/T+7gTnywXlzw16R0fOE280Ng2NHhKNtYnP2+P0YHDf0qqKv9Rn7eGVo6G8SbV
+         yEJjeMssoUFIMP+C2rSO9AgkAAu4UonzFI5zP+lXR6IxsdWM0lLrKr1fsTZdQSl7hU
+         F/Pze9fbNBdaQ==
+Message-ID: <252a5224-2f1b-cdcd-2c37-d49bce704099@kernel.org>
+Date:   Wed, 2 Aug 2023 18:12:20 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v5 1/7] block: Introduce the flag
- QUEUE_FLAG_NO_ZONE_WRITE_LOCK
+Subject: Re: [PATCH v5 2/7] block/mq-deadline: Only use zone locking if
+ necessary
 Content-Language: en-US
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Ming Lei <ming.lei@redhat.com>
 References: <20230731221458.437440-1-bvanassche@acm.org>
- <20230731221458.437440-2-bvanassche@acm.org>
+ <20230731221458.437440-3-bvanassche@acm.org>
 From:   Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <20230731221458.437440-2-bvanassche@acm.org>
+In-Reply-To: <20230731221458.437440-3-bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -56,16 +56,16 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/1/23 07:14, Bart Van Assche wrote:
-> Writes in sequential write required zones must happen at the write
-> pointer. Even if the submitter of the write commands (e.g. a filesystem)
-> submits writes for sequential write required zones in order, the block
-> layer or the storage controller may reorder these write commands.
-> 
-> The zone locking mechanism in the mq-deadline I/O scheduler serializes
-> write commands for sequential zones. Some but not all storage controllers
-> require this serialization. Introduce a new request queue flag to allow
-> block drivers to indicate that they preserve the order of write commands
-> and thus do not require serialization of writes per zone.
+> Measurements have shown that limiting the queue depth to one per zone for
+> zoned writes has a significant negative performance impact on zoned UFS
+> devices. Hence this patch that disables zone locking by the mq-deadline
+> scheduler if the storage controller preserves the command order. This
+> patch is based on the following assumptions:
+> - It happens infrequently that zoned write requests are reordered by the
+>   block layer.
+> - The I/O priority of all write requests is the same per zone.
+> - Either no I/O scheduler is used or an I/O scheduler is used that
+>   submits write requests per zone in LBA order.
 > 
 > Cc: Christoph Hellwig <hch@lst.de>
 > Cc: Damien Le Moal <dlemoal@kernel.org>
@@ -73,52 +73,83 @@ On 8/1/23 07:14, Bart Van Assche wrote:
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
 Looks OK.
-Very minor nit below.
 
 Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
 > ---
->  include/linux/blkdev.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  block/mq-deadline.c | 24 ++++++++++++++++++------
+>  1 file changed, 18 insertions(+), 6 deletions(-)
 > 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 2f5371b8482c..de5e05cc34fa 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -534,6 +534,11 @@ struct request_queue {
->  #define QUEUE_FLAG_NONROT	6	/* non-rotational device (SSD) */
->  #define QUEUE_FLAG_VIRT		QUEUE_FLAG_NONROT /* paravirt device */
->  #define QUEUE_FLAG_IO_STAT	7	/* do disk/partitions IO accounting */
-> +/*
-> + * Do not serialize sequential writes (REQ_OP_WRITE, REQ_OP_WRITE_ZEROES) sent
-> + * to a sequential write required zone (BLK_ZONE_TYPE_SEQWRITE_REQ).
-> + */
-
-I would be very explicit here, for this to be clear to people who are not
-familiar with zone device write operation handling. Something like:
-
-/*
- * The device supports not using the zone write locking mechanism to serialize
- * write operations (REQ_OP_WRITE, REQ_OP_WRITE_ZEROES) issued to a sequential
- * write required zone (BLK_ZONE_TYPE_SEQWRITE_REQ).
- */
-
-> +#define QUEUE_FLAG_NO_ZONE_WRITE_LOCK 8
->  #define QUEUE_FLAG_NOXMERGES	9	/* No extended merges */
->  #define QUEUE_FLAG_ADD_RANDOM	10	/* Contributes to random pool */
->  #define QUEUE_FLAG_SYNCHRONOUS	11	/* always completes in submit context */
-> @@ -597,6 +602,11 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
->  #define blk_queue_skip_tagset_quiesce(q) \
->  	test_bit(QUEUE_FLAG_SKIP_TAGSET_QUIESCE, &(q)->queue_flags)
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index 02a916ba62ee..1f4124dd4a0b 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -338,6 +338,16 @@ static struct request *deadline_skip_seq_writes(struct deadline_data *dd,
+>  	return rq;
+>  }
 >  
-> +static inline bool blk_queue_no_zone_write_lock(struct request_queue *q)
+> +/*
+> + * Use write locking if either QUEUE_FLAG_NO_ZONE_WRITE_LOCK has not been set.
+> + * Not using zone write locking is only safe if the block driver preserves the
+> + * request order.
+> + */
+> +static bool dd_use_zone_write_locking(struct request_queue *q)
 > +{
-> +	return test_bit(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, &q->queue_flags);
+> +	return blk_queue_is_zoned(q) && !blk_queue_no_zone_write_lock(q);
 > +}
 > +
->  extern void blk_set_pm_only(struct request_queue *q);
->  extern void blk_clear_pm_only(struct request_queue *q);
+>  /*
+>   * For the specified data direction, return the next request to
+>   * dispatch using arrival ordered lists.
+> @@ -353,7 +363,7 @@ deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+>  		return NULL;
 >  
+>  	rq = rq_entry_fifo(per_prio->fifo_list[data_dir].next);
+> -	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
+> +	if (data_dir == DD_READ || !dd_use_zone_write_locking(rq->q))
+>  		return rq;
+>  
+>  	/*
+> @@ -398,7 +408,7 @@ deadline_next_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+>  	if (!rq)
+>  		return NULL;
+>  
+> -	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
+> +	if (data_dir == DD_READ || !dd_use_zone_write_locking(rq->q))
+>  		return rq;
+>  
+>  	/*
+> @@ -526,8 +536,9 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
+>  	}
+>  
+>  	/*
+> -	 * For a zoned block device, if we only have writes queued and none of
+> -	 * them can be dispatched, rq will be NULL.
+> +	 * For a zoned block device that requires write serialization, if we
+> +	 * only have writes queued and none of them can be dispatched, rq will
+> +	 * be NULL.
+>  	 */
+>  	if (!rq)
+>  		return NULL;
+> @@ -552,7 +563,8 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
+>  	/*
+>  	 * If the request needs its target zone locked, do it.
+>  	 */
+> -	blk_req_zone_write_lock(rq);
+> +	if (dd_use_zone_write_locking(rq->q))
+> +		blk_req_zone_write_lock(rq);
+>  	rq->rq_flags |= RQF_STARTED;
+>  	return rq;
+>  }
+> @@ -933,7 +945,7 @@ static void dd_finish_request(struct request *rq)
+>  
+>  	atomic_inc(&per_prio->stats.completed);
+>  
+> -	if (blk_queue_is_zoned(q)) {
+> +	if (dd_use_zone_write_locking(rq->q)) {
+>  		unsigned long flags;
+>  
+>  		spin_lock_irqsave(&dd->zone_lock, flags);
 
 -- 
 Damien Le Moal
