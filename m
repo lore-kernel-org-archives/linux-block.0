@@ -2,103 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCDEC04A6A
-	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 15:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE9E2C04A6A
+	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 15:25:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234261AbjHBPNv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 11:13:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36976 "EHLO
+        id S235143AbjHBPZu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 11:25:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234221AbjHBPNs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 11:13:48 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0582D49
-        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 08:13:36 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id ca18e2360f4ac-790b6761117so32543939f.0
-        for <linux-block@vger.kernel.org>; Wed, 02 Aug 2023 08:13:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1690989215; x=1691594015;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aFN0yTkYJmRYBxe8C0crI4IHgD1XQCao320E85C1eJo=;
-        b=kp7n9nNtSk8/5HElDyrHrxdGYt7rv/xOLxBpQU+qG5wUj+aPhHFt7hOsgBNU+OETht
-         KWYQgN+RSSEkCSHwBiuIn2wqCn91pIcH/6WpiiodnA80qHVCbrbi7a5F7VrS1AWocpGX
-         lkpINsr9WOQxcFPAY8112JHDHuJNcmJ6kzBmZcak+HGIKh1mUfZlmlGg/fFYiljja8Iw
-         hOStezDZIgh7VUM+4wefm3ZdGRsulRhaUdKProubNLnmpS5r9xd7/3JvspGQR7Qmuo3D
-         jGBr6kX71aa/Ip9kVb1+ByoY7pLHM2YwhbYEQr92yRmJOnBOGLIpP3nmoti+KebJ98IT
-         YNZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690989215; x=1691594015;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aFN0yTkYJmRYBxe8C0crI4IHgD1XQCao320E85C1eJo=;
-        b=RmUMGu6Q7YME7QnWKvY4ykdBZYQheC1TPCd/TvrmS2VZTQmc3EQbMPpVGuxyoXA7Nw
-         sEqrc1cam7Nl0EPCqpVbb65o7K8iP52nkYJ5tRa5FYOEvBBgXk96I58lYEr7kPkjoouX
-         p5XNZjxX1kNDtNjG6vL5WBla0sfggYOYkO/82VS0Mmz/ikYaVDWucJivY7sZm0ezTXR/
-         UBK/dsmEWHDSXEEbtLmj97oySavPfSxOE1KHkY9OiIqlT0NQZrpgz/mIlK63gGv//aKj
-         1UPV+xr7OSWjZQAkGT7G+NGu9QP8b84YnbSt1ZoGMA3EbXEEzX3tc48ao6fhD6bxDklX
-         v0fA==
-X-Gm-Message-State: ABy/qLZP5PXYlcaXrruwVivLeg/LIGW+t2YUJFWgyBl+3RYOa1snAycw
-        XnpnPIr7FmmP3tElwg/ill2zsQ==
-X-Google-Smtp-Source: APBJJlGV0GWnRqN4nUuY2j+yBlsWFiPPK/hRERx9kc8EMoqN+d2kaqg0kL1v4ktlNGSiEvEAkXeswA==
-X-Received: by 2002:a05:6e02:4c4:b0:345:a3d0:f0d4 with SMTP id f4-20020a056e0204c400b00345a3d0f0d4mr12930279ils.3.1690989215175;
-        Wed, 02 Aug 2023 08:13:35 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id y8-20020a02a388000000b0042b46224650sm4293136jak.91.2023.08.02.08.13.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 08:13:34 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
+        with ESMTP id S235149AbjHBPZg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 11:25:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D854B59C1
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 08:21:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690989687;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+dy+vPxDN0Oc4Dfwi/3Tr1TnfRoXZvJhujCYlsH+q6k=;
+        b=MA5GnCPEookpvVH3t4mTgKk0M6llGl3nhpDZ8gXXGh7MKqipgrppEBGHei5e1ieWhVZeNs
+        YNf/se+mGKleXPBh1CKC2H85f+wLrIR7fTNRVV0V7cpmg9Og2SsxZTLrEDK6MhsY9s2yHf
+        9mjqgXgq7NlkPp/NfUzloeDSsICb3q4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-478-QBqSkhL4OX-oKjDBuC6YAQ-1; Wed, 02 Aug 2023 11:21:24 -0400
+X-MC-Unique: QBqSkhL4OX-oKjDBuC6YAQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CFF52858290;
+        Wed,  2 Aug 2023 15:21:23 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 941EC112132D;
+        Wed,  2 Aug 2023 15:21:23 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Christian Brauner <brauner@kernel.org>
-In-Reply-To: <20230801172201.1923299-2-hch@lst.de>
-References: <20230801172201.1923299-1-hch@lst.de>
- <20230801172201.1923299-2-hch@lst.de>
-Subject: Re: [PATCH 1/6] fs: remove emergency_thaw_bdev
-Message-Id: <169098921438.7183.18231196765480619399.b4-ty@kernel.dk>
-Date:   Wed, 02 Aug 2023 09:13:34 -0600
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "dan.j.williams\@intel.com" <dan.j.williams@intel.com>,
+        "vishal.l.verma\@intel.com" <vishal.l.verma@intel.com>,
+        "dave.jiang\@intel.com" <dave.jiang@intel.com>,
+        "ira.weiny\@intel.com" <ira.weiny@intel.com>,
+        "nvdimm\@lists.linux.dev" <nvdimm@lists.linux.dev>,
+        axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH V2 1/1] pmem: set QUEUE_FLAG_NOWAIT
+References: <20230731224617.8665-1-kch@nvidia.com>
+        <20230731224617.8665-2-kch@nvidia.com>
+        <x491qgmwzuv.fsf@segfault.boston.devel.redhat.com>
+        <20230801155943.GA13111@lst.de>
+        <x49wmyevej2.fsf@segfault.boston.devel.redhat.com>
+        <0a2d86d6-34a1-0c8d-389c-1dc2f886f108@nvidia.com>
+        <20230802123010.GB30792@lst.de>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Wed, 02 Aug 2023 11:27:12 -0400
+In-Reply-To: <20230802123010.GB30792@lst.de> (Christoph Hellwig's message of
+        "Wed, 2 Aug 2023 14:30:10 +0200")
+Message-ID: <x49o7jpv50v.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Christoph Hellwig <hch@lst.de> writes:
 
-On Tue, 01 Aug 2023 19:21:56 +0200, Christoph Hellwig wrote:
-> Fold emergency_thaw_bdev into it's only caller, to prepare for buffer.c
-> to be built only when buffer_head support is enabled.
-> 
-> 
+> Given that pmem simply loops over an arbitrarily large bio I think
+> we also need a threshold for which to allow nowait I/O.  While it
+> won't block for giant I/Os, doing all of them in the submitter
+> context isn't exactly the idea behind the nowait I/O.
+>
+> I'm not really sure what a good theshold would be, though.
 
-Applied, thanks!
+There's no mention of the latency of the submission side in the
+documentation for RWF_NOWAIT.  The man page says "Do not wait for data
+which is not immediately available."  Data in pmem *is* immediately
+available.  If we wanted to enforce a latency threshold for submission,
+it would have to be configurable and, ideally, a part of the API.  I
+don't think it's something we should even try to guarantee, though,
+unless application writers are asking for it.
 
-[1/6] fs: remove emergency_thaw_bdev
-      commit: 4a8b719f95c0dcd15fb7a04b806ad8139fa7c850
-[2/6] fs: rename and move block_page_mkwrite_return
-      commit: 2ba39cc46bfe463cb9673bf62a04c4c21942f1f2
-[3/6] block: open code __generic_file_write_iter for blkdev writes
-      commit: 727cfe976758b79f8d2f8051c75a5ccb14539a56
-[4/6] block: stop setting ->direct_IO
-      commit: a05f7bd9578b17521a9a5f3689f3934c082c6390
-[5/6] block: use iomap for writes to block devices
-      commit: 487c607df790d366e67a7d6a30adf785cdd98e55
-[6/6] fs: add CONFIG_BUFFER_HEAD
-      commit: 925c86a19bacf8ce10eb666328fb3fa5aff7b951
+So, I think with the change to return -EAGAIN for writes to poisoned
+memory, this patch is probably ok.
 
-Best regards,
--- 
-Jens Axboe
+Chaitanya, could you send a v2?
 
-
+Thanks,
+Jeff
 
