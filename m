@@ -2,178 +2,209 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4C8C04E69
-	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 10:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3ECEC00528
+	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 10:20:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231361AbjHBKG5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 06:06:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
+        id S233057AbjHBKUP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 06:20:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231327AbjHBKGz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 06:06:55 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F1E0196;
-        Wed,  2 Aug 2023 03:06:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1690970814; x=1722506814;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-  b=qiczXCxrkRYyy4wnZiyZeuBqLbf0Ohk97izrLfgN/htI6NfICFW+BS1L
-   UT1a6H3kBCplhhSeCz8YbmqfnbXuiHkicuq5iZjSj5KD0dUICoM8I2VU/
-   Mtv+ObivKHiVIXLzEIN5WeVERcHMlqLM8SUqP8o2NAoaeE9al7a15FFLa
-   7yMXc5Ssz6g0wFh+uUxBKvt986664KgVruudH4vZWCzvNE8922hVxNPii
-   2VRg5Xrk5XPRgcv1UZwch1fINDdB/XKSEeTIAromtb5jDb/44Kahqx/X1
-   GHFMAv6k/T/xc2u5WNmaSqgZEHknCu24b32VgZEvJ6JGxOs1+pWLDHMsk
-   g==;
-X-IronPort-AV: E=Sophos;i="6.01,248,1684771200"; 
-   d="scan'208";a="351895538"
-Received: from mail-dm6nam04lp2041.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.41])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2023 18:06:52 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HEtZCOOnyDYIpGQXCpjL409010UlEr5s2QqHr9rdd1i0e3J8MAtKRVkiSy5apibbeZUGn33EPiNlEKrqPDiodajjhna3MWVjlDXPv5vt5j/pBRumcilN2N6+YGO1eb5l8x6rEyTIIxRqg5szkNUAin8RADEOTFjjTDvqta754RJjgqR8zUm++pC3FOwWomKeLgXftB/Y+Sp4A7dNxjrVGdoUL8KgWEuPmCZdFPzlfgMLyQawyBLFRdu2iIMoUoZ20UPss6tsTVimgVMaxUnkZV0vVu+RLEU7nvJBjyUO5Bg+kKft7/C7qRLuOj2RNPh2b0+jD1BwkupTdElGUcIQgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=TrxP/kkdmPxvRZOLcT+/mtnYhEIbjGiTks63WD2/d9OGdIsElamxvhS1wQhLbTfn1xrrBu9UPNCmMipAImiBibhZ6ZjUUf+TtNIZF5bxeYRmmNikAYbNFqk2+ACrPhk3C4UBVSod7Yd2IdIRaN6ymAvz7G3EI5abhwLpUTUTN05hQlcZc6zk5FFxBrwaDgDN3pW/fT8Ijsj7cOOyt5DE/D2Gld4jrjbS1sjVBtEer6giRCsQCLHVfQVu+urQ9PjUooqzb07jjF9c7E8vH+8PhS0o179Kh5Gg+fUzWNrgAOC1TVMH0H1/UQ0YDqnQbLZ1om4jrihlrdvIEfE5TcTTFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        with ESMTP id S231821AbjHBKUN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 06:20:13 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99804213D
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 03:20:11 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3fe110de3b6so4878205e9.1
+        for <linux-block@vger.kernel.org>; Wed, 02 Aug 2023 03:20:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=H12dWklqnHGASDIuKDx6YOdhTnLC46tA8+ehrRFhcieofGFo7m/gQDsX1c78ZoUi31gTZ3wGC1Cjenqyv0QW7jLf5xQLzHIoI/KiYG/HhaTBIc4bHYN1LAk7izErGBDAW+XjpSrTKTjxx0CnIK5KMbpT2rVexZhaixphn9KoEZ8=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by SA3PR04MB8646.namprd04.prod.outlook.com (2603:10b6:806:2fb::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
- 2023 10:06:51 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::c91f:4f3e:5075:e7a8]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::c91f:4f3e:5075:e7a8%6]) with mapi id 15.20.6631.043; Wed, 2 Aug 2023
- 10:06:51 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC:     "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christian Brauner <christian@brauner.io>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 3/6] block: open code __generic_file_write_iter for blkdev
- writes
-Thread-Topic: [PATCH 3/6] block: open code __generic_file_write_iter for
- blkdev writes
-Thread-Index: AQHZxJzT/PsxFfD3nkyLbY3Do+7MGq/WyOEA
-Date:   Wed, 2 Aug 2023 10:06:51 +0000
-Message-ID: <46c04039-64e4-8079-ab12-4d74fc8b5d53@wdc.com>
-References: <20230801172201.1923299-1-hch@lst.de>
- <20230801172201.1923299-4-hch@lst.de>
-In-Reply-To: <20230801172201.1923299-4-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|SA3PR04MB8646:EE_
-x-ms-office365-filtering-correlation-id: f1b0024e-2777-4c9a-dcc8-08db93403107
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DMgyvgbdaYfPvwhik6GJzMK1HFhBjIzC1AkJH2+WEjGwjavy5TDEpmC/9SQCEh0VsIBagpdDvS3Uo4kHYyfMtW0GkXLnw764LCmEzxKJG5xlOcbCayMgS0Ck5Owet4DaeSQx/CHQQ8Dtba6ZsrxOpPCGASeFoAXbynwB/TyGLAjIIoZ4w7HY6I9gdEEVO/doaGSX4gdeWL51jalSK0spTWlWXkM3gHGVgtBpHkmQb5VI7oxqnQsNAes/eZDNJGBOdWjfbceKmnJH98+o5DQvomqvrkTFgiTRGWdPQf/EXyBFUwv4L2okn/xjG2bP7ZtnC5aCNX7vy1JBhX/HQ1qHGrFupS+e1J5iYtNrs6I2ekeitLv+EKQPCdl+/OG+omFrS5Yx3tTehGRgc+K6gzLzQ8sOzuMzFiFGirMDM7f7rA45fkKcDR7XwJvzaFWeDwBtEtY1h47QMh9+lNqRn+F5oVH4oRLFkq3cZKkrjRErLRMCwACXmXj5sBfqp+IIOBb9LBQTdDy13Qu7/cfYNANAPtXW9sNA+3FFSdZX/hAfWzPTomtjE6vI+bnASnPCovHpCJhqMDojio41sbxRIkCbWh5pFh+5s20671JvGAK9exz29izGhV3g4bhdlZdGcbiwXcKWro0I1EPUBBjiAcsBNjB8bLyTHdVJ87HtUUriTMwGbdW4OIeUPRjqNEieQ+cJRcNy8kyQbQeMrvhLDdi2lA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(136003)(366004)(376002)(39860400002)(451199021)(8676002)(8936002)(5660300002)(41300700001)(2906002)(31686004)(7416002)(38070700005)(19618925003)(186003)(2616005)(4270600006)(558084003)(122000001)(478600001)(110136005)(54906003)(38100700002)(316002)(86362001)(6506007)(6486002)(64756008)(71200400001)(66946007)(76116006)(91956017)(66556008)(66446008)(66476007)(82960400001)(31696002)(4326008)(6512007)(36756003)(41533002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?amxOSnh2aVpyVjRtaTRyRVoxd3F0NXlYR29YNXpHeCtDYmxiaVFzVU5aL0h6?=
- =?utf-8?B?YUhsV2FsSVVHeUxmK1c2UHJtWkxZYnUyYmVacWdoSEIwZXptcnhTSDhXeGZz?=
- =?utf-8?B?UGxnMldCU2JDeFdPZS9HQm03aEhGcHFkWTFTWVVRcXgreGpoMXNUNlZjY3h2?=
- =?utf-8?B?ODJFN05oQnd0Y3YrUlZkUVBjTkMrMm5Kc1BWUFhlTEdUdTJ3TXd2Y1AwelYy?=
- =?utf-8?B?Snc0NXhDY1VGRHhJYnEzRnUrKytUREQ0M3V2bDVjTTgyZjdWZE04TzJ0TW11?=
- =?utf-8?B?QVNtVEJJMHRiSkt0b3ZtZ21PUUxveDA3MzdHcjFPTmloS1FxQ3JCc3pyVGZv?=
- =?utf-8?B?T0FVRzlXaVhJSmY2VzJYWmxWZEVtU05FdlE5K2xWTUNaVEdXMjhDdDF1elU4?=
- =?utf-8?B?SHN6NW1sT0YrMWhsNnllY09LQnVhdFRXR2xRc3Y2VjE1K25sb0FpbmplZjVV?=
- =?utf-8?B?WFdLWDI2ZHFOQXErZS9yaW5xSU55ZHZQTEFwYnJUYWVRc2dSWktmdVhtQmRQ?=
- =?utf-8?B?NkszeVNETWs4dmRxbTlyWEJTcTR2ZGZsQlR4WHhMa3NHTGRhWnlBcm1rc05h?=
- =?utf-8?B?UlRGbE9sYlFwMXg3RzVQVk4wNFlMeVJVRGVBOGFRalJ1aDllT092eTUzSlhx?=
- =?utf-8?B?Q0l4ZEg1Vm9tMHVDZjFvSVJDamxCaUlBTXlJdXM3R3ZKQ2tjWXJScUpuUDh3?=
- =?utf-8?B?WTdLN29yVDNvaWdHbXNUL0J2S01oNjErYldrcFI0TWQ1aURkRWVyZzFOMHJ5?=
- =?utf-8?B?Nkc2WWYzbzNHbmhaWGVQd1lYdWV3UVZiOVZOczZVQlM0VHMwVENGS2Rjb1hU?=
- =?utf-8?B?VW8yejF6RHZvZVREOW1FUTdNRUZ0Zm9WcjNPYmdSTGdhSWJMSnVpQUFqN1dX?=
- =?utf-8?B?N3Uxa1drRkZEVGtmU3pmbmlvektyYnZ5ZHcyR2lmTWE1WWdxUU5SdHhqTGls?=
- =?utf-8?B?UitJQS81THMxL3IxOHJUZUlkazRldTlFMFJKdXFiQW9xTEFzSGxFMkdJZUpk?=
- =?utf-8?B?SjdueWxVZFBGUmk3V3grdERWMzFTTGM2Z1UvUGlRQ3pyTmFxcEVXVS9oRzdH?=
- =?utf-8?B?WGkySlk1SG5mYWxVZVdUaHlwL090TmM1YTAwb3JHTWFnVjBPeGhyc05MaThT?=
- =?utf-8?B?WUVLTGNaaWxuUmxBdjE5RXpSYitRMWVRUTBLNkFLNUw4cGRBZ3BSTDRJZWNZ?=
- =?utf-8?B?MGVDMGhKVWh2WTJadkRMbUltTy9DckYvTGVXd2hEZklxMzBLRlBHeGNWaWpx?=
- =?utf-8?B?bWNUMDF1eGp2Z3JOTGRWLzZaY3NXNVcvT3dNcGExMzd3TDMxWU1DSUh4S0Fj?=
- =?utf-8?B?K3BlUVQ2eDBabm1qMDNkLzllTk5vM0FpWE5DVXhjVm80M21hMlp2NVRSMnZG?=
- =?utf-8?B?RC81ME1xQU5UK2tkV3ZzL2lUb0cxcUdQenZxNWh1R1JURmkwdzh2d1JrNFhm?=
- =?utf-8?B?TjBGbk4yckRUQUV3b0hjdlVyTllhQ3V6cGd1M0hTaml2SXljdE1wdWYydjJy?=
- =?utf-8?B?WHNnb0tCU2E5T3hOeWxEM2dvdUdPVXMvU1ZyZmU0RXN1WTFUWEhjTkw2NTYz?=
- =?utf-8?B?V0pwYU5qRTkxK3VkeW5FUnBsTEJ0ZmRrdkdVb0FtN3ZFTWN1bkpNV0RrQjhU?=
- =?utf-8?B?Z3QybnRZYXFRbmtKdTBDYkgyU0cxR2ZmV3BiSUF6aUNLS0MzbUh0d29ZcXhx?=
- =?utf-8?B?YUYwOGZpUDAyR2UwckljRjdiSmUxSDlSbDlEN216aDRoMTVoVFA2VGhkVm5M?=
- =?utf-8?B?UkxFTlMwcHhuNGMyL0F6ak1SVnBUL0JKVlFBODM3MW9FUkc1M2pzNys0Yllt?=
- =?utf-8?B?M09Zc3lWdERxcVlXSmxrVlprTHFpZTNrQTczZU5SWm1Eei92WG56cUt3QWJD?=
- =?utf-8?B?MWw1eEI1dGpVdGNUWHdyVnhTV1BsOE0zbEdzaEo1eU5qa3pkMXFCSEcraWJm?=
- =?utf-8?B?OWtpMytyNERXSnY1YUhQTEw0T3NpaTcvdDV3L0MyNGlVN0RUL09SanJKcW9I?=
- =?utf-8?B?c0lUVmF1TmlxbnQ2WkZpTGJsUTJIQzZ5MktoYW1Ib1V5WTI1bFZiMzc4cUZE?=
- =?utf-8?B?Nkc4RDFxVGpBUEtMSnduVjNxbmlFSTJ2SnI0UnZOYXVCM3YyeTRIbUp5dnlK?=
- =?utf-8?B?LzNWOHJMMEVmeXBmMHlobVN0RnBnRms1dGRlVXlCN0d1Ump0RVZCWXBNT2w4?=
- =?utf-8?B?cWN0RjFCaUZNREd3Z3g0ay9PZzBuQTRBZUdwbnBjc2l0dllqdjBURkZhOUdw?=
- =?utf-8?B?Qk9WY1RHZUtGbEVESzlVcWlVMmp3PT0=?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6A7FCD8D436DA847ABFD2964B9BF9518@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1690971610; x=1691576410;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=z4rJUp9E40rL5+8CP32mycBdPuI07UiAoVNbdysH/2w=;
+        b=IHZHoNJee0qngDGi7rgLFsu2Fj3ALWVZqdunZfkstaFa3525boASabLF5QNjW/aDLh
+         Wb1HSXHuoj0HRIpsriTPJoocccS4SdS6rNVWiuR8pt4I9tm3VjGN6Qyr8oXsYyACZryt
+         qUbxszJNfgNIeGkLvg2LE7M9/piNcPmHx5pdOLgCKECr6CIAylmmAxxMnHY5N586RGtG
+         dm4AKWtC8wdaV+ktiEZddrna0uwdSau4gXLHsddTHKH0UTrUYkqxzezp1zuPbbn0S7CP
+         bhZYTPDEdnrj4Gatz5BqoGjlObqw90upHoOmmz61UCPUzwidEm0XBMIC4MinoZ6yQPCE
+         fB7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690971610; x=1691576410;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z4rJUp9E40rL5+8CP32mycBdPuI07UiAoVNbdysH/2w=;
+        b=km1FfCUCRJKd24QQI5VZfQ0YWxxYWnbfuiUHTXxgry3EhL9g8DWrKZS29FJb9BVA4G
+         d1pIFW7NGYp6+CtAlNpxDT+Gb/EYu8NvgCqtF+VRkmXxBc0aCgdpwFN9yOzCN5U8BIg1
+         U07uAdlTCfHA9FOG7kC5WN2Fya2Ql66NYEu3uqjnhZ58u1aroVI5ExZ/rjVXWsrhQcPA
+         MjIgzvOWVR2WCVOdr9sr7RQOqckWnupolCGDm0Ci5/1nf3CyOwfGKAN3k+XWRNi+ob40
+         B45HUGPIalIabJmaJJntfWFAgVECpEE+ztAeakOlLYwtP/SZNRnhKeyBXKZB2EO8Nqa1
+         b8Kg==
+X-Gm-Message-State: ABy/qLZTNZSmfZU/3fX9IEWY31/XIzItRdxu206k8VqjpB2WzEdqca1f
+        wMc2upOO9IgIYnWtScZ/dDsP1w==
+X-Google-Smtp-Source: APBJJlFo+ohuERZxmfjaTrMzYUhCBVxfbYhKnGmeFRtFDL8Dh535ATJwmkvaXoavUylHY7WzkW7zkA==
+X-Received: by 2002:a05:600c:4792:b0:3fe:21f1:aba8 with SMTP id k18-20020a05600c479200b003fe21f1aba8mr4750448wmo.12.1690971609857;
+        Wed, 02 Aug 2023 03:20:09 -0700 (PDT)
+Received: from localhost ([165.225.194.216])
+        by smtp.gmail.com with ESMTPSA id a13-20020a05600c224d00b003fc05b89e5bsm1253536wmm.34.2023.08.02.03.20.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 03:20:09 -0700 (PDT)
+References: <20230714072510.47770-1-nmi@metaspace.dk>
+ <20230714072510.47770-3-nmi@metaspace.dk>
+ <ZLesM5flOn2aet8p@ovpn-8-17.pek2.redhat.com>
+ <ZLfZ/I2O3d7V9v7d@ovpn-8-21.pek2.redhat.com>
+User-agent: mu4e 1.10.5; emacs 28.2.50
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Matias Bjorling <Matias.Bjorling@wdc.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, gost.dev@samsung.com,
+        Christoph Hellwig <hch@infradead.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH v9 2/2] ublk: enable zoned storage support
+Date:   Wed, 02 Aug 2023 12:19:26 +0200
+In-reply-to: <ZLfZ/I2O3d7V9v7d@ovpn-8-21.pek2.redhat.com>
+Message-ID: <875y5xpwyv.fsf@metaspace.dk>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?QW5Kc1JQamJ0UjBTVTFmTGpXeHVieWh3VTlOdUNwOGs4ZGtqTFI1cmF4aU0w?=
- =?utf-8?B?OElEWVB6b0F4dnlLbmtVaHlXNTl0NUlWRWJZWDRBWmtldXFrRXFGR2gwcnBW?=
- =?utf-8?B?QVJYdytWaldTeGltd2xreUxqS3ZFTmZVS0ovMzBiZ3cyeW5SSHR6NEhQZzBm?=
- =?utf-8?B?UDRoT2R2aDhRRmdENC9TTFdVdUdOZ3k3ZEZqUVYyMUNNcmVzbGtiRWpxQlcw?=
- =?utf-8?B?bVB4SWR0LzNKMHhzWWZkekFPY0dvbjFwdGZUNEMwSzkwUk9NRmlhRHlzcTFO?=
- =?utf-8?B?Q2V1RTdXMHBibnN1bGZ0VGdGOEJKK0hMUnhpMUVPWDR4UnhkT2pUUWo3RXNG?=
- =?utf-8?B?MXUrNmdWWkh3K2U1M2lzVDFMVjFvdTRLYWZqVWVaNDN6YlpUWkliMHRoWmJq?=
- =?utf-8?B?RHFGR1NURzJOeU5UV0xLYWwrejhpbFhsRHl4cDZiZmhXYU94VFlSclducnhs?=
- =?utf-8?B?K3Q1OWR4WENaTHBMSGRQY3IyY1BIVXZzOXVlUEJTU2pOR1kvbUNMTm5yWmtK?=
- =?utf-8?B?aXlHWUtlalZHVHptYmpuRlFrbW1TM1oyN1RyS21Eb05kTXdGdXFTZFZwRjA3?=
- =?utf-8?B?ZWxOL1VWc0lqb3J5TllraFptLzFrb0lRUDQveklHaC96UlFjc2tycTJ6alFT?=
- =?utf-8?B?b1hYRU5XV1VhRll0ZnBueTd0emtoV0lhWmZXT0R1b2RkMlVvUHhmSmtXZkFo?=
- =?utf-8?B?dzB1OUlnOXIvRHFCRGphcUd5YmJhVjROWU0xMlZaYVVmc0FIc0ozMEdiQ3Mw?=
- =?utf-8?B?SkZjZUVOcG1tdXNFTElYWk80SnZvS0xoZWIwb29HZC9qR0VNQ1hwTlJzLzJZ?=
- =?utf-8?B?R3V4N045L01xRjVOSWFWTXVaTmdEUE1uaTUvVjIza3FWVGl2TnlzcGtxKzUw?=
- =?utf-8?B?SkwvWVZ3WFpKMVptQVk1R2tUZHRvdUhINFNwUllqc2pNR3ZHVitYQ1ZnSVhO?=
- =?utf-8?B?SzRDeXVmN0tOaUNNRmg1dC90VTA0eFJmSXBNTDhqQ0tHQW1kWmtkRHROZDAz?=
- =?utf-8?B?b0M4Z25oaWJDblZiUFdWZW1NRGJvQW5rM3haN0xtbThCZFZEelFESm1Ea0lo?=
- =?utf-8?B?UWZ1RXRBSTJwb3QyOXJEODg0NFo4WWd3YmEzVkc1Y0IrTHlpUGxMTk5JUnBy?=
- =?utf-8?B?aXJFd2lqVVN2UFEvaG1ONkxQdHE0OFgyOCt2VnJjNW9aQ1dmSEV5b0JlYi9D?=
- =?utf-8?B?M3VYN2xWUE9QZVFIK21LMXNOWXRReEJzOEkzZTFsdUFzeHE4T2szLysvS1lq?=
- =?utf-8?B?UjBCWnhRY1pSa2Z4NWNEbW9LdTNYMDFQLzUvTlhRditnM2xwSXRkcjVYY2xI?=
- =?utf-8?Q?BbNCMidRpx8kePMMOL23HYC8VTvD+wG4n3?=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1b0024e-2777-4c9a-dcc8-08db93403107
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 10:06:51.2665
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: AwQ5szv3p8dEZvDB7k7hm9/W1gZ41I09posr28cCkebH/3mwaOw5d053g54Yi1d0ffDdMdQrRyBqu89+rxVMgS0zhYcqzduvlpWvBvTzK7s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR04MB8646
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
-dW1zaGlybkB3ZGMuY29tPg0K
+
+Ming Lei <ming.lei@redhat.com> writes:
+
+> On Wed, Jul 19, 2023 at 05:26:11PM +0800, Ming Lei wrote:
+>> On Fri, Jul 14, 2023 at 09:25:10AM +0200, Andreas Hindborg wrote:
+>> > From: Andreas Hindborg <a.hindborg@samsung.com>
+>> > 
+>> > Add zoned storage support to ublk: report_zones and operations:
+>> >  - REQ_OP_ZONE_OPEN
+>> >  - REQ_OP_ZONE_CLOSE
+>> >  - REQ_OP_ZONE_FINISH
+>> >  - REQ_OP_ZONE_RESET
+>> >  - REQ_OP_ZONE_APPEND
+>> > 
+>> > The zone append feature uses the `addr` field of `struct ublksrv_io_cmd` to
+>> > communicate ALBA back to the kernel. Therefore ublk must be used with the
+>> > user copy feature (UBLK_F_USER_COPY) for zoned storage support to be
+>> > available. Without this feature, ublk will not allow zoned storage support.
+>> > 
+>> > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+>> > ---
+>> 
+>> ...
+>> 
+>> > +/*
+>> > + * Construct a zone report. The report request is carried in `struct
+>> > + * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
+>> > + * and shall indicate the first zone of the report. The `nr_sectors` shall
+>> > + * indicate how many zones should be reported (divide by zone size to get number
+>> > + * of zones in the report) and must be an integer multiple of the zone size. The
+>> > + * report shall be delivered as a `struct blk_zone` array. To report fewer zones
+>> > + * than requested, zero the last entry of the returned array.
+>> > + */
+>> > +#define		UBLK_IO_OP_REPORT_ZONES		18
+>> 
+>> Actually, I meant the following delta change in V8 comment, then the UAPI
+>> looks more clean & readable wrt. reporting how many zones in UBLK_IO_OP_REPORT_ZONES
+>> and reusing ublksrv_io_cmd->addr.
+>> 
+>> Otherwise, this patchset looks fine.
+>> 
+>> 
+>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+>> index 5698f4575e05..454c852ed328 100644
+>> --- a/drivers/block/ublk_drv.c
+>> +++ b/drivers/block/ublk_drv.c
+>> @@ -70,7 +70,7 @@ struct ublk_rq_data {
+>>  	struct kref ref;
+>>  	__u64 sector;
+>>  	__u32 operation;
+>> -	__u32 nr_sectors;
+>> +	__u32 nr_zones;
+>>  };
+>>  
+>>  struct ublk_uring_cmd_pdu {
+>> @@ -335,7 +335,7 @@ static int ublk_report_zones(struct gendisk *disk, sector_t sector,
+>>  		pdu = blk_mq_rq_to_pdu(req);
+>>  		pdu->operation = UBLK_IO_OP_REPORT_ZONES;
+>>  		pdu->sector = sector;
+>> -		pdu->nr_sectors = zones_in_request * zone_size_sectors;
+>> +		pdu->nr_zones = zones_in_request;
+>>  
+>>  		ret = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
+>>  					GFP_KERNEL);
+>> @@ -404,7 +404,7 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
+>>  		switch (ublk_op) {
+>>  		case UBLK_IO_OP_REPORT_ZONES:
+>>  			iod->op_flags = ublk_op | ublk_req_build_flags(req);
+>> -			iod->nr_sectors = pdu->nr_sectors;
+>> +			iod->nr_zones = pdu->nr_zones;
+>>  			iod->start_sector = pdu->sector;
+>>  			return BLK_STS_OK;
+>>  		default:
+>> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+>> index 4d97eb0f7d13..602a788a650e 100644
+>> --- a/include/uapi/linux/ublk_cmd.h
+>> +++ b/include/uapi/linux/ublk_cmd.h
+>> @@ -249,11 +249,13 @@ struct ublksrv_ctrl_dev_info {
+>>  /*
+>>   * Construct a zone report. The report request is carried in `struct
+>>   * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
+>> - * and shall indicate the first zone of the report. The `nr_sectors` shall
+>> - * indicate how many zones should be reported (divide by zone size to get number
+>> - * of zones in the report) and must be an integer multiple of the zone size. The
+>> - * report shall be delivered as a `struct blk_zone` array. To report fewer zones
+>> - * than requested, zero the last entry of the returned array.
+>> + * and shall indicate the first zone of the report. The `nr_zones` shall
+>> + * indicate how many zones should be reported at most. The report shall be
+>> + * delivered as a `struct blk_zone` array. To report fewer zones than
+>> + * requested, zero the last entry of the returned array.
+>> + *
+>> + * So related definitions(blk_zone, blk_zone_cond, blk_zone_type, ...) in
+>> + * include/uapi/linux/blkzoned.h are part of ublk UAPI.
+>>   */
+>>  #define		UBLK_IO_OP_REPORT_ZONES		18
+>>  
+>> @@ -276,7 +278,10 @@ struct ublksrv_io_desc {
+>>  	/* op: bit 0-7, flags: bit 8-31 */
+>>  	__u32		op_flags;
+>>  
+>> -	__u32		nr_sectors;
+>> +	union {
+>> +		__u32		nr_sectors;
+>> +		__u32		nr_zones; /* for UBLK_IO_OP_REPORT_ZONES only */
+>> +	};
+>>  
+>>  	/* start sector for this io */
+>>  	__u64		start_sector;
+>> @@ -308,6 +313,12 @@ struct ublksrv_io_cmd {
+>>  	/*
+>>  	 * userspace buffer address in ublksrv daemon process, valid for
+>>  	 * FETCH* command only
+>> +	 *
+>> +	 * This field shouldn't be used if UBLK_F_USER_COPY is enabled,
+>> +	 * because userspace deals with data copy by pread()/pwrite() over
+>> +	 * /dev/ublkcN. But in case of UBLK_F_ZONED, 'addr' is re-used to
+>> +	 * pass back the allocated LBA for UBLK_IO_OP_ZONE_APPEND which
+>> +	 * actually depends on UBLK_F_USER_COPY
+>>  	 */
+>>  	__u64	addr;
+>
+> Or use union to cover zoned_append_lba, and we still need above
+> document about UBLK_F_USER_COPY & UBLK_F_ZONED uses.
+>
+> 	union {
+> 		__u64	addr;
+> 		__u64	zoned_append_lba;
+> 	}
+>
+
+Thanks, I'll add this to the next version.
+
+BR Andreas
