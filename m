@@ -2,112 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24FF3C001E0
-	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 14:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCDEC04A6A
+	for <linux-block@archiver.kernel.org>; Wed,  2 Aug 2023 15:13:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231915AbjHBOjI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 10:39:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40684 "EHLO
+        id S234261AbjHBPNv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 11:13:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234141AbjHBOjH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 10:39:07 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E68E0
-        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 07:39:05 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RGF1S07z7zVjm6;
-        Wed,  2 Aug 2023 22:37:16 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 2 Aug
- 2023 22:39:00 +0800
-From:   Yue Haibing <yuehaibing@huawei.com>
-To:     <philipp.reisner@linbit.com>, <lars.ellenberg@linbit.com>,
-        <christoph.boehmwalder@linbit.com>, <axboe@kernel.dk>
-CC:     <drbd-dev@lists.linbit.com>, <linux-block@vger.kernel.org>,
-        <yuehaibing@huawei.com>
-Subject: [PATCH -next] drbd: Remove unused function declarations
-Date:   Wed, 2 Aug 2023 22:38:57 +0800
-Message-ID: <20230802143857.33900-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        with ESMTP id S234221AbjHBPNs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 11:13:48 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0582D49
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 08:13:36 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id ca18e2360f4ac-790b6761117so32543939f.0
+        for <linux-block@vger.kernel.org>; Wed, 02 Aug 2023 08:13:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1690989215; x=1691594015;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aFN0yTkYJmRYBxe8C0crI4IHgD1XQCao320E85C1eJo=;
+        b=kp7n9nNtSk8/5HElDyrHrxdGYt7rv/xOLxBpQU+qG5wUj+aPhHFt7hOsgBNU+OETht
+         KWYQgN+RSSEkCSHwBiuIn2wqCn91pIcH/6WpiiodnA80qHVCbrbi7a5F7VrS1AWocpGX
+         lkpINsr9WOQxcFPAY8112JHDHuJNcmJ6kzBmZcak+HGIKh1mUfZlmlGg/fFYiljja8Iw
+         hOStezDZIgh7VUM+4wefm3ZdGRsulRhaUdKProubNLnmpS5r9xd7/3JvspGQR7Qmuo3D
+         jGBr6kX71aa/Ip9kVb1+ByoY7pLHM2YwhbYEQr92yRmJOnBOGLIpP3nmoti+KebJ98IT
+         YNZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690989215; x=1691594015;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aFN0yTkYJmRYBxe8C0crI4IHgD1XQCao320E85C1eJo=;
+        b=RmUMGu6Q7YME7QnWKvY4ykdBZYQheC1TPCd/TvrmS2VZTQmc3EQbMPpVGuxyoXA7Nw
+         sEqrc1cam7Nl0EPCqpVbb65o7K8iP52nkYJ5tRa5FYOEvBBgXk96I58lYEr7kPkjoouX
+         p5XNZjxX1kNDtNjG6vL5WBla0sfggYOYkO/82VS0Mmz/ikYaVDWucJivY7sZm0ezTXR/
+         UBK/dsmEWHDSXEEbtLmj97oySavPfSxOE1KHkY9OiIqlT0NQZrpgz/mIlK63gGv//aKj
+         1UPV+xr7OSWjZQAkGT7G+NGu9QP8b84YnbSt1ZoGMA3EbXEEzX3tc48ao6fhD6bxDklX
+         v0fA==
+X-Gm-Message-State: ABy/qLZP5PXYlcaXrruwVivLeg/LIGW+t2YUJFWgyBl+3RYOa1snAycw
+        XnpnPIr7FmmP3tElwg/ill2zsQ==
+X-Google-Smtp-Source: APBJJlGV0GWnRqN4nUuY2j+yBlsWFiPPK/hRERx9kc8EMoqN+d2kaqg0kL1v4ktlNGSiEvEAkXeswA==
+X-Received: by 2002:a05:6e02:4c4:b0:345:a3d0:f0d4 with SMTP id f4-20020a056e0204c400b00345a3d0f0d4mr12930279ils.3.1690989215175;
+        Wed, 02 Aug 2023 08:13:35 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id y8-20020a02a388000000b0042b46224650sm4293136jak.91.2023.08.02.08.13.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 08:13:34 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Christian Brauner <brauner@kernel.org>
+In-Reply-To: <20230801172201.1923299-2-hch@lst.de>
+References: <20230801172201.1923299-1-hch@lst.de>
+ <20230801172201.1923299-2-hch@lst.de>
+Subject: Re: [PATCH 1/6] fs: remove emergency_thaw_bdev
+Message-Id: <169098921438.7183.18231196765480619399.b4-ty@kernel.dk>
+Date:   Wed, 02 Aug 2023 09:13:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: YueHaibing <yuehaibing@huawei.com>
 
-Commit b411b3637fa7 ("The DRBD driver") declared but never implemented
-drbd_read_remote(), is_valid_ar_handle() and drbd_set_recv_tcq().
-And commit 668700b40a7c ("drbd: Create a dedicated workqueue for sending acks on the control connection")
-never implemented drbd_send_ping_wf().
+On Tue, 01 Aug 2023 19:21:56 +0200, Christoph Hellwig wrote:
+> Fold emergency_thaw_bdev into it's only caller, to prepare for buffer.c
+> to be built only when buffer_head support is enabled.
+> 
+> 
 
-Commit 2451fc3b2bd3 ("drbd: Removed the BIO_RW_BARRIER support form the receiver/epoch code")
-leave w_e_reissue() declaration unused.
+Applied, thanks!
 
-Commit 8fe605513ab4 ("drbd: Rename drbdd_init() -> drbd_receiver()")
-rename drbdd_init() and leave unsued declaration. Also drbd_asender() is removed in
-commit 1c03e52083c8 ("drbd: Rename asender to ack_receiver").
+[1/6] fs: remove emergency_thaw_bdev
+      commit: 4a8b719f95c0dcd15fb7a04b806ad8139fa7c850
+[2/6] fs: rename and move block_page_mkwrite_return
+      commit: 2ba39cc46bfe463cb9673bf62a04c4c21942f1f2
+[3/6] block: open code __generic_file_write_iter for blkdev writes
+      commit: 727cfe976758b79f8d2f8051c75a5ccb14539a56
+[4/6] block: stop setting ->direct_IO
+      commit: a05f7bd9578b17521a9a5f3689f3934c082c6390
+[5/6] block: use iomap for writes to block devices
+      commit: 487c607df790d366e67a7d6a30adf785cdd98e55
+[6/6] fs: add CONFIG_BUFFER_HEAD
+      commit: 925c86a19bacf8ce10eb666328fb3fa5aff7b951
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/block/drbd/drbd_int.h | 10 ----------
- 1 file changed, 10 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index a30a5ed811be..6e68e8bbad9c 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -297,10 +297,6 @@ struct drbd_epoch {
- 	unsigned long flags;
- };
- 
--/* Prototype declaration of function defined in drbd_receiver.c */
--int drbdd_init(struct drbd_thread *);
--int drbd_asender(struct drbd_thread *);
--
- /* drbd_epoch flag bits */
- enum {
- 	DE_HAVE_BARRIER_NUMBER,
-@@ -1388,9 +1384,6 @@ extern void conn_free_crypto(struct drbd_connection *connection);
- extern void do_submit(struct work_struct *ws);
- extern void __drbd_make_request(struct drbd_device *, struct bio *);
- void drbd_submit_bio(struct bio *bio);
--extern int drbd_read_remote(struct drbd_device *device, struct drbd_request *req);
--extern int is_valid_ar_handle(struct drbd_request *, sector_t);
--
- 
- /* drbd_nl.c */
- 
-@@ -1472,7 +1465,6 @@ extern int w_resync_timer(struct drbd_work *, int);
- extern int w_send_write_hint(struct drbd_work *, int);
- extern int w_send_dblock(struct drbd_work *, int);
- extern int w_send_read_req(struct drbd_work *, int);
--extern int w_e_reissue(struct drbd_work *, int);
- extern int w_restart_disk_io(struct drbd_work *, int);
- extern int w_send_out_of_sync(struct drbd_work *, int);
- 
-@@ -1486,7 +1478,6 @@ extern int drbd_issue_discard_or_zero_out(struct drbd_device *device,
- 		sector_t start, unsigned int nr_sectors, int flags);
- extern int drbd_receiver(struct drbd_thread *thi);
- extern int drbd_ack_receiver(struct drbd_thread *thi);
--extern void drbd_send_ping_wf(struct work_struct *ws);
- extern void drbd_send_acks_wf(struct work_struct *ws);
- extern bool drbd_rs_c_min_rate_throttle(struct drbd_device *device);
- extern bool drbd_rs_should_slow_down(struct drbd_peer_device *peer_device, sector_t sector,
-@@ -1502,7 +1493,6 @@ extern void __drbd_free_peer_req(struct drbd_device *, struct drbd_peer_request
- #define drbd_free_peer_req(m,e) __drbd_free_peer_req(m, e, 0)
- #define drbd_free_net_peer_req(m,e) __drbd_free_peer_req(m, e, 1)
- extern struct page *drbd_alloc_pages(struct drbd_peer_device *, unsigned int, bool);
--extern void drbd_set_recv_tcq(struct drbd_device *device, int tcq_enabled);
- extern void _drbd_clear_done_ee(struct drbd_device *device, struct list_head *to_be_freed);
- extern int drbd_connected(struct drbd_peer_device *);
- 
+Best regards,
 -- 
-2.34.1
+Jens Axboe
+
+
 
