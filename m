@@ -2,99 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44620C04A6A
-	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 11:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D39AEC41513
+	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 11:21:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232707AbjHCLOr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Aug 2023 07:14:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53370 "EHLO
+        id S235463AbjHCLVR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Aug 2023 07:21:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233764AbjHCLOq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 07:14:46 -0400
-Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E77E9B;
-        Thu,  3 Aug 2023 04:14:43 -0700 (PDT)
-Received: from dlp.unisoc.com ([10.29.3.86])
-        by SHSQR01.spreadtrum.com with ESMTP id 373BEBdF048295;
-        Thu, 3 Aug 2023 19:14:11 +0800 (+08)
-        (envelope-from Zhiguo.Niu@unisoc.com)
-Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
-        by dlp.unisoc.com (SkyGuard) with ESMTPS id 4RGmQf3WpJz2Nwpsg;
-        Thu,  3 Aug 2023 19:12:26 +0800 (CST)
-Received: from bj08434pcu.spreadtrum.com (10.0.73.87) by
- BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Thu, 3 Aug 2023 19:14:09 +0800
-From:   Zhiguo Niu <zhiguo.niu@unisoc.com>
-To:     <axboe@kernel.dk>, <bvanassche@acm.org>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <niuzhiguo84@gmail.com>, <zhiguo.niu@unisoc.com>,
-        <hongyu.jin@unisoc.com>, <yunlong.xing@unisoc.com>
-Subject: [PATCH] block/mq-deadline: use correct way to throttling write requests
-Date:   Thu, 3 Aug 2023 19:12:42 +0800
-Message-ID: <1691061162-22898-1-git-send-email-zhiguo.niu@unisoc.com>
-X-Mailer: git-send-email 1.9.1
+        with ESMTP id S234686AbjHCLVQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 07:21:16 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D624C13D;
+        Thu,  3 Aug 2023 04:21:12 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 982C91F45A;
+        Thu,  3 Aug 2023 11:21:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1691061671; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/oqdnU2hVSvQjG7zr7ybcm4vgtUzeJvEjdOgZyr5MDo=;
+        b=SshCa3at/QVqc2HIIpLg9LhDhKTreRaL2cZGX45vYwIeK3cx7PttlNBGYy6OudlZNlY9ra
+        MOv4rt6y4ZaVGS2gQBky7dhvCX5sAuEwxT7t0AG/xr4WPg3HrvCw3+qX5Fp1tt3Cecc/DQ
+        xnTqKiRxO3ni8MzYtqEIGMQIwjC94ag=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1691061671;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/oqdnU2hVSvQjG7zr7ybcm4vgtUzeJvEjdOgZyr5MDo=;
+        b=H+MFCeAyi3R3yXuvvMJFuzNpnCx698yyaUcPgHxx1B/25fIvZ6HmN/YfD5MBWOxvwIKJn3
+        LdjGjluOtzdqOXCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 85D45134B0;
+        Thu,  3 Aug 2023 11:21:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id C3WjIKeNy2SCLgAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 03 Aug 2023 11:21:11 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id D9E0FA076B; Thu,  3 Aug 2023 13:21:10 +0200 (CEST)
+Date:   Thu, 3 Aug 2023 13:21:10 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 05/12] ext4: make the IS_EXT2_SB/IS_EXT3_SB checks more
+ robust
+Message-ID: <20230803112110.7qybhrgn2rwaguu2@quack3>
+References: <20230802154131.2221419-1-hch@lst.de>
+ <20230802154131.2221419-6-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.0.73.87]
-X-ClientProxiedBy: SHCAS01.spreadtrum.com (10.0.1.201) To
- BJMBX02.spreadtrum.com (10.0.64.8)
-X-MAIL: SHSQR01.spreadtrum.com 373BEBdF048295
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230802154131.2221419-6-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The original formula was inaccurate:
-dd->async_depth = max(1UL, 3 * q->nr_requests / 4);
+On Wed 02-08-23 17:41:24, Christoph Hellwig wrote:
+> Check for sb->s_type which is the right place to look at the file system
+> type, not the holder, which is just an implementation detail in the VFS
+> helpers.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-For write requests, when we assign a tags from sched_tags,
-data->shallow_depth will be passed to sbitmap_find_bit,
-see the following code:
+Looks good. Feel free to add:
 
-nr = sbitmap_find_bit_in_word(&sb->map[index],
-			min_t (unsigned int,
-			__map_depth(sb, index),
-			depth),
-			alloc_hint, wrap);
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-The smaller of data->shallow_depth and __map_depth(sb, index)
-will be used as the maximum range when allocating bits.
+								Honza
 
-For a mmc device (one hw queue, deadline I/O scheduler):
-q->nr_requests = sched_tags = 128, so according to the previous
-calculation method, dd->async_depth = data->shallow_depth = 96,
-and the platform is 64bits with 8 cpus, sched_tags.bitmap_tags.sb.shift=5,
-sb.maps[]=32/32/32/32, 32 is smaller than 96, whether it is a read or
-a write I/O, tags can be allocated to the maximum range each time,
-which has not throttling effect.
-
-In addition, refer to the methods of bfg/kyber I/O scheduler,
-limit ratiois are calculated base on sched_tags.bitmap_tags.sb.shift.
-
-This patch can throttle write requests really.
-
-Fixes: 07757588e507 ("block/mq-deadline: Reserve 25% of scheduler tags for synchronous requests")
-
-Signed-off-by: Zhiguo Niu <zhiguo.niu@unisoc.com>
-
----
- block/mq-deadline.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 5839a027e0f0..7e043d4a78f8 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -620,8 +620,9 @@ static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)
- 	struct request_queue *q = hctx->queue;
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	struct blk_mq_tags *tags = hctx->sched_tags;
-+	unsigned int shift = tags->bitmap_tags.sb.shift;
- 
--	dd->async_depth = max(1UL, 3 * q->nr_requests / 4);
-+	dd->async_depth = max(1U, 3 * (1U << shift)  / 4);
- 
- 	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_depth);
- }
+> ---
+>  fs/ext4/super.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+> index c94ebf704616e5..193d665813b611 100644
+> --- a/fs/ext4/super.c
+> +++ b/fs/ext4/super.c
+> @@ -140,7 +140,7 @@ static struct file_system_type ext2_fs_type = {
+>  };
+>  MODULE_ALIAS_FS("ext2");
+>  MODULE_ALIAS("ext2");
+> -#define IS_EXT2_SB(sb) ((sb)->s_bdev->bd_holder == &ext2_fs_type)
+> +#define IS_EXT2_SB(sb) ((sb)->s_type == &ext2_fs_type)
+>  #else
+>  #define IS_EXT2_SB(sb) (0)
+>  #endif
+> @@ -156,7 +156,7 @@ static struct file_system_type ext3_fs_type = {
+>  };
+>  MODULE_ALIAS_FS("ext3");
+>  MODULE_ALIAS("ext3");
+> -#define IS_EXT3_SB(sb) ((sb)->s_bdev->bd_holder == &ext3_fs_type)
+> +#define IS_EXT3_SB(sb) ((sb)->s_type == &ext3_fs_type)
+>  
+>  
+>  static inline void __ext4_read_bh(struct buffer_head *bh, blk_opf_t op_flags,
+> -- 
+> 2.39.2
+> 
 -- 
-2.37.3
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
