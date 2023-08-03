@@ -2,140 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BC8C001DF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 00:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DBAEC001DE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 01:48:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230280AbjHCAIO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 20:08:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53804 "EHLO
+        id S229882AbjHCBsg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 21:48:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230085AbjHCAHt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 20:07:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8767F272B
-        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 17:06:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691021188;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=E4JlhFPikF+sSc4TfuvT2iSqBvcIXhfFcOmWT8+LXOA=;
-        b=Jm0DJbCe8KNATUcFtyborOcUk+PgPCyjjKQ5S0RpBenCDyzx1YtdRTV4Xw37BRzXowclgZ
-        P2OBrnCf4RZFsYfAhB1v8iJ4rk7Sfz8bA7hjOo1W0bNqW+visiJPh0Czp1TIrLrFKn1zM/
-        PeQd1gM976dSw+d2pGhHRVK0OhnCyDc=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-30-y-ZaeKMtPM2ckAmg_G7-VA-1; Wed, 02 Aug 2023 20:06:25 -0400
-X-MC-Unique: y-ZaeKMtPM2ckAmg_G7-VA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A16441C0782A;
-        Thu,  3 Aug 2023 00:06:24 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 86EBC112132D;
-        Thu,  3 Aug 2023 00:06:06 +0000 (UTC)
-Date:   Thu, 3 Aug 2023 08:06:00 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-Cc:     Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [PATCH v9 2/2] ublk: enable zoned storage support
-Message-ID: <ZMrvaE4FjdYya72P@fedora>
-References: <20230714072510.47770-1-nmi@metaspace.dk>
- <20230714072510.47770-3-nmi@metaspace.dk>
- <ZLfQjNK5j5lB68C/@x1-carbon>
- <87il9zot9c.fsf@metaspace.dk>
- <ZMkBbvb7EFyT/zGX@ovpn-8-18.pek2.redhat.com>
- <87a5v9pzx7.fsf@metaspace.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a5v9pzx7.fsf@metaspace.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+        with ESMTP id S231484AbjHCBsU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 21:48:20 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E672D62
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 18:48:18 -0700 (PDT)
+Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230803014815epoutp01bcf28919e4480463c6663abf0ba7dc63~3vF2pDX0F0501805018epoutp01g
+        for <linux-block@vger.kernel.org>; Thu,  3 Aug 2023 01:48:15 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230803014815epoutp01bcf28919e4480463c6663abf0ba7dc63~3vF2pDX0F0501805018epoutp01g
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1691027295;
+        bh=HgBY7lrPaWXKVOL88v/DbQ4RH1S1ZvplAdNDATbtocI=;
+        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+        b=N/n27RTeK1RwkQlyEVkB/TjRV7uKEtHMwTfRHQWR/4X4A/yOcnehS8hg9MLD6xdQ5
+         +YvRtZBjHLxQTVGVQV6oQCXI2TvY45QzzFF3qrpFCDJwIG8B9uNEnVJG/+LWOXtU1z
+         zAU08PDbO+tx5fsn5hLjOClNfRDkj4kbiP+n4dyw=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
+        20230803014814epcas2p29e71ca25cc489b9c720dee4b14ac3d78~3vF17XHeX1271112711epcas2p2k;
+        Thu,  3 Aug 2023 01:48:14 +0000 (GMT)
+Received: from epsmges2p3.samsung.com (unknown [182.195.36.101]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4RGWvf3MQjz4x9Px; Thu,  3 Aug
+        2023 01:48:14 +0000 (GMT)
+X-AuditID: b6c32a47-9cbff70000007f5e-e0-64cb075e5051
+Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+        0F.93.32606.E570BC46; Thu,  3 Aug 2023 10:48:14 +0900 (KST)
+Mime-Version: 1.0
+Subject: RE:(2) [PATCH v2 3/4] bio-integrity: cleanup adding integrity pages
+ to bip's bvec
+Reply-To: j-young.choi@samsung.com
+Sender: Jinyoung Choi <j-young.choi@samsung.com>
+From:   Jinyoung Choi <j-young.choi@samsung.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "chaitanya.kulkarni@wdc.com" <chaitanya.kulkarni@wdc.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <ZMjYYtXgzn86UIF8@infradead.org>
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20230803014814epcms2p3ed3f8a7e5f53e98d0acf478617445aee@epcms2p3>
+Date:   Thu, 03 Aug 2023 10:48:14 +0900
+X-CMS-MailID: 20230803014814epcms2p3ed3f8a7e5f53e98d0acf478617445aee
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-CPGSPASS: Y
+X-CPGSPASS: Y
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBJsWRmVeSWpSXmKPExsWy7bCmuW4c++kUg4+TpCxW3+1ns5h1+zWL
+        xctDmhanJyxisph06Bqjxd5b2haXd81hs1h+/B+TxbrX71kcOD3O39vI4rF5hZbH5bOlHptW
+        dbJ5fHx6i8Wjb8sqRo/Pm+Q82g90MwVwRGXbZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjq
+        GlpamCsp5CXmptoqufgE6Lpl5gDdpqRQlphTChQKSCwuVtK3synKLy1JVcjILy6xVUotSMkp
+        MC/QK07MLS7NS9fLSy2xMjQwMDIFKkzIzmh9fYypYCZ7RcuLGcwNjBvZuhg5OSQETCS2bnzF
+        0sXIxSEksINR4nZHI1MXIwcHr4CgxN8dwiA1wgIxEque72AGsYUElCTOrZnFCBE3kGi53cYC
+        YrMJ6EnseL6bHcQWEdCUuLW8nRlkJrPAZyaJmY2XmSCW8UrMaH/KAmFLS2xfvhVsEKeArsTb
+        lZ1QB2lI/FjWywxhi0rcXP2WHcZ+f2w+I4QtItF67yxUjaDEg5+7oeKSEocOfWUDuV9CIF9i
+        w4FAiHCNRNuv91Dl+hLXOjaCncAr4CvxpfkKI0g5i4CqRMdXbYgSF4nTG7aBXcMsoC2xbOFr
+        ZpASZqC31u/ShxiuLHHkFgtEBZ9Ex+G/7DD/NWz8jZW9Y94TJohWNYlFTUYTGJVnIUJ5FpJV
+        sxBWLWBkXsUollpQnJueWmxUYAyP2OT83E2M4CSq5b6DccbbD3qHGJk4GA8xSnAwK4nwSv8+
+        niLEm5JYWZValB9fVJqTWnyI0RTox4nMUqLJ+cA0nlcSb2hiaWBiZmZobmRqYK4kznuvdW6K
+        kEB6YklqdmpqQWoRTB8TB6dUA1Pm1BOFnNrHjh+ZMberpKxt3epJony9wR2mP+YJdnHOtdf8
+        0H/96eRo/l+zvQUuWejcNHp8+dCT5llKmR9M8jQeWT9wrru8LVS+YE8Dw+Sv9rZWTvNsrj8L
+        27okwWh276oy7wtLb1b9vrnqS6jLzc27xdZ9/B1xq8AiJEmg9KQUf0DC5bwfX5MOr1p4u9T/
+        4tmyX86Ls44EcL1vLD+waJpov4PUUwE5l5cTeR99Yc1Q4bp8Kl9+MvvZhSrLwyuPbKhp2812
+        hNXznuPjhJDYIzavHsrxMd/SmHaeo1F4l/Qc7lDm8JPLmr64r5qzvvDE3qZ1kv5Cmzc8Ld/g
+        WMgVZHlk/sRoVauqGY82rtLVPiSmxFKckWioxVxUnAgAjm6LRisEAAA=
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5
+References: <ZMjYYtXgzn86UIF8@infradead.org>
+        <20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5@epcms2p5>
+        <20230731125459epcms2p177a5cc5caa7ef0a9de35689e96558f43@epcms2p1>
+        <CGME20230731124710epcms2p55b4d1a163b5ee6f15d96bf07817e12a5@epcms2p3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 02, 2023 at 11:09:56AM +0200, Andreas Hindborg (Samsung) wrote:
-> 
-> Ming Lei <ming.lei@redhat.com> writes:
-> 
-> > On Tue, Aug 01, 2023 at 02:11:56PM +0200, Andreas Hindborg (Samsung) wrote:
-> >> 
-> >> Niklas Cassel <Niklas.Cassel@wdc.com> writes:
-> >> 
-> >> > On Fri, Jul 14, 2023 at 09:25:10AM +0200, Andreas Hindborg wrote:
-> >> >> From: Andreas Hindborg <a.hindborg@samsung.com>
-> >> >
-> >> > Hello Andreas!
-> >> >
-> >> 
-> >> <snip>
-> >> 
-> >> >>  	/* for READ request, writing data in iod->addr to rq buffers */
-> >> >> @@ -1120,6 +1404,11 @@ static void ublk_commit_completion(struct ublk_device *ub,
-> >> >>  	/* find the io request and complete */
-> >> >>  	req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
-> >> >>  
-> >> >> +	if (io->flags & UBLK_IO_FLAG_ZONE_APPEND) {
-> >> >
-> >> > Do we really need to introduce a completely new flag just for this?
-> >> >
-> >> > if (req_op(req) == REQ_OP_ZONE_APPEND)
-> >> >
-> >> > should work just as well, no?
-> >> 
-> >> Makes sense, thanks.
-> >
-> > The above one can be replaced with req_op().
-> >
-> > But extra cost is added when retrieving request for the check in
-> > __ublk_ch_uring_cmd().
-> >
-> 
-> How about this (diff to v9):
-> 
-> @@ -1709,7 +1702,7 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
->  		goto out;
->  
->  	if (ublk_support_user_copy(ubq) &&
-> -	    !(io->flags & UBLK_IO_FLAG_ZONE_APPEND) && ub_cmd->addr) {
-> +	    _IOC_NR(cmd_op) != UBLK_IO_COMMIT_AND_FETCH_REQ && ub_cmd->addr) {
->  		ret = -EINVAL;
->  		goto out;
->  	}
-
-Let's merge the above original user_copy check into 'case UBLK_IO_FETCH_REQ' &
-'case UBLK_IO_COMMIT_AND_FETCH_REQ' first, then this patch can be cleaner, which
-can be done as one prep change for zoned support.
-
-> @@ -1751,6 +1744,12 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
->  		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
->  			goto out;
->  
-> +		if (ublk_support_user_copy(ubq) &&
-> +		    req_op(req) != REQ_OP_ZONE_APPEND && ub_cmd->addr) {
-> +			ret = -EINVAL;
-> +			goto out;
-> +		}
-> +
-
-Given request is available for UBLK_IO_COMMIT_AND_FETCH_REQ, this approach is
-good, and UBLK_IO_FETCH_REQ cmd doesn't have OP.
-
-
-Thanks,
-Ming
-
+> On Mon, Jul 31, 2023 at 09:54:59PM +0900, Jinyoung Choi wrote:
+> > The bio_integrity_add_page() returns the set length if the execution
+> > result is successful. Otherwise, return 0.
+> >=20
+> > Unnecessary if statement was removed. And when the result value was les=
+s
+> > than the set value, it was changed to failed.
+>=20
+> Maybe word this as
+>=20
+> bio_integrity_add_page() returns the add length if successful, else 0,
+> just as bio_add_page.=C2=A0=20Simply=20check=20return=20value=20checking=
+=20in=0D=0A>=20bio_integrity_prep=20to=20not=20deal=20with=20a=20>=200=20bu=
+t=20<=20len=20case=20that=20can't=0D=0A>=20happen.=0D=0A>=20=0D=0A>=20Other=
+wise=20looks=20good:=0D=0A>=20=0D=0A>=20Reviewed-by:=20Christoph=20Hellwig=
+=20<hch=40lst.de>=0D=0A=0D=0AHi,=20Christoph.=0D=0AThank=20you=20for=20your=
+=20review.=20I=20will=20update=20comment=20soon=21=0D=0A=0D=0ABest=20Regard=
+s,=0D=0AJinyoung.
