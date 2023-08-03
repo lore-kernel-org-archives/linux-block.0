@@ -2,97 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C60FCC001DB
-	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 21:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B787AC001DF
+	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 21:32:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229733AbjHCVVq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Aug 2023 17:21:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41224 "EHLO
+        id S230072AbjHCVcn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Aug 2023 17:32:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbjHCVVp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 17:21:45 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 141B5211E
-        for <linux-block@vger.kernel.org>; Thu,  3 Aug 2023 14:21:43 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-112-100.bstnma.fios.verizon.net [173.48.112.100])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 373LLe7Z001074
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 3 Aug 2023 17:21:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1691097701; bh=qcpzbiRuVKSH4bm+vKqPl11/5eCczz1lb6g5muV3MG0=;
-        h=From:Subject:Date:Message-Id:MIME-Version;
-        b=GEPH4kCKryRf2gdBrgnXPK2FOE/NZE47zTxr8E/W4X8HSrbtLjp3vCYnAL42CyTg4
-         XBZvkrW6ySrYdyh05AvH+lMrhxdjVUXEUtCfQfWDg63qtCDZa+MHBRkHVbhv9i2k5+
-         RZYWylfAX4Mi2xDyBXNRYCE/b6oNiaOW0egO/bz95FBXv29IM/MM5DRhjeGCK9M9sm
-         kg+pgyA8a80r6HHbxRyazYmECzOEAOCUCcorX2MxjfRJEWQnlzh/CuNjtsAev+Re+l
-         yAhB5Pcvwfo2KHRmM450vq731usL2fKSW24U6Yt+VbUSXzOrqOSENn+7yOAGANmFMH
-         cqNbkqFiz0mvA==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 2388515C04F1; Thu,  3 Aug 2023 17:21:40 -0400 (EDT)
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     linux-block@vger.kernel.org
-Cc:     "Theodore Ts'o" <tytso@mit.edu>
-Subject: [PATCH blktests] src/Makefile: fix static linking of miniublk
-Date:   Thu,  3 Aug 2023 17:20:52 -0400
-Message-Id: <20230803212052.1173449-1-tytso@mit.edu>
-X-Mailer: git-send-email 2.31.0
+        with ESMTP id S229534AbjHCVcm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 17:32:42 -0400
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F6F62D4C;
+        Thu,  3 Aug 2023 14:32:40 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailout.west.internal (Postfix) with ESMTP id 890E332005CA;
+        Thu,  3 Aug 2023 17:32:38 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Thu, 03 Aug 2023 17:32:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dustymabe.com;
+         h=cc:cc:content-transfer-encoding:content-type:content-type
+        :date:date:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to;
+         s=fm1; t=1691098357; x=1691184757; bh=eLWv24SU4JBoezYsr2cBSZuCW
+        tzURtwoHCJ79k+/ThY=; b=EoAwEneRS1Q3qrgohOWIz3LCTx+pYd6hfkWB/X3/H
+        UI4mNR0oHhGpKs+/oqeumswx7qvygco6TqruEbF7taSX30I6rxPToeiTfeMIIm6G
+        YjJi0pFDvLx2tSZFLlIp02+5Bhl34MEYpZo6vyY0aR9fsGM9mxyQOKp1qvcklPXx
+        Mz2oCZqW7U6nxZsun/6yUgSzd5dDSw+XDsVB4dsQMv/EiOyH1odzEC6aW7hgSRnx
+        /jaWZlkwZ4sZzt0csYSLnxJqQt5IDBYyylSOtdmoxQ6SJMpsMoknheHlGqrcO2QU
+        AbuwAYGbeBBn9Vw/JpLuiEVxwLSiyLjLQH43wbEAmuTIA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:content-type:date:date:feedback-id:feedback-id
+        :from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+        1691098357; x=1691184757; bh=eLWv24SU4JBoezYsr2cBSZuCWtzURtwoHCJ
+        79k+/ThY=; b=aEIe+UJ4xDH3Qv3CHJNWzaM/Xvpr3yuAWucX6yi9DVCn0W3nEE0
+        erpMIEmRmENsglMml6nBZf0HkMvNAlHtR3bR9eGV8T1+LzIvYJD1M2IuvqbTFOX1
+        6+UQGt61JG9VXX2+zyU4/3Lq9Fb94js6vRCrqasDTa4rPxFc95q3gFSbL7d0ONe2
+        1RjkIudibS4GO4le2k1BK4sJv/MRwNHMZ/9JrNoS1VmJatyaA4RrwOO1bvggv5c6
+        v3SgqGaCUwbbBzHiR7oIXOBbhh+xfUpCmW4LMPiVKAvy5HpSYL8/H+IlUycJVCXM
+        zDazKRAYKzsvx1MroKP6bPV1gjstVPL146A==
+X-ME-Sender: <xms:9RzMZIf7Jbz5CLpXIZF9W-px4vZu0mpqhneeTpAQY_epZjH1LpB7zA>
+    <xme:9RzMZKN-kXZZ5Mi_O_JY9f3kDB7NcA_ZIoXgoNBB2UAB9rJXAFEOVJO_81fJczO30
+    6QhmObpvbL8CKsf_xA>
+X-ME-Received: <xmr:9RzMZJi1XUNPzmdyvdmX7X71YghEK0e_cVm0J6rZkzhZwfH7ng6t_P_ounICbSrQkQ49>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkedvgdduiedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepkfffgggfuffhvfevfhgjtgfgsehtjeertddtfeejnecuhfhrohhmpeffuhhs
+    thihucforggsvgcuoeguuhhsthihseguuhhsthihmhgrsggvrdgtohhmqeenucggtffrrg
+    htthgvrhhnpedtueeltdfgfffftddttdduffekueegffehteevudduheduleegtedtffev
+    hfduueenucffohhmrghinhepfhgvughorhgrphhrohhjvggtthdrohhrghenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpeguuhhsthihseguuhhs
+    thihmhgrsggvrdgtohhm
+X-ME-Proxy: <xmx:9RzMZN9NEF0b4kfvzL2vxJu1VxAcNxMKPS_zAUgQS_Vx5f-dQph5UQ>
+    <xmx:9RzMZEtGv63Nq8YJgACCp-LFj86T8yeuRAzOm37Ro2VkBJUU1p-1Eg>
+    <xmx:9RzMZEHsoitt8pGYHFBsTr0ZhLLeypqfF5v23598MzUmhj8GrFsAiw>
+    <xmx:9RzMZCA0xVZAQ4E32lOUVL8f_O_AaudfV4yMy7Okuqjhu8lSGbMAwQ>
+Feedback-ID: i13394474:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 3 Aug 2023 17:32:36 -0400 (EDT)
+Message-ID: <a0f05188-d142-82f2-74aa-6c9a6ae2bbc9@dustymabe.com>
+Date:   Thu, 3 Aug 2023 17:32:35 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: XFS metadata CRC errors on zram block device on ppc64le
+ architecture
+Content-Language: en-US
+From:   Dusty Mabe <dusty@dustymabe.com>
+To:     Hannes Reinecke <hare@suse.de>, wq@lst.de
+Cc:     Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Andrew Morton <akpm@linux-foundation.org>, marmijo@redhat.com
+References: <b2d40565-7868-ba15-4bb1-fca6f0df076b@dustymabe.com>
+ <20230802094106.GA28187@lst.de>
+ <3f36882c-b429-3ece-989b-a6899c001cbd@suse.de>
+ <43843fec-f30a-1edc-b428-1d38ddb1050f@dustymabe.com>
+In-Reply-To: <43843fec-f30a-1edc-b428-1d38ddb1050f@dustymabe.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When using static linking, the libraries need to be placed after the
-.o or .c files so they are searched.  Otherwise, the build will fail:
 
-cc -O2 -Wall -Wshadow  -DHAVE_LINUX_BLKZONED_H  -D_GNU_SOURCE -lpthread -luring -o miniublk miniublk.c
-/bin/ld: /tmp/ccfjiUvb.o: in function `ublk_ctrl_init':
-miniublk.c:(.text+0xaeb): undefined reference to `io_uring_queue_init_params'
-/bin/ld: /tmp/ccfjiUvb.o: in function `ublk_queue_deinit':
-miniublk.c:(.text+0xb73): undefined reference to `io_uring_unregister_ring_fd'
-/bin/ld: miniublk.c:(.text+0xb85): undefined reference to `io_uring_unregister_files'
-/bin/ld: /tmp/ccfjiUvb.o: in function `ublk_io_handler_fn':
-miniublk.c:(.text+0xd62): undefined reference to `io_uring_queue_init_params'
-/bin/ld: miniublk.c:(.text+0xd77): undefined reference to `io_uring_register_ring_fd'
-/bin/ld: miniublk.c:(.text+0xd8c): undefined reference to `io_uring_register_files'
-/bin/ld: miniublk.c:(.text+0xe94): undefined reference to `io_uring_submit_and_wait_timeout'
-/bin/ld: /tmp/ccfjiUvb.o: in function `__ublk_ctrl_cmd':
-miniublk.c:(.text+0x14a6): undefined reference to `io_uring_submit'
-/bin/ld: miniublk.c:(.text+0x1533): undefined reference to `__io_uring_get_cqe'
-collect2: error: ld returned 1 exit status
-make: *** [Makefile:61: miniublk] Error 1
 
-Fixes: d42fe976 ("src: add mini ublk source code")
-Signed-off-by: Theodore Ts'o <tytso@mit.edu>
----
- src/Makefile | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+On 8/2/23 08:00, Dusty Mabe wrote:
+> 
+> 
+> On 8/2/23 07:03, Hannes Reinecke wrote:
+>> On 8/2/23 11:41, Christoph Hellwig wrote:
+>>> On Tue, Aug 01, 2023 at 11:31:37PM -0400, Dusty Mabe wrote:
+>>>> We ran a kernel bisect and narrowed it down to offending commit af8b04c6:
+>>>>
+>>>> ```
+>>>> [root@ibm-p8-kvm-03-guest-02 linux]# git bisect good
+>>>> af8b04c63708fa730c0257084fab91fb2a9cecc4 is the first bad commit
+>>>> commit af8b04c63708fa730c0257084fab91fb2a9cecc4
+>>>> Author: Christoph Hellwig <hch@lst.de>
+>>>> Date:   Tue Apr 11 19:14:46 2023 +0200
+>>>>
+>>>>      zram: simplify bvec iteration in __zram_make_request
+>>>>      
+>>>>      bio_for_each_segment synthetize bvecs that never cross page boundaries, so
+>>>>      don't duplicate that work in an inner loop.
+>>>
+>>>> Any ideas on how to fix the problem?
+>>>
+>>> So the interesting cases are:
+>>>
+>>>    - ppc64 usually uses 64k page sizes
+>>>    - ppc64 is somewhat cache incoherent (compared to say x86)
+>>>
+>>> Let me think of this a bit more.
+>>
+>> Would need to be confirmed first that 64k pages really are in use
+>> (eg we compile ppc64le with 4k page sizes ...).
+>> Dusty?
+>> For which page size did you compile your kernel?
+> 
+> 
+> For Fedora the configuration is to enable 64k pages with CONFIG_PPC_64K_PAGES=y
+> https://src.fedoraproject.org/rpms/kernel/blob/064c1675a16b4d379b42ab6c3397632ca54ad897/f/kernel-ppc64le-fedora.config#_4791
+> 
+> I used the same configuration when running the git bisect.
 
-diff --git a/src/Makefile b/src/Makefile
-index 1365480..c902649 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -39,7 +39,8 @@ CONFIG_DEFS := $(call HAVE_C_HEADER,linux/blkzoned.h,-DHAVE_LINUX_BLKZONED_H)
- override CFLAGS   := -O2 -Wall -Wshadow $(CFLAGS) $(CONFIG_DEFS)
- override CXXFLAGS := -O2 -std=c++11 -Wall -Wextra -Wshadow -Wno-sign-compare \
- 		     -Werror $(CXXFLAGS) $(CONFIG_DEFS)
--MINIUBLK_FLAGS :=  -D_GNU_SOURCE -lpthread -luring
-+MINIUBLK_FLAGS :=  -D_GNU_SOURCE
-+MINIUBLK_LIBS := -lpthread -luring
- LDFLAGS ?=
- 
- all: $(TARGETS)
-@@ -58,6 +59,7 @@ $(CXX_TARGETS): %: %.cpp
- 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
- 
- $(C_MINIUBLK): %: miniublk.c
--	$(CC) $(CFLAGS) $(LDFLAGS) $(MINIUBLK_FLAGS) -o $@ miniublk.c
-+	$(CC) $(CFLAGS) $(LDFLAGS) $(MINIUBLK_FLAGS) -o $@ miniublk.c \
-+		$(MINIUBLK_LIBS)
- 
- .PHONY: all clean install
--- 
-2.31.0
+Naive question from my side: would this be a candidate for reverting while we investigate the root cause?
+
+Dusty
+
 
