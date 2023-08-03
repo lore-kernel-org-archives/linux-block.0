@@ -2,157 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5239C001DF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 03:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38729C00528
+	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 08:31:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233665AbjHCDZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 23:25:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51020 "EHLO
+        id S234630AbjHCIbw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Aug 2023 04:31:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233815AbjHCDY5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 23:24:57 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2052.outbound.protection.outlook.com [40.107.243.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B9C03ABE
-        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 20:24:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iCBjpB2lLe4+D7M8kZUwB9u84OK2TGRWYwZXIcsXcDQc0E0RLlPBjqeLBd/x9SrjKelfCMaY0+FJroM7xq5ZZNNrDpXqWvDv8iSf2QxsWMh7aHdeKonZXP1X/yxdixfRm3WBpT1wZqrrqEPE+xCQ07UXayhXmG6agtN3/1ZdE2qh5y6NJ3J9k5plYUJ9FBcv5tsWOtIxONDo02z3DJBTPZsjNDmjSpKY16CsQ2KHbhwvbwsC0JBAvg68NmWwj1xnnV8PbaR8Xb2rDZO19/67NIh2O2OLiUDCHEauulLVpsCSBA+zI9B8mFiNIGJWAsyQnQ6qzoY7JS97roRc4k+UIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JFNlFij2HT0XtUuB5yHM6Fy0yATdW8XEpQFwtoDE9JE=;
- b=ljDUoO8SbYLje8FI9+fNB3zzT9D4XrdKmjVhnXJyBq5h7LAHaigr+af6COdqq1wJFApH0C7ZeaiW7Q+M7iBp/Cwe8R18Mtw87DbV5C5GoWiXTjflM9NbSHOe0pL56Wdrdqkk6/A92r068cYhh9E+mZ3N2ch3WmnyRDaEcE7QnroNOuWcB+wDwHqYr5wM9mkntjhAwp73QaS711BectL3/VCVAGqnv6Uz59s6u5ZLw+Jy6zTnT8EE0MlAdkFyRL0pf8jZig+89mIsVzTpTOr85ik+7HfmYz9goUIAM8KBDhwilqMgWOL8AOOi2QXP3ppLx1b5olsXS+StagWKvjh7aw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JFNlFij2HT0XtUuB5yHM6Fy0yATdW8XEpQFwtoDE9JE=;
- b=X9ZKhp++iXByi9dHjZySyrdnmLp2sq07ueM4PA4HwerKLhlbWKUu1RJdonfb2lXT4et+fJf4gnrcB0tXldnF8rwJHsJ8Btc7a6OD+Y+hx3HeYBrM8Bf06HtwfIqOLFbmYpANVDSnAFXK9tZh5UbRv3p6wubdEmE5KdmXLu69biomP5hm+LuVTO0T59b4O4msG62+7ZGEysJ+Ykh7kUlBhKbdMa1qYoGNPJU2FQ1+Fwlbq8UiL0quM7OuEDb1PkCfVgzjjJswFSqMHRWo5fBb239Ah5RJq0VyPkwgqC0Pk3zrbyr7dZ0EKFF+WYGQNG9d7NEL9YDzOU+nQVe8zhxw2w==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by BY5PR12MB4903.namprd12.prod.outlook.com (2603:10b6:a03:1d6::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Thu, 3 Aug
- 2023 03:24:36 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::c3cf:2236:234b:b664]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::c3cf:2236:234b:b664%4]) with mapi id 15.20.6631.046; Thu, 3 Aug 2023
- 03:24:36 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Jeff Moyer <jmoyer@redhat.com>, Christoph Hellwig <hch@lst.de>
-CC:     "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-        "vishal.l.verma@intel.com" <vishal.l.verma@intel.com>,
-        "dave.jiang@intel.com" <dave.jiang@intel.com>,
-        "ira.weiny@intel.com" <ira.weiny@intel.com>,
-        "nvdimm@lists.linux.dev" <nvdimm@lists.linux.dev>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH V2 1/1] pmem: set QUEUE_FLAG_NOWAIT
-Thread-Topic: [PATCH V2 1/1] pmem: set QUEUE_FLAG_NOWAIT
-Thread-Index: AQHZxADrXE+/yvq5u06qlYmjeW0Jd6/Vjqw1gAALsYCAAB0cXoAAgQeAgAC5pQCAAC/hhoAAygWA
-Date:   Thu, 3 Aug 2023 03:24:36 +0000
-Message-ID: <2466cca2-4cc6-9ac2-d6cd-cded843c44be@nvidia.com>
-References: <20230731224617.8665-1-kch@nvidia.com>
- <20230731224617.8665-2-kch@nvidia.com>
- <x491qgmwzuv.fsf@segfault.boston.devel.redhat.com>
- <20230801155943.GA13111@lst.de>
- <x49wmyevej2.fsf@segfault.boston.devel.redhat.com>
- <0a2d86d6-34a1-0c8d-389c-1dc2f886f108@nvidia.com>
- <20230802123010.GB30792@lst.de>
- <x49o7jpv50v.fsf@segfault.boston.devel.redhat.com>
-In-Reply-To: <x49o7jpv50v.fsf@segfault.boston.devel.redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|BY5PR12MB4903:EE_
-x-ms-office365-filtering-correlation-id: a57ca032-1e0b-4432-2ffb-08db93d129f5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ADdDZrQz6AoQ7RWgofs9n6Uh5Y7cjLVVKto3aoKe3YM4WU1v6o7WY+9coRSAy6iAhkiaeZvjoN43XJxPQAGP+Bt4pl26s/NmiO+WCud9eeMCeaSEaviK1kwzOzLr84XQgUngPyDXyshkzSi6N3qV/EtBWjZYk79ptZsfLm8LempezJdqmcM/r9ZfdnOrdM5L64huCcuLQcKGXRIAsUct3gLbuy7nPCyye8vrmWZ/GguaonFd/SOgBV0tlHw6XUSNOroSi3aPSYeCxodz4mU2ZweV4k+qQjpZLyBTBAthudsgvuHASEC5G0J2qzstRRTAyXBei2vJk1LbsmaUwTpITqmYrgcXo7cGEy2cFWW+WycJEaIUMzm3vzJONA6Zm93dw7sU2Rhirkn5zDGGa2RzJWTIYyM4csVNycq4M/bt+fHw2B0DQIyicnPdoQ6U/f/AFg6aJityQMhem6Vq/d9XVJC/49gEmNeuS8DNyoqv9U84qh9jn2BuqZJihslX6yAk0OtKjjdFC8se0ovRHGaHkQTNz4t4OHsNREYFKu/puPoKGbGaTqXrPwhqkebErLkkvJTyd0sPiAn/8We/EcBSCXFSy+kxcQBzzS06fnhj4vaSXcFXny7BfnDRgY3KizD2rL8Eo+VrqJ41xOGmi1S2bQythBdtnBUclGFEGErTf5/4VER5mgIoNsl3TGwB7Mly
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(366004)(136003)(376002)(396003)(451199021)(2616005)(186003)(6512007)(316002)(86362001)(478600001)(54906003)(122000001)(38100700002)(110136005)(66556008)(66476007)(91956017)(66446008)(66946007)(6486002)(71200400001)(76116006)(31696002)(4326008)(64756008)(53546011)(6506007)(36756003)(41300700001)(26005)(5660300002)(8676002)(8936002)(2906002)(66899021)(38070700005)(83380400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RmkrWkkxRTBSd3FzTi9qamZPSUVCSFQzOGhNOUd0clNiRyt0Z0pzSnl3bkh1?=
- =?utf-8?B?SWZjOVRHb0s0UHhvcHpQYXZTV3Nmc0hZdDlHUUc0VUY1eWY1L2praGlQSDQy?=
- =?utf-8?B?WG16OW9YaVBZWnJZKy9nMWRTckxzazhEZW0yanFDNEtLMXFnVElxSGxib0c0?=
- =?utf-8?B?OWlrbm9sMXkrVSsvMWRxVGZTbXJobW5vZDk1WDU5OFZXY2JVK1VYb2IyZW84?=
- =?utf-8?B?VWtsRlNBWnhBL01PRlRJU3UxY1JvS1d3VEdHMTVucUJwVEU4YmIxbGNmTi9v?=
- =?utf-8?B?Z3pWL0MvejNuL1BFOUtrM1ZnenJ5ekhQV0QraTJLNm5EZjRLcmM1LytSWDNR?=
- =?utf-8?B?N2l3YzdBbitDcWo4dmlvMjNNZ1VZeE56ekloeWV0cTNicGoya2dGRmQzQWwr?=
- =?utf-8?B?blUzVHh0VlZCRHg2WnhHQm1JWmV4VFVGemwyc0ZYU0FBOGtTenYwNlF2anRU?=
- =?utf-8?B?amdhSnJqcjZBTXFCN3kxSGMyUVZ0eTNrallTdTFNSlJDZC9yRVAyMTJtdThE?=
- =?utf-8?B?WE5YckNUNVFmb0k4M0kyTVVsQ0NONjRhSHlKdi8ySjdlUnpzWHd1ZGNZY0c2?=
- =?utf-8?B?L1krVTNONjhsYi81NjJvajd3WUFybENvQUh5ZGpwTENuS3dXQ3RUbkM5emd5?=
- =?utf-8?B?S2lsRDJmRHk3cFhtZXZNYlZnM1F1ck05a2VEY3M4ZitpSTVSM0h6dGJWSWR0?=
- =?utf-8?B?d0Y0UStFUjBESDlZdk9KY1RWSkQ3VWlpN0NLYWhwSjVPblAxQUdwZUhsWjFx?=
- =?utf-8?B?d2FtVVRaa0V4amVYSTFLWVE3WTgxUUpYbVRIY0VuUWJGWlo0cjVHYUcwZVlL?=
- =?utf-8?B?UlVFVGlNdVpDRFRKd3FubnllU2Fyd2xkZmI1bU1wQWlneERNRUZCVy9jRU93?=
- =?utf-8?B?S3NLTERJRXZQN1o4dWEvOFRiOURad2MzRis4WTFYTGQ1dHREd2xpbkJaQ043?=
- =?utf-8?B?Vy93Rk92Z0N4MUNCVzAvRGFORlFGWnV5VUlTOHRibzlsWEN2OFNneWlLUURt?=
- =?utf-8?B?Ukh5RE53ZUpPay9uN2FDU0ZZcTFxZGtSTmYwNXFCT2lpRTZ1Wi9zY0tuRlEy?=
- =?utf-8?B?c3FUZ0F1M2E3YVh1eWFTdGorUXRoZWFVYmo0VDVHOFpuK1JoUjk4ajlyVVNz?=
- =?utf-8?B?eG56ajdTZUpvMTlVdlRaMmJ3bDJOcHZyU01RbXhUS3FHTVdRMm1RVFZPcW1r?=
- =?utf-8?B?Q2RTS0l0YlFocTNDMktOSW4xMzA5RmtkWVUva1p5OU8zdURVdTh0bUdWYzEy?=
- =?utf-8?B?VDZZd1lUVzQ4WTlraERTWmNJbGdFSzBWTzRMMnU1dnFYWnFqUnZBQm9XRjI0?=
- =?utf-8?B?bWoyNndGM0ZYQTNIUnY4RUlSdWNqV0djdGVMWUlndkF2Rk11NStPbnR1VDZM?=
- =?utf-8?B?VnZLelJZRVZ4dE00S3BPZUhsNmtlWklZUlFGaGhtWTQ2dDRaSUdiWC9UWnFJ?=
- =?utf-8?B?dHNrUFVjQUpwRGFLMzFsSHc0aFpTYVFiYlNZdnM2bnF0UXUwaDRpVEFxNHlk?=
- =?utf-8?B?TlNUbVdLV3VOS3V3U0tzTzczSmptbEdkOUE3cVhSZ3BKRHFYWklCNnc0aFNr?=
- =?utf-8?B?SVdzbG5kdEtDL09FVms5VlBCdi95SGpXT1puTVZPczJZV3orUmxnbzZZY2Ix?=
- =?utf-8?B?RXh1QVkrMmFrNlNuVEhyVlhvdGpOd25HaHhKdjdEWXY4NHF1aWpPSjdkYU1F?=
- =?utf-8?B?bFdzUDNuY2I5a2VvVVFmSzVpaFdrazVLMGg3dWRDZEw0NHhOSGMycWJzUEY3?=
- =?utf-8?B?UmJ2ZDNNQ1FPRWZsQy9GeCtaMi8rNkdlc2ZJanVvTDdCVlREeG0zTDF6Yyt4?=
- =?utf-8?B?Sy92NEZBYWNsWjE3ZkRMSlhPcHVScUZWcGZEOWh0R2ordEpzd1EzWWxoVlox?=
- =?utf-8?B?QTZQTGZPZ0ZwWUVpSDE1UW8rTmZWcEtNTTNNMDZwSTVLaE1qTjdJWmJWTkln?=
- =?utf-8?B?cyt0Y29QWmJXOThuQXd0amRUUWJNMGlKL2NmeTJ6MEpJaStkdzF3THlIWmVL?=
- =?utf-8?B?THhpSWUyK1VJQlUzT2I5N3BWanFsV0FwclJNYmZ6VVhGb3NNc3JDN3pFU1Fh?=
- =?utf-8?B?dWJpUUMrZXoyUG1jb0d1UForNTg0aEc0UFl0QWZWeVZzMkRnR0FaWVBCaWMv?=
- =?utf-8?Q?ONK0QAdbOnBxiilE5g9SLVFRt?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <26476AD20A7315408E8EA0EAB3CF5D85@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S231823AbjHCIbK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 04:31:10 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 368C35597;
+        Thu,  3 Aug 2023 01:27:44 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 8718521990;
+        Thu,  3 Aug 2023 08:27:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1691051262; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0JKh0YoT5EtMkmw+6bQ4IAlmA0cKqBisDvoowqXZlsY=;
+        b=QTwbY7tdSYtBbOr6bU3TIjPc48JFY0p1VEQ5UnC2EHaxwrykAGZGvKzQRdVgJSsKL/m+yM
+        fJuEpmMtc+P5sgSlDFeiqXxqxaeXH3fz3fl5asZhjGqs41c7L3FfI7JED49+jtjEXd++iP
+        tdAxoHZWGrv1GShKFMJxGJ048j17dSc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1691051262;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0JKh0YoT5EtMkmw+6bQ4IAlmA0cKqBisDvoowqXZlsY=;
+        b=SceAnaI/ZBi3nu/BhzdVcO/Exau4SNI7QBc/3iF9kI37OtrKOf3KYrOX0bS4DyIdl5GlUj
+        1GPytqRNhMzqXLDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 45FCC134B0;
+        Thu,  3 Aug 2023 08:27:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id oHFOEP5ky2SfUgAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Thu, 03 Aug 2023 08:27:42 +0000
+Message-ID: <2cfa5f55-1d68-8a4f-d049-13f42e0d1484@suse.cz>
+Date:   Thu, 3 Aug 2023 10:27:41 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a57ca032-1e0b-4432-2ffb-08db93d129f5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Aug 2023 03:24:36.3896
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Y0uQYxb20TmTqCtkLsQlfKihK1/nvOo0fcbeCuV+9tnGvnBbFv0QqqZPJ+p+ryPWYCtlhXOtpLPU/51M0OGZvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4903
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH 04/24] PM: hibernate: move finding the resume device out
+ of software_resume
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Joern Engel <joern@lazybastard.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Loic Poulain <loic.poulain@linaro.org>, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org,
+        Linux regressions mailing list <regressions@lists.linux.dev>
+References: <20230531125535.676098-1-hch@lst.de>
+ <20230531125535.676098-5-hch@lst.de>
+Content-Language: en-US
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20230531125535.676098-5-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gOC8yLzIzIDA4OjI3LCBKZWZmIE1veWVyIHdyb3RlOg0KPiBDaHJpc3RvcGggSGVsbHdpZyA8
-aGNoQGxzdC5kZT4gd3JpdGVzOg0KPg0KPj4gR2l2ZW4gdGhhdCBwbWVtIHNpbXBseSBsb29wcyBv
-dmVyIGFuIGFyYml0cmFyaWx5IGxhcmdlIGJpbyBJIHRoaW5rDQo+PiB3ZSBhbHNvIG5lZWQgYSB0
-aHJlc2hvbGQgZm9yIHdoaWNoIHRvIGFsbG93IG5vd2FpdCBJL08uICBXaGlsZSBpdA0KPj4gd29u
-J3QgYmxvY2sgZm9yIGdpYW50IEkvT3MsIGRvaW5nIGFsbCBvZiB0aGVtIGluIHRoZSBzdWJtaXR0
-ZXINCj4+IGNvbnRleHQgaXNuJ3QgZXhhY3RseSB0aGUgaWRlYSBiZWhpbmQgdGhlIG5vd2FpdCBJ
-L08uDQo+Pg0KPj4gSSdtIG5vdCByZWFsbHkgc3VyZSB3aGF0IGEgZ29vZCB0aGVzaG9sZCB3b3Vs
-ZCBiZSwgdGhvdWdoLg0KPiBUaGVyZSdzIG5vIG1lbnRpb24gb2YgdGhlIGxhdGVuY3kgb2YgdGhl
-IHN1Ym1pc3Npb24gc2lkZSBpbiB0aGUNCj4gZG9jdW1lbnRhdGlvbiBmb3IgUldGX05PV0FJVC4g
-IFRoZSBtYW4gcGFnZSBzYXlzICJEbyBub3Qgd2FpdCBmb3IgZGF0YQ0KPiB3aGljaCBpcyBub3Qg
-aW1tZWRpYXRlbHkgYXZhaWxhYmxlLiIgIERhdGEgaW4gcG1lbSAqaXMqIGltbWVkaWF0ZWx5DQo+
-IGF2YWlsYWJsZS4gIElmIHdlIHdhbnRlZCB0byBlbmZvcmNlIGEgbGF0ZW5jeSB0aHJlc2hvbGQg
-Zm9yIHN1Ym1pc3Npb24sDQo+IGl0IHdvdWxkIGhhdmUgdG8gYmUgY29uZmlndXJhYmxlIGFuZCwg
-aWRlYWxseSwgYSBwYXJ0IG9mIHRoZSBBUEkuICBJDQo+IGRvbid0IHRoaW5rIGl0J3Mgc29tZXRo
-aW5nIHdlIHNob3VsZCBldmVuIHRyeSB0byBndWFyYW50ZWUsIHRob3VnaCwNCj4gdW5sZXNzIGFw
-cGxpY2F0aW9uIHdyaXRlcnMgYXJlIGFza2luZyBmb3IgaXQuDQoNCkkgbmVlZCB0byBzZWUgdGhl
-IHVzZWNhc2UgZnJvbSBhcHBsaWNhdGlvbiB3cml0dGVyIHdobyBjYW5ub3QgY29tZQ0Kd2l0aCBh
-IHNvbHV0aW9uIHNvIGtlcm5lbCBoYXZlIHRvIHByb3ZpZGUgdGhpcyBpbnRlcmZhY2UsIEknbGwg
-YmUgaGFwcHkNCnRvIGRvIHRoYXQgLi4NCg0KPiBTbywgSSB0aGluayB3aXRoIHRoZSBjaGFuZ2Ug
-dG8gcmV0dXJuIC1FQUdBSU4gZm9yIHdyaXRlcyB0byBwb2lzb25lZA0KPiBtZW1vcnksIHRoaXMg
-cGF0Y2ggaXMgcHJvYmFibHkgb2suDQoNCkkgYmVsaWV2ZSB5b3UgbWVhbiB0aGUgc2FtZSBvbmUg
-SSd2ZcKgIHByb3ZpZGVkIGVhcmxpZXIgaW5jcmVtZW50YWwgLi4NCg0KPiBDaGFpdGFueWEsIGNv
-dWxkIHlvdSBzZW5kIGEgdjI/DQoNCnN1cmUgLi4uDQoNCi1jaw0KDQoNCg0KDQo=
+On 5/31/23 14:55, Christoph Hellwig wrote:
+> software_resume can be called either from an init call in the boot code,
+> or from sysfs once the system has finished booting, and the two
+> invocation methods this can't race with each other.
+> 
+> For the latter case we did just parse the suspend device manually, while
+> the former might not have one.  Split software_resume so that the search
+> only happens for the boot case, which also means the special lockdep
+> nesting annotation can go away as the system transition mutex can be
+> taken a little later and doesn't have the sysfs locking nest inside it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+
+This caused a regression for me in 6.5-rc1+, fix below.
+
+----8<----
+From 95a310ae6cfae9b3cab61e54a1bce488c3ab93a1 Mon Sep 17 00:00:00 2001
+From: Vlastimil Babka <vbabka@suse.cz>
+Date: Wed, 2 Aug 2023 15:46:18 +0200
+Subject: [PATCH] PM: hibernate: fix resume_store() return value when
+ hibernation not available
+
+On a laptop with hibernation set up but not actively used, and with
+secure boot and lockdown enabled kernel, 6.5-rc1 gets stuck on boot with
+the following repeated messages:
+
+  A start job is running for Resume from hibernation using device /dev/system/swap (24s / no limit)
+  lockdown_is_locked_down: 25311154 callbacks suppressed
+  Lockdown: systemd-hiberna: hibernation is restricted; see man kernel_lockdown.7
+  ...
+
+Checking the resume code leads to commit cc89c63e2fe3 ("PM: hibernate:
+move finding the resume device out of software_resume") which
+inadvertently changed the return value from resume_store() to 0 when
+!hibernation_available(). This apparently translates to userspace
+write() returning 0 as in number of bytes written, and userspace looping
+indefinitely in the attempt to write the intended value.
+
+Fix this by returning the full number of bytes that were to be written,
+as that's what was done before the commit.
+
+Fixes: cc89c63e2fe3 ("PM: hibernate: move finding the resume device out of software_resume")
+Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+---
+ kernel/power/hibernate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index e1b4bfa938dd..2b4a946a6ff5 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -1166,7 +1166,7 @@ static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr,
+ 	int error;
+ 
+ 	if (!hibernation_available())
+-		return 0;
++		return n;
+ 
+ 	if (len && buf[len-1] == '\n')
+ 		len--;
+-- 
+2.41.0
+
+
