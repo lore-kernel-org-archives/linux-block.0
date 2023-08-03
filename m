@@ -2,162 +2,144 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA25C04A6A
-	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 02:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B96FDC04A6A
+	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 03:17:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232400AbjHCCwI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Aug 2023 22:52:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37492 "EHLO
+        id S230460AbjHCDRr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Aug 2023 23:17:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231354AbjHCCwH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 22:52:07 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA9AC1AA
-        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 19:52:05 -0700 (PDT)
-Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230803025203epoutp03edbaf2108ea5bb9f61f09bc2d0325cf2~3v9kEe-fi3117531175epoutp03a
-        for <linux-block@vger.kernel.org>; Thu,  3 Aug 2023 02:52:03 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230803025203epoutp03edbaf2108ea5bb9f61f09bc2d0325cf2~3v9kEe-fi3117531175epoutp03a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1691031123;
-        bh=PoQdjC9lBed1xqyEfsVkXd2x90gYvZd/Stb7lCXTnc0=;
-        h=Subject:Reply-To:From:To:In-Reply-To:Date:References:From;
-        b=TDbnLOJFuQJogZjHquL6qwrCnLtTWOshSi29pJ52cz/Rw2yzAEw6/Wde1phkzo81P
-         8w+NenQZdPi3IVTcRsFbqfOFPQcMJmTv+hB3FZwKjmE0OwT4gwz+N5WwV5ekXh3fRr
-         7MYqNVGj2R33kdaBGlcql0lIiboZkfsphhFH5zDM=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20230803025203epcas2p22fd826ad8ebfbc1bc720885cc81be973~3v9jtijML0956209562epcas2p2A;
-        Thu,  3 Aug 2023 02:52:03 +0000 (GMT)
-Received: from epsmgec2p1.samsung.com (unknown [182.195.36.99]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4RGYKG6b9sz4x9Py; Thu,  3 Aug
-        2023 02:52:02 +0000 (GMT)
-X-AuditID: b6c32a43-84dfa7000000c342-bd-64cb1652b575
-Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
-        epsmgec2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        2C.44.49986.2561BC46; Thu,  3 Aug 2023 11:52:02 +0900 (KST)
-Mime-Version: 1.0
-Subject: [PATCH v3 4/4] bio-integrity: create multi-page bvecs in
- bio_integrity_add_page()
-Reply-To: j-young.choi@samsung.com
-Sender: Jinyoung Choi <j-young.choi@samsung.com>
-From:   Jinyoung Choi <j-young.choi@samsung.com>
-To:     Christoph Hellwig <hch@infradead.org>,
+        with ESMTP id S231555AbjHCDRm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2023 23:17:42 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2072.outbound.protection.outlook.com [40.107.212.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F4CE2130
+        for <linux-block@vger.kernel.org>; Wed,  2 Aug 2023 20:17:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dE9tD/H3QI95q9y+++RXAWJ7pfQibnXmDE6Oc/dcJ8kQUAoCmUdlRfnWSwo9mC6tOSVVMNF4qYzbAzrwlzf0pf3rkbapg773u0OFQ/HHGBgXCqRu340Mfeo34YjIxh61xMP4ep5KqzuHGeoouzFsoUJXWnhDGztvt0tMnVWuDhOpGsLpkiDHkOFZQ8e6CfrZQpoSstDuguCkHgjrccafdZe/r2fCU80iV7dc2tfU54hduzKgqGckyQfojoAHZzid07smH9GkTajZZ/WkbsAM9fmTJiHARTktDS2e23iFbRVpEdHd93/ZFycVFtxhQ3uIgnfnqoY3ShmW7pb8XDHGQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kX4H+Hrwgywg40T2B31PqUFzOdwawqFgKlc4Ec40zec=;
+ b=X7PrOr+RAp/XZgcZzRMyUQH3PlRzIj6vtDoISesZVfYlfgvWa09qLDCz1JYnmah2Eac+eL6NTbG7A70A1sBPt14heLYF37iBK//TSnYf3vMvUXDdzp284kXeijElu7YHlLg+kr0b6Utd+UdKyhyMko9KZy+KbgTbKIg2rRnIf87NmkLCcqJ3YlaYHcmLLTlEbrK0o5bhdbYyceQHn4HKrM/6h+o6LPJ68kHh+UW2OPsFH42UMKJ/jf/DZE5kRV/MuwnGRcJQx205ftd0y88Ae8qc5nlZK+almVwLL6Ct9lIHrbOSqkrwJoQ0msqdMIxHqjSOJttlzWDmyqGCqxwqnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kX4H+Hrwgywg40T2B31PqUFzOdwawqFgKlc4Ec40zec=;
+ b=d8wWdLF5Pbq8TLZ8SmcPKbihGaHsxObHJtm4B8XbycWNh9d/Un9dgRB6y25afIg8lu/zI8IfkqypgRVhU7IL7XERTTJjYTZwkOyrmLGb8RYngCzupcGTCeduASV+IuI+8PdsSMW5GaLOIysqHo0xCzDEoWFiN1ZA0VI7E/5fNYgsFgOpvd1xJ3cPJ8x7EB5g5bdaH72KI92h9qy9hOY92Kcgu4RfZSjThAb2cHrcMxSBXcayncCvjXC6ORwbOmU1dNonNTpW1ZLLYT6MK8+ZzJpHRply44K3LQvwkNDQzuyVPegSqkJ4zb2nMt10K64P5P94e3jzblNl1jv1JnTxZQ==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by BY5PR12MB4903.namprd12.prod.outlook.com (2603:10b6:a03:1d6::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Thu, 3 Aug
+ 2023 03:17:38 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::c3cf:2236:234b:b664]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::c3cf:2236:234b:b664%4]) with mapi id 15.20.6631.046; Thu, 3 Aug 2023
+ 03:17:38 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     Jeff Moyer <jmoyer@redhat.com>,
+        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+        "vishal.l.verma@intel.com" <vishal.l.verma@intel.com>,
+        "dave.jiang@intel.com" <dave.jiang@intel.com>,
+        "ira.weiny@intel.com" <ira.weiny@intel.com>,
+        "nvdimm@lists.linux.dev" <nvdimm@lists.linux.dev>,
         "axboe@kernel.dk" <axboe@kernel.dk>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "chaitanya.kulkarni@wdc.com" <chaitanya.kulkarni@wdc.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20230803024656epcms2p4da6defb8e1e9b050fe2fbd52cb2e9524@epcms2p4>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20230803025202epcms2p82f57cbfe32195da38c776377b55aed59@epcms2p8>
-Date:   Thu, 03 Aug 2023 11:52:02 +0900
-X-CMS-MailID: 20230803025202epcms2p82f57cbfe32195da38c776377b55aed59
-Content-Transfer-Encoding: 7bit
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH V2 1/1] pmem: set QUEUE_FLAG_NOWAIT
+Thread-Topic: [PATCH V2 1/1] pmem: set QUEUE_FLAG_NOWAIT
+Thread-Index: AQHZxADrXE+/yvq5u06qlYmjeW0Jd6/Vjqw1gAALsYCAAB0cXoAAgQeAgAC5pQCAAPf0gA==
+Date:   Thu, 3 Aug 2023 03:17:38 +0000
+Message-ID: <a765facc-3991-41b3-6fe7-9fc5ee68e57e@nvidia.com>
+References: <20230731224617.8665-1-kch@nvidia.com>
+ <20230731224617.8665-2-kch@nvidia.com>
+ <x491qgmwzuv.fsf@segfault.boston.devel.redhat.com>
+ <20230801155943.GA13111@lst.de>
+ <x49wmyevej2.fsf@segfault.boston.devel.redhat.com>
+ <0a2d86d6-34a1-0c8d-389c-1dc2f886f108@nvidia.com>
+ <20230802123010.GB30792@lst.de>
+In-Reply-To: <20230802123010.GB30792@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|BY5PR12MB4903:EE_
+x-ms-office365-filtering-correlation-id: 9455303f-9ad7-4ca8-2510-08db93d030a1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: E+nq9Yx9aPq7DE6EkGRwMgt9BWaaVNIgQpY8Cs8+4LBlo4gvBGD619zrQGZCSbu2uC5xBHzL9+SN08L2Fcb3VdcHA0IacgTu/KFSjm+vzwTrvu+bh0IFfGYfJ6FXfylHC3QndFFXODvxvhk1rbkk+Yrw9fWu9kj7feiPcAvooCC4j+CrBi3v3cAHB/E6bxlsyT7lM9OmwxFgNvzQOpVz6Qq82cVQrZ/qc0GPASaRNG9SkPHMhaZTRCmzZ2apMw8weTG4ckXZBJYoBck+WqCoChH+fJx6xrmTYag9BKxvkCmEUGQ4Nc/1wTYNBbT7f0awlv1n+6r+FqQSSjtIKcK8EPNIzm5YqeFZ67tOHWdTtC7iT7eR+wA6TrTi/+kW6Le/GrMW3UjvUwajy4EIyfwcqr78SB8VUWliqpCjM/0qKfqEfjDNDlCwW43WBEljBYdNqi4Bib4rFfi0JVbhnc7oXzt4e0Eoavkhw8L/rKGUwAiyxvjddxx9HMB9MoKqVlWU0GexBggWKYDP7CEdjHLx+UEA1FowKaZ1H9bPzwuizWAMbobg+6+8FRxmqZ6fXvAjmSPCUBInnzBBj6ztO5RPcoEtitw+Ic3vXi6OUVk9IC2XY4XdrHfnqEjaFg9HcS0zmv9PuKKxSQEMbwEMflfQvqk+LnaI2sOEJvm5VstZQMWAozfxR76SYlsFXxODm9OQ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(366004)(136003)(376002)(396003)(451199021)(2616005)(186003)(6512007)(316002)(86362001)(478600001)(54906003)(122000001)(38100700002)(66556008)(66476007)(91956017)(66446008)(66946007)(6486002)(71200400001)(76116006)(31696002)(4326008)(6916009)(64756008)(53546011)(6506007)(36756003)(41300700001)(26005)(5660300002)(8676002)(8936002)(4744005)(2906002)(38070700005)(83380400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZXl1eGJCazV3MGRaS0ZINy9tL1ZHME9yZUF2Kzh4L1lOVHREWUZwSjg1N090?=
+ =?utf-8?B?SXYxSlV3ZERDVDVqWnZEUitIbHUvY1F5VDY2TGhCczlmWjUycnlmNThDT2R5?=
+ =?utf-8?B?V2M0L0tKdVZrRDdQWVMyU0h0ZlJtbzNCMndUam9KL21tQzNBU3Q1YzRPRCtz?=
+ =?utf-8?B?K3dWV3V0L0xYRlhzK2t3bXEyb0F4WTRaVGpkT2dOU05VRG9yTmVSZmVTU2RW?=
+ =?utf-8?B?QnhuTkNIU0hMVFNJbEQwWXZWQkVtREJSTnltZXFWU0ovRFBpcWZEdGlQNlEy?=
+ =?utf-8?B?OGZUSE1oak5sUkN4WUhGRy9HejlQWlNBMktWMURXZ0ZnVVBKb09WQkJpMFNS?=
+ =?utf-8?B?ajRmSjRxTDRYU1dpTGY2aGxjbFlUaUhWRGdhNGdlSFhNZ1drckQ5bzhoNnM2?=
+ =?utf-8?B?OTJDUHRmcUNnT1RqOGFzeGJISCtIc3NqQWw4TloxdkhqblQrOVpwQVhsTXdM?=
+ =?utf-8?B?NzJ1NXFhWkFPY1E5ZmFJVWRpUWxKbjJMMXltS2VmZklxMm1xNldJS2Y0NE9M?=
+ =?utf-8?B?OUxLMEdFWGRzQmt6MGFSWEttYmI3aGFOc0V3amhvMHA4TTUvTlk1SERFd2x5?=
+ =?utf-8?B?dklzdkMrN3FVYXdXUm41MzVScGxianVYU3dnbGFZbEduOG9yc1UwUU1XSVkv?=
+ =?utf-8?B?S3ZDMXNBZDFTNGlvTHBzZUxlKzRWZVBOdVNSUDJVdUtYVnJMVzh5K1lwSDVw?=
+ =?utf-8?B?MXR2VysraEZOcjBoczBVZkl2ZUYyTmZaUGNxTWQzMnJQdjBYaGRmdWV1VXpy?=
+ =?utf-8?B?THlDcXZaVHplQXpCYWFNa3Vkd3hmRVRoK293WjNxY1JsZHl0VFl2dzlXQlFX?=
+ =?utf-8?B?Y2VEcGx6M29LN3FuTmhOM3JTMjZZTndoblBJK2c2SUN3eVhZZEZUalZOMHMx?=
+ =?utf-8?B?V0l5ZWJId204c1FDZERLbEdtcDhrTE5QelZoTzdkUmIxSGxGRzZYNjA2QzN5?=
+ =?utf-8?B?NHNnSjFwbTdDcHZSTVR3bCtLS2ZOQTJnUWNjMnY0b25jc2oveUhOUWNOalpP?=
+ =?utf-8?B?b1RGQzcxT2JldWZnVnZBaFNIRGxOWTRkNWhSN3ZmSnVjWThnMWZIQjJCZXJt?=
+ =?utf-8?B?Zm1tUWNKZ2s5MVFkSUN1T3hBNkZrMlN1TC9kNG1tM2pDY25NR1VVRjdxWVdW?=
+ =?utf-8?B?bzdWZkcxbnIzSE5hOUgwZ1hTWXkzcVY5TWNqYUMwYklCRm1Zb3pPd2ZVSFFh?=
+ =?utf-8?B?ZjNvYUJWU3BzV21jd1Z3MGd1TDVTSHlJWm5NNUtWKzVieER5cU16eGJ4RGFJ?=
+ =?utf-8?B?ekJDWXlLRjFqYlNpWEtRKzNONjVmbzBISStIbjBIRU9TZ1dKOGpaQ0JubWFX?=
+ =?utf-8?B?cVN2NC8xcWRWTGJkWW1uL2kzN3JDMHU3aVloMHE5VCtOUW5LOUV4MnFMNnVu?=
+ =?utf-8?B?ZkZ0OUx3dkdpWENSSUVySjJBTFFIMXNTMGwxWHpBOGFPWjQ5R2RqNU9TcThN?=
+ =?utf-8?B?M1p0Z2IvTDZ0WkFLMUVhelBFVkZTSkU3N3JqNDJ2ZlIwby95MVVIaktyVVpv?=
+ =?utf-8?B?SEUvU0NaV1RSTVlqKzQzRTVrVDVjZlc1L2pXY0pseHV0Yk5ZSWlHSnpRdUp6?=
+ =?utf-8?B?cDlxTDNLUzc2N2VPaEQvODFlMnYxZ0FYZFJaN3lPNnRiZmN0ek40emNld01V?=
+ =?utf-8?B?V2lsWGc0YjJVdWR1djRmV01zOElJL1JodWh0NlZqSXNqUmttaHlLaEJRd0Q1?=
+ =?utf-8?B?aG9pcHFnSzkxTmNNNTI5b1NDK0JIaDUxbll4Smp4RmVLUmJCK1lTTVRZVjhJ?=
+ =?utf-8?B?VGtWL2lndTFsZ0RpeU1xeDRKVFE3TFluNVNkSGRIUFlUNjNjL0lHV3FtSXNC?=
+ =?utf-8?B?OUd4amN2QWZpSEdydFF2bXRJWE95elU2SmtZbHRiM25wYkdWdmpBTVNPQWV4?=
+ =?utf-8?B?ekpUUThOYzZCMmJ2cVZrVXRYak84Qzd6amFOOEhxZ2NJd0ZTVW9FaE9qd2ls?=
+ =?utf-8?B?aFFZTHJNMTZLMUIwVCtGUTdod3J0cjhuYXA1VDF5ZUVCWkN3Y0J2anQ0MXZi?=
+ =?utf-8?B?Unk4a0lxS1NhU3VHOHBjRWhuVGNscEl2dXR6bkJzbElQaitRdGV3OVRsZVlG?=
+ =?utf-8?B?NEpVcktYSGo3c2p5NlFlT2QwZytsbGhMOUJ1NHFDUmVHTVk1K01mTW1Lb09H?=
+ =?utf-8?Q?yaRw/WNFz1E6lEC42XQQ5Rjjd?=
 Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJJsWRmVeSWpSXmKPExsWy7bCmqW6Q2OkUg7dPDSxW3+1ns5h1+zWL
-        xctDmhanJyxisph06Bqjxd5b2haXd81hs1h+/B+TxbrX71kcOD3O39vI4rF5hZbH5bOlHptW
-        dbJ5fHx6i8Wjb8sqRo/Pm+Q82g90MwVwRGXbZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjq
-        GlpamCsp5CXmptoqufgE6Lpl5gDdpqRQlphTChQKSCwuVtK3synKLy1JVcjILy6xVUotSMkp
-        MC/QK07MLS7NS9fLSy2xMjQwMDIFKkzIzpjTsJyloEeoYs32lYwNjA/5uhg5OSQETCTu3G9m
-        7GLk4hAS2MEoseLTMiCHg4NXQFDi7w5hkBphgRiJSfuXsILYQgJKEufWzGKEiBtItNxuYwGx
-        2QT0JHY8380OMkdEYA6zxKU1y1ghFvBKzGh/ygJhS0tsX74VrJlTwE/i0rTZUHENiR/Lepkh
-        bFGJm6vfssPY74/NZ4SwRSRa752FqhGUePBzN1RcUuLQoa9sIDdLCORLbDgQCBGukWj79R6q
-        XF/iWsdGsFW8Ar4Sf5efArNZBFQlTm75BDXGReJVXwcbiM0sIC+x/e0cZpCRzAKaEut36UNM
-        V5Y4cosFooJPouPwX3aYBxs2/sbK3jHvCRNEq5rEoiYjiLCMxNfD89knMCrNQgTzLCRrZyGs
-        XcDIvIpRLLWgODc9NdmowBAes8n5uZsYwWlUy3kH45X5//QOMTJxMB5ilOBgVhLhlf59PEWI
-        NyWxsiq1KD++qDQntfgQoynQwxOZpUST84GJPK8k3tDE0sDEzMzQ3MjUwFxJnPde69wUIYH0
-        xJLU7NTUgtQimD4mDk6pBiZv1tMrtFavaVJ3X6vF4+qnfH6JwcZvSdO2f4/79HzB9npGn6x/
-        m2zcVGoOtq+745XxcqfAhgj2BQ8fFCQnBMad0p46fep77umxt2WOn+h2nhjyZM6v1TXzkr1T
-        13xnKz0rbrYx4qmhTYVDJvuLpKYyVXmxiqOTNjKdtdd+yH4o1vfRvpwzfyKTr786lsl04puA
-        4CmFeVOFdza3rj67U1orWCvh4Z1OkSPsv857VSnI2va1q6qb/yw6vbz6S8Hr6xy/121xEpSU
-        m5DN94XV6JtRP++nlkPVa9t/5sSzL/p2auvP6XXr/GwSr97f9SSt6LzcBp5jiUZRLpdvPnCY
-        +e5y/OZnq5LPrJ21vLDGavkUJZbijERDLeai4kQA7+eTQCwEAAA=
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230803024656epcms2p4da6defb8e1e9b050fe2fbd52cb2e9524
-References: <20230803024656epcms2p4da6defb8e1e9b050fe2fbd52cb2e9524@epcms2p4>
-        <CGME20230803024656epcms2p4da6defb8e1e9b050fe2fbd52cb2e9524@epcms2p8>
+Content-ID: <B261DDC8124A75429E435116E5C34817@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9455303f-9ad7-4ca8-2510-08db93d030a1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Aug 2023 03:17:38.1342
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nZdnTCqJpAscaagQaD0GmFpPK/TJhwYhzZ4pqweQuKAt5yx6eXORzVR19EJDhlhI4o2+YS1UE4QVCL5rnchgFA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4903
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In general, the bvec data structure consists of one for physically
-continuous pages. But, in the bvec configuration for bip, physically
-continuous integrity pages are composed of each bvec.
-
-Allow bio_integrity_add_page() to create multi-page bvecs, just like
-the bio payloads. This simplifies adding larger payloads, and fixes
-support for non-tiny workloads with nvme, which stopped using
-scatterlist for metadata a while ago.
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-
-Fixes: 783b94bd9250 ("nvme-pci: do not build a scatterlist to map metadata")
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
----
- block/bio-integrity.c | 31 ++++++++++++++++++++++++-------
- 1 file changed, 24 insertions(+), 7 deletions(-)
-
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index c6b3bc86e1f9..ec8ac8cf6e1b 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -123,17 +123,34 @@ void bio_integrity_free(struct bio *bio)
- int bio_integrity_add_page(struct bio *bio, struct page *page,
- 			   unsigned int len, unsigned int offset)
- {
-+	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 	struct bio_integrity_payload *bip = bio_integrity(bio);
- 
--	if (bip->bip_vcnt >= bip->bip_max_vcnt) {
--		printk(KERN_ERR "%s: bip_vec full\n", __func__);
-+	if (((bip->bip_iter.bi_size + len) >> SECTOR_SHIFT) >
-+	    queue_max_hw_sectors(q))
- 		return 0;
--	}
- 
--	if (bip->bip_vcnt &&
--	    bvec_gap_to_prev(&bdev_get_queue(bio->bi_bdev)->limits,
--			     &bip->bip_vec[bip->bip_vcnt - 1], offset))
--		return 0;
-+	if (bip->bip_vcnt > 0) {
-+		struct bio_vec *bv = &bip->bip_vec[bip->bip_vcnt - 1];
-+		bool same_page = false;
-+
-+		if (bvec_try_merge_hw_page(q, bv, page, len, offset,
-+					   &same_page)) {
-+			bip->bip_iter.bi_size += len;
-+			return len;
-+		}
-+
-+		if (bip->bip_vcnt >=
-+		    min(bip->bip_max_vcnt, queue_max_integrity_segments(q)))
-+			return 0;
-+
-+		/*
-+		 * If the queue doesn't support SG gaps and adding this segment
-+		 * would create a gap, disallow it.
-+		 */
-+		if (bvec_gap_to_prev(&q->limits, bv, offset))
-+			return 0;
-+	}
- 
- 	bvec_set_page(&bip->bip_vec[bip->bip_vcnt], page, len, offset);
- 	bip->bip_vcnt++;
--- 
-2.34.1
+T24gOC8yLzIzIDA1OjMwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90ZToNCj4gR2l2ZW4gdGhhdCBw
+bWVtIHNpbXBseSBsb29wcyBvdmVyIGFuIGFyYml0cmFyaWx5IGxhcmdlIGJpbyBJIHRoaW5rDQo+
+IHdlIGFsc28gbmVlZCBhIHRocmVzaG9sZCBmb3Igd2hpY2ggdG8gYWxsb3cgbm93YWl0IEkvTy4g
+IFdoaWxlIGl0DQo+IHdvbid0IGJsb2NrIGZvciBnaWFudCBJL09zLCBkb2luZyBhbGwgb2YgdGhl
+bSBpbiB0aGUgc3VibWl0dGVyDQo+IGNvbnRleHQgaXNuJ3QgZXhhY3RseSB0aGUgaWRlYSBiZWhp
+bmQgdGhlIG5vd2FpdCBJL08uDQo+DQo+IEknbSBub3QgcmVhbGx5IHN1cmUgd2hhdCBhIGdvb2Qg
+dGhlc2hvbGQgd291bGQgYmUsIHRob3VnaC4NCj4NCj4gQnR3LCBwbGVhc2UgYWxzbyBhbHdheXMg
+YWRkIGxpbnV4LWJsb2NrIHRvIHRoZSBDYyBsaXN0IGZvciBibG9jaw0KPiBkcml2ZXIgcGF0Y2hl
+cyB0aGF0IGFyZSBldmVuIHRoZSBzbGlnaHRlc3QgYml0IGFib3V0IHRoZSBibG9jaw0KPiBsYXll
+ciBpbnRlcmZhY2UuDQoNCndpbGwgZG8gLi4NCg0KLWNrDQoNCg0K
