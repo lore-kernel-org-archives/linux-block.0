@@ -2,92 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45094C001DF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 13:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB362C001DF
+	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 13:14:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236153AbjHCNJf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Aug 2023 09:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53632 "EHLO
+        id S236249AbjHCNOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Aug 2023 09:14:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235956AbjHCNJR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 09:09:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425E04683
-        for <linux-block@vger.kernel.org>; Thu,  3 Aug 2023 06:06:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691067953;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UErKKVaCtdS2O7EB//Zus61TQ5vBeF3I4I1lCVszpKU=;
-        b=Vd7hew6Lb4K2g2Wbc3zq3JSLxTx52UlX5NC05IU2HnaSBMtsgTxY/DhGXyeCsqkNIZ8ssz
-        U0LVxmVmoN28EdO2bjrUO2Z0SgLi7/QCNO4sCIv8X0zqRunPfDcO9wG+AMAiaUlWvq+N0P
-        qCLjwR2wVPsA1yqQVGQC6GgjEYxExIo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-412-0lhyKOVvMjOvfa0yWrybcg-1; Thu, 03 Aug 2023 09:05:52 -0400
-X-MC-Unique: 0lhyKOVvMjOvfa0yWrybcg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S236079AbjHCNNw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 09:13:52 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55505525B;
+        Thu,  3 Aug 2023 06:12:33 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CFBA6830DAF;
-        Thu,  3 Aug 2023 13:05:38 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 61B3B1121325;
-        Thu,  3 Aug 2023 13:05:38 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "dan.j.williams\@intel.com" <dan.j.williams@intel.com>,
-        "vishal.l.verma\@intel.com" <vishal.l.verma@intel.com>,
-        "dave.jiang\@intel.com" <dave.jiang@intel.com>,
-        "ira.weiny\@intel.com" <ira.weiny@intel.com>,
-        "nvdimm\@lists.linux.dev" <nvdimm@lists.linux.dev>,
-        "axboe\@kernel.dk" <axboe@kernel.dk>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH V2 1/1] pmem: set QUEUE_FLAG_NOWAIT
-References: <20230731224617.8665-1-kch@nvidia.com>
-        <20230731224617.8665-2-kch@nvidia.com>
-        <x491qgmwzuv.fsf@segfault.boston.devel.redhat.com>
-        <20230801155943.GA13111@lst.de>
-        <x49wmyevej2.fsf@segfault.boston.devel.redhat.com>
-        <0a2d86d6-34a1-0c8d-389c-1dc2f886f108@nvidia.com>
-        <20230802123010.GB30792@lst.de>
-        <x49o7jpv50v.fsf@segfault.boston.devel.redhat.com>
-        <2466cca2-4cc6-9ac2-d6cd-cded843c44be@nvidia.com>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Thu, 03 Aug 2023 09:11:27 -0400
-In-Reply-To: <2466cca2-4cc6-9ac2-d6cd-cded843c44be@nvidia.com> (Chaitanya
-        Kulkarni's message of "Thu, 3 Aug 2023 03:24:36 +0000")
-Message-ID: <x49cz04uv7k.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id EA5B021873;
+        Thu,  3 Aug 2023 13:12:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1691068343; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ot59AV78ck5rwDh+ZxSbqdOYuWP3zspJplYXbIDCPEg=;
+        b=it/uueHk20C6SWEYwRpODhnx+51PxdNAjrwcS9cfESIfoTBPsaMl9lEOEhlF32ejDxtO2A
+        EA1m1wBtZxzuyOfvHcObttcWzU7rZueXbv/p4C8VY+JnylCyIh0khx8jqCl/EH+nKWK8JT
+        UnXxYqzEOKMjCjdEpmW3Haw1++m2Mys=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1691068343;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ot59AV78ck5rwDh+ZxSbqdOYuWP3zspJplYXbIDCPEg=;
+        b=mHyzUQlS3YILs5AEHKYro3JJ7LVvtu/qJYwnmvIum04HjMQdynKDQAHtFCrr8yiH4eTuHl
+        jsD3rd1lPhJ7MJAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D8406134B0;
+        Thu,  3 Aug 2023 13:12:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id YUvNNLeny2RAaAAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 03 Aug 2023 13:12:23 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 67ED8A076B; Thu,  3 Aug 2023 15:12:23 +0200 (CEST)
+Date:   Thu, 3 Aug 2023 15:12:23 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 07/12] fs: stop using get_super in fs_mark_dead
+Message-ID: <20230803131223.qkxsxs7svtcu5buz@quack3>
+References: <20230802154131.2221419-1-hch@lst.de>
+ <20230802154131.2221419-8-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230802154131.2221419-8-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Chaitanya Kulkarni <chaitanyak@nvidia.com> writes:
+On Wed 02-08-23 17:41:26, Christoph Hellwig wrote:
+> fs_mark_dead currently uses get_super to find the superblock for the
+> block device that is going away.  This means it is limited to the
+> main device stored in sb->s_dev, leading to a lot of code duplication
+> for file systems that can use multiple block devices.
+> 
+> Now that the holder for all block devices used by file systems is set
+> to the super_block, we can instead look at that holder and then check
+> if the file system is born and active, so do that instead.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-> On 8/2/23 08:27, Jeff Moyer wrote:
->> So, I think with the change to return -EAGAIN for writes to poisoned
->> memory, this patch is probably ok.
->
-> I believe you mean the same one I've=C2=A0 provided earlier incremental ..
+Looks good. Feel free to add:
 
-Yes, sorry if that wasn't clear.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
->> Chaitanya, could you send a v2?
->
-> sure ...
+								Honza
 
-and I guess I should have said v3.  ;-)
-
-Cheers,
-Jeff
-
+> ---
+>  fs/super.c | 30 ++++++++++++++++++++++++++----
+>  1 file changed, 26 insertions(+), 4 deletions(-)
+> 
+> diff --git a/fs/super.c b/fs/super.c
+> index 09b65ee1a8b737..0cda4af0a7e16c 100644
+> --- a/fs/super.c
+> +++ b/fs/super.c
+> @@ -1209,17 +1209,39 @@ int get_tree_keyed(struct fs_context *fc,
+>  EXPORT_SYMBOL(get_tree_keyed);
+>  
+>  #ifdef CONFIG_BLOCK
+> +/*
+> + * Lock a super block that the callers holds a reference to.
+> + *
+> + * The caller needs to ensure that the super_block isn't being freed while
+> + * calling this function, e.g. by holding a lock over the call to this function
+> + * and the place that clears the pointer to the superblock used by this function
+> + * before freeing the superblock.
+> + */
+> +static bool lock_active_super(struct super_block *sb)
+> +{
+> +	down_read(&sb->s_umount);
+> +	if (!sb->s_root ||
+> +	    (sb->s_flags & (SB_ACTIVE | SB_BORN)) != (SB_ACTIVE | SB_BORN)) {
+> +		up_read(&sb->s_umount);
+> +		return false;
+> +	}
+> +	return true;
+> +}
+> +
+>  static void fs_mark_dead(struct block_device *bdev)
+>  {
+> -	struct super_block *sb;
+> +	struct super_block *sb = bdev->bd_holder;
+>  
+> -	sb = get_super(bdev);
+> -	if (!sb)
+> +	/* bd_holder_lock ensures that the sb isn't freed */
+> +	lockdep_assert_held(&bdev->bd_holder_lock);
+> +
+> +	if (!lock_active_super(sb))
+>  		return;
+>  
+>  	if (sb->s_op->shutdown)
+>  		sb->s_op->shutdown(sb);
+> -	drop_super(sb);
+> +
+> +	up_read(&sb->s_umount);
+>  }
+>  
+>  static const struct blk_holder_ops fs_holder_ops = {
+> -- 
+> 2.39.2
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
