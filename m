@@ -2,207 +2,261 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB09C001DF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 11:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D401CC001DF
+	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 13:03:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233914AbjHCLvh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Aug 2023 07:51:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47808 "EHLO
+        id S235923AbjHCNDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Aug 2023 09:03:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231184AbjHCLvg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 07:51:36 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A631273A;
-        Thu,  3 Aug 2023 04:51:33 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        with ESMTP id S235875AbjHCNDw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 09:03:52 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E978E46;
+        Thu,  3 Aug 2023 06:03:30 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9A664218F6;
-        Thu,  3 Aug 2023 11:51:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1691063491; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FSDsUsIEQz9MqYljBqqvkw70hXtdohgf+Xi67OczPRo=;
-        b=odMACKCIVrFSIXlcffue7bXE6GbaXBcd5uZGciE4H0AoT/+WWV/L2NVjCjh25U1T4hX/cs
-        TTJY8v5U9PLqp7sFGPj9P5jvU6MF0P30lZW3EvpPJELuObqYiD8Wgn+1RmiEU/gZzwcyaA
-        EvOmiWaVUuvxkKP2YG9McS4lETi+k9Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1691063491;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FSDsUsIEQz9MqYljBqqvkw70hXtdohgf+Xi67OczPRo=;
-        b=jIB7cdSAyRslx1phzXdb8IVuWU82Qcmj3mJGynL7hiUUJ8Mnn3Rj/hJ8z5LEMxGiSqZEO3
-        zfwQeDRaEtkTLMBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 818011333C;
-        Thu,  3 Aug 2023 11:51:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 6saaH8OUy2SWPgAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 03 Aug 2023 11:51:31 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 1420AA076B; Thu,  3 Aug 2023 13:51:31 +0200 (CEST)
-Date:   Thu, 3 Aug 2023 13:51:31 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 06/12] fs: use the super_block as holder when mounting
- file systems
-Message-ID: <20230803115131.w6hbhjvvkqnv4qbq@quack3>
-References: <20230802154131.2221419-1-hch@lst.de>
- <20230802154131.2221419-7-hch@lst.de>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 98A1E61D98;
+        Thu,  3 Aug 2023 13:03:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15D3BC433CB;
+        Thu,  3 Aug 2023 13:03:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691067809;
+        bh=zQE4rT5enBO5UT1ezJALmZAk6kcWK//Jfn4eLC+j/7g=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=hn7VzLbLhbKyqqu6GA441R734ybvDl2odyoMshJvQxGsxlkfFtTHCjcOqrl7HmXQU
+         Jt5uaP/SIM78l0kLKcb4r70a5cDK/v/RX8rSTzeHD67URlhhh3hMO/wzMuZhoFbqeC
+         g+8SMGLVxh4ZLA8ZiK6NPKu3PH+ef1I6FacbX5bIDOY2Xd86/xd+UvprALUPUmzcew
+         E+Mqq4/GmeNmYbXnlUKomKayJ2ShU7ODpVIBEF13KEM3UrpFg0RcUPCoyTwPSl0kk9
+         8SrQ0PNpQXpYlVhhQyYEC9HtPY81nv0QbrlYFlLcmMenMdxosQilUiXqljm/WZuqZL
+         RpLn0N1fuOH4A==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Damien Le Moal <dlemoal@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Sasha Levin <sashal@kernel.org>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 4/7] scsi: block: Improve checks in blk_revalidate_disk_zones()
+Date:   Thu,  3 Aug 2023 09:03:17 -0400
+Message-Id: <20230803130321.641516-4-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230803130321.641516-1-sashal@kernel.org>
+References: <20230803130321.641516-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802154131.2221419-7-hch@lst.de>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.7
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 02-08-23 17:41:25, Christoph Hellwig wrote:
-> The file system type is not a very useful holder as it doesn't allow us
-> to go back to the actual file system instance.  Pass the super_block instead
-> which is useful when passed back to the file system driver.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
 
-Nice, this is what I also wanted to eventually do :). Feel free to add:
+[ Upstream commit 03e51c4a74b91b0b1a9ca091029b0b58f014be81 ]
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+blk_revalidate_disk_zones() implements checks of the zones of a zoned
+block device, verifying that the zone size is a power of 2 number of
+sectors, that all zones (except possibly the last one) have the same
+size and that zones cover the entire addressing space of the device.
 
-								Honza
+While these checks are appropriate to verify that well tested hardware
+devices have an adequate zone configurations, they lack in certain areas
+which may result in issues with emulated devices implemented with user
+drivers such as ublk or tcmu. Specifically, this function does not
+check if the device driver indicated support for the mandatory zone
+append writes, that is, if the device max_zone_append_sectors queue
+limit is set to a non-zero value. Additionally, invalid zones such as
+a zero length zone with a start sector equal to the device capacity will
+not be detected and result in out of bounds use of the zone bitmaps
+prepared with the callback function blk_revalidate_zone_cb().
 
-> ---
->  fs/btrfs/super.c | 7 ++-----
->  fs/f2fs/super.c  | 7 +++----
->  fs/super.c       | 8 ++++----
->  3 files changed, 9 insertions(+), 13 deletions(-)
-> 
-> diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-> index 5980b5dcc6b163..8a47c7f2690880 100644
-> --- a/fs/btrfs/super.c
-> +++ b/fs/btrfs/super.c
-> @@ -69,8 +69,6 @@ static const struct super_operations btrfs_super_ops;
->   * requested by subvol=/path. That way the callchain is straightforward and we
->   * don't have to play tricks with the mount options and recursive calls to
->   * btrfs_mount.
-> - *
-> - * The new btrfs_root_fs_type also servers as a tag for the bdev_holder.
->   */
->  static struct file_system_type btrfs_fs_type;
->  static struct file_system_type btrfs_root_fs_type;
-> @@ -1498,8 +1496,7 @@ static struct dentry *btrfs_mount_root(struct file_system_type *fs_type,
->  	} else {
->  		struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
->  
-> -		error = btrfs_open_devices(fs_devices, sb_open_mode(flags),
-> -					   fs_type);
-> +		error = btrfs_open_devices(fs_devices, sb_open_mode(flags), s);
->  		if (error)
->  			goto out_deactivate;
->  
-> @@ -1513,7 +1510,7 @@ static struct dentry *btrfs_mount_root(struct file_system_type *fs_type,
->  			 fs_devices->latest_dev->bdev);
->  		shrinker_debugfs_rename(&s->s_shrink, "sb-%s:%s", fs_type->name,
->  					s->s_id);
-> -		btrfs_sb(s)->bdev_holder = fs_type;
-> +		fs_info->bdev_holder = s;
->  		error = btrfs_fill_super(s, fs_devices, data);
->  	}
->  	if (!error)
-> diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-> index ca31163da00a55..05c90fdb7a6cca 100644
-> --- a/fs/f2fs/super.c
-> +++ b/fs/f2fs/super.c
-> @@ -1561,7 +1561,7 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
->  	int i;
->  
->  	for (i = 0; i < sbi->s_ndevs; i++) {
-> -		blkdev_put(FDEV(i).bdev, sbi->sb->s_type);
-> +		blkdev_put(FDEV(i).bdev, sbi->sb);
->  #ifdef CONFIG_BLK_DEV_ZONED
->  		kvfree(FDEV(i).blkz_seq);
->  #endif
-> @@ -4198,7 +4198,7 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
->  			/* Single zoned block device mount */
->  			FDEV(0).bdev =
->  				blkdev_get_by_dev(sbi->sb->s_bdev->bd_dev, mode,
-> -						  sbi->sb->s_type, NULL);
-> +						  sbi->sb, NULL);
->  		} else {
->  			/* Multi-device mount */
->  			memcpy(FDEV(i).path, RDEV(i).path, MAX_PATH_LEN);
-> @@ -4217,8 +4217,7 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
->  					sbi->log_blocks_per_seg) - 1;
->  			}
->  			FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path, mode,
-> -							  sbi->sb->s_type,
-> -							  NULL);
-> +							  sbi->sb, NULL);
->  		}
->  		if (IS_ERR(FDEV(i).bdev))
->  			return PTR_ERR(FDEV(i).bdev);
-> diff --git a/fs/super.c b/fs/super.c
-> index 6aaa275fa8630d..09b65ee1a8b737 100644
-> --- a/fs/super.c
-> +++ b/fs/super.c
-> @@ -1249,7 +1249,7 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
->  	blk_mode_t mode = sb_open_mode(sb_flags);
->  	struct block_device *bdev;
->  
-> -	bdev = blkdev_get_by_dev(sb->s_dev, mode, sb->s_type, &fs_holder_ops);
-> +	bdev = blkdev_get_by_dev(sb->s_dev, mode, sb, &fs_holder_ops);
->  	if (IS_ERR(bdev)) {
->  		if (fc)
->  			errorf(fc, "%s: Can't open blockdev", fc->source);
-> @@ -1262,7 +1262,7 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
->  	 * writable from userspace even for a read-only block device.
->  	 */
->  	if ((mode & BLK_OPEN_WRITE) && bdev_read_only(bdev)) {
-> -		blkdev_put(bdev, sb->s_type);
-> +		blkdev_put(bdev, sb);
->  		return -EACCES;
->  	}
->  
-> @@ -1278,7 +1278,7 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
->  		mutex_unlock(&bdev->bd_fsfreeze_mutex);
->  		if (fc)
->  			warnf(fc, "%pg: Can't mount, blockdev is frozen", bdev);
-> -		blkdev_put(bdev, sb->s_type);
-> +		blkdev_put(bdev, sb);
->  		return -EBUSY;
->  	}
->  	spin_lock(&sb_lock);
-> @@ -1418,7 +1418,7 @@ void kill_block_super(struct super_block *sb)
->  	if (bdev) {
->  		bdev->bd_super = NULL;
->  		sync_blockdev(bdev);
-> -		blkdev_put(bdev, sb->s_type);
-> +		blkdev_put(bdev, sb);
->  	}
->  }
->  
-> -- 
-> 2.39.2
-> 
+Improve blk_revalidate_disk_zones() to address these inadequate checks,
+relying on the fact that all device drivers supporting zoned block
+devices must set the device zone size (chunk_sectors queue limit) and
+the max_zone_append_sectors queue limit before executing this function.
+
+The check for a non-zero max_zone_append_sectors value is done in
+blk_revalidate_disk_zones() before executing the zone report. The zone
+report callback function blk_revalidate_zone_cb() is also modified to
+add a check that a zone start is below the device capacity.
+
+The check that the zone size is a power of 2 number of sectors is moved
+to blk_revalidate_disk_zones() as the zone size is already known.
+Similarly, the number of zones of the device can be calculated in
+blk_revalidate_disk_zones() before executing the zone report.
+
+The kdoc comment for blk_revalidate_disk_zones() is also updated to
+mention that device drivers must set the device zone size and the
+max_zone_append_sectors queue limit before calling this function.
+
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Link: https://lore.kernel.org/r/20230703024812.76778-6-dlemoal@kernel.org
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-zoned.c | 86 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 50 insertions(+), 36 deletions(-)
+
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index fce9082384d65..da92ce0c5da98 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -448,7 +448,6 @@ struct blk_revalidate_zone_args {
+ 	unsigned long	*conv_zones_bitmap;
+ 	unsigned long	*seq_zones_wlock;
+ 	unsigned int	nr_zones;
+-	sector_t	zone_sectors;
+ 	sector_t	sector;
+ };
+ 
+@@ -462,38 +461,34 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+ 	struct gendisk *disk = args->disk;
+ 	struct request_queue *q = disk->queue;
+ 	sector_t capacity = get_capacity(disk);
++	sector_t zone_sectors = q->limits.chunk_sectors;
++
++	/* Check for bad zones and holes in the zone report */
++	if (zone->start != args->sector) {
++		pr_warn("%s: Zone gap at sectors %llu..%llu\n",
++			disk->disk_name, args->sector, zone->start);
++		return -ENODEV;
++	}
++
++	if (zone->start >= capacity || !zone->len) {
++		pr_warn("%s: Invalid zone start %llu, length %llu\n",
++			disk->disk_name, zone->start, zone->len);
++		return -ENODEV;
++	}
+ 
+ 	/*
+ 	 * All zones must have the same size, with the exception on an eventual
+ 	 * smaller last zone.
+ 	 */
+-	if (zone->start == 0) {
+-		if (zone->len == 0 || !is_power_of_2(zone->len)) {
+-			pr_warn("%s: Invalid zoned device with non power of two zone size (%llu)\n",
+-				disk->disk_name, zone->len);
+-			return -ENODEV;
+-		}
+-
+-		args->zone_sectors = zone->len;
+-		args->nr_zones = (capacity + zone->len - 1) >> ilog2(zone->len);
+-	} else if (zone->start + args->zone_sectors < capacity) {
+-		if (zone->len != args->zone_sectors) {
++	if (zone->start + zone->len < capacity) {
++		if (zone->len != zone_sectors) {
+ 			pr_warn("%s: Invalid zoned device with non constant zone size\n",
+ 				disk->disk_name);
+ 			return -ENODEV;
+ 		}
+-	} else {
+-		if (zone->len > args->zone_sectors) {
+-			pr_warn("%s: Invalid zoned device with larger last zone size\n",
+-				disk->disk_name);
+-			return -ENODEV;
+-		}
+-	}
+-
+-	/* Check for holes in the zone report */
+-	if (zone->start != args->sector) {
+-		pr_warn("%s: Zone gap at sectors %llu..%llu\n",
+-			disk->disk_name, args->sector, zone->start);
++	} else if (zone->len > zone_sectors) {
++		pr_warn("%s: Invalid zoned device with larger last zone size\n",
++			disk->disk_name);
+ 		return -ENODEV;
+ 	}
+ 
+@@ -532,11 +527,13 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+  * @disk:	Target disk
+  * @update_driver_data:	Callback to update driver data on the frozen disk
+  *
+- * Helper function for low-level device drivers to (re) allocate and initialize
+- * a disk request queue zone bitmaps. This functions should normally be called
+- * within the disk ->revalidate method for blk-mq based drivers.  For BIO based
+- * drivers only q->nr_zones needs to be updated so that the sysfs exposed value
+- * is correct.
++ * Helper function for low-level device drivers to check and (re) allocate and
++ * initialize a disk request queue zone bitmaps. This functions should normally
++ * be called within the disk ->revalidate method for blk-mq based drivers.
++ * Before calling this function, the device driver must already have set the
++ * device zone size (chunk_sector limit) and the max zone append limit.
++ * For BIO based drivers, this function cannot be used. BIO based device drivers
++ * only need to set disk->nr_zones so that the sysfs exposed value is correct.
+  * If the @update_driver_data callback function is not NULL, the callback is
+  * executed with the device request queue frozen after all zones have been
+  * checked.
+@@ -545,9 +542,9 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+ 			      void (*update_driver_data)(struct gendisk *disk))
+ {
+ 	struct request_queue *q = disk->queue;
+-	struct blk_revalidate_zone_args args = {
+-		.disk		= disk,
+-	};
++	sector_t zone_sectors = q->limits.chunk_sectors;
++	sector_t capacity = get_capacity(disk);
++	struct blk_revalidate_zone_args args = { };
+ 	unsigned int noio_flag;
+ 	int ret;
+ 
+@@ -556,13 +553,31 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+ 	if (WARN_ON_ONCE(!queue_is_mq(q)))
+ 		return -EIO;
+ 
+-	if (!get_capacity(disk))
+-		return -EIO;
++	if (!capacity)
++		return -ENODEV;
++
++	/*
++	 * Checks that the device driver indicated a valid zone size and that
++	 * the max zone append limit is set.
++	 */
++	if (!zone_sectors || !is_power_of_2(zone_sectors)) {
++		pr_warn("%s: Invalid non power of two zone size (%llu)\n",
++			disk->disk_name, zone_sectors);
++		return -ENODEV;
++	}
++
++	if (!q->limits.max_zone_append_sectors) {
++		pr_warn("%s: Invalid 0 maximum zone append limit\n",
++			disk->disk_name);
++		return -ENODEV;
++	}
+ 
+ 	/*
+ 	 * Ensure that all memory allocations in this context are done as if
+ 	 * GFP_NOIO was specified.
+ 	 */
++	args.disk = disk;
++	args.nr_zones = (capacity + zone_sectors - 1) >> ilog2(zone_sectors);
+ 	noio_flag = memalloc_noio_save();
+ 	ret = disk->fops->report_zones(disk, 0, UINT_MAX,
+ 				       blk_revalidate_zone_cb, &args);
+@@ -576,7 +591,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+ 	 * If zones where reported, make sure that the entire disk capacity
+ 	 * has been checked.
+ 	 */
+-	if (ret > 0 && args.sector != get_capacity(disk)) {
++	if (ret > 0 && args.sector != capacity) {
+ 		pr_warn("%s: Missing zones from sector %llu\n",
+ 			disk->disk_name, args.sector);
+ 		ret = -ENODEV;
+@@ -589,7 +604,6 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+ 	 */
+ 	blk_mq_freeze_queue(q);
+ 	if (ret > 0) {
+-		blk_queue_chunk_sectors(q, args.zone_sectors);
+ 		disk->nr_zones = args.nr_zones;
+ 		swap(disk->seq_zones_wlock, args.seq_zones_wlock);
+ 		swap(disk->conv_zones_bitmap, args.conv_zones_bitmap);
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.40.1
+
