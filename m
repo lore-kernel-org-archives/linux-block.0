@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D401CC001DF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 13:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2653BC04FE0
+	for <linux-block@archiver.kernel.org>; Thu,  3 Aug 2023 13:04:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235923AbjHCNDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Aug 2023 09:03:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53908 "EHLO
+        id S235910AbjHCNEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Aug 2023 09:04:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235875AbjHCNDw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 09:03:52 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E978E46;
-        Thu,  3 Aug 2023 06:03:30 -0700 (PDT)
+        with ESMTP id S235903AbjHCNDx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 09:03:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93653A95;
+        Thu,  3 Aug 2023 06:03:39 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 98A1E61D98;
-        Thu,  3 Aug 2023 13:03:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15D3BC433CB;
-        Thu,  3 Aug 2023 13:03:27 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 25F4461D95;
+        Thu,  3 Aug 2023 13:03:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93CE4C433CB;
+        Thu,  3 Aug 2023 13:03:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691067809;
-        bh=zQE4rT5enBO5UT1ezJALmZAk6kcWK//Jfn4eLC+j/7g=;
+        s=k20201202; t=1691067818;
+        bh=0x6TgWu1Bn+eCj8xVEVQRapJw7Zn53cnaAqZeL2CRdo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hn7VzLbLhbKyqqu6GA441R734ybvDl2odyoMshJvQxGsxlkfFtTHCjcOqrl7HmXQU
-         Jt5uaP/SIM78l0kLKcb4r70a5cDK/v/RX8rSTzeHD67URlhhh3hMO/wzMuZhoFbqeC
-         g+8SMGLVxh4ZLA8ZiK6NPKu3PH+ef1I6FacbX5bIDOY2Xd86/xd+UvprALUPUmzcew
-         E+Mqq4/GmeNmYbXnlUKomKayJ2ShU7ODpVIBEF13KEM3UrpFg0RcUPCoyTwPSl0kk9
-         8SrQ0PNpQXpYlVhhQyYEC9HtPY81nv0QbrlYFlLcmMenMdxosQilUiXqljm/WZuqZL
-         RpLn0N1fuOH4A==
+        b=YwjdhJ4sYjInzkG9i1oCz351ibWbx6AMA0mOsygRLtinTl/mOem5/mEWAFps2aPrP
+         1zEu6tGfm9m02YN/J5pZAXJ8fJvKOMGlvcV7KNSL2OZZpIOE0FY7Epj1YrLnXY10ic
+         xqJGFjmSzk2620TJ6VOxXh57vf1neelzfRRVA2ihbIJVybM70lUnuuQyC+kcFmFKBk
+         I2TUTK7XRZSMujJJWoY9GsaP/KYr84KzhHnF/VdSViuEbPIaEScrDGaDcN7PE4LFCB
+         MDi9cvvduo7hIR52HSFTqx9s71HNKukbps+u4acJDdi7K7LGMD7w3N8mtvoMJZ3zFz
+         7QYRhNMqRKpdQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Damien Le Moal <dlemoal@kernel.org>,
@@ -40,16 +40,16 @@ Cc:     Damien Le Moal <dlemoal@kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Sasha Levin <sashal@kernel.org>, axboe@kernel.dk,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 4/7] scsi: block: Improve checks in blk_revalidate_disk_zones()
-Date:   Thu,  3 Aug 2023 09:03:17 -0400
-Message-Id: <20230803130321.641516-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 2/5] scsi: block: Improve checks in blk_revalidate_disk_zones()
+Date:   Thu,  3 Aug 2023 09:03:30 -0400
+Message-Id: <20230803130333.641625-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230803130321.641516-1-sashal@kernel.org>
-References: <20230803130321.641516-1-sashal@kernel.org>
+In-Reply-To: <20230803130333.641625-1-sashal@kernel.org>
+References: <20230803130333.641625-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.4.7
+X-stable-base: Linux 6.1.42
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -105,10 +105,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 50 insertions(+), 36 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index fce9082384d65..da92ce0c5da98 100644
+index db829401d8d0c..79250c70b8802 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -448,7 +448,6 @@ struct blk_revalidate_zone_args {
+@@ -458,7 +458,6 @@ struct blk_revalidate_zone_args {
  	unsigned long	*conv_zones_bitmap;
  	unsigned long	*seq_zones_wlock;
  	unsigned int	nr_zones;
@@ -116,7 +116,7 @@ index fce9082384d65..da92ce0c5da98 100644
  	sector_t	sector;
  };
  
-@@ -462,38 +461,34 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+@@ -472,38 +471,34 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
  	struct gendisk *disk = args->disk;
  	struct request_queue *q = disk->queue;
  	sector_t capacity = get_capacity(disk);
@@ -174,7 +174,7 @@ index fce9082384d65..da92ce0c5da98 100644
  		return -ENODEV;
  	}
  
-@@ -532,11 +527,13 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
+@@ -542,11 +537,13 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
   * @disk:	Target disk
   * @update_driver_data:	Callback to update driver data on the frozen disk
   *
@@ -193,7 +193,7 @@ index fce9082384d65..da92ce0c5da98 100644
   * If the @update_driver_data callback function is not NULL, the callback is
   * executed with the device request queue frozen after all zones have been
   * checked.
-@@ -545,9 +542,9 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+@@ -555,9 +552,9 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
  			      void (*update_driver_data)(struct gendisk *disk))
  {
  	struct request_queue *q = disk->queue;
@@ -206,7 +206,7 @@ index fce9082384d65..da92ce0c5da98 100644
  	unsigned int noio_flag;
  	int ret;
  
-@@ -556,13 +553,31 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+@@ -566,13 +563,31 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
  	if (WARN_ON_ONCE(!queue_is_mq(q)))
  		return -EIO;
  
@@ -240,7 +240,7 @@ index fce9082384d65..da92ce0c5da98 100644
  	noio_flag = memalloc_noio_save();
  	ret = disk->fops->report_zones(disk, 0, UINT_MAX,
  				       blk_revalidate_zone_cb, &args);
-@@ -576,7 +591,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+@@ -586,7 +601,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
  	 * If zones where reported, make sure that the entire disk capacity
  	 * has been checked.
  	 */
@@ -249,7 +249,7 @@ index fce9082384d65..da92ce0c5da98 100644
  		pr_warn("%s: Missing zones from sector %llu\n",
  			disk->disk_name, args.sector);
  		ret = -ENODEV;
-@@ -589,7 +604,6 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
+@@ -599,7 +614,6 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
  	 */
  	blk_mq_freeze_queue(q);
  	if (ret > 0) {
