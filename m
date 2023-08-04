@@ -2,52 +2,59 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0E3C04A6A
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 15:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF65C41513
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 15:49:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232160AbjHDPs4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 11:48:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45562 "EHLO
+        id S232184AbjHDPtC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 11:49:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232099AbjHDPsg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 11:48:36 -0400
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9536212D;
-        Fri,  4 Aug 2023 08:48:35 -0700 (PDT)
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-686daaa5f1fso1707303b3a.3;
-        Fri, 04 Aug 2023 08:48:35 -0700 (PDT)
+        with ESMTP id S232176AbjHDPs6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 11:48:58 -0400
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8351C3C3D;
+        Fri,  4 Aug 2023 08:48:51 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-686b91c2744so1658841b3a.0;
+        Fri, 04 Aug 2023 08:48:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691164115; x=1691768915;
+        d=1e100.net; s=20221208; t=1691164131; x=1691768931;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/dgVJwigdvLnC3PLQrDWBl0zwhzVQqSuEsytYp17x/Y=;
-        b=M4Ot9OTmkOPk+bUQurRH6a97qDMsh8YdTY7WFWWYd8xk8/kPPvX+yqDotL1Fx5OBon
-         A4ySavAUZamGF1PzooWnHeoaWXj5LXIXSgviIS4AjUyDOAD2dahFQoEH4v0j8AsOX2QC
-         uDHpmUbj/MvqbZ8eMtsWlIp7WtMyRWBhhLdNj9mDK+1Nf2mHjDIUk4dZqaP/mVL/1Gwk
-         SwT5UcxVu8Xb5+z3NWbvuG4C3zElGZgZAd4zQUPvIHXQ25eZ5yI5ozUWQScnkRKQnB4e
-         jm6zsaKjQDu3kr39qUzTsHxUVtJd9U2RvrmJqpZ/Ak9+S6LdkS75+4U2qp2lqNjXMuBd
-         Nvag==
-X-Gm-Message-State: AOJu0YzuRWmbitPH6flf4ITxN/klifSvyJ0pTtPPTUs0/pJBjAx4M69K
-        +4oPnla5CQHehdx7PZJs+I4=
-X-Google-Smtp-Source: AGHT+IE6UXeJ8m7847TPVs7vLSEAfOlH6ykY+KbSZLgMvhXxq6urbq5zJmbU1hdzw9B2bAQnGhyBoQ==
-X-Received: by 2002:a05:6a00:22c2:b0:687:3e8f:2211 with SMTP id f2-20020a056a0022c200b006873e8f2211mr2370496pfj.34.1691164115160;
-        Fri, 04 Aug 2023 08:48:35 -0700 (PDT)
+        bh=KQtAnIArA9iV45Y4VwwqcwMGiJtLwJXQ9EsDGHUi6lM=;
+        b=d2zmke1GtAqOm2rjGdpCs7xLj2MTKpDp7TECW3hWN2rbRX6BtV7iKHqpu5JkoW2uTE
+         PFKCL9i01sFU7rp0lYMwTg2EtF/awXXmw1XZO8VHbMHej87trt2QVUNPwFj86q0sF0GC
+         LLJJ2phe/CLGmY1qTfw2aDrtl3K0q991FlQCUAVY7htxvvnlcuDrFKJa4gVnPbWx0XjB
+         y+aUMh3UCUN2JlHTXOnfDXJVmJot1uRGnMA0TRLHWy/0M6ro1WB1s7KyZl6MfjRr2FGz
+         vrGBj1mivv9CJXxAgrZCaU200eJ3GJNJBLitTG7v6ZAX2fb510rsIgttgDEeyYOdhWSf
+         Zc1A==
+X-Gm-Message-State: AOJu0Ywe+VOw5NA2rRYGwtAKblpEQ5rKnGwtW/KsRGWhgpyfJqZz6lmb
+        nK5QUNSUroJ8RBzPuStPT4M=
+X-Google-Smtp-Source: AGHT+IE48FqADNLKlkekkHruc3Q1Lm15ReNNdc+DPvYTsEztXHmAxkjlOsp1OBR7lysU26fELmMznQ==
+X-Received: by 2002:a05:6a20:970e:b0:122:10f9:f635 with SMTP id hr14-20020a056a20970e00b0012210f9f635mr1925562pzc.19.1691164130831;
+        Fri, 04 Aug 2023 08:48:50 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:4af5:d063:a66d:403b])
-        by smtp.gmail.com with ESMTPSA id h8-20020a62b408000000b00640ddad2e0dsm1760839pfn.47.2023.08.04.08.48.34
+        by smtp.gmail.com with ESMTPSA id h8-20020a62b408000000b00640ddad2e0dsm1760839pfn.47.2023.08.04.08.48.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 08:48:34 -0700 (PDT)
+        Fri, 04 Aug 2023 08:48:50 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: [PATCH v6 5/7] scsi: scsi_debug: Support injecting unaligned write errors
-Date:   Fri,  4 Aug 2023 08:48:03 -0700
-Message-ID: <20230804154821.3232094-6-bvanassche@acm.org>
+        Avri Altman <avri.altman@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Can Guo <quic_cang@quicinc.com>, Bean Huo <beanhuo@micron.com>,
+        Asutosh Das <quic_asutoshd@quicinc.com>,
+        "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
+        Arthur Simchaev <Arthur.Simchaev@wdc.com>
+Subject: [PATCH v6 7/7] scsi: ufs: Disable zone write locking
+Date:   Fri,  4 Aug 2023 08:48:05 -0700
+Message-ID: <20230804154821.3232094-8-bvanassche@acm.org>
 X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
 In-Reply-To: <20230804154821.3232094-1-bvanassche@acm.org>
 References: <20230804154821.3232094-1-bvanassche@acm.org>
@@ -57,50 +64,128 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allow user space software, e.g. a blktests test, to inject unaligned
-write errors.
+From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
+"The host controller always process transfer requests in-order according
+to the order submitted to the list. In case of multiple commands with
+single doorbell register ringing (batch mode), The dispatch order for
+these transfer requests by host controller will base on their index in
+the List. A transfer request with lower index value will be executed
+before a transfer request with higher index value."
+
+From the UFSHCI 4.0 specification, about the MCQ mode:
+"Command Submission
+1. Host SW writes an Entry to SQ
+2. Host SW updates SQ doorbell tail pointer
+
+Command Processing
+3. After fetching the Entry, Host Controller updates SQ doorbell head
+   pointer
+4. Host controller sends COMMAND UPIU to UFS device"
+
+In other words, for both legacy and MCQ mode, UFS controllers are
+required to forward commands to the UFS device in the order these
+commands have been received from the host.
+
+Notes:
+- For legacy mode this is only correct if the host submits one
+  command at a time. The UFS driver does this.
+- Also in legacy mode, the command order is not preserved if
+  auto-hibernation is enabled in the UFS controller. Hence, enable
+  zone write locking if auto-hibernation is enabled.
+
+This patch improves performance as follows on my test setup:
+- With the mq-deadline scheduler: 2.5x more IOPS for small writes.
+- When not using an I/O scheduler compared to using mq-deadline with
+  zone locking: 4x more IOPS for small writes.
 
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Douglas Gilbert <dgilbert@interlog.com>
+Cc: Avri Altman <avri.altman@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/scsi_debug.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ drivers/ufs/core/ufshcd.c | 40 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 57c6242bfb26..051b0605f11f 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -181,6 +181,7 @@ static const char *sdebug_version_date = "20210520";
- #define SDEBUG_OPT_NO_CDB_NOISE		0x4000
- #define SDEBUG_OPT_HOST_BUSY		0x8000
- #define SDEBUG_OPT_CMD_ABORT		0x10000
-+#define SDEBUG_OPT_UNALIGNED_WRITE	0x20000
- #define SDEBUG_OPT_ALL_NOISE (SDEBUG_OPT_NOISE | SDEBUG_OPT_Q_NOISE | \
- 			      SDEBUG_OPT_RESET_NOISE)
- #define SDEBUG_OPT_ALL_INJECTING (SDEBUG_OPT_RECOVERED_ERR | \
-@@ -188,7 +189,8 @@ static const char *sdebug_version_date = "20210520";
- 				  SDEBUG_OPT_DIF_ERR | SDEBUG_OPT_DIX_ERR | \
- 				  SDEBUG_OPT_SHORT_TRANSFER | \
- 				  SDEBUG_OPT_HOST_BUSY | \
--				  SDEBUG_OPT_CMD_ABORT)
-+				  SDEBUG_OPT_CMD_ABORT | \
-+				  SDEBUG_OPT_UNALIGNED_WRITE)
- #define SDEBUG_OPT_RECOV_DIF_DIX (SDEBUG_OPT_RECOVERED_ERR | \
- 				  SDEBUG_OPT_DIF_ERR | SDEBUG_OPT_DIX_ERR)
+diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
+index ae7b868f9c26..3c99516c38fa 100644
+--- a/drivers/ufs/core/ufshcd.c
++++ b/drivers/ufs/core/ufshcd.c
+@@ -4337,23 +4337,53 @@ int ufshcd_uic_hibern8_exit(struct ufs_hba *hba)
+ }
+ EXPORT_SYMBOL_GPL(ufshcd_uic_hibern8_exit);
  
-@@ -3587,6 +3589,14 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 	struct sdeb_store_info *sip = devip2sip(devip, true);
- 	u8 *cmd = scp->cmnd;
- 
-+	if (unlikely(sdebug_opts & SDEBUG_OPT_UNALIGNED_WRITE &&
-+		     atomic_read(&sdeb_inject_pending))) {
-+		atomic_set(&sdeb_inject_pending, 0);
-+		mk_sense_buffer(scp, ILLEGAL_REQUEST, LBA_OUT_OF_RANGE,
-+				UNALIGNED_WRITE_ASCQ);
-+		return check_condition_result;
-+	}
++static void ufshcd_update_no_zone_write_lock(struct ufs_hba *hba,
++					     bool set_no_zone_write_lock)
++{
++	struct scsi_device *sdev;
 +
- 	switch (cmd[0]) {
- 	case WRITE_16:
- 		ei_lba = 0;
++	shost_for_each_device(sdev, hba->host)
++		blk_freeze_queue_start(sdev->request_queue);
++	shost_for_each_device(sdev, hba->host) {
++		struct request_queue *q = sdev->request_queue;
++
++		blk_mq_freeze_queue_wait(q);
++		if (set_no_zone_write_lock)
++			blk_queue_flag_set(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, q);
++		else
++			blk_queue_flag_clear(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, q);
++		blk_mq_unfreeze_queue(q);
++	}
++}
++
+ void ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
+ {
+ 	unsigned long flags;
+-	bool update = false;
++	bool prev_state, new_state, update = false;
+ 
+ 	if (!ufshcd_is_auto_hibern8_supported(hba))
+ 		return;
+ 
+ 	spin_lock_irqsave(hba->host->host_lock, flags);
++	prev_state = ufshcd_is_auto_hibern8_enabled(hba);
+ 	if (hba->ahit != ahit) {
+ 		hba->ahit = ahit;
+ 		update = true;
+ 	}
++	new_state = ufshcd_is_auto_hibern8_enabled(hba);
+ 	spin_unlock_irqrestore(hba->host->host_lock, flags);
+ 
+ 	if (!update)
+ 		return;
++	if (!is_mcq_enabled(hba) && !prev_state && new_state) {
++		/*
++		 * Auto-hibernation will be enabled. Enable write locking for
++		 * zoned writes since auto-hibernation may cause reordering of
++		 * zoned writes when using the legacy mode of the UFS host
++		 * controller.
++		 */
++		ufshcd_update_no_zone_write_lock(hba, false);
++	}
+ 	if (!pm_runtime_suspended(&hba->ufs_device_wlun->sdev_gendev)) {
+ 		ufshcd_rpm_get_sync(hba);
+ 		ufshcd_hold(hba);
+@@ -4361,6 +4391,13 @@ void ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
+ 		ufshcd_release(hba);
+ 		ufshcd_rpm_put_sync(hba);
+ 	}
++	if (!is_mcq_enabled(hba) && prev_state && !new_state) {
++		/*
++		 * Auto-hibernation has been disabled. Disable write locking
++		 * for zoned writes.
++		 */
++		ufshcd_update_no_zone_write_lock(hba, true);
++	}
+ }
+ EXPORT_SYMBOL_GPL(ufshcd_auto_hibern8_update);
+ 
+@@ -5140,6 +5177,7 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
+ 
+ 	ufshcd_hpb_configure(hba, sdev);
+ 
++	blk_queue_flag_set(QUEUE_FLAG_NO_ZONE_WRITE_LOCK, q);
+ 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
+ 	if (hba->quirks & UFSHCD_QUIRK_4KB_DMA_ALIGNMENT)
+ 		blk_queue_update_dma_alignment(q, SZ_4K - 1);
