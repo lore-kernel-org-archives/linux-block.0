@@ -2,101 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E203EB64DD
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 02:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70153C0015E
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 02:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231236AbjHDCBO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Aug 2023 22:01:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32852 "EHLO
+        id S232735AbjHDCB7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Aug 2023 22:01:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjHDCBN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 22:01:13 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7BF10EA
-        for <linux-block@vger.kernel.org>; Thu,  3 Aug 2023 19:01:11 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-2684e225a6cso272027a91.1
-        for <linux-block@vger.kernel.org>; Thu, 03 Aug 2023 19:01:11 -0700 (PDT)
+        with ESMTP id S232705AbjHDCB7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 22:01:59 -0400
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 306E544A1;
+        Thu,  3 Aug 2023 19:01:57 -0700 (PDT)
+Received: by mail-vs1-xe2e.google.com with SMTP id ada2fe7eead31-447684c4283so673822137.2;
+        Thu, 03 Aug 2023 19:01:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691114471; x=1691719271;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qRe8CI7xK9YdHSQPDOmK1mO6LPdqNHzGTyyI9WtFcQs=;
-        b=cZTYvPmmKjZ6yPE7K9dSTJyWSDjeQfjGSRPCZRCVPH8iHnHlKkMPVIa4Pftfv9LbUf
-         y8in3Dfic+IDakjT5z3xU9+FJ36tsZ0BQcT/PoFKMJaxt3i76TZ8b5+SEGVc+BoWCeAh
-         V7P4ZzeXN8MKdqg8xQwB1QbaoslUhBTRSJCjcD+ZwIgPGC/9ILCXYqsQWC9YYn6BVDRK
-         cJulIg9T0FCEEcoW1FTYTllYx2gJYXxYOvbqbJv7iTbbYeOoyZnolW/gzB6EXRSEXDhO
-         ef1sHvOFNBp2mhB2i4p1x6e2UK+MKc4wCsRxgMYPUSmXfbfyLxSnU+A8YZc5SCC1uri7
-         kykg==
+        d=gmail.com; s=20221208; t=1691114516; x=1691719316;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Li4Rr3SDbAWbMC9vqUARkDUxqa5LNmgwNWmtZCQPN7c=;
+        b=MoVB1XjmMagsHZzn9G8ftY6HWJZOUd3UQbdoUZGHvxiTrJtRhQmKpY5hMXxXdiDzuq
+         zQBrBD4AM2yCz+AjuuOypK1qRVFL8If5W+fTO+cw9XBWSGuM7Hrx2k1cmlpjp62wiDDF
+         xmsVPYq08ScKsEB2acJFU2fLVkjAs3OQk4kUojzHHGQtCjQau8BO/IfSPhWz7s7RoG+F
+         ObfsdVyd9J6qFm5iu3TH8pCH6XZy+vWbCGwACVvcWshSg7B1v3rxfId451mLVIpY2bVi
+         GasCyfXQI0s3z46olnWXSpFmLflSUgwZZScpT/KeG4Ra5OVORJFyNsdv2rD2oRuBkEtE
+         dKlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691114471; x=1691719271;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qRe8CI7xK9YdHSQPDOmK1mO6LPdqNHzGTyyI9WtFcQs=;
-        b=UdotXsbZ7bFqUKGGoiXSxWGfYR2DMOP9Z6ZIr9AzuguS9Gdip53kUCT6eA6DmUk2ez
-         AIY5TGyO6BU6PUURLCXNDEF8QUZXq4XSofMcxEn3s6wJeyfDwtNX5haAk8A/tF7V3m2+
-         YXOIYTfqFcOtWzOrttcb3q2k1RnIY6A1HIjC256xYv5j4gWxxcQQJB3IOrFw0mBny9iy
-         Hoc0KT4Nyih8Ikh1mfENcxL6sIGyBR+QRhgM8IxGgugDf0Iqfd8f81sk947Hdrdl6BM7
-         wx4ZXF/lFfaHSp5IN78mz0kptRLiQyoKL0zyZs61OqiDx+s0nFkxSQcjODALwn1RVUEO
-         X4RA==
-X-Gm-Message-State: ABy/qLbQO0bcArMxHBFQJLQ3FoIzrI/cAZomCbH/zTpN/VeTFz43XYK5
-        93tu5BQzj+7q5nmLE9yY4jY6xA==
-X-Google-Smtp-Source: APBJJlEE6jmPJaIgUGvwa3nc9Ve34em9166qso/8niv4JtARWIb0Bra8YqYex0R0gszappbuUQssIw==
-X-Received: by 2002:a17:90a:53a3:b0:268:437:7bd9 with SMTP id y32-20020a17090a53a300b0026804377bd9mr15893961pjh.3.1691114471116;
-        Thu, 03 Aug 2023 19:01:11 -0700 (PDT)
-Received: from [172.20.1.218] (071-095-160-189.biz.spectrum.com. [71.95.160.189])
-        by smtp.gmail.com with ESMTPSA id jh2-20020a170903328200b001a6d4ea7301sm483963plb.251.2023.08.03.19.01.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Aug 2023 19:01:10 -0700 (PDT)
-Message-ID: <5c85d3ee-26f8-9f34-a462-ebdbaee3b900@kernel.dk>
-Date:   Thu, 3 Aug 2023 20:01:09 -0600
+        d=1e100.net; s=20221208; t=1691114516; x=1691719316;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Li4Rr3SDbAWbMC9vqUARkDUxqa5LNmgwNWmtZCQPN7c=;
+        b=AHwHs1RDHmSRRmMjEQdp+RoWkigg69QbSEujxAVrY8D9ipzJ60Ju0TJHasS2oa2qcp
+         QbDA3n8BWOjcDu7YmnYL80StdtYdCcaJS+9TwoUiYpuxqzZt7IPnjwf0A6ImjihI7ljx
+         Rz+3hsVYQo3vef1JPaB/jl0TW3sVPCr5wgfXf91SkP92D74ssmF2C15Ah/LhHFgD6OrZ
+         Dr/G81p/groWSONlBM9e2z1WG6HPPfD3YAjCK6lfKGyxNfKaWUwVKXJL35T1lR9phjzH
+         c2uCC3MK43cARq8goc0EWtvy/EVUyEM1JWP2C5M0YA7UrRdxGcPsM3YyfBYcevdmUcOR
+         rlMw==
+X-Gm-Message-State: AOJu0YyZGsTcfdCada2Pv0UMonW1QldD/e237rGQQSMnfF7ynhVuJ9H/
+        Gm3gH9iSKS6EsN42ApoOrz+Xc1/wNT+tEcOslw0=
+X-Google-Smtp-Source: AGHT+IHATFbengwvPlZLXwXXl9tdvm/xeC68n6I1h9PJY7Qw0FOEZCU8f3gigNz/0f8AxRF04Qwf1gS0iLv+NBKaP4k=
+X-Received: by 2002:a05:6102:a35:b0:443:7635:34d with SMTP id
+ 21-20020a0561020a3500b004437635034dmr329869vsb.30.1691114516008; Thu, 03 Aug
+ 2023 19:01:56 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH -next] fs/Kconfig: Fix compile error for romfs
-To:     Li Zetao <lizetao1@huawei.com>, mcgrof@kernel.org,
-        johannes.thumshirn@wdc.com
-Cc:     hch@lst.de,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20230803130738.999853-1-lizetao1@huawei.com>
-Content-Language: en-US
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230803130738.999853-1-lizetao1@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230802154131.2221419-1-hch@lst.de> <20230802154131.2221419-3-hch@lst.de>
+ <20230803114651.ihtqqgthbdjjgxev@quack3>
+In-Reply-To: <20230803114651.ihtqqgthbdjjgxev@quack3>
+From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Date:   Fri, 4 Aug 2023 11:01:39 +0900
+Message-ID: <CAKFNMomzHg33SHnp6xGMEZY=+k6Y4t7dvBvgBDbO9H3ujzNDCw@mail.gmail.com>
+Subject: Re: [PATCH 02/12] nilfs2: use setup_bdev_super to de-duplicate the
+ mount code
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/3/23 7:07?AM, Li Zetao wrote:
-> There are some compile errors reported by kernel test robot:
-> 
-> arm-linux-gnueabi-ld: fs/romfs/storage.o: in function `romfs_dev_read':
-> storage.c:(.text+0x64): undefined reference to `__brelse'
-> arm-linux-gnueabi-ld: storage.c:(.text+0x9c): undefined reference to `__bread_gfp'
-> arm-linux-gnueabi-ld: fs/romfs/storage.o: in function `romfs_dev_strnlen':
-> storage.c:(.text+0x128): undefined reference to `__brelse'
-> arm-linux-gnueabi-ld: storage.c:(.text+0x16c): undefined reference to `__bread_gfp'
-> arm-linux-gnueabi-ld: fs/romfs/storage.o: in function `romfs_dev_strcmp':
-> storage.c:(.text+0x22c): undefined reference to `__bread_gfp'
-> arm-linux-gnueabi-ld: storage.c:(.text+0x27c): undefined reference to `__brelse'
-> arm-linux-gnueabi-ld: storage.c:(.text+0x2a8): undefined reference to `__bread_gfp'
-> arm-linux-gnueabi-ld: storage.c:(.text+0x2bc): undefined reference to `__brelse'
-> arm-linux-gnueabi-ld: storage.c:(.text+0x2d4): undefined reference to `__brelse'
-> arm-linux-gnueabi-ld: storage.c:(.text+0x2f4): undefined reference to `__brelse'
-> arm-linux-gnueabi-ld: storage.c:(.text+0x304): undefined reference to `__brelse'
-> 
-> The reason for the problem is that the commit
-> "925c86a19bac" ("fs: add CONFIG_BUFFER_HEAD") has added a new config
-> "CONFIG_BUFFER_HEAD" that controls building the buffer_head code, and
-> romfs needs to use the buffer_head API, but no corresponding config has
-> beed added. Select the config "CONFIG_BUFFER_HEAD" in romfs Kconfig to
-> resolve the problem.
+On Thu, Aug 3, 2023 at 8:46=E2=80=AFPM Jan Kara wrote:
+>
+> On Wed 02-08-23 17:41:21, Christoph Hellwig wrote:
+> > Use the generic setup_bdev_super helper to open the main block device
+> > and do various bits of superblock setup instead of duplicating the
+> > logic.  This includes moving to the new scheme implemented in common
+> > code that only opens the block device after the superblock has allocate=
+d.
+> >
+> > It does not yet convert nilfs2 to the new mount API, but doing so will
+> > become a bit simpler after this first step.
+> >
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+>
+> AFAICS nilfs2 could *almost* use mount_bdev() directly and then just do i=
+ts
 
-Patch looks good to me, for some reason not CC'ed to any lists though.
-Adding linux-block now and getting it applied.
+> snapshot thing after mount_bdev() returns. But it has this weird logic
+> that: "if the superblock is already mounted but we can shrink the whole
+> dcache, then do remount instead of ignoring mount options". Firstly, this
+> looks racy - what prevents someone from say opening a file on the sb just
+> after nilfs_tree_is_busy() shrinks dcache? Secondly, it is inconsistent
+> with any other filesystem so it's going to surprise sysadmins not
+> intimately knowing nilfs2. Thirdly, from userspace you cannot tell what
+> your mount call is going to do. Last but not least, what is it really goo=
+d
+> for? Ryusuke, can you explain please?
+>
+>                                                                 Honza
 
--- 
-Jens Axboe
+I think you are referring to the following part:
 
+>        if (!s->s_root) {
+...
+>        } else if (!sd.cno) {
+>                if (nilfs_tree_is_busy(s->s_root)) {
+>                        if ((flags ^ s->s_flags) & SB_RDONLY) {
+>                                nilfs_err(s,
+>                                          "the device already has a %s mou=
+nt.",
+>                                          sb_rdonly(s) ? "read-only" : "re=
+ad/write");
+>                                err =3D -EBUSY;
+>                                goto failed_super;
+>                        }
+>                } else {
+>                        /*
+>                         * Try remount to setup mount states if the curren=
+t
+>                         * tree is not mounted and only snapshots use this=
+ sb.
+>                         */
+>                        err =3D nilfs_remount(s, &flags, data);
+>                        if (err)
+>                                goto failed_super;
+>                }
+>        }
+
+What this logic is trying to do is, if there is already a nilfs2 mount
+instance for the device, and are trying to mounting the current tree
+(sd.cno is 0, so this is not a snapshot mount), then will switch
+depending on whether the current tree has a mount:
+
+- If the current tree is mounted, it's just like a normal filesystem.
+(A read-only mount and a read/write mount can't coexist, so check
+that, and reuse the instance if possible)
+- Otherwise, i.e. for snapshot mounts only, do whatever is necessary
+to add a new current mount, such as starting a log writer.
+   Since it does the same thing that nilfs_remount does, so
+nilfs_remount() is used there.
+
+Whether or not there is a current tree mount can be determined by
+d_count(s->s_root) > 1 as nilfs_tree_is_busy() does.
+Where s->s_root is always the root dentry of the current tree, not
+that of the mounted snapshot.
+
+I remember that calling shrink_dcache_parent() before this test was to
+do the test correctly if there was garbage left in the dcache from the
+past current mount.
+
+If the current tree isn't mounted, it just cleans up the garbage, and
+the reference count wouldn't have incremented in parallel.
+
+If the current tree is mounted, d_count(s->s_root) will not decrease
+to 1, so it's not a problem.
+However, this will cause unexpected dcache shrinkage for the in-use
+tree, so it's not a good idea, as you pointed out.  If there is
+another way of judging without this side effect, it should be
+replaced.
+
+I will reply here once.
+
+Regards,
+Ryusuke Konishi
