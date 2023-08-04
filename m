@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA242C00528
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC07C001DB
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:16:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230365AbjHDNQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 09:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57340 "EHLO
+        id S230359AbjHDNQp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 09:16:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230464AbjHDNQO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:16:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA434C38
-        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 06:14:01 -0700 (PDT)
+        with ESMTP id S230387AbjHDNQP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:16:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522574EC7
+        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 06:14:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691154841;
+        s=mimecast20190719; t=1691154844;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8jx2PV1ugV88EZ7bQHh38xuBD59rjqjMHqZUXN4vRtQ=;
-        b=TqiuviNO6R+Uy4sfpNOxPT+K3qpVZG9uhl20jy4t8+ey8Gsn1SAfyg5QAV4oaFQEgB8HjV
-        XqAujwl3qx3e5SXkvABMjJkiiApP/8OgZ8yVeteKV1oe+I7qHC8NVZnRXbP/cf0rcfV12u
-        VzTXiXIt6JhoxTdejkW5WRD/uQxQQBo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-670-Lnq9KISqNHem0GsIpm5I-Q-1; Fri, 04 Aug 2023 09:13:56 -0400
-X-MC-Unique: Lnq9KISqNHem0GsIpm5I-Q-1
+        bh=jzu8fasV+aKxrhKzf7SpDRjT/Fb/KvqzXURcAl/1eC8=;
+        b=VKllNzU6WWSL2BGv3uW3/izw9p4Ac6OVERXk5uGvin9f1p1pXlvbjUvf1cnzu6UM9NK6jQ
+        KjEOht2YmrMHjzMbJaDaHva1qMgRbtUdPuHKlRxqO6Mrfslw7QIRq6emZAVYHWWj+AKVFN
+        gHYYlo5giCYw7LCl6gqBS+r5wo1ZsZo=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-611-KDnOmyoHPMCfaw7z8GudnA-1; Fri, 04 Aug 2023 09:14:03 -0400
+X-MC-Unique: KDnOmyoHPMCfaw7z8GudnA-1
 Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E6B180123E;
-        Fri,  4 Aug 2023 13:13:55 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C08613C0FCB0;
+        Fri,  4 Aug 2023 13:14:02 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D1EB492B03;
-        Fri,  4 Aug 2023 13:13:54 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 93B07492B03;
+        Fri,  4 Aug 2023 13:14:01 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -44,9 +44,9 @@ Cc:     David Howells <dhowells@redhat.com>,
         Dongsheng Yang <dongsheng.yang@easystack.cn>,
         ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 12/18] ceph: Convert some page arrays to ceph_databuf
-Date:   Fri,  4 Aug 2023 14:13:21 +0100
-Message-ID: <20230804131327.2574082-13-dhowells@redhat.com>
+Subject: [RFC PATCH 16/18] ceph: Remove CEPH_OS_DATA_TYPE_PAGES and its attendant helpers
+Date:   Fri,  4 Aug 2023 14:13:25 +0100
+Message-ID: <20230804131327.2574082-17-dhowells@redhat.com>
 In-Reply-To: <20230804131327.2574082-1-dhowells@redhat.com>
 References: <20230804131327.2574082-1-dhowells@redhat.com>
 MIME-Version: 1.0
@@ -57,232 +57,154 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 ---
- drivers/block/rbd.c             | 12 +++---
- include/linux/ceph/osd_client.h |  3 ++
- net/ceph/osd_client.c           | 74 +++++++++++++++++++++------------
- 3 files changed, 55 insertions(+), 34 deletions(-)
+ include/linux/ceph/osd_client.h | 20 ++----------
+ net/ceph/osd_client.c           | 57 +--------------------------------
+ 2 files changed, 3 insertions(+), 74 deletions(-)
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 1756973b696f..950b63eb41de 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -2108,7 +2108,7 @@ static int rbd_obj_calc_img_extents(struct rbd_obj_request *obj_req,
- 
- static int rbd_osd_setup_stat(struct ceph_osd_request *osd_req, int which)
- {
--	struct page **pages;
-+	struct ceph_databuf *dbuf;
- 
- 	/*
- 	 * The response data for a STAT call consists of:
-@@ -2118,14 +2118,12 @@ static int rbd_osd_setup_stat(struct ceph_osd_request *osd_req, int which)
- 	 *         le32 tv_nsec;
- 	 *     } mtime;
- 	 */
--	pages = ceph_alloc_page_vector(1, GFP_NOIO);
--	if (IS_ERR(pages))
--		return PTR_ERR(pages);
-+	dbuf = ceph_databuf_alloc(1, 8 + sizeof(struct ceph_timespec), GFP_NOIO);
-+	if (!dbuf)
-+		return -ENOMEM;
- 
- 	osd_req_op_init(osd_req, which, CEPH_OSD_OP_STAT, 0);
--	osd_req_op_raw_data_in_pages(osd_req, which, pages,
--				     8 + sizeof(struct ceph_timespec),
--				     0, false, true);
-+	osd_req_op_raw_data_in_databuf(osd_req, which, dbuf);
- 	return 0;
- }
- 
 diff --git a/include/linux/ceph/osd_client.h b/include/linux/ceph/osd_client.h
-index fd91c5d92600..fec78550d5ce 100644
+index 3099f923c241..1a1137787487 100644
 --- a/include/linux/ceph/osd_client.h
 +++ b/include/linux/ceph/osd_client.h
-@@ -483,6 +483,9 @@ extern void osd_req_op_extent_osd_data_pages(struct ceph_osd_request *,
- 					struct page **pages, u64 length,
- 					u32 offset, bool pages_from_pool,
- 					bool own_pages);
-+void osd_req_op_raw_data_in_databuf(struct ceph_osd_request *osd_req,
-+				    unsigned int which,
-+				    struct ceph_databuf *databuf);
- extern void osd_req_op_extent_osd_data_pagelist(struct ceph_osd_request *,
- 					unsigned int which,
- 					struct ceph_pagelist *pagelist);
+@@ -103,23 +103,13 @@ struct ceph_osd {
+ enum ceph_osd_data_type {
+ 	CEPH_OSD_DATA_TYPE_NONE = 0,
+ 	CEPH_OSD_DATA_TYPE_DATABUF,
+-	CEPH_OSD_DATA_TYPE_PAGES,
+ 	CEPH_OSD_DATA_TYPE_ITER,
+ };
+ 
+ struct ceph_osd_data {
+ 	enum ceph_osd_data_type	type;
+-	union {
+-		struct ceph_databuf	*dbuf;
+-		struct {
+-			struct page	**pages;
+-			u64		length;
+-			u32		offset;
+-			bool		pages_from_pool;
+-			bool		own_pages;
+-		};
+-		struct iov_iter		iter;
+-	};
++	struct ceph_databuf	*dbuf;
++	struct iov_iter		iter;
+ };
+ 
+ struct ceph_osd_req_op {
+@@ -451,12 +441,6 @@ void ceph_osdc_clear_abort_err(struct ceph_osd_client *osdc);
+ struct ceph_osd_req_op *osd_req_op_init(struct ceph_osd_request *osd_req,
+ 			    unsigned int which, u16 opcode, u32 flags);
+ 
+-extern void osd_req_op_raw_data_in_pages(struct ceph_osd_request *,
+-					unsigned int which,
+-					struct page **pages, u64 length,
+-					u32 offset, bool pages_from_pool,
+-					bool own_pages);
+-
+ extern void osd_req_op_extent_init(struct ceph_osd_request *osd_req,
+ 					unsigned int which, u16 opcode,
+ 					u64 offset, u64 length,
 diff --git a/net/ceph/osd_client.c b/net/ceph/osd_client.c
-index 6bbd9fe780c3..c83ae9bb335e 100644
+index 0fe16fdc760f..70f81a0b62c0 100644
 --- a/net/ceph/osd_client.c
 +++ b/net/ceph/osd_client.c
-@@ -181,6 +181,17 @@ osd_req_op_extent_osd_data(struct ceph_osd_request *osd_req,
+@@ -122,21 +122,6 @@ static void ceph_osd_data_init(struct ceph_osd_data *osd_data)
+ 	osd_data->type = CEPH_OSD_DATA_TYPE_NONE;
  }
- EXPORT_SYMBOL(osd_req_op_extent_osd_data);
  
-+void osd_req_op_raw_data_in_databuf(struct ceph_osd_request *osd_req,
-+				    unsigned int which,
-+				    struct ceph_databuf *dbuf)
-+{
-+	struct ceph_osd_data *osd_data;
-+
-+	osd_data = osd_req_op_raw_data_in(osd_req, which);
-+	ceph_osd_databuf_init(osd_data, dbuf);
-+}
-+EXPORT_SYMBOL(osd_req_op_raw_data_in_databuf);
-+
- void osd_req_op_raw_data_in_pages(struct ceph_osd_request *osd_req,
- 			unsigned int which, struct page **pages,
- 			u64 length, u32 offset,
-@@ -280,17 +291,16 @@ void osd_req_op_cls_request_data_pagelist(
- }
- EXPORT_SYMBOL(osd_req_op_cls_request_data_pagelist);
- 
--static void osd_req_op_cls_request_data_pages(struct ceph_osd_request *osd_req,
--			unsigned int which, struct page **pages, u64 length,
--			u32 offset, bool pages_from_pool, bool own_pages)
-+static void osd_req_op_cls_request_data_iter(
-+			struct ceph_osd_request *osd_req,
-+			unsigned int which, struct iov_iter *iter)
+-/*
+- * Consumes @pages if @own_pages is true.
+- */
+-static void ceph_osd_data_pages_init(struct ceph_osd_data *osd_data,
+-			struct page **pages, u64 length, u32 offset,
+-			bool pages_from_pool, bool own_pages)
+-{
+-	osd_data->type = CEPH_OSD_DATA_TYPE_PAGES;
+-	osd_data->pages = pages;
+-	osd_data->length = length;
+-	osd_data->offset = offset;
+-	osd_data->pages_from_pool = pages_from_pool;
+-	osd_data->own_pages = own_pages;
+-}
+-
+ static void ceph_osd_iter_init(struct ceph_osd_data *osd_data,
+ 			       struct iov_iter *iter)
  {
- 	struct ceph_osd_data *osd_data;
+@@ -181,19 +166,6 @@ void osd_req_op_raw_data_in_databuf(struct ceph_osd_request *osd_req,
+ }
+ EXPORT_SYMBOL(osd_req_op_raw_data_in_databuf);
  
- 	osd_data = osd_req_op_data(osd_req, which, cls, request_data);
+-void osd_req_op_raw_data_in_pages(struct ceph_osd_request *osd_req,
+-			unsigned int which, struct page **pages,
+-			u64 length, u32 offset,
+-			bool pages_from_pool, bool own_pages)
+-{
+-	struct ceph_osd_data *osd_data;
+-
+-	osd_data = osd_req_op_raw_data_in(osd_req, which);
 -	ceph_osd_data_pages_init(osd_data, pages, length, offset,
 -				pages_from_pool, own_pages);
--	osd_req->r_ops[which].cls.indata_len += length;
--	osd_req->r_ops[which].indata_len += length;
-+	ceph_osd_iter_init(osd_data, iter);
-+	osd_req->r_ops[which].cls.indata_len += iter->count;
-+	osd_req->r_ops[which].indata_len += iter->count;
+-}
+-EXPORT_SYMBOL(osd_req_op_raw_data_in_pages);
+-
+ void osd_req_op_extent_osd_databuf(struct ceph_osd_request *osd_req,
+ 				   unsigned int which,
+ 				   struct ceph_databuf *dbuf)
+@@ -205,19 +177,6 @@ void osd_req_op_extent_osd_databuf(struct ceph_osd_request *osd_req,
+ }
+ EXPORT_SYMBOL(osd_req_op_extent_osd_databuf);
+ 
+-void osd_req_op_extent_osd_data_pages(struct ceph_osd_request *osd_req,
+-			unsigned int which, struct page **pages,
+-			u64 length, u32 offset,
+-			bool pages_from_pool, bool own_pages)
+-{
+-	struct ceph_osd_data *osd_data;
+-
+-	osd_data = osd_req_op_data(osd_req, which, extent, osd_data);
+-	ceph_osd_data_pages_init(osd_data, pages, length, offset,
+-				pages_from_pool, own_pages);
+-}
+-EXPORT_SYMBOL(osd_req_op_extent_osd_data_pages);
+-
+ /**
+  * osd_req_op_extent_osd_iter - Set up an operation with an iterator buffer
+  * @osd_req: The request to set up
+@@ -285,8 +244,6 @@ static u64 ceph_osd_data_length(struct ceph_osd_data *osd_data)
+ 	switch (osd_data->type) {
+ 	case CEPH_OSD_DATA_TYPE_NONE:
+ 		return 0;
+-	case CEPH_OSD_DATA_TYPE_PAGES:
+-		return osd_data->length;
+ 	case CEPH_OSD_DATA_TYPE_ITER:
+ 		return iov_iter_count(&osd_data->iter);
+ 	default:
+@@ -297,13 +254,6 @@ static u64 ceph_osd_data_length(struct ceph_osd_data *osd_data)
+ 
+ static void ceph_osd_data_release(struct ceph_osd_data *osd_data)
+ {
+-	if (osd_data->type == CEPH_OSD_DATA_TYPE_PAGES && osd_data->own_pages) {
+-		int num_pages;
+-
+-		num_pages = calc_pages_for((u64)osd_data->offset,
+-						(u64)osd_data->length);
+-		ceph_release_page_vector(osd_data->pages, num_pages);
+-	}
+ 	ceph_osd_data_init(osd_data);
  }
  
- void osd_req_op_cls_response_databuf(struct ceph_osd_request *osd_req,
-@@ -3017,10 +3027,12 @@ static void linger_commit_cb(struct ceph_osd_request *req)
- 	if (!lreq->is_watch) {
- 		struct ceph_osd_data *osd_data =
- 		    osd_req_op_data(req, 0, notify, response_data);
--		void *p = page_address(osd_data->pages[0]);
-+		void *p;
- 
- 		WARN_ON(req->r_ops[0].op != CEPH_OSD_OP_NOTIFY ||
--			osd_data->type != CEPH_OSD_DATA_TYPE_PAGES);
-+			osd_data->type != CEPH_OSD_DATA_TYPE_PAGELIST);
-+
-+		p = kmap_ceph_databuf_page(osd_data->dbuf, 0);
- 
- 		/* make note of the notify_id */
- 		if (req->r_ops[0].outdata_len >= sizeof(u64)) {
-@@ -3030,6 +3042,8 @@ static void linger_commit_cb(struct ceph_osd_request *req)
- 		} else {
- 			dout("lreq %p no notify_id\n", lreq);
- 		}
-+
-+		kunmap_local(p);
- 	}
- 
- out:
-@@ -5032,7 +5046,7 @@ int ceph_osdc_list_watchers(struct ceph_osd_client *osdc,
- 			    u32 *num_watchers)
+@@ -881,12 +831,7 @@ static void ceph_osdc_msg_data_add(struct ceph_msg *msg,
  {
- 	struct ceph_osd_request *req;
--	struct page **pages;
-+	struct ceph_databuf *dbuf;
- 	int ret;
+ 	u64 length = ceph_osd_data_length(osd_data);
  
- 	req = ceph_osdc_alloc_request(osdc, NULL, 1, false, GFP_NOIO);
-@@ -5043,16 +5057,16 @@ int ceph_osdc_list_watchers(struct ceph_osd_client *osdc,
- 	ceph_oloc_copy(&req->r_base_oloc, oloc);
- 	req->r_flags = CEPH_OSD_FLAG_READ;
- 
--	pages = ceph_alloc_page_vector(1, GFP_NOIO);
--	if (IS_ERR(pages)) {
--		ret = PTR_ERR(pages);
-+	dbuf = ceph_databuf_alloc(1, PAGE_SIZE, GFP_NOIO);
-+	if (!dbuf) {
-+		ret = -ENOMEM;
- 		goto out_put_req;
- 	}
- 
- 	osd_req_op_init(req, 0, CEPH_OSD_OP_LIST_WATCHERS, 0);
--	ceph_osd_data_pages_init(osd_req_op_data(req, 0, list_watchers,
--						 response_data),
--				 pages, PAGE_SIZE, 0, false, true);
-+	ceph_osd_databuf_init(osd_req_op_data(req, 0, list_watchers,
-+					      response_data),
-+			      dbuf);
- 
- 	ret = ceph_osdc_alloc_messages(req, GFP_NOIO);
- 	if (ret)
-@@ -5061,10 +5075,11 @@ int ceph_osdc_list_watchers(struct ceph_osd_client *osdc,
- 	ceph_osdc_start_request(osdc, req);
- 	ret = ceph_osdc_wait_request(osdc, req);
- 	if (ret >= 0) {
--		void *p = page_address(pages[0]);
-+		void *p = kmap_ceph_databuf_page(dbuf, 0);
- 		void *const end = p + req->r_ops[0].outdata_len;
- 
- 		ret = decode_watchers(&p, end, watchers, num_watchers);
-+		kunmap(p);
- 	}
- 
- out_put_req:
-@@ -5111,6 +5126,8 @@ int ceph_osdc_call(struct ceph_osd_client *osdc,
- 		   struct ceph_databuf *response)
- {
- 	struct ceph_osd_request *req;
-+	struct iov_iter iter;
-+	struct bio_vec bv;
- 	int ret;
- 
- 	if (req_len > PAGE_SIZE)
-@@ -5128,9 +5145,11 @@ int ceph_osdc_call(struct ceph_osd_client *osdc,
- 	if (ret)
- 		goto out_put_req;
- 
--	if (req_page)
--		osd_req_op_cls_request_data_pages(req, 0, &req_page, req_len,
--						  0, false, false);
-+	if (req_page) {
-+		bvec_set_page(&bv, req_page, 0, req_len);
-+		iov_iter_bvec(&iter, ITER_SOURCE, &bv, 1, req_len);
-+		osd_req_op_cls_request_data_iter(req, 0, &iter);
-+	}
- 	if (response)
- 		osd_req_op_cls_response_databuf(req, 0, response);
- 
-@@ -5285,12 +5304,12 @@ int osd_req_op_copy_from_init(struct ceph_osd_request *req,
- 			      u8 copy_from_flags)
- {
- 	struct ceph_osd_req_op *op;
--	struct page **pages;
-+	struct ceph_databuf *dbuf;
- 	void *p, *end;
- 
--	pages = ceph_alloc_page_vector(1, GFP_KERNEL);
--	if (IS_ERR(pages))
--		return PTR_ERR(pages);
-+	dbuf = ceph_databuf_alloc(1, PAGE_SIZE, GFP_KERNEL);
-+	if (!dbuf)
-+		return -ENOMEM;
- 
- 	op = osd_req_op_init(req, 0, CEPH_OSD_OP_COPY_FROM2,
- 			     dst_fadvise_flags);
-@@ -5299,16 +5318,17 @@ int osd_req_op_copy_from_init(struct ceph_osd_request *req,
- 	op->copy_from.flags = copy_from_flags;
- 	op->copy_from.src_fadvise_flags = src_fadvise_flags;
- 
--	p = page_address(pages[0]);
-+	p = kmap_ceph_databuf_page(dbuf, 0);
- 	end = p + PAGE_SIZE;
- 	ceph_encode_string(&p, end, src_oid->name, src_oid->name_len);
- 	encode_oloc(&p, end, src_oloc);
- 	ceph_encode_32(&p, truncate_seq);
- 	ceph_encode_64(&p, truncate_size);
- 	op->indata_len = PAGE_SIZE - (end - p);
-+	dbuf->length = op->indata_len;
-+	kunmap_local(p);
- 
--	ceph_osd_data_pages_init(&op->copy_from.osd_data, pages,
--				 op->indata_len, 0, false, true);
-+	ceph_osd_databuf_init(&op->copy_from.osd_data, dbuf);
- 	return 0;
- }
- EXPORT_SYMBOL(osd_req_op_copy_from_init);
+-	if (osd_data->type == CEPH_OSD_DATA_TYPE_PAGES) {
+-		BUG_ON(length > (u64) SIZE_MAX);
+-		if (length)
+-			ceph_msg_data_add_pages(msg, osd_data->pages,
+-					length, osd_data->offset, false);
+-	} else if (osd_data->type == CEPH_OSD_DATA_TYPE_ITER) {
++	if (osd_data->type == CEPH_OSD_DATA_TYPE_ITER) {
+ 		ceph_msg_data_add_iter(msg, &osd_data->iter);
+ 	} else {
+ 		BUG_ON(osd_data->type != CEPH_OSD_DATA_TYPE_NONE);
 
