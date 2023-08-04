@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9A6C04FE0
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF19AC001DB
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:17:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbjHDNRe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 09:17:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57756 "EHLO
+        id S230440AbjHDNRp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 09:17:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230440AbjHDNQj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:16:39 -0400
+        with ESMTP id S230462AbjHDNQq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:16:46 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A69CD4EC9
-        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 06:14:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19134ED8
+        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 06:14:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691154844;
+        s=mimecast20190719; t=1691154850;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oVee4rtXMYHUJZK2CEQzZWTxaX9UJNm5zlDFLGqikl8=;
-        b=E6LST8BDfkoM9RT33vvc0cYjRZdqlKC/je92EtFSJ5pjO0TpKi7POD1ooMFAzZgMVKNuCJ
-        vkYiLAeobkBr8Wn0P4NJrFy5IdYkoHVDA3xKiL5kufgQCYtn/NjcYNPftspnpnNcS45lMB
-        e/7F8yIWVBeHylVCQfuvbz6gtGFIHpE=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-583-X_0h_HJxMUy5w_9McjiieQ-1; Fri, 04 Aug 2023 09:13:59 -0400
-X-MC-Unique: X_0h_HJxMUy5w_9McjiieQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        bh=f/BKSXxxhhMTfoeqsWRqFb0Oq6eukia0RhTi4EGOEeI=;
+        b=XIsEsi9bGPcV9jdhZ1+CVDecrYtoCC+a6eSTuKOji+4BgRxjHNhVyyZ6UertO/rtyFEve8
+        5qY092FUQo78+CkVAbq1E76EnocWMR9tmNkP/NYmPfFrlJfc72HOPwUG+Vz/VD51Rd3Prc
+        UQy36xg7H+xOBsyHhXpICQVmnFLOZGo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-625-EwXe6hFBMXSXqLNuy816gg-1; Fri, 04 Aug 2023 09:14:07 -0400
+X-MC-Unique: EwXe6hFBMXSXqLNuy816gg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 29F1B1C060DE;
-        Fri,  4 Aug 2023 13:13:59 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 585A9805951;
+        Fri,  4 Aug 2023 13:14:06 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DAABB1401C2E;
-        Fri,  4 Aug 2023 13:13:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 37D29201EE6E;
+        Fri,  4 Aug 2023 13:14:05 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -44,698 +44,236 @@ Cc:     David Howells <dhowells@redhat.com>,
         Dongsheng Yang <dongsheng.yang@easystack.cn>,
         ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 14/18] ceph: Remove ceph_pagelist
-Date:   Fri,  4 Aug 2023 14:13:23 +0100
-Message-ID: <20230804131327.2574082-15-dhowells@redhat.com>
+Subject: [RFC PATCH 18/18] ceph: Don't use data_pages
+Date:   Fri,  4 Aug 2023 14:13:27 +0100
+Message-ID: <20230804131327.2574082-19-dhowells@redhat.com>
 In-Reply-To: <20230804131327.2574082-1-dhowells@redhat.com>
 References: <20230804131327.2574082-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove ceph_pagelist and its helpers.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
 ---
- fs/ceph/locks.c                 |   1 -
- fs/ceph/mds_client.c            |   1 -
- fs/ceph/xattr.c                 |   1 -
- include/linux/ceph/messenger.h  |   8 --
- include/linux/ceph/osd_client.h |   9 --
- include/linux/ceph/pagelist.h   |  72 --------------
- net/ceph/Makefile               |   2 +-
- net/ceph/messenger.c            | 110 --------------------
- net/ceph/osd_client.c           |  51 ----------
- net/ceph/pagelist.c             | 171 --------------------------------
- 10 files changed, 1 insertion(+), 425 deletions(-)
- delete mode 100644 include/linux/ceph/pagelist.h
- delete mode 100644 net/ceph/pagelist.c
+ fs/ceph/addr.c                  | 16 +++++-----------
+ fs/ceph/file.c                  | 34 +++++++++++++++------------------
+ include/linux/ceph/osd_client.h |  1 +
+ net/ceph/osd_client.c           | 16 ++--------------
+ 4 files changed, 23 insertions(+), 44 deletions(-)
 
-diff --git a/fs/ceph/locks.c b/fs/ceph/locks.c
-index b3c018a8a92f..f80b09304fdc 100644
---- a/fs/ceph/locks.c
-+++ b/fs/ceph/locks.c
-@@ -8,7 +8,6 @@
- #include "super.h"
- #include "mds_client.h"
- #include <linux/filelock.h>
--#include <linux/ceph/pagelist.h>
+diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+index 7571606cf61f..7557f4a85ef0 100644
+--- a/fs/ceph/addr.c
++++ b/fs/ceph/addr.c
+@@ -277,11 +277,6 @@ static void finish_netfs_read(struct ceph_osd_request *req)
+ 		}
+ 	}
  
- static u64 lock_secret;
- static int ceph_lock_wait_for_completion(struct ceph_mds_client *mdsc,
-diff --git a/fs/ceph/mds_client.c b/fs/ceph/mds_client.c
-index 9f5c4f47982e..e94877725824 100644
---- a/fs/ceph/mds_client.c
-+++ b/fs/ceph/mds_client.c
-@@ -21,7 +21,6 @@
- #include <linux/ceph/ceph_features.h>
- #include <linux/ceph/messenger.h>
- #include <linux/ceph/decode.h>
--#include <linux/ceph/pagelist.h>
- #include <linux/ceph/auth.h>
- #include <linux/ceph/debugfs.h>
+-	if (osd_data->type == CEPH_OSD_DATA_TYPE_PAGES) {
+-		ceph_put_page_vector(osd_data->pages,
+-				     calc_pages_for(osd_data->offset,
+-					osd_data->length), false);
+-	}
+ 	netfs_subreq_terminated(subreq, err, false);
+ 	iput(req->r_inode);
+ 	ceph_dec_osd_stopping_blocker(fsc->mdsc);
+@@ -2007,7 +2002,7 @@ static int __ceph_pool_perm_get(struct ceph_inode_info *ci,
+ 	struct ceph_osd_request *rd_req = NULL, *wr_req = NULL;
+ 	struct rb_node **p, *parent;
+ 	struct ceph_pool_perm *perm;
+-	struct page **pages;
++	struct ceph_databuf *dbuf;
+ 	size_t pool_ns_len;
+ 	int err = 0, err2 = 0, have = 0;
  
-diff --git a/fs/ceph/xattr.c b/fs/ceph/xattr.c
-index ca3ec5dd0382..d42779d10dc9 100644
---- a/fs/ceph/xattr.c
-+++ b/fs/ceph/xattr.c
-@@ -1,6 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <linux/ceph/ceph_debug.h>
--#include <linux/ceph/pagelist.h>
+@@ -2107,14 +2102,13 @@ static int __ceph_pool_perm_get(struct ceph_inode_info *ci,
+ 		goto out_unlock;
  
- #include "super.h"
- #include "mds_client.h"
-diff --git a/include/linux/ceph/messenger.h b/include/linux/ceph/messenger.h
-index 0f4cc6e39da0..a2489e266bff 100644
---- a/include/linux/ceph/messenger.h
-+++ b/include/linux/ceph/messenger.h
-@@ -119,7 +119,6 @@ enum ceph_msg_data_type {
- 	CEPH_MSG_DATA_NONE,	/* message contains no data payload */
- 	CEPH_MSG_DATA_DATABUF,	/* data source/destination is a data buffer */
- 	CEPH_MSG_DATA_PAGES,	/* data source/destination is a page array */
--	CEPH_MSG_DATA_PAGELIST,	/* data source/destination is a pagelist */
- 	CEPH_MSG_DATA_ITER,	/* data source/destination is an iov_iter */
- };
+ 	/* one page should be large enough for STAT data */
+-	pages = ceph_alloc_page_vector(1, GFP_KERNEL);
+-	if (IS_ERR(pages)) {
+-		err = PTR_ERR(pages);
++	dbuf = ceph_databuf_alloc(1, PAGE_SIZE, GFP_KERNEL);
++	if (!dbuf) {
++		err = -ENOMEM;
+ 		goto out_unlock;
+ 	}
  
-@@ -135,7 +134,6 @@ struct ceph_msg_data {
- 			unsigned int	offset;		/* first page */
- 			bool		own_pages;
- 		};
--		struct ceph_pagelist	*pagelist;
- 	};
- };
+-	osd_req_op_raw_data_in_pages(rd_req, 0, pages, PAGE_SIZE,
+-				     0, false, true);
++	osd_req_op_raw_data_in_databuf(rd_req, 0, dbuf);
+ 	ceph_osdc_start_request(&fsc->client->osdc, rd_req);
  
-@@ -152,10 +150,6 @@ struct ceph_msg_data_cursor {
- 			unsigned short	page_index;	/* index in array */
- 			unsigned short	page_count;	/* pages in array */
- 		};
--		struct {				/* pagelist */
--			struct page	*page;		/* page from list */
--			size_t		offset;		/* bytes from list */
--		};
- 		struct {
- 			struct iov_iter		iov_iter;
- 			unsigned int		lastlen;
-@@ -510,8 +504,6 @@ extern bool ceph_con_keepalive_expired(struct ceph_connection *con,
- void ceph_msg_data_add_databuf(struct ceph_msg *msg, struct ceph_databuf *dbuf);
- void ceph_msg_data_add_pages(struct ceph_msg *msg, struct page **pages,
- 			     size_t length, size_t offset, bool own_pages);
--extern void ceph_msg_data_add_pagelist(struct ceph_msg *msg,
--				struct ceph_pagelist *pagelist);
- void ceph_msg_data_add_iter(struct ceph_msg *msg,
- 			    struct iov_iter *iter);
+ 	wr_req->r_mtime = ci->netfs.inode.i_mtime;
+diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+index 5d16469a3690..caf557187ca8 100644
+--- a/fs/ceph/file.c
++++ b/fs/ceph/file.c
+@@ -977,6 +977,7 @@ ssize_t __ceph_sync_read(struct inode *inode, loff_t *ki_pos,
+ 	struct ceph_fs_client *fsc = ceph_inode_to_fs_client(inode);
+ 	struct ceph_client *cl = fsc->client;
+ 	struct ceph_osd_client *osdc = &fsc->client->osdc;
++	struct ceph_databuf *dbuf;
+ 	ssize_t ret;
+ 	u64 off = *ki_pos;
+ 	u64 len = iov_iter_count(to);
+@@ -1041,16 +1042,14 @@ ssize_t __ceph_sync_read(struct inode *inode, loff_t *ki_pos,
  
+ 		num_pages = calc_pages_for(read_off, read_len);
+ 		page_off = offset_in_page(off);
+-		pages = ceph_alloc_page_vector(num_pages, GFP_KERNEL);
+-		if (IS_ERR(pages)) {
++		dbuf = ceph_databuf_alloc(num_pages, read_len, GFP_KERNEL);
++		if (!dbuf) {
+ 			ceph_osdc_put_request(req);
+-			ret = PTR_ERR(pages);
++			ret = -ENOMEM;
+ 			break;
+ 		}
+ 
+-		osd_req_op_extent_osd_data_pages(req, 0, pages, read_len,
+-						 offset_in_page(read_off),
+-						 false, false);
++		osd_req_op_extent_osd_databuf(req, 0, dbuf);
+ 
+ 		op = &req->r_ops[0];
+ 		if (sparse) {
+@@ -1137,7 +1136,7 @@ ssize_t __ceph_sync_read(struct inode *inode, loff_t *ki_pos,
+ 				break;
+ 			}
+ 		}
+-		ceph_release_page_vector(pages, num_pages);
++		ceph_databuf_release(dbuf);
+ 
+ 		if (ret < 0) {
+ 			if (ret == -EBLOCKLISTED)
+@@ -1625,7 +1624,7 @@ ceph_sync_write(struct kiocb *iocb, struct iov_iter *from, loff_t pos,
+ 	struct ceph_client *cl = fsc->client;
+ 	struct ceph_osd_client *osdc = &fsc->client->osdc;
+ 	struct ceph_osd_request *req;
+-	struct page **pages;
++	struct ceph_databuf *dbuf = NULL;
+ 	u64 len;
+ 	int num_pages;
+ 	int written = 0;
+@@ -1691,9 +1690,9 @@ ceph_sync_write(struct kiocb *iocb, struct iov_iter *from, loff_t pos,
+ 		 * an array of pagecache pages.
+ 		 */
+ 		num_pages = calc_pages_for(write_pos, write_len);
+-		pages = ceph_alloc_page_vector(num_pages, GFP_KERNEL);
+-		if (IS_ERR(pages)) {
+-			ret = PTR_ERR(pages);
++		dbuf = ceph_databuf_alloc(num_pages, num_pages * PAGE_SIZE, GFP_KERNEL);
++		if (!dbuf) {
++			ret = -ENOMEM;
+ 			break;
+ 		}
+ 
+@@ -1722,7 +1721,6 @@ ceph_sync_write(struct kiocb *iocb, struct iov_iter *from, loff_t pos,
+ 					NULL, ci->i_truncate_seq,
+ 					ci->i_truncate_size, false);
+ 			if (IS_ERR(req)) {
+-				ceph_release_page_vector(pages, num_pages);
+ 				ret = PTR_ERR(req);
+ 				break;
+ 			}
+@@ -1730,7 +1728,6 @@ ceph_sync_write(struct kiocb *iocb, struct iov_iter *from, loff_t pos,
+ 			/* Something is misaligned! */
+ 			if (read_len != CEPH_FSCRYPT_BLOCK_SIZE) {
+ 				ceph_osdc_put_request(req);
+-				ceph_release_page_vector(pages, num_pages);
+ 				ret = -EIO;
+ 				break;
+ 			}
+@@ -1739,15 +1736,14 @@ ceph_sync_write(struct kiocb *iocb, struct iov_iter *from, loff_t pos,
+ 			op = &req->r_ops[0];
+ 
+ 			if (first) {
+-				osd_req_op_extent_osd_data_pages(req, 0, pages,
+-							 CEPH_FSCRYPT_BLOCK_SIZE,
+-							 offset_in_page(first_pos),
+-							 false, false);
++				iov_iter_advance(&dbuf->iter, offset_in_page(first_pos));
++				osd_req_op_extent_osd_databuf(req, 0, dbuf,
++							 CEPH_FSCRYPT_BLOCK_SIZE);
++				dbuf = NULL;
+ 				/* We only expect a single extent here */
+ 				ret = __ceph_alloc_sparse_ext_map(op, 1);
+ 				if (ret) {
+ 					ceph_osdc_put_request(req);
+-					ceph_release_page_vector(pages, num_pages);
+ 					break;
+ 				}
+ 			}
+@@ -1766,7 +1762,6 @@ ceph_sync_write(struct kiocb *iocb, struct iov_iter *from, loff_t pos,
+ 				ret = __ceph_alloc_sparse_ext_map(op, 1);
+ 				if (ret) {
+ 					ceph_osdc_put_request(req);
+-					ceph_release_page_vector(pages, num_pages);
+ 					break;
+ 				}
+ 
+@@ -1998,6 +1993,7 @@ ceph_sync_write(struct kiocb *iocb, struct iov_iter *from, loff_t pos,
+ 
+ 	}
+ 
++	ceph_databuf_release(dbuf);
+ 	if (ret != -EOLDSNAPC && written > 0) {
+ 		ret = written;
+ 		iocb->ki_pos = pos;
 diff --git a/include/linux/ceph/osd_client.h b/include/linux/ceph/osd_client.h
-index 82c1c325861d..83c3073c44bb 100644
+index 1a1137787487..c26a7866695a 100644
 --- a/include/linux/ceph/osd_client.h
 +++ b/include/linux/ceph/osd_client.h
-@@ -15,7 +15,6 @@
- #include <linux/ceph/messenger.h>
- #include <linux/ceph/msgpool.h>
- #include <linux/ceph/auth.h>
--#include <linux/ceph/pagelist.h>
- #include <linux/ceph/databuf.h>
- 
- struct ceph_msg;
-@@ -105,7 +104,6 @@ enum ceph_osd_data_type {
- 	CEPH_OSD_DATA_TYPE_NONE = 0,
- 	CEPH_OSD_DATA_TYPE_DATABUF,
- 	CEPH_OSD_DATA_TYPE_PAGES,
--	CEPH_OSD_DATA_TYPE_PAGELIST,
- 	CEPH_OSD_DATA_TYPE_ITER,
+@@ -110,6 +110,7 @@ struct ceph_osd_data {
+ 	enum ceph_osd_data_type	type;
+ 	struct ceph_databuf	*dbuf;
+ 	struct iov_iter		iter;
++	size_t			length;
  };
  
-@@ -120,7 +118,6 @@ struct ceph_osd_data {
- 			bool		pages_from_pool;
- 			bool		own_pages;
- 		};
--		struct ceph_pagelist	*pagelist;
- 		struct iov_iter		iter;
- 	};
- };
-@@ -486,18 +483,12 @@ extern void osd_req_op_extent_osd_data_pages(struct ceph_osd_request *,
- void osd_req_op_raw_data_in_databuf(struct ceph_osd_request *osd_req,
- 				    unsigned int which,
- 				    struct ceph_databuf *databuf);
--extern void osd_req_op_extent_osd_data_pagelist(struct ceph_osd_request *,
--					unsigned int which,
--					struct ceph_pagelist *pagelist);
- void osd_req_op_extent_osd_iter(struct ceph_osd_request *osd_req,
- 				unsigned int which, struct iov_iter *iter);
- 
- void osd_req_op_cls_request_databuf(struct ceph_osd_request *req,
- 				    unsigned int which,
- 				    struct ceph_databuf *dbuf);
--extern void osd_req_op_cls_request_data_pagelist(struct ceph_osd_request *,
--					unsigned int which,
--					struct ceph_pagelist *pagelist);
- void osd_req_op_cls_response_databuf(struct ceph_osd_request *osd_req,
- 				     unsigned int which,
- 				     struct ceph_databuf *dbuf);
-diff --git a/include/linux/ceph/pagelist.h b/include/linux/ceph/pagelist.h
-deleted file mode 100644
-index 5dead8486fd8..000000000000
---- a/include/linux/ceph/pagelist.h
-+++ /dev/null
-@@ -1,72 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef __FS_CEPH_PAGELIST_H
--#define __FS_CEPH_PAGELIST_H
--
--#include <asm/byteorder.h>
--#include <linux/refcount.h>
--#include <linux/list.h>
--#include <linux/types.h>
--
--struct ceph_pagelist {
--	struct list_head head;
--	void *mapped_tail;
--	size_t length;
--	size_t room;
--	struct list_head free_list;
--	size_t num_pages_free;
--	refcount_t refcnt;
--};
--
--struct ceph_pagelist_cursor {
--	struct ceph_pagelist *pl;   /* pagelist, for error checking */
--	struct list_head *page_lru; /* page in list */
--	size_t room;		    /* room remaining to reset to */
--};
--
--struct ceph_pagelist *ceph_pagelist_alloc(gfp_t gfp_flags);
--
--extern void ceph_pagelist_release(struct ceph_pagelist *pl);
--
--extern int ceph_pagelist_append(struct ceph_pagelist *pl, const void *d, size_t l);
--
--extern int ceph_pagelist_reserve(struct ceph_pagelist *pl, size_t space);
--
--extern int ceph_pagelist_free_reserve(struct ceph_pagelist *pl);
--
--extern void ceph_pagelist_set_cursor(struct ceph_pagelist *pl,
--				     struct ceph_pagelist_cursor *c);
--
--extern int ceph_pagelist_truncate(struct ceph_pagelist *pl,
--				  struct ceph_pagelist_cursor *c);
--
--static inline int ceph_pagelist_encode_64(struct ceph_pagelist *pl, u64 v)
--{
--	__le64 ev = cpu_to_le64(v);
--	return ceph_pagelist_append(pl, &ev, sizeof(ev));
--}
--static inline int ceph_pagelist_encode_32(struct ceph_pagelist *pl, u32 v)
--{
--	__le32 ev = cpu_to_le32(v);
--	return ceph_pagelist_append(pl, &ev, sizeof(ev));
--}
--static inline int ceph_pagelist_encode_16(struct ceph_pagelist *pl, u16 v)
--{
--	__le16 ev = cpu_to_le16(v);
--	return ceph_pagelist_append(pl, &ev, sizeof(ev));
--}
--static inline int ceph_pagelist_encode_8(struct ceph_pagelist *pl, u8 v)
--{
--	return ceph_pagelist_append(pl, &v, 1);
--}
--static inline int ceph_pagelist_encode_string(struct ceph_pagelist *pl,
--					      char *s, u32 len)
--{
--	int ret = ceph_pagelist_encode_32(pl, len);
--	if (ret)
--		return ret;
--	if (len)
--		return ceph_pagelist_append(pl, s, len);
--	return 0;
--}
--
--#endif
-diff --git a/net/ceph/Makefile b/net/ceph/Makefile
-index 4b2e0b654e45..0c8787e2e733 100644
---- a/net/ceph/Makefile
-+++ b/net/ceph/Makefile
-@@ -4,7 +4,7 @@
- #
- obj-$(CONFIG_CEPH_LIB) += libceph.o
- 
--libceph-y := ceph_common.o messenger.o msgpool.o buffer.o pagelist.o \
-+libceph-y := ceph_common.o messenger.o msgpool.o buffer.o \
- 	mon_client.o decode.o \
- 	cls_lock_client.o \
- 	osd_client.o osdmap.o crush/crush.o crush/mapper.o crush/hash.o \
-diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-index 1ef3576c930d..5b28c27858b2 100644
---- a/net/ceph/messenger.c
-+++ b/net/ceph/messenger.c
-@@ -20,7 +20,6 @@
- #include <linux/ceph/libceph.h>
- #include <linux/ceph/messenger.h>
- #include <linux/ceph/decode.h>
--#include <linux/ceph/pagelist.h>
- #include <linux/export.h>
- 
- /*
-@@ -775,87 +774,6 @@ static bool ceph_msg_data_pages_advance(struct ceph_msg_data_cursor *cursor,
- 	return true;
- }
- 
--/*
-- * For a pagelist, a piece is whatever remains to be consumed in the
-- * first page in the list, or the front of the next page.
-- */
--static void
--ceph_msg_data_pagelist_cursor_init(struct ceph_msg_data_cursor *cursor,
--					size_t length)
--{
--	struct ceph_msg_data *data = cursor->data;
--	struct ceph_pagelist *pagelist;
--	struct page *page;
--
--	BUG_ON(data->type != CEPH_MSG_DATA_PAGELIST);
--
--	pagelist = data->pagelist;
--	BUG_ON(!pagelist);
--
--	if (!length)
--		return;		/* pagelist can be assigned but empty */
--
--	BUG_ON(list_empty(&pagelist->head));
--	page = list_first_entry(&pagelist->head, struct page, lru);
--
--	cursor->resid = min(length, pagelist->length);
--	cursor->page = page;
--	cursor->offset = 0;
--}
--
--static struct page *
--ceph_msg_data_pagelist_next(struct ceph_msg_data_cursor *cursor,
--				size_t *page_offset, size_t *length)
--{
--	struct ceph_msg_data *data = cursor->data;
--	struct ceph_pagelist *pagelist;
--
--	BUG_ON(data->type != CEPH_MSG_DATA_PAGELIST);
--
--	pagelist = data->pagelist;
--	BUG_ON(!pagelist);
--
--	BUG_ON(!cursor->page);
--	BUG_ON(cursor->offset + cursor->resid != pagelist->length);
--
--	/* offset of first page in pagelist is always 0 */
--	*page_offset = cursor->offset & ~PAGE_MASK;
--	*length = min_t(size_t, cursor->resid, PAGE_SIZE - *page_offset);
--	return cursor->page;
--}
--
--static bool ceph_msg_data_pagelist_advance(struct ceph_msg_data_cursor *cursor,
--						size_t bytes)
--{
--	struct ceph_msg_data *data = cursor->data;
--	struct ceph_pagelist *pagelist;
--
--	BUG_ON(data->type != CEPH_MSG_DATA_PAGELIST);
--
--	pagelist = data->pagelist;
--	BUG_ON(!pagelist);
--
--	BUG_ON(cursor->offset + cursor->resid != pagelist->length);
--	BUG_ON((cursor->offset & ~PAGE_MASK) + bytes > PAGE_SIZE);
--
--	/* Advance the cursor offset */
--
--	cursor->resid -= bytes;
--	cursor->offset += bytes;
--	/* offset of first page in pagelist is always 0 */
--	if (!bytes || cursor->offset & ~PAGE_MASK)
--		return false;	/* more bytes to process in the current page */
--
--	if (!cursor->resid)
--		return false;   /* no more data */
--
--	/* Move on to the next page */
--
--	BUG_ON(list_is_last(&cursor->page->lru, &pagelist->head));
--	cursor->page = list_next_entry(cursor->page, lru);
--	return true;
--}
--
- static void ceph_msg_data_iter_cursor_init(struct ceph_msg_data_cursor *cursor,
- 					size_t length)
- {
-@@ -926,9 +844,6 @@ static void __ceph_msg_data_cursor_init(struct ceph_msg_data_cursor *cursor)
- 	size_t length = cursor->total_resid;
- 
- 	switch (cursor->data->type) {
--	case CEPH_MSG_DATA_PAGELIST:
--		ceph_msg_data_pagelist_cursor_init(cursor, length);
--		break;
- 	case CEPH_MSG_DATA_PAGES:
- 		ceph_msg_data_pages_cursor_init(cursor, length);
- 		break;
-@@ -968,9 +883,6 @@ struct page *ceph_msg_data_next(struct ceph_msg_data_cursor *cursor,
- 	struct page *page;
- 
- 	switch (cursor->data->type) {
--	case CEPH_MSG_DATA_PAGELIST:
--		page = ceph_msg_data_pagelist_next(cursor, page_offset, length);
--		break;
- 	case CEPH_MSG_DATA_PAGES:
- 		page = ceph_msg_data_pages_next(cursor, page_offset, length);
- 		break;
-@@ -1001,9 +913,6 @@ void ceph_msg_data_advance(struct ceph_msg_data_cursor *cursor, size_t bytes)
- 
- 	BUG_ON(bytes > cursor->resid);
- 	switch (cursor->data->type) {
--	case CEPH_MSG_DATA_PAGELIST:
--		new_piece = ceph_msg_data_pagelist_advance(cursor, bytes);
--		break;
- 	case CEPH_MSG_DATA_PAGES:
- 		new_piece = ceph_msg_data_pages_advance(cursor, bytes);
- 		break;
-@@ -1740,8 +1649,6 @@ static void ceph_msg_data_destroy(struct ceph_msg_data *data)
- 	} else if (data->type == CEPH_MSG_DATA_PAGES && data->own_pages) {
- 		int num_pages = calc_pages_for(data->offset, data->length);
- 		ceph_release_page_vector(data->pages, num_pages);
--	} else if (data->type == CEPH_MSG_DATA_PAGELIST) {
--		ceph_pagelist_release(data->pagelist);
- 	}
- }
- 
-@@ -1782,23 +1689,6 @@ void ceph_msg_data_add_pages(struct ceph_msg *msg, struct page **pages,
- }
- EXPORT_SYMBOL(ceph_msg_data_add_pages);
- 
--void ceph_msg_data_add_pagelist(struct ceph_msg *msg,
--				struct ceph_pagelist *pagelist)
--{
--	struct ceph_msg_data *data;
--
--	BUG_ON(!pagelist);
--	BUG_ON(!pagelist->length);
--
--	data = ceph_msg_data_add(msg);
--	data->type = CEPH_MSG_DATA_PAGELIST;
--	refcount_inc(&pagelist->refcnt);
--	data->pagelist = pagelist;
--
--	msg->data_length += pagelist->length;
--}
--EXPORT_SYMBOL(ceph_msg_data_add_pagelist);
--
- void ceph_msg_data_add_iter(struct ceph_msg *msg,
- 			    struct iov_iter *iter)
- {
+ struct ceph_osd_req_op {
 diff --git a/net/ceph/osd_client.c b/net/ceph/osd_client.c
-index c4486799f54b..8cbe06d2e16d 100644
+index 6fb78ae14f03..95daf4cdb07b 100644
 --- a/net/ceph/osd_client.c
 +++ b/net/ceph/osd_client.c
-@@ -16,7 +16,6 @@
- #include <linux/ceph/messenger.h>
- #include <linux/ceph/decode.h>
- #include <linux/ceph/auth.h>
--#include <linux/ceph/pagelist.h>
- #include <linux/ceph/striper.h>
- 
- #define OSD_OPREPLY_FRONT_LEN	512
-@@ -138,16 +137,6 @@ static void ceph_osd_data_pages_init(struct ceph_osd_data *osd_data,
- 	osd_data->own_pages = own_pages;
- }
- 
--/*
-- * Consumes a ref on @pagelist.
-- */
--static void ceph_osd_data_pagelist_init(struct ceph_osd_data *osd_data,
--			struct ceph_pagelist *pagelist)
--{
--	osd_data->type = CEPH_OSD_DATA_TYPE_PAGELIST;
--	osd_data->pagelist = pagelist;
--}
--
- static void ceph_osd_iter_init(struct ceph_osd_data *osd_data,
- 			       struct iov_iter *iter)
+@@ -127,6 +127,7 @@ static void ceph_osd_iter_init(struct ceph_osd_data *osd_data,
  {
-@@ -229,16 +218,6 @@ void osd_req_op_extent_osd_data_pages(struct ceph_osd_request *osd_req,
- }
- EXPORT_SYMBOL(osd_req_op_extent_osd_data_pages);
- 
--void osd_req_op_extent_osd_data_pagelist(struct ceph_osd_request *osd_req,
--			unsigned int which, struct ceph_pagelist *pagelist)
--{
--	struct ceph_osd_data *osd_data;
--
--	osd_data = osd_req_op_data(osd_req, which, extent, osd_data);
--	ceph_osd_data_pagelist_init(osd_data, pagelist);
--}
--EXPORT_SYMBOL(osd_req_op_extent_osd_data_pagelist);
--
- /**
-  * osd_req_op_extent_osd_iter - Set up an operation with an iterator buffer
-  * @osd_req: The request to set up
-@@ -265,16 +244,6 @@ static void osd_req_op_cls_request_info_databuf(struct ceph_osd_request *osd_req
- 	ceph_osd_databuf_init(osd_data, dbuf);
+ 	osd_data->type = CEPH_OSD_DATA_TYPE_ITER;
+ 	osd_data->iter = *iter;
++	osd_data->length = iter->count;
  }
  
--static void osd_req_op_cls_request_info_pagelist(
--			struct ceph_osd_request *osd_req,
--			unsigned int which, struct ceph_pagelist *pagelist)
--{
--	struct ceph_osd_data *osd_data;
--
--	osd_data = osd_req_op_data(osd_req, which, cls, request_info);
--	ceph_osd_data_pagelist_init(osd_data, pagelist);
--}
--
- void osd_req_op_cls_request_databuf(struct ceph_osd_request *osd_req,
- 				    unsigned int which,
- 				    struct ceph_databuf *dbuf)
-@@ -288,19 +257,6 @@ void osd_req_op_cls_request_databuf(struct ceph_osd_request *osd_req,
+ /*
+@@ -239,19 +240,6 @@ void osd_req_op_cls_response_databuf(struct ceph_osd_request *osd_req,
  }
- EXPORT_SYMBOL(osd_req_op_cls_request_databuf);
+ EXPORT_SYMBOL(osd_req_op_cls_response_databuf);
  
--void osd_req_op_cls_request_data_pagelist(
--			struct ceph_osd_request *osd_req,
--			unsigned int which, struct ceph_pagelist *pagelist)
+-static u64 ceph_osd_data_length(struct ceph_osd_data *osd_data)
 -{
--	struct ceph_osd_data *osd_data;
--
--	osd_data = osd_req_op_data(osd_req, which, cls, request_data);
--	ceph_osd_data_pagelist_init(osd_data, pagelist);
--	osd_req->r_ops[which].cls.indata_len += pagelist->length;
--	osd_req->r_ops[which].indata_len += pagelist->length;
--}
--EXPORT_SYMBOL(osd_req_op_cls_request_data_pagelist);
--
- static void osd_req_op_cls_request_data_iter(
- 			struct ceph_osd_request *osd_req,
- 			unsigned int which, struct iov_iter *iter)
-@@ -331,8 +287,6 @@ static u64 ceph_osd_data_length(struct ceph_osd_data *osd_data)
- 		return 0;
- 	case CEPH_OSD_DATA_TYPE_PAGES:
- 		return osd_data->length;
--	case CEPH_OSD_DATA_TYPE_PAGELIST:
--		return (u64)osd_data->pagelist->length;
- 	case CEPH_OSD_DATA_TYPE_ITER:
- 		return iov_iter_count(&osd_data->iter);
- 	default:
-@@ -349,8 +303,6 @@ static void ceph_osd_data_release(struct ceph_osd_data *osd_data)
- 		num_pages = calc_pages_for((u64)osd_data->offset,
- 						(u64)osd_data->length);
- 		ceph_release_page_vector(osd_data->pages, num_pages);
--	} else if (osd_data->type == CEPH_OSD_DATA_TYPE_PAGELIST) {
--		ceph_pagelist_release(osd_data->pagelist);
- 	}
- 	ceph_osd_data_init(osd_data);
- }
-@@ -934,9 +886,6 @@ static void ceph_osdc_msg_data_add(struct ceph_msg *msg,
- 		if (length)
- 			ceph_msg_data_add_pages(msg, osd_data->pages,
- 					length, osd_data->offset, false);
--	} else if (osd_data->type == CEPH_OSD_DATA_TYPE_PAGELIST) {
--		BUG_ON(!length);
--		ceph_msg_data_add_pagelist(msg, osd_data->pagelist);
- 	} else if (osd_data->type == CEPH_OSD_DATA_TYPE_ITER) {
- 		ceph_msg_data_add_iter(msg, &osd_data->iter);
- 	} else {
-diff --git a/net/ceph/pagelist.c b/net/ceph/pagelist.c
-deleted file mode 100644
-index 74622b278d57..000000000000
---- a/net/ceph/pagelist.c
-+++ /dev/null
-@@ -1,171 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--#include <linux/module.h>
--#include <linux/gfp.h>
--#include <linux/slab.h>
--#include <linux/pagemap.h>
--#include <linux/highmem.h>
--#include <linux/ceph/pagelist.h>
--
--struct ceph_pagelist *ceph_pagelist_alloc(gfp_t gfp_flags)
--{
--	struct ceph_pagelist *pl;
--
--	pl = kmalloc(sizeof(*pl), gfp_flags);
--	if (!pl)
--		return NULL;
--
--	INIT_LIST_HEAD(&pl->head);
--	pl->mapped_tail = NULL;
--	pl->length = 0;
--	pl->room = 0;
--	INIT_LIST_HEAD(&pl->free_list);
--	pl->num_pages_free = 0;
--	refcount_set(&pl->refcnt, 1);
--
--	return pl;
--}
--EXPORT_SYMBOL(ceph_pagelist_alloc);
--
--static void ceph_pagelist_unmap_tail(struct ceph_pagelist *pl)
--{
--	if (pl->mapped_tail) {
--		struct page *page = list_entry(pl->head.prev, struct page, lru);
--		kunmap(page);
--		pl->mapped_tail = NULL;
--	}
--}
--
--void ceph_pagelist_release(struct ceph_pagelist *pl)
--{
--	if (!refcount_dec_and_test(&pl->refcnt))
--		return;
--	ceph_pagelist_unmap_tail(pl);
--	while (!list_empty(&pl->head)) {
--		struct page *page = list_first_entry(&pl->head, struct page,
--						     lru);
--		list_del(&page->lru);
--		__free_page(page);
--	}
--	ceph_pagelist_free_reserve(pl);
--	kfree(pl);
--}
--EXPORT_SYMBOL(ceph_pagelist_release);
--
--static int ceph_pagelist_addpage(struct ceph_pagelist *pl)
--{
--	struct page *page;
--
--	if (!pl->num_pages_free) {
--		page = __page_cache_alloc(GFP_NOFS);
--	} else {
--		page = list_first_entry(&pl->free_list, struct page, lru);
--		list_del(&page->lru);
--		--pl->num_pages_free;
--	}
--	if (!page)
--		return -ENOMEM;
--	pl->room += PAGE_SIZE;
--	ceph_pagelist_unmap_tail(pl);
--	list_add_tail(&page->lru, &pl->head);
--	pl->mapped_tail = kmap(page);
--	return 0;
--}
--
--int ceph_pagelist_append(struct ceph_pagelist *pl, const void *buf, size_t len)
--{
--	while (pl->room < len) {
--		size_t bit = pl->room;
--		int ret;
--
--		memcpy(pl->mapped_tail + (pl->length & ~PAGE_MASK),
--		       buf, bit);
--		pl->length += bit;
--		pl->room -= bit;
--		buf += bit;
--		len -= bit;
--		ret = ceph_pagelist_addpage(pl);
--		if (ret)
--			return ret;
--	}
--
--	memcpy(pl->mapped_tail + (pl->length & ~PAGE_MASK), buf, len);
--	pl->length += len;
--	pl->room -= len;
--	return 0;
--}
--EXPORT_SYMBOL(ceph_pagelist_append);
--
--/* Allocate enough pages for a pagelist to append the given amount
-- * of data without allocating.
-- * Returns: 0 on success, -ENOMEM on error.
-- */
--int ceph_pagelist_reserve(struct ceph_pagelist *pl, size_t space)
--{
--	if (space <= pl->room)
+-	switch (osd_data->type) {
+-	case CEPH_OSD_DATA_TYPE_NONE:
 -		return 0;
--	space -= pl->room;
--	space = (space + PAGE_SIZE - 1) >> PAGE_SHIFT;   /* conv to num pages */
--
--	while (space > pl->num_pages_free) {
--		struct page *page = __page_cache_alloc(GFP_NOFS);
--		if (!page)
--			return -ENOMEM;
--		list_add_tail(&page->lru, &pl->free_list);
--		++pl->num_pages_free;
+-	case CEPH_OSD_DATA_TYPE_ITER:
+-		return iov_iter_count(&osd_data->iter);
+-	default:
+-		WARN(true, "unrecognized data type %d\n", (int)osd_data->type);
+-		return 0;
 -	}
--	return 0;
 -}
--EXPORT_SYMBOL(ceph_pagelist_reserve);
 -
--/* Free any pages that have been preallocated. */
--int ceph_pagelist_free_reserve(struct ceph_pagelist *pl)
--{
--	while (!list_empty(&pl->free_list)) {
--		struct page *page = list_first_entry(&pl->free_list,
--						     struct page, lru);
--		list_del(&page->lru);
--		__free_page(page);
--		--pl->num_pages_free;
--	}
--	BUG_ON(pl->num_pages_free);
--	return 0;
--}
--EXPORT_SYMBOL(ceph_pagelist_free_reserve);
--
--/* Create a truncation point. */
--void ceph_pagelist_set_cursor(struct ceph_pagelist *pl,
--			      struct ceph_pagelist_cursor *c)
--{
--	c->pl = pl;
--	c->page_lru = pl->head.prev;
--	c->room = pl->room;
--}
--EXPORT_SYMBOL(ceph_pagelist_set_cursor);
--
--/* Truncate a pagelist to the given point. Move extra pages to reserve.
-- * This won't sleep.
-- * Returns: 0 on success,
-- *          -EINVAL if the pagelist doesn't match the trunc point pagelist
-- */
--int ceph_pagelist_truncate(struct ceph_pagelist *pl,
--			   struct ceph_pagelist_cursor *c)
--{
--	struct page *page;
--
--	if (pl != c->pl)
--		return -EINVAL;
--	ceph_pagelist_unmap_tail(pl);
--	while (pl->head.prev != c->page_lru) {
--		page = list_entry(pl->head.prev, struct page, lru);
--		/* move from pagelist to reserve */
--		list_move_tail(&page->lru, &pl->free_list);
--		++pl->num_pages_free;
--	}
--	pl->room = c->room;
--	if (!list_empty(&pl->head)) {
--		page = list_entry(pl->head.prev, struct page, lru);
--		pl->mapped_tail = kmap(page);
--	}
--	return 0;
--}
--EXPORT_SYMBOL(ceph_pagelist_truncate);
+ static void ceph_osd_data_release(struct ceph_osd_data *osd_data)
+ {
+ 	ceph_osd_data_init(osd_data);
+@@ -4475,7 +4463,7 @@ static void handle_watch_notify(struct ceph_osd_client *osdc,
+ 			if (data) {
+ 				if (lreq->reply) {
+ 					WARN_ON(data->type !=
+-							CEPH_MSG_DATA_PAGES);
++							CEPH_MSG_DATA_DATABUF);
+ 					*lreq->preply_pages = data->pages;
+ 					*lreq->preply_len = data->length;
+ 					data->own_pages = false;
 
