@@ -2,178 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C61B4C001DE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 07:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E108C04A6A
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 07:06:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233311AbjHDHFO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 03:05:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53220 "EHLO
+        id S233273AbjHDHGr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 03:06:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233273AbjHDHFM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 03:05:12 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20EC21724;
-        Fri,  4 Aug 2023 00:05:11 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37471rjd030280;
-        Fri, 4 Aug 2023 07:05:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : from : subject : content-type :
- content-transfer-encoding; s=pp1;
- bh=24qyg4cSlJjHoqoe8L2XEipaq8lqTFC/VtHWc2EFn80=;
- b=qyDo8ffnxj3QyE2FxHL3IkNcdS4oDOJTRvtRsClu9d/SqCxYRiKZO8o96IS+/s1C1asw
- ykjX67NMJ5341ZSQilIe9JsfvYP3qXM2ni6C7z/KpHwlVwkSF+Au6LkCXsW3YorPwp8p
- ubhaufdb/Xt1GoJJEMUeJ6GZJ0QepObawueBHRHXfumiyB09b6Bbdsda02XAIgtiepUX
- 9y3YDTOhCWrMIAf4BY5nOpeRJrLbw5Y4+v9z+HUJI2Pv0Z5HpIbWrIfgRoQqNkdkYjhy
- iWBdlOfRhrUoJZtDzeeW4A+T4TqN2aKCdl4zwkxy0xXqCYPCGxSBcJ+bHyJ3dR3Pa+iX HQ== 
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s8vjy05p2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Aug 2023 07:05:09 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3746oS1w023495;
-        Fri, 4 Aug 2023 07:05:06 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s8km9khby-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Aug 2023 07:05:06 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 374754oe38863110
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Aug 2023 07:05:06 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7FC1558058;
-        Fri,  4 Aug 2023 07:05:04 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 31E0858061;
-        Fri,  4 Aug 2023 07:05:02 +0000 (GMT)
-Received: from [9.43.75.26] (unknown [9.43.75.26])
-        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Aug 2023 07:05:01 +0000 (GMT)
-Message-ID: <5d7bd9aa-3456-cda8-ecaf-87a75daf56e9@linux.vnet.ibm.com>
-Date:   Fri, 4 Aug 2023 12:35:00 +0530
+        with ESMTP id S233957AbjHDHGr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 03:06:47 -0400
+Received: from out-90.mta1.migadu.com (out-90.mta1.migadu.com [95.215.58.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD621724;
+        Fri,  4 Aug 2023 00:06:46 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1691132804;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=N+PDNOldMLpWe69wkWNroeRQ0YSGNugCwYgD/y+ooro=;
+        b=wWYdynmWr8j2Zpj7xMyOAs3ezXwF7tkwWlomyVRAePrtrisQ9F1QoabhoFgJiY2j1udwyP
+        YjkEZ127YkooBA7JmZZVq+cy9rtCJLeEdG5gnmzrq/dxIwl+TGD24r+BppOHvGctzkLEnC
+        S3lZWg0en8KKb6y+Rr3NBbobqsJqMWQ=
+From:   chengming.zhou@linux.dev
+To:     tj@kernel.org, axboe@kernel.dk, josef@toxicpanda.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+Subject: [PATCH] blk-iocost: fix queue stats accounting
+Date:   Fri,  4 Aug 2023 15:06:09 +0800
+Message-ID: <20230804070609.31623-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Content-Language: en-US
-To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        abdhalee@linux.vnet.ibm.com, mputtash@linux.vnet.com,
-        sachinp@linux.vnet.com,
-        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-From:   Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Subject: [linux-next] [Mellanox] [6.5.0-rc4-next-20230803] Kernel crash while
- installing to upstream kernel
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SNsz_oUQQQ5TEI4vF9SoZG-QjThDAzZt
-X-Proofpoint-ORIG-GUID: SNsz_oUQQQ5TEI4vF9SoZG-QjThDAzZt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-04_05,2023-08-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 malwarescore=0 mlxscore=0 mlxlogscore=736
- lowpriorityscore=0 spamscore=0 phishscore=0 bulkscore=0 clxscore=1011
- adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2306200000 definitions=main-2308040061
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Greetings,
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-[linux-next] [Mellanox] [6.5.0-rc4-next-20230803] Kernel crash while 
-installing to upstream kernel
+The q->stats->accounting is not only used by iocost, but iocost only
+increase this counter, never decrease it. So queue stats accounting
+will always enabled after using iocost once.
 
----Traces---
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-iocost.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-[  216.663025] BUG: Unable to handle kernel data access at 
-0x6800000005a01500
-[  216.663034] Faulting instruction address: 0xc000000000531654
-[  216.663039] Oops: Kernel access of bad area, sig: 11 [#1]
-[  216.663041] LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=8192 NUMA pSeries
-[  216.663046] Modules linked in: pseries_rng vmx_crypto binfmt_misc 
-ext4 mbcache jbd2 dm_service_time sd_mod t10_pi crc64_rocksoft crc64 sg 
-ibmvfc scsi_transport_fc ibmveth mlx5_core mlxfw psample dm_multipath 
-dm_mirror dm_region_hash dm_log dm_mod fuse
-[  216.663067] CPU: 8 PID: 1035 Comm: systemd-cgroups Not tainted 
-6.5.0-rc4-next-20230803-auto #1
-[  216.663072] Hardware name: IBM,9080-HEX POWER10 (raw) 0x800200 
-0xf000006 of:IBM,FW1030.20 (NH1030_047) hv:phyp pSeries
-[  216.663076] NIP:  c000000000531654 LR: c000000000531538 CTR: 
-0000000000000000
-[  216.663078] REGS: c00000000da5f7a0 TRAP: 0380   Not tainted 
-(6.5.0-rc4-next-20230803-auto)
-[  216.663082] MSR:  8000000000009033 <SF,EE,ME,IR,DR,RI,LE>  CR: 
-28022848  XER: 00000000
-[  216.663090] CFAR: c000000000531540 IRQMASK: 0
-[  216.663090] GPR00: c000000000531538 c00000000da5fa40 c000000001451c00 
-0000000000000000
-[  216.663090] GPR04: 0000000000000cc0 0000000000000008 00000000000016c5 
-6800000005a01500
-[  216.663090] GPR08: 00000000000016c4 0000000000000010 42f6d0d03e938537 
-c000000005a0b8d8
-[  216.663090] GPR12: 0000000000000000 c0000018ffff5700 0000000000000000 
-0000000000000000
-[  216.663090] GPR16: 0000000000000000 0000000000000000 0000000000000000 
-0000000000000000
-[  216.663090] GPR20: c00000000da5fcc0 c00000000da5fd00 c00000000da5fcb8 
-0000000000000001
-[  216.663090] GPR24: c00000000a709580 0000000000000000 c0000000001589e0 
-0000000000000028
-[  216.663090] GPR28: 0000000000000cc0 0000000000000cc0 6800000005a014f0 
-c000000003019a00
-[  216.663127] NIP [c000000000531654] kmem_cache_alloc+0x1c4/0x470
-[  216.663134] LR [c000000000531538] kmem_cache_alloc+0xa8/0x470
-[  216.663137] Call Trace:
-[  216.663139] [c00000000da5fa40] [c000000000531538] 
-kmem_cache_alloc+0xa8/0x470 (unreliable)
-[  216.663144] [c00000000da5fab0] [c0000000001589e0] vm_area_dup+0x70/0x110
-[  216.663149] [c00000000da5faf0] [c0000000004bc190] __split_vma+0xc0/0x880
-[  216.663153] [c00000000da5fbb0] [c0000000004c3c14] 
-mprotect_fixup+0x304/0x3c0
-[  216.663158] [c00000000da5fc90] [c0000000004c4038] 
-do_mprotect_pkey+0x368/0x5c0
-[  216.663162] [c00000000da5fdf0] [c0000000004c42c0] sys_mprotect+0x30/0x40
-[  216.663166] [c00000000da5fe10] [c000000000036554] 
-system_call_exception+0x134/0x330
-[  216.663171] [c00000000da5fe50] [c00000000000d6a0] 
-system_call_common+0x160/0x2e4
-[  216.663177] --- interrupt: c00 at 0x7fff9cd89db4
-[  216.663180] NIP:  00007fff9cd89db4 LR: 00007fff9cd70c9c CTR: 
-0000000000000000
-[  216.663183] REGS: c00000000da5fe80 TRAP: 0c00   Not tainted 
-(6.5.0-rc4-next-20230803-auto)
-[  216.663186] MSR:  800000000280f033 
-<SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 24022248  XER: 00000000
-[  216.663195] IRQMASK: 0
-[  216.663195] GPR00: 000000000000007d 00007ffffadf2600 00007fff9cdb7e00 
-00007fff9c5f0000
-[  216.663195] GPR04: 0000000000010000 0000000000000001 000000000000000b 
-00007fff9c5ff170
-[  216.663195] GPR08: 00000000001fc1a8 0000000000000000 0000000000000000 
-0000000000000000
-[  216.663195] GPR12: 0000000000000000 00007fff9cdc5ed0 00007fff9c4120a0 
-00007fff9cdb2ef8
-[  216.663195] GPR16: 00007fff9c403fd0 00007ffffadf26d0 000000000000fff1 
-00007ffffadf26d0
-[  216.663195] GPR20: 00007fff9c41848c 0000000000000000 00007fff9c600070 
-00007fff9c400000
-[  216.663195] GPR24: 0000000000200070 0000000000000015 00007fff9c411f20 
-000000000000df50
-[  216.663195] GPR28: 0000094e00000015 00007fff9cdb2b70 0000000000000000 
-00007fff9cdb2b70
-[  216.663230] NIP [00007fff9cd89db4] 0x7fff9cd89db4
-[  216.663233] LR [00007fff9cd70c9c] 0x7fff9cd70c9c
-[  216.663235] --- interrupt: c00
-[  216.663236] Code: 7ce95214 e9070008 7fc9502a e9270010 2fbe0000 
-419e01f8 2fa90000 419e01f0 813f0028 e95f00b8 38c80001 7cfe4a14 
-<7d3e482a> 78e50022 54fdc03e 54a4c03e
-[  216.663249] ---[ end trace 0000000000000000 ]---
-
-
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index dd64e2066f01..089fcb9cfce3 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3301,11 +3301,12 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	if (qos[QOS_MIN] > qos[QOS_MAX])
+ 		goto einval;
+ 
+-	if (enable) {
++	if (enable && !ioc->enabled) {
+ 		blk_stat_enable_accounting(disk->queue);
+ 		blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
+ 		ioc->enabled = true;
+-	} else {
++	} else if (!enable && ioc->enabled) {
++		blk_stat_disable_accounting(disk->queue);
+ 		blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
+ 		ioc->enabled = false;
+ 	}
 -- 
-Regards,
-Tasmiya Nalatwad
-IBM Linux Technology Center
+2.41.0
 
