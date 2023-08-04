@@ -2,272 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63DDC04E69
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBDFC41513
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:30:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230465AbjHDNRr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 09:17:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56986 "EHLO
+        id S229637AbjHDNap (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 09:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230476AbjHDNQq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:16:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0CCB4EDA
-        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 06:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691154851;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rCroQnGwP6ReYl8bRAbrswP6dCB/MYi7V8I25lVTiBY=;
-        b=FcFf4mq7V1FosSbUXsbJNhyQ2s6hXVOl9zBYJl3yFNw16K69d/fl1qUYuzai4i6cx6GndZ
-        jQRm2sjkpli2EPNGuRbhYPDAS4pzl9W13+qKbd/iPzB9tu3qmfhMuP3JaOriv9c7QEhLd6
-        nPpuTdrXf45O+A2uBw1fVTtZqJFaFFc=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-255-fdGOafsgOcWmy19g8uwIkA-1; Fri, 04 Aug 2023 09:14:05 -0400
-X-MC-Unique: fdGOafsgOcWmy19g8uwIkA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229450AbjHDNae (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:30:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0116711B;
+        Fri,  4 Aug 2023 06:30:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7CA741C060E6;
-        Fri,  4 Aug 2023 13:14:04 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F81B40282C;
-        Fri,  4 Aug 2023 13:14:03 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 17/18] ceph: Remove CEPH_MSG_DATA_PAGES and its helpers
-Date:   Fri,  4 Aug 2023 14:13:26 +0100
-Message-ID: <20230804131327.2574082-18-dhowells@redhat.com>
-In-Reply-To: <20230804131327.2574082-1-dhowells@redhat.com>
-References: <20230804131327.2574082-1-dhowells@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 911D861FFE;
+        Fri,  4 Aug 2023 13:30:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73F87C433C7;
+        Fri,  4 Aug 2023 13:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1691155833;
+        bh=im2RMECXabHoMAl6aoY/p4hXCll2/KJcbIiea1mLir8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ofNDSiWzVm0r4xjuy9aOUMs1uNTeXTfZCnUkjNUhaFV5M9txgRHS1AUo5AAArQbH3
+         MzMtKRv4PI00/z539qt+HoROQ+2+b3uRVrvQYfJC/csYFEbUgcZJ03ZMwm0WNun/9H
+         7fMIGryo5UW8koPC5Wyo9ik6eSLHkVNK84aj4kZQ=
+Date:   Fri, 4 Aug 2023 15:30:30 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Vlastimil Babka <vbabka@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Joern Engel <joern@lazybastard.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Loic Poulain <loic.poulain@linaro.org>, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org,
+        Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: [PATCH 04/24] PM: hibernate: move finding the resume device out
+ of software_resume
+Message-ID: <2023080422-hurricane-rehab-7c2d@gregkh>
+References: <20230531125535.676098-1-hch@lst.de>
+ <20230531125535.676098-5-hch@lst.de>
+ <2cfa5f55-1d68-8a4f-d049-13f42e0d1484@suse.cz>
+ <20230804103101.GA23613@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230804103101.GA23613@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
----
- include/linux/ceph/messenger.h | 26 ++-------
- net/ceph/messenger.c           | 98 +---------------------------------
- net/ceph/osd_client.c          |  2 -
- 3 files changed, 5 insertions(+), 121 deletions(-)
+On Fri, Aug 04, 2023 at 12:31:01PM +0200, Christoph Hellwig wrote:
+> Looks good, thanks!
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
 
-diff --git a/include/linux/ceph/messenger.h b/include/linux/ceph/messenger.h
-index a2489e266bff..f48657eef648 100644
---- a/include/linux/ceph/messenger.h
-+++ b/include/linux/ceph/messenger.h
-@@ -118,23 +118,14 @@ struct ceph_messenger {
- enum ceph_msg_data_type {
- 	CEPH_MSG_DATA_NONE,	/* message contains no data payload */
- 	CEPH_MSG_DATA_DATABUF,	/* data source/destination is a data buffer */
--	CEPH_MSG_DATA_PAGES,	/* data source/destination is a page array */
- 	CEPH_MSG_DATA_ITER,	/* data source/destination is an iov_iter */
- };
- 
- struct ceph_msg_data {
- 	enum ceph_msg_data_type		type;
--	struct iov_iter			iter;
- 	bool				release_dbuf;
--	union {
--		struct ceph_databuf	*dbuf;
--		struct {
--			struct page	**pages;
--			size_t		length;		/* total # bytes */
--			unsigned int	offset;		/* first page */
--			bool		own_pages;
--		};
--	};
-+	struct iov_iter			iter;
-+	struct ceph_databuf		*dbuf;
- };
- 
- struct ceph_msg_data_cursor {
-@@ -144,17 +135,8 @@ struct ceph_msg_data_cursor {
- 	size_t			resid;		/* bytes not yet consumed */
- 	int			sr_resid;	/* residual sparse_read len */
- 	bool			need_crc;	/* crc update needed */
--	union {
--		struct {				/* pages */
--			unsigned int	page_offset;	/* offset in page */
--			unsigned short	page_index;	/* index in array */
--			unsigned short	page_count;	/* pages in array */
--		};
--		struct {
--			struct iov_iter		iov_iter;
--			unsigned int		lastlen;
--		};
--	};
-+	struct iov_iter		iov_iter;
-+	unsigned int		lastlen;
- };
- 
- /*
-diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-index 5b28c27858b2..acbdd086cd7a 100644
---- a/net/ceph/messenger.c
-+++ b/net/ceph/messenger.c
-@@ -710,70 +710,6 @@ void ceph_con_discard_requeued(struct ceph_connection *con, u64 reconnect_seq)
- 	}
- }
- 
--/*
-- * For a page array, a piece comes from the first page in the array
-- * that has not already been fully consumed.
-- */
--static void ceph_msg_data_pages_cursor_init(struct ceph_msg_data_cursor *cursor,
--					size_t length)
--{
--	struct ceph_msg_data *data = cursor->data;
--	int page_count;
--
--	BUG_ON(data->type != CEPH_MSG_DATA_PAGES);
--
--	BUG_ON(!data->pages);
--	BUG_ON(!data->length);
--
--	cursor->resid = min(length, data->length);
--	page_count = calc_pages_for(data->offset, (u64)data->length);
--	cursor->page_offset = data->offset & ~PAGE_MASK;
--	cursor->page_index = 0;
--	BUG_ON(page_count > (int)USHRT_MAX);
--	cursor->page_count = (unsigned short)page_count;
--	BUG_ON(length > SIZE_MAX - cursor->page_offset);
--}
--
--static struct page *
--ceph_msg_data_pages_next(struct ceph_msg_data_cursor *cursor,
--					size_t *page_offset, size_t *length)
--{
--	struct ceph_msg_data *data = cursor->data;
--
--	BUG_ON(data->type != CEPH_MSG_DATA_PAGES);
--
--	BUG_ON(cursor->page_index >= cursor->page_count);
--	BUG_ON(cursor->page_offset >= PAGE_SIZE);
--
--	*page_offset = cursor->page_offset;
--	*length = min_t(size_t, cursor->resid, PAGE_SIZE - *page_offset);
--	return data->pages[cursor->page_index];
--}
--
--static bool ceph_msg_data_pages_advance(struct ceph_msg_data_cursor *cursor,
--						size_t bytes)
--{
--	BUG_ON(cursor->data->type != CEPH_MSG_DATA_PAGES);
--
--	BUG_ON(cursor->page_offset + bytes > PAGE_SIZE);
--
--	/* Advance the cursor page offset */
--
--	cursor->resid -= bytes;
--	cursor->page_offset = (cursor->page_offset + bytes) & ~PAGE_MASK;
--	if (!bytes || cursor->page_offset)
--		return false;	/* more bytes to process in the current page */
--
--	if (!cursor->resid)
--		return false;   /* no more data */
--
--	/* Move on to the next page; offset is already at 0 */
--
--	BUG_ON(cursor->page_index >= cursor->page_count);
--	cursor->page_index++;
--	return true;
--}
--
- static void ceph_msg_data_iter_cursor_init(struct ceph_msg_data_cursor *cursor,
- 					size_t length)
- {
-@@ -844,9 +780,6 @@ static void __ceph_msg_data_cursor_init(struct ceph_msg_data_cursor *cursor)
- 	size_t length = cursor->total_resid;
- 
- 	switch (cursor->data->type) {
--	case CEPH_MSG_DATA_PAGES:
--		ceph_msg_data_pages_cursor_init(cursor, length);
--		break;
- 	case CEPH_MSG_DATA_ITER:
- 		ceph_msg_data_iter_cursor_init(cursor, length);
- 		break;
-@@ -883,9 +816,6 @@ struct page *ceph_msg_data_next(struct ceph_msg_data_cursor *cursor,
- 	struct page *page;
- 
- 	switch (cursor->data->type) {
--	case CEPH_MSG_DATA_PAGES:
--		page = ceph_msg_data_pages_next(cursor, page_offset, length);
--		break;
- 	case CEPH_MSG_DATA_ITER:
- 		page = ceph_msg_data_iter_next(cursor, page_offset, length);
- 		break;
-@@ -913,9 +843,6 @@ void ceph_msg_data_advance(struct ceph_msg_data_cursor *cursor, size_t bytes)
- 
- 	BUG_ON(bytes > cursor->resid);
- 	switch (cursor->data->type) {
--	case CEPH_MSG_DATA_PAGES:
--		new_piece = ceph_msg_data_pages_advance(cursor, bytes);
--		break;
- 	case CEPH_MSG_DATA_ITER:
- 		new_piece = ceph_msg_data_iter_advance(cursor, bytes);
- 		break;
-@@ -1644,12 +1571,8 @@ static struct ceph_msg_data *ceph_msg_data_add(struct ceph_msg *msg)
- 
- static void ceph_msg_data_destroy(struct ceph_msg_data *data)
- {
--	if (data->release_dbuf) {
-+	if (data->release_dbuf)
- 		ceph_databuf_release(data->dbuf);
--	} else if (data->type == CEPH_MSG_DATA_PAGES && data->own_pages) {
--		int num_pages = calc_pages_for(data->offset, data->length);
--		ceph_release_page_vector(data->pages, num_pages);
--	}
- }
- 
- void ceph_msg_data_add_databuf(struct ceph_msg *msg, struct ceph_databuf *dbuf)
-@@ -1670,25 +1593,6 @@ void ceph_msg_data_add_databuf(struct ceph_msg *msg, struct ceph_databuf *dbuf)
- }
- EXPORT_SYMBOL(ceph_msg_data_add_databuf);
- 
--void ceph_msg_data_add_pages(struct ceph_msg *msg, struct page **pages,
--			     size_t length, size_t offset, bool own_pages)
--{
--	struct ceph_msg_data *data;
--
--	BUG_ON(!pages);
--	BUG_ON(!length);
--
--	data = ceph_msg_data_add(msg);
--	data->type = CEPH_MSG_DATA_PAGES;
--	data->pages = pages;
--	data->length = length;
--	data->offset = offset & ~PAGE_MASK;
--	data->own_pages = own_pages;
--
--	msg->data_length += length;
--}
--EXPORT_SYMBOL(ceph_msg_data_add_pages);
--
- void ceph_msg_data_add_iter(struct ceph_msg *msg,
- 			    struct iov_iter *iter)
- {
-diff --git a/net/ceph/osd_client.c b/net/ceph/osd_client.c
-index 70f81a0b62c0..6fb78ae14f03 100644
---- a/net/ceph/osd_client.c
-+++ b/net/ceph/osd_client.c
-@@ -829,8 +829,6 @@ EXPORT_SYMBOL(osd_req_op_alloc_hint_init);
- static void ceph_osdc_msg_data_add(struct ceph_msg *msg,
- 				struct ceph_osd_data *osd_data)
- {
--	u64 length = ceph_osd_data_length(osd_data);
--
- 	if (osd_data->type == CEPH_OSD_DATA_TYPE_ITER) {
- 		ceph_msg_data_add_iter(msg, &osd_data->iter);
- 	} else {
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
 
