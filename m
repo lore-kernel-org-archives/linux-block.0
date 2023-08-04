@@ -2,52 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D010AC001DF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 11:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F9D2C001DF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 11:46:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbjHDLqS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 07:46:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45104 "EHLO
+        id S230179AbjHDLqY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 07:46:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbjHDLqR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 07:46:17 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463D8126
-        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 04:46:13 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99c1f6f3884so278067266b.0
-        for <linux-block@vger.kernel.org>; Fri, 04 Aug 2023 04:46:13 -0700 (PDT)
+        with ESMTP id S229911AbjHDLqV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 07:46:21 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2832A134
+        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 04:46:15 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-99bccc9ec02so287745066b.2
+        for <linux-block@vger.kernel.org>; Fri, 04 Aug 2023 04:46:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1691149571; x=1691754371;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BCoO+eXbLDZ6LS4ScYv1U/n5Fj5ZbQV1Lly5tQSedaA=;
-        b=ex9GIswFD6wVaea7Y/G4QtiPWycco6WsxPzjVlDZM28jkmAO/OnGr/fV4XKKdftbK8
-         1zQDeAEmYQCkpMOyKA7sMpERno8pfqUksnohPEa8CGTe5LapfSzvXgW+JDX077GTZm0v
-         84XD0l+st2UuvHMCO93Zxfr57yTpaGp3x6/x8bXtMBgaqajL5liBrSR9/W+9+BcWKPjw
-         U4bESYY7LvANqQ0IWgRzspnBMvPdGJqp9F/lZdoFPHdCebTMrZpTc3RqsTybMGdIHSI9
-         z+mLeTLF03kMaThUjZNspToUWBsL4ko75dtibBAZmvY3PLxWpsKln6CYMLH0PEoIJFy/
-         rX7g==
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1691149573; x=1691754373;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4oUmzoS5U5R4lTgYbAptq50tRMqAAmIZWZ/4iyIzFtA=;
+        b=jP2+6gufCLdXIUzWnwuWpyLuoq2Yb5cKN7ZHjhp9S1j1tyNhOwoVQawTz385tcS1gM
+         T3U5dArVWN/+ooEUGcnlJdVZG9GYvHx7XToELL7c2KkvSOw68fRGu4u0zbrk/j1YV0Rm
+         bMyL5ASTkRpmhuMb1cB+vVrXWrd3rHoYr9lg+bH3hmJLD0xUfhz7nL3y7d+MA/qqg8G9
+         1zrsN0KccT4TYkKLHYXGX/u0yrEThQstOCkILQrDP2mCvDNCO7V7kuZPKQHiEI2YDzkF
+         oviOoEhdv4RJc6aiMtz0Hf3rmqcZAoOW6u9Q/xq2TRKh+VOe2kb8QkkcZ4Zpi97Ay2vd
+         lBGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691149571; x=1691754371;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BCoO+eXbLDZ6LS4ScYv1U/n5Fj5ZbQV1Lly5tQSedaA=;
-        b=QYfuq4MEcgadWPZoyIjqphXZJTCl4inoNoqjwfUeZn2mQeztaciUNNn8v29iPyED0V
-         tZq7xPmTKe0S8rzYQVkiHYQhXX19hnPlC1cNCLZqMGKdiCYAzQ1IWKXOSQ9+qte9LbMg
-         QF2BV96fWzI+zUHLR7/6ixkSdv/jBcLSEwVuPwkOtraruoyPx7RMrcUugGJBlPaxpZCL
-         AYpDTm9lNyXOlAnAGGfYDA496bDpoWegcDNMUeUUK4xLZc4/D0TsiMVLJaYFgEPSW/Sq
-         I30sX6d7SUMpbxA1JBHndq1CbGQjnYhvszR0CbloiLC0HM5DsLfbfDOi6YEM0P3grSE/
-         sgxQ==
-X-Gm-Message-State: AOJu0YxznMVaPAa/h9FCMwtOD7Q80MrQq+ASt0k9XNYzT8fYh8ndLx2b
-        FynAQKP89Xn5zaMrNWR64+G3dA==
-X-Google-Smtp-Source: AGHT+IGUtsnOFxbNePDUk61BtaBL6nP9F1OwCQHPVQy9YswjGkhl5WqyXbQ+Jh0ImRPtdFBOGVNBSQ==
-X-Received: by 2002:a17:906:d8:b0:99b:ca5d:1466 with SMTP id 24-20020a17090600d800b0099bca5d1466mr1435276eji.66.1691149571637;
-        Fri, 04 Aug 2023 04:46:11 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691149573; x=1691754373;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4oUmzoS5U5R4lTgYbAptq50tRMqAAmIZWZ/4iyIzFtA=;
+        b=fQ2ISn9LfA2h8RcnOCUi+odgugtp7fmuRcEmcX0CDR6PqZIdwXPgLL/Tuv9HKSRWcO
+         rh7Y3MGgRIOOaZzi49A2c3Mh+RAkgK5fuY6a3Yi1nlbVXc0U7BCb+3dvhXAAzOf/Jrnq
+         1h67DRxdBMIalz0OClkDOJ6BNF0iwjl4c1CY7FID5fszpKDfrE/E8suQoi/WNvb5OynD
+         N3mWLgEypLUJixCt5HKF96zmsQZfcbyJhqlJ0ibhlFLAThWm2cYel/Y5/qc+xtickW6W
+         dsrhLhmse4flzjrXMxK2hX74SdxhIImJxeckk2No5YD+CQkveojEU9LmfR/DUP/a8xWU
+         Mqww==
+X-Gm-Message-State: AOJu0YywnMuOGqwTmM+BFLhjmguapy6Hom7wI/YP3YHebWhGKIyeR8Kx
+        Re5OlkjwvdAqKQxvxWE1FcwGBA==
+X-Google-Smtp-Source: AGHT+IHD+OuHtzNtnzNr499wcfgIySPTSjsABomYo5uYAYmj1/1aICmH0CIpWrR1Ar0RQ0ktGbEB5w==
+X-Received: by 2002:a17:906:18b1:b0:99c:6671:66d7 with SMTP id c17-20020a17090618b100b0099c667166d7mr1129068ejf.39.1691149573597;
+        Fri, 04 Aug 2023 04:46:13 -0700 (PDT)
 Received: from localhost ([194.62.217.4])
-        by smtp.gmail.com with ESMTPSA id lc15-20020a170906f90f00b0098ce63e36e9sm1210960ejb.16.2023.08.04.04.46.11
+        by smtp.gmail.com with ESMTPSA id p27-20020a170906229b00b0099bd8c1f67esm1196013eja.109.2023.08.04.04.46.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 04:46:11 -0700 (PDT)
+        Fri, 04 Aug 2023 04:46:13 -0700 (PDT)
 From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Aravind Ramesh <Aravind.Ramesh@wdc.com>,
@@ -61,11 +62,12 @@ Cc:     Aravind Ramesh <Aravind.Ramesh@wdc.com>,
         linux-kernel@vger.kernel.org (open list),
         Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org (open list:BLOCK LAYER)
-Subject: [PATCH v11 0/3] ublk: enable zoned storage support
-Date:   Fri,  4 Aug 2023 13:46:07 +0200
-Message-ID: <20230804114610.179530-1-nmi@metaspace.dk>
+Subject: [PATCH v11 2/3] ublk: move check for empty address field on command submission
+Date:   Fri,  4 Aug 2023 13:46:09 +0200
+Message-ID: <20230804114610.179530-3-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.41.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20230804114610.179530-1-nmi@metaspace.dk>
+References: <20230804114610.179530-1-nmi@metaspace.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -74,46 +76,56 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Hi All,
+In preparation for zoned storage support, move the check for empty `addr`
+field into the command handler case statement. Note that the check makes no
+sense for `UBLK_IO_NEED_GET_DATA` because the `addr` field must always be
+set for this command.
 
-This patch set adds zoned storage support to `ublk`. The first two patches do
-some house cleaning in preparation for the last patch. The last patch adds
-support for report_zones and the following operations:
+Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+---
+ drivers/block/ublk_drv.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
- - REQ_OP_ZONE_OPEN
- - REQ_OP_ZONE_CLOSE
- - REQ_OP_ZONE_FINISH
- - REQ_OP_ZONE_RESET
- - REQ_OP_ZONE_APPEND
-
-A user space component based on ubdsrv is available for testing [1] with the
-"loop" target.
-
-Read/write and zone operations are tested with zenfs [2].
-
-The zone append path is tested with fio -> zonefs -> ublk -> null_blk.
-
-The series is based on v6.5-rc4.
-
-Changes for v11
- - Style fixes
- - Use `kvmalloc()` instead of `__vmalloc()`  for zone report buffer
-
-[1] https://github.com/metaspace/ubdsrv/tree/2966e5f9637b5856d4a4273ae113e31b1c53ff98
-[2] https://github.com/westerndigitalcorporation/zenfs
-[3] https://git.kernel.dk/linux.git
-
-Andreas Hindborg (3):
-  ublk: add helper to check if device supports user copy
-  ublk: move check for empty address field on command submission
-  ublk: enable zoned storage support
-
- drivers/block/ublk_drv.c      | 348 ++++++++++++++++++++++++++++++++--
- include/uapi/linux/ublk_cmd.h |  63 +++++-
- 2 files changed, 383 insertions(+), 28 deletions(-)
-
-
-base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index db3523e281a6..5dba4b27d820 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1419,11 +1419,6 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 			^ (_IOC_NR(cmd_op) == UBLK_IO_NEED_GET_DATA))
+ 		goto out;
+ 
+-	if (ublk_support_user_copy(ubq) && ub_cmd->addr) {
+-		ret = -EINVAL;
+-		goto out;
+-	}
+-
+ 	ret = ublk_check_cmd_op(cmd_op);
+ 	if (ret)
+ 		goto out;
+@@ -1450,6 +1445,10 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 			 */
+ 			if (!ub_cmd->addr && !ublk_need_get_data(ubq))
+ 				goto out;
++		} else if (ub_cmd->addr) {
++			/* User copy requires addr to be unset */
++			ret = -EINVAL;
++			goto out;
+ 		}
+ 
+ 		ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
+@@ -1469,7 +1468,12 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 			if (!ub_cmd->addr && (!ublk_need_get_data(ubq) ||
+ 						req_op(req) == REQ_OP_READ))
+ 				goto out;
++		} else if (ub_cmd->addr) {
++			/* User copy requires addr to be unset */
++			ret = -EINVAL;
++			goto out;
+ 		}
++
+ 		ublk_fill_io_cmd(io, cmd, ub_cmd->addr);
+ 		ublk_commit_completion(ub, ub_cmd);
+ 		break;
 -- 
 2.41.0
 
