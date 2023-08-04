@@ -2,169 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70153C0015E
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 02:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA49C001DE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 03:26:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232735AbjHDCB7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Aug 2023 22:01:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33124 "EHLO
+        id S233127AbjHDD0J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Aug 2023 23:26:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232705AbjHDCB7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 22:01:59 -0400
-Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 306E544A1;
-        Thu,  3 Aug 2023 19:01:57 -0700 (PDT)
-Received: by mail-vs1-xe2e.google.com with SMTP id ada2fe7eead31-447684c4283so673822137.2;
-        Thu, 03 Aug 2023 19:01:57 -0700 (PDT)
+        with ESMTP id S232592AbjHDDZ7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2023 23:25:59 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FCF746A0
+        for <linux-block@vger.kernel.org>; Thu,  3 Aug 2023 20:25:29 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-563f8e8a53dso898436a12.3
+        for <linux-block@vger.kernel.org>; Thu, 03 Aug 2023 20:25:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691114516; x=1691719316;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Li4Rr3SDbAWbMC9vqUARkDUxqa5LNmgwNWmtZCQPN7c=;
-        b=MoVB1XjmMagsHZzn9G8ftY6HWJZOUd3UQbdoUZGHvxiTrJtRhQmKpY5hMXxXdiDzuq
-         zQBrBD4AM2yCz+AjuuOypK1qRVFL8If5W+fTO+cw9XBWSGuM7Hrx2k1cmlpjp62wiDDF
-         xmsVPYq08ScKsEB2acJFU2fLVkjAs3OQk4kUojzHHGQtCjQau8BO/IfSPhWz7s7RoG+F
-         ObfsdVyd9J6qFm5iu3TH8pCH6XZy+vWbCGwACVvcWshSg7B1v3rxfId451mLVIpY2bVi
-         GasCyfXQI0s3z46olnWXSpFmLflSUgwZZScpT/KeG4Ra5OVORJFyNsdv2rD2oRuBkEtE
-         dKlA==
+        d=chromium.org; s=google; t=1691119529; x=1691724329;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jyfiza8/jaSwlv2PJ16w6xf8krDmPMZlwhEQxHgzJgs=;
+        b=eCKANP1mUefA0PHSLAGYq8/9ynLDso/9XcT2RGU64hgL2PEltYzsqliCtIMnB5q3vJ
+         2j/DH4mH7/GpjQ0lgGnTl/F9agFM5OMB90xMqyV50I4IDXeg7js8JU3w5SNftaUzWtdy
+         OfPHMRXvKR5aE8Eeh5nf8xcry3ghoY8kHaTmE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691114516; x=1691719316;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Li4Rr3SDbAWbMC9vqUARkDUxqa5LNmgwNWmtZCQPN7c=;
-        b=AHwHs1RDHmSRRmMjEQdp+RoWkigg69QbSEujxAVrY8D9ipzJ60Ju0TJHasS2oa2qcp
-         QbDA3n8BWOjcDu7YmnYL80StdtYdCcaJS+9TwoUiYpuxqzZt7IPnjwf0A6ImjihI7ljx
-         Rz+3hsVYQo3vef1JPaB/jl0TW3sVPCr5wgfXf91SkP92D74ssmF2C15Ah/LhHFgD6OrZ
-         Dr/G81p/groWSONlBM9e2z1WG6HPPfD3YAjCK6lfKGyxNfKaWUwVKXJL35T1lR9phjzH
-         c2uCC3MK43cARq8goc0EWtvy/EVUyEM1JWP2C5M0YA7UrRdxGcPsM3YyfBYcevdmUcOR
-         rlMw==
-X-Gm-Message-State: AOJu0YyZGsTcfdCada2Pv0UMonW1QldD/e237rGQQSMnfF7ynhVuJ9H/
-        Gm3gH9iSKS6EsN42ApoOrz+Xc1/wNT+tEcOslw0=
-X-Google-Smtp-Source: AGHT+IHATFbengwvPlZLXwXXl9tdvm/xeC68n6I1h9PJY7Qw0FOEZCU8f3gigNz/0f8AxRF04Qwf1gS0iLv+NBKaP4k=
-X-Received: by 2002:a05:6102:a35:b0:443:7635:34d with SMTP id
- 21-20020a0561020a3500b004437635034dmr329869vsb.30.1691114516008; Thu, 03 Aug
- 2023 19:01:56 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691119529; x=1691724329;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jyfiza8/jaSwlv2PJ16w6xf8krDmPMZlwhEQxHgzJgs=;
+        b=NZMc/xWnEEzb/LKZr6/uGBZQUrM0by/kIwof1DUvo1vLGy+44lUWjK/j/q9JbPSeFT
+         P17L3BCWymENtJ3wh3KZz2VfMS6yBTRHORXzX5mWFjA++WOq3rINqIYPJ8dnQ1lSlyJD
+         zA83l9KLSLB6oGfUFjEGpMqJKbDW+cNAxUHCpc0sHf9kZRmfBfJNN/ZiK0za9i+LFqLV
+         7j8MSM7esyz+dX9PprO47TKFEkFzcMkp30e19ci7LkLCT7weN2wocMzLDxHPsAqvRam1
+         B92HYYWpMdLzvXdVp8DgSWHaDR6Wuf5HgYdRsctl4dJ+Aj43fDxhe7ZSH7FYgbkasDj4
+         7XMg==
+X-Gm-Message-State: AOJu0YyMAlBDs8cwph4+01hVrznBFwtSlhTlZ8uTaLkmZXf6QdeC8hw9
+        APzDgC1K25+LUySlk3zpk5vRoQ==
+X-Google-Smtp-Source: AGHT+IHfJ4qYOu6gLnzDKeOhiUQ76EZMvMDkxzOOb7S5CpaiEiwDFR+NXklJfm8ejXLEkmpbZOZz8g==
+X-Received: by 2002:a05:6a21:2704:b0:134:d4d3:f0a8 with SMTP id rm4-20020a056a21270400b00134d4d3f0a8mr366430pzb.3.1691119528822;
+        Thu, 03 Aug 2023 20:25:28 -0700 (PDT)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id b1-20020a170903228100b001b7fd27144dsm584487plh.40.2023.08.03.20.25.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Aug 2023 20:25:28 -0700 (PDT)
+Date:   Fri, 4 Aug 2023 12:25:23 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Dusty Mabe <dusty@dustymabe.com>
+Cc:     Hannes Reinecke <hare@suse.de>, wq@lst.de,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Andrew Morton <akpm@linux-foundation.org>, marmijo@redhat.com
+Subject: Re: XFS metadata CRC errors on zram block device on ppc64le
+ architecture
+Message-ID: <20230804032523.GA81493@google.com>
+References: <b2d40565-7868-ba15-4bb1-fca6f0df076b@dustymabe.com>
+ <20230802094106.GA28187@lst.de>
+ <3f36882c-b429-3ece-989b-a6899c001cbd@suse.de>
+ <43843fec-f30a-1edc-b428-1d38ddb1050f@dustymabe.com>
+ <a0f05188-d142-82f2-74aa-6c9a6ae2bbc9@dustymabe.com>
 MIME-Version: 1.0
-References: <20230802154131.2221419-1-hch@lst.de> <20230802154131.2221419-3-hch@lst.de>
- <20230803114651.ihtqqgthbdjjgxev@quack3>
-In-Reply-To: <20230803114651.ihtqqgthbdjjgxev@quack3>
-From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Date:   Fri, 4 Aug 2023 11:01:39 +0900
-Message-ID: <CAKFNMomzHg33SHnp6xGMEZY=+k6Y4t7dvBvgBDbO9H3ujzNDCw@mail.gmail.com>
-Subject: Re: [PATCH 02/12] nilfs2: use setup_bdev_super to de-duplicate the
- mount code
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a0f05188-d142-82f2-74aa-6c9a6ae2bbc9@dustymabe.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 3, 2023 at 8:46=E2=80=AFPM Jan Kara wrote:
->
-> On Wed 02-08-23 17:41:21, Christoph Hellwig wrote:
-> > Use the generic setup_bdev_super helper to open the main block device
-> > and do various bits of superblock setup instead of duplicating the
-> > logic.  This includes moving to the new scheme implemented in common
-> > code that only opens the block device after the superblock has allocate=
-d.
-> >
-> > It does not yet convert nilfs2 to the new mount API, but doing so will
-> > become a bit simpler after this first step.
-> >
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
->
-> AFAICS nilfs2 could *almost* use mount_bdev() directly and then just do i=
-ts
+On (23/08/03 17:32), Dusty Mabe wrote:
+> >>>>      zram: simplify bvec iteration in __zram_make_request
+> >>>>      
+> >>>>      bio_for_each_segment synthetize bvecs that never cross page boundaries, so
+> >>>>      don't duplicate that work in an inner loop.
+> >>>
+> >>>> Any ideas on how to fix the problem?
+> >>>
+> >>> So the interesting cases are:
+> >>>
+> >>>    - ppc64 usually uses 64k page sizes
+> >>>    - ppc64 is somewhat cache incoherent (compared to say x86)
+> >>>
+> >>> Let me think of this a bit more.
+> >>
+> >> Would need to be confirmed first that 64k pages really are in use
+> >> (eg we compile ppc64le with 4k page sizes ...).
+> >> Dusty?
+> >> For which page size did you compile your kernel?
+> > 
+> > 
+> > For Fedora the configuration is to enable 64k pages with CONFIG_PPC_64K_PAGES=y
+> > https://src.fedoraproject.org/rpms/kernel/blob/064c1675a16b4d379b42ab6c3397632ca54ad897/f/kernel-ppc64le-fedora.config#_4791
+> > 
+> > I used the same configuration when running the git bisect.
+> 
+> Naive question from my side: would this be a candidate for reverting while we investigate the root cause?
 
-> snapshot thing after mount_bdev() returns. But it has this weird logic
-> that: "if the superblock is already mounted but we can shrink the whole
-> dcache, then do remount instead of ignoring mount options". Firstly, this
-> looks racy - what prevents someone from say opening a file on the sb just
-> after nilfs_tree_is_busy() shrinks dcache? Secondly, it is inconsistent
-> with any other filesystem so it's going to surprise sysadmins not
-> intimately knowing nilfs2. Thirdly, from userspace you cannot tell what
-> your mount call is going to do. Last but not least, what is it really goo=
-d
-> for? Ryusuke, can you explain please?
->
->                                                                 Honza
+That's certainly a possible solution.
 
-I think you are referring to the following part:
-
->        if (!s->s_root) {
-...
->        } else if (!sd.cno) {
->                if (nilfs_tree_is_busy(s->s_root)) {
->                        if ((flags ^ s->s_flags) & SB_RDONLY) {
->                                nilfs_err(s,
->                                          "the device already has a %s mou=
-nt.",
->                                          sb_rdonly(s) ? "read-only" : "re=
-ad/write");
->                                err =3D -EBUSY;
->                                goto failed_super;
->                        }
->                } else {
->                        /*
->                         * Try remount to setup mount states if the curren=
-t
->                         * tree is not mounted and only snapshots use this=
- sb.
->                         */
->                        err =3D nilfs_remount(s, &flags, data);
->                        if (err)
->                                goto failed_super;
->                }
->        }
-
-What this logic is trying to do is, if there is already a nilfs2 mount
-instance for the device, and are trying to mounting the current tree
-(sd.cno is 0, so this is not a snapshot mount), then will switch
-depending on whether the current tree has a mount:
-
-- If the current tree is mounted, it's just like a normal filesystem.
-(A read-only mount and a read/write mount can't coexist, so check
-that, and reuse the instance if possible)
-- Otherwise, i.e. for snapshot mounts only, do whatever is necessary
-to add a new current mount, such as starting a log writer.
-   Since it does the same thing that nilfs_remount does, so
-nilfs_remount() is used there.
-
-Whether or not there is a current tree mount can be determined by
-d_count(s->s_root) > 1 as nilfs_tree_is_busy() does.
-Where s->s_root is always the root dentry of the current tree, not
-that of the mounted snapshot.
-
-I remember that calling shrink_dcache_parent() before this test was to
-do the test correctly if there was garbage left in the dcache from the
-past current mount.
-
-If the current tree isn't mounted, it just cleans up the garbage, and
-the reference count wouldn't have incremented in parallel.
-
-If the current tree is mounted, d_count(s->s_root) will not decrease
-to 1, so it's not a problem.
-However, this will cause unexpected dcache shrinkage for the in-use
-tree, so it's not a good idea, as you pointed out.  If there is
-another way of judging without this side effect, it should be
-replaced.
-
-I will reply here once.
-
-Regards,
-Ryusuke Konishi
+But I don't quite understand why af8b04c63708 doesn't work.
