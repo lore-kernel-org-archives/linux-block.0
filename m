@@ -2,69 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBDFC41513
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:30:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF47C00528
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:33:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbjHDNap (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 09:30:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41752 "EHLO
+        id S230151AbjHDNdR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 09:33:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjHDNae (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:30:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0116711B;
-        Fri,  4 Aug 2023 06:30:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 911D861FFE;
-        Fri,  4 Aug 2023 13:30:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73F87C433C7;
-        Fri,  4 Aug 2023 13:30:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1691155833;
-        bh=im2RMECXabHoMAl6aoY/p4hXCll2/KJcbIiea1mLir8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ofNDSiWzVm0r4xjuy9aOUMs1uNTeXTfZCnUkjNUhaFV5M9txgRHS1AUo5AAArQbH3
-         MzMtKRv4PI00/z539qt+HoROQ+2+b3uRVrvQYfJC/csYFEbUgcZJ03ZMwm0WNun/9H
-         7fMIGryo5UW8koPC5Wyo9ik6eSLHkVNK84aj4kZQ=
-Date:   Fri, 4 Aug 2023 15:30:30 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Vlastimil Babka <vbabka@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Joern Engel <joern@lazybastard.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Loic Poulain <loic.poulain@linaro.org>, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org,
-        Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: [PATCH 04/24] PM: hibernate: move finding the resume device out
- of software_resume
-Message-ID: <2023080422-hurricane-rehab-7c2d@gregkh>
-References: <20230531125535.676098-1-hch@lst.de>
- <20230531125535.676098-5-hch@lst.de>
- <2cfa5f55-1d68-8a4f-d049-13f42e0d1484@suse.cz>
- <20230804103101.GA23613@lst.de>
+        with ESMTP id S230267AbjHDNdO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:33:14 -0400
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B9C19AA;
+        Fri,  4 Aug 2023 06:32:50 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-586b78aa26eso253987b3.1;
+        Fri, 04 Aug 2023 06:32:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691155970; x=1691760770;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ikm4FSDqyfrLlvitoKoz6UWtj3pz7XBNX80PZSDcqc8=;
+        b=Lt5cdLJQGwGOk+MTd1wlB9czMX+9tEcCV1YF/GzpTUQyFgJsqGnAj0RJqbXggaQTqV
+         uRwEgGwvxl4ZA1Z680A+HfSkDiRikctVSMl55NwANyDPYQbYe58eq1fCedJTNExFZwJ8
+         KcS6vI0rC6wkBfQ/as/xCH6h9pT9j3ITRqx8XjX6MbCJ3FHkwnJjsZA9by5tq5d7H7jW
+         +EZMhQAYlABCOfGoUqYLOXq8tuaTr21UsYd3WmWOR5530VrxQw51HYfJGsDeqj9sKd0s
+         vKxeCc3gEj7wNtS+tzyG+rjQORkWIyTKXBWXIzThvROvEX+Ck41+qY0gZ5+ITjVJTQFN
+         /QWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691155970; x=1691760770;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ikm4FSDqyfrLlvitoKoz6UWtj3pz7XBNX80PZSDcqc8=;
+        b=Rg44QEl3dVU4jyVO/P8HdG+qdlCe8B/ZEv4Ue3G1yN2lltHvoSPPiOIN+9u780otCP
+         9+WTGh7Cs9pu98JgSkFgIn3AMFUAoVbvd+jpy2XXrJQ/D0JWZ+OLHfAQol+XrZ7W6mAp
+         sDwh2h6BKXlv1NBAgLcFcAx+TQbAtgSKfecLsy9zIWEwO7W60lhhcq8eyy4T8N0pPjyC
+         pvSnqcUUv8syQOnpZaEvkuZL5172dAFaT9Zv/S5VkDukDrtfkYusmx2vrqD6YyKqvthR
+         RUa80cPGb38eti5dbUBQh5PGD4ymWOBr3jnrUQNg9gcN7Ze3fyM9d8JHKfQHxpUBpZb5
+         5T4g==
+X-Gm-Message-State: AOJu0YyCjuk0YTfJo6M3kQ3vUeDhZyDYMYxm91XiAOW65xGLKNYQvbl1
+        fJ0xdu2vV+WXzhezst0C7qnPKXMa2cvUK7I4q78=
+X-Google-Smtp-Source: AGHT+IFTUo4+bd3eBCObNbXFyO0eLQUgPyrFwdg/ThYek9ub/crmrxKW84vWlURnd1HZy/5AhTmYeUsv5r1d7+p9e/o=
+X-Received: by 2002:a25:240a:0:b0:d3d:74b6:e05c with SMTP id
+ k10-20020a25240a000000b00d3d74b6e05cmr2116497ybk.52.1691155970059; Fri, 04
+ Aug 2023 06:32:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230804103101.GA23613@lst.de>
+References: <20230804114610.179530-1-nmi@metaspace.dk> <20230804114610.179530-3-nmi@metaspace.dk>
+In-Reply-To: <20230804114610.179530-3-nmi@metaspace.dk>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Fri, 4 Aug 2023 21:32:38 +0800
+Message-ID: <CACVXFVP1x7dRfHTFvM7ah9iB41E-5nxp=r16xr580UVJ_PRKUQ@mail.gmail.com>
+Subject: Re: [PATCH v11 2/3] ublk: move check for empty address field on
+ command submission
+To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 04, 2023 at 12:31:01PM +0200, Christoph Hellwig wrote:
-> Looks good, thanks!
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
+On Fri, Aug 4, 2023 at 8:34=E2=80=AFPM Andreas Hindborg (Samsung)
+<nmi@metaspace.dk> wrote:
+>
+> From: Andreas Hindborg <a.hindborg@samsung.com>
+>
+> In preparation for zoned storage support, move the check for empty `addr`
+> field into the command handler case statement. Note that the check makes =
+no
+> sense for `UBLK_IO_NEED_GET_DATA` because the `addr` field must always be
+> set for this command.
+>
+> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-
+Thanks,
