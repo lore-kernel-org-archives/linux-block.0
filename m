@@ -2,78 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D078CC001DB
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 17:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7FAC001DF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 18:40:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232301AbjHDRb6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 13:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56118 "EHLO
+        id S229572AbjHDSkM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 14:40:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231142AbjHDRb6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 13:31:58 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4F13C25
-        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 10:31:56 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bb91c20602so4503215ad.0
-        for <linux-block@vger.kernel.org>; Fri, 04 Aug 2023 10:31:56 -0700 (PDT)
+        with ESMTP id S230051AbjHDSkC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 14:40:02 -0400
+Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A22F1734
+        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 11:39:56 -0700 (PDT)
+Received: by mail-oo1-xc29.google.com with SMTP id 006d021491bc7-56cca35d8c3so1431975eaf.3
+        for <linux-block@vger.kernel.org>; Fri, 04 Aug 2023 11:39:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691170316; x=1691775116;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0qQmF/aDPN/Nd1iFTYAKf0iaoJAfdocEV/pAQRYwbqs=;
-        b=Ok9lyphivxgObFBlVcatBdf9FmrWhag5FrhV0znfPx7b0uGvx81YG9TIoMjLRNS7b/
-         ts0mtR1Y9E0+QBeAk/a0+IlNVPt+PxsQChz4M88beydb3Mpsg7rhIdCllLO6JQb6IBTV
-         Y4Ku4AtHVmGXtReS5HYAymdGGt4hwG6JyKtnjSbpeF7/eoxKNvLxy0f0PbDgukuFafYp
-         zgiXrx2mpc+A684TIxjc2aQBX5g7EVb4AiL+aX8VXtRaB71gh5dh0d2MzDsHgoigdu9u
-         vQd6ZSCf++eWeBf7rkJ/u0bayfu60/INm38m5w3FLO/qPHjtZRa54bcrOKhB9ga/smdb
-         U+qQ==
+        d=gmail.com; s=20221208; t=1691174395; x=1691779195;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pdb4S4jUFam2YhjI6Vvc54gNq3pasG3XtD6ctU3NAjQ=;
+        b=I9VG2TN71UFCBaFTm9LK2L3jfysGIhtbcHeQeGMXQhKiCwA8vNMUZ9SDkSksNhDXJ+
+         LX4B7GQ+s0aK3kq9PWy7gyjkh0rZtHOQu30z6vmNzh+siHQIRY+IhDpgEDe2sEkBku7a
+         Js8NncabV7a5emcw4d9BZQ0igQSWdDxlB/Yny4EaC8R7ShhRZz/+e9RT33uExgguhpUp
+         GpjE8INpjgUlKGzyXTsN1HVMMI2DKNJtW1GT3ccO8G2eYim1o1FxDa1R0eKPYMOW3SNr
+         91tU8sDp1PtkKwmylBJ9ULtCt7T8vkXn02tSL1xLiGbSWW9dtMlG6pOuw9vcTOIrzMrX
+         2qmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691170316; x=1691775116;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0qQmF/aDPN/Nd1iFTYAKf0iaoJAfdocEV/pAQRYwbqs=;
-        b=NXXSiZ6IqyUuCARvFjB1Aom30E+FV9L8otBvM6mQkzL0ZX7XXtKOk9IfDNOici/647
-         oOhgQRYHxE/JcFcrOEKl7GS/k4xVjKMab6qbweVBHPfJuMCotSlrCFE5FczUnXKkn24V
-         jQBxK4AZluOo39Mod2vC9vwZp6eLefPsFDGv0cr5h8/dXtFVteI9+HX7xvu5goXqIcmR
-         aCKDZCXeUG8JOuY9DRRV+ecLnbMaBFgPQesZ9pQU3bxmD0Qf56XzRF4ZTx+R7eG9aZv7
-         NBZWYh26+3O6WahP1JhyfkACbMisPe0YzHcP7Zk9W38+6gkcx9upVVmisW1BZxJ3zigr
-         8ttA==
-X-Gm-Message-State: ABy/qLaXoSKpRLNcZRrcggUNN0/WkMEfAlzcfALBDWxWeX0pZ+Qgajid
-        yAJeTJ5cC1qEWSezKSV7VOpNDPmz3lnEhYYVDbg=
-X-Google-Smtp-Source: APBJJlEdzXnBEVkC+oRckNCewl432/bLmEhe9+Wm62NxjTqEJ4fFwsHGLSLh75I/cZUN4QFCJqB/nA==
-X-Received: by 2002:a17:903:244f:b0:1b3:ec39:f42c with SMTP id l15-20020a170903244f00b001b3ec39f42cmr24213518pls.5.1691170316247;
-        Fri, 04 Aug 2023 10:31:56 -0700 (PDT)
-Received: from [172.20.1.218] (071-095-160-189.biz.spectrum.com. [71.95.160.189])
-        by smtp.gmail.com with ESMTPSA id ju2-20020a170903428200b001bbcf43e120sm2024602plb.95.2023.08.04.10.31.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Aug 2023 10:31:54 -0700 (PDT)
-Message-ID: <32b8aef9-061a-bf4b-e3a4-c72a4ecbe27f@kernel.dk>
-Date:   Fri, 4 Aug 2023 11:31:51 -0600
+        d=1e100.net; s=20221208; t=1691174395; x=1691779195;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pdb4S4jUFam2YhjI6Vvc54gNq3pasG3XtD6ctU3NAjQ=;
+        b=jqvlTq73GXN2fVuWkiJbec5bTysJVn2SGS92kndqV0U9gUhDAw09qjwCykrcda1Ec2
+         7T3lB0AK44ZSuMJmzHPP/SkENeFxsiVYfBBkrHMStkvOyO5Hx5nM4q9vUEKsbgAH6B5y
+         xXkxTDhXrVC+yq1dl3aHu4e70VhjkjJ4VPr32a7EYJ68yJIzff8QIbKYegUF02C+ClJG
+         Rl8N+fVojEXncm3iWpuvdMSuauHNi7jBxNw2SnCGuJb7T0QviyfP5m1XsvPkpNr0gXJM
+         BOoa6QLfhkFf+5zqxSUxHaJE6o6cV99eAt+Y351DnQqKIFm/lAOkNgcvqHp9NPR+Hiap
+         dh/g==
+X-Gm-Message-State: AOJu0YxnP7Q64D9mHqtsOwavoVFAIci7VayWWnClQp4t1PI1S0ViuVo5
+        mqHKTBaYki/AN9ZbF4gQcKOYNbtcto3EVm8HAN0=
+X-Google-Smtp-Source: AGHT+IFs0h5DxXct9osM1RKApWLE5ecrqHLo2TdX1nYTIkTpD4DVEulpSxL0E8JXXS0yK6ZEJUwW+q0wDKazTDwfQuQ=
+X-Received: by 2002:a05:6358:99a8:b0:139:5a46:ea7d with SMTP id
+ j40-20020a05635899a800b001395a46ea7dmr1260451rwb.7.1691174395225; Fri, 04 Aug
+ 2023 11:39:55 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH] romfs: only select BUFFER_HEAD for the block based path
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     lizetao1@huawei.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20230804102648.78683-1-hch@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230804102648.78683-1-hch@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAM9Jb+g5rrvmw8xCcwe3REK4x=RymrcqQ8cZavwWoWu7BH+8wA@mail.gmail.com>
+ <20230713135413.2946622-1-houtao@huaweicloud.com>
+In-Reply-To: <20230713135413.2946622-1-houtao@huaweicloud.com>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Fri, 4 Aug 2023 20:39:43 +0200
+Message-ID: <CAM9Jb+jjg_By+A2F+HVBsHCMsVz1AEVWbBPtLTRTfOmtFao5hA@mail.gmail.com>
+Subject: Re: [PATCH v4] virtio_pmem: add the missing REQ_OP_WRITE for flush bio
+To:     Hou Tao <houtao@huaweicloud.com>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+        virtualization@lists.linux-foundation.org, houtao1@huawei.com,
+        "Michael S . Tsirkin" <mst@redhat.com>, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/4/23 4:26?AM, Christoph Hellwig wrote:
-> selecting BUFFER_HEAD unconditionally does not work as romfs can also
-> be built with only the MTD backend and thus without CONFIG_BLOCK.
+Gentle ping!
 
-I folded this in with the other one and made a note about that.
+Dan, Vishal for suggestion/review on this patch and request for merging.
++Cc Michael for awareness, as virtio-pmem device is currently broken.
 
--- 
-Jens Axboe
+Thanks,
+Pankaj
 
+> From: Hou Tao <houtao1@huawei.com>
+>
+> When doing mkfs.xfs on a pmem device, the following warning was
+> reported:
+>
+>  ------------[ cut here ]------------
+>  WARNING: CPU: 2 PID: 384 at block/blk-core.c:751 submit_bio_noacct
+>  Modules linked in:
+>  CPU: 2 PID: 384 Comm: mkfs.xfs Not tainted 6.4.0-rc7+ #154
+>  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
+>  RIP: 0010:submit_bio_noacct+0x340/0x520
+>  ......
+>  Call Trace:
+>   <TASK>
+>   ? submit_bio_noacct+0xd5/0x520
+>   submit_bio+0x37/0x60
+>   async_pmem_flush+0x79/0xa0
+>   nvdimm_flush+0x17/0x40
+>   pmem_submit_bio+0x370/0x390
+>   __submit_bio+0xbc/0x190
+>   submit_bio_noacct_nocheck+0x14d/0x370
+>   submit_bio_noacct+0x1ef/0x520
+>   submit_bio+0x55/0x60
+>   submit_bio_wait+0x5a/0xc0
+>   blkdev_issue_flush+0x44/0x60
+>
+> The root cause is that submit_bio_noacct() needs bio_op() is either
+> WRITE or ZONE_APPEND for flush bio and async_pmem_flush() doesn't assign
+> REQ_OP_WRITE when allocating flush bio, so submit_bio_noacct just fail
+> the flush bio.
+>
+> Simply fix it by adding the missing REQ_OP_WRITE for flush bio. And we
+> could fix the flush order issue and do flush optimization later.
+>
+> Cc: stable@vger.kernel.org # 6.3+
+> Fixes: b4a6bb3a67aa ("block: add a sanity check for non-write flush/fua bios")
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
+> Tested-by: Pankaj Gupta <pankaj.gupta@amd.com>
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> ---
+> v4:
+>  * add stable Cc
+>  * collect Rvb and Tested-by tags
+>
+> v3: https://lore.kernel.org/linux-block/20230625022633.2753877-1-houtao@huaweicloud.com
+>  * adjust the overly long lines in both commit message and code
+>
+> v2: https://lore.kernel.org/linux-block/20230621134340.878461-1-houtao@huaweicloud.com
+>  * do a minimal fix first (Suggested by Christoph)
+>
+> v1: https://lore.kernel.org/linux-block/ZJLpYMC8FgtZ0k2k@infradead.org/T/#t
+>
+>  drivers/nvdimm/nd_virtio.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
+> index c6a648fd8744..1f8c667c6f1e 100644
+> --- a/drivers/nvdimm/nd_virtio.c
+> +++ b/drivers/nvdimm/nd_virtio.c
+> @@ -105,7 +105,8 @@ int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
+>          * parent bio. Otherwise directly call nd_region flush.
+>          */
+>         if (bio && bio->bi_iter.bi_sector != -1) {
+> -               struct bio *child = bio_alloc(bio->bi_bdev, 0, REQ_PREFLUSH,
+> +               struct bio *child = bio_alloc(bio->bi_bdev, 0,
+> +                                             REQ_OP_WRITE | REQ_PREFLUSH,
+>                                               GFP_ATOMIC);
+>
+>                 if (!child)
+> --
+> 2.29.2
+>
