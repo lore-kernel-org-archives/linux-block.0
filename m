@@ -2,182 +2,178 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 687D0C04A94
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 06:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C61B4C001DE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 07:05:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233173AbjHDGiu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 02:38:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37364 "EHLO
+        id S233311AbjHDHFO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 03:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233194AbjHDGiM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 02:38:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6AF246BB
-        for <linux-block@vger.kernel.org>; Thu,  3 Aug 2023 23:37:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691131042;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JRbNEV/g+3SWffCtpqnTW+44zOe74EJ4R0UlzfLRMdg=;
-        b=aA/lC50pfMCZ4ZXM4HdzDcHeECa/8q6129iXzS2g1XkDAb9EFQNQnGHeuWiXJBz1t8jzSi
-        GmLNR4jojzARAshS2/FF+vMvFH25+DuoI0px/PQI0qBI7Nv916X+Rr/MaAkKttKHLRAOI9
-        PQWmh1emsXeBc8ZwpdBFqGUKel9IEsY=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-438-dNwAkdJdOziL2bJs1qcMcw-1; Fri, 04 Aug 2023 02:37:19 -0400
-X-MC-Unique: dNwAkdJdOziL2bJs1qcMcw-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-40c10c73650so23224661cf.0
-        for <linux-block@vger.kernel.org>; Thu, 03 Aug 2023 23:37:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691131039; x=1691735839;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JRbNEV/g+3SWffCtpqnTW+44zOe74EJ4R0UlzfLRMdg=;
-        b=cnxO2A/120E1NpLb3b1XkQu45Qy7Ae6MYy5miZNYxGNb7DiKCB7xvgI9DfWUyMwkR6
-         z4CaYGJVNsvVmxcs9pzQTG2Jz8eHwxlby0z0sZBxyTXln78EAFAAhqFibfL+YEMeoecP
-         b0ysPc6tkGyZeA6kpmGAEI3BzGW9xea24HdR0VTZrTd8LRPGH2xdNumu4SI9AKi53twG
-         tPQT6JYjEh0o6l9qrjAPG6eezs2yaLT+62rlIwbIyQxqhsimT0SWMWJuOOaZtjS4m42j
-         JyrhfROykh7A06RMH+0dM0sogQ6qaw4ulgw70Mx3ln2XTE9eg23zbnWmg3vlJ4LLks3l
-         goaA==
-X-Gm-Message-State: AOJu0YxceY671bHcwnzue4+dTG6L1K2LQhV2weAXkbj2jwNRTH/Wv2RR
-        AyN+KRO01Jm+1mcq5ptUoOUPjI14176rVlxFlX3aTPCig1wE5d8JssIEkG20Bdt1Vagge0sKSho
-        Df8BcZOGNuppaTb7u9bUfUtU=
-X-Received: by 2002:a05:622a:44f:b0:404:a649:879c with SMTP id o15-20020a05622a044f00b00404a649879cmr1022821qtx.49.1691131038970;
-        Thu, 03 Aug 2023 23:37:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEQAEaqfcC9XZlm+xYVaRBqSvtLqOU49iCHOkXeJwSJ4Vq7u3O4eD+BrXMQHkYycIHuMGVRvA==
-X-Received: by 2002:a05:622a:44f:b0:404:a649:879c with SMTP id o15-20020a05622a044f00b00404a649879cmr1022804qtx.49.1691131038689;
-        Thu, 03 Aug 2023 23:37:18 -0700 (PDT)
-Received: from fedora19.localdomain ([2401:d002:2d05:b10a:c9ac:2dd7:6463:bb84])
-        by smtp.gmail.com with ESMTPSA id 7-20020a17090a034700b002681bda127esm920379pjf.35.2023.08.03.23.37.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 23:37:18 -0700 (PDT)
-Date:   Fri, 4 Aug 2023 16:37:11 +1000
-From:   Ian Wienand <iwienand@redhat.com>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Petr Vorel <pvorel@suse.cz>, ltp@lists.linux.it,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Martin Doucha <mdoucha@suse.cz>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
-Message-ID: <ZMycl7xKyJoQNpcu@fedora19.localdomain>
-References: <20221107191136.18048-1-pvorel@suse.cz>
- <Y2l3vJb1y2Jynf50@google.com>
+        with ESMTP id S233273AbjHDHFM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 03:05:12 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20EC21724;
+        Fri,  4 Aug 2023 00:05:11 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37471rjd030280;
+        Fri, 4 Aug 2023 07:05:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : from : subject : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=24qyg4cSlJjHoqoe8L2XEipaq8lqTFC/VtHWc2EFn80=;
+ b=qyDo8ffnxj3QyE2FxHL3IkNcdS4oDOJTRvtRsClu9d/SqCxYRiKZO8o96IS+/s1C1asw
+ ykjX67NMJ5341ZSQilIe9JsfvYP3qXM2ni6C7z/KpHwlVwkSF+Au6LkCXsW3YorPwp8p
+ ubhaufdb/Xt1GoJJEMUeJ6GZJ0QepObawueBHRHXfumiyB09b6Bbdsda02XAIgtiepUX
+ 9y3YDTOhCWrMIAf4BY5nOpeRJrLbw5Y4+v9z+HUJI2Pv0Z5HpIbWrIfgRoQqNkdkYjhy
+ iWBdlOfRhrUoJZtDzeeW4A+T4TqN2aKCdl4zwkxy0xXqCYPCGxSBcJ+bHyJ3dR3Pa+iX HQ== 
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s8vjy05p2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Aug 2023 07:05:09 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3746oS1w023495;
+        Fri, 4 Aug 2023 07:05:06 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s8km9khby-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Aug 2023 07:05:06 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 374754oe38863110
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Aug 2023 07:05:06 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7FC1558058;
+        Fri,  4 Aug 2023 07:05:04 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 31E0858061;
+        Fri,  4 Aug 2023 07:05:02 +0000 (GMT)
+Received: from [9.43.75.26] (unknown [9.43.75.26])
+        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Aug 2023 07:05:01 +0000 (GMT)
+Message-ID: <5d7bd9aa-3456-cda8-ecaf-87a75daf56e9@linux.vnet.ibm.com>
+Date:   Fri, 4 Aug 2023 12:35:00 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2l3vJb1y2Jynf50@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Content-Language: en-US
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        abdhalee@linux.vnet.ibm.com, mputtash@linux.vnet.com,
+        sachinp@linux.vnet.com,
+        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+From:   Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+Subject: [linux-next] [Mellanox] [6.5.0-rc4-next-20230803] Kernel crash while
+ installing to upstream kernel
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SNsz_oUQQQ5TEI4vF9SoZG-QjThDAzZt
+X-Proofpoint-ORIG-GUID: SNsz_oUQQQ5TEI4vF9SoZG-QjThDAzZt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-04_05,2023-08-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 mlxscore=0 mlxlogscore=736
+ lowpriorityscore=0 spamscore=0 phishscore=0 bulkscore=0 clxscore=1011
+ adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2306200000 definitions=main-2308040061
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 01:25:16PM -0800, Minchan Kim wrote:
-> > following bug is trying to workaround an error on ppc64le, where
-> > zram01.sh LTP test (there is also kernel selftest
-> > tools/testing/selftests/zram/zram01.sh, but LTP test got further
-> > updates) has often mem_used_total 0 although zram is already filled.
+Greetings,
 
-> Is it happening on only ppc64le?
+[linux-next] [Mellanox] [6.5.0-rc4-next-20230803] Kernel crash while 
+installing to upstream kernel
 
-I have managed to replicate this on an arm64 system.  I frankly don't
-know what is so special about it -- it's a qemu guest and I'm not sure
-what exactly it's running ontop of.
+---Traces---
 
-> Is it a new regression? What kernel version did you use?
+[  216.663025] BUG: Unable to handle kernel data access at 
+0x6800000005a01500
+[  216.663034] Faulting instruction address: 0xc000000000531654
+[  216.663039] Oops: Kernel access of bad area, sig: 11 [#1]
+[  216.663041] LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=8192 NUMA pSeries
+[  216.663046] Modules linked in: pseries_rng vmx_crypto binfmt_misc 
+ext4 mbcache jbd2 dm_service_time sd_mod t10_pi crc64_rocksoft crc64 sg 
+ibmvfc scsi_transport_fc ibmveth mlx5_core mlxfw psample dm_multipath 
+dm_mirror dm_region_hash dm_log dm_mod fuse
+[  216.663067] CPU: 8 PID: 1035 Comm: systemd-cgroups Not tainted 
+6.5.0-rc4-next-20230803-auto #1
+[  216.663072] Hardware name: IBM,9080-HEX POWER10 (raw) 0x800200 
+0xf000006 of:IBM,FW1030.20 (NH1030_047) hv:phyp pSeries
+[  216.663076] NIP:  c000000000531654 LR: c000000000531538 CTR: 
+0000000000000000
+[  216.663078] REGS: c00000000da5f7a0 TRAP: 0380   Not tainted 
+(6.5.0-rc4-next-20230803-auto)
+[  216.663082] MSR:  8000000000009033 <SF,EE,ME,IR,DR,RI,LE>  CR: 
+28022848  XER: 00000000
+[  216.663090] CFAR: c000000000531540 IRQMASK: 0
+[  216.663090] GPR00: c000000000531538 c00000000da5fa40 c000000001451c00 
+0000000000000000
+[  216.663090] GPR04: 0000000000000cc0 0000000000000008 00000000000016c5 
+6800000005a01500
+[  216.663090] GPR08: 00000000000016c4 0000000000000010 42f6d0d03e938537 
+c000000005a0b8d8
+[  216.663090] GPR12: 0000000000000000 c0000018ffff5700 0000000000000000 
+0000000000000000
+[  216.663090] GPR16: 0000000000000000 0000000000000000 0000000000000000 
+0000000000000000
+[  216.663090] GPR20: c00000000da5fcc0 c00000000da5fd00 c00000000da5fcb8 
+0000000000000001
+[  216.663090] GPR24: c00000000a709580 0000000000000000 c0000000001589e0 
+0000000000000028
+[  216.663090] GPR28: 0000000000000cc0 0000000000000cc0 6800000005a014f0 
+c000000003019a00
+[  216.663127] NIP [c000000000531654] kmem_cache_alloc+0x1c4/0x470
+[  216.663134] LR [c000000000531538] kmem_cache_alloc+0xa8/0x470
+[  216.663137] Call Trace:
+[  216.663139] [c00000000da5fa40] [c000000000531538] 
+kmem_cache_alloc+0xa8/0x470 (unreliable)
+[  216.663144] [c00000000da5fab0] [c0000000001589e0] vm_area_dup+0x70/0x110
+[  216.663149] [c00000000da5faf0] [c0000000004bc190] __split_vma+0xc0/0x880
+[  216.663153] [c00000000da5fbb0] [c0000000004c3c14] 
+mprotect_fixup+0x304/0x3c0
+[  216.663158] [c00000000da5fc90] [c0000000004c4038] 
+do_mprotect_pkey+0x368/0x5c0
+[  216.663162] [c00000000da5fdf0] [c0000000004c42c0] sys_mprotect+0x30/0x40
+[  216.663166] [c00000000da5fe10] [c000000000036554] 
+system_call_exception+0x134/0x330
+[  216.663171] [c00000000da5fe50] [c00000000000d6a0] 
+system_call_common+0x160/0x2e4
+[  216.663177] --- interrupt: c00 at 0x7fff9cd89db4
+[  216.663180] NIP:  00007fff9cd89db4 LR: 00007fff9cd70c9c CTR: 
+0000000000000000
+[  216.663183] REGS: c00000000da5fe80 TRAP: 0c00   Not tainted 
+(6.5.0-rc4-next-20230803-auto)
+[  216.663186] MSR:  800000000280f033 
+<SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 24022248  XER: 00000000
+[  216.663195] IRQMASK: 0
+[  216.663195] GPR00: 000000000000007d 00007ffffadf2600 00007fff9cdb7e00 
+00007fff9c5f0000
+[  216.663195] GPR04: 0000000000010000 0000000000000001 000000000000000b 
+00007fff9c5ff170
+[  216.663195] GPR08: 00000000001fc1a8 0000000000000000 0000000000000000 
+0000000000000000
+[  216.663195] GPR12: 0000000000000000 00007fff9cdc5ed0 00007fff9c4120a0 
+00007fff9cdb2ef8
+[  216.663195] GPR16: 00007fff9c403fd0 00007ffffadf26d0 000000000000fff1 
+00007ffffadf26d0
+[  216.663195] GPR20: 00007fff9c41848c 0000000000000000 00007fff9c600070 
+00007fff9c400000
+[  216.663195] GPR24: 0000000000200070 0000000000000015 00007fff9c411f20 
+000000000000df50
+[  216.663195] GPR28: 0000094e00000015 00007fff9cdb2b70 0000000000000000 
+00007fff9cdb2b70
+[  216.663230] NIP [00007fff9cd89db4] 0x7fff9cd89db4
+[  216.663233] LR [00007fff9cd70c9c] 0x7fff9cd70c9c
+[  216.663235] --- interrupt: c00
+[  216.663236] Code: 7ce95214 e9070008 7fc9502a e9270010 2fbe0000 
+419e01f8 2fa90000 419e01f0 813f0028 e95f00b8 38c80001 7cfe4a14 
+<7d3e482a> 78e50022 54fdc03e 54a4c03e
+[  216.663249] ---[ end trace 0000000000000000 ]---
 
-I've replicated this on 4.18.0; obviously something more recent would
-be useful but I'm hesitant to destroy too much state in case it is
-something ...
 
-> Actually, mem_used_total indicates how many *physical memory* were
-> currently used to keep original data size.
-> 
-> However, if the test data is repeated pattern of unsigned long
-> (https://github.com/torvalds/linux/blob/master/drivers/block/zram/zram_drv.c#L210)
-> zram doesn't allocate the physical memory but just mark the unsigned long's value
-> in meta area for decompression later.
-
-To recap; this test [1] creates a zram device, makes a filesystem on
-it, and fills it with sequential 1k writes from /dev/zero via dd.  The
-problem is that it sees the mem_used_total for the zram device as zero
-in the sysfs stats after the writes; this causes a divide by zero
-error in the script calculation.
-
-An annoted extract:
-
- zram01 3 TINFO: /sys/block/zram1/disksize = '26214400'
- zram01 3 TPASS: test succeeded
- zram01 4 TINFO: set memory limit to zram device(s)
- zram01 4 TINFO: /sys/block/zram1/mem_limit = '25M'
- zram01 4 TPASS: test succeeded
- zram01 5 TINFO: make vfat filesystem on /dev/zram1
-
- >> at this point a cat of /sys/block/zram1/mm_stat shows
- >>   65536      527    65536 26214400    65536        0        0        0
-
- zram01 5 TPASS: zram_makefs succeeded
- zram01 6 TINFO: mount /dev/zram1
- zram01 6 TPASS: mount of zram device(s) succeeded
- zram01 7 TINFO: filling zram1 (it can take long time)
- zram01 7 TPASS: zram1 was filled with '25568' KB
-
- >> at this point "ls -lh" shows the file
- >> total 25M
- >> -rwxr-xr-x. 1 root root 25M Aug  4 01:06 file
-
- >> however, /sys/block/zram1/mm_stat shows
- >>   9502720        0        0 26214400   196608      145        0        0
- >> the script reads this zero value and tries to calculate the
- >> compression ratio
-
- ./zram01.sh: line 145: 100 * 1024 * 25568 / 0: division by 0 (error token is "0")
-
- >> If we do a "sync" then redisply the mm_stat after, we get
- >>   26214400     2842    65536 26214400   196608      399        0        0
-
-I have managed to instrument this, and in the following
-
- static ssize_t mm_stat_show(struct device *dev,
-                struct device_attribute *attr, char *buf)
- {
-  ...
-        if (init_done(zram)) {
-		mem_used = zs_get_total_pages(zram->mem_pool);
-                pr_info("mm_stat_show: init done %p %lld\n", zram->mem_pool, mem_used);
-                zs_pool_stats(zram->mem_pool, &pool_stats);
-
-zs_get_total_pages(zram->mem_pool) is definitely zero, which is why
-the mm_stat is returning zero.  i.e. zsmalloc really doesn't seem to
-have any pages recorded for that mem_pool ...
-
-This doesn't seem to make sense; how can a device that has a file
-system on it not even have one page assigned to it in zram->mem_pool?
-
-I *think* this has something to do with the de-deuplication as noted.
-If I stub out page_same_filled() to return false always, we see instead
-
- zram01 7 TPASS: zram1 was filled with '25568' KB
- >>  < immediately after >
- >> 10223616    48516   131072 26214400   196608        0        0        0
- >>  < after sync >
- >> 26214400   126933   327680 26214400   327680        0        0        0
-
-So I think this test still needs a sync to be sure that it's seeing
-the right values?  It's probably expected that this takes some time to
-write everything out?
-
-But is it possible that mem_used_total being zero is a bug -- possibly
-triggered by the de-dup path and the test writing the same thing in
-every block?  Something like the first de-duped page also being thrown
-out?
-
--i
-
-[1] https://github.com/linux-test-project/ltp/blob/8c201e55f684965df2ae5a13ff439b28278dec0d/testcases/kernel/device-drivers/zram/zram01.sh
+-- 
+Regards,
+Tasmiya Nalatwad
+IBM Linux Technology Center
 
