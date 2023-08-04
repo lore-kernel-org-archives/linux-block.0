@@ -2,108 +2,152 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB01C001DF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 12:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66786C00528
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 13:14:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229485AbjHDMzi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 08:55:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47142 "EHLO
+        id S229510AbjHDNOZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 09:14:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjHDMzi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 08:55:38 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 292A111B
-        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 05:55:37 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        with ESMTP id S229825AbjHDNOY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 09:14:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9114446B1
+        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 06:13:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691154815;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=YdazvjmGmZmgj91lOlAbSLPEx72pSHsRbgB1k8qsYaw=;
+        b=BI/pbSMThgJej+S97pcam1JNB/NaFoeyxq7BeaLw6cwn72DPoteVHZG8RSrxUSatRHzR/j
+        mkLKEjcKh/xnPGs+pVY0iK4zSBWyhRdCSpVWcPXg4mcsJRjuOTP+QjhPKYFbBaIRDQEV4U
+        Cu1KCTaot+QPiQSBCWjt41kCyeYH8Q4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-370-MjUsA69JPfGO44TxO2PFBQ-1; Fri, 04 Aug 2023 09:13:32 -0400
+X-MC-Unique: MjUsA69JPfGO44TxO2PFBQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id CC33C1F74D;
-        Fri,  4 Aug 2023 12:55:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1691153735; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dxuNE7EC0VQnJSO02qPrq1Amt0j8J/AVJ8tjhc5rwls=;
-        b=w9ovV+qULygpjIceOOXvFsUWs6uwsY/nC4Ke9gFeBNGXW0MaUVFTDLtNxeTcuoBwkIDARZ
-        pmOQXOWcDiz78a/JAMeJx5fVq/CPjD5UU2VBl+neQHrfXtOj2WuXw0iDtm0weSHusyfpdQ
-        10CcoTTxeNqPr1DOgufGC84R++qw9Gg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1691153735;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dxuNE7EC0VQnJSO02qPrq1Amt0j8J/AVJ8tjhc5rwls=;
-        b=p4lts56iLg1R6F7/AKjnczkL4uece5lqEa+Vk/EgCq2Z3cPX363YUmaDfIzSdnuF1vjud9
-        iZFYOjBo/M3YjyCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AAD73133B5;
-        Fri,  4 Aug 2023 12:55:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id f+GOJEf1zGQfBQAAMHmgww
-        (envelope-from <hare@suse.de>); Fri, 04 Aug 2023 12:55:35 +0000
-Message-ID: <d6ce5f11-46d3-cf05-ad47-0114d0f88096@suse.de>
-Date:   Fri, 4 Aug 2023 14:55:03 +0200
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 274C180006E;
+        Fri,  4 Aug 2023 13:13:32 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3DE8F112132D;
+        Fri,  4 Aug 2023 13:13:30 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 00/18] ceph, rbd: Collapse all the I/O types down to something iov_iter-based
+Date:   Fri,  4 Aug 2023 14:13:09 +0100
+Message-ID: <20230804131327.2574082-1-dhowells@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH blktests] block/004: reset zones of TEST_DEV before fio
- operation
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org
-References: <20230804122007.2396170-1-shinichiro.kawasaki@wdc.com>
-Content-Language: en-US
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230804122007.2396170-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/4/23 14:20, Shin'ichiro Kawasaki wrote:
-> When test target is a zoned block device with max_active_zones limit
-> larger than max_open_zones, fio write operation may fail depending on
-> zone conditions. To avoid the failure, reset zones of the device before
-> the fio run.
-> 
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
->   tests/block/004 | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/block/004 b/tests/block/004
-> index 63484a4..52a260f 100755
-> --- a/tests/block/004
-> +++ b/tests/block/004
-> @@ -15,7 +15,10 @@ requires() {
->   }
->   
->   device_requires() {
-> -	! _test_dev_is_zoned || _have_fio_zbd_zonemode
-> +	if _test_dev_is_zoned; then
-> +		_have_fio_zbd_zonemode
-> +		_have_program blkzone
-> +	fi
->   }
->   
-What would be the return value here?
-Do we care?
-Should we make it explicit?
+Hi Ilya, Xiubo,
 
-Cheers,
+[!] NOTE: This is a preview of a work in progress and doesn't yet fully
+    compile, let alone actually work!
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Frankenstr. 146, 90461 Nürnberg
-Managing Directors: I. Totev, A. Myers, A. McDonald, M. B. Moerman
-(HRB 36809, AG Nürnberg)
+Here are some patches that (mostly) collapse the different I/O types
+(PAGES, PAGELIST, BVECS, BIO) down to a single one.  I added a new type,
+ceph_databuf, to make this easier.  The page list is attached to that as a
+bio_vec[] with an iov_iter, but could also be some other type supported by
+the iov_iter.  The iov_iter defines the data or buffer to be used.  I have
+an additional iov_iter type implemented that allows use of a straight
+folio[] or page[] instead of a bio_vec[] that I can deploy if that proves
+more useful.
+
+The conversion isn't quite complete:
+
+ (1) rbd is done; BVECS and BIO types are replaced with ceph_databuf.
+
+ (2) ceph_osd_linger_request::preply_pages needs switching over to a
+     ceph_databuf, but I haven't yet managed to work out how the pages that
+     handle_watch_notify() sticks in there come about.
+
+ (3) I haven't altered data transmission in net/ceph/messenger*.c yet.  The
+     aim is to reduce it to a single sendmsg() call for each ceph_msg_data
+     struct, using the iov_iter therein.
+
+ (4) The data reception routines in net/ceph/messenger*.c also need
+     modifying to pass each ceph_msg_data::iter to recvmsg() in turn.
+
+ (5) It might be possible to merge struct ceph_databuf into struct
+     ceph_msg_data and eliminate the former.
+
+ (6) fs/ceph/ still needs some work to clean up the use of page arrays.
+
+ (7) I would like to change front and middle buffers with a ceph_databuf,
+     vmapping them when we need to access them.
+
+I added a kmap_ceph_databuf_page() macro and used that to get a page and
+use kmap_local_page() on it to hide the bvec[] inside to make it easier to
+replace.
+
+Anyway, if anyone has any thoughts...
+
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
+
+David
+
+David Howells (18):
+  iov_iter: Add function to see if buffer is all zeros
+  ceph: Rename alignment to offset
+  ceph: Add a new data container type, ceph_databuf
+  ceph: Convert ceph_mds_request::r_pagelist to a databuf
+  rbd: Use ceph_databuf for rbd_obj_read_sync()
+  ceph: Change ceph_osdc_call()'s reply to a ceph_databuf
+  ceph: Unexport osd_req_op_cls_request_data_pages()
+  ceph: Remove osd_req_op_cls_response_data_pages()
+  ceph: Convert notify_id_pages to a ceph_databuf
+  rbd: Switch from using bvec_iter to iov_iter
+  ceph: Remove bvec and bio data container types
+  ceph: Convert some page arrays to ceph_databuf
+  ceph: Convert users of ceph_pagelist to ceph_databuf
+  ceph: Remove ceph_pagelist
+  ceph: Convert ceph_osdc_notify() reply to ceph_databuf
+  ceph: Remove CEPH_OS_DATA_TYPE_PAGES and its attendant helpers
+  ceph: Remove CEPH_MSG_DATA_PAGES and its helpers
+  ceph: Don't use data_pages
+
+ drivers/block/rbd.c             | 645 ++++++++++----------------------
+ fs/ceph/acl.c                   |  39 +-
+ fs/ceph/addr.c                  |  18 +-
+ fs/ceph/file.c                  | 157 ++++----
+ fs/ceph/inode.c                 |  85 ++---
+ fs/ceph/locks.c                 |  23 +-
+ fs/ceph/mds_client.c            | 134 ++++---
+ fs/ceph/mds_client.h            |   2 +-
+ fs/ceph/super.h                 |   8 +-
+ fs/ceph/xattr.c                 |  68 ++--
+ include/linux/ceph/databuf.h    |  65 ++++
+ include/linux/ceph/messenger.h  | 141 +------
+ include/linux/ceph/osd_client.h |  97 ++---
+ include/linux/ceph/pagelist.h   |  72 ----
+ include/linux/uio.h             |   1 +
+ lib/iov_iter.c                  |  22 ++
+ net/ceph/Makefile               |   5 +-
+ net/ceph/cls_lock_client.c      |  40 +-
+ net/ceph/databuf.c              | 149 ++++++++
+ net/ceph/messenger.c            | 376 +------------------
+ net/ceph/osd_client.c           | 430 +++++++--------------
+ net/ceph/pagelist.c             | 171 ---------
+ 22 files changed, 876 insertions(+), 1872 deletions(-)
+ create mode 100644 include/linux/ceph/databuf.h
+ delete mode 100644 include/linux/ceph/pagelist.h
+ create mode 100644 net/ceph/databuf.c
+ delete mode 100644 net/ceph/pagelist.c
 
