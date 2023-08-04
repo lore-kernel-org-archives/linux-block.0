@@ -2,97 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E63D8C001DB
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 16:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D078CC001DB
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 17:31:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230108AbjHDQ2a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 12:28:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42606 "EHLO
+        id S232301AbjHDRb6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 13:31:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229739AbjHDQ23 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 12:28:29 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 855BF170F;
-        Fri,  4 Aug 2023 09:28:27 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qRxf6-0001Qz-Fw; Fri, 04 Aug 2023 18:28:24 +0200
-Message-ID: <0eec59f5-2f9d-1058-6323-3177de82bd55@leemhuis.info>
-Date:   Fri, 4 Aug 2023 18:28:23 +0200
+        with ESMTP id S231142AbjHDRb6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 13:31:58 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4F13C25
+        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 10:31:56 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bb91c20602so4503215ad.0
+        for <linux-block@vger.kernel.org>; Fri, 04 Aug 2023 10:31:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691170316; x=1691775116;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0qQmF/aDPN/Nd1iFTYAKf0iaoJAfdocEV/pAQRYwbqs=;
+        b=Ok9lyphivxgObFBlVcatBdf9FmrWhag5FrhV0znfPx7b0uGvx81YG9TIoMjLRNS7b/
+         ts0mtR1Y9E0+QBeAk/a0+IlNVPt+PxsQChz4M88beydb3Mpsg7rhIdCllLO6JQb6IBTV
+         Y4Ku4AtHVmGXtReS5HYAymdGGt4hwG6JyKtnjSbpeF7/eoxKNvLxy0f0PbDgukuFafYp
+         zgiXrx2mpc+A684TIxjc2aQBX5g7EVb4AiL+aX8VXtRaB71gh5dh0d2MzDsHgoigdu9u
+         vQd6ZSCf++eWeBf7rkJ/u0bayfu60/INm38m5w3FLO/qPHjtZRa54bcrOKhB9ga/smdb
+         U+qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691170316; x=1691775116;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0qQmF/aDPN/Nd1iFTYAKf0iaoJAfdocEV/pAQRYwbqs=;
+        b=NXXSiZ6IqyUuCARvFjB1Aom30E+FV9L8otBvM6mQkzL0ZX7XXtKOk9IfDNOici/647
+         oOhgQRYHxE/JcFcrOEKl7GS/k4xVjKMab6qbweVBHPfJuMCotSlrCFE5FczUnXKkn24V
+         jQBxK4AZluOo39Mod2vC9vwZp6eLefPsFDGv0cr5h8/dXtFVteI9+HX7xvu5goXqIcmR
+         aCKDZCXeUG8JOuY9DRRV+ecLnbMaBFgPQesZ9pQU3bxmD0Qf56XzRF4ZTx+R7eG9aZv7
+         NBZWYh26+3O6WahP1JhyfkACbMisPe0YzHcP7Zk9W38+6gkcx9upVVmisW1BZxJ3zigr
+         8ttA==
+X-Gm-Message-State: ABy/qLaXoSKpRLNcZRrcggUNN0/WkMEfAlzcfALBDWxWeX0pZ+Qgajid
+        yAJeTJ5cC1qEWSezKSV7VOpNDPmz3lnEhYYVDbg=
+X-Google-Smtp-Source: APBJJlEdzXnBEVkC+oRckNCewl432/bLmEhe9+Wm62NxjTqEJ4fFwsHGLSLh75I/cZUN4QFCJqB/nA==
+X-Received: by 2002:a17:903:244f:b0:1b3:ec39:f42c with SMTP id l15-20020a170903244f00b001b3ec39f42cmr24213518pls.5.1691170316247;
+        Fri, 04 Aug 2023 10:31:56 -0700 (PDT)
+Received: from [172.20.1.218] (071-095-160-189.biz.spectrum.com. [71.95.160.189])
+        by smtp.gmail.com with ESMTPSA id ju2-20020a170903428200b001bbcf43e120sm2024602plb.95.2023.08.04.10.31.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Aug 2023 10:31:54 -0700 (PDT)
+Message-ID: <32b8aef9-061a-bf4b-e3a4-c72a4ecbe27f@kernel.dk>
+Date:   Fri, 4 Aug 2023 11:31:51 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: XFS metadata CRC errors on zram block device on ppc64le
- architecture
-Content-Language: en-US, de-DE
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Dusty Mabe <dusty@dustymabe.com>
-Cc:     Hannes Reinecke <hare@suse.de>, wq@lst.de,
-        Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>, marmijo@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux kernel regressions list <regressions@lists.linux.dev>
-References: <b2d40565-7868-ba15-4bb1-fca6f0df076b@dustymabe.com>
- <20230802094106.GA28187@lst.de>
- <3f36882c-b429-3ece-989b-a6899c001cbd@suse.de>
- <43843fec-f30a-1edc-b428-1d38ddb1050f@dustymabe.com>
- <a0f05188-d142-82f2-74aa-6c9a6ae2bbc9@dustymabe.com>
- <20230804032523.GA81493@google.com>
-From:   "Linux regression tracking (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-In-Reply-To: <20230804032523.GA81493@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH] romfs: only select BUFFER_HEAD for the block based path
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     lizetao1@huawei.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20230804102648.78683-1-hch@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230804102648.78683-1-hch@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1691166507;5933620c;
-X-HE-SMSGID: 1qRxf6-0001Qz-Fw
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[CCing Linus and the regressions list; fwiw, initial report is here:
-https://lore.kernel.org/all/b2d40565-7868-ba15-4bb1-fca6f0df076b@dustymabe.com/
-]
+On 8/4/23 4:26?AM, Christoph Hellwig wrote:
+> selecting BUFFER_HEAD unconditionally does not work as romfs can also
+> be built with only the MTD backend and thus without CONFIG_BLOCK.
 
-On 04.08.23 05:25, Sergey Senozhatsky wrote:
-> On (23/08/03 17:32), Dusty Mabe wrote:
->>>>>>      zram: simplify bvec iteration in __zram_make_request
->>>>>>      
->>>>>>      bio_for_each_segment synthetize bvecs that never cross page boundaries, so
->>>>>>      don't duplicate that work in an inner loop.
->>>>>
->>>>>> Any ideas on how to fix the problem?
->>>>>
->>>>> So the interesting cases are:
->>>>>
->>>>>    - ppc64 usually uses 64k page sizes
->>>>>    - ppc64 is somewhat cache incoherent (compared to say x86)
->>>>>
->>>>> Let me think of this a bit more.
->>>>
->>>> Would need to be confirmed first that 64k pages really are in use
->>>> (eg we compile ppc64le with 4k page sizes ...).
->>>> Dusty?
->>>> For which page size did you compile your kernel?
->>>
->>> For Fedora the configuration is to enable 64k pages with CONFIG_PPC_64K_PAGES=y
->>> https://src.fedoraproject.org/rpms/kernel/blob/064c1675a16b4d379b42ab6c3397632ca54ad897/f/kernel-ppc64le-fedora.config#_4791
->>>
->>> I used the same configuration when running the git bisect.
->>
->> Naive question from my side: would this be a candidate for reverting while we investigate the root cause?
-> 
-> That's certainly a possible solution.
-> 
-> But I don't quite understand why af8b04c63708 doesn't work.
+I folded this in with the other one and made a note about that.
 
-Seems Christoph and Hannes (thx to both of you) got a bit closer to
-that, but as this apparently is causing data corruption and we are close
-to -rc5 I'd like to bring the following up now, as it gets harder to
-discuss these things on weekends:
+-- 
+Jens Axboe
 
-Should Linus revert the culprit for -rc5 if no fix is found within the
-next 48 hours?
-
-Ciao, Thorsten
