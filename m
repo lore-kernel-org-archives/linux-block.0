@@ -2,101 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE9AC41513
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 11:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D010AC001DF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 11:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229806AbjHDLkF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 07:40:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44608 "EHLO
+        id S229614AbjHDLqS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Aug 2023 07:46:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjHDLkE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 07:40:04 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1909B9;
-        Fri,  4 Aug 2023 04:40:02 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RHNzy65zMz4f3k6Z;
-        Fri,  4 Aug 2023 19:39:58 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgCX_7KO48xkcKosPg--.36807S4;
-        Fri, 04 Aug 2023 19:39:59 +0800 (CST)
-From:   Li Lingfeng <lilingfeng@huaweicloud.com>
-To:     tj@kernel.org
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, yukuai3@huawei.com,
-        linan122@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        lilingfeng@huaweicloud.com, lilingfeng3@huawei.com
-Subject: [PATCH -next] block: remove init_mutex in blk_iolatency_try_init
-Date:   Fri,  4 Aug 2023 19:36:59 +0800
-Message-Id: <20230804113659.3816877-1-lilingfeng@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S229534AbjHDLqR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 07:46:17 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463D8126
+        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 04:46:13 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99c1f6f3884so278067266b.0
+        for <linux-block@vger.kernel.org>; Fri, 04 Aug 2023 04:46:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1691149571; x=1691754371;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BCoO+eXbLDZ6LS4ScYv1U/n5Fj5ZbQV1Lly5tQSedaA=;
+        b=ex9GIswFD6wVaea7Y/G4QtiPWycco6WsxPzjVlDZM28jkmAO/OnGr/fV4XKKdftbK8
+         1zQDeAEmYQCkpMOyKA7sMpERno8pfqUksnohPEa8CGTe5LapfSzvXgW+JDX077GTZm0v
+         84XD0l+st2UuvHMCO93Zxfr57yTpaGp3x6/x8bXtMBgaqajL5liBrSR9/W+9+BcWKPjw
+         U4bESYY7LvANqQ0IWgRzspnBMvPdGJqp9F/lZdoFPHdCebTMrZpTc3RqsTybMGdIHSI9
+         z+mLeTLF03kMaThUjZNspToUWBsL4ko75dtibBAZmvY3PLxWpsKln6CYMLH0PEoIJFy/
+         rX7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691149571; x=1691754371;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BCoO+eXbLDZ6LS4ScYv1U/n5Fj5ZbQV1Lly5tQSedaA=;
+        b=QYfuq4MEcgadWPZoyIjqphXZJTCl4inoNoqjwfUeZn2mQeztaciUNNn8v29iPyED0V
+         tZq7xPmTKe0S8rzYQVkiHYQhXX19hnPlC1cNCLZqMGKdiCYAzQ1IWKXOSQ9+qte9LbMg
+         QF2BV96fWzI+zUHLR7/6ixkSdv/jBcLSEwVuPwkOtraruoyPx7RMrcUugGJBlPaxpZCL
+         AYpDTm9lNyXOlAnAGGfYDA496bDpoWegcDNMUeUUK4xLZc4/D0TsiMVLJaYFgEPSW/Sq
+         I30sX6d7SUMpbxA1JBHndq1CbGQjnYhvszR0CbloiLC0HM5DsLfbfDOi6YEM0P3grSE/
+         sgxQ==
+X-Gm-Message-State: AOJu0YxznMVaPAa/h9FCMwtOD7Q80MrQq+ASt0k9XNYzT8fYh8ndLx2b
+        FynAQKP89Xn5zaMrNWR64+G3dA==
+X-Google-Smtp-Source: AGHT+IGUtsnOFxbNePDUk61BtaBL6nP9F1OwCQHPVQy9YswjGkhl5WqyXbQ+Jh0ImRPtdFBOGVNBSQ==
+X-Received: by 2002:a17:906:d8:b0:99b:ca5d:1466 with SMTP id 24-20020a17090600d800b0099bca5d1466mr1435276eji.66.1691149571637;
+        Fri, 04 Aug 2023 04:46:11 -0700 (PDT)
+Received: from localhost ([194.62.217.4])
+        by smtp.gmail.com with ESMTPSA id lc15-20020a170906f90f00b0098ce63e36e9sm1210960ejb.16.2023.08.04.04.46.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 04:46:11 -0700 (PDT)
+From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Aravind Ramesh <Aravind.Ramesh@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>, gost.dev@samsung.com,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-kernel@vger.kernel.org (open list),
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER)
+Subject: [PATCH v11 0/3] ublk: enable zoned storage support
+Date:   Fri,  4 Aug 2023 13:46:07 +0200
+Message-ID: <20230804114610.179530-1-nmi@metaspace.dk>
+X-Mailer: git-send-email 2.41.0
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCX_7KO48xkcKosPg--.36807S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZrW8GF48WFWkJr4kJF4kXrb_yoW8XrW5p3
-        yrWrsIk3yUKr4kXF4ktw1xur1UK3ykKFyUGF4rCFy5JFyq9r1SgF18ZF1FgrW8urWfAFs8
-        Jr48Xryvkr45G37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-        6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-        n2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-        AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v26r1j
-        6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZa9
-        -UUUUU=
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Lingfeng <lilingfeng3@huawei.com>
+From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Commit a13696b83da4 ("blk-iolatency: Make initialization lazy") adds
-a mutex named "init_mutex" in blk_iolatency_try_init for the race
-condition of initializing RQ_QOS_LATENCY.
-Now a new lock has been add to struct request_queue by commit a13bd91be223
-("block/rq_qos: protect rq_qos apis with a new lock"). And it has been
-held in blkg_conf_open_bdev before calling blk_iolatency_init.
-So it's not necessary to keep init_mutex in blk_iolatency_try_init, just
-remove it.
+Hi All,
 
-Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
----
- block/blk-iolatency.c | 5 -----
- 1 file changed, 5 deletions(-)
+This patch set adds zoned storage support to `ublk`. The first two patches do
+some house cleaning in preparation for the last patch. The last patch adds
+support for report_zones and the following operations:
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index fd5fec989e39..8fbd6bc96acb 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -826,7 +826,6 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
- 
- static int blk_iolatency_try_init(struct blkg_conf_ctx *ctx)
- {
--	static DEFINE_MUTEX(init_mutex);
- 	int ret;
- 
- 	ret = blkg_conf_open_bdev(ctx);
-@@ -837,13 +836,9 @@ static int blk_iolatency_try_init(struct blkg_conf_ctx *ctx)
- 	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
- 	 * confuse iolat_rq_qos() test. Make the test and init atomic.
- 	 */
--	mutex_lock(&init_mutex);
--
- 	if (!iolat_rq_qos(ctx->bdev->bd_queue))
- 		ret = blk_iolatency_init(ctx->bdev->bd_disk);
- 
--	mutex_unlock(&init_mutex);
--
- 	return ret;
- }
- 
+ - REQ_OP_ZONE_OPEN
+ - REQ_OP_ZONE_CLOSE
+ - REQ_OP_ZONE_FINISH
+ - REQ_OP_ZONE_RESET
+ - REQ_OP_ZONE_APPEND
+
+A user space component based on ubdsrv is available for testing [1] with the
+"loop" target.
+
+Read/write and zone operations are tested with zenfs [2].
+
+The zone append path is tested with fio -> zonefs -> ublk -> null_blk.
+
+The series is based on v6.5-rc4.
+
+Changes for v11
+ - Style fixes
+ - Use `kvmalloc()` instead of `__vmalloc()`  for zone report buffer
+
+[1] https://github.com/metaspace/ubdsrv/tree/2966e5f9637b5856d4a4273ae113e31b1c53ff98
+[2] https://github.com/westerndigitalcorporation/zenfs
+[3] https://git.kernel.dk/linux.git
+
+Andreas Hindborg (3):
+  ublk: add helper to check if device supports user copy
+  ublk: move check for empty address field on command submission
+  ublk: enable zoned storage support
+
+ drivers/block/ublk_drv.c      | 348 ++++++++++++++++++++++++++++++++--
+ include/uapi/linux/ublk_cmd.h |  63 +++++-
+ 2 files changed, 383 insertions(+), 28 deletions(-)
+
+
+base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
 -- 
-2.39.2
+2.41.0
 
