@@ -2,112 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F7AC001DB
-	for <linux-block@archiver.kernel.org>; Sat,  5 Aug 2023 21:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33125C00528
+	for <linux-block@archiver.kernel.org>; Sat,  5 Aug 2023 22:13:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbjHEVrN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Aug 2023 17:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53712 "EHLO
+        id S229839AbjHEWNk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Aug 2023 18:13:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229662AbjHEVrM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2023 17:47:12 -0400
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 905901BCA;
-        Sat,  5 Aug 2023 14:47:11 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 40C3B5C005C;
-        Sat,  5 Aug 2023 17:47:08 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Sat, 05 Aug 2023 17:47:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dustymabe.com;
-         h=cc:cc:content-transfer-encoding:content-type:content-type
-        :date:date:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to;
-         s=fm1; t=1691272028; x=1691358428; bh=PDZaMOIU4UarYbs6ckRvGTabK
-        al4sIaEiC324VR5DDQ=; b=Crr8G8ou9IOsrquDkzJgJjxC4v9hdtkyHX0m6QXX3
-        XjfggUJFzOqBY7mJAbL9XfM4jPftOKLdgdc5fjn+PNus4dWfBOu55T/35xXyGl0A
-        A8TvbW0oSfyaY9OL+cvCENBFwfdc/8ZKNRNbsgy8KaYVXUeoNteKHZoS25K62Sbi
-        KEUQAkNPv6CsvvzCGmY8DJXuHVuh2+8TjLX+P0MWf3mFREfdvDpm0wSbzZfwGLCF
-        HLmIMqzrqAgTGaqRATot8sd/An+8OluHf3+/50YxWKILx815kEZgNi3CmOFsWeeg
-        85BuIsr2LL+GcmcEMu+7I3DbvlK5YUNUvX0MKapTU7uQQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:content-type:date:date:feedback-id:feedback-id
-        :from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-        1691272028; x=1691358428; bh=PDZaMOIU4UarYbs6ckRvGTabKal4sIaEiC3
-        24VR5DDQ=; b=xZBsAFcWvRVAlrWM7IkitFjChkIiEdItEmMKO9HPKCJJuzwL7X1
-        hSk4ZxPj1GcjHeZZd4Rlq/ck7x5lB/iYkOmaQBz85bfAB9diplLjEpWkxTEanmWM
-        FkLwGY3o3ezmjKmqIRXxvyPfvOh7A3inxbx8RYmzina0F4HnJQOsTDgvLrXV6hxb
-        P02sVJ0edeW14yZoI7e8ZuEQD4iLe6ct/4l2842WLpCb+fgoCnpSKLJrLLUa9RNS
-        3ZI9Srf+D24meFlt5isRw63XfbffcQl24onUBNq5Pocke4s3uM+fvVwUWhFfkG8B
-        71Pjmj2vRLOamQ5aGpfy5kcIpKiswm1f9Xw==
-X-ME-Sender: <xms:W8POZE3X2nzRIHJGDcvUfgxzSdyVoOd6L1fT9ExOIfg5kel0_0t02g>
-    <xme:W8POZPH1jk-giyhf_0G3cZ1HMtlDMqQrvwqqn8k4zV3oraTLzoomYuMB-A_43G1ge
-    QbpSwj1dT9zCtp7lik>
-X-ME-Received: <xmr:W8POZM6VYQBwkfesfIHSNm-RzQmbPpte0n-tNeFHecKy-EdbB0nPCIArdWbetHDBXnV6>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkeejgddtvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefkffggfgfuvfevfhfhjggtgfesthejredttdefjeenucfhrhhomhepffhushht
-    hicuofgrsggvuceoughushhthiesughushhthihmrggsvgdrtghomheqnecuggftrfgrth
-    htvghrnhepieffffeugfdthffgkeeftdektdetfefgveeuleeufeeugedvheetueelgfeu
-    keeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepug
-    hushhthiesughushhthihmrggsvgdrtghomh
-X-ME-Proxy: <xmx:W8POZN1I79i2wcucKA4KYHEoknJw6ZqaMSzn3EbjLk5UQas6twdNkg>
-    <xmx:W8POZHFYWGcvhxFlrOlbaNE3cg1sWBMpGI1gnrDw-tZmqQmL9MURfg>
-    <xmx:W8POZG_KJWeqcTGYNvzZCV61nzxQO4Iwo6xm90qr9YKDZwpqxKPJ5w>
-    <xmx:XMPOZPBuTd2upMA1TgvwdcBvFRHG096ch8b90zTdVwjuYPWe2CJFng>
-Feedback-ID: i13394474:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 5 Aug 2023 17:47:07 -0400 (EDT)
-Message-ID: <a10b62b0-2b17-581b-db7d-d346f9578ff8@dustymabe.com>
-Date:   Sat, 5 Aug 2023 17:47:06 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH] zram: take device and not only bvec offset into account
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     minchan@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        with ESMTP id S229477AbjHEWNj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2023 18:13:39 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0FC0E78
+        for <linux-block@vger.kernel.org>; Sat,  5 Aug 2023 15:13:37 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bc4dc65aa7so3191115ad.0
+        for <linux-block@vger.kernel.org>; Sat, 05 Aug 2023 15:13:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691273616; x=1691878416;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wfoCc+RvjV+g+GLE3LFiITYI1ax4E6KyrUn9GtTQWKU=;
+        b=Y2h94PojIusanzrjPBql/8LV2CORjY1s6biXpvYlWwZA1L/KDwvg8dvBt37DG0mzpN
+         B7dt7VojBlYTaPOWjlaP5esyiMkVGFyQucBOPNHcvfI5nN80tbVha52gvGMx6PAuPB0v
+         I3ysUBajJcS2F0UybgEkEiBJjjMbxn/id96mFIOfl5hJoI7YRXvhcLxucQMIm0/wWZ4U
+         62tdfCNAIwzXEP8CaXC1q6uZg7CyC9VldzoAzQ5L2RoFlI9z8xHcM33mXz2xZvpT/pLI
+         bMh/CR95r3UXAc39JwJxAjYlje52Q/t6RStTV8BsBBOms0Pux+zE5OS5TEZW6fN55YhK
+         +zjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691273616; x=1691878416;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wfoCc+RvjV+g+GLE3LFiITYI1ax4E6KyrUn9GtTQWKU=;
+        b=MHJp9d096LI/laoceKEmCr9Wi8A8bcEUXDFYrUISDbRd4SQ4J8CwWTcO+gWavmIidb
+         7PDtVyP9Ou0CKFAFGOvbJrUoHlDESiYR5gcxuiGh2Iri0s5wN4APnbME57X17mt+ixe4
+         OUtn3jj21B5RGRt4Fxxru2RQetGB6gL7tT60FlHAKldMNQ/yAbLYjGIILRC63dBqXo4r
+         8JdtVNFhtYNuBoqODPx3HGEBDSz6qIorjo2NDn/ALzkIjc429T7FfE/HYubD4sxA3y4C
+         GFm0a3fDirK97DhGdm5SjRtiR0bdSU/lCgGtNB7X/yKRs6ehM+eOn+LT7M1nLpyP2ZD/
+         /2dw==
+X-Gm-Message-State: ABy/qLYn2EPZ3z1oV+PySz44UFh5K2KclWvTzQj7DlDwJwgNQceX4Aoj
+        OLKRb5JGyFr8ln74i98vL6e8lurtNLyfHniaiBY=
+X-Google-Smtp-Source: APBJJlEv8pHOH7HWV+MOVitX5Kxcf06soD19PKjn8qyNH4ESUwUgXVaV/O/MtzWWKBI09ZRESJ80Tg==
+X-Received: by 2002:a17:902:d2d1:b0:1b8:ac61:ffcd with SMTP id n17-20020a170902d2d100b001b8ac61ffcdmr28867244plc.3.1691273616618;
+        Sat, 05 Aug 2023 15:13:36 -0700 (PDT)
+Received: from [127.0.0.1] (071-095-160-189.biz.spectrum.com. [71.95.160.189])
+        by smtp.gmail.com with ESMTPSA id j21-20020a170902c3d500b001bba1188c8esm3929244plj.271.2023.08.05.15.13.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Aug 2023 15:13:35 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     minchan@kernel.org, senozhatsky@chromium.org,
+        Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dusty Mabe <dusty@dustymabe.com>
+In-Reply-To: <20230805055537.147835-1-hch@lst.de>
 References: <20230805055537.147835-1-hch@lst.de>
- <20230805074645.GA907732@google.com> <20230805081306.GA29615@lst.de>
-From:   Dusty Mabe <dusty@dustymabe.com>
-In-Reply-To: <20230805081306.GA29615@lst.de>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] zram: take device and not only bvec offset into
+ account
+Message-Id: <169127361527.13732.4190461845439151626.b4-ty@kernel.dk>
+Date:   Sat, 05 Aug 2023 16:13:35 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-
-On 8/5/23 04:13, Christoph Hellwig wrote:
-> On Sat, Aug 05, 2023 at 04:46:45PM +0900, Sergey Senozhatsky wrote:
->>> Fixes: af8b04c63708 ("zram: simplify bvec iteration in __zram_make_request")
->>> Reported-by: Dusty Mabe <dusty@dustymabe.com>
->>> Signed-off-by: Christoph Hellwig <hch@lst.de>
->>
->> Acked-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+On Sat, 05 Aug 2023 07:55:37 +0200, Christoph Hellwig wrote:
+> Commit af8b04c63708 ("zram: simplify bvec iteration in
+> __zram_make_request") changed the bio iteration in zram to rely on the
+> implicit capping to page boundaries in bio_for_each_segment.  But it
+> failed to care for the fact zram not only care about the page alignment
+> of the bio payload, but also the page alignment into the device.  For
+> buffered I/O and swap those are the same, but for direct I/O or kernel
+> internal I/O like XFS log buffer writes they can differ.
 > 
-> Btw, are there any interesting test suites you want me to run on
-> a > 4K page size system now that I do have this setup available?
+> [...]
 
-The patch is passing tests for me. I ran the Fedora CoreOS root reprovision tests
-(which are the tests that caught this bug to begin with) and the trivial reproducer:
+Applied, thanks!
 
-```
-#!/bin/bash
-set -eux -o pipefail
-modprobe zram num_devices=0
-read dev < /sys/class/zram-control/hot_add
-echo 10G > /sys/block/zram"${dev}"/disksize
-mkfs.xfs /dev/zram"${dev}"
-mkdir -p /tmp/foo
-mount -t xfs /dev/zram"${dev}" /tmp/foo
-```
+[1/1] zram: take device and not only bvec offset into account
+      commit: 95848dcb9d676738411a8ff70a9704039f1b3982
 
-Dusty
+Best regards,
+-- 
+Jens Axboe
+
+
+
