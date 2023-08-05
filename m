@@ -2,99 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3ACC00528
-	for <linux-block@archiver.kernel.org>; Fri,  4 Aug 2023 23:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8D6EB64DD
+	for <linux-block@archiver.kernel.org>; Sat,  5 Aug 2023 05:55:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229817AbjHDXLu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Aug 2023 19:11:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53312 "EHLO
+        id S229539AbjHEFzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Aug 2023 01:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229585AbjHDXLt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Aug 2023 19:11:49 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 603B74EE4
-        for <linux-block@vger.kernel.org>; Fri,  4 Aug 2023 16:11:41 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-63d09d886a3so15956926d6.2
-        for <linux-block@vger.kernel.org>; Fri, 04 Aug 2023 16:11:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691190700; x=1691795500;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j7LI/S/OevvCT8dlDRfxneTW0yS08CDgZop+m3jGuRs=;
-        b=HkSYGeBaNvpw9vieOK8JMxCIT6VhROgdq00s1KtCHCjgi0ciiNiuPog3mMj/jZJ/h7
-         p3OrHb4Z2xWpHnHaGS6v6w1yPFpkaudUEF8F29rj1C9yxrjQ0Gh6dO3+ECyD9YjKJAsA
-         4sBWjEGJWHTKU5mkgBcOx47McVJizKhsCRfPpTkwD+qZ2Gl5N4mTlGhEXbZTGrFJnkUo
-         KuzXwDV+5dypiWEboy7XNYWdkQ/BY09fxtY4Tkh3E4+MCFOTKpmi0Eo0c5GtFFZzgq4N
-         PJHqiErx3iS+jpgSIHxyU2j/PL+OiSskT0rdoLkutS6zHKZLNRryewGZ8JNE7BSoS1kX
-         SpnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691190700; x=1691795500;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j7LI/S/OevvCT8dlDRfxneTW0yS08CDgZop+m3jGuRs=;
-        b=ftplH51v8m6jZK9C1Lp5hsyoy6Xjz9045jhYoLGW6GK8lLGsns+4AH+QCbH6arvy+K
-         UoM5+u5S02RiXlKTjWEy9aCALYBlqSlGGQ7g1n4XPD80vPOBsXZAmZTQ8KeOjtGXdfpz
-         V/xsMYM3uAqntKsOU24aQhSdB12x1bxQNhCu3di0mpx4Oi0tkJdirZDUUpcNWQnEFF1U
-         kmi1bOTd2ehFLLoiOkwTLGGmcsBVTgqNWlejrlJCStB76GY6s/+sOELploN8W6dfybFP
-         l8ZCggC1v9SpGIMTTZbz+tM8HXb83Ep58sORQlEPIwwqyXfpo1v+zYER098eSLFa9oVi
-         nUsw==
-X-Gm-Message-State: AOJu0YzZKvu4IPuNHMlCvaBJpHUikHrvmJ28oVn2n71V9LXzXlliHqGF
-        7IaJhehPXHZQALsqRFyb6zPmMoZyyQGxZ9yY2aPNkA==
-X-Google-Smtp-Source: AGHT+IFXC4PbFH1KSqnDJZtWZySsNxjZaBEs/YvKmT7aGdo6+gXK5tVnzXUIV8CoUFMh2E+atFwYfpd9MJJ3JBGDgZQ=
-X-Received: by 2002:a0c:e553:0:b0:63f:726c:14ef with SMTP id
- n19-20020a0ce553000000b0063f726c14efmr2502233qvm.9.1691190700350; Fri, 04 Aug
- 2023 16:11:40 -0700 (PDT)
+        with ESMTP id S229445AbjHEFzp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2023 01:55:45 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C83464ECF;
+        Fri,  4 Aug 2023 22:55:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=VVm3P3asI3oviVAO++8ExuHX7bAYG9Ho51gp9OdQ6NM=; b=TbPmkFKgpaXQa0E52oU9HdcUKC
+        jCrORP6DdR7WbwmTMEds8TnHwFPcH7hb+uyOV719HKMk/lX2fipLeAbsoMqy7qLrrQvf2kR+EoG4P
+        InqyaK9QajFnU5tGDVCylEI6FyeQ1OWDEaXVgdI6MzyeaOQPgnzDtNXn331e93qYUQSzcivsogP5e
+        DGovxpMfl2CO8rPjji0OdjkQLAuB/bAR0TO3VGcs/FfdukthVBP+eflfH+vAB/l5Djpam9T9k0dqQ
+        1TjhNKroyWnNj98pwxuoYx3faQdQsS1bEFFQ+FL14KvMrdy6h6KaWBOTpAMDz4Nx2pzmRDod0p/H1
+        8fIynSWw==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qSAGL-00DjuF-09;
+        Sat, 05 Aug 2023 05:55:41 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     minchan@kernel.org, senozhatsky@chromium.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dusty Mabe <dusty@dustymabe.com>
+Subject: [PATCH] zram: take device and not only bvec offset into account
+Date:   Sat,  5 Aug 2023 07:55:37 +0200
+Message-Id: <20230805055537.147835-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-References: <20230612203314.17820-1-bvanassche@acm.org> <5041fc15-2c6c-b91e-6fb6-5eac740f75eb@kernel.dk>
- <20230615041537.GB4281@lst.de> <1d55e942-5150-de4c-3a02-c3d066f87028@acm.org> <20230616070237.GC29500@lst.de>
-In-Reply-To: <20230616070237.GC29500@lst.de>
-From:   Juan Yescas <jyescas@google.com>
-Date:   Fri, 4 Aug 2023 16:11:29 -0700
-Message-ID: <CAJDx_rhf0ex9EAZcpqqDmvC96dFgVXWh0diNZ3fb3narfY0_rQ@mail.gmail.com>
-Subject: Re: [PATCH v6 0/8] Support limits below the page size
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
-        Sandeep Dhavale <dhavale@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 16, 2023 at 12:02=E2=80=AFAM Christoph Hellwig <hch@lst.de> wro=
-te:
->
-> On Thu, Jun 15, 2023 at 06:55:36AM -0700, Bart Van Assche wrote:
-> > On 6/14/23 21:15, Christoph Hellwig wrote:
-> >> I really hate having this core complexity, but I suspect trying to dri=
-ver
-> >> hacks would be even worse than that, especially as this goes through
-> >> the SCSI midlayer.  I think the answer is simply that if Google keeps
-> >> buying broken hardware for their products from Samsung they just need
-> >> to stick to a 4k page size instead of moving to a larger one.
-> >
-> > Although I do not like it that the Exynos UFS controller does not follo=
-w
-> > the UFS standard, this UFS controller is used much more widely than onl=
-y in
-> > devices produced by my employer. See e.g. the output of the following g=
-rep
-> > command:
->
-> But it seems like no one is insisting on using it with larger than 4k
-> page sizes.  I think we should just prohibit using the driver for those
-> kernel configs and be done with it.
+Commit af8b04c63708 ("zram: simplify bvec iteration in
+__zram_make_request") changed the bio iteration in zram to rely on the
+implicit capping to page boundaries in bio_for_each_segment.  But it
+failed to care for the fact zram not only care about the page alignment
+of the bio payload, but also the page alignment into the device.  For
+buffered I/O and swap those are the same, but for direct I/O or kernel
+internal I/O like XFS log buffer writes they can differ.
 
-In addition to Google, Samsung and MediaTek and other vendors have devices
-that want to take advantage of 16k page size support and they use the same
-Exynos UFS host controller.
+Fix this by open coding bio_for_each_segment and limiting the bvec len
+so that it never crosses over a page alignment boundary in the device
+in addition to the payload boundary already taken care of by
+bio_iter_iovec.
 
-For example, these phones could potentially support 16k page sizes:
+Fixes: af8b04c63708 ("zram: simplify bvec iteration in __zram_make_request")
+Reported-by: Dusty Mabe <dusty@dustymabe.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/zram/zram_drv.c | 32 ++++++++++++++++++++------------
+ 1 file changed, 20 insertions(+), 12 deletions(-)
 
-Samsung Galaxy A54 5G, Exynos 1380
-Samsung Galaxy A14 5G, Exynos 1330
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 5676e6dd5b1672..06673c6ca25555 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1870,15 +1870,16 @@ static void zram_bio_discard(struct zram *zram, struct bio *bio)
+ 
+ static void zram_bio_read(struct zram *zram, struct bio *bio)
+ {
+-	struct bvec_iter iter;
+-	struct bio_vec bv;
+-	unsigned long start_time;
++	unsigned long start_time = bio_start_io_acct(bio);
++	struct bvec_iter iter = bio->bi_iter;
+ 
+-	start_time = bio_start_io_acct(bio);
+-	bio_for_each_segment(bv, bio, iter) {
++	do {
+ 		u32 index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
+ 		u32 offset = (iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
+ 				SECTOR_SHIFT;
++		struct bio_vec bv = bio_iter_iovec(bio, iter);
++
++		bv.bv_len = min_t(u32, bv.bv_len, PAGE_SIZE - offset);
+ 
+ 		if (zram_bvec_read(zram, &bv, index, offset, bio) < 0) {
+ 			atomic64_inc(&zram->stats.failed_reads);
+@@ -1890,22 +1891,26 @@ static void zram_bio_read(struct zram *zram, struct bio *bio)
+ 		zram_slot_lock(zram, index);
+ 		zram_accessed(zram, index);
+ 		zram_slot_unlock(zram, index);
+-	}
++
++		bio_advance_iter_single(bio, &iter, bv.bv_len);
++	} while (iter.bi_size);
++
+ 	bio_end_io_acct(bio, start_time);
+ 	bio_endio(bio);
+ }
+ 
+ static void zram_bio_write(struct zram *zram, struct bio *bio)
+ {
+-	struct bvec_iter iter;
+-	struct bio_vec bv;
+-	unsigned long start_time;
++	unsigned long start_time = bio_start_io_acct(bio);
++	struct bvec_iter iter = bio->bi_iter;
+ 
+-	start_time = bio_start_io_acct(bio);
+-	bio_for_each_segment(bv, bio, iter) {
++	do {
+ 		u32 index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
+ 		u32 offset = (iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
+ 				SECTOR_SHIFT;
++		struct bio_vec bv = bio_iter_iovec(bio, iter);
++
++		bv.bv_len = min_t(u32, bv.bv_len, PAGE_SIZE - offset);
+ 
+ 		if (zram_bvec_write(zram, &bv, index, offset, bio) < 0) {
+ 			atomic64_inc(&zram->stats.failed_writes);
+@@ -1916,7 +1921,10 @@ static void zram_bio_write(struct zram *zram, struct bio *bio)
+ 		zram_slot_lock(zram, index);
+ 		zram_accessed(zram, index);
+ 		zram_slot_unlock(zram, index);
+-	}
++
++		bio_advance_iter_single(bio, &iter, bv.bv_len);
++	} while (iter.bi_size);
++
+ 	bio_end_io_acct(bio, start_time);
+ 	bio_endio(bio);
+ }
+-- 
+2.39.2
 
-See https://semiconductor.samsung.com/us/processor/showcase/smartphone/
