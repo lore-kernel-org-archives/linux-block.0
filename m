@@ -2,97 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45931C0015E
-	for <linux-block@archiver.kernel.org>; Sat,  5 Aug 2023 17:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F7AC001DB
+	for <linux-block@archiver.kernel.org>; Sat,  5 Aug 2023 21:47:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229733AbjHERNX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Aug 2023 13:13:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49782 "EHLO
+        id S229436AbjHEVrN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Aug 2023 17:47:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjHERNW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2023 13:13:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE15E6E;
-        Sat,  5 Aug 2023 10:13:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C46B560C5F;
-        Sat,  5 Aug 2023 17:13:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48498C433C8;
-        Sat,  5 Aug 2023 17:13:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691255600;
-        bh=ZfbjUjtwjQ3RdoKZ4m9be+A3vKSXVdCSc1xlaCOCYaQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GPg8Jk0hmq/xHabhON9f9Wy4e6exu8iJEYNopK5zDw8GmrFoQGT2DAXxd87LbWap8
-         4/d+lARj/a+CAYc0aXP8vt0XyFD50NbrypchRRdrvRVesi8hQ5+cEJMlEIBNxUxc+d
-         ju3eCdqdVSpgSL9LURl8ByQA2GFWm47ugH4yf4iithQ0PhmracdrwHb7oSvfUhq7Ai
-         nCDi4+LRW1PkLg70nBcnYsgykVajnsxEbLJ7zF6Rc6eY3wzAXbqT8zx3H+lqrTWMP6
-         IHpiobC/SI7B85Kpm8M7ejKRDRklWb6ijfPX4OnHfxRBF3MQG4f0ma58crs+q7UJ0a
-         TmEspZ09z2ylw==
-Date:   Sat, 5 Aug 2023 19:13:13 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 11/12] xfs: drop s_umount over opening the log and RT
- devices
-Message-ID: <20230805-langzeitfolgen-notation-dfd8a0175060@brauner>
-References: <20230802154131.2221419-1-hch@lst.de>
- <20230802154131.2221419-12-hch@lst.de>
- <20230802163219.GW11352@frogsfrogsfrogs>
- <20230805083239.GA29780@lst.de>
- <20230805161904.GM11377@frogsfrogsfrogs>
+        with ESMTP id S229662AbjHEVrM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2023 17:47:12 -0400
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 905901BCA;
+        Sat,  5 Aug 2023 14:47:11 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.nyi.internal (Postfix) with ESMTP id 40C3B5C005C;
+        Sat,  5 Aug 2023 17:47:08 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Sat, 05 Aug 2023 17:47:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dustymabe.com;
+         h=cc:cc:content-transfer-encoding:content-type:content-type
+        :date:date:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to;
+         s=fm1; t=1691272028; x=1691358428; bh=PDZaMOIU4UarYbs6ckRvGTabK
+        al4sIaEiC324VR5DDQ=; b=Crr8G8ou9IOsrquDkzJgJjxC4v9hdtkyHX0m6QXX3
+        XjfggUJFzOqBY7mJAbL9XfM4jPftOKLdgdc5fjn+PNus4dWfBOu55T/35xXyGl0A
+        A8TvbW0oSfyaY9OL+cvCENBFwfdc/8ZKNRNbsgy8KaYVXUeoNteKHZoS25K62Sbi
+        KEUQAkNPv6CsvvzCGmY8DJXuHVuh2+8TjLX+P0MWf3mFREfdvDpm0wSbzZfwGLCF
+        HLmIMqzrqAgTGaqRATot8sd/An+8OluHf3+/50YxWKILx815kEZgNi3CmOFsWeeg
+        85BuIsr2LL+GcmcEMu+7I3DbvlK5YUNUvX0MKapTU7uQQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:content-type:date:date:feedback-id:feedback-id
+        :from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+        1691272028; x=1691358428; bh=PDZaMOIU4UarYbs6ckRvGTabKal4sIaEiC3
+        24VR5DDQ=; b=xZBsAFcWvRVAlrWM7IkitFjChkIiEdItEmMKO9HPKCJJuzwL7X1
+        hSk4ZxPj1GcjHeZZd4Rlq/ck7x5lB/iYkOmaQBz85bfAB9diplLjEpWkxTEanmWM
+        FkLwGY3o3ezmjKmqIRXxvyPfvOh7A3inxbx8RYmzina0F4HnJQOsTDgvLrXV6hxb
+        P02sVJ0edeW14yZoI7e8ZuEQD4iLe6ct/4l2842WLpCb+fgoCnpSKLJrLLUa9RNS
+        3ZI9Srf+D24meFlt5isRw63XfbffcQl24onUBNq5Pocke4s3uM+fvVwUWhFfkG8B
+        71Pjmj2vRLOamQ5aGpfy5kcIpKiswm1f9Xw==
+X-ME-Sender: <xms:W8POZE3X2nzRIHJGDcvUfgxzSdyVoOd6L1fT9ExOIfg5kel0_0t02g>
+    <xme:W8POZPH1jk-giyhf_0G3cZ1HMtlDMqQrvwqqn8k4zV3oraTLzoomYuMB-A_43G1ge
+    QbpSwj1dT9zCtp7lik>
+X-ME-Received: <xmr:W8POZM6VYQBwkfesfIHSNm-RzQmbPpte0n-tNeFHecKy-EdbB0nPCIArdWbetHDBXnV6>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrkeejgddtvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefkffggfgfuvfevfhfhjggtgfesthejredttdefjeenucfhrhhomhepffhushht
+    hicuofgrsggvuceoughushhthiesughushhthihmrggsvgdrtghomheqnecuggftrfgrth
+    htvghrnhepieffffeugfdthffgkeeftdektdetfefgveeuleeufeeugedvheetueelgfeu
+    keeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepug
+    hushhthiesughushhthihmrggsvgdrtghomh
+X-ME-Proxy: <xmx:W8POZN1I79i2wcucKA4KYHEoknJw6ZqaMSzn3EbjLk5UQas6twdNkg>
+    <xmx:W8POZHFYWGcvhxFlrOlbaNE3cg1sWBMpGI1gnrDw-tZmqQmL9MURfg>
+    <xmx:W8POZG_KJWeqcTGYNvzZCV61nzxQO4Iwo6xm90qr9YKDZwpqxKPJ5w>
+    <xmx:XMPOZPBuTd2upMA1TgvwdcBvFRHG096ch8b90zTdVwjuYPWe2CJFng>
+Feedback-ID: i13394474:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 5 Aug 2023 17:47:07 -0400 (EDT)
+Message-ID: <a10b62b0-2b17-581b-db7d-d346f9578ff8@dustymabe.com>
+Date:   Sat, 5 Aug 2023 17:47:06 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230805161904.GM11377@frogsfrogsfrogs>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH] zram: take device and not only bvec offset into account
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     minchan@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230805055537.147835-1-hch@lst.de>
+ <20230805074645.GA907732@google.com> <20230805081306.GA29615@lst.de>
+From:   Dusty Mabe <dusty@dustymabe.com>
+In-Reply-To: <20230805081306.GA29615@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 05, 2023 at 09:19:04AM -0700, Darrick J. Wong wrote:
-> On Sat, Aug 05, 2023 at 10:32:39AM +0200, Christoph Hellwig wrote:
-> > On Wed, Aug 02, 2023 at 09:32:19AM -0700, Darrick J. Wong wrote:
-> > > > +	/* see get_tree_bdev why this is needed and safe */
-> > > 
-> > > Which part of get_tree_bdev?  Is it this?
-> > > 
-> > > 		/*
-> > > 		 * s_umount nests inside open_mutex during
-> > > 		 * __invalidate_device().  blkdev_put() acquires
-> > > 		 * open_mutex and can't be called under s_umount.  Drop
-> > > 		 * s_umount temporarily.  This is safe as we're
-> > > 		 * holding an active reference.
-> > > 		 */
-> > > 		up_write(&s->s_umount);
-> > > 		blkdev_put(bdev, fc->fs_type);
-> > > 		down_write(&s->s_umount);
-> > 
-> > Yes.  With the refactoring earlier in the series get_tree_bdev should
-> > be trivial enough to not need a more specific reference.  If you
-> > think there's a better way to refer to it I can update the comment,
-> > though.
-> 
-> How about:
-> 
-> 	/*
-> 	 * blkdev_put can't be called under s_umount, see the comment in
-> 	 * get_tree_bdev for more details
-> 	 */
-> 
-> with that and the label name change,
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-Added that comment and you rvb in-tree.
+
+On 8/5/23 04:13, Christoph Hellwig wrote:
+> On Sat, Aug 05, 2023 at 04:46:45PM +0900, Sergey Senozhatsky wrote:
+>>> Fixes: af8b04c63708 ("zram: simplify bvec iteration in __zram_make_request")
+>>> Reported-by: Dusty Mabe <dusty@dustymabe.com>
+>>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>>
+>> Acked-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> 
+> Btw, are there any interesting test suites you want me to run on
+> a > 4K page size system now that I do have this setup available?
+
+The patch is passing tests for me. I ran the Fedora CoreOS root reprovision tests
+(which are the tests that caught this bug to begin with) and the trivial reproducer:
+
+```
+#!/bin/bash
+set -eux -o pipefail
+modprobe zram num_devices=0
+read dev < /sys/class/zram-control/hot_add
+echo 10G > /sys/block/zram"${dev}"/disksize
+mkfs.xfs /dev/zram"${dev}"
+mkdir -p /tmp/foo
+mount -t xfs /dev/zram"${dev}" /tmp/foo
+```
+
+Dusty
