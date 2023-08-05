@@ -2,132 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A1AC001DB
-	for <linux-block@archiver.kernel.org>; Sat,  5 Aug 2023 13:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA41C001DB
+	for <linux-block@archiver.kernel.org>; Sat,  5 Aug 2023 16:19:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229511AbjHENHc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Aug 2023 09:07:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39452 "EHLO
+        id S229504AbjHEQTI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Aug 2023 12:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjHENHc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2023 09:07:32 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52933E7;
-        Sat,  5 Aug 2023 06:07:31 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qSH03-0006q9-To; Sat, 05 Aug 2023 15:07:19 +0200
-Message-ID: <84f6ea98-0d72-e17a-4b7c-d025f2d34e95@leemhuis.info>
-Date:   Sat, 5 Aug 2023 15:07:18 +0200
+        with ESMTP id S229481AbjHEQTH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2023 12:19:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1A910F8;
+        Sat,  5 Aug 2023 09:19:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E366960C08;
+        Sat,  5 Aug 2023 16:19:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F45DC433C8;
+        Sat,  5 Aug 2023 16:19:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691252345;
+        bh=eczxg65nAKdspBAZJjvsqnJ9aD9e1Cnh1ASqk/5x4Tc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Z0h/IrNV9FDvUWv2eNzdGVI/pdKwMLXK4ephLjq8qasptg9QR42I18oxpmAO8umTF
+         +jPDQ/hHlUXz8vlybFxoV5RemFk0DVSLbmOMRAK0CJqcO8LUXtppZEHOBIInbCw1Bp
+         JTrajwX0bDnORyljOsGHdnXOxmx4UhQ4gFvfINhcXD8pnn5ERuxQv6rcgrEHwNJK1I
+         cw8urElSBCWxmfql/5enH6QJ/LQEtkXgzdIYOACoSdLpWEdSHCXQJS6+TIJwCyfYu7
+         hRiEBFxuNr7P2y5wMX51/z0/iaXoTcxnlDluglqILaNhlVU/0TaObzI32WdPQIaxv2
+         RPO/N8LaaV66Q==
+Date:   Sat, 5 Aug 2023 09:19:04 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 11/12] xfs: drop s_umount over opening the log and RT
+ devices
+Message-ID: <20230805161904.GM11377@frogsfrogsfrogs>
+References: <20230802154131.2221419-1-hch@lst.de>
+ <20230802154131.2221419-12-hch@lst.de>
+ <20230802163219.GW11352@frogsfrogsfrogs>
+ <20230805083239.GA29780@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/24] PM: hibernate: move finding the resume device out
- of software_resume
-Content-Language: en-US, de-DE
-To:     Vlastimil Babka <vbabka@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Joern Engel <joern@lazybastard.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Loic Poulain <loic.poulain@linaro.org>, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org,
-        Linux regressions mailing list <regressions@lists.linux.dev>
-References: <20230531125535.676098-1-hch@lst.de>
- <20230531125535.676098-5-hch@lst.de>
- <2cfa5f55-1d68-8a4f-d049-13f42e0d1484@suse.cz>
-From:   "Linux regression tracking #adding (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <2cfa5f55-1d68-8a4f-d049-13f42e0d1484@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1691240851;88782bfb;
-X-HE-SMSGID: 1qSH03-0006q9-To
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230805083239.GA29780@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[TLDR: I'm adding this report to the list of tracked Linux kernel
-regressions; the text you find below is based on a few templates
-paragraphs you might have encountered already in similar form.
-See link in footer if these mails annoy you.]
+On Sat, Aug 05, 2023 at 10:32:39AM +0200, Christoph Hellwig wrote:
+> On Wed, Aug 02, 2023 at 09:32:19AM -0700, Darrick J. Wong wrote:
+> > > +	/* see get_tree_bdev why this is needed and safe */
+> > 
+> > Which part of get_tree_bdev?  Is it this?
+> > 
+> > 		/*
+> > 		 * s_umount nests inside open_mutex during
+> > 		 * __invalidate_device().  blkdev_put() acquires
+> > 		 * open_mutex and can't be called under s_umount.  Drop
+> > 		 * s_umount temporarily.  This is safe as we're
+> > 		 * holding an active reference.
+> > 		 */
+> > 		up_write(&s->s_umount);
+> > 		blkdev_put(bdev, fc->fs_type);
+> > 		down_write(&s->s_umount);
+> 
+> Yes.  With the refactoring earlier in the series get_tree_bdev should
+> be trivial enough to not need a more specific reference.  If you
+> think there's a better way to refer to it I can update the comment,
+> though.
 
-On 03.08.23 10:27, Vlastimil Babka wrote:
-> On 5/31/23 14:55, Christoph Hellwig wrote:
->> software_resume can be called either from an init call in the boot code,
->> or from sysfs once the system has finished booting, and the two
->> invocation methods this can't race with each other.
->>
->> For the latter case we did just parse the suspend device manually, while
->> the former might not have one.  Split software_resume so that the search
->> only happens for the boot case, which also means the special lockdep
->> nesting annotation can go away as the system transition mutex can be
->> taken a little later and doesn't have the sysfs locking nest inside it.
->>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> Acked-by: Rafael J. Wysocki <rafael@kernel.org>
-> 
-> This caused a regression for me in 6.5-rc1+, fix below.
-> 
-> ----8<----
->>From 95a310ae6cfae9b3cab61e54a1bce488c3ab93a1 Mon Sep 17 00:00:00 2001
-> From: Vlastimil Babka <vbabka@suse.cz>
-> Date: Wed, 2 Aug 2023 15:46:18 +0200
-> Subject: [PATCH] PM: hibernate: fix resume_store() return value when
->  hibernation not available
-> 
-> On a laptop with hibernation set up but not actively used, and with
-> secure boot and lockdown enabled kernel, 6.5-rc1 gets stuck on boot with
-> the following repeated messages:
-> 
->   A start job is running for Resume from hibernation using device /dev/system/swap (24s / no limit)
->   lockdown_is_locked_down: 25311154 callbacks suppressed
->   Lockdown: systemd-hiberna: hibernation is restricted; see man kernel_lockdown.7
->   ...
-> 
-> Checking the resume code leads to commit cc89c63e2fe3 ("PM: hibernate:
-> move finding the resume device out of software_resume") which
-> inadvertently changed the return value from resume_store() to 0 when
-> !hibernation_available(). This apparently translates to userspace
-> write() returning 0 as in number of bytes written, and userspace looping
-> indefinitely in the attempt to write the intended value.
-> 
-> Fix this by returning the full number of bytes that were to be written,
-> as that's what was done before the commit.
-> 
-> Fixes: cc89c63e2fe3 ("PM: hibernate: move finding the resume device out of software_resume")
-> [...]
+How about:
 
-Thanks for the report. To be sure the issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
-tracking bot:
+	/*
+	 * blkdev_put can't be called under s_umount, see the comment in
+	 * get_tree_bdev for more details
+	 */
 
-#regzbot ^introduced cc89c63e2fe3
-#regzbot title pm: boot problems when hibernate is configured and kernel
-locked down
-#regzbot fix: PM: hibernate: fix resume_store() return value when
-hibernation not available
-#regzbot ignore-activity
+with that and the label name change,
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-This isn't a regression? This issue or a fix for it are already
-discussed somewhere else? It was fixed already? You want to clarify when
-the regression started to happen? Or point out I got the title or
-something else totally wrong? Then just reply and tell me -- ideally
-while also telling regzbot about it, as explained by the page listed in
-the footer of this mail.
+--D
 
-Developers: When fixing the issue, remember to add 'Link:' tags pointing
-to the report (the parent of this mail). See page linked in footer for
-details.
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+> > >  		mp->m_logdev_targp = mp->m_ddev_targp;
+> > >  	}
+> > >  
+> > > -	return 0;
+> > > +	error = 0;
+> > > +out_unlock:
+> > > +	down_write(&sb->s_umount);
+> > 
+> > Isn't down_write taking s_umount?  I think the label should be
+> > out_relock or something less misleading.
+> 
+> Agreed.  Christian, can you just change this in your branch, or should
+> I send an incremental patch?
+> 
