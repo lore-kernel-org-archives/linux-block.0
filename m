@@ -2,87 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BB9C04A6A
-	for <linux-block@archiver.kernel.org>; Sun,  6 Aug 2023 07:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50EB3C0015E
+	for <linux-block@archiver.kernel.org>; Sun,  6 Aug 2023 12:24:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbjHFHQN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Aug 2023 03:16:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49242 "EHLO
+        id S229458AbjHFMYC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Aug 2023 08:24:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjHFHQM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Aug 2023 03:16:12 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85CD31FD4
-        for <linux-block@vger.kernel.org>; Sun,  6 Aug 2023 00:16:07 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bbf0f36ce4so22510635ad.0
-        for <linux-block@vger.kernel.org>; Sun, 06 Aug 2023 00:16:07 -0700 (PDT)
+        with ESMTP id S229573AbjHFMYB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Aug 2023 08:24:01 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB88EF4
+        for <linux-block@vger.kernel.org>; Sun,  6 Aug 2023 05:24:00 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6873a30d02eso2378614b3a.3
+        for <linux-block@vger.kernel.org>; Sun, 06 Aug 2023 05:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1691306167; x=1691910967;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f1cC44qcZYBIcGUfzoCdu9nx9KiNTrSbTmLs8T1S274=;
-        b=Kd5pIGopqU5EnXakxalZyW2dhaMcCG0JQLJjdJbyY8/i5b/iAVZ6jacxFc/WBGw7TZ
-         lNFxcdciTl/M7gTrFLHB+GRtlfq/ThS2fd8T5o3/p18HTpelyOOezVaATrbOeY9HRuAP
-         mnviOjpeni7zbextffZd5mlV9tbYweMErJY+M=
+        d=gmail.com; s=20221208; t=1691324640; x=1691929440;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0OP3sZeafU4m0UvmTlOzrFMO40KUOq+JpcUSvznD7bw=;
+        b=rlM0y2UFWX5yMGImUCu9Uzd/HOr6asy+NiIwL5GVuh7acTg7rjT8i3fEt7Dx0N9LcK
+         ZLTDcXd6ew4TMQTZrJIUk2NlrHrkVpgv1LNjmzcVSyqmtKdDLcx4mCy5IAJKOHYmwVBs
+         OUwqNmiw3kiDk9cA+0xhjBERUpIwv+lI3FGGaxUbxvIhdb2P70Zz44Zv02KQ6HTkZ3Pt
+         YGqTmdNnfvijvXL9Xyy/n62BQA0rBJ5NeXd1zfvMMNYb+ZeQuuv1SfXFzZxVpNI9APtW
+         cjA/QxqvcoEaFWJYFTOUXh+sHe39sKJZS9Bu5QoDxg0jp2XZ6gmey5B/ocJMi0T0itA+
+         SDww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691306167; x=1691910967;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f1cC44qcZYBIcGUfzoCdu9nx9KiNTrSbTmLs8T1S274=;
-        b=ergR4dmxOPpjdn/ZvKK6UVNYKTG7oTbQWs81rOK6WyON05RlorU5jglYNf9NWLhJ3I
-         OdIzLy2UNvKyhACOgYhulQ/9YUTEr2gVo4UjqYZa2vu+vLu3Mff6/HkZc6t1g4J3BQY3
-         2YuGVcn7nsZqyhfVujiKPJbtbMjBHSzdwFV6EeiPdzSaeUANpnGArMGfgXMWoYXNnBYg
-         1w0v5NjZfcRXdxNWJnz164/8Uv4sxIXoabp7AlawONmMyO3MK7JTaTPI0SMODWd3pr7k
-         SyZk5I3wUJsyNlbeRsx7A/BlzhxQ8nqENzOQE58RIwI7ZLTp28Y4SsFBu2tE2vowzmhG
-         2UcA==
-X-Gm-Message-State: AOJu0Yz57XPhPw9SbfZfWTa7XwxOCK3CB6k5KgPrDynwz8OxlM/6g0qx
-        R/WEf9GoceSSoJWXZi+PdBYvfA==
-X-Google-Smtp-Source: AGHT+IFEHBJ4DDuyqM/dQDN0aPzndo/IuYpJsH4xff2mPzui4ao44kG2ICtjSio+J2LQT8pzDs7LaA==
-X-Received: by 2002:a17:902:e74c:b0:1b6:6b90:7c2f with SMTP id p12-20020a170902e74c00b001b66b907c2fmr5879078plf.55.1691306166662;
-        Sun, 06 Aug 2023 00:16:06 -0700 (PDT)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id p17-20020a170902ead100b001b03a1a3151sm4492969pld.70.2023.08.06.00.16.04
+        d=1e100.net; s=20221208; t=1691324640; x=1691929440;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0OP3sZeafU4m0UvmTlOzrFMO40KUOq+JpcUSvznD7bw=;
+        b=CnFNVMJFo9vBk+i7eV0pw45YlXgvjyXrLt8YWoa/no3k6QEz4QO0+5Hb6oGPCpCOx+
+         9jdedesE7um/C5F4Ta1IO4hOio5jzsxy11ejGGjcKCDCkapeQyWad3J/70IeaFXdblIf
+         7xEyElQiOvF40ek4ood0XNz0sXJZq6niM7l50/0FHW7bCK27dLuEM0Reu08Lpu1Tkq4l
+         iG8II6fCDR0z12UaYCryvUWfD+v0XLf1/thKmgqVenboxtfmHCDzsBqEnEBJaZ1F+v9N
+         jkulJVpkfcQ6romCCKBJb2Vqd6AqwiXnTJ/LenipT4gOMTOUL+IiGKd0KhdvjDiPEcKN
+         wfiw==
+X-Gm-Message-State: AOJu0YxJtpQDkOg5qXrz+M1b81/UlcM9zRmCQVXCiJQgSliu2u3PBac4
+        JCAnLnqSDsvMHh8VrZyFZ7A=
+X-Google-Smtp-Source: AGHT+IFr1bZnirGJUFRnxXC9TXA6S12TQZZnJCcuPAvKxdcjo7aby1bQ6E/0zdEL/4qy7x9DgHi4ug==
+X-Received: by 2002:a05:6a00:2495:b0:66c:9e97:aece with SMTP id c21-20020a056a00249500b0066c9e97aecemr5796227pfv.10.1691324640150;
+        Sun, 06 Aug 2023 05:24:00 -0700 (PDT)
+Received: from localhost.localdomain ([2405:201:c009:58e9:3a2a:ee75:10eb:7534])
+        by smtp.gmail.com with ESMTPSA id p26-20020a63741a000000b0054f9936accesm3540570pgc.55.2023.08.06.05.23.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Aug 2023 00:16:06 -0700 (PDT)
-Date:   Sun, 6 Aug 2023 16:16:01 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>, minchan@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dusty Mabe <dusty@dustymabe.com>
-Subject: Re: [PATCH] zram: take device and not only bvec offset into account
-Message-ID: <20230806071601.GB907732@google.com>
-References: <20230805055537.147835-1-hch@lst.de>
- <20230805074645.GA907732@google.com>
- <20230805081306.GA29615@lst.de>
+        Sun, 06 Aug 2023 05:23:59 -0700 (PDT)
+From:   Atul Kumar Pant <atulpant.linux@gmail.com>
+To:     josef@toxicpanda.com, axboe@kernel.dk
+Cc:     Atul Kumar Pant <atulpant.linux@gmail.com>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        shuah@kernel.org, linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH v1] drivers: block: Updates return value check
+Date:   Sun,  6 Aug 2023 17:53:51 +0530
+Message-Id: <20230806122351.157168-1-atulpant.linux@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230805081306.GA29615@lst.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (23/08/05 10:13), Christoph Hellwig wrote:
-> On Sat, Aug 05, 2023 at 04:46:45PM +0900, Sergey Senozhatsky wrote:
-> > > Fixes: af8b04c63708 ("zram: simplify bvec iteration in __zram_make_request")
-> > > Reported-by: Dusty Mabe <dusty@dustymabe.com>
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > 
-> > Acked-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-> 
-> Btw, are there any interesting test suites you want me to run on
-> a > 4K page size system now that I do have this setup available?
+Updating the check of return value from debugfs_create_dir
+to use IS_ERR.
 
-I don't really have any special tests. I used to run fio, but switched
-to a shell script that:
+Signed-off-by: Atul Kumar Pant <atulpant.linux@gmail.com>
+---
+ drivers/block/nbd.c     | 4 ++--
+ drivers/block/pktcdvd.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-1) configures zram0 and adds zram1 as writeback
-2) mkfs.ext4 on zram0, cp linux tar.gz, compile (in parallel)
-3) deferred recompress (idle and size based)
-4) idle writeback
-5) re-reads all writtenback pages
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 9c35c958f2c8..65ecde3e2a5b 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1666,7 +1666,7 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
+ 		return -EIO;
+ 
+ 	dir = debugfs_create_dir(nbd_name(nbd), nbd_dbg_dir);
+-	if (!dir) {
++	if (IS_ERR(dir)) {
+ 		dev_err(nbd_to_dev(nbd), "Failed to create debugfs dir for '%s'\n",
+ 			nbd_name(nbd));
+ 		return -EIO;
+@@ -1692,7 +1692,7 @@ static int nbd_dbg_init(void)
+ 	struct dentry *dbg_dir;
+ 
+ 	dbg_dir = debugfs_create_dir("nbd", NULL);
+-	if (!dbg_dir)
++	if (IS_ERR(dbg_dir))
+ 		return -EIO;
+ 
+ 	nbd_dbg_dir = dbg_dir;
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index d5d7884cedd4..69e5a100b3cf 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -451,7 +451,7 @@ static void pkt_debugfs_dev_new(struct pktcdvd_device *pd)
+ 	if (!pkt_debugfs_root)
+ 		return;
+ 	pd->dfs_d_root = debugfs_create_dir(pd->name, pkt_debugfs_root);
+-	if (!pd->dfs_d_root)
++	if (IS_ERR(pd->dfs_d_root))
+ 		return;
+ 
+ 	pd->dfs_f_info = debugfs_create_file("info", 0444,
+-- 
+2.25.1
 
-I test on a system with 4K pages, tho, I probably need to get an image
-with larger PAGE_SIZE.
