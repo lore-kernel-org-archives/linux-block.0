@@ -2,92 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33125C00528
-	for <linux-block@archiver.kernel.org>; Sat,  5 Aug 2023 22:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BB9C04A6A
+	for <linux-block@archiver.kernel.org>; Sun,  6 Aug 2023 07:18:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbjHEWNk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Aug 2023 18:13:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55592 "EHLO
+        id S229545AbjHFHQN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Aug 2023 03:16:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjHEWNj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2023 18:13:39 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0FC0E78
-        for <linux-block@vger.kernel.org>; Sat,  5 Aug 2023 15:13:37 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bc4dc65aa7so3191115ad.0
-        for <linux-block@vger.kernel.org>; Sat, 05 Aug 2023 15:13:37 -0700 (PDT)
+        with ESMTP id S229480AbjHFHQM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Aug 2023 03:16:12 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85CD31FD4
+        for <linux-block@vger.kernel.org>; Sun,  6 Aug 2023 00:16:07 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bbf0f36ce4so22510635ad.0
+        for <linux-block@vger.kernel.org>; Sun, 06 Aug 2023 00:16:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691273616; x=1691878416;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wfoCc+RvjV+g+GLE3LFiITYI1ax4E6KyrUn9GtTQWKU=;
-        b=Y2h94PojIusanzrjPBql/8LV2CORjY1s6biXpvYlWwZA1L/KDwvg8dvBt37DG0mzpN
-         B7dt7VojBlYTaPOWjlaP5esyiMkVGFyQucBOPNHcvfI5nN80tbVha52gvGMx6PAuPB0v
-         I3ysUBajJcS2F0UybgEkEiBJjjMbxn/id96mFIOfl5hJoI7YRXvhcLxucQMIm0/wWZ4U
-         62tdfCNAIwzXEP8CaXC1q6uZg7CyC9VldzoAzQ5L2RoFlI9z8xHcM33mXz2xZvpT/pLI
-         bMh/CR95r3UXAc39JwJxAjYlje52Q/t6RStTV8BsBBOms0Pux+zE5OS5TEZW6fN55YhK
-         +zjQ==
+        d=chromium.org; s=google; t=1691306167; x=1691910967;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=f1cC44qcZYBIcGUfzoCdu9nx9KiNTrSbTmLs8T1S274=;
+        b=Kd5pIGopqU5EnXakxalZyW2dhaMcCG0JQLJjdJbyY8/i5b/iAVZ6jacxFc/WBGw7TZ
+         lNFxcdciTl/M7gTrFLHB+GRtlfq/ThS2fd8T5o3/p18HTpelyOOezVaATrbOeY9HRuAP
+         mnviOjpeni7zbextffZd5mlV9tbYweMErJY+M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691273616; x=1691878416;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wfoCc+RvjV+g+GLE3LFiITYI1ax4E6KyrUn9GtTQWKU=;
-        b=MHJp9d096LI/laoceKEmCr9Wi8A8bcEUXDFYrUISDbRd4SQ4J8CwWTcO+gWavmIidb
-         7PDtVyP9Ou0CKFAFGOvbJrUoHlDESiYR5gcxuiGh2Iri0s5wN4APnbME57X17mt+ixe4
-         OUtn3jj21B5RGRt4Fxxru2RQetGB6gL7tT60FlHAKldMNQ/yAbLYjGIILRC63dBqXo4r
-         8JdtVNFhtYNuBoqODPx3HGEBDSz6qIorjo2NDn/ALzkIjc429T7FfE/HYubD4sxA3y4C
-         GFm0a3fDirK97DhGdm5SjRtiR0bdSU/lCgGtNB7X/yKRs6ehM+eOn+LT7M1nLpyP2ZD/
-         /2dw==
-X-Gm-Message-State: ABy/qLYn2EPZ3z1oV+PySz44UFh5K2KclWvTzQj7DlDwJwgNQceX4Aoj
-        OLKRb5JGyFr8ln74i98vL6e8lurtNLyfHniaiBY=
-X-Google-Smtp-Source: APBJJlEv8pHOH7HWV+MOVitX5Kxcf06soD19PKjn8qyNH4ESUwUgXVaV/O/MtzWWKBI09ZRESJ80Tg==
-X-Received: by 2002:a17:902:d2d1:b0:1b8:ac61:ffcd with SMTP id n17-20020a170902d2d100b001b8ac61ffcdmr28867244plc.3.1691273616618;
-        Sat, 05 Aug 2023 15:13:36 -0700 (PDT)
-Received: from [127.0.0.1] (071-095-160-189.biz.spectrum.com. [71.95.160.189])
-        by smtp.gmail.com with ESMTPSA id j21-20020a170902c3d500b001bba1188c8esm3929244plj.271.2023.08.05.15.13.35
+        d=1e100.net; s=20221208; t=1691306167; x=1691910967;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f1cC44qcZYBIcGUfzoCdu9nx9KiNTrSbTmLs8T1S274=;
+        b=ergR4dmxOPpjdn/ZvKK6UVNYKTG7oTbQWs81rOK6WyON05RlorU5jglYNf9NWLhJ3I
+         OdIzLy2UNvKyhACOgYhulQ/9YUTEr2gVo4UjqYZa2vu+vLu3Mff6/HkZc6t1g4J3BQY3
+         2YuGVcn7nsZqyhfVujiKPJbtbMjBHSzdwFV6EeiPdzSaeUANpnGArMGfgXMWoYXNnBYg
+         1w0v5NjZfcRXdxNWJnz164/8Uv4sxIXoabp7AlawONmMyO3MK7JTaTPI0SMODWd3pr7k
+         SyZk5I3wUJsyNlbeRsx7A/BlzhxQ8nqENzOQE58RIwI7ZLTp28Y4SsFBu2tE2vowzmhG
+         2UcA==
+X-Gm-Message-State: AOJu0Yz57XPhPw9SbfZfWTa7XwxOCK3CB6k5KgPrDynwz8OxlM/6g0qx
+        R/WEf9GoceSSoJWXZi+PdBYvfA==
+X-Google-Smtp-Source: AGHT+IFEHBJ4DDuyqM/dQDN0aPzndo/IuYpJsH4xff2mPzui4ao44kG2ICtjSio+J2LQT8pzDs7LaA==
+X-Received: by 2002:a17:902:e74c:b0:1b6:6b90:7c2f with SMTP id p12-20020a170902e74c00b001b66b907c2fmr5879078plf.55.1691306166662;
+        Sun, 06 Aug 2023 00:16:06 -0700 (PDT)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id p17-20020a170902ead100b001b03a1a3151sm4492969pld.70.2023.08.06.00.16.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Aug 2023 15:13:35 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     minchan@kernel.org, senozhatsky@chromium.org,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sun, 06 Aug 2023 00:16:06 -0700 (PDT)
+Date:   Sun, 6 Aug 2023 16:16:01 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>, minchan@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Dusty Mabe <dusty@dustymabe.com>
-In-Reply-To: <20230805055537.147835-1-hch@lst.de>
+Subject: Re: [PATCH] zram: take device and not only bvec offset into account
+Message-ID: <20230806071601.GB907732@google.com>
 References: <20230805055537.147835-1-hch@lst.de>
-Subject: Re: [PATCH] zram: take device and not only bvec offset into
- account
-Message-Id: <169127361527.13732.4190461845439151626.b4-ty@kernel.dk>
-Date:   Sat, 05 Aug 2023 16:13:35 -0600
+ <20230805074645.GA907732@google.com>
+ <20230805081306.GA29615@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230805081306.GA29615@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Sat, 05 Aug 2023 07:55:37 +0200, Christoph Hellwig wrote:
-> Commit af8b04c63708 ("zram: simplify bvec iteration in
-> __zram_make_request") changed the bio iteration in zram to rely on the
-> implicit capping to page boundaries in bio_for_each_segment.  But it
-> failed to care for the fact zram not only care about the page alignment
-> of the bio payload, but also the page alignment into the device.  For
-> buffered I/O and swap those are the same, but for direct I/O or kernel
-> internal I/O like XFS log buffer writes they can differ.
+On (23/08/05 10:13), Christoph Hellwig wrote:
+> On Sat, Aug 05, 2023 at 04:46:45PM +0900, Sergey Senozhatsky wrote:
+> > > Fixes: af8b04c63708 ("zram: simplify bvec iteration in __zram_make_request")
+> > > Reported-by: Dusty Mabe <dusty@dustymabe.com>
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > 
+> > Acked-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 > 
-> [...]
+> Btw, are there any interesting test suites you want me to run on
+> a > 4K page size system now that I do have this setup available?
 
-Applied, thanks!
+I don't really have any special tests. I used to run fio, but switched
+to a shell script that:
 
-[1/1] zram: take device and not only bvec offset into account
-      commit: 95848dcb9d676738411a8ff70a9704039f1b3982
+1) configures zram0 and adds zram1 as writeback
+2) mkfs.ext4 on zram0, cp linux tar.gz, compile (in parallel)
+3) deferred recompress (idle and size based)
+4) idle writeback
+5) re-reads all writtenback pages
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+I test on a system with 4K pages, tho, I probably need to get an image
+with larger PAGE_SIZE.
