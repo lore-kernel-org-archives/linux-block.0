@@ -2,122 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F8EFC001DB
-	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 05:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB4DC001DB
+	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 06:18:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230170AbjHGFT1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Aug 2023 01:19:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43394 "EHLO
+        id S229881AbjHGGSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Aug 2023 02:18:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230166AbjHGFTZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 01:19:25 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26AB7171B
-        for <linux-block@vger.kernel.org>; Sun,  6 Aug 2023 22:19:24 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bc02bd4eafso35926395ad.1
-        for <linux-block@vger.kernel.org>; Sun, 06 Aug 2023 22:19:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1691385563; x=1691990363;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TFnplcIQrufgoEeVnD1iXcx2sLuZX9r5b+/X2IXHNf8=;
-        b=Q7DxxIhgMo46QGY0MrbuPuKxRUCe4gavGP6YsLFndAQqK9FPDABdLLnQqnYB8H9ebW
-         EkXHpkiFK7lecutNCxsohpe1hIPHd1HAxLXofeko7lWPAYlEUbYG/HWYA7VO6Ppji+L8
-         KPFb4h8H+3yOU6595s5gH4QBLiOWkMRAnxZU0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691385563; x=1691990363;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TFnplcIQrufgoEeVnD1iXcx2sLuZX9r5b+/X2IXHNf8=;
-        b=MW8PssFM84wYyKyTfu+RG2Bl1Z8l20hUlaf9uJGYQFDITD1tUPD63/AZUZ7qnl/uXs
-         cVBfj1c3VgBx660EjzDoEpUaUW1TILytKTOLR14EN33EE9IVuOxT/+DJLqtu6CR4hq47
-         YtGdNQ+uCEvYdjfz0g7Nbfu7fUIY7Q5kqzVmkwTLTw9xrTaA2569ujFmOFtx5goSdClQ
-         DYdme3HF/kbug6xhLRXmfyUQ4dXVDRqffG6sMnP3isGJHNjhvGYeC9LvFRyjuGjr+wkE
-         9dN2OBHJMtMsvc+Q/NbKVFwtuwz0D2MVcdu3uHDPFedx3MYHjJIB6wI3QJOy4F0yWJT9
-         SOgw==
-X-Gm-Message-State: AOJu0Yz9fnfNQmr27PHsYtFS0mG4XpldxZ9O2y2DIrGWxhvZPAUHWeUq
-        im/B8Qiy+8HYOHp9rwU32aBrdQ==
-X-Google-Smtp-Source: AGHT+IH9VWVSqgbvsZOfDQkkDfR3GmRAM6nKTnGLYAkOPsQI5W+o8XCsCIaf1qov50YwMQAeJ8h7JQ==
-X-Received: by 2002:a17:902:d512:b0:1bb:59da:77f8 with SMTP id b18-20020a170902d51200b001bb59da77f8mr11480833plg.48.1691385563411;
-        Sun, 06 Aug 2023 22:19:23 -0700 (PDT)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id e12-20020a170902ed8c00b001bba7aab826sm5793688plj.163.2023.08.06.22.19.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Aug 2023 22:19:22 -0700 (PDT)
-Date:   Mon, 7 Aug 2023 14:19:17 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Ian Wienand <iwienand@redhat.com>
-Cc:     Minchan Kim <minchan@kernel.org>, Petr Vorel <pvorel@suse.cz>,
-        ltp@lists.linux.it, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Martin Doucha <mdoucha@suse.cz>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Subject: Re: [PATCH 0/1] Possible bug in zram on ppc64le on vfat
-Message-ID: <20230807051917.GC907732@google.com>
-References: <20221107191136.18048-1-pvorel@suse.cz>
- <Y2l3vJb1y2Jynf50@google.com>
- <ZMycl7xKyJoQNpcu@fedora19.localdomain>
- <ZNB2kORYiKdl3vSq@fedora19.localdomain>
+        with ESMTP id S229752AbjHGGSv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 02:18:51 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A780F9;
+        Sun,  6 Aug 2023 23:18:49 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RK5jw3Kdnz4f3m75;
+        Mon,  7 Aug 2023 14:18:44 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAHl6nDjNBkPbGEAA--.29196S3;
+        Mon, 07 Aug 2023 14:18:45 +0800 (CST)
+Subject: Re: [PATCH -next] block: remove init_mutex in blk_iolatency_try_init
+To:     Li Lingfeng <lilingfeng@huaweicloud.com>, tj@kernel.org
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linan122@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com, lilingfeng3@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230804113659.3816877-1-lilingfeng@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <7436e5af-f32c-6eea-7b25-d416c414f3c5@huaweicloud.com>
+Date:   Mon, 7 Aug 2023 14:18:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNB2kORYiKdl3vSq@fedora19.localdomain>
+In-Reply-To: <20230804113659.3816877-1-lilingfeng@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAHl6nDjNBkPbGEAA--.29196S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZrW5AF4DAFyxXF45ur1UGFg_yoW8WF1xpa
+        y0gFnFy3yjgrs7WF48Kw1fur10g3ykKFy7GF4rCFy5GrnF9r1agF1ruF1FgrW8urZ3Aan0
+        qF4UXryvk345G37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvab4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv
+        67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
+        uYvjxUOyCJDUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (23/08/07 14:44), Ian Wienand wrote:
-[..]
+ÔÚ 2023/08/04 19:36, Li Lingfeng Ð´µÀ:
+> From: Li Lingfeng <lilingfeng3@huawei.com>
 > 
-> At this point, because this test fills from /dev/zero, the zsmalloc
-> pool doesn't actually have anything in it.  The filesystem metadata is
-> in-use from the writes, and is not written out as compressed data.
-> The zram page de-duplication has kicked in, and instead of handles to
-> zsmalloc areas for data we just have "this is a page of zeros"
-> recorded.  So this is correctly reflecting that fact that we don't
-> actually have anything compressed stored at this time.
+> Commit a13696b83da4 ("blk-iolatency: Make initialization lazy") adds
+> a mutex named "init_mutex" in blk_iolatency_try_init for the race
+> condition of initializing RQ_QOS_LATENCY.
+> Now a new lock has been add to struct request_queue by commit a13bd91be223
+> ("block/rq_qos: protect rq_qos apis with a new lock"). And it has been
+> held in blkg_conf_open_bdev before calling blk_iolatency_init.
+> So it's not necessary to keep init_mutex in blk_iolatency_try_init, just
+> remove it.
+
+LGTM
+
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 > 
-> >  >> If we do a "sync" then redisply the mm_stat after, we get
-> >  >>   26214400     2842    65536 26214400   196608      399        0        0
+> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+> ---
+>   block/blk-iolatency.c | 5 -----
+>   1 file changed, 5 deletions(-)
 > 
-> Now we've finished writing all our zeros and have synced, we would
-> have finished updating vfat allocations, etc.  So this gets compressed
-> and written, and we're back to have some small FS metadata compressed
-> in our 1 page of zsmalloc allocations.
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index fd5fec989e39..8fbd6bc96acb 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -826,7 +826,6 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
+>   
+>   static int blk_iolatency_try_init(struct blkg_conf_ctx *ctx)
+>   {
+> -	static DEFINE_MUTEX(init_mutex);
+>   	int ret;
+>   
+>   	ret = blkg_conf_open_bdev(ctx);
+> @@ -837,13 +836,9 @@ static int blk_iolatency_try_init(struct blkg_conf_ctx *ctx)
+>   	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
+>   	 * confuse iolat_rq_qos() test. Make the test and init atomic.
+>   	 */
+> -	mutex_lock(&init_mutex);
+> -
+>   	if (!iolat_rq_qos(ctx->bdev->bd_queue))
+>   		ret = blk_iolatency_init(ctx->bdev->bd_disk);
+>   
+> -	mutex_unlock(&init_mutex);
+> -
+>   	return ret;
+>   }
+>   
 > 
-> I think what is probably "special" about this reproducer system is
-> that it is slow enough to allow the zero allocation to persist between
-> the end of the test writes and examining the stats.
-> 
-> I'd be happy for any thoughts on the likelyhood of this!
 
-Thanks for looking into this.
-
-Yes, the fact that /dev/urandom shows non-zero values in mm_stat means
-that we don't have any fishy going on in zram but instead very likely
-have ZRAM_SAME pages, which don't reach zsmalloc pool and don't use any
-physical pages.
-
-And this is what 145 is in mm_stat that was posted earlier. We have 145
-pages that are filled with the same bytes pattern:
-
-> >  >> however, /sys/block/zram1/mm_stat shows
-> >  >>   9502720        0        0 26214400   196608      145        0        0
-
-> If we think this is right; then the point of the end of this test [1]
-> is ensure a high reported compression ratio on the device, presumably
-> to ensure the compression is working.  Filling it with urandom would
-> be unreliable in this regard.  I think what we want to do is something
-> highly compressable like alternate lengths of 0x00 and 0xFF.
-
-So var-lengths 0x00/0xff should work, just make sure that you don't have
-a pattern of sizeof(unsigned long) length.
-
-I think fio had an option to generate bin data with a certain level
-of compress-ability. If that option works then maybe you can just use
-fio with some static buffer_compress_percentage configuration.
