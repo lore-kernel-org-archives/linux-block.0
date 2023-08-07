@@ -2,185 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F15C001DE
-	for <linux-block@archiver.kernel.org>; Sun,  6 Aug 2023 15:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F750C0015E
+	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 00:10:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbjHFPSi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Aug 2023 11:18:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57636 "EHLO
+        id S229636AbjHGAKD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Aug 2023 20:10:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjHFPSg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Aug 2023 11:18:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E16AC10DE
-        for <linux-block@vger.kernel.org>; Sun,  6 Aug 2023 08:17:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691335070;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jmKB9tnmoSW66PnBBOCrXWK1ePidGDAnxGSMu5crApw=;
-        b=R7/Dvvs67igond/A10mE7BvhHWASzh1D4R1wIYjojGMhJRNahTYp3n29n35lsCxPOwZD06
-        eoGZRom7KIqZpeoMEaiI1YUGavhyHKmb7JucEvUIycJiXO83ISn2hKF2PKowQUBroHAom4
-        xii2pzotYEMCSAOTS+NGOs4sMmPKluA=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-569-rYzX39rrM0aWPTkoEGgibA-1; Sun, 06 Aug 2023 11:17:46 -0400
-X-MC-Unique: rYzX39rrM0aWPTkoEGgibA-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99c20561244so242914666b.0
-        for <linux-block@vger.kernel.org>; Sun, 06 Aug 2023 08:17:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691335065; x=1691939865;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jmKB9tnmoSW66PnBBOCrXWK1ePidGDAnxGSMu5crApw=;
-        b=KqJWSHxqF1ZtyfQ2piJCF+lNl2jAi+AXzIfst5A1jhvlcttiPMy+PM7lMGAIFdT/Ez
-         ivG0gPaHp78kHW+q/fyfqZoLB/xMIYrM8fzJtGjkzHZGPfs1k6sEUr6MLAzhCWtGLcBe
-         H85sSlwhD78/ACiiclrZqRKo8EVXLQxaXo7kZf0sRuYNc349SbkIUgJz1UpG+bg+YYg/
-         qOqJim0m4PbsVuHwVGjscq0ynQ+MWik69SsDGnBWKaZdQuH7ecjIGQvZmT6ra+1a963k
-         j6uyVFCks1CnN5ppnHLK1NZJMsuZZVXWE/fqHr5gpxt1qmqE807QwazrKRh0X+eQpNZ0
-         xIEw==
-X-Gm-Message-State: AOJu0YxIbI7kodsmwGgsPsWNtHMoXdao/1V0EK956y+kp8g6YBTE0d0n
-        fQqBD4cVHa7FG5vldbLORs/+uz+SAnTK3wAmFULEtvR6p7UzGTtQTv9TH+4kj/Sz9hoAUOrVl4V
-        SabeJd7yMsNn77VbZdRvVx/g=
-X-Received: by 2002:a17:907:2bca:b0:97d:2bcc:47d5 with SMTP id gv10-20020a1709072bca00b0097d2bcc47d5mr6414190ejc.49.1691335064957;
-        Sun, 06 Aug 2023 08:17:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGtapW82Hb1Zd8BBSQHwutyuDtCwq2yQg3/1rQjZzPMqZ9Z/8LbFdyhFBBVmpsYlocZxyvMvg==
-X-Received: by 2002:a17:907:2bca:b0:97d:2bcc:47d5 with SMTP id gv10-20020a1709072bca00b0097d2bcc47d5mr6414173ejc.49.1691335064609;
-        Sun, 06 Aug 2023 08:17:44 -0700 (PDT)
-Received: from redhat.com ([91.242.248.114])
-        by smtp.gmail.com with ESMTPSA id bj10-20020a170906b04a00b0099bd6026f45sm4018477ejb.198.2023.08.06.08.10.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Aug 2023 08:17:43 -0700 (PDT)
-Date:   Sun, 6 Aug 2023 11:10:22 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     "Verma, Vishal L" <vishal.l.verma@intel.com>
-Cc:     "Jiang, Dave" <dave.jiang@intel.com>,
-        "pankaj.gupta.linux@gmail.com" <pankaj.gupta.linux@gmail.com>,
-        "houtao@huaweicloud.com" <houtao@huaweicloud.com>,
-        "houtao1@huawei.com" <houtao1@huawei.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "nvdimm@lists.linux.dev" <nvdimm@lists.linux.dev>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
-        "kch@nvidia.com" <kch@nvidia.com>
-Subject: Re: [PATCH v4] virtio_pmem: add the missing REQ_OP_WRITE for flush
- bio
-Message-ID: <20230806110854-mutt-send-email-mst@kernel.org>
-References: <CAM9Jb+g5rrvmw8xCcwe3REK4x=RymrcqQ8cZavwWoWu7BH+8wA@mail.gmail.com>
- <20230713135413.2946622-1-houtao@huaweicloud.com>
- <CAM9Jb+jjg_By+A2F+HVBsHCMsVz1AEVWbBPtLTRTfOmtFao5hA@mail.gmail.com>
- <47f9753353d07e3beb60b6254632d740682376f9.camel@intel.com>
+        with ESMTP id S229436AbjHGAKC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Aug 2023 20:10:02 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E65CFA
+        for <linux-block@vger.kernel.org>; Sun,  6 Aug 2023 17:10:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1691367000; x=1722903000;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=6SLR8kGYjAySM/GfgP20BlO06tVDMMZcx1GEUbsQrCg=;
+  b=CfRUVkzZyQ2S3Ki/XOiBMWu7XKFgZLpHGbT67UVgbrPavO8JTYuAQFrJ
+   usibLcz3MUr9fWJPPZo7bxMmUx9qNOt6c2ZqIqGnQPgqlrHRBjDebwWmz
+   HJKobPr+XZAJjZo51WKILZ7dg8+6DjhGyPzoQBgtaJ5va2meIfFz2gs0k
+   CDceFJnjSzEQkejF0Wacad4uzCrpuOh08TvlWTNMyYhTsa2k4A7NFqmmw
+   uZ4M9lz4a0abtprZy00JbAXid+2B3yFDyQoI+888HLc0cKVyYebA8J4Ng
+   yJl2NAjcykzIMLGvJY1rJo63wrwjiBycEsnsLw92pM2ybgCkCrTDVCQ8q
+   w==;
+X-IronPort-AV: E=Sophos;i="6.01,261,1684771200"; 
+   d="scan'208";a="238586857"
+Received: from mail-bn8nam12lp2170.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.170])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Aug 2023 08:09:59 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hSUFOS2Y+xk0RIY+bmNs6DGnZP6Kl3S8FFmi6z6VVnqEiBVA1qr4yGXNrjdFZ812nobITiV9Y3bhQUH8DjjAVHpmMpcaM60LCP9gLjsuYKy21Wo+tNBYw65cST8RowMCZmwyfUtFg6YhXT/78MuPngutV641hEDPobvGhEn3lCBbkseUSv3BGgwGwtimUTP+EnGKYy3F37ydukitZqE/1Cin9cA/WUaa0gBFO/TDLcntsYYX/0nOXnf7pxKGqMZVtZ5C6RBXZh3+oA8ybyeOzx2okanJJr5IuXG8fOxfx8oNtFE5BUK6d7D20sRyfzFWfRqnEqihYrNAoelJzjZxTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=faAdijuxYtTuyzbpx5smjMbESrEJK81MRdV1DEZZkxQ=;
+ b=j48Trat7tToSWfHO4hNq6popn46KbsGPmaK6kI62rEQka3hIQ5/MhHevYhAcrOQhIc2lCXpcXbbmEpCbZ8Sg7Gg6xCpOvLcTD8G0Gxz2OvdFizsi7Np2FxVo4CIen+GlkZEuuHBYgDvtPklaMfcuyUFFwD+EFd7AZWT6Gffwz6kQMYYt4ftWsLf9H2b5dcE29s38nQ4wDJi4YWuVOE3tiXZLui9jzYHUcZ/PwjqDR93fRFJz+F4IiksX6dldeSjLWi+wSwdkc4KrCfmVC3HgsaQWtfTecRFK90JGA5ZeMEbNU+86Rx6H4U2KfZDNsqzNtGfcJUbHzbPEGpLLgxeRZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=faAdijuxYtTuyzbpx5smjMbESrEJK81MRdV1DEZZkxQ=;
+ b=xdDDTEj/UakmBSMICHVhS06dqAcIMSP5Rm4Bgi8ul3MP8RBGQhixl6e18VZgYM0/bDMRm+eaZO7LLNY8c4lVej35Jhup7Q4gMNEdPkDyOoCzyow3QEtWHlSb9EjyFZA3++TRIn0JEenwuUFiaD1IAjlWyhuonqkkxoHjXcsfhoY=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ DM8PR04MB7829.namprd04.prod.outlook.com (2603:10b6:8:3b::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.26; Mon, 7 Aug 2023 00:09:54 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::f92a:6d40:fe94:34e9]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::f92a:6d40:fe94:34e9%7]) with mapi id 15.20.6652.025; Mon, 7 Aug 2023
+ 00:09:54 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Hannes Reinecke <hare@suse.de>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests] block/004: reset zones of TEST_DEV before fio
+ operation
+Thread-Topic: [PATCH blktests] block/004: reset zones of TEST_DEV before fio
+ operation
+Thread-Index: AQHZxs4J2EJyrcGDEkaJ62l4MkKe4a/aGCiAgAPhJAA=
+Date:   Mon, 7 Aug 2023 00:09:54 +0000
+Message-ID: <vxnxdaebpeurw5zm2f2n3r2ed34nrfbom32bop7xfnbeveidvy@fjkaomc5rdx6>
+References: <20230804122007.2396170-1-shinichiro.kawasaki@wdc.com>
+ <d6ce5f11-46d3-cf05-ad47-0114d0f88096@suse.de>
+In-Reply-To: <d6ce5f11-46d3-cf05-ad47-0114d0f88096@suse.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DM8PR04MB7829:EE_
+x-ms-office365-filtering-correlation-id: 4b512669-d0e4-465f-eaa9-08db96daa079
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UbtXIRNL1jg1hS4rQOwdkv/gLgDjXs6KZxHl4KYslned2RvwXul9KT7GmId+pgYWrzGAOCqqBSaavkxRu7ZBOW/4cGQLXDDgeNYDbeh3iyLYDLSO4Rs6Hm0huzN3S5p12zdG1xAiEM1Ctp5pWbSDlWQ4L3i6PwS/KoGXkYFtslsxBIzlcHnfeRdezYXbVwZ4A1UMxrWtdirwHWbtN4ynq4zseRh4QmnVHEhEBWQ7hRCPzVStnkPWaY41gwkw/xhJbtBiNClZGr+JdGlWu2EEY247cZubArgkR+4gxviwHXwL138J7kK9U+1MR2GJSmun+iFaeqyvUGJ0GgiLkTTBO6mTIX3Pall9IpsFN9KyrAsC0g9GOqdnihH+Md9k7rBSSrWVLNUxXxD7/W8NKihvbGWHfjQ8Qmfuy7kUuXVzSvLi2MSYfgjuATLOVul2wPI1JdYz5uvJRkYxWKQZ8L9ClDUyRJFlxBmCbS3mm40b54cIUM+DXFMDVr6RrdESWzWsn84HmfDx3f96SXQtKMkxrKMRQZUbhoTL115dbBFYwNhO7RmOONzQGW86tWQVYsw3ISItIjVzyKDZsQ50B3JyOJfgaEf9r4l77ZaUZL5JVC7N6RwEq40eRoO2Yb5jiJzX
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(346002)(376002)(39860400002)(366004)(396003)(136003)(186006)(1800799003)(451199021)(38070700005)(41300700001)(26005)(2906002)(44832011)(5660300002)(83380400001)(8936002)(8676002)(122000001)(478600001)(6916009)(86362001)(316002)(82960400001)(6506007)(53546011)(38100700002)(76116006)(6486002)(33716001)(64756008)(66446008)(66476007)(66556008)(91956017)(71200400001)(66946007)(4326008)(9686003)(6512007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?sEw7YNw1b7TBYchi2X74fKBhN3kn6LvZaJtRw/zbFOr8B0DLdKFwDjgCcgqo?=
+ =?us-ascii?Q?ivTgieC99PdGRok6NgfHN5nEFFd0vuhXMHH2ynYoqAO53cd+lrXM/LWBx2It?=
+ =?us-ascii?Q?gXndicacN4AzrkezG5HZhevfkXRCA9+7x9O6VF6m30j9gYfxZESlnTJMFRbI?=
+ =?us-ascii?Q?1XD3eAAlR6r6JIW/MDRSDvmrqQ2E4mN9ei+768bpjDf6S+VwC/3goRf0xfrN?=
+ =?us-ascii?Q?RLTFlTjHPcWFegbolgE+ey6gq9r3ca5AmfNT8D1EoWxpTvogwkP5gm1uy7LS?=
+ =?us-ascii?Q?+ekuqqSK0srq7uR0oHAipa2jw2h5hT0lGLnkf4LGQtMzoHY1ESAoJVCoxvZF?=
+ =?us-ascii?Q?FzmiwxCW93mPCDFzNewG7sCWUs5M20iV0jhOB3IyUJdjSwiq8aJ6Ys/8DgSK?=
+ =?us-ascii?Q?C5cyZoObr3PaTWtGyWBlD80veEaCbyXQrUV/duSgf6MPqdcC5AO9hhzfhdNH?=
+ =?us-ascii?Q?C9JGEzOUSKxE0Zk+fflMBUc0TddCXEq+Jg7S/LkRp/10rg5WVUKwIbki663/?=
+ =?us-ascii?Q?l4iZOfI//T17Jx7Inx/teF16d9oG6pXxk9mcsM1inecBP8AwyBTgaC0weZWo?=
+ =?us-ascii?Q?47Btc6xL7TKH+N6lasAvjt/R4J3rScxvEGH3WTIzsELhbw0AU+mtY4PGs/dl?=
+ =?us-ascii?Q?NB5HBrkl0yC5x2AdY1e0LZ6vzG68Eg7zHQ+Fx1INSLqJ5nN7QHvsD2fmZZ4A?=
+ =?us-ascii?Q?p51au6QiLykcBy/729uja1a1n4AzwgLytl6O7pjIn5Ru7p5ZnzjhymUldQbT?=
+ =?us-ascii?Q?zUqqdM0h+7EqPwNt8XuWAonBK9qRCs65Qg68O+C0s1LAPAkuEZTzGOUWQwHX?=
+ =?us-ascii?Q?rF/4ztcS8PNdIAn50Exgf7ukiqQXGraJ0YBbDeR24doXo/XQi9M02VDZ/woV?=
+ =?us-ascii?Q?3vkKwArbk5ntRF4DD3HL5wwyZBl1bzW0x7diJ7N5cdINPgUMij0Sx5DqhluB?=
+ =?us-ascii?Q?JMb2r7ePMy+WbM0hfkYZ25iSeav5a/01nxL3VH+SoNuAK8V3Z+tgqKhwsLjN?=
+ =?us-ascii?Q?cSozdmftc57if4n4U+QLmW6PakrG39wYbELxL1dAvqLP005d48eYFqOesC3T?=
+ =?us-ascii?Q?Qye+KVaoni/iXqzYrom0N823fo5bs0qFnVjreULVmWBS7Nc1hAKduzZDXFRw?=
+ =?us-ascii?Q?Ov26BPsQHNPlRraa+4MhtVyqHOzN1ZB4BMQ4eHR/KVlSgO3yqC8GUVjdm+fo?=
+ =?us-ascii?Q?hJbJM0iiTe2pkjYu2TeLfMqQeX9bw8SbQkmhNW/FyuPyy+cFIV6xI7CDOthb?=
+ =?us-ascii?Q?7NMhYkZuMgr6j/w/rHtI0u1RHftWEagD0ipWqgb0mRjyUWKsfQ+/70NONtpB?=
+ =?us-ascii?Q?Ezdk40OuSmusnpBhPK1kfJbJh73o326E+46y58fDFOujVLLXMr5RNMoT6QBs?=
+ =?us-ascii?Q?XQFmULFm5g2vw/OnImdbeUdcDZ7NrlIVJUy6VflGXr8XLCWSgEWvYrR57LpF?=
+ =?us-ascii?Q?xB5hTBQIYD08erMCbHuH4+2SV4CEFu7BXbrbqzDJehhRb96NQ/meZHWwWTBv?=
+ =?us-ascii?Q?7FHgCcxlxoOm+hLvP0P+AQPZ0UmWKHjTKiygLlWQQ4J8VUMWw34dlGytJNTJ?=
+ =?us-ascii?Q?A3njPj1nUs4bB4TLf0ciTzd1os2PkNILXfFjzzKDE7pYjjNQVnlKv9qOt/Zy?=
+ =?us-ascii?Q?1/lR/1UyKx0A4Ck8mYSSjJg=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <DC2152D08225CE47B2780CC1EBA0EA94@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <47f9753353d07e3beb60b6254632d740682376f9.camel@intel.com>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 52ZA9uzRsvsV/p8SATPsJPZjpgMnwm0bxsghvrut4K7baMwLbl5MgsHc2vPqbgQCnhPL/xeD1jhqgwj5XfWAHk0KrRgGcaXdO9g01vITT1BD78PcriM0Dl+BBVo3/8NWEMmd4KPQ4oDUJ0Gcr7pEVqkq6DX3QxQsvFsvHXBQUVgmVBYZBXggT4vxWrDxEC5qRKNNtZlNnUK+wBdbPN5BfbZ1zu8FQsY57xWyoCfBJ3gj25RITHW829jJjY07osh09Ttk9LwNrCwpwWOxGj/40VJKYolsZaW5ob8j7jeWbseVBzkKu1QfrddhFSF2QZWDdpZ5q+XoPJTAX3AGt3BMpLPqerPeO018sLZ2awmZ1W8MkyF8Urfg443uYRL+5oBrJYBkp4H99NF2UY0pnwDok9pZuHyUdfi1VrU/MWjrl801cNYrkhCwSBrNqSrV+MaLCvW8WbCqTxGPcswUOgDsHj+7kP5Sy6InRZRFmZ76lA1dV5kDSH17GVuN2+mrxbfkTQdOOBveJ0aznfwQWaI5VMbSxVczM21DsIkcFNxExWSu139vrjeN8zfRkJHyNB7/11KXYQsyCVTKlnB+qb1r8/V4KG1AlZeTaEJ4LkMjLvNWhUx8Wz/Isgu6llO7e+mrnY2753hi5z0cWuMt7gz3W+6Gn6K7jgBH50FMaP/3OBB/Reak+Mt5JLMT0wbME8sh9h/Kev6Jp4lxmKGDZoAyLhBIURGRY1hoPdprUA1NTHBKxJCz9A1MWR45xcd0qOOnj88jN+gfh0W1AOkN2XCIE/c+GMkwIt/1V9/Avz85jHk=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b512669-d0e4-465f-eaa9-08db96daa079
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2023 00:09:54.2239
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HHH7iou0LKz8b0OMp6b9czg1KC3P3N9DsjCwLwsqUNhzVbVAcbeXP6xkKdhbjor/ugGwowlp6qeb6HHs2S1ac9FJ4bjAbkT9M5iPvN0hFHA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR04MB7829
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 04, 2023 at 09:03:20PM +0000, Verma, Vishal L wrote:
-> On Fri, 2023-08-04 at 20:39 +0200, Pankaj Gupta wrote:
-> > Gentle ping!
-> > 
-> > Dan, Vishal for suggestion/review on this patch and request for merging.
-> > +Cc Michael for awareness, as virtio-pmem device is currently broken.
-> 
-> Looks good to me,
-> 
-> Reviewed-by: Vishal Verma <vishal.l.verma@intel.com>
-> 
-> Dave, will you queue this for 6.6.
+On Aug 04, 2023 / 14:55, Hannes Reinecke wrote:
+> On 8/4/23 14:20, Shin'ichiro Kawasaki wrote:
+> > When test target is a zoned block device with max_active_zones limit
+> > larger than max_open_zones, fio write operation may fail depending on
+> > zone conditions. To avoid the failure, reset zones of the device before
+> > the fio run.
+> >=20
+> > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> > ---
+> >   tests/block/004 | 6 +++++-
+> >   1 file changed, 5 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/tests/block/004 b/tests/block/004
+> > index 63484a4..52a260f 100755
+> > --- a/tests/block/004
+> > +++ b/tests/block/004
+> > @@ -15,7 +15,10 @@ requires() {
+> >   }
+> >   device_requires() {
+> > -	! _test_dev_is_zoned || _have_fio_zbd_zonemode
+> > +	if _test_dev_is_zoned; then
+> > +		_have_fio_zbd_zonemode
+> > +		_have_program blkzone
+> > +	fi
+> >   }
+> What would be the return value here?
+> Do we care?
+> Should we make it explicit?
 
+No, we no longer care the return value. In the past, return values from
+*requires() mattered until the commit 4824ac3f5c4a ("Skip tests based on
+SKIP_REASON, not return value"). Instead of the return values, SKIP_REASON
+were referred to judge test case skips.
 
-Generally if you expect me to merge a patch I should be CC'd.
-
-
-> > 
-> > Thanks,
-> > Pankaj
-> > 
-> > > From: Hou Tao <houtao1@huawei.com>
-> > > 
-> > > When doing mkfs.xfs on a pmem device, the following warning was
-> > > reported:
-> > > 
-> > >  ------------[ cut here ]------------
-> > >  WARNING: CPU: 2 PID: 384 at block/blk-core.c:751 submit_bio_noacct
-> > >  Modules linked in:
-> > >  CPU: 2 PID: 384 Comm: mkfs.xfs Not tainted 6.4.0-rc7+ #154
-> > >  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
-> > >  RIP: 0010:submit_bio_noacct+0x340/0x520
-> > >  ......
-> > >  Call Trace:
-> > >   <TASK>
-> > >   ? submit_bio_noacct+0xd5/0x520
-> > >   submit_bio+0x37/0x60
-> > >   async_pmem_flush+0x79/0xa0
-> > >   nvdimm_flush+0x17/0x40
-> > >   pmem_submit_bio+0x370/0x390
-> > >   __submit_bio+0xbc/0x190
-> > >   submit_bio_noacct_nocheck+0x14d/0x370
-> > >   submit_bio_noacct+0x1ef/0x520
-> > >   submit_bio+0x55/0x60
-> > >   submit_bio_wait+0x5a/0xc0
-> > >   blkdev_issue_flush+0x44/0x60
-> > > 
-> > > The root cause is that submit_bio_noacct() needs bio_op() is either
-> > > WRITE or ZONE_APPEND for flush bio and async_pmem_flush() doesn't assign
-> > > REQ_OP_WRITE when allocating flush bio, so submit_bio_noacct just fail
-> > > the flush bio.
-> > > 
-> > > Simply fix it by adding the missing REQ_OP_WRITE for flush bio. And we
-> > > could fix the flush order issue and do flush optimization later.
-> > > 
-> > > Cc: stable@vger.kernel.org # 6.3+
-> > > Fixes: b4a6bb3a67aa ("block: add a sanity check for non-write flush/fua bios")
-> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > > Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> > > Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
-> > > Tested-by: Pankaj Gupta <pankaj.gupta@amd.com>
-> > > Signed-off-by: Hou Tao <houtao1@huawei.com>
-> > > ---
-> > > v4:
-> > >  * add stable Cc
-> > >  * collect Rvb and Tested-by tags
-> > > 
-> > > v3: https://lore.kernel.org/linux-block/20230625022633.2753877-1-houtao@huaweicloud.com
-> > >  * adjust the overly long lines in both commit message and code
-> > > 
-> > > v2: https://lore.kernel.org/linux-block/20230621134340.878461-1-houtao@huaweicloud.com
-> > >  * do a minimal fix first (Suggested by Christoph)
-> > > 
-> > > v1: https://lore.kernel.org/linux-block/ZJLpYMC8FgtZ0k2k@infradead.org/T/#t
-> > > 
-> > >  drivers/nvdimm/nd_virtio.c | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-> > > index c6a648fd8744..1f8c667c6f1e 100644
-> > > --- a/drivers/nvdimm/nd_virtio.c
-> > > +++ b/drivers/nvdimm/nd_virtio.c
-> > > @@ -105,7 +105,8 @@ int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
-> > >          * parent bio. Otherwise directly call nd_region flush.
-> > >          */
-> > >         if (bio && bio->bi_iter.bi_sector != -1) {
-> > > -               struct bio *child = bio_alloc(bio->bi_bdev, 0, REQ_PREFLUSH,
-> > > +               struct bio *child = bio_alloc(bio->bi_bdev, 0,
-> > > +                                             REQ_OP_WRITE | REQ_PREFLUSH,
-> > >                                               GFP_ATOMIC);
-> > > 
-> > >                 if (!child)
-> > > --
-> > > 2.29.2
-> > > 
-> 
-
+After that, the commit 5c2012764cbc ("common, tests: Print multiple skip
+reasons") renamed SKIP_REASON to SKIP_REASONS. These changes are reflected
+in the descriptions in the "./new" script.=
