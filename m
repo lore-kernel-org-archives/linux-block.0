@@ -2,91 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA54C001DE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 07:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A190C41513
+	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 08:34:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229468AbjHGH27 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Aug 2023 03:28:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40230 "EHLO
+        id S230109AbjHGIeP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Aug 2023 04:34:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230022AbjHGH26 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 03:28:58 -0400
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE3E10F0
-        for <linux-block@vger.kernel.org>; Mon,  7 Aug 2023 00:28:57 -0700 (PDT)
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-560c7abdbdcso6094259eaf.0
-        for <linux-block@vger.kernel.org>; Mon, 07 Aug 2023 00:28:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691393336; x=1691998136;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dfO5ZbXwlkV4VhH7u4bUaPKULBzp7kD4cV+g8CpJZdM=;
-        b=ZLdyx+w+iNkD7zXrDXJCgStHKqXZ9rwk9x2FOFen1VFlicjXDBBkdRD75sXMTp0a8S
-         aTnghrm1h3HC8qtFMSJybCW5wnRRnRrlCXt2qRV9P5gqznqQtmxSZSKNixhFeFmiBIEL
-         nLIE1aFtACRWu3+9/SNZLjftYhOXzY4rhyVfztY4eqwQIOxuKmFt8qhSnF9ove8WPchf
-         Fi9iWuo+jV/sUKSMg7Jre34j9yR2dUyQW4GfdbGSebr4Pbz45WUvSdKrg9NyoY4gh+in
-         YgwkUgsnORoleRIX8Qmj7+VrNdnAK6Q2fbIyn7OK60ytWwh9LEGht+GnoMHwaKXe0w/j
-         u0RQ==
-X-Gm-Message-State: AOJu0YypnJiUN01uobN6Ck/KePgujwtyaKFAnwECgO8s5q5qNCKlL9lf
-        CjpHRPoGWXFZ/RnAc5OyvhUtTsHginDzGvaLM8XnZuXLccPDIrw=
-X-Google-Smtp-Source: AGHT+IEIDgb9k0sy4mwrbkfAGavGcIXwzXnwGJQCjrXoLb7F3BiTBAvKA3mpsS1fkwiEx2xv9DYliIcrhqV/XmIUyPLzRPqFiHJz
+        with ESMTP id S229469AbjHGIeO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 04:34:14 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E64710EF;
+        Mon,  7 Aug 2023 01:34:12 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 44AAB218A9;
+        Mon,  7 Aug 2023 08:34:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1691397251; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=CkiLjiLMxObzy3Sb9w3oxtxHFV8IOAxBlCK+K5bcwaE=;
+        b=r+DUjLGFEllhgYp/YiieuZF0DOCjFDWeLyJoWFD0+nxlhS2s+B4eZvPMd4W3P12+txsJ5K
+        G431i69aOhsJSqtUZcspvZ0xB1KGBCaF8Sc0PPEF5QWSdWdODP1kf6Odvb05n1/K6EP4OM
+        2N5m5JFtHu58v9ZyWEHYpAtkTXoamI0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1691397251;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=CkiLjiLMxObzy3Sb9w3oxtxHFV8IOAxBlCK+K5bcwaE=;
+        b=PmOcswpF0o6Csfk6kbt4+f54rrFElHQs3ovyF4w1bqSUJ5n6roG5qyOxTHY7f0PI1TMtU0
+        9q+79oecr2eV8RBg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0F71013487;
+        Mon,  7 Aug 2023 08:34:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 9RkuA4Os0GTCBwAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Mon, 07 Aug 2023 08:34:11 +0000
+From:   Vlastimil Babka <vbabka@suse.cz>
+To:     "Rafael J . Wysocki" <rafael@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>, Jens Axboe <axboe@kernel.dk>
+Cc:     dm-devel@redhat.com, gregkh@linuxfoundation.org, hch@lst.de,
+        joern@lazybastard.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-pm@vger.kernel.org, loic.poulain@linaro.org,
+        miquel.raynal@bootlin.com, regressions@lists.linux.dev,
+        richard@nod.at, snitzer@kernel.org, vigneshr@ti.com,
+        Vlastimil Babka <vbabka@suse.cz>
+Subject: [PATCH for 6.5 regression] PM: hibernate: fix resume_store() return value when hibernation not available
+Date:   Mon,  7 Aug 2023 10:33:57 +0200
+Message-ID: <20230807083356.19222-2-vbabka@suse.cz>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1584:b0:3a7:26fe:ed3 with SMTP id
- t4-20020a056808158400b003a726fe0ed3mr14573742oiw.4.1691393336618; Mon, 07 Aug
- 2023 00:28:56 -0700 (PDT)
-Date:   Mon, 07 Aug 2023 00:28:56 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000013717060250331f@google.com>
-Subject: [syzbot] Monthly block report (Aug 2023)
-From:   syzbot <syzbot+list4b3930a5db9ded147aec@syzkaller.appspotmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello block maintainers/developers,
+On a laptop with hibernation set up but not actively used, and with
+secure boot and lockdown enabled kernel, 6.5-rc1 gets stuck on boot with
+the following repeated messages:
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+  A start job is running for Resume from hibernation using device /dev/system/swap (24s / no limit)
+  lockdown_is_locked_down: 25311154 callbacks suppressed
+  Lockdown: systemd-hiberna: hibernation is restricted; see man kernel_lockdown.7
+  ...
 
-During the period, 2 new issues were detected and 1 were fixed.
-In total, 25 issues are still open and 85 have been fixed so far.
+Checking the resume code leads to commit cc89c63e2fe3 ("PM: hibernate:
+move finding the resume device out of software_resume") which
+inadvertently changed the return value from resume_store() to 0 when
+!hibernation_available(). This apparently translates to userspace
+write() returning 0 as in number of bytes written, and userspace looping
+indefinitely in the attempt to write the intended value.
 
-Some of the still happening issues:
+Fix this by returning the full number of bytes that were to be written,
+as that's what was done before the commit.
 
-Ref Crashes Repro Title
-<1> 1313    Yes   WARNING in copy_page_from_iter
-                  https://syzkaller.appspot.com/bug?extid=63dec323ac56c28e644f
-<2> 398     Yes   INFO: task hung in blkdev_put (4)
-                  https://syzkaller.appspot.com/bug?extid=9a29d5e745bd7523c851
-<3> 152     No    KMSAN: kernel-infoleak in copy_page_to_iter (4)
-                  https://syzkaller.appspot.com/bug?extid=17a061f6132066e9fb95
-<4> 111     Yes   INFO: task hung in __filemap_get_folio
-                  https://syzkaller.appspot.com/bug?extid=0e9dc403e57033a74b1d
-<5> 93      Yes   INFO: task hung in blkdev_fallocate
-                  https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<6> 24      Yes   INFO: task hung in blkdev_get_by_dev (5)
-                  https://syzkaller.appspot.com/bug?extid=6229476844294775319e
-<7> 23      Yes   WARNING in blk_register_tracepoints
-                  https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
-<8> 12      Yes   WARNING in wait_til_done (2)
-                  https://syzkaller.appspot.com/bug?extid=9bc4da690ee5334f5d15
-<9> 4       No    general protection fault in reset_interrupt (3)
-                  https://syzkaller.appspot.com/bug?extid=619e27617b2abe6b9b72
-
+Fixes: cc89c63e2fe3 ("PM: hibernate: move finding the resume device out of software_resume")
+Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Resend with review/ack tags added and not buried in the thread.
+Link: https://lore.kernel.org/all/2cfa5f55-1d68-8a4f-d049-13f42e0d1484@suse.cz/
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+ kernel/power/hibernate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index e1b4bfa938dd..2b4a946a6ff5 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -1166,7 +1166,7 @@ static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr,
+ 	int error;
+ 
+ 	if (!hibernation_available())
+-		return 0;
++		return n;
+ 
+ 	if (len && buf[len-1] == '\n')
+ 		len--;
+-- 
+2.41.0
 
-You may send multiple commands in a single email message.
