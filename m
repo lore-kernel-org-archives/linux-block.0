@@ -2,111 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A190C41513
-	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 08:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFFAC41513
+	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 09:11:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230109AbjHGIeP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Aug 2023 04:34:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59810 "EHLO
+        id S231278AbjHGJLD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Aug 2023 05:11:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjHGIeO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 04:34:14 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E64710EF;
-        Mon,  7 Aug 2023 01:34:12 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 44AAB218A9;
-        Mon,  7 Aug 2023 08:34:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1691397251; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=CkiLjiLMxObzy3Sb9w3oxtxHFV8IOAxBlCK+K5bcwaE=;
-        b=r+DUjLGFEllhgYp/YiieuZF0DOCjFDWeLyJoWFD0+nxlhS2s+B4eZvPMd4W3P12+txsJ5K
-        G431i69aOhsJSqtUZcspvZ0xB1KGBCaF8Sc0PPEF5QWSdWdODP1kf6Odvb05n1/K6EP4OM
-        2N5m5JFtHu58v9ZyWEHYpAtkTXoamI0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1691397251;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=CkiLjiLMxObzy3Sb9w3oxtxHFV8IOAxBlCK+K5bcwaE=;
-        b=PmOcswpF0o6Csfk6kbt4+f54rrFElHQs3ovyF4w1bqSUJ5n6roG5qyOxTHY7f0PI1TMtU0
-        9q+79oecr2eV8RBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0F71013487;
-        Mon,  7 Aug 2023 08:34:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 9RkuA4Os0GTCBwAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Mon, 07 Aug 2023 08:34:11 +0000
-From:   Vlastimil Babka <vbabka@suse.cz>
-To:     "Rafael J . Wysocki" <rafael@kernel.org>,
-        Pavel Machek <pavel@ucw.cz>, Jens Axboe <axboe@kernel.dk>
-Cc:     dm-devel@redhat.com, gregkh@linuxfoundation.org, hch@lst.de,
-        joern@lazybastard.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-pm@vger.kernel.org, loic.poulain@linaro.org,
-        miquel.raynal@bootlin.com, regressions@lists.linux.dev,
-        richard@nod.at, snitzer@kernel.org, vigneshr@ti.com,
-        Vlastimil Babka <vbabka@suse.cz>
-Subject: [PATCH for 6.5 regression] PM: hibernate: fix resume_store() return value when hibernation not available
-Date:   Mon,  7 Aug 2023 10:33:57 +0200
-Message-ID: <20230807083356.19222-2-vbabka@suse.cz>
-X-Mailer: git-send-email 2.41.0
+        with ESMTP id S230369AbjHGJLC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 05:11:02 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84121E6C;
+        Mon,  7 Aug 2023 02:11:01 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3778ZLgI012753;
+        Mon, 7 Aug 2023 09:10:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=yThY566GT6ogsFbeuR/k0d8GogwCb501Mia32jVcASw=;
+ b=XdMgNAjYew21I//lCnB57JZN7spa9djFaBAWLNw6JiyPprM8iJopo2nlmlcrn6j5s1FQ
+ g/U0RKOgsjyIdcVzRWQ4t3jq0PN6ry8GoqIJZmcZsYr1/k5gGIEW6irDFXKQB0Hw4FvI
+ b/PCQkc30l6M0/FplvRVN5WRiWdQDatn/6Nmc0TWIP5j76cqReCnAe0SVBy786Gh1vhj
+ 7sRTTl1ammBQx34EWV1SoylmRA2KsUClnhQywFQoiH9c2CyfgTI4PcSgHOdx/r2GqG4k
+ dWwTBmtKQDakMM+ucbL1ueht4HiTzIXxgjvrhUnmCXXdROZwHecsZZ89rFOxEhG8rQth Ng== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s9fqfax6h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Aug 2023 09:10:32 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+        by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3779AVIL005991
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 7 Aug 2023 09:10:31 GMT
+Received: from [10.253.14.51] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Mon, 7 Aug
+ 2023 02:10:27 -0700
+Message-ID: <dae8266c-ea52-f421-ec44-077cf4b033f8@quicinc.com>
+Date:   Mon, 7 Aug 2023 17:10:13 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH v6 6/7] scsi: ufs: Split an if-condition
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Avri Altman" <avri.altman@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Stanley Chu" <stanley.chu@mediatek.com>,
+        Bean Huo <beanhuo@micron.com>,
+        Asutosh Das <quic_asutoshd@quicinc.com>,
+        "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
+        Arthur Simchaev <Arthur.Simchaev@wdc.com>
+References: <20230804154821.3232094-1-bvanassche@acm.org>
+ <20230804154821.3232094-7-bvanassche@acm.org>
+From:   Can Guo <quic_cang@quicinc.com>
+In-Reply-To: <20230804154821.3232094-7-bvanassche@acm.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 4PKjqTppo55k8w1Z8ScapNEynNN0IH60
+X-Proofpoint-ORIG-GUID: 4PKjqTppo55k8w1Z8ScapNEynNN0IH60
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-07_06,2023-08-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 mlxscore=0 malwarescore=0 impostorscore=0
+ mlxlogscore=999 clxscore=1011 suspectscore=0 adultscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308070085
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On a laptop with hibernation set up but not actively used, and with
-secure boot and lockdown enabled kernel, 6.5-rc1 gets stuck on boot with
-the following repeated messages:
+Hi Bart,
 
-  A start job is running for Resume from hibernation using device /dev/system/swap (24s / no limit)
-  lockdown_is_locked_down: 25311154 callbacks suppressed
-  Lockdown: systemd-hiberna: hibernation is restricted; see man kernel_lockdown.7
-  ...
-
-Checking the resume code leads to commit cc89c63e2fe3 ("PM: hibernate:
-move finding the resume device out of software_resume") which
-inadvertently changed the return value from resume_store() to 0 when
-!hibernation_available(). This apparently translates to userspace
-write() returning 0 as in number of bytes written, and userspace looping
-indefinitely in the attempt to write the intended value.
-
-Fix this by returning the full number of bytes that were to be written,
-as that's what was done before the commit.
-
-Fixes: cc89c63e2fe3 ("PM: hibernate: move finding the resume device out of software_resume")
-Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-Resend with review/ack tags added and not buried in the thread.
-Link: https://lore.kernel.org/all/2cfa5f55-1d68-8a4f-d049-13f42e0d1484@suse.cz/
-
- kernel/power/hibernate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-index e1b4bfa938dd..2b4a946a6ff5 100644
---- a/kernel/power/hibernate.c
-+++ b/kernel/power/hibernate.c
-@@ -1166,7 +1166,7 @@ static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr,
- 	int error;
- 
- 	if (!hibernation_available())
--		return 0;
-+		return n;
- 
- 	if (len && buf[len-1] == '\n')
- 		len--;
--- 
-2.41.0
-
+On 8/4/2023 11:48 PM, Bart Van Assche wrote:
+> Make the next patch in this series easier to read. No functionality is
+> changed.
+>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Avri Altman <avri.altman@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   drivers/ufs/core/ufshcd.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
+> index 129446775796..ae7b868f9c26 100644
+> --- a/drivers/ufs/core/ufshcd.c
+> +++ b/drivers/ufs/core/ufshcd.c
+> @@ -4352,8 +4352,9 @@ void ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
+>   	}
+>   	spin_unlock_irqrestore(hba->host->host_lock, flags);
+>   
+> -	if (update &&
+> -	    !pm_runtime_suspended(&hba->ufs_device_wlun->sdev_gendev)) {
+> +	if (!update)
+> +		return;
+> +	if (!pm_runtime_suspended(&hba->ufs_device_wlun->sdev_gendev)) {
+>   		ufshcd_rpm_get_sync(hba);
+>   		ufshcd_hold(hba);
+>   		ufshcd_auto_hibern8_enable(hba);
+Reviewed-by: Can Guo <quic_cang@quicinc.com>
