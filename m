@@ -2,92 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6BFC001DB
-	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 17:55:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D40C001B0
+	for <linux-block@archiver.kernel.org>; Mon,  7 Aug 2023 18:19:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjHGRzO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Aug 2023 13:55:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46452 "EHLO
+        id S230103AbjHGSTG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Aug 2023 14:19:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbjHGRzO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 13:55:14 -0400
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22BE51701
-        for <linux-block@vger.kernel.org>; Mon,  7 Aug 2023 10:55:13 -0700 (PDT)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-583a8596e2aso44709957b3.1
-        for <linux-block@vger.kernel.org>; Mon, 07 Aug 2023 10:55:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691430912; x=1692035712;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RlCzFKNj2PLZtrDRconO+Ncogzp7Fz5t1sVouGvRFAY=;
-        b=hQ1WnTzUldedGB8lRCPKEoaeLuFvbD/k9u0mNXh3ly3gMJu7N8NVV21hA6n0junL6q
-         oxiSmBRroH02OdBGgner9gFn990pIHTanAtRdWN80/lHbo8T9EfdCzwx4J1eqJCQ+O7a
-         LH5yE5ftlwI7BywP/sXLvUeSBeQk/7PH3IoQ2q+ObmzBTd7JCl09N4qyvSfvIH/nBPVG
-         +N4fVsEcaJ0YXx9I0CC3nal7/6T01FWzAZRFPV9og04b5OcHuZaZXJ7c6BtdRFmpJaUB
-         PGfK0H/QKN9mD1KXLtfW9HNcodhKKra3lS75KalFMtOAXlMk7iB2HPRCdSvT6b9QZe1I
-         Sicg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691430912; x=1692035712;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RlCzFKNj2PLZtrDRconO+Ncogzp7Fz5t1sVouGvRFAY=;
-        b=gvyAol0ILisKcKEwrfMFFVrgaaW61Y0JKqv/zu+jbv/6fcEVDum9OrFvmiOyleaHJR
-         c5w84BHd+1wxjiKQVyDucNw5Zvcod9C8I3T9nLgqlHT/s3ONHP4hLWh6lbNnam7DUfs6
-         vEG9Dlg/cEm6rvhNZYioWEa1ENj9PsyMQtlKH+gI4/AlfVJMuEYh2sF/MOH3yWDUA2Z+
-         ijfqN6mY4TpoJpYfxt7QcN2zleGUb/RETqnmlqvIY+H8xzIw01mA49WROA2DVUAzfprc
-         tOkKD3iJqrds1Ypv8cWgl+eUyc9ZRhnkzTK57d9hy8WLrmWd72+sFMidn4twJ6A6vSot
-         eS8A==
-X-Gm-Message-State: AOJu0Yzutdji6nnCjCejfNw2da+ITITxqLlrKXGRWOrXnF99mD3VHkbq
-        h34D1UA+h0AHH2dXN02FTEgGiZjslrfn1XXMWD8=
-X-Google-Smtp-Source: AGHT+IF5Ce1yonD0nOwgvcdw9qjEnYMDbsCE0lJy3vYjGlNkX/3UOoq1uZ81RGlcEoSrEM0dk8SYv08ML3WTpFRyDrg=
-X-Received: by 2002:a81:a045:0:b0:56d:2c60:2f84 with SMTP id
- x66-20020a81a045000000b0056d2c602f84mr8419886ywg.46.1691430912283; Mon, 07
- Aug 2023 10:55:12 -0700 (PDT)
+        with ESMTP id S229875AbjHGSTG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 14:19:06 -0400
+Received: from mp-relay-02.fibernetics.ca (mp-relay-02.fibernetics.ca [208.85.217.137])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390F4194
+        for <linux-block@vger.kernel.org>; Mon,  7 Aug 2023 11:19:04 -0700 (PDT)
+Received: from mailpool-fe-01.fibernetics.ca (mailpool-fe-01.fibernetics.ca [208.85.217.144])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mp-relay-02.fibernetics.ca (Postfix) with ESMTPS id 566B975FDB;
+        Mon,  7 Aug 2023 18:14:00 +0000 (UTC)
+Received: from localhost (mailpool-mx-01.fibernetics.ca [208.85.217.140])
+        by mailpool-fe-01.fibernetics.ca (Postfix) with ESMTP id 4AF1E3EBBA;
+        Mon,  7 Aug 2023 18:14:00 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at 
+Received: from mailpool-fe-01.fibernetics.ca ([208.85.217.144])
+        by localhost (mail-mx-01.fibernetics.ca [208.85.217.140]) (amavisd-new, port 10024)
+        with ESMTP id aYMdM2wF4x-V; Mon,  7 Aug 2023 18:13:59 +0000 (UTC)
+Received: from [192.168.48.17] (host-192.252-165-26.dyn.295.ca [192.252.165.26])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: dgilbert@interlog.com)
+        by mail.ca.inter.net (Postfix) with ESMTPSA id C8DDB3EBB6;
+        Mon,  7 Aug 2023 18:13:59 +0000 (UTC)
+Message-ID: <ecae246e-42a5-850c-4208-e33ab9103511@interlog.com>
+Date:   Mon, 7 Aug 2023 14:13:59 -0400
 MIME-Version: 1.0
-References: <CAM9Jb+g5rrvmw8xCcwe3REK4x=RymrcqQ8cZavwWoWu7BH+8wA@mail.gmail.com>
- <20230713135413.2946622-1-houtao@huaweicloud.com> <CAM9Jb+jjg_By+A2F+HVBsHCMsVz1AEVWbBPtLTRTfOmtFao5hA@mail.gmail.com>
- <47f9753353d07e3beb60b6254632d740682376f9.camel@intel.com> <bcd1a935-b6ce-3941-5315-197f6876379e@intel.com>
-In-Reply-To: <bcd1a935-b6ce-3941-5315-197f6876379e@intel.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Mon, 7 Aug 2023 19:55:00 +0200
-Message-ID: <CAM9Jb+jmjDOsJz=D7GEtah4xFamVHUFsruh4eW7VtO6A8yCZTw@mail.gmail.com>
-Subject: Re: [PATCH v4] virtio_pmem: add the missing REQ_OP_WRITE for flush bio
-To:     Dave Jiang <dave.jiang@intel.com>
-Cc:     "Verma, Vishal L" <vishal.l.verma@intel.com>,
-        "houtao@huaweicloud.com" <houtao@huaweicloud.com>,
-        "houtao1@huawei.com" <houtao1@huawei.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "nvdimm@lists.linux.dev" <nvdimm@lists.linux.dev>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
-        "kch@nvidia.com" <kch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Reply-To: dgilbert@interlog.com
+Subject: Re: [PATCH v5 5/7] scsi: scsi_debug: Support injecting unaligned
+ write errors
+Content-Language: en-CA
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230731221458.437440-1-bvanassche@acm.org>
+ <20230731221458.437440-6-bvanassche@acm.org>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+In-Reply-To: <20230731221458.437440-6-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> >> Gentle ping!
-> >>
-> >> Dan, Vishal for suggestion/review on this patch and request for merging.
-> >> +Cc Michael for awareness, as virtio-pmem device is currently broken.
-> >
-> > Looks good to me,
-> >
-> > Reviewed-by: Vishal Verma <vishal.l.verma@intel.com>
-> >
-> > Dave, will you queue this for 6.6.
->
-> Looks like it's already queued:
-> https://git.kernel.org/pub/scm/linux/kernel/git/nvdimm/nvdimm.git/commit/?h=libnvdimm-for-next&id=c1dbd8a849183b9c12d257ad3043ecec50db50b3
+On 2023-07-31 18:14, Bart Van Assche wrote:
+> Allow user space software, e.g. a blktests test, to inject unaligned
+> write errors.
+> 
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Douglas Gilbert <dgilbert@interlog.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-Thank you, Dave!
+Acked-by: Douglas Gilbert <dgilbert@interlog.com>
 
-Best regards,
-Pankaj
+Thanks.
+
+> ---
+>   drivers/scsi/scsi_debug.c | 12 +++++++++++-
+>   1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+> index 57c6242bfb26..051b0605f11f 100644
+> --- a/drivers/scsi/scsi_debug.c
+> +++ b/drivers/scsi/scsi_debug.c
+> @@ -181,6 +181,7 @@ static const char *sdebug_version_date = "20210520";
+>   #define SDEBUG_OPT_NO_CDB_NOISE		0x4000
+>   #define SDEBUG_OPT_HOST_BUSY		0x8000
+>   #define SDEBUG_OPT_CMD_ABORT		0x10000
+> +#define SDEBUG_OPT_UNALIGNED_WRITE	0x20000
+>   #define SDEBUG_OPT_ALL_NOISE (SDEBUG_OPT_NOISE | SDEBUG_OPT_Q_NOISE | \
+>   			      SDEBUG_OPT_RESET_NOISE)
+>   #define SDEBUG_OPT_ALL_INJECTING (SDEBUG_OPT_RECOVERED_ERR | \
+> @@ -188,7 +189,8 @@ static const char *sdebug_version_date = "20210520";
+>   				  SDEBUG_OPT_DIF_ERR | SDEBUG_OPT_DIX_ERR | \
+>   				  SDEBUG_OPT_SHORT_TRANSFER | \
+>   				  SDEBUG_OPT_HOST_BUSY | \
+> -				  SDEBUG_OPT_CMD_ABORT)
+> +				  SDEBUG_OPT_CMD_ABORT | \
+> +				  SDEBUG_OPT_UNALIGNED_WRITE)
+>   #define SDEBUG_OPT_RECOV_DIF_DIX (SDEBUG_OPT_RECOVERED_ERR | \
+>   				  SDEBUG_OPT_DIF_ERR | SDEBUG_OPT_DIX_ERR)
+>   
+> @@ -3587,6 +3589,14 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
+>   	struct sdeb_store_info *sip = devip2sip(devip, true);
+>   	u8 *cmd = scp->cmnd;
+>   
+> +	if (unlikely(sdebug_opts & SDEBUG_OPT_UNALIGNED_WRITE &&
+> +		     atomic_read(&sdeb_inject_pending))) {
+> +		atomic_set(&sdeb_inject_pending, 0);
+> +		mk_sense_buffer(scp, ILLEGAL_REQUEST, LBA_OUT_OF_RANGE,
+> +				UNALIGNED_WRITE_ASCQ);
+> +		return check_condition_result;
+> +	}
+> +
+>   	switch (cmd[0]) {
+>   	case WRITE_16:
+>   		ei_lba = 0;
+
