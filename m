@@ -2,99 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8F8C001DB
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 16:39:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DDB8C001DB
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 17:14:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231185AbjHHQjT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 12:39:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38828 "EHLO
+        id S234198AbjHHROa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 13:14:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231209AbjHHQie (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 12:38:34 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F4DC525A
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 08:54:01 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        with ESMTP id S234108AbjHHRNt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 13:13:49 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3806526A6;
+        Tue,  8 Aug 2023 09:05:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8B5AD20310;
-        Tue,  8 Aug 2023 08:46:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1691484407; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1VmL4cnlNgAd9wIWh+n1F88tzINAPC+fI3K+o+7FiWI=;
-        b=kPmvuDyyKufNdk1d2aK3My5PVf/0qF0yLNCx+l0mgsLS5AkXAVPr6DcUFDdBqKiy2VQB6L
-        +CLlHOc0a28PZOaEGGb/4OEFRoO113NDS0BVDDAoY9dqUAMMr5qVx2mNXrWNbRaBYFTXkI
-        hq7BENiPoKY+rGn/vqLBMXSCBfSQyhE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1691484407;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1VmL4cnlNgAd9wIWh+n1F88tzINAPC+fI3K+o+7FiWI=;
-        b=ClDAnv4Er+7VUiVfj723l/hk/ylWWLCSHpwdDaXrQvWmmtVQlAefPBIZRcQp+dabW9EyR4
-        4AmUTlQLFoy260Aw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 718E4139D1;
-        Tue,  8 Aug 2023 08:46:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id qDuyG/cA0mQ8BQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Tue, 08 Aug 2023 08:46:47 +0000
-Date:   Tue, 8 Aug 2023 10:46:46 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [bug report] blktests nvme/047 failed due to /dev/nvme0n1 not
- created in time
-Message-ID: <vxeo2ucxhvdcm2z673keqerkpxay6dgfluuvxawukkbunddzm2@jdkdk7y3a5nu>
-References: <CAHj4cs9GNohGUjohNw93jrr8JGNcRYC-ienAZz+sa7az1RK77w@mail.gmail.com>
- <CAHj4cs9J7w_QSWMrj0ncufKwT9viS-o7pxmS2Y4FeaWEyPD34Q@mail.gmail.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0FA3F617C1;
+        Tue,  8 Aug 2023 08:57:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC090C433C8;
+        Tue,  8 Aug 2023 08:57:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691485069;
+        bh=jRxjFz09Uh7ZkVIXCQG/65cnOzMIdv2cBiHme7VbOvo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=EqsWvxVQnUY5uZoUjqDs00BsmyspxW0N3Nd/2KIExW4RCIDtEeMUjmgThJiJypC/J
+         HYmkIZkSVjOISExgk+Sn52YsNkU3YsV5ktKa+mMzjI7yGQS9Tkzp2Bl2g86u7DKA6t
+         AGqEdzVHORXG6kMTxD1BjgusWwxkxHHW3pz/fGgHFxgQd151ghwtd2xRW327ZHzTJN
+         YAm+A3xQXH0+IUsOsJ7Ew9c2uPNTaLWI2TJYriPpGprsNAKzC8UDrjuCjT3Mh3DW9p
+         KDEV2e49nCCgvtQ+6vRq48quiNlvKFpgyav0i6SkScKbs9fSGbKEOQLQP6lTLY//hm
+         tkpgCGhKIo7vg==
+From:   Christian Brauner <brauner@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: remove bdev->bd_super
+Date:   Tue,  8 Aug 2023 10:57:41 +0200
+Message-Id: <20230808-handhaben-jahrtausend-b3f041767517@brauner>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230807112625.652089-1-hch@lst.de>
+References: <20230807112625.652089-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1671; i=brauner@kernel.org; h=from:subject:message-id; bh=jRxjFz09Uh7ZkVIXCQG/65cnOzMIdv2cBiHme7VbOvo=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaRcYm6U+J4hEq746Uy2xOLOqnMH5h2ZfyHO8jrvPJ+E8nd8 u+5xdpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEwkyJORoc1ppZxui2vd8quNwaf/iK fz1S134NFzmV356sx2PTuWO4wMf8S2P7h36dux4y3zpH/dlItfmfMmfEn97E+tNxxLRCUusgAA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHj4cs9J7w_QSWMrj0ncufKwT9viS-o7pxmS2Y4FeaWEyPD34Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 04, 2023 at 06:33:04PM +0800, Yi Zhang wrote:
-> On Tue, Aug 1, 2023 at 7:28 PM Yi Zhang <yi.zhang@redhat.com> wrote:
-> > After some investigating, I found it was due to the /dev/nvme0n1 node
-> > couldn't be created in time which lead to the following fio failing.
-> > + nvme connect -t tcp -a 127.0.0.1 -s 4420 -n blktests-subsystem-1
-> > --hostnqn=nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
-> > --hostid=0f01fb42-9f7f-4856-b0b3-51e60b8de349 --nr-write-queues=1
-> > + ls -l /dev/nvme0 /dev/nvme-fabrics
-> > crw-------. 1 root root 234,   0 Aug  1 05:50 /dev/nvme0
-> > crw-------. 1 root root  10, 122 Aug  1 05:50 /dev/nvme-fabrics
-> > + '[' '!' -b /dev/nvme0n1 ']'
-> > + echo '/dev/nvme0n1 node still not created'
-> > dmesg:
-> > [ 1840.413396] loop0: detected capacity change from 0 to 10485760
-> > [ 1840.934379] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-> > [ 1841.018766] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
-> > [ 1846.782615] nvmet: creating nvm controller 1 for subsystem
-> > blktests-subsystem-1 for NQN
-> > nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
-> > [ 1846.808392] nvme nvme0: creating 33 I/O queues.
-> > [ 1846.874298] nvme nvme0: mapped 1/32/0 default/read/poll queues.
-> > [ 1846.945334] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr
-> > 127.0.0.1:4420
+On Mon, 07 Aug 2023 12:26:21 +0100, Christoph Hellwig wrote:
+> this series is against the vfs.super branch in the VFS tree and removes the
+> bd_super field in struct block_device.
+> 
+> Diffstat:
+>  fs/buffer.c               |   11 +++--------
+>  fs/ext4/ext4_jbd2.c       |    3 +--
+>  fs/ext4/super.c           |    1 -
+>  fs/ocfs2/journal.c        |    6 +++---
+>  fs/romfs/super.c          |    1 -
+>  fs/super.c                |    3 ---
+>  include/linux/blk_types.h |    1 -
+>  7 files changed, 7 insertions(+), 19 deletions(-)
+> 
+> [...]
 
-Not really sure how the blk device registration code works, but this
-looks like there something executed not in the same context as the
-nvme-cli command and thus we might return to userspace before the device
-is fully created. And there is also udev events which are handled by
-systemd. If this is the case, we might want to add some generic helper
-which waits for the device to pop up before we continue with the test.
+Applied to the vfs.super branch of the vfs/vfs.git tree.
+Patches in the vfs.super branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.super
+
+[1/4] fs: stop using bdev->bd_super in mark_buffer_write_io_error
+      https://git.kernel.org/vfs/vfs/c/0007ce9af88c
+[2/4] ext4: don't use bdev->bd_super in __ext4_journal_get_write_access
+      https://git.kernel.org/vfs/vfs/c/a9572cf0e7d2
+[3/4] ocfs2: stop using bdev->bd_super for journal error logging
+      https://git.kernel.org/vfs/vfs/c/807c772f2a12
+[4/4] fs, block: remove bdev->bd_super
+      https://git.kernel.org/vfs/vfs/c/0a59ff894703
