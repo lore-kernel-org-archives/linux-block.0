@@ -2,136 +2,168 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24106C001B0
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 17:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0D6C04A6A
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 17:56:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235079AbjHHR4K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 13:56:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33440 "EHLO
+        id S235111AbjHHR4T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 13:56:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231955AbjHHRzq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 13:55:46 -0400
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C3F42A815;
-        Tue,  8 Aug 2023 09:25:12 -0700 (PDT)
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-686ed1d2594so5637909b3a.2;
-        Tue, 08 Aug 2023 09:25:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691511869; x=1692116669;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2qgNS4DkRUi6QR/B4v/+tHHbyA7hT2tYZURhMtsh+Es=;
-        b=Cm/ddo8Iy7ejIYfIRaYmnf/iae17j9ESzbEr/mZDkonpHXV6C3lEEVQbb2lYS76RcW
-         r5gqxD5Gbp3lmHgDZ6hvh9i/nJyOTDXvSDINB/BMd8R/uHXSgXS4nDYHmOhBcy99cu+9
-         pN88qASzWJtjLk/VPhWJkpettB+fkEndEUuD/GQLp0RuwDNkuZ0OPHLiZmYC7FRGaEWF
-         LQK47c8KiOgIJMxBYXx/8zkKWdqOIVOs5ZMFlKDtCH5PL4l+QpJi1ejJ1TANRV7qijF6
-         ejETk0NxX/Zn0uaNaDn1Aqlf5Ne3XKdCC46DndfwdNRNkzuP7mEO3z3W0N+ha3n+aPsi
-         c/6Q==
-X-Gm-Message-State: AOJu0YxIq9zzn5aZCn0G566O1xPyMr1eWBIHM3Cqnz/Ml1xolI9Gbt38
-        iBUauk3v8aL3mCfl9jL5Sr+xm1+MLjs=
-X-Google-Smtp-Source: AGHT+IGi8chTo6biWKPL5WddtVnyrqZ6Q73m3OdAvun3EgO2v2Q5zkHcBpv/7uGiTQHy76JyUyu61g==
-X-Received: by 2002:a05:6a00:851:b0:67f:3dcd:bc00 with SMTP id q17-20020a056a00085100b0067f3dcdbc00mr17452354pfk.2.1691504457041;
-        Tue, 08 Aug 2023 07:20:57 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id j4-20020a635504000000b00563bee47a79sm6618903pgb.80.2023.08.08.07.20.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 07:20:56 -0700 (PDT)
-Message-ID: <95a6dbb4-b589-7f30-75b4-bc60f789512d@acm.org>
-Date:   Tue, 8 Aug 2023 07:20:55 -0700
+        with ESMTP id S230513AbjHHRzs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 13:55:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70AC1298AE
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 09:25:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2B7F961D9E
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 13:57:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C17FC433C8;
+        Tue,  8 Aug 2023 13:57:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691503027;
+        bh=ptKGcj+Hv+g5fxFGLRoGbRY5wCMXFJQrJ7vGDW5yqdU=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=bHKUoO4QK+Q/CDLxaofvtOGTg8zC5zWfq4nmRarquIz0r4KbQsaSYQcM/G6fMzE3S
+         WM067B6cntOLpQNKtoe2MuqQiX31IQhQTOjPofeTfJarfEIdWAUI2sobYBt41hoLOm
+         Tv4e4QbSyW4t4TBREfXCfrD18KSlp/4/3kN9Ht/3TM5DbyaZsgxEbLPJ/YiacS0Uba
+         m2a4qoPxKqPFhH3x61AxhcfkIMJ0tWVTmJ4JAzG9me99Mi6POgHfWhlFgSiJ2Pr8/Q
+         wGVlsNMB2FI5b6dspnpOIwjaHNcd0l66kgE+VCOa4OZJnUZdqLVpWlTZ5ijk7NcH2p
+         cNzkTOB02IaPw==
+From:   Damien Le Moal <dlemoal@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: [PATCH 5/5] block: switch ldm partition code to use pr_xxx() functions
+Date:   Tue,  8 Aug 2023 22:57:02 +0900
+Message-ID: <20230808135702.628588-6-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230808135702.628588-1-dlemoal@kernel.org>
+References: <20230808135702.628588-1-dlemoal@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v6 3/7] scsi: core: Retry unaligned zoned writes
-Content-Language: en-US
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230804154821.3232094-1-bvanassche@acm.org>
- <20230804154821.3232094-4-bvanassche@acm.org>
- <yq1y1imjod1.fsf@ca-mkp.ca.oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <yq1y1imjod1.fsf@ca-mkp.ca.oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/7/23 19:24, Martin K. Petersen wrote:
->> If zoned writes (REQ_OP_WRITE) for a sequential write required zone
->> have a starting LBA that differs from the write pointer, e.g. because
->> zoned writes have been reordered, then the storage device will respond
->> with an UNALIGNED WRITE COMMAND error. Send commands that failed with
->> an unaligned write error to the SCSI error handler if zone write
->> locking is disabled. Let the SCSI error handler sort SCSI commands per
->> LBA before resubmitting these.
->>
->> If zone write locking is disabled, increase the number of retries for
->> write commands sent to a sequential zone to the maximum number of
->> outstanding commands because in the worst case the number of times
->> reordered zoned writes have to be retried is (number of outstanding
->> writes per sequential zone) - 1.
-> 
-> I am afraid that I find falling back to rely on the error handler pretty
-> kludgy. It seems like there would be a more straightforward way ensure
-> that request ordering is preserved for devices that are known not to
-> reorder internally.
-> 
-> I probably missed the finer details of what was discussed while I was
-> away. But why can't we address the specific corner cases that cause the
-> unexpected reordering at the block layer? Sorting requests in the SCSI
-> error handler after a reported failure just seems like papering over the
-> fact that there's a problem elsewhere.
+Modify the ldm partition code to use the regular pr_info(), pr_err() etc
+functions instead of using printk(). With this change, the function
+_ldm_printk() is not necessary and removed. The special LDM_DEBUG
+configuration option is also removed as regular dynamic debug control
+can be used to turn on or off the debug messages. References to this
+configuration option is removed from the documentation and from the m68k
+defconfig.
 
-Hi Martin,
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ Documentation/admin-guide/ldm.rst |  7 +++----
+ arch/m68k/configs/virt_defconfig  |  1 -
+ block/partitions/Kconfig          | 10 ---------
+ block/partitions/ldm.c            | 35 +++++++------------------------
+ 4 files changed, 10 insertions(+), 43 deletions(-)
 
-An important question is whether it is possible to preserve the write order
-all the time. The software layers and hardware components that are involved
-in this context are:
-* The filesystem.
-* The block layer.
-* The I/O scheduler if an I/O scheduler is present.
-* The SCSI core.
-* The SCSI LLD.
-* The storage controller (UFSHCI in this case).
-* The link between storage controller and storage device.
-* The storage device (UFS in this case).
+diff --git a/Documentation/admin-guide/ldm.rst b/Documentation/admin-guide/ldm.rst
+index 12c571368e73..e7b69a03e938 100644
+--- a/Documentation/admin-guide/ldm.rst
++++ b/Documentation/admin-guide/ldm.rst
+@@ -80,10 +80,9 @@ To enable LDM, choose the following two options:
+   - "Advanced partition selection" CONFIG_PARTITION_ADVANCED
+   - "Windows Logical Disk Manager (Dynamic Disk) support" CONFIG_LDM_PARTITION
+ 
+-If you believe the driver isn't working as it should, you can enable the extra
+-debugging code.  This will produce a LOT of output.  The option is:
+-
+-  - "Windows LDM extra logging" CONFIG_LDM_DEBUG
++If you believe the driver isn't working as it should, you can enable extra
++debugging messages using dynamic debug.  This will produce a LOT of output.
++See Documentation/admin-guide/dynamic-debug-howto.rst for details.
+ 
+ N.B. The partition code cannot be compiled as a module.
+ 
+diff --git a/arch/m68k/configs/virt_defconfig b/arch/m68k/configs/virt_defconfig
+index 311b57e73316..94dd334da74f 100644
+--- a/arch/m68k/configs/virt_defconfig
++++ b/arch/m68k/configs/virt_defconfig
+@@ -19,7 +19,6 @@ CONFIG_MINIX_SUBPARTITION=y
+ CONFIG_SOLARIS_X86_PARTITION=y
+ CONFIG_UNIXWARE_DISKLABEL=y
+ CONFIG_LDM_PARTITION=y
+-CONFIG_LDM_DEBUG=y
+ CONFIG_SUN_PARTITION=y
+ CONFIG_SYSV68_PARTITION=y
+ CONFIG_NET=y
+diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
+index 7aff4eb81c60..71e4461fc35d 100644
+--- a/block/partitions/Kconfig
++++ b/block/partitions/Kconfig
+@@ -200,16 +200,6 @@ config LDM_PARTITION
+ 
+ 	  If unsure, say N.
+ 
+-config LDM_DEBUG
+-	bool "Windows LDM extra logging"
+-	depends on LDM_PARTITION
+-	help
+-	  Say Y here if you would like LDM to log verbosely.  This could be
+-	  helpful if the driver doesn't work as expected and you'd like to
+-	  report a bug.
+-
+-	  If unsure, say N.
+-
+ config SGI_PARTITION
+ 	bool "SGI partition support" if PARTITION_ADVANCED
+ 	default y if DEFAULT_SGI_PARTITION
+diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+index 38e58960ae03..691908c8c8f3 100644
+--- a/block/partitions/ldm.c
++++ b/block/partitions/ldm.c
+@@ -19,39 +19,18 @@
+ #include "ldm.h"
+ #include "check.h"
+ 
++#undef pr_fmt
++#define pr_fmt(fmt) "partition: ldm: " fmt
++
+ /*
+  * ldm_debug/info/error/crit - Output an error message
+  * @f:    A printf format string containing the message
+  * @...:  Variables to substitute into @f
+- *
+- * ldm_debug() writes a DEBUG level message to the syslog but only if the
+- * driver was compiled with debug enabled. Otherwise, the call turns into a NOP.
+  */
+-#ifndef CONFIG_LDM_DEBUG
+-#define ldm_debug(...)	do {} while (0)
+-#else
+-#define ldm_debug(f, a...) _ldm_printk (KERN_DEBUG, __func__, f, ##a)
+-#endif
+-
+-#define ldm_crit(f, a...)  _ldm_printk (KERN_CRIT,  __func__, f, ##a)
+-#define ldm_error(f, a...) _ldm_printk (KERN_ERR,   __func__, f, ##a)
+-#define ldm_info(f, a...)  _ldm_printk (KERN_INFO,  __func__, f, ##a)
+-
+-static __printf(3, 4)
+-void _ldm_printk(const char *level, const char *function, const char *fmt, ...)
+-{
+-	struct va_format vaf;
+-	va_list args;
+-
+-	va_start (args, fmt);
+-
+-	vaf.fmt = fmt;
+-	vaf.va = &args;
+-
+-	printk("%s%s(): %pV\n", level, function, &vaf);
+-
+-	va_end(args);
+-}
++#define ldm_debug(f, a...) pr_debug("%s(): " f, __func__, ##a)
++#define ldm_crit(f, a...)  pr_crit("%s(): " f, __func__, ##a)
++#define ldm_error(f, a...) pr_err("%s(): " f, __func__, ##a)
++#define ldm_info(f, a...)  pr_info("%s(): " f, __func__, ##a)
+ 
+ /**
+  * ldm_parse_privhead - Read the LDM Database PRIVHEAD structure
+-- 
+2.41.0
 
-The SCSI protocol allows SCSI devices, including UFS devices, to respond
-with a unit attention or the SCSI BUSY status at any time. If multiple write
-commands are pending and some of the pending SCSI commands are not executed
-because of a unit attention or because of another reason, this causes
-command reordering.
-
-The link between UFS controller and UFS device has a low but non-zero BER.
-If a SCSI command is lost by this link and has to be resent, this can cause
-reordering.
-
-Although I agree that the code in this patch that sorts and resubmits requests
-should be triggered infrequently, I don't think that such code can be avoided
-entirely. You may have noticed that a significant effort has been undertaken
-to eliminate certain causes of command reordering. See also:
-* [PATCH v4 0/5] ufs: Do not requeue while ungating the clock
-(https://lore.kernel.org/linux-scsi/20230529202640.11883-1-bvanassche@acm.org/).
-* [PATCH v6 00/11] mq-deadline: Improve support for zoned block devices
-(https://lore.kernel.org/linux-block/20230517174230.897144-1-bvanassche@acm.org/)
-* less special casing for flush requests v2
-(https://lore.kernel.org/linux-block/20230519044050.107790-1-hch@lst.de/)
-
-As you may be aware performance matters for UFS devices and performance of UFS
-devices increases gradually over time. It is important that the code added by
-this patch is triggered infrequently to achieve good performance so I have an
-interest myself in making sure that this code is triggered infrequently in
-current and also in future kernels.
-
-Since I think that it is not possible to avoid sorting and resubmitting
-requests entirely, I propose to proceed with the approach of this patch
-series.
-
-Thanks,
-
-Bart.
