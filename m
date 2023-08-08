@@ -2,168 +2,139 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0D6C04A6A
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 17:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCF3C04A94
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 17:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235111AbjHHR4T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 13:56:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58174 "EHLO
+        id S229600AbjHHR5X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 13:57:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230513AbjHHRzs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 13:55:48 -0400
+        with ESMTP id S231861AbjHHR4o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 13:56:44 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70AC1298AE
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 09:25:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596CFBF579
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 09:25:38 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2B7F961D9E
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 13:57:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C17FC433C8;
-        Tue,  8 Aug 2023 13:57:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691503027;
-        bh=ptKGcj+Hv+g5fxFGLRoGbRY5wCMXFJQrJ7vGDW5yqdU=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=bHKUoO4QK+Q/CDLxaofvtOGTg8zC5zWfq4nmRarquIz0r4KbQsaSYQcM/G6fMzE3S
-         WM067B6cntOLpQNKtoe2MuqQiX31IQhQTOjPofeTfJarfEIdWAUI2sobYBt41hoLOm
-         Tv4e4QbSyW4t4TBREfXCfrD18KSlp/4/3kN9Ht/3TM5DbyaZsgxEbLPJ/YiacS0Uba
-         m2a4qoPxKqPFhH3x61AxhcfkIMJ0tWVTmJ4JAzG9me99Mi6POgHfWhlFgSiJ2Pr8/Q
-         wGVlsNMB2FI5b6dspnpOIwjaHNcd0l66kgE+VCOa4OZJnUZdqLVpWlTZ5ijk7NcH2p
-         cNzkTOB02IaPw==
-From:   Damien Le Moal <dlemoal@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH 5/5] block: switch ldm partition code to use pr_xxx() functions
-Date:   Tue,  8 Aug 2023 22:57:02 +0900
-Message-ID: <20230808135702.628588-6-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230808135702.628588-1-dlemoal@kernel.org>
-References: <20230808135702.628588-1-dlemoal@kernel.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A45146242D
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 08:08:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BF0FC433C7;
+        Tue,  8 Aug 2023 08:08:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1691482139;
+        bh=01W2hqms8ZqWd00aCRj2aWotAjT/HqjOmCQ8l6gmh14=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=iRL9wCGrwqWzwHC2s/LKjqv3DIXoaU1m1eE2ZfUKy5RP6HxhtgKGbkeEm992lG7y6
+         Sa2vW/koBPgfvyTvEwx1rfxzzVrvU8cQwwcwt109Am4XzNo0qTpaxfXVtA6c6lCxqb
+         2Xb37oJySVLIYEvtEMLb07T2TVeN24n4/helYTDY=
+Date:   Tue, 8 Aug 2023 10:08:56 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Atul Kumar Pant <atulpant.linux@gmail.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+        shuah@kernel.org, linux-kernel-mentees@lists.linuxfoundation.org,
+        nbd@other.debian.org
+Subject: Re: [PATCH v1] drivers: block: Updates return value check
+Message-ID: <2023080841-preacher-lunchroom-7c8c@gregkh>
+References: <20230806122351.157168-1-atulpant.linux@gmail.com>
+ <2023080600-pretext-corporal-61e3@gregkh>
+ <20230807114420.GA5826@atom0118>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230807114420.GA5826@atom0118>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Modify the ldm partition code to use the regular pr_info(), pr_err() etc
-functions instead of using printk(). With this change, the function
-_ldm_printk() is not necessary and removed. The special LDM_DEBUG
-configuration option is also removed as regular dynamic debug control
-can be used to turn on or off the debug messages. References to this
-configuration option is removed from the documentation and from the m68k
-defconfig.
+On Mon, Aug 07, 2023 at 05:14:20PM +0530, Atul Kumar Pant wrote:
+> On Sun, Aug 06, 2023 at 03:36:18PM +0200, Greg KH wrote:
+> > On Sun, Aug 06, 2023 at 05:53:51PM +0530, Atul Kumar Pant wrote:
+> > > Updating the check of return value from debugfs_create_dir
+> > > to use IS_ERR.
+> > 
+> > Why?
+> > 
+> > > 
+> > > Signed-off-by: Atul Kumar Pant <atulpant.linux@gmail.com>
+> > > ---
+> > >  drivers/block/nbd.c     | 4 ++--
+> > >  drivers/block/pktcdvd.c | 2 +-
+> > >  2 files changed, 3 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > > index 9c35c958f2c8..65ecde3e2a5b 100644
+> > > --- a/drivers/block/nbd.c
+> > > +++ b/drivers/block/nbd.c
+> > > @@ -1666,7 +1666,7 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
+> > >  		return -EIO;
+> > >  
+> > >  	dir = debugfs_create_dir(nbd_name(nbd), nbd_dbg_dir);
+> > > -	if (!dir) {
+> > > +	if (IS_ERR(dir)) {
+> > >  		dev_err(nbd_to_dev(nbd), "Failed to create debugfs dir for '%s'\n",
+> > >  			nbd_name(nbd));
+> > >  		return -EIO;
+> > 
+> > This isn't correct, sorry.  Please do not make this change.
+> > 
+> > > @@ -1692,7 +1692,7 @@ static int nbd_dbg_init(void)
+> > >  	struct dentry *dbg_dir;
+> > >  
+> > >  	dbg_dir = debugfs_create_dir("nbd", NULL);
+> > > -	if (!dbg_dir)
+> > > +	if (IS_ERR(dbg_dir))
+> > >  		return -EIO;
+> > 
+> > Again, not corrct.
+> > 
+> > >  	nbd_dbg_dir = dbg_dir;
+> > > diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+> > > index d5d7884cedd4..69e5a100b3cf 100644
+> > > --- a/drivers/block/pktcdvd.c
+> > > +++ b/drivers/block/pktcdvd.c
+> > > @@ -451,7 +451,7 @@ static void pkt_debugfs_dev_new(struct pktcdvd_device *pd)
+> > >  	if (!pkt_debugfs_root)
+> > >  		return;
+> > >  	pd->dfs_d_root = debugfs_create_dir(pd->name, pkt_debugfs_root);
+> > > -	if (!pd->dfs_d_root)
+> > > +	if (IS_ERR(pd->dfs_d_root))
+> > >  		return;
+> > 
+> > Also not correct.
+> > 
+> > Why check the return value at all?  As this check has always been wrong,
+> > why are you wanting to keep it?
+> 
+>     I'll check the code again. I was not aware that this check is wrong,
+>     so just tried to fix this based on return value of
+>     debugfs_create_dir.
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- Documentation/admin-guide/ldm.rst |  7 +++----
- arch/m68k/configs/virt_defconfig  |  1 -
- block/partitions/Kconfig          | 10 ---------
- block/partitions/ldm.c            | 35 +++++++------------------------
- 4 files changed, 10 insertions(+), 43 deletions(-)
+The return value of debugfs_create_dir() should never need to be checked
+at all.  The value passed in can be later used in any debugfs call
+safely, be it an error or success.  The kernel logic should NOT change
+based on if debugfs is working properly or not.
 
-diff --git a/Documentation/admin-guide/ldm.rst b/Documentation/admin-guide/ldm.rst
-index 12c571368e73..e7b69a03e938 100644
---- a/Documentation/admin-guide/ldm.rst
-+++ b/Documentation/admin-guide/ldm.rst
-@@ -80,10 +80,9 @@ To enable LDM, choose the following two options:
-   - "Advanced partition selection" CONFIG_PARTITION_ADVANCED
-   - "Windows Logical Disk Manager (Dynamic Disk) support" CONFIG_LDM_PARTITION
- 
--If you believe the driver isn't working as it should, you can enable the extra
--debugging code.  This will produce a LOT of output.  The option is:
--
--  - "Windows LDM extra logging" CONFIG_LDM_DEBUG
-+If you believe the driver isn't working as it should, you can enable extra
-+debugging messages using dynamic debug.  This will produce a LOT of output.
-+See Documentation/admin-guide/dynamic-debug-howto.rst for details.
- 
- N.B. The partition code cannot be compiled as a module.
- 
-diff --git a/arch/m68k/configs/virt_defconfig b/arch/m68k/configs/virt_defconfig
-index 311b57e73316..94dd334da74f 100644
---- a/arch/m68k/configs/virt_defconfig
-+++ b/arch/m68k/configs/virt_defconfig
-@@ -19,7 +19,6 @@ CONFIG_MINIX_SUBPARTITION=y
- CONFIG_SOLARIS_X86_PARTITION=y
- CONFIG_UNIXWARE_DISKLABEL=y
- CONFIG_LDM_PARTITION=y
--CONFIG_LDM_DEBUG=y
- CONFIG_SUN_PARTITION=y
- CONFIG_SYSV68_PARTITION=y
- CONFIG_NET=y
-diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
-index 7aff4eb81c60..71e4461fc35d 100644
---- a/block/partitions/Kconfig
-+++ b/block/partitions/Kconfig
-@@ -200,16 +200,6 @@ config LDM_PARTITION
- 
- 	  If unsure, say N.
- 
--config LDM_DEBUG
--	bool "Windows LDM extra logging"
--	depends on LDM_PARTITION
--	help
--	  Say Y here if you would like LDM to log verbosely.  This could be
--	  helpful if the driver doesn't work as expected and you'd like to
--	  report a bug.
--
--	  If unsure, say N.
--
- config SGI_PARTITION
- 	bool "SGI partition support" if PARTITION_ADVANCED
- 	default y if DEFAULT_SGI_PARTITION
-diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
-index 38e58960ae03..691908c8c8f3 100644
---- a/block/partitions/ldm.c
-+++ b/block/partitions/ldm.c
-@@ -19,39 +19,18 @@
- #include "ldm.h"
- #include "check.h"
- 
-+#undef pr_fmt
-+#define pr_fmt(fmt) "partition: ldm: " fmt
-+
- /*
-  * ldm_debug/info/error/crit - Output an error message
-  * @f:    A printf format string containing the message
-  * @...:  Variables to substitute into @f
-- *
-- * ldm_debug() writes a DEBUG level message to the syslog but only if the
-- * driver was compiled with debug enabled. Otherwise, the call turns into a NOP.
-  */
--#ifndef CONFIG_LDM_DEBUG
--#define ldm_debug(...)	do {} while (0)
--#else
--#define ldm_debug(f, a...) _ldm_printk (KERN_DEBUG, __func__, f, ##a)
--#endif
--
--#define ldm_crit(f, a...)  _ldm_printk (KERN_CRIT,  __func__, f, ##a)
--#define ldm_error(f, a...) _ldm_printk (KERN_ERR,   __func__, f, ##a)
--#define ldm_info(f, a...)  _ldm_printk (KERN_INFO,  __func__, f, ##a)
--
--static __printf(3, 4)
--void _ldm_printk(const char *level, const char *function, const char *fmt, ...)
--{
--	struct va_format vaf;
--	va_list args;
--
--	va_start (args, fmt);
--
--	vaf.fmt = fmt;
--	vaf.va = &args;
--
--	printk("%s%s(): %pV\n", level, function, &vaf);
--
--	va_end(args);
--}
-+#define ldm_debug(f, a...) pr_debug("%s(): " f, __func__, ##a)
-+#define ldm_crit(f, a...)  pr_crit("%s(): " f, __func__, ##a)
-+#define ldm_error(f, a...) pr_err("%s(): " f, __func__, ##a)
-+#define ldm_info(f, a...)  pr_info("%s(): " f, __func__, ##a)
- 
- /**
-  * ldm_parse_privhead - Read the LDM Database PRIVHEAD structure
--- 
-2.41.0
+So for stuff like this, where the check is obviously wrong (i.e. it's
+never caught an error, it's even more of a good idea to remove the
+check.
 
+> > 
+> > Also, you never responded to our previous review comments, why not?  To
+> > ignore people is not generally considered a good idea :(
+> 
+>     I might have missed seeing your comments hence I did not reply back.
+>     Please accept my sincere apologies for this.
+
+Oops, nope, my apologies, this was my fault.  I got you confused with a
+different developer sending patches to the kernel-mentees mailing list
+with the same first name.  I should have checked better, again my fault,
+sorry.
+
+So all is good with your responses, but you should fix these up to NOT
+check the return value at all.
+
+thanks,
+
+greg k-h
