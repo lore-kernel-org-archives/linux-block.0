@@ -2,56 +2,61 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1945C001DB
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 16:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 240EDC001B0
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 16:13:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232082AbjHHQLq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 12:11:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32870 "EHLO
+        id S232108AbjHHQMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 12:12:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbjHHQJp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 12:09:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9CA7A83
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 08:46:22 -0700 (PDT)
+        with ESMTP id S231371AbjHHQLY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 12:11:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E443B3A81
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 08:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691509567;
+        s=mimecast20190719; t=1691509578;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cH8+J+v5eCSEAo5zzPYOsTrKPWy+zXGNhCQOIixYmz0=;
-        b=hEWW1uGTe+46JA2K7EtdqN8NNzv49+gZ8PjIEjr3Ukg8FDmNUNn+NLWUK/ucVmvwWNVVPD
-        pzSedgcNk/jOHF+lP2UqsezxvEz2s1gOXDE+J1uf+7XlxHAf4YzbAZwvXCJfmyCGzK8JDY
-        l2IRjU6HBtldgGIvlVlfBwuDX2Ps8UI=
+        bh=jmP+yqN1CMl4seuzyOdC4zCzUZWNFx4ZDmn6s0/7WWk=;
+        b=Jsf9oT2dLPdUiTsJQNZ0BUo+q/dWB2CrdZzPdXmTf8qzfGf6+/qYQjqOSgjIwVl3TMZvKJ
+        oEyzr4/FcaIe7XbFOSjSuQFbiUNNQ8NTzAcg6+CdvKgZ50JmhofbfBH3YSIX3qKyCq4hD4
+        QC3GzSJAVxJJMo02+sUEX/Qlv/4YwAI=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-694-ORIgDiMuM2yLXyVmCPXrgg-1; Tue, 08 Aug 2023 06:43:30 -0400
-X-MC-Unique: ORIgDiMuM2yLXyVmCPXrgg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-642-wIauOLLpNZKM2kg1dDb2WQ-1; Tue, 08 Aug 2023 06:43:19 -0400
+X-MC-Unique: wIauOLLpNZKM2kg1dDb2WQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 363D685CCE1;
-        Tue,  8 Aug 2023 10:43:30 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 201908DC666;
+        Tue,  8 Aug 2023 10:43:19 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5FD0C140E962;
-        Tue,  8 Aug 2023 10:43:29 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 54067492C13;
+        Tue,  8 Aug 2023 10:43:17 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         linux-nvme@lists.infradead.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         linux-scsi@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Wen Xiong <wenxiong@linux.ibm.com>,
-        Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 12/14] scsi: ufs: limit max allowed nr_hw_queues
-Date:   Tue,  8 Aug 2023 18:42:37 +0800
-Message-Id: <20230808104239.146085-13-ming.lei@redhat.com>
+        Keith Busch <kbusch@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>
+Subject: [PATCH V3 09/14] scsi: mpt3sas: take blk_mq_max_nr_hw_queues() into account for calculating io vectors
+Date:   Tue,  8 Aug 2023 18:42:34 +0800
+Message-Id: <20230808104239.146085-10-ming.lei@redhat.com>
 In-Reply-To: <20230808104239.146085-1-ming.lei@redhat.com>
 References: <20230808104239.146085-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -60,8 +65,8 @@ Take blk-mq's knowledge into account for calculating io queues.
 
 Fix wrong queue mapping in case of kdump kernel.
 
-On arm and ppc64, 'maxcpus=1' is passed to kdump command line, see
-`Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
+On arm and ppc64, 'maxcpus=1' is passed to kdump kernel command line,
+see `Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
 still returns all CPUs because 'maxcpus=1' just bring up one single
 cpu core during booting.
 
@@ -72,24 +77,29 @@ wrong queue mapping for handling IO, and IO timeout is triggered.
 Meantime, single queue makes much less resource utilization, and reduce
 risk of kernel failure.
 
+Cc: Sathya Prakash <sathya.prakash@broadcom.com>
+Cc: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Cc: Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/ufs/core/ufs-mcq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/scsi/mpt3sas/mpt3sas_base.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/ufs/core/ufs-mcq.c b/drivers/ufs/core/ufs-mcq.c
-index 6fb0e007af63..7d808836b018 100644
---- a/drivers/ufs/core/ufs-mcq.c
-+++ b/drivers/ufs/core/ufs-mcq.c
-@@ -186,7 +186,7 @@ static int ufshcd_mcq_config_nr_queues(struct ufs_hba *hba)
+diff --git a/drivers/scsi/mpt3sas/mpt3sas_base.c b/drivers/scsi/mpt3sas/mpt3sas_base.c
+index 53f5492579cb..d238e0275edd 100644
+--- a/drivers/scsi/mpt3sas/mpt3sas_base.c
++++ b/drivers/scsi/mpt3sas/mpt3sas_base.c
+@@ -3332,8 +3332,8 @@ _base_alloc_irq_vectors(struct MPT3SAS_ADAPTER *ioc)
+ 	 * Don't allocate msix vectors for poll_queues.
+ 	 * msix_vectors is always within a range of FW supported reply queue.
+ 	 */
+-	int nr_msix_vectors = ioc->iopoll_q_start_index;
+-
++	int nr_msix_vectors = min_t(unsigned int, ioc->iopoll_q_start_index,
++			scsi_max_nr_hw_queues());
  
- 	if (!hba->nr_queues[HCTX_TYPE_DEFAULT])
- 		hba->nr_queues[HCTX_TYPE_DEFAULT] = min3(rem, rw_queues,
--							 num_possible_cpus());
-+							 scsi_max_nr_hw_queues());
- 
- 	for (i = 0; i < HCTX_MAX_TYPES; i++)
- 		host->nr_hw_queues += hba->nr_queues[i];
+ 	if (ioc->smp_affinity_enable)
+ 		irq_flags |= PCI_IRQ_AFFINITY | PCI_IRQ_ALL_TYPES;
 -- 
 2.40.1
 
