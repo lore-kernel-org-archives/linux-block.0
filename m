@@ -2,95 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5911CC001DE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 16:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8F8C001DB
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 16:39:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232953AbjHHQdh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 12:33:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58070 "EHLO
+        id S231185AbjHHQjT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 12:39:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232988AbjHHQcp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 12:32:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E1C31007
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 08:51:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691509863;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+        with ESMTP id S231209AbjHHQie (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 12:38:34 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F4DC525A
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 08:54:01 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8B5AD20310;
+        Tue,  8 Aug 2023 08:46:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1691484407; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2TEtH5yVIZkcHhXlx7zXOq0kKCJ4wWHrHIE0jkzlzuw=;
-        b=SG38S9sH9NxrPtGfu1M2GpEk9LKC2SwJZR6LY5Wqw9y1aigjNCgmfs/F2S+Ya+9Z7S8KyO
-        E/aWP3Gi6+DdDTELP0bOW24CXJblox5I/RnV13rJS8ze5aXdmehBCeG3/faqbtOqker2/I
-        41O+2obluAlhGX2q8dNSwRXakfpFoCk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-90-leUcPBTANJW2QpPc0r0CxA-1; Tue, 08 Aug 2023 06:43:33 -0400
-X-MC-Unique: leUcPBTANJW2QpPc0r0CxA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        bh=1VmL4cnlNgAd9wIWh+n1F88tzINAPC+fI3K+o+7FiWI=;
+        b=kPmvuDyyKufNdk1d2aK3My5PVf/0qF0yLNCx+l0mgsLS5AkXAVPr6DcUFDdBqKiy2VQB6L
+        +CLlHOc0a28PZOaEGGb/4OEFRoO113NDS0BVDDAoY9dqUAMMr5qVx2mNXrWNbRaBYFTXkI
+        hq7BENiPoKY+rGn/vqLBMXSCBfSQyhE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1691484407;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1VmL4cnlNgAd9wIWh+n1F88tzINAPC+fI3K+o+7FiWI=;
+        b=ClDAnv4Er+7VUiVfj723l/hk/ylWWLCSHpwdDaXrQvWmmtVQlAefPBIZRcQp+dabW9EyR4
+        4AmUTlQLFoy260Aw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 604A785CCE1;
-        Tue,  8 Aug 2023 10:43:33 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C31B140E962;
-        Tue,  8 Aug 2023 10:43:32 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-nvme@lists.infradead.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Wen Xiong <wenxiong@linux.ibm.com>,
-        Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 13/14] scsi: storvsc: limit max allowed nr_hw_queues
-Date:   Tue,  8 Aug 2023 18:42:38 +0800
-Message-Id: <20230808104239.146085-14-ming.lei@redhat.com>
-In-Reply-To: <20230808104239.146085-1-ming.lei@redhat.com>
-References: <20230808104239.146085-1-ming.lei@redhat.com>
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 718E4139D1;
+        Tue,  8 Aug 2023 08:46:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id qDuyG/cA0mQ8BQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 08 Aug 2023 08:46:47 +0000
+Date:   Tue, 8 Aug 2023 10:46:46 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [bug report] blktests nvme/047 failed due to /dev/nvme0n1 not
+ created in time
+Message-ID: <vxeo2ucxhvdcm2z673keqerkpxay6dgfluuvxawukkbunddzm2@jdkdk7y3a5nu>
+References: <CAHj4cs9GNohGUjohNw93jrr8JGNcRYC-ienAZz+sa7az1RK77w@mail.gmail.com>
+ <CAHj4cs9J7w_QSWMrj0ncufKwT9viS-o7pxmS2Y4FeaWEyPD34Q@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+In-Reply-To: <CAHj4cs9J7w_QSWMrj0ncufKwT9viS-o7pxmS2Y4FeaWEyPD34Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Take blk-mq's knowledge into account for calculating io queues.
+On Fri, Aug 04, 2023 at 06:33:04PM +0800, Yi Zhang wrote:
+> On Tue, Aug 1, 2023 at 7:28 PM Yi Zhang <yi.zhang@redhat.com> wrote:
+> > After some investigating, I found it was due to the /dev/nvme0n1 node
+> > couldn't be created in time which lead to the following fio failing.
+> > + nvme connect -t tcp -a 127.0.0.1 -s 4420 -n blktests-subsystem-1
+> > --hostnqn=nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> > --hostid=0f01fb42-9f7f-4856-b0b3-51e60b8de349 --nr-write-queues=1
+> > + ls -l /dev/nvme0 /dev/nvme-fabrics
+> > crw-------. 1 root root 234,   0 Aug  1 05:50 /dev/nvme0
+> > crw-------. 1 root root  10, 122 Aug  1 05:50 /dev/nvme-fabrics
+> > + '[' '!' -b /dev/nvme0n1 ']'
+> > + echo '/dev/nvme0n1 node still not created'
+> > dmesg:
+> > [ 1840.413396] loop0: detected capacity change from 0 to 10485760
+> > [ 1840.934379] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+> > [ 1841.018766] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+> > [ 1846.782615] nvmet: creating nvm controller 1 for subsystem
+> > blktests-subsystem-1 for NQN
+> > nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> > [ 1846.808392] nvme nvme0: creating 33 I/O queues.
+> > [ 1846.874298] nvme nvme0: mapped 1/32/0 default/read/poll queues.
+> > [ 1846.945334] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr
+> > 127.0.0.1:4420
 
-Fix wrong queue mapping in case of kdump kernel.
-
-On arm and ppc64, 'maxcpus=1' is passed to kdump command line, see
-`Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
-still returns all CPUs because 'maxcpus=1' just bring up one single
-cpu core during booting.
-
-blk-mq sees single queue in kdump kernel, and in driver's viewpoint
-there are still multiple queues, this inconsistency causes driver to apply
-wrong queue mapping for handling IO, and IO timeout is triggered.
-
-Meantime, single queue makes much less resource utilization, and reduce
-risk of kernel failure.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/storvsc_drv.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/scsi/storvsc_drv.c b/drivers/scsi/storvsc_drv.c
-index f2823218670a..50df040b100d 100644
---- a/drivers/scsi/storvsc_drv.c
-+++ b/drivers/scsi/storvsc_drv.c
-@@ -2040,6 +2040,9 @@ static int storvsc_probe(struct hv_device *device,
- 			host->nr_hw_queues = storvsc_max_hw_queues;
- 		else
- 			host->nr_hw_queues = num_present_cpus;
-+		if (host->nr_hw_queues > scsi_max_nr_hw_queues())
-+			host->nr_hw_queues = scsi_max_nr_hw_queues();
-+
- 	}
- 
- 	/*
--- 
-2.40.1
-
+Not really sure how the blk device registration code works, but this
+looks like there something executed not in the same context as the
+nvme-cli command and thus we might return to userspace before the device
+is fully created. And there is also udev events which are handled by
+systemd. If this is the case, we might want to add some generic helper
+which waits for the device to pop up before we continue with the test.
