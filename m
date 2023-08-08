@@ -2,90 +2,134 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C47E3C001DB
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 18:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2EE4C04A6A
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 19:45:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235758AbjHHSZD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 14:25:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51800 "EHLO
+        id S236286AbjHHTpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 15:45:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235776AbjHHSYc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 14:24:32 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 073C3BC0C
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 10:36:53 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id ca18e2360f4ac-790b6761117so69824539f.0
-        for <linux-block@vger.kernel.org>; Tue, 08 Aug 2023 10:36:53 -0700 (PDT)
+        with ESMTP id S233224AbjHHTpQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 15:45:16 -0400
+Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6764E46FFB
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 09:48:38 -0700 (PDT)
+Received: by mail-oo1-xc2e.google.com with SMTP id 006d021491bc7-56c7f47ec42so4184328eaf.2
+        for <linux-block@vger.kernel.org>; Tue, 08 Aug 2023 09:48:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691516212; x=1692121012;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W12zFQNYWmf7lxVitQTmsPU6ohpCj7vCRxt2BuviHRg=;
-        b=xyGAFtDAT2tPBjTd1aJ2XnvUCud1/g6zAx2AYWN70Ly+He1mw+fJy0CddhXj9UAMa1
-         BT0sTdPbrjmzUnLFsLkFiJTPh8YdHBLKoIV9BLRBVisNoPW9xjyljU3gy9pSSakFXQRC
-         ZsLkvep318DI/l8tr/l0qx3G2LX0HLnQVgo+4IFp9WyqT63g0U7unp/Q21UB1uQRSMb3
-         oju4r/2GglDgnu/oWymTVrJaBSPDpiOOqWuQCkNJs/qV0bvyb+p+Q06/Bdc8k+N9uxCY
-         fe/akn93vobbJaJ6e+Oso3xFlLzFNctNYzRW7oJHlnDl7nbu4pDLpxM8eA/Oi0U3aNev
-         +pXw==
+        d=linaro.org; s=google; t=1691513317; x=1692118117;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Klg6b7rTmA3/2CEHhPBL9kFFomypTM/SqIrAORONAmA=;
+        b=HrUbAcZIcVGRlX4zScFuELATxKdyvbp8EoYD8gur7LDE7cd5xkSvkeb+qNOJVt0CgL
+         LpTgzCdKpBZ7s2chVEtBBqVGogsqFTl9bq6RmfljA1CUD35mRS6sBgjIzjTc6KlFC79F
+         umcgeR/4HIAAj+b0Lo1DU1sFg1qCBjU/SiZgIMmR1BntscuFlo1j6GejwT7eEtpLimsN
+         lnObmx/g9G7HFVlqt6LunRJL7bpGVgXibXcMV3yfTWBMs3vEBbwDfRHWh3hl06cisFnx
+         ZoXASz3ETrAAJ6POgDAueIlxE0o+jAu1YzU7388HyDJPcK9lBbMWtdY9x8g7nQ7s0I3X
+         PQ6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691516212; x=1692121012;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W12zFQNYWmf7lxVitQTmsPU6ohpCj7vCRxt2BuviHRg=;
-        b=iymQjCsA8+D52vdMkN8Od0NZ56mdKFxgHR15Vb3MZAdw06ugg94rqkJtHFNtiHYNXL
-         O181TfB4UpRAV1S0Qy/ogt1GejZ9hPtEcNFX+dh7aGHKFyn9+rfnzTVcq+r8bsiShhRM
-         Oz0N6xkX5mLgDv5J1iuwIpVctft7stgmSzkyV2jwyYDytFNCHi59ZjbmMD6FKidEX8SQ
-         qS6AtOdDu/BJXOykzGYzxLTOEgJFFi0q+pVT+6kWUO/MQpGhix9MWFPxNZvB6tihW1N2
-         8G8WNslpVWNgoGIGwERtv5soZSfbOJSrIYkSPzJ7vX32j2u+km41UaOHtzlL6TIACv2O
-         eiPQ==
-X-Gm-Message-State: AOJu0YwZ+WvAnK++5ZDnJu4zJKTgaXEG8exPhwHeXArVIMcg+bbz+Pxk
-        hNfiU6MdbmTtr3V2Ej/FEo5QmcvpYGMCrl3Pb0I=
-X-Google-Smtp-Source: AGHT+IH62rOiVnjNuGqI06d97/ArjLGjXdQg2Q222YmDWvHqg+md7I8nZsJjL9J0VbHSwYXwamnV3g==
-X-Received: by 2002:a05:6602:3798:b0:780:d65c:d78f with SMTP id be24-20020a056602379800b00780d65cd78fmr335599iob.2.1691516212356;
-        Tue, 08 Aug 2023 10:36:52 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id a24-20020a6b6618000000b007909b061efbsm3771878ioc.23.2023.08.08.10.36.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 10:36:51 -0700 (PDT)
-Message-ID: <5e560155-b2a4-e5bd-d22e-0e44a5a85f43@kernel.dk>
-Date:   Tue, 8 Aug 2023 11:36:51 -0600
+        d=1e100.net; s=20221208; t=1691513317; x=1692118117;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Klg6b7rTmA3/2CEHhPBL9kFFomypTM/SqIrAORONAmA=;
+        b=b/saTCVGHesABv/ObF6fMq/SlovhCBjoSlH7C96C1CH1EbVqUiMoiV6MQt14zhQ7Ep
+         eqp/40CBLDjQwFcJkeoxq5SfAJiQH48TBB7HOh3zTsj5xXthJiHrIW2ZT658nl55LM3H
+         KvGhrra8llEDI/IV9RUfYfcn09B+rPk+pcVhNLk6ZfRgbNZEELD3ECzP6GPCfgtlQntB
+         8mQpG0pv8r1p4Dy/lhc7e28aHe+ap+lkaGL3v4IHofNYCm4RDlQYKU7dkjm3lMDtL0VL
+         ePGZCv97IbVk9RGzFk9SVsGORfqds7KXfuqBA2gCS1ZT8M97x56iGJJtI8lcvUcTaRiy
+         RvHg==
+X-Gm-Message-State: AOJu0YzxCelwXM0XFdwdkf89ww/6XqxZMZPrhNtv5ZEDxxNmS1feq9xY
+        VIlXDoxz0FexjEqHu7E3qsuFFO/cgNmwGbXG8sxc4VMIHV3pVY54R5s=
+X-Google-Smtp-Source: AGHT+IFyFm7A28IM+G0on9OcPQxQMVC4tFTmtVJz+gYpID8XubCbPflmb8sfgiBS79hEh9WW2BWOpIws/LS1JffnNds=
+X-Received: by 2002:a05:6358:419b:b0:134:ca8a:7486 with SMTP id
+ w27-20020a056358419b00b00134ca8a7486mr11887238rwc.28.1691492428398; Tue, 08
+ Aug 2023 04:00:28 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH -next] drbd: Use helper put_drbd_dev() and get_drbd_dev()
-Content-Language: en-US
-To:     Ruan Jinjie <ruanjinjie@huawei.com>, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-References: <20230808090111.2420717-1-ruanjinjie@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230808090111.2420717-1-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <cover.1689802933.git.daniel@makrotopia.org> <1ce5f56df546cec25ef741f381286f1d7c33d000.1689802933.git.daniel@makrotopia.org>
+ <CAPDyKFqhZtCHVmCNnm_Qm7X+=GtJY8uNJOWOgZXuTTVEw0msNA@mail.gmail.com> <ZNGULFxXpLT7zn35@makrotopia.org>
+In-Reply-To: <ZNGULFxXpLT7zn35@makrotopia.org>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Tue, 8 Aug 2023 12:59:52 +0200
+Message-ID: <CAPDyKFrpWgA=e-FSoKfYhWSOq5m5_pHjxgzaGeOFHFhU_mcmNw@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/6] mmc: block: set fwnode of disk devices
+To:     Daniel Golle <daniel@makrotopia.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
+        Christian Loehle <CLoehle@hyperstone.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ye Bin <yebin10@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/23 3:01 AM, Ruan Jinjie wrote:
-> The drbd_destroy_device() arg of this code is already duplicated
-> 18 times, use helper function put_drbd_dev() to release drbd_device
-> and related resources instead of open coding it to help improve
-> code readability a bit.
-> 
-> And add get_drbd_dev() helper function to be symmetrical with it.
-> 
-> No functional change involved.
+On Tue, 8 Aug 2023 at 03:02, Daniel Golle <daniel@makrotopia.org> wrote:
+>
+> Hi Ulf,
+>
+> thank you for reviewing and suggesting ways to improve this series!
+>
+> On Mon, Aug 07, 2023 at 03:48:31PM +0200, Ulf Hansson wrote:
+> > On Thu, 20 Jul 2023 at 00:02, Daniel Golle <daniel@makrotopia.org> wrote:
+> > >
+> > > Set fwnode of disk devices to 'block', 'boot0' and 'boot1' subnodes of
+> > > the mmc-card. This is done in preparation for having the eMMC act as
+> > > NVMEM provider.
+> >
+> > Sorry, but I don't quite understand what you are trying to do here.
+> > Maybe you should re-order the patches in the series so it becomes
+> > clear why this is needed?
+> >
+> > Moreover, I don't see any DT docs being updated as a part of the
+> > series, which looks like it is needed too. That would also help to
+> > understand what you are proposing, I think.
+>
+> I've prepared a tree on Github which now also includes commits adding
+> dt-bindings for block devices and partitions, so they can be referenced
+> as nvmem-cells provider.
+>
+> The dt-schema addition supposedly explaining this specific patch:
+>
+> https://github.com/dangowrt/linux/commit/b399a758f0e1c444ae9443dc80902a30de54af09
+>
+> The whole tree:
+>
+> https://github.com/dangowrt/linux/commits/for-nvmem-next
 
-IMHO this just makes the code harder to read. You're not adding a
-helper, all it does is call the same get/put parts. Why not just keep
-it as-is then?
+Thanks for sharing. However, allow people to review, I suggest you
+post a new version with the updated DT bindings included.
 
--- 
-Jens Axboe
+The point is, we really need confirmation from the DT maintainers -
+otherwise this is simply a no go.
 
+>
+> Most comments have been addressed, however, I still depend on using
+> either a class_interface *or* adding calls to add/remove the NVMEM
+> representation of a block device to block/genhd.c as well as
+> block/partitions/core.c, simply because afaik there isn't any better
+> way for in-kernel users of block devices to be notified about the
+> creation or removal of a block device.
 
+Okay, so that needs further discussions then. I will try to chim in.
+
+[...]
+
+Kind regards
+Uffe
