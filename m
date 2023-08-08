@@ -2,100 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D07D9C001DE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 16:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC30C04FDF
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 16:05:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbjHHQFI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 12:05:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34312 "EHLO
+        id S230519AbjHHQFV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 12:05:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231637AbjHHQDe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 12:03:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A87961B6
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 08:44:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691509476;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=O+NLl0HWC1rjA2zoBp3evkIVtVVCQOGJ99N11skgClg=;
-        b=f9NSJN+Ec8PS8BeK6vBpcQbhgOVLjVz1E0/H+DECSo6lUaVWwU7GIsmgEZf4UJON0nkPkP
-        kbGsIAcZ4xPoV6XjRoEcv0QLlRSuROzfkgVcoKk1V2yf+6dz05hB7qx7HBVQQ+orVvsyVc
-        JFWShIM2K83sPOBh0Dqi3KDuxGHujWY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-287-MhQueYY_PJC-llP_5SeNaw-1; Tue, 08 Aug 2023 06:43:27 -0400
-X-MC-Unique: MhQueYY_PJC-llP_5SeNaw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7404B801FA0;
-        Tue,  8 Aug 2023 10:43:26 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 69ED140C2077;
-        Tue,  8 Aug 2023 10:43:25 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-nvme@lists.infradead.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Wen Xiong <wenxiong@linux.ibm.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        John Garry <john.g.garry@oracle.com>,
-        Xiang Chen <chenxiang66@hisilicon.com>
-Subject: [PATCH V3 11/14] scsi: hisi: take blk_mq_max_nr_hw_queues() into account for calculating io vectors
-Date:   Tue,  8 Aug 2023 18:42:36 +0800
-Message-Id: <20230808104239.146085-12-ming.lei@redhat.com>
-In-Reply-To: <20230808104239.146085-1-ming.lei@redhat.com>
-References: <20230808104239.146085-1-ming.lei@redhat.com>
+        with ESMTP id S231365AbjHHQDs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 12:03:48 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC214170B
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 08:45:06 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-112-100.bstnma.fios.verizon.net [173.48.112.100])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 378EXcUK010681
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 8 Aug 2023 10:33:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1691505224; bh=POsuLKf+nXyR7IYhWeM46kPBqQcMGC9ufKCQTBFFtf0=;
+        h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+        b=cOrIQ7oNj6T1c0fsinQ9p/311Q2F4m5/0q05C1455WuPyH2K8UBnhKJSDFgrMhlQ2
+         95TCUswKGgeZ93icN/qFXvZ4PFIeVLvTqCyGJSkr5/Hz0zYndnZqjL+0GCFPb23rJo
+         mjok7gxFN5RVi2v0bSORo46pgcUAdq3jATQ1GBTdLppGxI2uy1+snUAiJHOa6PXRdA
+         j1Bzi2Llx5MGVf77KB/v6kg5g7aPiYYs5cyk5rkLLtv475/vyR4enLzw5BWIelvh61
+         K1tPTIQp1NAuPNLVO7zDo+czKmufwg3QuqGqX35UsCq0La0KCC/YHTY44JHDVK3fYl
+         a89nfd/rhOeZQ==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id ABF4415C04F2; Tue,  8 Aug 2023 10:33:38 -0400 (EDT)
+Date:   Tue, 8 Aug 2023 10:33:38 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/4] ext4: don't use bdev->bd_super in
+ __ext4_journal_get_write_access
+Message-ID: <20230808143338.GA1523259@mit.edu>
+References: <20230807112625.652089-1-hch@lst.de>
+ <20230807112625.652089-3-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230807112625.652089-3-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Take blk-mq's knowledge into account for calculating io queues.
+On Mon, Aug 07, 2023 at 12:26:23PM +0100, Christoph Hellwig wrote:
+> __ext4_journal_get_write_access already has a super_block available,
+> and there is no need to go from that to the bdev to go back to the
+> owning super_block.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Fix wrong queue mapping in case of kdump kernel.
-
-On arm and ppc64, 'maxcpus=1' is passed to kdump kernel command line,
-see `Documentation/admin-guide/kdump/kdump.rst`, so num_possible_cpus()
-still returns all CPUs because 'maxcpus=1' just bring up one single
-cpu core during booting.
-
-blk-mq sees single queue in kdump kernel, and in driver's viewpoint
-there are still multiple queues, this inconsistency causes driver to apply
-wrong queue mapping for handling IO, and IO timeout is triggered.
-
-Meantime, single queue makes much less resource utilization, and reduce
-risk of kernel failure.
-
-Cc: John Garry <john.g.garry@oracle.com>
-Cc: Xiang Chen <chenxiang66@hisilicon.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/hisi_sas/hisi_sas_v3_hw.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-index 20e1607c6282..60d2301e7f9d 100644
---- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-+++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-@@ -2550,6 +2550,9 @@ static int interrupt_preinit_v3_hw(struct hisi_hba *hisi_hba)
- 
- 
- 	hisi_hba->cq_nvecs = vectors - BASE_VECTORS_V3_HW - hisi_hba->iopoll_q_cnt;
-+	if (hisi_hba->cq_nvecs > scsi_max_nr_hw_queues())
-+		hisi_hba->cq_nvecs = scsi_max_nr_hw_queues();
-+
- 	shost->nr_hw_queues = hisi_hba->cq_nvecs + hisi_hba->iopoll_q_cnt;
- 
- 	return devm_add_action(&pdev->dev, hisi_sas_v3_free_vectors, pdev);
--- 
-2.40.1
-
+Acked-by: Theodore Ts'o <tytso@mit.edu>
