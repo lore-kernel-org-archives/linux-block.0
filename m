@@ -2,90 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F6AC04A94
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 21:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA1FC001E0
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 21:46:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230503AbjHHVqq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 17:46:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33530 "EHLO
+        id S230107AbjHHVqx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 17:46:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230107AbjHHVqp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 17:46:45 -0400
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADDBE72;
-        Tue,  8 Aug 2023 14:46:44 -0700 (PDT)
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1bc5acc627dso22266865ad.1;
-        Tue, 08 Aug 2023 14:46:44 -0700 (PDT)
+        with ESMTP id S231171AbjHHVqw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 17:46:52 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD821BEA
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 14:46:51 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1bb91c20602so12673405ad.0
+        for <linux-block@vger.kernel.org>; Tue, 08 Aug 2023 14:46:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691531211; x=1692136011;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hVvoOD3a42GY8Ebmz0RgOSN9u//C9LOSXpl4Qlkoi1A=;
+        b=vwzjw4SdDejKeetWZRaBDTicu9grb6ugVg7T8YnuZUbdMLc9dfk1EMR28ENeqt+GpF
+         5Rftbu+6VKu4oW+ZTSpphTvNyOs4WfBzS8pdunUrA1UR90wPfLYwrUUpwfE+3LXAJPZi
+         //6RRyqPEptBY+xWLXIGTNZlhPmvBI0xPp6Ep7MQ+0r9HOZxa9TrayL3wT56TrFxqpC7
+         HIhArHuxT/LqzgRoWWDriK7Xhw47A+R8jvgfLMe44CV+MAQ05uet7T/RxO58soSzeFPY
+         gI/ZdmtovekPQBX/fxueb59ytj+PV2hGQJMaanSIemuwCUQAiS8sBVPeKddRIzQVpBFr
+         zzSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691531204; x=1692136004;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UWO+B3VMMC5kdv5gm3JrDZlf3aI34FAscPuuTecwAGs=;
-        b=EOiM4RWalYGQf1Ufd4WMFNZBNx00+5It+CjGj01dBrAf2BBL1ZzN8DZrbiqBZ2fAJt
-         hl0IxgB+Ap5IVYIV6GGY2zqF0XBV8dgLh/au0RSun2lYpyYdJ8RPuzYUkOb37xYhQELh
-         cfFsKNGdqJkqhoE7e8aSnGXNjish7pqprxdKLTvoNQljtj0WF0IuPbvjr0npB3EXxWRW
-         Avtqken03NsG/gMfMDvzT+jOomvr1NXsR/hejWsUmqdsrgCdqWa3+DL2HESifW6MVAPs
-         L/aLnrslHfLNv1inub90cAepX7sYeo/5b2ajxZngYgrpwGAc06zaMdN0/5PBx3IO/X7F
-         vZVw==
-X-Gm-Message-State: AOJu0YyJ2smef0EsoRY80TWr3cbiRER1LrISMBgCzKUoCQ9qZO/cgIDn
-        EZ6ootXbSS83KlCnShWRMuS/F5Kd394=
-X-Google-Smtp-Source: AGHT+IFiOmmS9FJznub0QD3vU+zFO5gge1d1uMLaORGxQYRsJz+2Jl68cbW00zwfwtZ7jedsYLh22g==
-X-Received: by 2002:a17:903:12d4:b0:1b7:e86f:7631 with SMTP id io20-20020a17090312d400b001b7e86f7631mr939779plb.19.1691531204273;
-        Tue, 08 Aug 2023 14:46:44 -0700 (PDT)
-Received: from ?IPV6:2600:1010:b047:2ab0:fd93:3f7d:e947:afd4? ([2600:1010:b047:2ab0:fd93:3f7d:e947:afd4])
-        by smtp.gmail.com with ESMTPSA id be5-20020a170902aa0500b001b5247cac3dsm9478808plb.110.2023.08.08.14.46.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 14:46:43 -0700 (PDT)
-Message-ID: <ede0c18a-f5d0-94af-5175-9be54aa85082@acm.org>
-Date:   Tue, 8 Aug 2023 14:46:39 -0700
+        d=1e100.net; s=20221208; t=1691531211; x=1692136011;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hVvoOD3a42GY8Ebmz0RgOSN9u//C9LOSXpl4Qlkoi1A=;
+        b=CGdxkfHPAiYdAbhPCpJCHjYJsY19j0h7Aspf0vqbS232nw0erhjkNuI1QukH0bNSl7
+         H0/qhdDxZu5dcMoVXK63es1mgHv++DV7o0s9bw7WHANXSx0/EGDaSL0op8uEZ2IhwR9B
+         ugPLdkHy/6lT4w4Tb7rM2wUCjh4Q2niGePWEIFfPz7Mg61WwlXS1Fgi2B+y8wrgROkT/
+         2eiowNXiAy9PTNgZtAG/jnx9pXPhOJy8xqknEoY8jcBvV9S/hDrYg1znG00pTA9hczHI
+         UmQG8UMKzUpOzU/btKMFcc5so8T+4wvTa6y74xdxvWzDaT7Mmhrxu4vYltJR+ho5yKqd
+         SXIA==
+X-Gm-Message-State: AOJu0Yx4VnR7/6oQPC7GQmlzKoF3FQ8MEB0t2gcKH0SY4TXBkSiBXJgG
+        sV/eKQdBtu9xMSavAnKbIHks3Q==
+X-Google-Smtp-Source: AGHT+IEBaw5bcF1S5gfk8OAPjNSNb32ZmPfHsUgxSa1VUvAiECqC/ErJwgsi0eVABsUaVuyoaxnLWw==
+X-Received: by 2002:a17:902:d2c2:b0:1bb:83ec:832 with SMTP id n2-20020a170902d2c200b001bb83ec0832mr1035725plc.2.1691531211359;
+        Tue, 08 Aug 2023 14:46:51 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id p9-20020a1709026b8900b001b9da8b4eb7sm9476577plk.35.2023.08.08.14.46.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 14:46:50 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     bvanassche@acm.org, Zhiguo Niu <zhiguo.niu@unisoc.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        niuzhiguo84@gmail.com, hongyu.jin@unisoc.com,
+        yunlong.xing@unisoc.com
+In-Reply-To: <1691061162-22898-1-git-send-email-zhiguo.niu@unisoc.com>
+References: <1691061162-22898-1-git-send-email-zhiguo.niu@unisoc.com>
+Subject: Re: [PATCH] block/mq-deadline: use correct way to throttling write
+ requests
+Message-Id: <169153121035.141127.745815954316396191.b4-ty@kernel.dk>
+Date:   Tue, 08 Aug 2023 15:46:50 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v6 1/7] block: Introduce the flag
- QUEUE_FLAG_NO_ZONE_WRITE_LOCK
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230804154821.3232094-1-bvanassche@acm.org>
- <20230804154821.3232094-2-bvanassche@acm.org>
- <dd230762-804c-bb8a-24e0-123afd81e26c@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <dd230762-804c-bb8a-24e0-123afd81e26c@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/23 14:19, Jens Axboe wrote:
-> On 8/4/23 9:47?AM, Bart Van Assche wrote:
->> Writes in sequential write required zones must happen at the write
->> pointer. Even if the submitter of the write commands (e.g. a filesystem)
->> submits writes for sequential write required zones in order, the block
->> layer or the storage controller may reorder these write commands.
->>
->> The zone locking mechanism in the mq-deadline I/O scheduler serializes
->> write commands for sequential zones. Some but not all storage controllers
->> require this serialization. Introduce a new request queue flag to allow
->> block drivers to indicate that they preserve the order of write commands
->> and thus do not require serialization of writes per zone.
+
+On Thu, 03 Aug 2023 19:12:42 +0800, Zhiguo Niu wrote:
+> The original formula was inaccurate:
+> dd->async_depth = max(1UL, 3 * q->nr_requests / 4);
 > 
-> Looking at how this is used, why not call it QUEUE_FLAG_ZONE_WRITE_LOCK
-> instead? That'd make the code easier to immediately grok, rather than
-> deal with double negations.
+> For write requests, when we assign a tags from sched_tags,
+> data->shallow_depth will be passed to sbitmap_find_bit,
+> see the following code:
+> 
+> [...]
 
-Hi Jens,
+Applied, thanks!
 
-Do I understand correctly that you want me to set the
-QUEUE_FLAG_ZONE_WRITE_LOCK flag for all request queues by adding it to
-QUEUE_FLAG_MQ_DEFAULT and also that the UFS driver should clear the
-QUEUE_FLAG_ZONE_WRITE_LOCK flag?
+[1/1] block/mq-deadline: use correct way to throttling write requests
+      commit: d47f9717e5cfd0dd8c0ba2ecfa47c38d140f1bb6
 
-Thanks,
+Best regards,
+-- 
+Jens Axboe
 
-Bart.
+
+
