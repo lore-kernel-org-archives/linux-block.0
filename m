@@ -2,152 +2,160 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9F3C001DB
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 18:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472A2C04A94
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 18:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235446AbjHHSRl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 14:17:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38298 "EHLO
+        id S235606AbjHHSSI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 14:18:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235726AbjHHSRK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 14:17:10 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B503E1FCAC
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 10:24:35 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-349177bf6bcso3998045ab.1
-        for <linux-block@vger.kernel.org>; Tue, 08 Aug 2023 10:24:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691515475; x=1692120275;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kTNldnivIaxBXBTNvK2PuiUZGj37r4ckmkm6xx/Y7x8=;
-        b=3GSyvCix/gNo9aJZpIwuFWfXNoOBpx6kRMT4rbLjQpbgzMyPhWrkT4i5p7lLF+6XLs
-         bEpPbJUKIBgRFjRFJsLqEXUZMuj0vPlfewS5rjAmo1axSe8i4vXMY10pwBSDMCzw+yNQ
-         06BQQa6YKJbRVQ2c5k4eV/Io+xqmGlYX2uPpAhvMrIgV1UZAbdkMOaKKHSFRz/rdELra
-         qDWZsyWgZg6XWJePQCz9st5FUkSbU+YNVwoA3nMOby7gjpPOWmxmTavd6br6873bND/Y
-         LTwCd6SrBeUfgm2M2G4s390mWUHZ9I7Zy6W6IUUV8svVKzM9JBcig4/CMSqyKq2RJdo9
-         vR9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691515475; x=1692120275;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kTNldnivIaxBXBTNvK2PuiUZGj37r4ckmkm6xx/Y7x8=;
-        b=bU6Ln19vlhmMP02JGKUy96SnRAnqsPqMLQU32oM+z/qrjakt4/iy9mEKH1cZ9p1Lfa
-         Wc+6guITHNkfBw/EWh15EJ9ulyr+mbf0UJhNXv5+0/sVMn8KXp9+I4ncMxa7xp+gma1f
-         JERdwMjG8hgmWmrut2ZV+CtMave18qRYKNwxI3TfHJQ/Uu4asbhblbb4a6QuGjbF6I5Z
-         Gu16QwC0fOIgYAGZL/+BcHAs5OWanLn5/o3uAlmEs3CuYox+PGQs/NWlZKoUfALZth2v
-         e2MbK5lge/Tue68QTLqd6KV6T2tYtjbQB8dzRW63ZwNJA/pj4VBg46QQ8oCpgA7zgz/F
-         WGlQ==
-X-Gm-Message-State: AOJu0YyZHpkgianOtJHIAHDFaGEmAeEPScWwg5Sflf1LwcdPhjRF5ayU
-        YT3d0SsCh1MYtYs0YUDkABNFwCYiRX6AYsm7l6Y=
-X-Google-Smtp-Source: AGHT+IFZ8tzTRlkO1ofUWMO/jWBZs502zP/nIfQQD68dZFdzepkcEvQ05/JAp41/iK7vxrWP7GcIHA==
-X-Received: by 2002:a92:d94c:0:b0:345:e438:7381 with SMTP id l12-20020a92d94c000000b00345e4387381mr350727ilq.2.1691515474896;
-        Tue, 08 Aug 2023 10:24:34 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id s16-20020a02cc90000000b0041a9022c3dasm3130981jap.118.2023.08.08.10.24.33
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 10:24:33 -0700 (PDT)
-Message-ID: <b655aa3a-17f6-d25a-38b1-4a02e87e2c98@kernel.dk>
-Date:   Tue, 8 Aug 2023 11:24:33 -0600
+        with ESMTP id S235549AbjHHSRo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 14:17:44 -0400
+Received: from box.fidei.email (box.fidei.email [71.19.144.250])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0754920269
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 10:25:54 -0700 (PDT)
+Received: from authenticated-user (box.fidei.email [71.19.144.250])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by box.fidei.email (Postfix) with ESMTPSA id 816FF83568;
+        Tue,  8 Aug 2023 13:25:54 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dorminy.me; s=mail;
+        t=1691515554; bh=Is2HliG2MkqspBW6f5BxRuASCS2e9kkNjtTWGyrNrys=;
+        h=From:To:Cc:Subject:Date:From;
+        b=vDnZjSX04HJQJMr8fJnGuH7u9PkX8Nvibo360GG8z9XxUAYmbwhVqThVkGTux72L8
+         WSvGyXGkGW6BLit4zqII0HqkIVj8qz1fTwT0HjnbMFSmiUeeO+KrowadeDztRpE2Ki
+         vWNKCqqhpjbzsT1seHzoaTf3WGbV3hjraDh4xH2KP14RJo4uNHGJEFmh5tS++NpikP
+         j7kT/os6aUJXvhjw9y7WKOLNQYF8NZtTiLm1J2OoY1Xp2sm0AkG1LB3ASUlKcfKULb
+         guiaE7/djBuoxH9OLHzBTJrgF2hw8E/pIMc/L5qX5936+CCFZkf6noYIsO3NCtwNzw
+         l0bK2K12sV4zw==
+From:   Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+To:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
+        Satya Tangirala <satyat@google.com>,
+        linux-block@vger.kernel.org, kernel-team@meta.com
+Cc:     Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Subject: [PATCH] blk-crypto: dynamically allocate fallback profile
+Date:   Tue,  8 Aug 2023 13:25:30 -0400
+Message-ID: <20230808172536.211434-1-sweettea-kernel@dorminy.me>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH 2/2] block: don't make REQ_POLLED imply REQ_NOWAIT
-Content-Language: en-US
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20230808171310.112878-1-axboe@kernel.dk>
- <20230808171310.112878-3-axboe@kernel.dk>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230808171310.112878-3-axboe@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/23 11:13?AM, Jens Axboe wrote:
-> Normally these two flags do go together, as the issuer of polled IO
-> generally cannot wait for resources that will get freed as part of IO
-> completion. This is because that very task is the one that will complete
-> the request and free those resources, hence that would introduce a
-> deadlock.
-> 
-> But it is possible to have someone else issue the polled IO, eg via
-> io_uring if the request is punted to io-wq. For that case, it's fine to
-> have the task block on IO submission, as it is not the same task that
-> will be completing the IO.
-> 
-> It's completely up to the caller to ask for both polled and nowait IO
-> separately! If we don't allow polled IO where IOCB_NOWAIT isn't set in
-> the kiocb, then we can run into repeated -EAGAIN submissions and not
-> make any progress.
-  
-Looks like I forgot to update when adding the first half of this...
-Here's the full patch 2/2:
+blk_crypto_profile_init() calls lockdep_register_key(), which asserts
+that the provided memory is not a static object. Unfortunately,
+blk-crypto-fallback currently has a single static blk_crypto_profile,
+which means trying to use the fallback with lockdep explodes in
+blk_crypto_fallback_init().
 
-commit 50bd4aa84442442c87e669d72d1a6d0b01c332a8
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Tue Aug 8 11:06:17 2023 -0600
+Fortunately it is simple enough to use a dynamically allocated profile
+for fallback, allowing the use of lockdep.
 
-    block: don't make REQ_POLLED imply REQ_NOWAIT
-    
-    Normally these two flags do go together, as the issuer of polled IO
-    generally cannot wait for resources that will get freed as part of IO
-    completion. This is because that very task is the one that will complete
-    the request and free those resources, hence that would introduce a
-    deadlock.
-    
-    But it is possible to have someone else issue the polled IO, eg via
-    io_uring if the request is punted to io-wq. For that case, it's fine to
-    have the task block on IO submission, as it is not the same task that
-    will be completing the IO.
-    
-    It's completely up to the caller to ask for both polled and nowait IO
-    separately! If we don't allow polled IO where IOCB_NOWAIT isn't set in
-    the kiocb, then we can run into repeated -EAGAIN submissions and not
-    make any progress.
-    
-    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Fixes: 488f6682c832e ("block: blk-crypto-fallback for Inline Encryption")
+Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+---
+ block/blk-crypto-fallback.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/block/fops.c b/block/fops.c
-index a286bf3325c5..838ffada5341 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -358,13 +358,14 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
- 		task_io_account_write(bio->bi_iter.bi_size);
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index ad9844c5b40c..de94e9bffec6 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -78,7 +78,7 @@ static struct blk_crypto_fallback_keyslot {
+ 	struct crypto_skcipher *tfms[BLK_ENCRYPTION_MODE_MAX];
+ } *blk_crypto_keyslots;
+ 
+-static struct blk_crypto_profile blk_crypto_fallback_profile;
++static struct blk_crypto_profile *blk_crypto_fallback_profile;
+ static struct workqueue_struct *blk_crypto_wq;
+ static mempool_t *blk_crypto_bounce_page_pool;
+ static struct bio_set crypto_bio_split;
+@@ -292,7 +292,7 @@ static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
+ 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
+ 	 * this bio's algorithm and key.
+ 	 */
+-	blk_st = blk_crypto_get_keyslot(&blk_crypto_fallback_profile,
++	blk_st = blk_crypto_get_keyslot(blk_crypto_fallback_profile,
+ 					bc->bc_key, &slot);
+ 	if (blk_st != BLK_STS_OK) {
+ 		src_bio->bi_status = blk_st;
+@@ -395,7 +395,7 @@ static void blk_crypto_fallback_decrypt_bio(struct work_struct *work)
+ 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
+ 	 * this bio's algorithm and key.
+ 	 */
+-	blk_st = blk_crypto_get_keyslot(&blk_crypto_fallback_profile,
++	blk_st = blk_crypto_get_keyslot(blk_crypto_fallback_profile,
+ 					bc->bc_key, &slot);
+ 	if (blk_st != BLK_STS_OK) {
+ 		bio->bi_status = blk_st;
+@@ -499,7 +499,7 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
+ 		return false;
  	}
  
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		bio->bi_opf |= REQ_NOWAIT;
-+
- 	if (iocb->ki_flags & IOCB_HIPRI) {
--		bio->bi_opf |= REQ_POLLED | REQ_NOWAIT;
-+		bio->bi_opf |= REQ_POLLED;
- 		submit_bio(bio);
- 		WRITE_ONCE(iocb->private, bio);
- 	} else {
--		if (iocb->ki_flags & IOCB_NOWAIT)
--			bio->bi_opf |= REQ_NOWAIT;
- 		submit_bio(bio);
- 	}
- 	return -EIOCBQUEUED;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index c4f5b5228105..11984ed29cb8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -791,7 +791,7 @@ static inline int bio_integrity_add_page(struct bio *bio, struct page *page,
- static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
+-	if (!__blk_crypto_cfg_supported(&blk_crypto_fallback_profile,
++	if (!__blk_crypto_cfg_supported(blk_crypto_fallback_profile,
+ 					&bc->bc_key->crypto_cfg)) {
+ 		bio->bi_status = BLK_STS_NOTSUPP;
+ 		return false;
+@@ -526,7 +526,7 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
+ 
+ int blk_crypto_fallback_evict_key(const struct blk_crypto_key *key)
  {
- 	bio->bi_opf |= REQ_POLLED;
--	if (!is_sync_kiocb(kiocb))
-+	if (kiocb->ki_flags & IOCB_NOWAIT)
- 		bio->bi_opf |= REQ_NOWAIT;
+-	return __blk_crypto_evict_key(&blk_crypto_fallback_profile, key);
++	return __blk_crypto_evict_key(blk_crypto_fallback_profile, key);
  }
  
+ static bool blk_crypto_fallback_inited;
+@@ -534,29 +534,32 @@ static int blk_crypto_fallback_init(void)
+ {
+ 	int i;
+ 	int err;
+-	struct blk_crypto_profile *profile = &blk_crypto_fallback_profile;
+ 
+ 	if (blk_crypto_fallback_inited)
+ 		return 0;
+ 
+ 	get_random_bytes(blank_key, BLK_CRYPTO_MAX_KEY_SIZE);
+ 
++	blk_crypto_fallback_profile =
++		kzalloc(sizeof(*blk_crypto_fallback_profile), GFP_KERNEL);
++
+ 	err = bioset_init(&crypto_bio_split, 64, 0, 0);
+ 	if (err)
+ 		goto out;
+ 
+-	err = blk_crypto_profile_init(profile, blk_crypto_num_keyslots);
++	err = blk_crypto_profile_init(blk_crypto_fallback_profile,
++				      blk_crypto_num_keyslots);
+ 	if (err)
+ 		goto fail_free_bioset;
+ 	err = -ENOMEM;
+ 
+-	profile->ll_ops = blk_crypto_fallback_ll_ops;
+-	profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
++	blk_crypto_fallback_profile->ll_ops = blk_crypto_fallback_ll_ops;
++	blk_crypto_fallback_profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
+ 
+ 	/* All blk-crypto modes have a crypto API fallback. */
+ 	for (i = 0; i < BLK_ENCRYPTION_MODE_MAX; i++)
+-		profile->modes_supported[i] = 0xFFFFFFFF;
+-	profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
++		blk_crypto_fallback_profile->modes_supported[i] = 0xFFFFFFFF;
++	blk_crypto_fallback_profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
+ 
+ 	blk_crypto_wq = alloc_workqueue("blk_crypto_wq",
+ 					WQ_UNBOUND | WQ_HIGHPRI |
+@@ -597,7 +600,7 @@ static int blk_crypto_fallback_init(void)
+ fail_free_wq:
+ 	destroy_workqueue(blk_crypto_wq);
+ fail_destroy_profile:
+-	blk_crypto_profile_destroy(profile);
++	blk_crypto_profile_destroy(blk_crypto_fallback_profile);
+ fail_free_bioset:
+ 	bioset_exit(&crypto_bio_split);
+ out:
 
+base-commit: 54d2161835d828a9663f548f61d1d9c3d3482122
 -- 
-Jens Axboe
+2.41.0
 
