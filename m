@@ -2,92 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8130FC001DB
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 00:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2220DEB64DD
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 01:03:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229782AbjHHAys (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Aug 2023 20:54:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50088 "EHLO
+        id S229990AbjHHBDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Aug 2023 21:03:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjHHAyr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 20:54:47 -0400
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2777FE9;
-        Mon,  7 Aug 2023 17:54:45 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0VpIkifi_1691456082;
-Received: from 30.221.128.117(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0VpIkifi_1691456082)
-          by smtp.aliyun-inc.com;
-          Tue, 08 Aug 2023 08:54:43 +0800
-Message-ID: <259ff3c4-4d9c-aaf4-c7be-205615c00125@linux.alibaba.com>
-Date:   Tue, 8 Aug 2023 08:54:42 +0800
+        with ESMTP id S229697AbjHHBDm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Aug 2023 21:03:42 -0400
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CF7A9E;
+        Mon,  7 Aug 2023 18:03:37 -0700 (PDT)
+Received: from local
+        by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.96)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1qTB7X-0002x3-0M;
+        Tue, 08 Aug 2023 01:02:47 +0000
+Date:   Tue, 8 Aug 2023 02:02:36 +0100
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Min Li <min15.li@samsung.com>,
+        Christian Loehle <CLoehle@hyperstone.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yeqi Fu <asuk4.q@gmail.com>, Avri Altman <avri.altman@wdc.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ye Bin <yebin10@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org
+Subject: Re: [RFC PATCH 2/6] mmc: block: set fwnode of disk devices
+Message-ID: <ZNGULFxXpLT7zn35@makrotopia.org>
+References: <cover.1689802933.git.daniel@makrotopia.org>
+ <1ce5f56df546cec25ef741f381286f1d7c33d000.1689802933.git.daniel@makrotopia.org>
+ <CAPDyKFqhZtCHVmCNnm_Qm7X+=GtJY8uNJOWOgZXuTTVEw0msNA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH 3/4] ocfs2: stop using bdev->bd_super for journal error
- logging
-To:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Cc:     Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        ocfs2-devel@lists.linux.dev, linux-block@vger.kernel.org
-References: <20230807112625.652089-1-hch@lst.de>
- <20230807112625.652089-4-hch@lst.de>
-Content-Language: en-US
-From:   Joseph Qi <joseph.qi@linux.alibaba.com>
-In-Reply-To: <20230807112625.652089-4-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPDyKFqhZtCHVmCNnm_Qm7X+=GtJY8uNJOWOgZXuTTVEw0msNA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Ulf,
 
+thank you for reviewing and suggesting ways to improve this series!
 
-On 8/7/23 7:26 PM, Christoph Hellwig wrote:
-> All ocfs2 journal error handling and logging is based on buffer_heads,
-> and the owning inode and thus super_block can be retrieved through
-> bh->b_assoc_map->host.  Switch to using that to remove the last users
-> of bdev->bd_super.
+On Mon, Aug 07, 2023 at 03:48:31PM +0200, Ulf Hansson wrote:
+> On Thu, 20 Jul 2023 at 00:02, Daniel Golle <daniel@makrotopia.org> wrote:
+> >
+> > Set fwnode of disk devices to 'block', 'boot0' and 'boot1' subnodes of
+> > the mmc-card. This is done in preparation for having the eMMC act as
+> > NVMEM provider.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Looks fine.
-Acked-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-
-> ---
->  fs/ocfs2/journal.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> Sorry, but I don't quite understand what you are trying to do here.
+> Maybe you should re-order the patches in the series so it becomes
+> clear why this is needed?
 > 
-> diff --git a/fs/ocfs2/journal.c b/fs/ocfs2/journal.c
-> index 25d8072ccfce46..c19c730c26e270 100644
-> --- a/fs/ocfs2/journal.c
-> +++ b/fs/ocfs2/journal.c
-> @@ -557,7 +557,7 @@ static void ocfs2_abort_trigger(struct jbd2_buffer_trigger_type *triggers,
->  	     (unsigned long)bh,
->  	     (unsigned long long)bh->b_blocknr);
->  
-> -	ocfs2_error(bh->b_bdev->bd_super,
-> +	ocfs2_error(bh->b_assoc_map->host->i_sb,
->  		    "JBD2 has aborted our journal, ocfs2 cannot continue\n");
->  }
->  
-> @@ -780,14 +780,14 @@ void ocfs2_journal_dirty(handle_t *handle, struct buffer_head *bh)
->  		mlog_errno(status);
->  		if (!is_handle_aborted(handle)) {
->  			journal_t *journal = handle->h_transaction->t_journal;
-> -			struct super_block *sb = bh->b_bdev->bd_super;
->  
->  			mlog(ML_ERROR, "jbd2_journal_dirty_metadata failed. "
->  					"Aborting transaction and journal.\n");
->  			handle->h_err = status;
->  			jbd2_journal_abort_handle(handle);
->  			jbd2_journal_abort(journal, status);
-> -			ocfs2_abort(sb, "Journal already aborted.\n");
-> +			ocfs2_abort(bh->b_assoc_map->host->i_sb,
-> +				    "Journal already aborted.\n");
->  		}
->  	}
->  }
+> Moreover, I don't see any DT docs being updated as a part of the
+> series, which looks like it is needed too. That would also help to
+> understand what you are proposing, I think.
+
+I've prepared a tree on Github which now also includes commits adding
+dt-bindings for block devices and partitions, so they can be referenced
+as nvmem-cells provider.
+
+The dt-schema addition supposedly explaining this specific patch:
+
+https://github.com/dangowrt/linux/commit/b399a758f0e1c444ae9443dc80902a30de54af09
+
+The whole tree:
+
+https://github.com/dangowrt/linux/commits/for-nvmem-next
+
+Most comments have been addressed, however, I still depend on using
+either a class_interface *or* adding calls to add/remove the NVMEM
+representation of a block device to block/genhd.c as well as
+block/partitions/core.c, simply because afaik there isn't any better
+way for in-kernel users of block devices to be notified about the
+creation or removal of a block device.
+
+Cheers
+
+
+Daniel
+
+> 
+> >
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >  drivers/mmc/core/block.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> > index f701efb1fa785..fc1a9f31bd253 100644
+> > --- a/drivers/mmc/core/block.c
+> > +++ b/drivers/mmc/core/block.c
+> > @@ -2413,6 +2413,8 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+> >                                               int area_type,
+> >                                               unsigned int part_type)
+> >  {
+> > +       struct fwnode_handle *fwnode;
+> > +       struct device *ddev;
+> >         struct mmc_blk_data *md;
+> >         int devidx, ret;
+> >         char cap_str[10];
+> > @@ -2509,6 +2511,12 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+> >
+> >         blk_queue_write_cache(md->queue.queue, cache_enabled, fua_enabled);
+> >
+> > +       ddev = disk_to_dev(md->disk);
+> > +       fwnode = device_get_named_child_node(subname ? md->parent->parent :
+> > +                                                      md->parent,
+> > +                                            subname ? subname : "block");
+> > +       ddev->fwnode = fwnode;
+> > +
+> >         string_get_size((u64)size, 512, STRING_UNITS_2,
+> >                         cap_str, sizeof(cap_str));
+> >         pr_info("%s: %s %s %s%s\n",
+> 
+> Kind regards
+> Uffe
