@@ -2,111 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E73C41513
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 22:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A1FC001DB
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 22:45:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230044AbjHHW1L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 18:27:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58886 "EHLO
+        id S229625AbjHHWpF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 18:45:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjHHW1L (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 18:27:11 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C527DD
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 15:27:08 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-55b78bf0423so650844a12.0
-        for <linux-block@vger.kernel.org>; Tue, 08 Aug 2023 15:27:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1691533627; x=1692138427;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XL+BULOd9HF1aBCX6wvlZBa44EWer95pBGvLwvurMVE=;
-        b=eas3rJP/bbSVsNioW89fwtP5a+7mmdBubXv0+21aYqeRM3H9ci0h/KSOwTja+iPzot
-         pe8Vq4xrOVASxpBNBsL1RIyJKP2QPVB8Qpk286IaaI2p4z8DuiAEuHS7Ejl6vN0mV5Ky
-         HXnZe/qCYZTQRjp0TNh0cpgjbQfJTuElCeQq7KhJDe8RpBbc33d6LVp8gCrVXD2iaaF4
-         0DwTU/wQYEZgvzWbpbBldSHA7jGw5zdHD8e6/Iyx4RoE6SpM2VTOJNuxk1T84bR1Y9LZ
-         0QmmDgOuV6mA3SioTOMpD43pWropQZfYifr+cIviDUtg0tWyqx6N22qm6zv7WYe0K0gw
-         AuQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691533627; x=1692138427;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XL+BULOd9HF1aBCX6wvlZBa44EWer95pBGvLwvurMVE=;
-        b=GAV5hwlClxcqz/eS6mjP0mYtr6xMTGoY+Lm7eDFWvPDfEffjKyNzYFIbeFxoZAK2jb
-         SoqHp82sYPRXdMvOntpm2YQPlvsEHQq1nMETkz4fnIss/DGevLWHouaWn1OZDSAOB8mj
-         gMx4kVwE7En7DnkrivZTQcfQzKgicftj51ifaoAQjWxB70PPSShT7k8uQGAPrgMYqNmd
-         1jeVXSL/gyJTJcgiZ/Dxb8udk/dFb0fGfnRyta0DNh36wVYfU5qbBmjyOnMTV8bQBPtO
-         fMEF68BtIQVippVLnzNWi4/HCgseLFcLa2gm7zEty8keFtqcTBiL2PCIqaV308BNmEE5
-         gW5g==
-X-Gm-Message-State: AOJu0YzhFyyO/Wj0yfL/URZzzsERb0gD4ngepjEnVDCAVUAnotT83KoG
-        x4OMeWPFxa4zPOBGU4VxSjUkrw==
-X-Google-Smtp-Source: AGHT+IFrrWjCITWUyeeKyC1U2g2S+h24tftyYugDC4Vw9sw4h6yesoRAYRojfe0VFUgp7sneJ+va8w==
-X-Received: by 2002:a05:6a00:e8c:b0:67f:7403:1fe8 with SMTP id bo12-20020a056a000e8c00b0067f74031fe8mr913544pfb.3.1691533627622;
-        Tue, 08 Aug 2023 15:27:07 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u21-20020aa78395000000b00686fe7b7b48sm8617146pfm.121.2023.08.08.15.27.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 15:27:07 -0700 (PDT)
-Message-ID: <067228e1-cd13-cf70-40fd-409f9b9ba557@kernel.dk>
-Date:   Tue, 8 Aug 2023 16:27:05 -0600
+        with ESMTP id S229526AbjHHWpF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 18:45:05 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 46A97100;
+        Tue,  8 Aug 2023 15:45:04 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id ACC3A20FC0D2; Tue,  8 Aug 2023 15:45:03 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com ACC3A20FC0D2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1691534703;
+        bh=sVCat3a1M7KHdlESd70oA1x2KXrxJ+56GtFSeTDlhcM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IKGEzYVtmP2d5RXQGvuDn1I/QZ4sOzZi4K/A2GFZ2iulDRvmRtjOIZiRVuMKczceS
+         0CiDLnNBQ2LUBMhDJBdn1PQPlunEfC8CXQzTGInv/hBg/Ilpo2DmC4rg8xJgCfKGlU
+         /LGb9xCJTxmrboncvvC5Grxc+B/9dleXOZ5FNzVQ=
+Date:   Tue, 8 Aug 2023 15:45:03 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     Mike Snitzer <snitzer@kernel.org>, corbet@lwn.net,
+        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
+        agk@redhat.com, eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v10 11/17] dm-verity: consume root hash digest and
+ signature data via LSM hook
+Message-ID: <20230808224503.GA20095@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
+ <1687986571-16823-12-git-send-email-wufan@linux.microsoft.com>
+ <ZKgm+ffQbdDTxrg9@redhat.com>
+ <20230712034319.GA17642@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <CAHC9VhQFxqcfgR0acgdiXKP9LT1KLgGjZd-QHs6O1dEex31HEQ@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH v6 1/7] block: Introduce the flag
- QUEUE_FLAG_NO_ZONE_WRITE_LOCK
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230804154821.3232094-1-bvanassche@acm.org>
- <20230804154821.3232094-2-bvanassche@acm.org>
- <dd230762-804c-bb8a-24e0-123afd81e26c@kernel.dk>
- <ede0c18a-f5d0-94af-5175-9be54aa85082@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ede0c18a-f5d0-94af-5175-9be54aa85082@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHC9VhQFxqcfgR0acgdiXKP9LT1KLgGjZd-QHs6O1dEex31HEQ@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/23 3:46?PM, Bart Van Assche wrote:
-> On 8/8/23 14:19, Jens Axboe wrote:
->> On 8/4/23 9:47?AM, Bart Van Assche wrote:
->>> Writes in sequential write required zones must happen at the write
->>> pointer. Even if the submitter of the write commands (e.g. a filesystem)
->>> submits writes for sequential write required zones in order, the block
->>> layer or the storage controller may reorder these write commands.
->>>
->>> The zone locking mechanism in the mq-deadline I/O scheduler serializes
->>> write commands for sequential zones. Some but not all storage controllers
->>> require this serialization. Introduce a new request queue flag to allow
->>> block drivers to indicate that they preserve the order of write commands
->>> and thus do not require serialization of writes per zone.
->>
->> Looking at how this is used, why not call it QUEUE_FLAG_ZONE_WRITE_LOCK
->> instead? That'd make the code easier to immediately grok, rather than
->> deal with double negations.
+On Tue, Jul 25, 2023 at 04:43:48PM -0400, Paul Moore wrote:
+> On Tue, Jul 11, 2023 at 11:43???PM Fan Wu <wufan@linux.microsoft.com> wrote:
+> > On Fri, Jul 07, 2023 at 10:53:45AM -0400, Mike Snitzer wrote:
 > 
-> Hi Jens,
+> ...
 > 
-> Do I understand correctly that you want me to set the
-> QUEUE_FLAG_ZONE_WRITE_LOCK flag for all request queues by adding it to
-> QUEUE_FLAG_MQ_DEFAULT and also that the UFS driver should clear the
-> QUEUE_FLAG_ZONE_WRITE_LOCK flag?
+> > > Both of your calls to security_bdev_setsecurity() to set your blobs in
+> > > the bdev are suspect because you're doing so from the verity_ctr().
+> > > The mapped_device has 2 dm_table slots (active and inactive).  The
+> > > verity_ctr() becomes part of the inactive slot, there is an extra step
+> > > to bind the inactive table to the active table.
+> > >
+> > > This leads to you changing the blobs in the global bdev _before_ the
+> > > table is actually active.  It is possible that the inactive table will
+> > > simply be removed and the DM verity device put back in service;
+> > > leaving your blob(s) in the bdev inconsistent.
+> > >
+> > > This issue has parallels to how we need to defer changing the global
+> > > queue_limits associated with a request_queue until _after_ all table
+> > > loading is settled and then the update is done just before resuming
+> > > the DM device (mapped_device) -- see dm_table_set_restrictions().
+> > >
+> > > Unfortunately, this feels like it may require a new hook in the
+> > > target_type struct (e.g. ->finalize())
+> >
+> > Thanks for pointing out this issue. We were calling security_bdev_setsecurity()
+> > because the roothash signature data is only available in verity_ctr()
+> > and it is discarded after verity_ctr() finishes.
+> > After digging deeper into the table_load, I realized that we were indeed
+> > wrong here.
+> >
+> > Based on my understanding of your suggestion, it seems that the correct
+> > approach would be to save the roothash signature into the struct dm_target
+> 
+Sorry for the delay in responding. It took me a while to test out the design idea
+suggested by Mike.
 
-I don't think setting that flag by default makes a lot of sense, if the
-device in question isn't zoned. Maybe have variants of BLK_ZONED_* which
-has a locked and unlocked variant for each where it applies? Perhaps
-have the lock flag be common between them so you can check them in the
-same way? That'd keep the fact that it's zoned and if it needs locking
-in the same spot, rather than scatter them in two spots.
+The current implementation is indeed incorrect. However, I've been able to develop
+a working prototype that addresses the problem identified in the existing implementation.
+I still need some additional time to fine-tune and clean up the prototype.
 
--- 
-Jens Axboe
+My goal is to have everything ready and send it out next month.
 
+> Would you be doing this with a LSM hook, or would this live in the
+> device mapper layer?
+> 
+In my implemention, it is a new hook in the device mapper layer. 
+The hook is triggered just before activating an inactive table of a mapped device.
+So in our case, we use the hook to attached the dm-verity's roothash metadata
+to the block_device struct of mapped device.
+
+> > and then invoke security_bdev_setsecurity() before activating
+> > the inactive table in the __bind function (where dm_table_set_restrictions is called).
+> >
+> > To facilitate this process, it seems appropriate to introduce a new hook
+> > called finalize() within the struct target_type. This hook would enable
+> > targets to define tasks that need to be completed before activating
+> > a new table.
+> >
+> > In our specific case, we would add a finalize hook to the dm-verity module,
+> > allowing us to call security_bdev_setsecurity() and associate the roothash
+> > information in the struct dm_target with the struct block_device of
+> > the struct mapped_device. Is this correct?
+> 
+> Where would the finalize() hook be called?
+
+It is in the __bind function in drivers/md/dm.c, calling just before 
+rcu_assign_pointer(md->map, (void *)t) which activates the inactive table.
+
+-Fan
