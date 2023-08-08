@@ -2,129 +2,348 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DEECC41513
-	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 20:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4396C001DB
+	for <linux-block@archiver.kernel.org>; Tue,  8 Aug 2023 20:40:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230504AbjHHU0f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 16:26:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45072 "EHLO
+        id S232389AbjHHUkB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 16:40:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229978AbjHHU0S (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 16:26:18 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2086.outbound.protection.outlook.com [40.107.92.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D8B132E0
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 12:39:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GtRGdNvIBr9KS+LMfrWEVt4YW5BUOxoUq/pWQ5GfNdWizz56LoE9Xwdeh2R0l4dyyN8tvV3l8LrXgcub0FUSxS00QHFThvnfzy085IkdjJA3Wr86F/XmfgPOKdv29mVeSb6PSabGpoK5/REHuZfGqvqsuK4ji6Y/rTiNzqk9kY7ndUWW73jeyr/UnxZK99WvY5dAok9GIrnZng3vvSor11anZC01W6AtUqhZOVbPpGVswsGKhfNxIfjM3w/6WWZCdKcIkG8nfDd8K11/PWvZtxruWIv22Zc/lhs1ZwwS5ipB/uoOJXnr4ucdW7SbcxoPaSz4mo6bZs9fyLiVbcMO5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vMJsNKQUZtymdHH2GIIDBH9pJZkNnJpqIPPKhUU2X6k=;
- b=U7in6K/xvj1VhHwcOUXHzSwpff8X3panp0ebeikbLaOwKJ9cm9TCRplRkaRXydgGQGVwVQTwOVS7ItYvXdciEeQNI+ZxThswQ4yLHsIdRiyhCsJB3t1rBFVx95mwlbheZDx33RY52mPJS6o44S89cx7XIZNwbjjkzm6+wKqZ4WN8UPBgjb4pAwtWVmBJH2okIWpUdn7OVYzsnxwFPcayampj2VmTyw7Ib3C/nRQ1BrP1N1ABjQBFgp3QwcnGOtCOM4rNuEfDievQ9G/069AZ1SSzdi10fe7INlXwWUjmUIDBMt1aUrMFV5S1HUTPnH2MuG2GBW6xWbxwO6QuAmK6Kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vMJsNKQUZtymdHH2GIIDBH9pJZkNnJpqIPPKhUU2X6k=;
- b=ZYrRcoC6Vje9b7A7rVAejbIZY9Fjd3CijMpwvLV2iwe9PhoAq0vcEQZ8x6nujj2cmNClBKEwLz+bHgiPoS3CYfUeydB+i5saOKgM4amTFl8l9xYN/za+zpJx5t/RG//MnfcKlZBRUYy4NdLddltePrddhKKcJ4QPcrHp3LQQMK44+i/xwrj/qV9aGE74F5dbqpDvx/FCQptGOkeR8GrVcLfFjf0y94RAZTcpeGnYUKbnGroKVNRxjoTONRF1TsM6pzawFtcomo5uy4a8rXLeABPKYJCTxtlKZEO/cLvL4uubo9d34bnznMhWp0dte6dZYwHyp04wPqgG+DOQxs7gwA==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by BL1PR12MB5111.namprd12.prod.outlook.com (2603:10b6:208:31b::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
- 2023 19:39:30 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::f55b:c44f:74a7:7056]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::f55b:c44f:74a7:7056%4]) with mapi id 15.20.6652.026; Tue, 8 Aug 2023
- 19:39:29 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 1/2] block: get rid of unused plug->nowait flag
-Thread-Topic: [PATCH 1/2] block: get rid of unused plug->nowait flag
-Thread-Index: AQHZyiOmE7S65bfMD0CSWlcLRuMTIq/gy9EA
-Date:   Tue, 8 Aug 2023 19:39:29 +0000
-Message-ID: <5309a2c6-8165-4c50-4e2f-95e66e800ff5@nvidia.com>
-References: <20230808171310.112878-1-axboe@kernel.dk>
- <20230808171310.112878-2-axboe@kernel.dk>
-In-Reply-To: <20230808171310.112878-2-axboe@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|BL1PR12MB5111:EE_
-x-ms-office365-filtering-correlation-id: 94768d9e-14d4-487f-8255-08db98472ec5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9qyGSiFNPUI+nSDu+d0zzqx4dJiy16unAuMdEdXGmSg2ZwLXuD1K7hbelLeu0G132hae0lg4v3y+NLdfKtBbrw7uHglTh9bqo+S2CrQAiWOND7q9nolAdW0OrrZnlDAyNdOOA+8NcX3sNBFhWp5SpCw8kT20K0Lx8B01K2V88zRBIyvUoaMo1aZfVhjd3APt6LMgJXTIx3G7hUjS9HCgIBjhdryu6gDciVcV+iPz26yGCl+oSn60qB7DvuLk66QoNx9IhJqngnoCVzQ7ys/Fkn+MhotfmQr2gYiH9i2y6iNMOzJKZfFM2O0l2+Aw5gbm97b3gtd188XSG3KrojGfKjardjSiwWecP5cOOdy5XttbpsPEQnH/2aoLi1SX4PwtDsJho11PD8LJ3TjnWPtM5+xPdjrKznk+6yxjUs54lKdVpuxvRs4UVlxnRbDQF+4YIrzYM40ybb/p/u/4aD9+6Uor3YIskiLHC14lVYjR5l92du7oBI1m5GRDjJaA5LITuk/+pgQncqBuZinFfXvnvZ8aUkerMwlWFHKisaiL+bYOETGB3s1KZEbN43pkXCemhIlrAo0xHqBEpiCeZ6sxGQYhqPrMb+2Gxl081diuvEHGjEiWwOEhDbK00WE01zGHObaSi5c0HXy1coXGNxNIcWcS2VA5rh+OTA6u2xWwO/o06dn4/1bZhM+xXcok64HwW1s5bTFSb0UO34Ovo704ww==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(39860400002)(376002)(136003)(346002)(186006)(1800799003)(451199021)(2616005)(122000001)(478600001)(83380400001)(31686004)(6486002)(53546011)(6512007)(26005)(6506007)(66946007)(76116006)(91956017)(66476007)(66446008)(8936002)(316002)(2906002)(8676002)(31696002)(66556008)(41300700001)(71200400001)(64756008)(110136005)(38100700002)(36756003)(38070700005)(558084003)(86362001)(5660300002)(26583001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VWU2VitDZ00wY2FqK2djTUZvU2pmalREN0ZoMUt2MGpqMElOY0ZYNGZhdW1Q?=
- =?utf-8?B?OWZxZU5GZHRlZktVS0prR1dVbmdvZXJ4ZnJaVmhiUGtuRHVJd1VoYW1DM1R5?=
- =?utf-8?B?RS9DR0RWQWpZanlMcnpGN0tJeEVkdEtpTVRybmVRUmZqcmhpejFGVUVTWFVY?=
- =?utf-8?B?UFBLWHloWlU1WkQ2ZE8xR3dFQzB6Yld3NS9IWUdaN2IvNDVFdTU1V0VvdVVF?=
- =?utf-8?B?WWN5SXZ4Z003b2dackpFK3pJczB6U0EwcUVJTHVQQnVFdHZuNmRVRGNmaExZ?=
- =?utf-8?B?VXhYcGJYQ2lMRDc0bC9qbXZwRW5DaWYzaGJUTk1Dc25hdTZNZy9RTmJVTmhQ?=
- =?utf-8?B?STlCSFQyeENzV1hTQTQwVUU1c1N4bE5ISkJ2dWZGN3FmTzlkaXFlbnZtR0M5?=
- =?utf-8?B?Q0hXS1JMN21lL0FCK255YWVlZUVKK3M5cSthSU94MEM2TmNXRzAzTEE4cFE4?=
- =?utf-8?B?dzZ0andhbzNFSHZKaWkrOGxrQTM4Tm1KVmFOOGl1QUJUUkdRWFhCbjZ1ZDRa?=
- =?utf-8?B?aVJ4MTBmWHhsT3Q5UnJzYllCRXVFUGxGYjVIM05lcjBMQVpBek01UkMvZ2VS?=
- =?utf-8?B?RTYyZlZoQ0o5WlBTcWlYTGx2N3JVV1FQaDFmZStrMnA0QjFGZnErdE1paG1E?=
- =?utf-8?B?dTM4TzhiWjBXYkNpRUFxczZlQkk0WEk3Mi9VMHA1cExha3E0UzZqR1NsWmF1?=
- =?utf-8?B?RDBqSktsY3N0Wjd1bUxTUFhpSXVZa2Y3RzVVYXlkVSt4VHZmbDZ0bXFyVFJK?=
- =?utf-8?B?YlV5cjFnSTk3THJmVHR4eUhEZTcrbXREWWUxRmVrajllOTMvUTRMZVpJMlEz?=
- =?utf-8?B?SllUeU0yc2RneE9Ya2UwTG94R29WVmpsMWJ0OHFGa2lYVFExb3dKaDNIRVps?=
- =?utf-8?B?M3l3bURTK29JOEI3TmYyVWdTbWM4djk2MHU1bm5FNzBsTUdUdmt4L1YxTEZJ?=
- =?utf-8?B?bnowenVYMHJSY3FhTllYNFJPaGNVamxqVXEvdmx3NDBydlBHUFYzNEUvS0Fu?=
- =?utf-8?B?YW1uT2lwZlFOd0pOVWp1d21kUGZPeEFESVZaTXJmcGY5cW5VVmQzajVFSm1T?=
- =?utf-8?B?cnpvRld2cEFwTTBrcDBQZlBMSFV2MEZMbHhyY0J1QkFGRmovSHh3NUNSak1p?=
- =?utf-8?B?c2NUa3RMRUhqSHYxQ2hFL1VPNlR2cjBnUHdqYXlYSkxrOC9iMFpPNGU1ZE4x?=
- =?utf-8?B?RHNZMkgyc1gyaFRoWmtFVWRQZisxZ0drMGJ4TXo1WkdiTUczTGtaMysrcHZP?=
- =?utf-8?B?OVcraFRCTm5mSXZtQm4wVjVQczBZOXhnY2dQYUhBVXFiZXhxcGpZM3lWeGhZ?=
- =?utf-8?B?ODExREFHck9VS0hLdzlwcHpwbWF6aW5YR3QzaXk0RTdzL3lUaUtTU1Raazh3?=
- =?utf-8?B?QlZueGZzWlRFMzA4NlJLOUZ2blBvOWZrYjNzZW5oNW8yWlhQM09aMWdHLysw?=
- =?utf-8?B?aWhFTUkxbmxuTVUraXR0Kys3eTJ6djRwbmoyd2JkeThqMS9ZYUdPWStyQTRY?=
- =?utf-8?B?MjJmbzUwOFBiMmovbFl4N0x2WlFReEJ2cHBMZkJ4TGVnL0hJbmRKVUJrY1hI?=
- =?utf-8?B?b1hubFJxbldwekl0MTVBUlJzTGdJWFAzUHJOMmhXcnpOaHhCMzdqQXA2VTJh?=
- =?utf-8?B?M2c5N3JMOElnY1V1Q3RMVzVwZmN0NXJ4TWp5WmROZGQ2akpGeFZqMUVvWmwz?=
- =?utf-8?B?bGZ1Z2pGN2JTcGFMeVVwTXpsdGl6R29JbkFQZFRwRlVNdmdBeU9qTTNjTDdY?=
- =?utf-8?B?V1c5UEdzKzJDUklINWRxYnNydHhLSG1QTGpUZ0pFMk5idWpJWS9RMzIyVnBU?=
- =?utf-8?B?WjlmUkhIR3RlaWFheFlxU3VXZCtZYkhPK3JMOWQxa2dMWHhaQi9ySk9weUJS?=
- =?utf-8?B?SHo5VHhkcWZsby9nYjZKZWF2MC9VSzNrV09CaitWSXlnSGtoZWEzMmJRRVhp?=
- =?utf-8?B?QUZtOS93THB3SUV4T0lraWtVaXQxbHJRdHRqQzJEa3VLMHh5Y1IrQTY4M3lH?=
- =?utf-8?B?YXNPK0ZXQzhndHZwb3M2aWp1R05GMGZOQ042Uk5Jak5Kd1o0TGRzODFLVXpH?=
- =?utf-8?B?MU5WWU5nV1J4cThVMGkzUHE0V3ZoNlIyTENSdnpIdXlrRkViR3p1RHdvQmda?=
- =?utf-8?Q?anDo=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <436429DC8CA1EF4386A0EDD7BACEC680@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S232298AbjHHUjm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 16:39:42 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0CA8772B3
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 10:20:52 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.56])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RKnDH2VS5z1hwGD;
+        Tue,  8 Aug 2023 16:58:55 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 8 Aug
+ 2023 17:01:43 +0800
+From:   Ruan Jinjie <ruanjinjie@huawei.com>
+To:     <linux-block@vger.kernel.org>, <drbd-dev@lists.linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>
+CC:     <ruanjinjie@huawei.com>
+Subject: [PATCH -next] drbd: Use helper put_drbd_dev() and get_drbd_dev()
+Date:   Tue, 8 Aug 2023 17:01:11 +0800
+Message-ID: <20230808090111.2420717-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94768d9e-14d4-487f-8255-08db98472ec5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2023 19:39:29.7420
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 15RkaWSpxKCoD9ewua98EzWu2sQii3WYbtQ2b1ZaW8ckKHMMVE6qySlkgzV97ZgyRMhV7CXtJnA2S38W5IY7VQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5111
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gOC84LzIwMjMgMTA6MTMgQU0sIEplbnMgQXhib2Ugd3JvdGU6DQo+IFRoaXMgd2FzIGludHJv
-ZHVjZWQgdG8gYWRkIGEgcGx1ZyBiYXNlZCB3YXkgb2Ygc2lnbmFsaW5nIG5vd2FpdCBpc3N1ZXMs
-DQo+IGJ1dCB3ZSBoYXZlIHNpbmNlIG1vdmVkIG9uIGZyb20gdGhhdC4gS2lsbCB0aGUgb2xkIGRl
-YWQgY29kZSwgbm9ib2R5IGlzDQo+IHNldHRpbmcgaXQgYW55bW9yZS4NCj4gDQo+IFNpZ25lZC1v
-ZmYtYnk6IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kaz4NCj4gLS0tDQoNCkxvb2tzIGdvb2Qg
-dG8gbWUuDQoNClJldmlld2VkLWJ5OiBDaGFpdGFueWEgS3Vsa2FybmkgPGtjaEBudmlkaWEuY29t
-Pg0KDQotY2sNCg0KDQo=
+The drbd_destroy_device() arg of this code is already duplicated
+18 times, use helper function put_drbd_dev() to release drbd_device
+and related resources instead of open coding it to help improve
+code readability a bit.
+
+And add get_drbd_dev() helper function to be symmetrical with it.
+
+No functional change involved.
+
+Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+---
+ drivers/block/drbd/drbd_debugfs.c  |  2 +-
+ drivers/block/drbd/drbd_int.h      | 10 ++++++++++
+ drivers/block/drbd/drbd_main.c     | 18 +++++++++---------
+ drivers/block/drbd/drbd_nl.c       |  4 ++--
+ drivers/block/drbd/drbd_receiver.c | 24 ++++++++++++------------
+ drivers/block/drbd/drbd_state.c    |  4 ++--
+ drivers/block/drbd/drbd_worker.c   | 12 ++++++------
+ 7 files changed, 42 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
+index 12460b584bcb..8f681be85460 100644
+--- a/drivers/block/drbd/drbd_debugfs.c
++++ b/drivers/block/drbd/drbd_debugfs.c
+@@ -751,7 +751,7 @@ static int device_ ## name ## _open(struct inode *inode, struct file *file)	\
+ static int device_ ## name ## _release(struct inode *inode, struct file *file)	\
+ {										\
+ 	struct drbd_device *device = inode->i_private;				\
+-	kref_put(&device->kref, drbd_destroy_device);				\
++	put_drbd_dev(device);							\
+ 	return single_release(inode, file);					\
+ }										\
+ static const struct file_operations device_ ## name ## _fops = {		\
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index a30a5ed811be..052a86240711 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -1372,6 +1372,16 @@ extern enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx
+ extern void drbd_destroy_device(struct kref *kref);
+ extern void drbd_delete_device(struct drbd_device *device);
+ 
++static inline void get_drbd_dev(struct drbd_device *dev)
++{
++	kref_get(&dev->kref);
++}
++
++static inline void put_drbd_dev(struct drbd_device *dev)
++{
++	kref_put(&dev->kref, drbd_destroy_device);
++}
++
+ extern struct drbd_resource *drbd_create_resource(const char *name);
+ extern void drbd_free_resource(struct drbd_resource *resource);
+ 
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 79ab532aabaf..a7c619afecec 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2746,7 +2746,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 			err = ERR_MINOR_OR_VOLUME_EXISTS;
+ 		goto out_no_minor_idr;
+ 	}
+-	kref_get(&device->kref);
++	get_drbd_dev(device);
+ 
+ 	id = idr_alloc(&resource->devices, device, vnr, vnr + 1, GFP_KERNEL);
+ 	if (id < 0) {
+@@ -2754,7 +2754,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 			err = ERR_MINOR_OR_VOLUME_EXISTS;
+ 		goto out_idr_remove_minor;
+ 	}
+-	kref_get(&device->kref);
++	get_drbd_dev(device);
+ 
+ 	INIT_LIST_HEAD(&device->peer_devices);
+ 	INIT_LIST_HEAD(&device->pending_bitmap_io);
+@@ -2766,7 +2766,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 		peer_device->device = device;
+ 
+ 		list_add(&peer_device->peer_devices, &device->peer_devices);
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 
+ 		id = idr_alloc(&connection->peer_devices, peer_device, vnr, vnr + 1, GFP_KERNEL);
+ 		if (id < 0) {
+@@ -2839,15 +2839,15 @@ void drbd_delete_device(struct drbd_device *device)
+ 	drbd_debugfs_device_cleanup(device);
+ 	for_each_connection(connection, resource) {
+ 		idr_remove(&connection->peer_devices, device->vnr);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 	}
+ 	idr_remove(&resource->devices, device->vnr);
+-	kref_put(&device->kref, drbd_destroy_device);
++	put_drbd_dev(device);
+ 	idr_remove(&drbd_devices, device_to_minor(device));
+-	kref_put(&device->kref, drbd_destroy_device);
++	put_drbd_dev(device);
+ 	del_gendisk(device->vdisk);
+ 	synchronize_rcu();
+-	kref_put(&device->kref, drbd_destroy_device);
++	put_drbd_dev(device);
+ }
+ 
+ static int __init drbd_init(void)
+@@ -2959,10 +2959,10 @@ void conn_md_sync(struct drbd_connection *connection)
+ 	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
+ 		struct drbd_device *device = peer_device->device;
+ 
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 		rcu_read_unlock();
+ 		drbd_md_sync(device);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 		rcu_read_lock();
+ 	}
+ 	rcu_read_unlock();
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index cddae6f4b00f..294b0b138e7d 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -228,7 +228,7 @@ static int drbd_adm_prepare(struct drbd_config_context *adm_ctx,
+ 	 * But we may explicitly drop it/retake it in drbd_adm_set_role(),
+ 	 * so make sure this object stays around. */
+ 	if (adm_ctx->device)
+-		kref_get(&adm_ctx->device->kref);
++		get_drbd_dev(adm_ctx->device);
+ 
+ 	if (adm_ctx->resource_name) {
+ 		adm_ctx->resource = drbd_find_resource(adm_ctx->resource_name);
+@@ -304,7 +304,7 @@ static int drbd_adm_finish(struct drbd_config_context *adm_ctx,
+ 	struct genl_info *info, int retcode)
+ {
+ 	if (adm_ctx->device) {
+-		kref_put(&adm_ctx->device->kref, drbd_destroy_device);
++		put_drbd_dev(adm_ctx->device);
+ 		adm_ctx->device = NULL;
+ 	}
+ 	if (adm_ctx->connection) {
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 0c9f54197768..101d81cd4db1 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -230,10 +230,10 @@ static void conn_reclaim_net_peer_reqs(struct drbd_connection *connection)
+ 		if (!atomic_read(&device->pp_in_use_by_net))
+ 			continue;
+ 
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 		rcu_read_unlock();
+ 		drbd_reclaim_net_peer_reqs(device);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 		rcu_read_lock();
+ 	}
+ 	rcu_read_unlock();
+@@ -1105,7 +1105,7 @@ static int conn_connect(struct drbd_connection *connection)
+ 	rcu_read_lock();
+ 	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
+ 		struct drbd_device *device = peer_device->device;
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 		rcu_read_unlock();
+ 
+ 		if (discard_my_data)
+@@ -1114,7 +1114,7 @@ static int conn_connect(struct drbd_connection *connection)
+ 			clear_bit(DISCARD_MY_DATA, &device->flags);
+ 
+ 		drbd_connected(peer_device);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 		rcu_read_lock();
+ 	}
+ 	rcu_read_unlock();
+@@ -1273,7 +1273,7 @@ static void one_flush_endio(struct bio *bio)
+ 
+ 	clear_bit(FLUSH_PENDING, &device->flags);
+ 	put_ldev(device);
+-	kref_put(&device->kref, drbd_destroy_device);
++	put_drbd_dev(device);
+ 
+ 	if (atomic_dec_and_test(&ctx->pending))
+ 		complete(&ctx->done);
+@@ -1294,7 +1294,7 @@ static void submit_one_flush(struct drbd_device *device, struct issue_flush_cont
+ 
+ 		ctx->error = -ENOMEM;
+ 		put_ldev(device);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 		return;
+ 	}
+ 
+@@ -1326,7 +1326,7 @@ static void drbd_flush(struct drbd_connection *connection)
+ 
+ 			if (!get_ldev(device))
+ 				continue;
+-			kref_get(&device->kref);
++			get_drbd_dev(device);
+ 			rcu_read_unlock();
+ 
+ 			submit_one_flush(device, &ctx);
+@@ -1746,10 +1746,10 @@ static void conn_wait_active_ee_empty(struct drbd_connection *connection)
+ 	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
+ 		struct drbd_device *device = peer_device->device;
+ 
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 		rcu_read_unlock();
+ 		drbd_wait_ee_list_empty(device, &device->active_ee);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 		rcu_read_lock();
+ 	}
+ 	rcu_read_unlock();
+@@ -5129,10 +5129,10 @@ static void conn_disconnect(struct drbd_connection *connection)
+ 	rcu_read_lock();
+ 	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
+ 		struct drbd_device *device = peer_device->device;
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 		rcu_read_unlock();
+ 		drbd_disconnected(peer_device);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 		rcu_read_lock();
+ 	}
+ 	rcu_read_unlock();
+@@ -6112,7 +6112,7 @@ void drbd_send_acks_wf(struct work_struct *ws)
+ 		tcp_sock_set_cork(connection->meta.socket->sk, true);
+ 
+ 	err = drbd_finish_peer_reqs(device);
+-	kref_put(&device->kref, drbd_destroy_device);
++	put_drbd_dev(device);
+ 	/* get is in drbd_endio_write_sec_final(). That is necessary to keep the
+ 	   struct work_struct send_acks_work alive, which is in the peer_device object */
+ 
+diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
+index 287a8d1d3f70..c2fe43d80a29 100644
+--- a/drivers/block/drbd/drbd_state.c
++++ b/drivers/block/drbd/drbd_state.c
+@@ -122,7 +122,7 @@ struct drbd_state_change *remember_old_state(struct drbd_resource *resource, gfp
+ 	device_state_change = state_change->devices;
+ 	peer_device_state_change = state_change->peer_devices;
+ 	idr_for_each_entry(&resource->devices, device, vnr) {
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 		device_state_change->device = device;
+ 		device_state_change->disk_state[OLD] = device->state.disk;
+ 
+@@ -264,7 +264,7 @@ void forget_state_change(struct drbd_state_change *state_change)
+ 		struct drbd_device *device = state_change->devices[n].device;
+ 
+ 		if (device)
+-			kref_put(&device->kref, drbd_destroy_device);
++			put_drbd_dev(device);
+ 	}
+ 	for (n = 0; n < state_change->n_connections; n++) {
+ 		struct drbd_connection *connection =
+diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
+index 4352a50fbb3f..10d074885ea4 100644
+--- a/drivers/block/drbd/drbd_worker.c
++++ b/drivers/block/drbd/drbd_worker.c
+@@ -147,9 +147,9 @@ void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req) __releases(l
+ 		__drbd_chk_io_error(device, DRBD_WRITE_ERROR);
+ 
+ 	if (connection->cstate >= C_WF_REPORT_PARAMS) {
+-		kref_get(&device->kref); /* put is in drbd_send_acks_wf() */
++		get_drbd_dev(device); /* put is in drbd_send_acks_wf() */
+ 		if (!queue_work(connection->ack_sender, &peer_device->send_acks_work))
+-			kref_put(&device->kref, drbd_destroy_device);
++			put_drbd_dev(device);
+ 	}
+ 	spin_unlock_irqrestore(&device->resource->req_lock, flags);
+ 
+@@ -2065,10 +2065,10 @@ static void do_unqueued_work(struct drbd_connection *connection)
+ 		if (!todo)
+ 			continue;
+ 
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 		rcu_read_unlock();
+ 		do_device_work(device, todo);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 		rcu_read_lock();
+ 	}
+ 	rcu_read_unlock();
+@@ -2229,10 +2229,10 @@ int drbd_worker(struct drbd_thread *thi)
+ 	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
+ 		struct drbd_device *device = peer_device->device;
+ 		D_ASSERT(device, device->state.disk == D_DISKLESS && device->state.conn == C_STANDALONE);
+-		kref_get(&device->kref);
++		get_drbd_dev(device);
+ 		rcu_read_unlock();
+ 		drbd_device_cleanup(device);
+-		kref_put(&device->kref, drbd_destroy_device);
++		put_drbd_dev(device);
+ 		rcu_read_lock();
+ 	}
+ 	rcu_read_unlock();
+-- 
+2.34.1
+
