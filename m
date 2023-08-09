@@ -2,133 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A242C001B0
-	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 11:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D26EAC001B0
+	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 12:11:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233950AbjHILcx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Aug 2023 07:32:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51966 "EHLO
+        id S229491AbjHIMLR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Aug 2023 08:11:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233944AbjHILcw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 07:32:52 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F5C1724;
-        Wed,  9 Aug 2023 04:32:51 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RLSbK5c7Gz4f3lVT;
-        Wed,  9 Aug 2023 19:32:45 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgA3xqhcedNkIfkzAQ--.33619S4;
-        Wed, 09 Aug 2023 19:32:46 +0800 (CST)
-From:   Li Lingfeng <lilingfeng@huaweicloud.com>
-To:     tj@kernel.org
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, mkoutny@suse.com,
+        with ESMTP id S231597AbjHIMLQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 08:11:16 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 899271FD4;
+        Wed,  9 Aug 2023 05:11:15 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 4517B1F390;
+        Wed,  9 Aug 2023 12:11:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1691583074; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0bFw/WJBWsVmnC3JIQOGCnya92pXr+LvPFTesg/9s1Q=;
+        b=ub7DH9nJ6UoqBcoyE6iSeIUyE0clsVVe5kr8cLreCRs3+yOwc6WU+42omEKVGcb/gvgfPj
+        oVqhy3fAHZCWwoR+tdZRHfU3fYjPFnVc3wKvCw4PhA4i7plNsvJhMFx5UZ7fOrghG9i54O
+        d09dv4DUMpoBrW3WSb1ipEZMLrYeBpE=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 109B1133B5;
+        Wed,  9 Aug 2023 12:11:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id zlguA2KC02RmZQAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Wed, 09 Aug 2023 12:11:14 +0000
+Date:   Wed, 9 Aug 2023 14:11:12 +0200
+From:   Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To:     Li Lingfeng <lilingfeng@huaweicloud.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         yukuai3@huawei.com, linan122@huawei.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com, lilingfeng@huaweicloud.com,
-        lilingfeng3@huawei.com
-Subject: [PATCH -next v2] block: remove init_mutex and open-code blk_iolatency_try_init
-Date:   Wed,  9 Aug 2023 19:29:28 +0800
-Message-Id: <20230809112928.2009183-1-lilingfeng@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        yangerkun@huawei.com, lilingfeng3@huawei.com
+Subject: Re: [PATCH -next v2] block: remove init_mutex and open-code
+ blk_iolatency_try_init
+Message-ID: <6dcshmol4oz4hpsm42s3ocfdg7rtykkx2vjg6fd6zdvmkbmg7w@4liecv2rxqqk>
+References: <20230809112928.2009183-1-lilingfeng@huaweicloud.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgA3xqhcedNkIfkzAQ--.33619S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZrW8GF48WFWkJr4DCF1fXrb_yoW8Kr15p3
-        ySgrsIy3yUGrs7XF1kKw1xur15K3y8Kry7Gr4fCFyrJr1j9r1agF18AF1FgFWfZrZ5Aan8
-        KF48J34kCr4rG37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
-        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
-        fUoOJ5UUUUU
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="vz25knwjnl4pua2b"
+Content-Disposition: inline
+In-Reply-To: <20230809112928.2009183-1-lilingfeng@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Lingfeng <lilingfeng3@huawei.com>
 
-Commit a13696b83da4 ("blk-iolatency: Make initialization lazy") adds
-a mutex named "init_mutex" in blk_iolatency_try_init for the race
-condition of initializing RQ_QOS_LATENCY.
-Now a new lock has been add to struct request_queue by commit a13bd91be223
-("block/rq_qos: protect rq_qos apis with a new lock"). And it has been
-held in blkg_conf_open_bdev before calling blk_iolatency_init.
-So it's not necessary to keep init_mutex in blk_iolatency_try_init, just
-remove it.
+--vz25knwjnl4pua2b
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Since init_mutex has been removed, blk_iolatency_try_init can be
-open-coded back to iolatency_set_limit() like ioc_qos_write().
+On Wed, Aug 09, 2023 at 07:29:28PM +0800, Li Lingfeng <lilingfeng@huaweiclo=
+ud.com> wrote:
+>  1 file changed, 10 insertions(+), 24 deletions(-)
 
-Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
----
-  v1->v2: open-code blk_iolatency_try_init()
+I like this bottom line.
 
- block/blk-iolatency.c | 34 ++++++++++------------------------
- 1 file changed, 10 insertions(+), 24 deletions(-)
+> @@ -861,7 +838,16 @@ static ssize_t iolatency_set_limit(struct kernfs_ope=
+n_file *of, char *buf,
+> =20
+>  	blkg_conf_init(&ctx, buf);
+> =20
+> -	ret =3D blk_iolatency_try_init(&ctx);
+> +	ret =3D blkg_conf_open_bdev(&ctx);
+> +	if (ret)
+> +		goto out;
+> +
+> +	/*
+> +	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
+> +	 * confuse iolat_rq_qos() test. Make the test and init atomic.
+> +	 */
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index fd5fec989e39..e1dbf18a1d1d 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -824,29 +824,6 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
- 	}
- }
- 
--static int blk_iolatency_try_init(struct blkg_conf_ctx *ctx)
--{
--	static DEFINE_MUTEX(init_mutex);
--	int ret;
--
--	ret = blkg_conf_open_bdev(ctx);
--	if (ret)
--		return ret;
--
--	/*
--	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
--	 * confuse iolat_rq_qos() test. Make the test and init atomic.
--	 */
--	mutex_lock(&init_mutex);
--
--	if (!iolat_rq_qos(ctx->bdev->bd_queue))
--		ret = blk_iolatency_init(ctx->bdev->bd_disk);
--
--	mutex_unlock(&init_mutex);
--
--	return ret;
--}
--
- static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 			     size_t nbytes, loff_t off)
- {
-@@ -861,7 +838,16 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 
- 	blkg_conf_init(&ctx, buf);
- 
--	ret = blk_iolatency_try_init(&ctx);
-+	ret = blkg_conf_open_bdev(&ctx);
-+	if (ret)
-+		goto out;
-+
-+	/*
-+	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
-+	 * confuse iolat_rq_qos() test. Make the test and init atomic.
-+	 */
-+	if (!iolat_rq_qos(ctx.bdev->bd_queue))
-+		ret = blk_iolatency_init(ctx.bdev->bd_disk);
- 	if (ret)
- 		goto out;
- 
--- 
-2.39.2
+Perhaps add here
+	lockdep_assert_held(ctx.bdev->bd_queue->rq_qos_mutex);
 
+because without that the last sentence of the comment misses the
+context.
+
+> +	if (!iolat_rq_qos(ctx.bdev->bd_queue))
+> +		ret =3D blk_iolatency_init(ctx.bdev->bd_disk);
+>  	if (ret)
+>  		goto out;
+
+Thanks,
+Michal
+
+--vz25knwjnl4pua2b
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQQpEWyjXuwGT2dDBqAGvrMr/1gcjgUCZNOCXgAKCRAGvrMr/1gc
+jqQ5AP97ZVTbopQGteWUqwgmcSpEJ6DaXzMfGJ8JRsEFEncwPQD/d9YGR41xRPtq
+9ifkSdCa+JcV+2WAW25bjYGN6+hovwc=
+=8mdk
+-----END PGP SIGNATURE-----
+
+--vz25knwjnl4pua2b--
