@@ -2,58 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AADCC0015E
-	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 08:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1563AC001DE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 10:58:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbjHII1z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Aug 2023 04:27:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38606 "EHLO
+        id S232707AbjHIK6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Aug 2023 06:58:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231384AbjHII1y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 04:27:54 -0400
-X-Greylist: delayed 521 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 09 Aug 2023 01:27:54 PDT
-Received: from mail.profitpathwaygo.com (mail.profitpathwaygo.com [141.94.21.238])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109F810FF
-        for <linux-block@vger.kernel.org>; Wed,  9 Aug 2023 01:27:54 -0700 (PDT)
-Received: by mail.profitpathwaygo.com (Postfix, from userid 1002)
-        id 3895A48F85; Wed,  9 Aug 2023 08:16:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=profitpathwaygo.com;
-        s=mail; t=1691569010;
-        bh=qp3Ofokho6Ql+WtI8ZPVilyHYhskXL7fod7u9CWs8W4=;
-        h=Date:From:To:Subject:From;
-        b=L9Ca3gtDz5P+AA0hbKNosLwE1J9EGy7EUZ80RhrUDO4rhjeXIkRgfGdsr0UVtgDPm
-         bmOt6bv8dqTsNghGIbOxhxOJutnxlaik9vl+F60fPnFQ51ad/z8YtSAZCwdAvvUJjL
-         KUjNqz87JZ/7O57VWSDBBJvKmJbzlUrVoXEwbdwMA7tQaXIDymaPr0KlOLIic9Lc2v
-         MBnKlAqju+TchHG0PZD1CB25rq5Vaz+270dqus2uKLq2hOirbJ5YUZS757AvtwTRVZ
-         jRpCT8uNBZgy4LYzeLPFJ7PjNtXUt2Are2+g1XDALV9K48wWN2HKhBDEGE3zlKikJT
-         TdS6xF3By7Shw==
-Received: by mail.profitpathwaygo.com for <linux-block@vger.kernel.org>; Wed,  9 Aug 2023 08:16:11 GMT
-Message-ID: <20230809064500-0.1.10.4sbx.0.0r95750eui@profitpathwaygo.com>
-Date:   Wed,  9 Aug 2023 08:16:11 GMT
-From:   "Adam Charachuta" <adam.charachuta@profitpathwaygo.com>
-To:     <linux-block@vger.kernel.org>
-Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania_?=
-X-Mailer: mail.profitpathwaygo.com
+        with ESMTP id S232750AbjHIK56 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 06:57:58 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B533213B;
+        Wed,  9 Aug 2023 03:57:58 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RLRq55bwDz4f4719;
+        Wed,  9 Aug 2023 18:57:53 +0800 (CST)
+Received: from [10.174.179.155] (unknown [10.174.179.155])
+        by APP4 (Coremail) with SMTP id gCh0CgAXp6kwcdNk9wkyAQ--.5865S3;
+        Wed, 09 Aug 2023 18:57:54 +0800 (CST)
+Message-ID: <c8b09f3b-b8c2-4973-255a-ab63bd6cf771@huaweicloud.com>
+Date:   Wed, 9 Aug 2023 18:57:52 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
+ Thunderbird/104.0
+Subject: Re: [PATCH -next] block: remove init_mutex in blk_iolatency_try_init
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        yukuai3@huawei.com, linan122@huawei.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com, lilingfeng3@huawei.com
+References: <20230804113659.3816877-1-lilingfeng@huaweicloud.com>
+ <o6nnp6jwzpchlqsiusbioqsyaml2fonxzmzi46yrycjgtq6hyb@ixqiysu6lmpe>
+From:   Li Lingfeng <lilingfeng@huaweicloud.com>
+In-Reply-To: <o6nnp6jwzpchlqsiusbioqsyaml2fonxzmzi46yrycjgtq6hyb@ixqiysu6lmpe>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAXp6kwcdNk9wkyAQ--.5865S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Gr4rurWfGrW5Zw4xGryfJFb_yoWfKFXE9r
+        43GF9Ikw10g3W3Gws8tay7GrWYgrW8X347CFyxZrZrWwn3A395CF4fA3sxWFWSka4Ikas8
+        Cr1Yqw47Jr4FvjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbIxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+        07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+        02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
+        GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+        CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
+        wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+        7IU1zuWJUUUUU==
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Thanks for your advice, I will send a new patch soon.
 
-zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
-=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
-o dalszych rozm=C3=B3w.=20
+在 2023/8/8 0:05, Michal Koutný 写道:
+> Hello.
+>
+> On Fri, Aug 04, 2023 at 07:36:59PM +0800, Li Lingfeng <lilingfeng@huaweicloud.com> wrote:
+>> From: Li Lingfeng <lilingfeng3@huawei.com>
+>>
+>> Commit a13696b83da4 ("blk-iolatency: Make initialization lazy") adds
+>> a mutex named "init_mutex" in blk_iolatency_try_init for the race
+>> condition of initializing RQ_QOS_LATENCY.
+>> Now a new lock has been add to struct request_queue by commit a13bd91be223
+>> ("block/rq_qos: protect rq_qos apis with a new lock"). And it has been
+>> held in blkg_conf_open_bdev before calling blk_iolatency_init.
+>> So it's not necessary to keep init_mutex in blk_iolatency_try_init, just
+>> remove it.
+> I'm looking at ioc_cost_model_write() or ioc_qos_write() where is
+> a similar pattern.
+> Could the check+init be open-coded back to iolatency_set_limit() to make
+> code more regular?
+>
+> Michal
 
-Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
-=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
-=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
-strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
-
-Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
-
-
-Pozdrawiam serdecznie
-Adam Charachuta
