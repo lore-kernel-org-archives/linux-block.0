@@ -2,140 +2,70 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2BCC001DB
-	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 01:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E65D2C001B0
+	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 01:32:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbjHIBRZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 21:17:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
+        id S230256AbjHIBcN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Aug 2023 21:32:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjHIBRY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 21:17:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0709D1FD5
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 18:16:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691543779;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z6WQGimvpw8I3eWQzkelPA3+R/lSG2mPQ4BbdsuaY/0=;
-        b=asLANZXzXyUAcAJEC+LQ8kX+ZSdsC0kXyXe2wiwKrno0/55zjyZ0BvvHopEZpQlTiAZGly
-        hptVtcTCMlGg9cqDEpYk1edguK6ODNVnf1CvKOyK8+/+NUNAQd31OILCUtB0aHIG4CQqPJ
-        +w+JKIcX+yQ8m/1H+bfSGkhXS3kn2AQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-614-otz98xfCMmO9ly3oHNFUnA-1; Tue, 08 Aug 2023 21:16:14 -0400
-X-MC-Unique: otz98xfCMmO9ly3oHNFUnA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4DA178007CE;
-        Wed,  9 Aug 2023 01:16:09 +0000 (UTC)
-Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DA2C492C13;
-        Wed,  9 Aug 2023 01:16:02 +0000 (UTC)
-Date:   Wed, 9 Aug 2023 09:15:57 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-        asml.silence@gmail.com, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
-        ming.lei@redhat.com
-Subject: Re: [PATCH for-next v3 4/4] nvme: wire up async polling for io
- passthrough commands
-Message-ID: <ZNLozRZNPJ6CVYLO@ovpn-8-17.pek2.redhat.com>
-References: <20220823161443.49436-1-joshi.k@samsung.com>
- <CGME20220823162517epcas5p2f1b808e60bae4bc1161b2d3a3a388534@epcas5p2.samsung.com>
- <20220823161443.49436-5-joshi.k@samsung.com>
+        with ESMTP id S229519AbjHIBcM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 21:32:12 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C79E19BC
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 18:32:12 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RLCC36Xbfz1hwLF;
+        Wed,  9 Aug 2023 09:29:19 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 9 Aug 2023 09:32:09 +0800
+Message-ID: <ee32b802-91a8-f7a8-cf2a-e17de1aef9a9@huawei.com>
+Date:   Wed, 9 Aug 2023 09:32:08 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220823161443.49436-5-joshi.k@samsung.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH -next] drbd: Use helper put_drbd_dev() and get_drbd_dev()
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <drbd-dev@lists.linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+References: <20230808090111.2420717-1-ruanjinjie@huawei.com>
+ <5e560155-b2a4-e5bd-d22e-0e44a5a85f43@kernel.dk>
+From:   Ruan Jinjie <ruanjinjie@huawei.com>
+In-Reply-To: <5e560155-b2a4-e5bd-d22e-0e44a5a85f43@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.109.254]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Kanchan,
 
-On Tue, Aug 23, 2022 at 09:44:43PM +0530, Kanchan Joshi wrote:
-> Store a cookie during submission, and use that to implement
-> completion-polling inside the ->uring_cmd_iopoll handler.
-> This handler makes use of existing bio poll facility.
+
+On 2023/8/9 1:36, Jens Axboe wrote:
+> On 8/8/23 3:01 AM, Ruan Jinjie wrote:
+>> The drbd_destroy_device() arg of this code is already duplicated
+>> 18 times, use helper function put_drbd_dev() to release drbd_device
+>> and related resources instead of open coding it to help improve
+>> code readability a bit.
+>>
+>> And add get_drbd_dev() helper function to be symmetrical with it.
+>>
+>> No functional change involved.
 > 
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> ---
+> IMHO this just makes the code harder to read. You're not adding a
+> helper, all it does is call the same get/put parts. Why not just keep
+> it as-is then?
 
-...
+Sorry, I misunderstood the meaning of a helper.I'll learn more about
+what other helper patches are doing. It's okay to keep it as it is.
 
->  
-> +int nvme_ns_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd)
-> +{
-> +	struct bio *bio;
-> +	int ret = 0;
-> +	struct nvme_ns *ns;
-> +	struct request_queue *q;
-> +
-> +	rcu_read_lock();
-> +	bio = READ_ONCE(ioucmd->cookie);
-> +	ns = container_of(file_inode(ioucmd->file)->i_cdev,
-> +			struct nvme_ns, cdev);
-> +	q = ns->queue;
-> +	if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio && bio->bi_bdev)
-> +		ret = bio_poll(bio, NULL, 0);
-> +	rcu_read_unlock();
-> +	return ret;
-> +}
-
-It looks not good to call bio_poll() with holding rcu read lock,
-since set_page_dirty_lock() may sleep from end_io code path.
-
-blk_rq_unmap_user
-	bio_release_pages
-		__bio_release_pages
-			set_page_dirty_lock
-				lock_page
-
-Probably you need to move dirtying pages into wq context, such as
-bio_check_pages_dirty(), then I guess pt io poll perf may drop.
-
-Maybe we need to investigate how to remove the rcu read lock here.
-
-
->  #ifdef CONFIG_NVME_MULTIPATH
->  static int nvme_ns_head_ctrl_ioctl(struct nvme_ns *ns, unsigned int cmd,
->  		void __user *argp, struct nvme_ns_head *head, int srcu_idx)
-> @@ -685,6 +721,29 @@ int nvme_ns_head_chr_uring_cmd(struct io_uring_cmd *ioucmd,
->  	srcu_read_unlock(&head->srcu, srcu_idx);
->  	return ret;
->  }
-> +
-> +int nvme_ns_head_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd)
-> +{
-> +	struct cdev *cdev = file_inode(ioucmd->file)->i_cdev;
-> +	struct nvme_ns_head *head = container_of(cdev, struct nvme_ns_head, cdev);
-> +	int srcu_idx = srcu_read_lock(&head->srcu);
-> +	struct nvme_ns *ns = nvme_find_path(head);
-> +	struct bio *bio;
-> +	int ret = 0;
-> +	struct request_queue *q;
-> +
-> +	if (ns) {
-> +		rcu_read_lock();
-> +		bio = READ_ONCE(ioucmd->cookie);
-> +		q = ns->queue;
-> +		if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio
-> +				&& bio->bi_bdev)
-> +			ret = bio_poll(bio, NULL, 0);
-> +		rcu_read_unlock();
-
-Same with above.
-
-
-thanks,
-Ming
-
+> 
