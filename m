@@ -2,175 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A922C001B0
-	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 16:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8605CC04A94
+	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 18:02:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232091AbjHIQvO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Aug 2023 12:51:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57268 "EHLO
+        id S231598AbjHISCz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Aug 2023 14:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232119AbjHIQvA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 12:51:00 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618F03A93
-        for <linux-block@vger.kernel.org>; Wed,  9 Aug 2023 09:50:25 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 78A861F390;
-        Wed,  9 Aug 2023 16:50:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1691599816; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AF0HqJKtq785OAd4GOPrkFjQegeTnPgjinGxD+qGhgU=;
-        b=Mt7opTm3TNW2tVA/MCh75LxQ1X2CTjtKBHJYyK58Xgxtcrjzckx+k0vSB50UUnjdTP7sxz
-        1s8j4+kfJ/Dl3yH69VyqyPOtURjfryebE4HTRZ5XDzxd51DnqN3W0VhW+2qn/grgjZLgUG
-        gV1KMdmYz4CqqGXbXgLHYwgXceN/YZI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1691599816;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AF0HqJKtq785OAd4GOPrkFjQegeTnPgjinGxD+qGhgU=;
-        b=dTCzO7IiZtqTaoztLGK5HCLF7NjFMfxwwY6Dc9R5SO8UxO1oRjCsrzL0dOS377ipjiDFyU
-        F/SYu5obqKie4rCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A8CF133B5;
-        Wed,  9 Aug 2023 16:50:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id BJ4AGsjD02Q4bgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 09 Aug 2023 16:50:16 +0000
-Date:   Wed, 9 Aug 2023 18:50:17 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [bug report] blktests nvme/047 failed due to /dev/nvme0n1 not
- created in time
-Message-ID: <xrqutkdhz7v6axohfxipv4or7k4jhoa57semwcxde7gletk76z@5kcashfdezhk>
-References: <CAHj4cs9GNohGUjohNw93jrr8JGNcRYC-ienAZz+sa7az1RK77w@mail.gmail.com>
- <CAHj4cs9J7w_QSWMrj0ncufKwT9viS-o7pxmS2Y4FeaWEyPD34Q@mail.gmail.com>
- <vxeo2ucxhvdcm2z673keqerkpxay6dgfluuvxawukkbunddzm2@jdkdk7y3a5nu>
+        with ESMTP id S232245AbjHISCp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 14:02:45 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8FE2E19A1;
+        Wed,  9 Aug 2023 11:02:43 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id F276320FC4C4; Wed,  9 Aug 2023 11:02:42 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F276320FC4C4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1691604163;
+        bh=2BAEPHZjC1csVSUp5YiA21kHWYMQI2muR+jIz+ByF+4=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=V0JoJpg23L/peNkCEvzn4viDNmOHVq322EXzMIkHlzswJAG/7x2U+HK9aVOM+hySz
+         mbJuWfMNHkSfC5A/dOjdMfskmaecJosfCzIgyyFlwjv23+hsdZtd9zVTW2hG2gpZGJ
+         y6qnuS91reyXsJjl52Mc922yNssoBNVK4a9tvzQs=
+Date:   Wed, 9 Aug 2023 11:02:42 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>,
+        Mike Snitzer <snitzer@kernel.org>, corbet@lwn.net,
+        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
+        agk@redhat.com, eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v10 11/17] dm-verity: consume root hash digest and
+ signature data via LSM hook
+Message-ID: <20230809180242.GA23396@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1687986571-16823-1-git-send-email-wufan@linux.microsoft.com>
+ <1687986571-16823-12-git-send-email-wufan@linux.microsoft.com>
+ <ZKgm+ffQbdDTxrg9@redhat.com>
+ <20230712034319.GA17642@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <CAHC9VhQFxqcfgR0acgdiXKP9LT1KLgGjZd-QHs6O1dEex31HEQ@mail.gmail.com>
+ <20230808224503.GA20095@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20230808234023.GC120054@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <vxeo2ucxhvdcm2z673keqerkpxay6dgfluuvxawukkbunddzm2@jdkdk7y3a5nu>
+In-Reply-To: <20230808234023.GC120054@agk-cloud1.hosts.prod.upshift.rdu2.redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 08, 2023 at 10:46:46AM +0200, Daniel Wagner wrote:
-> On Fri, Aug 04, 2023 at 06:33:04PM +0800, Yi Zhang wrote:
-> > On Tue, Aug 1, 2023 at 7:28 PM Yi Zhang <yi.zhang@redhat.com> wrote:
-> > > After some investigating, I found it was due to the /dev/nvme0n1 node
-> > > couldn't be created in time which lead to the following fio failing.
-> > > + nvme connect -t tcp -a 127.0.0.1 -s 4420 -n blktests-subsystem-1
-> > > --hostnqn=nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
-> > > --hostid=0f01fb42-9f7f-4856-b0b3-51e60b8de349 --nr-write-queues=1
-> > > + ls -l /dev/nvme0 /dev/nvme-fabrics
-> > > crw-------. 1 root root 234,   0 Aug  1 05:50 /dev/nvme0
-> > > crw-------. 1 root root  10, 122 Aug  1 05:50 /dev/nvme-fabrics
-> > > + '[' '!' -b /dev/nvme0n1 ']'
-> > > + echo '/dev/nvme0n1 node still not created'
-> > > dmesg:
-> > > [ 1840.413396] loop0: detected capacity change from 0 to 10485760
-> > > [ 1840.934379] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-> > > [ 1841.018766] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
-> > > [ 1846.782615] nvmet: creating nvm controller 1 for subsystem
-> > > blktests-subsystem-1 for NQN
-> > > nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
-> > > [ 1846.808392] nvme nvme0: creating 33 I/O queues.
-> > > [ 1846.874298] nvme nvme0: mapped 1/32/0 default/read/poll queues.
-> > > [ 1846.945334] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr
-> > > 127.0.0.1:4420
+On Wed, Aug 09, 2023 at 12:40:23AM +0100, Alasdair G Kergon wrote:
+> On Tue, Aug 08, 2023 at 03:45:03PM -0700, Fan Wu wrote:
+> > On Tue, Jul 25, 2023 at 04:43:48PM -0400, Paul Moore wrote:
+> > > Where would the finalize() hook be called?
+> > 
+> > It is in the __bind function in drivers/md/dm.c, calling just before 
+> > rcu_assign_pointer(md->map, (void *)t) which activates the inactive table.
+>  
+> That would be after the existing commit point, meaning the table swap
+> cannot be cancelled there, so is the finalize() you are proposing void()
+> i.e. designed so it always succeeds?
 > 
-> Not really sure how the blk device registration code works, but this
-> looks like there something executed not in the same context as the
-> nvme-cli command and thus we might return to userspace before the device
-> is fully created. And there is also udev events which are handled by
-> systemd. If this is the case, we might want to add some generic helper
-> which waits for the device to pop up before we continue with the test.
+> Alasdair
 
-After looking a bit at nvme/010 I see why does tests are not failing
-in the same way as nvme/047. After connecting _find_nvme_dev is used
-to wait for the device to appear:
+Thanks for the input.
 
-+ nvme connect -t tcp -n blktests-subsystem-1 -a 127.0.0.1 -s 4420 --hostnqn=nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349 --hostid=0f01fb42-9f7f-4856-b0b3-51e60b8de349
-++ _find_nvme_dev blktests-subsystem-1
-++ local subsys=blktests-subsystem-1
-++ local subsysnqn
-++ local dev
-++ for dev in /sys/class/nvme/nvme*
-++ '[' -e /sys/class/nvme/nvme0 ']'
-+++ basename /sys/class/nvme/nvme0
-++ dev=nvme0
-+++ cat /sys/class/nvme/nvme0/subsysnqn
-++ subsysnqn=nqn.2019-08.org.qemu:nvme-0
-++ [[ nqn.2019-08.org.qemu:nvme-0 == \b\l\k\t\e\s\t\s\-\s\u\b\s\y\s\t\e\m\-\1 ]]
-++ for dev in /sys/class/nvme/nvme*
-++ '[' -e /sys/class/nvme/nvme1 ']'
-+++ basename /sys/class/nvme/nvme1
-++ dev=nvme1
-+++ cat /sys/class/nvme/nvme1/subsysnqn
-++ subsysnqn=blktests-subsystem-1
-++ [[ blktests-subsystem-1 == \b\l\k\t\e\s\t\s\-\s\u\b\s\y\s\t\e\m\-\1 ]]
-++ echo nvme1
-++ (( i = 0 ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-++ [[ -e /sys/block/nvme1/uuid ]]
-++ sleep .1
-++ (( i++ ))
-++ (( i < 10 ))
-+ nvmedev=nvme1
-+ cat /sys/block/nvme1n1/uuid
-91fdba0d-f87b-4c25-b80f-db7be1418b9e
-+ cat /sys/block/nvme1n1/wwid
-uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+Actually, no, the hook can be failed. I noticed the existing call before rcu_assign_pointer(md->map, (void *)t);
+(https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/md/dm.c#n2255)
+can also be failed so I was following the same pattern.
 
-We should propably do the same for all tests.
+Could you explain a bit more about the "commit point"? It sounds like it might be better to move
+the hook call just before the commit point instead.
+
+-Fan
