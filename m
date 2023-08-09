@@ -2,83 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F301BC001B0
-	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 03:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDBFC001B0
+	for <linux-block@archiver.kernel.org>; Wed,  9 Aug 2023 06:07:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230107AbjHIDmQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Aug 2023 23:42:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59334 "EHLO
+        id S229630AbjHIGHm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Aug 2023 02:07:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbjHIDmO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Aug 2023 23:42:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3313F10D4
-        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 20:42:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S229535AbjHIGHm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 02:07:42 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D9D912D
+        for <linux-block@vger.kernel.org>; Tue,  8 Aug 2023 23:07:41 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C27F162F02
-        for <linux-block@vger.kernel.org>; Wed,  9 Aug 2023 03:42:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7165C433C7;
-        Wed,  9 Aug 2023 03:42:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691552532;
-        bh=o/NkuSH+uNiaN3nyTlzp/kSrx5fcQFsDn3CrPm+0d4g=;
-        h=Date:Subject:To:References:From:In-Reply-To:From;
-        b=og5bdyUssv9DhhdO1sn8VrOnSu1BZNdiRrXMCQ8+SVS48pljGpBWCMiD8USPk7rmR
-         YqFpC+W5UPj4KjRl/iu5TYMUtQAcFNKETPbG3STRsLbRU7wkMkRXGAA5CsXbkYe60n
-         PVgQAZwRsqwaoeWelnNNYi8i5/ioSDNEj84QTL/SwHnOcIv9oPG6AfE8Eq/fMN5amY
-         Rs/8WWncAB+6Sx3Cb5l+w1TR63rKgoDWqpc1AejCxVaLgXBWyJYv3Q1TZWgfwIIu6+
-         vbjym6oHDztQ2Cfpj1XF2IvUdeiGMybjHZJ7r9W7qxISQ8+P6iiM71M1wvtta2K00l
-         YqpjObVzhK3iA==
-Message-ID: <0c740117-f398-7b12-9a0b-7ad402ca034d@kernel.org>
-Date:   Wed, 9 Aug 2023 12:42:10 +0900
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 3C6431F388;
+        Wed,  9 Aug 2023 06:07:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1691561260; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=l6UXQ0i4tg7g8JoHktOSNbXYhH0Tmp0UBByZq/Tq2ic=;
+        b=oJ5U73nifOm0Uy0jMOl52oRjJCCTy0fxBs3t38Db9vycCbKij2W5QjQ3wh49QQgKrYG4kd
+        pj6eiZbm+Ub4YK2W6BZKBuUc8/D7SXhReBoukg5WFdaBrSlJJuKmyilnX/3FfFgA/162Cv
+        SEW+x2UZ4TDBF5vV/kUAE1R1eIc+dHQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1691561260;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=l6UXQ0i4tg7g8JoHktOSNbXYhH0Tmp0UBByZq/Tq2ic=;
+        b=JsCjOG6Q3cFz406EFfMhTwneLjh7ROwZojDNPeWiSRb5tRghb3cNH+60xbtkPVbCtVuAU/
+        qGW1kyjXgZomWGCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2540713251;
+        Wed,  9 Aug 2023 06:07:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vy0eCCwt02S1MQAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 09 Aug 2023 06:07:40 +0000
+Message-ID: <926edf15-389d-d6f5-9ac9-337cc77cc561@suse.de>
+Date:   Wed, 9 Aug 2023 08:07:39 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 3/5] block: use pr_xxx() instead of printk() in partition
- code
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 1/5] block: use PAGE_SECTORS_SHIFT to set limits
 Content-Language: en-US
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
 References: <20230808135702.628588-1-dlemoal@kernel.org>
- <20230808135702.628588-4-dlemoal@kernel.org>
- <723ae935-2374-fcc6-5a27-36cff41e163b@nvidia.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <723ae935-2374-fcc6-5a27-36cff41e163b@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20230808135702.628588-2-dlemoal@kernel.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230808135702.628588-2-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/9/23 11:07, Chaitanya Kulkarni wrote:
-> On 8/8/2023 6:57 AM, Damien Le Moal wrote:
->> Replace calls to printk() in the core, atari, efi and sun partition
->> code with the equivalent pr_info(), pr_err() etc calls. For each
->> partition type, the pr_fmt message prefix is defined as "partition: xxx:
->> " where "xxx" is the partition type name.
->>
->> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
->> ---
+On 8/8/23 15:56, Damien Le Moal wrote:
+> Replace occurences of "PAGE_SHIFT - 9" in blk-settings.c with the
+> cleaner PAGE_SECTORS_SHIFT macro.
 > 
-> why not merge with previous patch ?
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>   block/blk-settings.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-To make the patches smaller and easier to review. I can merge if everyone is OK
-with that.
+Cheers,
 
-> 
-> either way :-
-> 
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> 
-> -ck
-> 
-
+Hannes
 -- 
-Damien Le Moal
-Western Digital Research
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
