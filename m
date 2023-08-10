@@ -2,165 +2,189 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA9DC001E0
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 11:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 607A5C001B0
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 11:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232755AbjHJLFw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 07:05:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49416 "EHLO
+        id S229486AbjHJLNZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 07:13:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231643AbjHJLFv (ORCPT
+        with ESMTP id S233890AbjHJLNY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 07:05:51 -0400
+        Thu, 10 Aug 2023 07:13:24 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1E8F2108;
-        Thu, 10 Aug 2023 04:05:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17A0C2694;
+        Thu, 10 Aug 2023 04:13:24 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 5FD561F749;
-        Thu, 10 Aug 2023 11:05:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1691665548; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D09F41F45B;
+        Thu, 10 Aug 2023 11:13:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1691666002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1DFh8evqtxspjStydxXxKkjnilpW0tYumnluwrTMIZo=;
-        b=vLT7nxhsKaVB+2d6j1Yf5X8t1GLYqRuuN4g6ZutMMICOunL7y0FZNv7gLZiYXzC/l2Xomu
-        I8xmm0CPUZCp/iFMbz+eWr+/L/YJb1/utRAjSeiWYdJX1v/2EQl6s2syK6Yg4TzJfLlWXK
-        j+SruuD6SzbR8Z3B6IZKMOfh62510CU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1691665548;
+        bh=9RZ2Yzq36jl6W2j4gefEmERvFCX8trh+F8G0TYairgM=;
+        b=A2mn1HPzcuw3tZZBfLUW5seoHyYW9QW2Ryli+b0yyByjeiEP7ASfvebMwVxi1XxfmMxEJk
+        qIrwkw/PllrAvxIpjaeyQmadAtJgFtxu5fRSMBT5maJBKWcpLNm1+46Tqp6mzi4NVvABEB
+        T1ImTa6aHCUcr6ochRqzD+ofptNhyt4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1691666002;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+         mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1DFh8evqtxspjStydxXxKkjnilpW0tYumnluwrTMIZo=;
-        b=gjop8gtt3TnFXcbkSm06MHlxNzKkmd+CJQt27qbqqSRylA/dQexstbBZ/MQ0KnNaiV041a
-        Mrb6ToOuPtQHkpAw==
+        bh=9RZ2Yzq36jl6W2j4gefEmERvFCX8trh+F8G0TYairgM=;
+        b=Jc/IUxiJJWnoNNM60p3ovitCIonhd5gzoCUrb5mihaseaOdPbKS9WlXJwtVJjYMCq8bo87
+        Qwgk1OG6qhHPQuBA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4EB2E138E2;
-        Thu, 10 Aug 2023 11:05:48 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C1862138E2;
+        Thu, 10 Aug 2023 11:13:22 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id bLIxE4zE1GQpLAAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 10 Aug 2023 11:05:48 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id D2565A076F; Thu, 10 Aug 2023 13:05:47 +0200 (CEST)
-Date:   Thu, 10 Aug 2023 13:05:47 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 02/12] nilfs2: use setup_bdev_super to de-duplicate the
- mount code
-Message-ID: <20230810110547.ks62g2flysgwpgru@quack3>
-References: <20230802154131.2221419-1-hch@lst.de>
- <20230802154131.2221419-3-hch@lst.de>
- <20230803114651.ihtqqgthbdjjgxev@quack3>
- <CAKFNMomzHg33SHnp6xGMEZY=+k6Y4t7dvBvgBDbO9H3ujzNDCw@mail.gmail.com>
+        id FdD1LlLG1GQ1LwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Thu, 10 Aug 2023 11:13:22 +0000
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <jsmart2021@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v2 01/12] nvme/{003,004,005,013,046,049}: Group all variables declarations
+Date:   Thu, 10 Aug 2023 13:13:06 +0200
+Message-ID: <20230810111317.25273-2-dwagner@suse.de>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230810111317.25273-1-dwagner@suse.de>
+References: <20230810111317.25273-1-dwagner@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKFNMomzHg33SHnp6xGMEZY=+k6Y4t7dvBvgBDbO9H3ujzNDCw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 04-08-23 11:01:39, Ryusuke Konishi wrote:
-> On Thu, Aug 3, 2023 at 8:46 PM Jan Kara wrote:
-> >
-> > On Wed 02-08-23 17:41:21, Christoph Hellwig wrote:
-> > > Use the generic setup_bdev_super helper to open the main block device
-> > > and do various bits of superblock setup instead of duplicating the
-> > > logic.  This includes moving to the new scheme implemented in common
-> > > code that only opens the block device after the superblock has allocated.
-> > >
-> > > It does not yet convert nilfs2 to the new mount API, but doing so will
-> > > become a bit simpler after this first step.
-> > >
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> >
-> > AFAICS nilfs2 could *almost* use mount_bdev() directly and then just do its
-> 
-> > snapshot thing after mount_bdev() returns. But it has this weird logic
-> > that: "if the superblock is already mounted but we can shrink the whole
-> > dcache, then do remount instead of ignoring mount options". Firstly, this
-> > looks racy - what prevents someone from say opening a file on the sb just
-> > after nilfs_tree_is_busy() shrinks dcache? Secondly, it is inconsistent
-> > with any other filesystem so it's going to surprise sysadmins not
-> > intimately knowing nilfs2. Thirdly, from userspace you cannot tell what
-> > your mount call is going to do. Last but not least, what is it really good
-> > for? Ryusuke, can you explain please?
-> >
-> >                                                                 Honza
-> 
-> I think you are referring to the following part:
-> 
-> >        if (!s->s_root) {
-> ...
-> >        } else if (!sd.cno) {
-> >                if (nilfs_tree_is_busy(s->s_root)) {
-> >                        if ((flags ^ s->s_flags) & SB_RDONLY) {
-> >                                nilfs_err(s,
-> >                                          "the device already has a %s mount.",
-> >                                          sb_rdonly(s) ? "read-only" : "read/write");
-> >                                err = -EBUSY;
-> >                                goto failed_super;
-> >                        }
-> >                } else {
-> >                        /*
-> >                         * Try remount to setup mount states if the current
-> >                         * tree is not mounted and only snapshots use this sb.
-> >                         */
-> >                        err = nilfs_remount(s, &flags, data);
-> >                        if (err)
-> >                                goto failed_super;
-> >                }
-> >        }
-> 
-> What this logic is trying to do is, if there is already a nilfs2 mount
-> instance for the device, and are trying to mounting the current tree
-> (sd.cno is 0, so this is not a snapshot mount), then will switch
-> depending on whether the current tree has a mount:
-> 
-> - If the current tree is mounted, it's just like a normal filesystem.
-> (A read-only mount and a read/write mount can't coexist, so check
-> that, and reuse the instance if possible)
-> - Otherwise, i.e. for snapshot mounts only, do whatever is necessary
-> to add a new current mount, such as starting a log writer.
->    Since it does the same thing that nilfs_remount does, so
-> nilfs_remount() is used there.
-> 
-> Whether or not there is a current tree mount can be determined by
-> d_count(s->s_root) > 1 as nilfs_tree_is_busy() does.
-> Where s->s_root is always the root dentry of the current tree, not
-> that of the mounted snapshot.
+Group all variable declarations together at the beginning of the
+function. Many of the nvme tests do this but not all. Thus make these
+tests use the same style. This allows to spot the odd balls in the
+refactoring of the tests.
 
-I see now, thanks for explanation! But one thing still is not clear to me.
-If you say have a snapshot mounted read-write and then you mount the
-current snapshot (cno == 0) read-only, you'll switch the whole superblock
-to read-only state. So also the mounted snapshot is suddently read-only
-which is unexpected and actually supposedly breaks things because you can
-still have file handles open for writing on the snapshot etc.. So how do
-you solve that?
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+ tests/nvme/003 | 3 ++-
+ tests/nvme/004 | 3 ++-
+ tests/nvme/005 | 5 +++--
+ tests/nvme/013 | 1 -
+ tests/nvme/046 | 1 +
+ tests/nvme/049 | 1 +
+ 6 files changed, 9 insertions(+), 5 deletions(-)
 
-								Honza
+diff --git a/tests/nvme/003 b/tests/nvme/003
+index 6604012d2068..aa26abf8d8b3 100755
+--- a/tests/nvme/003
++++ b/tests/nvme/003
+@@ -22,10 +22,11 @@ test() {
+ 
+ 	_setup_nvmet
+ 
++	local loop_dev
+ 	local port
++
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
+ 
+-	local loop_dev
+ 	loop_dev="$(losetup -f)"
+ 
+ 	_create_nvmet_subsystem "blktests-subsystem-1" "${loop_dev}"
+diff --git a/tests/nvme/004 b/tests/nvme/004
+index cab98ff44326..1e5c2b8b3e87 100755
+--- a/tests/nvme/004
++++ b/tests/nvme/004
+@@ -23,11 +23,12 @@ test() {
+ 	_setup_nvmet
+ 
+ 	local port
++	local loop_dev
++
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
+ 
+ 	truncate -s "${nvme_img_size}" "$TMPDIR/img"
+ 
+-	local loop_dev
+ 	loop_dev="$(losetup -f --show "$TMPDIR/img")"
+ 
+ 	_create_nvmet_subsystem "blktests-subsystem-1" "${loop_dev}" \
+diff --git a/tests/nvme/005 b/tests/nvme/005
+index 8e15a13f3794..836854086822 100755
+--- a/tests/nvme/005
++++ b/tests/nvme/005
+@@ -22,11 +22,13 @@ test() {
+ 	_setup_nvmet
+ 
+ 	local port
++	local loop_dev
++	local nvmedev
++
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
+ 
+ 	truncate -s "${nvme_img_size}" "$TMPDIR/img"
+ 
+-	local loop_dev
+ 	loop_dev="$(losetup -f --show "$TMPDIR/img")"
+ 
+ 	_create_nvmet_subsystem "blktests-subsystem-1" "${loop_dev}" \
+@@ -35,7 +37,6 @@ test() {
+ 
+ 	_nvme_connect_subsys "${nvme_trtype}" blktests-subsystem-1
+ 
+-	local nvmedev
+ 	nvmedev=$(_find_nvme_dev "blktests-subsystem-1")
+ 
+ 	udevadm settle
+diff --git a/tests/nvme/013 b/tests/nvme/013
+index 14e646a19c47..2be8681616d1 100755
+--- a/tests/nvme/013
++++ b/tests/nvme/013
+@@ -26,7 +26,6 @@ test() {
+ 	local port
+ 	local nvmedev
+ 	local file_path="${TMPDIR}/img"
+-
+ 	local subsys_name="blktests-subsystem-1"
+ 
+ 	truncate -s "${nvme_img_size}" "${file_path}"
+diff --git a/tests/nvme/046 b/tests/nvme/046
+index b37b9e98a559..942f25206c17 100755
+--- a/tests/nvme/046
++++ b/tests/nvme/046
+@@ -16,6 +16,7 @@ requires() {
+ 
+ test_device() {
+ 	echo "Running ${TEST_NAME}"
++
+ 	local ngdev=${TEST_DEV/nvme/ng}
+ 	local perm nsid
+ 
+diff --git a/tests/nvme/049 b/tests/nvme/049
+index f72862c6426d..599ab58d7a29 100755
+--- a/tests/nvme/049
++++ b/tests/nvme/049
+@@ -17,6 +17,7 @@ requires() {
+ 
+ test_device() {
+ 	echo "Running ${TEST_NAME}"
++
+ 	local ngdev=${TEST_DEV/nvme/ng}
+ 	local common_args=(
+ 		--size=1M
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.41.0
+
