@@ -2,101 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D1B3C001E0
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 03:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5866CEB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 03:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230372AbjHJDUM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Aug 2023 23:20:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36372 "EHLO
+        id S229711AbjHJDnm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Aug 2023 23:43:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbjHJDUK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 23:20:10 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F48E10EC;
-        Wed,  9 Aug 2023 20:20:09 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RLscN06lBz4f3v4f;
-        Thu, 10 Aug 2023 11:20:04 +0800 (CST)
-Received: from [10.174.179.155] (unknown [10.174.179.155])
-        by APP4 (Coremail) with SMTP id gCh0CgAXp6ljV9Rkz4xoAQ--.17685S3;
-        Thu, 10 Aug 2023 11:20:05 +0800 (CST)
-Message-ID: <e5539fc2-9c30-3da5-ce81-fd67fc0fd53a@huaweicloud.com>
-Date:   Thu, 10 Aug 2023 11:20:03 +0800
+        with ESMTP id S229677AbjHJDnk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 23:43:40 -0400
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4441FF7
+        for <linux-block@vger.kernel.org>; Wed,  9 Aug 2023 20:42:55 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6bc9811558cso448842a34.0
+        for <linux-block@vger.kernel.org>; Wed, 09 Aug 2023 20:42:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1691638975; x=1692243775;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B4RSMo1fBND8rVHHnIuWYp8oZATIFXug9YVVpx6JvSU=;
+        b=R7Jc4sXsiFXrA4yW5WqDxMVpJ2WvcRSR/7OGGAzasL5sQeG0HYp3rDsg0S5rbqw5dc
+         hseFMOvB9l2g6gpt1lce4yyYJzJoht16qkDlDBmLR8RMT/tJ7MaPMrHNQC34bsCkkkPW
+         T8kbKF4ODjVFr1i/xl5Fd6AffGAcIqp158ltGD2cQ8HRAofcKrZBrFwI7atzlr1WtBnn
+         WApOG8SNAVJRYwiI3wlDbped0h8/+qVTcU6QPGya57ENEhj8TvEs6desGai2gNkn7UrQ
+         onbfKV8tUTpAr5tbUbCVaIr6ySeCpiaaXDeyh+NDV6tBHjF3O+hG4M8UfRR2b28uKy6v
+         fnTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691638975; x=1692243775;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4RSMo1fBND8rVHHnIuWYp8oZATIFXug9YVVpx6JvSU=;
+        b=VAUiR964KUmG3OgpemQsceGlQPqxahAWRA4wonuu3Zb/ehFd3DrMIXQ8HBjoFNxYwJ
+         g9Rk1yv3DLkmdi+tjsD0LdDub2hus4jqSaKLH3+EJYa+d5Gm2sWXqpOJu/wqZD4/G6NG
+         aTZ8f753Pi1EgxVGP8gazsDDIqqWMooG3KHDi1Bawv80D9OaleSuT5drv9kaKIlJ0f+4
+         BytZmHYzGNY2zp4SrOgVWsEjp1jiZyZRmzvurOTzx4TrnNnFdFf9CsoQazyG8VGyoNl+
+         F8cUdS2kcPd85UPebg9hJPAh9HI1VGVz0xXO9ciI9Fv/cPBsqucOjHrylCUvM52VV03b
+         anyQ==
+X-Gm-Message-State: AOJu0YwWcIo1D2m7uiegUR4tW0VTey7GOOuls82EeiaW3kcZtgoBWRzm
+        iomGoplwY4dWp6DpxxGVHGmXXg==
+X-Google-Smtp-Source: AGHT+IEdmG2XuZqwzOtBW9SyX+LO81ptV0L1FDqwtJVZqePG/lQZ75vsbzufQXK4dBu2HSEL3Q4k9g==
+X-Received: by 2002:a05:6358:e488:b0:135:449c:341b with SMTP id by8-20020a056358e48800b00135449c341bmr1289104rwb.10.1691638974739;
+        Wed, 09 Aug 2023 20:42:54 -0700 (PDT)
+Received: from [10.4.190.166] ([139.177.225.239])
+        by smtp.gmail.com with ESMTPSA id 8-20020a17090a034800b00262e485156esm2383811pjf.57.2023.08.09.20.42.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Aug 2023 20:42:54 -0700 (PDT)
+Message-ID: <86ce2299-ce42-c0bb-e577-9d23f8af494c@bytedance.com>
+Date:   Thu, 10 Aug 2023 11:42:50 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
- Thunderbird/104.0
-Subject: Re: [PATCH -next v2] block: remove init_mutex and open-code
- blk_iolatency_try_init
-To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        yukuai3@huawei.com, linan122@huawei.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com, lilingfeng3@huawei.com
-References: <20230809112928.2009183-1-lilingfeng@huaweicloud.com>
- <6dcshmol4oz4hpsm42s3ocfdg7rtykkx2vjg6fd6zdvmkbmg7w@4liecv2rxqqk>
-From:   Li Lingfeng <lilingfeng@huaweicloud.com>
-In-Reply-To: <6dcshmol4oz4hpsm42s3ocfdg7rtykkx2vjg6fd6zdvmkbmg7w@4liecv2rxqqk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAXp6ljV9Rkz4xoAQ--.17685S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruw17XFWxWFWDKw13urW3ZFb_yoWDJFc_W3
-        95ZFn7Ar47Gay0yrn8Grs3Was5WF4DXFy8uFW7tFyUJ3s3X3ykJr48Cr98Zay3uw42yrZ3
-        Ar1qvw48Ary8WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbIkYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
-        07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-        02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
-        GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-        CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE
-        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-        9x07UWE__UUUUU=
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH RFC] block: Revert 615939a2ae73
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>,
+        Chuck Lever III <chuck.lever@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Chuck Lever <cel@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <169158653156.2034.8363987273532378512.stgit@bazille.1015granger.net>
+ <d51b0683-8872-4e10-8589-5c6de8db61d4@kernel.dk>
+ <20230809161105.GA2304@lst.de>
+ <9BADCC53-72E9-44FB-80C8-CEBC9897809D@oracle.com>
+ <20230809214913.GA9902@lst.de>
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+In-Reply-To: <20230809214913.GA9902@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2023/8/10 05:49, Christoph Hellwig wrote:
+> Oh well.  I don't feel like we're going to find the root cause
+> given that its late in the merge window and I'm running out of
+> time I have to work due to the annual summer vacation.  Unless
+> someone like Chengming who knows the flush code pretty well
+> feels like working with chuck on a few more iterations we'll
 
-在 2023/8/9 20:11, Michal Koutný 写道:
-> On Wed, Aug 09, 2023 at 07:29:28PM +0800, Li Lingfeng <lilingfeng@huaweicloud.com> wrote:
->>   1 file changed, 10 insertions(+), 24 deletions(-)
-> I like this bottom line.
->
->> @@ -861,7 +838,16 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
->>   
->>   	blkg_conf_init(&ctx, buf);
->>   
->> -	ret = blk_iolatency_try_init(&ctx);
->> +	ret = blkg_conf_open_bdev(&ctx);
->> +	if (ret)
->> +		goto out;
->> +
->> +	/*
->> +	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
->> +	 * confuse iolat_rq_qos() test. Make the test and init atomic.
->> +	 */
-> Perhaps add here
-> 	lockdep_assert_held(ctx.bdev->bd_queue->rq_qos_mutex);
->
-> because without that the last sentence of the comment misses the
-> context.
+Hi,
 
-Yes, it looks better.
+No problem, I can work with Chuck to find the root cause if Chuck
+has time too, since I still can't reproduce it by myself.
 
-Thanks.
+Maybe we should first find what's the status of the hang request?
+I can write a Drgn script to find if any request hang in the queue.
 
-Li
+Christoph, it would be very helpful if you share some thoughts
+and directions.
 
->
->> +	if (!iolat_rq_qos(ctx.bdev->bd_queue))
->> +		ret = blk_iolatency_init(ctx.bdev->bd_disk);
->>   	if (ret)
->>   		goto out;
-> Thanks,
-> Michal
+
+> have to revert it.  Which is going to be a very painful merge
+> with Chengming's work in the for-6.6 branch.
+> 
+
+Maybe we can revert it manually if we still fail since that commit
+just let postflushes go to the normal I/O path, instead of going to
+the flush state machine.
+
+So I think it should be fine if we just delete that case?
+
+Chuck, could you please help to check this change on block/for-next?
+
+Thanks!
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index e73dc22d05c1..7ea3c00f40ce 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -442,17 +442,6 @@ bool blk_insert_flush(struct request *rq)
+                 * Queue for normal execution.
+                 */
+                return false;
+-       case REQ_FSEQ_DATA | REQ_FSEQ_POSTFLUSH:
+-               /*
+-                * Initialize the flush fields and completion handler to trigger
+-                * the post flush, and then just pass the command on.
+-                */
+-               blk_rq_init_flush(rq);
+-               rq->flush.seq |= REQ_FSEQ_PREFLUSH;
+-               spin_lock_irq(&fq->mq_flush_lock);
+-               fq->flush_data_in_flight++;
+-               spin_unlock_irq(&fq->mq_flush_lock);
+-               return false;
+        default:
+                /*
+                 * Mark the request as part of a flush sequence and submit it
+
+
+
 
