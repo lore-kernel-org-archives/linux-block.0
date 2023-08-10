@@ -2,134 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF66C04A6A
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 03:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 999C2C04A6A
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 04:53:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231938AbjHJDyk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Aug 2023 23:54:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53344 "EHLO
+        id S231631AbjHJExJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 00:53:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230212AbjHJDyg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 23:54:36 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BC4E5F;
-        Wed,  9 Aug 2023 20:54:35 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RLtN45QlQz4f3kFj;
-        Thu, 10 Aug 2023 11:54:28 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgA3xqh1X9RksnRqAQ--.45635S4;
-        Thu, 10 Aug 2023 11:54:31 +0800 (CST)
-From:   Li Lingfeng <lilingfeng@huaweicloud.com>
-To:     tj@kernel.org
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, mkoutny@suse.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        yukuai3@huawei.com, linan122@huawei.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com, lilingfeng@huaweicloud.com,
-        lilingfeng3@huawei.com
-Subject: [PATCH -next v3] block: remove init_mutex and open-code blk_iolatency_try_init
-Date:   Thu, 10 Aug 2023 11:51:11 +0800
-Message-Id: <20230810035111.2236335-1-lilingfeng@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S229540AbjHJExI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Aug 2023 00:53:08 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CAEF10C;
+        Wed,  9 Aug 2023 21:53:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9D7B064160;
+        Thu, 10 Aug 2023 04:53:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C954C433C8;
+        Thu, 10 Aug 2023 04:53:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1691643187;
+        bh=6WqbdW5HGyQE9QxGF/BtZzJqHxjXHZs/Ml+TDLDpJWM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=wNdo26el7rLra4TZwidBgrIWEpbk8h+uUUX4TG0wUakD1fzbIdm8Yjs0/3RkxbJV8
+         7fnTd40iBPcfNPt1J8J6nH8lkyTYGv162vatnji9gXtsIhAhzG8LNLY1Xb10oz7YiM
+         35fJ1zNDXJ4+e/hGTZPX1lk8bbWNbwJYFctouZZk=
+Date:   Thu, 10 Aug 2023 06:53:04 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Sweet Tea Dorminy <sweettea-kernel@dorminy.me>,
+        Satya Tangirala <satyat@google.com>,
+        linux-block@vger.kernel.org, kernel-team@meta.com,
+        ebiggers@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] blk-crypto: dynamically allocate fallback profile
+Message-ID: <2023081023-parsnip-limb-dcd4@gregkh>
+References: <20230809125628.529884-1-sweettea-kernel@dorminy.me>
+ <94c661a6-442b-4ca2-b9e8-198069d8b635@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgA3xqh1X9RksnRqAQ--.45635S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZrW8GF48WFWkJr4DCF1fXrb_yoW8Kw1Up3
-        ySgrsIy3yUGrs3XF1kKw4xur15K3y8Kry7GF4fCFyrJr1j9r1agF18ZF1FqFWfZrZ5Aan5
-        KF48J34kGr4rG37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
-        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
-        fUoOJ5UUUUU
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <94c661a6-442b-4ca2-b9e8-198069d8b635@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Lingfeng <lilingfeng3@huawei.com>
+On Wed, Aug 09, 2023 at 04:08:52PM -0600, Jens Axboe wrote:
+> On 8/9/23 6:56 AM, Sweet Tea Dorminy wrote:
+> > blk_crypto_profile_init() calls lockdep_register_key(), which warns and
+> > does not register if the provided memory is a static object.
+> > blk-crypto-fallback currently has a static blk_crypto_profile and calls
+> > blk_crypto_profile_init() thereupon, resulting in the warning and
+> > failure to register.
+> > 
+> > Fortunately it is simple enough to use a dynamically allocated profile
+> > and make lockdep function correctly.
+> > 
+> > Fixes: 2fb48d88e77f ("blk-crypto: use dynamic lock class for blk_crypto_profile::lock")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+> 
+> The offending commit went into 6.5, so there should be no need for a
+> stable tag on this one. But I can edit that while applying, waiting on
+> Eric to ack it.
 
-Commit a13696b83da4 ("blk-iolatency: Make initialization lazy") adds
-a mutex named "init_mutex" in blk_iolatency_try_init for the race
-condition of initializing RQ_QOS_LATENCY.
-Now a new lock has been add to struct request_queue by commit a13bd91be223
-("block/rq_qos: protect rq_qos apis with a new lock"). And it has been
-held in blkg_conf_open_bdev before calling blk_iolatency_init.
-So it's not necessary to keep init_mutex in blk_iolatency_try_init, just
-remove it.
+That commit has been backported to stable releases, so it would be nice
+to keep it there so our tools automatically pick it up properly.  Once
+the authorship name is fixed up of course.
 
-Since init_mutex has been removed, blk_iolatency_try_init can be
-open-coded back to iolatency_set_limit() like ioc_qos_write().
+thanks,
 
-Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
----
-  v1->v2: open-code blk_iolatency_try_init()
-  v2->v3: add lockdep check
- block/blk-iolatency.c | 35 +++++++++++------------------------
- 1 file changed, 11 insertions(+), 24 deletions(-)
-
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index fd5fec989e39..c16aef4be036 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -824,29 +824,6 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
- 	}
- }
- 
--static int blk_iolatency_try_init(struct blkg_conf_ctx *ctx)
--{
--	static DEFINE_MUTEX(init_mutex);
--	int ret;
--
--	ret = blkg_conf_open_bdev(ctx);
--	if (ret)
--		return ret;
--
--	/*
--	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
--	 * confuse iolat_rq_qos() test. Make the test and init atomic.
--	 */
--	mutex_lock(&init_mutex);
--
--	if (!iolat_rq_qos(ctx->bdev->bd_queue))
--		ret = blk_iolatency_init(ctx->bdev->bd_disk);
--
--	mutex_unlock(&init_mutex);
--
--	return ret;
--}
--
- static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 			     size_t nbytes, loff_t off)
- {
-@@ -861,7 +838,17 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 
- 	blkg_conf_init(&ctx, buf);
- 
--	ret = blk_iolatency_try_init(&ctx);
-+	ret = blkg_conf_open_bdev(&ctx);
-+	if (ret)
-+		goto out;
-+
-+	/*
-+	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
-+	 * confuse iolat_rq_qos() test. Make the test and init atomic.
-+	 */
-+	lockdep_assert_held(ctx.bdev->bd_queue->rq_qos_mutex);
-+	if (!iolat_rq_qos(ctx.bdev->bd_queue))
-+		ret = blk_iolatency_init(ctx.bdev->bd_disk);
- 	if (ret)
- 		goto out;
- 
--- 
-2.39.2
-
+greg k-h
