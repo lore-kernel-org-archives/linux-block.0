@@ -2,156 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB512C04A6A
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 01:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E15EB64DD
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 02:06:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbjHJBgO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Aug 2023 21:36:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38112 "EHLO
+        id S231658AbjHJCGZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Aug 2023 22:06:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbjHJBgN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 21:36:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E53F1982;
-        Wed,  9 Aug 2023 18:36:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A7BDB617F0;
-        Thu, 10 Aug 2023 01:36:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4734FC433C8;
-        Thu, 10 Aug 2023 01:36:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691631372;
-        bh=ztq7cTQm3DVhlVUte/zLPzkS3OzDfmQ5LdM3sbz0DDE=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=d9/AEUHE7NPmHFm8kaem4sHRrsTyAfcaxg9SllkjhPH7Ztze7sTzJ1LneExgxyhfg
-         gxvM4j9EVBXIKlGFBj1KYKtCn5MwnODGsPXu3MMnF1vEa2extwXNZIzAqCWC5PORm3
-         6c8COz/YX5/AuA9Ucf5Occ8sSFp0ze54C4/FHDKSp2OweVOLJXgBR4wvIUAAjVROIk
-         1onDwksjd3r9pVHntm3khZZMs5qhlOcqGJUdp02e4ouTrNJme59JgpV3WB64a7ZjMh
-         oJ0aK34bTj9RxKPsWUaWaVCVWbFKCwmFTRNa3Vjo0jlV4h5AMCexrXT3JPkfzeqA/7
-         qPV+wnAHAPqGQ==
-Message-ID: <06527195-8f6d-0395-a7d5-d19634a00ad2@kernel.org>
-Date:   Thu, 10 Aug 2023 10:36:10 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v7 2/7] block/mq-deadline: Only use zone locking if
- necessary
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230809202355.1171455-1-bvanassche@acm.org>
- <20230809202355.1171455-3-bvanassche@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230809202355.1171455-3-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S229611AbjHJCGZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 22:06:25 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568E710DA
+        for <linux-block@vger.kernel.org>; Wed,  9 Aug 2023 19:06:22 -0700 (PDT)
+Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230810020616epoutp0181f8921b8db4e08e8f32f7cf5b99e0d8~542lPLDbo0115801158epoutp01S
+        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 02:06:16 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230810020616epoutp0181f8921b8db4e08e8f32f7cf5b99e0d8~542lPLDbo0115801158epoutp01S
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1691633176;
+        bh=PBnRm2oRhfvLhESry5Ivra7pQp4y7Epj+56bT+8qL7Q=;
+        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+        b=NYsBy6GXyBox7KPg9K8DZnpXnG4xitN3lJ6NwGxsTi8Z729sogxuKwCCJtDvesBPZ
+         uL7Ep6F/kbepEbX5/AZfER2boYm/XGnJUF4FvL/kEJuHykJ01Kb7z+yUPCNFC6lymI
+         77sbX3jFY4nev1T4dcXsSEegrs70XL/DUCLuwi6A=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+        20230810020616epcas2p1b060878c961888b7dd0465c21440c24e~542kycGs81707817078epcas2p1J;
+        Thu, 10 Aug 2023 02:06:16 +0000 (GMT)
+Received: from epsmgec2p1.samsung.com (unknown [182.195.36.102]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4RLqzC3CfHz4x9Pr; Thu, 10 Aug
+        2023 02:06:15 +0000 (GMT)
+X-AuditID: b6c32a43-e6fdca800000c342-31-64d44617cca6
+Received: from epcas2p2.samsung.com ( [182.195.41.54]) by
+        epsmgec2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        2F.63.49986.71644D46; Thu, 10 Aug 2023 11:06:15 +0900 (KST)
+Mime-Version: 1.0
+Subject: RE:(2) [PATCH v3 0/4] multi-page bvec configuration for integrity
+ payload
+Reply-To: j-young.choi@samsung.com
+Sender: Jinyoung Choi <j-young.choi@samsung.com>
+From:   Jinyoung Choi <j-young.choi@samsung.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+CC:     Christoph Hellwig <hch@infradead.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "chaitanya.kulkarni@wdc.com" <chaitanya.kulkarni@wdc.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <yq1y1ijho3e.fsf@ca-mkp.ca.oracle.com>
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20230810020615epcms2p8ae414270a3b4cf171fdcd7537fdfbe64@epcms2p8>
+Date:   Thu, 10 Aug 2023 11:06:15 +0900
+X-CMS-MailID: 20230810020615epcms2p8ae414270a3b4cf171fdcd7537fdfbe64
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-CPGSPASS: Y
+X-CPGSPASS: Y
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBJsWRmVeSWpSXmKPExsWy7bCmma6425UUg45XIhar7/azWcy6/ZrF
+        4uUhTYvTExYxWUw6dI3RYu8tbYvLu+awWSw//o/JYt3r9ywOnB7n721k8di8Qsvj8tlSj02r
+        Otk8Pj69xeLRt2UVo8fnTXIe7Qe6mQI4orJtMlITU1KLFFLzkvNTMvPSbZW8g+Od403NDAx1
+        DS0tzJUU8hJzU22VXHwCdN0yc4BuU1IoS8wpBQoFJBYXK+nb2RTll5akKmTkF5fYKqUWpOQU
+        mBfoFSfmFpfmpevlpZZYGRoYGJkCFSZkZzyavo+5oI+t4uiMKSwNjAdZuxg5OSQETCReXf7O
+        3MXIxSEksINR4sS+c+xdjBwcvAKCEn93CIPUCAuESCzY9YEJxBYSUJI4t2YWI0TcQKLldhsL
+        iM0moCex4/ludhBbRMBUYvKnrWwgNrPAfSaJdVvNIHbxSsxof8oCYUtLbF++FWwOp4CxxNRd
+        q6Du0ZD4sayXGcIWlbi5+i07jP3+2HxGCFtEovXeWagaQYkHP3dDxSUlDh36ygZyvoRAvsSG
+        A4EQ4RqJtl/vocr1Ja51bAQ7gVfAV+Jkxyswm0VAVaJ1czsTRI2LxNqdnewQ52tLLFv4mhlk
+        JLOApsT6XfoQ05Uljtxigajgk+g4/Jcd5sGGjb+xsnfMe8IE0aomsajJaAKj8ixEKM9CsmoW
+        wqoFjMyrGMVSC4pz01OTjQoM4RGbnJ+7iRGcRLWcdzBemf9P7xAjEwfjIUYJDmYlEV7b4Esp
+        QrwpiZVVqUX58UWlOanFhxhNgZ6cyCwlmpwPTON5JfGGJpYGJmZmhuZGpgbmSuK891rnpggJ
+        pCeWpGanphakFsH0MXFwSjUwWQTMsLt2vKDb6dbs49qOD5iT8uIvCEcpvj2gaHuO+2THt2+n
+        b6XvepxVYHLbnvOzdF6x3Pl76QZVp6KfH3byfKzQu/e0j1mQJZtEj9CMevk1UxjjGd8uqlac
+        kqy3zHlZ48Mp1QcEbiq6JaSLtNa+a7R35Klfyy8y2X96ANPexDbVpluW4o5X1T6duNHCLp6T
+        rbwzJsw24NtRcyv+0luSsx8u53dk/vn2b5xdXFq3gJ7UC6kDkY+fRgakmV8s9Erus9gYaBdj
+        77ajJm/TvH2fGd8UXlzgH8L/puUCx45NMb/SKg5cZDmjfmCq+b9JNf9+TLPXTv/ionxq1dnt
+        F0IOOXDdf/4/cOdNbY/mqEVKLMUZiYZazEXFiQCdkxh8KwQAAA==
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230803024656epcms2p4da6defb8e1e9b050fe2fbd52cb2e9524
+References: <yq1y1ijho3e.fsf@ca-mkp.ca.oracle.com>
+        <20230803024656epcms2p4da6defb8e1e9b050fe2fbd52cb2e9524@epcms2p4>
+        <yq1zg31hubf.fsf@ca-mkp.ca.oracle.com>
+        <CGME20230803024656epcms2p4da6defb8e1e9b050fe2fbd52cb2e9524@epcms2p8>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/23 05:23, Bart Van Assche wrote:
-> Measurements have shown that limiting the queue depth to one per zone for
-> zoned writes has a significant negative performance impact on zoned UFS
-> devices. Hence this patch that disables zone locking by the mq-deadline
-> scheduler if the storage controller preserves the command order. This
-> patch is based on the following assumptions:
-> - It happens infrequently that zoned write requests are reordered by the
->   block layer.
-> - The I/O priority of all write requests is the same per zone.
-> - Either no I/O scheduler is used or an I/O scheduler is used that
->   serializes write requests per zone.
-> 
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/mq-deadline.c | 24 ++++++++++++++++++------
->  1 file changed, 18 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index f958e79277b8..cd2504205ff8 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -338,6 +338,16 @@ static struct request *deadline_skip_seq_writes(struct deadline_data *dd,
->  	return rq;
->  }
->  
-> +/*
-> + * Whether or not to use zone write locking. Not using zone write locking for
-> + * sequential write required zones is only safe if the block driver preserves
-> + * the request order.
-> + */
-> +static bool dd_use_zone_write_locking(struct request_queue *q)
-> +{
-> +	return q->limits.use_zone_write_lock && blk_queue_is_zoned(q);
+Hi, Martin.
 
-use_zone_write_lock should be true ONLY if the queue is zoned.
-So the "&& blk_queue_is_zoned(q)" seems unnecessary to me.
-This little helper could be moved to be generic in blkdev.h too.
-
-> +}
-> +
->  /*
->   * For the specified data direction, return the next request to
->   * dispatch using arrival ordered lists.
-> @@ -353,7 +363,7 @@ deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
->  		return NULL;
->  
->  	rq = rq_entry_fifo(per_prio->fifo_list[data_dir].next);
-> -	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
-> +	if (data_dir == DD_READ || !dd_use_zone_write_locking(rq->q))
->  		return rq;
->  
->  	/*
-> @@ -398,7 +408,7 @@ deadline_next_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
->  	if (!rq)
->  		return NULL;
->  
-> -	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
-> +	if (data_dir == DD_READ || !dd_use_zone_write_locking(rq->q))
->  		return rq;
->  
->  	/*
-> @@ -526,8 +536,9 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
->  	}
->  
->  	/*
-> -	 * For a zoned block device, if we only have writes queued and none of
-> -	 * them can be dispatched, rq will be NULL.
-> +	 * For a zoned block device that requires write serialization, if we
-> +	 * only have writes queued and none of them can be dispatched, rq will
-> +	 * be NULL.
->  	 */
->  	if (!rq)
->  		return NULL;
-> @@ -552,7 +563,8 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
->  	/*
->  	 * If the request needs its target zone locked, do it.
->  	 */
-> -	blk_req_zone_write_lock(rq);
-> +	if (dd_use_zone_write_locking(rq->q))
-> +		blk_req_zone_write_lock(rq);
->  	rq->rq_flags |= RQF_STARTED;
->  	return rq;
->  }
-> @@ -934,7 +946,7 @@ static void dd_finish_request(struct request *rq)
->  
->  	atomic_inc(&per_prio->stats.completed);
->  
-> -	if (blk_queue_is_zoned(q)) {
-> +	if (dd_use_zone_write_locking(rq->q)) {
->  		unsigned long flags;
->  
->  		spin_lock_irqsave(&dd->zone_lock, flags);
-
--- 
-Damien Le Moal
-Western Digital Research
-
+> Jinyoung,
+>=20
+> > This looks OK to me. I'll test on physical SCSI hardware tomorrow to
+> > make sure there are no regressions.
+>=20
+> Lab test complete, no regressions seen.
+>=20
+> Tested-by: Martin K. Petersen <martin.petersen=40oracle.com>
+>=20
+> --=20
+> Martin K. Petersen =C2=A0=20=C2=A0=20=C2=A0=20=C2=A0Oracle=20Linux=20Engi=
+neering=0D=0A=0D=0AI=20uploaded=20only=20the=20parts=20that=20would=20not=
+=20be=20a=20problem=20in=20the=20patch-set=0D=0AI=20prepared=20for=20the=20=
+first=20time.=0D=0A=0D=0AI=20will=20prepare=20to=20make=20good=20use=20of=
+=20the=20nr_integrity_segments=20in=20the=0D=0Arequest=20structure.=0D=0A=
+=0D=0AThank=20you=20for=20your=20time.=0D=0AHave=20a=20nice=20day=21=0D=0A=
+=0D=0AKind=20Regards,=0D=0AJinyoung.
