@@ -2,93 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 037C4C001DE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 09:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D30C001DE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 09:21:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232450AbjHJJUh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 05:20:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46322 "EHLO
+        id S234839AbjHJJVi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 05:21:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234692AbjHJJUZ (ORCPT
+        with ESMTP id S229904AbjHJJVW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 05:20:25 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BC955AF
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 02:18:14 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 1F1EF1F749;
-        Thu, 10 Aug 2023 09:18:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1691659088; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Thu, 10 Aug 2023 05:21:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7D146A9
+        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 02:18:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691659086;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=dj/3hiHNvgy84wGzyP6ros8JwJPIhLDARNnNreLN2PM=;
-        b=QPw6JNrH/pKSGpx3LnXjM0mQesM+zq9YEFJs/YQwXLfW8w6okEW3jQX9O9aXVbJpRvd0TU
-        pc3sCdRGsgfvR8r5pBnt1dOZdxms04k1kTx/3qyjEcSeUIjlY1O0U1R8BGM8WxXWI4y6QU
-        ynkvBZEhHCldoIAFrrNVk0CXi5jauyw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1691659088;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dj/3hiHNvgy84wGzyP6ros8JwJPIhLDARNnNreLN2PM=;
-        b=foBJ2yxslq2CWH0awapgv4EzeEgtLFLUwyGnyBvDtcwZAKCfecHARxRReh6Xo6fJ/fL1XC
-        zhejFe+BeD6ZekCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=zCpvjGRV9TAD3foyhqRHy9bTJoBNpeC1r6qbYuF0Dlg=;
+        b=GNe5kFjoptCmKs+rMU047BLhU4/ALjYYq1Odb1FBcUI+MLjqGdWcVSBobyuPdLeMDVH3Hu
+        MmBkqUgShpgltXeoyyfo4IeDG4fYpw7+BZNkNWB4zGCn7yNBj0PabHmoC11JgjaNRA6rse
+        8U+KeYJq9NUxbJ/Hg3w5Cx6nsJEVp4I=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-518-14KIsuPWO-an0hPQX6Rzsw-1; Thu, 10 Aug 2023 05:18:02 -0400
+X-MC-Unique: 14KIsuPWO-an0hPQX6Rzsw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0ECD5138E0;
-        Thu, 10 Aug 2023 09:18:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id GiORA1Cr1GSgewAAMHmgww
-        (envelope-from <dwagner@suse.de>); Thu, 10 Aug 2023 09:18:08 +0000
-Date:   Thu, 10 Aug 2023 11:18:10 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Subject: Re: [bug report] blktests nvme/047 failed due to /dev/nvme0n1 not
- created in time
-Message-ID: <o2443ezmpny7dyvhiteajzgt3j7wcxo2fv7dik3h7hkjpc2h74@xeetbva55fx2>
-References: <CAHj4cs9GNohGUjohNw93jrr8JGNcRYC-ienAZz+sa7az1RK77w@mail.gmail.com>
- <CAHj4cs9J7w_QSWMrj0ncufKwT9viS-o7pxmS2Y4FeaWEyPD34Q@mail.gmail.com>
- <vxeo2ucxhvdcm2z673keqerkpxay6dgfluuvxawukkbunddzm2@jdkdk7y3a5nu>
- <xrqutkdhz7v6axohfxipv4or7k4jhoa57semwcxde7gletk76z@5kcashfdezhk>
- <adgkdt52d6qvcbxq4aof7ggun3t77znndpvzq5k7aww3jrx2tk@6ispx7zimxhy>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8AC4B29DD998;
+        Thu, 10 Aug 2023 09:18:02 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 32B5740C6F4E;
+        Thu, 10 Aug 2023 09:17:58 +0000 (UTC)
+Date:   Thu, 10 Aug 2023 17:17:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Li Zetao <lizetao1@huawei.com>
+Cc:     axboe@kernel.dk, a.hindborg@samsung.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH -next] ublk: Fix signedness bug returning warning
+Message-ID: <ZNSrQp+KT02M+GTZ@fedora>
+References: <20230810084836.3535322-1-lizetao1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <adgkdt52d6qvcbxq4aof7ggun3t77znndpvzq5k7aww3jrx2tk@6ispx7zimxhy>
+In-Reply-To: <20230810084836.3535322-1-lizetao1@huawei.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 12:19:39AM +0000, Shinichiro Kawasaki wrote:
-> Yi, could you try and see if it avoids the failure?
+On Thu, Aug 10, 2023 at 04:48:36PM +0800, Li Zetao wrote:
+> There are two warnings reported by smatch:
 > 
-> diff --git a/tests/nvme/rc b/tests/nvme/rc
-> index 4f3a994..005db80 100644
-> --- a/tests/nvme/rc
-> +++ b/tests/nvme/rc
-> @@ -740,7 +740,7 @@ _find_nvme_dev() {
->  		if [[ "$subsysnqn" == "$subsys" ]]; then
->  			echo "$dev"
->  			for ((i = 0; i < 10; i++)); do
-> -				if [[ -e /sys/block/$dev/uuid &&
-> +				if [[ -e /dev/$dev && -e /sys/block/$dev/uuid &&
->  					-e /sys/block/$dev/wwid ]]; then
->  					return
->  				fi
+> drivers/block/ublk_drv.c:445 ublk_setup_iod_zoned() warn:
+> 	signedness bug returning '(-95)'
+> drivers/block/ublk_drv.c:963 ublk_setup_iod() warn:
+> 	signedness bug returning '(-5)'
+> 
+> The type of "blk_status_t" is either be a u32 or u8, but this two
+> functions return a negative value when not supported or failed. Use
+> the error code of the blk module to fix these warnings.
+> 
+> Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/r/202308100201.TCRhgdvN-lkp@intel.com/
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
 
-The path for uuid is not correct. It's needs to be something like
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-	if [[ -e /dev/$dev && -e /sys/block/"${dev}n1"/uuid &&
-		-e /sys/block/"${dev}n1"/wwid ]]; then
-			return
-	fi
+thanks,
+Ming
+
