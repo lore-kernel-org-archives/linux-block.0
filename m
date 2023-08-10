@@ -2,53 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B162CC04A6A
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 15:43:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCF1C001B0
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 15:58:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233800AbjHJPnN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 11:43:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41606 "EHLO
+        id S236272AbjHJP6l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 11:58:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233659AbjHJPnN (ORCPT
+        with ESMTP id S236292AbjHJP6l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 11:43:13 -0400
+        Thu, 10 Aug 2023 11:58:41 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E98EF1BD9;
-        Thu, 10 Aug 2023 08:43:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B39BF270E
+        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 08:58:39 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7616467373; Thu, 10 Aug 2023 17:43:00 +0200 (CEST)
-Date:   Thu, 10 Aug 2023 17:43:00 +0200
-From:   hch <hch@lst.de>
-To:     Richard Weinberger <richard@nod.at>
-Cc:     hch <hch@lst.de>, Stephan Wurm <stephan.wurm@a-eberle.de>,
-        linux-block <linux-block@vger.kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-mtd <linux-mtd@lists.infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Johannes Eigner <johannes.eigner@a-eberle.de>
-Subject: Re: ubiblock: null pointer dereference using scatterlist in
- work_queue
-Message-ID: <20230810154300.GA28000@lst.de>
-References: <ZLT2qEYjaWgSpRD6@PC-LX-Wurm> <1293911429.1782934.1691445776353.JavaMail.zimbra@nod.at> <20230809135308.GA32214@lst.de> <ZNOec8JmndA63Mnh@PC-LX-Wurm> <20230809141542.GA32614@lst.de> <366198994.5052941.1691620484888.JavaMail.zimbra@nod.at> <20230809223703.GA10719@lst.de> <533238598.5052964.1691621039144.JavaMail.zimbra@nod.at>
+        id 1E7A367373; Thu, 10 Aug 2023 17:58:36 +0200 (CEST)
+Date:   Thu, 10 Aug 2023 17:58:35 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chengming Zhou <zhouchengming@bytedance.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Chuck Lever III <chuck.lever@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Chuck Lever <cel@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH RFC] block: Revert 615939a2ae73
+Message-ID: <20230810155835.GF28000@lst.de>
+References: <169158653156.2034.8363987273532378512.stgit@bazille.1015granger.net> <d51b0683-8872-4e10-8589-5c6de8db61d4@kernel.dk> <20230809161105.GA2304@lst.de> <9BADCC53-72E9-44FB-80C8-CEBC9897809D@oracle.com> <20230809214913.GA9902@lst.de> <86ce2299-ce42-c0bb-e577-9d23f8af494c@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <533238598.5052964.1691621039144.JavaMail.zimbra@nod.at>
+In-Reply-To: <86ce2299-ce42-c0bb-e577-9d23f8af494c@bytedance.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 12:43:59AM +0200, Richard Weinberger wrote:
-> > deprecated kmap_atomic to kmap_local first you can sleep and don't
-> > need bounce buffers.
-> 
-> Yep, for upstream kmap_local will do the trick, but I need also something
-> for the stable trees.
-> Anyway, time to get some sleep.
+On Thu, Aug 10, 2023 at 11:42:50AM +0800, Chengming Zhou wrote:
+> Christoph, it would be very helpful if you share some thoughts
+> and directions.
 
-Maybe just copy and paste it with the kmap_local change and then do
-another patch (series) to unify them again.  IIRC we also have a copy
-and paste version in an mmc driver somewhere.
+I am not quite sure where the problems could even be.  I think the
+interesting aspects are:
+
+ - we are not directly processing through the normal submission path
+   instead of adding the command to the flush_data_in_flight list and
+   then going through blk_kick_flush.  So a command now gets executed
+   earlier than it did before.
+
+ - given that it only happens with SATA, it must be in some way related
+   to the fact that ATA flush commands are not queud, that is when a
+   flush is outstanding no other command can't.
 
