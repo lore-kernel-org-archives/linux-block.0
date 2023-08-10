@@ -2,210 +2,202 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 396BFC04FDF
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 16:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 155A2C001E0
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 16:39:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236388AbjHJQDQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 12:03:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54834 "EHLO
+        id S232535AbjHJQju (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 12:39:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236392AbjHJQCn (ORCPT
+        with ESMTP id S229631AbjHJQj3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 12:02:43 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A054D2738
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 09:02:26 -0700 (PDT)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37AEwvnh006085;
-        Thu, 10 Aug 2023 16:02:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2023-03-30;
- bh=OCh6oBSLk/W8JmSzKDJGnlZHHlTjCacC8k9Q+cUMerg=;
- b=qLPXgyOMg9/YZCLqOMhMh7tSAJOr5wWoBXDs7Q/KhEnfgLfP5K/wHGDujji+scElSnM1
- DXTH3lLTJucOUrYr/OWZ2gYyPtTSQ9iEd557BNMFiZFMUR1j2le2BYLRIVyuZkGeOyoH
- UXjGBn+lDFF4YVGlRRMStBQL4QXVwbFRJDVEzRme3ITiwnck+HFx9vLmr4f61G+C5HUZ
- 6sWqoC6XzMQdWkHUYxIlEW7ozDbE3sr7y8dT6yM+LLaTNBpyw/CS6aKhXShRW3JDGC9o
- FaVAJ3G2mTvGKmC/d1GNa1S6oLdbCdUamf7BB2JdNjIL1HtskKzySjP880maYFmATzvr wA== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3s9d73kjag-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Aug 2023 16:02:08 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37AEox5l018559;
-        Thu, 10 Aug 2023 16:02:07 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3s9cv97bw6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Aug 2023 16:02:05 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IgM0356qf13ofDXutbf6K8f0uf8LIPrgnUbSuetsxiHdl748kqODsLX8mtJ2CHxpLNw8uUPW45btskay38NqWFDr0+j2/oSNmRcrDQl5XOMQRm6vXwkaU8S08UngG+7LWQYhPwRPLjdGFgESsfVLsx+mqwkHvakytNB5cm5lwgnJvjMUHP9HMSj5a8JMyDIDmwio7wizqUrFdaFGfmqzp8gM5ydU3YgSUdWPLRBsRzy1uqUel97/LFQxdpvSBC1eFzXi1cBmfpaWnwFh3K807YeqHjbmdec606+Rx/5hm+i6oNY1q2HSLnTa35EVbOfJpVJdYCxxXtF0FBQ01Z9Cnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OCh6oBSLk/W8JmSzKDJGnlZHHlTjCacC8k9Q+cUMerg=;
- b=i0vIvhAmSaXBw6Z7Swvt8Avb/+LHjAE24BRzl/4pxC21gzWB0sRRk6mVe7Vd5xWxcj8S9vvNJZzMoYZOLGyVvyMFU86IQdPNjxE5h2mlx/aK2yLazHKOFCxgLDos2JASQXfiUTPpH6mwOjtnAnIhMz71Kro85x8kP7PKM4xrGw+Ni4EIodi7JiTCB28inegkQzoSbNRw3MN45Q3hKLt+B5pE04pr/VCq8pKdgBhUzdx7K+ntH+5QG73G5T8QHUhQnYs7y349ZVbYdNDnnEvzIMEIKywqi+8YkNMaSYYtmyMLItlqa9y/CuINvnHuGo5tXCGPKy8iwkCTmPXwZSIi9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Thu, 10 Aug 2023 12:39:29 -0400
+Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8C409C;
+        Thu, 10 Aug 2023 09:39:28 -0700 (PDT)
+Received: by mail-vs1-xe34.google.com with SMTP id ada2fe7eead31-44757af136cso479929137.3;
+        Thu, 10 Aug 2023 09:39:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OCh6oBSLk/W8JmSzKDJGnlZHHlTjCacC8k9Q+cUMerg=;
- b=uU7hikd8mgQb+cGVv9u47Nq1AhA9GZTGkDyZx2sFCZDjJaVeFU+NgdT+C98ryF1/4m7HgKrg5y97ExcrKKv+Vv6lK7Ju9gKmkHafGwj/MNFjUurujMgScDecr4ODg8pKTZxGb3hdEkB5apHQ10u9pSbtSRTu/CQqMEDfB7D5I5Y=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by IA1PR10MB7537.namprd10.prod.outlook.com (2603:10b6:208:457::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
- 2023 16:02:04 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::2990:c166:9436:40e]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::2990:c166:9436:40e%6]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
- 16:02:04 +0000
-Date:   Thu, 10 Aug 2023 12:02:01 -0400
-From:   Chuck Lever <chuck.lever@oracle.com>
-To:     Chengming Zhou <zhouchengming@bytedance.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Chuck Lever <cel@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH RFC] block: Revert 615939a2ae73
-Message-ID: <ZNUJ+Z9nK3s7kKb+@tissot.1015granger.net>
-References: <169158653156.2034.8363987273532378512.stgit@bazille.1015granger.net>
- <d51b0683-8872-4e10-8589-5c6de8db61d4@kernel.dk>
- <20230809161105.GA2304@lst.de>
- <9BADCC53-72E9-44FB-80C8-CEBC9897809D@oracle.com>
- <20230809214913.GA9902@lst.de>
- <86ce2299-ce42-c0bb-e577-9d23f8af494c@bytedance.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ce2299-ce42-c0bb-e577-9d23f8af494c@bytedance.com>
-X-ClientProxiedBy: CH2PR12CA0025.namprd12.prod.outlook.com
- (2603:10b6:610:57::35) To BN0PR10MB5128.namprd10.prod.outlook.com
- (2603:10b6:408:117::24)
+        d=gmail.com; s=20221208; t=1691685568; x=1692290368;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PiiUXlYJ8bvDKMXQX0ZpS7OfVahtG1U2z1S893Hu6ZU=;
+        b=MRHaf2nEjiv5t5Q5zoZ0UefIWXOkWjR11SdaXVYzelWOneebbVCB3cHeCHu/l1S4aj
+         tZHdJB4H0OWjl7w7FiTUQGuIsJFhmgFe9Nf/3Rj2u4tIfahYGZv2GbnKN/mltO2q60wZ
+         sTV15EDdCdTHliC4RYvxDLyHniXcvUYzLvIubBiAWaA4poKsO7WCLJyOZrRshvRGVmq+
+         ldlHhJOLuZBMe0jCvT5Q3ASTyW930C9fQWLpIasD6NAs0tKU8RMNdxrQLFjOPFFsUGgG
+         T5y8zxlLG/LOjUIhGzDECYXnHbt7WtuLnsX6kIAwDmkpVskifAA9mmVp4qxX+knQr+P6
+         sAXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691685568; x=1692290368;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PiiUXlYJ8bvDKMXQX0ZpS7OfVahtG1U2z1S893Hu6ZU=;
+        b=BfbBxlq5LfP77OstwPPrVcjub6PNNBgcCwd7tJDixYQx/Q0mdjzaJbRTZhAjj5yxrV
+         EwOmpOppw+/r6DKNHyGtBpj7iuIiRlljHhzzBwv2H1d6+E1sN26Uw6J1TroYzklSDwNF
+         OkN3IfHvStmYayOeS6v2Q5tgE5nncJ7qrtouSGDlu4RzXdcDiEU/B6CH/UhP9+M0qpNt
+         gqkmP1IoaBYeZ7Hdb4THxxYBT+H7lIPoHvbIIMa0XXejFOMk4/pgNba65LHY+gFDBFl/
+         hMZXWNLFYT7358Slfa5Rbj9B8GEosSCo0LNfolQdAGr7GtMdDmQIkqonvjDWsqx4ZDf0
+         dbvQ==
+X-Gm-Message-State: AOJu0Yy6wp5iYW8e6QWaxE6/6l0CRoqj7P+YOge85+i7xB0qyJ0uFJ2j
+        pnwnXV3R9wMrN+HbQt4AvlfOD5WZkXu4lUka06/JdSG54YcdAQ==
+X-Google-Smtp-Source: AGHT+IGrX1ae/kXMdBqblfeIEI/NiLvob99ua2FBeyd4WVGKXISuhSkW8yHD7vYRNdG1Oh0tfwTkI8jasKFCVAxJC6A=
+X-Received: by 2002:a05:6102:498:b0:43d:6660:581b with SMTP id
+ n24-20020a056102049800b0043d6660581bmr2236672vsa.5.1691685567696; Thu, 10 Aug
+ 2023 09:39:27 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|IA1PR10MB7537:EE_
-X-MS-Office365-Filtering-Correlation-Id: 585ee571-3556-40da-3a69-08db99bb239a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7WlRm+CPNA1wFkuUKdEEHxkfPdcVkOrjQ/tx92yNc3GG6aT7UVJ7h9lAGW9jB32q82C8TQmtKNSJb6UgW5UFzICaUP0YNr06d89+y2syts8RJtwK5Y2blpXGWHTWnJ8OdBFofxhvIjPU24UEUWGnZ0UyK4B3O3yIOCq7yo2saceJf7ycoRn7JzmFNPNQQ42OGCjY2ZCtB2yG9LR7WLWOtWpstn18Hjy6KDrPP2mAGyJXxJOUeIGV2mBVu2vwBfNg+Xk0KtLDu/QCcmKjtN3kLov6K7Xztp/wLodSekO9kd067BioNAkUICuAihGbaHcgdzuGZ2VH6Zjyg9+nFn7yMoRYyoV+1uXE6hiiHdDEbPOgLeh1OH6u1D4/1DfUwSdp4LrAEFr+YiDFuNcDnrIRX394WjPUuXALRFovaoWLaGjeJ+6S/IqMzMqglZcmXWgmxA1l3Xq8nIZGwEVWulW4x4It+bFU13ol+zuttcwrtv/6ynTlWZAZiLUXgVeVj8syElj5sVumeTU7i9ECxFfJja1Xre8hudeBHwhxszpU/HSa07kY92r+tVgGD0lWe6Is
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(346002)(136003)(366004)(376002)(451199021)(1800799006)(186006)(6666004)(6486002)(86362001)(53546011)(26005)(6506007)(9686003)(6512007)(66946007)(66556008)(66476007)(38100700002)(8676002)(54906003)(4326008)(2906002)(478600001)(6916009)(5660300002)(316002)(44832011)(83380400001)(41300700001)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FBqhImGbwQ/AeuftSYZJJbneJDmY1XPyWMJsc3raErG+c36Wk5+4f4Tu8hcs?=
- =?us-ascii?Q?QwaVRIiXKZ3GVIeKIOXHY8H71SlLxVBjYH1GX5V+7kdybofTL0kRAyemL+rZ?=
- =?us-ascii?Q?hy5mpf3TBzeTmNMMaDx5ztYxhOMu4F27aeBZsJU9i+USgfk1ABF+Kxt9u7FX?=
- =?us-ascii?Q?omVal2NDG+stlRiEm4zE+H8KGdr0TUC4YWn0CDgz0M28Yq2FfFvNjNu+E9KF?=
- =?us-ascii?Q?sbY/5UNcWGNzec/i6UOOgJVdK2SYavbauadReeYWeU5dZEW2SivZMn3KHAL+?=
- =?us-ascii?Q?8swFvzuMdI0JnIXrhMdjZ65ha7UXMkPIV1CdyC2/nftT/fFcMIyr3O522kMe?=
- =?us-ascii?Q?1zEetwyiKc9s2moAnJYTcD73K3YAoZp9lnFyd653tqPeWD1L/7LkrWBqes+O?=
- =?us-ascii?Q?nPO/crOZgL8bB73+4nzHmHB2DPxD2Nj9ZRqe64QRfUboQZVPwnmbyG1QBk07?=
- =?us-ascii?Q?9GwScjAN/DDP3WxBIH/0L52U4GYjO1HOAX/aiFnf52yN6AJ46ctcAE+5FsZg?=
- =?us-ascii?Q?A/XrG6dHigVB966yFgkaV2MS5CdD3uCB8kXMRDkMzjLcVnYVLha2pWIaZFAc?=
- =?us-ascii?Q?TdGFLVRSMYMNEXSHSN4pEvhdat7V94cLOi6TKsu4VR+UIvUzPCDmk8ZnWw09?=
- =?us-ascii?Q?WcShsSEJqpab5GFfUr8qz/adGg90Th4hTIA6qqvvk9mh9K6XBoh0hUqgkEA+?=
- =?us-ascii?Q?J/DX3sTUG5av4Em2+vk+gtCdUJDF0fajEPwO/FagfEmg6gNiNp0uw932M1mH?=
- =?us-ascii?Q?7vlwxpNLcd2BTffFI4EDWZtDgaEGwiSsZ/LGajzE5XoEloiyqLDfZ//3UWSg?=
- =?us-ascii?Q?cIBj4xUO4/Izkg7Npi/ePkgq38xbZ66MZwX5laKQDWmR3sXtGlSGpVXUBVgG?=
- =?us-ascii?Q?J7MehrxtGqdzZ3mbY2x9onqK+YyKsZNjiFSFcV04kK6xYuScdXmLJDT9LlVd?=
- =?us-ascii?Q?ovLweopzdp4afFUBkfJA/++d0179XLLjg4xXN3qkoRD9yuh02PxVhamXo/FP?=
- =?us-ascii?Q?L/Xl4bLzMVDDIPpxl+Z1rQPjy7MlTaztbNcRK0rGIHzNXIZS9kB0yWe0OZJb?=
- =?us-ascii?Q?1LgGETZrjMU6UbOAB6sn76dB8MdnhPDakMMogB2OqAQUnuZNraK7gCAqU13X?=
- =?us-ascii?Q?IDT/s7JGaYn1FQxFmXihUAC25s/+Jbf4nhR7YKNwY2nbXoA8CW2CVaO2tnCb?=
- =?us-ascii?Q?1FohD6nA7BhUYgCHhY93vJ3IAfzCBi0Navq9SO1UuqwzH076h0gBuPahyJBQ?=
- =?us-ascii?Q?cXjhdn0sHi7bB4872ddJmRE09XwtEqy9V5gPycgcs9dtyZZWt0guxU1sznBW?=
- =?us-ascii?Q?clSHP+suHTyb4WgW5fZRXZC1+r6Nc6tk23k+NuXu5GMdPYpv1FmLoZnG0M8/?=
- =?us-ascii?Q?xW/L6pw+DBeCVkTh17FeXhbf/RWZHZAQ3QpN6ciiStQ4rA8uB7rIsjR+Fuh9?=
- =?us-ascii?Q?JgS2zGIT3pdGlcO8zcf8U6OKFW2UVBqmNgpmtq30rhsff/4xDCVhSKTOZTIt?=
- =?us-ascii?Q?BwV12St9gYY48fPaCq68Z4J4OgrYQiTNrqnU9zXf5YkWA6LVE0VAIYCrEGvZ?=
- =?us-ascii?Q?jPFtIVvPSg77wInFxaNTN285vI3EnZp1RzUjrDn16+XTFfVGjxQtY+HzAi8m?=
- =?us-ascii?Q?Vg=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: WcQIF6p5xbdD4Si+irC1WACgu4GlmkAvFmhVAjeV9WdwkAntTVmfa7PECeuQnrj06MEoN72kraPn4iUTTYzl85wICdRvTagTg1vZfbDxPiGCDxIKkIANRHgUxPxldW6zAPkPkX+7uSiSeXihCPjErMgk7rtaRNgsfnvmMxye5mGyrCXODzabRU2YEoND6osTH0yFf7DhgzRc9BYJCvrlGM+OXJwunlRuZh5vOWTqIb7zf4SAfOmy/538MFUfJbjTek7tQk8ZcqHmRBisDv0bWhCPi470mw5Edhn3/O5MXcWMWNwXaetFWw1JhcPydF4ne761o6GqcnikLxJY5nDdGiA8lOd+a8lNr5eGwRF4irkLP0BjwDn89IOpoWzwOuIxaJq4h5daqCltoDW0ouOr3y3SgSnMSggiiaE1hw42tuDp/fWeMWTUH+ByGSBlbwxL0Ae48KPhNsktMZKECvmT7myxPI9VHIpuNXhoFBHIwaMOJj0ydw1MfpT9mkoItslJTG7fwGo3ev21mvJuitaYde0VEVh88tEiL47V6u1fxbRMrHV2th/T/LJsQ37K+VU+ZuCpGg2pHQmVQ9g6Z/R6n9oWRGip8DT65TQ92DrIKnUBzHno2xRrk89K2cZyp4zJ1zLt8g+/Bwa5q+Rak5pDfGYg/pkXMxLBstp6pDWOh7p34YcKihUqRkDzDhkl8XU0zruRP1jKzJTlRcgyK7XK6nJCAl0Ssokj5EHuEfCmXpBXVrqPit3NPusVyn2xoQJIiWyk7U/eUgVwg48dEJe2LPrFH21UKO9n6Z4qm+WiD/oqSUZRCbFoY+CiBr0BVusZpf4K2+ENw5POuarvp/8dxvIGYNZfdnYSWTXoE+URP6fAhwudFL5XjbEplKI9gPNp
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 585ee571-3556-40da-3a69-08db99bb239a
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 16:02:03.9694
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4gc6pzA1ycSzj3B4LWOPrDrLgL4C2EnZZSMvA5939nn1/NcRNIxKyAD3/0Wt8Ppdy/iuuypd937/lleX7KL6UA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB7537
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-10_14,2023-08-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0 bulkscore=0
- malwarescore=0 adultscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308100137
-X-Proofpoint-GUID: J3RRchxkbK0ivDEkOJ44zFZKOA5hw577
-X-Proofpoint-ORIG-GUID: J3RRchxkbK0ivDEkOJ44zFZKOA5hw577
+References: <20230802154131.2221419-1-hch@lst.de> <20230802154131.2221419-3-hch@lst.de>
+ <20230803114651.ihtqqgthbdjjgxev@quack3> <CAKFNMomzHg33SHnp6xGMEZY=+k6Y4t7dvBvgBDbO9H3ujzNDCw@mail.gmail.com>
+ <20230810110547.ks62g2flysgwpgru@quack3>
+In-Reply-To: <20230810110547.ks62g2flysgwpgru@quack3>
+From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Date:   Fri, 11 Aug 2023 01:39:10 +0900
+Message-ID: <CAKFNMon_3A7dC+k1q_RjEnoXXNtxBJAUQud_FD4s4VrHZdCVzg@mail.gmail.com>
+Subject: Re: [PATCH 02/12] nilfs2: use setup_bdev_super to de-duplicate the
+ mount code
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 11:42:50AM +0800, Chengming Zhou wrote:
-> On 2023/8/10 05:49, Christoph Hellwig wrote:
-> > Oh well.  I don't feel like we're going to find the root cause
-> > given that its late in the merge window and I'm running out of
-> > time I have to work due to the annual summer vacation.  Unless
-> > someone like Chengming who knows the flush code pretty well
-> > feels like working with chuck on a few more iterations we'll
-> 
-> Hi,
-> 
-> No problem, I can work with Chuck to find the root cause if Chuck
-> has time too, since I still can't reproduce it by myself.
-> 
-> Maybe we should first find what's the status of the hang request?
-> I can write a Drgn script to find if any request hang in the queue.
-> 
-> Christoph, it would be very helpful if you share some thoughts
-> and directions.
-> 
-> 
-> > have to revert it.  Which is going to be a very painful merge
-> > with Chengming's work in the for-6.6 branch.
-> > 
-> 
-> Maybe we can revert it manually if we still fail since that commit
-> just let postflushes go to the normal I/O path, instead of going to
-> the flush state machine.
-> 
-> So I think it should be fine if we just delete that case?
-> 
-> Chuck, could you please help to check this change on block/for-next?
-> 
-> Thanks!
-> 
-> diff --git a/block/blk-flush.c b/block/blk-flush.c
-> index e73dc22d05c1..7ea3c00f40ce 100644
-> --- a/block/blk-flush.c
-> +++ b/block/blk-flush.c
-> @@ -442,17 +442,6 @@ bool blk_insert_flush(struct request *rq)
->                  * Queue for normal execution.
->                  */
->                 return false;
-> -       case REQ_FSEQ_DATA | REQ_FSEQ_POSTFLUSH:
-> -               /*
-> -                * Initialize the flush fields and completion handler to trigger
-> -                * the post flush, and then just pass the command on.
-> -                */
-> -               blk_rq_init_flush(rq);
-> -               rq->flush.seq |= REQ_FSEQ_PREFLUSH;
-> -               spin_lock_irq(&fq->mq_flush_lock);
-> -               fq->flush_data_in_flight++;
-> -               spin_unlock_irq(&fq->mq_flush_lock);
-> -               return false;
->         default:
->                 /*
->                  * Mark the request as part of a flush sequence and submit it
+On Thu, Aug 10, 2023 at 8:05=E2=80=AFPM Jan Kara wrote:
+>
+> On Fri 04-08-23 11:01:39, Ryusuke Konishi wrote:
+> > On Thu, Aug 3, 2023 at 8:46=E2=80=AFPM Jan Kara wrote:
+> > >
+> > > On Wed 02-08-23 17:41:21, Christoph Hellwig wrote:
+> > > > Use the generic setup_bdev_super helper to open the main block devi=
+ce
+> > > > and do various bits of superblock setup instead of duplicating the
+> > > > logic.  This includes moving to the new scheme implemented in commo=
+n
+> > > > code that only opens the block device after the superblock has allo=
+cated.
+> > > >
+> > > > It does not yet convert nilfs2 to the new mount API, but doing so w=
+ill
+> > > > become a bit simpler after this first step.
+> > > >
+> > > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > >
+> > > AFAICS nilfs2 could *almost* use mount_bdev() directly and then just =
+do its
+> >
+> > > snapshot thing after mount_bdev() returns. But it has this weird logi=
+c
+> > > that: "if the superblock is already mounted but we can shrink the who=
+le
+> > > dcache, then do remount instead of ignoring mount options". Firstly, =
+this
+> > > looks racy - what prevents someone from say opening a file on the sb =
+just
+> > > after nilfs_tree_is_busy() shrinks dcache? Secondly, it is inconsiste=
+nt
+> > > with any other filesystem so it's going to surprise sysadmins not
+> > > intimately knowing nilfs2. Thirdly, from userspace you cannot tell wh=
+at
+> > > your mount call is going to do. Last but not least, what is it really=
+ good
+> > > for? Ryusuke, can you explain please?
+> > >
+> > >                                                                 Honza
+> >
+> > I think you are referring to the following part:
+> >
+> > >        if (!s->s_root) {
+> > ...
+> > >        } else if (!sd.cno) {
+> > >                if (nilfs_tree_is_busy(s->s_root)) {
+> > >                        if ((flags ^ s->s_flags) & SB_RDONLY) {
+> > >                                nilfs_err(s,
+> > >                                          "the device already has a %s=
+ mount.",
+> > >                                          sb_rdonly(s) ? "read-only" :=
+ "read/write");
+> > >                                err =3D -EBUSY;
+> > >                                goto failed_super;
+> > >                        }
+> > >                } else {
+> > >                        /*
+> > >                         * Try remount to setup mount states if the cu=
+rrent
+> > >                         * tree is not mounted and only snapshots use =
+this sb.
+> > >                         */
+> > >                        err =3D nilfs_remount(s, &flags, data);
+> > >                        if (err)
+> > >                                goto failed_super;
+> > >                }
+> > >        }
+> >
+> > What this logic is trying to do is, if there is already a nilfs2 mount
+> > instance for the device, and are trying to mounting the current tree
+> > (sd.cno is 0, so this is not a snapshot mount), then will switch
+> > depending on whether the current tree has a mount:
+> >
+> > - If the current tree is mounted, it's just like a normal filesystem.
+> > (A read-only mount and a read/write mount can't coexist, so check
+> > that, and reuse the instance if possible)
+> > - Otherwise, i.e. for snapshot mounts only, do whatever is necessary
+> > to add a new current mount, such as starting a log writer.
+> >    Since it does the same thing that nilfs_remount does, so
+> > nilfs_remount() is used there.
+> >
+> > Whether or not there is a current tree mount can be determined by
+> > d_count(s->s_root) > 1 as nilfs_tree_is_busy() does.
+> > Where s->s_root is always the root dentry of the current tree, not
+> > that of the mounted snapshot.
+>
+> I see now, thanks for explanation! But one thing still is not clear to me=
+.
+> If you say have a snapshot mounted read-write and then you mount the
+> current snapshot (cno =3D=3D 0) read-only, you'll switch the whole superb=
+lock
+> to read-only state. So also the mounted snapshot is suddently read-only
+> which is unexpected and actually supposedly breaks things because you can
+> still have file handles open for writing on the snapshot etc.. So how do
+> you solve that?
+>
+>                                                                 Honza
 
-linux-block/for-next with the above hunk applied is not able to
-reproduce the NFSD hangs on SATA devices.
+One thing I have to tell you as a premise is that nilfs2's snapshot
+mounts (cno !=3D 0) are read-only.
 
+The read-only option is mandatory for nilfs2 snapshot mounts, so
+remounting to read/write mode will result in an error.
+This constraint is checked in nilfs_parse_snapshot_option() which is
+called from nilfs_identify().
 
--- 
-Chuck Lever
+In fact, any write mode file/inode operations on a snapshot mount will
+result in an EROFS error, regardless of whether the coexisting current
+tree mount is read-only or read/write (i.e. regardless of the
+read-only flag of the superblock instance).
+
+This is mostly (and possibly entirely) accomplished at the vfs layer
+by checking the MNT_READONLY flag in mnt_flags of the vfsmount
+structure, and even on the nilfs2 side,  iops->permission
+(=3Dnilfs_permission) rejects write operations on snapshot mounts.
+
+Therefore, the problem you pointed out shouldn't occur in the first
+place since the situation where a snapshot with a handle in write mode
+suddenly becomes read-only doesn't happen.   Unless I'm missing
+something..
+
+Regards,
+Ryusuke Konishi
