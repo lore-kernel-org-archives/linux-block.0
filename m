@@ -2,131 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FB8C001B0
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 10:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 714A3C001DB
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 10:35:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234049AbjHJKWc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 06:22:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48646 "EHLO
+        id S230114AbjHJKfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 06:35:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232018AbjHJKWK (ORCPT
+        with ESMTP id S231991AbjHJKft (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 06:22:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C6483
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 03:21:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691662882;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=97EnLhuROKiA5XU6sdqPiWoCqvYENz+CWlSWUkPCvf4=;
-        b=N1bxD7AIVsinxjdqSqgj1CN9yn5hISi8uhdijasODV8STOwNFsBSzrRBqLJ/NQM62qUciH
-        ovFyPOtwA5SKwuK2IjsQcBByyoVS4ubdH36EUU+EfuZCEPhqpfgoCdAMcXflWxwKc6sq4+
-        NcPptz8DlKXMJW5+fGkrsyGPrFviGlc=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-61-RKumFiYKNE2uWZqCF-e6kg-1; Thu, 10 Aug 2023 06:21:21 -0400
-X-MC-Unique: RKumFiYKNE2uWZqCF-e6kg-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-268099fd4f5so828412a91.1
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 03:21:21 -0700 (PDT)
+        Thu, 10 Aug 2023 06:35:49 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2712CE6B
+        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 03:35:49 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fe1d462762so6515495e9.0
+        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 03:35:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1691663747; x=1692268547;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FRClu8OKbCccK+GpVjNM1rBXRMSXaT4uZih+XyUZcUM=;
+        b=ydlNjKSA6ZQkdPYzNf3bwG0IUVOcqkw8lH9yA25W4d1bstSOk1456597VDBsXwbxOd
+         zvYLglxAf7kjViw+2fB98c34g8o+EOGoEKO3f5ya6VZV0KTs8gZG76NjdnC6X3jhtruC
+         iXkVQeocwN48VtpvGVeS+M3lP9ued6VD1gRt8hr02Rr0OVMIBTwuIidhzTbhbtWWRMwX
+         s146xsLu1rx9WSE3R2lRYqB2/cUrr95lxTEbp2+GtB4DYPuCskgzvU9GW/CYs4uAySRS
+         UNZAS6RHYnAMTtJdh1wH5+bwGfw1QorzPk3KhSII9bicYOlMGFrFHdTD/oY8VLCzprag
+         HITA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691662880; x=1692267680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=97EnLhuROKiA5XU6sdqPiWoCqvYENz+CWlSWUkPCvf4=;
-        b=cHFzDXNlhPy4T1sLK+ubiI+YxoH5sJA0frSN0cZiKHgFwWCyuTbEOiQsvujDftzuEn
-         lnQAEbp4dOfJTm5cggyX4AwC3nlc4PKDIwCl5gn9MfONGWxaSFeHVZRBlxIDZj125M+s
-         I/zt2F9yq9L5ZDwhkdUoBCtCn5f+jo1crKVU9VsiBESUXzpMOd1p26GcjqAWKux6po0m
-         0PKI6xS3VBxA6ag3LxUMqrLqvB9F3Um36zJbBvJY3LQlkqTT3TXTBdSE+cjxXoIdaitH
-         LJH07z6nWkAQBDLW0r22fjaHMA9ahzZNNX5BlApgFExSub+UHIt6tth2cBet2ZVuxNiD
-         o+2w==
-X-Gm-Message-State: AOJu0YynsWqOSE43YYyWBYUxxE1oDrIySKMftTrQ7jZdWIJBrIU3yvvP
-        TScDs2IBce+pA0KCcqAu83+GayxsYpwcIjFPWx9Uw8Cx1AIp1GdtsL8f1zWtmBASGl04vT6hPIK
-        hTfYc7zo+zsg4BxuDDCsPn/J59MVCjGIhtpC6Z0c=
-X-Received: by 2002:a17:90a:9a4:b0:263:fc45:4091 with SMTP id 33-20020a17090a09a400b00263fc454091mr1361097pjo.15.1691662880260;
-        Thu, 10 Aug 2023 03:21:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFcHNBMvFDBk7y0QhwsuUlmRcVRHLwkbRLjYKPP87oSA7v3s9ExCPraMelKe7GWxlh/LHUGAO7F9bQzhjOj7kc=
-X-Received: by 2002:a17:90a:9a4:b0:263:fc45:4091 with SMTP id
- 33-20020a17090a09a400b00263fc454091mr1361090pjo.15.1691662879954; Thu, 10 Aug
- 2023 03:21:19 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691663747; x=1692268547;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FRClu8OKbCccK+GpVjNM1rBXRMSXaT4uZih+XyUZcUM=;
+        b=APe2Q0nj98yb/AfvcWugWEz1nufTSt98lyRJ0xVm1L/8sZdAYjod3y/WYmTnhVu43w
+         28F6X1cZaE/Y8oOSICs/n2RrV5R7sqyzhXkcP/nbX12l8EzRKMtp14otBDwD4UbrwXwT
+         q3nL/M42F6b3LSZsa/30YsuqRxv75ZleSdPTpWYwTLqgHE2r/ycvE9MgeIYp/F2EW/1A
+         CnReTFn6nOcy8AZZDbsWBqoGBffiqjxyJFuMVUvC9SIUKsn2ZSUnf6pZWYmIxaffmGVr
+         prg7nDKRbK6gw+KmUrG47qouXfNeK/4+rlpwpG7J99r1WkXeZq3LcgX3Yoflhra5IxGA
+         BfuQ==
+X-Gm-Message-State: AOJu0YytwJBbl0sgnpVQbrj5rShBRz8dkL3X+ec9oJd6OtvuVuzVYsnq
+        qj8gm4YWwoCyrNgaselURTDZGQ==
+X-Google-Smtp-Source: AGHT+IGn42OkTxCreENUDG1eZEjFZjr/1puXM7aIIicE3k5SY+MeZfPRTgEkrqysv99Y1Uem9qSl5w==
+X-Received: by 2002:a05:600c:290a:b0:3fe:2219:9052 with SMTP id i10-20020a05600c290a00b003fe22199052mr1712516wmd.18.1691663747607;
+        Thu, 10 Aug 2023 03:35:47 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id n12-20020a7bcbcc000000b003fe557829ccsm4567309wmi.28.2023.08.10.03.35.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 03:35:47 -0700 (PDT)
+Date:   Thu, 10 Aug 2023 13:35:44 +0300
+From:   Dan Carpenter <dan.carpenter@linaro.org>
+To:     a.hindborg@samsung.com
+Cc:     linux-block@vger.kernel.org
+Subject: [bug report] ublk: enable zoned storage support
+Message-ID: <d74153a0-6b0c-4416-8190-c845c89d8b5c@moroto.mountain>
 MIME-Version: 1.0
-References: <CAHj4cs9GNohGUjohNw93jrr8JGNcRYC-ienAZz+sa7az1RK77w@mail.gmail.com>
- <CAHj4cs9J7w_QSWMrj0ncufKwT9viS-o7pxmS2Y4FeaWEyPD34Q@mail.gmail.com>
- <vxeo2ucxhvdcm2z673keqerkpxay6dgfluuvxawukkbunddzm2@jdkdk7y3a5nu>
- <xrqutkdhz7v6axohfxipv4or7k4jhoa57semwcxde7gletk76z@5kcashfdezhk>
- <adgkdt52d6qvcbxq4aof7ggun3t77znndpvzq5k7aww3jrx2tk@6ispx7zimxhy> <o2443ezmpny7dyvhiteajzgt3j7wcxo2fv7dik3h7hkjpc2h74@xeetbva55fx2>
-In-Reply-To: <o2443ezmpny7dyvhiteajzgt3j7wcxo2fv7dik3h7hkjpc2h74@xeetbva55fx2>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Thu, 10 Aug 2023 18:21:07 +0800
-Message-ID: <CAHj4cs8TBsEct9P6iiYwsiRhgCkPbdVL0-8KkXuKZbYhVsQV0Q@mail.gmail.com>
-Subject: Re: [bug report] blktests nvme/047 failed due to /dev/nvme0n1 not
- created in time
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Daniel/Shinichiro
-Thanks for looking into this issue, I checked the 047 code, and we are
-missing _find_nvme_dev after the second connect, and the below change
-could fix this issue now.
+Hello Andreas Hindborg,
 
-diff --git a/tests/nvme/047 b/tests/nvme/047
-index 6a7599b..8c0a024 100755
---- a/tests/nvme/047
-+++ b/tests/nvme/047
-@@ -52,6 +52,8 @@ test() {
-                --nr-write-queues 1 \
-                --nr-poll-queues 1 || echo FAIL
+This is a semi-automatic email about new static checker warnings.
 
-+       nvmedev=3D$(_find_nvme_dev "${subsys_name}")
-+
-        _run_fio_rand_io --filename=3D"/dev/${nvmedev}n1" --size=3D"${rand_=
-io_size}"
+The patch 29802d7ca33b: "ublk: enable zoned storage support" from Aug
+4, 2023, leads to the following Smatch complaint:
 
-        _nvme_disconnect_subsys "${subsys_name}" >> "$FULL" 2>&1
+    drivers/block/ublk_drv.c:1404 ublk_commit_completion()
+    warn: variable dereferenced before check 'req' (see line 1401)
 
+drivers/block/ublk_drv.c
+  1398          /* find the io request and complete */
+  1399          req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
+  1400  
+  1401          if (req_op(req) == REQ_OP_ZONE_APPEND)
+                           ^^^
+The patch adds an unchecked dereference
 
-On Thu, Aug 10, 2023 at 5:18=E2=80=AFPM Daniel Wagner <dwagner@suse.de> wro=
-te:
->
-> On Thu, Aug 10, 2023 at 12:19:39AM +0000, Shinichiro Kawasaki wrote:
-> > Yi, could you try and see if it avoids the failure?
-> >
-> > diff --git a/tests/nvme/rc b/tests/nvme/rc
-> > index 4f3a994..005db80 100644
-> > --- a/tests/nvme/rc
-> > +++ b/tests/nvme/rc
-> > @@ -740,7 +740,7 @@ _find_nvme_dev() {
-> >               if [[ "$subsysnqn" =3D=3D "$subsys" ]]; then
-> >                       echo "$dev"
-> >                       for ((i =3D 0; i < 10; i++)); do
-> > -                             if [[ -e /sys/block/$dev/uuid &&
-> > +                             if [[ -e /dev/$dev && -e /sys/block/$dev/=
-uuid &&
-> >                                       -e /sys/block/$dev/wwid ]]; then
-> >                                       return
-> >                               fi
->
-> The path for uuid is not correct. It's needs to be something like
->
->         if [[ -e /dev/$dev && -e /sys/block/"${dev}n1"/uuid &&
->                 -e /sys/block/"${dev}n1"/wwid ]]; then
->                         return
->         fi
->
+  1402                  req->__sector = ub_cmd->zone_append_lba;
+  1403  
+  1404          if (req && likely(!blk_should_fake_timeout(req->q)))
+                    ^^^
+The existing code assumes req can be NULL
 
+  1405                  ublk_put_req_ref(ubq, req);
+  1406  }
 
---=20
-Best Regards,
-  Yi Zhang
-
+regards,
+dan carpenter
