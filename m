@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7552C04E69
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 11:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5BCC04FDF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 11:13:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233983AbjHJLN1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 07:13:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39690 "EHLO
+        id S234990AbjHJLNg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 07:13:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234525AbjHJLN0 (ORCPT
+        with ESMTP id S234657AbjHJLN1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 07:13:26 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE6282684;
-        Thu, 10 Aug 2023 04:13:24 -0700 (PDT)
+        Thu, 10 Aug 2023 07:13:27 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501CF26A2;
+        Thu, 10 Aug 2023 04:13:26 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6F61A21867;
-        Thu, 10 Aug 2023 11:13:23 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 05EF01F74D;
+        Thu, 10 Aug 2023 11:13:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1691666003; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1691666005; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ySX0bPj+OlMTvPO100mpK3C4LxGQ/kzWWhKoP04YVHk=;
-        b=1KJzQHtd2yEoQ9RANk+oHFA5qS3HkdIzzmFgXLjh8dAw9eWFuFVi/jDftrH9KAOYZXbLn+
-        NKKH9sFtiPB+PCtZsFSBmf9MQ3pp1cR8IJT+/I8qFhNOF5qYCKas2aeFuCbYG5vVJfYt3u
-        dRldxAeOEY37B2Zy7G/c7y8YjoWhKUM=
+        bh=ac4SZIHJuwditUTgeiRbiLy7q3HhMjFvWfM/zdhxKuw=;
+        b=H+Qh0u6PdS0fCbyQLhBlSkv0tS8ihVDxCqja53s6iZ30jBOo9B7bDupG21BsuBcI9vvEKs
+        +dWE+XqMEBNteK8Ffr8jJNZX8UgZkbTpnTvU36whLI0v/v69kFG6xROFy1ER54weAh86JR
+        5JE/qwVTedXaqBS99Zt84zPtYcxjEEg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1691666003;
+        s=susede2_ed25519; t=1691666005;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ySX0bPj+OlMTvPO100mpK3C4LxGQ/kzWWhKoP04YVHk=;
-        b=DSx1hN/81uIOJzcpJh2ArzA9ZSPo1MDRm9DAVGFwzTkIB+j6sLiaKGSnmXWmUg5uhwPHJN
-        obE+g3Fjp/uL/qDw==
+        bh=ac4SZIHJuwditUTgeiRbiLy7q3HhMjFvWfM/zdhxKuw=;
+        b=Mm+pVfkBJ4ojvPKEfQ4Pw72b3tbTVY4eemulSPdqpPT9bg2gZ3LFg1RVLO7Ya93jLdijJy
+        y8gPYvjEmjPLzNDA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 54187138E2;
-        Thu, 10 Aug 2023 11:13:23 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E9C03138E2;
+        Thu, 10 Aug 2023 11:13:24 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id P/iDFFPG1GQ3LwAAMHmgww
-        (envelope-from <dwagner@suse.de>); Thu, 10 Aug 2023 11:13:23 +0000
+        id hdPyOFTG1GQ/LwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Thu, 10 Aug 2023 11:13:24 +0000
 From:   Daniel Wagner <dwagner@suse.de>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         James Smart <jsmart2021@gmail.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v2 02/12] nvme: Reorganize test preamble code section
-Date:   Thu, 10 Aug 2023 13:13:07 +0200
-Message-ID: <20230810111317.25273-3-dwagner@suse.de>
+Subject: [PATCH blktests v2 05/12] nvme/{041,042,043,044,045,048}: Remove local variable hostnqn and hostid
+Date:   Thu, 10 Aug 2023 13:13:10 +0200
+Message-ID: <20230810111317.25273-6-dwagner@suse.de>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230810111317.25273-1-dwagner@suse.de>
 References: <20230810111317.25273-1-dwagner@suse.de>
@@ -72,525 +72,425 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This unifies all the tests preamble code section.
-
-Reorganize all tests to start with printing the test name, then
-the setting nvmet and finally followed by the variable declarations.
+Commit acc408477e85 ("nvme/{041,042,043,044,045,048}: Use default
+hostnqn and hostid") switched the test over to use the default
+hostnqn. It missed the change to remove the local variable and
+use the def_hostnqn/def_hostid directly.
 
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
 ---
- tests/nvme/006 | 4 ++--
- tests/nvme/007 | 4 ++--
- tests/nvme/016 | 4 ++--
- tests/nvme/017 | 4 ++--
- tests/nvme/030 | 8 ++++----
- tests/nvme/031 | 8 ++++----
- tests/nvme/033 | 7 ++++---
- tests/nvme/034 | 7 ++++---
- tests/nvme/035 | 7 ++++---
- tests/nvme/036 | 7 ++++---
- tests/nvme/037 | 8 ++++----
- tests/nvme/038 | 6 +++---
- tests/nvme/039 | 4 ++--
- tests/nvme/040 | 7 ++++---
- tests/nvme/041 | 8 ++++----
- tests/nvme/042 | 8 ++++----
- tests/nvme/043 | 8 ++++----
- tests/nvme/044 | 8 ++++----
- tests/nvme/045 | 8 ++++----
- tests/nvme/048 | 8 ++++----
- 20 files changed, 69 insertions(+), 64 deletions(-)
+ tests/nvme/041 | 16 ++++++----------
+ tests/nvme/042 | 21 ++++++++-------------
+ tests/nvme/043 | 23 +++++++++--------------
+ tests/nvme/044 | 27 +++++++++++----------------
+ tests/nvme/045 | 23 +++++++++--------------
+ tests/nvme/048 | 12 ++++--------
+ 6 files changed, 47 insertions(+), 75 deletions(-)
 
-diff --git a/tests/nvme/006 b/tests/nvme/006
-index ea0db93791a7..b44c56b6a25d 100755
---- a/tests/nvme/006
-+++ b/tests/nvme/006
-@@ -18,12 +18,12 @@ requires() {
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-+	_setup_nvmet
-+
- 	local port
- 	local loop_dev
- 	local subsys_name="blktests-subsystem-1"
- 
--	_setup_nvmet
--
- 	truncate -s "${nvme_img_size}" "$TMPDIR/img"
- 
- 	loop_dev="$(losetup -f --show "$TMPDIR/img")"
-diff --git a/tests/nvme/007 b/tests/nvme/007
-index 243a79f5a254..112432df7a9d 100755
---- a/tests/nvme/007
-+++ b/tests/nvme/007
-@@ -17,12 +17,12 @@ requires() {
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-+	_setup_nvmet
-+
- 	local port
- 	local file_path
- 	local subsys_name="blktests-subsystem-1"
- 
--	_setup_nvmet
--
- 	file_path="${TMPDIR}/img"
- 
- 	truncate -s "${nvme_img_size}" "${file_path}"
-diff --git a/tests/nvme/016 b/tests/nvme/016
-index f617cf103900..cac0c0509aca 100755
---- a/tests/nvme/016
-+++ b/tests/nvme/016
-@@ -16,13 +16,13 @@ requires() {
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-+	_setup_nvmet
-+
- 	local port
- 	local iterations="${nvme_num_iter}"
- 	local loop_dev
- 	local subsys_nqn="blktests-subsystem-1"
- 
--	_setup_nvmet
--
- 	loop_dev="$(losetup -f)"
- 	local genctr=1
- 
-diff --git a/tests/nvme/017 b/tests/nvme/017
-index 3dbb7c174b56..429a25e8e011 100755
---- a/tests/nvme/017
-+++ b/tests/nvme/017
-@@ -16,13 +16,13 @@ requires() {
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-+	_setup_nvmet
-+
- 	local port
- 	local file_path
- 	local iterations="${nvme_num_iter}"
- 	local subsys_name="blktests-subsystem-1"
- 
--	_setup_nvmet
--
- 	file_path="${TMPDIR}/img"
- 
- 	truncate -s "${nvme_img_size}" "${file_path}"
-diff --git a/tests/nvme/030 b/tests/nvme/030
-index cfcdcbe6be23..a0b999cace94 100755
---- a/tests/nvme/030
-+++ b/tests/nvme/030
-@@ -16,14 +16,14 @@ requires() {
- }
- 
- test() {
--	local port
--	local genctr
--	local subsys="blktests-subsystem-"
--
- 	echo "Running ${TEST_NAME}"
- 
- 	_setup_nvmet
- 
-+	local port
-+	local genctr
-+	local subsys="blktests-subsystem-"
-+
- 	port="$(_create_nvmet_port "${nvme_trtype}")"
- 
- 	_create_nvmet_subsystem "${subsys}1" "$(losetup -f)"
-diff --git a/tests/nvme/031 b/tests/nvme/031
-index e70898819a86..27b08e96dd0b 100755
---- a/tests/nvme/031
-+++ b/tests/nvme/031
-@@ -24,15 +24,15 @@ requires() {
- }
- 
- test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
- 	local subsys="blktests-subsystem-"
- 	local iterations=10
- 	local loop_dev
- 	local port
- 
--	echo "Running ${TEST_NAME}"
--
--	_setup_nvmet
--
- 	truncate -s "${nvme_img_size}" "$TMPDIR/img"
- 
- 	loop_dev="$(losetup -f --show "$TMPDIR/img")"
-diff --git a/tests/nvme/033 b/tests/nvme/033
-index 90aee817de5d..5a4fac03bea0 100755
---- a/tests/nvme/033
-+++ b/tests/nvme/033
-@@ -45,13 +45,14 @@ compare_dev_info() {
- }
- 
- test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
- 	local subsys="blktests-subsystem-1"
- 	local nsdev
- 	local port
- 
--	echo "Running ${TEST_NAME}"
--
--	_setup_nvmet
- 	port=$(_nvmet_passthru_target_setup "${subsys}")
- 
- 	nsdev=$(_nvmet_passthru_target_connect "${nvme_trtype}" "${subsys}")
-diff --git a/tests/nvme/034 b/tests/nvme/034
-index e0ede717c373..334b2525d1b6 100755
---- a/tests/nvme/034
-+++ b/tests/nvme/034
-@@ -15,14 +15,15 @@ requires() {
- }
- 
- test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
- 	local subsys="blktests-subsystem-1"
- 	local ctrldev
- 	local nsdev
- 	local port
- 
--	echo "Running ${TEST_NAME}"
--
--	_setup_nvmet
- 	port=$(_nvmet_passthru_target_setup "${subsys}")
- 	nsdev=$(_nvmet_passthru_target_connect "${nvme_trtype}" "${subsys}")
- 
-diff --git a/tests/nvme/035 b/tests/nvme/035
-index 0896f7bb578d..68a9b608920e 100755
---- a/tests/nvme/035
-+++ b/tests/nvme/035
-@@ -21,14 +21,15 @@ device_requires() {
- }
- 
- test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
- 	local subsys="blktests-subsystem-1"
- 	local ctrldev
- 	local nsdev
- 	local port
- 
--	echo "Running ${TEST_NAME}"
--
--	_setup_nvmet
- 	port=$(_nvmet_passthru_target_setup "${subsys}")
- 	nsdev=$(_nvmet_passthru_target_connect "${nvme_trtype}" "${subsys}")
- 
-diff --git a/tests/nvme/036 b/tests/nvme/036
-index 8218c6538dfd..c3fc5d4a948d 100755
---- a/tests/nvme/036
-+++ b/tests/nvme/036
-@@ -14,13 +14,14 @@ requires() {
- }
- 
- test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
- 	local subsys="blktests-subsystem-1"
- 	local ctrldev
- 	local port
- 
--	echo "Running ${TEST_NAME}"
--
--	_setup_nvmet
- 	port=$(_nvmet_passthru_target_setup "${subsys}")
- 	nsdev=$(_nvmet_passthru_target_connect "${nvme_trtype}" "${subsys}")
- 
-diff --git a/tests/nvme/037 b/tests/nvme/037
-index fc6c21343652..5a78444b7e78 100755
---- a/tests/nvme/037
-+++ b/tests/nvme/037
-@@ -13,15 +13,15 @@ requires() {
- }
- 
- test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
- 	local subsys="blktests-subsystem-"
- 	local iterations=10
- 	local ctrldev
- 	local port
- 
--	echo "Running ${TEST_NAME}"
--
--	_setup_nvmet
--
- 	for ((i = 0; i < iterations; i++)); do
- 		port=$(_nvmet_passthru_target_setup "${subsys}${i}")
- 		nsdev=$(_nvmet_passthru_target_connect "${nvme_trtype}" \
-diff --git a/tests/nvme/038 b/tests/nvme/038
-index 24f02d4ad4d1..5af28da03c36 100755
---- a/tests/nvme/038
-+++ b/tests/nvme/038
-@@ -19,13 +19,13 @@ requires() {
- }
- 
- test() {
--	local subsys_path="${NVMET_CFS}/subsystems/blktests-subsystem-1"
--	local port
--
- 	echo "Running ${TEST_NAME}"
- 
- 	_setup_nvmet
- 
-+	local subsys_path="${NVMET_CFS}/subsystems/blktests-subsystem-1"
-+	local port
-+
- 	mkdir -p "${subsys_path}"
- 	rmdir "${subsys_path}"
- 
-diff --git a/tests/nvme/039 b/tests/nvme/039
-index f327b54a8d00..73b53d0b949c 100755
---- a/tests/nvme/039
-+++ b/tests/nvme/039
-@@ -131,12 +131,12 @@ inject_invalid_admin_cmd()
- }
- 
- test_device() {
-+	echo "Running ${TEST_NAME}"
-+
- 	local nvme_verbose_errors
- 	local ns_dev
- 	local ctrl_dev
- 
--	echo "Running ${TEST_NAME}"
--
- 	if _check_kernel_option NVME_VERBOSE_ERRORS; then
- 		nvme_verbose_errors=true
- 	else
-diff --git a/tests/nvme/040 b/tests/nvme/040
-index 688a0939a376..3b76753132f3 100755
---- a/tests/nvme/040
-+++ b/tests/nvme/040
-@@ -17,6 +17,10 @@ requires() {
- }
- 
- test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
- 	local subsys="blktests-subsystem-1"
- 	local file_path="${TMPDIR}/img"
- 	local port
-@@ -24,9 +28,6 @@ test() {
- 	local nvmedev
- 	local fio_pid
- 
--	echo "Running ${TEST_NAME}"
--
--	_setup_nvmet
- 	truncate -s "${nvme_img_size}" "${file_path}"
- 	loop_dev="$(losetup -f --show "${file_path}")"
- 
 diff --git a/tests/nvme/041 b/tests/nvme/041
-index 5b04b99b128e..d8937915d622 100755
+index fbceaa1cb2d5..4c553251f379 100755
 --- a/tests/nvme/041
 +++ b/tests/nvme/041
-@@ -20,6 +20,10 @@ requires() {
+@@ -25,14 +25,10 @@ test() {
+ 	_setup_nvmet
  
- 
- test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
  	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
-@@ -28,8 +32,6 @@ test() {
+-	local hostid
+-	local hostnqn
+ 	local file_path="${TMPDIR}/img"
  	local hostkey
  	local ctrldev
  
--	echo "Running ${TEST_NAME}"
--
- 	hostid="${def_hostid}"
- 	hostnqn="${def_hostnqn}"
- 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
-@@ -38,8 +40,6 @@ test() {
- 		return 1
- 	fi
+-	hostid="${def_hostid}"
+-	hostnqn="${def_hostnqn}"
+ 	hostkey="$(nvme gen-dhchap-key -n ${def_subsysnqn} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
+ 		echo "nvme gen-dhchap-key failed"
+@@ -45,21 +41,21 @@ test() {
+ 		"b92842df-a394-44b1-84a4-92ae7d112861"
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
+ 	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+-	_create_nvmet_host "${def_subsysnqn}" "${hostnqn}" "${hostkey}"
++	_create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}" "${hostkey}"
  
--	_setup_nvmet
--
- 	truncate -s "${nvme_img_size}" "${file_path}"
+ 	# Test unauthenticated connection (should fail)
+ 	echo "Test unauthenticated connection (should fail)"
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-			     --hostnqn "${hostnqn}" \
+-			     --hostid "${hostid}"
++			     --hostnqn "${def_hostnqn}" \
++			     --hostid "${def_hostid}"
  
- 	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+ 	_nvme_disconnect_subsys "${def_subsysnqn}"
+ 
+ 	# Test authenticated connection
+ 	echo "Test authenticated connection"
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-			     --hostnqn "${hostnqn}" \
+-			     --hostid "${hostid}" \
++			     --hostnqn "${def_hostnqn}" \
++			     --hostid "${def_hostid}" \
+ 			     --dhchap-secret "${hostkey}"
+ 
+ 	udevadm settle
+@@ -71,7 +67,7 @@ test() {
+ 
+ 	_remove_nvmet_port "${port}"
+ 
+-	_remove_nvmet_host "${hostnqn}"
++	_remove_nvmet_host "${def_hostnqn}"
+ 
+ 	rm "${file_path}"
+ 
 diff --git a/tests/nvme/042 b/tests/nvme/042
-index 8df5ed37aacc..af291cb33a04 100755
+index 28d712e835df..866249ed598c 100755
 --- a/tests/nvme/042
 +++ b/tests/nvme/042
-@@ -20,6 +20,10 @@ requires() {
+@@ -25,23 +25,18 @@ test() {
+ 	_setup_nvmet
  
- 
- test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
  	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
-@@ -30,13 +34,9 @@ test() {
+-	local hostid
+-	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hmac
+ 	local key_len
  	local hostkey
  	local ctrldev
  
--	echo "Running ${TEST_NAME}"
--
- 	hostid="${def_hostid}"
- 	hostnqn="${def_hostnqn}"
- 
--	_setup_nvmet
+-	hostid="${def_hostid}"
+-	hostnqn="${def_hostnqn}"
 -
  	truncate -s "${nvme_img_size}" "${file_path}"
  
- 	_create_nvmet_subsystem "${subsys_name}" "${file_path}"
+ 	_create_nvmet_subsystem "${def_subsysnqn}" "${file_path}"
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
+ 	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+-	_create_nvmet_host "${def_subsysnqn}" "${hostnqn}"
++	_create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}"
+ 
+ 	for hmac in 0 1 2 3; do
+ 		echo "Testing hmac ${hmac}"
+@@ -50,11 +45,11 @@ test() {
+ 			echo "couldn't generate host key for hmac ${hmac}"
+ 			return 1
+ 		fi
+-		_set_nvmet_hostkey "${hostnqn}" "${hostkey}"
++		_set_nvmet_hostkey "${def_hostnqn}" "${hostkey}"
+ 
+ 		_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-				     --hostnqn "${hostnqn}" \
+-				     --hostid "${hostid}" \
++				     --hostnqn "${def_hostnqn}" \
++				     --hostid "${def_hostid}" \
+ 				     --dhchap-secret "${hostkey}"
+ 		udevadm settle
+ 
+@@ -68,11 +63,11 @@ test() {
+ 			echo "couldn't generate host key for length ${key_len}"
+ 			return 1
+ 		fi
+-		_set_nvmet_hostkey "${hostnqn}" "${hostkey}"
++		_set_nvmet_hostkey "${def_hostnqn}" "${hostkey}"
+ 
+ 		_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-				     --hostnqn "${hostnqn}" \
+-				     --hostid "${hostid}" \
++				     --hostnqn "${def_hostnqn}" \
++				     --hostid "${def_hostid}" \
+ 				     --dhchap-secret "${hostkey}"
+ 
+ 		udevadm settle
+@@ -85,7 +80,7 @@ test() {
+ 
+ 	_remove_nvmet_port "${port}"
+ 
+-	_remove_nvmet_host "${hostnqn}"
++	_remove_nvmet_host "${def_hostnqn}"
+ 
+ 	rm "${file_path}"
+ 
 diff --git a/tests/nvme/043 b/tests/nvme/043
-index 8f4b783a02ff..4a37f91e50c3 100755
+index 3dc543fd55d3..5569a7a58ad5 100755
 --- a/tests/nvme/043
 +++ b/tests/nvme/043
-@@ -21,6 +21,10 @@ requires() {
+@@ -26,18 +26,13 @@ test() {
+ 	_setup_nvmet
  
- 
- test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
  	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
-@@ -31,8 +35,6 @@ test() {
+-	local subsys_name="blktests-subsystem-1"
+-	local hostid
+-	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hash
+ 	local dhgroup
  	local hostkey
  	local ctrldev
  
--	echo "Running ${TEST_NAME}"
--
- 	hostid="${def_hostid}"
- 	hostnqn="${def_hostnqn}"
- 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
-@@ -41,8 +43,6 @@ test() {
+-	hostid="${def_hostid}"
+-	hostnqn="${def_hostnqn}"
+-	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
++	hostkey="$(nvme gen-dhchap-key -n ${def_hostnqn} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
+ 		echo "nvme gen-dhchap-key failed"
  		return 1
- 	fi
+@@ -48,17 +43,17 @@ test() {
+ 	_create_nvmet_subsystem "${def_subsysnqn}" "${file_path}"
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
+ 	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+-	_create_nvmet_host "${def_subsysnqn}" "${hostnqn}" "${hostkey}"
++	_create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}" "${hostkey}"
  
--	_setup_nvmet
--
- 	truncate -s "${nvme_img_size}" "${file_path}"
+ 	for hash in "hmac(sha256)" "hmac(sha384)" "hmac(sha512)" ; do
  
- 	_create_nvmet_subsystem "${subsys_name}" "${file_path}"
+ 		echo "Testing hash ${hash}"
+ 
+-		_set_nvmet_hash "${hostnqn}" "${hash}"
++		_set_nvmet_hash "${def_hostnqn}" "${hash}"
+ 
+ 		_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-				     --hostnqn "${hostnqn}" \
+-				     --hostid "${hostid}" \
++				     --hostnqn "${def_hostnqn}" \
++				     --hostid "${def_hostid}" \
+ 				     --dhchap-secret "${hostkey}"
+ 
+ 		udevadm settle
+@@ -70,11 +65,11 @@ test() {
+ 
+ 		echo "Testing DH group ${dhgroup}"
+ 
+-		_set_nvmet_dhgroup "${hostnqn}" "${dhgroup}"
++		_set_nvmet_dhgroup "${def_hostnqn}" "${dhgroup}"
+ 
+ 		_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-				      --hostnqn "${hostnqn}" \
+-				      --hostid "${hostid}" \
++				      --hostnqn "${def_hostnqn}" \
++				      --hostid "${def_hostid}" \
+ 				      --dhchap-secret "${hostkey}"
+ 
+ 		udevadm settle
+@@ -87,7 +82,7 @@ test() {
+ 
+ 	_remove_nvmet_port "${port}"
+ 
+-	_remove_nvmet_host "${hostnqn}"
++	_remove_nvmet_host "${def_hostnqn}"
+ 
+ 	rm "${file_path}"
+ 
 diff --git a/tests/nvme/044 b/tests/nvme/044
-index fca0897af27b..27cb343f5ea7 100755
+index 608a086a0864..6c2cb602313c 100755
 --- a/tests/nvme/044
 +++ b/tests/nvme/044
-@@ -21,6 +21,10 @@ requires() {
+@@ -26,16 +26,11 @@ test() {
+ 	_setup_nvmet
  
- 
- test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
  	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
-@@ -30,8 +34,6 @@ test() {
+-	local hostid
+-	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hostkey
  	local ctrlkey
  	local ctrldev
  
--	echo "Running ${TEST_NAME}"
+-	hostid="${def_hostid}"
+-	hostnqn="${def_hostnqn}"
 -
- 	hostid="${def_hostid}"
- 	hostnqn="${def_hostnqn}"
+ 	hostkey="$(nvme gen-dhchap-key -n ${def_subsysnqn} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
+ 		echo "failed to generate host key"
+@@ -53,16 +48,16 @@ test() {
+ 	_create_nvmet_subsystem "${def_subsysnqn}" "${file_path}"
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
+ 	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+-	_create_nvmet_host "${def_subsysnqn}" "${hostnqn}" \
++	_create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}" \
+ 			   "${hostkey}" "${ctrlkey}"
  
-@@ -47,8 +49,6 @@ test() {
- 		return 1
- 	fi
+-	_set_nvmet_dhgroup "${hostnqn}" "ffdhe2048"
++	_set_nvmet_dhgroup "${def_hostnqn}" "ffdhe2048"
  
--	_setup_nvmet
--
- 	truncate -s "${nvme_img_size}" "${file_path}"
+ 	# Step 1: Connect with host authentication only
+ 	echo "Test host authentication"
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-			     --hostnqn "${hostnqn}" \
+-			     --hostid "${hostid}" \
++			     --hostnqn "${def_hostnqn}" \
++			     --hostid "${def_hostid}" \
+ 			     --dhchap-secret "${hostkey}"
  
- 	_create_nvmet_subsystem "${subsys_name}" "${file_path}"
+ 	udevadm settle
+@@ -73,8 +68,8 @@ test() {
+ 	# and invalid ctrl authentication
+ 	echo "Test invalid ctrl authentication (should fail)"
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-			     --hostnqn "${hostnqn}" \
+-			     --hostid "${hostid}" \
++			     --hostnqn "${def_hostnqn}" \
++			     --hostid "${def_hostid}" \
+ 			     --dhchap-secret "${hostkey}" \
+ 			     --dhchap-ctrl-secret "${hostkey}"
+ 
+@@ -86,8 +81,8 @@ test() {
+ 	# and valid ctrl authentication
+ 	echo "Test valid ctrl authentication"
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-			     --hostnqn "${hostnqn}" \
+-			     --hostid "${hostid}" \
++			     --hostnqn "${def_hostnqn}" \
++			     --hostid "${def_hostid}" \
+ 			     --dhchap-secret "${hostkey}" \
+ 			     --dhchap-ctrl-secret "${ctrlkey}"
+ 
+@@ -100,8 +95,8 @@ test() {
+ 	echo "Test invalid ctrl key (should fail)"
+ 	invkey="DHHC-1:00:Jc/My1o0qtLCWRp+sHhAVafdfaS7YQOMYhk9zSmlatobqB8C:"
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-			     --hostnqn "${hostnqn}" \
+-			     --hostid "${hostid}" \
++			     --hostnqn "${def_hostnqn}" \
++			     --hostid "${def_hostid}" \
+ 			     --dhchap-secret "${hostkey}" \
+ 			     --dhchap-ctrl-secret "${invkey}"
+ 
+@@ -114,7 +109,7 @@ test() {
+ 
+ 	_remove_nvmet_port "${port}"
+ 
+-	_remove_nvmet_host "${hostnqn}"
++	_remove_nvmet_host "${def_hostnqn}"
+ 
+ 	rm "${file_path}"
+ 
 diff --git a/tests/nvme/045 b/tests/nvme/045
-index eca629a18691..005d62d4f886 100755
+index b8d886aaf9e8..a936e7fb661f 100755
 --- a/tests/nvme/045
 +++ b/tests/nvme/045
-@@ -22,6 +22,10 @@ requires() {
+@@ -27,8 +27,6 @@ test() {
+ 	_setup_nvmet
  
- 
- test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
  	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
-@@ -34,8 +38,6 @@ test() {
+-	local hostid
+-	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hostkey
+ 	local new_hostkey
+@@ -37,9 +35,6 @@ test() {
  	local ctrldev
  	local rand_io_size
  
--	echo "Running ${TEST_NAME}"
+-	hostid="${def_hostid}"
+-	hostnqn="${def_hostnqn}"
 -
- 	hostid="${def_hostid}"
- 	hostnqn="${def_hostnqn}"
+ 	hostkey="$(nvme gen-dhchap-key -n ${def_subsysnqn} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
+ 		echo "failed to generate host key"
+@@ -57,13 +52,13 @@ test() {
+ 	_create_nvmet_subsystem "${def_subsysnqn}" "${file_path}"
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
+ 	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+-	_create_nvmet_host "${def_subsysnqn}" "${hostnqn}" "${hostkey}" "${ctrlkey}"
++	_create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}" "${hostkey}" "${ctrlkey}"
  
-@@ -51,8 +53,6 @@ test() {
- 		return 1
- 	fi
+-	_set_nvmet_dhgroup "${hostnqn}" "ffdhe2048"
++	_set_nvmet_dhgroup "${def_hostnqn}" "ffdhe2048"
  
--	_setup_nvmet
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-			     --hostnqn "${hostnqn}" \
+-			     --hostid "${hostid}" \
++			     --hostnqn "${def_hostnqn}" \
++			     --hostid "${def_hostid}" \
+ 			     --dhchap-secret "${hostkey}" \
+ 			     --dhchap-ctrl-secret "${ctrlkey}"
+ 
+@@ -82,7 +77,7 @@ test() {
+ 
+ 	new_hostkey="$(nvme gen-dhchap-key -n ${def_subsysnqn} 2> /dev/null)"
+ 
+-	_set_nvmet_hostkey "${hostnqn}" "${new_hostkey}"
++	_set_nvmet_hostkey "${def_hostnqn}" "${new_hostkey}"
+ 
+ 	echo "Re-authenticate with new host key"
+ 
+@@ -92,7 +87,7 @@ test() {
+ 
+ 	new_ctrlkey="$(nvme gen-dhchap-key -n ${def_subsysnqn} 2> /dev/null)"
+ 
+-	_set_nvmet_ctrlkey "${hostnqn}" "${new_ctrlkey}"
++	_set_nvmet_ctrlkey "${def_hostnqn}" "${new_ctrlkey}"
+ 
+ 	echo "Re-authenticate with new ctrl key"
+ 
+@@ -101,7 +96,7 @@ test() {
+ 
+ 	echo "Change DH group to ffdhe8192"
+ 
+-	_set_nvmet_dhgroup "${hostnqn}" "ffdhe8192"
++	_set_nvmet_dhgroup "${def_hostnqn}" "ffdhe8192"
+ 
+ 	echo "Re-authenticate with changed DH group"
+ 
+@@ -109,7 +104,7 @@ test() {
+ 
+ 	echo "Change hash to hmac(sha512)"
+ 
+-	_set_nvmet_hash "${hostnqn}" "hmac(sha512)"
++	_set_nvmet_hash "${def_hostnqn}" "hmac(sha512)"
+ 
+ 	echo "Re-authenticate with changed hash"
+ 
+@@ -127,7 +122,7 @@ test() {
+ 
+ 	_remove_nvmet_port "${port}"
+ 
+-	_remove_nvmet_host "${hostnqn}"
++	_remove_nvmet_host "${def_hostnqn}"
+ 
+ 	rm "${file_path}"
+ 
+diff --git a/tests/nvme/048 b/tests/nvme/048
+index 20d234e72621..f9a19b1e655e 100755
+--- a/tests/nvme/048
++++ b/tests/nvme/048
+@@ -88,25 +88,21 @@ test() {
+ 	local cfs_path="${NVMET_CFS}/subsystems/${def_subsysnqn}"
+ 	local file_path="${TMPDIR}/img"
+ 	local skipped=false
+-	local hostnqn
+-	local hostid
+ 	local port
+ 
+-	hostid="${def_hostid}"
+-	hostnqn="${def_hostnqn}"
 -
  	truncate -s "${nvme_img_size}" "${file_path}"
  
- 	_create_nvmet_subsystem "${subsys_name}" "${file_path}"
-diff --git a/tests/nvme/048 b/tests/nvme/048
-index a6ebb8927865..6efcd7d6ab03 100755
---- a/tests/nvme/048
-+++ b/tests/nvme/048
-@@ -81,6 +81,10 @@ set_qid_max() {
- }
- 
- test() {
-+	echo "Running ${TEST_NAME}"
+ 	_create_nvmet_subsystem "${def_subsysnqn}" "${file_path}" \
+ 		"b92842df-a394-44b1-84a4-92ae7d112861"
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
 +
-+	_setup_nvmet
-+
- 	local subsys_name="blktests-subsystem-1"
- 	local cfs_path="${NVMET_CFS}/subsystems/${subsys_name}"
- 	local file_path="${TMPDIR}/img"
-@@ -89,10 +93,6 @@ test() {
- 	local hostid
- 	local port
+ 	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+ 	_create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}"
  
--	echo "Running ${TEST_NAME}"
--
--	_setup_nvmet
--
- 	hostid="${def_hostid}"
- 	hostnqn="${def_hostnqn}"
+ 	if [[ -f "${cfs_path}/attr_qid_max" ]] ; then
+ 		_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+-					--hostnqn "${hostnqn}" \
+-					--hostid "${hostid}" \
++					--hostnqn "${def_hostnqn}" \
++					--hostid "${def_hostid}" \
+ 					--keep-alive-tmo 1 \
+ 					--reconnect-delay 2
+ 
+@@ -126,7 +122,7 @@ test() {
+ 	_remove_nvmet_subsystem_from_port "${port}" "${def_subsysnqn}"
+ 	_remove_nvmet_subsystem "${def_subsysnqn}"
+ 	_remove_nvmet_port "${port}"
+-	_remove_nvmet_host "${hostnqn}"
++	_remove_nvmet_host "${def_hostnqn}"
+ 
+ 	rm "${file_path}"
  
 -- 
 2.41.0
