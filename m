@@ -2,47 +2,46 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D89FC001DB
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 12:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 399BAC001DB
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 12:39:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235459AbjHJMe3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 08:34:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48460 "EHLO
+        id S234276AbjHJMjR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 08:39:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235340AbjHJMe3 (ORCPT
+        with ESMTP id S230155AbjHJMjQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 08:34:29 -0400
+        Thu, 10 Aug 2023 08:39:16 -0400
 Received: from box.fidei.email (box.fidei.email [71.19.144.250])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12102127;
-        Thu, 10 Aug 2023 05:34:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83ED410C7;
+        Thu, 10 Aug 2023 05:39:16 -0700 (PDT)
 Received: from authenticated-user (box.fidei.email [71.19.144.250])
         (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
         (No client certificate requested)
-        by box.fidei.email (Postfix) with ESMTPSA id 64441835E6;
-        Thu, 10 Aug 2023 08:34:25 -0400 (EDT)
+        by box.fidei.email (Postfix) with ESMTPSA id C4A8D80254;
+        Thu, 10 Aug 2023 08:39:15 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dorminy.me; s=mail;
-        t=1691670866; bh=ML5SfmwASQtjse17hbDn1da7PJSyvKnyAEKSbGudQo8=;
+        t=1691671156; bh=n7aR0zqyygkmVHTZcDKNlHWMZC0NCU/kngYcQqc4qVM=;
         h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=VarItYdfyHrAg0AulNW3EJhm+Hahz+QX22Dm5In5TYAqRJast60YH86Qh0HnB9Sj6
-         QRt5mcE0FbTVdlSUx2oMHhoYvkhlExTUafJ+XQkoYWPMnvx4sHw3DJyoklx1IPPy80
-         xVLAwIGCnG08QGusAYHefrNYVVA3VdbIIGctH4GC59a6wYvqibegG9JSEsgbVdJC6x
-         xkFf6Ips0wHGzPjQPHCGiss929LAV+Zd1/Uu9iXdQ8/znPYgZzqMLMweLGZhzuYPKi
-         EGrJjPQMGk9tSXFXIVo86qSDAh6OyP6LpgU3FnrzjIu45yYDSG/R4vBuFzA4PWZwfK
-         gFKxcjACDUbuw==
-Message-ID: <1455689d-8266-66e0-2ba4-354c3a4225b5@dorminy.me>
-Date:   Thu, 10 Aug 2023 08:34:23 -0400
+        b=gk44zgKbZL5ak+RhsrmUJkYw4LWVmgNZveSNacU7llWaNcSS7eCYSA6a6PhoH9XyZ
+         HqsUQj13KbMKnFg2l2HKBMtIpZO3WpbAm7F/D66FTtAmX2GpkbJbqijSuN2yf32hK8
+         YR+2/H4dXmBYtnvBC11VoV2okvIeub6MtxLdy6OBWGVRN/dPnZg2URVbUg2Ab3xmEw
+         87agLMjveeVZtxf9dywcYhigcFzEeRLQQRlewMBJo7o0DxPVh0MaEa61a0lR19Xojc
+         wporJHTraPIC5aTn2mio2CtJ1GdQIbo2ZFSAGExfbNknc0HZ7lcAIJA3/AoBDGPAN4
+         GYHJ7w6yYu1cQ==
+Message-ID: <f3ab3d6b-23f9-dbe0-446d-597defb46296@dorminy.me>
+Date:   Thu, 10 Aug 2023 08:39:15 -0400
 MIME-Version: 1.0
 Subject: Re: [PATCH v2] blk-crypto: dynamically allocate fallback profile
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        Satya Tangirala <satyat@google.com>,
-        linux-block@vger.kernel.org, kernel-team@meta.com,
-        ebiggers@kernel.org
-Cc:     stable@vger.kernel.org
-References: <20230809125628.529884-1-sweettea-kernel@dorminy.me>
- <bdc3956a-9ba9-3268-b822-7ea337c0e9b9@acm.org>
 Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Satya Tangirala <satyat@google.com>,
+        linux-block@vger.kernel.org, kernel-team@meta.com,
+        stable@vger.kernel.org
+References: <20230809125628.529884-1-sweettea-kernel@dorminy.me>
+ <20230810045907.GB923@sol.localdomain>
 From:   Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-In-Reply-To: <bdc3956a-9ba9-3268-b822-7ea337c0e9b9@acm.org>
+In-Reply-To: <20230810045907.GB923@sol.localdomain>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -51,17 +50,16 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 8/9/23 17:57, Bart Van Assche wrote:
-> On 8/9/23 05:56, Sweet Tea Dorminy wrote:
->> Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+On 8/10/23 00:59, Eric Biggers wrote:
+> On Wed, Aug 09, 2023 at 08:56:22AM -0400, Sweet Tea Dorminy wrote:
+>>   
+>> +	blk_crypto_fallback_profile =
+>> +		kzalloc(sizeof(*blk_crypto_fallback_profile), GFP_KERNEL);
+>> +
 > 
-> Signed-off-by should be followed by a real name. Sweet Tea doesn't look
-> like a real name to me.
+> I think you missed part of my feedback on v1.
+> 
+> - Eric
 
-I do go by Sweet Tea in real life as well as online.
-
-And the DCO changed to say 'known identity' instead of 'real name' in 
-6.3: 
-https://github.com/torvalds/linux/commit/d4563201f33a022fc0353033d9dfeb1606a88330. 
-
-
+You're absolutely right, I completely missed that there were code 
+changes. I'll fixup and resend.
