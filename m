@@ -2,92 +2,143 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E88FC001DB
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 13:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F58BC001DB
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 13:44:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233832AbjHJNl4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 09:41:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35368 "EHLO
+        id S231989AbjHJNoL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 09:44:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229871AbjHJNlz (ORCPT
+        with ESMTP id S229871AbjHJNoK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 09:41:55 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A123E54;
-        Thu, 10 Aug 2023 06:41:55 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CBF8263A03;
-        Thu, 10 Aug 2023 13:41:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE7BCC433C7;
-        Thu, 10 Aug 2023 13:41:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1691674914;
-        bh=hD7gm6UAYGCpPdmCxIGSw8e0ROXHcwaNuD6UBvX+RAE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ULthCZyCkDWmN3MRJvkvvuzY+xk4gm40aVJqFYaY1h3s2l9TEgtXSRuDafLQVDx9K
-         t64KT2Lh4G+TJ07SasgyB+dCPkIdOb83BNNZeqiZAlbwvdg7txoPs+6p9yHgltReXL
-         BvYr8cGo1CupNt9imJQFmR7aEBLKbDLfC0Yh/9oo=
-Date:   Thu, 10 Aug 2023 15:41:51 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Sweet Tea Dorminy <sweettea-kernel@dorminy.me>,
-        Satya Tangirala <satyat@google.com>,
-        linux-block@vger.kernel.org, kernel-team@meta.com,
-        ebiggers@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] blk-crypto: dynamically allocate fallback profile
-Message-ID: <2023081007-poise-zeppelin-df6a@gregkh>
-References: <20230809125628.529884-1-sweettea-kernel@dorminy.me>
- <94c661a6-442b-4ca2-b9e8-198069d8b635@kernel.dk>
- <2023081023-parsnip-limb-dcd4@gregkh>
- <29a213de-d7c7-4e53-8b5c-eb742dcf23ea@kernel.dk>
+        Thu, 10 Aug 2023 09:44:10 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A01DE54;
+        Thu, 10 Aug 2023 06:44:09 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RM7SH5XdRz4f3l84;
+        Thu, 10 Aug 2023 21:43:59 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgA3x6me6dRkZCCLAQ--.21920S3;
+        Thu, 10 Aug 2023 21:44:00 +0800 (CST)
+Subject: Re: [PATCH -next v3] block: remove init_mutex and open-code
+ blk_iolatency_try_init
+To:     Li Lingfeng <lilingfeng@huaweicloud.com>, tj@kernel.org
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, mkoutny@suse.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linan122@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+        lilingfeng3@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230810035111.2236335-1-lilingfeng@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <6637e6cd-20aa-110a-40ae-53ecd6eb4184@huaweicloud.com>
+Date:   Thu, 10 Aug 2023 21:43:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29a213de-d7c7-4e53-8b5c-eb742dcf23ea@kernel.dk>
+In-Reply-To: <20230810035111.2236335-1-lilingfeng@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgA3x6me6dRkZCCLAQ--.21920S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXFW7tFWrZFyDJw4rtF45GFg_yoW5GrW5p3
+        93Wr4av3yUGrs7WF1kKws7ur15K3y8Kry7GF43AryrJr129rnIgF18ZF1F9FWxZrZ5Aan5
+        KF1UArykKry5GrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+        07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+        02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
+        GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+        CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
+        wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+        7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 07:18:27AM -0600, Jens Axboe wrote:
-> On 8/9/23 10:53 PM, Greg KH wrote:
-> > On Wed, Aug 09, 2023 at 04:08:52PM -0600, Jens Axboe wrote:
-> >> On 8/9/23 6:56 AM, Sweet Tea Dorminy wrote:
-> >>> blk_crypto_profile_init() calls lockdep_register_key(), which warns and
-> >>> does not register if the provided memory is a static object.
-> >>> blk-crypto-fallback currently has a static blk_crypto_profile and calls
-> >>> blk_crypto_profile_init() thereupon, resulting in the warning and
-> >>> failure to register.
-> >>>
-> >>> Fortunately it is simple enough to use a dynamically allocated profile
-> >>> and make lockdep function correctly.
-> >>>
-> >>> Fixes: 2fb48d88e77f ("blk-crypto: use dynamic lock class for blk_crypto_profile::lock")
-> >>> Cc: stable@vger.kernel.org
-> >>> Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-> >>
-> >> The offending commit went into 6.5, so there should be no need for a
-> >> stable tag on this one. But I can edit that while applying, waiting on
-> >> Eric to ack it.
-> > 
-> > That commit has been backported to stable releases, so it would be nice
-> > to keep it there so our tools automatically pick it up properly.  Once
-> > the authorship name is fixed up of course.
+ÔÚ 2023/08/10 11:51, Li Lingfeng Ð´µÀ:
+> From: Li Lingfeng <lilingfeng3@huawei.com>
 > 
-> But that stable tag should not be necessary? If stable has backported a
-> commit, surely it'll pick a commit that has that in Fixes? Otherwise
-> that seems broken and implies that people need to potentially check
-> every commit for a stable presence.
+> Commit a13696b83da4 ("blk-iolatency: Make initialization lazy") adds
+> a mutex named "init_mutex" in blk_iolatency_try_init for the race
+> condition of initializing RQ_QOS_LATENCY.
+> Now a new lock has been add to struct request_queue by commit a13bd91be223
+> ("block/rq_qos: protect rq_qos apis with a new lock"). And it has been
+> held in blkg_conf_open_bdev before calling blk_iolatency_init.
+> So it's not necessary to keep init_mutex in blk_iolatency_try_init, just
+> remove it.
 > 
-> I can keep the tag, just a bit puzzled as to why that would be
-> necessary.
+> Since init_mutex has been removed, blk_iolatency_try_init can be
+> open-coded back to iolatency_set_limit() like ioc_qos_write().
+> 
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-It's not necessary, no, our scripts will pick it out and get it merged
-eventually.  But if you know it's needed to start with, it's always nice
-to add it if possible, saves me the extra work :)
+Thanks,
+Kuai
+> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+> ---
+>    v1->v2: open-code blk_iolatency_try_init()
+>    v2->v3: add lockdep check
+>   block/blk-iolatency.c | 35 +++++++++++------------------------
+>   1 file changed, 11 insertions(+), 24 deletions(-)
+> 
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index fd5fec989e39..c16aef4be036 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -824,29 +824,6 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
+>   	}
+>   }
+>   
+> -static int blk_iolatency_try_init(struct blkg_conf_ctx *ctx)
+> -{
+> -	static DEFINE_MUTEX(init_mutex);
+> -	int ret;
+> -
+> -	ret = blkg_conf_open_bdev(ctx);
+> -	if (ret)
+> -		return ret;
+> -
+> -	/*
+> -	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
+> -	 * confuse iolat_rq_qos() test. Make the test and init atomic.
+> -	 */
+> -	mutex_lock(&init_mutex);
+> -
+> -	if (!iolat_rq_qos(ctx->bdev->bd_queue))
+> -		ret = blk_iolatency_init(ctx->bdev->bd_disk);
+> -
+> -	mutex_unlock(&init_mutex);
+> -
+> -	return ret;
+> -}
+> -
+>   static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
+>   			     size_t nbytes, loff_t off)
+>   {
+> @@ -861,7 +838,17 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
+>   
+>   	blkg_conf_init(&ctx, buf);
+>   
+> -	ret = blk_iolatency_try_init(&ctx);
+> +	ret = blkg_conf_open_bdev(&ctx);
+> +	if (ret)
+> +		goto out;
+> +
+> +	/*
+> +	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
+> +	 * confuse iolat_rq_qos() test. Make the test and init atomic.
+> +	 */
+> +	lockdep_assert_held(ctx.bdev->bd_queue->rq_qos_mutex);
+> +	if (!iolat_rq_qos(ctx.bdev->bd_queue))
+> +		ret = blk_iolatency_init(ctx.bdev->bd_disk);
+>   	if (ret)
+>   		goto out;
+>   
+> 
 
-thanks,
-
-greg k-h
