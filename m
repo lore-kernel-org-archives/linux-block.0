@@ -2,83 +2,164 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE96EC41513
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 14:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 915A8C001B0
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 14:01:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235530AbjHJOA4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 10:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46696 "EHLO
+        id S235551AbjHJOBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 10:01:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235525AbjHJOAw (ORCPT
+        with ESMTP id S235525AbjHJOB3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:00:52 -0400
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00E5EA;
-        Thu, 10 Aug 2023 07:00:51 -0700 (PDT)
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-26871992645so627487a91.0;
-        Thu, 10 Aug 2023 07:00:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691676051; x=1692280851;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LlypYbRKG3NKpXgPKPqR+UWALgFg6Q8FfGNiBjrzt2Y=;
-        b=SR1SkR8AN1tw05fgF1Jfpq9f4vb/iR1QBbAJ+AMI0Mwe8xeFD9ydQ/6Srh4YiE1SZ5
-         Wk943Btwp/DtCtHUWFj8+4DnlWtBbKp2otGf5ibtmjHBs4fGf+2G+KIjMGwDFVoBLVS9
-         Ni/L19TiFz68b6/3MJbypBXGVNdS21/ZLV0EO5DgirPh/k9c5NtGKpDvj6dYosPvJgA0
-         KCHi7FHb9VqeIlCOmYzijIPCE1zqrC/abk4017i5W5Kaj1Z/lWHLFHG3x8C0aPAjaatO
-         w3vrr6xOssFXKSUSycrJmqmXk8li2sR+3+wPD0nHbsphe6EOqUAXrK0f0ndjCsZRDv6W
-         +K7g==
-X-Gm-Message-State: AOJu0YxZL9cy9EqOZshTC2MwYSAAn/x9gKvmG4l5lhwC+w/ad2Y0lUw8
-        Cye2NgLVR8bTJxl3EQAIMvU=
-X-Google-Smtp-Source: AGHT+IFDz3mok5Kt8wN7GsVxc1JbntKwspV6ya4sG4nYEBvX7NmXHUlRpnR7On6oK8H9hCQdqErg/A==
-X-Received: by 2002:a17:90b:614:b0:261:685:95b6 with SMTP id gb20-20020a17090b061400b00261068595b6mr2393491pjb.13.1691676051026;
-        Thu, 10 Aug 2023 07:00:51 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id c4-20020a17090ab28400b00256a4d59bfasm3354851pjr.23.2023.08.10.07.00.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Aug 2023 07:00:50 -0700 (PDT)
-Message-ID: <d83cb0aa-ae35-bb58-5cd0-72b8c03d934f@acm.org>
-Date:   Thu, 10 Aug 2023 07:00:48 -0700
+        Thu, 10 Aug 2023 10:01:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC0A526AF
+        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 07:00:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691676040;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+g8mE7QgyEjqn7+5inRH3OtNbDjmawTuNNPPwXzqCuY=;
+        b=CuPW25TMK+Ia4C316cy27niD9SssBxnuK+SEaXeCJ6ahKNgU+WC6veYFc4nfUCRkEk3Xp3
+        B3g2KVRAQSkz3S262RuAgeRpzhVu2/LfmzmI0fACSRRp/V+Gr/IUf6H1OZp5QeerqE0luN
+        YUA8K4itIiEgXMCuLiW5XL4Mki40F0s=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-650-WyGF6OghP6e0iHJ2JUk9og-1; Thu, 10 Aug 2023 10:00:36 -0400
+X-MC-Unique: WyGF6OghP6e0iHJ2JUk9og-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4EAB1C06EFB;
+        Thu, 10 Aug 2023 14:00:24 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D164492B0F;
+        Thu, 10 Aug 2023 14:00:20 +0000 (UTC)
+Date:   Thu, 10 Aug 2023 22:00:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V2] ublk: zoned: support REQ_OP_ZONE_RESET_ALL
+Message-ID: <ZNTtbpNCiXPvRlvI@fedora>
+References: <20230810124326.321472-1-ming.lei@redhat.com>
+ <ZNThwMBAqqVUGtek@x1-carbon>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v7 2/7] block/mq-deadline: Only use zone locking if
- necessary
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230809202355.1171455-1-bvanassche@acm.org>
- <20230809202355.1171455-3-bvanassche@acm.org>
- <06527195-8f6d-0395-a7d5-d19634a00ad2@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <06527195-8f6d-0395-a7d5-d19634a00ad2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZNThwMBAqqVUGtek@x1-carbon>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/9/23 18:36, Damien Le Moal wrote:
-> On 8/10/23 05:23, Bart Van Assche wrote:
->> +static bool dd_use_zone_write_locking(struct request_queue *q)
->> +{
->> +	return q->limits.use_zone_write_lock && blk_queue_is_zoned(q);
+On Thu, Aug 10, 2023 at 01:10:30PM +0000, Niklas Cassel wrote:
+> On Thu, Aug 10, 2023 at 08:43:26PM +0800, Ming Lei wrote:
+> > There isn't any reason to not support REQ_OP_ZONE_RESET_ALL given everything
+> > is actually handled in userspace, not mention it is pretty easy to support
+> > RESET_ALL.
+> > 
+> > So enable REQ_OP_ZONE_RESET_ALL and let userspace handle it.
+> > 
+> > Verified by 'tools/zbc_reset_zone -all /dev/ublkb0' in libzbc[1] with
+> > libublk-rs based ublk-zoned target prototype[2], follows command line
+> > for creating ublk-zoned:
+> > 
+> > 	cargo run --example zoned -- add -1 1024	# add $dev_id $DEV_SIZE
+> > 
+> > [1] https://github.com/westerndigitalcorporation/libzbc
+> > [2] https://github.com/ming1/libublk-rs/tree/zoned.v2
+> > 
+> > Cc: Niklas Cassel <Niklas.Cassel@wdc.com>
+> > Cc: Damien Le Moal <dlemoal@kernel.org>
+> > Cc: Andreas Hindborg <a.hindborg@samsung.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> > V2:
+> > 	- update comment as reported by Niklas
+> > 
+> >  drivers/block/ublk_drv.c      | 7 +++++--
+> >  include/uapi/linux/ublk_cmd.h | 1 +
+> >  2 files changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index b60394fe7be6..3650ef209344 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -251,6 +251,7 @@ static int ublk_dev_param_zoned_apply(struct ublk_device *ub)
+> >  	const struct ublk_param_zoned *p = &ub->params.zoned;
+> >  
+> >  	disk_set_zoned(ub->ub_disk, BLK_ZONED_HM);
+> > +	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, ub->ub_disk->queue);
+> >  	blk_queue_required_elevator_features(ub->ub_disk->queue,
+> >  					     ELEVATOR_F_ZBD_SEQ_WRITE);
+> >  	disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
+> > @@ -393,6 +394,9 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
+> >  	case REQ_OP_ZONE_APPEND:
+> >  		ublk_op = UBLK_IO_OP_ZONE_APPEND;
+> >  		break;
+> > +	case REQ_OP_ZONE_RESET_ALL:
+> > +		ublk_op = UBLK_IO_OP_ZONE_RESET_ALL;
+> > +		break;
+> >  	case REQ_OP_DRV_IN:
+> >  		ublk_op = pdu->operation;
+> >  		switch (ublk_op) {
+> > @@ -404,9 +408,8 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
+> >  		default:
+> >  			return BLK_STS_IOERR;
+> >  		}
+> > -	case REQ_OP_ZONE_RESET_ALL:
+> >  	case REQ_OP_DRV_OUT:
+> > -		/* We do not support reset_all and drv_out */
+> > +		/* We do not support drv_out */
+> >  		return BLK_STS_NOTSUPP;
+> >  	default:
+> >  		return BLK_STS_IOERR;
+> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> > index 2685e53e4752..b9cfc5c96268 100644
+> > --- a/include/uapi/linux/ublk_cmd.h
+> > +++ b/include/uapi/linux/ublk_cmd.h
+> > @@ -245,6 +245,7 @@ struct ublksrv_ctrl_dev_info {
+> >  #define		UBLK_IO_OP_ZONE_CLOSE		11
+> >  #define		UBLK_IO_OP_ZONE_FINISH		12
+> >  #define		UBLK_IO_OP_ZONE_APPEND		13
+> > +#define		UBLK_IO_OP_ZONE_RESET_ALL	14
 > 
-> use_zone_write_lock should be true ONLY if the queue is zoned.
-> So the "&& blk_queue_is_zoned(q)" seems unnecessary to me.
-> This little helper could be moved to be generic in blkdev.h too.
+> For some reason, it seems like the UBLK_IO_OP_ZONE_* values
+> are identical to the REQ_OP_ZONE_* values in enum req_op:
 
-Hi Damien,
+Yeah.
 
-use_zone_write_lock should be set by the block driver (e.g. a SCSI
-LLD) before I/O starts. The zone model information is retrieved by
-submitting I/O. It is not clear to me how to set use_zone_write_lock
-to true only for zoned block devices before I/O starts since I/O is
-required to retrieve information about the zone model.
+I think that is zoned interface abstraction, which should be
+generic enough to use linux's definition for ublk's UAPI in 1:1.
+
+The same mapping can be found in virtio-blk zoned spec.
+
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/blk_types.h?h=v6.5-rc5#n371
+> 
+> I don't see any obvious advantage of keeping them the same,
+
+Not sure I follow your idea, and can you share your exact suggestion?
+
+UBLK_IO_OP_ZONE_* is part of ublk UAPI, but REQ_OP_ZONE_* is just kernel
+internal definition which may be changed time by time, so we can't use
+REQ_OP_ZONE_* directly.
+
+Here you can think of UBLK_IO_OP_ZONE_* as interface between driver and
+hardware, so UBLK_IO_OP_ZONE_* has to be defined independently.
+
+> but if you want to keep this pattern, then perhaps you want
+> to define UBLK_IO_OP_ZONE_RESET_ALL to 17.
+
+Why do you think that 17 is better than 14?
+
+I'd rather use 14 to fill the hole, meantime the two ZONE_RESET OPs
+can be kept together.
 
 Thanks,
+Ming
 
-Bart.
