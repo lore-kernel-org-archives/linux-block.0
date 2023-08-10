@@ -2,174 +2,139 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7CDBC04A6A
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 14:39:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7172C001E0
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 14:48:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235091AbjHJOj0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 10:39:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60906 "EHLO
+        id S233979AbjHJOsM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 10:48:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235151AbjHJOj0 (ORCPT
+        with ESMTP id S232701AbjHJOsM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:39:26 -0400
+        Thu, 10 Aug 2023 10:48:12 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 385EE2719
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 07:38:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B6C211C
+        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 07:47:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691678314;
+        s=mimecast20190719; t=1691678846;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t7W0c0lPm/+AXFw1hghT8af4Ha098Ln/xEqAt+UBUVk=;
-        b=aYmcl+pfOXFo4+bXZyncD5yqXSShV9TZDPg5kQEmCXswuAgPTA2sCHaGyRYCdZIIiwkVwU
-        5HLpidbrehfNnl5dNR7J0SKzGe8s1eoPsb8tXMSesTkdGIDVVBt2uFXcaxhm5zxGe4SLmI
-        6aRnXYk9uE8/za5pZ2V4fdj65sqGPzo=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-157-1gkwh4XVMtGQkCALtYR3Mg-1; Thu, 10 Aug 2023 10:38:33 -0400
-X-MC-Unique: 1gkwh4XVMtGQkCALtYR3Mg-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-267f00f6876so1119674a91.3
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 07:38:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691678312; x=1692283112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t7W0c0lPm/+AXFw1hghT8af4Ha098Ln/xEqAt+UBUVk=;
-        b=L9pFaKgbO1BEO2gWnar8sAAp5PUDVhHlpo+Tx15XXljmNP3U5ZaE0nyHOKKuYH+tvd
-         06vOpvatm/fcdlFFaqkU4Z21oXZhvyuU9s9grNVuhzv9Iyy33ff58rIppsnS+aUnnX/k
-         SURstlEKyLcQxLU/43162Ngubl4bGVGTKdu6sjn0u88a30NaEK/y+l2uCZZTb4EErv1m
-         nQX/+8oGEXE0Cl8tNxRQHXldSbNqw2Lbsuu9yDt4cbpmsBSqx5l3cuhg1avYCzMOT3Ts
-         9s62DaHJLLl7QXzukuvHl00w/SoqV4q7ly+3Mp6G5EeY7pIv4piqi1tgGVK6wjPiTfor
-         XPvg==
-X-Gm-Message-State: AOJu0Yzo+Hy5K048SYkN0vNcBCC6meAf0Roi3MmitawE0JXwjim5LWtc
-        NW9xhdFX0+iqgAUDdgDp1ltaVziNE5j1RFhD/p66DSidB+jtw47+yFfxs81FEB28ZKP/1+faWJp
-        XSX6uqmYUfZltquLl4MDEPqhhNPLzkv78p0RQMd4=
-X-Received: by 2002:a17:90a:fe5:b0:269:2356:19fb with SMTP id 92-20020a17090a0fe500b00269235619fbmr1973770pjz.15.1691678312103;
-        Thu, 10 Aug 2023 07:38:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEknc/uFiNFwgJkb8GLMBu5GIVbyWK9XpeUzVzAXC+QoqHBqvXCKKZs9+YcOrzvD0+gtpjE8Tftb4E87x/Y05A=
-X-Received: by 2002:a17:90a:fe5:b0:269:2356:19fb with SMTP id
- 92-20020a17090a0fe500b00269235619fbmr1973753pjz.15.1691678311836; Thu, 10 Aug
- 2023 07:38:31 -0700 (PDT)
+        bh=HZfBQqwYZwDy7AS4zOLhF6hi2Hsl9Nr/pxSmeJlJBgQ=;
+        b=h3A9LAjWYKmPTLRO4yPQAT7tMVWsyyslElHf/NhK2FL4cwY0dLucPV3gb8C949daVem1Rv
+        5Q6hPvLxbuw7EGvyNlqWsfM48iW7fR3L5mdfwNamSfBp0vp0OiIz38BgzQSmFCWioy5N2j
+        FWL3alyV+TnWC83XPFV3UK2CJuHY7WU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-313-roNj9TVIPRmFTbF2c2YNIw-1; Thu, 10 Aug 2023 10:47:23 -0400
+X-MC-Unique: roNj9TVIPRmFTbF2c2YNIw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DA2A0856DED;
+        Thu, 10 Aug 2023 14:47:22 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 855BB2026D68;
+        Thu, 10 Aug 2023 14:47:19 +0000 (UTC)
+Date:   Thu, 10 Aug 2023 22:47:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andreas Hindborg <a.hindborg@samsung.com>
+Subject: Re: [PATCH V2] ublk: zoned: support REQ_OP_ZONE_RESET_ALL
+Message-ID: <ZNT4cjB7bh4jDaNl@fedora>
+References: <20230810124326.321472-1-ming.lei@redhat.com>
+ <ZNThwMBAqqVUGtek@x1-carbon>
+ <ZNTtbpNCiXPvRlvI@fedora>
+ <ZNTytlego591Zmin@x1-carbon>
 MIME-Version: 1.0
-References: <CAHj4cs9GNohGUjohNw93jrr8JGNcRYC-ienAZz+sa7az1RK77w@mail.gmail.com>
- <CAHj4cs9J7w_QSWMrj0ncufKwT9viS-o7pxmS2Y4FeaWEyPD34Q@mail.gmail.com>
- <vxeo2ucxhvdcm2z673keqerkpxay6dgfluuvxawukkbunddzm2@jdkdk7y3a5nu>
- <xrqutkdhz7v6axohfxipv4or7k4jhoa57semwcxde7gletk76z@5kcashfdezhk>
- <adgkdt52d6qvcbxq4aof7ggun3t77znndpvzq5k7aww3jrx2tk@6ispx7zimxhy>
- <o2443ezmpny7dyvhiteajzgt3j7wcxo2fv7dik3h7hkjpc2h74@xeetbva55fx2>
- <CAHj4cs8TBsEct9P6iiYwsiRhgCkPbdVL0-8KkXuKZbYhVsQV0Q@mail.gmail.com> <git5brh4yq7ij65oskwd7m4pwnhfcqbvwdn7pzsbrmzv3wgsk4@xvb43h5dbo4g>
-In-Reply-To: <git5brh4yq7ij65oskwd7m4pwnhfcqbvwdn7pzsbrmzv3wgsk4@xvb43h5dbo4g>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Thu, 10 Aug 2023 22:38:18 +0800
-Message-ID: <CAHj4cs-RqFEWFxdCGfZA7+qHLA+JJYs6qynCvKqTDdfW+V66ug@mail.gmail.com>
-Subject: Re: [bug report] blktests nvme/047 failed due to /dev/nvme0n1 not
- created in time
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Daniel Wagner <dwagner@suse.de>,
-        linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZNTytlego591Zmin@x1-carbon>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 8:51=E2=80=AFPM Shinichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
->
-> On Aug 10, 2023 / 18:21, Yi Zhang wrote:
-> > Hi Daniel/Shinichiro
-> > Thanks for looking into this issue, I checked the 047 code, and we are
-> > missing _find_nvme_dev after the second connect, and the below change
-> > could fix this issue now.
-> >
-> > diff --git a/tests/nvme/047 b/tests/nvme/047
-> > index 6a7599b..8c0a024 100755
-> > --- a/tests/nvme/047
-> > +++ b/tests/nvme/047
-> > @@ -52,6 +52,8 @@ test() {
-> >                 --nr-write-queues 1 \
-> >                 --nr-poll-queues 1 || echo FAIL
-> >
-> > +       nvmedev=3D$(_find_nvme_dev "${subsys_name}")
-> > +
-> >         _run_fio_rand_io --filename=3D"/dev/${nvmedev}n1" --size=3D"${r=
-and_io_size}"
-> >
-> >         _nvme_disconnect_subsys "${subsys_name}" >> "$FULL" 2>&1
-> >
-> >
->
-> Ah, I overlooked that the test case calls _nvme_connect_subsys twice. Goo=
-d to
-> know that the above changes avoid the failure.
->
-> Having said that, the fix above does not look the best. As discussed in a=
-nother
-> e-mail, _find_nvme_dev() just does 1 second wait, and it actually does no=
-t check
-> readiness of the device. This needs fix. Also I think the check and wait =
-should
-> move from _find_nvme_dev()to _nvme_connect_subsys(). Could you try the pa=
-tch
+On Thu, Aug 10, 2023 at 02:22:50PM +0000, Niklas Cassel wrote:
+> On Thu, Aug 10, 2023 at 10:00:14PM +0800, Ming Lei wrote:
+> > On Thu, Aug 10, 2023 at 01:10:30PM +0000, Niklas Cassel wrote:
+> > > On Thu, Aug 10, 2023 at 08:43:26PM +0800, Ming Lei wrote:
+> 
+> (snip)
+>  
+> > UBLK_IO_OP_ZONE_* is part of ublk UAPI, but REQ_OP_ZONE_* is just kernel
+> > internal definition which may be changed time by time, so we can't use
+> > REQ_OP_ZONE_* directly.
+> > 
+> > Here you can think of UBLK_IO_OP_ZONE_* as interface between driver and
+> > hardware, so UBLK_IO_OP_ZONE_* has to be defined independently.
+> > 
+> > > but if you want to keep this pattern, then perhaps you want
+> > > to define UBLK_IO_OP_ZONE_RESET_ALL to 17.
+> > 
+> > Why do you think that 17 is better than 14?
+> 
+> I never said that it was better :)
+> I even said: "I don't see any obvious advantage of keeping them the same" :)
 
-Yeah, move to _nvme_connect_subsys looks more reasonable.
+OK, maybe I misunderstood your point.
 
-> below and see if it avoid the failure?
+> 
+> Just that it would follow the existing pattern of keeping
+> UBLK_IO_OP_ZONE_* in sync with REQ_OP_ZONE_*.
 
-This change works well :)
+No matter 14 or 17, it does sync with REQ_OP_ZONE_*, even though it
+isn't necessary to do so.
 
->
-> diff --git a/tests/nvme/rc b/tests/nvme/rc
-> index 4f3a994..d09e7b4 100644
-> --- a/tests/nvme/rc
-> +++ b/tests/nvme/rc
-> @@ -425,6 +425,7 @@ _nvme_connect_subsys() {
->         local keep_alive_tmo=3D""
->         local reconnect_delay=3D""
->         local ctrl_loss_tmo=3D""
-> +       local dev i
->
->         while [[ $# -gt 0 ]]; do
->                 case $1 in
-> @@ -529,6 +530,16 @@ _nvme_connect_subsys() {
->         fi
->
->         nvme connect "${ARGS[@]}" 2> /dev/null
-> +
-> +       dev=3D$(_find_nvme_dev "$subsysnqn")
-> +       for ((i =3D 0; i < 10; i++)); do
-> +               if [[ -b /dev/${dev}n1 &&
-> +                             -e /sys/block/${dev}n1/uuid &&
-> +                             -e /sys/block/${dev}n1/wwid ]]; then
-> +                       return
-> +               fi
-> +               sleep .1
-> +       done
->  }
->
->  _nvme_discover() {
-> @@ -739,13 +750,6 @@ _find_nvme_dev() {
->                 subsysnqn=3D"$(cat "/sys/class/nvme/${dev}/subsysnqn")"
->                 if [[ "$subsysnqn" =3D=3D "$subsys" ]]; then
->                         echo "$dev"
-> -                       for ((i =3D 0; i < 10; i++)); do
-> -                               if [[ -e /sys/block/$dev/uuid &&
-> -                                       -e /sys/block/$dev/wwid ]]; then
-> -                                       return
-> -                               fi
-> -                               sleep .1
-> -                       done
->                 fi
->         done
->  }
->
+Then your all comment on this patch should be addressed, right?
+
+> 
+> 
+> > 
+> > I'd rather use 14 to fill the hole, meantime the two ZONE_RESET OPs
+> > can be kept together.
+> 
+> Ok, but then, considering that UBLK_IO_OP_ZONE_* is not part of any official
+> kernel release, and that the highest UBLK_IO_OP is currently defined as 5:
+
+I don't think it is necessary, see below.
+
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/ublk_cmd.h?h=v6.5-rc5#n237
+> 
+> why not define:
+> +#define		UBLK_IO_OP_ZONE_OPEN		6
+> +#define		UBLK_IO_OP_ZONE_CLOSE		7
+> +#define		UBLK_IO_OP_ZONE_FINISH		8
+> +#define		UBLK_IO_OP_ZONE_APPEND		9
+> +#define		UBLK_IO_OP_ZONE_RESET		10
+> +#define		UBLK_IO_OP_ZONE_RESET_ALL	11
+> 
+> instead of, like it currently is in linux-block/for-next (this patch included):
+> 
+> +#define		UBLK_IO_OP_ZONE_OPEN		10
+> +#define		UBLK_IO_OP_ZONE_CLOSE		11
+> +#define		UBLK_IO_OP_ZONE_FINISH		12
+> +#define		UBLK_IO_OP_ZONE_APPEND		13
+> +#define		UBLK_IO_OP_ZONE_RESET_ALL	14
+> +#define		UBLK_IO_OP_ZONE_RESET		15
+> 
+> Because, even after this patch, you would still have a hole between
+> UBLK_IO_OP_ value 5 and 10.
+
+(5, 10) can be reserved for some more generic normal IOs, maybe new kind
+of READ/WRITE, or whatever.
+
+We have 256 OP available, which is big enough for future extend, and OP
+code can be used from any offset, but still more readable to group them
+according to their category. And it isn't big deal to use which number
+for which command, what matters is that we can extend, and keep
+compatible.
 
 
---=20
-Best Regards,
-  Yi Zhang
+Thanks,
+Ming
 
