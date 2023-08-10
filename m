@@ -2,133 +2,134 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5866CEB64DD
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 03:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF66C04A6A
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 03:54:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229711AbjHJDnm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Aug 2023 23:43:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60352 "EHLO
+        id S231938AbjHJDyk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Aug 2023 23:54:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbjHJDnk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 23:43:40 -0400
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4441FF7
-        for <linux-block@vger.kernel.org>; Wed,  9 Aug 2023 20:42:55 -0700 (PDT)
-Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6bc9811558cso448842a34.0
-        for <linux-block@vger.kernel.org>; Wed, 09 Aug 2023 20:42:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1691638975; x=1692243775;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B4RSMo1fBND8rVHHnIuWYp8oZATIFXug9YVVpx6JvSU=;
-        b=R7Jc4sXsiFXrA4yW5WqDxMVpJ2WvcRSR/7OGGAzasL5sQeG0HYp3rDsg0S5rbqw5dc
-         hseFMOvB9l2g6gpt1lce4yyYJzJoht16qkDlDBmLR8RMT/tJ7MaPMrHNQC34bsCkkkPW
-         T8kbKF4ODjVFr1i/xl5Fd6AffGAcIqp158ltGD2cQ8HRAofcKrZBrFwI7atzlr1WtBnn
-         WApOG8SNAVJRYwiI3wlDbped0h8/+qVTcU6QPGya57ENEhj8TvEs6desGai2gNkn7UrQ
-         onbfKV8tUTpAr5tbUbCVaIr6ySeCpiaaXDeyh+NDV6tBHjF3O+hG4M8UfRR2b28uKy6v
-         fnTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691638975; x=1692243775;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B4RSMo1fBND8rVHHnIuWYp8oZATIFXug9YVVpx6JvSU=;
-        b=VAUiR964KUmG3OgpemQsceGlQPqxahAWRA4wonuu3Zb/ehFd3DrMIXQ8HBjoFNxYwJ
-         g9Rk1yv3DLkmdi+tjsD0LdDub2hus4jqSaKLH3+EJYa+d5Gm2sWXqpOJu/wqZD4/G6NG
-         aTZ8f753Pi1EgxVGP8gazsDDIqqWMooG3KHDi1Bawv80D9OaleSuT5drv9kaKIlJ0f+4
-         BytZmHYzGNY2zp4SrOgVWsEjp1jiZyZRmzvurOTzx4TrnNnFdFf9CsoQazyG8VGyoNl+
-         F8cUdS2kcPd85UPebg9hJPAh9HI1VGVz0xXO9ciI9Fv/cPBsqucOjHrylCUvM52VV03b
-         anyQ==
-X-Gm-Message-State: AOJu0YwWcIo1D2m7uiegUR4tW0VTey7GOOuls82EeiaW3kcZtgoBWRzm
-        iomGoplwY4dWp6DpxxGVHGmXXg==
-X-Google-Smtp-Source: AGHT+IEdmG2XuZqwzOtBW9SyX+LO81ptV0L1FDqwtJVZqePG/lQZ75vsbzufQXK4dBu2HSEL3Q4k9g==
-X-Received: by 2002:a05:6358:e488:b0:135:449c:341b with SMTP id by8-20020a056358e48800b00135449c341bmr1289104rwb.10.1691638974739;
-        Wed, 09 Aug 2023 20:42:54 -0700 (PDT)
-Received: from [10.4.190.166] ([139.177.225.239])
-        by smtp.gmail.com with ESMTPSA id 8-20020a17090a034800b00262e485156esm2383811pjf.57.2023.08.09.20.42.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Aug 2023 20:42:54 -0700 (PDT)
-Message-ID: <86ce2299-ce42-c0bb-e577-9d23f8af494c@bytedance.com>
-Date:   Thu, 10 Aug 2023 11:42:50 +0800
+        with ESMTP id S230212AbjHJDyg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Aug 2023 23:54:36 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BC4E5F;
+        Wed,  9 Aug 2023 20:54:35 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RLtN45QlQz4f3kFj;
+        Thu, 10 Aug 2023 11:54:28 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgA3xqh1X9RksnRqAQ--.45635S4;
+        Thu, 10 Aug 2023 11:54:31 +0800 (CST)
+From:   Li Lingfeng <lilingfeng@huaweicloud.com>
+To:     tj@kernel.org
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, mkoutny@suse.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        yukuai3@huawei.com, linan122@huawei.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com, lilingfeng@huaweicloud.com,
+        lilingfeng3@huawei.com
+Subject: [PATCH -next v3] block: remove init_mutex and open-code blk_iolatency_try_init
+Date:   Thu, 10 Aug 2023 11:51:11 +0800
+Message-Id: <20230810035111.2236335-1-lilingfeng@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH RFC] block: Revert 615939a2ae73
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Chuck Lever III <chuck.lever@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Chuck Lever <cel@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <169158653156.2034.8363987273532378512.stgit@bazille.1015granger.net>
- <d51b0683-8872-4e10-8589-5c6de8db61d4@kernel.dk>
- <20230809161105.GA2304@lst.de>
- <9BADCC53-72E9-44FB-80C8-CEBC9897809D@oracle.com>
- <20230809214913.GA9902@lst.de>
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-In-Reply-To: <20230809214913.GA9902@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgA3xqh1X9RksnRqAQ--.45635S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZrW8GF48WFWkJr4DCF1fXrb_yoW8Kw1Up3
+        ySgrsIy3yUGrs3XF1kKw4xur15K3y8Kry7GF4fCFyrJr1j9r1agF18ZF1FqFWfZrZ5Aan5
+        KF48J34kGr4rG37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
+        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+        fUoOJ5UUUUU
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/8/10 05:49, Christoph Hellwig wrote:
-> Oh well.  I don't feel like we're going to find the root cause
-> given that its late in the merge window and I'm running out of
-> time I have to work due to the annual summer vacation.  Unless
-> someone like Chengming who knows the flush code pretty well
-> feels like working with chuck on a few more iterations we'll
+From: Li Lingfeng <lilingfeng3@huawei.com>
 
-Hi,
+Commit a13696b83da4 ("blk-iolatency: Make initialization lazy") adds
+a mutex named "init_mutex" in blk_iolatency_try_init for the race
+condition of initializing RQ_QOS_LATENCY.
+Now a new lock has been add to struct request_queue by commit a13bd91be223
+("block/rq_qos: protect rq_qos apis with a new lock"). And it has been
+held in blkg_conf_open_bdev before calling blk_iolatency_init.
+So it's not necessary to keep init_mutex in blk_iolatency_try_init, just
+remove it.
 
-No problem, I can work with Chuck to find the root cause if Chuck
-has time too, since I still can't reproduce it by myself.
+Since init_mutex has been removed, blk_iolatency_try_init can be
+open-coded back to iolatency_set_limit() like ioc_qos_write().
 
-Maybe we should first find what's the status of the hang request?
-I can write a Drgn script to find if any request hang in the queue.
+Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+---
+  v1->v2: open-code blk_iolatency_try_init()
+  v2->v3: add lockdep check
+ block/blk-iolatency.c | 35 +++++++++++------------------------
+ 1 file changed, 11 insertions(+), 24 deletions(-)
 
-Christoph, it would be very helpful if you share some thoughts
-and directions.
-
-
-> have to revert it.  Which is going to be a very painful merge
-> with Chengming's work in the for-6.6 branch.
-> 
-
-Maybe we can revert it manually if we still fail since that commit
-just let postflushes go to the normal I/O path, instead of going to
-the flush state machine.
-
-So I think it should be fine if we just delete that case?
-
-Chuck, could you please help to check this change on block/for-next?
-
-Thanks!
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index e73dc22d05c1..7ea3c00f40ce 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -442,17 +442,6 @@ bool blk_insert_flush(struct request *rq)
-                 * Queue for normal execution.
-                 */
-                return false;
--       case REQ_FSEQ_DATA | REQ_FSEQ_POSTFLUSH:
--               /*
--                * Initialize the flush fields and completion handler to trigger
--                * the post flush, and then just pass the command on.
--                */
--               blk_rq_init_flush(rq);
--               rq->flush.seq |= REQ_FSEQ_PREFLUSH;
--               spin_lock_irq(&fq->mq_flush_lock);
--               fq->flush_data_in_flight++;
--               spin_unlock_irq(&fq->mq_flush_lock);
--               return false;
-        default:
-                /*
-                 * Mark the request as part of a flush sequence and submit it
-
-
-
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index fd5fec989e39..c16aef4be036 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -824,29 +824,6 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
+ 	}
+ }
+ 
+-static int blk_iolatency_try_init(struct blkg_conf_ctx *ctx)
+-{
+-	static DEFINE_MUTEX(init_mutex);
+-	int ret;
+-
+-	ret = blkg_conf_open_bdev(ctx);
+-	if (ret)
+-		return ret;
+-
+-	/*
+-	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
+-	 * confuse iolat_rq_qos() test. Make the test and init atomic.
+-	 */
+-	mutex_lock(&init_mutex);
+-
+-	if (!iolat_rq_qos(ctx->bdev->bd_queue))
+-		ret = blk_iolatency_init(ctx->bdev->bd_disk);
+-
+-	mutex_unlock(&init_mutex);
+-
+-	return ret;
+-}
+-
+ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
+ 			     size_t nbytes, loff_t off)
+ {
+@@ -861,7 +838,17 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
+ 
+ 	blkg_conf_init(&ctx, buf);
+ 
+-	ret = blk_iolatency_try_init(&ctx);
++	ret = blkg_conf_open_bdev(&ctx);
++	if (ret)
++		goto out;
++
++	/*
++	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
++	 * confuse iolat_rq_qos() test. Make the test and init atomic.
++	 */
++	lockdep_assert_held(ctx.bdev->bd_queue->rq_qos_mutex);
++	if (!iolat_rq_qos(ctx.bdev->bd_queue))
++		ret = blk_iolatency_init(ctx.bdev->bd_disk);
+ 	if (ret)
+ 		goto out;
+ 
+-- 
+2.39.2
 
