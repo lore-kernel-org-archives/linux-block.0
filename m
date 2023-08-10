@@ -2,91 +2,165 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 714A3C001DB
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 10:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA9DC001E0
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 11:05:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230114AbjHJKfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 06:35:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40748 "EHLO
+        id S232755AbjHJLFw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 07:05:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231991AbjHJKft (ORCPT
+        with ESMTP id S231643AbjHJLFv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 06:35:49 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2712CE6B
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 03:35:49 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fe1d462762so6515495e9.0
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 03:35:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691663747; x=1692268547;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FRClu8OKbCccK+GpVjNM1rBXRMSXaT4uZih+XyUZcUM=;
-        b=ydlNjKSA6ZQkdPYzNf3bwG0IUVOcqkw8lH9yA25W4d1bstSOk1456597VDBsXwbxOd
-         zvYLglxAf7kjViw+2fB98c34g8o+EOGoEKO3f5ya6VZV0KTs8gZG76NjdnC6X3jhtruC
-         iXkVQeocwN48VtpvGVeS+M3lP9ued6VD1gRt8hr02Rr0OVMIBTwuIidhzTbhbtWWRMwX
-         s146xsLu1rx9WSE3R2lRYqB2/cUrr95lxTEbp2+GtB4DYPuCskgzvU9GW/CYs4uAySRS
-         UNZAS6RHYnAMTtJdh1wH5+bwGfw1QorzPk3KhSII9bicYOlMGFrFHdTD/oY8VLCzprag
-         HITA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691663747; x=1692268547;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FRClu8OKbCccK+GpVjNM1rBXRMSXaT4uZih+XyUZcUM=;
-        b=APe2Q0nj98yb/AfvcWugWEz1nufTSt98lyRJ0xVm1L/8sZdAYjod3y/WYmTnhVu43w
-         28F6X1cZaE/Y8oOSICs/n2RrV5R7sqyzhXkcP/nbX12l8EzRKMtp14otBDwD4UbrwXwT
-         q3nL/M42F6b3LSZsa/30YsuqRxv75ZleSdPTpWYwTLqgHE2r/ycvE9MgeIYp/F2EW/1A
-         CnReTFn6nOcy8AZZDbsWBqoGBffiqjxyJFuMVUvC9SIUKsn2ZSUnf6pZWYmIxaffmGVr
-         prg7nDKRbK6gw+KmUrG47qouXfNeK/4+rlpwpG7J99r1WkXeZq3LcgX3Yoflhra5IxGA
-         BfuQ==
-X-Gm-Message-State: AOJu0YytwJBbl0sgnpVQbrj5rShBRz8dkL3X+ec9oJd6OtvuVuzVYsnq
-        qj8gm4YWwoCyrNgaselURTDZGQ==
-X-Google-Smtp-Source: AGHT+IGn42OkTxCreENUDG1eZEjFZjr/1puXM7aIIicE3k5SY+MeZfPRTgEkrqysv99Y1Uem9qSl5w==
-X-Received: by 2002:a05:600c:290a:b0:3fe:2219:9052 with SMTP id i10-20020a05600c290a00b003fe22199052mr1712516wmd.18.1691663747607;
-        Thu, 10 Aug 2023 03:35:47 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id n12-20020a7bcbcc000000b003fe557829ccsm4567309wmi.28.2023.08.10.03.35.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 03:35:47 -0700 (PDT)
-Date:   Thu, 10 Aug 2023 13:35:44 +0300
-From:   Dan Carpenter <dan.carpenter@linaro.org>
-To:     a.hindborg@samsung.com
-Cc:     linux-block@vger.kernel.org
-Subject: [bug report] ublk: enable zoned storage support
-Message-ID: <d74153a0-6b0c-4416-8190-c845c89d8b5c@moroto.mountain>
+        Thu, 10 Aug 2023 07:05:51 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1E8F2108;
+        Thu, 10 Aug 2023 04:05:49 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5FD561F749;
+        Thu, 10 Aug 2023 11:05:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1691665548; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1DFh8evqtxspjStydxXxKkjnilpW0tYumnluwrTMIZo=;
+        b=vLT7nxhsKaVB+2d6j1Yf5X8t1GLYqRuuN4g6ZutMMICOunL7y0FZNv7gLZiYXzC/l2Xomu
+        I8xmm0CPUZCp/iFMbz+eWr+/L/YJb1/utRAjSeiWYdJX1v/2EQl6s2syK6Yg4TzJfLlWXK
+        j+SruuD6SzbR8Z3B6IZKMOfh62510CU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1691665548;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1DFh8evqtxspjStydxXxKkjnilpW0tYumnluwrTMIZo=;
+        b=gjop8gtt3TnFXcbkSm06MHlxNzKkmd+CJQt27qbqqSRylA/dQexstbBZ/MQ0KnNaiV041a
+        Mrb6ToOuPtQHkpAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4EB2E138E2;
+        Thu, 10 Aug 2023 11:05:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id bLIxE4zE1GQpLAAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 10 Aug 2023 11:05:48 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id D2565A076F; Thu, 10 Aug 2023 13:05:47 +0200 (CEST)
+Date:   Thu, 10 Aug 2023 13:05:47 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 02/12] nilfs2: use setup_bdev_super to de-duplicate the
+ mount code
+Message-ID: <20230810110547.ks62g2flysgwpgru@quack3>
+References: <20230802154131.2221419-1-hch@lst.de>
+ <20230802154131.2221419-3-hch@lst.de>
+ <20230803114651.ihtqqgthbdjjgxev@quack3>
+ <CAKFNMomzHg33SHnp6xGMEZY=+k6Y4t7dvBvgBDbO9H3ujzNDCw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKFNMomzHg33SHnp6xGMEZY=+k6Y4t7dvBvgBDbO9H3ujzNDCw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Andreas Hindborg,
+On Fri 04-08-23 11:01:39, Ryusuke Konishi wrote:
+> On Thu, Aug 3, 2023 at 8:46 PM Jan Kara wrote:
+> >
+> > On Wed 02-08-23 17:41:21, Christoph Hellwig wrote:
+> > > Use the generic setup_bdev_super helper to open the main block device
+> > > and do various bits of superblock setup instead of duplicating the
+> > > logic.  This includes moving to the new scheme implemented in common
+> > > code that only opens the block device after the superblock has allocated.
+> > >
+> > > It does not yet convert nilfs2 to the new mount API, but doing so will
+> > > become a bit simpler after this first step.
+> > >
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> >
+> > AFAICS nilfs2 could *almost* use mount_bdev() directly and then just do its
+> 
+> > snapshot thing after mount_bdev() returns. But it has this weird logic
+> > that: "if the superblock is already mounted but we can shrink the whole
+> > dcache, then do remount instead of ignoring mount options". Firstly, this
+> > looks racy - what prevents someone from say opening a file on the sb just
+> > after nilfs_tree_is_busy() shrinks dcache? Secondly, it is inconsistent
+> > with any other filesystem so it's going to surprise sysadmins not
+> > intimately knowing nilfs2. Thirdly, from userspace you cannot tell what
+> > your mount call is going to do. Last but not least, what is it really good
+> > for? Ryusuke, can you explain please?
+> >
+> >                                                                 Honza
+> 
+> I think you are referring to the following part:
+> 
+> >        if (!s->s_root) {
+> ...
+> >        } else if (!sd.cno) {
+> >                if (nilfs_tree_is_busy(s->s_root)) {
+> >                        if ((flags ^ s->s_flags) & SB_RDONLY) {
+> >                                nilfs_err(s,
+> >                                          "the device already has a %s mount.",
+> >                                          sb_rdonly(s) ? "read-only" : "read/write");
+> >                                err = -EBUSY;
+> >                                goto failed_super;
+> >                        }
+> >                } else {
+> >                        /*
+> >                         * Try remount to setup mount states if the current
+> >                         * tree is not mounted and only snapshots use this sb.
+> >                         */
+> >                        err = nilfs_remount(s, &flags, data);
+> >                        if (err)
+> >                                goto failed_super;
+> >                }
+> >        }
+> 
+> What this logic is trying to do is, if there is already a nilfs2 mount
+> instance for the device, and are trying to mounting the current tree
+> (sd.cno is 0, so this is not a snapshot mount), then will switch
+> depending on whether the current tree has a mount:
+> 
+> - If the current tree is mounted, it's just like a normal filesystem.
+> (A read-only mount and a read/write mount can't coexist, so check
+> that, and reuse the instance if possible)
+> - Otherwise, i.e. for snapshot mounts only, do whatever is necessary
+> to add a new current mount, such as starting a log writer.
+>    Since it does the same thing that nilfs_remount does, so
+> nilfs_remount() is used there.
+> 
+> Whether or not there is a current tree mount can be determined by
+> d_count(s->s_root) > 1 as nilfs_tree_is_busy() does.
+> Where s->s_root is always the root dentry of the current tree, not
+> that of the mounted snapshot.
 
-This is a semi-automatic email about new static checker warnings.
+I see now, thanks for explanation! But one thing still is not clear to me.
+If you say have a snapshot mounted read-write and then you mount the
+current snapshot (cno == 0) read-only, you'll switch the whole superblock
+to read-only state. So also the mounted snapshot is suddently read-only
+which is unexpected and actually supposedly breaks things because you can
+still have file handles open for writing on the snapshot etc.. So how do
+you solve that?
 
-The patch 29802d7ca33b: "ublk: enable zoned storage support" from Aug
-4, 2023, leads to the following Smatch complaint:
-
-    drivers/block/ublk_drv.c:1404 ublk_commit_completion()
-    warn: variable dereferenced before check 'req' (see line 1401)
-
-drivers/block/ublk_drv.c
-  1398          /* find the io request and complete */
-  1399          req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
-  1400  
-  1401          if (req_op(req) == REQ_OP_ZONE_APPEND)
-                           ^^^
-The patch adds an unchecked dereference
-
-  1402                  req->__sector = ub_cmd->zone_append_lba;
-  1403  
-  1404          if (req && likely(!blk_should_fake_timeout(req->q)))
-                    ^^^
-The existing code assumes req can be NULL
-
-  1405                  ublk_put_req_ref(ubq, req);
-  1406  }
-
-regards,
-dan carpenter
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
