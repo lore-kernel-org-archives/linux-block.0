@@ -2,169 +2,262 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 083A1C001B0
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 14:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7453C04A6A
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 14:20:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233719AbjHJODP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 10:03:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56770 "EHLO
+        id S235574AbjHJOUX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 10:20:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231351AbjHJODP (ORCPT
+        with ESMTP id S230434AbjHJOUW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:03:15 -0400
-Received: from box.fidei.email (box.fidei.email [71.19.144.250])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A981120;
-        Thu, 10 Aug 2023 07:03:14 -0700 (PDT)
-Received: from authenticated-user (box.fidei.email [71.19.144.250])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        Thu, 10 Aug 2023 10:20:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B87B2698;
+        Thu, 10 Aug 2023 07:20:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by box.fidei.email (Postfix) with ESMTPSA id C8B6F835BE;
-        Thu, 10 Aug 2023 10:03:13 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dorminy.me; s=mail;
-        t=1691676194; bh=FKi9lWX389yWPHAdsOOq80Hxlwk+4mUEYc3mvuzJLzs=;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DB6F065D22;
+        Thu, 10 Aug 2023 14:20:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E700C433C7;
+        Thu, 10 Aug 2023 14:20:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691677220;
+        bh=M6pCzl56hQfYBur6YmsekmzG2MMWL9hk5rFjJ0OsUU0=;
         h=From:To:Cc:Subject:Date:From;
-        b=hzVLh3BHE2zW3OwLiVjC3Byo9LDXt2HCv/EqVLk3MwDIcjoggPkUg3S2it9GO63cO
-         DKVY5MIOBmsO3rSsCiuwylA8BKZJs6kd9q8/ng/0q0Zqxt1uvvkFDo4fq2n0C7nXqh
-         j7IJpGeTXxtJUBSEm9ZG0FjVb5M4gnL+57cv2m5w3TB3agltkHDlavosrMqJdFeQcb
-         h0Nvccr9wJSIKTn4BjuIUxLI90iYtfQHVNwVhTWC1TlJBuOexoERcGo9a1HbeqwPNb
-         yHXkpMGaU+3nUZavMGaygC/EHAYnFgaHUTlXGVZ8kDSIP3KzGFYZ4GwTXiLPC/8iXr
-         BR3XX4yg63d/A==
-From:   Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-To:     Jens Axboe <axboe@kernel.dk>, Satya Tangirala <satyat@google.com>,
-        linux-block@vger.kernel.org, kernel-team@meta.com,
-        ebiggers@kernel.org
-Cc:     Sweet Tea Dorminy <sweettea-kernel@dorminy.me>,
-        stable@vger.kernel.org
-Subject: [PATCH v3] blk-crypto: dynamically allocate fallback profile
-Date:   Thu, 10 Aug 2023 09:49:59 -0400
-Message-ID: <20230810140307.92790-1-sweettea-kernel@dorminy.me>
+        b=sEToNoLWqGtj4+RI0IeL2/r+G3nimZRvSUqztupu9NJ+WYoZP0DMJQzTc7AhlsCRR
+         jK+SIxlfrcfMXKvWeumyeQOK5nFc2dY4tBk6a84vRp7cTftkekwCVyX2rgv9+6AmrC
+         Dh91SfRjBjwYI9+cQxGNywuPyE4jUPyAUbzRq1qlPCpdc5pfBe17qe4QSw1GWxutDV
+         LEqx6GOFuLUoidCbQEbTBmg9pIzjp2gcCgmaYfyZA/oR7dMrTfDlL6wCOIJiRAEh5z
+         7bD2ltW5YMGSzYVVjE66ksMmUMrACNMp5UJJUI+KM+0mH1fxsUmNyF/NEvXI4YbDxf
+         rS2tPNYilE83g==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org
+Cc:     Arnd Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Brian Cain <bcain@quicinc.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Michal Simek <monstr@monstr.eu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Stafford Horne <shorne@gmail.com>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Richard Weinberger <richard@nod.at>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-next@vger.kernel.org, linux-alpha@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
+        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: [PATCH 00/17] -Wmissing-prototype warning fixes
+Date:   Thu, 10 Aug 2023 16:19:18 +0200
+Message-Id: <20230810141947.1236730-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_crypto_profile_init() calls lockdep_register_key(), which warns and
-does not register if the provided memory is a static object.
-blk-crypto-fallback currently has a static blk_crypto_profile and calls
-blk_crypto_profile_init() thereupon, resulting in the warning and
-failure to register.
+From: Arnd Bergmann <arnd@arndb.de>
 
-Fortunately it is simple enough to use a dynamically allocated profile
-and make lockdep function correctly.
+Most of the patches I sent so far for the -Wmissing-prototype warnings
+have made it into linux-next now. There are a few that I'm resending
+now as nobody has picked them up, and then a number of fixes that I
+found while test-building across all architectures rather than just the
+ones I usually test.
 
-Fixes: 2fb48d88e77f ("blk-crypto: use dynamic lock class for blk_crypto_profile::lock")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
----
-v3: added allocation error checking as noted by Eric Biggers.
-v2: reworded commit message, fixed Fixes tag, as pointed out by Eric
-Biggers.
+The first 15 patches in this series should be uncontroversial, so
+I expect that either a subsystem maintainer or Andrew Morton can
+apply these directly.
 
- block/blk-crypto-fallback.c | 36 ++++++++++++++++++++++--------------
- 1 file changed, 22 insertions(+), 14 deletions(-)
+For the last two patches, these might still need some debate about how
+to handle them. I added a Kconfig option to turn off most of the missing
+prototype warnings in the architectures that nobody has fixed yet,
+see patch 16 for those. The last patch does cause some known warnings
+and likely unknown ones for architectures other than x86 and arm,
+so applying it now will bring new problems, but not applying it also
+means that new warnings creep in, so I think this is mainly a question
+of what the best timing is for having this in linux-next.
 
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index ad9844c5b40c..4b0c661df191 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -78,7 +78,7 @@ static struct blk_crypto_fallback_keyslot {
- 	struct crypto_skcipher *tfms[BLK_ENCRYPTION_MODE_MAX];
- } *blk_crypto_keyslots;
- 
--static struct blk_crypto_profile blk_crypto_fallback_profile;
-+static struct blk_crypto_profile *blk_crypto_fallback_profile;
- static struct workqueue_struct *blk_crypto_wq;
- static mempool_t *blk_crypto_bounce_page_pool;
- static struct bio_set crypto_bio_split;
-@@ -292,7 +292,7 @@ static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
- 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
- 	 * this bio's algorithm and key.
- 	 */
--	blk_st = blk_crypto_get_keyslot(&blk_crypto_fallback_profile,
-+	blk_st = blk_crypto_get_keyslot(blk_crypto_fallback_profile,
- 					bc->bc_key, &slot);
- 	if (blk_st != BLK_STS_OK) {
- 		src_bio->bi_status = blk_st;
-@@ -395,7 +395,7 @@ static void blk_crypto_fallback_decrypt_bio(struct work_struct *work)
- 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
- 	 * this bio's algorithm and key.
- 	 */
--	blk_st = blk_crypto_get_keyslot(&blk_crypto_fallback_profile,
-+	blk_st = blk_crypto_get_keyslot(blk_crypto_fallback_profile,
- 					bc->bc_key, &slot);
- 	if (blk_st != BLK_STS_OK) {
- 		bio->bi_status = blk_st;
-@@ -499,7 +499,7 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
- 		return false;
- 	}
- 
--	if (!__blk_crypto_cfg_supported(&blk_crypto_fallback_profile,
-+	if (!__blk_crypto_cfg_supported(blk_crypto_fallback_profile,
- 					&bc->bc_key->crypto_cfg)) {
- 		bio->bi_status = BLK_STS_NOTSUPP;
- 		return false;
-@@ -526,15 +526,14 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
- 
- int blk_crypto_fallback_evict_key(const struct blk_crypto_key *key)
- {
--	return __blk_crypto_evict_key(&blk_crypto_fallback_profile, key);
-+	return __blk_crypto_evict_key(blk_crypto_fallback_profile, key);
- }
- 
- static bool blk_crypto_fallback_inited;
- static int blk_crypto_fallback_init(void)
- {
- 	int i;
--	int err;
--	struct blk_crypto_profile *profile = &blk_crypto_fallback_profile;
-+	int err = 0;
- 
- 	if (blk_crypto_fallback_inited)
- 		return 0;
-@@ -545,18 +544,25 @@ static int blk_crypto_fallback_init(void)
- 	if (err)
- 		goto out;
- 
--	err = blk_crypto_profile_init(profile, blk_crypto_num_keyslots);
--	if (err)
-+	/* Dynamic allocation is needed because of lockdep_register_key(). */
-+	blk_crypto_fallback_profile =
-+		kzalloc(sizeof(*blk_crypto_fallback_profile), GFP_KERNEL);
-+	if (!blk_crypto_fallback_profile)
- 		goto fail_free_bioset;
-+
-+	err = blk_crypto_profile_init(blk_crypto_fallback_profile,
-+				      blk_crypto_num_keyslots);
-+	if (err)
-+		goto fail_free_profile;
- 	err = -ENOMEM;
- 
--	profile->ll_ops = blk_crypto_fallback_ll_ops;
--	profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
-+	blk_crypto_fallback_profile->ll_ops = blk_crypto_fallback_ll_ops;
-+	blk_crypto_fallback_profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
- 
- 	/* All blk-crypto modes have a crypto API fallback. */
- 	for (i = 0; i < BLK_ENCRYPTION_MODE_MAX; i++)
--		profile->modes_supported[i] = 0xFFFFFFFF;
--	profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
-+		blk_crypto_fallback_profile->modes_supported[i] = 0xFFFFFFFF;
-+	blk_crypto_fallback_profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
- 
- 	blk_crypto_wq = alloc_workqueue("blk_crypto_wq",
- 					WQ_UNBOUND | WQ_HIGHPRI |
-@@ -597,7 +603,9 @@ static int blk_crypto_fallback_init(void)
- fail_free_wq:
- 	destroy_workqueue(blk_crypto_wq);
- fail_destroy_profile:
--	blk_crypto_profile_destroy(profile);
-+	blk_crypto_profile_destroy(blk_crypto_fallback_profile);
-+fail_free_profile:
-+	kfree(blk_crypto_fallback_profile);
- fail_free_bioset:
- 	bioset_exit(&crypto_bio_split);
- out:
+Arnd Bergmann (17):
+  [RESEND] jffs2: mark __jffs2_dbg_superblock_counts() static
+  [RESEND] irq_work: consolidate arch_irq_work_raise prototypes
+  [RESEND] ida: make 'ida_dump' static
+  pci: sysfs: move declarations to linux/pci.h
+  swim3: mark swim3_init() static
+  macintosh/ams: mark ams_init() static
+  scsi: qlogicpti: mark qlogicpti_info() static
+  microblaze: mark flush_dcache_folio() inline
+  parport: gsc: mark init function static
+  zorro: include zorro.h in names.c
+  scsi: gvp11: remove unused gvp11_setup() function
+  time: make sysfs_get_uname() function visible in header
+  stackleak: add declarations for global functions
+  kprobes: unify kprobes_exceptions_nofify() prototypes
+  arch: fix asm-offsets.c building with -Wmissing-prototypes
+  [RFC] arch: turn -Wmissing-prototypes off conditionally
+  [RFC] Makefile.extrawarn: turn on missing-prototypes again
+
+ arch/alpha/Kbuild                        |  2 ++
+ arch/alpha/include/asm/pci.h             |  3 ---
+ arch/alpha/kernel/asm-offsets.c          |  2 +-
+ arch/alpha/lib/Makefile                  |  1 +
+ arch/arc/Kbuild                          |  2 ++
+ arch/arc/include/asm/kprobes.h           |  3 ---
+ arch/arm/include/asm/irq_work.h          |  2 --
+ arch/arm/include/asm/kprobes.h           |  2 --
+ arch/arm64/include/asm/irq_work.h        |  2 --
+ arch/arm64/include/asm/kprobes.h         |  2 --
+ arch/csky/Kbuild                         |  2 ++
+ arch/csky/include/asm/irq_work.h         |  2 +-
+ arch/hexagon/Kbuild                      |  2 ++
+ arch/ia64/Kbuild                         |  2 ++
+ arch/ia64/include/asm/kprobes.h          |  2 --
+ arch/ia64/kernel/asm-offsets.c           |  2 +-
+ arch/ia64/lib/Makefile                   |  1 +
+ arch/loongarch/Kbuild                    |  2 ++
+ arch/loongarch/kernel/asm-offsets.c      | 12 ++++++++++++
+ arch/m68k/Kbuild                         |  2 ++
+ arch/m68k/lib/Makefile                   |  1 +
+ arch/microblaze/Kbuild                   |  2 ++
+ arch/microblaze/include/asm/cacheflush.h |  2 +-
+ arch/mips/Kbuild                         |  2 ++
+ arch/mips/boot/compressed/Makefile       |  3 ++-
+ arch/mips/include/asm/kprobes.h          |  2 --
+ arch/nios2/Kbuild                        |  2 ++
+ arch/nios2/lib/Makefile                  |  1 +
+ arch/openrisc/Kbuild                     |  2 ++
+ arch/parisc/Kbuild                       |  2 ++
+ arch/parisc/lib/Makefile                 |  1 +
+ arch/powerpc/include/asm/irq_work.h      |  1 -
+ arch/powerpc/include/asm/kprobes.h       |  2 --
+ arch/riscv/include/asm/irq_work.h        |  2 +-
+ arch/s390/include/asm/irq_work.h         |  2 --
+ arch/s390/include/asm/kprobes.h          |  2 --
+ arch/sh/Kbuild                           |  2 ++
+ arch/sh/boot/compressed/Makefile         |  1 +
+ arch/sh/include/asm/kprobes.h            |  2 --
+ arch/sparc/Kbuild                        |  2 ++
+ arch/sparc/include/asm/kprobes.h         |  2 --
+ arch/sparc/kernel/asm-offsets.c          | 13 ++-----------
+ arch/sparc/lib/Makefile                  |  1 +
+ arch/sparc/prom/Makefile                 |  1 +
+ arch/x86/include/asm/irq_work.h          |  1 -
+ arch/x86/include/asm/kprobes.h           |  2 --
+ arch/xtensa/Kbuild                       |  2 ++
+ arch/xtensa/boot/lib/Makefile            |  2 ++
+ drivers/block/swim3.c                    |  2 +-
+ drivers/macintosh/ams/ams-core.c         |  2 +-
+ drivers/parport/parport_gsc.c            |  2 +-
+ drivers/scsi/gvp11.c                     |  5 -----
+ drivers/scsi/qlogicpti.c                 |  2 +-
+ drivers/zorro/names.c                    |  1 +
+ fs/jffs2/debug.c                         |  2 +-
+ include/linux/irq_work.h                 |  3 +++
+ include/linux/kprobes.h                  |  4 ++++
+ include/linux/pci.h                      |  5 +++++
+ include/linux/stackleak.h                |  6 ++++++
+ init/Kconfig                             | 10 ++++++++++
+ kernel/time/tick-internal.h              |  3 ++-
+ lib/test_ida.c                           |  2 +-
+ scripts/Makefile.extrawarn               |  5 +++--
+ 63 files changed, 101 insertions(+), 63 deletions(-)
+
 -- 
-2.41.0
-
+2.39.2
+Cc: Matt Turner <mattst88@gmail.com>
+Cc: Vineet Gupta <vgupta@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Guo Ren <guoren@kernel.org>
+Cc: Brian Cain <bcain@quicinc.com>
+Cc: Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Michal Simek <monstr@monstr.eu>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Dinh Nguyen <dinguyen@kernel.org>
+Cc: Jonas Bonn <jonas@southpole.se>
+Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+Cc: Stafford Horne <shorne@gmail.com>
+Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+Cc: Helge Deller <deller@gmx.de>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: x86@kernel.org
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: linux-next@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-alpha@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-snps-arc@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-csky@vger.kernel.org
+Cc: linux-hexagon@vger.kernel.org
+Cc: linux-ia64@vger.kernel.org
+Cc: loongarch@lists.linux.dev
+Cc: linux-m68k@lists.linux-m68k.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-openrisc@vger.kernel.org
+Cc: linux-parisc@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-riscv@lists.infradead.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-sh@vger.kernel.org
+Cc: sparclinux@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-scsi@vger.kernel.org
+Cc: linux-mtd@lists.infradead.org
+Cc: linux-trace-kernel@vger.kernel.org
+Cc: linux-pci@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
