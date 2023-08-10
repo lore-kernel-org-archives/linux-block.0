@@ -2,150 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C4EC41513
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 14:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 083A1C001B0
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 14:03:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233818AbjHJOCE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 10:02:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60776 "EHLO
+        id S233719AbjHJODP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 10:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231600AbjHJOCD (ORCPT
+        with ESMTP id S231351AbjHJODP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:02:03 -0400
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE373EA;
-        Thu, 10 Aug 2023 07:02:02 -0700 (PDT)
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-56530cfee38so639116a12.2;
-        Thu, 10 Aug 2023 07:02:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691676122; x=1692280922;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=79gmeazvHAKk7515ds+nfk838n03+4+IxCe3JAS7JNM=;
-        b=Qjr0XDtMDX9XkNL26tN1Q2m4PyW5HfZGmx6hQ94bG3+MjlQRPLWW/3zS9VtCePTH9z
-         hWFiH8FBY8HLsSlYfaudjHS9mkIvw9YSi+7B2kWXmfPu/l78K0+sRLJqRFCmOVK1zSJ8
-         3EFH7afBtO0YgahPbvTcqJqJXOW7IQnJ7oGvYpdjla6PPlP++6RwLtI23dO6+yWr0FPP
-         jOmlTTHO0F2eK6TqCtH6whFIHvDJtvB9qBKyHZM6SdwS3HN1mJIi7RGBVpFC5vtg6qX9
-         CqhvKU6VSrkQBDWMLNrYYfU5ymkO2q6uOj/ik6u3jgsqlyS91ozOQeajRao0tYyQY8qJ
-         5iAg==
-X-Gm-Message-State: AOJu0YzvwGetaLKO05oYfHmljUP59Z0UeiU/7SA/ZD08kgLp6msdM2BI
-        5FZXhocSfhl+tBrLPwYiGGg=
-X-Google-Smtp-Source: AGHT+IElLA0DuXeX2kI/4A01w+Zr2jYc3j3TJjS6w18oNjp3zAIKpjTqgkE5AMLM4oWFsnH2I7WFWQ==
-X-Received: by 2002:a17:90b:2310:b0:262:df91:cdce with SMTP id mt16-20020a17090b231000b00262df91cdcemr1902786pjb.23.1691676121968;
-        Thu, 10 Aug 2023 07:02:01 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id f10-20020a170902ce8a00b001b7fd27144dsm1787088plg.40.2023.08.10.07.02.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Aug 2023 07:02:01 -0700 (PDT)
-Message-ID: <3ebefe64-bb74-732e-68d1-faf9e3c5877b@acm.org>
-Date:   Thu, 10 Aug 2023 07:02:00 -0700
+        Thu, 10 Aug 2023 10:03:15 -0400
+Received: from box.fidei.email (box.fidei.email [71.19.144.250])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A981120;
+        Thu, 10 Aug 2023 07:03:14 -0700 (PDT)
+Received: from authenticated-user (box.fidei.email [71.19.144.250])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by box.fidei.email (Postfix) with ESMTPSA id C8B6F835BE;
+        Thu, 10 Aug 2023 10:03:13 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dorminy.me; s=mail;
+        t=1691676194; bh=FKi9lWX389yWPHAdsOOq80Hxlwk+4mUEYc3mvuzJLzs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=hzVLh3BHE2zW3OwLiVjC3Byo9LDXt2HCv/EqVLk3MwDIcjoggPkUg3S2it9GO63cO
+         DKVY5MIOBmsO3rSsCiuwylA8BKZJs6kd9q8/ng/0q0Zqxt1uvvkFDo4fq2n0C7nXqh
+         j7IJpGeTXxtJUBSEm9ZG0FjVb5M4gnL+57cv2m5w3TB3agltkHDlavosrMqJdFeQcb
+         h0Nvccr9wJSIKTn4BjuIUxLI90iYtfQHVNwVhTWC1TlJBuOexoERcGo9a1HbeqwPNb
+         yHXkpMGaU+3nUZavMGaygC/EHAYnFgaHUTlXGVZ8kDSIP3KzGFYZ4GwTXiLPC/8iXr
+         BR3XX4yg63d/A==
+From:   Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+To:     Jens Axboe <axboe@kernel.dk>, Satya Tangirala <satyat@google.com>,
+        linux-block@vger.kernel.org, kernel-team@meta.com,
+        ebiggers@kernel.org
+Cc:     Sweet Tea Dorminy <sweettea-kernel@dorminy.me>,
+        stable@vger.kernel.org
+Subject: [PATCH v3] blk-crypto: dynamically allocate fallback profile
+Date:   Thu, 10 Aug 2023 09:49:59 -0400
+Message-ID: <20230810140307.92790-1-sweettea-kernel@dorminy.me>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v7 1/7] block: Introduce the use_zone_write_lock member
- variable
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230809202355.1171455-1-bvanassche@acm.org>
- <20230809202355.1171455-2-bvanassche@acm.org>
- <8312a7c4-b3ef-873d-c4fa-825b7fce8be1@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <8312a7c4-b3ef-873d-c4fa-825b7fce8be1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/9/23 18:33, Damien Le Moal wrote:
-> On 8/10/23 05:23, Bart Van Assche wrote:
->> Writes in sequential write required zones must happen at the write
->> pointer. Even if the submitter of the write commands (e.g. a filesystem)
->> submits writes for sequential write required zones in order, the block
->> layer or the storage controller may reorder these write commands.
->>
->> The zone locking mechanism in the mq-deadline I/O scheduler serializes
->> write commands for sequential zones. Some but not all storage controllers
->> require this serialization. Introduce a new request queue limit member
->> variable to allow block drivers to indicate that they preserve the order
->> of write commands and thus do not require serialization of writes per
->> zone.
->>
->> Cc: Damien Le Moal <dlemoal@kernel.org>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Cc: Ming Lei <ming.lei@redhat.com>
->> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
->> ---
->>   block/blk-settings.c   | 6 ++++++
->>   include/linux/blkdev.h | 1 +
->>   2 files changed, 7 insertions(+)
->>
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index 0046b447268f..b75c97971860 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -56,6 +56,7 @@ void blk_set_default_limits(struct queue_limits *lim)
->>   	lim->alignment_offset = 0;
->>   	lim->io_opt = 0;
->>   	lim->misaligned = 0;
->> +	lim->use_zone_write_lock = true;
->>   	lim->zoned = BLK_ZONED_NONE;
-> 
-> Given that the default for zoned is BLK_ZONED_NONE, having use_zone_write_lock
-> default to true is strange. It would be better to set the default to false and
-> have disk_set_zoned() set it to true if needed, with an additional argument to
-> specify if it should be the case or not. E.g., for SMR drives, sd.c would call
-> something like:
-> 
-> disk_set_zoned(sdkp->disk, BLK_ZONED_HM, sdp->use_zone_write_lock);
-> 
-> sd.c would default to sdp->use_zone_write_lock == true and UFS driver can set
-> it to false. That would be cleaner I think.
+blk_crypto_profile_init() calls lockdep_register_key(), which warns and
+does not register if the provided memory is a static object.
+blk-crypto-fallback currently has a static blk_crypto_profile and calls
+blk_crypto_profile_init() thereupon, resulting in the warning and
+failure to register.
 
-Hi Damien,
+Fortunately it is simple enough to use a dynamically allocated profile
+and make lockdep function correctly.
 
-Thanks for the detailed feedback.
+Fixes: 2fb48d88e77f ("blk-crypto: use dynamic lock class for blk_crypto_profile::lock")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+---
+v3: added allocation error checking as noted by Eric Biggers.
+v2: reworded commit message, fixed Fixes tag, as pointed out by Eric
+Biggers.
 
-My concerns about the above proposal are as follows:
-* The information about whether or not the zone write lock should be used comes
-   from the block driver, e.g. a SCSI LLD.
-* sdp, the SCSI disk pointer, is owned by the ULD.
-* An ULD may be attached and detached multiple times during the lifetime of a
-   logical unit without the LLD being informed about this. So how to set
-   sdp->use_zone_write_lock without introducing a new callback or member variable
-   in a data structure owned by the LLD?
+ block/blk-crypto-fallback.c | 36 ++++++++++++++++++++++--------------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
-Hence my preference to store use_zone_write_lock in a data structure that has the
-same lifetime as the logical unit and not in any data structure controlled by the
-ULD.
-
->>   	lim->zone_write_granularity = 0;
->>   	lim->dma_alignment = 511;
->> @@ -685,6 +686,11 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>   						   b->max_secure_erase_sectors);
->>   	t->zone_write_granularity = max(t->zone_write_granularity,
->>   					b->zone_write_granularity);
->> +	/*
->> +	 * Whether or not the zone write lock should be used depends on the
->> +	 * bottom driver only.
->> +	 */
->> +	t->use_zone_write_lock = b->use_zone_write_lock;
-> 
-> Given that DM bio targets do not have a scheduler and do not have a zone lock
-> bitmap allocated, I do not think this is necessary at all. This can remain to
-> false, thus in sync with the fact that there is no IO scheduler.
-
-How about the request-based dm drivers (dm-mpath and dm-target)? Isn't the dm-mpath
-driver request based because that allows the I/O scheduler to be configured on top
-of the dm-mpath driver? From https://lwn.net/Articles/274292/: "The basic idea to
-resolve the issue is to move multipathing layer down below the I/O scheduler, and it
-was proposed from Mike Christie as the block layer (request-based) multipath".
-
-Thanks,
-
-Bart.
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index ad9844c5b40c..4b0c661df191 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -78,7 +78,7 @@ static struct blk_crypto_fallback_keyslot {
+ 	struct crypto_skcipher *tfms[BLK_ENCRYPTION_MODE_MAX];
+ } *blk_crypto_keyslots;
+ 
+-static struct blk_crypto_profile blk_crypto_fallback_profile;
++static struct blk_crypto_profile *blk_crypto_fallback_profile;
+ static struct workqueue_struct *blk_crypto_wq;
+ static mempool_t *blk_crypto_bounce_page_pool;
+ static struct bio_set crypto_bio_split;
+@@ -292,7 +292,7 @@ static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
+ 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
+ 	 * this bio's algorithm and key.
+ 	 */
+-	blk_st = blk_crypto_get_keyslot(&blk_crypto_fallback_profile,
++	blk_st = blk_crypto_get_keyslot(blk_crypto_fallback_profile,
+ 					bc->bc_key, &slot);
+ 	if (blk_st != BLK_STS_OK) {
+ 		src_bio->bi_status = blk_st;
+@@ -395,7 +395,7 @@ static void blk_crypto_fallback_decrypt_bio(struct work_struct *work)
+ 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
+ 	 * this bio's algorithm and key.
+ 	 */
+-	blk_st = blk_crypto_get_keyslot(&blk_crypto_fallback_profile,
++	blk_st = blk_crypto_get_keyslot(blk_crypto_fallback_profile,
+ 					bc->bc_key, &slot);
+ 	if (blk_st != BLK_STS_OK) {
+ 		bio->bi_status = blk_st;
+@@ -499,7 +499,7 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
+ 		return false;
+ 	}
+ 
+-	if (!__blk_crypto_cfg_supported(&blk_crypto_fallback_profile,
++	if (!__blk_crypto_cfg_supported(blk_crypto_fallback_profile,
+ 					&bc->bc_key->crypto_cfg)) {
+ 		bio->bi_status = BLK_STS_NOTSUPP;
+ 		return false;
+@@ -526,15 +526,14 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
+ 
+ int blk_crypto_fallback_evict_key(const struct blk_crypto_key *key)
+ {
+-	return __blk_crypto_evict_key(&blk_crypto_fallback_profile, key);
++	return __blk_crypto_evict_key(blk_crypto_fallback_profile, key);
+ }
+ 
+ static bool blk_crypto_fallback_inited;
+ static int blk_crypto_fallback_init(void)
+ {
+ 	int i;
+-	int err;
+-	struct blk_crypto_profile *profile = &blk_crypto_fallback_profile;
++	int err = 0;
+ 
+ 	if (blk_crypto_fallback_inited)
+ 		return 0;
+@@ -545,18 +544,25 @@ static int blk_crypto_fallback_init(void)
+ 	if (err)
+ 		goto out;
+ 
+-	err = blk_crypto_profile_init(profile, blk_crypto_num_keyslots);
+-	if (err)
++	/* Dynamic allocation is needed because of lockdep_register_key(). */
++	blk_crypto_fallback_profile =
++		kzalloc(sizeof(*blk_crypto_fallback_profile), GFP_KERNEL);
++	if (!blk_crypto_fallback_profile)
+ 		goto fail_free_bioset;
++
++	err = blk_crypto_profile_init(blk_crypto_fallback_profile,
++				      blk_crypto_num_keyslots);
++	if (err)
++		goto fail_free_profile;
+ 	err = -ENOMEM;
+ 
+-	profile->ll_ops = blk_crypto_fallback_ll_ops;
+-	profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
++	blk_crypto_fallback_profile->ll_ops = blk_crypto_fallback_ll_ops;
++	blk_crypto_fallback_profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
+ 
+ 	/* All blk-crypto modes have a crypto API fallback. */
+ 	for (i = 0; i < BLK_ENCRYPTION_MODE_MAX; i++)
+-		profile->modes_supported[i] = 0xFFFFFFFF;
+-	profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
++		blk_crypto_fallback_profile->modes_supported[i] = 0xFFFFFFFF;
++	blk_crypto_fallback_profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
+ 
+ 	blk_crypto_wq = alloc_workqueue("blk_crypto_wq",
+ 					WQ_UNBOUND | WQ_HIGHPRI |
+@@ -597,7 +603,9 @@ static int blk_crypto_fallback_init(void)
+ fail_free_wq:
+ 	destroy_workqueue(blk_crypto_wq);
+ fail_destroy_profile:
+-	blk_crypto_profile_destroy(profile);
++	blk_crypto_profile_destroy(blk_crypto_fallback_profile);
++fail_free_profile:
++	kfree(blk_crypto_fallback_profile);
+ fail_free_bioset:
+ 	bioset_exit(&crypto_bio_split);
+ out:
+-- 
+2.41.0
 
