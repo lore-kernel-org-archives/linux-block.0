@@ -2,86 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDC5C001DB
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 08:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2412BC41513
+	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 08:59:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234331AbjHJItE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 04:49:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47402 "EHLO
+        id S231187AbjHJI7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 04:59:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233517AbjHJItE (ORCPT
+        with ESMTP id S230494AbjHJI7u (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 04:49:04 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A6E2127
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 01:49:01 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RM0sf23R5zTmXR;
-        Thu, 10 Aug 2023 16:47:02 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
- (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 10 Aug
- 2023 16:48:58 +0800
-From:   Li Zetao <lizetao1@huawei.com>
-To:     <ming.lei@redhat.com>, <axboe@kernel.dk>, <a.hindborg@samsung.com>
-CC:     <lizetao1@huawei.com>, <linux-block@vger.kernel.org>
-Subject: [PATCH -next] ublk: Fix signedness bug returning warning
-Date:   Thu, 10 Aug 2023 16:48:36 +0800
-Message-ID: <20230810084836.3535322-1-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 10 Aug 2023 04:59:50 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 038692115;
+        Thu, 10 Aug 2023 01:59:50 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B4B041F749;
+        Thu, 10 Aug 2023 08:59:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1691657988; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jy/YCn0JOglkNZoKf+HHCofDjT30/Uw6kt1m0VyWxSM=;
+        b=aAu4rrdfNPSY9/SthNOTGY4CcP4k23StpfFeloLpGY6m0J63bPGetURM2yapPQ5RR377Sw
+        un1UUxcQIlFfbIE8OayE0qBIBWs4wra2XowlN5r+AHzYeAmm+zdW5doEF8qSmj4iq/0XmX
+        2l4+ypNoD3XdbgUreuByjoX5UuAXuuY=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7811A138E2;
+        Thu, 10 Aug 2023 08:59:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id fUtwHASn1GRDcwAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 10 Aug 2023 08:59:48 +0000
+Date:   Thu, 10 Aug 2023 10:59:47 +0200
+From:   Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To:     Li Lingfeng <lilingfeng@huaweicloud.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        yukuai3@huawei.com, linan122@huawei.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com, lilingfeng3@huawei.com
+Subject: Re: [PATCH -next v3] block: remove init_mutex and open-code
+ blk_iolatency_try_init
+Message-ID: <5n6ti5ym5ean7nk3meul4nzpd6poimyfx5hn3mfj436k64qkz3@uzhut3yeszcu>
+References: <20230810035111.2236335-1-lilingfeng@huaweicloud.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="hj4duincgs2uethd"
+Content-Disposition: inline
+In-Reply-To: <20230810035111.2236335-1-lilingfeng@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are two warnings reported by smatch:
 
-drivers/block/ublk_drv.c:445 ublk_setup_iod_zoned() warn:
-	signedness bug returning '(-95)'
-drivers/block/ublk_drv.c:963 ublk_setup_iod() warn:
-	signedness bug returning '(-5)'
+--hj4duincgs2uethd
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The type of "blk_status_t" is either be a u32 or u8, but this two
-functions return a negative value when not supported or failed. Use
-the error code of the blk module to fix these warnings.
+On Thu, Aug 10, 2023 at 11:51:11AM +0800, Li Lingfeng <lilingfeng@huaweiclo=
+ud.com> wrote:
+> ---
+>   v1->v2: open-code blk_iolatency_try_init()
+>   v2->v3: add lockdep check
+>  block/blk-iolatency.c | 35 +++++++++++------------------------
+>  1 file changed, 11 insertions(+), 24 deletions(-)
 
-Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/r/202308100201.TCRhgdvN-lkp@intel.com/
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- drivers/block/ublk_drv.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Michal Koutn=FD <mkoutny@suse.com>
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 85a81ee556d5..ef1760b3d8b5 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -442,7 +442,7 @@ static int ublk_revalidate_disk_zones(struct ublk_device *ub)
- static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
- 					 struct request *req)
- {
--	return -EOPNOTSUPP;
-+	return BLK_STS_NOTSUPP;
- }
- 
- #endif
-@@ -960,7 +960,7 @@ static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
- 
- 	if (!ublk_queue_is_zoned(ubq) &&
- 	    (op_is_zone_mgmt(op) || op == REQ_OP_ZONE_APPEND))
--		return -EIO;
-+		return BLK_STS_IOERR;
- 
- 	switch (req_op(req)) {
- 	case REQ_OP_READ:
--- 
-2.34.1
+Thanks.
 
+--hj4duincgs2uethd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQQpEWyjXuwGT2dDBqAGvrMr/1gcjgUCZNSnAQAKCRAGvrMr/1gc
+jssIAP0S+pqij21mDTM9cHk5Ner222D9hnl4pzbvxyJZSBlg2gD/V7I3A4pTZgvm
+sK+hU4OXge5gDrsskiOKZkE19TZpHgM=
+=CNhy
+-----END PGP SIGNATURE-----
+
+--hj4duincgs2uethd--
