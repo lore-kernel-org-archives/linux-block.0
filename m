@@ -2,90 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A594C001B0
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 13:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CD3C41513
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 13:58:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231588AbjHKNxT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 09:53:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34898 "EHLO
+        id S233940AbjHKN6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 09:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbjHKNxS (ORCPT
+        with ESMTP id S230303AbjHKN6c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 09:53:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00532D78
-        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 06:52:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691761955;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=qf6Ic09Y1qGMG460Va8GOjb/vJlHu0f0gtfrpU1SYGw=;
-        b=FGdb19zmi2OZhOavxaYB8soVFslHvROIGwc3DWdc7vpaPtwAnyf5jIZsou33g2Ij//n/Oh
-        JJebKlo40jI7wwZA0VgGoXZmIKx5iXmjCCSbkYtNVILE1CcaNAk1WKE0SVs3GEVEngENO0
-        f843nTdNdU412vgCVJRc0SzSy0IlebU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-449-aFM0sSvQO32mjAkHo1E5tw-1; Fri, 11 Aug 2023 09:52:32 -0400
-X-MC-Unique: aFM0sSvQO32mjAkHo1E5tw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5402C85C70B;
-        Fri, 11 Aug 2023 13:52:32 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E19B1121314;
-        Fri, 11 Aug 2023 13:52:31 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH] ublk: fix 'warn: variable dereferenced before check 'req'' from Smatch
-Date:   Fri, 11 Aug 2023 21:52:16 +0800
-Message-Id: <20230811135216.420404-1-ming.lei@redhat.com>
+        Fri, 11 Aug 2023 09:58:32 -0400
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03BEBD7
+        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 06:58:32 -0700 (PDT)
+Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-63d10da0f26so13600666d6.3
+        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 06:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20221208.gappssmtp.com; s=20221208; t=1691762311; x=1692367111;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MOzDCd04VE0SULfz9lrhi4705BMAE/fYR5J/4qqrUV0=;
+        b=cawaK5Dp6mIWutTITZ4bH4giSOQALDe36gSCfFbV5uiC/RHKJZp5HzGDkOrEWlLKSl
+         47FJHJJzARLEFPuhrTquTWztAtcgaetrdOtVMCpGGKDb8ZDOM3TcW+/B4jbqCWZgpIBL
+         7FgVwbAl4g2q+Yppa4fdCLiL5hOZyH9umaOc4Zv9u7DsfBCQEusJSHhmHwC9ktII82P1
+         YDprV1R9yEHGWV9R9C166iUiKVa7qyTMf/q1R+5/Z6uzw06c3rLstWTlGCmg4dUurxo1
+         +hKBeGi9BMuCbni1Yvc5RfzpHF+8embJvUf+R8j/PCzCh8OPE+DiyYc3UYNuMFKzz8P6
+         fXFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691762311; x=1692367111;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MOzDCd04VE0SULfz9lrhi4705BMAE/fYR5J/4qqrUV0=;
+        b=eYeP76fYS5t0aXoaKdFRQylbgVNz/OuuZDSsN08EnUi2RVMYh8sP7bETqFPbvlFGd+
+         0cY5+qM9hPWDG+hAMyOKUq59yQvVQ/d1UWKNRMR/gts56UIeT+AvrlSH7pAbK/+qgO5S
+         8Scash8liDcYVlAAacXy5imbyVNEh9TUg7xPRkexDeqPLpL1+l+WsLqONUPqK/DwAp20
+         qoJYr/PGdLDRZJCKaB4HHh6W12ioOHlxL/hs9amZttlgPis/EJE0TJk9AVZsMu3GhtYy
+         p2iMHG7NYPkluwJhgkwvUlxbQ7vVDP+iAwyLz3OTEt58atidEE1gIsXjG8lZmjljP6Yt
+         HIhw==
+X-Gm-Message-State: AOJu0YwOpa45h5zgfqX2V9QKbh4wJZhuy6YpN9oom3rIRmWo1YOfO79f
+        xXdAad6PoRdz3v1/9He5zXIxIA==
+X-Google-Smtp-Source: AGHT+IGVzn498qbFNettmingI72J3rVK4joYT9qIyHhVAUq+7mWAeEKyf6BHcV179iCeBXifA9QbpQ==
+X-Received: by 2002:a0c:e14c:0:b0:63d:f8d:102f with SMTP id c12-20020a0ce14c000000b0063d0f8d102fmr1711178qvl.18.1691762311058;
+        Fri, 11 Aug 2023 06:58:31 -0700 (PDT)
+Received: from localhost (cpe-76-182-20-124.nc.res.rr.com. [76.182.20.124])
+        by smtp.gmail.com with ESMTPSA id y22-20020a37e316000000b00767dcf6f4adsm1191525qki.51.2023.08.11.06.58.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Aug 2023 06:58:29 -0700 (PDT)
+Date:   Fri, 11 Aug 2023 09:58:28 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Denis Efremov <efremov@linux.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-s390@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: remove get_super
+Message-ID: <20230811135828.GA2724906@perftesting>
+References: <20230811100828.1897174-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811100828.1897174-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The added check of 'req_op(req) == REQ_OP_ZONE_APPEND' should have been
-done after the request is confirmed as valid.
+On Fri, Aug 11, 2023 at 12:08:11PM +0200, Christoph Hellwig wrote:
+> Hi all,
+> 
+> this series against the VFS vfs.super branch finishes off the work to remove
+> get_super and move (almost) all upcalls to use the holder ops.
+> 
+> The first part is the missing btrfs bits so that all file systems use the
+> super_block as holder.
+> 
+> The second part is various block driver cleanups so that we use proper
+> interfaces instead of raw calls to __invalidate_device and fsync_bdev.
+> 
+> The last part than replaces __invalidate_device and fsync_bdev with upcalls
+> to the file system through the holder ops, and finally removes get_super.
+> 
+> It leaves user_get_super and get_active_super around.  The former is not
+> used for upcalls in the traditional sense, but for legacy UAPI that for
+> some weird reason take a dev_t argument (ustat) or a block device path
+> (quotactl).  get_active_super is only used for calling into the file system
+> on freeze and should get a similar treatment, but given that Darrick has
+> changes to that code queued up already this will be handled in the next
+> merge window.
+> 
+> A git tree is available here:
+> 
+>     git://git.infradead.org/users/hch/misc.git remove-get_super
+> 
+> Gitweb:
+> 
+>     http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/remove-get_super
+> 
 
-Actually here, the request should always been true, so add one
-WARN_ON_ONCE(!req), meantime move the zone_append check after
-checking the request.
+I rebased this onto misc-next and put in a PR to get it running through the GH
+CI, you can follow it here
 
-Cc: Andreas Hindborg <a.hindborg@samsung.com>
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Fixes: 29802d7ca33b ("ublk: enable zoned storage support")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+https://github.com/btrfs/linux/actions/runs/5833422266
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3650ef209344..be76db54db1f 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1400,11 +1400,13 @@ static void ublk_commit_completion(struct ublk_device *ub,
- 
- 	/* find the io request and complete */
- 	req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
-+	if (WARN_ON_ONCE(unlikely(!req)))
-+		return;
- 
- 	if (req_op(req) == REQ_OP_ZONE_APPEND)
- 		req->__sector = ub_cmd->zone_append_lba;
- 
--	if (req && likely(!blk_should_fake_timeout(req->q)))
-+	if (likely(!blk_should_fake_timeout(req->q)))
- 		ublk_put_req_ref(ubq, req);
- }
- 
--- 
-2.40.1
+In the meantime I'll start reviewing the patches.  Thanks,
 
+Josef
