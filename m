@@ -2,106 +2,159 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2557EC001DB
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 09:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19672C001B0
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 09:36:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229499AbjHKJXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 05:23:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47004 "EHLO
+        id S234959AbjHKJgW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 05:36:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbjHKJXJ (ORCPT
+        with ESMTP id S235018AbjHKJgV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 05:23:09 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0780110;
-        Fri, 11 Aug 2023 02:23:08 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RMdcm5YGwz4f3v4j;
-        Fri, 11 Aug 2023 17:23:04 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHl6n4_dVk9EbMAQ--.45074S3;
-        Fri, 11 Aug 2023 17:23:05 +0800 (CST)
-Subject: Re: [PATCH -next v3] block: remove init_mutex and open-code
- blk_iolatency_try_init
-To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Li Lingfeng <lilingfeng@huaweicloud.com>, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linan122@huawei.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com, lilingfeng3@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230810035111.2236335-1-lilingfeng@huaweicloud.com>
- <6637e6cd-20aa-110a-40ae-53ecd6eb4184@huaweicloud.com>
- <d4050f7e-d491-c111-3e26-160e7d5a4208@huaweicloud.com>
- <dtobag743cbzb3rxzldu36wszqtnbayz2grpyj2cctptfybtt3@66ico6n2clrr>
- <60dbff4b-d823-5dc9-ff8e-36648ddf7207@huaweicloud.com>
- <fwzsn3wyqpthfkegnlq7obl3uy6hhodobvcswena2z42ndzmzp@izv4k6wy6opt>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <b3409889-bb8a-d664-a495-c8cd34e501f3@huaweicloud.com>
-Date:   Fri, 11 Aug 2023 17:23:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 11 Aug 2023 05:36:21 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37DC32709;
+        Fri, 11 Aug 2023 02:36:20 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id EDF0D1F74A;
+        Fri, 11 Aug 2023 09:36:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1691746578; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=UDONgfwgA/FMspNb/GOALY2RYg7JltRc6Ev7K/UxWaw=;
+        b=x1MHdMx26Ax67mKKIsE3NEmwz4NRYvnm77MrBSgt6WC3voD8gdp6D7HD8qsaPePhmHH7Gi
+        gHgDZPdWY1u8PBhNH10ACf4SihXbHGZOagyVhXiusPkzV89qTvotwa4SputhfuoutpWPn/
+        5e5AgJyy3Da4ZkZ6SWDeblTkT18O0TM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1691746578;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=UDONgfwgA/FMspNb/GOALY2RYg7JltRc6Ev7K/UxWaw=;
+        b=t8XJzg82wvsTCVOiJ9d4IqoZeOqHmLbYKaitH9wZDy6xbUl+3/egEKa9+o062aclW8kWym
+        SHlN7BvnCQ+RGjBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DC013138E2;
+        Fri, 11 Aug 2023 09:36:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id YOsiFxEB1mSSHwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 11 Aug 2023 09:36:17 +0000
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <jsmart2021@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v3 00/13] Switch to allowed_host 
+Date:   Fri, 11 Aug 2023 11:36:01 +0200
+Message-ID: <20230811093614.28005-1-dwagner@suse.de>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-In-Reply-To: <fwzsn3wyqpthfkegnlq7obl3uy6hhodobvcswena2z42ndzmzp@izv4k6wy6opt>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHl6n4_dVk9EbMAQ--.45074S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKFW5WryfKryrZw4rJFy3XFb_yoWfZrX_uw
-        4ktFsrGw48GayFkw4Skr98Xa9YqayUWryUGryFgFW7uw1vvF4rCr4DCr9avFy5G3yfGFs0
-        yFs8ua4rJryIgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUba8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
-        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Michal
+Addressed the comments from v2. I also added cleanup code to _nvmet_cleanup() to
+make sure we do not leak resources when something goes wrong. I run into this
+while testing and all tests after the first failure failed then.
 
-在 2023/08/11 17:17, Michal Koutný 写道:
-> On Fri, Aug 11, 2023 at 04:53:44PM +0800, Yu Kuai <yukuai1@huaweicloud.com> wrote:
->> Yes, it'm implemented in the upper layer that rq_qos_add() and
->> blkcg_activate_policy() should be atmoic, and currently there is no
->> comments for that.
-> 
-> The check (iolat_rq_qos()) and use (activating the policy) should be the
-> atomic pair.
-> 
->> Perhaps it's better to add some comments like following in rq_qos_add()
->> instead?
-> 
-> Honestly, I find the current variant (v3) good as it is -- closest to
-> the pair of the operations.
-> 
-> (But it's merely a comment so ¯\_(ツ)_/¯)
+changes:
+v3:
+ - added new patch: "nvme/043: Use hostnqn to generate DHCAP key"
+ - removed unused variable in "nvme/rc: Add helper for adding/removing to allow list"
+ - added cleanup code to _nvmet_cleanup().
 
-Yes, it's just a comment.
+v2:
+ - updated commit messages
+ - moved the removal of subsys_name to the right patch
+ - added _nvmet_target_{setup|cleanup} helpers
+   this addresses also the 'appears unused' warning by ShellCheck
+ - https://lore.kernel.org/linux-nvme/20230810111317.25273-1-dwagner@suse.de/
 
-Lingfeng, can you resend this patch with the following fixed?
+v1:
+ - initial version
+   https://lore.kernel.org/linux-nvme/20230726124644.12619-1-dwagner@suse.de/
 
- > lockdep_assert_held(ctx.bdev->bd_queue->rq_qos_mutex);
 
-should be:
-lockdep_assert_held(&ctx.bdev->bd_queue->rq_qos_mutex);
+*** BLURB HERE ***
 
-And you can keep my review tag.
+Daniel Wagner (13):
+  nvme/{003,004,005,013,046,049}: Group all variables declarations
+  nvme: Reorganize test preamble code section
+  nvme/043: Use hostnqn to generate DHCAP key
+  nvme/rc: Add common subsystem nqn define
+  nvme: Use def_subsysnqn variable instead local variable
+  nvme/{041,042,043,044,045,048}: Remove local variable hostnqn and
+    hostid
+  nvme/rc: Add common file_path name define
+  nvme: Use def_file_path variable instead local variable
+  nvme/rc: Add common def_subsys_uuid define
+  nvme: Use def_subsys_uuid variable
+  nvme/rc: Add helper for adding/removing to allow list
+  nvme: Add explicitly host to allow_host list
+  nvme: Introduce nvmet_target_{setup/cleanup} common code
 
-Thanks,
-Kuai
+ tests/nvme/003 | 12 ++-----
+ tests/nvme/004 | 23 ++++--------
+ tests/nvme/005 | 22 +++---------
+ tests/nvme/006 | 21 ++---------
+ tests/nvme/007 | 19 ++--------
+ tests/nvme/008 | 26 +++-----------
+ tests/nvme/009 | 21 +++--------
+ tests/nvme/010 | 26 +++-----------
+ tests/nvme/011 | 22 +++---------
+ tests/nvme/012 | 26 +++-----------
+ tests/nvme/013 | 22 +++---------
+ tests/nvme/014 | 26 +++-----------
+ tests/nvme/015 | 21 +++--------
+ tests/nvme/016 | 17 +++++----
+ tests/nvme/017 | 26 ++++++--------
+ tests/nvme/018 | 21 +++--------
+ tests/nvme/019 | 26 +++-----------
+ tests/nvme/020 | 21 +++--------
+ tests/nvme/021 | 21 +++--------
+ tests/nvme/022 | 21 +++--------
+ tests/nvme/023 | 26 +++-----------
+ tests/nvme/024 | 21 +++--------
+ tests/nvme/025 | 21 +++--------
+ tests/nvme/026 | 21 +++--------
+ tests/nvme/027 | 20 +++--------
+ tests/nvme/028 | 20 +++--------
+ tests/nvme/029 | 26 +++-----------
+ tests/nvme/030 | 19 +++++-----
+ tests/nvme/031 | 14 ++++----
+ tests/nvme/033 |  9 ++---
+ tests/nvme/034 |  9 ++---
+ tests/nvme/035 |  9 ++---
+ tests/nvme/036 |  9 ++---
+ tests/nvme/037 |  8 ++---
+ tests/nvme/038 |  6 ++--
+ tests/nvme/039 |  4 +--
+ tests/nvme/040 | 28 +++++----------
+ tests/nvme/041 | 49 ++++++++-----------------
+ tests/nvme/042 | 55 ++++++++++------------------
+ tests/nvme/043 | 52 +++++++++------------------
+ tests/nvme/044 | 71 ++++++++++++++----------------------
+ tests/nvme/045 | 62 ++++++++++++--------------------
+ tests/nvme/046 |  1 +
+ tests/nvme/047 | 30 ++++------------
+ tests/nvme/048 | 42 +++++++---------------
+ tests/nvme/049 |  1 +
+ tests/nvme/rc  | 97 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 47 files changed, 404 insertions(+), 766 deletions(-)
 
-> 
-> Michal
-> 
+-- 
+2.41.0
 
