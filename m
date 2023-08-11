@@ -2,70 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D0DC001DB
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 12:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51705C001DE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 13:10:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbjHKMtF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 08:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33680 "EHLO
+        id S231894AbjHKNKz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 09:10:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbjHKMtE (ORCPT
+        with ESMTP id S229994AbjHKNKy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 08:49:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8187C2696;
-        Fri, 11 Aug 2023 05:49:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 17E9E64FE4;
-        Fri, 11 Aug 2023 12:49:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03536C433C8;
-        Fri, 11 Aug 2023 12:48:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691758143;
-        bh=ejIUNFO7vD5+JAhPZ7uJRR/J5AhcRrudBRP7+EnTl0o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HXvwatSPGWudGtF+0zb3+i8/8EZHT7CDtvPfZ616wj4sSEBiDQgFyK/j+9BklCYkk
-         iOrOrH/Ny9lYKv95OxHW08M0OPf1yx+XLb9hxxzHb/Z6lXMRl2R4lnNX5ofV2zkz/O
-         54yTbvDXGqTl2PhJUYM8Ej9ZIYpkH1Zz8aOkUPWDus44pXDpu7RduXHF+ic//DHz6p
-         FjxNNGnvPVFnAkUyzcU6X7Mjqt8Zc+tHEz0sME0qV7LgBoEAUAZA40crjocb6FnwlM
-         cQr1Up+zWrGYLXCZ4uLZ1+4PaZaj3rjfx4BchygqFQqqyIeWJyfQ4jmCsuPTYWM7Ik
-         zsd4Mia8YDZAg==
-Date:   Fri, 11 Aug 2023 14:48:57 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
-        Denis Efremov <efremov@linux.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-s390@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 17/17] fs: simplify invalidate_inodes
-Message-ID: <20230811-warnt-vorhaben-54641d422810@brauner>
-References: <20230811100828.1897174-1-hch@lst.de>
- <20230811100828.1897174-18-hch@lst.de>
+        Fri, 11 Aug 2023 09:10:54 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FF730CB;
+        Fri, 11 Aug 2023 06:10:53 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 4DD1867373; Fri, 11 Aug 2023 15:10:49 +0200 (CEST)
+Date:   Fri, 11 Aug 2023 15:10:49 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-nvme@lists.infradead.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Wen Xiong <wenxiong@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+        Dave Young <dyoung@redhat.com>, kexec@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Baoquan He <bhe@redhat.com>,
+        Pingfan Liu <piliu@redhat.com>
+Subject: Re: [PATCH V3 01/14] blk-mq: add blk_mq_max_nr_hw_queues()
+Message-ID: <20230811131049.GA20991@lst.de>
+References: <20230808104239.146085-1-ming.lei@redhat.com> <20230808104239.146085-2-ming.lei@redhat.com> <20230809134401.GA31852@lst.de> <ZNQqt1C0pXspGl3d@fedora>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230811100828.1897174-18-hch@lst.de>
+In-Reply-To: <ZNQqt1C0pXspGl3d@fedora>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 12:08:28PM +0200, Christoph Hellwig wrote:
-> kill_dirty has always been true for a long time, so hard code it and
-> remove the unused return value.
+On Thu, Aug 10, 2023 at 08:09:27AM +0800, Ming Lei wrote:
+> 1) some archs support 'nr_cpus=1' for kdump kernel, which is fine, since
+> num_possible_cpus becomes 1.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+> 2) some archs do not support 'nr_cpus=1', and have to rely on
+> 'max_cpus=1', so num_possible_cpus isn't changed, and kernel just boots
+> with single online cpu. That causes trouble because blk-mq limits single
+> queue.
 
-Looks good to me,
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+And we need to fix case 2.  We need to drop the is_kdump support, and
+if they want to force less cpus they need to make nr_cpus=1 work.
+
