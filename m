@@ -2,323 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF73C05052
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04242C41513
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:05:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235170AbjHKLFS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 07:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51762 "EHLO
+        id S236038AbjHKLFi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 07:05:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235546AbjHKLFK (ORCPT
+        with ESMTP id S235805AbjHKLFQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 07:05:10 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5515A10C4;
-        Fri, 11 Aug 2023 04:05:06 -0700 (PDT)
+        Fri, 11 Aug 2023 07:05:16 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D45B1704;
+        Fri, 11 Aug 2023 04:05:10 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B313F1F88E;
-        Fri, 11 Aug 2023 11:05:05 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3A1AD21881;
+        Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1691751905; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1691751906; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TtSsh1bxD1kTzE1tzsyayM2YSPIeACuZS7/5iK10REQ=;
-        b=lB1Jk8Amgg61DkXCuDWB8lLv4PCfbhPcjlI80FfAM7lLvOvQiCec2TcBpMFH1JCFCJVcrM
-        0JDbCK6tIkH2ysmC/SsfkA5r04VpwSsT7QeSY8OZnrGPAgzWwexE8ZrZixZMc4u9KfjyGs
-        9c7REhbv8mBpoGZ+TLGO3uaRALRFc1c=
+        bh=N7YBdToMFHaAC8IuWKxRPEMdSd9LNGUUtvM7Pk+ghBw=;
+        b=Ul3UwbMRQyZ+lV4S70iZQQbNxGooM3q1zIYUgEcgQEXb9yYN/oeO6AJHPZfYpOvWE3g4WC
+        IiiKdj/nQyQDf74qh6qKXYFhIvQyP49Q6lcMUAQfyNiGYd7n6h8WLpX2UGRevKFsjMpxSu
+        o2WooLKy9weeXK2HrPA5Ivd1+GUY1UM=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1691751905;
+        s=susede2_ed25519; t=1691751906;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TtSsh1bxD1kTzE1tzsyayM2YSPIeACuZS7/5iK10REQ=;
-        b=SVn796l4eDu0eJeQZPk/YRr2pQTRiNVOq9f0xP3vYBuhKb1dp4f3EMMudmzE22GaqEtTIk
-        jysvTlGs6ybjeLAw==
+        bh=N7YBdToMFHaAC8IuWKxRPEMdSd9LNGUUtvM7Pk+ghBw=;
+        b=HEJTqCpPWYHmclzG4mM6Ml/hoXvGA2WyPJ8/kRk+APfgnz/q6t1xstYUL8CA50JFDYyyw3
+        MTFgEotSz6jdseDw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A0CE7138E3;
-        Fri, 11 Aug 2023 11:05:05 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2D3FD139F3;
+        Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id z3Q6J+EV1mQ/RQAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:05 +0000
+        id j1kJC+IV1mRhRQAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:06 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id D4900A077D; Fri, 11 Aug 2023 13:05:04 +0200 (CEST)
+        id 3B81FA0776; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 05/29] pktcdvd: Convert to bdev_open_by_dev()
-Date:   Fri, 11 Aug 2023 13:04:36 +0200
-Message-Id: <20230811110504.27514-5-jack@suse.cz>
+        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+        linux-erofs@lists.ozlabs.org,
+        Gao Xiang <hsiangkao@linux.alibaba.com>
+Subject: [PATCH 21/29] erofs: Convert to use bdev_open_by_path()
+Date:   Fri, 11 Aug 2023 13:04:52 +0200
+Message-Id: <20230811110504.27514-21-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230810171429.31759-1-jack@suse.cz>
 References: <20230810171429.31759-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8793; i=jack@suse.cz; h=from:subject; bh=S6GT60u32S81v3ua/wYtgSEli6A4fZWZhVmmGQ8L6eM=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXHQLwLFy3JkOR3s6fVSJmLXJxY16Mi+2Y23w29 jTuHugSJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYVxwAKCRCcnaoHP2RA2UjpCA DvC3vudAVZMPc9c7XvBExpAvi6DVjv1F1p9Dj69gNSHTK1+oHgvL2d4GLmFSSoRhLEVfM5WEjcj0lB 5QOGQBz9rQWLhhyELZ+Vs7+SoAcvFGAlJjXKYW4QrvAYE6pgZvB3p4zVsMJF8bLGKd+RjTXMTivf0c joUjtSDUK+buKyvcaJ/YuF0wMBCI65Z8ED7Rix+ptia0q/apqYMb4MyZS8inOkaSwye+wwghRrGv9q X6OA0HcRYHPmXc7UXQJ7T3jqG4MtbdZ8ROxQqbB8O50Yvgv7ezhv1tQNvSE0XYssmBSY+q06LIj2uW 1E1p4W1l+yzqpiD1zXBdyK0iBO54Dl
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3347; i=jack@suse.cz; h=from:subject; bh=Glj53ItxKIh4U/O00C8riQd3I+fFSfRNGzqJ+ZAj4Bg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXV0FHZIj+A1bkBGTOkfyaWMpGZtuAJLG1/q8fD NO3txLqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYV1QAKCRCcnaoHP2RA2Zl+B/ 0cu4Q1Y3QdlYyLTbX+QhCFkECfAcJYt43AC/5VwiEYcQf9sk5zq+XP0P0KYEz9kgILT+OeVKI7Rx/8 RlyAtYEyD2Y87nZNtLoIqjf2Y63pQGf/JCgcJTV9/oLSb3CeWtJhZsgwICS1C7rWT4UG+HYKdjQo9A R9YIl1l1nppfZUTi4qS4l6x//vYX3XIA97c0wxJ7VFD6nZARshnlZ5LDrekS/71y4ZA6ESyD1ImpNU eF3BX9Rq3Jb2zyFZpN1/sySgpWgRaf0k477y1yBXKzLrQ2ZGo/EYiVeL+7WAoQKtGy1H8RwVgLVVLS cLGpaHfq2Ox9cXpfXVU0hL/eX97N2i
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert pktcdvd to use bdev_open_by_dev().
+Convert erofs to use bdev_open_by_path() and pass the handle around.
 
+CC: Gao Xiang <xiang@kernel.org>
+CC: Chao Yu <chao@kernel.org>
+CC: linux-erofs@lists.ozlabs.org
+Acked-by: Gao Xiang <hsiangkao@linux.alibaba.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/pktcdvd.c | 76 ++++++++++++++++++++++-------------------
- include/linux/pktcdvd.h |  4 ++-
- 2 files changed, 44 insertions(+), 36 deletions(-)
+ fs/erofs/data.c     |  4 ++--
+ fs/erofs/internal.h |  2 +-
+ fs/erofs/super.c    | 20 ++++++++++----------
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index a1428538bda5..d56d972aadb3 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -340,8 +340,8 @@ static ssize_t device_map_show(const struct class *c, const struct class_attribu
- 		n += sysfs_emit_at(data, n, "%s %u:%u %u:%u\n",
- 			pd->disk->disk_name,
- 			MAJOR(pd->pkt_dev), MINOR(pd->pkt_dev),
--			MAJOR(pd->bdev->bd_dev),
--			MINOR(pd->bdev->bd_dev));
-+			MAJOR(pd->bdev_handle->bdev->bd_dev),
-+			MINOR(pd->bdev_handle->bdev->bd_dev));
- 	}
- 	mutex_unlock(&ctl_mutex);
- 	return n;
-@@ -437,7 +437,8 @@ static int pkt_seq_show(struct seq_file *m, void *p)
- 	char *msg;
- 	int states[PACKET_NUM_STATES];
- 
--	seq_printf(m, "Writer %s mapped to %pg:\n", pd->disk->disk_name, pd->bdev);
-+	seq_printf(m, "Writer %s mapped to %pg:\n", pd->disk->disk_name,
-+		   pd->bdev_handle->bdev);
- 
- 	seq_printf(m, "\nSettings:\n");
- 	seq_printf(m, "\tpacket size:\t\t%dkB\n", pd->settings.size / 2);
-@@ -714,7 +715,7 @@ static void pkt_rbtree_insert(struct pktcdvd_device *pd, struct pkt_rb_node *nod
-  */
- static int pkt_generic_packet(struct pktcdvd_device *pd, struct packet_command *cgc)
- {
--	struct request_queue *q = bdev_get_queue(pd->bdev);
-+	struct request_queue *q = bdev_get_queue(pd->bdev_handle->bdev);
- 	struct scsi_cmnd *scmd;
- 	struct request *rq;
- 	int ret = 0;
-@@ -1047,7 +1048,8 @@ static void pkt_gather_data(struct pktcdvd_device *pd, struct packet_data *pkt)
- 			continue;
- 
- 		bio = pkt->r_bios[f];
--		bio_init(bio, pd->bdev, bio->bi_inline_vecs, 1, REQ_OP_READ);
-+		bio_init(bio, pd->bdev_handle->bdev, bio->bi_inline_vecs, 1,
-+			 REQ_OP_READ);
- 		bio->bi_iter.bi_sector = pkt->sector + f * (CD_FRAMESIZE >> 9);
- 		bio->bi_end_io = pkt_end_io_read;
- 		bio->bi_private = pkt;
-@@ -1262,8 +1264,8 @@ static void pkt_start_write(struct pktcdvd_device *pd, struct packet_data *pkt)
- 	struct device *ddev = disk_to_dev(pd->disk);
- 	int f;
- 
--	bio_init(pkt->w_bio, pd->bdev, pkt->w_bio->bi_inline_vecs, pkt->frames,
--		 REQ_OP_WRITE);
-+	bio_init(pkt->w_bio, pd->bdev_handle->bdev, pkt->w_bio->bi_inline_vecs,
-+		 pkt->frames, REQ_OP_WRITE);
- 	pkt->w_bio->bi_iter.bi_sector = pkt->sector;
- 	pkt->w_bio->bi_end_io = pkt_end_io_packet_write;
- 	pkt->w_bio->bi_private = pkt;
-@@ -2160,18 +2162,20 @@ static int pkt_open_dev(struct pktcdvd_device *pd, bool write)
- 	int ret;
- 	long lba;
- 	struct request_queue *q;
+diff --git a/fs/erofs/data.c b/fs/erofs/data.c
+index db5e4b7636ec..1fa60cfff267 100644
+--- a/fs/erofs/data.c
++++ b/fs/erofs/data.c
+@@ -222,7 +222,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
+ 			up_read(&devs->rwsem);
+ 			return 0;
+ 		}
+-		map->m_bdev = dif->bdev;
++		map->m_bdev = dif->bdev_handle->bdev;
+ 		map->m_daxdev = dif->dax_dev;
+ 		map->m_dax_part_off = dif->dax_part_off;
+ 		map->m_fscache = dif->fscache;
+@@ -240,7 +240,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
+ 			if (map->m_pa >= startoff &&
+ 			    map->m_pa < startoff + length) {
+ 				map->m_pa -= startoff;
+-				map->m_bdev = dif->bdev;
++				map->m_bdev = dif->bdev_handle->bdev;
+ 				map->m_daxdev = dif->dax_dev;
+ 				map->m_dax_part_off = dif->dax_part_off;
+ 				map->m_fscache = dif->fscache;
+diff --git a/fs/erofs/internal.h b/fs/erofs/internal.h
+index 36e32fa542f0..fabd3bb0c194 100644
+--- a/fs/erofs/internal.h
++++ b/fs/erofs/internal.h
+@@ -47,7 +47,7 @@ typedef u32 erofs_blk_t;
+ struct erofs_device_info {
+ 	char *path;
+ 	struct erofs_fscache *fscache;
 -	struct block_device *bdev;
 +	struct bdev_handle *bdev_handle;
+ 	struct dax_device *dax_dev;
+ 	u64 dax_part_off;
  
- 	/*
- 	 * We need to re-open the cdrom device without O_NONBLOCK to be able
- 	 * to read/write from/to it. It is already opened in O_NONBLOCK mode
- 	 * so open should not fail.
- 	 */
--	bdev = blkdev_get_by_dev(pd->bdev->bd_dev, BLK_OPEN_READ, pd, NULL);
--	if (IS_ERR(bdev)) {
--		ret = PTR_ERR(bdev);
-+	bdev_handle = bdev_open_by_dev(pd->bdev_handle->bdev->bd_dev,
-+				       BLK_OPEN_READ, pd, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		ret = PTR_ERR(bdev_handle);
- 		goto out;
- 	}
-+	pd->open_bdev_handle = bdev_handle;
- 
- 	ret = pkt_get_last_written(pd, &lba);
- 	if (ret) {
-@@ -2180,9 +2184,9 @@ static int pkt_open_dev(struct pktcdvd_device *pd, bool write)
- 	}
- 
- 	set_capacity(pd->disk, lba << 2);
--	set_capacity_and_notify(pd->bdev->bd_disk, lba << 2);
-+	set_capacity_and_notify(pd->bdev_handle->bdev->bd_disk, lba << 2);
- 
--	q = bdev_get_queue(pd->bdev);
-+	q = bdev_get_queue(pd->bdev_handle->bdev);
- 	if (write) {
- 		ret = pkt_open_write(pd);
- 		if (ret)
-@@ -2214,7 +2218,7 @@ static int pkt_open_dev(struct pktcdvd_device *pd, bool write)
- 	return 0;
- 
- out_putdev:
--	blkdev_put(bdev, pd);
-+	bdev_release(bdev_handle);
- out:
- 	return ret;
- }
-@@ -2233,7 +2237,8 @@ static void pkt_release_dev(struct pktcdvd_device *pd, int flush)
- 	pkt_lock_door(pd, 0);
- 
- 	pkt_set_speed(pd, MAX_SPEED, MAX_SPEED);
--	blkdev_put(pd->bdev, pd);
-+	bdev_release(pd->open_bdev_handle);
-+	pd->open_bdev_handle = NULL;
- 
- 	pkt_shrink_pktlist(pd);
- }
-@@ -2321,8 +2326,8 @@ static void pkt_end_io_read_cloned(struct bio *bio)
- 
- static void pkt_make_request_read(struct pktcdvd_device *pd, struct bio *bio)
- {
--	struct bio *cloned_bio =
--		bio_alloc_clone(pd->bdev, bio, GFP_NOIO, &pkt_bio_set);
-+	struct bio *cloned_bio = bio_alloc_clone(pd->bdev_handle->bdev, bio,
-+		GFP_NOIO, &pkt_bio_set);
- 	struct packet_stacked_data *psd = mempool_alloc(&psd_pool, GFP_NOIO);
- 
- 	psd->pd = pd;
-@@ -2492,7 +2497,7 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- {
- 	struct device *ddev = disk_to_dev(pd->disk);
- 	int i;
+diff --git a/fs/erofs/super.c b/fs/erofs/super.c
+index 9d6a3c6158bd..ce163b456d4a 100644
+--- a/fs/erofs/super.c
++++ b/fs/erofs/super.c
+@@ -230,7 +230,7 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
+ 	struct erofs_sb_info *sbi = EROFS_SB(sb);
+ 	struct erofs_fscache *fscache;
+ 	struct erofs_deviceslot *dis;
 -	struct block_device *bdev;
 +	struct bdev_handle *bdev_handle;
- 	struct scsi_device *sdev;
+ 	void *ptr;
  
- 	if (pd->pkt_dev == dev) {
-@@ -2503,8 +2508,9 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 		struct pktcdvd_device *pd2 = pkt_devs[i];
- 		if (!pd2)
- 			continue;
--		if (pd2->bdev->bd_dev == dev) {
--			dev_err(ddev, "%pg already setup\n", pd2->bdev);
-+		if (pd2->bdev_handle->bdev->bd_dev == dev) {
-+			dev_err(ddev, "%pg already setup\n",
-+				pd2->bdev_handle->bdev);
- 			return -EBUSY;
- 		}
- 		if (pd2->pkt_dev == dev) {
-@@ -2513,13 +2519,13 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 		}
+ 	ptr = erofs_read_metabuf(buf, sb, erofs_blknr(sb, *pos), EROFS_KMAP);
+@@ -254,13 +254,13 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
+ 			return PTR_ERR(fscache);
+ 		dif->fscache = fscache;
+ 	} else if (!sbi->devs->flatdev) {
+-		bdev = blkdev_get_by_path(dif->path, BLK_OPEN_READ, sb->s_type,
+-					  NULL);
+-		if (IS_ERR(bdev))
+-			return PTR_ERR(bdev);
+-		dif->bdev = bdev;
+-		dif->dax_dev = fs_dax_get_by_bdev(bdev, &dif->dax_part_off,
+-						  NULL, NULL);
++		bdev_handle = bdev_open_by_path(dif->path, BLK_OPEN_READ,
++						sb->s_type, NULL);
++		if (IS_ERR(bdev_handle))
++			return PTR_ERR(bdev_handle);
++		dif->bdev_handle = bdev_handle;
++		dif->dax_dev = fs_dax_get_by_bdev(bdev_handle->bdev,
++				&dif->dax_part_off, NULL, NULL);
  	}
  
--	bdev = blkdev_get_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_NDELAY, NULL,
--				 NULL);
--	if (IS_ERR(bdev))
--		return PTR_ERR(bdev);
--	sdev = scsi_device_from_queue(bdev->bd_disk->queue);
-+	bdev_handle = bdev_open_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_NDELAY,
-+				       NULL, NULL);
-+	if (IS_ERR(bdev_handle))
-+		return PTR_ERR(bdev_handle);
-+	sdev = scsi_device_from_queue(bdev_handle->bdev->bd_disk->queue);
- 	if (!sdev) {
--		blkdev_put(bdev, NULL);
-+		bdev_release(bdev_handle);
- 		return -EINVAL;
- 	}
- 	put_device(&sdev->sdev_gendev);
-@@ -2527,8 +2533,8 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 	/* This is safe, since we have a reference from open(). */
- 	__module_get(THIS_MODULE);
+ 	dif->blocks = le32_to_cpu(dis->blocks);
+@@ -815,8 +815,8 @@ static int erofs_release_device_info(int id, void *ptr, void *data)
+ 	struct erofs_device_info *dif = ptr;
  
--	pd->bdev = bdev;
--	set_blocksize(bdev, CD_FRAMESIZE);
-+	pd->bdev_handle = bdev_handle;
-+	set_blocksize(bdev_handle->bdev, CD_FRAMESIZE);
- 
- 	pkt_init_queue(pd);
- 
-@@ -2540,11 +2546,11 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 	}
- 
- 	proc_create_single_data(pd->disk->disk_name, 0, pkt_proc, pkt_seq_show, pd);
--	dev_notice(ddev, "writer mapped to %pg\n", bdev);
-+	dev_notice(ddev, "writer mapped to %pg\n", bdev_handle->bdev);
- 	return 0;
- 
- out_mem:
--	blkdev_put(bdev, NULL);
-+	bdev_release(bdev_handle);
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
- 	return -ENOMEM;
-@@ -2599,9 +2605,9 @@ static unsigned int pkt_check_events(struct gendisk *disk,
- 
- 	if (!pd)
- 		return 0;
--	if (!pd->bdev)
-+	if (!pd->bdev_handle)
- 		return 0;
--	attached_disk = pd->bdev->bd_disk;
-+	attached_disk = pd->bdev_handle->bdev->bd_disk;
- 	if (!attached_disk || !attached_disk->fops->check_events)
- 		return 0;
- 	return attached_disk->fops->check_events(attached_disk, clearing);
-@@ -2686,7 +2692,7 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
- 		goto out_mem2;
- 
- 	/* inherit events of the host device */
--	disk->events = pd->bdev->bd_disk->events;
-+	disk->events = pd->bdev_handle->bdev->bd_disk->events;
- 
- 	ret = add_disk(disk);
- 	if (ret)
-@@ -2751,7 +2757,7 @@ static int pkt_remove_dev(dev_t pkt_dev)
- 	pkt_debugfs_dev_remove(pd);
- 	pkt_sysfs_dev_remove(pd);
- 
--	blkdev_put(pd->bdev, NULL);
-+	bdev_release(pd->bdev_handle);
- 
- 	remove_proc_entry(pd->disk->disk_name, pkt_proc);
- 	dev_notice(ddev, "writer unmapped\n");
-@@ -2778,7 +2784,7 @@ static void pkt_get_status(struct pkt_ctrl_command *ctrl_cmd)
- 
- 	pd = pkt_find_dev_from_minor(ctrl_cmd->dev_index);
- 	if (pd) {
--		ctrl_cmd->dev = new_encode_dev(pd->bdev->bd_dev);
-+		ctrl_cmd->dev = new_encode_dev(pd->bdev_handle->bdev->bd_dev);
- 		ctrl_cmd->pkt_dev = new_encode_dev(pd->pkt_dev);
- 	} else {
- 		ctrl_cmd->dev = 0;
-diff --git a/include/linux/pktcdvd.h b/include/linux/pktcdvd.h
-index 80cb00db42a4..79594aeb160d 100644
---- a/include/linux/pktcdvd.h
-+++ b/include/linux/pktcdvd.h
-@@ -154,7 +154,9 @@ struct packet_stacked_data
- 
- struct pktcdvd_device
- {
--	struct block_device	*bdev;		/* dev attached */
-+	struct bdev_handle	*bdev_handle;	/* dev attached */
-+	/* handle acquired for bdev during pkt_open_dev() */
-+	struct bdev_handle	*open_bdev_handle;
- 	dev_t			pkt_dev;	/* our dev */
- 	struct packet_settings	settings;
- 	struct packet_stats	stats;
+ 	fs_put_dax(dif->dax_dev, NULL);
+-	if (dif->bdev)
+-		blkdev_put(dif->bdev, &erofs_fs_type);
++	if (dif->bdev_handle)
++		bdev_release(dif->bdev_handle);
+ 	erofs_fscache_unregister_cookie(dif->fscache);
+ 	dif->fscache = NULL;
+ 	kfree(dif->path);
 -- 
 2.35.3
 
