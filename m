@@ -2,206 +2,340 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE81C07E8C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F9E1C04FE0
 	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234479AbjHKLFO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 07:05:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51730 "EHLO
+        id S234821AbjHKLFP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 07:05:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235310AbjHKLFJ (ORCPT
+        with ESMTP id S235466AbjHKLFJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 11 Aug 2023 07:05:09 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53ED9E54;
-        Fri, 11 Aug 2023 04:05:06 -0700 (PDT)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1DB10F5;
+        Fri, 11 Aug 2023 04:05:07 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id AF84B1F88C;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id D78A12187C;
         Fri, 11 Aug 2023 11:05:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1691751905; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=K5wfkPoMhWhP47Ra7Ax8BVTcGQ61zn6XCMvvAECBO/A=;
-        b=S/QvnXit4Pfmxgo5k5gV5dngteTfGSxfvrSuMNPRab+lxRoW07uR7+cJwFq0FehBqej6Ku
-        7ry7EA2vAmTlkF1Iw8CQJvX6nqg0Sm0RzHi4sECb3owP7U3RHB832v9ok45gMx9F3Rs6Oe
-        DWdoJ82XyqkYsEFu8VgsRUiKcOvrgJM=
+        bh=AZvF9pAwZdklJY8vKsCkFwxQNHKU8QvDPK+3FubBNW4=;
+        b=WLx62Ko/jgBBvdCWMhuempkg1jYWkVWnVhJI0hK5p38A0KowpvPCy392DZHKfbu/02afTK
+        L96ZYvQKMSnfzJYJ4u9clhCUxLb5FZsQnkjcNSCLKm+v4VaxU+un5OxoyE3If/L6ZyzcjZ
+        pIkh9fjwXfKvYKfLkMVqUaiyno9T89Y=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1691751905;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=K5wfkPoMhWhP47Ra7Ax8BVTcGQ61zn6XCMvvAECBO/A=;
-        b=MVC0lkrdD5vx5wGsB4A68x1+pY8aXZopT3Wqfqi8ya+SJgBff6KtC8Wqlq2JSNBYn3xCqq
-        sVC25G1NQ5e73KBg==
+        bh=AZvF9pAwZdklJY8vKsCkFwxQNHKU8QvDPK+3FubBNW4=;
+        b=8pEYkTCEnFeTF9VtaeqtjrUC06FH9uW7tQRD6wbK0o9Y/lZW11vTsVJSHDoCd8G45v+zdD
+        tWw2DzmdUaxEWeAg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9F60013592;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C1719139F3;
         Fri, 11 Aug 2023 11:05:05 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id wufmJuEV1mQ9RQAAMHmgww
+        id FZsbL+EV1mRJRQAAMHmgww
         (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:05 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id D9F24A077E; Fri, 11 Aug 2023 13:05:04 +0200 (CEST)
+        id EC67AA0782; Fri, 11 Aug 2023 13:05:04 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>
-Subject: [PATCH 06/29] rnbd-srv: Convert to use bdev_open_by_path()
-Date:   Fri, 11 Aug 2023 13:04:37 +0200
-Message-Id: <20230811110504.27514-6-jack@suse.cz>
+        linux-bcache@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH 09/29] bcache: Convert to bdev_open_by_path()
+Date:   Fri, 11 Aug 2023 13:04:40 +0200
+Message-Id: <20230811110504.27514-9-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230810171429.31759-1-jack@suse.cz>
 References: <20230810171429.31759-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5216; i=jack@suse.cz; h=from:subject; bh=u8NdlIxIl0m5bWsmEZwXaI5CixwiHwKBP/jCF++/M1M=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXI5Y76WSlClezo53KuXoEZXPxYGigcslWBLHYG gJSSLYaJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYVyAAKCRCcnaoHP2RA2WrfCA Dn30T0BKrpAbX88gQyt8ifJf4OcjhL6BqnzBgpuB2dnRp+x3QNN/V3U0kUJemkWFiStJ85lpYNDFVH wtxNdPrzKGCmkB4igIITplV9A+bENYmsV4MdOzkOubgEecAn868mr2Beu7L/2nUzkgZgUO49VtxBfU YvRZxSck5a8bWAdYRgGDXyuuL8PCEoQ+u7D/5zVImDHWWejyLKi5MD2R2OM+8/VdQScSMyBkU26Boj C4T/E/9lfndhN9tMkYkisPWkw/kz9k2r7ehq0bdmvaUsTTCDIpf1J0m/FKevrWRMBmXkmApBATx8St 6MKeNbzz6ZCkmT1SqipHAJaq+AQTjL
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8861; i=jack@suse.cz; h=from:subject; bh=D/9GvZD0KiQPJN6aSX5CywXNJLZa2jzUMmDtEFLHpkM=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXKqIdSvJNwkZ9OU7OEW5NYbAiaxmF9NOWZBKFl LzuUqCeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYVygAKCRCcnaoHP2RA2b0uCA Dje2hqXfjfJTBEIrOj/icWXEcdm+hYr5ui/588R2vKzpdoyMFnxmglUS7cezzehBbT1j+A2/sMGrb5 S0enjosV10Fp+piDmkaPPIfKfu0wAnxkd2yJI5YRyAvfridZy4HYoNZd/bKjHAjXYd66w0ghYp3nW2 qHH6SGf7u2NcVe4JZTFUFTzgxoLKP+BAIxOGFdazwfRHGvC39J7mJjm3ipz9wWHqiX5/ZhSYPDoAUE Bz9qGauSkBQYI/6ooBZZ8BwOWi0eYSqQsw/PjcvDXGVjtaO3GiL6cFDoFi/E6q/JqCQcDx7TziuU3r TMpxHPqKoFWtqLTx0SKJu42vQwVvlT
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert rnbd-srv to use bdev_open_by_path() and pass the handle
-around.
+Convert bcache to use bdev_open_by_path() and pass the handle around.
 
-CC: Jack Wang <jinpu.wang@ionos.com>
-CC: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
-Acked-by: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
+CC: linux-bcache@vger.kernel.org
+CC: Coly Li <colyli@suse.de
+CC: Kent Overstreet <kent.overstreet@gmail.com>
+Acked-by: Coly Li <colyli@suse.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/rnbd/rnbd-srv.c | 27 ++++++++++++++-------------
- drivers/block/rnbd/rnbd-srv.h |  2 +-
- 2 files changed, 15 insertions(+), 14 deletions(-)
+ drivers/md/bcache/bcache.h |  2 +
+ drivers/md/bcache/super.c  | 78 ++++++++++++++++++++------------------
+ 2 files changed, 43 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index c186df0ec641..65de51f3dfd9 100644
---- a/drivers/block/rnbd/rnbd-srv.c
-+++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -145,7 +145,7 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
- 	priv->sess_dev = sess_dev;
- 	priv->id = id;
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 5a79bb3c272f..2aa3f2c1f719 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -299,6 +299,7 @@ struct cached_dev {
+ 	struct list_head	list;
+ 	struct bcache_device	disk;
+ 	struct block_device	*bdev;
++	struct bdev_handle	*bdev_handle;
  
--	bio = bio_alloc(sess_dev->bdev, 1,
-+	bio = bio_alloc(sess_dev->bdev_handle->bdev, 1,
- 			rnbd_to_bio_flags(le32_to_cpu(msg->rw)), GFP_KERNEL);
- 	if (bio_add_page(bio, virt_to_page(data), datalen,
- 			offset_in_page(data)) != datalen) {
-@@ -219,7 +219,7 @@ void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *sess_dev, bool keep_id)
- 	rnbd_put_sess_dev(sess_dev);
- 	wait_for_completion(&dc); /* wait for inflights to drop to zero */
+ 	struct cache_sb		sb;
+ 	struct cache_sb_disk	*sb_disk;
+@@ -421,6 +422,7 @@ struct cache {
  
--	blkdev_put(sess_dev->bdev, NULL);
-+	bdev_release(sess_dev->bdev_handle);
- 	mutex_lock(&sess_dev->dev->lock);
- 	list_del(&sess_dev->dev_list);
- 	if (!sess_dev->readonly)
-@@ -534,7 +534,7 @@ rnbd_srv_get_or_create_srv_dev(struct block_device *bdev,
- static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
- 					struct rnbd_srv_sess_dev *sess_dev)
+ 	struct kobject		kobj;
+ 	struct block_device	*bdev;
++	struct bdev_handle	*bdev_handle;
+ 
+ 	struct task_struct	*alloc_thread;
+ 
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 0ae2b3676293..c11ac86be72b 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1368,8 +1368,8 @@ static void cached_dev_free(struct closure *cl)
+ 	if (dc->sb_disk)
+ 		put_page(virt_to_page(dc->sb_disk));
+ 
+-	if (!IS_ERR_OR_NULL(dc->bdev))
+-		blkdev_put(dc->bdev, dc);
++	if (dc->bdev_handle)
++		bdev_release(dc->bdev_handle);
+ 
+ 	wake_up(&unregister_wait);
+ 
+@@ -1444,7 +1444,7 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+ /* Cached device - bcache superblock */
+ 
+ static int register_bdev(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+-				 struct block_device *bdev,
++				 struct bdev_handle *bdev_handle,
+ 				 struct cached_dev *dc)
  {
--	struct block_device *bdev = sess_dev->bdev;
-+	struct block_device *bdev = sess_dev->bdev_handle->bdev;
+ 	const char *err = "cannot allocate memory";
+@@ -1452,14 +1452,15 @@ static int register_bdev(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 	int ret = -ENOMEM;
  
- 	rsp->hdr.type = cpu_to_le16(RNBD_MSG_OPEN_RSP);
- 	rsp->device_id = cpu_to_le32(sess_dev->device_id);
-@@ -559,7 +559,7 @@ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
- static struct rnbd_srv_sess_dev *
- rnbd_srv_create_set_sess_dev(struct rnbd_srv_session *srv_sess,
- 			      const struct rnbd_msg_open *open_msg,
--			      struct block_device *bdev, bool readonly,
-+			      struct bdev_handle *handle, bool readonly,
- 			      struct rnbd_srv_dev *srv_dev)
+ 	memcpy(&dc->sb, sb, sizeof(struct cache_sb));
+-	dc->bdev = bdev;
++	dc->bdev_handle = bdev_handle;
++	dc->bdev = bdev_handle->bdev;
+ 	dc->sb_disk = sb_disk;
+ 
+ 	if (cached_dev_init(dc, sb->block_size << 9))
+ 		goto err;
+ 
+ 	err = "error creating kobject";
+-	if (kobject_add(&dc->disk.kobj, bdev_kobj(bdev), "bcache"))
++	if (kobject_add(&dc->disk.kobj, bdev_kobj(dc->bdev), "bcache"))
+ 		goto err;
+ 	if (bch_cache_accounting_add_kobjs(&dc->accounting, &dc->disk.kobj))
+ 		goto err;
+@@ -2216,8 +2217,8 @@ void bch_cache_release(struct kobject *kobj)
+ 	if (ca->sb_disk)
+ 		put_page(virt_to_page(ca->sb_disk));
+ 
+-	if (!IS_ERR_OR_NULL(ca->bdev))
+-		blkdev_put(ca->bdev, ca);
++	if (ca->bdev_handle)
++		bdev_release(ca->bdev_handle);
+ 
+ 	kfree(ca);
+ 	module_put(THIS_MODULE);
+@@ -2337,16 +2338,18 @@ static int cache_alloc(struct cache *ca)
+ }
+ 
+ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+-				struct block_device *bdev, struct cache *ca)
++				struct bdev_handle *bdev_handle,
++				struct cache *ca)
  {
- 	struct rnbd_srv_sess_dev *sdev = rnbd_sess_dev_alloc(srv_sess);
-@@ -571,7 +571,7 @@ rnbd_srv_create_set_sess_dev(struct rnbd_srv_session *srv_sess,
+ 	const char *err = NULL; /* must be set for any error case */
+ 	int ret = 0;
  
- 	strscpy(sdev->pathname, open_msg->dev_name, sizeof(sdev->pathname));
+ 	memcpy(&ca->sb, sb, sizeof(struct cache_sb));
+-	ca->bdev = bdev;
++	ca->bdev_handle = bdev_handle;
++	ca->bdev = bdev_handle->bdev;
+ 	ca->sb_disk = sb_disk;
  
--	sdev->bdev		= bdev;
-+	sdev->bdev_handle	= handle;
- 	sdev->sess		= srv_sess;
- 	sdev->dev		= srv_dev;
- 	sdev->readonly		= readonly;
-@@ -676,7 +676,7 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
- 	struct rnbd_srv_dev *srv_dev;
- 	struct rnbd_srv_sess_dev *srv_sess_dev;
- 	const struct rnbd_msg_open *open_msg = msg;
+-	if (bdev_max_discard_sectors((bdev)))
++	if (bdev_max_discard_sectors((bdev_handle->bdev)))
+ 		ca->discard = CACHE_DISCARD(&ca->sb);
+ 
+ 	ret = cache_alloc(ca);
+@@ -2354,10 +2357,10 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 		/*
+ 		 * If we failed here, it means ca->kobj is not initialized yet,
+ 		 * kobject_put() won't be called and there is no chance to
+-		 * call blkdev_put() to bdev in bch_cache_release(). So we
+-		 * explicitly call blkdev_put() here.
++		 * call bdev_release() to bdev in bch_cache_release(). So
++		 * we explicitly call bdev_release() here.
+ 		 */
+-		blkdev_put(bdev, ca);
++		bdev_release(bdev_handle);
+ 		if (ret == -ENOMEM)
+ 			err = "cache_alloc(): -ENOMEM";
+ 		else if (ret == -EPERM)
+@@ -2367,7 +2370,7 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 		goto err;
+ 	}
+ 
+-	if (kobject_add(&ca->kobj, bdev_kobj(bdev), "bcache")) {
++	if (kobject_add(&ca->kobj, bdev_kobj(bdev_handle->bdev), "bcache")) {
+ 		err = "error calling kobject_add";
+ 		ret = -ENOMEM;
+ 		goto out;
+@@ -2382,14 +2385,14 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 		goto out;
+ 	}
+ 
+-	pr_info("registered cache device %pg\n", ca->bdev);
++	pr_info("registered cache device %pg\n", ca->bdev_handle->bdev);
+ 
+ out:
+ 	kobject_put(&ca->kobj);
+ 
+ err:
+ 	if (err)
+-		pr_notice("error %pg: %s\n", ca->bdev, err);
++		pr_notice("error %pg: %s\n", ca->bdev_handle->bdev, err);
+ 
+ 	return ret;
+ }
+@@ -2445,7 +2448,7 @@ struct async_reg_args {
+ 	char *path;
+ 	struct cache_sb *sb;
+ 	struct cache_sb_disk *sb_disk;
 -	struct block_device *bdev;
 +	struct bdev_handle *bdev_handle;
- 	blk_mode_t open_flags = BLK_OPEN_READ;
- 	char *full_path;
- 	struct rnbd_msg_open_rsp *rsp = data;
-@@ -714,15 +714,15 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
- 		goto reject;
+ 	void *holder;
+ };
+ 
+@@ -2456,8 +2459,8 @@ static void register_bdev_worker(struct work_struct *work)
+ 		container_of(work, struct async_reg_args, reg_work.work);
+ 
+ 	mutex_lock(&bch_register_lock);
+-	if (register_bdev(args->sb, args->sb_disk, args->bdev, args->holder)
+-	    < 0)
++	if (register_bdev(args->sb, args->sb_disk, args->bdev_handle,
++			  args->holder) < 0)
+ 		fail = true;
+ 	mutex_unlock(&bch_register_lock);
+ 
+@@ -2477,7 +2480,8 @@ static void register_cache_worker(struct work_struct *work)
+ 		container_of(work, struct async_reg_args, reg_work.work);
+ 
+ 	/* blkdev_put() will be called in bch_cache_release() */
+-	if (register_cache(args->sb, args->sb_disk, args->bdev, args->holder))
++	if (register_cache(args->sb, args->sb_disk, args->bdev_handle,
++			   args->holder))
+ 		fail = true;
+ 
+ 	if (fail)
+@@ -2514,7 +2518,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	char *path = NULL;
+ 	struct cache_sb *sb;
+ 	struct cache_sb_disk *sb_disk;
+-	struct block_device *bdev, *bdev2;
++	struct bdev_handle *bdev_handle, *bdev_handle2;
+ 	void *holder = NULL;
+ 	ssize_t ret;
+ 	bool async_registration = false;
+@@ -2547,15 +2551,15 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 
+ 	ret = -EINVAL;
+ 	err = "failed to open device";
+-	bdev = blkdev_get_by_path(strim(path), BLK_OPEN_READ, NULL, NULL);
+-	if (IS_ERR(bdev))
++	bdev_handle = bdev_open_by_path(strim(path), BLK_OPEN_READ, NULL, NULL);
++	if (IS_ERR(bdev_handle))
+ 		goto out_free_sb;
+ 
+ 	err = "failed to set blocksize";
+-	if (set_blocksize(bdev, 4096))
++	if (set_blocksize(bdev_handle->bdev, 4096))
+ 		goto out_blkdev_put;
+ 
+-	err = read_super(sb, bdev, &sb_disk);
++	err = read_super(sb, bdev_handle->bdev, &sb_disk);
+ 	if (err)
+ 		goto out_blkdev_put;
+ 
+@@ -2567,13 +2571,13 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
  	}
  
--	bdev = blkdev_get_by_path(full_path, open_flags, NULL, NULL);
+ 	/* Now reopen in exclusive mode with proper holder */
+-	bdev2 = blkdev_get_by_dev(bdev->bd_dev, BLK_OPEN_READ | BLK_OPEN_WRITE,
+-				  holder, NULL);
+-	blkdev_put(bdev, NULL);
+-	bdev = bdev2;
 -	if (IS_ERR(bdev)) {
 -		ret = PTR_ERR(bdev);
-+	bdev_handle = bdev_open_by_path(full_path, open_flags, NULL, NULL);
+-		bdev = NULL;
++	bdev_handle2 = bdev_open_by_dev(bdev_handle->bdev->bd_dev,
++			BLK_OPEN_READ | BLK_OPEN_WRITE, holder, NULL);
++	bdev_release(bdev_handle);
++	bdev_handle = bdev_handle2;
 +	if (IS_ERR(bdev_handle)) {
 +		ret = PTR_ERR(bdev_handle);
- 		pr_err("Opening device '%s' on session %s failed, failed to open the block device, err: %d\n",
- 		       full_path, srv_sess->sessname, ret);
- 		goto free_path;
- 	}
++		bdev_handle = NULL;
+ 		if (ret == -EBUSY) {
+ 			dev_t dev;
  
--	srv_dev = rnbd_srv_get_or_create_srv_dev(bdev, srv_sess,
-+	srv_dev = rnbd_srv_get_or_create_srv_dev(bdev_handle->bdev, srv_sess,
- 						  open_msg->access_mode);
- 	if (IS_ERR(srv_dev)) {
- 		pr_err("Opening device '%s' on session %s failed, creating srv_dev failed, err: %ld\n",
-@@ -731,7 +731,8 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
- 		goto blkdev_put;
- 	}
+@@ -2608,7 +2612,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 		args->path	= path;
+ 		args->sb	= sb;
+ 		args->sb_disk	= sb_disk;
+-		args->bdev	= bdev;
++		args->bdev_handle	= bdev_handle;
+ 		args->holder	= holder;
+ 		register_device_async(args);
+ 		/* No wait and returns to user space */
+@@ -2617,14 +2621,14 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
  
--	srv_sess_dev = rnbd_srv_create_set_sess_dev(srv_sess, open_msg, bdev,
-+	srv_sess_dev = rnbd_srv_create_set_sess_dev(srv_sess, open_msg,
-+				bdev_handle,
- 				open_msg->access_mode == RNBD_ACCESS_RO,
- 				srv_dev);
- 	if (IS_ERR(srv_sess_dev)) {
-@@ -747,7 +748,7 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
- 	 */
- 	mutex_lock(&srv_dev->lock);
- 	if (!srv_dev->dev_kobj.state_in_sysfs) {
--		ret = rnbd_srv_create_dev_sysfs(srv_dev, bdev);
-+		ret = rnbd_srv_create_dev_sysfs(srv_dev, bdev_handle->bdev);
- 		if (ret) {
- 			mutex_unlock(&srv_dev->lock);
- 			rnbd_srv_err(srv_sess_dev,
-@@ -790,7 +791,7 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
+ 	if (SB_IS_BDEV(sb)) {
+ 		mutex_lock(&bch_register_lock);
+-		ret = register_bdev(sb, sb_disk, bdev, holder);
++		ret = register_bdev(sb, sb_disk, bdev_handle, holder);
+ 		mutex_unlock(&bch_register_lock);
+ 		/* blkdev_put() will be called in cached_dev_free() */
+ 		if (ret < 0)
+ 			goto out_free_sb;
+ 	} else {
+ 		/* blkdev_put() will be called in bch_cache_release() */
+-		ret = register_cache(sb, sb_disk, bdev, holder);
++		ret = register_cache(sb, sb_disk, bdev_handle, holder);
+ 		if (ret)
+ 			goto out_free_sb;
  	}
- 	rnbd_put_srv_dev(srv_dev);
- blkdev_put:
--	blkdev_put(bdev, NULL);
-+	bdev_release(bdev_handle);
- free_path:
- 	kfree(full_path);
- reject:
-diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
-index 1027656dedb0..343cc682b617 100644
---- a/drivers/block/rnbd/rnbd-srv.h
-+++ b/drivers/block/rnbd/rnbd-srv.h
-@@ -46,7 +46,7 @@ struct rnbd_srv_dev {
- struct rnbd_srv_sess_dev {
- 	/* Entry inside rnbd_srv_dev struct */
- 	struct list_head		dev_list;
--	struct block_device		*bdev;
-+	struct bdev_handle		*bdev_handle;
- 	struct rnbd_srv_session		*sess;
- 	struct rnbd_srv_dev		*dev;
- 	struct kobject                  kobj;
+@@ -2640,8 +2644,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ out_put_sb_page:
+ 	put_page(virt_to_page(sb_disk));
+ out_blkdev_put:
+-	if (bdev)
+-		blkdev_put(bdev, holder);
++	if (bdev_handle)
++		bdev_release(bdev_handle);
+ out_free_sb:
+ 	kfree(sb);
+ out_free_path:
 -- 
 2.35.3
 
