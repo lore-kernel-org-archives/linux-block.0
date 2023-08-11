@@ -2,275 +2,364 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BD6C04A6A
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C1BEC04A94
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:20:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236173AbjHKLGL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 07:06:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50578 "EHLO
+        id S236271AbjHKLT6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 07:19:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234475AbjHKLFh (ORCPT
+        with ESMTP id S236260AbjHKLT5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 07:05:37 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71EE11724;
-        Fri, 11 Aug 2023 04:05:11 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 865FA21889;
-        Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1691751906; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HLZ+FJ5a3X4cEmI/4w/njr2u9gvoqCcJ5q5FaxPPw/w=;
-        b=0FVT7xD48P76tt0888SfRlPEilbt2oCqiO7UBAGJq47tsvozHYgzGRnVb2J2c+fy1srV94
-        p4pu/6lGi8JXttQiHi04eW0Wr0HP3Pc9+ktcCsSQ7rIdtZiHAdZUftvcdkD8V55+cLZEwT
-        AzJZyPr1H6D6dKXaj/uUI5k+93pH7iM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1691751906;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HLZ+FJ5a3X4cEmI/4w/njr2u9gvoqCcJ5q5FaxPPw/w=;
-        b=hSsK4450WmES2AmWHYSPdYVDieNKLOSp2q2vs7bSK8PbRVguVyOhEcuqmOfspmCqe7IROp
-        uxgdPiODz0yyllDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 75A49139FD;
-        Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id eXa2HOIV1mR8RQAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:06 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 63F48A077C; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
-From:   Jan Kara <jack@suse.cz>
-To:     <linux-fsdevel@vger.kernel.org>
-Cc:     <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org
-Subject: [PATCH 28/29] xfs: Convert to bdev_open_by_path()
-Date:   Fri, 11 Aug 2023 13:04:59 +0200
-Message-Id: <20230811110504.27514-28-jack@suse.cz>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230810171429.31759-1-jack@suse.cz>
-References: <20230810171429.31759-1-jack@suse.cz>
+        Fri, 11 Aug 2023 07:19:57 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84815E62
+        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 04:19:56 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230811111952epoutp014c6e6bb347e972853a0ae3023c063b3f~6UDN6r6rQ2881128811epoutp01-
+        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 11:19:52 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230811111952epoutp014c6e6bb347e972853a0ae3023c063b3f~6UDN6r6rQ2881128811epoutp01-
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1691752792;
+        bh=41IvKjB7ObpkkH3NYijSy6MXGGyUeHBmOD8f30Qm08Q=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=QGSpliyXUEtPGIX0MC35lPgbk3L8X3cEpNg4j7B1l/tIj1O1LQghTnXQVsa9v88i6
+         +9iOwjqo8aUOSMSyAhO4pFvR74tDkwiXkHI3n6hoNl6QMQAbbZZYUlwP1GieQav4ny
+         7ol7D2Iw2MbFLy4c1PxIIkwL+NPiAnaHxkuBIU7g=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20230811111951epcas5p38cb788aa62be90c0ec50fb384ee4da88~6UDNLo1WG0875108751epcas5p3r;
+        Fri, 11 Aug 2023 11:19:51 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.180]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4RMhCV0lPnz4x9Q2; Fri, 11 Aug
+        2023 11:19:50 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        DF.14.57354.55916D46; Fri, 11 Aug 2023 20:19:49 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230811105627epcas5p1aa1ef0e58bcd0fc05a072c8b40dcfb96~6TuyHqoMl0561805618epcas5p1k;
+        Fri, 11 Aug 2023 10:56:27 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230811105627epsmtrp2c5c278f27b4947c70ec3bc65bd97da43~6TuyGnG362478224782epsmtrp29;
+        Fri, 11 Aug 2023 10:56:27 +0000 (GMT)
+X-AuditID: b6c32a44-269fb7000001e00a-bb-64d619550934
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        50.01.30535.BD316D46; Fri, 11 Aug 2023 19:56:27 +0900 (KST)
+Received: from green245.sa.corp.samsungelectronics.net (unknown
+        [107.99.41.245]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230811105623epsmtip28b74e7eda337ae274ac1e8f3adb2de6c~6TuubT0QE1205912059epsmtip2g;
+        Fri, 11 Aug 2023 10:56:23 +0000 (GMT)
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>
+Cc:     martin.petersen@oracle.com, mcgrof@kernel.org, dlemoal@kernel.org,
+        gost.dev@samsung.com, Nitesh Shetty <nj.shetty@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH v14 00/11] Implement copy offload support
+Date:   Fri, 11 Aug 2023 16:22:43 +0530
+Message-Id: <20230811105300.15889-1-nj.shetty@samsung.com>
+X-Mailer: git-send-email 2.35.1.500.gb896f729e2
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6314; i=jack@suse.cz; h=from:subject; bh=fCjnbGQr51LNGcYyGIghmqbMHxMe2tOBpGwL5yVXyrI=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXbRdI4pAvtDs4EY4hf6cZ1EYHrW+thCvo+0j6u RYOSosaJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYV2wAKCRCcnaoHP2RA2STTB/ 9p/Wg8zf6BN1kxctm4RBmge70UgXLo6Gc2H0ucTrlG/O74Pf/W+3OBLSsF8m4xoGZ+C4iwk/LLiJS3 EJ0xZcjzzQ9l3Tcn9tJo7TNtrkEtXTD0QuLyFdmkj4YIoSZ0sHBu4WkperW5rUAbuvfp9pSp/SpDsE TvnGxGHWvLa8iVhks2Zy2mi69tPNKKE3wN1dPAwRBUbiand/16/XGBVypHJVXQjt50YMYyMez/s7xs v/U0DzS2BaPPGQlvnDPhif/swjs1rdBH0e+kEdglFNyqifrP2uzczruwSokMcei1z/DZHBu8qOInMm VKtorQWvsAWi1DJLVnts3Itl/1xQMs
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01TbUxTZxTOe+9tucKYlyrbC5PJalwEB7QK5cXAlIlyIxviGHNz4aOhd0CA
+        tukHIku0UxgfTtBNR1Y+6gJBAddKQQZ07QigIEYQDJWyqdvSTjNi2SSCCrK1XNz895znnOc8
+        57wfJM5zcP3JHKmKUUjFeXyuJ9HZH7QpJMXPKhGUGaORYfgKjlpvV3HRdP9DgOy9pQD9+tN2
+        ZHbWcJCttxtDza2XMfRVnxUgx4QWQ+apzei7LxoJ9KP5KoFu9tRyka7J4YHODS5haPKkA6DO
+        BR2O9NMzBBqaeg2NPhvk7PClR++0EfTN62ra2FLOpdsbj9Amm4ZLN1R+zaFPHHNy6b8dUwQ9
+        Y5ng0pUdLYCeNb5OG+0PsKSXDuRGZzNiCaMIZKSZMkmONCuGn5CcvjM9QiQQhgijUCQ/UCrO
+        Z2L4ce8mhezOyXOtyg8sEOepXVSSWKnkh70drZCpVUxgtkypiuEzckmePFweqhTnK9XSrFAp
+        o9omFAi2RLgKM3Kzyx6Zcbk+oVDzZB7TgNrICkCSkAqHI0N4BfAkeZQJwKUx80rwEMDLZh2H
+        DeZcGesItwKsWlYslS4SbMIM4B/jbSuSEgyeHhvycPflUpvhtX9IN7+W0uDwoqkBuNU4pcOg
+        2fmxu2YNFQU79Dw3TVAb4aOnFsyNvaltsGXCRrDjhcGquz4s7QOvfmsn2C7r4bFLNcu2kHpM
+        wuk2K84OFwevPz1OsHgN/HOww4PF/nDWaV5Z4CBsPn2ey4qLAdTe0gI2sR2WDFfhbmOcCoKG
+        njCWDoBnhvUYa/wyPLFgx1jeG3bVP8cb4AXD2ZX+ftA6//kKpuHj1iHgbsmjUqG1ZM9JsF77
+        wjraF9bR/m98FuAtwI+RK/OzmMwIuVDKHPzvWjNl+Uaw/N6D47rApG4ptA9gJOgDkMT5a71j
+        ksclPG+J+FARo5ClK9R5jLIPRLiO+BTu75spc30YqSpdGB4lCBeJROFRW0VC/qve0yV1Eh6V
+        JVYxuQwjZxTPdRi5yl+DVafGi8jI/NimvUGmec+NV4y9TkFkl+PeWx/tOXKqzCujPYLzwCdF
+        Dtp337pQEIDfuJNhXf/GjEds2obfyvGC0RtFOb1e+k9GL8YnZr5pq7o/c62zIG7EHL9r0ZRt
+        mbPd/cvLsi/4XvIWImSGN2b1bkgPSNkbX9tZvi/t8G0UMJs4wBuOt4e8sunLYo3qnf22S5/p
+        v2+rnKuvru+JHRceHvBdLfhlXbGX4v0wwY6t31SmPjtk6R9v+lCzLlHw84DatKvofNvqugSd
+        qYbRN+1Uiro93/udU/jpGcs581F7KXRm1BUVxhgWD0w+MTRXf0Df/yF4csFQXdOdctTfmra/
+        cpwUNvIJZbZYGIwrlOJ/Aa5MhSB4BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrOIsWRmVeSWpSXmKPExsWy7bCSvO5t4WspBj92q1qsP3WM2WL13X42
+        i9eHPzFaPDnQzmjxYL+9xd53s1ktbh7YyWSxcvVRJotJh64xWjy9OovJYu8tbYuFbUtYLPbs
+        PclicXnXHDaL+cueslssP/6PyeLGhKeMFtt+z2e2WPf6PYvFiVvSFuf/Hmd1EPU4f28ji8fl
+        s6Uem1Z1snlsXlLvsftmA5vH4r7JrB69ze/YPD4+vcXi8X7fVTaPvi2rGD0+b5Lz2PTkLVMA
+        TxSXTUpqTmZZapG+XQJXRsfXvcwF67wrGn5+Z2pgnGPexcjJISFgIvGv/Q9LFyMXh5DAbkaJ
+        6d3HWCASkhLL/h5hhrCFJVb+e84OYgsJNDNJ/Hwq3MXIwcEmoC1x+j8HSK+IQBezROfOd2CD
+        mAVWMknsPDyTEaRIWMBSYss6IZBeFgFVia+/9jGB2LwCVhKrrt5kASmRENCX6L8vCBEWlDg5
+        8wlYmFlAXWL9PLBOZgF5ieats5knMPLPQlI1C6FqFpKqBYzMqxglUwuKc9Nziw0LjPJSy/WK
+        E3OLS/PS9ZLzczcxguNSS2sH455VH/QOMTJxMB5ilOBgVhLhtQ2+lCLEm5JYWZValB9fVJqT
+        WnyIUZqDRUmc99vr3hQhgfTEktTs1NSC1CKYLBMHp1QDk03on9CPizq3F4X6cgR1c0Uned/3
+        LD51Uv5WzbHoW/tOFC7Qmum99qB+f1Z83tZswbXTdwUf+ZvwYPanqfE8T/Nvfs9bcJkr10ag
+        fGeBrqHgYleDMtdNUoeu3kywF/q3b3+0kKV92UPJwh1VF8XO73F/PuXgns5VlybNLEu+sOyT
+        fpIPB8dErbNVetmaDQpLmu5pHb10qHXiBvFo+R326Qv11bs3VLxgTjiR5HRC9481z/86p9OT
+        HpmW2TUrPD/zdo/IumQxsV02NrNYr55VlGZ1SUxtvH796K2Oy0k6zEsuyX38c/+JYrp/6oos
+        6/+M16JXf5N/ILfoVXbv+4tH95lrL295srVOsuv+jAk9RUosxRmJhlrMRcWJADyY9Ao6AwAA
+X-CMS-MailID: 20230811105627epcas5p1aa1ef0e58bcd0fc05a072c8b40dcfb96
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230811105627epcas5p1aa1ef0e58bcd0fc05a072c8b40dcfb96
+References: <CGME20230811105627epcas5p1aa1ef0e58bcd0fc05a072c8b40dcfb96@epcas5p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert xfs to use bdev_open_by_path() and pass the handle around.
+The patch series covers the points discussed in past and most recently
+in LSFMM'23[0].
+We have covered the initial agreed requirements in this patch set and
+further additional features suggested by community.
 
-CC: "Darrick J. Wong" <djwong@kernel.org>
-CC: linux-xfs@vger.kernel.org
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/xfs/xfs_buf.c   | 11 +++++-----
- fs/xfs/xfs_buf.h   |  3 ++-
- fs/xfs/xfs_super.c | 54 +++++++++++++++++++++++++---------------------
- 3 files changed, 37 insertions(+), 31 deletions(-)
+This is next iteration of our previous patch set v13[1].
+We achieve copy offload by sending 2 bio's with source and destination
+info and merge them to form a request. This request is sent to driver.
+So this design works only for request based storage drivers.
 
-diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-index 15d1e5a7c2d3..461a5fb6155b 100644
---- a/fs/xfs/xfs_buf.c
-+++ b/fs/xfs/xfs_buf.c
-@@ -1989,7 +1989,7 @@ xfs_setsize_buftarg_early(
- struct xfs_buftarg *
- xfs_alloc_buftarg(
- 	struct xfs_mount	*mp,
--	struct block_device	*bdev)
-+	struct bdev_handle	*bdev_handle)
- {
- 	xfs_buftarg_t		*btp;
- 	const struct dax_holder_operations *ops = NULL;
-@@ -2000,9 +2000,10 @@ xfs_alloc_buftarg(
- 	btp = kmem_zalloc(sizeof(*btp), KM_NOFS);
- 
- 	btp->bt_mount = mp;
--	btp->bt_dev =  bdev->bd_dev;
--	btp->bt_bdev = bdev;
--	btp->bt_daxdev = fs_dax_get_by_bdev(bdev, &btp->bt_dax_part_off,
-+	btp->bt_bdev_handle = bdev_handle;
-+	btp->bt_dev =  bdev_handle->bdev->bd_dev;
-+	btp->bt_bdev = bdev_handle->bdev;
-+	btp->bt_daxdev = fs_dax_get_by_bdev(btp->bt_bdev, &btp->bt_dax_part_off,
- 					    mp, ops);
- 
- 	/*
-@@ -2012,7 +2013,7 @@ xfs_alloc_buftarg(
- 	ratelimit_state_init(&btp->bt_ioerror_rl, 30 * HZ,
- 			     DEFAULT_RATELIMIT_BURST);
- 
--	if (xfs_setsize_buftarg_early(btp, bdev))
-+	if (xfs_setsize_buftarg_early(btp, btp->bt_bdev))
- 		goto error_free;
- 
- 	if (list_lru_init(&btp->bt_lru))
-diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
-index 549c60942208..f6418c1312f5 100644
---- a/fs/xfs/xfs_buf.h
-+++ b/fs/xfs/xfs_buf.h
-@@ -92,6 +92,7 @@ typedef unsigned int xfs_buf_flags_t;
-  */
- typedef struct xfs_buftarg {
- 	dev_t			bt_dev;
-+	struct bdev_handle	*bt_bdev_handle;
- 	struct block_device	*bt_bdev;
- 	struct dax_device	*bt_daxdev;
- 	u64			bt_dax_part_off;
-@@ -351,7 +352,7 @@ xfs_buf_update_cksum(struct xfs_buf *bp, unsigned long cksum_offset)
-  *	Handling of buftargs.
-  */
- struct xfs_buftarg *xfs_alloc_buftarg(struct xfs_mount *mp,
--		struct block_device *bdev);
-+		struct bdev_handle *bdev_handle);
- extern void xfs_free_buftarg(struct xfs_buftarg *);
- extern void xfs_buftarg_wait(struct xfs_buftarg *);
- extern void xfs_buftarg_drain(struct xfs_buftarg *);
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index 5340f2dc28bd..6189f726b309 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -381,14 +381,15 @@ STATIC int
- xfs_blkdev_get(
- 	xfs_mount_t		*mp,
- 	const char		*name,
--	struct block_device	**bdevp)
-+	struct bdev_handle	**handlep)
- {
- 	int			error = 0;
- 
--	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
--				    mp->m_super, &fs_holder_ops);
--	if (IS_ERR(*bdevp)) {
--		error = PTR_ERR(*bdevp);
-+	*handlep = bdev_open_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
-+				     mp->m_super, &fs_holder_ops);
-+	if (IS_ERR(*handlep)) {
-+		error = PTR_ERR(*handlep);
-+		*handlep = NULL;
- 		xfs_warn(mp, "Invalid device [%s], error=%d", name, error);
- 	}
- 
-@@ -397,11 +398,10 @@ xfs_blkdev_get(
- 
- STATIC void
- xfs_blkdev_put(
--	struct xfs_mount	*mp,
--	struct block_device	*bdev)
-+	struct bdev_handle	*handle)
- {
--	if (bdev)
--		blkdev_put(bdev, mp->m_super);
-+	if (handle)
-+		bdev_release(handle);
- }
- 
- STATIC void
-@@ -409,16 +409,18 @@ xfs_close_devices(
- 	struct xfs_mount	*mp)
- {
- 	if (mp->m_logdev_targp && mp->m_logdev_targp != mp->m_ddev_targp) {
--		struct block_device *logdev = mp->m_logdev_targp->bt_bdev;
-+		struct bdev_handle *logdev_handle =
-+			mp->m_logdev_targp->bt_bdev_handle;
- 
- 		xfs_free_buftarg(mp->m_logdev_targp);
--		xfs_blkdev_put(mp, logdev);
-+		xfs_blkdev_put(logdev_handle);
- 	}
- 	if (mp->m_rtdev_targp) {
--		struct block_device *rtdev = mp->m_rtdev_targp->bt_bdev;
-+		struct bdev_handle *rtdev_handle =
-+			mp->m_rtdev_targp->bt_bdev_handle;
- 
- 		xfs_free_buftarg(mp->m_rtdev_targp);
--		xfs_blkdev_put(mp, rtdev);
-+		xfs_blkdev_put(rtdev_handle);
- 	}
- 	xfs_free_buftarg(mp->m_ddev_targp);
- }
-@@ -439,7 +441,7 @@ xfs_open_devices(
- {
- 	struct super_block	*sb = mp->m_super;
- 	struct block_device	*ddev = sb->s_bdev;
--	struct block_device	*logdev = NULL, *rtdev = NULL;
-+	struct bdev_handle	*logdev_handle = NULL, *rtdev_handle = NULL;
- 	int			error;
- 
- 	/*
-@@ -452,17 +454,19 @@ xfs_open_devices(
- 	 * Open real time and log devices - order is important.
- 	 */
- 	if (mp->m_logname) {
--		error = xfs_blkdev_get(mp, mp->m_logname, &logdev);
-+		error = xfs_blkdev_get(mp, mp->m_logname, &logdev_handle);
- 		if (error)
- 			goto out_relock;
- 	}
- 
- 	if (mp->m_rtname) {
--		error = xfs_blkdev_get(mp, mp->m_rtname, &rtdev);
-+		error = xfs_blkdev_get(mp, mp->m_rtname, &rtdev_handle);
- 		if (error)
- 			goto out_close_logdev;
- 
--		if (rtdev == ddev || rtdev == logdev) {
-+		if (rtdev_handle->bdev == ddev ||
-+		    (logdev_handle &&
-+		     rtdev_handle->bdev == logdev_handle->bdev)) {
- 			xfs_warn(mp,
- 	"Cannot mount filesystem with identical rtdev and ddev/logdev.");
- 			error = -EINVAL;
-@@ -474,18 +478,18 @@ xfs_open_devices(
- 	 * Setup xfs_mount buffer target pointers
- 	 */
- 	error = -ENOMEM;
--	mp->m_ddev_targp = xfs_alloc_buftarg(mp, ddev);
-+	mp->m_ddev_targp = xfs_alloc_buftarg(mp, sb->s_bdev_handle);
- 	if (!mp->m_ddev_targp)
- 		goto out_close_rtdev;
- 
--	if (rtdev) {
--		mp->m_rtdev_targp = xfs_alloc_buftarg(mp, rtdev);
-+	if (rtdev_handle) {
-+		mp->m_rtdev_targp = xfs_alloc_buftarg(mp, rtdev_handle);
- 		if (!mp->m_rtdev_targp)
- 			goto out_free_ddev_targ;
- 	}
- 
--	if (logdev && logdev != ddev) {
--		mp->m_logdev_targp = xfs_alloc_buftarg(mp, logdev);
-+	if (logdev_handle && logdev_handle->bdev != ddev) {
-+		mp->m_logdev_targp = xfs_alloc_buftarg(mp, logdev_handle);
- 		if (!mp->m_logdev_targp)
- 			goto out_free_rtdev_targ;
- 	} else {
-@@ -503,10 +507,10 @@ xfs_open_devices(
-  out_free_ddev_targ:
- 	xfs_free_buftarg(mp->m_ddev_targp);
-  out_close_rtdev:
--	xfs_blkdev_put(mp, rtdev);
-+	xfs_blkdev_put(rtdev_handle);
-  out_close_logdev:
--	if (logdev && logdev != ddev)
--		xfs_blkdev_put(mp, logdev);
-+	if (logdev_handle && logdev_handle->bdev != ddev)
-+		xfs_blkdev_put(logdev_handle);
- 	goto out_relock;
- }
- 
+Overall series supports:
+========================
+	1. Driver
+		- NVMe Copy command (single NS, TP 4065), including support
+		in nvme-target (for block and file back end).
+
+	2. Block layer
+		- Block-generic copy (REQ_OP_COPY_DST/SRC), operation with
+                  interface accommodating two block-devs
+                - Merging copy requests in request layer
+		- Emulation, for in-kernel user when offload is natively 
+                absent
+		- dm-linear support (for cases not requiring split)
+
+	3. User-interface
+		- copy_file_range
+
+Testing
+=======
+	Copy offload can be tested on:
+	a. QEMU: NVME simple copy (TP 4065). By setting nvme-ns
+		parameters mssrl,mcl, msrc. For more info [2].
+	b. Null block device
+        c. NVMe Fabrics loopback.
+	d. blktests[3]
+
+	Emulation can be tested on any device.
+
+	fio[4].
+
+Infra and plumbing:
+===================
+        We populate copy_file_range callback in def_blk_fops. 
+        For devices that support copy-offload, use blkdev_copy_offload to
+        achieve in-device copy.
+        However for cases, where device doesn't support offload,
+        fallback to generic_copy_file_range.
+        For in-kernel users (like NVMe fabrics), use blkdev_copy_offload
+        if device is copy offload capable or else fallback to emulation 
+        using blkdev_copy_emulation.
+        Modify checks in generic_copy_file_range to support block-device.
+
+Blktests[3]
+======================
+	tests/block/035-040: Runs copy offload and emulation on null
+                              block device.
+	tests/block/050,055: Runs copy offload and emulation on test
+                              nvme block device.
+        tests/nvme/056-067: Create a loop backed fabrics device and
+                              run copy offload and emulation.
+
+Future Work
+===========
+	- loopback device copy offload support
+	- upstream fio to use copy offload
+	- upstream blktest to test copy offload
+        - update man pages for copy_file_range
+        - expand in-kernel users of copy offload
+
+	These are to be taken up after this minimal series is agreed upon.
+
+Additional links:
+=================
+	[0] https://lore.kernel.org/linux-nvme/CA+1E3rJ7BZ7LjQXXTdX+-0Edz=zT14mmPGMiVCzUgB33C60tbQ@mail.gmail.com/
+            https://lore.kernel.org/linux-nvme/f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com/
+            https://lore.kernel.org/linux-nvme/20230113094648.15614-1-nj.shetty@samsung.com/
+	[1] https://lore.kernel.org/linux-nvme/20230627183629.26571-1-nj.shetty@samsung.com/
+	[2] https://qemu-project.gitlab.io/qemu/system/devices/nvme.html#simple-copy
+	[3] https://github.com/nitesh-shetty/blktests/tree/feat/copy_offload/v14
+	[4] https://github.com/OpenMPDK/fio/tree/copyoffload-3.35-v14
+
+Changes since v13:
+=================
+        - block:
+            1. Simplified copy offload and emulation helpers, now
+                  caller needs to decide between offload/emulation fallback
+            2. src,dst bio order change (Christoph Hellwig)
+            3. refcount changes similar to dio (Christoph Hellwig)
+            4. Single outstanding IO for copy emulation (Christoph Hellwig)
+            5. use copy_max_sectors to identify copy offload
+                  capability and other reviews (Damien, Christoph)
+            6. Return status in endio handler (Christoph Hellwig)
+        - nvme-fabrics: fallback to emulation in case of partial
+          offload completion
+        - in kernel user addition (Ming lei)
+        - indentation, documentation, minor fixes, misc changes (Damien,
+          Christoph)
+        - blktests changes to test kernel changes
+
+Changes since v12:
+=================
+        - block,nvme: Replaced token based approach with request based
+          single namespace capable approach (Christoph Hellwig)
+
+Changes since v11:
+=================
+        - Documentation: Improved documentation (Damien Le Moal)
+        - block,nvme: ssize_t return values (Darrick J. Wong)
+        - block: token is allocated to SECTOR_SIZE (Matthew Wilcox)
+        - block: mem leak fix (Maurizio Lombardi)
+
+Changes since v10:
+=================
+        - NVMeOF: optimization in NVMe fabrics (Chaitanya Kulkarni)
+        - NVMeOF: sparse warnings (kernel test robot)
+
+Changes since v9:
+=================
+        - null_blk, improved documentation, minor fixes(Chaitanya Kulkarni)
+        - fio, expanded testing and minor fixes (Vincent Fu)
+
+Changes since v8:
+=================
+        - null_blk, copy_max_bytes_hw is made config fs parameter
+          (Damien Le Moal)
+        - Negative error handling in copy_file_range (Christian Brauner)
+        - minor fixes, better documentation (Damien Le Moal)
+        - fio upgraded to 3.34 (Vincent Fu)
+
+Changes since v7:
+=================
+        - null block copy offload support for testing (Damien Le Moal)
+        - adding direct flag check for copy offload to block device,
+	  as we are using generic_copy_file_range for cached cases.
+        - Minor fixes
+
+Changes since v6:
+=================
+        - copy_file_range instead of ioctl for direct block device
+        - Remove support for multi range (vectored) copy
+        - Remove ioctl interface for copy.
+        - Remove offload support in dm kcopyd.
+
+Changes since v5:
+=================
+	- Addition of blktests (Chaitanya Kulkarni)
+        - Minor fix for fabrics file backed path
+        - Remove buggy zonefs copy file range implementation.
+
+Changes since v4:
+=================
+	- make the offload and emulation design asynchronous (Hannes
+	  Reinecke)
+	- fabrics loopback support
+	- sysfs naming improvements (Damien Le Moal)
+	- use kfree() instead of kvfree() in cio_await_completion
+	  (Damien Le Moal)
+	- use ranges instead of rlist to represent range_entry (Damien
+	  Le Moal)
+	- change argument ordering in blk_copy_offload suggested (Damien
+	  Le Moal)
+	- removed multiple copy limit and merged into only one limit
+	  (Damien Le Moal)
+	- wrap overly long lines (Damien Le Moal)
+	- other naming improvements and cleanups (Damien Le Moal)
+	- correctly format the code example in description (Damien Le
+	  Moal)
+	- mark blk_copy_offload as static (kernel test robot)
+	
+Changes since v3:
+=================
+	- added copy_file_range support for zonefs
+	- added documentation about new sysfs entries
+	- incorporated review comments on v3
+	- minor fixes
+
+Changes since v2:
+=================
+	- fixed possible race condition reported by Damien Le Moal
+	- new sysfs controls as suggested by Damien Le Moal
+	- fixed possible memory leak reported by Dan Carpenter, lkp
+	- minor fixes
+
+Changes since v1:
+=================
+	- sysfs documentation (Greg KH)
+        - 2 bios for copy operation (Bart Van Assche, Mikulas Patocka,
+          Martin K. Petersen, Douglas Gilbert)
+        - better payload design (Darrick J. Wong)
+
+Anuj Gupta (1):
+  fs/read_write: Enable copy_file_range for block device.
+
+Nitesh Shetty (10):
+  block: Introduce queue limits and sysfs for copy-offload support
+  Add infrastructure for copy offload in block and request layer.
+  block: add copy offload support
+  block: add emulation for copy
+  fs, block: copy_file_range for def_blk_ops for direct block device
+  nvme: add copy offload support
+  nvmet: add copy command support for bdev and file ns
+  dm: Add support for copy offload
+  dm: Enable copy offload for dm-linear target
+  null_blk: add support for copy offload
+
+ Documentation/ABI/stable/sysfs-block |  23 ++
+ Documentation/block/null_blk.rst     |   5 +
+ block/blk-core.c                     |   7 +
+ block/blk-lib.c                      | 419 +++++++++++++++++++++++++++
+ block/blk-merge.c                    |  41 +++
+ block/blk-settings.c                 |  24 ++
+ block/blk-sysfs.c                    |  36 +++
+ block/blk.h                          |  16 +
+ block/elevator.h                     |   1 +
+ block/fops.c                         |  25 ++
+ drivers/block/null_blk/main.c        |  99 ++++++-
+ drivers/block/null_blk/null_blk.h    |   1 +
+ drivers/block/null_blk/trace.h       |  23 ++
+ drivers/md/dm-linear.c               |   1 +
+ drivers/md/dm-table.c                |  37 +++
+ drivers/md/dm.c                      |   7 +
+ drivers/nvme/host/constants.c        |   1 +
+ drivers/nvme/host/core.c             |  79 +++++
+ drivers/nvme/host/trace.c            |  19 ++
+ drivers/nvme/target/admin-cmd.c      |   9 +-
+ drivers/nvme/target/io-cmd-bdev.c    |  97 +++++++
+ drivers/nvme/target/io-cmd-file.c    |  50 ++++
+ drivers/nvme/target/nvmet.h          |   4 +
+ drivers/nvme/target/trace.c          |  19 ++
+ fs/read_write.c                      |   8 +-
+ include/linux/bio.h                  |   6 +-
+ include/linux/blk_types.h            |  10 +
+ include/linux/blkdev.h               |  22 ++
+ include/linux/device-mapper.h        |   3 +
+ include/linux/nvme.h                 |  43 ++-
+ 30 files changed, 1119 insertions(+), 16 deletions(-)
+
+
+base-commit: f7dc24b3413851109c4047b22997bd0d95ed52a2
 -- 
-2.35.3
+2.35.1.500.gb896f729e2
 
