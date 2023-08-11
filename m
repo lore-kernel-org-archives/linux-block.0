@@ -2,138 +2,193 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B7F4C0015E
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:05:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B318FC04FE0
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:05:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233618AbjHKLFk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 07:05:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50548 "EHLO
+        id S233683AbjHKLFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 07:05:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235674AbjHKLFL (ORCPT
+        with ESMTP id S235523AbjHKLFL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 11 Aug 2023 07:05:11 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06162E65;
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF2EE71;
         Fri, 11 Aug 2023 04:05:10 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D0CAA1F894;
-        Fri, 11 Aug 2023 11:05:05 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 4BE1821883;
+        Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1691751905; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1691751906; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1sq/65j+CY9i3t8hL9bwXc39jHO7aQnHuaT66ofTFDw=;
-        b=1l25YOx6rv1s9C4rI0idkwKYVX2TInbGaE93NvGTkM6IGlqrAryuj7jdLsWE1dFt3W7FXK
-        VRkIM8aV3chI0DoxCMXjzKGVrzLViHa6tpQe0eFWv2gQkm/G6gb+JJg1hFFnvXcUN6Mg8R
-        0fRbMAr9j8S7T5CeZNd8KbgiRH8HIYQ=
+        bh=6luzPVXSDVEUOtJJ3n3omPBoNUdDHogmn1iNnmk3SJ4=;
+        b=SuVjHf5WZctl55n6lUk2h3uRI+BhXIwIdWDt8rp23E6w4P7Kn2iGwIG4j7wDQ9Fft/PeYJ
+        fDppUURzbUyNYvGYnmtR2lN3Q5W3FjrbxLR3hEAdhG1vjpN9Pjd10snquZTTA0o/2qsiOr
+        p3SouZolZvLFwID1OQVrfil2rFX7660=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1691751905;
+        s=susede2_ed25519; t=1691751906;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1sq/65j+CY9i3t8hL9bwXc39jHO7aQnHuaT66ofTFDw=;
-        b=2/GRkkpP3FwV4zjlG58lb/M/n1gWj2Vk86fjJLulfRdqNWWIXfnsC1exIDihwIcDI9F9DQ
-        ol83lAvNFovsk0CQ==
+        bh=6luzPVXSDVEUOtJJ3n3omPBoNUdDHogmn1iNnmk3SJ4=;
+        b=jIaCi4urD01bjLEQl8bYVLVRhjAtYVf1qHwL70t6PUXgjFJVxmnSaVWYxsagJb3KezE1Rx
+        z4VrU1e2Zny+SfDQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C0D6F138E3;
-        Fri, 11 Aug 2023 11:05:05 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3E2B5139FD;
+        Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id SFsQL+EV1mRNRQAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:05 +0000
+        id N38rD+IV1mRmRQAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:06 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 036D1A0789; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
+        id 24D5FA0790; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-raid@vger.kernel.org, Song Liu <song@kernel.org>
-Subject: [PATCH 11/29] md: Convert to bdev_open_by_dev()
-Date:   Fri, 11 Aug 2023 13:04:42 +0200
-Message-Id: <20230811110504.27514-11-jack@suse.cz>
+        linux-pm@vger.kernel.org
+Subject: [PATCH 17/29] PM: hibernate: Drop unused snapshot_test argument
+Date:   Fri, 11 Aug 2023 13:04:48 +0200
+Message-Id: <20230811110504.27514-17-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230810171429.31759-1-jack@suse.cz>
 References: <20230810171429.31759-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2193; i=jack@suse.cz; h=from:subject; bh=B0+iSj9jsLp41usXiwKwpFGHgEtk6xuIxKa3VQkGjLo=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXMG0hnHADMBdqV1Vbg/Q26yvvdN7RwrInxb4di dKrx4y+JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYVzAAKCRCcnaoHP2RA2TgICA CWls3FPaqpXOzqMN4ezha85vqO0oTO5QKnXy+co7t//8/85YDV3bKzgwZrEP1e5kunrWyHC5lpb/mp Gk7/0ldBWyNjLsYO3kwzu4sK+NZdCowreYfPonRvYSplDNuPpwaDEG5jGU9iLhfy5tKtgoiJLUtxjx OPtr+a8dL8+2HuEEnSl1c6xZt/yooDkK5OddGPgzsf9ux/ptaPPnpWQgpGtzltlS0sh66WootqQ04a yZbTbtN7nMkDh0oTFCTtr3tqPnxhqPf8QNyJQRk38zb0TBcHqdQW7GePPpgXXMIQZu3jvk2M9nILXL xnPM+L0fxWk61luymUc6iUrgfcIUv9
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3450; i=jack@suse.cz; h=from:subject; bh=EYiYPYIKB+WJacuyKZgkGjy+mR31pBVUNTN/L6fc2bs=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXR/+ckoRxIzn1GaSHqLLvthVaos2lTm5L88vxE rm8UX3WJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYV0QAKCRCcnaoHP2RA2ek5B/ 9Pi82m0GTl08fRjdq0kEU1LfLdWe8eE/Un0pnOLzFHu/FLF7/o1AARu66tsRIu/f6mblm099QfGQVi E7qHzgthGg20b1dQz+uOgkNhqnNO7pBOBqsiBFBxvh8ALfl9WpVveGAof7/8bKe6f1r0cCixAA1yvE 8LIxzx2vBYQi2kNw8BhhP+7l2mZnvk8ebOKdvcroQrU12k0EM+ga2aYWO6zt4ltOFxaC+y2Z/ZlhP9 zXFhDphr1FpTeqGFbBxm5f21S7W30FXVImufnudg8KlwKBjr11hYxWOnNSW85ZZCi4d7Y0I7mLpCE9 tyQX61tgIk8qo6D1jw4l4x4Xn/0Xaa
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert md to use bdev_open_by_dev() and pass the handle around.
+snapshot_test argument is now unused in swsusp_close() and
+load_image_and_restore(). Drop it
 
-CC: linux-raid@vger.kernel.org
-CC: Song Liu <song@kernel.org>
+CC: linux-pm@vger.kernel.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/md/md.c | 12 +++++++-----
- drivers/md/md.h |  1 +
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ kernel/power/hibernate.c | 14 +++++++-------
+ kernel/power/power.h     |  2 +-
+ kernel/power/swap.c      |  6 +++---
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 78be7811a89f..20d6cefda3e8 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -2450,7 +2450,7 @@ static void export_rdev(struct md_rdev *rdev, struct mddev *mddev)
- 	if (test_bit(AutoDetected, &rdev->flags))
- 		md_autodetect_dev(rdev->bdev->bd_dev);
- #endif
--	blkdev_put(rdev->bdev, mddev->external ? &claim_rdev : rdev);
-+	bdev_release(rdev->bdev_handle);
- 	rdev->bdev = NULL;
- 	kobject_put(&rdev->kobj);
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index e1b4bfa938dd..6abeec0ae084 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -684,7 +684,7 @@ static void power_down(void)
+ 		cpu_relax();
  }
-@@ -3644,14 +3644,16 @@ static struct md_rdev *md_import_device(dev_t newdev, int super_format, int supe
- 	if (err)
- 		goto out_clear_rdev;
  
--	rdev->bdev = blkdev_get_by_dev(newdev, BLK_OPEN_READ | BLK_OPEN_WRITE,
-+	rdev->bdev_handle = bdev_open_by_dev(newdev,
-+			BLK_OPEN_READ | BLK_OPEN_WRITE,
- 			super_format == -2 ? &claim_rdev : rdev, NULL);
--	if (IS_ERR(rdev->bdev)) {
-+	if (IS_ERR(rdev->bdev_handle)) {
- 		pr_warn("md: could not open device unknown-block(%u,%u).\n",
- 			MAJOR(newdev), MINOR(newdev));
--		err = PTR_ERR(rdev->bdev);
-+		err = PTR_ERR(rdev->bdev_handle);
- 		goto out_clear_rdev;
+-static int load_image_and_restore(bool snapshot_test)
++static int load_image_and_restore(void)
+ {
+ 	int error;
+ 	unsigned int flags;
+@@ -694,12 +694,12 @@ static int load_image_and_restore(bool snapshot_test)
+ 	lock_device_hotplug();
+ 	error = create_basic_memory_bitmaps();
+ 	if (error) {
+-		swsusp_close(snapshot_test);
++		swsusp_close();
+ 		goto Unlock;
  	}
-+	rdev->bdev = rdev->bdev_handle->bdev;
  
- 	kobject_init(&rdev->kobj, &rdev_ktype);
+ 	error = swsusp_read(&flags);
+-	swsusp_close(snapshot_test);
++	swsusp_close();
+ 	if (!error)
+ 		error = hibernation_restore(flags & SF_PLATFORM_MODE);
  
-@@ -3682,7 +3684,7 @@ static struct md_rdev *md_import_device(dev_t newdev, int super_format, int supe
- 	return rdev;
+@@ -788,7 +788,7 @@ int hibernate(void)
+ 		pm_pr_dbg("Checking hibernation image\n");
+ 		error = swsusp_check(snapshot_test);
+ 		if (!error)
+-			error = load_image_and_restore(snapshot_test);
++			error = load_image_and_restore();
+ 	}
+ 	thaw_processes();
  
- out_blkdev_put:
--	blkdev_put(rdev->bdev, super_format == -2 ? &claim_rdev : rdev);
-+	bdev_release(rdev->bdev_handle);
- out_clear_rdev:
- 	md_rdev_clear(rdev);
- out_free_rdev:
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 1aef86bf3fc3..e8108845157b 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -59,6 +59,7 @@ struct md_rdev {
- 	 */
- 	struct block_device *meta_bdev;
- 	struct block_device *bdev;	/* block device handle */
-+	struct bdev_handle *bdev_handle;	/* Handle from open for bdev */
+@@ -952,7 +952,7 @@ static int software_resume(void)
+ 	/* The snapshot device should not be opened while we're running */
+ 	if (!hibernate_acquire()) {
+ 		error = -EBUSY;
+-		swsusp_close(false);
++		swsusp_close();
+ 		goto Unlock;
+ 	}
  
- 	struct page	*sb_page, *bb_page;
- 	int		sb_loaded;
+@@ -973,7 +973,7 @@ static int software_resume(void)
+ 		goto Close_Finish;
+ 	}
+ 
+-	error = load_image_and_restore(false);
++	error = load_image_and_restore();
+ 	thaw_processes();
+  Finish:
+ 	pm_notifier_call_chain(PM_POST_RESTORE);
+@@ -987,7 +987,7 @@ static int software_resume(void)
+ 	pm_pr_dbg("Hibernation image not present or could not be loaded.\n");
+ 	return error;
+  Close_Finish:
+-	swsusp_close(false);
++	swsusp_close();
+ 	goto Finish;
+ }
+ 
+diff --git a/kernel/power/power.h b/kernel/power/power.h
+index 46eb14dc50c3..bebf049a51c1 100644
+--- a/kernel/power/power.h
++++ b/kernel/power/power.h
+@@ -172,7 +172,7 @@ int swsusp_check(bool snapshot_test);
+ extern void swsusp_free(void);
+ extern int swsusp_read(unsigned int *flags_p);
+ extern int swsusp_write(unsigned int flags);
+-void swsusp_close(bool snapshot_test);
++void swsusp_close(void);
+ #ifdef CONFIG_SUSPEND
+ extern int swsusp_unmark(void);
+ #endif
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index b475bee282ff..17e0dad5008e 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -444,7 +444,7 @@ static int get_swap_writer(struct swap_map_handle *handle)
+ err_rel:
+ 	release_swap_writer(handle);
+ err_close:
+-	swsusp_close(false);
++	swsusp_close();
+ 	return ret;
+ }
+ 
+@@ -509,7 +509,7 @@ static int swap_writer_finish(struct swap_map_handle *handle,
+ 	if (error)
+ 		free_all_swap_pages(root_swap);
+ 	release_swap_writer(handle);
+-	swsusp_close(false);
++	swsusp_close();
+ 
+ 	return error;
+ }
+@@ -1567,7 +1567,7 @@ int swsusp_check(bool snapshot_test)
+  *	swsusp_close - close swap device.
+  */
+ 
+-void swsusp_close(bool snapshot_test)
++void swsusp_close(void)
+ {
+ 	if (IS_ERR(hib_resume_bdev_handle)) {
+ 		pr_debug("Image device not initialised\n");
 -- 
 2.35.3
 
