@@ -2,169 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04242C41513
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B462EC04FDF
 	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:05:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236038AbjHKLFi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 07:05:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51730 "EHLO
+        id S236050AbjHKLFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 07:05:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235805AbjHKLFQ (ORCPT
+        with ESMTP id S235700AbjHKLFL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 07:05:16 -0400
+        Fri, 11 Aug 2023 07:05:11 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D45B1704;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF7E10C9;
         Fri, 11 Aug 2023 04:05:10 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 3A1AD21881;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 2D62621880;
         Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1691751906; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N7YBdToMFHaAC8IuWKxRPEMdSd9LNGUUtvM7Pk+ghBw=;
-        b=Ul3UwbMRQyZ+lV4S70iZQQbNxGooM3q1zIYUgEcgQEXb9yYN/oeO6AJHPZfYpOvWE3g4WC
-        IiiKdj/nQyQDf74qh6qKXYFhIvQyP49Q6lcMUAQfyNiGYd7n6h8WLpX2UGRevKFsjMpxSu
-        o2WooLKy9weeXK2HrPA5Ivd1+GUY1UM=
+        bh=mxcAzzD+Uyye6qjjVVcqoAgSgsS8B+BvpQl4uroL/p4=;
+        b=UfLc/kvaQVRluoWTmPGAQrSqxXK8dQnKKaN1pkarO69aTnznWAZsqMwuoauiVv31nLrMtX
+        wF8rV+yetP+zQuaGhOpDx6rYvlHkRzJZldFd4RKw/Y/RoB92UDRCYE1WewkQzsYZjkI3xr
+        uXmSid0sxidMQKO9Q/Nz18nSYtlIg6Q=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1691751906;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N7YBdToMFHaAC8IuWKxRPEMdSd9LNGUUtvM7Pk+ghBw=;
-        b=HEJTqCpPWYHmclzG4mM6Ml/hoXvGA2WyPJ8/kRk+APfgnz/q6t1xstYUL8CA50JFDYyyw3
-        MTFgEotSz6jdseDw==
+        bh=mxcAzzD+Uyye6qjjVVcqoAgSgsS8B+BvpQl4uroL/p4=;
+        b=XU2xPpP6S2ppAm6IQSk6w5oc41GYALuZTxpzlRlafMYomHz5nlFXFJCQ0tz29zy0BysmNA
+        N0xSyS8/7SJEjTCA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2D3FD139F3;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 22452138E3;
         Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id j1kJC+IV1mRhRQAAMHmgww
+        id JPpRCOIV1mRcRQAAMHmgww
         (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:06 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 3B81FA0776; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
+        id 1FA5CA078F; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-        linux-erofs@lists.ozlabs.org,
-        Gao Xiang <hsiangkao@linux.alibaba.com>
-Subject: [PATCH 21/29] erofs: Convert to use bdev_open_by_path()
-Date:   Fri, 11 Aug 2023 13:04:52 +0200
-Message-Id: <20230811110504.27514-21-jack@suse.cz>
+        linux-pm@vger.kernel.org
+Subject: [PATCH 16/29] PM: hibernate: Convert to bdev_open_by_dev()
+Date:   Fri, 11 Aug 2023 13:04:47 +0200
+Message-Id: <20230811110504.27514-16-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230810171429.31759-1-jack@suse.cz>
 References: <20230810171429.31759-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3347; i=jack@suse.cz; h=from:subject; bh=Glj53ItxKIh4U/O00C8riQd3I+fFSfRNGzqJ+ZAj4Bg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXV0FHZIj+A1bkBGTOkfyaWMpGZtuAJLG1/q8fD NO3txLqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYV1QAKCRCcnaoHP2RA2Zl+B/ 0cu4Q1Y3QdlYyLTbX+QhCFkECfAcJYt43AC/5VwiEYcQf9sk5zq+XP0P0KYEz9kgILT+OeVKI7Rx/8 RlyAtYEyD2Y87nZNtLoIqjf2Y63pQGf/JCgcJTV9/oLSb3CeWtJhZsgwICS1C7rWT4UG+HYKdjQo9A R9YIl1l1nppfZUTi4qS4l6x//vYX3XIA97c0wxJ7VFD6nZARshnlZ5LDrekS/71y4ZA6ESyD1ImpNU eF3BX9Rq3Jb2zyFZpN1/sySgpWgRaf0k477y1yBXKzLrQ2ZGo/EYiVeL+7WAoQKtGy1H8RwVgLVVLS cLGpaHfq2Ox9cXpfXVU0hL/eX97N2i
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3086; i=jack@suse.cz; h=from:subject; bh=gHRpjpEOsJl1nkmTzeoLxPEEw/WCLHXfkHcdzoKJwjw=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXQ4OczpzJX8G4+68Yl6+VrCj6JyNam5hshjuFc a9M++HCJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYV0AAKCRCcnaoHP2RA2YjZB/ 0fUUUmmAgt3XVjXh8Cy0RuahYZ18A/bH531q2MqfRMz7ANRKFT2d1eNapi0/DnQLi54DhT8O6as0ly JV0r2+GizKfh2gUBQ6oMJg5Di2H1Y8Vf5KZmMKp/ic1XQTgmZoJpWqWgX/TbzfB6uhO+VIzFYbwq// 2AEPM6hZ/7efSqdUgWCvE58bZ0o7PO9+gC4PQfWtItqIjGBiHRSbfzTES+inXRoXur4djMwigd4iEd 1mQyR6geMQ8X1OhHbg4RmaoHO/uo2LM4ZXfqHJmMHS1cYj4s0vTxlUZxLGgeLfPHWa3kjaWbj+6YBz sgmliYID/ZuLdnSkTNmw0kZnzcy6XI
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert erofs to use bdev_open_by_path() and pass the handle around.
+Convert hibernation code to use bdev_open_by_dev().
 
-CC: Gao Xiang <xiang@kernel.org>
-CC: Chao Yu <chao@kernel.org>
-CC: linux-erofs@lists.ozlabs.org
-Acked-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+CC: linux-pm@vger.kernel.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/erofs/data.c     |  4 ++--
- fs/erofs/internal.h |  2 +-
- fs/erofs/super.c    | 20 ++++++++++----------
- 3 files changed, 13 insertions(+), 13 deletions(-)
+ kernel/power/swap.c | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
 
-diff --git a/fs/erofs/data.c b/fs/erofs/data.c
-index db5e4b7636ec..1fa60cfff267 100644
---- a/fs/erofs/data.c
-+++ b/fs/erofs/data.c
-@@ -222,7 +222,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
- 			up_read(&devs->rwsem);
- 			return 0;
- 		}
--		map->m_bdev = dif->bdev;
-+		map->m_bdev = dif->bdev_handle->bdev;
- 		map->m_daxdev = dif->dax_dev;
- 		map->m_dax_part_off = dif->dax_part_off;
- 		map->m_fscache = dif->fscache;
-@@ -240,7 +240,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
- 			if (map->m_pa >= startoff &&
- 			    map->m_pa < startoff + length) {
- 				map->m_pa -= startoff;
--				map->m_bdev = dif->bdev;
-+				map->m_bdev = dif->bdev_handle->bdev;
- 				map->m_daxdev = dif->dax_dev;
- 				map->m_dax_part_off = dif->dax_part_off;
- 				map->m_fscache = dif->fscache;
-diff --git a/fs/erofs/internal.h b/fs/erofs/internal.h
-index 36e32fa542f0..fabd3bb0c194 100644
---- a/fs/erofs/internal.h
-+++ b/fs/erofs/internal.h
-@@ -47,7 +47,7 @@ typedef u32 erofs_blk_t;
- struct erofs_device_info {
- 	char *path;
- 	struct erofs_fscache *fscache;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	struct dax_device *dax_dev;
- 	u64 dax_part_off;
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index f6ebcd00c410..b475bee282ff 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -222,7 +222,7 @@ int swsusp_swap_in_use(void)
+  */
  
-diff --git a/fs/erofs/super.c b/fs/erofs/super.c
-index 9d6a3c6158bd..ce163b456d4a 100644
---- a/fs/erofs/super.c
-+++ b/fs/erofs/super.c
-@@ -230,7 +230,7 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
- 	struct erofs_sb_info *sbi = EROFS_SB(sb);
- 	struct erofs_fscache *fscache;
- 	struct erofs_deviceslot *dis;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	void *ptr;
+ static unsigned short root_swap = 0xffff;
+-static struct block_device *hib_resume_bdev;
++static struct bdev_handle *hib_resume_bdev_handle;
  
- 	ptr = erofs_read_metabuf(buf, sb, erofs_blknr(sb, *pos), EROFS_KMAP);
-@@ -254,13 +254,13 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
- 			return PTR_ERR(fscache);
- 		dif->fscache = fscache;
- 	} else if (!sbi->devs->flatdev) {
--		bdev = blkdev_get_by_path(dif->path, BLK_OPEN_READ, sb->s_type,
--					  NULL);
--		if (IS_ERR(bdev))
--			return PTR_ERR(bdev);
--		dif->bdev = bdev;
--		dif->dax_dev = fs_dax_get_by_bdev(bdev, &dif->dax_part_off,
--						  NULL, NULL);
-+		bdev_handle = bdev_open_by_path(dif->path, BLK_OPEN_READ,
-+						sb->s_type, NULL);
-+		if (IS_ERR(bdev_handle))
-+			return PTR_ERR(bdev_handle);
-+		dif->bdev_handle = bdev_handle;
-+		dif->dax_dev = fs_dax_get_by_bdev(bdev_handle->bdev,
-+				&dif->dax_part_off, NULL, NULL);
+ struct hib_bio_batch {
+ 	atomic_t		count;
+@@ -276,7 +276,8 @@ static int hib_submit_io(blk_opf_t opf, pgoff_t page_off, void *addr,
+ 	struct bio *bio;
+ 	int error = 0;
+ 
+-	bio = bio_alloc(hib_resume_bdev, 1, opf, GFP_NOIO | __GFP_HIGH);
++	bio = bio_alloc(hib_resume_bdev_handle->bdev, 1, opf,
++			GFP_NOIO | __GFP_HIGH);
+ 	bio->bi_iter.bi_sector = page_off * (PAGE_SIZE >> 9);
+ 
+ 	if (bio_add_page(bio, page, PAGE_SIZE, 0) < PAGE_SIZE) {
+@@ -356,14 +357,14 @@ static int swsusp_swap_check(void)
+ 		return res;
+ 	root_swap = res;
+ 
+-	hib_resume_bdev = blkdev_get_by_dev(swsusp_resume_device,
++	hib_resume_bdev_handle = bdev_open_by_dev(swsusp_resume_device,
+ 			BLK_OPEN_WRITE, NULL, NULL);
+-	if (IS_ERR(hib_resume_bdev))
+-		return PTR_ERR(hib_resume_bdev);
++	if (IS_ERR(hib_resume_bdev_handle))
++		return PTR_ERR(hib_resume_bdev_handle);
+ 
+-	res = set_blocksize(hib_resume_bdev, PAGE_SIZE);
++	res = set_blocksize(hib_resume_bdev_handle->bdev, PAGE_SIZE);
+ 	if (res < 0)
+-		blkdev_put(hib_resume_bdev, NULL);
++		bdev_release(hib_resume_bdev_handle);
+ 
+ 	return res;
+ }
+@@ -1521,10 +1522,10 @@ int swsusp_check(bool snapshot_test)
+ 	void *holder = snapshot_test ? &swsusp_holder : NULL;
+ 	int error;
+ 
+-	hib_resume_bdev = blkdev_get_by_dev(swsusp_resume_device, BLK_OPEN_READ,
+-					    holder, NULL);
+-	if (!IS_ERR(hib_resume_bdev)) {
+-		set_blocksize(hib_resume_bdev, PAGE_SIZE);
++	hib_resume_bdev_handle = bdev_open_by_dev(swsusp_resume_device,
++				BLK_OPEN_READ, holder, NULL);
++	if (!IS_ERR(hib_resume_bdev_handle)) {
++		set_blocksize(hib_resume_bdev_handle->bdev, PAGE_SIZE);
+ 		clear_page(swsusp_header);
+ 		error = hib_submit_io(REQ_OP_READ, swsusp_resume_block,
+ 					swsusp_header, NULL);
+@@ -1549,11 +1550,11 @@ int swsusp_check(bool snapshot_test)
+ 
+ put:
+ 		if (error)
+-			blkdev_put(hib_resume_bdev, holder);
++			bdev_release(hib_resume_bdev_handle);
+ 		else
+ 			pr_debug("Image signature found, resuming\n");
+ 	} else {
+-		error = PTR_ERR(hib_resume_bdev);
++		error = PTR_ERR(hib_resume_bdev_handle);
  	}
  
- 	dif->blocks = le32_to_cpu(dis->blocks);
-@@ -815,8 +815,8 @@ static int erofs_release_device_info(int id, void *ptr, void *data)
- 	struct erofs_device_info *dif = ptr;
+ 	if (error)
+@@ -1568,12 +1569,12 @@ int swsusp_check(bool snapshot_test)
  
- 	fs_put_dax(dif->dax_dev, NULL);
--	if (dif->bdev)
--		blkdev_put(dif->bdev, &erofs_fs_type);
-+	if (dif->bdev_handle)
-+		bdev_release(dif->bdev_handle);
- 	erofs_fscache_unregister_cookie(dif->fscache);
- 	dif->fscache = NULL;
- 	kfree(dif->path);
+ void swsusp_close(bool snapshot_test)
+ {
+-	if (IS_ERR(hib_resume_bdev)) {
++	if (IS_ERR(hib_resume_bdev_handle)) {
+ 		pr_debug("Image device not initialised\n");
+ 		return;
+ 	}
+ 
+-	blkdev_put(hib_resume_bdev, snapshot_test ? &swsusp_holder : NULL);
++	bdev_release(hib_resume_bdev_handle);
+ }
+ 
+ /**
 -- 
 2.35.3
 
