@@ -2,273 +2,228 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 868DEC04A6A
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15934C04FDF
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:06:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236114AbjHKLF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 07:05:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50524 "EHLO
+        id S236123AbjHKLF7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 07:05:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235546AbjHKLF0 (ORCPT
+        with ESMTP id S235467AbjHKLF0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 11 Aug 2023 07:05:26 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF24110C0;
-        Fri, 11 Aug 2023 04:05:10 -0700 (PDT)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2313910FB;
+        Fri, 11 Aug 2023 04:05:11 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6AFB521885;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 29E461F898;
         Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1691751906; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=r56ljdyh4C12jH1H+7RaS1LuLMKIjQFGRxEUY+aZq58=;
-        b=V7oie20ChCGKTMDgrUI3Sw8Dt58PhPTvs7VvGSVwZQse0+LV1WCKXbYVJFK9Dyk/ShRdUR
-        +kkxoYTsXu5bxErHATJRiEqRByHMEkpWWHK09dvyVq/L0qK8Rt7+iKApuv2TDswaGGvEWo
-        EmwbEuqakqmRmqOCbh7dJIrU4yANI78=
+        bh=wFvICVv8x2uT8joIddq2/IlE5HMWsq6yIuMM3UeaW0c=;
+        b=NCY85/ZBr5LJLZTzRqPhlWXWi2rE/qC4EnA25opYrELrKKhdtjPato0kqToDLOXmEMIF4X
+        VRGzAA6Qnle77gp5/trO3BFZC46cIDUv6seG+Fz0I/aJri6NZ29//v9ApIYsKmTStt4PbU
+        r4WldRacNfRGo269Yy/Wo04yZlfcauY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1691751906;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=r56ljdyh4C12jH1H+7RaS1LuLMKIjQFGRxEUY+aZq58=;
-        b=lyu2ygVQln/bi5EfdMaarQTeJakBYy2NBL2k9EutByTfp/p1Dk8hPdzL0spaYxmIzBzg8E
-        0FfN7z0OccDx2CBg==
+        bh=wFvICVv8x2uT8joIddq2/IlE5HMWsq6yIuMM3UeaW0c=;
+        b=cuHmqysKxxWKOeMGGp2c6+ivSdWpdqAjBpubGx52jeuqDZ9L2IhSShExlSBJd1euPaPW3t
+        f5vxyh6HKCruq/BA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5D76C13592;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1D1FE13592;
         Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id C9DHFuIV1mR2RQAAMHmgww
+        id uCgZB+IV1mRaRQAAMHmgww
         (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:06 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 51BAEA0775; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
+        id 1AA5BA078E; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-nfs@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>
-Subject: [PATCH 25/29] nfs/blocklayout: Convert to use bdev_open_by_dev/path()
-Date:   Fri, 11 Aug 2023 13:04:56 +0200
-Message-Id: <20230811110504.27514-25-jack@suse.cz>
+        target-devel@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: [PATCH 15/29] scsi: target: Convert to bdev_open_by_path()
+Date:   Fri, 11 Aug 2023 13:04:46 +0200
+Message-Id: <20230811110504.27514-15-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230810171429.31759-1-jack@suse.cz>
 References: <20230810171429.31759-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6139; i=jack@suse.cz; h=from:subject; bh=rYWDLxZJfkOvGQxYSeKk1k3a9sAq+n3eSEXfZ19XET0=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXY5qvaPDUJu8Kor5whY6JXMbZ7b2z6NFsq8+ct xPXKYfSJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYV2AAKCRCcnaoHP2RA2W0JB/ 99pQ7azPGDM09ZigQskkTYdgQTg+dxijY/IF1zSej3D8LIN9nHThk5h74BQ6HEw79UnhQleTZdyxd5 4fQlB62b8wQzPx1NGds0xC883Rz/MVaBJIR7IA1FovysKyvEpUpOzr1RgCejDs5BUQK0nnq00enLYs PTyO+btAhWceCA3c5ZndbKf5t0jqI3wi8cs6tTs2A+I6fwAlKNzt7GvcLgL3jas1iATLtu0k9BpZri EL743wcY3sKkaU5F/5yvJDr50/e7wJ77/njB8AvSWnx7JT91mApUKp/+pbsVpecGi+RpDm7XhLHSRG d/BmdKp4QAXW+rja6LqQnGS1yVDDio
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5377; i=jack@suse.cz; h=from:subject; bh=FYADzj9bzqF0mg50YmbIzoyWzhnJKTLZDGnb02uEND8=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXQrMDXRsTAoVCRqQysMiYCMgT203gLRtlgd8/n xZIOYE+JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYV0AAKCRCcnaoHP2RA2YPeB/ wMPZWYqaDGgo2j245iJUQzIIXDZhpYYTFCu8MJU0rssUdiBqH/UlepC9BH3+B4Q+AfMdbBbiLI0GGL WALPz+P4NWsf49B5KMMFqcZQdEoGpuPuIf4SfeRrBavqKpMQgVTJ5lAwzFL6KXu+7YDxmkwGRPvcar Rc/RjmRvEOvGarPqSc/DJlN/77N8HDLVob3GvUT8PXSEowTHG4kkN8QtENmoNOSf76Owny/jlGwV2Z t6+TXfU6P7MlrgV4PbDgcgujD/fH3Nll8rjoOjBzbz71tdfCb6YDVsYriB0ZDmMyISMrkGMST66EC+ 3vDS5DlkQjgcuGrCSxR3jsEreIFRVn
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert block device handling to use bdev_open_by_dev/path() and pass
-the handle around.
+Convert iblock and pscsi drivers to use bdev_open_by_path() and pass the
+handle around.
 
-CC: linux-nfs@vger.kernel.org
-CC: Trond Myklebust <trond.myklebust@hammerspace.com>
-CC: Anna Schumaker <anna@kernel.org>
+CC: target-devel@vger.kernel.org
+CC: linux-scsi@vger.kernel.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/nfs/blocklayout/blocklayout.h |  2 +-
- fs/nfs/blocklayout/dev.c         | 76 ++++++++++++++++----------------
- 2 files changed, 38 insertions(+), 40 deletions(-)
+ drivers/target/target_core_iblock.c | 19 +++++++++++--------
+ drivers/target/target_core_iblock.h |  1 +
+ drivers/target/target_core_pscsi.c  | 26 +++++++++++++-------------
+ drivers/target/target_core_pscsi.h  |  2 +-
+ 4 files changed, 26 insertions(+), 22 deletions(-)
 
-diff --git a/fs/nfs/blocklayout/blocklayout.h b/fs/nfs/blocklayout/blocklayout.h
-index 716bc75e9ed2..b4294a8aa2d4 100644
---- a/fs/nfs/blocklayout/blocklayout.h
-+++ b/fs/nfs/blocklayout/blocklayout.h
-@@ -108,7 +108,7 @@ struct pnfs_block_dev {
- 	struct pnfs_block_dev		*children;
- 	u64				chunk_size;
- 
--	struct block_device		*bdev;
-+	struct bdev_handle		*bdev_handle;
- 	u64				disk_offset;
- 
- 	u64				pr_key;
-diff --git a/fs/nfs/blocklayout/dev.c b/fs/nfs/blocklayout/dev.c
-index 70f5563a8e81..0b57b8a4b7e2 100644
---- a/fs/nfs/blocklayout/dev.c
-+++ b/fs/nfs/blocklayout/dev.c
-@@ -25,17 +25,17 @@ bl_free_device(struct pnfs_block_dev *dev)
- 	} else {
- 		if (dev->pr_registered) {
- 			const struct pr_ops *ops =
--				dev->bdev->bd_disk->fops->pr_ops;
-+				dev->bdev_handle->bdev->bd_disk->fops->pr_ops;
- 			int error;
- 
--			error = ops->pr_register(dev->bdev, dev->pr_key, 0,
--				false);
-+			error = ops->pr_register(dev->bdev_handle->bdev,
-+				dev->pr_key, 0, false);
- 			if (error)
- 				pr_err("failed to unregister PR key.\n");
- 		}
- 
--		if (dev->bdev)
--			blkdev_put(dev->bdev, NULL);
-+		if (dev->bdev_handle)
-+			bdev_release(dev->bdev_handle);
- 	}
- }
- 
-@@ -169,7 +169,7 @@ static bool bl_map_simple(struct pnfs_block_dev *dev, u64 offset,
- 	map->start = dev->start;
- 	map->len = dev->len;
- 	map->disk_offset = dev->disk_offset;
--	map->bdev = dev->bdev;
-+	map->bdev = dev->bdev_handle->bdev;
- 	return true;
- }
- 
-@@ -236,28 +236,26 @@ bl_parse_simple(struct nfs_server *server, struct pnfs_block_dev *d,
- 		struct pnfs_block_volume *volumes, int idx, gfp_t gfp_mask)
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 3d1b511ea284..3695a9f8d8a5 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -91,7 +91,8 @@ static int iblock_configure_device(struct se_device *dev)
  {
- 	struct pnfs_block_volume *v = &volumes[idx];
--	struct block_device *bdev;
+ 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
+ 	struct request_queue *q;
+-	struct block_device *bd = NULL;
 +	struct bdev_handle *bdev_handle;
- 	dev_t dev;
++	struct block_device *bd;
+ 	struct blk_integrity *bi;
+ 	blk_mode_t mode = BLK_OPEN_READ;
+ 	unsigned int max_write_zeroes_sectors;
+@@ -116,12 +117,14 @@ static int iblock_configure_device(struct se_device *dev)
+ 	else
+ 		dev->dev_flags |= DF_READ_ONLY;
  
- 	dev = bl_resolve_deviceid(server, v, gfp_mask);
- 	if (!dev)
- 		return -EIO;
- 
--	bdev = blkdev_get_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_WRITE, NULL,
--				 NULL);
--	if (IS_ERR(bdev)) {
-+	bdev_handle = bdev_open_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_WRITE,
-+				       NULL, NULL);
+-	bd = blkdev_get_by_path(ib_dev->ibd_udev_path, mode, ib_dev, NULL);
+-	if (IS_ERR(bd)) {
+-		ret = PTR_ERR(bd);
++	bdev_handle = bdev_open_by_path(ib_dev->ibd_udev_path, mode, ib_dev,
++					NULL);
 +	if (IS_ERR(bdev_handle)) {
- 		printk(KERN_WARNING "pNFS: failed to open device %d:%d (%ld)\n",
--			MAJOR(dev), MINOR(dev), PTR_ERR(bdev));
--		return PTR_ERR(bdev);
-+			MAJOR(dev), MINOR(dev), PTR_ERR(bdev_handle));
-+		return PTR_ERR(bdev_handle);
++		ret = PTR_ERR(bdev_handle);
+ 		goto out_free_bioset;
  	}
--	d->bdev = bdev;
--
--
--	d->len = bdev_nr_bytes(d->bdev);
-+	d->bdev_handle = bdev_handle;
-+	d->len = bdev_nr_bytes(bdev_handle->bdev);
- 	d->map = bl_map_simple;
+-	ib_dev->ibd_bd = bd;
++	ib_dev->ibd_bdev_handle = bdev_handle;
++	ib_dev->ibd_bd = bd = bdev_handle->bdev;
  
- 	printk(KERN_INFO "pNFS: using block device %s\n",
--		d->bdev->bd_disk->disk_name);
-+		bdev_handle->bdev->bd_disk->disk_name);
- 	return 0;
- }
+ 	q = bdev_get_queue(bd);
  
-@@ -302,10 +300,10 @@ bl_validate_designator(struct pnfs_block_volume *v)
- 	}
- }
- 
--static struct block_device *
-+static struct bdev_handle *
- bl_open_path(struct pnfs_block_volume *v, const char *prefix)
- {
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	const char *devname;
- 
- 	devname = kasprintf(GFP_KERNEL, "/dev/disk/by-id/%s%*phN",
-@@ -313,15 +311,15 @@ bl_open_path(struct pnfs_block_volume *v, const char *prefix)
- 	if (!devname)
- 		return ERR_PTR(-ENOMEM);
- 
--	bdev = blkdev_get_by_path(devname, BLK_OPEN_READ | BLK_OPEN_WRITE, NULL,
--				  NULL);
--	if (IS_ERR(bdev)) {
-+	bdev_handle = bdev_open_by_path(devname, BLK_OPEN_READ | BLK_OPEN_WRITE,
-+					NULL, NULL);
-+	if (IS_ERR(bdev_handle)) {
- 		pr_warn("pNFS: failed to open device %s (%ld)\n",
--			devname, PTR_ERR(bdev));
-+			devname, PTR_ERR(bdev_handle));
- 	}
- 
- 	kfree(devname);
--	return bdev;
-+	return bdev_handle;
- }
- 
- static int
-@@ -329,7 +327,7 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
- 		struct pnfs_block_volume *volumes, int idx, gfp_t gfp_mask)
- {
- 	struct pnfs_block_volume *v = &volumes[idx];
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	const struct pr_ops *ops;
- 	int error;
- 
-@@ -342,32 +340,32 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
- 	 * On other distributions like Debian, the default SCSI by-id path will
- 	 * point to the dm-multipath device if one exists.
- 	 */
--	bdev = bl_open_path(v, "dm-uuid-mpath-0x");
--	if (IS_ERR(bdev))
--		bdev = bl_open_path(v, "wwn-0x");
--	if (IS_ERR(bdev))
--		return PTR_ERR(bdev);
--	d->bdev = bdev;
--
--	d->len = bdev_nr_bytes(d->bdev);
-+	bdev_handle = bl_open_path(v, "dm-uuid-mpath-0x");
-+	if (IS_ERR(bdev_handle))
-+		bdev_handle = bl_open_path(v, "wwn-0x");
-+	if (IS_ERR(bdev_handle))
-+		return PTR_ERR(bdev_handle);
-+	d->bdev_handle = bdev_handle;
-+
-+	d->len = bdev_nr_bytes(d->bdev_handle->bdev);
- 	d->map = bl_map_simple;
- 	d->pr_key = v->scsi.pr_key;
- 
- 	pr_info("pNFS: using block device %s (reservation key 0x%llx)\n",
--		d->bdev->bd_disk->disk_name, d->pr_key);
-+		d->bdev_handle->bdev->bd_disk->disk_name, d->pr_key);
- 
--	ops = d->bdev->bd_disk->fops->pr_ops;
-+	ops = d->bdev_handle->bdev->bd_disk->fops->pr_ops;
- 	if (!ops) {
- 		pr_err("pNFS: block device %s does not support reservations.",
--				d->bdev->bd_disk->disk_name);
-+				d->bdev_handle->bdev->bd_disk->disk_name);
- 		error = -EINVAL;
- 		goto out_blkdev_put;
- 	}
- 
--	error = ops->pr_register(d->bdev, 0, d->pr_key, true);
-+	error = ops->pr_register(d->bdev_handle->bdev, 0, d->pr_key, true);
- 	if (error) {
- 		pr_err("pNFS: failed to register key for block device %s.",
--				d->bdev->bd_disk->disk_name);
-+				d->bdev_handle->bdev->bd_disk->disk_name);
- 		goto out_blkdev_put;
- 	}
- 
-@@ -375,7 +373,7 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
+@@ -177,7 +180,7 @@ static int iblock_configure_device(struct se_device *dev)
  	return 0;
  
  out_blkdev_put:
--	blkdev_put(d->bdev, NULL);
-+	bdev_release(d->bdev_handle);
- 	return error;
+-	blkdev_put(ib_dev->ibd_bd, ib_dev);
++	bdev_release(ib_dev->ibd_bdev_handle);
+ out_free_bioset:
+ 	bioset_exit(&ib_dev->ibd_bio_set);
+ out:
+@@ -202,8 +205,8 @@ static void iblock_destroy_device(struct se_device *dev)
+ {
+ 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
+ 
+-	if (ib_dev->ibd_bd != NULL)
+-		blkdev_put(ib_dev->ibd_bd, ib_dev);
++	if (ib_dev->ibd_bdev_handle)
++		bdev_release(ib_dev->ibd_bdev_handle);
+ 	bioset_exit(&ib_dev->ibd_bio_set);
  }
  
+diff --git a/drivers/target/target_core_iblock.h b/drivers/target/target_core_iblock.h
+index 8c55375d2f75..683f9a55945b 100644
+--- a/drivers/target/target_core_iblock.h
++++ b/drivers/target/target_core_iblock.h
+@@ -32,6 +32,7 @@ struct iblock_dev {
+ 	u32	ibd_flags;
+ 	struct bio_set	ibd_bio_set;
+ 	struct block_device *ibd_bd;
++	struct bdev_handle *ibd_bdev_handle;
+ 	bool ibd_readonly;
+ 	struct iblock_dev_plug *ibd_plug;
+ } ____cacheline_aligned;
+diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
+index 0d4f09693ef4..41b7489d37ce 100644
+--- a/drivers/target/target_core_pscsi.c
++++ b/drivers/target/target_core_pscsi.c
+@@ -352,7 +352,7 @@ static int pscsi_create_type_disk(struct se_device *dev, struct scsi_device *sd)
+ 	struct pscsi_hba_virt *phv = dev->se_hba->hba_ptr;
+ 	struct pscsi_dev_virt *pdv = PSCSI_DEV(dev);
+ 	struct Scsi_Host *sh = sd->host;
+-	struct block_device *bd;
++	struct bdev_handle *bdev_handle;
+ 	int ret;
+ 
+ 	if (scsi_device_get(sd)) {
+@@ -366,18 +366,18 @@ static int pscsi_create_type_disk(struct se_device *dev, struct scsi_device *sd)
+ 	 * Claim exclusive struct block_device access to struct scsi_device
+ 	 * for TYPE_DISK and TYPE_ZBC using supplied udev_path
+ 	 */
+-	bd = blkdev_get_by_path(dev->udev_path, BLK_OPEN_WRITE | BLK_OPEN_READ,
+-				pdv, NULL);
+-	if (IS_ERR(bd)) {
+-		pr_err("pSCSI: blkdev_get_by_path() failed\n");
++	bdev_handle = bdev_open_by_path(dev->udev_path,
++				BLK_OPEN_WRITE | BLK_OPEN_READ, pdv, NULL);
++	if (IS_ERR(bdev_handle)) {
++		pr_err("pSCSI: bdev_open_by_path() failed\n");
+ 		scsi_device_put(sd);
+-		return PTR_ERR(bd);
++		return PTR_ERR(bdev_handle);
+ 	}
+-	pdv->pdv_bd = bd;
++	pdv->pdv_bdev_handle = bdev_handle;
+ 
+ 	ret = pscsi_add_device_to_list(dev, sd);
+ 	if (ret) {
+-		blkdev_put(pdv->pdv_bd, pdv);
++		bdev_release(bdev_handle);
+ 		scsi_device_put(sd);
+ 		return ret;
+ 	}
+@@ -564,9 +564,9 @@ static void pscsi_destroy_device(struct se_device *dev)
+ 		 * from pscsi_create_type_disk()
+ 		 */
+ 		if ((sd->type == TYPE_DISK || sd->type == TYPE_ZBC) &&
+-		    pdv->pdv_bd) {
+-			blkdev_put(pdv->pdv_bd, pdv);
+-			pdv->pdv_bd = NULL;
++		    pdv->pdv_bdev_handle) {
++			bdev_release(pdv->pdv_bdev_handle);
++			pdv->pdv_bdev_handle = NULL;
+ 		}
+ 		/*
+ 		 * For HBA mode PHV_LLD_SCSI_HOST_NO, release the reference
+@@ -994,8 +994,8 @@ static sector_t pscsi_get_blocks(struct se_device *dev)
+ {
+ 	struct pscsi_dev_virt *pdv = PSCSI_DEV(dev);
+ 
+-	if (pdv->pdv_bd)
+-		return bdev_nr_sectors(pdv->pdv_bd);
++	if (pdv->pdv_bdev_handle)
++		return bdev_nr_sectors(pdv->pdv_bdev_handle->bdev);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/target/target_core_pscsi.h b/drivers/target/target_core_pscsi.h
+index 23d9a6e340d4..b0a3ef136592 100644
+--- a/drivers/target/target_core_pscsi.h
++++ b/drivers/target/target_core_pscsi.h
+@@ -37,7 +37,7 @@ struct pscsi_dev_virt {
+ 	int	pdv_channel_id;
+ 	int	pdv_target_id;
+ 	int	pdv_lun_id;
+-	struct block_device *pdv_bd;
++	struct bdev_handle *pdv_bdev_handle;
+ 	struct scsi_device *pdv_sd;
+ 	struct Scsi_Host *pdv_lld_host;
+ } ____cacheline_aligned;
 -- 
 2.35.3
 
