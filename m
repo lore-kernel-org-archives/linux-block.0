@@ -2,193 +2,250 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B318FC04FE0
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92378C04FE2
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 11:05:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233683AbjHKLFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 07:05:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50562 "EHLO
+        id S236053AbjHKLFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 07:05:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235523AbjHKLFL (ORCPT
+        with ESMTP id S235808AbjHKLFQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 07:05:11 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF2EE71;
-        Fri, 11 Aug 2023 04:05:10 -0700 (PDT)
+        Fri, 11 Aug 2023 07:05:16 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012F3E4C;
+        Fri, 11 Aug 2023 04:05:09 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 4BE1821883;
-        Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id BD1191F891;
+        Fri, 11 Aug 2023 11:05:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1691751906; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1691751905; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6luzPVXSDVEUOtJJ3n3omPBoNUdDHogmn1iNnmk3SJ4=;
-        b=SuVjHf5WZctl55n6lUk2h3uRI+BhXIwIdWDt8rp23E6w4P7Kn2iGwIG4j7wDQ9Fft/PeYJ
-        fDppUURzbUyNYvGYnmtR2lN3Q5W3FjrbxLR3hEAdhG1vjpN9Pjd10snquZTTA0o/2qsiOr
-        p3SouZolZvLFwID1OQVrfil2rFX7660=
+        bh=o4+jKqQ1x0Ey1yIHBqwsn99vq9xGiNmltJzcj4Snsx4=;
+        b=NymZwWCmDVPf+oAdkRp6Fd3W33uCeIVi+mDXP+gMel/Ag9XuCoE75HkGLq87VAtzoY82Pm
+        NRBGYqUSqo7VuWbrTkTzLCA0urGSKJ/5ochKyN1G0WVh4j4TjzEhOXMakth4zvXTMyjtXs
+        phXifH8SKsqXtabIeHdhAQ6M8qKgMH4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1691751906;
+        s=susede2_ed25519; t=1691751905;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6luzPVXSDVEUOtJJ3n3omPBoNUdDHogmn1iNnmk3SJ4=;
-        b=jIaCi4urD01bjLEQl8bYVLVRhjAtYVf1qHwL70t6PUXgjFJVxmnSaVWYxsagJb3KezE1Rx
-        z4VrU1e2Zny+SfDQ==
+        bh=o4+jKqQ1x0Ey1yIHBqwsn99vq9xGiNmltJzcj4Snsx4=;
+        b=GsSZk6dIGu7xkC6a1rGWdt52tNx1adZtbaEtcaKG74D2xlinnFSyKWvF4DBqQnfyI5MBxR
+        hwouiESDYmn+fWDw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3E2B5139FD;
-        Fri, 11 Aug 2023 11:05:06 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B031C139FD;
+        Fri, 11 Aug 2023 11:05:05 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id N38rD+IV1mRmRQAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:06 +0000
+        id P7n/KuEV1mRGRQAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 11 Aug 2023 11:05:05 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 24D5FA0790; Fri, 11 Aug 2023 13:05:05 +0200 (CEST)
+        id E0560A077F; Fri, 11 Aug 2023 13:05:04 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-pm@vger.kernel.org
-Subject: [PATCH 17/29] PM: hibernate: Drop unused snapshot_test argument
-Date:   Fri, 11 Aug 2023 13:04:48 +0200
-Message-Id: <20230811110504.27514-17-jack@suse.cz>
+        xen-devel@lists.xenproject.org
+Subject: [PATCH 07/29] xen/blkback: Convert to bdev_open_by_dev()
+Date:   Fri, 11 Aug 2023 13:04:38 +0200
+Message-Id: <20230811110504.27514-7-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230810171429.31759-1-jack@suse.cz>
 References: <20230810171429.31759-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3450; i=jack@suse.cz; h=from:subject; bh=EYiYPYIKB+WJacuyKZgkGjy+mR31pBVUNTN/L6fc2bs=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXR/+ckoRxIzn1GaSHqLLvthVaos2lTm5L88vxE rm8UX3WJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYV0QAKCRCcnaoHP2RA2ek5B/ 9Pi82m0GTl08fRjdq0kEU1LfLdWe8eE/Un0pnOLzFHu/FLF7/o1AARu66tsRIu/f6mblm099QfGQVi E7qHzgthGg20b1dQz+uOgkNhqnNO7pBOBqsiBFBxvh8ALfl9WpVveGAof7/8bKe6f1r0cCixAA1yvE 8LIxzx2vBYQi2kNw8BhhP+7l2mZnvk8ebOKdvcroQrU12k0EM+ga2aYWO6zt4ltOFxaC+y2Z/ZlhP9 zXFhDphr1FpTeqGFbBxm5f21S7W30FXVImufnudg8KlwKBjr11hYxWOnNSW85ZZCi4d7Y0I7mLpCE9 tyQX61tgIk8qo6D1jw4l4x4Xn/0Xaa
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6152; i=jack@suse.cz; h=from:subject; bh=BtKISSNjUPlIJ2mx01CaoHxKal+UUOpgJzDPeV+Tjng=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk1hXJTAApujvhW+MJCl3UP6VxhTukhoQX0oarVPIN qZbOtKeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZNYVyQAKCRCcnaoHP2RA2YTBCA CGxviiVkdtcZrheoDeTPAHsM7pySrLUYJzmmOtb66fig1K8eNsZaga/HYJbzFzqEARVS6BHDnBMlS3 O6ZPWXyrpodgPwsFXMfYq75Qm4aYI/emJOyrnM3Eg5TRgBaYBgBwKimM3309HZVfpmKEXA+l2JqpnN N1GFvI9ldoBqGQfiATVauUfxihdiK0b7Ci5P6Q6B/FABpjHt+kD2mOftlwneWhBtpWzPbo77dCeIq6 U5qLYZLH8KswL1ZMes46IO8lZ6pC8GnmqswRKSRwsLfsX3pCaY5rhmakO5hIhf6L3AcqUD519hed5z L1KRtGnxJ+LiyTUMYbQ1H0ZIb4KQeO
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-snapshot_test argument is now unused in swsusp_close() and
-load_image_and_restore(). Drop it
+Convert xen/blkback to use bdev_open_by_dev() and pass the
+handle around.
 
-CC: linux-pm@vger.kernel.org
+CC: xen-devel@lists.xenproject.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- kernel/power/hibernate.c | 14 +++++++-------
- kernel/power/power.h     |  2 +-
- kernel/power/swap.c      |  6 +++---
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ drivers/block/xen-blkback/blkback.c |  4 +--
+ drivers/block/xen-blkback/common.h  |  4 +--
+ drivers/block/xen-blkback/xenbus.c  | 40 +++++++++++++++--------------
+ 3 files changed, 25 insertions(+), 23 deletions(-)
 
-diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-index e1b4bfa938dd..6abeec0ae084 100644
---- a/kernel/power/hibernate.c
-+++ b/kernel/power/hibernate.c
-@@ -684,7 +684,7 @@ static void power_down(void)
- 		cpu_relax();
- }
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index c362f4ad80ab..4defd7f387c7 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -465,7 +465,7 @@ static int xen_vbd_translate(struct phys_req *req, struct xen_blkif *blkif,
+ 	}
  
--static int load_image_and_restore(bool snapshot_test)
-+static int load_image_and_restore(void)
+ 	req->dev  = vbd->pdevice;
+-	req->bdev = vbd->bdev;
++	req->bdev = vbd->bdev_handle->bdev;
+ 	rc = 0;
+ 
+  out:
+@@ -969,7 +969,7 @@ static int dispatch_discard_io(struct xen_blkif_ring *ring,
+ 	int err = 0;
+ 	int status = BLKIF_RSP_OKAY;
+ 	struct xen_blkif *blkif = ring->blkif;
+-	struct block_device *bdev = blkif->vbd.bdev;
++	struct block_device *bdev = blkif->vbd.bdev_handle->bdev;
+ 	struct phys_req preq;
+ 
+ 	xen_blkif_get(blkif);
+diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+index 40f67bfc052d..5ff50e76cee5 100644
+--- a/drivers/block/xen-blkback/common.h
++++ b/drivers/block/xen-blkback/common.h
+@@ -221,7 +221,7 @@ struct xen_vbd {
+ 	unsigned char		type;
+ 	/* phys device that this vbd maps to. */
+ 	u32			pdevice;
+-	struct block_device	*bdev;
++	struct bdev_handle	*bdev_handle;
+ 	/* Cached size parameter. */
+ 	sector_t		size;
+ 	unsigned int		flush_support:1;
+@@ -360,7 +360,7 @@ struct pending_req {
+ };
+ 
+ 
+-#define vbd_sz(_v)	bdev_nr_sectors((_v)->bdev)
++#define vbd_sz(_v)	bdev_nr_sectors((_v)->bdev_handle->bdev)
+ 
+ #define xen_blkif_get(_b) (atomic_inc(&(_b)->refcnt))
+ #define xen_blkif_put(_b)				\
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index bb66178c432b..e34219ea2b05 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -81,7 +81,7 @@ static void xen_update_blkif_status(struct xen_blkif *blkif)
+ 	int i;
+ 
+ 	/* Not ready to connect? */
+-	if (!blkif->rings || !blkif->rings[0].irq || !blkif->vbd.bdev)
++	if (!blkif->rings || !blkif->rings[0].irq || !blkif->vbd.bdev_handle)
+ 		return;
+ 
+ 	/* Already connected? */
+@@ -99,12 +99,13 @@ static void xen_update_blkif_status(struct xen_blkif *blkif)
+ 		return;
+ 	}
+ 
+-	err = sync_blockdev(blkif->vbd.bdev);
++	err = sync_blockdev(blkif->vbd.bdev_handle->bdev);
+ 	if (err) {
+ 		xenbus_dev_error(blkif->be->dev, err, "block flush");
+ 		return;
+ 	}
+-	invalidate_inode_pages2(blkif->vbd.bdev->bd_inode->i_mapping);
++	invalidate_inode_pages2(
++			blkif->vbd.bdev_handle->bdev->bd_inode->i_mapping);
+ 
+ 	for (i = 0; i < blkif->nr_rings; i++) {
+ 		ring = &blkif->rings[i];
+@@ -472,9 +473,9 @@ static void xenvbd_sysfs_delif(struct xenbus_device *dev)
+ 
+ static void xen_vbd_free(struct xen_vbd *vbd)
  {
- 	int error;
- 	unsigned int flags;
-@@ -694,12 +694,12 @@ static int load_image_and_restore(bool snapshot_test)
- 	lock_device_hotplug();
- 	error = create_basic_memory_bitmaps();
- 	if (error) {
--		swsusp_close(snapshot_test);
-+		swsusp_close();
- 		goto Unlock;
- 	}
- 
- 	error = swsusp_read(&flags);
--	swsusp_close(snapshot_test);
-+	swsusp_close();
- 	if (!error)
- 		error = hibernation_restore(flags & SF_PLATFORM_MODE);
- 
-@@ -788,7 +788,7 @@ int hibernate(void)
- 		pm_pr_dbg("Checking hibernation image\n");
- 		error = swsusp_check(snapshot_test);
- 		if (!error)
--			error = load_image_and_restore(snapshot_test);
-+			error = load_image_and_restore();
- 	}
- 	thaw_processes();
- 
-@@ -952,7 +952,7 @@ static int software_resume(void)
- 	/* The snapshot device should not be opened while we're running */
- 	if (!hibernate_acquire()) {
- 		error = -EBUSY;
--		swsusp_close(false);
-+		swsusp_close();
- 		goto Unlock;
- 	}
- 
-@@ -973,7 +973,7 @@ static int software_resume(void)
- 		goto Close_Finish;
- 	}
- 
--	error = load_image_and_restore(false);
-+	error = load_image_and_restore();
- 	thaw_processes();
-  Finish:
- 	pm_notifier_call_chain(PM_POST_RESTORE);
-@@ -987,7 +987,7 @@ static int software_resume(void)
- 	pm_pr_dbg("Hibernation image not present or could not be loaded.\n");
- 	return error;
-  Close_Finish:
--	swsusp_close(false);
-+	swsusp_close();
- 	goto Finish;
+-	if (vbd->bdev)
+-		blkdev_put(vbd->bdev, NULL);
+-	vbd->bdev = NULL;
++	if (vbd->bdev_handle)
++		bdev_release(vbd->bdev_handle);
++	vbd->bdev_handle = NULL;
  }
  
-diff --git a/kernel/power/power.h b/kernel/power/power.h
-index 46eb14dc50c3..bebf049a51c1 100644
---- a/kernel/power/power.h
-+++ b/kernel/power/power.h
-@@ -172,7 +172,7 @@ int swsusp_check(bool snapshot_test);
- extern void swsusp_free(void);
- extern int swsusp_read(unsigned int *flags_p);
- extern int swsusp_write(unsigned int flags);
--void swsusp_close(bool snapshot_test);
-+void swsusp_close(void);
- #ifdef CONFIG_SUSPEND
- extern int swsusp_unmark(void);
- #endif
-diff --git a/kernel/power/swap.c b/kernel/power/swap.c
-index b475bee282ff..17e0dad5008e 100644
---- a/kernel/power/swap.c
-+++ b/kernel/power/swap.c
-@@ -444,7 +444,7 @@ static int get_swap_writer(struct swap_map_handle *handle)
- err_rel:
- 	release_swap_writer(handle);
- err_close:
--	swsusp_close(false);
-+	swsusp_close();
- 	return ret;
- }
- 
-@@ -509,7 +509,7 @@ static int swap_writer_finish(struct swap_map_handle *handle,
- 	if (error)
- 		free_all_swap_pages(root_swap);
- 	release_swap_writer(handle);
--	swsusp_close(false);
-+	swsusp_close();
- 
- 	return error;
- }
-@@ -1567,7 +1567,7 @@ int swsusp_check(bool snapshot_test)
-  *	swsusp_close - close swap device.
-  */
- 
--void swsusp_close(bool snapshot_test)
-+void swsusp_close(void)
+ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+@@ -482,7 +483,7 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+ 			  int cdrom)
  {
- 	if (IS_ERR(hib_resume_bdev_handle)) {
- 		pr_debug("Image device not initialised\n");
+ 	struct xen_vbd *vbd;
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 
+ 	vbd = &blkif->vbd;
+ 	vbd->handle   = handle;
+@@ -491,17 +492,17 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+ 
+ 	vbd->pdevice  = MKDEV(major, minor);
+ 
+-	bdev = blkdev_get_by_dev(vbd->pdevice, vbd->readonly ?
++	bdev_handle = bdev_open_by_dev(vbd->pdevice, vbd->readonly ?
+ 				 BLK_OPEN_READ : BLK_OPEN_WRITE, NULL, NULL);
+ 
+-	if (IS_ERR(bdev)) {
++	if (IS_ERR(bdev_handle)) {
+ 		pr_warn("xen_vbd_create: device %08x could not be opened\n",
+ 			vbd->pdevice);
+ 		return -ENOENT;
+ 	}
+ 
+-	vbd->bdev = bdev;
+-	if (vbd->bdev->bd_disk == NULL) {
++	vbd->bdev_handle = bdev_handle;
++	if (vbd->bdev_handle->bdev->bd_disk == NULL) {
+ 		pr_warn("xen_vbd_create: device %08x doesn't exist\n",
+ 			vbd->pdevice);
+ 		xen_vbd_free(vbd);
+@@ -509,14 +510,14 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+ 	}
+ 	vbd->size = vbd_sz(vbd);
+ 
+-	if (cdrom || disk_to_cdi(vbd->bdev->bd_disk))
++	if (cdrom || disk_to_cdi(vbd->bdev_handle->bdev->bd_disk))
+ 		vbd->type |= VDISK_CDROM;
+-	if (vbd->bdev->bd_disk->flags & GENHD_FL_REMOVABLE)
++	if (vbd->bdev_handle->bdev->bd_disk->flags & GENHD_FL_REMOVABLE)
+ 		vbd->type |= VDISK_REMOVABLE;
+ 
+-	if (bdev_write_cache(bdev))
++	if (bdev_write_cache(bdev_handle->bdev))
+ 		vbd->flush_support = true;
+-	if (bdev_max_secure_erase_sectors(bdev))
++	if (bdev_max_secure_erase_sectors(bdev_handle->bdev))
+ 		vbd->discard_secure = true;
+ 
+ 	pr_debug("Successful creation of handle=%04x (dom=%u)\n",
+@@ -569,7 +570,7 @@ static void xen_blkbk_discard(struct xenbus_transaction xbt, struct backend_info
+ 	struct xen_blkif *blkif = be->blkif;
+ 	int err;
+ 	int state = 0;
+-	struct block_device *bdev = be->blkif->vbd.bdev;
++	struct block_device *bdev = be->blkif->vbd.bdev_handle->bdev;
+ 
+ 	if (!xenbus_read_unsigned(dev->nodename, "discard-enable", 1))
+ 		return;
+@@ -930,15 +931,16 @@ static void connect(struct backend_info *be)
+ 		goto abort;
+ 	}
+ 	err = xenbus_printf(xbt, dev->nodename, "sector-size", "%lu",
+-			    (unsigned long)
+-			    bdev_logical_block_size(be->blkif->vbd.bdev));
++			    (unsigned long)bdev_logical_block_size(
++					be->blkif->vbd.bdev_handle->bdev));
+ 	if (err) {
+ 		xenbus_dev_fatal(dev, err, "writing %s/sector-size",
+ 				 dev->nodename);
+ 		goto abort;
+ 	}
+ 	err = xenbus_printf(xbt, dev->nodename, "physical-sector-size", "%u",
+-			    bdev_physical_block_size(be->blkif->vbd.bdev));
++			    bdev_physical_block_size(
++					be->blkif->vbd.bdev_handle->bdev));
+ 	if (err)
+ 		xenbus_dev_error(dev, err, "writing %s/physical-sector-size",
+ 				 dev->nodename);
 -- 
 2.35.3
 
