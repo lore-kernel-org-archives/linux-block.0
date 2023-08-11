@@ -2,153 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BCFC001DB
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 10:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 279C5C04A6A
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 10:44:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234970AbjHKK3X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 06:29:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57368 "EHLO
+        id S234527AbjHKKol (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 06:44:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234867AbjHKK3W (ORCPT
+        with ESMTP id S229882AbjHKKol (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 06:29:22 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F50E103;
-        Fri, 11 Aug 2023 03:29:20 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        Fri, 11 Aug 2023 06:44:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C16E4127;
+        Fri, 11 Aug 2023 03:44:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E57C521857;
-        Fri, 11 Aug 2023 10:29:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1691749758; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=2biRLr+ybHUGAvPaQcwoOwzen6pdf12bmyXIkH4xuos=;
-        b=rnsKxa7mvHQ0rVfHoScWLnHx+im7Fyvra+flxJ8k1fIBCnVhS0AZLUNSAdjEM87lq056Ei
-        8iyqQj5s67scGylQGPcVD4IBXDhI7tgaaErIS5/S0EPyXtV/Z4LQ4AmpSdp/AxGOMQkDw1
-        huGQegX1cv4bb+nDHsLEW3V5PJ3+oIA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1691749758;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=2biRLr+ybHUGAvPaQcwoOwzen6pdf12bmyXIkH4xuos=;
-        b=7k+mBFZa4s+msaZGF9zmzYlbJx4I+Fhd3Aikjp+gpDm6u5mg//D01L8c63iW7cM41PjBUf
-        AmGPYEWplJgwNgCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1350213592;
-        Fri, 11 Aug 2023 10:29:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id T0VmBH4N1mTCNQAAMHmgww
-        (envelope-from <hare@suse.de>); Fri, 11 Aug 2023 10:29:18 +0000
-Message-ID: <0bdc92a4-5eee-075b-2357-27cac97aa524@suse.de>
-Date:   Fri, 11 Aug 2023 12:29:17 +0200
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5290366A3D;
+        Fri, 11 Aug 2023 10:44:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34573C433C7;
+        Fri, 11 Aug 2023 10:44:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691750679;
+        bh=kkdQzEAQ0sF7AzB1JBDDbcTt7pWf3ymQ9Td1BynCWLg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RoukUon9sfsiciMjSOY6TVc8EqeSY93QZK24KKaNj5aMyzR1vasllKfU2NqxsS/Zh
+         EtlioH+wUgbrpcyyQ0zx+wE9vlXqiBdKjTAr8YnpePsR44z+Qm9LZK/Bz9G8K3nTJa
+         5Ods4z2uo8rS9DrNWHOQd+SdXc7YW5KImIAA6o4zV54G6XJUskvE6Ey9YPVOjCtHBY
+         Zte5IHKP0ey9bj+a4MDF8Tu7nUd5Vu3GOblEdr/EPvwu7Z35f8uyfvbpFAnN4lWt/W
+         kt9R3ElV7dxMZKEJjzdeyjx33visFZlFuUQFdyVLiisybuY3eXpzPSHHwP/UMB60FJ
+         sLHOFxaZCM2Vg==
+Date:   Fri, 11 Aug 2023 12:44:33 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+        Denis Efremov <efremov@linux.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-s390@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 01/17] FOLD: reverts part of "fs: use the super_block as
+ holder when mounting file systems"
+Message-ID: <20230811-codiert-ballen-159707b5d20e@brauner>
+References: <20230811100828.1897174-1-hch@lst.de>
+ <20230811100828.1897174-2-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v3 00/13] Switch to allowed_host
-To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <jsmart2021@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <20230811093614.28005-1-dwagner@suse.de>
-Content-Language: en-US
-From:   Hannes Reinecke <hare@suse.de>
-Autocrypt: addr=hare@suse.de; keydata=
- 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
- YwtooKEemPj2lg==
-In-Reply-To: <20230811093614.28005-1-dwagner@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230811100828.1897174-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/11/23 11:36, Daniel Wagner wrote:
-> Addressed the comments from v2. I also added cleanup code to _nvmet_cleanup() to
-> make sure we do not leak resources when something goes wrong. I run into this
-> while testing and all tests after the first failure failed then.
+On Fri, Aug 11, 2023 at 12:08:12PM +0200, Christoph Hellwig wrote:
+> The btrfs hunk should be dropped because the prerequisite btrfs changes were
+> dropped from the branch.
 > 
-> changes:
-> v3:
->   - added new patch: "nvme/043: Use hostnqn to generate DHCAP key"
->   - removed unused variable in "nvme/rc: Add helper for adding/removing to allow list"
->   - added cleanup code to _nvmet_cleanup().
-> 
-> v2:
->   - updated commit messages
->   - moved the removal of subsys_name to the right patch
->   - added _nvmet_target_{setup|cleanup} helpers
->     this addresses also the 'appears unused' warning by ShellCheck
->   - https://lore.kernel.org/linux-nvme/20230810111317.25273-1-dwagner@suse.de/
-> 
-> v1:
->   - initial version
->     https://lore.kernel.org/linux-nvme/20230726124644.12619-1-dwagner@suse.de/
-> Looks good.
-You can add:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Frankenstr. 146, 90461 Nürnberg
-Managing Directors: I. Totev, A. Myers, A. McDonald, M. B. Moerman
-(HRB 36809, AG Nürnberg)
-
+I've already got that dropped in vfs.super.
+So no need to for this.
