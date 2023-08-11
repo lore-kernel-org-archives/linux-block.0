@@ -2,132 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D21C04A94
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 10:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BCFC001DB
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 10:29:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235934AbjHKKVR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 06:21:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50100 "EHLO
+        id S234970AbjHKK3X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 06:29:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234340AbjHKKUx (ORCPT
+        with ESMTP id S234867AbjHKK3W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 06:20:53 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D844C3593
-        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 03:20:16 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230811102015epoutp04cbec2276a6e04d85465845a63f310cc1~6TPK3uDGl2849728497epoutp04h
-        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 10:20:15 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230811102015epoutp04cbec2276a6e04d85465845a63f310cc1~6TPK3uDGl2849728497epoutp04h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1691749215;
-        bh=c2jLjNWnQ/M9Rw0sJ/cfW/hL9LXxiP2rzuneLjpKg+c=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=u3JjtO8w08CzCEqYZZi0EVjTjjbkfLDPglCybFEkQiulj1cHLR8QNUFsFr7ElLVBh
-         z2ruPwWSr3XwnhwW29HrXtXY+DEMkYU/dlQOP9+OD+TJTAttvjdWOl9XGB+3dVRsLF
-         CI0TWpxEghwbutlleUT4vhbecbQqhwHjxsL4BZfw=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20230811102015epcas5p1c3fa8a8e05124e96c0e828a432592ea8~6TPKlq-wA1319413194epcas5p1l;
-        Fri, 11 Aug 2023 10:20:15 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.177]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4RMftj269cz4x9Px; Fri, 11 Aug
-        2023 10:20:13 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D1.3C.57354.B5B06D46; Fri, 11 Aug 2023 19:20:11 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20230811101913epcas5p3a007d4594f5313a04ed5b6414aeb5b61~6TORWLndn0497904979epcas5p3B;
-        Fri, 11 Aug 2023 10:19:13 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230811101913epsmtrp1fd2bd3a233f190012a121c571fb7b52f~6TORS0Lzr1422214222epsmtrp1H;
-        Fri, 11 Aug 2023 10:19:13 +0000 (GMT)
-X-AuditID: b6c32a44-007ff7000001e00a-e6-64d60b5b361c
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D9.FF.14748.12B06D46; Fri, 11 Aug 2023 19:19:13 +0900 (KST)
-Received: from unvme-desktop.sa.corp.samsungelectronics.net (unknown
-        [107.99.41.39]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230811101912epsmtip1bf5b373082dc71d4fe6a38b17a225e6d~6TOQNw61V1269712697epsmtip1L;
-        Fri, 11 Aug 2023 10:19:12 +0000 (GMT)
-From:   Ankit Kumar <ankit.kumar@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Keith Busch <kbusch@kernel.org>
-Cc:     gost.dev@samsung.com, Ankit Kumar <ankit.kumar@samsung.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] block:t10-pi: remove duplicate module license
-Date:   Fri, 11 Aug 2023 21:03:13 +0530
-Message-Id: <20230811153313.93786-3-ankit.kumar@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230811153313.93786-1-ankit.kumar@samsung.com>
+        Fri, 11 Aug 2023 06:29:22 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F50E103;
+        Fri, 11 Aug 2023 03:29:20 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id E57C521857;
+        Fri, 11 Aug 2023 10:29:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1691749758; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=2biRLr+ybHUGAvPaQcwoOwzen6pdf12bmyXIkH4xuos=;
+        b=rnsKxa7mvHQ0rVfHoScWLnHx+im7Fyvra+flxJ8k1fIBCnVhS0AZLUNSAdjEM87lq056Ei
+        8iyqQj5s67scGylQGPcVD4IBXDhI7tgaaErIS5/S0EPyXtV/Z4LQ4AmpSdp/AxGOMQkDw1
+        huGQegX1cv4bb+nDHsLEW3V5PJ3+oIA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1691749758;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=2biRLr+ybHUGAvPaQcwoOwzen6pdf12bmyXIkH4xuos=;
+        b=7k+mBFZa4s+msaZGF9zmzYlbJx4I+Fhd3Aikjp+gpDm6u5mg//D01L8c63iW7cM41PjBUf
+        AmGPYEWplJgwNgCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1350213592;
+        Fri, 11 Aug 2023 10:29:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id T0VmBH4N1mTCNQAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 11 Aug 2023 10:29:18 +0000
+Message-ID: <0bdc92a4-5eee-075b-2357-27cac97aa524@suse.de>
+Date:   Fri, 11 Aug 2023 12:29:17 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests v3 00/13] Switch to allowed_host
+To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <jsmart2021@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <20230811093614.28005-1-dwagner@suse.de>
+Content-Language: en-US
+From:   Hannes Reinecke <hare@suse.de>
+Autocrypt: addr=hare@suse.de; keydata=
+ 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
+ YwtooKEemPj2lg==
+In-Reply-To: <20230811093614.28005-1-dwagner@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupjk+LIzCtJLcpLzFFi42LZdlhTSzea+1qKwfyTahZrrvxmt1h9t5/N
-        4uaBnUwWkw5dY7TYe0vb4vKuOWwWy4//Y3Jg97h8ttRj06pONo+PT2+xePRtWcXo8XmTXABr
-        VLZNRmpiSmqRQmpecn5KZl66rZJ3cLxzvKmZgaGuoaWFuZJCXmJuqq2Si0+ArltmDtARSgpl
-        iTmlQKGAxOJiJX07m6L80pJUhYz84hJbpdSClJwCkwK94sTc4tK8dL281BIrQwMDI1OgwoTs
-        jL/NR9kLVrJULLtzlamB8RpzFyMnh4SAicTxxU1ANheHkMBuRonpj/cwQjifGCXuzDvFCFIl
-        JPCNUWL1Wj2YjgV3XrJAFO1llNi0cwkThNPJJHGl+S3YXDYBbYlXb2+A2SICZRJvHu4Es5kF
-        aiQ6781iArGFBZwk7q5/xAZiswioSixYvhmshlfARmLl/v3sENvkJWZe+g5mcwrYSkz98YYR
-        okZQ4uTMJywQM+UlmrfOBvtBQuAtu8TjKXuhml0kHn5YzwJhC0u8Or4FKi4l8bK/DcrOltj0
-        8CcThF0gceRFLzRg7CVaT/UD2RxACzQl1u/ShwjLSkw9tY4JYi+fRO/vJ1CtvBI75sHYqhJ/
-        792GWistcfPdVSjbQ+L1vpXQ4J3AKNH/7yPrBEaFWUj+mYXkn1kIqxcwMq9ilEwtKM5NT002
-        LTDMSy2Hx3Jyfu4mRnDC1HLZwXhj/j+9Q4xMHIyHGCU4mJVEeG2DL6UI8aYkVlalFuXHF5Xm
-        pBYfYjQFBvhEZinR5Hxgys4riTc0sTQwMTMzM7E0NjNUEud93To3RUggPbEkNTs1tSC1CKaP
-        iYNTqoEpLPPDOZdjBjdmbf+a3zVZfpbsXV+Vk8W+zuFf9sc/tu7yznKXv8JxYeuKZq7u7SdX
-        fYz/ylZ29XNQdnFXKfsX0YW5yiUv2ZI8dwu3+sQ//LiZ1bz4Tw5XM6e+V87ayT1X/lnv/3Vm
-        YeI/k19RTo2vrfsblAwVeg8+a9x85rxWVN+KWbyC7RVueyq38jlc7joUsLhAee8myYow21ST
-        7kf9q790rpB8d/mAyj5bH1Xz+SWTtbolbnqEPF83J/DFSsHjapuLmNY83Cj0Z9a120V6Fp+z
-        lE+flcmZN9eBvc87pXa6w8f1t7Yq3/q9p76u0jNvluzUTzPVtEQKhLXtF65Um3F4/qKlcyoK
-        GY+zv1JVYinOSDTUYi4qTgQAxq70vSEEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrCLMWRmVeSWpSXmKPExsWy7bCSnK4i97UUg8MHZSzWXPnNbrH6bj+b
-        xc0DO5ksJh26xmix95a2xeVdc9gslh//x+TA7nH5bKnHplWdbB4fn95i8ejbsorR4/MmuQDW
-        KC6blNSczLLUIn27BK6Mv81H2QtWslQsu3OVqYHxGnMXIyeHhICJxII7L1m6GLk4hAR2M0qs
-        fHqFvYuRAyghLbFwfSJEjbDEyn/P2UFsIYF2JontHyJAbDYBbYlXb2+AzRERqJCY82kpK8gc
-        ZoEGRokpn/vAEsICThJ31z9iA7FZBFQlFizfDBbnFbCRWLl/PzvEAnmJmZe+g9mcArYSU3+8
-        YYRYZiNxdNUVNoh6QYmTM5+wgNjMQPXNW2czT2AUmIUkNQtJagEj0ypGydSC4tz03GTDAsO8
-        1HK94sTc4tK8dL3k/NxNjOCA1tLYwXhv/j+9Q4xMHIyHGCU4mJVEeG2DL6UI8aYkVlalFuXH
-        F5XmpBYfYpTmYFES5zWcMTtFSCA9sSQ1OzW1ILUIJsvEwSnVwJRwOUfg3ZUDdiHnnFvXWmh3
-        SvicKLjNNFmCv67/tUJKhM6ErzM+CVxduaZH/emceSsjC2V3z7Wt2TFP+vjaeTMOZ96t/7n3
-        vm3Hp1uxezU0xRbdkNCfyrTuAe++pC23Mopm50XNsHesCVwQkZ4yJeXqNkXN/ZO4W4P4Vxye
-        fanWkcEzX9Odt6Ble73eBp00x1TBgljz88fVUni125W9Z3Fk7Ks/9sKzd03Zlv9HFm1pdzrE
-        Ne3CJGYjnxXx7/ufRq/q6Ypdc32BfdRsC5NFL98d5eVNN4h/n8n2Xf6Wp6mOvmVA7sUH++Vv
-        eO248Ec3QG/nN9Vdanx6f5e88d61ZlvZZlXmvLdMk87PK572q1WJpTgj0VCLuag4EQDO5JFd
-        1wIAAA==
-X-CMS-MailID: 20230811101913epcas5p3a007d4594f5313a04ed5b6414aeb5b61
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230811101913epcas5p3a007d4594f5313a04ed5b6414aeb5b61
-References: <20230811153313.93786-1-ankit.kumar@samsung.com>
-        <CGME20230811101913epcas5p3a007d4594f5313a04ed5b6414aeb5b61@epcas5p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove duplicate MODULE_LICENSE("GPL") from t10-pi.c
-Fixes: a7d4383f17e1 ("block: add pi for extended integrity")
+On 8/11/23 11:36, Daniel Wagner wrote:
+> Addressed the comments from v2. I also added cleanup code to _nvmet_cleanup() to
+> make sure we do not leak resources when something goes wrong. I run into this
+> while testing and all tests after the first failure failed then.
+> 
+> changes:
+> v3:
+>   - added new patch: "nvme/043: Use hostnqn to generate DHCAP key"
+>   - removed unused variable in "nvme/rc: Add helper for adding/removing to allow list"
+>   - added cleanup code to _nvmet_cleanup().
+> 
+> v2:
+>   - updated commit messages
+>   - moved the removal of subsys_name to the right patch
+>   - added _nvmet_target_{setup|cleanup} helpers
+>     this addresses also the 'appears unused' warning by ShellCheck
+>   - https://lore.kernel.org/linux-nvme/20230810111317.25273-1-dwagner@suse.de/
+> 
+> v1:
+>   - initial version
+>     https://lore.kernel.org/linux-nvme/20230726124644.12619-1-dwagner@suse.de/
+> Looks good.
+You can add:
 
-Signed-off-by: Ankit Kumar <ankit.kumar@samsung.com>
----
- block/t10-pi.c | 1 -
- 1 file changed, 1 deletion(-)
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index bf0bba01417f..042f21b0e2e5 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -471,4 +471,3 @@ const struct blk_integrity_profile ext_pi_type3_crc64 = {
- EXPORT_SYMBOL_GPL(ext_pi_type3_crc64);
- 
- MODULE_LICENSE("GPL");
--MODULE_LICENSE("GPL");
+Cheers,
+
+Hannes
 -- 
-2.25.1
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Frankenstr. 146, 90461 Nürnberg
+Managing Directors: I. Totev, A. Myers, A. McDonald, M. B. Moerman
+(HRB 36809, AG Nürnberg)
 
