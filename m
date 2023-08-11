@@ -2,92 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2731EB64DD
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 16:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A389CC41513
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 16:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235758AbjHKQjJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 12:39:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56516 "EHLO
+        id S234853AbjHKQ5X convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 12:57:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235700AbjHKQjJ (ORCPT
+        with ESMTP id S235502AbjHKQ5V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 12:39:09 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A8F52696
-        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 09:39:08 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99cbfee358eso292520866b.3
-        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 09:39:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1691771947; x=1692376747;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZIHlgRVD4zuIsPHrllchsXgEvRrrKBDJPCXSLRIlRrE=;
-        b=HKHeGXsCsnFAgm5g19pTrZh7wlETPzz6bibBKIHF7dFVtlcbrZfdZx/5fo+bjGFGKR
-         JlmyttburRrNMleVRL7az+QY06Z99EU/gQdrtZiZtFMDu9QYak1AQGY/CfVzd8BSx0FQ
-         YYXV9UECSnsSqdxDAaAJ2Pm0riRPcsoqhgyK8=
+        Fri, 11 Aug 2023 12:57:21 -0400
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB172D79;
+        Fri, 11 Aug 2023 09:57:21 -0700 (PDT)
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-56d0deeca09so401101eaf.0;
+        Fri, 11 Aug 2023 09:57:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691771947; x=1692376747;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZIHlgRVD4zuIsPHrllchsXgEvRrrKBDJPCXSLRIlRrE=;
-        b=I27KzZba1ShB7FGraGqD2o17PIfsYnu+2OMSWLdL1diVNty5tr8c9mbiTyLyuWV2JW
-         AclzJ0PVYadRvD8tZhXQU4jKQvjtqqx66LpDSOYEXHvLE0jMVF1PqZXUfKhWhapDfpfU
-         YJ+ESLfDHTAVU8rNfY1INt7J9Meag3l/WpuT/IU+8kLV4VrDLlM1sPHNqJmN39jiYwal
-         pdp17JDMrmUCVg1P/K+/dxz67xBFwuTOXmqXTMo/Naa8/3Zh5J1r6z58YV0q+RNuf2ow
-         xechDEIrpZsXe/i4R2lEWhykuSWCDl75pQ0UPCgYRITxLdWD17htADv5n5Mc/y1fAvYN
-         HdqA==
-X-Gm-Message-State: AOJu0YyTJo/uqtAEENkE+HHspdUeXYmIPNQccVA6syhw+1DCdn6hMBzc
-        qRBCsoK7EtX2i4t7/r4OlZlIm68vwIotB96DmslgBaKU
-X-Google-Smtp-Source: AGHT+IFOcC6uPRL7wbA7puKsFyUpJuG7YsDCaMGBMYfmAd0AE0bw/a8Gxeazqs5l9HK4GMf8L2UUWA==
-X-Received: by 2002:a17:906:7698:b0:999:80cf:82fd with SMTP id o24-20020a170906769800b0099980cf82fdmr2291372ejm.18.1691771947031;
-        Fri, 11 Aug 2023 09:39:07 -0700 (PDT)
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com. [209.85.208.54])
-        by smtp.gmail.com with ESMTPSA id ce11-20020a170906b24b00b0097073f1ed84sm2439883ejb.4.2023.08.11.09.39.04
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Aug 2023 09:39:04 -0700 (PDT)
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-51e2a6a3768so2927995a12.0
-        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2023 09:39:04 -0700 (PDT)
-X-Received: by 2002:a05:6402:184c:b0:522:ae79:3ee8 with SMTP id
- v12-20020a056402184c00b00522ae793ee8mr2037905edy.5.1691771944135; Fri, 11 Aug
- 2023 09:39:04 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691773040; x=1692377840;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/MKrsTvyOkFqYnQxHrODPvzn4CYiImWubBs2zxt84WE=;
+        b=N5zN+I8pPchiAd+KAWPGPUQU50wB0o4Q8DHbGKcz5BDjqyXOn/7BKL7q6+bCOyg/Oj
+         X9Qb++jgWKLOfyqCil6MTnsef/wNKvF0N3X+Jw1+bApaxg91CZSPyXLxvs7e3YLeI4dD
+         zaiitjwoWnLxJCVOA6v6te64qqbdL4bCjS74dlk7Bp5HE4QZorIV0neDHOzVEIkvSx87
+         7plLYsGgzIU2XOFIb+syK84yL5Ww3lDlCWgENwTKA6ynsSkhQ4ILDYchhZcGe2bae7kc
+         aEAcHCxr+QB5TdzlhuucbnRWMVSXSK+/gGswqVC/cQJ9a6nd/r9vK0fTx7D7l2yCuZ7x
+         Bilw==
+X-Gm-Message-State: AOJu0Yw6PAg/IaMe1xlmv/7/8qn14nWrkvieRPDEgx54UWLCvsG8Y3Fp
+        5b/h4HJPQJjrEx0obBzE88xAehIfPk7tTI1dCsPIwELz
+X-Google-Smtp-Source: AGHT+IFMyWrzb3vv1ElBiPYzpwa36cwgwBCpEMcLCPL2IYmDcOJa1XmuQJK0vw7falr30iJFoiXy4kqHBDPTohgtiSs=
+X-Received: by 2002:a4a:e04e:0:b0:569:a08a:d9c5 with SMTP id
+ v14-20020a4ae04e000000b00569a08ad9c5mr1997794oos.0.1691773040594; Fri, 11 Aug
+ 2023 09:57:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <3710261.1691764329@warthog.procyon.org.uk>
-In-Reply-To: <3710261.1691764329@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 11 Aug 2023 09:38:46 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wi1QZ+zdXkjnEY7u1GsVDaBv8yY+m4-9G3R34ihwg9pmQ@mail.gmail.com>
-Message-ID: <CAHk-=wi1QZ+zdXkjnEY7u1GsVDaBv8yY+m4-9G3R34ihwg9pmQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] iov_iter: Convert iterate*() to inline funcs
-To:     David Howells <dhowells@redhat.com>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>, jlayton@kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+References: <20230810171429.31759-1-jack@suse.cz> <20230811110504.27514-16-jack@suse.cz>
+In-Reply-To: <20230811110504.27514-16-jack@suse.cz>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Fri, 11 Aug 2023 18:57:09 +0200
+Message-ID: <CAJZ5v0jpCQugJCqPEXCsjskmRRoF9PTj0p696WA+GoKVroL0Lw@mail.gmail.com>
+Subject: Re: [PATCH 16/29] PM: hibernate: Convert to bdev_open_by_dev()
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, linux-pm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 11 Aug 2023 at 07:40, David Howells <dhowells@redhat.com> wrote:
+On Fri, Aug 11, 2023 at 1:05 PM Jan Kara <jack@suse.cz> wrote:
 >
-> Convert the iov_iter iteration macros to inline functions to make the code
-> easier to follow.
+> Convert hibernation code to use bdev_open_by_dev().
+>
+> CC: linux-pm@vger.kernel.org
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-I like this generally, the code generation deprovement worries me a
-bit, but from a quick look on a test-branch it didn't really look all
-that bad (but the changes are too big to usefully show up as asm
-diffs)
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
 
-I do note that maybe you should just also mark
-copy_to/from/page_user_iter as being always-inlines. clang actually
-seems to do that without prompting, gcc apparently not.
-
-Or at *least* do the memcpy_to/from_iter functions, which are only
-wrappers around memcpy and are just completely noise. I'm surprised
-gcc didn't already inline that. Strange.
-
-            Linus
+> ---
+>  kernel/power/swap.c | 31 ++++++++++++++++---------------
+>  1 file changed, 16 insertions(+), 15 deletions(-)
+>
+> diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+> index f6ebcd00c410..b475bee282ff 100644
+> --- a/kernel/power/swap.c
+> +++ b/kernel/power/swap.c
+> @@ -222,7 +222,7 @@ int swsusp_swap_in_use(void)
+>   */
+>
+>  static unsigned short root_swap = 0xffff;
+> -static struct block_device *hib_resume_bdev;
+> +static struct bdev_handle *hib_resume_bdev_handle;
+>
+>  struct hib_bio_batch {
+>         atomic_t                count;
+> @@ -276,7 +276,8 @@ static int hib_submit_io(blk_opf_t opf, pgoff_t page_off, void *addr,
+>         struct bio *bio;
+>         int error = 0;
+>
+> -       bio = bio_alloc(hib_resume_bdev, 1, opf, GFP_NOIO | __GFP_HIGH);
+> +       bio = bio_alloc(hib_resume_bdev_handle->bdev, 1, opf,
+> +                       GFP_NOIO | __GFP_HIGH);
+>         bio->bi_iter.bi_sector = page_off * (PAGE_SIZE >> 9);
+>
+>         if (bio_add_page(bio, page, PAGE_SIZE, 0) < PAGE_SIZE) {
+> @@ -356,14 +357,14 @@ static int swsusp_swap_check(void)
+>                 return res;
+>         root_swap = res;
+>
+> -       hib_resume_bdev = blkdev_get_by_dev(swsusp_resume_device,
+> +       hib_resume_bdev_handle = bdev_open_by_dev(swsusp_resume_device,
+>                         BLK_OPEN_WRITE, NULL, NULL);
+> -       if (IS_ERR(hib_resume_bdev))
+> -               return PTR_ERR(hib_resume_bdev);
+> +       if (IS_ERR(hib_resume_bdev_handle))
+> +               return PTR_ERR(hib_resume_bdev_handle);
+>
+> -       res = set_blocksize(hib_resume_bdev, PAGE_SIZE);
+> +       res = set_blocksize(hib_resume_bdev_handle->bdev, PAGE_SIZE);
+>         if (res < 0)
+> -               blkdev_put(hib_resume_bdev, NULL);
+> +               bdev_release(hib_resume_bdev_handle);
+>
+>         return res;
+>  }
+> @@ -1521,10 +1522,10 @@ int swsusp_check(bool snapshot_test)
+>         void *holder = snapshot_test ? &swsusp_holder : NULL;
+>         int error;
+>
+> -       hib_resume_bdev = blkdev_get_by_dev(swsusp_resume_device, BLK_OPEN_READ,
+> -                                           holder, NULL);
+> -       if (!IS_ERR(hib_resume_bdev)) {
+> -               set_blocksize(hib_resume_bdev, PAGE_SIZE);
+> +       hib_resume_bdev_handle = bdev_open_by_dev(swsusp_resume_device,
+> +                               BLK_OPEN_READ, holder, NULL);
+> +       if (!IS_ERR(hib_resume_bdev_handle)) {
+> +               set_blocksize(hib_resume_bdev_handle->bdev, PAGE_SIZE);
+>                 clear_page(swsusp_header);
+>                 error = hib_submit_io(REQ_OP_READ, swsusp_resume_block,
+>                                         swsusp_header, NULL);
+> @@ -1549,11 +1550,11 @@ int swsusp_check(bool snapshot_test)
+>
+>  put:
+>                 if (error)
+> -                       blkdev_put(hib_resume_bdev, holder);
+> +                       bdev_release(hib_resume_bdev_handle);
+>                 else
+>                         pr_debug("Image signature found, resuming\n");
+>         } else {
+> -               error = PTR_ERR(hib_resume_bdev);
+> +               error = PTR_ERR(hib_resume_bdev_handle);
+>         }
+>
+>         if (error)
+> @@ -1568,12 +1569,12 @@ int swsusp_check(bool snapshot_test)
+>
+>  void swsusp_close(bool snapshot_test)
+>  {
+> -       if (IS_ERR(hib_resume_bdev)) {
+> +       if (IS_ERR(hib_resume_bdev_handle)) {
+>                 pr_debug("Image device not initialised\n");
+>                 return;
+>         }
+>
+> -       blkdev_put(hib_resume_bdev, snapshot_test ? &swsusp_holder : NULL);
+> +       bdev_release(hib_resume_bdev_handle);
+>  }
+>
+>  /**
+> --
+> 2.35.3
+>
