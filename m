@@ -2,54 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51705C001DE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 13:10:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B78DC001DB
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 13:18:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231894AbjHKNKz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 09:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40370 "EHLO
+        id S235494AbjHKNSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Aug 2023 09:18:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229994AbjHKNKy (ORCPT
+        with ESMTP id S235437AbjHKNR7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 09:10:54 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FF730CB;
-        Fri, 11 Aug 2023 06:10:53 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 4DD1867373; Fri, 11 Aug 2023 15:10:49 +0200 (CEST)
-Date:   Fri, 11 Aug 2023 15:10:49 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-nvme@lists.infradead.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Wen Xiong <wenxiong@linux.ibm.com>,
-        Keith Busch <kbusch@kernel.org>, linuxppc-dev@lists.ozlabs.org,
-        Dave Young <dyoung@redhat.com>, kexec@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Baoquan He <bhe@redhat.com>,
-        Pingfan Liu <piliu@redhat.com>
-Subject: Re: [PATCH V3 01/14] blk-mq: add blk_mq_max_nr_hw_queues()
-Message-ID: <20230811131049.GA20991@lst.de>
-References: <20230808104239.146085-1-ming.lei@redhat.com> <20230808104239.146085-2-ming.lei@redhat.com> <20230809134401.GA31852@lst.de> <ZNQqt1C0pXspGl3d@fedora>
+        Fri, 11 Aug 2023 09:17:59 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B6430EB;
+        Fri, 11 Aug 2023 06:17:58 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 41B8321875;
+        Fri, 11 Aug 2023 13:17:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1691759877;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jxg4TxS/cWMUXDhX+Q9gfid5V2x8SK/7YZ4qzrUQGPw=;
+        b=E4Sjzuw1+s9z57yqR8TqHdrTIAIfqlF0aO3xt916+YEZQoGQ8xf0cposTBZQU0wFD+mUPK
+        N357zPJOSNrXTqUErUFX/4FCpghua6XQu5bD0bbJKzRFGyqM91yug32oJPZ4/ewNu8pmeX
+        cwevnrFG+Ao1hj3ojRyKVt1OpDwiI6s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1691759877;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jxg4TxS/cWMUXDhX+Q9gfid5V2x8SK/7YZ4qzrUQGPw=;
+        b=M+ZAVaWnqAM/Oi3IQFevlgwEaHXiAZnzmggT07Dkg7x9FI9GNAMFZc9doUlUu+4+yr8DFg
+        d0l3iNDFg1Z2lXAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D88E813592;
+        Fri, 11 Aug 2023 13:17:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id TMEFNAQ11mRafgAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Fri, 11 Aug 2023 13:17:56 +0000
+Date:   Fri, 11 Aug 2023 15:11:31 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>,
+        Denis Efremov <efremov@linux.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-s390@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 05/17] btrfs: open block devices after superblock creation
+Message-ID: <20230811131131.GN2420@suse.cz>
+Reply-To: dsterba@suse.cz
+References: <20230811100828.1897174-1-hch@lst.de>
+ <20230811100828.1897174-6-hch@lst.de>
+ <20230811-wildpark-bronzen-5e30a56de1a1@brauner>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZNQqt1C0pXspGl3d@fedora>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20230811-wildpark-bronzen-5e30a56de1a1@brauner>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 08:09:27AM +0800, Ming Lei wrote:
-> 1) some archs support 'nr_cpus=1' for kdump kernel, which is fine, since
-> num_possible_cpus becomes 1.
+On Fri, Aug 11, 2023 at 02:44:50PM +0200, Christian Brauner wrote:
+> On Fri, Aug 11, 2023 at 12:08:16PM +0200, Christoph Hellwig wrote:
+> > Currently btrfs_mount_root opens the block devices before committing to
+> > allocating a super block. That creates problems for restricting the
+> > number of writers to a device, and also leads to a unusual and not very
+> > helpful holder (the fs_type).
+> > 
+> > Reorganize the code to first check whether the superblock for a
+> > particular fsid does already exist and open the block devices only if it
+> > doesn't, mirroring the recent changes to the VFS mount helpers.  To do
+> > this the increment of the in_use counter moves out of btrfs_open_devices
+> > and into the only caller in btrfs_mount_root so that it happens before
+> > dropping uuid_mutex around the call to sget.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
 > 
-> 2) some archs do not support 'nr_cpus=1', and have to rely on
-> 'max_cpus=1', so num_possible_cpus isn't changed, and kernel just boots
-> with single online cpu. That causes trouble because blk-mq limits single
-> queue.
+> Looks good to me,
+> Acked-by: Christian Brauner <brauner@kernel.org>
+> 
+> And ofc, would be great to get btrfs reviews.
 
-And we need to fix case 2.  We need to drop the is_kdump support, and
-if they want to force less cpus they need to make nr_cpus=1 work.
-
+I'll take a look but there are some performance regressions to deal with
+and pre-merge window freeze so it won't be soon.
