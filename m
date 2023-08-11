@@ -2,99 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D66BFC04A94
-	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 00:45:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F22C04A94
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 01:23:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231449AbjHKApd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 20:45:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
+        id S229580AbjHKBXk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 21:23:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbjHKApd (ORCPT
+        with ESMTP id S229503AbjHKBXk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 20:45:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4F212D;
-        Thu, 10 Aug 2023 17:45:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 38E156581F;
-        Fri, 11 Aug 2023 00:45:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C3F8C433C8;
-        Fri, 11 Aug 2023 00:45:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691714731;
-        bh=TL2lGinnVfblYhXzBN1hM2/vDMpAf0+EW8bTRI0zmNo=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=oBIO4Um7iID0oSvut+Trfud+6Ej05D9FGCvSoMvkolWQk7t0YjDphWF0qQ3FGKUrO
-         i8meZgFCu5QTqJve4o5HTbJ7Zlz6UI7gk8MYPQJsW5KV3vvvd/xvGZZKZtnhLuTpKT
-         KbchN7gceHeEO1XXhTaHjThfJnERP6basokH9FN8PcbiL8XHVWGIs6Ub17tsE10LLx
-         MSMGVuCoKcEV2wowM0LbmM1+IojR7AqlABAxqkbTU5k1lh/y0hG6Y337ITIgJj9K/j
-         NWCuvN4sDuPf8lkZ9uC+FV6Sfl1GafkZos+q10cRDiYmr6IY+Uzf2ScOmKciL0wsBD
-         69rtk9W7HZxZg==
-Message-ID: <8aa716eb-e440-8a28-0c89-07729fcf1715@kernel.org>
-Date:   Fri, 11 Aug 2023 09:45:29 +0900
+        Thu, 10 Aug 2023 21:23:40 -0400
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74552273E
+        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 18:23:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1691717019; x=1723253019;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lQkrLEJOnEmWSUncnB7H5JsGyGJ220SolBqq4n6SNa4=;
+  b=E2MjHC/PilaFgf9ECM4fL4/iMXm23s9rBccAkntr5xW/I1XqHbEiAOnp
+   cctukoDO1uk9zaZQUHDxqkkOu3iX5WWGrgJAIvBopr9J0WQyDg5RkLCms
+   SkJkQG0o7IF+zNOdNN4PZ872XmEyM3ZfYC2LsN/6YAYRVeP6a0d7aoCHo
+   P1tG8Tg5GWAM461gTEPUXAtM8Cweg54bWwpK9Xz2ldV4F1f9FEC0ryawH
+   EVcWQHMeRKXk9QajNtjHv9wkXa/o0YmyOCrcHsYB5FFUKwkbToINnf2Mu
+   j3IZMMQKPicwP/Z/yf0sz4/2K1Rp9XglfYWqVlDcVx9+QxPkwwdGdAz0t
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.01,164,1684771200"; 
+   d="scan'208";a="241082143"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 11 Aug 2023 09:23:38 +0800
+IronPort-SDR: hf49wq1D/LVsEMpBwFVbTnTAK2EBkvAUywAZIC8GI3h21pw59RrWhq4xcjwg6DeRXSqQhHVzbB
+ aS7h6sVh/vKqaP4YzKLywynj/Rkf7LZwvVj9vA1JbdsU00dthKAneR5zxipihAUVQ7Cb/B/bmV
+ UH0XYH3qFvKb4KDFudel3pGCWmZgc1c/n6kybEQyz9nHrGiD5I4UVRbdNWI1LGJotKuKNj0iHQ
+ +9SPMbEj3OnbOd39kFMZZDzdK2ETOIWbscUHLaS8xVnzqOealqw9hIsB6Oh0V5/tyt354wuhSy
+ V+c=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Aug 2023 17:31:22 -0700
+IronPort-SDR: EBD7Zsap+FTYB854yNdN2NfsiEr1MfXNc30Bu1vU1Muqxhttsk3sdWS5ZND/JMPiilMneIE3xq
+ cnvliOtwiuF9JLsx6oh7NpCOA4eOAFv+UDJ9yLC0S9cN9/fNlwEe2D93QHgHf2jS073tiJxoVD
+ 51j1CyO+1WfJKvs/f5gzlT4G8CCQA6g9i2RJhpSjp+bsPxX9yc4U3BmkkI5qoAbIRjiLyVv7l6
+ YoR+WS32iYxcvJXxbgR3ksumW+34nZwmvzcIuh1UfApVsM2N6Q4zuDSznm20C807iBTKjhwWHd
+ L4o=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
+  by uls-op-cesaip02.wdc.com with ESMTP; 10 Aug 2023 18:23:35 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc:     Yi Zhang <yi.zhang@redhat.com>, Daniel Wagner <dwagner@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] nvme/rc: fix nvme device readiness check after _nvme_connect_subsys
+Date:   Fri, 11 Aug 2023 10:23:34 +0900
+Message-Id: <20230811012334.3392220-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v7 2/7] block/mq-deadline: Only use zone locking if
- necessary
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230809202355.1171455-1-bvanassche@acm.org>
- <20230809202355.1171455-3-bvanassche@acm.org>
- <06527195-8f6d-0395-a7d5-d19634a00ad2@kernel.org>
- <d83cb0aa-ae35-bb58-5cd0-72b8c03d934f@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <d83cb0aa-ae35-bb58-5cd0-72b8c03d934f@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/23 23:00, Bart Van Assche wrote:
-> On 8/9/23 18:36, Damien Le Moal wrote:
->> On 8/10/23 05:23, Bart Van Assche wrote:
->>> +static bool dd_use_zone_write_locking(struct request_queue *q)
->>> +{
->>> +	return q->limits.use_zone_write_lock && blk_queue_is_zoned(q);
->>
->> use_zone_write_lock should be true ONLY if the queue is zoned.
->> So the "&& blk_queue_is_zoned(q)" seems unnecessary to me.
->> This little helper could be moved to be generic in blkdev.h too.
-> 
-> Hi Damien,
-> 
-> use_zone_write_lock should be set by the block driver (e.g. a SCSI
-> LLD) before I/O starts. The zone model information is retrieved by
-> submitting I/O. It is not clear to me how to set use_zone_write_lock
-> to true only for zoned block devices before I/O starts since I/O is
-> required to retrieve information about the zone model.
+The helper function _nvme_connect_subsys() creates a nvme device. It may
+take some time after the function call until the device gets ready for
+I/O. So it is expected that the test cases call _find_nvme_dev() after
+_nvme_connect_subsys() before I/O. _find_nvme_dev() returns the path of
+the created device, and it also waits for uuid and wwid sysfs attributes
+of the created device get ready. This wait works as the wait for the
+device I/O readiness.
 
-See my other email. Once you know that the drive is zoned, then
-use_zone_write_lock can default to true. That is trivial to do in
-disk_set_zoned(), which is called by all drivers. I proposed adding an argument
-to this function to override the default, thus allowing a device driver to set
-it to false.
+However, this wait by _find_nvme_dev() has two problems. The first
+problem is missing call of _find_nvme_dev(). The test case nvme/047
+calls _nvme_connect_subsys() twice, but _find_nvme_dev() is called only
+for the first _nvme_connect_subsys() call. This causes too early I/O to
+the device with tcp transport [1]. Fix this by moving the code for
+device readiness wait from _find_nvme_dev() to _nvme_connect_subsys().
 
-The limit default set to true as you have it in your current patch does not make
-sense to me. It should be false by default and turned on only for zoned drive
-that require zone write locking (e.g. SMR HDDs). With that, mq-deadline can even
-be simplified to not even look at the q zoned model and simply us
-q->limits.use_zone_write_lock to determine if locking a zone is needed or not.
-That would be a lot cleaner.
+The second problem is wrong paths for the sysfs attributes. The paths
+do not include namespace index, so the check for the attributes always
+fail. Still _find_nvme_dev() does 1 second wait and allows the device
+get ready for I/O in most cases, but this is not intended behavior.
+Fix the paths by adding the namespace index.
 
-Not that device scan and revalidation never write to the device. So that can be
-done safely regardless of the current value for the use_zone_write_lock limit.
+On top of the checks for sysfs attributes, add check for the created
+device file. This ensures that the create device is ready for I/O.
 
+[1] https://lore.kernel.org/linux-block/CAHj4cs9GNohGUjohNw93jrr8JGNcRYC-ienAZz+sa7az1RK77w@mail.gmail.com/
 
+Fixes: c766fccf3aff ("Make the NVMe tests more reliable")
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ tests/nvme/rc | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 4f3a994..d09e7b4 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -425,6 +425,7 @@ _nvme_connect_subsys() {
+ 	local keep_alive_tmo=""
+ 	local reconnect_delay=""
+ 	local ctrl_loss_tmo=""
++	local dev i
+ 
+ 	while [[ $# -gt 0 ]]; do
+ 		case $1 in
+@@ -529,6 +530,16 @@ _nvme_connect_subsys() {
+ 	fi
+ 
+ 	nvme connect "${ARGS[@]}" 2> /dev/null
++
++	dev=$(_find_nvme_dev "$subsysnqn")
++	for ((i = 0; i < 10; i++)); do
++		if [[ -b /dev/${dev}n1 &&
++			      -e /sys/block/${dev}n1/uuid &&
++			      -e /sys/block/${dev}n1/wwid ]]; then
++			return
++		fi
++		sleep .1
++	done
+ }
+ 
+ _nvme_discover() {
+@@ -739,13 +750,6 @@ _find_nvme_dev() {
+ 		subsysnqn="$(cat "/sys/class/nvme/${dev}/subsysnqn")"
+ 		if [[ "$subsysnqn" == "$subsys" ]]; then
+ 			echo "$dev"
+-			for ((i = 0; i < 10; i++)); do
+-				if [[ -e /sys/block/$dev/uuid &&
+-					-e /sys/block/$dev/wwid ]]; then
+-					return
+-				fi
+-				sleep .1
+-			done
+ 		fi
+ 	done
+ }
 -- 
-Damien Le Moal
-Western Digital Research
+2.40.1
 
