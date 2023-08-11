@@ -2,368 +2,134 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12919C001DE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Aug 2023 23:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E47C04A94
+	for <linux-block@archiver.kernel.org>; Fri, 11 Aug 2023 00:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbjHJXiy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Aug 2023 19:38:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40160 "EHLO
+        id S229929AbjHKA1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Aug 2023 20:27:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjHJXix (ORCPT
+        with ESMTP id S229448AbjHKA1Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2023 19:38:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9309F271E
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 16:38:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 11DD064D92
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2023 23:38:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C57D7C433C7;
-        Thu, 10 Aug 2023 23:38:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691710731;
-        bh=se5Vu7ZAbf9ajPA0Wxef4WG3s0pw1ppQzcBxbOd4YfA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EXWKjnLrgS1c7VIit9rYOhzv1O0DZSrOtJjXw/dHA4W//dkPzwoMkzXGz4BA4039C
-         YTzsx6Wt6qzazfIWylw/NvRow832yqhk9M0fSyEmnxMBNsnKUCnyNAz55fMppI+aq3
-         jao4IBWjAlRKTFwSm3uZVPAIIW5EYwSTGKrzNdBk4mAzifUyCT3p7VVgA+UyAwpBws
-         uQQvycqfz1y1H+0kOgZ8Xpiq2qp672dHUOlXnVmsXmmIXX0NMAzomTCVAYutndxOeb
-         f38SXaEe/PBjbeJmjFsWx4pUdGazBuOc7fzTVGzWQsz8j6WY8BxHnYfDk0Bk7j+zhl
-         Nuz/h/XuZsfIQ==
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     davem@davemloft.net
-Cc:     netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-        jiri@resnulli.us, johannes@sipsolutions.net,
-        Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@nvidia.com>,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, axboe@kernel.dk, pshelar@ovn.org,
-        jmaloy@redhat.com, ying.xue@windriver.com,
-        jacob.e.keller@intel.com, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, dev@openvswitch.org,
-        tipc-discussion@lists.sourceforge.net
-Subject: [PATCH net-next v2 03/10] genetlink: remove userhdr from struct genl_info
-Date:   Thu, 10 Aug 2023 16:38:38 -0700
-Message-ID: <20230810233845.2318049-4-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230810233845.2318049-1-kuba@kernel.org>
-References: <20230810233845.2318049-1-kuba@kernel.org>
+        Thu, 10 Aug 2023 20:27:24 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED792718;
+        Thu, 10 Aug 2023 17:27:24 -0700 (PDT)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37B03Iiq025172;
+        Fri, 11 Aug 2023 00:27:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=qcppdkim1;
+ bh=MRXzDHmf0jpToFYvEYjb8jcM+QLXtNMavgjF9THlYLE=;
+ b=BOTSZ0fDNVkSQ2MXuhqZkVBJtcu1xuqjVkD3kqNgj0R6g+84iJIVm4Ls62c6pBKoI7W7
+ p/dcoq7qe40pDjetHpPopEW2LbWcuryw8NcuK8KJanGLYKXpK53W4fB4rvW/JIeHwCDD
+ GyXBg4t6oYOX+fJ4wrn2E33Bj+xaYFNsN2LU+0yb2Dx7rMpulEtUUEC+eeYuExbOq+mk
+ 0YsFkN+xXVl7/9F6w71K45gensKmlVcH2G2WClIUm7FwTWHsv3nyCeC/o1ddy4sIbHgd
+ SZj0Y1A3vjtNFT6gGklKFuo/dRJBjtGus+6fVv3LAcB9N0mVB2oAuqQjhoXUgGoyf1OA +A== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sd90603vk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Aug 2023 00:27:20 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37B0RJsh004329
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Aug 2023 00:27:19 GMT
+Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 10 Aug 2023 17:27:18 -0700
+Received: from nalasex01a.na.qualcomm.com ([fe80::25d0:9235:354f:5fa9]) by
+ nalasex01a.na.qualcomm.com ([fe80::25d0:9235:354f:5fa9%4]) with mapi id
+ 15.02.1118.030; Thu, 10 Aug 2023 17:27:18 -0700
+From:   "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "Om Prakash Singh" <omprsing@qti.qualcomm.com>,
+        "Prasad Sodagudi (QUIC)" <quic_psodagud@quicinc.com>,
+        "Arun Menon (SSG)" <avmenon@quicinc.com>,
+        "abel.vesa@linaro.org" <abel.vesa@linaro.org>,
+        "Seshu Madhavi Puppala (QUIC)" <quic_spuppala@quicinc.com>
+Subject: RE: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
+ ufs
+Thread-Topic: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
+ ufs
+Thread-Index: AQHZumN+a5RI3WgcJ0CO2LlDH5s476/Ca+iAgBIbBxCADxLrAIAAxjXQ
+Date:   Fri, 11 Aug 2023 00:27:18 +0000
+Message-ID: <371088f78c6d4febbbfaf3c1a12cf19f@quicinc.com>
+References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
+ <20230720025541.GA2607@sol.localdomain>
+ <ca11701e403f48b6839b26c47a1b537f@quicinc.com>
+ <20230810053642.GD923@sol.localdomain>
+In-Reply-To: <20230810053642.GD923@sol.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.52.103.164]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: tNmSuQfPNm_Uwa1dtOWpKf-UlFsAkBQ8
+X-Proofpoint-ORIG-GUID: tNmSuQfPNm_Uwa1dtOWpKf-UlFsAkBQ8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-10_19,2023-08-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 adultscore=0
+ suspectscore=0 malwarescore=0 mlxscore=0 clxscore=1015 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308110002
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Only three families use info->userhdr today and going forward
-we discourage using fixed headers in new families.
-So having the pointer to user header in struct genl_info
-is an overkill. Compute the header pointer at runtime.
 
-Reviewed-by: Johannes Berg <johannes@sipsolutions.net>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: philipp.reisner@linbit.com
-CC: lars.ellenberg@linbit.com
-CC: christoph.boehmwalder@linbit.com
-CC: axboe@kernel.dk
-CC: pshelar@ovn.org
-CC: jmaloy@redhat.com
-CC: ying.xue@windriver.com
-CC: jacob.e.keller@intel.com
-CC: drbd-dev@lists.linbit.com
-CC: linux-block@vger.kernel.org
-CC: dev@openvswitch.org
-CC: tipc-discussion@lists.sourceforge.net
----
- drivers/block/drbd/drbd_nl.c |  9 +++++----
- include/net/genetlink.h      |  7 +++++--
- net/netlink/genetlink.c      |  1 -
- net/openvswitch/conntrack.c  |  2 +-
- net/openvswitch/datapath.c   | 29 ++++++++++++++++-------------
- net/openvswitch/meter.c      | 10 +++++-----
- net/tipc/netlink_compat.c    |  2 +-
- 7 files changed, 33 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index cddae6f4b00f..d3538bd83fb3 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -159,7 +159,7 @@ static int drbd_msg_sprintf_info(struct sk_buff *skb, const char *fmt, ...)
- static int drbd_adm_prepare(struct drbd_config_context *adm_ctx,
- 	struct sk_buff *skb, struct genl_info *info, unsigned flags)
- {
--	struct drbd_genlmsghdr *d_in = info->userhdr;
-+	struct drbd_genlmsghdr *d_in = genl_info_userhdr(info);
- 	const u8 cmd = info->genlhdr->cmd;
- 	int err;
- 
-@@ -1396,8 +1396,9 @@ static void drbd_suspend_al(struct drbd_device *device)
- 
- static bool should_set_defaults(struct genl_info *info)
- {
--	unsigned flags = ((struct drbd_genlmsghdr*)info->userhdr)->flags;
--	return 0 != (flags & DRBD_GENL_F_SET_DEFAULTS);
-+	struct drbd_genlmsghdr *dh = genl_info_userhdr(info);
-+
-+	return 0 != (dh->flags & DRBD_GENL_F_SET_DEFAULTS);
- }
- 
- static unsigned int drbd_al_extents_max(struct drbd_backing_dev *bdev)
-@@ -4276,7 +4277,7 @@ static void device_to_info(struct device_info *info,
- int drbd_adm_new_minor(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct drbd_config_context adm_ctx;
--	struct drbd_genlmsghdr *dh = info->userhdr;
-+	struct drbd_genlmsghdr *dh = genl_info_userhdr(info);
- 	enum drbd_ret_code retcode;
- 
- 	retcode = drbd_adm_prepare(&adm_ctx, skb, info, DRBD_ADM_NEED_RESOURCE);
-diff --git a/include/net/genetlink.h b/include/net/genetlink.h
-index 0366d0925596..9dc21ec15734 100644
---- a/include/net/genetlink.h
-+++ b/include/net/genetlink.h
-@@ -95,7 +95,6 @@ struct genl_family {
-  * @snd_portid: netlink portid of sender
-  * @nlhdr: netlink message header
-  * @genlhdr: generic netlink message header
-- * @userhdr: user specific header
-  * @attrs: netlink attributes
-  * @_net: network namespace
-  * @user_ptr: user pointers
-@@ -106,7 +105,6 @@ struct genl_info {
- 	u32			snd_portid;
- 	const struct nlmsghdr *	nlhdr;
- 	struct genlmsghdr *	genlhdr;
--	void *			userhdr;
- 	struct nlattr **	attrs;
- 	possible_net_t		_net;
- 	void *			user_ptr[2];
-@@ -123,6 +121,11 @@ static inline void genl_info_net_set(struct genl_info *info, struct net *net)
- 	write_pnet(&info->_net, net);
- }
- 
-+static inline void *genl_info_userhdr(const struct genl_info *info)
-+{
-+	return (u8 *)info->genlhdr + GENL_HDRLEN;
-+}
-+
- #define GENL_SET_ERR_MSG(info, msg) NL_SET_ERR_MSG((info)->extack, msg)
- 
- #define GENL_SET_ERR_MSG_FMT(info, msg, args...) \
-diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-index 0d4285688ab9..f98f730bb245 100644
---- a/net/netlink/genetlink.c
-+++ b/net/netlink/genetlink.c
-@@ -943,7 +943,6 @@ static int genl_family_rcv_msg_doit(const struct genl_family *family,
- 	info.snd_portid = NETLINK_CB(skb).portid;
- 	info.nlhdr = nlh;
- 	info.genlhdr = nlmsg_data(nlh);
--	info.userhdr = nlmsg_data(nlh) + GENL_HDRLEN;
- 	info.attrs = attrbuf;
- 	info.extack = extack;
- 	genl_info_net_set(&info, net);
-diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
-index fa955e892210..03a6220b7d99 100644
---- a/net/openvswitch/conntrack.c
-+++ b/net/openvswitch/conntrack.c
-@@ -1604,7 +1604,7 @@ static struct sk_buff *
- ovs_ct_limit_cmd_reply_start(struct genl_info *info, u8 cmd,
- 			     struct ovs_header **ovs_reply_header)
- {
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct sk_buff *skb;
- 
- 	skb = genlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index a6d2a0b1aa21..80f5f755b0e6 100644
---- a/net/openvswitch/datapath.c
-+++ b/net/openvswitch/datapath.c
-@@ -589,7 +589,7 @@ static int queue_userspace_packet(struct datapath *dp, struct sk_buff *skb,
- 
- static int ovs_packet_cmd_execute(struct sk_buff *skb, struct genl_info *info)
- {
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct net *net = sock_net(skb->sk);
- 	struct nlattr **a = info->attrs;
- 	struct sw_flow_actions *acts;
-@@ -966,7 +966,7 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct net *net = sock_net(skb->sk);
- 	struct nlattr **a = info->attrs;
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct sw_flow *flow = NULL, *new_flow;
- 	struct sw_flow_mask mask;
- 	struct sk_buff *reply;
-@@ -1213,7 +1213,7 @@ static int ovs_flow_cmd_set(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct net *net = sock_net(skb->sk);
- 	struct nlattr **a = info->attrs;
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct sw_flow_key key;
- 	struct sw_flow *flow;
- 	struct sk_buff *reply = NULL;
-@@ -1314,7 +1314,7 @@ static int ovs_flow_cmd_set(struct sk_buff *skb, struct genl_info *info)
- static int ovs_flow_cmd_get(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nlattr **a = info->attrs;
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct net *net = sock_net(skb->sk);
- 	struct sw_flow_key key;
- 	struct sk_buff *reply;
-@@ -1373,7 +1373,7 @@ static int ovs_flow_cmd_get(struct sk_buff *skb, struct genl_info *info)
- static int ovs_flow_cmd_del(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nlattr **a = info->attrs;
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct net *net = sock_net(skb->sk);
- 	struct sw_flow_key key;
- 	struct sk_buff *reply;
-@@ -1641,7 +1641,7 @@ static void ovs_dp_reset_user_features(struct sk_buff *skb,
- {
- 	struct datapath *dp;
- 
--	dp = lookup_datapath(sock_net(skb->sk), info->userhdr,
-+	dp = lookup_datapath(sock_net(skb->sk), genl_info_userhdr(info),
- 			     info->attrs);
- 	if (IS_ERR(dp))
- 		return;
-@@ -1934,7 +1934,8 @@ static int ovs_dp_cmd_del(struct sk_buff *skb, struct genl_info *info)
- 		return -ENOMEM;
- 
- 	ovs_lock();
--	dp = lookup_datapath(sock_net(skb->sk), info->userhdr, info->attrs);
-+	dp = lookup_datapath(sock_net(skb->sk), genl_info_userhdr(info),
-+			     info->attrs);
- 	err = PTR_ERR(dp);
- 	if (IS_ERR(dp))
- 		goto err_unlock_free;
-@@ -1967,7 +1968,8 @@ static int ovs_dp_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 		return -ENOMEM;
- 
- 	ovs_lock();
--	dp = lookup_datapath(sock_net(skb->sk), info->userhdr, info->attrs);
-+	dp = lookup_datapath(sock_net(skb->sk), genl_info_userhdr(info),
-+			     info->attrs);
- 	err = PTR_ERR(dp);
- 	if (IS_ERR(dp))
- 		goto err_unlock_free;
-@@ -2002,7 +2004,8 @@ static int ovs_dp_cmd_get(struct sk_buff *skb, struct genl_info *info)
- 		return -ENOMEM;
- 
- 	ovs_lock();
--	dp = lookup_datapath(sock_net(skb->sk), info->userhdr, info->attrs);
-+	dp = lookup_datapath(sock_net(skb->sk), genl_info_userhdr(info),
-+			     info->attrs);
- 	if (IS_ERR(dp)) {
- 		err = PTR_ERR(dp);
- 		goto err_unlock_free;
-@@ -2245,7 +2248,7 @@ static void ovs_update_headroom(struct datapath *dp, unsigned int new_headroom)
- static int ovs_vport_cmd_new(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nlattr **a = info->attrs;
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct vport_parms parms;
- 	struct sk_buff *reply;
- 	struct vport *vport;
-@@ -2347,7 +2350,7 @@ static int ovs_vport_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 		return -ENOMEM;
- 
- 	ovs_lock();
--	vport = lookup_vport(sock_net(skb->sk), info->userhdr, a);
-+	vport = lookup_vport(sock_net(skb->sk), genl_info_userhdr(info), a);
- 	err = PTR_ERR(vport);
- 	if (IS_ERR(vport))
- 		goto exit_unlock_free;
-@@ -2403,7 +2406,7 @@ static int ovs_vport_cmd_del(struct sk_buff *skb, struct genl_info *info)
- 		return -ENOMEM;
- 
- 	ovs_lock();
--	vport = lookup_vport(sock_net(skb->sk), info->userhdr, a);
-+	vport = lookup_vport(sock_net(skb->sk), genl_info_userhdr(info), a);
- 	err = PTR_ERR(vport);
- 	if (IS_ERR(vport))
- 		goto exit_unlock_free;
-@@ -2446,7 +2449,7 @@ static int ovs_vport_cmd_del(struct sk_buff *skb, struct genl_info *info)
- static int ovs_vport_cmd_get(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nlattr **a = info->attrs;
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct sk_buff *reply;
- 	struct vport *vport;
- 	int err;
-diff --git a/net/openvswitch/meter.c b/net/openvswitch/meter.c
-index c4ebf810e4b1..cc08e0403909 100644
---- a/net/openvswitch/meter.c
-+++ b/net/openvswitch/meter.c
-@@ -211,7 +211,7 @@ ovs_meter_cmd_reply_start(struct genl_info *info, u8 cmd,
- 			  struct ovs_header **ovs_reply_header)
- {
- 	struct sk_buff *skb;
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 
- 	skb = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_ATOMIC);
- 	if (!skb)
-@@ -272,7 +272,7 @@ static int ovs_meter_cmd_reply_stats(struct sk_buff *reply, u32 meter_id,
- 
- static int ovs_meter_cmd_features(struct sk_buff *skb, struct genl_info *info)
- {
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct ovs_header *ovs_reply_header;
- 	struct nlattr *nla, *band_nla;
- 	struct sk_buff *reply;
-@@ -409,7 +409,7 @@ static int ovs_meter_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 	struct dp_meter *meter, *old_meter;
- 	struct sk_buff *reply;
- 	struct ovs_header *ovs_reply_header;
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct dp_meter_table *meter_tbl;
- 	struct datapath *dp;
- 	int err;
-@@ -482,7 +482,7 @@ static int ovs_meter_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 
- static int ovs_meter_cmd_get(struct sk_buff *skb, struct genl_info *info)
- {
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct ovs_header *ovs_reply_header;
- 	struct nlattr **a = info->attrs;
- 	struct dp_meter *meter;
-@@ -535,7 +535,7 @@ static int ovs_meter_cmd_get(struct sk_buff *skb, struct genl_info *info)
- 
- static int ovs_meter_cmd_del(struct sk_buff *skb, struct genl_info *info)
- {
--	struct ovs_header *ovs_header = info->userhdr;
-+	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct ovs_header *ovs_reply_header;
- 	struct nlattr **a = info->attrs;
- 	struct dp_meter *old_meter;
-diff --git a/net/tipc/netlink_compat.c b/net/tipc/netlink_compat.c
-index 9b47c8409231..299cd6754f14 100644
---- a/net/tipc/netlink_compat.c
-+++ b/net/tipc/netlink_compat.c
-@@ -1294,7 +1294,7 @@ static int tipc_nl_compat_recv(struct sk_buff *skb, struct genl_info *info)
- 	struct tipc_nl_compat_msg msg;
- 	struct nlmsghdr *req_nlh;
- 	struct nlmsghdr *rep_nlh;
--	struct tipc_genlmsghdr *req_userhdr = info->userhdr;
-+	struct tipc_genlmsghdr *req_userhdr = genl_info_userhdr(info);
- 
- 	memset(&msg, 0, sizeof(msg));
- 
--- 
-2.41.0
+-----Original Message-----
+From: Eric Biggers <ebiggers@kernel.org>=20
+Sent: Wednesday, August 9, 2023 10:37 PM
+To: Gaurav Kashyap (QUIC) <quic_gaurkash@quicinc.com>
+Cc: linux-scsi@vger.kernel.org; linux-arm-msm@vger.kernel.org; linux-mmc@vg=
+er.kernel.org; linux-block@vger.kernel.org; linux-fscrypt@vger.kernel.org; =
+Om Prakash Singh <omprsing@qti.qualcomm.com>; Prasad Sodagudi (QUIC) <quic_=
+psodagud@quicinc.com>; Arun Menon (SSG) <avmenon@quicinc.com>; abel.vesa@li=
+naro.org; Seshu Madhavi Puppala (QUIC) <quic_spuppala@quicinc.com>
+Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and=
+ ufs
 
+On Tue, Aug 01, 2023 at 05:31:59PM +0000, Gaurav Kashyap (QUIC) wrote:
+>=20
+> According to your cover letter, this feature requires a custom TrustZone =
+image to work on SM8550.  Will that image be made available outside Qualcom=
+m?
+> --> Unfortunately, I don't think there is a way to do that. You can still=
+ request for one through our customer engineering team like before.
+
+I think it's already been shown that that is not a workable approach.
+
+> Also, can you please make available a git branch somewhere that contains =
+your patchset?  It sounds like this depends on https://git.kernel.org/pub/s=
+cm/fs/fscrypt/linux.git/log/?h=3Dwrapped-keys-v7, but actually a version of=
+ it that you've rebased, which I don't have access to.
+> Without being able to apply your patchset, I can't properly review it.
+> --> As for the fscrypt patches,
+>       I have not changed much functionally from the v7 patch, just merge =
+conflicts.
+>       I will update this thread once I figure out a git location.
+>=20
+
+Any update on this?  Most kernel developers just create a GitHub repo if th=
+ey don't have kernel.org access.
+
+>> Here are the git links
+>> https://github.com/quic-gaurkash/linux/tree/fscrypt
+>> https://github.com/quic-gaurkash/linux/tree/wrapped_keys_ice_ufs
+
+- Eric
