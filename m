@@ -2,89 +2,144 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6120FEB64DD
-	for <linux-block@archiver.kernel.org>; Sat, 12 Aug 2023 02:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E44C0015E
+	for <linux-block@archiver.kernel.org>; Sat, 12 Aug 2023 07:21:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236665AbjHLCtp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Aug 2023 22:49:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55770 "EHLO
+        id S231631AbjHLHV0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 12 Aug 2023 03:21:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236300AbjHLCtp (ORCPT
+        with ESMTP id S229497AbjHLHVY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2023 22:49:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B32130E7;
-        Fri, 11 Aug 2023 19:49:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D5006642A0;
-        Sat, 12 Aug 2023 02:49:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DB92C433C8;
-        Sat, 12 Aug 2023 02:49:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691808584;
-        bh=oiiYrMY4fXAFliNihHNUww9+1ATkMLlVtS4xA0Jfd8s=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=caZLxlDxzMyDFKTHLCnfX4jx0e2O+5uE/9UeWKdC0Un7x+5ZdqyyRcwtmO+s40LlS
-         UkxQdr9z5k72FqQIt+R1XdRPUcs0pJ2QaFDOKLNGOdVrVp0aokOqoMqiEb97uoYjtJ
-         nKMegpa64fteEYgsoLclUu7Xj7Pd+KRDx9HrILj74XpjDTLRXRFkfifciyk5Ls5fz7
-         U10h5Ajtx7aW6T58jER+jSKrCJ7f7eW9ATaectgXs3VEEaxoAfNGl4g3bCvOC971zu
-         0FrduCZuw4l9q2oGK5eYQ62zT7sJXvBF2PW/VVUVjDGXAXR3Ei+s1VM3wZbn8Gehjk
-         lshKafQ71jAwQ==
-Message-ID: <dc83cb3b-b495-aa8c-fc96-c3f7ac56c262@kernel.org>
-Date:   Sat, 12 Aug 2023 11:49:42 +0900
+        Sat, 12 Aug 2023 03:21:24 -0400
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EFF49C;
+        Sat, 12 Aug 2023 00:21:24 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6b9cf1997c4so2509678a34.3;
+        Sat, 12 Aug 2023 00:21:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691824884; x=1692429684;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IEENV70+bdbkoZdaUV5XqhM/23tTitj6To+lYwver7M=;
+        b=o7GwMmBzt4k4OkA91irOXoOtbUDgvM2iz+y5d7B6/5HN74c1sjPuZ6uZJQa3Ce+sc7
+         vGTTqxblgVyVBvKDBfMPjt8Exmr1eHtAb8vexkXuORyuHK/BOil+XQUl7R7uhPIzFQQj
+         OQbd/KCOE/okri3p5POGhiZwk0my/2A5dfjbz8T4qb8D+6IwPItdM9J1s7AkKdjxymSd
+         IOx/678dJNyXnwZnxzdeahovq7hwmyCqCDj0BFvrhqWnZj8ZL9Fhv2idMpVuXAPp78H0
+         BTSXV3rRqQSWLUwzzkdRwYJD40P/f/4licOGWFA2z9WeIrpAOZ2yiaOLM6UMIzuvEN6V
+         dXfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691824884; x=1692429684;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IEENV70+bdbkoZdaUV5XqhM/23tTitj6To+lYwver7M=;
+        b=kJqeFwTgAOlkCAoJX/wGbQHr9J4vi1ZzJe0uCG0RPZec1jrrtIgQb+RNs38kfEqL77
+         yrjC8vsS9cR6Ce7Jjul1hcfBPt4c04RXw/ewMXIZD1KlSJ532ZKNd2pQn2bN2ZUG1QFg
+         p7oZ3GPZ82Au8WgqKhe7XPleOBDG6AeUh/Y51R2Z324FJIeKfsgAVl2GszSSd7leR8N9
+         lM8FXsFxoAOCDPRdAtT9sZ2oabuEQIE1wQwvWO/CKckH+5urI+/x8DQ8AQy+0y2AvIyh
+         HohFt6Dk4EEuLhMAIquaXvH4wzcmJNjygWtpU8Y5FtlX2/SLJqebn7MxgZGnvV0xsPKN
+         afaA==
+X-Gm-Message-State: AOJu0Yzu122veFTY+KJPxAqQyIH4aJSUcNex2WgN0Q8iXgkDy9tsRmAb
+        WHtFANEaNLE7Giu0qTg1pBg=
+X-Google-Smtp-Source: AGHT+IFG7p9TE3X3rIEFB70uFATNJGmL2bU2k9WiS033dEXIJJVhKb4LFIjniIFD6IFDn/3RcMEJ/g==
+X-Received: by 2002:a9d:7d90:0:b0:6bc:da49:676c with SMTP id j16-20020a9d7d90000000b006bcda49676cmr4234990otn.24.1691824883752;
+        Sat, 12 Aug 2023 00:21:23 -0700 (PDT)
+Received: from MacBook-Pro.bytedance.net ([139.177.225.251])
+        by smtp.gmail.com with ESMTPSA id q22-20020a62ae16000000b006687b4f2044sm4356649pff.164.2023.08.12.00.21.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Aug 2023 00:21:23 -0700 (PDT)
+From:   zhuxiaohui <zhuxiaohui400@gmail.com>
+X-Google-Original-From: zhuxiaohui <zhuxiaohui.400@bytedance.com>
+To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org, zhuxiaohui <zhuxiaohui.400@bytedance.com>
+Subject: [PATCH 1/1] blk-throttle: fix throttle configuring not effective
+Date:   Sat, 12 Aug 2023 15:21:16 +0800
+Message-ID: <20230812072116.42321-1-zhuxiaohui.400@bytedance.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v7 2/7] block/mq-deadline: Only use zone locking if
- necessary
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230809202355.1171455-1-bvanassche@acm.org>
- <20230809202355.1171455-3-bvanassche@acm.org>
- <06527195-8f6d-0395-a7d5-d19634a00ad2@kernel.org>
- <d83cb0aa-ae35-bb58-5cd0-72b8c03d934f@acm.org>
- <8aa716eb-e440-8a28-0c89-07729fcf1715@kernel.org>
- <92e109dc-c5ee-ce0c-002c-3323f3918503@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <92e109dc-c5ee-ce0c-002c-3323f3918503@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/12/23 00:49, Bart Van Assche wrote:
-> On 8/10/23 17:45, Damien Le Moal wrote:
->> With that, mq-deadline can even be simplified to not even look at the
->> q zoned model and simply us q->limits.use_zone_write_lock to
->> determine if locking a zone is needed or not.
-> 
-> Hi Damien,
-> 
-> I think implementing the above proposal requires splitting 
-> 'use_zone_write_lock' into two variables:
-> (a) One member variable that indicates whether the zone write lock
->      should be used.
-> (b) Another member variable that indicates whether or not the LLD
->      preserves the order of SCSI commands.
-> 
-> Member variable (b) should be set by the LLD and member variable (a) can 
-> be set by disk_set_zoned().
-> 
-> Do you want me to implement this approach?
-> 
+when updating block throttle limit with persistence and stable io
+pressure, especially a relative high io pressure, fio test e.g.,
+there may never be a change to start a new slice, and carryover_ios &
+carryover_bytes will not be cleared.
 
-Looking at your v8, this seems better.
-I will have a more in-depth look Monday.
+As a result, when reconfiguring block throttle limit, we can notice that
+the actual iops and throughput is a random value far away from what is
+set
 
+So we need to update carryover value when dispatching bio
+
+Signed-off-by: zhuxiaohui <zhuxiaohui.400@bytedance.com>
+---
+ block/blk-throttle.c | 26 ++++++++++++++++++++++++++
+ block/blk-throttle.h |  4 ++--
+ 2 files changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 7397ff199d66..13c9d87a7201 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -821,6 +821,30 @@ static void tg_update_carryover(struct throtl_grp *tg)
+ 		   tg->carryover_ios[READ], tg->carryover_ios[WRITE]);
+ }
+ 
++static void tg_charge_carryover(struct throtl_grp *tg, struct bio *bio)
++{
++	bool rw = bio_data_dir(bio);
++
++	if (unlikely(tg->carryover_bytes[rw])) {
++		unsigned int bio_size = throtl_bio_data_size(bio);
++		unsigned int carryout_size = abs(tg->carryover_bytes[rw]);
++
++		carryout_size = min(carryout_size, bio_size);
++
++		if (tg->carryover_bytes[rw] < 0)
++			tg->carryover_bytes[rw] += carryout_size;
++		else
++			tg->carryover_bytes[rw] -= carryout_size;
++	}
++
++	if (unlikely(tg->carryover_ios[rw])) {
++		if (tg->carryover_ios[rw] < 0)
++			tg->carryover_ios[rw] += 1;
++		else
++			tg->carryover_ios[rw] -= 1;
++	}
++}
++
+ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 				 u32 iops_limit)
+ {
+@@ -965,6 +989,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 
+ 	tg->io_disp[rw]++;
+ 	tg->last_io_disp[rw]++;
++
++	tg_charge_carryover(tg, bio);
+ }
+ 
+ /**
+diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+index d1ccbfe9f797..8f1642becb23 100644
+--- a/block/blk-throttle.h
++++ b/block/blk-throttle.h
+@@ -127,8 +127,8 @@ struct throtl_grp {
+ 	 * bytes/ios are waited already in previous configuration, and they will
+ 	 * be used to calculate wait time under new configuration.
+ 	 */
+-	uint64_t carryover_bytes[2];
+-	unsigned int carryover_ios[2];
++	int64_t carryover_bytes[2];
++	int carryover_ios[2];
+ 
+ 	unsigned long last_check_time;
+ 
 -- 
-Damien Le Moal
-Western Digital Research
+2.39.2
 
