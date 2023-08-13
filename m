@@ -2,76 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B22DC04A6A
-	for <linux-block@archiver.kernel.org>; Sun, 13 Aug 2023 15:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C184C001DE
+	for <linux-block@archiver.kernel.org>; Sun, 13 Aug 2023 15:24:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230257AbjHMO76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Aug 2023 10:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55560 "EHLO
+        id S230245AbjHMPX7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Aug 2023 11:23:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbjHMO7z (ORCPT
+        with ESMTP id S230186AbjHMPX7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Aug 2023 10:59:55 -0400
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C95E4B;
-        Sun, 13 Aug 2023 07:59:57 -0700 (PDT)
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fe8d816a40so3470205e9.1;
-        Sun, 13 Aug 2023 07:59:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691938796; x=1692543596;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Il0m/lOqz0vfB+XlsodsH9+I+amK+zd4Tb9YP5hNen0=;
-        b=aUiSB33sknPd6+50yVb0jYxhDQjmQfd2DN/n2ivQTr7onpmeoD2DkbfzHHP5jAyCWy
-         UN5mSw42vMW0to2XzKbWyC718/pcM5IW+murwBlYQlHfJsa+pQ1oBpNa96dNXKAwXebg
-         5PZFyELVxFW8wrj1s0tO+phYUfJIW5C6xM35IMjk0SSnXUoMDVZWgolTAHXxsl5cxeMO
-         oxyL8tqNI+vATObhjiCwvVk2G1H8IO7g3/Qv/M9P7MqeCPuVuICD0/x77lBxCCrYJY1i
-         0bxMjVxOVwp4FJRavwkFPnBPaSi2hsncu2IP40Jhx3EBsINQmzP0MoHBqN8N4mNmkUL8
-         aMDg==
-X-Gm-Message-State: AOJu0YxpVHT+odnmvS35wbnyST1MUfd3zTmekJDDMVaDBYHovUTfkjtq
-        A3u/pHkqhDJjUvN6s2IHoRs=
-X-Google-Smtp-Source: AGHT+IHTrX97QvCgayVEBdbqNUrzi0Oa+3iNx1L7BGPGmJ1HsLfOLo9itX/W7HaXgjAK5iLkZmhtQw==
-X-Received: by 2002:a5d:5484:0:b0:319:7624:4c8d with SMTP id h4-20020a5d5484000000b0031976244c8dmr711423wrv.0.1691938795912;
-        Sun, 13 Aug 2023 07:59:55 -0700 (PDT)
-Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
-        by smtp.gmail.com with ESMTPSA id pk15-20020a170906d7af00b0099bcf9c2ec6sm4690166ejb.75.2023.08.13.07.59.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Aug 2023 07:59:55 -0700 (PDT)
-Message-ID: <1098c6a6-50cb-8704-9041-03c431155dfb@grimberg.me>
-Date:   Sun, 13 Aug 2023 17:59:53 +0300
+        Sun, 13 Aug 2023 11:23:59 -0400
+Received: from out-81.mta1.migadu.com (out-81.mta1.migadu.com [95.215.58.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4CE1709
+        for <linux-block@vger.kernel.org>; Sun, 13 Aug 2023 08:23:58 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1691940236;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=XkcqFUq2iQ+GDNeZzMw6CrBWy06VHbGuLcfVVf92S4A=;
+        b=LK5FGwlCHvTui01VHknsB9SONJipEgvP9qTCUPmFzeaxlcoQqge/GnMinykRtbVcypZ27b
+        dMxE1qwdLtR5TTMbgLlPgdYdUA0gCmx22s/7TlJPV5QwXLxvnWYpvWKrZbZwuMK7v2cKue
+        6l0dxDk6TOW2qWatxbTbHfhGwg/6jkM=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, hch@lst.de, chuck.lever@oracle.com
+Cc:     bvanassche@acm.org, cel@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
+Subject: [PATCH v2] blk-mq: release scheduler resource when request complete
+Date:   Sun, 13 Aug 2023 23:23:25 +0800
+Message-ID: <20230813152325.3017343-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH blktests v3 00/13] Switch to allowed_host
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <20230811093614.28005-1-dwagner@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230811093614.28005-1-dwagner@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-> Addressed the comments from v2. I also added cleanup code to _nvmet_cleanup() to
-> make sure we do not leak resources when something goes wrong. I run into this
-> while testing and all tests after the first failure failed then.
+Chuck reported [1] a IO hang problem on NFS exports that reside on SATA
+devices and bisected to commit 615939a2ae73 ("blk-mq: defer to the normal
+submission path for post-flush requests").
 
-The name of the patch series suggest that it switches to allowed_hosts
-where it does that in 2 patches 11+12 out of 13 patches. The rest are
-just bug fixes and unifications. It's true that any series will include
-fixes, cleanups and prep patches, but this is too far :)
+We analysed the IO hang problem, found there are two postflush requests
+are waiting for each other.
 
-I'll let Shinichiro accept as he wish though.
+The first postflush request completed the REQ_FSEQ_DATA sequence, so go to
+the REQ_FSEQ_POSTFLUSH sequence and added in the flush pending list, but
+failed to blk_kick_flush() because of the second postflush request which
+is inflight waiting in scheduler queue.
 
-The cleanups look fine to me.
+The second postflush waiting in scheduler queue can't be dispatched because
+the first postflush hasn't released scheduler resource even though it has
+completed by itself.
+
+Fix it by releasing scheduler resource when the first postflush request
+completed, so the second postflush can be dispatched and completed, then
+make blk_kick_flush() succeed.
+
+[1] https://lore.kernel.org/all/7A57C7AE-A51A-4254-888B-FE15CA21F9E9@oracle.com/
+
+Fixes: 615939a2ae73 ("blk-mq: defer to the normal submission path for post-flush requests")
+Reported-by: Chuck Lever <chuck.lever@oracle.com>
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+Tested-by: Chuck Lever <chuck.lever@oracle.com>
+---
+v2:
+ - All IO schedulers do set ->finish_request(), so remove the
+   check and warn on not setting when register.
+---
+ block/blk-mq.c   | 16 ++++++++++++----
+ block/elevator.c |  3 +++
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f14b8669ac69..a8c63bef8ff1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -682,6 +682,14 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
+ 
++static void blk_mq_finish_request(struct request *rq)
++{
++	struct request_queue *q = rq->q;
++
++	if (rq->rq_flags & RQF_USE_SCHED)
++		q->elevator->type->ops.finish_request(rq);
++}
++
+ static void __blk_mq_free_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+@@ -708,10 +716,6 @@ void blk_mq_free_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+ 
+-	if ((rq->rq_flags & RQF_USE_SCHED) &&
+-	    q->elevator->type->ops.finish_request)
+-		q->elevator->type->ops.finish_request(rq);
+-
+ 	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
+ 		laptop_io_completion(q->disk->bdi);
+ 
+@@ -1021,6 +1025,8 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ 	if (blk_mq_need_time_stamp(rq))
+ 		__blk_mq_end_request_acct(rq, ktime_get_ns());
+ 
++	blk_mq_finish_request(rq);
++
+ 	if (rq->end_io) {
+ 		rq_qos_done(rq->q, rq);
+ 		if (rq->end_io(rq, error) == RQ_END_IO_FREE)
+@@ -1075,6 +1081,8 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
+ 		if (iob->need_ts)
+ 			__blk_mq_end_request_acct(rq, now);
+ 
++		blk_mq_finish_request(rq);
++
+ 		rq_qos_done(rq->q, rq);
+ 
+ 		/*
+diff --git a/block/elevator.c b/block/elevator.c
+index 8400e303fbcb..ac2cb3814eac 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -499,6 +499,9 @@ void elv_unregister_queue(struct request_queue *q)
+ 
+ int elv_register(struct elevator_type *e)
+ {
++	if (WARN_ON_ONCE(!e->ops.finish_request))
++		return -EINVAL;
++
+ 	/* insert_requests and dispatch_request are mandatory */
+ 	if (WARN_ON_ONCE(!e->ops.insert_requests || !e->ops.dispatch_request))
+ 		return -EINVAL;
+-- 
+2.41.0
+
