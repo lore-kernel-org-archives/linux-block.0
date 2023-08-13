@@ -2,231 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA518C04E69
-	for <linux-block@archiver.kernel.org>; Sun, 13 Aug 2023 16:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4F6C001B0
+	for <linux-block@archiver.kernel.org>; Sun, 13 Aug 2023 18:26:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232983AbjHMQMc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Aug 2023 12:12:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47480 "EHLO
+        id S230412AbjHMS0o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Aug 2023 14:26:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233320AbjHMQMN (ORCPT
+        with ESMTP id S229451AbjHMS0o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Aug 2023 12:12:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1F73C0A;
-        Sun, 13 Aug 2023 09:11:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D05C863A52;
-        Sun, 13 Aug 2023 16:11:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F9FC433C7;
-        Sun, 13 Aug 2023 16:11:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691943075;
-        bh=rAYwRyMxRkjEsU5qDSG4duEtw9c+cb5Dcz+XpcRMPzU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uv5XWzuCCROesXehcRBvJo7gFtp112FVeHamFZ3YqqXnJ/ScY0RHEQDnTWRafd8wC
-         poiWMGckX27DvELD4iRQ2oGBovyhGNcNfBci9oAghWrNKuFIbP+6af/tpYUA2uOqlz
-         RJMbwS/gdDsnLy7vqp7HVmz+oH6qZU+n/hj20sGUPL8RTe1cx9KNnzAOKHDcRnksRY
-         Y86SZggnZ1sVfGldn/jvNyWEZpRoJLYclv5/VXGFmwFlDsbrU0GDx2tlwqbyDJnWzE
-         kzd1MKMpRhz9HlJlktSHb+wJCTDTuGP0ISnF38EB+FmNJagQsrLCChwqD/sZSFJJKH
-         FkwV4vwh/Gw5Q==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Sasha Levin <sashal@kernel.org>, axboe@kernel.dk,
-        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 22/25] rbd: make get_lock_owner_info() return a single locker or NULL
-Date:   Sun, 13 Aug 2023 12:09:33 -0400
-Message-Id: <20230813160936.1082758-22-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230813160936.1082758-1-sashal@kernel.org>
-References: <20230813160936.1082758-1-sashal@kernel.org>
+        Sun, 13 Aug 2023 14:26:44 -0400
+Received: from out-64.mta0.migadu.com (out-64.mta0.migadu.com [IPv6:2001:41d0:1004:224b::40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B92910E3
+        for <linux-block@vger.kernel.org>; Sun, 13 Aug 2023 11:26:45 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1691951203;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=EGnlBdzWiItWEyj1uxLZJa+yR+f6yFA61Olaqu7O6Xs=;
+        b=ZpO3Pa8jpbyBweGMlDtpOFA1GFjTfTEl4PJduSIwRvVhng1wo6lurvZZ5TjYjN5lp5wjRy
+        EceEyVNT1xZJumpjFUVB7NEltO/fu3xNPnqhpbwCiO28RGjfwl3fWidv8Vs3UB1L6u5oS6
+        vOtu/kp4pkG3H1hVd+h+hl8HWatjnz8=
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk
+Cc:     Kent Overstreet <kent.overstreet@linux.dev>
+Subject: [PATCH 0/3] bcachefs block layer prereqs
+Date:   Sun, 13 Aug 2023 14:26:33 -0400
+Message-Id: <20230813182636.2966159-1-kent.overstreet@linux.dev>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.190
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ilya Dryomov <idryomov@gmail.com>
+Hi Jens, here's the (hopefully final) bcachefs block layer prereqs,
+aiming for v6.6.
 
-[ Upstream commit f38cb9d9c2045dad16eead4a2e1aedfddd94603b ]
+The "block: Don't block on s_umount from __invalidate_super()" patch has
+been dropped for now - but we may want this later as there's a real bug
+it addresses, and with the blockdev holder changes now landing I suspect
+other filesystems will be hitting the same issue as bcachefs.
 
-Make the "num_lockers can be only 0 or 1" assumption explicit and
-simplify the API by getting rid of output parameters in preparation
-for calling get_lock_owner_info() twice before blocklisting.
+But that can be a topic for another thread.
 
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
-Reviewed-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/rbd.c | 84 +++++++++++++++++++++++++++------------------
- 1 file changed, 51 insertions(+), 33 deletions(-)
+Can I get either acks or have you take them via your tree, your
+preference?
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 63491748dc8d7..81ebb86836c5b 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -3914,10 +3914,17 @@ static void wake_lock_waiters(struct rbd_device *rbd_dev, int result)
- 	list_splice_tail_init(&rbd_dev->acquiring_list, &rbd_dev->running_list);
- }
- 
--static int get_lock_owner_info(struct rbd_device *rbd_dev,
--			       struct ceph_locker **lockers, u32 *num_lockers)
-+static void free_locker(struct ceph_locker *locker)
-+{
-+	if (locker)
-+		ceph_free_lockers(locker, 1);
-+}
-+
-+static struct ceph_locker *get_lock_owner_info(struct rbd_device *rbd_dev)
- {
- 	struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
-+	struct ceph_locker *lockers;
-+	u32 num_lockers;
- 	u8 lock_type;
- 	char *lock_tag;
- 	int ret;
-@@ -3926,39 +3933,45 @@ static int get_lock_owner_info(struct rbd_device *rbd_dev,
- 
- 	ret = ceph_cls_lock_info(osdc, &rbd_dev->header_oid,
- 				 &rbd_dev->header_oloc, RBD_LOCK_NAME,
--				 &lock_type, &lock_tag, lockers, num_lockers);
--	if (ret)
--		return ret;
-+				 &lock_type, &lock_tag, &lockers, &num_lockers);
-+	if (ret) {
-+		rbd_warn(rbd_dev, "failed to retrieve lockers: %d", ret);
-+		return ERR_PTR(ret);
-+	}
- 
--	if (*num_lockers == 0) {
-+	if (num_lockers == 0) {
- 		dout("%s rbd_dev %p no lockers detected\n", __func__, rbd_dev);
-+		lockers = NULL;
- 		goto out;
- 	}
- 
- 	if (strcmp(lock_tag, RBD_LOCK_TAG)) {
- 		rbd_warn(rbd_dev, "locked by external mechanism, tag %s",
- 			 lock_tag);
--		ret = -EBUSY;
--		goto out;
-+		goto err_busy;
- 	}
- 
- 	if (lock_type == CEPH_CLS_LOCK_SHARED) {
- 		rbd_warn(rbd_dev, "shared lock type detected");
--		ret = -EBUSY;
--		goto out;
-+		goto err_busy;
- 	}
- 
--	if (strncmp((*lockers)[0].id.cookie, RBD_LOCK_COOKIE_PREFIX,
-+	WARN_ON(num_lockers != 1);
-+	if (strncmp(lockers[0].id.cookie, RBD_LOCK_COOKIE_PREFIX,
- 		    strlen(RBD_LOCK_COOKIE_PREFIX))) {
- 		rbd_warn(rbd_dev, "locked by external mechanism, cookie %s",
--			 (*lockers)[0].id.cookie);
--		ret = -EBUSY;
--		goto out;
-+			 lockers[0].id.cookie);
-+		goto err_busy;
- 	}
- 
- out:
- 	kfree(lock_tag);
--	return ret;
-+	return lockers;
-+
-+err_busy:
-+	kfree(lock_tag);
-+	ceph_free_lockers(lockers, num_lockers);
-+	return ERR_PTR(-EBUSY);
- }
- 
- static int find_watcher(struct rbd_device *rbd_dev,
-@@ -4008,51 +4021,56 @@ static int find_watcher(struct rbd_device *rbd_dev,
- static int rbd_try_lock(struct rbd_device *rbd_dev)
- {
- 	struct ceph_client *client = rbd_dev->rbd_client->client;
--	struct ceph_locker *lockers;
--	u32 num_lockers;
-+	struct ceph_locker *locker;
- 	int ret;
- 
- 	for (;;) {
-+		locker = NULL;
-+
- 		ret = rbd_lock(rbd_dev);
- 		if (ret != -EBUSY)
--			return ret;
-+			goto out;
- 
- 		/* determine if the current lock holder is still alive */
--		ret = get_lock_owner_info(rbd_dev, &lockers, &num_lockers);
--		if (ret)
--			return ret;
--
--		if (num_lockers == 0)
-+		locker = get_lock_owner_info(rbd_dev);
-+		if (IS_ERR(locker)) {
-+			ret = PTR_ERR(locker);
-+			locker = NULL;
-+			goto out;
-+		}
-+		if (!locker)
- 			goto again;
- 
--		ret = find_watcher(rbd_dev, lockers);
-+		ret = find_watcher(rbd_dev, locker);
- 		if (ret)
- 			goto out; /* request lock or error */
- 
- 		rbd_warn(rbd_dev, "breaking header lock owned by %s%llu",
--			 ENTITY_NAME(lockers[0].id.name));
-+			 ENTITY_NAME(locker->id.name));
- 
- 		ret = ceph_monc_blocklist_add(&client->monc,
--					      &lockers[0].info.addr);
-+					      &locker->info.addr);
- 		if (ret) {
--			rbd_warn(rbd_dev, "blocklist of %s%llu failed: %d",
--				 ENTITY_NAME(lockers[0].id.name), ret);
-+			rbd_warn(rbd_dev, "failed to blocklist %s%llu: %d",
-+				 ENTITY_NAME(locker->id.name), ret);
- 			goto out;
- 		}
- 
- 		ret = ceph_cls_break_lock(&client->osdc, &rbd_dev->header_oid,
- 					  &rbd_dev->header_oloc, RBD_LOCK_NAME,
--					  lockers[0].id.cookie,
--					  &lockers[0].id.name);
--		if (ret && ret != -ENOENT)
-+					  locker->id.cookie, &locker->id.name);
-+		if (ret && ret != -ENOENT) {
-+			rbd_warn(rbd_dev, "failed to break header lock: %d",
-+				 ret);
- 			goto out;
-+		}
- 
- again:
--		ceph_free_lockers(lockers, num_lockers);
-+		free_locker(locker);
- 	}
- 
- out:
--	ceph_free_lockers(lockers, num_lockers);
-+	free_locker(locker);
- 	return ret;
- }
- 
+Kent Overstreet (3):
+  block: Add some exports for bcachefs
+  block: Allow bio_iov_iter_get_pages() with bio->bi_bdev unset
+  block: Bring back zero_fill_bio_iter
+
+ block/bio.c            | 18 +++++++++++-------
+ block/blk-core.c       |  1 +
+ block/blk.h            |  1 -
+ include/linux/bio.h    |  7 ++++++-
+ include/linux/blkdev.h |  1 +
+ 5 files changed, 19 insertions(+), 9 deletions(-)
+
 -- 
 2.40.1
 
