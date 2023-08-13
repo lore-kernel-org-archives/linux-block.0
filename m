@@ -2,49 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D533C001B0
-	for <linux-block@archiver.kernel.org>; Sun, 13 Aug 2023 14:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B22DC04A6A
+	for <linux-block@archiver.kernel.org>; Sun, 13 Aug 2023 15:00:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjHMO4A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Aug 2023 10:56:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34744 "EHLO
+        id S230257AbjHMO76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Aug 2023 10:59:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbjHMO4A (ORCPT
+        with ESMTP id S229799AbjHMO7z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Aug 2023 10:56:00 -0400
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023241708;
-        Sun, 13 Aug 2023 07:55:53 -0700 (PDT)
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-522a9e0e6e9so839706a12.1;
-        Sun, 13 Aug 2023 07:55:52 -0700 (PDT)
+        Sun, 13 Aug 2023 10:59:55 -0400
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C95E4B;
+        Sun, 13 Aug 2023 07:59:57 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fe8d816a40so3470205e9.1;
+        Sun, 13 Aug 2023 07:59:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691938551; x=1692543351;
+        d=1e100.net; s=20221208; t=1691938796; x=1692543596;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ad0NVWbLc0DW2zExtiVlyR4ajbzJ+cjn6E663HH2QCg=;
-        b=lzfT+aLnG4S/IqnFIxff4FBihzzeH9paD0Gi1CU5sP7DpGOfUUA6qK+yV/pnskK3UL
-         0L8ERXphw/wrtpqO3NHAWIq3s5UE/GCvtOWlm+/HTO8+kIaknrE+veKiCHNwtC+/TXIa
-         bhgh9zKRoQ2ZTmA3Mg6JFDqiqmh19TRCk9j5uOoFAUQ2Pk3HfLvkBXZx/r0HEwzSuPbc
-         3CC47ReZFqqVq9BJlzDs78Pv/tPvsZhWacSjB/snYOVi3XNRg5SC70L3GBigFtBM7ydK
-         Kxn9SI9LfDoixFX7+DE9EkIZpEUUn30Ta+AiMUNbWE52ay/z9DFP90npHCCoMCgvrbRO
-         EX1w==
-X-Gm-Message-State: AOJu0Yxd0O1XxNglro3cqPwQAPhvKCdPggLTITgSRBL4DpPxOkUYclik
-        WkI2rYfJ8kN6tHI5H3t1LP8=
-X-Google-Smtp-Source: AGHT+IH3JQ0kaSRLJCXCDqYhq/hqML2mvDZq457dPLaKXnmiQQaxMW8oTzpTC0DWWg3H/Y51a7PXIg==
-X-Received: by 2002:a05:6402:4314:b0:522:580f:8304 with SMTP id m20-20020a056402431400b00522580f8304mr6185856edc.1.1691938551110;
-        Sun, 13 Aug 2023 07:55:51 -0700 (PDT)
+        bh=Il0m/lOqz0vfB+XlsodsH9+I+amK+zd4Tb9YP5hNen0=;
+        b=aUiSB33sknPd6+50yVb0jYxhDQjmQfd2DN/n2ivQTr7onpmeoD2DkbfzHHP5jAyCWy
+         UN5mSw42vMW0to2XzKbWyC718/pcM5IW+murwBlYQlHfJsa+pQ1oBpNa96dNXKAwXebg
+         5PZFyELVxFW8wrj1s0tO+phYUfJIW5C6xM35IMjk0SSnXUoMDVZWgolTAHXxsl5cxeMO
+         oxyL8tqNI+vATObhjiCwvVk2G1H8IO7g3/Qv/M9P7MqeCPuVuICD0/x77lBxCCrYJY1i
+         0bxMjVxOVwp4FJRavwkFPnBPaSi2hsncu2IP40Jhx3EBsINQmzP0MoHBqN8N4mNmkUL8
+         aMDg==
+X-Gm-Message-State: AOJu0YxpVHT+odnmvS35wbnyST1MUfd3zTmekJDDMVaDBYHovUTfkjtq
+        A3u/pHkqhDJjUvN6s2IHoRs=
+X-Google-Smtp-Source: AGHT+IHTrX97QvCgayVEBdbqNUrzi0Oa+3iNx1L7BGPGmJ1HsLfOLo9itX/W7HaXgjAK5iLkZmhtQw==
+X-Received: by 2002:a5d:5484:0:b0:319:7624:4c8d with SMTP id h4-20020a5d5484000000b0031976244c8dmr711423wrv.0.1691938795912;
+        Sun, 13 Aug 2023 07:59:55 -0700 (PDT)
 Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
-        by smtp.gmail.com with ESMTPSA id r15-20020a056402034f00b005255991c576sm1032584edw.66.2023.08.13.07.55.49
+        by smtp.gmail.com with ESMTPSA id pk15-20020a170906d7af00b0099bcf9c2ec6sm4690166ejb.75.2023.08.13.07.59.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Aug 2023 07:55:50 -0700 (PDT)
-Message-ID: <58d299c4-84e1-603d-6c99-15d0484f9609@grimberg.me>
-Date:   Sun, 13 Aug 2023 17:55:48 +0300
+        Sun, 13 Aug 2023 07:59:55 -0700 (PDT)
+Message-ID: <1098c6a6-50cb-8704-9041-03c431155dfb@grimberg.me>
+Date:   Sun, 13 Aug 2023 17:59:53 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH blktests v3 13/13] nvme: Introduce
- nvmet_target_{setup/cleanup} common code
+Subject: Re: [PATCH blktests v3 00/13] Switch to allowed_host
 Content-Language: en-US
 To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -55,9 +54,8 @@ Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         James Smart <jsmart2021@gmail.com>,
         Bart Van Assche <bvanassche@acm.org>
 References: <20230811093614.28005-1-dwagner@suse.de>
- <20230811093614.28005-14-dwagner@suse.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230811093614.28005-14-dwagner@suse.de>
+In-Reply-To: <20230811093614.28005-1-dwagner@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -65,88 +63,15 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+> Addressed the comments from v2. I also added cleanup code to _nvmet_cleanup() to
+> make sure we do not leak resources when something goes wrong. I run into this
+> while testing and all tests after the first failure failed then.
 
-On 8/11/23 12:36, Daniel Wagner wrote:
-> Almost all fabric tests have the identically code for
-> setting up and cleaning up the target side. Introduce
-> two new helpers.
-> 
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> ---
->   tests/nvme/003 | 13 +++-------
->   tests/nvme/004 | 20 +++------------
->   tests/nvme/005 | 19 ++-------------
->   tests/nvme/006 | 18 ++------------
->   tests/nvme/007 | 13 ++--------
->   tests/nvme/008 | 20 ++-------------
->   tests/nvme/009 | 15 ++----------
->   tests/nvme/010 | 20 ++-------------
->   tests/nvme/011 | 15 ++----------
->   tests/nvme/012 | 20 ++-------------
->   tests/nvme/013 | 15 ++----------
->   tests/nvme/014 | 20 ++-------------
->   tests/nvme/015 | 15 ++----------
->   tests/nvme/018 | 15 ++----------
->   tests/nvme/019 | 20 ++-------------
->   tests/nvme/020 | 15 ++----------
->   tests/nvme/021 | 15 ++----------
->   tests/nvme/022 | 15 ++----------
->   tests/nvme/023 | 20 ++-------------
->   tests/nvme/024 | 15 ++----------
->   tests/nvme/025 | 15 ++----------
->   tests/nvme/026 | 15 ++----------
->   tests/nvme/027 | 16 +++---------
->   tests/nvme/028 | 16 +++---------
->   tests/nvme/029 | 20 ++-------------
->   tests/nvme/040 | 18 ++------------
->   tests/nvme/041 | 17 ++-----------
->   tests/nvme/042 | 16 ++----------
->   tests/nvme/043 | 16 ++----------
->   tests/nvme/044 | 18 +++-----------
->   tests/nvme/045 | 17 +++----------
->   tests/nvme/047 | 20 ++-------------
->   tests/nvme/048 | 16 ++----------
->   tests/nvme/rc  | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   34 files changed, 138 insertions(+), 486 deletions(-)
-> 
-> diff --git a/tests/nvme/003 b/tests/nvme/003
-> index 71b82ce758a3..54e5fe651c9a 100755
-> --- a/tests/nvme/003
-> +++ b/tests/nvme/003
-> @@ -22,15 +22,9 @@ test() {
->   
->   	_setup_nvmet
->   
-> -	local loop_dev
->   	local port
->   
-> -	port="$(_create_nvmet_port "${nvme_trtype}")"
-> -
-> -	loop_dev="$(losetup -f)"
-> -
-> -	_create_nvmet_subsystem "${def_subsysnqn}" "${loop_dev}"
-> -	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
-> +	port="$(_nvmet_target_setup --blkdev=device)"
->   
->   	_nvme_connect_subsys "${nvme_trtype}" nqn.2014-08.org.nvmexpress.discovery
->   
-> @@ -46,9 +40,8 @@ test() {
->   	fi
->   
->   	_nvme_disconnect_subsys nqn.2014-08.org.nvmexpress.discovery
-> -	_remove_nvmet_subsystem_from_port "${port}" "${def_subsysnqn}"
-> -	_remove_nvmet_subsystem "${def_subsysnqn}"
-> -	_remove_nvmet_port "${port}"
-> +
-> +	_nvmet_target_cleanup "${port}"
+The name of the patch series suggest that it switches to allowed_hosts
+where it does that in 2 patches 11+12 out of 13 patches. The rest are
+just bug fixes and unifications. It's true that any series will include
+fixes, cleanups and prep patches, but this is too far :)
 
-It is very very strange that _setup returns a port
-which is passed to _cleanup...
+I'll let Shinichiro accept as he wish though.
 
-I think that _cleanup should simply remove all
-ports, and that setup should not return a port
-to begin with.
-
-If someone needs the actual port number, then it
-should either not use this _setup helper or
-query it somehow.
+The cleanups look fine to me.
