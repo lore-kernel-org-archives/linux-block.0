@@ -2,84 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3ADC001DE
-	for <linux-block@archiver.kernel.org>; Sun, 13 Aug 2023 15:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3AC8C001DB
+	for <linux-block@archiver.kernel.org>; Sun, 13 Aug 2023 16:00:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230189AbjHMP5S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Aug 2023 11:57:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47748 "EHLO
+        id S230454AbjHMQAh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Aug 2023 12:00:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231804AbjHMP4s (ORCPT
+        with ESMTP id S230411AbjHMQAg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Aug 2023 11:56:48 -0400
+        Sun, 13 Aug 2023 12:00:36 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B9821FE8;
-        Sun, 13 Aug 2023 08:56:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A76FF1AA;
+        Sun, 13 Aug 2023 09:00:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 693F26347A;
-        Sun, 13 Aug 2023 15:55:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6AD7C433C7;
-        Sun, 13 Aug 2023 15:55:11 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5B68663369;
+        Sun, 13 Aug 2023 15:52:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F217C433C7;
+        Sun, 13 Aug 2023 15:52:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691942111;
-        bh=EE1qBYC2VFNgzkC+5CVDvVGU409np2W52fk9BXNiCT8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=B6Zx4/Zlu08UZbl5IW6n9yXisovtrPq6cDENng6nRMcd88Nk3qkJVpOJH5yA/zdZT
-         vtbmJ7wLIStvLFZ8zbXcyyue4QAuAP7KuKoMJmZyRgdj02TrsG7Lhgv/qYFtrBwNde
-         YnvUhgGS5ZSszmsHdk861EoAJBehNMZv2RodzHZNkFj+2ZxilvINTmJwLnLmupw2GY
-         mrUwVW4LQ51S76y3LId2jMewToI/7Tc9djoZPRO9NSWJbw1E4ghOfsWvvU7Z/WXoqi
-         UfGkvycKUF2ubgvYJyM0AIXXuyHFJ/se5v0JK2eX24SRy7oiR32bPjpdLPJIF06rmj
-         TigsP6W6bNSvw==
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2b9dc1bff38so51966551fa.1;
-        Sun, 13 Aug 2023 08:55:11 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwCiD2VWjROBWqSl5Opb/OzFRK1lv7LNWf2kmAEboaqJSckDS9+
-        1KA+J1L4CkPB6HjJROGKmWD+2HM+TSf/1mhutsI=
-X-Google-Smtp-Source: AGHT+IE6JOJlfZPkn6MmM3Dm0G9btbpive7UJR8vXvvHfhahTolgYnkSCRd2XJcGPP1xys/Rq59sG0mLjb1ZArVUtMU=
-X-Received: by 2002:a05:6512:2f9:b0:4fe:82a7:814d with SMTP id
- m25-20020a05651202f900b004fe82a7814dmr4223909lfq.48.1691942109831; Sun, 13
- Aug 2023 08:55:09 -0700 (PDT)
+        s=k20201202; t=1691941959;
+        bh=NPEAUS5UERZKzGHUYw8YYedeTDArOelPvY/JM33AHd8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=kYaCHpxrDObBLy/+riT7UqdjYbrrJRieeXTkYZH3UAQ58N+BRUyOJsQ/ll+5Vi0Wr
+         b2A29ua1mWSGcG+yTQtoftefmGW20HR8yxDBdAgyIqOKg6IKqPazH/7LRwj76vV22g
+         CXMERTZEF/uUf+zMkYBv6X+bgNOs/RllJqEBHYQCtcizGr9RXWSit5CGcyc9KrpcWP
+         BgdO/16C/wbgVCTL4XNmoa+SdtEnVQoZoRYFeSz+IA2e9g9f0n7ixFNzWo2sxBmtoW
+         H4DgwBtCQxATVJKIwqb/09L+hDBnnH+K/BCvNBpfuWSoBCMflyY5nQ1IfLYs38g74z
+         WivTHggCv5+kQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Sasha Levin <sashal@kernel.org>, axboe@kernel.dk,
+        xiubli@redhat.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, ceph-devel@vger.kernel.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 48/54] rbd: harden get_lock_owner_info() a bit
+Date:   Sun, 13 Aug 2023 11:49:27 -0400
+Message-Id: <20230813154934.1067569-48-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230813154934.1067569-1-sashal@kernel.org>
+References: <20230813154934.1067569-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20230810171429.31759-1-jack@suse.cz> <20230811110504.27514-11-jack@suse.cz>
-In-Reply-To: <20230811110504.27514-11-jack@suse.cz>
-From:   Song Liu <song@kernel.org>
-Date:   Sun, 13 Aug 2023 19:54:56 +0400
-X-Gmail-Original-Message-ID: <CAPhsuW5S2gjPv+UpLjX=uBhsbPOmNGMbGjF2eJO7rWMnGVgOmg@mail.gmail.com>
-Message-ID: <CAPhsuW5S2gjPv+UpLjX=uBhsbPOmNGMbGjF2eJO7rWMnGVgOmg@mail.gmail.com>
-Subject: Re: [PATCH 11/29] md: Convert to bdev_open_by_dev()
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-raid@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.10
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 3:05=E2=80=AFPM Jan Kara <jack@suse.cz> wrote:
-[...]
-> diff --git a/drivers/md/md.h b/drivers/md/md.h
-> index 1aef86bf3fc3..e8108845157b 100644
-> --- a/drivers/md/md.h
-> +++ b/drivers/md/md.h
-> @@ -59,6 +59,7 @@ struct md_rdev {
->          */
->         struct block_device *meta_bdev;
->         struct block_device *bdev;      /* block device handle */
-> +       struct bdev_handle *bdev_handle;        /* Handle from open for b=
-dev */
+From: Ilya Dryomov <idryomov@gmail.com>
 
-With bdev_handle, we should eventually get rid of md_rdev->bdev.
-But that can be done in a separate patch.
+[ Upstream commit 8ff2c64c9765446c3cef804fb99da04916603e27 ]
 
-Acked-by: Song Liu <song@kernel.org>
+- we want the exclusive lock type, so test for it directly
+- use sscanf() to actually parse the lock cookie and avoid admitting
+  invalid handles
+- bail if locker has a blank address
 
->
->         struct page     *sb_page, *bb_page;
->         int             sb_loaded;
-> --
-> 2.35.3
->
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+Reviewed-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/rbd.c  | 21 +++++++++++++++------
+ net/ceph/messenger.c |  1 +
+ 2 files changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 7c37c047dbea2..a6210dfae0012 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -3862,10 +3862,9 @@ static struct ceph_locker *get_lock_owner_info(struct rbd_device *rbd_dev)
+ 	u32 num_lockers;
+ 	u8 lock_type;
+ 	char *lock_tag;
++	u64 handle;
+ 	int ret;
+ 
+-	dout("%s rbd_dev %p\n", __func__, rbd_dev);
+-
+ 	ret = ceph_cls_lock_info(osdc, &rbd_dev->header_oid,
+ 				 &rbd_dev->header_oloc, RBD_LOCK_NAME,
+ 				 &lock_type, &lock_tag, &lockers, &num_lockers);
+@@ -3886,18 +3885,28 @@ static struct ceph_locker *get_lock_owner_info(struct rbd_device *rbd_dev)
+ 		goto err_busy;
+ 	}
+ 
+-	if (lock_type == CEPH_CLS_LOCK_SHARED) {
+-		rbd_warn(rbd_dev, "shared lock type detected");
++	if (lock_type != CEPH_CLS_LOCK_EXCLUSIVE) {
++		rbd_warn(rbd_dev, "incompatible lock type detected");
+ 		goto err_busy;
+ 	}
+ 
+ 	WARN_ON(num_lockers != 1);
+-	if (strncmp(lockers[0].id.cookie, RBD_LOCK_COOKIE_PREFIX,
+-		    strlen(RBD_LOCK_COOKIE_PREFIX))) {
++	ret = sscanf(lockers[0].id.cookie, RBD_LOCK_COOKIE_PREFIX " %llu",
++		     &handle);
++	if (ret != 1) {
+ 		rbd_warn(rbd_dev, "locked by external mechanism, cookie %s",
+ 			 lockers[0].id.cookie);
+ 		goto err_busy;
+ 	}
++	if (ceph_addr_is_blank(&lockers[0].info.addr)) {
++		rbd_warn(rbd_dev, "locker has a blank address");
++		goto err_busy;
++	}
++
++	dout("%s rbd_dev %p got locker %s%llu@%pISpc/%u handle %llu\n",
++	     __func__, rbd_dev, ENTITY_NAME(lockers[0].id.name),
++	     &lockers[0].info.addr.in_addr,
++	     le32_to_cpu(lockers[0].info.addr.nonce), handle);
+ 
+ out:
+ 	kfree(lock_tag);
+diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
+index cd7b0bf5369ec..5eb4898cccd4c 100644
+--- a/net/ceph/messenger.c
++++ b/net/ceph/messenger.c
+@@ -1123,6 +1123,7 @@ bool ceph_addr_is_blank(const struct ceph_entity_addr *addr)
+ 		return true;
+ 	}
+ }
++EXPORT_SYMBOL(ceph_addr_is_blank);
+ 
+ int ceph_addr_port(const struct ceph_entity_addr *addr)
+ {
+-- 
+2.40.1
+
