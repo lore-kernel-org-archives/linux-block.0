@@ -2,90 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7916FC04A6A
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 13:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF0F5C001DB
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 13:24:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbjHNNSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 09:18:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55882 "EHLO
+        id S230163AbjHNNXv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 09:23:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbjHNNSG (ORCPT
+        with ESMTP id S230498AbjHNNXk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 09:18:06 -0400
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF1F12D;
-        Mon, 14 Aug 2023 06:18:05 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1c504386374so535100fac.3;
-        Mon, 14 Aug 2023 06:18:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692019084; x=1692623884;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tciLO5aIFeWALn4B+WuHKgBZ+0zyAoOpqtrps2MSa0I=;
-        b=RLmAQ1GQK22rhXIpBwgMSRQe6kAaOWCeqYSmoO7XVu7W+jIjZAivlY7p2Ibdd+kvm0
-         R4PVaSaslxBI17MTqjXXL9pOFDZnuvFI5GtrrGLlGty5g2VPlcTizFGQXE2q7fxv9FE2
-         VTaLTUENc5nlW46TX60tueNgC9Ab22TMCfJFOWBKUb/wor10f7QH0ThXWQXZQTE6I4tO
-         2f7vtaj3XPMYqp1SR1Q6VemydFH0AjkR60J1yaziRwS6IQc6U1P/o7GV7HZcgzJ3D1Yr
-         EFR25XhQ7uLhN8Ug/U0sk0lpKdRinoobn5AyQkbY0YRW6HLLwpphCKGzwtgxdB8PdWJD
-         YzpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692019084; x=1692623884;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tciLO5aIFeWALn4B+WuHKgBZ+0zyAoOpqtrps2MSa0I=;
-        b=LQFhbmrMDTKmWsoPdTKq4NJMpZBmuzv8DtOdyBBWDvkCb6UbnAjw73kdyPys9pKvgd
-         SLPwYxA8VLA05OguwJd28vtCDjgRaiypWM5Oiqn4zuvSwAH/TFEv7Ao3nK8ymQFlBgVA
-         ht20EqWHZZbNt6BPR7iHkBt/CiXJktAor5nUnjZZOjq7oclWusLY5Wf0Db720Cg91a68
-         F3oKIZrLLrDkglcTWnr5VCuIXMPYo7X6zSVkLh9SFag3Qotg/CyRJkIdlAL0mSfXnZxW
-         y2GkeCmipkddBhBumCLZaPgHXQEp5eF9iD9m/QTzmOlXffVXjKIcjNdKFQtT/6kGLN7N
-         cowQ==
-X-Gm-Message-State: AOJu0YxpFKJCJG1rvCvKgGU2XVAgS0htJxbIBRzRAvuUPvzZEuLkjUAm
-        mYN+kQtJTd0aG48X/YAWCOzUNF+gcBTmXZ8UvCG2KgPFNzQ=
-X-Google-Smtp-Source: AGHT+IFXW5h7oxdY3BTPwoujmhAS/pefvYYF4kWoJeZSYIfCNmlR1SSqhyHhQJfYXWSaXyN8FgqMVQBk1BSuPNJc+g0=
-X-Received: by 2002:a05:6870:9629:b0:1b4:685d:55e4 with SMTP id
- d41-20020a056870962900b001b4685d55e4mr9266601oaq.39.1692019084446; Mon, 14
- Aug 2023 06:18:04 -0700 (PDT)
+        Mon, 14 Aug 2023 09:23:40 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AA6212D;
+        Mon, 14 Aug 2023 06:23:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=T8Pbi+AtdsCBMxSWZKRpPW1Wq89VMiXjiZzvJl2OWrg=; b=ZAzrCQUwDaAiLY4rZgSiHtfOqx
+        IW4PK1p+wQl0ChvH7y0wpWHWR1LYToASBwSu0e0rdS9Xca7PHdv361bc0zWtqxALBw2YbZE8gTIzw
+        13sjIAlCgdMAwDNFKrSkxr9EgUQKWPHkeNvYBf8QbDUyMjHiTJLz1zL0NHqF32I0riLKJ51lf4FaP
+        WXfc4pqsB+rzHH9681o5Kp/D8rqmKoSAfEFvs97UULXP66FtphZ0I3Hq6RhsECX25jD1y3TKWr1aY
+        lyGixDvt6jM913leiyLRLYy667PvsQDGi2bPZnuVG0g3Qk20/qMhJAdDhUc5bligeE0bPItFzdYq3
+        NbVRDT0g==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qVXXc-002BRU-Pq; Mon, 14 Aug 2023 13:23:28 +0000
+Date:   Mon, 14 Aug 2023 14:23:28 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        jlayton@kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] iov_iter: Convert iterate*() to inline funcs
+Message-ID: <ZNoq0PNpFM8l8vAe@casper.infradead.org>
+References: <3710261.1691764329@warthog.procyon.org.uk>
 MIME-Version: 1.0
-References: <20230813160605.1080385-1-sashal@kernel.org> <20230813160605.1080385-28-sashal@kernel.org>
-In-Reply-To: <20230813160605.1080385-28-sashal@kernel.org>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Mon, 14 Aug 2023 15:17:52 +0200
-Message-ID: <CAOi1vP-TjjckKBNAiiTQDpgxVVKU0NFW0OrxADs6dz4p6p0yfQ@mail.gmail.com>
-Subject: Re: [PATCH AUTOSEL 5.15 28/31] rbd: make get_lock_owner_info() return
- a single locker or NULL
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>, axboe@kernel.dk,
-        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3710261.1691764329@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 13, 2023 at 6:09=E2=80=AFPM Sasha Levin <sashal@kernel.org> wro=
-te:
->
-> From: Ilya Dryomov <idryomov@gmail.com>
->
-> [ Upstream commit f38cb9d9c2045dad16eead4a2e1aedfddd94603b ]
->
-> Make the "num_lockers can be only 0 or 1" assumption explicit and
-> simplify the API by getting rid of output parameters in preparation
-> for calling get_lock_owner_info() twice before blocklisting.
->
-> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
-> Reviewed-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
+On Fri, Aug 11, 2023 at 03:32:09PM +0100, David Howells wrote:
+> @@ -578,10 +683,11 @@ size_t copy_page_from_iter_atomic(struct page *page, unsigned offset, size_t byt
+>  		kunmap_atomic(kaddr);
+>  		return 0;
+>  	}
+> -	iterate_and_advance(i, bytes, base, len, off,
+> -		copyin(p + off, base, len),
+> -		memcpy_from_iter(i, p + off, base, len)
+> -	)
+> +
+> +	bytes = iterate_and_advance(i, bytes, p,
+> +				    copy_from_user_iter,
+> +				    iov_iter_is_copy_mc(i) ?
+> +				    memcpy_from_iter_mc : memcpy_from_iter);
+>  	kunmap_atomic(kaddr);
+>  	return bytes;
+>  }
 
-Hi Sasha,
-
-I think this patch, as well as "rbd: harden get_lock_owner_info()
-a bit", have already been applied to 5.15, 6.1 and 6.4 by Greg.  The
-emails went out on Aug 1.
-
-Thanks,
-
-                Ilya
+Please work against linux-next; this function is completely rewritten
+there.
