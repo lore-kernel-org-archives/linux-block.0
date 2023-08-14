@@ -2,122 +2,161 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92AB4C41513
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 11:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D31C04A94
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 12:32:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233462AbjHNLF5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 07:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57012 "EHLO
+        id S230099AbjHNMcN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 08:32:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbjHNLF2 (ORCPT
+        with ESMTP id S231294AbjHNMcI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 07:05:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F19A1B5;
-        Mon, 14 Aug 2023 04:05:28 -0700 (PDT)
+        Mon, 14 Aug 2023 08:32:08 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB17CCC;
+        Mon, 14 Aug 2023 05:32:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9505F63C48;
-        Mon, 14 Aug 2023 11:05:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D8AAC433C7;
-        Mon, 14 Aug 2023 11:05:21 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 79CE962D5E;
+        Mon, 14 Aug 2023 12:32:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEFB7C433C8;
+        Mon, 14 Aug 2023 12:32:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692011127;
-        bh=o2GX9ktf7XmPbMjQ9eJQ/RJAYkU4u146tdoCQwdGLb0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bIay++Zk8I7jdq3aa314BvqvMSwSTvUrpfQ7qiM3lFepfXfKvkyxKw+ScOHOeNAeF
-         swv1N35AaYHTsafue1ph47qRvF4v7/WNS4m6C/vyxo5D8YlSLO7aA3cWTsuhPBBc5n
-         LB+rxQtjAurAl+RNPoAAUTKinsrT3dSVXbCaXI4wxEsLhMQzqaX9UtRxoIsUj5gxfY
-         +H3DHAZWgwJJoUhMVb9xrAz/MBkCw+eE9/jjoA6eBhWtNlCNXNEfgNI/4TVQRrEk3+
-         iMkeR/oOvgPUnvMrLBKF2FjWxg11L6xc3ZZzJ4Tt6uXZBsaEqVGQza9pz0gzmiarsL
-         wVtCOM+YmdytQ==
-Date:   Mon, 14 Aug 2023 13:05:19 +0200
-From:   Carlos Maiolino <cem@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 12/12] xfs use fs_holder_ops for the log and RT devices
-Message-ID: <20230814110519.i4vjdomisjrez3r3@andromeda>
-References: <20230802154131.2221419-1-hch@lst.de>
- <GiAHRRU8GiDH6Pv5bBBlwPA3hI_9kRXKZCNl7-CoadP8Bf7DiWIUnUt9bG1gBU92q5OuJ4Uy1Negt6JqJWxpeg==@protonmail.internalid>
- <20230802154131.2221419-13-hch@lst.de>
+        s=k20201202; t=1692016326;
+        bh=0DJHJ3rAXmJtkRIBadVM+FdIyJCgIhDp0E+687UQdnk=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=VqE2HWtj76+zmKkRWjjiH2qbvY27jDLfKUgAVDzgyvDsmudGHpVdO9Qv/1jTL3a4C
+         p/h8sm59CsWPRsqElEvTfNyspdylh4gJ7msg4l7Eum4unsEDc25Vy2nLAdoyWyjQeZ
+         6mozxkIajwgy2lP6mQIbk/GL1nzHFaXTeLmUS8/vmw7X4+tWhb6NVnwYZacnYJnLOL
+         zxSL5JPL2AjgnUJHTYX/LjGi38YbCbJdG5Z6pkmhYB0og8oYzNa3XliLRfjVvMR2R4
+         sEUo4KLmGNBeu+84aIjCTKsONuRndTrd+fiBHfzQ7/CJ1FfGLNA4+E0UfDTaRgVAWr
+         tVWBqbDERiC5A==
+Message-ID: <3188f400-b387-7be8-0f21-cf5089fe1411@kernel.org>
+Date:   Mon, 14 Aug 2023 21:32:04 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802154131.2221419-13-hch@lst.de>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v8 1/9] block: Introduce more member variables related to
+ zone write locking
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+References: <20230811213604.548235-1-bvanassche@acm.org>
+ <20230811213604.548235-2-bvanassche@acm.org>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20230811213604.548235-2-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 02, 2023 at 05:41:31PM +0200, Christoph Hellwig wrote:
-> Use the generic fs_holder_ops to shut down the file system when the
-> log or RT device goes away instead of duplicating the logic.
+On 8/12/23 06:35, Bart Van Assche wrote:
+> Many but not all storage controllers require serialization of zoned writes.
+> Introduce a new request queue limit member variable
+> (driver_preserves_write_order) that allows block drivers to indicate that
+> the order of write commands is preserved and hence that serialization of
+> writes per zone is not required.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
-
-Carlos
-
+> Make disk_set_zoned() set 'use_zone_write_lock' only if the block device
+> has zones and if the block driver does not preserve the order of write
+> requests.
+> 
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->  fs/xfs/xfs_super.c | 17 +++--------------
->  1 file changed, 3 insertions(+), 14 deletions(-)
+>  block/blk-settings.c   |  7 +++++++
+>  include/linux/blkdev.h | 10 ++++++++++
+>  2 files changed, 17 insertions(+)
 > 
-> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-> index d5042419ed9997..338eba71ff8667 100644
-> --- a/fs/xfs/xfs_super.c
-> +++ b/fs/xfs/xfs_super.c
-> @@ -377,17 +377,6 @@ xfs_setup_dax_always(
->  	return 0;
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 0046b447268f..3a7748af1bef 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -56,6 +56,8 @@ void blk_set_default_limits(struct queue_limits *lim)
+>  	lim->alignment_offset = 0;
+>  	lim->io_opt = 0;
+>  	lim->misaligned = 0;
+> +	lim->driver_preserves_write_order = false;
+> +	lim->use_zone_write_lock = false;
+>  	lim->zoned = BLK_ZONED_NONE;
+>  	lim->zone_write_granularity = 0;
+>  	lim->dma_alignment = 511;
+> @@ -685,6 +687,9 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>  						   b->max_secure_erase_sectors);
+>  	t->zone_write_granularity = max(t->zone_write_granularity,
+>  					b->zone_write_granularity);
+> +	/* Request-based stacking drivers do not reorder requests. */
+> +	t->driver_preserves_write_order = b->driver_preserves_write_order;
+> +	t->use_zone_write_lock = b->use_zone_write_lock;
+
+I do not think this is correct as the last target of a multi target device will
+dictate the result, regardless of the other targets. So this should be something
+like:
+
+	t->driver_preserves_write_order = t->driver_preserves_write_order &&
+		b->driver_preserves_write_order;
+	t->use_zone_write_lock =
+		t->use_zone_write_lock || b->use_zone_write_lock;
+
+However, given that driver_preserves_write_order is initialized as false, this
+would always be false. Not sure how to handle that...
+
+>  	t->zoned = max(t->zoned, b->zoned);
+>  	return ret;
 >  }
-> 
-> -static void
-> -xfs_bdev_mark_dead(
-> -	struct block_device	*bdev)
-> -{
-> -	xfs_force_shutdown(bdev->bd_holder, SHUTDOWN_DEVICE_REMOVED);
-> -}
-> -
-> -static const struct blk_holder_ops xfs_holder_ops = {
-> -	.mark_dead		= xfs_bdev_mark_dead,
-> -};
-> -
->  STATIC int
->  xfs_blkdev_get(
->  	xfs_mount_t		*mp,
-> @@ -396,8 +385,8 @@ xfs_blkdev_get(
->  {
->  	int			error = 0;
-> 
-> -	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE, mp,
-> -				    &xfs_holder_ops);
-> +	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
-> +				    mp->m_super, &fs_holder_ops);
->  	if (IS_ERR(*bdevp)) {
->  		error = PTR_ERR(*bdevp);
->  		xfs_warn(mp, "Invalid device [%s], error=%d", name, error);
-> @@ -412,7 +401,7 @@ xfs_blkdev_put(
->  	struct block_device	*bdev)
->  {
->  	if (bdev)
-> -		blkdev_put(bdev, mp);
-> +		blkdev_put(bdev, mp->m_super);
->  }
-> 
->  STATIC void
-> --
-> 2.39.2
-> 
+> @@ -949,6 +954,8 @@ void disk_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
+>  	}
+>  
+>  	q->limits.zoned = model;
+> +	q->limits.use_zone_write_lock = model != BLK_ZONED_NONE &&
+> +		!q->limits.driver_preserves_write_order;
+
+I think this needs a comment to explain the condition as it takes a while to
+understand it.
+
+>  	if (model != BLK_ZONED_NONE) {
+>  		/*
+>  		 * Set the zone write granularity to the device logical block
+
+You also should set use_zone_write_lock to false in disk_clear_zone_settings().
+
+In patch 9, ufshcd_auto_hibern8_update() changes the value of
+driver_preserves_write_order, which will change the value of use_zone_write_lock
+only if disk_set_zoned() is called again after ufshcd_auto_hibern8_update(). Is
+that the case ? Is the drive revalidated always after
+ufshcd_auto_hibern8_update() is executed ?
+
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 2f5371b8482c..2c090a28ec78 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -316,6 +316,16 @@ struct queue_limits {
+>  	unsigned char		misaligned;
+>  	unsigned char		discard_misaligned;
+>  	unsigned char		raid_partial_stripes_expensive;
+> +	/*
+> +	 * Whether or not the block driver preserves the order of write
+> +	 * requests. Set by the block driver.
+> +	 */
+> +	bool			driver_preserves_write_order;
+> +	/*
+> +	 * Whether or not zone write locking should be used. Set by
+> +	 * disk_set_zoned().
+> +	 */
+> +	bool			use_zone_write_lock;
+>  	enum blk_zoned_model	zoned;
+>  
+>  	/*
+
+-- 
+Damien Le Moal
+Western Digital Research
+
