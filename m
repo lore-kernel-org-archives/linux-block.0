@@ -2,339 +2,160 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E78EB64DD
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 10:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11350C04A94
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 10:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233313AbjHNK2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 06:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37822 "EHLO
+        id S233537AbjHNK2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 06:28:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234899AbjHNK1x (ORCPT
+        with ESMTP id S234966AbjHNK14 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 06:27:53 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A799E3
-        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 03:27:51 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230814102748euoutp01021cc8cc84a9c1c78baabab16e1cdd92~7ORn6O95G2025320253euoutp01I
-        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 10:27:48 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230814102748euoutp01021cc8cc84a9c1c78baabab16e1cdd92~7ORn6O95G2025320253euoutp01I
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1692008868;
-        bh=ajwDShxVNbg+HvM3I3kKNILSIkNZ3aZZ+4CsThERfGc=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=PEEiuoftIQBaV+3MdjHAcq+AOHJs52eIOn5u3JmuM+HMVZYyXYlgAoEiEg9BZiykj
-         yKLZb7XRKXT6i2zIqlePs5u9ZXmt8navMun1IN2qS9bFk6jcQfBEbHkPlxhoL/Y1eQ
-         4rdSB1IDGbZpCJAz2msLp0wFb5krH31XgEqIlEMc=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20230814102748eucas1p1e0aea6b2bc6a373034c4e45484da0d7a~7ORng-eDN0771107711eucas1p1N;
-        Mon, 14 Aug 2023 10:27:48 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 9A.7A.42423.4A10AD46; Mon, 14
-        Aug 2023 11:27:48 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230814102748eucas1p269b8a53ed09fae1eb57dce3d2a7de752~7ORnPy8oz1818918189eucas1p2f;
-        Mon, 14 Aug 2023 10:27:48 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230814102748eusmtrp17a0142b0237443c9639ad64688434d14~7ORnPQIuy0364103641eusmtrp1N;
-        Mon, 14 Aug 2023 10:27:48 +0000 (GMT)
-X-AuditID: cbfec7f2-a51ff7000002a5b7-42-64da01a4fc0e
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id F5.73.10549.3A10AD46; Mon, 14
-        Aug 2023 11:27:47 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20230814102747eusmtip25ea4c33deed995ab619f320df474121a~7ORnCoBWJ1457814578eusmtip2L;
-        Mon, 14 Aug 2023 10:27:47 +0000 (GMT)
-Received: from CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) by
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) with Microsoft SMTP
-        Server (TLS) id 15.0.1497.2; Mon, 14 Aug 2023 11:27:47 +0100
-Received: from CAMSVWEXC02.scsc.local ([::1]) by CAMSVWEXC02.scsc.local
-        ([fe80::3c08:6c51:fa0a:6384%13]) with mapi id 15.00.1497.012; Mon, 14 Aug
-        2023 11:27:46 +0100
-From:   Daniel Gomez <da.gomez@samsung.com>
-To:     Jan Kara <jack@suse.cz>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Christoph Hellwig" <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>
-Subject: Re: [PATCH 28/29] xfs: Convert to bdev_open_by_path()
-Thread-Topic: [PATCH 28/29] xfs: Convert to bdev_open_by_path()
-Thread-Index: AQHZzpn3frOw3CirWEi0FotpS5lDtg==
-Date:   Mon, 14 Aug 2023 10:27:46 +0000
-Message-ID: <3wo4aepjfabkpoqovt3d5j2fysgjahvd2dfli42nzjzfdklxp5@zsgzkmifxsbm>
-In-Reply-To: <20230811110504.27514-28-jack@suse.cz>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [106.110.32.67]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <281D9B9158C24A4583606B48DD4B4AA6@scsc.local>
-Content-Transfer-Encoding: quoted-printable
+        Mon, 14 Aug 2023 06:27:56 -0400
+Received: from mail-pj1-f80.google.com (mail-pj1-f80.google.com [209.85.216.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C82C2E3
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 03:27:54 -0700 (PDT)
+Received: by mail-pj1-f80.google.com with SMTP id 98e67ed59e1d1-268136a93b3so4580839a91.3
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 03:27:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692008874; x=1692613674;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wNa7ul5soS5E5SSXHyHYrSwZyKw8X9nA5eDMBKiCbHc=;
+        b=R4ruPn/AvRt8+6vY3fMEa2evJb5zkVIFBBxOUyU7f1x4Rb74U30YSR9AdUOVBmXfwq
+         1ZgfHGXI8fmK/RY6BnBH9qj582PBWBBA+aPmgU5sPhvsWQv6hLlYvtv8wzYqD4sCSDbZ
+         ZT5j/swR2nciJ8Sn3ua8nJrXPw9zcrnb3sFZ//rzfPjmpvCmu8XksRBdnOVU5qHv9Kgs
+         Y6k6PjOYP2fhiy1lXObjqugbBbcrqu6c5BP5yU7zzyXPKo/2pEAEajOMvWqkQ34ZHLgi
+         CLFXJwgW0Qr40dB1EGEX1pk3GvbPWAsnwRtVwfi3P5jmMdPipevu9Da6TJGzNae4/wLl
+         ybsQ==
+X-Gm-Message-State: AOJu0YwGMPYD/KMVWou1ZMxUo7riMXIyadCSLv54ct6/S+FAw4LF57OA
+        fpeusAL1Xn9v4AdokdjUXu6gziOKUTnaQjyghCI5H8LYj2rs
+X-Google-Smtp-Source: AGHT+IEDZrGV6OhGw6QnvghjwV21o3rOyHL3X2mw1zGWTHLitjJ+g2DN/kRoBEgs6GT450Fb1q5/+z1gkcXUro6voy6ZbNq+sL0R
 MIME-Version: 1.0
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xSYRjHe885wIHCjmTxrHtm66KS3al1W7Oiti7f2lxLSE9qoiJIWK4k
-        u2iuko2mEy3NLmhbLimTxLChRmRpZRfFVtPILnwosZtGrODYxrffs+f/vL/nffeSuKCKNZlM
-        Sc+ilekyeTibR9y+P9wRfRk5E2N6zSHiLleIuF1XhYnLSo5h4rvOSHHTXQchbvSaOevZkpvV
-        CySma6fYkkeVrRzJkGn6TiKOtzqRlqccoJUL10p5yboLJYTi6fLs7ptXkBYNRhYiLgnUUui+
-        UUQUIh4poKoRmJ53cJjiGwL9DzPbnxJQQwga+uH/RJXxE4sJGRFYdAUYU/wLfen8hpjiEQKv
-        pWs0VoPAp+8h/PNsaj5YHSaOn8OoPdBWey8gxP0TzxzvWf7GBGot1P9qZjOhdWDRtrIYFsG5
-        6jLMzwQ1By40PQ0wn9oGtU1/AhkutQTcRifyM6KmQX/NSECGU0Jwuiow5hKhUFXWhDM8CXyN
-        fWyGo+DxKxdiOAbqr1gJhmdBwf0eNnNOFFRaPKO8EuztPzCGI+HqRTfO7BMKjlJX4FmBaubC
-        s3f5o4JYGMwv4zA8AT7bb3F0KMoQtJ8hyGEIchiCHIYgRyViXUNCWq1KS6JVi9JpjUglS1Op
-        05NECRlpJvTvG7X77B4zOv95UGRDGIlsCEg8PIzv3PwyUcBPlB08RCsz4pVqOa2yoSkkES7k
-        R65xJAioJFkWnUrTClr5v4uR3MlabJeOzN5iVhYWxvePVey592RgnGb5i1LJ4poCzYYXlSX9
-        RsXeGKIz2VeUihXzf61oGO+r06+quLFx2b4nRS17dz+M1poJ6ekp8+QbZuauHrtJvXFJXlvF
-        ke8db1X73A8/WH4meFzSr/pyXqvFnIdzb51JlcSl9GWWRsi1BcOiMa/3v5e1nPTaL/8c0HvS
-        3DN3xL/pHJHmjxiLx+EaU4785NzruS68rbc2InbiUnq/MLrZmvP768AdtadF42486EZTM6x0
-        RNjHo+XWrV06aVb5EUWb1ynAiHW2GblbhQd6vVn2hj+HOobPzh5Df3jwKe+E7dX8xdnbow+H
-        ZG6/hErrjocTqmTZogW4UiX7C5ShDPu1AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0hTURjAO7t3Dwvruikehlmtt9bV6aZb2QyiXFFZQYT2sKmXKU1n926W
-        FbGKyBaRoSFttqa5TCux6bLyVbKUYVFqag2LyGVMsdRM0h7mvAb77/cdvt/3OHwchFvO5HPS
-        MzUEmalQCVhz0ba/rR/W3gLO1HDdj2hJp2u+pC2vhCExFp5jSBqcoZL6BgcqefL7EXsjS159
-        J0RurbjIkr8w29ny79bgXWgiHkOqtRpicZqa0mwQ7BdKInChVIJHiKS4MDL64LoIsSBMFpNK
-        qNKzCTJMdhhPyzMVolntUcffVluADoyE6oEPB2IiWFLmZnqYi1kAtF/fTr8HwQdjXUyaefB3
-        t56lB3Onc0YAHLIOIXTwAsCqcj2gg3IA3X/62B6Fha2GjQ7rDPtjh+DzyqdsTxLiMTocn2fq
-        8jAZtP1sYtFJsbBOZ2fSjMOCO0aGh1FsOTTVt8+wL7YDVtb/mZ01EQ7nmlEP+2CRcLDMCTwM
-        sIXwU/nkTGMEC4RO100GvQMGS+tfITQHQHff39nd1sCXPS5Aczi0WRpRmpfA3JZ3LLrOGmiu
-        G51lKWxtG2fQHApvFw8i9Gx+0HHdheaBIINXa4OXbvDSDV66wUs3A2YF8Ce0VIYygxLilCKD
-        0mYq8RR1hhVM38zDlonqR8A0MII3AwYHNAPIQQT+vs647lSub6oi5wRBqpNIrYqgmoF4+u+u
-        IvyAFPX00WVqkoRR4WKhKEoaLpZGRQoCfbdm5Sq4mFKhIY4QRBZB/vcYHB++jrHe9sMhqwna
-        5XcNTra6G23mK0WjsHROdnAvdeRXmHJBcEgolXD6ffdUsU9RQVxynZFXmbzC4jDHdsZ29k1x
-        rY/T9dqJc6sS+nPmJV7sdedf2hww4l45KRi39BDjqmeGC+2rswQHeGSZ7NuiazsGttWWzPvY
-        JV8+6upvGjLU3C9+vS2Oxy8A8QUb1KzNos/2+4O9Y3a+CM3hxnQcPanr35vQXOpCtlxYxja9
-        3x14D6t6cJ5U5WdPVHT2Tn1VgpBvHXu2fzha0r/yxj7FeJl4p0n8ZuzVJumionWWqvh844Bh
-        4Rfj+qW1pxw5x3412dSFTbKYyyfOYHcBe3iMPNsgFKBUmkIYgpCU4h82bS9IvAMAAA==
-X-CMS-MailID: 20230814102748eucas1p269b8a53ed09fae1eb57dce3d2a7de752
-X-Msg-Generator: CA
-X-RootMTR: 20230814102748eucas1p269b8a53ed09fae1eb57dce3d2a7de752
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230814102748eucas1p269b8a53ed09fae1eb57dce3d2a7de752
-References: <20230810171429.31759-1-jack@suse.cz>
-        <20230811110504.27514-28-jack@suse.cz>
-        <CGME20230814102748eucas1p269b8a53ed09fae1eb57dce3d2a7de752@eucas1p2.samsung.com>
+X-Received: by 2002:a17:90a:e691:b0:26b:5c14:cedc with SMTP id
+ s17-20020a17090ae69100b0026b5c14cedcmr462753pjy.1.1692008874384; Mon, 14 Aug
+ 2023 03:27:54 -0700 (PDT)
+Date:   Mon, 14 Aug 2023 03:27:54 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ea227d0602df83eb@google.com>
+Subject: [syzbot] [block?] general protection fault in start_motor (3)
+From:   syzbot <syzbot+1fad709a9a55674f0e0b@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
-Hi Jan,
+syzbot found the following issue on:
 
-On Fri, Aug 11, 2023 at 01:04:59PM +0200, Jan Kara wrote:
-> Convert xfs to use bdev_open_by_path() and pass the handle around.
->
-> CC: "Darrick J. Wong" <djwong@kernel.org>
-> CC: linux-xfs@vger.kernel.org
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
->  fs/xfs/xfs_buf.c   | 11 +++++-----
->  fs/xfs/xfs_buf.h   |  3 ++-
->  fs/xfs/xfs_super.c | 54 +++++++++++++++++++++++++---------------------
->  3 files changed, 37 insertions(+), 31 deletions(-)
->
-> diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-> index 15d1e5a7c2d3..461a5fb6155b 100644
-> --- a/fs/xfs/xfs_buf.c
-> +++ b/fs/xfs/xfs_buf.c
-> @@ -1989,7 +1989,7 @@ xfs_setsize_buftarg_early(
->  struct xfs_buftarg *
->  xfs_alloc_buftarg(
->  	struct xfs_mount	*mp,
-> -	struct block_device	*bdev)
-> +	struct bdev_handle	*bdev_handle)
->  {
->  	xfs_buftarg_t		*btp;
->  	const struct dax_holder_operations *ops =3D NULL;
-> @@ -2000,9 +2000,10 @@ xfs_alloc_buftarg(
->  	btp =3D kmem_zalloc(sizeof(*btp), KM_NOFS);
->
->  	btp->bt_mount =3D mp;
-> -	btp->bt_dev =3D  bdev->bd_dev;
-> -	btp->bt_bdev =3D bdev;
-> -	btp->bt_daxdev =3D fs_dax_get_by_bdev(bdev, &btp->bt_dax_part_off,
-> +	btp->bt_bdev_handle =3D bdev_handle;
-> +	btp->bt_dev =3D  bdev_handle->bdev->bd_dev;
-> +	btp->bt_bdev =3D bdev_handle->bdev;
-> +	btp->bt_daxdev =3D fs_dax_get_by_bdev(btp->bt_bdev, &btp->bt_dax_part_o=
-ff,
->  					    mp, ops);
->
->  	/*
-> @@ -2012,7 +2013,7 @@ xfs_alloc_buftarg(
->  	ratelimit_state_init(&btp->bt_ioerror_rl, 30 * HZ,
->  			     DEFAULT_RATELIMIT_BURST);
->
-> -	if (xfs_setsize_buftarg_early(btp, bdev))
-> +	if (xfs_setsize_buftarg_early(btp, btp->bt_bdev))
+HEAD commit:    2ccdd1b13c59 Linux 6.5-rc6
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=138ad837a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8fc59e2140295873
+dashboard link: https://syzkaller.appspot.com/bug?extid=1fad709a9a55674f0e0b
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=101c2b69a80000
 
-This can now be simplified to one parameter. And use the btp->bt_bdev
-directly when invoking bdev_logical_block_size.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2ccdd1b1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/421f85ee78b3/vmlinux-2ccdd1b1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a52df43998f1/bzImage-2ccdd1b1.xz
 
->  		goto error_free;
->
->  	if (list_lru_init(&btp->bt_lru))
-> diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
-> index 549c60942208..f6418c1312f5 100644
-> --- a/fs/xfs/xfs_buf.h
-> +++ b/fs/xfs/xfs_buf.h
-> @@ -92,6 +92,7 @@ typedef unsigned int xfs_buf_flags_t;
->   */
->  typedef struct xfs_buftarg {
->  	dev_t			bt_dev;
-> +	struct bdev_handle	*bt_bdev_handle;
->  	struct block_device	*bt_bdev;
->  	struct dax_device	*bt_daxdev;
->  	u64			bt_dax_part_off;
-> @@ -351,7 +352,7 @@ xfs_buf_update_cksum(struct xfs_buf *bp, unsigned lon=
-g cksum_offset)
->   *	Handling of buftargs.
->   */
->  struct xfs_buftarg *xfs_alloc_buftarg(struct xfs_mount *mp,
-> -		struct block_device *bdev);
-> +		struct bdev_handle *bdev_handle);
->  extern void xfs_free_buftarg(struct xfs_buftarg *);
->  extern void xfs_buftarg_wait(struct xfs_buftarg *);
->  extern void xfs_buftarg_drain(struct xfs_buftarg *);
-> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-> index 5340f2dc28bd..6189f726b309 100644
-> --- a/fs/xfs/xfs_super.c
-> +++ b/fs/xfs/xfs_super.c
-> @@ -381,14 +381,15 @@ STATIC int
->  xfs_blkdev_get(
->  	xfs_mount_t		*mp,
->  	const char		*name,
-> -	struct block_device	**bdevp)
-> +	struct bdev_handle	**handlep)
->  {
->  	int			error =3D 0;
->
-> -	*bdevp =3D blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
-> -				    mp->m_super, &fs_holder_ops);
-> -	if (IS_ERR(*bdevp)) {
-> -		error =3D PTR_ERR(*bdevp);
-> +	*handlep =3D bdev_open_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
-> +				     mp->m_super, &fs_holder_ops);
-> +	if (IS_ERR(*handlep)) {
-> +		error =3D PTR_ERR(*handlep);
-> +		*handlep =3D NULL;
->  		xfs_warn(mp, "Invalid device [%s], error=3D%d", name, error);
->  	}
->
-> @@ -397,11 +398,10 @@ xfs_blkdev_get(
->
->  STATIC void
->  xfs_blkdev_put(
-> -	struct xfs_mount	*mp,
-> -	struct block_device	*bdev)
-> +	struct bdev_handle	*handle)
->  {
-> -	if (bdev)
-> -		blkdev_put(bdev, mp->m_super);
-> +	if (handle)
-> +		bdev_release(handle);
->  }
->
->  STATIC void
-> @@ -409,16 +409,18 @@ xfs_close_devices(
->  	struct xfs_mount	*mp)
->  {
->  	if (mp->m_logdev_targp && mp->m_logdev_targp !=3D mp->m_ddev_targp) {
-> -		struct block_device *logdev =3D mp->m_logdev_targp->bt_bdev;
-> +		struct bdev_handle *logdev_handle =3D
-> +			mp->m_logdev_targp->bt_bdev_handle;
->
->  		xfs_free_buftarg(mp->m_logdev_targp);
-> -		xfs_blkdev_put(mp, logdev);
-> +		xfs_blkdev_put(logdev_handle);
->  	}
->  	if (mp->m_rtdev_targp) {
-> -		struct block_device *rtdev =3D mp->m_rtdev_targp->bt_bdev;
-> +		struct bdev_handle *rtdev_handle =3D
-> +			mp->m_rtdev_targp->bt_bdev_handle;
->
->  		xfs_free_buftarg(mp->m_rtdev_targp);
-> -		xfs_blkdev_put(mp, rtdev);
-> +		xfs_blkdev_put(rtdev_handle);
->  	}
->  	xfs_free_buftarg(mp->m_ddev_targp);
->  }
-> @@ -439,7 +441,7 @@ xfs_open_devices(
->  {
->  	struct super_block	*sb =3D mp->m_super;
->  	struct block_device	*ddev =3D sb->s_bdev;
-> -	struct block_device	*logdev =3D NULL, *rtdev =3D NULL;
-> +	struct bdev_handle	*logdev_handle =3D NULL, *rtdev_handle =3D NULL;
->  	int			error;
->
->  	/*
-> @@ -452,17 +454,19 @@ xfs_open_devices(
->  	 * Open real time and log devices - order is important.
->  	 */
->  	if (mp->m_logname) {
-> -		error =3D xfs_blkdev_get(mp, mp->m_logname, &logdev);
-> +		error =3D xfs_blkdev_get(mp, mp->m_logname, &logdev_handle);
->  		if (error)
->  			goto out_relock;
->  	}
->
->  	if (mp->m_rtname) {
-> -		error =3D xfs_blkdev_get(mp, mp->m_rtname, &rtdev);
-> +		error =3D xfs_blkdev_get(mp, mp->m_rtname, &rtdev_handle);
->  		if (error)
->  			goto out_close_logdev;
->
-> -		if (rtdev =3D=3D ddev || rtdev =3D=3D logdev) {
-> +		if (rtdev_handle->bdev =3D=3D ddev ||
-> +		    (logdev_handle &&
-> +		     rtdev_handle->bdev =3D=3D logdev_handle->bdev)) {
->  			xfs_warn(mp,
->  	"Cannot mount filesystem with identical rtdev and ddev/logdev.");
->  			error =3D -EINVAL;
-> @@ -474,18 +478,18 @@ xfs_open_devices(
->  	 * Setup xfs_mount buffer target pointers
->  	 */
->  	error =3D -ENOMEM;
-> -	mp->m_ddev_targp =3D xfs_alloc_buftarg(mp, ddev);
-> +	mp->m_ddev_targp =3D xfs_alloc_buftarg(mp, sb->s_bdev_handle);
->  	if (!mp->m_ddev_targp)
->  		goto out_close_rtdev;
->
-> -	if (rtdev) {
-> -		mp->m_rtdev_targp =3D xfs_alloc_buftarg(mp, rtdev);
-> +	if (rtdev_handle) {
-> +		mp->m_rtdev_targp =3D xfs_alloc_buftarg(mp, rtdev_handle);
->  		if (!mp->m_rtdev_targp)
->  			goto out_free_ddev_targ;
->  	}
->
-> -	if (logdev && logdev !=3D ddev) {
-> -		mp->m_logdev_targp =3D xfs_alloc_buftarg(mp, logdev);
-> +	if (logdev_handle && logdev_handle->bdev !=3D ddev) {
-> +		mp->m_logdev_targp =3D xfs_alloc_buftarg(mp, logdev_handle);
->  		if (!mp->m_logdev_targp)
->  			goto out_free_rtdev_targ;
->  	} else {
-> @@ -503,10 +507,10 @@ xfs_open_devices(
->   out_free_ddev_targ:
->  	xfs_free_buftarg(mp->m_ddev_targp);
->   out_close_rtdev:
-> -	xfs_blkdev_put(mp, rtdev);
-> +	xfs_blkdev_put(rtdev_handle);
->   out_close_logdev:
-> -	if (logdev && logdev !=3D ddev)
-> -		xfs_blkdev_put(mp, logdev);
-> +	if (logdev_handle && logdev_handle->bdev !=3D ddev)
-> +		xfs_blkdev_put(logdev_handle);
->  	goto out_relock;
->  }
->
-> --
-> 2.35.3
->=
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1fad709a9a55674f0e0b@syzkaller.appspotmail.com
+
+floppy1: FDC access conflict!
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 12 Comm: kworker/u16:1 Not tainted 6.5.0-rc6-syzkaller #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Workqueue: floppy floppy_work_workfn
+RIP: 0010:start_motor+0x3a/0x3e0 drivers/block/floppy.c:1905
+Code: 08 e8 da 6d 50 fc 48 8b 1d 73 8c 0d 0d 48 b8 00 00 00 00 00 fc ff df 0f b6 2d c2 76 0d 0d 48 89 da 48 c1 ea 03 89 e9 41 89 ed <0f> b6 04 02 83 e1 03 41 83 e5 03 84 c0 74 08 3c 03 0f 8e a8 02 00
+RSP: 0018:ffffc90000317c70 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
+RDX: 0000000000000000 RSI: ffffffff8534b2e6 RDI: ffffffff8534e840
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff8534e840
+R13: 0000000000000001 R14: ffff88801cfc5000 R15: ffffffff8d6dffe0
+FS:  0000000000000000(0000) GS:ffff88806b600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f2f4f471c98 CR3: 00000000222a8000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ floppy_ready+0x87/0x1b40 drivers/block/floppy.c:1932
+ process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
+ worker_thread+0x687/0x1110 kernel/workqueue.c:2751
+ kthread+0x33a/0x430 kernel/kthread.c:389
+ ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:start_motor+0x3a/0x3e0 drivers/block/floppy.c:1905
+Code: 08 e8 da 6d 50 fc 48 8b 1d 73 8c 0d 0d 48 b8 00 00 00 00 00 fc ff df 0f b6 2d c2 76 0d 0d 48 89 da 48 c1 ea 03 89 e9 41 89 ed <0f> b6 04 02 83 e1 03 41 83 e5 03 84 c0 74 08 3c 03 0f 8e a8 02 00
+RSP: 0018:ffffc90000317c70 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
+RDX: 0000000000000000 RSI: ffffffff8534b2e6 RDI: ffffffff8534e840
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff8534e840
+R13: 0000000000000001 R14: ffff88801cfc5000 R15: ffffffff8d6dffe0
+FS:  0000000000000000(0000) GS:ffff88806b600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f2f4f471c98 CR3: 00000000222a8000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	08 e8                	or     %ch,%al
+   2:	da 6d 50             	fisubrl 0x50(%rbp)
+   5:	fc                   	cld
+   6:	48 8b 1d 73 8c 0d 0d 	mov    0xd0d8c73(%rip),%rbx        # 0xd0d8c80
+   d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  14:	fc ff df
+  17:	0f b6 2d c2 76 0d 0d 	movzbl 0xd0d76c2(%rip),%ebp        # 0xd0d76e0
+  1e:	48 89 da             	mov    %rbx,%rdx
+  21:	48 c1 ea 03          	shr    $0x3,%rdx
+  25:	89 e9                	mov    %ebp,%ecx
+  27:	41 89 ed             	mov    %ebp,%r13d
+* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
+  2e:	83 e1 03             	and    $0x3,%ecx
+  31:	41 83 e5 03          	and    $0x3,%r13d
+  35:	84 c0                	test   %al,%al
+  37:	74 08                	je     0x41
+  39:	3c 03                	cmp    $0x3,%al
+  3b:	0f                   	.byte 0xf
+  3c:	8e                   	.byte 0x8e
+  3d:	a8 02                	test   $0x2,%al
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
