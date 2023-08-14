@@ -2,331 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 707BEC04A6A
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 01:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66642EB64DD
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 01:21:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231599AbjHNBT5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Aug 2023 21:19:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57004 "EHLO
+        id S231627AbjHNBU3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Aug 2023 21:20:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230137AbjHNBTa (ORCPT
+        with ESMTP id S231683AbjHNBUJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Aug 2023 21:19:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA771B5;
-        Sun, 13 Aug 2023 18:19:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CD8F3627F7;
-        Mon, 14 Aug 2023 01:19:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E62FC433C7;
-        Mon, 14 Aug 2023 01:19:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691975968;
-        bh=2r4SrXgWvxdddgK2CyZN0rbI3plOx6MYyNp/XA7y7ss=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=qFdXlUQOYu755yyGCW1/bzs0DKNmWbg+5/OUkVArDj+PTSLZcGuAfpfnbTBJ0Sygp
-         tOhuNJFYkAHA410wslCJKlMqjlngexQtfNnbZt5bRNSgiVx7HlsB2jb6w1HGTuGeRq
-         3NqRlbUT3AFHYeXWQ3IPbbw8EWBLLmKFpboNZHIPOaI0GRJuZa/v8KhBnWVCsnihPy
-         k/4JximUlZ2Mwnw9z8x1g7uUOSURvGIZb/Qy2sSZddGWa0fRMkpJzg8VF6NDWpXXlV
-         cjEdWbzT2n6x/TfWuqCB9Z+DspfIe+7sW3N7l7r0ZT2tkAilsm1iPd7uE/aKPisFsA
-         ehgpx6du4ow/g==
-Message-ID: <29cca660-4e66-002c-7378-2d2df5c79a08@kernel.org>
-Date:   Mon, 14 Aug 2023 10:19:25 +0900
+        Sun, 13 Aug 2023 21:20:09 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642FF1B5;
+        Sun, 13 Aug 2023 18:20:09 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37DMl1JX000880;
+        Mon, 14 Aug 2023 01:20:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : content-type :
+ mime-version; s=corp-2023-03-30;
+ bh=3yeFxQIq4zE1Mf2S5O9kqsyOwqOIHBjrA7ZaiFE3Dm4=;
+ b=sHNyxv0oP7fCi7Sr8NtiKuGh97TioCrimh8/bczE0gcUAh4rhlNy+/kA/Lt65QHJGJov
+ r7HCqyIEPJUt67N/WD10nEyrzr057UHHOIADk8W+QcF8X/pSeBWSXtzj92MWrVlj8x5W
+ 4QPdVttvU6yr5i10X8HL8ypmZBDCAXeB5dTsz8B8Thyr47A5704ZQLXEiswSsyseb+5y
+ 4h6K13HF3uwKnoNtoVi+U21HinEGN5F5GW/ZxO6hhO2NtOtnpX3ma7sWlS9YK26YiPAn
+ QX8oZmRgitVrEBa28rZ3NsLAztyqbDg/kW+acebzdefv0ODP0vZRpVQcwKoLiF3bYbbC xw== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3se3499kb5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Aug 2023 01:20:02 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37DMoVU6040074;
+        Mon, 14 Aug 2023 01:20:01 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2100.outbound.protection.outlook.com [104.47.70.100])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3sey0p30sq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Aug 2023 01:20:01 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=edzjiXJpOBRNZ/+u096n9zhLHFRgsHBf8ulIkCNl790qe6s3uhaqwpjGXFQG3XtjqRlnaPE+CBE84QQfXlv07CTICcl3eUZdw2Iubfzzm1R/LRl8tsMtSx8GQq3HeSSibAAkw4Bb8QBtbWnssUiudIeksoraLLwTx4rwmHvYwrT+0vEBjPmLwMyvzSZtQAwbXcJYO3wtfcl4K2f5OLe7Snh4j3QQflQRxxqenqWV8UvMl6fVAgpi3jQd/e/cZ1teFKWBQaygu9O3Rt9P8o5CrwnnGA6FFAclsZK7bjaGfjpa9pWswGcHbH/pRWwQbyCNY5/29CjyyqnBYj+wr3JEQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3yeFxQIq4zE1Mf2S5O9kqsyOwqOIHBjrA7ZaiFE3Dm4=;
+ b=BajAc4wNZlDp86e366MLR0qQQccKgYt8lEqQsbgb2FPBkgNEYHQ2w2eTa3xqImGM2amyb/NM7TsnKe0+4P76VctfZNcoD1V/SvTeh7nw0s8tJm6ZSHtOxQJsaO8yABSqVMIKQBxp+Cvel0ynB5cjdQQ2xOUwbra2yKCieH3RIRWzPKd6KJwtUztpsSKLKZaU5qNUnVS9KZTpfExFjgZH3JeW1Xpj0cNpfvUwlfkVPFXV7VhCI27LDQLMfVI+uwtXkOxp/cFU+7tqXdqb+f9okhaJPPJ32/fLGBNet2K3sZU+jFLEM+i358OnVDBk83i+575/kq9QkXb2dWSf5s75UQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3yeFxQIq4zE1Mf2S5O9kqsyOwqOIHBjrA7ZaiFE3Dm4=;
+ b=LqkUVgFtb6Q5c4vBeb1bMhq9llJNtdNNW8CL+fXDPeIOz4qI4tU4G4RR2h9ucm9jEld2B08Z1x9VnS/pSDToyekZOx8QDQ03fdojn5U9+4rAg9lQuLhuALrA+HSXRGDQR2rss9EHWTzlr5vPPD14S13plmcqZKQkjqe4MkdTiow=
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
+ by CH3PR10MB7260.namprd10.prod.outlook.com (2603:10b6:610:12e::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.19; Mon, 14 Aug
+ 2023 01:19:59 +0000
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::59f3:b30d:a592:36be]) by PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::59f3:b30d:a592:36be%7]) with mapi id 15.20.6678.022; Mon, 14 Aug 2023
+ 01:19:59 +0000
+To:     Ankit Kumar <ankit.kumar@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Keith Busch <kbusch@kernel.org>, gost.dev@samsung.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] block:t10-pi: remove duplicate module license
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1350mfmj8.fsf@ca-mkp.ca.oracle.com>
+References: <20230811153313.93786-1-ankit.kumar@samsung.com>
+        <CGME20230811101913epcas5p3a007d4594f5313a04ed5b6414aeb5b61@epcas5p3.samsung.com>
+        <20230811153313.93786-3-ankit.kumar@samsung.com>
+Date:   Sun, 13 Aug 2023 21:19:57 -0400
+In-Reply-To: <20230811153313.93786-3-ankit.kumar@samsung.com> (Ankit Kumar's
+        message of "Fri, 11 Aug 2023 21:03:13 +0530")
+Content-Type: text/plain
+X-ClientProxiedBy: SA9PR11CA0011.namprd11.prod.outlook.com
+ (2603:10b6:806:6e::16) To PH0PR10MB4759.namprd10.prod.outlook.com
+ (2603:10b6:510:3d::12)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v8 3/9] scsi: core: Call .eh_prepare_resubmit() before
- resubmitting
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230811213604.548235-1-bvanassche@acm.org>
- <20230811213604.548235-4-bvanassche@acm.org>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230811213604.548235-4-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|CH3PR10MB7260:EE_
+X-MS-Office365-Filtering-Correlation-Id: ace8af1d-8669-47c3-7de0-08db9c64936d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KTRK0lrayIezIWppLx2BefuX5g2zGDVqmEFC49C4M3NI4XK2ekJERVcKWAf8V12kSPIkggfDLUHZeYGWqJskQXf3aa2ke8+g4Y6Mb36xbmUUA33H6KFkNwStr+ybbl2QSb/NSPDkxZhqF7Dzg+MPjcK6CoDWponvug8LLBVQBxrl7FFaDITFWCrxLsHXrIc0oZqcZCBusBmJXvaGaGa0d73WDohOibyqsv4F2ftUG0eoMw8FDowwuNYLyfJrj+Akb5ZIiKtHdS1IIZ/KDre8ZmrZXmle334ShlU+PmQmT6/WrRwnCM1HWeA4539qZmh6iNGYmS0XpnXdw13AzauEheRicXwGybJGVuzwJuOmNKM5tC5dbfX6f9dXCZ7tmW3zhaGCwJ3mbknPgj6uHLPIx5HYPFgvSiOgvXsGBndSK8LB/i5XX5iH56lgEScmvZczuBZE5sEgsyezG1WStUcvPWT81TRALmpiJaD5pDp7HD256osgbPMDErVEF3MPluHZgiWKIWFqK9kQV2pChSP5v+bF3UM0rl5oiMCDEn3jJ8B3KlVl+wgTX+90rrIw0T4v
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(396003)(136003)(366004)(39860400002)(346002)(451199021)(186006)(1800799006)(6512007)(36916002)(6486002)(478600001)(54906003)(83380400001)(5660300002)(66476007)(66556008)(2906002)(66946007)(8936002)(26005)(6916009)(6506007)(4326008)(41300700001)(86362001)(558084003)(38100700002)(8676002)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GGgQgkwKRvGufn6qG5NpvL3fEDNyNEkC9328ESM29NHuU0KwGchYMsHUcJI8?=
+ =?us-ascii?Q?PgaWZaRiHbAypDBoUG0kxrkTalzPtFt/FOz8a0ylX5hofhKY4Ibpa+CrA5dT?=
+ =?us-ascii?Q?ro3FVxW9JNqZxd/Nhj/0K/pv97rxNqN8FCPsoyBqGXygPSJU0qW2c/5E/wxG?=
+ =?us-ascii?Q?AMOdyxlL4AkfdekzSJI3V30+2iBMfRB889niWeCWHl8EbH0T0Ot4I8Hz57ov?=
+ =?us-ascii?Q?OaWB/qsW+puFpNBV+embBunXHUGmU+w8wrK2+kBvoIVE4SFRpTCMMWFiDNcL?=
+ =?us-ascii?Q?ipmL3LAcVdCoX4mMDJCTcZNR6uVEriPgYxlBSReekuPRjp/zzpjol1tRV1wr?=
+ =?us-ascii?Q?KTqTcvMmtM21sLUYsthRPpavIK/NwThtAppjHo+FRfdewzX4RcTJGDZYQFZO?=
+ =?us-ascii?Q?/6R9LH5iLOwk8/sXPdPl8JhmCD+Uu7AQtj5qxsVLX6/szK6XCv5L06rKV0o/?=
+ =?us-ascii?Q?W2pNik/VfdVR2htE9juk98Jv15AwGNp8Re8j3F2+V07hgOjYwynLsFyy/gkk?=
+ =?us-ascii?Q?YkKtmOLtOj4/VeU+3By6/gP0m2cECNXN6FJKy9lI5C4a2wVCnWrRI7CoK1NK?=
+ =?us-ascii?Q?54VgtaA062t8VkMDkIT8HVcb1CWKAZwZJKNWMf4MnkJMT8W1XFN0CxUjvyDQ?=
+ =?us-ascii?Q?K8NY6QmSv+vIn7Oo00mj4uenrs8ZohVJscE7UG1MrplUORGs1/likyuhVsKs?=
+ =?us-ascii?Q?bmp14MEBHALUX4Jsv+QVmrpHeBiJD6hJu0cI9g4aDg+QVm/yzZO+e82KKL0x?=
+ =?us-ascii?Q?xFb5GjIIR+n6XDBAwHmXGdN+Rvw7dTsLN9anhjgaR1+FXJmf5VHdT1KRjaKE?=
+ =?us-ascii?Q?byIzaJAQ6s6LhnS6r2EATUH2LNu7HnlWBXCtpkdkJ7qKBUTazstPB4cPs3s6?=
+ =?us-ascii?Q?yzKMusLgbj147EFThhpL7z2iSuAiXaZq7KTgxAtHo6G8VGXSER3s7mnY/dch?=
+ =?us-ascii?Q?k3u7pBxES4oKRH9kAjmSDkrjwcj1JsqQ/YKbfomSnM2mqcke0/ct1wT/Zi/i?=
+ =?us-ascii?Q?hiq4S7ZxLBT8uoJdo2GaFlFsCZF6Jq4XlThtuSC9gh+OhvYmArcoGcfexPbx?=
+ =?us-ascii?Q?UTU/XuFDI1zUDSwdvRvJam+T6YgxrTumJ/59ndGiIDeJ1TIgtExyhIVPbErZ?=
+ =?us-ascii?Q?VuQzvvPMaH9EeKKGeLpGlN+a3OctlqxbXt1H4mVJW4VbqhcUry/PeNqlksDH?=
+ =?us-ascii?Q?54s9Qdk5Em5/TrxO/N7oZHprl6p2yIc4qovm+Qk4jkRUkiMXzBEqaTcA5dTx?=
+ =?us-ascii?Q?7W5r9n0/TWPEUsv80cJ6kZ9UwVtSniDYqGbYCm7hwYgMDJATRgp9gtilkpbm?=
+ =?us-ascii?Q?22b24Mw4qHSS9GyX+Cw4EOieQpICuZdYJMtOLpFmXkxWnSUsKtxcRdfk5PjB?=
+ =?us-ascii?Q?/TUfKTnExX4gjltgnIFdn6RQM5DILxGUevhvjKAvOlwpE3q33x7lhKiIfWrj?=
+ =?us-ascii?Q?1nRG6wzRCd8xkr6i7oYTRPCfwHKuGAuFwr9JyR00W5t5UzHL4mpoGSPk4AOh?=
+ =?us-ascii?Q?0Dute3awNYvUCD2R/8rkL7Sd6aRvIffjKLPKxOZ91YUk18F7NDjM+vaPgM0D?=
+ =?us-ascii?Q?ooJksLNEFT9oG7zrZtnUuz5FuaChDoxW4MGsvnj31pIImX06TWZDg3JfFt29?=
+ =?us-ascii?Q?YQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: KFNDoIOzyXxjQJm2xFvzeMlESFn6l6GUL766aSoOaBDj0ZQTL41QSShQ8FFPEnx/0sOYxhjREm+o5ZcYr8/vsAahj1DR0AXpbsA3HYOPVqcrFB8BXwzET8fNOjarL965XTzHS1pCUiUUKNTtkdaRu4F5YpKgmAcK9wN046G/nJlzDdo1JeGODL36Af5pkrk1UHqb0RM6aTCWsySYt3SUlcepRmNv/9UxKxXJh5bODQQK8vkm71FeczIzl7I7zq7UclGRazn6xChC3J8GdIZHY6YjDh6O5nHkNhhv2+nstPk7YwF4A3yfZnZdPOztox0zMPQ79jAPhzbqOWLyurbZEYiOXvVyzaDA3RjBLcWujxIAxLjtzcYgnXvMXuOE95CvP1eoVG1YmVZyQhHZqqOZxX/YbTbi1gvoE6K7/eVt0Hcf3NUkecPG3+61w6yY4ya0eb7afK/7DgMtH4olmRBTFk7F0iyxlRETVb9I97RKVBxEQFOujjRxgu0judoRhzRMKLOX89Cmui/64qmsyGNRbobxaOri/KWXskryV6Sj6ltBNRkt+M+EHGxRSNx4qTuTaCjvohrhgbsjoVxcWcrecHAHCnwMWYPbBeLX4foLrhX3KF5hCFKdQiLPfozngci+OeEtIOXuPaBMRc7D+5hSYWJmTnx8u67rezZNeNYIdeSOK5AogtgwCdMTu1pM4RkNY2vCnHwscxpvLBvxh3CXAq65uIi2A8Qm0J8RIzEKC/WHiV1lar4wqCRvM1JGabUDuIaj+YUg7pju8I6g8riPihT3p0ntrkFDHvWuNM++Sp4MYmrP65Swno9lNppMGVR/iIvvK7ca29G2sgVXM+JmyGQ6gm6Tkb44S7htXYQasbc=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ace8af1d-8669-47c3-7de0-08db9c64936d
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2023 01:19:58.9098
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jDgUovTSIE04n3b/Fl6AeMuOVbprHQgD+ZFQjubsCYlKb5B1gwr5uHEsbSV4XRA5n9imHlBqSfCOXB0iU4JmEmBdWeThvjTZ37TAdxK4fCs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB7260
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-13_24,2023-08-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 mlxscore=0
+ spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2308140011
+X-Proofpoint-GUID: wiIDPR0MTBxcYRtwFKRxG3EZH_XdfxRR
+X-Proofpoint-ORIG-GUID: wiIDPR0MTBxcYRtwFKRxG3EZH_XdfxRR
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/12/23 06:35, Bart Van Assche wrote:
-> Make the error handler call .eh_prepare_resubmit() before resubmitting
 
-This reads like the eh_prepare_resubmit callback already exists. But you are
-adding it. So you should state that.
+Ankit,
 
-> commands. A later patch will use this functionality to sort SCSI
-> commands per LBA from inside the SCSI disk driver.
-> 
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  drivers/scsi/Kconfig           |  2 +
->  drivers/scsi/Kconfig.kunit     |  4 ++
->  drivers/scsi/Makefile          |  2 +
->  drivers/scsi/Makefile.kunit    |  1 +
->  drivers/scsi/scsi_error.c      | 43 ++++++++++++++++
->  drivers/scsi/scsi_error_test.c | 92 ++++++++++++++++++++++++++++++++++
->  drivers/scsi/scsi_priv.h       |  1 +
->  include/scsi/scsi_driver.h     |  1 +
->  8 files changed, 146 insertions(+)
->  create mode 100644 drivers/scsi/Kconfig.kunit
->  create mode 100644 drivers/scsi/Makefile.kunit
->  create mode 100644 drivers/scsi/scsi_error_test.c
-> 
-> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-> index 4962ce989113..fc288f8fb800 100644
-> --- a/drivers/scsi/Kconfig
-> +++ b/drivers/scsi/Kconfig
-> @@ -232,6 +232,8 @@ config SCSI_SCAN_ASYNC
->  	  Note that this setting also affects whether resuming from
->  	  system suspend will be performed asynchronously.
->  
-> +source "drivers/scsi/Kconfig.kunit"
-> +
->  menu "SCSI Transports"
->  	depends on SCSI
->  
-> diff --git a/drivers/scsi/Kconfig.kunit b/drivers/scsi/Kconfig.kunit
-> new file mode 100644
-> index 000000000000..68e3d90d49e9
-> --- /dev/null
-> +++ b/drivers/scsi/Kconfig.kunit
-> @@ -0,0 +1,4 @@
-> +config SCSI_ERROR_TEST
-> +	tristate "scsi_error.c unit tests" if !KUNIT_ALL_TESTS
-> +	depends on SCSI_MOD && KUNIT
-> +	default KUNIT_ALL_TESTS
-> diff --git a/drivers/scsi/Makefile b/drivers/scsi/Makefile
-> index f055bfd54a68..1c5c3afb6c6e 100644
-> --- a/drivers/scsi/Makefile
-> +++ b/drivers/scsi/Makefile
-> @@ -168,6 +168,8 @@ scsi_mod-$(CONFIG_PM)		+= scsi_pm.o
->  scsi_mod-$(CONFIG_SCSI_DH)	+= scsi_dh.o
->  scsi_mod-$(CONFIG_BLK_DEV_BSG)	+= scsi_bsg.o
->  
-> +include $(srctree)/drivers/scsi/Makefile.kunit
-> +
->  hv_storvsc-y			:= storvsc_drv.o
->  
->  sd_mod-objs	:= sd.o
-> diff --git a/drivers/scsi/Makefile.kunit b/drivers/scsi/Makefile.kunit
-> new file mode 100644
-> index 000000000000..3e98053b2709
-> --- /dev/null
-> +++ b/drivers/scsi/Makefile.kunit
-> @@ -0,0 +1 @@
-> +obj-$(CONFIG_SCSI_ERROR_TEST) += scsi_error_test.o
+> Remove duplicate MODULE_LICENSE("GPL") from t10-pi.c
+> Fixes: a7d4383f17e1 ("block: add pi for extended integrity")
 
-All the above kunit changes (and the test changes below) seem unrelated to what
-the commit message describes. Should these be split into a different patch ?
+Looks fine.
 
-> diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-> index c67cdcdc3ba8..0d7835bdc8af 100644
-> --- a/drivers/scsi/scsi_error.c
-> +++ b/drivers/scsi/scsi_error.c
-> @@ -27,6 +27,7 @@
->  #include <linux/blkdev.h>
->  #include <linux/delay.h>
->  #include <linux/jiffies.h>
-> +#include <linux/list_sort.h>
->  
->  #include <scsi/scsi.h>
->  #include <scsi/scsi_cmnd.h>
-> @@ -2186,6 +2187,46 @@ void scsi_eh_ready_devs(struct Scsi_Host *shost,
->  }
->  EXPORT_SYMBOL_GPL(scsi_eh_ready_devs);
->  
-> +/*
-> + * Comparison function that allows to sort SCSI commands by ULD driver.
-> + */
-> +static int scsi_cmp_uld(void *priv, const struct list_head *_a,
-> +			const struct list_head *_b)
-> +{
-> +	struct scsi_cmnd *a = list_entry(_a, typeof(*a), eh_entry);
-> +	struct scsi_cmnd *b = list_entry(_b, typeof(*b), eh_entry);
-> +
-> +	/* See also the comment above the list_sort() definition. */
-> +	return scsi_cmd_to_driver(a) > scsi_cmd_to_driver(b);
-> +}
-> +
-> +void scsi_call_prepare_resubmit(struct list_head *done_q)
-> +{
-> +	struct scsi_cmnd *scmd, *next;
-> +
-> +	/* Sort pending SCSI commands by ULD. */
-> +	list_sort(NULL, done_q, scsi_cmp_uld);
-> +
-> +	/*
-> +	 * Call .eh_prepare_resubmit for each range of commands with identical
-> +	 * ULD driver pointer.
-> +	 */
-> +	list_for_each_entry_safe(scmd, next, done_q, eh_entry) {
-> +		struct scsi_driver *uld = scsi_cmd_to_driver(scmd);
-> +		struct list_head *prev, uld_cmd_list;
-> +
-> +		while (&next->eh_entry != done_q &&
-> +		       scsi_cmd_to_driver(next) == uld)
-> +			next = list_next_entry(next, eh_entry);
-> +		if (!uld->eh_prepare_resubmit)
-> +			continue;
-> +		prev = scmd->eh_entry.prev;
-> +		list_cut_position(&uld_cmd_list, prev, next->eh_entry.prev);
-> +		uld->eh_prepare_resubmit(&uld_cmd_list);
-
-Is it guaranteed that all uld implement eh_prepare_resubmit ?
-
-> +		list_splice(&uld_cmd_list, prev);
-> +	}
-> +}
-> +
->  /**
->   * scsi_eh_flush_done_q - finish processed commands or retry them.
->   * @done_q:	list_head of processed commands.
-> @@ -2194,6 +2235,8 @@ void scsi_eh_flush_done_q(struct list_head *done_q)
->  {
->  	struct scsi_cmnd *scmd, *next;
->  
-> +	scsi_call_prepare_resubmit(done_q);
-> +
->  	list_for_each_entry_safe(scmd, next, done_q, eh_entry) {
->  		list_del_init(&scmd->eh_entry);
->  		if (scsi_device_online(scmd->device) &&
-> diff --git a/drivers/scsi/scsi_error_test.c b/drivers/scsi/scsi_error_test.c
-> new file mode 100644
-> index 000000000000..fd616527f726
-> --- /dev/null
-> +++ b/drivers/scsi/scsi_error_test.c
-> @@ -0,0 +1,92 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright 2023 Google LLC
-> + */
-> +#include <kunit/test.h>
-> +#include <scsi/scsi_cmnd.h>
-> +#include <scsi/scsi_driver.h>
-> +#include "scsi_priv.h"
-> +
-> +static struct kunit *kunit_test;
-> +
-> +static struct scsi_driver *uld1, *uld2, *uld3;
-> +
-> +static void uld1_prepare_resubmit(struct list_head *cmd_list)
-> +{
-> +	struct scsi_cmnd *cmd;
-> +
-> +	KUNIT_EXPECT_EQ(kunit_test, list_count_nodes(cmd_list), 2);
-> +	list_for_each_entry(cmd, cmd_list, eh_entry)
-> +		KUNIT_EXPECT_PTR_EQ(kunit_test, scsi_cmd_to_driver(cmd), uld1);
-> +}
-> +
-> +static void uld2_prepare_resubmit(struct list_head *cmd_list)
-> +{
-> +	struct scsi_cmnd *cmd;
-> +
-> +	KUNIT_EXPECT_EQ(kunit_test, list_count_nodes(cmd_list), 2);
-> +	list_for_each_entry(cmd, cmd_list, eh_entry)
-> +		KUNIT_EXPECT_PTR_EQ(kunit_test, scsi_cmd_to_driver(cmd), uld2);
-> +}
-> +
-> +static void test_prepare_resubmit(struct kunit *test)
-> +{
-> +	static struct scsi_cmnd cmd1, cmd2, cmd3, cmd4, cmd5, cmd6;
-> +	static struct scsi_device dev1, dev2, dev3;
-> +	struct scsi_driver *uld;
-> +	LIST_HEAD(cmd_list);
-> +
-> +	uld = kzalloc(3 * sizeof(uld), GFP_KERNEL);
-> +	uld1 = &uld[0];
-> +	uld1->eh_prepare_resubmit = uld1_prepare_resubmit;
-> +	uld2 = &uld[1];
-> +	uld2->eh_prepare_resubmit = uld2_prepare_resubmit;
-> +	uld3 = &uld[2];
-> +	dev1.sdev_gendev.driver = &uld1->gendrv;
-> +	dev2.sdev_gendev.driver = &uld2->gendrv;
-> +	dev3.sdev_gendev.driver = &uld3->gendrv;
-> +	cmd1.device = &dev1;
-> +	cmd2.device = &dev1;
-> +	cmd3.device = &dev2;
-> +	cmd4.device = &dev2;
-> +	cmd5.device = &dev3;
-> +	cmd6.device = &dev3;
-> +	list_add_tail(&cmd1.eh_entry, &cmd_list);
-> +	list_add_tail(&cmd3.eh_entry, &cmd_list);
-> +	list_add_tail(&cmd5.eh_entry, &cmd_list);
-> +	list_add_tail(&cmd2.eh_entry, &cmd_list);
-> +	list_add_tail(&cmd4.eh_entry, &cmd_list);
-> +	list_add_tail(&cmd6.eh_entry, &cmd_list);
-> +
-> +	KUNIT_EXPECT_EQ(test, list_count_nodes(&cmd_list), 6);
-> +	kunit_test = test;
-> +	scsi_call_prepare_resubmit(&cmd_list);
-> +	kunit_test = NULL;
-> +	KUNIT_EXPECT_EQ(test, list_count_nodes(&cmd_list), 6);
-> +	KUNIT_EXPECT_TRUE(test, uld1 < uld2);
-> +	KUNIT_EXPECT_TRUE(test, uld2 < uld3);
-> +	KUNIT_EXPECT_PTR_EQ(test, cmd_list.next, &cmd1.eh_entry);
-> +	KUNIT_EXPECT_PTR_EQ(test, cmd_list.next->next, &cmd2.eh_entry);
-> +	KUNIT_EXPECT_PTR_EQ(test, cmd_list.next->next->next, &cmd3.eh_entry);
-> +	KUNIT_EXPECT_PTR_EQ(test, cmd_list.next->next->next->next,
-> +			    &cmd4.eh_entry);
-> +	KUNIT_EXPECT_PTR_EQ(test, cmd_list.next->next->next->next->next,
-> +			    &cmd5.eh_entry);
-> +	KUNIT_EXPECT_PTR_EQ(test, cmd_list.next->next->next->next->next->next,
-> +			    &cmd6.eh_entry);
-> +	kfree(uld);
-> +}
-> +
-> +static struct kunit_case prepare_resubmit_test_cases[] = {
-> +	KUNIT_CASE(test_prepare_resubmit),
-> +	{}
-> +};
-> +
-> +static struct kunit_suite prepare_resubmit_test_suite = {
-> +	.name = "prepare_resubmit",
-> +	.test_cases = prepare_resubmit_test_cases,
-> +};
-> +kunit_test_suite(prepare_resubmit_test_suite);
-> +
-> +MODULE_AUTHOR("Bart Van Assche");
-> +MODULE_LICENSE("GPL");
-> diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
-> index f42388ecb024..df4af4645430 100644
-> --- a/drivers/scsi/scsi_priv.h
-> +++ b/drivers/scsi/scsi_priv.h
-> @@ -101,6 +101,7 @@ int scsi_eh_get_sense(struct list_head *work_q,
->  		      struct list_head *done_q);
->  bool scsi_noretry_cmd(struct scsi_cmnd *scmd);
->  void scsi_eh_done(struct scsi_cmnd *scmd);
-> +void scsi_call_prepare_resubmit(struct list_head *done_q);
->  
->  /* scsi_lib.c */
->  extern int scsi_maybe_unblock_host(struct scsi_device *sdev);
-> diff --git a/include/scsi/scsi_driver.h b/include/scsi/scsi_driver.h
-> index 4ce1988b2ba0..2b11be896eee 100644
-> --- a/include/scsi/scsi_driver.h
-> +++ b/include/scsi/scsi_driver.h
-> @@ -18,6 +18,7 @@ struct scsi_driver {
->  	int (*done)(struct scsi_cmnd *);
->  	int (*eh_action)(struct scsi_cmnd *, int);
->  	void (*eh_reset)(struct scsi_cmnd *);
-> +	void (*eh_prepare_resubmit)(struct list_head *cmd_list);
->  };
->  #define to_scsi_driver(drv) \
->  	container_of((drv), struct scsi_driver, gendrv)
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
-Damien Le Moal
-Western Digital Research
-
+Martin K. Petersen	Oracle Linux Engineering
