@@ -2,158 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66642EB64DD
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 01:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C204EB64DD
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 02:02:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231627AbjHNBU3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Aug 2023 21:20:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52790 "EHLO
+        id S231984AbjHNCCD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Aug 2023 22:02:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231683AbjHNBUJ (ORCPT
+        with ESMTP id S232582AbjHNCBl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Aug 2023 21:20:09 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642FF1B5;
-        Sun, 13 Aug 2023 18:20:09 -0700 (PDT)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37DMl1JX000880;
-        Mon, 14 Aug 2023 01:20:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2023-03-30;
- bh=3yeFxQIq4zE1Mf2S5O9kqsyOwqOIHBjrA7ZaiFE3Dm4=;
- b=sHNyxv0oP7fCi7Sr8NtiKuGh97TioCrimh8/bczE0gcUAh4rhlNy+/kA/Lt65QHJGJov
- r7HCqyIEPJUt67N/WD10nEyrzr057UHHOIADk8W+QcF8X/pSeBWSXtzj92MWrVlj8x5W
- 4QPdVttvU6yr5i10X8HL8ypmZBDCAXeB5dTsz8B8Thyr47A5704ZQLXEiswSsyseb+5y
- 4h6K13HF3uwKnoNtoVi+U21HinEGN5F5GW/ZxO6hhO2NtOtnpX3ma7sWlS9YK26YiPAn
- QX8oZmRgitVrEBa28rZ3NsLAztyqbDg/kW+acebzdefv0ODP0vZRpVQcwKoLiF3bYbbC xw== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3se3499kb5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Aug 2023 01:20:02 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37DMoVU6040074;
-        Mon, 14 Aug 2023 01:20:01 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2100.outbound.protection.outlook.com [104.47.70.100])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3sey0p30sq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Aug 2023 01:20:01 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=edzjiXJpOBRNZ/+u096n9zhLHFRgsHBf8ulIkCNl790qe6s3uhaqwpjGXFQG3XtjqRlnaPE+CBE84QQfXlv07CTICcl3eUZdw2Iubfzzm1R/LRl8tsMtSx8GQq3HeSSibAAkw4Bb8QBtbWnssUiudIeksoraLLwTx4rwmHvYwrT+0vEBjPmLwMyvzSZtQAwbXcJYO3wtfcl4K2f5OLe7Snh4j3QQflQRxxqenqWV8UvMl6fVAgpi3jQd/e/cZ1teFKWBQaygu9O3Rt9P8o5CrwnnGA6FFAclsZK7bjaGfjpa9pWswGcHbH/pRWwQbyCNY5/29CjyyqnBYj+wr3JEQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3yeFxQIq4zE1Mf2S5O9kqsyOwqOIHBjrA7ZaiFE3Dm4=;
- b=BajAc4wNZlDp86e366MLR0qQQccKgYt8lEqQsbgb2FPBkgNEYHQ2w2eTa3xqImGM2amyb/NM7TsnKe0+4P76VctfZNcoD1V/SvTeh7nw0s8tJm6ZSHtOxQJsaO8yABSqVMIKQBxp+Cvel0ynB5cjdQQ2xOUwbra2yKCieH3RIRWzPKd6KJwtUztpsSKLKZaU5qNUnVS9KZTpfExFjgZH3JeW1Xpj0cNpfvUwlfkVPFXV7VhCI27LDQLMfVI+uwtXkOxp/cFU+7tqXdqb+f9okhaJPPJ32/fLGBNet2K3sZU+jFLEM+i358OnVDBk83i+575/kq9QkXb2dWSf5s75UQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3yeFxQIq4zE1Mf2S5O9kqsyOwqOIHBjrA7ZaiFE3Dm4=;
- b=LqkUVgFtb6Q5c4vBeb1bMhq9llJNtdNNW8CL+fXDPeIOz4qI4tU4G4RR2h9ucm9jEld2B08Z1x9VnS/pSDToyekZOx8QDQ03fdojn5U9+4rAg9lQuLhuALrA+HSXRGDQR2rss9EHWTzlr5vPPD14S13plmcqZKQkjqe4MkdTiow=
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by CH3PR10MB7260.namprd10.prod.outlook.com (2603:10b6:610:12e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.19; Mon, 14 Aug
- 2023 01:19:59 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::59f3:b30d:a592:36be]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::59f3:b30d:a592:36be%7]) with mapi id 15.20.6678.022; Mon, 14 Aug 2023
- 01:19:59 +0000
-To:     Ankit Kumar <ankit.kumar@samsung.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Keith Busch <kbusch@kernel.org>, gost.dev@samsung.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] block:t10-pi: remove duplicate module license
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1350mfmj8.fsf@ca-mkp.ca.oracle.com>
-References: <20230811153313.93786-1-ankit.kumar@samsung.com>
-        <CGME20230811101913epcas5p3a007d4594f5313a04ed5b6414aeb5b61@epcas5p3.samsung.com>
-        <20230811153313.93786-3-ankit.kumar@samsung.com>
-Date:   Sun, 13 Aug 2023 21:19:57 -0400
-In-Reply-To: <20230811153313.93786-3-ankit.kumar@samsung.com> (Ankit Kumar's
-        message of "Fri, 11 Aug 2023 21:03:13 +0530")
-Content-Type: text/plain
-X-ClientProxiedBy: SA9PR11CA0011.namprd11.prod.outlook.com
- (2603:10b6:806:6e::16) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+        Sun, 13 Aug 2023 22:01:41 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FC810D1;
+        Sun, 13 Aug 2023 19:01:27 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RPHgh6fkCz4f3kFt;
+        Mon, 14 Aug 2023 10:01:20 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAH5Kbyitlkc4GkAg--.41869S3;
+        Mon, 14 Aug 2023 10:01:23 +0800 (CST)
+Subject: Re: [PATCH 1/1] blk-throttle: fix throttle configuring not effective
+To:     Yu Kuai <yukuai1@huaweicloud.com>,
+        zhuxiaohui <zhuxiaohui400@gmail.com>, tj@kernel.org,
+        josef@toxicpanda.com, axboe@kernel.dk,
+        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org, zhuxiaohui <zhuxiaohui.400@bytedance.com>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230812072116.42321-1-zhuxiaohui.400@bytedance.com>
+ <5ba76f5e-9b02-13c8-c2a3-b15fe016261d@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <d69f850a-ecfc-61dc-a970-64f57fff806f@huaweicloud.com>
+Date:   Mon, 14 Aug 2023 10:01:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|CH3PR10MB7260:EE_
-X-MS-Office365-Filtering-Correlation-Id: ace8af1d-8669-47c3-7de0-08db9c64936d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KTRK0lrayIezIWppLx2BefuX5g2zGDVqmEFC49C4M3NI4XK2ekJERVcKWAf8V12kSPIkggfDLUHZeYGWqJskQXf3aa2ke8+g4Y6Mb36xbmUUA33H6KFkNwStr+ybbl2QSb/NSPDkxZhqF7Dzg+MPjcK6CoDWponvug8LLBVQBxrl7FFaDITFWCrxLsHXrIc0oZqcZCBusBmJXvaGaGa0d73WDohOibyqsv4F2ftUG0eoMw8FDowwuNYLyfJrj+Akb5ZIiKtHdS1IIZ/KDre8ZmrZXmle334ShlU+PmQmT6/WrRwnCM1HWeA4539qZmh6iNGYmS0XpnXdw13AzauEheRicXwGybJGVuzwJuOmNKM5tC5dbfX6f9dXCZ7tmW3zhaGCwJ3mbknPgj6uHLPIx5HYPFgvSiOgvXsGBndSK8LB/i5XX5iH56lgEScmvZczuBZE5sEgsyezG1WStUcvPWT81TRALmpiJaD5pDp7HD256osgbPMDErVEF3MPluHZgiWKIWFqK9kQV2pChSP5v+bF3UM0rl5oiMCDEn3jJ8B3KlVl+wgTX+90rrIw0T4v
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(396003)(136003)(366004)(39860400002)(346002)(451199021)(186006)(1800799006)(6512007)(36916002)(6486002)(478600001)(54906003)(83380400001)(5660300002)(66476007)(66556008)(2906002)(66946007)(8936002)(26005)(6916009)(6506007)(4326008)(41300700001)(86362001)(558084003)(38100700002)(8676002)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GGgQgkwKRvGufn6qG5NpvL3fEDNyNEkC9328ESM29NHuU0KwGchYMsHUcJI8?=
- =?us-ascii?Q?PgaWZaRiHbAypDBoUG0kxrkTalzPtFt/FOz8a0ylX5hofhKY4Ibpa+CrA5dT?=
- =?us-ascii?Q?ro3FVxW9JNqZxd/Nhj/0K/pv97rxNqN8FCPsoyBqGXygPSJU0qW2c/5E/wxG?=
- =?us-ascii?Q?AMOdyxlL4AkfdekzSJI3V30+2iBMfRB889niWeCWHl8EbH0T0Ot4I8Hz57ov?=
- =?us-ascii?Q?OaWB/qsW+puFpNBV+embBunXHUGmU+w8wrK2+kBvoIVE4SFRpTCMMWFiDNcL?=
- =?us-ascii?Q?ipmL3LAcVdCoX4mMDJCTcZNR6uVEriPgYxlBSReekuPRjp/zzpjol1tRV1wr?=
- =?us-ascii?Q?KTqTcvMmtM21sLUYsthRPpavIK/NwThtAppjHo+FRfdewzX4RcTJGDZYQFZO?=
- =?us-ascii?Q?/6R9LH5iLOwk8/sXPdPl8JhmCD+Uu7AQtj5qxsVLX6/szK6XCv5L06rKV0o/?=
- =?us-ascii?Q?W2pNik/VfdVR2htE9juk98Jv15AwGNp8Re8j3F2+V07hgOjYwynLsFyy/gkk?=
- =?us-ascii?Q?YkKtmOLtOj4/VeU+3By6/gP0m2cECNXN6FJKy9lI5C4a2wVCnWrRI7CoK1NK?=
- =?us-ascii?Q?54VgtaA062t8VkMDkIT8HVcb1CWKAZwZJKNWMf4MnkJMT8W1XFN0CxUjvyDQ?=
- =?us-ascii?Q?K8NY6QmSv+vIn7Oo00mj4uenrs8ZohVJscE7UG1MrplUORGs1/likyuhVsKs?=
- =?us-ascii?Q?bmp14MEBHALUX4Jsv+QVmrpHeBiJD6hJu0cI9g4aDg+QVm/yzZO+e82KKL0x?=
- =?us-ascii?Q?xFb5GjIIR+n6XDBAwHmXGdN+Rvw7dTsLN9anhjgaR1+FXJmf5VHdT1KRjaKE?=
- =?us-ascii?Q?byIzaJAQ6s6LhnS6r2EATUH2LNu7HnlWBXCtpkdkJ7qKBUTazstPB4cPs3s6?=
- =?us-ascii?Q?yzKMusLgbj147EFThhpL7z2iSuAiXaZq7KTgxAtHo6G8VGXSER3s7mnY/dch?=
- =?us-ascii?Q?k3u7pBxES4oKRH9kAjmSDkrjwcj1JsqQ/YKbfomSnM2mqcke0/ct1wT/Zi/i?=
- =?us-ascii?Q?hiq4S7ZxLBT8uoJdo2GaFlFsCZF6Jq4XlThtuSC9gh+OhvYmArcoGcfexPbx?=
- =?us-ascii?Q?UTU/XuFDI1zUDSwdvRvJam+T6YgxrTumJ/59ndGiIDeJ1TIgtExyhIVPbErZ?=
- =?us-ascii?Q?VuQzvvPMaH9EeKKGeLpGlN+a3OctlqxbXt1H4mVJW4VbqhcUry/PeNqlksDH?=
- =?us-ascii?Q?54s9Qdk5Em5/TrxO/N7oZHprl6p2yIc4qovm+Qk4jkRUkiMXzBEqaTcA5dTx?=
- =?us-ascii?Q?7W5r9n0/TWPEUsv80cJ6kZ9UwVtSniDYqGbYCm7hwYgMDJATRgp9gtilkpbm?=
- =?us-ascii?Q?22b24Mw4qHSS9GyX+Cw4EOieQpICuZdYJMtOLpFmXkxWnSUsKtxcRdfk5PjB?=
- =?us-ascii?Q?/TUfKTnExX4gjltgnIFdn6RQM5DILxGUevhvjKAvOlwpE3q33x7lhKiIfWrj?=
- =?us-ascii?Q?1nRG6wzRCd8xkr6i7oYTRPCfwHKuGAuFwr9JyR00W5t5UzHL4mpoGSPk4AOh?=
- =?us-ascii?Q?0Dute3awNYvUCD2R/8rkL7Sd6aRvIffjKLPKxOZ91YUk18F7NDjM+vaPgM0D?=
- =?us-ascii?Q?ooJksLNEFT9oG7zrZtnUuz5FuaChDoxW4MGsvnj31pIImX06TWZDg3JfFt29?=
- =?us-ascii?Q?YQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: KFNDoIOzyXxjQJm2xFvzeMlESFn6l6GUL766aSoOaBDj0ZQTL41QSShQ8FFPEnx/0sOYxhjREm+o5ZcYr8/vsAahj1DR0AXpbsA3HYOPVqcrFB8BXwzET8fNOjarL965XTzHS1pCUiUUKNTtkdaRu4F5YpKgmAcK9wN046G/nJlzDdo1JeGODL36Af5pkrk1UHqb0RM6aTCWsySYt3SUlcepRmNv/9UxKxXJh5bODQQK8vkm71FeczIzl7I7zq7UclGRazn6xChC3J8GdIZHY6YjDh6O5nHkNhhv2+nstPk7YwF4A3yfZnZdPOztox0zMPQ79jAPhzbqOWLyurbZEYiOXvVyzaDA3RjBLcWujxIAxLjtzcYgnXvMXuOE95CvP1eoVG1YmVZyQhHZqqOZxX/YbTbi1gvoE6K7/eVt0Hcf3NUkecPG3+61w6yY4ya0eb7afK/7DgMtH4olmRBTFk7F0iyxlRETVb9I97RKVBxEQFOujjRxgu0judoRhzRMKLOX89Cmui/64qmsyGNRbobxaOri/KWXskryV6Sj6ltBNRkt+M+EHGxRSNx4qTuTaCjvohrhgbsjoVxcWcrecHAHCnwMWYPbBeLX4foLrhX3KF5hCFKdQiLPfozngci+OeEtIOXuPaBMRc7D+5hSYWJmTnx8u67rezZNeNYIdeSOK5AogtgwCdMTu1pM4RkNY2vCnHwscxpvLBvxh3CXAq65uIi2A8Qm0J8RIzEKC/WHiV1lar4wqCRvM1JGabUDuIaj+YUg7pju8I6g8riPihT3p0ntrkFDHvWuNM++Sp4MYmrP65Swno9lNppMGVR/iIvvK7ca29G2sgVXM+JmyGQ6gm6Tkb44S7htXYQasbc=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ace8af1d-8669-47c3-7de0-08db9c64936d
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2023 01:19:58.9098
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jDgUovTSIE04n3b/Fl6AeMuOVbprHQgD+ZFQjubsCYlKb5B1gwr5uHEsbSV4XRA5n9imHlBqSfCOXB0iU4JmEmBdWeThvjTZ37TAdxK4fCs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB7260
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-13_24,2023-08-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 mlxscore=0
- spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308140011
-X-Proofpoint-GUID: wiIDPR0MTBxcYRtwFKRxG3EZH_XdfxRR
-X-Proofpoint-ORIG-GUID: wiIDPR0MTBxcYRtwFKRxG3EZH_XdfxRR
+In-Reply-To: <5ba76f5e-9b02-13c8-c2a3-b15fe016261d@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAH5Kbyitlkc4GkAg--.41869S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXrWfJry3try7Gry8Jw1DJrb_yoWrJF1rpF
+        y8trs8GrWYqFn3G3W3J3W5Ja45Xw48J348JrWIqFy5AF17Cr90gryUXrnY9348Ars7GF48
+        tw1jqr9rZF47urDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
++CC Michal.
 
-Ankit,
+在 2023/08/12 15:53, Yu Kuai 写道:
+> Hi,
+> 
+> 在 2023/08/12 15:21, zhuxiaohui 写道:
+>> when updating block throttle limit with persistence and stable io
+>> pressure, especially a relative high io pressure, fio test e.g.,
+>> there may never be a change to start a new slice, and carryover_ios &
+>> carryover_bytes will not be cleared.
+>>
+>> As a result, when reconfiguring block throttle limit, we can notice that
+>> the actual iops and throughput is a random value far away from what is
+>> set
+>>
+>> So we need to update carryover value when dispatching bio
+> 
+> I don't understand, not clear carryover_bytes/ios is what expected, and
+> how can they affect actual bandwith/iops.
+> 
+> Can you give a example how you tested and why current calculation is not
+> correct?
 
-> Remove duplicate MODULE_LICENSE("GPL") from t10-pi.c
-> Fixes: a7d4383f17e1 ("block: add pi for extended integrity")
+I can reporduce this, but this patch is obviously wrong. You must
+explaim how the calculation is not correct.
 
-Looks fine.
+After a quick loock, I found that carryover_bytes/ios is not updated in
+throtl_trim_slice(), while tg->io/bytes_disp[] can be cleared. This is
+definitly a problem.
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Thanks,
+Kuai
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+> 
+> Thanks,
+> Kuai
+> 
+>>
+>> Signed-off-by: zhuxiaohui <zhuxiaohui.400@bytedance.com>
+>> ---
+>>   block/blk-throttle.c | 26 ++++++++++++++++++++++++++
+>>   block/blk-throttle.h |  4 ++--
+>>   2 files changed, 28 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+>> index 7397ff199d66..13c9d87a7201 100644
+>> --- a/block/blk-throttle.c
+>> +++ b/block/blk-throttle.c
+>> @@ -821,6 +821,30 @@ static void tg_update_carryover(struct throtl_grp 
+>> *tg)
+>>              tg->carryover_ios[READ], tg->carryover_ios[WRITE]);
+>>   }
+>> +static void tg_charge_carryover(struct throtl_grp *tg, struct bio *bio)
+>> +{
+>> +    bool rw = bio_data_dir(bio);
+>> +
+>> +    if (unlikely(tg->carryover_bytes[rw])) {
+>> +        unsigned int bio_size = throtl_bio_data_size(bio);
+>> +        unsigned int carryout_size = abs(tg->carryover_bytes[rw]);
+>> +
+>> +        carryout_size = min(carryout_size, bio_size);
+>> +
+>> +        if (tg->carryover_bytes[rw] < 0)
+>> +            tg->carryover_bytes[rw] += carryout_size;
+>> +        else
+>> +            tg->carryover_bytes[rw] -= carryout_size;
+>> +    }
+>> +
+>> +    if (unlikely(tg->carryover_ios[rw])) {
+>> +        if (tg->carryover_ios[rw] < 0)
+>> +            tg->carryover_ios[rw] += 1;
+>> +        else
+>> +            tg->carryover_ios[rw] -= 1;
+>> +    }
+>> +}
+>> +
+>>   static unsigned long tg_within_iops_limit(struct throtl_grp *tg, 
+>> struct bio *bio,
+>>                    u32 iops_limit)
+>>   {
+>> @@ -965,6 +989,8 @@ static void throtl_charge_bio(struct throtl_grp 
+>> *tg, struct bio *bio)
+>>       tg->io_disp[rw]++;
+>>       tg->last_io_disp[rw]++;
+>> +
+>> +    tg_charge_carryover(tg, bio);
+>>   }
+>>   /**
+>> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+>> index d1ccbfe9f797..8f1642becb23 100644
+>> --- a/block/blk-throttle.h
+>> +++ b/block/blk-throttle.h
+>> @@ -127,8 +127,8 @@ struct throtl_grp {
+>>        * bytes/ios are waited already in previous configuration, and 
+>> they will
+>>        * be used to calculate wait time under new configuration.
+>>        */
+>> -    uint64_t carryover_bytes[2];
+>> -    unsigned int carryover_ios[2];
+>> +    int64_t carryover_bytes[2];
+>> +    int carryover_ios[2];
+>>       unsigned long last_check_time;
+>>
+> 
+> .
+> 
+
