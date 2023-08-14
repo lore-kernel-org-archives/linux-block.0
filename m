@@ -2,101 +2,70 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E6EC04E69
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 04:19:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D6F2EB64DD
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 09:39:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232882AbjHNES5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 00:18:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44210 "EHLO
+        id S233330AbjHNJjI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 05:39:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232934AbjHNESc (ORCPT
+        with ESMTP id S234715AbjHNJiq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 00:18:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22FC2AD;
-        Sun, 13 Aug 2023 21:18:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B1EA761735;
-        Mon, 14 Aug 2023 04:18:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2270C433C7;
-        Mon, 14 Aug 2023 04:18:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691986708;
-        bh=sdCfbwOrNrhHX8FDcR9lXmBqbKqdYnF0NA1vNvBZblY=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=JBrSLtIZyE7zg2HN4loSGX9LSMxSSG7S9UdIGKDmIBkPmKYB+63ZAhFOv+2efgWNM
-         it+vAbFZD68GQMyHt+fX1pt6g92KGtOsY3vTp+w7I4gPDkYyyR7bzsUe8RkT+aAWlC
-         4ZyVz4zPB0f1AO8GmhuTbuYrV3mXj018cLs1EhXKcT+jyckOfZzhgHXfhEjCrozbpj
-         9Sp4aFbXi0ETw2YcC7CIriYumMTyuQD04jYR9U1xbazqNyYyr13GTbHn8CHaVRZdH4
-         BNHLOZiFAnIKphRKLHwiyasz5NMP40MSe9RY8eGFrkRCMbjMpvx30rv9I+MbhTeKMn
-         /r4fG2T+brfFQ==
-Message-ID: <5b6f882b-82ab-6a00-4a2d-4e93b8c1d973@kernel.org>
-Date:   Mon, 14 Aug 2023 13:18:25 +0900
+        Mon, 14 Aug 2023 05:38:46 -0400
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAAA5173E
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 02:38:04 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5221bd8f62eso1295331a12.1
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 02:38:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692005878; x=1692610678;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eML3dbDdV7FB4Va827hh5Q5QJm9umEJcmICBYPAeFZo=;
+        b=FEB8z/XXoKqBfOvHMx4Tp36rvQ5kLR7YKgz2oQYdioQPnCXF0h1g1AiK0KvHllX31a
+         vmDwTVEc50mcMQIEw4Jvn54xePcoH+ask6wPPva/iBSoyb/XI7xcDarU9Qzm+R5kwC20
+         3S9N7DizxpdlucCw3F4puJMw/4D6+A87ii4QR7QERtXElJp4SCQPGioOfwT61t+XDFtw
+         /XsQ+y5+l+R2ytXpYiFRlzZwCH3JHgDVvvrgRODVmpLy1rrDoiYqIun3qYKWOfIemakN
+         Pa+zI1hmnIuA6qpnEvetvWJVI1s0FoojOytV2DK40QZHu3gjIjDkYORxsYPnMqzCKuPb
+         kxUA==
+X-Gm-Message-State: AOJu0Yzlk6Gtvsis0LltiKEE60QERSdIgUowo9AZ4ykyJwM948SXnyTT
+        jQQWmROpAE5c+1aOq/2qwCY=
+X-Google-Smtp-Source: AGHT+IHCqeZA5fZuiYWf4EyC/985KnonSfc9jEbo9VIu7+DLlecKfF2ztCbvN47WBzVZb3o2n6c8HA==
+X-Received: by 2002:a17:906:7394:b0:99b:d682:f306 with SMTP id f20-20020a170906739400b0099bd682f306mr6364779ejl.4.1692005878299;
+        Mon, 14 Aug 2023 02:37:58 -0700 (PDT)
+Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id lj5-20020a170906f9c500b0098d2d219649sm5556604ejb.174.2023.08.14.02.37.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Aug 2023 02:37:57 -0700 (PDT)
+Message-ID: <149f023e-e4f4-3b36-56d5-e2d0f486439f@grimberg.me>
+Date:   Mon, 14 Aug 2023 12:37:56 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v8 3/9] scsi: core: Call .eh_prepare_resubmit() before
- resubmitting
+Subject: Re: [PATCH blktests] nvme/rc: fix nvme device readiness check after
+ _nvme_connect_subsys
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230811213604.548235-1-bvanassche@acm.org>
- <20230811213604.548235-4-bvanassche@acm.org>
- <29cca660-4e66-002c-7378-2d2df5c79a08@kernel.org>
- <057e08f2-7349-bcad-c21d-11586c059fac@acm.org>
- <02d18d6a-ece5-f8f6-0c6c-4468c86c9ea1@kernel.org>
- <ee3e2f36-1089-f95c-8145-ea91d5912fde@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <ee3e2f36-1089-f95c-8145-ea91d5912fde@acm.org>
-Content-Type: text/plain; charset=UTF-8
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc:     Yi Zhang <yi.zhang@redhat.com>, Daniel Wagner <dwagner@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <20230811012334.3392220-1-shinichiro.kawasaki@wdc.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230811012334.3392220-1-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/14/23 12:23, Bart Van Assche wrote:
-> On 8/13/23 19:41, Damien Le Moal wrote:
->> But at the very least, may be mention in the commit message that you also add
->> the unit tests associated with the change ?
-> 
-> Hi Damien,
-> 
-> I will mention this in the patch description when I repost this patch.
-> 
->> Another remark: we'll need this sorting only for devices that are zoned and do
->> not need zone write locking. For other cases (most cases in fact), we don't and
->> this could have some performance impact (e.g. fast RAID systems). Is there a way
->> to have this eh_prepare_resubmit to do nothing for regular devices to avoid that ?
-> 
-> The common case is that all commands passed to the SCSI error handler
-> are associated with the same ULD. For this case list_sort() iterates
-> once over the list with commands that have to be resubmitted because
-> all eh_prepare_resubmit pointers are identical. The code introduced
-> in the next patch requires O(n^2) time with n the number of commands
-> passed to the error handler. I expect this time to be smaller than the
-> time needed to wake up the error handler if n < 100. Waking up the
-> error handler involves expediting the grace period (call_rcu_hurry())
-> and a context switch. I expect that these two mechanisms combined will
-> take more time than the list_sort() call if the number of commands that
-> failed is below 100. In other words, I don't think that
-> scsi_call_prepare_resubmit() will slow down error handling measurably
-> for the cases we care about.
-> 
-> Do you perhaps want me to change the code in the next patch such that
-> it takes O(n) time instead of O(n^2) time in case no zoned devices are
-> involved?
 
-I was more thinking of a mean to not call scsi_call_prepare_resubmit() at all if
-no zoned devices with use_zone_write_lock == true are involved.
+> The helper function _nvme_connect_subsys() creates a nvme device. It may
+> take some time after the function call until the device gets ready for
+> I/O. So it is expected that the test cases call _find_nvme_dev() after
+> _nvme_connect_subsys() before I/O. _find_nvme_dev() returns the path of
+> the created device, and it also waits for uuid and wwid sysfs attributes
+> of the created device get ready. This wait works as the wait for the
+> device I/O readiness.
 
--- 
-Damien Le Moal
-Western Digital Research
-
+Shouldn't this call udevadm --settle or something?
