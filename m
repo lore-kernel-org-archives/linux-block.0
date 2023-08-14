@@ -2,72 +2,124 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 299CDC001DB
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 16:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4682DC001E0
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 16:58:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231455AbjHNQum (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 12:50:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49620 "EHLO
+        id S229379AbjHNQ5i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 12:57:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231803AbjHNQu3 (ORCPT
+        with ESMTP id S231678AbjHNQ5S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 12:50:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1CA2D2;
-        Mon, 14 Aug 2023 09:50:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 544D26327C;
-        Mon, 14 Aug 2023 16:50:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 603F6C433C8;
-        Mon, 14 Aug 2023 16:50:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692031827;
-        bh=xejVDIFW4M3KqYcvfFvp6idaZ0x1SMTNjqiyN51qDiE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=iZFnF+gQRBF3qE+MXsyv83rodax3KV8Jy1NHSqQZnav4FZLwOFe+zqT73zPi3oJAj
-         NLohBS7p4LMDVA1sO1KHk6fXjYlsqTZ3k2zvtK84Ctkx4VBX1EHWfwccWaczW7ei6d
-         k0kD/hgSEkppkQUxTRAlz+jAzGurQOAIJ4DZ+paJoovXgeJd8JPrcJ7vEH4xTsTr4j
-         txCMt1+M4y96rvS43Nuvt0QaFqcjUL1i2WT0pvTEaOCL4pTWcSD/aKrohUtAkQgVWw
-         1VjLJbWS3ACZ3XilwcbDJKLL2O+lwZeiqZphw4za5Ai+fgrnNaU9R6S0IO2ye9zAo4
-         NjQUnlq/QKClA==
-Date:   Mon, 14 Aug 2023 10:50:25 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@meta.com>, asml.silence@gmail.com,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [PATCHv3] io_uring: set plug tags for same file
-Message-ID: <ZNpbUeDDIMYgJSkt@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230731203932.2083468-1-kbusch@meta.com>
- <cbf529c4-6fb7-40da-8b01-514a8e3e6f5c@kernel.dk>
+        Mon, 14 Aug 2023 12:57:18 -0400
+Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CA27199F;
+        Mon, 14 Aug 2023 09:56:57 -0700 (PDT)
+Received: by mail-oo1-xc2a.google.com with SMTP id 006d021491bc7-56dfe5ce871so1542176eaf.2;
+        Mon, 14 Aug 2023 09:56:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692032166; x=1692636966;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f9O7uVavugQIWG4+/30ol/uNZ+vUipg1yWncf1HB7Z8=;
+        b=SXLBBu9oNOxnHeWHA3EzDEcQx4zuwk/WnRawLjvMOoFNw7dpzT1cc0Zh3imGGu5biH
+         hF3gj0fRHQ72e59mu7XzFNFxxtuLAL6ZFxOgG2j4wOX+YZAVs3TkYanLQVFe+jZctHSn
+         gRxqqBRQ64EUwLZkoQs6MhwsohiAS+iuZrEPX6LlKTe7wKlVSVqQ5ZUWMS2XWnv3ukdN
+         xlx8rrlrQqId4/tGMozDD2l5xfvpRrFWtivaal0jSX3deLqfh+C3I6DXAEvX5W8/UQJ5
+         CNDQmsfU8Esw1uGGrTs5LBHBGY5zVpcRKJdL/zTQ7JbJGkTBRoprtkOUNrZbBBQ1Hqzm
+         u1xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692032166; x=1692636966;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f9O7uVavugQIWG4+/30ol/uNZ+vUipg1yWncf1HB7Z8=;
+        b=CJ7eDssTBGXb/bdDoe+U+BeEtGUEnRw5bZIoXuQ7k+rRcjidn5a+RaMpoIdkCAx21x
+         pNdPwbfR620dSoVDkA5xIAR7pq8oTz0D4LhXP2cXCNXLxWlb+m4L5O2aL8cs9qhJlQ8b
+         qQhF0X5wy0rUswqY3o8Pn7MxiEg4179t+xZguqyizr6duc67ifapgcRVrt9Xi/XUb4iA
+         KyErwI9hMhYwpcpEo95k6cE8sAs/ckWwWpvMpt2W6cpS3HWIpQCBNOPNIgi2s+9BRipV
+         gwxk+nUlFNe5DWWY2AvUua9AEejMr5NKxg2WsyhHnzLv3VW9QR+V7wiIal/OLU6MJ2AE
+         oSLw==
+X-Gm-Message-State: AOJu0YzIl60tqzkn4qfEO/zGmM8hBaKMmXvqTBedwG/lSbY+LGIIMj4Y
+        Xxr4Cmb3ZjYBwY8Ur+fzgdKagOXaNX3qZVJysSQ=
+X-Google-Smtp-Source: AGHT+IGRiUAbrBbY9Vni9Tn8QSBhVGIX9TfUXofBqPCsNnEmk1YYklY4fqhqnWDK5MhusbsyCSnQmJcr7FbUisha/AQ=
+X-Received: by 2002:a05:6358:9212:b0:134:e952:16a8 with SMTP id
+ d18-20020a056358921200b00134e95216a8mr6760283rwb.24.1692032165879; Mon, 14
+ Aug 2023 09:56:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cbf529c4-6fb7-40da-8b01-514a8e3e6f5c@kernel.dk>
+References: <CGME20230811105627epcas5p1aa1ef0e58bcd0fc05a072c8b40dcfb96@epcas5p1.samsung.com>
+ <20230811105300.15889-1-nj.shetty@samsung.com> <2cc56fb5-ddba-b6d0-f66b-aa8fffa42af0@acm.org>
+In-Reply-To: <2cc56fb5-ddba-b6d0-f66b-aa8fffa42af0@acm.org>
+From:   Nitesh Shetty <nitheshshetty@gmail.com>
+Date:   Mon, 14 Aug 2023 22:25:54 +0530
+Message-ID: <CAOSviJ1b5ySAugzKExa_ZQgOzvQAOWB3D-ZRMQeGmNpQbaoBSQ@mail.gmail.com>
+Subject: Re: [dm-devel] [PATCH v14 00/11] Implement copy offload support
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        martin.petersen@oracle.com, linux-doc@vger.kernel.org,
+        gost.dev@samsung.com, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        mcgrof@kernel.org, dlemoal@kernel.org,
+        linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 01:24:17PM -0600, Jens Axboe wrote:
-> 
->      3.51%     +2.84%  [kernel.vmlinux]  [k] io_issue_sqe
->      3.24%     +1.35%  [kernel.vmlinux]  [k] io_submit_sqes
-> 
-> With the kernel without your patch, I was looking for tag flush overhead
-> but didn't find much:
-> 
->      0.02%  io_uring  [kernel.vmlinux]  [k] blk_mq_free_plug_rqs
-> 
-> Outside of the peak worry with the patch, do you have a workload that we
-> should test this on?
+On Sat, Aug 12, 2023 at 3:42=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
+> wrote:
+>
+> On 8/11/23 03:52, Nitesh Shetty wrote:
+> > We achieve copy offload by sending 2 bio's with source and destination
+> > info and merge them to form a request. This request is sent to driver.
+> > So this design works only for request based storage drivers.
+>
+> [ ... ]
+>
+> > Overall series supports:
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+> >       1. Driver
+> >               - NVMe Copy command (single NS, TP 4065), including suppo=
+rt
+> >               in nvme-target (for block and file back end).
+> >
+> >       2. Block layer
+> >               - Block-generic copy (REQ_OP_COPY_DST/SRC), operation wit=
+h
+> >                    interface accommodating two block-devs
+> >                  - Merging copy requests in request layer
+> >               - Emulation, for in-kernel user when offload is natively
+> >                  absent
+> >               - dm-linear support (for cases not requiring split)
+> >
+> >       3. User-interface
+> >               - copy_file_range
+>
+> Is this sufficient? The combination of dm-crypt, dm-linear and the NVMe
+> driver is very common. What is the plan for supporting dm-crypt?
 
-Thanks for the insights! I had tested simply 4 nvme drives with 1
-thread, default everything:
+Plan is to add offload support for other dm targets as part of subsequent
+series once current patchset merges, dm targets can use emulation to
+achieve the same at present.
 
-   ./t/io_uring /dev/nvme1n1 /dev/nvme2n1 /dev/nvme3n1 /dev/nvme4n1
+> Shouldn't bio splitting be supported for dm-linear?
+Handling split is tricky in this case, if we allow splitting, there is
+no easy way
+to match/merge different src/dst bio's. Once we have multi range support th=
+en
+we feel at least src bio's can be split. But this series split won't work.
 
-Which appeared to show a very small improvement with this patch on my
-test vm. I'll test more to see where the tipping point is, and also see
-if there's any other ways to reduce time spent in io_issue_sqe.
+Thank you,
+Nitesh Shetty
