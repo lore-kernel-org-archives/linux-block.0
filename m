@@ -2,92 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 581E9C41513
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 13:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6399CC41513
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 13:38:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbjHNNYY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 09:24:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
+        id S229483AbjHNNh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 09:37:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230435AbjHNNXy (ORCPT
+        with ESMTP id S231496AbjHNNhw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 09:23:54 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EA0B10C6;
-        Mon, 14 Aug 2023 06:23:54 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6bb140cd5a5so3455720a34.3;
-        Mon, 14 Aug 2023 06:23:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692019433; x=1692624233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DrPNQERrOv3TUTMR4WcWsfPPW9clyc64cY5xGbhYQfU=;
-        b=qRMXV3ux3UEznrhbp/FNBxNre5mDfXcdXEgxRffHEVNISfrJvmgkVGvEIdcBgpiz7B
-         eYw19fAMKPMUvrlKUsdlfcUaRjDwz+CSvsJOW7Uz2vv88Jos+K2c/WDk6MZsf1BizKLo
-         5pf55lrnaW8WDphjg90V9c2JZAVeH0qfpXrekjo+a1xH59KK1ajTPuGTBz2yix9btarh
-         ETtGjq/Jy5R6rzZUqMqGFjJoJSLPud4Ak2T70Brb/VJooBuNARe+A6M0zHBixc8a2Z8X
-         DJuD/CHJvMPttngCAMDfi83GTBCEH1SBWl11ba89qjBJpo8hreXjvTCxR1u4c4qCIC+9
-         CHew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692019433; x=1692624233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DrPNQERrOv3TUTMR4WcWsfPPW9clyc64cY5xGbhYQfU=;
-        b=RrXUYhamYAG4c14hhMajPV7LtcvtebHzdZourjf3c3g8tIPESETLW4+n4w4+pgB3+y
-         vd6UTOkGOk6JPUUzfQuyl744DAyB+WDH5t9kYm9QrPqEyk8iejf8H1v2cV6W/oTC22em
-         h0p2ZBHSJCRZlLp/MOf4yfYWrVti6qGayouXHFsO9FWE16HULd9u6PGG78n0oeugIM88
-         /0y0JrWkINPJqppZ5iUANd7DLi4sY39L0jnw08dFq/n+w6fBoKF3NpZhUQWADW41fm0a
-         XMBCP+wtM0m1E4L49MAOYKjmR9ZWRu3evn0ww172ZBa59c2KPrz+fBjaa5kXaV2g2mQg
-         AdVA==
-X-Gm-Message-State: AOJu0Yxl+F938WKnlzXRsbJ3+I4To8OcYAbW0kaDHEU6pX1YmBEC6wHZ
-        KuYEoe3hhdrL2MX22w82V2HkLws9An3Bu42Mt2M=
-X-Google-Smtp-Source: AGHT+IFnyrKGUBSBRzYP9MZWbLPYVlvyCpffBIQq5VQjXF3tzYzUHmgGqPhYE+0g0sf0xcHWlAf7JP3fXn3i6xo0t1Y=
-X-Received: by 2002:a05:6870:440e:b0:1bb:b172:4bd5 with SMTP id
- u14-20020a056870440e00b001bbb1724bd5mr11409614oah.18.1692019433185; Mon, 14
- Aug 2023 06:23:53 -0700 (PDT)
+        Mon, 14 Aug 2023 09:37:52 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B978810C0;
+        Mon, 14 Aug 2023 06:37:51 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 76AF11F7AB;
+        Mon, 14 Aug 2023 13:37:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1692020270; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R5mYSrpxL4D9+Tu4E3dFs5QFfz/kTUIaqraD9BAIWnk=;
+        b=GJGtiP44qEyMS++IcCpJVuqAJqNfB892HlH7zzwbWjr2DuUPksM/WuQ2cqOhwGoIW0OkUw
+        isNcEFcxNH7Kx4xQN4LIJtrVQmN257YQIV6X/4+0I+a0Z3g2iVvMqzH2l9BrdwUCPYjtpd
+        u+hVRyJ7qMCW395p0m59X3/snLioA2o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1692020270;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R5mYSrpxL4D9+Tu4E3dFs5QFfz/kTUIaqraD9BAIWnk=;
+        b=Cg8S7dDRWqAaCS+21sZ8loL0gWgk28M5gJWJ4JCFrhEn0tKyswCqtWAYJdbbHE8zq6i76K
+        GKD+mToYv1MH9lBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 61A45138E2;
+        Mon, 14 Aug 2023 13:37:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id BW9EFy4u2mQTYQAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 14 Aug 2023 13:37:50 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id EA49DA0769; Mon, 14 Aug 2023 15:37:49 +0200 (CEST)
+Date:   Mon, 14 Aug 2023 15:37:49 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Song Liu <song@kernel.org>
+Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        linux-raid@vger.kernel.org
+Subject: Re: [PATCH 11/29] md: Convert to bdev_open_by_dev()
+Message-ID: <20230814133749.yqcgmcuo5xkvlxyc@quack3>
+References: <20230810171429.31759-1-jack@suse.cz>
+ <20230811110504.27514-11-jack@suse.cz>
+ <CAPhsuW5S2gjPv+UpLjX=uBhsbPOmNGMbGjF2eJO7rWMnGVgOmg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20230813160936.1082758-1-sashal@kernel.org> <20230813160936.1082758-22-sashal@kernel.org>
-In-Reply-To: <20230813160936.1082758-22-sashal@kernel.org>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Mon, 14 Aug 2023 15:23:41 +0200
-Message-ID: <CAOi1vP-+xfmQBNWL4iKC+bB-T+yjPh=zF0nBqGMeXCdvpf7+zg@mail.gmail.com>
-Subject: Re: [PATCH AUTOSEL 5.10 22/25] rbd: make get_lock_owner_info() return
- a single locker or NULL
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>, axboe@kernel.dk,
-        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAPhsuW5S2gjPv+UpLjX=uBhsbPOmNGMbGjF2eJO7rWMnGVgOmg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 13, 2023 at 6:11=E2=80=AFPM Sasha Levin <sashal@kernel.org> wro=
-te:
->
-> From: Ilya Dryomov <idryomov@gmail.com>
->
-> [ Upstream commit f38cb9d9c2045dad16eead4a2e1aedfddd94603b ]
->
-> Make the "num_lockers can be only 0 or 1" assumption explicit and
-> simplify the API by getting rid of output parameters in preparation
-> for calling get_lock_owner_info() twice before blocklisting.
->
-> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
-> Reviewed-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
+On Sun 13-08-23 19:54:56, Song Liu wrote:
+> On Fri, Aug 11, 2023 at 3:05 PM Jan Kara <jack@suse.cz> wrote:
+> [...]
+> > diff --git a/drivers/md/md.h b/drivers/md/md.h
+> > index 1aef86bf3fc3..e8108845157b 100644
+> > --- a/drivers/md/md.h
+> > +++ b/drivers/md/md.h
+> > @@ -59,6 +59,7 @@ struct md_rdev {
+> >          */
+> >         struct block_device *meta_bdev;
+> >         struct block_device *bdev;      /* block device handle */
+> > +       struct bdev_handle *bdev_handle;        /* Handle from open for bdev */
+> 
+> With bdev_handle, we should eventually get rid of md_rdev->bdev.
+> But that can be done in a separate patch.
 
-Hi Sasha,
+Yeah, we can do that. But in the case of md it would cause a relatively
+large amount of churn so at least for this series I've stayed with the
+minimal solution.
 
-This is a prerequisite patch, it doesn't make sense to backport it
-without also backporting "rbd: harden get_lock_owner_info() a bit" and
-"rbd: retrieve and check lock owner twice before blocklisting".
+> Acked-by: Song Liu <song@kernel.org>
 
-Please drop it.
+Thanks!
 
-Thanks,
-
-                Ilya
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
