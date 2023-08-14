@@ -2,91 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B54CC41513
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 13:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7916FC04A6A
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 13:19:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229618AbjHNNOJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 09:14:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46736 "EHLO
+        id S230048AbjHNNSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 09:18:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230399AbjHNNOG (ORCPT
+        with ESMTP id S229972AbjHNNSG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 09:14:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC01CE6E
-        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 06:13:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692018796;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=isiG484zzCuLoyRUFKL6De9VKMSnc0IGGZzsm/pASx8=;
-        b=MlRuC8n04PEoZoYFWB0dOg3NNpxZ8mgd0gbpmhx2nrF1JfeM6kgluveCljsNXsUx7waqU8
-        ypZlHD8lgTq5+oTuHPFL4omkFm1kDcOWgjuhDRi1SGn0CpjokRdS7GiGC6Ier+Yd/w4Ofr
-        OMnYHMpx1qzEY3EuN/EGd4NXpMsrBvA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-611-ZaxUL9r3NBeKF3Hn7XEVaQ-1; Mon, 14 Aug 2023 09:13:13 -0400
-X-MC-Unique: ZaxUL9r3NBeKF3Hn7XEVaQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4DAB85D063;
-        Mon, 14 Aug 2023 13:13:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4236D2026D68;
-        Mon, 14 Aug 2023 13:13:10 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=whsKN50RfZAP4EL12djwvMiWYKTca_5AYxPnHNzF7ffvg@mail.gmail.com>
-References: <CAHk-=whsKN50RfZAP4EL12djwvMiWYKTca_5AYxPnHNzF7ffvg@mail.gmail.com> <3710261.1691764329@warthog.procyon.org.uk> <CAHk-=wi1QZ+zdXkjnEY7u1GsVDaBv8yY+m4-9G3R34ihwg9pmQ@mail.gmail.com> <3888331.1691773627@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>, jlayton@kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] iov_iter: Convert iterate*() to inline funcs
+        Mon, 14 Aug 2023 09:18:06 -0400
+Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF1F12D;
+        Mon, 14 Aug 2023 06:18:05 -0700 (PDT)
+Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1c504386374so535100fac.3;
+        Mon, 14 Aug 2023 06:18:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692019084; x=1692623884;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tciLO5aIFeWALn4B+WuHKgBZ+0zyAoOpqtrps2MSa0I=;
+        b=RLmAQ1GQK22rhXIpBwgMSRQe6kAaOWCeqYSmoO7XVu7W+jIjZAivlY7p2Ibdd+kvm0
+         R4PVaSaslxBI17MTqjXXL9pOFDZnuvFI5GtrrGLlGty5g2VPlcTizFGQXE2q7fxv9FE2
+         VTaLTUENc5nlW46TX60tueNgC9Ab22TMCfJFOWBKUb/wor10f7QH0ThXWQXZQTE6I4tO
+         2f7vtaj3XPMYqp1SR1Q6VemydFH0AjkR60J1yaziRwS6IQc6U1P/o7GV7HZcgzJ3D1Yr
+         EFR25XhQ7uLhN8Ug/U0sk0lpKdRinoobn5AyQkbY0YRW6HLLwpphCKGzwtgxdB8PdWJD
+         YzpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692019084; x=1692623884;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tciLO5aIFeWALn4B+WuHKgBZ+0zyAoOpqtrps2MSa0I=;
+        b=LQFhbmrMDTKmWsoPdTKq4NJMpZBmuzv8DtOdyBBWDvkCb6UbnAjw73kdyPys9pKvgd
+         SLPwYxA8VLA05OguwJd28vtCDjgRaiypWM5Oiqn4zuvSwAH/TFEv7Ao3nK8ymQFlBgVA
+         ht20EqWHZZbNt6BPR7iHkBt/CiXJktAor5nUnjZZOjq7oclWusLY5Wf0Db720Cg91a68
+         F3oKIZrLLrDkglcTWnr5VCuIXMPYo7X6zSVkLh9SFag3Qotg/CyRJkIdlAL0mSfXnZxW
+         y2GkeCmipkddBhBumCLZaPgHXQEp5eF9iD9m/QTzmOlXffVXjKIcjNdKFQtT/6kGLN7N
+         cowQ==
+X-Gm-Message-State: AOJu0YxpFKJCJG1rvCvKgGU2XVAgS0htJxbIBRzRAvuUPvzZEuLkjUAm
+        mYN+kQtJTd0aG48X/YAWCOzUNF+gcBTmXZ8UvCG2KgPFNzQ=
+X-Google-Smtp-Source: AGHT+IFXW5h7oxdY3BTPwoujmhAS/pefvYYF4kWoJeZSYIfCNmlR1SSqhyHhQJfYXWSaXyN8FgqMVQBk1BSuPNJc+g0=
+X-Received: by 2002:a05:6870:9629:b0:1b4:685d:55e4 with SMTP id
+ d41-20020a056870962900b001b4685d55e4mr9266601oaq.39.1692019084446; Mon, 14
+ Aug 2023 06:18:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4032544.1692018789.1@warthog.procyon.org.uk>
-Date:   Mon, 14 Aug 2023 14:13:09 +0100
-Message-ID: <4032545.1692018789@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+References: <20230813160605.1080385-1-sashal@kernel.org> <20230813160605.1080385-28-sashal@kernel.org>
+In-Reply-To: <20230813160605.1080385-28-sashal@kernel.org>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Mon, 14 Aug 2023 15:17:52 +0200
+Message-ID: <CAOi1vP-TjjckKBNAiiTQDpgxVVKU0NFW0OrxADs6dz4p6p0yfQ@mail.gmail.com>
+Subject: Re: [PATCH AUTOSEL 5.15 28/31] rbd: make get_lock_owner_info() return
+ a single locker or NULL
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>, axboe@kernel.dk,
+        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On Sun, Aug 13, 2023 at 6:09=E2=80=AFPM Sasha Levin <sashal@kernel.org> wro=
+te:
+>
+> From: Ilya Dryomov <idryomov@gmail.com>
+>
+> [ Upstream commit f38cb9d9c2045dad16eead4a2e1aedfddd94603b ]
+>
+> Make the "num_lockers can be only 0 or 1" assumption explicit and
+> simplify the API by getting rid of output parameters in preparation
+> for calling get_lock_owner_info() twice before blocklisting.
+>
+> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+> Reviewed-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-> 
-> So I think you need to remove the changes you did to
-> memcpy_from_iter(). The old code was an explicit conditional of direct
-> calls:
-> 
->         if (iov_iter_is_copy_mc(i))
->                 return (void *)copy_mc_to_kernel(to, from, size);
->         return memcpy(to, from, size);
-> 
-> and now you do that
-> 
->                                    iov_iter_is_copy_mc(i) ?
->                                    memcpy_from_iter_mc : memcpy_from_iter);
-> 
-> to pass in a function pointer.
-> 
-> Not ok. Not ok at all. It may look clever, but function pointers are
-> bad. Avoid them like the plague.
+Hi Sasha,
 
-Yeah.  I was hoping that the compiler would manage to inline that, but it just
-does an indirect call.  I'm trying to avoid passing the iterator as that makes
-things bigger.  I think I can probably share the extra argument used for
-passing checksums.
+I think this patch, as well as "rbd: harden get_lock_owner_info()
+a bit", have already been applied to 5.15, 6.1 and 6.4 by Greg.  The
+emails went out on Aug 1.
 
-David
+Thanks,
 
+                Ilya
