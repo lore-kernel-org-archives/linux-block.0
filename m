@@ -2,93 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18ECAC41513
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 16:59:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BECB0C001B0
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 17:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231521AbjHNQ7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 12:59:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47516 "EHLO
+        id S229461AbjHNRA5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 13:00:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbjHNQ6p (ORCPT
+        with ESMTP id S229925AbjHNRAj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 12:58:45 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4DA1FCF;
-        Mon, 14 Aug 2023 09:58:30 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id 46e09a7af769-6bd0425ad4fso3881204a34.2;
-        Mon, 14 Aug 2023 09:58:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692032309; x=1692637109;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3UJyFzkhfPV1LXyzB0ge0qlS62RRiQrpMwsiRYTQDRI=;
-        b=FDNjxoV6HizyNME4qceOyz2W/T/QvxPUaeKiIaQ5S2HaIiL+mCb5lwmFEqCKAXCfNC
-         hF45qfgBBL/md9Xsf7IYuuqBRy8X8CUaK08JDJ6eXBGVA8kUIOltMVr7G1LMW0zlwVUD
-         0U2Jq5THfYuI4WsaWaLl3g/YI8wEFKWf+uHsvTpWWM3i1BOpPiyHsrW7ALDkfsNv6DTX
-         8l8ecOKJrGy/qVCNP8+95c96htmtisRcfZmhYjvWsBRaToCisEc898dWFyYLHeEdVsKS
-         nk71Rg2gxhsYhI1yHLGmHjv/txtoYtA+pttVNlloNW7utArWjbcdjDTNPDKI31KHuDHH
-         ck6Q==
+        Mon, 14 Aug 2023 13:00:39 -0400
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D408F1733;
+        Mon, 14 Aug 2023 10:00:25 -0700 (PDT)
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-26b0b4a7cccso3013789a91.1;
+        Mon, 14 Aug 2023 10:00:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692032309; x=1692637109;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3UJyFzkhfPV1LXyzB0ge0qlS62RRiQrpMwsiRYTQDRI=;
-        b=ePiGag00MEmgZtvxFSVrxkCWMlji2LbOaIq5sALRnN6glbgvmb+ijlRuBB/dA2+hHE
-         J2LKJ2ZLeoaqn6cLbJePjSN/aBYD+9oEUx/+aRp6XRR3F5P5+W+XGFKJ4HC+ePv8iC+z
-         scG/tLgQXpAIi7QTuHG0jRe81CRP9gcr7AA5wNMccEX04fFlKFueTKV3/NBwBMPT/lyM
-         wWedD24k+dXCIC1brCzGv0M5qRr45QufY9KaFHm4LdUl5YIprKcJmOJCKeIk7AMhVQ7H
-         Tg2nDQ4RU+8+AnPCVM5MAEo8f0YPLplUnb0ZISwIxxtnK7GGDZZwbYn98AqPlDAWBoA+
-         MChg==
-X-Gm-Message-State: AOJu0YwH3prAlyy5xC/LwhnFK/74jVcWpPnTtqC/DAu4oovYLy1zcyYO
-        4ilroeTM5Lc6OxNEv/JLSsov9Zgc5aEown+xcYo=
-X-Google-Smtp-Source: AGHT+IE9LDZ83v2hgug7emDF5KyYh5EtftbM06X5OK/zdRBDKO/Jg4fRYrCeL75t5wx91fwlfKtCCIuFBCXTW1QrU9s=
-X-Received: by 2002:a05:6830:4dc:b0:6b9:bd9d:e333 with SMTP id
- s28-20020a05683004dc00b006b9bd9de333mr10451524otd.3.1692032309587; Mon, 14
- Aug 2023 09:58:29 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692032425; x=1692637225;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nteGdYrZN3XFEVLmrj3D/CZDWuq6FRMukFgAkXDOWhQ=;
+        b=bPckEnPJlpXgdaxkH+B5h/3nUFMV7P9go6u5Zc9XOxGezKs339vkatbQvtpT2QIlJX
+         A69ZTorVk9erNdczawYhZOlAGkeAt0MfJsuoWR5y/MP52hswhIDq1GDEP6LAH7T3KAXN
+         XqsuHWBBeFwsAm7iwDIiDVo7mmJsBX4cBomQ3dVlpJesVSekwzoud4prKieaSoAVWnC1
+         TsEfpFMFh40prqPNzRJLRj902ERMaEyr0r9AFhKZFMW2T1S3SxN1bJ3K6RFlWOOl127/
+         Znz+KKEs0zg8Lgn9UfZgHXJ4920IYGXYCE4TusbmzEm167paCC89Zg2CaLVI4tjvOF/g
+         VGTA==
+X-Gm-Message-State: AOJu0YzwyKXGinwp5Cggk6Gbswm9rQCg6yReYNtqLpoW+UwVxcbzyXj5
+        ntt8QU48Pl+FlRunSTEXTfA=
+X-Google-Smtp-Source: AGHT+IH+bjbLr4DX+IkMbvLZQd7N+08Jyz/7L4FWGQ4pQMpP7P35MTkHlUbBp08iXgNRaMghy2qpGg==
+X-Received: by 2002:a17:90a:9e2:b0:26b:c5b:bb44 with SMTP id 89-20020a17090a09e200b0026b0c5bbb44mr9291283pjo.13.1692032425205;
+        Mon, 14 Aug 2023 10:00:25 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:e105:59a6:229c:65de? ([2620:15c:211:201:e105:59a6:229c:65de])
+        by smtp.gmail.com with ESMTPSA id jw14-20020a17090b464e00b0026b26181ac9sm6289647pjb.14.2023.08.14.10.00.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Aug 2023 10:00:24 -0700 (PDT)
+Message-ID: <e7054af1-d820-b808-80ac-1b636c0f6a40@acm.org>
+Date:   Mon, 14 Aug 2023 10:00:22 -0700
 MIME-Version: 1.0
-References: <20230811105300.15889-1-nj.shetty@samsung.com> <CGME20230811105713epcas5p3b5323a0c553006e60671dde6c72fc4c6@epcas5p3.samsung.com>
- <20230811105300.15889-5-nj.shetty@samsung.com> <57558d7b-4444-b709-60bf-5a061cd6c3e9@acm.org>
-In-Reply-To: <57558d7b-4444-b709-60bf-5a061cd6c3e9@acm.org>
-From:   Nitesh Shetty <nitheshshetty@gmail.com>
-Date:   Mon, 14 Aug 2023 22:28:18 +0530
-Message-ID: <CAOSviJ13RJd4gTL2dzXrijXLaPUCB-pGG6x+_8ouW=7REO6e7g@mail.gmail.com>
-Subject: Re: [dm-devel] [PATCH v14 04/11] block: add emulation for copy
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Vincent Fu <vincent.fu@samsung.com>,
-        martin.petersen@oracle.com, linux-doc@vger.kernel.org,
-        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, mcgrof@kernel.org, dlemoal@kernel.org,
-        linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v8 2/9] block/mq-deadline: Only use zone locking if
+ necessary
+Content-Language: en-US
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+References: <20230811213604.548235-1-bvanassche@acm.org>
+ <20230811213604.548235-3-bvanassche@acm.org>
+ <0ba79726-fb9c-c5ae-146f-ffc29703ec21@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <0ba79726-fb9c-c5ae-146f-ffc29703ec21@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 12, 2023 at 4:25=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
-> wrote:
->
-> On 8/11/23 03:52, Nitesh Shetty wrote:
-> > +     schedule_work(&emulation_io->emulation_work);
->
-> schedule_work() uses system_wq. This won't work for all users since
-> there are no latency guarantees for system_wq.
->
-At present copy is treated as background operation, so went ahead
-with the current approach.
+On 8/14/23 05:33, Damien Le Moal wrote:
+> On 8/12/23 06:35, Bart Van Assche wrote:
+>> @@ -934,7 +936,7 @@ static void dd_finish_request(struct request *rq)
+>>   
+>>   	atomic_inc(&per_prio->stats.completed);
+>>   
+>> -	if (blk_queue_is_zoned(q)) {
+>> +	if (rq->q->limits.use_zone_write_lock) {
+> 
+> This is all nice and simple ! However, an inline helper to check
+> rq->q->limits.use_zone_write_lock would be nice. E.g.
+> blk_queue_use_zone_write_lock() ?
 
-Thank you,
-Nitesh Shetty
+Hi Damien,
+
+Do you perhaps want me to introduce a function that does nothing else than
+returning the value of q->limits.use_zone_write_lock? I'm asking this because
+recently I have seen a fair number of patches that remove functions that do
+nothing else than returning the value of a single member variable.
+
+Thanks,
+
+Bart.
+
