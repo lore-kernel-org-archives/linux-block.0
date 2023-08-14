@@ -2,101 +2,174 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D33E8C04E69
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 14:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF1FC04A94
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 14:42:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231637AbjHNO1E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 10:27:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44404 "EHLO
+        id S229645AbjHNOl3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 10:41:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232035AbjHNO0s (ORCPT
+        with ESMTP id S232511AbjHNOlM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 10:26:48 -0400
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A560BB2;
-        Mon, 14 Aug 2023 07:26:47 -0700 (PDT)
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-686ea67195dso2875719b3a.2;
-        Mon, 14 Aug 2023 07:26:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692023207; x=1692628007;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lqPfjKBh4fEn5Wj87LjUhKggel2I0g0zW4XnW9s14SU=;
-        b=UD7R0cYlv9ZdLynzmrk0ifiklrDAV7u2pQIzyT/HzttSYarybBYqdYMUgQd/fRwRyK
-         6vaJWTWacCOsGn8F/g+X0Snh7slof1OMbNuXb6LHIBBMWf388sH5rxAYV+muvNOv9YxN
-         gREyhAN/HR/Mwjq9Dn6VMHMRAldxC50xo9mzyuh5QEl/RiDQ2ABD6gT2KlTnelYGBoqS
-         eEGDyW8tUtWqcyLv/QigzBOYYtVXPFeyg5v29v/9PwO5OW7eyreNl4OdDzNrAzzU0mHZ
-         lxzwkjr7Iqd7bMzbTQhgwriguOXuH+GBEx6Y2cYuKEGBz7GzAd+e+BQ8bO9BDOkQfsqj
-         6CNA==
-X-Gm-Message-State: AOJu0YzUIxHU84Y+YM0JAPDbff0O/eNcKbcOvACGh2UQktsnSv2qziB1
-        RcSlR707ZkOfEhWzB9RqwP0=
-X-Google-Smtp-Source: AGHT+IHOmH/CPfbHjiPSRAabws5WhG05U7tv659QbNd/xn288gX5HmehFp2dEtU52oDRt4xSfXpfVg==
-X-Received: by 2002:a05:6a21:7985:b0:135:2f12:7662 with SMTP id bh5-20020a056a21798500b001352f127662mr8501008pzc.33.1692023206792;
-        Mon, 14 Aug 2023 07:26:46 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:e105:59a6:229c:65de? ([2620:15c:211:201:e105:59a6:229c:65de])
-        by smtp.gmail.com with ESMTPSA id x17-20020aa79191000000b006874c47e918sm7977606pfa.124.2023.08.14.07.26.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 07:26:46 -0700 (PDT)
-Message-ID: <abad92af-d8b2-0488-cc75-01a3f4e8e270@acm.org>
-Date:   Mon, 14 Aug 2023 07:26:44 -0700
+        Mon, 14 Aug 2023 10:41:12 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18628109;
+        Mon, 14 Aug 2023 07:41:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=ZEcKxV+OG7yAAAoqK3p3o4fR1eb6giyew8o7UtGpAeg=; b=aooSz6Do+KBjGJGkpgWrnn0vIx
+        xDDRlBc70ov4lG2yocyAedKGB+FCy8SYtPtxhCawV/2FUPJZgsps7qzIGZWJQ/fSHubSDMkhg7yvs
+        UYRsc2bhxBWUwlk4x2wh0vb45dfivQYCHCbDFXS3NWfZZVBw9TgB7ZggT0dhYc3nYwvD8toKPe4n0
+        ZCYWtYl1+MYLOAs/GJBtJxMJ8yqHmwgM7NBxAKiLvQcfMCwNhAF0T2g66PRwTtnAG25WqqExf/a0H
+        P9Ko14yTCJLTeTpnjNWj+QiaiKpTnIR6Uom/K+tDu+JZw8SF6z22VB903u3mewbr8oZnty2q6SHC0
+        uGNniv7A==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qVYkg-002VFG-TN; Mon, 14 Aug 2023 14:41:03 +0000
+From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Hugh Dickins <hughd@google.com>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH] block: Remove special-casing of compound pages
+Date:   Mon, 14 Aug 2023 15:41:00 +0100
+Message-Id: <20230814144100.596749-1-willy@infradead.org>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [dm-devel] [PATCH v14 02/11] Add infrastructure for copy offload
- in block and request layer.
-Content-Language: en-US
-To:     Nitesh Shetty <nj.shetty@samsung.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        martin.petersen@oracle.com, linux-doc@vger.kernel.org,
-        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, mcgrof@kernel.org, dlemoal@kernel.org,
-        linux-fsdevel@vger.kernel.org
-References: <20230811105300.15889-1-nj.shetty@samsung.com>
- <CGME20230811105648epcas5p3ae8b8f6ed341e2aa253e8b4de8920a4d@epcas5p3.samsung.com>
- <20230811105300.15889-3-nj.shetty@samsung.com>
- <3b1da341-1c7f-e28f-d6aa-cecb83188f34@acm.org>
- <20230814121853.ms4acxwr56etf3ph@green245>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230814121853.ms4acxwr56etf3ph@green245>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/14/23 05:18, Nitesh Shetty wrote:
-> On 23/08/11 02:25PM, Bart Van Assche wrote:
->> On 8/11/23 03:52, Nitesh Shetty wrote:
->>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
->>> index 0bad62cca3d0..de0ad7a0d571 100644
->>> +static inline bool op_is_copy(blk_opf_t op)
->>> +{
->>> +    return ((op & REQ_OP_MASK) == REQ_OP_COPY_SRC ||
->>> +        (op & REQ_OP_MASK) == REQ_OP_COPY_DST);
->>> +}
->>> +
->>
->> The above function should be moved into include/linux/blk-mq.h below the
->> definition of req_op() such that it can use req_op() instead of 
->> open-coding it.
->>
-> We use this later for dm patches(patch 9) as well, and we don't have 
-> request at
-> that time.
+The special casing was originally added in pre-git history; reproducing
+the commit log here:
 
-My understanding is that include/linux/blk_types.h should only contain
-data types and constants and hence that inline functions like
-op_is_copy() should be moved elsewhere.
+> commit a318a92567d77
+> Author: Andrew Morton <akpm@osdl.org>
+> Date:   Sun Sep 21 01:42:22 2003 -0700
+>
+>     [PATCH] Speed up direct-io hugetlbpage handling
+>
+>     This patch short-circuits all the direct-io page dirtying logic for
+>     higher-order pages.  Without this, we pointlessly bounce BIOs up to
+>     keventd all the time.
 
-Bart.
+In the last twenty years, compound pages have become used for more than
+just hugetlb.  Rewrite these functions to operate on folios instead
+of pages and remove the special case for hugetlbfs; I don't think
+it's needed any more (and if it is, we can put it back in as a call
+to folio_test_hugetlb()).
+
+This was found by inspection; as far as I can tell, this bug can lead
+to pages used as the destination of a direct I/O read not being marked
+as dirty.  If those pages are then reclaimed by the MM without being
+dirtied for some other reason, they won't be written out.  Then when
+they're faulted back in, they will not contain the data they should.
+It'll take a pretty unusual setup to produce this problem with several
+races all going the wrong way.
+
+This problem predates the folio work; it could for example have been
+triggered by mmaping a THP in tmpfs and using that as the target of an
+O_DIRECT read.
+
+Fixes: 800d8c63b2e98 ("shmem: add huge pages support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ block/bio.c | 46 ++++++++++++++++++++++++----------------------
+ 1 file changed, 24 insertions(+), 22 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 8672179213b9..f46d8ec71fbd 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1171,13 +1171,22 @@ EXPORT_SYMBOL(bio_add_folio);
+ 
+ void __bio_release_pages(struct bio *bio, bool mark_dirty)
+ {
+-	struct bvec_iter_all iter_all;
+-	struct bio_vec *bvec;
++	struct folio_iter fi;
++
++	bio_for_each_folio_all(fi, bio) {
++		struct page *page;
++		size_t done = 0;
+ 
+-	bio_for_each_segment_all(bvec, bio, iter_all) {
+-		if (mark_dirty && !PageCompound(bvec->bv_page))
+-			set_page_dirty_lock(bvec->bv_page);
+-		bio_release_page(bio, bvec->bv_page);
++		if (mark_dirty) {
++			folio_lock(fi.folio);
++			folio_mark_dirty(fi.folio);
++			folio_unlock(fi.folio);
++		}
++		page = folio_page(fi.folio, fi.offset / PAGE_SIZE);
++		do {
++			bio_release_page(bio, page++);
++			done += PAGE_SIZE;
++		} while (done < fi.length);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__bio_release_pages);
+@@ -1455,18 +1464,12 @@ EXPORT_SYMBOL(bio_free_pages);
+  * bio_set_pages_dirty() and bio_check_pages_dirty() are support functions
+  * for performing direct-IO in BIOs.
+  *
+- * The problem is that we cannot run set_page_dirty() from interrupt context
++ * The problem is that we cannot run folio_mark_dirty() from interrupt context
+  * because the required locks are not interrupt-safe.  So what we can do is to
+  * mark the pages dirty _before_ performing IO.  And in interrupt context,
+  * check that the pages are still dirty.   If so, fine.  If not, redirty them
+  * in process context.
+  *
+- * We special-case compound pages here: normally this means reads into hugetlb
+- * pages.  The logic in here doesn't really work right for compound pages
+- * because the VM does not uniformly chase down the head page in all cases.
+- * But dirtiness of compound pages is pretty meaningless anyway: the VM doesn't
+- * handle them at all.  So we skip compound pages here at an early stage.
+- *
+  * Note that this code is very hard to test under normal circumstances because
+  * direct-io pins the pages with get_user_pages().  This makes
+  * is_page_cache_freeable return false, and the VM will not clean the pages.
+@@ -1482,12 +1485,12 @@ EXPORT_SYMBOL(bio_free_pages);
+  */
+ void bio_set_pages_dirty(struct bio *bio)
+ {
+-	struct bio_vec *bvec;
+-	struct bvec_iter_all iter_all;
++	struct folio_iter fi;
+ 
+-	bio_for_each_segment_all(bvec, bio, iter_all) {
+-		if (!PageCompound(bvec->bv_page))
+-			set_page_dirty_lock(bvec->bv_page);
++	bio_for_each_folio_all(fi, bio) {
++		folio_lock(fi.folio);
++		folio_mark_dirty(fi.folio);
++		folio_unlock(fi.folio);
+ 	}
+ }
+ 
+@@ -1530,12 +1533,11 @@ static void bio_dirty_fn(struct work_struct *work)
+ 
+ void bio_check_pages_dirty(struct bio *bio)
+ {
+-	struct bio_vec *bvec;
++	struct folio_iter fi;
+ 	unsigned long flags;
+-	struct bvec_iter_all iter_all;
+ 
+-	bio_for_each_segment_all(bvec, bio, iter_all) {
+-		if (!PageDirty(bvec->bv_page) && !PageCompound(bvec->bv_page))
++	bio_for_each_folio_all(fi, bio) {
++		if (!folio_test_dirty(fi.folio))
+ 			goto defer;
+ 	}
+ 
+-- 
+2.40.1
 
