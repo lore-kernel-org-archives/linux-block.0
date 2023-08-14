@@ -2,125 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79FBDEB64DD
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 18:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE774C04FE1
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 19:26:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231621AbjHNSXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 14:23:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42546 "EHLO
+        id S230241AbjHNTZ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 15:25:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230186AbjHNSXY (ORCPT
+        with ESMTP id S230423AbjHNTZr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 14:23:24 -0400
+        Mon, 14 Aug 2023 15:25:47 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE92F10E3;
-        Mon, 14 Aug 2023 11:23:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 778DBBF;
+        Mon, 14 Aug 2023 12:25:46 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 6980F1F383;
-        Mon, 14 Aug 2023 18:23:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1692037401; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 0EB6F1F383;
+        Mon, 14 Aug 2023 19:25:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1692041145;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=vrw+g1DBe8ZPV78sHOiS1djXqV9DnzvZjLoD8+5Ub/8=;
-        b=tCmuTOXcY5U/WnmCUKer/o3hDR65mS9KZX9ZtaCZVD1M4PKlK6eSwMAyra3qbnEBIO81kf
-        5jqqmE+q9GTbonNz8LouAmJNOhHg0pkkN2P6FyrGwoCR0gid3rCn8r4WHz8aeSpJWLEVjW
-        kZevLYSXPMXWO472TSV5W2Rwr/0LVAw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1692037401;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        bh=gDBqIJKvroeCfXfpUv4/ZGPXv5sa7x8XdKKwPjB9ULg=;
+        b=SOGvOEvbuD5vUTu3J5Fpek+ukg/Zw+Wd0avmcG7Hm1CQ2yvXhNrj+FfcDCQM2b5WfJsHwZ
+        oAiJcmtFZtFweNiQ1OIZtNCYdZ9eJ5CuwkgquFoVqlIxDEAO+5KD8KAOJum1pTTe+QERxW
+        jjSJII360HHBYWxiivNUBjUjAMFE2vk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1692041145;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=vrw+g1DBe8ZPV78sHOiS1djXqV9DnzvZjLoD8+5Ub/8=;
-        b=MTnMi+ayDLoRGG2sMGg+W6/qTl3tDCttR5vKQUFAkMSGCc5RCQOvn8p3WdUOGKtM+cZfqB
-        L3cK/dc6qIRCIhBw==
+        bh=gDBqIJKvroeCfXfpUv4/ZGPXv5sa7x8XdKKwPjB9ULg=;
+        b=nbNx+ptD09UhWkkJZQLNvzv+B1jYThTtIU9I2QXPasQ7gEen0mtNfSVRldowl6jXMibSUW
+        RMowIkWMIGlAD/Cw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 11D17138E2;
-        Mon, 14 Aug 2023 18:23:20 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A3842138EE;
+        Mon, 14 Aug 2023 19:25:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id H561Nxhx2mTAZQAAMHmgww
-        (envelope-from <krisman@suse.de>); Mon, 14 Aug 2023 18:23:20 +0000
-From:   Gabriel Krisman Bertazi <krisman@suse.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
-        Andreas Hindborg <nmi@metaspace.dk>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        German Maglione <gmaglione@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Joe Thornber <ethornbe@redhat.com>
-Subject: Re: Libublk-rs v0.1.0
-In-Reply-To: <ZNmX5UQev4qvFMaq@fedora> (Ming Lei's message of "Mon, 14 Aug
-        2023 10:56:37 +0800")
-References: <ZNmX5UQev4qvFMaq@fedora>
-Date:   Mon, 14 Aug 2023 14:23:14 -0400
-Message-ID: <87o7j95vql.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        id cxb7Jrh/2mTefAAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Mon, 14 Aug 2023 19:25:44 +0000
+Date:   Mon, 14 Aug 2023 21:19:17 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Josef Bacik <josef@toxicpanda.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Denis Efremov <efremov@linux.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-s390@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: remove get_super
+Message-ID: <20230814191917.GF2420@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20230811100828.1897174-1-hch@lst.de>
+ <20230811190507.GA2791339@perftesting>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811190507.GA2791339@perftesting>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming Lei <ming.lei@redhat.com> writes:
+On Fri, Aug 11, 2023 at 03:05:07PM -0400, Josef Bacik wrote:
+> The CI testing didn't show any regressions or lockdep errors related to moving
+> the device opening around (which is what I was worried about). 
 
-> Hello,
->
-> Libublk-rs(Rust)[1][2] 0.1.0 is released.
-
-Hi Ming,
-
-Do you intend to effectively deprecate the code in ubdsrv in favor of
-libublk-rs or do you intend to keep the C library?  I'm asking because
-I'm looking into how to enable ublk in distributions.
-
-Thanks,
-
->
-> The original idea is to use Rust to write ublk target for covering all
-> kinds of block queue limits/parameters combination easily when talking
-> with Andreas and Shinichiro about blktests in LSFMM/BPF 2023.
->
-> Finally it is evolved into one generic library. Attributed to Rust's
-> some modern language features, libublk interfaces are pretty simple:
->
-> - one closure(tgt_init) for user to customize device by providing all
->   kind of parameter
->
-> - the other closure(io handling) for user to handling IO which is
->   completely io_uring CQE driven: a) IO command CQE from ublk driver,
->   b) target IO CQE originated from target io handling code, c) eventfd
->   CQE if IO is offloaded to other context
->
-> With low level APIs, <50 LoC can build one ublk-null, and if high level
-> APIs are used, 30 LoC is enough.
->
-> Performance is basically aligned with pure C ublk implementation[3].
->
-> The library has been verified on null, ramdisk, loop and zoned target.
-> The plan is to support async/await in 0.2 or 0.3 so that libublk can
-> be used to build complicated target easily and efficiently.
->
-> Thanks Andreas for reviewing and providing lots of good ideas for
-> improvement & cleanup. Thanks German Maglione for some suggestions, such
-> as eventfd support. Thanks Joe for providing excellent Rust programming
-> guide.
->
-> Any feedback is welcome!
->
-> [1] https://crates.io/crates/libublk 
-> [2] https://github.com/ming1/libublk-rs
-> [3] https://github.com/osandov/blktests/blob/master/src/miniublk.c
->
-> Thanks,
-> Ming
->
-
--- 
-Gabriel Krisman Bertazi
+The problems with device opening and scanning we fixed in the past were
+not hit by regular testing, syzbot had reproducers that were relatively
+reliable so we'd need this kind of verification.
