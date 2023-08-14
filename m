@@ -2,123 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 331F4C41513
-	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 10:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A933EB64DD
+	for <linux-block@archiver.kernel.org>; Mon, 14 Aug 2023 11:05:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234171AbjHNK7Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 06:59:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50962 "EHLO
+        id S231461AbjHNLEx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 07:04:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233958AbjHNK7H (ORCPT
+        with ESMTP id S231268AbjHNLEl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 06:59:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9698AF4;
-        Mon, 14 Aug 2023 03:59:06 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2B8BD64D8C;
-        Mon, 14 Aug 2023 10:59:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9056C433C7;
-        Mon, 14 Aug 2023 10:58:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692010745;
-        bh=M68BqgspvfU5HkD8cXrXN5XkVUNTnVosqqKv0zCZIIk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ada7zEq7w0DjLuBrqXHOSajouseLbVl17YndMQxL3QeWejlDOozfOtF82B8qmwNTA
-         7dCpOY37afZc8cxdIIJJwmBSOgHOlJ5bzVUO6YcRgJH+7pnIhpv17Z3Q7hJ1yX3twJ
-         KOO+HncXhvEEEB5YKNR1RNqUW0wvB6HisyJDUZ2DOA+IADPGNKO10AJfDgGjU5mnji
-         lXLQIy2a5AFWaKwNNAprmmH0HYbwbydTi3s7Ro3RoQTRznof5bS6Qjip6IN9hQwrw3
-         FNMGM+A0F4aRNoGmLxg9R2TwJH+atdw5/KmEhxfDPY/tZ0k7M77GLPNf0+NgB9l4gG
-         Vu2X2xHwSn73A==
-Date:   Mon, 14 Aug 2023 12:58:56 +0200
-From:   Carlos Maiolino <cem@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Mon, 14 Aug 2023 07:04:41 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609EC1BD
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 04:04:39 -0700 (PDT)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230814110436epoutp0195bc1c6d5b863e534d5255873069dfb8~7Oxvl9Ecw1526715267epoutp01S
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 11:04:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230814110436epoutp0195bc1c6d5b863e534d5255873069dfb8~7Oxvl9Ecw1526715267epoutp01S
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1692011076;
+        bh=zimQmN124b9hCHDFiSEFba5yy1zwRCykPczhvQAj1Nw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=IhW/Vsd1Y+TcEP/LBgVpOWZFdSHmmW4IDhhC7hC9wcyC9OQp2i9Qp4GW8/+SVphvf
+         IZUTAfZTHNJSj3mDNXUtxkUpE7/aARWFn03aexVrKXiwXuregwC0AIehOuJvLtaZfw
+         SnSM8ce3TbAM/4CWarjbNp5RRiHRzqFQ2/Oe5bqM=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20230814110435epcas5p439e065a790dea8509bce6fb988775511~7Oxu9c-JP2023920239epcas5p4V;
+        Mon, 14 Aug 2023 11:04:35 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.180]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4RPWkS6hHXz4x9Pp; Mon, 14 Aug
+        2023 11:04:32 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        BA.7E.55173.04A0AD46; Mon, 14 Aug 2023 20:04:32 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230814103355epcas5p114de1c2977fe97f8281218a25ef3a6dd~7OW9zWzlA0591305913epcas5p1q;
+        Mon, 14 Aug 2023 10:33:55 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230814103355epsmtrp2af3e2c51166a8e225642c7d02bb42bed~7OW9yaU--1787017870epsmtrp2j;
+        Mon, 14 Aug 2023 10:33:55 +0000 (GMT)
+X-AuditID: b6c32a50-df1ff7000001d785-c7-64da0a409dcb
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        BC.02.14748.3130AD46; Mon, 14 Aug 2023 19:33:55 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230814103352epsmtip1bfa9454f6fc7f53da273f13b70b179e0~7OW6ddTKg0808008080epsmtip1p;
+        Mon, 14 Aug 2023 10:33:51 +0000 (GMT)
+Date:   Mon, 14 Aug 2023 16:00:29 +0530
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
         Christian Brauner <brauner@kernel.org>,
-        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 12/12] xfs use fs_holder_ops for the log and RT devices
-Message-ID: <20230814105856.pudqvixopjh3hmtn@andromeda>
-References: <20230802154131.2221419-1-hch@lst.de>
- <GiAHRRU8GiDH6Pv5bBBlwPA3hI_9kRXKZCNl7-CoadP8Bf7DiWIUnUt9bG1gBU92q5OuJ4Uy1Negt6JqJWxpeg==@protonmail.internalid>
- <20230802154131.2221419-13-hch@lst.de>
+        martin.petersen@oracle.com, linux-doc@vger.kernel.org,
+        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, mcgrof@kernel.org, dlemoal@kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [dm-devel] [PATCH v14 03/11] block: add copy offload support
+Message-ID: <20230814103029.mc5l4wt6y6dzf7db@green245>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802154131.2221419-13-hch@lst.de>
+In-Reply-To: <2e263977-0ee7-ae78-5a8a-2a67df43df76@acm.org>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA02TfVRTdRjH+917t91RoxuC/QRRzqJSFNgM1uUt8ER1Cz1xjsc60UGc7MaI
+        sa29iMAfEgkoCJJgySLAo4KOtyRCWixoCIt5kDrIcjPfatgJcIDg0DxQYxc6/vd5vuf5/n7P
+        y3lw1KeM449nyjW0Si6W8dleWFf/5pDQBC+7RKC3C8h2yyBKFlYuomTzjWNscrL/PiC/mHmE
+        ko6+EkDe7o0njc6vWKSt73uEPN88gJDHTVZAjo/pENJo30KeKj6DkT3GIYwcNdSyyfrGcQ7Z
+        ZF5CyGuV44Bsm5zGyJ/tAeTIopmVsJYavZpEjdy8gFGjw1qqQ3+ETX175iD1g62ATZ2uqGJR
+        5Z852dTsuB2jpn8cY1MVnXpAzXVsoDoc95BkXkpWrJQWS2hVEC1PV0gy5Rlx/KRdaa+nRYoE
+        wlBhFPkqP0guzqbj+Ik7kkPfzJS5e+YH7RfLtG4pWaxW88Nfi1UptBo6SKpQa+L4tFIiU0Yo
+        w9TibLVWnhEmpzXRQoFgW6Q7cW+WdMzYwVH+yjpg6Z3ACsAEVgq4OCQi4K3jerQUeOE+RA+A
+        81MWNhPcB7DpWuNK4ALQ8tcsumpxlTdyltmHMAI48/tuJukugDeqznnexYgXYX1vm5txnE1s
+        gZf/xZdlX2ITdN1uwpbzUaKGBbta6jyPriHehgbnsMfLI0TwutPAYfg5OFTj8OhcIgbWdPay
+        l9mPWA9Pnn3gqRsSp7mwteEqi6kuEXbOWAHDa+CEuZPDsD+ccxrZDOfA89Xn2Iz5EIC633Qr
+        hnhYZDnmqQglpLDa2rdiCIQnLG0Io3vD8scOhNF5sLtulV+ALe0NK/nroHXh0xWmYG2tE2FG
+        NANgxZ8utBJs1D3Rne6J/xiOhkdmClk69/RQIgA2LeEMbobthvAGwNIDf1qpzs6g0yOVwlA5
+        nfP/ztMV2R3AcxUhyd2g+ZvFMBNAcGACEEf5vjz7W1aJD08izs2jVYo0lVZGq00g0r2uz1F/
+        v3SF+6zkmjRhRJQgQiQSRUS9IhLyn+dNFn0t8SEyxBo6i6aVtGrVh+Bc/wLkZb8N0bnTo9mD
+        toCeFvE/e27h/Re2OQae0dxFjxIKE7VAZ3JyLpVyvQqP7p26+O5l1SXL9jvcra5oGYcaKUNK
+        HLP27g8eCD+p/MWABZb1z1uulOQZDtlifJ9NLKiXid85HPNQO591k2JVh39n3aGPHfjj8MmB
+        e5qzsx+y+INLPD9zcXDqvoS+2oSC0uiPh77MXxhoS+6Py3nv/U2NxVOaiq7uEz8N7bl+aue6
+        lrXSkeDA7um6opSD+ovBxevr5raGUtur9uc3Xck/EDxi2vX3dMUdwfyw+Y2Up/a5WKnawbKd
+        1t3hrTZRbS7CSlXXeH/0+OmXbI/8kmoemnvzWuNbvbzbRXxMLRULQ1CVWvwfmf2HcJ4EAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrFIsWRmVeSWpSXmKPExsWy7bCSnK4w860Ug4P/NSzWnzrGbNE04S+z
+        xeq7/WwWrw9/YrSY9uEns8WTA+2MFg/221vsfTeb1eLmgZ1MFitXH2WymHToGqPF06uzmCz2
+        3tK2WNi2hMViz96TLBaXd81hs5i/7Cm7xfLj/5gsbkx4ymix7vV7FosTt6Qtzv89zuog5nH5
+        irfH+XsbWTwuny312LSqk81j85J6j903G9g8FvdNZvXobX7H5vHx6S0Wj/f7rrJ59G1Zxejx
+        eZOcx6Ynb5kCeKO4bFJSczLLUov07RK4MjY0X2EqaGaueHftDVsD4zamLkZODgkBE4lvvcvY
+        uxi5OIQEdjNKrLv2GCohKbHs7xFmCFtYYuW/51BFTxglVm99xAaSYBFQlZi/fx1LFyMHB5uA
+        tsTp/xwgYREBDYlvD5azgNQzC8xllVj2+zw7SEJYwFNi17uzLCA2r4CZxO13u8DiQgIfGCWu
+        PbeEiAtKnJz5BKyGGahm3uaHzCDzmQWkJZb/A5vPKWAtMXPLfrATRAVkJGYs/co8gVFwFpLu
+        WUi6ZyF0L2BkXsUomVpQnJuem2xYYJiXWq5XnJhbXJqXrpecn7uJERzdWho7GO/N/6d3iJGJ
+        g/EQowQHs5II7y33aylCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeQ1nzE4REkhPLEnNTk0tSC2C
+        yTJxcEo1MN1YuOKnZ9yKdUyih3XvPQv0+JISmJL2u/O68ybNENZ/HrsXK+Zs3/Pf6tKXy4ab
+        Zba5smxT32/6UkST4ejM/5Z3BRaUrS14kF1Vveqro/TUFZNTkkybPK4rRXzZ33xT5pty7M2y
+        u2/cNz+6cklKNIe74MWS57ILzHO3NSdn/bj2xnhy29uZi9Ncwy5VbDw2QeD6xKP/e1V8W9/M
+        9a+YsP3FhVObTgffvp+7lf3LHqez4SYmNcEzLt/Yf323I1NLhbHbCcXVoh9eVwj//OjBaM9e
+        PatA8peP0MKrHrZPmj/d2286N0i4InB6HserhHP7j+Srd3Bxq0VN7m/bulRBQO2LqthX2Xzd
+        yYJsSnXeM84osRRnJBpqMRcVJwIAvUnskl0DAAA=
+X-CMS-MailID: 20230814103355epcas5p114de1c2977fe97f8281218a25ef3a6dd
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_545fc_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230811105659epcas5p1982eeaeb580c4cb9b23a29270945be08
+References: <20230811105300.15889-1-nj.shetty@samsung.com>
+        <CGME20230811105659epcas5p1982eeaeb580c4cb9b23a29270945be08@epcas5p1.samsung.com>
+        <20230811105300.15889-4-nj.shetty@samsung.com>
+        <2e263977-0ee7-ae78-5a8a-2a67df43df76@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 02, 2023 at 05:41:31PM +0200, Christoph Hellwig wrote:
-> Use the generic fs_holder_ops to shut down the file system when the
-> log or RT device goes away instead of duplicating the logic.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/xfs/xfs_super.c | 17 +++--------------
->  1 file changed, 3 insertions(+), 14 deletions(-)
+------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_545fc_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Looks good:
+On 23/08/11 03:06PM, Bart Van Assche wrote:
+>On 8/11/23 03:52, Nitesh Shetty wrote:
+>>+		if (rem != chunk)
+>>+			atomic_inc(&cio->refcount);
+>
+>This code will be easier to read if the above if-test is left out
+>and if the following code is added below the for-loop:
+>
+>	if (atomic_dec_and_test(&cio->refcount))
+>		blkdev_copy_endio(cio);
+>
+Acked
 
-Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
+Thank you,
+Nitesh Shetty
 
-Carlos
-> 
-> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-> index d5042419ed9997..338eba71ff8667 100644
-> --- a/fs/xfs/xfs_super.c
-> +++ b/fs/xfs/xfs_super.c
-> @@ -377,17 +377,6 @@ xfs_setup_dax_always(
->  	return 0;
->  }
-> 
-> -static void
-> -xfs_bdev_mark_dead(
-> -	struct block_device	*bdev)
-> -{
-> -	xfs_force_shutdown(bdev->bd_holder, SHUTDOWN_DEVICE_REMOVED);
-> -}
-> -
-> -static const struct blk_holder_ops xfs_holder_ops = {
-> -	.mark_dead		= xfs_bdev_mark_dead,
-> -};
-> -
->  STATIC int
->  xfs_blkdev_get(
->  	xfs_mount_t		*mp,
-> @@ -396,8 +385,8 @@ xfs_blkdev_get(
->  {
->  	int			error = 0;
-> 
-> -	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE, mp,
-> -				    &xfs_holder_ops);
-> +	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
-> +				    mp->m_super, &fs_holder_ops);
->  	if (IS_ERR(*bdevp)) {
->  		error = PTR_ERR(*bdevp);
->  		xfs_warn(mp, "Invalid device [%s], error=%d", name, error);
-> @@ -412,7 +401,7 @@ xfs_blkdev_put(
->  	struct block_device	*bdev)
->  {
->  	if (bdev)
-> -		blkdev_put(bdev, mp);
-> +		blkdev_put(bdev, mp->m_super);
->  }
-> 
->  STATIC void
-> --
-> 2.39.2
-> 
+------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_545fc_
+Content-Type: text/plain; charset="utf-8"
+
+
+------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_545fc_--
