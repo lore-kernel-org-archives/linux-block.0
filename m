@@ -2,167 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D7EC001B0
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 06:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C41C04A6A
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 07:51:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235057AbjHOGH1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 02:07:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41110 "EHLO
+        id S235344AbjHOHuo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 03:50:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235090AbjHOGGq (ORCPT
+        with ESMTP id S235527AbjHOHu0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 02:06:46 -0400
-X-Greylist: delayed 137961 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 14 Aug 2023 23:05:43 PDT
-Received: from out-74.mta1.migadu.com (out-74.mta1.migadu.com [IPv6:2001:41d0:203:375::4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14FF530DA
-        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 23:05:42 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692079529;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wWsB6kltJ58XUaHsFfqL6Q4RJBmpJEQuaQ5cbRsruY0=;
-        b=NUHbtoXEkOC8aBNe94FABWlMwijvoLrxPXdAz3cp2t7x8mszPyYnRShHVoRdYT3qPD5tLB
-        +t02N9eyMZwIdEVE0NAV0OYK/eOF+laBK0+x0X9i+s1cJD4ynQ8cAhQyrn2ia3XJBfoZ/v
-        /D2RPLbW1RgSe4Az0tdTxRbZd0eUSZw=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, kch@nvidia.com, dhowells@redhat.com
-Cc:     damien.lemoal@opensource.wdc.com, bvanassche@acm.org,
-        nj.shetty@samsung.com, kbusch@kernel.org,
-        zhouchengming@bytedance.com, akinobu.mita@gmail.com,
-        shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] null_blk: fix poll request timeout handling
-Date:   Tue, 15 Aug 2023 14:04:42 +0800
-Message-ID: <20230815060443.660263-1-chengming.zhou@linux.dev>
+        Tue, 15 Aug 2023 03:50:26 -0400
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E193111A;
+        Tue, 15 Aug 2023 00:50:24 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d62ae3fc7f1so3876934276.2;
+        Tue, 15 Aug 2023 00:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692085824; x=1692690624;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FA7UNvLh/NtwE8oB7thsQ+ZgxpcPVqBILp5Db1EACXc=;
+        b=i0vKNHq1GyS7aJEKx4XbRrsU+PCcQIEbW/RUDNyYjiAhDowmhMMCSpCW5uqmbQYhfU
+         0aUkNENEhyHUH4Og5FtJz4fLzUNs8pGPtvJaT5Pkmq4GcQ/RG1xOk8lJmVot4NzXWVVT
+         +EMe6Dsl16OBo1dKVXSrxy5sAXiDQQSezHfSLr+N0mYaql5ivZV9RC8qIGjF3BhqSdKg
+         j5NtGUd5VhucPZcectiLfIEWE2KX5unNEKK4w7eXIN6v5EBbc+sUKe2KXowzCE0hsBLU
+         IEfIZ1j3G9HfgN28SkhRqgplcntyqqZY6LS3sxLFknEs9+E4rix/NQLSeE45SDLAtyzU
+         d/Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692085824; x=1692690624;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FA7UNvLh/NtwE8oB7thsQ+ZgxpcPVqBILp5Db1EACXc=;
+        b=ZHhllPBDibaR25bl1IevukHuIbk7uRzkHANvYN1CmWW98uxOV1zfwPk1UbGCfQcU1M
+         kV7dw8eI+4+oo8lqC0To6mYc51xwsBQjs50VqSEHFf+WzXIC5k8WTG7e4ab9m6Xg6/r0
+         YAjOA2A2TdEsBBuGeehR40LwTFq1w9zHUVGOOPCt1i8uTV5zAur1hNIXwHSo2GICeJjF
+         lFNKWbySHasMKY65CWu+Sfcq13RqSBOe6zIofxlnVdfC6/qLiNm3YMweo1i9VeIP6ao7
+         bivC7WVgsYiFSeYrxgi+7FTbSAyEsxqSKON4+zBGPc8tynTqrpYKJv5BwnkhjQ/p4tLW
+         uOAA==
+X-Gm-Message-State: AOJu0YxUZiu2Pd7rLB5Mdh5Ml6tGhbBPj+M4ftq9Mg807IchFZzNlM88
+        n/rWOIKSf2UA3z+pjnJD1vECX8JnT6nm4zl3z2s=
+X-Google-Smtp-Source: AGHT+IHaiDSMY+QkhVwb3BPgUZZO+nmIvLSHf5aXIVOauSuFeN6IaJFsD4dH94ZZRJntrGxxCFrmO4AX2M6byBZ62ig=
+X-Received: by 2002:a25:bf86:0:b0:c83:27d4:c0d6 with SMTP id
+ l6-20020a25bf86000000b00c8327d4c0d6mr9479331ybk.37.1692085824032; Tue, 15 Aug
+ 2023 00:50:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20230811105300.15889-1-nj.shetty@samsung.com> <CGME20230811105648epcas5p3ae8b8f6ed341e2aa253e8b4de8920a4d@epcas5p3.samsung.com>
+ <20230811105300.15889-3-nj.shetty@samsung.com> <3b1da341-1c7f-e28f-d6aa-cecb83188f34@acm.org>
+ <20230814121853.ms4acxwr56etf3ph@green245> <abad92af-d8b2-0488-cc75-01a3f4e8e270@acm.org>
+In-Reply-To: <abad92af-d8b2-0488-cc75-01a3f4e8e270@acm.org>
+From:   Nitesh Shetty <nitheshshetty@gmail.com>
+Date:   Tue, 15 Aug 2023 13:20:12 +0530
+Message-ID: <CAOSviJ1XL1UyMk2Ur37cJpW5BJAE5Ts6J4BtTSRd2_h_NPtGCQ@mail.gmail.com>
+Subject: Re: [dm-devel] [PATCH v14 02/11] Add infrastructure for copy offload
+ in block and request layer.
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        martin.petersen@oracle.com, linux-doc@vger.kernel.org,
+        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, mcgrof@kernel.org, dlemoal@kernel.org,
+        linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+We had kept this as a part of blk-types.h because we saw some other functio=
+ns
+trying to do similar things inside this file (op_is_write/flush/discard).
+But it should be okay for us to move it to blk-mq.h if that=E2=80=99s the r=
+ight way.
 
-When doing io_uring benchmark on /dev/nullb0, it's easy to crash the
-kernel if poll requests timeout triggered, as reported by David. [1]
+Thank you,
+Nitesh Shetty
 
-BUG: kernel NULL pointer dereference, address: 0000000000000008
-Workqueue: kblockd blk_mq_timeout_work
-RIP: 0010:null_timeout_rq+0x4e/0x91
-Call Trace:
- ? __die_body+0x1a/0x5c
- ? page_fault_oops+0x6f/0x9c
- ? kernelmode_fixup_or_oops+0xc6/0xd6
- ? __bad_area_nosemaphore+0x44/0x1eb
- ? exc_page_fault+0xe2/0xf4
- ? asm_exc_page_fault+0x22/0x30
- ? null_timeout_rq+0x4e/0x91
- blk_mq_handle_expired+0x31/0x4b
- bt_iter+0x68/0x84
- ? bt_tags_iter+0x81/0x81
- __sbitmap_for_each_set.constprop.0+0xb0/0xf2
- ? __blk_mq_complete_request_remote+0xf/0xf
- bt_for_each+0x46/0x64
- ? __blk_mq_complete_request_remote+0xf/0xf
- ? percpu_ref_get_many+0xc/0x2a
- blk_mq_queue_tag_busy_iter+0x14d/0x18e
- blk_mq_timeout_work+0x95/0x127
- process_one_work+0x185/0x263
- worker_thread+0x1b5/0x227
- ? rescuer_thread+0x287/0x287
- kthread+0xfa/0x102
- ? kthread_complete_and_exit+0x1b/0x1b
- ret_from_fork+0x22/0x30
 
-This is indeed a race problem between null_timeout_rq() and null_poll().
-
-null_poll()				null_timeout_rq()
-  spin_lock(&nq->poll_lock)
-  list_splice_init(&nq->poll_list, &list)
-  spin_unlock(&nq->poll_lock)
-
-  while (!list_empty(&list))
-    req = list_first_entry()
-    list_del_init()
-    ...
-    blk_mq_add_to_batch()
-    // req->rq_next = NULL
-					spin_lock(&nq->poll_lock)
-
-					// rq->queuelist->next == NULL
-					list_del_init(&rq->queuelist)
-
-					spin_unlock(&nq->poll_lock)
-
-What's worse is that we don't call blk_mq_complete_request_remote()
-before blk_mq_add_to_batch(), so these completed requests have wrong
-rq->state == MQ_RQ_IN_FLIGHT. We can easily check this using bpftrace:
-
-```
-bpftrace -e 'kretfunc:null_blk:null_poll {
-  $iob=(struct io_comp_batch *)args->iob;
-  @[$iob->req_list->state]=count();
-}'
-
-@[1]: 51708
-```
-
-Fix these problems by setting requests state to MQ_RQ_COMPLETE under
-nq->poll_lock protection, in which null_timeout_rq() can safely detect
-this race and early return.
-
-[1] https://lore.kernel.org/all/3893581.1691785261@warthog.procyon.org.uk/
-
-Fixes: 0a593fbbc245 ("null_blk: poll queue support")
-Reported-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- drivers/block/null_blk/main.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 864013019d6b..968090935eb2 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1643,9 +1643,12 @@ static int null_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- 	struct nullb_queue *nq = hctx->driver_data;
- 	LIST_HEAD(list);
- 	int nr = 0;
-+	struct request *rq;
- 
- 	spin_lock(&nq->poll_lock);
- 	list_splice_init(&nq->poll_list, &list);
-+	list_for_each_entry(rq, &list, queuelist)
-+		blk_mq_set_request_complete(rq);
- 	spin_unlock(&nq->poll_lock);
- 
- 	while (!list_empty(&list)) {
-@@ -1671,16 +1674,21 @@ static enum blk_eh_timer_return null_timeout_rq(struct request *rq)
- 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
- 	struct nullb_cmd *cmd = blk_mq_rq_to_pdu(rq);
- 
--	pr_info("rq %p timed out\n", rq);
--
- 	if (hctx->type == HCTX_TYPE_POLL) {
- 		struct nullb_queue *nq = hctx->driver_data;
- 
- 		spin_lock(&nq->poll_lock);
-+		/* The request may have completed meanwhile. */
-+		if (blk_mq_request_completed(rq)) {
-+			spin_unlock(&nq->poll_lock);
-+			return BLK_EH_DONE;
-+		}
- 		list_del_init(&rq->queuelist);
- 		spin_unlock(&nq->poll_lock);
- 	}
- 
-+	pr_info("rq %p timed out\n", rq);
-+
- 	/*
- 	 * If the device is marked as blocking (i.e. memory backed or zoned
- 	 * device), the submission path may be blocked waiting for resources
--- 
-2.41.0
-
+On Mon, Aug 14, 2023 at 8:28=E2=80=AFPM Bart Van Assche <bvanassche@acm.org=
+> wrote:
+>
+> On 8/14/23 05:18, Nitesh Shetty wrote:
+> > On 23/08/11 02:25PM, Bart Van Assche wrote:
+> >> On 8/11/23 03:52, Nitesh Shetty wrote:
+> >>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> >>> index 0bad62cca3d0..de0ad7a0d571 100644
+> >>> +static inline bool op_is_copy(blk_opf_t op)
+> >>> +{
+> >>> +    return ((op & REQ_OP_MASK) =3D=3D REQ_OP_COPY_SRC ||
+> >>> +        (op & REQ_OP_MASK) =3D=3D REQ_OP_COPY_DST);
+> >>> +}
+> >>> +
+> >>
+> >> The above function should be moved into include/linux/blk-mq.h below t=
+he
+> >> definition of req_op() such that it can use req_op() instead of
+> >> open-coding it.
+> >>
+> > We use this later for dm patches(patch 9) as well, and we don't have
+> > request at
+> > that time.
+>
+> My understanding is that include/linux/blk_types.h should only contain
+> data types and constants and hence that inline functions like
+> op_is_copy() should be moved elsewhere.
+>
+> Bart.
+>
