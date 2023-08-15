@@ -2,57 +2,55 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E674C04A6A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0718C04E69
 	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 01:45:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233931AbjHOBpZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 21:45:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51056 "EHLO
+        id S233943AbjHOBp1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 21:45:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233962AbjHOBpG (ORCPT
+        with ESMTP id S233956AbjHOBpE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 21:45:06 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18DD210E3;
-        Mon, 14 Aug 2023 18:45:05 -0700 (PDT)
+        Mon, 14 Aug 2023 21:45:04 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC455170B;
+        Mon, 14 Aug 2023 18:45:03 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RPvGL6z3hz4f40L7;
-        Tue, 15 Aug 2023 09:44:58 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RPvGN4lC6z4f3mWL;
+        Tue, 15 Aug 2023 09:45:00 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgA3x6mb2NpkdnTyAg--.15945S6;
-        Tue, 15 Aug 2023 09:45:01 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgA3x6mb2NpkdnTyAg--.15945S4;
+        Tue, 15 Aug 2023 09:45:00 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
         yukuai3@huawei.com, mkoutny@suse.com
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
         yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH -next 2/4] blk-throttle: fix wrong comparation while 'carryover_ios/bytes' is negative
-Date:   Tue, 15 Aug 2023 09:41:21 +0800
-Message-Id: <20230815014123.368929-3-yukuai1@huaweicloud.com>
+Subject: [PATCH -next 0/4] cleanup and fixes for 'carryover_ios/bytes'
+Date:   Tue, 15 Aug 2023 09:41:19 +0800
+Message-Id: <20230815014123.368929-1-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230815014123.368929-1-yukuai1@huaweicloud.com>
-References: <20230815014123.368929-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgA3x6mb2NpkdnTyAg--.15945S6
-X-Coremail-Antispam: 1UD129KBjvJXoWxAFWkAF4xAry8WF17KF17ZFb_yoW5ArWrpr
-        WfGF1IgF4rX3Z3tFnxJan8AFyrt39rAr98GrW3WayrCFn8GFyktrn5uFWFyayUZFs3uF4S
-        kw1FqFn7AF4qyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUHbyAUUUUU
-        =
+X-CM-TRANSID: gCh0CgA3x6mb2NpkdnTyAg--.15945S4
+X-Coremail-Antispam: 1UD129KBjvdXoW7GFWrKry5ZFWfWw4kGF4xXrb_yoWfJwb_uF
+        ykta48CF1UJa4IyFWxAry3A34rWw4jqw1qg3WqkFW7Zr9rZrn8Jr1fJF4qqFsxua1DCrs7
+        trs8Xr4xAr1aqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbxAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+        n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+        AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v2
+        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
+        UdHUDUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -61,79 +59,25 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-carryover_ios/bytes[] can be negative in the case that ios are
-dispatched in the slice in advance, and then configuration is updated.
-For example:
+Patch 1 print signed value for 'carryover_ios/bytes' to user.
 
-1) set iops limit to 1000, and slice start is 0, slice end is 100ms;
-2) current time is 0, and 100 ios are dispatched, those ios will not be
-   throttled, hence io_disp is 100;
-3) still at current time 0, update iops limit to 100, then carryover_ios
-   is (0 - 100) = -100;
-4) then, dispatch a new io at time 0, the expected result is that this
-   io will wait for 1s. The calculation in tg_within_iops_limit:
+Patch 2 fix that comparation ”unsigned value < negative value“ will
+pass, causing that io won't be throttled in the silce.
 
-   io_disp = 0;
-   io_allowed = calculate_io_allowed + carryover_ios
-	      = 10 + (-100) = -90;
-   io won't be throttled if (io_disp + 1 < io_allowed) passed.
+Patch 3,4 fix that 'carryover_ios/bytes' is not cleared while
+'io/bytes_disp' is cleared, causing that throttle is not accurate.
 
-Before this patch, in step 4) (io_disp + 1 < io_allowed) is passed,
-because -90 for unsigned value is very huge, and such io won't be
-throttled.
+Yu Kuai (4):
+  blk-throttle: print signed value 'carryover_bytes/ios' for user
+  blk-throttle: fix wrong comparation while 'carryover_ios/bytes' is
+    negative
+  blk-throttle: use calculate_io/bytes_allowed() for throtl_trim_slice()
+  blk-throttle: consider 'carryover_ios/bytes' in throtl_trim_slice()
 
-Fix this problem by checking if 'io/bytes_allowed' is negative first.
+ block/blk-throttle.c | 105 +++++++++++++++++++++----------------------
+ block/blk-throttle.h |   4 +-
+ 2 files changed, 54 insertions(+), 55 deletions(-)
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 5184f17f5129..7c93144d03da 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -825,7 +825,7 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
- 				 u32 iops_limit)
- {
- 	bool rw = bio_data_dir(bio);
--	unsigned int io_allowed;
-+	int io_allowed;
- 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
- 
- 	if (iops_limit == UINT_MAX) {
-@@ -838,9 +838,8 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
- 	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
- 		     tg->carryover_ios[rw];
--	if (tg->io_disp[rw] + 1 <= io_allowed) {
-+	if (io_allowed > 0 && tg->io_disp[rw] + 1 <= io_allowed)
- 		return 0;
--	}
- 
- 	/* Calc approx time to dispatch */
- 	jiffy_wait = jiffy_elapsed_rnd - jiffy_elapsed;
-@@ -851,7 +850,8 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 				u64 bps_limit)
- {
- 	bool rw = bio_data_dir(bio);
--	u64 bytes_allowed, extra_bytes;
-+	long long bytes_allowed;
-+	u64 extra_bytes;
- 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
- 	unsigned int bio_size = throtl_bio_data_size(bio);
- 
-@@ -869,9 +869,8 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
- 	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
- 			tg->carryover_bytes[rw];
--	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
-+	if (bytes_allowed > 0 && tg->bytes_disp[rw] + bio_size <= bytes_allowed)
- 		return 0;
--	}
- 
- 	/* Calc approx time to dispatch */
- 	extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
 -- 
 2.39.2
 
