@@ -2,90 +2,79 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5564CC001B0
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 12:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA21C41513
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 12:42:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237123AbjHOMks (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 08:40:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60116 "EHLO
+        id S237208AbjHOMlw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 08:41:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237316AbjHOMki (ORCPT
+        with ESMTP id S237233AbjHOMlq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 08:40:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED302F7
-        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 05:39:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692103189;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fOoisqtD4tWSvw/NguWbEb9nx26NfioCD1H8k3AKHtA=;
-        b=DGz1GmOjDkXa96rFyQ86t4lXsOvDuHxDuJQxptSIfLciNdmVEtLGxocTVWocdtGQNvtNnY
-        0YMDq7MP8qh33lchLqiaBcToCnVbOLEkS1hNOcSbIR4vWe3tvFkkDSZVNG9OGoncbRnxIq
-        ijNl5GhPIscGRMBWfKRAxNuMohZtRGU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-354-AZVHXd0dPQilttig_KwY-g-1; Tue, 15 Aug 2023 08:39:45 -0400
-X-MC-Unique: AZVHXd0dPQilttig_KwY-g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 15 Aug 2023 08:41:46 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8582DEE
+        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 05:41:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5BEC1185A78B;
-        Tue, 15 Aug 2023 12:39:45 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DCEF31121314;
-        Tue, 15 Aug 2023 12:39:42 +0000 (UTC)
-Date:   Tue, 15 Aug 2023 20:39:37 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ruan Jinjie <ruanjinjie@huawei.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH -next] ublk: Switch to memdup_user_nul() helper
-Message-ID: <ZNtyCQoso3RNMvwp@fedora>
-References: <20230815114815.1551171-1-ruanjinjie@huawei.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2187F61355
+        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 12:41:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C3D5C433C7;
+        Tue, 15 Aug 2023 12:41:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692103304;
+        bh=cN1NrmlLfhNXoiItjJFkdiIm61IFr8pMIbIeul1KnTw=;
+        h=Date:Subject:To:References:From:In-Reply-To:From;
+        b=KoPwo1tOMjPngPfIkZGiN/nJj7JrCftIbnDxbfKRnJ/KoMq9tsvwiNumpbW7xp2pA
+         cZZwx++3MtfZdlDtG8OSArcyemqjK+3wVU7QtGCRP70gor/dErm9luRblw937XhDiw
+         1tVZQxZK/fGysBd8/WskYRD6BPo9/6znD14vDKGEY2+D5ngRCQzzWUCAA+6V8RMMBx
+         L2ZkxTYv1ao6evcaOgCCX/aODP6LJiPiMiIpNn5CthZuMgTURnHRJ+JiX0RXuGlxtp
+         TqR5gM6CcfdvQD2uJxyZ+gvBXmhtO2svwDca4ZKIgiuzB4n2+UP325enEpsrVSRq6z
+         njbSuHZVBJF1A==
+Message-ID: <2d1bc374-cb98-8986-75b3-230d1ac580f9@kernel.org>
+Date:   Tue, 15 Aug 2023 21:41:42 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230815114815.1551171-1-ruanjinjie@huawei.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 5/5] block: switch ldm partition code to use pr_xxx()
+ functions
+Content-Language: en-US
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20230808135702.628588-1-dlemoal@kernel.org>
+ <20230808135702.628588-6-dlemoal@kernel.org>
+ <790b86db-da57-4997-86f4-98796bcca8b1@wdc.com>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <790b86db-da57-4997-86f4-98796bcca8b1@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 15, 2023 at 07:48:14PM +0800, Ruan Jinjie wrote:
-> Use memdup_user_nul() helper instead of open-coding
-> to simplify the code.
+On 8/15/23 19:06, Johannes Thumshirn wrote:
+> On 08.08.23 19:56, Damien Le Moal wrote:
+>> +#define ldm_debug(f, a...) pr_debug("%s(): " f, __func__, ##a) +#define 
+>> ldm_crit(f, a...) pr_crit("%s(): " f, __func__, ##a) +#define 
+>> ldm_error(f, a...) pr_err("%s(): " f, __func__, ##a) +#define 
+>> ldm_info(f, a...) pr_info("%s(): " f, __func__, ##a)
 > 
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
-> ---
->  drivers/block/ublk_drv.c | 11 +++--------
->  1 file changed, 3 insertions(+), 8 deletions(-)
+> Is there any value in keeping these ldm_XXX() macros around, other than 
+> printing the function name?
+
+You named it: I didn't want to change the messages.
+I do not mind simplifying these by removing the function name, but if we do not,
+then the macros actually simplify the print calls.
+
 > 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 85a81ee556d5..fa7e6955eb3b 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -2743,14 +2743,9 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
->  	if (header->len < header->dev_path_len)
->  		return -EINVAL;
->  
-> -	dev_path = kmalloc(header->dev_path_len + 1, GFP_KERNEL);
-> -	if (!dev_path)
-> -		return -ENOMEM;
-> -
-> -	ret = -EFAULT;
-> -	if (copy_from_user(dev_path, argp, header->dev_path_len))
-> -		goto exit;
-> -	dev_path[header->dev_path_len] = 0;
-> +	dev_path = memdup_user_nul(argp, header->dev_path_len);
-> +	if (IS_ERR(dev_path))
-> +		return PTR_ERR(dev_path);
+> I'd just get rid of them as well and replace with the according pr_XXX() 
+> calls.
 
-Nice cleanup:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-Thanks,
-Ming
+-- 
+Damien Le Moal
+Western Digital Research
 
