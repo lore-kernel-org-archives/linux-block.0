@@ -2,85 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A81BAC0015E
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 15:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F3DBC04A6A
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 15:42:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237187AbjHOPHK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 11:07:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56044 "EHLO
+        id S238170AbjHOPmC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 11:42:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237383AbjHOPGx (ORCPT
+        with ESMTP id S238209AbjHOPly (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 11:06:53 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E69138
-        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 08:06:53 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1bb91c20602so9737595ad.0
-        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 08:06:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692112012; x=1692716812;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5gNBiuYmPP/CPRleGouxvrvKl9BhoSBRBp4snnqKeuc=;
-        b=1G2UkYk7f1Fl3Hx9pXhbPTDEFsxawmWoFLLhldzAfzw42D/af9XD+abf0ogufTM0KF
-         UE6E78+ZaxCi1o8RjXIq3XSVU6+ih8lmKVFgk9LhUvimJQjdZo1o72my1xrginy5nrsD
-         C3ROZrmdJnJA+RyeBgkG94pFNAy+uqFFFc9L3sI10J6msQQ6/RydQoPat6KsK37ZVBjp
-         TjiRxOcTddCr3CDnV2XNtY7RXlpH45nfVI7hFOcZqEUDD83ztjgdVfd2tY6WyHgeQ7uk
-         jyNeEyNLPhaG5++LbW6Vc4nWxj4aacYpwdLFzshalFjDHdIAp84dYPUQTbfkK856tUEj
-         spqQ==
+        Tue, 15 Aug 2023 11:41:54 -0400
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3CFCE61;
+        Tue, 15 Aug 2023 08:41:53 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1bbc87ded50so33781295ad.1;
+        Tue, 15 Aug 2023 08:41:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692112012; x=1692716812;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5gNBiuYmPP/CPRleGouxvrvKl9BhoSBRBp4snnqKeuc=;
-        b=SOlIrThwR3nSR46ZFqrNCWtDWnopLaH0fUYiAFOy2cXq48iM4VY0KoCqMhJ5tCr7KQ
-         27IuIhXSyoZJVJkcRyjlz2IJm3sV6kiUHHkYXnO3WmxF9weTEebUTIvjAlQLSDIiUOzJ
-         6oCM9Td32MMjctILcb5mAXnyvqn4oeqSF2rdAAq2XEeTbSGysfRrd+sMVwIk2J5brAL8
-         Oeb5+PwvfrlsyU6l/RM9h7V6SKyRAmSJhAocSgtsRILnpZSnK94C0GVkYmVu80pf6NtP
-         vzbBpxJgrIFIc7J4jhueRfLJu3QrWHtFIxKZaxWAj3fFdy3hR+bOVstiFY6F7zNy4CiF
-         VmbQ==
-X-Gm-Message-State: AOJu0YxaPcYefxjc2P6fSOs9NeMxAVAy/tsFjDlUvf+yFcGs+m2uWxV6
-        XLV8t13PWOR7Y6zwkGuDh6v5ew==
-X-Google-Smtp-Source: AGHT+IHwe0jlShP56MobJv+dBrZK7ARzi9c2zKj0IRO45ZlXfcd0KwA5pyVcc0EBBy17q0hVxx4vZw==
-X-Received: by 2002:a17:902:e5c8:b0:1bb:83ec:832 with SMTP id u8-20020a170902e5c800b001bb83ec0832mr14830924plf.2.1692112012590;
-        Tue, 15 Aug 2023 08:06:52 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id f2-20020a170902ce8200b001bbfa86ca3bsm11222620plg.78.2023.08.15.08.06.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 08:06:52 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Ruan Jinjie <ruanjinjie@huawei.com>
-In-Reply-To: <20230815114815.1551171-1-ruanjinjie@huawei.com>
-References: <20230815114815.1551171-1-ruanjinjie@huawei.com>
-Subject: Re: [PATCH -next] ublk: Switch to memdup_user_nul() helper
-Message-Id: <169211201169.433025.9292584498879248061.b4-ty@kernel.dk>
-Date:   Tue, 15 Aug 2023 09:06:51 -0600
+        d=1e100.net; s=20221208; t=1692114113; x=1692718913;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fYx8/ZuGx8lkcy0N8m/2/xObBqot7iWm0DNawtdKEIQ=;
+        b=JNBE7dH5BH6419W/jNNrmTF1s4NahnEeNKSMfYC99D5C4+Q/iFJ039zISoBUINGX8u
+         N/ErDRTpmuWzlV0VOBR6GEOjWJgmKq6b5IJUoigH9bUx3cq3EfCKpTN+lZrq7iFsx++1
+         v1DCMAC+YiIZdpV+uWxxDAzuCQkxegTGNRHR6BiUGKYhJSy7X6zAajnKa3IUqHXMJPKa
+         kv6GdVhDOWpVEU+N5oIYaXnG6o9FeehzERoXIR6fSEPy3vLE9gL2/H/Nb85RpKQC2LpX
+         Xl9pncWc9sMEDl+APfXMuvySDVTm9HGJSjES3FBXoBCAN6QaVsMp7gCp4ZyF7aF9DFBl
+         BLRA==
+X-Gm-Message-State: AOJu0YwpcZyt5ZeF8WkBRHmNzMkjiUAHiUyRMXH9O2T+im9xlT7DSLdW
+        /K239l3CvmFLA1knDot+C/nvCdBXgXc=
+X-Google-Smtp-Source: AGHT+IGfQIPurCfExSVAHEGBEHGbEI1D876oxVZ5c3Cry6fSkqo8tfAPKHwuypj+T7VzA+lbQHwOOQ==
+X-Received: by 2002:a17:902:f7d2:b0:1b3:b3c5:1d1f with SMTP id h18-20020a170902f7d200b001b3b3c51d1fmr10470950plw.8.1692114113091;
+        Tue, 15 Aug 2023 08:41:53 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:a40d:28ad:b5b9:2ae2? ([2620:15c:211:201:a40d:28ad:b5b9:2ae2])
+        by smtp.gmail.com with ESMTPSA id b13-20020a170902d50d00b001b87bedcc6fsm11211946plg.93.2023.08.15.08.41.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Aug 2023 08:41:51 -0700 (PDT)
+Message-ID: <b15e238f-f900-ec99-f718-925a08b590b8@acm.org>
+Date:   Tue, 15 Aug 2023 08:41:49 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v8 9/9] scsi: ufs: Inform the block layer about write
+ ordering
+To:     "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Can Guo <quic_cang@quicinc.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Bean Huo <beanhuo@micron.com>,
+        Asutosh Das <quic_asutoshd@quicinc.com>,
+        Arthur Simchaev <Arthur.Simchaev@wdc.com>
+References: <20230811213604.548235-1-bvanassche@acm.org>
+ <20230811213604.548235-10-bvanassche@acm.org>
+ <668f296c-48f3-02ef-5ac1-30131579ea8d@quicinc.com>
+ <4b3d0fa7-cccb-b206-e48a-c5ee48560ea4@acm.org>
+ <1c6dfd06-088d-7b3a-af01-b8c553f9fa18@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <1c6dfd06-088d-7b3a-af01-b8c553f9fa18@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 8/14/23 20:20, Bao D. Nguyen wrote:
+> How about this?
+> - Make ufshcd_auto_hibern8_enable() a static function. It should not >   be called from the vendor drivers.
+> - Mandate that vendor drivers must only update auto-hibernation >   settings via the ufshcd_auto_hibern8_update() api. This function 
+is>   already exported, so only need to update the function comment to> 
+  make it clear (updating the hba->ahit alone may result in abnormal
+>   behavior).
 
-On Tue, 15 Aug 2023 19:48:14 +0800, Ruan Jinjie wrote:
-> Use memdup_user_nul() helper instead of open-coding
-> to simplify the code.
-> 
-> 
+That sounds good to me. I will look into implementing the above proposal.
 
-Applied, thanks!
+Thanks,
 
-[1/1] ublk: Switch to memdup_user_nul() helper
-      commit: 306d74055754976f6bbe67aef60fe1022c6b76e0
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Bart.
