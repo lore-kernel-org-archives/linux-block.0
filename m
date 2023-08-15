@@ -2,132 +2,190 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24ACAC001B0
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 01:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CB7C001DB
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 01:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233409AbjHOBSw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 21:18:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52488 "EHLO
+        id S233941AbjHOBp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 21:45:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231839AbjHOBSg (ORCPT
+        with ESMTP id S233963AbjHOBpG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 21:18:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B631723
-        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 18:17:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692062274;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GJZSb/K28s3fnxQUtqipmDAy6W549OVPD0eFsko4JeE=;
-        b=TvEiRXDEnIcxaJGIsiSgYTECz4EC4N+jl7R812wA+rFf+dAFlTegUIL6SFhzoKVCmTTFPo
-        ZeiX1x/hMtBiHJhJfa54oIECRhwPmCftUXs/r+zJUTc8A737LOuRguOHLwQ6l2jqCEI6gj
-        UOcIar13lQjOeLSyWrXwnGWXSyXlL5w=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-408-NIF718NrMy24XEUo4SqI5g-1; Mon, 14 Aug 2023 21:17:53 -0400
-X-MC-Unique: NIF718NrMy24XEUo4SqI5g-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 79D1D8011AD;
-        Tue, 15 Aug 2023 01:17:52 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C2B05401E6A;
-        Tue, 15 Aug 2023 01:17:46 +0000 (UTC)
-Date:   Tue, 15 Aug 2023 09:17:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Gabriel Krisman Bertazi <krisman@suse.de>
-Cc:     linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
-        Andreas Hindborg <nmi@metaspace.dk>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        German Maglione <gmaglione@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Joe Thornber <ethornbe@redhat.com>, ming.lei@redhat.com
-Subject: Re: Libublk-rs v0.1.0
-Message-ID: <ZNrSNeCSg5qsOu61@fedora>
-References: <ZNmX5UQev4qvFMaq@fedora>
- <87o7j95vql.fsf@suse.de>
+        Mon, 14 Aug 2023 21:45:06 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B0AE10F2;
+        Mon, 14 Aug 2023 18:45:05 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RPvGM4fX2z4f40LJ;
+        Tue, 15 Aug 2023 09:44:59 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgA3x6mb2NpkdnTyAg--.15945S7;
+        Tue, 15 Aug 2023 09:45:02 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        yukuai3@huawei.com, mkoutny@suse.com
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next 3/4] blk-throttle: use calculate_io/bytes_allowed() for throtl_trim_slice()
+Date:   Tue, 15 Aug 2023 09:41:22 +0800
+Message-Id: <20230815014123.368929-4-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230815014123.368929-1-yukuai1@huaweicloud.com>
+References: <20230815014123.368929-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o7j95vql.fsf@suse.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgA3x6mb2NpkdnTyAg--.15945S7
+X-Coremail-Antispam: 1UD129KBjvJXoWxur1UJF1DXrW5AFWfJr1kKrg_yoWrJw45pr
+        WfAF4jgrs5Xas7tFy3Awn0yayrCwsxXFyUJ3y3XF95AFWUAFy8GF1kAryUtayxAas7ua1f
+        Aw1DZrn8Cr42yrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUPj14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JrWl82xGYIkIc2
+        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
+        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+        Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+        CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUojjgUUUU
+        U
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Gabriel,
+From: Yu Kuai <yukuai3@huawei.com>
 
-On Mon, Aug 14, 2023 at 02:23:14PM -0400, Gabriel Krisman Bertazi wrote:
-> Ming Lei <ming.lei@redhat.com> writes:
-> 
-> > Hello,
-> >
-> > Libublk-rs(Rust)[1][2] 0.1.0 is released.
-> 
-> Hi Ming,
-> 
-> Do you intend to effectively deprecate the code in ubdsrv in favor of
-> libublk-rs or do you intend to keep the C library?  I'm asking because
-> I'm looking into how to enable ublk in distributions.
+There are no functional changes, just make the code cleaner.
 
-So far, there are users of C ubdsrv library, and both are maintained
-and co-exist, so C library is still kept.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-throttle.c | 81 +++++++++++++++++++++-----------------------
+ 1 file changed, 38 insertions(+), 43 deletions(-)
 
-
-Thanks
-Ming
-
-> 
-> Thanks,
-> 
-> >
-> > The original idea is to use Rust to write ublk target for covering all
-> > kinds of block queue limits/parameters combination easily when talking
-> > with Andreas and Shinichiro about blktests in LSFMM/BPF 2023.
-> >
-> > Finally it is evolved into one generic library. Attributed to Rust's
-> > some modern language features, libublk interfaces are pretty simple:
-> >
-> > - one closure(tgt_init) for user to customize device by providing all
-> >   kind of parameter
-> >
-> > - the other closure(io handling) for user to handling IO which is
-> >   completely io_uring CQE driven: a) IO command CQE from ublk driver,
-> >   b) target IO CQE originated from target io handling code, c) eventfd
-> >   CQE if IO is offloaded to other context
-> >
-> > With low level APIs, <50 LoC can build one ublk-null, and if high level
-> > APIs are used, 30 LoC is enough.
-> >
-> > Performance is basically aligned with pure C ublk implementation[3].
-> >
-> > The library has been verified on null, ramdisk, loop and zoned target.
-> > The plan is to support async/await in 0.2 or 0.3 so that libublk can
-> > be used to build complicated target easily and efficiently.
-> >
-> > Thanks Andreas for reviewing and providing lots of good ideas for
-> > improvement & cleanup. Thanks German Maglione for some suggestions, such
-> > as eventfd support. Thanks Joe for providing excellent Rust programming
-> > guide.
-> >
-> > Any feedback is welcome!
-> >
-> > [1] https://crates.io/crates/libublk 
-> > [2] https://github.com/ming1/libublk-rs
-> > [3] https://github.com/osandov/blktests/blob/master/src/miniublk.c
-> >
-> > Thanks,
-> > Ming
-> >
-> 
-> -- 
-> Gabriel Krisman Bertazi
-> 
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 7c93144d03da..e5296960c799 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -697,11 +697,40 @@ static bool throtl_slice_used(struct throtl_grp *tg, bool rw)
+ 	return true;
+ }
+ 
++static unsigned int calculate_io_allowed(u32 iops_limit,
++					 unsigned long jiffy_elapsed)
++{
++	unsigned int io_allowed;
++	u64 tmp;
++
++	/*
++	 * jiffy_elapsed should not be a big value as minimum iops can be
++	 * 1 then at max jiffy elapsed should be equivalent of 1 second as we
++	 * will allow dispatch after 1 second and after that slice should
++	 * have been trimmed.
++	 */
++
++	tmp = (u64)iops_limit * jiffy_elapsed;
++	do_div(tmp, HZ);
++
++	if (tmp > UINT_MAX)
++		io_allowed = UINT_MAX;
++	else
++		io_allowed = tmp;
++
++	return io_allowed;
++}
++
++static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
++{
++	return mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed, (u64)HZ);
++}
++
+ /* Trim the used slices and adjust slice start accordingly */
+ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ {
+-	unsigned long nr_slices, time_elapsed, io_trim;
+-	u64 bytes_trim, tmp;
++	unsigned long time_elapsed, io_trim;
++	u64 bytes_trim;
+ 
+ 	BUG_ON(time_before(tg->slice_end[rw], tg->slice_start[rw]));
+ 
+@@ -723,19 +752,14 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 
+ 	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
+ 
+-	time_elapsed = jiffies - tg->slice_start[rw];
+-
+-	nr_slices = time_elapsed / tg->td->throtl_slice;
+-
+-	if (!nr_slices)
++	time_elapsed = rounddown(jiffies - tg->slice_start[rw],
++				 tg->td->throtl_slice);
++	if (!time_elapsed)
+ 		return;
+-	tmp = tg_bps_limit(tg, rw) * tg->td->throtl_slice * nr_slices;
+-	do_div(tmp, HZ);
+-	bytes_trim = tmp;
+-
+-	io_trim = (tg_iops_limit(tg, rw) * tg->td->throtl_slice * nr_slices) /
+-		HZ;
+ 
++	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
++					     time_elapsed);
++	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed);
+ 	if (!bytes_trim && !io_trim)
+ 		return;
+ 
+@@ -749,7 +773,7 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 	else
+ 		tg->io_disp[rw] = 0;
+ 
+-	tg->slice_start[rw] += nr_slices * tg->td->throtl_slice;
++	tg->slice_start[rw] += time_elapsed;
+ 
+ 	throtl_log(&tg->service_queue,
+ 		   "[%c] trim slice nr=%lu bytes=%llu io=%lu start=%lu end=%lu jiffies=%lu",
+@@ -757,35 +781,6 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 		   tg->slice_start[rw], tg->slice_end[rw], jiffies);
+ }
+ 
+-static unsigned int calculate_io_allowed(u32 iops_limit,
+-					 unsigned long jiffy_elapsed)
+-{
+-	unsigned int io_allowed;
+-	u64 tmp;
+-
+-	/*
+-	 * jiffy_elapsed should not be a big value as minimum iops can be
+-	 * 1 then at max jiffy elapsed should be equivalent of 1 second as we
+-	 * will allow dispatch after 1 second and after that slice should
+-	 * have been trimmed.
+-	 */
+-
+-	tmp = (u64)iops_limit * jiffy_elapsed;
+-	do_div(tmp, HZ);
+-
+-	if (tmp > UINT_MAX)
+-		io_allowed = UINT_MAX;
+-	else
+-		io_allowed = tmp;
+-
+-	return io_allowed;
+-}
+-
+-static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
+-{
+-	return mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed, (u64)HZ);
+-}
+-
+ static void __tg_update_carryover(struct throtl_grp *tg, bool rw)
+ {
+ 	unsigned long jiffy_elapsed = jiffies - tg->slice_start[rw];
 -- 
-Ming
+2.39.2
 
