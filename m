@@ -2,105 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDE0C41513
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 01:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 775D7C41513
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 01:56:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234003AbjHOBxc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 21:53:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52672 "EHLO
+        id S232848AbjHOBzm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 21:55:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230079AbjHOBxB (ORCPT
+        with ESMTP id S234039AbjHOBzW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 21:53:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617C6B0;
-        Mon, 14 Aug 2023 18:53:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F192964F90;
-        Tue, 15 Aug 2023 01:52:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D78EC433C8;
-        Tue, 15 Aug 2023 01:52:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692064379;
-        bh=+gMtWyYUJ+r4hafaHAp80BOsmuUEuuPjy8FAmemD3t8=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=CxvpYlNJhagAqcqP3QxzhO1I0jxVVz+dfJS/nlkENcwOy1JelOFGlBNn2tf47nFl2
-         ZoWiY6QdAnFSTGcyxbwRtTcdPvvSi4CaVv6GmiPxPfvCMAsAU/neqsHp+wTmg0zV7e
-         8/esQChogF+CBobncvnYTY8IVwJCxJ8Dl6b9gTjKy5bVTVmAbvCvzwDgK72myrr+T+
-         Ws85Sb1MTUAbUXmPKGPxwO4iChRsU5qYTVN4nZ1gkwCCOqBuzD67XiuIuUf2cF5bAY
-         WvJGGYFsPvnk8mgMfMN7+NW+rS7gVSvEF5Fbw3EQq/AHxOzL861CXmHBxaXm30WjVO
-         IGR/AbPAuW/YA==
-Message-ID: <f50eea3e-fb4a-00b9-a357-62de7769286e@kernel.org>
-Date:   Tue, 15 Aug 2023 10:52:57 +0900
+        Mon, 14 Aug 2023 21:55:22 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD90EC3
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 18:55:21 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bc76cdf0cbso4758265ad.1
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 18:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692064521; x=1692669321;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b8E3gqVae+/3PhY35u0mE0K55UplNn5j0SdclWsmek8=;
+        b=fyMXhgpNcQU5FSZaE+nF1hE9LIn3vy4r+slj2VBx1gyj8Dkq/AfBjS27jZpaFDACb2
+         JbzjhjsH8s5RHi9iYE6IpCzAcywiRmNfx1d5xqDDc3yDR88BBZT+FlqNd3RWLgTmFPPp
+         m/PNxcD0kRRJ8bN5ERQzT4MvQrjkvsxtmzOmhXA2BqW8rlkP5QvHTflITQVGFORoj6qF
+         7SjTeVwdS0AC1OBVqvC9DIt12HCiaQTCbZUUBHC9hD9Dhmli10mVxAraM5hLT2aaLnc1
+         272Tn4ew4AqSS4JDliIJV6kx9Z6F7GUCtUIbCfMoXjuY9w9ECbmJQv9GTifewTupIJvH
+         Vorw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692064521; x=1692669321;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b8E3gqVae+/3PhY35u0mE0K55UplNn5j0SdclWsmek8=;
+        b=FnCWuAE0TrtV8xoEghqcdhkSmR9YHwHluVNAq3DXT4eNX8013GtZKPsEjluJF9ucGc
+         rH95N85EO27HHrfTVfWOUzCyEbpKie5gZX+DLmm4RIVqRaa1C/nwiXQ3LUKeBHB9WZby
+         we2Mvc8dV/h+4GB99d2lFUE/AGZ9ngy8IizCFRHT/FaWKPyGUQ1vIlzIZtonn55oW1fn
+         fBK8loNuyFTsy8dYHs7jFjQb4cvJk/o1rO/OJ0QXa8i5Z9RRr6u7OTqBBs0lXpEaU0lP
+         xiuCqFGsOGOc3BtT/MQ7Ac58MIvsbK2bS3gNvKQgUg3ZECD8Oq+oznUKz91tDJwuVKCs
+         T+LQ==
+X-Gm-Message-State: AOJu0YwX2Mi1owEWZxX1D3M2Et2a65C7pWcAjVNw4PNTEDZppl2bnSsG
+        +r7gXApeKazxOkJg+X18E4VlfW9Z7UDBjGFzPIs=
+X-Google-Smtp-Source: AGHT+IER8i24BIs/ILoxEMFOzy6YgNjCWsIXiFZWf8lu2tK5ujSefa2PYKpW1EQRxf0Tekn2/0I4iA==
+X-Received: by 2002:a17:902:db03:b0:1b8:ac61:ffcd with SMTP id m3-20020a170902db0300b001b8ac61ffcdmr13835425plx.3.1692064521308;
+        Mon, 14 Aug 2023 18:55:21 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id y2-20020a170902700200b001bbb1eec92dsm10097420plk.224.2023.08.14.18.55.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 18:55:20 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+Cc:     Igor Pylypiv <ipylypiv@google.com>
+In-Reply-To: <20230814215833.259286-1-dlemoal@kernel.org>
+References: <20230814215833.259286-1-dlemoal@kernel.org>
+Subject: Re: [PATCH] block: uapi: Fix compilation errors using ioprio.h
+ with C++
+Message-Id: <169206452014.428095.9972774953529871129.b4-ty@kernel.dk>
+Date:   Mon, 14 Aug 2023 19:55:20 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v8 5/9] scsi: core: Retry unaligned zoned writes
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230811213604.548235-1-bvanassche@acm.org>
- <20230811213604.548235-6-bvanassche@acm.org>
- <7dd67537-1ad8-79ca-281c-540bade2cb83@kernel.org>
- <fd60a934-4b9f-97b2-6dd4-522d9194f9c7@acm.org>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <fd60a934-4b9f-97b2-6dd4-522d9194f9c7@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/15/23 02:57, Bart Van Assche wrote:
-> On 8/14/23 05:36, Damien Le Moal wrote:
->> On 8/12/23 06:35, Bart Van Assche wrote:
->>> +	if (!rq->q->limits.use_zone_write_lock && blk_rq_is_seq_zoned_write(rq))
->>
->> This condition could be written as a little inline helper
->> blk_req_need_zone_write_lock(), which could be used in mq-dealine patch 2.
+
+On Tue, 15 Aug 2023 06:58:32 +0900, Damien Le Moal wrote:
+> The use of the "class" argument name in the ioprio_value() inline
+> function in include/uapi/linux/ioprio.h confuses C++ compilers
+> resulting in compilation errors such as:
 > 
-> Hi Damien,
+> /usr/include/linux/ioprio.h:110:43: error: expected primary-expression before ‘int’
+>   110 | static __always_inline __u16 ioprio_value(int class, int level, int hint)
+>       |                                           ^~~
 > 
-> Since q->limits.use_zone_write_lock is being introduced, how about
-> modifying blk_req_needs_zone_write_lock() such that it tests that new member
-> variable instead of checking rq->q->disk->seq_zones_wlock? That would allow
-> me to leave out one change from block/mq-deadline.c. I do not have a strong
-> opinion about whether the name blk_req_needs_zone_write_lock() should be
-> retained or whether that function should be renamed into
-> blk_req_use_zone_write_lock().
+> [...]
 
-Something like this ?
+Applied, thanks!
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 619ee41a51cc..a3980a71c0ac 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -57,7 +57,12 @@ EXPORT_SYMBOL_GPL(blk_zone_cond_str);
-  */
- bool blk_req_needs_zone_write_lock(struct request *rq)
- {
--       if (!rq->q->disk->seq_zones_wlock)
-+       struct request_queue *q = rq->q;
-+
-+       if (!q->limits.use_zone_write_lock)
-+               return false;
-+
-+       if (!q->disk->seq_zones_wlock)
-                return false;
+[1/1] block: uapi: Fix compilation errors using ioprio.h with C++
+      commit: 8b6e92c358d2e12ff9f12e55bb6101e2ab053ee7
 
-        return blk_rq_is_seq_zoned_write(rq);
-
-I think that is fine and avoids adding yet another helper.
-I am OK with this.
-
+Best regards,
 -- 
-Damien Le Moal
-Western Digital Research
+Jens Axboe
+
+
 
