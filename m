@@ -2,87 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F3DBC04A6A
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 15:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86738C001B0
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 15:49:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238170AbjHOPmC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 11:42:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56462 "EHLO
+        id S236210AbjHOPtF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 11:49:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238209AbjHOPly (ORCPT
+        with ESMTP id S238292AbjHOPsm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 11:41:54 -0400
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3CFCE61;
-        Tue, 15 Aug 2023 08:41:53 -0700 (PDT)
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1bbc87ded50so33781295ad.1;
-        Tue, 15 Aug 2023 08:41:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692114113; x=1692718913;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYx8/ZuGx8lkcy0N8m/2/xObBqot7iWm0DNawtdKEIQ=;
-        b=JNBE7dH5BH6419W/jNNrmTF1s4NahnEeNKSMfYC99D5C4+Q/iFJ039zISoBUINGX8u
-         N/ErDRTpmuWzlV0VOBR6GEOjWJgmKq6b5IJUoigH9bUx3cq3EfCKpTN+lZrq7iFsx++1
-         v1DCMAC+YiIZdpV+uWxxDAzuCQkxegTGNRHR6BiUGKYhJSy7X6zAajnKa3IUqHXMJPKa
-         kv6GdVhDOWpVEU+N5oIYaXnG6o9FeehzERoXIR6fSEPy3vLE9gL2/H/Nb85RpKQC2LpX
-         Xl9pncWc9sMEDl+APfXMuvySDVTm9HGJSjES3FBXoBCAN6QaVsMp7gCp4ZyF7aF9DFBl
-         BLRA==
-X-Gm-Message-State: AOJu0YwpcZyt5ZeF8WkBRHmNzMkjiUAHiUyRMXH9O2T+im9xlT7DSLdW
-        /K239l3CvmFLA1knDot+C/nvCdBXgXc=
-X-Google-Smtp-Source: AGHT+IGfQIPurCfExSVAHEGBEHGbEI1D876oxVZ5c3Cry6fSkqo8tfAPKHwuypj+T7VzA+lbQHwOOQ==
-X-Received: by 2002:a17:902:f7d2:b0:1b3:b3c5:1d1f with SMTP id h18-20020a170902f7d200b001b3b3c51d1fmr10470950plw.8.1692114113091;
-        Tue, 15 Aug 2023 08:41:53 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:a40d:28ad:b5b9:2ae2? ([2620:15c:211:201:a40d:28ad:b5b9:2ae2])
-        by smtp.gmail.com with ESMTPSA id b13-20020a170902d50d00b001b87bedcc6fsm11211946plg.93.2023.08.15.08.41.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 08:41:51 -0700 (PDT)
-Message-ID: <b15e238f-f900-ec99-f718-925a08b590b8@acm.org>
-Date:   Tue, 15 Aug 2023 08:41:49 -0700
+        Tue, 15 Aug 2023 11:48:42 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58C210C;
+        Tue, 15 Aug 2023 08:48:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692114521; x=1723650521;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vYKwY7fJgB/Wm+pd7ZCVNTiQ6KYMZdtBO/eDX6RYb2U=;
+  b=QJrrj3FYYKbrCJ8QF1XpccPrQB8Oktb10v8hHapkHp1uP2rNY9yMy013
+   6v97QGrnnMTAHDYJ5QmuTIc0vby2+RPKyTLBjFGFRfss/HXkC53lx8Tfr
+   lgpmAgYchxmS0719ULNM8lZj9y1YbwCCO1UoZtT/XfIktle3aRupsmFeW
+   emdTTHrqJBwl0apcfG3xbkCBfCIottRWG2DT36dMZLoeFBvaWwn4e7dKx
+   e7OZ8zu5o7bNn/n473ywuKpeQo6VBDvWKwIWtcKmxdgJDaChyu63tH6Rm
+   yOpwOpm4ktJ5OSdesmlQAS8jgD5W8WVaE8bls2hUtE2eeTFd/XGVNd5zZ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="351898548"
+X-IronPort-AV: E=Sophos;i="6.01,174,1684825200"; 
+   d="scan'208";a="351898548"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 08:48:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="727408116"
+X-IronPort-AV: E=Sophos;i="6.01,174,1684825200"; 
+   d="scan'208";a="727408116"
+Received: from lkp-server02.sh.intel.com (HELO b5fb8d9e1ffc) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 15 Aug 2023 08:48:38 -0700
+Received: from kbuild by b5fb8d9e1ffc with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qVwHa-00013d-2I;
+        Tue, 15 Aug 2023 15:48:35 +0000
+Date:   Tue, 15 Aug 2023 23:48:06 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org,
+        josef@toxicpanda.com, axboe@kernel.dk, yukuai3@huawei.com,
+        mkoutny@suse.com
+Cc:     oe-kbuild-all@lists.linux.dev, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH -next 3/4] blk-throttle: use calculate_io/bytes_allowed()
+ for throtl_trim_slice()
+Message-ID: <202308152351.JdDlpV4Q-lkp@intel.com>
+References: <20230815014123.368929-4-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-From:   Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v8 9/9] scsi: ufs: Inform the block layer about write
- ordering
-To:     "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Can Guo <quic_cang@quicinc.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Bean Huo <beanhuo@micron.com>,
-        Asutosh Das <quic_asutoshd@quicinc.com>,
-        Arthur Simchaev <Arthur.Simchaev@wdc.com>
-References: <20230811213604.548235-1-bvanassche@acm.org>
- <20230811213604.548235-10-bvanassche@acm.org>
- <668f296c-48f3-02ef-5ac1-30131579ea8d@quicinc.com>
- <4b3d0fa7-cccb-b206-e48a-c5ee48560ea4@acm.org>
- <1c6dfd06-088d-7b3a-af01-b8c553f9fa18@quicinc.com>
-Content-Language: en-US
-In-Reply-To: <1c6dfd06-088d-7b3a-af01-b8c553f9fa18@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230815014123.368929-4-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/14/23 20:20, Bao D. Nguyen wrote:
-> How about this?
-> - Make ufshcd_auto_hibern8_enable() a static function. It should not >   be called from the vendor drivers.
-> - Mandate that vendor drivers must only update auto-hibernation >   settings via the ufshcd_auto_hibern8_update() api. This function 
-is>   already exported, so only need to update the function comment to> 
-  make it clear (updating the hba->ahit alone may result in abnormal
->   behavior).
+Hi Yu,
 
-That sounds good to me. I will look into implementing the above proposal.
+kernel test robot noticed the following build errors:
 
-Thanks,
+[auto build test ERROR on next-20230809]
 
-Bart.
+url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/blk-throttle-print-signed-value-carryover_bytes-ios-for-user/20230815-095025
+base:   next-20230809
+patch link:    https://lore.kernel.org/r/20230815014123.368929-4-yukuai1%40huaweicloud.com
+patch subject: [PATCH -next 3/4] blk-throttle: use calculate_io/bytes_allowed() for throtl_trim_slice()
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230815/202308152351.JdDlpV4Q-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230815/202308152351.JdDlpV4Q-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308152351.JdDlpV4Q-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from block/blk-throttle.c:12:
+   block/blk-throttle.c: In function 'throtl_trim_slice':
+>> block/blk-throttle.c:780:44: error: 'nr_slices' undeclared (first use in this function)
+     780 |                    rw == READ ? 'R' : 'W', nr_slices, bytes_trim, io_trim,
+         |                                            ^~~~~~~~~
+   include/linux/blktrace_api.h:56:66: note: in definition of macro 'blk_add_cgroup_trace_msg'
+      56 |                         __blk_trace_note_message(bt, css, fmt, ##__VA_ARGS__);\
+         |                                                                  ^~~~~~~~~~~
+   block/blk-throttle.c:778:9: note: in expansion of macro 'throtl_log'
+     778 |         throtl_log(&tg->service_queue,
+         |         ^~~~~~~~~~
+   block/blk-throttle.c:780:44: note: each undeclared identifier is reported only once for each function it appears in
+     780 |                    rw == READ ? 'R' : 'W', nr_slices, bytes_trim, io_trim,
+         |                                            ^~~~~~~~~
+   include/linux/blktrace_api.h:56:66: note: in definition of macro 'blk_add_cgroup_trace_msg'
+      56 |                         __blk_trace_note_message(bt, css, fmt, ##__VA_ARGS__);\
+         |                                                                  ^~~~~~~~~~~
+   block/blk-throttle.c:778:9: note: in expansion of macro 'throtl_log'
+     778 |         throtl_log(&tg->service_queue,
+         |         ^~~~~~~~~~
+
+
+vim +/nr_slices +780 block/blk-throttle.c
+
+1a46ae7773b475 Yu Kuai     2023-08-15  728  
+e43473b7f223ec Vivek Goyal 2010-09-15  729  /* Trim the used slices and adjust slice start accordingly */
+0f3457f60edc57 Tejun Heo   2013-05-14  730  static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+e43473b7f223ec Vivek Goyal 2010-09-15  731  {
+1a46ae7773b475 Yu Kuai     2023-08-15  732  	unsigned long time_elapsed, io_trim;
+1a46ae7773b475 Yu Kuai     2023-08-15  733  	u64 bytes_trim;
+e43473b7f223ec Vivek Goyal 2010-09-15  734  
+e43473b7f223ec Vivek Goyal 2010-09-15  735  	BUG_ON(time_before(tg->slice_end[rw], tg->slice_start[rw]));
+e43473b7f223ec Vivek Goyal 2010-09-15  736  
+e43473b7f223ec Vivek Goyal 2010-09-15  737  	/*
+e43473b7f223ec Vivek Goyal 2010-09-15  738  	 * If bps are unlimited (-1), then time slice don't get
+e43473b7f223ec Vivek Goyal 2010-09-15  739  	 * renewed. Don't try to trim the slice if slice is used. A new
+e43473b7f223ec Vivek Goyal 2010-09-15  740  	 * slice will start when appropriate.
+e43473b7f223ec Vivek Goyal 2010-09-15  741  	 */
+0f3457f60edc57 Tejun Heo   2013-05-14  742  	if (throtl_slice_used(tg, rw))
+e43473b7f223ec Vivek Goyal 2010-09-15  743  		return;
+e43473b7f223ec Vivek Goyal 2010-09-15  744  
+d1ae8ffdfaa16b Vivek Goyal 2010-12-01  745  	/*
+d1ae8ffdfaa16b Vivek Goyal 2010-12-01  746  	 * A bio has been dispatched. Also adjust slice_end. It might happen
+d1ae8ffdfaa16b Vivek Goyal 2010-12-01  747  	 * that initially cgroup limit was very low resulting in high
+b53b072c4bb579 Baolin Wang 2020-09-07  748  	 * slice_end, but later limit was bumped up and bio was dispatched
+d1ae8ffdfaa16b Vivek Goyal 2010-12-01  749  	 * sooner, then we need to reduce slice_end. A high bogus slice_end
+d1ae8ffdfaa16b Vivek Goyal 2010-12-01  750  	 * is bad because it does not allow new slice to start.
+d1ae8ffdfaa16b Vivek Goyal 2010-12-01  751  	 */
+d1ae8ffdfaa16b Vivek Goyal 2010-12-01  752  
+297e3d85478482 Shaohua Li  2017-03-27  753  	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
+d1ae8ffdfaa16b Vivek Goyal 2010-12-01  754  
+1a46ae7773b475 Yu Kuai     2023-08-15  755  	time_elapsed = rounddown(jiffies - tg->slice_start[rw],
+1a46ae7773b475 Yu Kuai     2023-08-15  756  				 tg->td->throtl_slice);
+1a46ae7773b475 Yu Kuai     2023-08-15  757  	if (!time_elapsed)
+e43473b7f223ec Vivek Goyal 2010-09-15  758  		return;
+e43473b7f223ec Vivek Goyal 2010-09-15  759  
+1a46ae7773b475 Yu Kuai     2023-08-15  760  	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
+1a46ae7773b475 Yu Kuai     2023-08-15  761  					     time_elapsed);
+1a46ae7773b475 Yu Kuai     2023-08-15  762  	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed);
+8e89d13f4ede24 Vivek Goyal 2010-09-15  763  	if (!bytes_trim && !io_trim)
+e43473b7f223ec Vivek Goyal 2010-09-15  764  		return;
+e43473b7f223ec Vivek Goyal 2010-09-15  765  
+e43473b7f223ec Vivek Goyal 2010-09-15  766  	if (tg->bytes_disp[rw] >= bytes_trim)
+e43473b7f223ec Vivek Goyal 2010-09-15  767  		tg->bytes_disp[rw] -= bytes_trim;
+e43473b7f223ec Vivek Goyal 2010-09-15  768  	else
+e43473b7f223ec Vivek Goyal 2010-09-15  769  		tg->bytes_disp[rw] = 0;
+e43473b7f223ec Vivek Goyal 2010-09-15  770  
+8e89d13f4ede24 Vivek Goyal 2010-09-15  771  	if (tg->io_disp[rw] >= io_trim)
+8e89d13f4ede24 Vivek Goyal 2010-09-15  772  		tg->io_disp[rw] -= io_trim;
+8e89d13f4ede24 Vivek Goyal 2010-09-15  773  	else
+8e89d13f4ede24 Vivek Goyal 2010-09-15  774  		tg->io_disp[rw] = 0;
+8e89d13f4ede24 Vivek Goyal 2010-09-15  775  
+1a46ae7773b475 Yu Kuai     2023-08-15  776  	tg->slice_start[rw] += time_elapsed;
+e43473b7f223ec Vivek Goyal 2010-09-15  777  
+fda6f272c77a7a Tejun Heo   2013-05-14  778  	throtl_log(&tg->service_queue,
+fda6f272c77a7a Tejun Heo   2013-05-14  779  		   "[%c] trim slice nr=%lu bytes=%llu io=%lu start=%lu end=%lu jiffies=%lu",
+8e89d13f4ede24 Vivek Goyal 2010-09-15 @780  		   rw == READ ? 'R' : 'W', nr_slices, bytes_trim, io_trim,
+e43473b7f223ec Vivek Goyal 2010-09-15  781  		   tg->slice_start[rw], tg->slice_end[rw], jiffies);
+e43473b7f223ec Vivek Goyal 2010-09-15  782  }
+e43473b7f223ec Vivek Goyal 2010-09-15  783  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
