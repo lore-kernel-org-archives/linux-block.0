@@ -2,103 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0CEC04FDF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 01:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDE0C41513
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 01:54:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233949AbjHOBp2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 21:45:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51068 "EHLO
+        id S234003AbjHOBxc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 21:53:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233964AbjHOBpG (ORCPT
+        with ESMTP id S230079AbjHOBxB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 21:45:06 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA64B1736;
-        Mon, 14 Aug 2023 18:45:05 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RPvGL40qRz4f40L6;
-        Tue, 15 Aug 2023 09:44:58 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgA3x6mb2NpkdnTyAg--.15945S5;
-        Tue, 15 Aug 2023 09:45:01 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai3@huawei.com, mkoutny@suse.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH -next 1/4] blk-throttle: print signed value 'carryover_bytes/ios' for user
-Date:   Tue, 15 Aug 2023 09:41:20 +0800
-Message-Id: <20230815014123.368929-2-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230815014123.368929-1-yukuai1@huaweicloud.com>
-References: <20230815014123.368929-1-yukuai1@huaweicloud.com>
+        Mon, 14 Aug 2023 21:53:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617C6B0;
+        Mon, 14 Aug 2023 18:53:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F192964F90;
+        Tue, 15 Aug 2023 01:52:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D78EC433C8;
+        Tue, 15 Aug 2023 01:52:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692064379;
+        bh=+gMtWyYUJ+r4hafaHAp80BOsmuUEuuPjy8FAmemD3t8=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=CxvpYlNJhagAqcqP3QxzhO1I0jxVVz+dfJS/nlkENcwOy1JelOFGlBNn2tf47nFl2
+         ZoWiY6QdAnFSTGcyxbwRtTcdPvvSi4CaVv6GmiPxPfvCMAsAU/neqsHp+wTmg0zV7e
+         8/esQChogF+CBobncvnYTY8IVwJCxJ8Dl6b9gTjKy5bVTVmAbvCvzwDgK72myrr+T+
+         Ws85Sb1MTUAbUXmPKGPxwO4iChRsU5qYTVN4nZ1gkwCCOqBuzD67XiuIuUf2cF5bAY
+         WvJGGYFsPvnk8mgMfMN7+NW+rS7gVSvEF5Fbw3EQq/AHxOzL861CXmHBxaXm30WjVO
+         IGR/AbPAuW/YA==
+Message-ID: <f50eea3e-fb4a-00b9-a357-62de7769286e@kernel.org>
+Date:   Tue, 15 Aug 2023 10:52:57 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgA3x6mb2NpkdnTyAg--.15945S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFWrAF1UJr48WF1fArWxCrg_yoW8XF4kpF
-        W3KrW8GF12qFnxCa13G3W5t3yUZan7Jry8A390kF13AF12k34qgr95ur1Skay0yFn3CF4v
-        v34qqryxJF1Uu37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
-        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU2_M3UUUUU
-        =
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v8 5/9] scsi: core: Retry unaligned zoned writes
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230811213604.548235-1-bvanassche@acm.org>
+ <20230811213604.548235-6-bvanassche@acm.org>
+ <7dd67537-1ad8-79ca-281c-540bade2cb83@kernel.org>
+ <fd60a934-4b9f-97b2-6dd4-522d9194f9c7@acm.org>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <fd60a934-4b9f-97b2-6dd4-522d9194f9c7@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On 8/15/23 02:57, Bart Van Assche wrote:
+> On 8/14/23 05:36, Damien Le Moal wrote:
+>> On 8/12/23 06:35, Bart Van Assche wrote:
+>>> +	if (!rq->q->limits.use_zone_write_lock && blk_rq_is_seq_zoned_write(rq))
+>>
+>> This condition could be written as a little inline helper
+>> blk_req_need_zone_write_lock(), which could be used in mq-dealine patch 2.
+> 
+> Hi Damien,
+> 
+> Since q->limits.use_zone_write_lock is being introduced, how about
+> modifying blk_req_needs_zone_write_lock() such that it tests that new member
+> variable instead of checking rq->q->disk->seq_zones_wlock? That would allow
+> me to leave out one change from block/mq-deadline.c. I do not have a strong
+> opinion about whether the name blk_req_needs_zone_write_lock() should be
+> retained or whether that function should be renamed into
+> blk_req_use_zone_write_lock().
 
-'carryover_bytes/ios' can be negative, indicate that some bio is
-dispatched in advance within slice while configuration is updated.
-Print a huge value is not user-friendly.
+Something like this ?
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 2 +-
- block/blk-throttle.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 619ee41a51cc..a3980a71c0ac 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -57,7 +57,12 @@ EXPORT_SYMBOL_GPL(blk_zone_cond_str);
+  */
+ bool blk_req_needs_zone_write_lock(struct request *rq)
+ {
+-       if (!rq->q->disk->seq_zones_wlock)
++       struct request_queue *q = rq->q;
++
++       if (!q->limits.use_zone_write_lock)
++               return false;
++
++       if (!q->disk->seq_zones_wlock)
+                return false;
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 7397ff199d66..5184f17f5129 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -816,7 +816,7 @@ static void tg_update_carryover(struct throtl_grp *tg)
- 		__tg_update_carryover(tg, WRITE);
- 
- 	/* see comments in struct throtl_grp for meaning of these fields. */
--	throtl_log(&tg->service_queue, "%s: %llu %llu %u %u\n", __func__,
-+	throtl_log(&tg->service_queue, "%s: %lld %lld %d %d\n", __func__,
- 		   tg->carryover_bytes[READ], tg->carryover_bytes[WRITE],
- 		   tg->carryover_ios[READ], tg->carryover_ios[WRITE]);
- }
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index d1ccbfe9f797..bffbc9cfc8ab 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -127,8 +127,8 @@ struct throtl_grp {
- 	 * bytes/ios are waited already in previous configuration, and they will
- 	 * be used to calculate wait time under new configuration.
- 	 */
--	uint64_t carryover_bytes[2];
--	unsigned int carryover_ios[2];
-+	long long carryover_bytes[2];
-+	int carryover_ios[2];
- 
- 	unsigned long last_check_time;
- 
+        return blk_rq_is_seq_zoned_write(rq);
+
+I think that is fine and avoids adding yet another helper.
+I am OK with this.
+
 -- 
-2.39.2
+Damien Le Moal
+Western Digital Research
 
