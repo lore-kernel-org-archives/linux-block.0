@@ -2,190 +2,154 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CEA8C04A6A
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 02:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9645EEB64DD
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 03:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234057AbjHOCBm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Aug 2023 22:01:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52232 "EHLO
+        id S232523AbjHODbM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Aug 2023 23:31:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234050AbjHOCBM (ORCPT
+        with ESMTP id S232047AbjHOD3H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2023 22:01:12 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7BB4DD;
-        Mon, 14 Aug 2023 19:01:11 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5C9BE62BF9;
-        Tue, 15 Aug 2023 02:01:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4810C433C7;
-        Tue, 15 Aug 2023 02:01:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692064870;
-        bh=Vjc4rhFXLW7GsoK55D+2oukOvsa3PehjWIrhqNx3I40=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=oNn9zhVCfqYnvKLshaJ8KZQLEdiFuwejlIoG2Y1HKV8zI10pWQE4A3fEpZbmEYoD7
-         Kc2UOolywm/c+vKwCDH/RdzcKYwuBUUYvxp78dLFrEUan4WjSIt3o+YlHeQ4R51Ywo
-         RTC9yEQ5WG5getgsfixYE71c+VMqo9hgA1j+yf+exRUb83BJ2vGobK5NpplByV6mHv
-         Qjjl0z5UR7EGtyqoieUdWxCCqYoSQuANkzoh/DIV4SS1PSNf5hacijhv9Nsl5wDOcL
-         sLqUk5M8bTyl8ZoXhMkqs5gKYFIo6S1trizATs5RVLWCG+UU1rMQyMoQf1WeWGAUDC
-         KdfIksGAoMmKw==
-Message-ID: <66fa32a0-1c0d-1346-a77f-42b99058a1c3@kernel.org>
-Date:   Tue, 15 Aug 2023 11:01:09 +0900
+        Mon, 14 Aug 2023 23:29:07 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4056C1998;
+        Mon, 14 Aug 2023 20:20:26 -0700 (PDT)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37F2jVv8014065;
+        Tue, 15 Aug 2023 03:20:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=qLGJnULZaClH4RdURETjhaMgqIBINYf3tTBguvmLEYY=;
+ b=SAkg128iXHr4uXS231k2H46+Tv/qe6VbqhWgeiXFTO7hF+TPLEPuGOz4scYGzoUFVguv
+ D26HDt+MlLOVMJ2cTAVK+dlQDiGhEriH5gCvfImyvpqPJzRMNA17pUexu5FQuaFFzpaW
+ lD0WmVuOaydYczp5KXem6vjbvqGQlH4I1jg0roOaQxBOjta4bbZ3EY7SPHUtUXTFh4H0
+ BKeeZQpMvnLi0lCQRvwm2aRaQmA0+etB5yzB+ySSIJDRtLijX8jviDzvWwEn5Wij4Azu
+ Qss4OAN7rcmNlQ+hmYXtB6Z+CT7b2i32IusAH6DOUaMUBbrfx2wMEpyNWL10zckqxwRR wA== 
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sfxbyg7wn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Aug 2023 03:20:07 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+        by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37F3K5tZ018030
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Aug 2023 03:20:05 GMT
+Received: from [192.168.143.77] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Mon, 14 Aug
+ 2023 20:20:04 -0700
+Message-ID: <1c6dfd06-088d-7b3a-af01-b8c553f9fa18@quicinc.com>
+Date:   Mon, 14 Aug 2023 20:20:04 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v8 1/9] block: Introduce more member variables related to
- zone write locking
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v8 9/9] scsi: ufs: Inform the block layer about write
+ ordering
 Content-Language: en-US
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+        Christoph Hellwig <hch@lst.de>,
+        "Can Guo" <quic_cang@quicinc.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        "Damien Le Moal" <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        "Bean Huo" <beanhuo@micron.com>,
+        Asutosh Das <quic_asutoshd@quicinc.com>,
+        "Arthur Simchaev" <Arthur.Simchaev@wdc.com>
 References: <20230811213604.548235-1-bvanassche@acm.org>
- <20230811213604.548235-2-bvanassche@acm.org>
- <3188f400-b387-7be8-0f21-cf5089fe1411@kernel.org>
- <5a2b24c5-14c5-57a6-8af0-6ebdee2371de@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <5a2b24c5-14c5-57a6-8af0-6ebdee2371de@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20230811213604.548235-10-bvanassche@acm.org>
+ <668f296c-48f3-02ef-5ac1-30131579ea8d@quicinc.com>
+ <4b3d0fa7-cccb-b206-e48a-c5ee48560ea4@acm.org>
+From:   "Bao D. Nguyen" <quic_nguyenb@quicinc.com>
+In-Reply-To: <4b3d0fa7-cccb-b206-e48a-c5ee48560ea4@acm.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: FMgEPhOAHe2TGuLDmlh1fpTLbzeDipcd
+X-Proofpoint-ORIG-GUID: FMgEPhOAHe2TGuLDmlh1fpTLbzeDipcd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-15_01,2023-08-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ spamscore=0 suspectscore=0 mlxlogscore=999 lowpriorityscore=0 phishscore=0
+ impostorscore=0 adultscore=0 bulkscore=0 priorityscore=1501 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2308150028
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/15/23 01:57, Bart Van Assche wrote:
-> On 8/14/23 05:32, Damien Le Moal wrote:
->> On 8/12/23 06:35, Bart Van Assche wrote:
->>> --- a/block/blk-settings.c
->>> +++ b/block/blk-settings.c
->>> @@ -56,6 +56,8 @@ void blk_set_default_limits(struct queue_limits *lim)
->>>   	lim->alignment_offset = 0;
->>>   	lim->io_opt = 0;
->>>   	lim->misaligned = 0;
->>> +	lim->driver_preserves_write_order = false;
->>> +	lim->use_zone_write_lock = false;
->>>   	lim->zoned = BLK_ZONED_NONE;
->>>   	lim->zone_write_granularity = 0;
->>>   	lim->dma_alignment = 511;
->>> @@ -685,6 +687,9 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>>   						   b->max_secure_erase_sectors);
->>>   	t->zone_write_granularity = max(t->zone_write_granularity,
->>>   					b->zone_write_granularity);
->>> +	/* Request-based stacking drivers do not reorder requests. */
->>> +	t->driver_preserves_write_order = b->driver_preserves_write_order;
->>> +	t->use_zone_write_lock = b->use_zone_write_lock;
+On 8/14/2023 9:23 AM, Bart Van Assche wrote:
+> On 8/12/23 10:09, Bao D. Nguyen wrote:
+>> I am not reviewing other patches in this series, so I don't know the 
+>> whole context. Here is my comment on this patch alone.
 >>
->> I do not think this is correct as the last target of a multi target device will
->> dictate the result, regardless of the other targets. So this should be something
->> like:
->>
->> 	t->driver_preserves_write_order = t->driver_preserves_write_order &&
->> 		b->driver_preserves_write_order;
->> 	t->use_zone_write_lock =
->> 		t->use_zone_write_lock || b->use_zone_write_lock;
->>
->> However, given that driver_preserves_write_order is initialized as false, this
->> would always be false. Not sure how to handle that...
+>> Looks like you rely on ufshcd_auto_hibern8_update() being invoked so 
+>> that you can update the driver_preserves_write_order. However, the 
+>> hba->ahit value can be updated by the vendor's driver, and 
+>> ufshcd_auto_hibern8_enable() can be invoked without 
+>> ufshcd_auto_hibern8_update(). Therefore, you may have a situation 
+>> where the driver_preserves_write_order is true by default, but 
+>> Auto-hibernation is enabled by default.
 > 
-> How about integrating the (untested) change below into this patch? It keeps
-> the default value for driver_preserves_write_order to false for regular block
-> drivers and changes the default value to true for stacking drivers:
+> Hi Bao,
 > 
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -84,6 +84,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
->   	lim->max_dev_sectors = UINT_MAX;
->   	lim->max_write_zeroes_sectors = UINT_MAX;
->   	lim->max_zone_append_sectors = UINT_MAX;
-> +	lim->driver_preserves_write_order = true;
->   }
->   EXPORT_SYMBOL(blk_set_stacking_limits);
-> 
-> @@ -688,8 +689,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->   	t->zone_write_granularity = max(t->zone_write_granularity,
->   					b->zone_write_granularity);
->   	/* Request-based stacking drivers do not reorder requests. */
-> -	t->driver_preserves_write_order = b->driver_preserves_write_order;
-> -	t->use_zone_write_lock = b->use_zone_write_lock;
-> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
-> +		b->driver_preserves_write_order;
-> +	t->use_zone_write_lock = t->use_zone_write_lock ||
-> +		b->use_zone_write_lock;
->   	t->zoned = max(t->zoned, b->zoned);
->   	return ret;
->   }
+> Other than setting a default value for auto-hibernation, vendor drivers
+> must not modify the auto-hibernation settings.
+IMO, it is not a good solution to prohibit changing auto-hibernation 
+settings during runtime. I can think of a few situations where changing 
+this parameter may help the system such as:
+- Reduce heat. The device may be hot, so hibernate often helps.
+- Battery is low, so hibernate quicker to save battery.
+- Allows the vendor to make decision whether to trade performance for 
+power, or vice versa. Sometimes, the system can afford trading 
+performance for power saving.
 
-I think that should work. Testing/checking this with dm-linear by combining
-different null-blk devices with different configs should be easy enough.
+How about this?
+- Make ufshcd_auto_hibern8_enable() a static function. It should not be 
+called from the vendor drivers.
+- Mandate that vendor drivers must only update auto-hibernation settings 
+via the ufshcd_auto_hibern8_update() api. This function is already 
+exported, so only need to update the function comment to make it clear 
+(updating the hba->ahit alone may result in abnormal behavior).
+
+Thanks,
+Bao
+
 
 > 
+> ufshcd_auto_hibern8_enable() calls from outside 
+> ufshcd_auto_hibern8_update() are used to reapply auto-hibernation
+> settings and not to modify auto-hibernation settings.
 > 
->>>   	t->zoned = max(t->zoned, b->zoned);
->>>   	return ret;
->>>   }
->>> @@ -949,6 +954,8 @@ void disk_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
->>>   	}
->>>   
->>>   	q->limits.zoned = model;
->>> +	q->limits.use_zone_write_lock = model != BLK_ZONED_NONE &&
->>> +		!q->limits.driver_preserves_write_order;
->>
->> I think this needs a comment to explain the condition as it takes a while to
->> understand it.
+> So I think that integrating the following change on top of this patch is
+> sufficient:
 > 
-> Something like this?
+> @@ -5172,7 +5172,9 @@ static int ufshcd_slave_configure(struct 
+> scsi_device *sdev)
 > 
-> 	/*
-> 	 * Use the zone write lock only for zoned block devices and only if
-> 	 * the block driver does not preserve the order of write commands.
-> 	 */
+>       ufshcd_hpb_configure(hba, sdev);
+> 
+> -    q->limits.driver_preserves_write_order = true;
+> +    q->limits.driver_preserves_write_order =
+> +        !ufshcd_is_auto_hibern8_supported(hba) ||
+> +        FIELD_GET(UFSHCI_AHIBERN8_TIMER_MASK, hba->ahit) == 0;
+Yes, this should help.
 
-That works for me.
-
-> 
->>>   	if (model != BLK_ZONED_NONE) {
->>>   		/*
->>>   		 * Set the zone write granularity to the device logical block
->>
->> You also should set use_zone_write_lock to false in disk_clear_zone_settings().
-> 
-> I will do this.
-> 
->> In patch 9, ufshcd_auto_hibern8_update() changes the value of
->> driver_preserves_write_order, which will change the value of use_zone_write_lock
->> only if disk_set_zoned() is called again after ufshcd_auto_hibern8_update(). Is
->> that the case ? Is the drive revalidated always after
->> ufshcd_auto_hibern8_update() is executed ?
-> 
-> I will start with testing this change on top of this patch series:
-> 
-> --- a/drivers/ufs/core/ufshcd.c
-> +++ b/drivers/ufs/core/ufshcd.c
-> @@ -4350,6 +4350,7 @@ static void ufshcd_update_preserves_write_order(struct ufs_hba *hba,
->   		blk_mq_freeze_queue_wait(q);
->   		q->limits.driver_preserves_write_order = preserves_write_order;
->   		blk_mq_unfreeze_queue(q);
-> +		scsi_rescan_device(&sdev->sdev_gendev);
-
-Maybe calling disk_set_zoned() before blk_mq_unfreeze_queue() should be enough ?
-rescan/revalidate will be done in case you get a topology change event (or
-equivalent), which I think is not the case here.
-
->   	}
->   }
+>       blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
+>       if (hba->quirks & UFSHCD_QUIRK_4KB_DMA_ALIGNMENT)
+>           blk_queue_update_dma_alignment(q, SZ_4K - 1);
 > 
 > Thanks,
 > 
 > Bart.
 > 
-> 
-
--- 
-Damien Le Moal
-Western Digital Research
 
