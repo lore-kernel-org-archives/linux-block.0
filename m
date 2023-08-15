@@ -2,120 +2,218 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C41C04A6A
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 07:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DABF7C0015E
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 08:21:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235344AbjHOHuo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 03:50:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45002 "EHLO
+        id S234914AbjHOIVE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 04:21:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235527AbjHOHu0 (ORCPT
+        with ESMTP id S234049AbjHOIUo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 03:50:26 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E193111A;
-        Tue, 15 Aug 2023 00:50:24 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d62ae3fc7f1so3876934276.2;
-        Tue, 15 Aug 2023 00:50:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692085824; x=1692690624;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FA7UNvLh/NtwE8oB7thsQ+ZgxpcPVqBILp5Db1EACXc=;
-        b=i0vKNHq1GyS7aJEKx4XbRrsU+PCcQIEbW/RUDNyYjiAhDowmhMMCSpCW5uqmbQYhfU
-         0aUkNENEhyHUH4Og5FtJz4fLzUNs8pGPtvJaT5Pkmq4GcQ/RG1xOk8lJmVot4NzXWVVT
-         +EMe6Dsl16OBo1dKVXSrxy5sAXiDQQSezHfSLr+N0mYaql5ivZV9RC8qIGjF3BhqSdKg
-         j5NtGUd5VhucPZcectiLfIEWE2KX5unNEKK4w7eXIN6v5EBbc+sUKe2KXowzCE0hsBLU
-         IEfIZ1j3G9HfgN28SkhRqgplcntyqqZY6LS3sxLFknEs9+E4rix/NQLSeE45SDLAtyzU
-         d/Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692085824; x=1692690624;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FA7UNvLh/NtwE8oB7thsQ+ZgxpcPVqBILp5Db1EACXc=;
-        b=ZHhllPBDibaR25bl1IevukHuIbk7uRzkHANvYN1CmWW98uxOV1zfwPk1UbGCfQcU1M
-         kV7dw8eI+4+oo8lqC0To6mYc51xwsBQjs50VqSEHFf+WzXIC5k8WTG7e4ab9m6Xg6/r0
-         YAjOA2A2TdEsBBuGeehR40LwTFq1w9zHUVGOOPCt1i8uTV5zAur1hNIXwHSo2GICeJjF
-         lFNKWbySHasMKY65CWu+Sfcq13RqSBOe6zIofxlnVdfC6/qLiNm3YMweo1i9VeIP6ao7
-         bivC7WVgsYiFSeYrxgi+7FTbSAyEsxqSKON4+zBGPc8tynTqrpYKJv5BwnkhjQ/p4tLW
-         uOAA==
-X-Gm-Message-State: AOJu0YxUZiu2Pd7rLB5Mdh5Ml6tGhbBPj+M4ftq9Mg807IchFZzNlM88
-        n/rWOIKSf2UA3z+pjnJD1vECX8JnT6nm4zl3z2s=
-X-Google-Smtp-Source: AGHT+IHaiDSMY+QkhVwb3BPgUZZO+nmIvLSHf5aXIVOauSuFeN6IaJFsD4dH94ZZRJntrGxxCFrmO4AX2M6byBZ62ig=
-X-Received: by 2002:a25:bf86:0:b0:c83:27d4:c0d6 with SMTP id
- l6-20020a25bf86000000b00c8327d4c0d6mr9479331ybk.37.1692085824032; Tue, 15 Aug
- 2023 00:50:24 -0700 (PDT)
+        Tue, 15 Aug 2023 04:20:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8083B1703
+        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 01:19:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692087581;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UF3lqFgAWM3woBisT/XHF1hR2APGwzy9dAgACkIkoRk=;
+        b=HhytXsip1GGNWp7SLG7WCkMGZRdZEZ/PzLsLF6Rj/WG6bVDvEhf2nfD8tPy00ipkbBIO3M
+        Y6JyKwZIkAQwzlnHMRdo2I2iDOQAP4YutHi4Dw1XdnHnRcI5T1DahFTCFO/QCVg/5/Le0F
+        FTHw7ttc0m67vO6oA8drDvJ40OHk4A4=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-665-p6Ist1xPNauhruad7BGL3w-1; Tue, 15 Aug 2023 04:19:38 -0400
+X-MC-Unique: p6Ist1xPNauhruad7BGL3w-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BBCCB38008A2;
+        Tue, 15 Aug 2023 08:19:37 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C720C492C13;
+        Tue, 15 Aug 2023 08:19:35 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230815060443.660263-1-chengming.zhou@linux.dev>
+References: <20230815060443.660263-1-chengming.zhou@linux.dev>
+To:     chengming.zhou@linux.dev
+Cc:     dhowells@redhat.com, axboe@kernel.dk, kch@nvidia.com,
+        damien.lemoal@opensource.wdc.com, bvanassche@acm.org,
+        nj.shetty@samsung.com, kbusch@kernel.org,
+        zhouchengming@bytedance.com, akinobu.mita@gmail.com,
+        shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] null_blk: fix poll request timeout handling
 MIME-Version: 1.0
-References: <20230811105300.15889-1-nj.shetty@samsung.com> <CGME20230811105648epcas5p3ae8b8f6ed341e2aa253e8b4de8920a4d@epcas5p3.samsung.com>
- <20230811105300.15889-3-nj.shetty@samsung.com> <3b1da341-1c7f-e28f-d6aa-cecb83188f34@acm.org>
- <20230814121853.ms4acxwr56etf3ph@green245> <abad92af-d8b2-0488-cc75-01a3f4e8e270@acm.org>
-In-Reply-To: <abad92af-d8b2-0488-cc75-01a3f4e8e270@acm.org>
-From:   Nitesh Shetty <nitheshshetty@gmail.com>
-Date:   Tue, 15 Aug 2023 13:20:12 +0530
-Message-ID: <CAOSviJ1XL1UyMk2Ur37cJpW5BJAE5Ts6J4BtTSRd2_h_NPtGCQ@mail.gmail.com>
-Subject: Re: [dm-devel] [PATCH v14 02/11] Add infrastructure for copy offload
- in block and request layer.
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        martin.petersen@oracle.com, linux-doc@vger.kernel.org,
-        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, mcgrof@kernel.org, dlemoal@kernel.org,
-        linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <23382.1692087575.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date:   Tue, 15 Aug 2023 09:19:35 +0100
+Message-ID: <23383.1692087575@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We had kept this as a part of blk-types.h because we saw some other functio=
-ns
-trying to do similar things inside this file (op_is_write/flush/discard).
-But it should be okay for us to move it to blk-mq.h if that=E2=80=99s the r=
-ight way.
+chengming.zhou@linux.dev wrote:
 
-Thank you,
-Nitesh Shetty
+> From: Chengming Zhou <zhouchengming@bytedance.com>
+> =
+
+> When doing io_uring benchmark on /dev/nullb0, it's easy to crash the
+> kernel if poll requests timeout triggered, as reported by David. [1]
+> =
+
+> BUG: kernel NULL pointer dereference, address: 0000000000000008
+> Workqueue: kblockd blk_mq_timeout_work
+> RIP: 0010:null_timeout_rq+0x4e/0x91
+> Call Trace:
+>  ? __die_body+0x1a/0x5c
+>  ? page_fault_oops+0x6f/0x9c
+>  ? kernelmode_fixup_or_oops+0xc6/0xd6
+>  ? __bad_area_nosemaphore+0x44/0x1eb
+>  ? exc_page_fault+0xe2/0xf4
+>  ? asm_exc_page_fault+0x22/0x30
+>  ? null_timeout_rq+0x4e/0x91
+>  blk_mq_handle_expired+0x31/0x4b
+>  bt_iter+0x68/0x84
+>  ? bt_tags_iter+0x81/0x81
+>  __sbitmap_for_each_set.constprop.0+0xb0/0xf2
+>  ? __blk_mq_complete_request_remote+0xf/0xf
+>  bt_for_each+0x46/0x64
+>  ? __blk_mq_complete_request_remote+0xf/0xf
+>  ? percpu_ref_get_many+0xc/0x2a
+>  blk_mq_queue_tag_busy_iter+0x14d/0x18e
+>  blk_mq_timeout_work+0x95/0x127
+>  process_one_work+0x185/0x263
+>  worker_thread+0x1b5/0x227
+>  ? rescuer_thread+0x287/0x287
+>  kthread+0xfa/0x102
+>  ? kthread_complete_and_exit+0x1b/0x1b
+>  ret_from_fork+0x22/0x30
+> =
+
+> This is indeed a race problem between null_timeout_rq() and null_poll().
+> =
+
+> null_poll()				null_timeout_rq()
+>   spin_lock(&nq->poll_lock)
+>   list_splice_init(&nq->poll_list, &list)
+>   spin_unlock(&nq->poll_lock)
+> =
+
+>   while (!list_empty(&list))
+>     req =3D list_first_entry()
+>     list_del_init()
+>     ...
+>     blk_mq_add_to_batch()
+>     // req->rq_next =3D NULL
+> 					spin_lock(&nq->poll_lock)
+> =
+
+> 					// rq->queuelist->next =3D=3D NULL
+> 					list_del_init(&rq->queuelist)
+> =
+
+> 					spin_unlock(&nq->poll_lock)
+> =
+
+> What's worse is that we don't call blk_mq_complete_request_remote()
+> before blk_mq_add_to_batch(), so these completed requests have wrong
+> rq->state =3D=3D MQ_RQ_IN_FLIGHT. We can easily check this using bpftrac=
+e:
+> =
+
+> ```
+> bpftrace -e 'kretfunc:null_blk:null_poll {
+>   $iob=3D(struct io_comp_batch *)args->iob;
+>   @[$iob->req_list->state]=3Dcount();
+> }'
+> =
+
+> @[1]: 51708
+> ```
+> =
+
+> Fix these problems by setting requests state to MQ_RQ_COMPLETE under
+> nq->poll_lock protection, in which null_timeout_rq() can safely detect
+> this race and early return.
+> =
+
+> [1] https://lore.kernel.org/all/3893581.1691785261@warthog.procyon.org.u=
+k/
+> =
+
+> Fixes: 0a593fbbc245 ("null_blk: poll queue support")
+> Reported-by: David Howells <dhowells@redhat.com>
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+
+Okay, the oops no longer seems to happen, so on that basis:
+
+Tested-by: David Howells <dhowells@redhat.com>
 
 
-On Mon, Aug 14, 2023 at 8:28=E2=80=AFPM Bart Van Assche <bvanassche@acm.org=
-> wrote:
->
-> On 8/14/23 05:18, Nitesh Shetty wrote:
-> > On 23/08/11 02:25PM, Bart Van Assche wrote:
-> >> On 8/11/23 03:52, Nitesh Shetty wrote:
-> >>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> >>> index 0bad62cca3d0..de0ad7a0d571 100644
-> >>> +static inline bool op_is_copy(blk_opf_t op)
-> >>> +{
-> >>> +    return ((op & REQ_OP_MASK) =3D=3D REQ_OP_COPY_SRC ||
-> >>> +        (op & REQ_OP_MASK) =3D=3D REQ_OP_COPY_DST);
-> >>> +}
-> >>> +
-> >>
-> >> The above function should be moved into include/linux/blk-mq.h below t=
-he
-> >> definition of req_op() such that it can use req_op() instead of
-> >> open-coding it.
-> >>
-> > We use this later for dm patches(patch 9) as well, and we don't have
-> > request at
-> > that time.
->
-> My understanding is that include/linux/blk_types.h should only contain
-> data types and constants and hence that inline functions like
-> op_is_copy() should be moved elsewhere.
->
-> Bart.
->
+However, running:
+
+	./fio/t/io_uring -n4 /dev/nullb0
+
+and then interrupting it with ctrl-C after a while dumps a whole load of
+messages into the dmesg log (excerpt attached).  It seems wrong that the u=
+ser
+should be able to generate a dump like this just by interrupting - but I g=
+uess
+as it's null_blk it probably doesn't matter.
+
+David
+---
+null_blk: rq 00000000bb2d3264 timed out
+timeout error, dev nullb0, sector 328372624 op 0x0:(READ) flags 0xe00000 p=
+hys_seg 1 prio class 2
+null_blk: rq 00000000abcc1075 timed out
+timeout error, dev nullb0, sector 378610072 op 0x0:(READ) flags 0xe00000 p=
+hys_seg 1 prio class 2
+null_blk: rq 00000000d4bdc71f timed out
+timeout error, dev nullb0, sector 185005312 op 0x0:(READ) flags 0xe00000 p=
+hys_seg 1 prio class 2
+null_blk: rq 00000000f4ffddee timed out
+timeout error, dev nullb0, sector 206118608 op 0x0:(READ) flags 0xe00000 p=
+hys_seg 1 prio class 2
+null_blk: rq 000000001e68b709 timed out
+timeout error, dev nullb0, sector 310381160 op 0x0:(READ) flags 0xe00000 p=
+hys_seg 1 prio class 2
+null_blk: rq 00000000bfeafe97 timed out
+timeout error, dev nullb0, sector 52036480 op 0x0:(READ) flags 0xe00000 ph=
+ys_seg 1 prio class 2
+null_blk: rq 00000000aa67d21c timed out
+timeout error, dev nullb0, sector 22746448 op 0x0:(READ) flags 0xe00000 ph=
+ys_seg 1 prio class 2
+null_blk: rq 00000000faec1291 timed out
+timeout error, dev nullb0, sector 391201440 op 0x0:(READ) flags 0xe00000 p=
+hys_seg 1 prio class 2
+null_blk: rq 00000000c634428c timed out
+timeout error, dev nullb0, sector 237216136 op 0x0:(READ) flags 0xe00000 p=
+hys_seg 1 prio class 2
+null_blk: rq 0000000077f91a5d timed out
+timeout error, dev nullb0, sector 453778912 op 0x0:(READ) flags 0xe00000 p=
+hys_seg 1 prio class 2
+null_blk: rq 000000003076467c timed out
+null_blk: rq 000000009c172678 timed out
+null_blk: rq 000000002df50b48 timed out
+null_blk: rq 00000000e4c66900 timed out
+null_blk: rq 0000000082606e31 timed out
+null_blk: rq 00000000fe21ffdc timed out
+null_blk: rq 000000005e5c5173 timed out
+null_blk: rq 00000000b0a0d20c timed out
+null_blk: rq 000000008c729e47 timed out
+null_blk: rq 00000000970f75a0 timed out
+null_blk: rq 000000002ad3c45a timed out
+
