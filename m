@@ -2,79 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE8DC0015E
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 11:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF52C001B0
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 11:49:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236599AbjHOLNn convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 07:13:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41348 "EHLO
+        id S236862AbjHOLtD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 07:49:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236623AbjHOLNE (ORCPT
+        with ESMTP id S236896AbjHOLsw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 07:13:04 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EEE7107
-        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 04:13:02 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-180-guUsedkBOBOlgnKb9Vot1w-1; Tue, 15 Aug 2023 12:12:59 +0100
-X-MC-Unique: guUsedkBOBOlgnKb9Vot1w-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 15 Aug
- 2023 12:12:57 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Tue, 15 Aug 2023 12:12:57 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'David Howells' <dhowells@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-CC:     "jlayton@kernel.org" <jlayton@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH] iov_iter: Convert iterate*() to inline funcs
-Thread-Topic: [RFC PATCH] iov_iter: Convert iterate*() to inline funcs
-Thread-Index: AQHZzGHVnVxrFjw7PE2nk6LHTBa8tq/rOLUQ
-Date:   Tue, 15 Aug 2023 11:12:57 +0000
-Message-ID: <aceea2408bf049aebb1f1f893281795c@AcuMS.aculab.com>
-References: <3710261.1691764329@warthog.procyon.org.uk>
-In-Reply-To: <3710261.1691764329@warthog.procyon.org.uk>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Tue, 15 Aug 2023 07:48:52 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AFDF10CF
+        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 04:48:51 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RQ8ch6KsVzVjr6;
+        Tue, 15 Aug 2023 19:46:44 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 15 Aug
+ 2023 19:48:48 +0800
+From:   Ruan Jinjie <ruanjinjie@huawei.com>
+To:     <linux-block@vger.kernel.org>, Ming Lei <ming.lei@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     <ruanjinjie@huawei.com>
+Subject: [PATCH -next] ublk: Switch to memdup_user_nul() helper
+Date:   Tue, 15 Aug 2023 19:48:14 +0800
+Message-ID: <20230815114815.1551171-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Howells
-> Sent: 11 August 2023 15:32
-> 
-> Convert the iov_iter iteration macros to inline functions to make the code
-> easier to follow.  Ideally, the optimiser would produce much the same code
-> in both cases, but the revised code ends up a bit bigger.
-...
+Use memdup_user_nul() helper instead of open-coding
+to simplify the code.
 
-Actually quite typical because inlining happens much later on.
-I suspect that the #define benefits from the compile front-end
-optimising constants.
+Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+---
+ drivers/block/ublk_drv.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-	David
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 85a81ee556d5..fa7e6955eb3b 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -2743,14 +2743,9 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
+ 	if (header->len < header->dev_path_len)
+ 		return -EINVAL;
+ 
+-	dev_path = kmalloc(header->dev_path_len + 1, GFP_KERNEL);
+-	if (!dev_path)
+-		return -ENOMEM;
 -
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+-	ret = -EFAULT;
+-	if (copy_from_user(dev_path, argp, header->dev_path_len))
+-		goto exit;
+-	dev_path[header->dev_path_len] = 0;
++	dev_path = memdup_user_nul(argp, header->dev_path_len);
++	if (IS_ERR(dev_path))
++		return PTR_ERR(dev_path);
+ 
+ 	ret = -EINVAL;
+ 	switch (_IOC_NR(cmd->cmd_op)) {
+-- 
+2.34.1
 
