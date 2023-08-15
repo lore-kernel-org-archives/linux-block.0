@@ -2,88 +2,167 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D661C04FE0
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 05:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D7EC001B0
+	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 06:07:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232416AbjHOFf7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 01:35:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43800 "EHLO
+        id S235057AbjHOGH1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 02:07:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234708AbjHOFaD (ORCPT
+        with ESMTP id S235090AbjHOGGq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 01:30:03 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8281293
-        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 22:29:59 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-82-92.bstnma.fios.verizon.net [173.48.82.92])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 37F5TlsN002022
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Aug 2023 01:29:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1692077390; bh=KV8dziXjkt2w+JS9iEHu4PQQdHS/0krnQy5HzZLUJaE=;
-        h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-        b=HgRUJ5nFM8FqNUDGQuMtyqAjm6sgDHSZnNCFVsd4ImQ4jD0ZEIUlFu+gyzg6L54cx
-         bCds0BnTMCc9ptxiyfi7Xk6riBcdjE1/c+mJZXSsdP7GVti85+bylqf0oXq+vTZRZg
-         YJdxdK05EMkk6UCDBIK7ET0jROuNqpbJd1eXbQKNcfRufMS1zSa415kZOBX3oMcprT
-         vNmH1nfIUPUDJO6u2qKoQOSBOniUHKt5y8Fr5SSmnhKKtQYyvKFwtgw3HRlI5mrM+T
-         XLS7ZQP2K/lwDynTBXVMAGmY72VSegtRu2imOk0c9o0fOlgobDBVg5bHt7kkqOaXx/
-         R4NeIyGj6ArXA==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id A9D0615C0292; Tue, 15 Aug 2023 01:29:47 -0400 (EDT)
-Date:   Tue, 15 Aug 2023 01:29:47 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, ksummit@lists.linux.dev
-Subject: Maintainers Summit 2023 Call for Topics
-Message-ID: <20230815052947.GA3214753@mit.edu>
+        Tue, 15 Aug 2023 02:06:46 -0400
+X-Greylist: delayed 137961 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 14 Aug 2023 23:05:43 PDT
+Received: from out-74.mta1.migadu.com (out-74.mta1.migadu.com [IPv6:2001:41d0:203:375::4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14FF530DA
+        for <linux-block@vger.kernel.org>; Mon, 14 Aug 2023 23:05:42 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1692079529;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=wWsB6kltJ58XUaHsFfqL6Q4RJBmpJEQuaQ5cbRsruY0=;
+        b=NUHbtoXEkOC8aBNe94FABWlMwijvoLrxPXdAz3cp2t7x8mszPyYnRShHVoRdYT3qPD5tLB
+        +t02N9eyMZwIdEVE0NAV0OYK/eOF+laBK0+x0X9i+s1cJD4ynQ8cAhQyrn2ia3XJBfoZ/v
+        /D2RPLbW1RgSe4Az0tdTxRbZd0eUSZw=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, kch@nvidia.com, dhowells@redhat.com
+Cc:     damien.lemoal@opensource.wdc.com, bvanassche@acm.org,
+        nj.shetty@samsung.com, kbusch@kernel.org,
+        zhouchengming@bytedance.com, akinobu.mita@gmail.com,
+        shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] null_blk: fix poll request timeout handling
+Date:   Tue, 15 Aug 2023 14:04:42 +0800
+Message-ID: <20230815060443.660263-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This year, the Maintainers Summit will be held in Richmond, VA on
-November 16th, 2023, just after the Linux Plumber's Conference
-(November 13--15th).
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-As in previous years, the Maintainers Summit is invite-only, where the
-primary focus will be process issues around Linux Kernel Development.
-It will be limited to 30 invitees and a handful of sponsored
-attendees.
+When doing io_uring benchmark on /dev/nullb0, it's easy to crash the
+kernel if poll requests timeout triggered, as reported by David. [1]
 
-Linus has generated a list of people for the program committee to
-consider.  People who suggest topics that should be discussed at the
-Maintainers Summit will also be added to the list for consideration.
-To make topic suggestions for the Maintainers Summit, please send
-e-mail to the ksummit@lists.linux.dev with a subject prefix of
-[MAINTAINERS SUMMIT].
+BUG: kernel NULL pointer dereference, address: 0000000000000008
+Workqueue: kblockd blk_mq_timeout_work
+RIP: 0010:null_timeout_rq+0x4e/0x91
+Call Trace:
+ ? __die_body+0x1a/0x5c
+ ? page_fault_oops+0x6f/0x9c
+ ? kernelmode_fixup_or_oops+0xc6/0xd6
+ ? __bad_area_nosemaphore+0x44/0x1eb
+ ? exc_page_fault+0xe2/0xf4
+ ? asm_exc_page_fault+0x22/0x30
+ ? null_timeout_rq+0x4e/0x91
+ blk_mq_handle_expired+0x31/0x4b
+ bt_iter+0x68/0x84
+ ? bt_tags_iter+0x81/0x81
+ __sbitmap_for_each_set.constprop.0+0xb0/0xf2
+ ? __blk_mq_complete_request_remote+0xf/0xf
+ bt_for_each+0x46/0x64
+ ? __blk_mq_complete_request_remote+0xf/0xf
+ ? percpu_ref_get_many+0xc/0x2a
+ blk_mq_queue_tag_busy_iter+0x14d/0x18e
+ blk_mq_timeout_work+0x95/0x127
+ process_one_work+0x185/0x263
+ worker_thread+0x1b5/0x227
+ ? rescuer_thread+0x287/0x287
+ kthread+0xfa/0x102
+ ? kthread_complete_and_exit+0x1b/0x1b
+ ret_from_fork+0x22/0x30
 
-For an examples of past Maintainers Summit topics, please see the
-these LWN articles:
+This is indeed a race problem between null_timeout_rq() and null_poll().
 
- * 2022 https://lwn.net/Articles/908320/
- * 2021 https://lwn.net/Articles/870415/
- * 2019 https://lwn.net/Articles/799060/
+null_poll()				null_timeout_rq()
+  spin_lock(&nq->poll_lock)
+  list_splice_init(&nq->poll_list, &list)
+  spin_unlock(&nq->poll_lock)
 
-Invites will be sent out on a rolling basis, with the first batch
-being sent out in roughly 2 weeks or so, so if you have some topics
-which you are burning to discuss, why not wait and submit them today?  :-)
+  while (!list_empty(&list))
+    req = list_first_entry()
+    list_del_init()
+    ...
+    blk_mq_add_to_batch()
+    // req->rq_next = NULL
+					spin_lock(&nq->poll_lock)
 
+					// rq->queuelist->next == NULL
+					list_del_init(&rq->queuelist)
 
-If you were not subscribed on to the kernel mailing list from
-last year (or if you had removed yourself after the kernel summit),
-you can subscribe by sending an e-mail to the address:
+					spin_unlock(&nq->poll_lock)
 
-   ksummit+subscribe@lists.linux.dev
+What's worse is that we don't call blk_mq_complete_request_remote()
+before blk_mq_add_to_batch(), so these completed requests have wrong
+rq->state == MQ_RQ_IN_FLIGHT. We can easily check this using bpftrace:
 
-The program committee this year is composed of the following people:
+```
+bpftrace -e 'kretfunc:null_blk:null_poll {
+  $iob=(struct io_comp_batch *)args->iob;
+  @[$iob->req_list->state]=count();
+}'
 
-Christian Brauner
-Jon Corbet
-Greg KH
-Ted Ts'o
-Rafael J. Wysocki
+@[1]: 51708
+```
+
+Fix these problems by setting requests state to MQ_RQ_COMPLETE under
+nq->poll_lock protection, in which null_timeout_rq() can safely detect
+this race and early return.
+
+[1] https://lore.kernel.org/all/3893581.1691785261@warthog.procyon.org.uk/
+
+Fixes: 0a593fbbc245 ("null_blk: poll queue support")
+Reported-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ drivers/block/null_blk/main.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 864013019d6b..968090935eb2 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1643,9 +1643,12 @@ static int null_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+ 	struct nullb_queue *nq = hctx->driver_data;
+ 	LIST_HEAD(list);
+ 	int nr = 0;
++	struct request *rq;
+ 
+ 	spin_lock(&nq->poll_lock);
+ 	list_splice_init(&nq->poll_list, &list);
++	list_for_each_entry(rq, &list, queuelist)
++		blk_mq_set_request_complete(rq);
+ 	spin_unlock(&nq->poll_lock);
+ 
+ 	while (!list_empty(&list)) {
+@@ -1671,16 +1674,21 @@ static enum blk_eh_timer_return null_timeout_rq(struct request *rq)
+ 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+ 	struct nullb_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 
+-	pr_info("rq %p timed out\n", rq);
+-
+ 	if (hctx->type == HCTX_TYPE_POLL) {
+ 		struct nullb_queue *nq = hctx->driver_data;
+ 
+ 		spin_lock(&nq->poll_lock);
++		/* The request may have completed meanwhile. */
++		if (blk_mq_request_completed(rq)) {
++			spin_unlock(&nq->poll_lock);
++			return BLK_EH_DONE;
++		}
+ 		list_del_init(&rq->queuelist);
+ 		spin_unlock(&nq->poll_lock);
+ 	}
+ 
++	pr_info("rq %p timed out\n", rq);
++
+ 	/*
+ 	 * If the device is marked as blocking (i.e. memory backed or zoned
+ 	 * device), the submission path may be blocked waiting for resources
+-- 
+2.41.0
+
