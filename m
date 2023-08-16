@@ -2,111 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C688C001DF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 08:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8781AC001DF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 08:55:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243029AbjHPIdg convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 04:33:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33816 "EHLO
+        id S243157AbjHPIyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 04:54:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243094AbjHPIcv (ORCPT
+        with ESMTP id S243213AbjHPIyj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 04:32:51 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A790F2D4D
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 01:31:57 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-102-GQJWoHGIPVK3nlIn0yNs6w-1; Wed, 16 Aug 2023 09:30:54 +0100
-X-MC-Unique: GQJWoHGIPVK3nlIn0yNs6w-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 16 Aug
- 2023 09:30:52 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 16 Aug 2023 09:30:52 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'David Howells' <dhowells@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
-        "jlayton@kernel.org" <jlayton@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH v2] iov_iter: Convert iterate*() to inline funcs
-Thread-Topic: [RFC PATCH v2] iov_iter: Convert iterate*() to inline funcs
-Thread-Index: AQHZzvgmq2lQZxPz+UuF+eoksadYZ6/rhpfw
-Date:   Wed, 16 Aug 2023 08:30:52 +0000
-Message-ID: <8722207799c342e780e1162a983dc48b@AcuMS.aculab.com>
-References: <855.1692047347@warthog.procyon.org.uk>
- <5247.1692049208@warthog.procyon.org.uk>
-In-Reply-To: <5247.1692049208@warthog.procyon.org.uk>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Wed, 16 Aug 2023 04:54:39 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0403610C8;
+        Wed, 16 Aug 2023 01:54:37 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RQhlW1Tnjz4f3jXm;
+        Wed, 16 Aug 2023 16:54:31 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+        by APP4 (Coremail) with SMTP id gCh0CgCXc6bEjtxkxHNZAw--.11704S3;
+        Wed, 16 Aug 2023 16:54:32 +0800 (CST)
+Message-ID: <6042c46d-72f1-6480-032d-1670916a734e@huaweicloud.com>
+Date:   Wed, 16 Aug 2023 16:54:28 +0800
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v4 0/4] block/badblocks: fix badblocks setting error
+To:     axboe@kernel.dk, vishal.l.verma@intel.com,
+        dan.j.williams@intel.com, ashok_raj@linux.intel.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
+        yangerkun@huawei.com
+References: <20230626080913.3493135-1-linan666@huaweicloud.com>
+From:   Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <20230626080913.3493135-1-linan666@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCXc6bEjtxkxHNZAw--.11704S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrKryxKw13ZF4rZF13GF1kGrg_yoWktFc_u3
+        yIyFyrGr4kXayfAay3tF15XrWIyF4UCr10kFyDtr4Sqr17tF4Utws5JrWDXwnxWF4kWwn8
+        Z3s5XryfXw1IqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbakYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l
+        5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67
+        AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+        IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+        MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+        WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3
+        Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8Jb
+        IYCTnIWIevJa73UjIFyTuYvjxUFfHjUUUUU
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Howells
-> Sent: 14 August 2023 22:40
-> 
-> 
-> >         _copy_from_iter                          inc 0x36e -> 0x395 +0x27
-> 
-> Here a disassembly of _copy_from_iter() from unpatched and patched, marked up for
-> the different iterator-type branches.  To summarise:
-> 
-> 		UNPATCHED	PATCHED
-> 		START	LEN	START	LEN
-> 		=======	=======	=======	=======
-> Prologue	0	77	0	76
-> UBUF		77	36	76	36
-> IOVEC		113	148	112	105
-> BVEC		261	159	217	163
-> KVEC		420	125	380	116
-> XARRAY		545	286	496	374
-> DISCARD/Epi	831	42	870	42
-> Return		873	-	912	-
-> 
-> 
-> The overall change in the entire file, according to size, is:
->    19855     744       0   20599    5077 build3/lib/iov_iter.o -- before
->    19739     864       0   20603    507b build3/lib/iov_iter.o -- after
+Friendly ping.
 
-It is harder to compare because of some of the random name changes.
-The version of the source I found seems to pass priv2 to functions
-that don't use it?
+在 2023/6/26 16:09, linan666@huaweicloud.com 写道:
+> From: Li Nan <linan122@huawei.com>
+> 
+> This patch series fixes some simple bugs of setting badblocks and
+> optimizing struct badblocks. Coly Li has been trying to refactor badblocks
+> in patch series "badblocks improvement for multiple bad block ranges"
+> (https://lore.kernel.org/all/20220721121152.4180-1-colyli@suse.de). but the
+> workload is significant. Before that, I will fix some easily triggered
+> issues and optimize some code that does not conflict with Coly's changes.
+> 
+> Changes in v4:
+>   - patch 1, remove the part of reorder fields
+>   - patch 3/4, improve commit log.
+> 
+> Changes in v3:
+>   - delete patchs with significant changes.
+> 
+> Li Nan (4):
+>    block/badblocks: change some members of badblocks to bool
+>    block/badblocks: only set bb->changed/unacked_exist when badblocks
+>      changes
+>    block/badblocks: fix badblocks loss when badblocks combine
+>    block/badblocks: fix the bug of reverse order
+> 
+>   include/linux/badblocks.h |  9 +++++----
+>   block/badblocks.c         | 38 ++++++++++++++++++++++----------------
+>   2 files changed, 27 insertions(+), 20 deletions(-)
+> 
 
-Since the functions aren't inlined you get the cost of passing
-the parameters.
-This seems to affect the common cases.
-Is that all left over from a version that passed function pointers
-(with the hope they'd be inlined?).
-Just directly inlining the simple copies should help.
-
-I rather hope the should_fail_usercopy() and instrument_copy_xxx()
-calls are usually either absent or, at most, nops.
-
-This all seems to have a lot fewer options than last time I looked.
-Is it worth optimising the KVEC case with a single buffer?
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+-- 
+Thanks,
+Nan
 
