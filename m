@@ -2,66 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07464C001E0
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 07:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C688C001DF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 08:34:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233357AbjHPHid (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 03:38:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46986 "EHLO
+        id S243029AbjHPIdg convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 04:33:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242349AbjHPHiO (ORCPT
+        with ESMTP id S243094AbjHPIcv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 03:38:14 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A7A310FF
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 00:38:12 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RQg013C0RzFqZn;
-        Wed, 16 Aug 2023 15:35:13 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
- (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 16 Aug
- 2023 15:38:10 +0800
-From:   Ruan Jinjie <ruanjinjie@huawei.com>
-To:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
-CC:     <ruanjinjie@huawei.com>
-Subject: [PATCH -next] swim: Remove unnecessary check of res
-Date:   Wed, 16 Aug 2023 15:37:45 +0800
-Message-ID: <20230816073745.226425-1-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 16 Aug 2023 04:32:51 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A790F2D4D
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 01:31:57 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-102-GQJWoHGIPVK3nlIn0yNs6w-1; Wed, 16 Aug 2023 09:30:54 +0100
+X-MC-Unique: GQJWoHGIPVK3nlIn0yNs6w-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 16 Aug
+ 2023 09:30:52 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 16 Aug 2023 09:30:52 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Howells' <dhowells@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        Matthew Wilcox <willy@infradead.org>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [RFC PATCH v2] iov_iter: Convert iterate*() to inline funcs
+Thread-Topic: [RFC PATCH v2] iov_iter: Convert iterate*() to inline funcs
+Thread-Index: AQHZzvgmq2lQZxPz+UuF+eoksadYZ6/rhpfw
+Date:   Wed, 16 Aug 2023 08:30:52 +0000
+Message-ID: <8722207799c342e780e1162a983dc48b@AcuMS.aculab.com>
+References: <855.1692047347@warthog.procyon.org.uk>
+ <5247.1692049208@warthog.procyon.org.uk>
+In-Reply-To: <5247.1692049208@warthog.procyon.org.uk>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemi500008.china.huawei.com (7.221.188.139)
-X-CFilter-Loop: Reflected
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The resource is checked in probe function, so there is
-no need do this check in remove function.
+From: David Howells
+> Sent: 14 August 2023 22:40
+> 
+> 
+> >         _copy_from_iter                          inc 0x36e -> 0x395 +0x27
+> 
+> Here a disassembly of _copy_from_iter() from unpatched and patched, marked up for
+> the different iterator-type branches.  To summarise:
+> 
+> 		UNPATCHED	PATCHED
+> 		START	LEN	START	LEN
+> 		=======	=======	=======	=======
+> Prologue	0	77	0	76
+> UBUF		77	36	76	36
+> IOVEC		113	148	112	105
+> BVEC		261	159	217	163
+> KVEC		420	125	380	116
+> XARRAY		545	286	496	374
+> DISCARD/Epi	831	42	870	42
+> Return		873	-	912	-
+> 
+> 
+> The overall change in the entire file, according to size, is:
+>    19855     744       0   20599    5077 build3/lib/iov_iter.o -- before
+>    19739     864       0   20603    507b build3/lib/iov_iter.o -- after
 
-Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
----
- drivers/block/swim.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+It is harder to compare because of some of the random name changes.
+The version of the source I found seems to pass priv2 to functions
+that don't use it?
 
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index f85b6af414b4..6f7b5e15fd6d 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -933,8 +933,7 @@ static int swim_remove(struct platform_device *dev)
- 		floppy_eject(&swd->unit[drive]);
- 
- 	res = platform_get_resource(dev, IORESOURCE_MEM, 0);
--	if (res)
--		release_mem_region(res->start, resource_size(res));
-+	release_mem_region(res->start, resource_size(res));
- 
- 	kfree(swd);
- 
--- 
-2.34.1
+Since the functions aren't inlined you get the cost of passing
+the parameters.
+This seems to affect the common cases.
+Is that all left over from a version that passed function pointers
+(with the hope they'd be inlined?).
+Just directly inlining the simple copies should help.
+
+I rather hope the should_fail_usercopy() and instrument_copy_xxx()
+calls are usually either absent or, at most, nops.
+
+This all seems to have a lot fewer options than last time I looked.
+Is it worth optimising the KVEC case with a single buffer?
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
