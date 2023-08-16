@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EFAC001DF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 09:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67118C04A94
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 09:32:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243314AbjHPJ3C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 05:29:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49674 "EHLO
+        id S243344AbjHPJbp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 05:31:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243315AbjHPJ2h (ORCPT
+        with ESMTP id S242422AbjHPJbk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 05:28:37 -0400
+        Wed, 16 Aug 2023 05:31:40 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511C426A4;
-        Wed, 16 Aug 2023 02:28:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13B1B26A1;
+        Wed, 16 Aug 2023 02:31:39 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0E7882186F;
-        Wed, 16 Aug 2023 09:28:35 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id C7D692191A;
+        Wed, 16 Aug 2023 09:31:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1692178115; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1692178297; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3v+/Wi405rsVGzzaExajmDFKvpMN/i7HI4eeAj0pfWU=;
-        b=XkJanD5yZJgl8bb9mkFXnFDcEx4sySY7RY+x5ufziG1rwpF/bMKnVLphGL1drSm2Y6Ey8r
-        2lT7PhBYmm0ZAupI2KUGviMcxa/21SjJBIra0ZxJQkCpVdaBiqoa3mUzdAlXW/yT1gA5IA
-        GDxpTfIoyVkJNqCuwQ7H1OWX7j/+sB0=
+        bh=6sKyG7pmNqgi6eGz+JdQnSC3feV2UCUViK6Z12J6spo=;
+        b=WZ4PRyHOlZ2TgjYP+EDYWHzP2I1VGz0nPyOBLVnX09XlvQUrNqGoN1VFpVE1cBvzTXPt9a
+        9MbT3acHM6OysITkLAInhE8YwJsl4EEKyGTG/BTapu66or6dhtCFTI9FkCds77mAgcabRo
+        0pgDRxM0zS4ee70PhrVK1+8sBUM4bd4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1692178115;
+        s=susede2_ed25519; t=1692178297;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3v+/Wi405rsVGzzaExajmDFKvpMN/i7HI4eeAj0pfWU=;
-        b=ULIR+MRWe5CidH1YupjqjCLKpm8hhUkOrppAkcxLSc/mnMVX09az9R0PI4dEpRV+H4MjkQ
-        YJ1HkDHmpT3oQfCA==
+        bh=6sKyG7pmNqgi6eGz+JdQnSC3feV2UCUViK6Z12J6spo=;
+        b=aSwtdCnQ4/CNaHi+iCBy4oLJWfpXKwLzE7fThb5aa6MLdqHdXVGY8HgbUIiXTO01J0G65h
+        WiSJs4V6huUnARDg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F29F9133F2;
-        Wed, 16 Aug 2023 09:28:34 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B0215133F2;
+        Wed, 16 Aug 2023 09:31:37 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id Uq0mO8KW3GTYTQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 16 Aug 2023 09:28:34 +0000
-Date:   Wed, 16 Aug 2023 11:28:44 +0200
+        id GKQRK3mX3GSNTwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 16 Aug 2023 09:31:37 +0000
+Date:   Wed, 16 Aug 2023 11:31:46 +0200
 From:   Daniel Wagner <dwagner@suse.de>
 To:     Sagi Grimberg <sagi@grimberg.me>
 Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -57,60 +57,37 @@ Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>,
         James Smart <jsmart2021@gmail.com>,
         Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH blktests v3 13/13] nvme: Introduce
- nvmet_target_{setup/cleanup} common code
-Message-ID: <lfr3tkzz3sqnsw4y7sqyxc42ptvzkyfqfpeko6gzs42jdgjl2d@u5fbzjksbztd>
+Subject: Re: [PATCH blktests v3 00/13] Switch to allowed_host
+Message-ID: <6e3i34utxot67jod2opzksdufcnfypycule5kkrcfaezxxvyg4@ixifxnti4wqy>
 References: <20230811093614.28005-1-dwagner@suse.de>
- <20230811093614.28005-14-dwagner@suse.de>
- <58d299c4-84e1-603d-6c99-15d0484f9609@grimberg.me>
+ <1098c6a6-50cb-8704-9041-03c431155dfb@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <58d299c4-84e1-603d-6c99-15d0484f9609@grimberg.me>
+In-Reply-To: <1098c6a6-50cb-8704-9041-03c431155dfb@grimberg.me>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 13, 2023 at 05:55:48PM +0300, Sagi Grimberg wrote:
-> > --- a/tests/nvme/003
-> > +++ b/tests/nvme/003
-> > @@ -22,15 +22,9 @@ test() {
-> >   	_setup_nvmet
-> > -	local loop_dev
-> >   	local port
-> > -	port="$(_create_nvmet_port "${nvme_trtype}")"
-> > -
-> > -	loop_dev="$(losetup -f)"
-> > -
-> > -	_create_nvmet_subsystem "${def_subsysnqn}" "${loop_dev}"
-> > -	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
-> > +	port="$(_nvmet_target_setup --blkdev=device)"
-> >   	_nvme_connect_subsys "${nvme_trtype}" nqn.2014-08.org.nvmexpress.discovery
-> > @@ -46,9 +40,8 @@ test() {
-> >   	fi
-> >   	_nvme_disconnect_subsys nqn.2014-08.org.nvmexpress.discovery
-> > -	_remove_nvmet_subsystem_from_port "${port}" "${def_subsysnqn}"
-> > -	_remove_nvmet_subsystem "${def_subsysnqn}"
-> > -	_remove_nvmet_port "${port}"
-> > +
-> > +	_nvmet_target_cleanup "${port}"
+On Sun, Aug 13, 2023 at 05:59:53PM +0300, Sagi Grimberg wrote:
 > 
-> It is very very strange that _setup returns a port
-> which is passed to _cleanup...
+> > Addressed the comments from v2. I also added cleanup code to _nvmet_cleanup() to
+> > make sure we do not leak resources when something goes wrong. I run into this
+> > while testing and all tests after the first failure failed then.
+> 
+> The name of the patch series suggest that it switches to allowed_hosts
+> where it does that in 2 patches 11+12 out of 13 patches. The rest are
+> just bug fixes and unifications. It's true that any series will include
+> fixes, cleanups and prep patches, but this is too far :)
 
-This is the only information the _cleanup helper needs and that is why
-it survived the refactoring so far.
+I see your point. The whole series started smaller, but just grew over
+time. I suppose if we agree with the general direction we could just get
+the first part done (bug fixes and refactoring).
 
-> I think that _cleanup should simply remove all
-> ports, and that setup should not return a port
-> to begin with.
+> I'll let Shinichiro accept as he wish though.
 
-This assumes that blktests is the single user and can blindly remove
-everything. I would like to play nice here and only cleanup resources
-blktests actually allocates.
+I am fine either way, just let me know what you prefer.
 
-> If someone needs the actual port number, then it
-> should either not use this _setup helper or
-> query it somehow.
+> The cleanups look fine to me.
 
-I try to figure out how to implement such a query helper then.
+Thanks for reviewing!
