@@ -2,186 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 614FEC001E0
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 09:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EFAC001DF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 09:29:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243232AbjHPJPb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 05:15:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35154 "EHLO
+        id S243314AbjHPJ3C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 05:29:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243286AbjHPJP2 (ORCPT
+        with ESMTP id S243315AbjHPJ2h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 05:15:28 -0400
-Received: from out-30.mta0.migadu.com (out-30.mta0.migadu.com [IPv6:2001:41d0:1004:224b::1e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 856271BF8
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 02:15:26 -0700 (PDT)
-Message-ID: <9091fa43-1c38-58f4-b23d-7705fc647293@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692177324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Wed, 16 Aug 2023 05:28:37 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511C426A4;
+        Wed, 16 Aug 2023 02:28:36 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0E7882186F;
+        Wed, 16 Aug 2023 09:28:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692178115; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7hzRwpdWY8QIffBbn0D1YNeGrZzAgPJoF3wC1s2tY6M=;
-        b=XQBooO+R0LjluBdeAtLEQNXIFeBN6MY67jQWB2CEMoSSKsz6vpgkY7xN3PgdYHvND952wE
-        zbN7gPLjguh29PjLy9NxSKmPOg6mpSL4T4Lb/CHidSINUwBe4GZclVHq6q37qptqGvi60P
-        oZky3NRnyqPGtUHfvHfoJCW9oQhl8x0=
-Date:   Wed, 16 Aug 2023 17:15:14 +0800
+        bh=3v+/Wi405rsVGzzaExajmDFKvpMN/i7HI4eeAj0pfWU=;
+        b=XkJanD5yZJgl8bb9mkFXnFDcEx4sySY7RY+x5ufziG1rwpF/bMKnVLphGL1drSm2Y6Ey8r
+        2lT7PhBYmm0ZAupI2KUGviMcxa/21SjJBIra0ZxJQkCpVdaBiqoa3mUzdAlXW/yT1gA5IA
+        GDxpTfIoyVkJNqCuwQ7H1OWX7j/+sB0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692178115;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3v+/Wi405rsVGzzaExajmDFKvpMN/i7HI4eeAj0pfWU=;
+        b=ULIR+MRWe5CidH1YupjqjCLKpm8hhUkOrppAkcxLSc/mnMVX09az9R0PI4dEpRV+H4MjkQ
+        YJ1HkDHmpT3oQfCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F29F9133F2;
+        Wed, 16 Aug 2023 09:28:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Uq0mO8KW3GTYTQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 16 Aug 2023 09:28:34 +0000
+Date:   Wed, 16 Aug 2023 11:28:44 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH blktests v3 13/13] nvme: Introduce
+ nvmet_target_{setup/cleanup} common code
+Message-ID: <lfr3tkzz3sqnsw4y7sqyxc42ptvzkyfqfpeko6gzs42jdgjl2d@u5fbzjksbztd>
+References: <20230811093614.28005-1-dwagner@suse.de>
+ <20230811093614.28005-14-dwagner@suse.de>
+ <58d299c4-84e1-603d-6c99-15d0484f9609@grimberg.me>
 MIME-Version: 1.0
-Subject: Re: [PATCH] null_blk: fix poll request timeout handling
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>
-Cc:     axboe@kernel.dk, kch@nvidia.com, damien.lemoal@opensource.wdc.com,
-        bvanassche@acm.org, nj.shetty@samsung.com, kbusch@kernel.org,
-        zhouchengming@bytedance.com, akinobu.mita@gmail.com,
-        shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230815060443.660263-1-chengming.zhou@linux.dev>
- <23383.1692087575@warthog.procyon.org.uk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <23383.1692087575@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58d299c4-84e1-603d-6c99-15d0484f9609@grimberg.me>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/8/15 16:19, David Howells wrote:
-> chengming.zhou@linux.dev wrote:
+On Sun, Aug 13, 2023 at 05:55:48PM +0300, Sagi Grimberg wrote:
+> > --- a/tests/nvme/003
+> > +++ b/tests/nvme/003
+> > @@ -22,15 +22,9 @@ test() {
+> >   	_setup_nvmet
+> > -	local loop_dev
+> >   	local port
+> > -	port="$(_create_nvmet_port "${nvme_trtype}")"
+> > -
+> > -	loop_dev="$(losetup -f)"
+> > -
+> > -	_create_nvmet_subsystem "${def_subsysnqn}" "${loop_dev}"
+> > -	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+> > +	port="$(_nvmet_target_setup --blkdev=device)"
+> >   	_nvme_connect_subsys "${nvme_trtype}" nqn.2014-08.org.nvmexpress.discovery
+> > @@ -46,9 +40,8 @@ test() {
+> >   	fi
+> >   	_nvme_disconnect_subsys nqn.2014-08.org.nvmexpress.discovery
+> > -	_remove_nvmet_subsystem_from_port "${port}" "${def_subsysnqn}"
+> > -	_remove_nvmet_subsystem "${def_subsysnqn}"
+> > -	_remove_nvmet_port "${port}"
+> > +
+> > +	_nvmet_target_cleanup "${port}"
 > 
->> From: Chengming Zhou <zhouchengming@bytedance.com>
->>
->> When doing io_uring benchmark on /dev/nullb0, it's easy to crash the
->> kernel if poll requests timeout triggered, as reported by David. [1]
->>
->> BUG: kernel NULL pointer dereference, address: 0000000000000008
->> Workqueue: kblockd blk_mq_timeout_work
->> RIP: 0010:null_timeout_rq+0x4e/0x91
->> Call Trace:
->>  ? __die_body+0x1a/0x5c
->>  ? page_fault_oops+0x6f/0x9c
->>  ? kernelmode_fixup_or_oops+0xc6/0xd6
->>  ? __bad_area_nosemaphore+0x44/0x1eb
->>  ? exc_page_fault+0xe2/0xf4
->>  ? asm_exc_page_fault+0x22/0x30
->>  ? null_timeout_rq+0x4e/0x91
->>  blk_mq_handle_expired+0x31/0x4b
->>  bt_iter+0x68/0x84
->>  ? bt_tags_iter+0x81/0x81
->>  __sbitmap_for_each_set.constprop.0+0xb0/0xf2
->>  ? __blk_mq_complete_request_remote+0xf/0xf
->>  bt_for_each+0x46/0x64
->>  ? __blk_mq_complete_request_remote+0xf/0xf
->>  ? percpu_ref_get_many+0xc/0x2a
->>  blk_mq_queue_tag_busy_iter+0x14d/0x18e
->>  blk_mq_timeout_work+0x95/0x127
->>  process_one_work+0x185/0x263
->>  worker_thread+0x1b5/0x227
->>  ? rescuer_thread+0x287/0x287
->>  kthread+0xfa/0x102
->>  ? kthread_complete_and_exit+0x1b/0x1b
->>  ret_from_fork+0x22/0x30
->>
->> This is indeed a race problem between null_timeout_rq() and null_poll().
->>
->> null_poll()				null_timeout_rq()
->>   spin_lock(&nq->poll_lock)
->>   list_splice_init(&nq->poll_list, &list)
->>   spin_unlock(&nq->poll_lock)
->>
->>   while (!list_empty(&list))
->>     req = list_first_entry()
->>     list_del_init()
->>     ...
->>     blk_mq_add_to_batch()
->>     // req->rq_next = NULL
->> 					spin_lock(&nq->poll_lock)
->>
->> 					// rq->queuelist->next == NULL
->> 					list_del_init(&rq->queuelist)
->>
->> 					spin_unlock(&nq->poll_lock)
->>
->> What's worse is that we don't call blk_mq_complete_request_remote()
->> before blk_mq_add_to_batch(), so these completed requests have wrong
->> rq->state == MQ_RQ_IN_FLIGHT. We can easily check this using bpftrace:
->>
->> ```
->> bpftrace -e 'kretfunc:null_blk:null_poll {
->>   $iob=(struct io_comp_batch *)args->iob;
->>   @[$iob->req_list->state]=count();
->> }'
->>
->> @[1]: 51708
->> ```
->>
->> Fix these problems by setting requests state to MQ_RQ_COMPLETE under
->> nq->poll_lock protection, in which null_timeout_rq() can safely detect
->> this race and early return.
->>
->> [1] https://lore.kernel.org/all/3893581.1691785261@warthog.procyon.org.uk/
->>
->> Fixes: 0a593fbbc245 ("null_blk: poll queue support")
->> Reported-by: David Howells <dhowells@redhat.com>
->> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> 
-> Okay, the oops no longer seems to happen, so on that basis:
-> 
-> Tested-by: David Howells <dhowells@redhat.com>
-> 
+> It is very very strange that _setup returns a port
+> which is passed to _cleanup...
 
-Yes, this patch just fixes the kernel oops when request timeout happened.
+This is the only information the _cleanup helper needs and that is why
+it survived the refactoring so far.
 
-> 
-> However, running:
-> 
-> 	./fio/t/io_uring -n4 /dev/nullb0
-> 
-> and then interrupting it with ctrl-C after a while dumps a whole load of
-> messages into the dmesg log (excerpt attached).  It seems wrong that the user
-> should be able to generate a dump like this just by interrupting - but I guess
-> as it's null_blk it probably doesn't matter.
+> I think that _cleanup should simply remove all
+> ports, and that setup should not return a port
+> to begin with.
 
-I can reproduce it, maybe an issue in io_uring. Although io_uring will reap
-all pending requests when task exit, it seems that it will block for some
-seconds before doing reap, so timeout happen. I'm not sure, just some guess ;-)
+This assumes that blktests is the single user and can blindly remove
+everything. I would like to play nice here and only cleanup resources
+blktests actually allocates.
 
-Thanks.
+> If someone needs the actual port number, then it
+> should either not use this _setup helper or
+> query it somehow.
 
-> 
-> David
-> ---
-> null_blk: rq 00000000bb2d3264 timed out
-> timeout error, dev nullb0, sector 328372624 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 00000000abcc1075 timed out
-> timeout error, dev nullb0, sector 378610072 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 00000000d4bdc71f timed out
-> timeout error, dev nullb0, sector 185005312 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 00000000f4ffddee timed out
-> timeout error, dev nullb0, sector 206118608 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 000000001e68b709 timed out
-> timeout error, dev nullb0, sector 310381160 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 00000000bfeafe97 timed out
-> timeout error, dev nullb0, sector 52036480 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 00000000aa67d21c timed out
-> timeout error, dev nullb0, sector 22746448 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 00000000faec1291 timed out
-> timeout error, dev nullb0, sector 391201440 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 00000000c634428c timed out
-> timeout error, dev nullb0, sector 237216136 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 0000000077f91a5d timed out
-> timeout error, dev nullb0, sector 453778912 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
-> null_blk: rq 000000003076467c timed out
-> null_blk: rq 000000009c172678 timed out
-> null_blk: rq 000000002df50b48 timed out
-> null_blk: rq 00000000e4c66900 timed out
-> null_blk: rq 0000000082606e31 timed out
-> null_blk: rq 00000000fe21ffdc timed out
-> null_blk: rq 000000005e5c5173 timed out
-> null_blk: rq 00000000b0a0d20c timed out
-> null_blk: rq 000000008c729e47 timed out
-> null_blk: rq 00000000970f75a0 timed out
-> null_blk: rq 000000002ad3c45a timed out
-> 
+I try to figure out how to implement such a query helper then.
