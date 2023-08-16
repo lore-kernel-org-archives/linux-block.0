@@ -2,33 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD100C001B0
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 10:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2570CC001E0
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 11:20:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243811AbjHPKRc convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 06:17:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
+        id S243465AbjHPLUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 07:20:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243830AbjHPKRb (ORCPT
+        with ESMTP id S244480AbjHPLT5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 06:17:31 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C855C1
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 03:17:30 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-263-B9QQiW5KPp2z-0gqw5gR7Q-1; Wed, 16 Aug 2023 11:17:27 +0100
-X-MC-Unique: B9QQiW5KPp2z-0gqw5gR7Q-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 16 Aug
- 2023 11:17:23 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 16 Aug 2023 11:17:23 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'David Howells' <dhowells@redhat.com>
-CC:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Wed, 16 Aug 2023 07:19:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAA2410FF
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 04:19:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692184748;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9DmGZYcSr2I9SiRg9Pn0WyLYqr3/OyAYXMXaLgBZidY=;
+        b=QYaDiT74ngipsXQb60r9QYsgkipK8OtCtDJhtCRpipMFQ/tqX9THQsK7Mwj71qJyvvAzzw
+        SfNj71RtFyj+4HSuSWmns8DY/NjSMsWnMpRnY9JcPOEGMpCJIGMqRqWs5vbTcq4Rtebr+l
+        1pLEfsYr1WaoMTLJlMDWvJphoU6TaAY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-389-E48cI-hyNleWg9BbfLx0XA-1; Wed, 16 Aug 2023 07:19:07 -0400
+X-MC-Unique: E48cI-hyNleWg9BbfLx0XA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB9FF101A528;
+        Wed, 16 Aug 2023 11:19:06 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 322881121314;
+        Wed, 16 Aug 2023 11:19:04 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <a72036d57d50464ea4fe7fa556ee1a72@AcuMS.aculab.com>
+References: <a72036d57d50464ea4fe7fa556ee1a72@AcuMS.aculab.com> <8722207799c342e780e1162a983dc48b@AcuMS.aculab.com> <855.1692047347@warthog.procyon.org.uk> <5247.1692049208@warthog.procyon.org.uk> <440141.1692179410@warthog.procyon.org.uk>
+To:     David Laight <David.Laight@ACULAB.COM>
+Cc:     dhowells@redhat.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Christian Brauner <christian@brauner.io>,
@@ -38,101 +56,117 @@ CC:     Linus Torvalds <torvalds@linux-foundation.org>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "linux-mm@kvack.org" <linux-mm@kvack.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH v2] iov_iter: Convert iterate*() to inline funcs
-Thread-Topic: [RFC PATCH v2] iov_iter: Convert iterate*() to inline funcs
-Thread-Index: AQHZzvgmq2lQZxPz+UuF+eoksadYZ6/rhpfwgAEYzACAABNV8A==
-Date:   Wed, 16 Aug 2023 10:17:23 +0000
-Message-ID: <a72036d57d50464ea4fe7fa556ee1a72@AcuMS.aculab.com>
-References: <8722207799c342e780e1162a983dc48b@AcuMS.aculab.com>
- <855.1692047347@warthog.procyon.org.uk>
- <5247.1692049208@warthog.procyon.org.uk>
- <440141.1692179410@warthog.procyon.org.uk>
-In-Reply-To: <440141.1692179410@warthog.procyon.org.uk>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+Subject: Re: [RFC PATCH v2] iov_iter: Convert iterate*() to inline funcs
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <532384.1692184743.1@warthog.procyon.org.uk>
+Date:   Wed, 16 Aug 2023 12:19:03 +0100
+Message-ID: <532385.1692184743@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Howells
-> Sent: Wednesday, August 16, 2023 10:50 AM
+David Laight <David.Laight@ACULAB.COM> wrote:
+
+> > That can't be avoided if I convert everything to inline functions and
+> > function pointers - but the optimiser can get rid of it where it can
+> > inline the step function.
 > 
-> David Laight <David.Laight@ACULAB.COM> wrote:
-> 
-> > It is harder to compare because of some of the random name changes.
-> 
-> I wouldn't say 'random' exactly, but if you prefer, some of the name changing
-> can be split out into a separate patch.  The macros are kind of the worst
-> since they picked up variable names from the callers.
-> 
-> > The version of the source I found seems to pass priv2 to functions
-> > that don't use it?
-> 
-> That can't be avoided if I convert everything to inline functions and function
-> pointers - but the optimiser can get rid of it where it can inline the step
-> function.
+> AFAICT the IOVEC one was only called directly.
 
-AFAICT the IOVEC one was only called directly.
+I've made some changes that I'll post shortly, and I now get this:
 
-> I tried passing the iterator to the step functions instead, but that just made
-> things bigger.  memcpy_from_iter_mc() is interesting to deal with.  I would
-> prefer to deal with it in the caller so we only do the check once, but that
-> might mean duplicating the caller.
+	...
+	<+36>:	cmpb   $0x0,0x1(%rdx)	# iter->copy_mc
+	...
+	<+46>:	je     0xffffffff81779aae <_copy_from_iter+98>
+	<+48>:	jmp    0xffffffff81779a87 <_copy_from_iter+59>
+	...
+	# Handle ->copy_mc == true
+	<+59>:	mov    0x38(%rsp),%rax
+	<+64>:	sub    %gs:0x28,%rax
+	<+73>:	jne    0xffffffff81779db1 <_copy_from_iter+869>
+	<+79>:	add    $0x40,%rsp
+	<+83>:	pop    %rbx
+	<+84>:	pop    %rbp
+	<+85>:	pop    %r12
+	<+87>:	pop    %r13
+	<+89>:	pop    %r14
+	<+91>:	pop    %r15
+	<+93>:	jmp    0xffffffff81777934 <__copy_from_iter_mc>
+	...
+	# ITER_UBUF
+	<+121>:	mov    (%rdx),%al
+	<+123>:	cmp    $0x5,%al
+	<+125>:	jne    0xffffffff81779b01 <_copy_from_iter+181>
+	...
+	<+147>:	call   0xffffffff817777ee <__access_ok>
+	<+152>:	test   %al,%al
+	<+154>:	je     0xffffffff81779af9 <_copy_from_iter+173>
+	<+156>:	nop
+	<+157>:	nop
+	<+158>:	nop
+	<+159>:	mov    %r12,%rdi
+	<+162>:	mov    %rdx,%rsi
+	<+165>:	rep movsb %ds:(%rsi),%es:(%rdi)
+	...
+	# ITER_IOVEC
+	<+181>:	test   %al,%al
+	<+183>:	jne    0xffffffff81779b8d <_copy_from_iter+321>
+	...
+	<+234>:	call   0xffffffff817777ee <__access_ok>
+	<+239>:	test   %al,%al
+	<+241>:	je     0xffffffff81779b54 <_copy_from_iter+264>
+	<+243>:	nop
+	<+244>:	nop
+	<+245>:	nop
+	<+246>:	lea    (%r12,%r15,1),%rax
+	<+250>:	mov    %r8,%rsi
+	<+253>:	mov    %rax,%rdi
+	<+256>:	rep movsb %ds:(%rsi),%es:(%rdi)
+	...
+	# ITER_BVEC
+	<+321>:	cmp    $0x2,%al
+	<+323>:	jne    0xffffffff81779c1f <_copy_from_iter+467>
+	...
+	<+375>:	call   0xffffffff81777282 <kmap_local_page>
+	...
+	<+431>:	rep movsb %ds:(%rsi),%es:(%rdi)
+	...
+	# ITER_KVEC
+	<+467>:	cmp    $0x1,%al
+	<+469>:	jne    0xffffffff81779c82 <_copy_from_iter+566>
+	...
+	<+526>:	rep movsb %ds:(%rsi),%es:(%rdi)
+	...
+	# ITER_XARRAY
+	<+566>:	cmp    $0x3,%al
+	<+568>:	jne    0xffffffff81779d9d <_copy_from_iter+849>
+	...
+	<+639>:	call   0xffffffff81126bcf <__rcu_read_lock>
+	...
+	<+651>:	call   0xffffffff81d5ed97 <xas_find>
+	...
+	<+764>:	call   0xffffffff817772a7 <kmap_local_folio>
+	...
+	<+806>:	rep movsb %ds:(%rsi),%es:(%rdi)
+	...
+	# ITER_DISCARD/default
+	<+849>:	sub    %rbx,0x18(%rbp)
+	<+853>:	mov    0x38(%rsp),%rax
+	<+858>:	sub    %gs:0x28,%rax
+	<+867>:	je     0xffffffff81779db6 <_copy_from_iter+874>
+	<+869>:	call   0xffffffff81d6578c <__stack_chk_fail>
+	<+874>:	add    $0x40,%rsp
+	<+878>:	mov    %rbx,%rax
+	<+881>:	pop    %rbx
+	<+882>:	pop    %rbp
+	<+883>:	pop    %r12
+	<+885>:	pop    %r13
+	<+887>:	pop    %r14
+	<+889>:	pop    %r15
+	<+891>:	jmp    0xffffffff81d72920 <__x86_return_thunk>
 
-You could try something slightly horrid that the compiler
-might optimise for you.
-Instead of passing in a function pointer pass a number.
-Then do something like:
-#define call_iter(id, ...) \
-	(id == x ? fn_x(__VA_ARGS__) : id == y ? fn_y(__VA_ARGS) ...)
-constant folding on the inline should kill the function pointer.
-You might get away with putting the args on the end.
-
-...
-> > I rather hope the should_fail_usercopy() and instrument_copy_xxx()
-> > calls are usually either absent or, at most, nops.
-> 
-> Okay - it's probably worth marking those too, then.
-
-Thinking I'm sure they are KASAN annotations.
-The are few enough calls that I suspect that replicating them
-won't affect KASAN (etc) builds.
-
-> > This all seems to have a lot fewer options than last time I looked.
-> 
-> I'm not sure what you mean by 'a lot fewer options'?
-
-It might just be ITER_PIPE that has gone.
-
-> > Is it worth optimising the KVEC case with a single buffer?
-> 
-> You mean an equivalent of UBUF?  Maybe.  There are probably a whole bunch of
-> netfs places that do single-kvec writes, though I'm trying to convert these
-> over to bvec arrays, combining them with their data, and MSG_SPLICE_PAGES.
-
-I'm thinking of what happens with kernel callers of things
-like the socket code - especially for address/option buffers.
-Probably io_uring and bpf (and my out of tree drivers!).
-
-Could be the equivalent of UBUF, but checking for KVEC with
-a count of 1 wouldn't really add any more cmp/jmp pairs.
-
-I've also noticed in the past that some of this code seems
-to be optimised for zero length buffers/fragments.
-Surely they just need to work?
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+David
 
