@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C690C001B0
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 15:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A61C001E0
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 15:35:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344190AbjHPPei (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 11:34:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50748 "EHLO
+        id S237053AbjHPPfK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 11:35:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344232AbjHPPee (ORCPT
+        with ESMTP id S1344293AbjHPPfJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 11:34:34 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE08268D
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 08:34:27 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1b89b0c73d7so9633935ad.1
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 08:34:27 -0700 (PDT)
+        Wed, 16 Aug 2023 11:35:09 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5D42684
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 08:35:08 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1bdb3ecd20dso8751075ad.0
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 08:35:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692200067; x=1692804867;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692200108; x=1692804908;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=szijuggdBgOnGhhlhc88VNlpdmYNCTxiLI/7liHn6JI=;
-        b=nbX+MEgU/N7E71s8kgzLc8flbc7HMMP5zy/X30TZJFjP1cj00r1QO2xOWPpiTzBIKg
-         ZWZG1IxiEx5tFvMu3grWy9PuFGWTPCAlbcE9EwSigc23KyMX+QI53kaPuVXuoi7sAJSN
-         yds/qaECDqHmzzwzipb3JR92MfBotjmjMVaWcANj5c4qtcpE+xK+HijocSjbBDoleInB
-         QxCLuQLv9Ljx/znQMiNe2TekLoi5MhxqkbPMw+RcrE2eunOyPRTcSBp4BKaC+rlE/4Ej
-         1QYm56ZwyZcrYkLh4vECjVMzr9b8SqkDvxyHDx3g2xM1Q3UiaFNhJzgPllM8W8N8KNM0
-         xxMQ==
+        bh=5BSe9V42ZjtjuXMIoDT4hSOqjzajl/G7+W7al4NwnG4=;
+        b=R7Rs2/sf24gsIDZjlQms+eyYWUz2/0CJsU9RFJ7Dn5+4oSHJw+SZ4vULdGXt/O740p
+         Z5pttQBpbrgVNR14qcT+K5wP3bHkQ0U2OwQ+aTClIilJuhULK8ybnmTmTWGLFW8Vc6d5
+         p2Znx7+NeXxe6tm8Nhhr1j8yfcQ+cWPpbjo32j2CITs+y17/P2GzZ77WoP7sT5j1cKjd
+         gIQvVAjlObx+1yAWu+eb4fmQUlep9m6FZgnolzzMTpA5F94OGDkW3zt4e86O8NLOZszo
+         2ef5K6ENGEsPGexdC4bL1RB8xv26qddXtFckemTOpFqftR/zecI+unwCzZIlrDr2aR3v
+         aRkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692200067; x=1692804867;
+        d=1e100.net; s=20221208; t=1692200108; x=1692804908;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=szijuggdBgOnGhhlhc88VNlpdmYNCTxiLI/7liHn6JI=;
-        b=UEpGxWWfHH1rXsg/npZn10AIaIQEarasfSCGGmbDFZNGgSd4Egfn48D6YW6WoIgv74
-         uctKYxlxTi6ABs4bGYmUDzWG+IKGtGBK4z0d/KZ1BvSMrQLFbntCdrbFpbFS5x3J/ZBT
-         U3b6FVNA1HzgHA3HvCk+L7cC2s/REuGE8eNA/bCHka7s9Vb+gy+aVVBhRYmuaAZwdWdJ
-         9U31raJ52zEGp4Qx2PTiyFn9d+Z86tdBUH4WTGGNftaRyWy56/dT4x0Ppb53ZVNIuv6s
-         kCbv34WAyBGG4Q4B3Le5KCOY28GSAOkLm7nGW2pewToaJnhb7PntSyfob5VRKTHE1hgN
-         P6LA==
-X-Gm-Message-State: AOJu0YwuWsvPyqgJlhNGHSjaTQtPkZ8j/dWCC1GzE5Q7p1YbYmvUUJUJ
-        ZpZ/h+cihOSv3v3EoiMcZQQJwvTqsHDR4DMNKvg=
-X-Google-Smtp-Source: AGHT+IGeTr0mgFa21N7TONbGhjcHbzLgDbgckmj9bZkZ7cVbb0OiGz04V5SIbMAZefEzVhmX4z2DQA==
-X-Received: by 2002:a17:902:cec1:b0:1b8:85c4:48f5 with SMTP id d1-20020a170902cec100b001b885c448f5mr2642304plg.2.1692200066845;
-        Wed, 16 Aug 2023 08:34:26 -0700 (PDT)
+        bh=5BSe9V42ZjtjuXMIoDT4hSOqjzajl/G7+W7al4NwnG4=;
+        b=cA3KFfOPxCjRz7pcf9mWsPARZuYdlPuZA2iO8IYAW34SqNMUJHrhgmW38KK6kSgCqe
+         7kM/lzPz/AV4Ief5/LkZw+ht5rQGF2dxW3eFuRHyaxeGX96Z+qowbm9cJyyels3yPe5G
+         LIeczB73IXx2gryBCSUK0NCG/aBEUFs+XZuS0O/s/ebRDNEvkzs+ACx+07miKed4seK2
+         Ul/A49Zk++QtO/HRIVCN6m3qLbT+PpBvWl72tAHALeij67tIiTaqgZxqLzHuOqPeV1/Q
+         H+UqPtbL7650bSkKO6lo+WLDmxeqnp4i6QkGNu0GnUFi+ShNmgkPw0NZR/LZl3GPqd9A
+         LrHQ==
+X-Gm-Message-State: AOJu0YwhGwJgG2Bkw5LmqlRkh8q451JntgXpbkqyNHeRMJwW36IFrpWT
+        jDO8go7Hc0QIn/CZBRlAJrsMzw==
+X-Google-Smtp-Source: AGHT+IEtleHAvQ8fA+Y80krT+tushpsxY0E++kAgT+7p3iSw4XZ76AS5edOAH3O749HA0GqFhekZxg==
+X-Received: by 2002:a17:902:d48e:b0:1b1:9272:55e2 with SMTP id c14-20020a170902d48e00b001b1927255e2mr2607209plg.3.1692200107704;
+        Wed, 16 Aug 2023 08:35:07 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id m11-20020a170902768b00b001bb750189desm13320648pll.255.2023.08.16.08.34.25
+        by smtp.gmail.com with ESMTPSA id b16-20020a170902b61000b001b80d399730sm13311779pls.242.2023.08.16.08.35.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 08:34:26 -0700 (PDT)
+        Wed, 16 Aug 2023 08:35:07 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, Li Zhijian <lizhijian@fujitsu.com>
 Cc:     linux-kernel@vger.kernel.org,
@@ -59,8 +59,8 @@ Cc:     linux-kernel@vger.kernel.org,
 In-Reply-To: <20230816022210.2501228-1-lizhijian@fujitsu.com>
 References: <20230816022210.2501228-1-lizhijian@fujitsu.com>
 Subject: Re: [PATCH] drivers/rnbd: restore sysfs interface to rnbd-client
-Message-Id: <169220006570.515765.5824725604378944460.b4-ty@kernel.dk>
-Date:   Wed, 16 Aug 2023 09:34:25 -0600
+Message-Id: <169220010662.516163.3901210902059231374.b4-ty@kernel.dk>
+Date:   Wed, 16 Aug 2023 09:35:06 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -80,7 +80,7 @@ On Wed, 16 Aug 2023 10:22:10 +0800, Li Zhijian wrote:
 Applied, thanks!
 
 [1/1] drivers/rnbd: restore sysfs interface to rnbd-client
-      commit: 8fc3dbf3dfb1ff30c9893fbbf02b0169f25944fe
+      commit: f4283bc7e38ac89d0c6c0ae188464d3769bec098
 
 Best regards,
 -- 
