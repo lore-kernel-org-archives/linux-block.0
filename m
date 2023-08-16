@@ -2,230 +2,166 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E0B3C25B5E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 969B7C41513
 	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 19:58:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243188AbjHPT53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S235037AbjHPT53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 16 Aug 2023 15:57:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346045AbjHPT44 (ORCPT
+        with ESMTP id S1345990AbjHPT5H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 15:56:56 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83AD72D5D;
-        Wed, 16 Aug 2023 12:56:26 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-686be3cbea0so153571b3a.0;
-        Wed, 16 Aug 2023 12:56:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692215786; x=1692820586;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=4vxmzu6lc7JjIoq+nTSEdJoxgezdUcawpidVrUY+UWQ=;
-        b=Gw4+wwjU4xbUEDpd2AwdLpWFqceigsg69EcM89/lCqx5uKI/LU6ZLki9ULmvH8fB5z
-         9mXJYphrXcPrMwmpyCZADbJAWZIN8miPBenho/l6oyIOE6/eYVFpmlNjrp1JFDOAFY1j
-         zd9v0VzSOFQQruhwa3d1egHZ4H1IDa7RwDSCF4P1RBzpH/19KlpVmM6zsCDV5KXEBmFJ
-         WPjoQ6oQ91FCEckATE43spvEviQQrnK4YWji8Ua8UZKYrrLbOxJS5zvNrABOqo+iJanU
-         GHgbtD7svgPxBUMa5k3e9hTpZA+/jGJeE4YirQSOOFR6fH5d3nPN4oaEudUClH9npLn6
-         6y1A==
+        Wed, 16 Aug 2023 15:57:07 -0400
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC4130C7;
+        Wed, 16 Aug 2023 12:56:35 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-68934672e7bso194133b3a.2;
+        Wed, 16 Aug 2023 12:56:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692215786; x=1692820586;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4vxmzu6lc7JjIoq+nTSEdJoxgezdUcawpidVrUY+UWQ=;
-        b=ffgztIAUYNOfPTMMnXhnw2mOxPAhY/iBj1GTFfLs7TahlshndACUUGgIw8javGFUHG
-         DA0b0B3EvtkbQQdW+0tQcTk8gh5rlzBS63u5rWMCpSvREaUeO2+MvOqJcMVCCqsgJeLq
-         DaMrhbfwNQcUw7GxvFXHC4ZBy67V45EP/vIssg10vaWs0rmPan2ht5w7pJTY9zg8OtuN
-         nBxJsFkcu4x6gyFQ9Xn7erYU6QfvfUVzy5LcCc4tDwi1NGq5CKEizYjoUUjevs8RSCf/
-         5DXCDOC6PPlY38ooJn+ld/cx2RRUIg6DrfDA2y8o7xqs982NqvALr63hvFajeMNLNBcl
-         6j9A==
-X-Gm-Message-State: AOJu0YxvDE0k6hFHM+S0Mn+DGuO5tJbnNhw1q58XRKVzxfC49iqbQKpz
-        yY3hp0LrzBNAr8ERjjVFNaxj9pH6EWk=
-X-Google-Smtp-Source: AGHT+IFv5TicirQzTeFeX8zGMlAHIn+ehTuXLjg1oSjBnDytRyjOjEtOQQ3fM+oVnV4Noc+ODjOzGA==
-X-Received: by 2002:a05:6a00:139e:b0:688:79c6:1c13 with SMTP id t30-20020a056a00139e00b0068879c61c13mr776107pfg.9.1692215785858;
-        Wed, 16 Aug 2023 12:56:25 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:93bd])
-        by smtp.gmail.com with ESMTPSA id f15-20020aa782cf000000b00686a80f431dsm11387304pfn.126.2023.08.16.12.56.24
+        d=1e100.net; s=20221208; t=1692215795; x=1692820595;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bkMQyPixpqYPRVAjDEtNvAJQ2OgvR1IbHljjNClfrjQ=;
+        b=jmFrcXYHFRXhaXpob4ZjF2B4sMZ/gV52zXMsQDMstl+kqidTtuVX6zfPmw+06jKMHL
+         8qSZkroM6y45H1H76sYx/9gpoNjAzVH82sSJOmprP5nncZkoH+H5I8gBWpDQ/wVwfvVy
+         a9tQk0JsD12mRvQY5rtyIHW6Ns1y3CHEQ/e2roJYafgjC2xv8ipELxaLKSh19mMzEY15
+         GbtYVeLG3rgBzhVO5DDea5fpN3JZSQCdqumlo+ciHHGTTsBMblO//V2qxjUMdgKf8Rom
+         TDT9jpSqleydmvQkZiy44BRNjtu3oo8dDxpvbktCjRUXUclVsjcZN0ezUXK4v/pBVRIg
+         Cbhg==
+X-Gm-Message-State: AOJu0YxIBvXemW+H+4qu/o4ks70slN1XFjIvFv6BUq1uoieVOv8GU5Xw
+        eilIZp+3Z5Auzrq3P0bWprg=
+X-Google-Smtp-Source: AGHT+IHSRHvlPvP82XvRMrHHSIS85wJqkYv98PSKADamhZgYPMvI1th7udQmPDbE0/RJWh5YYGTHWg==
+X-Received: by 2002:a05:6a21:601:b0:140:2805:6cce with SMTP id ll1-20020a056a21060100b0014028056ccemr2802133pzb.19.1692215795049;
+        Wed, 16 Aug 2023 12:56:35 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:7141:e456:f574:7de0])
+        by smtp.gmail.com with ESMTPSA id r26-20020a62e41a000000b0068890c19c49sm1588508pfh.180.2023.08.16.12.56.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 12:56:25 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 16 Aug 2023 09:56:23 -1000
-From:   Tejun Heo <tj@kernel.org>
+        Wed, 16 Aug 2023 12:56:34 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Breno Leitao <leitao@debian.org>, kernel-team@meta.com
-Subject: [PATCH for-6.6/block] blk-cgroup: Fix NULL deref caused by
- blkg_policy_data being installed before init
-Message-ID: <ZN0p5_W-Q9mAHBVY@slm.duckdns.org>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Can Guo <quic_cang@quicinc.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Bean Huo <beanhuo@micron.com>,
+        Asutosh Das <quic_asutoshd@quicinc.com>,
+        "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
+        Arthur Simchaev <Arthur.Simchaev@wdc.com>
+Subject: [PATCH v9 17/17] scsi: ufs: Inform the block layer about write ordering
+Date:   Wed, 16 Aug 2023 12:53:29 -0700
+Message-ID: <20230816195447.3703954-18-bvanassche@acm.org>
+X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
+In-Reply-To: <20230816195447.3703954-1-bvanassche@acm.org>
+References: <20230816195447.3703954-1-bvanassche@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk-iocost sometimes causes the following crash:
+From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
+"The host controller always process transfer requests in-order according
+to the order submitted to the list. In case of multiple commands with
+single doorbell register ringing (batch mode), The dispatch order for
+these transfer requests by host controller will base on their index in
+the List. A transfer request with lower index value will be executed
+before a transfer request with higher index value."
 
-  BUG: kernel NULL pointer dereference, address: 00000000000000e0
-  ...
-  RIP: 0010:_raw_spin_lock+0x17/0x30
-  Code: be 01 02 00 00 e8 79 38 39 ff 31 d2 89 d0 5d c3 0f 1f 00 0f 1f 44 00 00 55 48 89 e5 65 ff 05 48 d0 34 7e b9 01 00 00 00 31 c0 <f0> 0f b1 0f 75 02 5d c3 89 c6 e8 ea 04 00 00 5d c3 0f 1f 84 00 00
-  RSP: 0018:ffffc900023b3d40 EFLAGS: 00010046
-  RAX: 0000000000000000 RBX: 00000000000000e0 RCX: 0000000000000001
-  RDX: ffffc900023b3d20 RSI: ffffc900023b3cf0 RDI: 00000000000000e0
-  RBP: ffffc900023b3d40 R08: ffffc900023b3c10 R09: 0000000000000003
-  R10: 0000000000000064 R11: 000000000000000a R12: ffff888102337000
-  R13: fffffffffffffff2 R14: ffff88810af408c8 R15: ffff8881070c3600
-  FS:  00007faaaf364fc0(0000) GS:ffff88842fdc0000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 00000000000000e0 CR3: 00000001097b1000 CR4: 0000000000350ea0
-  Call Trace:
-   <TASK>
-   ioc_weight_write+0x13d/0x410
-   cgroup_file_write+0x7a/0x130
-   kernfs_fop_write_iter+0xf5/0x170
-   vfs_write+0x298/0x370
-   ksys_write+0x5f/0xb0
-   __x64_sys_write+0x1b/0x20
-   do_syscall_64+0x3d/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
+From the UFSHCI 4.0 specification, about the MCQ mode:
+"Command Submission
+1. Host SW writes an Entry to SQ
+2. Host SW updates SQ doorbell tail pointer
 
-This happens because iocg->ioc is NULL. The field is initialized by
-ioc_pd_init() and never cleared. The NULL deref is caused by
-blkcg_activate_policy() installing blkg_policy_data before initializing it.
+Command Processing
+3. After fetching the Entry, Host Controller updates SQ doorbell head
+   pointer
+4. Host controller sends COMMAND UPIU to UFS device"
 
-blkcg_activate_policy() was doing the following:
+In other words, for both legacy and MCQ mode, UFS controllers are
+required to forward commands to the UFS device in the order these
+commands have been received from the host.
 
-1. Allocate pd's for all existing blkg's and install them in blkg->pd[].
-2. Initialize all pd's.
-3. Online all pd's.
+Notes:
+- For legacy mode this is only correct if the host submits one
+  command at a time. The UFS driver does this.
+- Also in legacy mode, the command order is not preserved if
+  auto-hibernation is enabled in the UFS controller. Hence, enable
+  zone write locking if auto-hibernation is enabled.
 
-blkcg_activate_policy() only grabs the queue_lock and may release and
-re-acquire the lock as allocation may need to sleep. ioc_weight_write()
-grabs blkcg->lock and iterates all its blkg's. The two can race and if
-ioc_weight_write() runs during #1 or between #1 and #2, it can encounter a
-pd which is not initialized yet, leading to crash.
+This patch improves performance as follows on my test setup:
+- With the mq-deadline scheduler: 2.5x more IOPS for small writes.
+- When not using an I/O scheduler compared to using mq-deadline with
+  zone locking: 4x more IOPS for small writes.
 
-The crash can be reproduced with the following script:
-
-  #!/bin/bash
-
-  echo +io > /sys/fs/cgroup/cgroup.subtree_control
-  systemd-run --unit touch-sda --scope dd if=/dev/sda of=/dev/null bs=1M count=1 iflag=direct
-  echo 100 > /sys/fs/cgroup/system.slice/io.weight
-  bash -c "echo '8:0 enable=1' > /sys/fs/cgroup/io.cost.qos" &
-  sleep .2
-  echo 100 > /sys/fs/cgroup/system.slice/io.weight
-
-with the following patch applied:
-
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index fc49be622e05..38d671d5e10c 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -1553,6 +1553,12 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
-> 		pd->online = false;
-> 	}
-> 
-> +       if (system_state == SYSTEM_RUNNING) {
-> +               spin_unlock_irq(&q->queue_lock);
-> +               ssleep(1);
-> +               spin_lock_irq(&q->queue_lock);
-> +       }
-> +
-> 	/* all allocated, init in the same order */
-> 	if (pol->pd_init_fn)
-> 		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
-
-I don't see a reason why all pd's should be allocated, initialized and
-onlined together. The only ordering requirement is that parent blkgs to be
-initialized and onlined before children, which is guaranteed from the
-walking order. Let's fix the bug by allocating, initializing and onlining pd
-for each blkg and holding blkcg->lock over initialization and onlining. This
-ensures that an installed blkg is always fully initialized and onlined
-removing the the race window.
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: Breno Leitao <leitao@debian.org>
-Fixes: 9d179b865449 ("blkcg: Fix multiple bugs in blkcg_activate_policy()")
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Can Guo <quic_cang@quicinc.com>
+Cc: Avri Altman <avri.altman@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
-Hello,
+ drivers/ufs/core/ufshcd.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-This is a bug fix but I targetted it for for-6.6 and skipped tagging stable.
-The bug has been there for a long time, the occurrence rate for the bug is
-pretty low, and this area has been a source of repeated subtle issues, so I
-think it'd be better to be a bit more careful before forwarding the patch to
-stable.
-
-Thanks.
-
- block/blk-cgroup.c |   32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
-
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1509,7 +1509,7 @@ int blkcg_activate_policy(struct gendisk
- retry:
- 	spin_lock_irq(&q->queue_lock);
- 
--	/* blkg_list is pushed at the head, reverse walk to allocate parents first */
-+	/* blkg_list is pushed at the head, reverse walk to initialize parents first */
- 	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
- 		struct blkg_policy_data *pd;
- 
-@@ -1547,21 +1547,20 @@ retry:
- 				goto enomem;
+diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
+index 37d430d20939..7f5049a66cca 100644
+--- a/drivers/ufs/core/ufshcd.c
++++ b/drivers/ufs/core/ufshcd.c
+@@ -4356,6 +4356,19 @@ static int ufshcd_update_preserves_write_order(struct ufs_hba *hba,
+ 				return -EPERM;
  		}
- 
--		blkg->pd[pol->plid] = pd;
-+		spin_lock(&blkg->blkcg->lock);
-+
- 		pd->blkg = blkg;
- 		pd->plid = pol->plid;
--		pd->online = false;
--	}
-+		blkg->pd[pol->plid] = pd;
- 
--	/* all allocated, init in the same order */
--	if (pol->pd_init_fn)
--		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
--			pol->pd_init_fn(blkg->pd[pol->plid]);
-+		if (pol->pd_init_fn)
-+			pol->pd_init_fn(pd);
- 
--	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
- 		if (pol->pd_online_fn)
--			pol->pd_online_fn(blkg->pd[pol->plid]);
--		blkg->pd[pol->plid]->online = true;
-+			pol->pd_online_fn(pd);
-+		pd->online = true;
-+
-+		spin_unlock(&blkg->blkcg->lock);
  	}
++	shost_for_each_device(sdev, hba->host)
++		blk_freeze_queue_start(sdev->request_queue);
++	shost_for_each_device(sdev, hba->host) {
++		struct request_queue *q = sdev->request_queue;
++
++		blk_mq_freeze_queue_wait(q);
++		q->limits.driver_preserves_write_order = preserves_write_order;
++		blk_queue_required_elevator_features(q,
++			preserves_write_order ? 0 : ELEVATOR_F_ZBD_SEQ_WRITE);
++		if (q->disk)
++			disk_set_zoned(q->disk, q->limits.zoned);
++		blk_mq_unfreeze_queue(q);
++	}
  
- 	__set_bit(pol->plid, q->blkcg_pols);
-@@ -1578,14 +1577,19 @@ out:
- 	return ret;
+ 	return 0;
+ }
+@@ -4393,7 +4406,8 @@ int ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
  
- enomem:
--	/* alloc failed, nothing's initialized yet, free everything */
-+	/* alloc failed, take down everything */
- 	spin_lock_irq(&q->queue_lock);
- 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
- 		struct blkcg *blkcg = blkg->blkcg;
-+		struct blkg_policy_data *pd;
+ 	if (!is_mcq_enabled(hba) && !prev_state && new_state) {
+ 		/*
+-		 * Auto-hibernation will be enabled for legacy UFSHCI mode.
++		 * Auto-hibernation will be enabled for legacy UFSHCI mode. Tell
++		 * the block layer that write requests may be reordered.
+ 		 */
+ 		ret = ufshcd_update_preserves_write_order(hba, false);
+ 		if (ret)
+@@ -4409,7 +4423,8 @@ int ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
+ 	}
+ 	if (!is_mcq_enabled(hba) && prev_state && !new_state) {
+ 		/*
+-		 * Auto-hibernation has been disabled.
++		 * Auto-hibernation has been disabled. Tell the block layer that
++		 * the order of write requests is preserved.
+ 		 */
+ 		ret = ufshcd_update_preserves_write_order(hba, true);
+ 		WARN_ON_ONCE(ret);
+@@ -5187,6 +5202,9 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
  
- 		spin_lock(&blkcg->lock);
--		if (blkg->pd[pol->plid]) {
--			pol->pd_free_fn(blkg->pd[pol->plid]);
-+		pd = blkg->pd[pol->plid];
-+		if (pd) {
-+			if (pd->online && pol->pd_offline_fn)
-+				pol->pd_offline_fn(pd);
-+			pd->online = false;
-+			pol->pd_free_fn(pd);
- 			blkg->pd[pol->plid] = NULL;
- 		}
- 		spin_unlock(&blkcg->lock);
-
+ 	ufshcd_hpb_configure(hba, sdev);
+ 
++	q->limits.driver_preserves_write_order =
++		!ufshcd_is_auto_hibern8_supported(hba) ||
++		FIELD_GET(UFSHCI_AHIBERN8_TIMER_MASK, hba->ahit) == 0;
+ 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
+ 	if (hba->quirks & UFSHCD_QUIRK_4KB_DMA_ALIGNMENT)
+ 		blk_queue_update_dma_alignment(q, SZ_4K - 1);
