@@ -2,200 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8BDC07E8B
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 14:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C690C001B0
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 15:35:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343738AbjHPOju (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 10:39:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50496 "EHLO
+        id S1344190AbjHPPei (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 11:34:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343754AbjHPOjV (ORCPT
+        with ESMTP id S1344232AbjHPPee (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 10:39:21 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD9412735
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 07:38:53 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-565e387000fso1145080a12.2
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 07:38:53 -0700 (PDT)
+        Wed, 16 Aug 2023 11:34:34 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE08268D
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 08:34:27 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1b89b0c73d7so9633935ad.1
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 08:34:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1692196728; x=1692801528;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z7kyCuHl1t/gCCGpNTbA3hwFj/lf6SuaKvtbsxGuDBs=;
-        b=dZxL0Ptmo/RfqSZAnaNdMqEON3wvqTtz9rCCZbGwRlxrXd7njXeZ9MC0HoDMQnzbMm
-         Mbp7gkbEr8As7DndYa19Nv36eYd2hToSSCFzF826MiTxJFQPanB3TDkisU5ug1n2xO0x
-         lqvfBU8gjYGcjvzm7z1KhnYi76zAKQMvLjSkKN8VKcgO7yrfcLxnnczFGmL7s8fYvGKe
-         iupXY/7su7eB4Qp8Ot15WegMitq0aXkC7C2B4amBqtpQq9iCTqbSvz7oVYvokSqAF4SL
-         qE7Cmnt2iThlim9z5xca3mEZ27llu2nfrUpa7hwX8WY7UkN0OSfjH/LjoRTW/fMpY9+M
-         GNdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692196728; x=1692801528;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692200067; x=1692804867;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=z7kyCuHl1t/gCCGpNTbA3hwFj/lf6SuaKvtbsxGuDBs=;
-        b=GSRZjaeh0UIRvnW4adGH+SD05ORNw97yIWz77Xjxw8fg7VNE6GiZBgTA2vyyzrxp2y
-         EvBxr3uhYIdNsADhGVhTX7YKy8kabTWzrqE9nLV3cRmy2RrouV2SzezCpUkgpSZFwA5z
-         c2GkKMcHBz+9SM3L54t5aWu34CTu1zxYtCS9OFYMO/ZdNdiOmmP53fBzktDUpBhsQTGX
-         kh7csMZRJaSpnVtd8FXPFPG2z6hUsto16DUu5AMUBYCkmRTbEx44KqT4upwn58Fy93HG
-         xgagbe1iQMxDyZ+8ZMPD2wvGBPxLEb5D3kMCWRGlfvOxT5Vds421M1wxq/qrNabnSf1s
-         PZ/g==
-X-Gm-Message-State: AOJu0YwSOdXa4KBpr453wK3b1cnZ9iRj/OFzWWXlr/O+A5QecvZ816vT
-        y5kbdBw976QATaYW6z5kUia7pg==
-X-Google-Smtp-Source: AGHT+IG9lm23RRLom/xb7C80klG2aDXB0ZwUgcZV4fsV/hyXYHdBd19S4I3YH9SwHqrCXPj4TdemSQ==
-X-Received: by 2002:a17:90a:f982:b0:26b:4e59:57e7 with SMTP id cq2-20020a17090af98200b0026b4e5957e7mr1730234pjb.43.1692196727793;
-        Wed, 16 Aug 2023 07:38:47 -0700 (PDT)
-Received: from localhost ([135.180.227.0])
-        by smtp.gmail.com with ESMTPSA id gi23-20020a17090b111700b0025645ce761dsm13120399pjb.35.2023.08.16.07.38.46
+        bh=szijuggdBgOnGhhlhc88VNlpdmYNCTxiLI/7liHn6JI=;
+        b=nbX+MEgU/N7E71s8kgzLc8flbc7HMMP5zy/X30TZJFjP1cj00r1QO2xOWPpiTzBIKg
+         ZWZG1IxiEx5tFvMu3grWy9PuFGWTPCAlbcE9EwSigc23KyMX+QI53kaPuVXuoi7sAJSN
+         yds/qaECDqHmzzwzipb3JR92MfBotjmjMVaWcANj5c4qtcpE+xK+HijocSjbBDoleInB
+         QxCLuQLv9Ljx/znQMiNe2TekLoi5MhxqkbPMw+RcrE2eunOyPRTcSBp4BKaC+rlE/4Ej
+         1QYm56ZwyZcrYkLh4vECjVMzr9b8SqkDvxyHDx3g2xM1Q3UiaFNhJzgPllM8W8N8KNM0
+         xxMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692200067; x=1692804867;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=szijuggdBgOnGhhlhc88VNlpdmYNCTxiLI/7liHn6JI=;
+        b=UEpGxWWfHH1rXsg/npZn10AIaIQEarasfSCGGmbDFZNGgSd4Egfn48D6YW6WoIgv74
+         uctKYxlxTi6ABs4bGYmUDzWG+IKGtGBK4z0d/KZ1BvSMrQLFbntCdrbFpbFS5x3J/ZBT
+         U3b6FVNA1HzgHA3HvCk+L7cC2s/REuGE8eNA/bCHka7s9Vb+gy+aVVBhRYmuaAZwdWdJ
+         9U31raJ52zEGp4Qx2PTiyFn9d+Z86tdBUH4WTGGNftaRyWy56/dT4x0Ppb53ZVNIuv6s
+         kCbv34WAyBGG4Q4B3Le5KCOY28GSAOkLm7nGW2pewToaJnhb7PntSyfob5VRKTHE1hgN
+         P6LA==
+X-Gm-Message-State: AOJu0YwuWsvPyqgJlhNGHSjaTQtPkZ8j/dWCC1GzE5Q7p1YbYmvUUJUJ
+        ZpZ/h+cihOSv3v3EoiMcZQQJwvTqsHDR4DMNKvg=
+X-Google-Smtp-Source: AGHT+IGeTr0mgFa21N7TONbGhjcHbzLgDbgckmj9bZkZ7cVbb0OiGz04V5SIbMAZefEzVhmX4z2DQA==
+X-Received: by 2002:a17:902:cec1:b0:1b8:85c4:48f5 with SMTP id d1-20020a170902cec100b001b885c448f5mr2642304plg.2.1692200066845;
+        Wed, 16 Aug 2023 08:34:26 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id m11-20020a170902768b00b001bb750189desm13320648pll.255.2023.08.16.08.34.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 07:38:47 -0700 (PDT)
-Date:   Wed, 16 Aug 2023 07:38:47 -0700 (PDT)
-X-Google-Original-Date: Wed, 16 Aug 2023 07:38:45 PDT (-0700)
-Subject:     Re: [PATCH 00/17] -Wmissing-prototype warning fixes
-In-Reply-To: <20230810141947.1236730-1-arnd@kernel.org>
-CC:     akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>, mattst88@gmail.com,
-        vgupta@kernel.org, linux@armlinux.org.uk,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, guoren@kernel.org,
-        bcain@quicinc.com, chenhuacai@kernel.org, kernel@xen0n.name,
-        geert@linux-m68k.org, monstr@monstr.eu, tsbogend@alpha.franken.de,
-        dinguyen@kernel.org, jonas@southpole.se,
-        stefan.kristiansson@saunalahti.fi, shorne@gmail.com,
-        James.Bottomley@HansenPartnership.com, deller@gmx.de,
-        mpe@ellerman.id.au, christophe.leroy@csgroup.eu, hca@linux.ibm.com,
-        glaubitz@physik.fu-berlin.de, x86@kernel.org, bp@alien8.de,
-        jcmvbkbc@gmail.com, axboe@kernel.dk, sudipm.mukherjee@gmail.com,
-        martin.petersen@oracle.com, richard@nod.at, bhelgaas@google.com,
-        masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
-        linux@roeck-us.net, Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-next@vger.kernel.org, linux-alpha@vger.kernel.org,
-        linux-snps-arc@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     arnd@kernel.org
-Message-ID: <mhng-ce493a2d-71e9-440f-84d0-522a4f694bbe@palmer-ri-x1c9>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Wed, 16 Aug 2023 08:34:26 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, Li Zhijian <lizhijian@fujitsu.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Ivan Orlov <ivan.orlov0322@gmail.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>
+In-Reply-To: <20230816022210.2501228-1-lizhijian@fujitsu.com>
+References: <20230816022210.2501228-1-lizhijian@fujitsu.com>
+Subject: Re: [PATCH] drivers/rnbd: restore sysfs interface to rnbd-client
+Message-Id: <169220006570.515765.5824725604378944460.b4-ty@kernel.dk>
+Date:   Wed, 16 Aug 2023 09:34:25 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 10 Aug 2023 07:19:18 PDT (-0700), arnd@kernel.org wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> Most of the patches I sent so far for the -Wmissing-prototype warnings
-> have made it into linux-next now. There are a few that I'm resending
-> now as nobody has picked them up, and then a number of fixes that I
-> found while test-building across all architectures rather than just the
-> ones I usually test.
->
-> The first 15 patches in this series should be uncontroversial, so
-> I expect that either a subsystem maintainer or Andrew Morton can
-> apply these directly.
->
-> For the last two patches, these might still need some debate about how
-> to handle them. I added a Kconfig option to turn off most of the missing
-> prototype warnings in the architectures that nobody has fixed yet,
-> see patch 16 for those. The last patch does cause some known warnings
-> and likely unknown ones for architectures other than x86 and arm,
-> so applying it now will bring new problems, but not applying it also
-> means that new warnings creep in, so I think this is mainly a question
-> of what the best timing is for having this in linux-next.
->
-> Arnd Bergmann (17):
->   [RESEND] jffs2: mark __jffs2_dbg_superblock_counts() static
->   [RESEND] irq_work: consolidate arch_irq_work_raise prototypes
->   [RESEND] ida: make 'ida_dump' static
->   pci: sysfs: move declarations to linux/pci.h
->   swim3: mark swim3_init() static
->   macintosh/ams: mark ams_init() static
->   scsi: qlogicpti: mark qlogicpti_info() static
->   microblaze: mark flush_dcache_folio() inline
->   parport: gsc: mark init function static
->   zorro: include zorro.h in names.c
->   scsi: gvp11: remove unused gvp11_setup() function
->   time: make sysfs_get_uname() function visible in header
->   stackleak: add declarations for global functions
->   kprobes: unify kprobes_exceptions_nofify() prototypes
->   arch: fix asm-offsets.c building with -Wmissing-prototypes
->   [RFC] arch: turn -Wmissing-prototypes off conditionally
->   [RFC] Makefile.extrawarn: turn on missing-prototypes again
->
->  arch/alpha/Kbuild                        |  2 ++
->  arch/alpha/include/asm/pci.h             |  3 ---
->  arch/alpha/kernel/asm-offsets.c          |  2 +-
->  arch/alpha/lib/Makefile                  |  1 +
->  arch/arc/Kbuild                          |  2 ++
->  arch/arc/include/asm/kprobes.h           |  3 ---
->  arch/arm/include/asm/irq_work.h          |  2 --
->  arch/arm/include/asm/kprobes.h           |  2 --
->  arch/arm64/include/asm/irq_work.h        |  2 --
->  arch/arm64/include/asm/kprobes.h         |  2 --
->  arch/csky/Kbuild                         |  2 ++
->  arch/csky/include/asm/irq_work.h         |  2 +-
->  arch/hexagon/Kbuild                      |  2 ++
->  arch/ia64/Kbuild                         |  2 ++
->  arch/ia64/include/asm/kprobes.h          |  2 --
->  arch/ia64/kernel/asm-offsets.c           |  2 +-
->  arch/ia64/lib/Makefile                   |  1 +
->  arch/loongarch/Kbuild                    |  2 ++
->  arch/loongarch/kernel/asm-offsets.c      | 12 ++++++++++++
->  arch/m68k/Kbuild                         |  2 ++
->  arch/m68k/lib/Makefile                   |  1 +
->  arch/microblaze/Kbuild                   |  2 ++
->  arch/microblaze/include/asm/cacheflush.h |  2 +-
->  arch/mips/Kbuild                         |  2 ++
->  arch/mips/boot/compressed/Makefile       |  3 ++-
->  arch/mips/include/asm/kprobes.h          |  2 --
->  arch/nios2/Kbuild                        |  2 ++
->  arch/nios2/lib/Makefile                  |  1 +
->  arch/openrisc/Kbuild                     |  2 ++
->  arch/parisc/Kbuild                       |  2 ++
->  arch/parisc/lib/Makefile                 |  1 +
->  arch/powerpc/include/asm/irq_work.h      |  1 -
->  arch/powerpc/include/asm/kprobes.h       |  2 --
->  arch/riscv/include/asm/irq_work.h        |  2 +-
->  arch/s390/include/asm/irq_work.h         |  2 --
->  arch/s390/include/asm/kprobes.h          |  2 --
->  arch/sh/Kbuild                           |  2 ++
->  arch/sh/boot/compressed/Makefile         |  1 +
->  arch/sh/include/asm/kprobes.h            |  2 --
->  arch/sparc/Kbuild                        |  2 ++
->  arch/sparc/include/asm/kprobes.h         |  2 --
->  arch/sparc/kernel/asm-offsets.c          | 13 ++-----------
->  arch/sparc/lib/Makefile                  |  1 +
->  arch/sparc/prom/Makefile                 |  1 +
->  arch/x86/include/asm/irq_work.h          |  1 -
->  arch/x86/include/asm/kprobes.h           |  2 --
->  arch/xtensa/Kbuild                       |  2 ++
->  arch/xtensa/boot/lib/Makefile            |  2 ++
->  drivers/block/swim3.c                    |  2 +-
->  drivers/macintosh/ams/ams-core.c         |  2 +-
->  drivers/parport/parport_gsc.c            |  2 +-
->  drivers/scsi/gvp11.c                     |  5 -----
->  drivers/scsi/qlogicpti.c                 |  2 +-
->  drivers/zorro/names.c                    |  1 +
->  fs/jffs2/debug.c                         |  2 +-
->  include/linux/irq_work.h                 |  3 +++
->  include/linux/kprobes.h                  |  4 ++++
->  include/linux/pci.h                      |  5 +++++
->  include/linux/stackleak.h                |  6 ++++++
->  init/Kconfig                             | 10 ++++++++++
->  kernel/time/tick-internal.h              |  3 ++-
->  lib/test_ida.c                           |  2 +-
->  scripts/Makefile.extrawarn               |  5 +++--
->  63 files changed, 101 insertions(+), 63 deletions(-)
 
-Acked-by: Palmer Dabbelt <palmer@rivosinc.com> # RISC-V
+On Wed, 16 Aug 2023 10:22:10 +0800, Li Zhijian wrote:
+> Commit 137380c0ec40 renamed 'rnbd-client' to 'rnbd_client', this changed
+> sysfs interface to /sys/devices/virtual/rnbd_client/ctl/map_device
+> from /sys/devices/virtual/rnbd-client/ctl/map_device.
+> 
+> 
+
+Applied, thanks!
+
+[1/1] drivers/rnbd: restore sysfs interface to rnbd-client
+      commit: 8fc3dbf3dfb1ff30c9893fbbf02b0169f25944fe
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
