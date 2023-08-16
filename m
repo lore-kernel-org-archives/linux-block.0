@@ -2,117 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39827C001B0
-	for <linux-block@archiver.kernel.org>; Tue, 15 Aug 2023 20:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F70C0015E
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 01:13:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238408AbjHOUiv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 16:38:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35468 "EHLO
+        id S240950AbjHPBNT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 21:13:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239110AbjHOUif (ORCPT
+        with ESMTP id S241065AbjHPBNP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 16:38:35 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1859EE7A;
-        Tue, 15 Aug 2023 13:38:05 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bdf7086ae5so10543715ad.0;
-        Tue, 15 Aug 2023 13:38:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692131884; x=1692736684;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q9ApbnI87Q8RNqPgxcxbxYleBLjFt36Eud/z8NM1Jfc=;
-        b=Igj27S3Q1W7pnf91BSrgUhHYMac9KPTpHDNMOSpyjGg87YOqrM8yugbC9cQpM9wFZn
-         ot905KzakQ/YUojEz0/la0PlQcexdTkV45EUPdQnKkunKIKgveO6JG3bv/6pgNYvalik
-         UqWYSWuq+SbR1g1jX/emIsChbfQyWYnBmNKUlCtPFO0f3aUqGdJ8K3b4Y5KJS1me89BY
-         3FVnSH4f22UmdGN4eSKRukmqoOtNH/T41pGJSB8pqMnVFiD1wWqL7fjuU2JYKmywif5N
-         HeDbsn+VbosOa+pjWaRjS1lKO8IFSabcQ2uSHHGk16BiEO4Ihv9OrDdu4p4YEY+ESIr8
-         jGQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692131884; x=1692736684;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q9ApbnI87Q8RNqPgxcxbxYleBLjFt36Eud/z8NM1Jfc=;
-        b=fRK16UN1cAq2bs+KBd0cJRFiCtCriR55IqltjzWIGlUf4aOZgnhTZtsYAbad+OFu8j
-         0d5WKhFrDM41EYKuOXn6VXSIxdrFiR7pQrkMrsKjUV/3xKk2jrxXR7FMlevYz1LWGY/w
-         8QOblA+TdsySvXs8kRFlui2MSvhKrVJnljoODxa+VAZrZjSigPb1H9W/tkHCAa7erW3c
-         jUlBR9FaW/ZQQx+dbxY45EmQFGp2qRu7buDF8HCtAcqhI7Jzr8dsWnkYDQg4zMEG2CpW
-         jasfxI02EE3vhurIGkWWUC5tmf0uxMvZPfjJYl2X4MyTvVaHnv4KC15zzbuJgM1XvhIm
-         Pzjw==
-X-Gm-Message-State: AOJu0Yybm4ioE1bniIFIiTM8brtCEfgoDGumAUgyMJjehZlChjDV5H5r
-        CymQMj44AID9f5Tuwhl9l6I=
-X-Google-Smtp-Source: AGHT+IHhUV8EaldMz7zWKp34yUjxtun7VSqtlbQQK+DzG0CXOWQECA3nlkJg7rjhLd5VtW+qDgr4YA==
-X-Received: by 2002:a17:903:11c9:b0:1bb:ce4a:5893 with SMTP id q9-20020a17090311c900b001bbce4a5893mr17379711plh.30.1692131884499;
-        Tue, 15 Aug 2023 13:38:04 -0700 (PDT)
-Received: from localhost.localdomain ([2405:201:c009:58e9:db85:3caf:1429:e455])
-        by smtp.gmail.com with ESMTPSA id j11-20020a170902da8b00b001b9e9f191f2sm11492962plx.15.2023.08.15.13.37.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 13:38:04 -0700 (PDT)
-From:   Atul Kumar Pant <atulpant.linux@gmail.com>
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     Atul Kumar Pant <atulpant.linux@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        nbd@other.debian.org, shuah@kernel.org
-Subject: [PATCH v1] drivers: block: Drop unnecessary error check for debugfs_create_dir
-Date:   Wed, 16 Aug 2023 02:07:39 +0530
-Message-Id: <20230815203739.51706-1-atulpant.linux@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 15 Aug 2023 21:13:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D48931FCE;
+        Tue, 15 Aug 2023 18:13:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5FE20644DD;
+        Wed, 16 Aug 2023 01:13:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5CC4C433C7;
+        Wed, 16 Aug 2023 01:13:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692148383;
+        bh=QjRJQDTbptRiTmupwSjSqxA9iaxB6Z7Rjtp+mkWFNJY=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=bwo2WNc9oMK10BMu4/1EFNUQIxxTQqY6uBnlWYOx2krA40wQtOYlgObeJDkrymNVG
+         DLxzoFBlpiaisOMLn6MT5fcWjRP4c4LpWwAKOaZRQkW8kVUCcjT8x2DSnXvcnAcVL/
+         fqrxK4AlmRzsXWS8q0K0LY8+5LF/+ZGiZ7tR3drfazPDvTNBYLbZMYGXUnvGgrm6Qz
+         KWjVWpwdBDB7NypeI+Nc8fbsR6nHd/w71EedzouX/b/LyTHktbjv6UVqmMaZRZPKU4
+         RvSrviZNR682fEe+uFdJ2nuUsVJa6uBitRvP+PVBRg3+lBap2wYan9pqLuySZQt4vL
+         h1BZop7A3gO1w==
+Message-ID: <2b73497c-0c0c-6eeb-91ca-000884a9898c@kernel.org>
+Date:   Wed, 16 Aug 2023 10:13:01 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v8 5/9] scsi: core: Retry unaligned zoned writes
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230811213604.548235-1-bvanassche@acm.org>
+ <20230811213604.548235-6-bvanassche@acm.org>
+ <7dd67537-1ad8-79ca-281c-540bade2cb83@kernel.org>
+ <3161926c-b1cb-9617-bf71-73b8711e86de@acm.org>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <3161926c-b1cb-9617-bf71-73b8711e86de@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch removes the error checking for debugfs_create_dir.
-Even if we get an error from this function, other debugfs APIs will
-handle the error value and doesn't crash in that case. Hence caller can
-safely ignore the errors that occur during the creation of debugfs nodes.
+On 8/16/23 02:29, Bart Van Assche wrote:
+> On 8/14/23 05:36, Damien Le Moal wrote:
+>> On 8/12/23 06:35, Bart Van Assche wrote:
+>>> --- a/drivers/scsi/sd.c
+>>> +++ b/drivers/scsi/sd.c
+>>> @@ -1238,6 +1238,8 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
+>>>   	cmd->transfersize = sdp->sector_size;
+>>>   	cmd->underflow = nr_blocks << 9;
+>>>   	cmd->allowed = sdkp->max_retries;
+>>> +	if (!rq->q->limits.use_zone_write_lock && blk_rq_is_seq_zoned_write(rq))
+>>
+>> This condition could be written as a little inline helper
+>> blk_req_need_zone_write_lock(), which could be used in mq-dealine patch 2.
+> 
+> The above test differs from the tests in the mq-deadline I/O scheduler.
+> The mq-deadline I/O scheduler uses write locking if
+> rq->q->limits.use_zone_write_lock && q->disk->seq_zones_wlock &&
+> blk_rq_is_seq_zoned_write(rq). The above test is different and occurs
+> two times in scsi_error.c and one time in sd.c. Do you still want me to
+> introduce a helper function for that expression?
 
-Signed-off-by: Atul Kumar Pant <atulpant.linux@gmail.com>
----
- drivers/block/nbd.c     | 7 -------
- drivers/block/pktcdvd.c | 2 --
- 2 files changed, 9 deletions(-)
+May be not needed. But a comment explaining it may be good to add.
+I still think that added the test for use_zone_write_lock in
+blk_req_needs_zone_write_lock() is needed though, for consistency of all
+functions related to zone locking.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 65ecde3e2a5b..f64c79f6e112 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1666,11 +1666,6 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
- 		return -EIO;
- 
- 	dir = debugfs_create_dir(nbd_name(nbd), nbd_dbg_dir);
--	if (IS_ERR(dir)) {
--		dev_err(nbd_to_dev(nbd), "Failed to create debugfs dir for '%s'\n",
--			nbd_name(nbd));
--		return -EIO;
--	}
- 	config->dbg_dir = dir;
- 
- 	debugfs_create_file("tasks", 0444, dir, nbd, &nbd_dbg_tasks_fops);
-@@ -1692,8 +1687,6 @@ static int nbd_dbg_init(void)
- 	struct dentry *dbg_dir;
- 
- 	dbg_dir = debugfs_create_dir("nbd", NULL);
--	if (IS_ERR(dbg_dir))
--		return -EIO;
- 
- 	nbd_dbg_dir = dbg_dir;
- 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 69e5a100b3cf..37cdd68c3de5 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -451,8 +451,6 @@ static void pkt_debugfs_dev_new(struct pktcdvd_device *pd)
- 	if (!pkt_debugfs_root)
- 		return;
- 	pd->dfs_d_root = debugfs_create_dir(pd->name, pkt_debugfs_root);
--	if (IS_ERR(pd->dfs_d_root))
--		return;
- 
- 	pd->dfs_f_info = debugfs_create_file("info", 0444,
- 					     pd->dfs_d_root, pd, &debug_fops);
+> 
+> Thanks,
+> 
+> Bart.
+
 -- 
-2.25.1
+Damien Le Moal
+Western Digital Research
 
