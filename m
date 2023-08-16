@@ -2,166 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D88A2C10F19
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 19:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B39F0C41513
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 19:55:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345861AbjHPTqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 15:46:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47568 "EHLO
+        id S1345920AbjHPTzW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 15:55:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345873AbjHPTqN (ORCPT
+        with ESMTP id S1345910AbjHPTzE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 15:46:13 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEB9A12B;
-        Wed, 16 Aug 2023 12:46:11 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37GJcJMA002225;
-        Wed, 16 Aug 2023 19:45:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=hBBNENKxEqj7kT9AWimxqHg0F8y2eG57NgzFKLZvEq8=;
- b=BEnU/VM/IxoQrcs8N/gkFdfQSivK/gQtYePhH+ukeJUnhr155tCy8KHTroDVPm28SjjX
- 98N8shN3yEsZvRCwBWSOA5ZDfEHIfYzVCbnKSeMV5PvHyCJw5mUKNXB2dpYZgpHutyZO
- Z+cmo7yWk+qsif/ayp0CCljDtUzQJtryMmwHITxytCw3VGkH0GM51b1CcbJe/QbZBZCK
- dakKpUVH1B7A9kn6tdTLbdBm0HNkkatbRVxJj2ddbifCSGdCVU3jV/cJC/7ZfUtsGMaD
- CmxNRAgam/TmSDOtbWHeYj15TnB6pxbU/u4b70fLUO8+jzf2KCpAEveW9LblNz7eMxtj nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sh4pbrbpg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Aug 2023 19:45:50 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37GJcPLT002972;
-        Wed, 16 Aug 2023 19:45:49 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sh4pbrbpb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Aug 2023 19:45:49 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37GJKOJM007856;
-        Wed, 16 Aug 2023 19:45:48 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3senwkfpma-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Aug 2023 19:45:48 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37GJjlde7602808
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Aug 2023 19:45:47 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 698D25805C;
-        Wed, 16 Aug 2023 19:45:47 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 86DC65805E;
-        Wed, 16 Aug 2023 19:45:46 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.61.60.97])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Aug 2023 19:45:46 +0000 (GMT)
-Message-ID: <46cda90a12da4639d1e65ce82ae342df05b7afc2.camel@linux.vnet.ibm.com>
-Subject: Re: [PATCH v5 0/3 RESEND] sed-opal: keyrings, discovery, revert,
- key store
-From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reply-To: gjoyce@linux.vnet.ibm.com
-To:     linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
-        keyrings@vger.kernel.org, okozina@redhat.com, dkeefe@redhat.com
-Date:   Wed, 16 Aug 2023 14:45:46 -0500
-In-Reply-To: <20230721211534.3437070-1-gjoyce@linux.vnet.ibm.com>
-References: <20230721211534.3437070-1-gjoyce@linux.vnet.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Gv8S02VnGEarXaN7umjt4jkoFW7jziU1
-X-Proofpoint-ORIG-GUID: QeHwhJfdE2e3SCjhvbRRswF3o-uLsE18
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-16_18,2023-08-15_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- malwarescore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0
- priorityscore=1501 clxscore=1011 mlxlogscore=844 suspectscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308160173
+        Wed, 16 Aug 2023 15:55:04 -0400
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 446041BEE;
+        Wed, 16 Aug 2023 12:55:03 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6887b3613e4so1179377b3a.3;
+        Wed, 16 Aug 2023 12:55:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692215703; x=1692820503;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3+wK2b/T5ahLT/169wPA2eew56bTI2jrIsHOq12bMQA=;
+        b=EhLzdUnZ5CDX0wooop5A0Qy2LNwf48H63clRs5608awpNCv2M87DxxLJIcbsw9Abbh
+         2n6PM2J7ZTPLIHA99mdCFkezIQuRUmVrccH9S44X5TW05J+p2WplKxiWfABDMsZKGCL9
+         0YMWRa4CZygiDG+TJbd7e86Lyek8NOOvUqgCtoqQpuY/BHyWqJEh9vJ5LpzQYjEGoEQG
+         9aWkglbqpaifVgYYnjZD8gbGoapV4Y8Ut4b0gKGRH7TkV7lomOPWAHvoMjybC4F7Y930
+         TXLy9UGm7AogVMiWYnfN3zEsl32ruZ/ArqnxNkgoz6ub3hCuZvxfy7PYBE+RHq1p7wTW
+         ThBg==
+X-Gm-Message-State: AOJu0YwxrOUhQ2zjQqs14E7cWt7VFgPAWh/howTIqCAA394bL/ECBKlG
+        dV8CBZsGhHJxT0BPyqPGCwA=
+X-Google-Smtp-Source: AGHT+IEuPF57GoiVHy80p8JN6Kr+gPanM9h0ZyGHzuX3I8WzdqLR9CvUVl4AOtI95bYJNiaGxHdubQ==
+X-Received: by 2002:a05:6a00:3490:b0:687:9909:3c75 with SMTP id cp16-20020a056a00349000b0068799093c75mr3170690pfb.4.1692215702559;
+        Wed, 16 Aug 2023 12:55:02 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:7141:e456:f574:7de0])
+        by smtp.gmail.com with ESMTPSA id r26-20020a62e41a000000b0068890c19c49sm1588508pfh.180.2023.08.16.12.55.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 12:55:02 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v9 02/17] block: Only use write locking if necessary
+Date:   Wed, 16 Aug 2023 12:53:14 -0700
+Message-ID: <20230816195447.3703954-3-bvanassche@acm.org>
+X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
+In-Reply-To: <20230816195447.3703954-1-bvanassche@acm.org>
+References: <20230816195447.3703954-1-bvanassche@acm.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's been almost 4 weeks since the last resend and there haven't been
-any comments. Is there anything that needs to be changed for
-acceptance?
+Make blk_req_needs_zone_write_lock() return false if
+q->limits.use_zone_write_lock is false. Inline this function because it
+is short and because it is called from the hot path of the mq-deadline
+I/O scheduler.
 
-Thanks for your input.
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-zoned.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Greg
-
-On Fri, 2023-07-21 at 16:15 -0500, gjoyce@linux.vnet.ibm.com wrote:
-> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> 
-> This patchset has gone through numerous rounds of review and
-> all comments/suggetions have been addressed. The reviews have
-> covered all relevant areas including reviews by block and keyring
-> developers as well as the SED Opal maintainer. The last
-> patchset submission has not solicited any responses in the
-> six weeks since it was last distributed. The changes are
-> generally useful and ready for inclusion.
-> 
-> TCG SED Opal is a specification from The Trusted Computing Group
-> that allows self encrypting storage devices (SED) to be locked at
-> power on and require an authentication key to unlock the drive.
-> 
-> The current SED Opal implementation in the block driver
-> requires that authentication keys be provided in an ioctl
-> so that they can be presented to the underlying SED
-> capable drive. Currently, the key is typically entered by
-> a user with an application like sedutil or sedcli. While
-> this process works, it does not lend itself to automation
-> like unlock by a udev rule.
-> 
-> The SED block driver has been extended so it can alternatively
-> obtain a key from a sed-opal kernel keyring. The SED ioctls
-> will indicate the source of the key, either directly in the
-> ioctl data or from the keyring.
-> 
-> Two new SED ioctls have also been added. These are:
->   1) IOC_OPAL_REVERT_LSP to revert LSP state
->   2) IOC_OPAL_DISCOVERY to discover drive capabilities/state
-> 
-> change log v5:
->         - rebase to for-6.5/block
-> 
-> change log v4:
->         - rebase to 6.3-rc7
->         - replaced "255" magic number with U8_MAX
-> 
-> change log:
->         - rebase to 6.x
->         - added latest reviews
->         - removed platform functions for persistent key storage
->         - replaced key update logic with key_create_or_update()
->         - minor bracing and padding changes
->         - add error returns
->         - opal_key structure is application provided but kernel
->           verified
->         - added brief description of TCG SED Opal
-> 
-> 
-> Greg Joyce (3):
->   block: sed-opal: Implement IOC_OPAL_DISCOVERY
->   block: sed-opal: Implement IOC_OPAL_REVERT_LSP
->   block: sed-opal: keyring support for SED keys
-> 
->  block/Kconfig                 |   2 +
->  block/opal_proto.h            |   4 +
->  block/sed-opal.c              | 252
-> +++++++++++++++++++++++++++++++++-
->  include/linux/sed-opal.h      |   5 +
->  include/uapi/linux/sed-opal.h |  25 +++-
->  5 files changed, 282 insertions(+), 6 deletions(-)
-> 
-> 
-> base-commit: 1341c7d2ccf42ed91aea80b8579d35bc1ea381e2
-
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 112620985bff..d8a80cce832f 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -53,11 +53,16 @@ const char *blk_zone_cond_str(enum blk_zone_cond zone_cond)
+ EXPORT_SYMBOL_GPL(blk_zone_cond_str);
+ 
+ /*
+- * Return true if a request is a write requests that needs zone write locking.
++ * Return true if a request is a write request that needs zone write locking.
+  */
+ bool blk_req_needs_zone_write_lock(struct request *rq)
+ {
+-	if (!rq->q->disk->seq_zones_wlock)
++	struct request_queue *q = rq->q;
++
++	if (!q->limits.use_zone_write_lock)
++		return false;
++
++	if (!q->disk->seq_zones_wlock)
+ 		return false;
+ 
+ 	return blk_rq_is_seq_zoned_write(rq);
