@@ -2,140 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B86EBC25B4F
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 20:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8E92C27C41
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 20:37:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240746AbjHPU1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 16:27:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50790 "EHLO
+        id S1346119AbjHPUgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 16:36:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236852AbjHPU12 (ORCPT
+        with ESMTP id S1346179AbjHPUgJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 16:27:28 -0400
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7723B268F
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 13:27:27 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-58d41109351so3448397b3.1
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 13:27:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692217646; x=1692822446;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o6nAd4B+hY09XKdSdHx5sCH4iOSgPQT2h6trGlM+vNA=;
-        b=dveIXLQA89ZUWYHabJVtI3oEEzpIr9fV/lirVBfekKiFOXn1lGgA2uPGEcOlkOZjBD
-         a1aBpoGF8QaJMHqlLM0UKvL9kaKpzS6zyOvmB6Zbc1eS7EEJ6VlfQkXyzLpNQhfG3OEw
-         eCGtvZNYLyrmkoj5+tJuw3HMFHCP3sqPuk8fbd3spP0mYw93n9H7+8N80JmbfIs4qiXv
-         pYw7bvDGtSSGmN6GSey1TNwmTvBJC5JMT671NM0B4mgv/BXoWeH/4YzxKbh3yB570fS0
-         aJREuoDn9t0m4s+z3u9TOwbz2TQ5vLr7L5z9o4q0UsNVHdnnboFQwrHaMLNNgfIPCdb7
-         au3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692217646; x=1692822446;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o6nAd4B+hY09XKdSdHx5sCH4iOSgPQT2h6trGlM+vNA=;
-        b=NiEw46kIg4hWmKyrZvYn1SHN9w1wnmhxZi0o5ZFO84b7C8b607S978GBizkLWU4TPy
-         oYU4xG5KkKHFiF6K8NhYyKvKvFsD/3UH3vau4PpAag0v+p86aSoDWnYgyPYLX24DVnWb
-         G0sPblog5mh+fuCqTYN2q4Neax1uJzxH6tj6ZkJpqL3aI9xdwNZYT7kVTtIpCZryhBJt
-         dHlMB6hBZaUiKr5i07SuSyLdBRzG0s8AiJ+HYGlVE5RJLkyjvArx2S0GlmvlEmlqerB5
-         qbnByDU07mj9LDA3p3GALyG8cUwJ0578WFDfZaL908ZEIIJmSQTWYRjPegAhGYZ8Hke0
-         Da8Q==
-X-Gm-Message-State: AOJu0YynsVeZxgqq4NN26Fsa7gNprUCZ7y0jFwr+ZEk8/5tZVQKcOUSy
-        vOqMIFqHcrlY5uWgmrnUi9w+dw==
-X-Google-Smtp-Source: AGHT+IEO5uc8CKDzvfrW8shdjb35Kp27HpuCfrFDLQV5dylLk8ofwbkbKcaFpgjeKtRhrvd/mx2svA==
-X-Received: by 2002:a0d:d641:0:b0:56c:e5a3:3e09 with SMTP id y62-20020a0dd641000000b0056ce5a33e09mr850661ywd.15.1692217646555;
-        Wed, 16 Aug 2023 13:27:26 -0700 (PDT)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id z16-20020a81c210000000b005463e45458bsm4189762ywc.123.2023.08.16.13.27.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 13:27:25 -0700 (PDT)
-Date:   Wed, 16 Aug 2023 13:27:17 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.attlocal.net
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-cc:     Jens Axboe <axboe@kernel.dk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Hugh Dickins <hughd@google.com>, Hannes Reineke <hare@suse.de>,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] block: Remove special-casing of compound pages
-In-Reply-To: <20230814144100.596749-1-willy@infradead.org>
-Message-ID: <94635da5-ce28-a8fb-84e3-7a9f5240fe6a@google.com>
-References: <20230814144100.596749-1-willy@infradead.org>
+        Wed, 16 Aug 2023 16:36:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB37F2705
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 13:35:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692218122;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8oUR7dATEA9GXbFeybfh8Kk00mHSoSorpZF1PcQEdPw=;
+        b=Ylb7Jmr1gVo0g34UKYEGlDpYpcQ28b6l2lfzs0sFrB4VTG4GV1nz/3NfM4U9ESrGID5rvU
+        fxw6A8pUUQlRYhkRpuQ4V5a+3KgottQsWEU03/bpTL6vOZ/nVlu2EBFQJo5904168cpBmz
+        WlFqspawVObBPI8sjPzqZRau6Nx1FT4=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-7-2T0FB_1HO5SCDKlfnSHo-Q-1; Wed, 16 Aug 2023 16:35:18 -0400
+X-MC-Unique: 2T0FB_1HO5SCDKlfnSHo-Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC6C83C0F685;
+        Wed, 16 Aug 2023 20:35:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CF6EF492C14;
+        Wed, 16 Aug 2023 20:35:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
+References: <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com> <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com> <20230816120741.534415-1-dhowells@redhat.com> <20230816120741.534415-3-dhowells@redhat.com> <608853.1692190847@warthog.procyon.org.uk> <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, David Laight <David.Laight@aculab.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@list.de>,
+        Christian Brauner <christian@brauner.io>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <665723.1692218114.1@warthog.procyon.org.uk>
+Date:   Wed, 16 Aug 2023 21:35:14 +0100
+Message-ID: <665724.1692218114@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-a.k.a "Fix rare user data corruption when using THP" :)
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-On Mon, 14 Aug 2023, Matthew Wilcox (Oracle) wrote:
-
-> The special casing was originally added in pre-git history; reproducing
-> the commit log here:
+> > What about ITER_BVEC_MC ??
 > 
-> > commit a318a92567d77
-> > Author: Andrew Morton <akpm@osdl.org>
-> > Date:   Sun Sep 21 01:42:22 2003 -0700
-> >
-> >     [PATCH] Speed up direct-io hugetlbpage handling
-> >
-> >     This patch short-circuits all the direct-io page dirtying logic for
-> >     higher-order pages.  Without this, we pointlessly bounce BIOs up to
-> >     keventd all the time.
-> 
-> In the last twenty years, compound pages have become used for more than
-> just hugetlb.  Rewrite these functions to operate on folios instead
-> of pages and remove the special case for hugetlbfs; I don't think
-> it's needed any more (and if it is, we can put it back in as a call
-> to folio_test_hugetlb()).
-> 
-> This was found by inspection; as far as I can tell, this bug can lead
-> to pages used as the destination of a direct I/O read not being marked
-> as dirty.  If those pages are then reclaimed by the MM without being
-> dirtied for some other reason, they won't be written out.  Then when
-> they're faulted back in, they will not contain the data they should.
-> It'll take a pretty unusual setup to produce this problem with several
-> races all going the wrong way.
-> 
-> This problem predates the folio work; it could for example have been
-> triggered by mmaping a THP in tmpfs and using that as the target of an
-> O_DIRECT read.
-> 
-> Fixes: 800d8c63b2e98 ("shmem: add huge pages support")
+> That probably would be the best option. Just make it a proper
+> ITER_xyz, instead of an odd sub-case for one ITER (but set up in such
+> a way that it looks like it might happen for other ITER_xyz cases).
 
-No. It's a good catch, but bug looks specific to the folio work to me.
+I'm not sure that buys us anything.  It would then require every call to
+iov_iter_is_bvec()[*] to check for two values instead of one - including in
+iterate_and_advance() - and *still* we'd have to have the special-casing in
+_copy_from_iter() and copy_page_from_iter_atomic().
 
-Almost all shmem pages are dirty from birth, even as soon as they are
-brought back from swap; so it is not necessary to re-mark them dirty.
+The issue is that ITER_xyz changes the iteration function - but we don't
+actually want to do that; rather, we need to change the step function.
 
-The exceptions are pages allocated to holes when faulted: so you did
-get me worried as to whether khugepaged could collapse a pmd-ful of
-those into a THP without marking the result as dirty.
+David
 
-But no, in v6.5-rc6 the collapse_file() success path has
-	if (is_shmem)
-		folio_mark_dirty(folio);
-and in v5.10 the same appears as
-		if (is_shmem)
-			set_page_dirty(new_page);
+[*] There's a bunch of them outside of iov_iter.c.
 
-(IIRC, that or marking pmd dirty was missed from early shmem THP
-support, but fairly soon corrected, and backported to stable then.
-I have a faint memory of versions which assembled pmd_dirty from
-collected pte_dirtys.)
-
-And the !is_shmem case is for CONFIG_READ_ONLY_THP_FOR_FS: writing
-into those pages, by direct IO or whatever, is already prohibited.
-
-It's dem dirty (or not dirty) folios dat's the trouble!
-
-Hugh
-
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> ---
->  block/bio.c | 46 ++++++++++++++++++++++++----------------------
->  1 file changed, 24 insertions(+), 22 deletions(-)
