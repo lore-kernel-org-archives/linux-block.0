@@ -2,96 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8781AC001DF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 08:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 614FEC001E0
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 09:16:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243157AbjHPIyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 04:54:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38270 "EHLO
+        id S243232AbjHPJPb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 05:15:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243213AbjHPIyj (ORCPT
+        with ESMTP id S243286AbjHPJP2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 04:54:39 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0403610C8;
-        Wed, 16 Aug 2023 01:54:37 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RQhlW1Tnjz4f3jXm;
-        Wed, 16 Aug 2023 16:54:31 +0800 (CST)
-Received: from [10.174.179.247] (unknown [10.174.179.247])
-        by APP4 (Coremail) with SMTP id gCh0CgCXc6bEjtxkxHNZAw--.11704S3;
-        Wed, 16 Aug 2023 16:54:32 +0800 (CST)
-Message-ID: <6042c46d-72f1-6480-032d-1670916a734e@huaweicloud.com>
-Date:   Wed, 16 Aug 2023 16:54:28 +0800
+        Wed, 16 Aug 2023 05:15:28 -0400
+Received: from out-30.mta0.migadu.com (out-30.mta0.migadu.com [IPv6:2001:41d0:1004:224b::1e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 856271BF8
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 02:15:26 -0700 (PDT)
+Message-ID: <9091fa43-1c38-58f4-b23d-7705fc647293@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1692177324;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7hzRwpdWY8QIffBbn0D1YNeGrZzAgPJoF3wC1s2tY6M=;
+        b=XQBooO+R0LjluBdeAtLEQNXIFeBN6MY67jQWB2CEMoSSKsz6vpgkY7xN3PgdYHvND952wE
+        zbN7gPLjguh29PjLy9NxSKmPOg6mpSL4T4Lb/CHidSINUwBe4GZclVHq6q37qptqGvi60P
+        oZky3NRnyqPGtUHfvHfoJCW9oQhl8x0=
+Date:   Wed, 16 Aug 2023 17:15:14 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v4 0/4] block/badblocks: fix badblocks setting error
-To:     axboe@kernel.dk, vishal.l.verma@intel.com,
-        dan.j.williams@intel.com, ashok_raj@linux.intel.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
-        yangerkun@huawei.com
-References: <20230626080913.3493135-1-linan666@huaweicloud.com>
-From:   Li Nan <linan666@huaweicloud.com>
-In-Reply-To: <20230626080913.3493135-1-linan666@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCXc6bEjtxkxHNZAw--.11704S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKryxKw13ZF4rZF13GF1kGrg_yoWktFc_u3
-        yIyFyrGr4kXayfAay3tF15XrWIyF4UCr10kFyDtr4Sqr17tF4Utws5JrWDXwnxWF4kWwn8
-        Z3s5XryfXw1IqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbakYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l
-        5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67
-        AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2
-        Y2ka0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
-        IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
-        MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
-        WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3
-        Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8Jb
-        IYCTnIWIevJa73UjIFyTuYvjxUFfHjUUUUU
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+Subject: Re: [PATCH] null_blk: fix poll request timeout handling
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>
+Cc:     axboe@kernel.dk, kch@nvidia.com, damien.lemoal@opensource.wdc.com,
+        bvanassche@acm.org, nj.shetty@samsung.com, kbusch@kernel.org,
+        zhouchengming@bytedance.com, akinobu.mita@gmail.com,
+        shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230815060443.660263-1-chengming.zhou@linux.dev>
+ <23383.1692087575@warthog.procyon.org.uk>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <23383.1692087575@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Friendly ping.
+On 2023/8/15 16:19, David Howells wrote:
+> chengming.zhou@linux.dev wrote:
+> 
+>> From: Chengming Zhou <zhouchengming@bytedance.com>
+>>
+>> When doing io_uring benchmark on /dev/nullb0, it's easy to crash the
+>> kernel if poll requests timeout triggered, as reported by David. [1]
+>>
+>> BUG: kernel NULL pointer dereference, address: 0000000000000008
+>> Workqueue: kblockd blk_mq_timeout_work
+>> RIP: 0010:null_timeout_rq+0x4e/0x91
+>> Call Trace:
+>>  ? __die_body+0x1a/0x5c
+>>  ? page_fault_oops+0x6f/0x9c
+>>  ? kernelmode_fixup_or_oops+0xc6/0xd6
+>>  ? __bad_area_nosemaphore+0x44/0x1eb
+>>  ? exc_page_fault+0xe2/0xf4
+>>  ? asm_exc_page_fault+0x22/0x30
+>>  ? null_timeout_rq+0x4e/0x91
+>>  blk_mq_handle_expired+0x31/0x4b
+>>  bt_iter+0x68/0x84
+>>  ? bt_tags_iter+0x81/0x81
+>>  __sbitmap_for_each_set.constprop.0+0xb0/0xf2
+>>  ? __blk_mq_complete_request_remote+0xf/0xf
+>>  bt_for_each+0x46/0x64
+>>  ? __blk_mq_complete_request_remote+0xf/0xf
+>>  ? percpu_ref_get_many+0xc/0x2a
+>>  blk_mq_queue_tag_busy_iter+0x14d/0x18e
+>>  blk_mq_timeout_work+0x95/0x127
+>>  process_one_work+0x185/0x263
+>>  worker_thread+0x1b5/0x227
+>>  ? rescuer_thread+0x287/0x287
+>>  kthread+0xfa/0x102
+>>  ? kthread_complete_and_exit+0x1b/0x1b
+>>  ret_from_fork+0x22/0x30
+>>
+>> This is indeed a race problem between null_timeout_rq() and null_poll().
+>>
+>> null_poll()				null_timeout_rq()
+>>   spin_lock(&nq->poll_lock)
+>>   list_splice_init(&nq->poll_list, &list)
+>>   spin_unlock(&nq->poll_lock)
+>>
+>>   while (!list_empty(&list))
+>>     req = list_first_entry()
+>>     list_del_init()
+>>     ...
+>>     blk_mq_add_to_batch()
+>>     // req->rq_next = NULL
+>> 					spin_lock(&nq->poll_lock)
+>>
+>> 					// rq->queuelist->next == NULL
+>> 					list_del_init(&rq->queuelist)
+>>
+>> 					spin_unlock(&nq->poll_lock)
+>>
+>> What's worse is that we don't call blk_mq_complete_request_remote()
+>> before blk_mq_add_to_batch(), so these completed requests have wrong
+>> rq->state == MQ_RQ_IN_FLIGHT. We can easily check this using bpftrace:
+>>
+>> ```
+>> bpftrace -e 'kretfunc:null_blk:null_poll {
+>>   $iob=(struct io_comp_batch *)args->iob;
+>>   @[$iob->req_list->state]=count();
+>> }'
+>>
+>> @[1]: 51708
+>> ```
+>>
+>> Fix these problems by setting requests state to MQ_RQ_COMPLETE under
+>> nq->poll_lock protection, in which null_timeout_rq() can safely detect
+>> this race and early return.
+>>
+>> [1] https://lore.kernel.org/all/3893581.1691785261@warthog.procyon.org.uk/
+>>
+>> Fixes: 0a593fbbc245 ("null_blk: poll queue support")
+>> Reported-by: David Howells <dhowells@redhat.com>
+>> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> 
+> Okay, the oops no longer seems to happen, so on that basis:
+> 
+> Tested-by: David Howells <dhowells@redhat.com>
+> 
 
-在 2023/6/26 16:09, linan666@huaweicloud.com 写道:
-> From: Li Nan <linan122@huawei.com>
-> 
-> This patch series fixes some simple bugs of setting badblocks and
-> optimizing struct badblocks. Coly Li has been trying to refactor badblocks
-> in patch series "badblocks improvement for multiple bad block ranges"
-> (https://lore.kernel.org/all/20220721121152.4180-1-colyli@suse.de). but the
-> workload is significant. Before that, I will fix some easily triggered
-> issues and optimize some code that does not conflict with Coly's changes.
-> 
-> Changes in v4:
->   - patch 1, remove the part of reorder fields
->   - patch 3/4, improve commit log.
-> 
-> Changes in v3:
->   - delete patchs with significant changes.
-> 
-> Li Nan (4):
->    block/badblocks: change some members of badblocks to bool
->    block/badblocks: only set bb->changed/unacked_exist when badblocks
->      changes
->    block/badblocks: fix badblocks loss when badblocks combine
->    block/badblocks: fix the bug of reverse order
-> 
->   include/linux/badblocks.h |  9 +++++----
->   block/badblocks.c         | 38 ++++++++++++++++++++++----------------
->   2 files changed, 27 insertions(+), 20 deletions(-)
-> 
+Yes, this patch just fixes the kernel oops when request timeout happened.
 
--- 
-Thanks,
-Nan
+> 
+> However, running:
+> 
+> 	./fio/t/io_uring -n4 /dev/nullb0
+> 
+> and then interrupting it with ctrl-C after a while dumps a whole load of
+> messages into the dmesg log (excerpt attached).  It seems wrong that the user
+> should be able to generate a dump like this just by interrupting - but I guess
+> as it's null_blk it probably doesn't matter.
 
+I can reproduce it, maybe an issue in io_uring. Although io_uring will reap
+all pending requests when task exit, it seems that it will block for some
+seconds before doing reap, so timeout happen. I'm not sure, just some guess ;-)
+
+Thanks.
+
+> 
+> David
+> ---
+> null_blk: rq 00000000bb2d3264 timed out
+> timeout error, dev nullb0, sector 328372624 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 00000000abcc1075 timed out
+> timeout error, dev nullb0, sector 378610072 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 00000000d4bdc71f timed out
+> timeout error, dev nullb0, sector 185005312 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 00000000f4ffddee timed out
+> timeout error, dev nullb0, sector 206118608 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 000000001e68b709 timed out
+> timeout error, dev nullb0, sector 310381160 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 00000000bfeafe97 timed out
+> timeout error, dev nullb0, sector 52036480 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 00000000aa67d21c timed out
+> timeout error, dev nullb0, sector 22746448 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 00000000faec1291 timed out
+> timeout error, dev nullb0, sector 391201440 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 00000000c634428c timed out
+> timeout error, dev nullb0, sector 237216136 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 0000000077f91a5d timed out
+> timeout error, dev nullb0, sector 453778912 op 0x0:(READ) flags 0xe00000 phys_seg 1 prio class 2
+> null_blk: rq 000000003076467c timed out
+> null_blk: rq 000000009c172678 timed out
+> null_blk: rq 000000002df50b48 timed out
+> null_blk: rq 00000000e4c66900 timed out
+> null_blk: rq 0000000082606e31 timed out
+> null_blk: rq 00000000fe21ffdc timed out
+> null_blk: rq 000000005e5c5173 timed out
+> null_blk: rq 00000000b0a0d20c timed out
+> null_blk: rq 000000008c729e47 timed out
+> null_blk: rq 00000000970f75a0 timed out
+> null_blk: rq 000000002ad3c45a timed out
+> 
