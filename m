@@ -2,144 +2,179 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8C6C001B0
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 01:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5189CC001DE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 02:18:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241081AbjHPBb3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 21:31:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46776 "EHLO
+        id S237041AbjHPCSY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 22:18:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241065AbjHPBa5 (ORCPT
+        with ESMTP id S241284AbjHPCSM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 21:30:57 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 898D81BF8;
-        Tue, 15 Aug 2023 18:30:56 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RQVvZ5DMnz4f3nwk;
-        Wed, 16 Aug 2023 09:30:50 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgAH5KbHJtxkQuVAAw--.55976S8;
-        Wed, 16 Aug 2023 09:30:51 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai3@huawei.com, mkoutny@suse.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH -next v2 4/4] blk-throttle: consider 'carryover_ios/bytes' in throtl_trim_slice()
-Date:   Wed, 16 Aug 2023 09:27:08 +0800
-Message-Id: <20230816012708.1193747-5-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230816012708.1193747-1-yukuai1@huaweicloud.com>
-References: <20230816012708.1193747-1-yukuai1@huaweicloud.com>
+        Tue, 15 Aug 2023 22:18:12 -0400
+Received: from mail-pl1-f206.google.com (mail-pl1-f206.google.com [209.85.214.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF98BE5
+        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 19:17:53 -0700 (PDT)
+Received: by mail-pl1-f206.google.com with SMTP id d9443c01a7336-1bdeadd1b0cso26051315ad.1
+        for <linux-block@vger.kernel.org>; Tue, 15 Aug 2023 19:17:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692152273; x=1692757073;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=X1uA/aWqWfQQStzLak2n/ZM3Onur8CIAEdPF1VtgWpg=;
+        b=VVDXcy9iYBuhVnJQ89/e7z4k/dJ4G/8HTzsj5Nja3ZaTuWNskEsglQY3Ke15QTJVQk
+         0dCa5/dKw4SGHf0gqHF+ZsKkvnIgIQFc7wpCUdKwmFd0e6ZPuPcqN7otK2uxZQjGdxrX
+         HOAzFGldhcdgn0xN5rrZtSeAU4fqxoKSoqmhExbLTCsUSJbY/d+EE3JVS23KHAZ6m6uo
+         4esobsRvNH/jCb8A+two+NxDnej2E+VueTgDmdDPOAgqqw3cI/MxG38wPtAWX7SrpWJt
+         CGFsb55qnKzBZAQEZmirxiZna12Lbz2g8vKs/IQSXkOUE2OXWMejai7Gpwp/Bh1ZTFDr
+         Ck/g==
+X-Gm-Message-State: AOJu0Yy2ZfiLI1LrIrcbN+zXKG8xMZGQaiSFnXaY4ejh/RbugGnQbSFA
+        pZZKF+6jO4577pYvnJnKEcEkJGOVAOdWJGj4/wKYe6BRaVz3
+X-Google-Smtp-Source: AGHT+IHu4UHeL0j053E/P8XFSlVdjgzsz6kM4pt+NYnBY5oPhox6ysb1cFKGQRsvXxHZ/KGdNzMLVdA/WiOm037V12sXcxZoyAVW
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAH5KbHJtxkQuVAAw--.55976S8
-X-Coremail-Antispam: 1UD129KBjvJXoWxWrW3ZF47Zw43Ww13trW8WFg_yoW5Zw1fpF
-        WfJF47twsIqFn3K3ZxZ3Wvv3Wjk3yDJryDG3y5trWfAF90kry8Kr1vkrW2qay2yas7ua1f
-        J3409r9rAr4qkrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-        z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-        kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
-        UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a17:902:da88:b0:1b8:a555:7615 with SMTP id
+ j8-20020a170902da8800b001b8a5557615mr224890plx.9.1692152273063; Tue, 15 Aug
+ 2023 19:17:53 -0700 (PDT)
+Date:   Tue, 15 Aug 2023 19:17:52 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002455cc060300e766@google.com>
+Subject: [syzbot] [block?] [hfs?] general protection fault in blk_stat_add
+From:   syzbot <syzbot+a6eebfd633f0f4630a40@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+Hello,
 
-Currently, 'carryover_ios/bytes' is not handled in throtl_trim_slice(),
-for consequence, 'carryover_ios/bytes' will be used to throttle bio
-multiple times, for example:
+syzbot found the following issue on:
 
-1) set iops limit to 100, and slice start is 0, slice end is 100ms;
-2) current time is 0, and 10 ios are dispatched, those io won't be
-   throttled and io_disp is 10;
-3) still at current time 0, update iops limit to 1000, carryover_ios is
-   updated to (0 - 10) = -10;
-4) in this slice(0 - 100ms), io_allowed = 100 + (-10) = 90, which means
-   only 90 ios can be dispatched without waiting;
-5) assume that io is throttled in slice(0 - 100ms), and
-   throtl_trim_slice() update silce to (100ms - 200ms). In this case,
-   'carryover_ios/bytes' is not cleared and still only 90 ios can be
-   dispatched between 100ms - 200ms.
+HEAD commit:    21ef7b1e17d0 Add linux-next specific files for 20230809
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1475a7a5a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=28e9e38cc16e8f0
+dashboard link: https://syzkaller.appspot.com/bug?extid=a6eebfd633f0f4630a40
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1489cffda80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13bd2969a80000
 
-Fix this problem by updating 'carryover_ios/bytes' in
-throtl_trim_slice().
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e961d9a9b52d/disk-21ef7b1e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f5c9bb17b02c/vmlinux-21ef7b1e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ebef5bdf7465/bzImage-21ef7b1e.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/3565b37f1a37/mount_0.gz
 
-Fixes: a880ae93e5b5 ("blk-throttle: fix io hung due to configuration updates")
-Reported-by: zhuxiaohui <zhuxiaohui.400@bytedance.com>
-Link: https://lore.kernel.org/all/20230812072116.42321-1-zhuxiaohui.400@bytedance.com/
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Bisection is inconclusive: the issue happens on the oldest tested release.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1273906ba80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1173906ba80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1673906ba80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a6eebfd633f0f4630a40@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000003: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
+CPU: 1 PID: 22 Comm: ksoftirqd/1 Not tainted 6.5.0-rc5-next-20230809-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+RIP: 0010:hlist_unhashed_lockless include/linux/list.h:963 [inline]
+RIP: 0010:timer_pending include/linux/timer.h:168 [inline]
+RIP: 0010:blk_stat_is_active block/blk-stat.h:133 [inline]
+RIP: 0010:blk_stat_add+0x168/0x4f0 block/blk-stat.c:66
+Code: 48 bd 00 00 00 00 00 fc ff df 4d 63 f6 4a 8d 04 f5 00 8a 3b 8c 48 89 44 24 08 e8 73 09 7f fd 48 8d 7b 18 48 89 f8 48 c1 e8 03 <80> 3c 28 00 0f 85 ca 02 00 00 48 8b 43 18 48 85 c0 0f 84 0d 01 00
+RSP: 0018:ffffc900001c7d10 EFLAGS: 00010206
+RAX: 0000000000000003 RBX: 0000000000000000 RCX: 0000000000000100
+RDX: ffff888017643b80 RSI: ffffffff8408be0d RDI: 0000000000000018
+RBP: dffffc0000000000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000022000
+R13: 00000000000195cc R14: 0000000000000001 R15: ffff88801c78d690
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005555562206f8 CR3: 000000001be4a000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __blk_mq_end_request_acct block/blk-mq.c:1013 [inline]
+ __blk_mq_end_request block/blk-mq.c:1022 [inline]
+ blk_mq_end_request+0x2fd/0x3c0 block/blk-mq.c:1038
+ lo_complete_rq+0x1c4/0x270 drivers/block/loop.c:370
+ blk_complete_reqs+0xb2/0xf0 block/blk-mq.c:1114
+ __do_softirq+0x218/0x965 kernel/softirq.c:553
+ run_ksoftirqd kernel/softirq.c:921 [inline]
+ run_ksoftirqd+0x31/0x60 kernel/softirq.c:913
+ smpboot_thread_fn+0x67d/0xa00 kernel/smpboot.c:164
+ kthread+0x33a/0x430 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:145
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:hlist_unhashed_lockless include/linux/list.h:963 [inline]
+RIP: 0010:timer_pending include/linux/timer.h:168 [inline]
+RIP: 0010:blk_stat_is_active block/blk-stat.h:133 [inline]
+RIP: 0010:blk_stat_add+0x168/0x4f0 block/blk-stat.c:66
+Code: 48 bd 00 00 00 00 00 fc ff df 4d 63 f6 4a 8d 04 f5 00 8a 3b 8c 48 89 44 24 08 e8 73 09 7f fd 48 8d 7b 18 48 89 f8 48 c1 e8 03 <80> 3c 28 00 0f 85 ca 02 00 00 48 8b 43 18 48 85 c0 0f 84 0d 01 00
+RSP: 0018:ffffc900001c7d10 EFLAGS: 00010206
+
+RAX: 0000000000000003 RBX: 0000000000000000 RCX: 0000000000000100
+RDX: ffff888017643b80 RSI: ffffffff8408be0d RDI: 0000000000000018
+RBP: dffffc0000000000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000022000
+R13: 00000000000195cc R14: 0000000000000001 R15: ffff88801c78d690
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005555562206f8 CR3: 000000001be4a000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	48 bd 00 00 00 00 00 	movabs $0xdffffc0000000000,%rbp
+   7:	fc ff df
+   a:	4d 63 f6             	movslq %r14d,%r14
+   d:	4a 8d 04 f5 00 8a 3b 	lea    -0x73c47600(,%r14,8),%rax
+  14:	8c
+  15:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
+  1a:	e8 73 09 7f fd       	call   0xfd7f0992
+  1f:	48 8d 7b 18          	lea    0x18(%rbx),%rdi
+  23:	48 89 f8             	mov    %rdi,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1) <-- trapping instruction
+  2e:	0f 85 ca 02 00 00    	jne    0x2fe
+  34:	48 8b 43 18          	mov    0x18(%rbx),%rax
+  38:	48 85 c0             	test   %rax,%rax
+  3b:	0f                   	.byte 0xf
+  3c:	84                   	.byte 0x84
+  3d:	0d                   	.byte 0xd
+  3e:	01 00                	add    %eax,(%rax)
+
+
 ---
- block/blk-throttle.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 69a994156772..38a881cf97d0 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -729,8 +729,9 @@ static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
- /* Trim the used slices and adjust slice start accordingly */
- static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- {
--	unsigned long time_elapsed, io_trim;
--	u64 bytes_trim;
-+	unsigned long time_elapsed;
-+	long long bytes_trim;
-+	int io_trim;
- 
- 	BUG_ON(time_before(tg->slice_end[rw], tg->slice_start[rw]));
- 
-@@ -758,17 +759,21 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 		return;
- 
- 	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
--					     time_elapsed);
--	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed);
--	if (!bytes_trim && !io_trim)
-+					     time_elapsed) +
-+		     tg->carryover_bytes[rw];
-+	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed) +
-+		  tg->carryover_ios[rw];
-+	if (bytes_trim <= 0 && io_trim <= 0)
- 		return;
- 
--	if (tg->bytes_disp[rw] >= bytes_trim)
-+	tg->carryover_bytes[rw] = 0;
-+	if ((long long)tg->bytes_disp[rw] >= bytes_trim)
- 		tg->bytes_disp[rw] -= bytes_trim;
- 	else
- 		tg->bytes_disp[rw] = 0;
- 
--	if (tg->io_disp[rw] >= io_trim)
-+	tg->carryover_ios[rw] = 0;
-+	if ((int)tg->io_disp[rw] >= io_trim)
- 		tg->io_disp[rw] -= io_trim;
- 	else
- 		tg->io_disp[rw] = 0;
-@@ -776,7 +781,7 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	tg->slice_start[rw] += time_elapsed;
- 
- 	throtl_log(&tg->service_queue,
--		   "[%c] trim slice nr=%lu bytes=%llu io=%lu start=%lu end=%lu jiffies=%lu",
-+		   "[%c] trim slice nr=%lu bytes=%lld io=%d start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', time_elapsed / tg->td->throtl_slice,
- 		   bytes_trim, io_trim, tg->slice_start[rw], tg->slice_end[rw],
- 		   jiffies);
--- 
-2.39.2
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
