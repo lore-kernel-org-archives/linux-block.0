@@ -2,94 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F70C0015E
-	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 01:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E700C001B0
+	for <linux-block@archiver.kernel.org>; Wed, 16 Aug 2023 01:31:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240950AbjHPBNT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Aug 2023 21:13:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42790 "EHLO
+        id S241058AbjHPBa5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Aug 2023 21:30:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241065AbjHPBNP (ORCPT
+        with ESMTP id S241115AbjHPBay (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2023 21:13:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D48931FCE;
-        Tue, 15 Aug 2023 18:13:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5FE20644DD;
-        Wed, 16 Aug 2023 01:13:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5CC4C433C7;
-        Wed, 16 Aug 2023 01:13:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692148383;
-        bh=QjRJQDTbptRiTmupwSjSqxA9iaxB6Z7Rjtp+mkWFNJY=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=bwo2WNc9oMK10BMu4/1EFNUQIxxTQqY6uBnlWYOx2krA40wQtOYlgObeJDkrymNVG
-         DLxzoFBlpiaisOMLn6MT5fcWjRP4c4LpWwAKOaZRQkW8kVUCcjT8x2DSnXvcnAcVL/
-         fqrxK4AlmRzsXWS8q0K0LY8+5LF/+ZGiZ7tR3drfazPDvTNBYLbZMYGXUnvGgrm6Qz
-         KWjVWpwdBDB7NypeI+Nc8fbsR6nHd/w71EedzouX/b/LyTHktbjv6UVqmMaZRZPKU4
-         RvSrviZNR682fEe+uFdJ2nuUsVJa6uBitRvP+PVBRg3+lBap2wYan9pqLuySZQt4vL
-         h1BZop7A3gO1w==
-Message-ID: <2b73497c-0c0c-6eeb-91ca-000884a9898c@kernel.org>
-Date:   Wed, 16 Aug 2023 10:13:01 +0900
+        Tue, 15 Aug 2023 21:30:54 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 286C42121;
+        Tue, 15 Aug 2023 18:30:53 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RQVvY6Zh1z4f3q3b;
+        Wed, 16 Aug 2023 09:30:49 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgAH5KbHJtxkQuVAAw--.55976S6;
+        Wed, 16 Aug 2023 09:30:50 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        yukuai3@huawei.com, mkoutny@suse.com
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next v2 2/4] blk-throttle: fix wrong comparation while 'carryover_ios/bytes' is negative
+Date:   Wed, 16 Aug 2023 09:27:06 +0800
+Message-Id: <20230816012708.1193747-3-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230816012708.1193747-1-yukuai1@huaweicloud.com>
+References: <20230816012708.1193747-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v8 5/9] scsi: core: Retry unaligned zoned writes
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230811213604.548235-1-bvanassche@acm.org>
- <20230811213604.548235-6-bvanassche@acm.org>
- <7dd67537-1ad8-79ca-281c-540bade2cb83@kernel.org>
- <3161926c-b1cb-9617-bf71-73b8711e86de@acm.org>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <3161926c-b1cb-9617-bf71-73b8711e86de@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAH5KbHJtxkQuVAAw--.55976S6
+X-Coremail-Antispam: 1UD129KBjvJXoWxAFWkAF4xAry8WF17KF17ZFb_yoW5ArWrpr
+        WfGF1IgF4rX3Z3tFnxJan8AFyrt39rAr98GrW3WayrCFn8GFyktrn5uFWFyayUZFs3uF4S
+        kw1FqFn7AF4qyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBK14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
+        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
+        v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_
+        Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x
+        0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8
+        JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIx
+        AIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbdOz7UUUUU=
+        =
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/16/23 02:29, Bart Van Assche wrote:
-> On 8/14/23 05:36, Damien Le Moal wrote:
->> On 8/12/23 06:35, Bart Van Assche wrote:
->>> --- a/drivers/scsi/sd.c
->>> +++ b/drivers/scsi/sd.c
->>> @@ -1238,6 +1238,8 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
->>>   	cmd->transfersize = sdp->sector_size;
->>>   	cmd->underflow = nr_blocks << 9;
->>>   	cmd->allowed = sdkp->max_retries;
->>> +	if (!rq->q->limits.use_zone_write_lock && blk_rq_is_seq_zoned_write(rq))
->>
->> This condition could be written as a little inline helper
->> blk_req_need_zone_write_lock(), which could be used in mq-dealine patch 2.
-> 
-> The above test differs from the tests in the mq-deadline I/O scheduler.
-> The mq-deadline I/O scheduler uses write locking if
-> rq->q->limits.use_zone_write_lock && q->disk->seq_zones_wlock &&
-> blk_rq_is_seq_zoned_write(rq). The above test is different and occurs
-> two times in scsi_error.c and one time in sd.c. Do you still want me to
-> introduce a helper function for that expression?
+From: Yu Kuai <yukuai3@huawei.com>
 
-May be not needed. But a comment explaining it may be good to add.
-I still think that added the test for use_zone_write_lock in
-blk_req_needs_zone_write_lock() is needed though, for consistency of all
-functions related to zone locking.
+carryover_ios/bytes[] can be negative in the case that ios are
+dispatched in the slice in advance, and then configuration is updated.
+For example:
 
-> 
-> Thanks,
-> 
-> Bart.
+1) set iops limit to 1000, and slice start is 0, slice end is 100ms;
+2) current time is 0, and 100 ios are dispatched, those ios will not be
+   throttled, hence io_disp is 100;
+3) still at current time 0, update iops limit to 100, then carryover_ios
+   is (0 - 100) = -100;
+4) then, dispatch a new io at time 0, the expected result is that this
+   io will wait for 1s. The calculation in tg_within_iops_limit:
 
+   io_disp = 0;
+   io_allowed = calculate_io_allowed + carryover_ios
+	      = 10 + (-100) = -90;
+   io won't be throttled if (io_disp + 1 < io_allowed) passed.
+
+Before this patch, in step 4) (io_disp + 1 < io_allowed) is passed,
+because -90 for unsigned value is very huge, and such io won't be
+throttled.
+
+Fix this problem by checking if 'io/bytes_allowed' is negative first.
+
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-throttle.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 5184f17f5129..7c93144d03da 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -825,7 +825,7 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
+ 				 u32 iops_limit)
+ {
+ 	bool rw = bio_data_dir(bio);
+-	unsigned int io_allowed;
++	int io_allowed;
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+ 
+ 	if (iops_limit == UINT_MAX) {
+@@ -838,9 +838,8 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
+ 	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
+ 	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
+ 		     tg->carryover_ios[rw];
+-	if (tg->io_disp[rw] + 1 <= io_allowed) {
++	if (io_allowed > 0 && tg->io_disp[rw] + 1 <= io_allowed)
+ 		return 0;
+-	}
+ 
+ 	/* Calc approx time to dispatch */
+ 	jiffy_wait = jiffy_elapsed_rnd - jiffy_elapsed;
+@@ -851,7 +850,8 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 				u64 bps_limit)
+ {
+ 	bool rw = bio_data_dir(bio);
+-	u64 bytes_allowed, extra_bytes;
++	long long bytes_allowed;
++	u64 extra_bytes;
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+@@ -869,9 +869,8 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
+ 	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
+ 			tg->carryover_bytes[rw];
+-	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
++	if (bytes_allowed > 0 && tg->bytes_disp[rw] + bio_size <= bytes_allowed)
+ 		return 0;
+-	}
+ 
+ 	/* Calc approx time to dispatch */
+ 	extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
 -- 
-Damien Le Moal
-Western Digital Research
+2.39.2
 
