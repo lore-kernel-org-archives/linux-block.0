@@ -2,76 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 805A4C3DA4E
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 16:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63ED0C3DA4D
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 16:07:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353423AbjHQQB0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 12:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56200 "EHLO
+        id S1349049AbjHQQGt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 12:06:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353415AbjHQQA6 (ORCPT
+        with ESMTP id S1353491AbjHQQGo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 12:00:58 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4258F30E9;
-        Thu, 17 Aug 2023 09:00:57 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D4ECB6293C;
-        Thu, 17 Aug 2023 16:00:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17746C433C8;
-        Thu, 17 Aug 2023 16:00:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692288056;
-        bh=7q34eH4rPK+YptiiNrbK2ngkqEU1Twj0WP3fj7nVHh0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=I2XWH9jGq2qV/sPJNUHVQPg9+SVwc2njdp5bC4MMV5jS3MlqdHdVGw/jAxqh6ulJo
-         JIufTlcPvFVRZoyYf2p1AMbGMgZqhfdgknDPFCUvMka9PrOVu/2HOe9v1f7pZ8dNM/
-         ewZd38j6EXOKzqEH6pIeTD1vqFYmQb46wjDuSigr14HfGrghJe/dAMu7F9Zvu6tMOU
-         vrNZQ2iofkDAABKf+u6KaUU8pOxeBPIx9IWPOkJnqp+jFvNYedeFIIs+m3/hAzMZg0
-         SxeR1iYqFqjblStp23M/OnSwr4i93OiUbJRnNCDW/tKj22ft5zi4CHYcbXt8tXXV+t
-         0efFQfXSBUnqQ==
-Date:   Thu, 17 Aug 2023 09:00:54 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, Satya Tangirala <satyat@google.com>,
-        linux-block@vger.kernel.org, kernel-team@meta.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v5] blk-crypto: dynamically allocate fallback profile
-Message-ID: <20230817160054.GB1483@sol.localdomain>
-References: <20230817141615.15387-1-sweettea-kernel@dorminy.me>
+        Thu, 17 Aug 2023 12:06:44 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5758830F6
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 09:06:42 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-202-WB12oNh9NZeEKc7yOwxybA-1; Thu, 17 Aug 2023 17:06:39 +0100
+X-MC-Unique: WB12oNh9NZeEKc7yOwxybA-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 17 Aug
+ 2023 17:06:35 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Thu, 17 Aug 2023 17:06:35 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Linus Torvalds' <torvalds@linux-foundation.org>
+CC:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christian Brauner <christian@brauner.io>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Topic: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Index: AQHZ0DpP/l59sWTPXU+UuQ9VGbJikq/s16Kg///6foCAACRpIIAA7PpbgABGFYCAAFYcAIAAGHiw///2TICAABg4YA==
+Date:   Thu, 17 Aug 2023 16:06:35 +0000
+Message-ID: <d8500b7f585d41628b9c53a9848d9875@AcuMS.aculab.com>
+References: <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com>
+ <20230816120741.534415-1-dhowells@redhat.com>
+ <20230816120741.534415-3-dhowells@redhat.com>
+ <608853.1692190847@warthog.procyon.org.uk>
+ <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
+ <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
+ <665724.1692218114@warthog.procyon.org.uk>
+ <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com>
+ <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
+ <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
+ <2190704172a5458eb909c9df59b6a556@AcuMS.aculab.com>
+ <CAHk-=wj1WfFGxHs4k6pn5y6V8BYd3aqODCjqEmrTWP8XO78giw@mail.gmail.com>
+In-Reply-To: <CAHk-=wj1WfFGxHs4k6pn5y6V8BYd3aqODCjqEmrTWP8XO78giw@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230817141615.15387-1-sweettea-kernel@dorminy.me>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 17, 2023 at 10:15:56AM -0400, Sweet Tea Dorminy wrote:
-> blk_crypto_profile_init() calls lockdep_register_key(), which warns and
-> does not register if the provided memory is a static object.
-> blk-crypto-fallback currently has a static blk_crypto_profile and calls
-> blk_crypto_profile_init() thereupon, resulting in the warning and
-> failure to register.
-> 
-> Fortunately it is simple enough to use a dynamically allocated profile
-> and make lockdep function correctly.
-> 
-> Fixes: 2fb48d88e77f ("blk-crypto: use dynamic lock class for blk_crypto_profile::lock")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-> ---
-> v5: added correct error return if allocation fails.
-> v4: removed a stray change introduced in v3.
-> v3: added allocation error checking as noted by Eric Biggers.
-> v2: reworded commit message, fixed Fixes tag, as pointed out by Eric
-> Biggers.
+RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogVGh1cnNkYXksIEF1Z3VzdCAxNywgMjAyMyA0
+OjMxIFBNDQouLi4NCj4gICAgICAgICBtb3Z6d2wgIC5MQzEoJXJpcCksICVlYXgNCj4gICAgICAg
+ICB0ZXN0bCAgICVlc2ksICVlc2kNCj4gICAgICAgICBtb3ZiICAgICQwLCAoJXJkaSkNCj4gICAg
+ICAgICBtb3ZiICAgICQxLCA0KCVyZGkpDQo+ICAgICAgICAgbW92dyAgICAlYXgsIDEoJXJkaSkN
+Cj4gICAgICAgICBtb3ZxICAgICQwLCA4KCVyZGkpDQo+ICAgICAgICAgbW92cSAgICAlcmR4LCAx
+NiglcmRpKQ0KPiAgICAgICAgIG1vdnEgICAgJXI4LCAyNCglcmRpKQ0KPiAgICAgICAgIG1vdnEg
+ICAgJXJjeCwgMzIoJXJkaSkNCj4gICAgICAgICBzZXRuZSAgIDMoJXJkaSkNCj4gDQo+IHdoaWNo
+IGlzIHRoYXQgZGlzZ3VzdGluZyAibW92ZSB0d28gYnl0ZXMgZnJvbSBtZW1vcnkiLCBhbmQgbWFr
+ZXMNCj4gYWJzb2x1dGVseSBubyBzZW5zZSBhcyBhIHdheSB0byAid3JpdGUgMiB6ZXJvIGJ5dGVz
+IjoNCj4gDQo+IC5MQzE6DQo+ICAgICAgICAgLmJ5dGUgICAwDQo+ICAgICAgICAgLmJ5dGUgICAw
+DQo+IA0KPiBJIHRoaW5rIHRoYXQncyBzb21lIG9kZCBnY2MgYnVnLCBhY3R1YWxseS4NCg0KSSBn
+ZXQgdGhhdCB3aXRoIHNvbWUgY29kZSwgYnV0IG5vdCBvdGhlcnMuDQpTZWVtcyB0byBkZXBlbmQg
+b24gcmFuZG9tIG90aGVyIHN0dWZmLg0KSGFwcGVucyBmb3I6DQoJc3RydWN0IHsgdW5zaWduZWQg
+Y2hhciB4OjcsIHk6MTsgfTsNCmJ1dCBub3QgaWYgSSBhZGQgYW55dGhpbmcgYWZ0ZXIgaWYgKHRo
+YXQgZ2V0cyB6ZXJvZWQpLg0KV2hpY2ggc2VlbXMgdG8gYmUgdGhlIG9wcG9zaXRlIG9mIHdoYXQg
+eW91IHNlZS4NCg0KSWYgSSB1c2UgZXhwbGljaXQgYXNzaWdubWVudHMgKHJhdGhlciB0aGFuIGFu
+IGluaXRpYWxpc2VyKQ0KSSBzdGlsbCBnZXQgbWVyZ2VkIHdyaXRlcyAoZXZlbiBpZiBub3QgYSBi
+aXRmaWVsZCkgYnV0IGFsc28NCmxvc2UgdGhlIG1lbW9yeSBhY2Nlc3MuDQoNCglEYXZpZA0KDQot
+DQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwg
+TWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2Fs
+ZXMpDQo=
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
-
-Thanks,
-
-- Eric
