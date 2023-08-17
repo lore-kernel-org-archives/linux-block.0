@@ -2,88 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5FEC3DA50
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 16:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FE6C3DA65
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 17:19:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237179AbjHQQmW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 12:42:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40360 "EHLO
+        id S1353764AbjHQRSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 13:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353792AbjHQQmT (ORCPT
+        with ESMTP id S1353920AbjHQRSJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 12:42:19 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD1EE2
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 09:42:18 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6887918ed20so2335756b3a.2
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 09:42:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692290538; x=1692895338;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3rnl+DkfnyTGwEkXjajrDtB2k99vpyoIfVdloGCBXA8=;
-        b=PObTuIGUzsHBVBFzNAJ1uQkawaMS2DvIYaos+4hu2+EPxvd7eR+X5GMGA/gpNT12MJ
-         v1kESEfUIN0sZqeLhUk2LdOaPRVX6i9s4MGy5ku4WcyetsVQtbO7VIvBUTQcXB7GTzi/
-         W+E3ynqqdWAo0rCm7sspwx1HT+UHBCMaApUEP+79xdrLCyvGd2bfnM6ZqXLLjbLLmedW
-         RoROiy+SNdvQ4omYbQRha/IRnzks2Ut905x4NsrOkkRR2dK4MYeLrBP7wLTdO/qIJUP+
-         BJnBwGAQG/ji//ATuMQWfTC7oe5G/7MF+0QDhLry0QEf2RZ+izac907MP/JNYHJVDZbL
-         QleQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692290538; x=1692895338;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3rnl+DkfnyTGwEkXjajrDtB2k99vpyoIfVdloGCBXA8=;
-        b=XTSurYnu4WIZgjUyv3a2glBT0lq1UvtOsEkVBAeCjZgzv8NUo93iXJaIZcEPl9/nIY
-         m21O+jVjXooHMNCI1janNpJDKJ2zme3g9Q/rYTA47EbqkxyFy8B3oqDFW1MvkfU1vBQw
-         TITtBbwaw5yIcpXjniysgL1wUA1ve0IDWN+TsXUke1AWI7vSIpA8sYxUDRbtWEfDoAhp
-         ARyVbhG65TZvCT7LR/b78EINA11MTg9BL+0yF9VUi2jcAEDvPDf/6xCsai0xV+iG3V0r
-         bJkphWLMsiFPMa2wbqBHQDKcaUkDErIwVvQ+dqVlq64XhHcgE4g7gAF+7xfByv1xo3lE
-         Qcqw==
-X-Gm-Message-State: AOJu0YyorvAEM0TTweZ+q1yhQqfTxssXEw4VOSEbVXqnw3uyippu5ASW
-        9mTcznAr5xAVLuO6lZq8RM4=
-X-Google-Smtp-Source: AGHT+IH5VTNGq+DguEhLJQI6e+Tjvt8iBJGu+6a1mr1T8rS542z7sWTaE05+hzR3zgqD8V3Y38nruw==
-X-Received: by 2002:a05:6a00:1a87:b0:682:537f:2cb8 with SMTP id e7-20020a056a001a8700b00682537f2cb8mr46520pfv.26.1692290537781;
-        Thu, 17 Aug 2023 09:42:17 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:93bd])
-        by smtp.gmail.com with ESMTPSA id k4-20020aa792c4000000b0065438394fa4sm13428283pfa.90.2023.08.17.09.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 09:42:17 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 17 Aug 2023 06:42:15 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Yu Kuai <yukuai3@huawei.com>, xiaoli feng <xifeng@redhat.com>,
-        Chunyu Hu <chuhu@redhat.com>, Mike Snitzer <snitzer@kernel.org>
-Subject: Re: [PATCH] blk-cgroup: hold queue_lock when removing blkg->q_node
-Message-ID: <ZN5N5zrBIy-1NLVW@slm.duckdns.org>
-References: <20230817141751.1128970-1-ming.lei@redhat.com>
+        Thu, 17 Aug 2023 13:18:09 -0400
+Received: from out-5.mta1.migadu.com (out-5.mta1.migadu.com [IPv6:2001:41d0:203:375::5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651EA11F
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 10:18:07 -0700 (PDT)
+Message-ID: <d16edaf8-1eef-f099-eb15-7599906d1492@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1692292685;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oP35WFkAGM1mqUKfAAOZno6K6eolQgOYmd9Fifhu4bc=;
+        b=nQo8ZaFh4yp+bsrYRq0hie4ebKHaQlZGU0ayDy4fw+UT2srPnsKGHaDOxfutrxnFSty3xy
+        owB27Rv6A0jVF2M8vERdix/hdktvDxtiYnQsOySRG8TRjycni0KqVonZceBF5+CL8Cc8U1
+        b1FIdi7T6aopaNAnKoLgJqqxdTDkLxw=
+Date:   Fri, 18 Aug 2023 01:17:38 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230817141751.1128970-1-ming.lei@redhat.com>
+Subject: Re: [PATCH v2] blk-mq: release scheduler resource when request
+ complete
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, hch@lst.de
+Cc:     oe-lkp@lists.linux.dev, lkp@intel.com,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, cel@kernel.org,
+        linux-kernel@vger.kernel.org,
+        kernel test robot <oliver.sang@intel.com>
+References: <202308172100.8ce4b853-oliver.sang@intel.com>
+ <af61c72c-b3ec-ce7a-4f41-bce9a9844baf@acm.org>
+ <317715dc-f6e4-1847-5b78-b2d8184b446a@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <317715dc-f6e4-1847-5b78-b2d8184b446a@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 17, 2023 at 10:17:51PM +0800, Ming Lei wrote:
-> When blkg is removed from q->blkg_list from blkg_free_workfn(), queue_lock
-> has to be held, otherwise, all kinds of bugs(list corruption, hard lockup,
-> ..) can be triggered from blkg_destroy_all().
+On 2023/8/17 23:29, Chengming Zhou wrote:
+> On 2023/8/17 22:50, Bart Van Assche wrote:
+>> On 8/17/23 07:41, kernel test robot wrote:
+>>> [  222.622837][ T2216] statistics for priority 1: i 276 m 0 d 276 c 278
+>>> [ 222.629307][ T2216] WARNING: CPU: 0 PID: 2216 at block/mq-deadline.c:680 dd_exit_sched (block/mq-deadline.c:680 (discriminator 3))
+>>
+>> The above information shows that dd_inserted_request() has been called
+>> 276 times and also that dd_finish_request() has been called 278 times.
 > 
-> Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()")
-> Cc: Yu Kuai <yukuai3@huawei.com>
-> Cc: xiaoli feng <xifeng@redhat.com>
-> Cc: Chunyu Hu <chuhu@redhat.com>
-> Cc: Mike Snitzer <snitzer@kernel.org>
-> Cc: Tejun Heo <tj@kernel.org>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Thanks much for your help.
+> 
+> This patch indeed introduced a regression, postflush requests will be completed
+> twice, so here dd_finish_request() is more than dd_inserted_request().
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index a8c63bef8ff1..7cd47ffc04ce 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -686,8 +686,10 @@ static void blk_mq_finish_request(struct request *rq)
+>  {
+>         struct request_queue *q = rq->q;
+> 
+> -       if (rq->rq_flags & RQF_USE_SCHED)
+> +       if (rq->rq_flags & RQF_USE_SCHED) {
+>                 q->elevator->type->ops.finish_request(rq);
+> +               rq->rq_flags &= ~RQF_USE_SCHED;
+> +       }
+>  }
+> 
 
-Acked-by: Tejun Heo <tj@kernel.org>
+I just tried to run LKP and xfstests, firstly failed to run LKP on my server
+which seems to miss some dependencies. Then I ran xfstests successfully.
+
+But xfstests generic/704 always pass and no WARN in dmesg. (I don't know why,
+maybe my server settings are some different from the test robot.)
+
+So I try to reproduce it manually. Steps:
+
+```
+echo mq-deadline > /sys/block/sdb/queue/scheduler
+
+mkfs.ext4 /dev/sdb
+mount /dev/sdb /fs/sdb
+cd /fs/sdb
+stress-ng --symlink 4 --timeout 60
+
+echo none > /sys/block/sdb/queue/scheduler
+```
+
+This way the WARNING in mq-deadline can be reproduced easily.
+
+Then retest with the diff, mq-deadline WARNING still happened... So there
+are still other requests which have RQF_USE_SCHED flag completed without
+being inserted into elevator.
+
+Will use some tracing and look again.
 
 Thanks.
 
--- 
-tejun
+> 
+> Clear RQF_USE_SCHED flag here should fix this problem, which should be ok
+> since finish_request() is the last callback, this flag isn't needed anymore.
+> 
+> Jens, should I send this diff as another patch or resend updated v3?
+> 
+> Thanks.
+> 
+>> Calling dd_finish_request() more than once per request breaks the code
+>> for priority handling since that code checks how many requests are
+>> pending per priority level by subtracting the number of completion calls
+>> from the number of insertion calls (see also dd_queued()). I think the
+>> above output indicates that this patch introduced a regression.
+>>
+>> Bart.
+>>
