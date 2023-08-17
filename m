@@ -2,113 +2,172 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABD1C41513
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 13:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD5AC2FC3D
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 14:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351517AbjHQNbj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 09:31:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42930 "EHLO
+        id S242886AbjHQOQc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 10:16:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351492AbjHQNbM (ORCPT
+        with ESMTP id S1351782AbjHQOQZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 09:31:12 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F225211E;
-        Thu, 17 Aug 2023 06:31:10 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Thu, 17 Aug 2023 10:16:25 -0400
+Received: from box.fidei.email (box.fidei.email [71.19.144.250])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6EE2D61;
+        Thu, 17 Aug 2023 07:16:23 -0700 (PDT)
+Received: from authenticated-user (box.fidei.email [71.19.144.250])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id EA45921838;
-        Thu, 17 Aug 2023 13:31:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1692279068;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rxHsVahN+II7L6QdwHgwa3dykGnq3oewSCrsfH/KRNs=;
-        b=pHNe7my7estC1s/b6vNW11izgXmUg8eLSmwUlnvrKjW45L2s+O3jB8frT5bERp44nW9BFf
-        oxFCapVFDSxEzySP1Lq1l6jfELzBVUh15T6d3FJa1ZFtKyzP5PsN2w5msAKzUcn2aM1xMG
-        iUzTD5mH+tGbv6b5/MH0uDUtd61l+QY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1692279068;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rxHsVahN+II7L6QdwHgwa3dykGnq3oewSCrsfH/KRNs=;
-        b=ZrIkejyby1h+sgyUZ9stf6CAWIOutsF7wcK+5OakVnNnUR9eSPlgD0dCnK7CEY4g4rPXpz
-        YA5vuiECt2DwOpCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8AEBC1392B;
-        Thu, 17 Aug 2023 13:31:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id ycUOIRwh3mR0AwAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Thu, 17 Aug 2023 13:31:08 +0000
-Date:   Thu, 17 Aug 2023 15:24:39 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     David Sterba <dsterba@suse.cz>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>,
-        Denis Efremov <efremov@linux.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-s390@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 05/17] btrfs: open block devices after superblock creation
-Message-ID: <20230817132439.GS2420@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20230811100828.1897174-1-hch@lst.de>
- <20230811100828.1897174-6-hch@lst.de>
- <20230811-wildpark-bronzen-5e30a56de1a1@brauner>
- <20230811131131.GN2420@suse.cz>
+        by box.fidei.email (Postfix) with ESMTPSA id 7267E83576;
+        Thu, 17 Aug 2023 10:16:22 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dorminy.me; s=mail;
+        t=1692281783; bh=5QaJMGTqDXnOj2vANgK+U8tNAXN092i7fC3cVp3rpcM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=L20K7231ezVz4f6iiJ0UWqM67ylY3iiMZw5oiex8dZ58NQNTpaTW1UFAWdBs61ehF
+         V9WTRnEhbCx4TvzkvvFtx36q06qvRqxFc54BPufsfE6R1U1C0eTDLb+9D9Yz9Peg6l
+         Fp90oB8GQ6NhxRhMlSiamcOZz234k8r8s7zGSm5t6ytx38FZJnAievw9mNQPfN1bqJ
+         OFqMN0FF7Phm5cq+96dR5uS2kA4xUwJIFK2PS1fjOrXQFDammqT3FZU3q2+0a8Dbmi
+         0Yqts62pbSBM5iVWpqveFPSZSLoJYx333ViYaJvDFM0HmPnjdg8EX1CwQ2uUCLZeNe
+         ZiMKFQ8hYMYzA==
+From:   Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+To:     Jens Axboe <axboe@kernel.dk>, Satya Tangirala <satyat@google.com>,
+        linux-block@vger.kernel.org, kernel-team@meta.com,
+        ebiggers@kernel.org
+Cc:     Sweet Tea Dorminy <sweettea-kernel@dorminy.me>,
+        stable@vger.kernel.org
+Subject: [PATCH v5] blk-crypto: dynamically allocate fallback profile
+Date:   Thu, 17 Aug 2023 10:15:56 -0400
+Message-ID: <20230817141615.15387-1-sweettea-kernel@dorminy.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811131131.GN2420@suse.cz>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 03:11:31PM +0200, David Sterba wrote:
-> On Fri, Aug 11, 2023 at 02:44:50PM +0200, Christian Brauner wrote:
-> > On Fri, Aug 11, 2023 at 12:08:16PM +0200, Christoph Hellwig wrote:
-> > > Currently btrfs_mount_root opens the block devices before committing to
-> > > allocating a super block. That creates problems for restricting the
-> > > number of writers to a device, and also leads to a unusual and not very
-> > > helpful holder (the fs_type).
-> > > 
-> > > Reorganize the code to first check whether the superblock for a
-> > > particular fsid does already exist and open the block devices only if it
-> > > doesn't, mirroring the recent changes to the VFS mount helpers.  To do
-> > > this the increment of the in_use counter moves out of btrfs_open_devices
-> > > and into the only caller in btrfs_mount_root so that it happens before
-> > > dropping uuid_mutex around the call to sget.
-> > > 
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > > ---
-> > 
-> > Looks good to me,
-> > Acked-by: Christian Brauner <brauner@kernel.org>
-> > 
-> > And ofc, would be great to get btrfs reviews.
-> 
-> I'll take a look but there are some performance regressions to deal with
-> and pre-merge window freeze so it won't be soon.
+blk_crypto_profile_init() calls lockdep_register_key(), which warns and
+does not register if the provided memory is a static object.
+blk-crypto-fallback currently has a static blk_crypto_profile and calls
+blk_crypto_profile_init() thereupon, resulting in the warning and
+failure to register.
 
-I'd rather take the btrfs patches via my tree and get them tested for a
-longer time.  This patch in particular changes locking, mount, device
-management, that's beyond what I'd consider safe to get merged outside
-of btrfs.
+Fortunately it is simple enough to use a dynamically allocated profile
+and make lockdep function correctly.
+
+Fixes: 2fb48d88e77f ("blk-crypto: use dynamic lock class for blk_crypto_profile::lock")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+---
+v5: added correct error return if allocation fails.
+v4: removed a stray change introduced in v3.
+v3: added allocation error checking as noted by Eric Biggers.
+v2: reworded commit message, fixed Fixes tag, as pointed out by Eric
+Biggers.
+
+ block/blk-crypto-fallback.c | 36 +++++++++++++++++++++++-------------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
+
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index ad9844c5b40c..e6468eab2681 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -78,7 +78,7 @@ static struct blk_crypto_fallback_keyslot {
+ 	struct crypto_skcipher *tfms[BLK_ENCRYPTION_MODE_MAX];
+ } *blk_crypto_keyslots;
+ 
+-static struct blk_crypto_profile blk_crypto_fallback_profile;
++static struct blk_crypto_profile *blk_crypto_fallback_profile;
+ static struct workqueue_struct *blk_crypto_wq;
+ static mempool_t *blk_crypto_bounce_page_pool;
+ static struct bio_set crypto_bio_split;
+@@ -292,7 +292,7 @@ static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
+ 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
+ 	 * this bio's algorithm and key.
+ 	 */
+-	blk_st = blk_crypto_get_keyslot(&blk_crypto_fallback_profile,
++	blk_st = blk_crypto_get_keyslot(blk_crypto_fallback_profile,
+ 					bc->bc_key, &slot);
+ 	if (blk_st != BLK_STS_OK) {
+ 		src_bio->bi_status = blk_st;
+@@ -395,7 +395,7 @@ static void blk_crypto_fallback_decrypt_bio(struct work_struct *work)
+ 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
+ 	 * this bio's algorithm and key.
+ 	 */
+-	blk_st = blk_crypto_get_keyslot(&blk_crypto_fallback_profile,
++	blk_st = blk_crypto_get_keyslot(blk_crypto_fallback_profile,
+ 					bc->bc_key, &slot);
+ 	if (blk_st != BLK_STS_OK) {
+ 		bio->bi_status = blk_st;
+@@ -499,7 +499,7 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
+ 		return false;
+ 	}
+ 
+-	if (!__blk_crypto_cfg_supported(&blk_crypto_fallback_profile,
++	if (!__blk_crypto_cfg_supported(blk_crypto_fallback_profile,
+ 					&bc->bc_key->crypto_cfg)) {
+ 		bio->bi_status = BLK_STS_NOTSUPP;
+ 		return false;
+@@ -526,7 +526,7 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
+ 
+ int blk_crypto_fallback_evict_key(const struct blk_crypto_key *key)
+ {
+-	return __blk_crypto_evict_key(&blk_crypto_fallback_profile, key);
++	return __blk_crypto_evict_key(blk_crypto_fallback_profile, key);
+ }
+ 
+ static bool blk_crypto_fallback_inited;
+@@ -534,7 +534,6 @@ static int blk_crypto_fallback_init(void)
+ {
+ 	int i;
+ 	int err;
+-	struct blk_crypto_profile *profile = &blk_crypto_fallback_profile;
+ 
+ 	if (blk_crypto_fallback_inited)
+ 		return 0;
+@@ -545,18 +544,27 @@ static int blk_crypto_fallback_init(void)
+ 	if (err)
+ 		goto out;
+ 
+-	err = blk_crypto_profile_init(profile, blk_crypto_num_keyslots);
+-	if (err)
++	/* Dynamic allocation is needed because of lockdep_register_key(). */
++	blk_crypto_fallback_profile =
++		kzalloc(sizeof(*blk_crypto_fallback_profile), GFP_KERNEL);
++	if (!blk_crypto_fallback_profile) {
++		err = -ENOMEM;
+ 		goto fail_free_bioset;
++	}
++
++	err = blk_crypto_profile_init(blk_crypto_fallback_profile,
++				      blk_crypto_num_keyslots);
++	if (err)
++		goto fail_free_profile;
+ 	err = -ENOMEM;
+ 
+-	profile->ll_ops = blk_crypto_fallback_ll_ops;
+-	profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
++	blk_crypto_fallback_profile->ll_ops = blk_crypto_fallback_ll_ops;
++	blk_crypto_fallback_profile->max_dun_bytes_supported = BLK_CRYPTO_MAX_IV_SIZE;
+ 
+ 	/* All blk-crypto modes have a crypto API fallback. */
+ 	for (i = 0; i < BLK_ENCRYPTION_MODE_MAX; i++)
+-		profile->modes_supported[i] = 0xFFFFFFFF;
+-	profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
++		blk_crypto_fallback_profile->modes_supported[i] = 0xFFFFFFFF;
++	blk_crypto_fallback_profile->modes_supported[BLK_ENCRYPTION_MODE_INVALID] = 0;
+ 
+ 	blk_crypto_wq = alloc_workqueue("blk_crypto_wq",
+ 					WQ_UNBOUND | WQ_HIGHPRI |
+@@ -597,7 +605,9 @@ static int blk_crypto_fallback_init(void)
+ fail_free_wq:
+ 	destroy_workqueue(blk_crypto_wq);
+ fail_destroy_profile:
+-	blk_crypto_profile_destroy(profile);
++	blk_crypto_profile_destroy(blk_crypto_fallback_profile);
++fail_free_profile:
++	kfree(blk_crypto_fallback_profile);
+ fail_free_bioset:
+ 	bioset_exit(&crypto_bio_split);
+ out:
+-- 
+2.41.0
+
