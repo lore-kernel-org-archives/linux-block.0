@@ -2,93 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B35C30654
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 15:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A2EC3064E
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 15:31:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353141AbjHQPUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 11:20:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44350 "EHLO
+        id S1353210AbjHQPaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 11:30:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353125AbjHQPUM (ORCPT
+        with ESMTP id S1353199AbjHQPaU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 11:20:12 -0400
-X-Greylist: delayed 1684 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 17 Aug 2023 08:20:10 PDT
-Received: from pegase1.c-s.fr (unknown [90.115.179.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 781F31AE;
-        Thu, 17 Aug 2023 08:20:10 -0700 (PDT)
-Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
-        by localhost (Postfix) with ESMTP id 4RRSdd3c0Wz9wDZ;
-        Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id Xu1Wi41DeIWd; Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 4RRSdd2zBVz9wDR;
-        Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 5E5298B76C;
-        Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id YD0PK2gt8x9D; Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
-Received: from PO20335.IDSI0.si.c-s.fr (unknown [172.19.54.59])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 2C13F8B763;
-        Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
-Received: from PO20335.IDSI0.si.c-s.fr (localhost [127.0.0.1])
-        by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 37HEq05R469319
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-        Thu, 17 Aug 2023 16:52:00 +0200
-Received: (from chleroy@localhost)
-        by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 37HEprmG469307;
-        Thu, 17 Aug 2023 16:51:53 +0200
-X-Authentication-Warning: PO20335.IDSI0.si.c-s.fr: chleroy set sender to christophe.leroy@csgroup.eu using -f
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christophe Leroy <christophe.leroy@csgroup.eu>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] block: swim3: Mark swim3_init() static to fix no previous prototype error
-Date:   Thu, 17 Aug 2023 16:51:40 +0200
-Message-ID: <4798f19879b0470c07ee6a37aa79eae04db5d433.1692283840.git.christophe.leroy@csgroup.eu>
-X-Mailer: git-send-email 2.41.0
+        Thu, 17 Aug 2023 11:30:20 -0400
+Received: from out-46.mta0.migadu.com (out-46.mta0.migadu.com [91.218.175.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A952D6D
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 08:30:18 -0700 (PDT)
+Message-ID: <317715dc-f6e4-1847-5b78-b2d8184b446a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1692286216;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yJM4Hdms6SRtkTPMdaK0rVnNa8K7qD60i1kkq/z/JZE=;
+        b=p4dgNVuyKQlmB33x/50qtlSqE3/3/CevI0ifBM5IQvX1C/7yA73d/Xri0b6QgxeX4PQBd2
+        BjMahVhit6WQ4pV8S0Bal9utS+qfRhZf+z1SRDoDO3kvE5uOaITm6yy3uoZQmZ9D1TEgIs
+        RHkCkj96v+cfKGcYJc1ipVNCHQqYCAs=
+Date:   Thu, 17 Aug 2023 23:29:37 +0800
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1692283899; l=838; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=wlYp3VeZpONLYQueB+H0V50QRiOXOc6nd6WiozapWLA=; b=OEdpamS1V+IuoDmX+sUxNq62U71ABstA2/v+nkid48E3b8hfIbTwe3conzyA2Cz2DrCWU+Zax /DRiNiTyj1oD/KtaQ3iscVsDr9UCmsxcE+V1DwKTzV1qGh1aY2yYtee
-X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Subject: Re: [PATCH v2] blk-mq: release scheduler resource when request
+ complete
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, hch@lst.de
+Cc:     oe-lkp@lists.linux.dev, lkp@intel.com,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, cel@kernel.org,
+        linux-kernel@vger.kernel.org,
+        kernel test robot <oliver.sang@intel.com>,
+        chengming.zhou@linux.dev
+References: <202308172100.8ce4b853-oliver.sang@intel.com>
+ <af61c72c-b3ec-ce7a-4f41-bce9a9844baf@acm.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <af61c72c-b3ec-ce7a-4f41-bce9a9844baf@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With pmac32_defconfig W=1:
+On 2023/8/17 22:50, Bart Van Assche wrote:
+> On 8/17/23 07:41, kernel test robot wrote:
+>> [  222.622837][ T2216] statistics for priority 1: i 276 m 0 d 276 c 278
+>> [ 222.629307][ T2216] WARNING: CPU: 0 PID: 2216 at block/mq-deadline.c:680 dd_exit_sched (block/mq-deadline.c:680 (discriminator 3))
+> 
+> The above information shows that dd_inserted_request() has been called
+> 276 times and also that dd_finish_request() has been called 278 times.
 
-  CC [M]  drivers/block/swim3.o
-drivers/block/swim3.c:1280:5: warning: no previous prototype for 'swim3_init' [-Wmissing-prototypes]
- 1280 | int swim3_init(void)
-      |     ^~~~~~~~~~
+Thanks much for your help.
 
-swim3_init() is called locally via module_init(), it should be static.
+This patch indeed introduced a regression, postflush requests will be completed
+twice, so here dd_finish_request() is more than dd_inserted_request().
 
-Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Arnd Bergmann <arnd@arndb.de>
----
- drivers/block/swim3.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index dc43a63b3469..c2bc85826358 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -1277,7 +1277,7 @@ static struct macio_driver swim3_driver =
- };
- 
- 
--int swim3_init(void)
-+static int swim3_init(void)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a8c63bef8ff1..7cd47ffc04ce 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -686,8 +686,10 @@ static void blk_mq_finish_request(struct request *rq)
  {
- 	macio_register_driver(&swim3_driver);
- 	return 0;
--- 
-2.41.0
+        struct request_queue *q = rq->q;
 
+-       if (rq->rq_flags & RQF_USE_SCHED)
++       if (rq->rq_flags & RQF_USE_SCHED) {
+                q->elevator->type->ops.finish_request(rq);
++               rq->rq_flags &= ~RQF_USE_SCHED;
++       }
+ }
+
+
+Clear RQF_USE_SCHED flag here should fix this problem, which should be ok
+since finish_request() is the last callback, this flag isn't needed anymore.
+
+Jens, should I send this diff as another patch or resend updated v3?
+
+Thanks.
+
+> Calling dd_finish_request() more than once per request breaks the code
+> for priority handling since that code checks how many requests are
+> pending per priority level by subtracting the number of completion calls
+> from the number of insertion calls (see also dd_queued()). I think the
+> above output indicates that this patch introduced a regression.
+> 
+> Bart.
+> 
