@@ -2,86 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE594C2FC39
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 14:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B913C41513
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 14:21:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351788AbjHQOTP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 10:19:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44804 "EHLO
+        id S1351803AbjHQOVY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 10:21:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351804AbjHQOSu (ORCPT
+        with ESMTP id S1351811AbjHQOVV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 10:18:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD5C12102
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 07:18:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692281883;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=eYnFt28lNdZriUp21eHzMX+2y8ItViASJPhu+RHShGw=;
-        b=ME2iU3WtBm4lUv0nQzaeIVgjmy95oXnzRMnvVatcFZro+oyXsUKxuix7tkqEkxjwT6w3F6
-        W2SJp8OvYruMYF14vO48m1EM7PmZxAXC7Zz8UGiCfd2a6rC3ikCJ3Ee0BEgvU44pamdsNM
-        4MjklkAAl/ej5RI1b1tklxMrFnaApwI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-206-LtV6zdAsOj-IhUeaKPR7Ww-1; Thu, 17 Aug 2023 10:18:01 -0400
-X-MC-Unique: LtV6zdAsOj-IhUeaKPR7Ww-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 866F2101AA5F;
-        Thu, 17 Aug 2023 14:18:00 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BFD6740C207A;
-        Thu, 17 Aug 2023 14:17:58 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Yu Kuai <yukuai3@huawei.com>, xiaoli feng <xifeng@redhat.com>,
-        Chunyu Hu <chuhu@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, Tejun Heo <tj@kernel.org>
-Subject: [PATCH] blk-cgroup: hold queue_lock when removing blkg->q_node
-Date:   Thu, 17 Aug 2023 22:17:51 +0800
-Message-Id: <20230817141751.1128970-1-ming.lei@redhat.com>
+        Thu, 17 Aug 2023 10:21:21 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEFA230C6;
+        Thu, 17 Aug 2023 07:21:19 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1bdc8081147so7019095ad.1;
+        Thu, 17 Aug 2023 07:21:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692282079; x=1692886879;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=doPszRaxb9/4aAuNDgX3hC/2hLgfoHZ5dbhDCD5Yc84=;
+        b=GE46xeWYJM8E+28luULAeiTHBf1zb3k5yYa8GzC5oQrTfnv2Uum1D9vQ2nkr4RnulG
+         76rOQ0Hal8TaZdwihhaLQlBS9+sTuR1SEzL2RVk4HTEzhLgaXHRb5uzXFvEizB5LoHO0
+         P0gNseEKZyyGD1b96AFwuSZ545GgpTzt1hiWuANd6KzUeUIGHPV1xp62RHbkWRnm0QtP
+         uiNTEPN74AIIg75LsTNFKRN/ZBiGI2Pu44NEeptjERGIPh8FIlXjrxpC2tBsn2WFN5pd
+         +bf1lMcIetmkjvux8lY2dv6nqnIh5YhSYO2i6DqlSbVmYu2+C7c2uSaecb5U1ELOUVQ2
+         mODA==
+X-Gm-Message-State: AOJu0Yycwz0IJ6K0t2yi/s8ST1w0J3jK2u0azuWJZMRy8PplTA7OrR+D
+        DyXJjOzLgnmGxMhADf0MIh0=
+X-Google-Smtp-Source: AGHT+IGK2O968MxULonLkiIvt0R8Fnr37jU6Li4FQru1mc7wC2vtfEJavqSEFjuNCY3YSvHzpj1YWA==
+X-Received: by 2002:a17:902:d4c2:b0:1bd:9498:f15d with SMTP id o2-20020a170902d4c200b001bd9498f15dmr3298255plg.24.1692282079283;
+        Thu, 17 Aug 2023 07:21:19 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:dfd:6f25:f7be:a9ca? ([2620:15c:211:201:dfd:6f25:f7be:a9ca])
+        by smtp.gmail.com with ESMTPSA id jh15-20020a170903328f00b001bde77f3d0esm7673475plb.117.2023.08.17.07.21.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Aug 2023 07:21:18 -0700 (PDT)
+Message-ID: <5f45675d-20ac-02b5-8f88-edcc0d4ffc8a@acm.org>
+Date:   Thu, 17 Aug 2023 07:21:16 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v9 02/17] block: Only use write locking if necessary
+Content-Language: en-US
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+References: <20230816195447.3703954-1-bvanassche@acm.org>
+ <20230816195447.3703954-3-bvanassche@acm.org>
+ <0b3b4453-52a1-75e3-4dfd-6aae74c8c257@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <0b3b4453-52a1-75e3-4dfd-6aae74c8c257@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When blkg is removed from q->blkg_list from blkg_free_workfn(), queue_lock
-has to be held, otherwise, all kinds of bugs(list corruption, hard lockup,
-..) can be triggered from blkg_destroy_all().
+On 8/17/23 04:01, Damien Le Moal wrote:
+> On 8/17/23 04:53, Bart Van Assche wrote:
+>> Make blk_req_needs_zone_write_lock() return false if
+>> q->limits.use_zone_write_lock is false. Inline this function because it
+>> is short and because it is called from the hot path of the mq-deadline
+>> I/O scheduler.
+> 
+> Your are not actually inlining the function. Did you forget to move it to
+> blkdev.h ?
 
-Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()")
-Cc: Yu Kuai <yukuai3@huawei.com>
-Cc: xiaoli feng <xifeng@redhat.com>
-Cc: Chunyu Hu <chuhu@redhat.com>
-Cc: Mike Snitzer <snitzer@kernel.org>
-Cc: Tejun Heo <tj@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-cgroup.c | 2 ++
- 1 file changed, 2 insertions(+)
+I considered inlining but eventually decided not to inline 
+blk_req_needs_zone_write_lock(). I will update the patch description.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index fc49be622e05..9faafcd10e17 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -136,7 +136,9 @@ static void blkg_free_workfn(struct work_struct *work)
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
- 	if (blkg->parent)
- 		blkg_put(blkg->parent);
-+	spin_lock_irq(&q->queue_lock);
- 	list_del_init(&blkg->q_node);
-+	spin_unlock_irq(&q->queue_lock);
- 	mutex_unlock(&q->blkcg_mutex);
- 
- 	blk_put_queue(q);
--- 
-2.40.1
+Thanks,
+
+Bart.
 
