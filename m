@@ -2,95 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63ED0C3DA4D
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 16:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5FEC3DA50
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 16:42:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349049AbjHQQGt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 12:06:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38066 "EHLO
+        id S237179AbjHQQmW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 12:42:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353491AbjHQQGo (ORCPT
+        with ESMTP id S1353792AbjHQQmT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 12:06:44 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5758830F6
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 09:06:42 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-202-WB12oNh9NZeEKc7yOwxybA-1; Thu, 17 Aug 2023 17:06:39 +0100
-X-MC-Unique: WB12oNh9NZeEKc7yOwxybA-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 17 Aug
- 2023 17:06:35 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 17 Aug 2023 17:06:35 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Linus Torvalds' <torvalds@linux-foundation.org>
-CC:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>,
-        Christian Brauner <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
- memcpy_from_iter_mc()
-Thread-Topic: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
- memcpy_from_iter_mc()
-Thread-Index: AQHZ0DpP/l59sWTPXU+UuQ9VGbJikq/s16Kg///6foCAACRpIIAA7PpbgABGFYCAAFYcAIAAGHiw///2TICAABg4YA==
-Date:   Thu, 17 Aug 2023 16:06:35 +0000
-Message-ID: <d8500b7f585d41628b9c53a9848d9875@AcuMS.aculab.com>
-References: <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com>
- <20230816120741.534415-1-dhowells@redhat.com>
- <20230816120741.534415-3-dhowells@redhat.com>
- <608853.1692190847@warthog.procyon.org.uk>
- <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
- <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
- <665724.1692218114@warthog.procyon.org.uk>
- <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com>
- <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
- <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
- <2190704172a5458eb909c9df59b6a556@AcuMS.aculab.com>
- <CAHk-=wj1WfFGxHs4k6pn5y6V8BYd3aqODCjqEmrTWP8XO78giw@mail.gmail.com>
-In-Reply-To: <CAHk-=wj1WfFGxHs4k6pn5y6V8BYd3aqODCjqEmrTWP8XO78giw@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Thu, 17 Aug 2023 12:42:19 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD1EE2
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 09:42:18 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6887918ed20so2335756b3a.2
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 09:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692290538; x=1692895338;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3rnl+DkfnyTGwEkXjajrDtB2k99vpyoIfVdloGCBXA8=;
+        b=PObTuIGUzsHBVBFzNAJ1uQkawaMS2DvIYaos+4hu2+EPxvd7eR+X5GMGA/gpNT12MJ
+         v1kESEfUIN0sZqeLhUk2LdOaPRVX6i9s4MGy5ku4WcyetsVQtbO7VIvBUTQcXB7GTzi/
+         W+E3ynqqdWAo0rCm7sspwx1HT+UHBCMaApUEP+79xdrLCyvGd2bfnM6ZqXLLjbLLmedW
+         RoROiy+SNdvQ4omYbQRha/IRnzks2Ut905x4NsrOkkRR2dK4MYeLrBP7wLTdO/qIJUP+
+         BJnBwGAQG/ji//ATuMQWfTC7oe5G/7MF+0QDhLry0QEf2RZ+izac907MP/JNYHJVDZbL
+         QleQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692290538; x=1692895338;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3rnl+DkfnyTGwEkXjajrDtB2k99vpyoIfVdloGCBXA8=;
+        b=XTSurYnu4WIZgjUyv3a2glBT0lq1UvtOsEkVBAeCjZgzv8NUo93iXJaIZcEPl9/nIY
+         m21O+jVjXooHMNCI1janNpJDKJ2zme3g9Q/rYTA47EbqkxyFy8B3oqDFW1MvkfU1vBQw
+         TITtBbwaw5yIcpXjniysgL1wUA1ve0IDWN+TsXUke1AWI7vSIpA8sYxUDRbtWEfDoAhp
+         ARyVbhG65TZvCT7LR/b78EINA11MTg9BL+0yF9VUi2jcAEDvPDf/6xCsai0xV+iG3V0r
+         bJkphWLMsiFPMa2wbqBHQDKcaUkDErIwVvQ+dqVlq64XhHcgE4g7gAF+7xfByv1xo3lE
+         Qcqw==
+X-Gm-Message-State: AOJu0YyorvAEM0TTweZ+q1yhQqfTxssXEw4VOSEbVXqnw3uyippu5ASW
+        9mTcznAr5xAVLuO6lZq8RM4=
+X-Google-Smtp-Source: AGHT+IH5VTNGq+DguEhLJQI6e+Tjvt8iBJGu+6a1mr1T8rS542z7sWTaE05+hzR3zgqD8V3Y38nruw==
+X-Received: by 2002:a05:6a00:1a87:b0:682:537f:2cb8 with SMTP id e7-20020a056a001a8700b00682537f2cb8mr46520pfv.26.1692290537781;
+        Thu, 17 Aug 2023 09:42:17 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:93bd])
+        by smtp.gmail.com with ESMTPSA id k4-20020aa792c4000000b0065438394fa4sm13428283pfa.90.2023.08.17.09.42.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Aug 2023 09:42:17 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 17 Aug 2023 06:42:15 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Yu Kuai <yukuai3@huawei.com>, xiaoli feng <xifeng@redhat.com>,
+        Chunyu Hu <chuhu@redhat.com>, Mike Snitzer <snitzer@kernel.org>
+Subject: Re: [PATCH] blk-cgroup: hold queue_lock when removing blkg->q_node
+Message-ID: <ZN5N5zrBIy-1NLVW@slm.duckdns.org>
+References: <20230817141751.1128970-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230817141751.1128970-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogVGh1cnNkYXksIEF1Z3VzdCAxNywgMjAyMyA0
-OjMxIFBNDQouLi4NCj4gICAgICAgICBtb3Z6d2wgIC5MQzEoJXJpcCksICVlYXgNCj4gICAgICAg
-ICB0ZXN0bCAgICVlc2ksICVlc2kNCj4gICAgICAgICBtb3ZiICAgICQwLCAoJXJkaSkNCj4gICAg
-ICAgICBtb3ZiICAgICQxLCA0KCVyZGkpDQo+ICAgICAgICAgbW92dyAgICAlYXgsIDEoJXJkaSkN
-Cj4gICAgICAgICBtb3ZxICAgICQwLCA4KCVyZGkpDQo+ICAgICAgICAgbW92cSAgICAlcmR4LCAx
-NiglcmRpKQ0KPiAgICAgICAgIG1vdnEgICAgJXI4LCAyNCglcmRpKQ0KPiAgICAgICAgIG1vdnEg
-ICAgJXJjeCwgMzIoJXJkaSkNCj4gICAgICAgICBzZXRuZSAgIDMoJXJkaSkNCj4gDQo+IHdoaWNo
-IGlzIHRoYXQgZGlzZ3VzdGluZyAibW92ZSB0d28gYnl0ZXMgZnJvbSBtZW1vcnkiLCBhbmQgbWFr
-ZXMNCj4gYWJzb2x1dGVseSBubyBzZW5zZSBhcyBhIHdheSB0byAid3JpdGUgMiB6ZXJvIGJ5dGVz
-IjoNCj4gDQo+IC5MQzE6DQo+ICAgICAgICAgLmJ5dGUgICAwDQo+ICAgICAgICAgLmJ5dGUgICAw
-DQo+IA0KPiBJIHRoaW5rIHRoYXQncyBzb21lIG9kZCBnY2MgYnVnLCBhY3R1YWxseS4NCg0KSSBn
-ZXQgdGhhdCB3aXRoIHNvbWUgY29kZSwgYnV0IG5vdCBvdGhlcnMuDQpTZWVtcyB0byBkZXBlbmQg
-b24gcmFuZG9tIG90aGVyIHN0dWZmLg0KSGFwcGVucyBmb3I6DQoJc3RydWN0IHsgdW5zaWduZWQg
-Y2hhciB4OjcsIHk6MTsgfTsNCmJ1dCBub3QgaWYgSSBhZGQgYW55dGhpbmcgYWZ0ZXIgaWYgKHRo
-YXQgZ2V0cyB6ZXJvZWQpLg0KV2hpY2ggc2VlbXMgdG8gYmUgdGhlIG9wcG9zaXRlIG9mIHdoYXQg
-eW91IHNlZS4NCg0KSWYgSSB1c2UgZXhwbGljaXQgYXNzaWdubWVudHMgKHJhdGhlciB0aGFuIGFu
-IGluaXRpYWxpc2VyKQ0KSSBzdGlsbCBnZXQgbWVyZ2VkIHdyaXRlcyAoZXZlbiBpZiBub3QgYSBi
-aXRmaWVsZCkgYnV0IGFsc28NCmxvc2UgdGhlIG1lbW9yeSBhY2Nlc3MuDQoNCglEYXZpZA0KDQot
-DQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwg
-TWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2Fs
-ZXMpDQo=
+On Thu, Aug 17, 2023 at 10:17:51PM +0800, Ming Lei wrote:
+> When blkg is removed from q->blkg_list from blkg_free_workfn(), queue_lock
+> has to be held, otherwise, all kinds of bugs(list corruption, hard lockup,
+> ..) can be triggered from blkg_destroy_all().
+> 
+> Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()")
+> Cc: Yu Kuai <yukuai3@huawei.com>
+> Cc: xiaoli feng <xifeng@redhat.com>
+> Cc: Chunyu Hu <chuhu@redhat.com>
+> Cc: Mike Snitzer <snitzer@kernel.org>
+> Cc: Tejun Heo <tj@kernel.org>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
