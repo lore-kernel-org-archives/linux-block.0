@@ -2,101 +2,196 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E47C2FC0F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 01:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F642C2FC14
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 01:56:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347470AbjHQBW7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Aug 2023 21:22:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43312 "EHLO
+        id S1347484AbjHQB4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Aug 2023 21:56:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347490AbjHQBWm (ORCPT
+        with ESMTP id S1347517AbjHQB4F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2023 21:22:42 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0244FD;
-        Wed, 16 Aug 2023 18:22:41 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RR6gd2t4Cz4f3tpq;
-        Thu, 17 Aug 2023 09:22:37 +0800 (CST)
-Received: from [10.174.179.247] (unknown [10.174.179.247])
-        by APP4 (Coremail) with SMTP id gCh0CgDHVqlbdt1kzWWQAw--.63661S3;
-        Thu, 17 Aug 2023 09:22:36 +0800 (CST)
-Message-ID: <ae62f34f-149c-77df-f864-2db653774715@huaweicloud.com>
-Date:   Thu, 17 Aug 2023 09:22:35 +0800
+        Wed, 16 Aug 2023 21:56:05 -0400
+Received: from mail-pl1-f205.google.com (mail-pl1-f205.google.com [209.85.214.205])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F2752712
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 18:56:03 -0700 (PDT)
+Received: by mail-pl1-f205.google.com with SMTP id d9443c01a7336-1bdf28d29b9so45057155ad.2
+        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2023 18:56:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692237363; x=1692842163;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=R8V9XkajV6ljTOCotpnGckWIdYBATaJK32ONI2Pb2tw=;
+        b=jEu+tBlSU7hX/ypUYreHC6jJ0N6Tk1WRWiFfgQkLvxkLzcopKwxZbfsVbUwuEa+M7Q
+         f+RRSW2l3eZe4AlyEqscMY75sO9oVFmlzvWhbNUTIgRyasrlzNc4N7BXb4xVHMhnTIm9
+         WkoTeGVU1LtFxqkBgc2cQbcvP1obUxj1BBVejKGzvRXwqLf0+aS/Sdm6vbi2cI6rTDX1
+         A5nD61FncZD6iQGSqbBM5L6UfPt2+2kh14ws18jYAQ7Fozh8ZwbOvRx5M56Ytzk55rs7
+         DIq6Yg1qjqcZ11q+Enbr++4vewUoDxBnXtTzOvu+ZYu7DeNwmpnOQbGHAZgZLK40aHOS
+         5vOA==
+X-Gm-Message-State: AOJu0YxX73u195/kOKwHLjC7mUvPxN5LbMqD9OJQcl9piK1xGHQHUtrr
+        vDadXNSnkGUhNlcGovO1thN9VzQmoCaszRKPOAO1uTJJumGY
+X-Google-Smtp-Source: AGHT+IGfthxfMAsX8gV+ClK1SZfMjDY5oWvLu/89fUxbqw4q8mvBhOalJAe1Nj9qjAZ6+UWQGok0eU6K9yyH5RIVpV/0csjR42hF
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v4 0/4] block/badblocks: fix badblocks setting error
-To:     axboe@kernel.dk, vishal.l.verma@intel.com,
-        dan.j.williams@intel.com, ashok_raj@linux.intel.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
-        yangerkun@huawei.com
-References: <20230626080913.3493135-1-linan666@huaweicloud.com>
-From:   Li Nan <linan666@huaweicloud.com>
-In-Reply-To: <20230626080913.3493135-1-linan666@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDHVqlbdt1kzWWQAw--.63661S3
-X-Coremail-Antispam: 1UD129KBjvJXoWrKryxKw13ZF4rZF13GF1kGrg_yoW8JF4UpF
-        Z5Ga1fWr40gr97ZFn3Zw17Xr1rC3WxJF4UWa13tw18u34UAw1xJrn2gr1rtryqqrWIkFWq
-        vF90gry5uryDG37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487
-        Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aV
-        AFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E
-        8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4I
-        kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-        WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-        0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWr
-        Zr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_Gr
-        UvcSsGvfC2KfnxnUUI43ZEXa7IUbJ73PUUUUU==
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a17:903:1c3:b0:1b3:e4f1:1b3f with SMTP id
+ e3-20020a17090301c300b001b3e4f11b3fmr1629629plh.2.1692237362831; Wed, 16 Aug
+ 2023 18:56:02 -0700 (PDT)
+Date:   Wed, 16 Aug 2023 18:56:02 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e32603060314b623@google.com>
+Subject: [syzbot] [block?] memory leak in iov_iter_extract_pages
+From:   syzbot <syzbot+cb729843d0f42a5c1a50@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    ae545c3283dc Merge tag 'gpio-fixes-for-v6.5-rc6' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17d1456fa80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2bf8962e4f7984f4
+dashboard link: https://syzkaller.appspot.com/bug?extid=cb729843d0f42a5c1a50
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=143edef7a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16e93037a80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ab6a1e819c1f/disk-ae545c32.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/55f3314970f5/vmlinux-ae545c32.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1a27c3b2a812/bzImage-ae545c32.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cb729843d0f42a5c1a50@syzkaller.appspotmail.com
+
+Warning: Permanently added '10.128.1.14' (ED25519) to the list of known hosts.
+executing program
+executing program
+executing program
+BUG: memory leak
+unreferenced object 0xffff888109d2e400 (size 1024):
+  comm "syz-executor121", pid 5006, jiffies 4294943225 (age 17.760s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81554bbb>] __do_kmalloc_node mm/slab_common.c:984 [inline]
+    [<ffffffff81554bbb>] __kmalloc_node+0x4b/0x150 mm/slab_common.c:992
+    [<ffffffff815440f9>] kmalloc_node include/linux/slab.h:602 [inline]
+    [<ffffffff815440f9>] kvmalloc_node+0x99/0x170 mm/util.c:604
+    [<ffffffff824c52fe>] kvmalloc include/linux/slab.h:720 [inline]
+    [<ffffffff824c52fe>] kvmalloc_array include/linux/slab.h:738 [inline]
+    [<ffffffff824c52fe>] want_pages_array lib/iov_iter.c:985 [inline]
+    [<ffffffff824c52fe>] iov_iter_extract_user_pages lib/iov_iter.c:1765 [inline]
+    [<ffffffff824c52fe>] iov_iter_extract_pages+0x1ee/0xa40 lib/iov_iter.c:1831
+    [<ffffffff824125a7>] bio_map_user_iov+0x167/0x5d0 block/blk-map.c:297
+    [<ffffffff82412df3>] blk_rq_map_user_iov+0x3e3/0xb30 block/blk-map.c:664
+    [<ffffffff82413943>] blk_rq_map_user block/blk-map.c:691 [inline]
+    [<ffffffff82413943>] blk_rq_map_user_io+0x143/0x160 block/blk-map.c:724
+    [<ffffffff82ca0925>] sg_io+0x285/0x510 drivers/scsi/scsi_ioctl.c:456
+    [<ffffffff82ca1025>] scsi_cdrom_send_packet+0x1b5/0x480 drivers/scsi/scsi_ioctl.c:820
+    [<ffffffff82ca13ba>] scsi_ioctl+0xca/0xd30 drivers/scsi/scsi_ioctl.c:903
+    [<ffffffff82d35964>] sg_ioctl+0x5f4/0x10a0 drivers/scsi/sg.c:1163
+    [<ffffffff8168e602>] vfs_ioctl fs/ioctl.c:51 [inline]
+    [<ffffffff8168e602>] __do_sys_ioctl fs/ioctl.c:870 [inline]
+    [<ffffffff8168e602>] __se_sys_ioctl fs/ioctl.c:856 [inline]
+    [<ffffffff8168e602>] __x64_sys_ioctl+0xf2/0x140 fs/ioctl.c:856
+    [<ffffffff84ad2bb8>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84ad2bb8>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff888109d2dc00 (size 1024):
+  comm "syz-executor121", pid 5007, jiffies 4294943747 (age 12.540s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81554bbb>] __do_kmalloc_node mm/slab_common.c:984 [inline]
+    [<ffffffff81554bbb>] __kmalloc_node+0x4b/0x150 mm/slab_common.c:992
+    [<ffffffff815440f9>] kmalloc_node include/linux/slab.h:602 [inline]
+    [<ffffffff815440f9>] kvmalloc_node+0x99/0x170 mm/util.c:604
+    [<ffffffff824c52fe>] kvmalloc include/linux/slab.h:720 [inline]
+    [<ffffffff824c52fe>] kvmalloc_array include/linux/slab.h:738 [inline]
+    [<ffffffff824c52fe>] want_pages_array lib/iov_iter.c:985 [inline]
+    [<ffffffff824c52fe>] iov_iter_extract_user_pages lib/iov_iter.c:1765 [inline]
+    [<ffffffff824c52fe>] iov_iter_extract_pages+0x1ee/0xa40 lib/iov_iter.c:1831
+    [<ffffffff824125a7>] bio_map_user_iov+0x167/0x5d0 block/blk-map.c:297
+    [<ffffffff82412df3>] blk_rq_map_user_iov+0x3e3/0xb30 block/blk-map.c:664
+    [<ffffffff82413943>] blk_rq_map_user block/blk-map.c:691 [inline]
+    [<ffffffff82413943>] blk_rq_map_user_io+0x143/0x160 block/blk-map.c:724
+    [<ffffffff82ca0925>] sg_io+0x285/0x510 drivers/scsi/scsi_ioctl.c:456
+    [<ffffffff82ca1025>] scsi_cdrom_send_packet+0x1b5/0x480 drivers/scsi/scsi_ioctl.c:820
+    [<ffffffff82ca13ba>] scsi_ioctl+0xca/0xd30 drivers/scsi/scsi_ioctl.c:903
+    [<ffffffff82d35964>] sg_ioctl+0x5f4/0x10a0 drivers/scsi/sg.c:1163
+    [<ffffffff8168e602>] vfs_ioctl fs/ioctl.c:51 [inline]
+    [<ffffffff8168e602>] __do_sys_ioctl fs/ioctl.c:870 [inline]
+    [<ffffffff8168e602>] __se_sys_ioctl fs/ioctl.c:856 [inline]
+    [<ffffffff8168e602>] __x64_sys_ioctl+0xf2/0x140 fs/ioctl.c:856
+    [<ffffffff84ad2bb8>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84ad2bb8>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff888109d2d800 (size 1024):
+  comm "syz-executor121", pid 5010, jiffies 4294944269 (age 7.320s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81554bbb>] __do_kmalloc_node mm/slab_common.c:984 [inline]
+    [<ffffffff81554bbb>] __kmalloc_node+0x4b/0x150 mm/slab_common.c:992
+    [<ffffffff815440f9>] kmalloc_node include/linux/slab.h:602 [inline]
+    [<ffffffff815440f9>] kvmalloc_node+0x99/0x170 mm/util.c:604
+    [<ffffffff824c52fe>] kvmalloc include/linux/slab.h:720 [inline]
+    [<ffffffff824c52fe>] kvmalloc_array include/linux/slab.h:738 [inline]
+    [<ffffffff824c52fe>] want_pages_array lib/iov_iter.c:985 [inline]
+    [<ffffffff824c52fe>] iov_iter_extract_user_pages lib/iov_iter.c:1765 [inline]
+    [<ffffffff824c52fe>] iov_iter_extract_pages+0x1ee/0xa40 lib/iov_iter.c:1831
+    [<ffffffff824125a7>] bio_map_user_iov+0x167/0x5d0 block/blk-map.c:297
+    [<ffffffff82412df3>] blk_rq_map_user_iov+0x3e3/0xb30 block/blk-map.c:664
+    [<ffffffff82413943>] blk_rq_map_user block/blk-map.c:691 [inline]
+    [<ffffffff82413943>] blk_rq_map_user_io+0x143/0x160 block/blk-map.c:724
+    [<ffffffff82ca0925>] sg_io+0x285/0x510 drivers/scsi/scsi_ioctl.c:456
+    [<ffffffff82ca1025>] scsi_cdrom_send_packet+0x1b5/0x480 drivers/scsi/scsi_ioctl.c:820
+    [<ffffffff82ca13ba>] scsi_ioctl+0xca/0xd30 drivers/scsi/scsi_ioctl.c:903
+    [<ffffffff82d35964>] sg_ioctl+0x5f4/0x10a0 drivers/scsi/sg.c:1163
+    [<ffffffff8168e602>] vfs_ioctl fs/ioctl.c:51 [inline]
+    [<ffffffff8168e602>] __do_sys_ioctl fs/ioctl.c:870 [inline]
+    [<ffffffff8168e602>] __se_sys_ioctl fs/ioctl.c:856 [inline]
+    [<ffffffff8168e602>] __x64_sys_ioctl+0xf2/0x140 fs/ioctl.c:856
+    [<ffffffff84ad2bb8>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84ad2bb8>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
 
-在 2023/6/26 16:09, linan666@huaweicloud.com 写道:
-> From: Li Nan <linan122@huawei.com>
-> 
-> This patch series fixes some simple bugs of setting badblocks and
-> optimizing struct badblocks. Coly Li has been trying to refactor badblocks
-> in patch series "badblocks improvement for multiple bad block ranges"
-> (https://lore.kernel.org/all/20220721121152.4180-1-colyli@suse.de). but the
 
-Coly has sent the lastest version of his patch series.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Now this patch series can be discarded.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-> workload is significant. Before that, I will fix some easily triggered
-> issues and optimize some code that does not conflict with Coly's changes.
-> 
-> Changes in v4:
->   - patch 1, remove the part of reorder fields
->   - patch 3/4, improve commit log.
-> 
-> Changes in v3:
->   - delete patchs with significant changes.
-> 
-> Li Nan (4):
->    block/badblocks: change some members of badblocks to bool
->    block/badblocks: only set bb->changed/unacked_exist when badblocks
->      changes
->    block/badblocks: fix badblocks loss when badblocks combine
->    block/badblocks: fix the bug of reverse order
-> 
->   include/linux/badblocks.h |  9 +++++----
->   block/badblocks.c         | 38 ++++++++++++++++++++++----------------
->   2 files changed, 27 insertions(+), 20 deletions(-)
-> 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
--- 
-Thanks,
-Nan
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
