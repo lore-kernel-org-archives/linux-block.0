@@ -2,77 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A8C6C41513
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 14:51:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FBCC41513
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 15:17:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243715AbjHQOvA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 10:51:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53212 "EHLO
+        id S1353048AbjHQPQ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 11:16:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352345AbjHQOum (ORCPT
+        with ESMTP id S1353136AbjHQPQs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 10:50:42 -0400
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98AB82D78;
-        Thu, 17 Aug 2023 07:50:40 -0700 (PDT)
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-26b41112708so3864194a91.3;
-        Thu, 17 Aug 2023 07:50:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692283840; x=1692888640;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Swe7qS1gWsrm3LERSWVriC7BNsYVaHQ/NWIJOtLygzE=;
-        b=KtvecZiMk6GEkGLxqwesZDEZQ546MvLIVdT7ogRmePd84+OsCtJ+Jl/m6qPm0Uyt+O
-         VvsazR9CCYwFJODTQ+uTfh2cKCjFaPSVg/VT+TDMR5O0W6eGnv6s40rDc2xb0Pc7is/6
-         lWJOjXkY6SRzuuRF3Pau67gDMREawEMe32nOwFdItktk9xUsoxEwMUSPXGANuDBa4RF5
-         /ivI4va44PeMmGQqpt2/+IFIfjTZEF3UERTU7sWfmhu0kuxYk1vc8rFVum1E5hb3gWWG
-         k28+9d+2mxZPfhgTMKnAEYXXsnoOF5mdrll/tWGBdL12Byg/29GyD3rNXfIkmxSblLvJ
-         mbmQ==
-X-Gm-Message-State: AOJu0Yw/GAkdoLkwapvgCRAitxPPXMve5CMHqAD3FS3GTM3cWNHS82Pe
-        ZbivfGPhswFZykstyalVHfc=
-X-Google-Smtp-Source: AGHT+IFixLVVwRoS+ebQdkKmKGR5+zSOuE1vDbyNm+1B3b/hEgjshhzCxdl3EVfg+K86FX4nwiVxtQ==
-X-Received: by 2002:a17:90a:fc95:b0:268:52a6:103d with SMTP id ci21-20020a17090afc9500b0026852a6103dmr4656895pjb.9.1692283839903;
-        Thu, 17 Aug 2023 07:50:39 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:dfd:6f25:f7be:a9ca? ([2620:15c:211:201:dfd:6f25:f7be:a9ca])
-        by smtp.gmail.com with ESMTPSA id fv23-20020a17090b0e9700b0025645ce761dsm1663238pjb.35.2023.08.17.07.50.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Aug 2023 07:50:39 -0700 (PDT)
-Message-ID: <af61c72c-b3ec-ce7a-4f41-bce9a9844baf@acm.org>
-Date:   Thu, 17 Aug 2023 07:50:38 -0700
+        Thu, 17 Aug 2023 11:16:48 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0098106
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 08:16:46 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-220-eGokBTGGPKySjKBRyhfXcw-1; Thu, 17 Aug 2023 16:16:44 +0100
+X-MC-Unique: eGokBTGGPKySjKBRyhfXcw-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 17 Aug
+ 2023 16:16:40 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Thu, 17 Aug 2023 16:16:40 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Linus Torvalds' <torvalds@linux-foundation.org>
+CC:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@list.de>,
+        "Christian Brauner" <christian@brauner.io>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Jeff Layton" <jlayton@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Topic: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Index: AQHZ0DpP/l59sWTPXU+UuQ9VGbJikq/s16Kg///6foCAACRpIIAA7PpbgABGFYCAAFYcAIAAGHiw
+Date:   Thu, 17 Aug 2023 15:16:40 +0000
+Message-ID: <2190704172a5458eb909c9df59b6a556@AcuMS.aculab.com>
+References: <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com>
+ <20230816120741.534415-1-dhowells@redhat.com>
+ <20230816120741.534415-3-dhowells@redhat.com>
+ <608853.1692190847@warthog.procyon.org.uk>
+ <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
+ <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
+ <665724.1692218114@warthog.procyon.org.uk>
+ <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com>
+ <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
+ <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
+In-Reply-To: <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH v2] blk-mq: release scheduler resource when request
- complete
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-To:     chengming.zhou@linux.dev
-Cc:     oe-lkp@lists.linux.dev, lkp@intel.com,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        cel@kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com,
-        kernel test robot <oliver.sang@intel.com>
-References: <202308172100.8ce4b853-oliver.sang@intel.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <202308172100.8ce4b853-oliver.sang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/17/23 07:41, kernel test robot wrote:
-> [  222.622837][ T2216] statistics for priority 1: i 276 m 0 d 276 c 278
-> [ 222.629307][ T2216] WARNING: CPU: 0 PID: 2216 at block/mq-deadline.c:680 dd_exit_sched (block/mq-deadline.c:680 (discriminator 3))
-
-The above information shows that dd_inserted_request() has been called
-276 times and also that dd_finish_request() has been called 278 times.
-Calling dd_finish_request() more than once per request breaks the code
-for priority handling since that code checks how many requests are
-pending per priority level by subtracting the number of completion calls
-from the number of insertion calls (see also dd_queued()). I think the
-above output indicates that this patch introduced a regression.
-
-Bart.
+RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogVGh1cnNkYXksIEF1Z3VzdCAxNywgMjAyMyAz
+OjM4IFBNDQo+IA0KPiBPbiBUaHUsIDE3IEF1ZyAyMDIzIGF0IDEwOjQyLCBEYXZpZCBMYWlnaHQg
+PERhdmlkLkxhaWdodEBhY3VsYWIuY29tPiB3cm90ZToNCj4gPg0KPiA+IEFsdGhvdWdoIEknbSBu
+b3Qgc3VyZSB0aGUgYml0LWZpZWxkcyByZWFsbHkgaGVscC4NCj4gPiBUaGVyZSBhcmUgOCBieXRl
+cyBhdCB0aGUgc3RhcnQgb2YgdGhlIHN0cnVjdHVyZSwgbWlnaHQgYXMgd2VsbA0KPiA+IHVzZSB0
+aGVtIDotKQ0KPiANCj4gQWN0dWFsbHnDpyBJIHdyb3RlIHRoZSBwYXRjaCB0aGF0IHdheSBiZWNh
+dXNlIGl0IHNlZW1zIHRvIGltcHJvdmUgY29kZQ0KPiBnZW5lcmF0aW9uLg0KPiANCj4gVGhlIGJp
+dGZpZWxkcyBhcmUgZ2VuZXJhbGx5IGFsbCBzZXQgdG9nZXRoZXIgYXMganVzdCBwbGFpbiBvbmUt
+dGltZQ0KPiBjb25zdGFudHMgYXQgaW5pdGlhbGl6YXRpb24gdGltZSwgYW5kIGdjYyBzZWVzIHRo
+YXQgaXQncyBhIGZ1bGwgYnl0ZQ0KPiB3cml0ZS4NCg0KSSd2ZSBqdXN0IHNwZW50IHRvbyBsb25n
+IG9uIGdvZGJvbHQgKGFnYWluKSA6LSkNCkZpZGRsaW5nIHdpdGg6DQoNCiNkZWZpbmUgdDEgdW5z
+aWduZWQgY2hhcg0Kc3RydWN0IGIgew0KICAgIHQxIGIxOjc7DQogICAgdDEgYjI6MTsNCn07DQoN
+CnZvaWQgZmYoc3RydWN0IGIgKixpbnQpOw0KDQp2b2lkIGZmMSh2b2lkKQ0Kew0KICAgIHN0cnVj
+dCBiIGIgPSB7LmIxPTMsIC5iMiA9IDF9Ow0KICAgIGZmKCZiLCBzaXplb2YgYik7DQp9DQoNCmdj
+YyBmb3IgeDg2LTY0IG1ha2UgYSBwaWdzLWJyZWFrZmFzdCB3aGVuIHRoZSBiaXRmaWVsZHMgYXJl
+ICdjaGFyJw0KYW5kIGxvYWRzIHRoZSBjb25zdGFudCBmcm9tIG1lbW9yeSB1c2luZyBwYy1yZWxh
+dGl2ZSBhY2Nlc3MuDQpPdGhlcndpc2UgcHJldHR5IG11c3QgYWxsIHZhcmlhbnRzICh3aXRoIG9y
+IHdpdGhvdXQgdGhlIGJpdGZpZWxkKQ0KZ2V0IGluaXRpYWxpc2VkIGluIGEgc2luZ2xlIHdyaXRl
+Lg0KKEFsdGhvdWdoIGdjYyBzZWVtcyB0byBpbnNpc3Qgb24gbG9hZGluZyBhIDMyYml0IGNvbnN0
+YW50IGludG8gJWVheC4pDQoNCkkgY2FuIHdlbGwgaW1hZ2luZSB0aGF0IGtlZXBpbmcgdGhlIGNv
+bnN0YW50IGJlbG93IDMyNzY4IHdpbGwgaGVscA0Kb24gYXJjaGl0ZWN0dXJlcyB0aGF0IGhhdmUg
+dG8gY29uc3RydWN0IGxhcmdlIGNvbnN0YW50cy4NCg0KPiBBbmQgdGhlIHJlYXNvbiAnZGF0YV9z
+b3VyY2UnIGlzIG5vdCBhIGJpdGZpZWxkIGlzIHRoYXQgaXQncyBub3QNCj4gYSBjb25zdGFudCBh
+dCBpb3ZfaXRlciBpbml0IHRpbWUgKGl0J3MgYW4gYXJndW1lbnQgdG8gYWxsIHRoZSBpbml0DQo+
+IGZ1bmN0aW9ucyksIHNvIGhhdmluZyB0aGF0IG9uZSBhcyBhIHNlcGFyYXRlIGJ5dGUgYXQgaW5p
+dCB0aW1lIGlzIGdvb2QNCj4gZm9yIGNvZGUgZ2VuZXJhdGlvbiB3aGVuIHlvdSBkb24ndCBuZWVk
+IHRvIG1hc2sgYml0cyBvciBhbnl0aGluZyBsaWtlDQo+IHRoYXQuDQo+IA0KPiBBbmQgb25jZSBp
+bml0aWFsaXplZCwgaGF2aW5nIHRoaW5ncyBiZSBkZW5zZSBhbmQgZG9pbmcgYWxsIHRoZQ0KPiBj
+b21wYXJlcyB3aXRoIGEgYml0d2lzZSAnYW5kJyBpbnN0ZWFkIG9mIGRvaW5nIHRoZW0gYXMgc29t
+ZSB2YWx1ZQ0KPiBjb21wYXJlIGFnYWluIHRlbmRzIHRvIGdlbmVyYXRlIGdvb2QgY29kZS4NCj4g
+DQo+IFRoZW4gYmVpbmcgYWJsZSB0byB0ZXN0IG11bHRpcGxlIGJpdHMgYXQgdGhlIHNhbWUgdGlt
+ZSBpcyBqdXN0IGdyYXZ5DQo+IG9uIHRvcCBvZiB0aGF0IChpZSB0aGF0IHdob2xlICJyZW1vdmUg
+dXNlcl9iYWNrZWQsIGJlY2F1c2UgaXQncyBlYXNpZXINCj4gdG8ganVzdCB0ZXN0IHRoZSBiaXQg
+Y29tYmluYXRpb24iKS4NCg0KSW5kZWVkLCB0aGV5IHVzZWQgdG8gYmUgYml0cyBidXQgbmV2ZXIg
+Z290IHRlc3RlZCB0b2dldGhlci4NCg0KPiA+IE9UT0ggdGhlICdub2ZhdWx0JyBhbmQgJ2NvcHlf
+bWMnIGZsYWdzIGNvdWxkIGJlIHB1dCBpbnRvIG11Y2gNCj4gPiBoaWdoZXIgYml0cyBvZiBhIDMy
+Yml0IHZhbHVlLg0KPiANCj4gT25jZSB5b3Ugc3RhcnQgZG9pbmcgdGhhdCwgeW91IG9mdGVuIGdl
+dCBiaWdnZXIgY29uc3RhbnRzIGluIHRoZSBjb2RlIHN0cmVhbS4NCg0KSSB3YXNuJ3QgdGhpbmtp
+bmcgb2YgdXNpbmcgJ3JlYWxseSBiaWcnIHZhbHVlcyA6LSkNCkV2ZW4gMzI3NjggY2FuIGJlIGFu
+IGlzc3VlIGJlY2F1c2Ugc29tZSBjcHUgc2lnbiBleHRlbmQgYWxsIGNvbnN0YW50cy4NCg0KCURh
+dmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3Vu
+dCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3
+Mzg2IChXYWxlcykNCg==
 
