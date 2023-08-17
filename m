@@ -2,143 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F57C41513
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 17:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81539C41513
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 18:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353965AbjHQR0f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 13:26:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42760 "EHLO
+        id S241500AbjHQSkr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 14:40:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353993AbjHQR02 (ORCPT
+        with ESMTP id S1354541AbjHQSk2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 13:26:28 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C232D3
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 10:26:27 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bdb3ecd20dso86325ad.0
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 10:26:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692293187; x=1692897987;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CDRl1/FFXQzt1PG5UM+41faxkoiYDoNvq2d7j+I4d6M=;
-        b=2mwQCh5jd41H1BJAU+hEBa8u1PRPFONFNvdXcHOgRsWX1CPT2Nb/5RhD0DZWCc8Clu
-         2v+sEIidduxj/LXVHU6xGOVzR5jJwANuymgND905u8yG6UZ2Cbeg0/vFpr1qPwM+hSFT
-         Q0g1tOgsrAkOPGbb8l/Ow3pE/5Upg4r89MKU5Oelsd/GRTJdCFkqnNe1VsFEl4ADmQHw
-         jhIJ8oStYVaCu7uHY0MCIf+GWRur98K/WOuqrlWp0nOrz5WO94OjPQrm85pvFL0O99zg
-         duJEtpObhhWxHie0ZcbAm9LwauPIVnYiWLLarm2htg9VSOXS1iTKq2SJSpGR/e322zmn
-         D/YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692293187; x=1692897987;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CDRl1/FFXQzt1PG5UM+41faxkoiYDoNvq2d7j+I4d6M=;
-        b=frEQemFlZEZ0cvBl+qpBMRFiTCq/WRZLI9NC8aTvuQlcP2bpM4vTxOG2j3E/SdEefQ
-         m4eqt1/aSHk5rZBdR1/a1xvOYIu3cbokGizYfs+e2YJQ2ixdDFS+lm8O9gBlHeCK8Odb
-         uPwuwZ4Eig9PSY84/rMzHDi99yPtM51YEWMvjxKUFbYe7x4gJ0bv6Iuev2XdUQF8P9gz
-         EE6tD6scUFJkB2boBW2UMHuA53GTK+QH+5ZA4iE9dFGJZtjjeL29bl0MOnfdWCO2mMsM
-         7JWO3MNvzeb8AdsABB1C7gFEXa+bvQoA9OAidnlE/t/a06meEzlv7WYdXnLu1HyLk55b
-         CmKw==
-X-Gm-Message-State: AOJu0YzLNYuCbMeyMo6W6ePM7Kx+NRR6o7mDeFPmoXVRkdTadOxkHzFi
-        wIgjI23iiGsOCXU+y9O4nXWNlQ==
-X-Google-Smtp-Source: AGHT+IHNnMqBatXZYdvKTkOvYxFNJ7DOcCguixrdqDz0LK7VurLGe3CXxam/YuJMZnTSzK3oRdJRiA==
-X-Received: by 2002:a17:903:22cd:b0:1b8:50a9:6874 with SMTP id y13-20020a17090322cd00b001b850a96874mr19735plg.5.1692293186761;
-        Thu, 17 Aug 2023 10:26:26 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id w6-20020a170902d3c600b001bdf45eb5b6sm12246plb.284.2023.08.17.10.26.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Aug 2023 10:26:26 -0700 (PDT)
-Message-ID: <8a33da7a-425b-4fb5-9bf0-9a34ff01d80f@kernel.dk>
-Date:   Thu, 17 Aug 2023 11:26:25 -0600
+        Thu, 17 Aug 2023 14:40:28 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AA5030D4;
+        Thu, 17 Aug 2023 11:40:27 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37HDgcr1003956;
+        Thu, 17 Aug 2023 18:40:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=8beUAYvVt+q73E7VB8BGUK84aeEF3fecJqSz3gMPZbM=;
+ b=f8wN1NJPs9v5zmuNyrI3jWwSt7eVe8ih99yVQcYR0sajvx/GLMY/r5CVGCk6yUNWCq5u
+ CVD0PuBAbYePuCfyE+E5bYjV9u116CxFnIznvmqa32bM7IeLrLuSaPHREApKj0gDfstQ
+ 92FjrwaQPtHWjNOjj08folon4B21ro+YLoy/HB5n6Z8cBpUhFVW1YqdfAGoFERWfCfso
+ lwq7wzSuQEXDBM0PGQDr8dGw/zUy+36pX7eqr2eOFXFD79WVD23eGqS2PM4KmABYQWLn
+ 63XXDW1ELd8xSzzGZLpkuw/O2thtxVOcvQmXUFBvcp0e4SzUlpwWVG5BVOaZKaKzDBLT 8g== 
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sh3xxas4j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Aug 2023 18:40:08 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+        by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37HIe8X1007501
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Aug 2023 18:40:08 GMT
+Received: from [192.168.143.77] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Thu, 17 Aug
+ 2023 11:40:07 -0700
+Message-ID: <3b1caab8-c95e-eb81-57ef-21b746795ba6@quicinc.com>
+Date:   Thu, 17 Aug 2023 11:40:07 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] blk-mq: release scheduler resource when request
- complete
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v9 12/17] scsi: ufs: mediatek: Rework the code for
+ disabling auto-hibernation
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>
+References: <20230816195447.3703954-1-bvanassche@acm.org>
+ <20230816195447.3703954-13-bvanassche@acm.org>
 Content-Language: en-US
-To:     Chengming Zhou <chengming.zhou@linux.dev>,
-        Bart Van Assche <bvanassche@acm.org>, hch@lst.de
-Cc:     oe-lkp@lists.linux.dev, lkp@intel.com,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, cel@kernel.org,
-        linux-kernel@vger.kernel.org,
-        kernel test robot <oliver.sang@intel.com>
-References: <202308172100.8ce4b853-oliver.sang@intel.com>
- <af61c72c-b3ec-ce7a-4f41-bce9a9844baf@acm.org>
- <317715dc-f6e4-1847-5b78-b2d8184b446a@linux.dev>
- <d16edaf8-1eef-f099-eb15-7599906d1492@linux.dev>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <d16edaf8-1eef-f099-eb15-7599906d1492@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+From:   "Bao D. Nguyen" <quic_nguyenb@quicinc.com>
+In-Reply-To: <20230816195447.3703954-13-bvanassche@acm.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: ROd2cc_OXYpNHcdJUDgJ851jEobzE3m_
+X-Proofpoint-ORIG-GUID: ROd2cc_OXYpNHcdJUDgJ851jEobzE3m_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-17_14,2023-08-17_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
+ bulkscore=0 mlxlogscore=999 clxscore=1011 priorityscore=1501
+ impostorscore=0 adultscore=0 phishscore=0 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308170168
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/17/23 11:17 AM, Chengming Zhou wrote:
-> On 2023/8/17 23:29, Chengming Zhou wrote:
->> On 2023/8/17 22:50, Bart Van Assche wrote:
->>> On 8/17/23 07:41, kernel test robot wrote:
->>>> [  222.622837][ T2216] statistics for priority 1: i 276 m 0 d 276 c 278
->>>> [ 222.629307][ T2216] WARNING: CPU: 0 PID: 2216 at block/mq-deadline.c:680 dd_exit_sched (block/mq-deadline.c:680 (discriminator 3))
->>>
->>> The above information shows that dd_inserted_request() has been called
->>> 276 times and also that dd_finish_request() has been called 278 times.
->>
->> Thanks much for your help.
->>
->> This patch indeed introduced a regression, postflush requests will be completed
->> twice, so here dd_finish_request() is more than dd_inserted_request().
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index a8c63bef8ff1..7cd47ffc04ce 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -686,8 +686,10 @@ static void blk_mq_finish_request(struct request *rq)
->>  {
->>         struct request_queue *q = rq->q;
->>
->> -       if (rq->rq_flags & RQF_USE_SCHED)
->> +       if (rq->rq_flags & RQF_USE_SCHED) {
->>                 q->elevator->type->ops.finish_request(rq);
->> +               rq->rq_flags &= ~RQF_USE_SCHED;
->> +       }
->>  }
->>
+On 8/16/2023 12:53 PM, Bart Van Assche wrote:
+> Call ufshcd_auto_hibern8_update() instead of writing directly into the
+> auto-hibernation control register. This patch is part of an effort to
+> move all auto-hibernation register changes into the UFSHCI driver core.
 > 
-> I just tried to run LKP and xfstests, firstly failed to run LKP on my server
-> which seems to miss some dependencies. Then I ran xfstests successfully.
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   drivers/ufs/host/ufs-mediatek.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> But xfstests generic/704 always pass and no WARN in dmesg. (I don't know why,
-> maybe my server settings are some different from the test robot.)
-> 
-> So I try to reproduce it manually. Steps:
-> 
-> ```
-> echo mq-deadline > /sys/block/sdb/queue/scheduler
-> 
-> mkfs.ext4 /dev/sdb
-> mount /dev/sdb /fs/sdb
-> cd /fs/sdb
-> stress-ng --symlink 4 --timeout 60
-> 
-> echo none > /sys/block/sdb/queue/scheduler
-> ```
-> 
-> This way the WARNING in mq-deadline can be reproduced easily.
-> 
-> Then retest with the diff, mq-deadline WARNING still happened... So there
-> are still other requests which have RQF_USE_SCHED flag completed without
-> being inserted into elevator.
-> 
-> Will use some tracing and look again.
+> diff --git a/drivers/ufs/host/ufs-mediatek.c b/drivers/ufs/host/ufs-mediatek.c
+> index e68b05976f9e..a3cf30e603ca 100644
+> --- a/drivers/ufs/host/ufs-mediatek.c
+> +++ b/drivers/ufs/host/ufs-mediatek.c
+> @@ -1252,7 +1252,7 @@ static void ufs_mtk_auto_hibern8_disable(struct ufs_hba *hba)
+>   	int ret;
+>   
+>   	/* disable auto-hibern8 */
+> -	ufshcd_writel(hba, 0, REG_AUTO_HIBERNATE_IDLE_TIMER);
+> +	ufshcd_auto_hibern8_update(hba, 0);
+Since you now use ufshcd_auto_hibern8_update(), the caller should not 
+need to check for ufshcd_is_auto_hibern8_supported() because this is 
+already part of the hibern8_update(). Suggest remove the if statement 
+from the caller.
 
-Ah missed this, thanks for doing this testing. I'll wait for an update
-version. We can just fold in whatever change we need, and most likely
-just push the patch to next week rather than send off a pull request for
-this week. It's the only important thing pending on the block side.
+	if (ufshcd_is_auto_hibern8_supported(hba))
+		ufs_mtk_auto_hibern8_disable(hba);
 
--- 
-Jens Axboe
+>   
+>   	/* wait host return to idle state when auto-hibern8 off */
+>   	ufs_mtk_wait_idle_state(hba, 5);
 
