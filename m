@@ -2,115 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FBCC41513
-	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 15:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B35C30654
+	for <linux-block@archiver.kernel.org>; Thu, 17 Aug 2023 15:21:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353048AbjHQPQ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 11:16:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47844 "EHLO
+        id S1353141AbjHQPUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 11:20:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353136AbjHQPQs (ORCPT
+        with ESMTP id S1353125AbjHQPUM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 11:16:48 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0098106
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 08:16:46 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-220-eGokBTGGPKySjKBRyhfXcw-1; Thu, 17 Aug 2023 16:16:44 +0100
-X-MC-Unique: eGokBTGGPKySjKBRyhfXcw-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 17 Aug
- 2023 16:16:40 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 17 Aug 2023 16:16:40 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Linus Torvalds' <torvalds@linux-foundation.org>
-CC:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@list.de>,
-        "Christian Brauner" <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
- memcpy_from_iter_mc()
-Thread-Topic: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
- memcpy_from_iter_mc()
-Thread-Index: AQHZ0DpP/l59sWTPXU+UuQ9VGbJikq/s16Kg///6foCAACRpIIAA7PpbgABGFYCAAFYcAIAAGHiw
-Date:   Thu, 17 Aug 2023 15:16:40 +0000
-Message-ID: <2190704172a5458eb909c9df59b6a556@AcuMS.aculab.com>
-References: <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com>
- <20230816120741.534415-1-dhowells@redhat.com>
- <20230816120741.534415-3-dhowells@redhat.com>
- <608853.1692190847@warthog.procyon.org.uk>
- <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
- <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
- <665724.1692218114@warthog.procyon.org.uk>
- <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com>
- <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
- <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
-In-Reply-To: <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Thu, 17 Aug 2023 11:20:12 -0400
+X-Greylist: delayed 1684 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 17 Aug 2023 08:20:10 PDT
+Received: from pegase1.c-s.fr (unknown [90.115.179.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 781F31AE;
+        Thu, 17 Aug 2023 08:20:10 -0700 (PDT)
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+        by localhost (Postfix) with ESMTP id 4RRSdd3c0Wz9wDZ;
+        Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id Xu1Wi41DeIWd; Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 4RRSdd2zBVz9wDR;
+        Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 5E5298B76C;
+        Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id YD0PK2gt8x9D; Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (unknown [172.19.54.59])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 2C13F8B763;
+        Thu, 17 Aug 2023 16:52:05 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (localhost [127.0.0.1])
+        by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 37HEq05R469319
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Thu, 17 Aug 2023 16:52:00 +0200
+Received: (from chleroy@localhost)
+        by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 37HEprmG469307;
+        Thu, 17 Aug 2023 16:51:53 +0200
+X-Authentication-Warning: PO20335.IDSI0.si.c-s.fr: chleroy set sender to christophe.leroy@csgroup.eu using -f
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christophe Leroy <christophe.leroy@csgroup.eu>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] block: swim3: Mark swim3_init() static to fix no previous prototype error
+Date:   Thu, 17 Aug 2023 16:51:40 +0200
+Message-ID: <4798f19879b0470c07ee6a37aa79eae04db5d433.1692283840.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1692283899; l=838; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=wlYp3VeZpONLYQueB+H0V50QRiOXOc6nd6WiozapWLA=; b=OEdpamS1V+IuoDmX+sUxNq62U71ABstA2/v+nkid48E3b8hfIbTwe3conzyA2Cz2DrCWU+Zax /DRiNiTyj1oD/KtaQ3iscVsDr9UCmsxcE+V1DwKTzV1qGh1aY2yYtee
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogVGh1cnNkYXksIEF1Z3VzdCAxNywgMjAyMyAz
-OjM4IFBNDQo+IA0KPiBPbiBUaHUsIDE3IEF1ZyAyMDIzIGF0IDEwOjQyLCBEYXZpZCBMYWlnaHQg
-PERhdmlkLkxhaWdodEBhY3VsYWIuY29tPiB3cm90ZToNCj4gPg0KPiA+IEFsdGhvdWdoIEknbSBu
-b3Qgc3VyZSB0aGUgYml0LWZpZWxkcyByZWFsbHkgaGVscC4NCj4gPiBUaGVyZSBhcmUgOCBieXRl
-cyBhdCB0aGUgc3RhcnQgb2YgdGhlIHN0cnVjdHVyZSwgbWlnaHQgYXMgd2VsbA0KPiA+IHVzZSB0
-aGVtIDotKQ0KPiANCj4gQWN0dWFsbHnDpyBJIHdyb3RlIHRoZSBwYXRjaCB0aGF0IHdheSBiZWNh
-dXNlIGl0IHNlZW1zIHRvIGltcHJvdmUgY29kZQ0KPiBnZW5lcmF0aW9uLg0KPiANCj4gVGhlIGJp
-dGZpZWxkcyBhcmUgZ2VuZXJhbGx5IGFsbCBzZXQgdG9nZXRoZXIgYXMganVzdCBwbGFpbiBvbmUt
-dGltZQ0KPiBjb25zdGFudHMgYXQgaW5pdGlhbGl6YXRpb24gdGltZSwgYW5kIGdjYyBzZWVzIHRo
-YXQgaXQncyBhIGZ1bGwgYnl0ZQ0KPiB3cml0ZS4NCg0KSSd2ZSBqdXN0IHNwZW50IHRvbyBsb25n
-IG9uIGdvZGJvbHQgKGFnYWluKSA6LSkNCkZpZGRsaW5nIHdpdGg6DQoNCiNkZWZpbmUgdDEgdW5z
-aWduZWQgY2hhcg0Kc3RydWN0IGIgew0KICAgIHQxIGIxOjc7DQogICAgdDEgYjI6MTsNCn07DQoN
-CnZvaWQgZmYoc3RydWN0IGIgKixpbnQpOw0KDQp2b2lkIGZmMSh2b2lkKQ0Kew0KICAgIHN0cnVj
-dCBiIGIgPSB7LmIxPTMsIC5iMiA9IDF9Ow0KICAgIGZmKCZiLCBzaXplb2YgYik7DQp9DQoNCmdj
-YyBmb3IgeDg2LTY0IG1ha2UgYSBwaWdzLWJyZWFrZmFzdCB3aGVuIHRoZSBiaXRmaWVsZHMgYXJl
-ICdjaGFyJw0KYW5kIGxvYWRzIHRoZSBjb25zdGFudCBmcm9tIG1lbW9yeSB1c2luZyBwYy1yZWxh
-dGl2ZSBhY2Nlc3MuDQpPdGhlcndpc2UgcHJldHR5IG11c3QgYWxsIHZhcmlhbnRzICh3aXRoIG9y
-IHdpdGhvdXQgdGhlIGJpdGZpZWxkKQ0KZ2V0IGluaXRpYWxpc2VkIGluIGEgc2luZ2xlIHdyaXRl
-Lg0KKEFsdGhvdWdoIGdjYyBzZWVtcyB0byBpbnNpc3Qgb24gbG9hZGluZyBhIDMyYml0IGNvbnN0
-YW50IGludG8gJWVheC4pDQoNCkkgY2FuIHdlbGwgaW1hZ2luZSB0aGF0IGtlZXBpbmcgdGhlIGNv
-bnN0YW50IGJlbG93IDMyNzY4IHdpbGwgaGVscA0Kb24gYXJjaGl0ZWN0dXJlcyB0aGF0IGhhdmUg
-dG8gY29uc3RydWN0IGxhcmdlIGNvbnN0YW50cy4NCg0KPiBBbmQgdGhlIHJlYXNvbiAnZGF0YV9z
-b3VyY2UnIGlzIG5vdCBhIGJpdGZpZWxkIGlzIHRoYXQgaXQncyBub3QNCj4gYSBjb25zdGFudCBh
-dCBpb3ZfaXRlciBpbml0IHRpbWUgKGl0J3MgYW4gYXJndW1lbnQgdG8gYWxsIHRoZSBpbml0DQo+
-IGZ1bmN0aW9ucyksIHNvIGhhdmluZyB0aGF0IG9uZSBhcyBhIHNlcGFyYXRlIGJ5dGUgYXQgaW5p
-dCB0aW1lIGlzIGdvb2QNCj4gZm9yIGNvZGUgZ2VuZXJhdGlvbiB3aGVuIHlvdSBkb24ndCBuZWVk
-IHRvIG1hc2sgYml0cyBvciBhbnl0aGluZyBsaWtlDQo+IHRoYXQuDQo+IA0KPiBBbmQgb25jZSBp
-bml0aWFsaXplZCwgaGF2aW5nIHRoaW5ncyBiZSBkZW5zZSBhbmQgZG9pbmcgYWxsIHRoZQ0KPiBj
-b21wYXJlcyB3aXRoIGEgYml0d2lzZSAnYW5kJyBpbnN0ZWFkIG9mIGRvaW5nIHRoZW0gYXMgc29t
-ZSB2YWx1ZQ0KPiBjb21wYXJlIGFnYWluIHRlbmRzIHRvIGdlbmVyYXRlIGdvb2QgY29kZS4NCj4g
-DQo+IFRoZW4gYmVpbmcgYWJsZSB0byB0ZXN0IG11bHRpcGxlIGJpdHMgYXQgdGhlIHNhbWUgdGlt
-ZSBpcyBqdXN0IGdyYXZ5DQo+IG9uIHRvcCBvZiB0aGF0IChpZSB0aGF0IHdob2xlICJyZW1vdmUg
-dXNlcl9iYWNrZWQsIGJlY2F1c2UgaXQncyBlYXNpZXINCj4gdG8ganVzdCB0ZXN0IHRoZSBiaXQg
-Y29tYmluYXRpb24iKS4NCg0KSW5kZWVkLCB0aGV5IHVzZWQgdG8gYmUgYml0cyBidXQgbmV2ZXIg
-Z290IHRlc3RlZCB0b2dldGhlci4NCg0KPiA+IE9UT0ggdGhlICdub2ZhdWx0JyBhbmQgJ2NvcHlf
-bWMnIGZsYWdzIGNvdWxkIGJlIHB1dCBpbnRvIG11Y2gNCj4gPiBoaWdoZXIgYml0cyBvZiBhIDMy
-Yml0IHZhbHVlLg0KPiANCj4gT25jZSB5b3Ugc3RhcnQgZG9pbmcgdGhhdCwgeW91IG9mdGVuIGdl
-dCBiaWdnZXIgY29uc3RhbnRzIGluIHRoZSBjb2RlIHN0cmVhbS4NCg0KSSB3YXNuJ3QgdGhpbmtp
-bmcgb2YgdXNpbmcgJ3JlYWxseSBiaWcnIHZhbHVlcyA6LSkNCkV2ZW4gMzI3NjggY2FuIGJlIGFu
-IGlzc3VlIGJlY2F1c2Ugc29tZSBjcHUgc2lnbiBleHRlbmQgYWxsIGNvbnN0YW50cy4NCg0KCURh
-dmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3Vu
-dCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3
-Mzg2IChXYWxlcykNCg==
+With pmac32_defconfig W=1:
+
+  CC [M]  drivers/block/swim3.o
+drivers/block/swim3.c:1280:5: warning: no previous prototype for 'swim3_init' [-Wmissing-prototypes]
+ 1280 | int swim3_init(void)
+      |     ^~~~~~~~~~
+
+swim3_init() is called locally via module_init(), it should be static.
+
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/block/swim3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index dc43a63b3469..c2bc85826358 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -1277,7 +1277,7 @@ static struct macio_driver swim3_driver =
+ };
+ 
+ 
+-int swim3_init(void)
++static int swim3_init(void)
+ {
+ 	macio_register_driver(&swim3_driver);
+ 	return 0;
+-- 
+2.41.0
 
