@@ -2,124 +2,159 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E70EEE4999
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 21:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECC0EE499D
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 21:40:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236533AbjHRVUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 17:20:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54020 "EHLO
+        id S240561AbjHRVjo convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 17:39:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240595AbjHRVTk (ORCPT
+        with ESMTP id S240712AbjHRVj0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 17:19:40 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 292C72102;
-        Fri, 18 Aug 2023 14:19:39 -0700 (PDT)
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37IKw4N2010368;
-        Fri, 18 Aug 2023 21:19:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=a6rKvlfuBT5cWWbXTDuJZRXqZ2uXq/SqXooJNvei7E4=;
- b=NTa2YO7dUj4QhMrNPrvkZQ85MA+uM4JCFcoDOB780fy7bJ/O0Pjijkb/a0fH8EuP5T/e
- yXQ6TvdrT/3UWQHTyet+BaD7RGnURFnGQLZm9efO6ph7gEPrbvet3yagiL/d6XtCSeCL
- TePaxBMoamaBtnMpyYk8xSv9XRQoC03IElfb2p3gN1hhMd34BMH/zpnBPFpSh/VZreKU
- QM1o+jHm1wDC3pZCdmuI/Cx0MoXlQDpHdFVVJzf67ckQafXfXpIcs6xtbbAmU2ABFhUv
- LPliPe0qk2qP+WOLk3iYH2bg8KkM9DosnvbJavOf+4WIpOCsdinRQw0EJOtRTVy+SLaN xw== 
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sj6321a70-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Aug 2023 21:19:27 +0000
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-        by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37ILJQS2032248
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Aug 2023 21:19:26 GMT
-Received: from [192.168.143.77] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Fri, 18 Aug
- 2023 14:19:25 -0700
-Message-ID: <571a6b8c-b0bb-6c0e-7cda-b5c59f8fa0da@quicinc.com>
-Date:   Fri, 18 Aug 2023 14:19:24 -0700
+        Fri, 18 Aug 2023 17:39:26 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D773C0F
+        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 14:39:24 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-156-hPJ_18syOlyCB1PGiL-aSA-1; Fri, 18 Aug 2023 22:39:21 +0100
+X-MC-Unique: hPJ_18syOlyCB1PGiL-aSA-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 18 Aug
+ 2023 22:39:20 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 18 Aug 2023 22:39:20 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Howells' <dhowells@redhat.com>
+CC:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@list.de>,
+        Christian Brauner <christian@brauner.io>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Topic: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Index: AQHZ0DpP/l59sWTPXU+UuQ9VGbJikq/s16Kg///6foCAACRpIIAA7PpbgABGFYCAAgTAc4AAASpwgAAG9ACAAFxrAA==
+Date:   Fri, 18 Aug 2023 21:39:20 +0000
+Message-ID: <04ee44bc6c2d4c5bb1c143bcb6803b7b@AcuMS.aculab.com>
+References: <d8fce3c159b04fdca65cc4d5c307854d@AcuMS.aculab.com>
+ <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
+ <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com>
+ <20230816120741.534415-1-dhowells@redhat.com>
+ <20230816120741.534415-3-dhowells@redhat.com>
+ <608853.1692190847@warthog.procyon.org.uk>
+ <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
+ <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
+ <665724.1692218114@warthog.procyon.org.uk>
+ <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com>
+ <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
+ <2058762.1692371971@warthog.procyon.org.uk>
+ <2093413.1692377320@warthog.procyon.org.uk>
+In-Reply-To: <2093413.1692377320@warthog.procyon.org.uk>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v10 18/18] scsi: ufs: Inform the block layer about write
- ordering
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Can Guo" <quic_cang@quicinc.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        "Bean Huo" <beanhuo@micron.com>,
-        Asutosh Das <quic_asutoshd@quicinc.com>,
-        "Arthur Simchaev" <Arthur.Simchaev@wdc.com>
-References: <20230818193546.2014874-1-bvanassche@acm.org>
- <20230818193546.2014874-19-bvanassche@acm.org>
-From:   "Bao D. Nguyen" <quic_nguyenb@quicinc.com>
-In-Reply-To: <20230818193546.2014874-19-bvanassche@acm.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: W3PdJ69feuc3B1Kn9GvthAKDusVHVWHc
-X-Proofpoint-ORIG-GUID: W3PdJ69feuc3B1Kn9GvthAKDusVHVWHc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-18_26,2023-08-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 adultscore=0 spamscore=0 impostorscore=0 suspectscore=0
- bulkscore=0 malwarescore=0 clxscore=1015 mlxscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308180195
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/18/2023 12:34 PM, Bart Van Assche wrote:
->  From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
-> "The host controller always process transfer requests in-order according
-> to the order submitted to the list. In case of multiple commands with
-> single doorbell register ringing (batch mode), The dispatch order for
-> these transfer requests by host controller will base on their index in
-> the List. A transfer request with lower index value will be executed
-> before a transfer request with higher index value."
+From: David Howells
+> Sent: Friday, August 18, 2023 5:49 PM
 > 
->  From the UFSHCI 4.0 specification, about the MCQ mode:
-> "Command Submission
-> 1. Host SW writes an Entry to SQ
-> 2. Host SW updates SQ doorbell tail pointer
+> David Laight <David.Laight@ACULAB.COM> wrote:
 > 
-> Command Processing
-> 3. After fetching the Entry, Host Controller updates SQ doorbell head
->     pointer
-> 4. Host controller sends COMMAND UPIU to UFS device"
+> > > iov_iter_init                            inc 0x27 -> 0x31 +0xa
+> >
+> > Are you hitting the gcc bug that loads the constant from memory?
 > 
-> In other words, for both legacy and MCQ mode, UFS controllers are
-> required to forward commands to the UFS device in the order these
-> commands have been received from the host.
+> I'm not sure what that looks like.  For your perusal, here's a disassembly of
+> the use-switch-on-enum variant:
 > 
-> Notes:
-> - For legacy mode this is only correct if the host submits one
->    command at a time. The UFS driver does this.
-> - Also in legacy mode, the command order is not preserved if
->    auto-hibernation is enabled in the UFS controller. Hence, enable
->    zone write locking if auto-hibernation is enabled.
+>    0xffffffff8177726c <+0>:     cmp    $0x1,%esi
+>    0xffffffff8177726f <+3>:     jbe    0xffffffff81777273 <iov_iter_init+7>
+>    0xffffffff81777271 <+5>:     ud2
+>    0xffffffff81777273 <+7>:     test   %esi,%esi
+>    0xffffffff81777275 <+9>:     movw   $0x1,(%rdi)
+>    0xffffffff8177727a <+14>:    setne  0x3(%rdi)
+>    0xffffffff8177727e <+18>:    xor    %eax,%eax
+>    0xffffffff81777280 <+20>:    movb   $0x0,0x2(%rdi)
+>    0xffffffff81777284 <+24>:    movb   $0x1,0x4(%rdi)
+>    0xffffffff81777288 <+28>:    mov    %rax,0x8(%rdi)
+>    0xffffffff8177728c <+32>:    mov    %rdx,0x10(%rdi)
+>    0xffffffff81777290 <+36>:    mov    %r8,0x18(%rdi)
+>    0xffffffff81777294 <+40>:    mov    %rcx,0x20(%rdi)
+>    0xffffffff81777298 <+44>:    jmp    0xffffffff81d728a0 <__x86_return_thunk>
 > 
-> This patch improves performance as follows on my test setup:
-> - With the mq-deadline scheduler: 2.5x more IOPS for small writes.
-> - When not using an I/O scheduler compared to using mq-deadline with
->    zone locking: 4x more IOPS for small writes.
+> versus the use-bitmap variant:
 > 
+>    0xffffffff81777311 <+0>:     cmp    $0x1,%esi
+>    0xffffffff81777314 <+3>:     jbe    0xffffffff81777318 <iov_iter_init+7>
+>    0xffffffff81777316 <+5>:     ud2
+>    0xffffffff81777318 <+7>:     test   %esi,%esi
+>    0xffffffff8177731a <+9>:     movb   $0x2,(%rdi)
+>    0xffffffff8177731d <+12>:    setne  0x1(%rdi)
+>    0xffffffff81777321 <+16>:    xor    %eax,%eax
+>    0xffffffff81777323 <+18>:    mov    %rdx,0x10(%rdi)
+>    0xffffffff81777327 <+22>:    mov    %rax,0x8(%rdi)
+>    0xffffffff8177732b <+26>:    mov    %r8,0x18(%rdi)
+>    0xffffffff8177732f <+30>:    mov    %rcx,0x20(%rdi)
+>    0xffffffff81777333 <+34>:    jmp    0xffffffff81d72960 <__x86_return_thunk>
+> 
+> It seems to be that the former is loading byte constants individually, whereas
+> Linus combined all those fields into a single byte and eliminated one of them.
 
-Hi Bart,
-Thank you for double checking and the detailed explanation.
+I think you need to re-order the structure.
+The top set writes to bytes 0..4 with:
+>    0xffffffff81777275 <+9>:     movw   $0x1,(%rdi)
+>    0xffffffff8177727a <+14>:    setne  0x3(%rdi)
+>    0xffffffff81777280 <+20>:    movb   $0x0,0x2(%rdi)
+>    0xffffffff81777284 <+24>:    movb   $0x1,0x4(%rdi)
+Note that the 'setne' writes into the middle of the constants.
 
-Reviewed-by: Bao D. Nguyen <quic_nguyenb@quicinc.com>
+The lower writes bytes 0..1 with:
+>    0xffffffff8177731a <+9>:     movb   $0x2,(%rdi)
+>    0xffffffff8177731d <+12>:    setne  0x1(%rdi)
+
+I think that if you move the 'conditional' value to offset 4
+you'll get fewer writes.
+Probably a 32bit load into %eax and then a write.
+
+I don't think gcc likes generating 16bit immediates.
+In some tests I did it loaded a 32bit value into %eax
+and then wrote the low bits.
+So the code is much the same (on x86) for 2 or 4 bytes
+of constants.
+I'm sure you can use the 'data-16' prefix with an immediate.
+
+I'm not sure why you have two non-zero values when Linus
+only had one though.
+
+OTOH you don't want to be writing 3 bytes of constants.
+Also gcc won't generate:
+	movl $0xaabbccdd,%eax
+	setne %al   // overwriting the dd
+	movl %eax,(%rdi)
+and I suspect the partial write (to %al) will be a stall.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
