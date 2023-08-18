@@ -2,146 +2,173 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CCEC71155
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 14:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44807C71150
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 14:16:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350477AbjHROEI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 10:04:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36660 "EHLO
+        id S241268AbjHROQR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 10:16:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377683AbjHRODX (ORCPT
+        with ESMTP id S1352770AbjHROPq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 10:03:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6AD4689
-        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 07:01:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692367313;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Km5bEjvHFKHGKfuEsrUW3JzJAnKEezHhvxomlDHV3DU=;
-        b=DaGWHBdJ4VVqt9ItcMWEf8ytt5MN/YmOJq18D4RLGG6294p0SQx6G0RsWUHaREUqT1wQrp
-        mo/b5UxP1L0u4m7tqwL3VyUKCVc0CqDNIi5yaaLKXWbTciAJvMC6UJTagvJ4m+Ncvo7xpG
-        ztZwKrn4ppe1K6EixRIUAdvBcMRtSxI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-610-gY35I9gfO6u6S84jANp4JA-1; Fri, 18 Aug 2023 10:01:51 -0400
-X-MC-Unique: gY35I9gfO6u6S84jANp4JA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 18 Aug 2023 10:15:46 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7333E2D79;
+        Fri, 18 Aug 2023 07:15:45 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0621A85CBE2;
-        Fri, 18 Aug 2023 14:01:51 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C787E140E96E;
-        Fri, 18 Aug 2023 14:01:49 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Guangwu Zhang <guazhang@redhat.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH V3] lib/group_cpus.c: avoid to acquire cpu hotplug lock in group_cpus_evenly
-Date:   Fri, 18 Aug 2023 22:01:45 +0800
-Message-Id: <20230818140145.1229805-1-ming.lei@redhat.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 31C452188E;
+        Fri, 18 Aug 2023 14:15:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692368144; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=d/7zqkRLWIWxWvda4BWwDf8i+W56yQsa+BJdqTLnd8E=;
+        b=do5QGAvAdPsbSHggbhL0312MUN/DIt7IlQ6WomwCO9yk/n9jeJItQfkjobeAxuPFZlonfT
+        HDrova9KA68dB4o+xwgAxYGohfZFDwhzq2p//+5c43IerJggsuWoGhdmDqxBWaq63nOVum
+        egoFvcGeH6yGiQbRZQYuvmf+vNMkWtU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692368144;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=d/7zqkRLWIWxWvda4BWwDf8i+W56yQsa+BJdqTLnd8E=;
+        b=RDwzUzcOKBuzzpG96ATXIu+uSlJfbBDFYr5vJacXJXMGayHLQjF6U1zZYH5tdvccqVYjIf
+        52ase1XHVpvOjuCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 228F413441;
+        Fri, 18 Aug 2023 14:15:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id zehmCBB932SXOwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 18 Aug 2023 14:15:44 +0000
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v2 0/1] Introduce nvmet target setup/cleanup helpers
+Date:   Fri, 18 Aug 2023 16:15:34 +0200
+Message-ID: <20230818141537.22332-1-dwagner@suse.de>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-group_cpus_evenly() could be part of storage driver's error handler,
-such as nvme driver, when may happen during CPU hotplug, in which
-storage queue has to drain its pending IOs because all CPUs associated
-with the queue are offline and the queue is becoming inactive. And
-handling IO needs error handler to provide forward progress.
+I've decided to at two cleanup patches for the passthru tests. Initially I tried
+to get rid of the arguments when calling the helpers.
 
-Then dead lock is caused:
+Instead
 
-1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
-handler is waiting for inflight IO
+   _nvmet_passthru_target_setup "${def_subsysnqn}"
 
-2) error handler is waiting for CPU hotplug lock
+just
 
-3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
-error handling can't provide forward progress.
+   _nvmet_passthru_target_setup
 
-Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
-in which two stage spreads are taken: 1) the 1st stage is over all present
-CPUs; 2) the end stage is over all other CPUs.
+but I run into the problem that ShellCheck seems to have a bug when default
+arguments are used in the function:
 
-Turns out the two stage spread just needs consistent 'cpu_present_mask', and
-remove the CPU hotplug lock by storing it into one local cache. This way
-doesn't change correctness, because all CPUs are still covered.
+fn() {
+        local -i a=${1:-42}
+        printf '%d\n' "$a"
+}
+fn
 
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: linux-nvme@lists.infradead.org
-Cc: linux-block@vger.kernel.org
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Tested-by: Guangwu Zhang <guazhang@redhat.com>
-Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V3:
-	- reuse `npresmsk`, and avoid to allocate new variable, suggested by
-	Chengming Zhou
+will trigger SC2119 and SC2120. This has been reported but not fixed yet:
 
-V2:
-	- fix "Cc: block list"
-	- add tested-by tag
+  https://github.com/koalaman/shellcheck/issues/2511
 
- lib/group_cpus.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+Thus I decided to leave it as it is, unless someone has a clever idea
+how to get this working.
 
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index aa3f6815bb12..fffe8a893597 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -366,13 +366,18 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 	if (!masks)
- 		goto fail_node_to_cpumask;
- 
--	/* Stabilize the cpumasks */
--	cpus_read_lock();
- 	build_node_to_cpumask(node_to_cpumask);
- 
-+	/*
-+	 * Make a local cache of 'cpu_present_mask', so the two stages
-+	 * spread can observe consistent 'cpu_present_mask' without holding
-+	 * cpu hotplug lock.
-+	 */
-+	cpumask_copy(npresmsk, cpu_present_mask);
-+
- 	/* grouping present CPUs first */
- 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
--				  cpu_present_mask, nmsk, masks);
-+				  npresmsk, nmsk, masks);
- 	if (ret < 0)
- 		goto fail_build_affinity;
- 	nr_present = ret;
-@@ -387,15 +392,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 		curgrp = 0;
- 	else
- 		curgrp = nr_present;
--	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
-+	cpumask_andnot(npresmsk, cpu_possible_mask, npresmsk);
- 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
- 				  npresmsk, nmsk, masks);
- 	if (ret >= 0)
- 		nr_others = ret;
- 
-  fail_build_affinity:
--	cpus_read_unlock();
--
- 	if (ret >= 0)
- 		WARN_ON(nr_present + nr_others < numgrps);
- 
+
+
+original cover letter:
+
+Introduce helpers to setup nvmet targets. This is spin off from the refactoring
+patches and the allowed_host patches [1].
+
+Sagi suggested to record all resources allocated by nvmet_target_setup and then
+later clean them up in nvmet_target_cleanup. I opted to figure out in
+nvmet_target_cleanup what was allocated via the newly introdcuded _get_nvmet_ports
+helper. The reason being, Hannes told me offline that he would like to add ANA
+tests which will add some more ports to the subsystem. I hope with this
+the code is more future proof.
+
+BTW, while looking at this I saw that the passthru code is using the awkward
+return value port when calling nvmet_passthru_target_setup. It seems some
+more refactoring is in order...
+
+[1] https://lore.kernel.org/linux-nvme/5h333eqhtw252sjw6axjewlb5bbb5ze7awekczxe3kie2lnhw6@manyer42khct/
+
+
+changes
+
+v2:
+ - drop local subsys variable in passthru tests
+ - do not use port as handle in passthru tests
+ - free port after unregistering from subsys
+
+v1:
+ - https://lore.kernel.org/linux-nvme/20230818095744.24619-1-dwagner@suse.de/
+
+
+Daniel Wagner (3):
+  nvme/{033,034,035,036}: use default subsysnqn variable directly
+  nvme/{033,034,035,036,37}: drop port handle between passthru target
+    setup and cleanup
+  nvme: introduce nvmet_target_{setup/cleanup} common code
+
+ tests/nvme/003 | 14 ++-----
+ tests/nvme/004 | 21 ++---------
+ tests/nvme/005 | 20 +---------
+ tests/nvme/006 | 19 +---------
+ tests/nvme/007 | 14 +------
+ tests/nvme/008 | 21 +----------
+ tests/nvme/009 | 16 +-------
+ tests/nvme/010 | 21 +----------
+ tests/nvme/011 | 16 +-------
+ tests/nvme/012 | 21 +----------
+ tests/nvme/013 | 16 +-------
+ tests/nvme/014 | 21 +----------
+ tests/nvme/015 | 16 +-------
+ tests/nvme/018 | 16 +-------
+ tests/nvme/019 | 21 +----------
+ tests/nvme/020 | 16 +-------
+ tests/nvme/021 | 16 +-------
+ tests/nvme/022 | 16 +-------
+ tests/nvme/023 | 21 +----------
+ tests/nvme/024 | 16 +-------
+ tests/nvme/025 | 16 +-------
+ tests/nvme/026 | 16 +-------
+ tests/nvme/027 | 17 ++-------
+ tests/nvme/028 | 17 ++-------
+ tests/nvme/029 | 21 +----------
+ tests/nvme/033 | 10 ++---
+ tests/nvme/034 | 10 ++---
+ tests/nvme/035 | 10 ++---
+ tests/nvme/036 | 12 +++---
+ tests/nvme/037 |  5 +--
+ tests/nvme/040 | 19 +---------
+ tests/nvme/041 | 18 +--------
+ tests/nvme/042 | 17 +--------
+ tests/nvme/043 | 17 +--------
+ tests/nvme/044 | 19 ++--------
+ tests/nvme/045 | 18 ++-------
+ tests/nvme/047 | 21 +----------
+ tests/nvme/048 | 17 +--------
+ tests/nvme/rc  | 99 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 39 files changed, 184 insertions(+), 553 deletions(-)
+
 -- 
-2.40.1
+2.41.0
 
