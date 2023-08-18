@@ -2,177 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 458FBC7112F
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 07:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6CFC678DC
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 08:54:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352353AbjHRG7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 02:59:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42546 "EHLO
+        id S1351547AbjHRIxr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 04:53:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349847AbjHRG7Y (ORCPT
+        with ESMTP id S1358781AbjHRIxV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 02:59:24 -0400
-Received: from out-24.mta0.migadu.com (out-24.mta0.migadu.com [IPv6:2001:41d0:1004:224b::18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27B12D73
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 23:59:21 -0700 (PDT)
-Message-ID: <a60de9ff-6dad-f243-6bd0-56810ef57c85@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692341959;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Fri, 18 Aug 2023 04:53:21 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAA1C30E6
+        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 01:53:14 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 6F2AA21875;
+        Fri, 18 Aug 2023 08:53:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692348793; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=CmMGnP7L7bn/5ssBCNCkB8ryZejZU4L6IU8tNWtA8SU=;
-        b=qk7w6tviAs5Oa5HG9F4Y1FXDH7P1BeQVk9ddJEzlTyeN+JDa1EwWL6exFVAaxqWOeEyiL3
-        GJ+u9sm8V8Dpgi/mdD8dxbYG7FJgVJ/zF4fKPIUM6n3WcMmO5IRODTQA5Djyp4EDiw4VCq
-        V+e5XLxhAaI+92zrhup++X+05QLElEM=
-Date:   Fri, 18 Aug 2023 14:59:13 +0800
-MIME-Version: 1.0
-Subject: Re: [PATCH V2] lib/group_cpus.c: avoid to acquire cpu hotplug lock in
- group_cpus_evenly
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        bh=KzcdXcvVdIdhkTV0Shlwle4xaHsekb83/IOSjUzWN0s=;
+        b=rSVQKs89JKN2+4Aqlr300idCqAjq8f0LRUAIkPIlQX26kh6SAPualI2223kORO34xnJXga
+        /qC2Zh0uxAZOmNB3Hs26Inal2KrhT5ea1OYCSYi5reGUfaXp0wMj5XCO81RWTRBAMlp04w
+        mmjwc7rRHKgSiVZXcQuGEYYAE3nyXyA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692348793;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KzcdXcvVdIdhkTV0Shlwle4xaHsekb83/IOSjUzWN0s=;
+        b=YUr04K2o+UhlLhDTs+iSZ6r3N/wxfaqTtBnJ2tyaSf9iR2p88PXmb5IZwWieiz4k3j43N5
+        c2GvAgq6AQJZetCw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5626813441;
+        Fri, 18 Aug 2023 08:53:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id /sj+FHkx32StFgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 18 Aug 2023 08:53:13 +0000
+Date:   Fri, 18 Aug 2023 10:53:24 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Yi Zhang <yi.zhang@redhat.com>,
-        Guangwu Zhang <guazhang@redhat.com>
-References: <20230818015244.1176929-1-ming.lei@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <20230818015244.1176929-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH blktests v3 1/2] nvme/rc: fix nvme device readiness check
+ after _nvme_connect_subsys
+Message-ID: <mgfm3zji6qpuohc2hxfhttu3dmrj74ytmx5wfkloj23le6zcg7@gorhk6oekqln>
+References: <20230818044057.3794564-1-shinichiro.kawasaki@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230818044057.3794564-1-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Fri, Aug 18, 2023 at 01:40:56PM +0900, Shin'ichiro Kawasaki wrote:
+> The helper function _nvme_connect_subsys() creates a nvme device. It may
+> take some time after the function call until the device gets ready for
+> I/O. So it is expected that the test cases call _find_nvme_dev() after
+> _nvme_connect_subsys() before I/O. _find_nvme_dev() returns the path of
+> the created device, and it also waits for uuid and wwid sysfs attributes
+> of the created device get ready. This wait works as the wait for the
+> device I/O readiness.
+> 
+> However, this wait by _find_nvme_dev() has two problems. The first
+> problem is missing call of _find_nvme_dev(). The test case nvme/047
+> calls _nvme_connect_subsys() twice, but _find_nvme_dev() is called only
+> for the first _nvme_connect_subsys() call. This causes too early I/O to
+> the device with tcp transport [1]. Fix this by moving the wait for the
+> device readiness from _find_nvme_dev() to _nvme_connect_subsys(). Also
+> add --no-wait option to _nvme_connect_subsys(). It allows to skip the
+> wait in _nvmet_passthru_target_connect() which has its own wait for
+> device readiness.
+> 
+> The second problem is wrong paths for the sysfs attributes. The paths
+> do not include namespace index, so the check for the attributes always
+> fail. Still _find_nvme_dev() does 1 second wait and allows the device
+> get ready for I/O in most cases, but this is not intended behavior.
+> Fix this by checking sysfs paths with the namespace index. Get list of
+> namespace indices for the sub-system and do the check for all indices.
+> 
+> On top of the checks for sysfs attributes, add 'udevadm settle' and a
+> check for the created device file. These ensures that the create device
+> is ready for I/O.
+> 
+> [1] https://lore.kernel.org/linux-block/CAHj4cs9GNohGUjohNw93jrr8JGNcRYC-ienAZz+sa7az1RK77w@mail.gmail.com/
+> 
+> Fixes: c766fccf3aff ("Make the NVMe tests more reliable")
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-On 2023/8/18 09:52, Ming Lei wrote:
-> group_cpus_evenly() could be part of storage driver's error handler,
-> such as nvme driver, when may happen during CPU hotplug, in which
-> storage queue has to drain its pending IOs because all CPUs associated
-> with the queue are offline and the queue is becoming inactive. And
-> handling IO needs error handler to provide forward progress.
-> 
-> Then dead lock is caused:
-> 
-> 1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
-> handler is waiting for inflight IO
-> 
-> 2) error handler is waiting for CPU hotplug lock
-> 
-> 3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
-> error handling can't provide forward progress.
-> 
-> Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
-> in which two stage spreads are taken: 1) the 1st stage is over all present
-> CPUs; 2) the end stage is over all other CPUs.
-> 
-> Turns out the two stage spread just needs consistent 'cpu_present_mask', and
-> remove the CPU hotplug lock by storing it into one local cache. This way
-> doesn't change correctness, because all CPUs are still covered.
-> 
-> Cc: Keith Busch <kbusch@kernel.org>
-> Cc: linux-nvme@lists.infradead.org
-> Cc: linux-block@vger.kernel.org
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Reported-by: Guangwu Zhang <guazhang@redhat.com>
-> Tested-by: Guangwu Zhang <guazhang@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
-> 	- fix "Cc: block list"
-> 	- add tested-by tag
-> 
->  lib/group_cpus.c | 22 ++++++++++++++++------
->  1 file changed, 16 insertions(+), 6 deletions(-)
-> 
-> diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-> index aa3f6815bb12..15006e79196f 100644
-> --- a/lib/group_cpus.c
-> +++ b/lib/group_cpus.c
-> @@ -348,6 +348,7 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
->  {
->  	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
->  	cpumask_var_t *node_to_cpumask;
-> +	cpumask_var_t local_cpu_present_mask;
->  	cpumask_var_t nmsk, npresmsk;
->  	int ret = -ENOMEM;
->  	struct cpumask *masks = NULL;
-> @@ -355,6 +356,16 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
->  	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
->  		return NULL;
+just a minor nitpick but feel free to add:
+
+Reviewed-by: Daniel Wagner <dwagner@suse.de>
+
+> diff --git a/tests/nvme/rc b/tests/nvme/rc
+> index 0b964e9..92eac06 100644
+> --- a/tests/nvme/rc
+> +++ b/tests/nvme/rc
+> @@ -428,6 +428,8 @@ _nvme_connect_subsys() {
+>  	local keep_alive_tmo=""
+>  	local reconnect_delay=""
+>  	local ctrl_loss_tmo=""
+> +	local no_wait=""
+
+I suggest to use the default 'no_wait=false' here
+
+> +	local i
 >  
-> +	if (!zalloc_cpumask_var(&local_cpu_present_mask, GFP_KERNEL))
-> +		goto fail_local_pres_mask;
+>  	while [[ $# -gt 0 ]]; do
+>  		case $1 in
+> @@ -483,6 +485,10 @@ _nvme_connect_subsys() {
+>  				ctrl_loss_tmo="$2"
+>  				shift 2
+>  				;;
+> +			--no-wait)
+> +				no_wait=true
+> +				shift 1
+> +				;;
+>  			*)
+>  				positional_args+=("$1")
+>  				shift
+> @@ -532,6 +538,33 @@ _nvme_connect_subsys() {
+>  	fi
+>  
+>  	nvme connect "${ARGS[@]}" 2> /dev/null
 > +
-> +	/*
-> +	 * Make a local cache of 'cpu_present_mask', so the two stages
-> +	 * spread can observe consistent 'cpu_present_mask' without holding
-> +	 * cpu hotplug lock.
-> +	 */
-> +	cpumask_copy(local_cpu_present_mask, cpu_present_mask);
-> +
+> +	# Wait until device file and uuid/wwid sysfs attributes get ready for
+> +	# all namespaces.
+> +	if [[ -z ${no_wait} ]]; then
 
-Maybe we can reuse npresmsk instead of allocating another cpumask?
-In the first stage: npresmsk = cpu_present_mask
-In the second stage: npresmsk = cpu_possible_mask & ~npresmsk
+and do a
 
->  	if (!zalloc_cpumask_var(&npresmsk, GFP_KERNEL))
->  		goto fail_nmsk;
->  
-> @@ -366,13 +377,11 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
->  	if (!masks)
->  		goto fail_node_to_cpumask;
->  
-> -	/* Stabilize the cpumasks */
-> -	cpus_read_lock();
->  	build_node_to_cpumask(node_to_cpumask);
->  
->  	/* grouping present CPUs first */
->  	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
-> -				  cpu_present_mask, nmsk, masks);
-> +				  local_cpu_present_mask, nmsk, masks);
->  	if (ret < 0)
->  		goto fail_build_affinity;
->  	nr_present = ret;
-> @@ -387,15 +396,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
->  		curgrp = 0;
->  	else
->  		curgrp = nr_present;
-> -	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
-> +	cpumask_andnot(npresmsk, cpu_possible_mask, local_cpu_present_mask);
->  	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
->  				  npresmsk, nmsk, masks);
->  	if (ret >= 0)
->  		nr_others = ret;
->  
->   fail_build_affinity:
-> -	cpus_read_unlock();
-> -
->  	if (ret >= 0)
->  		WARN_ON(nr_present + nr_others < numgrps);
+	if [[ "${no_wait}" = true ]] ; then
 
-This fail_build_affinity tag seems unneeded anymore.
-
-The patch looks good to me:
-
-Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
-
-Thanks.
-
->  
-> @@ -406,6 +413,9 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
->  	free_cpumask_var(npresmsk);
->  
->   fail_nmsk:
-> +	free_cpumask_var(local_cpu_present_mask);
-> +
-> + fail_local_pres_mask:
->  	free_cpumask_var(nmsk);
->  	if (ret < 0) {
->  		kfree(masks);
-
+instead using a testing for an empty string.
