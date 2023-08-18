@@ -2,168 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB86C71132
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 01:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF83C3DA66
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 02:39:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352977AbjHRBxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 21:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58984 "EHLO
+        id S1352529AbjHRCip (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 22:38:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357119AbjHRBxq (ORCPT
+        with ESMTP id S1357332AbjHRCij (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 21:53:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2782D58
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:53:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692323579;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=f42bCxvlAvmcujooXy3bffnAnWJZzzFDZ6+tYkOrJJ0=;
-        b=hxe3CMRKhKSAwibn+X0VBecPxKZYL98rxNVp98OV8wxCT6tY9Ymf71BLlBuOxh5AlFDOKk
-        RmNiNBU/A3/LKlKUYMeEKQapTNRyEyPu/dKLhmYVHChS1mf2XWcxPcSKQ6TjUMrwk+sm48
-        zlGaeN7aNMnXI3E0Cu0U6f21p3U5VcU=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-681-tyZm7me1N8SlX0ks18qw8Q-1; Thu, 17 Aug 2023 21:52:54 -0400
-X-MC-Unique: tyZm7me1N8SlX0ks18qw8Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 17 Aug 2023 22:38:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B128D3A99;
+        Thu, 17 Aug 2023 19:38:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1CD8E3C01C1B;
-        Fri, 18 Aug 2023 01:52:54 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 33F84C15BAD;
-        Fri, 18 Aug 2023 01:52:52 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Guangwu Zhang <guazhang@redhat.com>
-Subject: [PATCH V2] lib/group_cpus.c: avoid to acquire cpu hotplug lock in group_cpus_evenly
-Date:   Fri, 18 Aug 2023 09:52:44 +0800
-Message-Id: <20230818015244.1176929-1-ming.lei@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 475B7631F3;
+        Fri, 18 Aug 2023 02:38:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E63C433C8;
+        Fri, 18 Aug 2023 02:38:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692326310;
+        bh=KCuT3kze6nhX34nu2DFz2uiX0/3DY6wurYuLDxoFexc=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=p5/DTVkgFYAdybu+HwDy4kXXvnEG6gxGINlGYDipIqZrMJQVTauQr2w43sqLN432a
+         W3C3LCnT1/PzG2POWT23hUe80+5CMmMU5ereIhOf0RBNkoDj3M9zjln8Nz9i3EHlhb
+         yIXPV6O5sJmkYq0CrX8AIp0YPkXrpVVxLRz3Pn49nhlMNbml1p2T0OU4tcRLkyNXcs
+         AgypH1VkbaG5FJY7y4mS/5pm9KCMhs3/BxkSA9NyQw/Gc354pLfWK5SUqlb6QE23vF
+         4MBMXULEl8WnX3dH0yuESE5BZkU6iAS+Gi4QObj9xzjfQNYRYV6Ur98ivVgkrowZg4
+         Uliw29brzeW5g==
+Message-ID: <033a9b3f-c1d8-46b5-e4e4-350308648679@kernel.org>
+Date:   Fri, 18 Aug 2023 11:38:27 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH v9 04/17] scsi: core: Call .eh_prepare_resubmit() before
+ resubmitting
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230816195447.3703954-1-bvanassche@acm.org>
+ <20230816195447.3703954-5-bvanassche@acm.org>
+ <201ae2be-3829-97ad-caa5-6f6f3a41e6db@kernel.org>
+ <49bdae64-6162-5802-2dfb-c433ab48b5f9@acm.org>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <49bdae64-6162-5802-2dfb-c433ab48b5f9@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-group_cpus_evenly() could be part of storage driver's error handler,
-such as nvme driver, when may happen during CPU hotplug, in which
-storage queue has to drain its pending IOs because all CPUs associated
-with the queue are offline and the queue is becoming inactive. And
-handling IO needs error handler to provide forward progress.
+On 2023/08/17 23:26, Bart Van Assche wrote:
+> On 8/17/23 04:10, Damien Le Moal wrote:
+>> On 8/17/23 04:53, Bart Van Assche wrote:
+>>> +/*
+>>> + * Returns true if the commands in @done_q should be sorted in LBA order
+>>> + * before being resubmitted.
+>>> + */
+>>> +static bool scsi_needs_sorting(struct list_head *done_q)
+>>> +{
+>>> +	struct scsi_cmnd *scmd;
+>>> +
+>>> +	list_for_each_entry(scmd, done_q, eh_entry) {
+>>> +		struct request *rq = scsi_cmd_to_rq(scmd);
+>>> +
+>>> +		if (!rq->q->limits.use_zone_write_lock &&
+>>> +		    blk_rq_is_seq_zoned_write(rq))
+>>> +			return true;
+>>> +	}
+>>> +
+>>> +	return false;
+>>> +}
+>>> +
+>>> +/*
+>>> + * Comparison function that allows to sort SCSI commands by ULD driver.
+>>> + */
+>>> +static int scsi_cmp_uld(void *priv, const struct list_head *_a,
+>>> +			const struct list_head *_b)
+>>> +{
+>>> +	struct scsi_cmnd *a = list_entry(_a, typeof(*a), eh_entry);
+>>> +	struct scsi_cmnd *b = list_entry(_b, typeof(*b), eh_entry);
+>>> +
+>>> +	/* See also the comment above the list_sort() definition. */
+>>> +	return scsi_cmd_to_driver(a) > scsi_cmd_to_driver(b);
+>>> +}
+>>> +
+>>> +void scsi_call_prepare_resubmit(struct list_head *done_q)
+>>> +{
+>>> +	struct scsi_cmnd *scmd, *next;
+>>> +
+>>> +	if (!scsi_needs_sorting(done_q))
+>>> +		return;
+>>
+>> This is strange. The eh_prepare_resubmit callback is generic and its name does
+>> not indicate anything related to sorting by LBAs. So this check would prevent
+>> other actions not related to sorting by LBA. This should go away.
+>>
+>> In patch 6, based on the device characteristics, the sd driver should decides
+>> if it needs to set .eh_prepare_resubmit or not.
+>>
+>> And ideally, if all ULDs have eh_prepare_resubmit == NULL, this function should
+>> return here before going through the list of commands to resubmit. Given that
+>> this list should generally be small, going through it and doing nothing should
+>> be OK though...
+> 
+> I can add a eh_prepare_resubmit == NULL check early in 
+> scsi_call_prepare_resubmit(). Regarding the code inside 
+> scsi_needs_sorting(), how about moving that code into an additional 
+> callback function, e.g. eh_needs_prepare_resubmit? Setting 
+> .eh_prepare_resubmit depending on the zone model would prevent 
+> constification of struct scsi_driver.
 
-Then dead lock is caused:
+Sounds OK.
 
-1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
-handler is waiting for inflight IO
+> 
+> Thanks,
+> 
+> Bart.
 
-2) error handler is waiting for CPU hotplug lock
-
-3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
-error handling can't provide forward progress.
-
-Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
-in which two stage spreads are taken: 1) the 1st stage is over all present
-CPUs; 2) the end stage is over all other CPUs.
-
-Turns out the two stage spread just needs consistent 'cpu_present_mask', and
-remove the CPU hotplug lock by storing it into one local cache. This way
-doesn't change correctness, because all CPUs are still covered.
-
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: linux-nvme@lists.infradead.org
-Cc: linux-block@vger.kernel.org
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Tested-by: Guangwu Zhang <guazhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- fix "Cc: block list"
-	- add tested-by tag
-
- lib/group_cpus.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
-
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index aa3f6815bb12..15006e79196f 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -348,6 +348,7 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- {
- 	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
- 	cpumask_var_t *node_to_cpumask;
-+	cpumask_var_t local_cpu_present_mask;
- 	cpumask_var_t nmsk, npresmsk;
- 	int ret = -ENOMEM;
- 	struct cpumask *masks = NULL;
-@@ -355,6 +356,16 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
- 		return NULL;
- 
-+	if (!zalloc_cpumask_var(&local_cpu_present_mask, GFP_KERNEL))
-+		goto fail_local_pres_mask;
-+
-+	/*
-+	 * Make a local cache of 'cpu_present_mask', so the two stages
-+	 * spread can observe consistent 'cpu_present_mask' without holding
-+	 * cpu hotplug lock.
-+	 */
-+	cpumask_copy(local_cpu_present_mask, cpu_present_mask);
-+
- 	if (!zalloc_cpumask_var(&npresmsk, GFP_KERNEL))
- 		goto fail_nmsk;
- 
-@@ -366,13 +377,11 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 	if (!masks)
- 		goto fail_node_to_cpumask;
- 
--	/* Stabilize the cpumasks */
--	cpus_read_lock();
- 	build_node_to_cpumask(node_to_cpumask);
- 
- 	/* grouping present CPUs first */
- 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
--				  cpu_present_mask, nmsk, masks);
-+				  local_cpu_present_mask, nmsk, masks);
- 	if (ret < 0)
- 		goto fail_build_affinity;
- 	nr_present = ret;
-@@ -387,15 +396,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 		curgrp = 0;
- 	else
- 		curgrp = nr_present;
--	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
-+	cpumask_andnot(npresmsk, cpu_possible_mask, local_cpu_present_mask);
- 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
- 				  npresmsk, nmsk, masks);
- 	if (ret >= 0)
- 		nr_others = ret;
- 
-  fail_build_affinity:
--	cpus_read_unlock();
--
- 	if (ret >= 0)
- 		WARN_ON(nr_present + nr_others < numgrps);
- 
-@@ -406,6 +413,9 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 	free_cpumask_var(npresmsk);
- 
-  fail_nmsk:
-+	free_cpumask_var(local_cpu_present_mask);
-+
-+ fail_local_pres_mask:
- 	free_cpumask_var(nmsk);
- 	if (ret < 0) {
- 		kfree(masks);
 -- 
-2.40.1
+Damien Le Moal
+Western Digital Research
 
