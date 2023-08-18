@@ -2,93 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D901C7113D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 12:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC7EDC7113C
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 12:17:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343837AbjHRMKU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 08:10:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46756 "EHLO
+        id S1376813AbjHRMQs convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 08:16:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352896AbjHRMJx (ORCPT
+        with ESMTP id S1376864AbjHRMQf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 08:09:53 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B4C8121;
-        Fri, 18 Aug 2023 05:09:52 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 1D4F21F74B;
-        Fri, 18 Aug 2023 12:09:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1692360591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bZUqLx6aDKEOVtIoUrNHKk3Ucu59bgR9yuEuVpBRaHM=;
-        b=FRQ34vhe/T3rBnmLl5YkJXm5zo1E/juH9fGlDnr+vAMyw3pVkX7jazylobbCzLFWNa4BBD
-        O5b34nS54MkVkEYGhVK3tgM6eusS55Dqffvov4d6F84gyqDYsmr51jcS9S+O5KfmPWBIYd
-        sSsNAgNWnbv2p0pGPBj0zuTKTUAvZAc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1692360591;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bZUqLx6aDKEOVtIoUrNHKk3Ucu59bgR9yuEuVpBRaHM=;
-        b=+90ZxIb/gl/Xzp4wXd+OtPrussY4k1hefjrplLseKn9s/uf1kp6F2hrCnuFba/udCwlgfQ
-        WMFT9q7W1fbdkbBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0F5AF13441;
-        Fri, 18 Aug 2023 12:09:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id dzO1A49f32SbegAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 18 Aug 2023 12:09:51 +0000
-Date:   Fri, 18 Aug 2023 14:10:02 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH blktests v1 1/1] nvme: Introduce
- nvmet_target_{setup/cleanup} common code
-Message-ID: <2jv5fxbuyd6zqwmgkqydrmgpiozxgebsbq3qzd46uf7xtyo3iv@wmp2ejair6l4>
-References: <20230818095744.24619-1-dwagner@suse.de>
- <20230818095744.24619-2-dwagner@suse.de>
+        Fri, 18 Aug 2023 08:16:35 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B79421B
+        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 05:16:30 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-202-98C0T_vJOJK6bOwFbwR9Yw-1; Fri, 18 Aug 2023 13:16:27 +0100
+X-MC-Unique: 98C0T_vJOJK6bOwFbwR9Yw-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 18 Aug
+ 2023 13:16:23 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 18 Aug 2023 13:16:23 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Howells' <dhowells@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+CC:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+        "Christoph Hellwig" <hch@list.de>,
+        Christian Brauner <christian@brauner.io>,
+        "Matthew Wilcox" <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Topic: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Index: AQHZ0DpP/l59sWTPXU+UuQ9VGbJikq/s16Kg///6foCAACRpIIAC+zJggAAE0WA=
+Date:   Fri, 18 Aug 2023 12:16:23 +0000
+Message-ID: <b9c32d9669174dbbbb8e944146814a98@AcuMS.aculab.com>
+References: <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com>
+ <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com>
+ <20230816120741.534415-1-dhowells@redhat.com>
+ <20230816120741.534415-3-dhowells@redhat.com>
+ <608853.1692190847@warthog.procyon.org.uk>
+ <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
+ <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
+ <665724.1692218114@warthog.procyon.org.uk>
+ <1748360.1692358952@warthog.procyon.org.uk>
+In-Reply-To: <1748360.1692358952@warthog.procyon.org.uk>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230818095744.24619-2-dwagner@suse.de>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +_nvmet_target_cleanup() {
-> +	local ports
-> +	local port
-> +	local blkdev
-> +
-> +	_get_nvmet_ports "${def_subsysnqn}" ports
-> +
-> +	for port in "${ports[@]}"; do
-> +		_remove_nvmet_subsystem_from_port "${port}" "${def_subsysnqn}"
-> +	done
-> +	_remove_nvmet_subsystem "${def_subsysnqn}"
-> +	_remove_nvmet_port "${port}"
+From: David Howells
+> Sent: Friday, August 18, 2023 12:43 PM
+> 
+> Linus Torvalds <torvalds@linux-foundation.org> wrote:
+> 
+> > Well, that part is trivially fixable, and we should do that anyway for
+> > other reasons.
+> > ..
+> >  enum iter_type {
+> >  	/* iter types */
+> > -	ITER_IOVEC,
+> > -	ITER_KVEC,
+> > -	ITER_BVEC,
+> > -	ITER_XARRAY,
+> > -	ITER_DISCARD,
+> > -	ITER_UBUF,
+> > +	ITER_IOVEC = 1,
+> > +	ITER_UBUF = 2,
+> > +	ITER_KVEC = 4,
+> > +	ITER_BVEC = 8,
+> > +	ITER_XARRAY = 16,
+> > +	ITER_DISCARD = 32,
 
-_remove_nvmet_port should be also be part of the loop.
+That could be zero - no bits and default.
 
-> +	_remove_nvmet_host "${def_hostnqn}"
-> +
-> +	blkdev="$(losetup -l | awk '$6 == "'"${def_file_path}"'" { print $1 }')"
-> +	if [[ -n "${blkdev}" ]] ; then
-> +		losetup -d "${blkdev}"
-> +	fi
-> +	rm "${def_file_path}"
-> +}
-> +
+> >  };
+> 
+> It used to be this way, but Al switched it:
+> 
+> 	8cd54c1c848031a87820e58d772166ffdf8c08c0
+> 	iov_iter: separate direction from flavour
+
+Except it also had the direction flag inside the enum.
+That caused its own piles of grief.
+
+IIRC Linus had type:6 - that doesn't leave any headroom
+for additional types (even though they shouldn't proliferate).
+It may be best to avoid bits 15+ (in a bitfield) due to
+issues with large constants and sign extension.
+On x86 (I think) 'and immediate' and 'bit test' are the same
+size for bit 0 to 7, BIT wins for higher bits.
+
+gcc generates strange code for some initialisers (see yesterday's
+thread) and you definitely mustn't leave unused bits in a bitfield.
+Might be better is the fields are assigned later!
+
+(I also saw clang carefully preserving %eax on stabck!)
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
