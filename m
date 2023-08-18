@@ -2,54 +2,59 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA785EE499A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9816AEE4997
 	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 19:47:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357534AbjHRTql (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1379821AbjHRTql (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 18 Aug 2023 15:46:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32950 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379851AbjHRTqU (ORCPT
+        with ESMTP id S1379680AbjHRTqV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 15:46:20 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3C7944AF;
+        Fri, 18 Aug 2023 15:46:21 -0400
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2AED44BA;
         Fri, 18 Aug 2023 12:45:55 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bf0b24d925so9813725ad.3;
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-689fa6f94e1so1078081b3a.1;
         Fri, 18 Aug 2023 12:45:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692387803; x=1692992603;
+        d=1e100.net; s=20221208; t=1692387893; x=1692992693;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+kT0lODXnQs5o0Wfuh374uESQu7wFS2RjdWOYRnRcYk=;
-        b=MR8hYS4xc9GrhxL1vH5j1xuejdraHWHfagU9fdzrltw0ZwJQfaeMtfjsFl3VXJ8m0g
-         +JedLgmlpuJBcDkUG3uuKIKHevzsHnTpf9AUnU2k9Kf3H9bwdE9GEeJK1NEdq7C9XPBM
-         xe4bl6o9o1UCwZA9zaVN4bSpr+mzLr3IbxS5wCsXjb7Rqyn/J2gWC7QAOYlH4R3eqzIB
-         ZXQTaQMgTmPA6muzV1fJSWrkD+Ays4t7TN1LsWvxEX3kUwnK/GhYr5bHNuzJmp4Xh21f
-         8w/Y4CgqMz1lfJXJa6MdERAifBNPLfS4odlsqb5KD+m7CGP8d/OaPjCYij7Qs8vwr/ha
-         k5Iw==
-X-Gm-Message-State: AOJu0YwjrDnpDQCBY8F3plTvZ3tIW8eC6tim0YftZPwu9myRTZWQfxkF
-        CaNZk6kcKRVTYrsbmgV20+ihK8Mc4V4=
-X-Google-Smtp-Source: AGHT+IEF3BgAgcEuz3dbs6/Pn7ecjoSU8tP8vQ7YMbvZ8XkC23fbFtOk+cZ6uX/aPEZ02HofKZVZ6Q==
-X-Received: by 2002:a17:902:d2c9:b0:1bc:8748:8bbf with SMTP id n9-20020a170902d2c900b001bc87488bbfmr186330plc.52.1692387802982;
-        Fri, 18 Aug 2023 12:43:22 -0700 (PDT)
+        bh=3nGkbMr8f4Di9fmNTcg0EeI1U2lHMPKKJiTC7Gl/Le4=;
+        b=Y92L83YMw/FmKVh5ovIFjwroTnBJruzPPY3jaGButfzCkPXBRyRjLZOA79MZ/hfckY
+         XKBhjSV5xIGpsfCbNmsR6nkygIMntXDq3x7f6FKYWOcaf+hqlrfn1bNI69rHKcH+WyV3
+         7qyt9f6TysR35asNUj6PNJpxURl3uitpsY2w/2qDlJwiAA+QA4d0KftpJlzwb0nLsLLi
+         hMA/Lw1YjtnP4RjvQ/ypEVsT2dalNv0LbsnB7tZnX73gi0NUehvjjg4klE+LAg//gZaS
+         Eo54mYicPXc1cbH7RDUctxkbejIQYYBEflFgNj6LSZzXj1nWt15r9btw0Av5Nk5nwHp3
+         k+3w==
+X-Gm-Message-State: AOJu0Yx/wdxopz0G87nZsuEgDrUWPtJFwpiBvNkVsbfp63JiGr2RQWi7
+        th9FM3w9za/I1yZDLWF88xw=
+X-Google-Smtp-Source: AGHT+IENyR4lLjxKxnHJugBFI37tqAeFW35iUCCyJM4vlgSxkiPPnM+YQGedDS8bleV9sDwcAKw+oA==
+X-Received: by 2002:a05:6a20:548f:b0:143:b9c4:966 with SMTP id i15-20020a056a20548f00b00143b9c40966mr236838pzk.22.1692387892903;
+        Fri, 18 Aug 2023 12:44:52 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5012:5192:47aa:c304])
-        by smtp.gmail.com with ESMTPSA id u16-20020a170903125000b001bb8be10a84sm2115801plh.304.2023.08.18.12.43.21
+        by smtp.gmail.com with ESMTPSA id u16-20020a170903125000b001bb8be10a84sm2115801plh.304.2023.08.18.12.44.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 12:43:22 -0700 (PDT)
+        Fri, 18 Aug 2023 12:44:52 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: [PATCH v10 06/18] scsi: sd: Sort commands by LBA before resubmitting
-Date:   Fri, 18 Aug 2023 12:34:09 -0700
-Message-ID: <20230818193546.2014874-7-bvanassche@acm.org>
+        Can Guo <quic_cang@quicinc.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        "Bao D . Nguyen" <quic_nguyenb@quicinc.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Bean Huo <beanhuo@micron.com>,
+        Asutosh Das <quic_asutoshd@quicinc.com>,
+        Arthur Simchaev <Arthur.Simchaev@wdc.com>
+Subject: [PATCH v10 17/18] scsi: ufs: Forbid auto-hibernation without I/O scheduler
+Date:   Fri, 18 Aug 2023 12:34:20 -0700
+Message-ID: <20230818193546.2014874-18-bvanassche@acm.org>
 X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
 In-Reply-To: <20230818193546.2014874-1-bvanassche@acm.org>
 References: <20230818193546.2014874-1-bvanassche@acm.org>
@@ -59,93 +64,141 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sort SCSI commands by LBA before the SCSI error handler resubmits
-these commands. This is necessary when resubmitting zoned writes
-(REQ_OP_WRITE) if multiple writes have been queued for a single zone.
+UFSHCI 3.0 controllers do not preserve the write order if auto-hibernation
+is enabled. If the write order is not preserved, an I/O scheduler is
+required to serialize zoned writes. Hence do not allow auto-hibernation
+to be enabled without I/O scheduler if a zoned logical unit is present
+and if the controller is operating in legacy mode. This patch has been
+tested with the following shell script:
+
+    show_ah8() {
+        echo -n "auto_hibern8: "
+        adb shell "cat /sys/devices/platform/13200000.ufs/auto_hibern8"
+    }
+
+    set_ah8() {
+        local rc
+        adb shell "echo $1 > /sys/devices/platform/13200000.ufs/auto_hibern8"
+        rc=$?
+        show_ah8
+        return $rc
+    }
+
+    set_iosched() {
+        adb shell "echo $1 >/sys/class/block/$zoned_bdev/queue/scheduler &&
+    	           echo -n 'I/O scheduler: ' &&
+	           cat /sys/class/block/sde/queue/scheduler"
+    }
+
+    adb root
+    zoned_bdev=$(adb shell grep -lvw 0 /sys/class/block/sd*/queue/chunk_sectors |&
+	         sed 's|/sys/class/block/||g;s|/queue/chunk_sectors||g')
+    [ -n "$zoned_bdev" ]
+    show_ah8
+    set_ah8 0
+    set_iosched none
+    if set_ah8 150000; then
+        echo "Error: enabled AH8 without I/O scheduler"
+    fi
+    set_iosched mq-deadline
+    set_ah8 150000
 
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Can Guo <quic_cang@quicinc.com>
+Cc: Avri Altman <avri.altman@wdc.com>
+Cc: Bao D. Nguyen <quic_nguyenb@quicinc.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/sd.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ drivers/ufs/core/ufshcd.c | 58 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 3c668cfb146d..d4feac5de17a 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -47,6 +47,7 @@
- #include <linux/blkpg.h>
- #include <linux/blk-pm.h>
- #include <linux/delay.h>
-+#include <linux/list_sort.h>
- #include <linux/major.h>
- #include <linux/mutex.h>
- #include <linux/string_helpers.h>
-@@ -117,6 +118,8 @@ static void sd_uninit_command(struct scsi_cmnd *SCpnt);
- static int sd_done(struct scsi_cmnd *);
- static void sd_eh_reset(struct scsi_cmnd *);
- static int sd_eh_action(struct scsi_cmnd *, int);
-+static bool sd_needs_prepare_resubmit(struct scsi_cmnd *cmd);
-+static void sd_prepare_resubmit(struct list_head *cmd_list);
- static void sd_read_capacity(struct scsi_disk *sdkp, unsigned char *buffer);
- static void scsi_disk_release(struct device *cdev);
+diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
+index 68bf8e94eee6..c28a362b5b99 100644
+--- a/drivers/ufs/core/ufshcd.c
++++ b/drivers/ufs/core/ufshcd.c
+@@ -4337,6 +4337,30 @@ int ufshcd_uic_hibern8_exit(struct ufs_hba *hba)
+ }
+ EXPORT_SYMBOL_GPL(ufshcd_uic_hibern8_exit);
  
-@@ -617,6 +620,8 @@ static struct scsi_driver sd_template = {
- 	.done			= sd_done,
- 	.eh_action		= sd_eh_action,
- 	.eh_reset		= sd_eh_reset,
-+	.eh_needs_prepare_resubmit = sd_needs_prepare_resubmit,
-+	.eh_prepare_resubmit	= sd_prepare_resubmit,
- };
- 
- /*
-@@ -2018,6 +2023,46 @@ static int sd_eh_action(struct scsi_cmnd *scmd, int eh_disp)
- 	return eh_disp;
++static int ufshcd_update_preserves_write_order(struct ufs_hba *hba,
++					       bool preserves_write_order)
++{
++	struct scsi_device *sdev;
++
++	if (!preserves_write_order) {
++		shost_for_each_device(sdev, hba->host) {
++			struct request_queue *q = sdev->request_queue;
++
++			/*
++			 * Refuse to enable auto-hibernation if no I/O scheduler
++			 * is present. This code does not check whether the
++			 * attached I/O scheduler serializes zoned writes
++			 * (ELEVATOR_F_ZBD_SEQ_WRITE) because this cannot be
++			 * checked from outside the block layer core.
++			 */
++			if (blk_queue_is_zoned(q) && !q->elevator)
++				return -EPERM;
++		}
++	}
++
++	return 0;
++}
++
+ static void ufshcd_configure_auto_hibern8(struct ufs_hba *hba)
+ {
+ 	if (!ufshcd_is_auto_hibern8_supported(hba))
+@@ -4345,13 +4369,40 @@ static void ufshcd_configure_auto_hibern8(struct ufs_hba *hba)
+ 	ufshcd_writel(hba, hba->ahit, REG_AUTO_HIBERNATE_IDLE_TIMER);
  }
  
-+static bool sd_needs_prepare_resubmit(struct scsi_cmnd *cmd)
-+{
-+	struct request *rq = scsi_cmd_to_rq(cmd);
-+
-+	return !rq->q->limits.use_zone_write_lock &&
-+		blk_rq_is_seq_zoned_write(rq);
-+}
-+
-+static int sd_cmp_sector(void *priv, const struct list_head *_a,
-+			 const struct list_head *_b)
-+{
-+	struct scsi_cmnd *a = list_entry(_a, typeof(*a), eh_entry);
-+	struct scsi_cmnd *b = list_entry(_b, typeof(*b), eh_entry);
-+	struct request *rq_a = scsi_cmd_to_rq(a);
-+	struct request *rq_b = scsi_cmd_to_rq(b);
-+	bool use_zwl_a = rq_a->q->limits.use_zone_write_lock;
-+	bool use_zwl_b = rq_b->q->limits.use_zone_write_lock;
-+
-+	/*
-+	 * Order the commands that need zone write locking after the commands
-+	 * that do not need zone write locking. Order the commands that do not
-+	 * need zone write locking by LBA. Do not reorder the commands that
-+	 * need zone write locking. See also the comment above the list_sort()
-+	 * definition.
-+	 */
-+	if (use_zwl_a || use_zwl_b)
-+		return use_zwl_a > use_zwl_b;
-+	return blk_rq_pos(rq_a) > blk_rq_pos(rq_b);
-+}
-+
-+static void sd_prepare_resubmit(struct list_head *cmd_list)
-+{
-+	/*
-+	 * Sort pending SCSI commands in starting sector order. This is
-+	 * important if one of the SCSI devices associated with @shost is a
-+	 * zoned block device for which zone write locking is disabled.
-+	 */
-+	list_sort(NULL, cmd_list, sd_cmp_sector);
-+}
-+
- static unsigned int sd_completed_bytes(struct scsi_cmnd *scmd)
++/**
++ * ufshcd_auto_hibern8_update() - Modify the auto-hibernation control register
++ * @hba: per-adapter instance
++ * @ahit: New auto-hibernate settings. Includes the scale and the value of the
++ * auto-hibernation timer. See also the UFSHCI_AHIBERN8_TIMER_MASK and
++ * UFSHCI_AHIBERN8_SCALE_MASK constants.
++ *
++ * A note: UFSHCI controllers do not preserve the command order in legacy mode
++ * if auto-hibernation is enabled. If the command order is not preserved, an
++ * I/O scheduler that serializes zoned writes (mq-deadline) is required if a
++ * zoned logical unit is present. Enabling auto-hibernation without attaching
++ * the mq-deadline scheduler first may cause unaligned write errors for the
++ * zoned logical unit if a zoned logical unit is present.
++ */
+ int ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
  {
- 	struct request *req = scsi_cmd_to_rq(scmd);
+ 	const u32 cur_ahit = READ_ONCE(hba->ahit);
++	bool prev_state, new_state;
++	int ret;
+ 
+ 	if (!ufshcd_is_auto_hibern8_supported(hba) || cur_ahit == ahit)
+ 		return 0;
+ 
++	prev_state = FIELD_GET(UFSHCI_AHIBERN8_TIMER_MASK, cur_ahit);
++	new_state = FIELD_GET(UFSHCI_AHIBERN8_TIMER_MASK, ahit);
++
++	if (!is_mcq_enabled(hba) && !prev_state && new_state) {
++		/*
++		 * Auto-hibernation will be enabled for legacy UFSHCI mode.
++		 */
++		ret = ufshcd_update_preserves_write_order(hba, false);
++		if (ret)
++			return ret;
++	}
+ 	WRITE_ONCE(hba->ahit, ahit);
+ 	if (!pm_runtime_suspended(&hba->ufs_device_wlun->sdev_gendev)) {
+ 		ufshcd_rpm_get_sync(hba);
+@@ -4360,6 +4411,13 @@ int ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
+ 		ufshcd_release(hba);
+ 		ufshcd_rpm_put_sync(hba);
+ 	}
++	if (!is_mcq_enabled(hba) && prev_state && !new_state) {
++		/*
++		 * Auto-hibernation has been disabled.
++		 */
++		ret = ufshcd_update_preserves_write_order(hba, true);
++		WARN_ON_ONCE(ret);
++	}
+ 
+ 	return 0;
+ }
