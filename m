@@ -2,170 +2,208 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9DD2C73C66
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 15:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC90C77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 15:21:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355448AbjHRPNh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 11:13:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43602 "EHLO
+        id S1378017AbjHRPUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 11:20:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378082AbjHRPN3 (ORCPT
+        with ESMTP id S1378121AbjHRPUZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 11:13:29 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E3035A1;
-        Fri, 18 Aug 2023 08:13:28 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37IEqorR012483;
-        Fri, 18 Aug 2023 15:13:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=8h4zR/PmlOXLOh62i2/d1IwWmmQUDQiqemDALncI/7I=;
- b=UHUoqQKhmemCloOoIvoSAZ96I3jeaaL+bCp4TUEf8L6M2gUEv03YStrbUxvFw4xQ+N24
- pJXA/tObzOyukRDflSMVmcvVKHaZkO3yqxJXclo2M0zn4jikAA6L2x1UuvNHsjv0/7qj
- YoIoqRR1+uLoOQ4F2NSVtp7+I9wFNwt31R4Yu5a3nP/GGME/Q+nBMEG5xbFw+wejxfAr
- MtHaYtMuKoTFyWoKnbpw3YL+srNtpdzOZWfoQfFv691Vcf/3q5W1vynd0nmq8bhsrxzj
- FAglYZFK+9W/A6Zq4TZ6HTumVwrDTLaXbHr5UStql8muJBm0xlqV8g0/6EfMgGCH8HPd Gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sjasygmm8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Aug 2023 15:12:59 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37IExWX6004564;
-        Fri, 18 Aug 2023 15:12:59 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sjasygmm0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Aug 2023 15:12:59 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37IDkkeo007871;
-        Fri, 18 Aug 2023 15:12:58 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3senwkyss4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Aug 2023 15:12:58 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-        by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37IFCwxO7143978
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Aug 2023 15:12:58 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 63C9A5805A;
-        Fri, 18 Aug 2023 15:12:58 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BFC9B5805D;
-        Fri, 18 Aug 2023 15:12:57 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.61.60.97])
-        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Aug 2023 15:12:57 +0000 (GMT)
-Message-ID: <0d768e42d671b2ff84ff10bc3f84531f15a5c57c.camel@linux.vnet.ibm.com>
-Subject: Re: [PATCH v7 1/3 RESEND] block:sed-opal: SED Opal keystore
-From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reply-To: gjoyce@linux.vnet.ibm.com
-To:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
-        keyrings@vger.kernel.org, okozina@redhat.com, dkeefe@redhat.com
-Date:   Fri, 18 Aug 2023 10:12:57 -0500
-In-Reply-To: <997311ee-a63b-75ea-dedc-78ed2f90b322@suse.de>
-References: <20230721211949.3437598-1-gjoyce@linux.vnet.ibm.com>
-         <20230721211949.3437598-2-gjoyce@linux.vnet.ibm.com>
-         <997311ee-a63b-75ea-dedc-78ed2f90b322@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: yNeQjn14sXgQ7XuwyB1a9nMwdPHPfiHA
-X-Proofpoint-ORIG-GUID: FLNOAWhQXsVjZYPAQMFl-x8uoNJ_kM2K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-18_18,2023-08-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=944 suspectscore=0 adultscore=0 priorityscore=1501 bulkscore=0
- malwarescore=0 lowpriorityscore=0 clxscore=1011 phishscore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308180137
+        Fri, 18 Aug 2023 11:20:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74603A94
+        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 08:19:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692371977;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4OGLm1Ji2zPIND+DM8hgK8fLQyP0EOw8FXAzm3TjU6k=;
+        b=CnAYvmnaTVT1/d+ZC/z+o/qkrOJinkipzbDAManuDKEPwgkIYapAThgVKv2/rsqgVuNjx8
+        qKE6vv9tPg4jatzsy0/cfFS9T/aSIe6Qo7xQKQOXBds10VQe68Yk9q4u715To1D0XF/7im
+        4zDr3Fe8aKNoyYh12UnGAg4W7MrR1do=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-111-_dky-kfcO7yXblC5erPVLw-1; Fri, 18 Aug 2023 11:19:34 -0400
+X-MC-Unique: _dky-kfcO7yXblC5erPVLw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B100A80006E;
+        Fri, 18 Aug 2023 15:19:33 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DE7B440D2843;
+        Fri, 18 Aug 2023 15:19:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
+References: <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com> <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com> <20230816120741.534415-1-dhowells@redhat.com> <20230816120741.534415-3-dhowells@redhat.com> <608853.1692190847@warthog.procyon.org.uk> <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com> <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com> <665724.1692218114@warthog.procyon.org.uk> <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com> <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, David Laight <David.Laight@aculab.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@list.de>,
+        Christian Brauner <christian@brauner.io>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 18 Aug 2023 16:19:31 +0100
+Message-ID: <2058762.1692371971@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2023-08-17 at 07:42 +0200, Hannes Reinecke wrote:
-> On 7/21/23 23:19, gjoyce@linux.vnet.ibm.com wrote:
-> > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > 
-> > Add read and write functions that allow SED Opal keys to stored
-> > in a permanent keystore.
-> > 
-> Probably state that these are dummy functions only.
-> 
-> > Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
-> > ---
-> >   block/Makefile               |  2 +-
-> >   block/sed-opal-key.c         | 24 ++++++++++++++++++++++++
-> >   include/linux/sed-opal-key.h | 15 +++++++++++++++
-> >   3 files changed, 40 insertions(+), 1 deletion(-)
-> >   create mode 100644 block/sed-opal-key.c
-> >   create mode 100644 include/linux/sed-opal-key.h
-> > 
-> > diff --git a/block/Makefile b/block/Makefile
-> > index 46ada9dc8bbf..ea07d80402a6 100644
-> > --- a/block/Makefile
-> > +++ b/block/Makefile
-> > @@ -34,7 +34,7 @@ obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
-> >   obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
-> >   obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
-> >   obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
-> > -obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
-> > +obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o sed-opal-key.o
-> >   obj-$(CONFIG_BLK_PM)		+= blk-pm.o
-> >   obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-
-> > crypto-profile.o \
-> >   					   blk-crypto-sysfs.o
-> > diff --git a/block/sed-opal-key.c b/block/sed-opal-key.c
-> > new file mode 100644
-> > index 000000000000..16f380164c44
-> > --- /dev/null
-> > +++ b/block/sed-opal-key.c
-> > @@ -0,0 +1,24 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * SED key operations.
-> > + *
-> > + * Copyright (C) 2022 IBM Corporation
-> > + *
-> > + * These are the accessor functions (read/write) for SED Opal
-> > + * keys. Specific keystores can provide overrides.
-> > + *
-> > + */
-> > +
-> > +#include <linux/kernel.h>
-> > +#include <linux/errno.h>
-> > +#include <linux/sed-opal-key.h>
-> > +
-> > +int __weak sed_read_key(char *keyname, char *key, u_int *keylen)
-> > +{
-> > +	return -EOPNOTSUPP;
-> > +}
-> > +
-> > +int __weak sed_write_key(char *keyname, char *key, u_int keylen)
-> > +{
-> > +	return -EOPNOTSUPP;
-> > +}
-> 
-> Hmm. We do have security/keys, which is using a 'struct key' for
-> their operations.
-> Why don't you leverage that structure?
-> 
-> Cheers,
-> 
-> Hannes
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-Thanks for the review Hannes. Are you referring to struct key in
-linux/key.h? If so, that may a bit heavy for just specifying key data
-and key length.
+> > Although I'm not sure the bit-fields really help.
+> > There are 8 bytes at the start of the structure, might as well
+> > use them :-)
+>=20
+> Actually=C3=A7 I wrote the patch that way because it seems to improve code
+> generation.
+>=20
+> The bitfields are generally all set together as just plain one-time
+> constants at initialization time, and gcc sees that it's a full byte
+> write. And the reason 'data_source' is not a bitfield is that it's not
+> a constant at iov_iter init time (it's an argument to all the init
+> functions), so having that one as a separate byte at init time is good
+> for code generation when you don't need to mask bits or anything like
+> that.
+>=20
+> And once initialized, having things be dense and doing all the
+> compares with a bitwise 'and' instead of doing them as some value
+> compare again tends to generate good code.
 
--Greg
+Actually...  I said that switch(enum) seemed to generate suboptimal code...
+However, if the enum is renumbered such that the constants are in the same
+order as in the switch() it generates better code.
+
+So we want this order:
+
+	enum iter_type {
+		ITER_UBUF,
+		ITER_IOVEC,
+		ITER_BVEC,
+		ITER_KVEC,
+		ITER_XARRAY,
+		ITER_DISCARD,
+	};
+
+to match:
+
+	switch (iov_iter_type(iter)) {
+	case ITER_UBUF:
+		progress =3D iterate_ubuf(iter, len, priv, priv2, ustep);
+		break;
+	case ITER_IOVEC:
+		progress =3D iterate_iovec(iter, len, priv, priv2, ustep);
+		break;
+	case ITER_BVEC:
+		progress =3D iterate_bvec(iter, len, priv, priv2, step);
+		break;
+	case ITER_KVEC:
+		progress =3D iterate_kvec(iter, len, priv, priv2, step);
+		break;
+	case ITER_XARRAY:
+		progress =3D iterate_xarray(iter, len, priv, priv2, step);
+		break;
+	case ITER_DISCARD:
+	default:
+		progress =3D len;
+		break;
+	}
+
+then gcc should be able to generate a ternary tree, which it does here:
+
+	<+77>:	mov    (%rdx),%al
+	<+79>:	cmp    $0x2,%al
+	<+81>:	je     0xffffffff81779bcc <_copy_from_iter+394>
+	<+87>:	ja     0xffffffff81779aa9 <_copy_from_iter+103>
+
+though it really split the number space in the wrong place.  It can then use
+one CMP (or TEST) to split again:
+
+	<+89>:	test   %al,%al
+	<+91>:	mov    0x8(%rdx),%rdx
+	<+95>:	jne    0xffffffff81779b48 <_copy_from_iter+262>
+	<+101>:	jmp    0xffffffff81779b17 <_copy_from_iter+213>
+
+It then should only require one CMP at this point, since AL can only be 4, 5
+or 6+:
+
+	<+103>:	cmp    $0x3,%al
+	<+105>:	je     0xffffffff81779c6e <_copy_from_iter+556>
+	<+111>:	cmp    $0x4,%al
+	<+113>:	jne    0xffffffff81779dd2 <_copy_from_iter+912>
+
+The end result being that it should have at most two CMP instructions for a=
+ny
+number in the range 0 to 5 - though in this case, it will have three for AL=
+>3.
+
+However, it doesn't do this with if-if-if with a number sequence or a bitma=
+sk,
+but rather generates an chain of cmp-cmp-cmp or test-test-test, presumably
+because it fails to spot the if-conditions are related.
+
+I should log a gcc bug on this on the poor switch() behaviour.
+
+Also, if we renumber the enum to put UBUF and IOVEC first, we can get rid of
+iter->user_backed in favour of:
+
+	static inline bool user_backed_iter(const struct iov_iter *i)
+	{
+		return iter_is_ubuf(i) || iter_is_iovec(i);
+	}
+
+which gcc just changes into something like a "CMP $1" and a "JA".
+
+
+Comparing Linus's bit patch (+ is better) to renumbering the switch (- is
+better):
+
+__iov_iter_get_pages_alloc               inc 0x32a -> 0x331 +0x7
+_copy_from_iter                          dcr 0x3c7 -> 0x3bf -0x8
+_copy_from_iter_flushcache               inc 0x364 -> 0x370 +0xc
+_copy_from_iter_nocache                  inc 0x33e -> 0x347 +0x9
+_copy_mc_to_iter                         dcr 0x3bc -> 0x3b6 -0x6
+_copy_to_iter                            inc 0x34a -> 0x34b +0x1
+copy_page_from_iter_atomic.part.0        dcr 0x424 -> 0x41c -0x8
+copy_page_to_iter_nofault.part.0         dcr 0x3a9 -> 0x3a5 -0x4
+csum_and_copy_from_iter                  inc 0x3e5 -> 0x3e8 +0x3
+csum_and_copy_to_iter                    dcr 0x449 -> 0x448 -0x1
+dup_iter                                 inc 0x34 -> 0x37 +0x3
+fault_in_iov_iter_readable               dcr 0x9c -> 0x9a -0x2
+fault_in_iov_iter_writeable              dcr 0x9c -> 0x9a -0x2
+iov_iter_advance                         dcr 0xde -> 0xd8 -0x6
+iov_iter_alignment                       inc 0xe0 -> 0xe3 +0x3
+iov_iter_extract_pages                   inc 0x416 -> 0x418 +0x2
+iov_iter_gap_alignment                   dcr 0x69 -> 0x67 -0x2
+iov_iter_init                            inc 0x27 -> 0x31 +0xa
+iov_iter_is_aligned                      dcr 0x104 -> 0xf5 -0xf
+iov_iter_npages                          inc 0x119 -> 0x11d +0x4
+iov_iter_revert                          dcr 0x93 -> 0x86 -0xd
+iov_iter_single_seg_count                dcr 0x41 -> 0x3c -0x5
+iov_iter_ubuf                            inc 0x39 -> 0x3a +0x1
+iov_iter_zero                            dcr 0x338 -> 0x32e -0xa
+memcpy_from_iter_mc                      inc 0x2a -> 0x2b +0x1
+
+I think there may be more savings to be made if I go and convert more of the
+functions to using switch().
+
+David
 
