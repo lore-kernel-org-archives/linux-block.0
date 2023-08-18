@@ -2,64 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B3BC3DA66
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 01:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E7AC3DA66
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 01:22:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356802AbjHRBR3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 21:17:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46424 "EHLO
+        id S238379AbjHRBWS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 21:22:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356868AbjHRBRO (ORCPT
+        with ESMTP id S1356939AbjHRBWE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 21:17:14 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 324433A9F
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:17:09 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bf095e1becso633545ad.1
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:17:09 -0700 (PDT)
+        Thu, 17 Aug 2023 21:22:04 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EE13448E
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:21:28 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-5657659a8a1so82381a12.1
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:21:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692321428; x=1692926228;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692321685; x=1692926485;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0rOWh71R2unsmK0j18LXUVFqJ8OAoWTJeI+ndUPvXeI=;
-        b=ZTS6fgNIGlcr8R7FOud+NC/deBiPoZ1OfG4zLqCQA3jEFU5bqr9ZrccyJKZN8251G2
-         mt3YVWglWPQ+PoGr+V9Elwd/iHFVWotmUBWoTTpLDpJqWZcmmjsWQqZtKr2Tx5Ng6QBJ
-         JaU5O57Z8hEGukbgSoUY65rqJQ7DbbWvfoGulguQvKJ6WUhy6U8IZq06DWEe8VJh1q/r
-         rhKBUDuK0aYsXiJfwntmcIL/2oqtBP2ImRlYKpOUaxefGMUGNz+qLr/GfWlPreURsZDM
-         j57QwEpbiHjQSYXwWTNG2LHD6+xyyK7M+OEMFKi0sZ89MJrV3ulYd8coCowlm4HmZKrP
-         dSqA==
+        bh=9HgV6QkCXuVGaj9r0bY3pZeAJ8G99Uwd4RPEeNO69yg=;
+        b=IPqgAMfBdYYudPJZ3jiKRcp3VbazelPGKFQVhZG2NUyZUiny65YCFU46ZNvyNYPQSR
+         79XlMozAxk4vMjyLE/LI/e+Bky+IbXZ1nP3+uEdyKqdPIFtbxa8fYxQbQ/+vhYamcWmd
+         6d4okcffkYW1FfbHsVdOyrfOjaPxKNGbnyisdD7TQzgvJY9sAH16UxU4r84WeYuNVKJi
+         6j+laNxgU8MVGQjnn5vrXzgTwadNfCAZM1VpScJ2wbS2SpgJaWNOyLpiDlIcmtkGg+kN
+         EyuTjfXSsL6OwMZs41R3jNIj5P7YDOPEA/z8brP9nJBbx4wzur271I+1ul0hEF4Nnv2x
+         5OQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692321428; x=1692926228;
+        d=1e100.net; s=20221208; t=1692321685; x=1692926485;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0rOWh71R2unsmK0j18LXUVFqJ8OAoWTJeI+ndUPvXeI=;
-        b=dtsKscvVJoh5jmvQ/fkPxXknWBuL/O1JNs6wo1099V+cKd2GGPhVqwlVT4+k+PhTix
-         4KD3rLBAhIiVp7hJImFHcss3OP9aWl991rkVuE9VxPpcR7NJFKDJzHXyakIZ9wmG56G/
-         zwbpjc2bkk2gaGIergrkoarV4NKhDuY/CjXhHqhQS6kVQBTfhTnSqPkNnL4vA43NpOgX
-         K5XvIKvJYx2/SEbxeUA35ruQgact7+jIqruOvguDSs6x+AiH2KeJCD+z5y/D6TdYkWbM
-         kqy2T4R/EAQ4SdBj8zQX3u9fMrLe3T2JtdJ/xTYnYjC70bhdpQ0edOuM7OOjI+lOEn4H
-         9E5w==
-X-Gm-Message-State: AOJu0Ywjv59kWHoMXkntYZuiJYW17vq/Gi9yNacWBpu0JV2ICOOZFn4L
-        PJBPqp9Hw9jbEYwbx7DHf0vsMA==
-X-Google-Smtp-Source: AGHT+IEPvuAZTF/J4BLjkzC2XooD6Ry1mwWHeucKb32CCzjPzbPPVJ6IH03SeRCWu7Un32tb1Uy72w==
-X-Received: by 2002:a17:902:e54b:b0:1bf:349f:b85c with SMTP id n11-20020a170902e54b00b001bf349fb85cmr970086plf.1.1692321428716;
-        Thu, 17 Aug 2023 18:17:08 -0700 (PDT)
+        bh=9HgV6QkCXuVGaj9r0bY3pZeAJ8G99Uwd4RPEeNO69yg=;
+        b=B0KYs+VbQQG2cd+mRPt6Vr4BxFC971yxRQu1VbdKyJaQOWhQUNZoia/rWJbqxoxR3Q
+         Y7jVCrsw2dhP0hKzV0yncm8eOV4wLYtSLWhb6rm7l7/gRMf1zc5DkZ3a/zjro2MK8GwH
+         BjG9xTE5G3tLnXw0nJ5IqoRtm6A8Xags8NovezCOhZ6CAQG2CY/35W3Re5U/fC/YECzH
+         1RIFth4S5RB6aO7T/aPJW3xvdb3j4sqEmXhACztfDsyWUQvc8CXiPq9OiLYRaOw9ldIP
+         kSR6XIXqy53MR7003Xv31tLbY/EelsvafoL/RqomHvFXUOOmhFUvaMtO/zT2A+I5xoYn
+         JCIg==
+X-Gm-Message-State: AOJu0YzZ8kEViD0nMyiigqs3BISqBNr1eXhn303pPijTrJW9OGhQ+Rbj
+        zSU+stM2Vy0G5ecI24qRu6NMFQ==
+X-Google-Smtp-Source: AGHT+IHz9skIyACs/5ZpVcrRBMRJ3gozd8Eigs/K1LrxV18BUJnanVhXoQ5J7YF6JICU1sl9UWwMeg==
+X-Received: by 2002:a05:6a21:9989:b0:112:cf5:d5cc with SMTP id ve9-20020a056a21998900b001120cf5d5ccmr1741595pzb.1.1692321684715;
+        Thu, 17 Aug 2023 18:21:24 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id i3-20020a170902c94300b001b890009634sm391358pla.139.2023.08.17.18.17.07
+        by smtp.gmail.com with ESMTPSA id b5-20020aa78705000000b0068746ab9aebsm387139pfo.14.2023.08.17.18.21.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 18:17:08 -0700 (PDT)
+        Thu, 17 Aug 2023 18:21:24 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
-        kernel-team@meta.com, ebiggers@kernel.org,
-        Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-Cc:     stable@vger.kernel.org
-In-Reply-To: <20230817141615.15387-1-sweettea-kernel@dorminy.me>
-References: <20230817141615.15387-1-sweettea-kernel@dorminy.me>
-Subject: Re: [PATCH v5] blk-crypto: dynamically allocate fallback profile
-Message-Id: <169232142755.701491.1403250038127170415.b4-ty@kernel.dk>
-Date:   Thu, 17 Aug 2023 19:17:07 -0600
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Breno Leitao <leitao@debian.org>, kernel-team@meta.com
+In-Reply-To: <ZN0p5_W-Q9mAHBVY@slm.duckdns.org>
+References: <ZN0p5_W-Q9mAHBVY@slm.duckdns.org>
+Subject: Re: [PATCH for-6.6/block] blk-cgroup: Fix NULL deref caused by
+ blkg_policy_data being installed before init
+Message-Id: <169232168362.702027.10446286850922079635.b4-ty@kernel.dk>
+Date:   Thu, 17 Aug 2023 19:21:23 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -69,22 +69,39 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Thu, 17 Aug 2023 10:15:56 -0400, Sweet Tea Dorminy wrote:
-> blk_crypto_profile_init() calls lockdep_register_key(), which warns and
-> does not register if the provided memory is a static object.
-> blk-crypto-fallback currently has a static blk_crypto_profile and calls
-> blk_crypto_profile_init() thereupon, resulting in the warning and
-> failure to register.
+On Wed, 16 Aug 2023 09:56:23 -1000, Tejun Heo wrote:
+> blk-iocost sometimes causes the following crash:
 > 
-> Fortunately it is simple enough to use a dynamically allocated profile
-> and make lockdep function correctly.
+>   BUG: kernel NULL pointer dereference, address: 00000000000000e0
+>   ...
+>   RIP: 0010:_raw_spin_lock+0x17/0x30
+>   Code: be 01 02 00 00 e8 79 38 39 ff 31 d2 89 d0 5d c3 0f 1f 00 0f 1f 44 00 00 55 48 89 e5 65 ff 05 48 d0 34 7e b9 01 00 00 00 31 c0 <f0> 0f b1 0f 75 02 5d c3 89 c6 e8 ea 04 00 00 5d c3 0f 1f 84 00 00
+>   RSP: 0018:ffffc900023b3d40 EFLAGS: 00010046
+>   RAX: 0000000000000000 RBX: 00000000000000e0 RCX: 0000000000000001
+>   RDX: ffffc900023b3d20 RSI: ffffc900023b3cf0 RDI: 00000000000000e0
+>   RBP: ffffc900023b3d40 R08: ffffc900023b3c10 R09: 0000000000000003
+>   R10: 0000000000000064 R11: 000000000000000a R12: ffff888102337000
+>   R13: fffffffffffffff2 R14: ffff88810af408c8 R15: ffff8881070c3600
+>   FS:  00007faaaf364fc0(0000) GS:ffff88842fdc0000(0000) knlGS:0000000000000000
+>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>   CR2: 00000000000000e0 CR3: 00000001097b1000 CR4: 0000000000350ea0
+>   Call Trace:
+>    <TASK>
+>    ioc_weight_write+0x13d/0x410
+>    cgroup_file_write+0x7a/0x130
+>    kernfs_fop_write_iter+0xf5/0x170
+>    vfs_write+0x298/0x370
+>    ksys_write+0x5f/0xb0
+>    __x64_sys_write+0x1b/0x20
+>    do_syscall_64+0x3d/0x80
+>    entry_SYSCALL_64_after_hwframe+0x46/0xb0
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] blk-crypto: dynamically allocate fallback profile
-      commit: cc7de17e2fe6b778a836032e7e5f9991dec40a25
+[1/1] blk-cgroup: Fix NULL deref caused by blkg_policy_data being installed before init
+      commit: ec14a87ee1999b19d8b7ed0fa95fea80644624ae
 
 Best regards,
 -- 
