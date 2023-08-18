@@ -2,113 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E28BC7EE2D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 16:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56825EE498B
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 17:57:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbjHRQuA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 12:50:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39188 "EHLO
+        id S1351746AbjHRR5N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 13:57:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234535AbjHRQtd (ORCPT
+        with ESMTP id S1379336AbjHRR4y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 12:49:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B20B2D64
-        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 09:48:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692377329;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=veHnm8JIytX/ZN4b89EoSQLoYiAOvTxlrfzT5tPpVw4=;
-        b=d5ySZp3uh5S6XiLJtIAPKA23YsKxqFKtYBtbkv6KEI0P7ZNicTL4LljcK/3c1VtAdsSOnt
-        XztgZSw67JJ/Q6h07GUNTA7gg5VqIzeWdgBaAIX3yo6uoFQ3s77OP80yRlvDiAHu0SGmpD
-        ORn3Qza8Vq9j6k9Ut6jsG09JtReWgDE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-668-EkqRh9h2M7qdDKIFcGzgWw-1; Fri, 18 Aug 2023 12:48:43 -0400
-X-MC-Unique: EkqRh9h2M7qdDKIFcGzgWw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 602E8101A52E;
-        Fri, 18 Aug 2023 16:48:42 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EE1640C6E8A;
-        Fri, 18 Aug 2023 16:48:40 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <d8fce3c159b04fdca65cc4d5c307854d@AcuMS.aculab.com>
-References: <d8fce3c159b04fdca65cc4d5c307854d@AcuMS.aculab.com> <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com> <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com> <20230816120741.534415-1-dhowells@redhat.com> <20230816120741.534415-3-dhowells@redhat.com> <608853.1692190847@warthog.procyon.org.uk> <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com> <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com> <665724.1692218114@warthog.procyon.org.uk> <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com> <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com> <2058762.1692371971@warthog.procyon.org.uk>
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     dhowells@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Christoph Hellwig" <hch@list.de>,
-        Christian Brauner <christian@brauner.io>,
-        "Matthew Wilcox" <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()
+        Fri, 18 Aug 2023 13:56:54 -0400
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840074214;
+        Fri, 18 Aug 2023 10:56:52 -0700 (PDT)
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3a7d7de894bso819673b6e.3;
+        Fri, 18 Aug 2023 10:56:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692381412; x=1692986212;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yuI8MkzJJoYh9dvd2xid2uOhj8pnHKRXjd43RBRg0rA=;
+        b=YRUUy0d97cF3EieH1zBYnulOqjt0CsKF2rXIm82o4FR16NisD7RhgXHmotxszwon8z
+         57CGrasuoKfew3m9keBTB4ZS0zDSIFzXiAloZk0QbewZdTw62duZHeYt4bJ2Wzj7lLhf
+         83Lp2XT0tfrQkoiR4kCgJqhF/XFWquWR76NNDeWawpQVGNKmmPc7NzXP9jOeC23o3uCx
+         ngDpUBrgx6IcOulaZcvbHgSPVERIcOrMwlEHI3sWJPie75YHjS709dWw1T6LfuEaGDg6
+         AiUl/o2wokk0Lxs8+jYrv9CpVeGLYHxaks49riXKkE0Q/f+z1QL7RSAfwY4AzWEaFGv/
+         Iy9A==
+X-Gm-Message-State: AOJu0YxOHQweRRjSnu0FghZjwi9vd3jGBNNuil+6MRUlExo6+zlUba70
+        jVkAjJoX/q2VjPLO2hn6qI7HMckwKus=
+X-Google-Smtp-Source: AGHT+IG3s71S8mL+h2YgIMAHMOvvnlkeYHbs5HTsCQlY3OPhMzNh2LAEGZwiYZ2jf+LcFR/QsYV4Xg==
+X-Received: by 2002:a05:6808:1307:b0:3a4:894a:9f57 with SMTP id y7-20020a056808130700b003a4894a9f57mr4428972oiv.6.1692381411564;
+        Fri, 18 Aug 2023 10:56:51 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:5012:5192:47aa:c304? ([2620:15c:211:201:5012:5192:47aa:c304])
+        by smtp.gmail.com with ESMTPSA id p8-20020a63ab08000000b005642a68a508sm1858800pgf.35.2023.08.18.10.56.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Aug 2023 10:56:50 -0700 (PDT)
+Message-ID: <06d34c2f-a89e-3134-d78f-3c071aa490cf@acm.org>
+Date:   Fri, 18 Aug 2023 10:56:49 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2093412.1692377320.1@warthog.procyon.org.uk>
-Date:   Fri, 18 Aug 2023 17:48:40 +0100
-Message-ID: <2093413.1692377320@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v9 17/17] scsi: ufs: Inform the block layer about write
+ ordering
+Content-Language: en-US
+To:     "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Can Guo <quic_cang@quicinc.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Bean Huo <beanhuo@micron.com>,
+        Asutosh Das <quic_asutoshd@quicinc.com>,
+        Arthur Simchaev <Arthur.Simchaev@wdc.com>
+References: <20230816195447.3703954-1-bvanassche@acm.org>
+ <20230816195447.3703954-18-bvanassche@acm.org>
+ <666c6d78-d975-c9f9-4ad2-c9fa86497b47@quicinc.com>
+ <4f332520-329c-6355-3aa3-cd5e29716a06@acm.org>
+ <97100392-0c17-e950-1dd4-c52b97aecbe8@quicinc.com>
+ <5d8e90b9-34c8-5cab-2653-6f28e68eda94@acm.org>
+ <8299025e-e895-8fdb-c62d-80f1d4c9b64c@quicinc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <8299025e-e895-8fdb-c62d-80f1d4c9b64c@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Laight <David.Laight@ACULAB.COM> wrote:
-
-> > iov_iter_init                            inc 0x27 -> 0x31 +0xa
+On 8/17/23 17:19, Bao D. Nguyen wrote:
+> For example, in SDB mode, after the probe and you want to enable auto-hibern8, you would call ufshcd_auto_hibern8_update() which then calls
+> ufshcd_update_preserves_write_order(). Before auto-hibern8 is enabled, you would check this condition:
+>      if (blk_queue_is_zoned(q) && !q->elevator)
 > 
-> Are you hitting the gcc bug that loads the constant from memory?
+> In other words, auto-hibern8 is enabled only if the above condition false.
+> 
+> However, the during a normal operation, the ufshcd_auto_hibern8_update() may not get called at all, and auto-hibern8 can be enabled in SDB mode as part of ufs init. Would that be a problem to have auto-hibern8 enabled without checking whether the above condition is false?
 
-I'm not sure what that looks like.  For your perusal, here's a disassembly of
-the use-switch-on-enum variant:
+Hi Bao,
 
-   0xffffffff8177726c <+0>:     cmp    $0x1,%esi
-   0xffffffff8177726f <+3>:     jbe    0xffffffff81777273 <iov_iter_init+7>
-   0xffffffff81777271 <+5>:     ud2
-   0xffffffff81777273 <+7>:     test   %esi,%esi
-   0xffffffff81777275 <+9>:     movw   $0x1,(%rdi)
-   0xffffffff8177727a <+14>:    setne  0x3(%rdi)
-   0xffffffff8177727e <+18>:    xor    %eax,%eax
-   0xffffffff81777280 <+20>:    movb   $0x0,0x2(%rdi)
-   0xffffffff81777284 <+24>:    movb   $0x1,0x4(%rdi)
-   0xffffffff81777288 <+28>:    mov    %rax,0x8(%rdi)
-   0xffffffff8177728c <+32>:    mov    %rdx,0x10(%rdi)
-   0xffffffff81777290 <+36>:    mov    %r8,0x18(%rdi)
-   0xffffffff81777294 <+40>:    mov    %rcx,0x20(%rdi)
-   0xffffffff81777298 <+44>:    jmp    0xffffffff81d728a0 <__x86_return_thunk>
+Probing the host controller happens as follows:
+* The host controller probing function is called, e.g. ufs_qcom_probe().
+* ufshcd_alloc_host() and ufshcd_init() are called directly or indirectly
+   by the host controller probe function.
+* ufshcd_init() calls scsi_add_host() and async_schedule(ufshcd_async_scan, hba).
 
-versus the use-bitmap variant:
+Once ufshcd_async_scan() is called asynchronously, it performs the
+following actions:
+* ufs_probe_hba() is called. This function calls ufshcd_link_startup()
+   indirectly. That function invokes the link_startup_notify vop if it has
+   been defined. Some host drivers set hba->ahit from inside that vop.
+* scsi_scan_host() is called and calls scsi_alloc_sdev() indirectly.
+* scsi_alloc_sdev() calls blk_mq_init_queue() and shost->hostt->slave_alloc().
+* scsi_add_lun() calls sdev->host->hostt->slave_configure().
+* scsi_add_lun() calls scsi_sysfs_add_sdev(). This indirectly causes sd_probe()
+   to be called asynchronously.
+* sd_probe() calls sd_revalidate_disk(). This results in an indirect call of
+   disk_set_zoned(). Additionally, the ELEVATOR_F_ZBD_SEQ_WRITE flag is set by
+   the sd driver if q->limits.driver_preserves_write_order has not been set.
+* Still from inside sd_probe(), device_add_disk() is called and a scheduler
+   is selected based on the value of q->required_elevator_features.
 
-   0xffffffff81777311 <+0>:     cmp    $0x1,%esi
-   0xffffffff81777314 <+3>:     jbe    0xffffffff81777318 <iov_iter_init+7>
-   0xffffffff81777316 <+5>:     ud2
-   0xffffffff81777318 <+7>:     test   %esi,%esi
-   0xffffffff8177731a <+9>:     movb   $0x2,(%rdi)
-   0xffffffff8177731d <+12>:    setne  0x1(%rdi)
-   0xffffffff81777321 <+16>:    xor    %eax,%eax
-   0xffffffff81777323 <+18>:    mov    %rdx,0x10(%rdi)
-   0xffffffff81777327 <+22>:    mov    %rax,0x8(%rdi)
-   0xffffffff8177732b <+26>:    mov    %r8,0x18(%rdi)
-   0xffffffff8177732f <+30>:    mov    %rcx,0x20(%rdi)
-   0xffffffff81777333 <+34>:    jmp    0xffffffff81d72960 <__x86_return_thunk>
+There are two ways in which host drivers initialize auto-hibernation:
+* Either by setting hba->ahit before ufshcd_init() is called.
+* Or by calling ufshcd_auto_hibern8_update() from the link_startup_notify
+   vop.
 
-It seems to be that the former is loading byte constants individually, whereas
-Linus combined all those fields into a single byte and eliminated one of them.
+I think the above shows that the zoned model is queried *after* the above methods
+for enabling auto-hibernation have completed and hence that blk_queue_is_zoned()
+evaluates to false if a host driver calls ufshcd_auto_hibern8_update() from
+inside the link_startup_notify vop.
 
-David
+If auto-hibernation is enabled from inside the host driver then that should
+happen before sd_probe() is called. sd_probe() will use the value of
+q->limits.driver_preserves_write_order that has been set by
+ufshcd_slave_configure() so there is no risk for inconsistencies between the
+auto-hibernation configuration and the request queue configuration.
+
+Bart.
+
+
 
