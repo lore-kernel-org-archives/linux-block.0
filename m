@@ -2,110 +2,168 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E7AC3DA66
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 01:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB86C71132
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 01:54:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238379AbjHRBWS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 21:22:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33266 "EHLO
+        id S1352977AbjHRBxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 21:53:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356939AbjHRBWE (ORCPT
+        with ESMTP id S1357119AbjHRBxq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 21:22:04 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EE13448E
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:21:28 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-5657659a8a1so82381a12.1
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:21:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692321685; x=1692926485;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9HgV6QkCXuVGaj9r0bY3pZeAJ8G99Uwd4RPEeNO69yg=;
-        b=IPqgAMfBdYYudPJZ3jiKRcp3VbazelPGKFQVhZG2NUyZUiny65YCFU46ZNvyNYPQSR
-         79XlMozAxk4vMjyLE/LI/e+Bky+IbXZ1nP3+uEdyKqdPIFtbxa8fYxQbQ/+vhYamcWmd
-         6d4okcffkYW1FfbHsVdOyrfOjaPxKNGbnyisdD7TQzgvJY9sAH16UxU4r84WeYuNVKJi
-         6j+laNxgU8MVGQjnn5vrXzgTwadNfCAZM1VpScJ2wbS2SpgJaWNOyLpiDlIcmtkGg+kN
-         EyuTjfXSsL6OwMZs41R3jNIj5P7YDOPEA/z8brP9nJBbx4wzur271I+1ul0hEF4Nnv2x
-         5OQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692321685; x=1692926485;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9HgV6QkCXuVGaj9r0bY3pZeAJ8G99Uwd4RPEeNO69yg=;
-        b=B0KYs+VbQQG2cd+mRPt6Vr4BxFC971yxRQu1VbdKyJaQOWhQUNZoia/rWJbqxoxR3Q
-         Y7jVCrsw2dhP0hKzV0yncm8eOV4wLYtSLWhb6rm7l7/gRMf1zc5DkZ3a/zjro2MK8GwH
-         BjG9xTE5G3tLnXw0nJ5IqoRtm6A8Xags8NovezCOhZ6CAQG2CY/35W3Re5U/fC/YECzH
-         1RIFth4S5RB6aO7T/aPJW3xvdb3j4sqEmXhACztfDsyWUQvc8CXiPq9OiLYRaOw9ldIP
-         kSR6XIXqy53MR7003Xv31tLbY/EelsvafoL/RqomHvFXUOOmhFUvaMtO/zT2A+I5xoYn
-         JCIg==
-X-Gm-Message-State: AOJu0YzZ8kEViD0nMyiigqs3BISqBNr1eXhn303pPijTrJW9OGhQ+Rbj
-        zSU+stM2Vy0G5ecI24qRu6NMFQ==
-X-Google-Smtp-Source: AGHT+IHz9skIyACs/5ZpVcrRBMRJ3gozd8Eigs/K1LrxV18BUJnanVhXoQ5J7YF6JICU1sl9UWwMeg==
-X-Received: by 2002:a05:6a21:9989:b0:112:cf5:d5cc with SMTP id ve9-20020a056a21998900b001120cf5d5ccmr1741595pzb.1.1692321684715;
-        Thu, 17 Aug 2023 18:21:24 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id b5-20020aa78705000000b0068746ab9aebsm387139pfo.14.2023.08.17.18.21.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 18:21:24 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Breno Leitao <leitao@debian.org>, kernel-team@meta.com
-In-Reply-To: <ZN0p5_W-Q9mAHBVY@slm.duckdns.org>
-References: <ZN0p5_W-Q9mAHBVY@slm.duckdns.org>
-Subject: Re: [PATCH for-6.6/block] blk-cgroup: Fix NULL deref caused by
- blkg_policy_data being installed before init
-Message-Id: <169232168362.702027.10446286850922079635.b4-ty@kernel.dk>
-Date:   Thu, 17 Aug 2023 19:21:23 -0600
+        Thu, 17 Aug 2023 21:53:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2782D58
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:53:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692323579;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=f42bCxvlAvmcujooXy3bffnAnWJZzzFDZ6+tYkOrJJ0=;
+        b=hxe3CMRKhKSAwibn+X0VBecPxKZYL98rxNVp98OV8wxCT6tY9Ymf71BLlBuOxh5AlFDOKk
+        RmNiNBU/A3/LKlKUYMeEKQapTNRyEyPu/dKLhmYVHChS1mf2XWcxPcSKQ6TjUMrwk+sm48
+        zlGaeN7aNMnXI3E0Cu0U6f21p3U5VcU=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-681-tyZm7me1N8SlX0ks18qw8Q-1; Thu, 17 Aug 2023 21:52:54 -0400
+X-MC-Unique: tyZm7me1N8SlX0ks18qw8Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1CD8E3C01C1B;
+        Fri, 18 Aug 2023 01:52:54 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 33F84C15BAD;
+        Fri, 18 Aug 2023 01:52:52 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>
+Cc:     linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Yi Zhang <yi.zhang@redhat.com>,
+        Guangwu Zhang <guazhang@redhat.com>
+Subject: [PATCH V2] lib/group_cpus.c: avoid to acquire cpu hotplug lock in group_cpus_evenly
+Date:   Fri, 18 Aug 2023 09:52:44 +0800
+Message-Id: <20230818015244.1176929-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+group_cpus_evenly() could be part of storage driver's error handler,
+such as nvme driver, when may happen during CPU hotplug, in which
+storage queue has to drain its pending IOs because all CPUs associated
+with the queue are offline and the queue is becoming inactive. And
+handling IO needs error handler to provide forward progress.
 
-On Wed, 16 Aug 2023 09:56:23 -1000, Tejun Heo wrote:
-> blk-iocost sometimes causes the following crash:
-> 
->   BUG: kernel NULL pointer dereference, address: 00000000000000e0
->   ...
->   RIP: 0010:_raw_spin_lock+0x17/0x30
->   Code: be 01 02 00 00 e8 79 38 39 ff 31 d2 89 d0 5d c3 0f 1f 00 0f 1f 44 00 00 55 48 89 e5 65 ff 05 48 d0 34 7e b9 01 00 00 00 31 c0 <f0> 0f b1 0f 75 02 5d c3 89 c6 e8 ea 04 00 00 5d c3 0f 1f 84 00 00
->   RSP: 0018:ffffc900023b3d40 EFLAGS: 00010046
->   RAX: 0000000000000000 RBX: 00000000000000e0 RCX: 0000000000000001
->   RDX: ffffc900023b3d20 RSI: ffffc900023b3cf0 RDI: 00000000000000e0
->   RBP: ffffc900023b3d40 R08: ffffc900023b3c10 R09: 0000000000000003
->   R10: 0000000000000064 R11: 000000000000000a R12: ffff888102337000
->   R13: fffffffffffffff2 R14: ffff88810af408c8 R15: ffff8881070c3600
->   FS:  00007faaaf364fc0(0000) GS:ffff88842fdc0000(0000) knlGS:0000000000000000
->   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->   CR2: 00000000000000e0 CR3: 00000001097b1000 CR4: 0000000000350ea0
->   Call Trace:
->    <TASK>
->    ioc_weight_write+0x13d/0x410
->    cgroup_file_write+0x7a/0x130
->    kernfs_fop_write_iter+0xf5/0x170
->    vfs_write+0x298/0x370
->    ksys_write+0x5f/0xb0
->    __x64_sys_write+0x1b/0x20
->    do_syscall_64+0x3d/0x80
->    entry_SYSCALL_64_after_hwframe+0x46/0xb0
-> 
-> [...]
+Then dead lock is caused:
 
-Applied, thanks!
+1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
+handler is waiting for inflight IO
 
-[1/1] blk-cgroup: Fix NULL deref caused by blkg_policy_data being installed before init
-      commit: ec14a87ee1999b19d8b7ed0fa95fea80644624ae
+2) error handler is waiting for CPU hotplug lock
 
-Best regards,
+3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
+error handling can't provide forward progress.
+
+Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
+in which two stage spreads are taken: 1) the 1st stage is over all present
+CPUs; 2) the end stage is over all other CPUs.
+
+Turns out the two stage spread just needs consistent 'cpu_present_mask', and
+remove the CPU hotplug lock by storing it into one local cache. This way
+doesn't change correctness, because all CPUs are still covered.
+
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: linux-nvme@lists.infradead.org
+Cc: linux-block@vger.kernel.org
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Reported-by: Guangwu Zhang <guazhang@redhat.com>
+Tested-by: Guangwu Zhang <guazhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- fix "Cc: block list"
+	- add tested-by tag
+
+ lib/group_cpus.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/lib/group_cpus.c b/lib/group_cpus.c
+index aa3f6815bb12..15006e79196f 100644
+--- a/lib/group_cpus.c
++++ b/lib/group_cpus.c
+@@ -348,6 +348,7 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+ {
+ 	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
+ 	cpumask_var_t *node_to_cpumask;
++	cpumask_var_t local_cpu_present_mask;
+ 	cpumask_var_t nmsk, npresmsk;
+ 	int ret = -ENOMEM;
+ 	struct cpumask *masks = NULL;
+@@ -355,6 +356,16 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+ 	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
+ 		return NULL;
+ 
++	if (!zalloc_cpumask_var(&local_cpu_present_mask, GFP_KERNEL))
++		goto fail_local_pres_mask;
++
++	/*
++	 * Make a local cache of 'cpu_present_mask', so the two stages
++	 * spread can observe consistent 'cpu_present_mask' without holding
++	 * cpu hotplug lock.
++	 */
++	cpumask_copy(local_cpu_present_mask, cpu_present_mask);
++
+ 	if (!zalloc_cpumask_var(&npresmsk, GFP_KERNEL))
+ 		goto fail_nmsk;
+ 
+@@ -366,13 +377,11 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+ 	if (!masks)
+ 		goto fail_node_to_cpumask;
+ 
+-	/* Stabilize the cpumasks */
+-	cpus_read_lock();
+ 	build_node_to_cpumask(node_to_cpumask);
+ 
+ 	/* grouping present CPUs first */
+ 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+-				  cpu_present_mask, nmsk, masks);
++				  local_cpu_present_mask, nmsk, masks);
+ 	if (ret < 0)
+ 		goto fail_build_affinity;
+ 	nr_present = ret;
+@@ -387,15 +396,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+ 		curgrp = 0;
+ 	else
+ 		curgrp = nr_present;
+-	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
++	cpumask_andnot(npresmsk, cpu_possible_mask, local_cpu_present_mask);
+ 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+ 				  npresmsk, nmsk, masks);
+ 	if (ret >= 0)
+ 		nr_others = ret;
+ 
+  fail_build_affinity:
+-	cpus_read_unlock();
+-
+ 	if (ret >= 0)
+ 		WARN_ON(nr_present + nr_others < numgrps);
+ 
+@@ -406,6 +413,9 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+ 	free_cpumask_var(npresmsk);
+ 
+  fail_nmsk:
++	free_cpumask_var(local_cpu_present_mask);
++
++ fail_local_pres_mask:
+ 	free_cpumask_var(nmsk);
+ 	if (ret < 0) {
+ 		kfree(masks);
 -- 
-Jens Axboe
-
-
+2.40.1
 
