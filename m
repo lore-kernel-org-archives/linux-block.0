@@ -2,208 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC90C77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 15:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D18D4C71159
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 15:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378017AbjHRPUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 11:20:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47316 "EHLO
+        id S1378268AbjHRPmT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 11:42:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378121AbjHRPUZ (ORCPT
+        with ESMTP id S1378349AbjHRPmP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 11:20:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74603A94
-        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 08:19:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692371977;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4OGLm1Ji2zPIND+DM8hgK8fLQyP0EOw8FXAzm3TjU6k=;
-        b=CnAYvmnaTVT1/d+ZC/z+o/qkrOJinkipzbDAManuDKEPwgkIYapAThgVKv2/rsqgVuNjx8
-        qKE6vv9tPg4jatzsy0/cfFS9T/aSIe6Qo7xQKQOXBds10VQe68Yk9q4u715To1D0XF/7im
-        4zDr3Fe8aKNoyYh12UnGAg4W7MrR1do=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-111-_dky-kfcO7yXblC5erPVLw-1; Fri, 18 Aug 2023 11:19:34 -0400
-X-MC-Unique: _dky-kfcO7yXblC5erPVLw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B100A80006E;
-        Fri, 18 Aug 2023 15:19:33 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DE7B440D2843;
-        Fri, 18 Aug 2023 15:19:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
-References: <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com> <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com> <20230816120741.534415-1-dhowells@redhat.com> <20230816120741.534415-3-dhowells@redhat.com> <608853.1692190847@warthog.procyon.org.uk> <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com> <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com> <665724.1692218114@warthog.procyon.org.uk> <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com> <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, David Laight <David.Laight@aculab.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@list.de>,
+        Fri, 18 Aug 2023 11:42:15 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD5C3C3E
+        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 08:42:11 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-208-OcodsAF0MY-quNIfCez-Lg-1; Fri, 18 Aug 2023 16:42:09 +0100
+X-MC-Unique: OcodsAF0MY-quNIfCez-Lg-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 18 Aug
+ 2023 16:42:05 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 18 Aug 2023 16:42:05 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Howells' <dhowells@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+CC:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+        "Christoph Hellwig" <hch@list.de>,
         Christian Brauner <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
+        "Matthew Wilcox" <willy@infradead.org>,
         Jeff Layton <jlayton@kernel.org>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-mm@kvack.org" <linux-mm@kvack.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()
+Subject: RE: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Topic: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
+ memcpy_from_iter_mc()
+Thread-Index: AQHZ0DpP/l59sWTPXU+UuQ9VGbJikq/s16Kg///6foCAACRpIIAA7PpbgABGFYCAAgTAc4AAASpw
+Date:   Fri, 18 Aug 2023 15:42:05 +0000
+Message-ID: <d8fce3c159b04fdca65cc4d5c307854d@AcuMS.aculab.com>
+References: <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
+ <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com>
+ <20230816120741.534415-1-dhowells@redhat.com>
+ <20230816120741.534415-3-dhowells@redhat.com>
+ <608853.1692190847@warthog.procyon.org.uk>
+ <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
+ <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
+ <665724.1692218114@warthog.procyon.org.uk>
+ <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com>
+ <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
+ <2058762.1692371971@warthog.procyon.org.uk>
+In-Reply-To: <2058762.1692371971@warthog.procyon.org.uk>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 18 Aug 2023 16:19:31 +0100
-Message-ID: <2058762.1692371971@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
-
-> > Although I'm not sure the bit-fields really help.
-> > There are 8 bytes at the start of the structure, might as well
-> > use them :-)
->=20
-> Actually=C3=A7 I wrote the patch that way because it seems to improve code
-> generation.
->=20
-> The bitfields are generally all set together as just plain one-time
-> constants at initialization time, and gcc sees that it's a full byte
-> write. And the reason 'data_source' is not a bitfield is that it's not
-> a constant at iov_iter init time (it's an argument to all the init
-> functions), so having that one as a separate byte at init time is good
-> for code generation when you don't need to mask bits or anything like
-> that.
->=20
-> And once initialized, having things be dense and doing all the
-> compares with a bitwise 'and' instead of doing them as some value
-> compare again tends to generate good code.
-
-Actually...  I said that switch(enum) seemed to generate suboptimal code...
-However, if the enum is renumbered such that the constants are in the same
-order as in the switch() it generates better code.
-
-So we want this order:
-
-	enum iter_type {
-		ITER_UBUF,
-		ITER_IOVEC,
-		ITER_BVEC,
-		ITER_KVEC,
-		ITER_XARRAY,
-		ITER_DISCARD,
-	};
-
-to match:
-
-	switch (iov_iter_type(iter)) {
-	case ITER_UBUF:
-		progress =3D iterate_ubuf(iter, len, priv, priv2, ustep);
-		break;
-	case ITER_IOVEC:
-		progress =3D iterate_iovec(iter, len, priv, priv2, ustep);
-		break;
-	case ITER_BVEC:
-		progress =3D iterate_bvec(iter, len, priv, priv2, step);
-		break;
-	case ITER_KVEC:
-		progress =3D iterate_kvec(iter, len, priv, priv2, step);
-		break;
-	case ITER_XARRAY:
-		progress =3D iterate_xarray(iter, len, priv, priv2, step);
-		break;
-	case ITER_DISCARD:
-	default:
-		progress =3D len;
-		break;
-	}
-
-then gcc should be able to generate a ternary tree, which it does here:
-
-	<+77>:	mov    (%rdx),%al
-	<+79>:	cmp    $0x2,%al
-	<+81>:	je     0xffffffff81779bcc <_copy_from_iter+394>
-	<+87>:	ja     0xffffffff81779aa9 <_copy_from_iter+103>
-
-though it really split the number space in the wrong place.  It can then use
-one CMP (or TEST) to split again:
-
-	<+89>:	test   %al,%al
-	<+91>:	mov    0x8(%rdx),%rdx
-	<+95>:	jne    0xffffffff81779b48 <_copy_from_iter+262>
-	<+101>:	jmp    0xffffffff81779b17 <_copy_from_iter+213>
-
-It then should only require one CMP at this point, since AL can only be 4, 5
-or 6+:
-
-	<+103>:	cmp    $0x3,%al
-	<+105>:	je     0xffffffff81779c6e <_copy_from_iter+556>
-	<+111>:	cmp    $0x4,%al
-	<+113>:	jne    0xffffffff81779dd2 <_copy_from_iter+912>
-
-The end result being that it should have at most two CMP instructions for a=
-ny
-number in the range 0 to 5 - though in this case, it will have three for AL=
->3.
-
-However, it doesn't do this with if-if-if with a number sequence or a bitma=
-sk,
-but rather generates an chain of cmp-cmp-cmp or test-test-test, presumably
-because it fails to spot the if-conditions are related.
-
-I should log a gcc bug on this on the poor switch() behaviour.
-
-Also, if we renumber the enum to put UBUF and IOVEC first, we can get rid of
-iter->user_backed in favour of:
-
-	static inline bool user_backed_iter(const struct iov_iter *i)
-	{
-		return iter_is_ubuf(i) || iter_is_iovec(i);
-	}
-
-which gcc just changes into something like a "CMP $1" and a "JA".
-
-
-Comparing Linus's bit patch (+ is better) to renumbering the switch (- is
-better):
-
-__iov_iter_get_pages_alloc               inc 0x32a -> 0x331 +0x7
-_copy_from_iter                          dcr 0x3c7 -> 0x3bf -0x8
-_copy_from_iter_flushcache               inc 0x364 -> 0x370 +0xc
-_copy_from_iter_nocache                  inc 0x33e -> 0x347 +0x9
-_copy_mc_to_iter                         dcr 0x3bc -> 0x3b6 -0x6
-_copy_to_iter                            inc 0x34a -> 0x34b +0x1
-copy_page_from_iter_atomic.part.0        dcr 0x424 -> 0x41c -0x8
-copy_page_to_iter_nofault.part.0         dcr 0x3a9 -> 0x3a5 -0x4
-csum_and_copy_from_iter                  inc 0x3e5 -> 0x3e8 +0x3
-csum_and_copy_to_iter                    dcr 0x449 -> 0x448 -0x1
-dup_iter                                 inc 0x34 -> 0x37 +0x3
-fault_in_iov_iter_readable               dcr 0x9c -> 0x9a -0x2
-fault_in_iov_iter_writeable              dcr 0x9c -> 0x9a -0x2
-iov_iter_advance                         dcr 0xde -> 0xd8 -0x6
-iov_iter_alignment                       inc 0xe0 -> 0xe3 +0x3
-iov_iter_extract_pages                   inc 0x416 -> 0x418 +0x2
-iov_iter_gap_alignment                   dcr 0x69 -> 0x67 -0x2
-iov_iter_init                            inc 0x27 -> 0x31 +0xa
-iov_iter_is_aligned                      dcr 0x104 -> 0xf5 -0xf
-iov_iter_npages                          inc 0x119 -> 0x11d +0x4
-iov_iter_revert                          dcr 0x93 -> 0x86 -0xd
-iov_iter_single_seg_count                dcr 0x41 -> 0x3c -0x5
-iov_iter_ubuf                            inc 0x39 -> 0x3a +0x1
-iov_iter_zero                            dcr 0x338 -> 0x32e -0xa
-memcpy_from_iter_mc                      inc 0x2a -> 0x2b +0x1
-
-I think there may be more savings to be made if I go and convert more of the
-functions to using switch().
-
-David
+RnJvbTogRGF2aWQgSG93ZWxscw0KPiBTZW50OiBGcmlkYXksIEF1Z3VzdCAxOCwgMjAyMyA0OjIw
+IFBNDQo+IA0KPiBMaW51cyBUb3J2YWxkcyA8dG9ydmFsZHNAbGludXgtZm91bmRhdGlvbi5vcmc+
+IHdyb3RlOg0KPiANCj4gPiA+IEFsdGhvdWdoIEknbSBub3Qgc3VyZSB0aGUgYml0LWZpZWxkcyBy
+ZWFsbHkgaGVscC4NCj4gPiA+IFRoZXJlIGFyZSA4IGJ5dGVzIGF0IHRoZSBzdGFydCBvZiB0aGUg
+c3RydWN0dXJlLCBtaWdodCBhcyB3ZWxsDQo+ID4gPiB1c2UgdGhlbSA6LSkNCj4gPg0KPiA+IEFj
+dHVhbGx5w6cgSSB3cm90ZSB0aGUgcGF0Y2ggdGhhdCB3YXkgYmVjYXVzZSBpdCBzZWVtcyB0byBp
+bXByb3ZlIGNvZGUNCj4gPiBnZW5lcmF0aW9uLg0KPiA+DQo+ID4gVGhlIGJpdGZpZWxkcyBhcmUg
+Z2VuZXJhbGx5IGFsbCBzZXQgdG9nZXRoZXIgYXMganVzdCBwbGFpbiBvbmUtdGltZQ0KPiA+IGNv
+bnN0YW50cyBhdCBpbml0aWFsaXphdGlvbiB0aW1lLCBhbmQgZ2NjIHNlZXMgdGhhdCBpdCdzIGEg
+ZnVsbCBieXRlDQo+ID4gd3JpdGUuIEFuZCB0aGUgcmVhc29uICdkYXRhX3NvdXJjZScgaXMgbm90
+IGEgYml0ZmllbGQgaXMgdGhhdCBpdCdzIG5vdA0KPiA+IGEgY29uc3RhbnQgYXQgaW92X2l0ZXIg
+aW5pdCB0aW1lIChpdCdzIGFuIGFyZ3VtZW50IHRvIGFsbCB0aGUgaW5pdA0KPiA+IGZ1bmN0aW9u
+cyksIHNvIGhhdmluZyB0aGF0IG9uZSBhcyBhIHNlcGFyYXRlIGJ5dGUgYXQgaW5pdCB0aW1lIGlz
+IGdvb2QNCj4gPiBmb3IgY29kZSBnZW5lcmF0aW9uIHdoZW4geW91IGRvbid0IG5lZWQgdG8gbWFz
+ayBiaXRzIG9yIGFueXRoaW5nIGxpa2UNCj4gPiB0aGF0Lg0KPiA+DQo+ID4gQW5kIG9uY2UgaW5p
+dGlhbGl6ZWQsIGhhdmluZyB0aGluZ3MgYmUgZGVuc2UgYW5kIGRvaW5nIGFsbCB0aGUNCj4gPiBj
+b21wYXJlcyB3aXRoIGEgYml0d2lzZSAnYW5kJyBpbnN0ZWFkIG9mIGRvaW5nIHRoZW0gYXMgc29t
+ZSB2YWx1ZQ0KPiA+IGNvbXBhcmUgYWdhaW4gdGVuZHMgdG8gZ2VuZXJhdGUgZ29vZCBjb2RlLg0K
+PiANCj4gQWN0dWFsbHkuLi4gIEkgc2FpZCB0aGF0IHN3aXRjaChlbnVtKSBzZWVtZWQgdG8gZ2Vu
+ZXJhdGUgc3Vib3B0aW1hbCBjb2RlLi4uDQo+IEhvd2V2ZXIsIGlmIHRoZSBlbnVtIGlzIHJlbnVt
+YmVyZWQgc3VjaCB0aGF0IHRoZSBjb25zdGFudHMgYXJlIGluIHRoZSBzYW1lDQo+IG9yZGVyIGFz
+IGluIHRoZSBzd2l0Y2goKSBpdCBnZW5lcmF0ZXMgYmV0dGVyIGNvZGUuDQoNCkhtbW0uLiB0aGUg
+b3JkZXIgb2YgdGhlIHN3aXRjaCBsYWJlbHMgcmVhbGx5IHNob3VsZG4ndCBtYXR0ZXIuDQoNClRo
+ZSBhZHZhbnRhZ2Ugb2YgdGhlIGlmLWNoYWluIGlzIHRoYXQgeW91IGNhbiBvcHRpbWlzZSBmb3IN
+CnRoZSBtb3N0IGNvbW1vbiBjYXNlLg0KDQo+IFNvIHdlIHdhbnQgdGhpcyBvcmRlcjoNCj4gDQo+
+IAllbnVtIGl0ZXJfdHlwZSB7DQo+IAkJSVRFUl9VQlVGLA0KPiAJCUlURVJfSU9WRUMsDQo+IAkJ
+SVRFUl9CVkVDLA0KPiAJCUlURVJfS1ZFQywNCj4gCQlJVEVSX1hBUlJBWSwNCj4gCQlJVEVSX0RJ
+U0NBUkQsDQo+IAl9Ow0KDQpXaWxsIGdjYyBhY3R1YWxseSBjb2RlIHRoaXMgdmVyc2lvbiB3aXRo
+b3V0IHBlc3NpbWlzaW5nIGl0Pw0KDQoJaWYgKGxpa2VseSh0eXBlIDw9IElURVJfSU9WRUMpIHsN
+CgkJaWYgKGxpa2VseSh0eXBlICE9IElURVJfSU9WRUMpKQ0KCQkJaXRlcmF0ZV91YnVmKCk7DQoJ
+CWVsc2UNCgkJCWl0ZXJhdGVfaW92ZWMoKTsNCgl9IGVsc2UgaWYgKGxpa2VseSh0eXBlKSA8PSBJ
+VEVSX0tWRUMpKSB7DQoJCWlmICh0eXBlID09IElURVJfS1ZFQykNCgkJCWl0ZXJhdGVfa3ZlYygp
+Ow0KCQllbHNlDQoJCQlpdGVyYXRlX2J2ZWMoKTsNCgl9IGVsc2UgaWYgKHR5cGUgPT0gSVRFUl9Y
+QVJSQVkpIHsNCgkJaXRlcmF0ZV94YXJyYXIoKQ0KCX0gZWxzZSB7DQoJCWRpc2NhcmQ7DQoJfQ0K
+DQpCdXQgSSBiZXQgeW91IGNhbid0IHN0b3AgaXQgcmVwbGljYXRpbmcgdGhlIGNvbXBhcmVzLg0K
+KGVzcGVjaWFsbHkgd2l0aCB0aGUgbGlrZWx5KCkuDQoNClRoYXQgaGFzIHR3byBtaXMtcHJlZGlj
+dGVkIChhcmUgdGhleSBldmVyIHJpZ2h0ISkgYnJhbmNoZXMgaW4gdGhlDQpjb21tb24gdXNlci1j
+b3B5IHZlcnNpb25zIGFuZCB0aHJlZSBpbiB0aGUgY29tbW9uIGtlcm5lbCBvbmVzLg0KDQpJbiBz
+b21lIGFyY2hpdGVjdHVyZXMgeW91IG1pZ2h0IGdldCB0aGUgZGVmYXVsdCAnZmFsbCB0aHJvdWdo
+Jw0KdG8gdGhlIFVCVUYgY29kZSBpZiB0aGUgYnJhbmNoZXMgYXJlbid0IHByZWRpY3RhYmxlLg0K
+QnV0IEkgYmVsaWV2ZSBjdXJyZW50IHg4NiBjcHUgbmV2ZXIgZG8gc3RhdGljIHByZWRpY3Rpb24u
+DQpTbyB5b3UgYWx3YXlzIGxvc2UgOi0pDQoNCi4uLg0KPiAJc3RhdGljIGlubGluZSBib29sIHVz
+ZXJfYmFja2VkX2l0ZXIoY29uc3Qgc3RydWN0IGlvdl9pdGVyICppKQ0KPiAJew0KPiAJCXJldHVy
+biBpdGVyX2lzX3VidWYoaSkgfHwgaXRlcl9pc19pb3ZlYyhpKTsNCj4gCX0NCj4gDQo+IHdoaWNo
+IGdjYyBqdXN0IGNoYW5nZXMgaW50byBzb21ldGhpbmcgbGlrZSBhICJDTVAgJDEiIGFuZCBhICJK
+QSIuDQoNClRoYXQgbWFrZXMgc2Vuc2UuLi4NCg0KPiBDb21wYXJpbmcgTGludXMncyBiaXQgcGF0
+Y2ggKCsgaXMgYmV0dGVyKSB0byByZW51bWJlcmluZyB0aGUgc3dpdGNoICgtIGlzDQo+IGJldHRl
+cik6DQo+IA0KLi4uLg0KPiBpb3ZfaXRlcl9pbml0ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IGluYyAweDI3IC0+IDB4MzEgKzB4YQ0KDQpBcmUgeW91IGhpdHRpbmcgdGhlIGdjYyBidWcgdGhh
+dCBsb2FkcyB0aGUgY29uc3RhbnQgZnJvbSBtZW1vcnk/DQoNCj4gSSB0aGluayB0aGVyZSBtYXkg
+YmUgbW9yZSBzYXZpbmdzIHRvIGJlIG1hZGUgaWYgSSBnbyBhbmQgY29udmVydCBtb3JlIG9mIHRo
+ZQ0KPiBmdW5jdGlvbnMgdG8gdXNpbmcgc3dpdGNoKCkuDQoNClNpemUgaXNuJ3QgZXZlcnl0aGlu
+ZywgdGhlIGNvZGUgbmVlZHMgdG8gYmUgb3B0aW1pc2VkIGZvciB0aGUgaG90IHBhdGhzLg0KDQoJ
+RGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1v
+dW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEz
+OTczODYgKFdhbGVzKQ0K
 
