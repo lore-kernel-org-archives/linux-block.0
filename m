@@ -2,162 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C30EE498F
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 19:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F469EE4992
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 21:07:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379741AbjHRTro (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 15:47:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46664 "EHLO
+        id S238580AbjHRVGc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 17:06:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379885AbjHRTrh (ORCPT
+        with ESMTP id S237031AbjHRVGO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 15:47:37 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A876B421C;
-        Fri, 18 Aug 2023 12:46:58 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bdbbede5d4so10566595ad.2;
-        Fri, 18 Aug 2023 12:46:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692387901; x=1692992701;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G2eimpFm6MK7s06b9e2Yr8gGU9ocIPL07Hu4zNTtE8k=;
-        b=icjYkjleRgprSdUBwxJldGgKPFPquCqEjZDmVVR7NRV+WZng7THctHt67Zl1vVKe2n
-         yS03uMsebQ/NyEkoFaLkC7j3hZ2nJLaiRZzpYkK/P1HEOLY+CO5GtzU3XqolNaWGXMpI
-         8DR1mF6p6LNzuqijMWoyHMVm4axzVnFvcfo3p6U5TRUA1lghhuln1R+TxqQm4tlhzP2o
-         xrg/Fx0HfbBStdJNJvUdogdPuD7zD7SlQd48ZK4vQTFi2tPhB7Fv7KugWu26MKx301yI
-         Th21tGzRL6qO5dYL9Zyl2AJDmULuHeUocMQGN8mnPkrWRpavpcGSvgKuG2ot/6dUPyKj
-         zoFg==
-X-Gm-Message-State: AOJu0YzPnXkiBFy4VVZrOlDkoZ/ESvEx7mp+UEhFkBnh/cEp2kZF4/Rn
-        FZRE9UPeTQEMd6gckF82GpQ=
-X-Google-Smtp-Source: AGHT+IEzQyQxebBEERIXq39XaYdL9hcGXjvOR8wwBm3yITuIDviWJAlq8pG7+z7S6AnZS8ARxnK3sQ==
-X-Received: by 2002:a17:902:e809:b0:1bc:671d:6d28 with SMTP id u9-20020a170902e80900b001bc671d6d28mr265674plg.10.1692387901309;
-        Fri, 18 Aug 2023 12:45:01 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5012:5192:47aa:c304])
-        by smtp.gmail.com with ESMTPSA id u16-20020a170903125000b001bb8be10a84sm2115801plh.304.2023.08.18.12.45.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 12:45:01 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Fri, 18 Aug 2023 17:06:14 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2DA44214;
+        Fri, 18 Aug 2023 14:06:13 -0700 (PDT)
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37IKgH0k030329;
+        Fri, 18 Aug 2023 21:05:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=dKug2rspLP9ozJB6khd+VSG2uY3kPoHYW02E0VLxC8w=;
+ b=X+26jvrT0NGiofyDTEanDTUnbdxNNIbmEUNpBc3bL+RP4qqalt8qcULPQkTPHtl4+CPg
+ 5GOFE8bzzIO82F/pyCBB3t2uiX2NW6rtQN6NY9QuOdpd/vRAWfkj5Qu1AoG2PUI5kaPh
+ 0Bi4PnqZs7ttY9OomHq8561zttnaWQdAdGIo4yWtYgdvKFaFzlIrbVxN5XzHax2/njaE
+ jYShNWIKDNPOw40V4XgRyVX1SdYXm6OQuRnb9HT18UOkkpGD3Q9kpgaCSiUKkRP++p8S
+ nAFnPgGDtWS3LEwsoQV6Z55GzQ0ccqS9fyK0pPvLE53ROvY3SSZpC8+b5jICjZMW+OVY xQ== 
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sj5t49b5q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Aug 2023 21:05:44 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+        by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37IL5hnl016064
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Aug 2023 21:05:43 GMT
+Received: from [192.168.143.77] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Fri, 18 Aug
+ 2023 14:05:42 -0700
+Message-ID: <81030155-6df7-a7b0-a4ee-584aca6908e6@quicinc.com>
+Date:   Fri, 18 Aug 2023 14:05:42 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v10 11/18] scsi: ufs: Change the return type of
+ ufshcd_auto_hibern8_update()
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Can Guo <quic_cang@quicinc.com>,
+        "Can Guo" <quic_cang@quicinc.com>,
         Avri Altman <avri.altman@wdc.com>,
-        "Bao D . Nguyen" <quic_nguyenb@quicinc.com>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Stanley Chu <stanley.chu@mediatek.com>,
         Bean Huo <beanhuo@micron.com>,
-        Asutosh Das <quic_asutoshd@quicinc.com>,
-        Arthur Simchaev <Arthur.Simchaev@wdc.com>
-Subject: [PATCH v10 18/18] scsi: ufs: Inform the block layer about write ordering
-Date:   Fri, 18 Aug 2023 12:34:21 -0700
-Message-ID: <20230818193546.2014874-19-bvanassche@acm.org>
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-In-Reply-To: <20230818193546.2014874-1-bvanassche@acm.org>
+        Jinyoung Choi <j-young.choi@samsung.com>,
+        Peter Wang <peter.wang@mediatek.com>,
+        Lu Hongfei <luhongfei@vivo.com>,
+        Daniil Lunev <dlunev@chromium.org>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        "Asutosh Das" <quic_asutoshd@quicinc.com>,
+        Arthur Simchaev <arthur.simchaev@wdc.com>,
+        zhanghui <zhanghui31@xiaomi.com>,
+        Po-Wen Kao <powen.kao@mediatek.com>,
+        "Eric Biggers" <ebiggers@google.com>,
+        Keoseong Park <keosung.park@samsung.com>
 References: <20230818193546.2014874-1-bvanassche@acm.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ <20230818193546.2014874-12-bvanassche@acm.org>
+From:   "Bao D. Nguyen" <quic_nguyenb@quicinc.com>
+In-Reply-To: <20230818193546.2014874-12-bvanassche@acm.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: f7ang_Zw2e79v08ygADikeOXe9FLOGAG
+X-Proofpoint-ORIG-GUID: f7ang_Zw2e79v08ygADikeOXe9FLOGAG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-18_26,2023-08-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ clxscore=1015 lowpriorityscore=0 mlxlogscore=760 adultscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 phishscore=0 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308180193
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
-"The host controller always process transfer requests in-order according
-to the order submitted to the list. In case of multiple commands with
-single doorbell register ringing (batch mode), The dispatch order for
-these transfer requests by host controller will base on their index in
-the List. A transfer request with lower index value will be executed
-before a transfer request with higher index value."
+On 8/18/2023 12:34 PM, Bart Van Assche wrote:
+> A later patch will introduce an error path in ufshcd_auto_hibern8_update().
+> Change the return type of that function before introducing calls to that
+> function in the host drivers such that the host drivers only have to be
+> modified once.
+> 
 
-From the UFSHCI 4.0 specification, about the MCQ mode:
-"Command Submission
-1. Host SW writes an Entry to SQ
-2. Host SW updates SQ doorbell tail pointer
-
-Command Processing
-3. After fetching the Entry, Host Controller updates SQ doorbell head
-   pointer
-4. Host controller sends COMMAND UPIU to UFS device"
-
-In other words, for both legacy and MCQ mode, UFS controllers are
-required to forward commands to the UFS device in the order these
-commands have been received from the host.
-
-Notes:
-- For legacy mode this is only correct if the host submits one
-  command at a time. The UFS driver does this.
-- Also in legacy mode, the command order is not preserved if
-  auto-hibernation is enabled in the UFS controller. Hence, enable
-  zone write locking if auto-hibernation is enabled.
-
-This patch improves performance as follows on my test setup:
-- With the mq-deadline scheduler: 2.5x more IOPS for small writes.
-- When not using an I/O scheduler compared to using mq-deadline with
-  zone locking: 4x more IOPS for small writes.
-
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Can Guo <quic_cang@quicinc.com>
-Cc: Avri Altman <avri.altman@wdc.com>
-Cc: Bao D. Nguyen <quic_nguyenb@quicinc.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/ufs/core/ufshcd.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index c28a362b5b99..a685058d4943 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -4357,6 +4357,19 @@ static int ufshcd_update_preserves_write_order(struct ufs_hba *hba,
- 				return -EPERM;
- 		}
- 	}
-+	shost_for_each_device(sdev, hba->host)
-+		blk_freeze_queue_start(sdev->request_queue);
-+	shost_for_each_device(sdev, hba->host) {
-+		struct request_queue *q = sdev->request_queue;
-+
-+		blk_mq_freeze_queue_wait(q);
-+		q->limits.driver_preserves_write_order = preserves_write_order;
-+		blk_queue_required_elevator_features(q,
-+			preserves_write_order ? 0 : ELEVATOR_F_ZBD_SEQ_WRITE);
-+		if (q->disk)
-+			disk_set_zoned(q->disk, q->limits.zoned);
-+		blk_mq_unfreeze_queue(q);
-+	}
- 
- 	return 0;
- }
-@@ -4397,7 +4410,8 @@ int ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
- 
- 	if (!is_mcq_enabled(hba) && !prev_state && new_state) {
- 		/*
--		 * Auto-hibernation will be enabled for legacy UFSHCI mode.
-+		 * Auto-hibernation will be enabled for legacy UFSHCI mode. Tell
-+		 * the block layer that write requests may be reordered.
- 		 */
- 		ret = ufshcd_update_preserves_write_order(hba, false);
- 		if (ret)
-@@ -4413,7 +4427,8 @@ int ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
- 	}
- 	if (!is_mcq_enabled(hba) && prev_state && !new_state) {
- 		/*
--		 * Auto-hibernation has been disabled.
-+		 * Auto-hibernation has been disabled. Tell the block layer that
-+		 * the order of write requests is preserved.
- 		 */
- 		ret = ufshcd_update_preserves_write_order(hba, true);
- 		WARN_ON_ONCE(ret);
-@@ -5191,6 +5206,9 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
- 
- 	ufshcd_hpb_configure(hba, sdev);
- 
-+	q->limits.driver_preserves_write_order =
-+		!ufshcd_is_auto_hibern8_supported(hba) ||
-+		FIELD_GET(UFSHCI_AHIBERN8_TIMER_MASK, hba->ahit) == 0;
- 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
- 	if (hba->quirks & UFSHCD_QUIRK_4KB_DMA_ALIGNMENT)
- 		blk_queue_update_dma_alignment(q, SZ_4K - 1);
+Reviewed-by: Bao D. Nguyen <quic_nguyenb@quicinc.com>
