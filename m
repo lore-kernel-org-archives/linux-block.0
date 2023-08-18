@@ -2,129 +2,157 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56825EE498B
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 17:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C6F3EE4997
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 19:46:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351746AbjHRR5N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 13:57:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48138 "EHLO
+        id S1344014AbjHRTpg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 15:45:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379336AbjHRR4y (ORCPT
+        with ESMTP id S1379919AbjHRTpe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 13:56:54 -0400
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840074214;
-        Fri, 18 Aug 2023 10:56:52 -0700 (PDT)
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3a7d7de894bso819673b6e.3;
-        Fri, 18 Aug 2023 10:56:52 -0700 (PDT)
+        Fri, 18 Aug 2023 15:45:34 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB8E4684;
+        Fri, 18 Aug 2023 12:45:12 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1bc3d94d40fso10692775ad.3;
+        Fri, 18 Aug 2023 12:45:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692381412; x=1692986212;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yuI8MkzJJoYh9dvd2xid2uOhj8pnHKRXjd43RBRg0rA=;
-        b=YRUUy0d97cF3EieH1zBYnulOqjt0CsKF2rXIm82o4FR16NisD7RhgXHmotxszwon8z
-         57CGrasuoKfew3m9keBTB4ZS0zDSIFzXiAloZk0QbewZdTw62duZHeYt4bJ2Wzj7lLhf
-         83Lp2XT0tfrQkoiR4kCgJqhF/XFWquWR76NNDeWawpQVGNKmmPc7NzXP9jOeC23o3uCx
-         ngDpUBrgx6IcOulaZcvbHgSPVERIcOrMwlEHI3sWJPie75YHjS709dWw1T6LfuEaGDg6
-         AiUl/o2wokk0Lxs8+jYrv9CpVeGLYHxaks49riXKkE0Q/f+z1QL7RSAfwY4AzWEaFGv/
-         Iy9A==
-X-Gm-Message-State: AOJu0YxOHQweRRjSnu0FghZjwi9vd3jGBNNuil+6MRUlExo6+zlUba70
-        jVkAjJoX/q2VjPLO2hn6qI7HMckwKus=
-X-Google-Smtp-Source: AGHT+IG3s71S8mL+h2YgIMAHMOvvnlkeYHbs5HTsCQlY3OPhMzNh2LAEGZwiYZ2jf+LcFR/QsYV4Xg==
-X-Received: by 2002:a05:6808:1307:b0:3a4:894a:9f57 with SMTP id y7-20020a056808130700b003a4894a9f57mr4428972oiv.6.1692381411564;
-        Fri, 18 Aug 2023 10:56:51 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:5012:5192:47aa:c304? ([2620:15c:211:201:5012:5192:47aa:c304])
-        by smtp.gmail.com with ESMTPSA id p8-20020a63ab08000000b005642a68a508sm1858800pgf.35.2023.08.18.10.56.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Aug 2023 10:56:50 -0700 (PDT)
-Message-ID: <06d34c2f-a89e-3134-d78f-3c071aa490cf@acm.org>
-Date:   Fri, 18 Aug 2023 10:56:49 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH v9 17/17] scsi: ufs: Inform the block layer about write
- ordering
-Content-Language: en-US
-To:     "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
-        Jens Axboe <axboe@kernel.dk>
+        d=1e100.net; s=20221208; t=1692387790; x=1692992590;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A0wk1xa90VnYAyPUoUN4zedZwQDxNHF4MtXWEOIMiWM=;
+        b=bgzdamJIIrI7Tz0mnbPud/KLhqu3iw19owxqH6wugbCKVumeZL96ZygzorwKbFZQ+V
+         TKTxs/syf4EUSrog5lg5qJ+UAYH/1Wqm2Hqp/fN2wiiRMQMORHtKCgCC/0kyh20HkmO4
+         t6Oq0ELKTElWreD8bkvapE5dulal13T/TLZaQ6NqmSG955DeiFly35nVS6gq+pK02zVN
+         wcHHGkF106siEY4VlQyhOaCxiq2bCdbF17D/FjGaJhuzw5R7e/S9VQup4wOtOWnLlL6g
+         nKj96QOFhzm1idGvys9VMcE76rU1j0efuAaF+kbIe+qejBMGSpZvrYPzvvWEuavYnG53
+         w3FA==
+X-Gm-Message-State: AOJu0Yw98k2X9f4hLyMWXw7hhO4ZOIDExHhB/jrxXD4HNcGx7smKWAQH
+        ei0wK69af2zEQfXtxDwGNUo=
+X-Google-Smtp-Source: AGHT+IGnCDxz1tQlpiy7M2N5WUTK9mPo33ZafgMMWUjR1b6pbtgoL87mgKTCtQMPozbcH92qYmIdZw==
+X-Received: by 2002:a17:902:d4c9:b0:1b8:a88c:4dc6 with SMTP id o9-20020a170902d4c900b001b8a88c4dc6mr194814plg.45.1692387789982;
+        Fri, 18 Aug 2023 12:43:09 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5012:5192:47aa:c304])
+        by smtp.gmail.com with ESMTPSA id u16-20020a170903125000b001bb8be10a84sm2115801plh.304.2023.08.18.12.43.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Aug 2023 12:43:09 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
-        Can Guo <quic_cang@quicinc.com>,
-        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
         Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Bean Huo <beanhuo@micron.com>,
-        Asutosh Das <quic_asutoshd@quicinc.com>,
-        Arthur Simchaev <Arthur.Simchaev@wdc.com>
-References: <20230816195447.3703954-1-bvanassche@acm.org>
- <20230816195447.3703954-18-bvanassche@acm.org>
- <666c6d78-d975-c9f9-4ad2-c9fa86497b47@quicinc.com>
- <4f332520-329c-6355-3aa3-cd5e29716a06@acm.org>
- <97100392-0c17-e950-1dd4-c52b97aecbe8@quicinc.com>
- <5d8e90b9-34c8-5cab-2653-6f28e68eda94@acm.org>
- <8299025e-e895-8fdb-c62d-80f1d4c9b64c@quicinc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <8299025e-e895-8fdb-c62d-80f1d4c9b64c@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v10 01/18] block: Introduce more member variables related to zone write locking
+Date:   Fri, 18 Aug 2023 12:34:04 -0700
+Message-ID: <20230818193546.2014874-2-bvanassche@acm.org>
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+In-Reply-To: <20230818193546.2014874-1-bvanassche@acm.org>
+References: <20230818193546.2014874-1-bvanassche@acm.org>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/17/23 17:19, Bao D. Nguyen wrote:
-> For example, in SDB mode, after the probe and you want to enable auto-hibern8, you would call ufshcd_auto_hibern8_update() which then calls
-> ufshcd_update_preserves_write_order(). Before auto-hibern8 is enabled, you would check this condition:
->      if (blk_queue_is_zoned(q) && !q->elevator)
-> 
-> In other words, auto-hibern8 is enabled only if the above condition false.
-> 
-> However, the during a normal operation, the ufshcd_auto_hibern8_update() may not get called at all, and auto-hibern8 can be enabled in SDB mode as part of ufs init. Would that be a problem to have auto-hibern8 enabled without checking whether the above condition is false?
+Many but not all storage controllers require serialization of zoned writes.
+Introduce two new request queue limit member variables related to write
+serialization. 'driver_preserves_write_order' allows block drivers to
+indicate that the order of write commands is preserved and hence that
+serialization of writes per zone is not required. 'use_zone_write_lock' is
+set by disk_set_zoned() if and only if the block device has zones and if
+the block driver does not preserve the order of write requests.
 
-Hi Bao,
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-settings.c   | 15 +++++++++++++++
+ block/blk-zoned.c      |  1 +
+ include/linux/blkdev.h | 10 ++++++++++
+ 3 files changed, 26 insertions(+)
 
-Probing the host controller happens as follows:
-* The host controller probing function is called, e.g. ufs_qcom_probe().
-* ufshcd_alloc_host() and ufshcd_init() are called directly or indirectly
-   by the host controller probe function.
-* ufshcd_init() calls scsi_add_host() and async_schedule(ufshcd_async_scan, hba).
-
-Once ufshcd_async_scan() is called asynchronously, it performs the
-following actions:
-* ufs_probe_hba() is called. This function calls ufshcd_link_startup()
-   indirectly. That function invokes the link_startup_notify vop if it has
-   been defined. Some host drivers set hba->ahit from inside that vop.
-* scsi_scan_host() is called and calls scsi_alloc_sdev() indirectly.
-* scsi_alloc_sdev() calls blk_mq_init_queue() and shost->hostt->slave_alloc().
-* scsi_add_lun() calls sdev->host->hostt->slave_configure().
-* scsi_add_lun() calls scsi_sysfs_add_sdev(). This indirectly causes sd_probe()
-   to be called asynchronously.
-* sd_probe() calls sd_revalidate_disk(). This results in an indirect call of
-   disk_set_zoned(). Additionally, the ELEVATOR_F_ZBD_SEQ_WRITE flag is set by
-   the sd driver if q->limits.driver_preserves_write_order has not been set.
-* Still from inside sd_probe(), device_add_disk() is called and a scheduler
-   is selected based on the value of q->required_elevator_features.
-
-There are two ways in which host drivers initialize auto-hibernation:
-* Either by setting hba->ahit before ufshcd_init() is called.
-* Or by calling ufshcd_auto_hibern8_update() from the link_startup_notify
-   vop.
-
-I think the above shows that the zoned model is queried *after* the above methods
-for enabling auto-hibernation have completed and hence that blk_queue_is_zoned()
-evaluates to false if a host driver calls ufshcd_auto_hibern8_update() from
-inside the link_startup_notify vop.
-
-If auto-hibernation is enabled from inside the host driver then that should
-happen before sd_probe() is called. sd_probe() will use the value of
-q->limits.driver_preserves_write_order that has been set by
-ufshcd_slave_configure() so there is no risk for inconsistencies between the
-auto-hibernation configuration and the request queue configuration.
-
-Bart.
-
-
-
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 0046b447268f..4c776c08f190 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -56,6 +56,8 @@ void blk_set_default_limits(struct queue_limits *lim)
+ 	lim->alignment_offset = 0;
+ 	lim->io_opt = 0;
+ 	lim->misaligned = 0;
++	lim->driver_preserves_write_order = false;
++	lim->use_zone_write_lock = false;
+ 	lim->zoned = BLK_ZONED_NONE;
+ 	lim->zone_write_granularity = 0;
+ 	lim->dma_alignment = 511;
+@@ -82,6 +84,8 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+ 	lim->max_dev_sectors = UINT_MAX;
+ 	lim->max_write_zeroes_sectors = UINT_MAX;
+ 	lim->max_zone_append_sectors = UINT_MAX;
++	/* Request-based stacking drivers do not reorder requests. */
++	lim->driver_preserves_write_order = true;
+ }
+ EXPORT_SYMBOL(blk_set_stacking_limits);
+ 
+@@ -685,6 +689,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 						   b->max_secure_erase_sectors);
+ 	t->zone_write_granularity = max(t->zone_write_granularity,
+ 					b->zone_write_granularity);
++	t->driver_preserves_write_order = t->driver_preserves_write_order &&
++		b->driver_preserves_write_order;
++	t->use_zone_write_lock = t->use_zone_write_lock ||
++		b->use_zone_write_lock;
+ 	t->zoned = max(t->zoned, b->zoned);
+ 	return ret;
+ }
+@@ -949,6 +957,13 @@ void disk_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
+ 	}
+ 
+ 	q->limits.zoned = model;
++	/*
++	 * Use the zone write lock only for zoned block devices and only if
++	 * the block driver does not preserve the order of write commands.
++	 */
++	q->limits.use_zone_write_lock = model != BLK_ZONED_NONE &&
++		!q->limits.driver_preserves_write_order;
++
+ 	if (model != BLK_ZONED_NONE) {
+ 		/*
+ 		 * Set the zone write granularity to the device logical block
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 619ee41a51cc..112620985bff 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -631,6 +631,7 @@ void disk_clear_zone_settings(struct gendisk *disk)
+ 	q->limits.chunk_sectors = 0;
+ 	q->limits.zone_write_granularity = 0;
+ 	q->limits.max_zone_append_sectors = 0;
++	q->limits.use_zone_write_lock = false;
+ 
+ 	blk_mq_unfreeze_queue(q);
+ }
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c1421da8d45e..38a1a71b2bcc 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -316,6 +316,16 @@ struct queue_limits {
+ 	unsigned char		misaligned;
+ 	unsigned char		discard_misaligned;
+ 	unsigned char		raid_partial_stripes_expensive;
++	/*
++	 * Whether or not the block driver preserves the order of write
++	 * requests. Set by the block driver.
++	 */
++	bool			driver_preserves_write_order;
++	/*
++	 * Whether or not zone write locking should be used. Set by
++	 * disk_set_zoned().
++	 */
++	bool			use_zone_write_lock;
+ 	enum blk_zoned_model	zoned;
+ 
+ 	/*
