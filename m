@@ -2,64 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E99BC3DA66
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 01:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B3BC3DA66
+	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 01:18:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356834AbjHRBQ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Aug 2023 21:16:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37516 "EHLO
+        id S1356802AbjHRBR3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Aug 2023 21:17:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356872AbjHRBQo (ORCPT
+        with ESMTP id S1356868AbjHRBRO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2023 21:16:44 -0400
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5648F3A89
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:16:43 -0700 (PDT)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1c134602a55so56108fac.1
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:16:43 -0700 (PDT)
+        Thu, 17 Aug 2023 21:17:14 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 324433A9F
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:17:09 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bf095e1becso633545ad.1
+        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2023 18:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692321402; x=1692926202;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692321428; x=1692926228;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8qHPxgI+MW4SaOUNUrKbhHywGedPFGu2hUBebAKEvLc=;
-        b=Dj31joKXbt4pIMemqTw1L6yMWVlyw5kJ1zjfi+8m0nU3x1JzGMUV0dpm1iScXFZOnm
-         xtrqNQWR+vBBoOGcS4VVv79uLRNL6zZE2L62V0FhKmq5mXP8JACKxf1aaVzty188zxgt
-         oZnbtiu1diRM63gOJbWTo6nveeTWEfPzDrpY2H6+lquAfhUt3BnT8wDmvSEx3jhgd/Yc
-         +x0hiKqoopQePpwyfCcCPVTLQjyzoJfiagE2E+aGdTLD/Ck55ch4FTZaA26ZCSiHQstd
-         wq3wGCWLmPcrekSe1yxDNa0TVwa4F/kRZl3hsh2dMH+6u+W0kWjHorHdXIKO/xx+sDNH
-         yTdw==
+        bh=0rOWh71R2unsmK0j18LXUVFqJ8OAoWTJeI+ndUPvXeI=;
+        b=ZTS6fgNIGlcr8R7FOud+NC/deBiPoZ1OfG4zLqCQA3jEFU5bqr9ZrccyJKZN8251G2
+         mt3YVWglWPQ+PoGr+V9Elwd/iHFVWotmUBWoTTpLDpJqWZcmmjsWQqZtKr2Tx5Ng6QBJ
+         JaU5O57Z8hEGukbgSoUY65rqJQ7DbbWvfoGulguQvKJ6WUhy6U8IZq06DWEe8VJh1q/r
+         rhKBUDuK0aYsXiJfwntmcIL/2oqtBP2ImRlYKpOUaxefGMUGNz+qLr/GfWlPreURsZDM
+         j57QwEpbiHjQSYXwWTNG2LHD6+xyyK7M+OEMFKi0sZ89MJrV3ulYd8coCowlm4HmZKrP
+         dSqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692321402; x=1692926202;
+        d=1e100.net; s=20221208; t=1692321428; x=1692926228;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8qHPxgI+MW4SaOUNUrKbhHywGedPFGu2hUBebAKEvLc=;
-        b=W6MFDa7cSsOgTNbbmUyqQB+kqTss4YdISwvrm/8cKTXepQLLki2/lXPrR5fx0iM6sE
-         zs4SfTqtSX7sDNEoFx/F/muGA0rof/LmAax8DCHtlHHP+JvGGESfXRqJxllKFnL9LvpN
-         BTDQrwIDKi5uo4oP2PjUpFbqPlaVDEC0cJrwbBCbQ18flnZpYgqQ9csPNf+QTZvbDPy2
-         jmWK13fdZO76854iDrmlzU7JMexrvPcyp86/BFmqo3CrJN3DWlHTe7KhhrP7DgZFDkLx
-         OVOBa9d5J6rGXvBPtLZ3VFmpla2l3XFeIAF/ajPDwVG0CdxV8yDi5xdnaTzntfpJ47Ko
-         fWTQ==
-X-Gm-Message-State: AOJu0Yx+oDs7iydx821vwqxTqyFM+c6bSdXODIIyCvxfVX2GsiUWG33x
-        bbUKiejAnLI1oOgvkYGkHAcanAcLZedKpZRaaH8=
-X-Google-Smtp-Source: AGHT+IGuQbIzqUKgur1Wt/u7IQM5xQre/xKJrvSZ5gNGrgxBcTyVLf/xT/KBwAoOssW5bCPVWALT9g==
-X-Received: by 2002:a05:6870:c151:b0:1bf:9fa2:bfa3 with SMTP id g17-20020a056870c15100b001bf9fa2bfa3mr1297716oad.1.1692321402092;
-        Thu, 17 Aug 2023 18:16:42 -0700 (PDT)
+        bh=0rOWh71R2unsmK0j18LXUVFqJ8OAoWTJeI+ndUPvXeI=;
+        b=dtsKscvVJoh5jmvQ/fkPxXknWBuL/O1JNs6wo1099V+cKd2GGPhVqwlVT4+k+PhTix
+         4KD3rLBAhIiVp7hJImFHcss3OP9aWl991rkVuE9VxPpcR7NJFKDJzHXyakIZ9wmG56G/
+         zwbpjc2bkk2gaGIergrkoarV4NKhDuY/CjXhHqhQS6kVQBTfhTnSqPkNnL4vA43NpOgX
+         K5XvIKvJYx2/SEbxeUA35ruQgact7+jIqruOvguDSs6x+AiH2KeJCD+z5y/D6TdYkWbM
+         kqy2T4R/EAQ4SdBj8zQX3u9fMrLe3T2JtdJ/xTYnYjC70bhdpQ0edOuM7OOjI+lOEn4H
+         9E5w==
+X-Gm-Message-State: AOJu0Ywjv59kWHoMXkntYZuiJYW17vq/Gi9yNacWBpu0JV2ICOOZFn4L
+        PJBPqp9Hw9jbEYwbx7DHf0vsMA==
+X-Google-Smtp-Source: AGHT+IEPvuAZTF/J4BLjkzC2XooD6Ry1mwWHeucKb32CCzjPzbPPVJ6IH03SeRCWu7Un32tb1Uy72w==
+X-Received: by 2002:a17:902:e54b:b0:1bf:349f:b85c with SMTP id n11-20020a170902e54b00b001bf349fb85cmr970086plf.1.1692321428716;
+        Thu, 17 Aug 2023 18:17:08 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id gk10-20020a17090b118a00b00263f5ac814esm2138019pjb.38.2023.08.17.18.16.40
+        by smtp.gmail.com with ESMTPSA id i3-20020a170902c94300b001b890009634sm391358pla.139.2023.08.17.18.17.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 18:16:41 -0700 (PDT)
+        Thu, 17 Aug 2023 18:17:08 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
-        xiaoli feng <xifeng@redhat.com>, Chunyu Hu <chuhu@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, Tejun Heo <tj@kernel.org>
-In-Reply-To: <20230817141751.1128970-1-ming.lei@redhat.com>
-References: <20230817141751.1128970-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] blk-cgroup: hold queue_lock when removing blkg->q_node
-Message-Id: <169232140069.701299.12329118562683488055.b4-ty@kernel.dk>
-Date:   Thu, 17 Aug 2023 19:16:40 -0600
+To:     Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org,
+        kernel-team@meta.com, ebiggers@kernel.org,
+        Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Cc:     stable@vger.kernel.org
+In-Reply-To: <20230817141615.15387-1-sweettea-kernel@dorminy.me>
+References: <20230817141615.15387-1-sweettea-kernel@dorminy.me>
+Subject: Re: [PATCH v5] blk-crypto: dynamically allocate fallback profile
+Message-Id: <169232142755.701491.1403250038127170415.b4-ty@kernel.dk>
+Date:   Thu, 17 Aug 2023 19:17:07 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -69,17 +69,22 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Thu, 17 Aug 2023 22:17:51 +0800, Ming Lei wrote:
-> When blkg is removed from q->blkg_list from blkg_free_workfn(), queue_lock
-> has to be held, otherwise, all kinds of bugs(list corruption, hard lockup,
-> ..) can be triggered from blkg_destroy_all().
+On Thu, 17 Aug 2023 10:15:56 -0400, Sweet Tea Dorminy wrote:
+> blk_crypto_profile_init() calls lockdep_register_key(), which warns and
+> does not register if the provided memory is a static object.
+> blk-crypto-fallback currently has a static blk_crypto_profile and calls
+> blk_crypto_profile_init() thereupon, resulting in the warning and
+> failure to register.
 > 
+> Fortunately it is simple enough to use a dynamically allocated profile
+> and make lockdep function correctly.
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] blk-cgroup: hold queue_lock when removing blkg->q_node
-      commit: 94254d59c0d22ecf9fdd1a18dd03652fc6be19e5
+[1/1] blk-crypto: dynamically allocate fallback profile
+      commit: cc7de17e2fe6b778a836032e7e5f9991dec40a25
 
 Best regards,
 -- 
