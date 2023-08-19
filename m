@@ -2,159 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECC0EE499D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Aug 2023 21:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CA4EE49A4
+	for <linux-block@archiver.kernel.org>; Sat, 19 Aug 2023 03:18:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240561AbjHRVjo convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Aug 2023 17:39:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60380 "EHLO
+        id S244554AbjHSDN2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Aug 2023 23:13:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240712AbjHRVj0 (ORCPT
+        with ESMTP id S244595AbjHSDNG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2023 17:39:26 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D773C0F
-        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 14:39:24 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-156-hPJ_18syOlyCB1PGiL-aSA-1; Fri, 18 Aug 2023 22:39:21 +0100
-X-MC-Unique: hPJ_18syOlyCB1PGiL-aSA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 18 Aug
- 2023 22:39:20 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 18 Aug 2023 22:39:20 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'David Howells' <dhowells@redhat.com>
-CC:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@list.de>,
-        Christian Brauner <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
- memcpy_from_iter_mc()
-Thread-Topic: [PATCH v3 2/2] iov_iter: Don't deal with iter->copy_mc in
- memcpy_from_iter_mc()
-Thread-Index: AQHZ0DpP/l59sWTPXU+UuQ9VGbJikq/s16Kg///6foCAACRpIIAA7PpbgABGFYCAAgTAc4AAASpwgAAG9ACAAFxrAA==
-Date:   Fri, 18 Aug 2023 21:39:20 +0000
-Message-ID: <04ee44bc6c2d4c5bb1c143bcb6803b7b@AcuMS.aculab.com>
-References: <d8fce3c159b04fdca65cc4d5c307854d@AcuMS.aculab.com>
- <CAHk-=wi4wNm-2OjjhFEqm21xTNTvksmb5N4794isjkp9+FzngA@mail.gmail.com>
- <03730b50cebb4a349ad8667373bb8127@AcuMS.aculab.com>
- <20230816120741.534415-1-dhowells@redhat.com>
- <20230816120741.534415-3-dhowells@redhat.com>
- <608853.1692190847@warthog.procyon.org.uk>
- <3dabec5643b24534a1c1c51894798047@AcuMS.aculab.com>
- <CAHk-=wjFrVp6srTBsMKV8LBjCEO0bRDYXm-KYrq7oRk0TGr6HA@mail.gmail.com>
- <665724.1692218114@warthog.procyon.org.uk>
- <CAHk-=wg8G7teERgR7ExNUjHj0yx3dNRopjefnN3zOWWvYADXCw@mail.gmail.com>
- <d0232378a64a46659507e5c00d0c6599@AcuMS.aculab.com>
- <2058762.1692371971@warthog.procyon.org.uk>
- <2093413.1692377320@warthog.procyon.org.uk>
-In-Reply-To: <2093413.1692377320@warthog.procyon.org.uk>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Fri, 18 Aug 2023 23:13:06 -0400
+Received: from out-26.mta1.migadu.com (out-26.mta1.migadu.com [IPv6:2001:41d0:203:375::1a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABA394218
+        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2023 20:13:03 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1692414781;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Z+fBmSvZuIQpbseYhEh9Xt9nxn/9KuEbFVAwNjKXsAI=;
+        b=u628zJ4cG9HuzAFStSu6alV8eRCbTDKJTXaRYCEFfOPG62wLW5niBBZxoRHXU94DmPv6mR
+        ppXD6VP3kUuDZ/ezCOIhBV4pGUawIqZcDsD2tUv9lZejBDQZ42TuAb2zJ12p4ZB8MDZnk9
+        2XCBNHz8AkHfKTiu3l0UQEilI5lh92E=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, hch@lst.de, bvanassche@acm.org,
+        ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com, chuck.lever@oracle.com, lkp@intel.com,
+        kernel test robot <oliver.sang@intel.com>
+Subject: [PATCH] blk-mq: fix mismatch between IO scheduler insert and finish
+Date:   Sat, 19 Aug 2023 11:12:06 +0800
+Message-ID: <20230819031206.2744005-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Howells
-> Sent: Friday, August 18, 2023 5:49 PM
-> 
-> David Laight <David.Laight@ACULAB.COM> wrote:
-> 
-> > > iov_iter_init                            inc 0x27 -> 0x31 +0xa
-> >
-> > Are you hitting the gcc bug that loads the constant from memory?
-> 
-> I'm not sure what that looks like.  For your perusal, here's a disassembly of
-> the use-switch-on-enum variant:
-> 
->    0xffffffff8177726c <+0>:     cmp    $0x1,%esi
->    0xffffffff8177726f <+3>:     jbe    0xffffffff81777273 <iov_iter_init+7>
->    0xffffffff81777271 <+5>:     ud2
->    0xffffffff81777273 <+7>:     test   %esi,%esi
->    0xffffffff81777275 <+9>:     movw   $0x1,(%rdi)
->    0xffffffff8177727a <+14>:    setne  0x3(%rdi)
->    0xffffffff8177727e <+18>:    xor    %eax,%eax
->    0xffffffff81777280 <+20>:    movb   $0x0,0x2(%rdi)
->    0xffffffff81777284 <+24>:    movb   $0x1,0x4(%rdi)
->    0xffffffff81777288 <+28>:    mov    %rax,0x8(%rdi)
->    0xffffffff8177728c <+32>:    mov    %rdx,0x10(%rdi)
->    0xffffffff81777290 <+36>:    mov    %r8,0x18(%rdi)
->    0xffffffff81777294 <+40>:    mov    %rcx,0x20(%rdi)
->    0xffffffff81777298 <+44>:    jmp    0xffffffff81d728a0 <__x86_return_thunk>
-> 
-> versus the use-bitmap variant:
-> 
->    0xffffffff81777311 <+0>:     cmp    $0x1,%esi
->    0xffffffff81777314 <+3>:     jbe    0xffffffff81777318 <iov_iter_init+7>
->    0xffffffff81777316 <+5>:     ud2
->    0xffffffff81777318 <+7>:     test   %esi,%esi
->    0xffffffff8177731a <+9>:     movb   $0x2,(%rdi)
->    0xffffffff8177731d <+12>:    setne  0x1(%rdi)
->    0xffffffff81777321 <+16>:    xor    %eax,%eax
->    0xffffffff81777323 <+18>:    mov    %rdx,0x10(%rdi)
->    0xffffffff81777327 <+22>:    mov    %rax,0x8(%rdi)
->    0xffffffff8177732b <+26>:    mov    %r8,0x18(%rdi)
->    0xffffffff8177732f <+30>:    mov    %rcx,0x20(%rdi)
->    0xffffffff81777333 <+34>:    jmp    0xffffffff81d72960 <__x86_return_thunk>
-> 
-> It seems to be that the former is loading byte constants individually, whereas
-> Linus combined all those fields into a single byte and eliminated one of them.
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-I think you need to re-order the structure.
-The top set writes to bytes 0..4 with:
->    0xffffffff81777275 <+9>:     movw   $0x1,(%rdi)
->    0xffffffff8177727a <+14>:    setne  0x3(%rdi)
->    0xffffffff81777280 <+20>:    movb   $0x0,0x2(%rdi)
->    0xffffffff81777284 <+24>:    movb   $0x1,0x4(%rdi)
-Note that the 'setne' writes into the middle of the constants.
+IO scheduler has requirement that one request which has been inserted
+must call finish_request() only once.
 
-The lower writes bytes 0..1 with:
->    0xffffffff8177731a <+9>:     movb   $0x2,(%rdi)
->    0xffffffff8177731d <+12>:    setne  0x1(%rdi)
+Now we have three special cases to consider:
+1. rq has not insert, has complete: e.g. empty preflush
+2. rq has insert, has not complete: e.g. merged requests will be freed
+3. rq has insert, has twice complete: e.g. postflushes
 
-I think that if you move the 'conditional' value to offset 4
-you'll get fewer writes.
-Probably a 32bit load into %eax and then a write.
+Note case 1 which existed before, has been no problem since all the
+schedulers will check in their finish_request() if the rq has been
+inserted or not, like checking "rq->elv.priv[0]".
 
-I don't think gcc likes generating 16bit immediates.
-In some tests I did it loaded a 32bit value into %eax
-and then wrote the low bits.
-So the code is much the same (on x86) for 2 or 4 bytes
-of constants.
-I'm sure you can use the 'data-16' prefix with an immediate.
+Then case 2 and case 3 are the introduced regression, we moved the
+scheduler finish_request() from free phase to complete phase to solve
+a deadlock problem. But it caused no finish_request() for request in
+case 2, and double finish_request() for request in case 3.
 
-I'm not sure why you have two non-zero values when Linus
-only had one though.
+So we still need finish_request() in blk_mq_free_request() to cover
+case 2. And clear RQF_USE_SCHED flag to avoid double finish_request().
+It should be fine since we're freeing the request now anyway.
 
-OTOH you don't want to be writing 3 bytes of constants.
-Also gcc won't generate:
-	movl $0xaabbccdd,%eax
-	setne %al   // overwriting the dd
-	movl %eax,(%rdi)
-and I suspect the partial write (to %al) will be a stall.
+Of course, we can also make all schedulers' finish_request() to clear
+"rq->elv.priv[0]" to avoid double finish. Or clear it in blk-mq, make
+the rq like not inserted as case 1.
 
-	David
+FYI it's easy to reproduce warning in mq-deadline using this:
+```
+DEV=sdb
+echo mq-deadline > /sys/block/$DEV/queue/scheduler
+mkfs.ext4 /dev/$DEV
+mount /dev/$DEV /mnt
+cd /mnt
+stress-ng --symlink 4 --timeout 60
+echo none > /sys/block/$DEV/queue/scheduler
+```
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202308172100.8ce4b853-oliver.sang@intel.com
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-mq.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a6d59320e034..953f08354c8c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -685,8 +685,15 @@ static void blk_mq_finish_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+ 
+-	if (rq->rq_flags & RQF_USE_SCHED)
++	if (rq->rq_flags & RQF_USE_SCHED) {
+ 		q->elevator->type->ops.finish_request(rq);
++		/*
++		 * For postflush request that may need to be
++		 * completed twice, we should clear this flag
++		 * to avoid double finish_request() on the rq.
++		 */
++		rq->rq_flags &= ~RQF_USE_SCHED;
++	}
+ }
+ 
+ static void __blk_mq_free_request(struct request *rq)
+@@ -715,6 +722,8 @@ void blk_mq_free_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+ 
++	blk_mq_finish_request(rq);
++
+ 	if (unlikely(laptop_mode && !blk_rq_is_passthrough(rq)))
+ 		laptop_io_completion(q->disk->bdi);
+ 
+-- 
+2.41.0
 
