@@ -2,69 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B77EE4993
-	for <linux-block@archiver.kernel.org>; Sat, 19 Aug 2023 16:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80005EE49AA
+	for <linux-block@archiver.kernel.org>; Sun, 20 Aug 2023 14:59:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233480AbjHSQBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Aug 2023 12:01:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46198 "EHLO
+        id S231266AbjHTO7m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Aug 2023 10:59:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233777AbjHSQBp (ORCPT
+        with ESMTP id S231201AbjHTO7l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Aug 2023 12:01:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274B222A18
-        for <linux-block@vger.kernel.org>; Sat, 19 Aug 2023 09:01:44 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B246560C8C
-        for <linux-block@vger.kernel.org>; Sat, 19 Aug 2023 16:01:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1F426C433C8;
-        Sat, 19 Aug 2023 16:01:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692460903;
-        bh=dGPyCdn5zWNYku9cApY3vLXW0QrLof0r1SlB7m6y41M=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=n99DqYNE1vjrPNGIPXpKEJqTx71pwruGetjoZnKFylEW7oS8Qo+4XAlFHKzD2we0a
-         Yp/4GqnhxW/xfXBbzVXrT8BkkfNmiFlE9JSfQFnyaOsfbzJ5uI9BPbW9hTYNbIYPb7
-         boEBkTsdT5FEBBHGJD07ZRglBId/S4XwGzuyrL8scqjFa/Xkb5/Y8CJ56WjUepLQVs
-         qdUz4yFVt219SSNJUW9MYELooUAZuI84kQuk3gI/ho9gUkRMw1K7NfkEErI1uG3Oz9
-         z7ycteWiGhQ6R6sOz/YX9A8lRW9fHBIrG5iHXyDsHaiwZy6IWirhj2VCJEoaiQsc5J
-         kGvs6vs8FJjWA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0BF64C59A4C;
-        Sat, 19 Aug 2023 16:01:43 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.5-rc7
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <0ca594f5-3145-4e22-89d0-94c8a8f4ac22@kernel.dk>
-References: <0ca594f5-3145-4e22-89d0-94c8a8f4ac22@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <0ca594f5-3145-4e22-89d0-94c8a8f4ac22@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.5-2023-08-19
-X-PR-Tracked-Commit-Id: e5c0ca13659e9d18f53368d651ed7e6e433ec1cf
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 2383ffc41a7c701c058f6bb18030cd569aecd541
-Message-Id: <169246090304.15016.14230852625914387647.pr-tracker-bot@kernel.org>
-Date:   Sat, 19 Aug 2023 16:01:43 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Sun, 20 Aug 2023 10:59:41 -0400
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE0D10F;
+        Sun, 20 Aug 2023 07:58:38 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-94ea38c90ccso64914866b.1;
+        Sun, 20 Aug 2023 07:58:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692543517; x=1693148317;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pbNFg4FMsOEtDpmNGiLWQaiUGQH+kOdMIT+2KSP2jaU=;
+        b=eFYz1Yycu2iYaregKMlrJ2FtfZxORKm7vSgEkxu4YMtUK05f77LeLhoSJ8uqrFOKCQ
+         NNbyzNe1s0aMXG0GDS5LzC8sTM4x8UCz6wANz9xqXDWJu5IV5blZeqjfNurfZk8bvJ1j
+         dTGemqIiLNxN5yCZJtfdWrZisEuk9lQPkkLuZowMZWnri/OtT2C2AfgrPRSF+r0up8bT
+         ErWoXnvBN4g4Ea63QvC/OexZF/mF3rVE2O+8c7tu8VGpz/OoLgrvg3TxqYEbx72CyxLT
+         NBsv3yA3H7ByEnZdMOPOqS8jh8Mv/4oOHHS9XsbSnts71vlDs1cH15cRzsLh/0mZSKWs
+         zPrg==
+X-Gm-Message-State: AOJu0YwQ9WkRcE8siIZbGngqufqnqTpvJayB4NSH0e7UxCiC8ZfuQYZz
+        C8bqNIv2MaFNaJMsy9Fhd7zvUc1CDKk=
+X-Google-Smtp-Source: AGHT+IEs2VbbrzpBE+6vpoyVdVfQITvx7jOeRoIxPgTHfLCA6rCxKbzutCXT8qsW0HasIjlnL8cdZw==
+X-Received: by 2002:a17:906:535d:b0:99c:d995:22e6 with SMTP id j29-20020a170906535d00b0099cd99522e6mr3378271ejo.3.1692543517034;
+        Sun, 20 Aug 2023 07:58:37 -0700 (PDT)
+Received: from [10.100.102.14] (46-116-234-112.bb.netvision.net.il. [46.116.234.112])
+        by smtp.gmail.com with ESMTPSA id e3-20020a170906504300b0099bccb03eadsm4744880ejk.205.2023.08.20.07.58.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 20 Aug 2023 07:58:36 -0700 (PDT)
+Message-ID: <3713297b-a5fb-b027-c34b-d56526155c4c@grimberg.me>
+Date:   Sun, 20 Aug 2023 17:58:34 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH blktests v2 3/3] nvme: introduce
+ nvmet_target_{setup/cleanup} common code
+Content-Language: en-US
+To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Hannes Reinecke <hare@suse.de>, Jason Gunthorpe <jgg@ziepe.ca>
+References: <20230818141537.22332-1-dwagner@suse.de>
+ <20230818141537.22332-4-dwagner@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230818141537.22332-4-dwagner@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sat, 19 Aug 2023 08:57:28 -0600:
 
-> git://git.kernel.dk/linux.git tags/block-6.5-2023-08-19
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/2383ffc41a7c701c058f6bb18030cd569aecd541
+On 8/18/23 17:15, Daniel Wagner wrote:
+> Almost all fabric tests have the identically code for
+> setting up and cleaning up the target side. Introduce
+> two new helpers.
+> 
+> Signed-off-by: Daniel Wagner <dwagner@suse.de>
+> ---
+>   tests/nvme/003 | 14 +++-------
+>   tests/nvme/004 | 21 +++------------
+>   tests/nvme/005 | 20 ++-------------
+>   tests/nvme/006 | 19 ++------------
+>   tests/nvme/007 | 14 ++--------
+>   tests/nvme/008 | 21 ++-------------
+>   tests/nvme/009 | 16 ++----------
+>   tests/nvme/010 | 21 ++-------------
+>   tests/nvme/011 | 16 ++----------
+>   tests/nvme/012 | 21 ++-------------
+>   tests/nvme/013 | 16 ++----------
+>   tests/nvme/014 | 21 ++-------------
+>   tests/nvme/015 | 16 ++----------
+>   tests/nvme/018 | 16 ++----------
+>   tests/nvme/019 | 21 ++-------------
+>   tests/nvme/020 | 16 ++----------
+>   tests/nvme/021 | 16 ++----------
+>   tests/nvme/022 | 16 ++----------
+>   tests/nvme/023 | 21 ++-------------
+>   tests/nvme/024 | 16 ++----------
+>   tests/nvme/025 | 16 ++----------
+>   tests/nvme/026 | 16 ++----------
+>   tests/nvme/027 | 17 +++----------
+>   tests/nvme/028 | 17 +++----------
+>   tests/nvme/029 | 21 ++-------------
+>   tests/nvme/040 | 19 ++------------
+>   tests/nvme/041 | 18 ++-----------
+>   tests/nvme/042 | 17 ++-----------
+>   tests/nvme/043 | 17 ++-----------
+>   tests/nvme/044 | 19 +++-----------
+>   tests/nvme/045 | 18 +++----------
+>   tests/nvme/047 | 21 ++-------------
+>   tests/nvme/048 | 17 ++-----------
+>   tests/nvme/rc  | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   34 files changed, 141 insertions(+), 519 deletions(-)
+> 
+> diff --git a/tests/nvme/003 b/tests/nvme/003
+> index 71b82ce758a3..eed1f549866a 100755
+> --- a/tests/nvme/003
+> +++ b/tests/nvme/003
+> @@ -22,15 +22,8 @@ test() {
+>   
+>   	_setup_nvmet
+>   
+> -	local loop_dev
+> -	local port
+>   
+> -	port="$(_create_nvmet_port "${nvme_trtype}")"
+> -
+> -	loop_dev="$(losetup -f)"
+> -
+> -	_create_nvmet_subsystem "${def_subsysnqn}" "${loop_dev}"
+> -	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+> +	_nvmet_target_setup --blkdev=device
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--blkdev=device by default no?
