@@ -2,125 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E20CEE49A5
-	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 07:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C82AAEE4996
+	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 07:43:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232878AbjHUHmI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Aug 2023 03:42:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52504 "EHLO
+        id S233058AbjHUHn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Aug 2023 03:43:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233797AbjHUHmE (ORCPT
+        with ESMTP id S233790AbjHUHn1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Aug 2023 03:42:04 -0400
-Received: from out-23.mta0.migadu.com (out-23.mta0.migadu.com [91.218.175.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 141D3CA
-        for <linux-block@vger.kernel.org>; Mon, 21 Aug 2023 00:41:53 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692603712;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=a03w6SnNMU4QNYdw7qkMzyNmPZjKXh0qHkhwXfnmhvE=;
-        b=n+Gx8LJv7TPMxY00MICiRGUNGYmQQ5qhw/aZqq1nk3XX8J1PGmC9Ube/Zd99qxlm03p5ob
-        hGUQ08v4DhM4PUFd3B/uRHVCaSAXw2+kYfRoIV48flCK/k1KFic3n/PT8fFyD3J+RJq+P3
-        YvIPLFzg9wq+XPtAl6Z4n+2odcR8J74=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, ming.lei@redhat.com, hch@lst.de,
-        bvanassche@acm.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: [PATCH 4/4] blk-mq-tag: update or fix functions documentation
-Date:   Mon, 21 Aug 2023 15:35:28 +0800
-Message-ID: <20230821073528.3469210-5-chengming.zhou@linux.dev>
-In-Reply-To: <20230821073528.3469210-1-chengming.zhou@linux.dev>
-References: <20230821073528.3469210-1-chengming.zhou@linux.dev>
+        Mon, 21 Aug 2023 03:43:27 -0400
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBEFBC5;
+        Mon, 21 Aug 2023 00:43:19 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fe1f70a139so5988315e9.0;
+        Mon, 21 Aug 2023 00:43:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692603798; x=1693208598;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L6hlRFuEO18ewfLVhWL/VLpc0gMEa3vQtcpOVMBFDnE=;
+        b=SRkOalP30b3QYyaTKxtIXw5HvkiHJd+jRPby4VDt4ucCJOUq6zKapl/L7wjfUWC/HB
+         0igNL6VU5SDf+nFc87hVvMOOJmbpAv4+z2RXOgZgQLVwY9cIwbMmOmzPx0Qc83uNH0iO
+         Dr/hZatzA8ZftaayqSnY5nSSTlFV9rKv208oMhFRTIuxR+a0IGhl6RBrjfG0iz0JHz/6
+         iMSFhbvne01Srfs4JVfURZ7fBHWWRsbimP7a5IAMAvMk8SU1Ysj0Yql5AWirqyJnXFjC
+         8WPgrPNcVuQIdBkTziQE09AriA8Nymhi8aeQtI40z6r/K6/DaBkT5TjuslbgXoVFjZv5
+         wuAA==
+X-Gm-Message-State: AOJu0Yy+QXvKblGVEnWtRJUewtQliTmh6B4TjcNZD6QKO/hkb3I2S/+v
+        LIz4gKqTB1V3djxsrDfiClk=
+X-Google-Smtp-Source: AGHT+IHDt7naLH0gcQQARK8rQAsDXjJZrHcQgGMzMpPBtCojQBs1ERrRjAWBRx5UUBj9r+yPoyICZw==
+X-Received: by 2002:adf:f4ce:0:b0:317:f1d6:997c with SMTP id h14-20020adff4ce000000b00317f1d6997cmr4443599wrp.0.1692603798154;
+        Mon, 21 Aug 2023 00:43:18 -0700 (PDT)
+Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id e11-20020a5d65cb000000b0031416362e23sm11696178wrw.3.2023.08.21.00.43.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Aug 2023 00:43:17 -0700 (PDT)
+Message-ID: <fc4d55db-dbd3-d2e5-ab2a-3eed07b30676@grimberg.me>
+Date:   Mon, 21 Aug 2023 10:43:14 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH blktests v2 3/3] nvme: introduce
+ nvmet_target_{setup/cleanup} common code
+Content-Language: en-US
+To:     Daniel Wagner <dwagner@suse.de>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Hannes Reinecke <hare@suse.de>, Jason Gunthorpe <jgg@ziepe.ca>
+References: <20230818141537.22332-1-dwagner@suse.de>
+ <20230818141537.22332-4-dwagner@suse.de>
+ <3713297b-a5fb-b027-c34b-d56526155c4c@grimberg.me>
+ <u2esnihohobu5jaxgz3xdfpjfvfrnmkklzajjrckdnr6g3i54b@qofopy4bhhlp>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <u2esnihohobu5jaxgz3xdfpjfvfrnmkklzajjrckdnr6g3i54b@qofopy4bhhlp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
 
-There are some misleading or wrong documentation in the functions of
-blk-mq-tag, update it as we're here.
+>>> diff --git a/tests/nvme/003 b/tests/nvme/003
+>>> index 71b82ce758a3..eed1f549866a 100755
+>>> --- a/tests/nvme/003
+>>> +++ b/tests/nvme/003
+>>> @@ -22,15 +22,8 @@ test() {
+>>>    	_setup_nvmet
+>>> -	local loop_dev
+>>> -	local port
+>>> -	port="$(_create_nvmet_port "${nvme_trtype}")"
+>>> -
+>>> -	loop_dev="$(losetup -f)"
+>>> -
+>>> -	_create_nvmet_subsystem "${def_subsysnqn}" "${loop_dev}"
+>>> -	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+>>> +	_nvmet_target_setup --blkdev=device
+>>
+>> --blkdev=device by default no?
+> 
+> Yes. I thought it is better to be explicit in the tests. I don't mind
+> dropping --blkdev=device if you think we should use the defaults.
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-mq-tag.c | 32 ++++++++++++++------------------
- 1 file changed, 14 insertions(+), 18 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index c497d634cfdb..611f52568964 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -307,11 +307,12 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-  * @bt:		sbitmap to examine. This is either the breserved_tags member
-  *		or the bitmap_tags member of struct blk_mq_tags.
-  * @fn:		Pointer to the function that will be called for each started
-- *		request. @fn will be called as follows: @fn(rq, @data,
-- *		@reserved) where rq is a pointer to a request. Return true
-- *		to continue iterating tags, false to stop.
-+ *		request. @fn will be called as follows: @fn(rq, @data) where
-+ *		rq is a pointer to a request. Return true to continue iterating
-+ *		tags, false to stop.
-  * @data:	Will be passed as second argument to @fn.
-  * @flags:	BT_TAG_ITER_*
-+ * @q:		Only iterate over the requests of this queue.
-  */
- static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
- 			     busy_tag_iter_fn *fn, void *data, unsigned int flags,
-@@ -345,10 +346,9 @@ static void __blk_mq_all_tag_iter(struct blk_mq_tags *tags,
-  * blk_mq_all_tag_iter - iterate over all requests in a tag map
-  * @tags:	Tag map to iterate over.
-  * @fn:		Pointer to the function that will be called for each
-- *		request. @fn will be called as follows: @fn(rq, @priv,
-- *		reserved) where rq is a pointer to a request. 'reserved'
-- *		indicates whether or not @rq is a reserved request. Return
-- *		true to continue iterating tags, false to stop.
-+ *		request. @fn will be called as follows: @fn(rq, @priv)
-+ *		where rq is a pointer to a request. Return true to
-+ *		continue iterating tags, false to stop.
-  * @priv:	Will be passed as second argument to @fn.
-  *
-  * Caller has to pass the tag map from which requests are allocated.
-@@ -379,10 +379,9 @@ static void __blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
-  * blk_mq_tagset_busy_iter - iterate over all started requests in a tag set
-  * @tagset:	Tag set to iterate over.
-  * @fn:		Pointer to the function that will be called for each started
-- *		request. @fn will be called as follows: @fn(rq, @priv,
-- *		reserved) where rq is a pointer to a request. 'reserved'
-- *		indicates whether or not @rq is a reserved request. Return
-- *		true to continue iterating tags, false to stop.
-+ *		request. @fn will be called as follows: @fn(rq, @priv)
-+ *		where rq is a pointer to a request. Return true to
-+ *		continue iterating tags, false to stop.
-  * @priv:	Will be passed as second argument to @fn.
-  *
-  * We grab one request reference before calling @fn and release it after
-@@ -429,15 +428,12 @@ EXPORT_SYMBOL(blk_mq_tagset_wait_completed_request);
-  * blk_mq_queue_tag_busy_iter - iterate over all requests with a driver tag
-  * @q:		Request queue to examine.
-  * @fn:		Pointer to the function that will be called for each request
-- *		on @q. @fn will be called as follows: @fn(hctx, rq, @priv,
-- *		reserved) where rq is a pointer to a request and hctx points
-- *		to the hardware queue associated with the request. 'reserved'
-- *		indicates whether or not @rq is a reserved request.
-- * @priv:	Will be passed as third argument to @fn.
-+ *		on @q. @fn will be called as follows: @fn(rq, @priv) where rq
-+ *		is a pointer to a request.
-+ * @priv:	Will be passed as second argument to @fn.
-  *
-  * Note: if @q->tag_set is shared with other request queues then @fn will be
-- * called for all requests on all queues that share that tag set and not only
-- * for requests associated with @q.
-+ * called only for requests associated with @q.
-  */
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
- 		void *priv)
--- 
-2.41.0
-
+Just wondering why it is different than all the rest of the defaults?
+It probably can be omitted from the callers.
