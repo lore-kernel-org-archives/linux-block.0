@@ -2,183 +2,252 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF615EE49AA
-	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 15:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A2E2EE49A5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 17:50:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236354AbjHUP2b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Aug 2023 11:28:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37738 "EHLO
+        id S236552AbjHURu6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Aug 2023 13:50:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234196AbjHUP2b (ORCPT
+        with ESMTP id S235483AbjHURu6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Aug 2023 11:28:31 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FEFCF3;
-        Mon, 21 Aug 2023 08:28:27 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37LFBkBe019665;
-        Mon, 21 Aug 2023 15:27:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=4BCPF28Yejo0utjXOqmX/YVNPMuvsZagjVSJiXGOnLQ=;
- b=WxnNvJhpbwxp2ogAm93+C01Utn4OERDWz7Jm2zdduYIIpDeIwJhz/ob0nCSwwm4dMxsg
- 6LPv4r9/d3TE8O7JcygXVQaeA33y65RYGBEIO0oWiyHVRs5lYSuuI6opjysleDslB85d
- 2j2ZreyGOo6O6U/X9Lo1zT4CN6HaHvpSJLYFn/Snf+FYhRPdI5hmymS9ALqwqTNYLZQZ
- 46We58Rmgg5S9g+Lx9puGsk8dpCm1rlm0VIJAPSbyt6RQA3hWnxpyIa30oy1eqeV4wms
- 7FD57L1MQA/jDl1zQ4hs77b/U7ryiqvurKYKy/syzHVjo9G86CuXn5LfaXK2dW4t7JrN 9g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sm9ww9ek9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Aug 2023 15:27:57 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37LFLFSS020002;
-        Mon, 21 Aug 2023 15:27:57 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sm9ww9ek0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Aug 2023 15:27:57 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37LFKWcY018452;
-        Mon, 21 Aug 2023 15:26:56 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sk82smda7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Aug 2023 15:26:56 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37LFQt8t23593478
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Aug 2023 15:26:56 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E47ED5805A;
-        Mon, 21 Aug 2023 15:26:55 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE6BA5803F;
-        Mon, 21 Aug 2023 15:26:55 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.61.60.97])
-        by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 21 Aug 2023 15:26:55 +0000 (GMT)
-Message-ID: <a232e46bb7b364a6ef7d77aef853d0ddda4e3f2a.camel@linux.vnet.ibm.com>
-Subject: Re: [PATCH v5 0/3 RESEND] sed-opal: keyrings, discovery, revert,
- key store
-From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reply-To: gjoyce@linux.vnet.ibm.com
-To:     Jarkko Sakkinen <jarkko@kernel.org>, linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
-        keyrings@vger.kernel.org, okozina@redhat.com, dkeefe@redhat.com
-Date:   Mon, 21 Aug 2023 10:26:55 -0500
-In-Reply-To: <CUU9DZ1YEZVF.16X1CD7ES1RXD@suppilovahvero>
-References: <20230721211534.3437070-1-gjoyce@linux.vnet.ibm.com>
-         <46cda90a12da4639d1e65ce82ae342df05b7afc2.camel@linux.vnet.ibm.com>
-         <CUU9DZ1YEZVF.16X1CD7ES1RXD@suppilovahvero>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: RcdATUjtltTdXnCgWqPfjVO9qHvDevHU
-X-Proofpoint-ORIG-GUID: 9nD2g9hjl3NGhAG-uoQGc4xhDMv_CjeM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-21_03,2023-08-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 bulkscore=0 suspectscore=0 mlxscore=0 clxscore=1011
- spamscore=0 malwarescore=0 mlxlogscore=984 impostorscore=0 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308210140
+        Mon, 21 Aug 2023 13:50:58 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6438210E;
+        Mon, 21 Aug 2023 10:50:56 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A1E7B1F74D;
+        Mon, 21 Aug 2023 17:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1692640254; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Yi7Ztsd5sMGh3Lke4H7+yKs7fLu27TfIB4J5DA60U/U=;
+        b=UVXbvZXnYj5c3CXw8qNOednPhEWCmTMK4YMojEhixAYuRU2k3slp85PFqsxbipSyLj5KnP
+        wUK1UqYoiP2/YG89gMf7tgXrYwSoaLY6sP7oockA7HQZxuioyMe2iim/lb/qljvZLMwHSu
+        JZrGN2W3eoPBcVtSzoDrK+mejWKSIjI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1692640254;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Yi7Ztsd5sMGh3Lke4H7+yKs7fLu27TfIB4J5DA60U/U=;
+        b=Ktd0if85p+J816/opQAMkNa7e91LjWCTHwizpZyscnu413gxzku+zrvqDjUWiwItI2gVe3
+        zPudtJ6kjSIPKsBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9165713421;
+        Mon, 21 Aug 2023 17:50:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id af1xI/6j42QWXQAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 21 Aug 2023 17:50:54 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 089F5A0774; Mon, 21 Aug 2023 19:50:54 +0200 (CEST)
+Date:   Mon, 21 Aug 2023 19:50:53 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Eric Wheeler <bcache@lists.ewheeler.net>
+Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        linux-bcache@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Coly Li <colyli@suse.de>
+Subject: Re: [PATCH 09/29] bcache: Convert to bdev_open_by_path()
+Message-ID: <20230821175053.osjvbwnubr2k6q5q@quack3>
+References: <20230810171429.31759-1-jack@suse.cz>
+ <20230811110504.27514-9-jack@suse.cz>
+ <fd7fc9e-8d24-972-4b63-7eae3d2931e2@ewheeler.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fd7fc9e-8d24-972-4b63-7eae3d2931e2@ewheeler.net>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2023-08-16 at 23:41 +0300, Jarkko Sakkinen wrote:
-> On Wed Aug 16, 2023 at 10:45 PM EEST, Greg Joyce wrote:
-> > It's been almost 4 weeks since the last resend and there haven't
-> > been
-> > any comments. Is there anything that needs to be changed for
-> > acceptance?
+On Sun 20-08-23 18:06:01, Eric Wheeler wrote:
+> On Fri, 11 Aug 2023, Jan Kara wrote:
+> > Convert bcache to use bdev_open_by_path() and pass the handle around.
 > > 
-> > Thanks for your input.
+> > CC: linux-bcache@vger.kernel.org
+> > CC: Coly Li <colyli@suse.de
+> > CC: Kent Overstreet <kent.overstreet@gmail.com>
+> > Acked-by: Coly Li <colyli@suse.de>
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> > ---
+> >  drivers/md/bcache/bcache.h |  2 +
+> >  drivers/md/bcache/super.c  | 78 ++++++++++++++++++++------------------
+> >  2 files changed, 43 insertions(+), 37 deletions(-)
 > > 
-> > Greg
-> > 
-> > On Fri, 2023-07-21 at 16:15 -0500, gjoyce@linux.vnet.ibm.com wrote:
-> > > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > > 
-> > > This patchset has gone through numerous rounds of review and
-> > > all comments/suggetions have been addressed. The reviews have
-> > > covered all relevant areas including reviews by block and keyring
-> > > developers as well as the SED Opal maintainer. The last
-> > > patchset submission has not solicited any responses in the
-> > > six weeks since it was last distributed. The changes are
-> > > generally useful and ready for inclusion.
-> > > 
-> > > TCG SED Opal is a specification from The Trusted Computing Group
-> > > that allows self encrypting storage devices (SED) to be locked at
-> > > power on and require an authentication key to unlock the drive.
-> > > 
-> > > The current SED Opal implementation in the block driver
-> > > requires that authentication keys be provided in an ioctl
-> > > so that they can be presented to the underlying SED
-> > > capable drive. Currently, the key is typically entered by
-> > > a user with an application like sedutil or sedcli. While
-> > > this process works, it does not lend itself to automation
-> > > like unlock by a udev rule.
-> > > 
-> > > The SED block driver has been extended so it can alternatively
-> > > obtain a key from a sed-opal kernel keyring. The SED ioctls
-> > > will indicate the source of the key, either directly in the
-> > > ioctl data or from the keyring.
-> > > 
-> > > Two new SED ioctls have also been added. These are:
-> > >   1) IOC_OPAL_REVERT_LSP to revert LSP state
-> > >   2) IOC_OPAL_DISCOVERY to discover drive capabilities/state
-> > > 
-> > > change log v5:
-> > >         - rebase to for-6.5/block
-> > > 
-> > > change log v4:
-> > >         - rebase to 6.3-rc7
-> > >         - replaced "255" magic number with U8_MAX
-> > > 
-> > > change log:
-> > >         - rebase to 6.x
-> > >         - added latest reviews
-> > >         - removed platform functions for persistent key storage
-> > >         - replaced key update logic with key_create_or_update()
-> > >         - minor bracing and padding changes
-> > >         - add error returns
-> > >         - opal_key structure is application provided but kernel
-> > >           verified
-> > >         - added brief description of TCG SED Opal
-> > > 
-> > > 
-> > > Greg Joyce (3):
-> > >   block: sed-opal: Implement IOC_OPAL_DISCOVERY
-> > >   block: sed-opal: Implement IOC_OPAL_REVERT_LSP
-> > >   block: sed-opal: keyring support for SED keys
-> > > 
-> > >  block/Kconfig                 |   2 +
-> > >  block/opal_proto.h            |   4 +
-> > >  block/sed-opal.c              | 252
-> > > +++++++++++++++++++++++++++++++++-
-> > >  include/linux/sed-opal.h      |   5 +
-> > >  include/uapi/linux/sed-opal.h |  25 +++-
-> > >  5 files changed, 282 insertions(+), 6 deletions(-)
-> > > 
-> > > 
-> > > base-commit: 1341c7d2ccf42ed91aea80b8579d35bc1ea381e2
+> > diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+> > index 5a79bb3c272f..2aa3f2c1f719 100644
+> > --- a/drivers/md/bcache/bcache.h
+> > +++ b/drivers/md/bcache/bcache.h
+> > @@ -299,6 +299,7 @@ struct cached_dev {
+> >  	struct list_head	list;
+> >  	struct bcache_device	disk;
+> >  	struct block_device	*bdev;
+> > +	struct bdev_handle	*bdev_handle;
 > 
-> I can give because it looks good to me to all patches:
-> 
-> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
-> 
-> ... but should not probably go to my tree.
-> 
-> BR, Jarkko
+> It looks like you've handled most if not all of the `block_device *bdev` 
+> refactor.  Can we drop `block_device *bdev` and fixup any remaining 
+> references?  More below.
 
-Thanks for the ack Jarkko. Any thoughts on which tree it should go to?
+Well, we could but it's a lot of churn - like 53 dereferences in bcache.
+So if bcache maintainer wants to go this way, sure we can do it. But
+preferably as a separate cleanup patch on top of this series because the
+series generates enough conflicts as is and this will make it considerably
+worse.
 
-Greg
+> > @@ -421,6 +422,7 @@ struct cache {
+> >  
+> >  	struct kobject		kobj;
+> >  	struct block_device	*bdev;
+> > +	struct bdev_handle	*bdev_handle;
+> 
+> ditto.
+> 
+> >  
+> >  	struct task_struct	*alloc_thread;
+> >  
+> > diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> > index 0ae2b3676293..c11ac86be72b 100644
+> > --- a/drivers/md/bcache/super.c
+> > +++ b/drivers/md/bcache/super.c
+> > @@ -1368,8 +1368,8 @@ static void cached_dev_free(struct closure *cl)
+> >  	if (dc->sb_disk)
+> >  		put_page(virt_to_page(dc->sb_disk));
+> >  
+> > -	if (!IS_ERR_OR_NULL(dc->bdev))
+> > -		blkdev_put(dc->bdev, dc);
+> > +	if (dc->bdev_handle)
+> > +		bdev_release(dc->bdev_handle);
+> 
+> bdev_release does not reset dc->bdev, which could leave a hanging 
+> reference.
 
+So after this, dc->bdev may reference freed block device that is true. But
+the original code did not cleanup dc->bdev either so things just stay as
+they were.
+
+> > @@ -1444,7 +1444,7 @@ static int cached_dev_init(struct cached_dev *dc, unsigned int block_size)
+> >  /* Cached device - bcache superblock */
+> >  
+> >  static int register_bdev(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+> > -				 struct block_device *bdev,
+> > +				 struct bdev_handle *bdev_handle,
+> >  				 struct cached_dev *dc)
+> >  {
+> >  	const char *err = "cannot allocate memory";
+> > @@ -1452,14 +1452,15 @@ static int register_bdev(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+> >  	int ret = -ENOMEM;
+> >  
+> >  	memcpy(&dc->sb, sb, sizeof(struct cache_sb));
+> > -	dc->bdev = bdev;
+> > +	dc->bdev_handle = bdev_handle;
+> > +	dc->bdev = bdev_handle->bdev;
+> 
+> If I understand correctly, this patch duplicates the dc->bdev reference to 
+> exist as dc->bdev_handle->bdev _and_ dc->bdev. (Same for changes related 
+> to `struct cache`.)
+
+Well, dc->bdev isn't a reference anymore, just a shortcut so that people
+don't have to write the long dc->bdev_handle->bdev (plus it limits the
+churn this series generates as I've mentioned above). I can see why some
+people needn't like this duplication so sure we can clean it up if that's
+the concensus of bcache developers.
+ 
+> This would mean future developers have to understand they are the same 
+> thing, and someone may not manage it correctly.
+> 
+> If block core is moving to `struct bdev_handle`, then can we drop 
+> `dc->bdev` and replace all occurances of `dc->bdev` with 
+> `bdev_handle->bdev`?  Or make an accessor macro/function like 
+> bdev_handle_get_bdev(dc->bdev_handle)?
+
+Accessor is making things even longer and I don't see the benefit. So I'd
+just go with dc->bdev_handle->bdev.
+
+> Unless I misunderstand something here, I would NACK this as written 
+> because it increases the liklihood of future developer error.  
+> 
+> I've added a few other comments below, but my comments are not exhaustive:
+> 
+> >  	dc->sb_disk = sb_disk;
+> >  
+> >  	if (cached_dev_init(dc, sb->block_size << 9))
+> >  		goto err;
+> >  
+> >  	err = "error creating kobject";
+> > -	if (kobject_add(&dc->disk.kobj, bdev_kobj(bdev), "bcache"))
+> > +	if (kobject_add(&dc->disk.kobj, bdev_kobj(dc->bdev), "bcache"))
+> >  		goto err;
+> >  	if (bch_cache_accounting_add_kobjs(&dc->accounting, &dc->disk.kobj))
+> >  		goto err;
+> > @@ -2216,8 +2217,8 @@ void bch_cache_release(struct kobject *kobj)
+> >  	if (ca->sb_disk)
+> >  		put_page(virt_to_page(ca->sb_disk));
+> >  
+> > -	if (!IS_ERR_OR_NULL(ca->bdev))
+> > -		blkdev_put(ca->bdev, ca);
+> > +	if (ca->bdev_handle)
+> > +		bdev_release(ca->bdev_handle);
+> >  
+> 
+> ca->bdev is not cleaned up
+
+Well, same comment as with dc->bdev - the old code didn't cleanup the
+pointer either. Furthermore the structure is kfree()d in the line below so
+there is really no point in zeroing the pointer.
+
+> >  	kfree(ca);
+> >  	module_put(THIS_MODULE);
+> > @@ -2337,16 +2338,18 @@ static int cache_alloc(struct cache *ca)
+> >  }
+> >  
+> >  static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+> > -				struct block_device *bdev, struct cache *ca)
+> > +				struct bdev_handle *bdev_handle,
+> > +				struct cache *ca)
+> >  {
+> >  	const char *err = NULL; /* must be set for any error case */
+> >  	int ret = 0;
+> >  
+> >  	memcpy(&ca->sb, sb, sizeof(struct cache_sb));
+> > -	ca->bdev = bdev;
+> > +	ca->bdev_handle = bdev_handle;
+> > +	ca->bdev = bdev_handle->bdev;
+> >  	ca->sb_disk = sb_disk;
+> >  
+> > -	if (bdev_max_discard_sectors((bdev)))
+> > +	if (bdev_max_discard_sectors((bdev_handle->bdev)))
+> >  		ca->discard = CACHE_DISCARD(&ca->sb);
+> >  
+> >  	ret = cache_alloc(ca);
+> > @@ -2354,10 +2357,10 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+> >  		/*
+> >  		 * If we failed here, it means ca->kobj is not initialized yet,
+> >  		 * kobject_put() won't be called and there is no chance to
+> > -		 * call blkdev_put() to bdev in bch_cache_release(). So we
+> > -		 * explicitly call blkdev_put() here.
+> > +		 * call bdev_release() to bdev in bch_cache_release(). So
+> > +		 * we explicitly call bdev_release() here.
+> >  		 */
+> > -		blkdev_put(bdev, ca);
+> > +		bdev_release(bdev_handle);
+> 
+> ca->bdev is not cleaned up
+
+So ca->bdev doesn't really need to be cleaned up here and the original code
+wasn't cleaning it up either. So I don't see a problem here either... But
+maybe I miss something.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
