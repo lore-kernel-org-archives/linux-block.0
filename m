@@ -2,135 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C07EE49AB
-	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 04:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D139EE49A5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 05:22:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233071AbjHUEyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Aug 2023 00:54:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39340 "EHLO
+        id S233135AbjHUFWK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Aug 2023 01:22:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbjHUEyp (ORCPT
+        with ESMTP id S232391AbjHUFWJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Aug 2023 00:54:45 -0400
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 031D9A3;
-        Sun, 20 Aug 2023 21:54:41 -0700 (PDT)
-X-AuditID: a67dfc5b-d85ff70000001748-91-64e2ee0f13f7
-Date:   Mon, 21 Aug 2023 13:51:36 +0900
-From:   Byungchul Park <byungchul@sk.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-        torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-        tytso@mit.edu, david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
-        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
-        boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com,
-        her0gyugyu@gmail.com
-Subject: Re: [RESEND PATCH v10 25/25] dept: Track the potential waits of
- PG_{locked,writeback}
-Message-ID: <20230821045136.GB73328@system.software.com>
-References: <20230821034637.34630-1-byungchul@sk.com>
- <20230821034637.34630-26-byungchul@sk.com>
- <ZOLnRSdH4Wcrl67L@casper.infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZOLnRSdH4Wcrl67L@casper.infradead.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH9zz39rm3nXXX6rJHWDbt4rZgJi9xyYkuy7LE7Vm2JSa6D7oP
-        0K030lDQFEUgMcFZFXmtJsCo3VJgK4gVtRDFabWAUpgOmCBWBDI6NkFaSMCi5c21c2Z+Ofnl
-        /HN++X84IqfJIzGiIWOvbMrQGbVExauCy6ree2XSr0/4yxcPx4sSIPQonwfbWSeBnobTCJxN
-        BzGM3/gU7s4GEMz/1s1BRVkPgqqRIQ6a2ocRuOu+I9A7uhz6QlMEOssKCRyqOUvg94kFDIPl
-        JzCcdn0JNy3VGDzhBzxUjBM4WXEIR8YYhrCjXgBH3jrw11kFWBhJhM7hfgW4B9ZD5Y+DBK64
-        O3lob/Zj6P3FRmDY+VQBN9s7eOg5XqyAM5PVBCZmHRw4QlMC3PbYMZwzR0RHZpYU4C32YDjy
-        03kMffcuI7ia/wcGl7OfQFsogKHRVcbBXO0NBP6SoACHi8ICnDxYgqDwcDkP3YteBZgH34f5
-        Jzby0SbWFpjimLlxP3PP2nn2azVll6xDAjNfHRCY3bWPNdbFsZor45hVTYcUzFV/jDDX9AmB
-        FQT7MJvs6hJYx/fzPBvtq8BbY3eqPtDLRkOWbIr/MEWVeid4it+zoM4eaJ7m8tCcqgApRSpt
-        pI+8XvKcba3HhCjz0jpqu1jDR5lI71CfL8wVIFFcJb1LA01J0TUndahoqS03yiulFBqeKVVE
-        WS0BvXs0FGGVqJGKEP178fF/wQraWTnKPzuOo76lcRx1clIsrV0So2tlpILVEfi3zqvSW9Rz
-        wYujHiq1Kelg2IKf9VxNW+p8vAVJ1he01he01v+1dsTVI40hIytdZzBu3JCak2HI3vDt7nQX
-        ivyl48DC181oumdbK5JEpF2mTnndr9codFmZOemtiIqcdpU69vGIXqPW63JyZdPuZNM+o5zZ
-        imJFXvuaOml2v14j7dLtldNkeY9sep5iURmTh/Iv1qaVin+uuZYbszz+i13a5C3dQ1NHP37w
-        5Kn9K7tmDTemtWy+ntiwZfumYqOzqn+s5WffkvzyaBJrKekvfOlhsOz+/Vvw5uffxLy94t6l
-        ys/WX+tdO+MVCs7P+Q8kb+VIua6w4eEPOy5f6DKMrZ0wJ2TP5O5M039icb9x3X5KuXjOo+Uz
-        U3WJcZwpU/cPbz3LRJMDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUyTZxSGfZ73k2ad7zqMT4A/62LcWKYyJTkJC5kZCU+mW/bDuYVp7Ov6
-        ZjQU0FaZkJngAFFEBLdaqZ0psBTEbs5CHH5gmiKFClMUVMawGx2bYxbYwOIqBddmM/PPyZVz
-        57pzfhyR0QS5JNFQsEsxFchGLa9iVe9klL26dCqoX9PavBTqqtdA+MEBFuxnXDwMfHMagat9
-        H4aJ7my4MxdCMP/9dQaslgEEDWN3GWj3BRB0tnzGw+D4szAUnubBbznEQ1nTGR5u3I9iGD12
-        FMNp99vQV9uIwRO5x4J1gocT1jIcG79jiDhbBXCWroBgi02A6Fga+AO3Oej60s9B58grUH9y
-        lIdLnX4WfB1BDIMX7DwEXI856PP1sjBQd5iDr6caebg/52TAGZ4W4KbHgeHb8ljb/tlFDnoO
-        ezDs/+oshqEfLiK4fOBnDG7XbR66wiEMbW4LA4+auxEEayYFqKiOCHBiXw2CQxXHWLi+0MNB
-        +Wg6zP9t59/IoF2haYaWt31CO+ccLL3aSOh5212Bll8eEajDvZu2taTSpksTmDbMhDnqbj3I
-        U/fMUYFWTQ5hOnXtmkB7j8+zdHzIit9NyVG9rleMhiLFtDpTp8q9NXmK3RFV7xnpmGFK0SNV
-        FUoQibSO2L0HhTiz0gpi/66JjTMvrSTDwxGmColiovQSCbW/Fl8zUq+KHLGXxPl5SUcis0e4
-        OKslIHcqwzFWiRqpGpHfFh7+FzxH/PXj7L9yKhlenMDxTkZKJs2LYnydEDvB5gzxcV4mvUg8
-        53pwLVLbnrJtT9m2/20HYlpRoqGgKF82GNNXmfNyiwsMe1Z9VJjvRrHPc+6N1nWgB4PZXiSJ
-        SPuMWpcS1Gs4uchcnO9FRGS0ierkh2N6jVovF5copsJtpt1GxexFySKrXa5+631Fp5E+lncp
-        eYqyQzE9SbGYkFSKlst+3ctrnasTgvXGYNSbkrRZ9lW2RAKWQE7apiUv7N346+jZ0kz6Re2W
-        gPWPtdu3/tT/ecbxbDus78hMG/nxlGND5rLHuor+bSunTecq+z4sPN+vajCVrKshH/wyJvz5
-        3vadliyblIjSPxWLXFfu/eULZOW9SYpzZ9cv2LI8ge4BLWvOldNSGZNZ/gfo2omcdQMAAA==
-X-CFilter-Loop: Reflected
+        Mon, 21 Aug 2023 01:22:09 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE232A6
+        for <linux-block@vger.kernel.org>; Sun, 20 Aug 2023 22:22:06 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1bc3d94d40fso22727065ad.3
+        for <linux-block@vger.kernel.org>; Sun, 20 Aug 2023 22:22:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20221208.gappssmtp.com; s=20221208; t=1692595326; x=1693200126;
+        h=message-id:in-reply-to:to:references:date:subject:mime-version
+         :content-transfer-encoding:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rNJgKrjuFkLbTkmBrNhAZtgomNh0/6AE1OSuW3nAGwo=;
+        b=NacVtxYfsB4aDWiFomdWx/iRVikuaPFaFPJz5D2QnJp1v6zFn6gvGEgpYfgJGiDrB4
+         D/X0Fy1EPW2HammOnRzVEAzDVYnk5ron47j39UAbeMcOSYVUkl04UqVH9dNpayyqMeeE
+         JB+Dsz15/4l3fj3Sl2o0FavANZmFboL9WGo6XWy32Ueu1jr06hnNVgsjjyvYq5k2Hyum
+         Dk/m+hvDErbFZsVbUpCLyxxq/OBLjFCuQe76bhYqd8h41vfELcYw9YKXXg4PrBSFhLl2
+         o0/Wws3Pc9cM28CSCCuLjFmOJyFTddHWRh1kNDQhw0S2H+KgY+yIKSEv0T5QEeb3BRk0
+         IAfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692595326; x=1693200126;
+        h=message-id:in-reply-to:to:references:date:subject:mime-version
+         :content-transfer-encoding:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rNJgKrjuFkLbTkmBrNhAZtgomNh0/6AE1OSuW3nAGwo=;
+        b=aoI4ayn+RyJOdioDXLY6qHaw1lqdA3GS5RjHmBg9EWwALYyFQPJ57a7GoRwBvnG4b1
+         dCfrh3YfC7Sixb6s2+Eq9hQ+WBdEeCqw1nBuRAO0v1FiBekQ099/jCS7V7SDwuiUr+Wf
+         RnmGePD7SJB1jG3/rvmYxuJjRO9wDmK52WCr5l9n1vSMX0JndSAevVEZpp7ReirOtqCT
+         EjAo+NKG1q6HWbobpsHTgKDZ1ZbmJGrABHBhVLQMFcjz3VFydC1YdKFcOzXtSHdTPB61
+         prUtygcn+u9EJt1HdSJtF7takM7CZm3zUBkQwBycf7ogvay1xAvZEVKK2AOa5x82P4d1
+         Y4qg==
+X-Gm-Message-State: AOJu0Yx/gdEsdbvJ63fJ9imTrwp8e7oSKB895cEW3toMMUpGAfIkc5Ty
+        gtISpS7kD4HT42H1IFGvuijKaw==
+X-Google-Smtp-Source: AGHT+IG3ZPgRomyYKb15GlJLOX3HPI9YTShqcmyYEBasQL87VWmKT/tCwp9szHJ3kxrePf6C5Xx1cw==
+X-Received: by 2002:a17:902:d510:b0:1bb:ee0f:ab0f with SMTP id b16-20020a170902d51000b001bbee0fab0fmr7162181plg.17.1692595325830;
+        Sun, 20 Aug 2023 22:22:05 -0700 (PDT)
+Received: from smtpclient.apple ([47.75.78.161])
+        by smtp.gmail.com with ESMTPSA id e12-20020a170902d38c00b001b05e96d859sm5978858pld.135.2023.08.20.22.22.04
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 20 Aug 2023 22:22:05 -0700 (PDT)
+From:   Li Feng <fengli@smartx.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
+Subject: Re: [PATCH] block: fix unexpected split in bio_discard_limit
+Date:   Mon, 21 Aug 2023 13:22:48 +0800
+References: <20230817075509.1438569-1-fengli@smartx.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+In-Reply-To: <20230817075509.1438569-1-fengli@smartx.com>
+Message-Id: <B7093938-9D67-4987-8B6B-B05890147580@smartx.com>
+X-Mailer: Apple Mail (2.3731.300.101.1.3)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 21, 2023 at 05:25:41AM +0100, Matthew Wilcox wrote:
-> On Mon, Aug 21, 2023 at 12:46:37PM +0900, Byungchul Park wrote:
-> > @@ -377,44 +421,88 @@ static __always_inline int Page##uname(struct page *page)		\
-> >  #define SETPAGEFLAG(uname, lname, policy)				\
-> >  static __always_inline						\
-> >  void folio_set_##lname(struct folio *folio)			\
-> > -{ set_bit(PG_##lname, folio_flags(folio, FOLIO_##policy)); }	\
-> > +{									\
-> > +	set_bit(PG_##lname, folio_flags(folio, FOLIO_##policy));	\
-> > +	dept_page_set_bit(&folio->page, PG_##lname);			\
-> 
-> The PG_locked and PG_writeback bits only actually exist in the folio;
-> the ones in struct page are just legacy and never actually used.
-> Perhaps we could make the APIs more folio-based and less page-based?
+Ping=E2=80=A6
 
-Yeah. I need to make it more folio-based. I will work on it. Thank you.
+Thanks,
+Li
 
-> >  static __always_inline void SetPage##uname(struct page *page)	\
-> > -{ set_bit(PG_##lname, &policy(page, 1)->flags); }
-> > +{									\
-> > +	set_bit(PG_##lname, &policy(page, 1)->flags);			\
-> > +	dept_page_set_bit(page, PG_##lname);				\
-> > +}
-> 
-> I don't think we ever call this for PG_writeback or PG_locked.  If
-> I'm wrong, we can probably fix that ;-)
+> 2023=E5=B9=B48=E6=9C=8817=E6=97=A5 =E4=B8=8B=E5=8D=883:55=EF=BC=8CLi =
+Feng <fengli@smartx.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> bio_discard_limit() enforces discard boundaries within the range of =
+32-bit
+> unsigned integers, resulting in unexpected discard cut boundaries.
+>=20
+> For example, max discard size =3D 1MiB, discard_granularity =3D 512B, =
+then the
+> discard lengths sent in the range [0,4G) are 1MiB, 1MiB... (1MiB-512).
+> The next discard offset from 4G is [4G-512, 4G-512+1MiB).
+> The discard of the 4G offset boundary does not comply with the optimal =
+1MiB
+> size.
+>=20
+> Signed-off-by: Li Feng <fengli@smartx.com>
+> ---
+> block/blk-lib.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index e59c3069e835..ec95508c3593 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -32,7 +32,7 @@ static sector_t bio_discard_limit(struct =
+block_device *bdev, sector_t sector)
+> 	 * Align the bio size to the discard granularity to make =
+splitting the bio
+> 	 * at discard granularity boundaries easier in the driver if =
+needed.
+> 	 */
+> -	return round_down(UINT_MAX, discard_granularity) >> =
+SECTOR_SHIFT;
+> +	return round_down(ULONG_MAX, discard_granularity) >> =
+SECTOR_SHIFT;
+> }
+>=20
+> int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+> --=20
+> 2.41.0
+>=20
 
-Okay then, I will assume this will never be used. So are you asking me
-to get rid of this part, right?
-
-> >  static __always_inline void __SetPage##uname(struct page *page)	\
-> > -{ __set_bit(PG_##lname, &policy(page, 1)->flags); }
-> > +{									\
-> > +	__set_bit(PG_##lname, &policy(page, 1)->flags);			\
-> > +	dept_page_set_bit(page, PG_##lname);				\
-> > +}
-> 
-> Umm.  We do call __SetPageLocked() though ... I'll fix those up to
-> be __set_folio_locked().
-
-Haha Okay. Lemme know when you get done on it. Thanks.
-
-	Byungchul
