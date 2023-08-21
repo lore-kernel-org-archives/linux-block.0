@@ -2,110 +2,161 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24038EE49A4
-	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 03:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60156EE49AE
+	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 04:07:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232608AbjHUDJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Aug 2023 23:09:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35864 "EHLO
+        id S232753AbjHUEHA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Aug 2023 00:07:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232603AbjHUDJB (ORCPT
+        with ESMTP id S232738AbjHUEG7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Aug 2023 23:09:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A149A1
-        for <linux-block@vger.kernel.org>; Sun, 20 Aug 2023 20:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692587300;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C0K3lSgVNy75NApVtTilpqgXO7eQ6PZvcXeC5v4ay/E=;
-        b=LEt7PoS58Ag3jDShcRDjXq1jEt35/eH+YX1fbVtsFZ65hG+W2GT08qA8vXttlbzudf1KdM
-        U+U/sLYnteZsFmk4MMyt7WW/bq+kjiDhM679+M4pMFuoHUObI1nFXnK7xiDAnGLmKq8XRf
-        wxeiWNtWgOS8dD8aQrSs7aD3VaFyylc=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-ZSMvmqi0MvOTe-khKORJOA-1; Sun, 20 Aug 2023 23:08:19 -0400
-X-MC-Unique: ZSMvmqi0MvOTe-khKORJOA-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-26f3fce5b0bso903514a91.2
-        for <linux-block@vger.kernel.org>; Sun, 20 Aug 2023 20:08:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692587298; x=1693192098;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C0K3lSgVNy75NApVtTilpqgXO7eQ6PZvcXeC5v4ay/E=;
-        b=WXQXPZyETHpKK2LgrZJIiZWKF23NFiYt0tHwIVt44WEkJb6hOWkhi3KHH5vJgM3o1n
-         B2gm8jrHbzfLNJRs3tkkIzC0M+5pDwHdCyCEd/qXzwZrsl9aCdH4aTsuwK2115guBQBO
-         VcmLDFnqcq3Slu7Bb3zX/SYTFLGJpUmgBWiidHS178oRztFy560Fi2X9E8pg9txzpe2A
-         4O8p0/e/StE9Pi2Ba5dAv5R6P3Jz+HkBgnlTYk4kGz4T8rRrXNnlI9d/P89k0cAPErS2
-         sDeBFT34BK5EQD0OU6d6Mhd0Uz3T61rzWQiPBBuB0LG5Poowk8N4XjhskpA1HrTU1r7M
-         stxQ==
-X-Gm-Message-State: AOJu0YyU1abbVlDSGvEnYtg6Dg+BVU/8+sBngDf5jazvOl111WJjsmj/
-        XX/cpRqVDgoC6yu6ExXBL65afRrWNIqcB172krOIviAqFnRCWyD+A+5nNuN3OZjNyf8LZZ0bQUC
-        8oAyuGV4mLBLvE8LE4wCYfxfK1qSfcJyFQw0aR1o=
-X-Received: by 2002:a17:90b:2348:b0:263:ac11:c6d2 with SMTP id ms8-20020a17090b234800b00263ac11c6d2mr2819604pjb.25.1692587298090;
-        Sun, 20 Aug 2023 20:08:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHv8ECyBDQPnvmQjSO3+v6FXa+AzDdilOFrfgVCApWUFDJlXXHn2w9yd20OFGqOTVpexGgnUdUIPIayu2DlJeE=
-X-Received: by 2002:a17:90b:2348:b0:263:ac11:c6d2 with SMTP id
- ms8-20020a17090b234800b00263ac11c6d2mr2819598pjb.25.1692587297791; Sun, 20
- Aug 2023 20:08:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAGVVp+Xiz99dpFPn5RYjFfA-8tZH0cSvsmydB=1k08GfbViAFw@mail.gmail.com>
- <cffead50-032a-46d3-bc9e-ace6586a69d5@kernel.dk> <CAGVVp+VRcQs1qvsEeKyvmOXz=8KTybHpNDAwS9GzVMVw+FvTUg@mail.gmail.com>
- <f0c0937f-485c-d317-8bd9-b7d32ace4e1f@bytedance.com>
-In-Reply-To: <f0c0937f-485c-d317-8bd9-b7d32ace4e1f@bytedance.com>
-From:   Changhui Zhong <czhong@redhat.com>
-Date:   Mon, 21 Aug 2023 11:08:06 +0800
-Message-ID: <CAGVVp+X=sxRR15CSTr+OfzA06EojqpDeTCdBc0sQfXMiiK2EwQ@mail.gmail.com>
-Subject: Re: [bug report] WARNING: CPU: 12 PID: 51497 at block/mq-deadline.c:679
- dd_exit_sched+0xd5/0xe0
-To:     Chengming Zhou <zhouchengming@bytedance.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 21 Aug 2023 00:06:59 -0400
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8FC7E9B;
+        Sun, 20 Aug 2023 21:06:57 -0700 (PDT)
+X-AuditID: a67dfc5b-d6dff70000001748-5b-64e2ded5f456
+From:   Byungchul Park <byungchul@sk.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
+        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+        tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+        sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+        viro@zeniv.linux.org.uk, jack@suse.cz, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+        42.hyeyoo@gmail.com, chris.p.wilson@intel.com,
+        gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
+        boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com,
+        her0gyugyu@gmail.com
+Subject: [RESEND PATCH v10 07/25] dept: Apply sdt_might_sleep_{start,end}() to wait_for_completion()/complete()
+Date:   Mon, 21 Aug 2023 12:46:19 +0900
+Message-Id: <20230821034637.34630-8-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230821034637.34630-1-byungchul@sk.com>
+References: <20230821034637.34630-1-byungchul@sk.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTZxTH9zz33udeKiXXTrOrzIlNyBaX4UvUHI0xEkn2fHEhWbZkGsVq
+        70Y3KFgExcxRpL6BGGqCdYJLgVkrdAoXljC0roPxNiNWraww7EaHTgaIUIsi+FLY/HLyy/mf
+        8/v0FxhNE7dQMBj3yCajLk1LVKxqJLrigzuBoH758Ng7YD2+HMKPj7JQfslFwHuxBoGrIR/D
+        YOuH8PvEMIKp6zcYsJV6EVT032WgoS2AwO08SOD2QAz4wqMEOkuLCBRUXSJwc2gaQ9+pkxhq
+        lM1wraQSg2fyHxZsgwTKbAU4Mh5gmHRU8+Awx0PQeYaH6f4V0Bno5sDd+z58+10fgSvuThba
+        GoMYbjeVEwi4XnJwra2DBa+1mIMfHlYSGJpwMOAIj/Jwy2PHUGuJiA6HXnDQXuzBcPj7Ogy+
+        nssIrh79C4Pi6ibQEh7GUK+UMvDsfCuC4IkRHg4dn+ShLP8EgqJDp1i48bydA0vfaph6Wk42
+        rqMtw6MMtdTvpe4JO0t/q5ToT2fu8tRytZendiWb1juX0qorg5hWjIc5qlQfI1QZP8nTwhEf
+        pg+7unjacXqKpQM+G06O3aJar5fTDDmyadmGHarUIfcIn/nz3H1nvb/yZtQQU4iiBElcJbVe
+        /JN5zaF/W/gZJuK7kt8/ObufJ8ZJ9cX3uUKkEhjxyBzJ+eg6mQneFDOknnPmWWbFeOlHqzXC
+        gqAWV0vWkv+di6WaWs8sR4lrJOVyE5phTeRkrP9vdsYpiUeipO77Lva/hwXSL04/W4LUdvRG
+        NdIYjDnpOkPaqoTUXKNhX8KujHQFRRrlODC9tRGNez9uRqKAtNHqHW8H9RpOl5OVm96MJIHR
+        zlPHPunXa9R6Xe5+2ZSRYspOk7OaUazAat9Sr5zYq9eIX+j2yF/JcqZsep1iIWqhGeHEpGN1
+        d8Y/s3+SmR3dsT55bE7oc0sDF3fQX/2e3zcYetCYuJvEPdrSHv/1hYSiMlNez72COmtV9pOu
+        NYGe4v1LhpTTnjzLRzn3UmIyzYtDO41/2EJJC17Oz6df+gvDLYnfPDe+2N2bcrM9edei2hDJ
+        W9ZXUvTpxqRN67Yt2T7Qunalls1K1a1YypiydK8AMADUhk0DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzXSa1BMcRgGcP//ubYsx2o4IzNYg5FxGzKvcZnGlw4zjBkfXGe0Y49atja7
+        iWUiukhsWiZLbUmxVkWclnFb1kbJpZYSkWhdU1tuGymXjfHlnd/M88zz6WUJhZUazmpi40V9
+        rEqrpGWkbPHs5EmPmr3qqfsdDJj3TQX/13QSrGWlNHjOlCAodezE0HorAh53tSPouV9LgCXb
+        g+BYy3MCHJXNCJz2XTTUvR4I9f5OGqqz99KQXFRGw4O2XgxNhw5gKJEWwd2sQgyu7nckWFpp
+        yLUk48B5j6HbVsyALWkseO05DPS2TIPq5gYKKvKqKXA+nQhH8ptouOqsJqHyohdD3WUrDc2l
+        vym4W3mbBI/ZRMHpjkIa2rpsBNj8nQw8dBVgOJsSWEv78ouCKpMLQ9rxcxjqG68guJb+EoNU
+        2kBDhb8dQ7mUTcCPk7cQeDN9DKTu62Ygd2cmgr2ph0io/VlFQUpTGPR8t9Lhs4WK9k5CSCnf
+        LDi7CkjhTiEvXMp5zggp154yQoG0SSi3hwpFV1uxcOyznxKk4j20IH0+wAgZvnosdNTUMMLt
+        wz2k8LregpeMWCmboxa1mgRRP2VepCy6zelj4q4P3pLnuckkIcfADBTE8twM/suHCqbPNDee
+        f/Kkm+hzMDeKLze9pTKQjCW43f15+8f7dF8whNPxjSeS/prkxvLnzeaAWVbOhfHmLOLf5ki+
+        5Kzrr4O4mbx05TLqsyJQ+dTyisxCsgLUrxgFa2ITYlQabdhkw4ZoY6xmy+S1uhgJBX7Glthr
+        voi+1kW4Ecci5QB55AivWkGpEgzGGDfiWUIZLA/51qJWyNUq41ZRr1uj36QVDW4UwpLKYfKF
+        y8RIBRelihc3iGKcqP+fYjZoeBKaH56o+0B5l6403Sua8OKVlP8i5JRnvex4pnX1Nps7XDYs
+        rqN3QXbNiinPojY3rtG7+sdsz5i5pBg7jPPT8XLL0B2+Ew0RiXNTfW+1Z1aV4dwFYzaOvrAi
+        9ODckzeiRrfdyNftqXq4blBD4puj0zWzhvCD08YdzslsrXXHm2bZjasmHFWShmjVtFBCb1D9
+        AXJoOr8vAwAA
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 21, 2023 at 10:36=E2=80=AFAM Chengming Zhou
-<zhouchengming@bytedance.com> wrote:
->
-> On 2023/8/21 10:17, Changhui Zhong wrote:
-> > On Mon, Aug 21, 2023 at 9:56=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wr=
-ote:
-> >>
-> >> On 8/20/23 7:43 PM, Changhui Zhong wrote:
-> >>> Hello,
-> >>>
-> >>> triggered below warning issue with branch 'block-6.5',
-> >>
-> >> What sha? Please always include that in bug reports, people don't know
-> >> when you pulled it.
-> >>
-> >
-> > ok,I pulled the whole branch of block-6.5, I don't know which patch
-> > caused the issue=EF=BC=8Cthe HEAD is=EF=BC=9A
->
-> Hi, this problem should be fixed in the latest block-6.5 branch,
-> specifically including this commit:
->
-> commit e5c0ca13659e9d18f53368d651ed7e6e433ec1cf
->
->     blk-mq: release scheduler resource when request completes
->
->
-> Could you please help to check again?
+Makes Dept able to track dependencies by
+wait_for_completion()/complete().
 
+Signed-off-by: Byungchul Park <byungchul@sk.com>
+---
+ include/linux/completion.h | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
-ok,I will try the current branch  block-6.5
-
->
->
-> Thanks!
->
+diff --git a/include/linux/completion.h b/include/linux/completion.h
+index 62b32b19e0a8..32d535abebf3 100644
+--- a/include/linux/completion.h
++++ b/include/linux/completion.h
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <linux/swait.h>
++#include <linux/dept_sdt.h>
+ 
+ /*
+  * struct completion - structure used to maintain state for a "completion"
+@@ -26,14 +27,33 @@
+ struct completion {
+ 	unsigned int done;
+ 	struct swait_queue_head wait;
++	struct dept_map dmap;
+ };
+ 
++#define init_completion(x)				\
++do {							\
++	sdt_map_init(&(x)->dmap);			\
++	__init_completion(x);				\
++} while (0)
++
++/*
++ * XXX: No use cases for now. Fill the body when needed.
++ */
+ #define init_completion_map(x, m) init_completion(x)
+-static inline void complete_acquire(struct completion *x) {}
+-static inline void complete_release(struct completion *x) {}
++
++static inline void complete_acquire(struct completion *x)
++{
++	sdt_might_sleep_start(&x->dmap);
++}
++
++static inline void complete_release(struct completion *x)
++{
++	sdt_might_sleep_end();
++}
+ 
+ #define COMPLETION_INITIALIZER(work) \
+-	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
++	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait), \
++	  .dmap = DEPT_MAP_INITIALIZER(work, NULL), }
+ 
+ #define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
+ 	(*({ init_completion_map(&(work), &(map)); &(work); }))
+@@ -75,13 +95,13 @@ static inline void complete_release(struct completion *x) {}
+ #endif
+ 
+ /**
+- * init_completion - Initialize a dynamically allocated completion
++ * __init_completion - Initialize a dynamically allocated completion
+  * @x:  pointer to completion structure that is to be initialized
+  *
+  * This inline function will initialize a dynamically created completion
+  * structure.
+  */
+-static inline void init_completion(struct completion *x)
++static inline void __init_completion(struct completion *x)
+ {
+ 	x->done = 0;
+ 	init_swait_queue_head(&x->wait);
+-- 
+2.17.1
 
