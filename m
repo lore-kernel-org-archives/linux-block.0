@@ -2,20 +2,20 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B31EE49B4
-	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 04:07:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4BD1EE49B7
+	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 04:07:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232761AbjHUEHB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Aug 2023 00:07:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44578 "EHLO
+        id S232785AbjHUEHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Aug 2023 00:07:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232739AbjHUEHA (ORCPT
+        with ESMTP id S232746AbjHUEHA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 21 Aug 2023 00:07:00 -0400
 Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A42A7A6;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9E1CE9D;
         Sun, 20 Aug 2023 21:06:57 -0700 (PDT)
-X-AuditID: a67dfc5b-d6dff70000001748-6b-64e2ded5c594
+X-AuditID: a67dfc5b-d6dff70000001748-8b-64e2ded5c2df
 From:   Byungchul Park <byungchul@sk.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
@@ -41,99 +41,84 @@ Cc:     kernel_team@skhynix.com, torvalds@linux-foundation.org,
         gwan-gyeong.mun@intel.com, max.byungchul.park@gmail.com,
         boqun.feng@gmail.com, longman@redhat.com, hdanton@sina.com,
         her0gyugyu@gmail.com
-Subject: [RESEND PATCH v10 08/25] dept: Apply sdt_might_sleep_{start,end}() to PG_{locked,writeback} wait
-Date:   Mon, 21 Aug 2023 12:46:20 +0900
-Message-Id: <20230821034637.34630-9-byungchul@sk.com>
+Subject: [RESEND PATCH v10 10/25] dept: Apply sdt_might_sleep_{start,end}() to waitqueue wait
+Date:   Mon, 21 Aug 2023 12:46:22 +0900
+Message-Id: <20230821034637.34630-11-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230821034637.34630-1-byungchul@sk.com>
 References: <20230821034637.34630-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbVBMexzH/f/nsdVyZpnrVFxmPT9FnuY3GNfcwT0zxjDTeIHxsGOP2rm7
-        1ZySYoyyIZFbmQp12R5m26klzvYiKVJjFUpYidliF7GjxLKRStoab37zme/3O59XP5ZQVVLB
-        rC4qTpSiNHo1rSAV3YGFC592uLWLk7PmQubpxeD7mkpCfrmVhpYrZQisFckYPHf+gWe9XQj6
-        mx4SkJvdgqDA1U5Ahb0DQY3lKA1P3owDh6+HhsbsUzQYi8ppePRhAIMzJwtDmbwJ7mcUYqjt
-        e0dCroeGvFwjHj7vMfSZSxkwJ80Et+UCAwOuMGjsaKWg5sV8OH/RSUN1TSMJ9ko3hidV+TR0
-        WIcouG9vIKElM52Cyx8LafjQaybA7Oth4HGtCcPVlGHR8S8/KbibXovhePE1DI7nNxDcTH2F
-        Qba20lDv68Jgk7MJ+FFyB4H7TDcDx073MZCXfAbBqWM5JDwcvEtBinM59H/Pp9euFOq7eggh
-        xXZAqOk1kcK9Ql64fqGdEVJuvmAEk7xfsFnmCUXVHiwUeH2UIJeepAXZm8UIad0OLHxsbmaE
-        hnP9pPDGkYu3hGxXrNaKel28KC1as0cRmTfkIGIGlQn/t05PQs6xaSiA5bll/ODPkygNsSN8
-        sXiTP6a52XxbWx/h54ncNN6W3kmlIQVLcCfG8pZPTbS/mMDp+P9eXkJ+JrmZvPy5AvtZyS3n
-        292VzKh/Kl92tXZEFMCt4OUbVSN71fDms+s1OboxBvBPc2JGOYi/bWkjM5DShMaUIpUuKt6g
-        0emXhUYmRukSQvdGG2Q0/E/mwwM7KpG3JbwOcSxSByr3THZrVZQmPjbRUId4llBPVIZ8c2lV
-        Sq0m8aAoRe+W9uvF2DoUwpLqScolvQe0Ki5CEyf+K4oxovS7xWxAcBJaKh2qDn4Z96etIUj/
-        lz01ceuucftC3z74w9gzftX4iDlNUkRYpzNovWv15IKinaYxkOmp33twmzHn75D4zjml31VS
-        22ba2jTXNuX2p7eNqZe/hM9ybajKSLi1dIE9bMbzIbe7+MiVdc12sWShd8a+QEM09mZeK3eS
-        ax0e+8rNhrMb1WRspCZsHiHFan4B8io5LUsDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSfUzMcRzHfb+/x47jt6vxm+edNU+TmLOPeRiL+c6m+QtjpuN+000ld6SM
-        SU/Sw5GtopJUTipPv5qFzm6lkvRAJw+r1DHEKZ0uTk+6Nv+899rer73/evOUKpuZyevDjkmG
-        MG2ImlXQisC1scted9p1/gOJ0yAtxR9cA4k05NwtZaHlTgmC0vKzGHpqtsKbQQeCocZmCjLT
-        WxBc7+6goLy2E4GlKIaF1k9TwebqY6E+PZmF2IK7LLz8PoyhPeMShhJ5OzRczMdgdX+hIbOH
-        hezMWDweXzG4zcUcmKN9wV6UxcFw9wqo72xjoPpqPQOW90vhSm47C5WWehpqK+wYWh/lsNBZ
-        OsZAQ+0zGlrSUhm43ZvPwvdBMwVmVx8Hr6x5GO7Fja8l/BploC7ViiGh8D4G27vHCJ4kdmGQ
-        S9tYqHY5MJTJ6RT8vVmDwG76wUF8ipuD7LMmBMnxGTQ0j9QxENeugaE/OezGtaTa0UeRuLIT
-        xDKYR5Pn+SJ5mNXBkbgn7zmSJx8nZUVLSEFlDybXnS6GyMXnWSI7L3Ek6YcNk96mJo48uzxE
-        k0+2TLxj9h7FOp0Uoo+QDMs3BCmCs8dsVPiIMvJq24Jo1D45CfG8KKwScwu3JyEvnhUWim/f
-        uikP+wjzxbLUz0wSUvCUcG6yWPSzkfUU3oJevPDhGvIwLfiKcn859rBS0Igd9grOw6IwTyy5
-        Z50Y8hJWi/LjRxO+atzp7/5IX0SKPDSpGPnowyJCtfoQjZ/xcHBUmD7S7+CRUBmNX8Z8ejit
-        Ag20bq1CAo/UU5RBs+06FaONMEaFViGRp9Q+ylm/u3UqpU4bdVIyHNlvOB4iGavQLJ5Wz1Bu
-        2yUFqYRD2mPSYUkKlwz/W8x7zYxGm4f2ViVQu6drTdTcG7hJ6WeSUEBFW7/vogPivvVp3qcs
-        Wc6VthkHYvxJTksr8nZsypizJvLCrVNev52BdX2RZ+b9HE3p6vLh7OcMDZU1MQ8WBfqFL9aY
-        56bPf+dufhr/YsuCb6/H1h1NNI0UFDY6HQ29dtPSAH7NTt/9GtnKimraGKxdsYQyGLX/AOWw
-        WiQuAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSfUzMcRzHfX8P39/dcfbbYX5kw00zzLPsw8z857cZ85zJQzf3m26u2JWS
+        h+0oIUqyioSrdM51id/Z5HpwotxxnSSk1a07j+lR3JEKFf757LX3e3u//vlISMU9eqJEExUj
+        6KJUWiWWUbKOUbmzX3p86nnvuxbDuTPzwP/tJAU5xRYMtTcLEVjuHCWgtWolvA60I+ireUZC
+        VkYtglxvMwl3qj0Iyk3HMLx4Nxrq/V0YnBmnMSTkF2N43tZPQFNmOgGF4mp4mpZHgL33IwVZ
+        rRguZSUQg+cTAb1GMwNGfTD4TNkM9Hvng9Pziobyxllw8UoThrJyJwXVJT4CXthyMHgsv2l4
+        Wu2goPZcCg1FnXkY2gJGEoz+Lgbq7AYCbiUODiV9/UXD4xQ7AUnXbhNQ/6YUQcXJFgJEyysM
+        D/3tBFjFDBJ+Xq9C4EvtYOD4mV4GLh1NRXD6eCYFzwYe05DYFAJ9P3LwiqX8w/Yukk+0xvHl
+        AQPFP8nj+HvZzQyfWNHI8AZxP281zeTzy1oJPrfHT/Oi+RTmxZ50hk/uqCf4Treb4R0X+ij+
+        XX0WsTZoq2yZWtBqYgXd3OXhsghn6aF9N6QHKs42Ij26ziQjqYRjF3GvB9qp/3zT5UZDjNnp
+        XENDLznEY9kpnDXlA52MZBKSPTGSM3XX4KFiDLud+/q+jR5iig3m9MamYZazi7mqY4/+CSZz
+        hbfsw0PSwVwstQ0LFGwI98X79p84QcrZqkP+8gTugamBSkNyAxphRgpNVGykSqNdNCciPkpz
+        YM6uvZEiGnwo45H+sBLUU7uhErESpBwlD5/kUytoVWx0fGQl4iSkcqw86LtXrZCrVfEHBd3e
+        nbr9WiG6EgVJKOV4+YJAnFrB7lbFCHsEYZ+g+98SEulEPSrMPKF3ukpMd73uqTMG0g2Zh1rE
+        qzGr7Ui95vNlHD7OvSU4b3JBQfPl37KSuk0W14qPnY7UotTD2yIMZTYzNH7XTrP5W85uXhWa
+        ZraGbll/vzvJ5+nu2Bp6IT/OjovL6sISdnhNYecXuhwOkv6cXeBe4krfWNTqvr8uwMbXjFZS
+        0RGq+TNJXbTqD5YtGiVMAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0hTcRjG+5/rNl0dptTJomQhgaYppb2URH3IDoUVfQkCydEOOdQVm3kp
+        Ik1L0ywdeElXLY2l89qMWurG0LRWeSm1VFRy2cU0TXMzc1kq9eXlx/PA7/nyCnCJlvQSKJRx
+        vEopi5FSIkJ0aFeqf8+QXR6YU7gBcq8FgmMmgwBtTSUFndUVCCofpmAw2rIf3jnHEcy3deBQ
+        kNeJ4O7wIA4PW4cQmMsuUdA1shK6HZMU2PKyKEgtraHg9ZgLg4F8DQYVxnB4mVOCgXXuMwEF
+        oxQUF6Rii+cLBnN6Aw36ZB+wlxXR4BoOAtvQWxKab9lIMPf7wc3bAxQ0mm0EtJrsGHTVaykY
+        qvxDwsvW5wR05maTUDVRQsGYU4+D3jFJwxurDoPatEXblR8LJDzLtmJw5d4DDLr7GhBYMt5j
+        YKx8S0GzYxyDOmMeDr/utyCwX/9Gw+VrczQUp1xHkHU5n4CO389ISBsIhvmfWmrPLq55fBLn
+        0uoSOLNTR3AvSljuSdEgzaVZ+mlOZzzL1ZX5cqWNoxh3d9pBckbDVYozTmtoLvNbN8ZNtLfT
+        3PPCeYIb6S7Ajqw/LgqV8zGKeF61dXekKMrWcP5MuTDRcqMfJaP7dCYSClhmO1v9qh0tMcVs
+        Znt75/Al9mS82brsT2QmEglwJt2NLfveRi0VHkwE++PjGLnEBOPDJusHllnMhLAtl57+k25k
+        K2qtyyLhYm5sqF8ekDDB7NTwByIHiXRohQF5KpTxsTJFTHCAOjoqSalIDDh5OtaIFn9Gf8GV
+        a0IzXfubECNAUndx5Hq7XELK4tVJsU2IFeBST/G62WG5RCyXJZ3jVadPqM7G8OomtE5ASNeI
+        DxzjIyXMKVkcH83zZ3jV/xYTCL2SUfjglHDCoKvpCQuLWNDM1K7Kymqs2kSFtbmpiIPmOFeI
+        e+Cdna899hl6fK2fcdNIQugW7z0X41LrvS0+JibIvyv0UZXyo/tEn/are8O94jXB6bCg8UN6
+        i9dhr9rVzogkad7sUdPu38QOR83jbdvWlh92PRCllDiZ6T5N33THXimhjpIF+eIqtewvNPj9
+        uy8DAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Makes Dept able to track dependencies by PG_{locked,writeback} waits.
+Makes Dept able to track dependencies by waitqueue waits.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- mm/filemap.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ include/linux/wait.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 83dda76d1fc3..eed64dc88e43 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -44,6 +44,7 @@
- #include <linux/migrate.h>
- #include <linux/pipe_fs_i.h>
- #include <linux/splice.h>
+diff --git a/include/linux/wait.h b/include/linux/wait.h
+index a0307b516b09..ff349e609da7 100644
+--- a/include/linux/wait.h
++++ b/include/linux/wait.h
+@@ -7,6 +7,7 @@
+ #include <linux/list.h>
+ #include <linux/stddef.h>
+ #include <linux/spinlock.h>
 +#include <linux/dept_sdt.h>
- #include <asm/pgalloc.h>
- #include <asm/tlbflush.h>
- #include "internal.h"
-@@ -1219,6 +1220,9 @@ static inline bool folio_trylock_flag(struct folio *folio, int bit_nr,
- /* How many times do we accept lock stealing from under a waiter? */
- int sysctl_page_lock_unfairness = 5;
  
-+static struct dept_map __maybe_unused PG_locked_map = DEPT_MAP_INITIALIZER(PG_locked_map, NULL);
-+static struct dept_map __maybe_unused PG_writeback_map = DEPT_MAP_INITIALIZER(PG_writeback_map, NULL);
-+
- static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
- 		int state, enum behavior behavior)
- {
-@@ -1230,6 +1234,11 @@ static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
- 	unsigned long pflags;
- 	bool in_thrashing;
+ #include <asm/current.h>
+ #include <uapi/linux/wait.h>
+@@ -303,6 +304,7 @@ extern void init_wait_entry(struct wait_queue_entry *wq_entry, int flags);
+ 	struct wait_queue_entry __wq_entry;					\
+ 	long __ret = ret;	/* explicit shadow */				\
+ 										\
++	sdt_might_sleep_start(NULL);						\
+ 	init_wait_entry(&__wq_entry, exclusive ? WQ_FLAG_EXCLUSIVE : 0);	\
+ 	for (;;) {								\
+ 		long __int = prepare_to_wait_event(&wq_head, &__wq_entry, state);\
+@@ -318,6 +320,7 @@ extern void init_wait_entry(struct wait_queue_entry *wq_entry, int flags);
+ 		cmd;								\
+ 	}									\
+ 	finish_wait(&wq_head, &__wq_entry);					\
++	sdt_might_sleep_end();							\
+ __out:	__ret;									\
+ })
  
-+	if (bit_nr == PG_locked)
-+		sdt_might_sleep_start(&PG_locked_map);
-+	else if (bit_nr == PG_writeback)
-+		sdt_might_sleep_start(&PG_writeback_map);
-+
- 	if (bit_nr == PG_locked &&
- 	    !folio_test_uptodate(folio) && folio_test_workingset(folio)) {
- 		delayacct_thrashing_start(&in_thrashing);
-@@ -1331,6 +1340,8 @@ static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
- 	 */
- 	finish_wait(q, wait);
- 
-+	sdt_might_sleep_end();
-+
- 	if (thrashing) {
- 		delayacct_thrashing_end(&in_thrashing);
- 		psi_memstall_leave(&pflags);
 -- 
 2.17.1
 
