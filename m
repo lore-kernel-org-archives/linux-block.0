@@ -2,88 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C82AAEE4996
-	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 07:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D635EE4996
+	for <linux-block@archiver.kernel.org>; Mon, 21 Aug 2023 09:33:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233058AbjHUHn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Aug 2023 03:43:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51898 "EHLO
+        id S233328AbjHUJdj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Aug 2023 05:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233790AbjHUHn1 (ORCPT
+        with ESMTP id S232412AbjHUJdj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Aug 2023 03:43:27 -0400
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBEFBC5;
-        Mon, 21 Aug 2023 00:43:19 -0700 (PDT)
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fe1f70a139so5988315e9.0;
-        Mon, 21 Aug 2023 00:43:19 -0700 (PDT)
+        Mon, 21 Aug 2023 05:33:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D44129D
+        for <linux-block@vger.kernel.org>; Mon, 21 Aug 2023 02:32:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692610370;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NW0H5YY6tEUfUsrJHZpIlunAV22vJAx4tbyK+cyHoGI=;
+        b=iM5idAN0/D9uW7CXZVvwFhdCEvXxSpa/KqgBfqKz4R3+D/CoQ8IwPFfnCfj8dIxA+ziZ1l
+        pjaLQngK9MJD28JGxmknwo3VBPmJNMULW8C3QGUVF/B1/UGVkwd24GCTKatLUuDRAJ7WrZ
+        Wz1SPG21EYaW4hePZo3vs8N7AsmY6n0=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-635-5fMGggRDMMWjJj-Z85rA1w-1; Mon, 21 Aug 2023 05:32:48 -0400
+X-MC-Unique: 5fMGggRDMMWjJj-Z85rA1w-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-267f00f6876so3266951a91.3
+        for <linux-block@vger.kernel.org>; Mon, 21 Aug 2023 02:32:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692603798; x=1693208598;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L6hlRFuEO18ewfLVhWL/VLpc0gMEa3vQtcpOVMBFDnE=;
-        b=SRkOalP30b3QYyaTKxtIXw5HvkiHJd+jRPby4VDt4ucCJOUq6zKapl/L7wjfUWC/HB
-         0igNL6VU5SDf+nFc87hVvMOOJmbpAv4+z2RXOgZgQLVwY9cIwbMmOmzPx0Qc83uNH0iO
-         Dr/hZatzA8ZftaayqSnY5nSSTlFV9rKv208oMhFRTIuxR+a0IGhl6RBrjfG0iz0JHz/6
-         iMSFhbvne01Srfs4JVfURZ7fBHWWRsbimP7a5IAMAvMk8SU1Ysj0Yql5AWirqyJnXFjC
-         8WPgrPNcVuQIdBkTziQE09AriA8Nymhi8aeQtI40z6r/K6/DaBkT5TjuslbgXoVFjZv5
-         wuAA==
-X-Gm-Message-State: AOJu0Yy+QXvKblGVEnWtRJUewtQliTmh6B4TjcNZD6QKO/hkb3I2S/+v
-        LIz4gKqTB1V3djxsrDfiClk=
-X-Google-Smtp-Source: AGHT+IHDt7naLH0gcQQARK8rQAsDXjJZrHcQgGMzMpPBtCojQBs1ERrRjAWBRx5UUBj9r+yPoyICZw==
-X-Received: by 2002:adf:f4ce:0:b0:317:f1d6:997c with SMTP id h14-20020adff4ce000000b00317f1d6997cmr4443599wrp.0.1692603798154;
-        Mon, 21 Aug 2023 00:43:18 -0700 (PDT)
-Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id e11-20020a5d65cb000000b0031416362e23sm11696178wrw.3.2023.08.21.00.43.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Aug 2023 00:43:17 -0700 (PDT)
-Message-ID: <fc4d55db-dbd3-d2e5-ab2a-3eed07b30676@grimberg.me>
-Date:   Mon, 21 Aug 2023 10:43:14 +0300
+        d=1e100.net; s=20221208; t=1692610367; x=1693215167;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NW0H5YY6tEUfUsrJHZpIlunAV22vJAx4tbyK+cyHoGI=;
+        b=BhHpZkktxYV9sGPNiIn6kpw3vkAJ19Ai5yTw6I2Sd2umHdfu5EEcT+HQabVf7P/tZZ
+         /4mfbFX1+RTIUTzr+YQXN09tq6TVbBz79IAvdkDz+DfxKxcpHKpZah+8SUpidAg0X1UV
+         kmOb16WP7cbGyPAUwnITvRSOdCeN3dWK53/tI999cd4C/sS43pFoeE4PJ5oxzowspr2h
+         OefIyQKU6xC423gDiFsCirr9xczwprdgmHCbRbxEKzAKFe4rBPzn8bUB0m1C1sdPNPGW
+         N7ggfsMS04m8H661v5c8ucW7h01/439Of4tatazUZ5bmb3NDtaWv/fLVGb1wZoH9d3Bl
+         B6eQ==
+X-Gm-Message-State: AOJu0Yy0nGt1In49t9u8VTsEfYxLubjI4G3rz0xMtVx3IL/isyYPDEcy
+        GMqtgCfSXTGGzRHfL5giuwtt2M9pcF/Meu/TRkQig8xATWi5TpSWsGI2f6jDqvyJuxj//+5Zfl2
+        iXwQNMg8u5WUX5Jp/J8/ih0Iar8yl4GiHsYBv4uE=
+X-Received: by 2002:a17:90b:23c7:b0:26b:17ef:7365 with SMTP id md7-20020a17090b23c700b0026b17ef7365mr2797183pjb.48.1692610367494;
+        Mon, 21 Aug 2023 02:32:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEBYHsRN8ElizVXEXZra+vOZGm6HWRwFb6DeJ1fgtOCWZRqknWPixxhInnU4qcZUF7Pv4vJv+mgD8HuzGjyQEM=
+X-Received: by 2002:a17:90b:23c7:b0:26b:17ef:7365 with SMTP id
+ md7-20020a17090b23c700b0026b17ef7365mr2797169pjb.48.1692610367114; Mon, 21
+ Aug 2023 02:32:47 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH blktests v2 3/3] nvme: introduce
- nvmet_target_{setup/cleanup} common code
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, Jason Gunthorpe <jgg@ziepe.ca>
-References: <20230818141537.22332-1-dwagner@suse.de>
- <20230818141537.22332-4-dwagner@suse.de>
- <3713297b-a5fb-b027-c34b-d56526155c4c@grimberg.me>
- <u2esnihohobu5jaxgz3xdfpjfvfrnmkklzajjrckdnr6g3i54b@qofopy4bhhlp>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <u2esnihohobu5jaxgz3xdfpjfvfrnmkklzajjrckdnr6g3i54b@qofopy4bhhlp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CAGVVp+Xiz99dpFPn5RYjFfA-8tZH0cSvsmydB=1k08GfbViAFw@mail.gmail.com>
+ <cffead50-032a-46d3-bc9e-ace6586a69d5@kernel.dk> <CAGVVp+VRcQs1qvsEeKyvmOXz=8KTybHpNDAwS9GzVMVw+FvTUg@mail.gmail.com>
+ <f0c0937f-485c-d317-8bd9-b7d32ace4e1f@bytedance.com>
+In-Reply-To: <f0c0937f-485c-d317-8bd9-b7d32ace4e1f@bytedance.com>
+From:   Changhui Zhong <czhong@redhat.com>
+Date:   Mon, 21 Aug 2023 17:32:36 +0800
+Message-ID: <CAGVVp+US6zjWzTR_1zALr-jrVNWewtr4ARa3_3NXvEBjC01ZfA@mail.gmail.com>
+Subject: Re: [bug report] WARNING: CPU: 12 PID: 51497 at block/mq-deadline.c:679
+ dd_exit_sched+0xd5/0xe0
+To:     Chengming Zhou <zhouchengming@bytedance.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Aug 21, 2023 at 10:36=E2=80=AFAM Chengming Zhou
+<zhouchengming@bytedance.com> wrote:
+>
+> On 2023/8/21 10:17, Changhui Zhong wrote:
+> > On Mon, Aug 21, 2023 at 9:56=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wr=
+ote:
+> >>
+> >> On 8/20/23 7:43 PM, Changhui Zhong wrote:
+> >>> Hello,
+> >>>
+> >>> triggered below warning issue with branch 'block-6.5',
+> >>
+> >> What sha? Please always include that in bug reports, people don't know
+> >> when you pulled it.
+> >>
+> >
+> > ok,I pulled the whole branch of block-6.5, I don't know which patch
+> > caused the issue=EF=BC=8Cthe HEAD is=EF=BC=9A
+>
+> Hi, this problem should be fixed in the latest block-6.5 branch,
+> specifically including this commit:
+>
+> commit e5c0ca13659e9d18f53368d651ed7e6e433ec1cf
+>
+>     blk-mq: release scheduler resource when request completes
+>
+>
+> Could you please help to check again?
 
->>> diff --git a/tests/nvme/003 b/tests/nvme/003
->>> index 71b82ce758a3..eed1f549866a 100755
->>> --- a/tests/nvme/003
->>> +++ b/tests/nvme/003
->>> @@ -22,15 +22,8 @@ test() {
->>>    	_setup_nvmet
->>> -	local loop_dev
->>> -	local port
->>> -	port="$(_create_nvmet_port "${nvme_trtype}")"
->>> -
->>> -	loop_dev="$(losetup -f)"
->>> -
->>> -	_create_nvmet_subsystem "${def_subsysnqn}" "${loop_dev}"
->>> -	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
->>> +	_nvmet_target_setup --blkdev=device
->>
->> --blkdev=device by default no?
-> 
-> Yes. I thought it is better to be explicit in the tests. I don't mind
-> dropping --blkdev=device if you think we should use the defaults.
+Hi, Chengming
 
-Just wondering why it is different than all the rest of the defaults?
-It probably can be omitted from the callers.
+this issue is no longer triggered under the current branch=EF=BC=8C
+looks it has been fixed by this commit
+
+Thanks=EF=BC=8C
+
