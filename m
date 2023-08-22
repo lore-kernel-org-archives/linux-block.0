@@ -2,78 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 248D5EE4993
-	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 12:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3ACCEE4993
+	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 13:08:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235897AbjHVM4i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Aug 2023 08:56:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53880 "EHLO
+        id S233200AbjHVNIy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Aug 2023 09:08:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235881AbjHVM4f (ORCPT
+        with ESMTP id S232905AbjHVNIx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2023 08:56:35 -0400
+        Tue, 22 Aug 2023 09:08:53 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E3B6CC7
-        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 05:55:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA53CC6
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 06:08:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692708948;
+        s=mimecast20190719; t=1692709691;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=K68YHbA3+U8O9M9xl9/6yOrkj/8TeOjc2yYUeFDBx14=;
-        b=C+5Fa30SsO6k6+06eBhQnWDuRxhDGdBi0ib79Hpv2aOrX1XlDzmlDSEQ+SPONuNZoricO1
-        TMI1CPLON4/T2afN6UF4EdBATm3ieRkZTkK8AaXdVaS8abyu7arh0Q06PH9UDGeEDa1qcX
-        DY8AQR3x5Gv+EOUKZ1MVGshwohV/+3c=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-661-mZ8LSaXPOCazOkhgI8lbJw-1; Tue, 22 Aug 2023 08:55:44 -0400
-X-MC-Unique: mZ8LSaXPOCazOkhgI8lbJw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 825D83C0F676;
-        Tue, 22 Aug 2023 12:55:43 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 484CF492C13;
-        Tue, 22 Aug 2023 12:55:38 +0000 (UTC)
-Date:   Tue, 22 Aug 2023 20:55:34 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     chengming.zhou@linux.dev
-Cc:     axboe@kernel.dk, hch@lst.de, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: Re: [PATCH 3/3] blk-mq: prealloc tags when increase tagset
- nr_hw_queues
-Message-ID: <ZOSwRtKM75UWDryy@fedora>
-References: <20230821095602.70742-1-chengming.zhou@linux.dev>
- <20230821095602.70742-3-chengming.zhou@linux.dev>
+        bh=2i92USkhd3aYM8lBDCV9sQj/R5WX5KpFuC2KDLqm9uA=;
+        b=huIQdUcLweLc6TCgSbuPRjiEJe/0GqGqxURwqK7pPAFgL4z8M1RWRDapoYb/8knlgebPsR
+        wHY6aWRRZwXQX5CNmLgRigpDsVAZ1SJifpltunYwN2qdH3eAU7L8R9XeX2EoETX79Ahe2i
+        /Baq/ItNCgz72n7XNsnCjVGsEZqzU7U=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-63-5zeBv91CNd2s0HXxmfZWnw-1; Tue, 22 Aug 2023 09:08:10 -0400
+X-MC-Unique: 5zeBv91CNd2s0HXxmfZWnw-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3a8607eae76so414039b6e.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 06:08:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692709689; x=1693314489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2i92USkhd3aYM8lBDCV9sQj/R5WX5KpFuC2KDLqm9uA=;
+        b=U9Y5pjkR2ZG3y9x/14uHlHF6x4xRBW3dQFIbJULUSoKUzrTsv75N50M1BA3EZazCOB
+         xg8kMPk7+w/sutbgf/oKltwSyCaFFXvOKx74VujeQgDcU3+R6eFqJbJSyH4nHb121KCP
+         cxhWLykLhKfyYWaEwk+K/4FQMWp/9zKMeqeWJWr1Dl1ZaRUrhI7jdBQX4bVNrJtKPvX3
+         ohBt4xQWaq/kvVQ3iEYqgomu0Gx5Za2kTYmlt+epr9bx8x/h0doR4vICtJRz5em0Ti7r
+         P7vq9sLfZxMyIQiApemRuqz4VNs/ROa9x9opN0teVGtZs86oAax5VrdH50DAf9g0dF+I
+         jJVg==
+X-Gm-Message-State: AOJu0YxF8GiAHNNCmquBwSmvAgJ4spBg7KU7QGa7EGzSOZdZ0iP/bkAM
+        vem7+GPWI9oFPaKNTIbnN0b/JNGDWKS2KbZXxbTcuc02bMMXy9YGxYjbG1fjmo9BA3rTB+uIQaz
+        CqegBpLiI7A+PB/lcYTThB1fiC4750lIwZt3xyxZbx0Jt21PhwIdxQaM=
+X-Received: by 2002:a05:6358:c12a:b0:13a:cd06:f631 with SMTP id fh42-20020a056358c12a00b0013acd06f631mr6081333rwb.2.1692709688856;
+        Tue, 22 Aug 2023 06:08:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE5jnokBVqe6Vkt7S3b8TW/jdpbS9ktl8CZ+NlXNERyv6n6WFm96H+zxw3a8+CVtcXFhmkrn2bsT4tHJKpSLfY=
+X-Received: by 2002:a05:6358:c12a:b0:13a:cd06:f631 with SMTP id
+ fh42-20020a056358c12a00b0013acd06f631mr6081317rwb.2.1692709688582; Tue, 22
+ Aug 2023 06:08:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230821095602.70742-3-chengming.zhou@linux.dev>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+References: <20230817075509.1438569-1-fengli@smartx.com>
+In-Reply-To: <20230817075509.1438569-1-fengli@smartx.com>
+From:   Ming Lei <ming.lei@redhat.com>
+Date:   Tue, 22 Aug 2023 21:07:56 +0800
+Message-ID: <CAFj5m9+sm55FJAoM5iYtM=4y6VA7QwqD9bPqS7_uauwKqBvpNQ@mail.gmail.com>
+Subject: Re: [PATCH] block: fix unexpected split in bio_discard_limit
+To:     Li Feng <fengli@smartx.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>, lifeng1519@gmail.com,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 21, 2023 at 05:56:02PM +0800, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
-> 
-> Just like blk_mq_alloc_tag_set(), it's better to prepare all tags before
-> using to map to queue ctxs in blk_mq_map_swqueue(), which now have to
-> consider empty set->tags[].
-> 
-> The good point is that we can fallback easily if increasing nr_hw_queues
-> fail, instead of just mapping to hctx[0] when fail in blk_mq_map_swqueue().
-> 
-> And the fallback path already has tags free & clean handling, so all
-> is good.
-> 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+On Thu, Aug 17, 2023 at 3:42=E2=80=AFPM Li Feng <fengli@smartx.com> wrote:
+>
+> bio_discard_limit() enforces discard boundaries within the range of 32-bi=
+t
+> unsigned integers, resulting in unexpected discard cut boundaries.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Any bio size can't be bigger than UINT_MAX, see bio definition.
 
--- 
-Ming
+>
+> For example, max discard size =3D 1MiB, discard_granularity =3D 512B, the=
+n the
+> discard lengths sent in the range [0,4G) are 1MiB, 1MiB... (1MiB-512).
+> The next discard offset from 4G is [4G-512, 4G-512+1MiB).
+> The discard of the 4G offset boundary does not comply with the optimal 1M=
+iB
+> size.
+
+As mentioned, max bio size is 4GB, so there shouldn't be such issue.
+
+Thanks,
 
