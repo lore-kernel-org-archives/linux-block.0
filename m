@@ -2,161 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DFAEE4993
-	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 13:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6F6EE49A3
+	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 13:28:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231796AbjHVNZr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Aug 2023 09:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40988 "EHLO
+        id S236129AbjHVN20 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Aug 2023 09:28:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236108AbjHVNZq (ORCPT
+        with ESMTP id S236123AbjHVN2Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2023 09:25:46 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55F0BE;
-        Tue, 22 Aug 2023 06:25:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 77A1A61083;
-        Tue, 22 Aug 2023 13:25:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55180C433C8;
-        Tue, 22 Aug 2023 13:25:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692710741;
-        bh=dafa/FkbagFfW/Wg2rtYYk5Ab81iW7YdXDqOrQLAT4I=;
-        h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-        b=hFZThr2ocn7V7tRa0MewY+oDcibf1WdD0I6t9e1cQaJOMfIYBBnmTZhsVTdDLTYLO
-         w+XVfdNRrmyDiscucZCzYR1F00DOIxPUhlBWhIjbJdyIKw5Kts3UuPSVBZ210WuiTG
-         mwlpE+kOC+dHsKUvA3hZh0QPTn3Gq16lJyLbcby2jz2TwQm6Bar7Fl+qllNQMlIABr
-         kpaazCpPqSGBWp76JDC2gxh/jFHq9dFo0WkrrwndllADwxhlYkcXiI5SxxYm0wJ7qV
-         vP5KefSxtriiTs0liOCgA/58y+SsZH1eXhNv8fBs2YoJQkPBQsGzFS8D+R6BcsZdCJ
-         AGlqWXVCxMClw==
-Mime-Version: 1.0
+        Tue, 22 Aug 2023 09:28:25 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53038CE2
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 06:28:13 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bf3a2f44ffso32397895ad.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 06:28:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20221208.gappssmtp.com; s=20221208; t=1692710893; x=1693315693;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XxZ55EMzADqc7Vn1JWMMu+XroI194CgReOhVVFRwyr4=;
+        b=uVTNjxuQapxQgN+qHR21wi3mfGqGBgPwPRt4NfTrcWF/w9Vw9P5fZG5OczQHnLkiAY
+         3taqMUeS0pDH65ifPffXXesEAXofobDCJIH1+Xqv+7FxmosRDCGUvhLngavD/EaLxHEa
+         aE958Meor1ib56vuhZxVUDe5BZwzLk+0A9F9KWo9lRYVbcvN4pI8emWlHzyIq2AU2/o6
+         Sati9PmXbbPK/R1BJ3vAqFuKdtq8gYwU5/TJdybmmfU5LAdMTQR+ZMDg8JnnuZajvinY
+         UmdlphClurdvKYji+hX20jdEjtWC8oVIQr3M7ZV6/5rgCTkKqNpXIMN4qoDte1IEC8cO
+         J5uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692710893; x=1693315693;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XxZ55EMzADqc7Vn1JWMMu+XroI194CgReOhVVFRwyr4=;
+        b=Vm6SQ8Qh3ywq8baKj1nnHiZg/f6ufAxzi4xEgP8ZLNI2WCJqKSpLSwgNN8IGcCl9sG
+         yi+Rg04rfNyWEG0UoGFMmfWFcNT03fPYzWmTQ+k/+02wCsgDlc6hh0QUqc2JyEyuc+BT
+         hTlS2pMcnRcjnB4YSKeYXUjHTZ8HDV70ibhJgZBIXsObDEOWi2XM2ULC3d1OyxIKSDSA
+         n7rVGZsV23JE/dHS2UPTCVmKYzQRQ0g6lkgxfXe4UNw1do5Mz5BLVkrpTeKkYf2Ji1YI
+         fTR+ZN4MMRwurdKmLYf0G6vux4N2roRuVFdJ1895njKK8Qx9XbcgZJ+a/N4mE2yj2Y5T
+         KZ8A==
+X-Gm-Message-State: AOJu0Yz9s1Y0cCICgW3b5/UAy17k767YQvhGacpJzu1racadXhd00dys
+        ZN6znvsFFmbPphTLek9kalVSfw==
+X-Google-Smtp-Source: AGHT+IG2dVgySB9lhtQiE7d0yi+85lxJuvrESHnNKppl7eTgOceEkjxu4uBVFUbq+mRe/1NiVMwlhw==
+X-Received: by 2002:a17:902:e88e:b0:1bc:48dc:d881 with SMTP id w14-20020a170902e88e00b001bc48dcd881mr13438928plg.8.1692710892285;
+        Tue, 22 Aug 2023 06:28:12 -0700 (PDT)
+Received: from smtpclient.apple ([8.210.91.195])
+        by smtp.gmail.com with ESMTPSA id f1-20020a170902ce8100b001b801044466sm9083672plg.114.2023.08.22.06.28.10
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 22 Aug 2023 06:28:11 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
+Subject: Re: [PATCH] block: fix unexpected split in bio_discard_limit
+From:   Li Feng <fengli@smartx.com>
+In-Reply-To: <CAFj5m9+sm55FJAoM5iYtM=4y6VA7QwqD9bPqS7_uauwKqBvpNQ@mail.gmail.com>
+Date:   Tue, 22 Aug 2023 21:27:57 +0800
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 22 Aug 2023 16:25:37 +0300
-Message-Id: <CUZ3VLLQO2NT.27JTWARP7V32B@suppilovahvero>
-Cc:     <linuxppc-dev@lists.ozlabs.org>, <jonathan.derrick@linux.dev>,
-        <brking@linux.vnet.ibm.com>, <msuchanek@suse.de>,
-        <mpe@ellerman.id.au>, <nayna@linux.ibm.com>, <axboe@kernel.dk>,
-        <akpm@linux-foundation.org>, <keyrings@vger.kernel.org>,
-        <okozina@redhat.com>, <dkeefe@redhat.com>
-Subject: Re: [PATCH v5 0/3 RESEND] sed-opal: keyrings, discovery, revert,
- key store
-From:   "Jarkko Sakkinen" <jarkko@kernel.org>
-To:     <gjoyce@linux.vnet.ibm.com>, <linux-block@vger.kernel.org>
-X-Mailer: aerc 0.14.0
-References: <20230721211534.3437070-1-gjoyce@linux.vnet.ibm.com>
- <46cda90a12da4639d1e65ce82ae342df05b7afc2.camel@linux.vnet.ibm.com>
- <CUU9DZ1YEZVF.16X1CD7ES1RXD@suppilovahvero>
- <a232e46bb7b364a6ef7d77aef853d0ddda4e3f2a.camel@linux.vnet.ibm.com>
-In-Reply-To: <a232e46bb7b364a6ef7d77aef853d0ddda4e3f2a.camel@linux.vnet.ibm.com>
+Message-Id: <A6EFB969-309C-4A9B-AAE2-FFB93A0BB6E0@smartx.com>
+References: <20230817075509.1438569-1-fengli@smartx.com>
+ <CAFj5m9+sm55FJAoM5iYtM=4y6VA7QwqD9bPqS7_uauwKqBvpNQ@mail.gmail.com>
+To:     Ming Lei <ming.lei@redhat.com>
+X-Mailer: Apple Mail (2.3731.300.101.1.3)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon Aug 21, 2023 at 6:26 PM EEST, Greg Joyce wrote:
-> On Wed, 2023-08-16 at 23:41 +0300, Jarkko Sakkinen wrote:
-> > On Wed Aug 16, 2023 at 10:45 PM EEST, Greg Joyce wrote:
-> > > It's been almost 4 weeks since the last resend and there haven't
-> > > been
-> > > any comments. Is there anything that needs to be changed for
-> > > acceptance?
-> > >=20
-> > > Thanks for your input.
-> > >=20
-> > > Greg
-> > >=20
-> > > On Fri, 2023-07-21 at 16:15 -0500, gjoyce@linux.vnet.ibm.com wrote:
-> > > > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > > >=20
-> > > > This patchset has gone through numerous rounds of review and
-> > > > all comments/suggetions have been addressed. The reviews have
-> > > > covered all relevant areas including reviews by block and keyring
-> > > > developers as well as the SED Opal maintainer. The last
-> > > > patchset submission has not solicited any responses in the
-> > > > six weeks since it was last distributed. The changes are
-> > > > generally useful and ready for inclusion.
-> > > >=20
-> > > > TCG SED Opal is a specification from The Trusted Computing Group
-> > > > that allows self encrypting storage devices (SED) to be locked at
-> > > > power on and require an authentication key to unlock the drive.
-> > > >=20
-> > > > The current SED Opal implementation in the block driver
-> > > > requires that authentication keys be provided in an ioctl
-> > > > so that they can be presented to the underlying SED
-> > > > capable drive. Currently, the key is typically entered by
-> > > > a user with an application like sedutil or sedcli. While
-> > > > this process works, it does not lend itself to automation
-> > > > like unlock by a udev rule.
-> > > >=20
-> > > > The SED block driver has been extended so it can alternatively
-> > > > obtain a key from a sed-opal kernel keyring. The SED ioctls
-> > > > will indicate the source of the key, either directly in the
-> > > > ioctl data or from the keyring.
-> > > >=20
-> > > > Two new SED ioctls have also been added. These are:
-> > > >   1) IOC_OPAL_REVERT_LSP to revert LSP state
-> > > >   2) IOC_OPAL_DISCOVERY to discover drive capabilities/state
-> > > >=20
-> > > > change log v5:
-> > > >         - rebase to for-6.5/block
-> > > >=20
-> > > > change log v4:
-> > > >         - rebase to 6.3-rc7
-> > > >         - replaced "255" magic number with U8_MAX
-> > > >=20
-> > > > change log:
-> > > >         - rebase to 6.x
-> > > >         - added latest reviews
-> > > >         - removed platform functions for persistent key storage
-> > > >         - replaced key update logic with key_create_or_update()
-> > > >         - minor bracing and padding changes
-> > > >         - add error returns
-> > > >         - opal_key structure is application provided but kernel
-> > > >           verified
-> > > >         - added brief description of TCG SED Opal
-> > > >=20
-> > > >=20
-> > > > Greg Joyce (3):
-> > > >   block: sed-opal: Implement IOC_OPAL_DISCOVERY
-> > > >   block: sed-opal: Implement IOC_OPAL_REVERT_LSP
-> > > >   block: sed-opal: keyring support for SED keys
-> > > >=20
-> > > >  block/Kconfig                 |   2 +
-> > > >  block/opal_proto.h            |   4 +
-> > > >  block/sed-opal.c              | 252
-> > > > +++++++++++++++++++++++++++++++++-
-> > > >  include/linux/sed-opal.h      |   5 +
-> > > >  include/uapi/linux/sed-opal.h |  25 +++-
-> > > >  5 files changed, 282 insertions(+), 6 deletions(-)
-> > > >=20
-> > > >=20
-> > > > base-commit: 1341c7d2ccf42ed91aea80b8579d35bc1ea381e2
-> >=20
-> > I can give because it looks good to me to all patches:
-> >=20
-> > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
-> >=20
-> > ... but should not probably go to my tree.
-> >=20
-> > BR, Jarkko
->
-> Thanks for the ack Jarkko. Any thoughts on which tree it should go to?
 
-I get from "scripts/get_maintainer.pl block/sed-opal.c | wl-copy"
 
-Jonathan Derrick <jonathan.derrick@linux.dev> (supporter:SECURE ENCRYPTING =
-DEVICE (SED) OPAL DRIVER)
-Jens Axboe <axboe@kernel.dk> (maintainer:BLOCK LAYER)
-linux-block@vger.kernel.org (open list:SECURE ENCRYPTING DEVICE (SED) OPAL =
-DRIVER)
-linux-kernel@vger.kernel.org (open list)
+> 2023=E5=B9=B48=E6=9C=8822=E6=97=A5 21:07=EF=BC=8CMing Lei =
+<ming.lei@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Thu, Aug 17, 2023 at 3:42=E2=80=AFPM Li Feng <fengli@smartx.com> =
+wrote:
+>>=20
+>> bio_discard_limit() enforces discard boundaries within the range of =
+32-bit
+>> unsigned integers, resulting in unexpected discard cut boundaries.
+>=20
+> Any bio size can't be bigger than UINT_MAX, see bio definition.
+>=20
+>>=20
+>> For example, max discard size =3D 1MiB, discard_granularity =3D 512B, =
+then the
+>> discard lengths sent in the range [0,4G) are 1MiB, 1MiB... =
+(1MiB-512).
+>> The next discard offset from 4G is [4G-512, 4G-512+1MiB).
+>> The discard of the 4G offset boundary does not comply with the =
+optimal 1MiB
+>> size.
+>=20
+> As mentioned, max bio size is 4GB, so there shouldn't be such issue.
+>=20
+> Thanks,
+>=20
+Got it, many thanks.
 
-You should probably add the corresponding maintainers and linux-block to
-the loop. I suggest to send a new version of the patch set with my ack's
-added to the patches.
-
-BR, Jarkko
