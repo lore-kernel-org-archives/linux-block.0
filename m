@@ -2,72 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA20EE49AB
-	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 04:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D08FEE49AB
+	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 05:35:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232495AbjHVEx5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Aug 2023 00:53:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44600 "EHLO
+        id S232840AbjHVFf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Aug 2023 01:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232067AbjHVEx4 (ORCPT
+        with ESMTP id S231995AbjHVFf2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2023 00:53:56 -0400
+        Tue, 22 Aug 2023 01:35:28 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B1F18B;
-        Mon, 21 Aug 2023 21:53:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8FB7130;
+        Mon, 21 Aug 2023 22:35:26 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 26E586320D;
-        Tue, 22 Aug 2023 04:53:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C1E7C433C7;
-        Tue, 22 Aug 2023 04:53:54 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3167760FB4;
+        Tue, 22 Aug 2023 05:35:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2C2C433C7;
+        Tue, 22 Aug 2023 05:35:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692680034;
-        bh=JbeP199iE1PeA5nZ2TaeZmrgj5NV3RzN82APW6nImDA=;
+        s=k20201202; t=1692682525;
+        bh=0u/LkEF9xPWwwH+3zJUBHtJDhlV+bd1HJH3ZyM1DhmQ=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sKL0tD7iRZ0MkDNt1X/V6rp2royaC2a/4T7fNRnrWD9NelVu5FDoxeeR/DefCFcAy
-         iBd2gWNzEXW2eAe2EviRTrHqeYtfW6x61trdcBwDDlVVKZzIuQ3vY3rJkJwFBcZaxD
-         nqETuGGonh5g6T4KTYvoYcMqQ+SUkuwUTelAxZkEmMl3VXxVl3FEXFk6A3E1JPUgWy
-         GXLQglKVetZPae0RPpQtdyGLQg7vpYJtT6kiXjBaGt845lUsiWblW0MoH05OGmGlAe
-         lN8lQec6KOtV1vqQDBN3MN769xFtpFtrYQLTYY7k6MJYlQvNSeOYc9QZ1qNmQwlJNf
-         5KFLJrD9c57aA==
-Date:   Mon, 21 Aug 2023 21:53:52 -0700
+        b=ER1fmT70yZigtpkEHWQJqqxLOMrz2g+erN497tQb8M/hxgSDzP2CJwIthBDZBl69V
+         iFJbfNI13y5ZaSESFGIWN7SBBC6wegrDL3LUQnK0+fykkh3IfRklKofNjquu5OsOyT
+         NDqhX9rRRUh9MrccprWOg0r3jMXKrAfJNcqX8cjSdIHgOon86xFTEAyo079I7V2rQM
+         BAEz2hlf629zmqVQ1sH5NAwBHnlg7SYtwSWZLJH12gToUoXy8oIJWoMfqtm+6vD197
+         wY89pESyG9DlLy2c3ZexV6JSqDXDN4l9ruSiBSIcqWJvk4FMExHckh6N5vk99Z2aAy
+         qunFy7v4nNbTw==
+Date:   Mon, 21 Aug 2023 22:35:23 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Dongsoo Lee <letrhee@nsr.re.kr>
-Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
-        "'David S. Miller'" <davem@davemloft.net>,
-        'Jens Axboe' <axboe@kernel.dk>,
-        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
-        'Jaegeuk Kim' <jaegeuk@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 0/4] crypto: LEA block cipher implementation
-Message-ID: <20230822045352.GB1661@sol.localdomain>
-References: <20230630050323.984216-1-letrhee@nsr.re.kr>
- <000001d9d3b8$bca8e9d0$35fabd70$@nsr.re.kr>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
+        Ted Tso <tytso@mit.edu>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: [PATCH 1/6] block: Add config option to not allow writing to
+ mounted devices
+Message-ID: <20230822053523.GA8949@sol.localdomain>
+References: <20230704122727.17096-1-jack@suse.cz>
+ <20230704125702.23180-1-jack@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <000001d9d3b8$bca8e9d0$35fabd70$@nsr.re.kr>
+In-Reply-To: <20230704125702.23180-1-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 21, 2023 at 07:50:37AM +0900, Dongsoo Lee wrote:
-> Hello.
-> 
-> Is there any further progress on the patch we submitted and the additional fscrypt documentation? 
-> 
-> https://lore.kernel.org/linux-fscrypt/20230630064811.22569-1-ebiggers@kernel.org/T/#u.
-> 
-> If the LEA cipher is accepted, we would like to add a SIMD implementation for it.
+Hi Jan,
 
-I already applied 'fscrypt: improve the "Encryption modes and usage" section'
-(https://lore.kernel.org/r/20230630064811.22569-2-ebiggers@kernel.org) for 6.6.
+On Tue, Jul 04, 2023 at 02:56:49PM +0200, Jan Kara wrote:
+> Writing to mounted devices is dangerous and can lead to filesystem
+> corruption as well as crashes. Furthermore syzbot comes with more and
+> more involved examples how to corrupt block device under a mounted
+> filesystem leading to kernel crashes and reports we can do nothing
+> about. Add tracking of writers to each block device and a kernel cmdline
+> argument which controls whether writes to block devices open with
+> BLK_OPEN_BLOCK_WRITES flag are allowed. We will make filesystems use
+> this flag for used devices.
+> 
+> Syzbot can use this cmdline argument option to avoid uninteresting
+> crashes. Also users whose userspace setup does not need writing to
+> mounted block devices can set this option for hardening.
+> 
+> Link: https://lore.kernel.org/all/60788e5d-5c7c-1142-e554-c21d709acfd9@linaro.org
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-I don't object to the fscrypt support for LEA, but I'm not going to apply it
-until the crypto API support is accepted.
+Can you make it clear that the important thing this patch prevents is writes to
+the block device's buffer cache, not writes to the underlying storage?  It's
+super important not to confuse the two cases.
+
+Related to this topic, I wonder if there is any value in providing an option
+that would allow O_DIRECT writes but forbid buffered writes?  Would that be
+useful for any of the known use cases for writing to mounted block devices?
 
 - Eric
