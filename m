@@ -2,126 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A561CEE49A3
-	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 04:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA20EE49AB
+	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 04:53:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232547AbjHVEGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Aug 2023 00:06:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57640 "EHLO
+        id S232495AbjHVEx5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Aug 2023 00:53:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230312AbjHVEF4 (ORCPT
+        with ESMTP id S232067AbjHVEx4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2023 00:05:56 -0400
-Received: from mp-relay-02.fibernetics.ca (mp-relay-02.fibernetics.ca [208.85.217.137])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9438411D;
-        Mon, 21 Aug 2023 21:05:54 -0700 (PDT)
-Received: from mailpool-fe-02.fibernetics.ca (mailpool-fe-02.fibernetics.ca [208.85.217.145])
+        Tue, 22 Aug 2023 00:53:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B1F18B;
+        Mon, 21 Aug 2023 21:53:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mp-relay-02.fibernetics.ca (Postfix) with ESMTPS id A49B675E08;
-        Tue, 22 Aug 2023 04:05:53 +0000 (UTC)
-Received: from localhost (mailpool-mx-02.fibernetics.ca [208.85.217.141])
-        by mailpool-fe-02.fibernetics.ca (Postfix) with ESMTP id 824E760924;
-        Tue, 22 Aug 2023 04:05:53 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at 
-Received: from mailpool-fe-02.fibernetics.ca ([208.85.217.145])
-        by localhost (mail-mx-02.fibernetics.ca [208.85.217.141]) (amavisd-new, port 10024)
-        with ESMTP id fan7TSPOtEei; Tue, 22 Aug 2023 04:05:52 +0000 (UTC)
-Received: from [192.168.48.17] (host-104-157-193-42.dyn.295.ca [104.157.193.42])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: dgilbert@interlog.com)
-        by mail.ca.inter.net (Postfix) with ESMTPSA id DF676600C3;
-        Tue, 22 Aug 2023 04:05:50 +0000 (UTC)
-Message-ID: <c2344a58-43ca-8587-e4af-66265720ef4b@interlog.com>
-Date:   Tue, 22 Aug 2023 00:05:50 -0400
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 26E586320D;
+        Tue, 22 Aug 2023 04:53:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C1E7C433C7;
+        Tue, 22 Aug 2023 04:53:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692680034;
+        bh=JbeP199iE1PeA5nZ2TaeZmrgj5NV3RzN82APW6nImDA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sKL0tD7iRZ0MkDNt1X/V6rp2royaC2a/4T7fNRnrWD9NelVu5FDoxeeR/DefCFcAy
+         iBd2gWNzEXW2eAe2EviRTrHqeYtfW6x61trdcBwDDlVVKZzIuQ3vY3rJkJwFBcZaxD
+         nqETuGGonh5g6T4KTYvoYcMqQ+SUkuwUTelAxZkEmMl3VXxVl3FEXFk6A3E1JPUgWy
+         GXLQglKVetZPae0RPpQtdyGLQg7vpYJtT6kiXjBaGt845lUsiWblW0MoH05OGmGlAe
+         lN8lQec6KOtV1vqQDBN3MN769xFtpFtrYQLTYY7k6MJYlQvNSeOYc9QZ1qNmQwlJNf
+         5KFLJrD9c57aA==
+Date:   Mon, 21 Aug 2023 21:53:52 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Dongsoo Lee <letrhee@nsr.re.kr>
+Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        'Jens Axboe' <axboe@kernel.dk>,
+        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
+        'Jaegeuk Kim' <jaegeuk@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 0/4] crypto: LEA block cipher implementation
+Message-ID: <20230822045352.GB1661@sol.localdomain>
+References: <20230630050323.984216-1-letrhee@nsr.re.kr>
+ <000001d9d3b8$bca8e9d0$35fabd70$@nsr.re.kr>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v10 09/18] scsi: scsi_debug: Add the preserves_write_order
- module parameter
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20230818193546.2014874-1-bvanassche@acm.org>
- <20230818193546.2014874-10-bvanassche@acm.org>
-Content-Language: en-CA
-From:   Douglas Gilbert <dgilbert@interlog.com>
-In-Reply-To: <20230818193546.2014874-10-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000001d9d3b8$bca8e9d0$35fabd70$@nsr.re.kr>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023-08-18 15:34, Bart Van Assche wrote:
-> Zone write locking is not used for zoned devices if the block driver
-> reports that it preserves the order of write commands. Make it easier to
-> test not using zone write locking by adding support for setting the
-> driver_preserves_write_order flag.
+On Mon, Aug 21, 2023 at 07:50:37AM +0900, Dongsoo Lee wrote:
+> Hello.
 > 
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Douglas Gilbert <dgilbert@interlog.com>
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-
-Acked-by: Douglas Gilbert <dgilbert@interlog.com>
-
-> ---
->   drivers/scsi/scsi_debug.c | 9 +++++++++
->   1 file changed, 9 insertions(+)
+> Is there any further progress on the patch we submitted and the additional fscrypt documentation? 
 > 
-> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-> index 9c0af50501f9..1ea4925d2c2f 100644
-> --- a/drivers/scsi/scsi_debug.c
-> +++ b/drivers/scsi/scsi_debug.c
-> @@ -832,6 +832,7 @@ static int dix_reads;
->   static int dif_errors;
->   
->   /* ZBC global data */
-> +static bool sdeb_preserves_write_order;
->   static bool sdeb_zbc_in_use;	/* true for host-aware and host-managed disks */
->   static int sdeb_zbc_zone_cap_mb;
->   static int sdeb_zbc_zone_size_mb;
-> @@ -5138,9 +5139,13 @@ static struct sdebug_dev_info *find_build_dev_info(struct scsi_device *sdev)
->   
->   static int scsi_debug_slave_alloc(struct scsi_device *sdp)
->   {
-> +	struct request_queue *q = sdp->request_queue;
-> +
->   	if (sdebug_verbose)
->   		pr_info("slave_alloc <%u %u %u %llu>\n",
->   		       sdp->host->host_no, sdp->channel, sdp->id, sdp->lun);
-> +	if (sdeb_preserves_write_order)
-> +		q->limits.driver_preserves_write_order = true;
->   	return 0;
->   }
->   
-> @@ -5755,6 +5760,8 @@ module_param_named(statistics, sdebug_statistics, bool, S_IRUGO | S_IWUSR);
->   module_param_named(strict, sdebug_strict, bool, S_IRUGO | S_IWUSR);
->   module_param_named(submit_queues, submit_queues, int, S_IRUGO);
->   module_param_named(poll_queues, poll_queues, int, S_IRUGO);
-> +module_param_named(preserves_write_order, sdeb_preserves_write_order, bool,
-> +		   S_IRUGO);
->   module_param_named(tur_ms_to_ready, sdeb_tur_ms_to_ready, int, S_IRUGO);
->   module_param_named(unmap_alignment, sdebug_unmap_alignment, int, S_IRUGO);
->   module_param_named(unmap_granularity, sdebug_unmap_granularity, int, S_IRUGO);
-> @@ -5812,6 +5819,8 @@ MODULE_PARM_DESC(ndelay, "response delay in nanoseconds (def=0 -> ignore)");
->   MODULE_PARM_DESC(no_lun_0, "no LU number 0 (def=0 -> have lun 0)");
->   MODULE_PARM_DESC(no_rwlock, "don't protect user data reads+writes (def=0)");
->   MODULE_PARM_DESC(no_uld, "stop ULD (e.g. sd driver) attaching (def=0))");
-> +MODULE_PARM_DESC(preserves_write_order,
-> +		 "Whether or not to inform the block layer that this driver preserves the order of WRITE commands (def=0)");
->   MODULE_PARM_DESC(num_parts, "number of partitions(def=0)");
->   MODULE_PARM_DESC(num_tgts, "number of targets per host to simulate(def=1)");
->   MODULE_PARM_DESC(opt_blks, "optimal transfer length in blocks (def=1024)");
+> https://lore.kernel.org/linux-fscrypt/20230630064811.22569-1-ebiggers@kernel.org/T/#u.
+> 
+> If the LEA cipher is accepted, we would like to add a SIMD implementation for it.
 
+I already applied 'fscrypt: improve the "Encryption modes and usage" section'
+(https://lore.kernel.org/r/20230630064811.22569-2-ebiggers@kernel.org) for 6.6.
+
+I don't object to the fscrypt support for LEA, but I'm not going to apply it
+until the crypto API support is accepted.
+
+- Eric
