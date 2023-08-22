@@ -2,101 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6F6EE49A3
-	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 13:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3013EE4996
+	for <linux-block@archiver.kernel.org>; Tue, 22 Aug 2023 14:58:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236129AbjHVN20 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Aug 2023 09:28:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43204 "EHLO
+        id S236990AbjHVO6f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Aug 2023 10:58:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236123AbjHVN2Z (ORCPT
+        with ESMTP id S231358AbjHVO6e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2023 09:28:25 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53038CE2
-        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 06:28:13 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bf3a2f44ffso32397895ad.1
-        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 06:28:13 -0700 (PDT)
+        Tue, 22 Aug 2023 10:58:34 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EE5410B
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 07:58:32 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-34bbc394fa0so3611675ab.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 07:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20221208.gappssmtp.com; s=20221208; t=1692710893; x=1693315693;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1692716312; x=1693321112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XxZ55EMzADqc7Vn1JWMMu+XroI194CgReOhVVFRwyr4=;
-        b=uVTNjxuQapxQgN+qHR21wi3mfGqGBgPwPRt4NfTrcWF/w9Vw9P5fZG5OczQHnLkiAY
-         3taqMUeS0pDH65ifPffXXesEAXofobDCJIH1+Xqv+7FxmosRDCGUvhLngavD/EaLxHEa
-         aE958Meor1ib56vuhZxVUDe5BZwzLk+0A9F9KWo9lRYVbcvN4pI8emWlHzyIq2AU2/o6
-         Sati9PmXbbPK/R1BJ3vAqFuKdtq8gYwU5/TJdybmmfU5LAdMTQR+ZMDg8JnnuZajvinY
-         UmdlphClurdvKYji+hX20jdEjtWC8oVIQr3M7ZV6/5rgCTkKqNpXIMN4qoDte1IEC8cO
-         J5uA==
+        bh=aB1Ww7Xem8WGw089z88YFa9W21ZWu8LSbkqc+/UePgk=;
+        b=Wa/Yyd/kaC5r3r5yj8BC1U3nsT5jPqnb4GwBnzTcs3H05Y3QdTqX/2NLwI+JPq1Jue
+         +WwJsSxc4NYmg3cMmhJVbKAL+Ul52iRp8WKzJK6FexeWCg3rfZ4CKa7XhZR2+St+ynZx
+         0b6POKHXLNtb+eYvi8RQlZT1Q/5xmMwim3Fr3sutttDD6tNXvKV2kuhC6OYocMmXhClL
+         bf/zO4bHSGibmad3sP3G/Hvw7HPnjybr//eOrl7yC/MZRDJp8D0v/g3GA0a/wYuQUSFP
+         Gdy+XTMfU+zx1f11YIP0FA+XADzQF0wL1B9udx20Wql3H1ZjK9DWO8voXBc5mlFCpqEb
+         R36g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692710893; x=1693315693;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1692716312; x=1693321112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XxZ55EMzADqc7Vn1JWMMu+XroI194CgReOhVVFRwyr4=;
-        b=Vm6SQ8Qh3ywq8baKj1nnHiZg/f6ufAxzi4xEgP8ZLNI2WCJqKSpLSwgNN8IGcCl9sG
-         yi+Rg04rfNyWEG0UoGFMmfWFcNT03fPYzWmTQ+k/+02wCsgDlc6hh0QUqc2JyEyuc+BT
-         hTlS2pMcnRcjnB4YSKeYXUjHTZ8HDV70ibhJgZBIXsObDEOWi2XM2ULC3d1OyxIKSDSA
-         n7rVGZsV23JE/dHS2UPTCVmKYzQRQ0g6lkgxfXe4UNw1do5Mz5BLVkrpTeKkYf2Ji1YI
-         fTR+ZN4MMRwurdKmLYf0G6vux4N2roRuVFdJ1895njKK8Qx9XbcgZJ+a/N4mE2yj2Y5T
-         KZ8A==
-X-Gm-Message-State: AOJu0Yz9s1Y0cCICgW3b5/UAy17k767YQvhGacpJzu1racadXhd00dys
-        ZN6znvsFFmbPphTLek9kalVSfw==
-X-Google-Smtp-Source: AGHT+IG2dVgySB9lhtQiE7d0yi+85lxJuvrESHnNKppl7eTgOceEkjxu4uBVFUbq+mRe/1NiVMwlhw==
-X-Received: by 2002:a17:902:e88e:b0:1bc:48dc:d881 with SMTP id w14-20020a170902e88e00b001bc48dcd881mr13438928plg.8.1692710892285;
-        Tue, 22 Aug 2023 06:28:12 -0700 (PDT)
-Received: from smtpclient.apple ([8.210.91.195])
-        by smtp.gmail.com with ESMTPSA id f1-20020a170902ce8100b001b801044466sm9083672plg.114.2023.08.22.06.28.10
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 22 Aug 2023 06:28:11 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.101.1.3\))
-Subject: Re: [PATCH] block: fix unexpected split in bio_discard_limit
-From:   Li Feng <fengli@smartx.com>
-In-Reply-To: <CAFj5m9+sm55FJAoM5iYtM=4y6VA7QwqD9bPqS7_uauwKqBvpNQ@mail.gmail.com>
-Date:   Tue, 22 Aug 2023 21:27:57 +0800
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A6EFB969-309C-4A9B-AAE2-FFB93A0BB6E0@smartx.com>
-References: <20230817075509.1438569-1-fengli@smartx.com>
- <CAFj5m9+sm55FJAoM5iYtM=4y6VA7QwqD9bPqS7_uauwKqBvpNQ@mail.gmail.com>
-To:     Ming Lei <ming.lei@redhat.com>
-X-Mailer: Apple Mail (2.3731.300.101.1.3)
+        bh=aB1Ww7Xem8WGw089z88YFa9W21ZWu8LSbkqc+/UePgk=;
+        b=k/Y5aQTXK24KRFLTGUNiUwXVmZ8Oy946QGagEKQZpXbOnQTjtiwkGPPza+DAL7pJS6
+         t4bHEb0EPjM6Lqy2tzPb1XOyg560bMg4NQsKWkmQ3TB1B2dr5U/H6qq0d/1hjsWCNgfA
+         aQt7XaoOUKX6ty1zmMME3EfnXui50hVI+WQyViHY9TjVRSeHc+RBN/mGfq6gi3q0fBXo
+         3v+Kj8Pn2NPWNAwF8l48zpzKwcmgFODOq5dHDEQc3IrTMabaivwTnMZTJJVUGmByx/Fm
+         x3Zfh9efmiVhaWf2c9byfw/xnnE8GOOrbaA2kWWNYHuK87DeESo+/4SJ01wcVJ67x4T0
+         Qdkg==
+X-Gm-Message-State: AOJu0YxXd5UJX3bFIaMQaUl+MIvWaFbe2Rh2odXJcCFfmaQVN6xI2iIY
+        nas200yLETRrU5WOOJWieeGcZQ==
+X-Google-Smtp-Source: AGHT+IHr+XM33y4EusXFmXmeCjm9xQ3Z4ae/IlSxx/Fyh+yXTFLSUazav+XXl49xnpqnVLrupr7AKg==
+X-Received: by 2002:a6b:c8d1:0:b0:780:d65c:d78f with SMTP id y200-20020a6bc8d1000000b00780d65cd78fmr11704836iof.2.1692716312011;
+        Tue, 22 Aug 2023 07:58:32 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id b19-20020a5d8953000000b0079199e52035sm3245417iot.52.2023.08.22.07.58.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Aug 2023 07:58:31 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     hch@lst.de, ming.lei@redhat.com, bvanassche@acm.org,
+        chengming.zhou@linux.dev
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+In-Reply-To: <20230821095602.70742-1-chengming.zhou@linux.dev>
+References: <20230821095602.70742-1-chengming.zhou@linux.dev>
+Subject: Re: [PATCH 1/3] blk-mq: fix tags leak when shrink nr_hw_queues
+Message-Id: <169271631079.42104.4944668728331842875.b4-ty@kernel.dk>
+Date:   Tue, 22 Aug 2023 08:58:30 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+On Mon, 21 Aug 2023 17:56:00 +0800, chengming.zhou@linux.dev wrote:
+> Although we don't need to realloc set->tags[] when shrink nr_hw_queues,
+> we need to free them. Or these tags will be leaked.
+> 
+> How to reproduce:
+> 1. mount -t configfs configfs /mnt
+> 2. modprobe null_blk nr_devices=0 submit_queues=8
+> 3. mkdir /mnt/nullb/nullb0
+> 4. echo 1 > /mnt/nullb/nullb0/power
+> 5. echo 4 > /mnt/nullb/nullb0/submit_queues
+> 6. rmdir /mnt/nullb/nullb0
+> 
+> [...]
 
-> 2023=E5=B9=B48=E6=9C=8822=E6=97=A5 21:07=EF=BC=8CMing Lei =
-<ming.lei@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Thu, Aug 17, 2023 at 3:42=E2=80=AFPM Li Feng <fengli@smartx.com> =
-wrote:
->>=20
->> bio_discard_limit() enforces discard boundaries within the range of =
-32-bit
->> unsigned integers, resulting in unexpected discard cut boundaries.
->=20
-> Any bio size can't be bigger than UINT_MAX, see bio definition.
->=20
->>=20
->> For example, max discard size =3D 1MiB, discard_granularity =3D 512B, =
-then the
->> discard lengths sent in the range [0,4G) are 1MiB, 1MiB... =
-(1MiB-512).
->> The next discard offset from 4G is [4G-512, 4G-512+1MiB).
->> The discard of the 4G offset boundary does not comply with the =
-optimal 1MiB
->> size.
->=20
-> As mentioned, max bio size is 4GB, so there shouldn't be such issue.
->=20
-> Thanks,
->=20
-Got it, many thanks.
+Applied, thanks!
+
+[1/3] blk-mq: fix tags leak when shrink nr_hw_queues
+      commit: e1dd7bc93029024af5688253b0c05181d6e01f8e
+[2/3] blk-mq: delete redundant tagset map update when fallback
+      commit: 2bc4d7a355a4d617452eaf1b21d6d261194b3667
+[3/3] blk-mq: prealloc tags when increase tagset nr_hw_queues
+      commit: 7222657e51b5626d10154b3e48ad441c33b5da96
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
