@@ -2,199 +2,197 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3300EEE49B8
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C80EE49A0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234197AbjHWKuY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 06:50:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34074 "EHLO
+        id S234243AbjHWKu0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 06:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233789AbjHWKtg (ORCPT
+        with ESMTP id S232995AbjHWKuE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 06:49:36 -0400
+        Wed, 23 Aug 2023 06:50:04 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D53CFE;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9CEAE59;
         Wed, 23 Aug 2023 03:49:25 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 57A0721EE9;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id DB8CE21F3A;
         Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1692787738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5s9tef63uXp7Cu9e1OLj6+YD/eKKzIvpOoyUWBFd9hk=;
-        b=uqHAPU+zpWOqO73QMtZ5dHj8XiWzcxZV/vDYMcPNxwf6SoR/9JK5eUHBuU6HmhVE1kLohn
-        S/WGl/JuLQL2T5lcOBGRxEi+63LPqs19u0WOdQiOF8mDQdX/ZbzIQzKqfv262O5P6DqX66
-        335kHKkL4nH4sh8ehaknY0axk7215Mo=
+        bh=koXdTHHczmYX77MioiKuwdIQH7N17vLhNMrB6mN2fJM=;
+        b=mnpPWm8afR+9nWlKCmIpqDUUh6p5xsCEWi41UMQh7WCdYphewj06PLmgmIgZKgFCFWhkQJ
+        hoSEDIEtIQ1WA2CTIV8kzq+7K6gVVwLTJCbc4P13c4dHLMH4d49yjIaAsHkLzx95gsRp54
+        4WLlLP1m8AK7CBfAu5gbj037AxsRNlU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1692787738;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5s9tef63uXp7Cu9e1OLj6+YD/eKKzIvpOoyUWBFd9hk=;
-        b=707OUHV+nBcJ1RUPwoCnNlAg5vc8ef12Sp0BtjXBGK1gWcWPk01OyJZ5odqMiz11adgm7+
-        CoEOmvkXy9eDIYBA==
+        bh=koXdTHHczmYX77MioiKuwdIQH7N17vLhNMrB6mN2fJM=;
+        b=AjRGbNyN+DsbWWQwPC4gYZuNK5FCziaWFp5gMg8ROMPbwIgc9/JgnhyaqTEHZ5B3tFSouc
+        Zw7lp0LQdcXNdaCA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 48804139D0;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CBAFE139D0;
         Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id KSuFERrk5WQ6IAAAMHmgww
+        id zvW3MRrk5WRUIAAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 23 Aug 2023 10:48:58 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 39846A0782; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
+        id 6CAA4A0791; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 08/29] zram: Convert to use bdev_open_by_dev()
-Date:   Wed, 23 Aug 2023 12:48:19 +0200
-Message-Id: <20230823104857.11437-8-jack@suse.cz>
+        linux-pm@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>
+Subject: [PATCH 17/29] PM: hibernate: Drop unused snapshot_test argument
+Date:   Wed, 23 Aug 2023 12:48:28 +0200
+Message-Id: <20230823104857.11437-17-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4019; i=jack@suse.cz; h=from:subject; bh=JLZRaOcUzs1CeWC4QBrmAW+ZuHqJPQx8hA0R9uvVbMo=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eP1DGDykqGvuqR48NK/HIl362WeY6d8AwIy/5V/ cGhznbaJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXj9QAKCRCcnaoHP2RA2Rz9CA CNTbD1+EkPvWBjqwvBdBXt8UGXOWwEeg+Jr9u5uewFmJvVD8FxjAQLMAGtTMWzCpS+sKw+3sv8Oc3C jlmu5Zne0Pe6q3SGw/RAv+oa9p71A3TLkI/QZAGWFT0toEzeZwrU/rD5qSXNUjuKfdmyYu3YYMCZSk Lo946J4Je+c6qC9HrupQsYOy9so/fnDU3me7Kqx+jvhM9r7rXJLn92tdDRD446A6xoTpreHm6/wMck cw+EeOUAdhfhJeFl4dXYCQF8noHhQq4h8DKt/kV7TvBO6t+ie9lBWoH43hB9+d3WWgHwjnX4++xd3G vu3GWEgqLsITm+4g/a5xHVqEh/atOs
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3541; i=jack@suse.cz; h=from:subject; bh=bL9P9WbbJq+VAaQcU+81IXLuC2juctCN6GMTdhaNaNo=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eP8Qf4Tspp9mvpWbL96y+M+A4TYjvK/96/tICEp pYM7WP2JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXj/AAKCRCcnaoHP2RA2dBMCA CoQBofnjIAeTI62/NHVLi47LWKBoYLZiEUedBt51Ai7eEozrEW5nN+mXynIkbgtM3lZUG89zspSK2b pZRpd1YWSqAJzg8p5WpPMljD9F6jMBVCY5u2l7rAg5uqhYRo3R8cg1du9LXcksiwmcfFZvVmVHQG3a 17OnqXhMkD9Usg3OHeK8vPq9GEibQ0NXSCFZ2ETyTm3e+jljlGgaUtN3ggrkpwwyWuQmg0BZbZESDr mOA6QmQTTeErquxe3mALbJ7Folydv45MsjB7VtzinqUjshvP5RPvoghz1zEy2B6D7obwwqf5310tOz fDlwPXodO2hEm2WY+/VxLy0vFdNSbj
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert zram to use bdev_open_by_dev() and pass the handle around.
+snapshot_test argument is now unused in swsusp_close() and
+load_image_and_restore(). Drop it
 
-CC: Minchan Kim <minchan@kernel.org>
-CC: Sergey Senozhatsky <senozhatsky@chromium.org>
+CC: linux-pm@vger.kernel.org
 Acked-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/zram/zram_drv.c | 31 ++++++++++++++-----------------
- drivers/block/zram/zram_drv.h |  2 +-
- 2 files changed, 15 insertions(+), 18 deletions(-)
+ kernel/power/hibernate.c | 14 +++++++-------
+ kernel/power/power.h     |  2 +-
+ kernel/power/swap.c      |  6 +++---
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 5676e6dd5b16..dfbb102d9c79 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -414,17 +414,14 @@ static ssize_t writeback_limit_show(struct device *dev,
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index e1b4bfa938dd..6abeec0ae084 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -684,7 +684,7 @@ static void power_down(void)
+ 		cpu_relax();
+ }
  
- static void reset_bdev(struct zram *zram)
+-static int load_image_and_restore(bool snapshot_test)
++static int load_image_and_restore(void)
  {
--	struct block_device *bdev;
--
- 	if (!zram->backing_dev)
- 		return;
- 
--	bdev = zram->bdev;
--	blkdev_put(bdev, zram);
-+	bdev_release(zram->bdev_handle);
- 	/* hope filp_close flush all of IO */
- 	filp_close(zram->backing_dev, NULL);
- 	zram->backing_dev = NULL;
--	zram->bdev = NULL;
-+	zram->bdev_handle = NULL;
- 	zram->disk->fops = &zram_devops;
- 	kvfree(zram->bitmap);
- 	zram->bitmap = NULL;
-@@ -470,7 +467,7 @@ static ssize_t backing_dev_store(struct device *dev,
- 	struct address_space *mapping;
- 	unsigned int bitmap_sz;
- 	unsigned long nr_pages, *bitmap = NULL;
--	struct block_device *bdev = NULL;
-+	struct bdev_handle *bdev_handle = NULL;
- 	int err;
- 	struct zram *zram = dev_to_zram(dev);
- 
-@@ -507,11 +504,11 @@ static ssize_t backing_dev_store(struct device *dev,
- 		goto out;
+ 	int error;
+ 	unsigned int flags;
+@@ -694,12 +694,12 @@ static int load_image_and_restore(bool snapshot_test)
+ 	lock_device_hotplug();
+ 	error = create_basic_memory_bitmaps();
+ 	if (error) {
+-		swsusp_close(snapshot_test);
++		swsusp_close();
+ 		goto Unlock;
  	}
  
--	bdev = blkdev_get_by_dev(inode->i_rdev, BLK_OPEN_READ | BLK_OPEN_WRITE,
--				 zram, NULL);
--	if (IS_ERR(bdev)) {
--		err = PTR_ERR(bdev);
--		bdev = NULL;
-+	bdev_handle = bdev_open_by_dev(inode->i_rdev,
-+				BLK_OPEN_READ | BLK_OPEN_WRITE, zram, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		err = PTR_ERR(bdev_handle);
-+		bdev_handle = NULL;
- 		goto out;
+ 	error = swsusp_read(&flags);
+-	swsusp_close(snapshot_test);
++	swsusp_close();
+ 	if (!error)
+ 		error = hibernation_restore(flags & SF_PLATFORM_MODE);
+ 
+@@ -788,7 +788,7 @@ int hibernate(void)
+ 		pm_pr_dbg("Checking hibernation image\n");
+ 		error = swsusp_check(snapshot_test);
+ 		if (!error)
+-			error = load_image_and_restore(snapshot_test);
++			error = load_image_and_restore();
+ 	}
+ 	thaw_processes();
+ 
+@@ -952,7 +952,7 @@ static int software_resume(void)
+ 	/* The snapshot device should not be opened while we're running */
+ 	if (!hibernate_acquire()) {
+ 		error = -EBUSY;
+-		swsusp_close(false);
++		swsusp_close();
+ 		goto Unlock;
  	}
  
-@@ -525,7 +522,7 @@ static ssize_t backing_dev_store(struct device *dev,
+@@ -973,7 +973,7 @@ static int software_resume(void)
+ 		goto Close_Finish;
+ 	}
  
- 	reset_bdev(zram);
+-	error = load_image_and_restore(false);
++	error = load_image_and_restore();
+ 	thaw_processes();
+  Finish:
+ 	pm_notifier_call_chain(PM_POST_RESTORE);
+@@ -987,7 +987,7 @@ static int software_resume(void)
+ 	pm_pr_dbg("Hibernation image not present or could not be loaded.\n");
+ 	return error;
+  Close_Finish:
+-	swsusp_close(false);
++	swsusp_close();
+ 	goto Finish;
+ }
  
--	zram->bdev = bdev;
-+	zram->bdev_handle = bdev_handle;
- 	zram->backing_dev = backing_dev;
- 	zram->bitmap = bitmap;
- 	zram->nr_pages = nr_pages;
-@@ -538,8 +535,8 @@ static ssize_t backing_dev_store(struct device *dev,
- out:
- 	kvfree(bitmap);
- 
--	if (bdev)
--		blkdev_put(bdev, zram);
-+	if (bdev_handle)
-+		bdev_release(bdev_handle);
- 
- 	if (backing_dev)
- 		filp_close(backing_dev, NULL);
-@@ -581,7 +578,7 @@ static void read_from_bdev_async(struct zram *zram, struct page *page,
- {
- 	struct bio *bio;
- 
--	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
-+	bio = bio_alloc(zram->bdev_handle->bdev, 1, parent->bi_opf, GFP_NOIO);
- 	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
- 	__bio_add_page(bio, page, PAGE_SIZE, 0);
- 	bio_chain(bio, parent);
-@@ -697,7 +694,7 @@ static ssize_t writeback_store(struct device *dev,
- 			continue;
- 		}
- 
--		bio_init(&bio, zram->bdev, &bio_vec, 1,
-+		bio_init(&bio, zram->bdev_handle->bdev, &bio_vec, 1,
- 			 REQ_OP_WRITE | REQ_SYNC);
- 		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
- 		__bio_add_page(&bio, page, PAGE_SIZE, 0);
-@@ -779,7 +776,7 @@ static void zram_sync_read(struct work_struct *work)
- 	struct bio_vec bv;
- 	struct bio bio;
- 
--	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
-+	bio_init(&bio, zw->zram->bdev_handle->bdev, &bv, 1, REQ_OP_READ);
- 	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
- 	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
- 	zw->error = submit_bio_wait(&bio);
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index ca7a15bd4845..d090753f97be 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -132,7 +132,7 @@ struct zram {
- 	spinlock_t wb_limit_lock;
- 	bool wb_limit_enable;
- 	u64 bd_wb_limit;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	unsigned long *bitmap;
- 	unsigned long nr_pages;
+diff --git a/kernel/power/power.h b/kernel/power/power.h
+index 46eb14dc50c3..bebf049a51c1 100644
+--- a/kernel/power/power.h
++++ b/kernel/power/power.h
+@@ -172,7 +172,7 @@ int swsusp_check(bool snapshot_test);
+ extern void swsusp_free(void);
+ extern int swsusp_read(unsigned int *flags_p);
+ extern int swsusp_write(unsigned int flags);
+-void swsusp_close(bool snapshot_test);
++void swsusp_close(void);
+ #ifdef CONFIG_SUSPEND
+ extern int swsusp_unmark(void);
  #endif
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index b475bee282ff..17e0dad5008e 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -444,7 +444,7 @@ static int get_swap_writer(struct swap_map_handle *handle)
+ err_rel:
+ 	release_swap_writer(handle);
+ err_close:
+-	swsusp_close(false);
++	swsusp_close();
+ 	return ret;
+ }
+ 
+@@ -509,7 +509,7 @@ static int swap_writer_finish(struct swap_map_handle *handle,
+ 	if (error)
+ 		free_all_swap_pages(root_swap);
+ 	release_swap_writer(handle);
+-	swsusp_close(false);
++	swsusp_close();
+ 
+ 	return error;
+ }
+@@ -1567,7 +1567,7 @@ int swsusp_check(bool snapshot_test)
+  *	swsusp_close - close swap device.
+  */
+ 
+-void swsusp_close(bool snapshot_test)
++void swsusp_close(void)
+ {
+ 	if (IS_ERR(hib_resume_bdev_handle)) {
+ 		pr_debug("Image device not initialised\n");
 -- 
 2.35.3
 
