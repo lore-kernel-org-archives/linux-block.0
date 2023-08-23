@@ -2,125 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93491C7113B
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 21:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C75A3C3DA6F
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 22:12:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237379AbjHWVZA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 17:25:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42072 "EHLO
+        id S238562AbjHWWLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 18:11:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237741AbjHWVY2 (ORCPT
+        with ESMTP id S238568AbjHWWLs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 17:24:28 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B68510DF
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 14:24:25 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d746edab033so511707276.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 14:24:25 -0700 (PDT)
+        Wed, 23 Aug 2023 18:11:48 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A1BE6D
+        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 15:11:47 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-68a3b66f350so3783998b3a.3
+        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 15:11:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692825864; x=1693430664;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TbPL2PbuPCNxQGI1y3a6rEWIPbbe+cfcATZZcxOCUGI=;
-        b=fUWTLxYKAB6Bnwv5w/j0QG2oEXybU5q5Ucbtd0Pc0FR4pXaoEq7DAfWzn2dIdrYAXE
-         oHUiKql/YYEtbgV92PbTYLuISHGgk+wo3F1X/3lGiCbJwWz5liBndZ8Ap1LGyIBKly36
-         o14dBwlVyjH3E9AMfXXO0mnHDrkR42VWOcrTVzknk5L5mu9KqHOcWZ5I3Byzacl1iqo0
-         aMrJucttH5HBOkDxBU91joNpFesqv1Xwb10gcpsKTPkXpQZQQFjQJ9658g5cfPKfPbbp
-         tIQZr/48VbtDyLWbj6HQmtLiE9GuE3VA837nPdyNAT2I+k2R8dxGjUbglCDuSbz23t8w
-         h0lA==
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1692828707; x=1693433507;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0qPi2kIJpQLy18xtMKuQe11lphbuzzuy2PsJ6Bvx8tM=;
+        b=U1C/WGMO2F1nmtlZBhZXpRl2AY7TzDNzdifHVC4tPB3QkzlT9L/MpAZEz+15dRmc9J
+         gagCXjvgLJNZUVWtWqQ3s2I0v+G+eNr2UiscvGG6mn0AyuPB5Qq5dgTFD2Qh3GZFH1aU
+         lQ5h/w3EnSDgZWBHHhtHsG2nTznehvogAZH3q/aYH8WTrgR9KJYo2D8jH7nmrVMGt+LO
+         XP15ZDScHh8ue/Kq42vzxm49MOjX013Pp6rqS9sArmJcEbMSN4hQMg5W/TJv8rstvZgV
+         zDOSYcH+Dq2jRIbtSne3upoXuX9Bjt7z5S3gOsKMk3lD4kFqBN2J4kEzHhBTHL2UDeMo
+         qtTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692825864; x=1693430664;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TbPL2PbuPCNxQGI1y3a6rEWIPbbe+cfcATZZcxOCUGI=;
-        b=lSeoy4Gez1vVyvY+U0iyfPSD559PW/PGceIbaxHEqYqdUUdhngwc5qJxCfgT57HZim
-         D/MP7CQYjALEtcuoide3NmyKj2hx5trqe8IJovkEFosagYF2MV0koWhuvbT0N6sA3uIo
-         RTWohGtcD+NwqSHXli/fGLn9hrWqWaHvCw8/Ps60V4AAl8zRwxDhDwuGE9NthjYPt045
-         PwbsM5DTQB+GiSpFnKGTMaU9d1ZmPPw+VKMyYkOk6qyv2Foh6QNVdlW2k0ahZcjW17K6
-         9DFsUR4qzlt0l4CYj6ugzED1O6Vyu1g681C5nOtT7nfSPQqfUs7RZR4vA8MznWRfl3wC
-         aYTQ==
-X-Gm-Message-State: AOJu0YzIMG9pHRXSLYUtoMeDKxXbm13jed2ksK69v3uVvVEp7zRGOc5l
-        yNrkJrVYt+NdTI3OMyapfwiSyk7GrZLYU9uhUQ==
-X-Google-Smtp-Source: AGHT+IFC5CLGTBE5gLIYORB0WZv4opNFZjYQFqmQYtYhaR0QqqB+q4SWHuhGDXAN76pPJ7CO6CwR446PHw58/B29TQ==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a05:6902:1786:b0:d77:f943:ed59 with
- SMTP id ca6-20020a056902178600b00d77f943ed59mr8006ybb.4.1692825864222; Wed,
- 23 Aug 2023 14:24:24 -0700 (PDT)
-Date:   Wed, 23 Aug 2023 21:24:22 +0000
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAAV55mQC/5WNQQqDMBBFryKzboqmDUpXvUdxEcdRh2oSkiAV8
- e6deoMyqzf8/98OiSJTgkexQ6SVE3snoC8F4GTdSIp7YdClvpWN1irl6DBsqps9vlWwMXOWTlK
- 49DM7yXeLqgfTIVpT1mRBpkKkgT+n5tUKT5yyj9tpXavf90/BWik5c+/JNkNtDD5H78eZrugXa I/j+AK8rWNO2QAAAA==
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1692825863; l=2053;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=F91J7AD4u94TOVQIMBsKGDBwUQP3G+Sm5rhyoHv613I=; b=FVINnwLMtY574yUaHJXvkPLlkHraXeO6bU6OblYeuUDqDh8uov0e/zo0PaXmc+xM6/82pla1A
- v5jU752UOutBfLowpNP1MUrO5HCECSP9Cyx3+7jmXNKlx3erJyHAvK0
-X-Mailer: b4 0.12.3
-Message-ID: <20230823-strncpy-block-partitions-cmdline-ibm-v2-1-40c77f7182fc@google.com>
-Subject: [PATCH v2] partitions/ibm: refactor deprecated strncpy
-From:   Justin Stitt <justinstitt@google.com>
-To:     Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Kees Cook <keescook@chromium.org>, linux-s390@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org,
-        Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
+        d=1e100.net; s=20221208; t=1692828707; x=1693433507;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0qPi2kIJpQLy18xtMKuQe11lphbuzzuy2PsJ6Bvx8tM=;
+        b=Cq0JDTSXIp6o/CC+7Q8eI9c89rw1eNFmpCuia70fKByeuQMuY6Z+Ar/1JtrQOIdYZX
+         bdiZKxhRVgD3Of3cYH0cZQb+O6Qz4bNCS6gqe+wU2+Vk9UtSuWd7V8XTojpvIGoTiodB
+         624zltDiFhV/e+e06euFCw5xWGAvILHWv78TpIQ6zH9xzwrszlRFJxjLzsOow9G8b+yN
+         TPerLZm+stWrvNPA0O5s653OH5l3hFxkqJmFzsexke5VbIIFXt11ymCOpQLhO3Jhlxo/
+         nD6H389LFhYz0YUlfhA2b0lmzf7g6eEVFxh3JNwGghDuPph9d+eh83HShhSPfrm4nP6Z
+         0/5Q==
+X-Gm-Message-State: AOJu0YxrY+lrFOk977IOJ/D7umq8DxjZh2eqURb6ws6z4S1bCbrUjEqq
+        bxaoDGEOjxGTq6ZKqMhvkdtg5A==
+X-Google-Smtp-Source: AGHT+IEQSyQ7z4RVu0pb7MHFNML7PyOTepiSnhL+lT0CXZKJjO2dBDbdyqWxNYFC0vOecefPeybXwQ==
+X-Received: by 2002:a17:90a:4dc6:b0:26d:2fe5:ff2a with SMTP id r6-20020a17090a4dc600b0026d2fe5ff2amr12320409pjl.29.1692828706796;
+        Wed, 23 Aug 2023 15:11:46 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
+        by smtp.gmail.com with ESMTPSA id 19-20020a17090a031300b00256799877ffsm269767pje.47.2023.08.23.15.11.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Aug 2023 15:11:46 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qYw4k-005czG-1R;
+        Thu, 24 Aug 2023 08:11:42 +1000
+Date:   Thu, 24 Aug 2023 08:11:42 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 28/29] xfs: Convert to bdev_open_by_path()
+Message-ID: <ZOaEHrkx1xS9bgk9@dread.disaster.area>
+References: <20230818123232.2269-1-jack@suse.cz>
+ <20230823104857.11437-28-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230823104857.11437-28-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-`strncpy` is deprecated [1] and we should favor different interfaces.
+On Wed, Aug 23, 2023 at 12:48:39PM +0200, Jan Kara wrote:
+> Convert xfs to use bdev_open_by_path() and pass the handle around.
+....
 
-A suitable replacement is `strtomem_pad` as it is a more robust and less
-ambiguous interface. In this case, the destination buffer is not
-necessarily NUL-terminated as Heiko points out [2]. Using `strtomem_pad`
-over strncpy means it is now more obvious what is expected of the
-destination buffer: 1) Not necessarily NUL-terminated and 2) padded with
-NUL-bytes
+> @@ -426,15 +427,15 @@ xfs_shutdown_devices(
+>  	 * race, everyone loses.
+>  	 */
+>  	if (mp->m_logdev_targp && mp->m_logdev_targp != mp->m_ddev_targp) {
+> -		blkdev_issue_flush(mp->m_logdev_targp->bt_bdev);
+> -		invalidate_bdev(mp->m_logdev_targp->bt_bdev);
+> +		blkdev_issue_flush(mp->m_logdev_targp->bt_bdev_handle->bdev);
+> +		invalidate_bdev(mp->m_logdev_targp->bt_bdev_handle->bdev);
+>  	}
+>  	if (mp->m_rtdev_targp) {
+> -		blkdev_issue_flush(mp->m_rtdev_targp->bt_bdev);
+> -		invalidate_bdev(mp->m_rtdev_targp->bt_bdev);
+> +		blkdev_issue_flush(mp->m_rtdev_targp->bt_bdev_handle->bdev);
+> +		invalidate_bdev(mp->m_rtdev_targp->bt_bdev_handle->bdev);
+>  	}
+> -	blkdev_issue_flush(mp->m_ddev_targp->bt_bdev);
+> -	invalidate_bdev(mp->m_ddev_targp->bt_bdev);
+> +	blkdev_issue_flush(mp->m_ddev_targp->bt_bdev_handle->bdev);
+> +	invalidate_bdev(mp->m_ddev_targp->bt_bdev_handle->bdev);
+>  }
 
-Link: www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings[1]
-Link: https://lore.kernel.org/all/20230823134936.14378-E-hca@linux.ibm.com/ [2]
-Link: https://github.com/KSPP/linux/issues/90
-Suggested-by: Kees Cook <keescook@chromium.org>
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
----
-Changes in v2:
-- prefer `strtomem_pad` over `strscpy` (thanks Kees)
-- Link to v1: https://lore.kernel.org/r/20230822-strncpy-block-partitions-cmdline-ibm-v1-1-154dea8f755c@google.com
----
- block/partitions/ibm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Why do these need to be converted to run through bt_bdev_handle?  If
+the buftarg is present and we've assigned targp->bt_bdev_handle
+during the call to xfs_alloc_buftarg(), then we've assigned
+targp->bt_bdev from the handle at the same time, yes?
 
-diff --git a/block/partitions/ibm.c b/block/partitions/ibm.c
-index 403756dbd50d..56c076c5523d 100644
---- a/block/partitions/ibm.c
-+++ b/block/partitions/ibm.c
-@@ -111,11 +111,11 @@ static int find_label(struct parsed_partitions *state,
- 		    !strcmp(temp, "LNX1") ||
- 		    !strcmp(temp, "CMS1")) {
- 			if (!strcmp(temp, "VOL1")) {
--				strncpy(type, label->vol.vollbl, 4);
--				strncpy(name, label->vol.volid, 6);
-+				strtomem_pad(type, label->vol.vollbl, 4);
-+				strtomem_pad(name, label->vol.volid, 6);
- 			} else {
--				strncpy(type, label->lnx.vollbl, 4);
--				strncpy(name, label->lnx.volid, 6);
-+				strtomem_pad(type, label->lnx.vollbl, 4);
-+				strtomem_pad(name, label->lnx.volid, 6);
- 			}
- 			EBCASC(type, 4);
- 			EBCASC(name, 6);
+Cheers,
 
----
-base-commit: 706a741595047797872e669b3101429ab8d378ef
-change-id: 20230822-strncpy-block-partitions-cmdline-ibm-7f5bcca507ea
-
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
-
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
