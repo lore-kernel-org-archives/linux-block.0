@@ -2,110 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C75A3C3DA6F
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 22:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 479CAC3DA66
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 23:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238562AbjHWWLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 18:11:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54672 "EHLO
+        id S238480AbjHWXXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 19:23:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238568AbjHWWLs (ORCPT
+        with ESMTP id S238663AbjHWXXF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 18:11:48 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A1BE6D
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 15:11:47 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-68a3b66f350so3783998b3a.3
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 15:11:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1692828707; x=1693433507;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0qPi2kIJpQLy18xtMKuQe11lphbuzzuy2PsJ6Bvx8tM=;
-        b=U1C/WGMO2F1nmtlZBhZXpRl2AY7TzDNzdifHVC4tPB3QkzlT9L/MpAZEz+15dRmc9J
-         gagCXjvgLJNZUVWtWqQ3s2I0v+G+eNr2UiscvGG6mn0AyuPB5Qq5dgTFD2Qh3GZFH1aU
-         lQ5h/w3EnSDgZWBHHhtHsG2nTznehvogAZH3q/aYH8WTrgR9KJYo2D8jH7nmrVMGt+LO
-         XP15ZDScHh8ue/Kq42vzxm49MOjX013Pp6rqS9sArmJcEbMSN4hQMg5W/TJv8rstvZgV
-         zDOSYcH+Dq2jRIbtSne3upoXuX9Bjt7z5S3gOsKMk3lD4kFqBN2J4kEzHhBTHL2UDeMo
-         qtTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692828707; x=1693433507;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0qPi2kIJpQLy18xtMKuQe11lphbuzzuy2PsJ6Bvx8tM=;
-        b=Cq0JDTSXIp6o/CC+7Q8eI9c89rw1eNFmpCuia70fKByeuQMuY6Z+Ar/1JtrQOIdYZX
-         bdiZKxhRVgD3Of3cYH0cZQb+O6Qz4bNCS6gqe+wU2+Vk9UtSuWd7V8XTojpvIGoTiodB
-         624zltDiFhV/e+e06euFCw5xWGAvILHWv78TpIQ6zH9xzwrszlRFJxjLzsOow9G8b+yN
-         TPerLZm+stWrvNPA0O5s653OH5l3hFxkqJmFzsexke5VbIIFXt11ymCOpQLhO3Jhlxo/
-         nD6H389LFhYz0YUlfhA2b0lmzf7g6eEVFxh3JNwGghDuPph9d+eh83HShhSPfrm4nP6Z
-         0/5Q==
-X-Gm-Message-State: AOJu0YxrY+lrFOk977IOJ/D7umq8DxjZh2eqURb6ws6z4S1bCbrUjEqq
-        bxaoDGEOjxGTq6ZKqMhvkdtg5A==
-X-Google-Smtp-Source: AGHT+IEQSyQ7z4RVu0pb7MHFNML7PyOTepiSnhL+lT0CXZKJjO2dBDbdyqWxNYFC0vOecefPeybXwQ==
-X-Received: by 2002:a17:90a:4dc6:b0:26d:2fe5:ff2a with SMTP id r6-20020a17090a4dc600b0026d2fe5ff2amr12320409pjl.29.1692828706796;
-        Wed, 23 Aug 2023 15:11:46 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id 19-20020a17090a031300b00256799877ffsm269767pje.47.2023.08.23.15.11.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 15:11:46 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qYw4k-005czG-1R;
-        Thu, 24 Aug 2023 08:11:42 +1000
-Date:   Thu, 24 Aug 2023 08:11:42 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 28/29] xfs: Convert to bdev_open_by_path()
-Message-ID: <ZOaEHrkx1xS9bgk9@dread.disaster.area>
-References: <20230818123232.2269-1-jack@suse.cz>
- <20230823104857.11437-28-jack@suse.cz>
+        Wed, 23 Aug 2023 19:23:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E99DE66;
+        Wed, 23 Aug 2023 16:23:03 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C5B5461D47;
+        Wed, 23 Aug 2023 23:23:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA407C433C8;
+        Wed, 23 Aug 2023 23:23:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692832982;
+        bh=bCKAdgkFJDINHyl0Gzt4wi0NHoiY8QaSFceO99ADbeY=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=Dj/oo5yBMWyFS7JF5FzMvR4LkFGpXJ8IRZSAQlrZpKTloYhkPIgZ3DutJvVQ1WDV2
+         V9REN946QnVSdksRs9tbkrg0smAeHdCYnymkpMvjlXI8BW26fVn277hX7FFwkb93+C
+         3KhKBvejGSChIlqEmAkSUiyKIRXTEz7y+DXncoc8jy3FCmhABuk43CeQtP+n8PdVp0
+         oc9wReAE+Svo2XyNm5rK0KpJv8ShrN0QYHIkawt0LlmurK4iFtB3oO0MlyJDaJSQfB
+         a5z2LLBPw9if8kAqtZD9oSxgpRQQV1dMoExWTnGn4mIX6DsDIGSy1KaIZE/nMqEF8D
+         TH/tgwzapWiWA==
+Message-ID: <741e19ae-d4fd-11f5-7faa-18b888ff769c@kernel.org>
+Date:   Thu, 24 Aug 2023 08:22:59 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230823104857.11437-28-jack@suse.cz>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v11 04/16] scsi: core: Introduce a mechanism for
+ reordering requests in the error handler
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230822191822.337080-1-bvanassche@acm.org>
+ <20230822191822.337080-5-bvanassche@acm.org>
+ <3562fc36-4bc2-b4fb-a2ad-1e310baf1b47@suse.de>
+ <078d2954-f4af-6678-29ce-d8f65ff1397a@acm.org>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <078d2954-f4af-6678-29ce-d8f65ff1397a@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 23, 2023 at 12:48:39PM +0200, Jan Kara wrote:
-> Convert xfs to use bdev_open_by_path() and pass the handle around.
-....
+On 8/24/23 00:15, Bart Van Assche wrote:
+> On 8/22/23 23:26, Hannes Reinecke wrote:
+>> On 8/22/23 21:16, Bart Van Assche wrote:
+>>> +/*
+>>> + * Comparison function that allows to sort SCSI commands by ULD driver.
+>>> + */
+>>> +static int scsi_cmp_uld(void *priv, const struct list_head *_a,
+>>> +            const struct list_head *_b)
+>>> +{
+>>> +    struct scsi_cmnd *a = list_entry(_a, typeof(*a), eh_entry);
+>>> +    struct scsi_cmnd *b = list_entry(_b, typeof(*b), eh_entry);
+>>> +
+>>> +    /* See also the comment above the list_sort() definition. */
+>>> +    return scsi_cmd_to_driver(a) > scsi_cmd_to_driver(b);
+>>
+>> I have to agree with Christoph here.
+>> Comparing LBA numbers at the SCSI level is really the wrong place.
+>> SCSI commands might be anything, and quite some of these commands don't
+>> even have LBA numbers. So trying to order them will be pointless.
+>>
+>> The reordering mechanism really has to go into the block layer, with
+>> the driver failing the request and the block layer resubmitting in-order.
+> 
+> Hi Hannes,
+> 
+> Please take another look at patches 04/16 and 05/16. As one can see no
+> LBA numbers are being compared in the SCSI core - comparing LBA numbers
+> happens in the sd (SCSI disk) driver. The code that you replied to
+> compares ULD pointers, a well-defined concept in the SCSI core.
+> 
+> Your request to move the functionality from patches 04/16 and 05/16 into
+> the block layer would involve the following:
+> * Report the unaligned write errors (because a write did not happen at the
+>    write pointer) to the block layer (BLK_STS_WP_MISMATCH?).
+> * Introduce a mechanism in the block layer for postponing error handling
+>    until all outstanding commands have failed. The approach from the SCSI
+>    core (tracking the number of failed and the number of busy commands
+>    and only waking up the error handler after these counters are equal)
+>    would be unacceptable because of the runtime overhead this mechanism
+>    would introduce in the block layer hot path. Additionally, I strongly
+>    doubt that it is possible to introduce any mechanism for postponing
+>    error handling in the block layer without introducing additional
+>    overhead in the hot path.
+> * Christoph's opinion is that NVMe software should use zone append
+>    (REQ_OP_ZONE_APPEND) instead of regular writes (REQ_OP_WRITE) when
+>    writing to a zoned namespace. So the SCSI subsystem would be the only
+>    user of the new mechanism introduced in the block layer. The reason we
+>    chose REQ_OP_WRITE for zoned UFS devices is because the SCSI standard
+>    does not support a zone append command and introducing a zone append
+>    command in the SCSI standards is not something that can be realized in
+>    time for the first generation of zoned UFS devices.
 
-> @@ -426,15 +427,15 @@ xfs_shutdown_devices(
->  	 * race, everyone loses.
->  	 */
->  	if (mp->m_logdev_targp && mp->m_logdev_targp != mp->m_ddev_targp) {
-> -		blkdev_issue_flush(mp->m_logdev_targp->bt_bdev);
-> -		invalidate_bdev(mp->m_logdev_targp->bt_bdev);
-> +		blkdev_issue_flush(mp->m_logdev_targp->bt_bdev_handle->bdev);
-> +		invalidate_bdev(mp->m_logdev_targp->bt_bdev_handle->bdev);
->  	}
->  	if (mp->m_rtdev_targp) {
-> -		blkdev_issue_flush(mp->m_rtdev_targp->bt_bdev);
-> -		invalidate_bdev(mp->m_rtdev_targp->bt_bdev);
-> +		blkdev_issue_flush(mp->m_rtdev_targp->bt_bdev_handle->bdev);
-> +		invalidate_bdev(mp->m_rtdev_targp->bt_bdev_handle->bdev);
->  	}
-> -	blkdev_issue_flush(mp->m_ddev_targp->bt_bdev);
-> -	invalidate_bdev(mp->m_ddev_targp->bt_bdev);
-> +	blkdev_issue_flush(mp->m_ddev_targp->bt_bdev_handle->bdev);
-> +	invalidate_bdev(mp->m_ddev_targp->bt_bdev_handle->bdev);
->  }
+The sd driver does have zone append emulation using regular writes. The
+emulation relies on zone write locking to avoid issues with adapters that do not
+have strong ordering guarantees, but that could be adapted to be removed for UFS
+devices with write ordering guarantees. This solution would greatly simplify
+your series since zone append requests are not subject to zone write locking at
+the block layer. So no changes would be needed at that layer.
 
-Why do these need to be converted to run through bt_bdev_handle?  If
-the buftarg is present and we've assigned targp->bt_bdev_handle
-during the call to xfs_alloc_buftarg(), then we've assigned
-targp->bt_bdev from the handle at the same time, yes?
+However, that implies that your preferred use case (f2fs) must be adapted to use
+zone append instead of regular writes. That in itself may be a bigger-ish
+change, but in the long run, likely a better one I think as that would be
+compatible with NVMe ZNS and also future UFS standards defining a zone append
+command.
 
-Cheers,
+> 
+> Because I assume that both Jens and Christoph disagree strongly with your
+> request: I have no plans to move the code for sorting zoned writes into
+> the block layer core.
+> 
+> Jens and Christoph, please correct me if I misunderstood something.
+> 
+> Thanks,
+> 
+> Bart.
 
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Damien Le Moal
+Western Digital Research
+
