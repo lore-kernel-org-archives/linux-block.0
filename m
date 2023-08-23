@@ -2,140 +2,152 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FC2EE49BD
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B372EE49BA
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233477AbjHWKuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232454AbjHWKuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 23 Aug 2023 06:50:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45626 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233731AbjHWKuG (ORCPT
+        with ESMTP id S233774AbjHWKuH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 06:50:06 -0400
+        Wed, 23 Aug 2023 06:50:07 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50642E5D;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 986ECE60;
         Wed, 23 Aug 2023 03:49:26 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A27542074F;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E0EBD20750;
         Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1692787738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MBsPveD1xI53cn0DT68/0aGElxKX0zddJPsr7N619Ak=;
-        b=CDGV6etjiImeGEUO+0BUVbX7RrWvHoApelFxQwE+MvKkuapFoSM3992rna3Bq9ee4PSIw6
-        +LXG9cXNVM1eYwTwr/bQdOFAS6mHFaO1dN/yAeP3C+dn99TY4Go53DK6Qw+n5oqjlDEuxc
-        PqGpPheiFx2BLmX9XP87j/wbjP/DRao=
+        bh=cJnlKAsaBe7sPZrPQ08auxrCcdr7TMUMkg3NCrwvvAc=;
+        b=iDDKWdnMHbDv4nwSHrczBOyZD4GVw4sn2o/RXV/rBqMygIZ3dBYsdy86bk1KX8Q/UNpDGR
+        Oksuj1/rxd8CWpdHrtga5QKJYnyXdJNXRkhMVG+KNfzzHZmwj7EINCbtYsi+85dAF1MGnl
+        9htjoshTWF0/Nw4jpskx9axemvZojJ8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1692787738;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MBsPveD1xI53cn0DT68/0aGElxKX0zddJPsr7N619Ak=;
-        b=N6z3QTU6ieH93k9KF4kE1tM6zgWhTjKW3zovp7A1dMknTyjGy4QJojKcRNyAdb0/bhpQHV
-        8PGnGalNM2lFCrBA==
+        bh=cJnlKAsaBe7sPZrPQ08auxrCcdr7TMUMkg3NCrwvvAc=;
+        b=rB4qB/gJfwuSWz1MNhpxj7oTHhvBn4CLc3ep8oawowPA50BWgRE61cwqqmke248sNQZVad
+        Dwd9TQowyzRAOEAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9240E13592;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CFED013458;
         Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id kmaxIxrk5WRMIAAAMHmgww
+        id MmeoMhrk5WRVIAAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 23 Aug 2023 10:48:58 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 5625FA078D; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
+        id 7239CA0792; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 13/29] nvmet: Convert to bdev_open_by_path()
-Date:   Wed, 23 Aug 2023 12:48:24 +0200
-Message-Id: <20230823104857.11437-13-jack@suse.cz>
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 18/29] mm/swap: Convert to use bdev_open_by_dev()
+Date:   Wed, 23 Aug 2023 12:48:29 +0200
+Message-Id: <20230823104857.11437-18-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2146; i=jack@suse.cz; h=from:subject; bh=P3kIXEticntI8ldLR8W/RXMKkQjvvAD6UtqoFr/c9Kw=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eP5SvEBatGZsIjgJiA6c5YnzkSHf0MP6rkeUG43 o8ebsHqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXj+QAKCRCcnaoHP2RA2TUwB/ 4wcLZc14Yrt0gDhGdTJgkH8N4G8qwWxdOI88u2Lhfw2i3xYxHB4dmlkDvPGtGjq3hru2kNmml/zFpD aPXPQZSkA2xl0l5ycYbfKZ2qzVnS9dHCTaAh9XilOwY2ZOE+nPcazmIxaALS0e5vH27HAdIdVGXgfX +Ub5T4XFFXhhZeUarI3y6eUEhQwi4B9QxU0SV7K79+qmqy7HICDwIK8sJkE6uYE9ESXiqe/GE4GYFw 9G11zl4Aiw6O8tf+86EMdVp4YqdlAvfOVfDX7gDHNIAa4FpwiNqdy3Iy2XrbiBysP54gJ0Id1iFCh3 6kIb4sVIV1B9A4YMizL+G7Z/Y87xCZ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2762; i=jack@suse.cz; h=from:subject; bh=f/JlRJ3B9MNW3NLuXC/An2yXaaMnt87ViwCq0s9tEUM=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGFKePv7LcNySuWPPvC9SJ5OT7iQvOH5U+MJl8+yj3X0ms0V3 O/GkdzIaszAwcjDIiimyrI68qH1tnlHX1lANGZhBrExgU7g4BWAiO55zMMz8Elovf21lZOKij/Hv4q ZL6TfW53ky/FuirHKlo3+CTusUL7V6Sc1j/cIXXry00J7iJmp0+0305d7G2hNWCkcZlrOeX2PnkBXo KdHB4zS/YnaVZaPAifm3VorsOSHke/pf6y77xt6f5hKix3maT639nSTVd4EnomJB8e9arWdiHP85ts xwkJ9vtdHM/Kxfrnky/9+HzeweX33tTom37Mvk3VrOdeTm2tZ+61WhDnNqstb5197ZeJDhlVKhh060 y1vjO+X9yxUu362yvcitv0jZIDn76ELLS5drpn9av/JKkUfTlUUR83L/On1wKTZ5wLdgXskKubLrlZ ubd83813ZJqu5HYZnujun8e4vMAQ==
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert nvmet to use bdev_open_by_path() and pass the handle around.
+Convert swapping code to use bdev_open_by_dev() and pass the handle
+around.
 
-CC: linux-nvme@lists.infradead.org
+CC: linux-mm@kvack.org
+CC: Andrew Morton <akpm@linux-foundation.org>
 Acked-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/nvme/target/io-cmd-bdev.c | 20 +++++++++++---------
- drivers/nvme/target/nvmet.h       |  1 +
- 2 files changed, 12 insertions(+), 9 deletions(-)
+ include/linux/swap.h |  1 +
+ mm/swapfile.c        | 23 ++++++++++++-----------
+ 2 files changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 2733e0158585..0bf05c19d8b5 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -50,9 +50,10 @@ void nvmet_bdev_set_limits(struct block_device *bdev, struct nvme_id_ns *id)
+diff --git a/include/linux/swap.h b/include/linux/swap.h
+index 456546443f1f..62334f8d4932 100644
+--- a/include/linux/swap.h
++++ b/include/linux/swap.h
+@@ -298,6 +298,7 @@ struct swap_info_struct {
+ 	unsigned int __percpu *cluster_next_cpu; /*percpu index for next allocation */
+ 	struct percpu_cluster __percpu *percpu_cluster; /* per cpu's swap location */
+ 	struct rb_root swap_extent_root;/* root of the swap extent rbtree */
++	struct bdev_handle *bdev_handle;/* open handle of the bdev */
+ 	struct block_device *bdev;	/* swap device or bdev of swap file */
+ 	struct file *swap_file;		/* seldom referenced */
+ 	unsigned int old_block_size;	/* seldom referenced */
+diff --git a/mm/swapfile.c b/mm/swapfile.c
+index 8e6dde68b389..621428ee6895 100644
+--- a/mm/swapfile.c
++++ b/mm/swapfile.c
+@@ -2526,11 +2526,10 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
+ 	exit_swap_address_space(p->type);
  
- void nvmet_bdev_ns_disable(struct nvmet_ns *ns)
- {
--	if (ns->bdev) {
--		blkdev_put(ns->bdev, NULL);
-+	if (ns->bdev_handle) {
-+		bdev_release(ns->bdev_handle);
- 		ns->bdev = NULL;
-+		ns->bdev_handle = NULL;
+ 	inode = mapping->host;
+-	if (S_ISBLK(inode->i_mode)) {
+-		struct block_device *bdev = I_BDEV(inode);
+-
+-		set_blocksize(bdev, old_block_size);
+-		blkdev_put(bdev, p);
++	if (p->bdev_handle) {
++		set_blocksize(p->bdev, old_block_size);
++		bdev_release(p->bdev_handle);
++		p->bdev_handle = NULL;
  	}
- }
  
-@@ -84,17 +85,18 @@ int nvmet_bdev_ns_enable(struct nvmet_ns *ns)
- 	if (ns->buffered_io)
- 		return -ENOTBLK;
+ 	inode_lock(inode);
+@@ -2760,13 +2759,14 @@ static int claim_swapfile(struct swap_info_struct *p, struct inode *inode)
+ 	int error;
  
--	ns->bdev = blkdev_get_by_path(ns->device_path,
--			BLK_OPEN_READ | BLK_OPEN_WRITE, NULL, NULL);
--	if (IS_ERR(ns->bdev)) {
--		ret = PTR_ERR(ns->bdev);
-+	ns->bdev_handle = bdev_open_by_path(ns->device_path,
-+				BLK_OPEN_READ | BLK_OPEN_WRITE, NULL, NULL);
-+	if (IS_ERR(ns->bdev_handle)) {
-+		ret = PTR_ERR(ns->bdev_handle);
- 		if (ret != -ENOTBLK) {
--			pr_err("failed to open block device %s: (%ld)\n",
--					ns->device_path, PTR_ERR(ns->bdev));
-+			pr_err("failed to open block device %s: (%d)\n",
-+					ns->device_path, ret);
+ 	if (S_ISBLK(inode->i_mode)) {
+-		p->bdev = blkdev_get_by_dev(inode->i_rdev,
++		p->bdev_handle = bdev_open_by_dev(inode->i_rdev,
+ 				BLK_OPEN_READ | BLK_OPEN_WRITE, p, NULL);
+-		if (IS_ERR(p->bdev)) {
+-			error = PTR_ERR(p->bdev);
+-			p->bdev = NULL;
++		if (IS_ERR(p->bdev_handle)) {
++			error = PTR_ERR(p->bdev_handle);
++			p->bdev_handle = NULL;
+ 			return error;
  		}
--		ns->bdev = NULL;
-+		ns->bdev_handle = NULL;
- 		return ret;
++		p->bdev = p->bdev_handle->bdev;
+ 		p->old_block_size = block_size(p->bdev);
+ 		error = set_blocksize(p->bdev, PAGE_SIZE);
+ 		if (error < 0)
+@@ -3210,9 +3210,10 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+ 	p->percpu_cluster = NULL;
+ 	free_percpu(p->cluster_next_cpu);
+ 	p->cluster_next_cpu = NULL;
+-	if (inode && S_ISBLK(inode->i_mode) && p->bdev) {
++	if (p->bdev_handle) {
+ 		set_blocksize(p->bdev, p->old_block_size);
+-		blkdev_put(p->bdev, p);
++		bdev_release(p->bdev_handle);
++		p->bdev_handle = NULL;
  	}
-+	ns->bdev = ns->bdev_handle->bdev;
- 	ns->size = bdev_nr_bytes(ns->bdev);
- 	ns->blksize_shift = blksize_bits(bdev_logical_block_size(ns->bdev));
- 
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 8cfd60f3b564..360e385be33b 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -58,6 +58,7 @@
- 
- struct nvmet_ns {
- 	struct percpu_ref	ref;
-+	struct bdev_handle	*bdev_handle;
- 	struct block_device	*bdev;
- 	struct file		*file;
- 	bool			readonly;
+ 	inode = NULL;
+ 	destroy_swap_extents(p);
 -- 
 2.35.3
 
