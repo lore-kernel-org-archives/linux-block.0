@@ -2,143 +2,160 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB588EE49A0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 06:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5563EE49AE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 06:26:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232798AbjHWGXk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 02:23:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40716 "EHLO
+        id S232922AbjHWG0e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 02:26:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231645AbjHWGXk (ORCPT
+        with ESMTP id S232443AbjHWG0d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 02:23:40 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3EC6184
-        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2023 23:23:37 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230823062334epoutp03fb7072741539b2f2885bf9ce9027abea~97v8KpU961197911979epoutp03W
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 06:23:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230823062334epoutp03fb7072741539b2f2885bf9ce9027abea~97v8KpU961197911979epoutp03W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1692771814;
-        bh=oae8C16j6kRiezbBVYHuN1AsaLhdigYyXsBcbOjJJlQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=UmuDNLJNYDRDQWXGZlsrNWF6n39rHmc6U4H9jpMQY8SP7YIkwCevxLtCLJMxiEmAl
-         oJdJRntzFNOpfJ5nqhbXuFTxD1Yg3N7CI3VY7Az7lbOIItE13UF4sne90rw3QbeZ5D
-         y/v3swGxmwZP+96YbrsTL/LMl3mwGcPBI+oH3aoQ=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20230823062333epcas5p1370f686e36324ca51773f47df3ab62b4~97v78mf1N2579525795epcas5p15;
-        Wed, 23 Aug 2023 06:23:33 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.177]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4RVx441dljz4x9Pv; Wed, 23 Aug
-        2023 06:23:32 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C8.B0.55173.4E5A5E46; Wed, 23 Aug 2023 15:23:32 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20230822063335epcas5p330d79a9f3f88bf1bcdb849ee47b831ec~9oPZvdKLo2787427874epcas5p37;
-        Tue, 22 Aug 2023 06:33:35 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230822063335epsmtrp13429d45f12ce49da961a9c1396ca638d~9oPZuq11L1793717937epsmtrp1K;
-        Tue, 22 Aug 2023 06:33:35 +0000 (GMT)
-X-AuditID: b6c32a50-df1ff7000001d785-d8-64e5a5e4cef0
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        19.03.34491.FB654E46; Tue, 22 Aug 2023 15:33:35 +0900 (KST)
-Received: from unvme-desktop (unknown [107.99.41.39]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230822063334epsmtip1afd02e2b288eedd6242afcfffc8c6f7e~9oPYu7rEl0074600746epsmtip1w;
-        Tue, 22 Aug 2023 06:33:34 +0000 (GMT)
-Date:   Tue, 22 Aug 2023 17:22:36 +0530
-From:   Ankit Kumar <ankit.kumar@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     kbusch@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [PATCH 0/2] Small fixes for block t10-pi
-Message-ID: <20230822115236.GA183261@unvme-desktop>
+        Wed, 23 Aug 2023 02:26:33 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED31E70;
+        Tue, 22 Aug 2023 23:26:05 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E49571F38A;
+        Wed, 23 Aug 2023 06:26:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692771963; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XN7LqX2H6SbWhNZUOepPsDIemoCNTeP1hUkjrQMnJg8=;
+        b=PnlH3/MXDHI1G5VSHUSwJpitXWLZwqhVXHd5X6Z8fzkcK/tRvNJ4wBT6nAN/sn8xYOaGtJ
+        JgA8naWgSwjR9wfqqiCARSLuuyiGipCGUtY2kQ+JqK/VWye+Qu6Uc0IABXyEsTDuvyfedc
+        HEpc+NHnoxhjPKl+6CZEilaAgEBtOOA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692771963;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XN7LqX2H6SbWhNZUOepPsDIemoCNTeP1hUkjrQMnJg8=;
+        b=RR1WmuBmp+ULiqf+0l2Rf8346o1IVs89YHBjgEnWr1qccmrFyWhO28tBMtbsATGPJ45PU0
+        0TLw/wk7o7jA/NAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 44BCE13458;
+        Wed, 23 Aug 2023 06:26:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id AqV8D3qm5WTLJAAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 23 Aug 2023 06:26:02 +0000
+Message-ID: <3562fc36-4bc2-b4fb-a2ad-1e310baf1b47@suse.de>
+Date:   Wed, 23 Aug 2023 08:26:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20230811153313.93786-1-ankit.kumar@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupmk+LIzCtJLcpLzFFi42LZdlhTS/fJ0qcpBmfOs1usvtvPZnHzwE4m
-        i0mHrjFa7L2lbXF51xw2i+XH/zE5sHlcPlvqsWlVJ5vHx6e3WDz6tqxi9Pi8SS6ANSrbJiM1
-        MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwdov5JCWWJOKVAo
-        ILG4WEnfzqYov7QkVSEjv7jEVim1ICWnwKRArzgxt7g0L10vL7XEytDAwMgUqDAhO6PpxDX2
-        gtXsFa1vfrM3MLaydTFyckgImEhsOXyKpYuRi0NIYA+jxNzVa6GcT4wSKy73sEI43xgllp5c
-        zgTTMqfxNxtEYi+jxNlVh9ghnFeMEtNftrGAVLEIqErM/vYAzGYT0JZ49fYGM4gtIhAq0bjs
-        LNgkZoEMidNrHrGD2MICphJnHp5lBbF5BYwldjybxQJhC0qcnPkEzOYUsJWY+uMNI8gyCYFH
-        7BJ7ph5ihjjJReLjomlQ5wlLvDq+hR3ClpJ42d8GZWdLbHr4E6qmQOLIi16oXnuJ1lP9zDAH
-        tb7fB1UvKzH11DqoQ/kken8/gerlldgxD8ZWlfh77zYLhC0tcfPdVSjbQ+LLuhPMkFCZwCgx
-        e/8e1gmMcrOQPDQLyT4IW0diwe5PbLMYOYBsaYnl/zggTE2J9bv0FzCyrmKUSi0ozk1PTTYt
-        MNTNSy2Hx3Nyfu4mRnCq1ArYwbh6w1+9Q4xMHIyHGCU4mJVEeKW/P0wR4k1JrKxKLcqPLyrN
-        SS0+xGgKjKGJzFKiyfnAZJ1XEm9oYmlgYmZmZmJpbGaoJM77unVuipBAemJJanZqakFqEUwf
-        EwenVAOTmcoy2YOem65eUw3UP7Qw5craWXOPXz9knXPbxiFyXn00193njTNE9fQDNGo/Se46
-        fp1BtVZo+97wrJK6U+meS/mWsCz6Jmft5+LCVukvOXfXhtRs+3r3l39N1d8byk0ODrmZ3h76
-        4XRd2ce+vMMcbxtF6vYc+Xj59kelYpXGpnNbNuxVFmVc+4GHvSMi8cNj898T11qmXw7yaTCW
-        4xQ3Fr5+KMTSdMrD/wfTxEMnqDZX6E9IPMu+xUSt5XqotHKY+E5G05pPF+PP8mQK1LMZebG+
-        arm/pyrrw8qFLzQEwyrey/54JPj0aST/HpHtacHX9tTuCRDWPecVsPeLqLBQ8iLbymnX237c
-        jr4be0GJpTgj0VCLuag4EQDjH/R2HgQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJLMWRmVeSWpSXmKPExsWy7bCSnO7+sCcpBv/+sFmsvtvPZnHzwE4m
-        i0mHrjFa7L2lbXF51xw2i+XH/zE5sHlcPlvqsWlVJ5vHx6e3WDz6tqxi9Pi8SS6ANYrLJiU1
-        J7MstUjfLoErY+mWPpaC1ywV+1buZG1gvMfcxcjJISFgIjGn8TdbFyMXh5DAbkaJxT0PGbsY
-        OYAS0hIL1ydC1AhLrPz3nB2i5gWjxPXfS1hAEiwCqhKzvz0As9kEtCVevb3BDNIrIhAq0fFc
-        DCTMLJAhcXrNI3YQW1jAVOLMw7OsIDavgLHEjmezWCBmTmCUmHZpAVRCUOLkzCcsEM1aEjf+
-        vWQCmckMdM/yfxwgYU4BW4mpP94wTmAUmIWkYxaSjlkIHQsYmVcxSqYWFOem5xYbFhjmpZbr
-        FSfmFpfmpesl5+duYgSHtpbmDsbtqz7oHWJk4mA8xCjBwawkwiv9/WGKEG9KYmVValF+fFFp
-        TmrxIUZpDhYlcV7xF70pQgLpiSWp2ampBalFMFkmDk6pBqarNSwrez8cdTrOf/NCcqHjimu/
-        N8c+Ef//f94rtrn3xQzPqITOOWNb8PLa/7ZVkXqfnGvWTVi4pfzYSwuLFvE39nJRv/cUMLBP
-        tOmeLRk972HjjJb+T+x9W/25rT2419m5J4jkrO2PEZlYk9Sp7pvlNse0LzKmTKXqlsvCgvpn
-        Nv5JXrwuR46+mHi2KzVx3ySORJElSmxKLJnzbquGP0m7P7vDrsQ6J856QkZEwXdhs5pmyx/n
-        nk/TYLlueLkjWGJJTIavzJRvV9ODFXm1FzbONetzPP1VvMflzuEPNYE32WaWrF6Qen/u/n0O
-        e30FY0S599vtj9AsVBLgDZ5x0YnZcClPYpq3/Pbt5vP5lViKMxINtZiLihMBrKHy1NwCAAA=
-X-CMS-MailID: 20230822063335epcas5p330d79a9f3f88bf1bcdb849ee47b831ec
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----gE6680ZNUinvX0c6ClraybDZwn8mhhmyVsG0uFNlX7QT91ZL=_7a094_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230811101910epcas5p30f4711f8d7da7bcb716d3a4d71978859
-References: <CGME20230811101910epcas5p30f4711f8d7da7bcb716d3a4d71978859@epcas5p3.samsung.com>
-        <20230811153313.93786-1-ankit.kumar@samsung.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v11 04/16] scsi: core: Introduce a mechanism for
+ reordering requests in the error handler
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+References: <20230822191822.337080-1-bvanassche@acm.org>
+ <20230822191822.337080-5-bvanassche@acm.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230822191822.337080-5-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------gE6680ZNUinvX0c6ClraybDZwn8mhhmyVsG0uFNlX7QT91ZL=_7a094_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-
-On Fri, Aug 11, 2023 at 09:03:11PM +0530, Ankit Kumar wrote:
-> This series has two patches that:
->  - Removes redundant T10_PI_TYPE2_PROTECTION condition check during
->    t10_pi_verify.
->  - Removes duplicate module license introduced in an earlier commit.
+On 8/22/23 21:16, Bart Van Assche wrote:
+> Introduce the .eh_needs_prepare_resubmit and the .eh_prepare_resubmit
+> function pointers in struct scsi_driver. Make the error handler call
+> .eh_prepare_resubmit() before resubmitting commands if any of the
+> .eh_needs_prepare_resubmit() invocations return true. A later patch
+> will use this functionality to sort SCSI commands by LBA from inside
+> the SCSI disk driver before these are resubmitted by the error handler.
 > 
-> Ankit Kumar (2):
->   block:t10-pi: remove redundant Type2 check during t10 PI verify
->   block:t10-pi: remove duplicate module license
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   drivers/scsi/scsi_error.c  | 65 ++++++++++++++++++++++++++++++++++++++
+>   drivers/scsi/scsi_priv.h   |  1 +
+>   include/scsi/scsi_driver.h |  2 ++
+>   3 files changed, 68 insertions(+)
 > 
->  block/t10-pi.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> -- 
-> 2.25.1
-> 
->
+> diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
+> index c67cdcdc3ba8..c4d817f044a0 100644
+> --- a/drivers/scsi/scsi_error.c
+> +++ b/drivers/scsi/scsi_error.c
+> @@ -27,6 +27,7 @@
+>   #include <linux/blkdev.h>
+>   #include <linux/delay.h>
+>   #include <linux/jiffies.h>
+> +#include <linux/list_sort.h>
+>   
+>   #include <scsi/scsi.h>
+>   #include <scsi/scsi_cmnd.h>
+> @@ -2186,6 +2187,68 @@ void scsi_eh_ready_devs(struct Scsi_Host *shost,
+>   }
+>   EXPORT_SYMBOL_GPL(scsi_eh_ready_devs);
+>   
+> +/*
+> + * Returns true if .eh_prepare_resubmit should be called for the commands in
+> + * @done_q.
+> + */
+> +static bool scsi_needs_preparation(struct list_head *done_q)
+> +{
+> +	struct scsi_cmnd *scmd;
+> +
+> +	list_for_each_entry(scmd, done_q, eh_entry) {
+> +		struct scsi_driver *uld = scsi_cmd_to_driver(scmd);
+> +		bool (*npr)(struct scsi_cmnd *) = uld->eh_needs_prepare_resubmit;
+> +
+> +		if (npr && npr(scmd))
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+> + > +/*
+> + * Comparison function that allows to sort SCSI commands by ULD driver.
+> + */
+> +static int scsi_cmp_uld(void *priv, const struct list_head *_a,
+> +			const struct list_head *_b)
+> +{
+> +	struct scsi_cmnd *a = list_entry(_a, typeof(*a), eh_entry);
+> +	struct scsi_cmnd *b = list_entry(_b, typeof(*b), eh_entry);
+> +
+> +	/* See also the comment above the list_sort() definition. */
+> +	return scsi_cmd_to_driver(a) > scsi_cmd_to_driver(b);
 
-Hi Jens,
+I have to agree with Christoph here.
+Comparing LBA numbers at the SCSI level is really the wrong place.
+SCSI commands might be anything, and quite some of these commands don't
+even have LBA numbers. So trying to order them will be pointless.
 
-These two patches have been reviewed by Martin.
-Can you please take a look.
+The reordering mechanism really has to go into the block layer, with
+the driver failing the request and the block layer resubmitting in-order.
 
-Ankit
+Sorry.
 
-------gE6680ZNUinvX0c6ClraybDZwn8mhhmyVsG0uFNlX7QT91ZL=_7a094_
-Content-Type: text/plain; charset="utf-8"
+Cheers,
 
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
-------gE6680ZNUinvX0c6ClraybDZwn8mhhmyVsG0uFNlX7QT91ZL=_7a094_--
