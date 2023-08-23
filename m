@@ -2,141 +2,136 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD695EE4993
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 09:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D716FEE49B0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235040AbjHWJZC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 05:25:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
+        id S231881AbjHWKK1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 06:10:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235050AbjHWJMJ (ORCPT
+        with ESMTP id S232227AbjHWKKY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 05:12:09 -0400
-Received: from out-12.mta0.migadu.com (out-12.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD11E70
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 02:05:09 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692781507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+        Wed, 23 Aug 2023 06:10:24 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FF411F;
+        Wed, 23 Aug 2023 03:10:21 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 49FFE2070A;
+        Wed, 23 Aug 2023 10:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692785420; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+Ck0rs81AEiodN0S3rZySD0WGGzyJ4hTtyZoFTOerZQ=;
-        b=g6TeL8imDuOfAy/AqraJoNw2qHhnH3g0sx8U26G2sFHnyHg2QiDlFKimvbArOq3hlcafJ9
-        7Nh029sgg5Cf1jkNDsXoGf6RGIZQp6FnbtPZnGDQMK+aRqhYX+yAkxl428nNG/vHsgWkX4
-        BPnP0zOudV9Mzm/QTjyWkggrclRHVWI=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, ming.lei@redhat.com, bvanassche@acm.org,
-        hch@lst.de
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com
-Subject: [PATCH v2 2/6] blk-mq-tag: introduce __blk_mq_tagset_busy_iter()
-Date:   Wed, 23 Aug 2023 17:04:37 +0800
-Message-ID: <20230823090441.3986631-3-chengming.zhou@linux.dev>
-In-Reply-To: <20230823090441.3986631-1-chengming.zhou@linux.dev>
-References: <20230823090441.3986631-1-chengming.zhou@linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+        bh=Dt4LXnYrw4kAFJZczkw29qSFviXn6bGuSZ06J4CVMGc=;
+        b=tSd3TO7nAhLNBjDQLlgV8yMozadYVJZda+fMrXANENu/FwFJH9qwnsw7vpqRpmtMIn5CND
+        0Kx1TOvgmrI/a8AQjxIyzj6++94m89Ub6Y/635O0Ul8AtkbwJGKDLfPBa6iv5JRzBbzw4B
+        ljohnYxwA1BjoucqgSQd/Z27EFkZZHY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692785420;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dt4LXnYrw4kAFJZczkw29qSFviXn6bGuSZ06J4CVMGc=;
+        b=QgYok9NkFMdwGazAQgQrBrNEzN7VNlmKOtm2khz105XW9UNotzuFrxnEnX9KOo7zBNoOFr
+        H4DFgxw+CcnmIAAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B48AD1351F;
+        Wed, 23 Aug 2023 10:10:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HFzVIArb5WRQDgAAMHmgww
+        (envelope-from <colyli@suse.de>); Wed, 23 Aug 2023 10:10:18 +0000
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [PATCH 09/29] bcache: Convert to bdev_open_by_path()
+From:   Coly Li <colyli@suse.de>
+In-Reply-To: <4c14b62-22a-e9b4-ab2d-3272d0c0495e@ewheeler.net>
+Date:   Wed, 23 Aug 2023 18:10:06 +0800
+Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Bcache Linux <linux-bcache@vger.kernel.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <280FD38B-FD92-4995-834F-E3E69CEA49E8@suse.de>
+References: <20230810171429.31759-1-jack@suse.cz>
+ <20230811110504.27514-9-jack@suse.cz>
+ <fd7fc9e-8d24-972-4b63-7eae3d2931e2@ewheeler.net>
+ <20230821175053.osjvbwnubr2k6q5q@quack3>
+ <4c14b62-22a-e9b4-ab2d-3272d0c0495e@ewheeler.net>
+To:     Eric Wheeler <bcache@lists.ewheeler.net>
+X-Mailer: Apple Mail (2.3731.600.7)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
 
-For support of specified queue filter when iterating over a tagset,
-we introduce __blk_mq_tagset_busy_iter() here and all current users
-just set queue as NULL which means have no queue filter.
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-mq-tag.c | 40 +++++++++++++++++++++++++---------------
- 1 file changed, 25 insertions(+), 15 deletions(-)
+> 2023=E5=B9=B48=E6=9C=8822=E6=97=A5 02:54=EF=BC=8CEric Wheeler =
+<bcache@lists.ewheeler.net> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Mon, 21 Aug 2023, Jan Kara wrote:
+>> On Sun 20-08-23 18:06:01, Eric Wheeler wrote:
+>>> On Fri, 11 Aug 2023, Jan Kara wrote:
+>>>> Convert bcache to use bdev_open_by_path() and pass the handle =
+around.
+>>>>=20
+>>>> CC: linux-bcache@vger.kernel.org
+>>>> CC: Coly Li <colyli@suse.de
+>>>> CC: Kent Overstreet <kent.overstreet@gmail.com>
+>>>> Acked-by: Coly Li <colyli@suse.de>
+>>>> Signed-off-by: Jan Kara <jack@suse.cz>
+>>>> ---
+>>>> drivers/md/bcache/bcache.h |  2 +
+>>>> drivers/md/bcache/super.c  | 78 =
+++++++++++++++++++++------------------
+>>>> 2 files changed, 43 insertions(+), 37 deletions(-)
+>>>>=20
+>>>> diff --git a/drivers/md/bcache/bcache.h =
+b/drivers/md/bcache/bcache.h
+>>>> index 5a79bb3c272f..2aa3f2c1f719 100644
+>>>> --- a/drivers/md/bcache/bcache.h
+>>>> +++ b/drivers/md/bcache/bcache.h
+>>>> @@ -299,6 +299,7 @@ struct cached_dev {
+>>>> struct list_head list;
+>>>> struct bcache_device disk;
+>>>> struct block_device *bdev;
+>>>> + struct bdev_handle *bdev_handle;
+>>>=20
+>>> It looks like you've handled most if not all of the `block_device =
+*bdev`=20
+>>> refactor.  Can we drop `block_device *bdev` and fixup any remaining=20=
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 3cf3cf72cd54..75b33ae6acef 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -383,13 +383,15 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-  * @flags:	BT_TAG_ITER_*
-  */
- static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
--			     busy_tag_iter_fn *fn, void *data, unsigned int flags)
-+			     busy_tag_iter_fn *fn, void *data, unsigned int flags,
-+			     struct request_queue *q)
- {
- 	struct bt_tags_iter_data iter_data = {
- 		.tags = tags,
- 		.fn = fn,
- 		.data = data,
- 		.flags = flags,
-+		.q = q,
- 	};
- 
- 	if (tags->rqs)
-@@ -397,14 +399,15 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
- }
- 
- static void __blk_mq_all_tag_iter(struct blk_mq_tags *tags,
--		busy_tag_iter_fn *fn, void *priv, unsigned int flags)
-+		busy_tag_iter_fn *fn, void *priv, unsigned int flags,
-+		struct request_queue *q)
- {
- 	WARN_ON_ONCE(flags & BT_TAG_ITER_RESERVED);
- 
- 	if (tags->nr_reserved_tags)
- 		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv,
--				 flags | BT_TAG_ITER_RESERVED);
--	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, flags);
-+				 flags | BT_TAG_ITER_RESERVED, q);
-+	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, flags, q);
- }
- 
- /**
-@@ -422,7 +425,23 @@ static void __blk_mq_all_tag_iter(struct blk_mq_tags *tags,
- void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
- 		void *priv)
- {
--	__blk_mq_all_tag_iter(tags, fn, priv, BT_TAG_ITER_STATIC_RQS);
-+	__blk_mq_all_tag_iter(tags, fn, priv, BT_TAG_ITER_STATIC_RQS, NULL);
-+}
-+
-+static void __blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
-+				      busy_tag_iter_fn *fn, void *priv,
-+				      struct request_queue *q)
-+{
-+	unsigned int flags = tagset->flags;
-+	int i, nr_tags;
-+
-+	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
-+
-+	for (i = 0; i < nr_tags; i++) {
-+		if (tagset->tags && tagset->tags[i])
-+			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
-+					      BT_TAG_ITER_STARTED, q);
-+	}
- }
- 
- /**
-@@ -441,16 +460,7 @@ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv)
- {
--	unsigned int flags = tagset->flags;
--	int i, nr_tags;
--
--	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
--
--	for (i = 0; i < nr_tags; i++) {
--		if (tagset->tags && tagset->tags[i])
--			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
--					      BT_TAG_ITER_STARTED);
--	}
-+	__blk_mq_tagset_busy_iter(tagset, fn, priv, NULL);
- }
- EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
- 
--- 
-2.41.0
+>>> references?  More below.
+>>=20
+>> Well, we could but it's a lot of churn - like 53 dereferences in =
+bcache.
+>> So if bcache maintainer wants to go this way, sure we can do it. But
+>> preferably as a separate cleanup patch on top of this series because =
+the
+>> series generates enough conflicts as is and this will make it =
+considerably
+>> worse.
+>=20
+> A separate cleanup patch seems reasonable, I'll defer to Coly on this =
+one=20
+> since he's the maintainer.  I just wanted to point out the possible =
+issue. =20
+> Thanks for your work on this.
+
+Yes, the challenge of this series is from the block layer core, once the =
+change in core part is accepted, the cleanup can be followed up if =
+necessary.
+
+Thank you all.
+
+Coly Li
 
