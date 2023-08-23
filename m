@@ -2,88 +2,67 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA368EE49B0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 15:24:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB0CEE4993
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 15:26:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231700AbjHWPYG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 11:24:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32894 "EHLO
+        id S234434AbjHWP0q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 11:26:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233122AbjHWPYG (ORCPT
+        with ESMTP id S235600AbjHWP0p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 11:24:06 -0400
-Received: from out-7.mta0.migadu.com (out-7.mta0.migadu.com [IPv6:2001:41d0:1004:224b::7])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E8C210C2
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 08:23:47 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692803924;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=39OjMOjb/826+Jg9MdvipvIXBUc1uSG53IpTEpDZxrU=;
-        b=XAIXvIyAK1QhurQtGLr1P8iTvAjXecQQuUmN/33dBtlw3hRvPXwtsxdA2KPtOis6J/a/nz
-        jYWYgh1ZJSOtDRVlaHPZlyVjL9clM5MiHdz36qV+MmsEQr8rKDITDgYa6SQQwC0B2OfrtW
-        ybOaSvdBMyMynBXaFZNnkAFvyEXnd7k=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, ming.lei@redhat.com, bvanassche@acm.org,
+        Wed, 23 Aug 2023 11:26:45 -0400
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C132CF1;
+        Wed, 23 Aug 2023 08:26:43 -0700 (PDT)
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3a741f46fadso4216108b6e.0;
+        Wed, 23 Aug 2023 08:26:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692804403; x=1693409203;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lFvHPIv8iGfPkbYW5RlA5xNi6MZfGEzKYk4w0TdFSmo=;
+        b=VFKrbG6FPv3NsVncKlLrEE7cLkY/r+9BxGRvh1OsKSsdj0ODKZgB4eO94OmzwSbCIm
+         Y4351Aphy/4mf63VlrYtk7usCO4CTVoT5n/QRGcPF10uTjpwXv13ax5naj5gfQhKZSOf
+         3fOu5PaHb0s92wsvq8I+nXwSo7vRvaQg1ouVzAaTYmO//ngcr65kwB8g0sJUMY50sE/Y
+         vB9boNhmR3bJtt2276PJfjdYxkWZ0U75nzeTj0xdDGr3y/LwOzgslkzmRdSjJq9BnQxx
+         s+BO+aMR0ggHUOHxU0uxU65wEl+JLSDRXhfvVr0cqXtK4REDvqWuOaBYJ450afRDqqRO
+         AR+g==
+X-Gm-Message-State: AOJu0YxTCqjuv0IzbQq6B1jLQ1G6Oxzq3RtHK4SD7dW6TVlH6udARGQA
+        h3VIjuwzaKllYD+RRnxwTks=
+X-Google-Smtp-Source: AGHT+IFYzObcsdzja9TmeiqyQLpgZJqSNJfhID6x+odKA/vX3QKLzUFWwIcpOBWIxlp780a2IFcoKg==
+X-Received: by 2002:a05:6808:283:b0:3a8:4dfd:4f17 with SMTP id z3-20020a056808028300b003a84dfd4f17mr13178833oic.20.1692804402730;
+        Wed, 23 Aug 2023 08:26:42 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:ecb6:e8b9:f433:b4b4? ([2620:15c:211:201:ecb6:e8b9:f433:b4b4])
+        by smtp.gmail.com with ESMTPSA id i8-20020a63a848000000b005634343cd9esm9950144pgp.44.2023.08.23.08.26.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Aug 2023 08:26:41 -0700 (PDT)
+Message-ID: <870a7ddd-812c-b26f-5ae7-2b67d6be8b11@acm.org>
+Date:   Wed, 23 Aug 2023 08:26:40 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v3 6/6] blk-mq-tag: fix blk_mq_queue_tag_busy_iter()
+ documentation
+Content-Language: en-US
+To:     chengming.zhou@linux.dev, axboe@kernel.dk, ming.lei@redhat.com,
         hch@lst.de
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         zhouchengming@bytedance.com
-Subject: [PATCH v3 4/6] blk-mq: delete superfluous check in iterate callback
-Date:   Wed, 23 Aug 2023 23:18:01 +0800
-Message-ID: <20230823151803.926382-5-chengming.zhou@linux.dev>
-In-Reply-To: <20230823151803.926382-1-chengming.zhou@linux.dev>
 References: <20230823151803.926382-1-chengming.zhou@linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+ <20230823151803.926382-7-chengming.zhou@linux.dev>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230823151803.926382-7-chengming.zhou@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
-
-The previous patch in this series changed the behavior of
-blk_mq_queue_tag_busy_iter() from iterating over all allocated tags into
-iterating over started requests only. Leave out the code from
-blk_mq_rq_inflight() that became superfluous because of this change.
+On 8/23/23 08:18, chengming.zhou@linux.dev wrote:
+> The blk_mq_queue_tag_busy_iter() is only used to iterate over reqeusts
+> of the specified queue, fix the documentation.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-mq.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 953f08354c8c..f1bafbae0a61 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1516,19 +1516,15 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
- 
- static bool blk_mq_rq_inflight(struct request *rq, void *priv)
- {
-+	bool *busy = priv;
-+
- 	/*
- 	 * If we find a request that isn't idle we know the queue is busy
- 	 * as it's checked in the iter.
- 	 * Return false to stop the iteration.
- 	 */
--	if (blk_mq_request_started(rq)) {
--		bool *busy = priv;
--
--		*busy = true;
--		return false;
--	}
--
--	return true;
-+	*busy = true;
-+	return false;
- }
- 
- bool blk_mq_queue_inflight(struct request_queue *q)
--- 
-2.41.0
 
