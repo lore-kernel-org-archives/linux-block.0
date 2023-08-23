@@ -2,142 +2,209 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 935D6EE49B7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56076EE49B6
 	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:49:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233961AbjHWKtd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 06:49:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34028 "EHLO
+        id S234111AbjHWKtc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 06:49:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233993AbjHWKt1 (ORCPT
+        with ESMTP id S233501AbjHWKt1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 23 Aug 2023 06:49:27 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1515F170F;
-        Wed, 23 Aug 2023 03:49:02 -0700 (PDT)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51D4170D;
+        Wed, 23 Aug 2023 03:49:01 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8E9802074D;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 4B5DF21EE8;
         Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1692787738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5XYZxNtC34lGlFe63Wtqi33jz6UUKNdpkCuGR1HdOSg=;
-        b=rptHEC41T1HzGkwT1SV7EpKj9ADx+TLvWQSjiqd+I7ozCX+T5FUJIsUnBAIeGBK2KtWo1s
-        EMeg1tAibSPr4bjRZldr3N4q+UrUeTdIV4+qglJWUIAGKUP/LnYp81nQAEZ07PzGfzx3mP
-        KMzEsX9/W3R75rNjnYhOFRApeE8yxfU=
+        bh=3B6UgT9e7WKZ37HAk6nN2zOCpV17ZlB8IFJRAHx8NXM=;
+        b=Y9P3yIwFVU8uJFYeA/Sr/kQJAiEfdv2Tzx5tFN9eIi8cB3PHr+7CA6Nzl4FHjN8AkG2OFq
+        5rHRfx5vEpASvOIdOzJEk6ShJ0ww/rs27Kq5i8Y2Tj3SvBc76cBFfUsZfsiPV8mb2LikxO
+        BdPti3RrEbMQbLdRL7xCf8ME3UiD6G4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1692787738;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5XYZxNtC34lGlFe63Wtqi33jz6UUKNdpkCuGR1HdOSg=;
-        b=Re8DPWW9K21Terbhtc25uWEZg4lDhCG2Yhl7JeQEQcsMaQT8Fvk89mzDcFPekTdz4kLp8H
-        fKnNB9TbK64vQuCQ==
+        bh=3B6UgT9e7WKZ37HAk6nN2zOCpV17ZlB8IFJRAHx8NXM=;
+        b=BDS64H785FsCIhPMUVVqXiF2AWAVjUcwlnl9WZ7LosB5Cu1F3QqE2NU01xYFV7aU6gv1YG
+        DlKTpWmWvzlWg4Cg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7CBFB139D0;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3C47B13458;
         Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id LnZsHhrk5WRGIAAAMHmgww
+        id hNDCDhrk5WQ3IAAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 23 Aug 2023 10:48:58 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 4A78AA078B; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
+        id 2E6ADA077F; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-raid@vger.kernel.org, Song Liu <song@kernel.org>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 11/29] md: Convert to bdev_open_by_dev()
-Date:   Wed, 23 Aug 2023 12:48:22 +0200
-Message-Id: <20230823104857.11437-11-jack@suse.cz>
+Subject: [PATCH 06/29] rnbd-srv: Convert to use bdev_open_by_path()
+Date:   Wed, 23 Aug 2023 12:48:17 +0200
+Message-Id: <20230823104857.11437-6-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2273; i=jack@suse.cz; h=from:subject; bh=cVz0uZ7R2L7regG23VnRBgqqO1W752jyfIvUc4wfwLw=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eP3q2wj4+gcehRhCiRJhgps6JS8hcXKSnbx6+ok lT2H1GuJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXj9wAKCRCcnaoHP2RA2UMmCA DTsoJIbQr5374tZ9q2geg9tB7cZUc9Yn8NNFxwSs1U3z0IAybntVaOVJCtdvMuQtPhJsEPv+cMVu7T hZoPFNYbbMuqUGtpq2L73O6WHYVsjtflC5NoBXmMDXobw0qSFGUJCJGYjFonYmAHmeoPLmHC9J+uNf Tl1mjwdWNzRZ4nkD2YdeKD8HXQHYYGhaCWvznWxSGy5zfNSLVuFt7zvhTsO8zo5i0hlP3PF4zM61uW 80nYjPM+c+ZlYwGLbcC3hJ1HqiSR1QStvX1lj4t63C4PKWcXZxPx6NhYRCBbaJ1G86+DcchQLBW3Nj ufHLn+How651VatlBTawJcbXI4dESQ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5258; i=jack@suse.cz; h=from:subject; bh=L68h0rktksNTIyOKoltNtkT4sxTVsTqvIKO35TqqZOg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5ePzX6hs38iQkAhCZYkYBKSCs2iGdpQWjSOtEMUv W94Q1HeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXj8wAKCRCcnaoHP2RA2TvfCA DM9z3Vmi6OjqZU7ghu5q6r1OKhuXoEBG0R4YaFNVI7EKKH/wbM+D7xH5ZKvuPpo7ZGs8nHpHAXFuSV D64rshtvIzGLFlY4lMPE8VUl4mg9a4bjHDxQm2ImoTcRhmtwSLCQhWm9bGr8TtGqexOqeJCh/RMTMy APXd4iQCx7GYg/XZwUPxTmN3D0tA5T75G7ueSiL3qWgdnvFWAc2kfZXdBc6jC+6zcM4Mt4UsxpPISw IhVJIONEzHly/QK1qFL0EpK3t9kp3MVPsdapaAfntRIDXDe136GaCd5DlPE+qystmKWNLZPAI4ggKR jp9wgn5qZpYMmcCc5dgbkEWF81+dLp
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert md to use bdev_open_by_dev() and pass the handle around.
+Convert rnbd-srv to use bdev_open_by_path() and pass the handle
+around.
 
-CC: linux-raid@vger.kernel.org
-CC: Song Liu <song@kernel.org>
-Acked-by: Song Liu <song@kernel.org>
+CC: Jack Wang <jinpu.wang@ionos.com>
+CC: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
+Acked-by: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
 Acked-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/md/md.c | 12 +++++++-----
- drivers/md/md.h |  1 +
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ drivers/block/rnbd/rnbd-srv.c | 27 ++++++++++++++-------------
+ drivers/block/rnbd/rnbd-srv.h |  2 +-
+ 2 files changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 78be7811a89f..20d6cefda3e8 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -2450,7 +2450,7 @@ static void export_rdev(struct md_rdev *rdev, struct mddev *mddev)
- 	if (test_bit(AutoDetected, &rdev->flags))
- 		md_autodetect_dev(rdev->bdev->bd_dev);
- #endif
--	blkdev_put(rdev->bdev, mddev->external ? &claim_rdev : rdev);
-+	bdev_release(rdev->bdev_handle);
- 	rdev->bdev = NULL;
- 	kobject_put(&rdev->kobj);
- }
-@@ -3644,14 +3644,16 @@ static struct md_rdev *md_import_device(dev_t newdev, int super_format, int supe
- 	if (err)
- 		goto out_clear_rdev;
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index c186df0ec641..65de51f3dfd9 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -145,7 +145,7 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
+ 	priv->sess_dev = sess_dev;
+ 	priv->id = id;
  
--	rdev->bdev = blkdev_get_by_dev(newdev, BLK_OPEN_READ | BLK_OPEN_WRITE,
-+	rdev->bdev_handle = bdev_open_by_dev(newdev,
-+			BLK_OPEN_READ | BLK_OPEN_WRITE,
- 			super_format == -2 ? &claim_rdev : rdev, NULL);
--	if (IS_ERR(rdev->bdev)) {
-+	if (IS_ERR(rdev->bdev_handle)) {
- 		pr_warn("md: could not open device unknown-block(%u,%u).\n",
- 			MAJOR(newdev), MINOR(newdev));
--		err = PTR_ERR(rdev->bdev);
-+		err = PTR_ERR(rdev->bdev_handle);
- 		goto out_clear_rdev;
+-	bio = bio_alloc(sess_dev->bdev, 1,
++	bio = bio_alloc(sess_dev->bdev_handle->bdev, 1,
+ 			rnbd_to_bio_flags(le32_to_cpu(msg->rw)), GFP_KERNEL);
+ 	if (bio_add_page(bio, virt_to_page(data), datalen,
+ 			offset_in_page(data)) != datalen) {
+@@ -219,7 +219,7 @@ void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *sess_dev, bool keep_id)
+ 	rnbd_put_sess_dev(sess_dev);
+ 	wait_for_completion(&dc); /* wait for inflights to drop to zero */
+ 
+-	blkdev_put(sess_dev->bdev, NULL);
++	bdev_release(sess_dev->bdev_handle);
+ 	mutex_lock(&sess_dev->dev->lock);
+ 	list_del(&sess_dev->dev_list);
+ 	if (!sess_dev->readonly)
+@@ -534,7 +534,7 @@ rnbd_srv_get_or_create_srv_dev(struct block_device *bdev,
+ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
+ 					struct rnbd_srv_sess_dev *sess_dev)
+ {
+-	struct block_device *bdev = sess_dev->bdev;
++	struct block_device *bdev = sess_dev->bdev_handle->bdev;
+ 
+ 	rsp->hdr.type = cpu_to_le16(RNBD_MSG_OPEN_RSP);
+ 	rsp->device_id = cpu_to_le32(sess_dev->device_id);
+@@ -559,7 +559,7 @@ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
+ static struct rnbd_srv_sess_dev *
+ rnbd_srv_create_set_sess_dev(struct rnbd_srv_session *srv_sess,
+ 			      const struct rnbd_msg_open *open_msg,
+-			      struct block_device *bdev, bool readonly,
++			      struct bdev_handle *handle, bool readonly,
+ 			      struct rnbd_srv_dev *srv_dev)
+ {
+ 	struct rnbd_srv_sess_dev *sdev = rnbd_sess_dev_alloc(srv_sess);
+@@ -571,7 +571,7 @@ rnbd_srv_create_set_sess_dev(struct rnbd_srv_session *srv_sess,
+ 
+ 	strscpy(sdev->pathname, open_msg->dev_name, sizeof(sdev->pathname));
+ 
+-	sdev->bdev		= bdev;
++	sdev->bdev_handle	= handle;
+ 	sdev->sess		= srv_sess;
+ 	sdev->dev		= srv_dev;
+ 	sdev->readonly		= readonly;
+@@ -676,7 +676,7 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
+ 	struct rnbd_srv_dev *srv_dev;
+ 	struct rnbd_srv_sess_dev *srv_sess_dev;
+ 	const struct rnbd_msg_open *open_msg = msg;
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	blk_mode_t open_flags = BLK_OPEN_READ;
+ 	char *full_path;
+ 	struct rnbd_msg_open_rsp *rsp = data;
+@@ -714,15 +714,15 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
+ 		goto reject;
  	}
-+	rdev->bdev = rdev->bdev_handle->bdev;
  
- 	kobject_init(&rdev->kobj, &rdev_ktype);
+-	bdev = blkdev_get_by_path(full_path, open_flags, NULL, NULL);
+-	if (IS_ERR(bdev)) {
+-		ret = PTR_ERR(bdev);
++	bdev_handle = bdev_open_by_path(full_path, open_flags, NULL, NULL);
++	if (IS_ERR(bdev_handle)) {
++		ret = PTR_ERR(bdev_handle);
+ 		pr_err("Opening device '%s' on session %s failed, failed to open the block device, err: %d\n",
+ 		       full_path, srv_sess->sessname, ret);
+ 		goto free_path;
+ 	}
  
-@@ -3682,7 +3684,7 @@ static struct md_rdev *md_import_device(dev_t newdev, int super_format, int supe
- 	return rdev;
+-	srv_dev = rnbd_srv_get_or_create_srv_dev(bdev, srv_sess,
++	srv_dev = rnbd_srv_get_or_create_srv_dev(bdev_handle->bdev, srv_sess,
+ 						  open_msg->access_mode);
+ 	if (IS_ERR(srv_dev)) {
+ 		pr_err("Opening device '%s' on session %s failed, creating srv_dev failed, err: %ld\n",
+@@ -731,7 +731,8 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
+ 		goto blkdev_put;
+ 	}
  
- out_blkdev_put:
--	blkdev_put(rdev->bdev, super_format == -2 ? &claim_rdev : rdev);
-+	bdev_release(rdev->bdev_handle);
- out_clear_rdev:
- 	md_rdev_clear(rdev);
- out_free_rdev:
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 1aef86bf3fc3..e8108845157b 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -59,6 +59,7 @@ struct md_rdev {
+-	srv_sess_dev = rnbd_srv_create_set_sess_dev(srv_sess, open_msg, bdev,
++	srv_sess_dev = rnbd_srv_create_set_sess_dev(srv_sess, open_msg,
++				bdev_handle,
+ 				open_msg->access_mode == RNBD_ACCESS_RO,
+ 				srv_dev);
+ 	if (IS_ERR(srv_sess_dev)) {
+@@ -747,7 +748,7 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
  	 */
- 	struct block_device *meta_bdev;
- 	struct block_device *bdev;	/* block device handle */
-+	struct bdev_handle *bdev_handle;	/* Handle from open for bdev */
- 
- 	struct page	*sb_page, *bb_page;
- 	int		sb_loaded;
+ 	mutex_lock(&srv_dev->lock);
+ 	if (!srv_dev->dev_kobj.state_in_sysfs) {
+-		ret = rnbd_srv_create_dev_sysfs(srv_dev, bdev);
++		ret = rnbd_srv_create_dev_sysfs(srv_dev, bdev_handle->bdev);
+ 		if (ret) {
+ 			mutex_unlock(&srv_dev->lock);
+ 			rnbd_srv_err(srv_sess_dev,
+@@ -790,7 +791,7 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
+ 	}
+ 	rnbd_put_srv_dev(srv_dev);
+ blkdev_put:
+-	blkdev_put(bdev, NULL);
++	bdev_release(bdev_handle);
+ free_path:
+ 	kfree(full_path);
+ reject:
+diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
+index 1027656dedb0..343cc682b617 100644
+--- a/drivers/block/rnbd/rnbd-srv.h
++++ b/drivers/block/rnbd/rnbd-srv.h
+@@ -46,7 +46,7 @@ struct rnbd_srv_dev {
+ struct rnbd_srv_sess_dev {
+ 	/* Entry inside rnbd_srv_dev struct */
+ 	struct list_head		dev_list;
+-	struct block_device		*bdev;
++	struct bdev_handle		*bdev_handle;
+ 	struct rnbd_srv_session		*sess;
+ 	struct rnbd_srv_dev		*dev;
+ 	struct kobject                  kobj;
 -- 
 2.35.3
 
