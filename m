@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4775DEE49A0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 14:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E2B2EE49A0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 14:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235216AbjHWO2U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 10:28:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47064 "EHLO
+        id S235648AbjHWO3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 10:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233339AbjHWO2T (ORCPT
+        with ESMTP id S235348AbjHWO3l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 10:28:19 -0400
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35F5CE54;
-        Wed, 23 Aug 2023 07:28:18 -0700 (PDT)
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1bc8a2f71eeso37414965ad.0;
-        Wed, 23 Aug 2023 07:28:18 -0700 (PDT)
+        Wed, 23 Aug 2023 10:29:41 -0400
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9216BE54;
+        Wed, 23 Aug 2023 07:29:39 -0700 (PDT)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-1cc87405650so2050872fac.2;
+        Wed, 23 Aug 2023 07:29:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692800897; x=1693405697;
+        d=1e100.net; s=20221208; t=1692800979; x=1693405779;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ifSk/zsvJJFaiG6xt0kd3cwJmAV4kGD5Bq/Ohxo7ks0=;
-        b=VbDoCHj83wm/8SG6ANgr0zjOR9/U54QTTvoYixMWTrCO8Hgg8osQhTe5zqQrHIfDGm
-         Md8lmizmjjELb8UR4Hv4E/4oYPrpZi11uoIcpmpowNf+YfNgPVax1hf0/AhBnLMVNvZE
-         gycWq5YvVrPzCp8teUS20z7IMuPzLO+81KXnX9q5QQeMJU2bNOBz2rlBa5Fg4I5sJhlP
-         yJ4LZ57QRgwMPnwwEgTKkY4PBqd5Uipdk9nOaIEaGaI1CVmqYvAEnChbzfuDcJ4YrLsR
-         4frZbSuQnH4D0wPJMYec3D4dmeD7mtScBL0lRuIQI1psbhdDv2ltRcAxaOfTcF4Koo+X
-         uRAg==
-X-Gm-Message-State: AOJu0YzOjSz8PRwBL9jOEnIRN8u/ikHO9qMRr3OvFGCszeL/JbJJ4d82
-        SmJHC59kA7ZfGStdxFGbB0Q=
-X-Google-Smtp-Source: AGHT+IFwpdtgp8F8RGlrjvFxJk+k7IAaPAnQOVe4Lxqk60PIWuIuUzZMOwAcfCHMHKa65pYms/sLIQ==
-X-Received: by 2002:a17:902:b582:b0:1b9:e591:db38 with SMTP id a2-20020a170902b58200b001b9e591db38mr9367083pls.8.1692800897460;
-        Wed, 23 Aug 2023 07:28:17 -0700 (PDT)
+        bh=yVPsImqY9zUWDGiut17nagmDeGBMfQyIFhH7z+M3iFs=;
+        b=eDgJyseedSI4BoRU7ly8qZUWHHXsxjbS/KRnMMO+o8Qwkkvb6kZiEtz+yVPW5T2hpP
+         pbHI3IMPFRxAv6L0xwyNXc5E6fBUIdGrAz0PcsGXXfuHnpvUiVfXjhHrBMYSd95RCSqU
+         0m8Kf0kUA9n651ub/lWcF8UUEl6DWRkkonN6cAg/v3Tpjr56JfhEk5yaU1QicsjKRbRr
+         erWeeA93vY9a/B4f3G+Qeh70dsb9yc4K0lYLvHuMaIlSA7zYTc5OXX1dtNZrgkHxR3uN
+         NkuPbI+IjuI7DqhU1D0oaG9zOEovDv2Td19IXL0SrhWUd7EZ3p5d53T0zVYB5ppXZPSg
+         F4Gg==
+X-Gm-Message-State: AOJu0YyqDKmXDB/i1sfX7Fe0i7gkdX779pqqlYGWJ8LkNorH0uR94vid
+        Gf2QEJYdqXUU6p2m3gl1ZqLvrBGU6n8=
+X-Google-Smtp-Source: AGHT+IH4g+dl1D9eDLNljo2VY3UcD9u8pkJtu3XjEPhwv6CLxh5XbnolUBziW+TrfMvRSEU9Y90Rzw==
+X-Received: by 2002:a05:6870:64aa:b0:1bf:50e0:95d9 with SMTP id cz42-20020a05687064aa00b001bf50e095d9mr16033028oab.26.1692800978780;
+        Wed, 23 Aug 2023 07:29:38 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:ecb6:e8b9:f433:b4b4? ([2620:15c:211:201:ecb6:e8b9:f433:b4b4])
-        by smtp.gmail.com with ESMTPSA id iz22-20020a170902ef9600b001b9da42cd7dsm11107382plb.279.2023.08.23.07.28.16
+        by smtp.gmail.com with ESMTPSA id mu13-20020a17090b388d00b0026d54b2abe9sm8866711pjb.37.2023.08.23.07.29.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Aug 2023 07:28:16 -0700 (PDT)
-Message-ID: <a1732d82-2b5d-7865-d13f-dde1f31257d8@acm.org>
-Date:   Wed, 23 Aug 2023 07:28:15 -0700
+        Wed, 23 Aug 2023 07:29:38 -0700 (PDT)
+Message-ID: <5069d917-ed83-4036-709f-f97871968d13@acm.org>
+Date:   Wed, 23 Aug 2023 07:29:36 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.1
-Subject: Re: [PATCH v2 1/6] blk-mq-tag: support queue filter in bt_tags_iter()
+Subject: Re: [PATCH v2 2/6] blk-mq-tag: introduce __blk_mq_tagset_busy_iter()
 Content-Language: en-US
 To:     chengming.zhou@linux.dev, axboe@kernel.dk, ming.lei@redhat.com,
         hch@lst.de
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         zhouchengming@bytedance.com
 References: <20230823090441.3986631-1-chengming.zhou@linux.dev>
- <20230823090441.3986631-2-chengming.zhou@linux.dev>
+ <20230823090441.3986631-3-chengming.zhou@linux.dev>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230823090441.3986631-2-chengming.zhou@linux.dev>
+In-Reply-To: <20230823090441.3986631-3-chengming.zhou@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -60,8 +60,8 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/23/23 02:04, chengming.zhou@linux.dev wrote:
-> The only user of bt_for_each() is blk_mq_queue_tag_busy_iter(), which
-> need to filter queue when iterate the tags. In preparation of removing
-> bt_for_each(), support queue filter in bt_tags_iter().
+> For support of specified queue filter when iterating over a tagset,
+> we introduce __blk_mq_tagset_busy_iter() here and all current users
+> just set queue as NULL which means have no queue filter.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
