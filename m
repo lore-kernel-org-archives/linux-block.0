@@ -2,557 +2,270 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A67EE49B2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C227CEE49A0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234298AbjHWKu5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 06:50:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42926 "EHLO
+        id S234166AbjHWKvZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 06:51:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234041AbjHWKuX (ORCPT
+        with ESMTP id S234187AbjHWKuY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 06:50:23 -0400
+        Wed, 23 Aug 2023 06:50:24 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0420E7C;
-        Wed, 23 Aug 2023 03:49:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 926E810E6;
+        Wed, 23 Aug 2023 03:49:34 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E8DC321F4A;
-        Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 367D02223A;
+        Wed, 23 Aug 2023 10:48:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1692787738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1692787739; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tnJLH+Bt8+gCmYzpQyIDbcgmN9zx4njPgoMK7Z76VCM=;
-        b=Lf3fGSZ6HuNxEO4vvXk3+A3/fYUgHWEloT8G4qddjQzaiuLvNOR4uCaIzIrjsA9GDFM6Sa
-        vAzQ/5OpHRuBPXwFxGTAL3bFsINnyB1r0RrU+KrdaPN5xotxva4+iRBSYJ49CkyfWEog1X
-        CLvy9i+K6hU9o+iUlnCTsPS4oIK5ypI=
+        bh=lSTTyLV88foK1bhoLSdaN+o7W9asPR7FOrADldvRq1o=;
+        b=NPRX94iaAiEJl2fAwFRrxF1j6GgeagtnQzXqjTGZKGLk3MYK9HTp6Yq1gJZidC77tkzqVi
+        Vcu+WYXZ5sc79yQ6D3eXbwFipXXqlY+jWs0ZiZkanUtJC4RsjBEBR/XyIlBqI2nx5gHed0
+        LfEIrbp4jap1TmSgCXyiLb+AtGnbchg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1692787738;
+        s=susede2_ed25519; t=1692787739;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tnJLH+Bt8+gCmYzpQyIDbcgmN9zx4njPgoMK7Z76VCM=;
-        b=jmyOW+Mg9bSiYynl7+ZoIXADpXF567jT4YdFFptYN/LQY4XpeXDYYQJN1d4vEno9SsIGYt
-        6ZOgTCxk3pv08xDg==
+        bh=lSTTyLV88foK1bhoLSdaN+o7W9asPR7FOrADldvRq1o=;
+        b=Sg9h5rDbhjAriPGdxfH3t8WjP5I1NDMADUczB+N6Qr9PlqMUn8rzzLllgAJQd4LYaP1XIi
+        Tk8lbDBKBaIZIwAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D3CC413A1B;
-        Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 20B8013A1B;
+        Wed, 23 Aug 2023 10:48:59 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id MFsnMxrk5WRWIAAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 23 Aug 2023 10:48:58 +0000
+        id S0gACBvk5WR3IAAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 23 Aug 2023 10:48:59 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 7CF75A0796; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
+        id A5BEDA079F; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 20/29] btrfs: Convert to bdev_open_by_path()
-Date:   Wed, 23 Aug 2023 12:48:31 +0200
-Message-Id: <20230823104857.11437-20-jack@suse.cz>
+        reiserfs-devel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 27/29] reiserfs: Convert to bdev_open_by_dev/path()
+Date:   Wed, 23 Aug 2023 12:48:38 +0200
+Message-Id: <20230823104857.11437-27-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=16691; i=jack@suse.cz; h=from:subject; bh=8ZCF8MRl0DvMKekoyxZXeZG8/TJG3dOn3Qg5luwR2e4=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eP/2XJt9XwxFj6rvuJzZnJ/e+3VH8bLhPjr3Zg7 gHlT2ruJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXj/wAKCRCcnaoHP2RA2brOCA Ci5LG/u0ZQhetYrg46DD59U2zhbO+4msdsLokvokt5Ds1yq2dzOzJnT8RFWLcjMyOfV93ETcfOhySy /kCxA4nrYNvHVrvzCUJIpuMPcdL4+l98/9fHkChhwBCLhdlmFwGNUW9cn/ckAXA1NrhfI1jbqoVwe0 wys2zFcultBbJidqy+ALgdnWMDXtyiEeXdRl+aili/mK0JW6E7dduez83LlwOnOAdlODrl7Q7ed/36 MC6OVFAKnFT5h2Qa46tC1CawIwQqRsfBsQ8WNSmZxpsRVb9ZaSdilysazlHdpYN/hdnq6IHWdnN8BO KLyXwlvDM8X32ZPrJtYwIAgUOR2s5v
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7573; i=jack@suse.cz; h=from:subject; bh=4RZ7b5gTYj/1qiRz10n1qoEcWmkQPO0NEVnbSAgZGMM=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eQFdEvEHg4WgunJSUkZnvF7+6uyN4XwBKf9TT62 7kJOGqeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXkBQAKCRCcnaoHP2RA2UXmCA DMQQ0KznsrByjoQpARu9QPerhf9dH5Y67NxMe/wNybXpjUpqfgcR9gePlevzC+zQ3xBXr2Vc9TZjgA a97992sZvHxccDTR1BrqKSTzqP35lYHNQ699tOdA3Pd49fLYz7SoQRHVV16BZ1CZwCbt+hCLkvfjLV +Zn+zno2B/77SDKffACM0D0Oy+2rsfmj8FQ2sptKOt2yrJnDO31FzgqDAg7/IMfr7Voh58MEYqORV4 qsR6pzVzB4V6MdZv+pVLkWzPwZrdIZilOZ1qzCVm8JxLwxymDLbuVRPw/Ag6/EHI3qhMlqJvDh9QJi qGVkdvgVLt5Uh/EDrk1Gk7MAMpsJvY
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert btrfs to use bdev_open_by_path() and pass the handle around.  We
-also drop the holder from struct btrfs_device as it is now not needed
-anymore.
+Convert reiserfs to use bdev_open_by_dev/path() and pass the handle
+around.
 
-CC: David Sterba <dsterba@suse.com>
-CC: linux-btrfs@vger.kernel.org
+CC: reiserfs-devel@vger.kernel.org
 Acked-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/btrfs/dev-replace.c |  14 +++---
- fs/btrfs/ioctl.c       |  18 +++----
- fs/btrfs/volumes.c     | 107 +++++++++++++++++++++--------------------
- fs/btrfs/volumes.h     |   6 +--
- 4 files changed, 73 insertions(+), 72 deletions(-)
+ fs/reiserfs/journal.c  | 56 +++++++++++++++++++-----------------------
+ fs/reiserfs/procfs.c   |  2 +-
+ fs/reiserfs/reiserfs.h | 11 ++++++---
+ 3 files changed, 33 insertions(+), 36 deletions(-)
 
-diff --git a/fs/btrfs/dev-replace.c b/fs/btrfs/dev-replace.c
-index 5f10965fd72b..fec013c5f26c 100644
---- a/fs/btrfs/dev-replace.c
-+++ b/fs/btrfs/dev-replace.c
-@@ -247,6 +247,7 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- {
- 	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
- 	struct btrfs_device *device;
-+	struct bdev_handle *bdev_handle;
- 	struct block_device *bdev;
- 	u64 devid = BTRFS_DEV_REPLACE_DEVID;
- 	int ret = 0;
-@@ -257,12 +258,13 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- 		return -EINVAL;
- 	}
- 
--	bdev = blkdev_get_by_path(device_path, BLK_OPEN_WRITE,
--				  fs_info->bdev_holder, NULL);
--	if (IS_ERR(bdev)) {
-+	bdev_handle = bdev_open_by_path(device_path, BLK_OPEN_WRITE,
-+					fs_info->bdev_holder, NULL);
-+	if (IS_ERR(bdev_handle)) {
- 		btrfs_err(fs_info, "target device %s is invalid!", device_path);
--		return PTR_ERR(bdev);
-+		return PTR_ERR(bdev_handle);
- 	}
-+	bdev = bdev_handle->bdev;
- 
- 	if (!btrfs_check_device_zone_type(fs_info, bdev)) {
- 		btrfs_err(fs_info,
-@@ -313,9 +315,9 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- 	device->commit_bytes_used = device->bytes_used;
- 	device->fs_info = fs_info;
- 	device->bdev = bdev;
-+	device->bdev_handle = bdev_handle;
- 	set_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state);
- 	set_bit(BTRFS_DEV_STATE_REPLACE_TGT, &device->dev_state);
--	device->holder = fs_info->bdev_holder;
- 	device->dev_stats_valid = 1;
- 	set_blocksize(device->bdev, BTRFS_BDEV_BLOCKSIZE);
- 	device->fs_devices = fs_devices;
-@@ -334,7 +336,7 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- 	return 0;
- 
- error:
--	blkdev_put(bdev, fs_info->bdev_holder);
-+	bdev_release(bdev_handle);
- 	return ret;
- }
- 
-diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
-index a18ee7b5a166..b4074191fcc7 100644
---- a/fs/btrfs/ioctl.c
-+++ b/fs/btrfs/ioctl.c
-@@ -2670,8 +2670,7 @@ static long btrfs_ioctl_rm_dev_v2(struct file *file, void __user *arg)
- 	struct inode *inode = file_inode(file);
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
- 	struct btrfs_ioctl_vol_args_v2 *vol_args;
--	struct block_device *bdev = NULL;
--	void *holder;
-+	struct bdev_handle *bdev_handle = NULL;
- 	int ret;
- 	bool cancel = false;
- 
-@@ -2708,7 +2707,7 @@ static long btrfs_ioctl_rm_dev_v2(struct file *file, void __user *arg)
- 		goto err_drop;
- 
- 	/* Exclusive operation is now claimed */
--	ret = btrfs_rm_device(fs_info, &args, &bdev, &holder);
-+	ret = btrfs_rm_device(fs_info, &args, &bdev_handle);
- 
- 	btrfs_exclop_finish(fs_info);
- 
-@@ -2722,8 +2721,8 @@ static long btrfs_ioctl_rm_dev_v2(struct file *file, void __user *arg)
- 	}
- err_drop:
- 	mnt_drop_write_file(file);
--	if (bdev)
--		blkdev_put(bdev, holder);
-+	if (bdev_handle)
-+		bdev_release(bdev_handle);
- out:
- 	btrfs_put_dev_args_from_path(&args);
- 	kfree(vol_args);
-@@ -2736,8 +2735,7 @@ static long btrfs_ioctl_rm_dev(struct file *file, void __user *arg)
- 	struct inode *inode = file_inode(file);
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
- 	struct btrfs_ioctl_vol_args *vol_args;
--	struct block_device *bdev = NULL;
--	void *holder;
-+	struct bdev_handle *bdev_handle = NULL;
- 	int ret;
- 	bool cancel = false;
- 
-@@ -2764,15 +2762,15 @@ static long btrfs_ioctl_rm_dev(struct file *file, void __user *arg)
- 	ret = exclop_start_or_cancel_reloc(fs_info, BTRFS_EXCLOP_DEV_REMOVE,
- 					   cancel);
- 	if (ret == 0) {
--		ret = btrfs_rm_device(fs_info, &args, &bdev, &holder);
-+		ret = btrfs_rm_device(fs_info, &args, &bdev_handle);
- 		if (!ret)
- 			btrfs_info(fs_info, "disk deleted %s", vol_args->name);
- 		btrfs_exclop_finish(fs_info);
- 	}
- 
- 	mnt_drop_write_file(file);
--	if (bdev)
--		blkdev_put(bdev, holder);
-+	if (bdev_handle)
-+		bdev_release(bdev_handle);
- out:
- 	btrfs_put_dev_args_from_path(&args);
- 	kfree(vol_args);
-diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-index fc1bd0b03d63..9c4b5b825b5c 100644
---- a/fs/btrfs/volumes.c
-+++ b/fs/btrfs/volumes.c
-@@ -512,37 +512,39 @@ static struct btrfs_fs_devices *find_fsid_with_metadata_uuid(
- 
- static int
- btrfs_get_bdev_and_sb(const char *device_path, blk_mode_t flags, void *holder,
--		      int flush, struct block_device **bdev,
-+		      int flush, struct bdev_handle **bdev_handle,
- 		      struct btrfs_super_block **disk_super)
- {
-+	struct block_device *bdev;
- 	int ret;
- 
--	*bdev = blkdev_get_by_path(device_path, flags, holder, NULL);
-+	*bdev_handle = bdev_open_by_path(device_path, flags, holder, NULL);
- 
--	if (IS_ERR(*bdev)) {
--		ret = PTR_ERR(*bdev);
-+	if (IS_ERR(*bdev_handle)) {
-+		ret = PTR_ERR(*bdev_handle);
- 		goto error;
- 	}
-+	bdev = (*bdev_handle)->bdev;
- 
- 	if (flush)
--		sync_blockdev(*bdev);
--	ret = set_blocksize(*bdev, BTRFS_BDEV_BLOCKSIZE);
-+		sync_blockdev(bdev);
-+	ret = set_blocksize(bdev, BTRFS_BDEV_BLOCKSIZE);
- 	if (ret) {
--		blkdev_put(*bdev, holder);
-+		bdev_release(*bdev_handle);
- 		goto error;
- 	}
--	invalidate_bdev(*bdev);
--	*disk_super = btrfs_read_dev_super(*bdev);
-+	invalidate_bdev(bdev);
-+	*disk_super = btrfs_read_dev_super(bdev);
- 	if (IS_ERR(*disk_super)) {
- 		ret = PTR_ERR(*disk_super);
--		blkdev_put(*bdev, holder);
-+		bdev_release(*bdev_handle);
- 		goto error;
- 	}
- 
- 	return 0;
- 
- error:
--	*bdev = NULL;
-+	*bdev_handle = NULL;
- 	return ret;
- }
- 
-@@ -614,7 +616,7 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
- 			struct btrfs_device *device, blk_mode_t flags,
- 			void *holder)
- {
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	struct btrfs_super_block *disk_super;
- 	u64 devid;
- 	int ret;
-@@ -625,7 +627,7 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
- 		return -EINVAL;
- 
- 	ret = btrfs_get_bdev_and_sb(device->name->str, flags, holder, 1,
--				    &bdev, &disk_super);
-+				    &bdev_handle, &disk_super);
- 	if (ret)
- 		return ret;
- 
-@@ -649,21 +651,21 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
- 		clear_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state);
- 		fs_devices->seeding = true;
- 	} else {
--		if (bdev_read_only(bdev))
-+		if (bdev_read_only(bdev_handle->bdev))
- 			clear_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state);
- 		else
- 			set_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state);
- 	}
- 
--	if (!bdev_nonrot(bdev))
-+	if (!bdev_nonrot(bdev_handle->bdev))
- 		fs_devices->rotating = true;
- 
--	if (bdev_max_discard_sectors(bdev))
-+	if (bdev_max_discard_sectors(bdev_handle->bdev))
- 		fs_devices->discardable = true;
- 
--	device->bdev = bdev;
-+	device->bdev_handle = bdev_handle;
-+	device->bdev = bdev_handle->bdev;
- 	clear_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state);
--	device->holder = holder;
- 
- 	fs_devices->open_devices++;
- 	if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state) &&
-@@ -677,7 +679,7 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
- 
- error_free_page:
- 	btrfs_release_disk_super(disk_super);
--	blkdev_put(bdev, holder);
-+	bdev_release(bdev_handle);
- 
- 	return -EINVAL;
- }
-@@ -1067,9 +1069,10 @@ static void __btrfs_free_extra_devids(struct btrfs_fs_devices *fs_devices,
- 		if (device->devid == BTRFS_DEV_REPLACE_DEVID)
- 			continue;
- 
--		if (device->bdev) {
--			blkdev_put(device->bdev, device->holder);
-+		if (device->bdev_handle) {
-+			bdev_release(device->bdev_handle);
- 			device->bdev = NULL;
-+			device->bdev_handle = NULL;
- 			fs_devices->open_devices--;
- 		}
- 		if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state)) {
-@@ -1114,7 +1117,7 @@ static void btrfs_close_bdev(struct btrfs_device *device)
- 		invalidate_bdev(device->bdev);
- 	}
- 
--	blkdev_put(device->bdev, device->holder);
-+	bdev_release(device->bdev_handle);
- }
- 
- static void btrfs_close_one_device(struct btrfs_device *device)
-@@ -1359,7 +1362,7 @@ struct btrfs_device *btrfs_scan_one_device(const char *path)
- 	struct btrfs_super_block *disk_super;
- 	bool new_device_added = false;
- 	struct btrfs_device *device = NULL;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	u64 bytenr, bytenr_orig;
- 	int ret;
- 
-@@ -1382,18 +1385,19 @@ struct btrfs_device *btrfs_scan_one_device(const char *path)
- 	 * values temporarily, as the device paths of the fsid are the only
- 	 * required information for assembling the volume.
+diff --git a/fs/reiserfs/journal.c b/fs/reiserfs/journal.c
+index 015bfe4e4524..171c912af50f 100644
+--- a/fs/reiserfs/journal.c
++++ b/fs/reiserfs/journal.c
+@@ -90,8 +90,7 @@ static int flush_commit_list(struct super_block *s,
+ static int can_dirty(struct reiserfs_journal_cnode *cn);
+ static int journal_join(struct reiserfs_transaction_handle *th,
+ 			struct super_block *sb);
+-static void release_journal_dev(struct super_block *super,
+-			       struct reiserfs_journal *journal);
++static void release_journal_dev(struct reiserfs_journal *journal);
+ static void dirty_one_transaction(struct super_block *s,
+ 				 struct reiserfs_journal_list *jl);
+ static void flush_async_commits(struct work_struct *work);
+@@ -1893,7 +1892,7 @@ static void free_journal_ram(struct super_block *sb)
+ 	 * j_header_bh is on the journal dev, make sure
+ 	 * not to release the journal dev until we brelse j_header_bh
  	 */
--	bdev = blkdev_get_by_path(path, BLK_OPEN_READ, NULL, NULL);
--	if (IS_ERR(bdev))
--		return ERR_CAST(bdev);
-+	bdev_handle = bdev_open_by_path(path, BLK_OPEN_READ, NULL, NULL);
-+	if (IS_ERR(bdev_handle))
-+		return ERR_CAST(bdev_handle);
- 
- 	bytenr_orig = btrfs_sb_offset(0);
--	ret = btrfs_sb_log_location_bdev(bdev, 0, READ, &bytenr);
-+	ret = btrfs_sb_log_location_bdev(bdev_handle->bdev, 0, READ, &bytenr);
- 	if (ret) {
- 		device = ERR_PTR(ret);
- 		goto error_bdev_put;
- 	}
- 
--	disk_super = btrfs_read_disk_super(bdev, bytenr, bytenr_orig);
-+	disk_super = btrfs_read_disk_super(bdev_handle->bdev, bytenr,
-+					   bytenr_orig);
- 	if (IS_ERR(disk_super)) {
- 		device = ERR_CAST(disk_super);
- 		goto error_bdev_put;
-@@ -1406,7 +1410,7 @@ struct btrfs_device *btrfs_scan_one_device(const char *path)
- 	btrfs_release_disk_super(disk_super);
- 
- error_bdev_put:
--	blkdev_put(bdev, NULL);
-+	bdev_release(bdev_handle);
- 
- 	return device;
- }
-@@ -2091,7 +2095,7 @@ void btrfs_scratch_superblocks(struct btrfs_fs_info *fs_info,
- 
- int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 		    struct btrfs_dev_lookup_args *args,
--		    struct block_device **bdev, void **holder)
-+		    struct bdev_handle **bdev_handle)
- {
- 	struct btrfs_trans_handle *trans;
- 	struct btrfs_device *device;
-@@ -2200,7 +2204,7 @@ int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 
- 	btrfs_assign_next_active_device(device, NULL);
- 
--	if (device->bdev) {
-+	if (device->bdev_handle) {
- 		cur_devices->open_devices--;
- 		/* remove sysfs entry */
- 		btrfs_sysfs_remove_device(device);
-@@ -2216,9 +2220,9 @@ int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 	 * free the device.
- 	 *
- 	 * We cannot call btrfs_close_bdev() here because we're holding the sb
--	 * write lock, and blkdev_put() will pull in the ->open_mutex on the
--	 * block device and it's dependencies.  Instead just flush the device
--	 * and let the caller do the final blkdev_put.
-+	 * write lock, and bdev_release() will pull in the ->open_mutex on
-+	 * the block device and it's dependencies.  Instead just flush the
-+	 * device and let the caller do the final bdev_release.
- 	 */
- 	if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state)) {
- 		btrfs_scratch_superblocks(fs_info, device->bdev,
-@@ -2229,8 +2233,7 @@ int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 		}
- 	}
- 
--	*bdev = device->bdev;
--	*holder = device->holder;
-+	*bdev_handle = device->bdev_handle;
- 	synchronize_rcu();
- 	btrfs_free_device(device);
- 
-@@ -2368,7 +2371,7 @@ int btrfs_get_dev_args_from_path(struct btrfs_fs_info *fs_info,
- 				 const char *path)
- {
- 	struct btrfs_super_block *disk_super;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	int ret;
- 
- 	if (!path || !path[0])
-@@ -2386,7 +2389,7 @@ int btrfs_get_dev_args_from_path(struct btrfs_fs_info *fs_info,
- 	}
- 
- 	ret = btrfs_get_bdev_and_sb(path, BLK_OPEN_READ, NULL, 0,
--				    &bdev, &disk_super);
-+				    &bdev_handle, &disk_super);
- 	if (ret) {
- 		btrfs_put_dev_args_from_path(args);
- 		return ret;
-@@ -2399,7 +2402,7 @@ int btrfs_get_dev_args_from_path(struct btrfs_fs_info *fs_info,
- 	else
- 		memcpy(args->fsid, disk_super->fsid, BTRFS_FSID_SIZE);
- 	btrfs_release_disk_super(disk_super);
--	blkdev_put(bdev, NULL);
-+	bdev_release(bdev_handle);
- 	return 0;
+-	release_journal_dev(sb, journal);
++	release_journal_dev(journal);
+ 	vfree(journal);
  }
  
-@@ -2620,7 +2623,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 	struct btrfs_root *root = fs_info->dev_root;
- 	struct btrfs_trans_handle *trans;
- 	struct btrfs_device *device;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	struct super_block *sb = fs_info->sb;
- 	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
- 	struct btrfs_fs_devices *seed_devices = NULL;
-@@ -2633,12 +2636,12 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 	if (sb_rdonly(sb) && !fs_devices->seeding)
- 		return -EROFS;
+@@ -2387,7 +2386,7 @@ static int journal_read(struct super_block *sb)
  
--	bdev = blkdev_get_by_path(device_path, BLK_OPEN_WRITE,
--				  fs_info->bdev_holder, NULL);
--	if (IS_ERR(bdev))
--		return PTR_ERR(bdev);
-+	bdev_handle = bdev_open_by_path(device_path, BLK_OPEN_WRITE,
-+					fs_info->bdev_holder, NULL);
-+	if (IS_ERR(bdev_handle))
-+		return PTR_ERR(bdev_handle);
+ 	cur_dblock = SB_ONDISK_JOURNAL_1st_BLOCK(sb);
+ 	reiserfs_info(sb, "checking transaction log (%pg)\n",
+-		      journal->j_dev_bd);
++		      journal->j_bdev_handle->bdev);
+ 	start = ktime_get_seconds();
  
--	if (!btrfs_check_device_zone_type(fs_info, bdev)) {
-+	if (!btrfs_check_device_zone_type(fs_info, bdev_handle->bdev)) {
- 		ret = -EINVAL;
- 		goto error;
- 	}
-@@ -2650,11 +2653,11 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 		locked = true;
- 	}
- 
--	sync_blockdev(bdev);
-+	sync_blockdev(bdev_handle->bdev);
- 
- 	rcu_read_lock();
- 	list_for_each_entry_rcu(device, &fs_devices->devices, dev_list) {
--		if (device->bdev == bdev) {
-+		if (device->bdev == bdev_handle->bdev) {
- 			ret = -EEXIST;
- 			rcu_read_unlock();
- 			goto error;
-@@ -2670,7 +2673,8 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 	}
- 
- 	device->fs_info = fs_info;
--	device->bdev = bdev;
-+	device->bdev_handle = bdev_handle;
-+	device->bdev = bdev_handle->bdev;
- 	ret = lookup_bdev(device_path, &device->devt);
- 	if (ret)
- 		goto error_free_device;
-@@ -2691,12 +2695,11 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 	device->io_align = fs_info->sectorsize;
- 	device->sector_size = fs_info->sectorsize;
- 	device->total_bytes =
--		round_down(bdev_nr_bytes(bdev), fs_info->sectorsize);
-+		round_down(bdev_nr_bytes(device->bdev), fs_info->sectorsize);
- 	device->disk_total_bytes = device->total_bytes;
- 	device->commit_total_bytes = device->total_bytes;
- 	set_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state);
- 	clear_bit(BTRFS_DEV_STATE_REPLACE_TGT, &device->dev_state);
--	device->holder = fs_info->bdev_holder;
- 	device->dev_stats_valid = 1;
- 	set_blocksize(device->bdev, BTRFS_BDEV_BLOCKSIZE);
- 
-@@ -2732,7 +2735,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 
- 	atomic64_add(device->total_bytes, &fs_info->free_chunk_space);
- 
--	if (!bdev_nonrot(bdev))
-+	if (!bdev_nonrot(device->bdev))
- 		fs_devices->rotating = true;
- 
- 	orig_super_total_bytes = btrfs_super_total_bytes(fs_info->super_copy);
-@@ -2854,7 +2857,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- error_free_device:
- 	btrfs_free_device(device);
- error:
--	blkdev_put(bdev, fs_info->bdev_holder);
-+	bdev_release(bdev_handle);
- 	if (locked) {
- 		mutex_unlock(&uuid_mutex);
- 		up_write(&sb->s_umount);
-diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
-index f472d646715e..d92ebeaf1200 100644
---- a/fs/btrfs/volumes.h
-+++ b/fs/btrfs/volumes.h
-@@ -90,13 +90,11 @@ struct btrfs_device {
- 
- 	u64 generation;
- 
-+	struct bdev_handle *bdev_handle;
- 	struct block_device *bdev;
- 
- 	struct btrfs_zoned_device_info *zone_info;
- 
--	/* block device holder for blkdev_get/put */
--	void *holder;
--
  	/*
- 	 * Device's major-minor number. Must be set even if the device is not
- 	 * opened (bdev == NULL), unless the device is missing.
-@@ -631,7 +629,7 @@ struct btrfs_device *btrfs_alloc_device(struct btrfs_fs_info *fs_info,
- void btrfs_put_dev_args_from_path(struct btrfs_dev_lookup_args *args);
- int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 		    struct btrfs_dev_lookup_args *args,
--		    struct block_device **bdev, void **holder);
-+		    struct bdev_handle **bdev_handle);
- void __exit btrfs_cleanup_fs_uuids(void);
- int btrfs_num_copies(struct btrfs_fs_info *fs_info, u64 logical, u64 len);
- int btrfs_grow_device(struct btrfs_trans_handle *trans,
+@@ -2448,7 +2447,7 @@ static int journal_read(struct super_block *sb)
+ 		 * device and journal device to be the same
+ 		 */
+ 		d_bh =
+-		    reiserfs_breada(journal->j_dev_bd, cur_dblock,
++		    reiserfs_breada(journal->j_bdev_handle->bdev, cur_dblock,
+ 				    sb->s_blocksize,
+ 				    SB_ONDISK_JOURNAL_1st_BLOCK(sb) +
+ 				    SB_ONDISK_JOURNAL_SIZE(sb));
+@@ -2587,17 +2586,11 @@ static void journal_list_init(struct super_block *sb)
+ 	SB_JOURNAL(sb)->j_current_jl = alloc_journal_list(sb);
+ }
+ 
+-static void release_journal_dev(struct super_block *super,
+-			       struct reiserfs_journal *journal)
++static void release_journal_dev(struct reiserfs_journal *journal)
+ {
+-	if (journal->j_dev_bd != NULL) {
+-		void *holder = NULL;
+-
+-		if (journal->j_dev_bd->bd_dev != super->s_dev)
+-			holder = journal;
+-
+-		blkdev_put(journal->j_dev_bd, holder);
+-		journal->j_dev_bd = NULL;
++	if (journal->j_bdev_handle) {
++		bdev_release(journal->j_bdev_handle);
++		journal->j_bdev_handle = NULL;
+ 	}
+ }
+ 
+@@ -2612,7 +2605,7 @@ static int journal_init_dev(struct super_block *super,
+ 
+ 	result = 0;
+ 
+-	journal->j_dev_bd = NULL;
++	journal->j_bdev_handle = NULL;
+ 	jdev = SB_ONDISK_JOURNAL_DEVICE(super) ?
+ 	    new_decode_dev(SB_ONDISK_JOURNAL_DEVICE(super)) : super->s_dev;
+ 
+@@ -2623,36 +2616,37 @@ static int journal_init_dev(struct super_block *super,
+ 	if ((!jdev_name || !jdev_name[0])) {
+ 		if (jdev == super->s_dev)
+ 			holder = NULL;
+-		journal->j_dev_bd = blkdev_get_by_dev(jdev, blkdev_mode, holder,
+-						      NULL);
+-		if (IS_ERR(journal->j_dev_bd)) {
+-			result = PTR_ERR(journal->j_dev_bd);
+-			journal->j_dev_bd = NULL;
++		journal->j_bdev_handle = bdev_open_by_dev(jdev, blkdev_mode,
++							  holder, NULL);
++		if (IS_ERR(journal->j_bdev_handle)) {
++			result = PTR_ERR(journal->j_bdev_handle);
++			journal->j_bdev_handle = NULL;
+ 			reiserfs_warning(super, "sh-458",
+ 					 "cannot init journal device unknown-block(%u,%u): %i",
+ 					 MAJOR(jdev), MINOR(jdev), result);
+ 			return result;
+ 		} else if (jdev != super->s_dev)
+-			set_blocksize(journal->j_dev_bd, super->s_blocksize);
++			set_blocksize(journal->j_bdev_handle->bdev,
++				      super->s_blocksize);
+ 
+ 		return 0;
+ 	}
+ 
+-	journal->j_dev_bd = blkdev_get_by_path(jdev_name, blkdev_mode, holder,
+-					       NULL);
+-	if (IS_ERR(journal->j_dev_bd)) {
+-		result = PTR_ERR(journal->j_dev_bd);
+-		journal->j_dev_bd = NULL;
++	journal->j_bdev_handle = bdev_open_by_path(jdev_name, blkdev_mode,
++						   holder, NULL);
++	if (IS_ERR(journal->j_bdev_handle)) {
++		result = PTR_ERR(journal->j_bdev_handle);
++		journal->j_bdev_handle = NULL;
+ 		reiserfs_warning(super, "sh-457",
+ 				 "journal_init_dev: Cannot open '%s': %i",
+ 				 jdev_name, result);
+ 		return result;
+ 	}
+ 
+-	set_blocksize(journal->j_dev_bd, super->s_blocksize);
++	set_blocksize(journal->j_bdev_handle->bdev, super->s_blocksize);
+ 	reiserfs_info(super,
+ 		      "journal_init_dev: journal device: %pg\n",
+-		      journal->j_dev_bd);
++		      journal->j_bdev_handle->bdev);
+ 	return 0;
+ }
+ 
+@@ -2810,7 +2804,7 @@ int journal_init(struct super_block *sb, const char *j_dev_name,
+ 				 "journal header magic %x (device %pg) does "
+ 				 "not match to magic found in super block %x",
+ 				 jh->jh_journal.jp_journal_magic,
+-				 journal->j_dev_bd,
++				 journal->j_bdev_handle->bdev,
+ 				 sb_jp_journal_magic(rs));
+ 		brelse(bhjh);
+ 		goto free_and_return;
+@@ -2834,7 +2828,7 @@ int journal_init(struct super_block *sb, const char *j_dev_name,
+ 	reiserfs_info(sb, "journal params: device %pg, size %u, "
+ 		      "journal first block %u, max trans len %u, max batch %u, "
+ 		      "max commit age %u, max trans age %u\n",
+-		      journal->j_dev_bd,
++		      journal->j_bdev_handle->bdev,
+ 		      SB_ONDISK_JOURNAL_SIZE(sb),
+ 		      SB_ONDISK_JOURNAL_1st_BLOCK(sb),
+ 		      journal->j_trans_max,
+diff --git a/fs/reiserfs/procfs.c b/fs/reiserfs/procfs.c
+index 3dba8acf4e83..83cb9402e0f9 100644
+--- a/fs/reiserfs/procfs.c
++++ b/fs/reiserfs/procfs.c
+@@ -354,7 +354,7 @@ static int show_journal(struct seq_file *m, void *unused)
+ 		   "prepare: \t%12lu\n"
+ 		   "prepare_retry: \t%12lu\n",
+ 		   DJP(jp_journal_1st_block),
+-		   SB_JOURNAL(sb)->j_dev_bd,
++		   SB_JOURNAL(sb)->j_bdev_handle->bdev,
+ 		   DJP(jp_journal_dev),
+ 		   DJP(jp_journal_size),
+ 		   DJP(jp_journal_trans_max),
+diff --git a/fs/reiserfs/reiserfs.h b/fs/reiserfs/reiserfs.h
+index 55e85256aae8..8e426392b5c2 100644
+--- a/fs/reiserfs/reiserfs.h
++++ b/fs/reiserfs/reiserfs.h
+@@ -299,7 +299,7 @@ struct reiserfs_journal {
+ 	/* oldest journal block.  start here for traverse */
+ 	struct reiserfs_journal_cnode *j_first;
+ 
+-	struct block_device *j_dev_bd;
++	struct bdev_handle *j_bdev_handle;
+ 
+ 	/* first block on s_dev of reserved area journal */
+ 	int j_1st_reserved_block;
+@@ -2809,9 +2809,12 @@ struct reiserfs_journal_header {
+ #define journal_hash(t,sb,block) ((t)[_jhashfn((sb),(block)) & JBH_HASH_MASK])
+ 
+ /* We need these to make journal.c code more readable */
+-#define journal_find_get_block(s, block) __find_get_block(SB_JOURNAL(s)->j_dev_bd, block, s->s_blocksize)
+-#define journal_getblk(s, block) __getblk(SB_JOURNAL(s)->j_dev_bd, block, s->s_blocksize)
+-#define journal_bread(s, block) __bread(SB_JOURNAL(s)->j_dev_bd, block, s->s_blocksize)
++#define journal_find_get_block(s, block) __find_get_block(\
++		SB_JOURNAL(s)->j_bdev_handle->bdev, block, s->s_blocksize)
++#define journal_getblk(s, block) __getblk(SB_JOURNAL(s)->j_bdev_handle->bdev,\
++		block, s->s_blocksize)
++#define journal_bread(s, block) __bread(SB_JOURNAL(s)->j_bdev_handle->bdev,\
++		block, s->s_blocksize)
+ 
+ enum reiserfs_bh_state_bits {
+ 	BH_JDirty = BH_PrivateStart,	/* buffer is in current transaction */
 -- 
 2.35.3
 
