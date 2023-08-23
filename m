@@ -2,163 +2,193 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6459EE4993
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 08:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49ADEEE49A0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 09:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234912AbjHWIv3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 04:51:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54542 "EHLO
+        id S235054AbjHWJPH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 05:15:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235151AbjHWIsV (ORCPT
+        with ESMTP id S235067AbjHWJMS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 04:48:21 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2071C1FCA
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 01:36:35 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230823083633epoutp049503f50f0bdab4298bacfbbc99ea0d5e~99kDzSgrZ2557225572epoutp04C
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 08:36:33 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230823083633epoutp049503f50f0bdab4298bacfbbc99ea0d5e~99kDzSgrZ2557225572epoutp04C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1692779793;
-        bh=a8tqca0kcrzm8r/KJktDPGP+qh4VKMacXwGLktdVDYw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=BaLoa8YBtH47R6/yS9nh5iIaiFk2erJxNKbRe5ge4F2un1n56Dj1cHw6wfNeOlBtK
-         veeQg1JlUzpYIGb6SEkT7rV+OmX83V5VaH7grEq0eyMUjAiKhni2ToE6lwqbzWIJHu
-         n4EPAr92lu+CSVD2yrj1OOZv8zZq0FsJcxg469LI=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20230823083633epcas5p1eae6e11b6ba401f5be945affa66efdbc~99kDZoBUr0862308623epcas5p1J;
-        Wed, 23 Aug 2023 08:36:33 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.181]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4RW01W3NnTz4x9Q7; Wed, 23 Aug
-        2023 08:36:31 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        5A.1E.57354.F05C5E46; Wed, 23 Aug 2023 17:36:31 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20230823081251epcas5p16545cf117a351f29bb71db2340e17621~99PXR0OnP2485724857epcas5p1V;
-        Wed, 23 Aug 2023 08:12:51 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230823081251epsmtrp2995d804ad39c64196c4794dd4df591ec~99PXMfk-i0375403754epsmtrp2w;
-        Wed, 23 Aug 2023 08:12:51 +0000 (GMT)
-X-AuditID: b6c32a44-007ff7000001e00a-a1-64e5c50f977b
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        5A.5D.64355.38FB5E46; Wed, 23 Aug 2023 17:12:51 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230823081250epsmtip1f661078e2f458457afa9927c7eb64a9b~99PV9TyIU2121921219epsmtip1o;
-        Wed, 23 Aug 2023 08:12:50 +0000 (GMT)
-Date:   Wed, 23 Aug 2023 13:39:32 +0530
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH v11 02/16] block: Only use write locking if necessary
-Message-ID: <20230823080932.u2ctysyzchl23kog@green245>
+        Wed, 23 Aug 2023 05:12:18 -0400
+Received: from out-4.mta0.migadu.com (out-4.mta0.migadu.com [IPv6:2001:41d0:1004:224b::4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 422E5E76
+        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 02:05:11 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1692781510;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4V1NQ/tvkDki8EkwpGvc5cOfgVDcSNnY4o1m1wtB3Jo=;
+        b=pF/YjBxIK2zdCei5TdkO89nebVsYQpYhmyrzkoSboNA3yHA4UQzo/TzgqbrQi7Qqmiu0NC
+        5atY1nYzNz4p8FnY0Yat/Qo92v2/mDCUQ8A9NS8qliQXX695MH+Uv8xMBUBJX3K0UrDPcx
+        67Y+9XHWay7Pl4ignIM1aEqd9v1tUEs=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, ming.lei@redhat.com, bvanassche@acm.org,
+        hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com
+Subject: [PATCH v2 3/6] blk-mq-tag: remove bt_for_each()
+Date:   Wed, 23 Aug 2023 17:04:38 +0800
+Message-ID: <20230823090441.3986631-4-chengming.zhou@linux.dev>
+In-Reply-To: <20230823090441.3986631-1-chengming.zhou@linux.dev>
+References: <20230823090441.3986631-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20230822191822.337080-3-bvanassche@acm.org>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrCJsWRmVeSWpSXmKPExsWy7bCmhi7/0acpBlOmSlqsvtvPZjHtw09m
-        iwf77S1Wrj7KZLH3lrZF9/UdbBbLj/9jsjg0uZnJgcPj8hVvj8tnSz02repk89h9s4HN4+PT
-        Wywe7/ddZfP4vEkugD0q2yYjNTEltUghNS85PyUzL91WyTs43jne1MzAUNfQ0sJcSSEvMTfV
-        VsnFJ0DXLTMH6CIlhbLEnFKgUEBicbGSvp1NUX5pSapCRn5xia1SakFKToFJgV5xYm5xaV66
-        Xl5qiZWhgYGRKVBhQnbGtJdvWQom8FTsOPWNvYFxJ1cXIyeHhICJxIQJf5i7GLk4hAR2M0oc
-        aO1ggXA+MUr8nj+PHaQKzLlxIQ+mY/LBT1BFOxkl3pzfygjhPGOUuL3jLCNIFYuAqkTXlU7W
-        LkYODjYBbYnT/zlAwiICGhLfHiwHa2YW+MEosXDDPxaQGmEBT4nFsyVATF4BM4m7fTog5bwC
-        ghInZz5hAbE5BSwlvm6cAzZdVEBGYsbSr2BXSwh0ckgsajjJCHGci8TS7j42CFtY4tXxLewQ
-        tpTE53d7oeLlEiunrGCDaG5hlJh1fRZUs71E66l+ZpAjmAUyJHa8gqqXlZh6ah0TiM0swCfR
-        +/sJE0ScV2LHPBhbWWLN+gVQ9ZIS1743QtkeEpfWgYIBGrxHdvxjncAoPwvJc7MQ1s0CW2El
-        0fmhiRUiLC2x/B8HhKkpsX6X/gJG1lWMkqkFxbnpqcmmBYZ5qeXw6E7Oz93ECE6uWi47GG/M
-        /6d3iJGJg/EQowQHs5IIr/T3hylCvCmJlVWpRfnxRaU5qcWHGE2BMTWRWUo0OR+Y3vNK4g1N
-        LA1MzMzMTCyNzQyVxHlft85NERJITyxJzU5NLUgtgulj4uCUamC62O0Z9fELz87jfStKFl8S
-        t3r/w2S7RK+2QbBTSbRek7Gajtjs3t8hJw/Pz54rEHD4/tIHT83DDH7G27ltyji10YTL33Fz
-        s47x3hmTNe/66Ms2bLjRt62FxdTq5cazvMWVBt0fd724L7zDfbHM9hs+aepXVhm7r2mZ9uiH
-        FLt+r+P3hzbGr8UUzzCeTuaYWftaMTNOb09BsEvzotNZz1yP7J45a79Az+NoiSuPKqulO3Nj
-        m45eT3i9jPuZafHPey2H4+Rtth6ozHg5qfZPpt2PGFN/T9fZLyrWP1nMof8qYtHWOwvydxyf
-        sfVK/4lUad2VqUd2Ll+elD+BR+FrwrE1zSuav5z95O6/weJ0ofw5JZbijERDLeai4kQADhk9
-        aTcEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrILMWRmVeSWpSXmKPExsWy7bCSnG7z/qcpBrs3SFusvtvPZjHtw09m
-        iwf77S1Wrj7KZLH3lrZF9/UdbBbLj/9jsjg0uZnJgcPj8hVvj8tnSz02repk89h9s4HN4+PT
-        Wywe7/ddZfP4vEkugD2KyyYlNSezLLVI3y6BK6P5xhu2gkOcFQ/2n2dpYGzl6GLk5JAQMJGY
-        fPATSxcjF4eQwHZGiZe7TzBCJCQllv09wgxhC0us/PecHcQWEnjCKPHniAaIzSKgKtF1pZO1
-        i5GDg01AW+L0f7CZIgIaEt8eLAebySzwi1Fizt95jCA1wgKeEotnS4CYvAJmEnf7dCAmpkv0
-        vHnFBGLzCghKnJz5hAXEZgYqmbf5ITNIObOAtMTyf2DTOQUsJb5unAN2pKiAjMSMpV+ZJzAK
-        zkLSPQtJ9yyE7gWMzKsYRVMLinPTc5MLDPWKE3OLS/PS9ZLzczcxgmNBK2gH47L1f/UOMTJx
-        MB5ilOBgVhLhlf7+MEWINyWxsiq1KD++qDQntfgQozQHi5I4r3JOZwrQ+YklqdmpqQWpRTBZ
-        Jg5OqQYm/pi3e38s51n4P/Mv06vfTxwCnk1lerv0e+zlnfVOF+afuOyrzBCy5H7wfMXA/V++
-        zt5sd2/vvCXfn5+UYLVt9XhtfCflH4tnNU9ElPFhhbpvFuEZmW2XZJd9tnp9sPTSCst1s2r/
-        NLH9yStV97Q2VS53y+Zdsjjh8dVov2t7Fdhun7g57Vnnc9k0j3cHt141nj5LRO7Oyylnpjsc
-        ffVw8rq0FJeIjIlFWTN313cuk+neMSffLTHN29FMP/eEnLZf8HUxAYU1J3x1uSZrsGuXsxdI
-        f3ns5ObpIFW67/3lOUzdabY+PfOq0642562czSXnXcH4MORc2e3fkjargpkVHy7Xv33neOjJ
-        6lVTVY+uVmIpzkg01GIuKk4EACAM8ev0AgAA
-X-CMS-MailID: 20230823081251epcas5p16545cf117a351f29bb71db2340e17621
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_8085d_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230823081251epcas5p16545cf117a351f29bb71db2340e17621
-References: <20230822191822.337080-1-bvanassche@acm.org>
-        <20230822191822.337080-3-bvanassche@acm.org>
-        <CGME20230823081251epcas5p16545cf117a351f29bb71db2340e17621@epcas5p1.samsung.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_8085d_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-On 23/08/22 12:16PM, Bart Van Assche wrote:
->Make blk_req_needs_zone_write_lock() return false if
->q->limits.use_zone_write_lock is false.
->
->Cc: Damien Le Moal <dlemoal@kernel.org>
->Cc: Christoph Hellwig <hch@lst.de>
->Cc: Ming Lei <ming.lei@redhat.com>
->Signed-off-by: Bart Van Assche <bvanassche@acm.org>
->---
-> block/blk-zoned.c | 9 +++++++--
-> 1 file changed, 7 insertions(+), 2 deletions(-)
->
->diff --git a/block/blk-zoned.c b/block/blk-zoned.c
->index 112620985bff..d8a80cce832f 100644
->--- a/block/blk-zoned.c
->+++ b/block/blk-zoned.c
->@@ -53,11 +53,16 @@ const char *blk_zone_cond_str(enum blk_zone_cond zone_cond)
-> EXPORT_SYMBOL_GPL(blk_zone_cond_str);
->
-> /*
->- * Return true if a request is a write requests that needs zone write locking.
->+ * Return true if a request is a write request that needs zone write locking.
->  */
-> bool blk_req_needs_zone_write_lock(struct request *rq)
-> {
->-	if (!rq->q->disk->seq_zones_wlock)
->+	struct request_queue *q = rq->q;
->+
->+	if (!q->limits.use_zone_write_lock)
->+		return false;
->+
->+	if (!q->disk->seq_zones_wlock)
-> 		return false;
->
-> 	return blk_rq_is_seq_zoned_write(rq);
+Change the only user of bt_for_each() to use the introduced function
+__blk_mq_tagset_busy_iter() to specify queue filter when iterating.
 
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+Since blk_mq_queue_tag_busy_iter() is only used to iterate over started
+requests, __blk_mq_tagset_busy_iter() already have BT_TAG_ITER_STARTED
+filter to iterate over started requests only, there should be no
+problem.
 
-------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_8085d_
-Content-Type: text/plain; charset="utf-8"
+Only one potential disadvantage I can see is that we lost the
+blk_mq_hw_queue_mapped() filter, which maybe not happen for now.
+Unmapped hctx was used to dynamically map or unmap when CPU hotplug,
+but we don't do this anymore, we always map all possible CPUs now.
+So it seems unmapped hctx may only happen if something wrong with
+driver's tagset map settings.
 
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-mq-tag.c | 99 +---------------------------------------------
+ 1 file changed, 1 insertion(+), 98 deletions(-)
 
-------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_8085d_--
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 75b33ae6acef..c497d634cfdb 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -241,14 +241,6 @@ void blk_mq_put_tags(struct blk_mq_tags *tags, int *tag_array, int nr_tags)
+ 					tag_array, nr_tags);
+ }
+ 
+-struct bt_iter_data {
+-	struct blk_mq_hw_ctx *hctx;
+-	struct request_queue *q;
+-	busy_tag_iter_fn *fn;
+-	void *data;
+-	bool reserved;
+-};
+-
+ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
+ 		unsigned int bitnr)
+ {
+@@ -263,67 +255,6 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
+ 	return rq;
+ }
+ 
+-static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+-{
+-	struct bt_iter_data *iter_data = data;
+-	struct blk_mq_hw_ctx *hctx = iter_data->hctx;
+-	struct request_queue *q = iter_data->q;
+-	struct blk_mq_tag_set *set = q->tag_set;
+-	struct blk_mq_tags *tags;
+-	struct request *rq;
+-	bool ret = true;
+-
+-	if (blk_mq_is_shared_tags(set->flags))
+-		tags = set->shared_tags;
+-	else
+-		tags = hctx->tags;
+-
+-	if (!iter_data->reserved)
+-		bitnr += tags->nr_reserved_tags;
+-	/*
+-	 * We can hit rq == NULL here, because the tagging functions
+-	 * test and set the bit before assigning ->rqs[].
+-	 */
+-	rq = blk_mq_find_and_get_req(tags, bitnr);
+-	if (!rq)
+-		return true;
+-
+-	if (rq->q == q && (!hctx || rq->mq_hctx == hctx))
+-		ret = iter_data->fn(rq, iter_data->data);
+-	blk_mq_put_rq_ref(rq);
+-	return ret;
+-}
+-
+-/**
+- * bt_for_each - iterate over the requests associated with a hardware queue
+- * @hctx:	Hardware queue to examine.
+- * @q:		Request queue to examine.
+- * @bt:		sbitmap to examine. This is either the breserved_tags member
+- *		or the bitmap_tags member of struct blk_mq_tags.
+- * @fn:		Pointer to the function that will be called for each request
+- *		associated with @hctx that has been assigned a driver tag.
+- *		@fn will be called as follows: @fn(@hctx, rq, @data, @reserved)
+- *		where rq is a pointer to a request. Return true to continue
+- *		iterating tags, false to stop.
+- * @data:	Will be passed as third argument to @fn.
+- * @reserved:	Indicates whether @bt is the breserved_tags member or the
+- *		bitmap_tags member of struct blk_mq_tags.
+- */
+-static void bt_for_each(struct blk_mq_hw_ctx *hctx, struct request_queue *q,
+-			struct sbitmap_queue *bt, busy_tag_iter_fn *fn,
+-			void *data, bool reserved)
+-{
+-	struct bt_iter_data iter_data = {
+-		.hctx = hctx,
+-		.fn = fn,
+-		.data = data,
+-		.reserved = reserved,
+-		.q = q,
+-	};
+-
+-	sbitmap_for_each_set(&bt->sb, bt_iter, &iter_data);
+-}
+-
+ struct bt_tags_iter_data {
+ 	struct blk_mq_tags *tags;
+ 	busy_tag_iter_fn *fn;
+@@ -519,35 +450,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
+ 	if (!percpu_ref_tryget(&q->q_usage_counter))
+ 		return;
+ 
+-	if (blk_mq_is_shared_tags(q->tag_set->flags)) {
+-		struct blk_mq_tags *tags = q->tag_set->shared_tags;
+-		struct sbitmap_queue *bresv = &tags->breserved_tags;
+-		struct sbitmap_queue *btags = &tags->bitmap_tags;
+-
+-		if (tags->nr_reserved_tags)
+-			bt_for_each(NULL, q, bresv, fn, priv, true);
+-		bt_for_each(NULL, q, btags, fn, priv, false);
+-	} else {
+-		struct blk_mq_hw_ctx *hctx;
+-		unsigned long i;
+-
+-		queue_for_each_hw_ctx(q, hctx, i) {
+-			struct blk_mq_tags *tags = hctx->tags;
+-			struct sbitmap_queue *bresv = &tags->breserved_tags;
+-			struct sbitmap_queue *btags = &tags->bitmap_tags;
+-
+-			/*
+-			 * If no software queues are currently mapped to this
+-			 * hardware queue, there's nothing to check
+-			 */
+-			if (!blk_mq_hw_queue_mapped(hctx))
+-				continue;
+-
+-			if (tags->nr_reserved_tags)
+-				bt_for_each(hctx, q, bresv, fn, priv, true);
+-			bt_for_each(hctx, q, btags, fn, priv, false);
+-		}
+-	}
++	__blk_mq_tagset_busy_iter(q->tag_set, fn, priv, q);
+ 	blk_queue_exit(q);
+ }
+ 
+-- 
+2.41.0
+
