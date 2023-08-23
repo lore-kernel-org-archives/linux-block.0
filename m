@@ -2,256 +2,276 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65517EE49B6
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B37EE49B9
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234250AbjHWKub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 06:50:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34066 "EHLO
+        id S233987AbjHWKuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 06:50:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230514AbjHWKuW (ORCPT
+        with ESMTP id S232598AbjHWKuW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 23 Aug 2023 06:50:22 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98848E61;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4DBCE65;
         Wed, 23 Aug 2023 03:49:26 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id EE24820751;
-        Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 2BBEC20753;
+        Wed, 23 Aug 2023 10:48:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1692787738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1692787739; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UjqfLYM6+5StP/FBvjEmDMIiBmQctE6hfDpMr2h83M8=;
-        b=PHeNphP7Xd0L/8WLMot/to6cCUSfPaM/vkvWjEDe0oeo4MB/6bdttxmSuYsEXzmo2wzuYf
-        Tjvo3lb+X23cys4RPttnBZ58Xm0MCetRQ/VSN5XFkcvYTFfdkcRJW3/O8K4cWDJlvSkERS
-        xktwk3GXgRR6lcHlv4T8rU6a+m8/e1k=
+        bh=paxukEyoAAv5FkB2kDfTJynj+eHH5ui7CxItFNHAnCo=;
+        b=2UGC0DMiLeOcG+stzpEJHLm+c+cGgB+dy+s/g33T+OY8gmhPyET9a80AdvUIebwzTLMYdD
+        4GHmawzDg0vvxknqvVvLI0ArRBTu7p5TD6164g93NBNKRsxnUhuZR3+PWYsviea1bS+MAg
+        eomFz5xJxDsdEfksQjLOKX9f37SLvYc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1692787738;
+        s=susede2_ed25519; t=1692787739;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UjqfLYM6+5StP/FBvjEmDMIiBmQctE6hfDpMr2h83M8=;
-        b=iJVcs3zgA5Vtz/MblJqbelLpggv9WeRyDwIzGECH0Byt14+1+jJVNqoZ09pPaTavB0V3rV
-        5iq0de/e6sBRFLCQ==
+        bh=paxukEyoAAv5FkB2kDfTJynj+eHH5ui7CxItFNHAnCo=;
+        b=HTqul4jIBiEr7VLvqhgWPNeJ7Qh8Dl/dVPfoCHQF3vP8VmG/O0zl506+Dm0OC6nJCbCGYF
+        JlaDDYTeCkBnUVBQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DE06613A43;
-        Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 16F4513458;
+        Wed, 23 Aug 2023 10:48:59 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id pMw1Nhrk5WRiIAAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 23 Aug 2023 10:48:58 +0000
+        id 1juQBRvk5WRyIAAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 23 Aug 2023 10:48:59 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 872F9A0798; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
+        id 99332A079B; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-ext4@vger.kernel.org, Ted Tso <tytso@mit.edu>,
+        linux-nfs@vger.kernel.org,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 22/29] ext4: Convert to bdev_open_by_dev()
-Date:   Wed, 23 Aug 2023 12:48:33 +0200
-Message-Id: <20230823104857.11437-22-jack@suse.cz>
+Subject: [PATCH 25/29] nfs/blocklayout: Convert to use bdev_open_by_dev/path()
+Date:   Wed, 23 Aug 2023 12:48:36 +0200
+Message-Id: <20230823104857.11437-25-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6270; i=jack@suse.cz; h=from:subject; bh=WIkfaGad5gwZ4CJWdYxbu5ODcggZgJkvpQdzs8x0AG8=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eQBRQm6nySCvl6ypmkPdbrsBPlpwUHNPyLPp5fR M9AmFeqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXkAQAKCRCcnaoHP2RA2YBZB/ 9BrX/GtL1ZsUK7C6PwfphXJtdrPkeAHpgoDkODPClVxZFvZFWg3yOH459a/b5sQHqemRgiZxYhQyl9 qSTGoK1wpQHY58nxxKyw7UOzbpXmUvQ5QbUWcDHrl8xLXgW/dqEqi4JcVqIcaPNwWqMbbQEF78kerQ ta24Rnc2Pc83/lKw73+FqVgjX6Qq1yRyFwyWkFpcTA+hS+uj+Owy/Ow88+azwK1f/bL4BgsDdR/gPN j8ZVc9E0AfNglKXfvFYMKHyU232BniIpFQRp8zdp/Xv8C4Jex6o9SP4TQMLIKDr0Lp04C3eT/HdnFH VQpWjlN2Nnle6LuriEP9cnzvszhYhL
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6181; i=jack@suse.cz; h=from:subject; bh=0IjULVrCIX3jA8XS50OG9gB3t0tQZs/jagbxUdIARmQ=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eQDDRVrTyNrn3Bld2eVVP3ntq1nPuGH03sBMvBU aaEvSzeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXkAwAKCRCcnaoHP2RA2f3uB/ 9TApxncDSBqd+ot6pVyTXXe9FrQsQxN8sc66LyI0cYDvAsXbVlplBntvQw6HP7cLIECbB+Aq77cEKO 07B1WlgCQx5Y9jcAUQ05pLw7ShEHLwaB9DyPoWFUnv4bKg8dV3D02BaZv8W3Iorg3jaho4ZwxYHAHv Vlyvp5lGVvMHGGzIxLqzyxouS1j57LwPqOzbaXQRYHh5Kazg19B1ot1tQM6HmbF8drWHrhGcCkG3Np IAA/++uJQ0Pw0XJp3si5rpPXm2OnmlTl5Bkomxc5ZhNot0v/4rC8Pa4kuKUMCZtLAziiuv05YUIv2e pZCXGiawn5aSUtJqo4oESveUSPgB9v
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert ext4 to use bdev_open_by_dev() and pass the handle around.
+Convert block device handling to use bdev_open_by_dev/path() and pass
+the handle around.
 
-CC: <linux-ext4@vger.kernel.org>
-CC: Ted Tso <tytso@mit.edu>
+CC: linux-nfs@vger.kernel.org
+CC: Trond Myklebust <trond.myklebust@hammerspace.com>
+CC: Anna Schumaker <anna@kernel.org>
 Acked-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/ext4/ext4.h  |  2 +-
- fs/ext4/fsmap.c |  9 +++++----
- fs/ext4/super.c | 44 +++++++++++++++++++++++---------------------
- 3 files changed, 29 insertions(+), 26 deletions(-)
+ fs/nfs/blocklayout/blocklayout.h |  2 +-
+ fs/nfs/blocklayout/dev.c         | 76 ++++++++++++++++----------------
+ 2 files changed, 38 insertions(+), 40 deletions(-)
 
-diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
-index 1e2259d9967d..6856e80abf70 100644
---- a/fs/ext4/ext4.h
-+++ b/fs/ext4/ext4.h
-@@ -1541,7 +1541,7 @@ struct ext4_sb_info {
- 	unsigned long s_commit_interval;
- 	u32 s_max_batch_time;
- 	u32 s_min_batch_time;
--	struct block_device *s_journal_bdev;
-+	struct bdev_handle *s_journal_bdev_handle;
- #ifdef CONFIG_QUOTA
- 	/* Names of quota files with journalled quota */
- 	char __rcu *s_qf_names[EXT4_MAXQUOTAS];
-diff --git a/fs/ext4/fsmap.c b/fs/ext4/fsmap.c
-index cdf9bfe10137..11e6f33677a2 100644
---- a/fs/ext4/fsmap.c
-+++ b/fs/ext4/fsmap.c
-@@ -576,8 +576,9 @@ static bool ext4_getfsmap_is_valid_device(struct super_block *sb,
- 	if (fm->fmr_device == 0 || fm->fmr_device == UINT_MAX ||
- 	    fm->fmr_device == new_encode_dev(sb->s_bdev->bd_dev))
- 		return true;
--	if (EXT4_SB(sb)->s_journal_bdev &&
--	    fm->fmr_device == new_encode_dev(EXT4_SB(sb)->s_journal_bdev->bd_dev))
-+	if (EXT4_SB(sb)->s_journal_bdev_handle &&
-+	    fm->fmr_device ==
-+	    new_encode_dev(EXT4_SB(sb)->s_journal_bdev_handle->bdev->bd_dev))
- 		return true;
- 	return false;
- }
-@@ -647,9 +648,9 @@ int ext4_getfsmap(struct super_block *sb, struct ext4_fsmap_head *head,
- 	memset(handlers, 0, sizeof(handlers));
- 	handlers[0].gfd_dev = new_encode_dev(sb->s_bdev->bd_dev);
- 	handlers[0].gfd_fn = ext4_getfsmap_datadev;
--	if (EXT4_SB(sb)->s_journal_bdev) {
-+	if (EXT4_SB(sb)->s_journal_bdev_handle) {
- 		handlers[1].gfd_dev = new_encode_dev(
--				EXT4_SB(sb)->s_journal_bdev->bd_dev);
-+			EXT4_SB(sb)->s_journal_bdev_handle->bdev->bd_dev);
- 		handlers[1].gfd_fn = ext4_getfsmap_logdev;
- 	}
+diff --git a/fs/nfs/blocklayout/blocklayout.h b/fs/nfs/blocklayout/blocklayout.h
+index 716bc75e9ed2..b4294a8aa2d4 100644
+--- a/fs/nfs/blocklayout/blocklayout.h
++++ b/fs/nfs/blocklayout/blocklayout.h
+@@ -108,7 +108,7 @@ struct pnfs_block_dev {
+ 	struct pnfs_block_dev		*children;
+ 	u64				chunk_size;
  
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 73547d2334fd..c2f5f73ab9fc 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -1100,20 +1100,20 @@ void ext4_update_dynamic_rev(struct super_block *sb)
- /*
-  * Open the external journal device
-  */
--static struct block_device *ext4_blkdev_get(dev_t dev, struct super_block *sb)
-+static struct bdev_handle *ext4_blkdev_get(dev_t dev, struct super_block *sb)
+-	struct block_device		*bdev;
++	struct bdev_handle		*bdev_handle;
+ 	u64				disk_offset;
+ 
+ 	u64				pr_key;
+diff --git a/fs/nfs/blocklayout/dev.c b/fs/nfs/blocklayout/dev.c
+index 70f5563a8e81..0b57b8a4b7e2 100644
+--- a/fs/nfs/blocklayout/dev.c
++++ b/fs/nfs/blocklayout/dev.c
+@@ -25,17 +25,17 @@ bl_free_device(struct pnfs_block_dev *dev)
+ 	} else {
+ 		if (dev->pr_registered) {
+ 			const struct pr_ops *ops =
+-				dev->bdev->bd_disk->fops->pr_ops;
++				dev->bdev_handle->bdev->bd_disk->fops->pr_ops;
+ 			int error;
+ 
+-			error = ops->pr_register(dev->bdev, dev->pr_key, 0,
+-				false);
++			error = ops->pr_register(dev->bdev_handle->bdev,
++				dev->pr_key, 0, false);
+ 			if (error)
+ 				pr_err("failed to unregister PR key.\n");
+ 		}
+ 
+-		if (dev->bdev)
+-			blkdev_put(dev->bdev, NULL);
++		if (dev->bdev_handle)
++			bdev_release(dev->bdev_handle);
+ 	}
+ }
+ 
+@@ -169,7 +169,7 @@ static bool bl_map_simple(struct pnfs_block_dev *dev, u64 offset,
+ 	map->start = dev->start;
+ 	map->len = dev->len;
+ 	map->disk_offset = dev->disk_offset;
+-	map->bdev = dev->bdev;
++	map->bdev = dev->bdev_handle->bdev;
+ 	return true;
+ }
+ 
+@@ -236,28 +236,26 @@ bl_parse_simple(struct nfs_server *server, struct pnfs_block_dev *d,
+ 		struct pnfs_block_volume *volumes, int idx, gfp_t gfp_mask)
+ {
+ 	struct pnfs_block_volume *v = &volumes[idx];
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	dev_t dev;
+ 
+ 	dev = bl_resolve_deviceid(server, v, gfp_mask);
+ 	if (!dev)
+ 		return -EIO;
+ 
+-	bdev = blkdev_get_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_WRITE, NULL,
+-				 NULL);
+-	if (IS_ERR(bdev)) {
++	bdev_handle = bdev_open_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_WRITE,
++				       NULL, NULL);
++	if (IS_ERR(bdev_handle)) {
+ 		printk(KERN_WARNING "pNFS: failed to open device %d:%d (%ld)\n",
+-			MAJOR(dev), MINOR(dev), PTR_ERR(bdev));
+-		return PTR_ERR(bdev);
++			MAJOR(dev), MINOR(dev), PTR_ERR(bdev_handle));
++		return PTR_ERR(bdev_handle);
+ 	}
+-	d->bdev = bdev;
+-
+-
+-	d->len = bdev_nr_bytes(d->bdev);
++	d->bdev_handle = bdev_handle;
++	d->len = bdev_nr_bytes(bdev_handle->bdev);
+ 	d->map = bl_map_simple;
+ 
+ 	printk(KERN_INFO "pNFS: using block device %s\n",
+-		d->bdev->bd_disk->disk_name);
++		bdev_handle->bdev->bd_disk->disk_name);
+ 	return 0;
+ }
+ 
+@@ -302,10 +300,10 @@ bl_validate_designator(struct pnfs_block_volume *v)
+ 	}
+ }
+ 
+-static struct block_device *
++static struct bdev_handle *
+ bl_open_path(struct pnfs_block_volume *v, const char *prefix)
  {
 -	struct block_device *bdev;
-+	struct bdev_handle *handle;
- 
--	bdev = blkdev_get_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_WRITE, sb,
--				 &fs_holder_ops);
--	if (IS_ERR(bdev))
-+	handle = bdev_open_by_dev(dev, BLK_OPEN_READ | BLK_OPEN_WRITE, sb,
-+				  &fs_holder_ops);
-+	if (IS_ERR(handle))
- 		goto fail;
--	return bdev;
-+	return handle;
- 
- fail:
- 	ext4_msg(sb, KERN_ERR,
- 		 "failed to open journal device unknown-block(%u,%u) %ld",
--		 MAJOR(dev), MINOR(dev), PTR_ERR(bdev));
-+		 MAJOR(dev), MINOR(dev), PTR_ERR(handle));
- 	return NULL;
- }
- 
-@@ -1311,14 +1311,14 @@ static void ext4_put_super(struct super_block *sb)
- 
- 	sync_blockdev(sb->s_bdev);
- 	invalidate_bdev(sb->s_bdev);
--	if (sbi->s_journal_bdev) {
-+	if (sbi->s_journal_bdev_handle) {
- 		/*
- 		 * Invalidate the journal device's buffers.  We don't want them
- 		 * floating about in memory - the physical journal device may
- 		 * hotswapped, and it breaks the `ro-after' testing code.
- 		 */
--		sync_blockdev(sbi->s_journal_bdev);
--		invalidate_bdev(sbi->s_journal_bdev);
-+		sync_blockdev(sbi->s_journal_bdev_handle->bdev);
-+		invalidate_bdev(sbi->s_journal_bdev_handle->bdev);
- 	}
- 
- 	ext4_xattr_destroy_cache(sbi->s_ea_inode_cache);
-@@ -4205,7 +4205,7 @@ int ext4_calculate_overhead(struct super_block *sb)
- 	 * Add the internal journal blocks whether the journal has been
- 	 * loaded or not
- 	 */
--	if (sbi->s_journal && !sbi->s_journal_bdev)
-+	if (sbi->s_journal && !sbi->s_journal_bdev_handle)
- 		overhead += EXT4_NUM_B2C(sbi, sbi->s_journal->j_total_len);
- 	else if (ext4_has_feature_journal(sb) && !sbi->s_journal && j_inum) {
- 		/* j_inum for internal journal is non-zero */
-@@ -5642,9 +5642,9 @@ failed_mount9: __maybe_unused
- #endif
- 	fscrypt_free_dummy_policy(&sbi->s_dummy_enc_policy);
- 	brelse(sbi->s_sbh);
--	if (sbi->s_journal_bdev) {
--		invalidate_bdev(sbi->s_journal_bdev);
--		blkdev_put(sbi->s_journal_bdev, sb);
-+	if (sbi->s_journal_bdev_handle) {
-+		invalidate_bdev(sbi->s_journal_bdev_handle->bdev);
-+		bdev_release(sbi->s_journal_bdev_handle);
- 	}
- out_fail:
- 	invalidate_bdev(sb->s_bdev);
-@@ -5829,17 +5829,19 @@ static journal_t *ext4_get_dev_journal(struct super_block *sb,
- 	unsigned long offset;
- 	struct ext4_super_block *es;
- 	struct block_device *bdev;
 +	struct bdev_handle *bdev_handle;
+ 	const char *devname;
  
- 	if (WARN_ON_ONCE(!ext4_has_feature_journal(sb)))
- 		return NULL;
+ 	devname = kasprintf(GFP_KERNEL, "/dev/disk/by-id/%s%*phN",
+@@ -313,15 +311,15 @@ bl_open_path(struct pnfs_block_volume *v, const char *prefix)
+ 	if (!devname)
+ 		return ERR_PTR(-ENOMEM);
  
- 	/* see get_tree_bdev why this is needed and safe */
- 	up_write(&sb->s_umount);
--	bdev = ext4_blkdev_get(j_dev, sb);
-+	bdev_handle = ext4_blkdev_get(j_dev, sb);
- 	down_write(&sb->s_umount);
--	if (bdev == NULL)
-+	if (!bdev_handle)
- 		return NULL;
- 
-+	bdev = bdev_handle->bdev;
- 	blocksize = sb->s_blocksize;
- 	hblock = bdev_logical_block_size(bdev);
- 	if (blocksize < hblock) {
-@@ -5903,14 +5905,14 @@ static journal_t *ext4_get_dev_journal(struct super_block *sb,
- 			be32_to_cpu(journal->j_superblock->s_nr_users));
- 		goto out_journal;
+-	bdev = blkdev_get_by_path(devname, BLK_OPEN_READ | BLK_OPEN_WRITE, NULL,
+-				  NULL);
+-	if (IS_ERR(bdev)) {
++	bdev_handle = bdev_open_by_path(devname, BLK_OPEN_READ | BLK_OPEN_WRITE,
++					NULL, NULL);
++	if (IS_ERR(bdev_handle)) {
+ 		pr_warn("pNFS: failed to open device %s (%ld)\n",
+-			devname, PTR_ERR(bdev));
++			devname, PTR_ERR(bdev_handle));
  	}
--	EXT4_SB(sb)->s_journal_bdev = bdev;
-+	EXT4_SB(sb)->s_journal_bdev_handle = bdev_handle;
- 	ext4_init_journal_params(sb, journal);
- 	return journal;
  
- out_journal:
- 	jbd2_journal_destroy(journal);
- out_bdev:
--	blkdev_put(bdev, sb);
-+	bdev_release(bdev_handle);
- 	return NULL;
+ 	kfree(devname);
+-	return bdev;
++	return bdev_handle;
  }
  
-@@ -7258,12 +7260,12 @@ static inline int ext3_feature_set_ok(struct super_block *sb)
- static void ext4_kill_sb(struct super_block *sb)
+ static int
+@@ -329,7 +327,7 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
+ 		struct pnfs_block_volume *volumes, int idx, gfp_t gfp_mask)
  {
- 	struct ext4_sb_info *sbi = EXT4_SB(sb);
--	struct block_device *journal_bdev = sbi ? sbi->s_journal_bdev : NULL;
-+	struct bdev_handle *handle = sbi ? sbi->s_journal_bdev_handle : NULL;
+ 	struct pnfs_block_volume *v = &volumes[idx];
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	const struct pr_ops *ops;
+ 	int error;
  
- 	kill_block_super(sb);
+@@ -342,32 +340,32 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
+ 	 * On other distributions like Debian, the default SCSI by-id path will
+ 	 * point to the dm-multipath device if one exists.
+ 	 */
+-	bdev = bl_open_path(v, "dm-uuid-mpath-0x");
+-	if (IS_ERR(bdev))
+-		bdev = bl_open_path(v, "wwn-0x");
+-	if (IS_ERR(bdev))
+-		return PTR_ERR(bdev);
+-	d->bdev = bdev;
+-
+-	d->len = bdev_nr_bytes(d->bdev);
++	bdev_handle = bl_open_path(v, "dm-uuid-mpath-0x");
++	if (IS_ERR(bdev_handle))
++		bdev_handle = bl_open_path(v, "wwn-0x");
++	if (IS_ERR(bdev_handle))
++		return PTR_ERR(bdev_handle);
++	d->bdev_handle = bdev_handle;
++
++	d->len = bdev_nr_bytes(d->bdev_handle->bdev);
+ 	d->map = bl_map_simple;
+ 	d->pr_key = v->scsi.pr_key;
  
--	if (journal_bdev)
--		blkdev_put(journal_bdev, sb);
-+	if (handle)
-+		bdev_release(handle);
+ 	pr_info("pNFS: using block device %s (reservation key 0x%llx)\n",
+-		d->bdev->bd_disk->disk_name, d->pr_key);
++		d->bdev_handle->bdev->bd_disk->disk_name, d->pr_key);
+ 
+-	ops = d->bdev->bd_disk->fops->pr_ops;
++	ops = d->bdev_handle->bdev->bd_disk->fops->pr_ops;
+ 	if (!ops) {
+ 		pr_err("pNFS: block device %s does not support reservations.",
+-				d->bdev->bd_disk->disk_name);
++				d->bdev_handle->bdev->bd_disk->disk_name);
+ 		error = -EINVAL;
+ 		goto out_blkdev_put;
+ 	}
+ 
+-	error = ops->pr_register(d->bdev, 0, d->pr_key, true);
++	error = ops->pr_register(d->bdev_handle->bdev, 0, d->pr_key, true);
+ 	if (error) {
+ 		pr_err("pNFS: failed to register key for block device %s.",
+-				d->bdev->bd_disk->disk_name);
++				d->bdev_handle->bdev->bd_disk->disk_name);
+ 		goto out_blkdev_put;
+ 	}
+ 
+@@ -375,7 +373,7 @@ bl_parse_scsi(struct nfs_server *server, struct pnfs_block_dev *d,
+ 	return 0;
+ 
+ out_blkdev_put:
+-	blkdev_put(d->bdev, NULL);
++	bdev_release(d->bdev_handle);
+ 	return error;
  }
  
- static struct file_system_type ext4_fs_type = {
 -- 
 2.35.3
 
