@@ -2,152 +2,247 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B372EE49BA
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A73EE49B8
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 10:50:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232454AbjHWKuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 06:50:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
+        id S234266AbjHWKuh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 06:50:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233774AbjHWKuH (ORCPT
+        with ESMTP id S232547AbjHWKuE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 06:50:07 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 986ECE60;
-        Wed, 23 Aug 2023 03:49:26 -0700 (PDT)
+        Wed, 23 Aug 2023 06:50:04 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E21E54;
+        Wed, 23 Aug 2023 03:49:25 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E0EBD20750;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 9A76E21F18;
         Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1692787738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cJnlKAsaBe7sPZrPQ08auxrCcdr7TMUMkg3NCrwvvAc=;
-        b=iDDKWdnMHbDv4nwSHrczBOyZD4GVw4sn2o/RXV/rBqMygIZ3dBYsdy86bk1KX8Q/UNpDGR
-        Oksuj1/rxd8CWpdHrtga5QKJYnyXdJNXRkhMVG+KNfzzHZmwj7EINCbtYsi+85dAF1MGnl
-        9htjoshTWF0/Nw4jpskx9axemvZojJ8=
+        bh=6A6hRvylgBwTZcuIETqZgEqdZsV0/K4HPCnVHk0AEc0=;
+        b=GeMwkoDq9jZsvipXdFUIfIpUxSEnoASpn4w5D4K/349brcv9sbkd2fiY04fzjilBKfCp/Q
+        PfAixdVkvOkyfGYM1BJlWbXdwJ6SMk+q8vcche7s9Dk9fivM4azCPu+LiS/bAXUPn48E33
+        KfkHhFLyYLCsXrCQ0u6aPGRz6kk0f+Y=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1692787738;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cJnlKAsaBe7sPZrPQ08auxrCcdr7TMUMkg3NCrwvvAc=;
-        b=rB4qB/gJfwuSWz1MNhpxj7oTHhvBn4CLc3ep8oawowPA50BWgRE61cwqqmke248sNQZVad
-        Dwd9TQowyzRAOEAw==
+        bh=6A6hRvylgBwTZcuIETqZgEqdZsV0/K4HPCnVHk0AEc0=;
+        b=KeK2hjT+B2Y4j3m53Ye2pSJSNNRfDc247PvVF1fiSGboUQ6SYEa5ckiNxiFQF8eFVQVByk
+        M9yF1nQ70oTK7YDA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CFED013458;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8C9E613458;
         Wed, 23 Aug 2023 10:48:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id MmeoMhrk5WRVIAAAMHmgww
+        id +m9QIhrk5WRLIAAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 23 Aug 2023 10:48:58 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 7239CA0792; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
+        id 504F2A078C; Wed, 23 Aug 2023 12:48:57 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 18/29] mm/swap: Convert to use bdev_open_by_dev()
-Date:   Wed, 23 Aug 2023 12:48:29 +0200
-Message-Id: <20230823104857.11437-18-jack@suse.cz>
+        Joern Engel <joern@lazybastard.org>,
+        linux-mtd@lists.infradead.org, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 12/29] mtd: block2mtd: Convert to bdev_open_by_dev/path()
+Date:   Wed, 23 Aug 2023 12:48:23 +0200
+Message-Id: <20230823104857.11437-12-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2762; i=jack@suse.cz; h=from:subject; bh=f/JlRJ3B9MNW3NLuXC/An2yXaaMnt87ViwCq0s9tEUM=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGFKePv7LcNySuWPPvC9SJ5OT7iQvOH5U+MJl8+yj3X0ms0V3 O/GkdzIaszAwcjDIiimyrI68qH1tnlHX1lANGZhBrExgU7g4BWAiO55zMMz8Elovf21lZOKij/Hv4q ZL6TfW53ky/FuirHKlo3+CTusUL7V6Sc1j/cIXXry00J7iJmp0+0305d7G2hNWCkcZlrOeX2PnkBXo KdHB4zS/YnaVZaPAifm3VorsOSHke/pf6y77xt6f5hKix3maT639nSTVd4EnomJB8e9arWdiHP85ts xwkJ9vtdHM/Kxfrnky/9+HzeweX33tTom37Mvk3VrOdeTm2tZ+61WhDnNqstb5197ZeJDhlVKhh060 y1vjO+X9yxUu362yvcitv0jZIDn76ELLS5drpn9av/JKkUfTlUUR83L/On1wKTZ5wLdgXskKubLrlZ ubd83813ZJqu5HYZnujun8e4vMAQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6124; i=jack@suse.cz; h=from:subject; bh=Tz1ugp3DU+ZL/hNHyITzU2zJy8WxFdpgNi6kSxgLpeY=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBk5eP4BpWHOMZmxjSrW9wFbZII0CKnaJn+aayUt5VL 882/Y6mJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZOXj+AAKCRCcnaoHP2RA2fpBB/ 4kp25D2PqQ1jw+p/I0CJKROSenL7DrnJP8O8K48mC3nsufv/tYsZk8yiUxUD880RpPoKxF+7QEHpMW trZSANHdxAoTwOBAUTfIrje9gwRSw7zcyOOh7OqAlDxlzJJS5kH6W86wko3eYB1mt0ujtx4s/fkml7 mCZL27g5iEyDY7yhOU/4dfIttVF5+TWpXuAUzflZu5cXUHKiqjQ3qRudPO2BCWMns1R6X7EOqU4xJt rxOskwyUNJewZy8Wsw2SpbVbbaxzoLb4XxoMc/S2C3WwjSUwrBiNOZmMfot61QU4d+C9Moz8luGwzR Vx/zZeyP/rN/Ea+2sGf1r+bWltiZMV
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert swapping code to use bdev_open_by_dev() and pass the handle
-around.
+Convert block2mtd to use bdev_open_by_dev() and bdev_open_by_path() and
+pass the handle around.
 
-CC: linux-mm@kvack.org
-CC: Andrew Morton <akpm@linux-foundation.org>
+CC: Joern Engel <joern@lazybastard.org>
+CC: linux-mtd@lists.infradead.org
 Acked-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- include/linux/swap.h |  1 +
- mm/swapfile.c        | 23 ++++++++++++-----------
- 2 files changed, 13 insertions(+), 11 deletions(-)
+ drivers/mtd/devices/block2mtd.c | 51 +++++++++++++++++++--------------
+ 1 file changed, 29 insertions(+), 22 deletions(-)
 
-diff --git a/include/linux/swap.h b/include/linux/swap.h
-index 456546443f1f..62334f8d4932 100644
---- a/include/linux/swap.h
-+++ b/include/linux/swap.h
-@@ -298,6 +298,7 @@ struct swap_info_struct {
- 	unsigned int __percpu *cluster_next_cpu; /*percpu index for next allocation */
- 	struct percpu_cluster __percpu *percpu_cluster; /* per cpu's swap location */
- 	struct rb_root swap_extent_root;/* root of the swap extent rbtree */
-+	struct bdev_handle *bdev_handle;/* open handle of the bdev */
- 	struct block_device *bdev;	/* swap device or bdev of swap file */
- 	struct file *swap_file;		/* seldom referenced */
- 	unsigned int old_block_size;	/* seldom referenced */
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 8e6dde68b389..621428ee6895 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -2526,11 +2526,10 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
- 	exit_swap_address_space(p->type);
+diff --git a/drivers/mtd/devices/block2mtd.c b/drivers/mtd/devices/block2mtd.c
+index be106dc20ff3..aa44a23ec045 100644
+--- a/drivers/mtd/devices/block2mtd.c
++++ b/drivers/mtd/devices/block2mtd.c
+@@ -37,7 +37,7 @@
+ /* Info for the block device */
+ struct block2mtd_dev {
+ 	struct list_head list;
+-	struct block_device *blkdev;
++	struct bdev_handle *bdev_handle;
+ 	struct mtd_info mtd;
+ 	struct mutex write_mutex;
+ };
+@@ -55,7 +55,8 @@ static struct page *page_read(struct address_space *mapping, pgoff_t index)
+ /* erase a specified part of the device */
+ static int _block2mtd_erase(struct block2mtd_dev *dev, loff_t to, size_t len)
+ {
+-	struct address_space *mapping = dev->blkdev->bd_inode->i_mapping;
++	struct address_space *mapping =
++				dev->bdev_handle->bdev->bd_inode->i_mapping;
+ 	struct page *page;
+ 	pgoff_t index = to >> PAGE_SHIFT;	// page index
+ 	int pages = len >> PAGE_SHIFT;
+@@ -105,6 +106,8 @@ static int block2mtd_read(struct mtd_info *mtd, loff_t from, size_t len,
+ 		size_t *retlen, u_char *buf)
+ {
+ 	struct block2mtd_dev *dev = mtd->priv;
++	struct address_space *mapping =
++				dev->bdev_handle->bdev->bd_inode->i_mapping;
+ 	struct page *page;
+ 	pgoff_t index = from >> PAGE_SHIFT;
+ 	int offset = from & (PAGE_SIZE-1);
+@@ -117,7 +120,7 @@ static int block2mtd_read(struct mtd_info *mtd, loff_t from, size_t len,
+ 			cpylen = len;	// this page
+ 		len = len - cpylen;
  
- 	inode = mapping->host;
--	if (S_ISBLK(inode->i_mode)) {
--		struct block_device *bdev = I_BDEV(inode);
--
--		set_blocksize(bdev, old_block_size);
--		blkdev_put(bdev, p);
-+	if (p->bdev_handle) {
-+		set_blocksize(p->bdev, old_block_size);
-+		bdev_release(p->bdev_handle);
-+		p->bdev_handle = NULL;
+-		page = page_read(dev->blkdev->bd_inode->i_mapping, index);
++		page = page_read(mapping, index);
+ 		if (IS_ERR(page))
+ 			return PTR_ERR(page);
+ 
+@@ -139,7 +142,8 @@ static int _block2mtd_write(struct block2mtd_dev *dev, const u_char *buf,
+ 		loff_t to, size_t len, size_t *retlen)
+ {
+ 	struct page *page;
+-	struct address_space *mapping = dev->blkdev->bd_inode->i_mapping;
++	struct address_space *mapping =
++				dev->bdev_handle->bdev->bd_inode->i_mapping;
+ 	pgoff_t index = to >> PAGE_SHIFT;	// page index
+ 	int offset = to & ~PAGE_MASK;	// page offset
+ 	int cpylen;
+@@ -194,7 +198,7 @@ static int block2mtd_write(struct mtd_info *mtd, loff_t to, size_t len,
+ static void block2mtd_sync(struct mtd_info *mtd)
+ {
+ 	struct block2mtd_dev *dev = mtd->priv;
+-	sync_blockdev(dev->blkdev);
++	sync_blockdev(dev->bdev_handle->bdev);
+ 	return;
+ }
+ 
+@@ -206,10 +210,10 @@ static void block2mtd_free_device(struct block2mtd_dev *dev)
+ 
+ 	kfree(dev->mtd.name);
+ 
+-	if (dev->blkdev) {
+-		invalidate_mapping_pages(dev->blkdev->bd_inode->i_mapping,
+-					0, -1);
+-		blkdev_put(dev->blkdev, NULL);
++	if (dev->bdev_handle) {
++		invalidate_mapping_pages(
++			dev->bdev_handle->bdev->bd_inode->i_mapping, 0, -1);
++		bdev_release(dev->bdev_handle);
  	}
  
- 	inode_lock(inode);
-@@ -2760,13 +2759,14 @@ static int claim_swapfile(struct swap_info_struct *p, struct inode *inode)
- 	int error;
+ 	kfree(dev);
+@@ -219,10 +223,10 @@ static void block2mtd_free_device(struct block2mtd_dev *dev)
+  * This function is marked __ref because it calls the __init marked
+  * early_lookup_bdev when called from the early boot code.
+  */
+-static struct block_device __ref *mdtblock_early_get_bdev(const char *devname,
++static struct bdev_handle __ref *mdtblock_early_get_bdev(const char *devname,
+ 		blk_mode_t mode, int timeout, struct block2mtd_dev *dev)
+ {
+-	struct block_device *bdev = ERR_PTR(-ENODEV);
++	struct bdev_handle *bdev_handle = ERR_PTR(-ENODEV);
+ #ifndef MODULE
+ 	int i;
  
- 	if (S_ISBLK(inode->i_mode)) {
--		p->bdev = blkdev_get_by_dev(inode->i_rdev,
-+		p->bdev_handle = bdev_open_by_dev(inode->i_rdev,
- 				BLK_OPEN_READ | BLK_OPEN_WRITE, p, NULL);
--		if (IS_ERR(p->bdev)) {
--			error = PTR_ERR(p->bdev);
--			p->bdev = NULL;
-+		if (IS_ERR(p->bdev_handle)) {
-+			error = PTR_ERR(p->bdev_handle);
-+			p->bdev_handle = NULL;
- 			return error;
+@@ -230,7 +234,7 @@ static struct block_device __ref *mdtblock_early_get_bdev(const char *devname,
+ 	 * We can't use early_lookup_bdev from a running system.
+ 	 */
+ 	if (system_state >= SYSTEM_RUNNING)
+-		return bdev;
++		return bdev_handle;
+ 
+ 	/*
+ 	 * We might not have the root device mounted at this point.
+@@ -249,19 +253,20 @@ static struct block_device __ref *mdtblock_early_get_bdev(const char *devname,
+ 		wait_for_device_probe();
+ 
+ 		if (!early_lookup_bdev(devname, &devt)) {
+-			bdev = blkdev_get_by_dev(devt, mode, dev, NULL);
+-			if (!IS_ERR(bdev))
++			bdev_handle = bdev_open_by_dev(devt, mode, dev, NULL);
++			if (!IS_ERR(bdev_handle))
+ 				break;
  		}
-+		p->bdev = p->bdev_handle->bdev;
- 		p->old_block_size = block_size(p->bdev);
- 		error = set_blocksize(p->bdev, PAGE_SIZE);
- 		if (error < 0)
-@@ -3210,9 +3210,10 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
- 	p->percpu_cluster = NULL;
- 	free_percpu(p->cluster_next_cpu);
- 	p->cluster_next_cpu = NULL;
--	if (inode && S_ISBLK(inode->i_mode) && p->bdev) {
-+	if (p->bdev_handle) {
- 		set_blocksize(p->bdev, p->old_block_size);
--		blkdev_put(p->bdev, p);
-+		bdev_release(p->bdev_handle);
-+		p->bdev_handle = NULL;
  	}
- 	inode = NULL;
- 	destroy_swap_extents(p);
+ #endif
+-	return bdev;
++	return bdev_handle;
+ }
+ 
+ static struct block2mtd_dev *add_device(char *devname, int erase_size,
+ 		char *label, int timeout)
+ {
+ 	const blk_mode_t mode = BLK_OPEN_READ | BLK_OPEN_WRITE;
++	struct bdev_handle *bdev_handle;
+ 	struct block_device *bdev;
+ 	struct block2mtd_dev *dev;
+ 	char *name;
+@@ -274,21 +279,23 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
+ 		return NULL;
+ 
+ 	/* Get a handle on the device */
+-	bdev = blkdev_get_by_path(devname, mode, dev, NULL);
+-	if (IS_ERR(bdev))
+-		bdev = mdtblock_early_get_bdev(devname, mode, timeout, dev);
+-	if (IS_ERR(bdev)) {
++	bdev_handle = bdev_open_by_path(devname, mode, dev, NULL);
++	if (IS_ERR(bdev_handle))
++		bdev_handle = mdtblock_early_get_bdev(devname, mode, timeout,
++						      dev);
++	if (IS_ERR(bdev_handle)) {
+ 		pr_err("error: cannot open device %s\n", devname);
+ 		goto err_free_block2mtd;
+ 	}
+-	dev->blkdev = bdev;
++	dev->bdev_handle = bdev_handle;
++	bdev = bdev_handle->bdev;
+ 
+ 	if (MAJOR(bdev->bd_dev) == MTD_BLOCK_MAJOR) {
+ 		pr_err("attempting to use an MTD device as a block device\n");
+ 		goto err_free_block2mtd;
+ 	}
+ 
+-	if ((long)dev->blkdev->bd_inode->i_size % erase_size) {
++	if ((long)bdev->bd_inode->i_size % erase_size) {
+ 		pr_err("erasesize must be a divisor of device size\n");
+ 		goto err_free_block2mtd;
+ 	}
+@@ -306,7 +313,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
+ 
+ 	dev->mtd.name = name;
+ 
+-	dev->mtd.size = dev->blkdev->bd_inode->i_size & PAGE_MASK;
++	dev->mtd.size = bdev->bd_inode->i_size & PAGE_MASK;
+ 	dev->mtd.erasesize = erase_size;
+ 	dev->mtd.writesize = 1;
+ 	dev->mtd.writebufsize = PAGE_SIZE;
 -- 
 2.35.3
 
