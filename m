@@ -2,37 +2,40 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BF0EE49A0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 09:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD695EE4993
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 09:25:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235046AbjHWJZB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 05:25:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36866 "EHLO
+        id S235040AbjHWJZC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 05:25:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235040AbjHWJMJ (ORCPT
+        with ESMTP id S235050AbjHWJMJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 23 Aug 2023 05:12:09 -0400
-Received: from out-38.mta0.migadu.com (out-38.mta0.migadu.com [91.218.175.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A410BE54
-        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 02:05:02 -0700 (PDT)
+Received: from out-12.mta0.migadu.com (out-12.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD11E70
+        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2023 02:05:09 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692781500;
+        t=1692781507;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wjRgHpRn/Mi1kte2oU8yzlTkPSWTeowZKAuYRZmUUt4=;
-        b=NGZSwtJIqW9YiG7QkogGParOqmBK3DQXG/4Jm3I1UUNPJKMlj81KwMCNkjLnJzKVM3z7Xs
-        7y4bpA4eD0bfh6g7E0lot80JxKq+YInku6Ht/+rNBgPo7rQKSlxQeinP8WWXn3pwrk+/q3
-        Arn8Oxobq/IFo9BvYDevQEER5ZxRCpA=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+Ck0rs81AEiodN0S3rZySD0WGGzyJ4hTtyZoFTOerZQ=;
+        b=g6TeL8imDuOfAy/AqraJoNw2qHhnH3g0sx8U26G2sFHnyHg2QiDlFKimvbArOq3hlcafJ9
+        7Nh029sgg5Cf1jkNDsXoGf6RGIZQp6FnbtPZnGDQMK+aRqhYX+yAkxl428nNG/vHsgWkX4
+        BPnP0zOudV9Mzm/QTjyWkggrclRHVWI=
 From:   chengming.zhou@linux.dev
 To:     axboe@kernel.dk, ming.lei@redhat.com, bvanassche@acm.org,
         hch@lst.de
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         zhouchengming@bytedance.com
-Subject: [PATCH v2 0/6] blk-mq-tag: remove bt_for_each()
-Date:   Wed, 23 Aug 2023 17:04:35 +0800
-Message-ID: <20230823090441.3986631-1-chengming.zhou@linux.dev>
+Subject: [PATCH v2 2/6] blk-mq-tag: introduce __blk_mq_tagset_busy_iter()
+Date:   Wed, 23 Aug 2023 17:04:37 +0800
+Message-ID: <20230823090441.3986631-3-chengming.zhou@linux.dev>
+In-Reply-To: <20230823090441.3986631-1-chengming.zhou@linux.dev>
+References: <20230823090441.3986631-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
@@ -42,30 +45,98 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chengming Zhou <zhouchengming@bytedance.com>
 
-Changes in v2:
-  - Split by one change per patch and add Fixes tag.
-  - Improve commit messages, suggested by Bart Van Assche.
+For support of specified queue filter when iterating over a tagset,
+we introduce __blk_mq_tagset_busy_iter() here and all current users
+just set queue as NULL which means have no queue filter.
 
-There are two almost identical mechanisms in blk-mq-tag to iterate over
-requests of one tags: bt_for_each() and the newer bt_tags_for_each().
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-mq-tag.c | 40 +++++++++++++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
 
-This series aim to add support of queue filter in bt_tags_for_each()
-then remove bt_for_each(). Fix and update documentation as we're here.
-
-Thanks for review!
-
-Chengming Zhou (6):
-  blk-mq-tag: support queue filter in bt_tags_iter()
-  blk-mq-tag: introduce __blk_mq_tagset_busy_iter()
-  blk-mq-tag: remove bt_for_each()
-  blk-mq: delete superfluous check in iterate callback
-  blk-mq-tag: fix functions documentation
-  blk-mq-tag: fix blk_mq_queue_tag_busy_iter() documentation
-
- block/blk-mq-tag.c | 176 ++++++++++++---------------------------------
- block/blk-mq.c     |  12 ++--
- 2 files changed, 49 insertions(+), 139 deletions(-)
-
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 3cf3cf72cd54..75b33ae6acef 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -383,13 +383,15 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+  * @flags:	BT_TAG_ITER_*
+  */
+ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
+-			     busy_tag_iter_fn *fn, void *data, unsigned int flags)
++			     busy_tag_iter_fn *fn, void *data, unsigned int flags,
++			     struct request_queue *q)
+ {
+ 	struct bt_tags_iter_data iter_data = {
+ 		.tags = tags,
+ 		.fn = fn,
+ 		.data = data,
+ 		.flags = flags,
++		.q = q,
+ 	};
+ 
+ 	if (tags->rqs)
+@@ -397,14 +399,15 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
+ }
+ 
+ static void __blk_mq_all_tag_iter(struct blk_mq_tags *tags,
+-		busy_tag_iter_fn *fn, void *priv, unsigned int flags)
++		busy_tag_iter_fn *fn, void *priv, unsigned int flags,
++		struct request_queue *q)
+ {
+ 	WARN_ON_ONCE(flags & BT_TAG_ITER_RESERVED);
+ 
+ 	if (tags->nr_reserved_tags)
+ 		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv,
+-				 flags | BT_TAG_ITER_RESERVED);
+-	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, flags);
++				 flags | BT_TAG_ITER_RESERVED, q);
++	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, flags, q);
+ }
+ 
+ /**
+@@ -422,7 +425,23 @@ static void __blk_mq_all_tag_iter(struct blk_mq_tags *tags,
+ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+ 		void *priv)
+ {
+-	__blk_mq_all_tag_iter(tags, fn, priv, BT_TAG_ITER_STATIC_RQS);
++	__blk_mq_all_tag_iter(tags, fn, priv, BT_TAG_ITER_STATIC_RQS, NULL);
++}
++
++static void __blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
++				      busy_tag_iter_fn *fn, void *priv,
++				      struct request_queue *q)
++{
++	unsigned int flags = tagset->flags;
++	int i, nr_tags;
++
++	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
++
++	for (i = 0; i < nr_tags; i++) {
++		if (tagset->tags && tagset->tags[i])
++			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
++					      BT_TAG_ITER_STARTED, q);
++	}
+ }
+ 
+ /**
+@@ -441,16 +460,7 @@ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv)
+ {
+-	unsigned int flags = tagset->flags;
+-	int i, nr_tags;
+-
+-	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
+-
+-	for (i = 0; i < nr_tags; i++) {
+-		if (tagset->tags && tagset->tags[i])
+-			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+-					      BT_TAG_ITER_STARTED);
+-	}
++	__blk_mq_tagset_busy_iter(tagset, fn, priv, NULL);
+ }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+ 
 -- 
 2.41.0
 
