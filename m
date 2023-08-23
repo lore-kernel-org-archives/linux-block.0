@@ -2,57 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D112EE49A0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 14:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D642CEE49A0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Aug 2023 14:40:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234225AbjHWOjo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Aug 2023 10:39:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39460 "EHLO
+        id S236017AbjHWOkR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Aug 2023 10:40:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232656AbjHWOjn (ORCPT
+        with ESMTP id S232656AbjHWOkQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2023 10:39:43 -0400
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391C7E54;
-        Wed, 23 Aug 2023 07:39:42 -0700 (PDT)
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-68a40d8557eso2457071b3a.1;
-        Wed, 23 Aug 2023 07:39:42 -0700 (PDT)
+        Wed, 23 Aug 2023 10:40:16 -0400
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAFBE6C;
+        Wed, 23 Aug 2023 07:40:08 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-68a2bf8d404so3045987b3a.2;
+        Wed, 23 Aug 2023 07:40:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692801581; x=1693406381;
+        d=1e100.net; s=20221208; t=1692801607; x=1693406407;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OE/HnNTZ2Hp/wY8Q6I9B3Ei2exAHrxqSNYI7mKbQYn8=;
-        b=i8m+8MWM9IN+2X7rHA5Up63A8PYUfTOqJOgyhK3bWszS8i+/lwVGU1NWjpqiA+ICCq
-         k+1CasbzG1WkaE9wYuRxiGylZr3l5XpygdPBqOIcvyqeM0zG0OaAc1vfruPvafn9ZfnX
-         ZD5/6bBpQhHqcriHhCuSUlEybwYeLdbsSTCpuybvfry14+7siip0jJKEjPekIOSgfOIt
-         e7TX7jBXmQ90oA15HUocRL02htePXurAxo/HKcQsnMfDb+hEJ8O3lf8opVacpvRpXoim
-         3Nw9Sburxoua8g6/gkfzWz9UKRzd+w/8Bli34a9p/HGeQAIhqXVLeNuYqQThir5gvOMA
-         I5pw==
-X-Gm-Message-State: AOJu0YxVHFkJ20z9lFpJzneb1rcHWws8jsY/XpzDA/cZn7UVIfTs/rIT
-        ODNnORGQa3sxhL6VLXIJBXs=
-X-Google-Smtp-Source: AGHT+IHhnR2ucNMEn2wuM5A6KFR5XPYQ4RXZhV7erEPjJ5ekpOYgI+YrPjaoYdZc8SevXOOZpc2Jdg==
-X-Received: by 2002:a05:6a00:4806:b0:68a:2c6e:c2cc with SMTP id di6-20020a056a00480600b0068a2c6ec2ccmr13264882pfb.0.1692801581537;
-        Wed, 23 Aug 2023 07:39:41 -0700 (PDT)
+        bh=H4P9cGQmQ1aa6ihOJDcvqSptgPyazuBXLIyyVFrXDX4=;
+        b=hslAmqsCh9a1bcHktZkXPrmiJoJnlodp6LAlVyNHs/KPtgj+sN1oi/3uRQxG1+TuVZ
+         ke5rlWKHt9LnRwpxfzmYGvLCt3B5G54VZLSG2DIemjpIlyXH7MOXFWnphQ08+dG2EX8C
+         HGhrmuL5kBdWarWL+nYeBaMo46+Rl2NYu6dUYeioSP5ho3Ee5h17gYb7M4gFzJncafh0
+         JANzgpZSutzf8fz9vvzQJv9uYw+6Xtw3WbNQTzbx0448AeETX0AZVRSoFJPMICzhdi/D
+         adEP6hvblAO4tD83HgqBTzgMcKFrWuKFBznLrr9nJ8Bd9hoMxHQXh6lhjlZ/58UbFsmQ
+         MuNQ==
+X-Gm-Message-State: AOJu0YxqxYA+3SRVhUWRp9GYuvnjzICSvTcHKdsfZT0k3axhtolFp1ld
+        h8YiIzjb4hlI32IX8H8Olp0=
+X-Google-Smtp-Source: AGHT+IGARscpNm3kGU1DL+jFozDCAf3w/jNFhr2Q0T7m+wMvFfDGTDf8jw1LAIyhxGp6crwKOXnn8A==
+X-Received: by 2002:a05:6a21:3d82:b0:13e:f5b5:48f5 with SMTP id bj2-20020a056a213d8200b0013ef5b548f5mr9987438pzc.27.1692801607320;
+        Wed, 23 Aug 2023 07:40:07 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:ecb6:e8b9:f433:b4b4? ([2620:15c:211:201:ecb6:e8b9:f433:b4b4])
-        by smtp.gmail.com with ESMTPSA id 1-20020aa79241000000b0065a1b05193asm9507594pfp.185.2023.08.23.07.39.40
+        by smtp.gmail.com with ESMTPSA id s11-20020a62e70b000000b006887037cde6sm9513954pfh.60.2023.08.23.07.40.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Aug 2023 07:39:41 -0700 (PDT)
-Message-ID: <4751eb9b-755f-f890-cdda-03abff15e6f4@acm.org>
-Date:   Wed, 23 Aug 2023 07:39:39 -0700
+        Wed, 23 Aug 2023 07:40:06 -0700 (PDT)
+Message-ID: <6929b5d6-7f16-e217-57c6-5081c093c71f@acm.org>
+Date:   Wed, 23 Aug 2023 07:40:05 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.1
-Subject: Re: [PATCH v2 3/6] blk-mq-tag: remove bt_for_each()
+Subject: Re: [PATCH v2 4/6] blk-mq: delete superfluous check in iterate
+ callback
 Content-Language: en-US
 To:     chengming.zhou@linux.dev, axboe@kernel.dk, ming.lei@redhat.com,
         hch@lst.de
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         zhouchengming@bytedance.com
 References: <20230823090441.3986631-1-chengming.zhou@linux.dev>
- <20230823090441.3986631-4-chengming.zhou@linux.dev>
+ <20230823090441.3986631-5-chengming.zhou@linux.dev>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230823090441.3986631-4-chengming.zhou@linux.dev>
+In-Reply-To: <20230823090441.3986631-5-chengming.zhou@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -60,20 +61,10 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/23/23 02:04, chengming.zhou@linux.dev wrote:
-> Change the only user of bt_for_each() to use the introduced function
-> __blk_mq_tagset_busy_iter() to specify queue filter when iterating.
-> 
-> Since blk_mq_queue_tag_busy_iter() is only used to iterate over started
-> requests, __blk_mq_tagset_busy_iter() already have BT_TAG_ITER_STARTED
-> filter to iterate over started requests only, there should be no
-> problem.
-> 
-> Only one potential disadvantage I can see is that we lost the
-> blk_mq_hw_queue_mapped() filter, which maybe not happen for now.
-> Unmapped hctx was used to dynamically map or unmap when CPU hotplug,
-> but we don't do this anymore, we always map all possible CPUs now.
-> So it seems unmapped hctx may only happen if something wrong with
-> driver's tagset map settings.
+> The previous patch in this series changed the behavior of
+> blk_mq_queue_tag_busy_iter() from iterating over all allocated tags into
+> iterating over started requests only. Leave out the code from
+> blk_mq_rq_inflight() that became superfluous because of this change.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
