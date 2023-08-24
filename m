@@ -2,105 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 745CFC71153
-	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 14:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 673DBC6FA8F
+	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 15:18:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235773AbjHXOsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 10:48:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60082 "EHLO
+        id S229450AbjHXPSH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 11:18:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241844AbjHXOsb (ORCPT
+        with ESMTP id S242264AbjHXPRh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 10:48:31 -0400
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABD7C1BD4;
-        Thu, 24 Aug 2023 07:48:02 -0700 (PDT)
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1bf55a81eeaso34417505ad.0;
-        Thu, 24 Aug 2023 07:48:02 -0700 (PDT)
+        Thu, 24 Aug 2023 11:17:37 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B32EC
+        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 08:17:34 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b974031aeaso106514961fa.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 08:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692890253; x=1693495053;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=x7QFTOLH78RvEs9lsDd2isR/kznJbT884Moit9I1Mww=;
+        b=F8HYc2wlHQh7sFZRJXll5V+x4kkYAC97g23LuGAMfPuLh40W93RLLYxh4vUe4wYP0w
+         Zy5nK9hW2b8Jd19JogoFt/PXkPGoCYhQktI7+C5DSN9XigtBd0E7KejfgQsPimFqN0VE
+         q1bhBoVHKaX4CQvbiFWH1gAGc4bB3J7jIdnojT1KVWQqJk2Vovdd7YngZOZOioMl0vwY
+         honm76e8nfgXhvn8IBVJHXxGWpvwrxiHHOCnGXgq57yGnjz9hezb8yTfcZnY8XJw0ydL
+         u0lpf10gvJALa1QGZ9HReny0k2v7U22Ip6DnPQkogOjKTvMSP/1l8ij+sEsoswoB7JS5
+         yu5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692888468; x=1693493268;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Go0JA+ncTUVKQH5aP2NozeJeq8XplVwTrOGU4aPJmRA=;
-        b=KiTENg0bt26Xu/XdDOTeoJAS4Ljw6Xgzuxp/YWfkcrThGPWmDDzc7UIfuyfFIEVHto
-         RyZAHgZnArG5HcleAyRdXB5GIDDsvzmkQi0MGBm+bjH8H+DaJ7mMLTaic3FhtfqwO63O
-         WUMq3bHq+lB8tUHntoSrFgoc2daF8duqPpf2WSD1SmKE3Wozsaubm6QJxf13pf0Juq2m
-         eBtkTck3vmgVztOFEBJsqnPsWrx+yG6ocVK9htkLe7vENzYSzKqi8rVaKHe/t+W8jdTd
-         2S65m2jbHpUr2Ss4AorWRujBDvF97u+iigtvM02DthDc5K36ehxmzSCUYhP4wNTbnlZ6
-         cGIA==
-X-Gm-Message-State: AOJu0YyPoefDuLXrX9AkTcITX1Q+KX7DBtke30EXtAUy/7Dn+DslNE8G
-        dJQ2fQzdwh8Go4fTnd9ZAEg=
-X-Google-Smtp-Source: AGHT+IFW6UXRkLM6aMG+WThvbRzjw8qMM8hO0l9+4XzDaaDfGlIvrNQZpkMORXUzZGhGBoxuhimc2w==
-X-Received: by 2002:a17:902:b709:b0:1bd:a0cd:1860 with SMTP id d9-20020a170902b70900b001bda0cd1860mr10982628pls.64.1692888467851;
-        Thu, 24 Aug 2023 07:47:47 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:e6ec:4683:972:2d78? ([2620:15c:211:201:e6ec:4683:972:2d78])
-        by smtp.gmail.com with ESMTPSA id jg5-20020a17090326c500b001b9d8688956sm12923006plb.144.2023.08.24.07.47.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 07:47:47 -0700 (PDT)
-Message-ID: <6355b575-3f59-93dc-5acf-4726c6e80a15@acm.org>
-Date:   Thu, 24 Aug 2023 07:47:45 -0700
+        d=1e100.net; s=20221208; t=1692890253; x=1693495053;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x7QFTOLH78RvEs9lsDd2isR/kznJbT884Moit9I1Mww=;
+        b=WhpVIMmYfGPPZhOnBc/0ffXDGmupog/YgcUmQalgetOdA6S2QcKOlSIi+YOAV1ctXI
+         G5i7YF5bJGwiSvi0IlKpXLGr4cYzWy5fZbnO4vOvWoYfO/sTlZC1zL3lDjUaoovi6fdZ
+         hw8yRl6+27zCoMOeNmaMOIwqX2nuYuF6xtmcUjiYIrLCNzz5umJgzd8Pv4coAJHWHXPK
+         IF8SHVCZmWJ+TDJddu0LyMbN04zI5q1K7+EM3snr5dy/fvhDMAe1zEvBIJoEgx276uIe
+         JbEUkWWsBC9ElQPU8ZdXtxluMCxs7C0wwSRvDY94nIoRZy/QQ+6/IanYGrt26VlWi2H+
+         UajQ==
+X-Gm-Message-State: AOJu0YynOKO6MDMSTD6RZvIcj9yVmHxyrzQXlPs7AH0q7MPngCN3LPdl
+        jaH7Oh6F1MhbI0JzdLQAGL1lR8EVSLxCcOELpuKk9ws6c+4=
+X-Google-Smtp-Source: AGHT+IHLoSnR9wy0dD8HrHwRkD+cEwUF9Knq9ENj7AVSCpebugJsaTRmSWA3/gXe7kCvjkqLDIlIRGidCjZFkVZIh+0=
+X-Received: by 2002:a2e:81d5:0:b0:2bc:e882:f717 with SMTP id
+ s21-20020a2e81d5000000b002bce882f717mr1709229ljg.53.1692890251788; Thu, 24
+ Aug 2023 08:17:31 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH v11 04/16] scsi: core: Introduce a mechanism for
- reordering requests in the error handler
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20230822191822.337080-1-bvanassche@acm.org>
- <20230822191822.337080-5-bvanassche@acm.org>
- <3562fc36-4bc2-b4fb-a2ad-1e310baf1b47@suse.de>
- <078d2954-f4af-6678-29ce-d8f65ff1397a@acm.org>
- <741e19ae-d4fd-11f5-7faa-18b888ff769c@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <741e19ae-d4fd-11f5-7faa-18b888ff769c@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   Xinying Song <songxinying.ftd@gmail.com>
+Date:   Thu, 24 Aug 2023 23:17:20 +0800
+Message-ID: <CAMWWNq8NavOF0hf3+RmfVJeM3VbLnuMEXXyYfbhQbQsH+CBvog@mail.gmail.com>
+Subject: nbd: double reply err, how can nbd handle tag change after interrupt?
+To:     josef@toxicpanda.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/23/23 16:22, Damien Le Moal wrote:
-> The sd driver does have zone append emulation using regular writes. The
-> emulation relies on zone write locking to avoid issues with adapters that do not
-> have strong ordering guarantees, but that could be adapted to be removed for UFS
-> devices with write ordering guarantees. This solution would greatly simplify
-> your series since zone append requests are not subject to zone write locking at
-> the block layer. So no changes would be needed at that layer.
-> 
-> However, that implies that your preferred use case (f2fs) must be adapted to use
-> zone append instead of regular writes. That in itself may be a bigger-ish
-> change, but in the long run, likely a better one I think as that would be
-> compatible with NVMe ZNS and also future UFS standards defining a zone append
-> command.
-
-Hi Damien,
-
-Thanks for the feedback. I agree that it would be great to have zone append
-support in F2FS. However, I do not agree that switching from regular writes
-to zone append in F2FS would remove the need for sorting SCSI commands by LBA
-in the SCSI error handler. Even if F2FS would submit zoned writes then the
-following mechanisms could still cause reordering of the zoned writes after
-these have been translated into regular writes:
-* The SCSI protocol allows SCSI devices, including UFS devices, to respond
-with a unit attention or the SCSI BUSY status at any time. If multiple write
-commands are pending and some of the pending SCSI writes are not executed
-because of a unit attention or because of another reason, this causes
-command reordering.
-* Although the link between the UFS controller and the UFS device is pretty
-reliable, there is a non-zero chance that a SCSI command is lost. If this
-happens the SCSI timeout and error handlers are activated. This can cause
-reordering of write commands.
-
-In other words, whether F2FS submits regular writes (REQ_OP_WRITE) or zone
-appends (REQ_OP_ZONE_APPEND), I think we need the entire patch series.
-
-Thanks,
-
-Bart.
+Hi,
+Recently I find the nbd module of my server complains aboult "Double
+reply" error when using rbd-nbd. With more investigation, I find every
+time the error occurs nbd module is returning STS_RESOURCE to block
+layer due to EINTR in sock_sendmsg. When the block layer get a
+STS_RESOURCE ret value, it will free the tag of the request and
+reallocate a new tag next time the request is being processed.
+However, when the request is being interrupted, nbd module may have
+sent the nbd header of that request to nbd server, so it is possible
+that the tag of the request that nbd server gets is different with the
+new tag in nbd module for the same request. I don't find any patch for
+this in mainline. I'm not sure if my analisis is right, hope anyone
+can help to explain. Thank you in advance.
+Best regards.
+Xinying Song
