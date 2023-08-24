@@ -2,96 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99CFCC6FA8F
-	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 14:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BECAC71153
+	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 14:46:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234678AbjHXOg5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 10:36:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55736 "EHLO
+        id S241731AbjHXOpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 10:45:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241737AbjHXOgg (ORCPT
+        with ESMTP id S236907AbjHXOpI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 10:36:36 -0400
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568391FF1;
-        Thu, 24 Aug 2023 07:36:17 -0700 (PDT)
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-68a4bcf8a97so3454698b3a.1;
-        Thu, 24 Aug 2023 07:36:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692887777; x=1693492577;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EtlLPQ4XkMFpJySjQ9OXycirNX1t9e/eOV9xbgj8ih0=;
-        b=aVUWLIkQVv4H0GnuQoc12swNgvWH3LBbmlavY7yGnOT8zdUEIROuiAFnX2WfpMZONV
-         u+HCm0XRag9BZdx7d3cXrn8NBX4ScvITMLMebJUeMzFOMvqeRvH9MZhrl7Mzrov7lgVz
-         l5P1YCFnTIxWcvLwCwmIByasa4vg/wadSFtEtlOQkIGuFNGG4Bh7l99JkoDiXZCmyYHU
-         DX4VioMvAapUtMlAddUlzqRySpAkGZUv9xpqf2bSL/Vy/nyfgTalkI2cz0ROujUIABKz
-         Ii03ZHxKfXpBp7y2Dw/f0NfTxclLhKNZWnA8wbSVPSs7KyLYJIK1SlWb9Gy/SwE3YP5e
-         LUbQ==
-X-Gm-Message-State: AOJu0Yya2EQsUheTWM1MD90XSOfKS2uw7TQjTb701zo+Bu7jg/kHtmbQ
-        58bGeT0DMTxi3oERxAvOkVc=
-X-Google-Smtp-Source: AGHT+IFhh/yEEq8jK9/1mUwkjtgL9PDsZzGFDBhhP31JIt8DlZgc7qS60r6ZxJZj+KRAPFQGufVKHQ==
-X-Received: by 2002:a05:6a00:1406:b0:682:4ef7:9b17 with SMTP id l6-20020a056a00140600b006824ef79b17mr15252022pfu.32.1692887776574;
-        Thu, 24 Aug 2023 07:36:16 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:e6ec:4683:972:2d78? ([2620:15c:211:201:e6ec:4683:972:2d78])
-        by smtp.gmail.com with ESMTPSA id z12-20020aa791cc000000b00682c864f35bsm11533887pfa.140.2023.08.24.07.36.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 07:36:16 -0700 (PDT)
-Message-ID: <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
-Date:   Thu, 24 Aug 2023 07:36:12 -0700
+        Thu, 24 Aug 2023 10:45:08 -0400
+Received: from out-1.mta1.migadu.com (out-1.mta1.migadu.com [95.215.58.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCBC1BC5
+        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 07:45:05 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1692888302;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=S9+qnTir0RgMRooesWbZgHu9XmCpC66Spzkbub/tPAs=;
+        b=Tv8yFGBlN3FnIqVaaR7vwYZENCXOSfMeywy9FLLHKGN4V/I1K3NO4AGXmsqjBLwkZsePsK
+        qSlHpRlehWg/95fHe+r+CqJD0fD2Vdw14UGWbcPrY8OBPNnuALnS7XmidBNRluc0RGHvyM
+        E8ClSDm0xeJgUrF8n7jHGwVyD6GcdJo=
+From:   chengming.zhou@linux.dev
+To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com,
+        bvanassche@acm.org, kbusch@kernel.org
+Cc:     mst@redhat.com, sagi@grimberg.me, damien.lemoal@opensource.wdc.com,
+        kch@nvidia.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
+Subject: [PATCH 0/6] blk-mq: optimize the queue_rqs() support
+Date:   Thu, 24 Aug 2023 22:43:57 +0800
+Message-ID: <20230824144403.2135739-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
- nvmet_target_{setup/cleanup} common code
-Content-Language: en-US
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Daniel Wagner <dwagner@suse.de>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-References: <20230822083812.24612-1-dwagner@suse.de>
- <20230822083812.24612-4-dwagner@suse.de>
- <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/23/23 20:09, Shinichiro Kawasaki wrote:
-> CC+: Bart,
-> 
-> This patch makes shellcheck unhappy:
-> 
-> tests/nvme/003:26:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/004:26:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/005:26:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/006:24:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/008:25:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/010:25:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/012:29:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/014:28:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/018:26:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/019:27:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> tests/nvme/023:25:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
-> 
-> But I think the warn SC2119 is false-positive and we should suppress it. In the
-> past, blktests had suppressed it until the recent commit 26664dff17b6 ("Do not
-> suppress any shellcheck warnings"). I think this commit should be reverted
-> together with this series.
-Please do not revert commit 26664dff17b6 because it produces useful
-warnings. Do you agree that the above warnings are easy to suppress,
-e.g. by changing "_nvmet_target_setup" into
-"_nvmet_target_setup ignored_argument"?
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-Thanks,
+The current queue_rqs() support has limitation that it can't work on
+shared tags queue, which is resolved by patch 1-3. We move the account
+of active requests to where we really allocate the driver tag.
 
-Bart.
+This is clearer and matched with the unaccount side which now happen
+when we put the driver tag. And we can remove RQF_MQ_INFLIGHT, which
+was used to avoid double account problem of flush request.
+
+Another problem is that the driver that support queue_rqs() has to
+set inflight request table by itself, which is resolved in patch 4.
+
+The patch 5 fixes a potential race problem which may cause false
+timeout because of the reorder of rq->state and rq->deadline.
+
+The patch 6 add support queue_rqs() for null_blk, which showed a
+3.6% IOPS improvement in fio/t/io_uring benchmark on my test VM.
+And we also use it for testing queue_rqs() on shared tags queue.
+
+Thanks for review!
+
+Chengming Zhou (6):
+  blk-mq: account active requests when get driver tag
+  blk-mq: remove RQF_MQ_INFLIGHT
+  blk-mq: support batched queue_rqs() on shared tags queue
+  blk-mq: update driver tags request table when start request
+  blk-mq: fix potential reorder of request state and deadline
+  block/null_blk: add queue_rqs() support
+
+ block/blk-flush.c             | 11 ++-----
+ block/blk-mq-debugfs.c        |  1 -
+ block/blk-mq.c                | 53 ++++++++++++++------------------
+ block/blk-mq.h                | 57 ++++++++++++++++++++++++-----------
+ drivers/block/null_blk/main.c | 20 ++++++++++++
+ drivers/block/virtio_blk.c    |  2 --
+ drivers/nvme/host/pci.c       |  1 -
+ include/linux/blk-mq.h        |  2 --
+ 8 files changed, 84 insertions(+), 63 deletions(-)
+
+-- 
+2.41.0
+
