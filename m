@@ -2,123 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7581FC6FA8F
-	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 23:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5824C6FA8F
+	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 23:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243994AbjHXXGd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 19:06:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50990 "EHLO
+        id S231494AbjHXXlf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 19:41:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244055AbjHXXGa (ORCPT
+        with ESMTP id S231566AbjHXXlH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 19:06:30 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B9C1FD0
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 16:06:21 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id 46e09a7af769-6bca66e6c44so309114a34.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 16:06:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1692918381; x=1693523181;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eNbaus67NK+zwGGpU1OQ13+AZWMogBzh2lgxE9DpQNI=;
-        b=vu1SIqBnd/8lh5I0VzutUuTOU1KFDrbVXI42qRAmSDugOIAyw47v4NSiTcyUbjXQrT
-         xNfwJGtC50aFGoM83P3SZ468ME5MsHZJ4Rz4EeJqzPfbIzCc8l7wDoaaAuNJY1BBeh6N
-         yc83ey420/RPxrg5bAdbbzklrm6KZU1qsl7YbDqAq+m3+BvlCtAZF6A8zl7z7eLhqnpt
-         zvxG9c0LJiWS2XKOyjN00kuf4q3CjEIfoi2LZrC7EP7cwXotHox1bZEGTer9CVGEjmtE
-         4sNX6wQ9giIMUKp9tezbV7FvxnvF/eJTCs1CG+IYNNxpaZL/2dHWm8JZun5rI40/aogG
-         3ZSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692918381; x=1693523181;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eNbaus67NK+zwGGpU1OQ13+AZWMogBzh2lgxE9DpQNI=;
-        b=U3HU1HZJwykk5Yn3qAeyvdIh0PWTZKpeTSUqz7ddIl8IoCGl/1Y1bcm1BqwSzwLFkM
-         AhiavdiKVE3DTT2r7i4+/xUkb6R+PH2rq7EIrqtPd6Lkup9yX/sklR6cdNCs+9cV1m70
-         To7QKA5m7BlXTDgIh4Y3PXEhI9Rc+v7Y++6Ecqxr89BAAytU4WzwSSaYQOGOwhQLxWxN
-         8PZ3D/2Lywj3EXm8r+spCdCvQQlkc1oQ7tVTNjKcCCU1EkiiUHa08/gbNk9YFbLj3BZU
-         FsMoS9qfq2lxxsXZCKKmRdqcHorTAOPTYPzGdZBuDwTZSuCmiqEtige81UmAWGe6Row0
-         6OOw==
-X-Gm-Message-State: AOJu0YyzXWgBrMBy+EblZqW643tcYRkeAWQcLpF/87jzQ6ONlO2cnmBo
-        1oXj5rhFQ5b/60Del0sdPQQ5uQ==
-X-Google-Smtp-Source: AGHT+IFuCd1IFhBJSjX+OmaMYaqaO0qxWLD9iIUTxQwcvKOTOwc4BOpRQfguQEn1f8A95C46XqzsZg==
-X-Received: by 2002:a05:6870:41d2:b0:1b7:2d92:58d6 with SMTP id z18-20020a05687041d200b001b72d9258d6mr1278884oac.32.1692918380797;
-        Thu, 24 Aug 2023 16:06:20 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id jf15-20020a170903268f00b001bb3beb2bc6sm201670plb.65.2023.08.24.16.06.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 16:06:20 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qZJP8-0065PY-0W;
-        Fri, 25 Aug 2023 09:06:18 +1000
-Date:   Fri, 25 Aug 2023 09:06:18 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 28/29] xfs: Convert to bdev_open_by_path()
-Message-ID: <ZOfiakPoFC5w3FYg@dread.disaster.area>
-References: <20230818123232.2269-1-jack@suse.cz>
- <20230823104857.11437-28-jack@suse.cz>
- <ZOaEHrkx1xS9bgk9@dread.disaster.area>
- <20230824102837.credhh3fsco6vf7p@quack3>
- <20230824202910.wkzkvx6hbgdz6wuh@quack3>
+        Thu, 24 Aug 2023 19:41:07 -0400
+Received: from uriel.iewc.co.za (uriel.iewc.co.za [IPv6:2c0f:f720:0:3::9a49:2248])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B61D0FB
+        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 16:41:01 -0700 (PDT)
+Received: from [154.73.32.4] (helo=tauri.local.uls.co.za)
+        by uriel.iewc.co.za with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+        (Exim 4.96)
+        (envelope-from <jaco@uls.co.za>)
+        id 1qZJwd-0007tR-11;
+        Fri, 25 Aug 2023 01:40:55 +0200
+Received: from [192.168.1.145]
+        by tauri.local.uls.co.za with esmtp (Exim 4.96)
+        (envelope-from <jaco@uls.co.za>)
+        id 1qZJwc-0006k2-1m;
+        Fri, 25 Aug 2023 01:40:54 +0200
+Message-ID: <564fe606-1bbf-4f29-4f10-7142ae07321f@uls.co.za>
+Date:   Fri, 25 Aug 2023 01:40:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230824202910.wkzkvx6hbgdz6wuh@quack3>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: LVM kernel lockup scenario during lvcreate
+Content-Language: en-GB
+To:     Laurence Oberman <loberman@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
+ <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
+ <94477c459a398c47cb251afbcafbc9a6a83bba6f.camel@redhat.com>
+ <977a1223-a543-a6ca-4a6c-0cf0fc6f84a0@uls.co.za>
+ <69227e4091f3d9b05e739f900340f11afacdd91f.camel@redhat.com>
+From:   Jaco Kroon <jaco@uls.co.za>
+Organization: Ultimate Linux Solutions (Pty) Ltd
+In-Reply-To: <69227e4091f3d9b05e739f900340f11afacdd91f.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 24, 2023 at 10:29:10PM +0200, Jan Kara wrote:
-> On Thu 24-08-23 12:28:37, Jan Kara wrote:
-> > On Thu 24-08-23 08:11:42, Dave Chinner wrote:
-> > > On Wed, Aug 23, 2023 at 12:48:39PM +0200, Jan Kara wrote:
-> > > > Convert xfs to use bdev_open_by_path() and pass the handle around.
-> > > ....
-> > > 
-> > > > @@ -426,15 +427,15 @@ xfs_shutdown_devices(
-> > > >  	 * race, everyone loses.
-> > > >  	 */
-> > > >  	if (mp->m_logdev_targp && mp->m_logdev_targp != mp->m_ddev_targp) {
-> > > > -		blkdev_issue_flush(mp->m_logdev_targp->bt_bdev);
-> > > > -		invalidate_bdev(mp->m_logdev_targp->bt_bdev);
-> > > > +		blkdev_issue_flush(mp->m_logdev_targp->bt_bdev_handle->bdev);
-> > > > +		invalidate_bdev(mp->m_logdev_targp->bt_bdev_handle->bdev);
-> > > >  	}
-> > > >  	if (mp->m_rtdev_targp) {
-> > > > -		blkdev_issue_flush(mp->m_rtdev_targp->bt_bdev);
-> > > > -		invalidate_bdev(mp->m_rtdev_targp->bt_bdev);
-> > > > +		blkdev_issue_flush(mp->m_rtdev_targp->bt_bdev_handle->bdev);
-> > > > +		invalidate_bdev(mp->m_rtdev_targp->bt_bdev_handle->bdev);
-> > > >  	}
-> > > > -	blkdev_issue_flush(mp->m_ddev_targp->bt_bdev);
-> > > > -	invalidate_bdev(mp->m_ddev_targp->bt_bdev);
-> > > > +	blkdev_issue_flush(mp->m_ddev_targp->bt_bdev_handle->bdev);
-> > > > +	invalidate_bdev(mp->m_ddev_targp->bt_bdev_handle->bdev);
-> > > >  }
-> > > 
-> > > Why do these need to be converted to run through bt_bdev_handle?  If
-> > > the buftarg is present and we've assigned targp->bt_bdev_handle
-> > > during the call to xfs_alloc_buftarg(), then we've assigned
-> > > targp->bt_bdev from the handle at the same time, yes?
-> > 
-> > Good point, these conversions are pointless now so I've removed them. They
-> > are leftover from a previous version based on a kernel where xfs was
-> > dropping bdev references in a different place. Thanks for noticing.
-> 
-> FWIW attached is a new version of the patch I have currently in my tree.
+Hi Laurence,
+>>> One I am aware of is this
+>>> commit 106397376c0369fcc01c58dd189ff925a2724a57
+>>> Author: David Jeffery <djeffery@redhat.com>
 
-Looks OK.
+I should have held off on replying until I finished looking into this.  
+This looks very interesting indeed, that said, this is my first serious 
+venture into the block layers of the kernel :), so the essay below is 
+more for my understanding than anything else, would be great to have a 
+better understanding of the underlying principles here and your feedback 
+on my understanding thereof would be much appreciated.
 
-Reviewed-by: Dave Chinner <dchinner@redhat.com>
+If I understand this correctly (and that's a BIG IF) then it's possible 
+that a bunch of IO requests goes into a wait queue for whatever reason 
+(pending some other event?).  It's then possible that some of them 
+should get woken up, and previously (prior to above) it could happen 
+that only a single request gets woken up, and then that request would go 
+straight back to the wait queue ... with the patch, isn't it still 
+possible that all woken up requests could just go straight back to the 
+wait queue (albeit less likely)?
 
--- 
-Dave Chinner
-david@fromorbit.com
+Could the creation of a snapshot (which should based on my understanding 
+of what a snapshot is block writes whilst the snapshot is being created, 
+ie, make them go to the wait queue), and could it be that the process of 
+setting up the snapshot (which itself involves writes) then potentially 
+block due to this?  Ie, the write request that needs to get into the 
+next batch to allow other writes to proceed gets blocked?
+
+And as I write that it stops making sense to me because most likely the 
+IO for creating a snapshot would only result in blocking writes to the 
+LV, not to the underlying PVs which contains the metadata for the VG 
+which is being updated.
+
+But still ... if we think about this, the probability of that "bug" 
+hitting would increase as the number of outstanding IO requests 
+increase?  With iostat reporting r_await values upwards of 100 and 
+w_await values periodically going up to 5000 (both generally in the 
+20-50 range for the last few minutes that I've been watching them), it 
+would make sense for me that the number of requests blocking in-kernel 
+could be much higher than that, it makes perfect sense for me that it 
+could be related to this.  On the other hand, IIRC iostat -dmx 1 usually 
+showed only minimal if any requests in either [rw]_await during lockups.
+
+Consider the AHCI controller on the other hand where we've got 7200 RPM 
+SATA drives which are slow to begin with, now we've got traditional 
+snapshots, which are also causing an IO bottleneck and artificially 
+raising IO demand (much more so than thin snaps, really wish I could 
+figure out the migration process to convert this whole host to thin 
+pools but lvconvert scares me something crazy), so now having that first 
+snapshot causes IO bottleneck (ignoring relevant metadata updates, every 
+write to a not yet duplicated segment becomes a read + write + write to 
+clone the written to segment to the snapshot - thin pools just a read + 
+write for same), so already IO is more demanding, and now we try to 
+create another snapshot.
+
+What if some IO fails to finish (due to continually being put back into 
+the wait queue), thus blocking the process of creating the snapshot to 
+begin with?
+
+I know there are numerous other people using snapshots, but I've often 
+wondered how many use it quite as heavily as we do on this specific 
+host?  Given the massive amount of virtual machine infrastructure on the 
+one hand I think there must be quite a lot, but then I also think many 
+of them use "enterprise" (for whatever your definition of that is) 
+storage or something like ceph, so not based on LVM.  And more and more 
+so either SSD/flash or even NVMe, which given the faster response times 
+would also lower the risks of IO related problems from showing themselves.
+
+The risk seems to be during the creation of snapshots, so IO not making 
+progress makes sense.
+
+I've back-ported the referenced path onto 6.4.12 now, which will go 
+alive Saturday morning.  Perhaps we'll be sorted now.  Will also revert 
+to mq-deadline which has been shown to more regularly trigger this, so 
+let's see.
+
+>
+> Hello, this would usually need an NMI sent from a management interface
+> as with it locked up no guarantee a sysrq c will get there from the
+> keyboard.
+> You could try though.
+>
+> As long as you have in /etc/kdump.conf
+>
+> path /var/crash
+> core_collector makedumpfile -l --message-level 7 -d 31
+>
+> This will get kernel only pages and would not be very big.
+>
+> I could work with you privately to get what we need out of the vmcore
+> and we would avoid transferring it.
+Thanks.  This helps.  Let's get a core first (if it's going to happen 
+again) and then take it from there.
+
+Kind regards,
+Jaco
