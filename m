@@ -2,94 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38807C27C40
-	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 17:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33192C6FA8F
+	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 17:30:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230296AbjHXRNk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 13:13:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59750 "EHLO
+        id S232287AbjHXRaQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 13:30:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235697AbjHXRNM (ORCPT
+        with ESMTP id S242896AbjHXRaK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 13:13:12 -0400
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C105199D
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 10:13:10 -0700 (PDT)
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1c0d0bf18d7so1236055ad.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 10:13:10 -0700 (PDT)
+        Thu, 24 Aug 2023 13:30:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0902719B5
+        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 10:29:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692898162;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/XerZVYsBLsupyuldcAk3XlFkDauckeYXrIqkefabl0=;
+        b=MjS/eGTJF2FW2YKovk2U2v7JiEOONxfRi24lrJyBoWkMxjOFHRnU+DLYeMW94iXEMLkWTW
+        8OFAFq7MbgzqaUWiEhwklHDOhPEu10V24hnXr6ebZxqoT9+QXC6b8a6voLFW2prQruYHGz
+        KikiKgO7eIwMs19K1+/qwt/6z1X6Zzo=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-581-vnv-85RANx2Li9PR-ZKzZQ-1; Thu, 24 Aug 2023 13:29:20 -0400
+X-MC-Unique: vnv-85RANx2Li9PR-ZKzZQ-1
+Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-d74c58a3dd7so109342276.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 10:29:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692897190; x=1693501990;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZuzIfkc/gKFONXNez27bvtN7SeJQ//bCcBHbgY6hUtw=;
-        b=WLThRSwGRByL93Rok8hLzVg6gYSmgLQBXXviMrRpUUKExoqpRn36cRST/iRoU9GaPc
-         Z9z6DF3QbMNt815BqzsQSBb83zqcgrPfVe9d5DE8YZPSQ0fdN0VKmnrLWiSRSFGv7oKb
-         liobC7jCgEuXwPlF5hv6u6oT0gnrc/N3IMIl/10sdSIFcbZjBWJD1Ks2PG/f+u8Fonu9
-         rdma2Vco4TJrnJ65gaTGS/9eVJ7KCEgrt8sBAZr5iI94svKbfu+fKsdCIeLRLD0IPS++
-         h4lB8lHUKRoRQwB8Sk0H19/RCXJ7nBAAZzYstRu/7QWA0GZJNZcwEoVIOYuESuBkqstT
-         SIBQ==
-X-Gm-Message-State: AOJu0YxGAmosvtjXb4BZ+/3gffz3vJfSOAqhW2jfdyt8DnzTD+hnVfbl
-        yvdIDXUB+X+wAHS15xGhFQUcg5jPAe0=
-X-Google-Smtp-Source: AGHT+IGXyjGoOt2nQvswjkKYG43YgLOsvzh2Axcs6KrjfBdMkAzXm44ziam6kCAd0j+1YSR+MLlHiw==
-X-Received: by 2002:a17:902:eccf:b0:1c0:bcbc:d78 with SMTP id a15-20020a170902eccf00b001c0bcbc0d78mr4429271plh.14.1692897189710;
-        Thu, 24 Aug 2023 10:13:09 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:e6ec:4683:972:2d78? ([2620:15c:211:201:e6ec:4683:972:2d78])
-        by smtp.gmail.com with ESMTPSA id c4-20020a170902d48400b001b8af7f632asm13023476plg.176.2023.08.24.10.13.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 10:13:09 -0700 (PDT)
-Message-ID: <01b46e84-39f6-ec74-88d3-5735d7ac4a47@acm.org>
-Date:   Thu, 24 Aug 2023 10:13:08 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
+        d=1e100.net; s=20221208; t=1692898160; x=1693502960;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/XerZVYsBLsupyuldcAk3XlFkDauckeYXrIqkefabl0=;
+        b=JYt/lBkY3JmoR+jnKooOzXwcgvfDxVXprLrM5w05QpradaytR4PTYZu6rUo8rzh+R4
+         BQjwYoSkN7pINU9c900kRV3u5MOfDReAMdFF/XG98T8l2t5LonYcQmtOSw+qNxuLQa52
+         Vp+RhQ6mDB/U6GPmulBY1jz3NFHkjTKGntgNnC6ReJJEaDNyhucYCqUcaXNnWaA3M2H9
+         ROYTTV9n0K1han9/q023aghoGKRI4WaHZAJYNqUGdkDQ109ur4K3hbTXwKBnDCj3eDY8
+         Y3Z/P2ArZC+yw6HLKKW+bsn0QHnUgmH92A39BF53AWtdhRXr/RFJvyoL03+lR84Uovuw
+         /fYw==
+X-Gm-Message-State: AOJu0YzgZHaG648mlzl4eUhk8BwA+6/9MlwqWqzRd99gw1mkrqDj+Bdl
+        Ovl+NFrEpQ5UdfdF/0zBofr0PCEfK/Am4mxgkbpn5c25r+wXqlyJD2ptDnva1jNkVlcEI5w6dM0
+        s0C6W5eTzX+zW2HccQY+l52r5YBB0s+s=
+X-Received: by 2002:a0d:cc4f:0:b0:589:9717:22c7 with SMTP id o76-20020a0dcc4f000000b00589971722c7mr17360000ywd.22.1692898158390;
+        Thu, 24 Aug 2023 10:29:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHmeYlMkCNuo+7CDeTB21G5NrpqS/me37OKLf0uCIlrBJBWE2Vt23KkjQHGOtx0lr1+0c0weg==
+X-Received: by 2002:a0d:cc4f:0:b0:589:9717:22c7 with SMTP id o76-20020a0dcc4f000000b00589971722c7mr17359897ywd.22.1692898156657;
+        Thu, 24 Aug 2023 10:29:16 -0700 (PDT)
+Received: from ?IPv6:2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a? ([2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a])
+        by smtp.gmail.com with ESMTPSA id v20-20020a814814000000b00586ba973bddsm3828ywa.110.2023.08.24.10.29.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 10:29:16 -0700 (PDT)
+Message-ID: <94477c459a398c47cb251afbcafbc9a6a83bba6f.camel@redhat.com>
 Subject: Re: LVM kernel lockup scenario during lvcreate
-Content-Language: en-US
-To:     Jaco Kroon <jaco@uls.co.za>,
+From:   Laurence Oberman <loberman@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>, Jaco Kroon <jaco@uls.co.za>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date:   Thu, 24 Aug 2023 13:29:14 -0400
+In-Reply-To: <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
 References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
- <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
- <102b1994-74ff-c099-292c-f5429ce768c3@uls.co.za>
- <6b066ab5-7806-5a23-72a5-073153259116@acm.org>
- <544f4434-a32a-1824-b57a-9f7ff12dbb4f@uls.co.za>
- <a6d73e89-7a0c-3173-5f70-cd12cc7ef158@acm.org>
- <18d1c5a6-acd3-88cf-f997-80d97f43ab5c@uls.co.za>
- <0beea79c-af29-9f8f-e1f4-c8deba5a65c8@uls.co.za>
- <07d8b189-9379-560b-3291-3feb66d98e5c@acm.org>
- <ea29d76f-99c0-fcf2-09a3-4cc2e18f87da@uls.co.za>
- <1cf96e3b-e5e0-bcdb-df2b-ef9cbe51f9ca@acm.org>
- <ef2812b4-7853-9dda-85dd-210636840a59@uls.co.za>
- <d4b1c5d7-020b-7ef9-ee43-e78891649a3c@uls.co.za>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <d4b1c5d7-020b-7ef9-ee43-e78891649a3c@uls.co.za>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+         <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/24/23 00:29, Jaco Kroon wrote:
-> We're definitely seeing the same thing on another host using an ahci 
-> controller.  This seems to hint that it's not a firmware issue, as does 
-> the fact that this happens much less frequently with the none scheduler.
+On Mon, 2023-06-12 at 11:40 -0700, Bart Van Assche wrote:
+> On 6/9/23 00:29, Jaco Kroon wrote:
+> > I'm attaching dmesg -T and ps axf.=C2=A0 dmesg in particular may provid=
+e
+> > clues as it provides a number of stack traces indicating stalling
+> > at
+> > IO time.
+> >=20
+> > Once this has triggered, even commands such as "lvs" goes into
+> > uninterruptable wait, I unfortunately didn't test "dmsetup ls" now
+> > and triggered a reboot already (system needs to be up).
+>=20
+> To me the call traces suggest that an I/O request got stuck.=20
+> Unfortunately call traces are not sufficient to identify the root
+> cause=20
+> in case I/O gets stuck. Has debugfs been mounted? If so, how about=20
+> dumping the contents of /sys/kernel/debug/block/ into a tar file
+> after=20
+> the lockup has been reproduced and sharing that information?
+>=20
+> tar -czf- -C /sys/kernel/debug/block . >block.tgz
+>=20
+> Thanks,
+>=20
+> Bart.
+>=20
 
-That is unexpected. I don't think there is enough data available yet to
-conclude whether these issues are identical or not?
+One I am aware of is this
+commit 106397376c0369fcc01c58dd189ff925a2724a57
+Author: David Jeffery <djeffery@redhat.com>
 
-> I will make a plan to action the firmware updates on the raid controller 
-> over the weekend regardless, just in order to eliminate that.  I will 
-> then revert to mq-deadline.  Assuming this does NOT fix it, how would I 
-> go about assessing if this is a controller firmware issue or a Linux 
-> kernel issue?
+Can we try get a vmcore (assuming its not a secure site)
 
-If the root cause would be an issue in the mq-deadline scheduler or in
-the core block layer then there would be many more reports about I/O
-lockups. For this case I think that it's very likely that the root cause 
-is either the I/O controller driver or the I/O controller firmware.
+Add these to /etc/sysctl.conf
 
-Thanks,
+kernel.panic_on_io_nmi =3D 1
+kernel.panic_on_unrecovered_nmi =3D 1
+kernel.unknown_nmi_panic =3D 1
 
-Bart.
+Run sysctl -p
+Ensure kdump is running and can capture a vmcore
 
+When it locks up again
+send an NMI via the SuperMicro Web Managemnt interface
+
+Share the vmcore, or we can have you capture some specifics from it to
+triage.
+
+Thanks
+Laurence
 
 
