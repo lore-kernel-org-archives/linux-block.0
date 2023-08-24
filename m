@@ -2,117 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E290C3DA6F
-	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 16:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D6AC83003
+	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 17:03:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242705AbjHXQwi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 12:52:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50146 "EHLO
+        id S237464AbjHXRCr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 13:02:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242750AbjHXQwQ (ORCPT
+        with ESMTP id S242695AbjHXRCe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 12:52:16 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57A41BC2;
-        Thu, 24 Aug 2023 09:52:13 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-68a3e271491so70975b3a.0;
-        Thu, 24 Aug 2023 09:52:13 -0700 (PDT)
+        Thu, 24 Aug 2023 13:02:34 -0400
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E11041B0;
+        Thu, 24 Aug 2023 10:02:32 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-689f9576babso90921b3a.0;
+        Thu, 24 Aug 2023 10:02:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692895933; x=1693500733;
+        d=1e100.net; s=20221208; t=1692896552; x=1693501352;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dKJijkF155eGYoq1EBWJ9X5JNwQHMUG5mlsWsZ3nTqk=;
-        b=hUfuFU7If0c4h2ETcS0bnBoPqW/IJG1YNxRhdtmTwPuQN/7RIGdzELU3M+jYYfv6kZ
-         7UaggKGXTOF9d7BKuckk+J9q7vMuWP7oTrXdoFBH0HA+O1KF4S0EaRgSYpaLRO5AoT4X
-         2rGV5ln5/qVsOYELiVvOUnZFAFkJ4CGl7detjXDYcm95n7jUaiXRopS/5uiEhYCB6U/u
-         PiL2oXr265WqI79RkZgSWGtD6XGZc0W2s7Fvz7c15nnkkJYHiHKbzif7Mq/FkQim2tj6
-         /lWqcxsqMQ6AmCbUHolZ6FchMrAKr+AqpFyL7vvzf6fRQ9foK6fdL96kjKT8e1Z95val
-         +sig==
-X-Gm-Message-State: AOJu0YxAqkGsTSjCM9DItDAdhcKApt5tOb030sChvlGGsF+ljSb27U1O
-        flZu5CMdZkqacF80nFTp4To=
-X-Google-Smtp-Source: AGHT+IGCbX01wUabFA10fO9YzvjZ5TWcCaMiVWqPfI5uv8jJP9TYMhM7crYZB4rkXHd30AkPejkbww==
-X-Received: by 2002:a05:6a00:2389:b0:686:be77:431c with SMTP id f9-20020a056a00238900b00686be77431cmr16715374pfc.13.1692895933183;
-        Thu, 24 Aug 2023 09:52:13 -0700 (PDT)
+        bh=MO7O1kGOwFS/EawXS/x6fpyq+z0MGjgPDj7Ob5YzAfo=;
+        b=PAog45iQqHFoFCMzvY/6N7lD7430+3nKfIT3QT3daIY0QIE8U1EX9lCGYL6W1pSrsC
+         /uIc8OaKt+ut+buwzyq3XHQ7aW8icpQTHauB0x8R67cE6KNba+GSvRppd+E51JTKLhH4
+         V9cgkpfpiQTNk63y5rVvMCBO8NLhgMScjghXyh7Z2QUITmloIClP2lpy6bWeWaAWwpus
+         2STCwTZJOzunysEzZTqZdiNC0WRaxYnG4ORt3xJkhG8pfW/XYFZ1/wyVGL7JbZXwwEGn
+         Sd/Jbgmm1XtyC2AL68fnzzFTghTxXpR4bazI8K2tIcqGZ9BlPzfatF+ZyrLtkai4P7Or
+         L5Yg==
+X-Gm-Message-State: AOJu0YzWZwL3M2NZ5ih++rn/5LRg6FTamyrd5kk3PbxRtYw4gxiy5Hrt
+        HG/aj/AvzwaABUu57kUlxeI=
+X-Google-Smtp-Source: AGHT+IF3ln2fx6jVdhLG2TITnTUr0jZ9VXG2QusjVA6MG79oOYp0rA5bKlVvBkyv1SqOK12SertYnQ==
+X-Received: by 2002:a05:6a20:8e01:b0:13e:b7e9:1a71 with SMTP id y1-20020a056a208e0100b0013eb7e91a71mr17005086pzj.14.1692896552070;
+        Thu, 24 Aug 2023 10:02:32 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:e6ec:4683:972:2d78? ([2620:15c:211:201:e6ec:4683:972:2d78])
-        by smtp.gmail.com with ESMTPSA id a18-20020aa78652000000b00666e649ca46sm7800956pfo.101.2023.08.24.09.52.11
+        by smtp.gmail.com with ESMTPSA id r15-20020a62e40f000000b006887037cde6sm1499780pfh.60.2023.08.24.10.02.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 09:52:12 -0700 (PDT)
-Message-ID: <1e54cf7a-4e8f-4539-6677-d6bf0ec88ea5@acm.org>
-Date:   Thu, 24 Aug 2023 09:52:10 -0700
+        Thu, 24 Aug 2023 10:02:31 -0700 (PDT)
+Message-ID: <e4701e0e-57a3-6ee3-8686-6b1d3750c124@acm.org>
+Date:   Thu, 24 Aug 2023 10:02:30 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.1
-Subject: Re: [PATCH v11 04/16] scsi: core: Introduce a mechanism for
- reordering requests in the error handler
+Subject: Re: [PATCH 0/6] blk-mq: optimize the queue_rqs() support
 Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20230822191822.337080-1-bvanassche@acm.org>
- <20230822191822.337080-5-bvanassche@acm.org>
- <3562fc36-4bc2-b4fb-a2ad-1e310baf1b47@suse.de>
- <078d2954-f4af-6678-29ce-d8f65ff1397a@acm.org>
- <741e19ae-d4fd-11f5-7faa-18b888ff769c@kernel.org>
- <6355b575-3f59-93dc-5acf-4726c6e80a15@acm.org>
- <5c36ae01-a806-a36b-0196-41c217f78307@suse.de>
+To:     chengming.zhou@linux.dev, axboe@kernel.dk, hch@lst.de,
+        ming.lei@redhat.com, kbusch@kernel.org
+Cc:     mst@redhat.com, sagi@grimberg.me, damien.lemoal@opensource.wdc.com,
+        kch@nvidia.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
+References: <20230824144403.2135739-1-chengming.zhou@linux.dev>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <5c36ae01-a806-a36b-0196-41c217f78307@suse.de>
+In-Reply-To: <20230824144403.2135739-1-chengming.zhou@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/24/23 09:44, Hannes Reinecke wrote:
-> On 8/24/23 16:47, Bart Van Assche wrote:
->> Thanks for the feedback. I agree that it would be great to have zone 
->> append
->> support in F2FS. However, I do not agree that switching from regular 
->> writes
->> to zone append in F2FS would remove the need for sorting SCSI commands 
->> by LBA in the SCSI error handler. Even if F2FS would submit zoned writes
->> then the following mechanisms could still cause reordering of the zoned
->> write after these have been translated into regular writes:
->> * The SCSI protocol allows SCSI devices, including UFS devices, to 
->> respond
->> with a unit attention or the SCSI BUSY status at any time. If multiple 
->> write commands are pending and some of the pending SCSI writes are not
->> executed because of a unit attention or because of another reason, this
->> causes command reordering.
+On 8/24/23 07:43, chengming.zhou@linux.dev wrote:
+> From: Chengming Zhou <zhouchengming@bytedance.com>
 > 
-> Yes. But the important thing to remember is that with 'zone append' the 
-> resulting LBA will be returned on completion, they will _not_ be 
-> specified in the submission. So any command reordering doesn't affect 
-> the zone append commands as they heven't been written yet.
+> The current queue_rqs() support has limitation that it can't work on
+> shared tags queue, which is resolved by patch 1-3. We move the account
+> of active requests to where we really allocate the driver tag.
 > 
->> * Although the link between the UFS controller and the UFS device is 
->> pretty
->> reliable, there is a non-zero chance that a SCSI command is lost. If this
->> happens the SCSI timeout and error handlers are activated. This can cause
->> reordering of write commands.
->>
-> Again, reordering is not an issue with zone append. With zone append you 
-> specify in which zone the command should land, and upon completion the 
-> LBA where the data is written will be returned.
+> This is clearer and matched with the unaccount side which now happen
+> when we put the driver tag. And we can remove RQF_MQ_INFLIGHT, which
+> was used to avoid double account problem of flush request.
 > 
-> So if there is an error the command has not been written, consequently 
-> there is no LBA to worry about, and you can reorder at will.
+> Another problem is that the driver that support queue_rqs() has to
+> set inflight request table by itself, which is resolved in patch 4.
+> 
+> The patch 5 fixes a potential race problem which may cause false
+> timeout because of the reorder of rq->state and rq->deadline.
+> 
+> The patch 6 add support queue_rqs() for null_blk, which showed a
+> 3.6% IOPS improvement in fio/t/io_uring benchmark on my test VM.
+> And we also use it for testing queue_rqs() on shared tags queue.
 
-Hi Hannes,
+Hi Jens and Christoph,
 
-I agree that reordering is not an issue for NVMe zone append commands.
-It is an issue however with SCSI devices because there is no zone append
-command in the SCSI command set. The sd_zbc.c code translates zone
-appends (REQ_OP_ZONE_APPEND) into regular WRITE commands. If these WRITE
-commands are reordered, the ZBC standard requires that these commands
-fail with an UNALIGNED WRITE error. So I think for SCSI devices what you
-wrote is wrong.
+This patch series would be simplified significantly if the code for
+fair tag allocation would be removed first
+(https://lore.kernel.org/linux-block/20230103195337.158625-1-bvanassche@acm.org/, 
+January 2023).
+It has been proposed to improve fair tag sharing but the complexity of
+the proposed alternative is scary
+(https://lore.kernel.org/linux-block/20230618160738.54385-1-yukuai1@huaweicloud.com/, 
+June 2023).
+  Does everyone agree with removing the code for fair tag sharing - code
+that significantly hurts performance of UFS devices and code that did
+not exist in the legacy block layer?
+
+Thanks,
 
 Bart.
-
