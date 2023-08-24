@@ -2,102 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4835AC27C40
-	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 14:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 745CFC71153
+	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 14:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236907AbjHXOqE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 10:46:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37000 "EHLO
+        id S235773AbjHXOsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 10:48:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241750AbjHXOpe (ORCPT
+        with ESMTP id S241844AbjHXOsb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 10:45:34 -0400
-Received: from out-51.mta1.migadu.com (out-51.mta1.migadu.com [IPv6:2001:41d0:203:375::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B75841BC8
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 07:45:32 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692888330;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KuUH+9zTpQHPAacq3J8wMyhnGazr4U6zklKopxDD0no=;
-        b=nQd1/FwzjzBFi7rMxNcNiH+nJ08oYnR89VYgKO2z6iN1+2H5zVbUphrNLZ+n1fVUXYQHqz
-        fHhAdGpe+xkMok57NI7IWItVvXkPAhc32VIii9eqjap3szb7J/lQk5rqsAywa6VAmMKVqK
-        o/vCJY4RvmF4WMsMfmYiXwLFstL5JlM=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com,
-        bvanassche@acm.org, kbusch@kernel.org
-Cc:     mst@redhat.com, sagi@grimberg.me, damien.lemoal@opensource.wdc.com,
-        kch@nvidia.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
-Subject: [PATCH 6/6] block/null_blk: add queue_rqs() support
-Date:   Thu, 24 Aug 2023 22:44:03 +0800
-Message-ID: <20230824144403.2135739-7-chengming.zhou@linux.dev>
-In-Reply-To: <20230824144403.2135739-1-chengming.zhou@linux.dev>
-References: <20230824144403.2135739-1-chengming.zhou@linux.dev>
+        Thu, 24 Aug 2023 10:48:31 -0400
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABD7C1BD4;
+        Thu, 24 Aug 2023 07:48:02 -0700 (PDT)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1bf55a81eeaso34417505ad.0;
+        Thu, 24 Aug 2023 07:48:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692888468; x=1693493268;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Go0JA+ncTUVKQH5aP2NozeJeq8XplVwTrOGU4aPJmRA=;
+        b=KiTENg0bt26Xu/XdDOTeoJAS4Ljw6Xgzuxp/YWfkcrThGPWmDDzc7UIfuyfFIEVHto
+         RyZAHgZnArG5HcleAyRdXB5GIDDsvzmkQi0MGBm+bjH8H+DaJ7mMLTaic3FhtfqwO63O
+         WUMq3bHq+lB8tUHntoSrFgoc2daF8duqPpf2WSD1SmKE3Wozsaubm6QJxf13pf0Juq2m
+         eBtkTck3vmgVztOFEBJsqnPsWrx+yG6ocVK9htkLe7vENzYSzKqi8rVaKHe/t+W8jdTd
+         2S65m2jbHpUr2Ss4AorWRujBDvF97u+iigtvM02DthDc5K36ehxmzSCUYhP4wNTbnlZ6
+         cGIA==
+X-Gm-Message-State: AOJu0YyPoefDuLXrX9AkTcITX1Q+KX7DBtke30EXtAUy/7Dn+DslNE8G
+        dJQ2fQzdwh8Go4fTnd9ZAEg=
+X-Google-Smtp-Source: AGHT+IFW6UXRkLM6aMG+WThvbRzjw8qMM8hO0l9+4XzDaaDfGlIvrNQZpkMORXUzZGhGBoxuhimc2w==
+X-Received: by 2002:a17:902:b709:b0:1bd:a0cd:1860 with SMTP id d9-20020a170902b70900b001bda0cd1860mr10982628pls.64.1692888467851;
+        Thu, 24 Aug 2023 07:47:47 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:e6ec:4683:972:2d78? ([2620:15c:211:201:e6ec:4683:972:2d78])
+        by smtp.gmail.com with ESMTPSA id jg5-20020a17090326c500b001b9d8688956sm12923006plb.144.2023.08.24.07.47.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Aug 2023 07:47:47 -0700 (PDT)
+Message-ID: <6355b575-3f59-93dc-5acf-4726c6e80a15@acm.org>
+Date:   Thu, 24 Aug 2023 07:47:45 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v11 04/16] scsi: core: Introduce a mechanism for
+ reordering requests in the error handler
+Content-Language: en-US
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20230822191822.337080-1-bvanassche@acm.org>
+ <20230822191822.337080-5-bvanassche@acm.org>
+ <3562fc36-4bc2-b4fb-a2ad-1e310baf1b47@suse.de>
+ <078d2954-f4af-6678-29ce-d8f65ff1397a@acm.org>
+ <741e19ae-d4fd-11f5-7faa-18b888ff769c@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <741e19ae-d4fd-11f5-7faa-18b888ff769c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+On 8/23/23 16:22, Damien Le Moal wrote:
+> The sd driver does have zone append emulation using regular writes. The
+> emulation relies on zone write locking to avoid issues with adapters that do not
+> have strong ordering guarantees, but that could be adapted to be removed for UFS
+> devices with write ordering guarantees. This solution would greatly simplify
+> your series since zone append requests are not subject to zone write locking at
+> the block layer. So no changes would be needed at that layer.
+> 
+> However, that implies that your preferred use case (f2fs) must be adapted to use
+> zone append instead of regular writes. That in itself may be a bigger-ish
+> change, but in the long run, likely a better one I think as that would be
+> compatible with NVMe ZNS and also future UFS standards defining a zone append
+> command.
 
-Add batched mq_ops.queue_rqs() support in null_blk for testing. The
-implementation is much easy since null_blk doesn't have commit_rqs().
+Hi Damien,
 
-We simply handle each request one by one, if errors are encountered,
-leave them in the passed in list and return back.
+Thanks for the feedback. I agree that it would be great to have zone append
+support in F2FS. However, I do not agree that switching from regular writes
+to zone append in F2FS would remove the need for sorting SCSI commands by LBA
+in the SCSI error handler. Even if F2FS would submit zoned writes then the
+following mechanisms could still cause reordering of the zoned writes after
+these have been translated into regular writes:
+* The SCSI protocol allows SCSI devices, including UFS devices, to respond
+with a unit attention or the SCSI BUSY status at any time. If multiple write
+commands are pending and some of the pending SCSI writes are not executed
+because of a unit attention or because of another reason, this causes
+command reordering.
+* Although the link between the UFS controller and the UFS device is pretty
+reliable, there is a non-zero chance that a SCSI command is lost. If this
+happens the SCSI timeout and error handlers are activated. This can cause
+reordering of write commands.
 
-There is about 3.6% improvement in IOPS of fio/t/io_uring on null_blk
-with hw_queue_depth=256 on my test VM, from 1.09M to 1.13M.
+In other words, whether F2FS submits regular writes (REQ_OP_WRITE) or zone
+appends (REQ_OP_ZONE_APPEND), I think we need the entire patch series.
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- drivers/block/null_blk/main.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+Thanks,
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 864013019d6b..1b1b58d36707 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1742,6 +1742,25 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return null_handle_cmd(cmd, sector, nr_sectors, req_op(rq));
- }
- 
-+static void null_queue_rqs(struct request **rqlist)
-+{
-+	struct request *requeue_list = NULL;
-+	struct request **requeue_lastp = &requeue_list;
-+	struct blk_mq_queue_data bd = { };
-+	blk_status_t ret;
-+
-+	do {
-+		struct request *rq = rq_list_pop(rqlist);
-+
-+		bd.rq = rq;
-+		ret = null_queue_rq(rq->mq_hctx, &bd);
-+		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
-+			rq_list_add_tail(&requeue_lastp, rq);
-+	} while (!rq_list_empty(*rqlist));
-+
-+	*rqlist = requeue_list;
-+}
-+
- static void cleanup_queue(struct nullb_queue *nq)
- {
- 	bitmap_free(nq->tag_map);
-@@ -1794,6 +1813,7 @@ static int null_init_hctx(struct blk_mq_hw_ctx *hctx, void *driver_data,
- 
- static const struct blk_mq_ops null_mq_ops = {
- 	.queue_rq       = null_queue_rq,
-+	.queue_rqs	= null_queue_rqs,
- 	.complete	= null_complete_rq,
- 	.timeout	= null_timeout_rq,
- 	.poll		= null_poll,
--- 
-2.41.0
-
+Bart.
