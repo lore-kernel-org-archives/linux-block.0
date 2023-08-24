@@ -2,186 +2,339 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5453AC6FA8F
-	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 20:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F80C3DA6F
+	for <linux-block@archiver.kernel.org>; Thu, 24 Aug 2023 20:29:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236813AbjHXUVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 16:21:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55140 "EHLO
+        id S237170AbjHXU3V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 16:29:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238291AbjHXUUt (ORCPT
+        with ESMTP id S243587AbjHXU3O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 16:20:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3F5E4B
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 13:20:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692908400;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Thu, 24 Aug 2023 16:29:14 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41AB6E5E;
+        Thu, 24 Aug 2023 13:29:12 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D72001F388;
+        Thu, 24 Aug 2023 20:29:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1692908950; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=h4Z0d4E9iPXvaKz/Jyh5mYwykExSOMrH0ov7WaYqyyM=;
-        b=KPXMGivb+B/Pue99s7seqUqIt9Mqhk6iZSP7T8kZZvWvZZituwYZqOtiE5LzH2ii8mqANf
-        YVV9Of1G6qnnWv6S7SX0wun2ph6OBFeDcN+1liJzKOc+V1i6MhqdGokCRphY7TPMOVfRd6
-        LMndBNOdIAwf1UCNEm1ZGwO4P/DNsqE=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-192-R3PyXUwaP5KssQRdiDnMag-1; Thu, 24 Aug 2023 16:19:58 -0400
-X-MC-Unique: R3PyXUwaP5KssQRdiDnMag-1
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-57116decad8so275023eaf.2
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2023 13:19:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692908394; x=1693513194;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=h4Z0d4E9iPXvaKz/Jyh5mYwykExSOMrH0ov7WaYqyyM=;
-        b=DNrr6LHNCj/OH9qNW+0pBy1fjV+4xHMCiMX1DeFBtQtI6tnroKFDEHkBh+XRIw8G+M
-         wFiqi5rU9uJYWd0bq73JjKfAoTc5Qj3OQ9ItaCiHC/f7KWC80wzDUS12bK6WC+fFpe8u
-         lXFRvSQKuPTYsGZX+uWCP7AMv1y0858aF7EbIJIDlnHSkfKGKii+IxezHJMPwksixvQg
-         9CgAgTXkn1COJjo+oTZzsCV9jGC2WaqsHWhVz4wPfNuCQQNvHlkjD+merVHTLZd1RrWy
-         ZJegECVc0mPCklhy7hcVz/QZRwrK3O/zxbXO8SFy2k6RVR18oDWmevXAz3li844fk0we
-         mm3w==
-X-Gm-Message-State: AOJu0YwvpnLvR/DQv0VPC7ljlkXc9MNUgpBzlb/FVridnBFESm8qdmVQ
-        j+ZjuOyfuP81TIC2hx+kQosuWOgEHjXTSRLVFxciJ5IZSiovLvgcsS5pJMUHPgaWuRCT9QfrPBf
-        HBMDx0fJ0vwPcQvUuuaIaRL5EN/QxY+g=
-X-Received: by 2002:a05:6358:893:b0:133:a55:7e26 with SMTP id m19-20020a056358089300b001330a557e26mr15393267rwj.7.1692908393973;
-        Thu, 24 Aug 2023 13:19:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE+atzCLnDevWDsek3DwGGBemrxM7CbQNyCu5IzMhL7JVssTeyYNt/q2q+VtND3pOro+cGTUQ==
-X-Received: by 2002:a05:6358:893:b0:133:a55:7e26 with SMTP id m19-20020a056358089300b001330a557e26mr15393245rwj.7.1692908393610;
-        Thu, 24 Aug 2023 13:19:53 -0700 (PDT)
-Received: from ?IPv6:2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a? ([2600:6c64:4e7f:603b:fc4d:8b7c:e90c:601a])
-        by smtp.gmail.com with ESMTPSA id l4-20020a81d544000000b00589b653b7adsm81762ywj.136.2023.08.24.13.19.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 13:19:53 -0700 (PDT)
-Message-ID: <69227e4091f3d9b05e739f900340f11afacdd91f.camel@redhat.com>
-Subject: Re: LVM kernel lockup scenario during lvcreate
-From:   Laurence Oberman <loberman@redhat.com>
-To:     Jaco Kroon <jaco@uls.co.za>, Bart Van Assche <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Date:   Thu, 24 Aug 2023 16:19:51 -0400
-In-Reply-To: <977a1223-a543-a6ca-4a6c-0cf0fc6f84a0@uls.co.za>
-References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
-         <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
-         <94477c459a398c47cb251afbcafbc9a6a83bba6f.camel@redhat.com>
-         <977a1223-a543-a6ca-4a6c-0cf0fc6f84a0@uls.co.za>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        bh=JQAQKE6rbPIyb5a0hti3yhTSTlKjXTKmVblp4XKlyU8=;
+        b=MAzoDJ5U8gAlu25xUnZZGYXSvKEeoo1QFr5Xj3X4Zoh4zRkK6/tmTGuDl3OCufLneyQ0Hx
+        FfXtO9H+LvJygcOuIcK6nBbi1XWvVfZZBVcsQ2wiW9oEcUhNuR1NaDPIss9fCE2LKlZ4jJ
+        Tv/idwiIZvjRJvppkmdCoX/46ysAt5M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1692908950;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JQAQKE6rbPIyb5a0hti3yhTSTlKjXTKmVblp4XKlyU8=;
+        b=L/1a3GCZwjy0f6UnjdSbaHFo1dli9VE9HWuPcNzWhYrdyKRFlCffKcI5rZieDztoVkgwDn
+        1KgZhtFeg3QS0vAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C791C132F2;
+        Thu, 24 Aug 2023 20:29:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vHOtMJa952QMQQAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 24 Aug 2023 20:29:10 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 5AAC0A0774; Thu, 24 Aug 2023 22:29:10 +0200 (CEST)
+Date:   Thu, 24 Aug 2023 22:29:10 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 28/29] xfs: Convert to bdev_open_by_path()
+Message-ID: <20230824202910.wkzkvx6hbgdz6wuh@quack3>
+References: <20230818123232.2269-1-jack@suse.cz>
+ <20230823104857.11437-28-jack@suse.cz>
+ <ZOaEHrkx1xS9bgk9@dread.disaster.area>
+ <20230824102837.credhh3fsco6vf7p@quack3>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="2mxd4naznidvsths"
+Content-Disposition: inline
+In-Reply-To: <20230824102837.credhh3fsco6vf7p@quack3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2023-08-24 at 22:01 +0200, Jaco Kroon wrote:
-> Hi,
->=20
-> On 2023/08/24 19:29, Laurence Oberman wrote:
->=20
-> > On Mon, 2023-06-12 at 11:40 -0700, Bart Van Assche wrote:
-> > > On 6/9/23 00:29, Jaco Kroon wrote:
-> > > > I'm attaching dmesg -T and ps axf.=C2=A0 dmesg in particular may
-> > > > provide
-> > > > clues as it provides a number of stack traces indicating
-> > > > stalling
-> > > > at
-> > > > IO time.
-> > > >=20
-> > > > Once this has triggered, even commands such as "lvs" goes into
-> > > > uninterruptable wait, I unfortunately didn't test "dmsetup ls"
-> > > > now
-> > > > and triggered a reboot already (system needs to be up).
-> > > To me the call traces suggest that an I/O request got stuck.
-> > > Unfortunately call traces are not sufficient to identify the root
-> > > cause
-> > > in case I/O gets stuck. Has debugfs been mounted? If so, how
-> > > about
-> > > dumping the contents of /sys/kernel/debug/block/ into a tar file
-> > > after
-> > > the lockup has been reproduced and sharing that information?
-> > >=20
-> > > tar -czf- -C /sys/kernel/debug/block . >block.tgz
-> > >=20
-> > > Thanks,
-> > >=20
-> > > Bart.
-> > >=20
-> > One I am aware of is this
-> > commit 106397376c0369fcc01c58dd189ff925a2724a57
-> > Author: David Jeffery <djeffery@redhat.com>
-> >=20
-> > Can we try get a vmcore (assuming its not a secure site)
->=20
-> Certainly.=C2=A0 Obviously on any host handling any kind of sensitive dat=
-a
-> there is a likelihood that sensitive data may be present in the
-> vmcore,=20
-> as such I more than happy to create a vmcore, I'm assuming this will=20
-> create a kernel version of a core dump ... with 256GB of RAM (most of
-> which goes towards disk caches) I'm further assuming this file can be
-> potentially large.=C2=A0 Where will this get stored should the capture be=
-=20
-> made?=C2=A0 (I need to ensure that the filesystem has sufficient storage=
-=20
-> available)
->=20
-> >=20
-> > Add these to /etc/sysctl.conf
-> >=20
-> > kernel.panic_on_io_nmi =3D 1
-> > kernel.panic_on_unrecovered_nmi =3D 1
-> > kernel.unknown_nmi_panic =3D 1
-> >=20
-> > Run sysctl -p
-> > Ensure kdump is running and can capture a vmcore
-> Done.=C2=A0 Had to enable a few extra kernel options to get all the other=
-=20
-> requirements, so scheduled a reboot to activate the new kernel. This=20
-> will happen on Saturday morning very early.
-> >=20
-> > When it locks up again
-> > send an NMI via the SuperMicro Web Managemnt interface
->=20
-> Possible to send from sysrq at the keyboard?=C2=A0 Otherwise I'll just
-> need=20
-> to set up the RMI, will just be easier to do this from the keyboard
-> if=20
-> possible, it's not always if it's left too late.
->=20
-> >=20
-> > Share the vmcore, or we can have you capture some specifics from it
-> > to
-> > triage.
->=20
-> I'd prefer you let me know what you need ... security concerns and
-> all=20
-> ... frankly, I highly doubt there is any data that is really so=20
-> sensitive that it can be classified as "top secret" but we do have
-> NDAs=20
-> in place prohibiting me from sharing anything that may potentially=20
-> contain customer related data ...
->=20
-> Kind regards,
-> Jaco
->=20
 
-Hello, this would usually need an NMI sent from a management interface
-as with it locked up no guarantee a sysrq c will get there from the
-keyboard.=C2=A0
-You could try though.
+--2mxd4naznidvsths
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-As long as you have in /etc/kdump.conf=20
+On Thu 24-08-23 12:28:37, Jan Kara wrote:
+> On Thu 24-08-23 08:11:42, Dave Chinner wrote:
+> > On Wed, Aug 23, 2023 at 12:48:39PM +0200, Jan Kara wrote:
+> > > Convert xfs to use bdev_open_by_path() and pass the handle around.
+> > ....
+> > 
+> > > @@ -426,15 +427,15 @@ xfs_shutdown_devices(
+> > >  	 * race, everyone loses.
+> > >  	 */
+> > >  	if (mp->m_logdev_targp && mp->m_logdev_targp != mp->m_ddev_targp) {
+> > > -		blkdev_issue_flush(mp->m_logdev_targp->bt_bdev);
+> > > -		invalidate_bdev(mp->m_logdev_targp->bt_bdev);
+> > > +		blkdev_issue_flush(mp->m_logdev_targp->bt_bdev_handle->bdev);
+> > > +		invalidate_bdev(mp->m_logdev_targp->bt_bdev_handle->bdev);
+> > >  	}
+> > >  	if (mp->m_rtdev_targp) {
+> > > -		blkdev_issue_flush(mp->m_rtdev_targp->bt_bdev);
+> > > -		invalidate_bdev(mp->m_rtdev_targp->bt_bdev);
+> > > +		blkdev_issue_flush(mp->m_rtdev_targp->bt_bdev_handle->bdev);
+> > > +		invalidate_bdev(mp->m_rtdev_targp->bt_bdev_handle->bdev);
+> > >  	}
+> > > -	blkdev_issue_flush(mp->m_ddev_targp->bt_bdev);
+> > > -	invalidate_bdev(mp->m_ddev_targp->bt_bdev);
+> > > +	blkdev_issue_flush(mp->m_ddev_targp->bt_bdev_handle->bdev);
+> > > +	invalidate_bdev(mp->m_ddev_targp->bt_bdev_handle->bdev);
+> > >  }
+> > 
+> > Why do these need to be converted to run through bt_bdev_handle?  If
+> > the buftarg is present and we've assigned targp->bt_bdev_handle
+> > during the call to xfs_alloc_buftarg(), then we've assigned
+> > targp->bt_bdev from the handle at the same time, yes?
+> 
+> Good point, these conversions are pointless now so I've removed them. They
+> are leftover from a previous version based on a kernel where xfs was
+> dropping bdev references in a different place. Thanks for noticing.
 
-path /var/crash
-core_collector makedumpfile -l --message-level 7 -d 31
+FWIW attached is a new version of the patch I have currently in my tree.
 
-This will get kernel only pages and would not be very big.
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
-I could work with you privately to get what we need out of the vmcore
-and we would avoid transferring it.
+--2mxd4naznidvsths
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-xfs-Convert-to-bdev_open_by_path.patch"
 
-Thanks
-Laurence
+From 7ba12a848a8dcf70029c897b8cf7bca6d4f8c098 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Fri, 23 Jun 2023 15:48:53 +0200
+Subject: [PATCH] xfs: Convert to bdev_open_by_path()
 
+Convert xfs to use bdev_open_by_path() and pass the handle around.
+
+CC: "Darrick J. Wong" <djwong@kernel.org>
+CC: linux-xfs@vger.kernel.org
+Acked-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/xfs/xfs_buf.c   | 22 ++++++++++------------
+ fs/xfs/xfs_buf.h   |  3 ++-
+ fs/xfs/xfs_super.c | 42 ++++++++++++++++++++++++------------------
+ 3 files changed, 36 insertions(+), 31 deletions(-)
+
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index 3b903f6bce98..75a98eec2b27 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -1938,8 +1938,6 @@ void
+ xfs_free_buftarg(
+ 	struct xfs_buftarg	*btp)
+ {
+-	struct block_device	*bdev = btp->bt_bdev;
+-
+ 	unregister_shrinker(&btp->bt_shrinker);
+ 	ASSERT(percpu_counter_sum(&btp->bt_io_count) == 0);
+ 	percpu_counter_destroy(&btp->bt_io_count);
+@@ -1947,8 +1945,8 @@ xfs_free_buftarg(
+ 
+ 	fs_put_dax(btp->bt_daxdev, btp->bt_mount);
+ 	/* the main block device is closed by kill_block_super */
+-	if (bdev != btp->bt_mount->m_super->s_bdev)
+-		blkdev_put(bdev, btp->bt_mount->m_super);
++	if (btp->bt_bdev != btp->bt_mount->m_super->s_bdev)
++		bdev_release(btp->bt_bdev_handle);
+ 
+ 	kmem_free(btp);
+ }
+@@ -1983,16 +1981,15 @@ xfs_setsize_buftarg(
+  */
+ STATIC int
+ xfs_setsize_buftarg_early(
+-	xfs_buftarg_t		*btp,
+-	struct block_device	*bdev)
++	xfs_buftarg_t		*btp)
+ {
+-	return xfs_setsize_buftarg(btp, bdev_logical_block_size(bdev));
++	return xfs_setsize_buftarg(btp, bdev_logical_block_size(btp->bt_bdev));
+ }
+ 
+ struct xfs_buftarg *
+ xfs_alloc_buftarg(
+ 	struct xfs_mount	*mp,
+-	struct block_device	*bdev)
++	struct bdev_handle	*bdev_handle)
+ {
+ 	xfs_buftarg_t		*btp;
+ 	const struct dax_holder_operations *ops = NULL;
+@@ -2003,9 +2000,10 @@ xfs_alloc_buftarg(
+ 	btp = kmem_zalloc(sizeof(*btp), KM_NOFS);
+ 
+ 	btp->bt_mount = mp;
+-	btp->bt_dev =  bdev->bd_dev;
+-	btp->bt_bdev = bdev;
+-	btp->bt_daxdev = fs_dax_get_by_bdev(bdev, &btp->bt_dax_part_off,
++	btp->bt_bdev_handle = bdev_handle;
++	btp->bt_dev = bdev_handle->bdev->bd_dev;
++	btp->bt_bdev = bdev_handle->bdev;
++	btp->bt_daxdev = fs_dax_get_by_bdev(btp->bt_bdev, &btp->bt_dax_part_off,
+ 					    mp, ops);
+ 
+ 	/*
+@@ -2015,7 +2013,7 @@ xfs_alloc_buftarg(
+ 	ratelimit_state_init(&btp->bt_ioerror_rl, 30 * HZ,
+ 			     DEFAULT_RATELIMIT_BURST);
+ 
+-	if (xfs_setsize_buftarg_early(btp, bdev))
++	if (xfs_setsize_buftarg_early(btp))
+ 		goto error_free;
+ 
+ 	if (list_lru_init(&btp->bt_lru))
+diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
+index 549c60942208..f6418c1312f5 100644
+--- a/fs/xfs/xfs_buf.h
++++ b/fs/xfs/xfs_buf.h
+@@ -92,6 +92,7 @@ typedef unsigned int xfs_buf_flags_t;
+  */
+ typedef struct xfs_buftarg {
+ 	dev_t			bt_dev;
++	struct bdev_handle	*bt_bdev_handle;
+ 	struct block_device	*bt_bdev;
+ 	struct dax_device	*bt_daxdev;
+ 	u64			bt_dax_part_off;
+@@ -351,7 +352,7 @@ xfs_buf_update_cksum(struct xfs_buf *bp, unsigned long cksum_offset)
+  *	Handling of buftargs.
+  */
+ struct xfs_buftarg *xfs_alloc_buftarg(struct xfs_mount *mp,
+-		struct block_device *bdev);
++		struct bdev_handle *bdev_handle);
+ extern void xfs_free_buftarg(struct xfs_buftarg *);
+ extern void xfs_buftarg_wait(struct xfs_buftarg *);
+ extern void xfs_buftarg_drain(struct xfs_buftarg *);
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index c79eac048456..c98f08553ba8 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -381,14 +381,15 @@ STATIC int
+ xfs_blkdev_get(
+ 	xfs_mount_t		*mp,
+ 	const char		*name,
+-	struct block_device	**bdevp)
++	struct bdev_handle	**handlep)
+ {
+ 	int			error = 0;
+ 
+-	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
+-				    mp->m_super, &fs_holder_ops);
+-	if (IS_ERR(*bdevp)) {
+-		error = PTR_ERR(*bdevp);
++	*handlep = bdev_open_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
++				     mp->m_super, &fs_holder_ops);
++	if (IS_ERR(*handlep)) {
++		error = PTR_ERR(*handlep);
++		*handlep = NULL;
+ 		xfs_warn(mp, "Invalid device [%s], error=%d", name, error);
+ 	}
+ 
+@@ -453,7 +454,7 @@ xfs_open_devices(
+ {
+ 	struct super_block	*sb = mp->m_super;
+ 	struct block_device	*ddev = sb->s_bdev;
+-	struct block_device	*logdev = NULL, *rtdev = NULL;
++	struct bdev_handle	*logdev_handle = NULL, *rtdev_handle = NULL;
+ 	int			error;
+ 
+ 	/*
+@@ -466,17 +467,19 @@ xfs_open_devices(
+ 	 * Open real time and log devices - order is important.
+ 	 */
+ 	if (mp->m_logname) {
+-		error = xfs_blkdev_get(mp, mp->m_logname, &logdev);
++		error = xfs_blkdev_get(mp, mp->m_logname, &logdev_handle);
+ 		if (error)
+ 			goto out_relock;
+ 	}
+ 
+ 	if (mp->m_rtname) {
+-		error = xfs_blkdev_get(mp, mp->m_rtname, &rtdev);
++		error = xfs_blkdev_get(mp, mp->m_rtname, &rtdev_handle);
+ 		if (error)
+ 			goto out_close_logdev;
+ 
+-		if (rtdev == ddev || rtdev == logdev) {
++		if (rtdev_handle->bdev == ddev ||
++		    (logdev_handle &&
++		     rtdev_handle->bdev == logdev_handle->bdev)) {
+ 			xfs_warn(mp,
+ 	"Cannot mount filesystem with identical rtdev and ddev/logdev.");
+ 			error = -EINVAL;
+@@ -488,22 +491,25 @@ xfs_open_devices(
+ 	 * Setup xfs_mount buffer target pointers
+ 	 */
+ 	error = -ENOMEM;
+-	mp->m_ddev_targp = xfs_alloc_buftarg(mp, ddev);
++	mp->m_ddev_targp = xfs_alloc_buftarg(mp, sb->s_bdev_handle);
+ 	if (!mp->m_ddev_targp)
+ 		goto out_close_rtdev;
+ 
+-	if (rtdev) {
+-		mp->m_rtdev_targp = xfs_alloc_buftarg(mp, rtdev);
++	if (rtdev_handle) {
++		mp->m_rtdev_targp = xfs_alloc_buftarg(mp, rtdev_handle);
+ 		if (!mp->m_rtdev_targp)
+ 			goto out_free_ddev_targ;
+ 	}
+ 
+-	if (logdev && logdev != ddev) {
+-		mp->m_logdev_targp = xfs_alloc_buftarg(mp, logdev);
++	if (logdev_handle && logdev_handle->bdev != ddev) {
++		mp->m_logdev_targp = xfs_alloc_buftarg(mp, logdev_handle);
+ 		if (!mp->m_logdev_targp)
+ 			goto out_free_rtdev_targ;
+ 	} else {
+ 		mp->m_logdev_targp = mp->m_ddev_targp;
++		/* Handle won't be used, drop it */
++		if (logdev_handle)
++			bdev_release(logdev_handle);
+ 	}
+ 
+ 	error = 0;
+@@ -517,11 +523,11 @@ xfs_open_devices(
+  out_free_ddev_targ:
+ 	xfs_free_buftarg(mp->m_ddev_targp);
+  out_close_rtdev:
+-	 if (rtdev)
+-		 blkdev_put(rtdev, sb);
++	 if (rtdev_handle)
++		bdev_release(rtdev_handle);
+  out_close_logdev:
+-	if (logdev && logdev != ddev)
+-		blkdev_put(logdev, sb);
++	if (logdev_handle)
++		bdev_release(logdev_handle);
+ 	goto out_relock;
+ }
+ 
+-- 
+2.35.3
+
+
+--2mxd4naznidvsths--
