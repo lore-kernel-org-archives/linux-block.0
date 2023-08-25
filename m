@@ -2,233 +2,182 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1119EE49B4
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 22:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C61C83F01
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 22:45:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbjHYWQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Aug 2023 18:16:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47894 "EHLO
+        id S229722AbjHYWo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Aug 2023 18:44:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230294AbjHYWQW (ORCPT
+        with ESMTP id S230153AbjHYWok (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2023 18:16:22 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 703B32700
-        for <linux-block@vger.kernel.org>; Fri, 25 Aug 2023 15:16:19 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bf55a81eeaso10269785ad.0
-        for <linux-block@vger.kernel.org>; Fri, 25 Aug 2023 15:16:19 -0700 (PDT)
+        Fri, 25 Aug 2023 18:44:40 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A203269F;
+        Fri, 25 Aug 2023 15:44:38 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bdbbede5d4so11971175ad.2;
+        Fri, 25 Aug 2023 15:44:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1693001779; x=1693606579;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ppeQOWgbWz5gqWZs/rbytV4GhpZ82FSsmBh/giRYIfc=;
-        b=oGxnlMh0S/WiVEBqRgXg0XkOHzHqDpTBvnGnagMxXiK0WZOe1Z4r+2p1ptsCZGDnWB
-         pXEktmY/ad0PuwAxCgT0YcHOMRjDsuwyrAXCFtdwEmAj+muyxYQXIE+r39jHMvXhT5B0
-         o+SPYmvdCE0AaqEX44rBk89wjuy74zXAp3Vwzk0u1JPoPtSJh1DrCjw1RqWqiFdJpqby
-         tMNly65LV0QvaLstk47azhvzcHLQyEtc8q2u/G93EQr7wDi/F72WQh2TPKv7ILrD/tve
-         HoezaGEwtih61yu0zT7giO0Mqh1qaOyneAEL9vdEIb12mBB0wZbgWFOwNbvY6RzLwUwH
-         OW2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693001779; x=1693606579;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1693003477; x=1693608277;
+        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
+         :message-id:subject:from:references:cc:to:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ppeQOWgbWz5gqWZs/rbytV4GhpZ82FSsmBh/giRYIfc=;
-        b=fzywsqKM/D46WtHxtqQqPRB/FAsFnfEU5GTiIZbatNkgdI8ZBUURmbZenpTphydvlA
-         aROUE49sL7yx59+lBrUpiOYcymAOlqMvYsd0ATNRPYm0fl9GBWo/ouSz2ShNO018Ke9p
-         hCm72lMNTto5lVrk/Cezq1EfY2GQfP1FMvNRqrV4/HbbsyhU9QZuPAJJUzVFBsp9wE02
-         2yKvwwestXAbHHE0AGwsEuUh7RaMn+FMNlKIsKErUkbQagJgWUZegD5+pSt3JPPgDSKS
-         Dngg9jUf0R9/dFYQ37H4KBhd0fAbfQHxdEtderemm8UKZzo1++oUt6fbq5AGONTuh16a
-         QT1A==
-X-Gm-Message-State: AOJu0Yy+ZN7ZUz4w6GFi/+ctnIxwLjW+Gd64t+3/GdsBFkghOzrt9L16
-        1eCebyXCyYlUsCiTEjzc/TXiGw==
-X-Google-Smtp-Source: AGHT+IEjt82Q7/ukix1Bwi0HcqOCAUCGzooSpz1T14B8KRhD3u7v0lApveU1bnKvxuVgpN4iNhxk8w==
-X-Received: by 2002:a17:903:264e:b0:1bd:c338:ae14 with SMTP id je14-20020a170903264e00b001bdc338ae14mr16243879plb.12.1693001778913;
-        Fri, 25 Aug 2023 15:16:18 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id f8-20020a170902684800b001c0bf60ba5csm2276046pln.272.2023.08.25.15.16.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 15:16:18 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qZf6F-006Va3-0j;
-        Sat, 26 Aug 2023 08:16:15 +1000
-Date:   Sat, 26 Aug 2023 08:16:15 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Hao Xu <hao.xu@linux.dev>
-Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 25/29] xfs: support nowait for xfs_buf_item_init()
-Message-ID: <ZOkoL8nuXJDVZM1H@dread.disaster.area>
-References: <20230825135431.1317785-1-hao.xu@linux.dev>
- <20230825135431.1317785-26-hao.xu@linux.dev>
+        bh=+EfHZKV5Rs50FUqRYXClC9vzZD5WlxrYeYbs3IamXT4=;
+        b=YxGLOPcaOZR604IVjJRcGcoKnB33IZ0CTfYuHyWKXt+0pInUOQSMoNyJ0dS6B1KmgY
+         cxaBOMvor3UlQ6MZnz8hco99YltIQ+TVGTfUiOj3M6EtIom4aLy5Ogu10qSlU6URXk+W
+         RnRGmXEhLIg0POh+PDKptxk33OVTKsM2/52zz5494dr8R8CSNGpoqbrRI3gpmS9Q+cTN
+         hJYUsHOFyiz+AcMtmJLq8rt6PHOWgX+jhYTNJt4ghkMZ1YZYHd+UADqGIVtKxfSRzrdW
+         eHx1TWLsT9QLE3Re7SH9KzLMTXlxKvezJrH+R76CylIu77symnMHbROv+J2zJ4UP/BTK
+         7yuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693003477; x=1693608277;
+        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
+         :message-id:subject:from:references:cc:to:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+EfHZKV5Rs50FUqRYXClC9vzZD5WlxrYeYbs3IamXT4=;
+        b=cp1KRCgcYkUTSF2D8a/65bm9gqUzQihVnP8c6wC6//KEb6d0JIiky/UAp7xRjHFcih
+         8s1FHO+UQbhcKHIGH6ZyjVwvqRLBbhsB1N1lNaZ9FL0owO1HKhy/Fwso4Cvtq+DxE50o
+         vA7XJSYq98tq7HF5W5D9gEn1VMwaEF0hgGVUNno9jMKLX7vah3BgtHwPV9vdnNbsncU0
+         TFZg16oEAiXNzdM5iLR35aiSR8KTJ8GuInan1PFH3GSggW5Y8J+wCiQEH3fo8NVkPoAi
+         od40573Ua718hlQrOtxancrF5a/ztQX6HBg4R5oi+P8L7kdh3pR2ZE6vtGyfLme3mm8e
+         BgfA==
+X-Gm-Message-State: AOJu0Yx8RZpbLX9s4Wh8CoyI+NHVzTMAIgKR8W9FocKvYDSC9GX2MXs6
+        LP3g7lpzxzcizs6KrVtcVCocaJKsEpB/tg==
+X-Google-Smtp-Source: AGHT+IHfISCtSa05UGz9PT6tDA2qtVyoG70cJPjb2fBEQ6/U+mzxDHROeZB/hJ4FR5D+DwWhbVxiGA==
+X-Received: by 2002:a17:903:25d4:b0:1bd:bbc3:c87b with SMTP id jc20-20020a17090325d400b001bdbbc3c87bmr18047490plb.41.1693003477133;
+        Fri, 25 Aug 2023 15:44:37 -0700 (PDT)
+Received: from Schmitz-MacBook-Pro.local (125-236-136-221-fibre.sparkbb.co.nz. [125.236.136.221])
+        by smtp.googlemail.com with ESMTPSA id b1-20020a170902d50100b001adf6b21c77sm2280761plg.107.2023.08.25.15.44.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Aug 2023 15:44:36 -0700 (PDT)
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Matt Turner <mattst88@gmail.com>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Brian Cain <bcain@quicinc.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Michal Simek <monstr@monstr.eu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Stafford Horne <shorne@gmail.com>,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        Richard Weinberger <richard@nod.at>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-next@vger.kernel.org, linux-alpha@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
+        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org
+References: <20230810141947.1236730-1-arnd@kernel.org>
+ <169292577153.789945.11297239773543112051.b4-ty@oracle.com>
+ <3956e2a4-c545-1212-e95f-3cf61a60d6a4@gmail.com>
+ <CAMuHMdWC2S330_Vb_NTHTDC=BakBsw4ouP-eFJv0erV1-jmvTQ@mail.gmail.com>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+Subject: Re: (subset) [PATCH 00/17] -Wmissing-prototype warning fixes
+Message-ID: <130b3b57-edb0-184d-5b5f-69b013715773@gmail.com>
+Date:   Sat, 26 Aug 2023 10:44:13 +1200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230825135431.1317785-26-hao.xu@linux.dev>
+In-Reply-To: <CAMuHMdWC2S330_Vb_NTHTDC=BakBsw4ouP-eFJv0erV1-jmvTQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 09:54:27PM +0800, Hao Xu wrote:
-> From: Hao Xu <howeyxu@tencent.com>
-> 
-> support nowait for xfs_buf_item_init() and error out -EAGAIN to
-> _xfs_trans_bjoin() when it would block.
-> 
-> Signed-off-by: Hao Xu <howeyxu@tencent.com>
-> ---
->  fs/xfs/xfs_buf_item.c         |  9 +++++++--
->  fs/xfs/xfs_buf_item.h         |  2 +-
->  fs/xfs/xfs_buf_item_recover.c |  2 +-
->  fs/xfs/xfs_trans_buf.c        | 16 +++++++++++++---
->  4 files changed, 22 insertions(+), 7 deletions(-)
-> 
-> diff --git a/fs/xfs/xfs_buf_item.c b/fs/xfs/xfs_buf_item.c
-> index 023d4e0385dd..b1e63137d65b 100644
-> --- a/fs/xfs/xfs_buf_item.c
-> +++ b/fs/xfs/xfs_buf_item.c
-> @@ -827,7 +827,8 @@ xfs_buf_item_free_format(
->  int
->  xfs_buf_item_init(
->  	struct xfs_buf	*bp,
-> -	struct xfs_mount *mp)
-> +	struct xfs_mount *mp,
-> +	bool   nowait)
->  {
->  	struct xfs_buf_log_item	*bip = bp->b_log_item;
->  	int			chunks;
-> @@ -847,7 +848,11 @@ xfs_buf_item_init(
->  		return 0;
->  	}
->  
-> -	bip = kmem_cache_zalloc(xfs_buf_item_cache, GFP_KERNEL | __GFP_NOFAIL);
-> +	bip = kmem_cache_zalloc(xfs_buf_item_cache,
-> +				GFP_KERNEL | (nowait ? 0 : __GFP_NOFAIL));
-> +	if (!bip)
-> +		return -EAGAIN;
-> +
->  	xfs_log_item_init(mp, &bip->bli_item, XFS_LI_BUF, &xfs_buf_item_ops);
->  	bip->bli_buf = bp;
+Hi Geert,
 
-I see filesystem shutdowns....
+Am 25.08.23 um 19:39 schrieb Geert Uytterhoeven:
+> Hi Michael,
+>
+> On Fri, Aug 25, 2023 at 3:31=E2=80=AFAM Michael Schmitz <schmitzmic@gma=
+il.com> wrote:
+>> On 25/08/23 13:12, Martin K. Petersen wrote:
+>>> [11/17] scsi: gvp11: remove unused gvp11_setup() function
+>>>          https://git.kernel.org/mkp/scsi/c/bfaa4a0ce1bb
+>> I somehow missed that one ...
+>>
+>> The gvp11_setup() function was probably a relic from the times before
+>> module parameters.
+>>
+>> Since gvp11_xfer_mask appears to be required for some Amiga systems to=
 
-> diff --git a/fs/xfs/xfs_trans_buf.c b/fs/xfs/xfs_trans_buf.c
-> index 016371f58f26..a1e4f2e8629a 100644
-> --- a/fs/xfs/xfs_trans_buf.c
-> +++ b/fs/xfs/xfs_trans_buf.c
-> @@ -57,13 +57,14 @@ xfs_trans_buf_item_match(
->   * If the buffer does not yet have a buf log item associated with it,
->   * then allocate one for it.  Then add the buf item to the transaction.
->   */
-> -STATIC void
-> +STATIC int
->  _xfs_trans_bjoin(
->  	struct xfs_trans	*tp,
->  	struct xfs_buf		*bp,
->  	int			reset_recur)
->  {
->  	struct xfs_buf_log_item	*bip;
-> +	int ret;
->  
->  	ASSERT(bp->b_transp == NULL);
->  
-> @@ -72,7 +73,11 @@ _xfs_trans_bjoin(
->  	 * it doesn't have one yet, then allocate one and initialize it.
->  	 * The checks to see if one is there are in xfs_buf_item_init().
->  	 */
-> -	xfs_buf_item_init(bp, tp->t_mountp);
-> +	ret = xfs_buf_item_init(bp, tp->t_mountp,
-> +				tp->t_flags & XFS_TRANS_NOWAIT);
-> +	if (ret < 0)
-> +		return ret;
-> +
->  	bip = bp->b_log_item;
->  	ASSERT(!(bip->bli_flags & XFS_BLI_STALE));
->  	ASSERT(!(bip->__bli_format.blf_flags & XFS_BLF_CANCEL));
-> @@ -92,6 +97,7 @@ _xfs_trans_bjoin(
->  	xfs_trans_add_item(tp, &bip->bli_item);
->  	bp->b_transp = tp;
->  
-> +	return 0;
->  }
->  
->  void
-> @@ -309,7 +315,11 @@ xfs_trans_read_buf_map(
->  	}
->  
->  	if (tp) {
-> -		_xfs_trans_bjoin(tp, bp, 1);
-> +		error = _xfs_trans_bjoin(tp, bp, 1);
-> +		if (error) {
-> +			xfs_buf_relse(bp);
-> +			return error;
-> +		}
->  		trace_xfs_trans_read_buf(bp->b_log_item);
+>> set the DMA mask, I'd best send a patch to add such a module parameter=
+ ...
+>>
+>> Do you know any details around the use of DMA masks for Amiga WD33C93
+>> drivers, Geert?
+> Doh, it's been a while, and I never had an affected system.
+> Probably it's needed on A2000 with an accelerator card and GVP II SCSI,=
 
-So what happens at the callers when we have a dirty transaction and
-joining a buffer fails with -EAGAIN?
+> to prevent DMA to RAM banks that do not support fast DMA cycles.
 
-Apart from the fact this may well propagate -EAGAIN up to userspace,
-cancelling a dirty transaction at this point will result in a
-filesystem shutdown....
+Thanks, that's good enough for me.
 
-Indeed, this can happen in the "simple" timestamp update case that
-this "nowait" semantic is being aimed at. We log the inode in the
-timestamp update, which dirties the log item and registers a
-precommit operation to be run. We commit the
-transaction, which then runs xfs_inode_item_precommit() and that
-may need to attach the inode to the inode cluster buffer. This
-results in:
+Linux 2.0 had this comment:
 
-xfs_inode_item_precommit
-  xfs_imap_to_bp
-    xfs_trans_read_buf_map
-      _xfs_trans_bjoin
-        xfs_buf_item_init(XFS_TRANS_NOWAIT)
-	  kmem_cache_zalloc(GFP_NOFS)
-	  <memory allocation fails>
-      gets -EAGAIN error
-    propagates -EAGAIN
-  fails due to -EAGAIN
+|/* * DMA transfer mask for GVP Series II SCSI controller. * Some
+versions can only DMA into the 24 bit address space * (0->16M). Others
+can DMA into the full 32 bit address * space. The default is to only
+allow DMA into the 24 bit * address space. The "gvp11=3D0xFFFFFFFE" setup=
 
-And now xfs_trans_commit() fails with a dirty transaction and the
-filesystem shuts down.
+parameter can * be supplied to force an alternate (32 bit) mask. */ |
 
-IOWs, XFS_TRANS_NOWAIT as it stands is fundamentally broken. Once we
-dirty an item in a transaction, we *cannot* back out of the
-transaction. We *must block* in every place that could fail -
-locking, memory allocation and/or IO - until the transaction
-completes because we cannot undo the changes we've already made to
-the dirty items in the transaction....
+|We now handle that (since 2.6.35) through masks defined in
+gvp11_zorro_tbl[] (though I note these don't account for unaligned
+addresses such as implied by the example in the comment. Are unaligned
+DMA buffers still possible today?). Would that cover the 'A2000 with
+accelerator' case?
+|
 
-It's even worse than that - once we have committed intents, the
-whole chain of intent processing must be run to completionr. Hence
-we can't tolerate backing out of that defered processing chain half
-way through because we might have to block.
+||
 
-Until we can roll back partial dirty transactions and partially
-completed defered intent chains at any random point of completion,
-XFS_TRANS_NOWAIT will not work.
+I'm happy to send a patch if an override to the device default DMA mask
+is still necessary.
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+(Incidentally - did you ever publish the m68k full history tree anywhere
+in git?)
+
+Cheers,
+
+=C2=A0=C2=A0=C2=A0 Michael
+
+
+>
+> Gr{oetje,eeting}s,
+>
+>                         Geert
+>
+
