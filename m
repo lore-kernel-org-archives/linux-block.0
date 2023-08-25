@@ -2,140 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A721EE49B8
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 01:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E804C727A4
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 01:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235383AbjHYBOA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 21:14:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51814 "EHLO
+        id S238384AbjHYBOc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 21:14:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236757AbjHYBNs (ORCPT
+        with ESMTP id S238162AbjHYBOO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 21:13:48 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 724A51BF1;
-        Thu, 24 Aug 2023 18:13:46 -0700 (PDT)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37OJEN3l010276;
-        Fri, 25 Aug 2023 01:13:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2023-03-30;
- bh=uhEjckime6bsF1xq0dmnY+LwEHiDmuGwjHJQ7hVpFpk=;
- b=xT4JwIyBXmmvopnLoTqXTVQDIyq4jGSov+rjFGn7JrEsFJ0nGwiZ57rChZOcNtxS8gnd
- 32i9D/0gBNdAu6wmrSv4Tj5XGTtiOMTcrD7d8d7sIx9zu+UBUHmYA/WieiP0xKAeu3gF
- eHe1MsKPNrAZDzygQo0FmmEXELlSaZ2xMctwoLvlgndq1xchpQqBIi92sT4g6z/NC03I
- Sq45+sJdryY0Xt3UtsdNEeUPJQQwXRC0pKx/6zSsrk8N0z228cv46+9188htxHxgrJuH
- O19AK6RPcqphkoDDRpvAZZx3qvPOulLbxkXwvTBtVM7s38ELpJEo9mWBxT45N4g00a45 fg== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3sn1yv5ft9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Aug 2023 01:13:38 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37P03oRV035625;
-        Fri, 25 Aug 2023 01:13:37 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3sn1ywqfhw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Aug 2023 01:13:37 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37P1DVDv019787;
-        Fri, 25 Aug 2023 01:13:36 GMT
-Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3sn1ywqf8n-3;
-        Fri, 25 Aug 2023 01:13:36 +0000
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Matt Turner <mattst88@gmail.com>,
-        Vineet Gupta <vgupta@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Brian Cain <bcain@quicinc.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Michal Simek <monstr@monstr.eu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Jonas Bonn <jonas@southpole.se>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Stafford Horne <shorne@gmail.com>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Helge Deller <deller@gmx.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Richard Weinberger <richard@nod.at>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-next@vger.kernel.org, linux-alpha@vger.kernel.org,
-        linux-snps-arc@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: (subset) [PATCH 00/17] -Wmissing-prototype warning fixes
-Date:   Thu, 24 Aug 2023 21:12:49 -0400
-Message-Id: <169292577153.789945.11297239773543112051.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230810141947.1236730-1-arnd@kernel.org>
-References: <20230810141947.1236730-1-arnd@kernel.org>
+        Thu, 24 Aug 2023 21:14:14 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21FDD19BB;
+        Thu, 24 Aug 2023 18:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=VFNVFt/7/5G7r3AO6hVBx/rbI3iYFwIQVfmz3UrxPqI=; b=HPtqqzf93CqXk8WihPhuJV1RSK
+        tSfSSqn/vc3mtUcuanRMu0IQ9ysGwINwGa5jpVcjmo90M8vyVKpF8UQ1VaHRGmV8Eg2IcOr1vnsTf
+        RAjyJ6Gyf/3ks5v2MwTqTr/C99jBG8nCO1qdfrDVe92FmydcZ4DLBTMKjAXntd7e88uQGcPu/2L7x
+        R7iKLLejKOG2tdiXjGz4QC2qK2QtqsUrvB8D6TqbMX39QuczgJnh6bfUUbLHA9s60MTiPon8AcAnW
+        t/mDTpPoN/cTrdda1FVyuXXOht41Iwq6gQg3E+KoI87tZRcd07ozop3LluQdjiC89bgCnYHaeZYZl
+        FKh0gRcQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qZLOr-000czI-12;
+        Fri, 25 Aug 2023 01:14:09 +0000
+Date:   Fri, 25 Aug 2023 02:14:09 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 02/29] block: Use bdev_open_by_dev() in blkdev_open()
+Message-ID: <20230825011409.GA95084@ZenIV>
+References: <20230810171429.31759-1-jack@suse.cz>
+ <20230811110504.27514-2-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-25_01,2023-08-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0
- malwarescore=0 spamscore=0 phishscore=0 mlxlogscore=763 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308250009
-X-Proofpoint-GUID: X2SaJXDprf48MqrqrcFkis4RNSuOroKu
-X-Proofpoint-ORIG-GUID: X2SaJXDprf48MqrqrcFkis4RNSuOroKu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811110504.27514-2-jack@suse.cz>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 10 Aug 2023 16:19:18 +0200, Arnd Bergmann wrote:
+On Fri, Aug 11, 2023 at 01:04:33PM +0200, Jan Kara wrote:
 
-> Most of the patches I sent so far for the -Wmissing-prototype warnings
-> have made it into linux-next now. There are a few that I'm resending
-> now as nobody has picked them up, and then a number of fixes that I
-> found while test-building across all architectures rather than just the
-> ones I usually test.
-> 
-> The first 15 patches in this series should be uncontroversial, so
-> I expect that either a subsystem maintainer or Andrew Morton can
-> apply these directly.
-> 
-> [...]
+> @@ -478,7 +478,7 @@ blk_mode_t file_to_blk_mode(struct file *file)
+>  		mode |= BLK_OPEN_READ;
+>  	if (file->f_mode & FMODE_WRITE)
+>  		mode |= BLK_OPEN_WRITE;
+> -	if (file->private_data)
+> +	if (file->f_flags & O_EXCL)
+>  		mode |= BLK_OPEN_EXCL;
+>  	if (file->f_flags & O_NDELAY)
+>  		mode |= BLK_OPEN_NDELAY;
 
-Applied to 6.6/scsi-queue, thanks!
 
-[07/17] scsi: qlogicpti: mark qlogicpti_info() static
-        https://git.kernel.org/mkp/scsi/c/71cc486335c4
-[11/17] scsi: gvp11: remove unused gvp11_setup() function
-        https://git.kernel.org/mkp/scsi/c/bfaa4a0ce1bb
+> index 3be11941fb2d..47f216d8697f 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -575,7 +575,7 @@ long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+>  {
+>  	struct block_device *bdev = I_BDEV(file->f_mapping->host);
+>  	void __user *argp = (void __user *)arg;
+> -	blk_mode_t mode = file_to_blk_mode(file);
+> +	blk_mode_t mode = ((struct bdev_handle *)file->private_data)->mode;
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Take a look at sd_ioctl() and note that fcntl(2) can be used to set/clear O_NDELAY.
+The current variant works since we recalculate mode every time; this one will end up
+stuck with whatever we had at open time.  Note that Christoph's series could do this
+in blkdev_ioctl()
+-       /*
+-        * O_NDELAY can be altered using fcntl(.., F_SETFL, ..), so we have
+-        * to updated it before every ioctl.
+-        */
+-       if (file->f_flags & O_NDELAY)
+-               mode |= FMODE_NDELAY;
+-       else
+-               mode &= ~FMODE_NDELAY;
+precisely because his file_to_blk_mode() picks O_NDELAY from flags when blkdev_ioctl()
+calls it.
+
+The same goes for compat counterpart of that thing.  Both need to deal with that
+scenario - you need something that would pick the O_NDELAY updates from ->f_flags.
+
+Al, trying to catch up on the awful pile of mail that has accumulated over the 3 months
+of being net.dead...
