@@ -2,121 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 688BFC3DA66
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 11:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3910BC3DA6F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 11:45:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231573AbjHYLeX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Aug 2023 07:34:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53118 "EHLO
+        id S240884AbjHYLod (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Aug 2023 07:44:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243283AbjHYLd6 (ORCPT
+        with ESMTP id S243103AbjHYLoI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2023 07:33:58 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2EDD1FF7;
-        Fri, 25 Aug 2023 04:33:54 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        Fri, 25 Aug 2023 07:44:08 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3CEB2102;
+        Fri, 25 Aug 2023 04:44:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0E91721F99;
-        Fri, 25 Aug 2023 11:28:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1692962932; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XTQTzS7jcW5Dyy70M1pwbotuquEpW0pW0g8qkbMwvjI=;
-        b=Y7RosvmMmMWKXTY3jAPvch+LYM6Xhah4CZ+LYCfgpYHbAdSsNIYgy0+56Ed9DWkGnesy/X
-        AKbVO9/nwMeAFrNmEWV4b6rJWClbzKf0vs3Vti/AyE0mV378sqNAfxbfMLa2o5IuOnRl3f
-        ycyIsbg9uXQIeITAarhBvm7L2J1yw7c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1692962932;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XTQTzS7jcW5Dyy70M1pwbotuquEpW0pW0g8qkbMwvjI=;
-        b=sZQ4exe0xCHdRY6mCYV3Wv1Xzq6NgHdVEAUMcacq8P8Od6utsz0UsAJLFyobcasbPZLTml
-        gMzDSDR2NiT7XUDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E85E0138F9;
-        Fri, 25 Aug 2023 11:28:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id K2u3OHOQ6GSJPAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 25 Aug 2023 11:28:51 +0000
-Date:   Fri, 25 Aug 2023 13:29:08 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
- nvmet_target_{setup/cleanup} common code
-Message-ID: <kmnosm2p2vct7sxalz2dhr2yt32s2vdx2hvuvk4jli2hwjudv7@gdkrlayoojrf>
-References: <20230822083812.24612-1-dwagner@suse.de>
- <20230822083812.24612-4-dwagner@suse.de>
- <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
- <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
- <oss54jmgqzjcxecea4h7eeguh6lmhls4p74e7unbxmhz34asvk@a7n6vu6hauys>
- <zvu2ihivd6f4fbs7hpgowstq3li4wrdycqzso3c32qcco7zes4@s2l2solzzo6u>
- <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 49E436248A;
+        Fri, 25 Aug 2023 11:44:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53A50C433C8;
+        Fri, 25 Aug 2023 11:44:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692963844;
+        bh=plPhJwNAILPedp/4xhPGYcWv/GNH030YRAJOFv7vvxY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Sak3PHVVG/k3TXAFL4H/LUFpnCBLJ3JFp/yh4go4O+MHL7l3hrHcOKQsqwhpqkFkW
+         6HVWNlVSsvEoN5NGyuUqi/baD7ld0e9SAa9iNQDKhCKHfDyoMoqV5h4c5E3skPXA0d
+         4o8Me023r2/JA24+KpaU4HEzUHq1uM7RQthWwX0CLJUyhq6qwtQGey8Z1/8CKPoyhm
+         QRpjlbtSm2XoUmL5eBzjeGjDLE7H8z1V4cOJR2N521nGBntf1Tk9F4U8TQD3xe0EyC
+         Q+Zr46wYlexcV0wjSAbWG/G5M/41fOgFVfJ/Pz64/5aPU3G683M8mEEokbyU1K/xko
+         rzxxJuVOiawJw==
+Date:   Fri, 25 Aug 2023 13:44:00 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 01/29] block: Provide bdev_open_* functions
+Message-ID: <20230825-mithelfen-anregen-1275c7750d9f@brauner>
+References: <20230818123232.2269-1-jack@suse.cz>
+ <20230823104857.11437-1-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
+In-Reply-To: <20230823104857.11437-1-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 07:34:21AM +0000, Shinichiro Kawasaki wrote:
-> IMO, SC2119 is not broken. SC2119 (and its companion SC2120) assumes that bash
-> functions do not have optional arguments. If any functions which refer arguments
-> are called without arguments, it complains. With the assumption, SC2119 is
-> useful to detect missing arguments of function calls. (I guess Bart thinks this
-> is useful.)
-
-I wanted to say that the implementation of SC2119 is broken, not the
-SC2119/SC2120 itself. Sorry for the confusion.
-
-> However, when we implement argument parsers in bash functions so that the
-> arguments can be optional, the assumption for the SC2119 is wrong. Then SC2119
-> reports are useless. Until recently, blktests had few functions with such
-> optional arguments, such as _init_null_blk or _init_scsi_debug. But most of
-> calls to those functions had some arguments, and it was rare to call them
-> without any argument. So SC2119 reports were easy to suppress and not a pain.
->
->     I doubt Shellcheck can be improved and detect if functions have the optional
->     argument parsers...
-
-No idea. But we are not alone with this problem:
-
-https://github.com/koalaman/shellcheck/issues/2511
-
-> Recently, you actively cleans up tests/nvme/* (which is great!), and introduced
-> argument parsers in test/nvme/rc. The first one is _nvme_connect_subsys, and the
-> second one is this _nvme_target_setup. It looks for me this is a bash coding
-> style change in blktests, from "don't use optional arguments often" to "use
-> optional arguments aggressively".
-
-Yes, it's a bit excessive to hand in all possible arguments all the
-time. Especially it makes it even hard to review if only value changes
-but 6 default values are passed to the setup function.
-
-> If we apply this change, we should suppress
-> SC2119. If we keep the old coding style, we should keep on enabling SC2119. What
-> I see here is the style difference between you and Bart.
->
-> Now I'm tempted to disable SC2119, and to go with the new coding style...
+On Wed, Aug 23, 2023 at 12:48:12PM +0200, Jan Kara wrote:
+> Create struct bdev_handle that contains all parameters that need to be
+> passed to blkdev_put() and provide bdev_open_* functions that return
+> this structure instead of plain bdev pointer. This will eventually allow
+> us to pass one more argument to blkdev_put() (renamed to bdev_release())
+> without too much hassle.
 > 
-> If I have any misunderstanding, or if anyone has more comments on this, please
-> let me know.
+> Acked-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
 
-All good from my side.
+Looks good to me,
+Reviewed-by: Christian Brauner <brauner@kernel.org>
