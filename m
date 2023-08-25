@@ -2,165 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73376C7EE2C
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 10:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 688BFC3DA66
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 11:34:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234696AbjHYKUb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Aug 2023 06:20:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34982 "EHLO
+        id S231573AbjHYLeX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Aug 2023 07:34:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244383AbjHYKUG (ORCPT
+        with ESMTP id S243283AbjHYLd6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2023 06:20:06 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECB2212C
-        for <linux-block@vger.kernel.org>; Fri, 25 Aug 2023 03:19:44 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99bf8e5ab39so88403566b.2
-        for <linux-block@vger.kernel.org>; Fri, 25 Aug 2023 03:19:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692958783; x=1693563583;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8hmeN79sYGm2yupcg1U1ZPEVlv8mSwCgTnsR3HDlFcg=;
-        b=P1oUEbW6Avm1OcDDYWJCLmKiBo8QGj9EuaqkPpWDnihUz9zA78OWflrSORwwLycFFe
-         +hzuHp1q1lpm/Pt43kAvQvoVhHQd1Gt9IoNLMVAqkfa9inOi3g451+u9nKAOF4uvzfM7
-         w6YBMQZd0bdA8CokkDkOVw00zhPitOpLevFM8O5KTeV6qmF5XPxe6nPc/ctTqrZGH2Im
-         dUaI6+kpgRMaxoEgUk0xHP5G8TpB6idTW8qsN4VxK4X9T5SiGZGAasGtb6tyGtMN0uDd
-         za9gsaGZRzZ3LVzjqYEg0ljOelY8Ix3GmiMTbyi5RgQi4zAGzF66kk/HzC0k+uw1WZTC
-         NYRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692958783; x=1693563583;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8hmeN79sYGm2yupcg1U1ZPEVlv8mSwCgTnsR3HDlFcg=;
-        b=bNcJEUCNSfnxBca+k0HFIcCkNhREKnIyhmVuYha4915V7e57idpt/L5Yi4x9Bjh/2G
-         eHsfHFOswdYOUXZauqkIwt/yCWl1JDiD8Y2fF9zxbIjSOM+LJO6cFpCUIJVudICmBBJC
-         lYa/0PI70b9IY+v/4Irx1JUqlWiAjPFgIzDMPL7W0exCX0h0hZ8u0pd9WMPKxetYUxXF
-         3UE5leq7ue5bQXTtewGm5x1frv7RqopkYGS2FP017N+aeyC2Fw/MOckqn56m7bIGsgtV
-         GmJ3ODpfAhzcvQWMO944M4vp1p1fd10IFhRGvmY8Icx60FeHk1ccC9/x5xyVN6n25g2Z
-         YHwg==
-X-Gm-Message-State: AOJu0YwbRgTaZZsTsJPyTLDPuHHmULHZ/oUD6F0bqrxY1efxqGUxNzrJ
-        ktpYE3c//xXL3PeQk71aHE+ZCQ==
-X-Google-Smtp-Source: AGHT+IFLSi2VQHJDpvE/O9nRgSIMhEaB16ib6oXZqIwxs7UTphQws++T+eBZGRZa8TvD2hXubHxxqw==
-X-Received: by 2002:a17:906:220f:b0:9a3:faf:7aa8 with SMTP id s15-20020a170906220f00b009a30faf7aa8mr2104632ejs.10.1692958782813;
-        Fri, 25 Aug 2023 03:19:42 -0700 (PDT)
-Received: from [192.168.1.195] ([5.133.47.210])
-        by smtp.googlemail.com with ESMTPSA id z7-20020a17090655c700b00992f309cfe8sm810217ejp.178.2023.08.25.03.19.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Aug 2023 03:19:42 -0700 (PDT)
-Message-ID: <f4b5512b-9922-1511-fc22-f14d25e2426a@linaro.org>
-Date:   Fri, 25 Aug 2023 11:19:41 +0100
+        Fri, 25 Aug 2023 07:33:58 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2EDD1FF7;
+        Fri, 25 Aug 2023 04:33:54 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0E91721F99;
+        Fri, 25 Aug 2023 11:28:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692962932; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XTQTzS7jcW5Dyy70M1pwbotuquEpW0pW0g8qkbMwvjI=;
+        b=Y7RosvmMmMWKXTY3jAPvch+LYM6Xhah4CZ+LYCfgpYHbAdSsNIYgy0+56Ed9DWkGnesy/X
+        AKbVO9/nwMeAFrNmEWV4b6rJWClbzKf0vs3Vti/AyE0mV378sqNAfxbfMLa2o5IuOnRl3f
+        ycyIsbg9uXQIeITAarhBvm7L2J1yw7c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692962932;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XTQTzS7jcW5Dyy70M1pwbotuquEpW0pW0g8qkbMwvjI=;
+        b=sZQ4exe0xCHdRY6mCYV3Wv1Xzq6NgHdVEAUMcacq8P8Od6utsz0UsAJLFyobcasbPZLTml
+        gMzDSDR2NiT7XUDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E85E0138F9;
+        Fri, 25 Aug 2023 11:28:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id K2u3OHOQ6GSJPAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 25 Aug 2023 11:28:51 +0000
+Date:   Fri, 25 Aug 2023 13:29:08 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
+ nvmet_target_{setup/cleanup} common code
+Message-ID: <kmnosm2p2vct7sxalz2dhr2yt32s2vdx2hvuvk4jli2hwjudv7@gdkrlayoojrf>
+References: <20230822083812.24612-1-dwagner@suse.de>
+ <20230822083812.24612-4-dwagner@suse.de>
+ <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
+ <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
+ <oss54jmgqzjcxecea4h7eeguh6lmhls4p74e7unbxmhz34asvk@a7n6vu6hauys>
+ <zvu2ihivd6f4fbs7hpgowstq3li4wrdycqzso3c32qcco7zes4@s2l2solzzo6u>
+ <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
- ufs
-Content-Language: en-US
-To:     Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        ebiggers@google.com
-Cc:     linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
-        quic_psodagud@quicinc.com, avmenon@quicinc.com,
-        abel.vesa@linaro.org, quic_spuppala@quicinc.com
-References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
-From:   Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
-In-Reply-To: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Aug 25, 2023 at 07:34:21AM +0000, Shinichiro Kawasaki wrote:
+> IMO, SC2119 is not broken. SC2119 (and its companion SC2120) assumes that bash
+> functions do not have optional arguments. If any functions which refer arguments
+> are called without arguments, it complains. With the assumption, SC2119 is
+> useful to detect missing arguments of function calls. (I guess Bart thinks this
+> is useful.)
 
-On 19/07/2023 18:04, Gaurav Kashyap wrote:
-> These patches add support to Qualcomm ICE (Inline Crypto Enginr) for hardware
-> wrapped keys using Qualcomm Hardware Key Manager (HWKM) and are made on top
-> of a rebased version  Eric Bigger's set of changes to support wrapped keys in
-> fscrypt and block below:
-> https://git.kernel.org/pub/scm/fs/fscrypt/linux.git/log/?h=wrapped-keys-v7
-> (The rebased patches are not uploaded here)
+I wanted to say that the implementation of SC2119 is broken, not the
+SC2119/SC2120 itself. Sorry for the confusion.
+
+> However, when we implement argument parsers in bash functions so that the
+> arguments can be optional, the assumption for the SC2119 is wrong. Then SC2119
+> reports are useless. Until recently, blktests had few functions with such
+> optional arguments, such as _init_null_blk or _init_scsi_debug. But most of
+> calls to those functions had some arguments, and it was rare to call them
+> without any argument. So SC2119 reports were easy to suppress and not a pain.
+>
+>     I doubt Shellcheck can be improved and detect if functions have the optional
+>     argument parsers...
+
+No idea. But we are not alone with this problem:
+
+https://github.com/koalaman/shellcheck/issues/2511
+
+> Recently, you actively cleans up tests/nvme/* (which is great!), and introduced
+> argument parsers in test/nvme/rc. The first one is _nvme_connect_subsys, and the
+> second one is this _nvme_target_setup. It looks for me this is a bash coding
+> style change in blktests, from "don't use optional arguments often" to "use
+> optional arguments aggressively".
+
+Yes, it's a bit excessive to hand in all possible arguments all the
+time. Especially it makes it even hard to review if only value changes
+but 6 default values are passed to the setup function.
+
+> If we apply this change, we should suppress
+> SC2119. If we keep the old coding style, we should keep on enabling SC2119. What
+> I see here is the style difference between you and Bart.
+>
+> Now I'm tempted to disable SC2119, and to go with the new coding style...
 > 
-> Ref v1 here:
-> https://lore.kernel.org/linux-scsi/20211206225725.77512-1-quic_gaurkash@quicinc.com/
-> 
-> Explanation and use of hardware-wrapped-keys can be found here:
-> Documentation/block/inline-encryption.rst
-> 
-> This patch is organized as follows:
-> 
-> Patch 1 - Prepares ICE and storage layers (UFS and EMMC) to pass around wrapped keys.
-> Patch 2 - Adds a new SCM api to support deriving software secret when wrapped keys are used
-> Patch 3-4 - Adds support for wrapped keys in the ICE driver. This includes adding HWKM support
-> Patch 5-6 - Adds support for wrapped keys in UFS
-> Patch 7-10 - Supports generate, prepare and import functionality in ICE and UFS
-> 
-> NOTE: MMC will have similar changes to UFS and will be uploaded in a different patchset
->        Patch 3, 4, 8, 10 will have MMC equivalents.
-> 
-> Testing:
-> Test platform: SM8550 MTP
-> Engineering trustzone image is required to test this feature only
-> for SM8550. For SM8650 onwards, all trustzone changes to support this
-> will be part of the released images.
+> If I have any misunderstanding, or if anyone has more comments on this, please
+> let me know.
 
-AFAIU, Prior to these proposed changes in scm, HWKM was done with help 
-of TA(Trusted Application) for generate, import, unwrap ... functionality.
-
-1. What is the reason for moving this from TA to new smc calls?
-
-Is this because of missing smckinvoke support in upstream?
-
-How scalable is this approach? Are we going to add new sec sys calls to 
-every interface to TA?
-
-2. How are the older SoCs going to deal with this, given that you are 
-changing drivers that are common across these?
-
-Have you tested these patches on any older platforms?
-
-What happens if someone want to add support to wrapped keys to this 
-platforms in upstream, How is that going to be handled?
-
-As I understand with this, we will endup with two possible solutions 
-over time in upstream.
-
-
-thanks,
---srini
-
-> The engineering changes primarily contain hooks to generate, import and
-> prepare keys for HW wrapped disk encryption.
-> 
-> The changes were tested by mounting initramfs and running the fscryptctl
-> tool (Ref: https://github.com/ebiggers/fscryptctl/tree/wip-wrapped-keys) to
-> generate and prepare keys, as well as to set policies on folders, which
-> consequently invokes disk encryption flows through UFS.
-> 
-> Gaurav Kashyap (10):
->    ice, ufs, mmc: use blk_crypto_key for program_key
->    qcom_scm: scm call for deriving a software secret
->    soc: qcom: ice: add hwkm support in ice
->    soc: qcom: ice: support for hardware wrapped keys
->    ufs: core: support wrapped keys in ufs core
->    ufs: host: wrapped keys support in ufs qcom
->    qcom_scm: scm call for create, prepare and import keys
->    ufs: core: add support for generate, import and prepare keys
->    soc: qcom: support for generate, import and prepare key
->    ufs: host: support for generate, import and prepare key
-> 
->   drivers/firmware/qcom_scm.c            | 292 +++++++++++++++++++++++
->   drivers/firmware/qcom_scm.h            |   4 +
->   drivers/mmc/host/cqhci-crypto.c        |   7 +-
->   drivers/mmc/host/cqhci.h               |   2 +
->   drivers/mmc/host/sdhci-msm.c           |   6 +-
->   drivers/soc/qcom/ice.c                 | 309 +++++++++++++++++++++++--
->   drivers/ufs/core/ufshcd-crypto.c       |  92 +++++++-
->   drivers/ufs/host/ufs-qcom.c            |  63 ++++-
->   include/linux/firmware/qcom/qcom_scm.h |  13 ++
->   include/soc/qcom/ice.h                 |  18 +-
->   include/ufs/ufshcd.h                   |  25 ++
->   11 files changed, 797 insertions(+), 34 deletions(-)
-> 
+All good from my side.
