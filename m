@@ -2,156 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26A4C88CB9
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 01:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95ADCC3DA6F
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 01:59:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232409AbjHYBbE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 21:31:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
+        id S239074AbjHYB71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 21:59:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230008AbjHYBbA (ORCPT
+        with ESMTP id S229797AbjHYB6z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 21:31:00 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BABC1707;
-        Thu, 24 Aug 2023 18:30:58 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-68a4bcf8a97so371279b3a.1;
-        Thu, 24 Aug 2023 18:30:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692927057; x=1693531857;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z7ELdHtTL5wYh7Mk37fDEn5rWUjAm0EdSJQg/6HWPPQ=;
-        b=Tmlz4s2OgK58rZBzZOqQBOTKsewJsSbr0lEcw148TWgipwzPC4h3leu6DHGlT2r85/
-         Uip0aLw7OTRJ61MyT/fB+2M0fG4g6LWvilyhBIrARSkzuGacd0puWelGLD8sQFEorTQR
-         iWM9dveRRwtXAAMgsQ1/wPN9YLRbtznx8UH3GB/Gc6Kl2jKJWnRhPY+VLZrWbWEKV9yS
-         nafEaqYDFpVR5/DPJmFBDt9xOQCxtCGGHTqymDFSbzyjxleu1nAu7M/vlGloF4CFWAV1
-         1Mn9tQCCGOF3Z8ZylRnT1zAlhIOy4YB5/0u2bxeQjx03+CoamjdoA+ECCtWPkVPf8KF0
-         7rAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692927057; x=1693531857;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z7ELdHtTL5wYh7Mk37fDEn5rWUjAm0EdSJQg/6HWPPQ=;
-        b=fM6GEZbv05t42z2NV4sGBa9/2lUb7io90jGSiDUW8YhiDysvXswGIFawZ9ZP0kTMcE
-         gCLiKMevD5iXdtA5LuXFBolfAIJ/roaOo8b52DkkE2kuaPDy3jCmskFd48YlfA210aPB
-         yx7XYOotFIoJkAkGbI+tgj7xVxUN+LwKcnYuzUzEOVK+Xyb6vsfQ0AqWBre2JukZnzAi
-         utyi/1jjs1rDNSrJ1NzVHeGM/OabHxipQMvz2zRCQNU0uu+9rhFK3Tdv6Zd2DWhBJKTM
-         /fLViFtJu/M/BZAxnoUIClMrSDaoDTBE3kHIUYSfgdKNXBYmbwM0k2n10DhoNknjjYcm
-         x34Q==
-X-Gm-Message-State: AOJu0YzfjOT/Rp8EsVPasCS3PmWILcds+i4rAwQs02vHZor4rpX1rymb
-        qczmV1p/UcaV7R/DqaSVORo=
-X-Google-Smtp-Source: AGHT+IGkdO3IAVMt9b8NA6cgzJYFAF5G39z8+OmHSySwOLhyKezYRWYjT2VqAbDb9GTS6Db8Rjs5TA==
-X-Received: by 2002:a05:6a00:1a13:b0:68a:49bc:9be3 with SMTP id g19-20020a056a001a1300b0068a49bc9be3mr14483212pfv.29.1692927057420;
-        Thu, 24 Aug 2023 18:30:57 -0700 (PDT)
-Received: from ?IPV6:2001:df0:0:200c:cd10:2fec:7ce0:fe0a? ([2001:df0:0:200c:cd10:2fec:7ce0:fe0a])
-        by smtp.gmail.com with ESMTPSA id y19-20020aa78553000000b00682af93093dsm367550pfn.45.2023.08.24.18.30.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 18:30:57 -0700 (PDT)
-Message-ID: <3956e2a4-c545-1212-e95f-3cf61a60d6a4@gmail.com>
-Date:   Fri, 25 Aug 2023 13:30:32 +1200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: (subset) [PATCH 00/17] -Wmissing-prototype warning fixes
-Content-Language: en-US
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Thu, 24 Aug 2023 21:58:55 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A012B1BD1;
+        Thu, 24 Aug 2023 18:58:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=GqmLor0hgV4H3x7IuvuyaB/m3hDiUm8Yzrd7b9keFg8=; b=bxxlNJ96rsx4L2kKszQ8LF6ai5
+        iNtBNOQ6lzvCMPjrA8d2B5SKpMA8ehWy3QlKX8FPouK+kPzVIEZKx+nUetaQRW5JSdDZgZ40B7sUp
+        hz637OO4Su1eEUgn8Gl/dIA4NQM5w6cHamU5x0h4uc+j+8uZ5OMjiX5dOjWaEByfsbwcty7NjoKFy
+        3XYbSKjy+5wYC+oyCRnyAV7fQupk+8Mu6cgtvaubPBjXdneuinMhpNkKRGbKhUYZMh2pnc+qlSq3t
+        /phSE0e2tky2IO5H3c5MgeU2/J9SsgCPwQOsXy7U4/wxiV2850iLaIsQdHEKmyDTGxCmoecJk/YQG
+        iXEtALAQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qZM5z-000dvR-0M;
+        Fri, 25 Aug 2023 01:58:43 +0000
+Date:   Fri, 25 Aug 2023 02:58:43 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Alasdair Kergon <agk@redhat.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>,
-        Vineet Gupta <vgupta@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Brian Cain <bcain@quicinc.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Michal Simek <monstr@monstr.eu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Jonas Bonn <jonas@southpole.se>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Stafford Horne <shorne@gmail.com>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Helge Deller <deller@gmx.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Richard Weinberger <richard@nod.at>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-next@vger.kernel.org, linux-alpha@vger.kernel.org,
-        linux-snps-arc@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org
-References: <20230810141947.1236730-1-arnd@kernel.org>
- <169292577153.789945.11297239773543112051.b4-ty@oracle.com>
-From:   Michael Schmitz <schmitzmic@gmail.com>
-In-Reply-To: <169292577153.789945.11297239773543112051.b4-ty@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Anna Schumaker <anna@kernel.org>, Chao Yu <chao@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com, Gao Xiang <xiang@kernel.org>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        jfs-discussion@lists.sourceforge.net,
+        Joern Engel <joern@lazybastard.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-xfs@vger.kernel.org,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Minchan Kim <minchan@kernel.org>, ocfs2-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Song Liu <song@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        target-devel@vger.kernel.org, Ted Tso <tytso@mit.edu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 0/29] block: Make blkdev_get_by_*() return handle
+Message-ID: <20230825015843.GB95084@ZenIV>
+References: <20230810171429.31759-1-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230810171429.31759-1-jack@suse.cz>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Martin, Arnd,
+On Fri, Aug 11, 2023 at 01:04:31PM +0200, Jan Kara wrote:
+> Hello,
+> 
+> this is a v2 of the patch series which implements the idea of blkdev_get_by_*()
+> calls returning bdev_handle which is then passed to blkdev_put() [1]. This
+> makes the get and put calls for bdevs more obviously matching and allows us to
+> propagate context from get to put without having to modify all the users
+> (again!).  In particular I need to propagate used open flags to blkdev_put() to
+> be able count writeable opens and add support for blocking writes to mounted
+> block devices. I'll send that series separately.
+> 
+> The series is based on Christian's vfs tree as of yesterday as there is quite
+> some overlap. Patches have passed some reasonable testing - I've tested block
+> changes, md, dm, bcache, xfs, btrfs, ext4, swap. This obviously doesn't cover
+> everything so I'd like to ask respective maintainers to review / test their
+> changes. Thanks! I've pushed out the full branch to:
+> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/jack/linux-fs.git bdev_handle
+> 
+> to ease review / testing.
 
-On 25/08/23 13:12, Martin K. Petersen wrote:
-> On Thu, 10 Aug 2023 16:19:18 +0200, Arnd Bergmann wrote:
->
->> Most of the patches I sent so far for the -Wmissing-prototype warnings
->> have made it into linux-next now. There are a few that I'm resending
->> now as nobody has picked them up, and then a number of fixes that I
->> found while test-building across all architectures rather than just the
->> ones I usually test.
->>
->> The first 15 patches in this series should be uncontroversial, so
->> I expect that either a subsystem maintainer or Andrew Morton can
->> apply these directly.
->>
->> [...]
-> Applied to 6.6/scsi-queue, thanks!
->
-> [07/17] scsi: qlogicpti: mark qlogicpti_info() static
->          https://git.kernel.org/mkp/scsi/c/71cc486335c4
-> [11/17] scsi: gvp11: remove unused gvp11_setup() function
->          https://git.kernel.org/mkp/scsi/c/bfaa4a0ce1bb
+Hmm...  Completely Insane Idea(tm): how about turning that thing inside out and
+having your bdev_open_by... return an actual opened struct file?
 
-I somehow missed that one ...
+After all, we do that for sockets and pipes just fine and that's a whole lot
+hotter area.
 
-The gvp11_setup() function was probably a relic from the times before 
-module parameters.
+Suppose we leave blkdev_open()/blkdev_release() as-is.  No need to mess with
+what we have for normal opened files for block devices.  And have block_open_by_dev()
+that would find bdev, etc., same yours does and shove it into anon file.
 
-Since gvp11_xfer_mask appears to be required for some Amiga systems to 
-set the DMA mask, I'd best send a patch to add such a module parameter ...
+Paired with plain fput() - no need to bother with new primitives for closing.
+With a helper returning I_BDEV(bdev_file_inode(file)) to get from those to bdev.
 
-Do you know any details around the use of DMA masks for Amiga WD33C93 
-drivers, Geert?
+NOTE: I'm not suggesting replacing ->s_bdev with struct file * if we do that -
+we want that value cached, obviously.  Just store both...
 
-Cheers,
-
-     Michael
-
-
->
+Not saying it's a good idea, but... might be interesting to look into.
+Comments?
