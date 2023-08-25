@@ -2,131 +2,227 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03DFFEE49AD
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 21:08:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7825AEE49BA
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 21:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231485AbjHYVIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Aug 2023 17:08:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43532 "EHLO
+        id S231472AbjHYVj4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Aug 2023 17:39:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231344AbjHYVHc (ORCPT
+        with ESMTP id S231491AbjHYVjW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2023 17:07:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8810E210D;
-        Fri, 25 Aug 2023 14:07:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1C8A2623E9;
-        Fri, 25 Aug 2023 21:07:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CFC4C433C8;
-        Fri, 25 Aug 2023 21:07:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692997649;
-        bh=3LZslYY/Z/fNex0qpgIIxBGEpf6J7Qp2wNTLVeCxNak=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LR9LYHTCSNbzSLc+a2zNZ2I+W25v/mVPTtA0dzLRVhwjv9G0VM6C/01wxbPexNJtO
-         IN/lLLs1iPoI+nWUt3VCKz1XqUmuLxiAnZjft463YjEooqf2k74YRuhYY2sgojQpww
-         2w6ScwoHoYzScThIWRmnw+vI3kWLkM5Kn4Gr3VHZEEhTDd0X0IHsQdeL4SY870EbV1
-         DkkSIsiiqW2O7RsRITyHVZmniYFOgVbiQ4NOQEFj7zNv0s596W/h8p9WYVIpNkRuyD
-         Aqk/94KqUdul3h4G3phhhwwYh3HQYqt1WnZlAZhqehRfSHC2yVWQ00I693urTikF50
-         80QLqKOqr3tEg==
-Date:   Fri, 25 Aug 2023 14:07:27 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
-Cc:     Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
-        quic_psodagud@quicinc.com, avmenon@quicinc.com,
-        abel.vesa@linaro.org, quic_spuppala@quicinc.com
-Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
- ufs
-Message-ID: <20230825210727.GA1366@sol.localdomain>
-References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
- <f4b5512b-9922-1511-fc22-f14d25e2426a@linaro.org>
+        Fri, 25 Aug 2023 17:39:22 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F4AC26B2
+        for <linux-block@vger.kernel.org>; Fri, 25 Aug 2023 14:39:17 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-68bec3a9bdbso1060338b3a.3
+        for <linux-block@vger.kernel.org>; Fri, 25 Aug 2023 14:39:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1692999556; x=1693604356;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o7dRQ9By/T99QWDW5xev9b8rVkM9NZXXwZrmSduoTKY=;
+        b=SlHW1FHh55Miyt5dC5YbHFzbz8/Ww6dpIRyxo6vWvL1BUT9wpnYc90O8W3sh6jbVDI
+         8VSN/Xe7i/NpqgfmZUfGif/OWVY4CvO1XNCApsJ0gTKpBFDUVISAdbUZIXX0AL7Ymm4P
+         GTcb7wyrBEoupwm2T77MgFldNvL555iN8Gi3uYCzgcocNv0xnFj+WWlwbcbOTqmgKZI+
+         MLGEhJoBOR8ij98DujYJDG8/ErJs1WTRaajOZxKdaJWii5ir39jpSlGIz75MH3BFujgn
+         75aCRb2KJIpxhwlYFJHEvUeGNqpylJdIJf8XyyAJR0UoHIDg5wblyZNVqnwV4VZyvNd5
+         jfAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692999556; x=1693604356;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o7dRQ9By/T99QWDW5xev9b8rVkM9NZXXwZrmSduoTKY=;
+        b=Y4P7y8xCZMHLocfa9h11BArgafQ1VH1+hXGE3fKjBPTMr0HLmQu4+G+AG99QdsY9p+
+         8v6igxqkehrstEfG1Zc+BfyRI4GHVTXK+2kBuiIkkn9pgMyHpetEisUrD+f6R7Gl5cwa
+         Ibae4lmQY30id14qGPzDqTToDkCRq8qCkz2PJr5Gsq5ZOSvs0Ujzv8iolUe9W/69K/Mm
+         BEchZdhpp4DrC1ANVH03I7RWGJZpYTJBW0/+ZClkJjlLAgLKSX+TUpxO7Bfz3J828/1A
+         8g/qraT809mkgVT6PKAI7Jjwn92rKomyVw5qmBVBrp0coURWZNxsLFFZhkBOTha9nir6
+         9f9w==
+X-Gm-Message-State: AOJu0YxkqF9eZEKsnfQ0QhVraCEbtLPDOpP99BEkfCJJ7pNLbzCTfZ9v
+        slcMLLhqbgM3NQdGYAq2Ifq8zQ==
+X-Google-Smtp-Source: AGHT+IFGwDu4J6IE5hfbjc7KSF4OfJEndquVBvBoV5vhWuIhyGy4zoBWcpcC8Lokr19GaOsT0RulfQ==
+X-Received: by 2002:a05:6a20:7fa0:b0:140:324c:124c with SMTP id d32-20020a056a207fa000b00140324c124cmr22387249pzj.62.1692999556447;
+        Fri, 25 Aug 2023 14:39:16 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
+        by smtp.gmail.com with ESMTPSA id a14-20020a62bd0e000000b006875df4773fsm1997221pff.163.2023.08.25.14.39.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Aug 2023 14:39:15 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qZeWO-006Uvd-0J;
+        Sat, 26 Aug 2023 07:39:12 +1000
+Date:   Sat, 26 Aug 2023 07:39:12 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Hao Xu <hao.xu@linux.dev>
+Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 02/29] xfs: rename XBF_TRYLOCK to XBF_NOWAIT
+Message-ID: <ZOkfgBlWKVmGN84i@dread.disaster.area>
+References: <20230825135431.1317785-1-hao.xu@linux.dev>
+ <20230825135431.1317785-3-hao.xu@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f4b5512b-9922-1511-fc22-f14d25e2426a@linaro.org>
+In-Reply-To: <20230825135431.1317785-3-hao.xu@linux.dev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Srinivas,
+On Fri, Aug 25, 2023 at 09:54:04PM +0800, Hao Xu wrote:
+> From: Hao Xu <howeyxu@tencent.com>
+> 
+> XBF_TRYLOCK means we need lock but don't block on it,
 
-On Fri, Aug 25, 2023 at 11:19:41AM +0100, Srinivas Kandagatla wrote:
-> 
-> On 19/07/2023 18:04, Gaurav Kashyap wrote:
-> > These patches add support to Qualcomm ICE (Inline Crypto Enginr) for hardware
-> > wrapped keys using Qualcomm Hardware Key Manager (HWKM) and are made on top
-> > of a rebased version  Eric Bigger's set of changes to support wrapped keys in
-> > fscrypt and block below:
-> > https://git.kernel.org/pub/scm/fs/fscrypt/linux.git/log/?h=wrapped-keys-v7
-> > (The rebased patches are not uploaded here)
-> > 
-> > Ref v1 here:
-> > https://lore.kernel.org/linux-scsi/20211206225725.77512-1-quic_gaurkash@quicinc.com/
-> > 
-> > Explanation and use of hardware-wrapped-keys can be found here:
-> > Documentation/block/inline-encryption.rst
-> > 
-> > This patch is organized as follows:
-> > 
-> > Patch 1 - Prepares ICE and storage layers (UFS and EMMC) to pass around wrapped keys.
-> > Patch 2 - Adds a new SCM api to support deriving software secret when wrapped keys are used
-> > Patch 3-4 - Adds support for wrapped keys in the ICE driver. This includes adding HWKM support
-> > Patch 5-6 - Adds support for wrapped keys in UFS
-> > Patch 7-10 - Supports generate, prepare and import functionality in ICE and UFS
-> > 
-> > NOTE: MMC will have similar changes to UFS and will be uploaded in a different patchset
-> >        Patch 3, 4, 8, 10 will have MMC equivalents.
-> > 
-> > Testing:
-> > Test platform: SM8550 MTP
-> > Engineering trustzone image is required to test this feature only
-> > for SM8550. For SM8650 onwards, all trustzone changes to support this
-> > will be part of the released images.
-> 
-> AFAIU, Prior to these proposed changes in scm, HWKM was done with help of
-> TA(Trusted Application) for generate, import, unwrap ... functionality.
-> 
-> 1. What is the reason for moving this from TA to new smc calls?
-> 
-> Is this because of missing smckinvoke support in upstream?
-> 
-> How scalable is this approach? Are we going to add new sec sys calls to
-> every interface to TA?
-> 
-> 2. How are the older SoCs going to deal with this, given that you are
-> changing drivers that are common across these?
-> 
-> Have you tested these patches on any older platforms?
-> 
-> What happens if someone want to add support to wrapped keys to this
-> platforms in upstream, How is that going to be handled?
-> 
-> As I understand with this, we will endup with two possible solutions over
-> time in upstream.
+Yes.
 
-It's true that Qualcomm based Android devices already use HW-wrapped keys on
-SoCs earlier than SM8650.  The problem is that the key generation, import, and
-conversion were added to Android's KeyMint HAL, as a quick way to get the
-feature out the door when it was needed (so to speak).  Unfortunately this
-coupled this feature unnecessarily to the Android KeyMint and the corresponding
-(closed source) userspace HAL provided by Qualcomm, which it's not actually
-related to.  I'd guess that Qualcomm's closed source userspace HAL makes SMC
-calls into Qualcomm's KeyMint TA, but I have no insight into those details.
 
-The new SMC calls eliminate the dependency on the Android-specific KeyMint.
-They're also being documented by Qualcomm.  So, as this patchset does, they can
-be used by Linux in the implementation of new ioctls which provide a vendor
-independent interface to HW-wrapped key generation, import, and conversion.
+> we can use it to
+> stand for not waiting for memory allcation. Rename XBF_TRYLOCK to
+> XBF_NOWAIT, which is more generic.
 
-I think the new approach is the only one that is viable outside the Android
-context.  As such, I don't think anyone has any plan to upstream support for
-HW-wrapped keys for older Qualcomm SoCs that lack the new interface.
+No.
 
-- Eric
+Not only can XBF_TRYLOCK require memory allocation, it can require
+IO to be issued. We use TRYLOCK for -readahead- and so we *must* be
+able to allocate memory and issue IO under TRYLOCK caller
+conditions.
+
+[...]
+
+> diff --git a/fs/xfs/libxfs/xfs_attr_remote.c b/fs/xfs/libxfs/xfs_attr_remote.c
+> index d440393b40eb..2ccb0867824c 100644
+> --- a/fs/xfs/libxfs/xfs_attr_remote.c
+> +++ b/fs/xfs/libxfs/xfs_attr_remote.c
+> @@ -661,7 +661,7 @@ xfs_attr_rmtval_invalidate(
+>  			return error;
+>  		if (XFS_IS_CORRUPT(args->dp->i_mount, nmap != 1))
+>  			return -EFSCORRUPTED;
+> -		error = xfs_attr_rmtval_stale(args->dp, &map, XBF_TRYLOCK);
+> +		error = xfs_attr_rmtval_stale(args->dp, &map, XBF_NOWAIT);
+>  		if (error)
+>  			return error;
+
+XBF_INCORE | XBF_NOWAIT makes no real sense. I mean, XBF_INCORE is
+exactly "find a cached buffer or fail" - it's not going to do any
+memory allocation or IO so NOWAIT smeantics don't make any sense
+here. It's the buffer lock that this lookup is explicitly
+avoiding, and so TRYLOCK describes exactly the semantics we want
+from this incore lookup.
+
+Indeed, this is a deadlock avoidance mechanism as the transaction
+may already have the buffer locked and so we don't want the
+xfs_buf_incore() lookup to try to lock the buffer again. TRYLOCK
+documents this pretty clearly - NOWAIT loses that context....
+
+> diff --git a/fs/xfs/libxfs/xfs_btree.c b/fs/xfs/libxfs/xfs_btree.c
+> index 6a6503ab0cd7..77c4f1d83475 100644
+> --- a/fs/xfs/libxfs/xfs_btree.c
+> +++ b/fs/xfs/libxfs/xfs_btree.c
+> @@ -1343,7 +1343,7 @@ xfs_btree_read_buf_block(
+>  	int			error;
+>  
+>  	/* need to sort out how callers deal with failures first */
+> -	ASSERT(!(flags & XBF_TRYLOCK));
+> +	ASSERT(!(flags & XBF_NOWAIT));
+>  
+>  	error = xfs_btree_ptr_to_daddr(cur, ptr, &d);
+>  	if (error)
+> diff --git a/fs/xfs/scrub/repair.c b/fs/xfs/scrub/repair.c
+> index ac6d8803e660..9312cf3b20e2 100644
+> --- a/fs/xfs/scrub/repair.c
+> +++ b/fs/xfs/scrub/repair.c
+> @@ -460,7 +460,7 @@ xrep_invalidate_block(
+>  
+>  	error = xfs_buf_incore(sc->mp->m_ddev_targp,
+>  			XFS_FSB_TO_DADDR(sc->mp, fsbno),
+> -			XFS_FSB_TO_BB(sc->mp, 1), XBF_TRYLOCK, &bp);
+> +			XFS_FSB_TO_BB(sc->mp, 1), XBF_NOWAIT, &bp);
+
+My point exactly.
+
+xfs_buf_incore() is simply a lookup with XBF_INCORE set. (XBF_INCORE
+| XBF_TRYLOCK) has the exactly semantics of "return the buffer only
+if it is cached and we can lock it without blocking.
+
+It will not instantiate a new buffer (i.e. do memory allocation) or
+do IO because the if it is under IO the buffer lock will be held.
+
+So, essentially, this "NOWAIT" semantic you want is already supplied
+by (XBF_INCORE | XBF_TRYLOCK) buffer lookups.
+
+>  	if (error)
+>  		return 0;
+>  
+> diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+> index 15d1e5a7c2d3..9f84bc3b802c 100644
+> --- a/fs/xfs/xfs_buf.c
+> +++ b/fs/xfs/xfs_buf.c
+> @@ -228,7 +228,7 @@ _xfs_buf_alloc(
+>  	 * We don't want certain flags to appear in b_flags unless they are
+>  	 * specifically set by later operations on the buffer.
+>  	 */
+> -	flags &= ~(XBF_UNMAPPED | XBF_TRYLOCK | XBF_ASYNC | XBF_READ_AHEAD);
+> +	flags &= ~(XBF_UNMAPPED | XBF_NOWAIT | XBF_ASYNC | XBF_READ_AHEAD);
+>  
+>  	atomic_set(&bp->b_hold, 1);
+>  	atomic_set(&bp->b_lru_ref, 1);
+> @@ -543,7 +543,7 @@ xfs_buf_find_lock(
+>  	struct xfs_buf          *bp,
+>  	xfs_buf_flags_t		flags)
+>  {
+> -	if (flags & XBF_TRYLOCK) {
+> +	if (flags & XBF_NOWAIT) {
+>  		if (!xfs_buf_trylock(bp)) {
+>  			XFS_STATS_INC(bp->b_mount, xb_busy_locked);
+>  			return -EAGAIN;
+> @@ -886,7 +886,7 @@ xfs_buf_readahead_map(
+>  	struct xfs_buf		*bp;
+>  
+>  	xfs_buf_read_map(target, map, nmaps,
+> -		     XBF_TRYLOCK | XBF_ASYNC | XBF_READ_AHEAD, &bp, ops,
+> +		     XBF_NOWAIT | XBF_ASYNC | XBF_READ_AHEAD, &bp, ops,
+>  		     __this_address);
+
+That will break readahead (which we use extensively in getdents
+operations) if we can't allocate buffers and issue IO under NOWAIT
+conditions.
+
+>  }
+>  
+> diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
+> index 549c60942208..8cd307626939 100644
+> --- a/fs/xfs/xfs_buf.h
+> +++ b/fs/xfs/xfs_buf.h
+> @@ -45,7 +45,7 @@ struct xfs_buf;
+>  
+>  /* flags used only as arguments to access routines */
+>  #define XBF_INCORE	 (1u << 29)/* lookup only, return if found in cache */
+> -#define XBF_TRYLOCK	 (1u << 30)/* lock requested, but do not wait */
+> +#define XBF_NOWAIT	 (1u << 30)/* mem/lock requested, but do not wait */
+
+That's now a really poor comment. It doesn't describe the semantics
+or constraints that NOWAIT might imply.
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
