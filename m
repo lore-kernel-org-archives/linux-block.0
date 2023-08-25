@@ -2,105 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAD3C6FA8F
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 02:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB84C7EE2C
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 06:25:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbjHYCpf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 22:45:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50908 "EHLO
+        id S236499AbjHYGZM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Aug 2023 02:25:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230510AbjHYCpV (ORCPT
+        with ESMTP id S229468AbjHYGYm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 22:45:21 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E167133;
-        Thu, 24 Aug 2023 19:45:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BAs3vHnqB82jyF9T0JKZy08jGuQDnnwXLjj44ySrvFg=; b=qG/yF0qNQFz1HErcIOwDpMsE95
-        yvpWaJiccPJne5E6IKKdLk49il4mSFXaxO10+cPRq4RqC2mgW99o+1yf2c4bs81MOg47gz2QA9ZFT
-        aLJydE8tWV8lzCMv2+NeX7mQCMknUB5EhVQiqQN5lBaCEsUTiWdC5wvrGaIvwhXVRrB8AFK90tiyv
-        FLjfEbnlTWQpGxkRRGa9YbyGmW5wSGD0SSIG8KNS+lDxJs8er6W0jn8lCxtIFwizoom7apeGKhs9v
-        c0WlIDcCZSTbrPU9y3Jy4WWr/hC4ZjXs2RvO1eOF4P2UntF/l1INZ+xsvc1Hck8kt4ukocelH0IdQ
-        bSBNV7lw==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qZMoj-000edp-26;
-        Fri, 25 Aug 2023 02:44:57 +0000
-Date:   Fri, 25 Aug 2023 03:44:57 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
-        Josef Bacik <josef@toxicpanda.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Phillip Potter <phil@philpotter.co.uk>,
-        Coly Li <colyli@suse.de>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
-        Christian Brauner <brauner@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-um@lists.infradead.org,
-        linux-scsi@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        linux-btrfs@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-pm@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 01/30] block: also call ->open for incremental partition
- opens
-Message-ID: <20230825024457.GD95084@ZenIV>
-References: <20230608110258.189493-1-hch@lst.de>
- <20230608110258.189493-2-hch@lst.de>
+        Fri, 25 Aug 2023 02:24:42 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D83A1BDB;
+        Thu, 24 Aug 2023 23:24:40 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1007F1F8B0;
+        Fri, 25 Aug 2023 06:24:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692944678; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gUtDy3vy5owHa1nT7w/gfPpkT2zQPnqVi3pslPb35oc=;
+        b=KjL+qbyt3oKatnDWHUK+0GA6xt9mmc7xpJ0yM/pocrAofJaCW+82fvEqeMVyIx1gR/urpz
+        S/viyFJS3n2cHx2kK5hoGg+g8U36wWLlDJVvPuPw97v5oeC3kH14APVYAe1/6Jasb6Mooe
+        4I1eC1b5rAox9MICii2iMdkZh71DyGk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692944678;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gUtDy3vy5owHa1nT7w/gfPpkT2zQPnqVi3pslPb35oc=;
+        b=qT9WmPLRfqMP1Qm8+ziDKk9uH4PY41ZoprTBna3qyhiIQKKVVi5CIuqEo/TulajcpemShO
+        RI1d20vY8aiYO3DQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 010D01340A;
+        Fri, 25 Aug 2023 06:24:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id I+ZuOyVJ6GTrKAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 25 Aug 2023 06:24:37 +0000
+Date:   Fri, 25 Aug 2023 08:24:53 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
+ nvmet_target_{setup/cleanup} common code
+Message-ID: <fkj36wd64v3nzs5uy776zqqxqlyxucsyf7xbjzuxdy6d4lfagz@kzryxwk6ptfr>
+References: <20230822083812.24612-1-dwagner@suse.de>
+ <20230822083812.24612-4-dwagner@suse.de>
+ <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
+ <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230608110258.189493-2-hch@lst.de>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 08, 2023 at 01:02:29PM +0200, Christoph Hellwig wrote:
+On Thu, Aug 24, 2023 at 07:36:12AM -0700, Bart Van Assche wrote:
+> On 8/23/23 20:09, Shinichiro Kawasaki wrote:
+> > CC+: Bart,
+> > 
+> > This patch makes shellcheck unhappy:
+> > 
+> > tests/nvme/003:26:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/004:26:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/005:26:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/006:24:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/008:25:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/010:25:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/012:29:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/014:28:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/018:26:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/019:27:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > tests/nvme/023:25:2: note: Use _nvmet_target_setup "$@" if function's $1 should mean script's $1. [SC2119]
+> > 
+> > But I think the warn SC2119 is false-positive and we should suppress it. In the
+> > past, blktests had suppressed it until the recent commit 26664dff17b6 ("Do not
+> > suppress any shellcheck warnings"). I think this commit should be reverted
+> > together with this series.
+> Please do not revert commit 26664dff17b6 because it produces useful
+> warnings. Do you agree that the above warnings are easy to suppress,
+> e.g. by changing "_nvmet_target_setup" into
+> "_nvmet_target_setup ignored_argument"?
 
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -683,9 +683,6 @@ static int blkdev_get_part(struct block_device *part, fmode_t mode)
->  	struct gendisk *disk = part->bd_disk;
->  	int ret;
->  
-> -	if (atomic_read(&part->bd_openers))
-> -		goto done;
-> -
->  	ret = blkdev_get_whole(bdev_whole(part), mode);
->  	if (ret)
->  		return ret;
-> @@ -694,9 +691,10 @@ static int blkdev_get_part(struct block_device *part, fmode_t mode)
->  	if (!bdev_nr_sectors(part))
->  		goto out_blkdev_put;
->  
-> -	disk->open_partitions++;
-> -	set_init_blocksize(part);
-> -done:
-> +	if (!atomic_read(&part->bd_openers)) {
-> +		disk->open_partitions++;
-> +		set_init_blocksize(part);
-> +	}
+Well, these warnings could be address by adding back '--blkdev=device',
+but I just dropped them on Sagi's request.
 
-[with apologies for very late (and tangential) reply]
-
-That got me curious about the ->bd_openers - do we need it atomic?
-Most of the users (and all places that do modifications) are
-under ->open_mutex; the only exceptions are
-	* early sync logics in blkdev_put(); it's explicitly racy -
-see the comment there.
-	* callers of disk_openers() in loop and nbd (the ones in
-zram are under ->open_mutex).  There's driver-private exclusion
-around those, but in any case - READ_ONCE() is no worse than
-atomic_read() in those cases.
-
-Is there something subtle I'm missing here?
+So what is it going to be? Ignoring SC2119 or adding and default
+argument? I personally would rather add SC2119 because there a lot of
+more callers which hand in default arguments which I would like to
+remove anyway. Working around ShellCheck current limitation seems wrong
+to me.
