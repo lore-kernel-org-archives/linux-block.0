@@ -2,193 +2,233 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A15EBEE49A3
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 09:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84049C3DA66
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 09:46:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236435AbjHYJLy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Aug 2023 05:11:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56116 "EHLO
+        id S233890AbjHYJpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Aug 2023 05:45:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244162AbjHYJLe (ORCPT
+        with ESMTP id S241943AbjHYJpN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2023 05:11:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D69F01BF6
-        for <linux-block@vger.kernel.org>; Fri, 25 Aug 2023 02:10:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692954646;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UtgAsF0Pt8uZv/RBVLuSugJDghoD4rbxrgGsATEZ6x0=;
-        b=UK0ofPd7TTGXfIIkB9hCYhfBsSflNZejcBQzjhUzgNqvNWzZcIn7xTohsnah9Ul0RRCN83
-        F0Zp+5b3/7bRpXC9cfZr1PFtegWDC47OGwW5Haw1nHyOyiu2K05/qu0F3QP2GMaYkJ/sXQ
-        9wmdtHmSZMXFq9fHePjVyfzulpCmLnE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-527-HusiOG7eOZm_s60xlNxCYA-1; Fri, 25 Aug 2023 05:10:39 -0400
-X-MC-Unique: HusiOG7eOZm_s60xlNxCYA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 25 Aug 2023 05:45:13 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15B2519A1;
+        Fri, 25 Aug 2023 02:45:10 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2BD29108BEF3;
-        Fri, 25 Aug 2023 09:10:38 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 366AE2026D68;
-        Fri, 25 Aug 2023 09:10:36 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/2] io_uring: reap iopoll events before exiting io wq
-Date:   Fri, 25 Aug 2023 17:09:59 +0800
-Message-Id: <20230825090959.1866771-3-ming.lei@redhat.com>
-In-Reply-To: <20230825090959.1866771-1-ming.lei@redhat.com>
-References: <20230825090959.1866771-1-ming.lei@redhat.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B662220702;
+        Fri, 25 Aug 2023 09:45:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1692956709; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9Cr89KhDwlq733Agokzc5feg+gVzfabZs0ngAJoV2B8=;
+        b=tXkzGYYyF8dTgTRV2OcUxY7YPJ7B81fASutLRVNhjm9cJTw8kpcG9q40T2B6txCxP8xf2K
+        juK97e7Ue67XtTSBThYzKG568fUbMP2m0zD5h5i9ZmNaYDR1eHHL/+kiP1jPMolQ8RxNWE
+        Uk8hpNyIyLJ4qxlVkOrfe6IqRSn550w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1692956709;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9Cr89KhDwlq733Agokzc5feg+gVzfabZs0ngAJoV2B8=;
+        b=UEhSIq587DqSEIZRLu//AsWUpyZ50P8/7uJ/uTxE7s6tBD3YlqHU6r6wX/InYL7Vu7vnu3
+        KnvzX9ZylnAaUdCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A916C138F9;
+        Fri, 25 Aug 2023 09:45:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id p6ZCKSV46GSfDAAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 25 Aug 2023 09:45:09 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 1E657A0774; Fri, 25 Aug 2023 11:45:09 +0200 (CEST)
+Date:   Fri, 25 Aug 2023 11:45:09 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 02/29] block: Use bdev_open_by_dev() in blkdev_open()
+Message-ID: <20230825094509.yarnl4jpayqqjk4c@quack3>
+References: <20230818123232.2269-1-jack@suse.cz>
+ <20230823104857.11437-2-jack@suse.cz>
+ <20230825022826.GC95084@ZenIV>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: multipart/mixed; boundary="g54c2gfun6pzxbtx"
+Content-Disposition: inline
+In-Reply-To: <20230825022826.GC95084@ZenIV>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-io_uring delays reaping iopoll events into exit work, which is scheduled
-in io_uring_release(). But io wq is exited inside do_exit(), and wq code
-path may share resource with iopoll code path, such as request. If iopoll
-events aren't reaped, io wq exit can't be done, and cause IO hang.
 
-The issue can be triggered when terminating 't/io_uring -n4 /dev/nullb0' with
-default null_blk parameters.
+--g54c2gfun6pzxbtx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Fix it by reaping iopoll events in io_uring_clean_tctx() and moving io wq
-exit into workqueue context.
+On Fri 25-08-23 03:28:26, Al Viro wrote:
+> On Wed, Aug 23, 2023 at 12:48:13PM +0200, Jan Kara wrote:
+> > diff --git a/block/ioctl.c b/block/ioctl.c
+> > index 648670ddb164..54c1e2f71031 100644
+> > --- a/block/ioctl.c
+> > +++ b/block/ioctl.c
+> > @@ -582,7 +582,8 @@ long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+> >  {
+> >  	struct block_device *bdev = I_BDEV(file->f_mapping->host);
+> >  	void __user *argp = (void __user *)arg;
+> > -	blk_mode_t mode = file_to_blk_mode(file);
+> > +	struct bdev_handle *bdev_handle = file->private_data;
+> > +	blk_mode_t mode = bdev_handle->mode;
+> >  	int ret;
+> >  
+> >  	switch (cmd) {
+> 
+> 	Still the same bug as in v2 - you are missing the effects of
+> fcntl(2) setting/clearing O_NDELAY and sd_ioctl() is sensitive to that.
 
-Closes: https://lore.kernel.org/linux-block/3893581.1691785261@warthog.procyon.org.uk/
-Reported-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- io_uring/io_uring.c |  2 +-
- io_uring/io_uring.h |  1 +
- io_uring/tctx.c     | 60 +++++++++++++++++++++++++++++++++++++++------
- 3 files changed, 54 insertions(+), 9 deletions(-)
+Argh, indeed you are correct. I forgot about fcntl(2) modifying
+file->f_flags. Attached is a version of the patch that I'm currently
+testing.
 
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index c4adb44f1aa4..ab7844c3380c 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -3214,7 +3214,7 @@ static __cold bool io_uring_try_cancel_iowq(struct io_ring_ctx *ctx)
- 	return ret;
- }
- 
--static bool iopoll_reap_events(struct io_ring_ctx *ctx, bool reap_all)
-+bool iopoll_reap_events(struct io_ring_ctx *ctx, bool reap_all)
- {
- 	bool reapped = false;
- 
-diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
-index 547c30582fb8..f1556666a064 100644
---- a/io_uring/io_uring.h
-+++ b/io_uring/io_uring.h
-@@ -63,6 +63,7 @@ void io_req_task_queue_fail(struct io_kiocb *req, int ret);
- void io_req_task_submit(struct io_kiocb *req, struct io_tw_state *ts);
- void tctx_task_work(struct callback_head *cb);
- __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd);
-+bool iopoll_reap_events(struct io_ring_ctx *ctx, bool reap_all);
- int io_uring_alloc_task_context(struct task_struct *task,
- 				struct io_ring_ctx *ctx);
- 
-diff --git a/io_uring/tctx.c b/io_uring/tctx.c
-index c043fe93a3f2..582b9149bab1 100644
---- a/io_uring/tctx.c
-+++ b/io_uring/tctx.c
-@@ -6,6 +6,7 @@
- #include <linux/slab.h>
- #include <linux/nospec.h>
- #include <linux/io_uring.h>
-+#include <linux/delay.h>
- 
- #include <uapi/linux/io_uring.h>
- 
-@@ -175,24 +176,67 @@ __cold void io_uring_del_tctx_node(unsigned long index)
- 	kfree(node);
- }
- 
-+struct wq_exit_work {
-+	struct work_struct work;
-+	struct io_wq *wq;
-+	bool done;
-+};
-+
-+static void io_uring_wq_exit_work(struct work_struct *work)
-+{
-+	struct wq_exit_work *wq_work =
-+                  container_of(work, struct wq_exit_work, work);
-+	struct io_wq *wq = wq_work->wq;
-+
-+	/*
-+	 * Must be after io_uring_del_tctx_node() (removes nodes under
-+	 * uring_lock) to avoid race with io_uring_try_cancel_iowq().
-+	 */
-+	io_wq_put_and_exit(wq);
-+	wq_work->done = true;
-+}
-+
- __cold void io_uring_clean_tctx(struct io_uring_task *tctx)
- {
- 	struct io_wq *wq = tctx->io_wq;
-+	struct wq_exit_work work = {
-+		.wq = wq,
-+		.done = true,
-+	};
- 	struct io_tctx_node *node;
- 	unsigned long index;
- 
--	xa_for_each(&tctx->xa, index, node) {
--		io_uring_del_tctx_node(index);
--		cond_resched();
--	}
-+	/*
-+	 * io_wq may depend on reaping iopoll events because pending
-+	 * requests in io_wq may share resource with polled requests,
-+	 * meantime new polled IO may be submitted from io_wq after
-+	 * getting resource.
-+	 *
-+	 * So io_wq has to be exited from workqueue context for avoiding
-+	 * IO hang.
-+	 */
- 	if (wq) {
-+		work.done = false;
-+		INIT_WORK(&work.work, io_uring_wq_exit_work);
-+		queue_work(system_unbound_wq, &work.work);
-+	}
-+
-+	while (!work.done) {
-+		xa_for_each(&tctx->xa, index, node)
-+			iopoll_reap_events(node->ctx, true);
-+
- 		/*
--		 * Must be after io_uring_del_tctx_node() (removes nodes under
--		 * uring_lock) to avoid race with io_uring_try_cancel_iowq().
-+		 * Wait a little while and reap again since new polled
-+		 * IO may get resource from io_wq and be submitted.
- 		 */
--		io_wq_put_and_exit(wq);
--		tctx->io_wq = NULL;
-+		msleep(10);
-+	}
-+
-+	xa_for_each(&tctx->xa, index, node) {
-+		io_uring_del_tctx_node(index);
-+		cond_resched();
- 	}
-+	tctx->io_wq = NULL;
- }
- 
- void io_uring_unreg_ringfd(void)
+								Honza
+
 -- 
-2.40.1
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
+--g54c2gfun6pzxbtx
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-block-Use-bdev_open_by_dev-in-blkdev_open.patch"
+
+From 46df2340545e872d34cf824e0d33b9b00b91e32f Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Wed, 21 Jun 2023 13:16:32 +0200
+Subject: [PATCH] block: Use bdev_open_by_dev() in blkdev_open()
+
+Convert blkdev_open() to use bdev_open_by_dev(). To be able to propagate
+handle from blkdev_open() to blkdev_release() we need to stop using
+existence of file->private_data to determine exclusive block device
+opens. Use bdev_handle->mode for this purpose since file->f_flags
+isn't usable for this (O_EXCL is cleared from the flags during open).
+
+Acked-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/bdev.c           |  3 +++
+ block/fops.c           | 35 +++++++++++++++++++----------------
+ include/linux/blkdev.h |  1 +
+ 3 files changed, 23 insertions(+), 16 deletions(-)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index fce150f9e66d..f1de1e65517b 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -844,6 +844,9 @@ struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+ 	}
+ 	handle->bdev = bdev;
+ 	handle->holder = holder;
++	if (holder)
++		mode |= BLK_OPEN_EXCL;
++	handle->mode = mode;
+ 	return handle;
+ }
+ EXPORT_SYMBOL(bdev_open_by_dev);
+diff --git a/block/fops.c b/block/fops.c
+index a286bf3325c5..5b0e6899c5ad 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -473,12 +473,19 @@ static int blkdev_fsync(struct file *filp, loff_t start, loff_t end,
+ blk_mode_t file_to_blk_mode(struct file *file)
+ {
+ 	blk_mode_t mode = 0;
++	struct bdev_handle *handle = file->private_data;
+ 
+ 	if (file->f_mode & FMODE_READ)
+ 		mode |= BLK_OPEN_READ;
+ 	if (file->f_mode & FMODE_WRITE)
+ 		mode |= BLK_OPEN_WRITE;
+-	if (file->private_data)
++	/*
++	 * do_dentry_open() clears O_EXCL from f_flags, use handle->mode to
++	 * determine whether the open was exclusive for already open files.
++	 */
++	if (handle)
++		mode |= handle->mode & BLK_OPEN_EXCL;
++	else if (file->f_flags & O_EXCL)
+ 		mode |= BLK_OPEN_EXCL;
+ 	if (file->f_flags & O_NDELAY)
+ 		mode |= BLK_OPEN_NDELAY;
+@@ -496,7 +503,8 @@ blk_mode_t file_to_blk_mode(struct file *file)
+ 
+ static int blkdev_open(struct inode *inode, struct file *filp)
+ {
+-	struct block_device *bdev;
++	struct bdev_handle *handle;
++	blk_mode_t mode;
+ 
+ 	/*
+ 	 * Preserve backwards compatibility and allow large file access
+@@ -507,29 +515,24 @@ static int blkdev_open(struct inode *inode, struct file *filp)
+ 	filp->f_flags |= O_LARGEFILE;
+ 	filp->f_mode |= FMODE_BUF_RASYNC;
+ 
+-	/*
+-	 * Use the file private data to store the holder for exclusive openes.
+-	 * file_to_blk_mode relies on it being present to set BLK_OPEN_EXCL.
+-	 */
+-	if (filp->f_flags & O_EXCL)
+-		filp->private_data = filp;
+-
+-	bdev = blkdev_get_by_dev(inode->i_rdev, file_to_blk_mode(filp),
+-				 filp->private_data, NULL);
+-	if (IS_ERR(bdev))
+-		return PTR_ERR(bdev);
++	mode = file_to_blk_mode(filp);
++	handle = bdev_open_by_dev(inode->i_rdev, mode,
++			mode & BLK_OPEN_EXCL ? filp : NULL, NULL);
++	if (IS_ERR(handle))
++		return PTR_ERR(handle);
+ 
+-	if (bdev_nowait(bdev))
++	if (bdev_nowait(handle->bdev))
+ 		filp->f_mode |= FMODE_NOWAIT;
+ 
+-	filp->f_mapping = bdev->bd_inode->i_mapping;
++	filp->f_mapping = handle->bdev->bd_inode->i_mapping;
+ 	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
++	filp->private_data = handle;
+ 	return 0;
+ }
+ 
+ static int blkdev_release(struct inode *inode, struct file *filp)
+ {
+-	blkdev_put(I_BDEV(filp->f_mapping->host), filp->private_data);
++	bdev_release(filp->private_data);
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 6a942ec773b6..ae741dec184b 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1481,6 +1481,7 @@ extern const struct blk_holder_ops fs_holder_ops;
+ struct bdev_handle {
+ 	struct block_device *bdev;
+ 	void *holder;
++	blk_mode_t mode;
+ };
+ 
+ struct block_device *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
+-- 
+2.35.3
+
+
+--g54c2gfun6pzxbtx--
