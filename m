@@ -2,141 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB03EE49B4
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 07:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B95C3DA66
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 08:26:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238097AbjHYHjs convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Aug 2023 03:39:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37840 "EHLO
+        id S235769AbjHYIZa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Aug 2023 04:25:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243279AbjHYHjo (ORCPT
+        with ESMTP id S231164AbjHYIZA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2023 03:39:44 -0400
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA19D1FCA;
-        Fri, 25 Aug 2023 00:39:42 -0700 (PDT)
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-5921a962adfso7750207b3.1;
-        Fri, 25 Aug 2023 00:39:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692949182; x=1693553982;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E5r8bhhlGnXrx708tsGw6Ag8gm7AVkEO6BeDk4HD7tk=;
-        b=WLwKyxXquJm5Xn2E5suH9Ccdce9jLlK+GauaIf0md59SIWvBfCcZk4dC06SZ0nwQ5K
-         o8mlkO6FrAPPZ3xikK2nHElJNrNcLfVrv2YPtiaWl+//7MkAIb0Vy9SjeVnmpHyCYH4W
-         I5mObQzFhw+m1eUuyVIrzuU9uKe9VfJqoq2WCZPHWNbvYfU/7BBGvgSdw3Aj94FOHzun
-         daBwzKmfiYOEG8N743Xq7gSnARMMxTcLLRtVzpgdK587Rrb1jXfjpcGRqZ29++t0F+TH
-         kPYRW1w9pwZo8+0r6gIkcz/69x/2ENZa+/qIVHSblZZT+i08RU5Os3RvT9tGC4TBTm90
-         tNnA==
-X-Gm-Message-State: AOJu0YzJmfhWcq6vO1UlWpwHrSuIxQLbZeRqaa3IxlV4wtuvVLN03mWl
-        TT2srflCsiYRdKyAssRS2LZd8SWeNqosAGzC
-X-Google-Smtp-Source: AGHT+IG5X+1N+9gN7m2P63rFzRbifScZ6dVPHHJG1DUCTreGK5Pu6Rcf3MDfyMu9eFYv5GgCMrEEDw==
-X-Received: by 2002:a0d:cd45:0:b0:561:206a:ee52 with SMTP id p66-20020a0dcd45000000b00561206aee52mr20431530ywd.24.1692949181853;
-        Fri, 25 Aug 2023 00:39:41 -0700 (PDT)
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com. [209.85.128.172])
-        by smtp.gmail.com with ESMTPSA id l132-20020a0de28a000000b0058e430889d5sm379613ywe.10.2023.08.25.00.39.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Aug 2023 00:39:40 -0700 (PDT)
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5924093a9b2so7680237b3.2;
-        Fri, 25 Aug 2023 00:39:40 -0700 (PDT)
-X-Received: by 2002:a25:34cd:0:b0:d0b:5b6:4629 with SMTP id
- b196-20020a2534cd000000b00d0b05b64629mr19382891yba.46.1692949180028; Fri, 25
- Aug 2023 00:39:40 -0700 (PDT)
+        Fri, 25 Aug 2023 04:25:00 -0400
+Received: from out-67.mta1.migadu.com (out-67.mta1.migadu.com [IPv6:2001:41d0:203:375::43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD26F19A1
+        for <linux-block@vger.kernel.org>; Fri, 25 Aug 2023 01:24:57 -0700 (PDT)
+Message-ID: <84c857f7-9966-6125-92c4-1b2fa96fb98d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1692951895;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wqbXWkPKTS9wFhIrNSacoOf7UHR08PGSBOsQjqtY1Y4=;
+        b=kc4rEmgYNsSGtLStBuapfpyVWmgL1JJ4b2qZV9KujzXqAEEDM0Q9jKo5DBmKXm7rnSoBD7
+        bjq3JYuK7DyNtEIC7n8jqbS0F5IUg0y70dKOyaXfC9W6FnOEld/lGSmasId+1JCem3fmAQ
+        Vz9Gu+NRDV2e4fNSvRfoO3vCqMlaJZY=
+Date:   Fri, 25 Aug 2023 16:24:48 +0800
 MIME-Version: 1.0
-References: <20230810141947.1236730-1-arnd@kernel.org> <169292577153.789945.11297239773543112051.b4-ty@oracle.com>
- <3956e2a4-c545-1212-e95f-3cf61a60d6a4@gmail.com>
-In-Reply-To: <3956e2a4-c545-1212-e95f-3cf61a60d6a4@gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 25 Aug 2023 09:39:28 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdWC2S330_Vb_NTHTDC=BakBsw4ouP-eFJv0erV1-jmvTQ@mail.gmail.com>
-Message-ID: <CAMuHMdWC2S330_Vb_NTHTDC=BakBsw4ouP-eFJv0erV1-jmvTQ@mail.gmail.com>
-Subject: Re: (subset) [PATCH 00/17] -Wmissing-prototype warning fixes
-To:     Michael Schmitz <schmitzmic@gmail.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Matt Turner <mattst88@gmail.com>,
-        Vineet Gupta <vgupta@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Brian Cain <bcain@quicinc.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Michal Simek <monstr@monstr.eu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Jonas Bonn <jonas@southpole.se>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Stafford Horne <shorne@gmail.com>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Helge Deller <deller@gmx.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Richard Weinberger <richard@nod.at>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-next@vger.kernel.org, linux-alpha@vger.kernel.org,
-        linux-snps-arc@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH 0/6] blk-mq: optimize the queue_rqs() support
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk, hch@lst.de,
+        ming.lei@redhat.com, kbusch@kernel.org
+Cc:     mst@redhat.com, sagi@grimberg.me, damien.lemoal@opensource.wdc.com,
+        kch@nvidia.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
+References: <20230824144403.2135739-1-chengming.zhou@linux.dev>
+ <e4701e0e-57a3-6ee3-8686-6b1d3750c124@acm.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <e4701e0e-57a3-6ee3-8686-6b1d3750c124@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Michael,
+On 2023/8/25 01:02, Bart Van Assche wrote:
+> On 8/24/23 07:43, chengming.zhou@linux.dev wrote:
+>> From: Chengming Zhou <zhouchengming@bytedance.com>
+>>
+>> The current queue_rqs() support has limitation that it can't work on
+>> shared tags queue, which is resolved by patch 1-3. We move the account
+>> of active requests to where we really allocate the driver tag.
+>>
+>> This is clearer and matched with the unaccount side which now happen
+>> when we put the driver tag. And we can remove RQF_MQ_INFLIGHT, which
+>> was used to avoid double account problem of flush request.
+>>
+>> Another problem is that the driver that support queue_rqs() has to
+>> set inflight request table by itself, which is resolved in patch 4.
+>>
+>> The patch 5 fixes a potential race problem which may cause false
+>> timeout because of the reorder of rq->state and rq->deadline.
+>>
+>> The patch 6 add support queue_rqs() for null_blk, which showed a
+>> 3.6% IOPS improvement in fio/t/io_uring benchmark on my test VM.
+>> And we also use it for testing queue_rqs() on shared tags queue.
+> 
+> Hi Jens and Christoph,
+> 
+> This patch series would be simplified significantly if the code for
+> fair tag allocation would be removed first
+> (https://lore.kernel.org/linux-block/20230103195337.158625-1-bvanassche@acm.org/, January 2023).
+> It has been proposed to improve fair tag sharing but the complexity of
+> the proposed alternative is scary
+> (https://lore.kernel.org/linux-block/20230618160738.54385-1-yukuai1@huaweicloud.com/, June 2023).
+>  Does everyone agree with removing the code for fair tag sharing - code
+> that significantly hurts performance of UFS devices and code that did
+> not exist in the legacy block layer?
+> 
 
-On Fri, Aug 25, 2023 at 3:31 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
-> On 25/08/23 13:12, Martin K. Petersen wrote:
-> > [11/17] scsi: gvp11: remove unused gvp11_setup() function
-> >          https://git.kernel.org/mkp/scsi/c/bfaa4a0ce1bb
->
-> I somehow missed that one ...
->
-> The gvp11_setup() function was probably a relic from the times before
-> module parameters.
->
-> Since gvp11_xfer_mask appears to be required for some Amiga systems to
-> set the DMA mask, I'd best send a patch to add such a module parameter ...
->
-> Do you know any details around the use of DMA masks for Amiga WD33C93
-> drivers, Geert?
+Hi Bart, thanks for the references!
 
-Doh, it's been a while, and I never had an affected system.
-Probably it's needed on A2000 with an accelerator card and GVP II SCSI,
-to prevent DMA to RAM banks that do not support fast DMA cycles.
+I don't know the details of the UFS devices bad performance problem.
+But I feel it maybe caused by the too lazy queue idle handling, which
+is now only handled in queue timeout work.
 
-Gr{oetje,eeting}s,
+Another problem maybe the wakeup batch algorithm, which is too subtle.
+And there were some IO hang problems caused by it in the past.
 
-                        Geert
+So yes, we should improve it, although I don't have good idea for now,
+need to do some tests and analysis.
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+As for removing all this code, I don't know from my limited knowledge.
+It was introduced to improve relative fair tags sharing between queues,
+to avoid starvation. And the proposed alternative looks too complex to me.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Thanks.
