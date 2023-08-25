@@ -2,102 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 486C9C88CB9
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 01:01:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A721EE49B8
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 01:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234098AbjHYBAi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 21:00:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56084 "EHLO
+        id S235383AbjHYBOA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 21:14:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbjHYBAX (ORCPT
+        with ESMTP id S236757AbjHYBNs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 21:00:23 -0400
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 885E519B5;
-        Thu, 24 Aug 2023 18:00:21 -0700 (PDT)
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-68a3b66f350so398204b3a.3;
-        Thu, 24 Aug 2023 18:00:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692925221; x=1693530021;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jB2xRswWJa0klj7TJw27ybThB4/tZn3Dja5CUdH0AEA=;
-        b=T3qwrro5Z++rCEXnXHtBSaiK3Lz6hj2MDiYJDFBq+EELF/ijXoxhAGcdUOqUwXcj3U
-         0If80ChUpRs9p1YNjlvBDHtgsobr6OQ26cS5m4o37mX2i/F3u2LS/ac1+F8oQvuOQPmb
-         0jlpTjVyuoQKmGMAJRHvvIw2j4nbxOFn9YElodTNAgVpaQONihN5nkWI0yDyGbuC/pK3
-         p00MujHUhvbcO1UiNx1Vh3w2J+BeJUo5RFbrQR0VsBi2gLgr4y961JNFymvD/YGi3VK/
-         f4GfJKD9Y5iCx/c/9PdEWy3EJgaF39//Zq4NBXxxySHf7HS8mwkOVPlYMLDGdOsLqKz+
-         msWw==
-X-Gm-Message-State: AOJu0YyIuOrpOKkZ2rp+ic0YfMDh3Il14DjDzN/H6qgy+2/hZslAziso
-        z1Chm0h478UcohuSyOIJnR0=
-X-Google-Smtp-Source: AGHT+IHLI2s1q9v/JFg0bDQlKf45MGO1AWW/E3PjJecMe0+ksEhsT/rTY9FImsrICm4gBeNGRszsxg==
-X-Received: by 2002:a05:6a20:3215:b0:14c:512c:60d9 with SMTP id hl21-20020a056a20321500b0014c512c60d9mr1145750pzc.27.1692925220830;
-        Thu, 24 Aug 2023 18:00:20 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id 5-20020aa79245000000b0068bbd43a6e2sm358016pfp.10.2023.08.24.18.00.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 18:00:20 -0700 (PDT)
-Message-ID: <d9938e36-0a8c-49c6-89bf-73f9677253c3@acm.org>
-Date:   Thu, 24 Aug 2023 18:00:19 -0700
+        Thu, 24 Aug 2023 21:13:48 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 724A51BF1;
+        Thu, 24 Aug 2023 18:13:46 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37OJEN3l010276;
+        Fri, 25 Aug 2023 01:13:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2023-03-30;
+ bh=uhEjckime6bsF1xq0dmnY+LwEHiDmuGwjHJQ7hVpFpk=;
+ b=xT4JwIyBXmmvopnLoTqXTVQDIyq4jGSov+rjFGn7JrEsFJ0nGwiZ57rChZOcNtxS8gnd
+ 32i9D/0gBNdAu6wmrSv4Tj5XGTtiOMTcrD7d8d7sIx9zu+UBUHmYA/WieiP0xKAeu3gF
+ eHe1MsKPNrAZDzygQo0FmmEXELlSaZ2xMctwoLvlgndq1xchpQqBIi92sT4g6z/NC03I
+ Sq45+sJdryY0Xt3UtsdNEeUPJQQwXRC0pKx/6zSsrk8N0z228cv46+9188htxHxgrJuH
+ O19AK6RPcqphkoDDRpvAZZx3qvPOulLbxkXwvTBtVM7s38ELpJEo9mWBxT45N4g00a45 fg== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3sn1yv5ft9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Aug 2023 01:13:38 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37P03oRV035625;
+        Fri, 25 Aug 2023 01:13:37 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3sn1ywqfhw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Aug 2023 01:13:37 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37P1DVDv019787;
+        Fri, 25 Aug 2023 01:13:36 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3sn1ywqf8n-3;
+        Fri, 25 Aug 2023 01:13:36 +0000
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Matt Turner <mattst88@gmail.com>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Brian Cain <bcain@quicinc.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Michal Simek <monstr@monstr.eu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Stafford Horne <shorne@gmail.com>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        Richard Weinberger <richard@nod.at>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-next@vger.kernel.org, linux-alpha@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
+        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: (subset) [PATCH 00/17] -Wmissing-prototype warning fixes
+Date:   Thu, 24 Aug 2023 21:12:49 -0400
+Message-Id: <169292577153.789945.11297239773543112051.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230810141947.1236730-1-arnd@kernel.org>
+References: <20230810141947.1236730-1-arnd@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 04/16] scsi: core: Introduce a mechanism for
- reordering requests in the error handler
-To:     Damien Le Moal <dlemoal@kernel.org>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20230822191822.337080-1-bvanassche@acm.org>
- <20230822191822.337080-5-bvanassche@acm.org>
- <3562fc36-4bc2-b4fb-a2ad-1e310baf1b47@suse.de>
- <078d2954-f4af-6678-29ce-d8f65ff1397a@acm.org>
- <741e19ae-d4fd-11f5-7faa-18b888ff769c@kernel.org>
- <6355b575-3f59-93dc-5acf-4726c6e80a15@acm.org>
- <5c36ae01-a806-a36b-0196-41c217f78307@suse.de>
- <1e54cf7a-4e8f-4539-6677-d6bf0ec88ea5@acm.org>
- <5b94bd2d-78a0-b94b-621c-1732e2cce58c@kernel.org>
-Content-Language: en-US
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <5b94bd2d-78a0-b94b-621c-1732e2cce58c@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-25_01,2023-08-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 phishscore=0 mlxlogscore=763 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2308250009
+X-Proofpoint-GUID: X2SaJXDprf48MqrqrcFkis4RNSuOroKu
+X-Proofpoint-ORIG-GUID: X2SaJXDprf48MqrqrcFkis4RNSuOroKu
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/24/23 16:53, Damien Le Moal wrote:
-> I think that Hannes point was that if you ensure that the rejected regular write
-> commands used to emulate zone append when requeued go through the sd driver
-> again when resubmitted, they will be changed again to emulate the original zone
-> append using the latest wp location, which is assumed correct. And that does not
-> depend on the ordering. So requeuing these regular writes does not need sorting.
-> It can be in any order. The constraint is of course that they must be re-preped
-> from the original REQ_OP_ZONE_APPEND every time they are requeued.
+On Thu, 10 Aug 2023 16:19:18 +0200, Arnd Bergmann wrote:
 
-Hi Damien,
+> Most of the patches I sent so far for the -Wmissing-prototype warnings
+> have made it into linux-next now. There are a few that I'm resending
+> now as nobody has picked them up, and then a number of fixes that I
+> found while test-building across all architectures rather than just the
+> ones I usually test.
+> 
+> The first 15 patches in this series should be uncontroversial, so
+> I expect that either a subsystem maintainer or Andrew Morton can
+> apply these directly.
+> 
+> [...]
 
-Although this is a possible approach, I do not agree that this is a better
-approach. Compared to the patch series that I posted, the disadvantages of
-this approach are as follows:
-* It relies on the zone append emulation. Although that emulation is not too
-   complicated, it adds more code in the hot path. The spin lock in the zone
-   append emulation is expected to cause performance issues at the performance
-   levels supported by UFS devices. Current UFS devices already support more
-   than 300 K IOPS and future UFS devices are expected to support even higher
-   performance.
-* It would be challenging to derive the write pointer in the error handler
-   without submitting a REPORT ZONES command to the storage device. This
-   means that the error handler becomes more complicated.
+Applied to 6.6/scsi-queue, thanks!
 
-In summary: the feedback is appreciated but I do not agree that the zone
-append approach is a better approach for UFS devices than the approach of
-this patch series.
+[07/17] scsi: qlogicpti: mark qlogicpti_info() static
+        https://git.kernel.org/mkp/scsi/c/71cc486335c4
+[11/17] scsi: gvp11: remove unused gvp11_setup() function
+        https://git.kernel.org/mkp/scsi/c/bfaa4a0ce1bb
 
-Thanks,
-
-Bart.
-
+-- 
+Martin K. Petersen	Oracle Linux Engineering
