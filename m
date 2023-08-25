@@ -2,94 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B21DC7EE2C
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 14:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B75C88CB2
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 14:27:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343701AbjHYOVV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Aug 2023 10:21:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51004 "EHLO
+        id S240472AbjHYO0l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Aug 2023 10:26:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343717AbjHYOUy (ORCPT
+        with ESMTP id S1343733AbjHYO0S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2023 10:20:54 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B30AF2718;
-        Fri, 25 Aug 2023 07:20:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=rIMc/jDCj9ILMqoJd0dO659w/9cB73A1MIGl7MCNQc0=; b=oBoPRF9uQlcnzO+kvA9HXiHIxh
-        1BCZOYk+GNL3b9Hbl9e0kK321R7GUMuXBq5CnzZVygX8jax4dLYLnGd1XSzW1m9qVXov6cTXOpVyv
-        sv5l1EBw3uu95Jxon5Sw3wlu1qTTRFkBQCTr+N8L/Prb1jdIi5jstgZjfRsnuOwWr9LDfkxjeCY5c
-        UoI4nSwH2jPxj2QMMHZp0Wkb5xy7QvRuP3ObBs4CYLKVGqr6YBri4brVlX/zJEjbKcNGc0kRvuWzw
-        6Da7DA+BObM8TzfQI+r1SxtKCOrEiJNsg27vpqxgEagx4gi10g2HUFqfKuMQw4f6GgzpXJkYlNle8
-        RUhWro7w==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qZXfd-00HYsg-Qa; Fri, 25 Aug 2023 14:20:17 +0000
-Date:   Fri, 25 Aug 2023 15:20:17 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hao Xu <hao.xu@linux.dev>
-Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 12/29] xfs: enforce GFP_NOIO implicitly during nowait
- time update
-Message-ID: <ZOi4oV7Ho3y0106O@casper.infradead.org>
-References: <20230825135431.1317785-1-hao.xu@linux.dev>
- <20230825135431.1317785-13-hao.xu@linux.dev>
+        Fri, 25 Aug 2023 10:26:18 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CA710FF;
+        Fri, 25 Aug 2023 07:26:16 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id ECD311F45E;
+        Fri, 25 Aug 2023 14:26:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692973573; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=k3nAwwAKsWLIJVd2iWItRZG4ru0xIHX7/IuiHEF8IZI=;
+        b=HTeF6bZ0VA0DIQlN1T/x+27q58yPLJCNqFMa2xjRtd8bFTQ6dk9RVdiBHaYEGQQD3yhC9p
+        gEOECZeO+ZOfcaGAB/MJ+mWkj5Qr0d3klYpkmbT0F/pewNHc1CUjQ0aHfaHe2FhGbh6tNF
+        N1zGEue3U39PRNZ5CH+NJ8efsV5lceA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692973573;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=k3nAwwAKsWLIJVd2iWItRZG4ru0xIHX7/IuiHEF8IZI=;
+        b=GoFNno7AIFl6spdBIffFERcOsaottt++Igia4izVWJonLfyGRogq00gB6bd5sO/NrKNxaJ
+        SHKapJhRtDUbT8CA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DC997138F9;
+        Fri, 25 Aug 2023 14:26:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 2H6jNQW66GRzFgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 25 Aug 2023 14:26:13 +0000
+Date:   Fri, 25 Aug 2023 16:26:29 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
+ nvmet_target_{setup/cleanup} common code
+Message-ID: <xz7rnke52xu3anmnjliybqv4yk3w367noo6ipguarkec6u4i5g@7bqtovmc3gjb>
+References: <20230822083812.24612-1-dwagner@suse.de>
+ <20230822083812.24612-4-dwagner@suse.de>
+ <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
+ <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
+ <oss54jmgqzjcxecea4h7eeguh6lmhls4p74e7unbxmhz34asvk@a7n6vu6hauys>
+ <zvu2ihivd6f4fbs7hpgowstq3li4wrdycqzso3c32qcco7zes4@s2l2solzzo6u>
+ <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
+ <b79c0c9d-3930-4dbf-a1cf-8ca9e00af614@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230825135431.1317785-13-hao.xu@linux.dev>
+In-Reply-To: <b79c0c9d-3930-4dbf-a1cf-8ca9e00af614@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 09:54:14PM +0800, Hao Xu wrote:
-> +++ b/fs/xfs/xfs_iops.c
-> @@ -1037,6 +1037,8 @@ xfs_vn_update_time(
->  	int			log_flags = XFS_ILOG_TIMESTAMP;
->  	struct xfs_trans	*tp;
->  	int			error;
-> +	int			old_pflags;
-> +	bool			nowait = flags & S_NOWAIT;
->  
->  	trace_xfs_update_time(ip);
->  
-> @@ -1049,13 +1051,18 @@ xfs_vn_update_time(
->  		log_flags |= XFS_ILOG_CORE;
->  	}
->  
-> +	if (nowait)
-> +		old_pflags = memalloc_noio_save();
-> +
->  	error = xfs_trans_alloc(mp, &M_RES(mp)->tr_fsyncts, 0, 0, 0, &tp);
+On Fri, Aug 25, 2023 at 06:45:25AM -0700, Bart Van Assche wrote:
+> On 8/25/23 00:34, Shinichiro Kawasaki wrote:
+> > Recently, you actively cleans up tests/nvme/* (which is great!), and introduced
+> > argument parsers in test/nvme/rc. The first one is _nvme_connect_subsys, and the
+> > second one is this _nvme_target_setup. It looks for me this is a bash coding
+> > style change in blktests, from "don't use optional arguments often" to "use
+> > optional arguments aggressively". If we apply this change, we should suppress
+> > SC2119. If we keep the old coding style, we should keep on enabling SC2119. What
+> > I see here is the style difference between you and Bart.
+> > 
+> > Now I'm tempted to disable SC2119, and to go with the new coding style...
+> > 
+> > If I have any misunderstanding, or if anyone has more comments on this, please
+> > let me know.
+> 
+> I don't like the "new style". What is so hard about typing "$@" to pass all function
+> arguments to _nvmet_target_setup()? Leaving out "$@" makes it much harder than
+> necessary to figure out the intent of the code author - not passing any arguments
+> or passing all caller arguments implicitly.
 
-This is an abuse of the memalloc_noio_save() interface.  You shouldn't
-be setting it around individual allocations; it's the part of the kernel
-which decides "I can't afford to do I/O" that should be setting it.
-In this case, it should probably be set by io_uring, way way way up at
-the top.
+Because "$@" is just not correct. Also by using defaults we really see
+where the test is special.
 
-But Jens didn't actually answer my question about that:
+Let's look at this here:
 
-https://lore.kernel.org/all/ZMhZh2EYPMH1wIXX@casper.infradead.org/
+ _create_nvmet_subsystem "${def_subsysnqn}" "${def_file_path}"
 
+Both arguments are default values and could just be left out. It makes
+reading the code way simpler,
+
+ _create_nvmet_subsystem
+
+Another example, if setup a default target
+
+ _nvmet_target_setup
+
+and if we want to enable the auth code:
+
+ _nvmet_target_setup --ctrlkey "${ctrlkey}" --hostkey "${hostkey}"
+
+and that's all. You can easily see what's is different from the default
+values.
+
+The "old" style is expecting that the caller gets the number of
+arguments and position correct:
+
+ _create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}" "${hostkey}" "${ctrlkey}"
+
+And this isn't always the case. I already fixed a couple of bugs where
+the test got the order wrong.
