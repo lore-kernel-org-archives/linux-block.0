@@ -2,90 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E804C727A4
-	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 01:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B26A4C88CB9
+	for <linux-block@archiver.kernel.org>; Fri, 25 Aug 2023 01:31:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238384AbjHYBOc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Aug 2023 21:14:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47272 "EHLO
+        id S232409AbjHYBbE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Aug 2023 21:31:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238162AbjHYBOO (ORCPT
+        with ESMTP id S230008AbjHYBbA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2023 21:14:14 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21FDD19BB;
-        Thu, 24 Aug 2023 18:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VFNVFt/7/5G7r3AO6hVBx/rbI3iYFwIQVfmz3UrxPqI=; b=HPtqqzf93CqXk8WihPhuJV1RSK
-        tSfSSqn/vc3mtUcuanRMu0IQ9ysGwINwGa5jpVcjmo90M8vyVKpF8UQ1VaHRGmV8Eg2IcOr1vnsTf
-        RAjyJ6Gyf/3ks5v2MwTqTr/C99jBG8nCO1qdfrDVe92FmydcZ4DLBTMKjAXntd7e88uQGcPu/2L7x
-        R7iKLLejKOG2tdiXjGz4QC2qK2QtqsUrvB8D6TqbMX39QuczgJnh6bfUUbLHA9s60MTiPon8AcAnW
-        t/mDTpPoN/cTrdda1FVyuXXOht41Iwq6gQg3E+KoI87tZRcd07ozop3LluQdjiC89bgCnYHaeZYZl
-        FKh0gRcQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qZLOr-000czI-12;
-        Fri, 25 Aug 2023 01:14:09 +0000
-Date:   Fri, 25 Aug 2023 02:14:09 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 02/29] block: Use bdev_open_by_dev() in blkdev_open()
-Message-ID: <20230825011409.GA95084@ZenIV>
-References: <20230810171429.31759-1-jack@suse.cz>
- <20230811110504.27514-2-jack@suse.cz>
+        Thu, 24 Aug 2023 21:31:00 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BABC1707;
+        Thu, 24 Aug 2023 18:30:58 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-68a4bcf8a97so371279b3a.1;
+        Thu, 24 Aug 2023 18:30:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692927057; x=1693531857;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Z7ELdHtTL5wYh7Mk37fDEn5rWUjAm0EdSJQg/6HWPPQ=;
+        b=Tmlz4s2OgK58rZBzZOqQBOTKsewJsSbr0lEcw148TWgipwzPC4h3leu6DHGlT2r85/
+         Uip0aLw7OTRJ61MyT/fB+2M0fG4g6LWvilyhBIrARSkzuGacd0puWelGLD8sQFEorTQR
+         iWM9dveRRwtXAAMgsQ1/wPN9YLRbtznx8UH3GB/Gc6Kl2jKJWnRhPY+VLZrWbWEKV9yS
+         nafEaqYDFpVR5/DPJmFBDt9xOQCxtCGGHTqymDFSbzyjxleu1nAu7M/vlGloF4CFWAV1
+         1Mn9tQCCGOF3Z8ZylRnT1zAlhIOy4YB5/0u2bxeQjx03+CoamjdoA+ECCtWPkVPf8KF0
+         7rAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692927057; x=1693531857;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z7ELdHtTL5wYh7Mk37fDEn5rWUjAm0EdSJQg/6HWPPQ=;
+        b=fM6GEZbv05t42z2NV4sGBa9/2lUb7io90jGSiDUW8YhiDysvXswGIFawZ9ZP0kTMcE
+         gCLiKMevD5iXdtA5LuXFBolfAIJ/roaOo8b52DkkE2kuaPDy3jCmskFd48YlfA210aPB
+         yx7XYOotFIoJkAkGbI+tgj7xVxUN+LwKcnYuzUzEOVK+Xyb6vsfQ0AqWBre2JukZnzAi
+         utyi/1jjs1rDNSrJ1NzVHeGM/OabHxipQMvz2zRCQNU0uu+9rhFK3Tdv6Zd2DWhBJKTM
+         /fLViFtJu/M/BZAxnoUIClMrSDaoDTBE3kHIUYSfgdKNXBYmbwM0k2n10DhoNknjjYcm
+         x34Q==
+X-Gm-Message-State: AOJu0YzfjOT/Rp8EsVPasCS3PmWILcds+i4rAwQs02vHZor4rpX1rymb
+        qczmV1p/UcaV7R/DqaSVORo=
+X-Google-Smtp-Source: AGHT+IGkdO3IAVMt9b8NA6cgzJYFAF5G39z8+OmHSySwOLhyKezYRWYjT2VqAbDb9GTS6Db8Rjs5TA==
+X-Received: by 2002:a05:6a00:1a13:b0:68a:49bc:9be3 with SMTP id g19-20020a056a001a1300b0068a49bc9be3mr14483212pfv.29.1692927057420;
+        Thu, 24 Aug 2023 18:30:57 -0700 (PDT)
+Received: from ?IPV6:2001:df0:0:200c:cd10:2fec:7ce0:fe0a? ([2001:df0:0:200c:cd10:2fec:7ce0:fe0a])
+        by smtp.gmail.com with ESMTPSA id y19-20020aa78553000000b00682af93093dsm367550pfn.45.2023.08.24.18.30.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Aug 2023 18:30:57 -0700 (PDT)
+Message-ID: <3956e2a4-c545-1212-e95f-3cf61a60d6a4@gmail.com>
+Date:   Fri, 25 Aug 2023 13:30:32 +1200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811110504.27514-2-jack@suse.cz>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: (subset) [PATCH 00/17] -Wmissing-prototype warning fixes
+Content-Language: en-US
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Brian Cain <bcain@quicinc.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Michal Simek <monstr@monstr.eu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Stafford Horne <shorne@gmail.com>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        Richard Weinberger <richard@nod.at>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-next@vger.kernel.org, linux-alpha@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
+        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org
+References: <20230810141947.1236730-1-arnd@kernel.org>
+ <169292577153.789945.11297239773543112051.b4-ty@oracle.com>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+In-Reply-To: <169292577153.789945.11297239773543112051.b4-ty@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 01:04:33PM +0200, Jan Kara wrote:
+Hi Martin, Arnd,
 
-> @@ -478,7 +478,7 @@ blk_mode_t file_to_blk_mode(struct file *file)
->  		mode |= BLK_OPEN_READ;
->  	if (file->f_mode & FMODE_WRITE)
->  		mode |= BLK_OPEN_WRITE;
-> -	if (file->private_data)
-> +	if (file->f_flags & O_EXCL)
->  		mode |= BLK_OPEN_EXCL;
->  	if (file->f_flags & O_NDELAY)
->  		mode |= BLK_OPEN_NDELAY;
+On 25/08/23 13:12, Martin K. Petersen wrote:
+> On Thu, 10 Aug 2023 16:19:18 +0200, Arnd Bergmann wrote:
+>
+>> Most of the patches I sent so far for the -Wmissing-prototype warnings
+>> have made it into linux-next now. There are a few that I'm resending
+>> now as nobody has picked them up, and then a number of fixes that I
+>> found while test-building across all architectures rather than just the
+>> ones I usually test.
+>>
+>> The first 15 patches in this series should be uncontroversial, so
+>> I expect that either a subsystem maintainer or Andrew Morton can
+>> apply these directly.
+>>
+>> [...]
+> Applied to 6.6/scsi-queue, thanks!
+>
+> [07/17] scsi: qlogicpti: mark qlogicpti_info() static
+>          https://git.kernel.org/mkp/scsi/c/71cc486335c4
+> [11/17] scsi: gvp11: remove unused gvp11_setup() function
+>          https://git.kernel.org/mkp/scsi/c/bfaa4a0ce1bb
+
+I somehow missed that one ...
+
+The gvp11_setup() function was probably a relic from the times before 
+module parameters.
+
+Since gvp11_xfer_mask appears to be required for some Amiga systems to 
+set the DMA mask, I'd best send a patch to add such a module parameter ...
+
+Do you know any details around the use of DMA masks for Amiga WD33C93 
+drivers, Geert?
+
+Cheers,
+
+     Michael
 
 
-> index 3be11941fb2d..47f216d8697f 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -575,7 +575,7 @@ long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
->  {
->  	struct block_device *bdev = I_BDEV(file->f_mapping->host);
->  	void __user *argp = (void __user *)arg;
-> -	blk_mode_t mode = file_to_blk_mode(file);
-> +	blk_mode_t mode = ((struct bdev_handle *)file->private_data)->mode;
-
-Take a look at sd_ioctl() and note that fcntl(2) can be used to set/clear O_NDELAY.
-The current variant works since we recalculate mode every time; this one will end up
-stuck with whatever we had at open time.  Note that Christoph's series could do this
-in blkdev_ioctl()
--       /*
--        * O_NDELAY can be altered using fcntl(.., F_SETFL, ..), so we have
--        * to updated it before every ioctl.
--        */
--       if (file->f_flags & O_NDELAY)
--               mode |= FMODE_NDELAY;
--       else
--               mode &= ~FMODE_NDELAY;
-precisely because his file_to_blk_mode() picks O_NDELAY from flags when blkdev_ioctl()
-calls it.
-
-The same goes for compat counterpart of that thing.  Both need to deal with that
-scenario - you need something that would pick the O_NDELAY updates from ->f_flags.
-
-Al, trying to catch up on the awful pile of mail that has accumulated over the 3 months
-of being net.dead...
+>
