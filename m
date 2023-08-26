@@ -2,154 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59633C83F15
-	for <linux-block@archiver.kernel.org>; Sat, 26 Aug 2023 02:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DEBC83F01
+	for <linux-block@archiver.kernel.org>; Sat, 26 Aug 2023 18:19:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231737AbjHZC3d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Aug 2023 22:29:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36580 "EHLO
+        id S229520AbjHZST0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Aug 2023 14:19:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231722AbjHZC3E (ORCPT
+        with ESMTP id S229522AbjHZSTK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2023 22:29:04 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B41A8;
-        Fri, 25 Aug 2023 19:29:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kRz17k12DLtH5ptlx3fiiancvtShyoQwDvuAAOUED4Y=; b=mPm/qZCa7MWW4zdrpIjhXYeIS6
-        8cbIgOvCf/9Y6gIxhhuc7MbOClbX1o3H4gTlXLJmOpOyil1pufLmdD8oxm6VhlxB4x6C/OQmKz1OC
-        9Sg7eN60e8HGn0pn/DtWEZ2zi7uHlJyyQNolWeGdXQEgqn78/62UYsbUB8gsUgOw68YkPTd36+fo0
-        kPzizyM3mKJ55bukbV99w6F1Yx4exn0ELF0EHA2mn4TEClpd2hjjcTiwEbEGv+vsWkEq4IC7ejHjR
-        rO8uE9/3ipL5VpLJjGdd7WJssIdQ5Tj/z+j2E3fQDWI0Qb9TMLDhfRhfBXk5sw2QK4rJI42xn3tDe
-        SBJa1VHw==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qZj2i-0010QB-1S;
-        Sat, 26 Aug 2023 02:28:52 +0000
-Date:   Sat, 26 Aug 2023 03:28:52 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anna Schumaker <anna@kernel.org>, Chao Yu <chao@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, Gao Xiang <xiang@kernel.org>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        jfs-discussion@lists.sourceforge.net,
-        Joern Engel <joern@lazybastard.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        linux-bcache@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-xfs@vger.kernel.org,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Minchan Kim <minchan@kernel.org>, ocfs2-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Song Liu <song@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        target-devel@vger.kernel.org, Ted Tso <tytso@mit.edu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        xen-devel@lists.xenproject.org, Jens Axboe <axboe@kernel.dk>,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v2 0/29] block: Make blkdev_get_by_*() return handle
-Message-ID: <20230826022852.GO3390869@ZenIV>
-References: <20230810171429.31759-1-jack@suse.cz>
- <20230825015843.GB95084@ZenIV>
- <20230825134756.o3wpq6bogndukn53@quack3>
+        Sat, 26 Aug 2023 14:19:10 -0400
+Received: from uriel.iewc.co.za (unknown [IPv6:2c0f:f720:0:3::9a49:2248])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A69C100
+        for <linux-block@vger.kernel.org>; Sat, 26 Aug 2023 11:19:06 -0700 (PDT)
+Received: from [154.73.32.4] (helo=tauri.local.uls.co.za)
+        by uriel.iewc.co.za with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+        (Exim 4.96)
+        (envelope-from <jaco@uls.co.za>)
+        id 1qZxrq-0007nz-2p;
+        Sat, 26 Aug 2023 20:18:38 +0200
+Received: from [192.168.1.145]
+        by tauri.local.uls.co.za with esmtp (Exim 4.96)
+        (envelope-from <jaco@uls.co.za>)
+        id 1qZxrq-0001j2-1V;
+        Sat, 26 Aug 2023 20:18:38 +0200
+Message-ID: <8492dbe0-0985-dbb8-71b4-4541b88d3c56@uls.co.za>
+Date:   Sat, 26 Aug 2023 20:18:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230825134756.o3wpq6bogndukn53@quack3>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: LVM kernel lockup scenario during lvcreate
+Content-Language: en-GB
+To:     Laurence Oberman <loberman@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
+ <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
+ <94477c459a398c47cb251afbcafbc9a6a83bba6f.camel@redhat.com>
+ <977a1223-a543-a6ca-4a6c-0cf0fc6f84a0@uls.co.za>
+ <69227e4091f3d9b05e739f900340f11afacdd91f.camel@redhat.com>
+ <564fe606-1bbf-4f29-4f10-7142ae07321f@uls.co.za>
+ <b641b62d42fe890fa298dd1e3d56d685c6496441.camel@redhat.com>
+From:   Jaco Kroon <jaco@uls.co.za>
+Organization: Ultimate Linux Solutions (Pty) Ltd
+In-Reply-To: <b641b62d42fe890fa298dd1e3d56d685c6496441.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 03:47:56PM +0200, Jan Kara wrote:
+Hi Laurence,
 
-> I can see the appeal of not having to introduce the new bdev_handle type
-> and just using struct file which unifies in-kernel and userspace block
-> device opens. But I can see downsides too - the last fput() happening from
-> task work makes me a bit nervous whether it will not break something
-> somewhere with exclusive bdev opens. Getting from struct file to bdev is
-> somewhat harder but I guess a helper like F_BDEV() would solve that just
-> fine.
-> 
-> So besides my last fput() worry about I think this could work and would be
-> probably a bit nicer than what I have. But before going and redoing the whole
-> series let me gather some more feedback so that we don't go back and forth.
-> Christoph, Christian, Jens, any opinion?
+On 2023/08/25 14:01, Laurence Oberman wrote:
+>>> Hello, this would usually need an NMI sent from a management
+>>> interface
+>>> as with it locked up no guarantee a sysrq c will get there from the
+>>> keyboard.
+>>> You could try though.
+>>>
+>>> As long as you have in /etc/kdump.conf
+>>>
+>>> path /var/crash
+>>> core_collector makedumpfile -l --message-level 7 -d 31
+>>>
+>>> This will get kernel only pages and would not be very big.
+>>>
+>>> I could work with you privately to get what we need out of the
+>>> vmcore
+>>> and we would avoid transferring it.
+>> Thanks.  This helps.  Let's get a core first (if it's going to happen
+>> again) and then take it from there.
+>>
+>> Kind regards,
+>> Jaco
+>>
+> Hello Jaco
+> These hangs usually require the stacks to see where and why we are
+> blocked. The vmcore will definitely help in that regard.
 
-Redoing is not an issue - it can be done on top of your series just
-as well.  Async behaviour of fput() might be, but...  need to look
-through the actual users; for a lot of them it's perfectly fine.
+Linux crowsnest 6.4.12-uls #1 SMP PREEMPT_DYNAMIC Fri Aug 25 02:46:44 
+SAST 2023 x86_64 Intel(R) Xeon(R) CPU E5-2603 v3 @ 1.60GHz GenuineIntel 
+GNU/Linux
 
-FWIW, from a cursory look there appears to be a missing primitive: take
-an opened bdev (or bdev_handle, with your variant, or opened file if we
-go that way eventually) and claim it.
+With the patch you referenced.
 
-I mean, look at claim_swapfile() for example:
-                p->bdev = blkdev_get_by_dev(inode->i_rdev,
-                                   FMODE_READ | FMODE_WRITE | FMODE_EXCL, p);
-                if (IS_ERR(p->bdev)) {
-                        error = PTR_ERR(p->bdev);
-                        p->bdev = NULL;
-                        return error;
-                }
-                p->old_block_size = block_size(p->bdev);
-                error = set_blocksize(p->bdev, PAGE_SIZE);
-                if (error < 0)
-                        return error;
-we already have the file opened, and we keep it opened all the way until
-the swapoff(2); here we have noticed that it's a block device and we
-	* open the fucker again (by device number), this time claiming
-it with our swap_info_struct as holder, to be closed at swapoff(2) time
-(just before we close the file)
-	* flip the block size to PAGE_SIZE, to be reverted at swapoff(2)
-time That really looks like it ought to be
-	* take the opened file, see that it's a block device
-	* try to claim it with that holder
-	* on success, flip the block size
-with close_filp() in the swapoff(2) (or failure exit path in swapon(2))
-doing what it would've done for an O_EXCL opened block device.
-The only difference from O_EXCL userland open is that here we would
-end up with holder pointing not to struct file in question, but to our
-swap_info_struct.  It will do the right thing.
+/proc/vmcore exists post kexec to the "new" kernel, if I just copy that 
+do we need anything else?  Once I've copied /proc/vmcore and rebooted 
+back into a more "normal" system, how do I start extracting information 
+out of that core?
 
-This extra open is entirely due to "well, we need to claim it and the
-primitive that does that happens to be tied to opening"; feels rather
-counter-intuitive.
+I don't have a kdump binary, or any other seemingly useful stuff even 
+though I've got kexec-tools installed (which is where this comes from as 
+far as I can tell) ... no /etc/kdump.conf either. Followed instructions 
+here (with help from other sources):
 
-For that matter, we could add an explicit "unclaim" primitive - might
-be easier to follow.  That would add another example where that could
-be used - in blkdev_bszset() we have an opened block device (it's an
-ioctl, after all), we want to change block size and we *really* don't
-want to have that happen under a mounted filesystem.  So if it's not
-opened exclusive, we do a temporary exclusive open of own and act on
-that instead.   Might as well go for a temporary claim...
+https://www.kernel.org/doc/Documentation/kdump/kdump.txt
 
-BTW, what happens if two threads call ioctl(fd, BLKBSZSET, &n)
-for the same descriptor that happens to have been opened O_EXCL?
-Without O_EXCL they would've been unable to claim the sucker at the same
-time - the holder we are using is the address of a function argument,
-i.e. something that points to kernel stack of the caller.  Those would
-conflict and we either get set_blocksize() calls fully serialized, or
-one of the callers would eat -EBUSY.  Not so in "opened with O_EXCL"
-case - they can very well overlap and IIRC set_blocksize() does *not*
-expect that kind of crap...  It's all under CAP_SYS_ADMIN, so it's not
-as if it was a meaningful security hole anyway, but it does look fishy.
+kdump references I can find w.r.t. /etc/kdump.conf seems to all be 
+related to redhat and fedora ... neither of which applies (directly) to 
+my Gentoo environment.
+
+with 256G of RAM I'm assuming a crashkernel=512M should be sufficient?  
+crashkernel=auto doesn't work.
+
+The firmware upgrade on the controller killed reboot though ... BIOS no 
+longer speak with the controller, but when performing the update the 
+kernel immediately noticed that the firmware got upgraded.  So dead in 
+the water at the moment.
+
+Kind regards,
+Jaco
+
+
