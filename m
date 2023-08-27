@@ -2,116 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DEBC83F01
-	for <linux-block@archiver.kernel.org>; Sat, 26 Aug 2023 18:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A0AEC83F01
+	for <linux-block@archiver.kernel.org>; Sun, 27 Aug 2023 00:46:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229520AbjHZST0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Aug 2023 14:19:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38998 "EHLO
+        id S229379AbjH0AqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Aug 2023 20:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjHZSTK (ORCPT
+        with ESMTP id S229460AbjH0Ap7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Aug 2023 14:19:10 -0400
-Received: from uriel.iewc.co.za (unknown [IPv6:2c0f:f720:0:3::9a49:2248])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A69C100
-        for <linux-block@vger.kernel.org>; Sat, 26 Aug 2023 11:19:06 -0700 (PDT)
-Received: from [154.73.32.4] (helo=tauri.local.uls.co.za)
-        by uriel.iewc.co.za with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-        (Exim 4.96)
-        (envelope-from <jaco@uls.co.za>)
-        id 1qZxrq-0007nz-2p;
-        Sat, 26 Aug 2023 20:18:38 +0200
-Received: from [192.168.1.145]
-        by tauri.local.uls.co.za with esmtp (Exim 4.96)
-        (envelope-from <jaco@uls.co.za>)
-        id 1qZxrq-0001j2-1V;
-        Sat, 26 Aug 2023 20:18:38 +0200
-Message-ID: <8492dbe0-0985-dbb8-71b4-4541b88d3c56@uls.co.za>
-Date:   Sat, 26 Aug 2023 20:18:33 +0200
+        Sat, 26 Aug 2023 20:45:59 -0400
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3683419A;
+        Sat, 26 Aug 2023 17:45:57 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-68a3082c771so1416469b3a.0;
+        Sat, 26 Aug 2023 17:45:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693097156; x=1693701956;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x0noXuCw4diQPVVy5tMWjuaRU2NrMA9lPR9xkJ2qTPY=;
+        b=azA0pKXL4z+pCUgeG6MDwvEnAEn7gpMCm1RcrMk9EyVa1DSibYdGFZC5DO6/GTEkyx
+         MykGtdgr2BtbMkUES9hSqswzybjc0miW73hRKIPuPkN4lhoVo+K0Wqe3Bbfqx0eLZPWS
+         S9rEnIMyMNc169VA1ApWUBVFr7Z8OvPf+ptbavvkHVh723DdGlZIMYnLS5R1723QeFyt
+         Vjl7wuulTG8DUh/OiAzy75ldlGXapJP3zfcPphkTFt3P3evzuOCok5pYY7G1onTJMJ85
+         lhuvkqZsG7kf3sx1h21Te1wfak105VgF/m/z00sIE2xRB8hjMUHN/YbXIwdFpYCdDBuP
+         dFjw==
+X-Gm-Message-State: AOJu0YypGh7bvBbqiZBzCbY8/1jsIo/zacC3dLikm2EI858eEhQb1EYG
+        9swcGQCD3bX2jNo9KLjAbeI=
+X-Google-Smtp-Source: AGHT+IEgibIA76mDWHaRopAmphTXDvMSnqQaRh2bxRTFviWwjc2MyEgi19ys/Gu6OUOtT4Kq3DUVsQ==
+X-Received: by 2002:a05:6a00:a1f:b0:68a:6149:71cb with SMTP id p31-20020a056a000a1f00b0068a614971cbmr24088914pfh.5.1693097156403;
+        Sat, 26 Aug 2023 17:45:56 -0700 (PDT)
+Received: from ?IPV6:2601:647:5f00:5f5:4a46:e57b:bee0:6bc6? ([2601:647:5f00:5f5:4a46:e57b:bee0:6bc6])
+        by smtp.gmail.com with ESMTPSA id x15-20020a056a00270f00b0068a4cd8b530sm3858797pfv.139.2023.08.26.17.45.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 26 Aug 2023 17:45:55 -0700 (PDT)
+Message-ID: <c48a294c-a8a9-63ae-182f-e1d757f6179e@acm.org>
+Date:   Sat, 26 Aug 2023 17:45:53 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: LVM kernel lockup scenario during lvcreate
-Content-Language: en-GB
-To:     Laurence Oberman <loberman@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
- <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
- <94477c459a398c47cb251afbcafbc9a6a83bba6f.camel@redhat.com>
- <977a1223-a543-a6ca-4a6c-0cf0fc6f84a0@uls.co.za>
- <69227e4091f3d9b05e739f900340f11afacdd91f.camel@redhat.com>
- <564fe606-1bbf-4f29-4f10-7142ae07321f@uls.co.za>
- <b641b62d42fe890fa298dd1e3d56d685c6496441.camel@redhat.com>
-From:   Jaco Kroon <jaco@uls.co.za>
-Organization: Ultimate Linux Solutions (Pty) Ltd
-In-Reply-To: <b641b62d42fe890fa298dd1e3d56d685c6496441.camel@redhat.com>
+ Thunderbird/102.14.0
+Subject: Re: [PATCH 0/6] blk-mq: optimize the queue_rqs() support
+To:     Chengming Zhou <chengming.zhou@linux.dev>, axboe@kernel.dk,
+        hch@lst.de, ming.lei@redhat.com, kbusch@kernel.org
+Cc:     mst@redhat.com, sagi@grimberg.me, damien.lemoal@opensource.wdc.com,
+        kch@nvidia.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouchengming@bytedance.com
+References: <20230824144403.2135739-1-chengming.zhou@linux.dev>
+ <e4701e0e-57a3-6ee3-8686-6b1d3750c124@acm.org>
+ <84c857f7-9966-6125-92c4-1b2fa96fb98d@linux.dev>
+Content-Language: en-US
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <84c857f7-9966-6125-92c4-1b2fa96fb98d@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Laurence,
+On 8/25/23 01:24, Chengming Zhou wrote:
+> I don't know the details of the UFS devices bad performance problem.
+> But I feel it maybe caused by the too lazy queue idle handling, which
+> is now only handled in queue timeout work.
 
-On 2023/08/25 14:01, Laurence Oberman wrote:
->>> Hello, this would usually need an NMI sent from a management
->>> interface
->>> as with it locked up no guarantee a sysrq c will get there from the
->>> keyboard.
->>> You could try though.
->>>
->>> As long as you have in /etc/kdump.conf
->>>
->>> path /var/crash
->>> core_collector makedumpfile -l --message-level 7 -d 31
->>>
->>> This will get kernel only pages and would not be very big.
->>>
->>> I could work with you privately to get what we need out of the
->>> vmcore
->>> and we would avoid transferring it.
->> Thanks.  This helps.  Let's get a core first (if it's going to happen
->> again) and then take it from there.
->>
->> Kind regards,
->> Jaco
->>
-> Hello Jaco
-> These hangs usually require the stacks to see where and why we are
-> blocked. The vmcore will definitely help in that regard.
+Hi Chengming,
 
-Linux crowsnest 6.4.12-uls #1 SMP PREEMPT_DYNAMIC Fri Aug 25 02:46:44 
-SAST 2023 x86_64 Intel(R) Xeon(R) CPU E5-2603 v3 @ 1.60GHz GenuineIntel 
-GNU/Linux
+The root cause of the UFS performance problem is the fair sharing
+algorithm itself: reducing the active queue count only happens after
+the request queue timeout has expired. This is way too slow. Last time
+it was proposed to remove that algorithm Yu Kuai promised to replace it
+by a better algorithm. Since progress on the replacement algorithm has
+stalled I'm asking again whether everyone agrees to remove the fairness
+algorithm.
 
-With the patch you referenced.
+Thanks,
 
-/proc/vmcore exists post kexec to the "new" kernel, if I just copy that 
-do we need anything else?  Once I've copied /proc/vmcore and rebooted 
-back into a more "normal" system, how do I start extracting information 
-out of that core?
-
-I don't have a kdump binary, or any other seemingly useful stuff even 
-though I've got kexec-tools installed (which is where this comes from as 
-far as I can tell) ... no /etc/kdump.conf either. Followed instructions 
-here (with help from other sources):
-
-https://www.kernel.org/doc/Documentation/kdump/kdump.txt
-
-kdump references I can find w.r.t. /etc/kdump.conf seems to all be 
-related to redhat and fedora ... neither of which applies (directly) to 
-my Gentoo environment.
-
-with 256G of RAM I'm assuming a crashkernel=512M should be sufficient?  
-crashkernel=auto doesn't work.
-
-The firmware upgrade on the controller killed reboot though ... BIOS no 
-longer speak with the controller, but when performing the update the 
-kernel immediately noticed that the firmware got upgraded.  So dead in 
-the water at the moment.
-
-Kind regards,
-Jaco
-
-
+Bart.
