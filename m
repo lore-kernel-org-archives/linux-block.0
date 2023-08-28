@@ -2,102 +2,192 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C667C83F14
-	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 01:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC5BC83F16
+	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 01:32:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229460AbjH1BFR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Aug 2023 21:05:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36256 "EHLO
+        id S229586AbjH1Bbo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Aug 2023 21:31:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjH1BFE (ORCPT
+        with ESMTP id S229598AbjH1Bbk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Aug 2023 21:05:04 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CECBF4;
-        Sun, 27 Aug 2023 18:05:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=joEHMg4Vnx51INzte3pGka01/tHMgi/viw3PIuubDEg=; b=tBQRCz5+oVdl3BS/sNcy7bWOX7
-        GGqnD2dBYFuddcCAHCZIxNjDzAdi2le5BAt0r8Kntb7pX1JY0YphckowafjvL81vNIQ3iZbSuHB8W
-        r/PUBBhyIh5zGyiYSh551Ab8m+qrDF3vUESvq5gmF+156kAmT5ewUZLVGI0pVuCR+wxckZ4BuuSiW
-        RJFEDzRbT6/CwsUyBB67HLFUFCa0gDIENAIc4MS7fD/7hjHRH/QwT9ZGKRpKtatGkE8elHlNUeY9H
-        K7XCyGgu0m99e9gG1KyKu8v/0XPiv+PZlDfNvSozoVu79X3N9xA7HRVP+E5Pt/Irs6JBUgQAoXzdY
-        9136hnSA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qaQgN-001R4E-2B;
-        Mon, 28 Aug 2023 01:04:43 +0000
-Date:   Mon, 28 Aug 2023 02:04:43 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 03/12] filemap: update ki_pos in generic_perform_write
-Message-ID: <20230828010443.GV3390869@ZenIV>
-References: <20230601145904.1385409-1-hch@lst.de>
- <20230601145904.1385409-4-hch@lst.de>
- <20230827194122.GA325446@ZenIV>
+        Sun, 27 Aug 2023 21:31:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73599CC
+        for <linux-block@vger.kernel.org>; Sun, 27 Aug 2023 18:30:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693186251;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iXnLgOiqk5iWjqr83zA5rJW1ivGKK2OzxDGCdpxM3FU=;
+        b=KuGhCfTwbUq+ihKzjEIiDgL0j89W2p+btXK+SGJZFs+WpMwHmutHDoiZ/KX2XYioAJUtmZ
+        ahGB5oyrBR6hI+kP0XE2RiLSwGQ1MisScom0ZIN0+sJ7yHMv6YKlOu+EH/NTimM6GWrqyY
+        meucuAsHY73ut4TFqfeaOprfktwl9HM=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-394-AyAYvHssPi-wSfz_4UNmIQ-1; Sun, 27 Aug 2023 21:30:50 -0400
+X-MC-Unique: AyAYvHssPi-wSfz_4UNmIQ-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1c8e1617d96so3386840fac.2
+        for <linux-block@vger.kernel.org>; Sun, 27 Aug 2023 18:30:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693186249; x=1693791049;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iXnLgOiqk5iWjqr83zA5rJW1ivGKK2OzxDGCdpxM3FU=;
+        b=hzBMTPiWLRCK+zaniDovnI5i3jBUcrYB2/cawgo2KnI75rjjgqWSxnbf42m9eb7xfy
+         n0xRM0NFGLzK+OA3cetBV5PMQFJn1bAZIZX5moZ6rq/ZNmyXgu2zuqnfS/Gq6X+C5Ae3
+         QcQQr8xG0a+MiHJ1TR93l7x1eDxAFcE7HKrQ785CW8c4gaEx5fZkzcQkSsC1wi8RmhA2
+         zwomrCTdbYrDFTLlL6Xx9/+COkZc22+EmFOdpwwWnFlWW/UPnBtNfipDXyWQOPMr63mI
+         hR6Yzj8rWeS9xHhM6XSBfwPyq5L6bQtPG6ZVipt6KdNYxf1OQTyZ43MEauavQkbbsNRc
+         Vaow==
+X-Gm-Message-State: AOJu0Yz2wCI4ddJ9MRK5mH4O57zeRxo/YMNscrQhaS4XazfHzItlqUdt
+        tdP85/FE83eiXuVPcglq040fEteukO85xmAVDA23owwnPK1r9PwnjOtYkNR+9HPongDCqr8GTDD
+        0PlztsrDoKzMMayVJptJZ/sg=
+X-Received: by 2002:a05:6871:54e:b0:1c8:ca70:dd0c with SMTP id t14-20020a056871054e00b001c8ca70dd0cmr10849409oal.19.1693186249654;
+        Sun, 27 Aug 2023 18:30:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGC0BwJIXFO6tXCBMB05auta8S9eX5z0u4Q7lCQD0uk7uqjNg1uIqJw+FXGvj62JU0uFvOTw==
+X-Received: by 2002:a05:6871:54e:b0:1c8:ca70:dd0c with SMTP id t14-20020a056871054e00b001c8ca70dd0cmr10849397oal.19.1693186249402;
+        Sun, 27 Aug 2023 18:30:49 -0700 (PDT)
+Received: from [10.72.112.71] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id gf15-20020a17090ac7cf00b00268032f6a64sm7532175pjb.25.2023.08.27.18.30.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 27 Aug 2023 18:30:48 -0700 (PDT)
+Message-ID: <9d4a2348-608c-249e-1aab-25332a07e0a4@redhat.com>
+Date:   Mon, 28 Aug 2023 09:30:44 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230827194122.GA325446@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH 00/18] ceph, rbd: Collapse all the I/O types down to
+ something iov_iter-based
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>
+Cc:     Jeff Layton <jlayton@kernel.org>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230804131327.2574082-1-dhowells@redhat.com>
+From:   Xiubo Li <xiubli@redhat.com>
+In-Reply-To: <20230804131327.2574082-1-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 27, 2023 at 08:41:22PM +0100, Al Viro wrote:
 
-> That part is somewhat fishy - there's a case where you return a positive value
-> and advance ->ki_pos by more than that amount.  I really wonder if all callers
-> of ->write_iter() are OK with that.
+On 8/4/23 21:13, David Howells wrote:
+> Hi Ilya, Xiubo,
+>
+> [!] NOTE: This is a preview of a work in progress and doesn't yet fully
+>      compile, let alone actually work!
+>
+> Here are some patches that (mostly) collapse the different I/O types
+> (PAGES, PAGELIST, BVECS, BIO) down to a single one.  I added a new type,
+> ceph_databuf, to make this easier.  The page list is attached to that as a
+> bio_vec[] with an iov_iter, but could also be some other type supported by
+> the iov_iter.  The iov_iter defines the data or buffer to be used.  I have
+> an additional iov_iter type implemented that allows use of a straight
+> folio[] or page[] instead of a bio_vec[] that I can deploy if that proves
+> more useful.
+>
+> The conversion isn't quite complete:
+>
+>   (1) rbd is done; BVECS and BIO types are replaced with ceph_databuf.
+>
+>   (2) ceph_osd_linger_request::preply_pages needs switching over to a
+>       ceph_databuf, but I haven't yet managed to work out how the pages that
+>       handle_watch_notify() sticks in there come about.
+>
+>   (3) I haven't altered data transmission in net/ceph/messenger*.c yet.  The
+>       aim is to reduce it to a single sendmsg() call for each ceph_msg_data
+>       struct, using the iov_iter therein.
+>
+>   (4) The data reception routines in net/ceph/messenger*.c also need
+>       modifying to pass each ceph_msg_data::iter to recvmsg() in turn.
+>
+>   (5) It might be possible to merge struct ceph_databuf into struct
+>       ceph_msg_data and eliminate the former.
+>
+>   (6) fs/ceph/ still needs some work to clean up the use of page arrays.
+>
+>   (7) I would like to change front and middle buffers with a ceph_databuf,
+>       vmapping them when we need to access them.
+>
+> I added a kmap_ceph_databuf_page() macro and used that to get a page and
+> use kmap_local_page() on it to hide the bvec[] inside to make it easier to
+> replace.
+>
+> Anyway, if anyone has any thoughts...
+>
+>
+> I've pushed the patches here also:
+>
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
+>
+> David
+>
+> David Howells (18):
+>    iov_iter: Add function to see if buffer is all zeros
+>    ceph: Rename alignment to offset
+>    ceph: Add a new data container type, ceph_databuf
+>    ceph: Convert ceph_mds_request::r_pagelist to a databuf
+>    rbd: Use ceph_databuf for rbd_obj_read_sync()
+>    ceph: Change ceph_osdc_call()'s reply to a ceph_databuf
+>    ceph: Unexport osd_req_op_cls_request_data_pages()
+>    ceph: Remove osd_req_op_cls_response_data_pages()
 
-Speaking of which, in case of negative return value we'd better *not* use
-->ki_pos; consider e.g. generic_file_write_iter() with O_DSYNC and
-vfs_fsync_range() failure.  An error gets returned, but ->ki_pos is left
-advanced.  Normal write(2) is fine - it will only update file->f_pos if
-->write_iter() has returned a non-negative.  However, io_uring
-kiocb_done() starts with
-        if (req->flags & REQ_F_CUR_POS)
-                req->file->f_pos = rw->kiocb.ki_pos;
-        if (ret >= 0 && (rw->kiocb.ki_complete == io_complete_rw)) {
-                if (!__io_complete_rw_common(req, ret)) {
-                        /*
-                         * Safe to call io_end from here as we're inline
-                         * from the submission path.
-                         */
-                        io_req_io_end(req);
-                        io_req_set_res(req, final_ret,
-                                       io_put_kbuf(req, issue_flags));
-                        return IOU_OK;
-                }
-        } else {
-                io_rw_done(&rw->kiocb, ret);
-        }
-Note that ->f_pos update is *NOT* conditional upon ret >= 0 - it happens
-no matter what, provided that original request had ->kiocb.ki_pos equal
-to -1 (on a non-FMODE_STREAM file).
+David,
 
-Jens, is there any reason for doing that unconditionally?  IMO it's
-a bad idea - there's a wide scope for fuckups that way, especially
-since write(2) is not sensitive to that and this use of -1 ki_pos
-is not particularly encouraged on io_uring side either, AFAICT.
-Worse, it's handling of failure exits in the first place, which
-already gets little testing...
+I think the titles should be prefixed with "libceph: XXX" for the 
+patches in net/ceph/ ?
+
+Thanks
+
+- Xiubo
+
+
+>    ceph: Convert notify_id_pages to a ceph_databuf
+>    rbd: Switch from using bvec_iter to iov_iter
+>    ceph: Remove bvec and bio data container types
+>    ceph: Convert some page arrays to ceph_databuf
+>    ceph: Convert users of ceph_pagelist to ceph_databuf
+>    ceph: Remove ceph_pagelist
+>    ceph: Convert ceph_osdc_notify() reply to ceph_databuf
+>    ceph: Remove CEPH_OS_DATA_TYPE_PAGES and its attendant helpers
+>    ceph: Remove CEPH_MSG_DATA_PAGES and its helpers
+>    ceph: Don't use data_pages
+>
+>   drivers/block/rbd.c             | 645 ++++++++++----------------------
+>   fs/ceph/acl.c                   |  39 +-
+>   fs/ceph/addr.c                  |  18 +-
+>   fs/ceph/file.c                  | 157 ++++----
+>   fs/ceph/inode.c                 |  85 ++---
+>   fs/ceph/locks.c                 |  23 +-
+>   fs/ceph/mds_client.c            | 134 ++++---
+>   fs/ceph/mds_client.h            |   2 +-
+>   fs/ceph/super.h                 |   8 +-
+>   fs/ceph/xattr.c                 |  68 ++--
+>   include/linux/ceph/databuf.h    |  65 ++++
+>   include/linux/ceph/messenger.h  | 141 +------
+>   include/linux/ceph/osd_client.h |  97 ++---
+>   include/linux/ceph/pagelist.h   |  72 ----
+>   include/linux/uio.h             |   1 +
+>   lib/iov_iter.c                  |  22 ++
+>   net/ceph/Makefile               |   5 +-
+>   net/ceph/cls_lock_client.c      |  40 +-
+>   net/ceph/databuf.c              | 149 ++++++++
+>   net/ceph/messenger.c            | 376 +------------------
+>   net/ceph/osd_client.c           | 430 +++++++--------------
+>   net/ceph/pagelist.c             | 171 ---------
+>   22 files changed, 876 insertions(+), 1872 deletions(-)
+>   create mode 100644 include/linux/ceph/databuf.h
+>   delete mode 100644 include/linux/ceph/pagelist.h
+>   create mode 100644 net/ceph/databuf.c
+>   delete mode 100644 net/ceph/pagelist.c
+>
+
