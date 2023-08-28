@@ -2,100 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC57C83F15
-	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 16:46:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B2BC71153
+	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 17:03:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231679AbjH1Qq0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Aug 2023 12:46:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51558 "EHLO
+        id S230019AbjH1RDQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Aug 2023 13:03:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232140AbjH1QqR (ORCPT
+        with ESMTP id S232776AbjH1RCt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2023 12:46:17 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E757132;
-        Mon, 28 Aug 2023 09:46:15 -0700 (PDT)
+        Mon, 28 Aug 2023 13:02:49 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7B9CFA;
+        Mon, 28 Aug 2023 10:02:16 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E58C31F8AB;
-        Mon, 28 Aug 2023 16:46:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1693241173; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by smtp-out1.suse.de (Postfix) with ESMTPS id DE23E21A70;
+        Mon, 28 Aug 2023 17:01:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1693242106; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=jof/LV1Czh4XCCAplxOp5YVeEMx2KrU5CK+snlPgWoQ=;
-        b=Cx6gCB8nh4KqnoAXSzzoO3x0u40+OGC+NzGlJwdLVweSlOtj18EdFLHsp38Hfw9Kfib7o+
-        g4pDFE68GX32lOuBkGToG7iU+p0qLKsND53TyMnL0xxG+ohvnvi8xNguVQnHmikHkEAGI0
-        ipC8pHzF6/fGY2Xo2CGeymkFUfEHjtY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1693241173;
+        bh=S/98S7UGlGVbuoQo/nQkeiOHz185uMZm/ktFwF4RCt0=;
+        b=xlJ2neZhkbrzFt+WcvyWK8eqKP/KAH6rOCB0Csv9ybo5xb4Q3guoy1ibGE5wFCj0WmU04q
+        x1SKzZ7UHYWgfHaYWtqtPSwFxejkuRidXAgFbZGt3nT6homX9QemjYw2zFWeaHw95i+xrg
+        9CpvKqnX/hc9Ccz/uU7O9I0pq3a2AbE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1693242106;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=jof/LV1Czh4XCCAplxOp5YVeEMx2KrU5CK+snlPgWoQ=;
-        b=DzOsraWKSyl+h0e7ASlz0L9kQvNPvMH6EhMov+rtIGA/9RFljIPgFTK0ZXoHOYnXWq/zV9
-        l5g/8n2zTqCSZhAw==
+        bh=S/98S7UGlGVbuoQo/nQkeiOHz185uMZm/ktFwF4RCt0=;
+        b=+JsAubtjiKmzSzUxbJ9lyruBfJY/xAAswrNP81eJp0SXHMhKadCIhsZ17Sw7MWksuy6iY3
+        muYkWOR+i0q2OwBA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D7210139CC;
-        Mon, 28 Aug 2023 16:46:13 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D029D139CC;
+        Mon, 28 Aug 2023 17:01:46 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id ivqBNFXP7GR4KgAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 28 Aug 2023 16:46:13 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 64AB4A0774; Mon, 28 Aug 2023 18:46:13 +0200 (CEST)
-Date:   Mon, 28 Aug 2023 18:46:13 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 02/29] block: Use bdev_open_by_dev() in blkdev_open()
-Message-ID: <20230828164613.i6angwprxm57es6s@quack3>
-References: <20230818123232.2269-1-jack@suse.cz>
- <20230823104857.11437-2-jack@suse.cz>
- <20230825022826.GC95084@ZenIV>
- <20230825094509.yarnl4jpayqqjk4c@quack3>
- <20230825-attribut-sympathisch-6dfddfe25f45@brauner>
+        id BInEMvrS7GRHMgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Mon, 28 Aug 2023 17:01:46 +0000
+Date:   Mon, 28 Aug 2023 19:02:06 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
+ nvmet_target_{setup/cleanup} common code
+Message-ID: <txsyjpcxb3baog5fgqdnm5hh765nt5qcbcmllsto7uulyzr5kn@zirmqldhosbi>
+References: <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
+ <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
+ <oss54jmgqzjcxecea4h7eeguh6lmhls4p74e7unbxmhz34asvk@a7n6vu6hauys>
+ <zvu2ihivd6f4fbs7hpgowstq3li4wrdycqzso3c32qcco7zes4@s2l2solzzo6u>
+ <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
+ <b79c0c9d-3930-4dbf-a1cf-8ca9e00af614@acm.org>
+ <xz7rnke52xu3anmnjliybqv4yk3w367noo6ipguarkec6u4i5g@7bqtovmc3gjb>
+ <d6ec4e54-1ec9-648a-ce8c-1e08a439c3c6@acm.org>
+ <ckuewnzuiejug6jbuxfw4viqwf4v43pq54mj4k4qbq7uz3zwpn@3iijcby24ujd>
+ <8ffb6c2f-0836-4302-82b9-902e092e537c@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230825-attribut-sympathisch-6dfddfe25f45@brauner>
+In-Reply-To: <8ffb6c2f-0836-4302-82b9-902e092e537c@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 25-08-23 15:29:11, Christian Brauner wrote:
-> > file->f_flags. Attached is a version of the patch that I'm currently
-> > testing.
+On Mon, Aug 28, 2023 at 08:14:31AM -0700, Bart Van Assche wrote:
+> On 8/27/23 21:13, Shinichiro Kawasaki wrote:
+> > For me, your original suggestion to add "ignored_agument" looks better
+> > than "$@". (or in short, "noarg" or something)
 > 
-> Appended patch looks good to me,
-> Reviewed-by: Christian Brauner <brauner@kernel.org>
-> 
-> The patch also has another fix for O_EXCL. In earlier versions of this
-> patch series it relied of f_flags. Thanks for that comment you added in
-> there about this now. This really helps given that O_EXCL has special
-> meaning for block devices. Ideally we'd have kernel doc for
-> file_to_blk_mode().
+> It is not clear to me what the intention is of the _nvmet_target_setup
+> calls without arguments.
 
-Thanks for review! I've added the kerneldoc comment:
+Create a target. That's it. It is really not that complicated.
 
-/**
- * file_to_blk_mode - get block open flags from file flags
- * @file: file whose open flags should be converted
- *
- * Look at file open flags and generate corresponding block open flags from
- * them. The function works both for file just being open (e.g. during ->open
- * callback) and for file that is already open. This is actually non-trivial
- * (see comment in the function).
- */
+> Is the intention to pass all arguments that have
+> been passed to the caller or is the intention not to pass any
+> arguments?
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+If there are no arguments, the indent is not to pass any arguments.
+
+> In the latter case I think it would be wrong to suppress SC2119 because
+> there really is a problem in this case.
+
+IMO, SC2119 is not helping at all. What does it prevent? It doesn't even
+understand how many arguments are supposed to be passed into a function.
+The few error cases it catches are very limitted.
+
+> How about passing -- as argument
+> if the intention is not to pass any arguments? It is a well established
+> convention for shell commands and shell functions to ignore the double
+> hyphen if it is encountered in the argument list.
+
+I am against adding code just to make ShellCheck happy. If there is
+another way achieve this I am all ear.
