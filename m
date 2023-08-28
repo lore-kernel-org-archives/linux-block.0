@@ -2,71 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1490CC83F17
-	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 12:10:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45362C83F11
+	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 12:31:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229985AbjH1MJy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Aug 2023 08:09:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57160 "EHLO
+        id S232434AbjH1MbY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Aug 2023 08:31:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230333AbjH1MJs (ORCPT
+        with ESMTP id S232228AbjH1Max (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2023 08:09:48 -0400
+        Mon, 28 Aug 2023 08:30:53 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F89BA9;
-        Mon, 28 Aug 2023 05:09:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6389107;
+        Mon, 28 Aug 2023 05:30:37 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id CFEA56732A; Mon, 28 Aug 2023 14:09:40 +0200 (CEST)
-Date:   Mon, 28 Aug 2023 14:09:40 +0200
+        id 981DA68D05; Mon, 28 Aug 2023 14:30:25 +0200 (CEST)
+Date:   Mon, 28 Aug 2023 14:30:23 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Richard Weinberger <richard@nod.at>,
-        Josef Bacik <josef@toxicpanda.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Phillip Potter <phil@philpotter.co.uk>,
-        Coly Li <colyli@suse.de>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
         Christian Brauner <brauner@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-um@lists.infradead.org,
-        linux-scsi@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        linux-btrfs@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-pm@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 01/30] block: also call ->open for incremental
- partition opens
-Message-ID: <20230828120940.GB10552@lst.de>
-References: <20230608110258.189493-1-hch@lst.de> <20230608110258.189493-2-hch@lst.de> <20230825024457.GD95084@ZenIV>
+        Theodore Ts'o <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 03/12] filemap: update ki_pos in generic_perform_write
+Message-ID: <20230828123023.GA11084@lst.de>
+References: <20230601145904.1385409-1-hch@lst.de> <20230601145904.1385409-4-hch@lst.de> <20230827194122.GA325446@ZenIV>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230825024457.GD95084@ZenIV>
+In-Reply-To: <20230827194122.GA325446@ZenIV>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 03:44:57AM +0100, Al Viro wrote:
-> That got me curious about the ->bd_openers - do we need it atomic?
-> Most of the users (and all places that do modifications) are
-> under ->open_mutex; the only exceptions are
-> 	* early sync logics in blkdev_put(); it's explicitly racy -
-> see the comment there.
-> 	* callers of disk_openers() in loop and nbd (the ones in
-> zram are under ->open_mutex).  There's driver-private exclusion
-> around those, but in any case - READ_ONCE() is no worse than
-> atomic_read() in those cases.
-> 
-> Is there something subtle I'm missing here?
+On Sun, Aug 27, 2023 at 08:41:22PM +0100, Al Viro wrote:
+> That part is somewhat fishy - there's a case where you return a positive value
+> and advance ->ki_pos by more than that amount.  I really wonder if all callers
+> of ->write_iter() are OK with that.  Consider e.g. this:
 
-No.  When I had to add unlocked readers I did the READ_ONCE initially,
-but reviewers though the atomic_t would be better.  I didn't really feel
-like arguing so went with this version.
+This should not exist in the latest version merged by Jens.  Can you
+check if you still  see issues in the version in the block tree or
+linux-next.
+
+> Suppose ->write_iter() ends up doing returning a positive value smaller than
+> the increment of kiocb.ki_pos.  What do we get?  ret is positive, so
+> kiocb.ki_pos gets copied into *ppos, which is ksys_write's pos and there
+> we copy it into file->f_pos.
+> 
+> Is it really OK to have write() return 4096 and advance the file position
+> by 16K?  AFAICS, userland wouldn't get any indication of something
+> odd going on - just a short write to a regular file, with followup write
+> of remaining 12K getting quietly written in the range 16K..28K.
+> 
+> I don't remember what POSIX says about that, but it would qualify as
+> nasty surprise for any userland program - sure, one can check fsync()
+> results before closing the sucker and see if everything looks fine,
+> but the way it's usually discussed could easily lead to assumption that
+> (synchronous) O_DIRECT writes would not be affected by anything of that
+> sort.
+
+ki_pos should always be updated by the write return value.  Everything
+else is a bug.
