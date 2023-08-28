@@ -2,90 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42728C83F12
-	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 15:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A76FEC83F15
+	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 15:38:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230061AbjH1POy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Aug 2023 11:14:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54056 "EHLO
+        id S231440AbjH1Phc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Aug 2023 11:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232317AbjH1POf (ORCPT
+        with ESMTP id S231481AbjH1PhB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2023 11:14:35 -0400
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94CEDEA;
-        Mon, 28 Aug 2023 08:14:33 -0700 (PDT)
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-68a56401b9aso2358817b3a.1;
-        Mon, 28 Aug 2023 08:14:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693235673; x=1693840473;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k4/eVPaw3IBTjAjPz+bqGvgtrzgk0IYeEEuriGEdCkg=;
-        b=a/lUK2+slgqFtyaDOEnKU5shpfOxLAW2ydCYVFRSZIDFSfO7qVVqB/YjggDzrk7G6i
-         xFiP3Uc/fc3iukRgBhDt4WfTdqyoZBscWvLdP3lULd6jLwlnSobwT2JtUvIR76MlpHwL
-         QyQu835gupRneFndzv+rZjrIFtn633mDUoxiTzfQwBDB/SJABSZtnLzsrbc2eHj6P4RN
-         XN+C3GjmaB7wdzQiTYjw+jYhgtJW47SZ6YNOx330vZ7bG0IueAxyBlOUfWqjWhCjoLyV
-         Tqi5a6/fsMbB0aTHJ3MQxLReXH6R/RTttQvInV4NpyPehTzMbQ5aBoFx2eN8nmRxtrgQ
-         ltHg==
-X-Gm-Message-State: AOJu0Yycu9U7+B5HXxF8FS4wZEXF0lC+UNcfuQrJctmb3VJ8XWvxVAJR
-        Vvy7fMqAV6lTNvP88tYAtF4GWG1od/Y=
-X-Google-Smtp-Source: AGHT+IH+PPAxCeqwS0rQxAFK2k4hiRnRDctlRk35+6aaJ1RvNhCGrMLpEhUj+rAntmblcZ/VFz85jg==
-X-Received: by 2002:a05:6a21:6da6:b0:126:9081:2156 with SMTP id wl38-20020a056a216da600b0012690812156mr25192585pzb.4.1693235672771;
-        Mon, 28 Aug 2023 08:14:32 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id 16-20020aa79250000000b0068bff979c33sm6708230pfp.188.2023.08.28.08.14.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Aug 2023 08:14:32 -0700 (PDT)
-Message-ID: <8ffb6c2f-0836-4302-82b9-902e092e537c@acm.org>
-Date:   Mon, 28 Aug 2023 08:14:31 -0700
+        Mon, 28 Aug 2023 11:37:01 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EB621B1;
+        Mon, 28 Aug 2023 08:36:48 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37SF8LkI016755;
+        Mon, 28 Aug 2023 15:36:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=fuSNwwow7xUdJM87SsviW6neX56cMmlgdBfa7WN6Pes=;
+ b=tZz6wiCvOiAJIkOZwHKFSx9RDcuVCg2xVFHxxO8dwuzgHi1FJ8THOYMhtf1WMekpiZvn
+ ok7sD8NfjNcn/smgJIDII3SPeoDrz6ve8He8iyWq5cPBR/aVD0It37c/P3YZDBFbzTGi
+ fi5lZpFoUisEwWMOoTrcfMKTJmccHEMMiHEr1YcFGN60a+avBAJ0PSS9TK9p6cG3pVnO
+ O+IMqcfQABShEo2l7ZXZCrRIY+N/OW9nr9MN+luMTnyGPOhwFy7luMBu/eUlR/F2modO
+ aWVe2AwwnvvwOo9sP1VMkRGrp7VKSXhX/NMO5lS9TZ00SOuugigs2TJu2p4UgQ/cvuVy 6g== 
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sr87h2p5p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Aug 2023 15:36:46 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37SEqxLU019181;
+        Mon, 28 Aug 2023 15:31:45 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sqxe1bnvc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Aug 2023 15:31:45 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37SFVg1F22020654
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Aug 2023 15:31:43 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D207920043;
+        Mon, 28 Aug 2023 15:31:42 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9F2D320040;
+        Mon, 28 Aug 2023 15:31:42 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 28 Aug 2023 15:31:42 +0000 (GMT)
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Stefan Haberland <sth@linux.ibm.com>,
+        =?UTF-8?q?Jan=20H=C3=B6ppner?= <hoeppner@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 0/1] s390/dasd: fix string length handling
+Date:   Mon, 28 Aug 2023 17:31:41 +0200
+Message-Id: <20230828153142.2843753-1-hca@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
- nvmet_target_{setup/cleanup} common code
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Daniel Wagner <dwagner@suse.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-References: <20230822083812.24612-1-dwagner@suse.de>
- <20230822083812.24612-4-dwagner@suse.de>
- <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
- <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
- <oss54jmgqzjcxecea4h7eeguh6lmhls4p74e7unbxmhz34asvk@a7n6vu6hauys>
- <zvu2ihivd6f4fbs7hpgowstq3li4wrdycqzso3c32qcco7zes4@s2l2solzzo6u>
- <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
- <b79c0c9d-3930-4dbf-a1cf-8ca9e00af614@acm.org>
- <xz7rnke52xu3anmnjliybqv4yk3w367noo6ipguarkec6u4i5g@7bqtovmc3gjb>
- <d6ec4e54-1ec9-648a-ce8c-1e08a439c3c6@acm.org>
- <ckuewnzuiejug6jbuxfw4viqwf4v43pq54mj4k4qbq7uz3zwpn@3iijcby24ujd>
-Content-Language: en-US
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ckuewnzuiejug6jbuxfw4viqwf4v43pq54mj4k4qbq7uz3zwpn@3iijcby24ujd>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Jqw_vFUrPEw0Lb7OVDvQuxgkGNAiOsnO
+X-Proofpoint-GUID: Jqw_vFUrPEw0Lb7OVDvQuxgkGNAiOsnO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-28_12,2023-08-28_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=477
+ priorityscore=1501 clxscore=1015 impostorscore=0 suspectscore=0
+ adultscore=0 mlxscore=0 malwarescore=0 phishscore=0 bulkscore=0
+ lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2308100000 definitions=main-2308280137
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/27/23 21:13, Shinichiro Kawasaki wrote:
-> For me, your original suggestion to add "ignored_agument" looks better
-> than "$@". (or in short, "noarg" or something)
+Hi Jens,
 
-It is not clear to me what the intention is of the _nvmet_target_setup
-calls without arguments. Is the intention to pass all arguments that have
-been passed to the caller or is the intention not to pass any arguments?
-In the latter case I think it would be wrong to suppress SC2119 because
-there really is a problem in this case. How about passing -- as argument
-if the intention is not to pass any arguments? It is a well established
-convention for shell commands and shell functions to ignore the double
-hyphen if it is encountered in the argument list.
+since both Stefan and Jan are not available, I'm sending a simple fix
+to address a valid clang finding. Since I expect more reports and
+patches for this, I'm sending this now in order to avoid that more
+people spend time on this.
+
+Please apply.
 
 Thanks,
+Heiko
 
-Bart.
+Heiko Carstens (1):
+  s390/dasd: fix string length handling
+
+ drivers/s390/block/dasd_devmap.c |  6 +-----
+ drivers/s390/block/dasd_eckd.c   | 10 +++++-----
+ drivers/s390/block/dasd_int.h    |  4 ++++
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+-- 
+2.39.2
+
