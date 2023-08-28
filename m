@@ -2,100 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D365C83F19
-	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 18:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F04C71153
+	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 22:47:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233192AbjH1Szc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Aug 2023 14:55:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60018 "EHLO
+        id S234214AbjH1WrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Aug 2023 18:47:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233222AbjH1SzN (ORCPT
+        with ESMTP id S234251AbjH1WrC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2023 14:55:13 -0400
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BB621A3;
-        Mon, 28 Aug 2023 11:55:07 -0700 (PDT)
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1bf092a16c9so27684255ad.0;
-        Mon, 28 Aug 2023 11:55:07 -0700 (PDT)
+        Mon, 28 Aug 2023 18:47:02 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E59C6185
+        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2023 15:46:58 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1bf55a81eeaso18352565ad.0
+        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2023 15:46:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693262818; x=1693867618;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jfbVDtnUzC7S/98XQMX9mkLUChZIIcF3EqTa705rK40=;
+        b=DpUgaRdGmyys0YbzcJ+/+C/4TT7jf1NRTxh6quRzHmf0W7ShC/TICRXTpcZ+bfooDZ
+         MGEwb57HzW4HbsZv5qXAym6Vuj27xlfQRiC7IqWvDgw6tbgIsCaLtpawdHEDSOzx6h/C
+         KdyPPAxwPmi/1KKanDD8q1ldw/5UXMQMWlcwjeePUW9NFPerJvASgEvRs1+i1viJg2sW
+         4M54QrmCfMkGjh1r23unlGBCYVLiyLoj+GtplXm8aPBKD0pPKmqMO1jqR/CZrZyGuecf
+         NHMVctNEvEYrD6lKE8Ul/08Ky52jOkCUMqMH62NW8vYpwWQcamzhUW4QOVJJStjHcvjI
+         BlaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693248907; x=1693853707;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=umflnyFqBYkm4MgelOGwx19oN9oBe5SP3i3J2ZxPkxQ=;
-        b=el7WQAhC3uTso+CrYyYTyFpA2mWvmY9Nk0SnMf78ycenwiR0N+lfoor46ifpG3gBaR
-         jXggXK1vp23FXKFJ7E8i/JPsg1ACsE/d2CvCK7SCLoCj0T8NaLF99emI6TgD73HlKSm6
-         r5Xw8wDPzWl5xetUzlBlxboJg7pwdNANx/V8DPpGBUWh8oKShsOxUeDb8QR2IPk/NF5m
-         SHwxO/DROG9XUUei8W1b+HbFU17cMbuAKwsWvPvB0+YOfXlM/xkue+Pvy78NLoCU8sNd
-         374pTFAS8oEbHtKJeXKSrxKr+HEmSyEm995/lunjv98Ic1N+xIb7iLpSUWhv0UuV+cc4
-         9JIg==
-X-Gm-Message-State: AOJu0YwMVM0dxwnS3NbViGBBvns4RDpZGnk3aU8EqosOie5cJQ/L/IFI
-        wWQ62vUY4Td3rmEnChqBY7Q=
-X-Google-Smtp-Source: AGHT+IG5OnTzChA0NWY4c4vTbc4cYX/NBVucFHt1B0vYzAE05QFD8WTqXl+BXzYAGg4hw/79RtJ9YA==
-X-Received: by 2002:a17:902:f94e:b0:1c0:e014:90c1 with SMTP id kx14-20020a170902f94e00b001c0e01490c1mr8249817plb.48.1693248906633;
-        Mon, 28 Aug 2023 11:55:06 -0700 (PDT)
-Received: from [192.168.165.167] ([216.9.110.6])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c14d00b001b8a3e2c241sm7745382plj.14.2023.08.28.11.55.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Aug 2023 11:55:06 -0700 (PDT)
-Message-ID: <ed518b56-a579-49bb-b2bb-220214ef6e2e@acm.org>
-Date:   Mon, 28 Aug 2023 11:55:01 -0700
+        d=1e100.net; s=20221208; t=1693262818; x=1693867618;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jfbVDtnUzC7S/98XQMX9mkLUChZIIcF3EqTa705rK40=;
+        b=k7yCxVkuVsS5onrryv1GVpt5Bj93FBlgaVLZ93LDEmfobaSyvpqsj5/bXnBrPvmsnK
+         AY/gHrxEHZ0zNNfV8ihIEBoNVXb1d+tznMO4bhBVLXvTyRw6khB7qOluvpmsZ0/cCXJ8
+         YE7ZtGBVic+9hycbY0/PqVCY2IpyFO/bg98NPpBIixkAUb1uZj4oKgF9vz0u4MRclnvt
+         uHnkdTXUM2Tk9v2aC0uvMpnA+JBZKfAdm3Y9UQuRpZoLfbTMyi4kFD3ok71dt8JF1edZ
+         WV6MLvEccf8+om5IoZYRlGdpXpByo1lWGej3nQUR9Z1SdFtvJyl9B/RypyFVmRT9ddtz
+         7yfQ==
+X-Gm-Message-State: AOJu0YykU8VccHJfxRvM3uNTw4tVuipKKfw50VQypPIii+JVPiwR49eC
+        y9gAD+qVqgwMjUijcvKC9gNWBA==
+X-Google-Smtp-Source: AGHT+IFspYfjLzYgSOwGtPHy8bxl+y+5JkPrvkKdfXKLBR1uq/L9AkoAEuEDtgywPH8Tn+brWT5PnQ==
+X-Received: by 2002:a17:902:dacd:b0:1c0:c86a:5425 with SMTP id q13-20020a170902dacd00b001c0c86a5425mr11041619plx.19.1693262818063;
+        Mon, 28 Aug 2023 15:46:58 -0700 (PDT)
+Received: from google.com ([2620:15c:2d1:203:b64:7817:9989:9eba])
+        by smtp.gmail.com with ESMTPSA id jg12-20020a17090326cc00b001b8b07bc600sm7904627plb.186.2023.08.28.15.46.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Aug 2023 15:46:57 -0700 (PDT)
+Date:   Mon, 28 Aug 2023 15:46:52 -0700
+From:   Nick Desaulniers <ndesaulniers@google.com>
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
+        Jan =?iso-8859-1?Q?H=F6ppner?= <hoeppner@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, nathan@kernel.org,
+        llvm@lists.linux.dev, David Laight <David.Laight@aculab.com>
+Subject: Re: [PATCH 1/1] s390/dasd: fix string length handling
+Message-ID: <ZO0j3M8KFWeEznXy@google.com>
+References: <20230828153142.2843753-1-hca@linux.ibm.com>
+ <20230828153142.2843753-2-hca@linux.ibm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
- nvmet_target_{setup/cleanup} common code
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-References: <fbyacmtpqfhfb763s7utwbt4kdbr3pli4rp7prj7jlklq2tit6@mkkjzy73r3a3>
- <7b5fc500-afeb-7edf-383c-0cdda77b3cf6@acm.org>
- <oss54jmgqzjcxecea4h7eeguh6lmhls4p74e7unbxmhz34asvk@a7n6vu6hauys>
- <zvu2ihivd6f4fbs7hpgowstq3li4wrdycqzso3c32qcco7zes4@s2l2solzzo6u>
- <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
- <b79c0c9d-3930-4dbf-a1cf-8ca9e00af614@acm.org>
- <xz7rnke52xu3anmnjliybqv4yk3w367noo6ipguarkec6u4i5g@7bqtovmc3gjb>
- <d6ec4e54-1ec9-648a-ce8c-1e08a439c3c6@acm.org>
- <ckuewnzuiejug6jbuxfw4viqwf4v43pq54mj4k4qbq7uz3zwpn@3iijcby24ujd>
- <8ffb6c2f-0836-4302-82b9-902e092e537c@acm.org>
- <txsyjpcxb3baog5fgqdnm5hh765nt5qcbcmllsto7uulyzr5kn@zirmqldhosbi>
-Content-Language: en-US
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <txsyjpcxb3baog5fgqdnm5hh765nt5qcbcmllsto7uulyzr5kn@zirmqldhosbi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230828153142.2843753-2-hca@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/28/23 10:02, Daniel Wagner wrote:
-> I am against adding code just to make ShellCheck happy.
-Hi Daniel,
+On Mon, Aug 28, 2023 at 05:31:42PM +0200, Heiko Carstens wrote:
+> Building dasd_eckd.o with latest clang reveals this bug:
+> 
+>     CC      drivers/s390/block/dasd_eckd.o
+>       drivers/s390/block/dasd_eckd.c:1082:3: warning: 'snprintf' will always be truncated;
+>       specified size is 1, but format string expands to at least 11 [-Wfortify-source]
+>        1082 |                 snprintf(print_uid, sizeof(*print_uid),
+>             |                 ^
+>       drivers/s390/block/dasd_eckd.c:1087:3: warning: 'snprintf' will always be truncated;
+>       specified size is 1, but format string expands to at least 10 [-Wfortify-source]
+>        1087 |                 snprintf(print_uid, sizeof(*print_uid),
+>             |                 ^
+> 
+> Fix this by moving and using the existing UID_STRLEN for the arrays
+> that are being written to. Also rename UID_STRLEN to DASD_UID_STRLEN
+> to clarify its scope.
+> 
+> Fixes: 23596961b437 ("s390/dasd: split up dasd_eckd_read_conf")
+> Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 
-That's not what my concern is about. My concern is about keeping
-the blktests source code maintainable and easy to read. My opinion
-is that the ability of bash to pass arguments from caller to callee
-implicitly (a) hurts readability, (b) is error prone and (c) hurts
-maintainability. This is why I think that this feature should not
-be used and hence that disabling SC2119 would be really wrong.
+Thanks for the patch! Nathan just reported a bunch of these. I took a
+look at these two and thought "yeah that's clearly a bug in the kernel
+sources." Fix LGTM.
 
-Regarding (a), I think this long e-mail thread is more than enough
-evidence that it is not clear what the intention is of the
-_nvmet_target_setup calls without arguments - not pass any arguments
-or pass the argument list of the caller. Regarding (c): if any
-_nvmet_target_setup calls would be added in a function that accepts
-arguments, how is _nvmet_target_setup() expected to process arguments
-of which it doesn't know how to interpret these?
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Closes: https://github.com/ClangBuiltLinux/linux/issues/1923
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Hence my proposal to change the _nvmet_target_setup calls with no
-arguments into "_nvmet_target_setup --" and also to ignore the double
-hyphen argument inside _nvmet_target_setup().
-
-Thanks,
-
-Bart.
+I also like David's idea of passing `char ident [DASD_UID_STRLEN]`, too,
+but I don't feel strongly either way.
