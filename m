@@ -2,205 +2,124 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68755C83F16
-	for <linux-block@archiver.kernel.org>; Sun, 27 Aug 2023 21:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9CFC83F14
+	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 01:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230135AbjH0Vpx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Aug 2023 17:45:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34966 "EHLO
+        id S229507AbjH1A7z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Aug 2023 20:59:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbjH0Vpl (ORCPT
+        with ESMTP id S229506AbjH1A73 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Aug 2023 17:45:41 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6883E124;
-        Sun, 27 Aug 2023 14:45:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kY05MXjwCqUKuXNwucsgt/McL4F7q7Pfbjm7IIALTG0=; b=rwicGoUvL4VgCd8/Qp1uGcvFJj
-        2egMEWh2qIptB38yz3LkaovCgsrzYd5qWYzYVrLDB0+2cvC8Hq94M95X4EXXJUaYQexvV5ydz/PhQ
-        3oSRutUhsOumwt9db2so3z+etJXEF+Wi2+NHOmG8HlbMqrIjqtB+TQ9YoLhUuiexvk8+I1LYJ/xSV
-        ZlLyerq6Wcockw2BEhGC0e7r/uJgQmeAavj3yTO2QGyQwB10XYMkDDZ1Bff7wCxS6uqmy7RDsW0tE
-        LxV9EZ6t5yOJ6J5Tl0xTjIsbFSoYFc5//Rfxs/6ERxlTJUc4/DLKribj0NNKKwb+gHZab/RxADkLO
-        htbC578A==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qaNZO-001P52-2K;
-        Sun, 27 Aug 2023 21:45:18 +0000
-Date:   Sun, 27 Aug 2023 22:45:18 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 03/12] filemap: update ki_pos in generic_perform_write
-Message-ID: <20230827214518.GU3390869@ZenIV>
-References: <20230601145904.1385409-1-hch@lst.de>
- <20230601145904.1385409-4-hch@lst.de>
- <20230827194122.GA325446@ZenIV>
+        Sun, 27 Aug 2023 20:59:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4F12131
+        for <linux-block@vger.kernel.org>; Sun, 27 Aug 2023 17:58:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693184323;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Vmal4hn0XBHdSL8GzE89VF+dr7kcGENPa2m8SJGidbg=;
+        b=bAyEj4y6/c6GsNB6VrZQRXcAoxHI0Gye3lZZtDjRZKM6pB3mky6KChOOdMDgpLe3QswSDB
+        gj33awiXTFHYMwANeqPqfrwQZMrKaVvt3x2dcAQ9Pb5+HFP6ZRxDMzSMvQyuP7fmv7UT84
+        c59X4XzyRo81S42jgMbMkJnqe4x9+PU=
+Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
+ [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-413-BNSOdw1APEOFL6fWAjBMzw-1; Sun, 27 Aug 2023 20:58:41 -0400
+X-MC-Unique: BNSOdw1APEOFL6fWAjBMzw-1
+Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-48fa8d86dedso217398e0c.1
+        for <linux-block@vger.kernel.org>; Sun, 27 Aug 2023 17:58:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693184321; x=1693789121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vmal4hn0XBHdSL8GzE89VF+dr7kcGENPa2m8SJGidbg=;
+        b=YqOv7QnT4jBJvK9CXCpPG+y76s/t6xBXEp+YN+YtWAdbnW2Nqlxq3eIFAkggU9adfL
+         V/BOg5l/BBHUo8bN2HIpxRX7ZkWojHOV5NqkhwVIExtoxodo4gPUCr8nSXiYHYeeJk31
+         4Nr7VibzFlLX7CAtn54HUs9HC1zhIXbUK08phVGqsOD+RcyWhMQw7TheHvWbATO6mVDc
+         aPRYrUwjernHi2OIjihQ9rPYpj7x2Khd74PHQNL+BBxccT41Zhl+aRu+2yUK4ftUXPeO
+         AetY1p3lc20hcbi2zTUEwBNDWaPkoP5ZUgdyBkfkVU6WzObrMiNmqifaQa2itXUAVrVm
+         NcDQ==
+X-Gm-Message-State: AOJu0YydTOv/MSHOHxEsu7lRaQCzyysPuEhX62cbGz22lG9U9Zm4UzJ8
+        FFG2K86Mf3u5LWIDj8AwYxHRHTIe0fqDbxbICgO5OsNnjS8iBZX/P2vCVFPR+Yy6dvKbeoFiVsi
+        3zMTtC31xNVZHHAa3Qd4wgYywdc89i/2OkiFYc1o=
+X-Received: by 2002:a05:6102:3082:b0:44d:626a:f079 with SMTP id l2-20020a056102308200b0044d626af079mr11011478vsb.3.1693184319865;
+        Sun, 27 Aug 2023 17:58:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFk8x4y0ZS8y62BRq47uQm/s83tXzZyWyVZwGWwniyN2eYrb2TIg9cR3GcQ+RXT4nTqSvOaZ2XdGbeTF7tcLfI=
+X-Received: by 2002:a05:6102:3082:b0:44d:626a:f079 with SMTP id
+ l2-20020a056102308200b0044d626af079mr11011470vsb.3.1693184319657; Sun, 27 Aug
+ 2023 17:58:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230827194122.GA325446@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+References: <20230818140145.1229805-1-ming.lei@redhat.com>
+In-Reply-To: <20230818140145.1229805-1-ming.lei@redhat.com>
+From:   Ming Lei <ming.lei@redhat.com>
+Date:   Mon, 28 Aug 2023 08:58:28 +0800
+Message-ID: <CAFj5m9LGi4zxvDYqTvSHYh=Ra3YHUMe3nePZqJsMfEXttbrgMA@mail.gmail.com>
+Subject: Re: [PATCH V3] lib/group_cpus.c: avoid to acquire cpu hotplug lock in group_cpus_evenly
+To:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>
+Cc:     linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Yi Zhang <yi.zhang@redhat.com>,
+        Guangwu Zhang <guazhang@redhat.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 27, 2023 at 08:41:22PM +0100, Al Viro wrote:
-> On Thu, Jun 01, 2023 at 04:58:55PM +0200, Christoph Hellwig wrote:
-> > All callers of generic_perform_write need to updated ki_pos, move it into
-> > common code.
-> 
-> > @@ -4034,7 +4037,6 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
-> >  		endbyte = pos + status - 1;
-> >  		err = filemap_write_and_wait_range(mapping, pos, endbyte);
-> >  		if (err == 0) {
-> > -			iocb->ki_pos = endbyte + 1;
-> >  			written += status;
-> >  			invalidate_mapping_pages(mapping,
-> >  						 pos >> PAGE_SHIFT,
-> > @@ -4047,8 +4049,6 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
-> >  		}
-> >  	} else {
-> >  		written = generic_perform_write(iocb, from);
-> > -		if (likely(written > 0))
-> > -			iocb->ki_pos += written;
-> >  	}
-> >  out:
-> >  	return written ? written : err;
-> 
-> [another late reply, sorry]
-> 
-> That part is somewhat fishy - there's a case where you return a positive value
-> and advance ->ki_pos by more than that amount.  I really wonder if all callers
-> of ->write_iter() are OK with that.  Consider e.g. this:
-> 
-> ssize_t ksys_write(unsigned int fd, const char __user *buf, size_t count)
-> {
->         struct fd f = fdget_pos(fd);
->         ssize_t ret = -EBADF;
-> 
->         if (f.file) {
->                 loff_t pos, *ppos = file_ppos(f.file);
->                 if (ppos) {
->                         pos = *ppos;   
->                         ppos = &pos;
->                 }
->                 ret = vfs_write(f.file, buf, count, ppos);
->                 if (ret >= 0 && ppos)
->                         f.file->f_pos = pos;
->                 fdput_pos(f);
->         }
-> 
->         return ret;
-> }
-> 
-> ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_t *pos)
-> {
->         ssize_t ret;
-> 
->         if (!(file->f_mode & FMODE_WRITE))
->                 return -EBADF;
->         if (!(file->f_mode & FMODE_CAN_WRITE))
->                 return -EINVAL;
->         if (unlikely(!access_ok(buf, count)))
->                 return -EFAULT;
-> 
->         ret = rw_verify_area(WRITE, file, pos, count);
->         if (ret)
->                 return ret;
->         if (count > MAX_RW_COUNT)
->                 count =  MAX_RW_COUNT;
->         file_start_write(file);
->         if (file->f_op->write)
->                 ret = file->f_op->write(file, buf, count, pos);
->         else if (file->f_op->write_iter)
->                 ret = new_sync_write(file, buf, count, pos);
->         else   
->                 ret = -EINVAL;
->         if (ret > 0) {
->                 fsnotify_modify(file);
->                 add_wchar(current, ret);
->         }
->         inc_syscw(current);
->         file_end_write(file);
->         return ret;
-> }
-> 
-> static ssize_t new_sync_write(struct file *filp, const char __user *buf, size_t len, loff_t *ppos)
-> {
->         struct kiocb kiocb;
->         struct iov_iter iter;
->         ssize_t ret; 
-> 
->         init_sync_kiocb(&kiocb, filp);
->         kiocb.ki_pos = (ppos ? *ppos : 0);
->         iov_iter_ubuf(&iter, ITER_SOURCE, (void __user *)buf, len);
-> 
->         ret = call_write_iter(filp, &kiocb, &iter);
->         BUG_ON(ret == -EIOCBQUEUED);
->         if (ret > 0 && ppos)
->                 *ppos = kiocb.ki_pos;
->         return ret;
-> } 
-> 
-> Suppose ->write_iter() ends up doing returning a positive value smaller than
-> the increment of kiocb.ki_pos.  What do we get?  ret is positive, so
-> kiocb.ki_pos gets copied into *ppos, which is ksys_write's pos and there
-> we copy it into file->f_pos.
-> 
-> Is it really OK to have write() return 4096 and advance the file position
-> by 16K?  AFAICS, userland wouldn't get any indication of something
-> odd going on - just a short write to a regular file, with followup write
-> of remaining 12K getting quietly written in the range 16K..28K.
-> 
-> I don't remember what POSIX says about that, but it would qualify as
-> nasty surprise for any userland program - sure, one can check fsync()
-> results before closing the sucker and see if everything looks fine,
-> but the way it's usually discussed could easily lead to assumption that
-> (synchronous) O_DIRECT writes would not be affected by anything of that
-> sort.
+On Fri, Aug 18, 2023 at 10:01=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>
+> group_cpus_evenly() could be part of storage driver's error handler,
+> such as nvme driver, when may happen during CPU hotplug, in which
+> storage queue has to drain its pending IOs because all CPUs associated
+> with the queue are offline and the queue is becoming inactive. And
+> handling IO needs error handler to provide forward progress.
+>
+> Then dead lock is caused:
+>
+> 1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
+> handler is waiting for inflight IO
+>
+> 2) error handler is waiting for CPU hotplug lock
+>
+> 3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
+> error handling can't provide forward progress.
+>
+> Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly()=
+,
+> in which two stage spreads are taken: 1) the 1st stage is over all presen=
+t
+> CPUs; 2) the end stage is over all other CPUs.
+>
+> Turns out the two stage spread just needs consistent 'cpu_present_mask', =
+and
+> remove the CPU hotplug lock by storing it into one local cache. This way
+> doesn't change correctness, because all CPUs are still covered.
+>
+> Cc: Keith Busch <kbusch@kernel.org>
+> Cc: linux-nvme@lists.infradead.org
+> Cc: linux-block@vger.kernel.org
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Reported-by: Guangwu Zhang <guazhang@redhat.com>
+> Tested-by: Guangwu Zhang <guazhang@redhat.com>
+> Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V3:
+>         - reuse `npresmsk`, and avoid to allocate new variable, suggested=
+ by
+>         Chengming Zhou
 
-IOW, I suspect that the right thing to do would be something along the lines
-of
+Hello Thomas and Jens,
 
-direct_write_fallback(): on error revert the ->ki_pos update from buffered write
+Ping...
 
-If we fail filemap_write_and_wait_range() on the range the buffered write went
-into, we only report the "number of bytes which we direct-written", to quote
-the comment in there.  Which is fine, but buffered write has already advanced
-iocb->ki_pos, so we need to roll that back.  Otherwise we end up with e.g.
-write(2) advancing position by more than the amount it reports having written.
+Thanks,
+Ming
 
-Fixes: 182c25e9c157 "filemap: update ki_pos in generic_perform_write"
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
----
-diff --git a/fs/libfs.c b/fs/libfs.c
-index 5b851315eeed..712c57828c0e 100644
---- a/fs/libfs.c
-+++ b/fs/libfs.c
-@@ -1646,6 +1646,7 @@ ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
- 		 * We don't know how much we wrote, so just return the number of
- 		 * bytes which were direct-written
- 		 */
-+		iocb->ki_pos -= buffered_written;
- 		if (direct_written)
- 			return direct_written;
- 		return err;
