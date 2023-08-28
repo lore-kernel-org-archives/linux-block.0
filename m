@@ -2,59 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C79C83F19
-	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 12:34:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E62C83F15
+	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 12:58:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbjH1Mdc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Aug 2023 08:33:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60420 "EHLO
+        id S230110AbjH1M6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Aug 2023 08:58:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232709AbjH1MdX (ORCPT
+        with ESMTP id S230307AbjH1M6B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2023 08:33:23 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 395EA131;
-        Mon, 28 Aug 2023 05:33:06 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 580D668AA6; Mon, 28 Aug 2023 14:33:00 +0200 (CEST)
-Date:   Mon, 28 Aug 2023 14:32:59 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 03/12] filemap: update ki_pos in generic_perform_write
-Message-ID: <20230828123259.GB11084@lst.de>
-References: <20230601145904.1385409-1-hch@lst.de> <20230601145904.1385409-4-hch@lst.de> <20230827194122.GA325446@ZenIV> <20230827214518.GU3390869@ZenIV>
+        Mon, 28 Aug 2023 08:58:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6611E11C;
+        Mon, 28 Aug 2023 05:57:59 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C086063CAA;
+        Mon, 28 Aug 2023 12:57:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FDAFC433C7;
+        Mon, 28 Aug 2023 12:57:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1693227478;
+        bh=8cU2djbQzQGZfvO5mEqYGDCcsbdwpnMr9ZdtXrnK8iI=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=Di9gvKRP6tzRgQDhTqATp2XbwNQeb8dy99esv13fW63/rgXjXWQG+5WS7+1/aKl3v
+         Sw+bHJcHRz9BWLryOOctWfXsxJWVKRilMe5Mtx4rtvVccjhWiGHMb4ySFf9RMhDglT
+         l9tfIQxANtO0A7kP+GDhdOGxRxgpTxZfUdfo/b11OU/Hv/pMKB+/CScPmkceGkKKzw
+         U9bUCNbudcaU4h/VMVmdxRM+/dretupx+ZkwfPbLIZbU4xWvAZzjkqBj/DACK02hY+
+         iGTQ7c7OLJ6jl1HmblzKELTBE0qBNE9o2eMHNwEsKTi1lOU/9QK4WRhjupU/nClEW9
+         k2EQSuAekMJ/w==
+Message-ID: <1388dd5e-8d66-6f88-25d1-f563d7c366d6@kernel.org>
+Date:   Mon, 28 Aug 2023 20:57:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230827214518.GU3390869@ZenIV>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH 23/29] f2fs: Convert to bdev_open_by_dev/path()
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Christoph Hellwig <hch@lst.de>
+References: <20230818123232.2269-1-jack@suse.cz>
+ <20230823104857.11437-23-jack@suse.cz>
+From:   Chao Yu <chao@kernel.org>
+In-Reply-To: <20230823104857.11437-23-jack@suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 27, 2023 at 10:45:18PM +0100, Al Viro wrote:
-> IOW, I suspect that the right thing to do would be something along the lines
-> of
+On 2023/8/23 18:48, Jan Kara wrote:
+> Convert f2fs to use bdev_open_by_dev/path() and pass the handle around.
 
-The idea looks sensible to me, but we'll also need to do it for the
-filemap_write_and_wait_range failure case.
+Hi Jan,
 
+Seems it will confilct w/ below commit, could you please take a look?
+
+https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs.git/commit/?h=dev&id=51bf8d3c81992ae57beeaf22df78ed7c2782af9d
+
+Thanks,
+
+> 
+> CC: Jaegeuk Kim <jaegeuk@kernel.org>
+> CC: Chao Yu <chao@kernel.org>
+> CC: linux-f2fs-devel@lists.sourceforge.net
+> Acked-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>   fs/f2fs/f2fs.h  |  1 +
+>   fs/f2fs/super.c | 17 +++++++++--------
+>   2 files changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+> index e18272ae3119..2ec6c10df636 100644
+> --- a/fs/f2fs/f2fs.h
+> +++ b/fs/f2fs/f2fs.h
+> @@ -1234,6 +1234,7 @@ struct f2fs_bio_info {
+>   #define FDEV(i)				(sbi->devs[i])
+>   #define RDEV(i)				(raw_super->devs[i])
+>   struct f2fs_dev_info {
+> +	struct bdev_handle *bdev_handle;
+>   	struct block_device *bdev;
+>   	char path[MAX_PATH_LEN];
+>   	unsigned int total_segments;
+> diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+> index aa1f9a3a8037..885dcbd81859 100644
+> --- a/fs/f2fs/super.c
+> +++ b/fs/f2fs/super.c
+> @@ -1561,7 +1561,7 @@ static void destroy_device_list(struct f2fs_sb_info *sbi)
+>   	int i;
+>   
+>   	for (i = 0; i < sbi->s_ndevs; i++) {
+> -		blkdev_put(FDEV(i).bdev, sbi->sb);
+> +		bdev_release(FDEV(i).bdev_handle);
+>   #ifdef CONFIG_BLK_DEV_ZONED
+>   		kvfree(FDEV(i).blkz_seq);
+>   #endif
+> @@ -4196,9 +4196,9 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+>   
+>   		if (max_devices == 1) {
+>   			/* Single zoned block device mount */
+> -			FDEV(0).bdev =
+> -				blkdev_get_by_dev(sbi->sb->s_bdev->bd_dev, mode,
+> -						  sbi->sb, NULL);
+> +			FDEV(0).bdev_handle = bdev_open_by_dev(
+> +					sbi->sb->s_bdev->bd_dev, mode, sbi->sb,
+> +					NULL);
+>   		} else {
+>   			/* Multi-device mount */
+>   			memcpy(FDEV(i).path, RDEV(i).path, MAX_PATH_LEN);
+> @@ -4216,12 +4216,13 @@ static int f2fs_scan_devices(struct f2fs_sb_info *sbi)
+>   					(FDEV(i).total_segments <<
+>   					sbi->log_blocks_per_seg) - 1;
+>   			}
+> -			FDEV(i).bdev = blkdev_get_by_path(FDEV(i).path, mode,
+> -							  sbi->sb, NULL);
+> +			FDEV(i).bdev_handle = bdev_open_by_path(FDEV(i).path,
+> +					mode, sbi->sb, NULL);
+>   		}
+> -		if (IS_ERR(FDEV(i).bdev))
+> -			return PTR_ERR(FDEV(i).bdev);
+> +		if (IS_ERR(FDEV(i).bdev_handle))
+> +			return PTR_ERR(FDEV(i).bdev_handle);
+>   
+> +		FDEV(i).bdev = FDEV(i).bdev_handle->bdev;
+>   		/* to release errored devices */
+>   		sbi->s_ndevs = i + 1;
+>   
