@@ -2,83 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E898BC6FA8F
-	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 11:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFCE6C83F18
+	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 11:54:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231682AbjH2LEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Aug 2023 07:04:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48692 "EHLO
+        id S232360AbjH2Lxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Aug 2023 07:53:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235365AbjH2LDn (ORCPT
+        with ESMTP id S232475AbjH2Lxa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Aug 2023 07:03:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 312C91AD;
-        Tue, 29 Aug 2023 04:03:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B6E26654DF;
-        Tue, 29 Aug 2023 11:03:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D1AC433C8;
-        Tue, 29 Aug 2023 11:03:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693307020;
-        bh=dmhRaIoPYrHNxkH4ZB1VVK692yXKEC04ivOUvYbVaY0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KDeq8V00xGngbcNjE8R26ooRTE8CMWgG0Sq886mzIiSadRDDb2o7kmsxQtnRXW3gQ
-         zU8LFGQX0rOUGnxbsufITcGHa/jTxEC+lNAyQwB6CsMPepryhcjvStQwBxEX57fFSl
-         TQYxMLuCnl7Q47z2UMB8AsE6t9rNxrGbGaNF8qU9JGVZyAdlgZg3wJxzUk4lWK+Wld
-         gASZCUMBvtcy8ntHEuVqF+gwduJdJ/gdiMSIvK5ZLMKq9lpTiIU21IQC81ceh6MrnG
-         Ziv17Fr/8MDqsFThV1PzrpAp7RQVJ9t9t2gWVrcEC9woKJDuSJbqK+PIglo8frydKD
-         NZuACq9V7ImaA==
-Date:   Tue, 29 Aug 2023 13:03:36 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 02/29] block: Use bdev_open_by_dev() in blkdev_open()
-Message-ID: <20230829-zinspolitik-beruhen-521109e35cdc@brauner>
-References: <20230818123232.2269-1-jack@suse.cz>
- <20230823104857.11437-2-jack@suse.cz>
- <20230825022826.GC95084@ZenIV>
- <20230825094509.yarnl4jpayqqjk4c@quack3>
- <20230825-attribut-sympathisch-6dfddfe25f45@brauner>
- <20230828164613.i6angwprxm57es6s@quack3>
+        Tue, 29 Aug 2023 07:53:30 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF84194;
+        Tue, 29 Aug 2023 04:53:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=YZxpYOTF14BVcouqFhbahruwZXBLTSy2TCKsEoryGgA=; b=kNMS0YeYJE43XRXxkVUmLf2G+X
+        0F+Ci8x/vmTvip6eYnQqjlZo85hPiq+1XBtqpwy24WfkqxJcN3oDroYdU0hmUGTZO8DmOvrKcLnsA
+        I7wiz/QgNWUfJcZJ1P+jwtCGJuvaBfIm6i+nYBm4G4q1TzqZrEd8vmeeXhUF+nfDcEVXWTUFH8hQX
+        gmgzKK6rDBAyLZFUyKz32+/IHnRsGl+xYuxNBS8JVzpCmXVMJxm/LAsn2AL2YmcWHqJedjjw347sz
+        rnlxqkUfOTw1wHOoS2VuCxy8fDxR1A9rikvDXoQ9fhtzraRL7eHJTnjVX6n6aHUnUp8GZkipnoXzv
+        988YMF3g==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qaxHQ-006P4x-1X; Tue, 29 Aug 2023 11:53:08 +0000
+Date:   Tue, 29 Aug 2023 12:53:07 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hao Xu <hao.xu@linux.dev>
+Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
+Message-ID: <ZO3cI+DkotHQo3md@casper.infradead.org>
+References: <20230827132835.1373581-1-hao.xu@linux.dev>
+ <20230827132835.1373581-8-hao.xu@linux.dev>
+ <ZOvA5DJDZN0FRymp@casper.infradead.org>
+ <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230828164613.i6angwprxm57es6s@quack3>
+In-Reply-To: <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 28, 2023 at 06:46:13PM +0200, Jan Kara wrote:
-> On Fri 25-08-23 15:29:11, Christian Brauner wrote:
-> > > file->f_flags. Attached is a version of the patch that I'm currently
-> > > testing.
+On Tue, Aug 29, 2023 at 03:46:13PM +0800, Hao Xu wrote:
+> On 8/28/23 05:32, Matthew Wilcox wrote:
+> > On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
+> > > From: Hao Xu <howeyxu@tencent.com>
+> > > 
+> > > Add a boolean parameter for file_accessed() to support nowait semantics.
+> > > Currently it is true only with io_uring as its initial caller.
 > > 
-> > Appended patch looks good to me,
-> > Reviewed-by: Christian Brauner <brauner@kernel.org>
+> > So why do we need to do this as part of this series?  Apparently it
+> > hasn't caused any problems for filemap_read().
 > > 
-> > The patch also has another fix for O_EXCL. In earlier versions of this
-> > patch series it relied of f_flags. Thanks for that comment you added in
-> > there about this now. This really helps given that O_EXCL has special
-> > meaning for block devices. Ideally we'd have kernel doc for
-> > file_to_blk_mode().
 > 
-> Thanks for review! I've added the kerneldoc comment:
-> 
-> /**
->  * file_to_blk_mode - get block open flags from file flags
->  * @file: file whose open flags should be converted
->  *
->  * Look at file open flags and generate corresponding block open flags from
->  * them. The function works both for file just being open (e.g. during ->open
->  * callback) and for file that is already open. This is actually non-trivial
->  * (see comment in the function).
->  */
+> We need this parameter to indicate if nowait semantics should be enforced in
+> touch_atime(), There are locks and maybe IOs in it.
 
-Perfect, thanks!
+That's not my point.  We currently call file_accessed() and
+touch_atime() for nowait reads and nowait writes.  You haven't done
+anything to fix those.
+
+I suspect you can trim this patchset down significantly by avoiding
+fixing the file_accessed() problem.  And then come back with a later
+patchset that fixes it for all nowait i/o.  Or do a separate prep series
+first that fixes it for the existing nowait users, and then a second
+series to do all the directory stuff.
+
+I'd do the first thing.  Just ignore the problem.  Directory atime
+updates cause I/O so rarely that you can afford to ignore it.  Almost
+everyone uses relatime or nodiratime.
