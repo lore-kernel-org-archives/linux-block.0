@@ -2,120 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3039BC83F12
-	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 13:06:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA15FC6FA8F
+	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 13:39:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235753AbjH2NGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Aug 2023 09:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36046 "EHLO
+        id S236125AbjH2Nib (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Aug 2023 09:38:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235541AbjH2NFb (ORCPT
+        with ESMTP id S236842AbjH2Nh5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Aug 2023 09:05:31 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFCA184;
-        Tue, 29 Aug 2023 06:05:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=RchKoATVAdQvPJfSjQ7igQ4w+5FVPwMefhSLf5vYpSI=; b=Q3QmRgXTehCOZCVueX+FS2Az5N
-        PVqmWnEC5SOyltZJNMDkbuPj3BuxIKobdTkUGJdkwt9An23qab7RWIeUTJvkRcM5ZQw7A9VajHpfv
-        K7r2l3ZZ2pGC+tetoYQU12TmTvlZI3sm3ayVKtCD8x7/yd2j9SuUz7gnHbMb8LXGAJC6qfT96aNHD
-        /+KAN9szQKpq1/b+zh8evtWeBszURne3cpQtIIZ5DUWss+rP/RkNTx5Y/tCCASZPZaSLUEyAkYJWx
-        0SrCGJoWwn5s3UmnWTZbObVE6DrneAPDreiurlPZ6M22SpYEkwQtVmJFqXgm29PIZAfXouLOFvP7I
-        44OUuuBQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qayP8-006i8Z-JC; Tue, 29 Aug 2023 13:05:10 +0000
-Date:   Tue, 29 Aug 2023 14:05:10 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hao Xu <hao.xu@linux.dev>
-Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 02/11] xfs: add NOWAIT semantics for readdir
-Message-ID: <ZO3tBqJLtRwSYrEr@casper.infradead.org>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-3-hao.xu@linux.dev>
- <ZOu1xYS6LRmPgEiV@casper.infradead.org>
- <ca10040f-b7fa-7c43-1c89-6706d13b2747@linux.dev>
+        Tue, 29 Aug 2023 09:37:57 -0400
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BFC11724;
+        Tue, 29 Aug 2023 06:36:53 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-68c576d35feso1620438b3a.2;
+        Tue, 29 Aug 2023 06:36:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693316154; x=1693920954;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=58tJu8HS3Uk+gerFXyZAfcbbsx2SaXKrB/OzNfMroZM=;
+        b=VbLdHmRCfhdCyZtcnKq4nqIYarSiDFkPrni7iZrgGJpkMT9jFzhsJ4gP9Ik4tkyd5v
+         CRvNLS43hZFn9BAm8B3x77xNudamE3dvyzmjZNAw6yC9f0yHlolE2M+2pNKQUlYNhN3i
+         E6f84Rxf51D23V/+5WFb7ieyGH7xNguUfBoNPfn6O2W5YYB/rRCOFB7wQmQT9Dkhg4Mo
+         q7ajMa1RJJr+/+mmjQ/5S4pLumbxh76XBLcboBI0vII17B98XsjZZVmdcRbFBtdpEC/H
+         SZO2v9UYHHXNfYDTmISsrZpvRHSpM+tLagWDZqzODOzP71A5Hnj2bdExjF5uRoCxFebQ
+         zthQ==
+X-Gm-Message-State: AOJu0YzaEFltc9CG3xB9OKUqjsxRGCzBuYQB1Fzk9RMXrpadPy+ovNCa
+        K7tOXFxOKiOtZKmKxMpuxl0=
+X-Google-Smtp-Source: AGHT+IG9aL/VbyawH5cxLpKPv48bF/ifjtaCOBxvr16QlUWtHvl9BmANrS6abaZiiejyKlhA6FbCiw==
+X-Received: by 2002:a05:6a20:6a05:b0:13f:9cee:ff42 with SMTP id p5-20020a056a206a0500b0013f9ceeff42mr35105172pzk.41.1693316153610;
+        Tue, 29 Aug 2023 06:35:53 -0700 (PDT)
+Received: from [172.20.4.71] ([208.98.210.70])
+        by smtp.gmail.com with ESMTPSA id 22-20020aa79156000000b00666b012baedsm8485174pfi.158.2023.08.29.06.35.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Aug 2023 06:35:52 -0700 (PDT)
+Message-ID: <3b5b246f-386d-4afe-a20d-4b08770bd4cb@acm.org>
+Date:   Tue, 29 Aug 2023 06:35:52 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ca10040f-b7fa-7c43-1c89-6706d13b2747@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
+ nvmet_target_{setup/cleanup} common code
+Content-Language: en-US
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Daniel Wagner <dwagner@suse.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+References: <oss54jmgqzjcxecea4h7eeguh6lmhls4p74e7unbxmhz34asvk@a7n6vu6hauys>
+ <zvu2ihivd6f4fbs7hpgowstq3li4wrdycqzso3c32qcco7zes4@s2l2solzzo6u>
+ <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
+ <b79c0c9d-3930-4dbf-a1cf-8ca9e00af614@acm.org>
+ <xz7rnke52xu3anmnjliybqv4yk3w367noo6ipguarkec6u4i5g@7bqtovmc3gjb>
+ <d6ec4e54-1ec9-648a-ce8c-1e08a439c3c6@acm.org>
+ <ckuewnzuiejug6jbuxfw4viqwf4v43pq54mj4k4qbq7uz3zwpn@3iijcby24ujd>
+ <8ffb6c2f-0836-4302-82b9-902e092e537c@acm.org>
+ <txsyjpcxb3baog5fgqdnm5hh765nt5qcbcmllsto7uulyzr5kn@zirmqldhosbi>
+ <ed518b56-a579-49bb-b2bb-220214ef6e2e@acm.org>
+ <ptqdqjo7xt5qsijmuftmboutck5bpwm2wjrwks5lr4l44ssvjy@iurtgbaxnoji>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ptqdqjo7xt5qsijmuftmboutck5bpwm2wjrwks5lr4l44ssvjy@iurtgbaxnoji>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 29, 2023 at 03:41:43PM +0800, Hao Xu wrote:
-> On 8/28/23 04:44, Matthew Wilcox wrote:
-> > > @@ -391,10 +401,17 @@ xfs_dir2_leaf_getdents(
-> > >   				bp = NULL;
-> > >   			}
-> > > -			if (*lock_mode == 0)
-> > > -				*lock_mode = xfs_ilock_data_map_shared(dp);
-> > > +			if (*lock_mode == 0) {
-> > > +				*lock_mode =
-> > > +					xfs_ilock_data_map_shared_generic(dp,
-> > > +					ctx->flags & DIR_CONTEXT_F_NOWAIT);
-> > > +				if (!*lock_mode) {
-> > > +					error = -EAGAIN;
-> > > +					break;
-> > > +				}
-> > > +			}
-> > 
-> > 'generic' doesn't seem like a great suffix to mean 'takes nowait flag'.
-> > And this is far too far indented.
-> > 
-> > 			xfs_dir2_lock(dp, ctx, lock_mode);
-> > 
-> > with:
-> > 
-> > STATIC void xfs_dir2_lock(struct xfs_inode *dp, struct dir_context *ctx,
-> > 		unsigned int lock_mode)
-> > {
-> > 	if (*lock_mode)
-> > 		return;
-> > 	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
-> > 		return xfs_ilock_data_map_shared_nowait(dp);
-> > 	return xfs_ilock_data_map_shared(dp);
-> > }
-> > 
-> > ... which I think you can use elsewhere in this patch (reformat it to
-> > XFS coding style, of course).  And then you don't need
-> > xfs_ilock_data_map_shared_generic().
+On 8/28/23 19:11, Shinichiro Kawasaki wrote:
+> This is the unclear point for me. Does bash really pass the arguments list of
+> the caller to the callee when functions are called without arguments?
 > 
-> How about rename xfs_ilock_data_map_shared() to xfs_ilock_data_map_block()
-> and rename xfs_ilock_data_map_shared_generic() to
-> xfs_ilock_data_map_shared()?
+> Looking back the commit 852996fea4f1, you explained that bash does, and I
+> agreed. But now in my environment bash doesn't. I tried the script below in my
+> environment, and see nothing printed.
 > 
-> STATIC void xfs_ilock_data_map_shared(struct xfs_inode *dp, struct
-> dir_context *ctx, unsigned int lock_mode)
-> {
->  	if (*lock_mode)
->  		return;
->  	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
->  		return xfs_ilock_data_map_shared_nowait(dp);
->  	return xfs_ilock_data_map_shared_block(dp);
-> }
+>    funcA() { echo "$1" ; }
+>    funcB() { funcA; }
+>    funcB foo
+> 
+> Then the arguments of funcB is not passed to funcA. How does it run in your
+> environment?
 
-xfs_ilock_data_map_shared() is used for a lot of things which are not
-directories.  I think a new function name is appropriate, and that
-function name should include the word 'dir' in it somewhere.
+I see the same result that you see. It seems that I misinterpret the 
+text produced by shellcheck if it reports warning SC2119. After having 
+reread https://github.com/koalaman/shellcheck/wiki/SC2119, I'm OK with
+suppressing warning SC2119 because that warning doesn't seem useful to
+me.
+
+Thanks,
+
+Bart.
