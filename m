@@ -2,132 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4041BC71153
-	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 15:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AF7C71153
+	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 15:42:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233894AbjH2PkN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Aug 2023 11:40:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44348 "EHLO
+        id S236558AbjH2Plt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Aug 2023 11:41:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237297AbjH2Pjp (ORCPT
+        with ESMTP id S237335AbjH2Pl2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Aug 2023 11:39:45 -0400
-Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD1FB7
-        for <linux-block@vger.kernel.org>; Tue, 29 Aug 2023 08:39:41 -0700 (PDT)
-Received: by mail-ua1-x92f.google.com with SMTP id a1e0cc1a2514c-7a0254de2fdso1671803241.1
-        for <linux-block@vger.kernel.org>; Tue, 29 Aug 2023 08:39:41 -0700 (PDT)
+        Tue, 29 Aug 2023 11:41:28 -0400
+Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17947CD0
+        for <linux-block@vger.kernel.org>; Tue, 29 Aug 2023 08:41:21 -0700 (PDT)
+Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-64a70194fbeso28235436d6.0
+        for <linux-block@vger.kernel.org>; Tue, 29 Aug 2023 08:41:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693323580; x=1693928380;
+        d=google.com; s=20221208; t=1693323680; x=1693928480;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Mnzm799P6Q3j74LZPQjfhcA/lU7vvWbHsfU0R3jlCdA=;
-        b=21bL9sgc2nberDTHd8JR2kcJpnJThYAPI+w+wEl/2TE70wClWsQXUKQtxDRy+i0rtP
-         XyYc3bYl+wlHw4DhaTvnupahq//RRbeLSvoUnZikhM6PdxUpeC8n36+KN/A5MJBMJcI+
-         KyWGLe5XdNSGSw6FUYlq6sxc98Rq3oZwmtbpA5zPxdAxdpDgUinCD2hTw1Ob0+vtu4Bx
-         NiQaZhnQGGRUclNw78fljAstc+Hn68o7Phzrc2oa4Bwu5eQqLYz65P+UtBJiGlF1JQLt
-         JZ6SGRo/y9dmH6AiWjXD91jGoem9/zBIzFBbV6EO4qGEqcIxAY2KD7TBdXRORtaLnQ0p
-         RjRA==
+        bh=6w1Ls1sn3g8EuR9FLr87CmzSLawvlZA36YBFNsEyrqo=;
+        b=RePQtCbtJb8yTnPCG6XhU52r+nhBacgJ3m1Hf6++uzNpY5WVwBEgEeUOJJj5tRKsdG
+         Mw6sLocWVTveeyxm84ASXXZicf/JLpdRkJSwmatVMFNPEe5goKu6QN7BEo66ZLqhi1T+
+         oLie1Sx5nFp2iIxc7d6WlHxlqh6rUAF0Dymb9N1RfMjYr/aRUEeFv+K8CnDi5xIM85Xi
+         17dO0P9uDb3w45zqDsQWdD6UB9Q87aEBW1ZGKFFgfONnSR6z9Q7U/sy4bYcgvat1rACc
+         DXb1bskKsPhCDT9n049AqzRNxxbZE5euxOXUwImZiMxURyBMN/kwGdUZq9+Oruj5kfuq
+         ZjEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693323580; x=1693928380;
+        d=1e100.net; s=20221208; t=1693323680; x=1693928480;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Mnzm799P6Q3j74LZPQjfhcA/lU7vvWbHsfU0R3jlCdA=;
-        b=B53JhzLxRImnGaaBdKHm1Hym3MH0i6zMDlNnhXivZM8N9mO8mdSV9lNs3k9NR/M0Tm
-         FuQba3QFYbSyCQF3sfYGqMoCPPBgBMpWtdbJPbI3dAUmR9y9TWumsruuHz5zOvLC1lMM
-         Tv2ZUYBa4EjbnRMs84FtSRdFACWHxWRIGg7MOIVA/9lHHNmmEFM+nA/DK6s9pHvlzP8M
-         bjlzy0JkABP4VBBEEbUQemEqiX2LdhDWfQOzsha8OfZ4HjSIMmaGtNKCr9PizEUDMVT4
-         wQmP5N4fkypAU6VHA2iaGgPWvnGyFePSiSJpmQ8acjQBXao5+76JEg5Wb8T3dmDIM4rk
-         uYhA==
-X-Gm-Message-State: AOJu0YwJukXiVuCSwbSdHNKxoXdrfRDw7DjYli2QwtL5n8tZgwDctfOe
-        ja/EFBApJ9h7gMTlAPouoOXaOlMRn7Y1S3f7DX+3Dw==
-X-Google-Smtp-Source: AGHT+IFgQBf6W91PZLktY29myj7AxhMFsuzp9YBkQzOUK+EHpYkPHFHRJFOWCwRTC6PQXEYtheCVljru3JQYuH8tDTQ=
-X-Received: by 2002:a05:6102:358:b0:44e:d85c:ac48 with SMTP id
- e24-20020a056102035800b0044ed85cac48mr3766077vsa.5.1693323580026; Tue, 29 Aug
- 2023 08:39:40 -0700 (PDT)
+        bh=6w1Ls1sn3g8EuR9FLr87CmzSLawvlZA36YBFNsEyrqo=;
+        b=WwqsJFj+V4K9TIg5Y9aX8+q9zFIESoctCuzpAanYb+FgVo37Chy6uvc8PUDaBX9JSN
+         K4GRtspyC6I7+QvcP6x3yGmwxce4gawHsl3GCyWyPnMa8YhDTqPrePErrG5hse4Vur97
+         fM/cpMGI34yN0eWG1YiH2eoXLTjE0/237vu8WqJxuNgExcXnLlbE3V4pd5Ckp5WlvR6n
+         gUDtiY4odXpL8iUP5rYQ0hu55Xvk0dfOMeykDhx65ia8tetzpl/sIbjs1zanCjE+uh0R
+         sTG5Xtm7dLYJhfdt5Yn13NnrfSqG0nFXJJMOA0JVWvFd4EyFdTKUGWDJYWkTPimzFfBz
+         0UbA==
+X-Gm-Message-State: AOJu0YwAhSi92zkOE0wguUSJ2V05TbMOVKT+oo8tkKsD/XyzT2woQxMJ
+        2qqZIi9RsordAtfz+Tb39sFPeA7gkw7WP7gsaAYKOA==
+X-Google-Smtp-Source: AGHT+IGHcq6O4w4Xaif/Wkg7G2cp5jDPTlWZCjK9MvTG1O3GXizQyZyXKPiWJ235Db2+y9z6DE/nb27moDetWPL+YZ8=
+X-Received: by 2002:a0c:ab5d:0:b0:64f:42eb:92ea with SMTP id
+ i29-20020a0cab5d000000b0064f42eb92eamr24008326qvb.4.1693323680063; Tue, 29
+ Aug 2023 08:41:20 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230828153142.2843753-1-hca@linux.ibm.com> <20230828153142.2843753-2-hca@linux.ibm.com>
- <f0419f6428ad404386ebca813dc1ec03@AcuMS.aculab.com> <ZO0k1Par4i4FBCWF@google.com>
- <20230829074854.7031-A-hca@linux.ibm.com> <51f70b0ad37f469a93242db9cfc6d9e8@AcuMS.aculab.com>
-In-Reply-To: <51f70b0ad37f469a93242db9cfc6d9e8@AcuMS.aculab.com>
+ <ZO0j3M8KFWeEznXy@google.com> <20230829080202.7031-B-hca@linux.ibm.com>
+In-Reply-To: <20230829080202.7031-B-hca@linux.ibm.com>
 From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 29 Aug 2023 08:39:29 -0700
-Message-ID: <CAKwvOdkrCUchQzCT48dReOgxT4xFc5jOtz1YNDAYJp8FqdeHzA@mail.gmail.com>
+Date:   Tue, 29 Aug 2023 08:41:09 -0700
+Message-ID: <CAKwvOd=Q1woTad6wFMm=Phs36FTyQ5Gg1wFwZZUhe6j5x3zEqw@mail.gmail.com>
 Subject: Re: [PATCH 1/1] s390/dasd: fix string length handling
-To:     David Laight <David.Laight@aculab.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
-        Stefan Haberland <sth@linux.ibm.com>,
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
         =?UTF-8?B?SmFuIEjDtnBwbmVy?= <hoeppner@linux.ibm.com>,
         Peter Oberparleiter <oberpar@linux.ibm.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, nathan@kernel.org,
+        llvm@lists.linux.dev, David Laight <David.Laight@aculab.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 29, 2023 at 1:32=E2=80=AFAM David Laight <David.Laight@aculab.c=
-om> wrote:
+On Tue, Aug 29, 2023 at 1:02=E2=80=AFAM Heiko Carstens <hca@linux.ibm.com> =
+wrote:
 >
-> From: Heiko Carstens
-> > Sent: 29 August 2023 08:49
-> >
-> > On Mon, Aug 28, 2023 at 03:51:00PM -0700, Nick Desaulniers wrote:
-> > > On Mon, Aug 28, 2023 at 05:18:37PM +0000, David Laight wrote:
-> > > > From: Heiko Carstens
-> > > > > Sent: 28 August 2023 16:32
-> > > > >         if (strlen(uid.vduit) > 0)
-> > > >
-> > > > Does the compiler know enough to optimise that brain-dead test?
-> > > >
+> On Mon, Aug 28, 2023 at 03:46:52PM -0700, Nick Desaulniers wrote:
+> > On Mon, Aug 28, 2023 at 05:31:42PM +0200, Heiko Carstens wrote:
+> > > Building dasd_eckd.o with latest clang reveals this bug:
 > > >
-> > > For the purposes of skipping diagnostics, no; clang performs semantic
-> > > analysis BEFORE optimization (which is handled by LLVM). As such, cla=
-ng
-> > > will produce diagnostics on dead code.
+> > >     CC      drivers/s390/block/dasd_eckd.o
+> > >       drivers/s390/block/dasd_eckd.c:1082:3: warning: 'snprintf' will=
+ always be truncated;
+> > >       specified size is 1, but format string expands to at least 11 [=
+-Wfortify-source]
+> > >        1082 |                 snprintf(print_uid, sizeof(*print_uid),
+> > >             |                 ^
+> > >       drivers/s390/block/dasd_eckd.c:1087:3: warning: 'snprintf' will=
+ always be truncated;
+> > >       specified size is 1, but format string expands to at least 10 [=
+-Wfortify-source]
+> > >        1087 |                 snprintf(print_uid, sizeof(*print_uid),
+> > >             |                 ^
 > > >
-> > > Partly because LLVM isn't very ergonomic at emitting diagnostics from
-> > > the backend, partly because Clang code owner and developers don't wan=
-t
-> > > clang to emit diagnostics dependent on optimization level.
+> > > Fix this by moving and using the existing UID_STRLEN for the arrays
+> > > that are being written to. Also rename UID_STRLEN to DASD_UID_STRLEN
+> > > to clarify its scope.
 > > >
-> > > I disagree with my compatriots, and you can read more thoughts here:
-> > > https://discourse.llvm.org/t/rfc-improving-clangs-middle-and-back-end=
--
-> > diagnostics/69261?u=3Dnickdesaulniers
+> > > Fixes: 23596961b437 ("s390/dasd: split up dasd_eckd_read_conf")
+> > > Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+> > > Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 > >
-> > Maybe I misunderstand what you write above, however clang (latest+great=
-est)
-> > does indeed optimize the strlen() away and generates code which only te=
-sts
-> > if uid.vduit[0] is zero or not.
+> > Thanks for the patch! Nathan just reported a bunch of these. I took a
+> > look at these two and thought "yeah that's clearly a bug in the kernel
+> > sources." Fix LGTM.
 > >
-> > Unlike gcc, which does not optimize this away and which uses the strlen=
-()
-> > inline assembly provided via string.h...
+> > Reported-by: Nathan Chancellor <nathan@kernel.org>
+> > Closes: https://github.com/ClangBuiltLinux/linux/issues/1923
+> > Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> >
+> > I also like David's idea of passing `char ident [DASD_UID_STRLEN]`, too=
+,
+> > but I don't feel strongly either way.
 >
-> And, if -ffreestanding is set (as in some kernel builds), the compiler
-> can't assume what strlen() does.
+> Well, this is supposed to be the "minimal" fix. I consider everything els=
+e
+> additional cleanup work, which can and should be done by Stefan and Jan w=
+ho
+> maintain this device driver.
 
-Exactly.
+Sure, like I said, I don't care either way.
 
-But triple checking if -ffreestanding is being used in arch/s390/ I only se=
-e:
+>
+> For example there is more or less identical code within dasd_devmap.c
+> (dasd_uid_show()), where it would make sense to de-deduplicate the
+> code. And then of course there is the already mentioned rather pointless
+> strlen() invocation; plus there are many other string operations / format
+> strings, which also should be addressed.
+> E.g. there are quite a couple of "%p" printk format specifiers which are
+> pointless, since pointer values get hashed since years - so a more or les=
+s
+> random value will be printed, etc.
 
-arch/s390/purgatory/Makefile
-26:KBUILD_CFLAGS +=3D -fno-zero-initialized-in-bss -fno-builtin -ffreestand=
-ing
+kptr_restrict can be disabled at runtime though, so it's not useless
+to print pointer values (IMO).
 
-arch/s390/Makefile
-28:KBUILD_CFLAGS_DECOMPRESSOR +=3D -ffreestanding
+>
+> However all of this is up to Stefan and Jan.
+>
+> So I consider this current fix as good enough and final.
 
----
-So I don't think -ffreestanding is at play here.
+Thanks for the patch.
+
 --=20
 Thanks,
 ~Nick Desaulniers
