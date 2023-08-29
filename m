@@ -2,98 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA15FC6FA8F
-	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 13:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4041BC71153
+	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 15:40:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236125AbjH2Nib (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Aug 2023 09:38:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32992 "EHLO
+        id S233894AbjH2PkN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Aug 2023 11:40:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236842AbjH2Nh5 (ORCPT
+        with ESMTP id S237297AbjH2Pjp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Aug 2023 09:37:57 -0400
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BFC11724;
-        Tue, 29 Aug 2023 06:36:53 -0700 (PDT)
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-68c576d35feso1620438b3a.2;
-        Tue, 29 Aug 2023 06:36:53 -0700 (PDT)
+        Tue, 29 Aug 2023 11:39:45 -0400
+Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD1FB7
+        for <linux-block@vger.kernel.org>; Tue, 29 Aug 2023 08:39:41 -0700 (PDT)
+Received: by mail-ua1-x92f.google.com with SMTP id a1e0cc1a2514c-7a0254de2fdso1671803241.1
+        for <linux-block@vger.kernel.org>; Tue, 29 Aug 2023 08:39:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693323580; x=1693928380;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mnzm799P6Q3j74LZPQjfhcA/lU7vvWbHsfU0R3jlCdA=;
+        b=21bL9sgc2nberDTHd8JR2kcJpnJThYAPI+w+wEl/2TE70wClWsQXUKQtxDRy+i0rtP
+         XyYc3bYl+wlHw4DhaTvnupahq//RRbeLSvoUnZikhM6PdxUpeC8n36+KN/A5MJBMJcI+
+         KyWGLe5XdNSGSw6FUYlq6sxc98Rq3oZwmtbpA5zPxdAxdpDgUinCD2hTw1Ob0+vtu4Bx
+         NiQaZhnQGGRUclNw78fljAstc+Hn68o7Phzrc2oa4Bwu5eQqLYz65P+UtBJiGlF1JQLt
+         JZ6SGRo/y9dmH6AiWjXD91jGoem9/zBIzFBbV6EO4qGEqcIxAY2KD7TBdXRORtaLnQ0p
+         RjRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693316154; x=1693920954;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=58tJu8HS3Uk+gerFXyZAfcbbsx2SaXKrB/OzNfMroZM=;
-        b=VbLdHmRCfhdCyZtcnKq4nqIYarSiDFkPrni7iZrgGJpkMT9jFzhsJ4gP9Ik4tkyd5v
-         CRvNLS43hZFn9BAm8B3x77xNudamE3dvyzmjZNAw6yC9f0yHlolE2M+2pNKQUlYNhN3i
-         E6f84Rxf51D23V/+5WFb7ieyGH7xNguUfBoNPfn6O2W5YYB/rRCOFB7wQmQT9Dkhg4Mo
-         q7ajMa1RJJr+/+mmjQ/5S4pLumbxh76XBLcboBI0vII17B98XsjZZVmdcRbFBtdpEC/H
-         SZO2v9UYHHXNfYDTmISsrZpvRHSpM+tLagWDZqzODOzP71A5Hnj2bdExjF5uRoCxFebQ
-         zthQ==
-X-Gm-Message-State: AOJu0YzaEFltc9CG3xB9OKUqjsxRGCzBuYQB1Fzk9RMXrpadPy+ovNCa
-        K7tOXFxOKiOtZKmKxMpuxl0=
-X-Google-Smtp-Source: AGHT+IG9aL/VbyawH5cxLpKPv48bF/ifjtaCOBxvr16QlUWtHvl9BmANrS6abaZiiejyKlhA6FbCiw==
-X-Received: by 2002:a05:6a20:6a05:b0:13f:9cee:ff42 with SMTP id p5-20020a056a206a0500b0013f9ceeff42mr35105172pzk.41.1693316153610;
-        Tue, 29 Aug 2023 06:35:53 -0700 (PDT)
-Received: from [172.20.4.71] ([208.98.210.70])
-        by smtp.gmail.com with ESMTPSA id 22-20020aa79156000000b00666b012baedsm8485174pfi.158.2023.08.29.06.35.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Aug 2023 06:35:52 -0700 (PDT)
-Message-ID: <3b5b246f-386d-4afe-a20d-4b08770bd4cb@acm.org>
-Date:   Tue, 29 Aug 2023 06:35:52 -0700
+        d=1e100.net; s=20221208; t=1693323580; x=1693928380;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mnzm799P6Q3j74LZPQjfhcA/lU7vvWbHsfU0R3jlCdA=;
+        b=B53JhzLxRImnGaaBdKHm1Hym3MH0i6zMDlNnhXivZM8N9mO8mdSV9lNs3k9NR/M0Tm
+         FuQba3QFYbSyCQF3sfYGqMoCPPBgBMpWtdbJPbI3dAUmR9y9TWumsruuHz5zOvLC1lMM
+         Tv2ZUYBa4EjbnRMs84FtSRdFACWHxWRIGg7MOIVA/9lHHNmmEFM+nA/DK6s9pHvlzP8M
+         bjlzy0JkABP4VBBEEbUQemEqiX2LdhDWfQOzsha8OfZ4HjSIMmaGtNKCr9PizEUDMVT4
+         wQmP5N4fkypAU6VHA2iaGgPWvnGyFePSiSJpmQ8acjQBXao5+76JEg5Wb8T3dmDIM4rk
+         uYhA==
+X-Gm-Message-State: AOJu0YwJukXiVuCSwbSdHNKxoXdrfRDw7DjYli2QwtL5n8tZgwDctfOe
+        ja/EFBApJ9h7gMTlAPouoOXaOlMRn7Y1S3f7DX+3Dw==
+X-Google-Smtp-Source: AGHT+IFgQBf6W91PZLktY29myj7AxhMFsuzp9YBkQzOUK+EHpYkPHFHRJFOWCwRTC6PQXEYtheCVljru3JQYuH8tDTQ=
+X-Received: by 2002:a05:6102:358:b0:44e:d85c:ac48 with SMTP id
+ e24-20020a056102035800b0044ed85cac48mr3766077vsa.5.1693323580026; Tue, 29 Aug
+ 2023 08:39:40 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v3 3/3] nvme: introduce
- nvmet_target_{setup/cleanup} common code
-Content-Language: en-US
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Daniel Wagner <dwagner@suse.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+References: <20230828153142.2843753-1-hca@linux.ibm.com> <20230828153142.2843753-2-hca@linux.ibm.com>
+ <f0419f6428ad404386ebca813dc1ec03@AcuMS.aculab.com> <ZO0k1Par4i4FBCWF@google.com>
+ <20230829074854.7031-A-hca@linux.ibm.com> <51f70b0ad37f469a93242db9cfc6d9e8@AcuMS.aculab.com>
+In-Reply-To: <51f70b0ad37f469a93242db9cfc6d9e8@AcuMS.aculab.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 29 Aug 2023 08:39:29 -0700
+Message-ID: <CAKwvOdkrCUchQzCT48dReOgxT4xFc5jOtz1YNDAYJp8FqdeHzA@mail.gmail.com>
+Subject: Re: [PATCH 1/1] s390/dasd: fix string length handling
+To:     David Laight <David.Laight@aculab.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        =?UTF-8?B?SmFuIEjDtnBwbmVy?= <hoeppner@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-References: <oss54jmgqzjcxecea4h7eeguh6lmhls4p74e7unbxmhz34asvk@a7n6vu6hauys>
- <zvu2ihivd6f4fbs7hpgowstq3li4wrdycqzso3c32qcco7zes4@s2l2solzzo6u>
- <saxcmve2nchhytphnknfqp2fxpwdk5v5xqfoq2g5gsdlecf3il@sypswqownxih>
- <b79c0c9d-3930-4dbf-a1cf-8ca9e00af614@acm.org>
- <xz7rnke52xu3anmnjliybqv4yk3w367noo6ipguarkec6u4i5g@7bqtovmc3gjb>
- <d6ec4e54-1ec9-648a-ce8c-1e08a439c3c6@acm.org>
- <ckuewnzuiejug6jbuxfw4viqwf4v43pq54mj4k4qbq7uz3zwpn@3iijcby24ujd>
- <8ffb6c2f-0836-4302-82b9-902e092e537c@acm.org>
- <txsyjpcxb3baog5fgqdnm5hh765nt5qcbcmllsto7uulyzr5kn@zirmqldhosbi>
- <ed518b56-a579-49bb-b2bb-220214ef6e2e@acm.org>
- <ptqdqjo7xt5qsijmuftmboutck5bpwm2wjrwks5lr4l44ssvjy@iurtgbaxnoji>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ptqdqjo7xt5qsijmuftmboutck5bpwm2wjrwks5lr4l44ssvjy@iurtgbaxnoji>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/28/23 19:11, Shinichiro Kawasaki wrote:
-> This is the unclear point for me. Does bash really pass the arguments list of
-> the caller to the callee when functions are called without arguments?
-> 
-> Looking back the commit 852996fea4f1, you explained that bash does, and I
-> agreed. But now in my environment bash doesn't. I tried the script below in my
-> environment, and see nothing printed.
-> 
->    funcA() { echo "$1" ; }
->    funcB() { funcA; }
->    funcB foo
-> 
-> Then the arguments of funcB is not passed to funcA. How does it run in your
-> environment?
+On Tue, Aug 29, 2023 at 1:32=E2=80=AFAM David Laight <David.Laight@aculab.c=
+om> wrote:
+>
+> From: Heiko Carstens
+> > Sent: 29 August 2023 08:49
+> >
+> > On Mon, Aug 28, 2023 at 03:51:00PM -0700, Nick Desaulniers wrote:
+> > > On Mon, Aug 28, 2023 at 05:18:37PM +0000, David Laight wrote:
+> > > > From: Heiko Carstens
+> > > > > Sent: 28 August 2023 16:32
+> > > > >         if (strlen(uid.vduit) > 0)
+> > > >
+> > > > Does the compiler know enough to optimise that brain-dead test?
+> > > >
+> > >
+> > > For the purposes of skipping diagnostics, no; clang performs semantic
+> > > analysis BEFORE optimization (which is handled by LLVM). As such, cla=
+ng
+> > > will produce diagnostics on dead code.
+> > >
+> > > Partly because LLVM isn't very ergonomic at emitting diagnostics from
+> > > the backend, partly because Clang code owner and developers don't wan=
+t
+> > > clang to emit diagnostics dependent on optimization level.
+> > >
+> > > I disagree with my compatriots, and you can read more thoughts here:
+> > > https://discourse.llvm.org/t/rfc-improving-clangs-middle-and-back-end=
+-
+> > diagnostics/69261?u=3Dnickdesaulniers
+> >
+> > Maybe I misunderstand what you write above, however clang (latest+great=
+est)
+> > does indeed optimize the strlen() away and generates code which only te=
+sts
+> > if uid.vduit[0] is zero or not.
+> >
+> > Unlike gcc, which does not optimize this away and which uses the strlen=
+()
+> > inline assembly provided via string.h...
+>
+> And, if -ffreestanding is set (as in some kernel builds), the compiler
+> can't assume what strlen() does.
 
-I see the same result that you see. It seems that I misinterpret the 
-text produced by shellcheck if it reports warning SC2119. After having 
-reread https://github.com/koalaman/shellcheck/wiki/SC2119, I'm OK with
-suppressing warning SC2119 because that warning doesn't seem useful to
-me.
+Exactly.
 
+But triple checking if -ffreestanding is being used in arch/s390/ I only se=
+e:
+
+arch/s390/purgatory/Makefile
+26:KBUILD_CFLAGS +=3D -fno-zero-initialized-in-bss -fno-builtin -ffreestand=
+ing
+
+arch/s390/Makefile
+28:KBUILD_CFLAGS_DECOMPRESSOR +=3D -ffreestanding
+
+---
+So I don't think -ffreestanding is at play here.
+--=20
 Thanks,
-
-Bart.
+~Nick Desaulniers
