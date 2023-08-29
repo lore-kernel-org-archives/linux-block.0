@@ -2,118 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB5DC71153
-	for <linux-block@archiver.kernel.org>; Mon, 28 Aug 2023 22:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05ACC71153
+	for <linux-block@archiver.kernel.org>; Tue, 29 Aug 2023 00:57:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbjH1Wxv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Aug 2023 18:53:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57078 "EHLO
+        id S234679AbjH2A5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Aug 2023 20:57:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234296AbjH1Wxc (ORCPT
+        with ESMTP id S234835AbjH2A4z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2023 18:53:32 -0400
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE3E11A
-        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2023 15:53:29 -0700 (PDT)
-Received: by mail-ua1-x92e.google.com with SMTP id a1e0cc1a2514c-7a29ef55d5fso1340240241.3
-        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2023 15:53:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693263209; x=1693868009;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/rPp/OBCbyvFuIsHpW2W/8NQ9YGESVReCdBvNabrZPc=;
-        b=PmlCkaLnq/9d+ZnDSOIUY8W62gfd1Q4PDaWiXBTWNtBqBxYKE0gyPz8TTHoby2nbd2
-         hw7d1NxYT8IfYsrUgaU4vmdj7yC/f37TtpJKdoKKajqtzT0PxJFhfWfiVvqLdcj36VyQ
-         zzRd+gduere0MLd8tVzamhFXpcsOpDoWyG8ITbEttncN9w/gQYVubKGK6R/hk9enDdVc
-         KuoAasgQXK6fWagBTZNNNPYuiwZM1ErU/dzEuhbMpEdWCSepeH1B2Sd8lVyra99gSHqa
-         AmBGiUfY/IrrFEybNYJsSUxFjFyL5vyEQd09jeisfTE7jMdZ5P+gMQZwwcOt4qBalOEt
-         3NbA==
+        Mon, 28 Aug 2023 20:56:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BEB3124
+        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2023 17:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693270566;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TsCS4Saz7XJ/AO8lGkQ98m+HzcdDjapam8XYjy+GN00=;
+        b=busECbQQR3GM5eZyE/yE5hGJtjogZJcXdrbGHe2yGncK+SDPVrM+g2qqyjb45+jskFntXc
+        ZLe/qhfYZkfg5y2DNHtRKF/av4BJOCKj9LUWAGe6BvyfQnbhyb/4sWfUMO3hjl+YJjzlP2
+        iJIXyfEkDG33KjBpYHYXM8/DX0WmTs4=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-465-VJniLZN3OCyIU1mSaFo4LQ-1; Mon, 28 Aug 2023 20:56:04 -0400
+X-MC-Unique: VJniLZN3OCyIU1mSaFo4LQ-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1c0ed6a6df5so4575156fac.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2023 17:56:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693263209; x=1693868009;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/rPp/OBCbyvFuIsHpW2W/8NQ9YGESVReCdBvNabrZPc=;
-        b=hp/ZMdsSIMOin4H2Kps27phsMSvy7hRkbAXmHUOMQ04esAZGNmwHFAxrMjxccr3Qh6
-         xvCXW20XXl+Wgsi6Md89vgeB6mX27944HJoXjxM+fwU5Jf508g/d8btmB7J7nAk1ZuOD
-         cPcLpqBO9SQOnNyy3dTuYDTqdX33r6/N2+mTobF5hFkk3G2hLOJnas/A/tFb6otBgKys
-         lf5I8Ula+gVadzrOmmVeLmxnTuABROgjNnZbCS2mwJupTZqPQlFO7eVK2aVx3IR/eMfK
-         OyvQZ3Pho2vv4mQT0fEKbfyzB8lDKUHiWS2A35gMqrPWmuXhoP1wNBFO+yYu/vJx01VF
-         DFjA==
-X-Gm-Message-State: AOJu0Yxxb/spJ8c6vd3GyV1BHfxV6x00iKaOLEv9GtTB5Y7E6iY9CGzj
-        fR3vbZOQvI/wyPhHc/s3/qTPb16rYD5BtdGOiVuJqg==
-X-Google-Smtp-Source: AGHT+IGrZ5DKqPE2cjwP21nhG3fcsE8gMLdq/0yZ6jUtdfaFjIXOh1d5/lBcvYIomLGq7Sd4rp173jQCHPoyaeaI+uM=
-X-Received: by 2002:a67:fb49:0:b0:44e:8e28:284f with SMTP id
- e9-20020a67fb49000000b0044e8e28284fmr11952083vsr.18.1693263208813; Mon, 28
- Aug 2023 15:53:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230828153142.2843753-1-hca@linux.ibm.com> <20230828153142.2843753-2-hca@linux.ibm.com>
- <ZO0j3M8KFWeEznXy@google.com>
-In-Reply-To: <ZO0j3M8KFWeEznXy@google.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 28 Aug 2023 15:53:17 -0700
-Message-ID: <CAKwvOd=MG6KdE9fTGBV317s9-RkjcUWednkC1akpODGE2iuvgQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] s390/dasd: fix string length handling
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Haberland <sth@linux.ibm.com>,
-        =?UTF-8?B?SmFuIEjDtnBwbmVy?= <hoeppner@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, nathan@kernel.org,
-        llvm@lists.linux.dev, David Laight <David.Laight@aculab.com>
+        d=1e100.net; s=20221208; t=1693270564; x=1693875364;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TsCS4Saz7XJ/AO8lGkQ98m+HzcdDjapam8XYjy+GN00=;
+        b=EnnK9qEypw0ZYigvRTnD6ik6qV1hm4NrMT3C+bxthQbA9eKaNfHYejigET6aiVA54w
+         rZpsdoVY+3glV1fdT/7GACk3BRfUIVYCWnfHwZuPcbjlLRgL+sCKJXCZryA5LOb/9McH
+         q0lRA7xQImLBRZr+AbuyzWyD29mICLFFmujV96+DCbmUFcKFHCS2UIZHSm3RAgtZSnNU
+         /xnaYYVYkndwVE2ZOKIhGAbWbI3fS44aFsbj2uraRsdsrmh6wBxCRQR24jnFIl5UVi6k
+         Ed0/9M8obi3UxN1bNYwSwEeWB1xk4NLFKo2NKj8NyN49WnL2Ixi1TYT6RHkueFLIMi5Z
+         TnGw==
+X-Gm-Message-State: AOJu0Yzlg/tDwpqJY6sl4wICXOA5uPsCXMShoDCZ3pP3a+y4cFmrgFSJ
+        vlbQTRH0riZmFIy/zxameTorOYS7jsOACNxTU1QowTAE2ONbXx8IVDgMJoLln3HFMyHS5hlB1Fe
+        OPB1bN2jkFbNMgXslsWB4zzk=
+X-Received: by 2002:a05:6871:6a9:b0:1c8:bfd1:ecb8 with SMTP id l41-20020a05687106a900b001c8bfd1ecb8mr14029331oao.30.1693270563767;
+        Mon, 28 Aug 2023 17:56:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH99L/GJlPzzKJakqdR1VW77qqM+gVjCsypWEmExtGalGdQ02IIkeJB2oJ06A5aWe+HL23ziA==
+X-Received: by 2002:a05:6871:6a9:b0:1c8:bfd1:ecb8 with SMTP id l41-20020a05687106a900b001c8bfd1ecb8mr14029312oao.30.1693270563512;
+        Mon, 28 Aug 2023 17:56:03 -0700 (PDT)
+Received: from ?IPv6:2804:1b3:a802:98e3:3c98:3d83:9703:4411? ([2804:1b3:a802:98e3:3c98:3d83:9703:4411])
+        by smtp.gmail.com with ESMTPSA id ck3-20020a05687c048300b001b3538afd01sm4905729oac.51.2023.08.28.17.56.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Aug 2023 17:56:02 -0700 (PDT)
+Message-ID: <1cd98cb37dcf621520e52ac7a15513aab5749534.camel@redhat.com>
+Subject: Re: [RFC PATCH v2 0/3] Move usages of struct __call_single_data to
+ call_single_data_t
+From:   Leonardo =?ISO-8859-1?Q?Br=E1s?= <leobras@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Palmer Dabbelt <palmer@rivosinc.com>,
+        Guo Ren <guoren@kernel.org>,
+        Valentin Schneider <vschneid@redhat.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
+        Yury Norov <yury.norov@gmail.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 28 Aug 2023 21:55:58 -0300
+In-Reply-To: <b84ad9aa200457b1cbd5c55a7d860e685f068d7a.camel@redhat.com>
+References: <20230520052957.798486-1-leobras@redhat.com>
+         <CAJ6HWG6dK_-5jjoGJadOXqE=9c0Np-85r9-ymtAt241XrdwW=w@mail.gmail.com>
+         <b84ad9aa200457b1cbd5c55a7d860e685f068d7a.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 28, 2023 at 3:46=E2=80=AFPM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
->
-> On Mon, Aug 28, 2023 at 05:31:42PM +0200, Heiko Carstens wrote:
-> > Building dasd_eckd.o with latest clang reveals this bug:
-> >
-> >     CC      drivers/s390/block/dasd_eckd.o
-> >       drivers/s390/block/dasd_eckd.c:1082:3: warning: 'snprintf' will a=
-lways be truncated;
-> >       specified size is 1, but format string expands to at least 11 [-W=
-fortify-source]
-> >        1082 |                 snprintf(print_uid, sizeof(*print_uid),
-> >             |                 ^
-> >       drivers/s390/block/dasd_eckd.c:1087:3: warning: 'snprintf' will a=
-lways be truncated;
-> >       specified size is 1, but format string expands to at least 10 [-W=
-fortify-source]
-> >        1087 |                 snprintf(print_uid, sizeof(*print_uid),
-> >             |                 ^
-> >
-> > Fix this by moving and using the existing UID_STRLEN for the arrays
-> > that are being written to. Also rename UID_STRLEN to DASD_UID_STRLEN
-> > to clarify its scope.
-> >
-> > Fixes: 23596961b437 ("s390/dasd: split up dasd_eckd_read_conf")
-> > Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
-> > Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
->
-> Thanks for the patch! Nathan just reported a bunch of these. I took a
-> look at these two and thought "yeah that's clearly a bug in the kernel
-> sources." Fix LGTM.
->
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Closes: https://github.com/ClangBuiltLinux/linux/issues/1923
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+On Tue, 2023-07-04 at 04:22 -0300, Leonardo Br=C3=A1s wrote:
+> On Tue, 2023-06-13 at 00:51 -0300, Leonardo Bras Soares Passos wrote:
+> > Friendly ping
+> >=20
+> > On Sat, May 20, 2023 at 2:30=E2=80=AFAM Leonardo Bras <leobras@redhat.c=
+om> wrote:
+> > >=20
+> > > Changes since RFCv1:
+> > > - request->csd moved to the middle of the struct, without size impact
+> > > - type change happens in a different patch (thanks Jens Axboe!)
+> > > - Improved the third patch to also update the .h file.
+> > >=20
+> > > Leonardo Bras (3):
+> > >   blk-mq: Move csd inside struct request so it's 32-byte aligned
+> > >   blk-mq: Change request->csd type to call_single_data_t
+> > >   smp: Change signatures to use call_single_data_t
+> > >=20
+> > >  include/linux/blk-mq.h | 10 +++++-----
+> > >  include/linux/smp.h    |  2 +-
+> > >  kernel/smp.c           |  4 ++--
+> > >  kernel/up.c            |  2 +-
+> > >  4 files changed, 9 insertions(+), 9 deletions(-)
+> > >=20
+> > > --
+> > > 2.40.1
+> > >=20
+>=20
+> Hello Jens,
+>=20
+> I still want your feedback on this series :)
+>=20
+> I think I addressed every issue of RFCv1, but if you have any other feedb=
+ack,
+> please let me know.
+>=20
+> Thanks!
+> Leo
 
-Meant to add:
+Hello Jens Axboe,
 
-Tested-by: Nick Desaulniers <ndesaulniers@google.com> # build
+Please provide feedback on this series!
 
->
-> I also like David's idea of passing `char ident [DASD_UID_STRLEN]`, too,
-> but I don't feel strongly either way.
+Are you ok with those changes?
+What's your opinion on them?=20
 
+Thanks!
+Leo
 
-
---=20
-Thanks,
-~Nick Desaulniers
