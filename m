@@ -2,109 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A74C83F1E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Aug 2023 06:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83116C83F2C
+	for <linux-block@archiver.kernel.org>; Wed, 30 Aug 2023 18:47:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239761AbjH3GSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Aug 2023 02:18:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42710 "EHLO
+        id S243114AbjH3SqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:46:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240201AbjH3GRh (ORCPT
+        with ESMTP id S242978AbjH3KAP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2023 02:17:37 -0400
-X-Greylist: delayed 327 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 29 Aug 2023 23:17:32 PDT
-Received: from out-244.mta0.migadu.com (out-244.mta0.migadu.com [IPv6:2001:41d0:1004:224b::f4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6054FCD6;
-        Tue, 29 Aug 2023 23:17:32 -0700 (PDT)
-Message-ID: <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1693375918;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JMzOvVHk770qYz+7D4bRM3eiaC0WBb12Z/fuZleaQ2g=;
-        b=n8qZNKHDJ8ZkQN8s6YCFhUc5vlrIehXvAzssrfT4lOFAEgM70y7j9ccF+kTN544/il9mhv
-        /Qwyv0zoAHdwAPeCdmanHqcxV7A/7XcL4G5u9c/o5+tWUqR2xZIKUSlHotdEAwwwHhjWvg
-        KLK2CGyPGmGk32bcLUct3rbhOUMJhk8=
-Date:   Wed, 30 Aug 2023 14:11:31 +0800
+        Wed, 30 Aug 2023 06:00:15 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A798C1B7
+        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2023 03:00:11 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-500c63c9625so2245082e87.2
+        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2023 03:00:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1693389610; x=1693994410; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3xTYLzShSJrMNa33kOQFBwQyF7CcLinjfIsI73sj6mA=;
+        b=NhZVFfnZrY4lUb7uBX51m41Wvv2oL8ZuKoDEcP347ewa3qI6U3GfIJLNtwr1jVDnFF
+         E8lUHrzatV/ve4JM0dKcLqAecCAs5+WAqyHS2B7NvhP9SiFZ7NcAlhvLKCwR3dPK4peX
+         TqkxTDhY4a4C8qfmbfhvHnmBjmEqsTbwHicf/TKHh4gVQcBvV8us5V4Japo+tMnEembw
+         VA2Pqny78q90kCaoC5xTx1Ia3W3ZfN2VAUcINRg1t3c60ailf1WO6eH0c2MyAYRThFIG
+         U6juh+WNxwBT+Cdt4v521GRG9jB3fiVvoiT6YQchcO1Hd+1hD/KtZ0b1oEY6xPboByFA
+         7HPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693389610; x=1693994410;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3xTYLzShSJrMNa33kOQFBwQyF7CcLinjfIsI73sj6mA=;
+        b=BC9Q71sTbATCbsTby0qnMYB0RF6J0bxO7yWGU3GdO8NjgHoqnC5uXhXyyal7fKKHOk
+         gPwBwqN/5vvEkrT7O3C+JHLwRi84KbXIRXscTBVcIpZk6aexWU8RArvgvwh9v4YK+I6C
+         gTnDIRh8072VDwHz2TG8aWpf3ZK5BmMAUciDHeTKxCL2i8ojfFhuOiGGBaQO1xQaKdz3
+         1w4jwt7OxjdE20lrw4MawA6GiGUed0BlfNBD6itMPlcBjdq6vb/7ulDdl1wjTOuhiP/A
+         kuBysli9URn4etRUre4hXFoD9Toe/L+YtB27w5q9C+GY9BAriZh6H5OJua5y7/+l8Kao
+         ry8A==
+X-Gm-Message-State: AOJu0Yx7Jl/jYL4pHwB8/aNmb2aQio6F1/iin9k31aF+bjjjOeug3Hx8
+        0onSveUdo0uSZIT9kEaceffmbw==
+X-Google-Smtp-Source: AGHT+IHCaFP31zkAGHF02AmzezLz996huf1FhuxFlQEm+QFgPfp9jCQOyRrIpXdq64Q6sPBPvdP6GQ==
+X-Received: by 2002:a05:6512:2088:b0:500:7881:7b2f with SMTP id t8-20020a056512208800b0050078817b2fmr1125481lfr.54.1693389609676;
+        Wed, 30 Aug 2023 03:00:09 -0700 (PDT)
+Received: from [192.168.86.24] ([5.133.47.210])
+        by smtp.googlemail.com with ESMTPSA id dk24-20020a170906f0d800b0099ddc81903asm7030466ejb.221.2023.08.30.03.00.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Aug 2023 03:00:08 -0700 (PDT)
+Message-ID: <2230571a-114c-0d03-d02a-fa08c2a8d483@linaro.org>
+Date:   Wed, 30 Aug 2023 11:00:07 +0100
 MIME-Version: 1.0
-Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
+ ufs
 Content-Language: en-US
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-8-hao.xu@linux.dev>
- <ZOvA5DJDZN0FRymp@casper.infradead.org>
- <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
- <ZO3cI+DkotHQo3md@casper.infradead.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Hao Xu <hao.xu@linux.dev>
-In-Reply-To: <ZO3cI+DkotHQo3md@casper.infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
+        quic_psodagud@quicinc.com, avmenon@quicinc.com,
+        abel.vesa@linaro.org, quic_spuppala@quicinc.com
+References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
+ <f4b5512b-9922-1511-fc22-f14d25e2426a@linaro.org>
+ <20230825210727.GA1366@sol.localdomain>
+ <f63ce281-1434-f86f-3f4e-e1958a684bbd@linaro.org>
+ <20230829181223.GA2066264@google.com>
+From:   Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+In-Reply-To: <20230829181223.GA2066264@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/29/23 19:53, Matthew Wilcox wrote:
-> On Tue, Aug 29, 2023 at 03:46:13PM +0800, Hao Xu wrote:
->> On 8/28/23 05:32, Matthew Wilcox wrote:
->>> On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
->>>> From: Hao Xu <howeyxu@tencent.com>
->>>>
->>>> Add a boolean parameter for file_accessed() to support nowait semantics.
->>>> Currently it is true only with io_uring as its initial caller.
+Hi Eric,
+
+On 29/08/2023 19:12, Eric Biggers wrote:
+> 
+>>> They're also being documented by Qualcomm.  So, as this patchset does, they can
+>>> be used by Linux in the implementation of new ioctls which provide a vendor
+>>> independent interface to HW-wrapped key generation, import, and conversion.
 >>>
->>> So why do we need to do this as part of this series?  Apparently it
->>> hasn't caused any problems for filemap_read().
->>>
+>>> I think the new approach is the only one that is viable outside the Android
+>>> context.  As such, I don't think anyone has any plan to upstream support for
+>>> HW-wrapped keys for older Qualcomm SoCs that lack the new interface.
+>> AFAIU, There are other downstream Qualcomm LE platforms that use wrapped key
+>> support with the older interface.
+>> What happens to them whey then upgrade the kernel?
 >>
->> We need this parameter to indicate if nowait semantics should be enforced in
->> touch_atime(), There are locks and maybe IOs in it.
+>> Does TA interface still continue to work with the changes that went into
+>> common drivers (ufs/sd)?
+> This is a strange line of questioning for upstream review, as this feature does
+> not exist upstream.  This is the first time it will be supported by upstream
+> Linux, ever.  Adding support for this feature does not break anything.
+These are not unusual questions, what am trying to understand here is 
+below questions for better context, big picture and review/test. At the 
+end of the day we all want to get these features available in upstream.
+
+1. How backward compatibility of this wrapped key support. I guess the 
+answer is NO.
+
+2. secondly reasons behind this change. Am still not really convinced 
+with the current technical reasoning to shift from TA based approach to 
+this. But I guess this is all done to dump the closed source userspace 
+thingy. Am hoping that this can be made available to other older SoCs at 
+some point in time.
+
+3. We are adding these apis/callbacks in common code without doing any 
+compatible or SoC checks. Is this going to be a issue if someone tries 
+fscrypt?
+
+--srini
+
 > 
-> That's not my point.  We currently call file_accessed() and
-> touch_atime() for nowait reads and nowait writes.  You haven't done
-> anything to fix those.
-> 
-> I suspect you can trim this patchset down significantly by avoiding
-> fixing the file_accessed() problem.  And then come back with a later
-> patchset that fixes it for all nowait i/o.  Or do a separate prep series
-
-I'm ok to do that.
-
-> first that fixes it for the existing nowait users, and then a second
-> series to do all the directory stuff.
-> 
-> I'd do the first thing.  Just ignore the problem.  Directory atime
-> updates cause I/O so rarely that you can afford to ignore it.  Almost
-> everyone uses relatime or nodiratime.
-
-Hi Matthew,
-The previous discussion shows this does cause issues in real
-producations: 
-https://lore.kernel.org/io-uring/2785f009-2ebb-028d-8250-d5f3a30510f0@gmail.com/#:~:text=fwiw%2C%20we%27ve%20just%20recently%20had%20similar%20problems%20with%20io_uring%20read/write
-
-
-
-
+> Downstream users who implemented a less well designed version of this feature
+> can continue to use their existing code.
