@@ -2,90 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09534C83F1A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36809C83F2D
 	for <linux-block@archiver.kernel.org>; Wed, 30 Aug 2023 18:47:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242517AbjH3SqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:46:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42718 "EHLO
+        id S243127AbjH3SqE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:46:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343626AbjH3QUF (ORCPT
+        with ESMTP id S242527AbjH3I7j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2023 12:20:05 -0400
-X-Greylist: delayed 459 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 30 Aug 2023 09:20:02 PDT
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9776D2;
-        Wed, 30 Aug 2023 09:20:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 8FC88CE1DF4;
-        Wed, 30 Aug 2023 16:12:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45A35C433C8;
-        Wed, 30 Aug 2023 16:12:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693411937;
-        bh=0Hkngm8ZW/ojcPrOWV8u3ze2lTHk3kOwiBOMn/Y/K6o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pGNhVF4H6TQWNJ5tuDbFnoCmRuS7oKWmWUlaWAjTByszeDDGB/cRDFKQp7vKGCzTW
-         niUljb1RnH3Mv7XDlPt9SjXCF4kE0SyRmw6fAzCt9lrO5rULL4luSdXgtNtahjQocs
-         TOvtktG5A96bfAkB9BBCGYYKGTWrkzy2AkjM8sVxyq25w7/xBpkKKLbB3tDsIgo42s
-         IJLmhDZKaLQodepWHe6o14r1+36GYZtP9nMKR4vS7rSazSEGP5WeoY4piP7DQ2siNf
-         siZ04cqn6dgH9KRlxs4Jrs7zdZ4nozKoH9G428sIfd8E9L5u0oJL6b/sKMe6ZmU4mV
-         83l3ASVZb4SrA==
-Date:   Wed, 30 Aug 2023 09:12:15 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
-Cc:     Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
-        quic_psodagud@quicinc.com, avmenon@quicinc.com,
-        abel.vesa@linaro.org, quic_spuppala@quicinc.com
-Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
- ufs
-Message-ID: <20230830161215.GA893@sol.localdomain>
-References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
- <f4b5512b-9922-1511-fc22-f14d25e2426a@linaro.org>
- <20230825210727.GA1366@sol.localdomain>
- <f63ce281-1434-f86f-3f4e-e1958a684bbd@linaro.org>
- <20230829181223.GA2066264@google.com>
- <2230571a-114c-0d03-d02a-fa08c2a8d483@linaro.org>
+        Wed, 30 Aug 2023 04:59:39 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 024DCCC9;
+        Wed, 30 Aug 2023 01:59:36 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RbJ841cywzVkFF;
+        Wed, 30 Aug 2023 16:57:08 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 30 Aug
+ 2023 16:59:34 +0800
+From:   Jinjie Ruan <ruanjinjie@huawei.com>
+To:     <linux-block@vger.kernel.org>, <ceph-devel@vger.kernel.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     <ruanjinjie@huawei.com>
+Subject: [PATCH -next] rbd: Use list_for_each_entry() helper
+Date:   Wed, 30 Aug 2023 16:59:29 +0800
+Message-ID: <20230830085929.527853-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2230571a-114c-0d03-d02a-fa08c2a8d483@linaro.org>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 30, 2023 at 11:00:07AM +0100, Srinivas Kandagatla wrote:
-> 
-> 3. We are adding these apis/callbacks in common code without doing any
-> compatible or SoC checks. Is this going to be a issue if someone tries
-> fscrypt?
+Convert list_for_each() to list_for_each_entry() so that the tmp
+list_head pointer and list_entry() call are no longer needed, which
+can reduce a few lines of code. No functional changed.
 
-ufs-qcom only declares support for wrapped keys if it's supported.  See patch 5
-of this series:
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
+ drivers/block/rbd.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-+	if (qcom_ice_hwkm_supported(host->ice))
-+		hba->quirks |= UFSHCD_QUIRK_USES_WRAPPED_CRYPTO_KEYS;
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 2328cc05be36..3de11f077144 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -7199,7 +7199,6 @@ static void rbd_dev_remove_parent(struct rbd_device *rbd_dev)
+ static ssize_t do_rbd_remove(const char *buf, size_t count)
+ {
+ 	struct rbd_device *rbd_dev = NULL;
+-	struct list_head *tmp;
+ 	int dev_id;
+ 	char opt_buf[6];
+ 	bool force = false;
+@@ -7226,8 +7225,7 @@ static ssize_t do_rbd_remove(const char *buf, size_t count)
+ 
+ 	ret = -ENOENT;
+ 	spin_lock(&rbd_dev_list_lock);
+-	list_for_each(tmp, &rbd_dev_list) {
+-		rbd_dev = list_entry(tmp, struct rbd_device, node);
++	list_for_each_entry(rbd_dev, &rbd_dev_list, node) {
+ 		if (rbd_dev->dev_id == dev_id) {
+ 			ret = 0;
+ 			break;
+-- 
+2.34.1
 
-That in turn uses:
-
-+bool qcom_ice_hwkm_supported(struct qcom_ice *ice)
-+{
-+	return (ice->hwkm_version > 0);
-+}
-+EXPORT_SYMBOL_GPL(qcom_ice_hwkm_supported);
-
-Which in turn comes from the ICE version being >= 3.2.  It does seem a bit
-suspicious; it probably should check for both the ICE version and the
-availability of QCOM_SCM_ES_GENERATE_ICE_KEY, QCOM_SCM_ES_PREPARE_ICE_KEY, and
-QCOM_SCM_ES_IMPORT_ICE_KEY.  Regardless, it sounds like you want it to be
-determined by something set in the device tree instead?  I don't think it's been
-demonstrated that that's necessary.  If we can detect the hardware capabilities
-dynamically, we should do that, right?
-
-- Eric
