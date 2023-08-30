@@ -2,121 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83116C83F2C
-	for <linux-block@archiver.kernel.org>; Wed, 30 Aug 2023 18:47:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09534C83F1A
+	for <linux-block@archiver.kernel.org>; Wed, 30 Aug 2023 18:47:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243114AbjH3SqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:46:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45672 "EHLO
+        id S242517AbjH3SqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242978AbjH3KAP (ORCPT
+        with ESMTP id S1343626AbjH3QUF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2023 06:00:15 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A798C1B7
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2023 03:00:11 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-500c63c9625so2245082e87.2
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2023 03:00:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693389610; x=1693994410; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3xTYLzShSJrMNa33kOQFBwQyF7CcLinjfIsI73sj6mA=;
-        b=NhZVFfnZrY4lUb7uBX51m41Wvv2oL8ZuKoDEcP347ewa3qI6U3GfIJLNtwr1jVDnFF
-         E8lUHrzatV/ve4JM0dKcLqAecCAs5+WAqyHS2B7NvhP9SiFZ7NcAlhvLKCwR3dPK4peX
-         TqkxTDhY4a4C8qfmbfhvHnmBjmEqsTbwHicf/TKHh4gVQcBvV8us5V4Japo+tMnEembw
-         VA2Pqny78q90kCaoC5xTx1Ia3W3ZfN2VAUcINRg1t3c60ailf1WO6eH0c2MyAYRThFIG
-         U6juh+WNxwBT+Cdt4v521GRG9jB3fiVvoiT6YQchcO1Hd+1hD/KtZ0b1oEY6xPboByFA
-         7HPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693389610; x=1693994410;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3xTYLzShSJrMNa33kOQFBwQyF7CcLinjfIsI73sj6mA=;
-        b=BC9Q71sTbATCbsTby0qnMYB0RF6J0bxO7yWGU3GdO8NjgHoqnC5uXhXyyal7fKKHOk
-         gPwBwqN/5vvEkrT7O3C+JHLwRi84KbXIRXscTBVcIpZk6aexWU8RArvgvwh9v4YK+I6C
-         gTnDIRh8072VDwHz2TG8aWpf3ZK5BmMAUciDHeTKxCL2i8ojfFhuOiGGBaQO1xQaKdz3
-         1w4jwt7OxjdE20lrw4MawA6GiGUed0BlfNBD6itMPlcBjdq6vb/7ulDdl1wjTOuhiP/A
-         kuBysli9URn4etRUre4hXFoD9Toe/L+YtB27w5q9C+GY9BAriZh6H5OJua5y7/+l8Kao
-         ry8A==
-X-Gm-Message-State: AOJu0Yx7Jl/jYL4pHwB8/aNmb2aQio6F1/iin9k31aF+bjjjOeug3Hx8
-        0onSveUdo0uSZIT9kEaceffmbw==
-X-Google-Smtp-Source: AGHT+IHCaFP31zkAGHF02AmzezLz996huf1FhuxFlQEm+QFgPfp9jCQOyRrIpXdq64Q6sPBPvdP6GQ==
-X-Received: by 2002:a05:6512:2088:b0:500:7881:7b2f with SMTP id t8-20020a056512208800b0050078817b2fmr1125481lfr.54.1693389609676;
-        Wed, 30 Aug 2023 03:00:09 -0700 (PDT)
-Received: from [192.168.86.24] ([5.133.47.210])
-        by smtp.googlemail.com with ESMTPSA id dk24-20020a170906f0d800b0099ddc81903asm7030466ejb.221.2023.08.30.03.00.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Aug 2023 03:00:08 -0700 (PDT)
-Message-ID: <2230571a-114c-0d03-d02a-fa08c2a8d483@linaro.org>
-Date:   Wed, 30 Aug 2023 11:00:07 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
- ufs
-Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>
+        Wed, 30 Aug 2023 12:20:05 -0400
+X-Greylist: delayed 459 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 30 Aug 2023 09:20:02 PDT
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9776D2;
+        Wed, 30 Aug 2023 09:20:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 8FC88CE1DF4;
+        Wed, 30 Aug 2023 16:12:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45A35C433C8;
+        Wed, 30 Aug 2023 16:12:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1693411937;
+        bh=0Hkngm8ZW/ojcPrOWV8u3ze2lTHk3kOwiBOMn/Y/K6o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=pGNhVF4H6TQWNJ5tuDbFnoCmRuS7oKWmWUlaWAjTByszeDDGB/cRDFKQp7vKGCzTW
+         niUljb1RnH3Mv7XDlPt9SjXCF4kE0SyRmw6fAzCt9lrO5rULL4luSdXgtNtahjQocs
+         TOvtktG5A96bfAkB9BBCGYYKGTWrkzy2AkjM8sVxyq25w7/xBpkKKLbB3tDsIgo42s
+         IJLmhDZKaLQodepWHe6o14r1+36GYZtP9nMKR4vS7rSazSEGP5WeoY4piP7DQ2siNf
+         siZ04cqn6dgH9KRlxs4Jrs7zdZ4nozKoH9G428sIfd8E9L5u0oJL6b/sKMe6ZmU4mV
+         83l3ASVZb4SrA==
+Date:   Wed, 30 Aug 2023 09:12:15 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 Cc:     Gaurav Kashyap <quic_gaurkash@quicinc.com>,
         linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
         linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
         quic_psodagud@quicinc.com, avmenon@quicinc.com,
         abel.vesa@linaro.org, quic_spuppala@quicinc.com
+Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
+ ufs
+Message-ID: <20230830161215.GA893@sol.localdomain>
 References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
  <f4b5512b-9922-1511-fc22-f14d25e2426a@linaro.org>
  <20230825210727.GA1366@sol.localdomain>
  <f63ce281-1434-f86f-3f4e-e1958a684bbd@linaro.org>
  <20230829181223.GA2066264@google.com>
-From:   Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
-In-Reply-To: <20230829181223.GA2066264@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <2230571a-114c-0d03-d02a-fa08c2a8d483@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2230571a-114c-0d03-d02a-fa08c2a8d483@linaro.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Eric,
-
-On 29/08/2023 19:12, Eric Biggers wrote:
+On Wed, Aug 30, 2023 at 11:00:07AM +0100, Srinivas Kandagatla wrote:
 > 
->>> They're also being documented by Qualcomm.  So, as this patchset does, they can
->>> be used by Linux in the implementation of new ioctls which provide a vendor
->>> independent interface to HW-wrapped key generation, import, and conversion.
->>>
->>> I think the new approach is the only one that is viable outside the Android
->>> context.  As such, I don't think anyone has any plan to upstream support for
->>> HW-wrapped keys for older Qualcomm SoCs that lack the new interface.
->> AFAIU, There are other downstream Qualcomm LE platforms that use wrapped key
->> support with the older interface.
->> What happens to them whey then upgrade the kernel?
->>
->> Does TA interface still continue to work with the changes that went into
->> common drivers (ufs/sd)?
-> This is a strange line of questioning for upstream review, as this feature does
-> not exist upstream.  This is the first time it will be supported by upstream
-> Linux, ever.  Adding support for this feature does not break anything.
-These are not unusual questions, what am trying to understand here is 
-below questions for better context, big picture and review/test. At the 
-end of the day we all want to get these features available in upstream.
+> 3. We are adding these apis/callbacks in common code without doing any
+> compatible or SoC checks. Is this going to be a issue if someone tries
+> fscrypt?
 
-1. How backward compatibility of this wrapped key support. I guess the 
-answer is NO.
+ufs-qcom only declares support for wrapped keys if it's supported.  See patch 5
+of this series:
 
-2. secondly reasons behind this change. Am still not really convinced 
-with the current technical reasoning to shift from TA based approach to 
-this. But I guess this is all done to dump the closed source userspace 
-thingy. Am hoping that this can be made available to other older SoCs at 
-some point in time.
++	if (qcom_ice_hwkm_supported(host->ice))
++		hba->quirks |= UFSHCD_QUIRK_USES_WRAPPED_CRYPTO_KEYS;
 
-3. We are adding these apis/callbacks in common code without doing any 
-compatible or SoC checks. Is this going to be a issue if someone tries 
-fscrypt?
+That in turn uses:
 
---srini
++bool qcom_ice_hwkm_supported(struct qcom_ice *ice)
++{
++	return (ice->hwkm_version > 0);
++}
++EXPORT_SYMBOL_GPL(qcom_ice_hwkm_supported);
 
-> 
-> Downstream users who implemented a less well designed version of this feature
-> can continue to use their existing code.
+Which in turn comes from the ICE version being >= 3.2.  It does seem a bit
+suspicious; it probably should check for both the ICE version and the
+availability of QCOM_SCM_ES_GENERATE_ICE_KEY, QCOM_SCM_ES_PREPARE_ICE_KEY, and
+QCOM_SCM_ES_IMPORT_ICE_KEY.  Regardless, it sounds like you want it to be
+determined by something set in the device tree instead?  I don't think it's been
+demonstrated that that's necessary.  If we can detect the hardware capabilities
+dynamically, we should do that, right?
+
+- Eric
