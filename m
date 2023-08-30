@@ -2,162 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 013F8C83F1F
-	for <linux-block@archiver.kernel.org>; Wed, 30 Aug 2023 18:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C895FC83F01
+	for <linux-block@archiver.kernel.org>; Wed, 30 Aug 2023 18:47:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232446AbjH3SqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:46:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48490 "EHLO
+        id S242527AbjH3SqH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:46:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242684AbjH3JUF (ORCPT
+        with ESMTP id S245301AbjH3PGJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2023 05:20:05 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DDA919A;
-        Wed, 30 Aug 2023 02:20:02 -0700 (PDT)
+        Wed, 30 Aug 2023 11:06:09 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A37BAC;
+        Wed, 30 Aug 2023 08:06:01 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 578F41F45F;
-        Wed, 30 Aug 2023 09:20:01 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 53E271F74B;
+        Wed, 30 Aug 2023 15:06:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1693387201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=A7pso9UwnZzwHHTkSP4qR+/6H0hJWXNiUE7cgLjrg+s=;
-        b=oq3NKYx91a/1Q8qzFI+qPP0ISvqVa0PsVEjfvQd5aOtnUhqmYQ/bIRLVuRqpEU2IYYptIQ
-        nnGvph7i54cRZCbFeXcz/DEumlgr9jN4wcgg0X9ySsDTCfMFXnmL9QwMP5bzgiv3uKOoYh
-        Z24y4Rul6cckU+QXb2vM79AM7Ve2ECY=
+        t=1693407960; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hQgATRv0Yi8dSOXsizpcql2/oe40FoEEth/0M4vOQzM=;
+        b=i74ke5EYmN+nuBvfIpv5fQssIN/iuwRGjWUWPuvhq4yxm0U6tFvN5uHv1WDVVwblXr7u7L
+        5NIcfJXMboFmwLmsOVTLumnuwmLMel9y3IKHj8dt+l3J/XF7G/mld86ZE06xzjNboH/8P+
+        oyted/cJUQeM/7Clf1H9A6UE0NweGMI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1693387201;
+        s=susede2_ed25519; t=1693407960;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=A7pso9UwnZzwHHTkSP4qR+/6H0hJWXNiUE7cgLjrg+s=;
-        b=EzJgVoazKEo2xFcCJyH5yJjf17GHNWOJdLqBNQ13tJurEryw3GTgJgR8YQgZ5j97F7CHxC
-        4wUXY7UTVyi8dcAw==
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hQgATRv0Yi8dSOXsizpcql2/oe40FoEEth/0M4vOQzM=;
+        b=9GX8ofwxXSF4PgfWcK3B9cLiDA031+L2dIToWIlgI4jgwZr8uZzr0FrILvEhqMBnympM9z
+        ZdE3Es6JtcsS+WAQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 485CC13441;
-        Wed, 30 Aug 2023 09:20:01 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 43C741353E;
+        Wed, 30 Aug 2023 15:06:00 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id s9ucEcEJ72RZGQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 30 Aug 2023 09:20:01 +0000
+        id woJ9ENha72T7IgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 30 Aug 2023 15:06:00 +0000
+Date:   Wed, 30 Aug 2023 17:06:21 +0200
 From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
         Hannes Reinecke <hare@suse.de>,
         Sagi Grimberg <sagi@grimberg.me>,
         Jason Gunthorpe <jgg@ziepe.ca>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v4 0/3] Introduce nvmet target setup/cleanup helpers
-Date:   Wed, 30 Aug 2023 11:20:16 +0200
-Message-ID: <20230830092019.9846-1-dwagner@suse.de>
-X-Mailer: git-send-email 2.41.0
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH blktests v4 3/3] nvme: introduce
+ nvmet_target_{setup/cleanup} common code
+Message-ID: <c36hdvkw2ia5g2e6k2jkagux3by453stigjoik2wf7neinfrew@t35ny54nn7gt>
+References: <20230830092019.9846-1-dwagner@suse.de>
+ <20230830092019.9846-4-dwagner@suse.de>
+ <fhwbcvhmm57c55ozfgtczcix42zri63cswjavre46l42tmzgo7@3krpokexbslw>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fhwbcvhmm57c55ozfgtczcix42zri63cswjavre46l42tmzgo7@3krpokexbslw>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Updated the series according the last round of feedback and retested it. In
-order to pass the 'make check' check this version depends on the upcoming revert
-of 26664dff17b6 ("Do not suppress any shellcheck warnings") as discussed in the
-v3 thread.
+On Wed, Aug 30, 2023 at 01:38:03PM +0000, Shinichiro Kawasaki wrote:
+> > diff --git a/tests/nvme/018 b/tests/nvme/018
+> > index 68729c3cb070..19e439f3f3e0 100755
+> > --- a/tests/nvme/018
+> > +++ b/tests/nvme/018
+> > @@ -21,16 +21,9 @@ test() {
+> >  
+> >  	_setup_nvmet
+> >  
+> > -	local port
+> >  	local nvmedev
+> >  
+> > -	truncate -s "${nvme_img_size}" "${def_file_path}"
+> > -
+> > -	_create_nvmet_subsystem "${def_subsysnqn}" "${def_file_path}" \
+> > -		 "${def_subsys_uuid}"
+> > -	port="$(_create_nvmet_port "${nvme_trtype}")"
+> > -	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
+> > -	_create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}"
+> > +	_nvmet_target_setup
+> 
+> As I noted for v3, I think the line above should be,
+> 
+> 	_nvmet_target_setup --blkdev file
+> 
+> If the change is ok for you, I'll add this fix up and apply the
+> series.
 
-original cover letter:
-
-Introduce helpers to setup nvmet targets. This is spin off from the refactoring
-patches and the allowed_host patches [1].
-
-Sagi suggested to record all resources allocated by nvmet_target_setup and then
-later clean them up in nvmet_target_cleanup. I opted to figure out in
-nvmet_target_cleanup what was allocated via the newly introdcuded _get_nvmet_ports
-helper. The reason being, Hannes told me offline that he would like to add ANA
-tests which will add some more ports to the subsystem. I hope with this
-the code is more future proof.
-
-BTW, while looking at this I saw that the passthru code is using the awkward
-return value port when calling nvmet_passthru_target_setup. It seems some
-more refactoring is in order...
-
-[1] https://lore.kernel.org/linux-nvme/5h333eqhtw252sjw6axjewlb5bbb5ze7awekczxe3kie2lnhw6@manyer42khct/
-
-
-changes
-
-v4:
- - introduced _cleanup_blkdev helper
- - fixed --blkdev arguments passing
- - added unknown argument warning to _nvmet_target_setup argument parser
- - added rb tag
-
-v3:
- - rebased/retested
- - use the default with _nvmet_target_setup
- - https://lore.kernel.org/linux-nvme/20230822083812.24612-1-dwagner@suse.de/
-
-v2:
- - drop local subsys variable in passthru tests
- - do not use port as handle in passthru tests
- - free port after unregistering from subsys
- - https://lore.kernel.org/linux-nvme/20230818141537.22332-1-dwagner@suse.de/
-
-v1:
- - https://lore.kernel.org/linux-nvme/20230818095744.24619-1-dwagner@suse.de/
-
-Daniel Wagner (3):
-  nvme/{033,034,035,036}: use default subsysnqn variable directly
-  nvme/{033,034,035,036,37}: drop port handle between passthru target
-    setup and cleanup
-  nvme: introduce nvmet_target_{setup/cleanup} common code
-
- tests/nvme/003 |  14 ++-----
- tests/nvme/004 |  21 ++--------
- tests/nvme/005 |  20 +---------
- tests/nvme/006 |  19 +--------
- tests/nvme/007 |  14 +------
- tests/nvme/008 |  21 +---------
- tests/nvme/009 |  16 +-------
- tests/nvme/010 |  21 +---------
- tests/nvme/011 |  16 +-------
- tests/nvme/012 |  21 +---------
- tests/nvme/013 |  16 +-------
- tests/nvme/014 |  21 +---------
- tests/nvme/015 |  16 +-------
- tests/nvme/018 |  16 +-------
- tests/nvme/019 |  21 +---------
- tests/nvme/020 |  16 +-------
- tests/nvme/021 |  16 +-------
- tests/nvme/022 |  16 +-------
- tests/nvme/023 |  21 +---------
- tests/nvme/024 |  16 +-------
- tests/nvme/025 |  16 +-------
- tests/nvme/026 |  16 +-------
- tests/nvme/027 |  17 ++------
- tests/nvme/028 |  17 ++------
- tests/nvme/029 |  21 +---------
- tests/nvme/033 |  10 ++---
- tests/nvme/034 |  10 ++---
- tests/nvme/035 |  10 ++---
- tests/nvme/036 |  12 +++---
- tests/nvme/037 |   5 +--
- tests/nvme/040 |  19 +--------
- tests/nvme/041 |  18 +--------
- tests/nvme/042 |  17 +-------
- tests/nvme/043 |  17 +-------
- tests/nvme/044 |  19 ++-------
- tests/nvme/045 |  18 ++-------
- tests/nvme/047 |  21 +---------
- tests/nvme/048 |  17 +-------
- tests/nvme/rc  | 103 ++++++++++++++++++++++++++++++++++++++++++++++---
- 39 files changed, 188 insertions(+), 553 deletions(-)
-
--- 
-2.41.0
-
+Sorry, I didn't see it in the response. Sure thing, no objection from my
+side.
