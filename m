@@ -2,199 +2,193 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB09CC83F16
-	for <linux-block@archiver.kernel.org>; Thu, 31 Aug 2023 02:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D14FC6FA8F
+	for <linux-block@archiver.kernel.org>; Thu, 31 Aug 2023 02:25:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238255AbjHaCFU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Aug 2023 22:05:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47488 "EHLO
+        id S242817AbjHaCZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Aug 2023 22:25:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237719AbjHaCFU (ORCPT
+        with ESMTP id S238078AbjHaCZ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2023 22:05:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D7383
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2023 19:04:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1693447462;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qS9DIY2LuvUPjop/XQ0XRMN/MyTWTk1wrQjx1uhvL9U=;
-        b=bVzh9s1MWnV525Ba8ERLtimc8aVg4RiD1c70cd4+yqS62EOra4v9yy1GNxAkA94U1+VTO6
-        kDQyXh6OY9XhRByW5qQxfGLxoD1gCc033a7uABapaQVzhqZoYXiRuzGS/9n5EYiqODbs/a
-        /mXgU0dURSAJZjMuXgsnJM2QUePxjOA=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-252-wO3VbwFpOSauheKD7PBH_Q-1; Wed, 30 Aug 2023 22:04:21 -0400
-X-MC-Unique: wO3VbwFpOSauheKD7PBH_Q-1
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-573325a9d49so518450eaf.1
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2023 19:04:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693447460; x=1694052260;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qS9DIY2LuvUPjop/XQ0XRMN/MyTWTk1wrQjx1uhvL9U=;
-        b=CFEWGWX/fIJOwAvXt4xKJVFN+dpkignmDe85qzQTvRFqALbPg1EPjQowKlu6Zu6nJR
-         CmgCUXNlfA/Z+o+uVQfK7Q9y3FxUWgM5L0XGmNfTUiwC/8MBg9utnJm4uYqVOdpcuEso
-         a49Tw15owt0jovB7Hbjv7eyXNg+HgbxUc4vMCXsQ7mcQhQZcJwBSqnKl9uuG/50Ir5oM
-         segxfLTuzLRtBvdPFkQaKKwsCTPEGqRCCzn+pQv/uhjzsFfR7dWbvhh1x5ryww1hcmeB
-         uQm5FM7MQ2SPEaO2lg6OMYKJmSeOc09qP8xP3cEnzawWxITJ8VWCwkrEzKH36eamrQnU
-         LSxA==
-X-Gm-Message-State: AOJu0Yys13b8N+TUXjKBE8E6zJI/KjL+Q+sSA9AGeWTN1JNnwVm2hQAJ
-        udGjGo5JniuGAlRPDEf7p2AvQinWkw/DD15008+cs+VDgbd91XxAVppz3jP73SBXROarjjL7Rb6
-        o5jYzN1b+AbgR2WtA87sxgauBGsk/6G0=
-X-Received: by 2002:a4a:6547:0:b0:573:2863:2926 with SMTP id z7-20020a4a6547000000b0057328632926mr4033937oog.8.1693447460293;
-        Wed, 30 Aug 2023 19:04:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwta8V72PVbc0dwYP6tCEM0KG678FkYs6xsfTalPuLbQwpTlAJIfUEUcg62gz3GZB4XaBd2g==
-X-Received: by 2002:a4a:6547:0:b0:573:2863:2926 with SMTP id z7-20020a4a6547000000b0057328632926mr4033787oog.8.1693447459561;
-        Wed, 30 Aug 2023 19:04:19 -0700 (PDT)
-Received: from ?IPv6:2804:1b3:a802:98e3:3c98:3d83:9703:4411? ([2804:1b3:a802:98e3:3c98:3d83:9703:4411])
-        by smtp.gmail.com with ESMTPSA id g63-20020a4a5b42000000b00573a7d8f382sm201455oob.36.2023.08.30.19.04.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Aug 2023 19:04:19 -0700 (PDT)
-Message-ID: <b525dd86727e2b42ef947993c23ca0eefce83e25.camel@redhat.com>
-Subject: Re: [RFC PATCH v2 0/3] Move usages of struct __call_single_data to
- call_single_data_t
-From:   Leonardo =?ISO-8859-1?Q?Br=E1s?= <leobras@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Chengming Zhou <chengming.zhou@linux.dev>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Guo Ren <guoren@kernel.org>,
-        Valentin Schneider <vschneid@redhat.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Juergen Gross <jgross@suse.com>,
-        Yury Norov <yury.norov@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 30 Aug 2023 23:04:13 -0300
-In-Reply-To: <1a4d9f90-1bb0-4092-9be8-9cf2c70ef79d@kernel.dk>
-References: <20230520052957.798486-1-leobras@redhat.com>
-         <CAJ6HWG6dK_-5jjoGJadOXqE=9c0Np-85r9-ymtAt241XrdwW=w@mail.gmail.com>
-         <b84ad9aa200457b1cbd5c55a7d860e685f068d7a.camel@redhat.com>
-         <1cd98cb37dcf621520e52ac7a15513aab5749534.camel@redhat.com>
-         <51cf9db1-4487-4229-4d43-e91268e52125@linux.dev>
-         <16efceed0b215ee34cc46ca7bba4a86bcf2d8ad7.camel@redhat.com>
-         <1a4d9f90-1bb0-4092-9be8-9cf2c70ef79d@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 30 Aug 2023 22:25:28 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F121FCD2;
+        Wed, 30 Aug 2023 19:25:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1693448726; x=1724984726;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=+qz/7PgwRlKMaQbF7kbHFRCBY58wzEEzlmhzSyn9xoM=;
+  b=ePqdZPrkzf+6kGHbvTOWC9Pw9dtpwN2TbQBa+wc76HtV42C45sUq2Nny
+   pVp9pnLMsClEL6lbZpUYXA4jzCFX5OMYtozff08bqfjmW1X/AMVDe/s0u
+   U3vkbGD/wE+OvWhgwamV1vJjpLxyOVd5UkOA8pwGiQ+4Yg1aerv04TDwF
+   06y/htxWcFF17M4cbMckg0p5oRle7FQoOGSEHzZmjD3KNbNOEaT2hG5yR
+   m5N+WxN8QRbcqW60tjdKkTqowc5JYPQBj6qB2cLXKjNVuKRq5OIYLED5u
+   snSJ9q2R1BlBbQNutqIg8+1PlbCdr9mpsBPIcmx56F9kDpBcpALaz62DR
+   A==;
+X-IronPort-AV: E=Sophos;i="6.02,215,1688400000"; 
+   d="scan'208";a="242517766"
+Received: from mail-bn8nam12lp2177.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.177])
+  by ob1.hgst.iphmx.com with ESMTP; 31 Aug 2023 10:25:25 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WmN7U+uV2IzoBMsGLyUpf8DCReVv8rOXQFTflbGtvA7H0093ukYndQl/Z3UFqXqDJ4tsYm0BCU+UvrdoXdJBXf4VDFrO41qxuzdH4KR1CT+GhBdA9HyIJOyQbgzxW1XlqOXDu2ISdjFKR5IdWvYA7x8Y+B+TCfazm9ktVYccYQPn/BMDBkgHDN9x7hBchi9G7YXvYRgYldrqsRz4E+2YcyBtrSOMJzx3U1sHU0tc2+CBB6Mi5E8iTsw5jj4oGvvNtK7IQqIEYHm3Rl/RY45LSlvINFU+rkAWlfinvlAPfgrcFxm1YAZS/0msGzzvZvUvnq0FzFyNT0Voc7XzcNxGhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+qz/7PgwRlKMaQbF7kbHFRCBY58wzEEzlmhzSyn9xoM=;
+ b=maG7fS+V2TO3utbfp1xJVUHjSJz4ZYhutaRnz6IJGOXO1Eu6RiW4KuSL12l2/8o1isfSlAMDBRy2glA05t+sSIVJePwppOx+so5Sj/2zGMJ2RgLhy9JFnt2U2JA0phv1AeoWP3arTO4/NsXSvHrFclZM2OftBbhMFBV4S+cuRgLjom7PzKZlzrzG9IKEEf3zI/Pdh2tMGRpdmGyZRyP5JqQ6nEPuGAL2dB75IaLl7gtE/VUzXHF+IpnlzPrB0seN3JmHIaFntaSF5sn8xmKkjW3UXtdtyMrXQceMwqY2U/gRF+4HyinX0LAjcOyyWYZCfMlB2X0teY/LwLQhPzL98A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+qz/7PgwRlKMaQbF7kbHFRCBY58wzEEzlmhzSyn9xoM=;
+ b=fS1/iyedQDnlInX6Jes/CB9kPeiRBYU6wFPdQ584TOkDQKv7ZmYTg5K5683mYA/JfAueFLzXc7Y/V+U4vJjXtlntJk7tx6+ICSPwBzFT01/9apZKgyQPM5zFR0zT4zpvf0EM6XXTmTV9ESzihqMAI59/w81oS5ai9E2blNbJLwg=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ BN8PR04MB6354.namprd04.prod.outlook.com (2603:10b6:408:df::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6745.20; Thu, 31 Aug 2023 02:25:23 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::f92a:6d40:fe94:34e9]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::f92a:6d40:fe94:34e9%7]) with mapi id 15.20.6768.009; Thu, 31 Aug 2023
+ 02:25:23 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Daniel Wagner <dwagner@suse.de>
+CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH blktests v4 0/3] Introduce nvmet target setup/cleanup
+ helpers
+Thread-Topic: [PATCH blktests v4 0/3] Introduce nvmet target setup/cleanup
+ helpers
+Thread-Index: AQHZ2yMwDFr6yChQoUCALIhpFapgV7ADroIA
+Date:   Thu, 31 Aug 2023 02:25:23 +0000
+Message-ID: <yhnyazgqmgbzsa5irt4cu3735qxuvbl5czicsaxl7zm6ckjkzf@2cs7fpg2qvpb>
+References: <20230830092019.9846-1-dwagner@suse.de>
+In-Reply-To: <20230830092019.9846-1-dwagner@suse.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BN8PR04MB6354:EE_
+x-ms-office365-filtering-correlation-id: 6bd47250-b047-427c-96ce-08dba9c98794
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +Xi+Q1XxZiUXOx5luWS/Lgdznq7kSvHmnf/baKvoXsX+ao4aqxrzxBLQ0hSpe+M9w9BReTWG87R4GL/S8s2pe68LjgH2QDF7SHr77HagQWrDs8NsvZtOizu3MMu2hkZ0KoRW9U37kertqUoH43ehvhqbOj4ZYiy9TvtqDgS7yZWj8sHNIzYDt2j/b8WzR3ongpW9M6ZydJVfSocFuL7vSndN/x862RY6HiSFUCx2Gqi9WXy3ch0PEyQPXe3IMKd10BytHlBOGVMiNo+5TrVkVWKrGGwnUBrN+KinA77uB29Qs3QFgRueQuTai0AkpfSXwEMjAhbs6hcowVhI6FmpfZ1gBydX037SLImUkNtqvL7d8M35lUchojlb/TXXctPcjVPpYtyW2LS3fnn9tnZa34EOKeYtHMu6U48HjTwKZnTcEhV4uJ1gq1gDOD9H9rtblEumwVF9MzIMr7gQu0y4fxop2wGAOgb4nxKG5yp1SiUgvIv4tpO5aT+jqzdYjm5PT/bi1VUSz7PWMEsyejE+8YBgT6AvZp5sHyovLLw/dRgBM+ZxKw727qptZUQIqinTA1B7Xx5QpCw5491qzf//i4iRaDyphiWUODzfifPmpl8=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(39860400002)(346002)(366004)(376002)(396003)(186009)(451199024)(1800799009)(26005)(9686003)(6512007)(6506007)(5660300002)(6486002)(44832011)(71200400001)(38100700002)(38070700005)(8936002)(478600001)(33716001)(4326008)(8676002)(82960400001)(122000001)(86362001)(966005)(83380400001)(91956017)(76116006)(66446008)(66946007)(54906003)(6916009)(66476007)(64756008)(2906002)(316002)(66556008)(41300700001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?H+k5i/bNetT+dB8EAknhpM37pKMKO/QZ87WYzpmaem2qT9/3D51IleGSsFGc?=
+ =?us-ascii?Q?DNKXi7y1g283A2kwozXLQJ5SmQTUQHDpYkbwVmqM1X2odTK2zyQBHH1ggo4p?=
+ =?us-ascii?Q?SEqmcZBO806HlXWv+7M+AM6LB2+hDQjE+JNEn6gSBR9/D6E1eUHZ9hLfbBMS?=
+ =?us-ascii?Q?2YdyDjnisJyHA1NRe99X67UpwJC3areX+Ejn7Bs/RxQEgwZg0uJ+UtJZqjvn?=
+ =?us-ascii?Q?xJp6ljBiipzenxbIoGnq/MG0BL91iGsZ9HMtbCvzx6AKyKKn9rjtYbFI+EPS?=
+ =?us-ascii?Q?6pYrtoHWnNMzEs9bwRxmh6T+5B3ppCiiaib70PkR/8fXWDI41T5v4IRfZ3Rl?=
+ =?us-ascii?Q?gyuLSYMkr/vrWGmSK5DHcyYdRog3ipVvaByLH9lD5qQ+zhwvVj4AIakjib9u?=
+ =?us-ascii?Q?UytiyP6J9K8u/fkAnVrBkDLo3AcuBrTTRuHdItixqDThVCL9UDz7wA/Od0/J?=
+ =?us-ascii?Q?uypFJiOxsqulGYoYEl4rrutq2E6tLvUT7txG610FeEir68IrvRZ6z62l8yEV?=
+ =?us-ascii?Q?fBBkQknloXp6WGHc10bWrQHlAGg894cT8f6zEmK+CFIoHsEO/+FmYJhE9kCJ?=
+ =?us-ascii?Q?fykHP0L/+gBmSYdwnUVeAr383zrCjzeLJo35rePAqOeUmTKKoGeXAryumewo?=
+ =?us-ascii?Q?YD4LALAUIk4VvkipdvH6JfX/zwTQhm2kQU6yxAJ8/CqTdEMYrMU8e9Si7GtO?=
+ =?us-ascii?Q?dFbxDEeyzhDVBWHa5fpcj5xdsVvwGlaD0VytX0qygl8FmZ/hcQdwQ6yVafWS?=
+ =?us-ascii?Q?OrN3fI8BL3snAZWLX0+SErQYjO3Ep0o77wls3NdkA8D45xxK7vAtb5SZ9m0n?=
+ =?us-ascii?Q?MaLSF+tpPymnvAzE7kaeIQbP+5/O5+pPPFzbLKTcKjSVdvvb4oy4EGO4dIol?=
+ =?us-ascii?Q?HLQG/frS2+N4wCCUxTV7J8Gaipi/WfjGuXN9X8tmvLcL7wP4yawyQ8dlSLJD?=
+ =?us-ascii?Q?cqyET9F6hfIcKNbEnD9uaqM3ytjhWssy/ewJHnqds5RAcpoJHsRYkCTweYI8?=
+ =?us-ascii?Q?Ly7WGVlUWy0x1R+QvRwGyGZ5Bf3ki5UDrLPCP7hoeVXrvDzWBvsDX01LqCfc?=
+ =?us-ascii?Q?abWAHLeqaWoBgSsDOGuRuXGZR0HFPLD01Wh75Xxz4HEhy+fbLPMG3KHFLuXz?=
+ =?us-ascii?Q?DYvs1YjigvMcwQv3svBTGA+/VJ+vScEIg3tiwJecZTQrA0RQd4Oq0BoVFfp5?=
+ =?us-ascii?Q?IuyCjOPTnjhs89hPZpxuAxEo98RveD1vaLnROqTaUHnOCMdRk+G3zzFZmXzj?=
+ =?us-ascii?Q?YQymov6bkfd4cD76S5JAfkDOZijqn5FG451K359dXNg8f8rnT80snmlmE0+1?=
+ =?us-ascii?Q?fMouAP+G2166chn0YJ1Xhu1N76NVAsTlMyYz4OCtWCwljtNqoEnAHtB2mkqO?=
+ =?us-ascii?Q?Py+b2n5Qb4VSrToTTAt1qdxdftHkDBUYNYbPDlq/ETGsOYBZR5stenSqRKEb?=
+ =?us-ascii?Q?fl6e5waiHDk9chcymBBOPcxncQHWa8y2X+RjvD02xANGMZYZR/sqUXsqV2p7?=
+ =?us-ascii?Q?j7HEZVz72CDYarnOxubB1YrTveVRIJ2B4hhsVGRl3/IFskgCu9Z6QRkmN/d2?=
+ =?us-ascii?Q?KZHEhwsnFeBg6N8dkreI7VqtrrxUCvMSRAOoF6RiZ3+RkkXDFPtiaTjAOF+P?=
+ =?us-ascii?Q?jhYd5Omu7tiFyLkh+L7UUgk=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A6E0549F521DCA4097B490D0D9B6AECB@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 
 MIME-Version: 1.0
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?HkcSdmY9vasZvbQE1ZVoHKY5CkOQ/aWc0BZoI+4o6GUepAQgx9NeK8ZYAC9y?=
+ =?us-ascii?Q?SeygrMzo4zmlXwSXVtc8YL0t4H8wXOYGZ83dAwQ+8IOWpq6bI+M6j8WN1z0o?=
+ =?us-ascii?Q?cchSS20mS5gYn0aXYJbqNSCM5rWKls7XwGYHuF5gCEGKFrg1P+oIl/0FzwMc?=
+ =?us-ascii?Q?+3PG5VGwMutFgMb9rJzlS9gXhnv7HLR3DJZ2d1IJQ73utqoVWxKBqW77zIrf?=
+ =?us-ascii?Q?50g/OSDvdgVa6jyaARjaFHgpTCz9/Vnqb9U7WNZ8R3chvwdubKZuf6yCC3Jc?=
+ =?us-ascii?Q?iSFRWkHefaRIGTTCC3EnO/DEdamOhlxe+5elbksszBaCo5cjmX37+r1P9ZVu?=
+ =?us-ascii?Q?QHxMI6sauiHQJJpqWo7kRb0Nq8s1rHNxZsICJP0d80hvehhwzAGJDgW/4YGv?=
+ =?us-ascii?Q?9RadIC6oeYXKK6L6t+viACxJdwUb35881l4KmLQFs057NSU+MhwUpNMf6RtD?=
+ =?us-ascii?Q?bm93KtivL4XkOoQ39dGXistLO4gUqe2QKJzNXWRkCwOXCZwVwJWFp9THk/FN?=
+ =?us-ascii?Q?c1d8oIYoryMcSIOV7HsGgx/xFGGjxhkZplKetuSv+SwSz33nJCZVzenudhvK?=
+ =?us-ascii?Q?vu2afpzw+oSv1Ta36ZKrQ1/KbDT5+6MFrGMkx4KIWRn/BbPkx0VrARhA7ovs?=
+ =?us-ascii?Q?olG8ysZUqR+mn3lRsx5SpTL+hgoyDWXooDS11Q+6sPKtHobBIDQHIiBPIe/5?=
+ =?us-ascii?Q?uZDstLPQ0UdHbOP4w/TIpn4CZOLhthQZatJte1yMasuAftoRgcdtkudGovNN?=
+ =?us-ascii?Q?wamp/5QTjfneB2E2h/tbQ7jSaX7N6esrmSZSGovl4jlYbMzHUmnE5xd7pNQe?=
+ =?us-ascii?Q?Oa48sZKMREPJJswb5IFcrC10kdyHXIo3J8H4z+Q0D364aQr6CBuBXlzZx6EC?=
+ =?us-ascii?Q?pOjS2EdqAQ9TK994jzS9lGaJO6vjRmF84yt7ladl6cVri39d0J/JHptrInP9?=
+ =?us-ascii?Q?nJZJs+vI/irSwIaB1rqD1g=3D=3D?=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bd47250-b047-427c-96ce-08dba9c98794
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Aug 2023 02:25:23.0686
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BBhtO/6Ua0inZQkMdXqEg+E/WEBtSGbLq4BD7lypZLj3l7sf3gqkVf+gdqPfmEsz/bJgiXYmHMaOpukIE6sltf5Hd4Rx4EDg9ERDs7FE3nY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR04MB6354
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2023-08-30 at 16:48 -0600, Jens Axboe wrote:
-> On 8/30/23 4:29 PM, Leonardo Br?s wrote:
-> > On Tue, 2023-08-29 at 10:29 +0800, Chengming Zhou wrote:
-> > > On 2023/8/29 08:55, Leonardo Br?s wrote:
-> > > > On Tue, 2023-07-04 at 04:22 -0300, Leonardo Br?s wrote:
-> > > > > On Tue, 2023-06-13 at 00:51 -0300, Leonardo Bras Soares Passos wr=
-ote:
-> > > > > > Friendly ping
-> > > > > >=20
-> > > > > > On Sat, May 20, 2023 at 2:30?AM Leonardo Bras <leobras@redhat.c=
-om> wrote:
-> > > > > > >=20
-> > > > > > > Changes since RFCv1:
-> > > > > > > - request->csd moved to the middle of the struct, without siz=
-e impact
-> > > > > > > - type change happens in a different patch (thanks Jens Axboe=
-!)
-> > > > > > > - Improved the third patch to also update the .h file.
-> > > > > > >=20
-> > > > > > > Leonardo Bras (3):
-> > > > > > >   blk-mq: Move csd inside struct request so it's 32-byte alig=
-ned
-> > > > > > >   blk-mq: Change request->csd type to call_single_data_t
-> > > > > > >   smp: Change signatures to use call_single_data_t
-> > > > > > >=20
-> > > > > > >  include/linux/blk-mq.h | 10 +++++-----
-> > > > > > >  include/linux/smp.h    |  2 +-
-> > > > > > >  kernel/smp.c           |  4 ++--
-> > > > > > >  kernel/up.c            |  2 +-
-> > > > > > >  4 files changed, 9 insertions(+), 9 deletions(-)
-> > > > > > >=20
-> > > > > > > --
-> > > > > > > 2.40.1
-> > > > > > >=20
-> > > > >=20
-> > > > > Hello Jens,
-> > > > >=20
-> > > > > I still want your feedback on this series :)
-> > > > >=20
-> > > > > I think I addressed every issue of RFCv1, but if you have any oth=
-er feedback,
-> > > > > please let me know.
-> > > > >=20
-> > > > > Thanks!
-> > > > > Leo
-> > > >=20
-> > > > Hello Jens Axboe,
-> > > >=20
-> > > > Please provide feedback on this series!
-> > > >=20
-> > > > Are you ok with those changes?
-> > > > What's your opinion on them?=20
-> > > >=20
-> > > > Thanks!
-> > > > Leo
-> > > >=20
-> > >=20
-> > > Hello,
-> > >=20
-> > > FYI, there is no csd in struct request anymore in block/for-next bran=
-ch,
-> > > which is deleted by this commit:
-> > >=20
-> > > commit 660e802c76c89e871c29cd3174c07c8d23e39c35
-> > > Author: Chengming Zhou <zhouchengming@bytedance.com>
-> > > Date:   Mon Jul 17 12:00:55 2023 +0800
-> > >=20
-> > >     blk-mq: use percpu csd to remote complete instead of per-rq csd
-> > >=20
-> > >     If request need to be completed remotely, we insert it into percp=
-u llist,
-> > >     and smp_call_function_single_async() if llist is empty previously=
-.
-> > >=20
-> > >     We don't need to use per-rq csd, percpu csd is enough. And the si=
-ze of
-> > >     struct request is decreased by 24 bytes.
-> > >=20
-> > >     This way is cleaner, and looks correct, given block softirq is gu=
-aranteed
-> > >     to be scheduled to consume the list if one new request is added t=
-o this
-> > >     percpu list, either smp_call_function_single_async() returns -EBU=
-SY or 0.
-> > >=20
-> > >     Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> > >     Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> > >     Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > >     Link: https://lore.kernel.org/r/20230717040058.3993930-2-chengmin=
-g.zhou@linux.dev
-> > >     Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> > >=20
-> >=20
-> >=20
-> > Oh, thanks for the heads-up!
-> > I will send reviewed version of patch 3.
-> >=20
-> > I suppose it can go on top of block/for-next, since the above patch is =
-there.
-> > Does that work for you Jens Axboe?
+On Aug 30, 2023 / 11:20, Daniel Wagner wrote:
+> Updated the series according the last round of feedback and retested it. =
+In
+> order to pass the 'make check' check this version depends on the upcoming=
+ revert
+> of 26664dff17b6 ("Do not suppress any shellcheck warnings") as discussed =
+in the
+> v3 thread.
 >=20
-> Just send it against Linus's tree, it's all upstream now.
+> original cover letter:
 >=20
+> Introduce helpers to setup nvmet targets. This is spin off from the refac=
+toring
+> patches and the allowed_host patches [1].
+>=20
+> Sagi suggested to record all resources allocated by nvmet_target_setup an=
+d then
+> later clean them up in nvmet_target_cleanup. I opted to figure out in
+> nvmet_target_cleanup what was allocated via the newly introdcuded _get_nv=
+met_ports
+> helper. The reason being, Hannes told me offline that he would like to ad=
+d ANA
+> tests which will add some more ports to the subsystem. I hope with this
+> the code is more future proof.
+>=20
+> BTW, while looking at this I saw that the passthru code is using the awkw=
+ard
+> return value port when calling nvmet_passthru_target_setup. It seems some
+> more refactoring is in order...
+>=20
+> [1] https://lore.kernel.org/linux-nvme/5h333eqhtw252sjw6axjewlb5bbb5ze7aw=
+ekczxe3kie2lnhw6@manyer42khct/
 
-Sure,
-
-Thanks!
-Leo
-
+I've applied the series with the fix noted for the 3rd patch. I also revert=
+ed
+the commit 26664dff17b6 together. Thanks again for this clean up :)=
