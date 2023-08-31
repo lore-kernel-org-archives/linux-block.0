@@ -2,195 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4008C83F29
-	for <linux-block@archiver.kernel.org>; Thu, 31 Aug 2023 07:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94662C83F2B
+	for <linux-block@archiver.kernel.org>; Thu, 31 Aug 2023 08:03:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231280AbjHaHnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Aug 2023 03:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33192 "EHLO
+        id S236616AbjHaIDp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Aug 2023 04:03:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242041AbjHaHna (ORCPT
+        with ESMTP id S236557AbjHaIDp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2023 03:43:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE6B5CE7
-        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 00:42:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1693467762;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=J0Ea6gTjwYcN9NCwG8KZT5W8gLbv0Xxbbmtj4rhOA8U=;
-        b=Q2F9fJM0PvO9vNjueQVnQUhdTr1TD5TfPy2EX8vAl/orjaLeuNNQ+mmLIYrpIPpCPkxPPt
-        zJ4e1cMlqGsC0RB85bcDnU17x2X3N90HjUt9wbmK30sTAu8KZ9pMPH79X3EuwzSqhRzU/x
-        mxLpYlwZ3SAs5Mon6Nu61h5OepG+2os=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-13-23RzO_v0O2WRjgZrBSBj7w-1; Thu, 31 Aug 2023 03:42:37 -0400
-X-MC-Unique: 23RzO_v0O2WRjgZrBSBj7w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6FD78280D588;
-        Thu, 31 Aug 2023 07:42:37 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 84D832166B25;
-        Thu, 31 Aug 2023 07:42:36 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] io_uring: fix IO hang in io_wq_put_and_exit from do_exit()
-Date:   Thu, 31 Aug 2023 15:42:21 +0800
-Message-Id: <20230831074221.2309565-1-ming.lei@redhat.com>
+        Thu, 31 Aug 2023 04:03:45 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2FCCF3
+        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 01:03:36 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Rbtvk3tNCz4f3mLP
+        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 16:03:30 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgDHoqVVSfBknjULCA--.20500S4;
+        Thu, 31 Aug 2023 16:03:33 +0800 (CST)
+From:   Li Lingfeng <lilingfeng@huaweicloud.com>
+To:     linux-block@vger.kernel.org
+Cc:     hch@lst.de, axboe@kernel.dk, tj@kernel.org,
+        yukuai1@huaweicloud.com, houtao1@huawei.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com, lilingfeng@huaweicloud.com
+Subject: [PATCH] block: don't add or resize partition on the disk with GENHD_FL_NO_PART
+Date:   Thu, 31 Aug 2023 15:59:00 +0800
+Message-Id: <20230831075900.1725842-1-lilingfeng@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-CM-TRANSID: gCh0CgDHoqVVSfBknjULCA--.20500S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrtF4xAw4ktFW7AFyftFWDArb_yoWDZFX_Jr
+        15Aw1vgryxJF93ur1qkFZIgryFyay7Wr4qgF4agFZIv3ZrJasxZws7ursagr9xuFy7uFZx
+        uFs0gr42yF4xCjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbz8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6Fyj6rWUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+        14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUF9a9DUUUU
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-io_wq_put_and_exit() is called from do_exit(), but all requests in io_wq
-aren't cancelled in io_uring_cancel_generic() called from do_exit().
-Meantime io_wq IO code path may share resource with normal iopoll code
-path.
+From: Li Lingfeng <lilingfeng3@huawei.com>
 
-So if any HIPRI request is pending in io_wq_submit_work(), this request
-may not get resouce for moving on, given iopoll isn't possible in
-io_wq_put_and_exit().
+Commit a33df75c6328 ("block: use an xarray for disk->part_tbl") remove
+disk_expand_part_tbl() in add_partition(), which means all kinds of
+devices will support extended dynamic `dev_t`.
+However, some devices with GENHD_FL_NO_PART are not expected to add or
+resize partition.
+Fix this by adding check of GENHD_FL_NO_PART before add or resize
+partition.
 
-The issue can be triggered when terminating 't/io_uring -n4 /dev/nullb0'
-with default null_blk parameters.
-
-Fix it by always cancelling all requests in io_wq from io_uring_cancel_generic(),
-and this way is reasonable because io_wq destroying follows cancelling
-requests immediately. Based on one patch from Chengming.
-
-Closes: https://lore.kernel.org/linux-block/3893581.1691785261@warthog.procyon.org.uk/
-Reported-by: David Howells <dhowells@redhat.com>
-Cc: Chengming Zhou <zhouchengming@bytedance.com>,
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
+Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
 ---
- io_uring/io_uring.c | 40 ++++++++++++++++++++++++++++------------
- 1 file changed, 28 insertions(+), 12 deletions(-)
+ block/ioctl.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index e7675355048d..18d5ab969c29 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -144,7 +144,7 @@ struct io_defer_entry {
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 648670ddb164..d5f5cd61efd7 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -20,6 +20,8 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+ 	struct blkpg_partition p;
+ 	long long start, length;
  
- static bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
- 					 struct task_struct *task,
--					 bool cancel_all);
-+					 bool cancel_all, bool *wq_cancelled);
- 
- static void io_queue_sqe(struct io_kiocb *req);
- 
-@@ -3049,7 +3049,7 @@ static __cold void io_ring_exit_work(struct work_struct *work)
- 		if (ctx->flags & IORING_SETUP_DEFER_TASKRUN)
- 			io_move_task_work_from_local(ctx);
- 
--		while (io_uring_try_cancel_requests(ctx, NULL, true))
-+		while (io_uring_try_cancel_requests(ctx, NULL, true, NULL))
- 			cond_resched();
- 
- 		if (ctx->sq_data) {
-@@ -3231,12 +3231,13 @@ static __cold bool io_uring_try_cancel_iowq(struct io_ring_ctx *ctx)
- 
- static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
- 						struct task_struct *task,
--						bool cancel_all)
-+						bool cancel_all, bool *wq_cancelled)
- {
--	struct io_task_cancel cancel = { .task = task, .all = cancel_all, };
-+	struct io_task_cancel cancel = { .task = task, .all = true, };
- 	struct io_uring_task *tctx = task ? task->io_uring : NULL;
- 	enum io_wq_cancel cret;
- 	bool ret = false;
-+	bool wq_active = false;
- 
- 	/* set it so io_req_local_work_add() would wake us up */
- 	if (ctx->flags & IORING_SETUP_DEFER_TASKRUN) {
-@@ -3249,7 +3250,7 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
- 		return false;
- 
- 	if (!task) {
--		ret |= io_uring_try_cancel_iowq(ctx);
-+		wq_active = io_uring_try_cancel_iowq(ctx);
- 	} else if (tctx && tctx->io_wq) {
- 		/*
- 		 * Cancels requests of all rings, not only @ctx, but
-@@ -3257,11 +3258,20 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
- 		 */
- 		cret = io_wq_cancel_cb(tctx->io_wq, io_cancel_task_cb,
- 				       &cancel, true);
--		ret |= (cret != IO_WQ_CANCEL_NOTFOUND);
-+		wq_active = (cret != IO_WQ_CANCEL_NOTFOUND);
- 	}
-+	ret |= wq_active;
-+	if (wq_cancelled)
-+		*wq_cancelled = !wq_active;
- 
--	/* SQPOLL thread does its own polling */
--	if ((!(ctx->flags & IORING_SETUP_SQPOLL) && cancel_all) ||
-+	/*
-+	 * SQPOLL thread does its own polling
-+	 *
-+	 * io_wq may share IO resources(such as requests) with iopoll, so
-+	 * iopoll requests have to be reapped for providing forward
-+	 * progress to io_wq cancelling
-+	 */
-+	if (!(ctx->flags & IORING_SETUP_SQPOLL) ||
- 	    (ctx->sq_data && ctx->sq_data->thread == current)) {
- 		while (!wq_list_empty(&ctx->iopoll_list)) {
- 			io_iopoll_try_reap_events(ctx);
-@@ -3313,11 +3323,12 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
- 	atomic_inc(&tctx->in_cancel);
- 	do {
- 		bool loop = false;
-+		bool wq_cancelled;
- 
- 		io_uring_drop_tctx_refs(current);
- 		/* read completions before cancelations */
- 		inflight = tctx_inflight(tctx, !cancel_all);
--		if (!inflight)
-+		if (!inflight && !tctx->io_wq)
- 			break;
- 
- 		if (!sqd) {
-@@ -3326,20 +3337,25 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
- 				if (node->ctx->sq_data)
- 					continue;
- 				loop |= io_uring_try_cancel_requests(node->ctx,
--							current, cancel_all);
-+							current, cancel_all,
-+							&wq_cancelled);
- 			}
- 		} else {
- 			list_for_each_entry(ctx, &sqd->ctx_list, sqd_list)
- 				loop |= io_uring_try_cancel_requests(ctx,
- 								     current,
--								     cancel_all);
-+								     cancel_all,
-+								     &wq_cancelled);
- 		}
- 
--		if (loop) {
-+		if (!wq_cancelled || (inflight && loop)) {
- 			cond_resched();
- 			continue;
- 		}
- 
-+		if (!inflight)
-+			break;
-+
- 		prepare_to_wait(&tctx->wait, &wait, TASK_INTERRUPTIBLE);
- 		io_run_task_work();
- 		io_uring_drop_tctx_refs(current);
++	if (disk->flags & GENHD_FL_NO_PART)
++		return -EINVAL;
+ 	if (!capable(CAP_SYS_ADMIN))
+ 		return -EACCES;
+ 	if (copy_from_user(&p, upart, sizeof(struct blkpg_partition)))
 -- 
-2.41.0
+2.39.2
 
