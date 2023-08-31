@@ -2,348 +2,159 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93675C83F35
-	for <linux-block@archiver.kernel.org>; Thu, 31 Aug 2023 09:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E400C83F10
+	for <linux-block@archiver.kernel.org>; Thu, 31 Aug 2023 09:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243359AbjHaJKY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Aug 2023 05:10:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48774 "EHLO
+        id S231459AbjHaJi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Aug 2023 05:38:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241868AbjHaJKX (ORCPT
+        with ESMTP id S230428AbjHaJi4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2023 05:10:23 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D617CEB
-        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 02:10:19 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-4018af1038cso5425725e9.0
-        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 02:10:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693473018; x=1694077818; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:reply-to:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nFLdRgW4/pacJbc+A452yAnAB3CkyuJxPDrgBZGl12A=;
-        b=Jxn0XvRajCiDsKBz/jXfVHOv46Idhw3NTdatld3qghNYfCCQ1nA6V8IVZqZw22dXvs
-         X5RzYv2bNRVJkvDEAjWhB8HOadaAW3zpsKWZwDmQiy/uzA0zmajHQs+uoNr0VnVnCJxF
-         P+c0eUumRwLuGIvyMIXiBJ07cvMYkTcvNCBplJkK3/GnliZ/NIquownX93a+VCZJZPE9
-         ZdZPZYkRL6tXUesLX+CHQFuWFQy4iD4KcamLe/gcxDsSumSXdVJqNMQHqC7GlQg8SNEq
-         QLdhwEguW1FkLV911RRKTqbMZ5gPEOAGNda7+R2LzAEZe1z/UjPiwTYxd3SbblIq5DuA
-         9Ufg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693473018; x=1694077818;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nFLdRgW4/pacJbc+A452yAnAB3CkyuJxPDrgBZGl12A=;
-        b=OuJskAGsPBF7vHBR++l1G/g35kHJyfjPQCU4fb2XGTGdS94mbrnE50E634nDWKAhZN
-         OGU9n4XvkFSpVdDkbLItOYjnyKhF2cMwvWWhrWO7ionuSEbkn42db1Oaez56Euyy3HgU
-         ZU1ya2CJN9CkE7sJSZiDGEA6gkj69BDxOlCUxp13+8EaXZwsD0tYB8WnxJnkuemEq0Sa
-         mUAXkatt2WDAm/oiTaYJxZxskAOcigv8eKC6MUF+pVux+pp32miwkGa7pXWp2a4xNLSw
-         k/U5VyWt4AQA6UPEd0BlfC0OSLET9f9hfFMfulKgffg9l/b0QlsbYfRrIIpsdNr4nIsw
-         rvPQ==
-X-Gm-Message-State: AOJu0YxSpuT0UBHiH2hgXOK9R6u714q1zl/ti793xnaltK24EL08fQB3
-        lNDFDiQ3vZPxBXWnH+TpAPar3A==
-X-Google-Smtp-Source: AGHT+IGKzO/+486Q7YvS0uvNVnoQpdUjp2QursI+uXvKKzIeknBCuPgvAF22+Wr0Jm/QBSgWwhFpIQ==
-X-Received: by 2002:a5d:63cb:0:b0:317:7062:32d2 with SMTP id c11-20020a5d63cb000000b00317706232d2mr3618117wrw.54.1693473017848;
-        Thu, 31 Aug 2023 02:10:17 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:982:cbb0:a33e:476b:58d7:9689? ([2a01:e0a:982:cbb0:a33e:476b:58d7:9689])
-        by smtp.gmail.com with ESMTPSA id f12-20020adffccc000000b003143c9beeaesm1509345wrs.44.2023.08.31.02.10.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Aug 2023 02:10:17 -0700 (PDT)
-Message-ID: <3129d140-ac8e-4af1-9b87-3d04f7a65211@linaro.org>
-Date:   Thu, 31 Aug 2023 11:10:16 +0200
+        Thu, 31 Aug 2023 05:38:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A6A194
+        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 02:38:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693474686;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=pIHkr0l2kEulrVce5uaSBSAoxxMZwAnZ1GdIhmQZ2hI=;
+        b=h4Rw6WVct884FOtiMCjSlxg8phvuiksBY/UTHhhWCGh4lOlII0kcMwiSjORwn7BxVEeZah
+        obbxojbcOPATdPpUNcOTckUO8oJOhu6X9pE6d7D0NPzRv9WkXLHQtWWU/AKcCbDT6P9938
+        BH0bnlkyJ4QAJp424lPMjCTn+affKaY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-511-LnRHs2JGOduXWRKhYf_VWg-1; Thu, 31 Aug 2023 05:38:02 -0400
+X-MC-Unique: LnRHs2JGOduXWRKhYf_VWg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 84D7985CBE0;
+        Thu, 31 Aug 2023 09:38:00 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F65C1121315;
+        Thu, 31 Aug 2023 09:37:58 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>
+Cc:     linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Yi Zhang <yi.zhang@redhat.com>,
+        Guangwu Zhang <guazhang@redhat.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH V4] lib/group_cpus.c: avoid to acquire cpu hotplug lock in group_cpus_evenly
+Date:   Thu, 31 Aug 2023 17:37:54 +0800
+Message-Id: <20230831093754.2322955-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v2 04/10] soc: qcom: ice: support for hardware wrapped
- keys
-Content-Language: en-US, fr
-To:     Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        ebiggers@google.com
-Cc:     linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
-        quic_psodagud@quicinc.com, avmenon@quicinc.com,
-        abel.vesa@linaro.org, quic_spuppala@quicinc.com
-References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
- <20230719170423.220033-5-quic_gaurkash@quicinc.com>
-From:   Neil Armstrong <neil.armstrong@linaro.org>
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro Developer Services
-In-Reply-To: <20230719170423.220033-5-quic_gaurkash@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+group_cpus_evenly() could be part of storage driver's error handler,
+such as nvme driver, when may happen during CPU hotplug, in which
+storage queue has to drain its pending IOs because all CPUs associated
+with the queue are offline and the queue is becoming inactive. And
+handling IO needs error handler to provide forward progress.
 
-On 19/07/2023 19:04, Gaurav Kashyap wrote:
-> Now that HWKM support is added to ICE, extend the ICE
-> driver to support hardware wrapped keys programming coming
-> in from the storage controllers (ufs and emmc). The patches that follow
-> will add ufs and emmc support.
-> 
-> Derive software secret support is also added by forwarding the
-> call the corresponding scm api.
-> 
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> ---
->   drivers/soc/qcom/ice.c | 121 +++++++++++++++++++++++++++++++++++++----
->   include/soc/qcom/ice.h |   4 ++
->   2 files changed, 114 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
-> index 242306d13049..33f67fcfa1bc 100644
-> --- a/drivers/soc/qcom/ice.c
-> +++ b/drivers/soc/qcom/ice.c
-> @@ -25,6 +25,8 @@
->   #define QCOM_ICE_REG_BIST_STATUS		0x0070
->   #define QCOM_ICE_REG_ADVANCED_CONTROL		0x1000
->   #define QCOM_ICE_REG_CONTROL			0x0
-> +#define QCOM_ICE_LUT_KEYS_CRYPTOCFG_R16		0x4040
-> +
->   /* QCOM ICE HWKM registers */
->   #define QCOM_ICE_REG_HWKM_TZ_KM_CTL		0x1000
->   #define QCOM_ICE_REG_HWKM_TZ_KM_STATUS		0x1004
-> @@ -34,6 +36,7 @@
->   #define QCOM_ICE_REG_HWKM_BANK0_BBAC_3		0x500C
->   #define QCOM_ICE_REG_HWKM_BANK0_BBAC_4		0x5010
->   
-> +/* QCOM ICE HWKM BIST vals */
->   #define QCOM_ICE_HWKM_BIST_DONE_V1_VAL		0x11
->   #define QCOM_ICE_HWKM_BIST_DONE_V2_VAL		0x287
->   
-> @@ -44,6 +47,8 @@
->   #define QCOM_ICE_FORCE_HW_KEY0_SETTING_MASK	0x2
->   #define QCOM_ICE_FORCE_HW_KEY1_SETTING_MASK	0x4
->   
-> +#define QCOM_ICE_LUT_KEYS_CRYPTOCFG_OFFSET	0x80
-> +
->   #define QCOM_ICE_HWKM_REG_OFFSET	0x8000
->   #define HWKM_OFFSET(reg)		(reg + QCOM_ICE_HWKM_REG_OFFSET)
->   
-> @@ -60,6 +65,17 @@ struct qcom_ice {
->   
->   	struct clk *core_clk;
->   	u8 hwkm_version;
-> +	bool hwkm_init_complete;
-> +};
-> +
-> +union crypto_cfg {
-> +	__le32 regval;
-> +	struct {
-> +		u8 dusize;
-> +		u8 capidx;
-> +		u8 reserved;
-> +		u8 cfge;
-> +	};
->   };
->   
->   static bool qcom_ice_check_supported(struct qcom_ice *ice)
-> @@ -218,6 +234,8 @@ static void qcom_ice_hwkm_init(struct qcom_ice *ice)
->   			HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_3));
->   	qcom_ice_writel(ice, 0xFFFFFFFF,
->   			HWKM_OFFSET(QCOM_ICE_REG_HWKM_BANK0_BBAC_4));
-> +
-> +	ice->hwkm_init_complete = true;
->   }
->   
->   int qcom_ice_enable(struct qcom_ice *ice)
-> @@ -263,6 +281,52 @@ int qcom_ice_suspend(struct qcom_ice *ice)
->   }
->   EXPORT_SYMBOL_GPL(qcom_ice_suspend);
->   
-> +/*
-> + * HW dictates the internal mapping between the ICE and HWKM slots,
-> + * which are different for different versions, make the translation
-> + * here.
-> +*/
-> +static int translate_hwkm_slot(struct qcom_ice *ice, int slot)
-> +{
-> +	return (ice->hwkm_version == 1) ?
-> +	       (10 + slot * 2) : (slot * 2);
-> +}
-> +
-> +static int qcom_ice_program_wrapped_key(struct qcom_ice *ice,
-> +					const struct blk_crypto_key *key,
-> +					u8 data_unit_size, int slot)
-> +{
-> +	int hwkm_slot;
-> +	int err;
-> +	union crypto_cfg cfg;
-> +
-> +	hwkm_slot = translate_hwkm_slot(ice, slot);
-> +
-> +	memset(&cfg, 0, sizeof(cfg));
-> +	cfg.dusize = data_unit_size;
-> +	cfg.capidx = QCOM_SCM_ICE_CIPHER_AES_256_XTS;
-> +	cfg.cfge = 0x80;
-> +
-> +	/* Clear CFGE */
-> +	qcom_ice_writel(ice, 0x0, QCOM_ICE_LUT_KEYS_CRYPTOCFG_R16 +
-> +				  QCOM_ICE_LUT_KEYS_CRYPTOCFG_OFFSET * slot);
-> +
-> +	/* Call trustzone to program the wrapped key using hwkm */
-> +	err = qcom_scm_ice_set_key(hwkm_slot, key->raw, key->size,
-> +				   QCOM_SCM_ICE_CIPHER_AES_256_XTS, data_unit_size);
-> +	if (err) {
-> +		pr_err("%s:SCM call Error: 0x%x slot %d\n", __func__, err,
-> +		       slot);
-> +		return err;
-> +	}
-> +
-> +	/* Enable CFGE after programming key */
-> +	qcom_ice_writel(ice, cfg.regval, QCOM_ICE_LUT_KEYS_CRYPTOCFG_R16 +
-> +					 QCOM_ICE_LUT_KEYS_CRYPTOCFG_OFFSET * slot);
-> +
-> +	return err;
-> +}
-> +
->   int qcom_ice_program_key(struct qcom_ice *ice,
->   			 u8 algorithm_id, u8 key_size,
->   			 const struct blk_crypto_key *bkey,
-> @@ -278,24 +342,36 @@ int qcom_ice_program_key(struct qcom_ice *ice,
->   
->   	/* Only AES-256-XTS has been tested so far. */
->   	if (algorithm_id != QCOM_ICE_CRYPTO_ALG_AES_XTS ||
-> -	    key_size != QCOM_ICE_CRYPTO_KEY_SIZE_256) {
-> +	    key_size != QCOM_ICE_CRYPTO_KEY_SIZE_256 ||
-> +	    key_size != QCOM_ICE_CRYPTO_KEY_SIZE_WRAPPED) {
+Then dead lock is caused:
 
-This should be:
-	if (algorithm_id != QCOM_ICE_CRYPTO_ALG_AES_XTS ||
-	    (key_size != QCOM_ICE_CRYPTO_KEY_SIZE_256 &&
-	     key_size != QCOM_ICE_CRYPTO_KEY_SIZE_WRAPPED)) {
+1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
+handler is waiting for inflight IO
 
-Otherwise it would fail on any key_size value.
+2) error handler is waiting for CPU hotplug lock
 
-Neil
+3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
+error handling can't provide forward progress.
 
->   		dev_err_ratelimited(dev,
->   				    "Unhandled crypto capability; algorithm_id=%d, key_size=%d\n",
->   				    algorithm_id, key_size);
->   		return -EINVAL;
->   	}
->   
-> -	memcpy(key.bytes, bkey->raw, AES_256_XTS_KEY_SIZE);
-> -
-> -	/* The SCM call requires that the key words are encoded in big endian */
-> -	for (i = 0; i < ARRAY_SIZE(key.words); i++)
-> -		__cpu_to_be32s(&key.words[i]);
-> +	if (bkey->crypto_cfg.key_type == BLK_CRYPTO_KEY_TYPE_HW_WRAPPED) {
-> +		if (!ice->hwkm_version)
-> +			return -EINVAL;
-> +		err = qcom_ice_program_wrapped_key(ice, bkey, slot,
-> +						   data_unit_size);
-> +	} else {
-> +		if (bkey->size != QCOM_ICE_CRYPTO_KEY_SIZE_256)
-> +			dev_err_ratelimited(dev,
-> +				    "Incorrect key size; bkey->size=%d\n",
-> +				    algorithm_id);
-> +		return -EINVAL;
-> +		memcpy(key.bytes, bkey->raw, AES_256_XTS_KEY_SIZE);
->   
-> -	err = qcom_scm_ice_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
-> -				   QCOM_SCM_ICE_CIPHER_AES_256_XTS,
-> -				   data_unit_size);
-> +		/* The SCM call requires that the key words are encoded in big endian */
-> +		for (i = 0; i < ARRAY_SIZE(key.words); i++)
-> +			__cpu_to_be32s(&key.words[i]);
->   
-> -	memzero_explicit(&key, sizeof(key));
-> +		err = qcom_scm_ice_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
-> +					   QCOM_SCM_ICE_CIPHER_AES_256_XTS,
-> +					   data_unit_size);
-> +		memzero_explicit(&key, sizeof(key));
-> +	}
->   
->   	return err;
->   }
-> @@ -303,7 +379,21 @@ EXPORT_SYMBOL_GPL(qcom_ice_program_key);
->   
->   int qcom_ice_evict_key(struct qcom_ice *ice, int slot)
->   {
-> -	return qcom_scm_ice_invalidate_key(slot);
-> +	int hwkm_slot = slot;
-> +
-> +	if (ice->hwkm_version) {
-> +		hwkm_slot = translate_hwkm_slot(ice, slot);
-> +	/*
-> +	 * Ignore calls to evict key when HWKM is supported and hwkm init
-> +	 * is not yet done. This is to avoid the clearing all slots call
-> +	 * during a storage reset when ICE is still in legacy mode. HWKM slave
-> +	 * in ICE takes care of zeroing out the keytable on reset.
-> +	 */
-> +		if (!ice->hwkm_init_complete)
-> +			return 0;
-> +	}
-> +
-> +	return qcom_scm_ice_invalidate_key(hwkm_slot);
->   }
->   EXPORT_SYMBOL_GPL(qcom_ice_evict_key);
->   
-> @@ -313,6 +403,15 @@ bool qcom_ice_hwkm_supported(struct qcom_ice *ice)
->   }
->   EXPORT_SYMBOL_GPL(qcom_ice_hwkm_supported);
->   
-> +int qcom_ice_derive_sw_secret(struct qcom_ice *ice, const u8 wrapped_key[],
-> +			      unsigned int wrapped_key_size,
-> +			      u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE])
-> +{
-> +	return qcom_scm_derive_sw_secret(wrapped_key, wrapped_key_size,
-> +					 sw_secret, BLK_CRYPTO_SW_SECRET_SIZE);
-> +}
-> +EXPORT_SYMBOL_GPL(qcom_ice_derive_sw_secret);
-> +
->   static struct qcom_ice *qcom_ice_create(struct device *dev,
->   					void __iomem *base)
->   {
-> diff --git a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h
-> index 1f52e82e3e1c..22ab8d1a56de 100644
-> --- a/include/soc/qcom/ice.h
-> +++ b/include/soc/qcom/ice.h
-> @@ -17,6 +17,7 @@ enum qcom_ice_crypto_key_size {
->   	QCOM_ICE_CRYPTO_KEY_SIZE_192		= 0x2,
->   	QCOM_ICE_CRYPTO_KEY_SIZE_256		= 0x3,
->   	QCOM_ICE_CRYPTO_KEY_SIZE_512		= 0x4,
-> +	QCOM_ICE_CRYPTO_KEY_SIZE_WRAPPED	= 0x5,
->   };
->   
->   enum qcom_ice_crypto_alg {
-> @@ -35,5 +36,8 @@ int qcom_ice_program_key(struct qcom_ice *ice,
->   			 u8 data_unit_size, int slot);
->   int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
->   bool qcom_ice_hwkm_supported(struct qcom_ice *ice);
-> +int qcom_ice_derive_sw_secret(struct qcom_ice *ice, const u8 wrapped_key[],
-> +			      unsigned int wrapped_key_size,
-> +			      u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE]);
->   struct qcom_ice *of_qcom_ice_get(struct device *dev);
->   #endif /* __QCOM_ICE_H__ */
+Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
+in which two stage spreads are taken: 1) the 1st stage is over all present
+CPUs; 2) the end stage is over all other CPUs.
+
+Turns out the two stage spread just needs consistent 'cpu_present_mask', and
+remove the CPU hotplug lock by storing it into one local cache. This way
+doesn't change correctness, because all CPUs are still covered.
+
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: linux-nvme@lists.infradead.org
+Cc: linux-block@vger.kernel.org
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Reported-by: Guangwu Zhang <guazhang@redhat.com>
+Tested-by: Guangwu Zhang <guazhang@redhat.com>
+Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V4:
+	- annotate lockess read of cpu_present_mask with data_race()
+	- document why lockless read of cpu_present_mask is correct for
+	group_cpus_evenly, as suggested by Thomas
+	
+V3:
+	- reuse `npresmsk`, and avoid to allocate new variable, suggested by
+	Chengming Zhou
+
+V2:
+	- fix "Cc: block list"
+	- add tested-by tag
+
+
+ lib/group_cpus.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/lib/group_cpus.c b/lib/group_cpus.c
+index aa3f6815bb12..ee272c4cefcc 100644
+--- a/lib/group_cpus.c
++++ b/lib/group_cpus.c
+@@ -366,13 +366,25 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+ 	if (!masks)
+ 		goto fail_node_to_cpumask;
+ 
+-	/* Stabilize the cpumasks */
+-	cpus_read_lock();
+ 	build_node_to_cpumask(node_to_cpumask);
+ 
++	/*
++	 * Make a local cache of 'cpu_present_mask', so the two stages
++	 * spread can observe consistent 'cpu_present_mask' without holding
++	 * cpu hotplug lock, then we can reduce deadlock risk with cpu
++	 * hotplug code.
++	 *
++	 * Here CPU hotplug may happen when reading `cpu_present_mask`, and
++	 * we can live with the case because it only affects that hotplug
++	 * CPU is handled in the 1st or 2nd stage, and either way is correct
++	 * from API user viewpoint since 2-stage spread is sort of
++	 * optimization.
++	 */
++	cpumask_copy(npresmsk, data_race(cpu_present_mask));
++
+ 	/* grouping present CPUs first */
+ 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+-				  cpu_present_mask, nmsk, masks);
++				  npresmsk, nmsk, masks);
+ 	if (ret < 0)
+ 		goto fail_build_affinity;
+ 	nr_present = ret;
+@@ -387,15 +399,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
+ 		curgrp = 0;
+ 	else
+ 		curgrp = nr_present;
+-	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
++	cpumask_andnot(npresmsk, cpu_possible_mask, npresmsk);
+ 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+ 				  npresmsk, nmsk, masks);
+ 	if (ret >= 0)
+ 		nr_others = ret;
+ 
+  fail_build_affinity:
+-	cpus_read_unlock();
+-
+ 	if (ret >= 0)
+ 		WARN_ON(nr_present + nr_others < numgrps);
+ 
+-- 
+2.40.1
 
