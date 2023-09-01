@@ -2,92 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2153ECA0FE1
-	for <linux-block@archiver.kernel.org>; Fri,  1 Sep 2023 13:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84744CA0FE1
+	for <linux-block@archiver.kernel.org>; Fri,  1 Sep 2023 13:50:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344951AbjIANsH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Sep 2023 09:48:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56578 "EHLO
+        id S243396AbjIANud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Sep 2023 09:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242737AbjIANsB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2023 09:48:01 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A24C3E77
-        for <linux-block@vger.kernel.org>; Fri,  1 Sep 2023 06:47:57 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-790b9d7d643so26388739f.1
-        for <linux-block@vger.kernel.org>; Fri, 01 Sep 2023 06:47:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1693576077; x=1694180877; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kmFqd0RbA0WcuZBMIdIT4BmUFRAQgFIypD312R8UhzU=;
-        b=RuAvsUp/vDVMqUrcJUNtWRXPsqan/zL3OT3gv3mLHMgRHgqE7soRLT3ll/CNacfta0
-         afAfDe5ViJRYQKJq7jM7TWyj7tDggyQr0CRjo1+B/Pq7TybY+L+4W8AZMMIucKQWDpoq
-         ELHwuiKzAo8UaQqXxBmDTf6WUSz+ztAmcq4ZaIQ+LGkqtCNABqPkSBiIIM89aycytS2d
-         aHCl6qr5NHXZdEe5elGFsieIJEfUFsyNlobkRWm00cxqkP1Zrmk/xPRuJDRkwsyYmExH
-         D7REQTgu9aeBkLgRr4BUNgejieJL2ASBfbK02iqXNlsKzbB24nrhXRdtVOm1IOYdEtt7
-         gb9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693576077; x=1694180877;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kmFqd0RbA0WcuZBMIdIT4BmUFRAQgFIypD312R8UhzU=;
-        b=j8hw+cnnRi/mpmwGf6PzWstfi+7OrHQEVSMf3hG0aipHurB9wxIfucWJfKQuEnwl0V
-         k9F/1CxPvNQ5slBlu7lEG/+fekX83Q8dOn03YFgD+/GhA/3682oAO+YgLRU4RlhiTqrg
-         xTVVbeLJsWsZS+0V7GUnT46iIVeAaXcg643KqU5wr3bc9DT2YWJS+84LsJPltLuSoRwx
-         ixV1vB2E1lRlhZ/z3BR8uuRPAwAIBqo/1qXd3HRaNsH3/6Wpk/vPYI4kZbyP6bcg8f6H
-         WwJauFiwAhUzfIJStVuQ+v3u+iGYmEnBDpiOl3t66OouIuIsC3kw02MtX2+bsKopUpts
-         Rjfg==
-X-Gm-Message-State: AOJu0YxdoH+jX3TMJ7+z4Y1Dhb2ZRsJN3Jz+c8qsUdcogLDCfSNymiZD
-        qzzNs9MuCRXzMNu9HvMgvE/d8hfs3nVHoXlfDR0=
-X-Google-Smtp-Source: AGHT+IFS0So0giDhkiP6ZhQSrxon+4wrCd3spsAFzBK1P7OazDHtwnuCVD59lDg796XOVHb/T4eHow==
-X-Received: by 2002:a05:6602:1a0c:b0:792:6068:dcc8 with SMTP id bo12-20020a0566021a0c00b007926068dcc8mr2692241iob.2.1693576077039;
-        Fri, 01 Sep 2023 06:47:57 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id u4-20020a6b4904000000b0079216d6f219sm1065493iob.14.2023.09.01.06.47.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Sep 2023 06:47:55 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     Stefan Haberland <sth@linux.ibm.com>,
-        =?utf-8?q?Jan_H=C3=B6ppner?= <hoeppner@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        with ESMTP id S237729AbjIANud (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2023 09:50:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 192E2CFE
+        for <linux-block@vger.kernel.org>; Fri,  1 Sep 2023 06:49:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693576182;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Z24PZDN6ru0TVORNHrW6hru4yPU6KUQBQaeDmzMdlL8=;
+        b=IfSGIjvosFiVbjdYaDvsBYQfl8z/GvXqSBxMW/Fd5ECqccEBgiJ6HQgkmBtXT7fZyngqDo
+        aRY2cTv8V82OulGihyFqVq1JDMOeWjuJ/vmWzAxfG7LDrsG3osZ+WZVpl3jh2grTj9YH1U
+        fldib2GAjop8HYdV/k3PfnixXd8evOg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-455-6Qs2l5ZYPEeV0j2bHRMTmA-1; Fri, 01 Sep 2023 09:49:41 -0400
+X-MC-Unique: 6Qs2l5ZYPEeV0j2bHRMTmA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9F83E800193;
+        Fri,  1 Sep 2023 13:49:40 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AE95412F2CE;
+        Fri,  1 Sep 2023 13:49:38 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
         linux-block@vger.kernel.org
-In-Reply-To: <20230828153142.2843753-1-hca@linux.ibm.com>
-References: <20230828153142.2843753-1-hca@linux.ibm.com>
-Subject: Re: [PATCH 0/1] s390/dasd: fix string length handling
-Message-Id: <169357607517.292044.9672490907419732432.b4-ty@kernel.dk>
-Date:   Fri, 01 Sep 2023 07:47:55 -0600
+Cc:     David Howells <dhowells@redhat.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2] io_uring: fix IO hang in io_wq_put_and_exit from do_exit()
+Date:   Fri,  1 Sep 2023 21:49:16 +0800
+Message-Id: <20230901134916.2415386-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+io_wq_put_and_exit() is called from do_exit(), but all FIXED_FILE requests
+in io_wq aren't canceled in io_uring_cancel_generic() called from do_exit().
+Meantime io_wq IO code path may share resource with normal iopoll code
+path.
 
-On Mon, 28 Aug 2023 17:31:41 +0200, Heiko Carstens wrote:
-> since both Stefan and Jan are not available, I'm sending a simple fix
-> to address a valid clang finding. Since I expect more reports and
-> patches for this, I'm sending this now in order to avoid that more
-> people spend time on this.
-> 
-> Please apply.
-> 
-> [...]
+So if any HIPRI request is submittd via io_wq, this request may not get resouce
+for moving on, given iopoll isn't possible in io_wq_put_and_exit().
 
-Applied, thanks!
+The issue can be triggered when terminating 't/io_uring -n4 /dev/nullb0'
+with default null_blk parameters.
 
-[1/1] s390/dasd: fix string length handling
-      commit: f7cf22424665043787a96a66a048ff6b2cfd473c
+Fix it by always cancelling all requests in io_wq by adding helper of
+io_uring_cancel_wq(), and this way is reasonable because io_wq destroying
+follows canceling requests immediately.
 
-Best regards,
+Closes: https://lore.kernel.org/linux-block/3893581.1691785261@warthog.procyon.org.uk/
+Reported-by: David Howells <dhowells@redhat.com>
+Cc: Chengming Zhou <zhouchengming@bytedance.com>,
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- avoid to mess up io_uring_cancel_generic() by adding one new
+	  helper for canceling io_wq requests
+
+ io_uring/io_uring.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index f4591b912ea8..7b3518f96c3b 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -3298,6 +3298,37 @@ static s64 tctx_inflight(struct io_uring_task *tctx, bool tracked)
+ 	return percpu_counter_sum(&tctx->inflight);
+ }
+ 
++static void io_uring_cancel_wq(struct io_uring_task *tctx)
++{
++	int ret;
++
++	if (!tctx->io_wq)
++		return;
++
++	/*
++	 * FIXED_FILE request isn't tracked in do_exit(), and these
++	 * requests may be submitted to our io_wq as iopoll, so have to
++	 * cancel them before destroying io_wq for avoiding IO hang
++	 */
++	do {
++		struct io_tctx_node *node;
++		unsigned long index;
++
++		ret = 0;
++		xa_for_each(&tctx->xa, index, node) {
++			struct io_ring_ctx *ctx = node->ctx;
++			struct io_task_cancel cancel = { .task = current, .all = true, };
++			enum io_wq_cancel cret;
++
++			io_iopoll_try_reap_events(ctx);
++			cret = io_wq_cancel_cb(tctx->io_wq, io_cancel_task_cb,
++				       &cancel, true);
++			ret |= (cret != IO_WQ_CANCEL_NOTFOUND);
++			cond_resched();
++		}
++	} while (ret);
++}
++
+ /*
+  * Find any io_uring ctx that this task has registered or done IO on, and cancel
+  * requests. @sqd should be not-null IFF it's an SQPOLL thread cancellation.
+@@ -3369,6 +3400,7 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
+ 		finish_wait(&tctx->wait, &wait);
+ 	} while (1);
+ 
++	io_uring_cancel_wq(tctx);
+ 	io_uring_clean_tctx(tctx);
+ 	if (cancel_all) {
+ 		/*
 -- 
-Jens Axboe
-
-
+2.41.0
 
