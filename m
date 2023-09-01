@@ -2,146 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0849CA0FE6
-	for <linux-block@archiver.kernel.org>; Fri,  1 Sep 2023 12:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F8BCA0FE6
+	for <linux-block@archiver.kernel.org>; Fri,  1 Sep 2023 13:39:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349329AbjIAMEU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Sep 2023 08:04:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39844 "EHLO
+        id S242518AbjIANjG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Sep 2023 09:39:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347095AbjIAMET (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2023 08:04:19 -0400
-Received: from out-234.mta1.migadu.com (out-234.mta1.migadu.com [IPv6:2001:41d0:203:375::ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A88FCB5
-        for <linux-block@vger.kernel.org>; Fri,  1 Sep 2023 05:04:13 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1693569852;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HLsG099Z2LegFBqk4mtUwChsd4QinWx9wD5fWTNkaI0=;
-        b=cEzT2wEtNwyib/T1LXzCcsLjzrQCkNSLIQREK9UH61WZNAU8CFhI8VxOMfeXm0O88MTUzq
-        Lb4VU8ROjRPl7NrjaUQut59r5VfLg7Ci5Mls8E0kKgzSDL4h0Cu3f3Wp7e1bE9pgPvQMSo
-        icYGd/MZt37OQbcd6ib5/KV+CisQeLQ=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhouchengming@bytedance.com, dhowells@redhat.com
-Subject: [PATCH v2 1/1] null_blk: fix poll request timeout handling
-Date:   Fri,  1 Sep 2023 20:03:06 +0800
-Message-ID: <20230901120306.170520-2-chengming.zhou@linux.dev>
-In-Reply-To: <20230901120306.170520-1-chengming.zhou@linux.dev>
-References: <20230901120306.170520-1-chengming.zhou@linux.dev>
+        with ESMTP id S233098AbjIANjF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2023 09:39:05 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AF7E4C;
+        Fri,  1 Sep 2023 06:39:02 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 381DccGm019319;
+        Fri, 1 Sep 2023 13:38:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=lKatZ2/Cc1BaS6JWQPOwLl2JiazNzu2oTp+AqekD1Gw=;
+ b=nPUPDwzE1o8ECB4vda46e+WkrWpPMPGrr/Xbre62W97Xd1lGa2Tfngy4h9d3vDKqeOgy
+ VRPeWGrOiACpydUEp6DQzP1hLERvzvs1iTtZwQq5vCV4kyJzlNBMRUKdp0TOL9zFdKUu
+ nDjLub+j4hat6JrOL1lKE01LwcBWSavpupo/ZB8s3D91gL5/P4vu0cJRTZsRDv1RM8pS
+ vnbqKQPY78EWgDk5Wxqy4FluSc4zf/qz1vBAS6EDOiVK9hM0S+YTRgJqRjzkXFBmJyA9
+ 3oMR8wPFuCAeCtNM3WZsirIClJPe27Vj+BlO5iB0O+rlE/F880PyFdpHuXwkC1aET93O Fw== 
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sugcbhfrk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Sep 2023 13:38:58 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 381CED7v004928;
+        Fri, 1 Sep 2023 13:38:57 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3squqtddf5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Sep 2023 13:38:57 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 381DcsXY46203326
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Sep 2023 13:38:54 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2FA392004B;
+        Fri,  1 Sep 2023 13:38:54 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CEE4E20043;
+        Fri,  1 Sep 2023 13:38:53 +0000 (GMT)
+Received: from osiris (unknown [9.171.88.193])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Fri,  1 Sep 2023 13:38:53 +0000 (GMT)
+Date:   Fri, 1 Sep 2023 15:38:52 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Stefan Haberland <sth@linux.ibm.com>,
+        Jan =?iso-8859-1?Q?H=F6ppner?= <hoeppner@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/1] s390/dasd: fix string length handling
+Message-ID: <20230901133852.5990-A-hca@linux.ibm.com>
+References: <20230828153142.2843753-1-hca@linux.ibm.com>
+ <20230828153142.2843753-2-hca@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230828153142.2843753-2-hca@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aao6eX7HV6tUxRH2llbjf0RVoPlzK54R
+X-Proofpoint-ORIG-GUID: aao6eX7HV6tUxRH2llbjf0RVoPlzK54R
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-01_11,2023-08-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=956 mlxscore=0
+ suspectscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
+ definitions=main-2309010127
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+Hi Jens,
 
-When doing io_uring benchmark on /dev/nullb0, it's easy to crash the
-kernel if poll requests timeout triggered, as reported by David. [1]
+On Mon, Aug 28, 2023 at 05:31:42PM +0200, Heiko Carstens wrote:
+> Building dasd_eckd.o with latest clang reveals this bug:
+> 
+>     CC      drivers/s390/block/dasd_eckd.o
+>       drivers/s390/block/dasd_eckd.c:1082:3: warning: 'snprintf' will always be truncated;
+>       specified size is 1, but format string expands to at least 11 [-Wfortify-source]
+>        1082 |                 snprintf(print_uid, sizeof(*print_uid),
+>             |                 ^
+>       drivers/s390/block/dasd_eckd.c:1087:3: warning: 'snprintf' will always be truncated;
+>       specified size is 1, but format string expands to at least 10 [-Wfortify-source]
+>        1087 |                 snprintf(print_uid, sizeof(*print_uid),
+>             |                 ^
+> 
+> Fix this by moving and using the existing UID_STRLEN for the arrays
+> that are being written to. Also rename UID_STRLEN to DASD_UID_STRLEN
+> to clarify its scope.
+> 
+> Fixes: 23596961b437 ("s390/dasd: split up dasd_eckd_read_conf")
+> Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+> ---
+>  drivers/s390/block/dasd_devmap.c |  6 +-----
+>  drivers/s390/block/dasd_eckd.c   | 10 +++++-----
+>  drivers/s390/block/dasd_int.h    |  4 ++++
+>  3 files changed, 10 insertions(+), 10 deletions(-)
 
-BUG: kernel NULL pointer dereference, address: 0000000000000008
-Workqueue: kblockd blk_mq_timeout_work
-RIP: 0010:null_timeout_rq+0x4e/0x91
-Call Trace:
- ? null_timeout_rq+0x4e/0x91
- blk_mq_handle_expired+0x31/0x4b
- bt_iter+0x68/0x84
- ? bt_tags_iter+0x81/0x81
- __sbitmap_for_each_set.constprop.0+0xb0/0xf2
- ? __blk_mq_complete_request_remote+0xf/0xf
- bt_for_each+0x46/0x64
- ? __blk_mq_complete_request_remote+0xf/0xf
- ? percpu_ref_get_many+0xc/0x2a
- blk_mq_queue_tag_busy_iter+0x14d/0x18e
- blk_mq_timeout_work+0x95/0x127
- process_one_work+0x185/0x263
- worker_thread+0x1b5/0x227
-
-This is indeed a race problem between null_timeout_rq() and null_poll().
-
-null_poll()				null_timeout_rq()
-  spin_lock(&nq->poll_lock)
-  list_splice_init(&nq->poll_list, &list)
-  spin_unlock(&nq->poll_lock)
-
-  while (!list_empty(&list))
-    req = list_first_entry()
-    list_del_init()
-    ...
-    blk_mq_add_to_batch()
-    // req->rq_next = NULL
-					spin_lock(&nq->poll_lock)
-
-					// rq->queuelist->next == NULL
-					list_del_init(&rq->queuelist)
-
-					spin_unlock(&nq->poll_lock)
-
-Fix these problems by setting requests state to MQ_RQ_COMPLETE under
-nq->poll_lock protection, in which null_timeout_rq() can safely detect
-this race and early return.
-
-Note this patch just fix the kernel panic when request timeout happen.
-
-[1] https://lore.kernel.org/all/3893581.1691785261@warthog.procyon.org.uk/
-
-Fixes: 0a593fbbc245 ("null_blk: poll queue support")
-Reported-by: David Howells <dhowells@redhat.com>
-Tested-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- drivers/block/null_blk/main.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 864013019d6b..968090935eb2 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1643,9 +1643,12 @@ static int null_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- 	struct nullb_queue *nq = hctx->driver_data;
- 	LIST_HEAD(list);
- 	int nr = 0;
-+	struct request *rq;
- 
- 	spin_lock(&nq->poll_lock);
- 	list_splice_init(&nq->poll_list, &list);
-+	list_for_each_entry(rq, &list, queuelist)
-+		blk_mq_set_request_complete(rq);
- 	spin_unlock(&nq->poll_lock);
- 
- 	while (!list_empty(&list)) {
-@@ -1671,16 +1674,21 @@ static enum blk_eh_timer_return null_timeout_rq(struct request *rq)
- 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
- 	struct nullb_cmd *cmd = blk_mq_rq_to_pdu(rq);
- 
--	pr_info("rq %p timed out\n", rq);
--
- 	if (hctx->type == HCTX_TYPE_POLL) {
- 		struct nullb_queue *nq = hctx->driver_data;
- 
- 		spin_lock(&nq->poll_lock);
-+		/* The request may have completed meanwhile. */
-+		if (blk_mq_request_completed(rq)) {
-+			spin_unlock(&nq->poll_lock);
-+			return BLK_EH_DONE;
-+		}
- 		list_del_init(&rq->queuelist);
- 		spin_unlock(&nq->poll_lock);
- 	}
- 
-+	pr_info("rq %p timed out\n", rq);
-+
- 	/*
- 	 * If the device is marked as blocking (i.e. memory backed or zoned
- 	 * device), the submission path may be blocked waiting for resources
--- 
-2.41.0
-
+Just wondering, will you pick this one up, or should I route this via
+the s390 tree?
