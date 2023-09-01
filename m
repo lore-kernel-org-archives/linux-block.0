@@ -2,231 +2,227 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B84CA0FE2
-	for <linux-block@archiver.kernel.org>; Fri,  1 Sep 2023 02:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23EE6CA0FE1
+	for <linux-block@archiver.kernel.org>; Fri,  1 Sep 2023 04:02:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348132AbjIACR5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Aug 2023 22:17:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53752 "EHLO
+        id S232502AbjIAECV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Sep 2023 00:02:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237340AbjIACR5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2023 22:17:57 -0400
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A343AE6F
-        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 19:17:31 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id 71dfb90a1353d-48d0ceedda1so574007e0c.3
-        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 19:17:31 -0700 (PDT)
+        with ESMTP id S232098AbjIAECU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2023 00:02:20 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8FDEE49
+        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2023 21:02:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1693540937; x=1725076937;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=XNvDkD0aFZd5Eg8jChpGLysAk7O/7e4aKnpI0GqLt50=;
+  b=h4zVZ0OJK1cyID6i0cWnOGAGAg3AgLKf2VzYF169FKvL/51EUxYmnNJr
+   88JAmo9VsFVcmUUVtiuAP2EfHl+bcMQ69iQ4LeBxHadnwzI0Z/I445RWi
+   xHeH8460OD8PMlmaue9uxpaVm67RfcS3ONP24qcM9POMnZGtZNohexs7C
+   QjQDJVOwxrbsUKes42/bxts/GZee6ZxQzYJnQT1AVZsQVvKIMcaVXqu0h
+   /putOjJmE5P4eYOuGx60ehQvAJaeWEEHh3my2aP+mW8A4/vUvtGfym5F1
+   YOPtMoGBZxnhtDU9bx6AfJypIf5v3UauzflZY53K/AejDJZcCsRuBRbAM
+   w==;
+X-IronPort-AV: E=Sophos;i="6.02,218,1688400000"; 
+   d="scan'208";a="347929397"
+Received: from mail-dm6nam11lp2168.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.168])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Sep 2023 12:02:16 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eKxvvCpmUYhBRNAbOEMW5iXYwX2zT1sLtppSrkVZpF+C5HK1lm8r5nkCarhgK9QvLgnowEEW1IhvPcx2+ODvMN/wity/sbiujla6ta4NjJ3/ZBsSk91JB1jVDZ+a4mN0+AFnpgl1Y9VJzOZotbCEF/sHYULy+XC1H0+YY1/HCA2JiztumHT/xB91RUR4v05d4S3MubIKGVDln8QVivA2boJukrfi0aP1vAQCTcLzH1L4cpCliGb9l5Hyr7wwcCbis3NpyZxy2d8I7zLDG8fnDpbKlcQOG32qXqKLavt9i/GdG13go+yHvW5IqDEEfHFL4xzRM094hOln+yOJRzxDbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Og8EODvPIuz391u95sQPaoXBcUkwp9M+3r40JlJUqEI=;
+ b=k3YoUMq2Vnx6NTsnEZN0LeTr9L44sZ8LOxNVscGQNEcplINDOP3JhqaIUggWLZHiX6ca65B9cPv9Ue17uw6NFZKPF5jcr9jV4EVQz0UcGgK3xiKcGejkBbZUlD5uNrOQDh3K31uFF1AJ0NYE+xAVbjynxtVeuBpUwbhrZ0yAqNX1/cEUxpIgcigYHg4aFk3gctVusH4zvacJekvFhgs5KowRBK3mehkcSj1VXmNwM5YRci5LA8KMOYBHqm+SNezTB8wqIhh6tsTrPwlyVBBTfGAT1BVHYm7qUn4eTfzmfEmftR4Kqh8XQ9xqqzO26LsVrrx/gRdY+DuCJhPXGhJxHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1693534650; x=1694139450; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vJKYt94JdvO0pZ7fwwTOPf0qYRDlnD5VJs9iA54kUak=;
-        b=a3kDFdu/PngKcxRT+TeKVg067EAHm+dTbO9I+3/jDO1Cn2scbfsuRg1hnwrAE7g8+D
-         YZ5iZZKj1bzaPuT66JH+sPYCgh+QLbvHExocQgvsQH4lr//lbreofvan+Z9+D4+4GHYd
-         ScEupctEij/yTMMeqYAmu353M6GL452mrDWNT9oShxk/9cNCKgnXReTNVcxmMtpbfPP2
-         czDq5X4KdyiQonkqqICFUGYFxxHF/Vn91dL38EMyU1UUatYlMWMyp5MB39uzZAAGKOL0
-         mhFHFg7pVbCi2Dl6eSLZQQ5vh0ngAh4K1xaaUON5xgE2OxQsAaV3yTD5+R+4tnOxVlhQ
-         r3Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693534650; x=1694139450;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vJKYt94JdvO0pZ7fwwTOPf0qYRDlnD5VJs9iA54kUak=;
-        b=VJaGsltLZUbJwjH/huj5RlZu53H9IHFV9qJpq4CxMT0jwujV2xfEgxCUdR3J36OKZI
-         Mp8eRreX3GwaH93q1IjQZ4mbHMaKvhN1RlXtP3vggiieKZKf95/P1mPzDFjJQr28xv8w
-         6ZjW667Svr6PzrT74nD9x8ycFsX7L4PuLoCQfWL05H25dgR07Ic8mbocC1wprOENCSqU
-         l+lKLvYmFaicjGO1gzMZYH8l10bGtQBOvttP1NE2kftjrwkmMgloDt9c4Sc+wqoUl2IB
-         vDvJH0SjnSjgzKkJ2sknG+7u/7wu+9nBeCrg2POBh9Scht3kLrO6K0kU/8iAvnI+DYtt
-         G/tA==
-X-Gm-Message-State: AOJu0YzKCTaCNUAfiXIfdeOkPoh1P515Z304FrTzxk/yN6jK46i3j8gL
-        wkPjeO/GtSm6D+Bbttz9E8PqMg==
-X-Google-Smtp-Source: AGHT+IFpiAloiSx/uSnFsZHLgtWdf0wCS/tjAy7eTOinbvRKjhs9n/f8XPHixvnhIES9xBO5svMe7w==
-X-Received: by 2002:a1f:c9c3:0:b0:490:a0eb:1b9f with SMTP id z186-20020a1fc9c3000000b00490a0eb1b9fmr1244627vkf.10.1693534650658;
-        Thu, 31 Aug 2023 19:17:30 -0700 (PDT)
-Received: from [10.4.182.70] ([139.177.225.225])
-        by smtp.gmail.com with ESMTPSA id u191-20020a6379c8000000b0056368adf5e2sm1884113pgc.87.2023.08.31.19.17.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Aug 2023 19:17:30 -0700 (PDT)
-Message-ID: <22bde4fc-6dd8-e9de-5b28-96de14f51323@bytedance.com>
-Date:   Fri, 1 Sep 2023 10:17:25 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH] io_uring: fix IO hang in io_wq_put_and_exit from
- do_exit()
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Og8EODvPIuz391u95sQPaoXBcUkwp9M+3r40JlJUqEI=;
+ b=qsZ8tAlJL41NXn1wfcfRKgYkO1QKK9ANVAMQqqqP4fYi2+b6KdSQxQKzF9DwdFQN3kpjjxv6Qhwt1BkwD7lfnf6sjf4Z6FJx/jVKIIVE8JDRhJT6mf6pcBLSOxEh8Mrv1EHbfZ8TztqYZJmsHC46SVxZEneBdYkY+/+Ntbxdlv4=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ BY5PR04MB6422.namprd04.prod.outlook.com (2603:10b6:a03:1ee::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.14; Fri, 1 Sep
+ 2023 04:02:14 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::f92a:6d40:fe94:34e9]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::f92a:6d40:fe94:34e9%7]) with mapi id 15.20.6768.017; Fri, 1 Sep 2023
+ 04:02:14 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+CC:     linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [bug report] blktests nvme/043 nvme/045 failed
+Thread-Topic: [bug report] blktests nvme/043 nvme/045 failed
+Thread-Index: AQHZ2zRGpr+odBsX90y1YnPAmCZwELAFW8MA
+Date:   Fri, 1 Sep 2023 04:02:14 +0000
+Message-ID: <5h357gpm7i5yfp7hrem6x7eb5dcg7frpennafxh4j445p745ps@dwaw65x2vdp2>
+References: <CAHj4cs_eZWuYDmxi3T0WbkihLHJS6=36XGyx+xjE6JvgwRR-fA@mail.gmail.com>
+In-Reply-To: <CAHj4cs_eZWuYDmxi3T0WbkihLHJS6=36XGyx+xjE6JvgwRR-fA@mail.gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, David Howells <dhowells@redhat.com>
-References: <20230831074221.2309565-1-ming.lei@redhat.com>
- <7a083b4e-f9f3-552b-0e6c-32bf44982d8f@bytedance.com>
- <ZPFH1RArR07g+ldL@fedora>
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-In-Reply-To: <ZPFH1RArR07g+ldL@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BY5PR04MB6422:EE_
+x-ms-office365-filtering-correlation-id: 414fd7df-f9a4-4b6d-6551-08dbaaa039c7
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4gQAheuNQcPjgRwq57L0kQlNLWjAI28FJPxbjh27uWXeXxjunIWQxSubFOzdGeXq49qgYsFMc4wRA/hS6eFJ/IGmE8EnTSGEYQnjHzwlOQssKYQiVp0+aae2GK1pUhSp60kU/9DcGM82ZBUPE5Rf42unh5cNEKu9gspxIS7p4jop+K8rMKypOdEwGoeYTrUgoYhhZFeYeegzlPxx8dPq4hhAyJI36BsPZwY5Tu9TQjo+GJLGiAcjUvzP3EDEQVb/vvAK16eGOJnDjShyk69Gs1zgKE9l+lQqEdmF8+ERev5MYEye94OdBi2r+1pO99Z3gStcbJyt+fc+kkTZrlnfN/kvYeztYwBtLsSUsBSK30Nf2e9JInxc9HFD6wHM0u1oMfCpG4RmXfq9MrJhP5xprJiXYYQNw2QSB2ymzDZCpzbHmD4hozxyl47iQz2AmlGyikpu+AeKrfLmD8zSknauXuOfUtQGuhq0aVJEymyye8Qm+CsIJr+D6qy6L2ToFtbkL39NZeOcDPhVBOlPB452+0hOnwQv5B2HXv9IIeymw5Q7ZbOV5O6azuXFA2iuw9xe8iGeaa99xj1CWuxAzW4Ygkdv4YQmBYOl2St5ZL/uJO1l9S50sjHe6lBlSKmt/I3b
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(366004)(396003)(346002)(376002)(136003)(1800799009)(186009)(451199024)(9686003)(71200400001)(6512007)(6486002)(6506007)(82960400001)(86362001)(38070700005)(38100700002)(122000001)(2906002)(26005)(83380400001)(478600001)(91956017)(76116006)(66946007)(8936002)(54906003)(66476007)(8676002)(4326008)(44832011)(5660300002)(66556008)(66446008)(64756008)(41300700001)(6916009)(316002)(33716001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7pOpTHZM3z5J4I0qvQ6r6zNtQgqrslrautMBE8nLl+tay2BZigNx5gzq5lm7?=
+ =?us-ascii?Q?ceqCHkKN6jHrt70RLuxovQ4C9kKPfFcx208qTBjBUXLShdtYULZe7/ZAou7l?=
+ =?us-ascii?Q?BOugKAiez9IgmliLvQ3rtO5vOUuZot91xCTcl2n2r9BymesOm9BgDgDCNsAo?=
+ =?us-ascii?Q?o+Uh65eoRK1wRXoweprG0v/VsIz9Ebpbg/13mLfOS8Y157TyocaaJ7MXv0UE?=
+ =?us-ascii?Q?emd3Xx5WiZmkxxfvvzUIkUUAr5plRzd3SQho+4WQruNQxlEHKK0WQe74+biP?=
+ =?us-ascii?Q?Xv11HVYZNszFB01z7ApKLnK7MA586TiIU1tlM6yF66hmhssH8D7fpi/eeV+w?=
+ =?us-ascii?Q?p5SF5xSxLm1TBb55NmpA5D/7dhZc7qWtissmkpBTj3T/lYA1Yl3llw1wpmDH?=
+ =?us-ascii?Q?ljD4BzgujB1mTbAJ8niFDpTeuXyDxQeYTq/f6CeErF7lRXhdHF9VOEbjZ1ot?=
+ =?us-ascii?Q?srKrYWQOzmIAoZzZvEFaWg5EOXdhd9HGAjIHJVU+OV4UfmKBvG/zoz7v0aJB?=
+ =?us-ascii?Q?3MtPY41GukpgWH9VLwMIG4afstMB8yw5k99PHLlCAvHyKWbMFSViVhuub4jw?=
+ =?us-ascii?Q?7jAIdnPWD6C22WIM1e2+08L0TSI5lG6vdW3rIi4kwHkvVqpjyXRc4LCqrMrG?=
+ =?us-ascii?Q?D7a2pWqqUDWlQCHhB7xuEFFsnIEOh0UvmGYBdKkmz2QEVz2RgtM3Ia35cuYn?=
+ =?us-ascii?Q?NWUsizd+O5f1OfAmdXEMJYqkLheOrHyj9qHQta/zSYh9ZW1kslrXbPkEXxMB?=
+ =?us-ascii?Q?w5W1Yfmy8JWRN9QZgdSdao9YBBa/YwanMzjUl7hxNh7yRw7BEA2D2oS2b6Xy?=
+ =?us-ascii?Q?y0XEbg9H7FoMo9Q7+tkl7g3lZKOZYESMdtLyL3YxRlxC3uJBwsL0B3EGdYj+?=
+ =?us-ascii?Q?X30tzFaPvuVPq8RX1tLiFEchw5LoP2d75YFPGB5Nj8gy5jIZ9iXtd9iYDhaO?=
+ =?us-ascii?Q?3y5oYvsZfMI/rDVdllykrOPgE/YARZ96u/tquxRviZ7N/Al0HuMgMHK+HONH?=
+ =?us-ascii?Q?ASgALFK/FPhVKEeM3ZwzI366BsQaDQVllMxC3+YGlUeo8W1+13a25d9R6C0A?=
+ =?us-ascii?Q?sAA0ZYK76xTPEDpj1jM7+kdTyVEYrvadgm0d7i+Jd59wKjK8s/1RXxcPWqGj?=
+ =?us-ascii?Q?UH/XKjL0EWlhwJMkp+LmTlBTzm/o3pw20Hpv6gxCCPeEU03vf/of0wruGDwI?=
+ =?us-ascii?Q?Rxxxfl3RF+ctbNVjmZrLoaKYU+evTbc7lE2gG0L3lvmmKrf5e+ZTe6TCoyvU?=
+ =?us-ascii?Q?+DfmREgzY+mHymh9seqP9+ufmqp33dd09310CqVsmeYyNH4wLC66i+jr50MZ?=
+ =?us-ascii?Q?+57SQPXhK6Tf8DCEwMEnYrv6SnKx8vmLM8yuHpWLoVLHjVa27XACoIa80jAb?=
+ =?us-ascii?Q?/UPdPGIIC6ebmIZn7BLRqUyG8G67SizbkdwiJO4PCxj/cZoNqhyC0jw/IZvX?=
+ =?us-ascii?Q?jk+dyOijV37DLPA1kCg3Ypw3BW0Dqh7SniphVf//P5cn0+JdkNIsyLXTxgf4?=
+ =?us-ascii?Q?vVtJsV6jgJtCbEAQyIeVfGqILQV7eejecbibyPidKrbhKD0b68/LwQRj8gbq?=
+ =?us-ascii?Q?bDz2a1Xs8rXhhhKNXollZwimQuhEz+XMfMp+r6H4/wuUOtsrLHe+d+Il5I+l?=
+ =?us-ascii?Q?JFEE0TSfYfm2nEDEX6fadGU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <B051D8220CF1F840BE97C94AFCC0C576@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: +e31Cuqb/J9FmjH4HKj6tGEmUfcSdp4ZAPVemzmbkqbGCJ7WfiTGVRMyGehBvKbvJaH8E6jhfzUMDgwpS/B44hyldoyogpl3qZKwK09nwuhmMambr/l7RFuHW6Na+Vw3Q4miSmK48bEcV1KoQdA2d5i85p6cR6vAMBiHmT7CY/RW02Xwk/+OIjTrDXOGeGe/84yEUQzldIOQJKyWHgq7VQzsbCRtHjrmBMiO6RATXP9zSJwtZd88ZmRnT/WPwXB8bnMfkNSsdjG73uBgHrfkmHQX9DiBMY8otGDcEGdYJwVNvAvxPNmfpeiUJxE0nvmNrscyZjGfdaTQtkXphnQSnCeonzDiEyoBqW9vJcOQZvZBtX+9dAecI0+PUF28OmYKd5XKmAMZeAm3VDZL/37GnmOf2iixiHwwtWvYO/XNAd2vLscgYyyzgdJ0yzMTFJIIpWpfp6iFK/dMuN0/5OHbebGUwWAThNpP3yefztzyX0Fx5E9W8oHzsUwv9QAByX2An1QWzcl0JMprNaw5gS7fFc3ft8V8HFjqqZx9bbXe7H7aZ451IeoyLQr98N3Bj3OrVoeEEIHcag4CwfE20Sw7WvfjDyerVU7e9UFoaz2a0V3FfHK6dyDnD/zAP4+Y2ai9k9bZ7ItHeKISLpehX3lNcXYTntFCCFPj1jMp1L1kjzeOdUJHnMrYfP57Y5h4MeLpTcbNyZZKv0fBZneg329iNQapbnmiYk7UwY6lLTM2jkj0lIPk0xzWCQrMqWYnIjrNBcC7axJEi34hBwhoGRAuMgiaobfYndRW7SkBxgix99fsFOgTFrD24XjINYPeqiAEZDBuQmYGwF01SxFt+JBDcRlqQ16xtfL9jtKp/EzBr7SwXSBW30CBp670a0sXrxv2
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 414fd7df-f9a4-4b6d-6551-08dbaaa039c7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Sep 2023 04:02:14.3413
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QGQz0/zFK0BBQgmtXx5HdSYsu/O241E007fDCHYilsLKfXjs7fi/866XBuW+g4GnwPfQw8Gk/cVj786+JVnfI08HiBTsAuAldF5wQ5r39yk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6422
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/9/1 10:09, Ming Lei wrote:
-> On Fri, Sep 01, 2023 at 09:50:02AM +0800, Chengming Zhou wrote:
->> On 2023/8/31 15:42, Ming Lei wrote:
->>> io_wq_put_and_exit() is called from do_exit(), but all requests in io_wq
->>> aren't cancelled in io_uring_cancel_generic() called from do_exit().
->>> Meantime io_wq IO code path may share resource with normal iopoll code
->>> path.
->>>
->>> So if any HIPRI request is pending in io_wq_submit_work(), this request
->>> may not get resouce for moving on, given iopoll isn't possible in
->>> io_wq_put_and_exit().
->>>
->>> The issue can be triggered when terminating 't/io_uring -n4 /dev/nullb0'
->>> with default null_blk parameters.
->>>
->>> Fix it by always cancelling all requests in io_wq from io_uring_cancel_generic(),
->>> and this way is reasonable because io_wq destroying follows cancelling
->>> requests immediately. Based on one patch from Chengming.
->>
->> Thanks much for this work, I'm still learning these code, so maybe some
->> silly questions below.
->>
->>>
->>> Closes: https://lore.kernel.org/linux-block/3893581.1691785261@warthog.procyon.org.uk/
->>> Reported-by: David Howells <dhowells@redhat.com>
->>> Cc: Chengming Zhou <zhouchengming@bytedance.com>,
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>  io_uring/io_uring.c | 40 ++++++++++++++++++++++++++++------------
->>>  1 file changed, 28 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
->>> index e7675355048d..18d5ab969c29 100644
->>> --- a/io_uring/io_uring.c
->>> +++ b/io_uring/io_uring.c
->>> @@ -144,7 +144,7 @@ struct io_defer_entry {
->>>  
->>>  static bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
->>>  					 struct task_struct *task,
->>> -					 bool cancel_all);
->>> +					 bool cancel_all, bool *wq_cancelled);
->>>  
->>>  static void io_queue_sqe(struct io_kiocb *req);
->>>  
->>> @@ -3049,7 +3049,7 @@ static __cold void io_ring_exit_work(struct work_struct *work)
->>>  		if (ctx->flags & IORING_SETUP_DEFER_TASKRUN)
->>>  			io_move_task_work_from_local(ctx);
->>>  
->>> -		while (io_uring_try_cancel_requests(ctx, NULL, true))
->>> +		while (io_uring_try_cancel_requests(ctx, NULL, true, NULL))
->>>  			cond_resched();
->>>  
->>>  		if (ctx->sq_data) {
->>> @@ -3231,12 +3231,13 @@ static __cold bool io_uring_try_cancel_iowq(struct io_ring_ctx *ctx)
->>>  
->>>  static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
->>>  						struct task_struct *task,
->>> -						bool cancel_all)
->>> +						bool cancel_all, bool *wq_cancelled)
->>>  {
->>> -	struct io_task_cancel cancel = { .task = task, .all = cancel_all, };
->>> +	struct io_task_cancel cancel = { .task = task, .all = true, };
->>>  	struct io_uring_task *tctx = task ? task->io_uring : NULL;
->>>  	enum io_wq_cancel cret;
->>>  	bool ret = false;
->>> +	bool wq_active = false;
->>>  
->>>  	/* set it so io_req_local_work_add() would wake us up */
->>>  	if (ctx->flags & IORING_SETUP_DEFER_TASKRUN) {
->>> @@ -3249,7 +3250,7 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
->>>  		return false;
->>>  
->>>  	if (!task) {
->>> -		ret |= io_uring_try_cancel_iowq(ctx);
->>> +		wq_active = io_uring_try_cancel_iowq(ctx);
->>>  	} else if (tctx && tctx->io_wq) {
->>>  		/*
->>>  		 * Cancels requests of all rings, not only @ctx, but
->>> @@ -3257,11 +3258,20 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
->>>  		 */
->>>  		cret = io_wq_cancel_cb(tctx->io_wq, io_cancel_task_cb,
->>>  				       &cancel, true);
->>> -		ret |= (cret != IO_WQ_CANCEL_NOTFOUND);
->>> +		wq_active = (cret != IO_WQ_CANCEL_NOTFOUND);
->>>  	}
->>> +	ret |= wq_active;
->>> +	if (wq_cancelled)
->>> +		*wq_cancelled = !wq_active;
->>
->> Here it seems "wq_cancelled" means no any pending or running work anymore.
-> 
-> wq_cancelled means all requests in io_wq are canceled.
-> 
->>
->> Why not just use the return value "loop", instead of using this new "wq_cancelled"?
->>
->> If return value "loop" is true, we know there is still any request need to cancel,
->> so we will loop the cancel process until there is no any request.
->>
->> Ah, I guess you may want to cover one case: !wq_active && loop == true
-> 
-> If we just reply on 'loop', things could be like passing 'cancel_all' as
-> true, that might be over-kill. And I am still not sure why not canceling
-> all requests(cancel_all is true) in do_exit()?
-> 
+On Aug 30, 2023 / 19:22, Yi Zhang wrote:
+> Hello
+>=20
+> I found blkests nvme/043 nvme/045 failed on one of our x86_64 servers,
+> and it works on the other servers, from the log, it failed when
+> Testing DH group ffdhe6144 and ffdhe8192, is it hw limitation?
 
-Yes, I'm also confused by this. Could we just remove the "cancel_all"?
+Hannes, may I ask your comment? I have same guess as Yi.
 
-If we always cancel all requests, these code would be much simpler,
-and we can free task_ctx here, instead of in the last reference put
-of task_struct.
+If the DH groups ffdhe6144 and ffdhe8192 does not work always, I think chan=
+ges
+in nvme test cases will be required to avoid the failures. It could be some=
+thing
+like below (untested at all).
 
-> But here it is enough to cancel all requests in io_wq only for solving
-> this IO hang issue.
-
-Ok, get it.
-
-> 
->>
->>>  
->>> -	/* SQPOLL thread does its own polling */
->>> -	if ((!(ctx->flags & IORING_SETUP_SQPOLL) && cancel_all) ||
->>> +	/*
->>> +	 * SQPOLL thread does its own polling
->>> +	 *
->>> +	 * io_wq may share IO resources(such as requests) with iopoll, so
->>> +	 * iopoll requests have to be reapped for providing forward
->>> +	 * progress to io_wq cancelling
->>> +	 */
->>> +	if (!(ctx->flags & IORING_SETUP_SQPOLL) ||
->>>  	    (ctx->sq_data && ctx->sq_data->thread == current)) {
->>>  		while (!wq_list_empty(&ctx->iopoll_list)) {
->>>  			io_iopoll_try_reap_events(ctx);
->>> @@ -3313,11 +3323,12 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
->>>  	atomic_inc(&tctx->in_cancel);
->>>  	do {
->>>  		bool loop = false;
->>> +		bool wq_cancelled;
->>>  
->>>  		io_uring_drop_tctx_refs(current);
->>>  		/* read completions before cancelations */
->>>  		inflight = tctx_inflight(tctx, !cancel_all);
->>> -		if (!inflight)
->>> +		if (!inflight && !tctx->io_wq)
->>>  			break;
->>>  
->>
->> I think this inflight check should put after the cancel loop, because the
->> cancel loop make sure there is no any request need to cancel, then we can
->> loop inflight checking to make sure all inflight requests to complete.
-> 
-> But it is fine to break immediately in case that (!inflight && !tctx->io_wq) is true.
-> 
-
-This inflight will used after cancel, maybe some requests become inflight during cancel process?
-So we use a stale inflight value? I'm not sure.
-
-Thanks.
+diff --git a/tests/nvme/043 b/tests/nvme/043
+index c6a0aa0..81ccb1b 100755
+--- a/tests/nvme/043
++++ b/tests/nvme/043
+@@ -56,7 +56,12 @@ test() {
+=20
+ 		echo "Testing DH group ${dhgroup}"
+=20
+-		_set_nvmet_dhgroup "${def_hostnqn}" "${dhgroup}"
++		if ! _set_nvmet_dhgroup "${def_hostnqn}" "${dhgroup}" &&
++				[[ ${dhgroup} =3D=3D "ffdhe6144" ||
++					   ${dhgroup} =3D=3D "ffdhe8192" ]]; then
++			echo "DH group ${dhgroup} can not be set" >> "$FULL"
++			continue
++		fi
+=20
+ 		_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+ 				      --hostnqn "${def_hostnqn}" \
+diff --git a/tests/nvme/044 b/tests/nvme/044
+index 7bd43f3..3f11693 100755
+--- a/tests/nvme/044
++++ b/tests/nvme/044
+@@ -44,7 +44,10 @@ test() {
+ 	_nvmet_target_setup --blkdev file --ctrlkey "${ctrlkey}" \
+ 			    --hostkey "${hostkey}"
+=20
+-	_set_nvmet_dhgroup "${def_hostnqn}" "ffdhe2048"
++	if ! _set_nvmet_dhgroup "${def_hostnqn}" "ffdhe2048"; then
++		echo "failed to set DH group ffdhe2048"
++		return 1
++	fi
+=20
+ 	# Step 1: Connect with host authentication only
+ 	echo "Test host authentication"
+diff --git a/tests/nvme/045 b/tests/nvme/045
+index 1eb1032..8e17ef5 100755
+--- a/tests/nvme/045
++++ b/tests/nvme/045
+@@ -48,7 +48,10 @@ test() {
+ 	_nvmet_target_setup --blkdev file --ctrlkey "${ctrlkey}" \
+ 			    --hostkey "${hostkey}"
+=20
+-	_set_nvmet_dhgroup "${def_hostnqn}" "ffdhe2048"
++	if ! _set_nvmet_dhgroup "${def_hostnqn}" "ffdhe2048"; then
++		echo "failed to set DH group ffdhe2048"
++		return 1
++	fi
+=20
+ 	_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+ 			     --hostnqn "${def_hostnqn}" \
+@@ -88,7 +91,12 @@ test() {
+=20
+ 	echo "Change DH group to ffdhe8192"
+=20
+-	_set_nvmet_dhgroup "${def_hostnqn}" "ffdhe8192"
++	if ! _set_nvmet_dhgroup "${def_hostnqn}" "ffdhe8192"; then
++		SKIP_REASONS+=3D("can not change DH group to ffdhe8192")
++		_nvme_disconnect_subsys "${def_subsysnqn}"
++		_nvmet_target_cleanup
++		return
++	fi
+=20
+ 	echo "Re-authenticate with changed DH group"
+=20
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 1ec9eb6..46c8d60 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -803,8 +803,7 @@ _set_nvmet_dhgroup() {
+ 	local nvmet_dhgroup=3D"$2"
+ 	local cfs_path=3D"${NVMET_CFS}/hosts/${nvmet_hostnqn}"
+=20
+-	echo "${nvmet_dhgroup}" > \
+-	     "${cfs_path}/dhchap_dhgroup"
++	{ echo "${nvmet_dhgroup}" > "${cfs_path}/dhchap_dhgroup" ;} 2> /dev/null
+ }
+=20
+ _find_nvme_dev() {=
