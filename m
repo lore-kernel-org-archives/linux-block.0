@@ -2,133 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84744CA0FE1
-	for <linux-block@archiver.kernel.org>; Fri,  1 Sep 2023 13:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E9AFCA0FE5
+	for <linux-block@archiver.kernel.org>; Fri,  1 Sep 2023 14:19:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243396AbjIANud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Sep 2023 09:50:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57722 "EHLO
+        id S238849AbjIAOTD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Sep 2023 10:19:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237729AbjIANud (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2023 09:50:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 192E2CFE
-        for <linux-block@vger.kernel.org>; Fri,  1 Sep 2023 06:49:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1693576182;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Z24PZDN6ru0TVORNHrW6hru4yPU6KUQBQaeDmzMdlL8=;
-        b=IfSGIjvosFiVbjdYaDvsBYQfl8z/GvXqSBxMW/Fd5ECqccEBgiJ6HQgkmBtXT7fZyngqDo
-        aRY2cTv8V82OulGihyFqVq1JDMOeWjuJ/vmWzAxfG7LDrsG3osZ+WZVpl3jh2grTj9YH1U
-        fldib2GAjop8HYdV/k3PfnixXd8evOg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-455-6Qs2l5ZYPEeV0j2bHRMTmA-1; Fri, 01 Sep 2023 09:49:41 -0400
-X-MC-Unique: 6Qs2l5ZYPEeV0j2bHRMTmA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9F83E800193;
-        Fri,  1 Sep 2023 13:49:40 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.15])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AE95412F2CE;
-        Fri,  1 Sep 2023 13:49:38 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2] io_uring: fix IO hang in io_wq_put_and_exit from do_exit()
-Date:   Fri,  1 Sep 2023 21:49:16 +0800
-Message-Id: <20230901134916.2415386-1-ming.lei@redhat.com>
+        with ESMTP id S232827AbjIAOTC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2023 10:19:02 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D8210EC
+        for <linux-block@vger.kernel.org>; Fri,  1 Sep 2023 07:18:59 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-760dff4b701so17760539f.0
+        for <linux-block@vger.kernel.org>; Fri, 01 Sep 2023 07:18:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1693577938; x=1694182738; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oKW1nBpS9Q1X56VwSVFjCsUpOjQeYfRziNFoaW07QFU=;
+        b=OdyR2l3NjsHiGUqHvapLNx/ge4OdMUccs7484R+VEENqMDBqwgke3wB1WFBqSU013n
+         vkfDVhWFAKOjr9QHFbQRr6GgG0UQR5QlYM/bmHgwObTcUJOTHCz0OIgsZoIdlUU45UFN
+         1W+EbHzq69HXnWIVbCPR040dKrlXlGtDIItpzm82HEgy4tq0jMSSEouA2lil2dU0QXnF
+         TT5Nk+EGPSpFXBzS1PcrXYzHr81jBq7haxC47aHCeciQB9KHBWrEf9fISs7EeDZ+VZJe
+         /aQqo0OgiINXa01r7YBbHoxP2FfIdZCYItKN0umlA7vijIoHCEig2C+uNeYWAlWZfMKi
+         TNGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693577938; x=1694182738;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oKW1nBpS9Q1X56VwSVFjCsUpOjQeYfRziNFoaW07QFU=;
+        b=G2Jp6gBMRIV0ti3CsggrD2mmBLce9L+pn8xPbymASgd9FXEczBzX2eXP9ADV1i91FN
+         WFJyHzZoHyEr21NIdKG+8JxXwUoQlcf6NbN8dlkhOThf6bBjY+drY7F3kA9+0cY+JZhG
+         LVBPf9DDSSYHM9/NWMZW4vcx/0OHLtdSDPoqwy9XWdnt/m965Le0iOtgB23XQmh9AmBU
+         tXZHz4+a+4dxN5Lts3CBZQzjyCiq3VhvuIaCZFjcTaPad+3nK99qfZStgkwZDguXE0CO
+         hF5AeS0u2OnVQlt/Xr7QX8Ay7WG0aE8qkU7n8ypSsTWSw0bJ/6vR3+AhlvS5Jk6B9Ekz
+         fQsg==
+X-Gm-Message-State: AOJu0Yxi1VXFG6/FpqnunmBA71GMFD3+s/xQrKEIvY4TVsklkRtyrM0e
+        uux/n5eab9YJl9/XXkOyf0aNUFjflwnU3ackkA0SFg==
+X-Google-Smtp-Source: AGHT+IG0FShxW6UI1rD4z3lHhMt+9RIs9nN9WfcpkcaP7pSgzZyph0R8n1EkmyMxNwZ7byZTuhPHtw==
+X-Received: by 2002:a6b:1495:0:b0:790:958e:a667 with SMTP id 143-20020a6b1495000000b00790958ea667mr2645886iou.2.1693577938521;
+        Fri, 01 Sep 2023 07:18:58 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id fq24-20020a056638651800b004182f88c368sm1080139jab.67.2023.09.01.07.18.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Sep 2023 07:18:57 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     ming.lei@redhat.com, chengming.zhou@linux.dev
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com, dhowells@redhat.com
+In-Reply-To: <20230901120306.170520-1-chengming.zhou@linux.dev>
+References: <20230901120306.170520-1-chengming.zhou@linux.dev>
+Subject: Re: [PATCH v2 0/1] block/null_blk: fix poll request timeout panic
+Message-Id: <169357793753.310999.18144823981209368799.b4-ty@kernel.dk>
+Date:   Fri, 01 Sep 2023 08:18:57 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-io_wq_put_and_exit() is called from do_exit(), but all FIXED_FILE requests
-in io_wq aren't canceled in io_uring_cancel_generic() called from do_exit().
-Meantime io_wq IO code path may share resource with normal iopoll code
-path.
 
-So if any HIPRI request is submittd via io_wq, this request may not get resouce
-for moving on, given iopoll isn't possible in io_wq_put_and_exit().
+On Fri, 01 Sep 2023 20:03:05 +0800, chengming.zhou@linux.dev wrote:
+> Changes in v2:
+>  - Improve the commit message a little.
+>  - Add Tested-by from David Howells and Reviewed-by from Ming Lei.
+> 
+> The 't/io_uring -n4 /dev/nullb0' is easy to trigger poll request timeout,
+> then panic the kernel.
+> 
+> [...]
 
-The issue can be triggered when terminating 't/io_uring -n4 /dev/nullb0'
-with default null_blk parameters.
+Applied, thanks!
 
-Fix it by always cancelling all requests in io_wq by adding helper of
-io_uring_cancel_wq(), and this way is reasonable because io_wq destroying
-follows canceling requests immediately.
+[1/1] null_blk: fix poll request timeout handling
+      commit: 5a26e45edb4690d58406178b5a9ea4c6dcf2c105
 
-Closes: https://lore.kernel.org/linux-block/3893581.1691785261@warthog.procyon.org.uk/
-Reported-by: David Howells <dhowells@redhat.com>
-Cc: Chengming Zhou <zhouchengming@bytedance.com>,
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- avoid to mess up io_uring_cancel_generic() by adding one new
-	  helper for canceling io_wq requests
-
- io_uring/io_uring.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
-
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index f4591b912ea8..7b3518f96c3b 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -3298,6 +3298,37 @@ static s64 tctx_inflight(struct io_uring_task *tctx, bool tracked)
- 	return percpu_counter_sum(&tctx->inflight);
- }
- 
-+static void io_uring_cancel_wq(struct io_uring_task *tctx)
-+{
-+	int ret;
-+
-+	if (!tctx->io_wq)
-+		return;
-+
-+	/*
-+	 * FIXED_FILE request isn't tracked in do_exit(), and these
-+	 * requests may be submitted to our io_wq as iopoll, so have to
-+	 * cancel them before destroying io_wq for avoiding IO hang
-+	 */
-+	do {
-+		struct io_tctx_node *node;
-+		unsigned long index;
-+
-+		ret = 0;
-+		xa_for_each(&tctx->xa, index, node) {
-+			struct io_ring_ctx *ctx = node->ctx;
-+			struct io_task_cancel cancel = { .task = current, .all = true, };
-+			enum io_wq_cancel cret;
-+
-+			io_iopoll_try_reap_events(ctx);
-+			cret = io_wq_cancel_cb(tctx->io_wq, io_cancel_task_cb,
-+				       &cancel, true);
-+			ret |= (cret != IO_WQ_CANCEL_NOTFOUND);
-+			cond_resched();
-+		}
-+	} while (ret);
-+}
-+
- /*
-  * Find any io_uring ctx that this task has registered or done IO on, and cancel
-  * requests. @sqd should be not-null IFF it's an SQPOLL thread cancellation.
-@@ -3369,6 +3400,7 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
- 		finish_wait(&tctx->wait, &wait);
- 	} while (1);
- 
-+	io_uring_cancel_wq(tctx);
- 	io_uring_clean_tctx(tctx);
- 	if (cancel_all) {
- 		/*
+Best regards,
 -- 
-2.41.0
+Jens Axboe
+
+
 
