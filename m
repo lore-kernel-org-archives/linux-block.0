@@ -2,140 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5C7C88CB2
-	for <linux-block@archiver.kernel.org>; Sun,  3 Sep 2023 22:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C31A1C71153
+	for <linux-block@archiver.kernel.org>; Sun,  3 Sep 2023 23:51:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348521AbjICWbF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Sep 2023 18:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42956 "EHLO
+        id S237486AbjICXvn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Sep 2023 19:51:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236441AbjICWa7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Sep 2023 18:30:59 -0400
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3BC8FC
-        for <linux-block@vger.kernel.org>; Sun,  3 Sep 2023 15:30:55 -0700 (PDT)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1cc87405650so783578fac.2
-        for <linux-block@vger.kernel.org>; Sun, 03 Sep 2023 15:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1693780255; x=1694385055; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nv6YpToDNZJcA/Ccz8YHJKQ8zE37n7OYKvDh05ivZ8M=;
-        b=eLvFMZ6HweV3i75Mje3KyiQMHp72f3fVYJp4X8QBR1sUoWt5LbUe2oYe6gz7J03xSV
-         aHsv7iDil4KTnD32vRddboJhyW5dIQThpWZBfmdQlNdU/+SQKnZqTkI+8YNmhDFqSNM4
-         M/5uOEBZigGEpPC3vmfjiwnDFOd47IixsMl044OpUX7QG234XdFYwtba/jPyi6PCo/kZ
-         okP+nX6zzbLjyilv/Ocy1qCe5aC4gkdgDOfyh92JWGe8bVg+DmwjlPuuV3kM/V8mAkRG
-         YMrGVWwsvVs5uRT8A9BN8JD3DAOcyXyqtn49LxBGuGru+09OFjvSzk6tINPlQnplnbJD
-         r/Aw==
+        with ESMTP id S229653AbjICXvn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Sep 2023 19:51:43 -0400
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501A6101;
+        Sun,  3 Sep 2023 16:51:39 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1c0bae4da38so4932425ad.0;
+        Sun, 03 Sep 2023 16:51:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693780255; x=1694385055;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nv6YpToDNZJcA/Ccz8YHJKQ8zE37n7OYKvDh05ivZ8M=;
-        b=bFRNEhlb79SP9RnVlJaDlpfR6md3hkixgSnVmf1TDH3zBnpI16G3VOm9xcJTf5xhZa
-         PRGfPIwQ8keYIzVh874VG14OJFK3qpA6itLRhSp7SbF6v4RQ/mxtQ+vpfs06HOBCACKs
-         MiJr96AVulXD+sMF93frmqxjRSxfKo6IFyftvpVdo5NvGav3bmMPHvufzCfdBNxzOSU0
-         o+TCYLKho0RVMAWc2xqJZN/js0WJTUamEJQxB/PrtecpozMo9u7RTVdliKhP/xZ4QkCO
-         AFSowculfBE+I3PTT3uCgquwR/tMk7QOCx4ZH/IG4jMq13yolK6u8xqdvcDnRIGEmfi9
-         zxvw==
-X-Gm-Message-State: AOJu0YxS/8szdgwkGOIK7EZ1H6Iio1n2fPY96owvko4/NxJAIKxhtGgX
-        +6wjZunXHses2pABH3ggdud0cQ==
-X-Google-Smtp-Source: AGHT+IGLu9Ypqvz2HQH6Ke2apJHDtGTD5ZHmV6+9u1MT+8XuCmbNG2jkA6AQg79Zc5mY+kWQOWShIA==
-X-Received: by 2002:a05:6870:568d:b0:1be:c8e2:3ec3 with SMTP id p13-20020a056870568d00b001bec8e23ec3mr11536784oao.14.1693780255066;
-        Sun, 03 Sep 2023 15:30:55 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id i15-20020a63bf4f000000b00565e96d9874sm5648132pgo.89.2023.09.03.15.30.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Sep 2023 15:30:54 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qcvcK-00ASFy-0F;
-        Mon, 04 Sep 2023 08:30:52 +1000
-Date:   Mon, 4 Sep 2023 08:30:52 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Hao Xu <hao.xu@linux.dev>
-Cc:     Matthew Wilcox <willy@infradead.org>, io-uring@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
-Message-ID: <ZPUJHAKzxvXiEDYA@dread.disaster.area>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-8-hao.xu@linux.dev>
- <ZOvA5DJDZN0FRymp@casper.infradead.org>
- <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
- <ZO3cI+DkotHQo3md@casper.infradead.org>
- <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
+        d=1e100.net; s=20221208; t=1693785098; x=1694389898;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ADnKw0W/UsRkjXvTVJNNboOZq94SyLmEu8LrYVuRXYc=;
+        b=fL+jPeS7iY2c5hVROLI4TqW4Rti+xD/0uZdC4C9BtnvU1Kpp/9W1d1gBwFkNuWoorR
+         ROb8A7z4N+6oHzl33XXJlWbvbrFnOirOTjuvPUVdG3UdgP1OSqVTWC8bJiVLTg3OEszx
+         shWHr2mAUfEmNqML8YK+uQzBJ2bOWtZ1SkLh8hqEEJLasvHziBeltI4sJ1vT+LIlLQNK
+         nSYV8ZpvZPfqJbPKdYiGslOVZBULlTzECZMprUJV18vgCm8h9vy5060SlGTCX2Htq60i
+         WQ1f9py8zJ8SL8vEnNi7NXcAyjS2cEGqAw5SuCqqUYzwPan6Sf+KBRktlo83a1F3+OtU
+         zZ3g==
+X-Gm-Message-State: AOJu0YxMB3axPeQQWvIFMpOb9xzZpfmVDJUs1aGzrEpTwOGXgPwBDKtc
+        I5ta/n0KfERleo8ylX04muY=
+X-Google-Smtp-Source: AGHT+IGVxhESb6AXKsqFygXQ5Nwv6dnJpRb3uG5hX63kaP4jRjov6+WKTVTRO8CqFVfQx9roqztSTg==
+X-Received: by 2002:a17:902:e54e:b0:1c1:eb8b:799d with SMTP id n14-20020a170902e54e00b001c1eb8b799dmr11718856plf.21.1693785098541;
+        Sun, 03 Sep 2023 16:51:38 -0700 (PDT)
+Received: from ?IPV6:2601:647:5f00:5f5:4a46:e57b:bee0:6bc6? ([2601:647:5f00:5f5:4a46:e57b:bee0:6bc6])
+        by smtp.gmail.com with ESMTPSA id c1-20020a170902c1c100b001b83dc8649dsm6347957plc.250.2023.09.03.16.51.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 03 Sep 2023 16:51:37 -0700 (PDT)
+Message-ID: <13c27994-e372-674f-d265-dc623fae26ce@acm.org>
+Date:   Sun, 3 Sep 2023 16:51:36 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v3 0/6] blk-mq-tag: remove bt_for_each()
+To:     Chengming Zhou <zhouchengming@bytedance.com>,
+        chengming.zhou@linux.dev, axboe@kernel.dk, ming.lei@redhat.com,
+        hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230823151803.926382-1-chengming.zhou@linux.dev>
+ <a84b5ccb-151a-2de1-c213-de68a6f81f29@bytedance.com>
+Content-Language: en-US
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <a84b5ccb-151a-2de1-c213-de68a6f81f29@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 30, 2023 at 02:11:31PM +0800, Hao Xu wrote:
-> On 8/29/23 19:53, Matthew Wilcox wrote:
-> > On Tue, Aug 29, 2023 at 03:46:13PM +0800, Hao Xu wrote:
-> > > On 8/28/23 05:32, Matthew Wilcox wrote:
-> > > > On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
-> > > > > From: Hao Xu <howeyxu@tencent.com>
-> > > > > 
-> > > > > Add a boolean parameter for file_accessed() to support nowait semantics.
-> > > > > Currently it is true only with io_uring as its initial caller.
-> > > > 
-> > > > So why do we need to do this as part of this series?  Apparently it
-> > > > hasn't caused any problems for filemap_read().
-> > > > 
-> > > 
-> > > We need this parameter to indicate if nowait semantics should be enforced in
-> > > touch_atime(), There are locks and maybe IOs in it.
-> > 
-> > That's not my point.  We currently call file_accessed() and
-> > touch_atime() for nowait reads and nowait writes.  You haven't done
-> > anything to fix those.
-> > 
-> > I suspect you can trim this patchset down significantly by avoiding
-> > fixing the file_accessed() problem.  And then come back with a later
-> > patchset that fixes it for all nowait i/o.  Or do a separate prep series
-> 
-> I'm ok to do that.
-> 
-> > first that fixes it for the existing nowait users, and then a second
-> > series to do all the directory stuff.
-> > 
-> > I'd do the first thing.  Just ignore the problem.  Directory atime
-> > updates cause I/O so rarely that you can afford to ignore it.  Almost
-> > everyone uses relatime or nodiratime.
-> 
-> Hi Matthew,
-> The previous discussion shows this does cause issues in real
-> producations: https://lore.kernel.org/io-uring/2785f009-2ebb-028d-8250-d5f3a30510f0@gmail.com/#:~:text=fwiw%2C%20we%27ve%20just%20recently%20had%20similar%20problems%20with%20io_uring%20read/write
-> 
+On 9/2/23 07:58, Chengming Zhou wrote:
+> Hello, gentle ping.
+According to 
+https://lore.kernel.org/linux-kernel/CAHk-=wgmKhCrdrOCjp=5v9NO6C=PJ8ZTZcCXj09piHzsZ7qqmw@mail.gmail.com/,
+the merge window opened on August 27 (one week ago). Since we are now
+in the middle of the merge window and since maintainers typically do
+not merge patch series during the merge window, it's probably the wrong
+time to send a ping.
 
-Then separate it out into it's own patch set so we can have a
-discussion on the merits of requiring using noatime, relatime or
-lazytime for really latency sensitive IO applications. Changing code
-is not always the right solution...
+Thanks,
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Bart.
