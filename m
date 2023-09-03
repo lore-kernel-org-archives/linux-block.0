@@ -2,444 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E16AC71153
-	for <linux-block@archiver.kernel.org>; Sun,  3 Sep 2023 03:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5C7C88CB2
+	for <linux-block@archiver.kernel.org>; Sun,  3 Sep 2023 22:31:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235663AbjICD2U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Sep 2023 23:28:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37584 "EHLO
+        id S1348521AbjICWbF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Sep 2023 18:31:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235644AbjICD2T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Sep 2023 23:28:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DFB718C
-        for <linux-block@vger.kernel.org>; Sat,  2 Sep 2023 20:27:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1693711648;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kcD/0z9hB2h73HPVYeZiLrEggogTqOFbi0Cl5AQfZkg=;
-        b=UbEyAm9kV+rvjTAubB+ZcsOiX3MpZohcuaOoz+j+Xiu1jHdjV+zJdOosY9UDlOO/VDXclJ
-        IfUEqkSpUSziwTD6IAdXFZGUBFHIZz+pUBrAdpu6bGODGuSnFyEelghkgbYXo5nP2nvGJ7
-        wuW3cAWJpDeEC+a7jtlFrsbnAGmN6FE=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-633-Q6WTW4NpPSKw04Ebm30Rzg-1; Sat, 02 Sep 2023 23:27:27 -0400
-X-MC-Unique: Q6WTW4NpPSKw04Ebm30Rzg-1
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-594e5e2e608so3701597b3.2
-        for <linux-block@vger.kernel.org>; Sat, 02 Sep 2023 20:27:27 -0700 (PDT)
+        with ESMTP id S236441AbjICWa7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Sep 2023 18:30:59 -0400
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3BC8FC
+        for <linux-block@vger.kernel.org>; Sun,  3 Sep 2023 15:30:55 -0700 (PDT)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1cc87405650so783578fac.2
+        for <linux-block@vger.kernel.org>; Sun, 03 Sep 2023 15:30:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1693780255; x=1694385055; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nv6YpToDNZJcA/Ccz8YHJKQ8zE37n7OYKvDh05ivZ8M=;
+        b=eLvFMZ6HweV3i75Mje3KyiQMHp72f3fVYJp4X8QBR1sUoWt5LbUe2oYe6gz7J03xSV
+         aHsv7iDil4KTnD32vRddboJhyW5dIQThpWZBfmdQlNdU/+SQKnZqTkI+8YNmhDFqSNM4
+         M/5uOEBZigGEpPC3vmfjiwnDFOd47IixsMl044OpUX7QG234XdFYwtba/jPyi6PCo/kZ
+         okP+nX6zzbLjyilv/Ocy1qCe5aC4gkdgDOfyh92JWGe8bVg+DmwjlPuuV3kM/V8mAkRG
+         YMrGVWwsvVs5uRT8A9BN8JD3DAOcyXyqtn49LxBGuGru+09OFjvSzk6tINPlQnplnbJD
+         r/Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693711646; x=1694316446;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kcD/0z9hB2h73HPVYeZiLrEggogTqOFbi0Cl5AQfZkg=;
-        b=fXeArSYZHcApnZDBmsQY8f9LZ11lAsr4QWjDp3bd5symjyjhQP4HpvvVnXPO4KapV5
-         UxQQmVo5DoTPoi3SJepHfFfZwMVGxv1sZBQ/7covSGLduatla+8m4XtQB3zssS19wtMn
-         zZT9oXJX5x4745/+iqY/mzwGkwI9mhjS9DTa/WTM//c3z2aFEDHD2+YYv+m00d79eRZ1
-         rWOweB0xGis1qFwnfFE+4/0z4y72Dxz8hG2/Pxz29zAK3NU8ytmQkrWsfKPjMWeLS8lQ
-         oAYSh3MKhg99JoTts9KFQxH9AgDE2/9q5RfZBh8UkKsHRRmz0NxM8TyYXysR5f0pFwKC
-         Hs3g==
-X-Gm-Message-State: AOJu0Yw8uuaRxeZ/4OYbA9q2SAPUMudaTX1pm69zQZ5Giwvtzi+Hze2h
-        BX3p2kufZ9g2uez9B07XWGZtD7VoG1Jh3ls511bkcmsv0RgpuAqGsbh7QxzTRL73F/YJQO8gFhE
-        8j9m/WtB+jDLqFP1LywDLtd7b34SiImj74KhFsqU=
-X-Received: by 2002:a0d:cb02:0:b0:584:6d71:f465 with SMTP id n2-20020a0dcb02000000b005846d71f465mr7304613ywd.12.1693711646593;
-        Sat, 02 Sep 2023 20:27:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHArvZ3NeHmGWXJLEalW06EOpdzUevlNgEsp0gN4EEmwJCLD/xbG+SROwyK7VaGMJSwK20dTHIP9vmR9GUlD4Q=
-X-Received: by 2002:a0d:cb02:0:b0:584:6d71:f465 with SMTP id
- n2-20020a0dcb02000000b005846d71f465mr7304601ywd.12.1693711646358; Sat, 02 Sep
- 2023 20:27:26 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1693780255; x=1694385055;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nv6YpToDNZJcA/Ccz8YHJKQ8zE37n7OYKvDh05ivZ8M=;
+        b=bFRNEhlb79SP9RnVlJaDlpfR6md3hkixgSnVmf1TDH3zBnpI16G3VOm9xcJTf5xhZa
+         PRGfPIwQ8keYIzVh874VG14OJFK3qpA6itLRhSp7SbF6v4RQ/mxtQ+vpfs06HOBCACKs
+         MiJr96AVulXD+sMF93frmqxjRSxfKo6IFyftvpVdo5NvGav3bmMPHvufzCfdBNxzOSU0
+         o+TCYLKho0RVMAWc2xqJZN/js0WJTUamEJQxB/PrtecpozMo9u7RTVdliKhP/xZ4QkCO
+         AFSowculfBE+I3PTT3uCgquwR/tMk7QOCx4ZH/IG4jMq13yolK6u8xqdvcDnRIGEmfi9
+         zxvw==
+X-Gm-Message-State: AOJu0YxS/8szdgwkGOIK7EZ1H6Iio1n2fPY96owvko4/NxJAIKxhtGgX
+        +6wjZunXHses2pABH3ggdud0cQ==
+X-Google-Smtp-Source: AGHT+IGLu9Ypqvz2HQH6Ke2apJHDtGTD5ZHmV6+9u1MT+8XuCmbNG2jkA6AQg79Zc5mY+kWQOWShIA==
+X-Received: by 2002:a05:6870:568d:b0:1be:c8e2:3ec3 with SMTP id p13-20020a056870568d00b001bec8e23ec3mr11536784oao.14.1693780255066;
+        Sun, 03 Sep 2023 15:30:55 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
+        by smtp.gmail.com with ESMTPSA id i15-20020a63bf4f000000b00565e96d9874sm5648132pgo.89.2023.09.03.15.30.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Sep 2023 15:30:54 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qcvcK-00ASFy-0F;
+        Mon, 04 Sep 2023 08:30:52 +1000
+Date:   Mon, 4 Sep 2023 08:30:52 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Hao Xu <hao.xu@linux.dev>
+Cc:     Matthew Wilcox <willy@infradead.org>, io-uring@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
+Message-ID: <ZPUJHAKzxvXiEDYA@dread.disaster.area>
+References: <20230827132835.1373581-1-hao.xu@linux.dev>
+ <20230827132835.1373581-8-hao.xu@linux.dev>
+ <ZOvA5DJDZN0FRymp@casper.infradead.org>
+ <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
+ <ZO3cI+DkotHQo3md@casper.infradead.org>
+ <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
 MIME-Version: 1.0
-References: <20230811170513.2300-1-colyli@suse.de> <20230811170513.2300-7-colyli@suse.de>
-In-Reply-To: <20230811170513.2300-7-colyli@suse.de>
-From:   Xiao Ni <xni@redhat.com>
-Date:   Sun, 3 Sep 2023 11:27:11 +0800
-Message-ID: <CALTww2_OAcVZ8HpYF-g79neg9nEBqLssQ3k2G1fTX63vfZnA-Q@mail.gmail.com>
-Subject: Re: [PATCH v7 6/6] badblocks: switch to the improved badblock
- handling code
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
-        linux-block@vger.kernel.org,
-        Dan Williams <dan.j.williams@intel.com>,
-        Geliang Tang <geliang.tang@suse.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        NeilBrown <neilb@suse.de>,
-        Vishal L Verma <vishal.l.verma@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Aug 12, 2023 at 1:07=E2=80=AFAM Coly Li <colyli@suse.de> wrote:
->
-> This patch removes old code of badblocks_set(), badblocks_clear() and
-> badblocks_check(), and make them as wrappers to call _badblocks_set(),
-> _badblocks_clear() and _badblocks_check().
->
-> By this change now the badblock handing switch to the improved algorithm
-> in  _badblocks_set(), _badblocks_clear() and _badblocks_check().
->
-> This patch only contains the changes of old code deletion, new added
-> code for the improved algorithms are in previous patches.
->
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Geliang Tang <geliang.tang@suse.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: NeilBrown <neilb@suse.de>
-> Cc: Vishal L Verma <vishal.l.verma@intel.com>
-> Cc: Xiao Ni <xni@redhat.com>
-> ---
->  block/badblocks.c | 308 +---------------------------------------------
->  1 file changed, 3 insertions(+), 305 deletions(-)
->
-> diff --git a/block/badblocks.c b/block/badblocks.c
-> index 3438a2517749..fc92d4e18aa3 100644
-> --- a/block/badblocks.c
-> +++ b/block/badblocks.c
-> @@ -1405,74 +1405,7 @@ static int _badblocks_check(struct badblocks *bb, =
-sector_t s, int sectors,
->  int badblocks_check(struct badblocks *bb, sector_t s, int sectors,
->                         sector_t *first_bad, int *bad_sectors)
->  {
-> -       int hi;
-> -       int lo;
-> -       u64 *p =3D bb->page;
-> -       int rv;
-> -       sector_t target =3D s + sectors;
-> -       unsigned seq;
-> -
-> -       if (bb->shift > 0) {
-> -               /* round the start down, and the end up */
-> -               s >>=3D bb->shift;
-> -               target +=3D (1<<bb->shift) - 1;
-> -               target >>=3D bb->shift;
-> -       }
-> -       /* 'target' is now the first block after the bad range */
-> -
-> -retry:
-> -       seq =3D read_seqbegin(&bb->lock);
-> -       lo =3D 0;
-> -       rv =3D 0;
-> -       hi =3D bb->count;
-> -
-> -       /* Binary search between lo and hi for 'target'
-> -        * i.e. for the last range that starts before 'target'
-> -        */
-> -       /* INVARIANT: ranges before 'lo' and at-or-after 'hi'
-> -        * are known not to be the last range before target.
-> -        * VARIANT: hi-lo is the number of possible
-> -        * ranges, and decreases until it reaches 1
-> -        */
-> -       while (hi - lo > 1) {
-> -               int mid =3D (lo + hi) / 2;
-> -               sector_t a =3D BB_OFFSET(p[mid]);
-> -
-> -               if (a < target)
-> -                       /* This could still be the one, earlier ranges
-> -                        * could not.
-> -                        */
-> -                       lo =3D mid;
-> -               else
-> -                       /* This and later ranges are definitely out. */
-> -                       hi =3D mid;
-> -       }
-> -       /* 'lo' might be the last that started before target, but 'hi' is=
-n't */
-> -       if (hi > lo) {
-> -               /* need to check all range that end after 's' to see if
-> -                * any are unacknowledged.
-> -                */
-> -               while (lo >=3D 0 &&
-> -                      BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) {
-> -                       if (BB_OFFSET(p[lo]) < target) {
-> -                               /* starts before the end, and finishes af=
-ter
-> -                                * the start, so they must overlap
-> -                                */
-> -                               if (rv !=3D -1 && BB_ACK(p[lo]))
-> -                                       rv =3D 1;
-> -                               else
-> -                                       rv =3D -1;
-> -                               *first_bad =3D BB_OFFSET(p[lo]);
-> -                               *bad_sectors =3D BB_LEN(p[lo]);
-> -                       }
-> -                       lo--;
-> -               }
-> -       }
-> -
-> -       if (read_seqretry(&bb->lock, seq))
-> -               goto retry;
-> -
-> -       return rv;
-> +       return _badblocks_check(bb, s, sectors, first_bad, bad_sectors);
->  }
->  EXPORT_SYMBOL_GPL(badblocks_check);
->
-> @@ -1494,154 +1427,7 @@ EXPORT_SYMBOL_GPL(badblocks_check);
->  int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
->                         int acknowledged)
->  {
-> -       u64 *p;
-> -       int lo, hi;
-> -       int rv =3D 0;
-> -       unsigned long flags;
-> -
-> -       if (bb->shift < 0)
-> -               /* badblocks are disabled */
-> -               return 1;
-> -
-> -       if (bb->shift) {
-> -               /* round the start down, and the end up */
-> -               sector_t next =3D s + sectors;
-> -
-> -               s >>=3D bb->shift;
-> -               next +=3D (1<<bb->shift) - 1;
-> -               next >>=3D bb->shift;
-> -               sectors =3D next - s;
-> -       }
-> -
-> -       write_seqlock_irqsave(&bb->lock, flags);
-> -
-> -       p =3D bb->page;
-> -       lo =3D 0;
-> -       hi =3D bb->count;
-> -       /* Find the last range that starts at-or-before 's' */
-> -       while (hi - lo > 1) {
-> -               int mid =3D (lo + hi) / 2;
-> -               sector_t a =3D BB_OFFSET(p[mid]);
-> -
-> -               if (a <=3D s)
-> -                       lo =3D mid;
-> -               else
-> -                       hi =3D mid;
-> -       }
-> -       if (hi > lo && BB_OFFSET(p[lo]) > s)
-> -               hi =3D lo;
-> -
-> -       if (hi > lo) {
-> -               /* we found a range that might merge with the start
-> -                * of our new range
-> -                */
-> -               sector_t a =3D BB_OFFSET(p[lo]);
-> -               sector_t e =3D a + BB_LEN(p[lo]);
-> -               int ack =3D BB_ACK(p[lo]);
-> -
-> -               if (e >=3D s) {
-> -                       /* Yes, we can merge with a previous range */
-> -                       if (s =3D=3D a && s + sectors >=3D e)
-> -                               /* new range covers old */
-> -                               ack =3D acknowledged;
-> -                       else
-> -                               ack =3D ack && acknowledged;
-> -
-> -                       if (e < s + sectors)
-> -                               e =3D s + sectors;
-> -                       if (e - a <=3D BB_MAX_LEN) {
-> -                               p[lo] =3D BB_MAKE(a, e-a, ack);
-> -                               s =3D e;
-> -                       } else {
-> -                               /* does not all fit in one range,
-> -                                * make p[lo] maximal
-> -                                */
-> -                               if (BB_LEN(p[lo]) !=3D BB_MAX_LEN)
-> -                                       p[lo] =3D BB_MAKE(a, BB_MAX_LEN, =
-ack);
-> -                               s =3D a + BB_MAX_LEN;
-> -                       }
-> -                       sectors =3D e - s;
-> -               }
-> -       }
-> -       if (sectors && hi < bb->count) {
-> -               /* 'hi' points to the first range that starts after 's'.
-> -                * Maybe we can merge with the start of that range
-> -                */
-> -               sector_t a =3D BB_OFFSET(p[hi]);
-> -               sector_t e =3D a + BB_LEN(p[hi]);
-> -               int ack =3D BB_ACK(p[hi]);
-> -
-> -               if (a <=3D s + sectors) {
-> -                       /* merging is possible */
-> -                       if (e <=3D s + sectors) {
-> -                               /* full overlap */
-> -                               e =3D s + sectors;
-> -                               ack =3D acknowledged;
-> -                       } else
-> -                               ack =3D ack && acknowledged;
-> -
-> -                       a =3D s;
-> -                       if (e - a <=3D BB_MAX_LEN) {
-> -                               p[hi] =3D BB_MAKE(a, e-a, ack);
-> -                               s =3D e;
-> -                       } else {
-> -                               p[hi] =3D BB_MAKE(a, BB_MAX_LEN, ack);
-> -                               s =3D a + BB_MAX_LEN;
-> -                       }
-> -                       sectors =3D e - s;
-> -                       lo =3D hi;
-> -                       hi++;
-> -               }
-> -       }
-> -       if (sectors =3D=3D 0 && hi < bb->count) {
-> -               /* we might be able to combine lo and hi */
-> -               /* Note: 's' is at the end of 'lo' */
-> -               sector_t a =3D BB_OFFSET(p[hi]);
-> -               int lolen =3D BB_LEN(p[lo]);
-> -               int hilen =3D BB_LEN(p[hi]);
-> -               int newlen =3D lolen + hilen - (s - a);
-> -
-> -               if (s >=3D a && newlen < BB_MAX_LEN) {
-> -                       /* yes, we can combine them */
-> -                       int ack =3D BB_ACK(p[lo]) && BB_ACK(p[hi]);
-> -
-> -                       p[lo] =3D BB_MAKE(BB_OFFSET(p[lo]), newlen, ack);
-> -                       memmove(p + hi, p + hi + 1,
-> -                               (bb->count - hi - 1) * 8);
-> -                       bb->count--;
-> -               }
-> -       }
-> -       while (sectors) {
-> -               /* didn't merge (it all).
-> -                * Need to add a range just before 'hi'
-> -                */
-> -               if (bb->count >=3D MAX_BADBLOCKS) {
-> -                       /* No room for more */
-> -                       rv =3D 1;
-> -                       break;
-> -               } else {
-> -                       int this_sectors =3D sectors;
-> -
-> -                       memmove(p + hi + 1, p + hi,
-> -                               (bb->count - hi) * 8);
-> -                       bb->count++;
-> -
-> -                       if (this_sectors > BB_MAX_LEN)
-> -                               this_sectors =3D BB_MAX_LEN;
-> -                       p[hi] =3D BB_MAKE(s, this_sectors, acknowledged);
-> -                       sectors -=3D this_sectors;
-> -                       s +=3D this_sectors;
-> -               }
-> -       }
-> -
-> -       bb->changed =3D 1;
-> -       if (!acknowledged)
-> -               bb->unacked_exist =3D 1;
-> -       else
-> -               badblocks_update_acked(bb);
-> -       write_sequnlock_irqrestore(&bb->lock, flags);
-> -
-> -       return rv;
-> +       return _badblocks_set(bb, s, sectors, acknowledged);
->  }
->  EXPORT_SYMBOL_GPL(badblocks_set);
->
-> @@ -1661,95 +1447,7 @@ EXPORT_SYMBOL_GPL(badblocks_set);
->   */
->  int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
->  {
-> -       u64 *p;
-> -       int lo, hi;
-> -       sector_t target =3D s + sectors;
-> -       int rv =3D 0;
-> -
-> -       if (bb->shift > 0) {
-> -               /* When clearing we round the start up and the end down.
-> -                * This should not matter as the shift should align with
-> -                * the block size and no rounding should ever be needed.
-> -                * However it is better the think a block is bad when it
-> -                * isn't than to think a block is not bad when it is.
-> -                */
-> -               s +=3D (1<<bb->shift) - 1;
-> -               s >>=3D bb->shift;
-> -               target >>=3D bb->shift;
-> -       }
-> -
-> -       write_seqlock_irq(&bb->lock);
-> -
-> -       p =3D bb->page;
-> -       lo =3D 0;
-> -       hi =3D bb->count;
-> -       /* Find the last range that starts before 'target' */
-> -       while (hi - lo > 1) {
-> -               int mid =3D (lo + hi) / 2;
-> -               sector_t a =3D BB_OFFSET(p[mid]);
-> -
-> -               if (a < target)
-> -                       lo =3D mid;
-> -               else
-> -                       hi =3D mid;
-> -       }
-> -       if (hi > lo) {
-> -               /* p[lo] is the last range that could overlap the
-> -                * current range.  Earlier ranges could also overlap,
-> -                * but only this one can overlap the end of the range.
-> -                */
-> -               if ((BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) &&
-> -                   (BB_OFFSET(p[lo]) < target)) {
-> -                       /* Partial overlap, leave the tail of this range =
-*/
-> -                       int ack =3D BB_ACK(p[lo]);
-> -                       sector_t a =3D BB_OFFSET(p[lo]);
-> -                       sector_t end =3D a + BB_LEN(p[lo]);
-> -
-> -                       if (a < s) {
-> -                               /* we need to split this range */
-> -                               if (bb->count >=3D MAX_BADBLOCKS) {
-> -                                       rv =3D -ENOSPC;
-> -                                       goto out;
-> -                               }
-> -                               memmove(p+lo+1, p+lo, (bb->count - lo) * =
-8);
-> -                               bb->count++;
-> -                               p[lo] =3D BB_MAKE(a, s-a, ack);
-> -                               lo++;
-> -                       }
-> -                       p[lo] =3D BB_MAKE(target, end - target, ack);
-> -                       /* there is no longer an overlap */
-> -                       hi =3D lo;
-> -                       lo--;
-> -               }
-> -               while (lo >=3D 0 &&
-> -                      (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) &&
-> -                      (BB_OFFSET(p[lo]) < target)) {
-> -                       /* This range does overlap */
-> -                       if (BB_OFFSET(p[lo]) < s) {
-> -                               /* Keep the early parts of this range. */
-> -                               int ack =3D BB_ACK(p[lo]);
-> -                               sector_t start =3D BB_OFFSET(p[lo]);
-> -
-> -                               p[lo] =3D BB_MAKE(start, s - start, ack);
-> -                               /* now low doesn't overlap, so.. */
-> -                               break;
-> -                       }
-> -                       lo--;
-> -               }
-> -               /* 'lo' is strictly before, 'hi' is strictly after,
-> -                * anything between needs to be discarded
-> -                */
-> -               if (hi - lo > 1) {
-> -                       memmove(p+lo+1, p+hi, (bb->count - hi) * 8);
-> -                       bb->count -=3D (hi - lo - 1);
-> -               }
-> -       }
-> -
-> -       badblocks_update_acked(bb);
-> -       bb->changed =3D 1;
-> -out:
-> -       write_sequnlock_irq(&bb->lock);
-> -       return rv;
-> +       return _badblocks_clear(bb, s, sectors);
->  }
->  EXPORT_SYMBOL_GPL(badblocks_clear);
->
-> --
-> 2.35.3
->
+On Wed, Aug 30, 2023 at 02:11:31PM +0800, Hao Xu wrote:
+> On 8/29/23 19:53, Matthew Wilcox wrote:
+> > On Tue, Aug 29, 2023 at 03:46:13PM +0800, Hao Xu wrote:
+> > > On 8/28/23 05:32, Matthew Wilcox wrote:
+> > > > On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
+> > > > > From: Hao Xu <howeyxu@tencent.com>
+> > > > > 
+> > > > > Add a boolean parameter for file_accessed() to support nowait semantics.
+> > > > > Currently it is true only with io_uring as its initial caller.
+> > > > 
+> > > > So why do we need to do this as part of this series?  Apparently it
+> > > > hasn't caused any problems for filemap_read().
+> > > > 
+> > > 
+> > > We need this parameter to indicate if nowait semantics should be enforced in
+> > > touch_atime(), There are locks and maybe IOs in it.
+> > 
+> > That's not my point.  We currently call file_accessed() and
+> > touch_atime() for nowait reads and nowait writes.  You haven't done
+> > anything to fix those.
+> > 
+> > I suspect you can trim this patchset down significantly by avoiding
+> > fixing the file_accessed() problem.  And then come back with a later
+> > patchset that fixes it for all nowait i/o.  Or do a separate prep series
+> 
+> I'm ok to do that.
+> 
+> > first that fixes it for the existing nowait users, and then a second
+> > series to do all the directory stuff.
+> > 
+> > I'd do the first thing.  Just ignore the problem.  Directory atime
+> > updates cause I/O so rarely that you can afford to ignore it.  Almost
+> > everyone uses relatime or nodiratime.
+> 
+> Hi Matthew,
+> The previous discussion shows this does cause issues in real
+> producations: https://lore.kernel.org/io-uring/2785f009-2ebb-028d-8250-d5f3a30510f0@gmail.com/#:~:text=fwiw%2C%20we%27ve%20just%20recently%20had%20similar%20problems%20with%20io_uring%20read/write
+> 
 
-Reviewed-by: Xiao Ni <xni@redhat.com>
+Then separate it out into it's own patch set so we can have a
+discussion on the merits of requiring using noatime, relatime or
+lazytime for really latency sensitive IO applications. Changing code
+is not always the right solution...
 
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
