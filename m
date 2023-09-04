@@ -2,146 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C78EC83F2C
-	for <linux-block@archiver.kernel.org>; Mon,  4 Sep 2023 08:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08062CA0FF3
+	for <linux-block@archiver.kernel.org>; Mon,  4 Sep 2023 08:34:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239935AbjIDIK5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Sep 2023 04:10:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48838 "EHLO
+        id S1352572AbjIDIeB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Sep 2023 04:34:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230494AbjIDIK5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Sep 2023 04:10:57 -0400
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2123.outbound.protection.outlook.com [40.107.117.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9DFFCC4;
-        Mon,  4 Sep 2023 01:10:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fDQGuD4kzvxAl7Vdl2c60GJGL1oG6VF+InB2VkyqLj3FMrcaSENAUu45Xi96zPFowVN/TGnEAyZvXc1a5q3mlvjiq1ixU2yb93krhyfJDa7KZh4XnlzWooY3oZABRcYj3Jy7PalU84iPMB3TPMJb4zJgYW/ZnAtq4M6ywtSBR7yLKgHSbsyztfFXQ0NGNn1bvp4lzIerlSdQfMixjiBDt871iCbC9Lt9/S99z0yV8ijWNphD12w92b/WJgSd7migisYc7fZQFpvShYczwOabvoCpYvZxYqSPzoi6U+UuqLBRG9MUwqA3YbcozimDsce/ldYmfrDkU8G4V8yW0uJZ5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H+T/ib+bX+o1ajFixYh4MKiJu0F9NdsSeI31h+Q93co=;
- b=NjcKn0lUvdA6qB8nuxR4nYKFRxzRwE1mODg1SXW9Bg2ubEKr0KaFis4yROLTFYRTvCHoO2Kcv2tsj8OqispDF57oyPAttKqAm6x+nh0zU2X/glwdePG8HdNPtjSnvKdHHByJP5xvGyzHIiC70OS9eKvtjceLg4GXGMBAOv0lG14E4/uAfORR5YrouFWspuA4H2NzKWnOK7BL4SExN1ShfJTrxaSCX0Q02BaHfdWomIjFRYweQDG1wtgYvCVhZbcGRb8TS3lal1UyMVKSxYAXWkdwD5gRGJqSLg8RIapAgLxVafydKgcwTRrO+38jK3Flmwds/GDlL/FPLcCx2t17yg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H+T/ib+bX+o1ajFixYh4MKiJu0F9NdsSeI31h+Q93co=;
- b=VVrtaVSOHIeKhFBQfhDsjLRTUZKhPBRAprnn6xP+jUC9749VwUIG0iQIei6RDTSdWSsu8sznzfz9qOukppkTvhk1VmNl6OFri3ZWel9wIhpVXWwUpUQhPMuxTnTwKA0IHhUk7mMyNSGEc1wr6XTBwlzc4ERYMXusU0HTVDgKom5A8y6+gSagqr5txAW6Bgjvy934na/w8/cHZazFtKB2GLaxKphPcYc9uVA+l6r5F/L7/HnA3yydL9MonGgzYc+LTH8UBOpkgt7kUVp692nsOoEd/agzS7MmtI70VZusnO5FfnJBV+EZvzOcuKTCr6TjQmxWSdKrX2QyYyUW5PEXyA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from TY2PR06MB3342.apcprd06.prod.outlook.com (2603:1096:404:fb::23)
- by TYZPR06MB5733.apcprd06.prod.outlook.com (2603:1096:400:282::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.30; Mon, 4 Sep
- 2023 08:10:23 +0000
-Received: from TY2PR06MB3342.apcprd06.prod.outlook.com
- ([fe80::60d3:1ef9:d644:3959]) by TY2PR06MB3342.apcprd06.prod.outlook.com
- ([fe80::60d3:1ef9:d644:3959%4]) with mapi id 15.20.6745.030; Mon, 4 Sep 2023
- 08:10:23 +0000
-Message-ID: <86605698-bc85-42b5-b7e9-2da547ec1d4f@vivo.com>
-Date:   Mon, 4 Sep 2023 16:10:18 +0800
-User-Agent: Mozilla Thunderbird
-From:   Chunhai Guo <guochunhai@vivo.com>
-Subject: Re: [PATCH] block: export symbol blk_flush_plug
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "chao@kernel.org" <chao@kernel.org>,
-        "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kernel test robot <lkp@intel.com>
-References: <20230904042243.820031-1-guochunhai@vivo.com>
- <ZPV15I09CTC/Dfww@infradead.org>
- <08d3c0a5-7f5d-4054-8bfb-7767aacd47c3@vivo.com>
- <ZPWImKGXZbz6HUJs@infradead.org>
-In-Reply-To: <ZPWImKGXZbz6HUJs@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR04CA0011.apcprd04.prod.outlook.com
- (2603:1096:4:197::10) To TY2PR06MB3342.apcprd06.prod.outlook.com
- (2603:1096:404:fb::23)
+        with ESMTP id S1352135AbjIDId5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Sep 2023 04:33:57 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 873E3CDE
+        for <linux-block@vger.kernel.org>; Mon,  4 Sep 2023 01:33:45 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bc0d39b52cso4824715ad.2
+        for <linux-block@vger.kernel.org>; Mon, 04 Sep 2023 01:33:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1693816425; x=1694421225; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MDxq47lH4J+ZR6XRwDVJfrN/aEh66horqS8Q0LZlj/Y=;
+        b=jHDoXqGY9gRfpJMPzXqWSsH41D2SACS9E3O7KaNjwpxtyV4g+1cg/H5wpj9+QTeVra
+         L3veVnhsmRWR8Cj06OExdWruUlXs6pU91FhiZnAdlm3Sz/aNjVPR+CQWPXGMSNaecQYe
+         ko1SCQKvDRyXaAnHqgTUD96vQgzh5j7+2SyG1gE97eI/siKhjWeFJVeJ+fd00V5TIBV1
+         6En8HlLtoaoWIu62RSeLZJoczjl4hrfwt4Evv2Xtnr3IH4ukrARlaw/53S8KanKJ2G76
+         556guymSh32HKnmuA6t4SH6shJ0SjD7CdnewroqQ8dDU2fFn2p1H6jG5ZMyheBRt3qcI
+         oM7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693816425; x=1694421225;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MDxq47lH4J+ZR6XRwDVJfrN/aEh66horqS8Q0LZlj/Y=;
+        b=AoRtRnJ6E5IzfYbEY7EMQdWnFl2puVMfYZJPWJWK2wG9anVLKek3XPPtzQESGP/KR2
+         pYIUokePgmt8erTS6TEINOhgIRZtr9cLqE/at70ya5S6bpPZFeXiVcFKtq3VxHdTV4H4
+         ZTsKWWLTNo8Vu1Qyhp2uxZYmojeTXVwcfZJCtHeYk0012GSg9xMf+rKOhAs/pc5ghM4F
+         XKIAwz7n3PzL9aAaBNeOY3x15xj1F23fgMB62UMgp9QAB7bsp92OYfCL+3qEGG8qMKdR
+         h1Uy8VK+pTm+dtJiEotdNjTRI/KQQGMixdBFDtOpAm3DeQG0h2vTsSgFuo2P5/zMOo2K
+         +XWA==
+X-Gm-Message-State: AOJu0YwOjaPCYP4dgv4mdlZrBeHVQq3mpHHlftfsRthJCdmn8+KT6CEY
+        aXDG0X5uCDOv4GqILlgVWrbuQg==
+X-Google-Smtp-Source: AGHT+IFuLko3syhAxHbcZ/yTXMg91Gpq3n/9bGTpOnxZtJRpzZtVFlK/HE8nPar+ChyaqrvrAomZ5g==
+X-Received: by 2002:a17:902:76c3:b0:1bc:2c83:f770 with SMTP id j3-20020a17090276c300b001bc2c83f770mr6455033plt.45.1693816424756;
+        Mon, 04 Sep 2023 01:33:44 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
+        by smtp.gmail.com with ESMTPSA id f21-20020a170902e99500b001bdd7579b5dsm7041065plb.240.2023.09.04.01.33.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Sep 2023 01:33:44 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qd51h-00Adiy-0S;
+        Mon, 04 Sep 2023 18:33:41 +1000
+Date:   Mon, 4 Sep 2023 18:33:41 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     syzbot <syzbot+4a08ffdf3667b36650a1@syzkaller.appspotmail.com>
+Cc:     adilger.kernel@dilger.ca, djwong@kernel.org,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        song@kernel.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu,
+        yukuai3@huawei.com, zhang_shurong@foxmail.com,
+        linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de
+Subject: Re: [syzbot] [xfs?] [ext4?] kernel BUG in __block_write_begin_int
+Message-ID: <ZPWWZeWliX7RhOAZ@dread.disaster.area>
+References: <000000000000e76944060483798d@google.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TY2PR06MB3342:EE_|TYZPR06MB5733:EE_
-X-MS-Office365-Filtering-Correlation-Id: bb4a2470-83b6-48f3-e66f-08dbad1e6337
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sD5TnLajHY8uljCdkupfSUqhiis7ZZ2kIFYdc7bgER8R9MAMS4BElNMmXwo1grIuw0VRPp5i20ABFCK0isjazE1acJS8QcnNdKubj+KiwhqM0bnAn/W8zqWNDpGcuO0rIKPGlruc8zxRQRIoTZN/jXC3QFABx79gslXPtyjlYBqzRkLKAL457UmlUloi8qjdvFI0mCDigQ9RfyEjQDg63M09z2rPyu75Y8IN4wRVsPzO+26tphmDouA0qakVoG0WUZr2Bsm8rQAZHfyHWV34O/1Tf/O+NdSgSlseivhQz7kUQb9p49I5tncfrjASemjJE4ek+c+bjpa/HZjUTv+3kVyjRd7EFDR5mqB04KZX0TBarQ5g1Zj/C6PDKTM3RoNAF1UqiVI9gt/nwcoSOd9YS5gWFITmGJtG4/f7LTd4EDTA7MStJiXjcbsXZGAXagNV6+yyjzyBNFLUD7Qq+R9MQIJQjQtDVPnkSanpG7Af+qVCnOrWjYq100iLk8NUiiAyH9LD0fw/CD+DIhDFrKWqdakTRbdDYb+EVpPp41qI5fJnJ267u6D3/ZWdP62EkCB1asy2qdHpZsVEdauds9isyR20A7SZTo8L7Wf0V91ABoH3xzlrutvE2quEwjsdfIpO92OZ10t9SmFf/HKc5bSoQA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY2PR06MB3342.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(396003)(136003)(39850400004)(376002)(186009)(1800799009)(451199024)(41300700001)(6486002)(6506007)(6666004)(478600001)(966005)(2616005)(26005)(6512007)(38100700002)(4744005)(2906002)(66946007)(54906003)(36756003)(66556008)(66476007)(6916009)(316002)(86362001)(31696002)(31686004)(5660300002)(8936002)(4326008)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UGdWc1J6enpyRjBmZzRsSnJIQ3NhcmlMaCtqVUtIR1lpd05ibi9UNnNvbkhh?=
- =?utf-8?B?U2NXMVJ6T0MrbEpkQ0NrRGxOT0FyVXFiZ1VDclg5c2h6Z09NOU9jQm4rajFR?=
- =?utf-8?B?WTRRd09EREVycXZpdGZMeWViRmp6aXRJTGE4Y2FSaXhBdmlFY0hsdmlJcE5w?=
- =?utf-8?B?eS9DSjhBZGVvMDRSS21wR1NnWVd1K0JWeGVBbzdHYUhxc3B6T3BMZnRoemdy?=
- =?utf-8?B?NVJ0Wmo2d000T1piWTdEZ3FRL3Z0RHZrcVgwQ3lQdGpKNlhuZC82ZkJQUTA2?=
- =?utf-8?B?R0x0VEczYjNvc0J4Y09XU1VkWXB5ZElKa0x0VldQMUFrdUVRSS8rZ1VoL0NN?=
- =?utf-8?B?Y1BNd211Y0Z1SXlQWDkyK0VudWh4TkNhNnRMWGlqMmpSTFdnTE1TVDN0ZURI?=
- =?utf-8?B?Ym9WdWdQNEtZMURPS0l4cjliSFJkTTN0N1NmNE91eFo5WVYwZnYvN2sreVow?=
- =?utf-8?B?cDE5ME9sNFNrc1ZFYkV5VFh3QzFUb05ldWlhdklSUVZpQ0NHOWtSRlI1Nndu?=
- =?utf-8?B?M0FFQzFYNGxzUUJPSGlzQmp5ckJBK1Y1UUU4d3c0SU51WjB5WEZuWEU5M0RN?=
- =?utf-8?B?ZWZTbVJCSHFrTTBBSmdLU3JHN1FEOHV2cSt2c2RwSUhHLzhiQkRkN09nem5X?=
- =?utf-8?B?Yjl0WnI3OUVzT0tRQ0ZoSERjUXdCRXl3bEFXdkprcFlVMHJoVnlyTFBhNmtU?=
- =?utf-8?B?TmRWVnVEbGh1ODFiNzNRQkhwdFdJOGhDTFArUXMzNDduaThXdFJtb2ZPeXQ3?=
- =?utf-8?B?TDZhYWJxc0hDN2xwVWZxc1lFZXdjMkFzenRzRXB1ZS9tU0JtbGw5YjZmZDMx?=
- =?utf-8?B?amw2MllGa21uS0lVRFdHMmdQckRmZnRFT3kvWTZ0cHFncmZyZEE0UEZMRlNC?=
- =?utf-8?B?ci9UZ3cxZlBmSml1eDRPRUg4RUhJd3dyZjR5ellCRWJWL1J3Z3EvRm1RR0Nl?=
- =?utf-8?B?WFM5UnU3MTlpNFZnQWE1cElzSHVIcXkwd1pDMVpzdFp4b3NkdFM5RFk1OGVD?=
- =?utf-8?B?bG5KR1A1dngxNWtYRjN1b3RKMGF1NzN2SWM4MEdYcDc3TFJ1SndWUkxRNEVB?=
- =?utf-8?B?ZlFHWGk0YWYrNjVLNng2M0pidjZ0bWtGV09peGJOamtFTXovOXNHRjJiN1Js?=
- =?utf-8?B?Ky9YOVJsRXdZWmEzek5VdTF1c04rUDhSMEc1TTVrMldlNnhhTDNlOG5wYzJZ?=
- =?utf-8?B?SGxrZ3gveUJSVVBqUnAzdEJxUnZlU2pobGJkSlJaQ3NOTVlsZXFOKzVlWUNa?=
- =?utf-8?B?alVpa1ZMUmdJb0NsYUlqQlJrVDR5bjA5SE9ZTlJGVm1UOWpkQzhpdGpFL3BC?=
- =?utf-8?B?aVYxQldveEhEQTVRTmdqaDcxWFhnWWxMN2J6cGlEaDFCbGhwZ2wrdTV5RXJt?=
- =?utf-8?B?Z0RXSXFwZWdjT3RhbW1EMml5V1gybjQ3S0ZhSDdKdG95SVMwcHpaV0JEeHF3?=
- =?utf-8?B?Sm1HdjZXUnFyY2xZck1hSUliNVZyLzM3ckJhL09oK0RBWC9mbDQzRjZQeCt1?=
- =?utf-8?B?QlVQVGl0ZkxIQjlZNkppaWZ1MmtyV1NrQUpnSXlhNlBDY0xyaG1nV0hVOW41?=
- =?utf-8?B?c1k5YTZYNzEyKzdZSXZTMzlGVDgweHA1RGUrM29JclRnL0ZYT0VERDZlTTBy?=
- =?utf-8?B?U285VCthOWtmN0xDSnB4WStrRkhSU2pwaUhDeW5YZXFqUEFoS2dIVCtVdE16?=
- =?utf-8?B?eWZndEFjQU1OZTFXZlN0dVBWOVJMWlR2UFVNVndMMk5mL3g2L0tNWHpJWTZF?=
- =?utf-8?B?c3lJMDdtcmU5WmVmZ2tkMGUxcU1Fam5iRnJyUlk1eGJ2N3VaeTNsOUlndWU4?=
- =?utf-8?B?VFU4Qnd0M1l5aHJyV0ZQa1hSM1JDcWN5bkRNd3ZpOUoxYk9BczAvV2lGc2hP?=
- =?utf-8?B?UEJOZllCVCs4OHQ5WS9UWXdXY3dBc3RORGlvUzlqU08ydTc4UVVWaENDa1VU?=
- =?utf-8?B?c0JJbXVKRlRzNjFORXQ3N1E4WVlhME5kUXhKMGNwYk1zQUxUaUsrUTJ5SmND?=
- =?utf-8?B?VUlOR045QU04VVNMS28wTGY5ZWZGa2tDSXJiRytrUlV5aWRjcmU2MVBTcXJP?=
- =?utf-8?B?b0pneEYwZXJYNUU2RHlxbWVFa2ovRnVwUlNqUXNhU3ptY0R1dVJUTysyYkoz?=
- =?utf-8?Q?mPT1+TBgThvvjdHFdzHEk2L8J?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb4a2470-83b6-48f3-e66f-08dbad1e6337
-X-MS-Exchange-CrossTenant-AuthSource: TY2PR06MB3342.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2023 08:10:23.0217
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0Nl0Nd+ST/X3Zj7uUP6SmKUAQhsHO1yIsulMh5a3r9FoIymSIgCHPIrP5UqYq1Zexg8sYryYr1DDILnbZbfd0A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB5733
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000e76944060483798d@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+[cc linux-block, Christoph]
 
-
-在 2023/9/4 15:34, Christoph Hellwig 写道:
-> [????????? hch@infradead.org ????????? https://aka.ms/LearnAboutSenderIdentification?????????????]
+On Mon, Sep 04, 2023 at 12:29:52AM -0700, syzbot wrote:
+> Hello,
 > 
-> On Mon, Sep 04, 2023 at 03:24:10PM +0800, Chunhai Guo wrote:
->> Could you please detail why blk_flush_plug() can not be used by a file
->> system?
+> syzbot found the following issue on:
 > 
-> Can you detail why it is a good idea to use it?  Beause you nee to make
-> the argument why something should be exported.
+> HEAD commit:    0468be89b3fa Merge tag 'iommu-updates-v6.6' of git://git.k..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=11145910680000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3d78b3780d210e21
+> dashboard link: https://syzkaller.appspot.com/bug?extid=4a08ffdf3667b36650a1
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=164f7a57a80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=143b0298680000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/f3914b539822/disk-0468be89.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/6128b0644784/vmlinux-0468be89.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/349d98668c3a/bzImage-0468be89.xz
+> mounted in repro: https://storage.googleapis.com/syzbot-assets/75bd68910fd4/mount_0.gz
+> 
+> The issue was bisected to:
+> 
+> commit 8b0472b50bcf0f19a5119b00a53b63579c8e1e4d
+> Author: Zhang Shurong <zhang_shurong@foxmail.com>
+> Date:   Sat Jul 22 07:53:53 2023 +0000
+> 
+>     md: raid1: fix potential OOB in raid1_remove_disk()
 
-Hi Christoph,
-Got it. This could be a topic too big to discuss here.
-Thanks.
+Bisect is broken. That has nothing to do with the block device
+conversion to use iomap that triggered this.
 
+The commit that made this change was 487c607df790 ("block: use iomap
+for writes to block devices"), and that's why we're getting a
+BUG_ON() being triggered in iomap_to_bh()....
 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16e52577a80000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=15e52577a80000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=11e52577a80000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+4a08ffdf3667b36650a1@syzkaller.appspotmail.com
+> Fixes: 8b0472b50bcf ("md: raid1: fix potential OOB in raid1_remove_disk()")
+> 
+> ------------[ cut here ]------------
+> kernel BUG at fs/buffer.c:2028!
+> invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+> CPU: 0 PID: 5187 Comm: syz-executor424 Not tainted 6.5.0-syzkaller-10885-g0468be89b3fa #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+> RIP: 0010:iomap_to_bh fs/buffer.c:2028 [inline]
+> RIP: 0010:__block_write_begin_int+0x18f7/0x1a40 fs/buffer.c:2111
+> Code: af 0d 85 ff 48 8b 7c 24 08 48 c7 c6 20 22 18 8b e8 6e 8b c6 ff 0f 0b e8 97 0d 85 ff eb 13 e8 90 0d 85 ff eb c7 e8 89 0d 85 ff <0f> 0b e8 82 0d 85 ff 48 8b 7c 24 08 48 c7 c6 20 22 18 8b e8 41 8b
+> RSP: 0018:ffffc9000418f520 EFLAGS: 00010293
+> RAX: ffffffff82087b37 RBX: 0000000000040000 RCX: ffff888078093b80
+> RDX: 0000000000000000 RSI: 0000000000040000 RDI: 00000000000d0000
+> RBP: ffffc9000418f6b0 R08: ffffffff82086ba2 R09: 1ffff1100f27203a
+> R10: dffffc0000000000 R11: ffffed100f27203b R12: 00000000000d0000
+> R13: 0000000000000400 R14: 0000000000000000 R15: ffff8880793901d0
+> FS:  00007f0623ec56c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020040000 CR3: 0000000067478000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  iomap_write_begin+0xaf6/0x1f00 fs/iomap/buffered-io.c:772
+>  iomap_write_iter fs/iomap/buffered-io.c:907 [inline]
+>  iomap_file_buffered_write+0x587/0x1020 fs/iomap/buffered-io.c:968
+>  blkdev_buffered_write block/fops.c:634 [inline]
+>  blkdev_write_iter+0x41d/0x5c0 block/fops.c:688
+>  call_write_iter include/linux/fs.h:1985 [inline]
+>  new_sync_write fs/read_write.c:491 [inline]
+>  vfs_write+0x782/0xaf0 fs/read_write.c:584
+>  ksys_write+0x1a0/0x2c0 fs/read_write.c:637
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-Hi Jaegeuk,
-As per Christoph's suggestion, could you please assist with reverting 
-the commit e1e9b8062c74 ("f2fs: replace blk_finish_plug() with 
-blk_flush_plug()")?
-Thanks.
+It appears that 0010:__block_write_begin_int() has iterated beyond
+the iomap that was passed in, triggering the BUG_ON() check in
+iomap_to_bh().
+
+Definitely not an XFS problem. Most likely not an ext4 problem.
+It appears to be related to syzbot trying to modify the block device
+under a mounted ext4 filesystem given the reproducer involves
+mounting an ext4 filesystem, then the process that mounted the ext4
+filesystem hits a BUG_ON trying to write to a block device.
+
+Certainly seems like a block device problem, though, given
+the new iomap write path in the block device merged in the 6.6-rc1 window.
+
+#syz set subsystems: block
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
