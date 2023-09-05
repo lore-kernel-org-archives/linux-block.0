@@ -2,125 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDCAC71153
-	for <linux-block@archiver.kernel.org>; Mon,  4 Sep 2023 20:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E6FACA0FFB
+	for <linux-block@archiver.kernel.org>; Tue,  5 Sep 2023 16:24:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237453AbjIDUSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Sep 2023 16:18:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57070 "EHLO
+        id S1350299AbjIEQYy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Sep 2023 12:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237342AbjIDUSN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Sep 2023 16:18:13 -0400
-Received: from mail-pg1-f206.google.com (mail-pg1-f206.google.com [209.85.215.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD85D1BE
-        for <linux-block@vger.kernel.org>; Mon,  4 Sep 2023 13:18:08 -0700 (PDT)
-Received: by mail-pg1-f206.google.com with SMTP id 41be03b00d2f7-56f75ec7ca9so2104888a12.3
-        for <linux-block@vger.kernel.org>; Mon, 04 Sep 2023 13:18:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693858688; x=1694463488;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oKTSRqe5vEAAweK90RC29TYKol7WNXWy0cVJPsEYh1Y=;
-        b=KArXpyKPlMnbPnLxyag5KpuDTkhHI9nHnuQfDMyIVgr9EGoLwwRFzjAvLUpeTa006j
-         Y1/U58V3k5eqI1NJIC+PW4uujNcYvAqIflQSJUzr6r2vrXM4rxY8FSVLUGIbGT7JZKRG
-         WJBrczwLdVW4vsgYFce467HzVGNmkK4Zux68Fjs/BTZyC5/wrh5OSFdw33MzAQL3w2gc
-         zo3ZWve56bRUmJyNbJ/YHywOKZWTFiaCPZV6P66agagelfVyzdtK6JImlwd2shsSjhFL
-         fFoVcnepk92BNu/X+t35Z9SpAi2BaNXW+9zQCPhzWCvS+0E9H5VGG3+fSnisf64XozTu
-         HTQQ==
-X-Gm-Message-State: AOJu0Yw5NsqdFsG7/BfiD5V4qSELomPJML4F9vZlnS9dwmA+ueLBjjZ5
-        7wE4dxpNoCKSo9+oDUcme1Q1alSEmbl+fmHBFUZwMY9otlm8
-X-Google-Smtp-Source: AGHT+IGYcdTdNiU4vNGnWrzvNF0/XFSSD92cZu6IRSyvRdgXv0e602y/bjkC+L7Qid3c2fo86AKFKGcxurBPh4oLEcDaF6hlsJuv
+        with ESMTP id S1354564AbjIEMle (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2023 08:41:34 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007071A8;
+        Tue,  5 Sep 2023 05:41:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=I66u7n0qR7e4t2l/vHkn1+P4nfDofW3E+lXSWKAdYBU=; b=co4MG+2W+W6XTXPz7WYRQmR0j3
+        8PQGEq6qlCieyDdFq9+M9pPX4W+lm+6znAs21w9o70fhf8OAT5SUkzrJX65xgRBneV3lT2xCIXD4i
+        FIq7l+ln9X3FyQEMJZcp4TnnSXmZWEyJqMy3HO484PNKmlSYZrXiFR+T0OFMjoaIjyD0FO8pnuCIu
+        EvMqoGUbQMILy+A88Cnlq6gPlLvBtV0qScgqPxZD9oo2JPnY42oKZdu/A6t8wXTsrWt5JmZOE+1fx
+        p102lXJwc/3BYIHykX9h9GIJI1Su7xaY0FMYbccjaMQjn9c8CZ2TXq80xXrJPqWXBXHXeXlalvirN
+        XanECvGg==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qdVMz-0062IL-16;
+        Tue, 05 Sep 2023 12:41:25 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     djwong@kernel.org
+Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, axboe@kernel.dk,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        syzbot+4a08ffdf3667b36650a1@syzkaller.appspotmail.com
+Subject: [PATCH] iomap: handle error conditions more gracefully in iomap_to_bh
+Date:   Tue,  5 Sep 2023 14:41:20 +0200
+Message-Id: <20230905124120.325518-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-Received: by 2002:a63:8c16:0:b0:56f:8338:ebb3 with SMTP id
- m22-20020a638c16000000b0056f8338ebb3mr2404636pgd.11.1693858688381; Mon, 04
- Sep 2023 13:18:08 -0700 (PDT)
-Date:   Mon, 04 Sep 2023 13:18:08 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006bc3d106048e35da@google.com>
-Subject: [syzbot] [block?] WARNING in floppy_queue_rq (2)
-From:   syzbot <syzbot+0958c189aec84815fdf2@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+iomap_to_bh currently BUG()s when the passed in block number is not
+in the iomap.  For file systems that have proper synchronization this
+should never happen and so far hasn't in mainline, but for block devices
+size changes aren't fully synchronized against ongoing I/O.  Instead
+of BUG()ing in this case, return -EIO to the caller, which already has
+proper error handling.  While we're at it, also return -EIO for an
+unknown iomap state instead of returning garbage.
 
-syzbot found the following issue on:
-
-HEAD commit:    b97d64c72259 Merge tag '6.6-rc-smb3-client-fixes-part1' of..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=174657e0680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=763a90eee2968442
-dashboard link: https://syzkaller.appspot.com/bug?extid=0958c189aec84815fdf2
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-b97d64c7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/45e3d1c1d5e8/vmlinux-b97d64c7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f9587ba4915c/bzImage-b97d64c7.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0958c189aec84815fdf2@syzkaller.appspotmail.com
-
-WARNING: CPU: 3 PID: 122 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 3 PID: 122 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
-WARNING: CPU: 3 PID: 122 at drivers/block/floppy.c:999 floppy_queue_rq+0x344/0x3b0 drivers/block/floppy.c:2879
-Modules linked in:
-CPU: 3 PID: 122 Comm: kworker/3:1H Not tainted 6.5.0-syzkaller-08894-gb97d64c72259 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: kblockd blk_mq_run_work_fn
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
-RIP: 0010:floppy_queue_rq+0x344/0x3b0 drivers/block/floppy.c:2879
-Code: 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 5e 48 8b 56 30 48 c7 c7 e0 fc f2 8a e8 25 09 12 fc 0f 0b eb 8d e8 dc bd 4b fc <0f> 0b e9 d5 fe ff ff 48 89 df e8 cd a5 a0 fc e9 d9 fc ff ff 48 89
-RSP: 0018:ffffc900027bf988 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: ffff8880186ac340 RSI: ffffffff853a8134 RDI: 0000000000000001
-RBP: ffffffff8d6edc80 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffff888020a42408
-R13: ffff888020a423c0 R14: dffffc0000000000 R15: ffffc900027bfc00
-FS:  0000000000000000(0000) GS:ffff88806b900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f97b40fbd58 CR3: 000000000c776000 CR4: 0000000000350ee0
-Call Trace:
- <TASK>
- blk_mq_dispatch_rq_list+0x694/0x22d0 block/blk-mq.c:2049
- __blk_mq_do_dispatch_sched block/blk-mq-sched.c:170 [inline]
- blk_mq_do_dispatch_sched block/blk-mq-sched.c:184 [inline]
- __blk_mq_sched_dispatch_requests+0xd30/0x1740 block/blk-mq-sched.c:309
- blk_mq_sched_dispatch_requests+0x104/0x180 block/blk-mq-sched.c:333
- blk_mq_run_work_fn+0x1fe/0x390 block/blk-mq.c:2434
- process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
- worker_thread+0x687/0x1110 kernel/workqueue.c:2751
- kthread+0x33a/0x430 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:145
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
-
-
+Fixes: 487c607df790 ("block: use iomap for writes to block devices")
+Reported-by: syzbot+4a08ffdf3667b36650a1@syzkaller.appspotmail.com
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ fs/buffer.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 2379564e5aeadf..a6785cd07081cb 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -2011,7 +2011,7 @@ void folio_zero_new_buffers(struct folio *folio, size_t from, size_t to)
+ }
+ EXPORT_SYMBOL(folio_zero_new_buffers);
+ 
+-static void
++static int
+ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ 		const struct iomap *iomap)
+ {
+@@ -2025,7 +2025,8 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ 	 * current block, then do not map the buffer and let the caller
+ 	 * handle it.
+ 	 */
+-	BUG_ON(offset >= iomap->offset + iomap->length);
++	if (offset >= iomap->offset + iomap->length)
++		return -EIO;
+ 
+ 	switch (iomap->type) {
+ 	case IOMAP_HOLE:
+@@ -2037,7 +2038,7 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ 		if (!buffer_uptodate(bh) ||
+ 		    (offset >= i_size_read(inode)))
+ 			set_buffer_new(bh);
+-		break;
++		return 0;
+ 	case IOMAP_DELALLOC:
+ 		if (!buffer_uptodate(bh) ||
+ 		    (offset >= i_size_read(inode)))
+@@ -2045,7 +2046,7 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ 		set_buffer_uptodate(bh);
+ 		set_buffer_mapped(bh);
+ 		set_buffer_delay(bh);
+-		break;
++		return 0;
+ 	case IOMAP_UNWRITTEN:
+ 		/*
+ 		 * For unwritten regions, we always need to ensure that regions
+@@ -2062,7 +2063,10 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ 		bh->b_blocknr = (iomap->addr + offset - iomap->offset) >>
+ 				inode->i_blkbits;
+ 		set_buffer_mapped(bh);
+-		break;
++		return 0;
++	default:
++		WARN_ON_ONCE(1);
++		return -EIO;
+ 	}
+ }
+ 
+@@ -2103,13 +2107,12 @@ int __block_write_begin_int(struct folio *folio, loff_t pos, unsigned len,
+ 			clear_buffer_new(bh);
+ 		if (!buffer_mapped(bh)) {
+ 			WARN_ON(bh->b_size != blocksize);
+-			if (get_block) {
++			if (get_block)
+ 				err = get_block(inode, block, bh, 1);
+-				if (err)
+-					break;
+-			} else {
+-				iomap_to_bh(inode, block, bh, iomap);
+-			}
++			else
++				err = iomap_to_bh(inode, block, bh, iomap);
++			if (err)
++				break;
+ 
+ 			if (buffer_new(bh)) {
+ 				clean_bdev_bh_alias(bh);
+-- 
+2.39.2
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
