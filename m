@@ -2,63 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC0E3C83F2C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB679CA0FF3
 	for <linux-block@archiver.kernel.org>; Tue,  5 Sep 2023 16:25:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346864AbjIEQZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Sep 2023 12:25:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44936 "EHLO
+        id S1348572AbjIEQZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Sep 2023 12:25:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354049AbjIEJ2U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2023 05:28:20 -0400
-X-Greylist: delayed 4042 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Sep 2023 02:28:16 PDT
-Received: from mail.equinoxrise.pl (mail.equinoxrise.pl [217.61.112.157])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B0801A8
-        for <linux-block@vger.kernel.org>; Tue,  5 Sep 2023 02:28:16 -0700 (PDT)
-Received: by mail.equinoxrise.pl (Postfix, from userid 1002)
-        id D523C832F9; Mon,  4 Sep 2023 09:41:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=equinoxrise.pl;
-        s=mail; t=1693813352;
-        bh=v6OgBfK5dN7P5dQ0wCu59rOfZaiqziJeLNblJ8dOcGI=;
-        h=Date:From:To:Subject:From;
-        b=VPX5ej3RLhSHSvtHwHtu23kdjldHTQSdUHtP2XymLV5h38uOD8zNux205ZyNHDomE
-         AsUUO/sBOTk3pJFaOtB3jHOw1HA9OMqkU1fAPHCbhgjy8N7OBOIPrPMCpolCR4HVyK
-         x6BbDEAN4qTbvsWXY/+XmMXzMibh9bGf1jLI+nGI6/wjpZdRsY9nVABeWlNxhqN0KO
-         /bkl1aM+ni9gKG1uCdA970NtHKqy5WyexXXtR1IKS1rlYQV+7mDsvFqVr/2Z1+GJVY
-         87nY7wMvPn99N4bonR66Zzpo6Mky7GU0BYNITcTZjn+/wnbHNULhXQ37Nc0fOGxMCD
-         fLkjqn2rgPf4w==
-Received: by mail.equinoxrise.pl for <linux-block@vger.kernel.org>; Mon,  4 Sep 2023 07:40:34 GMT
-Message-ID: <20230904084500-0.1.7.rio.0.jw94e0pr4l@equinoxrise.pl>
-Date:   Mon,  4 Sep 2023 07:40:34 GMT
-From:   "Mateusz Talaga" <mateusz.talaga@equinoxrise.pl>
-To:     <linux-block@vger.kernel.org>
-Subject: Prezentacja
-X-Mailer: mail.equinoxrise.pl
+        with ESMTP id S1354586AbjIEMrj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2023 08:47:39 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C438A1A6
+        for <linux-block@vger.kernel.org>; Tue,  5 Sep 2023 05:47:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=nmkgySJXef3i3b/Buj6bY+9d63/8+xCAx84ENpTUqcg=; b=w0vgxZjUF+pyK9XVBz4TedniJZ
+        bvTPl3JW7vX5SvWn6tGAaUio+CCTXbMSEkF8MiXweX32ZcqrQf2YDJIIUJXu6Qgy5qoFxWV1PxQhN
+        tK9/TePGLticwJtlGOc1D72x2D0l9YRS//V319OC13mWyASmrUITBy7ZuMvHFKypa4oVYhDLil5yC
+        InahXdXknAJBkTVqrU1LJCw38tJYcaBKOmzdysuRVPuCx10baGKbofFIQwMlAhKI+MCSCXWJ7fVWV
+        U1c3HxLZjqoqtYy77gf1BlT5Xr/iM7J6AfZJ6ibOZ13IhqlkELmgbQUoUOWqRBxffmI+nwjN86Cxh
+        xQpGIcmg==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qdVSx-0062y4-02;
+        Tue, 05 Sep 2023 12:47:35 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH] block: fix pin count management when merging same-page segments
+Date:   Tue,  5 Sep 2023 14:47:31 +0200
+Message-Id: <20230905124731.328255-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry!
+There is no need to unpin the added page when adding it to the bio fails
+as that is done by the loop below.  Instead we want to unpin it when adding
+a single page to the bio more than once as bio_release_pages will only
+unpin it once.
 
-Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
-=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
-zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
+Fixes: d1916c86ccdc ("block: move same page handling from __bio_add_pc_page to the callers")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-map.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
-=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
-dostaw.
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 44d74a30ddac04..8584babf3ea0ca 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -315,12 +315,11 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 					n = bytes;
+ 
+ 				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
+-						     max_sectors, &same_page)) {
+-					if (same_page)
+-						bio_release_page(bio, page);
++						     max_sectors, &same_page))
+ 					break;
+-				}
+ 
++				if (same_page)
++					bio_release_page(bio, page);
+ 				bytes -= n;
+ 				offs = 0;
+ 			}
+-- 
+2.39.2
 
-Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
-nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
- co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
-
-Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
-=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
-zania w Pa=C5=84stwa firmie.
-
-
-Pozdrawiam
-Mateusz Talaga
