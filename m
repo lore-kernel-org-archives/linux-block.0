@@ -2,35 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 445F5CCF9F2
-	for <linux-block@archiver.kernel.org>; Wed,  6 Sep 2023 01:18:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B4EEB8FAD
+	for <linux-block@archiver.kernel.org>; Wed,  6 Sep 2023 09:27:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231270AbjIFBSy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Sep 2023 21:18:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38926 "EHLO
+        id S230347AbjIFJ1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Sep 2023 05:27:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbjIFBSx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2023 21:18:53 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62E4BCEA;
-        Tue,  5 Sep 2023 18:18:35 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDCEFC433C8;
-        Wed,  6 Sep 2023 01:18:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693963115;
-        bh=eeHDRb7VfosuUqyYtVjvJ/NSWIjvkBytSfOcika1FK4=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=C5eFJfawMth3UCf6NW1kktZ9SXhIy6WntHswux69S6WFgqvd9zvXOD1KwjeR/czbg
-         tTMhxsBbJL+qOoOdeHO0uYKjfks+MFY3wIzX/B16aHnOSXY76S0Q+UlJyYo8t9a5Fh
-         XNMG31KtJJZsJKo14ObOrzQC5+Dv6GPD1Y3d8n5k9dyosfdiSL9JKGGBR7YKrP7jqd
-         GFH6+pjResjDfIY6OsRpjmJzoiGf7kBcQcb1RxbsKgW3ixHiVVJkB1llRMaovplcc5
-         kD/1ohrUQFkibDlpLB4omNnybNnZhvjQ4F30MxOPBUCLyYyv8Lt2+0apx9y8TBVHSb
-         1gC6DprOFNQLA==
-Message-ID: <c27f7736-33b6-71ea-97aa-81bcbce342e8@kernel.org>
-Date:   Wed, 6 Sep 2023 10:18:32 +0900
+        with ESMTP id S236807AbjIFJ1O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2023 05:27:14 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07B24171F;
+        Wed,  6 Sep 2023 02:26:56 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id BF7A222443;
+        Wed,  6 Sep 2023 09:26:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1693992414; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I3rIv+HN01Web1KGJNNDUY+0CQGW+JW+xYMEz2h5hWo=;
+        b=lhq5Wdk3BgvB+cWFcsR0byMu0ym4CyA2QpF28RXJwBCt1WYds8ndsSH2LdYQTUZfLHuY1c
+        4wJX/hlGWwlkxjRmQS/pP9qiDCl5dcUCtsrDR5Qk1UDqF9V5AOxXRd0uIZl0ZoqHM4rU+H
+        0wNNBWWWRUUi7YbHS3uFmwBg2ts13as=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1693992414;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I3rIv+HN01Web1KGJNNDUY+0CQGW+JW+xYMEz2h5hWo=;
+        b=Nnz/GWrGwYjJ1ViI8zDUOPZTlsWutz/riRUdXQ5yRYApSlIfmfMJJatwh31cFr9ERdBax8
+        RrUmWYiAQXnzCKDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9046A1333E;
+        Wed,  6 Sep 2023 09:26:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id wKO1Id5F+GSJDQAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 06 Sep 2023 09:26:54 +0000
+Message-ID: <71c1213b-a5e0-4d14-9bbd-352d85361d67@suse.de>
+Date:   Wed, 6 Sep 2023 11:26:52 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] iomap: handle error conditions more gracefully in
  iomap_to_bh
 Content-Language: en-US
@@ -39,16 +60,15 @@ Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, axboe@kernel.dk,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         syzbot+4a08ffdf3667b36650a1@syzkaller.appspotmail.com
 References: <20230905124120.325518-1-hch@lst.de>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
+From:   Hannes Reinecke <hare@suse.de>
 In-Reply-To: <20230905124120.325518-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/5/23 21:41, Christoph Hellwig wrote:
+On 9/5/23 14:41, Christoph Hellwig wrote:
 > iomap_to_bh currently BUG()s when the passed in block number is not
 > in the iomap.  For file systems that have proper synchronization this
 > should never happen and so far hasn't in mainline, but for block devices
@@ -60,10 +80,19 @@ On 9/5/23 21:41, Christoph Hellwig wrote:
 > Fixes: 487c607df790 ("block: use iomap for writes to block devices")
 > Reported-by: syzbot+4a08ffdf3667b36650a1@syzkaller.appspotmail.com
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   fs/buffer.c | 25 ++++++++++++++-----------
+>   1 file changed, 14 insertions(+), 11 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Cheers,
 
+Hannes
 -- 
-Damien Le Moal
-Western Digital Research
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
