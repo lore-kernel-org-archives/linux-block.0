@@ -2,98 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA07EC873A
-	for <linux-block@archiver.kernel.org>; Thu,  7 Sep 2023 15:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C7BEC8740
+	for <linux-block@archiver.kernel.org>; Thu,  7 Sep 2023 16:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233975AbjIGPv5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Sep 2023 11:51:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49094 "EHLO
+        id S238457AbjIGQSt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Sep 2023 12:18:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245476AbjIGPgj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Sep 2023 11:36:39 -0400
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 626DC1BF8
-        for <linux-block@vger.kernel.org>; Thu,  7 Sep 2023 08:36:14 -0700 (PDT)
-Received: by mail-oo1-xc35.google.com with SMTP id 006d021491bc7-573128cd77dso169872eaf.0
-        for <linux-block@vger.kernel.org>; Thu, 07 Sep 2023 08:36:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694100972; x=1694705772; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mmqr09NFOdAcxT8GnRxHCgyTgj/fxtGD41pLptP2Au0=;
-        b=irlzL6FTIbmbJgRq5Igt9l5zk1JQ3Njqkz6ExRoNCX2C2g7F3yOoYUy4acd/NkjXui
-         IRCyx0ofS6KoNY7G7PJ32FGr9v17NWFSxEtw9JIkO35BRbpHi9YNZsy6XwWJEzdVw2KZ
-         ZVn4uoS0ZqcPqvu38GXL9dxk7oi/A14p8jzm09WCje/Dn/84+7Io5z+gV9zWBHC4lgo9
-         BcoTjL0X9MUxoGbmbbxAu0soNixklKoBz6lB6a5kltFtof0VJUrn1u9lPjvdd5gh3ekw
-         TTDoXmvH9AOcsQ2yf/9AuxxglQENo/xPRa4XxFDhrajbuM98JhVDbpwCgbO36/Vc04cI
-         bjqg==
+        with ESMTP id S237747AbjIGQRk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Sep 2023 12:17:40 -0400
+Received: from mail-yw1-x1145.google.com (mail-yw1-x1145.google.com [IPv6:2607:f8b0:4864:20::1145])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F4508A7A
+        for <linux-block@vger.kernel.org>; Thu,  7 Sep 2023 08:55:52 -0700 (PDT)
+Received: by mail-yw1-x1145.google.com with SMTP id 00721157ae682-58c8cbf0a0dso39973057b3.1
+        for <linux-block@vger.kernel.org>; Thu, 07 Sep 2023 08:55:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694100972; x=1694705772;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mmqr09NFOdAcxT8GnRxHCgyTgj/fxtGD41pLptP2Au0=;
-        b=L6XzWRZBalkXC+n+agrNV0Nyu6WV0ns6goEUIpBMetamgDm66XqqVXF6SJSMDm4eQK
-         tGgyoQ/iWXjcgXluVrfplC+ZQHdNVlrZ+au1Q2xhUCEW3MDjHO1eYvpUdSleqWCKVs+9
-         gM0zA0Otrkc7CpFIGdELP6bYQaHlTjGJToFRGC0cP+E1rLWgl+Nne91jyN+IaUBWy8li
-         Wa6Ab3h71HQDcADUkLtJcaSbn8moGs2n+ayfepTsdD4u0kbD0AAMfwqZicApDrQkW2Zx
-         3rlYVvfkUDMSuRvF9qK0v4oB7zsrCfLIny6iCNq6eZXferpqr47AKMwtFDDwAJx2tlxw
-         VlVw==
-X-Gm-Message-State: AOJu0YyVsdfPiy+4HmQnrVaNykafq9y6RbwlgHDxMDxrafb2VXwUzk9t
-        Onbnjr7zkcYymoJnyGQTW2LjcQ==
-X-Google-Smtp-Source: AGHT+IFAx31pDL9OS0UaQ1QM7P0+U8uqVOMnNbmVkRkKwNCPJEI10DFOozUuRPTBz0NCwjQiG7qxHg==
-X-Received: by 2002:a05:6358:51db:b0:13a:cf1d:4a0d with SMTP id 27-20020a05635851db00b0013acf1d4a0dmr14633190rwl.0.1694100972613;
-        Thu, 07 Sep 2023 08:36:12 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c0a8:11c9::11ab? ([2620:10d:c091:400::5:d08f])
-        by smtp.gmail.com with ESMTPSA id l9-20020a0c9789000000b0064c9f754794sm6517636qvd.86.2023.09.07.08.36.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Sep 2023 08:36:11 -0700 (PDT)
-Message-ID: <f6be40a3-38de-41ed-a545-d9063379f8e2@kernel.dk>
-Date:   Thu, 7 Sep 2023 09:36:10 -0600
+        d=1e100.net; s=20221208; t=1694102012; x=1694706812;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3uorYgBy/vSzGATNXjGaFcQjl0zqUtF7P8rETQPdQ6s=;
+        b=RLnEsUgrEto7+C0mePm0qrfRhjpzFRh/KmMVBp6WIl8gcKzBbXq3r3lwjAR/5jBG/a
+         vk3sgnoGG8TSHlN0be9TehKZQOnUrGlB9Y+pzJ+2qJqRS9IbNBxQDnRxjyz5VUGmqaSr
+         abdXNeyQLkoL4k3yrAy/RjIHwLGKwdGxyB0EtWMmOsxG17oB1Lmqe/Rklc+NzeTJsZna
+         FLhQCca7/yi6RTKRhnR4PSwjSRRmpBdvNqFF5EPYYvvxmWShsjpqqu1iVNw8N4KwQYHI
+         gBtT17MbIS+Iw22c9kkSKXTZ9Mja98KHXB6NyPKxCP7TI4dDbF0EQrazztLzv49bTHBi
+         BMKw==
+X-Gm-Message-State: AOJu0YxeYGkUZ+P5UFrinrW3GB9C5HXmrQA060iVqJMZ7ox5eFGISi6Q
+        MWcl5vVE7pDl8G3n2d0U1HZu/2rml2CcXcZPvaCrC3Gttm29nz0=
+X-Google-Smtp-Source: AGHT+IFv5RoDlYTTHNTZRVCYgdQ3cCvXQcVZJdqAENmmBoZNBWPCxhGShggp718Md5FgEKnzPNCIe8409SLooz2fwa7VgMNc/OBG
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] io_uring: fix IO hang in io_wq_put_and_exit from
- do_exit()
-Content-Language: en-US
-From:   Jens Axboe <axboe@kernel.dk>
-To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>,
-        Pavel Begunkov <asml.silence@gmail.com>
-References: <20230901134916.2415386-1-ming.lei@redhat.com>
- <169358121201.335729.4270950770834703042.b4-ty@kernel.dk>
-In-Reply-To: <169358121201.335729.4270950770834703042.b4-ty@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a17:903:32c2:b0:1c2:2485:ad7 with SMTP id
+ i2-20020a17090332c200b001c224850ad7mr587578plr.4.1694078749617; Thu, 07 Sep
+ 2023 02:25:49 -0700 (PDT)
+Date:   Thu, 07 Sep 2023 02:25:49 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000017b6b90604c17266@google.com>
+Subject: [syzbot] Monthly block report (Sep 2023)
+From:   syzbot <syzbot+list4766b5991d014e82a610@syzkaller.appspotmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/1/23 9:13 AM, Jens Axboe wrote:
-> 
-> On Fri, 01 Sep 2023 21:49:16 +0800, Ming Lei wrote:
->> io_wq_put_and_exit() is called from do_exit(), but all FIXED_FILE requests
->> in io_wq aren't canceled in io_uring_cancel_generic() called from do_exit().
->> Meantime io_wq IO code path may share resource with normal iopoll code
->> path.
->>
->> So if any HIPRI request is submittd via io_wq, this request may not get resouce
->> for moving on, given iopoll isn't possible in io_wq_put_and_exit().
->>
->> [...]
-> 
-> Applied, thanks!
-> 
-> [1/1] io_uring: fix IO hang in io_wq_put_and_exit from do_exit()
->       commit: b484a40dc1f16edb58e5430105a021e1916e6f27
+Hello block maintainers/developers,
 
-This causes a regression with the test/thread-exit.t test case, as it's
-canceling requests from other tasks as well. I will drop this patch for
-now.
+This is a 31-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
 
--- 
-Jens Axboe
+During the period, 5 new issues were detected and 0 were fixed.
+In total, 31 issues are still open and 85 have been fixed so far.
 
+Some of the still happening issues:
 
+Ref  Crashes Repro Title
+<1>  1987    Yes   WARNING in copy_page_from_iter
+                   https://syzkaller.appspot.com/bug?extid=63dec323ac56c28e644f
+<2>  407     Yes   INFO: task hung in blkdev_put (4)
+                   https://syzkaller.appspot.com/bug?extid=9a29d5e745bd7523c851
+<3>  252     No    KMSAN: kernel-infoleak in copy_page_to_iter (4)
+                   https://syzkaller.appspot.com/bug?extid=17a061f6132066e9fb95
+<4>  95      Yes   INFO: task hung in blkdev_fallocate
+                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
+<5>  36      Yes   KASAN: use-after-free Read in __dev_queue_xmit (5)
+                   https://syzkaller.appspot.com/bug?extid=b7be9429f37d15205470
+<6>  25      Yes   INFO: task hung in blkdev_get_by_dev (5)
+                   https://syzkaller.appspot.com/bug?extid=6229476844294775319e
+<7>  24      Yes   WARNING in blk_register_tracepoints
+                   https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
+<8>  16      Yes   WARNING in wait_til_done (2)
+                   https://syzkaller.appspot.com/bug?extid=9bc4da690ee5334f5d15
+<9>  8       Yes   WARNING in floppy_interrupt (2)
+                   https://syzkaller.appspot.com/bug?extid=aa45f3927a085bc1b242
+<10> 5       Yes   WARNING in get_probe_ref
+                   https://syzkaller.appspot.com/bug?extid=8672dcb9d10011c0a160
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
