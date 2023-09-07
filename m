@@ -2,60 +2,59 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F72EC8743
-	for <linux-block@archiver.kernel.org>; Thu,  7 Sep 2023 17:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D25FEC874C
+	for <linux-block@archiver.kernel.org>; Thu,  7 Sep 2023 17:37:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236074AbjIGRdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Sep 2023 13:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44932 "EHLO
+        id S244661AbjIGRhv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Sep 2023 13:37:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244824AbjIGRdA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Sep 2023 13:33:00 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 544DC10FD;
-        Thu,  7 Sep 2023 10:32:34 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D54322184B;
-        Thu,  7 Sep 2023 05:50:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1694065801; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GkBgQJPFmxHSxjl0QqrHficEND3DHJwl7TSsSPl31Fk=;
-        b=OG/bX/wrznenCvi4sH/KPgR14Bby2fChMRcPR0onrTpciMwcRSMqhwU92k6p4F3mYpEjrM
-        I73ZOXQxPb1P2/tWgTdEU1Vt7uGnuPI4/Nq3+F3L8f0eGoN45orjQzGgA5nogh707sjQSU
-        lU6OFXkGX5+JoD9SNdIkEB1HGapEjsI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1694065801;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GkBgQJPFmxHSxjl0QqrHficEND3DHJwl7TSsSPl31Fk=;
-        b=P1+WN2lEYCmr3vUbniY4nBzQ0JIJQZ9CjwNIIWHR3JfF+Ww/p4VX/BIwViWf0CHNVx0sXh
-        1MuiyNe4GgEVZFAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A2E3B13458;
-        Thu,  7 Sep 2023 05:50:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id fk1vIYhk+WRcYAAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 07 Sep 2023 05:50:00 +0000
-Message-ID: <b0f3d320-047b-4bd8-a6fc-25b468caf5b3@suse.de>
-Date:   Thu, 7 Sep 2023 07:49:59 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 03/12] block: add copy offload support
-Content-Language: en-US
-To:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        with ESMTP id S245139AbjIGRhs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Sep 2023 13:37:48 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44B210F9
+        for <linux-block@vger.kernel.org>; Thu,  7 Sep 2023 10:37:25 -0700 (PDT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230907080933epoutp04bf44a4dc28237dbf464298e3ba6da610~Cj3wguM4H0211902119epoutp04F
+        for <linux-block@vger.kernel.org>; Thu,  7 Sep 2023 08:09:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230907080933epoutp04bf44a4dc28237dbf464298e3ba6da610~Cj3wguM4H0211902119epoutp04F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1694074173;
+        bh=V6wr2bHKFf1JJGBntBJklQKl0KYjTY7rWeAV22neHUc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FuIsvGFBvEa3mSAuwbudLT13WTEF4irSeTJwTLS02ZR1lw4VXAkTtF7Mp51f/FSdv
+         4FsOsII2UFfacQCYclmXd/ERK+PuP7Dwzw1kKP7v8NGj2jOzCZdkT5/Z4KdjQ7Eeb+
+         em53o6sbb4Vimt9FBI1xdjZ+xsanhssjNly3gvzU=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20230907080932epcas5p29191997c30b6c069da4ec6098457f9ed~Cj3v7N0E82859528595epcas5p27;
+        Thu,  7 Sep 2023 08:09:32 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4RhBjQ5pMQz4x9Q6; Thu,  7 Sep
+        2023 08:09:30 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        61.40.09638.A3589F46; Thu,  7 Sep 2023 17:09:30 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230907071936epcas5p1ae555e75c8ee278f08e4537d0839cc72~CjMJf8lev2653926539epcas5p1y;
+        Thu,  7 Sep 2023 07:19:36 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230907071936epsmtrp17265aa18f417f5e035967b86ea7c0b17~CjMJe6os_1235812358epsmtrp1B;
+        Thu,  7 Sep 2023 07:19:36 +0000 (GMT)
+X-AuditID: b6c32a4a-92df9700000025a6-ff-64f9853a35a9
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        D0.0D.18916.88979F46; Thu,  7 Sep 2023 16:19:36 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230907071933epsmtip2c2f2ef6298194cfcf6c7db10e2733a19~CjMGmu15-2489124891epsmtip2B;
+        Thu,  7 Sep 2023 07:19:32 +0000 (GMT)
+Date:   Thu, 7 Sep 2023 12:46:11 +0530
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
         Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
         Keith Busch <kbusch@kernel.org>,
@@ -63,269 +62,95 @@ To:     Nitesh Shetty <nj.shetty@samsung.com>,
         Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Cc:     martin.petersen@oracle.com, mcgrof@kernel.org,
+        Christian Brauner <brauner@kernel.org>,
+        martin.petersen@oracle.com, mcgrof@kernel.org,
         gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v15 03/12] block: add copy offload support
+Message-ID: <20230907071611.rgukw7fory2xh5sy@green245>
+MIME-Version: 1.0
+In-Reply-To: <b0f3d320-047b-4bd8-a6fc-25b468caf5b3@suse.de>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA02TfVCTdRzA+z3Psxc8V09D7AdU0rC7kAM32uYzYuAp1z2XdQennlndwWKP
+        jGNsuz0bYHY1UUC4YIoUMKlAKN6E5SCP9yMMgVHxh4GAQsIxDZD3GyIEtLHh+d/n+/52XzbK
+        TWf5sBNUOkqrkil5zF3YrdsBAUGh6c/k/KKcAMJsvYMSaZc3UKJm1MgkZm4vAWKyIxMQbXPX
+        GMRwRxNCtF7PQ4iqmi6EyOscBIRtwIQQbSOBRGlGOUa0tvVixN3mYibx4882FlHRvYkQQ5dt
+        gKibmceInhFfon+jm3HYi+wfu4mRd//Uk5bqLCZZX/412TJsYJJluVcZZM6FOSa5aBvByPn2
+        ASaZ21ANyPq+c+Sy5U3SMjmLRHE+SQxTUDI5pfWjVHFqeYIqXso7djzmaIxIzBcECSTEIZ6f
+        SpZESXmRH0YFvZ+gdMzL80uWKfUOVZSMpnkHw8O0ar2O8lOoaZ2UR2nkSo1QE0zLkmi9Kj5Y
+        RelCBXx+iMjhGJuoWMtewDRbrNTKrCamATxgZgMPNsSFMGtzGMsGu9hcvAXAjMe/sFzCEoDz
+        tR3M54J9ogzZCbHPNCIuQxOABXPDLKeBiz8CsH5ht5MxfD+8uLHlcGKzmXgg7NtiO9V7cB5c
+        zOzcroDi6Qy4VrO0ndQTD4cTK5sMJ3NwMZw5X4q6+FXYWzSJOdkDfw8aV8e3+/bCX4eFP9lR
+        ZyKIF3jA8sJld3eRsLBpg+FiTzjd3cBysQ+cMma4OQVW5VcyXcEXATTdMwGXIQKmW43blVFc
+        AZ9MjWIu/RvwW2sd4tK/DHPWJ93FOLDxhx32hzfMJe6tesPBp+fdTMLJp7XuDS0AaJg9chns
+        M70wnOmFci4OhVkLaQyTY3ko7gsrNtkuDIDm5oMlgFENvCkNnRRP0SJNiIpKeX7xOHWSBWz/
+        w4EPGsH4w4XgToCwQSeAbJS3hzO3b0XO5chlZ7+gtOoYrV5J0Z1A5DjWFdTHK07teCiVLkYg
+        lPCFYrFYKHlXLOC9xplJ/17OxeNlOiqRojSUdicOYXv4GJCKa/nWM/cubJmjuoo2PFdQ6+/B
+        x0kpdyTTctJ66I93vO/M7R8fM0R+XDAsT/4r9p/kmOK6hvw6USkbiCZ+WzxWzIe3lKsaq2BN
+        n9N+OjmCHp2iLPd9bxR+FVGWUlVVuTeyR3Ip/mZT34DhvwKPElq43nzWOK1t7Xmr2Jb25Du7
+        f8RLVv+EL0uiU/8+9XaYRa7g9knW1yOH8kJ7uNgle605rpKCD6dbVsnBX7m+it2nsgIrTCfO
+        zfZa64zBA4+vPLDY+s+kfrRy+v7ecE7XSqv5aOx63pD18HUzEv5o6pV/2zLJT9ujk77xlEQf
+        ORlSNPbs6mcnYtOW2+yoVPN5wqI0l4fRCpngAKqlZf8D0vdD9ZgEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEIsWRmVeSWpSXmKPExsWy7bCSvG5H5c8Ug52beS3WnzrGbNE04S+z
+        xeq7/WwWrw9/YrR4cqCd0WLvu9msFjcP7GSy2LNoEpPFytVHmSwmHbrGaPH06iwmi723tC0W
+        ti1hsdiz9ySLxeVdc9gs5i97ym6x/Pg/JosbE54yWqx7/Z7F4sQtaYvzf4+zOoh6nL+3kcXj
+        8tlSj02rOtk8Ni+p99h9s4HNY3HfZFaP3uZ3bB4fn95i8Xi/7yqbR9+WVYwem09Xe3zeJOex
+        6clbpgDeKC6blNSczLLUIn27BK6M8613WAs2slYc3dnE1sC4gqWLkZNDQsBE4uvrHUxdjFwc
+        QgLbGSWezX3KDJGQlFj29wiULSyx8t9zdhBbSOAJo8TyPVEgNouAikTL3/9AzRwcbALaEqf/
+        c4CERQSUJD62H2IHmcks0M4q0b/gFSNIQljATuLRt3+sIDavgJnE68aFzBCLPzBKXNp+kxki
+        IShxcuYTsOuYgYrmbX7IDLKAWUBaYvk/sAWcAtYS/T8esoHYogIyEjOWfmWewCg4C0n3LCTd
+        sxC6FzAyr2IUTS0ozk3PTS4w1CtOzC0uzUvXS87P3cQIjmatoB2My9b/1TvEyMTBeIhRgoNZ
+        SYT3nfy3FCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8yjmdKUIC6YklqdmpqQWpRTBZJg5OqQYm
+        psVGUjocv0PKF1veYZ6r5CabX2m7J+v1ubSIoFPLQiZPSBackunI5m6f/aTmt5Csv8qiRuby
+        fYdsMlgPZThaXf/x13umoG4Qw4d/i/+GRTnsZJJL6LmXxsCXyHo9dVXFIc2+2MaQsLOK2TJu
+        PpdSXB5kHMvvPzlvW2GI8sPbpqpJX97oRK1JeV1W0H6U+bHzwvnch6cp5Vrcj/kRnBH4+O67
+        NYI1D7eLP/68patKUlN/xY9p7d7HjtawHlBOenbhwTaeN+yZ91M29xubxqS6MoYobvfu3s0V
+        zyAaJmBn9jk+MuJ4e8GM/+ZS3g8M1hmeuvL5/auvU9Yd5JrsviNBdkb5+4Rjfw7d4mRqalRi
+        Kc5INNRiLipOBABGGkG3VQMAAA==
+X-CMS-MailID: 20230907071936epcas5p1ae555e75c8ee278f08e4537d0839cc72
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----1B4_PwnuBgjs5al8.ARo7bB9J1Y4sbiuOmsCUR3u7pWcBekA=_3ae06_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230906164312epcas5p397662c68dde1dbc4dc14c3e80ca260b3
 References: <20230906163844.18754-1-nj.shetty@samsung.com>
- <CGME20230906164312epcas5p397662c68dde1dbc4dc14c3e80ca260b3@epcas5p3.samsung.com>
- <20230906163844.18754-4-nj.shetty@samsung.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230906163844.18754-4-nj.shetty@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        <CGME20230906164312epcas5p397662c68dde1dbc4dc14c3e80ca260b3@epcas5p3.samsung.com>
+        <20230906163844.18754-4-nj.shetty@samsung.com>
+        <b0f3d320-047b-4bd8-a6fc-25b468caf5b3@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/6/23 18:38, Nitesh Shetty wrote:
-> Introduce blkdev_copy_offload to perform copy offload.
-> Issue REQ_OP_COPY_SRC with source info along with taking a plug.
-> This flows till request layer and waits for dst bio to arrive.
-> Issue REQ_OP_COPY_DST with destination info and this bio reaches request
-> layer and merges with src request.
-> For any reason, if a request comes to the driver with only one of src/dst
-> bio, we fail the copy offload.
-> 
-> Larger copy will be divided, based on max_copy_sectors limit.
-> 
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> ---
->   block/blk-lib.c        | 202 +++++++++++++++++++++++++++++++++++++++++
->   include/linux/blkdev.h |   4 +
->   2 files changed, 206 insertions(+)
-> 
-> diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index e59c3069e835..d22e1e7417ca 100644
-> --- a/block/blk-lib.c
-> +++ b/block/blk-lib.c
-> @@ -10,6 +10,22 @@
->   
->   #include "blk.h"
->   
-> +/* Keeps track of all outstanding copy IO */
-> +struct blkdev_copy_io {
-> +	atomic_t refcount;
-> +	ssize_t copied;
-> +	int status;
-> +	struct task_struct *waiter;
-> +	void (*endio)(void *private, int status, ssize_t copied);
-> +	void *private;
-> +};
-> +
-> +/* Keeps track of single outstanding copy offload IO */
-> +struct blkdev_copy_offload_io {
-> +	struct blkdev_copy_io *cio;
-> +	loff_t offset;
-> +};
-> +
->   static sector_t bio_discard_limit(struct block_device *bdev, sector_t sector)
->   {
->   	unsigned int discard_granularity = bdev_discard_granularity(bdev);
-> @@ -115,6 +131,192 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->   }
->   EXPORT_SYMBOL(blkdev_issue_discard);
->   
-> +static inline ssize_t blkdev_copy_sanity_check(struct block_device *bdev_in,
-> +					       loff_t pos_in,
-> +					       struct block_device *bdev_out,
-> +					       loff_t pos_out, size_t len)
-> +{
-> +	unsigned int align = max(bdev_logical_block_size(bdev_out),
-> +				 bdev_logical_block_size(bdev_in)) - 1;
-> +
-> +	if ((pos_in & align) || (pos_out & align) || (len & align) || !len ||
-> +	    len >= BLK_COPY_MAX_BYTES)
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +static inline void blkdev_copy_endio(struct blkdev_copy_io *cio)
-> +{
-> +	if (cio->endio) {
-> +		cio->endio(cio->private, cio->status, cio->copied);
-> +		kfree(cio);
-> +	} else {
-> +		struct task_struct *waiter = cio->waiter;
-> +
-> +		WRITE_ONCE(cio->waiter, NULL);
-> +		blk_wake_io_task(waiter);
-> +	}
-> +}
-> +
-> +/*
-> + * This must only be called once all bios have been issued so that the refcount
-> + * can only decrease. This just waits for all bios to complete.
-> + * Returns the length of bytes copied or error
-> + */
-> +static ssize_t blkdev_copy_wait_io_completion(struct blkdev_copy_io *cio)
-> +{
-> +	ssize_t ret;
-> +
-> +	for (;;) {
-> +		__set_current_state(TASK_UNINTERRUPTIBLE);
-> +		if (!READ_ONCE(cio->waiter))
-> +			break;
-> +		blk_io_schedule();
-> +	}
-> +	__set_current_state(TASK_RUNNING);
-> +	ret = cio->copied;
-> +	kfree(cio);
-> +
-> +	return ret;
-> +}
-> +
-> +static void blkdev_copy_offload_dst_endio(struct bio *bio)
-> +{
-> +	struct blkdev_copy_offload_io *offload_io = bio->bi_private;
-> +	struct blkdev_copy_io *cio = offload_io->cio;
-> +
-> +	if (bio->bi_status) {
-> +		cio->copied = min_t(ssize_t, offload_io->offset, cio->copied);
-> +		if (!cio->status)
-> +			cio->status = blk_status_to_errno(bio->bi_status);
-> +	}
-> +	bio_put(bio);
-> +
-> +	if (atomic_dec_and_test(&cio->refcount))
-> +		blkdev_copy_endio(cio);
-> +}
-> +
-> +/*
-> + * @bdev:	block device
-> + * @pos_in:	source offset
-> + * @pos_out:	destination offset
-> + * @len:	length in bytes to be copied
-> + * @endio:	endio function to be called on completion of copy operation,
-> + *		for synchronous operation this should be NULL
-> + * @private:	endio function will be called with this private data,
-> + *		for synchronous operation this should be NULL
-> + * @gfp_mask:	memory allocation flags (for bio_alloc)
-> + *
-> + * For synchronous operation returns the length of bytes copied or error
-> + * For asynchronous operation returns -EIOCBQUEUED or error
-> + *
-> + * Description:
-> + *	Copy source offset to destination offset within block device, using
-> + *	device's native copy offload feature. This function can fail, and
-> + *	in that case the caller can fallback to emulation.
-> + *	We perform copy operation using 2 bio's.
-> + *	1. We take a plug and send a REQ_OP_COPY_SRC bio along with source
-> + *	sector and length. Once this bio reaches request layer, we form a
-> + *	request and wait for dst bio to arrive.
-> + *	2. We issue REQ_OP_COPY_DST bio along with destination sector, length.
-> + *	Once this bio reaches request layer and find a request with previously
-> + *	sent source info we merge the destination bio and return.
-> + *	3. Release the plug and request is sent to driver
-> + *	This design works only for drivers with request queue.
-> + */
-> +ssize_t blkdev_copy_offload(struct block_device *bdev, loff_t pos_in,
-> +			    loff_t pos_out, size_t len,
-> +			    void (*endio)(void *, int, ssize_t),
-> +			    void *private, gfp_t gfp)
-> +{
-> +	struct blkdev_copy_io *cio;
-> +	struct blkdev_copy_offload_io *offload_io;
-> +	struct bio *src_bio, *dst_bio;
-> +	ssize_t rem, chunk, ret;
-> +	ssize_t max_copy_bytes = bdev_max_copy_sectors(bdev) << SECTOR_SHIFT;
-> +	struct blk_plug plug;
-> +
-> +	if (!max_copy_bytes)
-> +		return -EINVAL;
-> +
-> +	ret = blkdev_copy_sanity_check(bdev, pos_in, bdev, pos_out, len);
-> +	if (ret)
-> +		return ret;
-> +
-> +	cio = kzalloc(sizeof(*cio), GFP_KERNEL);
-> +	if (!cio)
-> +		return -ENOMEM;
-> +	atomic_set(&cio->refcount, 1);
-> +	cio->waiter = current;
-> +	cio->endio = endio;
-> +	cio->private = private;
-> +
-> +	/*
-> +	 * If there is a error, copied will be set to least successfully
-> +	 * completed copied length
-> +	 */
-> +	cio->copied = len;
-> +	for (rem = len; rem > 0; rem -= chunk) {
-> +		chunk = min(rem, max_copy_bytes);
-> +
-> +		offload_io = kzalloc(sizeof(*offload_io), GFP_KERNEL);
-> +		if (!offload_io)
-> +			goto err_free_cio;
-> +		offload_io->cio = cio;
-> +		/*
-> +		 * For partial completion, we use offload_io->offset to truncate
-> +		 * successful copy length
-> +		 */
-> +		offload_io->offset = len - rem;
-> +
-> +		src_bio = bio_alloc(bdev, 0, REQ_OP_COPY_SRC, gfp);
-> +		if (!src_bio)
-> +			goto err_free_offload_io;
-> +		src_bio->bi_iter.bi_size = chunk;
-> +		src_bio->bi_iter.bi_sector = pos_in >> SECTOR_SHIFT;
-> +
-> +		blk_start_plug(&plug);
-> +		dst_bio = blk_next_bio(src_bio, bdev, 0, REQ_OP_COPY_DST, gfp);
-> +		if (!dst_bio)
-> +			goto err_free_src_bio;
-> +		dst_bio->bi_iter.bi_size = chunk;
-> +		dst_bio->bi_iter.bi_sector = pos_out >> SECTOR_SHIFT;
-> +		dst_bio->bi_end_io = blkdev_copy_offload_dst_endio;
-> +		dst_bio->bi_private = offload_io;
-> +
-> +		atomic_inc(&cio->refcount);
-> +		submit_bio(dst_bio);
-> +		blk_finish_plug(&plug);
-> +		pos_in += chunk;
-> +		pos_out += chunk;
-> +	}
-> +
-> +	if (atomic_dec_and_test(&cio->refcount))
-> +		blkdev_copy_endio(cio);
-> +	if (cio->endio)
-> +		return -EIOCBQUEUED;
-> +
-> +	return blkdev_copy_wait_io_completion(cio);
-> +
-> +err_free_src_bio:
-> +	bio_put(src_bio);
-> +err_free_offload_io:
-> +	kfree(offload_io);
-> +err_free_cio:
-> +	cio->copied = min_t(ssize_t, cio->copied, (len - rem));
-> +	cio->status = -ENOMEM;
-> +	if (rem == len) {
-> +		kfree(cio);
-> +		return cio->status;
-> +	}
-> +	if (cio->endio)
-> +		return cio->status;
-> +
-> +	return blkdev_copy_wait_io_completion(cio);
-> +}
-> +EXPORT_SYMBOL_GPL(blkdev_copy_offload);
+------1B4_PwnuBgjs5al8.ARo7bB9J1Y4sbiuOmsCUR3u7pWcBekA=_3ae06_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Hmm. That looks a bit odd. Why do you have to use wait_for_completion?
-Can't you submit the 'src' bio, and then submit the 'dst' bio from the 
-endio handler of the 'src' bio?
+On 07/09/23 07:49AM, Hannes Reinecke wrote:
+>On 9/6/23 18:38, Nitesh Shetty wrote:
+>
+>Hmm. That looks a bit odd. Why do you have to use wait_for_completion?
 
-Cheers,
+wait_for_completion is waiting for all the copy IOs to complete,
+when caller does not pass endio handler.
+Copy IO submissions are still async, as in previous revisions.
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+>Can't you submit the 'src' bio, and then submit the 'dst' bio from the 
+>endio handler of the 'src' bio?
+We can't do this with the current bio merging approach.
+'src' bio waits for the 'dst' bio to arrive in request layer.
+Note that both bio's should be present in request reaching the driver,
+to form the copy-cmd.
 
+Thank You,
+Nitesh Shetty
+
+------1B4_PwnuBgjs5al8.ARo7bB9J1Y4sbiuOmsCUR3u7pWcBekA=_3ae06_
+Content-Type: text/plain; charset="utf-8"
+
+
+------1B4_PwnuBgjs5al8.ARo7bB9J1Y4sbiuOmsCUR3u7pWcBekA=_3ae06_--
