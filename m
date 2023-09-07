@@ -2,120 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4627FEE14DA
-	for <linux-block@archiver.kernel.org>; Thu,  7 Sep 2023 05:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA07EC873A
+	for <linux-block@archiver.kernel.org>; Thu,  7 Sep 2023 15:51:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233330AbjIGFjW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Sep 2023 01:39:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46190 "EHLO
+        id S233975AbjIGPv5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Sep 2023 11:51:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbjIGFjV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Sep 2023 01:39:21 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C69B19BD;
-        Wed,  6 Sep 2023 22:39:17 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 2C08A1F459;
-        Thu,  7 Sep 2023 05:39:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1694065156; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vEzdXwzrXnDTeO0P+aNFlsgJ60oxO7RTr/+XEDVnWGU=;
-        b=zr7k3C3k5bcifoR7lksFXR5wYxINEnL5SHX7Hgtw8PH/VB7pxIJltEsBEDIsWKJhtOBllg
-        kjBlPikKsXRR3aBkuHtcwqVYAsGuRiCE+5YdeJ9Gj/nMdolzpBxh0W+LWzTQsmgCtsl0GU
-        nx8up8cqOng/NvIWPUVsz5QE5LyTNmQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1694065156;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vEzdXwzrXnDTeO0P+aNFlsgJ60oxO7RTr/+XEDVnWGU=;
-        b=cwHd6RbV9kQqZVcKJLf2ZxshTikYkz2/zqjz1vx77H0a2bb63I00umYAVZa6h4IjnOM5ZK
-        fpOti423Zoa7T8Ag==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7AB0513458;
-        Thu,  7 Sep 2023 05:39:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id r6UMGwNi+WQ6XAAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 07 Sep 2023 05:39:15 +0000
-Message-ID: <d2c3a257-0505-4d3e-ae71-28015952cef6@suse.de>
-Date:   Thu, 7 Sep 2023 07:39:14 +0200
+        with ESMTP id S245476AbjIGPgj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Sep 2023 11:36:39 -0400
+Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 626DC1BF8
+        for <linux-block@vger.kernel.org>; Thu,  7 Sep 2023 08:36:14 -0700 (PDT)
+Received: by mail-oo1-xc35.google.com with SMTP id 006d021491bc7-573128cd77dso169872eaf.0
+        for <linux-block@vger.kernel.org>; Thu, 07 Sep 2023 08:36:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694100972; x=1694705772; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mmqr09NFOdAcxT8GnRxHCgyTgj/fxtGD41pLptP2Au0=;
+        b=irlzL6FTIbmbJgRq5Igt9l5zk1JQ3Njqkz6ExRoNCX2C2g7F3yOoYUy4acd/NkjXui
+         IRCyx0ofS6KoNY7G7PJ32FGr9v17NWFSxEtw9JIkO35BRbpHi9YNZsy6XwWJEzdVw2KZ
+         ZVn4uoS0ZqcPqvu38GXL9dxk7oi/A14p8jzm09WCje/Dn/84+7Io5z+gV9zWBHC4lgo9
+         BcoTjL0X9MUxoGbmbbxAu0soNixklKoBz6lB6a5kltFtof0VJUrn1u9lPjvdd5gh3ekw
+         TTDoXmvH9AOcsQ2yf/9AuxxglQENo/xPRa4XxFDhrajbuM98JhVDbpwCgbO36/Vc04cI
+         bjqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694100972; x=1694705772;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mmqr09NFOdAcxT8GnRxHCgyTgj/fxtGD41pLptP2Au0=;
+        b=L6XzWRZBalkXC+n+agrNV0Nyu6WV0ns6goEUIpBMetamgDm66XqqVXF6SJSMDm4eQK
+         tGgyoQ/iWXjcgXluVrfplC+ZQHdNVlrZ+au1Q2xhUCEW3MDjHO1eYvpUdSleqWCKVs+9
+         gM0zA0Otrkc7CpFIGdELP6bYQaHlTjGJToFRGC0cP+E1rLWgl+Nne91jyN+IaUBWy8li
+         Wa6Ab3h71HQDcADUkLtJcaSbn8moGs2n+ayfepTsdD4u0kbD0AAMfwqZicApDrQkW2Zx
+         3rlYVvfkUDMSuRvF9qK0v4oB7zsrCfLIny6iCNq6eZXferpqr47AKMwtFDDwAJx2tlxw
+         VlVw==
+X-Gm-Message-State: AOJu0YyVsdfPiy+4HmQnrVaNykafq9y6RbwlgHDxMDxrafb2VXwUzk9t
+        Onbnjr7zkcYymoJnyGQTW2LjcQ==
+X-Google-Smtp-Source: AGHT+IFAx31pDL9OS0UaQ1QM7P0+U8uqVOMnNbmVkRkKwNCPJEI10DFOozUuRPTBz0NCwjQiG7qxHg==
+X-Received: by 2002:a05:6358:51db:b0:13a:cf1d:4a0d with SMTP id 27-20020a05635851db00b0013acf1d4a0dmr14633190rwl.0.1694100972613;
+        Thu, 07 Sep 2023 08:36:12 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c0a8:11c9::11ab? ([2620:10d:c091:400::5:d08f])
+        by smtp.gmail.com with ESMTPSA id l9-20020a0c9789000000b0064c9f754794sm6517636qvd.86.2023.09.07.08.36.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Sep 2023 08:36:11 -0700 (PDT)
+Message-ID: <f6be40a3-38de-41ed-a545-d9063379f8e2@kernel.dk>
+Date:   Thu, 7 Sep 2023 09:36:10 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 02/12] Add infrastructure for copy offload in block
- and request layer.
+Subject: Re: [PATCH V2] io_uring: fix IO hang in io_wq_put_and_exit from
+ do_exit()
 Content-Language: en-US
-To:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Cc:     martin.petersen@oracle.com, mcgrof@kernel.org,
-        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org
-References: <20230906163844.18754-1-nj.shetty@samsung.com>
- <CGME20230906164303epcas5p1c2d3ec21feac347f0f1d68adc97c61f5@epcas5p1.samsung.com>
- <20230906163844.18754-3-nj.shetty@samsung.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230906163844.18754-3-nj.shetty@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From:   Jens Axboe <axboe@kernel.dk>
+To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        Pavel Begunkov <asml.silence@gmail.com>
+References: <20230901134916.2415386-1-ming.lei@redhat.com>
+ <169358121201.335729.4270950770834703042.b4-ty@kernel.dk>
+In-Reply-To: <169358121201.335729.4270950770834703042.b4-ty@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/6/23 18:38, Nitesh Shetty wrote:
-> We add two new opcode REQ_OP_COPY_SRC, REQ_OP_COPY_DST.
-> Since copy is a composite operation involving src and dst sectors/lba,
-> each needs to be represented by a separate bio to make it compatible
-> with device mapper.
-> We expect caller to take a plug and send bio with source information,
-> followed by bio with destination information.
-> Once the src bio arrives we form a request and wait for destination
-> bio. Upon arrival of destination we merge these two bio's and send
-> corresponding request down to device driver.
+On 9/1/23 9:13 AM, Jens Axboe wrote:
 > 
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> ---
->   block/blk-core.c          |  7 +++++++
->   block/blk-merge.c         | 41 +++++++++++++++++++++++++++++++++++++++
->   block/blk.h               | 16 +++++++++++++++
->   block/elevator.h          |  1 +
->   include/linux/bio.h       |  6 +-----
->   include/linux/blk_types.h | 10 ++++++++++
->   6 files changed, 76 insertions(+), 5 deletions(-)
+> On Fri, 01 Sep 2023 21:49:16 +0800, Ming Lei wrote:
+>> io_wq_put_and_exit() is called from do_exit(), but all FIXED_FILE requests
+>> in io_wq aren't canceled in io_uring_cancel_generic() called from do_exit().
+>> Meantime io_wq IO code path may share resource with normal iopoll code
+>> path.
+>>
+>> So if any HIPRI request is submittd via io_wq, this request may not get resouce
+>> for moving on, given iopoll isn't possible in io_wq_put_and_exit().
+>>
+>> [...]
 > 
-Having two separate bios is okay, and what one would expect.
-What is slightly strange is the merging functionality;
-That could do with some more explanation why this approach was taken.
-And also some checks in the merging code to avoid merging non-copy 
-offload  bios.
+> Applied, thanks!
+> 
+> [1/1] io_uring: fix IO hang in io_wq_put_and_exit from do_exit()
+>       commit: b484a40dc1f16edb58e5430105a021e1916e6f27
 
-Cheers,
+This causes a regression with the test/thread-exit.t test case, as it's
+canceling requests from other tasks as well. I will drop this patch for
+now.
 
-Hannes
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+Jens Axboe
+
 
