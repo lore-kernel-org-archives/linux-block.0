@@ -2,163 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D63AEE57CA
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 06:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4DBEE57E0
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 07:41:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236947AbjIHGXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 02:23:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
+        id S236818AbjIHHl2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 03:41:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230500AbjIHGXb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 02:23:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F074C1BF5
-        for <linux-block@vger.kernel.org>; Thu,  7 Sep 2023 23:22:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694154150;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+UXfFIxsVw2h5+OEph1QBomDGEtwA2v/p6/zzV+9LVY=;
-        b=iKWgw7bYpm+Sw710ILWG/TxoVhT8//2Hr3cJhCjrFZUQia+S4Xy6bgH8se/e0eJRUW4Uxa
-        sU6NUHe8em/BIcwcY7O5UVrAb6+OqQyPTKvxUOj6b0DdUzs7YqzgpQkrzwGKHA7nfEKOs8
-        j/nN9In7+dpwtX8pRjHuOxapUZj3gqM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-628-zixQwmlfOaCgXScOdQxPzw-1; Fri, 08 Sep 2023 02:22:26 -0400
-X-MC-Unique: zixQwmlfOaCgXScOdQxPzw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8621C1C06EC8;
-        Fri,  8 Sep 2023 06:22:26 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ADBFC493110;
-        Fri,  8 Sep 2023 06:22:22 +0000 (UTC)
-Date:   Fri, 8 Sep 2023 14:22:17 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: Re: [PATCH V2] io_uring: fix IO hang in io_wq_put_and_exit from
- do_exit()
-Message-ID: <ZPq9mY51e7++cbpC@fedora>
-References: <20230901134916.2415386-1-ming.lei@redhat.com>
- <169358121201.335729.4270950770834703042.b4-ty@kernel.dk>
- <f6be40a3-38de-41ed-a545-d9063379f8e2@kernel.dk>
- <ffbe8a96-9f3e-9139-07c6-9bbf863185ed@gmail.com>
+        with ESMTP id S230300AbjIHHl0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 03:41:26 -0400
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 287E61BE6
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 00:41:22 -0700 (PDT)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230908074119epoutp035dc991a1bf35b6398d23411abb0435fc~C3IZKo9sG2392423924epoutp03l
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 07:41:19 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230908074119epoutp035dc991a1bf35b6398d23411abb0435fc~C3IZKo9sG2392423924epoutp03l
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1694158879;
+        bh=PmnCxtpwzHL76HZFUJr+h59YZmwECCxC7pSSKjUgycw=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=GalYE5DcKTBscYiJ5Omxvek5745yyCQxXnh9cfiXjz/gEwt1jC9OYH/7bIKts0HmR
+         b4zO/gCoKFNDNsnI5MRzyv3ylSkNsqoph7w9a7qrG4d0nRQKk6EfltDRJed7/aKA6q
+         eqApxQOCn60LUVulR8OPSZ+pksDmFR2ro6Abzh5Y=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20230908074118epcas5p31d513d96fd3d68a4000f7e1fd82c7c8b~C3IYo6qHS1398913989epcas5p3S;
+        Fri,  8 Sep 2023 07:41:18 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4Rhp2P06jWz4x9Q8; Fri,  8 Sep
+        2023 07:41:17 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        0D.E9.09635.C10DAF46; Fri,  8 Sep 2023 16:41:16 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230908063508epcas5p12fbca2a5723fa518489cb223ba24ccae~C2Onk-KSC0876308763epcas5p1q;
+        Fri,  8 Sep 2023 06:35:08 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230908063508epsmtrp14fc47b3e3f0e5cd1478f590178cea45e~C2OnkTaKx2348123481epsmtrp1-;
+        Fri,  8 Sep 2023 06:35:08 +0000 (GMT)
+X-AuditID: b6c32a4b-563fd700000025a3-b5-64fad01c7541
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        97.1E.08788.C90CAF46; Fri,  8 Sep 2023 15:35:08 +0900 (KST)
+Received: from unvme-desktop.sa.corp.samsungelectronics.net (unknown
+        [107.99.41.39]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20230908063507epsmtip1c7411dda9448452d63cc64d524b2031a~C2OmflYaM3148031480epsmtip1a;
+        Fri,  8 Sep 2023 06:35:07 +0000 (GMT)
+From:   Ankit Kumar <ankit.kumar@samsung.com>
+To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     gost.dev@samsung.com, Ankit Kumar <ankit.kumar@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] Small fixes for block t10-pi
+Date:   Fri,  8 Sep 2023 17:22:29 +0530
+Message-Id: <20230908115233.261195-1-ankit.kumar@samsung.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ffbe8a96-9f3e-9139-07c6-9bbf863185ed@gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpgk+LIzCtJLcpLzFFi42LZdlhTS1fmwq8Ug99brC3WXPnNbrH6bj+b
+        xc0DO5ksJh26xmix95a2xeVdc9gslh//x+TA7nH5bKnHplWdbB4fn95i8ejbsorR4/MmuQDW
+        qGybjNTElNQihdS85PyUzLx0WyXv4HjneFMzA0NdQ0sLcyWFvMTcVFslF58AXbfMHKAjlBTK
+        EnNKgUIBicXFSvp2NkX5pSWpChn5xSW2SqkFKTkFJgV6xYm5xaV56Xp5qSVWhgYGRqZAhQnZ
+        GY+WPWcteMBcMf0NbwPjX6YuRk4OCQETie+PPgPZXBxCArsZJY41v2aHcD4xSny49Q8q841R
+        4tXPM+wwLUvvb2GESOxllPi28yuU08kksW/XIjaQKjYBbYlXb28wg9giAmUSPybsAoszC9RI
+        dN6bBbZcGGjS+6fNQHEODhYBVYnZf4VAwrwCthKPFh+Huk9eYual7+wQcUGJkzOfsECMkZdo
+        3jqbGWSvhMA5domJO/axQTS4SDx58BKqWVji1fEtUFdLSbzsb4OysyU2PfwJVVMgceRFLzOE
+        bS/ReqqfGeQeZgFNifW79CHCshJTT61jgtjLJ9H7+wlUK6/EjnkwtqrE33u3WSBsaYmb765C
+        2R4SN2ZOZQSxhQRiJfYfu8c2gVF+FpJ3ZiF5ZxbC5gWMzKsYJVMLinPTU4tNC4zzUsvh8Zqc
+        n7uJEZwUtbx3MD568EHvECMTB+MhRgkOZiUR3tUiv1KEeFMSK6tSi/Lji0pzUosPMZoCg3gi
+        s5Rocj4wLeeVxBuaWBqYmJmZmVgamxkqifO+bp2bIiSQnliSmp2aWpBaBNPHxMEp1cDEtbJb
+        ccH9DmmjY2dqNwYcDBCavTgmd6H2mr+ah1JSTnG0rL82N2dCmp1lu+8cazbJz3nyIdcD50mt
+        fXarOuPBdU6xb+pPJ/LuPfl+gVSco/fJnt8iDCsfOFkdNGqPncbRouQWU3MzXU6kjses437H
+        qiV3r7+o/vOE+aLuxa6ADd/51r7OchKZ+9eputf3Cbuz/ANW/qfswYvuqshUuB97rLHz65pV
+        nkcDn3dflI3karj91E0xd22J2qn2eHXrM9YXrqf21q/sUO1rNjT8EMP71/Bh3o4JMxsXf6uY
+        v6VAjuHeJ+6QGy8FxLPvbf7UOrNnT+6nvRqWk35cyz72wqD03q/3ITO2dyp0qt9L/b9IiaU4
+        I9FQi7moOBEAFrFM/BMEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNLMWRmVeSWpSXmKPExsWy7bCSnO6cA79SDLZ9MLRYc+U3u8Xqu/1s
+        FjcP7GSymHToGqPF3lvaFpd3zWGzWH78H5MDu8fls6Uem1Z1snl8fHqLxaNvyypGj8+b5AJY
+        o7hsUlJzMstSi/TtErgyHi17zlrwgLli+hveBsa/TF2MnBwSAiYSS+9vYexi5OIQEtjNKDHv
+        0V3mLkYOoIS0xML1iRA1whIr/z1nh6hpZ5JomLGNESTBJqAt8ertDWYQW0SgQuLMl1OsIEXM
+        Ag2MElM+94ElhIE2vH/azAYylEVAVWL2XyGQMK+ArcSjxcehjpCXmHnpOztEXFDi5MwnLCA2
+        M1C8eets5gmMfLOQpGYhSS1gZFrFKJlaUJybnltsWGCUl1quV5yYW1yal66XnJ+7iREcnlpa
+        Oxj3rPqgd4iRiYPxEKMEB7OSCO9qkV8pQrwpiZVVqUX58UWlOanFhxilOViUxHm/ve5NERJI
+        TyxJzU5NLUgtgskycXBKNTBtrfh1sf/Oxq+KmtcmXOfew7rOi8Vz+lIrC6aSHTniH48sv3ih
+        uMzd4F3IGYeNBVXXFCYGNYiaHp3z5Ejc1u4jzis0lJktqk8zbgh4mRUxtfu0Sli9ZLrPqTPK
+        DDI3GY4IcEXNTNn8SPnS7LfvlvZPuCT61eT8oQDbp+lftqTcX8q6zevF/MpvscnctxU4bvDm
+        +C69eHDVmtk3HFYXtSlZdlj5VtcvnCBT8fPTI57K6AmfN8X8X+ARs/Kc3anYJT3lC8qmPjhf
+        5zxn46J3S/wKldIFnl7bPVemYKfzoe0WBY0BkT077vzSlLD9IP93o+lii3/TG7uvpC4J5Qsy
+        O/2tl6FRfN2R1boX3JepBqrIK7EUZyQaajEXFScCAIJp9rW+AgAA
+X-CMS-MailID: 20230908063508epcas5p12fbca2a5723fa518489cb223ba24ccae
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230908063508epcas5p12fbca2a5723fa518489cb223ba24ccae
+References: <CGME20230908063508epcas5p12fbca2a5723fa518489cb223ba24ccae@epcas5p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 08, 2023 at 02:03:11AM +0100, Pavel Begunkov wrote:
-> On 9/7/23 16:36, Jens Axboe wrote:
-> > On 9/1/23 9:13 AM, Jens Axboe wrote:
-> > > 
-> > > On Fri, 01 Sep 2023 21:49:16 +0800, Ming Lei wrote:
-> > > > io_wq_put_and_exit() is called from do_exit(), but all FIXED_FILE requests
-> > > > in io_wq aren't canceled in io_uring_cancel_generic() called from do_exit().
-> > > > Meantime io_wq IO code path may share resource with normal iopoll code
-> > > > path.
-> > > > 
-> > > > So if any HIPRI request is submittd via io_wq, this request may not get resouce
-> > > > for moving on, given iopoll isn't possible in io_wq_put_and_exit().
-> > > > > > [...]
-> > > 
-> > > Applied, thanks!
-> > > 
-> > > [1/1] io_uring: fix IO hang in io_wq_put_and_exit from do_exit()
-> > >        commit: b484a40dc1f16edb58e5430105a021e1916e6f27
-> > 
-> > This causes a regression with the test/thread-exit.t test case, as it's
-> > canceling requests from other tasks as well. I will drop this patch for
-> > now.
-> 
-> And this one has never hit my mailbox... Anyway, I'm confused with
-> the issue:
-> 
-> 1) request tracking is done only for io_uring polling io_uring, which
+This series has two patches that:
+ - Removes redundant T10_PI_TYPE2_PROTECTION condition check during
+   t10_pi_verify.
+ - Removes duplicate module license introduced in an earlier commit.
 
-request tracking isn't done on FIXED_FILE IO, which is used by t/io_uring.
+v2:
+ - Added Reviewed-by tag for Martin K. Petersen.
 
-> shouldn't be the case for t/io_uring, so it's probably unrelated?
+Ankit Kumar (2):
+  block:t10-pi: remove redundant Type2 check during t10 PI verify
+  block:t10-pi: remove duplicate module license
 
-So io_uring_try_cancel_requests() won't be called because
-tctx_inflight() returns zero.
+ block/t10-pi.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-> 
-> 2) In case of iopoll, io-wq only submits a request but doesn't wait/poll
-> for it. If io_issue_sqe() returned -EAGAIN or an error, the request is
-> considered not yet submitted to block and can be just cancelled normally
-> without any dancing like io_iopoll_try_reap_events().
-
-io_issue_sqe() may never return since IO_URING_F_NONBLOCK isn't set
-for iopoll, and recently polled IO doesn't imply nowait in commit
-2bc057692599 ("block: don't make REQ_POLLED imply REQ_NOWAIT"), this
-commit is actually fragile, cause it is easy to cause io hang if
-iopoll & submission is done in same context.
-
-This one should be easy to address, either the following change
-or revert 2bc057692599 ("block: don't make REQ_POLLED imply
-REQ_NOWAIT").
-
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index ad636954abae..d8419689ad3e 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -1930,6 +1930,9 @@ void io_wq_submit_work(struct io_wq_work *work)
-                }
-        }
-
-+       if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_queue)
-+               issue_flags |= IO_URING_F_NONBLOCK;
-+
-        do {
-                ret = io_issue_sqe(req, issue_flags);
-                if (ret != -EAGAIN)
-
-> 
-> 
-> 3) If we condense the code it sounds like it effectively will be
-> like this:
-> 
-> void io_wq_exit_start(struct io_wq *wq)
-> {
-> 	set_bit(IO_WQ_BIT_EXIT, &wq->state);
-> }
-> 
-> io_uring_cancel_generic()
-> {
-> 	if (tctx->io_wq)
-> 		io_wq_exit_start(tctx->io_wq);
-> 	io_uring_clean_tctx(tctx);
-> 	...
-> }
-> 
-> We set the flag, interrupt workers (TIF_NOTIFY_SIGNAL + wake up), and
-> wait for them. Workers are woken up (or just return), see
-> the flag and return. At least that's how it was intended to work.
-> 
-> What's missing? Racing for IO_WQ_BIT_EXIT? Not breaking on IO_WQ_BIT_EXIT
-> correctly? Not honouring / clearing TIF_NOTIFY_SIGNAL?
-> 
-> I'll try to repro later
-
-After applying your patch of 9256b9371204 ("io_uring: break out of iowq
-iopoll on teardown") and the above patch, the issue still can be triggered,
-and the worker is keeping to call io_issue_sqe() for ever, and
-io_wq_worker_stopped() returns false. So do_exit() isn't called on
-t/io_uring pthread yet, meantime I guess either iopoll is terminated or not
-get chance to run.
-
-
-Thanks,
-Ming
+-- 
+2.25.1
 
