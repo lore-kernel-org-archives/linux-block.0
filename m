@@ -2,116 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B49EE8010
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 14:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F66AEE8010
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 14:35:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239238AbjIHOdy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 10:33:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44042 "EHLO
+        id S234972AbjIHOfy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 10:35:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233199AbjIHOdx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 10:33:53 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789381BEE
-        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 07:33:49 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-34bae11c5a6so1801375ab.0
-        for <linux-block@vger.kernel.org>; Fri, 08 Sep 2023 07:33:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694183629; x=1694788429; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gzbe4ajhA+W2yKZqkWGOuIQDgfAVC+vcaZ3Igb5iFuE=;
-        b=Kq5++eSMT+Ro5InN3B7xJG5ZcdPmxybTTVfbiLsutTjLOfJZFmH4YK3KbBMdyXCHe/
-         rosutb6BTF5tgSZqO3iSVcZt7fw5IkR0DXt730oM2HywuKmWUZwiHrv6bvhjeZb53UpO
-         3o+BENClcu5anL7gg3ywlW4RNVphIslWW1ejtS26thDA9DjD4xO/hfhxiG6OyWdoat2Z
-         MV1n5i7rnMr8Bum4pZM/hzvPJe8B5pjC2OBWYP6TRctvJKJn0rK5lWwvC7xKtPJd9rD5
-         HP1Dj4wTCEue61IgSC/zhbrsLbJqGSlz/vjEJGC8juYhcIiA6UZXW1TxT0NnlQk0daDK
-         Nd/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694183629; x=1694788429;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gzbe4ajhA+W2yKZqkWGOuIQDgfAVC+vcaZ3Igb5iFuE=;
-        b=bcadj4OOkYjGMLKKPpbLyxdIv3ykVktA5mks9/gFjUelSuyrZAIHvwvWVm4KA36K7e
-         XUzoz27fwfIC6wFX9SNnN+Fx5rPYEaT8vZUF0SPA2Q2RW/wtDKXMM/VN7K/nh5kPlscD
-         fowpVc+F8leEIiTuxo27sTxuCo2rYcVYMKfdGuWS+8lGdQWbrH7VRTygPHRv8tiY/Jn6
-         y+jBihnJ9Xsm3Td3oOzYuXJVNUW1D4AwXDdVC2mXLAXaOI8rfkvVWqsfmB8qUuk24aif
-         tKEXxSJPIOmAlI7HlsYO2rEgtCrfZ5LQDRVn09NJTZVV/wRvkXA0wvmkaKeBF8cZOTyA
-         d5Nw==
-X-Gm-Message-State: AOJu0YwKCmZubGsMWJHxkXtqk6i1yLu12yQgajyvrrs8OWqzhrGQMvzg
-        9HKpPDyIOQrIBqpQH4yOey7ikU5lMAgsKt4QAtNx7w==
-X-Google-Smtp-Source: AGHT+IG8q0PwC/mw5/mDCmRF3LLYGxPFJvfJJohGXmg7fr2eEzATOvCBWaaCCz+e8OetChh5QrNHHA==
-X-Received: by 2002:a92:cb4e:0:b0:34f:3b12:799e with SMTP id f14-20020a92cb4e000000b0034f3b12799emr3145023ilq.0.1694183628824;
-        Fri, 08 Sep 2023 07:33:48 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id c10-20020a02a40a000000b0042b09bde126sm483816jal.165.2023.09.08.07.33.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Sep 2023 07:33:48 -0700 (PDT)
-Message-ID: <ae3d6e46-eb4f-48f6-99b5-bd0f6588ffbf@kernel.dk>
-Date:   Fri, 8 Sep 2023 08:33:47 -0600
+        with ESMTP id S233199AbjIHOfx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 10:35:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC5A213E
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 07:35:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694183705;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=t56OHGUrhxYBsMlHzANLp1z0NxF3arnLj8GzM5Bg66A=;
+        b=b62gthJsmGc66Ujm+Rc2Cz1MK0dfTOc8Mw/qu2iAYl3K+liNC/DpFkWJY787DnzleFu5zB
+        IeapeJlJyzYpeffRzABwSKk7Pdm58mJpJJ9cZsCUMj58rvNWc3MMiA0kDU7HjqjnDpOqAI
+        pE96rwSlLxnPJwJmIhexhpFki65BbnQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-576-ZmmKMsAwNz683qcNLL4dSA-1; Fri, 08 Sep 2023 10:35:01 -0400
+X-MC-Unique: ZmmKMsAwNz683qcNLL4dSA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF16394EA0D;
+        Fri,  8 Sep 2023 14:34:58 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 736DC404119;
+        Fri,  8 Sep 2023 14:34:54 +0000 (UTC)
+Date:   Fri, 8 Sep 2023 22:34:49 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        ming.lei@redhat.com
+Subject: Re: [PATCH V3] io_uring: fix IO hang in io_wq_put_and_exit from
+ do_exit()
+Message-ID: <ZPsxCYFgZjIIeaBk@fedora>
+References: <20230908093009.540763-1-ming.lei@redhat.com>
+ <58227846-6b73-46ef-957f-d9b1e0451899@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Consider inflight IO in io accounting for high
- latency devices
-Content-Language: en-US
-To:     Gulam Mohamed <gulam.mohamed@oracle.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230907214552.130636-1-gulam.mohamed@oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230907214552.130636-1-gulam.mohamed@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58227846-6b73-46ef-957f-d9b1e0451899@kernel.dk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/7/23 3:45 PM, Gulam Mohamed wrote:
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ec922c6bccbe..70e5763fb799 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1000,6 +1000,8 @@ static inline void blk_account_io_done(struct request *req, u64 now)
->  
->  static inline void blk_account_io_start(struct request *req)
->  {
-> +	bool delta = false;
-> +
+On Fri, Sep 08, 2023 at 07:49:53AM -0600, Jens Axboe wrote:
+> On 9/8/23 3:30 AM, Ming Lei wrote:
+> > diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> > index ad636954abae..95a3d31a1ef1 100644
+> > --- a/io_uring/io_uring.c
+> > +++ b/io_uring/io_uring.c
+> > @@ -1930,6 +1930,10 @@ void io_wq_submit_work(struct io_wq_work *work)
+> >  		}
+> >  	}
+> >  
+> > +	/* It is fragile to block POLLED IO, so switch to NON_BLOCK */
+> > +	if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_queue)
+> > +		issue_flags |= IO_URING_F_NONBLOCK;
+> > +
+> 
+> I think this comment deserves to be more descriptive. Normally we
+> absolutely cannot block for polled IO, it's only OK here because io-wq
 
-This is an odd name for this variable...
+Yeah, we don't do that until commit 2bc057692599 ("block: don't make REQ_POLLED
+imply REQ_NOWAIT") which actually push the responsibility/risk up to
+io_uring.
 
-> @@ -1015,7 +1017,10 @@ static inline void blk_account_io_start(struct request *req)
->  			req->part = req->q->disk->part0;
->  
->  		part_stat_lock();
-> -		update_io_ticks(req->part, jiffies, false);
-> +		if (req->q->nr_hw_queues == 1) {
-> +			delta = !!part_in_flight(req->part);
-> +		}
+> is the issuer and not necessarily the poller of it. That generally falls
+> upon the original issuer to poll these requests.
+> 
+> I think this should be a separate commit, coming before the main fix
+> which is below.
 
-No parens needed here. But that aside, I think this could be a lot
-better. You don't really care about the number of requests inflight,
-only if there are some. A better helper than part_in_flight() could do
-that ala:
+Looks fine, actually IO_URING_F_NONBLOCK change isn't a must, and the
+approach in V2 doesn't need this change.
 
-static bool part_any_in_flight(struct block_device *part)
-{
-	int cpu;
+> 
+> > @@ -3363,6 +3367,12 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
+> >  		finish_wait(&tctx->wait, &wait);
+> >  	} while (1);
+> >  
+> > +	/*
+> > +	 * Reap events from each ctx, otherwise these requests may take
+> > +	 * resources and prevent other contexts from being moved on.
+> > +	 */
+> > +	xa_for_each(&tctx->xa, index, node)
+> > +		io_iopoll_try_reap_events(node->ctx);
+> 
+> The main issue here is that if someone isn't polling for them, then we
 
-	for_each_possible_cpu(cpu) {
-		if (part_stat_local_read_cpu(part, in_flight[0], cpu) ||
-		    part_stat_local_read_cpu(part, in_flight[1], cpu))
-			return true;
-	}
+That is actually what this patch is addressing, :-)
 
-	return false;
-}
+> get to wait for a timeout before they complete. This can delay exit, for
+> example, as we're now just waiting 30 seconds (or whatever the timeout
+> is on the underlying device) for them to get timed out before exit can
+> finish.
 
-But I do wonder if it's just missed state checking for the request
-itself that's missing this, and this is fixing it entirely the wrong way
-around.
+For the issue on null_blk, device timeout handler provides
+forward-progress, such as requests are released, so new IO can be
+handled.
 
--- 
-Jens Axboe
+However, not all devices support timeout, such as virtio device.
+
+Here we just call io_iopoll_try_reap_events() to poll submitted IOs
+for releasing resources, so no need to rely on device timeout handler
+any more, and the extra exit delay can be avoided.
+
+But io_iopoll_try_reap_events() may not be enough because io_wq
+associated with current context can get released resource immediately,
+then new IOs are submitted successfully, but who can poll these new
+submitted IOs, then all device resources can be held by this (freed)io_wq
+for nothing.
+
+I guess we may have to take the approach in patch V2 by only canceling
+polled IO for avoiding the thread_exit regression, or other ideas?
+
+> 
+> Do we just want to move this a bit higher up where we iterate ctx's
+> anyway? Not that important I suspect.
+
+I think it isn't needed, here we only focus on io_wq and polled io, not
+same with what the iteration code covers, otherwise io_uring_try_cancel_requests
+could become less readable.
+
+
+Thanks,
+Ming
 
