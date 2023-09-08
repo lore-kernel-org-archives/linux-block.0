@@ -2,168 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 262E6EE8010
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 14:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8263CEE8012
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 15:08:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231961AbjIHOpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 10:45:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46432 "EHLO
+        id S238381AbjIHPI7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 11:08:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231410AbjIHOpA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 10:45:00 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 033DE1FD9
-        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 07:44:48 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-34df35f90d3so2823075ab.0
-        for <linux-block@vger.kernel.org>; Fri, 08 Sep 2023 07:44:47 -0700 (PDT)
+        with ESMTP id S230211AbjIHPI7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 11:08:59 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91BBD1BFA
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 08:08:55 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6bc57401cb9so266301a34.0
+        for <linux-block@vger.kernel.org>; Fri, 08 Sep 2023 08:08:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694184287; x=1694789087; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=60mf1xX1YcoxaxSA/GlBLkU3UEqqxPDQjjCzD8+wFSI=;
-        b=QnjDUFkHaTYRx513xbzwpY4mzRA5dLyMRe36CQOt/HPzzqzUdzczSc8Ofn0KRv00Uz
-         K0jMGaXE0VFGJw3LQzap34H/qF6DBGqxA0sX9XqKGIrE591DumEnJekEdZmzra4BoCYg
-         cn4pinDsKRCBPShXPJByu768574HtO8NPiXn6CKz/5tWCv4vUqqpDeqIRb/jDNZcvVFO
-         deJZVfB3MoDQLf6KJFpBiKMaOX+cAtVrsCWmfPRE5ck+IVkwb1mJbhH3BXDcaKp3pRse
-         jEHTMmbXeEQbHGexi4CdLXmUCdu8mn5ujyuofwbccCiSnWqL9UQNyA3xoexm7M5q+UAB
-         HXCA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694185735; x=1694790535; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RPBD1phaXUOgmfmtBF3vDEZdPaFHOju+Jc1jYF2AHO4=;
+        b=bMT89By2cLUEauHROWmVHdhn1/n/LEJjfBNbfLmxY7/pkYSEZLYrSvznh+TbRUQOUD
+         DKgyoAg2U6OSRw83UgtfWaGAvEX0CBF3u0IMejfsvUSHqjL09KgioqksrxCj4RIsjLqi
+         Lhe32rT7ysNb4Jnw6zObgAjRUCnX1cDzOfwySTAF3jPBUHy+KS55eoiKEgZIu/+nV/Uq
+         j4aO6rh7EJPAKlR3iegnWp01YrH+snS2BF38+YHFlFinKVL/8wpaJctVZoyRcnp2Wo4u
+         yq8xFUOBDeegM1wM6E7NRrXrWaRfPEo2JOHITBiVgvHi2K0/3UxNOUFQnhwnzuIC7hlL
+         clFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694184287; x=1694789087;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=60mf1xX1YcoxaxSA/GlBLkU3UEqqxPDQjjCzD8+wFSI=;
-        b=TABFyPh+l/t0RYxDXwVYtEcGQgf12kH69Wk+nwRXJBy9Rvz2KHPkBLgse58OCzmQzm
-         kKET4jHSVo8R2n7/hTt16PtsgCTNTuFxOvZJkSUrGxu+DC15T+uX3ODGNxd4Hr05M/gm
-         abfTgywE+nX3Fns5X4FwhmB6GOWnXFpMimmdDYB2725/WFQLyznsWO/VBByvB1+TxVhN
-         1XCZMfmm40CQmlS2onEtYrAAFwpSM9DQ7T/BeGnHhYr+JvCoY5zKe/LbyyUUAIkIOqdZ
-         D8HuYpMnGJn/CgAiJxtlhxcGLwyssb/I7kMFve9b0aNs/4v4C6jOBtaRLw+uTrjfbXWd
-         ZNGQ==
-X-Gm-Message-State: AOJu0Yy+fJgqtu/vOnGdi3I/SI3CfTyPMJN/hCly8sDxnn2fY+EW2TqT
-        gwdLmw39ZzYTCUzmR/XFH4UMQg==
-X-Google-Smtp-Source: AGHT+IGr5Psf0GhHlwjSfmvSoqfBSpxswW1uRbZfvjGgAIzMT+0wwOt8XjXNPCaHjJrdzH4aBmjnng==
-X-Received: by 2002:a92:d6ca:0:b0:346:1919:7cb1 with SMTP id z10-20020a92d6ca000000b0034619197cb1mr2947891ilp.2.1694184286891;
-        Fri, 08 Sep 2023 07:44:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694185735; x=1694790535;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RPBD1phaXUOgmfmtBF3vDEZdPaFHOju+Jc1jYF2AHO4=;
+        b=RRCWI2jJewou598QiZDKDqAkZnrQkiKnAi5A5RAD+b8P9vWB0TZgLxqa/zHhKeC69n
+         Bf3XxEjN5cN8zqOB0sXgjXqPVPQCstvTb2kMCglJJt3Ta5k7Ly6zrBJDEjbjKBg6j4xd
+         dySZN0p/hdez6VNUyK+WR1KM/Ko6vMXxUbAnYnKiDhTPlGLty9SSDccxNHsmAE12zOwy
+         E009Vdtck3cZ+aK9KVEjYFRNJpATdn3UVliiFHlmxhTCvk9JS2Gj+c3rh9xOkFEthWkS
+         LJaIHZt27ZXyFmENW9ljA8Yu1PmPvGmpG4sYdcDFrzYwnAHSrbspMZ+a9+jE+A2KkYsu
+         stqg==
+X-Gm-Message-State: AOJu0YxtY8Y0s080Q4r6dRytyQayDdD0+IRLiz/knK6wOprPKp9TnKDn
+        dfJXKRqdFqt5pTPCKiomRuEv2Uj3OdyGFBkrYVIUZw==
+X-Google-Smtp-Source: AGHT+IFpG6nQAieaM+F+ye9HDlPP1oA4qn9/WfapesDOcCLCSUJ9kky6Sxzi2dWhg4HajASClTtxZA==
+X-Received: by 2002:a05:6870:a447:b0:1d0:f5bd:6c8 with SMTP id n7-20020a056870a44700b001d0f5bd06c8mr2902165oal.5.1694185734838;
+        Fri, 08 Sep 2023 08:08:54 -0700 (PDT)
 Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id fn2-20020a056638640200b0042aec33bc26sm506810jab.18.2023.09.08.07.44.46
+        by smtp.gmail.com with ESMTPSA id k25-20020a02c779000000b00428737ce527sm514168jao.63.2023.09.08.08.08.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Sep 2023 07:44:46 -0700 (PDT)
-Message-ID: <0f85a6b5-3ba6-4b77-bb7d-79f365dbb44c@kernel.dk>
-Date:   Fri, 8 Sep 2023 08:44:45 -0600
+        Fri, 08 Sep 2023 08:08:53 -0700 (PDT)
+Message-ID: <4cb29a92-f386-4ab1-b7c7-56aef11e35f2@kernel.dk>
+Date:   Fri, 8 Sep 2023 09:08:53 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3] io_uring: fix IO hang in io_wq_put_and_exit from
- do_exit()
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>
-References: <20230908093009.540763-1-ming.lei@redhat.com>
- <58227846-6b73-46ef-957f-d9b1e0451899@kernel.dk> <ZPsxCYFgZjIIeaBk@fedora>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZPsxCYFgZjIIeaBk@fedora>
+Subject: [GIT PULL] Block fixes for 6.6-rc1
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/8/23 8:34 AM, Ming Lei wrote:
-> On Fri, Sep 08, 2023 at 07:49:53AM -0600, Jens Axboe wrote:
->> On 9/8/23 3:30 AM, Ming Lei wrote:
->>> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
->>> index ad636954abae..95a3d31a1ef1 100644
->>> --- a/io_uring/io_uring.c
->>> +++ b/io_uring/io_uring.c
->>> @@ -1930,6 +1930,10 @@ void io_wq_submit_work(struct io_wq_work *work)
->>>  		}
->>>  	}
->>>  
->>> +	/* It is fragile to block POLLED IO, so switch to NON_BLOCK */
->>> +	if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_queue)
->>> +		issue_flags |= IO_URING_F_NONBLOCK;
->>> +
->>
->> I think this comment deserves to be more descriptive. Normally we
->> absolutely cannot block for polled IO, it's only OK here because io-wq
-> 
-> Yeah, we don't do that until commit 2bc057692599 ("block: don't make REQ_POLLED
-> imply REQ_NOWAIT") which actually push the responsibility/risk up to
-> io_uring.
-> 
->> is the issuer and not necessarily the poller of it. That generally falls
->> upon the original issuer to poll these requests.
->>
->> I think this should be a separate commit, coming before the main fix
->> which is below.
-> 
-> Looks fine, actually IO_URING_F_NONBLOCK change isn't a must, and the
-> approach in V2 doesn't need this change.
-> 
->>
->>> @@ -3363,6 +3367,12 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
->>>  		finish_wait(&tctx->wait, &wait);
->>>  	} while (1);
->>>  
->>> +	/*
->>> +	 * Reap events from each ctx, otherwise these requests may take
->>> +	 * resources and prevent other contexts from being moved on.
->>> +	 */
->>> +	xa_for_each(&tctx->xa, index, node)
->>> +		io_iopoll_try_reap_events(node->ctx);
->>
->> The main issue here is that if someone isn't polling for them, then we
-> 
-> That is actually what this patch is addressing, :-)
+Hi Linus,
 
-Right, that part is obvious :)
+Some fixes for block that should go into the 6.6-rc1 merge window:
 
->> get to wait for a timeout before they complete. This can delay exit, for
->> example, as we're now just waiting 30 seconds (or whatever the timeout
->> is on the underlying device) for them to get timed out before exit can
->> finish.
-> 
-> For the issue on null_blk, device timeout handler provides
-> forward-progress, such as requests are released, so new IO can be
-> handled.
-> 
-> However, not all devices support timeout, such as virtio device.
+- Fix null_blk polled IO timeout handling (Chengming)
 
-That's a bug in the driver, you cannot sanely support polled IO and not
-be able to deal with timeouts. Someone HAS to reap the requests and
-there are only two things that can do that - the application doing the
-polled IO, or if that doesn't happen, a timeout.
+- Regression fix for swapped arguments in drbd bvec_set_page()
+  (Christoph)
 
-> Here we just call io_iopoll_try_reap_events() to poll submitted IOs
-> for releasing resources, so no need to rely on device timeout handler
-> any more, and the extra exit delay can be avoided.
-> 
-> But io_iopoll_try_reap_events() may not be enough because io_wq
-> associated with current context can get released resource immediately,
-> then new IOs are submitted successfully, but who can poll these new
-> submitted IOs, then all device resources can be held by this (freed)io_wq
-> for nothing.
-> 
-> I guess we may have to take the approach in patch V2 by only canceling
-> polled IO for avoiding the thread_exit regression, or other ideas?
+- String length handling fix for s390 dasd (Heiko)
 
-Ideally the behavior seems like it should be that if a task goes away,
-any pending polled IO it has should be reaped. With the above notion
-that a driver supporting poll absolutely must be able to deal with
-timeouts, it's not a strict requirement as we know that requests will be
-reaped.
+- Fixes for blk-throttle accounting (Yu)
 
->> Do we just want to move this a bit higher up where we iterate ctx's
->> anyway? Not that important I suspect.
-> 
-> I think it isn't needed, here we only focus on io_wq and polled io,
-> not same with what the iteration code covers, otherwise
-> io_uring_try_cancel_requests could become less readable.
+- Fix page pinning issue for same page segments (Christoph)
 
-Yeah, this part isn't a big deal at all, more of a stylistic thing.
+- Remove redundant file_remove_privs() call (Christoph)
+
+- Fix a regression in partition handling for devices not supporting
+  partitions (Li)
+
+Please pull!
+
+
+The following changes since commit 6c1b980a7e79e55e951b4b2c47eefebc75071209:
+
+  Merge tag 'dma-mapping-6.6-2023-08-29' of git://git.infradead.org/users/hch/dma-mapping (2023-08-29 20:32:10 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.6-2023-09-08
+
+for you to fetch changes up to 4b9c2edaf7282d60e069551b4b28abc2932cd3e3:
+
+  drbd: swap bvec_set_page len and offset (2023-09-06 07:33:03 -0600)
+
+----------------------------------------------------------------
+block-6.6-2023-09-08
+
+----------------------------------------------------------------
+Chengming Zhou (1):
+      null_blk: fix poll request timeout handling
+
+Christoph Böhmwalder (1):
+      drbd: swap bvec_set_page len and offset
+
+Christoph Hellwig (2):
+      block: remove the call to file_remove_privs in blkdev_write_iter
+      block: fix pin count management when merging same-page segments
+
+Heiko Carstens (1):
+      s390/dasd: fix string length handling
+
+Li Lingfeng (1):
+      block: don't add or resize partition on the disk with GENHD_FL_NO_PART
+
+Yu Kuai (4):
+      blk-throttle: print signed value 'carryover_bytes/ios' for user
+      blk-throttle: fix wrong comparation while 'carryover_ios/bytes' is negative
+      blk-throttle: use calculate_io/bytes_allowed() for throtl_trim_slice()
+      blk-throttle: consider 'carryover_ios/bytes' in throtl_trim_slice()
+
+ block/blk-map.c                  |   7 ++-
+ block/blk-throttle.c             | 112 +++++++++++++++++++--------------------
+ block/blk-throttle.h             |   4 +-
+ block/fops.c                     |   4 --
+ block/ioctl.c                    |   2 +
+ drivers/block/drbd/drbd_main.c   |   2 +-
+ drivers/block/null_blk/main.c    |  12 ++++-
+ drivers/s390/block/dasd_devmap.c |   6 +--
+ drivers/s390/block/dasd_eckd.c   |  10 ++--
+ drivers/s390/block/dasd_int.h    |   4 ++
+ 10 files changed, 84 insertions(+), 79 deletions(-)
 
 -- 
 Jens Axboe
