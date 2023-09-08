@@ -2,156 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E975EB8FD7
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 11:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E94EE7FE3
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 13:09:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242765AbjIHLzJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 07:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44414 "EHLO
+        id S229633AbjIHNJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 09:09:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242657AbjIHLzH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 07:55:07 -0400
-Received: from mail-pf1-f206.google.com (mail-pf1-f206.google.com [209.85.210.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF87F1BC5
-        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 04:55:03 -0700 (PDT)
-Received: by mail-pf1-f206.google.com with SMTP id d2e1a72fcca58-68a43131e39so2529648b3a.0
-        for <linux-block@vger.kernel.org>; Fri, 08 Sep 2023 04:55:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694174103; x=1694778903;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VpID/NCresXBqkoJiwT7k8kW4bhvmuOUSE5piT+zJ24=;
-        b=cCG9qsjtynRkoJM3GK8UCbcl634THZyh3e2aWygwE7B9bESHbvfwpSpi/GDvuZnMwk
-         DdXb8SKzIk0gJevwrj1hEEzpC7zeernxqGNWfSSiWYgw9XyeOpSrUuad3L9WFLTl1q9S
-         hNN3HPor9V+TSoMxCRyvUk5vMR4sbXWocIO8d6w6WAs5ymZZqF42RkgnN1qjzY00agHf
-         pIgJ6dF3xK5VntdeAhfMH6eUVajvklPQuzW4PsULBXHLujR/Gs7BMg6oms2I8+WoI1J9
-         UwiiA4xsgD3kTbjtbasbLnZ7ozY/9wxFPXUN36paVhB8x3WQebTfhnDAJA5q/SknRh3L
-         FYXw==
-X-Gm-Message-State: AOJu0YxISFPJ+Vg1PNQRhiAa7VaqYCjfLbhAY16iSJjpNDWMyhoahBbv
-        CkCPR8PMOzbycAcYru6cat/k0/Qz/tD6/UY9JMK3+CTzL7KO
-X-Google-Smtp-Source: AGHT+IFrnJxo5hVxE67zNWYwuOgzQLvb2WzNk+jodw+i6pTBsZ1USWQiKcu762ADAAM8MoUkxi/830WHW4DJDzDD+1mCz4xsS/sf
+        with ESMTP id S229699AbjIHNJN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 09:09:13 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BDFA19B5
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 06:09:09 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 22C031FE73;
+        Fri,  8 Sep 2023 13:09:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1694178548; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=v9BLOYjsYJqUx9nrHtpBBQiYT70sZn4WcNJoSM/TJQ0=;
+        b=cl/5RV47qHJqhgURPl+ftiyDw7IMTs87evo9niO+P8C14tz9886pVLBkRbWU038c5FCCQf
+        fNQDGFzqOuziq5zlj6NGW3Az2n11km6b+fMKS0jrhvGio/ShU8TxaZDrsLZBUoIxOgr1g4
+        SRvwPyptwnZsZzGiptNyby1E+FMAwIM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1694178548;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=v9BLOYjsYJqUx9nrHtpBBQiYT70sZn4WcNJoSM/TJQ0=;
+        b=AGLKHdVbc7sj874pc3T6ifMbk0caAkY7fgWSqae8RZouxPMLgb+IiNBX3w9GuXIR7YRRDk
+        ZvFJem3IFIxUh/Bg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 158F3131FD;
+        Fri,  8 Sep 2023 13:09:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id gw02BfQc+2S2TwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 08 Sep 2023 13:09:08 +0000
+Date:   Fri, 8 Sep 2023 15:09:39 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Yi Zhang <yi.zhang@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH blktests] tests/nvme/031: fix connecting faiure
+Message-ID: <kflpcc7u4wksuuo27gcrjxwsqr277b3phpnbbbjkdaniycmttn@f6t4dadmvqih>
+References: <20230907034423.3928010-1-yi.zhang@redhat.com>
+ <nrfuja62qetxqxzwxuxhjve2u4r4reofcpo43zmg6qbbhjjqkp@ratsu2kubymb>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:150b:b0:68a:2c24:57ce with SMTP id
- q11-20020a056a00150b00b0068a2c2457cemr850686pfu.5.1694174103177; Fri, 08 Sep
- 2023 04:55:03 -0700 (PDT)
-Date:   Fri, 08 Sep 2023 04:55:03 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009b92c10604d7a5e9@google.com>
-Subject: [syzbot] [block?] WARNING in blk_rq_map_user_iov
-From:   syzbot <syzbot+a532b03fdfee2c137666@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, dan.j.williams@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <nrfuja62qetxqxzwxuxhjve2u4r4reofcpo43zmg6qbbhjjqkp@ratsu2kubymb>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Fri, Sep 08, 2023 at 11:26:31AM +0000, Shinichiro Kawasaki wrote:
+> On Sep 07, 2023 / 11:44, Yi Zhang wrote:
+> > allow_any_host was disabled during _create_nvmet_subsystem, call
+> > _create_nvmet_host before connecting to allow the host to connect.
+> >
+> > [76096.420586] nvmet: adding nsid 1 to subsystem blktests-subsystem-0
+> > [76096.440595] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+> > [76096.491344] nvmet: connect by host nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349 for subsystem blktests-subsystem-0 not allowed
+> > [76096.505049] nvme nvme2: Connect for subsystem blktests-subsystem-0 is not allowed, hostnqn: nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> > [76096.519609] nvme nvme2: failed to connect queue: 0 ret=16772
+> >
+> > Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
 
-syzbot found the following issue on:
+Reviewed-by: Daniel Wagner <dwagner@suse.de>
 
-HEAD commit:    708283abf896 Merge tag 'dmaengine-6.6-rc1' of git://git.ke..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14142f38680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1dc3cb855cd74c2
-dashboard link: https://syzkaller.appspot.com/bug?extid=a532b03fdfee2c137666
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=115bfbf4680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13896ed0680000
+> Thanks for the catching this. I looked back the past changes and found that the
+> commit c32b233b7dd6 ("nvme/rc: Add helper for adding/removing to allow list")
+> triggered the connection failure. So, I think a Fixes tag with this commit is
+> required (I can add when this patch is applied).
+>
+> Even after the commit, the test case still passes. That's why I did not notice
+> the connection failure. I think _nvme_connect_subsys() should check exit status
+> of "nvme connect" command and print an error message on failure. This will help
+> to catch similar connection failures in future.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1bd71e72bfd8/disk-708283ab.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b1cd0be2dff5/vmlinux-708283ab.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ff76c3f9ca24/bzImage-708283ab.xz
+I was running into a similiar problem for (not yet existing) nvme/050
+test case [1]:
 
-The issue was bisected to:
+nvmf_wait_for_state() {
+       local def_state_timeout=5
+       local subsys_name="$1"
+       local state="$2"
+       local timeout="${3:-$def_state_timeout}"
+       local nvmedev
+       local state_file
+       local start_time
+       local end_time
 
-commit a41dad905e5a388f88435a517de102e9b2c8e43d
-Author: Al Viro <viro@zeniv.linux.org.uk>
-Date:   Fri Sep 16 00:11:15 2022 +0000
+       nvmedev=$(_find_nvme_dev "${subsys_name}")
+       state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
 
-    iov_iter: saner checks for attempt to copy to/from iterator
+       start_time=$(date +%s)
+       while ! grep -q "${state}" "${state_file}"; do
+               sleep 1
+               end_time=$(date +%s)
+               if (( end_time - start_time > timeout )); then
+                       echo "expected state \"${state}\" not " \
+                               "reached within ${timeout} seconds"
+                       return 1
+               fi
+       done
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=127483b8680000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=117483b8680000
-console output: https://syzkaller.appspot.com/x/log.txt?x=167483b8680000
+       return 0
+}
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a532b03fdfee2c137666@syzkaller.appspotmail.com
-Fixes: a41dad905e5a ("iov_iter: saner checks for attempt to copy to/from iterator")
+_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
+                            --hostnqn "${def_hostnqn}" \
+                            --reconnect-delay 1 \
+                            --ctrl-loss-tmo 10
 
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5033 at lib/iov_iter.c:385 _copy_from_iter+0x2c2/0x1270 lib/iov_iter.c:385
-Modules linked in:
-CPU: 1 PID: 5033 Comm: syz-executor399 Not tainted 6.5.0-syzkaller-11329-g708283abf896 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:_copy_from_iter+0x2c2/0x1270 lib/iov_iter.c:385
-Code: 5d 41 5c 41 5d 41 5e 41 5f c3 e8 f9 8c 65 fd be 85 01 00 00 48 c7 c7 a0 94 e8 8a e8 d8 37 a5 fd e9 48 fe ff ff e8 de 8c 65 fd <0f> 0b 45 31 ff eb 88 e8 d2 8c 65 fd 31 ff 89 ee e8 f9 87 65 fd 40
-RSP: 0018:ffffc900043c7480 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff888014b03b80 RSI: ffffffff84220fb2 RDI: 0000000000000001
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: ffffffff8a60008b R12: 0000000000000001
-R13: ffffc900043c76c8 R14: 0000000000000001 R15: 0000160000000000
-FS:  0000555555a41380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000200000c8 CR3: 000000007ebb3000 CR4: 0000000000350ee0
-Call Trace:
- <TASK>
- copy_page_from_iter lib/iov_iter.c:542 [inline]
- copy_page_from_iter+0xa5/0x120 lib/iov_iter.c:531
- bio_copy_from_iter block/blk-map.c:56 [inline]
- bio_copy_user_iov block/blk-map.c:211 [inline]
- blk_rq_map_user_iov+0x9d5/0x1860 block/blk-map.c:662
- blk_rq_map_user_io.part.0+0x276/0x2c0 block/blk-map.c:720
- blk_rq_map_user_io+0xe6/0x230 block/blk-map.c:701
- sg_start_req drivers/scsi/sg.c:1818 [inline]
- sg_common_write.constprop.0+0xd61/0x1c90 drivers/scsi/sg.c:803
- sg_new_write.isra.0+0x546/0xaa0 drivers/scsi/sg.c:770
- sg_ioctl_common drivers/scsi/sg.c:935 [inline]
- sg_ioctl+0x1814/0x2760 drivers/scsi/sg.c:1160
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:871 [inline]
- __se_sys_ioctl fs/ioctl.c:857 [inline]
- __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f4cd02c0229
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff2da41248 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fff2da41418 RCX: 00007f4cd02c0229
-RDX: 0000000020000300 RSI: 0000000000002285 RDI: 0000000000000003
-RBP: 00007f4cd0333610 R08: 00007fff2da41418 R09: 00007fff2da41418
-R10: 002367732f766564 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007fff2da41408 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+nvmf_wait_for_state "${def_subsysnqn}" "live"
+nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
 
+We could make this a bit more generic and move it into the connect
+helper. What do you think?
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+[1] https://lore.kernel.org/linux-nvme/20230621155825.20146-2-dwagner@suse.de/
