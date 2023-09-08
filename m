@@ -2,71 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D46EE57E2
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 08:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC95EE57EB
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 09:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235817AbjIHI3A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 04:29:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49052 "EHLO
+        id S238270AbjIHJbu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 05:31:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231129AbjIHI27 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 04:28:59 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D3321FC6;
-        Fri,  8 Sep 2023 01:28:50 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 80BDF68B05; Fri,  8 Sep 2023 10:28:46 +0200 (CEST)
-Date:   Fri, 8 Sep 2023 10:28:46 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Aleksandr Nogikh <nogikh@google.com>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        syzbot <syzbot+1fa947e7f09e136925b8@syzkaller.appspotmail.com>,
-        djwong@kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, linux-block@vger.kernel.org,
-        hch@lst.de
-Subject: Re: [syzbot] [xfs?] INFO: task hung in clean_bdev_aliases
-Message-ID: <20230908082846.GB9560@lst.de>
-References: <000000000000e534bb0604959011@google.com> <ZPeaH+K75a0nIyBk@dread.disaster.area> <CANp29Y4AK9dzmpMj4E9iz3gqTwhG=-_7DfA8knrWYaHy4QxrEg@mail.gmail.com>
+        with ESMTP id S229644AbjIHJbt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 05:31:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC161BF1
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 02:30:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694165451;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OdlUhZR0tBIomm2EXUPWjllXJOhjCMA2kWLNGo39Dlg=;
+        b=Fc14odbJgBNMYMHQ3im+dLLM2sPhb1uV3gJlI9PFf2dHVNp2YmiCE4U2srMcMkd6c7Iylw
+        loMDLK9RFZy++cua9K1V26/rEK9ouWJVfX/PS2zQb2x705gfAonLfmDLq76i5lU6vVcQmN
+        eI6U7kUKi1LQjlL5EjZ7jm+VtRB631k=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-513-jd4mE8OTPu-loGezocNyGw-1; Fri, 08 Sep 2023 05:30:47 -0400
+X-MC-Unique: jd4mE8OTPu-loGezocNyGw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7CED101CA84;
+        Fri,  8 Sep 2023 09:30:46 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CA77BC03295;
+        Fri,  8 Sep 2023 09:30:45 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        David Howells <dhowells@redhat.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH V3] io_uring: fix IO hang in io_wq_put_and_exit from do_exit()
+Date:   Fri,  8 Sep 2023 17:30:09 +0800
+Message-Id: <20230908093009.540763-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANp29Y4AK9dzmpMj4E9iz3gqTwhG=-_7DfA8knrWYaHy4QxrEg@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 06, 2023 at 07:20:15PM +0200, Aleksandr Nogikh wrote:
-> On Tue, Sep 5, 2023 at 11:14 PM 'Dave Chinner' via syzkaller-bugs
-> <syzkaller-bugs@googlegroups.com> wrote:
-> >
-> > [cc linux-block, Christoph]
-> >
-> > Another iomap-blockdev related issue.
-> >
-> > #syz set subsystems: block
-> >
-> > syzbot developers: Please review how you are classifying subsystems,
-> > this is the third false XFS classification in 24 hours.
-> 
-> The reason why syzbot marked this report as xfs is that, per
-> MAINTAINERS, fs/iomap/ points to linux-xfs@vger.kernel.org. I can
-> adjust the rules syzbot uses so that these are routed to "block".
-> 
-> But should MAINTAINERS actually also not relate IOMAP FILESYSTEM
-> LIBRARY with xfs in this case?
+io_wq_put_and_exit() is called from do_exit(), but all FIXED_FILE requests
+in io_wq aren't canceled in io_uring_cancel_generic() called from do_exit().
+Meantime io_wq IO code path may share resource with normal iopoll code
+path.
 
-I'd tag it with iomap, as it's a different subsystem just sharing
-the mailing list.  We also have iommu@lists.linux.dev for both the
-iommu and dma-mapping subsystems as a similar example.
+So if any HIPRI request is submitted via io_wq, this request may not get
+resource for moving on, given iopoll isn't possible in io_wq_put_and_exit().
 
-But what's also important for issues like this is that often the
-called library code (in this case iomap) if often not, or only
-partially at fault.  So capturing the calling context (in this
-case block) might also be useful.
+The issue can be triggered when terminating 't/io_uring -n4 /dev/nullb0'
+with default null_blk parameters.
 
-And to get out of these meta discussions:  I'll look into the actual
-issues in a bit, I'll try to find time despite travelling.
+Fix it by the following approaches:
+
+- switch to IO_URING_F_NONBLOCK for submitting POLLED IO from io_wq, so
+that requests can be canceled when submitting from exiting io_wq
+
+- reap completed events before exiting io wq, so that these completed
+requests won't hold resource and prevent other contexts from moving on
+
+Closes: https://lore.kernel.org/linux-block/3893581.1691785261@warthog.procyon.org.uk/
+Reported-by: David Howells <dhowells@redhat.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Chengming Zhou <zhouchengming@bytedance.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V3:
+	- take new approach and fix regression on thread_exit in liburing
+	  tests
+	- pass liburing tests(make runtests)
+V2:
+	- avoid to mess up io_uring_cancel_generic() by adding one new
+    helper for canceling io_wq requests
+
+ io_uring/io_uring.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index ad636954abae..95a3d31a1ef1 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -1930,6 +1930,10 @@ void io_wq_submit_work(struct io_wq_work *work)
+ 		}
+ 	}
+ 
++	/* It is fragile to block POLLED IO, so switch to NON_BLOCK */
++	if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_queue)
++		issue_flags |= IO_URING_F_NONBLOCK;
++
+ 	do {
+ 		ret = io_issue_sqe(req, issue_flags);
+ 		if (ret != -EAGAIN)
+@@ -3363,6 +3367,12 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
+ 		finish_wait(&tctx->wait, &wait);
+ 	} while (1);
+ 
++	/*
++	 * Reap events from each ctx, otherwise these requests may take
++	 * resources and prevent other contexts from being moved on.
++	 */
++	xa_for_each(&tctx->xa, index, node)
++		io_iopoll_try_reap_events(node->ctx);
+ 	io_uring_clean_tctx(tctx);
+ 	if (cancel_all) {
+ 		/*
+-- 
+2.40.1
 
