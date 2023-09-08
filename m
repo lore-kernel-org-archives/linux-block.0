@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD09EEE8015
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 16:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6286EEE801D
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 16:04:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244851AbjIHQEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 12:04:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44752 "EHLO
+        id S244872AbjIHQEi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 12:04:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244818AbjIHQEe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 12:04:34 -0400
+        with ESMTP id S244854AbjIHQEh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 12:04:37 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CBE11FE3
-        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 09:03:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2496A2101
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 09:03:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694189016;
+        s=mimecast20190719; t=1694189023;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8QArWqYjany3/3Kdac4mEmfhyAbXGy4THe9mhs3GeTM=;
-        b=STS1jwiatlMxbxs2RVsnCz1bep9sLU0yRto6YMvMvMmq2o/B0wuGgPlcIVeW4q1/HtxjRP
-        oxZ3Yq75Y2oA8CXrO29My1VX5UMmDTfv3wH3lrP5w8R9xaoltno27NvMHkViApmjoD+p4v
-        fz/fjKGISMd4cr/bLG6qKnDlgLybm7U=
+        bh=c5qKGDJOH0h32jOCU9/toIJ7m/LhliQCTlgTlpbMOlk=;
+        b=YbT8QYTgGzFC4l2CGs31p0htaCdPrxk6DFn97yNQ994rbC2dj8FUcBCBgt+Id6dfebWrEI
+        TXJafuUhpFKV8DgG+oDxz3z226/pPig+DubZejkhmTrfItz6EZBVv1kiXuVlI3BRbSLazt
+        6XV3YuWJnpwauEDNV+/l7lf00km4Msk=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-230-ChoFSJu6N1CkSRVz_hnIRQ-1; Fri, 08 Sep 2023 12:03:32 -0400
-X-MC-Unique: ChoFSJu6N1CkSRVz_hnIRQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-614-qVvRZSWPMUOFjFvB_AMgfg-1; Fri, 08 Sep 2023 12:03:38 -0400
+X-MC-Unique: qVvRZSWPMUOFjFvB_AMgfg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C7392101CA84;
-        Fri,  8 Sep 2023 16:03:31 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2BAC101A529;
+        Fri,  8 Sep 2023 16:03:36 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.148])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C70F2026D4B;
-        Fri,  8 Sep 2023 16:03:29 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 25E5FC03295;
+        Fri,  8 Sep 2023 16:03:35 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@lst.de>
@@ -50,27 +50,23 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] iov_iter: Fix iov_iter_extract_pages()
-Date:   Fri,  8 Sep 2023 17:03:20 +0100
-Message-ID: <20230908160322.1714302-2-dhowells@redhat.com>
+Subject: [PATCH 3/3] iov_iter: Kunit tests for page extraction
+Date:   Fri,  8 Sep 2023 17:03:22 +0100
+Message-ID: <20230908160322.1714302-4-dhowells@redhat.com>
 In-Reply-To: <20230908160322.1714302-1-dhowells@redhat.com>
 References: <20230908160322.1714302-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-iov_iter_extract_pages() doesn't correctly handle skipping over initial
-zero-length entries in ITER_KVEC and ITER_BVEC-type iterators.  The problem is
-that it accidentally reduces maxsize to 0 when it skipping and thus runs to
-the end of the array and returns 0.
+Add some kunit tests for page extraction for ITER_BVEC, ITER_KVEC and
+ITER_XARRAY type iterators.  ITER_UBUF and ITER_IOVEC aren't dealt with as
+they require userspace VM interaction.  ITER_DISCARD isn't dealt with
+either as that can't be extracted.
 
-Fix this by sticking the calculated size-to-copy in a new variable rather
-than back in maxsize.
-
-Fixes: 7d58fe731028 ("iov_iter: Add a function to extract a page list from an iterator")
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Christian Brauner <brauner@kernel.org>
@@ -82,97 +78,265 @@ cc: linux-mm@kvack.org
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 ---
- lib/iov_iter.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ lib/kunit_iov_iter.c | 240 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 240 insertions(+)
 
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index b31597b0ca20..27234a820eeb 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1654,14 +1654,14 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 					   size_t *offset0)
- {
- 	struct page **p, *page;
--	size_t skip = i->iov_offset, offset;
-+	size_t skip = i->iov_offset, offset, size;
- 	int k;
- 
- 	for (;;) {
- 		if (i->nr_segs == 0)
- 			return 0;
--		maxsize = min(maxsize, i->bvec->bv_len - skip);
--		if (maxsize)
-+		size = min(maxsize, i->bvec->bv_len - skip);
-+		if (size)
- 			break;
- 		i->iov_offset = 0;
- 		i->nr_segs--;
-@@ -1674,16 +1674,16 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 	offset = skip % PAGE_SIZE;
- 	*offset0 = offset;
- 
--	maxpages = want_pages_array(pages, maxsize, offset, maxpages);
-+	maxpages = want_pages_array(pages, size, offset, maxpages);
- 	if (!maxpages)
- 		return -ENOMEM;
- 	p = *pages;
- 	for (k = 0; k < maxpages; k++)
- 		p[k] = page + k;
- 
--	maxsize = min_t(size_t, maxsize, maxpages * PAGE_SIZE - offset);
--	iov_iter_advance(i, maxsize);
--	return maxsize;
-+	size = min_t(size_t, size, maxpages * PAGE_SIZE - offset);
-+	iov_iter_advance(i, size);
-+	return size;
+diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
+index 25a910187d17..859b67c4d697 100644
+--- a/lib/kunit_iov_iter.c
++++ b/lib/kunit_iov_iter.c
+@@ -519,6 +519,243 @@ static void __init iov_kunit_copy_from_xarray(struct kunit *test)
+ 	KUNIT_SUCCEED();
  }
  
- /*
-@@ -1698,14 +1698,14 @@ static ssize_t iov_iter_extract_kvec_pages(struct iov_iter *i,
- {
- 	struct page **p, *page;
- 	const void *kaddr;
--	size_t skip = i->iov_offset, offset, len;
-+	size_t skip = i->iov_offset, offset, len, size;
- 	int k;
++/*
++ * Test the extraction of ITER_KVEC-type iterators.
++ */
++static void __init iov_kunit_extract_pages_kvec(struct kunit *test)
++{
++	const struct kvec_test_range *pr;
++	struct iov_iter iter;
++	struct page **bpages, *pagelist[8], **pages = pagelist;
++	struct kvec kvec[8];
++	u8 *buffer;
++	ssize_t len;
++	size_t bufsize, size = 0, npages;
++	int i, from;
++
++	bufsize = 0x100000;
++	npages = bufsize / PAGE_SIZE;
++
++	buffer = iov_kunit_create_buffer(test, &bpages, npages);
++
++	iov_kunit_load_kvec(test, &iter, READ, kvec, ARRAY_SIZE(kvec),
++			    buffer, bufsize, kvec_test_ranges);
++	size = iter.count;
++
++	pr = kvec_test_ranges;
++	from = pr->from;
++	do {
++		size_t offset0 = LONG_MAX;
++
++		for (i = 0; i < ARRAY_SIZE(pagelist); i++)
++			pagelist[i] = (void *)(unsigned long)0xaa55aa55aa55aa55ULL;
++
++		len = iov_iter_extract_pages(&iter, &pages, 100 * 1024,
++					     ARRAY_SIZE(pagelist), 0, &offset0);
++		KUNIT_EXPECT_GE(test, len, 0);
++		if (len < 0)
++			break;
++		KUNIT_EXPECT_GE(test, (ssize_t)offset0, 0);
++		KUNIT_EXPECT_LT(test, offset0, PAGE_SIZE);
++		KUNIT_EXPECT_LE(test, len, size);
++		KUNIT_EXPECT_EQ(test, iter.count, size - len);
++		size -= len;
++
++		if (len == 0)
++			break;
++
++		for (i = 0; i < ARRAY_SIZE(pagelist); i++) {
++			struct page *p;
++			ssize_t part = min_t(ssize_t, len, PAGE_SIZE - offset0);
++			int ix;
++
++			KUNIT_ASSERT_GE(test, part, 0);
++			while (from == pr->to) {
++				pr++;
++				from = pr->from;
++				if (from < 0)
++					goto stop;
++			}
++			ix = from / PAGE_SIZE;
++			KUNIT_ASSERT_LT(test, ix, npages);
++			p = bpages[ix];
++			KUNIT_EXPECT_PTR_EQ(test, pagelist[i], p);
++			KUNIT_EXPECT_EQ(test, offset0, from % PAGE_SIZE);
++			from += part;
++			len -= part;
++			KUNIT_ASSERT_GE(test, len, 0);
++			if (len == 0)
++				break;
++			offset0 = 0;
++		}
++
++		if (test->status == KUNIT_FAILURE)
++			break;
++	} while (iov_iter_count(&iter) > 0);
++
++stop:
++	KUNIT_EXPECT_EQ(test, size, 0);
++	KUNIT_EXPECT_EQ(test, iter.count, 0);
++	KUNIT_SUCCEED();
++}
++
++/*
++ * Test the extraction of ITER_BVEC-type iterators.
++ */
++static void __init iov_kunit_extract_pages_bvec(struct kunit *test)
++{
++	const struct bvec_test_range *pr;
++	struct iov_iter iter;
++	struct page **bpages, *pagelist[8], **pages = pagelist;
++	struct bio_vec bvec[8];
++	ssize_t len;
++	size_t bufsize, size = 0, npages;
++	int i, from;
++
++	bufsize = 0x100000;
++	npages = bufsize / PAGE_SIZE;
++
++	iov_kunit_create_buffer(test, &bpages, npages);
++	iov_kunit_load_bvec(test, &iter, READ, bvec, ARRAY_SIZE(bvec),
++			    bpages, npages, bufsize, bvec_test_ranges);
++	size = iter.count;
++
++	pr = bvec_test_ranges;
++	from = pr->from;
++	do {
++		size_t offset0 = LONG_MAX;
++
++		for (i = 0; i < ARRAY_SIZE(pagelist); i++)
++			pagelist[i] = (void *)(unsigned long)0xaa55aa55aa55aa55ULL;
++
++		len = iov_iter_extract_pages(&iter, &pages, 100 * 1024,
++					     ARRAY_SIZE(pagelist), 0, &offset0);
++		KUNIT_EXPECT_GE(test, len, 0);
++		if (len < 0)
++			break;
++		KUNIT_EXPECT_GE(test, (ssize_t)offset0, 0);
++		KUNIT_EXPECT_LT(test, offset0, PAGE_SIZE);
++		KUNIT_EXPECT_LE(test, len, size);
++		KUNIT_EXPECT_EQ(test, iter.count, size - len);
++		size -= len;
++
++		if (len == 0)
++			break;
++
++		for (i = 0; i < ARRAY_SIZE(pagelist); i++) {
++			struct page *p;
++			ssize_t part = min_t(ssize_t, len, PAGE_SIZE - offset0);
++			int ix;
++
++			KUNIT_ASSERT_GE(test, part, 0);
++			while (from == pr->to) {
++				pr++;
++				from = pr->from;
++				if (from < 0)
++					goto stop;
++			}
++			ix = pr->page + from / PAGE_SIZE;
++			KUNIT_ASSERT_LT(test, ix, npages);
++			p = bpages[ix];
++			KUNIT_EXPECT_PTR_EQ(test, pagelist[i], p);
++			KUNIT_EXPECT_EQ(test, offset0, from % PAGE_SIZE);
++			from += part;
++			len -= part;
++			KUNIT_ASSERT_GE(test, len, 0);
++			if (len == 0)
++				break;
++			offset0 = 0;
++		}
++
++		if (test->status == KUNIT_FAILURE)
++			break;
++	} while (iov_iter_count(&iter) > 0);
++
++stop:
++	KUNIT_EXPECT_EQ(test, size, 0);
++	KUNIT_EXPECT_EQ(test, iter.count, 0);
++	KUNIT_SUCCEED();
++}
++
++/*
++ * Test the extraction of ITER_XARRAY-type iterators.
++ */
++static void __init iov_kunit_extract_pages_xarray(struct kunit *test)
++{
++	const struct kvec_test_range *pr;
++	struct iov_iter iter;
++	struct xarray *xarray;
++	struct page **bpages, *pagelist[8], **pages = pagelist;
++	ssize_t len;
++	size_t bufsize, size = 0, npages;
++	int i, from;
++
++	bufsize = 0x100000;
++	npages = bufsize / PAGE_SIZE;
++
++	xarray = iov_kunit_create_xarray(test);
++
++	iov_kunit_create_buffer(test, &bpages, npages);
++	iov_kunit_load_xarray(test, &iter, READ, xarray, bpages, npages);
++
++	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
++		from = pr->from;
++		size = pr->to - from;
++		KUNIT_ASSERT_LE(test, pr->to, bufsize);
++
++		iov_iter_xarray(&iter, WRITE, xarray, from, size);
++
++		do {
++			size_t offset0 = LONG_MAX;
++
++			for (i = 0; i < ARRAY_SIZE(pagelist); i++)
++				pagelist[i] = (void *)(unsigned long)0xaa55aa55aa55aa55ULL;
++
++			len = iov_iter_extract_pages(&iter, &pages, 100 * 1024,
++						     ARRAY_SIZE(pagelist), 0, &offset0);
++			KUNIT_EXPECT_GE(test, len, 0);
++			if (len < 0)
++				break;
++			KUNIT_EXPECT_LE(test, len, size);
++			KUNIT_EXPECT_EQ(test, iter.count, size - len);
++			if (len == 0)
++				break;
++			size -= len;
++			KUNIT_EXPECT_GE(test, (ssize_t)offset0, 0);
++			KUNIT_EXPECT_LT(test, offset0, PAGE_SIZE);
++
++			for (i = 0; i < ARRAY_SIZE(pagelist); i++) {
++				struct page *p;
++				ssize_t part = min_t(ssize_t, len, PAGE_SIZE - offset0);
++				int ix;
++
++				KUNIT_ASSERT_GE(test, part, 0);
++				ix = from / PAGE_SIZE;
++				KUNIT_ASSERT_LT(test, ix, npages);
++				p = bpages[ix];
++				KUNIT_EXPECT_PTR_EQ(test, pagelist[i], p);
++				KUNIT_EXPECT_EQ(test, offset0, from % PAGE_SIZE);
++				from += part;
++				len -= part;
++				KUNIT_ASSERT_GE(test, len, 0);
++				if (len == 0)
++					break;
++				offset0 = 0;
++			}
++
++			if (test->status == KUNIT_FAILURE)
++				goto stop;
++		} while (iov_iter_count(&iter) > 0);
++
++		KUNIT_EXPECT_EQ(test, size, 0);
++		KUNIT_EXPECT_EQ(test, iter.count, 0);
++		KUNIT_EXPECT_EQ(test, iter.iov_offset, pr->to - pr->from);
++	}
++
++stop:
++	KUNIT_SUCCEED();
++}
++
+ static struct kunit_case __refdata iov_kunit_cases[] = {
+ 	KUNIT_CASE(iov_kunit_copy_to_kvec),
+ 	KUNIT_CASE(iov_kunit_copy_from_kvec),
+@@ -526,6 +763,9 @@ static struct kunit_case __refdata iov_kunit_cases[] = {
+ 	KUNIT_CASE(iov_kunit_copy_from_bvec),
+ 	KUNIT_CASE(iov_kunit_copy_to_xarray),
+ 	KUNIT_CASE(iov_kunit_copy_from_xarray),
++	KUNIT_CASE(iov_kunit_extract_pages_kvec),
++	KUNIT_CASE(iov_kunit_extract_pages_bvec),
++	KUNIT_CASE(iov_kunit_extract_pages_xarray),
+ 	{}
+ };
  
- 	for (;;) {
- 		if (i->nr_segs == 0)
- 			return 0;
--		maxsize = min(maxsize, i->kvec->iov_len - skip);
--		if (maxsize)
-+		size = min(maxsize, i->kvec->iov_len - skip);
-+		if (size)
- 			break;
- 		i->iov_offset = 0;
- 		i->nr_segs--;
-@@ -1717,13 +1717,13 @@ static ssize_t iov_iter_extract_kvec_pages(struct iov_iter *i,
- 	offset = (unsigned long)kaddr & ~PAGE_MASK;
- 	*offset0 = offset;
- 
--	maxpages = want_pages_array(pages, maxsize, offset, maxpages);
-+	maxpages = want_pages_array(pages, size, offset, maxpages);
- 	if (!maxpages)
- 		return -ENOMEM;
- 	p = *pages;
- 
- 	kaddr -= offset;
--	len = offset + maxsize;
-+	len = offset + size;
- 	for (k = 0; k < maxpages; k++) {
- 		size_t seg = min_t(size_t, len, PAGE_SIZE);
- 
-@@ -1737,9 +1737,9 @@ static ssize_t iov_iter_extract_kvec_pages(struct iov_iter *i,
- 		kaddr += PAGE_SIZE;
- 	}
- 
--	maxsize = min_t(size_t, maxsize, maxpages * PAGE_SIZE - offset);
--	iov_iter_advance(i, maxsize);
--	return maxsize;
-+	size = min_t(size_t, size, maxpages * PAGE_SIZE - offset);
-+	iov_iter_advance(i, size);
-+	return size;
- }
- 
- /*
 
