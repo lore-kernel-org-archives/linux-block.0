@@ -2,90 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80801EEB56F
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 19:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C64C3EEB56B
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 19:34:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344936AbjIHTeB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 15:34:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34236 "EHLO
+        id S237699AbjIHTej (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 15:34:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244958AbjIHTdt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 15:33:49 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9562F1FE7
-        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 12:33:24 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-273b1ea30beso598211a91.1
-        for <linux-block@vger.kernel.org>; Fri, 08 Sep 2023 12:33:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694201565; x=1694806365; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=q77K6K9aetpUJ+m2swHb4WFutErkMKiXOvu8vLXzv6o=;
-        b=StaqAb895JvirYrM90QDqw3si2QNurWg9xqd3bKaTbAzN7xVFEafc8Jmtx+j252e4J
-         PhTV5qifegRuBcA97ZQv49pfRjdMBveQTNrD+bx2+ht+z6bitpIsdW+tJeh5SJg10+mZ
-         OSMSv4gQXVgunODUUCntC+mPvxH6usivIiSv6xaEzBHoo7KRgkQrJYE4MVXkwppJTgG9
-         jKx95J2fNhh0PsWbInAhfDal6KPd0eiCgLL09y3BtTzFaFheJmMZN885Spdk4TbGrgqa
-         awKrcAhzAqE3F+aTZEiZ9T3HpVi29zfnSU/G5rNJucsXrCiMQIC/0YiuffFzdgSpbPdx
-         fRvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694201565; x=1694806365;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q77K6K9aetpUJ+m2swHb4WFutErkMKiXOvu8vLXzv6o=;
-        b=Oq8sl4lSg48H9a/aIuDrRaWiHOvp+P3QdpNuaqlVtUTPO9fLsGxnPGmFpcs/Lg4vdI
-         TsU15ogz/VDcqDLSxtEtUNNjVXlLMd9Sjph/aQk+jX0QNWUKiyl8zY7gRvCdVjlaVptf
-         STIXv0bGdLRXJxOilVJ2uNcE/WXFmXBkcDkkuvPQIHUE2qS9waxY0cXn/CxyWLmSan29
-         SrHl3nYmCXcNCY32YL1O/BXnxRY+mjqLiHxYoEoKEo8Kh5N6DS/J0++NrnoflWShjyX9
-         lp/xLIp2I6VZMYun9DP0Y1BUuLyaju0puwIiE29dWu6xCDLCYNpLnGWFh1Hfek0c4on7
-         x6fg==
-X-Gm-Message-State: AOJu0YzTGVy+0TIjLz8D0uD4JhOropvt2HIoS4vvxK3i9vBAYxbi93Ux
-        1blTR81Ntj0FRZmuHoGRiWr+Uw==
-X-Google-Smtp-Source: AGHT+IGHLvavStavXlYDVS2UvBAcUd/wa4WruHdVF/uXy7Bs2gkR5oWddVf4pPXi4u1EgSURMVojhg==
-X-Received: by 2002:a17:90a:7025:b0:263:730b:f568 with SMTP id f34-20020a17090a702500b00263730bf568mr3401958pjk.3.1694201565361;
-        Fri, 08 Sep 2023 12:32:45 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 9-20020a17090a030900b002635db431a0sm1766410pje.45.2023.09.08.12.32.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Sep 2023 12:32:44 -0700 (PDT)
-Message-ID: <cd341326-cfaf-4796-8894-2241e7b630d9@kernel.dk>
-Date:   Fri, 8 Sep 2023 13:32:43 -0600
+        with ESMTP id S236264AbjIHTe1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 15:34:27 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DEF31FE8;
+        Fri,  8 Sep 2023 12:34:04 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D20A3C433B8;
+        Fri,  8 Sep 2023 19:33:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694201628;
+        bh=WnjuK4GWrv7imqTJ3JE3lg2r98F42KrLCH5nvnXBisA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Db5uCQpSobrf99xDiBCwUEuWmdIRC/WZbTpDv6lZUAH1bT+xrAO0tRPjMXLPg/m2L
+         83z+ryLxv0ANL0AEtUY6frHJA+LBx3J0YFq0M+l/Yq3J0EnU3TkRSoiiS/btaKA8mn
+         DfSdtUKqzWUgfvLPKxBAv64voC2dkuyprvrFbvbWJTYHUCsVX8yD0HeGyFYSq6y11+
+         v9J/ckuZ4JYbSD0rwJQWYwVTOcwPA3v7JfYXWN9koRw8uRcryPZ88HD6Uy2wUr34PQ
+         jnWAzByKQi0YnpZMc7lI6YAKJpXXyF26GXn8OnYVpGwAqXOD819ewdhmXGqa2n1Siq
+         i8vjoRxAloQAg==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Chengming Zhou <zhouchengming@bytedance.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 29/31] blk-mq: fix tags leak when shrink nr_hw_queues
+Date:   Fri,  8 Sep 2023 15:31:58 -0400
+Message-Id: <20230908193201.3462957-29-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230908193201.3462957-1-sashal@kernel.org>
+References: <20230908193201.3462957-1-sashal@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH AUTOSEL 6.5 31/36] block: Allow bio_iov_iter_get_pages()
- with bio->bi_bdev unset
-Content-Language: en-US
-To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Cc:     Kent Overstreet <kent.overstreet@linux.dev>,
-        linux-block@vger.kernel.org
-References: <20230908192848.3462476-1-sashal@kernel.org>
- <20230908192848.3462476-31-sashal@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230908192848.3462476-31-sashal@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.15
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/8/23 1:28 PM, Sasha Levin wrote:
-> From: Kent Overstreet <kent.overstreet@linux.dev>
-> 
-> [ Upstream commit 168145f617d57bf4e474901b7ffa869337a802e6 ]
-> 
-> bio_iov_iter_get_pages() trims the IO based on the block size of the
-> block device the IO will be issued to.
-> 
-> However, bcachefs is a multi device filesystem; when we're creating the
-> bio we don't yet know which block device the bio will be submitted to -
-> we have to handle the alignment checks elsewhere.
-> 
-> Thus this is needed to avoid a null ptr deref.
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-Please drop this one from -stable, there's no need.
+[ Upstream commit e1dd7bc93029024af5688253b0c05181d6e01f8e ]
 
+Although we don't need to realloc set->tags[] when shrink nr_hw_queues,
+we need to free them. Or these tags will be leaked.
+
+How to reproduce:
+1. mount -t configfs configfs /mnt
+2. modprobe null_blk nr_devices=0 submit_queues=8
+3. mkdir /mnt/nullb/nullb0
+4. echo 1 > /mnt/nullb/nullb0/power
+5. echo 4 > /mnt/nullb/nullb0/submit_queues
+6. rmdir /mnt/nullb/nullb0
+
+In step 4, will alloc 9 tags (8 submit queues and 1 poll queue), then
+in step 5, new_nr_hw_queues = 5 (4 submit queues and 1 poll queue).
+At last in step 6, only these 5 tags are freed, the other 4 tags leaked.
+
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20230821095602.70742-1-chengming.zhou@linux.dev
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-mq.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 58bf41e8e66c7..d539b73a6be4a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4385,9 +4385,13 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
+ 				       int new_nr_hw_queues)
+ {
+ 	struct blk_mq_tags **new_tags;
++	int i;
+ 
+-	if (set->nr_hw_queues >= new_nr_hw_queues)
++	if (set->nr_hw_queues >= new_nr_hw_queues) {
++		for (i = new_nr_hw_queues; i < set->nr_hw_queues; i++)
++			__blk_mq_free_map_and_rqs(set, i);
+ 		goto done;
++	}
+ 
+ 	new_tags = kcalloc_node(new_nr_hw_queues, sizeof(struct blk_mq_tags *),
+ 				GFP_KERNEL, set->numa_node);
 -- 
-Jens Axboe
+2.40.1
 
