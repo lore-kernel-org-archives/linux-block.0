@@ -2,132 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E94EE7FE3
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 13:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2E3EE8001
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 13:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbjIHNJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 09:09:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33612 "EHLO
+        id S243631AbjIHNuW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 09:50:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229699AbjIHNJN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 09:09:13 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BDFA19B5
-        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 06:09:09 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 22C031FE73;
-        Fri,  8 Sep 2023 13:09:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1694178548; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=v9BLOYjsYJqUx9nrHtpBBQiYT70sZn4WcNJoSM/TJQ0=;
-        b=cl/5RV47qHJqhgURPl+ftiyDw7IMTs87evo9niO+P8C14tz9886pVLBkRbWU038c5FCCQf
-        fNQDGFzqOuziq5zlj6NGW3Az2n11km6b+fMKS0jrhvGio/ShU8TxaZDrsLZBUoIxOgr1g4
-        SRvwPyptwnZsZzGiptNyby1E+FMAwIM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1694178548;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=v9BLOYjsYJqUx9nrHtpBBQiYT70sZn4WcNJoSM/TJQ0=;
-        b=AGLKHdVbc7sj874pc3T6ifMbk0caAkY7fgWSqae8RZouxPMLgb+IiNBX3w9GuXIR7YRRDk
-        ZvFJem3IFIxUh/Bg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 158F3131FD;
-        Fri,  8 Sep 2023 13:09:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id gw02BfQc+2S2TwAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 08 Sep 2023 13:09:08 +0000
-Date:   Fri, 8 Sep 2023 15:09:39 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Yi Zhang <yi.zhang@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH blktests] tests/nvme/031: fix connecting faiure
-Message-ID: <kflpcc7u4wksuuo27gcrjxwsqr277b3phpnbbbjkdaniycmttn@f6t4dadmvqih>
-References: <20230907034423.3928010-1-yi.zhang@redhat.com>
- <nrfuja62qetxqxzwxuxhjve2u4r4reofcpo43zmg6qbbhjjqkp@ratsu2kubymb>
+        with ESMTP id S243434AbjIHNuV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 09:50:21 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF4F1FDA
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 06:49:56 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-34e1757fe8fso2532575ab.0
+        for <linux-block@vger.kernel.org>; Fri, 08 Sep 2023 06:49:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694180995; x=1694785795; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FpgQK4s9bxFZTeQvTu525yORG+W4/IPY9nrdSs2ErBA=;
+        b=DxJvILV9AnF8CzcYw01F7csW8NmvK0ne/j+DwDfRa1Lamag+hkoiu2nvdkUYTjMtD6
+         7zmZ38YhhW3vZ5Ghtnu51Raqzzh3UgtNIJA9faL3qGpKJLCSTiAmbg3Nh86vnQcaWQ6t
+         sRuM+qzwBbjAY9Z7tjk5kNWS2ctFpXw6AdeD0vogJD/TnJj2+cqDlu1ASZNZf9vpsEkG
+         BcJzDTQ3wVRdHJ5Jpk2rZpn0AErjCbiqiuvuX3jeRsT1u89yO+xkOSFpm7TG1+VhKNwT
+         Mammgx4yquv3b9zG46gV5rUVQKUV4P63KkqPZkqxVT8L12JVSCAwSxC3p+mdojJIzUUt
+         WQAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694180995; x=1694785795;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FpgQK4s9bxFZTeQvTu525yORG+W4/IPY9nrdSs2ErBA=;
+        b=XP+e1xnvITrE2Q2dP3SQ3p6LU1Hk/EKoySBzKUoG+gwgHX4ZHsB3dOx3m5NbwnQD9u
+         YmiT2DNnT14Zrr5zIKjrN9h0b6Kzrbg1N7gMEFQd1eawASmrqraF4Hu5XyIADnnl7q7m
+         oWDQxJkT3xAK8lS8Skxd2mp+ePiGyDNWi5XKb4CR/X2A/PF6UGz/gF3AD2EtaWU3Flby
+         VbMUuZcKeqkcMFolZJinB85PUJCMmGGQB/+WWpo+Drk/69TurvkkUYngieAWjERSHuVP
+         5n/3Tzp93D7LW/veFI6T2eXYCMvYb2TGvJ05XDQeIq8Na2uI4zvGtrUcFgyYi2clJw33
+         DfMw==
+X-Gm-Message-State: AOJu0YyDYHkxWboTiZc5q1kTKJDl93BJmJT0zmaxOPmiJGtEJbypS6HA
+        NsPp6gweWObRctYRHnZ4nOc/Sw==
+X-Google-Smtp-Source: AGHT+IE9cEuYRFuFLiV85DC7b+ok0R2sZd3fg/+FWwWSVHviDBmJp21O8/u9JNbObSPCgRTJbeS+Lw==
+X-Received: by 2002:a05:6602:14ca:b0:792:6be4:3dcb with SMTP id b10-20020a05660214ca00b007926be43dcbmr3438299iow.2.1694180995470;
+        Fri, 08 Sep 2023 06:49:55 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id q7-20020a02c8c7000000b004300eca209csm461203jao.112.2023.09.08.06.49.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Sep 2023 06:49:54 -0700 (PDT)
+Message-ID: <58227846-6b73-46ef-957f-d9b1e0451899@kernel.dk>
+Date:   Fri, 8 Sep 2023 07:49:53 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <nrfuja62qetxqxzwxuxhjve2u4r4reofcpo43zmg6qbbhjjqkp@ratsu2kubymb>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3] io_uring: fix IO hang in io_wq_put_and_exit from
+ do_exit()
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>
+References: <20230908093009.540763-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230908093009.540763-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 08, 2023 at 11:26:31AM +0000, Shinichiro Kawasaki wrote:
-> On Sep 07, 2023 / 11:44, Yi Zhang wrote:
-> > allow_any_host was disabled during _create_nvmet_subsystem, call
-> > _create_nvmet_host before connecting to allow the host to connect.
-> >
-> > [76096.420586] nvmet: adding nsid 1 to subsystem blktests-subsystem-0
-> > [76096.440595] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
-> > [76096.491344] nvmet: connect by host nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349 for subsystem blktests-subsystem-0 not allowed
-> > [76096.505049] nvme nvme2: Connect for subsystem blktests-subsystem-0 is not allowed, hostnqn: nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
-> > [76096.519609] nvme nvme2: failed to connect queue: 0 ret=16772
-> >
-> > Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+On 9/8/23 3:30 AM, Ming Lei wrote:
+> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> index ad636954abae..95a3d31a1ef1 100644
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -1930,6 +1930,10 @@ void io_wq_submit_work(struct io_wq_work *work)
+>  		}
+>  	}
+>  
+> +	/* It is fragile to block POLLED IO, so switch to NON_BLOCK */
+> +	if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_queue)
+> +		issue_flags |= IO_URING_F_NONBLOCK;
+> +
 
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
+I think this comment deserves to be more descriptive. Normally we
+absolutely cannot block for polled IO, it's only OK here because io-wq
+is the issuer and not necessarily the poller of it. That generally falls
+upon the original issuer to poll these requests.
 
-> Thanks for the catching this. I looked back the past changes and found that the
-> commit c32b233b7dd6 ("nvme/rc: Add helper for adding/removing to allow list")
-> triggered the connection failure. So, I think a Fixes tag with this commit is
-> required (I can add when this patch is applied).
->
-> Even after the commit, the test case still passes. That's why I did not notice
-> the connection failure. I think _nvme_connect_subsys() should check exit status
-> of "nvme connect" command and print an error message on failure. This will help
-> to catch similar connection failures in future.
+I think this should be a separate commit, coming before the main fix
+which is below.
 
-I was running into a similiar problem for (not yet existing) nvme/050
-test case [1]:
+> @@ -3363,6 +3367,12 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
+>  		finish_wait(&tctx->wait, &wait);
+>  	} while (1);
+>  
+> +	/*
+> +	 * Reap events from each ctx, otherwise these requests may take
+> +	 * resources and prevent other contexts from being moved on.
+> +	 */
+> +	xa_for_each(&tctx->xa, index, node)
+> +		io_iopoll_try_reap_events(node->ctx);
 
-nvmf_wait_for_state() {
-       local def_state_timeout=5
-       local subsys_name="$1"
-       local state="$2"
-       local timeout="${3:-$def_state_timeout}"
-       local nvmedev
-       local state_file
-       local start_time
-       local end_time
+The main issue here is that if someone isn't polling for them, then we
+get to wait for a timeout before they complete. This can delay exit, for
+example, as we're now just waiting 30 seconds (or whatever the timeout
+is on the underlying device) for them to get timed out before exit can
+finish.
 
-       nvmedev=$(_find_nvme_dev "${subsys_name}")
-       state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
+Do we just want to move this a bit higher up where we iterate ctx's
+anyway? Not that important I suspect.
 
-       start_time=$(date +%s)
-       while ! grep -q "${state}" "${state_file}"; do
-               sleep 1
-               end_time=$(date +%s)
-               if (( end_time - start_time > timeout )); then
-                       echo "expected state \"${state}\" not " \
-                               "reached within ${timeout} seconds"
-                       return 1
-               fi
-       done
+-- 
+Jens Axboe
 
-       return 0
-}
-
-_nvme_connect_subsys "${nvme_trtype}" "${def_subsysnqn}" \
-                            --hostnqn "${def_hostnqn}" \
-                            --reconnect-delay 1 \
-                            --ctrl-loss-tmo 10
-
-nvmf_wait_for_state "${def_subsysnqn}" "live"
-nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
-
-We could make this a bit more generic and move it into the connect
-helper. What do you think?
-
-[1] https://lore.kernel.org/linux-nvme/20230621155825.20146-2-dwagner@suse.de/
