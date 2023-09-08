@@ -2,90 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73390EE57CA
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 05:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B466CEE57CA
+	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 05:56:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238445AbjIHFvX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 01:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45344 "EHLO
+        id S229880AbjIHF4E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 01:56:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbjIHFvW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 01:51:22 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16D5C19BA;
-        Thu,  7 Sep 2023 22:51:19 -0700 (PDT)
+        with ESMTP id S229710AbjIHF4E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 01:56:04 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084D519BA;
+        Thu,  7 Sep 2023 22:55:59 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id C371F218EA;
-        Fri,  8 Sep 2023 05:51:16 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A5A4F1F749;
+        Fri,  8 Sep 2023 05:55:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1694152276; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1694152558; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=I1jlw6dXRzKXinGxUT2SY0IMhDQLif42Och5k8NNLJE=;
-        b=TXzTuy5WCuaYAiImqFlBiXBtuAbEKWlz5ZoimisX1yskMoAvGRqbnZnv5r2xSdTUO1wCT2
-        v1a9nvXIHgpP0bVZeR/klHO6eOuYgMuwAPcrg+RyWLjcqk4Pj52ltJSam6cDuv2Gy/rQ9m
-        9rlEXJJBR+MKJ+i7iEf/o1LBaLeiuUc=
+        bh=QQhkJAyeX2RFjNddtb7bnQt1fhTJYz1Tq51AB0Z0tqs=;
+        b=xPAh9iPGzZnnKb0A2UugQwYTTMD2+nZv2GtmUPEceRRuvQTR+G/fPH/4GqvhjVXMRVzrhe
+        RCt4hrXtnb7tr/M1wqMAtdjlz08Zi0cyyN9EgvzC3rBz6QA8haZxX60mdLsCBGDL289l7U
+        gt31cy5JlR8TAz6bOmgxy1EvgI5jL34=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1694152276;
+        s=susede2_ed25519; t=1694152558;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=I1jlw6dXRzKXinGxUT2SY0IMhDQLif42Och5k8NNLJE=;
-        b=9zF2l2QhmQhF3pFOWbf90bVcKsaxsmS9oxZ2Hl0NlNckhBRAi5tTNPdMt0UbHTPbFIGtiF
-        9U1zhzzZNfKmMCBQ==
+        bh=QQhkJAyeX2RFjNddtb7bnQt1fhTJYz1Tq51AB0Z0tqs=;
+        b=7d0pBCEKDR0+2TM2hweNW7CefzSWRB1yKDUt2QWSK+Wn99P/7tXcs9r56lvXQyfdpvMkm1
+        HL5FiKiLWSjHKwAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 97CA0132FA;
-        Fri,  8 Sep 2023 05:51:16 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2DE78131FD;
+        Fri,  8 Sep 2023 05:55:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id VntUI1S2+mTYYgAAMHmgww
-        (envelope-from <hare@suse.de>); Fri, 08 Sep 2023 05:51:16 +0000
-Message-ID: <98a47b9b-45ee-4166-aad7-6a2c05c201a0@suse.de>
-Date:   Fri, 8 Sep 2023 07:51:16 +0200
+        id EJUhCm63+mSyZAAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 08 Sep 2023 05:55:58 +0000
+Message-ID: <9b524f00-35f1-4f6c-896e-40f2879040d2@suse.de>
+Date:   Fri, 8 Sep 2023 07:55:57 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: fix tags UAF when shrink nr_hw_queues
-To:     chengming.zhou@linux.dev, axboe@kernel.dk, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>,
-        Yi Zhang <yi.zhang@redhat.com>
-References: <20230908005702.2183908-1-chengming.zhou@linux.dev>
+Subject: Re: [PATCH v15 03/12] block: add copy offload support
 Content-Language: en-US
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        martin.petersen@oracle.com, mcgrof@kernel.org,
+        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org
+References: <20230906163844.18754-1-nj.shetty@samsung.com>
+ <CGME20230906164312epcas5p397662c68dde1dbc4dc14c3e80ca260b3@epcas5p3.samsung.com>
+ <20230906163844.18754-4-nj.shetty@samsung.com>
+ <b0f3d320-047b-4bd8-a6fc-25b468caf5b3@suse.de>
+ <20230907071611.rgukw7fory2xh5sy@green245>
 From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230908005702.2183908-1-chengming.zhou@linux.dev>
+In-Reply-To: <20230907071611.rgukw7fory2xh5sy@green245>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/8/23 02:57, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
+On 9/7/23 09:16, Nitesh Shetty wrote:
+> On 07/09/23 07:49AM, Hannes Reinecke wrote:
+>> On 9/6/23 18:38, Nitesh Shetty wrote:
+>>
+>> Hmm. That looks a bit odd. Why do you have to use wait_for_completion?
 > 
-> When nr_hw_queues shrink, we free the excess tags before realloc
-> hw_ctxs for each queue, during that we may need to access those
-> tags, like blk_mq_tag_idle(hctx) will access queue shared tags.
+> wait_for_completion is waiting for all the copy IOs to complete,
+> when caller does not pass endio handler.
+> Copy IO submissions are still async, as in previous revisions.
 > 
-> So slab-use-after-free caused and reported by KASAN. Fix it by
-> moving the releasing of excess tags to the end.
+>> Can't you submit the 'src' bio, and then submit the 'dst' bio from the 
+>> endio handler of the 'src' bio?
+> We can't do this with the current bio merging approach.
+> 'src' bio waits for the 'dst' bio to arrive in request layer.
+> Note that both bio's should be present in request reaching the driver,
+> to form the copy-cmd.
 > 
-> Fixes: e1dd7bc93029 ("blk-mq: fix tags leak when shrink nr_hw_queues")
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Closes: https://lore.kernel.org/all/CAHj4cs_CK63uoDpGBGZ6DN4OCTpzkR3UaVgK=LX8Owr8ej2ieQ@mail.gmail.com/
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> ---
->   block/blk-mq.c | 13 +++++++------
->   1 file changed, 7 insertions(+), 6 deletions(-)
-> 
+Hmm. I guess it would be possible, but in the end we can always change
+it later once the infrastructure is in.
+
+So:
+
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
