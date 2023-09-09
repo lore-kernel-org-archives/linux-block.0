@@ -2,102 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC214EEB56C
-	for <linux-block@archiver.kernel.org>; Fri,  8 Sep 2023 20:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C70B8EEB57B
+	for <linux-block@archiver.kernel.org>; Sat,  9 Sep 2023 01:44:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237941AbjIHUCU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Sep 2023 16:02:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56052 "EHLO
+        id S231748AbjIIBoh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Sep 2023 21:44:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236772AbjIHUCT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 16:02:19 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9629DBC;
-        Fri,  8 Sep 2023 13:02:15 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32439C43215;
-        Fri,  8 Sep 2023 19:33:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694201624;
-        bh=FPFd8J5/0DI1EqIPNK8tRbwJY5eNb3mrocRnaUFimtI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HPySLwzTGiOORfGge0eHC8a4/TjIAGt3m5aZMu5lPaemVTHdB+B5C07I7gNK65Xnx
-         373O7698gEG+pt/x8omkIjPeBAQlaRzkEBPUNOsrTegdi2OwEwmpc84bXBLVOU+KVI
-         KH8GV4n2fOhwdIvjyp005sPy5+sI2vV3GDdjQg3LjsjG3h4gVbBwqoqMGm1JZeVrp5
-         7glIoUxbtbQdxlkCSpyl/3ZN0d/PDON0/gcNBEI8b+rAjeDCTMRKnHmsYUu7+xu/9i
-         zFDtRe3Jbik4mx7nK+SsC8471ZrJYiwBCcg68kklE8Ww8Tdo+QEfmdXlgQSBIFhvpJ
-         jWTDR2v+6C+/g==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Kent Overstreet <kent.overstreet@linux.dev>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 6.4 26/31] block: Allow bio_iov_iter_get_pages() with bio->bi_bdev unset
-Date:   Fri,  8 Sep 2023 15:31:55 -0400
-Message-Id: <20230908193201.3462957-26-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230908193201.3462957-1-sashal@kernel.org>
-References: <20230908193201.3462957-1-sashal@kernel.org>
+        with ESMTP id S233944AbjIIBog (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2023 21:44:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8EAB186
+        for <linux-block@vger.kernel.org>; Fri,  8 Sep 2023 18:43:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694223822;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=K/wt5PNgeS/XIFcFT75P+BpbsgjLzxZwOLL9FJKcgMs=;
+        b=jLc2mySfwpFeHUUEQRgc+cID79tbTmUBkC22jySvN/rcIM+4zvMnKdFmSQ7FWgG+1i7jzX
+        UOpjySL5oYgIP7JybXOu/Tqq1Km2jiWkecC6Cnyj11fjDqItgZrukwlkXcLxTr4WSo582u
+        SKo9NCYb4K8E7nNIS273OPolH2qkvXw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-656-Jg7gBfcNNJa3xxxC2xAzOQ-1; Fri, 08 Sep 2023 21:43:39 -0400
+X-MC-Unique: Jg7gBfcNNJa3xxxC2xAzOQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 084CE181A6E2;
+        Sat,  9 Sep 2023 01:43:39 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D476F4022FC;
+        Sat,  9 Sep 2023 01:43:34 +0000 (UTC)
+Date:   Sat, 9 Sep 2023 09:43:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: Re: [PATCH V3] io_uring: fix IO hang in io_wq_put_and_exit from
+ do_exit()
+Message-ID: <ZPvNwczbDYaOinIC@fedora>
+References: <20230908093009.540763-1-ming.lei@redhat.com>
+ <58227846-6b73-46ef-957f-d9b1e0451899@kernel.dk>
+ <78577243-b7a6-6d7c-38e4-dfef1762f135@gmail.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.4.15
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <78577243-b7a6-6d7c-38e4-dfef1762f135@gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Kent Overstreet <kent.overstreet@linux.dev>
+On Fri, Sep 08, 2023 at 04:46:15PM +0100, Pavel Begunkov wrote:
+> On 9/8/23 14:49, Jens Axboe wrote:
+> > On 9/8/23 3:30 AM, Ming Lei wrote:
+> > > diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> > > index ad636954abae..95a3d31a1ef1 100644
+> > > --- a/io_uring/io_uring.c
+> > > +++ b/io_uring/io_uring.c
+> > > @@ -1930,6 +1930,10 @@ void io_wq_submit_work(struct io_wq_work *work)
+> > >   		}
+> > >   	}
+> > > +	/* It is fragile to block POLLED IO, so switch to NON_BLOCK */
+> > > +	if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_queue)
+> > > +		issue_flags |= IO_URING_F_NONBLOCK;
+> > > +
+> > 
+> > I think this comment deserves to be more descriptive. Normally we
+> > absolutely cannot block for polled IO, it's only OK here because io-wq
+> > is the issuer and not necessarily the poller of it. That generally falls
+> > upon the original issuer to poll these requests.
+> > 
+> > I think this should be a separate commit, coming before the main fix
+> > which is below.
+> > 
+> > > @@ -3363,6 +3367,12 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
+> > >   		finish_wait(&tctx->wait, &wait);
+> > >   	} while (1);
+> > > +	/*
+> > > +	 * Reap events from each ctx, otherwise these requests may take
+> > > +	 * resources and prevent other contexts from being moved on.
+> > > +	 */
+> > > +	xa_for_each(&tctx->xa, index, node)
+> > > +		io_iopoll_try_reap_events(node->ctx);
+> > 
+> > The main issue here is that if someone isn't polling for them, then we
+> > get to wait for a timeout before they complete. This can delay exit, for
+> > example, as we're now just waiting 30 seconds (or whatever the timeout
+> > is on the underlying device) for them to get timed out before exit can
+> > finish.
+> 
+> Ok, our case is that userspace crashes and doesn't poll for its IO.
+> How would that block io-wq termination? We send a signal and workers
+> should exit, either by queueing up the request for iopoll (and then
 
-[ Upstream commit 168145f617d57bf4e474901b7ffa869337a802e6 ]
+It depends on how userspace handles the signal, such as, t/io_uring,
+s->finish is set as true in INT signal handler, two cases may happen:
 
-bio_iov_iter_get_pages() trims the IO based on the block size of the
-block device the IO will be issued to.
+1) s->finish is observed immediately, then this pthread exits, and leave
+polled requests in ctx->iopoll_list
 
-However, bcachefs is a multi device filesystem; when we're creating the
-bio we don't yet know which block device the bio will be submitted to -
-we have to handle the alignment checks elsewhere.
+2) s->finish isn't observed immediately, and just submit & polling;
+if any IO can't be submitted because of no enough resource, there can
+be one busy spin because submitter_uring_fn() waits for inflight IO.
 
-Thus this is needed to avoid a null ptr deref.
+So if there are two pthreads(A, B), each setup its own io_uring context
+and submit & poll IO on same block device.  If 1) happens in A, all
+device tags can be held for nothing.  If 2) happens in B, the busy spin
+prevents exit() of this pthread B.
 
-Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Link: https://lore.kernel.org/r/20230813182636.2966159-3-kent.overstreet@linux.dev
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/bio.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Then the hang is caused, exit work can't be scheduled at all, because
+pthread B doesn't exit.
 
-diff --git a/block/bio.c b/block/bio.c
-index 043944fd46ebb..e54f2a9cbf9ba 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1245,7 +1245,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	struct page **pages = (struct page **)bv;
- 	ssize_t size, left;
- 	unsigned len, i = 0;
--	size_t offset, trim;
-+	size_t offset;
- 	int ret = 0;
- 
- 	/*
-@@ -1274,10 +1274,12 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 
- 	nr_pages = DIV_ROUND_UP(offset + size, PAGE_SIZE);
- 
--	trim = size & (bdev_logical_block_size(bio->bi_bdev) - 1);
--	iov_iter_revert(iter, trim);
-+	if (bio->bi_bdev) {
-+		size_t trim = size & (bdev_logical_block_size(bio->bi_bdev) - 1);
-+		iov_iter_revert(iter, trim);
-+		size -= trim;
-+	}
- 
--	size -= trim;
- 	if (unlikely(!size)) {
- 		ret = -EFAULT;
- 		goto out;
--- 
-2.40.1
+> we queue it into the io_uring iopoll list and the worker immediately
+> returns back and presumably exits), or it fails because of the signal
+> and returns back.
+> 
+> That should kill all io-wq and make exit go forward. Then the io_uring
+> file will be destroyed and the ring exit work will be polling via
+> 
+> io_ring_exit_work();
+> -- io_uring_try_cancel_requests();
+>   -- io_iopoll_try_reap_events();
+> 
+> What I'm missing? Does the blocking change make io-wq iopolling
+> completions inside the block? Was it by any chance with the recent
+> "do_exit() waiting for ring destruction" patches?
+
+In short, it is one resource dependency issue for polled IO.
+
+
+Thanks,
+Ming
 
