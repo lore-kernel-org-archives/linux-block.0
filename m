@@ -2,218 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE007CA0EC9
-	for <linux-block@archiver.kernel.org>; Mon, 11 Sep 2023 21:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD5FCA0ED3
+	for <linux-block@archiver.kernel.org>; Mon, 11 Sep 2023 21:47:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350761AbjIKVlH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:41:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38326 "EHLO
+        id S238030AbjIKVlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Sep 2023 17:41:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238030AbjIKNeo (ORCPT
+        with ESMTP id S237857AbjIKNP0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2023 09:34:44 -0400
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80B5125;
-        Mon, 11 Sep 2023 06:34:39 -0700 (PDT)
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4Rknkk1MxMz9slY;
-        Mon, 11 Sep 2023 15:34:38 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-        s=MBO0001; t=1694439278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BXAvZHy82SoCVQaKv/cbU0xLnaVu+pzPidj59xLN5A8=;
-        b=cu7s4m08t6I65Ck7rZOpE28zXVayV5lInSJ72/6vzTSz8wjACsQpffctcc75NXzi7655Yq
-        zQpVCUGLw9hB8sY1icjF1R0cGQqaHwQj+2/dRw2528KW+prXimhzVmfA7udgodWOLxfJ2m
-        mSzEAcDZK1V4+LS7wCFt+CDLoCjqQDiarfEZksvFz0fxmyz4d7CcbrflquuE2LOmjeIRzI
-        Fg3Al6gxwuBWYgoIWyp9KdFq7NY2uAmQBKMLCrMPRhaf1A2R+QJQDBFU8DOU6lmuNQefta
-        NR5kiGRq5pW3kD8VM6CDFY2WyAs9EYA9Nxwv9EjeowvpUAwYGc4dMbd2NXPo6A==
-From:   Pankaj Raghav <kernel@pankajraghav.com>
-To:     minchan@kernel.org, senozhatsky@chromium.org
-Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        p.raghav@samsung.com, linux-block@vger.kernel.org,
-        kernel@pankajraghav.com, gost.dev@samsung.com
-Subject: [PATCH 2/5] zram: encapsulate writeback to the backing bdev in a function
-Date:   Mon, 11 Sep 2023 15:34:27 +0200
-Message-Id: <20230911133430.1824564-3-kernel@pankajraghav.com>
-In-Reply-To: <20230911133430.1824564-1-kernel@pankajraghav.com>
-References: <20230911133430.1824564-1-kernel@pankajraghav.com>
+        Mon, 11 Sep 2023 09:15:26 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CD40EB
+        for <linux-block@vger.kernel.org>; Mon, 11 Sep 2023 06:15:21 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-68e2ff0b5c4so415957b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 11 Sep 2023 06:15:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694438120; x=1695042920; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IEzbOAJ4Fb01DDQnzPGrL2255sHl8eJXRyf8OznVFus=;
+        b=n+/dPdaFGlslxalFG5dQshZzQ1NB+zrUnqTKRXOBt0CWrJ1DGux/GVpOSWH26sx/og
+         InuJVd7502PA3wQLeS5ceHT3aGubpxRykJB0l3wyCG5TLImP15QNSA2eHyNdTUkHrdLo
+         GTBnHegJ/5dm5xOCXZMXWtlI/9FS1zRHdlOF5WYVYKdy8DbwILg/ybUGnUsfIzyaMN+X
+         NC9gQM5dJVhCG6cjlra4X44FI/M4aB2yDj5X9TsxNVPQOQ3FhEhygrSVo53bBF0eQVyQ
+         MdsW0Gh32ePJIznsvwt7DcEmAy2nAgd8lBzcUT8IFhlKb1jtSiURoFsxjK/lYWlZtS5r
+         XnQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694438120; x=1695042920;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IEzbOAJ4Fb01DDQnzPGrL2255sHl8eJXRyf8OznVFus=;
+        b=oVRuKS4avvwQ22/nmL3CYBKqU555t4o2YGAgkScWq3j34IBbW8e0aahkI8u9oLq1NC
+         OVmuhsLHkV3AvdTTar75iqpN6Wz0g8m/P9PRAuAZSTclpMHMaLSbMqdmwJsUXRHLDRY6
+         W7lYAdGsWIs+r3A3mygjCSOGv++3ZB57AhIbmTnHpz53ekDYKZAi4VLdFRVcNuWbTnS+
+         WUxDCGPlyl5h/O7T0x3VAbduxPNO7crB5ynxNan7ukkv4LA2lJDz5FrGbXxG1KxzDfU2
+         tGH+K14zM2oxCEUroWmox8hjPrenKpGxWskc+xp3vRt0yDBsdO6B49g/V6qpVRXYRUQv
+         qRXg==
+X-Gm-Message-State: AOJu0Yys5rki6s7W6Bd1Y3NubYQfmKLHujkhzcRQYiwZfSIK7ib3tDbW
+        5pZVsN0W8e4tGrcEdD2vXBlPEQ==
+X-Google-Smtp-Source: AGHT+IHudscUtHs0qFn619Ul6rWCuvw3olGAaxVp3mtAfQmBX9Hjci04z7QmU6EfAYODz1sIkdz2/w==
+X-Received: by 2002:a05:6a20:a10c:b0:145:3bd9:1389 with SMTP id q12-20020a056a20a10c00b001453bd91389mr11943803pzk.6.1694438120533;
+        Mon, 11 Sep 2023 06:15:20 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id f12-20020a17090274cc00b001bbb22652a4sm6365069plt.226.2023.09.11.06.15.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Sep 2023 06:15:19 -0700 (PDT)
+Message-ID: <d6da7de6-e603-4fb3-b68e-8d919f26fefe@kernel.dk>
+Date:   Mon, 11 Sep 2023 07:15:18 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4Rknkk1MxMz9slY
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH AUTOSEL 6.1 20/22] block: Allow bio_iov_iter_get_pages()
+ with bio->bi_bdev unset
+Content-Language: en-US
+To:     Pavel Machek <pavel@denx.de>, Sasha Levin <sashal@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@linux.dev>,
+        linux-block@vger.kernel.org
+References: <20230908193407.3463368-1-sashal@kernel.org>
+ <20230908193407.3463368-20-sashal@kernel.org> <ZP7j2MA5Qk6RBtAd@duo.ucw.cz>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZP7j2MA5Qk6RBtAd@duo.ucw.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Pankaj Raghav <p.raghav@samsung.com>
+On 9/11/23 3:54 AM, Pavel Machek wrote:
+> Hi!
+> 
+>> From: Kent Overstreet <kent.overstreet@linux.dev>
+>>
+>> [ Upstream commit 168145f617d57bf4e474901b7ffa869337a802e6 ]
+>>
+>> bio_iov_iter_get_pages() trims the IO based on the block size of the
+>> block device the IO will be issued to.
+>>
+>> However, bcachefs is a multi device filesystem; when we're creating the
+>> bio we don't yet know which block device the bio will be submitted to -
+>> we have to handle the alignment checks elsewhere.
+>>
+>> Thus this is needed to avoid a null ptr deref.
+> 
+> We are certainly not going to backport bcachefs to -stable. Please
+> drop.
 
-Encapsulate the flushing data to the backing bdev in writeback in a
-separate function writeback_flush_to_bdev(). This is in preparation for
-adding batching IO support to writeback_store().
+I already said as much 3 days ago:
 
-No functional changes.
+https://lore.kernel.org/all/cd341326-cfaf-4796-8894-2241e7b630d9@kernel.dk/
 
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
----
- drivers/block/zram/zram_drv.c | 125 ++++++++++++++++++----------------
- 1 file changed, 68 insertions(+), 57 deletions(-)
+but didn't hear back yet.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index eaf9e227778e..bd93ed653b99 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -635,14 +635,78 @@ static bool writeback_prep_or_skip_index(struct zram *zram, int mode,
- 	return ret;
- }
- 
-+static int writeback_flush_to_bdev(struct zram *zram, unsigned long index,
-+				   struct page *page, unsigned long *blk_idx)
-+{
-+	struct bio bio;
-+	struct bio_vec bio_vec;
-+	int ret;
-+
-+	bio_init(&bio, zram->bdev, &bio_vec, 1, REQ_OP_WRITE | REQ_SYNC);
-+	bio.bi_iter.bi_sector = *blk_idx * (PAGE_SIZE >> 9);
-+	__bio_add_page(&bio, page, PAGE_SIZE, 0);
-+
-+	/*
-+	 * XXX: A single page IO would be inefficient for write
-+	 * but it would be not bad as starter.
-+	 */
-+	ret = submit_bio_wait(&bio);
-+	if (ret) {
-+		zram_slot_lock(zram, index);
-+		zram_clear_flag(zram, index, ZRAM_UNDER_WB);
-+		zram_clear_flag(zram, index, ZRAM_IDLE);
-+		zram_slot_unlock(zram, index);
-+		/*
-+		 * BIO errors are not fatal, we continue and simply
-+		 * attempt to writeback the remaining objects (pages).
-+		 * At the same time we need to signal user-space that
-+		 * some writes (at least one, but also could be all of
-+		 * them) were not successful and we do so by returning
-+		 * the most recent BIO error.
-+		 */
-+		return ret;
-+	}
-+
-+	atomic64_inc(&zram->stats.bd_writes);
-+	/*
-+	 * We released zram_slot_lock so need to check if the slot was
-+	 * changed. If there is freeing for the slot, we can catch it
-+	 * easily by zram_allocated.
-+	 * A subtle case is the slot is freed/reallocated/marked as
-+	 * ZRAM_IDLE again. To close the race, idle_store doesn't
-+	 * mark ZRAM_IDLE once it found the slot was ZRAM_UNDER_WB.
-+	 * Thus, we could close the race by checking ZRAM_IDLE bit.
-+	 */
-+	zram_slot_lock(zram, index);
-+	if (!zram_allocated(zram, index) ||
-+	    !zram_test_flag(zram, index, ZRAM_IDLE)) {
-+		zram_clear_flag(zram, index, ZRAM_UNDER_WB);
-+		zram_clear_flag(zram, index, ZRAM_IDLE);
-+		goto skip;
-+	}
-+
-+	zram_free_page(zram, index);
-+	zram_clear_flag(zram, index, ZRAM_UNDER_WB);
-+	zram_set_flag(zram, index, ZRAM_WB);
-+	zram_set_element(zram, index, *blk_idx);
-+	atomic64_inc(&zram->stats.pages_stored);
-+	*blk_idx = 0;
-+
-+	spin_lock(&zram->wb_limit_lock);
-+	if (zram->wb_limit_enable && zram->bd_wb_limit > 0)
-+		zram->bd_wb_limit -= 1UL << (PAGE_SHIFT - 12);
-+	spin_unlock(&zram->wb_limit_lock);
-+skip:
-+	zram_slot_unlock(zram, index);
-+	return 0;
-+}
-+
- static ssize_t writeback_store(struct device *dev,
- 		struct device_attribute *attr, const char *buf, size_t len)
- {
- 	struct zram *zram = dev_to_zram(dev);
- 	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
- 	unsigned long index = 0;
--	struct bio bio;
--	struct bio_vec bio_vec;
- 	struct page *page;
- 	ssize_t ret = len;
- 	int mode, err;
-@@ -713,63 +777,10 @@ static ssize_t writeback_store(struct device *dev,
- 			continue;
- 		}
- 
--		bio_init(&bio, zram->bdev, &bio_vec, 1,
--			 REQ_OP_WRITE | REQ_SYNC);
--		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
--		__bio_add_page(&bio, page, PAGE_SIZE, 0);
-+		err = writeback_flush_to_bdev(zram, index, page, &blk_idx);
- 
--		/*
--		 * XXX: A single page IO would be inefficient for write
--		 * but it would be not bad as starter.
--		 */
--		err = submit_bio_wait(&bio);
--		if (err) {
--			zram_slot_lock(zram, index);
--			zram_clear_flag(zram, index, ZRAM_UNDER_WB);
--			zram_clear_flag(zram, index, ZRAM_IDLE);
--			zram_slot_unlock(zram, index);
--			/*
--			 * BIO errors are not fatal, we continue and simply
--			 * attempt to writeback the remaining objects (pages).
--			 * At the same time we need to signal user-space that
--			 * some writes (at least one, but also could be all of
--			 * them) were not successful and we do so by returning
--			 * the most recent BIO error.
--			 */
-+		if (err)
- 			ret = err;
--			continue;
--		}
--
--		atomic64_inc(&zram->stats.bd_writes);
--		/*
--		 * We released zram_slot_lock so need to check if the slot was
--		 * changed. If there is freeing for the slot, we can catch it
--		 * easily by zram_allocated.
--		 * A subtle case is the slot is freed/reallocated/marked as
--		 * ZRAM_IDLE again. To close the race, idle_store doesn't
--		 * mark ZRAM_IDLE once it found the slot was ZRAM_UNDER_WB.
--		 * Thus, we could close the race by checking ZRAM_IDLE bit.
--		 */
--		zram_slot_lock(zram, index);
--		if (!zram_allocated(zram, index) ||
--			  !zram_test_flag(zram, index, ZRAM_IDLE)) {
--			zram_clear_flag(zram, index, ZRAM_UNDER_WB);
--			zram_clear_flag(zram, index, ZRAM_IDLE);
--			goto next;
--		}
--
--		zram_free_page(zram, index);
--		zram_clear_flag(zram, index, ZRAM_UNDER_WB);
--		zram_set_flag(zram, index, ZRAM_WB);
--		zram_set_element(zram, index, blk_idx);
--		blk_idx = 0;
--		atomic64_inc(&zram->stats.pages_stored);
--		spin_lock(&zram->wb_limit_lock);
--		if (zram->wb_limit_enable && zram->bd_wb_limit > 0)
--			zram->bd_wb_limit -=  1UL << (PAGE_SHIFT - 12);
--		spin_unlock(&zram->wb_limit_lock);
--next:
--		zram_slot_unlock(zram, index);
- 	}
- 
- 	if (blk_idx)
 -- 
-2.40.1
+Jens Axboe
+
 
