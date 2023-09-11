@@ -2,101 +2,151 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD5FCA0ED3
-	for <linux-block@archiver.kernel.org>; Mon, 11 Sep 2023 21:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EED4ACA0EC3
+	for <linux-block@archiver.kernel.org>; Mon, 11 Sep 2023 21:47:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238030AbjIKVlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:41:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40736 "EHLO
+        id S1350777AbjIKVlR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Sep 2023 17:41:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237857AbjIKNP0 (ORCPT
+        with ESMTP id S238031AbjIKNep (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2023 09:15:26 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CD40EB
-        for <linux-block@vger.kernel.org>; Mon, 11 Sep 2023 06:15:21 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-68e2ff0b5c4so415957b3a.0
-        for <linux-block@vger.kernel.org>; Mon, 11 Sep 2023 06:15:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694438120; x=1695042920; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IEzbOAJ4Fb01DDQnzPGrL2255sHl8eJXRyf8OznVFus=;
-        b=n+/dPdaFGlslxalFG5dQshZzQ1NB+zrUnqTKRXOBt0CWrJ1DGux/GVpOSWH26sx/og
-         InuJVd7502PA3wQLeS5ceHT3aGubpxRykJB0l3wyCG5TLImP15QNSA2eHyNdTUkHrdLo
-         GTBnHegJ/5dm5xOCXZMXWtlI/9FS1zRHdlOF5WYVYKdy8DbwILg/ybUGnUsfIzyaMN+X
-         NC9gQM5dJVhCG6cjlra4X44FI/M4aB2yDj5X9TsxNVPQOQ3FhEhygrSVo53bBF0eQVyQ
-         MdsW0Gh32ePJIznsvwt7DcEmAy2nAgd8lBzcUT8IFhlKb1jtSiURoFsxjK/lYWlZtS5r
-         XnQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694438120; x=1695042920;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IEzbOAJ4Fb01DDQnzPGrL2255sHl8eJXRyf8OznVFus=;
-        b=oVRuKS4avvwQ22/nmL3CYBKqU555t4o2YGAgkScWq3j34IBbW8e0aahkI8u9oLq1NC
-         OVmuhsLHkV3AvdTTar75iqpN6Wz0g8m/P9PRAuAZSTclpMHMaLSbMqdmwJsUXRHLDRY6
-         W7lYAdGsWIs+r3A3mygjCSOGv++3ZB57AhIbmTnHpz53ekDYKZAi4VLdFRVcNuWbTnS+
-         WUxDCGPlyl5h/O7T0x3VAbduxPNO7crB5ynxNan7ukkv4LA2lJDz5FrGbXxG1KxzDfU2
-         tGH+K14zM2oxCEUroWmox8hjPrenKpGxWskc+xp3vRt0yDBsdO6B49g/V6qpVRXYRUQv
-         qRXg==
-X-Gm-Message-State: AOJu0Yys5rki6s7W6Bd1Y3NubYQfmKLHujkhzcRQYiwZfSIK7ib3tDbW
-        5pZVsN0W8e4tGrcEdD2vXBlPEQ==
-X-Google-Smtp-Source: AGHT+IHudscUtHs0qFn619Ul6rWCuvw3olGAaxVp3mtAfQmBX9Hjci04z7QmU6EfAYODz1sIkdz2/w==
-X-Received: by 2002:a05:6a20:a10c:b0:145:3bd9:1389 with SMTP id q12-20020a056a20a10c00b001453bd91389mr11943803pzk.6.1694438120533;
-        Mon, 11 Sep 2023 06:15:20 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id f12-20020a17090274cc00b001bbb22652a4sm6365069plt.226.2023.09.11.06.15.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Sep 2023 06:15:19 -0700 (PDT)
-Message-ID: <d6da7de6-e603-4fb3-b68e-8d919f26fefe@kernel.dk>
-Date:   Mon, 11 Sep 2023 07:15:18 -0600
+        Mon, 11 Sep 2023 09:34:45 -0400
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE71DCD7;
+        Mon, 11 Sep 2023 06:34:39 -0700 (PDT)
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4Rknkh1Cz9z9sqY;
+        Mon, 11 Sep 2023 15:34:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+        s=MBO0001; t=1694439276;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sKXrEFssCVb4iL+iRLOPhm9fa5JUtWNhHDnCVqBgNPc=;
+        b=a+rOwbLDJ0Sf+xzYoZzSRlHvx9UHJnqj+mQVZDnY4zqvNEODoN/XYhwdhjLk4ZgWiYjj1N
+        HpekzhvAisQ0yOeJC/Y9d4Oa6OZyrKxeFauCcz3dewg6KxTCn8otgbWvPnJsDS6ReTC1fA
+        WY8b7BNPjuCa6UaQJPrVHHpWItY6WDxdLT7flVA6EAwA6yZKVsVSUILep8Mw1vxGyTghVz
+        e0jdDb4xdCYtn7n2FlomMQNjAmiziLVVkwicfOTf5AS59l8W8F8nyrLO3l7rFGubeh3Nf1
+        NsB1marZdTVTnRSOsQSA9cOZ1kaHRKUrt8tESFD9rpGFfxYPwmDyxRmebVnq0A==
+From:   Pankaj Raghav <kernel@pankajraghav.com>
+To:     minchan@kernel.org, senozhatsky@chromium.org
+Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        p.raghav@samsung.com, linux-block@vger.kernel.org,
+        kernel@pankajraghav.com, gost.dev@samsung.com
+Subject: [PATCH 1/5] zram: move index preparation to a separate function in writeback_store
+Date:   Mon, 11 Sep 2023 15:34:26 +0200
+Message-Id: <20230911133430.1824564-2-kernel@pankajraghav.com>
+In-Reply-To: <20230911133430.1824564-1-kernel@pankajraghav.com>
+References: <20230911133430.1824564-1-kernel@pankajraghav.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH AUTOSEL 6.1 20/22] block: Allow bio_iov_iter_get_pages()
- with bio->bi_bdev unset
-Content-Language: en-US
-To:     Pavel Machek <pavel@denx.de>, Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@linux.dev>,
-        linux-block@vger.kernel.org
-References: <20230908193407.3463368-1-sashal@kernel.org>
- <20230908193407.3463368-20-sashal@kernel.org> <ZP7j2MA5Qk6RBtAd@duo.ucw.cz>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZP7j2MA5Qk6RBtAd@duo.ucw.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/11/23 3:54 AM, Pavel Machek wrote:
-> Hi!
-> 
->> From: Kent Overstreet <kent.overstreet@linux.dev>
->>
->> [ Upstream commit 168145f617d57bf4e474901b7ffa869337a802e6 ]
->>
->> bio_iov_iter_get_pages() trims the IO based on the block size of the
->> block device the IO will be issued to.
->>
->> However, bcachefs is a multi device filesystem; when we're creating the
->> bio we don't yet know which block device the bio will be submitted to -
->> we have to handle the alignment checks elsewhere.
->>
->> Thus this is needed to avoid a null ptr deref.
-> 
-> We are certainly not going to backport bcachefs to -stable. Please
-> drop.
+From: Pankaj Raghav <p.raghav@samsung.com>
 
-I already said as much 3 days ago:
+Add a new function writeback_prep_or_skip_index() that does the check
+and set the approapriate flags before writeback starts. The function
+returns false if the index can be skipped.
 
-https://lore.kernel.org/all/cd341326-cfaf-4796-8894-2241e7b630d9@kernel.dk/
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+---
+ drivers/block/zram/zram_drv.c | 68 +++++++++++++++++++++--------------
+ 1 file changed, 42 insertions(+), 26 deletions(-)
 
-but didn't hear back yet.
-
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 06673c6ca255..eaf9e227778e 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -595,6 +595,46 @@ static void read_from_bdev_async(struct zram *zram, struct page *page,
+ #define IDLE_WRITEBACK			(1<<1)
+ #define INCOMPRESSIBLE_WRITEBACK	(1<<2)
+ 
++/*
++ * Returns: true if the index was prepared for further processing
++ *          false if the index can be skipped
++ */
++static bool writeback_prep_or_skip_index(struct zram *zram, int mode,
++					 unsigned long index)
++{
++	bool ret = false;
++
++	zram_slot_lock(zram, index);
++	if (!zram_allocated(zram, index))
++		goto skip;
++
++	if (zram_test_flag(zram, index, ZRAM_WB) ||
++	    zram_test_flag(zram, index, ZRAM_SAME) ||
++	    zram_test_flag(zram, index, ZRAM_UNDER_WB))
++		goto skip;
++
++	if (mode & IDLE_WRITEBACK && !zram_test_flag(zram, index, ZRAM_IDLE))
++		goto skip;
++	if (mode & HUGE_WRITEBACK && !zram_test_flag(zram, index, ZRAM_HUGE))
++		goto skip;
++	if (mode & INCOMPRESSIBLE_WRITEBACK &&
++	    !zram_test_flag(zram, index, ZRAM_INCOMPRESSIBLE))
++		goto skip;
++
++	/*
++	 * Clearing ZRAM_UNDER_WB is duty of caller.
++	 * IOW, zram_free_page never clear it.
++	 */
++	zram_set_flag(zram, index, ZRAM_UNDER_WB);
++	/* Need for hugepage writeback racing */
++	zram_set_flag(zram, index, ZRAM_IDLE);
++
++	ret = true;
++skip:
++	zram_slot_unlock(zram, index);
++	return ret;
++}
++
+ static ssize_t writeback_store(struct device *dev,
+ 		struct device_attribute *attr, const char *buf, size_t len)
+ {
+@@ -662,33 +702,9 @@ static ssize_t writeback_store(struct device *dev,
+ 			}
+ 		}
+ 
+-		zram_slot_lock(zram, index);
+-		if (!zram_allocated(zram, index))
+-			goto next;
++		if (!writeback_prep_or_skip_index(zram, mode, index))
++			continue;
+ 
+-		if (zram_test_flag(zram, index, ZRAM_WB) ||
+-				zram_test_flag(zram, index, ZRAM_SAME) ||
+-				zram_test_flag(zram, index, ZRAM_UNDER_WB))
+-			goto next;
+-
+-		if (mode & IDLE_WRITEBACK &&
+-		    !zram_test_flag(zram, index, ZRAM_IDLE))
+-			goto next;
+-		if (mode & HUGE_WRITEBACK &&
+-		    !zram_test_flag(zram, index, ZRAM_HUGE))
+-			goto next;
+-		if (mode & INCOMPRESSIBLE_WRITEBACK &&
+-		    !zram_test_flag(zram, index, ZRAM_INCOMPRESSIBLE))
+-			goto next;
+-
+-		/*
+-		 * Clearing ZRAM_UNDER_WB is duty of caller.
+-		 * IOW, zram_free_page never clear it.
+-		 */
+-		zram_set_flag(zram, index, ZRAM_UNDER_WB);
+-		/* Need for hugepage writeback racing */
+-		zram_set_flag(zram, index, ZRAM_IDLE);
+-		zram_slot_unlock(zram, index);
+ 		if (zram_read_page(zram, page, index, NULL)) {
+ 			zram_slot_lock(zram, index);
+ 			zram_clear_flag(zram, index, ZRAM_UNDER_WB);
 -- 
-Jens Axboe
-
+2.40.1
 
