@@ -2,145 +2,139 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0510BEE57DF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Sep 2023 07:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1DDDEE7FF4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Sep 2023 07:39:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234206AbjIKHbe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Sep 2023 03:31:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36810 "EHLO
+        id S229694AbjIKHjr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Sep 2023 03:39:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231258AbjIKHbd (ORCPT
+        with ESMTP id S229678AbjIKHjo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2023 03:31:33 -0400
-Received: from mail-pg1-f207.google.com (mail-pg1-f207.google.com [209.85.215.207])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CF5ACD2
-        for <linux-block@vger.kernel.org>; Mon, 11 Sep 2023 00:31:25 -0700 (PDT)
-Received: by mail-pg1-f207.google.com with SMTP id 41be03b00d2f7-5776ba6c33bso654085a12.2
-        for <linux-block@vger.kernel.org>; Mon, 11 Sep 2023 00:31:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694417485; x=1695022285;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wDi80wPjvY3WLdXNBd8MVO4aCUP2Ev+1NV5i1w7rhJQ=;
-        b=LSyjXIGZdlh538rfZ3lAeeTe4qaRB4e57wBhBziwCUWi6JrsAe4BhI5SY/q790AqR0
-         K3uZjpxTA/9chBKA9cGy/80x+si1J803YTL33X6CpxQk058TA+5mQIFfWMM788kgtBCg
-         6ucNP8ZT55+52nW1FMZbZsj7CwkFgxj5oQ6WNH21f5YGhDubzgbZmVUDAXB7E3s9hp9d
-         K5hiNwByBMO+06kHEsHfsNc7BClVV4z41UjqowtIaKw3tzSYQAMSfOg8QVYJp7s3tix+
-         bRcssIwDaQ/v3kKG7nA2vinRIrAFFJ9MgTTikYq/SghikuH0+sfORW7f24xlQLfZ1q3b
-         w2JQ==
-X-Gm-Message-State: AOJu0YyB3DL2LI0t5QfaeOwMFML0oTTfHNBJ5yvZeEbaB+6+eEkRaJsZ
-        wFGPveM3v3TOt9Xthhw+Q4e2vvPNCYDfSKgJWOf7Ugm0ARPB
-X-Google-Smtp-Source: AGHT+IGYqQbyc8KyxwBeR046vk/BIPNja11+nvIlv+UsXFgfDUy9cXMT6qskkvMwlcVu7RheoPmWQyCtXLB40EPRWjL/Hi6JATgX
+        Mon, 11 Sep 2023 03:39:44 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE00A118;
+        Mon, 11 Sep 2023 00:39:39 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 84077218E2;
+        Mon, 11 Sep 2023 07:39:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1694417978; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OBms2MbanL4wowScFpok83vxiu9MRRYrFtiJ5kFMiJE=;
+        b=Q5EX8/qmTXzGMeQWXuJS40ntpaFw6uw7YuzJLn4QC1cRBcdVuZhlurw12eoTsd+Qrc7uSQ
+        KJBjLOHROwY8WXSmX+JHN6Pi3NE8nwDeN8So4vWuhQSOK7lyCHwDvtYR1Q+UIb3mZ06QDD
+        B9MT/yvLWruHEjdBXDkzV33IRfxLSmY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1694417978;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OBms2MbanL4wowScFpok83vxiu9MRRYrFtiJ5kFMiJE=;
+        b=LMm4dmczMri57uE8kWxOMnIlLIQex3ylAcOwrBlFAC+AdFCYxBx9BJBABNDOvjlGWvWW5+
+        X3k9Qg/oKPfViKBg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EA7F6139CC;
+        Mon, 11 Sep 2023 07:39:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id e2KjNznE/mT1aAAAMHmgww
+        (envelope-from <hare@suse.de>); Mon, 11 Sep 2023 07:39:37 +0000
+Message-ID: <ec35111d-ba31-497b-ab01-b198d3feb814@suse.de>
+Date:   Mon, 11 Sep 2023 09:39:37 +0200
 MIME-Version: 1.0
-X-Received: by 2002:a63:3d43:0:b0:56a:164b:c6ec with SMTP id
- k64-20020a633d43000000b0056a164bc6ecmr2021317pga.7.1694417484971; Mon, 11 Sep
- 2023 00:31:24 -0700 (PDT)
-Date:   Mon, 11 Sep 2023 00:31:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004b06a9060510505d@google.com>
-Subject: [syzbot] [block?] WARNING in floppy_check_events (2)
-From:   syzbot <syzbot+2302c7d7bfcdb6baae34@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 04/12] block: add emulation for copy
+Content-Language: en-US
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        martin.petersen@oracle.com, mcgrof@kernel.org,
+        gost.dev@samsung.com, Vincent Fu <vincent.fu@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+References: <20230906163844.18754-1-nj.shetty@samsung.com>
+ <CGME20230906164321epcas5p4dad5b1c64fcf85e2c4f9fc7ddb855ea7@epcas5p4.samsung.com>
+ <20230906163844.18754-5-nj.shetty@samsung.com>
+ <e6fc7e65-ad31-4ca2-8b1b-4d97ba32926e@suse.de>
+ <20230911070937.GB28177@green245>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230911070937.GB28177@green245>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 9/11/23 09:09, Nitesh Shetty wrote:
+> On Fri, Sep 08, 2023 at 08:06:38AM +0200, Hannes Reinecke wrote:
+>> On 9/6/23 18:38, Nitesh Shetty wrote:
+>>> For the devices which does not support copy, copy emulation is added.
+>>> It is required for in-kernel users like fabrics, where file descriptor is
+>>> not available and hence they can't use copy_file_range.
+>>> Copy-emulation is implemented by reading from source into memory and
+>>> writing to the corresponding destination.
+>>> Also emulation can be used, if copy offload fails or partially completes.
+>>> At present in kernel user of emulation is NVMe fabrics.
+>>>
+>> Leave out the last sentence; I really would like to see it enabled for SCSI,
+>> too (we do have copy offload commands for SCSI ...).
+>>
+> Sure, will do that
+> 
+>> And it raises all the questions which have bogged us down right from the
+>> start: where is the point in calling copy offload if copy offload is not
+>> implemented or slower than copying it by hand?
+>> And how can the caller differentiate whether copy offload bring a benefit to
+>> him?
+>>
+>> IOW: wouldn't it be better to return -EOPNOTSUPP if copy offload is not
+>> available?
+> 
+> Present approach treats copy as a background operation and the idea is to
+> maximize the chances of achieving copy by falling back to emulation.
+> Having said that, it should be possible to return -EOPNOTSUPP,
+> in case of offload IO failure or device not supporting offload.
+> We will update this in next version.
+> 
+That is also what I meant with my comments to patch 09/12: I don't see 
+it as a benefit to _always_ fall back to a generic copy-offload 
+emulation. After all, that hardly brings any benefit.
+Where I do see a benefit is to tie in the generic copy-offload 
+_infrastructure_ to existing mechanisms (like dm-kcopyd).
+But if there is no copy-offload infrastructure available then we really 
+should return -EOPNOTSUPP as it really is not supported.
 
-syzbot found the following issue on:
+In the end, copy offload is not a command which 'always works'.
+It's a command which _might_ deliver benefits (ie better performance) if 
+dedicated implementations are available and certain parameters are met. 
+If not then copy offload is not the best choice, and applications will 
+need to be made aware of that.
 
-HEAD commit:    744a759492b5 Merge tag 'input-for-v6.6-rc0' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13608e90680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bf0b75ea0da0ab1b
-dashboard link: https://syzkaller.appspot.com/bug?extid=2302c7d7bfcdb6baae34
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Cheers,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-744a7594.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f7ccfd4fc8e9/vmlinux-744a7594.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b040ddea4665/bzImage-744a7594.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2302c7d7bfcdb6baae34@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 2 PID: 29456 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 2 PID: 29456 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
-WARNING: CPU: 2 PID: 29456 at drivers/block/floppy.c:999 floppy_check_events+0x497/0x6f0 drivers/block/floppy.c:4100
-Modules linked in:
-CPU: 2 PID: 29456 Comm: syz-executor.3 Not tainted 6.5.0-syzkaller-12053-g744a759492b5 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
-RIP: 0010:floppy_check_events+0x497/0x6f0 drivers/block/floppy.c:4100
-Code: ff 48 c1 e0 04 8b 98 34 af 56 92 c1 fb 02 83 e3 1f 89 de e8 0b 72 4a fc 85 db 0f 94 c3 0f b6 db e9 d2 fe ff ff e8 89 76 4a fc <0f> 0b e9 55 ff ff ff e8 7d 73 9f fc e9 c7 fb ff ff 48 89 ef e8 70
-RSP: 0018:ffffc900289b77e0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: ffff888065b90480 RSI: ffffffff853c2bf7 RDI: 0000000000000001
-RBP: ffffffff9256af50 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
-R13: 1ffff92005136efc R14: 0000000000000001 R15: 0000000000000000
-FS:  00007fdc25bdd6c0(0000) GS:ffff88806b800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f75d9df6c98 CR3: 000000010b58f000 CR4: 0000000000350ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- disk_check_events+0xbc/0x400 block/disk-events.c:193
- disk_clear_events block/disk-events.c:248 [inline]
- disk_check_media_change+0x101/0x2b0 block/disk-events.c:279
- floppy_open+0x8ef/0xe00 drivers/block/floppy.c:4058
- blkdev_get_whole+0x93/0x2c0 block/bdev.c:640
- blkdev_get_by_dev.part.0+0x211/0xb20 block/bdev.c:795
- blkdev_get_by_dev+0x75/0x80 block/bdev.c:829
- blkdev_open+0x112/0x380 block/fops.c:589
- do_dentry_open+0x88b/0x1730 fs/open.c:929
- do_open fs/namei.c:3639 [inline]
- path_openat+0x19af/0x29c0 fs/namei.c:3796
- do_filp_open+0x1de/0x430 fs/namei.c:3823
- do_sys_openat2+0x176/0x1e0 fs/open.c:1422
- do_sys_open fs/open.c:1437 [inline]
- __do_sys_openat fs/open.c:1453 [inline]
- __se_sys_openat fs/open.c:1448 [inline]
- __x64_sys_openat+0x175/0x210 fs/open.c:1448
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fdc2707b6e0
-Code: 48 89 44 24 20 75 93 44 89 54 24 0c e8 09 82 02 00 44 8b 54 24 0c 89 da 48 89 ee 41 89 c0 bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 38 44 89 c7 89 44 24 0c e8 5c 82 02 00 8b 44
-RSP: 002b:00007fdc25bdcc00 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fdc2707b6e0
-RDX: 0000000000000000 RSI: 00007fdc25bdcca0 RDI: 00000000ffffff9c
-RBP: 00007fdc25bdcca0 R08: 0000000000000000 R09: 002364662f766564
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fdc2719c120 R15: 00007ffd07db9d08
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
