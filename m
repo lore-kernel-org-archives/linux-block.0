@@ -2,144 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E53CA0EC3
-	for <linux-block@archiver.kernel.org>; Mon, 11 Sep 2023 21:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD04ACA0ECB
+	for <linux-block@archiver.kernel.org>; Mon, 11 Sep 2023 21:47:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242754AbjIKVkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:40:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38312 "EHLO
+        id S1350713AbjIKVk5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Sep 2023 17:40:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238028AbjIKNeo (ORCPT
+        with ESMTP id S238032AbjIKNeu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2023 09:34:44 -0400
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46583106;
-        Mon, 11 Sep 2023 06:34:39 -0700 (PDT)
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+        Mon, 11 Sep 2023 09:34:50 -0400
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E798106;
+        Mon, 11 Sep 2023 06:34:45 -0700 (PDT)
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4Rknkd6rz6z9sZD;
-        Mon, 11 Sep 2023 15:34:33 +0200 (CEST)
+        by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4Rknkm0ZMnz9ssn;
+        Mon, 11 Sep 2023 15:34:40 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-        s=MBO0001; t=1694439273;
+        s=MBO0001; t=1694439280;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=L8zr++H2Eo56J7VdgsESHLcySXPIGTevKwUNRQXs9PU=;
-        b=BJ+y9AmXpwXdxxUfOGWnGQJvpi4QcK7BPbNY6h62UuUNk6gZFYdrZfNiyrM/vz+yEdMYYE
-        hMKC0LO2+5XMOPqgmxnUhnAGEBFXF/sOoQwGXTs4LwGmhi4Kwp39w2XEPVSZxhmCgsTVsJ
-        nJn9vr+7MMwcA4uGB8tLcYRYliamhi8YqBZOtWyv5D8Le/2xvHiaPC+/VjUIBaea/A0bwr
-        TqM68BkbLq8wDs6ZPvpCjkQUxuO9jfTtJRbLk0tLFqCpGAf5KZrEijdFusAZco9d5RTTtC
-        Cjp0wc4aet9Nimm2ar+ewrFD3vP4pF24yKGVF6zFH/YG0Unj5fwDVk5k7ycN3w==
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tX5Q/p2imNV6Vfwxh+ihQ2ZUaBdn0HxqAB6O7wq75t4=;
+        b=A4rvocrwut8w3kDn9hrNosZg/hjRDt10YVYAjjnDvElcx/bLavMp1sppemaUFwSJ0n+p8U
+        k0nB1Jk8AVaZSBBl3Lr22PZ7z5XhG4ZZ61JDBptPyPcTCpKQxrM0UFmiDipFo7kMXKdWGy
+        +OAfZ3NQyUEm9NPzd9GAhi08xM3HnQJ0K56MVNvPvmJZqOwfUkP6Yyhnan0nx6osZabei9
+        CicvRQ9Ai5edtrYhe6x9HU8lNfX9DPYYqJI79ozUcrmI6vGNywf3qe07gXCOJShsyLoeFa
+        rJ7TPfBejw7Fu0b9dRrpNVj/nRARjzzYylP5TP+dXHMYCvQUUkGih51d74Rn9A==
 From:   Pankaj Raghav <kernel@pankajraghav.com>
 To:     minchan@kernel.org, senozhatsky@chromium.org
 Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk,
         p.raghav@samsung.com, linux-block@vger.kernel.org,
         kernel@pankajraghav.com, gost.dev@samsung.com
-Subject: [PATCH 0/5] Improve zram writeback performance
-Date:   Mon, 11 Sep 2023 15:34:25 +0200
-Message-Id: <20230911133430.1824564-1-kernel@pankajraghav.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH 3/5] zram: add alloc_block_bdev_range() and free_block_bdev_range()
+Date:   Mon, 11 Sep 2023 15:34:28 +0200
+Message-Id: <20230911133430.1824564-4-kernel@pankajraghav.com>
+In-Reply-To: <20230911133430.1824564-1-kernel@pankajraghav.com>
+References: <20230911133430.1824564-1-kernel@pankajraghav.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4Rknkd6rz6z9sZD
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ZRAM can have a backing device that could be used as a writeback device
-for the pages in RAM. The current writeback code (writeback_store()) does
-a synchronous single page size IO to the backing device.
+From: Pankaj Raghav <p.raghav@samsung.com>
 
-This series implements IO batching while doing a writeback to a backing
-device. The code still does synchronous IOs but with larger IO sizes
-whenever possible. This crosses off one of the TODO that was there as a part
-of writeback_store() function:
-A single page IO would be inefficient for write...
+Add [alloc|free]_block_bdev_range() which accepts number of blocks to
+allocate or free from the block bitmap.
 
-The idea is to batch the IOs to a certain limit before the data is flushed
-to the backing device. The batch limit is initially chosen based on the
-bdi->io_pages value with an upper limit of 32 pages (128k on x86).
+alloc_block_bdev_range() tries to allocate a range of bitmap based in
+the input nr_of_blocks whenever possible, or else it will retry with a
+smaller value. This is done so that we don't unnecessarily return EIO
+when the underlying device is fragmented.
 
-Batching reduces the time of writeback of 4G data to a nvme backing device
-from 68 secs to 15 secs (more than **4x improvement**).
+alloc_block_bdev_range() is not an atomic operation as this function can
+be called only from writeback_store() and init_lock is anyway taken
+making sure there cannot be two processes allocating from bdev bitmap.
 
-The first 3 patches are prep. 4th patch implements the main logic for IO
-batching and the last patch is another cleanup.
+free_block_bdev_range() is just a simple loop that calls the atomic
+free_block_bdev() function. As bdev bitmap free can be called from
+two different process simulataneously without a lock, atomicity needs
+to be maintained.
 
-Perf:
+This is useful when we want to send larger IOs to the backing dev.
 
-$ modprobe zram num_devices=1
-$ echo "/dev/nvme0n1" > /sys/block/zram0/backing_dev
-$ echo 6G > /sys/block/zram0/disksize
-$ fio -iodepth=16 -rw=randwrite -ioengine=io_uring -bs=4k -numjobs=1 -size=4G -filename=/dev/zram0 -name=io_uring_1 > /dev/null
-$ echo all > /sys/block/zram0/idle
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+---
+ drivers/block/zram/zram_drv.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-Without changes:
-$ time echo idle > /sys/block/zram0/writeback
-real    1m8.648s         (68 secs)
-user    0m0.000s
-sys     0m24.899s
-$ cat /sys/block/zram0/bd_stat
-1048576        0  1048576
-
-With changes:
-$ time echo idle > /sys/block/zram0/writeback
-real    0m15.496s       (15 secs)
-user    0m0.000s
-sys     0m7.789s
-$ cat /sys/block/zram0/bd_stat
-1048576        0  1048576
-
-Testing:
-
-A basic End-End testing (based on Sergey's test flow [1]):
-1) configure zram0 and add a nvme device as a writeback device
-2) Get the sha256sum of a tarball
-3) mkfs.ext4 on zram0, cp tarball
-4) idle writeback
-5) cp tarball from zram0 to another device (reread writeback pages) and
-   compare the sha256sum again
-The sha before and after are verified to be the same.
-
-Writeback limit testing:
-
-1) configure zram0 and add a nvme device as a writeback device
-2) Set writeback limit and enable
-3) Do a fio that crosses the writeback limit
-4) idle writeback
-5) Verify the writeback is limited to the set writeback limit value
-
-$ modprobe zram num_devices=1
-$ echo "/dev/nvme0n1" > /sys/block/zram0/backing_dev
-$ echo 4G > /sys/block/zram0/disksize
-$ echo 1 > /sys/block/zram0/writeback_limit_enable
-$ echo 1002 > /sys/block/zram0/writeback_limit
-
-$ fio -iodepth=16 -rw=write -ioengine=io_uring -bs=4k -numjobs=1 -size=10M -filename=/dev/zram0 -name=io_uring_1
-
-$ echo all > /sys/block/zram0/idle
-$ echo idle > /sys/block/zram0/writeback
-$ cat /sys/block/zram0/bd_stat
-1002        0     1002
-
-writeback is limited to the set value.
-
-[1] https://lore.kernel.org/lkml/20230806071601.GB907732@google.com/
-
-Pankaj Raghav (5):
-  zram: move index preparation to a separate function in writeback_store
-  zram: encapsulate writeback to the backing bdev in a function
-  zram: add alloc_block_bdev_range() and free_block_bdev_range()
-  zram: batch IOs during writeback to improve performance
-  zram: don't overload blk_idx variable in writeback_store()
-
- drivers/block/zram/zram_drv.c | 318 ++++++++++++++++++++++------------
- 1 file changed, 210 insertions(+), 108 deletions(-)
-
-
-base-commit: 7bc675554773f09d88101bf1ccfc8537dc7c0be9
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index bd93ed653b99..0b8f814e11dd 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -576,6 +576,39 @@ static void free_block_bdev(struct zram *zram, unsigned long blk_idx)
+ 	atomic64_dec(&zram->stats.bd_count);
+ }
+ 
++static unsigned long alloc_block_bdev_range(struct zram *zram,
++					    unsigned int *nr_of_blocksp)
++{
++	unsigned long blk_idx;
++	unsigned int nr_of_blocks = *nr_of_blocksp;
++retry:
++	/* skip 0 bit to confuse zram.handle = 0 */
++	blk_idx = 1;
++	blk_idx = bitmap_find_next_zero_area(zram->bitmap, zram->nr_pages,
++					     blk_idx, nr_of_blocks, 0);
++
++	if ((blk_idx + nr_of_blocks) > zram->nr_pages) {
++		if (nr_of_blocks == 1)
++			return 0;
++
++		nr_of_blocks = nr_of_blocks / 2;
++		goto retry;
++	}
++
++	bitmap_set(zram->bitmap, blk_idx, nr_of_blocks);
++	atomic64_add(nr_of_blocks, &zram->stats.bd_count);
++	*nr_of_blocksp = nr_of_blocks;
++
++	return blk_idx;
++}
++
++static void free_block_bdev_range(struct zram *zram, unsigned long blk_idx,
++				  unsigned int nr_of_blocks)
++{
++	for (unsigned int i = 0; i < nr_of_blocks; i++)
++		free_block_bdev(zram, blk_idx + i);
++}
++
+ static void read_from_bdev_async(struct zram *zram, struct page *page,
+ 			unsigned long entry, struct bio *parent)
+ {
 -- 
 2.40.1
 
