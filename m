@@ -2,79 +2,189 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77401CA0EC3
-	for <linux-block@archiver.kernel.org>; Tue, 12 Sep 2023 08:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA455CA0EC3
+	for <linux-block@archiver.kernel.org>; Tue, 12 Sep 2023 10:07:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230012AbjILIgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Sep 2023 04:36:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40114 "EHLO
+        id S233859AbjILKHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Sep 2023 06:07:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232815AbjILIgI (ORCPT
+        with ESMTP id S233885AbjILKHI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Sep 2023 04:36:08 -0400
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9581171A;
-        Tue, 12 Sep 2023 01:35:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1694507721; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=Gw0d+h526N2Vmbzt/Aevz1FfJ7C3rxN928egdaG/R8oMfGmB3dwxZbpz0ptziIHKM5p/xlAAGKQi9RzHhSnQvLNG8FNggV7pVrz/+ay9+EnIn1xUk5yqc+ltOcf9f5Dr80n86dgprm8kGsAPtevh6QXXr4LxU51i8NR0jTGMnD0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1694507721; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-        bh=z/F34U9ZK96H06nJ6P8/A58VT4YUuwixWK6ET3bTanc=; 
-        b=UWvpEjy+ArW343wGZNrpMzg36ku7ZeuHZM8CUa3FyIX/U5s1KDrrWtSXaw5pr5vlPmTqyy1RfFkvpHrPuoGPlFgSlenuOTUmBsGRlWa5k2WaxOj+I17W6Fq3dNzlXJb5arLPE9H+r5y/p8ggo4CjOa+bv9sOUPffkF+AUz7Q7xI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=marliere.net;
-        spf=pass  smtp.mailfrom=ricardo@marliere.net;
-        dmarc=pass header.from=<ricardo@marliere.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1694507721;
-        s=zmail; d=marliere.net; i=ricardo@marliere.net;
-        h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
-        bh=z/F34U9ZK96H06nJ6P8/A58VT4YUuwixWK6ET3bTanc=;
-        b=NlBcJHtLU0c51jWi5tKfoAOb6RGQlCePvzm5rpIa4fFOHAB7RkfrKuzJNpRxP6q2
-        DZ+Fn62v/ih2y5NSKZMXLTKtNY8EXflaSQntLtlBeT/Kb89z7pd/bxCG+3hrOjkCzMV
-        J5UCn69RtM4MMhDkp24p7LcXwyWbvRRa/5EJu4XI=
-Received: from localhost (177.104.93.54 [177.104.93.54]) by mx.zohomail.com
-        with SMTPS id 1694507718909697.22466945198; Tue, 12 Sep 2023 01:35:18 -0700 (PDT)
-Date:   Tue, 12 Sep 2023 05:35:19 -0300
-From:   "Ricardo B. Marliere" <ricardo@marliere.net>
-To:     syzbot <syzbot+a532b03fdfee2c137666@syzkaller.appspotmail.com>
-Cc:     axboe@kernel.dk, dan.j.williams@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Subject: Re: [syzbot] [block?] WARNING in blk_rq_map_user_iov
-Message-ID: <20230912083519.e2yveio72emi7rd4@debian.org>
-References: <0000000000009b92c10604d7a5e9@google.com>
+        Tue, 12 Sep 2023 06:07:08 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3467019A6
+        for <linux-block@vger.kernel.org>; Tue, 12 Sep 2023 03:06:46 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9a9d6b98845so1281701666b.0
+        for <linux-block@vger.kernel.org>; Tue, 12 Sep 2023 03:06:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694513204; x=1695118004; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IBiBGq8YC/oHp0cfRWnQ5YGlOgmjdNVAihPt6gGNcNM=;
+        b=dR2dofEh4XuswaSIzndsGtc4G9Lo5IjAAN4SKBDvmzwjY2h22OkHIE2UXrNP54vV1c
+         ounoZUGiKswVQtcKDZO+BquiTBBUGAKqyaevyuy6joGwJOd1dARjlBr6bxIyhxmxror3
+         H7DLUj35S6M2ITsxUsLyEzPmWz3qyT4i3516bPL/xFOS1snx+F1KooisTxfH9HlVxIl3
+         cAl4Dpf/M4TeUo/hOAZUb2SFxk8rlKEciKZ+d8g8+kLX/OQBH4OGkn6mD3KMvOWrOU5L
+         31BhbfPqQMsOTuTkG62QZJaTqE4QrUIpz/5fmVZ59AdoVNzIuAFMl5UXwltvGekNBg1A
+         8aXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694513204; x=1695118004;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IBiBGq8YC/oHp0cfRWnQ5YGlOgmjdNVAihPt6gGNcNM=;
+        b=q+G+aClzd6kxcchpNYVzrSMQjV9ru442zkRjXkhSuaTQvCJRlqeYa6YFUP5t/82X+n
+         dlPLq3EW3wkI1B1s4iIWFgSREqqt+ScUWWiDczG9x9iLH42YKJD3kj05/2oO4/4yoMFP
+         131BwKI6/QLMvY/kMFeiSInJh2Tbc7j0lWL+pg6yvIi3Ytc3kE0TJmYvFLAvE8dSNsXo
+         4Rseq8/wepBeBDckmyrQLYzMYsvYofhyhynHHCcsLMa+U+87hFIfTgHd6VxdMiSyYKDD
+         vWWmxq+vX08RDouaMhTNlb/9O643P2+oZ1Um/KLeH+x0/F64Q/E7974mGn03fIqGVEx/
+         VWaQ==
+X-Gm-Message-State: AOJu0YylQLkFkjVF/hZQvfId9b+bvptBFIU5/f6pz14qn+Mc1nznsmUc
+        oY5GAc0HW8VRRNdkwUe2Kw4Mdw==
+X-Google-Smtp-Source: AGHT+IFRiMz1rvx/NGmDmYF9SHj5ttXTISHN66oLEMrxFb0YDiSPZvNprwhgZC4DPQf5c18sfGiofw==
+X-Received: by 2002:a17:907:c246:b0:9ad:7cbc:ea5b with SMTP id tj6-20020a170907c24600b009ad7cbcea5bmr2310997ejc.10.1694513204542;
+        Tue, 12 Sep 2023 03:06:44 -0700 (PDT)
+Received: from [192.168.86.24] ([5.133.47.210])
+        by smtp.googlemail.com with ESMTPSA id oy25-20020a170907105900b0099d0c0bb92bsm6583517ejb.80.2023.09.12.03.06.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Sep 2023 03:06:44 -0700 (PDT)
+Message-ID: <cf3816b0-7718-278c-aac2-bdd2dd85ac87@linaro.org>
+Date:   Tue, 12 Sep 2023 11:06:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000009b92c10604d7a5e9@google.com>
-X-ZohoMailClient: External
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
+ ufs
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, omprsing@qti.qualcomm.com,
+        quic_psodagud@quicinc.com, avmenon@quicinc.com,
+        abel.vesa@linaro.org, quic_spuppala@quicinc.com
+References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
+ <f4b5512b-9922-1511-fc22-f14d25e2426a@linaro.org>
+ <20230825210727.GA1366@sol.localdomain>
+From:   Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+In-Reply-To: <20230825210727.GA1366@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Flag iter as the data source if dxfer_direction is set to
-SG_DXFER_TO_DEV or SG_DXFER_TO_FROM_DEV.
+Hi Eric/Gaurav,
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+Adding more information and some questions to this discussion,
 
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 0d8afffd1683..991c6554bef4 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -1737,8 +1737,13 @@ sg_start_req(Sg_request *srp, unsigned char *cmd)
-        Sg_scatter_hold *rsv_schp = &sfp->reserve;
-        struct request_queue *q = sfp->parentdp->device->request_queue;
-        struct rq_map_data *md, map_data;
--       int rw = hp->dxfer_direction == SG_DXFER_TO_DEV ? ITER_SOURCE : ITER_DEST;
-        struct scsi_cmnd *scmd;
-+       int rw;
-+       if (hp->dxfer_direction == SG_DXFER_TO_DEV ||
-+           hp->dxfer_direction == SG_DXFER_TO_FROM_DEV)
-+               rw = ITER_SOURCE;
-+       else
-+               rw = ITER_DEST;
+On 25/08/2023 14:07, Eric Biggers wrote:
+> Hi Srinivas,
+> 
+> On Fri, Aug 25, 2023 at 11:19:41AM +0100, Srinivas Kandagatla wrote:
+>>
+>> On 19/07/2023 18:04, Gaurav Kashyap wrote:
+>>> These patches add support to Qualcomm ICE (Inline Crypto Enginr) for hardware
+>>> wrapped keys using Qualcomm Hardware Key Manager (HWKM) and are made on top
+>>> of a rebased version  Eric Bigger's set of changes to support wrapped keys in
+>>> fscrypt and block below:
+>>> https://git.kernel.org/pub/scm/fs/fscrypt/linux.git/log/?h=wrapped-keys-v7
+>>> (The rebased patches are not uploaded here)
+>>>
+>>> Ref v1 here:
+>>> https://lore.kernel.org/linux-scsi/20211206225725.77512-1-quic_gaurkash@quicinc.com/
+>>>
+>>> Explanation and use of hardware-wrapped-keys can be found here:
+>>> Documentation/block/inline-encryption.rst
+>>>
+>>> This patch is organized as follows:
+>>>
+>>> Patch 1 - Prepares ICE and storage layers (UFS and EMMC) to pass around wrapped keys.
+>>> Patch 2 - Adds a new SCM api to support deriving software secret when wrapped keys are used
+>>> Patch 3-4 - Adds support for wrapped keys in the ICE driver. This includes adding HWKM support
+>>> Patch 5-6 - Adds support for wrapped keys in UFS
+>>> Patch 7-10 - Supports generate, prepare and import functionality in ICE and UFS
+>>>
+>>> NOTE: MMC will have similar changes to UFS and will be uploaded in a different patchset
+>>>         Patch 3, 4, 8, 10 will have MMC equivalents.
+>>>
+>>> Testing:
+>>> Test platform: SM8550 MTP
+>>> Engineering trustzone image is required to test this feature only
+>>> for SM8550. For SM8650 onwards, all trustzone changes to support this
+>>> will be part of the released images.
+>>
+>> AFAIU, Prior to these proposed changes in scm, HWKM was done with help of
+>> TA(Trusted Application) for generate, import, unwrap ... functionality.
+>>
+>> 1. What is the reason for moving this from TA to new smc calls?
+>>
+>> Is this because of missing smckinvoke support in upstream?
+>>
+>> How scalable is this approach? Are we going to add new sec sys calls to
+>> every interface to TA?
+>>
+>> 2. How are the older SoCs going to deal with this, given that you are
+>> changing drivers that are common across these?
+>>
+>> Have you tested these patches on any older platforms?
+>>
+>> What happens if someone want to add support to wrapped keys to this
+>> platforms in upstream, How is that going to be handled?
+>>
+>> As I understand with this, we will endup with two possible solutions over
+>> time in upstream.
+> 
+> It's true that Qualcomm based Android devices already use HW-wrapped keys on
+> SoCs earlier than SM8650.  The problem is that the key generation, import, and
+> conversion were added to Android's KeyMint HAL, as a quick way to get the
+> feature out the door when it was needed (so to speak).  Unfortunately this
+> coupled this feature unnecessarily to the Android KeyMint and the corresponding
+> (closed source) userspace HAL provided by Qualcomm, which it's not actually
+> related to.  I'd guess that Qualcomm's closed source userspace HAL makes SMC
+> calls into Qualcomm's KeyMint TA, but I have no insight into those details.
+> 
+> The new SMC calls eliminate the dependency on the Android-specific KeyMint.
+> They're also being documented by Qualcomm.  So, as this patchset does, they can
+> be used by Linux in the implementation of new ioctls which provide a vendor
+> independent interface to HW-wrapped key generation, import, and conversion.
+> 
+> I think the new approach is the only one that is viable outside the Android
+> context.  As such, I don't think anyone has any plan to upstream support for
 
-        SCSI_LOG_TIMEOUT(4, sg_printk(KERN_INFO, sfp->parentdp,
-                                      "sg_start_req: dxfer_len=%d\n",
+Just bit of history afaiu.
 
+on Qcom SoCs there are 3 ways to talk to Trusted service/Trusted 
+application.
+
+1> Adding SCM calls. This is not scalable solution, imagine we keep 
+adding new scm calls and static services to the TZ as required and this 
+is going to bloat up the tz image size. Not only that, new SoCs would 
+need to maintain backward compatibility, which is not going to happen. 
+AFAIU this is discouraged in general and Qcom at some point in time will 
+move away from this..
+
+2> using QSEECOM: This has some scalable issues, which is now replaced 
+with smcinvoke.
+
+3> smcinvoke: This is preferred way to talk to any QTEE service or 
+application. The issue is that this is based on some downstream UAPI 
+which is not upstream ready yet.
+
+IMO, adding a solution that is just going to live for few years is 
+questionable for upstream.
+
+Fixing [3] seems to be much scalable solution along with it we will also 
+get support for this feature in all the Qualcomm platforms.
+
+Am interested to hear what Gaurav has to say on this.
+
+
+--srini
+
+
+> HW-wrapped keys for older Qualcomm SoCs that lack the new interface.
+> 
+> - Eric
