@@ -2,69 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AA0CA0ECF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Sep 2023 10:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BB4EE3F09
+	for <linux-block@archiver.kernel.org>; Tue, 12 Sep 2023 17:49:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231222AbjILKR4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Sep 2023 06:17:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
+        id S237137AbjILRte (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Sep 2023 13:49:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234068AbjILKRp (ORCPT
+        with ESMTP id S237184AbjILRtd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Sep 2023 06:17:45 -0400
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 431B719A3
-        for <linux-block@vger.kernel.org>; Tue, 12 Sep 2023 03:17:41 -0700 (PDT)
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-273983789adso6499153a91.0
-        for <linux-block@vger.kernel.org>; Tue, 12 Sep 2023 03:17:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694513860; x=1695118660;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HY7DpSorxrkfJmOH+CwT7iChclD4psUg07PYg6KnRjE=;
-        b=E8YbVkXYeov+6aPkNiG2eaNrmU0G2QZgiXk9sJqrJC/h/mYXCgSHknQRQcsS2h92LZ
-         NRDnsHzfU2KoOf2072kSvHRnKppkuEd+sBrhEL7Pi5RKI37rXnphb41+PqFNytBv5415
-         XeHB9FAGtpR303uNYzPYXaCMAcfD0gVeCVe4PawnL9iP+8EtgSIzGphFaQ0zUNKZ7sPS
-         yrDm5G0cT509rVcMjbzQlCegHA+QWbndhhhBYmnG16q3gCJGQGXCD631gIVXFeo2Z51c
-         ewnApcZA/eQKI9nlKo0+MgfW+s3CGPI0QIDaWAqIroJoX/b9jJBqdwJq9oSElCY9s4kj
-         R7xA==
-X-Gm-Message-State: AOJu0YzSYpMCiFw6S/pyfjY4wq+Mv79IYX+OtrKr3HhnkwJLSQLqwx1r
-        Hc/Xy71EU4GdWyU6tSYEJlu0XzoCVoYMV9Wp+/7ELE8rdc+/
-X-Google-Smtp-Source: AGHT+IFHaM/l+ezhbRMOgbt2kDm2MF38rZXvdiyr980HaM/iynb8ZU7cdmHx6OaJcCHqEKdaFjFW7nDNbB8YGB2EnqWEIlwISzC6
+        Tue, 12 Sep 2023 13:49:33 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0197810FF;
+        Tue, 12 Sep 2023 10:49:21 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 8C02F216DA;
+        Tue, 12 Sep 2023 17:49:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1694540960;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MIOECpgEAnqgxa9qsehre9AP3+VmQSdFWrInaEHQDXE=;
+        b=Iws/tWDkAkGR9jB9V1dH4uxynhncIMU1eWfpHFVr0JL4Cle55dzFLcgNMcGX8Qyw7NDg/O
+        oYaCf38oNWPsIGcA3BswteP+z35li5x+cETjFACcHoJh9uJH8BqH966lIr8QuRXjFo8vrF
+        +DK+VMxi4XOM3vyGLfIdirFD8JqWueo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1694540960;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MIOECpgEAnqgxa9qsehre9AP3+VmQSdFWrInaEHQDXE=;
+        b=tp+Tmfz3o0tokg/EHovOimYd1NK0XnSPDS0gVgpKoF4haRy57iFsM6dEBzipMT/U945Xb1
+        aSgheKLl7Gq7ZdAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2CD5213A39;
+        Tue, 12 Sep 2023 17:49:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id olkNCqCkAGUVPAAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Tue, 12 Sep 2023 17:49:20 +0000
+Date:   Tue, 12 Sep 2023 19:42:45 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Denis Efremov <efremov@linux.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-s390@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: remove get_super
+Message-ID: <20230912174245.GC20408@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20230811100828.1897174-1-hch@lst.de>
 MIME-Version: 1.0
-X-Received: by 2002:a17:90a:d30b:b0:263:317f:7ca4 with SMTP id
- p11-20020a17090ad30b00b00263317f7ca4mr3179077pju.9.1694513860796; Tue, 12 Sep
- 2023 03:17:40 -0700 (PDT)
-Date:   Tue, 12 Sep 2023 03:17:40 -0700
-In-Reply-To: <20230912083519.e2yveio72emi7rd4@debian.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bd66f3060526c093@google.com>
-Subject: Re: [syzbot] [block?] WARNING in blk_rq_map_user_iov
-From:   syzbot <syzbot+a532b03fdfee2c137666@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, dan.j.williams@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ricardo@marliere.net, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811100828.1897174-1-hch@lst.de>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Fri, Aug 11, 2023 at 12:08:11PM +0200, Christoph Hellwig wrote:
+> Hi all,
+> 
+> this series against the VFS vfs.super branch finishes off the work to remove
+> get_super and move (almost) all upcalls to use the holder ops.
+> 
+> The first part is the missing btrfs bits so that all file systems use the
+> super_block as holder.
+> 
+> The second part is various block driver cleanups so that we use proper
+> interfaces instead of raw calls to __invalidate_device and fsync_bdev.
+> 
+> The last part than replaces __invalidate_device and fsync_bdev with upcalls
+> to the file system through the holder ops, and finally removes get_super.
+> 
+> It leaves user_get_super and get_active_super around.  The former is not
+> used for upcalls in the traditional sense, but for legacy UAPI that for
+> some weird reason take a dev_t argument (ustat) or a block device path
+> (quotactl).  get_active_super is only used for calling into the file system
+> on freeze and should get a similar treatment, but given that Darrick has
+> changes to that code queued up already this will be handled in the next
+> merge window.
+> 
+> A git tree is available here:
+> 
+>     git://git.infradead.org/users/hch/misc.git remove-get_super
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
-
-Reported-and-tested-by: syzbot+a532b03fdfee2c137666@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         0bb80ecc Linux 6.6-rc1
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c0be80680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ba194e5cfd385dbf
-dashboard link: https://syzkaller.appspot.com/bug?extid=a532b03fdfee2c137666
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=15e02dc8680000
-
-Note: testing is done by a robot and is best-effort only.
+FYI, I've added patches 2-5 as a topic branch to btrfs for-next.
