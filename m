@@ -2,29 +2,30 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F6DEDEC70
-	for <linux-block@archiver.kernel.org>; Wed, 13 Sep 2023 15:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66271EDEC7F
+	for <linux-block@archiver.kernel.org>; Wed, 13 Sep 2023 15:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241308AbjIMPQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Sep 2023 11:16:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39290 "EHLO
+        id S241495AbjIMPQ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Sep 2023 11:16:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241633AbjIMPQf (ORCPT
+        with ESMTP id S241658AbjIMPQi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Sep 2023 11:16:35 -0400
-Received: from out-229.mta1.migadu.com (out-229.mta1.migadu.com [95.215.58.229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 055601B9
-        for <linux-block@vger.kernel.org>; Wed, 13 Sep 2023 08:16:29 -0700 (PDT)
+        Wed, 13 Sep 2023 11:16:38 -0400
+Received: from out-226.mta1.migadu.com (out-226.mta1.migadu.com [IPv6:2001:41d0:203:375::e2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967A9CE
+        for <linux-block@vger.kernel.org>; Wed, 13 Sep 2023 08:16:34 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1694618188;
+        t=1694618193;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Z8jXCZPukC62KzuUdS/5ci4fhw4YoBdcpJ7VcWMR4Nw=;
-        b=R6OB3Xsf2pprFdH7VzdzY8IkhbUPDPog74gB0aXDQyuHRt5dO8sJNIuWBcvxyL/jOL0Wcg
-        JAJC4tat6BWfqPkW99yfZEBnhOWM3bxjHce+tXxgvyu/OAu/Q1daxg+ZZwcTgwSwfaS989
-        MTV/iwizyG9Ylw9TS1LLaH3I/VrsCPU=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=54/TH6NwZmycBuSVYU7gHf61WfubLeQthagty1Zb+Ho=;
+        b=NTumMwyNHBdjcIricrwm9zKU91F6+4vINw2RVn5cVHIyaTqrJSZE1Mg/sY1E8kCeupdeyr
+        Mk+w9MGQRmxoZpZWD0F5Hqi3P6GnuNxVBtZuHXwpRoOTwqymnTnr6HMNHSW+Jrm7T5Bts+
+        GVowM6zQPg+BYhyrI4+b2Z2GeH1x8Pw=
 From:   chengming.zhou@linux.dev
 To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com,
         bvanassche@acm.org
@@ -32,9 +33,11 @@ Cc:     kbusch@kernel.org, mst@redhat.com,
         damien.lemoal@opensource.wdc.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, chengming.zhou@linux.dev,
         Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH v2 0/5] blk-mq: optimize queue_rqs() support
-Date:   Wed, 13 Sep 2023 15:16:11 +0000
-Message-Id: <20230913151616.3164338-1-chengming.zhou@linux.dev>
+Subject: [PATCH v2 2/5] blk-mq: remove RQF_MQ_INFLIGHT
+Date:   Wed, 13 Sep 2023 15:16:13 +0000
+Message-Id: <20230913151616.3164338-3-chengming.zhou@linux.dev>
+In-Reply-To: <20230913151616.3164338-1-chengming.zhou@linux.dev>
+References: <20230913151616.3164338-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
@@ -44,45 +47,87 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chengming Zhou <zhouchengming@bytedance.com>
 
-Changes in v2:
-  - Drop the patch that fixes a potential race in request timeout
-    from this series.
-  - Rebased on the newest block/for-next branch.
+Since the previous patch change to only account active requests when
+we really allocate the driver tag, the RQF_MQ_INFLIGHT can be removed
+and no double account problem.
 
-The current queue_rqs() support has limitation that it can't work on
-shared tags queue, which is resolved by patch 1-3. We move the account
-of active requests to where we really allocate the driver tag.
+1. none elevator: flush request will use the first pending request's
+   driver tag, won't double account.
 
-This is clearer and matched with the unaccount side which now happen
-when we put the driver tag. And we can remove RQF_MQ_INFLIGHT, which
-was used to avoid double account problem of flush request.
+2. other elevator: flush request will be accounted when allocate driver
+   tag when issue, and will be unaccounted when it put the driver tag.
 
-Another problem is that the driver that support queue_rqs() has to
-set inflight request table by itself, which is resolved in patch 4.
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-flush.c      | 11 ++---------
+ block/blk-mq-debugfs.c |  1 -
+ block/blk-mq.c         |  4 ----
+ include/linux/blk-mq.h |  2 --
+ 4 files changed, 2 insertions(+), 16 deletions(-)
 
-The last patch add queue_rqs() support for null_blk, which showed
-3.6% IOPS improvement in fio/t/io_uring benchmark on my test VM.
-And we also use it for testing queue_rqs() on shared tags queue.
-
-Thanks for review!
-
-Chengming Zhou (5):
-  blk-mq: account active requests when get driver tag
-  blk-mq: remove RQF_MQ_INFLIGHT
-  blk-mq: support batched queue_rqs() on shared tags queue
-  blk-mq: update driver tags request table when start request
-  block/null_blk: add queue_rqs() support
-
- block/blk-flush.c             | 11 ++-----
- block/blk-mq-debugfs.c        |  1 -
- block/blk-mq.c                | 45 +++++++++------------------
- block/blk-mq.h                | 57 ++++++++++++++++++++++++-----------
- drivers/block/null_blk/main.c | 20 ++++++++++++
- drivers/block/virtio_blk.c    |  2 --
- drivers/nvme/host/pci.c       |  1 -
- include/linux/blk-mq.h        |  2 --
- 8 files changed, 76 insertions(+), 63 deletions(-)
-
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index e73dc22d05c1..3f4d41952ef2 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -323,16 +323,9 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
+ 	flush_rq->mq_ctx = first_rq->mq_ctx;
+ 	flush_rq->mq_hctx = first_rq->mq_hctx;
+ 
+-	if (!q->elevator) {
++	if (!q->elevator)
+ 		flush_rq->tag = first_rq->tag;
+-
+-		/*
+-		 * We borrow data request's driver tag, so have to mark
+-		 * this flush request as INFLIGHT for avoiding double
+-		 * account of this driver tag
+-		 */
+-		flush_rq->rq_flags |= RQF_MQ_INFLIGHT;
+-	} else
++	else
+ 		flush_rq->internal_tag = first_rq->internal_tag;
+ 
+ 	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index c3b5930106b2..5cbeb9344f2f 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -246,7 +246,6 @@ static const char *const rqf_name[] = {
+ 	RQF_NAME(STARTED),
+ 	RQF_NAME(FLUSH_SEQ),
+ 	RQF_NAME(MIXED_MERGE),
+-	RQF_NAME(MQ_INFLIGHT),
+ 	RQF_NAME(DONTPREP),
+ 	RQF_NAME(SCHED_TAGS),
+ 	RQF_NAME(USE_SCHED),
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e776388decc3..c209a7dddee3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1066,10 +1066,6 @@ static inline void blk_mq_flush_tag_batch(struct blk_mq_hw_ctx *hctx,
+ {
+ 	struct request_queue *q = hctx->queue;
+ 
+-	/*
+-	 * All requests should have been marked as RQF_MQ_INFLIGHT, so
+-	 * update hctx->nr_active in batch
+-	 */
+ 	blk_mq_sub_active_requests(hctx, nr_tags);
+ 
+ 	blk_mq_put_tags(hctx->tags, tag_array, nr_tags);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 958ed7e89b30..1ab3081c82ed 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -32,8 +32,6 @@ typedef __u32 __bitwise req_flags_t;
+ #define RQF_FLUSH_SEQ		((__force req_flags_t)(1 << 4))
+ /* merge of different types, fail separately */
+ #define RQF_MIXED_MERGE		((__force req_flags_t)(1 << 5))
+-/* track inflight for MQ */
+-#define RQF_MQ_INFLIGHT		((__force req_flags_t)(1 << 6))
+ /* don't call prep for this one */
+ #define RQF_DONTPREP		((__force req_flags_t)(1 << 7))
+ /* use hctx->sched_tags */
 -- 
 2.40.1
 
