@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 566C5EE01E9
-	for <linux-block@archiver.kernel.org>; Wed, 13 Sep 2023 16:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 066E2EE01E9
+	for <linux-block@archiver.kernel.org>; Wed, 13 Sep 2023 16:58:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230111AbjIMQ6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Sep 2023 12:58:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36730 "EHLO
+        id S230221AbjIMQ6t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Sep 2023 12:58:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230503AbjIMQ6M (ORCPT
+        with ESMTP id S229913AbjIMQ6V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Sep 2023 12:58:12 -0400
+        Wed, 13 Sep 2023 12:58:21 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D9931FC2
-        for <linux-block@vger.kernel.org>; Wed, 13 Sep 2023 09:57:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BA5801BFB
+        for <linux-block@vger.kernel.org>; Wed, 13 Sep 2023 09:57:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694624239;
+        s=mimecast20190719; t=1694624250;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p+t8ChtS3C0mCAtd18JzNSIJcCnKtYlpMvVgh9PlkwE=;
-        b=F2yYXLRBrHm1mwLuVZR2o3y64+b9yRA6R2YUWQPTF5IvPwWVJd6n0pSP6c1XNPheh73MV3
-        cdhbkBPgQtCav135nuRxa+JAaIMbBtkE1/hd4VvmbGjd4FFwMyoFQi1eLXsSrFvoo9+DwK
-        7u/yCpBHo36xVCsqBCrxPvk+46DkllE=
+        bh=c2st9mzpODW5EfnFYy73QjLkmO48eOaJEcOSoL9qczM=;
+        b=GbC+/jJZR7GBO/jt/xHRAs5wXE4lAlnVO7BJiNFTeInP8Gv5+Gyi2KwNMCtEa2ucZIY+Z2
+        KV0tefcsnLcRtazViMMbUd+xo1r0FBeViAvNDdGoIIgudIMRm+PDfhAAv4aun2rksyJsn+
+        pTHbWe005PmdeUusc1ec0wf7u3/PvJU=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-542-5xC_0HubPGGLzilTHkSTMQ-1; Wed, 13 Sep 2023 12:57:13 -0400
-X-MC-Unique: 5xC_0HubPGGLzilTHkSTMQ-1
+ us-mta-628-Z0pMlrrIOVKNFRYw1td4xA-1; Wed, 13 Sep 2023 12:57:23 -0400
+X-MC-Unique: Z0pMlrrIOVKNFRYw1td4xA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 783FB85531D;
-        Wed, 13 Sep 2023 16:57:12 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D46F2101FAA0;
+        Wed, 13 Sep 2023 16:57:22 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D43F240C6EA8;
-        Wed, 13 Sep 2023 16:57:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CAFFF40C6EA8;
+        Wed, 13 Sep 2023 16:57:20 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Al Viro <viro@zeniv.linux.org.uk>,
         Linus Torvalds <torvalds@linux-foundation.org>
@@ -49,10 +49,14 @@ Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Jeff Layton <jlayton@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4 08/13] iov_iter: Remove the copy_mc flag and associated functions
-Date:   Wed, 13 Sep 2023 17:56:43 +0100
-Message-ID: <20230913165648.2570623-9-dhowells@redhat.com>
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH v4 12/13] iov_iter, net: Move hash_and_copy_to_iter() to net/
+Date:   Wed, 13 Sep 2023 17:56:47 +0100
+Message-ID: <20230913165648.2570623-13-dhowells@redhat.com>
 In-Reply-To: <20230913165648.2570623-1-dhowells@redhat.com>
 References: <20230913165648.2570623-1-dhowells@redhat.com>
 MIME-Version: 1.0
@@ -62,8 +66,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-copy_to/from_iter() now always return a short copy on MCE, so we don't need
-to have special handling.
+Move hash_and_copy_to_iter() to be with its only caller in networking code.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Alexander Viro <viro@zeniv.linux.org.uk>
@@ -73,99 +76,105 @@ cc: Christian Brauner <christian@brauner.io>
 cc: Matthew Wilcox <willy@infradead.org>
 cc: Linus Torvalds <torvalds@linux-foundation.org>
 cc: David Laight <David.Laight@ACULAB.COM>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
+cc: netdev@vger.kernel.org
 ---
- include/linux/uio.h | 16 ----------------
- lib/iov_iter.c      |  5 -----
- 2 files changed, 21 deletions(-)
+ include/linux/uio.h |  3 ---
+ lib/iov_iter.c      | 20 --------------------
+ net/core/datagram.c | 19 +++++++++++++++++++
+ 3 files changed, 19 insertions(+), 23 deletions(-)
 
 diff --git a/include/linux/uio.h b/include/linux/uio.h
-index e2a248dad80b..cc250892872e 100644
+index c335b95626af..6bb00645fe46 100644
 --- a/include/linux/uio.h
 +++ b/include/linux/uio.h
-@@ -40,7 +40,6 @@ struct iov_iter_state {
+@@ -326,9 +326,6 @@ iov_iter_npages_cap(struct iov_iter *i, int maxpages, size_t max_bytes)
+ 	return npages;
+ }
  
- struct iov_iter {
- 	u8 iter_type;
--	bool copy_mc;
- 	bool nofault;
- 	bool data_source;
- 	union {
-@@ -251,22 +250,8 @@ size_t _copy_from_iter_flushcache(void *addr, size_t bytes, struct iov_iter *i);
- 
- #ifdef CONFIG_ARCH_HAS_COPY_MC
- size_t _copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i);
--static inline void iov_iter_set_copy_mc(struct iov_iter *i)
--{
--	i->copy_mc = true;
--}
+-size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
+-		struct iov_iter *i);
 -
--static inline bool iov_iter_is_copy_mc(const struct iov_iter *i)
--{
--	return i->copy_mc;
--}
- #else
- #define _copy_mc_to_iter _copy_to_iter
--static inline void iov_iter_set_copy_mc(struct iov_iter *i) { }
--static inline bool iov_iter_is_copy_mc(const struct iov_iter *i)
--{
--	return false;
--}
- #endif
- 
- size_t iov_iter_zero(size_t bytes, struct iov_iter *);
-@@ -381,7 +366,6 @@ static inline void iov_iter_ubuf(struct iov_iter *i, unsigned int direction,
- 	WARN_ON(direction & ~(READ | WRITE));
- 	*i = (struct iov_iter) {
- 		.iter_type = ITER_UBUF,
--		.copy_mc = false,
- 		.data_source = direction,
- 		.ubuf = buf,
- 		.count = count,
+ struct iovec *iovec_from_user(const struct iovec __user *uvector,
+ 		unsigned long nr_segs, unsigned long fast_segs,
+ 		struct iovec *fast_iov, bool compat);
 diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index b574601783bc..66d2a16774fe 100644
+index 5b2d053f057f..77520834ebe4 100644
 --- a/lib/iov_iter.c
 +++ b/lib/iov_iter.c
-@@ -169,7 +169,6 @@ void iov_iter_init(struct iov_iter *i, unsigned int direction,
- 	WARN_ON(direction & ~(READ | WRITE));
- 	*i = (struct iov_iter) {
- 		.iter_type = ITER_IOVEC,
--		.copy_mc = false,
- 		.nofault = false,
- 		.data_source = direction,
- 		.__iov = iov,
-@@ -629,7 +628,6 @@ void iov_iter_kvec(struct iov_iter *i, unsigned int direction,
- 	WARN_ON(direction & ~(READ | WRITE));
- 	*i = (struct iov_iter){
- 		.iter_type = ITER_KVEC,
--		.copy_mc = false,
- 		.data_source = direction,
- 		.kvec = kvec,
- 		.nr_segs = nr_segs,
-@@ -646,7 +644,6 @@ void iov_iter_bvec(struct iov_iter *i, unsigned int direction,
- 	WARN_ON(direction & ~(READ | WRITE));
- 	*i = (struct iov_iter){
- 		.iter_type = ITER_BVEC,
--		.copy_mc = false,
- 		.data_source = direction,
- 		.bvec = bvec,
- 		.nr_segs = nr_segs,
-@@ -675,7 +672,6 @@ void iov_iter_xarray(struct iov_iter *i, unsigned int direction,
- 	BUG_ON(direction & ~1);
- 	*i = (struct iov_iter) {
- 		.iter_type = ITER_XARRAY,
--		.copy_mc = false,
- 		.data_source = direction,
- 		.xarray = xarray,
- 		.xarray_start = start,
-@@ -699,7 +695,6 @@ void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count)
- 	BUG_ON(direction != READ);
- 	*i = (struct iov_iter){
- 		.iter_type = ITER_DISCARD,
--		.copy_mc = false,
- 		.data_source = false,
- 		.count = count,
- 		.iov_offset = 0
+@@ -1,5 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#include <crypto/hash.h>
+ #include <linux/export.h>
+ #include <linux/bvec.h>
+ #include <linux/fault-inject-usercopy.h>
+@@ -1071,25 +1070,6 @@ ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
+ }
+ EXPORT_SYMBOL(iov_iter_get_pages_alloc2);
+ 
+-size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
+-		struct iov_iter *i)
+-{
+-#ifdef CONFIG_CRYPTO_HASH
+-	struct ahash_request *hash = hashp;
+-	struct scatterlist sg;
+-	size_t copied;
+-
+-	copied = copy_to_iter(addr, bytes, i);
+-	sg_init_one(&sg, addr, copied);
+-	ahash_request_set_crypt(hash, &sg, NULL, copied);
+-	crypto_ahash_update(hash);
+-	return copied;
+-#else
+-	return 0;
+-#endif
+-}
+-EXPORT_SYMBOL(hash_and_copy_to_iter);
+-
+ static int iov_npages(const struct iov_iter *i, int maxpages)
+ {
+ 	size_t skip = i->iov_offset, size = i->count;
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index 722311eeee18..103d46fa0eeb 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -61,6 +61,7 @@
+ #include <net/tcp_states.h>
+ #include <trace/events/skb.h>
+ #include <net/busy_poll.h>
++#include <crypto/hash.h>
+ 
+ /*
+  *	Is a socket 'connection oriented' ?
+@@ -489,6 +490,24 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+ 	return 0;
+ }
+ 
++static size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
++				    struct iov_iter *i)
++{
++#ifdef CONFIG_CRYPTO_HASH
++	struct ahash_request *hash = hashp;
++	struct scatterlist sg;
++	size_t copied;
++
++	copied = copy_to_iter(addr, bytes, i);
++	sg_init_one(&sg, addr, copied);
++	ahash_request_set_crypt(hash, &sg, NULL, copied);
++	crypto_ahash_update(hash);
++	return copied;
++#else
++	return 0;
++#endif
++}
++
+ /**
+  *	skb_copy_and_hash_datagram_iter - Copy datagram to an iovec iterator
+  *          and update a hash.
 
