@@ -2,103 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39DB7EDEC7E
-	for <linux-block@archiver.kernel.org>; Wed, 13 Sep 2023 15:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 964CDCA553D
+	for <linux-block@archiver.kernel.org>; Wed, 13 Sep 2023 16:33:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241406AbjIMPQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Sep 2023 11:16:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55808 "EHLO
+        id S229583AbjIMQdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Sep 2023 12:33:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241697AbjIMPQq (ORCPT
+        with ESMTP id S229472AbjIMQdW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Sep 2023 11:16:46 -0400
-Received: from out-230.mta1.migadu.com (out-230.mta1.migadu.com [IPv6:2001:41d0:203:375::e6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30CD2DC
-        for <linux-block@vger.kernel.org>; Wed, 13 Sep 2023 08:16:42 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1694618200;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hCOMDgQx+bgpwKLnJ2wBA8f+pdNiIK3o3ggHoT0hM7g=;
-        b=tTN41pCZ//w5UNw1GVbdKGdqCSWpAtDlyNGtHOLmA/YyKL9qApU6+LurZMfZ+k7Lyhit9u
-        ULGyDYi6YxwhAFwIanaBI2Eeg/Og6Ph7SECgHyu9Uc2MVF9JKexnFtaoBaVl9EOFG9WDv/
-        0BvG7Xgr04o7ABH9n1TVozi+Y8JsEYQ=
-From:   chengming.zhou@linux.dev
-To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com,
-        bvanassche@acm.org
-Cc:     kbusch@kernel.org, mst@redhat.com,
-        damien.lemoal@opensource.wdc.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, chengming.zhou@linux.dev,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH v2 5/5] block/null_blk: add queue_rqs() support
-Date:   Wed, 13 Sep 2023 15:16:16 +0000
-Message-Id: <20230913151616.3164338-6-chengming.zhou@linux.dev>
-In-Reply-To: <20230913151616.3164338-1-chengming.zhou@linux.dev>
-References: <20230913151616.3164338-1-chengming.zhou@linux.dev>
+        Wed, 13 Sep 2023 12:33:22 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425B019A7;
+        Wed, 13 Sep 2023 09:33:18 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6C43C433C8;
+        Wed, 13 Sep 2023 16:33:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694622797;
+        bh=/BE0SzPSHWJUDQnPrCfnTnaEO0Ee7ixrpqIiDWWi4pg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JEIWOoDeYw0Lf9hWj/zCyZ4x/rGCa/NQnygF+m0lMZeczRYWp/+IE53tvWyCKZsG+
+         up2zc8mQP9OdLjIt3ieHpSW+DbqQjZbKoxHgYka+ox5B/duraDYwWYC2flCW6yQuBT
+         cv0SrfJZcsbNKoo8+UUGobBcO+5vSh//zaB0oCO1AkX/JNOxsSLnUA74YuG8d2qy//
+         xSekU6sH/2OHlD59lMaI3d2pMSviFkxZRQRw7TX7MfD7+om+CEtOj6/4xJ6+C+s9aW
+         E5R98PPdfp9ZT0xmFjYnC4VDDVH+LzbtHDEh8winSlhdDUVsFOEtHvfQKUUr5vKlnV
+         kky/flcyBX0+w==
+Date:   Wed, 13 Sep 2023 18:33:10 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 03/12] filemap: update ki_pos in generic_perform_write
+Message-ID: <20230913-aufgreifen-fehlleiten-204b36f3069d@brauner>
+References: <20230601145904.1385409-1-hch@lst.de>
+ <20230601145904.1385409-4-hch@lst.de>
+ <20230827194122.GA325446@ZenIV>
+ <20230827214518.GU3390869@ZenIV>
+ <20230913110010.GA31292@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230913110010.GA31292@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+On Wed, Sep 13, 2023 at 01:00:10PM +0200, Christoph Hellwig wrote:
+> > direct_write_fallback(): on error revert the ->ki_pos update from buffered write
+> 
+> Al, Christian: can you send this fix on top Linus?
 
-Add batched mq_ops.queue_rqs() support in null_blk for testing. The
-implementation is much easy since null_blk doesn't have commit_rqs().
-
-We simply handle each request one by one, if errors are encountered,
-leave them in the passed in list and return back.
-
-There is about 3.6% improvement in IOPS of fio/t/io_uring on null_blk
-with hw_queue_depth=256 on my test VM, from 1.09M to 1.13M.
-
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- drivers/block/null_blk/main.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 968090935eb2..79d6cd3c3d41 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1750,6 +1750,25 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return null_handle_cmd(cmd, sector, nr_sectors, req_op(rq));
- }
- 
-+static void null_queue_rqs(struct request **rqlist)
-+{
-+	struct request *requeue_list = NULL;
-+	struct request **requeue_lastp = &requeue_list;
-+	struct blk_mq_queue_data bd = { };
-+	blk_status_t ret;
-+
-+	do {
-+		struct request *rq = rq_list_pop(rqlist);
-+
-+		bd.rq = rq;
-+		ret = null_queue_rq(rq->mq_hctx, &bd);
-+		if (ret != BLK_STS_OK)
-+			rq_list_add_tail(&requeue_lastp, rq);
-+	} while (!rq_list_empty(*rqlist));
-+
-+	*rqlist = requeue_list;
-+}
-+
- static void cleanup_queue(struct nullb_queue *nq)
- {
- 	bitmap_free(nq->tag_map);
-@@ -1802,6 +1821,7 @@ static int null_init_hctx(struct blk_mq_hw_ctx *hctx, void *driver_data,
- 
- static const struct blk_mq_ops null_mq_ops = {
- 	.queue_rq       = null_queue_rq,
-+	.queue_rqs	= null_queue_rqs,
- 	.complete	= null_complete_rq,
- 	.timeout	= null_timeout_rq,
- 	.poll		= null_poll,
--- 
-2.40.1
-
+Wasn't aware of this, sorry. I've picked it up and placed it with
+another set of small fixes I already have.
+I'm happy to have Al take it ofc.
