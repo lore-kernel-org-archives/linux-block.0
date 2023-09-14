@@ -2,173 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B062EE020D
-	for <linux-block@archiver.kernel.org>; Wed, 13 Sep 2023 21:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83165EE0212
+	for <linux-block@archiver.kernel.org>; Thu, 14 Sep 2023 01:15:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbjIMVdS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Sep 2023 17:33:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36824 "EHLO
+        id S231935AbjINBPq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Sep 2023 21:15:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbjIMVdS (ORCPT
+        with ESMTP id S233345AbjINBPq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Sep 2023 17:33:18 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622FA1724;
-        Wed, 13 Sep 2023 14:33:14 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3923FC433C7;
-        Wed, 13 Sep 2023 21:33:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694640794;
-        bh=GECw0+37SQCQQnWytIJsIFg22BcKEch0lpmHe9Lude0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DmA6cZAtQ4BkUKquEbLhSWfE6bQ5r/Q1V2YQjbnHUfNgvpu8bm1QPgusB41tfGi24
-         HXb7vzh3/UPHZbl8i8Gs+3NO1Oh7I1rhFzm5rZbkdCoHYFGjx44vfaFBHDcvbH44T9
-         BPXcf215d7+e7afUmHeQUstDJY8lltG70ABoJZCMOKsnDWnojsTuf0OoBIcsSbfxq4
-         bmMXIxxXX1EnetyTsQQy7ng28HBj70HJqdlQwaf9xgxk6GxmzQhz0fN4hkqSjLiUyM
-         WFXaxTcUnnjn86+h5mnD4SzQA7Jrmqp5r4DFgggOtNgOdIvd7ARVnFzZZc2YS2zq0L
-         rRjX92U77+jtg==
-Date:   Wed, 13 Sep 2023 14:33:11 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     gjoyce@linux.vnet.ibm.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk, jarkko@kernel.org, linuxppc-dev@lists.ozlabs.org,
-        jonathan.derrick@linux.dev, brking@linux.vnet.ibm.com,
-        msuchanek@suse.de, mpe@ellerman.id.au, nayna@linux.ibm.com,
-        akpm@linux-foundation.org, keyrings@vger.kernel.org,
-        llvm@lists.linux.dev
-Subject: Re: [PATCH v7 1/3 RESEND] block:sed-opal: SED Opal keystore
-Message-ID: <20230913213311.GA3279202@dev-arch.thelio-3990X>
-References: <20230908153056.3503975-1-gjoyce@linux.vnet.ibm.com>
- <20230908153056.3503975-2-gjoyce@linux.vnet.ibm.com>
- <20230913165612.GA2213586@dev-arch.thelio-3990X>
- <CAKwvOdnbKA-DiWRorWMR93JPFX-OjUjO=SQXSRf4=DpwzvZ=pQ@mail.gmail.com>
+        Wed, 13 Sep 2023 21:15:46 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D67B1724;
+        Wed, 13 Sep 2023 18:15:42 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RmKBb04DHz4f3jYS;
+        Thu, 14 Sep 2023 09:15:35 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.124.27])
+        by APP2 (Coremail) with SMTP id Syh0CgB3gAW6XgJl1RSfAQ--.51414S2;
+        Thu, 14 Sep 2023 09:15:38 +0800 (CST)
+From:   Kemeng Shi <shikemeng@huaweicloud.com>
+To:     axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] block: correct stale comment in rq_qos_wait
+Date:   Thu, 14 Sep 2023 17:15:08 +0800
+Message-Id: <20230914091508.36232-1-shikemeng@huaweicloud.com>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKwvOdnbKA-DiWRorWMR93JPFX-OjUjO=SQXSRf4=DpwzvZ=pQ@mail.gmail.com>
+X-CM-TRANSID: Syh0CgB3gAW6XgJl1RSfAQ--.51414S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKFyxXr45KrWxXFyUGrW8tFb_yoW3uFcEvF
+        s7Jr1I9Fn8Wrsakw18GFWIgFn7K34UGF48CryfWay3Gw1ftanrAa1vkws0qFsxG3W3Kw4a
+        qw45ZFnxJw4I9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb7kYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVAaII0Ic2I_JFv_Gryl8c
+        AvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWD
+        JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oV
+        Cq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG
+        8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2js
+        IE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY
+        0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I
+        0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAI
+        cVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcV
+        CF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280
+        aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUI-eoUUUUU
+X-CM-SenderInfo: 5vklyvpphqwq5kxd4v5lfo033gof0z/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 13, 2023 at 01:49:39PM -0700, Nick Desaulniers wrote:
-> On Wed, Sep 13, 2023 at 9:56 AM Nathan Chancellor <nathan@kernel.org> wrote:
-> >
-> > Hi Greg,
-> >
-> > On Fri, Sep 08, 2023 at 10:30:54AM -0500, gjoyce@linux.vnet.ibm.com wrote:
-> > > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > >
-> > > Add read and write functions that allow SED Opal keys to stored
-> > > in a permanent keystore.
-> > >
-> > > Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > > Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
-> > > ---
-> > >  block/Makefile               |  2 +-
-> > >  block/sed-opal-key.c         | 24 ++++++++++++++++++++++++
-> > >  include/linux/sed-opal-key.h | 15 +++++++++++++++
-> > >  3 files changed, 40 insertions(+), 1 deletion(-)
-> > >  create mode 100644 block/sed-opal-key.c
-> > >  create mode 100644 include/linux/sed-opal-key.h
-> > >
-> > > diff --git a/block/Makefile b/block/Makefile
-> > > index 46ada9dc8bbf..ea07d80402a6 100644
-> > > --- a/block/Makefile
-> > > +++ b/block/Makefile
-> > > @@ -34,7 +34,7 @@ obj-$(CONFIG_BLK_DEV_ZONED) += blk-zoned.o
-> > >  obj-$(CONFIG_BLK_WBT)                += blk-wbt.o
-> > >  obj-$(CONFIG_BLK_DEBUG_FS)   += blk-mq-debugfs.o
-> > >  obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
-> > > -obj-$(CONFIG_BLK_SED_OPAL)   += sed-opal.o
-> > > +obj-$(CONFIG_BLK_SED_OPAL)   += sed-opal.o sed-opal-key.o
-> > >  obj-$(CONFIG_BLK_PM)         += blk-pm.o
-> > >  obj-$(CONFIG_BLK_INLINE_ENCRYPTION)  += blk-crypto.o blk-crypto-profile.o \
-> > >                                          blk-crypto-sysfs.o
-> > > diff --git a/block/sed-opal-key.c b/block/sed-opal-key.c
-> > > new file mode 100644
-> > > index 000000000000..16f380164c44
-> > > --- /dev/null
-> > > +++ b/block/sed-opal-key.c
-> > > @@ -0,0 +1,24 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +/*
-> > > + * SED key operations.
-> > > + *
-> > > + * Copyright (C) 2022 IBM Corporation
-> > > + *
-> > > + * These are the accessor functions (read/write) for SED Opal
-> > > + * keys. Specific keystores can provide overrides.
-> > > + *
-> > > + */
-> > > +
-> > > +#include <linux/kernel.h>
-> > > +#include <linux/errno.h>
-> > > +#include <linux/sed-opal-key.h>
-> > > +
-> > > +int __weak sed_read_key(char *keyname, char *key, u_int *keylen)
-> > > +{
-> > > +     return -EOPNOTSUPP;
-> > > +}
-> > > +
-> > > +int __weak sed_write_key(char *keyname, char *key, u_int keylen)
-> > > +{
-> > > +     return -EOPNOTSUPP;
-> > > +}
-> >
-> > This change causes a build failure for certain clang configurations due
-> > to an unfortunate issue [1] with recordmcount, clang's integrated
-> > assembler, and object files that contain a section with only weak
-> > functions/symbols (in this case, the .text section in sed-opal-key.c),
-> > resulting in
-> >
-> >   Cannot find symbol for section 2: .text.
-> >   block/sed-opal-key.o: failed
-> >
-> > when building this file.
-> 
-> The definitions in
-> block/sed-opal-key.c
-> should be deleted. Instead, in
-> include/linux/sed-opal-key.h
-> CONFIG_PSERIES_PLPKS_SED should be used to define static inline
-> versions when CONFIG_PSERIES_PLPKS_SED is not defined.
-> 
-> #ifdef CONFIG_PSERIES_PLPKS_SED
-> int sed_read_key(char *keyname, char *key, u_int *keylen);
-> int sed_write_key(char *keyname, char *key, u_int keylen);
-> #else
-> static inline
-> int sed_read_key(char *keyname, char *key, u_int *keylen) {
->   return -EOPNOTSUPP;
-> }
-> static inline
-> int sed_write_key(char *keyname, char *key, u_int keylen);
->   return -EOPNOTSUPP;
-> }
-> #endif
+The rq_qos_wait calls common wake-up function rq_qos_wake_function to get
+token. Just replace stale wbt_wake_function with rq_qos_wake_function in
+comment.
 
-Ah yes, this is the other solution. I figured the way that it was
-written, sed_read_key() and sed_write_key() may be overridden by a
-different architecture or translation unit in the future but I think
-until it is needed, your solution would be perfectly fine. Thanks for
-taking a look!
+Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
+---
+ block/blk-rq-qos.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
-Nathan
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 167be74df4ee..dd7310c94713 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -270,7 +270,7 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 			finish_wait(&rqw->wait, &data.wq);
+ 
+ 			/*
+-			 * We raced with wbt_wake_function() getting a token,
++			 * We raced with rq_qos_wake_function() getting a token,
+ 			 * which means we now have two. Put our local token
+ 			 * and wake anyone else potentially waiting for one.
+ 			 */
+-- 
+2.30.0
 
-> > Is there any real reason to have a separate translation unit for these
-> > two functions versus just having them living in sed-opal.c? Those two
-> > object files share the same Kconfig dependency. I am happy to send a
-> > patch if that is an acceptable approach.
-> >
-> > [1]: https://github.com/ClangBuiltLinux/linux/issues/981
-> >
-> > Cheers,
-> > Nathan
-> >
-> 
-> 
-> -- 
-> Thanks,
-> ~Nick Desaulniers
