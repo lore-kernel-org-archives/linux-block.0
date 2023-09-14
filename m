@@ -2,126 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 843B9CA5506
-	for <linux-block@archiver.kernel.org>; Thu, 14 Sep 2023 12:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B18B6EEAA53
+	for <linux-block@archiver.kernel.org>; Thu, 14 Sep 2023 16:05:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238481AbjINMyS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Sep 2023 08:54:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51570 "EHLO
+        id S241520AbjINQF7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Sep 2023 12:05:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237762AbjINMyS (ORCPT
+        with ESMTP id S241503AbjINQF6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2023 08:54:18 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B7C81FCE;
-        Thu, 14 Sep 2023 05:54:14 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 212A421845;
-        Thu, 14 Sep 2023 12:54:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1694696053; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2P4CCIAtnMeq3zaMem7MKL9pDBcUYiJ/s09jYtJe+Vw=;
-        b=TDH+0sRsDYbNxyLehgDUK+EOz/MHao6bdQ4QvXGGH6AAebfS4KsCrIv6GePGqaBy73tP6+
-        4vNOm37ylF3YFxOEoZxsPNbrI79EGI32seGDEV25HzxIMVnE3PIRybd3bTJO2XcTklc8pz
-        c6k4CNvW9qCfOMDPQiNNw5rBALu7Svc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1694696053;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2P4CCIAtnMeq3zaMem7MKL9pDBcUYiJ/s09jYtJe+Vw=;
-        b=WVgJ5i2BMtmqpv3vBR1sx6yyyF7kaUn8NHHiht9xdjQ8sWqFGnqrUcteTNQZoxvXRpnSMY
-        bgjpnOXowl3HWwCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0F63F13580;
-        Thu, 14 Sep 2023 12:54:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id YkivA3UCA2WTQAAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 14 Sep 2023 12:54:13 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 8771BA07C2; Thu, 14 Sep 2023 14:54:12 +0200 (CEST)
-Date:   Thu, 14 Sep 2023 14:54:12 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     David Sterba <dsterba@suse.cz>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Denis Efremov <efremov@linux.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-s390@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: remove get_super
-Message-ID: <20230914125412.wlpoixwljdzqu2ih@quack3>
-References: <20230811100828.1897174-1-hch@lst.de>
- <20230912174245.GC20408@twin.jikos.cz>
- <20230914084809.arzw34svsvvkwivm@quack3>
- <20230914120320.GY20408@suse.cz>
+        Thu, 14 Sep 2023 12:05:58 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13501BEF
+        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2023 09:05:54 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-797ea09af91so1638339f.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2023 09:05:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694707554; x=1695312354; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n2G/8FvmJuP7Q+IcP+fUXoKKLeBYjk4CrYgaYipCuRQ=;
+        b=PNfPgDumQkQ4UmlqIouS6Kw+Vx3luxj/Gcvk6Qz7OOZZjbkoEx7ly4ntzaMqMfzk04
+         S3iSNqN59eTzSn1wYspIPO35SZ23QgZl8lM7KhdVCgin5DIXQvEkoIMYaS+5hHfHSYLu
+         1gDj9uo57Fif3cywrNK+m6Uzb6LtPWJ+BMMbHJeXLVdISt24GPC4qhbEW3lfyZOZW4tk
+         I/K7TLE9SFgySnXjngOl3kuFDOuRtPQuHSoUMbZxK5XewjbW72xWwVStlfRkYGwfgvjs
+         DEWVjFT4+x7LBT/JsaJf3dBqXZgfIRyGb6ZCevV7miK7phMXWVCD54eOsLTL+LU2LhXz
+         24yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694707554; x=1695312354;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n2G/8FvmJuP7Q+IcP+fUXoKKLeBYjk4CrYgaYipCuRQ=;
+        b=SOuoxLohTK9T6P/vFQPBzmlIYrrmsvXUo/FACfxUm0xEmy1C+OH3E++xts2vN2HmDW
+         Mfu+9k6yJCCf+9TGV2xgYb7MG3+zbccKkxrQmWoeWtw/d78Lza/sqNASpjSs1vSUAVkB
+         quEVATd4kJs6Su9P3/kJ6+lu629dv2/f229asa/qQbbNJ7w0LRmTE1EFS4PfhUtgF2gO
+         LEoHSCCVNAmADhMx5z8+dwNnTnQBZagaHyetzAUIPIWyjrNtlrxbn+EheR5cxjY0zz3w
+         gy5S5QKsA6G9CQncT2Jm1dqLGMldmG068/9H6dAyks5dVBPetMYH8B3MX5DtnlGn2oWc
+         9Oog==
+X-Gm-Message-State: AOJu0YzUbIoRdl6jM8onKj5iYclk7c/+JB86DrJ7HEkRvJ1Uwf7tOk8n
+        DjQLgjNxdxZ8yyaFeyh16CR1AA==
+X-Google-Smtp-Source: AGHT+IH5OxR1xf+yKXMKWvOe+xfW8ExWSTxWbzQqanpHc1KaLzdtqjI/ltyg8deWBjg03RZ+8kTjbg==
+X-Received: by 2002:a92:c948:0:b0:34f:3b12:799e with SMTP id i8-20020a92c948000000b0034f3b12799emr6157784ilq.0.1694707553871;
+        Thu, 14 Sep 2023 09:05:53 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e7-20020a926907000000b0034cd2c0afe8sm523083ilc.56.2023.09.14.09.05.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 09:05:53 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     ming.lei@redhat.com, chengming.zhou@linux.dev
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        Yi Zhang <yi.zhang@redhat.com>
+In-Reply-To: <20230908005702.2183908-1-chengming.zhou@linux.dev>
+References: <20230908005702.2183908-1-chengming.zhou@linux.dev>
+Subject: Re: [PATCH] blk-mq: fix tags UAF when shrink nr_hw_queues
+Message-Id: <169470755284.1974464.819655197479037967.b4-ty@kernel.dk>
+Date:   Thu, 14 Sep 2023 10:05:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914120320.GY20408@suse.cz>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 14-09-23 14:03:20, David Sterba wrote:
-> On Thu, Sep 14, 2023 at 10:48:09AM +0200, Jan Kara wrote:
-> > On Tue 12-09-23 19:42:45, David Sterba wrote:
-> > > On Fri, Aug 11, 2023 at 12:08:11PM +0200, Christoph Hellwig wrote:
-> > > > Hi all,
-> > > > 
-> > > > this series against the VFS vfs.super branch finishes off the work to remove
-> > > > get_super and move (almost) all upcalls to use the holder ops.
-> > > > 
-> > > > The first part is the missing btrfs bits so that all file systems use the
-> > > > super_block as holder.
-> > > > 
-> > > > The second part is various block driver cleanups so that we use proper
-> > > > interfaces instead of raw calls to __invalidate_device and fsync_bdev.
-> > > > 
-> > > > The last part than replaces __invalidate_device and fsync_bdev with upcalls
-> > > > to the file system through the holder ops, and finally removes get_super.
-> > > > 
-> > > > It leaves user_get_super and get_active_super around.  The former is not
-> > > > used for upcalls in the traditional sense, but for legacy UAPI that for
-> > > > some weird reason take a dev_t argument (ustat) or a block device path
-> > > > (quotactl).  get_active_super is only used for calling into the file system
-> > > > on freeze and should get a similar treatment, but given that Darrick has
-> > > > changes to that code queued up already this will be handled in the next
-> > > > merge window.
-> > > > 
-> > > > A git tree is available here:
-> > > > 
-> > > >     git://git.infradead.org/users/hch/misc.git remove-get_super
-> > > 
-> > > FYI, I've added patches 2-5 as a topic branch to btrfs for-next.
-> > 
-> > Hum, I don't see them there. Some glitch somewhere?
+
+On Fri, 08 Sep 2023 08:57:02 +0800, chengming.zhou@linux.dev wrote:
+> When nr_hw_queues shrink, we free the excess tags before realloc
+> hw_ctxs for each queue, during that we may need to access those
+> tags, like blk_mq_tag_idle(hctx) will access queue shared tags.
 > 
-> There will be a delay before the patches show up in the pushed for-next
-> branch, some tests failed (maybe not related to this series) and there
-> are other merge conflicts that I need to resolve first.
+> So slab-use-after-free caused and reported by KASAN. Fix it by
+> moving the releasing of excess tags to the end.
+> 
+> [...]
 
-Ah, I see. Thanks for explanation!
+Applied, thanks!
 
-								Honza
+[1/1] blk-mq: fix tags UAF when shrink nr_hw_queues
+      (no commit info)
+
+Best regards,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
+
