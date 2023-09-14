@@ -2,82 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 412DFEDE99E
-	for <linux-block@archiver.kernel.org>; Thu, 14 Sep 2023 09:06:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A32DEDE9A3
+	for <linux-block@archiver.kernel.org>; Thu, 14 Sep 2023 10:34:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236900AbjINJGy convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Sep 2023 05:06:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34884 "EHLO
+        id S237015AbjINKeJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Sep 2023 06:34:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237104AbjINJGw (ORCPT
+        with ESMTP id S237290AbjINKeI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2023 05:06:52 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DF3141FDF
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2023 02:06:46 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-252-oVJiQy4pMkOK69oh5CjVkA-1; Thu, 14 Sep 2023 10:06:29 +0100
-X-MC-Unique: oVJiQy4pMkOK69oh5CjVkA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 14 Sep
- 2023 10:06:25 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 14 Sep 2023 10:06:25 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'David Howells' <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-CC:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Christian Brauner" <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4 05/13] iov: Move iterator functions to a header file
-Thread-Topic: [PATCH v4 05/13] iov: Move iterator functions to a header file
-Thread-Index: AQHZ5mNctrIi+SmkLEm1sOlIj5L+5rAaBNNA
-Date:   Thu, 14 Sep 2023 09:06:25 +0000
-Message-ID: <445a78b0ff3047fea20d3c8058a5ff6a@AcuMS.aculab.com>
-References: <20230913165648.2570623-1-dhowells@redhat.com>
- <20230913165648.2570623-6-dhowells@redhat.com>
-In-Reply-To: <20230913165648.2570623-6-dhowells@redhat.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Thu, 14 Sep 2023 06:34:08 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7556B1BEB;
+        Thu, 14 Sep 2023 03:34:04 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 083171F854;
+        Thu, 14 Sep 2023 10:34:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1694687643; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fnfPmNtqKsvG7dCcr+XCTSyVIUc/H8QoYYVZgMuRg0o=;
+        b=U2JitcWcgj0eXzLT+JBmc2Cxb1QMzIKNcw/Dn0Ez3gyE6BRsX4fLId+GZNdYv+fCu3DtQn
+        7XHFNNWuV4eABQEXznhVaYVNc6otruFOd+yhPpnuhgOm7i4appyjgCO4Q/Fr+RixUkAH0c
+        ZBD22AVrqvieKd08zBfE5zGoKXFyRb0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1694687643;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fnfPmNtqKsvG7dCcr+XCTSyVIUc/H8QoYYVZgMuRg0o=;
+        b=S7Vh8jgldkYpZbrl7QdDL5V5NPP/o3otjaLQFo/qPXXRpJcfkUHNUY7AQNn/w5yn9HlKot
+        aeBhRJR06C7vgBDQ==
+Received: from kitsune.suse.cz (kitsune.suse.cz [10.100.12.127])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 2FB0F2C142;
+        Thu, 14 Sep 2023 10:34:01 +0000 (UTC)
+Date:   Thu, 14 Sep 2023 12:34:00 +0200
+From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Nathan Chancellor <nathan@kernel.org>, gjoyce@linux.vnet.ibm.com,
+        axboe@kernel.dk, nayna@linux.ibm.com, linux-block@vger.kernel.org,
+        jarkko@kernel.org, keyrings@vger.kernel.org,
+        jonathan.derrick@linux.dev, brking@linux.vnet.ibm.com,
+        akpm@linux-foundation.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v7 3/3 RESEND] powerpc/pseries: PLPKS SED Opal keystore
+ support
+Message-ID: <20230914103400.GX8826@kitsune.suse.cz>
+References: <20230908153056.3503975-1-gjoyce@linux.vnet.ibm.com>
+ <20230908153056.3503975-4-gjoyce@linux.vnet.ibm.com>
+ <20230913185951.GA3643621@dev-arch.thelio-3990X>
+ <877cot8k9f.fsf@mail.lhotse>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877cot8k9f.fsf@mail.lhotse>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Howells
-> Sent: 13 September 2023 17:57
+Hello,
+
+On Thu, Sep 14, 2023 at 02:13:32PM +1000, Michael Ellerman wrote:
+> Nathan Chancellor <nathan@kernel.org> writes:
+> > Hi Greg,
+> >
+> > On Fri, Sep 08, 2023 at 10:30:56AM -0500, gjoyce@linux.vnet.ibm.com wrote:
+> >> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+> >>
+> >> Define operations for SED Opal to read/write keys
+> >> from POWER LPAR Platform KeyStore(PLPKS). This allows
+> >> non-volatile storage of SED Opal keys.
+> >>
+> >> Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+> >> Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
+> >> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> >
+> > After this change in -next as commit 9f2c7411ada9 ("powerpc/pseries:
+> > PLPKS SED Opal keystore support"), I see the following crash when
+> > booting some distribution configurations, such as OpenSUSE's [1] (the
+> > rootfs is available at [2] if necessary):
 > 
-> Move the iterator functions to a header file so that other operations that
-> need to scan over an iterator can be added.  For instance, the rbd driver
-> could use this to scan a buffer to see if it is all zeros and libceph could
-> use this to generate a crc.
+> Thanks for testing Nathan.
+> 
+> The code needs to check plpks_is_available() somewhere, before calling
+> the plpks routines.
 
-These all look a bit big for being more generally inlined.
+would this fixup do it?
 
-I know you want to avoid the indirect call in the normal cases,
-but maybe it would be ok for other uses?
+I don't really see any other place to plug the check with the current
+code structure.
 
-		David
+Thanks
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+Michal
+
+diff --git a/arch/powerpc/platforms/pseries/plpks_sed_ops.c b/arch/powerpc/platforms/pseries/plpks_sed_ops.c
+index c1d08075e850..f8038d998eae 100644
+--- a/arch/powerpc/platforms/pseries/plpks_sed_ops.c
++++ b/arch/powerpc/platforms/pseries/plpks_sed_ops.c
+@@ -64,6 +64,9 @@ int sed_read_key(char *keyname, char *key, u_int *keylen)
+ 	int ret;
+ 	u_int len;
+ 
++	if (!plpks_is_available())
++		return -ENODEV;
++
+ 	plpks_init_var(&var, keyname);
+ 	var.data = (u8 *)&data;
+ 	var.datalen = sizeof(data);
+@@ -89,6 +92,9 @@ int sed_write_key(char *keyname, char *key, u_int keylen)
+ 	struct plpks_sed_object_data data;
+ 	struct plpks_var_name vname;
+ 
++	if (!plpks_is_available())
++		return -ENODEV;
++
+ 	plpks_init_var(&var, keyname);
+ 
+ 	var.datalen = sizeof(struct plpks_sed_object_data);
+-- 
+2.41.0
 
