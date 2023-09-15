@@ -2,163 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1F1EE6457
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 13:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127BBEE645D
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 13:36:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235315AbjIONZp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 09:25:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51996 "EHLO
+        id S235372AbjIONgt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 09:36:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235281AbjIONZo (ORCPT
+        with ESMTP id S234575AbjIONgt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 09:25:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B91B819AE
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 06:24:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694784297;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YwX0LvGe2IzI2EOEiWJxA7uUIanGLX6c6iCFRhbWEYk=;
-        b=L1nX8M9+GcmkkUwFTePrnkpgibt/jwx4lNoRQbQAV3LP9IIvUKVDXKScBYWSBqhKVHZ09O
-        +ImmX+6c0q+0R3pV0wUwOiO0xotA+hn4Xe/TQoA06wyP6yTVQr8V6becAK85pywSptjGG9
-        vdjOxiqNn8Z9C4IirBxtZ/2ZUItSH/k=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-66-4Bq-zBPcP-SVdF6pYdLdww-1; Fri, 15 Sep 2023 09:24:54 -0400
-X-MC-Unique: 4Bq-zBPcP-SVdF6pYdLdww-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA13480349B;
-        Fri, 15 Sep 2023 13:24:53 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6689610F1BE9;
-        Fri, 15 Sep 2023 13:24:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <5017b9fa177f4deaa5d481a5d8914ab4@AcuMS.aculab.com>
-References: <5017b9fa177f4deaa5d481a5d8914ab4@AcuMS.aculab.com> <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com> <20230914221526.3153402-1-dhowells@redhat.com> <20230914221526.3153402-10-dhowells@redhat.com> <3370515.1694772627@warthog.procyon.org.uk>
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, "Christoph Hellwig" <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>,
-        "Matthew Wilcox" <willy@infradead.org>,
-        Brendan Higgins <brendanhiggins@google.com>,
-        David Gow <davidgow@google.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christian Brauner <brauner@kernel.org>,
-        "David Hildenbrand" <david@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
+        Fri, 15 Sep 2023 09:36:49 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA9FC2120
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 06:36:42 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-760dff4b701so32369539f.0
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 06:36:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694785002; x=1695389802; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FyfUX0X2fmtB6PX68eelYyAoJB8jxcCYoU3jaj8MsYM=;
+        b=ydn4D9Jfxv5BuKoSlCNrEbvb0wmF/UhEs+33XosPhhKT/yK+jMCISrZt2wgU4HM87v
+         7KCXIviagDEc8M7npSAwopV0CkjU8APIaZPrZxk+TLvqRSEezoC3ZIpQCjSIBaQxANVK
+         biaVcG0RgFfe94C6GxLy9OSgNAXZHmFD38xMHM4ee4yX7mvOaZG/ucotanKldb1ciNIA
+         pwD8BOE0GACYkaxnmil2tFmNtlj1vwN+8aw9OqRqby4m/JpHwA6riYYpJZ7MnvSJCba8
+         bHCFt6A5CDU3LboM1AyBTUxoRG36YW/tzua93QCiPMyEKHsndpENAp9VlejjaE2tqKn+
+         rkYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694785002; x=1695389802;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FyfUX0X2fmtB6PX68eelYyAoJB8jxcCYoU3jaj8MsYM=;
+        b=RMoAG1iWauHXjeJmprdxcSxJdiCMDUWGY1QL7D9SNhSLc0emgCVGePgpop6Cl3EAzM
+         YLb6WExQZSfXXg5GinG9zl7a7yhaAleU1qMFAsugAZD8UIpTCdNMgDbgEwewCUApm1rR
+         PKCde7h2qbyg7hZVPYbM2j/fMCel1oBGaXMslW+sPlipTv+B7H5B/P6wfqQ1lHUsDqoa
+         hHPpTaNR9MNqdxk8ImTOiJ4upoXXXoAxCuULKvccru0LtObkpP7ZGM5Va6toiaMIW2+J
+         GbrUZP9LGOfIVT0Pi1cTZ3yqsUTHNOMIZpjlcDKyBlv7tqRCPOSeIuSRMn1XQeK26A2b
+         PZww==
+X-Gm-Message-State: AOJu0YxLpjwRZ8XDrjtq/666Ux9mIb2TkyzbdE2uHpUdFbZ6lpx60ID3
+        vLQDRG2OMaOP0pcqYtC67Wfgpg==
+X-Google-Smtp-Source: AGHT+IH9FFVy2H1yFJjidsyCoasweVzlcw3vqMkLY4wA397WlW2CuAHpeyoGIJF6lW3TWHiGyUOvwQ==
+X-Received: by 2002:a05:6602:17c9:b0:792:6dd8:a65f with SMTP id z9-20020a05660217c900b007926dd8a65fmr1530583iox.0.1694785002301;
+        Fri, 15 Sep 2023 06:36:42 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id b12-20020a02c98c000000b0042b6940b793sm1024607jap.17.2023.09.15.06.36.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Sep 2023 06:36:41 -0700 (PDT)
+Message-ID: <6338fbac-0177-43eb-be4f-7c586956953f@kernel.dk>
+Date:   Fri, 15 Sep 2023 07:36:40 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3629597.1694784290.1@warthog.procyon.org.uk>
-Date:   Fri, 15 Sep 2023 14:24:50 +0100
-Message-ID: <3629598.1694784290@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] aoe: refactor deprecated strncpy
+Content-Language: en-US
+To:     Kees Cook <keescook@chromium.org>,
+        Justin Stitt <justinstitt@google.com>
+Cc:     Justin Sanders <justin@coraid.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        Xu Panda <xu.panda@zte.com.cn>, Yang Yang <yang.yang29@zte.com>
+References: <20230911-strncpy-drivers-block-aoe-aoenet-c-v1-1-9643d6137ff9@google.com>
+ <202309142019.23A7D80A@keescook>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <202309142019.23A7D80A@keescook>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Laight <David.Laight@ACULAB.COM> wrote:
+On 9/14/23 9:21 PM, Kees Cook wrote:
+> On Mon, Sep 11, 2023 at 09:09:07PM +0000, Justin Stitt wrote:
+>> `strncpy` is deprecated for use on NUL-terminated destination strings [1].
+>>
+>> `aoe_iflist` is expected to be NUL-terminated which is evident by its
+>> use with string apis later on like `strspn`:
+>> | 	p = aoe_iflist + strspn(aoe_iflist, WHITESPACE);
+>>
+>> It also seems `aoe_iflist` does not need to be NUL-padded which means
+>> `strscpy` [2] is a suitable replacement due to the fact that it
+>> guarantees NUL-termination on the destination buffer while not
+>> unnecessarily NUL-padding.
+>>
+>> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+>> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+>> Link: https://github.com/KSPP/linux/issues/90
+>> Cc: linux-hardening@vger.kernel.org
+>> Cc: Kees Cook <keescook@chromium.org>
+>> Cc: Xu Panda <xu.panda@zte.com.cn>
+>> Cc: Yang Yang <yang.yang29@zte.com>
+>> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> 
+> Agreed, truncation is the current behavior, and padding isn't needed.
+> (Or more precisely, it's already zeroed and this function is called
+> once.)
+> 
+> Reviewed-by: Kees Cook <keescook@chromium.org>
 
-> You could also just not do the copy!
-> Although you need (say) asm volatile("\n",:::"memory") to
-> stop it all being completely optimised away.
-> That might show up a difference in the 'out_of_line' test
-> where 15% on top on the data copies is massive - it may be
-> that the data cache behaviour is very different for the
-> two cases.
+Change looks fine to me too, but for the love of $deity, please use
+a proper subject line for these kinds of patches. It's not refactoring
+anything.
 
-I tried using the following as the load:
-
-	volatile unsigned long foo;
-
-	static __always_inline
-	size_t idle_user_iter(void __user *iter_from, size_t progress,
-			      size_t len, void *to, void *priv2)
-	{
-		nop();
-		nop();
-		foo += (unsigned long)iter_from;
-		foo += (unsigned long)len;
-		foo += (unsigned long)to + progress;
-		nop();
-		nop();
-		return 0;
-	}
-
-	static __always_inline
-	size_t idle_kernel_iter(void *iter_from, size_t progress,
-				size_t len, void *to, void *priv2)
-	{
-		nop();
-		nop();
-		foo += (unsigned long)iter_from;
-		foo += (unsigned long)len;
-		foo += (unsigned long)to + progress;
-		nop();
-		nop();
-		return 0;
-	}
-
-	size_t iov_iter_idle(struct iov_iter *iter, size_t len, void *priv)
-	{
-		return iterate_and_advance(iter, len, priv,
-					   idle_user_iter, idle_kernel_iter);
-	}
-	EXPORT_SYMBOL(iov_iter_idle);
-
-adding various things into a volatile variable to prevent the optimiser from
-discarding the calculations.
-
-I get:
-
- iov_kunit_benchmark_bvec: avg 395 uS, stddev 46 uS
- iov_kunit_benchmark_bvec: avg 397 uS, stddev 38 uS
- iov_kunit_benchmark_bvec: avg 411 uS, stddev 57 uS
- iov_kunit_benchmark_bvec_outofline: avg 781 uS, stddev 5 uS
- iov_kunit_benchmark_bvec_outofline: avg 781 uS, stddev 6 uS
- iov_kunit_benchmark_bvec_outofline: avg 781 uS, stddev 7 uS
- iov_kunit_benchmark_bvec_split: avg 3599 uS, stddev 737 uS
- iov_kunit_benchmark_bvec_split: avg 3664 uS, stddev 838 uS
- iov_kunit_benchmark_bvec_split: avg 3669 uS, stddev 875 uS
- iov_kunit_benchmark_iovec: avg 472 uS, stddev 17 uS
- iov_kunit_benchmark_iovec: avg 506 uS, stddev 59 uS
- iov_kunit_benchmark_iovec: avg 525 uS, stddev 14 uS
- iov_kunit_benchmark_kvec: avg 421 uS, stddev 73 uS
- iov_kunit_benchmark_kvec: avg 428 uS, stddev 68 uS
- iov_kunit_benchmark_kvec: avg 469 uS, stddev 75 uS
- iov_kunit_benchmark_ubuf: avg 1052 uS, stddev 6 uS
- iov_kunit_benchmark_ubuf: avg 1168 uS, stddev 8 uS
- iov_kunit_benchmark_ubuf: avg 1168 uS, stddev 9 uS
- iov_kunit_benchmark_xarray: avg 680 uS, stddev 11 uS
- iov_kunit_benchmark_xarray: avg 682 uS, stddev 20 uS
- iov_kunit_benchmark_xarray: avg 686 uS, stddev 46 uS
- iov_kunit_benchmark_xarray_outofline: avg 1340 uS, stddev 34 uS
- iov_kunit_benchmark_xarray_outofline: avg 1358 uS, stddev 12 uS
- iov_kunit_benchmark_xarray_outofline: avg 1358 uS, stddev 15 uS
-
-where I made the iovec and kvec tests split their buffers into PAGE_SIZE
-segments and the ubuf test issue an iteration per PAGE_SIZE'd chunk.
-Splitting kvec into just 8 results in the iteration taking <1uS.
-
-The bvec_split test is doing a kmalloc() per 256 pages inside of the loop,
-which is why that takes quite a long time.
-
-David
+-- 
+Jens Axboe
 
