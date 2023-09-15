@@ -2,171 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0676EED61F
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 18:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F6BCD379F
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 20:04:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235770AbjIOS2l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 14:28:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38836 "EHLO
+        id S237032AbjIOUDw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 16:03:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236490AbjIOS20 (ORCPT
+        with ESMTP id S231650AbjIOUDY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 14:28:26 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157A2271B
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 11:27:18 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-52a4737a08fso2820409a12.3
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 11:27:17 -0700 (PDT)
+        Fri, 15 Sep 2023 16:03:24 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262B02120
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 13:03:19 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-68fcb4dc8a9so2445842b3a.2
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 13:03:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694802436; x=1695407236; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7TVRLEu9EJ9mGV2bipP8Xm97KGB9uZNTupnuQjSJdsE=;
-        b=sKKT+kRRXdqHAoUZgMTugOxbcrbgqDgkkXjasxrWctWJd77Sw8TlsGuTd98pSRft9A
-         jN/MMQ3oP4/QuTKHBD9/YypfLSNU+2cuvu8u73JxBHsdsSFjo1rojX5WJRXSO1lIrr4X
-         Q/i++DKlLWUNrBbI96a2DUSv9ydwwnivZJKP06X04/cK0r2bQFBArjWiQF6VYJBobiMX
-         PGK/u5s+F2yWQLPEdRhYCODQlNQ8S+qDRhy7Nh2noe1XmCVyac1kWiIlCNg4DMBP7SEd
-         a3S1lxEG5glLqSDYO5PGcLNoSDLKwOIaoa1Db4onOn/2goDJ5rYfzEFwI2eODMv2KWvJ
-         JQEg==
+        d=chromium.org; s=google; t=1694808198; x=1695412998; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vqU6w0o7wis7lXYiV/PtYRUS9jkyqSgo8jH+nv7z2lQ=;
+        b=Te06Ig6yNLnKo+W5QXpfQ3zaH+vcXPDIKySu+D0whY4WIV1UeT8xtsBEYrVekWnXqH
+         JIZzAOcFg4WzkXLSCD0rUvE4HgEnstk4MPd+iAVc9CfRWQPyxAqFrkWgQt6sILxaRGBU
+         7gWmfwAU/AHDovfFDnbFcqVq5XXabFHUAdeWQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694802436; x=1695407236;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7TVRLEu9EJ9mGV2bipP8Xm97KGB9uZNTupnuQjSJdsE=;
-        b=nKUr+SvpE80ctWlTLyYS10WYASqlG+i/+a+Tfmw738j7pti06pSJxGGP4L870++QbK
-         nfZZHi9on6C0wLFKVIdpqXC4hCAKjGW4PVB9KNtcSceU+UBYFbXNP1kbXoIR6OT6w/RY
-         ESXYoRCjoeUqppuWCol1S6XtBQ5p8b+v2QVawpSaKSh3+4Il8Nx3jBRBMe1jsZF4sxGT
-         FgsWtyfzDeaLoBbqwKO0WHTzHGW3BwkxYM9kH4CO/B8zjh5HdQ3IWS0nqne7hR8XT7Q0
-         kCfOxwviVJO6athl5HLH3TaGKWGsD8KwUtkvqBvdMTBJl0bIChqIiGjBuGI9USQQklf+
-         H9zQ==
-X-Gm-Message-State: AOJu0Yydr+ApEBivK47qdKSSFFu3sFgFyaGH0RhE1RHAbnjg1SG2S8Ax
-        /d+ZQDrVbp6RYq5U/FuA5oMo3CjGbr92zzg2YWcGOA==
-X-Google-Smtp-Source: AGHT+IHg0l+d+9eXrE3JQYT1rNSzTJ30WS4x3AxsO8Su5H91K9tA7o+8Ltb2jJoMejIzZEOsQjI7O6t5d3aHWeK0K/E=
-X-Received: by 2002:a17:907:75fb:b0:9a1:f3a6:b906 with SMTP id
- jz27-20020a17090775fb00b009a1f3a6b906mr2140406ejc.36.1694802436299; Fri, 15
- Sep 2023 11:27:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694808198; x=1695412998;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vqU6w0o7wis7lXYiV/PtYRUS9jkyqSgo8jH+nv7z2lQ=;
+        b=rAI6YWjxz2MeDNvxbxPtUghNgs3Vfosbyr5erf7ozRvxkUyLkMK8NX4vy+/4LaUwLq
+         gX37QmzwdpeALb8Z7RpzKqX+t5k04j0X5Ev4QCSwPUhWgdV4CmkFsTUcIYZ3ECClbKL4
+         is/ihoFgKdaOxIs+faQl+BfANqry0fkID9jpKU5HyT6iv1Uj+yPvWEmoZW515GLyOXEO
+         MqqrvvX7z7FuSn7gYK1muGyp69JkQnxbCSoAQz4tTwruzOl1c0XwXeFHmjrk0L8gSUhq
+         qerTAY68wkk32/T22grqHFMJC4ilsppG/IsqXHEKSImyT+12JwjrT+ulH26TtLiyPLDD
+         Zoew==
+X-Gm-Message-State: AOJu0Yyc5OnDaYtq8gglKbFxiENIH/jsC3sQlZx9P+s1yCEzyf5fYCGZ
+        5SUJpC/A9lMh1r1NEnYSnMOCCA==
+X-Google-Smtp-Source: AGHT+IH3OWyboutDfOfAciFvlgHKuWSpCyEFwnnry4+ZcBINS25y0aQgfc+F80nwPUf47he0MSKCZg==
+X-Received: by 2002:a05:6a21:3d82:b0:155:bff3:ea1d with SMTP id bj2-20020a056a213d8200b00155bff3ea1dmr2858114pzc.58.1694808198682;
+        Fri, 15 Sep 2023 13:03:18 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id s24-20020aa78298000000b0068be348e35fsm3327629pfm.166.2023.09.15.13.03.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Sep 2023 13:03:18 -0700 (PDT)
+From:   Kees Cook <keescook@chromium.org>
+To:     Philipp Reisner <philipp.reisner@linbit.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, linux-hardening@vger.kernel.org
+Subject: [PATCH] drbd: Annotate struct fifo_buffer with __counted_by
+Date:   Fri, 15 Sep 2023 13:03:16 -0700
+Message-Id: <20230915200316.never.707-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <CGME20230915095133eucas1p267bade2888b7fcd2e1ea8e13e21c495f@eucas1p2.samsung.com>
- <20230915095042.1320180-1-da.gomez@samsung.com> <20230915095042.1320180-7-da.gomez@samsung.com>
-In-Reply-To: <20230915095042.1320180-7-da.gomez@samsung.com>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Fri, 15 Sep 2023 11:26:37 -0700
-Message-ID: <CAJD7tkbU20tyGxtdL-cqJxrjf38ObG_dUttZdLstH3O2sUTKzw@mail.gmail.com>
-Subject: Re: [PATCH 6/6] shmem: add large folios support to the write path
-To:     Daniel Gomez <da.gomez@samsung.com>
-Cc:     "minchan@kernel.org" <minchan@kernel.org>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "hughd@google.com" <hughd@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1342; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=ZUSAvLi9vR+UNAa6nUlqpsYdl2ki5xpNFUW+QWpv+Gs=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlBLiE6lCzis0gsISR4JNPawG7ZHd60KeU/nnbd
+ V8maTMUfi2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZQS4hAAKCRCJcvTf3G3A
+ JkJlD/9l0pF1aFUgbVK4svrSUi+5O9iGRCXOXyoA8gV9689PopMTI0ye6wlfzm8Md0iYuPfhPXN
+ PiDaHZayfKusmZu960KmvoYn86R3PC7vusckxDFxIgZLKpHbUlrnIEvHyffN6rhQz/U0x3f3FOZ
+ Zo/+lHw5TwwltaJ0UuG4XxTzBmorhPU5VRUUvs8vN9MbJh+Zemw3EIECqisOwSLvIb44xn2EhsQ
+ ik9K5alDkuinwcoxqirtInCYXfVkatpA9hycu0y4BxSbpaHfeLZ8bD7qFGFWPWuSPEkoRqag+5a
+ I/lOP+ADDanjP1tHpdyL++/bWKhxpdzJQ/V4i6+OwO4240bpcoULvIZat0qzQ/Kc4O6E6V2FYEQ
+ If+FqC7XhZfU4OxTEaOECJUi4i1ziEZcD2gyrR4ZOLOD6WhZr7lqtDXhRDtGvCD1vl+/3u/frmE
+ 5DpKvhGaM0oE+x4HjT7CKuptyzLPaNpdjfbLBI26/9nHIWMorznDsuAigef1YyWMjfRg7mDsWyv
+ Wyf2UTzCBZPa4ezkhWjsFB9DAllI18T+IPzhY3S0g70qdnZvZDlJ3fDhraSbUyCE/e2jVgPbvJW
+ 6Tc6rXSm54n7WhP2cU6JIa/9pPv2J0rVcbUYyOqICMjEek0DhJ2EUyUa2umQjR49gGfT1cnVha9
+ e44QrY/ OHYIMW1Q==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 15, 2023 at 2:51=E2=80=AFAM Daniel Gomez <da.gomez@samsung.com>=
- wrote:
->
-> Add large folio support for shmem write path matching the same high
-> order preference mechanism used for iomap buffered IO path as used in
-> __filemap_get_folio().
->
-> Use the __folio_get_max_order to get a hint for the order of the folio
-> based on file size which takes care of the mapping requirements.
->
-> Swap does not support high order folios for now, so make it order 0 in
-> case swap is enabled.
+Prepare for the coming implementation by GCC and Clang of the __counted_by
+attribute. Flexible array members annotated with __counted_by can have
+their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+(for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+functions).
 
-I didn't take a close look at the series, but I am not sure I
-understand the rationale here. Reclaim will split high order shmem
-folios anyway, right?
+As found with Coccinelle[1], add __counted_by for struct fifo_buffer.
 
-It seems like we only enable high order folios if the "noswap" mount
-option is used, which is fairly recent. I doubt it is widely used.
+[1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
 
->
-> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
-> ---
->  mm/shmem.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
->
-> diff --git a/mm/shmem.c b/mm/shmem.c
-> index adff74751065..26ca555b1669 100644
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -1683,13 +1683,19 @@ static struct folio *shmem_alloc_folio(gfp_t gfp,
->  }
->
->  static struct folio *shmem_alloc_and_acct_folio(gfp_t gfp, struct inode =
-*inode,
-> -               pgoff_t index, bool huge, unsigned int *order)
-> +               pgoff_t index, bool huge, unsigned int *order,
-> +               struct shmem_sb_info *sbinfo)
->  {
->         struct shmem_inode_info *info =3D SHMEM_I(inode);
->         struct folio *folio;
->         int nr;
->         int err;
->
-> +       if (!sbinfo->noswap)
-> +               *order =3D 0;
-> +       else
-> +               *order =3D (*order =3D=3D 1) ? 0 : *order;
-> +
->         if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
->                 huge =3D false;
->         nr =3D huge ? HPAGE_PMD_NR : 1U << *order;
-> @@ -2032,6 +2038,8 @@ static int shmem_get_folio_gfp(struct inode *inode,=
- pgoff_t index,
->                 return 0;
->         }
->
-> +       order =3D mapping_size_order(inode->i_mapping, index, len);
-> +
->         if (!shmem_is_huge(inode, index, false,
->                            vma ? vma->vm_mm : NULL, vma ? vma->vm_flags :=
- 0))
->                 goto alloc_nohuge;
-> @@ -2039,11 +2047,11 @@ static int shmem_get_folio_gfp(struct inode *inod=
-e, pgoff_t index,
->         huge_gfp =3D vma_thp_gfp_mask(vma);
->         huge_gfp =3D limit_gfp_mask(huge_gfp, gfp);
->         folio =3D shmem_alloc_and_acct_folio(huge_gfp, inode, index, true=
-,
-> -                                          &order);
-> +                                          &order, sbinfo);
->         if (IS_ERR(folio)) {
->  alloc_nohuge:
->                 folio =3D shmem_alloc_and_acct_folio(gfp, inode, index, f=
-alse,
-> -                                                  &order);
-> +                                                  &order, sbinfo);
->         }
->         if (IS_ERR(folio)) {
->                 int retry =3D 5;
-> @@ -2147,6 +2155,8 @@ static int shmem_get_folio_gfp(struct inode *inode,=
- pgoff_t index,
->         if (folio_test_large(folio)) {
->                 folio_unlock(folio);
->                 folio_put(folio);
-> +               if (order > 0)
-> +                       order--;
->                 goto alloc_nohuge;
->         }
->  unlock:
-> --
-> 2.39.2
->
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linbit.com
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/block/drbd/drbd_int.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index a30a5ed811be..7eecc53fae3d 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -553,7 +553,7 @@ struct fifo_buffer {
+ 	unsigned int head_index;
+ 	unsigned int size;
+ 	int total; /* sum of all values */
+-	int values[];
++	int values[] __counted_by(size);
+ };
+ extern struct fifo_buffer *fifo_alloc(unsigned int fifo_size);
+ 
+-- 
+2.34.1
+
