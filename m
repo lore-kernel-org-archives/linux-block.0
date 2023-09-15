@@ -2,84 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3309DEDE988
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 14:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BA6EED60B
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 15:30:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235475AbjIOOV0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 10:21:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46326 "EHLO
+        id S236075AbjIOPap (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 11:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235323AbjIOOVZ (ORCPT
+        with ESMTP id S236130AbjIOPao (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 10:21:25 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BAEEF3;
-        Fri, 15 Sep 2023 07:21:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HhqRWnfOFQmhtzhnv8gfqh6lm+Imi8Fsr7KKLz7N0CA=; b=ZAFN3W4nMASD2f9xgs7ZQX6ljK
-        ZE54cWK5jw2+Sxw46PIOJA0UT2U5uUkdTZr2k8KtDrXX41eNaAyPpkouQr6gf2KB8iRM8JlWgsjPq
-        t5J8O6xrgRo4ZmbpLLDrG0qoZub5CnCxyF7xiWItr/5duXyu508Qh+WsEzlNdenRG20Q1ZqBJGjrT
-        P3pHnkskJkhMaKdgyszIiS2taMgR4RYA9tvPdRy46Qyos8b+Pf1/YITWhln/UD8jr6YsVX77kS86O
-        Jfgys6odI16/xcwKtGf2mj3NH9cxT2EOf0oVU6upGq60J67ibRP5ZTz6zAZLmzeIzhKi8c1Z+62nx
-        ZyxDzIsg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qh9h3-00ACmq-G6; Fri, 15 Sep 2023 14:21:13 +0000
-Date:   Fri, 15 Sep 2023 15:21:13 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Hannes Reineke <hare@suse.de>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] block: Remove special-casing of compound pages
-Message-ID: <ZQRoWVntO22VWL8K@casper.infradead.org>
-References: <20230814144100.596749-1-willy@infradead.org>
- <94635da5-ce28-a8fb-84e3-7a9f5240fe6a@google.com>
+        Fri, 15 Sep 2023 11:30:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DA5E7E6A
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 08:29:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694791799;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gJpaxC+7Y+75rYPpbOd56ZO18Rl2VH2cz+UAa2NMxbE=;
+        b=UWZrnLiZunK7iSpgOAz9LzJzKseGKbMPvtiBz+1V2NIOOBEksizF3O7aUr0FrTwVvCMDTq
+        W8lsjoLDqTLDffHq+g7vfuH5gWdGlhC6ffopqnttdebauMuIPhF2vHxde0LEkZwsVzwgxS
+        c4nC5Iew79PuzqtA1J9LHvz0VOznBWw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-6mOOLMi4P7mZpf2QZkNUzw-1; Fri, 15 Sep 2023 11:29:57 -0400
+X-MC-Unique: 6mOOLMi4P7mZpf2QZkNUzw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-403ca0e2112so17901275e9.0
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 08:29:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694791796; x=1695396596;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gJpaxC+7Y+75rYPpbOd56ZO18Rl2VH2cz+UAa2NMxbE=;
+        b=pVZ2Tes8anyxDHx58gm9iC7L6gErWf+VvCg+zOGgZd4YsBJHvyWOZs0+LAYuzFfqqs
+         SxO4Vpo/ICaWtVKJtKi6Qw5khFJM4ViUni+Viav/DymMKrtuHtzfKU9Fg4Ib+yzZM2z5
+         Zhgt4awqCdk+UsIFxNCbQI5OKPekBGPAYHd/WmOsA9dJWPJyxg0GkNQPwODwlpnw2NhE
+         ziGwY9gnMBPWxjbtCN/phM0J5FIxzAHx0SLljDZV6CMTG7y2iAWQsCUSNZ2N4Mjryi6n
+         ukBH755AclwS9eDnNAdOCYoFLPro+5ngaHrsTl51PMc2E9NsTzmBtzUuUDzXiuChipE3
+         rimw==
+X-Gm-Message-State: AOJu0YyFw1Y30IQ9q7CH+Z+ICprQgm/fkB5Cm9LPGeliYYWwyFytrzlP
+        JGwfP7R5r335qoBf4DtDRVl4tP3kQsIOEjtLtMdjcKVVnbJ9N8MycrkHeVNSQepHpzf16+lYSbB
+        /46X1xC3nuhioakmE1Z12FIY=
+X-Received: by 2002:a05:600c:2293:b0:3fe:5501:d293 with SMTP id 19-20020a05600c229300b003fe5501d293mr1986146wmf.30.1694791796359;
+        Fri, 15 Sep 2023 08:29:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFIrjtSY3mCEdjzBASUXOKYz2giyEwV+Sal1jqwjEXeA8+EAYhUpoZN7WSinZRhK3GWPQUqaw==
+X-Received: by 2002:a05:600c:2293:b0:3fe:5501:d293 with SMTP id 19-20020a05600c229300b003fe5501d293mr1986111wmf.30.1694791795956;
+        Fri, 15 Sep 2023 08:29:55 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c728:e000:a4bd:1c35:a64e:5c70? (p200300cbc728e000a4bd1c35a64e5c70.dip0.t-ipconnect.de. [2003:cb:c728:e000:a4bd:1c35:a64e:5c70])
+        by smtp.gmail.com with ESMTPSA id l26-20020a056000023a00b0031ff1ef7dc0sm1867385wrz.66.2023.09.15.08.29.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Sep 2023 08:29:55 -0700 (PDT)
+Message-ID: <b8f75b8e-77f5-4aa1-ce73-6c90f7d87d43@redhat.com>
+Date:   Fri, 15 Sep 2023 17:29:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <94635da5-ce28-a8fb-84e3-7a9f5240fe6a@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 0/6] shmem: high order folios support in write path
+Content-Language: en-US
+To:     Daniel Gomez <da.gomez@samsung.com>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "hughd@google.com" <hughd@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>
+Cc:     "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+References: <CGME20230915095123eucas1p2c23d8a8d910f5a8e9fd077dd9579ad0a@eucas1p2.samsung.com>
+ <20230915095042.1320180-1-da.gomez@samsung.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20230915095042.1320180-1-da.gomez@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 16, 2023 at 01:27:17PM -0700, Hugh Dickins wrote:
-> > This problem predates the folio work; it could for example have been
-> > triggered by mmaping a THP in tmpfs and using that as the target of an
-> > O_DIRECT read.
-> > 
-> > Fixes: 800d8c63b2e98 ("shmem: add huge pages support")
+On 15.09.23 11:51, Daniel Gomez wrote:
+> This series add support for high order folios in shmem write
+> path.
 > 
-> No. It's a good catch, but bug looks specific to the folio work to me.
+> This is a continuation of the shmem work from Luis here [1]
+> following Matthew Wilcox's suggestion [2] regarding the path to take
+> for the folio allocation order calculation.
 > 
-> Almost all shmem pages are dirty from birth, even as soon as they are
-> brought back from swap; so it is not necessary to re-mark them dirty.
+> [1] RFC v2 add support for blocksize > PAGE_SIZE
+> https://lore.kernel.org/all/ZHBowMEDfyrAAOWH@bombadil.infradead.org/T/#md3e93ab46ce2ad9254e1eb54ffe71211988b5632
+> [2] https://lore.kernel.org/all/ZHD9zmIeNXICDaRJ@casper.infradead.org/
 > 
-> The exceptions are pages allocated to holes when faulted: so you did
-> get me worried as to whether khugepaged could collapse a pmd-ful of
-> those into a THP without marking the result as dirty.
+> Patches have been tested and sent from next-230911. They do apply
+> cleanly to the latest next-230914.
 > 
-> But no, in v6.5-rc6 the collapse_file() success path has
-> 	if (is_shmem)
-> 		folio_mark_dirty(folio);
-> and in v5.10 the same appears as
-> 		if (is_shmem)
-> 			set_page_dirty(new_page);
+> fsx and fstests has been performed on tmpfs with noswap with the
+> following results:
+> - fsx: 2d test, 21,5B
+> - fstests: Same result as baseline for next-230911 [3][4][5]
 > 
-> (IIRC, that or marking pmd dirty was missed from early shmem THP
-> support, but fairly soon corrected, and backported to stable then.
-> I have a faint memory of versions which assembled pmd_dirty from
-> collected pte_dirtys.)
+> [3] Baseline next-230911 failures are: generic/080 generic/126
+> generic/193 generic/633 generic/689
+> [4] fstests logs baseline: https://gitlab.com/-/snippets/3598621
+> [5] fstests logs patches: https://gitlab.com/-/snippets/3598628
 > 
-> And the !is_shmem case is for CONFIG_READ_ONLY_THP_FOR_FS: writing
-> into those pages, by direct IO or whatever, is already prohibited.
-> 
-> It's dem dirty (or not dirty) folios dat's the trouble!
+> There are at least 2 cases/topics to handle that I'd appreciate
+> feedback.
+> 1. With the new strategy, you might end up with a folio order matching
+> HPAGE_PMD_ORDER. However, we won't respect the 'huge' flag anymore if
+> THP is enabled.
+> 2. When the above (1.) occurs, the code skips the huge path, so
+> xa_find with hindex is skipped.
 
-Thanks for the correction!  Could it happen with anon THP?
-They're not kept dirty from birth ... are they?
+Similar to large anon folios (but different to large non-shmem folios in 
+the pagecache), this can result in memory waste.
+
+We discussed that topic in the last bi-weekly mm meeting, and also how 
+to eventually configure that for shmem.
+
+Refer to of a summary. [1]
+
+[1] https://lkml.kernel.org/r/4966f496-9f71-460c-b2ab-8661384ce626@arm.com
+
+-- 
+Cheers,
+
+David / dhildenb
+
