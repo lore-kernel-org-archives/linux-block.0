@@ -2,107 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 127BBEE645D
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 13:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FEEDEE645C
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 13:40:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235372AbjIONgt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 09:36:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54222 "EHLO
+        id S235392AbjIONkZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 09:40:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234575AbjIONgt (ORCPT
+        with ESMTP id S235250AbjIONkY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 09:36:49 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA9FC2120
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 06:36:42 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-760dff4b701so32369539f.0
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 06:36:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1694785002; x=1695389802; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FyfUX0X2fmtB6PX68eelYyAoJB8jxcCYoU3jaj8MsYM=;
-        b=ydn4D9Jfxv5BuKoSlCNrEbvb0wmF/UhEs+33XosPhhKT/yK+jMCISrZt2wgU4HM87v
-         7KCXIviagDEc8M7npSAwopV0CkjU8APIaZPrZxk+TLvqRSEezoC3ZIpQCjSIBaQxANVK
-         biaVcG0RgFfe94C6GxLy9OSgNAXZHmFD38xMHM4ee4yX7mvOaZG/ucotanKldb1ciNIA
-         pwD8BOE0GACYkaxnmil2tFmNtlj1vwN+8aw9OqRqby4m/JpHwA6riYYpJZ7MnvSJCba8
-         bHCFt6A5CDU3LboM1AyBTUxoRG36YW/tzua93QCiPMyEKHsndpENAp9VlejjaE2tqKn+
-         rkYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694785002; x=1695389802;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FyfUX0X2fmtB6PX68eelYyAoJB8jxcCYoU3jaj8MsYM=;
-        b=RMoAG1iWauHXjeJmprdxcSxJdiCMDUWGY1QL7D9SNhSLc0emgCVGePgpop6Cl3EAzM
-         YLb6WExQZSfXXg5GinG9zl7a7yhaAleU1qMFAsugAZD8UIpTCdNMgDbgEwewCUApm1rR
-         PKCde7h2qbyg7hZVPYbM2j/fMCel1oBGaXMslW+sPlipTv+B7H5B/P6wfqQ1lHUsDqoa
-         hHPpTaNR9MNqdxk8ImTOiJ4upoXXXoAxCuULKvccru0LtObkpP7ZGM5Va6toiaMIW2+J
-         GbrUZP9LGOfIVT0Pi1cTZ3yqsUTHNOMIZpjlcDKyBlv7tqRCPOSeIuSRMn1XQeK26A2b
-         PZww==
-X-Gm-Message-State: AOJu0YxLpjwRZ8XDrjtq/666Ux9mIb2TkyzbdE2uHpUdFbZ6lpx60ID3
-        vLQDRG2OMaOP0pcqYtC67Wfgpg==
-X-Google-Smtp-Source: AGHT+IH9FFVy2H1yFJjidsyCoasweVzlcw3vqMkLY4wA397WlW2CuAHpeyoGIJF6lW3TWHiGyUOvwQ==
-X-Received: by 2002:a05:6602:17c9:b0:792:6dd8:a65f with SMTP id z9-20020a05660217c900b007926dd8a65fmr1530583iox.0.1694785002301;
-        Fri, 15 Sep 2023 06:36:42 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id b12-20020a02c98c000000b0042b6940b793sm1024607jap.17.2023.09.15.06.36.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Sep 2023 06:36:41 -0700 (PDT)
-Message-ID: <6338fbac-0177-43eb-be4f-7c586956953f@kernel.dk>
-Date:   Fri, 15 Sep 2023 07:36:40 -0600
+        Fri, 15 Sep 2023 09:40:24 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 431651BEB;
+        Fri, 15 Sep 2023 06:40:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=I+/YKQ4i+/r6yo756aOfG+7UGEVhIuZROLbZ9WTDM80=; b=Q4md8y4/PXXCS6tFFXDCy+1Czx
+        d1uDYKzf8x3eeThB0v0clHgFcJllTbJ/w+dM5rjEDs5ESW0hubWUmOtTW/Y73skTLMG0JAo4hZSDE
+        lv5TM8HdRzUdIQ1Q85nKx+zVtMEPNzscnYBZzmYj+Y07Z8jMeCbtvzO01G5iekEMJtwyI/0Hb+nI4
+        c4HqyL1w0pNyrxMo/8iQRiyG7Q+lUiCtDZQxtNcGxf8IGUjO35cUCFccj3Syt8iKHPNYnULskYB6I
+        A40s8+3gs8SVNvuf20h5Lvs0o91dLEKLPp0AkFXpGkL26fO9eKxcZFBEnOVEs5LV0rYcrr0WtNK0S
+        mkSA6d3A==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qh93H-009z79-Vc; Fri, 15 Sep 2023 13:40:08 +0000
+Date:   Fri, 15 Sep 2023 14:40:07 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Daniel Gomez <da.gomez@samsung.com>
+Cc:     "minchan@kernel.org" <minchan@kernel.org>,
+        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "hughd@google.com" <hughd@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCH 1/6] filemap: make the folio order calculation shareable
+Message-ID: <ZQRet4w5VSbvKvKB@casper.infradead.org>
+References: <20230915095042.1320180-1-da.gomez@samsung.com>
+ <CGME20230915095124eucas1p1eb0e0ef883f6316cf14c349404a51150@eucas1p1.samsung.com>
+ <20230915095042.1320180-2-da.gomez@samsung.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] aoe: refactor deprecated strncpy
-Content-Language: en-US
-To:     Kees Cook <keescook@chromium.org>,
-        Justin Stitt <justinstitt@google.com>
-Cc:     Justin Sanders <justin@coraid.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        Xu Panda <xu.panda@zte.com.cn>, Yang Yang <yang.yang29@zte.com>
-References: <20230911-strncpy-drivers-block-aoe-aoenet-c-v1-1-9643d6137ff9@google.com>
- <202309142019.23A7D80A@keescook>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <202309142019.23A7D80A@keescook>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230915095042.1320180-2-da.gomez@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/14/23 9:21 PM, Kees Cook wrote:
-> On Mon, Sep 11, 2023 at 09:09:07PM +0000, Justin Stitt wrote:
->> `strncpy` is deprecated for use on NUL-terminated destination strings [1].
->>
->> `aoe_iflist` is expected to be NUL-terminated which is evident by its
->> use with string apis later on like `strspn`:
->> | 	p = aoe_iflist + strspn(aoe_iflist, WHITESPACE);
->>
->> It also seems `aoe_iflist` does not need to be NUL-padded which means
->> `strscpy` [2] is a suitable replacement due to the fact that it
->> guarantees NUL-termination on the destination buffer while not
->> unnecessarily NUL-padding.
->>
->> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
->> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
->> Link: https://github.com/KSPP/linux/issues/90
->> Cc: linux-hardening@vger.kernel.org
->> Cc: Kees Cook <keescook@chromium.org>
->> Cc: Xu Panda <xu.panda@zte.com.cn>
->> Cc: Yang Yang <yang.yang29@zte.com>
->> Signed-off-by: Justin Stitt <justinstitt@google.com>
+On Fri, Sep 15, 2023 at 09:51:23AM +0000, Daniel Gomez wrote:
+> To make the code that clamps the folio order in the __filemap_get_folio
+> routine reusable to others, move and merge it to the fgf_set_order
+> new subroutine (mapping_size_order), so when mapping the size at a
+> given index, the order calculated is already valid and ready to be
+> used when order is retrieved from fgp_flags with FGF_GET_ORDER.
 > 
-> Agreed, truncation is the current behavior, and padding isn't needed.
-> (Or more precisely, it's already zeroed and this function is called
-> once.)
-> 
-> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+> ---
+>  fs/iomap/buffered-io.c  |  6 ++++--
+>  include/linux/pagemap.h | 42 ++++++++++++++++++++++++++++++++++++-----
+>  mm/filemap.c            |  8 --------
+>  3 files changed, 41 insertions(+), 15 deletions(-)
 
-Change looks fine to me too, but for the love of $deity, please use
-a proper subject line for these kinds of patches. It's not refactoring
-anything.
+That seems like a lot of extra code to add in order to avoid copying
+six lines of code and one comment into the shmem code.
 
--- 
-Jens Axboe
-
+It's not wrong, but it seems like a bad tradeoff to me.
