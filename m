@@ -2,134 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E01EED61E
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 17:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0676EED61F
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 18:29:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235732AbjIOR2f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 13:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59560 "EHLO
+        id S235770AbjIOS2l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 14:28:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236118AbjIOR2c (ORCPT
+        with ESMTP id S236490AbjIOS20 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 13:28:32 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3341BF2;
-        Fri, 15 Sep 2023 10:28:27 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C91941F74D;
-        Fri, 15 Sep 2023 17:28:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1694798905; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jYlrXr9COsiXTqZelDYIvgSCoIEmwG74Vx0nCHq6QF4=;
-        b=Ri5ozDQmN+12TtSf7/86mvip2TrUxYmT0KtDA2adIhQWfaJ8nbofS2/7HSdjGItU1HaKF9
-        CU6HlSSYBR23C33IfBEmcqKS14SH6mstqOm3r4FlPvZqoxlLgggMXsz1kkBHIGO5nnmiUJ
-        OUvvykuDidP7HORcTXLRznxgIQPIXXY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1694798905;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jYlrXr9COsiXTqZelDYIvgSCoIEmwG74Vx0nCHq6QF4=;
-        b=yN+SOk2sDHFaDDAew0tRGThDY9EavXDcQkSD3mtfLV16TSOHJIRvZf2OYKiTRfnJ5LdT3m
-        IwT7IIdzFpVqV+CQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B528F1358A;
-        Fri, 15 Sep 2023 17:28:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 6Cw/LDmUBGXtTwAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 15 Sep 2023 17:28:25 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 43D39A0759; Fri, 15 Sep 2023 19:28:25 +0200 (CEST)
-Date:   Fri, 15 Sep 2023 19:28:25 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     David Sterba <dsterba@suse.cz>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Denis Efremov <efremov@linux.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-s390@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: remove get_super
-Message-ID: <20230915172825.xedwomfct3sc6ars@quack3>
-References: <20230811100828.1897174-1-hch@lst.de>
- <20230912174245.GC20408@twin.jikos.cz>
- <20230914084809.arzw34svsvvkwivm@quack3>
- <20230914120320.GY20408@suse.cz>
+        Fri, 15 Sep 2023 14:28:26 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157A2271B
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 11:27:18 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-52a4737a08fso2820409a12.3
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 11:27:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694802436; x=1695407236; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7TVRLEu9EJ9mGV2bipP8Xm97KGB9uZNTupnuQjSJdsE=;
+        b=sKKT+kRRXdqHAoUZgMTugOxbcrbgqDgkkXjasxrWctWJd77Sw8TlsGuTd98pSRft9A
+         jN/MMQ3oP4/QuTKHBD9/YypfLSNU+2cuvu8u73JxBHsdsSFjo1rojX5WJRXSO1lIrr4X
+         Q/i++DKlLWUNrBbI96a2DUSv9ydwwnivZJKP06X04/cK0r2bQFBArjWiQF6VYJBobiMX
+         PGK/u5s+F2yWQLPEdRhYCODQlNQ8S+qDRhy7Nh2noe1XmCVyac1kWiIlCNg4DMBP7SEd
+         a3S1lxEG5glLqSDYO5PGcLNoSDLKwOIaoa1Db4onOn/2goDJ5rYfzEFwI2eODMv2KWvJ
+         JQEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694802436; x=1695407236;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7TVRLEu9EJ9mGV2bipP8Xm97KGB9uZNTupnuQjSJdsE=;
+        b=nKUr+SvpE80ctWlTLyYS10WYASqlG+i/+a+Tfmw738j7pti06pSJxGGP4L870++QbK
+         nfZZHi9on6C0wLFKVIdpqXC4hCAKjGW4PVB9KNtcSceU+UBYFbXNP1kbXoIR6OT6w/RY
+         ESXYoRCjoeUqppuWCol1S6XtBQ5p8b+v2QVawpSaKSh3+4Il8Nx3jBRBMe1jsZF4sxGT
+         FgsWtyfzDeaLoBbqwKO0WHTzHGW3BwkxYM9kH4CO/B8zjh5HdQ3IWS0nqne7hR8XT7Q0
+         kCfOxwviVJO6athl5HLH3TaGKWGsD8KwUtkvqBvdMTBJl0bIChqIiGjBuGI9USQQklf+
+         H9zQ==
+X-Gm-Message-State: AOJu0Yydr+ApEBivK47qdKSSFFu3sFgFyaGH0RhE1RHAbnjg1SG2S8Ax
+        /d+ZQDrVbp6RYq5U/FuA5oMo3CjGbr92zzg2YWcGOA==
+X-Google-Smtp-Source: AGHT+IHg0l+d+9eXrE3JQYT1rNSzTJ30WS4x3AxsO8Su5H91K9tA7o+8Ltb2jJoMejIzZEOsQjI7O6t5d3aHWeK0K/E=
+X-Received: by 2002:a17:907:75fb:b0:9a1:f3a6:b906 with SMTP id
+ jz27-20020a17090775fb00b009a1f3a6b906mr2140406ejc.36.1694802436299; Fri, 15
+ Sep 2023 11:27:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914120320.GY20408@suse.cz>
+References: <CGME20230915095133eucas1p267bade2888b7fcd2e1ea8e13e21c495f@eucas1p2.samsung.com>
+ <20230915095042.1320180-1-da.gomez@samsung.com> <20230915095042.1320180-7-da.gomez@samsung.com>
+In-Reply-To: <20230915095042.1320180-7-da.gomez@samsung.com>
+From:   Yosry Ahmed <yosryahmed@google.com>
+Date:   Fri, 15 Sep 2023 11:26:37 -0700
+Message-ID: <CAJD7tkbU20tyGxtdL-cqJxrjf38ObG_dUttZdLstH3O2sUTKzw@mail.gmail.com>
+Subject: Re: [PATCH 6/6] shmem: add large folios support to the write path
+To:     Daniel Gomez <da.gomez@samsung.com>
+Cc:     "minchan@kernel.org" <minchan@kernel.org>,
+        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "hughd@google.com" <hughd@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 14-09-23 14:03:20, David Sterba wrote:
-> On Thu, Sep 14, 2023 at 10:48:09AM +0200, Jan Kara wrote:
-> > On Tue 12-09-23 19:42:45, David Sterba wrote:
-> > > On Fri, Aug 11, 2023 at 12:08:11PM +0200, Christoph Hellwig wrote:
-> > > > Hi all,
-> > > > 
-> > > > this series against the VFS vfs.super branch finishes off the work to remove
-> > > > get_super and move (almost) all upcalls to use the holder ops.
-> > > > 
-> > > > The first part is the missing btrfs bits so that all file systems use the
-> > > > super_block as holder.
-> > > > 
-> > > > The second part is various block driver cleanups so that we use proper
-> > > > interfaces instead of raw calls to __invalidate_device and fsync_bdev.
-> > > > 
-> > > > The last part than replaces __invalidate_device and fsync_bdev with upcalls
-> > > > to the file system through the holder ops, and finally removes get_super.
-> > > > 
-> > > > It leaves user_get_super and get_active_super around.  The former is not
-> > > > used for upcalls in the traditional sense, but for legacy UAPI that for
-> > > > some weird reason take a dev_t argument (ustat) or a block device path
-> > > > (quotactl).  get_active_super is only used for calling into the file system
-> > > > on freeze and should get a similar treatment, but given that Darrick has
-> > > > changes to that code queued up already this will be handled in the next
-> > > > merge window.
-> > > > 
-> > > > A git tree is available here:
-> > > > 
-> > > >     git://git.infradead.org/users/hch/misc.git remove-get_super
-> > > 
-> > > FYI, I've added patches 2-5 as a topic branch to btrfs for-next.
-> > 
-> > Hum, I don't see them there. Some glitch somewhere?
-> 
-> There will be a delay before the patches show up in the pushed for-next
-> branch, some tests failed (maybe not related to this series) and there
-> are other merge conflicts that I need to resolve first.
+On Fri, Sep 15, 2023 at 2:51=E2=80=AFAM Daniel Gomez <da.gomez@samsung.com>=
+ wrote:
+>
+> Add large folio support for shmem write path matching the same high
+> order preference mechanism used for iomap buffered IO path as used in
+> __filemap_get_folio().
+>
+> Use the __folio_get_max_order to get a hint for the order of the folio
+> based on file size which takes care of the mapping requirements.
+>
+> Swap does not support high order folios for now, so make it order 0 in
+> case swap is enabled.
 
-Thanks for picking up the patches, I can see them in your tree now. But
-I've also noticed (by comparing my local branch with your tree), that in
-this series is also a patch 6/17 "btrfs: use the super_block as holder when
-mounting file systems" which you didn't pick up. It actually fixes block
-device freezing for btrfs as a sideeffect as Christian found out [1]. Can
-you please pick it up as well? Thanks!
+I didn't take a close look at the series, but I am not sure I
+understand the rationale here. Reclaim will split high order shmem
+folios anyway, right?
 
-								Honza
+It seems like we only enable high order folios if the "noswap" mount
+option is used, which is fairly recent. I doubt it is widely used.
 
-[1] https://lore.kernel.org/all/20230908-merklich-bebauen-11914a630db4@brauner
-
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>
+> Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+> ---
+>  mm/shmem.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+>
+> diff --git a/mm/shmem.c b/mm/shmem.c
+> index adff74751065..26ca555b1669 100644
+> --- a/mm/shmem.c
+> +++ b/mm/shmem.c
+> @@ -1683,13 +1683,19 @@ static struct folio *shmem_alloc_folio(gfp_t gfp,
+>  }
+>
+>  static struct folio *shmem_alloc_and_acct_folio(gfp_t gfp, struct inode =
+*inode,
+> -               pgoff_t index, bool huge, unsigned int *order)
+> +               pgoff_t index, bool huge, unsigned int *order,
+> +               struct shmem_sb_info *sbinfo)
+>  {
+>         struct shmem_inode_info *info =3D SHMEM_I(inode);
+>         struct folio *folio;
+>         int nr;
+>         int err;
+>
+> +       if (!sbinfo->noswap)
+> +               *order =3D 0;
+> +       else
+> +               *order =3D (*order =3D=3D 1) ? 0 : *order;
+> +
+>         if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
+>                 huge =3D false;
+>         nr =3D huge ? HPAGE_PMD_NR : 1U << *order;
+> @@ -2032,6 +2038,8 @@ static int shmem_get_folio_gfp(struct inode *inode,=
+ pgoff_t index,
+>                 return 0;
+>         }
+>
+> +       order =3D mapping_size_order(inode->i_mapping, index, len);
+> +
+>         if (!shmem_is_huge(inode, index, false,
+>                            vma ? vma->vm_mm : NULL, vma ? vma->vm_flags :=
+ 0))
+>                 goto alloc_nohuge;
+> @@ -2039,11 +2047,11 @@ static int shmem_get_folio_gfp(struct inode *inod=
+e, pgoff_t index,
+>         huge_gfp =3D vma_thp_gfp_mask(vma);
+>         huge_gfp =3D limit_gfp_mask(huge_gfp, gfp);
+>         folio =3D shmem_alloc_and_acct_folio(huge_gfp, inode, index, true=
+,
+> -                                          &order);
+> +                                          &order, sbinfo);
+>         if (IS_ERR(folio)) {
+>  alloc_nohuge:
+>                 folio =3D shmem_alloc_and_acct_folio(gfp, inode, index, f=
+alse,
+> -                                                  &order);
+> +                                                  &order, sbinfo);
+>         }
+>         if (IS_ERR(folio)) {
+>                 int retry =3D 5;
+> @@ -2147,6 +2155,8 @@ static int shmem_get_folio_gfp(struct inode *inode,=
+ pgoff_t index,
+>         if (folio_test_large(folio)) {
+>                 folio_unlock(folio);
+>                 folio_put(folio);
+> +               if (order > 0)
+> +                       order--;
+>                 goto alloc_nohuge;
+>         }
+>  unlock:
+> --
+> 2.39.2
+>
