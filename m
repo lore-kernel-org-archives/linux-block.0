@@ -2,65 +2,60 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E3BCD37B0
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 22:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FA48CD37AD
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 22:23:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237728AbjIOWQu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 18:16:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57262 "EHLO
+        id S236475AbjIOWWm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 18:22:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237822AbjIOWQX (ORCPT
+        with ESMTP id S238039AbjIOWWg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 18:16:23 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68478268F
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 15:16:18 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 02DBAC433BA;
-        Fri, 15 Sep 2023 22:16:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694816178;
-        bh=qlEhSYHo8svPRlX462l5zLC6y2hf8eqi9KMrzh+xPrY=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=fRlFxnCtTCc9EjITZN16mRQBApViYbaApq9ATbjHSKyvvn1bdPWQPgTWoBidFEzOb
-         bnoAI4/Jh6O1BlJwEAwepfaEMXHdjj/GNNnCT4viCS6rC1i4VGQVU+y7r2NGTIMZRo
-         HYg6oiYeL7fo37UoZzw6y8WLWw1hEmWlVrORBrRT1tUwW55lGSZTUk20pR5Rv310IN
-         UUVfg4gDQePw259N/y5sUxZGAp+NMTVykqG3NRliTBPc2i0PP6CedpJFBI916HN0Kl
-         0xZIGUmVSJJC36PjB99/Uq37hngsxqaKQpPJtszUS7t8GXmBEBqiEhm+1+0HRygqvR
-         qnl+IpaHREj5A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E65E3E26882;
-        Fri, 15 Sep 2023 22:16:17 +0000 (UTC)
-Subject: Re: [dm-devel] [git pull] device mapper fixes for 6.6-rc2
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <ZQTCEOrIV+JmvfIE@redhat.com>
-References: <ZQTCEOrIV+JmvfIE@redhat.com>
-X-PR-Tracked-List-Id: device-mapper development <dm-devel.redhat.com>
-X-PR-Tracked-Message-Id: <ZQTCEOrIV+JmvfIE@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.6/dm-fixes
-X-PR-Tracked-Commit-Id: a9ce385344f916cd1c36a33905e564f5581beae9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e39bfb5925ffac1688cd053d49792a764590bae2
-Message-Id: <169481617793.11838.15746982873328147675.pr-tracker-bot@kernel.org>
-Date:   Fri, 15 Sep 2023 22:16:17 +0000
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, Mikulas Patocka <mpatocka@redhat.com>,
-        Alasdair G Kergon <agk@redhat.com>
+        Fri, 15 Sep 2023 18:22:36 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BC823A91;
+        Fri, 15 Sep 2023 15:20:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=stKfa1bVkKPha42Sjnuc16U1G8MgPCtAaZubw65nLYs=; b=lacb2tD7cU3dvbjmLaOqTtWQic
+        x5sTyne0eSTLoCZvgKBVrTb5s4uvU1T/m7LyE6vYFPvAGppYB/NEW3PpZVTea1Hg8ibC6ad9WTKzE
+        +eMP9wyXvHnzN4R8+z0GgkAJp5dziHCJqm3kP794Jl6Eeu49qdS8F17dkrw/HprSCj+qacE2eDWZg
+        9uFDTKOvgXsukYwJAvb/mRVGDTDyQ2JXT+9KQjH34GVtEtfl8r6eeiAI/KOti/LvKA1k9/lmuV5T6
+        cfbr//vixZiDr0HRyb6O+u+NPCUmF524ztzWqYvAl6+hCAs8eDFKk+g260XRzVlX3lhYRwy8F4RaQ
+        yiDAnroA==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qhHB1-00CQBX-ST; Fri, 15 Sep 2023 22:20:39 +0000
+Date:   Fri, 15 Sep 2023 23:20:39 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     hch@infradead.org, djwong@kernel.org, dchinner@redhat.com,
+        kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
+        brauner@kernel.org, hare@suse.de, ritesh.list@gmail.com,
+        rgoldwyn@suse.com, jack@suse.cz, ziy@nvidia.com,
+        ryan.roberts@arm.com, patches@lists.linux.dev,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, p.raghav@samsung.com,
+        da.gomez@samsung.com, dan.helmick@samsung.com
+Subject: Re: [RFC v2 07/10] nvme: enhance max supported LBA format check
+Message-ID: <ZQTYt9qG0AxhgR4I@casper.infradead.org>
+References: <20230915213254.2724586-1-mcgrof@kernel.org>
+ <20230915213254.2724586-8-mcgrof@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230915213254.2724586-8-mcgrof@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 15 Sep 2023 16:44:00 -0400:
+On Fri, Sep 15, 2023 at 02:32:51PM -0700, Luis Chamberlain wrote:
+> +/* XXX: shift 20 (1 MiB LBA) crashes on pure-iomap */
+> +#define NVME_MAX_SHIFT_SUPPORTED 19
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.6/dm-fixes
+I imagine somewhere we do a PAGE_SIZE << 20 and it overflows an int to 0.
+I've been trying to use size_t everywhere, but we probably missed
+something.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e39bfb5925ffac1688cd053d49792a764590bae2
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Does 19 work on a machine with 64kB pages?  My guess is no.
