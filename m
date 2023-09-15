@@ -2,55 +2,38 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9235DEE644B
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 10:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 720B5EE6456
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 10:52:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234208AbjIOKLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 06:11:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47092 "EHLO
+        id S233969AbjIOKwM convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 06:52:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234185AbjIOKLx (ORCPT
+        with ESMTP id S233834AbjIOKwK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 06:11:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 81A2B2D68
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 03:10:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694772636;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5U61MhzJI73OJTFzPfDsmy/XLiTcwMLxEtjvstIs+RY=;
-        b=fK5LpLKnWXf9jnwTh0Pj/EwgJZMf2dvw5VHu1q+uB04VFsr/m95/sG2lqSfnR6mYkfOqyQ
-        amh6Uo5Faj5NN0AnTrh20sRwTRGdgI7QwlWQkKWxmFkiEmgCeDpcYlsB2kLcUS0GFDXFXZ
-        ahJNRLsPUhdhCRbpSMuoOuMB9f1HIXM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-396-u5N0xklJP8-lgLuGgb9A3w-1; Fri, 15 Sep 2023 06:10:32 -0400
-X-MC-Unique: u5N0xklJP8-lgLuGgb9A3w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B637A85A5A8;
-        Fri, 15 Sep 2023 10:10:31 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 388F240C2070;
-        Fri, 15 Sep 2023 10:10:28 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com>
-References: <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com> <20230914221526.3153402-1-dhowells@redhat.com> <20230914221526.3153402-10-dhowells@redhat.com>
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Fri, 15 Sep 2023 06:52:10 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 67F88E6E
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 03:51:52 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-225-CvPY7ioKPtWKGGdbPunc0A-1; Fri, 15 Sep 2023 11:51:40 +0100
+X-MC-Unique: CvPY7ioKPtWKGGdbPunc0A-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 15 Sep
+ 2023 11:51:36 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 15 Sep 2023 11:51:36 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Howells' <dhowells@redhat.com>
+CC:     Al Viro <viro@zeniv.linux.org.uk>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Christian Brauner" <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Brendan Higgins" <brendanhiggins@google.com>,
+        Jens Axboe <axboe@kernel.dk>, "Christoph Hellwig" <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        "Matthew Wilcox" <willy@infradead.org>,
+        Brendan Higgins <brendanhiggins@google.com>,
         David Gow <davidgow@google.com>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -61,46 +44,77 @@ Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Christian Brauner <brauner@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
+        "David Hildenbrand" <david@redhat.com>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
+Subject: RE: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for
+ UBUF/IOVEC
+Thread-Topic: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for
+ UBUF/IOVEC
+Thread-Index: AQHZ51kQ26Nrcgq1TkqWWiI5nPv6dLAbdkPggAAj+YCAABqPYA==
+Date:   Fri, 15 Sep 2023 10:51:36 +0000
+Message-ID: <5017b9fa177f4deaa5d481a5d8914ab4@AcuMS.aculab.com>
+References: <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com>
+ <20230914221526.3153402-1-dhowells@redhat.com>
+ <20230914221526.3153402-10-dhowells@redhat.com>
+ <3370515.1694772627@warthog.procyon.org.uk>
+In-Reply-To: <3370515.1694772627@warthog.procyon.org.uk>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3370514.1694772627.1@warthog.procyon.org.uk>
-Date:   Fri, 15 Sep 2023 11:10:27 +0100
-Message-ID: <3370515.1694772627@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Laight <David.Laight@ACULAB.COM> wrote:
-
-> > Add kunit tests to benchmark 256MiB copies to a UBUF iterator and an IOVEC
-> > iterator.  This attaches a userspace VM with a mapped file in it
-> > temporarily to the test thread.
+From: David Howells
+> Sent: 15 September 2023 11:10
 > 
-> Isn't that going to be completely dominated by the cache fills
-> from memory?
+> David Laight <David.Laight@ACULAB.COM> wrote:
+> 
+> > > Add kunit tests to benchmark 256MiB copies to a UBUF iterator and an IOVEC
+> > > iterator.  This attaches a userspace VM with a mapped file in it
+> > > temporarily to the test thread.
+> >
+> > Isn't that going to be completely dominated by the cache fills
+> > from memory?
+> 
+> Yes...  but it should be consistent in the amount of time that consumes since
+> no device drivers are involved.  I can try adding the same folio to the
+> anon_file multiple times - it might work especially if I don't put the pages
+> on the LRU (if that's even possible) - but I wanted separate pages for the
+> extraction test.
 
-Yes...  but it should be consistent in the amount of time that consumes since
-no device drivers are involved.  I can try adding the same folio to the
-anon_file multiple times - it might work especially if I don't put the pages
-on the LRU (if that's even possible) - but I wanted separate pages for the
-extraction test.
+You could also just not do the copy!
+Although you need (say) asm volatile("\n",:::"memory") to
+stop it all being completely optimised away.
+That might show up a difference in the 'out_of_line' test
+where 15% on top on the data copies is massive - it may be
+that the data cache behaviour is very different for the
+two cases.
 
-> I'd have thought you'd need to use something with a lot of
-> small fragments so that the iteration code dominates the copy.
+...
+> > Some measurements can be made using readv() and writev()
+> > on /dev/zero and /dev/null.
+> 
+> Forget /dev/null; that doesn't actually engage any iteration code.  The same
+> for writing to /dev/zero.  Reading from /dev/zero does its own iteration thing
+> rather than using iterate_and_advance(), presumably because it checks for
+> signals and resched.
 
-That would actually be a separate benchmark case which I should try also.
+Using /dev/null does exercise the 'copy iov from user' code.
+Last time I looked at that the 32bit compat code was faster than
+the 64bit code on x86!
 
-> Some measurements can be made using readv() and writev()
-> on /dev/zero and /dev/null.
+	David
 
-Forget /dev/null; that doesn't actually engage any iteration code.  The same
-for writing to /dev/zero.  Reading from /dev/zero does its own iteration thing
-rather than using iterate_and_advance(), presumably because it checks for
-signals and resched.
-
-David
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
