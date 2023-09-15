@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C6A0CD37BC
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 21:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0850CD37B9
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 21:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237779AbjIOVd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S237721AbjIOVd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 15 Sep 2023 17:33:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39968 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237742AbjIOVdO (ORCPT
+        with ESMTP id S237734AbjIOVdN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 17:33:14 -0400
+        Fri, 15 Sep 2023 17:33:13 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06A57B8;
-        Fri, 15 Sep 2023 14:33:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81F6E193;
+        Fri, 15 Sep 2023 14:33:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=ywg9faqG2BCnT1wKSQTUuxdInS3gshCAShEIiU6RHjQ=; b=qZS2ofRnqhN2ypoQAYEMnwcIRF
-        HZUE+++FdwsDen9M6IhyoAQ+Y7IzzG+N6V5wdQXwdMhZwhUZOOOkXUyJn5dH5RZELYsDhvqfIyCnA
-        ZjYUrf9zEzLClRiJF4F8RlTgboxEj7+SeYzajsKRRaiu9LdY0ic7q1ZAKdUj1flkfYBD5mf2ru396
-        o6BEKaGXoMw51wobZ87Zc80mRgP73fRjgEVpPf3KoqmioNBUm5UeaqAtE4ddC30ZIYqkwxU6RlDOC
-        28YjopC1+/y6tkHKPQpwssGCKPPuBy05mqO5WZzTekd+HM/K74fIDkiSrHBRW+fDUWOH85cjqgyBi
-        gUde0Spg==;
+        bh=klgxghukoLB077BcGmD37gwuwN5TiuVyvr8uJe/6qJU=; b=xTeTtvE1PB+sCk5jYN9CsRNDcC
+        oq2rbg1f2LevVKTppTb9rvS7a6d9knnti9jQdDdUKPFipV/7xRYRi9bXw1loPY9YRQLYncMi0eTH0
+        eSA7OvBPVYDjb/pTBadQaMypikILS+6vmRakqpcosKTLfq6mA5A9nT5TFdX/6+BWkToM79mGvZ7C/
+        tfJjEHFIAWrCbPalQvlsnGYZpiYB2i4a7P6av3qMHhcJxJ08e6/CKkcCSA5aVBYA0JrWxd6Hx1R0v
+        HvwVgB8hOjoe2H7UeTLiZRP+Ab6e+CWQp+OvTodpFSnvw6ER3Zk057IRQNPe4YstyGZWoX/Y8EDtM
+        kClVBvPA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qhGQq-00BQnS-0y;
+        id 1qhGQq-00BQna-1Y;
         Fri, 15 Sep 2023 21:32:56 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     hch@infradead.org, djwong@kernel.org, dchinner@redhat.com,
@@ -37,9 +37,9 @@ Cc:     willy@infradead.org, brauner@kernel.org, hare@suse.de,
         linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, p.raghav@samsung.com,
         da.gomez@samsung.com, dan.helmick@samsung.com, mcgrof@kernel.org
-Subject: [RFC v2 05/10] bdev: allow to switch between bdev aops
-Date:   Fri, 15 Sep 2023 14:32:49 -0700
-Message-Id: <20230915213254.2724586-6-mcgrof@kernel.org>
+Subject: [RFC v2 09/10] nvme: add nvme_core.debug_large_atomics to force high awun as phys_bs
+Date:   Fri, 15 Sep 2023 14:32:53 -0700
+Message-Id: <20230915213254.2724586-10-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230915213254.2724586-1-mcgrof@kernel.org>
 References: <20230915213254.2724586-1-mcgrof@kernel.org>
@@ -50,137 +50,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that we have annotations for filesystems which require buffer-heads we
-can use that flag to verify if we can use the filesystem on the target
-block devices which require higher order folios. A filesystems which requires
-buffer-heads cannot be used on block devices which have a logical block size
-greater than PAGE_SIZE. We also want to allow to use buffer-head filesystems
-on block devices and at a later time then unmount and switch to a filesystem
-which supports bs > PAGE_SIZE, even if the logical block size of the block
-device is PAGE_SIZE, and this requires iomap. Provide helpers to do all these
-checks and resets the aops to iomap when needed.
+A drive with atomic write support should have awun / nawun defined,
+for these drives it should be possible to play with and experiment
+safely with LBS support up to awun / nawun settings if you are
+completely ignoring power failure situations. Add support to
+experiment with this. The rationale to limit to awun / nawun is
+to avoid races with other on flight commands which otherwise
+could cause unexpected results.
 
-Leaving iomap in place after an umount would not make such block devices usable
-for buffer-head filesystems so we must reset the aops to buffer-heads also
-on unmount.
+This also means this debug module parameter feature is not supported
+if your drive does not support atomics / awun / nawun.
 
+Suggested-by: Dan Helmick <dan.helmick@samsung.com>
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- block/bdev.c           | 55 ++++++++++++++++++++++++++++++++++++++++++
- fs/super.c             |  3 ++-
- include/linux/blkdev.h |  7 ++++++
- 3 files changed, 64 insertions(+), 1 deletion(-)
+ drivers/nvme/host/core.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 0d685270cd34..bf3cfc02aaf9 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -150,6 +150,59 @@ static int bdev_bsize_limit(struct block_device *bdev)
- 	return PAGE_SIZE;
- }
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 7a3c51ac13bd..c1f9d8e3ea93 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -92,6 +92,10 @@ static bool debug_large_lbas;
+ module_param(debug_large_lbas, bool, 0644);
+ MODULE_PARM_DESC(debug_large_lbas, "allow LBAs > PAGE_SIZE");
  
-+#ifdef CONFIG_BUFFER_HEAD
-+static void bdev_aops_set(struct block_device *bdev,
-+			  const struct address_space_operations *aops)
-+{
-+	kill_bdev(bdev);
-+	bdev->bd_inode->i_data.a_ops = aops;
-+}
++static unsigned int debug_large_atomics;
++module_param(debug_large_atomics, uint, 0644);
++MODULE_PARM_DESC(debug_large_atomics, "allow large atomics <= awun or nawun <= mdts");
 +
-+static void bdev_aops_sync(struct super_block *sb, struct block_device *bdev,
-+			   const struct address_space_operations *aops)
-+{
-+	sync_blockdev(bdev);
-+	bdev_aops_set(bdev, aops);
-+	kill_bdev(bdev);
-+	bdev->bd_inode->i_data.a_ops = aops;
-+}
+ /*
+  * nvme_wq - hosts nvme related works that are not reset or delete
+  * nvme_reset_wq - hosts nvme reset works
+@@ -1958,6 +1962,20 @@ static void nvme_update_disk_info(struct gendisk *disk,
+ 		 * be aware of out of order reads/writes as npwg and nows
+ 		 * are purely performance optimizations.
+ 		 */
 +
-+void bdev_aops_reset(struct block_device *bdev)
-+{
-+	bdev_aops_set(bdev, &def_blk_aops);
-+}
-+
-+static int sb_bdev_aops_set(struct super_block *sb)
-+{
-+	struct block_device *bdev = sb->s_bdev;
-+
-+	if (mapping_min_folio_order(bdev->bd_inode->i_mapping) != 0 &&
-+	    sb->s_type->fs_flags & FS_BUFFER_HEADS) {
-+			pr_warn_ratelimited(
-+"block device logical block size > PAGE_SIZE, buffer-head filesystem cannot be used.\n");
-+		return -EINVAL;
-+	}
-+
-+	/*
-+	 * We can switch back and forth, but we need to use buffer-heads
-+	 * first, otherwise a filesystem created which only uses iomap
-+	 * will have it sticky and we can't detect buffer-head filesystems
-+	 * on mount.
-+	 */
-+	bdev_aops_sync(sb, bdev, &def_blk_aops);
-+	if (sb->s_type->fs_flags & FS_BUFFER_HEADS)
-+		return 0;
-+
-+	bdev_aops_sync(sb, bdev, &def_blk_aops_iomap);
-+	return 0;
-+}
-+#else
-+static int sb_bdev_aops_set(struct super_block *sb)
-+{
-+	return 0;
-+}
-+#endif
-+
- int set_blocksize(struct block_device *bdev, int size)
- {
- 	/* Size must be a power of two, and between 512 and supported order */
-@@ -173,6 +226,8 @@ EXPORT_SYMBOL(set_blocksize);
- 
- int sb_set_blocksize(struct super_block *sb, int size)
- {
-+	if (sb_bdev_aops_set(sb))
-+		return 0;
- 	if (set_blocksize(sb->s_bdev, size))
- 		return 0;
- 	/* If we get here, we know size is power of two
-diff --git a/fs/super.c b/fs/super.c
-index 816a22a5cad1..eb269c9489cb 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1649,12 +1649,13 @@ void kill_block_super(struct super_block *sb)
- 	generic_shutdown_super(sb);
- 	if (bdev) {
- 		sync_blockdev(bdev);
-+		bdev_aops_reset(bdev);
- 		blkdev_put(bdev, sb);
++		/*
++		 * If you're not concerned about power failure, in theory,
++		 * you should be able to experiment up to awun rather safely.
++		 *
++		 * Ignore qemu awun value of 1.
++		 */
++		if (debug_large_atomics && awun != 1) {
++			debug_large_atomics = min(awun_bs, debug_large_atomics);
++			phys_bs = atomic_bs = debug_large_atomics;
++			dev_info(ns->ctrl->device,
++				 "Forcing large atomic: %u (awun_bs: %u awun: %u)\n",
++				 debug_large_atomics, awun_bs, awun);
++		}
  	}
- }
  
- EXPORT_SYMBOL(kill_block_super);
--#endif
-+#endif /* CONFIG_BLOCK */
- 
- struct dentry *mount_nodev(struct file_system_type *fs_type,
- 	int flags, void *data,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index eef450f25982..738a879a0786 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1503,6 +1503,13 @@ void sync_bdevs(bool wait);
- void bdev_statx_dioalign(struct inode *inode, struct kstat *stat);
- void printk_all_partitions(void);
- int __init early_lookup_bdev(const char *pathname, dev_t *dev);
-+#ifdef CONFIG_BUFFER_HEAD
-+void bdev_aops_reset(struct block_device *bdev);
-+#else
-+static inline void bdev_aops_reset(struct block_device *bdev)
-+{
-+}
-+#endif
- #else
- static inline void invalidate_bdev(struct block_device *bdev)
- {
+ 	blk_queue_logical_block_size(disk->queue, bs);
 -- 
 2.39.2
 
