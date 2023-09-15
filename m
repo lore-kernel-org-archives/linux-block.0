@@ -2,320 +2,260 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCFCEE644B
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 09:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74749EE644B
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 09:53:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233595AbjIOJjh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 05:39:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38324 "EHLO
+        id S233962AbjIOJxU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 05:53:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233671AbjIOJjg (ORCPT
+        with ESMTP id S233975AbjIOJxQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 05:39:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EA9AB2D64
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 02:38:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694770704;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1kkiG5L/a/xceIw2PPIGBdgyPVq7y6221yleAsPibq4=;
-        b=INbdH8ThtlJSAJJ8dGpV++RhoRTveJIMU0t6n5WceyQE6+Hd54rVx5j7NNvNfW8UMIne4A
-        G4YdZ5agV81zM9zMsYrcu86I+qTsBhJPDSDEwNoX7xnv80srsxKDEWvaIdrt/U9WmFrm3X
-        1EY/0ZGi/jmYQNBtmEpC476XAJM4RA0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-260-Zfaqv3swO7urejhYiLIkNA-1; Fri, 15 Sep 2023 05:38:17 -0400
-X-MC-Unique: Zfaqv3swO7urejhYiLIkNA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0647681DA99;
-        Fri, 15 Sep 2023 09:38:17 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D167428FD;
-        Fri, 15 Sep 2023 09:38:14 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <445a78b0ff3047fea20d3c8058a5ff6a@AcuMS.aculab.com>
-References: <445a78b0ff3047fea20d3c8058a5ff6a@AcuMS.aculab.com> <20230913165648.2570623-1-dhowells@redhat.com> <20230913165648.2570623-6-dhowells@redhat.com>
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Christian Brauner" <christian@brauner.io>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        Fri, 15 Sep 2023 05:53:16 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97307273D
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 02:51:36 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230915095124euoutp016c5beaa1842bd2b0ec01cb9d8f3d3e94~FCa_eBBnG0810408104euoutp01U
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 09:51:24 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230915095124euoutp016c5beaa1842bd2b0ec01cb9d8f3d3e94~FCa_eBBnG0810408104euoutp01U
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1694771484;
+        bh=9t9ULkMuBq/epaiWHGp5SMiuW3po0qdU7nTNfWyOmvY=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=RQwu1oOKOP/OHNYx/6DeTA5c7ndiENxNu0XN99GO9cPncv7eY9AC1RxPHE2y/6W35
+         tdfnjH8d+Cba1a31UkfrqxlHUNaemIKiqY0oZ75ZnWAYO2Df7GMhEx1jyIjF0sIwam
+         b7ZpPMSXL58XOLa1lrWEu1AAJ4/ZP/KrK6BYEbnk=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230915095124eucas1p2b20cd2623e776492e070e7d7757fe49b~FCa_N49lA0862308623eucas1p2V;
+        Fri, 15 Sep 2023 09:51:24 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id E7.E7.11320.C1924056; Fri, 15
+        Sep 2023 10:51:24 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230915095124eucas1p1eb0e0ef883f6316cf14c349404a51150~FCa93UCLR2203022030eucas1p1Q;
+        Fri, 15 Sep 2023 09:51:23 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230915095123eusmtrp1c3cce7f6f7a5eb736598ffae8ecc3ca0~FCa92ilDZ1836118361eusmtrp17;
+        Fri, 15 Sep 2023 09:51:23 +0000 (GMT)
+X-AuditID: cbfec7f4-97dff70000022c38-1c-6504291cfd59
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 5A.D6.14344.B1924056; Fri, 15
+        Sep 2023 10:51:23 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230915095123eusmtip267ceaaeebbabd3d66cf4aa80ead14236~FCa9rj4DM0935009350eusmtip2G;
+        Fri, 15 Sep 2023 09:51:23 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) by
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) with Microsoft SMTP
+        Server (TLS) id 15.0.1497.2; Fri, 15 Sep 2023 10:51:23 +0100
+Received: from CAMSVWEXC02.scsc.local ([::1]) by CAMSVWEXC02.scsc.local
+        ([fe80::3c08:6c51:fa0a:6384%13]) with mapi id 15.00.1497.012; Fri, 15 Sep
+        2023 10:51:23 +0100
+From:   Daniel Gomez <da.gomez@samsung.com>
+To:     "minchan@kernel.org" <minchan@kernel.org>,
+        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "hughd@google.com" <hughd@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 05/13] iov: Move iterator functions to a header file
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3369773.1694770694.1@warthog.procyon.org.uk>
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>
+CC:     "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Daniel Gomez <da.gomez@samsung.com>
+Subject: [PATCH 1/6] filemap: make the folio order calculation shareable
+Thread-Topic: [PATCH 1/6] filemap: make the folio order calculation
+        shareable
+Thread-Index: AQHZ57ovaMdf9q/cjECRh1BbWSoXsQ==
+Date:   Fri, 15 Sep 2023 09:51:23 +0000
+Message-ID: <20230915095042.1320180-2-da.gomez@samsung.com>
+In-Reply-To: <20230915095042.1320180-1-da.gomez@samsung.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [106.110.32.103]
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 15 Sep 2023 10:38:14 +0100
-Message-ID: <3369774.1694770694@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+MIME-Version: 1.0
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNKsWRmVeSWpSXmKPExsWy7djP87oymiypBr+OC1vMWb+GzWL13X42
+        i8tP+Cyefupjsdh7S9tiz96TLBaXd81hs7i35j+rxa4/O9gtbkx4ymix7Ot7dovdGxexWfz+
+        MYfNgddjdsNFFo8Fm0o9Nq/Q8rh8ttRj06pONo9Nnyaxe5yY8ZvF4/MmuQCOKC6blNSczLLU
+        In27BK6MviXLmArOK1Z8a2hmbGDcLt3FyMkhIWAisfNbA2sXIxeHkMAKRonNO3axQzhfGCWe
+        rroD5XxmlNgztZEVpuXmwTNMEInljBKtExqY4aq69r2HajnDKDHp5wQ2CGclo8S1mc2MIP1s
+        ApoS+05uAqsSEZjNKnF4cQdYglmgTmLNs1ksILawgIfEsr17mEBsEQF/iVv7tzND2HoSrU1f
+        wWwWAVWJqe/us4PYvALWEj37e4DiHBycAjYS73+Ug4QZBWQlHq38xQ4xXlzi1pP5TBA/CEos
+        mr2HGcIWk/i36yEbhK0jcfb6E0YI20Bi69J9LBC2ksSfjoVQZ+pJ3Jg6hQ3C1pZYtvA1M8QJ
+        ghInZz5hAflLQqCJS+Lsrd/QAHOR6G5/yg5hC0u8Or4FypaROD25h2UCo/YsJPfNQrJjFpId
+        s5DsWMDIsopRPLW0ODc9tdgoL7Vcrzgxt7g0L10vOT93EyMwvZ3+d/zLDsblrz7qHWJk4mA8
+        xCjBwawkwstmy5QqxJuSWFmVWpQfX1Sak1p8iFGag0VJnFfb9mSykEB6YklqdmpqQWoRTJaJ
+        g1OqgSno/8LS5s8ZRx32KzrzXJnZszVv8dqLnhoH7iStPqR8O+X5ldSQ3oCkjXzulTqrJmU7
+        s+pFO4l4vdLLnr7RQrpSM+Hg6i7pz92nvdstw0REgxcYn3PX4/ff+/nfe93cLHPmrdseJcfu
+        jZ07IZXjh+n+GI3aP8sLHXgslb9/8paUuH7oSNi0fO9lTtXT37z7YO96M+HaYr3csxecE5+K
+        qj2YkCJuIT3/7BGlOUp/m6y72DtWP7wWfSfPY49Tan/DzifnThwWvis2my3p+4Rv7jUPtCLu
+        Bm4/duKTYZdpsa7wVY4u6U2v/4r6+OWXMRs8ncDyY8Ee5z2uKQuyL/Dayu5jbl2k8+sOf6jI
+        53uqbUosxRmJhlrMRcWJADmRL4LeAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrCKsWRmVeSWpSXmKPExsVy+t/xe7rSmiypBv+2WVjMWb+GzWL13X42
+        i8tP+Cyefupjsdh7S9tiz96TLBaXd81hs7i35j+rxa4/O9gtbkx4ymix7Ot7dovdGxexWfz+
+        MYfNgddjdsNFFo8Fm0o9Nq/Q8rh8ttRj06pONo9Nnyaxe5yY8ZvF4/MmuQCOKD2bovzSklSF
+        jPziElulaEMLIz1DSws9IxNLPUNj81grI1MlfTublNSczLLUIn27BL2MviXLmArOK1Z8a2hm
+        bGDcLt3FyMkhIWAicfPgGaYuRi4OIYGljBJH/i5lgkjISGz8cpUVwhaW+HOtiw3EFhL4yCjR
+        tqoYouEMo0RT13VGCGclo8SMa4cZQarYBDQl9p3cxA6SEBGYzSpxeHEHWIJZoE5izbNZLCC2
+        sICHxLK9e8DWiQj4Smw5sYUNwtaTaG36ygxiswioSkx9d58dxOYVsJbo2d8DFOcA2mYtMWu6
+        F4jJKWAj8f5HOUgFo4CsxKOVv9ghNolL3HoyH+oZAYkle84zQ9iiEi8f/4N6TEfi7PUnjBC2
+        gcTWpftYIGwliT8dC6Eu1pO4MXUKG4StLbFs4WtmiGsEJU7OfMIygVF6FpJ1s5C0zELSMgtJ
+        ywJGllWMIqmlxbnpucVGesWJucWleel6yfm5mxiByWnbsZ9bdjCufPVR7xAjEwfjIUYJDmYl
+        EV42W6ZUId6UxMqq1KL8+KLSnNTiQ4ymwBCayCwlmpwPTI95JfGGZgamhiZmlgamlmbGSuK8
+        ngUdiUIC6YklqdmpqQWpRTB9TBycUg1MOgkHnd78zdr97NxpyRXvVsU97kpbOF1j7f/qVz6L
+        d9rVr7+wKHxrQ2Cc8zaG75Oa6vqcf29fVn9bVEzRY+d2mytP7yaaC89eu9zRYVa497G7Xdec
+        bNK9DnEt0XkuuGrq80O/X39QVk3/dqZpcc/Pnw+27FaKnb8+2pkl91m7uq/3/17DE4EzJ7w4
+        aTnre88tzirWnSYW1gtV3oY4XRUVTOZayHGlf//m8DTDdu8PWkEZfYJZ874pMrCqT5VWLlQv
+        ntI3s++DK8/i/8Hv47bcm2l3yUlRzptPZbOqRJzpF+dNGl6l5Xe3zspKKXgVotOhdu5Nopzv
+        15DUy8m3XZMyX0U1MeYUnC27dKy5cCu3EktxRqKhFnNRcSIANnSnRtcDAAA=
+X-CMS-MailID: 20230915095124eucas1p1eb0e0ef883f6316cf14c349404a51150
+X-Msg-Generator: CA
+X-RootMTR: 20230915095124eucas1p1eb0e0ef883f6316cf14c349404a51150
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230915095124eucas1p1eb0e0ef883f6316cf14c349404a51150
+References: <20230915095042.1320180-1-da.gomez@samsung.com>
+        <CGME20230915095124eucas1p1eb0e0ef883f6316cf14c349404a51150@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Laight <David.Laight@ACULAB.COM> wrote:
+To make the code that clamps the folio order in the __filemap_get_folio
+routine reusable to others, move and merge it to the fgf_set_order
+new subroutine (mapping_size_order), so when mapping the size at a
+given index, the order calculated is already valid and ready to be
+used when order is retrieved from fgp_flags with FGF_GET_ORDER.
 
-> > Move the iterator functions to a header file so that other operations =
-that
-> > need to scan over an iterator can be added.  For instance, the rbd dri=
-ver
-> > could use this to scan a buffer to see if it is all zeros and libceph =
-could
-> > use this to generate a crc.
-> =
-
-> These all look a bit big for being more generally inlined.
-> =
-
-> I know you want to avoid the indirect call in the normal cases,
-> but maybe it would be ok for other uses?
-
-So you'd advocate for something like:
-
-	size_t generic_iterate(struct iov_iter *iter, size_t len, void *priv,
-			       void *priv2, iov_ustep_f ustep, iov_step_f step)
-	{
-		return iterate_and_advance2(iter, len, priv, priv2,
-					    ustep, step);
-	}
-	EXPORT_SYMBOL(generic_iterate);
-
-in lib/iov_iter.c and then call that from the places that want to use it?
-
-I tried benchmarking that (see attached patch - it needs to go on top of m=
-y
-iov patches).  Running the insmod thrice and then filtering out and sortin=
-g
-the results:
-
-	iov_kunit_benchmark_bvec: avg 3174 uS, stddev 68 uS
-	iov_kunit_benchmark_bvec: avg 3176 uS, stddev 61 uS
-	iov_kunit_benchmark_bvec: avg 3180 uS, stddev 64 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3678 uS, stddev 4 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3678 uS, stddev 5 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3679 uS, stddev 6 uS
-	iov_kunit_benchmark_xarray: avg 3560 uS, stddev 5 uS
-	iov_kunit_benchmark_xarray: avg 3560 uS, stddev 6 uS
-	iov_kunit_benchmark_xarray: avg 3570 uS, stddev 16 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4125 uS, stddev 13 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4125 uS, stddev 2 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4125 uS, stddev 6 uS
-
-It adds almost 16% overhead:
-
-	(gdb) p 4125/3560.0
-	$2 =3D 1.1587078651685394
-	(gdb) p 3678/3174.0
-	$3 =3D 1.1587901701323251
-
-I'm guessing a lot of that is due to function pointer mitigations.
-
-Now, part of the code size expansion can be mitigated by using, say,
-iterate_and_advance_kernel() if you know you aren't going to encounter
-user-backed iterators, or even using, say, iterate_bvec() if you know you'=
-re
-only going to see a specific iterator type.
-
-David
+Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
 ---
-iov_iter: Benchmark out of line generic iterator
+ fs/iomap/buffered-io.c  |  6 ++++--
+ include/linux/pagemap.h | 42 ++++++++++++++++++++++++++++++++++++-----
+ mm/filemap.c            |  8 --------
+ 3 files changed, 41 insertions(+), 15 deletions(-)
 
-diff --git a/include/linux/iov_iter.h b/include/linux/iov_iter.h
-index 2ebb86c041b6..8f562e80473b 100644
---- a/include/linux/iov_iter.h
-+++ b/include/linux/iov_iter.h
-@@ -293,4 +293,7 @@ size_t iterate_and_advance_kernel(struct iov_iter *ite=
-r, size_t len, void *priv,
- 	return progress;
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index ae8673ce08b1..bfd9a22a9464 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -546,12 +546,14 @@ EXPORT_SYMBOL_GPL(iomap_is_partially_uptodate);
+ struct folio *iomap_get_folio(struct iomap_iter *iter, loff_t pos, size_t =
+len)
+ {
+ 	fgf_t fgp =3D FGP_WRITEBEGIN | FGP_NOFS;
++	pgoff_t index =3D pos >> PAGE_SHIFT;
++	struct address_space *mapping =3D iter->inode->i_mapping;
+=20
+ 	if (iter->flags & IOMAP_NOWAIT)
+ 		fgp |=3D FGP_NOWAIT;
+-	fgp |=3D fgf_set_order(len);
++	fgp |=3D fgf_set_order(mapping, index, len);
+=20
+-	return __filemap_get_folio(iter->inode->i_mapping, pos >> PAGE_SHIFT,
++	return __filemap_get_folio(mapping, index,
+ 			fgp, mapping_gfp_mask(iter->inode->i_mapping));
  }
- =
-
-+size_t generic_iterate(struct iov_iter *iter, size_t len, void *priv, voi=
-d *priv2,
-+		       iov_ustep_f ustep, iov_step_f step);
-+
- #endif /* _LINUX_IOV_ITER_H */
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 8f7a10c4a295..f9643dd02676 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1684,3 +1684,10 @@ ssize_t iov_iter_extract_pages(struct iov_iter *i,
- 	return -EFAULT;
- }
- EXPORT_SYMBOL_GPL(iov_iter_extract_pages);
-+
-+size_t generic_iterate(struct iov_iter *iter, size_t len, void *priv, voi=
-d *priv2,
-+		       iov_ustep_f ustep, iov_step_f step)
-+{
-+	return iterate_and_advance2(iter, len, priv, priv2, ustep, step);
-+}
-+EXPORT_SYMBOL(generic_iterate);
-diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
-index cc9c64663a73..f208516a68c9 100644
---- a/lib/kunit_iov_iter.c
-+++ b/lib/kunit_iov_iter.c
-@@ -18,6 +18,7 @@
- #include <linux/writeback.h>
- #include <linux/uio.h>
- #include <linux/bvec.h>
-+#include <linux/iov_iter.h>
- #include <kunit/test.h>
- =
-
- MODULE_DESCRIPTION("iov_iter testing");
-@@ -1571,6 +1572,124 @@ static void __init iov_kunit_benchmark_xarray(stru=
-ct kunit *test)
- 	KUNIT_SUCCEED();
- }
- =
-
-+static noinline
-+size_t shovel_to_user_iter(void __user *iter_to, size_t progress,
-+			   size_t len, void *from, void *priv2)
-+{
-+	if (should_fail_usercopy())
-+		return len;
-+	if (access_ok(iter_to, len)) {
-+		from +=3D progress;
-+		instrument_copy_to_user(iter_to, from, len);
-+		len =3D raw_copy_to_user(iter_to, from, len);
-+	}
-+	return len;
-+}
-+
-+static noinline
-+size_t shovel_to_kernel_iter(void *iter_to, size_t progress,
-+			     size_t len, void *from, void *priv2)
-+{
-+	memcpy(iter_to, from + progress, len);
-+	return 0;
-+}
-+
-+/*
-+ * Time copying 256MiB through an ITER_BVEC with an out-of-line copier
-+ * function.
+ EXPORT_SYMBOL_GPL(iomap_get_folio);
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 351c3b7f93a1..7af5636eb32a 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -576,6 +576,39 @@ typedef unsigned int __bitwise fgf_t;
+=20
+ #define FGP_WRITEBEGIN		(FGP_LOCK | FGP_WRITE | FGP_CREAT | FGP_STABLE)
+=20
++/**
++ * mapping_size_order - Get maximum folio order for the given file size.
++ * @mapping: Target address_space.
++ * @index: The page index.
++ * @size: The suggested size of the folio to create.
++ *
++ * This returns a high order for folios (when supported) based on the file=
+ size
++ * which the mapping currently allows at the given index. The index is rel=
+evant
++ * due to alignment considerations the mapping might have. The returned or=
+der
++ * may be less than the size passed.
++ *
++ * Return: The order.
 + */
-+static void __init iov_kunit_benchmark_bvec_outofline(struct kunit *test)
++static inline unsigned int mapping_size_order(struct address_space *mappin=
+g,
++						 pgoff_t index, size_t size)
 +{
-+	struct iov_iter iter;
-+	struct bio_vec *bvec;
-+	struct page *page;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size =3D 256 * 1024 * 1024, npages =3D size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
++	unsigned int order =3D ilog2(size);
 +
-+	/* Allocate a page and tile it repeatedly in the buffer. */
-+	page =3D alloc_page(GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, page);
-+	kunit_add_action_or_reset(test, iov_kunit_free_page, page);
++	if ((order <=3D PAGE_SHIFT) || (!mapping_large_folio_support(mapping)))
++		return 0;
++	else
++		order =3D order - PAGE_SHIFT;
 +
-+	bvec =3D kunit_kmalloc_array(test, npages, sizeof(bvec[0]), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, bvec);
-+	for (i =3D 0; i < npages; i++)
-+		bvec_set_page(&bvec[i], page, PAGE_SIZE, 0);
++	/* If we're not aligned, allocate a smaller folio */
++	if (index & ((1UL << order) - 1))
++		order =3D __ffs(index);
 +
-+	/* Create a single large buffer to copy to/from. */
-+	scratch =3D iov_kunit_create_source(test, npages);
++	order =3D min_t(size_t, order, MAX_PAGECACHE_ORDER);
 +
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over BVEC:\n");
-+	for (i =3D 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_bvec(&iter, ITER_DEST, bvec, npages, size);
-+		a =3D ktime_get_real();
-+		copied =3D generic_iterate(&iter, size, scratch, NULL,
-+					 shovel_to_user_iter,
-+					 shovel_to_kernel_iter);
-+		b =3D ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] =3D ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
++	/* Order-1 not supported due to THP dependency */
++	return (order =3D=3D 1) ? 0 : order;
 +}
 +
-+/*
-+ * Time copying 256MiB through an ITER_XARRAY with an out-of-line copier
-+ * function.
-+ */
-+static void __init iov_kunit_benchmark_xarray_outofline(struct kunit *tes=
-t)
-+{
-+	struct iov_iter iter;
-+	struct xarray *xarray;
-+	struct page *page;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size =3D 256 * 1024 * 1024, npages =3D size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+
-+	/* Allocate a page and tile it repeatedly in the buffer. */
-+	page =3D alloc_page(GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, page);
-+	kunit_add_action_or_reset(test, iov_kunit_free_page, page);
-+
-+	xarray =3D iov_kunit_create_xarray(test);
-+
-+	for (i =3D 0; i < npages; i++) {
-+		void *x =3D xa_store(xarray, i, page, GFP_KERNEL);
-+
-+		KUNIT_ASSERT_FALSE(test, xa_is_err(x));
-+	}
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch =3D iov_kunit_create_source(test, npages);
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over XARRAY:\n");
-+	for (i =3D 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_xarray(&iter, ITER_DEST, xarray, 0, size);
-+		a =3D ktime_get_real();
-+
-+		copied =3D generic_iterate(&iter, size, scratch, NULL,
-+					 shovel_to_user_iter,
-+					 shovel_to_kernel_iter);
-+		b =3D ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] =3D ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
- static struct kunit_case __refdata iov_kunit_cases[] =3D {
- 	KUNIT_CASE(iov_kunit_copy_to_ubuf),
- 	KUNIT_CASE(iov_kunit_copy_from_ubuf),
-@@ -1593,6 +1712,8 @@ static struct kunit_case __refdata iov_kunit_cases[]=
- =3D {
- 	KUNIT_CASE(iov_kunit_benchmark_bvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec_split),
- 	KUNIT_CASE(iov_kunit_benchmark_xarray),
-+	KUNIT_CASE(iov_kunit_benchmark_bvec_outofline),
-+	KUNIT_CASE(iov_kunit_benchmark_xarray_outofline),
- 	{}
- };
- =
-
+ /**
+  * fgf_set_order - Encode a length in the fgf_t flags.
+  * @size: The suggested size of the folio to create.
+@@ -587,13 +620,12 @@ typedef unsigned int __bitwise fgf_t;
+  * due to alignment constraints, memory pressure, or the presence of
+  * other folios at nearby indices.
+  */
+-static inline fgf_t fgf_set_order(size_t size)
++static inline fgf_t fgf_set_order(struct address_space *mapping, pgoff_t i=
+ndex,
++				  size_t size)
+ {
+-	unsigned int shift =3D ilog2(size);
++	unsigned int order =3D mapping_size_order(mapping, index, size);
+=20
+-	if (shift <=3D PAGE_SHIFT)
+-		return 0;
+-	return (__force fgf_t)((shift - PAGE_SHIFT) << 26);
++	return (__force fgf_t)(order << 26);
+ }
+=20
+ void *filemap_get_entry(struct address_space *mapping, pgoff_t index);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 582f5317ff71..e285fffa9bcf 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1917,14 +1917,6 @@ struct folio *__filemap_get_folio(struct address_spa=
+ce *mapping, pgoff_t index,
+ 		if (WARN_ON_ONCE(!(fgp_flags & (FGP_LOCK | FGP_FOR_MMAP))))
+ 			fgp_flags |=3D FGP_LOCK;
+=20
+-		if (!mapping_large_folio_support(mapping))
+-			order =3D 0;
+-		if (order > MAX_PAGECACHE_ORDER)
+-			order =3D MAX_PAGECACHE_ORDER;
+-		/* If we're not aligned, allocate a smaller folio */
+-		if (index & ((1UL << order) - 1))
+-			order =3D __ffs(index);
+-
+ 		do {
+ 			gfp_t alloc_gfp =3D gfp;
+=20
+--=20
+2.39.2
