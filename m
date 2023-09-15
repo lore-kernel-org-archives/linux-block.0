@@ -2,104 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8669DC46CA1
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 20:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2042BC46CA1
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 21:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237126AbjIOUpH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Sep 2023 16:45:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50002 "EHLO
+        id S237651AbjIOVd1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 17:33:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237486AbjIOUox (ORCPT
+        with ESMTP id S237721AbjIOVdM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2023 16:44:53 -0400
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F9A5E58
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 13:44:03 -0700 (PDT)
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-79a10807b4fso1082301241.2
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 13:44:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694810642; x=1695415442;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RaheZZ3aWH4dfOldn9ZCeIYAt4mkA7cmMxZmrmD0nnI=;
-        b=pWVi0+xXnAmT6WzDGVbaOXR5SRVOgYRxikoQiexVOL26hAScxu9T4dYj5b89yco2Fb
-         unVk9+YF0eHPbPYvBCoMZtye2/bUdpDTvkMTaKilb3jt6Vu5x7J5ywX/S0YGACIgD9vL
-         ZoUMBy46rKg9AyUbD6MVzqVy5w9Czr/XoLs7vEjOIoP07sVzsBomb8bs2ANwSyULAfko
-         s0AOf2ROZMw/LQg7ZHqkpgZdWQhcxForD4Bbw9kv5Njal1PzqKCdL6TNSyPVXQiXIClF
-         tAExdCm7Zm05ktZd+FrMuQFIfyQcOINAYhjDOHareZXnbn3p7UKRPvY7mOcxhg/8AG0E
-         SHfw==
-X-Gm-Message-State: AOJu0YzXYBZV0MjCJkqn76juojZGY+pqXmMpDcjb7nhWuXrHcm2GjDPt
-        CqEgoSyrEoscXLPrYFPLjZrq
-X-Google-Smtp-Source: AGHT+IHh+CGQ1LQ9+nYV2h3rP3/WaZ66pFpMDO8YYt+Q4kieKGfGbDhPXKVAhMW8KfLvX71gD/W7IQ==
-X-Received: by 2002:a67:f7da:0:b0:44d:5c61:e473 with SMTP id a26-20020a67f7da000000b0044d5c61e473mr2854709vsp.22.1694810642718;
-        Fri, 15 Sep 2023 13:44:02 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id h15-20020a0cf44f000000b0064f5d70d072sm1525969qvm.37.2023.09.15.13.44.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 13:44:02 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 16:44:00 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [git pull] device mapper fixes for 6.6-rc2
-Message-ID: <ZQTCEOrIV+JmvfIE@redhat.com>
+        Fri, 15 Sep 2023 17:33:12 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 394E8F7;
+        Fri, 15 Sep 2023 14:33:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=fY/ZSJcX0nGtNhorp279tvkX1snuX5Kki9NEKyyEvZ0=; b=pMZOMSoplkznMz23hCcyCuvW+1
+        Q5X0DNXRoWSaQm50XrYed2ERGsB62yIGhxRFVJ5yWO7/WHTncq80QWO6bWPAxmnhgXa2arperZvms
+        NTxp8MdrjSQkYV48LcOR50FiLW93j9OS1kLLdbjLQ8sW2W7WPR5rqgWAM7bEnXWkxT4QnkGneUGO3
+        E8rh9r/+rao7kSNdq1f6/C0v4BHWzLlSlNz46HMKDM6azvHhAKSm/tyv230E9q1BPCMDWUATuo9/Y
+        IL5mKOlshmRBOtbl2P/dz7P55FbzsqPlB8QGk16lhaOPwcNLq1sYSSDisbfbiHzu6BE1WTaycpYL6
+        3hzMI4aQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qhGQq-00BQnH-0K;
+        Fri, 15 Sep 2023 21:32:56 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     hch@infradead.org, djwong@kernel.org, dchinner@redhat.com,
+        kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com
+Cc:     willy@infradead.org, brauner@kernel.org, hare@suse.de,
+        ritesh.list@gmail.com, rgoldwyn@suse.com, jack@suse.cz,
+        ziy@nvidia.com, ryan.roberts@arm.com, patches@lists.linux.dev,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, p.raghav@samsung.com,
+        da.gomez@samsung.com, dan.helmick@samsung.com, mcgrof@kernel.org
+Subject: [RFC v2 01/10] bdev: rename iomap aops
+Date:   Fri, 15 Sep 2023 14:32:45 -0700
+Message-Id: <20230915213254.2724586-2-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230915213254.2724586-1-mcgrof@kernel.org>
+References: <20230915213254.2724586-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Allow buffer-head and iomap aops to co-exist on a build. Right
+now the iomap aops is can only be used if you disable buffer-heads.
+In the near future we should be able to dynamically select at runtime
+the intended aops based on the nature of the filesystem and device
+requirements.
 
-The following changes since commit 0bb80ecc33a8fb5a682236443c1e740d5c917d1d:
+So rename the iomap aops, and select use the new name if buffer-heads
+is disabled. This introduces no functional changes.
 
-  Linux 6.6-rc1 (2023-09-10 16:28:41 -0700)
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ block/bdev.c |  4 ++++
+ block/blk.h  |  1 +
+ block/fops.c | 14 +++++++-------
+ 3 files changed, 12 insertions(+), 7 deletions(-)
 
-are available in the Git repository at:
+diff --git a/block/bdev.c b/block/bdev.c
+index f3b13aa1b7d4..6e62d8a992e6 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -392,7 +392,11 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+ 		return NULL;
+ 	inode->i_mode = S_IFBLK;
+ 	inode->i_rdev = 0;
++#ifdef CONFIG_BUFFER_HEAD
+ 	inode->i_data.a_ops = &def_blk_aops;
++#else
++	inode->i_data.a_ops = &def_blk_aops_iomap;
++#endif
+ 	mapping_set_gfp_mask(&inode->i_data, GFP_USER);
+ 
+ 	bdev = I_BDEV(inode);
+diff --git a/block/blk.h b/block/blk.h
+index 08a358bc0919..75e8deb9f458 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -473,6 +473,7 @@ long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+ 
+ extern const struct address_space_operations def_blk_aops;
++extern const struct address_space_operations def_blk_aops_iomap;
+ 
+ int disk_register_independent_access_ranges(struct gendisk *disk);
+ void disk_unregister_independent_access_ranges(struct gendisk *disk);
+diff --git a/block/fops.c b/block/fops.c
+index acff3d5d22d4..80a8430bcd69 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -455,13 +455,14 @@ const struct address_space_operations def_blk_aops = {
+ 	.migrate_folio	= buffer_migrate_folio_norefs,
+ 	.is_dirty_writeback = buffer_check_dirty_writeback,
+ };
+-#else /* CONFIG_BUFFER_HEAD */
+-static int blkdev_read_folio(struct file *file, struct folio *folio)
++
++#endif /* CONFIG_BUFFER_HEAD */
++static int blkdev_read_folio_iomap(struct file *file, struct folio *folio)
+ {
+ 	return iomap_read_folio(folio, &blkdev_iomap_ops);
+ }
+ 
+-static void blkdev_readahead(struct readahead_control *rac)
++static void blkdev_readahead_iomap(struct readahead_control *rac)
+ {
+ 	iomap_readahead(rac, &blkdev_iomap_ops);
+ }
+@@ -492,18 +493,17 @@ static int blkdev_writepages(struct address_space *mapping,
+ 	return iomap_writepages(mapping, wbc, &wpc, &blkdev_writeback_ops);
+ }
+ 
+-const struct address_space_operations def_blk_aops = {
++const struct address_space_operations def_blk_aops_iomap = {
+ 	.dirty_folio	= filemap_dirty_folio,
+ 	.release_folio		= iomap_release_folio,
+ 	.invalidate_folio	= iomap_invalidate_folio,
+-	.read_folio		= blkdev_read_folio,
+-	.readahead		= blkdev_readahead,
++	.read_folio		= blkdev_read_folio_iomap,
++	.readahead		= blkdev_readahead_iomap,
+ 	.writepages		= blkdev_writepages,
+ 	.is_partially_uptodate  = iomap_is_partially_uptodate,
+ 	.error_remove_page	= generic_error_remove_page,
+ 	.migrate_folio		= filemap_migrate_folio,
+ };
+-#endif /* CONFIG_BUFFER_HEAD */
+ 
+ /*
+  * for a block special file file_inode(file)->i_size is zero
+-- 
+2.39.2
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.6/dm-fixes
-
-for you to fetch changes up to a9ce385344f916cd1c36a33905e564f5581beae9:
-
-  dm: don't attempt to queue IO under RCU protection (2023-09-15 15:39:59 -0400)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Fix DM core retrieve_deps() UAF race due to missing locking of a DM
-  table's list of devices that is managed using dm_{get,put}_device.
-
-- Revert DM core's half-baked RCU optimization if IO submitter has set
-  REQ_NOWAIT. Can be revisited, and properly justified, after
-  comprehensively auditing all of DM to also pass GFP_NOWAIT for any
-  allocations if REQ_NOWAIT used.
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEJfWUX4UqZ4x1O2wixSPxCi2dA1oFAmUEt7wACgkQxSPxCi2d
-A1prNwf/RB4EyKiSx7XS3ysM6mh/BPGO5FNjWwHebkrSFzAkEowo4i0cY9lRD0N4
-x9Wbd5bcV8HarH/fiyffQxgdfXspAIrMt8z5hRnfElkBLzg6hHixxg/3sFCwg+U3
-LG6AZFNLil7VmDeca9Pd8MCyXoy1u4ErWjkz3fU8pzzT+NDwRZPZhUMd/MFCWag6
-q22S8KMXkYKiAHqKauF52CeDH77XsO66G70t/AElemZ66PpyKpasg2p99RCuHgTg
-7jNuMTM6qXYWSWw8OswVXCPZEVfCp4zTFv1ebu9bagfDKR4ppNxwzyz7/CMkir14
-4uKKzQ/cy8QND6OR/05zKh4U3ctqyA==
-=rVpu
------END PGP SIGNATURE-----
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      dm: don't attempt to queue IO under RCU protection
-
-Mikulas Patocka (1):
-      dm: fix a race condition in retrieve_deps
-
- drivers/md/dm-core.h  |  1 +
- drivers/md/dm-ioctl.c |  7 ++++++-
- drivers/md/dm-table.c | 32 ++++++++++++++++++++++++--------
- drivers/md/dm.c       | 23 ++---------------------
- 4 files changed, 33 insertions(+), 30 deletions(-)
