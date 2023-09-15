@@ -2,121 +2,167 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0105EEDE995
-	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 03:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93334EE6425
+	for <linux-block@archiver.kernel.org>; Fri, 15 Sep 2023 07:05:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbjIOD2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Sep 2023 23:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47658 "EHLO
+        id S232241AbjIOHFN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Sep 2023 03:05:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231478AbjIOD2F (ORCPT
+        with ESMTP id S229693AbjIOHFM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2023 23:28:05 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7772B270C
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2023 20:28:01 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c364fb8a4cso15511185ad.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2023 20:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1694748481; x=1695353281; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t+PxbEbDUK9m7L9eOwonONEUf3spAn5TVfpL5qQWV60=;
-        b=mLtXxtTKjvfYHe/VITVe0m8r7E20dD6WhQVlDdyN3Ywh3s3mHyO6jUXs2gSsOS+LVO
-         fuLT4TtoRg0ZgFabEqmLyckw5eRdqfQeeMwXaEnUQKyt/YMyooZJEkFu37vN5s8WeC1m
-         MpB3PJIKbP3x6DTZvCaVo7DSfSend1ficmTOU=
+        Fri, 15 Sep 2023 03:05:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BAE31E6
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 00:04:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694761459;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R0ZKX9+ZDfk8TG2B9BpARJtWjXCRBlMo1JDLbdvybKk=;
+        b=Qzf5fZVX+gVQ18fxWHy9bzwTEUHsz0JXk8zNAXaH336MUCntgCL/9aMwd6UVKx4MrF+He7
+        LSpr3AUQpK7xS16Nh8eYYpM/e3x0L2uhEk4LsAojnXD4tZAl0H9bxVHZSup2dSITE3EdSo
+        1NVYEGVQkxJXffFNTCRrNSAP/Nh9qDg=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-505-dwuj1twTMoG_bbx8RD4g3A-1; Fri, 15 Sep 2023 03:04:17 -0400
+X-MC-Unique: dwuj1twTMoG_bbx8RD4g3A-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-50081b0dba6so2159000e87.0
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2023 00:04:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694748481; x=1695353281;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t+PxbEbDUK9m7L9eOwonONEUf3spAn5TVfpL5qQWV60=;
-        b=Hxa4V19XXBuQfZ/RIq0HTqdbjVlEnHTXN6sQGy7A2HSSDdDQuJvGvZ/wqSXdi3nqfb
-         GPwWmMOqDZCeS/Z+P8dtVJVOOc5dupDYx56JG5dRiFLwvgMAD7cnHr0lkNzu0nn9o2TV
-         8EG5PRt7ju7PdoR/Fw7C5GGvVoCj2FGreQBcdjGDxVzPba9NKoXaw0aQyXVjj593GN/x
-         fY86PqW0QLSpsoFVanZuWUnbJs8BxGDdJD66cQrtJtRqv29XdKAkK6vvkcEjUd2PjVWv
-         cUe1hpKaAIRZkN/SjWEjFcALT2QEr8BZmYbvQLlq0mJkWG+70I0Ef2WVNPASco+8OYXK
-         E7Dg==
-X-Gm-Message-State: AOJu0YzYCCPsMSgU9K9oD6h7g8fYEywdMegTwy1nOA1LO0ed0g+yOVeJ
-        /70QdnZk4QOq6A1RmBfsPQwB8Q==
-X-Google-Smtp-Source: AGHT+IF0/YcQFVvOK0tcqUhNbXrT6DuPYxwgG6RG9j0w5ZYKT0uGXsAGlk7mB14f95hH7iaxmatr2w==
-X-Received: by 2002:a17:902:e881:b0:1bc:203f:3b3c with SMTP id w1-20020a170902e88100b001bc203f3b3cmr539931plg.24.1694748480950;
-        Thu, 14 Sep 2023 20:28:00 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id m7-20020a170902db0700b001b9f7bc3e77sm2326232plx.189.2023.09.14.20.28.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 20:28:00 -0700 (PDT)
-Date:   Thu, 14 Sep 2023 20:27:59 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Justin Stitt <justinstitt@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH] null_blk: refactor deprecated strncpy
-Message-ID: <202309142022.50EF929@keescook>
-References: <20230911-strncpy-drivers-block-null_blk-main-c-v1-1-3b3887e7fde4@google.com>
+        d=1e100.net; s=20230601; t=1694761456; x=1695366256;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R0ZKX9+ZDfk8TG2B9BpARJtWjXCRBlMo1JDLbdvybKk=;
+        b=fagxRSILOHHql+v3XaOxPzIW56r+F71vq4dnyyQU3uypVhfqA4gI3C6lxtRSLS090M
+         S2/S9L0m0qt+8DSmjEWLzyQePH4aIZcqhHnurOBd0pGPcjYiD9HMi3A8j+2pC0/q1m6r
+         gJvRuUYXS0BYdcE8mFzAVVrkL79RxO2oIKAK5OruCdFsnk2TQcvTPErCIYkGHrjwLz+U
+         uHFOWabqCNJsWpKj4sfmE1kAhOFt7Osty1aTLwdbXUDfRG/1IB3W8imRuYChItM8970j
+         Tns+l9bbG6Ab6K5qsj/Cy6haCb7seT/9RHRZlNsjavfWVtQFwyIk+GDi9Omy0JERZRkl
+         6AcQ==
+X-Gm-Message-State: AOJu0YwRdbDqnP3FSJrUg3qmZF5NZZUFNPt/TZRO0zrhslG5z8GUsZVk
+        Wr7IgTzpFW8jeqUyI/VM0FOE8+9VMmSMYFUcgmIHY2jtVt7ymmQc/oNeeyAJzVkonsDYrv0ZpPY
+        27dEU3rdFSZ/7cEpxEJStx79RwNQpIJY3j6+843g=
+X-Received: by 2002:a05:6512:2149:b0:4fd:d002:ddad with SMTP id s9-20020a056512214900b004fdd002ddadmr643738lfr.12.1694761456390;
+        Fri, 15 Sep 2023 00:04:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHtta3SijY3RzwwYuYFpIpWRyB53UbRzdNZ6fENanosL+1QizYjo1V+WEDWxW8bolgTjIL8Pmv4Uv9BVbuxiSY=
+X-Received: by 2002:a05:6512:2149:b0:4fd:d002:ddad with SMTP id
+ s9-20020a056512214900b004fdd002ddadmr643715lfr.12.1694761456031; Fri, 15 Sep
+ 2023 00:04:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230911-strncpy-drivers-block-null_blk-main-c-v1-1-3b3887e7fde4@google.com>
+References: <20230908093009.540763-1-ming.lei@redhat.com> <58227846-6b73-46ef-957f-d9b1e0451899@kernel.dk>
+ <ZPsxCYFgZjIIeaBk@fedora> <0f85a6b5-3ba6-4b77-bb7d-79f365dbb44c@kernel.dk> <ZPs81IAYfB8J78Pv@fedora>
+In-Reply-To: <ZPs81IAYfB8J78Pv@fedora>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Fri, 15 Sep 2023 15:04:05 +0800
+Message-ID: <CACGkMEvP=f1mB=01CDOhHaDLNL9espKPrUffgHEdBVkW4fo=pw@mail.gmail.com>
+Subject: Re: [PATCH V3] io_uring: fix IO hang in io_wq_put_and_exit from do_exit()
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        virtualization@lists.linux-foundation.org, mst@redhat.com,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 11, 2023 at 09:46:47PM +0000, Justin Stitt wrote:
-> `strncpy` is deprecated for use on NUL-terminated destination strings [1].
-> 
-> We should favor a more robust and less ambiguous interface.
-> 
-> We know `nullb->disk_name` is NUL-terminated and we expect that
-> `disk->disk_name` also be NUL-terminated:
-> |     snprintf(nullb->disk_name, sizeof(nullb->disk_name),
-> |              "%s", config_item_name(&dev->group.cg_item));
+On Fri, Sep 8, 2023 at 11:25=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> On Fri, Sep 08, 2023 at 08:44:45AM -0600, Jens Axboe wrote:
+> > On 9/8/23 8:34 AM, Ming Lei wrote:
+> > > On Fri, Sep 08, 2023 at 07:49:53AM -0600, Jens Axboe wrote:
+> > >> On 9/8/23 3:30 AM, Ming Lei wrote:
+> > >>> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> > >>> index ad636954abae..95a3d31a1ef1 100644
+> > >>> --- a/io_uring/io_uring.c
+> > >>> +++ b/io_uring/io_uring.c
+> > >>> @@ -1930,6 +1930,10 @@ void io_wq_submit_work(struct io_wq_work *wo=
+rk)
+> > >>>           }
+> > >>>   }
+> > >>>
+> > >>> + /* It is fragile to block POLLED IO, so switch to NON_BLOCK */
+> > >>> + if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_queue)
+> > >>> +         issue_flags |=3D IO_URING_F_NONBLOCK;
+> > >>> +
+> > >>
+> > >> I think this comment deserves to be more descriptive. Normally we
+> > >> absolutely cannot block for polled IO, it's only OK here because io-=
+wq
+> > >
+> > > Yeah, we don't do that until commit 2bc057692599 ("block: don't make =
+REQ_POLLED
+> > > imply REQ_NOWAIT") which actually push the responsibility/risk up to
+> > > io_uring.
+> > >
+> > >> is the issuer and not necessarily the poller of it. That generally f=
+alls
+> > >> upon the original issuer to poll these requests.
+> > >>
+> > >> I think this should be a separate commit, coming before the main fix
+> > >> which is below.
+> > >
+> > > Looks fine, actually IO_URING_F_NONBLOCK change isn't a must, and the
+> > > approach in V2 doesn't need this change.
+> > >
+> > >>
+> > >>> @@ -3363,6 +3367,12 @@ __cold void io_uring_cancel_generic(bool can=
+cel_all, struct io_sq_data *sqd)
+> > >>>           finish_wait(&tctx->wait, &wait);
+> > >>>   } while (1);
+> > >>>
+> > >>> + /*
+> > >>> +  * Reap events from each ctx, otherwise these requests may take
+> > >>> +  * resources and prevent other contexts from being moved on.
+> > >>> +  */
+> > >>> + xa_for_each(&tctx->xa, index, node)
+> > >>> +         io_iopoll_try_reap_events(node->ctx);
+> > >>
+> > >> The main issue here is that if someone isn't polling for them, then =
+we
+> > >
+> > > That is actually what this patch is addressing, :-)
+> >
+> > Right, that part is obvious :)
+> >
+> > >> get to wait for a timeout before they complete. This can delay exit,=
+ for
+> > >> example, as we're now just waiting 30 seconds (or whatever the timeo=
+ut
+> > >> is on the underlying device) for them to get timed out before exit c=
+an
+> > >> finish.
+> > >
+> > > For the issue on null_blk, device timeout handler provides
+> > > forward-progress, such as requests are released, so new IO can be
+> > > handled.
+> > >
+> > > However, not all devices support timeout, such as virtio device.
+> >
+> > That's a bug in the driver, you cannot sanely support polled IO and not
+> > be able to deal with timeouts. Someone HAS to reap the requests and
+> > there are only two things that can do that - the application doing the
+> > polled IO, or if that doesn't happen, a timeout.
+>
+> OK, then device driver timeout handler has new responsibility of covering
+> userspace accident, :-)
+>
+> We may document this requirement for driver.
+>
+> So far the only one should be virtio-blk, and the two virtio storage
+> drivers never implement timeout handler.
+>
 
-More accurately, it's has uses that require a %NUL-terminated string:
+Adding Stefan for more comments.
 
-	pr_info("disk %s created\n", nullb->disk_name);
+Thanks
 
-(i.e. showing the consumer's use is better evidence than the producer's
-use.)
-
-But I do think the above is good evidence that truncation is tolerated.
-
-> 
-> It seems like NUL-padding may be required due to __assign_disk_name()
-> utilizing a memcpy as opposed to a `str*cpy` api.
-> | static inline void __assign_disk_name(char *name, struct gendisk *disk)
-> | {
-> | 	if (disk)
-> | 		memcpy(name, disk->disk_name, DISK_NAME_LEN);
-> | 	else
-> | 		memset(name, 0, DISK_NAME_LEN);
-> | }
-
-I does look like it expects 0-fill. Looking at it with more context,
-this appears to be a trace buffer:
-
-TRACE_EVENT(nullb_zone_op,
-            TP_PROTO(struct nullb_cmd *cmd, unsigned int zone_no,
-                     unsigned int zone_cond),
-            TP_ARGS(cmd, zone_no, zone_cond),
-            TP_STRUCT__entry(
-                __array(char, disk, DISK_NAME_LEN)
-                __field(enum req_op, op)
-                __field(unsigned int, zone_no)
-                __field(unsigned int, zone_cond)
-            ),
-            TP_fast_assign(
-                __entry->op = req_op(cmd->rq);
-                __entry->zone_no = zone_no;
-                __entry->zone_cond = zone_cond;
-                __assign_disk_name(__entry->disk, cmd->rq->q->disk);
-            ),
-
-This should probably have been a dynamic string, but it's not. So let's
-make sure this stays padded. Can you send this again but use
-strscpy_pad() instead?
-
--- 
-Kees Cook
