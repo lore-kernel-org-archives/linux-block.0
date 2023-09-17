@@ -2,78 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF1BCD37BC
-	for <linux-block@archiver.kernel.org>; Sat, 16 Sep 2023 12:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02266CD37B3
+	for <linux-block@archiver.kernel.org>; Sun, 17 Sep 2023 11:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239475AbjIPMnc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Sep 2023 08:43:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47758 "EHLO
+        id S230005AbjIQLu6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Sep 2023 07:50:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231897AbjIPMnA (ORCPT
+        with ESMTP id S234387AbjIQLuy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Sep 2023 08:43:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 03C721B2
-        for <linux-block@vger.kernel.org>; Sat, 16 Sep 2023 05:41:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694868070;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/kqZRW9gXRNvc1F996eE1e2wizoKvGhnn1qjNWI2aaY=;
-        b=aL/BfTCxgCh4wJRUHxlcQDWRCOz6Zka2iugI0xYLFYr8ri+N3SPK9uLbpNzIwN+iuy8RVi
-        62mdC2BTPkjfexQCP9Bhm3XtoXfStUDTC4FYZ4rmKTV0tqOgF05r4NwGzCz1pRscLwbWcC
-        RDgDkPXRNSEFv8o3PUmdbi1FPFlA4+Y=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-592-qxep9wqRMGimdZPrcCGAcw-1; Sat, 16 Sep 2023 08:41:06 -0400
-X-MC-Unique: qxep9wqRMGimdZPrcCGAcw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Sun, 17 Sep 2023 07:50:54 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2271E128;
+        Sun, 17 Sep 2023 04:50:49 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0E02785A5BA;
-        Sat, 16 Sep 2023 12:41:06 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.6])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BC47F2026D68;
-        Sat, 16 Sep 2023 12:41:00 +0000 (UTC)
-Date:   Sat, 16 Sep 2023 20:40:55 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     chengming.zhou@linux.dev
-Cc:     axboe@kernel.dk, hch@lst.de, bvanassche@acm.org, kbusch@kernel.org,
-        mst@redhat.com, damien.lemoal@opensource.wdc.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: Re: [PATCH v2 2/5] blk-mq: remove RQF_MQ_INFLIGHT
-Message-ID: <ZQWiVwVh3VcjA6aD@fedora>
-References: <20230913151616.3164338-1-chengming.zhou@linux.dev>
- <20230913151616.3164338-3-chengming.zhou@linux.dev>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id AD46A1F88C;
+        Sun, 17 Sep 2023 11:50:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1694951447; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=loxy3PBfksAESFkI1XAMKVCrdymCRMcZU0rlFvXm9wo=;
+        b=VrRFMWYN7WZf9NEILYObPxsQfRf+Nrw0gAYnf8drrbpLNg9QTmVbyETIISqBaae5muZod0
+        W92ZWtOA9hJz5Ujak5p4T9D0icchXCxcji5s5t/G/U7FdKVtkA1IcRjpSegMn6dvXszQgG
+        tCJohYYvaYF4079js8Ooykg5pgIMuDg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1694951447;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=loxy3PBfksAESFkI1XAMKVCrdymCRMcZU0rlFvXm9wo=;
+        b=c946s20XW6AXt0yX0ux/PcEEvdw0vz3mJhHQJAxihMn1iCLmIquwG/RjInho2BHPhakhKW
+        C3BucqY19c0OoxAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6C839134F3;
+        Sun, 17 Sep 2023 11:50:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 0i76GBboBmV7MwAAMHmgww
+        (envelope-from <hare@suse.de>); Sun, 17 Sep 2023 11:50:46 +0000
+Message-ID: <5e5eb1f0-d197-4a25-b8bb-5734b9c57c1c@suse.de>
+Date:   Sun, 17 Sep 2023 13:50:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230913151616.3164338-3-chengming.zhou@linux.dev>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 00/10] bdev: LBS devices support to coexist with
+ buffer-heads
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Cc:     hch@infradead.org, djwong@kernel.org, dchinner@redhat.com,
+        kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
+        brauner@kernel.org, ritesh.list@gmail.com, rgoldwyn@suse.com,
+        jack@suse.cz, ziy@nvidia.com, ryan.roberts@arm.com,
+        patches@lists.linux.dev, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        p.raghav@samsung.com, da.gomez@samsung.com, dan.helmick@samsung.com
+References: <20230915213254.2724586-1-mcgrof@kernel.org>
+ <ZQTR0NorkxJlcNBW@casper.infradead.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ZQTR0NorkxJlcNBW@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 13, 2023 at 03:16:13PM +0000, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
+On 9/15/23 23:51, Matthew Wilcox wrote:
+> On Fri, Sep 15, 2023 at 02:32:44PM -0700, Luis Chamberlain wrote:
+>> However, an issue is that disabling CONFIG_BUFFER_HEAD in practice is not viable
+>> for many Linux distributions since it also means disabling support for most
+>> filesystems other than btrfs and XFS. So we either support larger order folios
+>> on buffer-heads, or we draw up a solution to enable co-existence. Since at LSFMM
+>> 2023 it was decided we would not support larger order folios on buffer-heads,
 > 
-> Since the previous patch change to only account active requests when
-> we really allocate the driver tag, the RQF_MQ_INFLIGHT can be removed
-> and no double account problem.
+> Um, I didn't agree to that.  If block size is equal to folio size, there
+> are no problems supporting one buffer head per folio.  In fact, we could
+> probably go up to 8 buffer heads per folio without any trouble (but I'm
+> not signing up to do that work).
 > 
-> 1. none elevator: flush request will use the first pending request's
->    driver tag, won't double account.
-> 
-> 2. other elevator: flush request will be accounted when allocate driver
->    tag when issue, and will be unaccounted when it put the driver tag.
-> 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+Entirely correct.
+I have a patchset ready for doing just that (ie having one buffer head 
+per folio); hope I'll find some time next week to get it cleaned up and 
+posted.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cheers,
 
-Thanks,
-Ming
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
