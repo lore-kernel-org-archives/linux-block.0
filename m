@@ -2,69 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CABCD37B0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 16:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AD7C46CA1
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 16:43:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230412AbjIRQkq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 12:40:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40738 "EHLO
+        id S230365AbjIRQn2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 12:43:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbjIRQkb (ORCPT
+        with ESMTP id S229938AbjIRQnB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:40:31 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC0D29014;
-        Mon, 18 Sep 2023 09:36:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=6lDiEKrRXMJA2N279PscPh32vANLMIzmwG4EoyHb/zA=; b=g6bZQ93v1MSvnguNfY0FUHoR0K
-        8pv1CptENiOT2Yytmv2STYyZJREvnpJj5h6aYkWyLkVGO3FQPBIubZRq4IfowwKiXtbt0gVrVU0W9
-        Ai9HzR9WMFNY0mJDxN58Ms8wzSopWIsXootTzUliXYmQGmn4/NwsS6PHJXyWG8egjKqv4SPFdMyv6
-        Z/GVvOhBt31uZafKvcHDBeIskPBpHfRFlm6k/cGw7v9uSpbuwd6Qf2b7kL6KFRz7noDdvCv+0WNMf
-        33xjEpykrkSBBjdRuMhnEYwv4aZyNGlNH0iNMC3T4lpzEc/9PY4QP7clKe/+5PIfWO1SM2PZunREK
-        9A1l+/Ag==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qiHEb-00C3j6-SN; Mon, 18 Sep 2023 16:36:29 +0000
-Date:   Mon, 18 Sep 2023 17:36:29 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 03/18] block/buffer_head: introduce
- block_{index_to_sector,sector_to_index}
-Message-ID: <ZQh8jXqpHFXQyEDT@casper.infradead.org>
-References: <20230918110510.66470-1-hare@suse.de>
- <20230918110510.66470-4-hare@suse.de>
+        Mon, 18 Sep 2023 12:43:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70276E6E
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 09:04:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695052988;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Hy0ReXQZiegSjwpmyZH2qjKRhSINulN3U3E7DKyqaHs=;
+        b=VXE/Ue4GjVgLBjH51xi4k/R3cA++D1nFAL4ErxXuEoATKQnYCxC1KoIeKVyyKV+r80WSCw
+        YvaQnLW2lkKKzL8NZZ+0LDRqQ79eRvdOzVELdKCn9IZJX6uIy1IBwAS8BH7w28Eo9Rfysc
+        AQvevjZVRNWVVmwsS67d4ID7EAgeZ+A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-54-HD6phgFBND-pWVVk7hfZWw-1; Mon, 18 Sep 2023 12:02:56 -0400
+X-MC-Unique: HD6phgFBND-pWVVk7hfZWw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 86AFE803470;
+        Mon, 18 Sep 2023 16:02:55 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B5B9A2904;
+        Mon, 18 Sep 2023 16:02:52 +0000 (UTC)
+Date:   Tue, 19 Sep 2023 00:02:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        ming.lei@redhat.com
+Subject: Re: [PATCH 00/10] io_uring/ublk: exit notifier support
+Message-ID: <ZQh0p+ovm1sd3Vau@fedora>
+References: <20230918041106.2134250-1-ming.lei@redhat.com>
+ <fae0bbc9-efdd-4b56-a5c8-53428facbe5b@kernel.dk>
+ <ZQhPhFwgSLvR/zDM@fedora>
+ <5706fa76-a071-4081-8bb0-b1089e86a77f@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230918110510.66470-4-hare@suse.de>
+In-Reply-To: <5706fa76-a071-4081-8bb0-b1089e86a77f@kernel.dk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 01:04:55PM +0200, Hannes Reinecke wrote:
-> @@ -449,6 +450,22 @@ __bread(struct block_device *bdev, sector_t block, unsigned size)
->  
->  bool block_dirty_folio(struct address_space *mapping, struct folio *folio);
->  
-> +static inline sector_t block_index_to_sector(pgoff_t index, unsigned int blkbits)
-> +{
-> +	if (PAGE_SHIFT < blkbits)
-> +		return (sector_t)index >> (blkbits - PAGE_SHIFT);
-> +	else
-> +		return (sector_t)index << (PAGE_SHIFT - blkbits);
-> +}
+On Mon, Sep 18, 2023 at 08:15:07AM -0600, Jens Axboe wrote:
+> On 9/18/23 7:24 AM, Ming Lei wrote:
+> > On Mon, Sep 18, 2023 at 06:54:33AM -0600, Jens Axboe wrote:
+> >> On 9/17/23 10:10 PM, Ming Lei wrote:
+> >>> Hello,
+> >>>
+> >>> In do_exit(), io_uring needs to wait pending requests.
+> >>>
+> >>> ublk is one uring_cmd driver, and its usage is a bit special by submitting
+> >>> command for waiting incoming block IO request in advance, so if there
+> >>> isn't any IO request coming, the command can't be completed. So far ublk
+> >>> driver has to bind its queue with one ublk daemon server, meantime
+> >>> starts one monitor work to check if this daemon is live periodically.
+> >>> This way requires ublk queue to be bound one single daemon pthread, and
+> >>> not flexible, meantime the monitor work is run in 3rd context, and the
+> >>> implementation is a bit tricky.
+> >>>
+> >>> The 1st 3 patches adds io_uring task exit notifier, and the other
+> >>> patches converts ublk into this exit notifier, and the implementation
+> >>> becomes more robust & readable, meantime it becomes easier to relax
+> >>> the ublk queue/daemon limit in future, such as not require to bind
+> >>> ublk queue with single daemon.
+> >>
+> >> The normal approach for this is to ensure that each request is
+> >> cancelable, which we need for other things too (like actual cancel
+> >> support) Why can't we just do the same for ublk?
+> > 
+> > I guess you meant IORING_OP_ASYNC_CANCEL, which needs userspace to
+> > submit this command, but here the userspace(ublk server) may be just panic
+> > or killed, and there isn't chance to send IORING_OP_ASYNC_CANCEL.
+> 
+> Either that, or cancel done because of task exit.
+> 
+> > And driver doesn't have any knowledge if the io_uring ctx or io task
+> > is exiting, so can't complete issued commands, then hang in
+> > io_uring_cancel_generic() when the io task/ctx is exiting.
+> 
+> If you hooked into the normal cancel paths, you very much would get
+> notified when the task is exiting. That's how the other cancelations
+> work, eg if a task has pending poll requests and exits, they get
+> canceled and reaped.
 
-Is this actually more efficient than ...
+Ok, got the idea, thanks for the point!
 
-	loff_t pos = (loff_t)index * PAGE_SIZE;
-	return pos >> blkbits;
+Turns out it is cancelable uring_cmd, and I will try to work towards
+this direction, and has got something in mind about the implementation.
 
-It feels like we're going to be doing this a lot, so we should find out
-what's actually faster.
+
+Thanks, 
+Ming
 
