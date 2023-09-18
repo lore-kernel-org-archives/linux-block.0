@@ -2,45 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3980CCD342B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5FACD342C
 	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234735AbjIRLF5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 07:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58348 "EHLO
+        id S237739AbjIRLF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 07:05:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235528AbjIRLFZ (ORCPT
+        with ESMTP id S236249AbjIRLF0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:05:25 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC52FF;
-        Mon, 18 Sep 2023 04:05:18 -0700 (PDT)
+        Mon, 18 Sep 2023 07:05:26 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DAC8103;
+        Mon, 18 Sep 2023 04:05:19 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 7888321AB1;
+        by smtp-out1.suse.de (Postfix) with ESMTP id 7200121AAF;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1695035117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zQdnjHkpphpTUZvovpEEYbCyA4aD++DzvNzuV2MwetQ=;
-        b=x6juv+yivgnzd1s2Cvo7yOHmPrQzRukbHDxCP1y1H/pXLOOkZnZSNPwQEi97Y5v7s/2ln8
-        XZyyhroVs6lVY5TuobUIO0zBWsWuQCgGsq/DQXqJitW7DUN4avEjD1N/vqTFXUTBqmhHv5
-        nP3RbTFVLiKCp8E/uw/Dl9VAsKfTKkE=
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=hiZ67VsJwWSd2gCuLZhIzDylPHqXuAjYStRK9uVLrOQ=;
+        b=izEau36HssT4JCnb1DZQxp2OyGMfY+h9BZf1Vox+BgnCC5bj5yWcLascp2R3fH0rN5kuHh
+        URhhoG6uAI5Qvy8XW6S5MKxsOL4g0BZO8/ng/b4PYkpkAd3CTwYSJGPw9VJtMHo842FJTX
+        Hlf9eIZPd8wMtufFd0aDMtOATeecBNw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1695035117;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zQdnjHkpphpTUZvovpEEYbCyA4aD++DzvNzuV2MwetQ=;
-        b=RNvEEQaqux8fUEAdfZUqsWWhx/kfpzRGbBVsEB8v0U6oh8r/nvHAHQ/dSF5jtFSCz8w7bE
-        ofp/aLks2o/8V3Dg==
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=hiZ67VsJwWSd2gCuLZhIzDylPHqXuAjYStRK9uVLrOQ=;
+        b=26ix+2FNqJ8kY7wTfkdQQzSI5pgnnVSNKzeOAh9d4kPpPlQ4ehTz63bUIo8lWKyRd6Aq7e
+        bs+h29iqu2fJZkDQ==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 618C52C14F;
-        Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id DA6A22C142;
+        Mon, 18 Sep 2023 11:05:16 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 1AE0351CD149; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
+        id E0C0C51CD13D; Mon, 18 Sep 2023 13:05:16 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
@@ -48,116 +44,78 @@ Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 06/18] fs: Allow fine-grained control of folio sizes
-Date:   Mon, 18 Sep 2023 13:04:58 +0200
-Message-Id: <20230918110510.66470-7-hare@suse.de>
+Subject: [RFC PATCH 00/18] block: update buffer_head for Large-block I/O
+Date:   Mon, 18 Sep 2023 13:04:52 +0200
+Message-Id: <20230918110510.66470-1-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230918110510.66470-1-hare@suse.de>
-References: <20230918110510.66470-1-hare@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Hi all,
 
-Some filesystems want to be able to limit the maximum size of folios,
-and some want to be able to ensure that folios are at least a certain
-size.  Add mapping_set_folio_orders() to allow this level of control
-(although it is not yet honoured).
+to make life a little bit more interesting, here is an alternative
+patchset to enable large-block I/O for buffer_head. Based on top of
+current linus master, no special tweaking required.
+And yes, I am _very_ much aware of hch's work to disable buffer_head for iomap.
 
-[Pankaj]: added mapping_min_folio_order()
+Key point here is that we can enable large block I/O for buffer heads
+if we always consider the page reference in 'struct buffer_head' to be
+a folio, and always calculcate the size of the page reference with using
+folio_size(). That way we keep the assumptions that each page (or, in our
+context, each folio) has a pointer (or a list of pointers) to a struct
+buffer_head, and each buffer_head has a pointer to exactly one page/folio.
+Then it's just a matter of auditing the page cache to always looks at the
+folio and not the page, and the work's pretty much done.
 
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
----
- include/linux/pagemap.h | 48 ++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 43 insertions(+), 5 deletions(-)
+Famous last words.
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 351c3b7f93a1..129d62a891be 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -202,10 +202,16 @@ enum mapping_flags {
- 	AS_EXITING	= 4, 	/* final truncate in progress */
- 	/* writeback related tags are not used */
- 	AS_NO_WRITEBACK_TAGS = 5,
--	AS_LARGE_FOLIO_SUPPORT = 6,
--	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
-+	AS_RELEASE_ALWAYS = 6,	/* Call ->release_folio(), even if no private data */
-+	AS_FOLIO_ORDER_MIN = 8,
-+	AS_FOLIO_ORDER_MAX = 13,
-+	/* 8-17 are used for FOLIO_ORDER */
- };
- 
-+#define AS_FOLIO_ORDER_MIN_MASK	0x00001f00
-+#define AS_FOLIO_ORDER_MAX_MASK 0x0002e000
-+#define AS_FOLIO_ORDER_MASK (AS_FOLIO_ORDER_MIN_MASK | AS_FOLIO_ORDER_MAX_MASK)
-+
- /**
-  * mapping_set_error - record a writeback error in the address_space
-  * @mapping: the mapping in which an error should be set
-@@ -310,6 +316,29 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
- 	m->gfp_mask = mask;
- }
- 
-+/**
-+ * mapping_set_folio_orders() - Set the range of folio sizes supported.
-+ * @mapping: The file.
-+ * @min: Minimum folio order (between 0-31 inclusive).
-+ * @max: Maximum folio order (between 0-31 inclusive).
-+ *
-+ * The filesystem should call this function in its inode constructor to
-+ * indicate which sizes of folio the VFS can use to cache the contents
-+ * of the file.  This should only be used if the filesystem needs special
-+ * handling of folio sizes (ie there is something the core cannot know).
-+ * Do not tune it based on, eg, i_size.
-+ *
-+ * Context: This should not be called while the inode is active as it
-+ * is non-atomic.
-+ */
-+static inline void mapping_set_folio_orders(struct address_space *mapping,
-+		unsigned int min, unsigned int max)
-+{
-+	mapping->flags = (mapping->flags & ~AS_FOLIO_ORDER_MASK) |
-+			(min << AS_FOLIO_ORDER_MIN) |
-+			(max << AS_FOLIO_ORDER_MAX);
-+}
-+
- /**
-  * mapping_set_large_folios() - Indicate the file supports large folios.
-  * @mapping: The file.
-@@ -323,7 +352,17 @@ static inline void mapping_set_gfp_mask(struct address_space *m, gfp_t mask)
-  */
- static inline void mapping_set_large_folios(struct address_space *mapping)
- {
--	__set_bit(AS_LARGE_FOLIO_SUPPORT, &mapping->flags);
-+	mapping_set_folio_orders(mapping, 0, 31);
-+}
-+
-+static inline unsigned mapping_max_folio_order(struct address_space *mapping)
-+{
-+	return (mapping->flags & AS_FOLIO_ORDER_MAX_MASK) >> AS_FOLIO_ORDER_MAX;
-+}
-+
-+static inline unsigned mapping_min_folio_order(struct address_space *mapping)
-+{
-+	return (mapping->flags & AS_FOLIO_ORDER_MIN_MASK) >> AS_FOLIO_ORDER_MIN;
- }
- 
- /*
-@@ -332,8 +371,7 @@ static inline void mapping_set_large_folios(struct address_space *mapping)
-  */
- static inline bool mapping_large_folio_support(struct address_space *mapping)
- {
--	return IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE) &&
--		test_bit(AS_LARGE_FOLIO_SUPPORT, &mapping->flags);
-+	return mapping_max_folio_order(mapping) > 0;
- }
- 
- static inline int filemap_nr_thps(struct address_space *mapping)
+Patchset also contains an update to 'brd' to enable large block sizes.
+For testing please do:
+
+# modprobe brd rd_size=524288 rd_blksize=16384 rd_logical_blksize=16384
+# mkfs.xfs -b size=16384
+
+As usual, comments and reviews are welcome.
+
+Hannes Reinecke (16):
+  mm/readahead: rework loop in page_cache_ra_unbounded()
+  fs/mpage: use blocks_per_folio instead of blocks_per_page
+  block/buffer_head: introduce block_{index_to_sector,sector_to_index}
+  fs/buffer.c: use accessor function to translate page index to sectors
+  fs/mpage: use accessor function to translate page index to sectors
+  mm/filemap: allocate folios with mapping order preference
+  mm/readahead: allocate folios with mapping order preference
+  fs/buffer: use mapping order in grow_dev_page()
+  block/bdev: lift restrictions on supported blocksize
+  block/bdev: enable large folio support for large logical block sizes
+  brd: convert to folios
+  brd: abstract page_size conventions
+  brd: use memcpy_{to,from}_folio()
+  brd: make sector size configurable
+  brd: make logical sector size configurable
+  xfs: remove check for block sizes smaller than PAGE_SIZE
+
+Matthew Wilcox (Oracle) (1):
+  fs: Allow fine-grained control of folio sizes
+
+Pankaj Raghav (1):
+  nvme: enable logical block size > PAGE_SIZE
+
+ block/bdev.c                |  15 ++-
+ drivers/block/brd.c         | 256 ++++++++++++++++++++----------------
+ drivers/nvme/host/core.c    |   2 +-
+ fs/buffer.c                 |  20 +--
+ fs/mpage.c                  |  54 ++++----
+ fs/xfs/xfs_super.c          |  12 --
+ include/linux/buffer_head.h |  17 +++
+ include/linux/pagemap.h     |  48 ++++++-
+ mm/filemap.c                |  20 ++-
+ mm/readahead.c              |  52 +++++---
+ 10 files changed, 305 insertions(+), 191 deletions(-)
+
 -- 
 2.35.3
 
