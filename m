@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 594CFCD3432
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB539CD3435
 	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241266AbjIRLGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 07:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58398 "EHLO
+        id S236249AbjIRLGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 07:06:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237319AbjIRLF1 (ORCPT
+        with ESMTP id S236692AbjIRLF1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 18 Sep 2023 07:05:27 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D4AEFD;
-        Mon, 18 Sep 2023 04:05:22 -0700 (PDT)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9745AE1;
+        Mon, 18 Sep 2023 04:05:21 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 7EEF321AB4;
+        by smtp-out2.suse.de (Postfix) with ESMTP id 8E6021FE02;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1695035117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jfTnCrMUyIgQQOyzhN/BiKgDJel5tnRX3E4HLhLkzxM=;
-        b=XOyY0LhapqBgN6pSKH7Mbc/6mT6ZAnmquMKLsh56kby7XJS0lw3lGfM6p8BddNwOSZZufF
-        9M8gbXHtHKAz1CXngAFPd5U2l1wGTkrcYGN+BiIPhY8DcqCphP1fHKHlnwRL84fjVPkLqn
-        21UbGnJjpVrWevNnDoJ9HWKQiNh7sOM=
+        bh=7YxTD9ivwBqDlU0rUH4B43A6drfBPCpobX7r4lclL8s=;
+        b=y5VrsQtZSyfCP0fSu9yQrUFJnRPQU53VfudrMl94CnYtrz5TIfHfzLfmNemC2t/AtTNnZR
+        gnI60raF0lCn37KIw2Iam3XuijU36LGZLadTiA1DMOkc5OatFR+NPqgz7jAlWM/JjhnKye
+        zkOKceM5BXwg+69ZGxZbHQBWsnDP4mo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1695035117;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jfTnCrMUyIgQQOyzhN/BiKgDJel5tnRX3E4HLhLkzxM=;
-        b=leI3RX8xZZGHsGV42OBUe/ir6ItWAM5XB2Sngtv/AlY6qQVFDI/twvdZfepPD3oBhxgC2+
-        9xzu4bb4ZHkeKLCQ==
+        bh=7YxTD9ivwBqDlU0rUH4B43A6drfBPCpobX7r4lclL8s=;
+        b=GErq9oHTLI0nfJVFCYTBNOF/uty0XP64JJAoJ1/rADTpUiVNKEh86z+59qNaQteBSRF2Ep
+        i8R5YbfLFdXUQdDA==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 66DF32C15B;
+        by relay2.suse.de (Postfix) with ESMTP id 79AA22C166;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 5401D51CD157; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
+        id 72C7551CD15F; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 13/18] brd: abstract page_size conventions
-Date:   Mon, 18 Sep 2023 13:05:05 +0200
-Message-Id: <20230918110510.66470-14-hare@suse.de>
+Subject: [PATCH 17/18] xfs: remove check for block sizes smaller than PAGE_SIZE
+Date:   Mon, 18 Sep 2023 13:05:09 +0200
+Message-Id: <20230918110510.66470-18-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230918110510.66470-1-hare@suse.de>
 References: <20230918110510.66470-1-hare@suse.de>
@@ -60,117 +60,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In preparation for changing the block sizes abstract away references
-to PAGE_SIZE and friends.
+We now support block sizes larger than PAGE_SIZE, so this
+check is pointless.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/block/brd.c | 39 ++++++++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 9 deletions(-)
+ fs/xfs/xfs_super.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 9aa7511abc33..d6595b1a22e8 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -45,6 +45,23 @@ struct brd_device {
- 	u64			brd_nr_folios;
- };
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index 1f77014c6e1a..67dcdd4dcf2d 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -1651,18 +1651,6 @@ xfs_fs_fill_super(
+ 		goto out_free_sb;
+ 	}
  
-+#define BRD_SECTOR_SHIFT(b) (PAGE_SHIFT - SECTOR_SHIFT)
-+
-+static pgoff_t brd_sector_index(struct brd_device *brd, sector_t sector)
-+{
-+	pgoff_t idx;
-+
-+	idx = sector >> BRD_SECTOR_SHIFT(brd);
-+	return idx;
-+}
-+
-+static int brd_sector_offset(struct brd_device *brd, sector_t sector)
-+{
-+	unsigned int rd_sector_mask = (1 << BRD_SECTOR_SHIFT(brd)) - 1;
-+
-+	return ((unsigned int)sector & rd_sector_mask) << SECTOR_SHIFT;
-+}
-+
- /*
-  * Look up and return a brd's folio for a given sector.
-  */
-@@ -53,7 +70,7 @@ static struct folio *brd_lookup_folio(struct brd_device *brd, sector_t sector)
- 	pgoff_t idx;
- 	struct folio *folio;
- 
--	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to folio index */
-+	idx = brd_sector_index(brd, sector); /* sector to folio index */
- 	folio = xa_load(&brd->brd_folios, idx);
- 
- 	BUG_ON(folio && folio->index != idx);
-@@ -68,19 +85,20 @@ static int brd_insert_folio(struct brd_device *brd, sector_t sector, gfp_t gfp)
- {
- 	pgoff_t idx;
- 	struct folio *folio, *cur;
-+	unsigned int rd_sector_order = get_order(PAGE_SIZE);
- 	int ret = 0;
- 
- 	folio = brd_lookup_folio(brd, sector);
- 	if (folio)
- 		return 0;
- 
--	folio = folio_alloc(gfp | __GFP_ZERO | __GFP_HIGHMEM, 0);
-+	folio = folio_alloc(gfp | __GFP_ZERO | __GFP_HIGHMEM, rd_sector_order);
- 	if (!folio)
- 		return -ENOMEM;
- 
- 	xa_lock(&brd->brd_folios);
- 
--	idx = sector >> PAGE_SECTORS_SHIFT;
-+	idx = brd_sector_index(brd, sector);
- 	folio->index = idx;
- 
- 	cur = __xa_cmpxchg(&brd->brd_folios, idx, NULL, folio, gfp);
-@@ -122,11 +140,12 @@ static void brd_free_folios(struct brd_device *brd)
- static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n,
- 			     gfp_t gfp)
- {
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
-+	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int offset = brd_sector_offset(brd, sector);
- 	size_t copy;
- 	int ret;
- 
--	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	copy = min_t(size_t, n, rd_sector_size - offset);
- 	ret = brd_insert_folio(brd, sector, gfp);
- 	if (ret)
- 		return ret;
-@@ -145,10 +164,11 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- {
- 	struct folio *folio;
- 	void *dst;
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
-+	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int offset = brd_sector_offset(brd, sector);
- 	size_t copy;
- 
--	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	copy = min_t(size_t, n, rd_sector_size - offset);
- 	folio = brd_lookup_folio(brd, sector);
- 	BUG_ON(!folio);
- 
-@@ -177,10 +197,11 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- {
- 	struct folio *folio;
- 	void *src;
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
-+	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int offset = brd_sector_offset(brd, sector);
- 	size_t copy;
- 
--	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	copy = min_t(size_t, n, rd_sector_size - offset);
- 	folio = brd_lookup_folio(brd, sector);
- 	if (folio) {
- 		src = kmap_local_folio(folio, offset);
+-	/*
+-	 * Until this is fixed only page-sized or smaller data blocks work.
+-	 */
+-	if (mp->m_sb.sb_blocksize > PAGE_SIZE) {
+-		xfs_warn(mp,
+-		"File system with blocksize %d bytes. "
+-		"Only pagesize (%ld) or less will currently work.",
+-				mp->m_sb.sb_blocksize, PAGE_SIZE);
+-		error = -ENOSYS;
+-		goto out_free_sb;
+-	}
+-
+ 	/* Ensure this filesystem fits in the page cache limits */
+ 	if (xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_dblocks) ||
+ 	    xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_rblocks)) {
 -- 
 2.35.3
 
