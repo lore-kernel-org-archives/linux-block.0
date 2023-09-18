@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23587CD13DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41095CD3421
 	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239728AbjIRLFx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 07:05:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58324 "EHLO
+        id S239869AbjIRLFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 07:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234440AbjIRLFZ (ORCPT
+        with ESMTP id S233408AbjIRLFY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:05:25 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF39100;
-        Mon, 18 Sep 2023 04:05:19 -0700 (PDT)
+        Mon, 18 Sep 2023 07:05:24 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEDBE8F;
+        Mon, 18 Sep 2023 04:05:18 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 7876321AB0;
+        by smtp-out2.suse.de (Postfix) with ESMTP id 6DC561FDFD;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1695035117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xN6TM7GHFN0mqNZxYxxtWtFr22aM89KuuSlQeaM7rVQ=;
-        b=oivGAnFiHoQC3mzve3gBbJhTW0HH2z9Ykvz/cBJoO8cE3qBvC15vlkaVeR62458BHPICXA
-        0vyEYWgJ8zbFp4wEddXmdAsRZ+UvnqwlGC0WO1+QbwU585t/AlhxOEJKvm32uBRV/2dBfJ
-        XhpsCs3qaXgk0Q/u6wNL0c3Tr2OB9Wo=
+        bh=hjD8cnhpkb2Y5lGXJnngRv/a5ht52uC6A09ZJu2R4Sk=;
+        b=q+DxNIy/ZdGzclXyaNKtO0EP6Qa3MpMBMit+ZPD8D4xYLfbyW1iiGWcnLCUtu5shbb0foY
+        KCfjVqmChiQbJO+ucF0/u2OP0+gPG0fgLyK6X7qBP7/P5yqbltpEXKR0D/7IM7NkkWdNY7
+        7kHxkG+/jUsm1xBJhitj2z9c1iZ0Qvg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1695035117;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xN6TM7GHFN0mqNZxYxxtWtFr22aM89KuuSlQeaM7rVQ=;
-        b=3pQ/CfDScouXELAST2XLDIoiqVihUdtxb1CypSlVKmNS3qXPs2j3hZjPhAVdUe2IzSiW9G
-        11xZze9zvMzyXGBw==
+        bh=hjD8cnhpkb2Y5lGXJnngRv/a5ht52uC6A09ZJu2R4Sk=;
+        b=xuR9poqmq8V9n9KU6b9VFXUJK6lbKZ5g1NhIREtuK4VxBXSb/fMzVXpbc7SzdKtg1vmkv7
+        3Rrxili5oEqVPqDw==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 613C22C14B;
+        by relay2.suse.de (Postfix) with ESMTP id 066092C149;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 233A151CD14B; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
+        id 0AA3651CD145; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 07/18] mm/filemap: allocate folios with mapping order preference
-Date:   Mon, 18 Sep 2023 13:04:59 +0200
-Message-Id: <20230918110510.66470-8-hare@suse.de>
+Subject: [PATCH 04/18] fs/buffer.c: use accessor function to translate page index to sectors
+Date:   Mon, 18 Sep 2023 13:04:56 +0200
+Message-Id: <20230918110510.66470-5-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230918110510.66470-1-hare@suse.de>
 References: <20230918110510.66470-1-hare@suse.de>
@@ -60,79 +60,79 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use mapping_min_folio_order() when calling filemap_alloc_folio()
-to allocate folios with the order specified by the mapping.
+Use accessor functions block_index_to_sector() and block_sector_to_index()
+to translate the page index into the block sector and vice versa.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- mm/filemap.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ fs/buffer.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 582f5317ff71..98c3737644d5 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -507,9 +507,14 @@ static void __filemap_fdatawait_range(struct address_space *mapping,
- 	pgoff_t end = end_byte >> PAGE_SHIFT;
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 2379564e5aea..66895432d91f 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -199,7 +199,7 @@ __find_get_block_slow(struct block_device *bdev, sector_t block)
+ 	int all_mapped = 1;
+ 	static DEFINE_RATELIMIT_STATE(last_warned, HZ, 1);
+ 
+-	index = block >> (PAGE_SHIFT - bd_inode->i_blkbits);
++	index = block_sector_to_index(block, bd_inode->i_blkbits);
+ 	folio = __filemap_get_folio(bd_mapping, index, FGP_ACCESSED, 0);
+ 	if (IS_ERR(folio))
+ 		goto out;
+@@ -1702,13 +1702,13 @@ void clean_bdev_aliases(struct block_device *bdev, sector_t block, sector_t len)
+ 	struct inode *bd_inode = bdev->bd_inode;
+ 	struct address_space *bd_mapping = bd_inode->i_mapping;
  	struct folio_batch fbatch;
- 	unsigned nr_folios;
-+	unsigned int order = mapping_min_folio_order(mapping);
+-	pgoff_t index = block >> (PAGE_SHIFT - bd_inode->i_blkbits);
++	pgoff_t index = block_sector_to_index(block, bd_inode->i_blkbits);
+ 	pgoff_t end;
+ 	int i, count;
+ 	struct buffer_head *bh;
+ 	struct buffer_head *head;
  
+-	end = (block + len - 1) >> (PAGE_SHIFT - bd_inode->i_blkbits);
++	end = block_sector_to_index(block + len - 1, bd_inode->i_blkbits);
  	folio_batch_init(&fbatch);
+ 	while (filemap_get_folios(bd_mapping, &index, end, &fbatch)) {
+ 		count = folio_batch_count(&fbatch);
+@@ -1835,7 +1835,7 @@ int __block_write_full_folio(struct inode *inode, struct folio *folio,
+ 	blocksize = bh->b_size;
+ 	bbits = block_size_bits(blocksize);
  
-+	if (order) {
-+		index = ALIGN_DOWN(index, 1 << order);
-+		end = ALIGN_DOWN(end, 1 << order);
-+	}
- 	while (index <= end) {
- 		unsigned i;
+-	block = (sector_t)folio->index << (PAGE_SHIFT - bbits);
++	block = block_index_to_sector(folio->index, bbits);
+ 	last_block = (i_size_read(inode) - 1) >> bbits;
  
-@@ -2482,7 +2487,8 @@ static int filemap_create_folio(struct file *file,
- 	struct folio *folio;
- 	int error;
+ 	/*
+@@ -2087,7 +2087,7 @@ int __block_write_begin_int(struct folio *folio, loff_t pos, unsigned len,
+ 	blocksize = head->b_size;
+ 	bbits = block_size_bits(blocksize);
  
--	folio = filemap_alloc_folio(mapping_gfp_mask(mapping), 0);
-+	folio = filemap_alloc_folio(mapping_gfp_mask(mapping),
-+				    mapping_min_folio_order(mapping));
- 	if (!folio)
- 		return -ENOMEM;
+-	block = (sector_t)folio->index << (PAGE_SHIFT - bbits);
++	block = block_index_to_sector(folio->index, bbits);
  
-@@ -2542,9 +2548,16 @@ static int filemap_get_pages(struct kiocb *iocb, size_t count,
- 	pgoff_t last_index;
- 	struct folio *folio;
- 	int err = 0;
-+	unsigned int order = mapping_min_folio_order(mapping);
+ 	for(bh = head, block_start = 0; bh != head || !block_start;
+ 	    block++, block_start=block_end, bh = bh->b_this_page) {
+@@ -2369,7 +2369,7 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+ 	blocksize = head->b_size;
+ 	bbits = block_size_bits(blocksize);
  
- 	/* "last_index" is the index of the page beyond the end of the read */
- 	last_index = DIV_ROUND_UP(iocb->ki_pos + count, PAGE_SIZE);
-+	if (order) {
-+		/* Align with folio order */
-+		WARN_ON(index % 1 << order);
-+		index = ALIGN_DOWN(index, 1 << order);
-+		last_index = ALIGN(last_index, 1 << order);
-+	}
- retry:
- 	if (fatal_signal_pending(current))
- 		return -EINTR;
-@@ -2561,7 +2574,7 @@ static int filemap_get_pages(struct kiocb *iocb, size_t count,
- 		if (iocb->ki_flags & (IOCB_NOWAIT | IOCB_WAITQ))
- 			return -EAGAIN;
- 		err = filemap_create_folio(filp, mapping,
--				iocb->ki_pos >> PAGE_SHIFT, fbatch);
-+				index, fbatch);
- 		if (err == AOP_TRUNCATED_PAGE)
- 			goto retry;
- 		return err;
-@@ -3676,7 +3689,8 @@ static struct folio *do_read_cache_folio(struct address_space *mapping,
- repeat:
- 	folio = filemap_get_folio(mapping, index);
- 	if (IS_ERR(folio)) {
--		folio = filemap_alloc_folio(gfp, 0);
-+		folio = filemap_alloc_folio(gfp,
-+				mapping_min_folio_order(mapping));
- 		if (!folio)
- 			return ERR_PTR(-ENOMEM);
- 		err = filemap_add_folio(mapping, folio, index, gfp);
+-	iblock = (sector_t)folio->index << (PAGE_SHIFT - bbits);
++	iblock = block_index_to_sector(folio->index, bbits);
+ 	lblock = (limit+blocksize-1) >> bbits;
+ 	bh = head;
+ 	nr = 0;
+@@ -2657,7 +2657,7 @@ int block_truncate_page(struct address_space *mapping,
+ 		return 0;
+ 
+ 	length = blocksize - length;
+-	iblock = (sector_t)index << (PAGE_SHIFT - inode->i_blkbits);
++	iblock = block_index_to_sector(index, inode->i_blkbits);
+ 	
+ 	folio = filemap_grab_folio(mapping, index);
+ 	if (IS_ERR(folio))
 -- 
 2.35.3
 
