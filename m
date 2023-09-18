@@ -2,80 +2,177 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 279BACD13D8
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 17:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F912CD37B0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 17:34:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231408AbjIRRMW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 13:12:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51862 "EHLO
+        id S229608AbjIRRe2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 13:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231354AbjIRRMV (ORCPT
+        with ESMTP id S229449AbjIRRe1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 13:12:21 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37AA93;
-        Mon, 18 Sep 2023 10:12:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=PSu733GoRVslMPSzrldgnW4DQMtvUqIFfdE6Ea7KZtw=; b=QqaOJE1v345bmLMIpNweBLn/oH
-        6f2sZbZH4foXRRJpd1Zf7LnAzLpRH/IzhInYD+6NtcYsrz1QzAItN0ai8Kp/WQxNg/WWUgr42msSB
-        VgtN+BZ7yUpY2eg1lxZA/nLvmd/nq3863BAiukLuaooCsrOhZcYC3P3oeJcJmHCWu6Mcj06TEwquV
-        UNGOtgGoI2pNpX/b+fGYXjsL7Mr9yU/X2lwBARt0Me3S1gSS+eW8JyBpNt5/PWSJDeq5trmO1oJoI
-        TMe0klFsS09bnRvKTgLllar6aE1dZDo86LPFK7KFPn6VyukqQ7xQnqXknbPM7FAOqLosyUF/yUgEo
-        7vqUojPw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qiHn2-00Fxbi-2x;
-        Mon, 18 Sep 2023 17:12:04 +0000
-Date:   Mon, 18 Sep 2023 10:12:04 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     hch@infradead.org, djwong@kernel.org, dchinner@redhat.com,
-        kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
-        brauner@kernel.org, hare@suse.de, ritesh.list@gmail.com,
-        rgoldwyn@suse.com, jack@suse.cz, ziy@nvidia.com,
-        ryan.roberts@arm.com, patches@lists.linux.dev,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, p.raghav@samsung.com,
-        da.gomez@samsung.com, dan.helmick@samsung.com
-Subject: Re: [RFC v2 00/10] bdev: LBS devices support to coexist with
- buffer-heads
-Message-ID: <ZQiE5HHTLdJOsVPq@bombadil.infradead.org>
-References: <20230915213254.2724586-1-mcgrof@kernel.org>
- <ZQTR0NorkxJlcNBW@casper.infradead.org>
+        Mon, 18 Sep 2023 13:34:27 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 936CBFB;
+        Mon, 18 Sep 2023 10:34:21 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 36FB221F4F;
+        Mon, 18 Sep 2023 17:34:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1695058460; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=STqzbirky7s4xIFxGt0ZFcoAbGbIBdRaWCKAcOYdde8=;
+        b=Cq7FpSXi++zxK8J8P9Ser1h1kXlSk5vWmIXvvDgrl8uHdJXe9fe7D4Sl0ByoItBNJLXbKA
+        vsO7LcTaNdL0RXxL/ovXoqDel9wTYbhAQ+LIAkoSftJm78wOphXEWCSK3fgUVjB/C+iAK/
+        7COpNLML3EbjWnqMpcTc7v3WyosSKcs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1695058460;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=STqzbirky7s4xIFxGt0ZFcoAbGbIBdRaWCKAcOYdde8=;
+        b=0i8H2c4AjvUuX+0wzaqIF56ox41EHErzOi3Bh5B8KkHme4bEiIPBLDf1sGj3H4pihB10xI
+        lHH2yg6Rk5DIPuAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A99201358A;
+        Mon, 18 Sep 2023 17:34:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id hHo0JhuKCGXTGgAAMHmgww
+        (envelope-from <hare@suse.de>); Mon, 18 Sep 2023 17:34:19 +0000
+Message-ID: <1409c8de-f591-42e5-b638-353bb43d39b5@suse.de>
+Date:   Mon, 18 Sep 2023 19:34:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZQTR0NorkxJlcNBW@casper.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/18] mm/filemap: allocate folios with mapping order
+ preference
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20230918110510.66470-1-hare@suse.de>
+ <20230918110510.66470-8-hare@suse.de> <ZQhTmF9VkShSequJ@casper.infradead.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ZQhTmF9VkShSequJ@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 15, 2023 at 10:51:12PM +0100, Matthew Wilcox wrote:
-> On Fri, Sep 15, 2023 at 02:32:44PM -0700, Luis Chamberlain wrote:
-> > However, an issue is that disabling CONFIG_BUFFER_HEAD in practice is not viable
-> > for many Linux distributions since it also means disabling support for most
-> > filesystems other than btrfs and XFS. So we either support larger order folios
-> > on buffer-heads, or we draw up a solution to enable co-existence. Since at LSFMM
-> > 2023 it was decided we would not support larger order folios on buffer-heads,
+On 9/18/23 15:41, Matthew Wilcox wrote:
+> On Mon, Sep 18, 2023 at 01:04:59PM +0200, Hannes Reinecke wrote:
+>> +++ b/mm/filemap.c
+>> @@ -507,9 +507,14 @@ static void __filemap_fdatawait_range(struct address_space *mapping,
+>>   	pgoff_t end = end_byte >> PAGE_SHIFT;
+>>   	struct folio_batch fbatch;
+>>   	unsigned nr_folios;
+>> +	unsigned int order = mapping_min_folio_order(mapping);
+>>   
+>>   	folio_batch_init(&fbatch);
+>>   
+>> +	if (order) {
+>> +		index = ALIGN_DOWN(index, 1 << order);
+>> +		end = ALIGN_DOWN(end, 1 << order);
+>> +	}
+>>   	while (index <= end) {
+>>   		unsigned i;
+>>   
 > 
-> Um, I didn't agree to that.
+> I don't understand why this function needs to change at all.
+> filemap_get_folios_tag() should return any folios which overlap
+> (index, end).  And aligning 'end' _down_ certainly sets off alarm bells
+> for me.  We surely would need to align _up_.  Except i don't think we
+> need to do anything to this function.
+> 
+Because 'end' is the _last_ valid index, not the index at which the 
+iteration stops (cf 'index <= end') here. And as the index remains in 4k 
+units we need to align both, index and end, to the nearest folio.
 
-Coverage on sunsetting buffer-heads talk by LWN:
+>> @@ -2482,7 +2487,8 @@ static int filemap_create_folio(struct file *file,
+>>   	struct folio *folio;
+>>   	int error;
+>>   
+>> -	folio = filemap_alloc_folio(mapping_gfp_mask(mapping), 0);
+>> +	folio = filemap_alloc_folio(mapping_gfp_mask(mapping),
+>> +				    mapping_min_folio_order(mapping));
+>>   	if (!folio)
+>>   		return -ENOMEM;
+>>   
+> 
+> Surely we need to align 'index' here?
+> 
+Surely.
 
-https://lwn.net/Articles/931809/
+>> @@ -2542,9 +2548,16 @@ static int filemap_get_pages(struct kiocb *iocb, size_t count,
+>>   	pgoff_t last_index;
+>>   	struct folio *folio;
+>>   	int err = 0;
+>> +	unsigned int order = mapping_min_folio_order(mapping);
+>>   
+>>   	/* "last_index" is the index of the page beyond the end of the read */
+>>   	last_index = DIV_ROUND_UP(iocb->ki_pos + count, PAGE_SIZE);
+>> +	if (order) {
+>> +		/* Align with folio order */
+>> +		WARN_ON(index % 1 << order);
+>> +		index = ALIGN_DOWN(index, 1 << order);
+>> +		last_index = ALIGN(last_index, 1 << order);
+>> +	}
+> 
+> Not sure I see the point of this.  filemap_get_read_batch() returns any
+> folio which contains 'index'.
+> 
+Does it? Cool. Then of course we don't need to align the index here.
 
-"the apparent conclusion from the session: the buffer-head layer will be
-converted to use folios internally while minimizing changes visible to
-the filesystems using it. Only single-page folios will be used within
-this new buffer-head layer. Any other desires, he said, can be addressed
-later after this problem has been solved."
+>>   retry:
+>>   	if (fatal_signal_pending(current))
+>>   		return -EINTR;
+>> @@ -2561,7 +2574,7 @@ static int filemap_get_pages(struct kiocb *iocb, size_t count,
+>>   		if (iocb->ki_flags & (IOCB_NOWAIT | IOCB_WAITQ))
+>>   			return -EAGAIN;
+>>   		err = filemap_create_folio(filp, mapping,
+>> -				iocb->ki_pos >> PAGE_SHIFT, fbatch);
+>> +				index, fbatch);
+> 
+> ... ah, you align index here.  I wonder if we wouldn't be better passing
+> iocb->ki_pos to filemap_create_folio() to emphasise that the caller
+> can't assume anything about the alignment/size of the folio.
+> 
+I can check if that makes a difference.
 
-And so I think we're at the later part of this. I'm happy to see efforts
-for buffer-heads support with large order folio support, and so at this
-point I think it would be wise to look for commonalities and colalborate
-on what things could / should be shared.
+>> @@ -3676,7 +3689,8 @@ static struct folio *do_read_cache_folio(struct address_space *mapping,
+>>   repeat:
+>>   	folio = filemap_get_folio(mapping, index);
+>>   	if (IS_ERR(folio)) {
+>> -		folio = filemap_alloc_folio(gfp, 0);
+>> +		folio = filemap_alloc_folio(gfp,
+>> +				mapping_min_folio_order(mapping));
+>>   		if (!folio)
+>>   			return ERR_PTR(-ENOMEM);
+>>   		err = filemap_add_folio(mapping, folio, index, gfp);
+> 
+> This needs to align index.
 
-  Luis
+Why, but of course. Will check.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
+
