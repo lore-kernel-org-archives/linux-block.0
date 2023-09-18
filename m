@@ -2,100 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601BACD37B0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 18:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E88CD37B0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 18:39:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229454AbjIRSZL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 14:25:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36334 "EHLO
+        id S229618AbjIRSjG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 14:39:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229668AbjIRSZK (ORCPT
+        with ESMTP id S229566AbjIRSjG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 14:25:10 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D2E4112;
-        Mon, 18 Sep 2023 11:25:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=TC8wfBk+ib87P7TgIQGCMrwtRUP58vsgw9dhZZ19d68=; b=hC17YkoDr54/vXu9pLxNScC1tR
-        58CYaFjKwojnqasqeKRlYiiyhGN4QyLMZXo7pvNF53AngJGnujARir/IibZbgbOBHea1gQYCq/Adb
-        bY5llp7euvOgmQscF8JZZw9iTzNILN3n52VgSdhzDId6M8HxQP0WtxdNDKMDmvtwQXhWX0X9/EnRZ
-        9Z6DFZm9ZT5/K0IK4Ws+5L/W2vrIs5ZY9T68/cVRDQHoxPATR3IoWSXl/ui2SpfPnqwTCmj9haQmR
-        RirTOGJJ0Z7SauWIWNgcAPcK3Hu/mpvfOupj/ssb6jbVGh4m3ZRjt0hZ4omWsTPNe4GOm9Y3x16Ps
-        SNP1t+ig==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qiIvX-00CXHT-W9; Mon, 18 Sep 2023 18:24:56 +0000
-Date:   Mon, 18 Sep 2023 19:24:55 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Daniel Gomez <da.gomez@samsung.com>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "hughd@google.com" <hughd@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [PATCH 1/6] filemap: make the folio order calculation shareable
-Message-ID: <ZQiV96mTMiSXF9yf@casper.infradead.org>
-References: <20230915095042.1320180-1-da.gomez@samsung.com>
- <CGME20230915095124eucas1p1eb0e0ef883f6316cf14c349404a51150@eucas1p1.samsung.com>
- <20230915095042.1320180-2-da.gomez@samsung.com>
- <ZQRet4w5VSbvKvKB@casper.infradead.org>
- <ZQiSPEKRJSkeh3Fe@bombadil.infradead.org>
+        Mon, 18 Sep 2023 14:39:06 -0400
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0354610D;
+        Mon, 18 Sep 2023 11:39:01 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id 5614622812f47-3ab29af398aso3497760b6e.1;
+        Mon, 18 Sep 2023 11:39:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695062340; x=1695667140; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UbNCRc6jnNBZS939u1reR2uAUdcvd46hdXXQ91lu/cQ=;
+        b=VwIRN74q0KhYfZHQJgFmZi6nJrmqSTLarzyPFF0OR1fOJymdpeF7vN50MXVjU17aRd
+         fMOjsmCTVmFUQB2OUPrjb7ma3KLSo14F1/C97KtOCqNNln3JnmlsZ8LQoLRrVDovpBo5
+         rF3HpvsdY96AbMOmv5aCwLJmVwzeLIEjkfOJycKeqLOnHAWShrEW1gcUVXgujonmD4Cn
+         hrTqjkzheSABVGUos8Up+4nYQW8zJdNuzgfH+tV8W5J6Yed1VhAqzcVo01aNVd8gLia4
+         UtOs/s4qbss0xmUTTLqML3UgYUCt0TPd7YewyaVDjQuJisWx8erC7EvzQjwP2p+JlRBO
+         jSjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695062340; x=1695667140;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UbNCRc6jnNBZS939u1reR2uAUdcvd46hdXXQ91lu/cQ=;
+        b=J2dPU9BvdFteYR6/b42+DOQDJgApLzmuXkyx2eo7nN1MQxsF6iPKr/QvwYZLfC3DdA
+         QesP/UNoUHg12itxMtf8H2IbL56YrGH+u/g12CZ09Bs8ikablns4rmVqFbIzFNuzgGUc
+         0JUy6/qMgpukvk6N7Mm8BfhI0l10nAljB49uu4gJbmiBw4ziptigpa7Htx5H+MvhvP9x
+         SCOMBZYenHMpMCVPcoGogF/T0zkN/m8O9G9iQLESxjjRFkpckvOcV5JPvi0/6399Fk4g
+         C5qlr6kRLCN9YYk3tIEa6f8RsFinUUAveyhcg7PTpC6/KexJgR9zd0bPLaUZ2FSUvWiJ
+         SeBQ==
+X-Gm-Message-State: AOJu0YyO0IvMOyJkAsOgBq0mf9Rah/Cr5ukHK1oxDhAJswcWaQnKnKd3
+        qsh9+qsEzFc7DxY1Cb+nacYz/TK92HcBDA==
+X-Google-Smtp-Source: AGHT+IEXhCQqKqEcbJ++hGfTwfzlLufF+PR8XA9CZMXBctFEIM4ClSL4x2OmaIeD2+CHgipENBXB/w==
+X-Received: by 2002:a05:6808:8d:b0:3a7:3100:f8b9 with SMTP id s13-20020a056808008d00b003a73100f8b9mr11311772oic.31.1695062340236;
+        Mon, 18 Sep 2023 11:39:00 -0700 (PDT)
+Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
+        by smtp.gmail.com with ESMTPSA id t23-20020a656097000000b005740ba1d649sm6186076pgu.88.2023.09.18.11.38.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Sep 2023 11:38:59 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 18 Sep 2023 08:38:58 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Kemeng Shi <shikemeng@huaweicloud.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: correct stale comment in rq_qos_wait
+Message-ID: <ZQiZQvym5h2FANWC@slm.duckdns.org>
+References: <20230914091508.36232-1-shikemeng@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZQiSPEKRJSkeh3Fe@bombadil.infradead.org>
+In-Reply-To: <20230914091508.36232-1-shikemeng@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 11:09:00AM -0700, Luis Chamberlain wrote:
-> On Fri, Sep 15, 2023 at 02:40:07PM +0100, Matthew Wilcox wrote:
-> > On Fri, Sep 15, 2023 at 09:51:23AM +0000, Daniel Gomez wrote:
-> > > To make the code that clamps the folio order in the __filemap_get_folio
-> > > routine reusable to others, move and merge it to the fgf_set_order
-> > > new subroutine (mapping_size_order), so when mapping the size at a
-> > > given index, the order calculated is already valid and ready to be
-> > > used when order is retrieved from fgp_flags with FGF_GET_ORDER.
-> > > 
-> > > Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
-> > > ---
-> > >  fs/iomap/buffered-io.c  |  6 ++++--
-> > >  include/linux/pagemap.h | 42 ++++++++++++++++++++++++++++++++++++-----
-> > >  mm/filemap.c            |  8 --------
-> > >  3 files changed, 41 insertions(+), 15 deletions(-)
-> > 
-> > That seems like a lot of extra code to add in order to avoid copying
-> > six lines of code and one comment into the shmem code.
-> > 
-> > It's not wrong, but it seems like a bad tradeoff to me.
+On Thu, Sep 14, 2023 at 05:15:08PM +0800, Kemeng Shi wrote:
+> The rq_qos_wait calls common wake-up function rq_qos_wake_function to get
+> token. Just replace stale wbt_wake_function with rq_qos_wake_function in
+> comment.
 > 
-> The suggestion to merge came from me, mostly based on later observations
-> that in the future we may want to extend this with a min order to ensure
-> the index is aligned the the order. This check would only be useful for
-> buffred IO for iomap, readahead. It has me wondering if buffer-heads
-> support for large order folios come around would we a similar check
-> there?
-> 
-> So Willy, you would know better if and when a shared piece of code would
-> be best with all these things in mind.
+> Signed-off-by: Kemeng Shi <shikemeng@huaweicloud.com>
 
-In my mind, this is fundamentally code which belongs in the page cache
-rather than in individual filesystems.  The fly in the ointment is that
-shmem has forked the page cache in order to do its own slightly
-specialised thing.  I don't see the buffer_head connection; shmem is
-an extremely special case, and we shouldn't mess around with other
-filesystems to avoid changing shmem.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Ideally, we'd reunify (parts of) shmem and the regular page cache, but
-that's a lot of work, probably involving the swap layer changing.
+Thanks.
+
+-- 
+tejun
