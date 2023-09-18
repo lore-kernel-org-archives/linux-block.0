@@ -2,154 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC43DCD13DE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CACE6CD13DD
 	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 04:13:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239484AbjIRENb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 00:13:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38080 "EHLO
+        id S239483AbjIRENa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 00:13:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239532AbjIRENH (ORCPT
+        with ESMTP id S239523AbjIRENF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 00:13:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49562137
-        for <linux-block@vger.kernel.org>; Sun, 17 Sep 2023 21:12:04 -0700 (PDT)
+        Mon, 18 Sep 2023 00:13:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B74F185
+        for <linux-block@vger.kernel.org>; Sun, 17 Sep 2023 21:12:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695010323;
+        s=mimecast20190719; t=1695010327;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=e772wTQJHJwxBOXO8UBygjxubDYmCkNIw23G8H1LTp0=;
-        b=VmTPfrnmbOJbMP5o1yF28hfsdHskb0CiD4EzroUYQMU07tcrPYhvxvylh8WdkChVZBDBIk
-        9reY4nnrPQX4U9ToymifBbwvM3sLCBKa+6WiJk4fzMyaKj/B4GBAmC32SQwz82p/xQTl/7
-        7E2BCao6gtNbazmRrNPY7NjCEMReKA8=
+        bh=7H3F07jM47TzAxqTwg2x9XRWNY0CBRdRHslqoChDfbc=;
+        b=ILXhFGVb36sRL038E7zVXVu9X6iU188s1fsVkgLwnj8jshUAHnCofUuH7PLCLJbesngm29
+        9liuoEqBtw724KYPQvh0tVGk4psrmnwwc9ijPe7RPSajoGJGeFJbfrPJgqy8S5jR3Wxl3d
+        Y3ZZOYgHafWnb/eSzvbrX+W+x5MHjwc=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-543-AW4f9IqIOCWV_UvVVcyz8A-1; Mon, 18 Sep 2023 00:11:53 -0400
-X-MC-Unique: AW4f9IqIOCWV_UvVVcyz8A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-692-Gxpd5jc0PA2L0sieXE1sbQ-1; Mon, 18 Sep 2023 00:12:02 -0400
+X-MC-Unique: Gxpd5jc0PA2L0sieXE1sbQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E877C85A5BA;
-        Mon, 18 Sep 2023 04:11:52 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B49741875045;
+        Mon, 18 Sep 2023 04:12:01 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F058740C6EA8;
-        Mon, 18 Sep 2023 04:11:51 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A785B1006B6D;
+        Mon, 18 Sep 2023 04:12:00 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         io-uring@vger.kernel.org
 Cc:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 08/10] ublk: quiesce request queue when aborting queue
-Date:   Mon, 18 Sep 2023 12:11:04 +0800
-Message-Id: <20230918041106.2134250-9-ming.lei@redhat.com>
+Subject: [PATCH 10/10] ublk: simplify aborting request
+Date:   Mon, 18 Sep 2023 12:11:06 +0800
+Message-Id: <20230918041106.2134250-11-ming.lei@redhat.com>
 In-Reply-To: <20230918041106.2134250-1-ming.lei@redhat.com>
 References: <20230918041106.2134250-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So far aborting queue ends request when the ubq daemon is exiting, and
-it can be run concurrently with ublk_queue_rq(), this way is fragile and
-we depend on the tricky usage of UBLK_IO_FLAG_ABORTED for avoiding such
-race.
+Now ublk_abort_queue() is run exclusively with ublk_queue_rq() and the
+ubq_daemon task, so simplify aborting request:
 
-Quiesce queue when aborting queue, and the two code paths can be run
-completely exclusively, then it becomes easier to add new ublk feature,
-such as relaxing single same task limit for each queue.
+- set UBLK_IO_FLAG_ABORTED in ublk_abort_queue()
+
+- abort request in ublk_queue_rq() if UBLK_IO_FLAG_ABORTED is observed,
+and no need to check ubq_daemon any more
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 43 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 37 insertions(+), 6 deletions(-)
+ drivers/block/ublk_drv.c | 46 ++++++++++++----------------------------
+ 1 file changed, 14 insertions(+), 32 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 4bc4c4f87b36..3b691bf3d9ef 100644
+index 90e0137ff784..0f54f63136fd 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -1446,21 +1446,45 @@ static void ublk_daemon_monitor_work(struct work_struct *work)
+@@ -1077,13 +1077,10 @@ static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
  {
- 	struct ublk_device *ub =
- 		container_of(work, struct ublk_device, monitor_work.work);
-+	struct gendisk *disk;
- 	int i;
+ 	WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
  
- 	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
- 		struct ublk_queue *ubq = ublk_get_queue(ub, i);
+-	if (!(io->flags & UBLK_IO_FLAG_ABORTED)) {
+-		io->flags |= UBLK_IO_FLAG_ABORTED;
+-		if (ublk_queue_can_use_recovery_reissue(ubq))
+-			blk_mq_requeue_request(req, false);
+-		else
+-			ublk_put_req_ref(ubq, req);
+-	}
++	if (ublk_queue_can_use_recovery_reissue(ubq))
++		blk_mq_requeue_request(req, false);
++	else
++		ublk_put_req_ref(ubq, req);
+ }
  
--		if (ubq_daemon_is_dying(ubq)) {
--			if (ublk_queue_can_use_recovery(ubq))
--				schedule_work(&ub->quiesce_work);
--			else
--				schedule_work(&ub->stop_work);
-+		if (ubq_daemon_is_dying(ubq))
-+			goto found;
-+	}
-+	return;
-+
-+found:
-+	spin_lock(&ub->lock);
-+	disk = ub->ub_disk;
-+	if (disk)
-+		get_device(disk_to_dev(disk));
-+	spin_unlock(&ub->lock);
-+
-+	/* Our disk has been dead */
-+	if (!disk)
-+		return;
-+
-+	/* Now we are serialized with ublk_queue_rq() */
-+	blk_mq_quiesce_queue(disk->queue);
-+	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
-+		struct ublk_queue *ubq = ublk_get_queue(ub, i);
+ static void ubq_complete_io_cmd(struct ublk_io *io, int res,
+@@ -1221,30 +1218,12 @@ static void ublk_rq_task_work_cb(struct io_uring_cmd *cmd, unsigned issue_flags)
+ 	ublk_forward_io_cmds(ubq, issue_flags);
+ }
  
-+		if (ubq_daemon_is_dying(ubq)) {
- 			/* abort queue is for making forward progress */
- 			ublk_abort_queue(ub, ubq);
+-static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
++static inline void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
+ {
+ 	struct ublk_rq_data *data = blk_mq_rq_to_pdu(rq);
+-	struct ublk_io *io;
+-
+-	if (!llist_add(&data->node, &ubq->io_cmds))
+-		return;
+ 
+-	io = &ubq->ios[rq->tag];
+-	/*
+-	 * If the check pass, we know that this is a re-issued request aborted
+-	 * previously in exit notifier because the ubq_daemon(cmd's task) is
+-	 * PF_EXITING. We cannot call io_uring_cmd_complete_in_task() anymore
+-	 * because this ioucmd's io_uring context may be freed now if no inflight
+-	 * ioucmd exists. Otherwise we may cause null-deref in ctx->fallback_work.
+-	 *
+-	 * Note: exit notifier sets UBLK_IO_FLAG_ABORTED and ends this request(releasing
+-	 * the tag). Then the request is re-started(allocating the tag) and we are here.
+-	 * Since releasing/allocating a tag implies smp_mb(), finding UBLK_IO_FLAG_ABORTED
+-	 * guarantees that here is a re-issued request aborted previously.
+-	 */
+-	if (unlikely(io->flags & UBLK_IO_FLAG_ABORTED)) {
+-		ublk_abort_io_cmds(ubq);
+-	} else {
++	if (llist_add(&data->node, &ubq->io_cmds)) {
++		struct ublk_io *io = &ubq->ios[rq->tag];
+ 		struct io_uring_cmd *cmd = io->cmd;
+ 		struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+ 
+@@ -1274,6 +1253,7 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+ {
+ 	struct ublk_queue *ubq = hctx->driver_data;
+ 	struct request *rq = bd->rq;
++	struct ublk_io *io = &ubq->ios[rq->tag];
+ 	blk_status_t res;
+ 
+ 	/* fill iod to slot in io cmd buffer */
+@@ -1293,13 +1273,12 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (ublk_queue_can_use_recovery(ubq) && unlikely(ubq->force_abort))
+ 		return BLK_STS_IOERR;
+ 
+-	blk_mq_start_request(bd->rq);
+-
+-	if (unlikely(ubq_daemon_is_dying(ubq))) {
++	if (unlikely(io->flags & UBLK_IO_FLAG_ABORTED)) {
+ 		__ublk_abort_rq(ubq, rq);
+ 		return BLK_STS_OK;
+ 	}
+ 
++	blk_mq_start_request(bd->rq);
+ 	ublk_queue_cmd(ubq, rq);
+ 
+ 	return BLK_STS_OK;
+@@ -1429,6 +1408,9 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
+ 	for (i = 0; i < ubq->q_depth; i++) {
+ 		struct ublk_io *io = &ubq->ios[i];
+ 
++		if (!(io->flags & UBLK_IO_FLAG_ABORTED))
++			io->flags |= UBLK_IO_FLAG_ABORTED;
++
+ 		if (!(io->flags & UBLK_IO_FLAG_ACTIVE)) {
+ 			struct request *rq;
+ 
+@@ -1437,7 +1419,7 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
+ 			 * will do it
+ 			 */
+ 			rq = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], i);
+-			if (rq)
++			if (rq && blk_mq_request_started(rq))
+ 				__ublk_fail_req(ubq, io, rq);
  		}
  	}
-+	blk_mq_unquiesce_queue(disk->queue);
-+	put_device(disk_to_dev(disk));
-+
-+	if (ublk_can_use_recovery(ub))
-+		schedule_work(&ub->quiesce_work);
-+	else
-+		schedule_work(&ub->stop_work);
- 
- 	/*
- 	 * We can't schedule monitor work after ub's state is not UBLK_S_DEV_LIVE.
-@@ -1595,6 +1619,8 @@ static void ublk_unquiesce_dev(struct ublk_device *ub)
- 
- static void ublk_stop_dev(struct ublk_device *ub)
- {
-+	struct gendisk *disk;
-+
- 	mutex_lock(&ub->mutex);
- 	if (ub->dev_info.state == UBLK_S_DEV_DEAD)
- 		goto unlock;
-@@ -1604,10 +1630,15 @@ static void ublk_stop_dev(struct ublk_device *ub)
- 		ublk_unquiesce_dev(ub);
- 	}
- 	del_gendisk(ub->ub_disk);
-+
-+	/* Sync with ublk_abort_queue() by holding the lock */
-+	spin_lock(&ub->lock);
-+	disk = ub->ub_disk;
- 	ub->dev_info.state = UBLK_S_DEV_DEAD;
- 	ub->dev_info.ublksrv_pid = -1;
--	put_disk(ub->ub_disk);
- 	ub->ub_disk = NULL;
-+	spin_unlock(&ub->lock);
-+	put_disk(disk);
-  unlock:
- 	ublk_cancel_dev(ub);
- 	mutex_unlock(&ub->mutex);
 -- 
 2.40.1
 
