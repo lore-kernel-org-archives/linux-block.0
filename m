@@ -2,87 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2635CD13D2
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 20:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C74C46CA1
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 20:46:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229720AbjIRUPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 16:15:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58942 "EHLO
+        id S229449AbjIRUqq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 16:46:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229713AbjIRUPs (ORCPT
+        with ESMTP id S229436AbjIRUqq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 16:15:48 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7439A8F
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 13:15:42 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-77dcff76e35so62527639f.1
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 13:15:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695068142; x=1695672942; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hjmj7plkbnOlDMjCra3y3a09oBx1pW45VyaUM21Y7AM=;
-        b=VvO4wGnHhG/8yjHEZ+ktbqa+0WjjZOpfuhYQhzYHwRmO3Tfs5PrCeFVIGb+RuvuoVS
-         o3uXe1boJTJycm6bAbDMp6Hd/tbkXt9Cuuw7LO1rqVIDX9I3NM4rla0o6VeMpKwUW0jl
-         ANojvXB0M+qOAVYToTPvF0TDjLZd1axval+XzTlrF496/Tayu32+0GypnTJJ2bCtd50l
-         aCB90HkTSL4VvjqbxYDpq0q7IbdGjjPWb9m6D8PIvCl32b55qUTrUmuYrtBXpaF9PX3V
-         NkzmW68hNHy/OLqhwsh1kVB+mDibMa3Zi2NIwDE8cet2LPMT06TB+jpN78sj2ENKx4ww
-         T2IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695068142; x=1695672942;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hjmj7plkbnOlDMjCra3y3a09oBx1pW45VyaUM21Y7AM=;
-        b=Yr2bHyR582p3Sbfj4xmmtomAHsR7TWYdraoB04YyA55YZF9lBX/AKML7ThYzDwWvWS
-         P++tbZdDYgSKgAZFZb8crHAfuiBURtU8vFPadMPbVoIc/531yso3ijLqvVGHsRTzb/8W
-         wg1KWDn2/8Y5ShWxL2mx3qG7BzYiBaVunyKQhsjRF9TxNW/2c8h6Dh3pFkXjIy0PChC+
-         6M64cwE5bGSbBNrSZ2YDsyOVzqfaz8jmMLs6NMOGvalIRMee08iSTmd4kYTD0WbR6nLZ
-         DdWeAkvoIWcEuTcrXih69/xfcV+2jCGmKfPjts4DO5UTbZUQlEGwcJVsJfwCYUrDD8b3
-         wOuQ==
-X-Gm-Message-State: AOJu0YxHbogOSRFPsuG/7kkXy9h7Cf60wLOMv9cnPyB4PDglg8YsltxN
-        mvmJu8cOK+DJEi8C+2Rcmf1KtYwAIsDEdRsffDN8Jw==
-X-Google-Smtp-Source: AGHT+IF6ZrFTRNOlSrFYsTgxKrHJFPd36vms08lvaqfmFTt5ikRLAhqAeHlPU/sHGBbXLkoXXETm0w==
-X-Received: by 2002:a92:907:0:b0:34f:6e08:d6a3 with SMTP id y7-20020a920907000000b0034f6e08d6a3mr10411038ilg.0.1695068141828;
-        Mon, 18 Sep 2023 13:15:41 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id o20-20020a056638125400b0042b451aa95esm2945116jas.150.2023.09.18.13.15.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 13:15:40 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     tj@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Kemeng Shi <shikemeng@huaweicloud.com>
-In-Reply-To: <20230914091508.36232-1-shikemeng@huaweicloud.com>
-References: <20230914091508.36232-1-shikemeng@huaweicloud.com>
-Subject: Re: [PATCH] block: correct stale comment in rq_qos_wait
-Message-Id: <169506814063.372099.2658807658177703138.b4-ty@kernel.dk>
-Date:   Mon, 18 Sep 2023 14:15:40 -0600
+        Mon, 18 Sep 2023 16:46:46 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EAF110F;
+        Mon, 18 Sep 2023 13:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695070000; x=1726606000;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BCNg8esHIlrbdDxoNAjFo9ABEI2hCjdPdGFJI6Lz/AM=;
+  b=VR30v8vZ3pNAiQ19rI3jdVcQ+asSFs9RXIuYNgK2lgJqQGcdOJBR+u1X
+   2TLhEvfX9KNZhhBs9/yW79jw7sNQwFXCzytUimM/KoXubTYVFexb+Canp
+   YSnUzywrxs58d80910Q0S9fNt/OJwtlexwebTYHP+2C+GJpCaPYqLX8fX
+   dhk+yQ1ap0ZyU7ORp903SU2UYQoH8FHJkbof73b09dqQKqUZDsh81kW61
+   vYJkr1OCMpQ2rb7Tmf+MbR9VCRYmbAG+vVhZglCRnYPn97ffb/ARiHh1u
+   NkuYFlRJASGFKW1ZNni7po3FVnahFyZF5UbeE17mNi+2f16OIYobsJGxL
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="378676688"
+X-IronPort-AV: E=Sophos;i="6.02,157,1688454000"; 
+   d="scan'208";a="378676688"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 13:46:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="695646891"
+X-IronPort-AV: E=Sophos;i="6.02,157,1688454000"; 
+   d="scan'208";a="695646891"
+Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 18 Sep 2023 13:46:37 -0700
+Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qiL8d-0006TW-1D;
+        Mon, 18 Sep 2023 20:46:35 +0000
+Date:   Tue, 19 Sep 2023 04:46:17 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 08/18] mm/readahead: allocate folios with mapping order
+ preference
+Message-ID: <202309190435.X4RxeTJO-lkp@intel.com>
+References: <20230918110510.66470-9-hare@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230918110510.66470-9-hare@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Hannes,
 
-On Thu, 14 Sep 2023 17:15:08 +0800, Kemeng Shi wrote:
-> The rq_qos_wait calls common wake-up function rq_qos_wake_function to get
-> token. Just replace stale wbt_wake_function with rq_qos_wake_function in
-> comment.
-> 
-> 
+kernel test robot noticed the following build errors:
 
-Applied, thanks!
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on akpm-mm/mm-everything linus/master v6.6-rc2 next-20230918]
+[cannot apply to xfs-linux/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-[1/1] block: correct stale comment in rq_qos_wait
-      commit: e599ed7866cd804ca15de7a92f7f629944cc278d
+url:    https://github.com/intel-lab-lkp/linux/commits/Hannes-Reinecke/mm-readahead-rework-loop-in-page_cache_ra_unbounded/20230918-190732
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230918110510.66470-9-hare%40suse.de
+patch subject: [PATCH 08/18] mm/readahead: allocate folios with mapping order preference
+config: arm-allnoconfig (https://download.01.org/0day-ci/archive/20230919/202309190435.X4RxeTJO-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230919/202309190435.X4RxeTJO-lkp@intel.com/reproduce)
 
-Best regards,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309190435.X4RxeTJO-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   arm-linux-gnueabi-ld: mm/readahead.o: in function `readahead_expand':
+>> readahead.c:(.text+0x360): undefined reference to `__aeabi_ldivmod'
+
 -- 
-Jens Axboe
-
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
