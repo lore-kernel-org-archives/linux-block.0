@@ -2,151 +2,196 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7237BCD37B0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 07:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E89CCD13DD
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 07:34:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238418AbjIRHZu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 03:25:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37632 "EHLO
+        id S240003AbjIRHdf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 03:33:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240053AbjIRHZn (ORCPT
+        with ESMTP id S240615AbjIRHd0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 03:25:43 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179C2AC
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 00:25:37 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d77fa2e7771so4721433276.1
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 00:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695021936; x=1695626736; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3WAQv+e8xIAvvalEvufZpQYuwaoIOUMyrU9FgMi+IEc=;
-        b=EtyU2DbHd+QkWP+a3Q3tat9zKgLFOiG/nb2tEIg/mdwcz3HmlhiGK7W5+O8j4P+YRE
-         ZhdYqE01irlOcZjQI/ES1XpbgT+IvAqTpVAUaNBvA4zezOywrWykpdrOVd0RP+VznTrq
-         uoEylyNjjddfu+tnguLsaA9b+5ZpiJj3HQYceBR+/cvYHRFpLPpsgRvv5o+Ll4Yxx2fI
-         eUN1bYIwAYjLEYIM6Sp6bcqZe9N93VNAWd+KLKXPz9ZYzgvYQGkgcBEMJljddTxgeraF
-         1dRa8mAxvnc07c63JcjWE3WSD3RFzPAslgj9gWCnmVBsPTOkM/HUR9JukV9Ohxu6985q
-         DLVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695021936; x=1695626736;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3WAQv+e8xIAvvalEvufZpQYuwaoIOUMyrU9FgMi+IEc=;
-        b=RcSNW7BF7CgYYNRqwDYteIiESgwkHUijD8c6uRCJKUNgmq6nSD/s6D782/Kd0vUCwR
-         d4FzXYTYrzIGRiaZIABq4PfU5lWlr0PS7/Pp9V+Oj4CPdpbf+fRyCTeLCTTrfbUvz7YX
-         Ig4R+6O4Cake3EJspQmxtea0wR6Tq0FYz20Gd7/VfBV555sJyQmBlth+fLtfPAWd9gFH
-         DjiWsvsksBC23Wu0ThBkw9Raay6iwIxdLVwjXIObr42RSSH44tUb9grSwhtdFYFt9V42
-         CJL0Hmosj20QWELI7lBHhEOB78EEwON6axunN8TCM2pX8SQczUWJqBoJpFLpmZlLtfm/
-         1UOQ==
-X-Gm-Message-State: AOJu0YwmS4nRc3Rp3VO0rk7wyHRMp98MYfxPrs9iiskwCPX0XOlUwA5g
-        M1s7CFnJ5dj9V26uCaw3aQHJZZz4Jrg7PVT4hw==
-X-Google-Smtp-Source: AGHT+IF+jX5dUSIkSB8RfzXLXxoPZwR9qlzLXtJHnwCjwBp0eZD0RK+hmfw8QP+439CpeHYVFT/vO68h56dKzlzm3w==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:ad5c:0:b0:d7b:9830:c172 with SMTP
- id l28-20020a25ad5c000000b00d7b9830c172mr172732ybe.0.1695021936336; Mon, 18
- Sep 2023 00:25:36 -0700 (PDT)
-Date:   Mon, 18 Sep 2023 07:25:35 +0000
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAG77B2UC/5XNQQ6CMBCF4auQrh3DUBR05T0MMVAGmFBa0mIjI
- dzdyg1c/m/xvk14ckxe3JNNOArs2ZoY2SkRaqhNT8BtbJGlmUxviOAXZ9S8Qus4kPPQaKtGMG+
- tX40eYarZgIJC5je8SEJ1rUX8mh11/DmcZxV7YL9Ytx5swN/6rxAQEGQjy7Kgomspf/TW9prOy k6i2vf9C+KPcjnbAAAA
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1695021935; l=2744;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=swPV5XpUlRXB66oR7Qh/nSFtVd/YWWRwyK5xLI6b/UY=; b=lQh9KvxNeNw90KFaN+C0AaSOn2MGPv/wnngx73fGHOn+3LvNHoRUpaTOi1Y57TwXuu3uuw7Uf
- QFw1u2PR0KpBJ0fpN3sNNORHsXBuqSeRuRmZLY1W53HrYOVatw/bPjw
-X-Mailer: b4 0.12.3
-Message-ID: <20230918-strncpy-drivers-block-null_blk-main-c-v2-1-cd9b109edfdf@google.com>
-Subject: [PATCH v2] null_blk: refactor deprecated strncpy
-From:   Justin Stitt <justinstitt@google.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
+        Mon, 18 Sep 2023 03:33:26 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7762AE51
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 00:33:03 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230918073300euoutp0109510551f4e693fce80c7fc1e0c7ef7e~F7d-TLSUg1601316013euoutp01Q
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 07:33:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230918073300euoutp0109510551f4e693fce80c7fc1e0c7ef7e~F7d-TLSUg1601316013euoutp01Q
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1695022380;
+        bh=dbgURMvRB5vglPwXNEinmDiIBwhTERpqxwujlCbmGpc=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=rwf73w9ncRjC3brjfD2715hl1hXTN9ifCUZWS6AqyxjK1saqp/dwicu0ASeLR8B9v
+         M8ZAO9HxO0PODwhFOtBXAkg7xHFTwD+U3Tc/kZ5euqBdpJY35IahXFk91ADBGIuXVq
+         GpcVCsPJrdp3OqBVb7PXSAHL1CgqA4BkLxv2gXbk=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20230918073300eucas1p1c9a31881336f26a495b69de4e7d0c071~F7d-DshJ-1309713097eucas1p1g;
+        Mon, 18 Sep 2023 07:33:00 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 6E.9B.11320.B2DF7056; Mon, 18
+        Sep 2023 08:33:00 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230918073259eucas1p1cfcfbfd6a8c37c7cebd0b4734beffbc5~F7d_ue6-f0660306603eucas1p1s;
+        Mon, 18 Sep 2023 07:32:59 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230918073259eusmtrp287fc632a8e38eea9a64656ffaf30256d~F7d_s7iJo3259532595eusmtrp2T;
+        Mon, 18 Sep 2023 07:32:59 +0000 (GMT)
+X-AuditID: cbfec7f4-97dff70000022c38-9b-6507fd2bc863
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 28.AB.10549.B2DF7056; Mon, 18
+        Sep 2023 08:32:59 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230918073259eusmtip2f600a41fd36323b49a478548a33828b6~F7d_frRyu1441814418eusmtip2j;
+        Mon, 18 Sep 2023 07:32:59 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) by
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) with Microsoft SMTP
+        Server (TLS) id 15.0.1497.2; Mon, 18 Sep 2023 08:32:58 +0100
+Received: from CAMSVWEXC02.scsc.local ([::1]) by CAMSVWEXC02.scsc.local
+        ([fe80::3c08:6c51:fa0a:6384%13]) with mapi id 15.00.1497.012; Mon, 18 Sep
+        2023 08:32:58 +0100
+From:   Daniel Gomez <da.gomez@samsung.com>
+To:     David Hildenbrand <david@redhat.com>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "hughd@google.com" <hughd@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>
+CC:     "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCH 0/6] shmem: high order folios support in write path
+Thread-Topic: [PATCH 0/6] shmem: high order folios support in write path
+Thread-Index: AQHZ57ou5Qxd50H2CkCAi/G4rRLLzbAb8riAgAQxuQA=
+Date:   Mon, 18 Sep 2023 07:32:57 +0000
+Message-ID: <20230918073252.7nljdakmdk5kcpdt@sarkhan>
+In-Reply-To: <b8f75b8e-77f5-4aa1-ce73-6c90f7d87d43@redhat.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [106.110.32.103]
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <7FB5FC383E12CC4DB148D262FACCE602@scsc.local>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-Brightmail-Tracker: H4sIAAAAAAAAA01SbUxTZxjd297eXmraXFoiT1icpmxjo7UI6naZylAxXlmWmOzHAppoxTvK
+        N2utTmIMokamia2bASkkYCcgyCRcwRAsEIvCKh/tIAPGmA65bKSkdPIVPoTNcmvSf+d5znnP
+        eU7yEkL5C1EYkZZ9itFnazOVuAR72LnUt1W9Kma2cU8QVVZfh1P3/jTh1Hz9spAa4GTUxMx1
+        jGodUVG2VgdGDbSU4dTzuv9EVMvrZjE1bJ5AVNW8V0w9arDi1MpiGR4vo0vzf8XoCtZIP7gb
+        SQ/0Gmm29nucZmd+ENO/3FrBaG/bbzg9y753OChZsvskk5l2mtFHxR2X6LoW/kC5bPB3tjGH
+        MB9dk11FQQSQO2D8ygS6iiSEnLyLwN3jFvPDHILfC6b9zCyC1qeV+Nsns51eEU9UI2ivuif2
+        EeuqzqWjPNGDoKD7J5wfahAU/tUq8qlw8mNoc7DrISFkhwicdYWYjxCSSVBkYtetFORBqC7o
+        Qz4cQtLw+MZNEY8/g3+9JW80BIGRH8DiVK5vLSV3wkhpu8C3DiLj4M6Pp31rRG6ClzXLYt49
+        FEa4cgHfIBispTYhjzfCWsuYv5kaeoc4xONt0FTZhvFYCa8LbyPeRw0Vj2ZwHseCZ9Tl91dB
+        1e0pIX9OMDhKOMxXEchKCXDWm37TBPhn6I4/TAHurkaxGaktAfdZAjIsARmWgAxLQEYFEtWi
+        UMZoyEplDDHZzBmNQZtlMGanalJyslj05g92r3XNNaNq9yuNHQkIZEdACJUh0pJonJFLT2rP
+        5jH6nGN6YyZjsKN3CUwZKlXtcaTIyVTtKSaDYXIZ/VtWQASF5Qsul7tMxq8S8y90P3tfl3Zr
+        skG5qenE8CHdlw1rggMxuheRk87V5UOxyWcU33xd/LLf+Q5TQH0x5m3cmJLLVcSVTiLNlowr
+        NvdcvXGhpnn7wtJHRy6GN6uSv43bn25z7ew3JKKExydGP+nvkBbLbeO1ERGePI/VUbP3Wui5
+        nPN7NQn2HfRib5RMZi9R7w/veZCYpAqL8MDuss/VU+HTpqSmYUef69N9MY3BK1T62dXYxvOX
+        m2RDm53P4m9cGhw8vD3aU1882h8Rbn6e3q4o3zDhzHkybuqwmu2O6/ddGd3xYwej5NNF52Tu
+        1V37PuR+Nv9tmUesosiWMs8N2jbXDucpMYNOGx0p1Bu0/wOXt2Ji8gMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrOKsWRmVeSWpSXmKPExsVy+t/xe7raf9lTDTYvVLGYs34Nm8Xqu/1s
+        Fl/X/2K2uPyEz+Lppz4Wi723tC327D3JYnF51xw2i3tr/rNa7Pqzg93ixoSnjBbLvr5nt9i9
+        cRGbxe8fc9gc+DxmN1xk8ViwqdRj8wotj8tnSz02repk89j0aRK7x4kZv1k83u+7yubxeZNc
+        AGeUnk1RfmlJqkJGfnGJrVK0oYWRnqGlhZ6RiaWeobF5rJWRqZK+nU1Kak5mWWqRvl2CXsbx
+        b7cZCzYJVux5eJK5gbGbr4uRk0NCwETi87H3rF2MXBxCAksZJR7NvcoIkZCR2PjlKiuELSzx
+        51oXG0TRR0aJ968OskM4ZxglFu7eBdW+klHi5O4lbCAtbAKaEvtObgKrEhE4yCrR/fQVE0iC
+        WSBSYlo/SIKTQ1jAXWJ50zmwfSICHhIHJ05hhbCtJD68nwlUw8HBIqAq8eN1AUiYV8BU4tbs
+        /WBjhAQOM0o07LEAKeEUsJNYMrkMJMwoICvxaOUvdohN4hK3nsxngvhAQGLJnvPMELaoxMvH
+        /6A+05E4e/0J1McGEluX7mOBsJUk/nQsZISYoyOxYPcnNgjbUuLtnQtQ87Ulli18zQxxmqDE
+        yZlPWCYwysxCsnoWkvZZSNpnIWmfhaR9ASPrKkaR1NLi3PTcYkO94sTc4tK8dL3k/NxNjMAU
+        t+3Yz807GOe9+qh3iJGJg/EQowQHs5II70xDtlQh3pTEyqrUovz4otKc1OJDjKbAkJvILCWa
+        nA9Msnkl8YZmBqaGJmaWBqaWZsZK4ryeBR2JQgLpiSWp2ampBalFMH1MHJxSDUw9R2977tHt
+        u7zI1qvx3Dod3s2SM/lsLEM+1mcaNed3dUgfe/55c7jqN/v/L9Zl3hTb5PH7sWDhp8ur+8Vv
+        TOPc4/FVQIH98plyFb1bXPdLLmr5XskWC5z/MdA4adGVHxb80i8/tHW6V7DNUnhVYrzmoUHj
+        /1uyGx9fn3QiwensvRZPq3/ZR/rTDsbez/odtMArhTP/6N3Kz+lFFzfXR2RZfLr8sUm99Mez
+        lX8eWd5982/+Br1TwbVLZe047t2IfrW6ZJ9b9hM2pu7Dz7NOl+65cHz7zI+HVT4G6X1gCHWc
+        4nnvdAD/B70rwhFpcyeHyBf+PDs9aU7/4n6LVdW5V1cvNcqyXXBa4H7xJrkyzuizSizFGYmG
+        WsxFxYkAyQ+4L/oDAAA=
+X-CMS-MailID: 20230918073259eucas1p1cfcfbfd6a8c37c7cebd0b4734beffbc5
+X-Msg-Generator: CA
+X-RootMTR: 20230915095123eucas1p2c23d8a8d910f5a8e9fd077dd9579ad0a
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230915095123eucas1p2c23d8a8d910f5a8e9fd077dd9579ad0a
+References: <CGME20230915095123eucas1p2c23d8a8d910f5a8e9fd077dd9579ad0a@eucas1p2.samsung.com>
+        <20230915095042.1320180-1-da.gomez@samsung.com>
+        <b8f75b8e-77f5-4aa1-ce73-6c90f7d87d43@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-`strncpy` is deprecated for use on NUL-terminated destination strings [1].
+On Fri, Sep 15, 2023 at 05:29:51PM +0200, David Hildenbrand wrote:
+> On 15.09.23 11:51, Daniel Gomez wrote:
+> > This series add support for high order folios in shmem write
+> > path.
+> >
+> > This is a continuation of the shmem work from Luis here [1]
+> > following Matthew Wilcox's suggestion [2] regarding the path to take
+> > for the folio allocation order calculation.
+> >
+> > [1] RFC v2 add support for blocksize > PAGE_SIZE
+> > https://lore.kernel.org/all/ZHBowMEDfyrAAOWH@bombadil.infradead.org/T/#=
+md3e93ab46ce2ad9254e1eb54ffe71211988b5632
+> > [2] https://lore.kernel.org/all/ZHD9zmIeNXICDaRJ@casper.infradead.org/
+> >
+> > Patches have been tested and sent from next-230911. They do apply
+> > cleanly to the latest next-230914.
+> >
+> > fsx and fstests has been performed on tmpfs with noswap with the
+> > following results:
+> > - fsx: 2d test, 21,5B
+> > - fstests: Same result as baseline for next-230911 [3][4][5]
+> >
+> > [3] Baseline next-230911 failures are: generic/080 generic/126
+> > generic/193 generic/633 generic/689
+> > [4] fstests logs baseline: https://gitlab.com/-/snippets/3598621
+> > [5] fstests logs patches: https://gitlab.com/-/snippets/3598628
+> >
+> > There are at least 2 cases/topics to handle that I'd appreciate
+> > feedback.
+> > 1. With the new strategy, you might end up with a folio order matching
+> > HPAGE_PMD_ORDER. However, we won't respect the 'huge' flag anymore if
+> > THP is enabled.
+> > 2. When the above (1.) occurs, the code skips the huge path, so
+> > xa_find with hindex is skipped.
+>
+> Similar to large anon folios (but different to large non-shmem folios in =
+the
+> pagecache), this can result in memory waste.
+>
+> We discussed that topic in the last bi-weekly mm meeting, and also how to
+> eventually configure that for shmem.
+>
+> Refer to of a summary. [1]
+>
+> [1] https://lkml.kernel.org/r/4966f496-9f71-460c-b2ab-8661384ce626@arm.co=
+m
 
-We should favor a more robust and less ambiguous interface.
+Thanks for the summary David (I was missing linux-MM from kvack in lei).
 
-We expect that both `nullb->disk_name` and `disk->disk_name` be
-NUL-terminated:
-|     snprintf(nullb->disk_name, sizeof(nullb->disk_name),
-|              "%s", config_item_name(&dev->group.cg_item));
-...
-|       pr_info("disk %s created\n", nullb->disk_name);
-
-It seems like NUL-padding may be required due to __assign_disk_name()
-utilizing a memcpy as opposed to a `str*cpy` api.
-| static inline void __assign_disk_name(char *name, struct gendisk *disk)
-| {
-| 	if (disk)
-| 		memcpy(name, disk->disk_name, DISK_NAME_LEN);
-| 	else
-| 		memset(name, 0, DISK_NAME_LEN);
-| }
-
-Then we go and print it with `__print_disk_name` which wraps `nullb_trace_disk_name()`.
-| #define __print_disk_name(name) nullb_trace_disk_name(p, name)
-
-This function obviously expects a NUL-terminated string.
-| const char *nullb_trace_disk_name(struct trace_seq *p, char *name)
-| {
-| 	const char *ret = trace_seq_buffer_ptr(p);
-|
-| 	if (name && *name)
-| 		trace_seq_printf(p, "disk=%s, ", name);
-| 	trace_seq_putc(p, 0);
-|
-| 	return ret;
-| }
-
-From the above, we need both 1) a NUL-terminated string and 2) a
-NUL-padded string. So, let's use strscpy_pad() as per Kees' suggestion
-from v1.
-
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Nathan Chancellor <nathan@kernel.org>
-Signed-off-by: Justin Stitt <justinstitt@google.com>
----
-Changes in v2:
-- use strscpy_pad (thanks Kees)
-- Link to v1: https://lore.kernel.org/r/20230911-strncpy-drivers-block-null_blk-main-c-v1-1-3b3887e7fde4@google.com
----
-Note: build-tested
----
- drivers/block/null_blk/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 864013019d6b..d83e65525e18 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1938,7 +1938,7 @@ static int null_gendisk_register(struct nullb *nullb)
- 	else
- 		disk->fops		= &null_bio_ops;
- 	disk->private_data	= nullb;
--	strncpy(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
-+	strscpy_pad(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
- 
- 	if (nullb->dev->zoned) {
- 		int ret = null_register_zoned_dev(nullb);
-
----
-base-commit: 2dde18cd1d8fac735875f2e4987f11817cc0bc2c
-change-id: 20230911-strncpy-drivers-block-null_blk-main-c-7349153e1c6a
-
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
-
+I think the PMD_ORDER-1 as max would suffice here to honor/respect the
+huge flag. Although, we would end up having a different max value
+than pagecache/readahead.
+>
+> --
+> Cheers,
+>
+> David / dhildenb
+>=
