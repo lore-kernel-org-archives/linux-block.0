@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB539CD3435
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 380E2CD343A
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236249AbjIRLGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 07:06:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58370 "EHLO
+        id S241288AbjIRLGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 07:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236692AbjIRLF1 (ORCPT
+        with ESMTP id S236351AbjIRLF1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 18 Sep 2023 07:05:27 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9745AE1;
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482D294;
         Mon, 18 Sep 2023 04:05:21 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 8E6021FE02;
+        by smtp-out1.suse.de (Postfix) with ESMTP id 7902F21AB2;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1695035117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7YxTD9ivwBqDlU0rUH4B43A6drfBPCpobX7r4lclL8s=;
-        b=y5VrsQtZSyfCP0fSu9yQrUFJnRPQU53VfudrMl94CnYtrz5TIfHfzLfmNemC2t/AtTNnZR
-        gnI60raF0lCn37KIw2Iam3XuijU36LGZLadTiA1DMOkc5OatFR+NPqgz7jAlWM/JjhnKye
-        zkOKceM5BXwg+69ZGxZbHQBWsnDP4mo=
+        bh=l3AoJv2BI4/Yeg1oZ6DdfLHBbwEuOnZEioucjclZ6/Y=;
+        b=Uf4h7o73hvBBWy0H8CPu+88GxRJcN/oV1LGJmdqMDllRbB+gR5VUw8aStuiiYFhRgEYdju
+        OVX3CmkNXvYt/Jaqe5Y1JuehWrfGwklG5xC6EY/ShKW+2Ysu+SMLJkiI4G5TbgE8ApnQBs
+        yJTfbYbN6pAMTfxvetGC+EJeow5BiD4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1695035117;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7YxTD9ivwBqDlU0rUH4B43A6drfBPCpobX7r4lclL8s=;
-        b=GErq9oHTLI0nfJVFCYTBNOF/uty0XP64JJAoJ1/rADTpUiVNKEh86z+59qNaQteBSRF2Ep
-        i8R5YbfLFdXUQdDA==
+        bh=l3AoJv2BI4/Yeg1oZ6DdfLHBbwEuOnZEioucjclZ6/Y=;
+        b=WYgm3DL0ajNKFozSyfShaisgQ/WKknxBghYuLNvjMebG7PtG/xAofBcO/vfQPwqWgmbBIA
+        ejzDgezFBVF+TDDw==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 79AA22C166;
+        by relay2.suse.de (Postfix) with ESMTP id 614122C14E;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 72C7551CD15F; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
+        id 338E851CD14F; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 17/18] xfs: remove check for block sizes smaller than PAGE_SIZE
-Date:   Mon, 18 Sep 2023 13:05:09 +0200
-Message-Id: <20230918110510.66470-18-hare@suse.de>
+Subject: [PATCH 09/18] fs/buffer: use mapping order in grow_dev_page()
+Date:   Mon, 18 Sep 2023 13:05:01 +0200
+Message-Id: <20230918110510.66470-10-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230918110510.66470-1-hare@suse.de>
 References: <20230918110510.66470-1-hare@suse.de>
@@ -60,37 +60,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We now support block sizes larger than PAGE_SIZE, so this
-check is pointless.
+Use the correct mapping order in grow_dev_page() to ensure folios
+are created with the correct order.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- fs/xfs/xfs_super.c | 12 ------------
- 1 file changed, 12 deletions(-)
+ fs/buffer.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index 1f77014c6e1a..67dcdd4dcf2d 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -1651,18 +1651,6 @@ xfs_fs_fill_super(
- 		goto out_free_sb;
- 	}
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 66895432d91f..a219b79c57ad 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1044,6 +1044,7 @@ grow_dev_page(struct block_device *bdev, sector_t block,
+ 	sector_t end_block;
+ 	int ret = 0;
+ 	gfp_t gfp_mask;
++	fgf_t fgf = FGP_LOCK | FGP_ACCESSED | FGP_CREAT;
  
--	/*
--	 * Until this is fixed only page-sized or smaller data blocks work.
--	 */
--	if (mp->m_sb.sb_blocksize > PAGE_SIZE) {
--		xfs_warn(mp,
--		"File system with blocksize %d bytes. "
--		"Only pagesize (%ld) or less will currently work.",
--				mp->m_sb.sb_blocksize, PAGE_SIZE);
--		error = -ENOSYS;
--		goto out_free_sb;
--	}
+ 	gfp_mask = mapping_gfp_constraint(inode->i_mapping, ~__GFP_FS) | gfp;
+ 
+@@ -1054,9 +1055,8 @@ grow_dev_page(struct block_device *bdev, sector_t block,
+ 	 * code knows what it's doing.
+ 	 */
+ 	gfp_mask |= __GFP_NOFAIL;
 -
- 	/* Ensure this filesystem fits in the page cache limits */
- 	if (xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_dblocks) ||
- 	    xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_rblocks)) {
+-	folio = __filemap_get_folio(inode->i_mapping, index,
+-			FGP_LOCK | FGP_ACCESSED | FGP_CREAT, gfp_mask);
++	fgf |= fgf_set_order(mapping_min_folio_order(inode->i_mapping));
++	folio = __filemap_get_folio(inode->i_mapping, index, fgf, gfp_mask);
+ 
+ 	bh = folio_buffers(folio);
+ 	if (bh) {
 -- 
 2.35.3
 
