@@ -2,129 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA11ACD37B0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 15:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42247CD13D2
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 15:46:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229463AbjIRPno (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 11:43:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36976 "EHLO
+        id S229721AbjIRPqI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 11:46:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbjIRPnk (ORCPT
+        with ESMTP id S229720AbjIRPqH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 11:43:40 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE91FE;
-        Mon, 18 Sep 2023 08:42:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=rj2lPT4ijRerOpK7UwrimNkow+34fyVgpBIesK0KMQc=; b=qoEX3H+xID+BmrY//PeamZj9yO
-        r14kN7qdBG0ZeZR8nJOK+PI/cbqASQLdisdX5fqZup87JfFblAbBOjgI0aYrG+/YduUe8wgG+FazP
-        8gwRGoQv9KUtaKiA40RCuVvdH5QwatL19c/NHUK7XUyF3bO6KVYRjyrFdr1/ol8LqbGEB63ETKKsP
-        hJ+MzvqzaCvjKzGKobFWtx9vPU3XSqOKBR+PI5BCA3OWYLJ3Ox4uGndSJZFc7y3QO5DhUFXIVF54+
-        Wq/RNkL8rqb2IGyzKxzFHKdn62ZtgQJ6Ms3l4kc6/jUPYe4M9IYeTzwL1heddCzn21cKupOvO25P/
-        nPVqcegA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qiEVV-00BKBs-16; Mon, 18 Sep 2023 13:41:45 +0000
-Date:   Mon, 18 Sep 2023 14:41:44 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Mon, 18 Sep 2023 11:46:07 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E732737;
+        Mon, 18 Sep 2023 08:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695051892; x=1726587892;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ykgUdcAyff68JbKMpOfYfrK6kmGZcZxRKCMtU2anr+I=;
+  b=HVTHZ00AThtAOg8Ljc230m/dF8XBoDobEM4sNiBsPcWxLzxoXkjCZD4k
+   2X/KFNI8fQSaLLp6Sq2UFMho9h2dbvIc5mqnI0Yp3iLHnkFUpcoPVamCG
+   J7LtyiETXVC8jtaPHZhQIerFoozGVE7IwWAB2cbUxdFywnwIO/MnN6QpE
+   1OkfsRg5cGWVu38Xi3K6PW15RiGLBiooLb4zGjKX9IEcVB9wG5QK3vsto
+   nRz7cL7rWi4kHQEnFJV7Q+7Gsfl3IdP9O+xyoztlLtY+GGzQOKRfTbeb5
+   t3jT7k92oy1HR78nXPkk8pBuKD2x/VHUeJ7RUO/3AlmTwISShWMFKoyrt
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446113310"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="446113310"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:12:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811342022"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="811342022"
+Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
+  by fmsmga008.fm.intel.com with ESMTP; 18 Sep 2023 06:12:19 -0700
+Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qiE2z-00067M-0D;
+        Mon, 18 Sep 2023 13:12:17 +0000
+Date:   Mon, 18 Sep 2023 21:11:40 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Luis Chamberlain <mcgrof@kernel.org>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Pankaj Raghav <p.raghav@samsung.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 07/18] mm/filemap: allocate folios with mapping order
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 08/18] mm/readahead: allocate folios with mapping order
  preference
-Message-ID: <ZQhTmF9VkShSequJ@casper.infradead.org>
-References: <20230918110510.66470-1-hare@suse.de>
- <20230918110510.66470-8-hare@suse.de>
+Message-ID: <202309182020.nSchrF93-lkp@intel.com>
+References: <20230918110510.66470-9-hare@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230918110510.66470-8-hare@suse.de>
+In-Reply-To: <20230918110510.66470-9-hare@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 01:04:59PM +0200, Hannes Reinecke wrote:
-> +++ b/mm/filemap.c
-> @@ -507,9 +507,14 @@ static void __filemap_fdatawait_range(struct address_space *mapping,
->  	pgoff_t end = end_byte >> PAGE_SHIFT;
->  	struct folio_batch fbatch;
->  	unsigned nr_folios;
-> +	unsigned int order = mapping_min_folio_order(mapping);
->  
->  	folio_batch_init(&fbatch);
->  
-> +	if (order) {
-> +		index = ALIGN_DOWN(index, 1 << order);
-> +		end = ALIGN_DOWN(end, 1 << order);
-> +	}
->  	while (index <= end) {
->  		unsigned i;
->  
+Hi Hannes,
 
-I don't understand why this function needs to change at all.
-filemap_get_folios_tag() should return any folios which overlap
-(index, end).  And aligning 'end' _down_ certainly sets off alarm bells
-for me.  We surely would need to align _up_.  Except i don't think we
-need to do anything to this function.
+kernel test robot noticed the following build errors:
 
-> @@ -2482,7 +2487,8 @@ static int filemap_create_folio(struct file *file,
->  	struct folio *folio;
->  	int error;
->  
-> -	folio = filemap_alloc_folio(mapping_gfp_mask(mapping), 0);
-> +	folio = filemap_alloc_folio(mapping_gfp_mask(mapping),
-> +				    mapping_min_folio_order(mapping));
->  	if (!folio)
->  		return -ENOMEM;
->  
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on akpm-mm/mm-everything linus/master v6.6-rc2 next-20230918]
+[cannot apply to xfs-linux/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Surely we need to align 'index' here?
+url:    https://github.com/intel-lab-lkp/linux/commits/Hannes-Reinecke/mm-readahead-rework-loop-in-page_cache_ra_unbounded/20230918-190732
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230918110510.66470-9-hare%40suse.de
+patch subject: [PATCH 08/18] mm/readahead: allocate folios with mapping order preference
+config: i386-tinyconfig (https://download.01.org/0day-ci/archive/20230918/202309182020.nSchrF93-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230918/202309182020.nSchrF93-lkp@intel.com/reproduce)
 
-> @@ -2542,9 +2548,16 @@ static int filemap_get_pages(struct kiocb *iocb, size_t count,
->  	pgoff_t last_index;
->  	struct folio *folio;
->  	int err = 0;
-> +	unsigned int order = mapping_min_folio_order(mapping);
->  
->  	/* "last_index" is the index of the page beyond the end of the read */
->  	last_index = DIV_ROUND_UP(iocb->ki_pos + count, PAGE_SIZE);
-> +	if (order) {
-> +		/* Align with folio order */
-> +		WARN_ON(index % 1 << order);
-> +		index = ALIGN_DOWN(index, 1 << order);
-> +		last_index = ALIGN(last_index, 1 << order);
-> +	}
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309182020.nSchrF93-lkp@intel.com/
 
-Not sure I see the point of this.  filemap_get_read_batch() returns any
-folio which contains 'index'.
+All errors (new ones prefixed by >>):
 
->  retry:
->  	if (fatal_signal_pending(current))
->  		return -EINTR;
-> @@ -2561,7 +2574,7 @@ static int filemap_get_pages(struct kiocb *iocb, size_t count,
->  		if (iocb->ki_flags & (IOCB_NOWAIT | IOCB_WAITQ))
->  			return -EAGAIN;
->  		err = filemap_create_folio(filp, mapping,
-> -				iocb->ki_pos >> PAGE_SHIFT, fbatch);
-> +				index, fbatch);
+   ld: mm/readahead.o: in function `readahead_expand':
+>> readahead.c:(.text+0x17b): undefined reference to `__divdi3'
 
-... ah, you align index here.  I wonder if we wouldn't be better passing
-iocb->ki_pos to filemap_create_folio() to emphasise that the caller
-can't assume anything about the alignment/size of the folio.
-
-> @@ -3676,7 +3689,8 @@ static struct folio *do_read_cache_folio(struct address_space *mapping,
->  repeat:
->  	folio = filemap_get_folio(mapping, index);
->  	if (IS_ERR(folio)) {
-> -		folio = filemap_alloc_folio(gfp, 0);
-> +		folio = filemap_alloc_folio(gfp,
-> +				mapping_min_folio_order(mapping));
->  		if (!folio)
->  			return ERR_PTR(-ENOMEM);
->  		err = filemap_add_folio(mapping, folio, index, gfp);
-
-This needs to align index.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
