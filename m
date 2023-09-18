@@ -2,83 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F179C46CA1
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 20:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B7CCD37B0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 21:01:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230165AbjIRU6O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 16:58:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42670 "EHLO
+        id S229821AbjIRVBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 17:01:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230070AbjIRU6L (ORCPT
+        with ESMTP id S229680AbjIRVBW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 16:58:11 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA327111;
-        Mon, 18 Sep 2023 13:57:57 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 340C3C433CC;
-        Mon, 18 Sep 2023 20:57:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695070677;
-        bh=1v0ZGhSwRTXLG9wlFUKoSk2qaGWwbEQ3ZBN31adiJGk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EyQ4qNA3cTHuUa50VsoFyLkcDOry7jj0AskmmAPeuio4TGtFkNj5lyQmRKZCQUH0S
-         ChQNoWBb/Rd7Ltji4aI//LH3J+fu6OCQn65aL9WdCInq9ataKAwfe+SbYxjSqrRcDG
-         xncfD4pIaGzM5vVP9nsuMsm0g8iC8HtCnsLicbWGo3GiLmR5jdAYJtR5WIGgaVOEy/
-         eITgvWD/9HyBv8NK5A2VciRnvBl83hwlTylkwcTiQWBmEpdJfQhN7r+OvxATWqK4Hi
-         c+C8jDbPvRprTDhING/o5klBN97EpLJToFnPjbvT4uy8CXEu2s4pQUSJbQjsGlMc/E
-         3z72kUXNEv3GA==
-Date:   Mon, 18 Sep 2023 16:57:55 -0400
-From:   Sasha Levin <sashal@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Pavel Machek <pavel@denx.de>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@linux.dev>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 6.1 20/22] block: Allow bio_iov_iter_get_pages()
- with bio->bi_bdev unset
-Message-ID: <ZQi50xT1o/N2o8Bt@sashalap>
-References: <20230908193407.3463368-1-sashal@kernel.org>
- <20230908193407.3463368-20-sashal@kernel.org>
- <ZP7j2MA5Qk6RBtAd@duo.ucw.cz>
- <d6da7de6-e603-4fb3-b68e-8d919f26fefe@kernel.dk>
+        Mon, 18 Sep 2023 17:01:22 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97DDC8E;
+        Mon, 18 Sep 2023 14:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=voBKfQZlSDADh+zlNbJvfxsPTMGaXinYcSirNGGzkd0=; b=M/Arl4i6WiJle77w1QQn6+VleA
+        lBDtkiwEESteehLSXPWBk77myXuQXJh1/FmrBhvOsjSLzm68FwYMBwlmKs4kjJCUOEVn4n+qqbWFq
+        3ZuoYG8c2gUYaONx+gSqtkowVg5VvJxSW3boLib+EATWL4fuEwwUIikznFjAKRD75TX5GgXren73P
+        B6U0xM2J5GdPI791k5IAxSJxzlv2paQP9NqWkaWiOMgo3fFpsf/crHldsmcR8IiDuHIQNgH7qxTZ3
+        5sLGw9wioUFm4eirVNg4lMLRS8vtGQFrgPumy3B947qM4BzJjvYkR6HokkBQ9OSArSFZhgqx2/DcS
+        /z4g2PBw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qiLMi-00DDZe-4o; Mon, 18 Sep 2023 21:01:08 +0000
+Date:   Mon, 18 Sep 2023 22:01:08 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 03/18] block/buffer_head: introduce
+ block_{index_to_sector,sector_to_index}
+Message-ID: <ZQi6lAJL2lydVH4A@casper.infradead.org>
+References: <20230918110510.66470-1-hare@suse.de>
+ <20230918110510.66470-4-hare@suse.de>
+ <ZQh8jXqpHFXQyEDT@casper.infradead.org>
+ <4b8014fc-a71b-4e2f-a6a7-a5dc6a120f9e@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d6da7de6-e603-4fb3-b68e-8d919f26fefe@kernel.dk>
+In-Reply-To: <4b8014fc-a71b-4e2f-a6a7-a5dc6a120f9e@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 11, 2023 at 07:15:18AM -0600, Jens Axboe wrote:
->On 9/11/23 3:54 AM, Pavel Machek wrote:
->> Hi!
->>
->>> From: Kent Overstreet <kent.overstreet@linux.dev>
->>>
->>> [ Upstream commit 168145f617d57bf4e474901b7ffa869337a802e6 ]
->>>
->>> bio_iov_iter_get_pages() trims the IO based on the block size of the
->>> block device the IO will be issued to.
->>>
->>> However, bcachefs is a multi device filesystem; when we're creating the
->>> bio we don't yet know which block device the bio will be submitted to -
->>> we have to handle the alignment checks elsewhere.
->>>
->>> Thus this is needed to avoid a null ptr deref.
->>
->> We are certainly not going to backport bcachefs to -stable. Please
->> drop.
->
->I already said as much 3 days ago:
->
->https://lore.kernel.org/all/cd341326-cfaf-4796-8894-2241e7b630d9@kernel.dk/
->
->but didn't hear back yet.
+On Mon, Sep 18, 2023 at 07:42:51PM +0200, Hannes Reinecke wrote:
+> On 9/18/23 18:36, Matthew Wilcox wrote:
+> > On Mon, Sep 18, 2023 at 01:04:55PM +0200, Hannes Reinecke wrote:
+> > > @@ -449,6 +450,22 @@ __bread(struct block_device *bdev, sector_t block, unsigned size)
+> > >   bool block_dirty_folio(struct address_space *mapping, struct folio *folio);
+> > > +static inline sector_t block_index_to_sector(pgoff_t index, unsigned int blkbits)
+> > > +{
+> > > +	if (PAGE_SHIFT < blkbits)
+> > > +		return (sector_t)index >> (blkbits - PAGE_SHIFT);
+> > > +	else
+> > > +		return (sector_t)index << (PAGE_SHIFT - blkbits);
+> > > +}
+> > 
+> > Is this actually more efficient than ...
+> > 
+> > 	loff_t pos = (loff_t)index * PAGE_SIZE;
+> > 	return pos >> blkbits;
+> > 
+> > It feels like we're going to be doing this a lot, so we should find out
+> > what's actually faster.
+> > 
+> I fear that's my numerical computation background chiming in again.
+> One always tries to worry about numerical stability, and increasing a number
+> always risks of running into an overflow.
+> But yeah, I guess your version is simpler, and we can always lean onto the
+> compiler folks to have the compiler arrive at the same assembler code than
+> my version.
 
-Dropped, and sorry for lack of timely replies on this - I let them
-collect feedback for a few weeks before going through it and dropping
-what needs to be dropped.
+I actually don't mind the additional complexity -- if it's faster.
+Yours is a conditional, two subtractions and two shifts (dependent on
+the result of the subtractions).  Mine is two shifts, the second
+dependent on the first.
 
--- 
-Thanks,
-Sasha
+I would say mine is safe because we're talking about a file (or a bdev).
+By definition, the byte offset into one of those fits into an loff_t,
+although maybe not an unsigned long.
+
