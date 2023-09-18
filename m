@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6F2CD3425
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD8BCD13D8
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240370AbjIRLFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 07:05:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58352 "EHLO
+        id S235741AbjIRLF7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 07:05:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235741AbjIRLF0 (ORCPT
+        with ESMTP id S237562AbjIRLF2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:05:26 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E122101;
-        Mon, 18 Sep 2023 04:05:19 -0700 (PDT)
+        Mon, 18 Sep 2023 07:05:28 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6298101;
+        Mon, 18 Sep 2023 04:05:22 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 814BD1FE00;
+        by smtp-out1.suse.de (Postfix) with ESMTP id 8502121AB8;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1695035117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zOEpzxJooswozjT85Ui4aOBC3IjFJwXMatMEtlRVlTE=;
-        b=rYAqHJnVkJwB51wZE49UY0JLIbmEbebfQPosKcEIQPnT9C7oTK+ewb1dKjwyIpbvHBDAn1
-        YdrFtwlyK+k3TI9hE5R8DAq30TRJEDIwHr8/JQzIiFeVxqxAIUHUPu1EuPxTsMI++q/PmN
-        gfgVes7FcHkjUaERvIJsXT3SJtJ9qkI=
+        bh=12LMwdHZ1bZ03RR+L49Ac8+YMFXdYZwVGlXkz8YquqM=;
+        b=dFpKEK4HeBOY3FewXaP7aJtlTdk6AnpOKd5O9i+LAbNCc2lHEJdxzKrF+7DEUo848CZIfI
+        3r83uBVKDg8zPugjmS+JWHroeQdVpXUn/+sgaEeVsy0kI6w9fZfcdCwQoA0uaGrsmsuGxL
+        jbSuxDdd69gcz1d+cohNFjmlclWvXtg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1695035117;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zOEpzxJooswozjT85Ui4aOBC3IjFJwXMatMEtlRVlTE=;
-        b=QCrgXxXzcqU5sBvHxJolByfPw9kozqKuDFDd0aVs49tOeIhHZVn/cxrmUlfCTBny1Y/uy9
-        TJhtZSrw0dt1dMDw==
+        bh=12LMwdHZ1bZ03RR+L49Ac8+YMFXdYZwVGlXkz8YquqM=;
+        b=zqNAQDBNpyFItxIXFqKGYZdQYwaKTOpB0xmuEb47kyGqB7bslHfHMYBqwQ7egP4XZPoEK+
+        4BmnSQlqI86VdDAQ==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 670712C15C;
+        by relay2.suse.de (Postfix) with ESMTP id 6ED792C162;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 5C0F851CD159; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
+        id 4386C51CD153; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 14/18] brd: use memcpy_{to,from}_folio()
-Date:   Mon, 18 Sep 2023 13:05:06 +0200
-Message-Id: <20230918110510.66470-15-hare@suse.de>
+Subject: [PATCH 11/18] block/bdev: enable large folio support for large logical block sizes
+Date:   Mon, 18 Sep 2023 13:05:03 +0200
+Message-Id: <20230918110510.66470-12-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230918110510.66470-1-hare@suse.de>
 References: <20230918110510.66470-1-hare@suse.de>
@@ -60,84 +60,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Simplify copy routines by using memcpy_to_folio()/memcpy_from_folio().
+Enable large folio support when the logical block size is larger
+than PAGE_SIZE.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/block/brd.c | 39 ++++-----------------------------------
- 1 file changed, 4 insertions(+), 35 deletions(-)
+ block/bdev.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index d6595b1a22e8..90e1b6c4fbc8 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -163,7 +163,6 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 			sector_t sector, size_t n)
- {
- 	struct folio *folio;
--	void *dst;
- 	unsigned int rd_sector_size = PAGE_SIZE;
- 	unsigned int offset = brd_sector_offset(brd, sector);
- 	size_t copy;
-@@ -172,21 +171,7 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 	folio = brd_lookup_folio(brd, sector);
- 	BUG_ON(!folio);
- 
--	dst = kmap_local_folio(folio, offset);
--	memcpy(dst, src, copy);
--	kunmap_local(dst);
--
--	if (copy < n) {
--		src += copy;
--		sector += copy >> SECTOR_SHIFT;
--		copy = n - copy;
--		folio = brd_lookup_folio(brd, sector);
--		BUG_ON(!folio);
--
--		dst = kmap_local_folio(folio, 0);
--		memcpy(dst, src, copy);
--		kunmap_local(dst);
--	}
-+	memcpy_to_folio(folio, offset, src, copy);
+diff --git a/block/bdev.c b/block/bdev.c
+index adbcf7af0b56..d5198743401a 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -133,6 +133,9 @@ static void set_init_blocksize(struct block_device *bdev)
+ 		bsize <<= 1;
+ 	}
+ 	bdev->bd_inode->i_blkbits = blksize_bits(bsize);
++	if (bsize > PAGE_SIZE)
++		mapping_set_folio_orders(bdev->bd_inode->i_mapping,
++					 get_order(bsize), MAX_ORDER);
  }
  
- /*
-@@ -196,32 +181,16 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- 			sector_t sector, size_t n)
+ int set_blocksize(struct block_device *bdev, int size)
+@@ -149,6 +152,9 @@ int set_blocksize(struct block_device *bdev, int size)
+ 	if (bdev->bd_inode->i_blkbits != blksize_bits(size)) {
+ 		sync_blockdev(bdev);
+ 		bdev->bd_inode->i_blkbits = blksize_bits(size);
++		if (size > PAGE_SIZE)
++			mapping_set_folio_orders(bdev->bd_inode->i_mapping,
++						 get_order(size), MAX_ORDER);
+ 		kill_bdev(bdev);
+ 	}
+ 	return 0;
+@@ -425,6 +431,11 @@ void bdev_set_nr_sectors(struct block_device *bdev, sector_t sectors)
+ 
+ void bdev_add(struct block_device *bdev, dev_t dev)
  {
- 	struct folio *folio;
--	void *src;
- 	unsigned int rd_sector_size = PAGE_SIZE;
- 	unsigned int offset = brd_sector_offset(brd, sector);
- 	size_t copy;
- 
- 	copy = min_t(size_t, n, rd_sector_size - offset);
- 	folio = brd_lookup_folio(brd, sector);
--	if (folio) {
--		src = kmap_local_folio(folio, offset);
--		memcpy(dst, src, copy);
--		kunmap_local(src);
--	} else
-+	if (folio)
-+		memcpy_from_folio(dst, folio, offset, copy);
-+	else
- 		memset(dst, 0, copy);
--
--	if (copy < n) {
--		dst += copy;
--		sector += copy >> SECTOR_SHIFT;
--		copy = n - copy;
--		folio = brd_lookup_folio(brd, sector);
--		if (folio) {
--			src = kmap_local_folio(folio, 0);
--			memcpy(dst, src, copy);
--			kunmap_local(src);
--		} else
--			memset(dst, 0, copy);
--	}
- }
- 
- /*
++	unsigned int bsize = bdev_logical_block_size(bdev);
++
++	if (bsize > PAGE_SIZE)
++		mapping_set_folio_orders(bdev->bd_inode->i_mapping,
++					 get_order(bsize), MAX_ORDER);
+ 	bdev->bd_dev = dev;
+ 	bdev->bd_inode->i_rdev = dev;
+ 	bdev->bd_inode->i_ino = dev;
 -- 
 2.35.3
 
