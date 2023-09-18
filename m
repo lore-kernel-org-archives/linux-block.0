@@ -2,113 +2,151 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C30CD37B0
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 07:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7237BCD37B0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 07:26:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236411AbjIRHEm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 03:04:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54864 "EHLO
+        id S238418AbjIRHZu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 03:25:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240022AbjIRHET (ORCPT
+        with ESMTP id S240053AbjIRHZn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 03:04:19 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD15F3
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 00:04:12 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-52889bc61b6so4988787a12.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 00:04:12 -0700 (PDT)
+        Mon, 18 Sep 2023 03:25:43 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179C2AC
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 00:25:37 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d77fa2e7771so4721433276.1
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 00:25:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695020650; x=1695625450; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mxanxzBzBYAY+nwMQabQhY93f4nqr/QEo3/ykSA6yhc=;
-        b=txTzqw05xgM4j5/K/Sxp4qY+OpBZrKBE/DLmTuPbkxbZmyRqiyzF1eDl6CqxVHmLel
-         ic+TBlqfy1Rd4LDqHuJJEsmEo27O/FFpjCI8l83zOsWBEmQfvdHxbm9OD8QV2lf/ABO4
-         EjB1icaqdYX+dLgUMjxbGPNoE2at0c41UPQkSF3+TXVlrHAd3r/nB6dfz99/cRyJMsSr
-         hn15RoVSpHmYh1hhahA9WU7CtbJtzp9qRl6k6iE1vd+CWXTyWnddOQI3Wt7ejqs/nhR6
-         DQyTW4hfmIWg8Rm4AAUpSRWnerWOTELLeRpSm+g8ZZ1Nn9xJ4lnuDL293hvkh+b54960
-         ycEA==
+        d=google.com; s=20230601; t=1695021936; x=1695626736; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3WAQv+e8xIAvvalEvufZpQYuwaoIOUMyrU9FgMi+IEc=;
+        b=EtyU2DbHd+QkWP+a3Q3tat9zKgLFOiG/nb2tEIg/mdwcz3HmlhiGK7W5+O8j4P+YRE
+         ZhdYqE01irlOcZjQI/ES1XpbgT+IvAqTpVAUaNBvA4zezOywrWykpdrOVd0RP+VznTrq
+         uoEylyNjjddfu+tnguLsaA9b+5ZpiJj3HQYceBR+/cvYHRFpLPpsgRvv5o+Ll4Yxx2fI
+         eUN1bYIwAYjLEYIM6Sp6bcqZe9N93VNAWd+KLKXPz9ZYzgvYQGkgcBEMJljddTxgeraF
+         1dRa8mAxvnc07c63JcjWE3WSD3RFzPAslgj9gWCnmVBsPTOkM/HUR9JukV9Ohxu6985q
+         DLVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695020650; x=1695625450;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mxanxzBzBYAY+nwMQabQhY93f4nqr/QEo3/ykSA6yhc=;
-        b=jcx30QEitxm9JU4sgHON9SDZo9trWhbZEKgKJlbAWFx1nxV+ejJ4JK3lp3omUM7Y8j
-         H+pJZ0mKh0zrs5KvurZ6CzCiP79Q06Ul4xyGn0pjGxKZFFmxB/lDW5tA2XTe9hTnw8On
-         xOuv0Mtg9HkRFTlDNupJ+7W7Yx5bXFstqyZKepK8sgW6+7FBYdDabFm7w9VnNw8sk+xY
-         0qFm4iWvlnH9RdtFnX+Gipue96iiDR/6i1KTH2LgZRnT8xhPStR7Rv2CzKwL4TD+Eae2
-         T5cKa+S6eljUGDodWYy+4zZ+BfBJGbCQpMUoexk6YWcpowLvpsS6QA+9W5f4mfrrlGab
-         f2IQ==
-X-Gm-Message-State: AOJu0YzsJ5I7QXudkOwDKEzIvtqPWjgY+Limmq/DGmgmlPbbPPm5iO4T
-        oW3BjmdzPVVdr3XB+XZLJWQCn34kzemgqsggsKwh+A==
-X-Google-Smtp-Source: AGHT+IHqikerTXA3+6J11m6jsjTlogmeIfrd2oscuOGRKrp9MkDG9Hp5jziyJnV6mEtXOrlAXSe7OBc2GyeiW4QrMsg=
-X-Received: by 2002:a05:6402:3207:b0:530:c3ac:b684 with SMTP id
- g7-20020a056402320700b00530c3acb684mr6094984eda.23.1695020650534; Mon, 18 Sep
- 2023 00:04:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230911-strncpy-drivers-block-aoe-aoenet-c-v1-1-9643d6137ff9@google.com>
- <202309142019.23A7D80A@keescook> <6338fbac-0177-43eb-be4f-7c586956953f@kernel.dk>
-In-Reply-To: <6338fbac-0177-43eb-be4f-7c586956953f@kernel.dk>
+        d=1e100.net; s=20230601; t=1695021936; x=1695626736;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3WAQv+e8xIAvvalEvufZpQYuwaoIOUMyrU9FgMi+IEc=;
+        b=RcSNW7BF7CgYYNRqwDYteIiESgwkHUijD8c6uRCJKUNgmq6nSD/s6D782/Kd0vUCwR
+         d4FzXYTYrzIGRiaZIABq4PfU5lWlr0PS7/Pp9V+Oj4CPdpbf+fRyCTeLCTTrfbUvz7YX
+         Ig4R+6O4Cake3EJspQmxtea0wR6Tq0FYz20Gd7/VfBV555sJyQmBlth+fLtfPAWd9gFH
+         DjiWsvsksBC23Wu0ThBkw9Raay6iwIxdLVwjXIObr42RSSH44tUb9grSwhtdFYFt9V42
+         CJL0Hmosj20QWELI7lBHhEOB78EEwON6axunN8TCM2pX8SQczUWJqBoJpFLpmZlLtfm/
+         1UOQ==
+X-Gm-Message-State: AOJu0YwmS4nRc3Rp3VO0rk7wyHRMp98MYfxPrs9iiskwCPX0XOlUwA5g
+        M1s7CFnJ5dj9V26uCaw3aQHJZZz4Jrg7PVT4hw==
+X-Google-Smtp-Source: AGHT+IF+jX5dUSIkSB8RfzXLXxoPZwR9qlzLXtJHnwCjwBp0eZD0RK+hmfw8QP+439CpeHYVFT/vO68h56dKzlzm3w==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a25:ad5c:0:b0:d7b:9830:c172 with SMTP
+ id l28-20020a25ad5c000000b00d7b9830c172mr172732ybe.0.1695021936336; Mon, 18
+ Sep 2023 00:25:36 -0700 (PDT)
+Date:   Mon, 18 Sep 2023 07:25:35 +0000
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAG77B2UC/5XNQQ6CMBCF4auQrh3DUBR05T0MMVAGmFBa0mIjI
+ dzdyg1c/m/xvk14ckxe3JNNOArs2ZoY2SkRaqhNT8BtbJGlmUxviOAXZ9S8Qus4kPPQaKtGMG+
+ tX40eYarZgIJC5je8SEJ1rUX8mh11/DmcZxV7YL9Ytx5swN/6rxAQEGQjy7Kgomspf/TW9prOy k6i2vf9C+KPcjnbAAAA
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1695021935; l=2744;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=swPV5XpUlRXB66oR7Qh/nSFtVd/YWWRwyK5xLI6b/UY=; b=lQh9KvxNeNw90KFaN+C0AaSOn2MGPv/wnngx73fGHOn+3LvNHoRUpaTOi1Y57TwXuu3uuw7Uf
+ QFw1u2PR0KpBJ0fpN3sNNORHsXBuqSeRuRmZLY1W53HrYOVatw/bPjw
+X-Mailer: b4 0.12.3
+Message-ID: <20230918-strncpy-drivers-block-null_blk-main-c-v2-1-cd9b109edfdf@google.com>
+Subject: [PATCH v2] null_blk: refactor deprecated strncpy
 From:   Justin Stitt <justinstitt@google.com>
-Date:   Mon, 18 Sep 2023 00:03:56 -0700
-Message-ID: <CAFhGd8pwtUSJBzepe=GBeyKuhD6ND6aWjeeT477Sdb4YTYDL_Q@mail.gmail.com>
-Subject: Re: [PATCH] aoe: refactor deprecated strncpy
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Justin Sanders <justin@coraid.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, Xu Panda <xu.panda@zte.com.cn>,
-        Yang Yang <yang.yang29@zte.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 15, 2023 at 6:36=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 9/14/23 9:21 PM, Kees Cook wrote:
-> > On Mon, Sep 11, 2023 at 09:09:07PM +0000, Justin Stitt wrote:
-> >> `strncpy` is deprecated for use on NUL-terminated destination strings =
-[1].
-> >>
-> >> `aoe_iflist` is expected to be NUL-terminated which is evident by its
-> >> use with string apis later on like `strspn`:
-> >> |    p =3D aoe_iflist + strspn(aoe_iflist, WHITESPACE);
-> >>
-> >> It also seems `aoe_iflist` does not need to be NUL-padded which means
-> >> `strscpy` [2] is a suitable replacement due to the fact that it
-> >> guarantees NUL-termination on the destination buffer while not
-> >> unnecessarily NUL-padding.
-> >>
-> >> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#s=
-trncpy-on-nul-terminated-strings [1]
-> >> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.e=
-n.html [2]
-> >> Link: https://github.com/KSPP/linux/issues/90
-> >> Cc: linux-hardening@vger.kernel.org
-> >> Cc: Kees Cook <keescook@chromium.org>
-> >> Cc: Xu Panda <xu.panda@zte.com.cn>
-> >> Cc: Yang Yang <yang.yang29@zte.com>
-> >> Signed-off-by: Justin Stitt <justinstitt@google.com>
-> >
-> > Agreed, truncation is the current behavior, and padding isn't needed.
-> > (Or more precisely, it's already zeroed and this function is called
-> > once.)
-> >
-> > Reviewed-by: Kees Cook <keescook@chromium.org>
->
-> Change looks fine to me too, but for the love of $deity, please use
-> a proper subject line for these kinds of patches. It's not refactoring
-> anything.
->
+`strncpy` is deprecated for use on NUL-terminated destination strings [1].
 
-Fair.
+We should favor a more robust and less ambiguous interface.
 
-Perhaps "xyz: replace strncpy with strscpy"?
+We expect that both `nullb->disk_name` and `disk->disk_name` be
+NUL-terminated:
+|     snprintf(nullb->disk_name, sizeof(nullb->disk_name),
+|              "%s", config_item_name(&dev->group.cg_item));
+...
+|       pr_info("disk %s created\n", nullb->disk_name);
 
-> --
-> Jens Axboe
->
+It seems like NUL-padding may be required due to __assign_disk_name()
+utilizing a memcpy as opposed to a `str*cpy` api.
+| static inline void __assign_disk_name(char *name, struct gendisk *disk)
+| {
+| 	if (disk)
+| 		memcpy(name, disk->disk_name, DISK_NAME_LEN);
+| 	else
+| 		memset(name, 0, DISK_NAME_LEN);
+| }
+
+Then we go and print it with `__print_disk_name` which wraps `nullb_trace_disk_name()`.
+| #define __print_disk_name(name) nullb_trace_disk_name(p, name)
+
+This function obviously expects a NUL-terminated string.
+| const char *nullb_trace_disk_name(struct trace_seq *p, char *name)
+| {
+| 	const char *ret = trace_seq_buffer_ptr(p);
+|
+| 	if (name && *name)
+| 		trace_seq_printf(p, "disk=%s, ", name);
+| 	trace_seq_putc(p, 0);
+|
+| 	return ret;
+| }
+
+From the above, we need both 1) a NUL-terminated string and 2) a
+NUL-padded string. So, let's use strscpy_pad() as per Kees' suggestion
+from v1.
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Changes in v2:
+- use strscpy_pad (thanks Kees)
+- Link to v1: https://lore.kernel.org/r/20230911-strncpy-drivers-block-null_blk-main-c-v1-1-3b3887e7fde4@google.com
+---
+Note: build-tested
+---
+ drivers/block/null_blk/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 864013019d6b..d83e65525e18 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1938,7 +1938,7 @@ static int null_gendisk_register(struct nullb *nullb)
+ 	else
+ 		disk->fops		= &null_bio_ops;
+ 	disk->private_data	= nullb;
+-	strncpy(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
++	strscpy_pad(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
+ 
+ 	if (nullb->dev->zoned) {
+ 		int ret = null_register_zoned_dev(nullb);
+
+---
+base-commit: 2dde18cd1d8fac735875f2e4987f11817cc0bc2c
+change-id: 20230911-strncpy-drivers-block-null_blk-main-c-7349153e1c6a
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
+
