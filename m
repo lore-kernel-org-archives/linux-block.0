@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E577CD3423
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAADBCD3426
 	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239806AbjIRLFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 07:05:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58340 "EHLO
+        id S241170AbjIRLF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 07:05:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234735AbjIRLFZ (ORCPT
+        with ESMTP id S236209AbjIRLF0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:05:25 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF819FD;
-        Mon, 18 Sep 2023 04:05:18 -0700 (PDT)
+        Mon, 18 Sep 2023 07:05:26 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D814102;
+        Mon, 18 Sep 2023 04:05:19 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 7BF781FDFF;
+        by smtp-out1.suse.de (Postfix) with ESMTP id 6F12721AAE;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1695035117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JUAe4yzlD4Eoh42gjXbVpU2X4y7THkjmua5ySlekNfg=;
-        b=1/tZ3PU6BLkKC52ewzLRI/ybegGD7vJNp3HGk9M2dQsQ9S2ozKGfrdXsPJd7nnlwFW53xN
-        4yYyTdqIdZmrg3+cnx0wPx2jVwwJwLAx6O74iyTrQ6jpBTIe7ARfZvk2DgadSNuTQUX2w5
-        r6q3hl9c4OzSl30+8JBtjjwZQR27tPg=
+        bh=sO3vom66G3v5wN0Rdlws4SQilffG/SX/AZnhq8li8s0=;
+        b=cj8Xl1vQV0GmNA9HBXj8qCFC/7Y3exTb67ZcPO94wqHHvTrAZ/dB1kK1qT6l5mP1JwBQ4J
+        usw1tv6VgKf8IcXVvgCQOZsIKdukqXuDAPHAEfoaoAkgmjaGvwy/mEf5Mlr/yUjfLPh0Kj
+        tyD0jeT+/Fvc/hDcQtHzmoAqYmUXuc4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1695035117;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JUAe4yzlD4Eoh42gjXbVpU2X4y7THkjmua5ySlekNfg=;
-        b=Fi+IlHP27ptD5VAo6UDbEfvUpyN+KyyvjdD/tT1lKA25UBKjcr/89Ug8hBItC+lVe53Rrj
-        BMfE2u5JpUfNmlDw==
+        bh=sO3vom66G3v5wN0Rdlws4SQilffG/SX/AZnhq8li8s0=;
+        b=piMdi4Fsth+ZBmMAKv2Q8dM0wTMAQce5SwRLodipTLgzMORWiDmU7WzMTnR9V1Eq1Y4u5E
+        gc7ZlULoKZUZdDBw==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 6347B2C153;
-        Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id F104D2C146;
+        Mon, 18 Sep 2023 11:05:16 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 1265251CD147; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
+        id 01FB851CD143; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 05/18] fs/mpage: use accessor function to translate page index to sectors
-Date:   Mon, 18 Sep 2023 13:04:57 +0200
-Message-Id: <20230918110510.66470-6-hare@suse.de>
+Subject: [PATCH 03/18] block/buffer_head: introduce block_{index_to_sector,sector_to_index}
+Date:   Mon, 18 Sep 2023 13:04:55 +0200
+Message-Id: <20230918110510.66470-4-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230918110510.66470-1-hare@suse.de>
 References: <20230918110510.66470-1-hare@suse.de>
@@ -60,60 +60,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use accessor functions to translate between page index and block sectors
-and ensure the resulting buffer size is calculated correctly.
+Introduce accessor functions block_index_to_sector() and block_sector_to_index()
+to convert the page index into the corresponding sector and vice versa.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- fs/mpage.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ include/linux/buffer_head.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index c9d9fdadb500..26460afd829a 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -168,7 +168,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	sector_t last_block;
- 	sector_t last_block_in_file;
- 	sector_t blocks[MAX_BUF_PER_PAGE];
--	unsigned page_block;
-+	unsigned num_blocks, page_block;
- 	unsigned first_hole = blocks_per_folio;
- 	struct block_device *bdev = NULL;
- 	int length;
-@@ -189,8 +189,12 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	if (folio_buffers(folio))
- 		goto confused;
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 4ede47649a81..55a3032f8375 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -277,6 +277,7 @@ int generic_cont_expand_simple(struct inode *inode, loff_t size);
+ void block_commit_write(struct page *page, unsigned int from, unsigned int to);
+ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
+ 				get_block_t get_block);
++
+ sector_t generic_block_bmap(struct address_space *, sector_t, get_block_t *);
+ int block_truncate_page(struct address_space *, loff_t, get_block_t *);
  
--	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
--	last_block = block_in_file + args->nr_pages * blocks_per_folio;
-+	block_in_file = block_index_to_sector(folio->index, blkbits);
-+	if (blkbits > PAGE_SHIFT)
-+		num_blocks = args->nr_pages >> (blkbits - PAGE_SHIFT);
+@@ -449,6 +450,22 @@ __bread(struct block_device *bdev, sector_t block, unsigned size)
+ 
+ bool block_dirty_folio(struct address_space *mapping, struct folio *folio);
+ 
++static inline sector_t block_index_to_sector(pgoff_t index, unsigned int blkbits)
++{
++	if (PAGE_SHIFT < blkbits)
++		return (sector_t)index >> (blkbits - PAGE_SHIFT);
 +	else
-+		num_blocks = args->nr_pages * blocks_per_folio;
-+	last_block = block_in_file + num_blocks;
- 	last_block_in_file = (i_size_read(inode) + blocksize - 1) >> blkbits;
- 	if (last_block > last_block_in_file)
- 		last_block = last_block_in_file;
-@@ -277,7 +281,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	}
++		return (sector_t)index << (PAGE_SHIFT - blkbits);
++}
++
++static inline pgoff_t block_sector_to_index(sector_t block, unsigned int blkbits)
++{
++	if (PAGE_SHIFT < blkbits)
++		return (pgoff_t)block << (blkbits - PAGE_SHIFT);
++	else
++		return (pgoff_t)block >> (PAGE_SHIFT - blkbits);
++}
++
+ #ifdef CONFIG_BUFFER_HEAD
  
- 	if (first_hole != blocks_per_folio) {
--		folio_zero_segment(folio, first_hole << blkbits, PAGE_SIZE);
-+		folio_zero_segment(folio, first_hole << blkbits, folio_size(folio));
- 		if (first_hole == 0) {
- 			folio_mark_uptodate(folio);
- 			folio_unlock(folio);
-@@ -543,7 +547,7 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
- 	 * The page has no buffers: map it to disk
- 	 */
- 	BUG_ON(!folio_test_uptodate(folio));
--	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
-+	block_in_file = block_index_to_sector(folio->index, blkbits);
- 	/*
- 	 * Whole page beyond EOF? Skip allocating blocks to avoid leaking
- 	 * space.
+ void buffer_init(void);
 -- 
 2.35.3
 
