@@ -2,206 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5093FCD13D9
-	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 18:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2635CD13D2
+	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 20:15:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229595AbjIRS4W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 14:56:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
+        id S229720AbjIRUPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 16:15:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjIRS4V (ORCPT
+        with ESMTP id S229713AbjIRUPs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2023 14:56:21 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44BF610F
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 11:56:15 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2bcde83ce9fso79835061fa.1
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 11:56:15 -0700 (PDT)
+        Mon, 18 Sep 2023 16:15:48 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7439A8F
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 13:15:42 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-77dcff76e35so62527639f.1
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2023 13:15:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695063373; x=1695668173; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jXz4cq66mHWtvTDRMK7RDIs9CKkcwkIB/OuEfXB14i8=;
-        b=cWzT2L6gq0U8CHE4gMU/E2T1aUscXny7l5fWXEScREMS7yJB/jwsP/B+ePnugpPOYf
-         tojZPUTB9nz4I31h3W35TTdFAFx0nUmQu7TkB9RrHybvoW1WU5dsV+VOUAHv5LaMNqEE
-         tRtazd67n6ml/KGYdi5GqBl0eyP5r++jc98z8vNyOPSsofF98G0T26wJ9Z4nBfy/o+nG
-         LT7rkPNAyOYZ+P//2r6nsBQ1PxYz8OcGNBjHKr+48zKb+DtlYtT5Dz2jM42vwNz8fa8P
-         JdjYEcIzebUIB362VkO1kvkzI31jBSjeh8WxoDZcBgvE/pnrc05YhNY9DvEPEtJ+hupC
-         KjSQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695068142; x=1695672942; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hjmj7plkbnOlDMjCra3y3a09oBx1pW45VyaUM21Y7AM=;
+        b=VvO4wGnHhG/8yjHEZ+ktbqa+0WjjZOpfuhYQhzYHwRmO3Tfs5PrCeFVIGb+RuvuoVS
+         o3uXe1boJTJycm6bAbDMp6Hd/tbkXt9Cuuw7LO1rqVIDX9I3NM4rla0o6VeMpKwUW0jl
+         ANojvXB0M+qOAVYToTPvF0TDjLZd1axval+XzTlrF496/Tayu32+0GypnTJJ2bCtd50l
+         aCB90HkTSL4VvjqbxYDpq0q7IbdGjjPWb9m6D8PIvCl32b55qUTrUmuYrtBXpaF9PX3V
+         NkzmW68hNHy/OLqhwsh1kVB+mDibMa3Zi2NIwDE8cet2LPMT06TB+jpN78sj2ENKx4ww
+         T2IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695063373; x=1695668173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1695068142; x=1695672942;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jXz4cq66mHWtvTDRMK7RDIs9CKkcwkIB/OuEfXB14i8=;
-        b=DiVPAajJhLmlVrR2kGjK3FMDEDQe3ZjKT3IK3CaY28npq//C+o3tQOSztjkkp+qhWe
-         v85Ed2kbtS0lpJOSZzryyRNlqN6gMAuqGMU09ueF9GKSGhV317QWUSqc+g9Sbrqtp6Ps
-         wtDplBEoMhrntbRHebING8SGjov9lQnwAEigmI5LZIVgvbvgJwDEAsMXz+Xfp3RBAjNs
-         MhC3Hp2CunXy8Zt6tVYAM1RywRH3LFmcwcdUJCrk8TZVRtGjezDaW9PHu8K9kTsxREZB
-         hiI7wIewuZWrcyHjWWBvQxkhWoZ6MVb23z3iYLDoeYGYuvnRFZMC0bdxYnHTvv8pbPrK
-         kxsQ==
-X-Gm-Message-State: AOJu0Yxvnfdop958/B7u2GyXi1/Bq8kBKBhmiLZGcSf71I08Bp9TSjt7
-        RSlmnHEzHrJKsGnMCkwp5wNYlUQoDvLvcQUy/dtSO7VP2ArV09PdUl1nRQ==
-X-Google-Smtp-Source: AGHT+IEHASyFmV1bd4FBQakOmDWzBWx3Rbg9ZbcFyr5AJUmZLMEwiCsc+/HpjVvZHJQElwIa+nplDGt/Kg+T7jbrlPc=
-X-Received: by 2002:a05:651c:210b:b0:2c0:1385:8c86 with SMTP id
- a11-20020a05651c210b00b002c013858c86mr2901745ljq.25.1695063373292; Mon, 18
- Sep 2023 11:56:13 -0700 (PDT)
+        bh=hjmj7plkbnOlDMjCra3y3a09oBx1pW45VyaUM21Y7AM=;
+        b=Yr2bHyR582p3Sbfj4xmmtomAHsR7TWYdraoB04YyA55YZF9lBX/AKML7ThYzDwWvWS
+         P++tbZdDYgSKgAZFZb8crHAfuiBURtU8vFPadMPbVoIc/531yso3ijLqvVGHsRTzb/8W
+         wg1KWDn2/8Y5ShWxL2mx3qG7BzYiBaVunyKQhsjRF9TxNW/2c8h6Dh3pFkXjIy0PChC+
+         6M64cwE5bGSbBNrSZ2YDsyOVzqfaz8jmMLs6NMOGvalIRMee08iSTmd4kYTD0WbR6nLZ
+         DdWeAkvoIWcEuTcrXih69/xfcV+2jCGmKfPjts4DO5UTbZUQlEGwcJVsJfwCYUrDD8b3
+         wOuQ==
+X-Gm-Message-State: AOJu0YxHbogOSRFPsuG/7kkXy9h7Cf60wLOMv9cnPyB4PDglg8YsltxN
+        mvmJu8cOK+DJEi8C+2Rcmf1KtYwAIsDEdRsffDN8Jw==
+X-Google-Smtp-Source: AGHT+IF6ZrFTRNOlSrFYsTgxKrHJFPd36vms08lvaqfmFTt5ikRLAhqAeHlPU/sHGBbXLkoXXETm0w==
+X-Received: by 2002:a92:907:0:b0:34f:6e08:d6a3 with SMTP id y7-20020a920907000000b0034f6e08d6a3mr10411038ilg.0.1695068141828;
+        Mon, 18 Sep 2023 13:15:41 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id o20-20020a056638125400b0042b451aa95esm2945116jas.150.2023.09.18.13.15.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Sep 2023 13:15:40 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     tj@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Kemeng Shi <shikemeng@huaweicloud.com>
+In-Reply-To: <20230914091508.36232-1-shikemeng@huaweicloud.com>
+References: <20230914091508.36232-1-shikemeng@huaweicloud.com>
+Subject: Re: [PATCH] block: correct stale comment in rq_qos_wait
+Message-Id: <169506814063.372099.2658807658177703138.b4-ty@kernel.dk>
+Date:   Mon, 18 Sep 2023 14:15:40 -0600
 MIME-Version: 1.0
-References: <CGME20230915095133eucas1p267bade2888b7fcd2e1ea8e13e21c495f@eucas1p2.samsung.com>
- <20230915095042.1320180-1-da.gomez@samsung.com> <20230915095042.1320180-7-da.gomez@samsung.com>
- <CAJD7tkbU20tyGxtdL-cqJxrjf38ObG_dUttZdLstH3O2sUTKzw@mail.gmail.com> <20230918075758.vlufrhq22es2dhuu@sarkhan>
-In-Reply-To: <20230918075758.vlufrhq22es2dhuu@sarkhan>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Mon, 18 Sep 2023 11:55:34 -0700
-Message-ID: <CAJD7tkZSST8Kc6duUWt6a9igrsn=ucUPSVPWWGDWEUxBs3b4bg@mail.gmail.com>
-Subject: Re: [PATCH 6/6] shmem: add large folios support to the write path
-To:     Daniel Gomez <da.gomez@samsung.com>
-Cc:     "minchan@kernel.org" <minchan@kernel.org>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "hughd@google.com" <hughd@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-034f2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 1:00=E2=80=AFAM Daniel Gomez <da.gomez@samsung.com>=
- wrote:
->
-> On Fri, Sep 15, 2023 at 11:26:37AM -0700, Yosry Ahmed wrote:
-> > On Fri, Sep 15, 2023 at 2:51=E2=80=AFAM Daniel Gomez <da.gomez@samsung.=
-com> wrote:
-> > >
-> > > Add large folio support for shmem write path matching the same high
-> > > order preference mechanism used for iomap buffered IO path as used in
-> > > __filemap_get_folio().
-> > >
-> > > Use the __folio_get_max_order to get a hint for the order of the foli=
-o
-> > > based on file size which takes care of the mapping requirements.
-> > >
-> > > Swap does not support high order folios for now, so make it order 0 i=
-n
-> > > case swap is enabled.
-> >
-> > I didn't take a close look at the series, but I am not sure I
-> > understand the rationale here. Reclaim will split high order shmem
-> > folios anyway, right?
->
-> For context, this is part of the enablement of large block sizes (LBS)
-> effort [1][2][3], so the assumption here is that the kernel will
-> reclaim memory with the same (large) block sizes that were written to
-> the device.
->
-> I'll add more context in the V2.
->
-> [1] https://kernelnewbies.org/KernelProjects/large-block-size
-> [2] https://docs.google.com/spreadsheets/d/e/2PACX-1vS7sQfw90S00l2rfOKm83=
-Jlg0px8KxMQE4HHp_DKRGbAGcAV-xu6LITHBEc4xzVh9wLH6WM2lR0cZS8/pubhtml#
-> [3] https://lore.kernel.org/all/ZQfbHloBUpDh+zCg@dread.disaster.area/
-> >
-> > It seems like we only enable high order folios if the "noswap" mount
-> > option is used, which is fairly recent. I doubt it is widely used.
->
-> For now, I skipped the swap path as it currently lacks support for
-> high order folios. But I'm currently looking into it as part of the LBS
-> effort (please check spreadsheet at [2] for that).
 
-Thanks for the context, but I am not sure I understand.
+On Thu, 14 Sep 2023 17:15:08 +0800, Kemeng Shi wrote:
+> The rq_qos_wait calls common wake-up function rq_qos_wake_function to get
+> token. Just replace stale wbt_wake_function with rq_qos_wake_function in
+> comment.
+> 
+> 
 
-IIUC we are skipping allocating large folios in shmem if swap is
-enabled in this patch. Swap does not support swapping out large folios
-as a whole (except THPs), but page reclaim will split those large
-folios and swap them out as order-0 pages anyway. So I am not sure I
-understand why we need to skip allocating large folios if swap is
-enabled.
+Applied, thanks!
+
+[1/1] block: correct stale comment in rq_qos_wait
+      commit: e599ed7866cd804ca15de7a92f7f629944cc278d
+
+Best regards,
+-- 
+Jens Axboe
 
 
-> >
-> > >
-> > > Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
-> > > ---
-> > >  mm/shmem.c | 16 +++++++++++++---
-> > >  1 file changed, 13 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/mm/shmem.c b/mm/shmem.c
-> > > index adff74751065..26ca555b1669 100644
-> > > --- a/mm/shmem.c
-> > > +++ b/mm/shmem.c
-> > > @@ -1683,13 +1683,19 @@ static struct folio *shmem_alloc_folio(gfp_t =
-gfp,
-> > >  }
-> > >
-> > >  static struct folio *shmem_alloc_and_acct_folio(gfp_t gfp, struct in=
-ode *inode,
-> > > -               pgoff_t index, bool huge, unsigned int *order)
-> > > +               pgoff_t index, bool huge, unsigned int *order,
-> > > +               struct shmem_sb_info *sbinfo)
-> > >  {
-> > >         struct shmem_inode_info *info =3D SHMEM_I(inode);
-> > >         struct folio *folio;
-> > >         int nr;
-> > >         int err;
-> > >
-> > > +       if (!sbinfo->noswap)
-> > > +               *order =3D 0;
-> > > +       else
-> > > +               *order =3D (*order =3D=3D 1) ? 0 : *order;
-> > > +
-> > >         if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
-> > >                 huge =3D false;
-> > >         nr =3D huge ? HPAGE_PMD_NR : 1U << *order;
-> > > @@ -2032,6 +2038,8 @@ static int shmem_get_folio_gfp(struct inode *in=
-ode, pgoff_t index,
-> > >                 return 0;
-> > >         }
-> > >
-> > > +       order =3D mapping_size_order(inode->i_mapping, index, len);
-> > > +
-> > >         if (!shmem_is_huge(inode, index, false,
-> > >                            vma ? vma->vm_mm : NULL, vma ? vma->vm_fla=
-gs : 0))
-> > >                 goto alloc_nohuge;
-> > > @@ -2039,11 +2047,11 @@ static int shmem_get_folio_gfp(struct inode *=
-inode, pgoff_t index,
-> > >         huge_gfp =3D vma_thp_gfp_mask(vma);
-> > >         huge_gfp =3D limit_gfp_mask(huge_gfp, gfp);
-> > >         folio =3D shmem_alloc_and_acct_folio(huge_gfp, inode, index, =
-true,
-> > > -                                          &order);
-> > > +                                          &order, sbinfo);
-> > >         if (IS_ERR(folio)) {
-> > >  alloc_nohuge:
-> > >                 folio =3D shmem_alloc_and_acct_folio(gfp, inode, inde=
-x, false,
-> > > -                                                  &order);
-> > > +                                                  &order, sbinfo);
-> > >         }
-> > >         if (IS_ERR(folio)) {
-> > >                 int retry =3D 5;
-> > > @@ -2147,6 +2155,8 @@ static int shmem_get_folio_gfp(struct inode *in=
-ode, pgoff_t index,
-> > >         if (folio_test_large(folio)) {
-> > >                 folio_unlock(folio);
-> > >                 folio_put(folio);
-> > > +               if (order > 0)
-> > > +                       order--;
-> > >                 goto alloc_nohuge;
-> > >         }
-> > >  unlock:
-> > > --
-> > > 2.39.2
-> > >
+
