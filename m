@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAADBCD3426
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6F2CD3425
 	for <linux-block@archiver.kernel.org>; Mon, 18 Sep 2023 11:06:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241170AbjIRLF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Sep 2023 07:05:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58358 "EHLO
+        id S240370AbjIRLFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Sep 2023 07:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236209AbjIRLF0 (ORCPT
+        with ESMTP id S235741AbjIRLF0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 18 Sep 2023 07:05:26 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D814102;
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E122101;
         Mon, 18 Sep 2023 04:05:19 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 6F12721AAE;
+        by smtp-out2.suse.de (Postfix) with ESMTP id 814BD1FE00;
         Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1695035117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sO3vom66G3v5wN0Rdlws4SQilffG/SX/AZnhq8li8s0=;
-        b=cj8Xl1vQV0GmNA9HBXj8qCFC/7Y3exTb67ZcPO94wqHHvTrAZ/dB1kK1qT6l5mP1JwBQ4J
-        usw1tv6VgKf8IcXVvgCQOZsIKdukqXuDAPHAEfoaoAkgmjaGvwy/mEf5Mlr/yUjfLPh0Kj
-        tyD0jeT+/Fvc/hDcQtHzmoAqYmUXuc4=
+        bh=zOEpzxJooswozjT85Ui4aOBC3IjFJwXMatMEtlRVlTE=;
+        b=rYAqHJnVkJwB51wZE49UY0JLIbmEbebfQPosKcEIQPnT9C7oTK+ewb1dKjwyIpbvHBDAn1
+        YdrFtwlyK+k3TI9hE5R8DAq30TRJEDIwHr8/JQzIiFeVxqxAIUHUPu1EuPxTsMI++q/PmN
+        gfgVes7FcHkjUaERvIJsXT3SJtJ9qkI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1695035117;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sO3vom66G3v5wN0Rdlws4SQilffG/SX/AZnhq8li8s0=;
-        b=piMdi4Fsth+ZBmMAKv2Q8dM0wTMAQce5SwRLodipTLgzMORWiDmU7WzMTnR9V1Eq1Y4u5E
-        gc7ZlULoKZUZdDBw==
+        bh=zOEpzxJooswozjT85Ui4aOBC3IjFJwXMatMEtlRVlTE=;
+        b=QCrgXxXzcqU5sBvHxJolByfPw9kozqKuDFDd0aVs49tOeIhHZVn/cxrmUlfCTBny1Y/uy9
+        TJhtZSrw0dt1dMDw==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id F104D2C146;
-        Mon, 18 Sep 2023 11:05:16 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 670712C15C;
+        Mon, 18 Sep 2023 11:05:17 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 01FB851CD143; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
+        id 5C0F851CD159; Mon, 18 Sep 2023 13:05:17 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     Luis Chamberlain <mcgrof@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Luis Chamberlain <mcgrof@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 03/18] block/buffer_head: introduce block_{index_to_sector,sector_to_index}
-Date:   Mon, 18 Sep 2023 13:04:55 +0200
-Message-Id: <20230918110510.66470-4-hare@suse.de>
+Subject: [PATCH 14/18] brd: use memcpy_{to,from}_folio()
+Date:   Mon, 18 Sep 2023 13:05:06 +0200
+Message-Id: <20230918110510.66470-15-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230918110510.66470-1-hare@suse.de>
 References: <20230918110510.66470-1-hare@suse.de>
@@ -60,49 +60,84 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce accessor functions block_index_to_sector() and block_sector_to_index()
-to convert the page index into the corresponding sector and vice versa.
+Simplify copy routines by using memcpy_to_folio()/memcpy_from_folio().
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- include/linux/buffer_head.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ drivers/block/brd.c | 39 ++++-----------------------------------
+ 1 file changed, 4 insertions(+), 35 deletions(-)
 
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index 4ede47649a81..55a3032f8375 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -277,6 +277,7 @@ int generic_cont_expand_simple(struct inode *inode, loff_t size);
- void block_commit_write(struct page *page, unsigned int from, unsigned int to);
- int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 				get_block_t get_block);
-+
- sector_t generic_block_bmap(struct address_space *, sector_t, get_block_t *);
- int block_truncate_page(struct address_space *, loff_t, get_block_t *);
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index d6595b1a22e8..90e1b6c4fbc8 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -163,7 +163,6 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
+ 			sector_t sector, size_t n)
+ {
+ 	struct folio *folio;
+-	void *dst;
+ 	unsigned int rd_sector_size = PAGE_SIZE;
+ 	unsigned int offset = brd_sector_offset(brd, sector);
+ 	size_t copy;
+@@ -172,21 +171,7 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
+ 	folio = brd_lookup_folio(brd, sector);
+ 	BUG_ON(!folio);
  
-@@ -449,6 +450,22 @@ __bread(struct block_device *bdev, sector_t block, unsigned size)
+-	dst = kmap_local_folio(folio, offset);
+-	memcpy(dst, src, copy);
+-	kunmap_local(dst);
+-
+-	if (copy < n) {
+-		src += copy;
+-		sector += copy >> SECTOR_SHIFT;
+-		copy = n - copy;
+-		folio = brd_lookup_folio(brd, sector);
+-		BUG_ON(!folio);
+-
+-		dst = kmap_local_folio(folio, 0);
+-		memcpy(dst, src, copy);
+-		kunmap_local(dst);
+-	}
++	memcpy_to_folio(folio, offset, src, copy);
+ }
  
- bool block_dirty_folio(struct address_space *mapping, struct folio *folio);
+ /*
+@@ -196,32 +181,16 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
+ 			sector_t sector, size_t n)
+ {
+ 	struct folio *folio;
+-	void *src;
+ 	unsigned int rd_sector_size = PAGE_SIZE;
+ 	unsigned int offset = brd_sector_offset(brd, sector);
+ 	size_t copy;
  
-+static inline sector_t block_index_to_sector(pgoff_t index, unsigned int blkbits)
-+{
-+	if (PAGE_SHIFT < blkbits)
-+		return (sector_t)index >> (blkbits - PAGE_SHIFT);
+ 	copy = min_t(size_t, n, rd_sector_size - offset);
+ 	folio = brd_lookup_folio(brd, sector);
+-	if (folio) {
+-		src = kmap_local_folio(folio, offset);
+-		memcpy(dst, src, copy);
+-		kunmap_local(src);
+-	} else
++	if (folio)
++		memcpy_from_folio(dst, folio, offset, copy);
 +	else
-+		return (sector_t)index << (PAGE_SHIFT - blkbits);
-+}
-+
-+static inline pgoff_t block_sector_to_index(sector_t block, unsigned int blkbits)
-+{
-+	if (PAGE_SHIFT < blkbits)
-+		return (pgoff_t)block << (blkbits - PAGE_SHIFT);
-+	else
-+		return (pgoff_t)block >> (PAGE_SHIFT - blkbits);
-+}
-+
- #ifdef CONFIG_BUFFER_HEAD
+ 		memset(dst, 0, copy);
+-
+-	if (copy < n) {
+-		dst += copy;
+-		sector += copy >> SECTOR_SHIFT;
+-		copy = n - copy;
+-		folio = brd_lookup_folio(brd, sector);
+-		if (folio) {
+-			src = kmap_local_folio(folio, 0);
+-			memcpy(dst, src, copy);
+-			kunmap_local(src);
+-		} else
+-			memset(dst, 0, copy);
+-	}
+ }
  
- void buffer_init(void);
+ /*
 -- 
 2.35.3
 
