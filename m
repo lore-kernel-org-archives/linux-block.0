@@ -2,159 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4385CE79C4
-	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 10:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE11CE79D1
+	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 11:56:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234257AbjITKzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Sep 2023 06:55:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58014 "EHLO
+        id S234913AbjITL5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Sep 2023 07:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233615AbjITKzk (ORCPT
+        with ESMTP id S234892AbjITL5C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Sep 2023 06:55:40 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCC983;
-        Wed, 20 Sep 2023 03:55:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695207334; x=1726743334;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LVfQr+3NYOJBB85Xy9NQj00gO9lfxtO7rH9xEOTjYvQ=;
-  b=eV02gQPSP0kbcSpp/RsZe5aiUatwTGpWzlIdwkkLzjwMbLItKipbSV4d
-   kzA3DDEy9rOGzNaeScGro9PTrcaeitYB08SAKvwbg0L+0dNzZArRLSGzn
-   yPTVQhnX9RWCOFHJY0N0AwPNf4UTwe284zhk3XcmyjasPMQcjZcvHfTNM
-   E9F7uI+Z7vuPk37SdDK/qMIZxI13TSbALjxdq/8SAfstwNmtHq1NYuCvk
-   bYYKuC1ddQBuZYbFk0N6RbNy1wbnFfvq2sJWEBEdEkWpsNYFEgWqiEEwT
-   JEckPT8bj6HY+5S7h1Wos8ohgMkG0ZK1PqZI3IBB/SFXI5APeXWJiLNI4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="365238749"
-X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
-   d="scan'208";a="365238749"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 03:55:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="781647988"
-X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
-   d="scan'208";a="781647988"
-Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 20 Sep 2023 03:55:27 -0700
-Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qiurd-0008fM-16;
-        Wed, 20 Sep 2023 10:55:25 +0000
-Date:   Wed, 20 Sep 2023 18:54:55 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Cc:     oe-kbuild-all@lists.linux.dev, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, nitheshshetty@gmail.com,
-        anuj1072538@gmail.com, gost.dev@samsung.com, mcgrof@kernel.org,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Anuj Gupta <anuj20.g@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v16 12/12] null_blk: add support for copy offload
-Message-ID: <202309201836.c2wRnper-lkp@intel.com>
-References: <20230920080756.11919-13-nj.shetty@samsung.com>
+        Wed, 20 Sep 2023 07:57:02 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A962B6
+        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 04:56:49 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230920115645euoutp02b612c6a74d82b7c214cf14c81f29209c~GmW2aMNqi2206922069euoutp02l
+        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 11:56:45 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230920115645euoutp02b612c6a74d82b7c214cf14c81f29209c~GmW2aMNqi2206922069euoutp02l
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1695211005;
+        bh=exkjwGsq72t9D7qBBVBdLdBtc3DWn+e/IuVjp8SVRTY=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=k+aGKczDoUGYQrIng6uRRULHbEnlHCJoFBH3ENOqFt43jfNrrzbPzo49kd0u3bowb
+         mgRcusDiOugo3x6rM3N/uJeOfhcZT4OT/6pLGWzTZyDVi+TJtEqSMJuJjMUyu5Y/DD
+         BfElClcntHqQCFVs25ju3ZquhahTKGZma9yowN/I=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230920115645eucas1p2652c4c73be77db7782b15029a28d6689~GmW2JxQC81604116041eucas1p2w;
+        Wed, 20 Sep 2023 11:56:45 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id D3.3F.11320.DFDDA056; Wed, 20
+        Sep 2023 12:56:45 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230920115645eucas1p1c8ed9bf515c4532b3e6995f8078a863b~GmW13pa5n1137911379eucas1p1_;
+        Wed, 20 Sep 2023 11:56:45 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230920115645eusmtrp284ab616da2b95d7fb930c4444320c9a2~GmW13Im7-2674426744eusmtrp2J;
+        Wed, 20 Sep 2023 11:56:45 +0000 (GMT)
+X-AuditID: cbfec7f4-97dff70000022c38-85-650addfddede
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 23.EA.14344.DFDDA056; Wed, 20
+        Sep 2023 12:56:45 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20230920115644eusmtip1c7dcff6386bd2e7497b1f43afc36dfc2~GmW1qyTvW2945029450eusmtip1T;
+        Wed, 20 Sep 2023 11:56:44 +0000 (GMT)
+Received: from localhost (106.110.32.140) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Wed, 20 Sep 2023 12:56:44 +0100
+Date:   Wed, 20 Sep 2023 13:56:43 +0200
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     Hannes Reinecke <hare@suse.de>
+CC:     Matthew Wilcox <willy@infradead.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <p.raghav@samsung.com>
+Subject: Re: [PATCH 01/18] mm/readahead: rework loop in
+ page_cache_ra_unbounded()
+Message-ID: <20230920115643.ohzza3x3cpgbo54s@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20230920080756.11919-13-nj.shetty@samsung.com>
+In-Reply-To: <20230918110510.66470-2-hare@suse.de>
+X-Originating-IP: [106.110.32.140]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAKsWRmVeSWpSXmKPExsWy7djPc7p/73KlGjz4LWmx+m4/m8WeRZOY
+        LFauPspksfeWtsWevSdZLG5MeMpo8fvHHDYHdo/NK7Q8Lp8t9di0qpPNY/fNBjaPzaerPT5v
+        kgtgi+KySUnNySxLLdK3S+DKWPjpEWvBadaKz1tvszcwrmPpYuTkkBAwkVjd9Iy1i5GLQ0hg
+        BaPEpXlXmSCcL4wSfzffY4NwPjNKHGzrYYNp2bTyHSNEYjmjxOHd25hBEmBVf79LQiS2MErc
+        fryIESTBIqAqcfXcFiCbg4NNQEuisZMdJCwioCTxsf0QO0g9s8ArRokF/3ezgNQICwRLbFhl
+        A1LDK2Au8ej5FDYIW1Di5MwnYHczC+hILNj9iQ2knFlAWmL5Pw6QMKeAkcSUm61QrylJNGw+
+        A2XXSpzacgvsMwmBFxwSU29uZ4ZIuEhsaJzLBGELS7w6voUdwpaR+L9zPlS8WuLpjd/MEM0t
+        jBL9O9eDLZYQsJboO5MDYTpKPNgfC2HySdx4KwhxJZ/EpG3TmSHCvBIdbUIQA9UkVt97wzKB
+        UXkWkr9mIflrFsJfCxiZVzGKp5YW56anFhvlpZbrFSfmFpfmpesl5+duYgQmmtP/jn/Zwbj8
+        1Ue9Q4xMHIyHGCU4mJVEeHPVuFKFeFMSK6tSi/Lji0pzUosPMUpzsCiJ82rbnkwWEkhPLEnN
+        Tk0tSC2CyTJxcEo1MNl9mu31c8XU08tk+jL692l0XM7UsbKubl5gIDMl15RlWlrs5UlLkmWT
+        BI3+35fzM77xa6mNiOCUnUueMpcrKh8Q0Da1vzvty0vugG0v+M6d/65akcaf3zR/xp80df6f
+        MS09x2xNra7POCh1XWfyd6ZvvKdPzbDjFeTJtX29+6e2+u3GsoT+zZLtVXMeem87/K4zM+5F
+        hab6U+fpsWcm9ObkyB0+73l920vxb+obW45PnVayxsT33r/NPX8Ypl/tyWE22nEj6dLpF8o5
+        HuxbZKZ9/8Ty5MzN4/Yaiz6lbZr6fh77+tS/kmliBmE7tkvbaf2daOz/yutz+SvFE/c42Bgd
+        SwyblBJLDf3s303fuFuJpTgj0VCLuag4EQCk5N/ZowMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHIsWRmVeSWpSXmKPExsVy+t/xu7p/73KlGkxezGGx+m4/m8WeRZOY
+        LFauPspksfeWtsWevSdZLG5MeMpo8fvHHDYHdo/NK7Q8Lp8t9di0qpPNY/fNBjaPzaerPT5v
+        kgtgi9KzKcovLUlVyMgvLrFVija0MNIztLTQMzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DL
+        WPjpEWvBadaKz1tvszcwrmPpYuTkkBAwkdi08h0jiC0ksJRR4sltc4i4jMTGL1dZIWxhiT/X
+        uti6GLmAaj4ySqztusoC4WxhlFje28sOUsUioCpx9dwWoEkcHGwCWhKNnWBhEQEliY/th9hB
+        6pkFXjFKLPi/mwWkRlggWGLDKhuQGl4Bc4lHz6ewQRwRKXFwzU42iLigxMmZT8AOZRbQkViw
+        +xMbSCuzgLTE8n8cIGFOASOJKTdboX5RkmjYfAbKrpX4/PcZ4wRG4VlIJs1CMmkWwqQFjMyr
+        GEVSS4tz03OLjfSKE3OLS/PS9ZLzczcxAiNu27GfW3Ywrnz1Ue8QIxMH4yFGCQ5mJRHeXDWu
+        VCHelMTKqtSi/Pii0pzU4kOMpsCAmMgsJZqcD4z5vJJ4QzMDU0MTM0sDU0szYyVxXs+CjkQh
+        gfTEktTs1NSC1CKYPiYOTqkGJqYM2QmW9zQmXrp1/om7y13tNzKVWyy7Jq4P8VLefuPqqWdP
+        Hrw8YXTLy/3Cj5s9uvGbVxXutRYxF16zRfrtLWXO0611N/8YuW13Kl+ROiE/0m/2ynUn658u
+        TFr/PnCz3vmrLjK2NuqhOaeUpkzTlXienx3Fdb2lMfuI0JmKeVMmWGkZWxwQ2KQqt+3U9fhH
+        UR1ON47M/7YuIq2s6dbuwvNlM3qaWtYXvJycVZSx+sGjFIsHjB19teeW6bKteDpRo3z+n2NM
+        C4okNFJe3+E2jrJ/HK7Ty7GqNqZK3VVIs1X11P3emqezV/y9snDnr1XBEx73+8asyZOu2ajK
+        3Gdx24Rx3ycjmS/V9Vl6sRe5DyuxFGckGmoxFxUnAgDee5p8QQMAAA==
+X-CMS-MailID: 20230920115645eucas1p1c8ed9bf515c4532b3e6995f8078a863b
+X-Msg-Generator: CA
+X-RootMTR: 20230920115645eucas1p1c8ed9bf515c4532b3e6995f8078a863b
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230920115645eucas1p1c8ed9bf515c4532b3e6995f8078a863b
+References: <20230918110510.66470-1-hare@suse.de>
+        <20230918110510.66470-2-hare@suse.de>
+        <CGME20230920115645eucas1p1c8ed9bf515c4532b3e6995f8078a863b@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Nitesh,
+On Mon, Sep 18, 2023 at 01:04:53PM +0200, Hannes Reinecke wrote:
+>  		if (folio && !xa_is_value(folio)) {
+> @@ -239,8 +239,8 @@ void page_cache_ra_unbounded(struct readahead_control *ractl,
+>  			 * not worth getting one just for that.
+>  			 */
+>  			read_pages(ractl);
+> -			ractl->_index++;
+> -			i = ractl->_index + ractl->_nr_pages - index - 1;
+> +			ractl->_index += folio_nr_pages(folio);
+> +			i = ractl->_index + ractl->_nr_pages - index;
+I am not entirely sure if this is correct.
 
-kernel test robot noticed the following build warnings:
+The above if condition only verifies if a folio is in the page cache but
+doesn't tell if it is uptodate. But we are advancing the ractl->index
+past this folio irrespective of that.
 
-[auto build test WARNING on 7fc7222d9680366edeecc219c21ca96310bdbc10]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Introduce-queue-limits-and-sysfs-for-copy-offload-support/20230920-170132
-base:   7fc7222d9680366edeecc219c21ca96310bdbc10
-patch link:    https://lore.kernel.org/r/20230920080756.11919-13-nj.shetty%40samsung.com
-patch subject: [PATCH v16 12/12] null_blk: add support for copy offload
-config: parisc-allyesconfig (https://download.01.org/0day-ci/archive/20230920/202309201836.c2wRnper-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230920/202309201836.c2wRnper-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309201836.c2wRnper-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from include/trace/define_trace.h:102,
-                    from drivers/block/null_blk/trace.h:104,
-                    from drivers/block/null_blk/main.c:15:
-   drivers/block/null_blk/./trace.h: In function 'trace_raw_output_nullb_copy_op':
->> drivers/block/null_blk/./trace.h:91:27: warning: format '%lu' expects argument of type 'long unsigned int', but argument 7 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
-      91 |                 TP_printk("%s req=%-15s: dst=%llu, src=%llu, len=%lu",
-         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/trace/trace_events.h:203:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
-     203 |         trace_event_printf(iter, print);                                \
-         |                                  ^~~~~
-   include/trace/trace_events.h:45:30: note: in expansion of macro 'PARAMS'
-      45 |                              PARAMS(print));                   \
-         |                              ^~~~~~
-   drivers/block/null_blk/./trace.h:73:1: note: in expansion of macro 'TRACE_EVENT'
-      73 | TRACE_EVENT(nullb_copy_op,
-         | ^~~~~~~~~~~
-   drivers/block/null_blk/./trace.h:91:17: note: in expansion of macro 'TP_printk'
-      91 |                 TP_printk("%s req=%-15s: dst=%llu, src=%llu, len=%lu",
-         |                 ^~~~~~~~~
-   In file included from include/trace/trace_events.h:237:
-   drivers/block/null_blk/./trace.h:91:68: note: format string is defined here
-      91 |                 TP_printk("%s req=%-15s: dst=%llu, src=%llu, len=%lu",
-         |                                                                  ~~^
-         |                                                                    |
-         |                                                                    long unsigned int
-         |                                                                  %u
-
-
-vim +91 drivers/block/null_blk/./trace.h
-
-    72	
-    73	TRACE_EVENT(nullb_copy_op,
-    74			TP_PROTO(struct request *req,
-    75				 sector_t dst, sector_t src, size_t len),
-    76			TP_ARGS(req, dst, src, len),
-    77			TP_STRUCT__entry(
-    78					 __array(char, disk, DISK_NAME_LEN)
-    79					 __field(enum req_op, op)
-    80					 __field(sector_t, dst)
-    81					 __field(sector_t, src)
-    82					 __field(size_t, len)
-    83			),
-    84			TP_fast_assign(
-    85				       __entry->op = req_op(req);
-    86				       __assign_disk_name(__entry->disk, req->q->disk);
-    87				       __entry->dst = dst;
-    88				       __entry->src = src;
-    89				       __entry->len = len;
-    90			),
-  > 91			TP_printk("%s req=%-15s: dst=%llu, src=%llu, len=%lu",
-    92				  __print_disk_name(__entry->disk),
-    93				  blk_op_str(__entry->op),
-    94				  __entry->dst, __entry->src, __entry->len)
-    95	);
-    96	#endif /* _TRACE_NULLB_H */
-    97	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Am I missing something?
