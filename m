@@ -2,88 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD73CE79D2
-	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 14:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CCA5CE79D3
+	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 14:19:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234543AbjITONQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Sep 2023 10:13:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45710 "EHLO
+        id S234100AbjITOTI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Sep 2023 10:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234533AbjITONP (ORCPT
+        with ESMTP id S233786AbjITOTH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Sep 2023 10:13:15 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 862C4CE;
-        Wed, 20 Sep 2023 07:13:09 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 330EA200ED;
-        Wed, 20 Sep 2023 14:13:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1695219188; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qvtsDZGdfrYmBMovePryJn8q41Ubc0jqUjXK9bF1o9Y=;
-        b=x35iR6EYbKXEKCY5R4YfjOaf+3n3PjvzSAn/On3msECOMArthtLToUKwPn0j/mpkieHPeo
-        LYSm9uu/ofKLf7D5r6H2DECFy4465syF7jQwxAEwuBoqJ9jSNZHxpV3WxNqy9D+t6QWRCa
-        iVgpUEnruE5OvbxDwj/qoF0yOeZ/bBE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1695219188;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qvtsDZGdfrYmBMovePryJn8q41Ubc0jqUjXK9bF1o9Y=;
-        b=2VCiUvnk9w62+p68kzPZ/SG+zsK/EvAEFrWo/D6mDRbY5tBEI9MBHr7GoJmWqNlw44ojU6
-        nX1zniikk8S6vlCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 94C911333E;
-        Wed, 20 Sep 2023 14:13:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id EkdWIfP9CmVwGgAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 20 Sep 2023 14:13:07 +0000
-Message-ID: <ed7fd7b8-3271-4dee-b5bb-84bdd4c3db49@suse.de>
-Date:   Wed, 20 Sep 2023 16:13:06 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/18] mm/readahead: rework loop in
- page_cache_ra_unbounded()
-Content-Language: en-US
+        Wed, 20 Sep 2023 10:19:07 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B10AF;
+        Wed, 20 Sep 2023 07:19:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=LCL+za9L/oG2/oA78zLeMg4B2m4wFuzkxDAfhaMatew=; b=oviwYh8MABsy1PRUiBtKJPBW7V
+        AT3zmPZ9R5MV64hEW7VITZ9VoHzAvWzxHW9izNdgIdtfBru3wNbChS/M2LdfI5SwGGNqVhCHAgAvJ
+        PVm4Cu1U9pDPpDPmQGFXgxn6bydjmRPHg41wt+W+qxD6+82oJfy35vjhnRqToqRfAIA4KHprgW4wq
+        jOtFWq61xQ/lAH24QzuPjskmuI1lfZJkovAx9WI6ZqI/U+1o90djRnLEmMCmGy16M8CSN9QVOhQ3R
+        cypPV3zlf66QTkf4StGQGRDrwX8mTcvHSQRP0EElooG0q2sLiZZa1AYhl+KsUlUhUjSnYbyLC1uxL
+        3jgo3PYw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qiy2U-006EhU-IP; Wed, 20 Sep 2023 14:18:51 +0000
+Date:   Wed, 20 Sep 2023 15:18:50 +0100
+From:   Matthew Wilcox <willy@infradead.org>
 To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
+Cc:     Hannes Reinecke <hare@suse.de>,
         Luis Chamberlain <mcgrof@kernel.org>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 01/18] mm/readahead: rework loop in
+ page_cache_ra_unbounded()
+Message-ID: <ZQr/ShPjJobN+zhk@casper.infradead.org>
 References: <20230918110510.66470-1-hare@suse.de>
  <20230918110510.66470-2-hare@suse.de>
  <CGME20230920115645eucas1p1c8ed9bf515c4532b3e6995f8078a863b@eucas1p1.samsung.com>
  <20230920115643.ohzza3x3cpgbo54s@localhost>
-From:   Hannes Reinecke <hare@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20230920115643.ohzza3x3cpgbo54s@localhost>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/20/23 13:56, Pankaj Raghav wrote:
+On Wed, Sep 20, 2023 at 01:56:43PM +0200, Pankaj Raghav wrote:
 > On Mon, Sep 18, 2023 at 01:04:53PM +0200, Hannes Reinecke wrote:
->>   		if (folio && !xa_is_value(folio)) {
->> @@ -239,8 +239,8 @@ void page_cache_ra_unbounded(struct readahead_control *ractl,
->>   			 * not worth getting one just for that.
->>   			 */
->>   			read_pages(ractl);
->> -			ractl->_index++;
->> -			i = ractl->_index + ractl->_nr_pages - index - 1;
->> +			ractl->_index += folio_nr_pages(folio);
->> +			i = ractl->_index + ractl->_nr_pages - index;
+> >  		if (folio && !xa_is_value(folio)) {
+> > @@ -239,8 +239,8 @@ void page_cache_ra_unbounded(struct readahead_control *ractl,
+> >  			 * not worth getting one just for that.
+> >  			 */
+> >  			read_pages(ractl);
+> > -			ractl->_index++;
+> > -			i = ractl->_index + ractl->_nr_pages - index - 1;
+> > +			ractl->_index += folio_nr_pages(folio);
+> > +			i = ractl->_index + ractl->_nr_pages - index;
 > I am not entirely sure if this is correct.
 > 
 > The above if condition only verifies if a folio is in the page cache but
@@ -92,19 +68,15 @@ On 9/20/23 13:56, Pankaj Raghav wrote:
 > 
 > Am I missing something?
 
-Confused. Which condition?
-I'm not changing the condition at all, just changing the way how the 'i' 
-index is calculated during the loop (ie getting rid of the weird 
-decrement and increment on 'i' during the loop).
-Please clarify.
+How readahead works?
 
-Cheers,
+Readahead is for the optimistic case where nothing has gone wrong;
+we just don't have anything in the page cache yet.
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
-
+If there's a !uptodate folio in the page cache, there are two
+possibilities.  The most likely is that we have two threads accessing this
+file at the same time.  If so, we should stop and allow the other thread
+to do the readahead it has decided to do.  The less likely scenario is
+that we had an error doing a previous readahead.  If that happened, we
+should not try reading it again in readahead; we should let the thread
+retry the read when it actually tries to access the folio.
