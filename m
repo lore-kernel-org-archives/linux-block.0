@@ -2,206 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDBBCE79CF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 13:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD73CE79D2
+	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 14:13:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236646AbjITNGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Sep 2023 09:06:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58708 "EHLO
+        id S234543AbjITONQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Sep 2023 10:13:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236402AbjITNGT (ORCPT
+        with ESMTP id S234533AbjITONP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Sep 2023 09:06:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549D1DE
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 06:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695215121;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+        Wed, 20 Sep 2023 10:13:15 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 862C4CE;
+        Wed, 20 Sep 2023 07:13:09 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 330EA200ED;
+        Wed, 20 Sep 2023 14:13:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1695219188; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WKL59oxitSx6DOUyNJ+1H0DeRSBlY0vVZI1oz1R1zFg=;
-        b=D145kSTw3sldAEnPmqVZgf/m1dURXMWuuJxha2BBAY0C/sCTdMQuqmqROz/DlXcI6qY6ZY
-        UYV9Q1CA91rU8G1zNybYECMcMpOZ4pMgTa3jY1qwQnZQoaaJ4IXQ62CQjPxG8C4eh9KMqM
-        SSatHN9co34dTMDefZkzId80wbBv9lM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-653-5VCNNxRlNwuawrr7coWaQA-1; Wed, 20 Sep 2023 09:05:18 -0400
-X-MC-Unique: 5VCNNxRlNwuawrr7coWaQA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        bh=qvtsDZGdfrYmBMovePryJn8q41Ubc0jqUjXK9bF1o9Y=;
+        b=x35iR6EYbKXEKCY5R4YfjOaf+3n3PjvzSAn/On3msECOMArthtLToUKwPn0j/mpkieHPeo
+        LYSm9uu/ofKLf7D5r6H2DECFy4465syF7jQwxAEwuBoqJ9jSNZHxpV3WxNqy9D+t6QWRCa
+        iVgpUEnruE5OvbxDwj/qoF0yOeZ/bBE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1695219188;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qvtsDZGdfrYmBMovePryJn8q41Ubc0jqUjXK9bF1o9Y=;
+        b=2VCiUvnk9w62+p68kzPZ/SG+zsK/EvAEFrWo/D6mDRbY5tBEI9MBHr7GoJmWqNlw44ojU6
+        nX1zniikk8S6vlCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5BEF2999B36;
-        Wed, 20 Sep 2023 13:05:16 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 698FE51E3;
-        Wed, 20 Sep 2023 13:05:14 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>,
-        David Laight <David.Laight@ACULAB.COM>,
-        Matthew Wilcox <willy@infradead.org>,
-        Brendan Higgins <brendanhiggins@google.com>,
-        David Gow <davidgow@google.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christian Brauner <brauner@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [RFC PATCH v2 9/9] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
-Date:   Wed, 20 Sep 2023 14:04:00 +0100
-Message-ID: <20230920130400.203330-10-dhowells@redhat.com>
-In-Reply-To: <20230920130400.203330-1-dhowells@redhat.com>
-References: <20230920130400.203330-1-dhowells@redhat.com>
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 94C911333E;
+        Wed, 20 Sep 2023 14:13:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id EkdWIfP9CmVwGgAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 20 Sep 2023 14:13:07 +0000
+Message-ID: <ed7fd7b8-3271-4dee-b5bb-84bdd4c3db49@suse.de>
+Date:   Wed, 20 Sep 2023 16:13:06 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/18] mm/readahead: rework loop in
+ page_cache_ra_unbounded()
+Content-Language: en-US
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20230918110510.66470-1-hare@suse.de>
+ <20230918110510.66470-2-hare@suse.de>
+ <CGME20230920115645eucas1p1c8ed9bf515c4532b3e6995f8078a863b@eucas1p1.samsung.com>
+ <20230920115643.ohzza3x3cpgbo54s@localhost>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230920115643.ohzza3x3cpgbo54s@localhost>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add kunit tests to benchmark 256MiB copies to a UBUF iterator and an IOVEC
-iterator.  This attaches a userspace VM with a mapped file in it
-temporarily to the test thread.
+On 9/20/23 13:56, Pankaj Raghav wrote:
+> On Mon, Sep 18, 2023 at 01:04:53PM +0200, Hannes Reinecke wrote:
+>>   		if (folio && !xa_is_value(folio)) {
+>> @@ -239,8 +239,8 @@ void page_cache_ra_unbounded(struct readahead_control *ractl,
+>>   			 * not worth getting one just for that.
+>>   			 */
+>>   			read_pages(ractl);
+>> -			ractl->_index++;
+>> -			i = ractl->_index + ractl->_nr_pages - index - 1;
+>> +			ractl->_index += folio_nr_pages(folio);
+>> +			i = ractl->_index + ractl->_nr_pages - index;
+> I am not entirely sure if this is correct.
+> 
+> The above if condition only verifies if a folio is in the page cache but
+> doesn't tell if it is uptodate. But we are advancing the ractl->index
+> past this folio irrespective of that.
+> 
+> Am I missing something?
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Andrew Morton <akpm@linux-foundation.org>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: Brendan Higgins <brendanhiggins@google.com>
-cc: David Gow <davidgow@google.com>
-cc: linux-kselftest@vger.kernel.org
-cc: kunit-dev@googlegroups.com
-cc: linux-mm@kvack.org
-cc: linux-fsdevel@vger.kernel.org
----
- lib/kunit_iov_iter.c | 95 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+Confused. Which condition?
+I'm not changing the condition at all, just changing the way how the 'i' 
+index is calculated during the loop (ie getting rid of the weird 
+decrement and increment on 'i' during the loop).
+Please clarify.
 
-diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
-index 17f85f24b239..4ee939a1c5ec 100644
---- a/lib/kunit_iov_iter.c
-+++ b/lib/kunit_iov_iter.c
-@@ -1324,6 +1324,99 @@ static void *__init iov_kunit_create_source(struct kunit *test, size_t npages)
- 	return scratch;
- }
- 
-+/*
-+ * Time copying 256MiB through an ITER_UBUF.
-+ */
-+static void __init iov_kunit_benchmark_ubuf(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size = 256 * 1024 * 1024, npages = size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+	u8 __user *buffer;
-+
-+	/* Allocate a huge buffer and populate it with pages. */
-+	buffer = iov_kunit_create_user_buf(test, npages, NULL);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch = iov_kunit_create_source(test, npages);
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over UBUF:\n");
-+	for (i = 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		size_t remain = size;
-+
-+		a = ktime_get_real();
-+		do {
-+			size_t part = min(remain, PAGE_SIZE);
-+
-+			iov_iter_ubuf(&iter, ITER_SOURCE, buffer, part);
-+			copied = copy_from_iter(scratch, part, &iter);
-+			KUNIT_EXPECT_EQ(test, copied, part);
-+			remain -= part;
-+		} while (remain > 0);
-+		b = ktime_get_real();
-+		samples[i] = ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
-+/*
-+ * Time copying 256MiB through an ITER_IOVEC.
-+ */
-+static void __init iov_kunit_benchmark_iovec(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	struct iovec *iov;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size = 256 * 1024 * 1024, npages = size / PAGE_SIZE, part;
-+	size_t ioc = size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+	u8 __user *buffer;
-+
-+	iov = kunit_kmalloc_array(test, ioc, sizeof(*iov), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, iov);
-+
-+	/* Allocate a huge buffer and populate it with pages. */
-+	buffer = iov_kunit_create_user_buf(test, npages, NULL);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch = iov_kunit_create_source(test, npages);
-+
-+	/* Split the target over a number of iovecs */
-+	copied = 0;
-+	for (i = 0; i < ioc; i++) {
-+		part = size / ioc;
-+		iov[i].iov_base = buffer + copied;
-+		iov[i].iov_len = part;
-+		copied += part;
-+	}
-+	iov[i - 1].iov_len += size - part;
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over IOVEC:\n");
-+	for (i = 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_init(&iter, ITER_SOURCE, iov, npages, size);
-+
-+		a = ktime_get_real();
-+		copied = copy_from_iter(scratch, size, &iter);
-+		b = ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] = ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
- /*
-  * Time copying 256MiB through an ITER_KVEC.
-  */
-@@ -1524,6 +1617,8 @@ static struct kunit_case __refdata iov_kunit_cases[] = {
- 	KUNIT_CASE(iov_kunit_extract_pages_kvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_bvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_xarray),
-+	KUNIT_CASE(iov_kunit_benchmark_ubuf),
-+	KUNIT_CASE(iov_kunit_benchmark_iovec),
- 	KUNIT_CASE(iov_kunit_benchmark_kvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec_split),
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
