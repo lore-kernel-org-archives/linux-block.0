@@ -2,262 +2,301 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8039CE79AD
-	for <linux-block@archiver.kernel.org>; Tue, 19 Sep 2023 23:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FF4CE79AC
+	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 02:13:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233374AbjISXTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Sep 2023 19:19:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51484 "EHLO
+        id S231260AbjITCNi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Sep 2023 22:13:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230152AbjISXTJ (ORCPT
+        with ESMTP id S229648AbjITCNh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Sep 2023 19:19:09 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D23DC4;
-        Tue, 19 Sep 2023 16:19:02 -0700 (PDT)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38JMuBOS021475;
-        Tue, 19 Sep 2023 23:18:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=qcppdkim1;
- bh=/RO0z7r2CknR+ow/9IxlksjGka5smxlnKF3LU+kDdFw=;
- b=X1jE9dFdMQsTc7GBH8u6NeDYFtbuEs+YWpkZigkOJyuGsZpfqxNoxRXIYnk3DG1z3RfA
- 7XyusekgwewB5LZXIEVfrqzoETb7yeUnK3juZCzo1ba45ddvUDXbCOIvkq/GSyI12spu
- VG2EhQ02B1ZzyxK6dLvuQlkGEg4PtuXlT80ihu0IfFHygF7TORCVrN5e4/+lXAjxASLO
- /w2bMc3OvGnuNA5LufuubKvjjIY0xRC77f99etT3NGXLCbQETicGfk++GQZK/lZ/T5AI
- kLhKxB1KGapvpCTm078OFprJXZpw9QB2jEqGnBRa1HUEPJyFgnFSpa1b0K20MDuZ3F/7 bQ== 
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2104.outbound.protection.outlook.com [104.47.70.104])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3t78uphqc8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Sep 2023 23:18:56 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j5F9P2PJeUN5OcGuHltrx/xpXE98WpG4gumf5sQD1QfLGNvDQ7P1RNDZqiT3yuzwpbCMG9RTNRhFKXalm51s7uWAGWFyOkjwLy3BlPA6V0stNeKixWJE/6MCUrc8Tg7kAG8/8ALHyDvWhn+nZjaib6D6aJAOscvOWIiveTAIRdyq56/phBLSF8gAJdmah24THgRg2rSDpE7ynSEZpKjKXEyONoYwnc6bpNQWNoutRjoVW8Ds+uN5BrMFlHEv6Cq7CHfxgtU/o0Ga9fdWpWDPau/PKpqKlFNgtMp4IGpFWpmLqD9JxHGoLf9l9MiGxCCEFe/Km0famt/nUIphv0HXVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/RO0z7r2CknR+ow/9IxlksjGka5smxlnKF3LU+kDdFw=;
- b=XcLuVeVX6fF0Q1cm2yo0kGlnsD/Yl+XvDqn3Au6VpKx84O1moGgsh4lMWVjmhZ1ykXeZ+93WnNF4ng/6pQDW+MUdjqQX2XTmdxnIB32USQqWnyqrS5YIQVflkF4QDjT3RAqwyekchwU4j0uDvK5850cgD95+yQPfwnsebvhZ5oMPQdSVVJUrgZ4gJ8EkhYmLmTfTph0V9Ot4Zg4w3StZzJKrxDh7VrFF1G/T0kIMMIZuiNqeeS30E7i9gV36ZBuTjERtxgglSYS6Cvu/Td4dDGPIjI04YsVHlCyEJT9PQmorcE8MX1QZU7vOvvb9EvLjqK6E5U5vSk4GQtJ2BmQBbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=qti.qualcomm.com; dmarc=pass action=none
- header.from=qti.qualcomm.com; dkim=pass header.d=qti.qualcomm.com; arc=none
-Received: from BYAPR02MB4071.namprd02.prod.outlook.com (2603:10b6:a02:fc::23)
- by PH7PR02MB8905.namprd02.prod.outlook.com (2603:10b6:510:1ff::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Tue, 19 Sep
- 2023 23:18:49 +0000
-Received: from BYAPR02MB4071.namprd02.prod.outlook.com
- ([fe80::cb85:9b35:eb6b:8c53]) by BYAPR02MB4071.namprd02.prod.outlook.com
- ([fe80::cb85:9b35:eb6b:8c53%7]) with mapi id 15.20.6792.026; Tue, 19 Sep 2023
- 23:18:49 +0000
-From:   Gaurav Kashyap <gaurkash@qti.qualcomm.com>
-To:     Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-        Eric Biggers <ebiggers@kernel.org>
-CC:     "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        Om Prakash Singh <omprsing@qti.qualcomm.com>,
-        "Prasad Sodagudi (QUIC)" <quic_psodagud@quicinc.com>,
-        "Arun Menon (SSG)" <avmenon@quicinc.com>,
-        "abel.vesa@linaro.org" <abel.vesa@linaro.org>,
-        "Seshu Madhavi Puppala (QUIC)" <quic_spuppala@quicinc.com>
-Subject: RE: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
- ufs
-Thread-Topic: [PATCH v2 00/10] Hardware wrapped key support for qcom ice and
- ufs
-Thread-Index: AQHZumOGCcBpt3+7c0iBGcomJKyUhq/7BoqAgAC0/ICAG5FaAIAL2QbQ
-Date:   Tue, 19 Sep 2023 23:18:48 +0000
-Message-ID: <BYAPR02MB40710E9FFF687A29005A7F53E2FAA@BYAPR02MB4071.namprd02.prod.outlook.com>
-References: <20230719170423.220033-1-quic_gaurkash@quicinc.com>
- <f4b5512b-9922-1511-fc22-f14d25e2426a@linaro.org>
- <20230825210727.GA1366@sol.localdomain>
- <cf3816b0-7718-278c-aac2-bdd2dd85ac87@linaro.org>
-In-Reply-To: <cf3816b0-7718-278c-aac2-bdd2dd85ac87@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR02MB4071:EE_|PH7PR02MB8905:EE_
-x-ms-office365-filtering-correlation-id: 65231d46-de2e-404c-3979-08dbb966c77d
-x-ld-processed: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Uy22vziSGaYgYRpktt6l88QckfTRMkOLprE5oE3Xn+5YT1K9XpQGyH2Y+7lDOVgivCFBXbW/xAkSjpdgZpNwWUitLqAcjy6bryDTCKLOD16PVD7Cgqdh6ABD4BGc5GlFwoPpYxx/l0KaRjif0UGFhN3OVfJ8g14oQnKNL/8O+pGJ8XV5GQi1lAaugDfcB6X3Cei8PGz0xfxKBB5EdmZYdGMV+/vfA+687ANZNsB5HXAXkyevU+yTkQOsMqvaYp/jxKTua84Y9NHO7cLI3xXJs4ln0wuGPRbT8bDmtvIM1lRQ/YTfNVDisRThNKUfKIllKJ/zI3vSQLXhaJN8yS/tHOSuhirGkrevSoX2dShr+IiFVz+OH5yhERsgZy5PLSUMqOov1W7xim2uFTIEsjprv3IEU5cn//SLzDJ5A3aku1R/bZnuqL4BVVBsZybThmWF9uT3hOqlrPw/5Z27soTgeE2YYXrPn855H1w0uU4BqiKDKI6vYRHw1h9hG/ZLhBd46V9holkj5i7zPcCoQ36mJssko6OGwKm1fWbDaRJ9q6KD1KjS7m0/aZdvr24F/c6oqx1bD/9vWx9IIf8ISLpbUAXxQMUqd5De9si9vKJFy4g=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR02MB4071.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(346002)(366004)(136003)(451199024)(186009)(1800799009)(966005)(55016003)(5660300002)(6506007)(7696005)(53546011)(86362001)(9686003)(54906003)(316002)(64756008)(66946007)(66446008)(38100700002)(41300700001)(66556008)(66476007)(38070700005)(76116006)(110136005)(478600001)(71200400001)(8936002)(8676002)(52536014)(26005)(2906002)(33656002)(66899024)(107886003)(4326008)(122000001)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?L0xEYzU2ZURqRzNBMDhUQWRHdWNQYlhVR0R4aCs3ZjZhUlNqTUhNWlhnUEpY?=
- =?utf-8?B?U1hEcHJhWklhM3hxVHZUVEJTU1IrYW1iWHQ4S3Z5dlVSTjRlekdhdTVTdFAr?=
- =?utf-8?B?NkFzQmZ5SVVVbFh5R1UxbTRnZitza0NZTm1TY2JiVGNGSEtlTDRnSkdSNUdR?=
- =?utf-8?B?NktsYWtiUlNQRWo2cjdGOFdkRTV6K0RHZ1dNK2JDdUoyNDcrNldFMitKcVRt?=
- =?utf-8?B?OW45T1VFVGN1SXhoNXRzSGg0dDdlaThWdmxPVHJZNHR5NTRqTWVrZENVVGdD?=
- =?utf-8?B?SVZlK0tJVVFmbUkydS9jeUhpUWV1SUdnUXo4STljbG9FT0dmOHB3WnhLbUN4?=
- =?utf-8?B?NnZJSG9QTHNML3c5d0ZQTGp3eXZtdS96YklybGZTRnBCbFlBUWlIK2xCRVB1?=
- =?utf-8?B?Zlc3NTVxUmxhaXZoUk9uOXhqMGd6cXdZekVyTUJqR1lwWmJMZTlIL3djSlZ6?=
- =?utf-8?B?NTRCQmFKb1BRTVpLYU11SUpldDcyQm5vRUVYaEtKMmR1MTJJODFicXBINDhW?=
- =?utf-8?B?amFWQll3d1F5dUhCSTZNUTk5dWF2QVJ1akxNY1NKNnA5ZldFY3VNZGQ5S0Zw?=
- =?utf-8?B?VHZaUUxTNktQRXRhK0VRdy81T1E2cFd2VnRTc3hSN3VSZGh3MU9ORnJHRU1C?=
- =?utf-8?B?ZWVWdjNLL05vWWhUZmQ0T25PRmN5OTVFeHRRL1UvdmlzSGwzbzBxYlNwWXpv?=
- =?utf-8?B?Lzd3S08xUk5ZL0hXY085R3dHeSt2dFZlY016ZWtOcFlnQmp2dHF5eUFiN28x?=
- =?utf-8?B?OWVkTGdOWjBnbWt1QVlqTzUxQUU1TUdQKzlXaGdiRXZWVzF4SS9rczM2Vm05?=
- =?utf-8?B?SmVkOGRKM1pzTW1ERmVsdzRSek01ZStzcC9iZXJtNXpQTlVZZW03eFFGTmps?=
- =?utf-8?B?TmRYMFpuVEdCM0JkZmFzRFhKM1Nta0VnaWlRSFM4UHpvWnFLelZCUWhzQTFk?=
- =?utf-8?B?M0lJS2Mrb0xIQ1dDa3FDQnVQWWlEZVMwVW5raTFQd05WYXNPdkRuTHVCWDhW?=
- =?utf-8?B?VWlqZm4yWlFPaWNsOUZUeW9JYm12WTJZejRMZ2t6bUhLbGMxbUlNajVxQnNn?=
- =?utf-8?B?T0g5MWVFMGpuQzd2RVh4cUw0UVBXWGlzcnNoUng4bndRTndKakJUSHJsM0lZ?=
- =?utf-8?B?TFV6aTA2MnJiTUVxa2c5djdwQmY3RDdVMFRRWXM5bXZpMCs3RSszNk5Tc0Jp?=
- =?utf-8?B?QmtSVjFmdGg5aGpoc0VBcFdJclF0STZidjFRSTQ4WEJoUU5NaHl1SmJieHhw?=
- =?utf-8?B?d3FZRjlVc040NDZpSDB0RkthdnVjeW8xV1BEeExRTFE0SjYzRm43VTJsdlVC?=
- =?utf-8?B?Wm1TdEZEN0I5OTRsUVVVc2FIeFk4MWt3VlU1dW9ROE9ISzVJd1JISVYvNWZ0?=
- =?utf-8?B?WW1VWk4wYUpaaHhrUHhrRCtpNTJzN1Q1ZFZwZG96cW10QnlGYVdCWU5pYzd5?=
- =?utf-8?B?b1UrRlg5VkdkK3Y5QUV1VEp4eWI5QzhDTGhDUFNESkZCWm1lRXFlc2dtWE9a?=
- =?utf-8?B?NUlxYVQ0czB2ZVprOFB2eU9aNmdHT2hSMThVV3V3b0pCb29pdnE3VzZtWUxD?=
- =?utf-8?B?UjFrck8rTEVYU3BmYkUySS96VEJNK0k5UW5wa05HWERVblhHTkVGbmsvaS9Y?=
- =?utf-8?B?UVJ1SFpmTnh1eVovREhEMmdUNkx0WTNiNHl2RG1hTUlueDhUbld6eW0rTzd3?=
- =?utf-8?B?dVZKNTVrR3NsckhGejJmQUhDOUFMMzB6TERxTi9MYTJ6NllWZlBNa01vTldO?=
- =?utf-8?B?TTJLRmhibENpeGdJSjZJc0FXNHUyTnB2SHRNRTFJYW9FU1c4MnJ3WmpwK2dl?=
- =?utf-8?B?aW1JZnU5VzlmblFyYUlXVFFBWTlhWDVsdS9QdXJSS0RoaWd5L0lJSmp4VGNO?=
- =?utf-8?B?SFh5aHlSWncwc3VHa3A0aXVoWStBbHBBQWY2eENXRnM1RmpldFZaSmVCak02?=
- =?utf-8?B?THBxUlBVdGZNK1hTc0VZWUQzTXdxZW5kNThqOHBUTUZlQ3FCd2NBekkwSTZP?=
- =?utf-8?B?WXFxYkNiKzBFL1d1a0ZETG9IRDV0eXRHV2lOTWNMUGhPa0UzRHpndmwzU3Ix?=
- =?utf-8?B?c0g4U0o3bWhqN2NCU1hPenRiQ21rb3RSQ0JkMnVwUlF3WkVnbGhrY2tsTzN1?=
- =?utf-8?Q?QKjPQ+KoStxU1/pWwcVb+c8zU?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 19 Sep 2023 22:13:37 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 218D7C6
+        for <linux-block@vger.kernel.org>; Tue, 19 Sep 2023 19:13:30 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bf1935f6c2so3076055ad.1
+        for <linux-block@vger.kernel.org>; Tue, 19 Sep 2023 19:13:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1695176009; x=1695780809; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6uXBbE5KgrXZ1PrV2CPAiVdc34yjyfb/zSsxiLq4Gfg=;
+        b=KcgFWtd+jXtA0yqkpqXXjl6SCwWdqAlmvJizHLKXxkJSHD0ZMRRTFOFZTEVC9gpwco
+         owQSdVUACIe1yu1C/P4VRD79jCcw4I0Zz7IQCN0JBMJI4QIGbofO47BJ5SsP2hwjuchy
+         HE1zIGC4OPWmVnX41KR1FGP1NCSs/fTgFW3bmVVDKq1obxAsafW4L0klarEX4zTrAcsE
+         yKizYIEnmYV+YL7sh1GCnimzMO4DqB8IzmEyZQoooqnTklsfG/1GBOmL62lZIvA3CeSH
+         oXpgjMTtaeeeBSR3rs7FNwtBBu728iq6LPVZ4EtrYsykjOyxfD1BP4gW+qVaDTEQ8bNg
+         uZWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695176009; x=1695780809;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6uXBbE5KgrXZ1PrV2CPAiVdc34yjyfb/zSsxiLq4Gfg=;
+        b=qV1pAo6OHea56U5UBdMZmy+qS3WpLaeJUpTFujvTgfBF/5vX3/Xh2WXgudRJG+jRYy
+         d2ISrktoCneQj3XD2pLWPFMBH6nSMzAz8Ts59BCZPShW+goMSSvOpV+R2B2WTlCnRZre
+         Wwh1Jz+DLkLklXn1j+Hjj/uMMKK/ZSp8VYoDtsBewyDziaTbAT9HAq7yoD0xGGxvwXr0
+         E9oBU5BvE+iRFiGDpjncGbFlhfxVQ5w/zcWyGByIkD+mtO2Gnnqe+6CW0dGCdwNCy3X5
+         AO8t28A9q4g9d4UN3lxduvLjxTEDpWY/j5FwBthssMEpGLlS54szjkJH3tR5bccqOOZE
+         h8IA==
+X-Gm-Message-State: AOJu0Yz4D1GHinb4PhgfVWW/bJ9+PLdpDcleYExexOr2GFfqNilv1l1V
+        v5Dy2Xu4HJ/cxBAkwP9N5n8q5A==
+X-Google-Smtp-Source: AGHT+IFCr8HadOsZQbrJ4wohDzoccU6NTqszpfjxoJWBXQTUrZ9oQbdMYc2MVuKsvyy2AKtfg3iwGQ==
+X-Received: by 2002:a17:903:2310:b0:1bc:edd:e891 with SMTP id d16-20020a170903231000b001bc0edde891mr5799297plh.1.1695176009443;
+        Tue, 19 Sep 2023 19:13:29 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
+        by smtp.gmail.com with ESMTPSA id q5-20020a17090311c500b001b9de39905asm10587082plh.59.2023.09.19.19.13.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 19:13:28 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qimiU-0032LT-0s;
+        Wed, 20 Sep 2023 12:13:26 +1000
+Date:   Wed, 20 Sep 2023 12:13:26 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 17/18] xfs: remove check for block sizes smaller than
+ PAGE_SIZE
+Message-ID: <ZQpVRnh9QgdoQZso@dread.disaster.area>
+References: <20230918110510.66470-1-hare@suse.de>
+ <20230918110510.66470-18-hare@suse.de>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: u5bvKLXvTSzug5cRB4/0+TkKoOhZNbExjno102rB72uu92mkEk9W3QVRyyyoIo7tPlXl5jD6rqoVs4meCqQdFB5lM/OkcyDTV/q+i8SOxQufM9nFNWy3YxST69SZDLR84yhrYJzB7kapLY9+Gkx9gOCAnoMVFfv69/l6fx0yxF8VwhV4Fv8fnPsljk636IWt2xJm5VPPXzQCIC341XUM34fg+TCdDyjkyJE3iOXDxNX8xIqRGfkRJAWo4X4ao1+7wgimF2kILm19l39mJNa2yk/hypvvxFn94Pf5JjJAJJuwPBehSFLjv/D4gPNPQe7qjTemwa/TIhT8d9PqwexhR3REEPOXDUXqG7riGSIeut5ht8mockptUxpQnWUrP3XYa76lZpkMkVY03Ekjbwy+gbZH16/njCaXhBD1aIOWoPOsFroQSqz7jhNNVPPKQ5m1Kh5qI3I0PnGkQJm3KSGuHXQPm63YfK+QQXOBOINfyRzozvh0LUZyxkdw4RPWyu51i6QUaBnEroaA0C7qAkGBCRM66LHwZ2xUsUOpDQ0oAVtoYJGiZtgvMo5khGMDMSVFTPI+GsmwvE7tSErDMNkDLijruDNZSer6C1zTsP7oR5isSbUhQs8aMYj0jFrRXetsA9FoIRfpZ4dRRx9GdD0WcUR654tz9xPGH2BXoVbei7LO3c23XTFCsSSdtW7xjAH/cKtnQ3VXpzzQiRgjYsxoS4BNZyqMAI6MAMMDOSgEyyiWc3l475HT2L7qHK98MyM8kY4e72HpuxgByivorhsZz0aC0Xpc2MRushg6sMij8QLhEseYIYi5IRgCQzAmk4Wqg2ch+XhNhQsqqBQv1CwhQQ==
-X-OriginatorOrg: qti.qualcomm.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR02MB4071.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65231d46-de2e-404c-3979-08dbb966c77d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2023 23:18:48.7150
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Yz4B4hkf/S70HhnIxQphfeQmyGHFeppVLoBPNZAD5zGsZ0lbgJYxNeVNcIf8rYpqid0pop0x2rEK8zJYMdZ3PMqpPq9cUrSumM8iaWk9s9E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR02MB8905
-X-Proofpoint-GUID: 90XenHgHeiZlaPVtE41EG3CYyR0TVQ3W
-X-Proofpoint-ORIG-GUID: 90XenHgHeiZlaPVtE41EG3CYyR0TVQ3W
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-19_12,2023-09-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 phishscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0
- spamscore=0 clxscore=1011 adultscore=0 priorityscore=1501 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309190197
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230918110510.66470-18-hare@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGVsbG8gU3Jpbml2YXMsDQoNCk9uIFR1ZSwgU2VwIDEyLCAyMDIzIGF0IDM6MDcgQU0sIFNyaW5p
-dmFzIEthbmRhZ2F0bGEgd3JvdGU6DQo+IEhpIEVyaWMvR2F1cmF2LA0KPiANCj4gQWRkaW5nIG1v
-cmUgaW5mb3JtYXRpb24gYW5kIHNvbWUgcXVlc3Rpb25zIHRvIHRoaXMgZGlzY3Vzc2lvbiwNCj4g
-DQo+IE9uIDI1LzA4LzIwMjMgMTQ6MDcsIEVyaWMgQmlnZ2VycyB3cm90ZToNCj4gPiBIaSBTcmlu
-aXZhcywNCj4gPg0KPiA+IE9uIEZyaSwgQXVnIDI1LCAyMDIzIGF0IDExOjE5OjQxQU0gKzAxMDAs
-IFNyaW5pdmFzIEthbmRhZ2F0bGEgd3JvdGU6DQo+ID4+DQo+ID4+IE9uIDE5LzA3LzIwMjMgMTg6
-MDQsIEdhdXJhdiBLYXNoeWFwIHdyb3RlOg0KPiA+Pj4gVGhlc2UgcGF0Y2hlcyBhZGQgc3VwcG9y
-dCB0byBRdWFsY29tbSBJQ0UgKElubGluZSBDcnlwdG8gRW5naW5yKSBmb3INCj4gPj4+IGhhcmR3
-YXJlIHdyYXBwZWQga2V5cyB1c2luZyBRdWFsY29tbSBIYXJkd2FyZSBLZXkgTWFuYWdlcg0KPiAo
-SFdLTSkgYW5kDQo+ID4+PiBhcmUgbWFkZSBvbiB0b3Agb2YgYSByZWJhc2VkIHZlcnNpb24gIEVy
-aWMgQmlnZ2VyJ3Mgc2V0IG9mIGNoYW5nZXMNCj4gPj4+IHRvIHN1cHBvcnQgd3JhcHBlZCBrZXlz
-IGluIGZzY3J5cHQgYW5kIGJsb2NrIGJlbG93Og0KPiA+Pj4gaHR0cHM6Ly9naXQua2VybmVsLm9y
-Zy9wdWIvc2NtL2ZzL2ZzY3J5cHQvbGludXguZ2l0L2xvZy8/aD13cmFwcGVkLWsNCj4gPj4+IGV5
-cy12NyAoVGhlIHJlYmFzZWQgcGF0Y2hlcyBhcmUgbm90IHVwbG9hZGVkIGhlcmUpDQo+ID4+Pg0K
-PiA+Pj4gUmVmIHYxIGhlcmU6DQo+ID4+PiBodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1z
-Y3NpLzIwMjExMjA2MjI1NzI1Ljc3NTEyLTEtcXVpY19nYXVyaw0KPiA+Pj4gYXNoQHF1aWNpbmMu
-Y29tLw0KPiA+Pj4NCj4gPj4+IEV4cGxhbmF0aW9uIGFuZCB1c2Ugb2YgaGFyZHdhcmUtd3JhcHBl
-ZC1rZXlzIGNhbiBiZSBmb3VuZCBoZXJlOg0KPiA+Pj4gRG9jdW1lbnRhdGlvbi9ibG9jay9pbmxp
-bmUtZW5jcnlwdGlvbi5yc3QNCj4gPj4+DQo+ID4+PiBUaGlzIHBhdGNoIGlzIG9yZ2FuaXplZCBh
-cyBmb2xsb3dzOg0KPiA+Pj4NCj4gPj4+IFBhdGNoIDEgLSBQcmVwYXJlcyBJQ0UgYW5kIHN0b3Jh
-Z2UgbGF5ZXJzIChVRlMgYW5kIEVNTUMpIHRvIHBhc3MgYXJvdW5kDQo+IHdyYXBwZWQga2V5cy4N
-Cj4gPj4+IFBhdGNoIDIgLSBBZGRzIGEgbmV3IFNDTSBhcGkgdG8gc3VwcG9ydCBkZXJpdmluZyBz
-b2Z0d2FyZSBzZWNyZXQNCj4gPj4+IHdoZW4gd3JhcHBlZCBrZXlzIGFyZSB1c2VkIFBhdGNoIDMt
-NCAtIEFkZHMgc3VwcG9ydCBmb3Igd3JhcHBlZCBrZXlzDQo+ID4+PiBpbiB0aGUgSUNFIGRyaXZl
-ci4gVGhpcyBpbmNsdWRlcyBhZGRpbmcgSFdLTSBzdXBwb3J0IFBhdGNoIDUtNiAtDQo+ID4+PiBB
-ZGRzIHN1cHBvcnQgZm9yIHdyYXBwZWQga2V5cyBpbiBVRlMgUGF0Y2ggNy0xMCAtIFN1cHBvcnRz
-IGdlbmVyYXRlLA0KPiA+Pj4gcHJlcGFyZSBhbmQgaW1wb3J0IGZ1bmN0aW9uYWxpdHkgaW4gSUNF
-IGFuZCBVRlMNCj4gPj4+DQo+ID4+PiBOT1RFOiBNTUMgd2lsbCBoYXZlIHNpbWlsYXIgY2hhbmdl
-cyB0byBVRlMgYW5kIHdpbGwgYmUgdXBsb2FkZWQgaW4gYQ0KPiBkaWZmZXJlbnQgcGF0Y2hzZXQN
-Cj4gPj4+ICAgICAgICAgUGF0Y2ggMywgNCwgOCwgMTAgd2lsbCBoYXZlIE1NQyBlcXVpdmFsZW50
-cy4NCj4gPj4+DQo+ID4+PiBUZXN0aW5nOg0KPiA+Pj4gVGVzdCBwbGF0Zm9ybTogU004NTUwIE1U
-UA0KPiA+Pj4gRW5naW5lZXJpbmcgdHJ1c3R6b25lIGltYWdlIGlzIHJlcXVpcmVkIHRvIHRlc3Qg
-dGhpcyBmZWF0dXJlIG9ubHkNCj4gPj4+IGZvciBTTTg1NTAuIEZvciBTTTg2NTAgb253YXJkcywg
-YWxsIHRydXN0em9uZSBjaGFuZ2VzIHRvIHN1cHBvcnQNCj4gPj4+IHRoaXMgd2lsbCBiZSBwYXJ0
-IG9mIHRoZSByZWxlYXNlZCBpbWFnZXMuDQo+ID4+DQo+ID4+IEFGQUlVLCBQcmlvciB0byB0aGVz
-ZSBwcm9wb3NlZCBjaGFuZ2VzIGluIHNjbSwgSFdLTSB3YXMgZG9uZSB3aXRoDQo+ID4+IGhlbHAg
-b2YgVEEoVHJ1c3RlZCBBcHBsaWNhdGlvbikgZm9yIGdlbmVyYXRlLCBpbXBvcnQsIHVud3JhcCAu
-Li4NCj4gZnVuY3Rpb25hbGl0eS4NCj4gPj4NCj4gPj4gMS4gV2hhdCBpcyB0aGUgcmVhc29uIGZv
-ciBtb3ZpbmcgdGhpcyBmcm9tIFRBIHRvIG5ldyBzbWMgY2FsbHM/DQo+ID4+DQo+ID4+IElzIHRo
-aXMgYmVjYXVzZSBvZiBtaXNzaW5nIHNtY2tpbnZva2Ugc3VwcG9ydCBpbiB1cHN0cmVhbT8NCj4g
-Pj4NCj4gPj4gSG93IHNjYWxhYmxlIGlzIHRoaXMgYXBwcm9hY2g/IEFyZSB3ZSBnb2luZyB0byBh
-ZGQgbmV3IHNlYyBzeXMgY2FsbHMNCj4gPj4gdG8gZXZlcnkgaW50ZXJmYWNlIHRvIFRBPw0KPiA+
-Pg0KPiA+PiAyLiBIb3cgYXJlIHRoZSBvbGRlciBTb0NzIGdvaW5nIHRvIGRlYWwgd2l0aCB0aGlz
-LCBnaXZlbiB0aGF0IHlvdSBhcmUNCj4gPj4gY2hhbmdpbmcgZHJpdmVycyB0aGF0IGFyZSBjb21t
-b24gYWNyb3NzIHRoZXNlPw0KPiA+Pg0KPiA+PiBIYXZlIHlvdSB0ZXN0ZWQgdGhlc2UgcGF0Y2hl
-cyBvbiBhbnkgb2xkZXIgcGxhdGZvcm1zPw0KPiA+Pg0KPiA+PiBXaGF0IGhhcHBlbnMgaWYgc29t
-ZW9uZSB3YW50IHRvIGFkZCBzdXBwb3J0IHRvIHdyYXBwZWQga2V5cyB0byB0aGlzDQo+ID4+IHBs
-YXRmb3JtcyBpbiB1cHN0cmVhbSwgSG93IGlzIHRoYXQgZ29pbmcgdG8gYmUgaGFuZGxlZD8NCj4g
-Pj4NCj4gPj4gQXMgSSB1bmRlcnN0YW5kIHdpdGggdGhpcywgd2Ugd2lsbCBlbmR1cCB3aXRoIHR3
-byBwb3NzaWJsZSBzb2x1dGlvbnMNCj4gPj4gb3ZlciB0aW1lIGluIHVwc3RyZWFtLg0KPiA+DQo+
-ID4gSXQncyB0cnVlIHRoYXQgUXVhbGNvbW0gYmFzZWQgQW5kcm9pZCBkZXZpY2VzIGFscmVhZHkg
-dXNlIEhXLXdyYXBwZWQNCj4gPiBrZXlzIG9uIFNvQ3MgZWFybGllciB0aGFuIFNNODY1MC4gIFRo
-ZSBwcm9ibGVtIGlzIHRoYXQgdGhlIGtleQ0KPiA+IGdlbmVyYXRpb24sIGltcG9ydCwgYW5kIGNv
-bnZlcnNpb24gd2VyZSBhZGRlZCB0byBBbmRyb2lkJ3MgS2V5TWludA0KPiA+IEhBTCwgYXMgYSBx
-dWljayB3YXkgdG8gZ2V0IHRoZSBmZWF0dXJlIG91dCB0aGUgZG9vciB3aGVuIGl0IHdhcyBuZWVk
-ZWQNCj4gPiAoc28gdG8gc3BlYWspLiAgVW5mb3J0dW5hdGVseSB0aGlzIGNvdXBsZWQgdGhpcyBm
-ZWF0dXJlIHVubmVjZXNzYXJpbHkNCj4gPiB0byB0aGUgQW5kcm9pZCBLZXlNaW50IGFuZCB0aGUg
-Y29ycmVzcG9uZGluZyAoY2xvc2VkIHNvdXJjZSkgdXNlcnNwYWNlDQo+ID4gSEFMIHByb3ZpZGVk
-IGJ5IFF1YWxjb21tLCB3aGljaCBpdCdzIG5vdCBhY3R1YWxseSByZWxhdGVkIHRvLiAgSSdkDQo+
-ID4gZ3Vlc3MgdGhhdCBRdWFsY29tbSdzIGNsb3NlZCBzb3VyY2UgdXNlcnNwYWNlIEhBTCBtYWtl
-cyBTTUMgY2FsbHMgaW50bw0KPiBRdWFsY29tbSdzIEtleU1pbnQgVEEsIGJ1dCBJIGhhdmUgbm8g
-aW5zaWdodCBpbnRvIHRob3NlIGRldGFpbHMuDQo+ID4NCj4gPiBUaGUgbmV3IFNNQyBjYWxscyBl
-bGltaW5hdGUgdGhlIGRlcGVuZGVuY3kgb24gdGhlIEFuZHJvaWQtc3BlY2lmaWMNCj4gS2V5TWlu
-dC4NCj4gPiBUaGV5J3JlIGFsc28gYmVpbmcgZG9jdW1lbnRlZCBieSBRdWFsY29tbS4gIFNvLCBh
-cyB0aGlzIHBhdGNoc2V0IGRvZXMsDQo+ID4gdGhleSBjYW4gYmUgdXNlZCBieSBMaW51eCBpbiB0
-aGUgaW1wbGVtZW50YXRpb24gb2YgbmV3IGlvY3RscyB3aGljaA0KPiA+IHByb3ZpZGUgYSB2ZW5k
-b3IgaW5kZXBlbmRlbnQgaW50ZXJmYWNlIHRvIEhXLXdyYXBwZWQga2V5IGdlbmVyYXRpb24sDQo+
-IGltcG9ydCwgYW5kIGNvbnZlcnNpb24uDQo+ID4NCj4gPiBJIHRoaW5rIHRoZSBuZXcgYXBwcm9h
-Y2ggaXMgdGhlIG9ubHkgb25lIHRoYXQgaXMgdmlhYmxlIG91dHNpZGUgdGhlDQo+ID4gQW5kcm9p
-ZCBjb250ZXh0LiAgQXMgc3VjaCwgSSBkb24ndCB0aGluayBhbnlvbmUgaGFzIGFueSBwbGFuIHRv
-DQo+ID4gdXBzdHJlYW0gc3VwcG9ydCBmb3INCj4gDQo+IEp1c3QgYml0IG9mIGhpc3RvcnkgYWZh
-aXUuDQo+IA0KPiBvbiBRY29tIFNvQ3MgdGhlcmUgYXJlIDMgd2F5cyB0byB0YWxrIHRvIFRydXN0
-ZWQgc2VydmljZS9UcnVzdGVkIGFwcGxpY2F0aW9uLg0KPiANCj4gMT4gQWRkaW5nIFNDTSBjYWxs
-cy4gVGhpcyBpcyBub3Qgc2NhbGFibGUgc29sdXRpb24sIGltYWdpbmUgd2Uga2VlcA0KPiBhZGRp
-bmcgbmV3IHNjbSBjYWxscyBhbmQgc3RhdGljIHNlcnZpY2VzIHRvIHRoZSBUWiBhcyByZXF1aXJl
-ZCBhbmQgdGhpcyBpcyBnb2luZw0KPiB0byBibG9hdCB1cCB0aGUgdHogaW1hZ2Ugc2l6ZS4gTm90
-IG9ubHkgdGhhdCwgbmV3IFNvQ3Mgd291bGQgbmVlZCB0byBtYWludGFpbg0KPiBiYWNrd2FyZCBj
-b21wYXRpYmlsaXR5LCB3aGljaCBpcyBub3QgZ29pbmcgdG8gaGFwcGVuLg0KPiBBRkFJVSB0aGlz
-IGlzIGRpc2NvdXJhZ2VkIGluIGdlbmVyYWwgYW5kIFFjb20gYXQgc29tZSBwb2ludCBpbiB0aW1l
-IHdpbGwgbW92ZQ0KPiBhd2F5IGZyb20gdGhpcy4uDQo+IA0KPiAyPiB1c2luZyBRU0VFQ09NOiBU
-aGlzIGhhcyBzb21lIHNjYWxhYmxlIGlzc3Vlcywgd2hpY2ggaXMgbm93IHJlcGxhY2VkDQo+IHdp
-dGggc21jaW52b2tlLg0KPiANCj4gMz4gc21jaW52b2tlOiBUaGlzIGlzIHByZWZlcnJlZCB3YXkg
-dG8gdGFsayB0byBhbnkgUVRFRSBzZXJ2aWNlIG9yDQo+IGFwcGxpY2F0aW9uLiBUaGUgaXNzdWUg
-aXMgdGhhdCB0aGlzIGlzIGJhc2VkIG9uIHNvbWUgZG93bnN0cmVhbSBVQVBJIHdoaWNoIGlzDQo+
-IG5vdCB1cHN0cmVhbSByZWFkeSB5ZXQuDQo+IA0KPiBJTU8sIGFkZGluZyBhIHNvbHV0aW9uIHRo
-YXQgaXMganVzdCBnb2luZyB0byBsaXZlIGZvciBmZXcgeWVhcnMgaXMgcXVlc3Rpb25hYmxlDQo+
-IGZvciB1cHN0cmVhbS4NCj4gDQo+IEZpeGluZyBbM10gc2VlbXMgdG8gYmUgbXVjaCBzY2FsYWJs
-ZSBzb2x1dGlvbiBhbG9uZyB3aXRoIGl0IHdlIHdpbGwgYWxzbyBnZXQNCj4gc3VwcG9ydCBmb3Ig
-dGhpcyBmZWF0dXJlIGluIGFsbCB0aGUgUXVhbGNvbW0gcGxhdGZvcm1zLg0KPiANCj4gQW0gaW50
-ZXJlc3RlZCB0byBoZWFyIHdoYXQgR2F1cmF2IGhhcyB0byBzYXkgb24gdGhpcy4NCj4gDQo+IA0K
-PiAtLXNyaW5pDQo+IA0KPiANCg0KV2hhdCB5b3UgYXJlIHJlZmVycmluZyB0byBpcyB3cmFwcGVk
-IGtleXMgYmVpbmcgZ2VuZXJhdGVkIGluIGEgVHJ1c3RlZCBBcHBsaWNhdGlvbiAoaW4gY2FzZSBv
-ZiBhbmRyb2lkIGFuZCBzb21lIG90aGVyIHNvbHV0aW9ucywga2V5bWFzdGVyKSwgYW5kIGV2ZW50
-dWFsbHkgYmVpbmcgcHJvZ3JhbW1lZCB2aWEgU0NNIGNhbGxzIGluIFRaLg0KQW5kLCB5b3UgYXJl
-IHN1Z2dlc3RpbmcgaW5zdGVhZCBvZiBpb2N0bC0+c2NtIGNhbGwsIHdlIHNob3VsZCBiZSBkb2lu
-ZyBpb2N0bC0+c21jaW52b2tlLT5UQQ0KDQpXaGF0IEVyaWMgYW5kIEkgYXJlIGFkZGluZyBoZXJl
-IHNob3VsZCBub3QgYmUganVzdCBjb25zaWRlcmVkIGEgc3RvcGdhcCwgYnV0IGEgcGF0aCBmb3Ig
-cG90ZW50aWFsIGNsaWVudHMgdG8gZ2VuZXJhdGUgYW5kIG1hbmFnZSB3cmFwcGVkIGtleXMgd2l0
-aG91dCByZXF1aXJpbmcgYW55IFRBLg0KVGhlIFRBIHdheSB3aWxsIGNvbnRpbnVlIHRvIHdvcmss
-IGFuZCB0aG9zZSB3cmFwcGVkIGtleXMgY2FuIGJlIHByb2dyYW1tZWQgdG8gSUNFIHVzaW5nIGZz
-Y3J5cHQuDQoNClVubGVzcywgaXMgdGhlIHN1Z2dlc3Rpb24gdGhhdCB3cmFwcGVkIGtleXMgc2hv
-dWxkIGFsd2F5cyBiZSBnZW5lcmF0ZWQgYW5kIG1hbmFnZWQgaW4gYSB0cnVzdGVkIGFwcGxpY2F0
-aW9uPw0KQW5kIHRoZW4gcHJvZ3JhbW1lZCB0aG91Z2gga2VybmVsLT5TQ00gY2FsbCBpbnRlcmZh
-Y2U/DQoNCj4gPiBIVy13cmFwcGVkIGtleXMgZm9yIG9sZGVyIFF1YWxjb21tIFNvQ3MgdGhhdCBs
-YWNrIHRoZSBuZXcgaW50ZXJmYWNlLg0KPiA+DQo+ID4gLSBFcmljDQo=
+On Mon, Sep 18, 2023 at 01:05:09PM +0200, Hannes Reinecke wrote:
+> We now support block sizes larger than PAGE_SIZE, so this
+> check is pointless.
+> 
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> ---
+>  fs/xfs/xfs_super.c | 12 ------------
+>  1 file changed, 12 deletions(-)
+> 
+> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+> index 1f77014c6e1a..67dcdd4dcf2d 100644
+> --- a/fs/xfs/xfs_super.c
+> +++ b/fs/xfs/xfs_super.c
+> @@ -1651,18 +1651,6 @@ xfs_fs_fill_super(
+>  		goto out_free_sb;
+>  	}
+>  
+> -	/*
+> -	 * Until this is fixed only page-sized or smaller data blocks work.
+> -	 */
+> -	if (mp->m_sb.sb_blocksize > PAGE_SIZE) {
+> -		xfs_warn(mp,
+> -		"File system with blocksize %d bytes. "
+> -		"Only pagesize (%ld) or less will currently work.",
+> -				mp->m_sb.sb_blocksize, PAGE_SIZE);
+> -		error = -ENOSYS;
+> -		goto out_free_sb;
+> -	}
+
+This really needs to be replaced with an EXPERIMENTAL warning -
+we're not going to support these LBS configurations until we are
+sure it doesn't eat data.
+
+Anyway, smoke tests....
+
+# mkfs.xfs -f -b size=64k /dev/pmem0
+meta-data=/dev/pmem0             isize=512    agcount=4, agsize=32768 blks
+         =                       sectsz=4096  attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=0
+data     =                       bsize=65536  blocks=131072, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=65536  ascii-ci=0, ftype=1
+log      =internal log           bsize=65536  blocks=1024, version=2
+         =                       sectsz=4096  sunit=1 blks, lazy-count=1
+realtime =none                   extsz=65536  blocks=0, rtextents=0
+# mount /dev/pmem0 /mnt/test
+
+Message from syslogd@test3 at Sep 20 11:23:32 ...
+ kernel:[   73.521819] XFS: Assertion failed: PAGE_SHIFT >= sbp->sb_blocklog, file: fs/xfs/xfs_mount.c, line: 134
+
+Message from syslogd@test3 at Sep 20 11:23:32 ...
+ kernel:[   73.521819] XFS: Assertion failed: PAGE_SHIFT >= sbp->sb_blocklog, file: fs/xfs/xfs_mount.c, line: 134
+Segmentation fault
+#
+
+Looks like this hasn't been tested with CONFIG_XFS_DEBUG=y. If
+that's the case, I expect that none of this actually works... :/
+
+I've attached a patch at the end of the email that allows XFS
+filesystems to mount with debug enabled.
+
+Next problem, filesystem created with a 32kB sector size:
+
+# mkfs.xfs -f -b size=64k -s size=32k /dev/pmem0
+meta-data=/dev/pmem0             isize=512    agcount=4, agsize=32768 blks
+         =                       sectsz=32768 attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=1
+         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=0
+data     =                       bsize=65536  blocks=131072, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=65536  ascii-ci=0, ftype=1
+log      =internal log           bsize=65536  blocks=2709, version=2
+         =                       sectsz=32768 sunit=1 blks, lazy-count=1
+realtime =none                   extsz=65536  blocks=0, rtextents=0
+#
+
+and then running xfs_db on it to change the UUID:
+
+# xfs_admin -U generate /dev/pmem0
+
+Results in a kernel panic:
+
+[  132.151886] XFS (pmem0): Mounting V5 Filesystem 3d96f860-2aa2-4e50-970c-134508b7954a
+[  132.161673] XFS (pmem0): Ending clean mount
+[  175.824015] XFS (pmem0): Unmounting Filesystem 3d96f860-2aa2-4e50-970c-134508b7954a
+[  185.759251] Kernel panic - not syncing: stack-protector: Kernel stack is corrupted in: do_mpage_readpage+0x7e5/0x7f0
+[  185.766632] CPU: 1 PID: 4383 Comm: xfs_db Not tainted 6.6.0-rc2-dgc+ #1903
+[  185.771882] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+[  185.778827] Call Trace:
+[  185.780706]  <TASK>
+[  185.782318]  dump_stack_lvl+0x37/0x50
+[  185.785069]  dump_stack+0x10/0x20
+[  185.787557]  panic+0x15b/0x300
+[  185.789763]  ? do_mpage_readpage+0x7e5/0x7f0
+[  185.792705]  __stack_chk_fail+0x14/0x20
+[  185.795183]  do_mpage_readpage+0x7e5/0x7f0
+[  185.797826]  ? blkdev_write_begin+0x30/0x30
+[  185.800500]  ? blkdev_readahead+0x15/0x20
+[  185.802894]  ? read_pages+0x5c/0x230
+[  185.805023]  ? page_cache_ra_order+0x2ae/0x310
+[  185.807538]  ? ondemand_readahead+0x1f1/0x3a0
+[  185.809899]  ? page_cache_async_ra+0x26/0x30
+[  185.812175]  ? filemap_get_pages+0x540/0x6d0
+[  185.814327]  ? _copy_to_iter+0x65/0x4c0
+[  185.816283]  ? filemap_read+0xfc/0x3a0
+[  185.818086]  ? __fsnotify_parent+0x107/0x340
+[  185.820142]  ? __might_sleep+0x42/0x70
+[  185.821854]  ? blkdev_read_iter+0x6d/0x150
+[  185.823697]  ? vfs_read+0x1b1/0x300
+[  185.825307]  ? __x64_sys_pread64+0x8f/0xc0
+[  185.827159]  ? irqentry_exit+0x33/0x40
+[  185.828858]  ? do_syscall_64+0x35/0x80
+[  185.830485]  ? entry_SYSCALL_64_after_hwframe+0x63/0xcd
+[  185.832677]  </TASK>
+[  185.834068] Kernel Offset: disabled
+[  185.835510] ---[ end Kernel panic - not syncing: stack-protector: Kernel stack is corrupted in: do_mpage_readpage+0x7e5/0x7f0 ]---
+
+Probably related to the block device having a 32kB block size set on
+the pmem device by xfs_db when it only really has a 4kB sector size....
+
+Anyway, back to just using 64k fsb, 4k sector.  generic/001 ASSERT
+fails immediately with:
+
+[  111.785796] run fstests generic/001 at 2023-09-20 11:50:19
+[  113.346797] XFS: Assertion failed: imap.br_startblock != DELAYSTARTBLOCK, file: fs/xfs/xfs_reflink.c, line: 1392
+[  113.352512] ------------[ cut here ]------------
+[  113.354793] kernel BUG at fs/xfs/xfs_message.c:102!
+[  113.358444] invalid opcode: 0000 [#1] PREEMPT SMP
+[  113.360769] CPU: 8 PID: 7581 Comm: cp Not tainted 6.6.0-rc2-dgc+ #1903
+[  113.364183] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+[  113.369784] RIP: 0010:assfail+0x35/0x40
+[  113.372038] Code: c9 48 c7 c2 00 d8 6c 82 48 89 e5 48 89 f1 48 89 fe 48 c7 c7 d8 d3 60 82 e8 a8 fd ff ff 80 3d d1 36 ec 02 00 75 04 0f 0b 5d c3 <0f> 0b 66 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 55 48 63 f6 49 89
+[  113.384178] RSP: 0018:ffffc9000962bca0 EFLAGS: 00010202
+[  113.387467] RAX: 0000000000000000 RBX: 0000000000000001 RCX: 000000007fffffff
+[  113.392326] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8260d3d8
+[  113.397235] RBP: ffffc9000962bca0 R08: 0000000000000000 R09: 000000000000000a
+[  113.401449] R10: 000000000000000a R11: 0fffffffffffffff R12: 0000000000000000
+[  113.406312] R13: 00000000ffffff8b R14: 0000000000000000 R15: ffff88810de00f00
+[  113.410562] FS:  00007f4f6219b500(0000) GS:ffff8885fec00000(0000) knlGS:0000000000000000
+[  113.415506] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  113.418688] CR2: 0000564951bfcf50 CR3: 00000005cd6b8005 CR4: 0000000000060ee0
+[  113.422825] Call Trace:
+[  113.424302]  <TASK>
+[  113.425566]  ? show_regs+0x61/0x70
+[  113.427444]  ? die+0x37/0x90
+[  113.429175]  ? do_trap+0xec/0x100
+[  113.431016]  ? do_error_trap+0x6c/0x90
+[  113.432951]  ? assfail+0x35/0x40
+[  113.434677]  ? exc_invalid_op+0x52/0x70
+[  113.436755]  ? assfail+0x35/0x40
+[  113.438659]  ? asm_exc_invalid_op+0x1b/0x20
+[  113.440864]  ? assfail+0x35/0x40
+[  113.442671]  xfs_reflink_remap_blocks+0x197/0x350
+[  113.445278]  xfs_file_remap_range+0xf3/0x320
+[  113.447504]  do_clone_file_range+0xfe/0x2b0
+[  113.449689]  vfs_clone_file_range+0x3f/0x150
+[  113.452080]  ioctl_file_clone+0x52/0xa0
+[  113.453600]  do_vfs_ioctl+0x485/0x8d0
+[  113.455054]  ? selinux_file_ioctl+0x96/0x120
+[  113.456637]  ? selinux_file_ioctl+0x96/0x120
+[  113.458213]  __x64_sys_ioctl+0x73/0xd0
+[  113.459598]  do_syscall_64+0x35/0x80
+[  113.460840]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Problems with unexpected extent types in the reflink remap code.
+
+This is due to the reflink operation finding a delalloc extent where
+it should be finding a real extent. this implies the
+xfs_flush_unmap_range() call in xfs_reflink_remap_prep() didn't
+flush the full data range it was supposed to.
+xfs_flush_unmap_range() is supposed to round the range out to:
+
+	rounding = max_t(xfs_off_t, mp->m_sb.sb_blocksize, PAGE_SIZE);
+
+the block size for these cases, so it is LBS aware. So maybe there's
+a problem with filemap_write_and_wait_range() and/or
+truncate_pagecache_range() when dealing with LBS enabled page cache?
+
+So, yeah, debug XFS builds tell us straight away that important stuff
+does not appear to be not working correctly. Debug really needs to
+be enabled, otherwise silent data corruption situations like this
+can go unnoticed by fstests tests...
+
+-Dave
+-- 
+Dave Chinner
+david@fromorbit.com
+
+
+xfs: fix page cache size validation for LBS configuations
+
+From: Dave Chinner <dchinner@redhat.com>
+
+The page cache can index larger filesystem sizes on 32 bit systems
+if large block sizes are enabled. Fix this code to take these
+configurations into account.
+
+Signed-off-by: Dave Chinner <dchinner@redhat.com>
+---
+ fs/xfs/xfs_mount.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
+index 0a0fd19573d8..35dfcbc1e576 100644
+--- a/fs/xfs/xfs_mount.c
++++ b/fs/xfs/xfs_mount.c
+@@ -131,11 +131,15 @@ xfs_sb_validate_fsb_count(
+ 	xfs_sb_t	*sbp,
+ 	uint64_t	nblocks)
+ {
+-	ASSERT(PAGE_SHIFT >= sbp->sb_blocklog);
+-	ASSERT(sbp->sb_blocklog >= BBSHIFT);
++	ASSERT(sbp->sb_blocklog <= XFS_MAX_BLOCKSIZE_LOG);
++	ASSERT(sbp->sb_blocklog >= XFS_MIN_BLOCKSIZE_LOG);
+ 
+ 	/* Limited by ULONG_MAX of page cache index */
+-	if (nblocks >> (PAGE_SHIFT - sbp->sb_blocklog) > ULONG_MAX)
++	if (PAGE_SHIFT >= sbp->sb_blocklog)
++		nblocks >>= (PAGE_SHIFT - sbp->sb_blocklog);
++	else
++		nblocks <<= (sbp->sb_blocklog - PAGE_SHIFT);
++	if (nblocks > ULONG_MAX)
+ 		return -EFBIG;
+ 	return 0;
+ }
