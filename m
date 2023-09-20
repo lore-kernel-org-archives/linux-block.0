@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 781F0CD5BD4
-	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 22:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DFCFCD13CF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 22:24:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229652AbjITWYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Sep 2023 18:24:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56964 "EHLO
+        id S229743AbjITWYe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Sep 2023 18:24:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229659AbjITWYY (ORCPT
+        with ESMTP id S229653AbjITWYY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 20 Sep 2023 18:24:24 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039F2F1
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 15:22:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7D1118
+        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 15:23:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695248571;
+        s=mimecast20190719; t=1695248579;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=z7dUGMUCdPzyoXpN55evy5eiv8axvEjBjfUl9Q9dpbg=;
-        b=hi6HOiKNH0V2dwIi1B4TzZDa/zM0p+csp/jfrJtt0JMNw2wqJDVJZl9w5euYk0Vq+G6Knq
-        BiD4ipu58QCXJl64/y6sHsfqy1CAAENEUleCh1gQAaug6Z7VTEMVq3vV/x3/ZQoFRDfAJu
-        9bbRw4CartYbBsRzgXzdGfqfKArmUuQ=
+        bh=gfSLwCbdFMwywMZPFTO5hx480mND9O9O9B3C6PwfVhs=;
+        b=QGfkJ7xv29ruO9Hi5/YkzhOMhxw6GcpcRvZweAceREdKss0eEtqNMrpnukKHkoMm+m/wss
+        0eg/t2OvX3OwE6mGWLnTNfup8rt+3cduOdoc0e4VgEdsHePFEr1ZYEppGfdRVi1GM4RfB6
+        TY8FJlawN4EuTINBIQQO1bM5EOTgw6o=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-630-R2WmEFWxPlGwwyO8nYc--A-1; Wed, 20 Sep 2023 18:22:49 -0400
-X-MC-Unique: R2WmEFWxPlGwwyO8nYc--A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-74-jGqCcrvuM6694XgMINqOzQ-1; Wed, 20 Sep 2023 18:22:54 -0400
+X-MC-Unique: jGqCcrvuM6694XgMINqOzQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E9CE12932493;
-        Wed, 20 Sep 2023 22:22:48 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A146428EC111;
+        Wed, 20 Sep 2023 22:22:53 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FC2840C6EC0;
-        Wed, 20 Sep 2023 22:22:47 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 07578492C37;
+        Wed, 20 Sep 2023 22:22:51 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -51,77 +51,90 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 04/11] iov_iter: Derive user-backedness from the iterator type
-Date:   Wed, 20 Sep 2023 23:22:24 +0100
-Message-ID: <20230920222231.686275-5-dhowells@redhat.com>
+Subject: [PATCH v5 06/11] iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()
+Date:   Wed, 20 Sep 2023 23:22:26 +0100
+Message-ID: <20230920222231.686275-7-dhowells@redhat.com>
 In-Reply-To: <20230920222231.686275-1-dhowells@redhat.com>
 References: <20230920222231.686275-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the iterator type to determine whether an iterator is user-backed or
-not rather than using a special flag for it.  Now that ITER_UBUF and
-ITER_IOVEC are 0 and 1, they can be checked with a single comparison.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Alexander Viro <viro@zeniv.linux.org.uk>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Christian Brauner <christian@brauner.io>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: David Laight <David.Laight@ACULAB.COM>
-cc: linux-block@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
+iter->copy_mc is only used with a bvec iterator and only by
+dump_emit_page() in fs/coredump.c so rather than handle this in
+memcpy_from_iter_mc() where it is checked repeatedly by _copy_from_iter()
+and copy_page_from_iter_atomic(),
 ---
- include/linux/uio.h | 4 +---
- lib/iov_iter.c      | 1 -
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ lib/iov_iter.c | 39 +++++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index d1801c46e89e..e2a248dad80b 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -43,7 +43,6 @@ struct iov_iter {
- 	bool copy_mc;
- 	bool nofault;
- 	bool data_source;
--	bool user_backed;
- 	union {
- 		size_t iov_offset;
- 		int last_offset;
-@@ -143,7 +142,7 @@ static inline unsigned char iov_iter_rw(const struct iov_iter *i)
- 
- static inline bool user_backed_iter(const struct iov_iter *i)
- {
--	return i->user_backed;
-+	return iter_is_ubuf(i) || iter_is_iovec(i);
- }
- 
- /*
-@@ -383,7 +382,6 @@ static inline void iov_iter_ubuf(struct iov_iter *i, unsigned int direction,
- 	*i = (struct iov_iter) {
- 		.iter_type = ITER_UBUF,
- 		.copy_mc = false,
--		.user_backed = true,
- 		.data_source = direction,
- 		.ubuf = buf,
- 		.count = count,
 diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 27234a820eeb..227c9f536b94 100644
+index 65374ee91ecd..943aa3cfd7b3 100644
 --- a/lib/iov_iter.c
 +++ b/lib/iov_iter.c
-@@ -290,7 +290,6 @@ void iov_iter_init(struct iov_iter *i, unsigned int direction,
- 		.iter_type = ITER_IOVEC,
- 		.copy_mc = false,
- 		.nofault = false,
--		.user_backed = true,
- 		.data_source = direction,
- 		.__iov = iov,
- 		.nr_segs = nr_segs,
+@@ -253,14 +253,33 @@ size_t _copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
+ EXPORT_SYMBOL_GPL(_copy_mc_to_iter);
+ #endif /* CONFIG_ARCH_HAS_COPY_MC */
+ 
+-static size_t memcpy_from_iter_mc(void *iter_from, size_t progress,
+-				  size_t len, void *to, void *priv2)
++static __always_inline
++size_t memcpy_from_iter_mc(void *iter_from, size_t progress,
++			   size_t len, void *to, void *priv2)
++{
++	return copy_mc_to_kernel(to + progress, iter_from, len);
++}
++
++static size_t __copy_from_iter_mc(void *addr, size_t bytes, struct iov_iter *i)
+ {
+-	struct iov_iter *iter = priv2;
++	size_t progress;
+ 
+-	if (iov_iter_is_copy_mc(iter))
+-		return copy_mc_to_kernel(to + progress, iter_from, len);
+-	return memcpy_from_iter(iter_from, progress, len, to, priv2);
++	if (unlikely(i->count < bytes))
++		bytes = i->count;
++	if (unlikely(!bytes))
++		return 0;
++	progress = iterate_bvec(i, bytes, addr, NULL, memcpy_from_iter_mc);
++	i->count -= progress;
++	return progress;
++}
++
++static __always_inline
++size_t __copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
++{
++	if (unlikely(iov_iter_is_copy_mc(i)))
++		return __copy_from_iter_mc(addr, bytes, i);
++	return iterate_and_advance(i, bytes, addr,
++				   copy_from_user_iter, memcpy_from_iter);
+ }
+ 
+ size_t _copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
+@@ -270,9 +289,7 @@ size_t _copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
+ 
+ 	if (user_backed_iter(i))
+ 		might_fault();
+-	return iterate_and_advance2(i, bytes, addr, i,
+-				    copy_from_user_iter,
+-				    memcpy_from_iter_mc);
++	return __copy_from_iter(addr, bytes, i);
+ }
+ EXPORT_SYMBOL(_copy_from_iter);
+ 
+@@ -493,9 +510,7 @@ size_t copy_page_from_iter_atomic(struct page *page, size_t offset,
+ 		}
+ 
+ 		p = kmap_atomic(page) + offset;
+-		n = iterate_and_advance2(i, n, p, i,
+-					 copy_from_user_iter,
+-					 memcpy_from_iter_mc);
++		__copy_from_iter(p, n, i);
+ 		kunmap_atomic(p);
+ 		copied += n;
+ 		offset += n;
 
