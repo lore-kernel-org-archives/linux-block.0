@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D6DCE79D3
-	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 13:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0DECE79CF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 13:06:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236569AbjITNGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Sep 2023 09:06:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56318 "EHLO
+        id S236445AbjITNG2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Sep 2023 09:06:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236584AbjITNGC (ORCPT
+        with ESMTP id S236525AbjITNGH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Sep 2023 09:06:02 -0400
+        Wed, 20 Sep 2023 09:06:07 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B339B6
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 06:05:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049A5E0
+        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 06:05:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695215105;
+        s=mimecast20190719; t=1695215113;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uub17mzu8dgUj1tkqvUjJMJqsHG/bWf8Fylywc+muQE=;
-        b=ZE5PCCyyzMqYyWO0We1qREaUYWqQP6vdwnhz/PXxQm2BSJ/QYDAwJVmGZiPqockjPY67We
-        1vh3Rr+H7C885dCiIbHgGj2Er3UBjBiiQwdzGy7j1Urugwiy6pfqLlR/SeLduuFQWXCkU1
-        JyEWq6OvbvqR1ysaRjhKYacx3Sv3dpE=
+        bh=fIh9Fj3H3rRnydHywvA7K8Amir9a3UPzNcMRqZcgBSE=;
+        b=IyQ2n0lxouir6C6gv/KKagDCJYb8EUtYsWCXBBrZO7rn+AZUmt3mTdSTKQoQRnOrzh+SUh
+        iX8BE0L85Pam7jRUWBOD2OOCTnGLKJNRaH0Ffl6OhL74ixFUR4BXBxqbZWVI9VYLXyY4Ep
+        pL94op3hXba8UEGne+HzGM5KXleMIYg=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-106-K9l0k3J9MKGNVn_uOBNDsQ-1; Wed, 20 Sep 2023 09:05:00 -0400
-X-MC-Unique: K9l0k3J9MKGNVn_uOBNDsQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-668-tGfIu03hPlqM41kxV_oZLg-1; Wed, 20 Sep 2023 09:05:11 -0400
+X-MC-Unique: tGfIu03hPlqM41kxV_oZLg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B6913C18C27;
-        Wed, 20 Sep 2023 13:04:58 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4BB43812592;
+        Wed, 20 Sep 2023 13:05:10 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2FF68202696C;
-        Wed, 20 Sep 2023 13:04:54 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 05B5E492B16;
+        Wed, 20 Sep 2023 13:05:07 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -55,55 +55,29 @@ Cc:     David Howells <dhowells@redhat.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Christian Brauner <brauner@kernel.org>,
         David Hildenbrand <david@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, loongarch@lists.linux.dev,
-        linux-s390@vger.kernel.org
-Subject: [RFC PATCH v2 5/9] iov_iter: Create a function to prepare userspace VM for UBUF/IOVEC tests
-Date:   Wed, 20 Sep 2023 14:03:56 +0100
-Message-ID: <20230920130400.203330-6-dhowells@redhat.com>
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [RFC PATCH v2 7/9] iov_iter: Add extract kunit tests for ITER_UBUF and ITER_IOVEC
+Date:   Wed, 20 Sep 2023 14:03:58 +0100
+Message-ID: <20230920130400.203330-8-dhowells@redhat.com>
 In-Reply-To: <20230920130400.203330-1-dhowells@redhat.com>
 References: <20230920130400.203330-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Create a function to set up a userspace VM for the kunit testing thread and
-set up a buffer within it such that ITER_UBUF and ITER_IOVEC tests can be
-performed.
+Add extraction kunit tests for ITER_UBUF- and ITER_IOVEC-type iterators.
+This attaches a userspace VM with a mapped file in it temporarily to the
+test thread.
 
-Note that this requires current->mm to point to a sufficiently set up
-mm_struct.  This is done by partially mirroring what execve does.
-
-The following steps are performed:
-
- (1) Allocate an mm_struct and pick an arch layout (required to set
-     mm->get_unmapped_area).
-
- (2) Create an empty "stack" VMA so that the VMA maple tree is set up and
-     won't cause a crash in the maple tree code later.  We don't actually
-     care about the stack as we're not going to actually execute userspace.
-
- (3) Create an anon file and attach a bunch of folios to it so that the
-     requested number of pages are accessible.
-
- (4) Make the kthread use the mm.  This must be done before mmap is called.
-
- (5) Shared-mmap the anon file into the allocated mm_struct.
-
-This requires access to otherwise unexported core symbols: mm_alloc(),
-vm_area_alloc(), insert_vm_struct() arch_pick_mmap_layout() and
-anon_inode_getfile_secure(), which I've exported _GPL.
-
-[?] Would it be better if this were done in core and not in a module?
+[!] Note that this requires the kernel thread running the test to obtain
+and deploy an mm_struct so that a user-side buffer can be created with mmap
+- basically it has to emulated part of execve().  Doing so requires access
+to additional core symbols: mm_alloc(), vm_area_alloc(), insert_vm_struct()
+and arch_pick_mmap_layout().  See the iov_kunit_create_user_buf() function
+added in the patch.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Andrew Morton <akpm@linux-foundation.org>
@@ -116,276 +90,194 @@ cc: David Hildenbrand <david@redhat.com>
 cc: John Hubbard <jhubbard@nvidia.com>
 cc: Brendan Higgins <brendanhiggins@google.com>
 cc: David Gow <davidgow@google.com>
-cc: Huacai Chen <chenhuacai@kernel.org>
-cc: WANG Xuerui <kernel@xen0n.name>
-cc: Heiko Carstens <hca@linux.ibm.com>
-cc: Vasily Gorbik <gor@linux.ibm.com>
-cc: Alexander Gordeev <agordeev@linux.ibm.com>
-cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-cc: Sven Schnelle <svens@linux.ibm.com>
 cc: linux-mm@kvack.org
-cc: loongarch@lists.linux.dev
-cc: linux-s390@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-kselftest@vger.kernel.org
 cc: kunit-dev@googlegroups.com
 ---
- arch/loongarch/include/asm/page.h |   1 +
- arch/s390/kernel/vdso.c           |   1 +
- fs/anon_inodes.c                  |   1 +
- kernel/fork.c                     |   2 +
- lib/kunit_iov_iter.c              | 142 ++++++++++++++++++++++++++++++
- mm/mmap.c                         |   1 +
- mm/util.c                         |   3 +
- 7 files changed, 151 insertions(+)
+ lib/kunit_iov_iter.c | 164 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 164 insertions(+)
 
-diff --git a/arch/loongarch/include/asm/page.h b/arch/loongarch/include/asm/page.h
-index 63f137ce82a4..c7c5f5b4c0d3 100644
---- a/arch/loongarch/include/asm/page.h
-+++ b/arch/loongarch/include/asm/page.h
-@@ -32,6 +32,7 @@
- 
- #include <linux/kernel.h>
- #include <linux/pfn.h>
-+#include <linux/personality.h>
- 
- /*
-  * It's normally defined only for FLATMEM config but it's
-diff --git a/arch/s390/kernel/vdso.c b/arch/s390/kernel/vdso.c
-index bbaefd84f15e..6849eac59129 100644
---- a/arch/s390/kernel/vdso.c
-+++ b/arch/s390/kernel/vdso.c
-@@ -223,6 +223,7 @@ unsigned long vdso_size(void)
- 		size += vdso64_end - vdso64_start;
- 	return PAGE_ALIGN(size);
- }
-+EXPORT_SYMBOL_GPL(vdso_size);
- 
- int arch_setup_additional_pages(struct linux_binprm *bprm, int uses_interp)
- {
-diff --git a/fs/anon_inodes.c b/fs/anon_inodes.c
-index 24192a7667ed..4190336180ee 100644
---- a/fs/anon_inodes.c
-+++ b/fs/anon_inodes.c
-@@ -176,6 +176,7 @@ struct file *anon_inode_getfile_secure(const char *name,
- 	return __anon_inode_getfile(name, fops, priv, flags,
- 				    context_inode, true);
- }
-+EXPORT_SYMBOL_GPL(anon_inode_getfile_secure);
- 
- static int __anon_inode_getfd(const char *name,
- 			      const struct file_operations *fops,
-diff --git a/kernel/fork.c b/kernel/fork.c
-index 3b6d20dfb9a8..9ab604574400 100644
---- a/kernel/fork.c
-+++ b/kernel/fork.c
-@@ -494,6 +494,7 @@ struct vm_area_struct *vm_area_alloc(struct mm_struct *mm)
- 
- 	return vma;
- }
-+EXPORT_SYMBOL_GPL(vm_area_alloc);
- 
- struct vm_area_struct *vm_area_dup(struct vm_area_struct *orig)
- {
-@@ -1337,6 +1338,7 @@ struct mm_struct *mm_alloc(void)
- 	memset(mm, 0, sizeof(*mm));
- 	return mm_init(mm, current, current_user_ns());
- }
-+EXPORT_SYMBOL_GPL(mm_alloc);
- 
- static inline void __mmput(struct mm_struct *mm)
- {
 diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
-index eb86371b67d0..85387a25484e 100644
+index d1817ab4ffee..2994c3f348ab 100644
 --- a/lib/kunit_iov_iter.c
 +++ b/lib/kunit_iov_iter.c
-@@ -10,6 +10,12 @@
- #include <linux/module.h>
- #include <linux/vmalloc.h>
- #include <linux/mm.h>
-+#include <linux/pagemap.h>
-+#include <linux/mman.h>
-+#include <linux/file.h>
-+#include <linux/kthread.h>
-+#include <linux/anon_inodes.h>
-+#include <linux/writeback.h>
- #include <linux/uio.h>
- #include <linux/bvec.h>
- #include <kunit/test.h>
-@@ -68,6 +74,20 @@ static void iov_kunit_unmap(void *data)
- 	vunmap(data);
+@@ -862,6 +862,168 @@ static void __init iov_kunit_copy_from_xarray(struct kunit *test)
+ 	KUNIT_SUCCEED();
  }
  
-+static void iov_kunit_mmdrop(void *data)
-+{
-+	struct mm_struct *mm = data;
-+
-+	if (current->mm == mm)
-+		kthread_unuse_mm(mm);
-+	mmdrop(mm);
-+}
-+
-+static void iov_kunit_fput(void *data)
-+{
-+	fput(data);
-+}
-+
- /*
-  * Create a buffer out of some pages and return a vmap'd pointer to it.
-  */
-@@ -151,6 +171,128 @@ static void iov_kunit_check_pattern(struct kunit *test, const u8 *buffer,
- 	}
- }
- 
-+static const struct file_operations iov_kunit_user_file_fops = {
-+	.mmap = generic_file_mmap,
-+};
-+
-+static int iov_kunit_user_file_read_folio(struct file *file, struct folio *folio)
-+{
-+	folio_mark_uptodate(folio);
-+	folio_unlock(folio);
-+	return 0;
-+}
-+
-+static const struct address_space_operations iov_kunit_user_file_aops = {
-+	.read_folio	= iov_kunit_user_file_read_folio,
-+	.dirty_folio	= filemap_dirty_folio,
-+};
-+
 +/*
-+ * Create an anonymous file and attach a bunch of pages to it.  We can then use
-+ * this in mmap() and check the pages against it when doing extraction tests.
++ * Test the extraction of ITER_UBUF-type iterators.
 + */
-+static struct file *iov_kunit_create_file(struct kunit *test, size_t npages,
-+					  struct page ***ppages)
++static void __init iov_kunit_extract_pages_ubuf(struct kunit *test)
 +{
-+	struct folio *folio;
-+	struct file *file;
-+	struct page **pages = NULL;
-+	size_t i;
-+
-+	if (ppages) {
-+		pages = kunit_kcalloc(test, npages, sizeof(struct page *), GFP_KERNEL);
-+		KUNIT_ASSERT_NOT_ERR_OR_NULL(test, pages);
-+		*ppages = pages;
-+	}
-+
-+	file = anon_inode_getfile_secure("kunit-iov-test",
-+					 &iov_kunit_user_file_fops,
-+					 NULL, O_RDWR, NULL);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, file);
-+	kunit_add_action_or_reset(test, iov_kunit_fput, file);
-+	file->f_mapping->a_ops = &iov_kunit_user_file_aops;
-+
-+	i_size_write(file_inode(file), npages * PAGE_SIZE);
-+	for (i = 0; i < npages; i++) {
-+		folio = filemap_grab_folio(file->f_mapping, i);
-+		KUNIT_ASSERT_NOT_ERR_OR_NULL(test, folio);
-+		if (pages)
-+			*pages++ = folio_page(folio, 0);
-+		folio_unlock(folio);
-+		folio_put(folio);
-+	}
-+
-+	return file;
-+}
-+
-+/*
-+ * Attach a userspace buffer to a kernel thread by adding an mm_struct to it
-+ * and mmapping the buffer.  If the caller requires a list of pages for
-+ * checking, then an anon_inode file is created, populated with pages and
-+ * mmapped otherwise an anonymous mapping is used.
-+ */
-+static u8 __user *__init iov_kunit_create_user_buf(struct kunit *test,
-+						   size_t npages,
-+						   struct page ***ppages)
-+{
-+	struct rlimit rlim_stack = {
-+		.rlim_cur = LONG_MAX,
-+		.rlim_max = LONG_MAX,
-+	};
-+	struct vm_area_struct *vma;
-+	struct mm_struct *mm;
-+	struct file *file;
++	const struct iov_kunit_range *pr;
++	struct iov_iter iter;
++	struct page **bpages, *pagelist[8], **pages = pagelist;
++	ssize_t len;
++	size_t bufsize, size = 0, npages;
++	int i, from;
 +	u8 __user *buffer;
-+	int ret;
 +
-+	KUNIT_ASSERT_NULL(test, current->mm);
++	bufsize = 0x100000;
++	npages = bufsize / PAGE_SIZE;
 +
-+	mm = mm_alloc();
-+	KUNIT_ASSERT_NOT_NULL(test, mm);
-+	kunit_add_action_or_reset(test, iov_kunit_mmdrop, mm);
-+	arch_pick_mmap_layout(mm, &rlim_stack);
++	buffer = iov_kunit_create_user_buf(test, npages, &bpages);
 +
-+	vma = vm_area_alloc(mm);
-+	KUNIT_ASSERT_NOT_NULL(test, vma);
-+	vma_set_anonymous(vma);
++	for (pr = kvec_test_ranges; pr->page >= 0; pr++) {
++		from = pr->from;
++		size = pr->to - from;
++		KUNIT_ASSERT_LE(test, pr->to, bufsize);
 +
-+	/*
-+	 * Place the stack at the largest stack address the architecture
-+	 * supports. Later, we'll move this to an appropriate place. We don't
-+	 * use STACK_TOP because that can depend on attributes which aren't
-+	 * configured yet.
-+	 */
-+	vma->vm_end = STACK_TOP_MAX;
-+	vma->vm_start = vma->vm_end - PAGE_SIZE;
-+	vm_flags_init(vma, VM_SOFTDIRTY | VM_STACK_FLAGS | VM_STACK_INCOMPLETE_SETUP);
-+	vma->vm_page_prot = vm_get_page_prot(vma->vm_flags);
++		iov_iter_ubuf(&iter, ITER_SOURCE, buffer + pr->from, size);
 +
-+	ret = insert_vm_struct(mm, vma);
-+	KUNIT_ASSERT_EQ(test, ret, 0);
++		do {
++			size_t offset0 = LONG_MAX;
 +
-+	mm->stack_vm = mm->total_vm = 1;
++			for (i = 0; i < ARRAY_SIZE(pagelist); i++)
++				pagelist[i] = (void *)POISON_POINTER_DELTA + 0x5a;
 +
-+	/*
-+	 * If we want the pages, attach the pages to a file to prevent swap
-+	 * interfering, otherwise use an anonymous mapping.
-+	 */
-+	if (ppages) {
-+		file = iov_kunit_create_file(test, npages, ppages);
++			len = iov_iter_extract_pages(&iter, &pages, 100 * 1024,
++						     ARRAY_SIZE(pagelist), 0, &offset0);
++			KUNIT_EXPECT_GE(test, len, 0);
++			if (len < 0)
++				break;
++			KUNIT_EXPECT_LE(test, len, size);
++			KUNIT_EXPECT_EQ(test, iter.count, size - len);
++			if (len == 0)
++				break;
++			size -= len;
++			KUNIT_EXPECT_GE(test, (ssize_t)offset0, 0);
++			KUNIT_EXPECT_LT(test, offset0, PAGE_SIZE);
 +
-+		kthread_use_mm(mm);
-+		buffer = (u8 __user *)vm_mmap(file, 0, PAGE_SIZE * npages,
-+					      PROT_READ | PROT_WRITE,
-+					      MAP_SHARED, 0);
-+	} else {
-+		kthread_use_mm(mm);
-+		buffer = (u8 __user *)vm_mmap(NULL, 0, PAGE_SIZE * npages,
-+					      PROT_READ | PROT_WRITE,
-+					      MAP_PRIVATE | MAP_ANONYMOUS, 0);
++			/* We're only checking the page pointers */
++			unpin_user_pages(pages, (offset0 + len) / PAGE_SIZE);
++
++			for (i = 0; i < ARRAY_SIZE(pagelist); i++) {
++				struct page *p;
++				ssize_t part = min_t(ssize_t, len, PAGE_SIZE - offset0);
++				int ix;
++
++				KUNIT_ASSERT_GE(test, part, 0);
++				ix = from / PAGE_SIZE;
++				KUNIT_ASSERT_LT(test, ix, npages);
++				p = bpages[ix];
++				KUNIT_EXPECT_PTR_EQ(test, pagelist[i], p);
++				KUNIT_EXPECT_EQ(test, offset0, from % PAGE_SIZE);
++				from += part;
++				len -= part;
++				KUNIT_ASSERT_GE(test, len, 0);
++				if (len == 0)
++					break;
++				offset0 = 0;
++			}
++
++			if (test->status == KUNIT_FAILURE)
++				goto stop;
++		} while (iov_iter_count(&iter) > 0);
++
++		KUNIT_EXPECT_EQ(test, size, 0);
++		KUNIT_EXPECT_EQ(test, iter.count, 0);
++		KUNIT_EXPECT_EQ(test, iter.iov_offset, pr->to - pr->from);
 +	}
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, (void __force *)buffer);
-+	return buffer;
++
++stop:
++	KUNIT_SUCCEED();
 +}
 +
- static void __init iov_kunit_load_kvec(struct kunit *test,
- 				       struct iov_iter *iter, int dir,
- 				       struct kvec *kvec, unsigned int kvmax,
-diff --git a/mm/mmap.c b/mm/mmap.c
-index b56a7f0c9f85..2ea4a98a2cab 100644
---- a/mm/mmap.c
-+++ b/mm/mmap.c
-@@ -3284,6 +3284,7 @@ int insert_vm_struct(struct mm_struct *mm, struct vm_area_struct *vma)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(insert_vm_struct);
- 
++/*
++ * Test the extraction of ITER_IOVEC-type iterators.
++ */
++static void __init iov_kunit_extract_pages_iovec(struct kunit *test)
++{
++	const struct iov_kunit_range *pr;
++	struct iov_iter iter;
++	struct iovec iov[8];
++	struct page **bpages, *pagelist[8], **pages = pagelist;
++	ssize_t len;
++	size_t bufsize, size = 0, npages;
++	int i, from;
++	u8 __user *buffer;
++
++	bufsize = 0x100000;
++	npages = bufsize / PAGE_SIZE;
++
++	buffer = iov_kunit_create_user_buf(test, npages, &bpages);
++
++	iov_kunit_load_iovec(test, &iter, ITER_SOURCE, iov, ARRAY_SIZE(iov),
++			     buffer, bufsize, kvec_test_ranges);
++	size = iter.count;
++
++	pr = kvec_test_ranges;
++	from = pr->from;
++	do {
++		size_t offset0 = LONG_MAX;
++
++		for (i = 0; i < ARRAY_SIZE(pagelist); i++)
++			pagelist[i] = (void *)POISON_POINTER_DELTA + 0x5a;
++
++		len = iov_iter_extract_pages(&iter, &pages, 100 * 1024,
++					     ARRAY_SIZE(pagelist), 0, &offset0);
++		KUNIT_EXPECT_GE(test, len, 0);
++		if (len < 0)
++			break;
++		KUNIT_EXPECT_LE(test, len, size);
++		KUNIT_EXPECT_EQ(test, iter.count, size - len);
++		if (len == 0)
++			break;
++		size -= len;
++		KUNIT_EXPECT_GE(test, (ssize_t)offset0, 0);
++		KUNIT_EXPECT_LT(test, offset0, PAGE_SIZE);
++
++		/* We're only checking the page pointers */
++		unpin_user_pages(pages, (offset0 + len) / PAGE_SIZE);
++
++		for (i = 0; i < ARRAY_SIZE(pagelist); i++) {
++			struct page *p;
++			ssize_t part = min_t(ssize_t, len, PAGE_SIZE - offset0);
++			int ix;
++
++			KUNIT_ASSERT_GE(test, part, 0);
++			while (from == pr->to) {
++				pr++;
++				from = pr->from;
++				if (pr->page < 0)
++					goto stop;
++			}
++
++			ix = from / PAGE_SIZE;
++			KUNIT_ASSERT_LT(test, ix, npages);
++			p = bpages[ix];
++			KUNIT_EXPECT_PTR_EQ(test, pagelist[i], p);
++			KUNIT_EXPECT_EQ(test, offset0, from % PAGE_SIZE);
++			from += part;
++			len -= part;
++			KUNIT_ASSERT_GE(test, len, 0);
++			if (len == 0)
++				break;
++			offset0 = 0;
++		}
++
++		if (test->status == KUNIT_FAILURE)
++			break;
++	} while (iov_iter_count(&iter) > 0);
++
++stop:
++	KUNIT_EXPECT_EQ(test, size, 0);
++	KUNIT_EXPECT_EQ(test, iter.count, 0);
++	KUNIT_SUCCEED();
++}
++
  /*
-  * Copy the vma structure to a new location in the same mm,
-diff --git a/mm/util.c b/mm/util.c
-index 8cbbfd3a3d59..09895358f067 100644
---- a/mm/util.c
-+++ b/mm/util.c
-@@ -455,6 +455,9 @@ void arch_pick_mmap_layout(struct mm_struct *mm, struct rlimit *rlim_stack)
- 	mm->get_unmapped_area = arch_get_unmapped_area;
- }
- #endif
-+#ifdef CONFIG_MMU
-+EXPORT_SYMBOL_GPL(arch_pick_mmap_layout);
-+#endif
- 
- /**
-  * __account_locked_vm - account locked pages to an mm's locked_vm
+  * Test the extraction of ITER_KVEC-type iterators.
+  */
+@@ -1110,6 +1272,8 @@ static struct kunit_case __refdata iov_kunit_cases[] = {
+ 	KUNIT_CASE(iov_kunit_copy_from_bvec),
+ 	KUNIT_CASE(iov_kunit_copy_to_xarray),
+ 	KUNIT_CASE(iov_kunit_copy_from_xarray),
++	KUNIT_CASE(iov_kunit_extract_pages_ubuf),
++	KUNIT_CASE(iov_kunit_extract_pages_iovec),
+ 	KUNIT_CASE(iov_kunit_extract_pages_kvec),
+ 	KUNIT_CASE(iov_kunit_extract_pages_bvec),
+ 	KUNIT_CASE(iov_kunit_extract_pages_xarray),
 
