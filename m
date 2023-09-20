@@ -2,58 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1A6CE79AF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 09:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4385CE79C4
+	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 10:55:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233976AbjITJUa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Sep 2023 05:20:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53986 "EHLO
+        id S234257AbjITKzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Sep 2023 06:55:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234067AbjITI7W (ORCPT
+        with ESMTP id S233615AbjITKzk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Sep 2023 04:59:22 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ACC1CDB
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 01:58:47 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230920085846epoutp013b4d816eeb3cef27bf76fdb70fd979a4~Gj7cH05oA3066430664epoutp01y
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 08:58:46 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230920085846epoutp013b4d816eeb3cef27bf76fdb70fd979a4~Gj7cH05oA3066430664epoutp01y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1695200326;
-        bh=W6Cvqjs8GJhwgBfxrn3JFatd+tYHBlqUZSV4Q7H1XFM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rhSdUafas7MKfZWxAVaZrdJW9z/GRnmgnd/JWKZX7QvgmLkXAe05qYbvlHt4R+pB+
-         0i+0T8BYbS2yTscOHtdOn6l2w3tuMHybrBvQUsOzq1+C/knJhlJHg3uFtN4/ccB2GN
-         6wHDSM408sc+ZlqsHeNulT15Z127uJXCuu9jggPI=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20230920085845epcas5p396c04043dede83074b0dd1971a85635e~Gj7bg7d9g1154211542epcas5p3r;
-        Wed, 20 Sep 2023 08:58:45 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.174]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4RrCBB2hH0z4x9Q6; Wed, 20 Sep
-        2023 08:58:42 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F2.FA.09638.244BA056; Wed, 20 Sep 2023 17:58:42 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20230920081558epcas5p4d791ba4be2836264a6fb44e06e636d11~GjWEhY0AW3181231812epcas5p41;
-        Wed, 20 Sep 2023 08:15:58 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230920081558epsmtrp104f414d8759ea58100910ec961341dab~GjWEgcbpy2250122501epsmtrp14;
-        Wed, 20 Sep 2023 08:15:58 +0000 (GMT)
-X-AuditID: b6c32a4a-6d5ff700000025a6-b1-650ab4426b85
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        DC.10.18916.D3AAA056; Wed, 20 Sep 2023 17:15:57 +0900 (KST)
-Received: from green245.sa.corp.samsungelectronics.net (unknown
-        [107.99.41.245]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230920081554epsmtip10685e21725660c9296a7bfa72629e389~GjWBgYFls2849128491epsmtip1e;
-        Wed, 20 Sep 2023 08:15:54 +0000 (GMT)
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Wed, 20 Sep 2023 06:55:40 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCC983;
+        Wed, 20 Sep 2023 03:55:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695207334; x=1726743334;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LVfQr+3NYOJBB85Xy9NQj00gO9lfxtO7rH9xEOTjYvQ=;
+  b=eV02gQPSP0kbcSpp/RsZe5aiUatwTGpWzlIdwkkLzjwMbLItKipbSV4d
+   kzA3DDEy9rOGzNaeScGro9PTrcaeitYB08SAKvwbg0L+0dNzZArRLSGzn
+   yPTVQhnX9RWCOFHJY0N0AwPNf4UTwe284zhk3XcmyjasPMQcjZcvHfTNM
+   E9F7uI+Z7vuPk37SdDK/qMIZxI13TSbALjxdq/8SAfstwNmtHq1NYuCvk
+   bYYKuC1ddQBuZYbFk0N6RbNy1wbnFfvq2sJWEBEdEkWpsNYFEgWqiEEwT
+   JEckPT8bj6HY+5S7h1Wos8ohgMkG0ZK1PqZI3IBB/SFXI5APeXWJiLNI4
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="365238749"
+X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
+   d="scan'208";a="365238749"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 03:55:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="781647988"
+X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
+   d="scan'208";a="781647988"
+Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 20 Sep 2023 03:55:27 -0700
+Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qiurd-0008fM-16;
+        Wed, 20 Sep 2023 10:55:25 +0000
+Date:   Wed, 20 Sep 2023 18:54:55 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
         Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
         Keith Busch <kbusch@kernel.org>,
@@ -62,91 +55,106 @@ To:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Christian Brauner <brauner@kernel.org>
-Cc:     martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        nitheshshetty@gmail.com, anuj1072538@gmail.com,
-        gost.dev@samsung.com, mcgrof@kernel.org,
+Cc:     oe-kbuild-all@lists.linux.dev, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org, nitheshshetty@gmail.com,
+        anuj1072538@gmail.com, gost.dev@samsung.com, mcgrof@kernel.org,
         Nitesh Shetty <nj.shetty@samsung.com>,
-        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH v16 10/12] dm: Enable copy offload for dm-linear target
-Date:   Wed, 20 Sep 2023 13:37:47 +0530
-Message-Id: <20230920080756.11919-11-nj.shetty@samsung.com>
-X-Mailer: git-send-email 2.35.1.500.gb896f729e2
-In-Reply-To: <20230920080756.11919-1-nj.shetty@samsung.com>
+        Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Anuj Gupta <anuj20.g@samsung.com>,
+        Vincent Fu <vincent.fu@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v16 12/12] null_blk: add support for copy offload
+Message-ID: <202309201836.c2wRnper-lkp@intel.com>
+References: <20230920080756.11919-13-nj.shetty@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Tf1CTdRi/7/uOdxvn6HVAfF1SuI5qePyYMfySUPzw6L3wD87OK82gxd74
-        uR9uLJCua4DIyWQThMohCIImUxgBcRuIrREBI49LggGm6AGnRQgyOyMubWNo/vd5Ps/neT7f
-        5/new8K5WiaPlSXLo5UycS6f8GZ09wsEoQld3nSE/bYPMtl/wtH9v9YY6OINPYEW+lcAmrOW
-        AdR3r9YLTVktGLp8tgpDLRcHMFRlmwBoftyAob7p7ajxaDMDXe4bZqCxntMEOnN+nom0DjOB
-        vhl8hKHJE/MAmeeKAOpeO4OjtoUlBhqafgGN/jvoFQcpi+EGkxq9+S2DGruqpjqMxwiqs/kL
-        qndKQ1BNupNeVEXJPYK6Pz/NoJaujBOUrssIqM6Rzyhnx4tUx9wiluJzICcmkxZLaGUQLUuX
-        S7JkGbH85HfTEtNEURHCUGE02skPkomldCx/956U0KSsXNcO+EGfinPVLipFrFLxw9+MUcrV
-        eXRQplyVF8unFZJcRaQiTCWWqtSyjDAZnfeGMCJih8gl/Cgn03rXiinavAq+vl4NNMDKKAds
-        FiQjYcOXQ1g58GZxyV4AzdX1hDvBJVcAtIztfYrLzsWUA9Z6wZ3ZRI/eAuCKa5ueoBSDhpvd
-        hFtEkNvhyGOWm/cjNThs720C7gAnVzFYcmEIuLv6km/D840DTDdmkMFw2fGA6S7mkLtg36VM
-        j1k41M9sdivYLtbZ7FhXc8jNcPjU3PoAOPkSLPmuFne3h2QtG94p0m9Mthv+2FNOeLAv/GOw
-        i+nBPPi7/ugGzoct1RcIT/ERAA0OA/Ak3oKldj3ufgROCqCpJ9xDB8IaexvmMfaBFWtzmIfn
-        QHP9E/wyvGRq2PDdAiceFm1gCtZVOhmeZekAPNd+nDgBggzPDGR4ZiDD/9YNADeCLbRCJc2g
-        VSLFDhmd//SP0+XSDrB+FSHvmMHtW8thNoCxgA1AFs7340hf8aa5HIn4cCGtlKcp1bm0ygZE
-        rn1X4jz/dLnrrGR5acLI6IjIqKioyOjXo4T8AM5CaZ2ES2aI8+gcmlbQyid1GIvN02A7JyzH
-        nFPD2f0HjbNZna8datE+TGo1Haqkry0WFsfsqcvZpEqXjgm2hZ9aUByPXjXe4sz6av8+sFys
-        SxJkBxxM3dsS2Lg1ePGx7JNQTeimw5b8WX9YR1Rp4wTf7xMnjKtTy2qzavJnrkiSgu8GaCZD
-        Om2G+LL4uNY/Nc5tkzqN9fMG3ujPPe0//HL1VeuumBl2irW0rlf0YOmapXWkouv6o/hehpX/
-        YZMkf7lKaTLzCoxKbs3JgXb5jMMemLxv3LTaL1u0J9RPsIF/9v7k92y/Zow0j49Nbi3/WJRe
-        nKiTnNbZAhvS/3muwKn9Ch7R6EVFH7y/7OfY/3xhaj3x29kePkOVKRaG4EqV+D9/tfJVngQA
-        AA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Re0hTYRjG+c45nnNcrI7a6ktNa1HiJGtg9jEviAV9QlBJUBhkQw9abVM3
-        jW7UUkq2yFK72LosS6xmLbIsZ86Gl9SWaZqZihWorbKclyxCtDpK0H+/97nAAy9LetspX3a3
-        JpPXapQqKS2iHtVJA1ZGWUT86n5XBLr3/BmJRicmKVTWd5pGQ3VjAA04cgGyD1/yQN0OG4Gq
-        rxcQ6HZZA4EKat8ANNhpIpC9JwQVnyihULW9mUIdVZdpZC4dZNDJrkoa3WycJtDbM4MAVQ4c
-        A+jRpJlE1iE3hZp6/FDrVKNHDMQ2Ux+DW9/dp3BHSxYutxho/KDkKH7SrafxjbxCD3wqZ5jG
-        o4M9FHbXdNI476EF4AfOQ3i8PACXD3wjNs9NEEUm86rd+3jtquhdolTHJweRbvXYX9R7FuiB
-        gzICloVcGHT1rzMCT9abewxgmzNDYMgtgqVT9eQs+8Db0y7GCER/MzkEfGobBUKX5kKg8zcr
-        6PM5IwkNtmFKOEgul4TOL0OE0PbhNsDS4gZGYIpbDke6vjNCWcxFQPud1NkNq+Dp915CwvOv
-        Ol7SxczuUUBnm3mGxZwXbL44QAlMcoEwp+ISeQZwpv8s03/WNUBYgIRP16lT1Enp8lCdUq3L
-        0qSEJqWpy8HMh2XxlaD03lRoLSBYUAsgS0rni9UrRLy3OFl54CCvTUvUZql4XS3wYynpQvEy
-        lSHZm0tRZvJ7eT6d1/5zCdbTV0/oblmbcQM4srX9sWa9LMwn6XDGyA6v3pgyoNmW9+GLoabn
-        fJpFuvOCbGnwj2pXvgLb50T3J1TYX/jO+fnUX1O0xc8cl3o9/H74gslEvL1JbmttiL5SfO3q
-        8u6NCrzWLbFuXpK9eFEQHxyxz72mcB4v2WR1mxm9KyrwZfhnkdwYFWhNKFydlz8RL3lR9Spu
-        ewhj+CjpaHFGBPnHBtZlxW46Nx3a2uLQhEX+2lAzz1Xfe76t/n1jX5Ao5xZjatcZ4tCR3HjF
-        7+Cmg3L/6bfZmQsnrpirr1486TOmb3/zKjv+W9X6rsjXI/mqgAIUu+WwomjPV/9TNccrS+6W
-        PfGTObRSSpeqlMtIrU75B4DsOJ1QAwAA
-X-CMS-MailID: 20230920081558epcas5p4d791ba4be2836264a6fb44e06e636d11
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230920081558epcas5p4d791ba4be2836264a6fb44e06e636d11
-References: <20230920080756.11919-1-nj.shetty@samsung.com>
-        <CGME20230920081558epcas5p4d791ba4be2836264a6fb44e06e636d11@epcas5p4.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230920080756.11919-13-nj.shetty@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Setting copy_offload_supported flag to enable offload.
+Hi Nitesh,
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
----
- drivers/md/dm-linear.c | 1 +
- 1 file changed, 1 insertion(+)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
-index f4448d520ee9..1d1ee30bbefb 100644
---- a/drivers/md/dm-linear.c
-+++ b/drivers/md/dm-linear.c
-@@ -62,6 +62,7 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 	ti->num_discard_bios = 1;
- 	ti->num_secure_erase_bios = 1;
- 	ti->num_write_zeroes_bios = 1;
-+	ti->copy_offload_supported = 1;
- 	ti->private = lc;
- 	return 0;
- 
+[auto build test WARNING on 7fc7222d9680366edeecc219c21ca96310bdbc10]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Introduce-queue-limits-and-sysfs-for-copy-offload-support/20230920-170132
+base:   7fc7222d9680366edeecc219c21ca96310bdbc10
+patch link:    https://lore.kernel.org/r/20230920080756.11919-13-nj.shetty%40samsung.com
+patch subject: [PATCH v16 12/12] null_blk: add support for copy offload
+config: parisc-allyesconfig (https://download.01.org/0day-ci/archive/20230920/202309201836.c2wRnper-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230920/202309201836.c2wRnper-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309201836.c2wRnper-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from include/trace/define_trace.h:102,
+                    from drivers/block/null_blk/trace.h:104,
+                    from drivers/block/null_blk/main.c:15:
+   drivers/block/null_blk/./trace.h: In function 'trace_raw_output_nullb_copy_op':
+>> drivers/block/null_blk/./trace.h:91:27: warning: format '%lu' expects argument of type 'long unsigned int', but argument 7 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
+      91 |                 TP_printk("%s req=%-15s: dst=%llu, src=%llu, len=%lu",
+         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/trace/trace_events.h:203:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     203 |         trace_event_printf(iter, print);                                \
+         |                                  ^~~~~
+   include/trace/trace_events.h:45:30: note: in expansion of macro 'PARAMS'
+      45 |                              PARAMS(print));                   \
+         |                              ^~~~~~
+   drivers/block/null_blk/./trace.h:73:1: note: in expansion of macro 'TRACE_EVENT'
+      73 | TRACE_EVENT(nullb_copy_op,
+         | ^~~~~~~~~~~
+   drivers/block/null_blk/./trace.h:91:17: note: in expansion of macro 'TP_printk'
+      91 |                 TP_printk("%s req=%-15s: dst=%llu, src=%llu, len=%lu",
+         |                 ^~~~~~~~~
+   In file included from include/trace/trace_events.h:237:
+   drivers/block/null_blk/./trace.h:91:68: note: format string is defined here
+      91 |                 TP_printk("%s req=%-15s: dst=%llu, src=%llu, len=%lu",
+         |                                                                  ~~^
+         |                                                                    |
+         |                                                                    long unsigned int
+         |                                                                  %u
+
+
+vim +91 drivers/block/null_blk/./trace.h
+
+    72	
+    73	TRACE_EVENT(nullb_copy_op,
+    74			TP_PROTO(struct request *req,
+    75				 sector_t dst, sector_t src, size_t len),
+    76			TP_ARGS(req, dst, src, len),
+    77			TP_STRUCT__entry(
+    78					 __array(char, disk, DISK_NAME_LEN)
+    79					 __field(enum req_op, op)
+    80					 __field(sector_t, dst)
+    81					 __field(sector_t, src)
+    82					 __field(size_t, len)
+    83			),
+    84			TP_fast_assign(
+    85				       __entry->op = req_op(req);
+    86				       __assign_disk_name(__entry->disk, req->q->disk);
+    87				       __entry->dst = dst;
+    88				       __entry->src = src;
+    89				       __entry->len = len;
+    90			),
+  > 91			TP_printk("%s req=%-15s: dst=%llu, src=%llu, len=%lu",
+    92				  __print_disk_name(__entry->disk),
+    93				  blk_op_str(__entry->op),
+    94				  __entry->dst, __entry->src, __entry->len)
+    95	);
+    96	#endif /* _TRACE_NULLB_H */
+    97	
+
 -- 
-2.35.1.500.gb896f729e2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
