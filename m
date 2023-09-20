@@ -2,121 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0574BC04AA9
-	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 15:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 272E2C04FF0
+	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 19:15:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235310AbjITPiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Sep 2023 11:38:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58240 "EHLO
+        id S229882AbjITTPU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Sep 2023 15:15:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235194AbjITPiT (ORCPT
+        with ESMTP id S229542AbjITTPT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Sep 2023 11:38:19 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F1D6A9
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 08:38:13 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c3bd829b86so52909145ad.0
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 08:38:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1695224292; x=1695829092; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KIlfnzN64vt0Db75ZI9wrazd3l6cBizkwl03TscBFBU=;
-        b=grIImtQWNBz4O3VZ8lBD2vfKB4PkQhfq/SxGc4hh3b9cS059J/+CIL/SfhGDckO18j
-         vUKBsiJHfHzbhNnjP5GedhmDEYVqVNdloYwGyBEAUxs1HCe5WXekkWk/adPF7kijc7TK
-         bN3/duva0WtrtsjRijft6xB4S44bSthUrbxco=
+        Wed, 20 Sep 2023 15:15:19 -0400
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 730D712F;
+        Wed, 20 Sep 2023 12:14:50 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1c3cbfa40d6so1094665ad.1;
+        Wed, 20 Sep 2023 12:14:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695224292; x=1695829092;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KIlfnzN64vt0Db75ZI9wrazd3l6cBizkwl03TscBFBU=;
-        b=Z6PAsgb8f1d7ePsPYVUNFRHlnfRG0Xo0EqDdDMzdYhDy2B37OEOmd1PR9m7LDBZjB1
-         kfIzeI4+Q66f34urt1uXLMjFEFu3D/ibkxqXZyQSzRrk38iIt6wYLX/UIt+Rwmjq6QbD
-         PyuLCR6dBgk40eMavt647GWTsNOKg6kHgf8LPvwmcCeszNmvJI9jvjw4f77UOt7OtWFM
-         cb497sYi80PedMTd2RBaA/ob5ux5LzIuTID11bXu5Azt4lwtT9iRfTmUV8UDj0Z5Dp7R
-         4Nd5t1LWdJkDn4cY8MA1RWs+tBfju6NSMVLp4SorpT5oZ0lxBLMfok2xIXpXmpRQXGfP
-         Ye/A==
-X-Gm-Message-State: AOJu0YweIOPyHyS+yLAfWo3YI8p/dZZI8iCGt0yG43pMNbSoSEROvTaB
-        ovckEXWy9qsUtA4j7kTM7CUFaQ==
-X-Google-Smtp-Source: AGHT+IE1DOyr9yY663BmjzKsqSYI/feK+DfQZwVOtqnpy/SKQBvmI6yXpFyHjBuRMaZeq4tzMyk7/A==
-X-Received: by 2002:a17:902:9344:b0:1bc:5924:2da2 with SMTP id g4-20020a170902934400b001bc59242da2mr2463874plp.56.1695224292381;
-        Wed, 20 Sep 2023 08:38:12 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id c10-20020a170902d48a00b001bc445e249asm8993425plg.124.2023.09.20.08.38.11
+        d=1e100.net; s=20230601; t=1695237289; x=1695842089;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=auLwmYcPwpCop/KyMdUsQVrE3j+wevfYzyjjkhpW8JQ=;
+        b=BwfKVMSNrjOHPISewDcE3JRWBljGUv/YwTjp0jwcc2pnMAoYy7HWVGUke0w4vHM072
+         qvKgWdjTQElOhDv9lZnQmOLQQF47HbdBDsbxfPYjROMDsThW+2MuX6s5lRWpHiwtdc/k
+         MP0FiMz/j4v/OYleFCfVrFaCPhYvGawKncCr9Z5rp41CST/i7OIYguHlyxx0z1D7t5VH
+         kMS4MgNoELr7PGkNpQs0l1vqNenhgZHaFDJG1wpWcEs7JzLUxDJAu0qsbZqt9UiT9ZfI
+         sk+vGp4hrhO3ifT8flH09/u/soTY4M3XuT94/fadNZzzgzJwrUIEEgmvgkS3JFlnQGib
+         6OrQ==
+X-Gm-Message-State: AOJu0Yx3JtnZFvg+Csm7K7ubt88X8gVWhNHctCBJe4rfbxud+zwdz2lQ
+        xD1BqmIVJo6nIf422CiFK0VGRGU33U4=
+X-Google-Smtp-Source: AGHT+IGUnEwHX2MXMmDcrFI/KFBT6yC74KxXDI1Qtbv29u3ZVQSECDj2jLkgvawjmi5HcU27+NXamQ==
+X-Received: by 2002:a17:90a:31c9:b0:26d:416a:b027 with SMTP id j9-20020a17090a31c900b0026d416ab027mr3487236pjf.31.1695237289429;
+        Wed, 20 Sep 2023 12:14:49 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:b0c6:e5b6:49ef:e0bd])
+        by smtp.gmail.com with ESMTPSA id a13-20020a17090a8c0d00b002633fa95ac2sm1656318pjo.13.2023.09.20.12.14.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 08:38:12 -0700 (PDT)
-Date:   Wed, 20 Sep 2023 08:38:11 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Justin Stitt <justinstitt@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH v3] null_blk: replace strncpy with strscpy
-Message-ID: <202309200837.FAE2C061FB@keescook>
-References: <20230919-strncpy-drivers-block-null_blk-main-c-v3-1-10cf0a87a2c3@google.com>
+        Wed, 20 Sep 2023 12:14:48 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 00/13] Pass data temperature information to zoned UFS devices
+Date:   Wed, 20 Sep 2023 12:14:25 -0700
+Message-ID: <20230920191442.3701673-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230919-strncpy-drivers-block-null_blk-main-c-v3-1-10cf0a87a2c3@google.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 19, 2023 at 05:30:35AM +0000, Justin Stitt wrote:
-> `strncpy` is deprecated for use on NUL-terminated destination strings [1].
-> 
-> We should favor a more robust and less ambiguous interface.
-> 
-> We expect that both `nullb->disk_name` and `disk->disk_name` be
-> NUL-terminated:
-> |     snprintf(nullb->disk_name, sizeof(nullb->disk_name),
-> |              "%s", config_item_name(&dev->group.cg_item));
-> ...
-> |       pr_info("disk %s created\n", nullb->disk_name);
-> 
-> It seems like NUL-padding may be required due to __assign_disk_name()
-> utilizing a memcpy as opposed to a `str*cpy` api.
-> | static inline void __assign_disk_name(char *name, struct gendisk *disk)
-> | {
-> | 	if (disk)
-> | 		memcpy(name, disk->disk_name, DISK_NAME_LEN);
-> | 	else
-> | 		memset(name, 0, DISK_NAME_LEN);
-> | }
-> 
-> Then we go and print it with `__print_disk_name` which wraps `nullb_trace_disk_name()`.
-> | #define __print_disk_name(name) nullb_trace_disk_name(p, name)
-> 
-> This function obviously expects a NUL-terminated string.
-> | const char *nullb_trace_disk_name(struct trace_seq *p, char *name)
-> | {
-> | 	const char *ret = trace_seq_buffer_ptr(p);
-> |
-> | 	if (name && *name)
-> | 		trace_seq_printf(p, "disk=%s, ", name);
-> | 	trace_seq_putc(p, 0);
-> |
-> | 	return ret;
-> | }
-> 
-> From the above, we need both 1) a NUL-terminated string and 2) a
-> NUL-padded string. So, let's use strscpy_pad() as per Kees' suggestion
-> from v1.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Nick Desaulniers <ndesaulniers@google.com>
-> Cc: Nathan Chancellor <nathan@kernel.org>
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
+Hi Jens,
 
-Thanks for the analysis in the commit log, and yeah, this looks right to
-me.
+Zoned UFS vendors need the data temperature information. Hence this patch
+series that restores write hint information in F2FS and in the block layer.
+The SCSI disk (sd) driver is modified such that it passes write hint
+information to SCSI devices via the GROUP NUMBER field.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Please consider this patch series for the next merge window.
 
--- 
-Kees Cook
+Thanks,
+
+Bart.
+
+Bart Van Assche (13):
+  fs/f2fs: Restore the whint_mode mount option
+  fs: Restore support for F_GET_FILE_RW_HINT and F_SET_FILE_RW_HINT
+  fs: Restore kiocb.ki_hint
+  block: Restore write hint support
+  scsi: core: Query the Block Limits Extension VPD page
+  scsi_proto: Add struct io_group_descriptor
+  sd: Translate data lifetime information
+  scsi_debug: Reduce code duplication
+  scsi_debug: Support the block limits extension VPD page
+  scsi_debug: Rework page code error handling
+  scsi_debug: Rework subpage code error handling
+  scsi_debug: Implement the IO Advice Hints Grouping mode page
+  scsi_debug: Maintain write statistics per group number
+
+ Documentation/filesystems/f2fs.rst |  70 ++++++++++
+ block/bio.c                        |   2 +
+ block/blk-crypto-fallback.c        |   1 +
+ block/blk-merge.c                  |  14 ++
+ block/blk-mq.c                     |   2 +
+ block/bounce.c                     |   1 +
+ block/fops.c                       |   3 +
+ drivers/scsi/scsi.c                |   2 +
+ drivers/scsi/scsi_debug.c          | 202 +++++++++++++++++++----------
+ drivers/scsi/scsi_sysfs.c          |  10 ++
+ drivers/scsi/sd.c                  |  78 ++++++++++-
+ drivers/scsi/sd.h                  |   2 +
+ fs/aio.c                           |   1 +
+ fs/buffer.c                        |  13 +-
+ fs/cachefiles/io.c                 |   2 +
+ fs/direct-io.c                     |   1 +
+ fs/f2fs/data.c                     |   2 +
+ fs/f2fs/f2fs.h                     |   9 ++
+ fs/f2fs/file.c                     |   6 +
+ fs/f2fs/segment.c                  |  95 ++++++++++++++
+ fs/f2fs/super.c                    |  32 ++++-
+ fs/fcntl.c                         |  18 +++
+ fs/iomap/buffered-io.c             |   2 +
+ fs/iomap/direct-io.c               |   1 +
+ fs/mpage.c                         |   1 +
+ fs/open.c                          |   1 +
+ include/linux/blk-mq.h             |   1 +
+ include/linux/blk_types.h          |   1 +
+ include/linux/fs.h                 |  21 +++
+ include/scsi/scsi_device.h         |   1 +
+ include/scsi/scsi_proto.h          |  40 ++++++
+ include/trace/events/f2fs.h        |   5 +-
+ io_uring/rw.c                      |   1 +
+ 33 files changed, 566 insertions(+), 75 deletions(-)
+
