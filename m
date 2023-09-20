@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C29C2FC0C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECAFCD37AB
 	for <linux-block@archiver.kernel.org>; Wed, 20 Sep 2023 22:24:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbjITWYc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Sep 2023 18:24:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57070 "EHLO
+        id S229720AbjITWYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Sep 2023 18:24:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbjITWYY (ORCPT
+        with ESMTP id S229652AbjITWYY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 20 Sep 2023 18:24:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A38C5130
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 15:23:06 -0700 (PDT)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2DBE125
+        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2023 15:23:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695248585;
+        s=mimecast20190719; t=1695248582;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=i+29vAFZrXF9naWng0ipN/2z31gEil+IMifE0VymLF4=;
-        b=NkgMamOPHl2HaSrINwGwCJGeMtleqXCiAyMicL3PJ9jEKdIQRJwYWxAyu7sYkyBtWBqnZ0
-        Xw+ugzrgYugzanHa/pYUezwU2ZzAHjeDZ2pR1qDXVMVneaOEXko1ZyCYGyVzr2iRD4HbN0
-        miCvybqKYCPZKVjrZzE3uu4DcDaiTZQ=
+        bh=QdaDFgQ/IdiUz+wPFCKvBKKks+ni1Kcs8Sp2gYxHcOI=;
+        b=JRiNz4IurgkaGdPhEAzMudSzsvStb9BTmmn5+SEmROte1USPyRBFPcpcU7CeP6BUaAXNn8
+        dqC+wvpLM0ZZb+u/vuRuh9Ii+dzHtwOJbHaIZDFwAp9tnprE0jocZ9TiC5EjwfsM5TCFS2
+        mhad9Z2bd9JhU1/3V1v383QVU3LJdqI=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-594-8JTl3Nq0NjWy4HtzvZJD0A-1; Wed, 20 Sep 2023 18:23:01 -0400
-X-MC-Unique: 8JTl3Nq0NjWy4HtzvZJD0A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-169-pcHmzeEEOaC540eqzQ0x5A-1; Wed, 20 Sep 2023 18:22:56 -0400
+X-MC-Unique: pcHmzeEEOaC540eqzQ0x5A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DABB028EC111;
-        Wed, 20 Sep 2023 22:23:00 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EEE4328EC113;
+        Wed, 20 Sep 2023 22:22:55 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CCB8EC15BB8;
-        Wed, 20 Sep 2023 22:22:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 55F5F2156A27;
+        Wed, 20 Sep 2023 22:22:54 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -50,24 +50,23 @@ Cc:     David Howells <dhowells@redhat.com>,
         Jeff Layton <jlayton@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v5 09/11] iov_iter, net: Fold in csum_and_memcpy()
-Date:   Wed, 20 Sep 2023 23:22:29 +0100
-Message-ID: <20230920222231.686275-10-dhowells@redhat.com>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v5 07/11] iov_iter: Add a kernel-type iterator-only iteration function
+Date:   Wed, 20 Sep 2023 23:22:27 +0100
+Message-ID: <20230920222231.686275-8-dhowells@redhat.com>
 In-Reply-To: <20230920222231.686275-1-dhowells@redhat.com>
 References: <20230920222231.686275-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fold csum_and_memcpy() in to its callers.
+Add an iteration function that can only iterate over kernel internal-type
+iterators (ie. BVEC, KVEC, XARRAY) and not user-backed iterators (ie. UBUF
+and IOVEC).  This allows for smaller iterators to be built when it is known
+the caller won't have a user-backed iterator.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Alexander Viro <viro@zeniv.linux.org.uk>
@@ -77,66 +76,51 @@ cc: Christian Brauner <christian@brauner.io>
 cc: Matthew Wilcox <willy@infradead.org>
 cc: Linus Torvalds <torvalds@linux-foundation.org>
 cc: David Laight <David.Laight@ACULAB.COM>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
-cc: netdev@vger.kernel.org
 ---
- include/linux/skbuff.h | 7 -------
- net/core/datagram.c    | 3 ++-
- net/core/skbuff.c      | 3 ++-
- 3 files changed, 4 insertions(+), 9 deletions(-)
+ include/linux/iov_iter.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index d0656cc11c16..c81ef5d76953 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3679,13 +3679,6 @@ static inline int __must_check skb_put_padto(struct sk_buff *skb, unsigned int l
- 	return __skb_put_padto(skb, len, true);
+diff --git a/include/linux/iov_iter.h b/include/linux/iov_iter.h
+index 270454a6703d..a94d605d7386 100644
+--- a/include/linux/iov_iter.h
++++ b/include/linux/iov_iter.h
+@@ -271,4 +271,35 @@ size_t iterate_and_advance(struct iov_iter *iter, size_t len, void *priv,
+ 	return iterate_and_advance2(iter, len, priv, NULL, ustep, step);
  }
  
--static inline __wsum csum_and_memcpy(void *to, const void *from, size_t len,
--				     __wsum sum, size_t off)
--{
--	__wsum next = csum_partial_copy_nocheck(from, to, len);
--	return csum_block_add(sum, next, off);
--}
--
- struct csum_state {
- 	__wsum csum;
- 	size_t off;
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 37c89d0933b7..452620dd41e4 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -732,8 +732,9 @@ size_t memcpy_to_iter_csum(void *iter_to, size_t progress,
- 			   size_t len, void *from, void *priv2)
- {
- 	__wsum *csum = priv2;
-+	__wsum next = csum_partial_copy_nocheck(from, iter_to, len);
- 
--	*csum = csum_and_memcpy(iter_to, from + progress, len, *csum, progress);
-+	*csum = csum_block_add(*csum, next, progress);
- 	return 0;
- }
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 5dbdfce2d05f..3efed86321db 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6938,8 +6938,9 @@ size_t memcpy_from_iter_csum(void *iter_from, size_t progress,
- 			     size_t len, void *to, void *priv2)
- {
- 	__wsum *csum = priv2;
-+	__wsum next = csum_partial_copy_nocheck(iter_from, to + progress, len);
- 
--	*csum = csum_and_memcpy(to + progress, iter_from, len, *csum, progress);
-+	*csum = csum_block_add(*csum, next, progress);
- 	return 0;
- }
- 
++/**
++ * iterate_and_advance_kernel - Iterate over a kernel iterator
++ * @iter: The iterator to iterate over.
++ * @len: The amount to iterate over.
++ * @priv: Data for the step functions.
++ * @step: Processing function; given kernel addresses.
++ *
++ * Like iterate_and_advance2(), but rejected UBUF and IOVEC iterators and does
++ * not take a user-step function.
++ */
++static __always_inline
++size_t iterate_and_advance_kernel(struct iov_iter *iter, size_t len, void *priv,
++				  void *priv2, iov_step_f step)
++{
++	if (unlikely(iter->count < len))
++		len = iter->count;
++	if (unlikely(!len))
++		return 0;
++
++	if (iov_iter_is_bvec(iter))
++		return iterate_bvec(iter, len, priv, priv2, step);
++	if (iov_iter_is_kvec(iter))
++		return iterate_kvec(iter, len, priv, priv2, step);
++	if (iov_iter_is_xarray(iter))
++		return iterate_xarray(iter, len, priv, priv2, step);
++	if (iov_iter_is_discard(iter))
++		return iterate_discard(iter, len, priv, priv2, step);
++	WARN_ON_ONCE(1);
++	return 0;
++}
++
+ #endif /* _LINUX_IOV_ITER_H */
 
