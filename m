@@ -2,83 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E395BE7D0A2
-	for <linux-block@archiver.kernel.org>; Thu, 21 Sep 2023 20:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 115DEE7D0A6
+	for <linux-block@archiver.kernel.org>; Thu, 21 Sep 2023 20:23:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230480AbjIUUW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Sep 2023 16:22:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
+        id S231791AbjIUUXG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Sep 2023 16:23:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231686AbjIUUWB (ORCPT
+        with ESMTP id S231654AbjIUUWn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:22:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B345491A
-        for <linux-block@vger.kernel.org>; Thu, 21 Sep 2023 10:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695316629;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oo4GNctLz8Shf19nIoryBMjQyKRYmeTybgYDXDbksM4=;
-        b=PwCzORY5We0QtRqIy4eR7RIK030z5MfL9ut7Zzu29SNKsKTBsXrDSKHu1w2NQxZODKM7/h
-        fHVE5yju/otgp5UT8gSvchbSgp0e0jst5lmCIDGkLz7RU+COQ2QIHxHSEDrj6CA/umsFNC
-        5XHPq7XhmhhX4eBsaob+r8T+zv64M/w=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-679-hp6VtaakNtupnp-MguiVZA-1; Thu, 21 Sep 2023 11:03:47 -0400
-X-MC-Unique: hp6VtaakNtupnp-MguiVZA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A7FF71C01EA3;
-        Thu, 21 Sep 2023 15:03:37 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A56CC40C200E;
-        Thu, 21 Sep 2023 15:03:29 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <87o7hvzn12.wl-tiwai@suse.de>
-References: <87o7hvzn12.wl-tiwai@suse.de> <20230920222231.686275-1-dhowells@redhat.com> <20230920222231.686275-2-dhowells@redhat.com>
-To:     Takashi Iwai <tiwai@suse.de>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>,
-        David Laight <David.Laight@ACULAB.COM>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Oswald Buddenhagen <oswald.buddenhagen@gmx.de>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
-        alsa-devel@alsa-project.org
-Subject: Re: [PATCH v5 01/11] sound: Fix snd_pcm_readv()/writev() to use iov access functions
+        Thu, 21 Sep 2023 16:22:43 -0400
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D29674B70A;
+        Thu, 21 Sep 2023 10:24:52 -0700 (PDT)
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3aa14ed0e7eso652882b6e.1;
+        Thu, 21 Sep 2023 10:24:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695317091; x=1695921891;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rshe0jW7UhxhoxHzQRdwHHly+hnX6L1+KyeP6WuSdms=;
+        b=Z+IW+nx4wDQcTjHdy9q4ktNMuEQQ7Qr2EFvRMUsGU7VGjjsjwTACQB+QNOLqITHa5w
+         hqspMx5KpRPSDGcgsJ13heS/ch/kJItAJVOfy5HrDzNwyQMmIgSpP/MJpUd+FHEsa1Ut
+         9BFsxjsgk45bIWWeQhP27RNsZbQt7yRVK8nUxi5AMEA+KkrH+65umSKgWpimdRuj+UB+
+         VHA0SsFtQxsOzkaszJVEir8rSGUgqLweuHsc/6rCn28F3gapaOrhxvQLfOK0RzmuS44H
+         8yDb0nkYUToJaLoI2ofxe8Zn0OE2gyduehAlnIoMHKvV9qCUCTGTHp4OlmCXrvJbkxiz
+         4wSg==
+X-Gm-Message-State: AOJu0YzOFewXulSn5NUOBRJGvHPPbhKVEHoSMbSIsrBjExl5cVZzWcZ5
+        bQzDQ4V63QhThDTI120N35YOWDY9Mc8=
+X-Google-Smtp-Source: AGHT+IEckYqWZk5F9LFw20ucVdeJ8Lr3aC+IsVyPzXDqHASE0LSTBOEzKe0qNxhV6kLLw7xkoMLFug==
+X-Received: by 2002:a05:6a20:3c8a:b0:158:143d:e215 with SMTP id b10-20020a056a203c8a00b00158143de215mr12630984pzj.1.1695306430192;
+        Thu, 21 Sep 2023 07:27:10 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:6903:9a1f:51f3:593e? ([2620:15c:211:201:6903:9a1f:51f3:593e])
+        by smtp.gmail.com with ESMTPSA id y7-20020a637d07000000b0054fa8539681sm1362140pgc.34.2023.09.21.07.27.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Sep 2023 07:27:09 -0700 (PDT)
+Message-ID: <8781636a-57ac-4dbd-8ec6-b49c10c81345@acm.org>
+Date:   Thu, 21 Sep 2023 07:27:08 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <809185.1695308608.1@warthog.procyon.org.uk>
-Date:   Thu, 21 Sep 2023 16:03:28 +0100
-Message-ID: <809186.1695308608@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/13] Pass data temperature information to zoned UFS
+ devices
+Content-Language: en-US
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20230920191442.3701673-1-bvanassche@acm.org>
+ <ZQtHwsNvS1wYDKfG@casper.infradead.org>
+ <1522d8ec-6b15-45d5-b6d9-517337e2c8cf@acm.org> <ZQv07Mg7qIXayHlf@x1-carbon>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ZQv07Mg7qIXayHlf@x1-carbon>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Takashi Iwai <tiwai@suse.de> wrote:
+On 9/21/23 00:46, Niklas Cassel wrote:
+> Considering that this API (F_GET_FILE_RW_HINT / F_SET_FILE_RW_HINT) 
+> was previously only used by NVMe (NVMe streams).
 
-> Would you apply it through your tree, or shall I apply this one via
-> sound git tree?
+That doesn't sound correct to me. I think support for this API was added
+in F2FS in November 2017 (commit 4f0a03d34dd4 ("f2fs: apply write hints
+to select the type of segments for buffered write")). That was a few
+months after NVMe stream support was added (June 2017) by commit
+f5d118406247 ("nvme: add support for streams and directives").
 
-It's a prerequisite for a later patch in this series, so I'd prefer to keep it
-with my other patches.
+> Should NVMe streams be brought back? Yes? No?
 
-David
+ From commit 561593a048d7 ("Merge tag 'for-5.18/write-streams-2022-03-18'
+of git://git.kernel.dk/linux-block"): "This removes the write streams
+support in NVMe. No vendor ever really shipped working support for this,
+and they are not interested in supporting it."
 
+I do not want to reopen the discussion about NVMe streams.
+
+Thanks,
+
+Bart.
