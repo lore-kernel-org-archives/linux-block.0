@@ -2,83 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCBFE7D0A6
-	for <linux-block@archiver.kernel.org>; Thu, 21 Sep 2023 19:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E395BE7D0A2
+	for <linux-block@archiver.kernel.org>; Thu, 21 Sep 2023 20:22:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230518AbjIUTxI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Sep 2023 15:53:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41342 "EHLO
+        id S230480AbjIUUW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Sep 2023 16:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231176AbjIUTw4 (ORCPT
+        with ESMTP id S231686AbjIUUWB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2023 15:52:56 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0707A3B191;
-        Thu, 21 Sep 2023 12:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=n6Owd0b29R3F+oLZERwwfQvWcqOKx+MYNJ1GGP2+h9U=; b=qaiShqcW//4ZUh/Q19Qnfc5j5v
-        0yqGTwlooSpRgQu9pHhXVLmbYoYnEmLoizakwQV7WHA2S1eUkpsY8ih6mV8FWy9PH4bZQ/fa2N+ol
-        pUZxeNtw8h9nLG6H17ePerko06JIjLHBdziKF1BPjZ1fu+LU95Hb2aMzclZYl4hMFE4+XPTpsd8RC
-        meDsKcYQLnqAPvjGgD9P2OIKOGD0WJWGnOByCmOs3pa/t5lR/dhIrMmFVHzJBhWZ1WVsCo2mERdoV
-        GUckSpfYv0RF2f+0IH0FFoeryAEVipth+IfKKE1f0gjXH1yVxPa43KHdvHwX0jZCvIctnVmbITp6F
-        qjttXlrQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qjPcf-00Dm0V-Ny; Thu, 21 Sep 2023 19:46:01 +0000
-Date:   Thu, 21 Sep 2023 20:46:01 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 00/13] Pass data temperature information to zoned UFS
- devices
-Message-ID: <ZQydeSIoHHJDQjHW@casper.infradead.org>
-References: <20230920191442.3701673-1-bvanassche@acm.org>
- <ZQtHwsNvS1wYDKfG@casper.infradead.org>
- <1522d8ec-6b15-45d5-b6d9-517337e2c8cf@acm.org>
- <ZQv07Mg7qIXayHlf@x1-carbon>
- <8781636a-57ac-4dbd-8ec6-b49c10c81345@acm.org>
- <ZQyZEqXJymyFWlKV@casper.infradead.org>
- <4cacae64-6a11-41ab-9bec-f8915da00106@acm.org>
+        Thu, 21 Sep 2023 16:22:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B345491A
+        for <linux-block@vger.kernel.org>; Thu, 21 Sep 2023 10:17:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695316629;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oo4GNctLz8Shf19nIoryBMjQyKRYmeTybgYDXDbksM4=;
+        b=PwCzORY5We0QtRqIy4eR7RIK030z5MfL9ut7Zzu29SNKsKTBsXrDSKHu1w2NQxZODKM7/h
+        fHVE5yju/otgp5UT8gSvchbSgp0e0jst5lmCIDGkLz7RU+COQ2QIHxHSEDrj6CA/umsFNC
+        5XHPq7XhmhhX4eBsaob+r8T+zv64M/w=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-679-hp6VtaakNtupnp-MguiVZA-1; Thu, 21 Sep 2023 11:03:47 -0400
+X-MC-Unique: hp6VtaakNtupnp-MguiVZA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A7FF71C01EA3;
+        Thu, 21 Sep 2023 15:03:37 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A56CC40C200E;
+        Thu, 21 Sep 2023 15:03:29 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <87o7hvzn12.wl-tiwai@suse.de>
+References: <87o7hvzn12.wl-tiwai@suse.de> <20230920222231.686275-1-dhowells@redhat.com> <20230920222231.686275-2-dhowells@redhat.com>
+To:     Takashi Iwai <tiwai@suse.de>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        David Laight <David.Laight@ACULAB.COM>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Oswald Buddenhagen <oswald.buddenhagen@gmx.de>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH v5 01/11] sound: Fix snd_pcm_readv()/writev() to use iov access functions
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4cacae64-6a11-41ab-9bec-f8915da00106@acm.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <809185.1695308608.1@warthog.procyon.org.uk>
+Date:   Thu, 21 Sep 2023 16:03:28 +0100
+Message-ID: <809186.1695308608@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 12:39:00PM -0700, Bart Van Assche wrote:
-> On 9/21/23 12:27, Matthew Wilcox wrote:
-> > On Thu, Sep 21, 2023 at 07:27:08AM -0700, Bart Van Assche wrote:
-> > > On 9/21/23 00:46, Niklas Cassel wrote:
-> > > > Should NVMe streams be brought back? Yes? No?
-> > > 
-> > > From commit 561593a048d7 ("Merge tag 'for-5.18/write-streams-2022-03-18'
-> > > of git://git.kernel.dk/linux-block"): "This removes the write streams
-> > > support in NVMe. No vendor ever really shipped working support for this,
-> > > and they are not interested in supporting it."
-> > 
-> > It sounds like UFS is at the same stage that NVMe got to -- standard
-> > exists, no vendor has committed to actually shipping it.  Isn't bringing
-> > it back a little premature?
-> 
-> Hi Matthew,
-> 
-> That's a misunderstanding. UFS vendors support interpreting the SCSI GROUP
-> NUMBER as a data temperature since many years, probably since more than ten
-> years. Additionally, for multiple UFS vendors having the data temperature
-> available is important for achieving good performance. This message shows
-> how UFS vendors were using that information before write hint support was
-> removed: https://lore.kernel.org/linux-block/PH0PR08MB7889642784B2E1FC1799A828DB0B9@PH0PR08MB7889.namprd08.prod.outlook.com/
+Takashi Iwai <tiwai@suse.de> wrote:
 
-If vendor support already exists, then why did you dodge the question
-asking for quantified data that I asked earlier?  And can we have that
-data now?
+> Would you apply it through your tree, or shall I apply this one via
+> sound git tree?
+
+It's a prerequisite for a later patch in this series, so I'd prefer to keep it
+with my other patches.
+
+David
+
