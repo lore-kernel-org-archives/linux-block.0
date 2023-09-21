@@ -2,75 +2,130 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4C0E7D0A2
-	for <linux-block@archiver.kernel.org>; Thu, 21 Sep 2023 17:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72349E7D0A7
+	for <linux-block@archiver.kernel.org>; Thu, 21 Sep 2023 18:12:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230033AbjIUR0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Sep 2023 13:26:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45444 "EHLO
+        id S229980AbjIUSMh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Sep 2023 14:12:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbjIUR0j (ORCPT
+        with ESMTP id S229615AbjIUSMQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2023 13:26:39 -0400
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AADCA2D69;
-        Thu, 21 Sep 2023 10:02:42 -0700 (PDT)
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3a9b41ffe12so721443b6e.3;
-        Thu, 21 Sep 2023 10:02:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695315643; x=1695920443;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+myxey5KkFamPLG+BXl8bpHSYiVN4ySSOSWXnhTIWBM=;
-        b=lPAsCm5pDGAjc0MKLMT5rXPtBCpaj3iWxUsuja3hf7WnyaqDXsIBdIZtS6p4lJcP34
-         v17x/G+qwSgzK/9jlpvhoPpc9hXtuFlbMEBmK6RQ6Y1vlVNWo9B5MtEu09fGUJjV2nMt
-         lB5ngN7QkK1EbNfFs+Nm6Hw4AiMQPIMur4GGxB7FOKQCiQ7H6JO0evgKH3nWbWwMgeUm
-         dKuiCuYlLjImTAxqOrNy+g3zQXfNH0eXO5kxD9odGC+dssWQVm9QDu6kvklZzHphtt08
-         Cy2gJpUzlMKmdbP2mVx0x8A0hUjOiNKgg7CA0AF2Et0hWFRXgiCAQZS5fH1rEf71U4Iq
-         Uhzg==
-X-Gm-Message-State: AOJu0YyAgtlPdUvPFOA94XrwGeneefDyYDWZn+Xw1ucBy2VPM8RJ9LTW
-        MMMFkWOd1P0WWitzGXMersU=
-X-Google-Smtp-Source: AGHT+IHkCW88em4+s4HanHcm2/nYfuEsdBtW/TqjDkgg3Ju0IBXefT2+akGRuQadD4OJtCmXfBOe8w==
-X-Received: by 2002:a05:6808:191c:b0:3a4:f9b:b42e with SMTP id bf28-20020a056808191c00b003a40f9bb42emr7058259oib.26.1695315642918;
-        Thu, 21 Sep 2023 10:00:42 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:6903:9a1f:51f3:593e? ([2620:15c:211:201:6903:9a1f:51f3:593e])
-        by smtp.gmail.com with ESMTPSA id i10-20020a63bf4a000000b005646e6634dcsm1389910pgo.83.2023.09.21.10.00.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 10:00:41 -0700 (PDT)
-Message-ID: <9975f36c-cacd-4922-9d27-a7ff726793a3@acm.org>
-Date:   Thu, 21 Sep 2023 10:00:40 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/13] Pass data temperature information to zoned UFS
- devices
-Content-Language: en-US
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20230920191442.3701673-1-bvanassche@acm.org>
- <ZQtHwsNvS1wYDKfG@casper.infradead.org>
- <1522d8ec-6b15-45d5-b6d9-517337e2c8cf@acm.org> <ZQv07Mg7qIXayHlf@x1-carbon>
- <8781636a-57ac-4dbd-8ec6-b49c10c81345@acm.org> <ZQxiklow/4m4kvYu@x1-carbon>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ZQxiklow/4m4kvYu@x1-carbon>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Thu, 21 Sep 2023 14:12:16 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FCFA645BE;
+        Thu, 21 Sep 2023 10:32:11 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1C1591FE17;
+        Thu, 21 Sep 2023 13:14:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1695302058; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hr4dJrGCAHGoorv5nC8n0VYn5plN0T8DDF/tRgAs9xw=;
+        b=yQ9zS8MLtbBzIv4XI+Fx8UAy9OA58BxnvA0q2n1vhQLjUSsNzM4w4MdLAlqHixUwTRUdoz
+        XubkwoYkWO2vMUvbTapSgZvfIRIZERoGsyfrIx8lbCcnL4Q5xOqDi0chiiy+ZoYKd3EIit
+        dDKtvAuqYXOAhz9Frc0BAj0JX4LPLQU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1695302058;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hr4dJrGCAHGoorv5nC8n0VYn5plN0T8DDF/tRgAs9xw=;
+        b=956IPJl5aJAhxsQTTbR4rPzctFBiEm6NaXj8nUVK+t2LBvTby0r5Safd7j/+V6jKUnW38T
+        CX4LhyiTf45bK1Bw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A5F23134B0;
+        Thu, 21 Sep 2023 13:14:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id o5KBJ6lBDGVtMQAAMHmgww
+        (envelope-from <tiwai@suse.de>); Thu, 21 Sep 2023 13:14:17 +0000
+Date:   Thu, 21 Sep 2023 15:14:17 +0200
+Message-ID: <87o7hvzn12.wl-tiwai@suse.de>
+From:   Takashi Iwai <tiwai@suse.de>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        David Laight <David.Laight@ACULAB.COM>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Oswald Buddenhagen <oswald.buddenhagen@gmx.de>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH v5 01/11] sound: Fix snd_pcm_readv()/writev() to use iov access functions
+In-Reply-To: <20230920222231.686275-2-dhowells@redhat.com>
+References: <20230920222231.686275-1-dhowells@redhat.com>
+        <20230920222231.686275-2-dhowells@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/21/23 08:34, Niklas Cassel wrote:
-> Right now your cover letter is 4 lines :)
-> I don't recall when I last saw such a small cover letter for a feature
-> impacting so many different parts of the kernel.
+On Thu, 21 Sep 2023 00:22:21 +0200,
+David Howells wrote:
+> 
+> Fix snd_pcm_readv()/writev() to use iov access functions rather than poking
+> at the iov_iter internals directly.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Jaroslav Kysela <perex@perex.cz>
+> cc: Takashi Iwai <tiwai@suse.com>
+> cc: Oswald Buddenhagen <oswald.buddenhagen@gmx.de>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Suren Baghdasaryan <surenb@google.com>
+> cc: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+> cc: alsa-devel@alsa-project.org
 
-I will expand the cover letter if I have to repost this patch series.
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
 
-Thanks,
+Would you apply it through your tree, or shall I apply this one via
+sound git tree?
 
-Bart.
+
+thanks,
+
+Takashi
+
+> ---
+>  sound/core/pcm_native.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/sound/core/pcm_native.c b/sound/core/pcm_native.c
+> index bd9ddf412b46..9a69236fa207 100644
+> --- a/sound/core/pcm_native.c
+> +++ b/sound/core/pcm_native.c
+> @@ -3527,7 +3527,7 @@ static ssize_t snd_pcm_readv(struct kiocb *iocb, struct iov_iter *to)
+>  	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
+>  	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
+>  		return -EBADFD;
+> -	if (!to->user_backed)
+> +	if (!user_backed_iter(to))
+>  		return -EINVAL;
+>  	if (to->nr_segs > 1024 || to->nr_segs != runtime->channels)
+>  		return -EINVAL;
+> @@ -3567,7 +3567,7 @@ static ssize_t snd_pcm_writev(struct kiocb *iocb, struct iov_iter *from)
+>  	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
+>  	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
+>  		return -EBADFD;
+> -	if (!from->user_backed)
+> +	if (!user_backed_iter(from))
+>  		return -EINVAL;
+>  	if (from->nr_segs > 128 || from->nr_segs != runtime->channels ||
+>  	    !frame_aligned(runtime, iov->iov_len))
+> 
