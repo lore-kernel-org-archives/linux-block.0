@@ -2,205 +2,285 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49129E6FE25
-	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 13:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D85E6FE3C
+	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 14:29:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231894AbjIVNIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Sep 2023 09:08:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52548 "EHLO
+        id S229923AbjIVO3U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Sep 2023 10:29:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233133AbjIVNI2 (ORCPT
+        with ESMTP id S230132AbjIVO3R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2023 09:08:28 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53B48180
-        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 06:08:20 -0700 (PDT)
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230922130818epoutp013ea2ba008045ecceca767bd0c23c777e~HOn44iEVV1863518635epoutp010
-        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 13:08:18 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230922130818epoutp013ea2ba008045ecceca767bd0c23c777e~HOn44iEVV1863518635epoutp010
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1695388098;
-        bh=EW6qBVeJ9IHrRbrFtaqMksl/J70ZrQ6wvJiYL6lk6PU=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=U7H85Mxo/bMNejk0SxSIhqgQxztq8nJ4mcuPi8VJRnCra5loR51bWYfokaUuMIPBF
-         6TV8fhgoP5FRuvwMa7hSjrMJgWrfWlkWxQc1qu8Sckx/Y5wGBUZzxUc5Wlbo9ceisu
-         vGkKEhQbGpA5Jcc5DCm1dKuYjiSOw9kjzhvNVosw=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
-        20230922130816epcas2p33d271a48d44365bb0a9300ff2edff03a~HOn3V3NrS2769427694epcas2p33;
-        Fri, 22 Sep 2023 13:08:16 +0000 (GMT)
-Received: from epsmges2p1.samsung.com (unknown [182.195.36.102]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4RsXdD20k3z4x9Pv; Fri, 22 Sep
-        2023 13:08:16 +0000 (GMT)
-X-AuditID: b6c32a45-84fff700000025dd-6f-650d91c036dc
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        87.06.09693.0C19D056; Fri, 22 Sep 2023 22:08:16 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE: [PATCH v16 04/12] block: add emulation for copy
-Reply-To: j-young.choi@samsung.com
-Sender: Jinyoung Choi <j-young.choi@samsung.com>
-From:   Jinyoung Choi <j-young.choi@samsung.com>
-To:     Nitesh Jagadeesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-CC:     "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "nitheshshetty@gmail.com" <nitheshshetty@gmail.com>,
-        "anuj1072538@gmail.com" <anuj1072538@gmail.com>,
-        SSDR Gost Dev <gost.dev@samsung.com>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        Vincent Kang Fu <vincent.fu@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20230920080756.11919-5-nj.shetty@samsung.com>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20230922130815epcms2p631fc5fc5ebe634cc948fef1992f83a38@epcms2p6>
-Date:   Fri, 22 Sep 2023 22:08:15 +0900
-X-CMS-MailID: 20230922130815epcms2p631fc5fc5ebe634cc948fef1992f83a38
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA22Tf1DTZRzHe/b9sg1q3NcJ+DTO4oYZPwI2gu2RoCOk+OaPg4o778hz7dg3
-        4Bjb2nezMlwoCogHgZzlTQlHHMQwYfzcJDgaIJgSJUFBinlscDYRhEATsGCD7I/+ez3ve38+
-        7+fzee5hY9x8Fo+dodBQaoVUzmd64K3dgeKQrlIOJbDMeaD67y9j6P7CEo6OlqxgqO7mZ0zk
-        6J4DyNaVD9AdayDquHfWDY12WRiotq6XgU5ZRwCyD+sZqGMsGBnyqnD0bccVHA1dOsdEFdV2
-        Fjr5i5mJavoeM9CvJXaAzLYjALUuVWDoomMGR/1jvmjiZAFAgyt9brE80qK/ySIHx004OTSg
-        JRuNJ5hkU9WnZPtoDpP8qrjMjSzKvcck79vHcHKmc5hJFjcbATnf+BzZaJtmJHFSMqPTKamM
-        UvtRilSlLEORFsPf/Y5kpyRSJBCGCHcgMd9PIc2iYvjxe5JC3siQry6C73dQKteuSklSmuaH
-        vRqtVmo1lF+6ktbE8CmVTK4Sq0JpaRatVaSFKihNlFAgCI9cNb6XmV7eY2OpmkUf2a0NIAc8
-        iCgE7mxIRMCf7prcCoEHm0uYAXQMzmOFgM3mEJvginnzmmczEQ2banvc1phL8OEPF/TApQvg
-        sd/y8DVmEqHQPNXOWuvjRVzFoPnv22DtgBF9bnB4cYjhSuPAM/l23MW+sK2mxdnJnXgFnrPm
-        rusB8GF1EeZibzhaN83a4JnLFcDFXvD4+MC6ZxP8/a/2df1ZaLUuMNcGgIQSNnS95ZKzYd6j
-        mXV7GBwpMDmjOMReeKFc79Rx4gVY8WP/+hXiYW1xuTMWI4JhtcHh3AlGBML6S2Gu7v6wZwx3
-        OTxhQfcKa2PAHNPS/7L5SxvDVbodVh4NLwH++id71v8nSv8k6jzAjMCHUtFZaRQdrhL++7Sp
-        yqxG4PwRQa+bQdn0bKgVMNjACiAb43txUuc8KC5HJv34EKVWStRaOUVbQeTqkKUYzztVufql
-        FBqJMGKHIEIkEorDIwVi/hbO+PFyGZdIk2qoTIpSUeqNOgbbnZfDGKjZL3zgOzsg+eDluMRR
-        +/B3vTfaSggldq1Sx/MPSBYFjyQvBeg0p7bGGujOd5sPXDny/OyuFI/9px/deSYv8VbGiabg
-        ea8Ex9lrukrjVSzp/aBJoHiJ3rLk2Ne7V5J9aGqiNda0LOuPuNjSGGj0DH1x67G66+Yzp+0Z
-        1IER2i/5oOdCFGpfvLXt8+HdH4rL34yfsSXM9AVl1SjTE0UPHy+PGhKSUt11nO2W27zzdKf2
-        6z99TAOTOoO38nBx8cTPi0+buK8Vtdzt5Rs+EW+Li6rKTYl8Kns5bjE86I+CXJ/rmgaeMtry
-        dnSrJSZGXrlvak+boH7yxi6j7psyefbhUuMXOB+n06XCIExNS/8BGm04MpoEAAA=
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230920081458epcas5p3a3e12d8b5661b5d6f4420316630b02e1
-References: <20230920080756.11919-5-nj.shetty@samsung.com>
-        <20230920080756.11919-1-nj.shetty@samsung.com>
-        <CGME20230920081458epcas5p3a3e12d8b5661b5d6f4420316630b02e1@epcms2p6>
+        Fri, 22 Sep 2023 10:29:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DB10100
+        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 07:28:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695392907;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=IzjFuc+Ps+XMfA++aToWsKP6POSQuCfjxQ0wjUUzyYM=;
+        b=R7QQxOlyuZ+zr0X7RuycaO0vxZ8YxzZqM9fy5Zvvw3avttQ/vKRFkv/d+Htu4d/3tpG5+P
+        X4NjaSv0mOq+3uVFQXC4y6wcvkQuMcM4sPLPkvjMavtCyso/SxlykA6er9yShlE72YSDfj
+        mMXZJDJ8hHrfA32K5n1mneMFwqdfmCw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-604-SYeH_5UKORec_SZd2zyi2g-1; Fri, 22 Sep 2023 10:28:24 -0400
+X-MC-Unique: SYeH_5UKORec_SZd2zyi2g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D89D68039C1;
+        Fri, 22 Sep 2023 14:28:23 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0AB9240C2064;
+        Fri, 22 Sep 2023 14:28:22 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Gabriel Krisman Bertazi <krisman@suse.de>
+Subject: [PATCH V2] io_uring: cancelable uring_cmd
+Date:   Fri, 22 Sep 2023 22:28:16 +0800
+Message-ID: <20230922142816.2784777-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +static void blkdev_copy_emulation_work(struct work_struct *work)
-> +=7B
-> +=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20struct=20blkdev_copy_emulation_io=20=
-*emulation_io=20=3D=20container_of(work,=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20struct=20blkdev_copy_emulation_io,=20emulation_work);=0D=0A>=20+=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20struct=20blkdev_copy_io=20*cio=20=3D=20=
-emulation_io->cio;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20struct=20b=
-io=20*read_bio,=20*write_bio;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20loff_t=20pos_in=20=3D=20emulation_io->pos_in,=20pos_out=20=3D=20emulatio=
-n_io->pos_out;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20ssize_t=20rem,=
-=20chunk;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20int=20ret=20=3D=200=
-;=0D=0A>=20+=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20for=20(rem=20=3D=
-=20emulation_io->len;=20rem=20>=200;=20rem=20-=3D=20chunk)=20=7B=0D=0A>=20+=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20chu=
-nk=20=3D=20min_t(int,=20emulation_io->buf_len,=20rem);=0D=0A>=20+=0D=0A>=20=
-+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20re=
-ad_bio=20=3D=20bio_map_buf(emulation_io->buf,=0D=0A>=20+=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0emulation_io->buf_len,=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0emulat=
-ion_io->gfp);=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20if=20(IS_ERR(read_bio))=20=7B=0D=0A>=20+=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20ret=20=3D=20PTR_ERR(read_bio);=0D=0A>=20+=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20break;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=7D=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20read_bio->bi_opf=20=3D=20RE=
-Q_OP_READ=20=7C=20REQ_SYNC;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20bio_set_dev(read_bio,=20emulation_io->b=
-dev_in);=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20read_bio->bi_iter.bi_sector=20=3D=20pos_in=20>>=20SECTOR_=
-SHIFT;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20read_bio->bi_iter.bi_size=20=3D=20chunk;=0D=0A>=20+=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20ret=20=3D=20=
-submit_bio_wait(read_bio);=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20kfree(read_bio);=0D=0A=0D=0AHi,=20Nites=
-h,=0D=0A=0D=0Ablk_mq_map_bio_put(read_bio)?=0D=0Aor=20bio_uninit(read_bio);=
-=20kfree(read_bio)?=0D=0A=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20if=20(ret)=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20break;=0D=0A>=20+=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20write_bio=20=3D=20bio_map_buf(emulat=
-ion_io->buf,=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20emulation_io->buf_len=
-,=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20emulation_io->gfp);=0D=0A>=20+=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20if=20(=
-IS_ERR(write_bio))=20=7B=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20ret=20=
-=3D=20PTR_ERR(write_bio);=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20break;=
-=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=7D=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20write_bio->bi_opf=20=3D=20REQ_OP_WRITE=20=7C=20REQ_SYN=
-C;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20bio_set_dev(write_bio,=20emulation_io->bdev_out);=0D=0A>=20+=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20write_=
-bio->bi_iter.bi_sector=20=3D=20pos_out=20>>=20SECTOR_SHIFT;=0D=0A>=20+=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20write_=
-bio->bi_iter.bi_size=20=3D=20chunk;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20ret=20=3D=20submit_bio_wait(wr=
-ite_bio);=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20kfree(write_bio);=0D=0A=0D=0Ablk_mq_map_bio_put(write_bio=
-)=20?=0D=0Aor=20bio_uninit(write_bio);=20kfree(write_bio)?=0D=0A=0D=0Ahmm..=
-.=20=0D=0AIt=20continuously=20allocates=20and=20releases=20memory=20for=20b=
-io,=0D=0AWhy=20don't=20you=20just=20allocate=20and=20reuse=20bio=20outside=
-=20the=20loop?=0D=0A=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20if=20(ret)=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20break;=0D=0A>=20+=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20pos_in=20+=3D=20chunk;=0D=0A>=20+=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20pos_out=
-=20+=3D=20chunk;=0D=0A>=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=7D=0D=0A>=
-=20+=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20cio->status=20=3D=20ret;=0D=0A>=20+=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20kvfree(emulation_io->buf);=0D=0A>=20+=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20kfree(emulation_io);=0D=0A=0D=0AI=20hav=
-e=20not=20usually=20seen=20an=20implementation=20that=20releases=20memory=
-=20for=0D=0Aitself=20while=20performing=20a=20worker.=20(=20I=20don't=20kno=
-w=20what's=20right.=20:)=20)=0D=0A=0D=0ASince=20blkdev_copy_emulation()=20a=
-llocates=20memory=20for=20the=20emulation=20=0D=0Aand=20waits=20for=20it=20=
-to=20be=20completed,=20wouldn't=20it=20be=20better=20to=20proceed=0D=0Awith=
-=20the=20memory=20release=20for=20it=20in=20the=20same=20context?=0D=0A=0D=
-=0AThat=20is,=20IMO,=20wouldn't=20it=20be=20better=20to=20free=20the=20memo=
-ry=20related=20to=0D=0Aemulation=20in=20blkdev_copy_wait_io_completion()?=
-=0D=0A=0D=0ABest=20Regards,=0D=0AJinyoung.=0D=0A=0D=0A=0D=0A=0D=0A
+uring_cmd may never complete, such as ublk, in which uring cmd isn't
+completed until one new block request is coming from ublk block device.
+
+Add cancelable uring_cmd to provide mechanism to driver for cancelling
+pending commands in its own way.
+
+Add API of io_uring_cmd_mark_cancelable() for driver to mark one command as
+cancelable, then io_uring will cancel this command in
+io_uring_cancel_generic(). ->uring_cmd() callback is reused for canceling
+command in driver's way, then driver gets notified with the cancelling
+from io_uring.
+
+Add API of io_uring_cmd_get_task() to help driver cancel handler
+deal with the canceling.
+
+Cc: Gabriel Krisman Bertazi <krisman@suse.de>
+Suggested-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+
+ublk patches:
+	https://github.com/ming1/linux/commits/uring_exit_and_ublk
+
+V2:
+	- use ->uring_cmd() with IO_URING_F_CANCEL for canceling command
+
+ include/linux/io_uring.h       | 15 +++++++++++
+ include/linux/io_uring_types.h |  6 +++++
+ include/uapi/linux/io_uring.h  |  7 +++--
+ io_uring/io_uring.c            | 35 +++++++++++++++++++++++++
+ io_uring/uring_cmd.c           | 48 ++++++++++++++++++++++++++++++++++
+ 5 files changed, 109 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+index 106cdc55ff3b..205179a1c191 100644
+--- a/include/linux/io_uring.h
++++ b/include/linux/io_uring.h
+@@ -20,6 +20,9 @@ enum io_uring_cmd_flags {
+ 	IO_URING_F_SQE128		= (1 << 8),
+ 	IO_URING_F_CQE32		= (1 << 9),
+ 	IO_URING_F_IOPOLL		= (1 << 10),
++
++	/* set when uring wants to cancel one issued command */
++	IO_URING_F_CANCEL		= (1 << 11),
+ };
+ 
+ struct io_uring_cmd {
+@@ -82,6 +85,9 @@ static inline void io_uring_free(struct task_struct *tsk)
+ 		__io_uring_free(tsk);
+ }
+ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags);
++int io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
++		unsigned int issue_flags);
++struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd);
+ #else
+ static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+ 			      struct iov_iter *iter, void *ioucmd)
+@@ -122,6 +128,15 @@ static inline int io_uring_cmd_sock(struct io_uring_cmd *cmd,
+ {
+ 	return -EOPNOTSUPP;
+ }
++static inline int io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
++		unsigned int issue_flags)
++{
++	return -EOPNOTSUPP;
++}
++static inline struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd)
++{
++	return NULL;
++}
+ #endif
+ 
+ #endif
+diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+index 13d19b9be9f4..1571db76bec1 100644
+--- a/include/linux/io_uring_types.h
++++ b/include/linux/io_uring_types.h
+@@ -265,6 +265,12 @@ struct io_ring_ctx {
+ 		 */
+ 		struct io_wq_work_list	iopoll_list;
+ 		bool			poll_multi_queue;
++
++		/*
++		 * Any cancelable uring_cmd is added to this list in
++		 * ->uring_cmd() by io_uring_cmd_insert_cancelable()
++		 */
++		struct hlist_head	cancelable_uring_cmd;
+ 	} ____cacheline_aligned_in_smp;
+ 
+ 	struct {
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 8e61f8b7c2ce..29a7a7e71f57 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -249,10 +249,13 @@ enum io_uring_op {
+  * sqe->uring_cmd_flags
+  * IORING_URING_CMD_FIXED	use registered buffer; pass this flag
+  *				along with setting sqe->buf_index.
++ * IORING_URING_CANCELABLE	not for userspace
+  * IORING_URING_CMD_POLLED	driver use only
+  */
+-#define IORING_URING_CMD_FIXED	(1U << 0)
+-#define IORING_URING_CMD_POLLED	(1U << 31)
++#define IORING_URING_CMD_FIXED		(1U << 0)
++/* set by driver, and handled by io_uring to cancel this cmd */
++#define IORING_URING_CMD_CANCELABLE	(1U << 30)
++#define IORING_URING_CMD_POLLED		(1U << 31)
+ 
+ 
+ /*
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index 783ed0fff71b..a3135fd47a4e 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -3256,6 +3256,40 @@ static __cold bool io_uring_try_cancel_iowq(struct io_ring_ctx *ctx)
+ 	return ret;
+ }
+ 
++static bool io_uring_try_cancel_uring_cmd(struct io_ring_ctx *ctx,
++		struct task_struct *task, bool cancel_all)
++{
++	struct hlist_node *tmp;
++	struct io_kiocb *req;
++	bool ret = false;
++
++	mutex_lock(&ctx->uring_lock);
++	hlist_for_each_entry_safe(req, tmp, &ctx->cancelable_uring_cmd,
++			hash_node) {
++		struct io_uring_cmd *cmd = io_kiocb_to_cmd(req,
++				struct io_uring_cmd);
++		struct file *file = req->file;
++
++		if (WARN_ON_ONCE(!file->f_op->uring_cmd))
++			continue;
++
++		if (!cancel_all && req->task != task)
++			continue;
++
++		if (cmd->flags & IORING_URING_CMD_CANCELABLE) {
++			/* ->sqe isn't available if no async data */
++			if (!req_has_async_data(req))
++				cmd->sqe = NULL;
++			file->f_op->uring_cmd(cmd, IO_URING_F_CANCEL);
++			ret = true;
++		}
++	}
++	io_submit_flush_completions(ctx);
++	mutex_unlock(&ctx->uring_lock);
++
++	return ret;
++}
++
+ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
+ 						struct task_struct *task,
+ 						bool cancel_all)
+@@ -3307,6 +3341,7 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
+ 	ret |= io_kill_timeouts(ctx, task, cancel_all);
+ 	if (task)
+ 		ret |= io_run_task_work() > 0;
++	ret |= io_uring_try_cancel_uring_cmd(ctx, task, cancel_all);
+ 	return ret;
+ }
+ 
+diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+index 537795fddc87..d6b200a0be33 100644
+--- a/io_uring/uring_cmd.c
++++ b/io_uring/uring_cmd.c
+@@ -13,6 +13,52 @@
+ #include "rsrc.h"
+ #include "uring_cmd.h"
+ 
++static void io_uring_cmd_del_cancelable(struct io_uring_cmd *cmd,
++		unsigned int issue_flags)
++{
++	if (cmd->flags & IORING_URING_CMD_CANCELABLE) {
++		struct io_kiocb *req = cmd_to_io_kiocb(cmd);
++		struct io_ring_ctx *ctx = req->ctx;
++
++		io_ring_submit_lock(ctx, issue_flags);
++		cmd->flags &= ~IORING_URING_CMD_CANCELABLE;
++		hlist_del(&req->hash_node);
++		io_ring_submit_unlock(ctx, issue_flags);
++	}
++}
++
++/*
++ * Mark this command as concelable, then io_uring_try_cancel_uring_cmd()
++ * will try to cancel this issued command by sending ->uring_cmd() with
++ * issue_flags of IO_URING_F_CANCEL.
++ *
++ * The command is guaranteed to not be done when calling ->uring_cmd()
++ * with IO_URING_F_CANCEL, but it is driver's responsibility to deal
++ * with race between io_uring canceling and normal completion.
++ */
++int io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
++		unsigned int issue_flags)
++{
++	struct io_kiocb *req = cmd_to_io_kiocb(cmd);
++	struct io_ring_ctx *ctx = req->ctx;
++
++	io_ring_submit_lock(ctx, issue_flags);
++	if (!(cmd->flags & IORING_URING_CMD_CANCELABLE)) {
++		cmd->flags |= IORING_URING_CMD_CANCELABLE;
++		hlist_add_head(&req->hash_node, &ctx->cancelable_uring_cmd);
++	}
++	io_ring_submit_unlock(ctx, issue_flags);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(io_uring_cmd_mark_cancelable);
++
++struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd)
++{
++	return cmd_to_io_kiocb(cmd)->task;
++}
++EXPORT_SYMBOL_GPL(io_uring_cmd_get_task);
++
+ static void io_uring_cmd_work(struct io_kiocb *req, struct io_tw_state *ts)
+ {
+ 	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
+@@ -56,6 +102,8 @@ void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2,
+ {
+ 	struct io_kiocb *req = cmd_to_io_kiocb(ioucmd);
+ 
++	io_uring_cmd_del_cancelable(ioucmd, issue_flags);
++
+ 	if (ret < 0)
+ 		req_set_fail(req);
+ 
+-- 
+2.41.0
+
