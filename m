@@ -2,147 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5865DCD4F2B
-	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 08:16:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B8F4CD4F32
+	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 08:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232558AbjIVIQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Sep 2023 04:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46620 "EHLO
+        id S229476AbjIVIhS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Sep 2023 04:37:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232753AbjIVIQ0 (ORCPT
+        with ESMTP id S232607AbjIVIhR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2023 04:16:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA0410C9
-        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 01:04:36 -0700 (PDT)
+        Fri, 22 Sep 2023 04:37:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA5B83
+        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 01:36:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695369876;
+        s=mimecast20190719; t=1695371792;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=CBLqoMyIVireLlLreZE4y9YWUgoFtH3j+ZLwtIAR6bY=;
-        b=OZg+BjedXGezaJGvSswT2cR2z4Wvi+UaVVtrltDAFYnsTdpHgZ9f8XspLfva5TjeymwK/5
-        +AGwRakaTSyR0v0klQ3MNnOj857VtM+XieAEr12c1LvAkgqmxAI0YHFYm5JOaUJAJ0w8De
-        kBnr40Rrg1pzVhlmMNyTa0stLjR3XUM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-414-movzolr0O5q7EvlVO3dTTQ-1; Fri, 22 Sep 2023 04:04:32 -0400
-X-MC-Unique: movzolr0O5q7EvlVO3dTTQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/DE04X5myYMSLSbdgQN2mttrC5Y+H9uzrXqGU6HwjJk=;
+        b=YA+Sf8rSqXygbt8P81dvJ9gRXBFmC0d8RU6WpqOGeQfhfaBDH2SUADMSCeoU6HYEj0FyI4
+        HbG1I+7IwGCMI5y+MeHUZLiBZe7IK4flc77MtcaW+mdY64mEkXbGRuVBpIVp4kz68iliEo
+        4h/8pQ2shrHb13WyooP1KgHZReXQBwU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-657-MI0UDQcpOEeUFOOzE94Bgg-1; Fri, 22 Sep 2023 04:36:28 -0400
+X-MC-Unique: MI0UDQcpOEeUFOOzE94Bgg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5C4131C06E0B;
-        Fri, 22 Sep 2023 08:04:32 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 190AF40C2064;
-        Fri, 22 Sep 2023 08:04:30 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 380EA802C1A;
+        Fri, 22 Sep 2023 08:36:27 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E4B7B140E950;
+        Fri, 22 Sep 2023 08:36:20 +0000 (UTC)
+Date:   Fri, 22 Sep 2023 16:36:16 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Guangwu Zhang <guazhang@redhat.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH V4 resend] lib/group_cpus.c: avoid to acquire cpu hotplug lock in group_cpus_evenly
-Date:   Fri, 22 Sep 2023 16:04:25 +0800
-Message-ID: <20230922080425.2745715-1-ming.lei@redhat.com>
+To:     chengming.zhou@linux.dev
+Cc:     axboe@kernel.dk, hch@lst.de, bvanassche@acm.org, kbusch@kernel.org,
+        mst@redhat.com, damien.lemoal@opensource.wdc.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: Re: [PATCH v2 3/5] blk-mq: support batched queue_rqs() on shared
+ tags queue
+Message-ID: <ZQ1SANMNrEK80lbN@fedora>
+References: <20230913151616.3164338-1-chengming.zhou@linux.dev>
+ <20230913151616.3164338-4-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230913151616.3164338-4-chengming.zhou@linux.dev>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-group_cpus_evenly() could be part of storage driver's error handler,
-such as nvme driver, when may happen during CPU hotplug, in which
-storage queue has to drain its pending IOs because all CPUs associated
-with the queue are offline and the queue is becoming inactive. And
-handling IO needs error handler to provide forward progress.
+On Wed, Sep 13, 2023 at 03:16:14PM +0000, chengming.zhou@linux.dev wrote:
+> From: Chengming Zhou <zhouchengming@bytedance.com>
+> 
+> Since active requests have been accounted when allocate driver tags,
+> we can remove this limit now.
+> 
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> ---
+>  block/blk-mq.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index c209a7dddee3..68ce9357463b 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2781,13 +2781,8 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+>  		 * If we do, we can dispatch the whole plug list in one go. We
+>  		 * already know at this point that all requests belong to the
+>  		 * same queue, caller must ensure that's the case.
+> -		 *
+> -		 * Since we pass off the full list to the driver at this point,
+> -		 * we do not increment the active request count for the queue.
+> -		 * Bypass shared tags for now because of that.
+>  		 */
+> -		if (q->mq_ops->queue_rqs &&
+> -		    !(rq->mq_hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
+> +		if (q->mq_ops->queue_rqs) {
+>  			blk_mq_run_dispatch_ops(q,
+>  				__blk_mq_flush_plug_list(q, plug));
+>  			if (rq_list_empty(plug->mq_list))
 
-Then dead lock is caused:
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
-handler is waiting for inflight IO
-
-2) error handler is waiting for CPU hotplug lock
-
-3) inflight IO can't be completed in blk-mq's CPU hotplug handler because
-error handling can't provide forward progress.
-
-Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
-in which two stage spreads are taken: 1) the 1st stage is over all present
-CPUs; 2) the end stage is over all other CPUs.
-
-Turns out the two stage spread just needs consistent 'cpu_present_mask', and
-remove the CPU hotplug lock by storing it into one local cache. This way
-doesn't change correctness, because all CPUs are still covered.
-
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: linux-nvme@lists.infradead.org
-Cc: linux-block@vger.kernel.org
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Tested-by: Guangwu Zhang <guazhang@redhat.com>
-Reviewed-by: Chengming Zhou <zhouchengming@bytedance.com>
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- lib/group_cpus.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
-
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index aa3f6815bb12..ee272c4cefcc 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -366,13 +366,25 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 	if (!masks)
- 		goto fail_node_to_cpumask;
- 
--	/* Stabilize the cpumasks */
--	cpus_read_lock();
- 	build_node_to_cpumask(node_to_cpumask);
- 
-+	/*
-+	 * Make a local cache of 'cpu_present_mask', so the two stages
-+	 * spread can observe consistent 'cpu_present_mask' without holding
-+	 * cpu hotplug lock, then we can reduce deadlock risk with cpu
-+	 * hotplug code.
-+	 *
-+	 * Here CPU hotplug may happen when reading `cpu_present_mask`, and
-+	 * we can live with the case because it only affects that hotplug
-+	 * CPU is handled in the 1st or 2nd stage, and either way is correct
-+	 * from API user viewpoint since 2-stage spread is sort of
-+	 * optimization.
-+	 */
-+	cpumask_copy(npresmsk, data_race(cpu_present_mask));
-+
- 	/* grouping present CPUs first */
- 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
--				  cpu_present_mask, nmsk, masks);
-+				  npresmsk, nmsk, masks);
- 	if (ret < 0)
- 		goto fail_build_affinity;
- 	nr_present = ret;
-@@ -387,15 +399,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps)
- 		curgrp = 0;
- 	else
- 		curgrp = nr_present;
--	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
-+	cpumask_andnot(npresmsk, cpu_possible_mask, npresmsk);
- 	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
- 				  npresmsk, nmsk, masks);
- 	if (ret >= 0)
- 		nr_others = ret;
- 
-  fail_build_affinity:
--	cpus_read_unlock();
--
- 	if (ret >= 0)
- 		WARN_ON(nr_present + nr_others < numgrps);
- 
--- 
-2.41.0
+Thanks,
+Ming
 
