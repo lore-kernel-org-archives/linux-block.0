@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BAB4CD4F5B
-	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 12:03:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2362C04AAB
+	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 12:03:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234012AbjIVMDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Sep 2023 08:03:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46868 "EHLO
+        id S233961AbjIVMDm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Sep 2023 08:03:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233973AbjIVMDe (ORCPT
+        with ESMTP id S233998AbjIVMDi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2023 08:03:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9348D19A
-        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 05:02:45 -0700 (PDT)
+        Fri, 22 Sep 2023 08:03:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FC9AFB
+        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 05:02:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695384164;
+        s=mimecast20190719; t=1695384162;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j/K7bby96tUMA/iC07lWusXqTlhgR9zlJgJ7++h0ZQI=;
-        b=X6dgfIubLYESfKa8RKr49REPzUWqJhpVBUyDwsdrxADSYxr+92BOemF0rDOU1QM1nqTi7U
-        1Tx/hf2fcEEhrEB+Dsss+DYyNc+XxO2NjZCZj0Hyx3UrIxsWjs+rAZQPgdN+zW83nqFibL
-        qckL1mOmx3/lpcCRNtgBi96W1FqDOsc=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-160-cipZYxGtNhaQj5TKw06UkQ-1; Fri, 22 Sep 2023 08:02:43 -0400
-X-MC-Unique: cipZYxGtNhaQj5TKw06UkQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        bh=oQ7llY41C7nXc6PO5+rWDb67yJZYIoiIAsyEYwhjg+w=;
+        b=e4BWwMdFAmBmYinrIhys6uhQmYkJq05vmQkSqm/9gvpi6HiiEV890HzY1s1x4Nf4xhco2u
+        cUY2Zlsj45d80Q7N6RqiU9sv73kU7M6b0sS2Sh7p0Ful/tFu7qlvk6/QO2KutHwkvWThMN
+        HufAtXu2ZkfXmlbh87Zy588pSS9dskc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-295-8-QZXS7iNU2GtXgc29v2FQ-1; Fri, 22 Sep 2023 08:02:37 -0400
+X-MC-Unique: 8-QZXS7iNU2GtXgc29v2FQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C824A1C01731;
-        Fri, 22 Sep 2023 12:02:42 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E637185A78E;
+        Fri, 22 Sep 2023 12:02:36 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FF4820268D6;
-        Fri, 22 Sep 2023 12:02:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DF47A40C6EBF;
+        Fri, 22 Sep 2023 12:02:34 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -51,58 +51,85 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org
-Subject: [PATCH v6 04/13] infiniband: Use user_backed_iter() to see if iterator is UBUF/IOVEC
-Date:   Fri, 22 Sep 2023 13:02:18 +0100
-Message-ID: <20230922120227.1173720-5-dhowells@redhat.com>
+        Dan Williams <dan.j.williams@intel.com>
+Subject: [PATCH v6 02/13] iov_iter: Be consistent about the __user tag on copy_mc_to_user()
+Date:   Fri, 22 Sep 2023 13:02:16 +0100
+Message-ID: <20230922120227.1173720-3-dhowells@redhat.com>
 In-Reply-To: <20230922120227.1173720-1-dhowells@redhat.com>
 References: <20230922120227.1173720-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use user_backed_iter() to see if iterator is UBUF/IOVEC rather than poking
-inside the iterator.
+copy_mc_to_user() has the destination marked __user on powerpc, but not on
+x86; the latter results in a sparse warning in lib/iov_iter.c.
 
+Fix this by applying the tag on x86 too.
+
+Fixes: ec6347bb4339 ("x86, powerpc: Rename memcpy_mcsafe() to copy_mc_to_{user, kernel}()")
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
-cc: Jason Gunthorpe <jgg@ziepe.ca>
-cc: Leon Romanovsky <leon@kernel.org>
-cc: linux-rdma@vger.kernel.org
+cc: Dan Williams <dan.j.williams@intel.com>
+cc: Alexander Viro <viro@zeniv.linux.org.uk>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Christian Brauner <christian@brauner.io>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: David Laight <David.Laight@ACULAB.COM>
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
 ---
- drivers/infiniband/hw/hfi1/file_ops.c    | 2 +-
- drivers/infiniband/hw/qib/qib_file_ops.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/uaccess.h | 2 +-
+ arch/x86/lib/copy_mc.c         | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/infiniband/hw/hfi1/file_ops.c b/drivers/infiniband/hw/hfi1/file_ops.c
-index a5ab22cedd41..788fc249234f 100644
---- a/drivers/infiniband/hw/hfi1/file_ops.c
-+++ b/drivers/infiniband/hw/hfi1/file_ops.c
-@@ -267,7 +267,7 @@ static ssize_t hfi1_write_iter(struct kiocb *kiocb, struct iov_iter *from)
+diff --git a/arch/x86/include/asm/uaccess.h b/arch/x86/include/asm/uaccess.h
+index 8bae40a66282..5c367c1290c3 100644
+--- a/arch/x86/include/asm/uaccess.h
++++ b/arch/x86/include/asm/uaccess.h
+@@ -496,7 +496,7 @@ copy_mc_to_kernel(void *to, const void *from, unsigned len);
+ #define copy_mc_to_kernel copy_mc_to_kernel
  
- 	if (!HFI1_CAP_IS_KSET(SDMA))
- 		return -EINVAL;
--	if (!from->user_backed)
-+	if (!user_backed_iter(from))
- 		return -EINVAL;
- 	idx = srcu_read_lock(&fd->pq_srcu);
- 	pq = srcu_dereference(fd->pq, &fd->pq_srcu);
-diff --git a/drivers/infiniband/hw/qib/qib_file_ops.c b/drivers/infiniband/hw/qib/qib_file_ops.c
-index 152952127f13..29e4c59aa23b 100644
---- a/drivers/infiniband/hw/qib/qib_file_ops.c
-+++ b/drivers/infiniband/hw/qib/qib_file_ops.c
-@@ -2244,7 +2244,7 @@ static ssize_t qib_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct qib_ctxtdata *rcd = ctxt_fp(iocb->ki_filp);
- 	struct qib_user_sdma_queue *pq = fp->pq;
+ unsigned long __must_check
+-copy_mc_to_user(void *to, const void *from, unsigned len);
++copy_mc_to_user(void __user *to, const void *from, unsigned len);
+ #endif
  
--	if (!from->user_backed || !from->nr_segs || !pq)
-+	if (!user_backed_iter(from) || !from->nr_segs || !pq)
- 		return -EINVAL;
+ /*
+diff --git a/arch/x86/lib/copy_mc.c b/arch/x86/lib/copy_mc.c
+index 80efd45a7761..6e8b7e600def 100644
+--- a/arch/x86/lib/copy_mc.c
++++ b/arch/x86/lib/copy_mc.c
+@@ -70,23 +70,23 @@ unsigned long __must_check copy_mc_to_kernel(void *dst, const void *src, unsigne
+ }
+ EXPORT_SYMBOL_GPL(copy_mc_to_kernel);
  
- 	return qib_user_sdma_writev(rcd, pq, iter_iov(from), from->nr_segs);
+-unsigned long __must_check copy_mc_to_user(void *dst, const void *src, unsigned len)
++unsigned long __must_check copy_mc_to_user(void __user *dst, const void *src, unsigned len)
+ {
+ 	unsigned long ret;
+ 
+ 	if (copy_mc_fragile_enabled) {
+ 		__uaccess_begin();
+-		ret = copy_mc_fragile(dst, src, len);
++		ret = copy_mc_fragile((__force void *)dst, src, len);
+ 		__uaccess_end();
+ 		return ret;
+ 	}
+ 
+ 	if (static_cpu_has(X86_FEATURE_ERMS)) {
+ 		__uaccess_begin();
+-		ret = copy_mc_enhanced_fast_string(dst, src, len);
++		ret = copy_mc_enhanced_fast_string((__force void *)dst, src, len);
+ 		__uaccess_end();
+ 		return ret;
+ 	}
+ 
+-	return copy_user_generic(dst, src, len);
++	return copy_user_generic((__force void *)dst, src, len);
+ }
 
