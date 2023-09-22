@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2362C04AAB
-	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 12:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF8FAC04AAB
+	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 12:04:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233961AbjIVMDm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Sep 2023 08:03:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40088 "EHLO
+        id S233971AbjIVMEd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Sep 2023 08:04:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233998AbjIVMDi (ORCPT
+        with ESMTP id S234084AbjIVMEP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2023 08:03:38 -0400
+        Fri, 22 Sep 2023 08:04:15 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FC9AFB
-        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 05:02:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C60CE1A6
+        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 05:02:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695384162;
+        s=mimecast20190719; t=1695384169;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oQ7llY41C7nXc6PO5+rWDb67yJZYIoiIAsyEYwhjg+w=;
-        b=e4BWwMdFAmBmYinrIhys6uhQmYkJq05vmQkSqm/9gvpi6HiiEV890HzY1s1x4Nf4xhco2u
-        cUY2Zlsj45d80Q7N6RqiU9sv73kU7M6b0sS2Sh7p0Ful/tFu7qlvk6/QO2KutHwkvWThMN
-        HufAtXu2ZkfXmlbh87Zy588pSS9dskc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-295-8-QZXS7iNU2GtXgc29v2FQ-1; Fri, 22 Sep 2023 08:02:37 -0400
-X-MC-Unique: 8-QZXS7iNU2GtXgc29v2FQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        bh=oQjxv/qWpzFGTlwOWGQlwUCcgnofDI2I99l4qJgz63Y=;
+        b=K0/NYz8xoMcZ2A8lZcJ5zU0G9qcMD93EvMuiNekVOe3v7HAn/qOW9LrDZENW2fAdandVwF
+        8QasQN+eh3zXhyIeX6Z3S531q9r8VkVy4E1U0B+7Q7wY7F8pDdjDGCkEXBZOd16imnTD8F
+        XWBk2jrZDxVd5+8UqtNjJ5ybJLISeF8=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-383-AeRfjP2MMb6jmnzsRdIcog-1; Fri, 22 Sep 2023 08:02:46 -0400
+X-MC-Unique: AeRfjP2MMb6jmnzsRdIcog-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E637185A78E;
-        Fri, 22 Sep 2023 12:02:36 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3B51B3C13505;
+        Fri, 22 Sep 2023 12:02:45 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DF47A40C6EBF;
-        Fri, 22 Sep 2023 12:02:34 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B15651E3;
+        Fri, 22 Sep 2023 12:02:43 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -50,28 +50,24 @@ Cc:     David Howells <dhowells@redhat.com>,
         Jeff Layton <jlayton@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Dan Williams <dan.j.williams@intel.com>
-Subject: [PATCH v6 02/13] iov_iter: Be consistent about the __user tag on copy_mc_to_user()
-Date:   Fri, 22 Sep 2023 13:02:16 +0100
-Message-ID: <20230922120227.1173720-3-dhowells@redhat.com>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v6 05/13] iov_iter: Renumber ITER_* constants
+Date:   Fri, 22 Sep 2023 13:02:19 +0100
+Message-ID: <20230922120227.1173720-6-dhowells@redhat.com>
 In-Reply-To: <20230922120227.1173720-1-dhowells@redhat.com>
 References: <20230922120227.1173720-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-copy_mc_to_user() has the destination marked __user on powerpc, but not on
-x86; the latter results in a sparse warning in lib/iov_iter.c.
+Renumber the ITER_* iterator-type constants to put things in the same order
+as in the iteration functions and to group user-backed iterators at the
+bottom.
 
-Fix this by applying the tag on x86 too.
-
-Fixes: ec6347bb4339 ("x86, powerpc: Rename memcpy_mcsafe() to copy_mc_to_{user, kernel}()")
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Dan Williams <dan.j.williams@intel.com>
 cc: Alexander Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Christoph Hellwig <hch@lst.de>
@@ -83,53 +79,26 @@ cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- arch/x86/include/asm/uaccess.h | 2 +-
- arch/x86/lib/copy_mc.c         | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ include/linux/uio.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/uaccess.h b/arch/x86/include/asm/uaccess.h
-index 8bae40a66282..5c367c1290c3 100644
---- a/arch/x86/include/asm/uaccess.h
-+++ b/arch/x86/include/asm/uaccess.h
-@@ -496,7 +496,7 @@ copy_mc_to_kernel(void *to, const void *from, unsigned len);
- #define copy_mc_to_kernel copy_mc_to_kernel
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 2000e42a6586..bef8e56aa45c 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -21,12 +21,12 @@ struct kvec {
  
- unsigned long __must_check
--copy_mc_to_user(void *to, const void *from, unsigned len);
-+copy_mc_to_user(void __user *to, const void *from, unsigned len);
- #endif
+ enum iter_type {
+ 	/* iter types */
++	ITER_UBUF,
+ 	ITER_IOVEC,
+-	ITER_KVEC,
+ 	ITER_BVEC,
++	ITER_KVEC,
+ 	ITER_XARRAY,
+ 	ITER_DISCARD,
+-	ITER_UBUF,
+ };
  
- /*
-diff --git a/arch/x86/lib/copy_mc.c b/arch/x86/lib/copy_mc.c
-index 80efd45a7761..6e8b7e600def 100644
---- a/arch/x86/lib/copy_mc.c
-+++ b/arch/x86/lib/copy_mc.c
-@@ -70,23 +70,23 @@ unsigned long __must_check copy_mc_to_kernel(void *dst, const void *src, unsigne
- }
- EXPORT_SYMBOL_GPL(copy_mc_to_kernel);
- 
--unsigned long __must_check copy_mc_to_user(void *dst, const void *src, unsigned len)
-+unsigned long __must_check copy_mc_to_user(void __user *dst, const void *src, unsigned len)
- {
- 	unsigned long ret;
- 
- 	if (copy_mc_fragile_enabled) {
- 		__uaccess_begin();
--		ret = copy_mc_fragile(dst, src, len);
-+		ret = copy_mc_fragile((__force void *)dst, src, len);
- 		__uaccess_end();
- 		return ret;
- 	}
- 
- 	if (static_cpu_has(X86_FEATURE_ERMS)) {
- 		__uaccess_begin();
--		ret = copy_mc_enhanced_fast_string(dst, src, len);
-+		ret = copy_mc_enhanced_fast_string((__force void *)dst, src, len);
- 		__uaccess_end();
- 		return ret;
- 	}
- 
--	return copy_user_generic(dst, src, len);
-+	return copy_user_generic((__force void *)dst, src, len);
- }
+ #define ITER_SOURCE	1	// == WRITE
 
