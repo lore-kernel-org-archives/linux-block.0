@@ -2,95 +2,161 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C279E7D0B6
-	for <linux-block@archiver.kernel.org>; Thu, 21 Sep 2023 23:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D320E7D0B7
+	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 00:51:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbjIUXFo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Sep 2023 19:05:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39012 "EHLO
+        id S229702AbjIVAvz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Sep 2023 20:51:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230198AbjIUXFb (ORCPT
+        with ESMTP id S229452AbjIVAvz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2023 19:05:31 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93665561C4;
-        Thu, 21 Sep 2023 13:47:21 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEDE7C433C9;
-        Thu, 21 Sep 2023 20:47:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695329241;
-        bh=RLA8T3fc6qHtdc/his8qpk9mIDEAxM3xk0IjQR4r2PA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rsr/Lctcicc+50Eg3JXu0b8dhmZ2v3WiFXeY2wkmrCnTqXUF4B7nsPi9SuqW7wRul
-         J71+88B/rdDTyO0UzmenIyD+3u0qf56/39z2OoPLy2LZVxpos7P1sw4x+ZsjCPD1lQ
-         Oi9wT74862kw3Owh0dAp1xYUD+4S0G0QULBC/Bc82yvw4uqrhWsK/tI7wWQ7VPjEC8
-         khmD/u7EE/Fzc2tfF3nKmvx7KwOL6FCNMKwTQ4cwikFOFEDe8GintWgWS1PEIGrSOb
-         dnAd2mBBrhDizb7QLZ5SDOooRRhE27lfw506KM3naUySsxMrWD5uZ8F0beX7iHsWlf
-         o2ovLfeWYivnA==
-Date:   Thu, 21 Sep 2023 13:47:19 -0700
-From:   Jaegeuk Kim <jaegeuk@kernel.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 00/13] Pass data temperature information to zoned UFS
- devices
-Message-ID: <ZQyr1wR9rM48p65l@google.com>
-References: <20230920191442.3701673-1-bvanassche@acm.org>
- <ZQtHwsNvS1wYDKfG@casper.infradead.org>
- <1522d8ec-6b15-45d5-b6d9-517337e2c8cf@acm.org>
- <ZQv07Mg7qIXayHlf@x1-carbon>
- <8781636a-57ac-4dbd-8ec6-b49c10c81345@acm.org>
- <ZQyZEqXJymyFWlKV@casper.infradead.org>
- <4cacae64-6a11-41ab-9bec-f8915da00106@acm.org>
- <ZQydeSIoHHJDQjHW@casper.infradead.org>
+        Thu, 21 Sep 2023 20:51:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCCAF5
+        for <linux-block@vger.kernel.org>; Thu, 21 Sep 2023 17:51:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695343860;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0vBJD4VFsffbJN0IpnlgjvtJl02DWBz9TH729EHnMCY=;
+        b=XT/PX8uE3cifflD4RqiejtXiE6JQnd53TY46X/1Ne+7nsXAvILH1XBZebjvaGEXHW8CRY2
+        rdn0DmFngzPE/EtbUz8GzUaffvFTJpOwqvq0k0kNLg5fT6eHsGUOOul36nJtLoLWVXe6/e
+        CL83+UA1GixG4kRd0VzXLZQUMQpGwCk=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-155-S6Z5djbgPu29FkyNG6DIFg-1; Thu, 21 Sep 2023 20:50:57 -0400
+X-MC-Unique: S6Z5djbgPu29FkyNG6DIFg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 264983814595;
+        Fri, 22 Sep 2023 00:50:57 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A3294140273C;
+        Fri, 22 Sep 2023 00:50:53 +0000 (UTC)
+Date:   Fri, 22 Sep 2023 08:50:48 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Gabriel Krisman Bertazi <krisman@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH] io_uring: cancelable uring_cmd
+Message-ID: <ZQzk6PW+4HHzCFrw@fedora>
+References: <20230921042434.2500190-1-ming.lei@redhat.com>
+ <878r8znz3s.fsf@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZQydeSIoHHJDQjHW@casper.infradead.org>
+In-Reply-To: <878r8znz3s.fsf@suse.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/21, Matthew Wilcox wrote:
-> On Thu, Sep 21, 2023 at 12:39:00PM -0700, Bart Van Assche wrote:
-> > On 9/21/23 12:27, Matthew Wilcox wrote:
-> > > On Thu, Sep 21, 2023 at 07:27:08AM -0700, Bart Van Assche wrote:
-> > > > On 9/21/23 00:46, Niklas Cassel wrote:
-> > > > > Should NVMe streams be brought back? Yes? No?
-> > > > 
-> > > > From commit 561593a048d7 ("Merge tag 'for-5.18/write-streams-2022-03-18'
-> > > > of git://git.kernel.dk/linux-block"): "This removes the write streams
-> > > > support in NVMe. No vendor ever really shipped working support for this,
-> > > > and they are not interested in supporting it."
-> > > 
-> > > It sounds like UFS is at the same stage that NVMe got to -- standard
-> > > exists, no vendor has committed to actually shipping it.  Isn't bringing
-> > > it back a little premature?
-> > 
-> > Hi Matthew,
-> > 
-> > That's a misunderstanding. UFS vendors support interpreting the SCSI GROUP
-> > NUMBER as a data temperature since many years, probably since more than ten
-> > years. Additionally, for multiple UFS vendors having the data temperature
-> > available is important for achieving good performance. This message shows
-> > how UFS vendors were using that information before write hint support was
-> > removed: https://lore.kernel.org/linux-block/PH0PR08MB7889642784B2E1FC1799A828DB0B9@PH0PR08MB7889.namprd08.prod.outlook.com/
-> 
-> If vendor support already exists, then why did you dodge the question
-> asking for quantified data that I asked earlier?  And can we have that
-> data now?
+Hello Gabriel,
 
-I'm in doubt this patch-set really requires the quantified data which may be
-mostly confidential to all the companies, also given the revert reason was no
-user, IIUC. OTOH, I'm not sure whether you're famailiar with FTL, but, when
-we consider the entire stack ranging from f2fs to FTL which manages NAND blocks,
-I do see a clear benefit to give the temperature hints for FTL to align therein
-garbage collection unit with one in f2fs, which is the key idea on Zoned UFS
-in mobile world, I believe. Otherwise, it can show non-deterministic longer
-write latencies due to internal GCs, increase WAI feeding to shorter lifetime.
+On Thu, Sep 21, 2023 at 02:46:31PM -0400, Gabriel Krisman Bertazi wrote:
+> Ming Lei <ming.lei@redhat.com> writes:
+> 
+> > uring_cmd may never complete, such as ublk, in which uring cmd isn't
+> > completed until one new block request is coming from ublk block device.
+> >
+> > Add cancelable uring_cmd to provide mechanism to driver to cancel
+> > pending commands in its own way.
+> >
+> > Add API of io_uring_cmd_mark_cancelable() for driver to mark one
+> > command as cancelable, then io_uring will cancel this command in
+> > io_uring_cancel_generic(). Driver callback is provided for canceling
+> > command in driver's way, meantime driver gets notified with exiting of
+> > io_uring task or context.
+> >
+> > Suggested-by: Jens Axboe <axboe@kernel.dk>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >
+> > ublk patches:
+> >
+> > 	https://github.com/ming1/linux/commits/uring_exit_and_ublk
+> >
+> >  include/linux/io_uring.h       | 22 +++++++++++++++++-
+> >  include/linux/io_uring_types.h |  6 +++++
+> >  include/uapi/linux/io_uring.h  |  7 ++++--
+> >  io_uring/io_uring.c            | 30 ++++++++++++++++++++++++
+> >  io_uring/uring_cmd.c           | 42 ++++++++++++++++++++++++++++++++++
+> >  5 files changed, 104 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+> > index 106cdc55ff3b..5b98308a154f 100644
+> > --- a/include/linux/io_uring.h
+> > +++ b/include/linux/io_uring.h
+> > @@ -22,6 +22,9 @@ enum io_uring_cmd_flags {
+> >  	IO_URING_F_IOPOLL		= (1 << 10),
+> >  };
+> >  
+> > +typedef void (uring_cmd_cancel_fn)(struct io_uring_cmd *,
+> > +		unsigned int issue_flags, struct task_struct *task);
+> > +
+> 
+> Hi Ming,
+> 
+> I wonder if uring_cmd_cancel shouldn't just be a new file operation, pairing
+> with f_op->uring_cmd.  it would, of course, also mean don't need to pass
+> it here occupying the pdu or explicitly registering it. iiuc, would also
+> allow you to drop the flag and just assume it is cancelable if the operation
+> exists, further simplifying the code.
+
+If there are more such use cases, it is probably not a bad idea to add
+new operation for canceling command.
+
+But definitely there are not, so not good to add one new operation now,
+since new operation field is added to all drivers/FSs actually, 99% of
+them shouldn't pay for such cost.
+
+Also I don't see how much simplification is made with new operation,
+cause the approach in this patch just needs one flag & callback for canceling,
+both are freely available, only driver with such feature needs to pay
+the extra callback cost(8bytes in uring_cmd->pdu[]).
+
+> 
+> > +static bool io_uring_try_cancel_uring_cmd(struct io_ring_ctx *ctx,
+> > +					  struct task_struct *task,
+> > +					  bool cancel_all)
+> > +{
+> > +	struct hlist_node *tmp;
+> > +	struct io_kiocb *req;
+> > +	bool ret = false;
+> > +
+> > +	mutex_lock(&ctx->uring_lock);
+> > +	hlist_for_each_entry_safe(req, tmp, &ctx->cancelable_uring_cmd,
+> > +			hash_node) {
+> > +		struct io_uring_cmd *cmd = io_kiocb_to_cmd(req,
+> > +				struct io_uring_cmd);
+> > +
+> > +		if (!cancel_all && req->task != task)
+> > +			continue;
+> > +
+> > +		/* safe to call ->cancel_fn() since cmd isn't done yet */
+> > +		if (cmd->flags & IORING_URING_CMD_CANCELABLE) {
+> > +			cmd->cancel_fn(cmd, 0, task);
+> 
+> I find it weird to pass task here.  Also, it seems you use it only to
+> sanity check it is the same as ubq->ubq_daemon.  Can you just recover it
+> from cmd_to_io_kiocb(cmd)->task? it should be guaranteed to be the same
+> as task by the check immediately before.
+
+'task' parameter is very important for ublk use case, in future I plan to
+support multiple tasks per queue(io_uring_ctx) for ublk queue for
+relaxing the current (more stict) limit of single task/context for
+single queue. So when one task is exiting, ublk driver will just need to
+cancel commands queued from this task, not necessarily to cancel the
+whole queue/device.
+
+Also cmd_to_io_kiocb(cmd)->task shouldn't work since io_kiocb can be
+thought as being not exported to driver strictly speaking.
+
+
+Thanks,
+Ming
+
