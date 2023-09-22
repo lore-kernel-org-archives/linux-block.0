@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F30CD4F41
-	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 09:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7EFCD4F41
+	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 09:34:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233067AbjIVJdR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Sep 2023 05:33:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52654 "EHLO
+        id S233017AbjIVJeZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Sep 2023 05:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233050AbjIVJdF (ORCPT
+        with ESMTP id S233186AbjIVJeP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2023 05:33:05 -0400
+        Fri, 22 Sep 2023 05:34:15 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD648192;
-        Fri, 22 Sep 2023 02:32:35 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B0F7C433C9;
-        Fri, 22 Sep 2023 09:32:30 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 061E0CDE;
+        Fri, 22 Sep 2023 02:34:09 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E5EC433C9;
+        Fri, 22 Sep 2023 09:34:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695375155;
-        bh=vwZUAYeEfWwnaGPU+f55fpprOAGYNnTdXdHwaC6Ti5o=;
+        s=k20201202; t=1695375248;
+        bh=3sau3zGAqT64PlvL93L3t5WW9upTsJ7zh15tcnTdr5Q=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=o9nXd2ERc/xNm7w0xvgZ+jg3uIJWBrEPTC/DuLDyeLQ2YVjNrOfjXaCb5QoLcXhOQ
-         s1yRC7V6cI8Gv0op5YlxFtha2SFI+Gs5PMt/+4yEo9dLmGjdlJbngdoYb/yDveICei
-         SL4Jf1YHttuw0WFbBVRKI1FjVXO1bHFaJ/dCTHA6NGz9mUe6PglwaVqVwjKWo97lEr
-         uGmtucbm6STBFJ37LXVZh9RAz7h3m0M6LsJ3X3hbbebUGAcM/q46hRo4yCB6F0Cml2
-         Q0jWXfW8jwWbgfYj8SCtNd5UhVXZL3ElDucO33i1B/6qbThCgKSjihp+5NfHv8K4Pl
-         ql2vtkPWxGuNg==
-Date:   Fri, 22 Sep 2023 10:32:27 +0100
+        b=hhaIBnCaAbuCpSxAopP2bOKGZnEbjsw1ElAoo3Zz7BnAv+l/F+pFaAiLxFA9ny7H4
+         9L3mO0A6LcrzntFIYgI89H2ltGDEBIp8buJfoqqX2Oket8WLh5QH4+7vA52PjIoXmF
+         zewHVEDJJ5s7nk3si4FZfbeiSKzOb+PQs0ixFTAuCpuG4a7+rn8HDBUBtzxA5Z7LmQ
+         9DxTufr/nkZ/j9CT/d7cv8Tjl14CVfZvwM5GTA2Jm9SOkAMYeEIgEsSi7Kk/Fh87yA
+         C7Y3P8pP44GUxZbrjNnO7rg1kLoKIIy5/7H2qkrSrshAyEnkdWKtxFpFjNqPVSTvqh
+         bwiFNK1GyFDMQ==
+Date:   Fri, 22 Sep 2023 10:34:01 +0100
 From:   Simon Horman <horms@kernel.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
@@ -40,73 +40,64 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 05/11] iov_iter: Convert iterate*() to inline funcs
-Message-ID: <20230922093227.GV224399@kernel.org>
+Subject: Re: [PATCH v5 07/11] iov_iter: Add a kernel-type iterator-only
+ iteration function
+Message-ID: <20230922093401.GW224399@kernel.org>
 References: <20230920222231.686275-1-dhowells@redhat.com>
- <20230920222231.686275-6-dhowells@redhat.com>
+ <20230920222231.686275-8-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230920222231.686275-6-dhowells@redhat.com>
+In-Reply-To: <20230920222231.686275-8-dhowells@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 20, 2023 at 11:22:25PM +0100, David Howells wrote:
-
-...
-
-> @@ -312,23 +192,29 @@ size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
->  		return 0;
->  	if (user_backed_iter(i))
->  		might_fault();
-> -	iterate_and_advance(i, bytes, base, len, off,
-> -		copyout(base, addr + off, len),
-> -		memcpy(base, addr + off, len)
-> -	)
-> -
-> -	return bytes;
-> +	return iterate_and_advance(i, bytes, (void *)addr,
-> +				   copy_to_user_iter, memcpy_to_iter);
->  }
->  EXPORT_SYMBOL(_copy_to_iter);
->  
->  #ifdef CONFIG_ARCH_HAS_COPY_MC
-> -static int copyout_mc(void __user *to, const void *from, size_t n)
-> -{
-> -	if (access_ok(to, n)) {
-> -		instrument_copy_to_user(to, from, n);
-> -		n = copy_mc_to_user((__force void *) to, from, n);
-> +static __always_inline
-> +size_t copy_to_user_iter_mc(void __user *iter_to, size_t progress,
-> +			    size_t len, void *from, void *priv2)
-> +{
-> +	if (access_ok(iter_to, len)) {
-> +		from += progress;
-> +		instrument_copy_to_user(iter_to, from, len);
-> +		len = copy_mc_to_user(iter_to, from, len);
-
-Hi David,
-
-Sparse complains a bit about the line above, perhaps the '(__force void *)'
-should be retained from the old code?
-
- lib/iov_iter.c:208:39: warning: incorrect type in argument 1 (different address spaces)
- lib/iov_iter.c:208:39:    expected void *to
- lib/iov_iter.c:208:39:    got void [noderef] __user *iter_to
-
->  	}
-> -	return n;
-> +	return len;
-> +}
-> +
-> +static __always_inline
-> +size_t memcpy_to_iter_mc(void *iter_to, size_t progress,
-> +			 size_t len, void *from, void *priv2)
-> +{
-> +	return copy_mc_to_kernel(iter_to, from + progress, len);
+On Wed, Sep 20, 2023 at 11:22:27PM +0100, David Howells wrote:
+> Add an iteration function that can only iterate over kernel internal-type
+> iterators (ie. BVEC, KVEC, XARRAY) and not user-backed iterators (ie. UBUF
+> and IOVEC).  This allows for smaller iterators to be built when it is known
+> the caller won't have a user-backed iterator.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Christian Brauner <christian@brauner.io>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Linus Torvalds <torvalds@linux-foundation.org>
+> cc: David Laight <David.Laight@ACULAB.COM>
+> cc: linux-block@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>  include/linux/iov_iter.h | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+> 
+> diff --git a/include/linux/iov_iter.h b/include/linux/iov_iter.h
+> index 270454a6703d..a94d605d7386 100644
+> --- a/include/linux/iov_iter.h
+> +++ b/include/linux/iov_iter.h
+> @@ -271,4 +271,35 @@ size_t iterate_and_advance(struct iov_iter *iter, size_t len, void *priv,
+>  	return iterate_and_advance2(iter, len, priv, NULL, ustep, step);
 >  }
 >  
->  /**
+> +/**
+> + * iterate_and_advance_kernel - Iterate over a kernel iterator
+> + * @iter: The iterator to iterate over.
+> + * @len: The amount to iterate over.
+> + * @priv: Data for the step functions.
+
+nit: an entry for @priv2 belongs here
+
+> + * @step: Processing function; given kernel addresses.
+> + *
+> + * Like iterate_and_advance2(), but rejected UBUF and IOVEC iterators and does
+> + * not take a user-step function.
+> + */
+> +static __always_inline
+> +size_t iterate_and_advance_kernel(struct iov_iter *iter, size_t len, void *priv,
+> +				  void *priv2, iov_step_f step)
+> +{
 
 ...
