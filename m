@@ -2,85 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68895CD4F42
-	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 09:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F30CD4F41
+	for <linux-block@archiver.kernel.org>; Fri, 22 Sep 2023 09:33:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232178AbjIVJ0b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Sep 2023 05:26:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60730 "EHLO
+        id S233067AbjIVJdR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Sep 2023 05:33:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232332AbjIVJ0a (ORCPT
+        with ESMTP id S233050AbjIVJdF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2023 05:26:30 -0400
+        Fri, 22 Sep 2023 05:33:05 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107C3197;
-        Fri, 22 Sep 2023 02:26:24 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EC56C433C7;
-        Fri, 22 Sep 2023 09:26:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1695374783;
-        bh=CiplfnZWE0N96tT0Pqsa0UEZgTjTPzci1ZYFdLmLu34=;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD648192;
+        Fri, 22 Sep 2023 02:32:35 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B0F7C433C9;
+        Fri, 22 Sep 2023 09:32:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695375155;
+        bh=vwZUAYeEfWwnaGPU+f55fpprOAGYNnTdXdHwaC6Ti5o=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WsZ6FYLlqZJ0Wx9wj3oJWpkWzElbpXmmVhOT05kNCZRqqstYlKXj1B60PruPBESXx
-         StdNK6XAXeDh7iImU1cuqe1zuYd7iJyCylBZTBVko2JYVYrFqUYtbbwzXrnTgSl82f
-         aQzDl8nITFW6K8KN2zhfv0Kwnon8Nz3Cu/3WH2z8=
-Date:   Fri, 22 Sep 2023 11:26:22 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Saranya Muruganandam <saranyamohan@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, stable@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhang Wensheng <zhangwensheng@huaweicloud.com>,
-        Zhong Jinghua <zhongjinghua@huawei.com>,
-        Hillf Danton <hdanton@sina.com>, Yu Kuai <yukuai3@huawei.com>,
-        Dennis Zhou <dennis@kernel.org>
-Subject: Re: [PATCH] block: fix use-after-free of q->q_usage_counter
-Message-ID: <2023092258-clothing-passerby-e0f2@gregkh>
-References: <20230921182012.3965572-1-saranyamohan@google.com>
+        b=o9nXd2ERc/xNm7w0xvgZ+jg3uIJWBrEPTC/DuLDyeLQ2YVjNrOfjXaCb5QoLcXhOQ
+         s1yRC7V6cI8Gv0op5YlxFtha2SFI+Gs5PMt/+4yEo9dLmGjdlJbngdoYb/yDveICei
+         SL4Jf1YHttuw0WFbBVRKI1FjVXO1bHFaJ/dCTHA6NGz9mUe6PglwaVqVwjKWo97lEr
+         uGmtucbm6STBFJ37LXVZh9RAz7h3m0M6LsJ3X3hbbebUGAcM/q46hRo4yCB6F0Cml2
+         Q0jWXfW8jwWbgfYj8SCtNd5UhVXZL3ElDucO33i1B/6qbThCgKSjihp+5NfHv8K4Pl
+         ql2vtkPWxGuNg==
+Date:   Fri, 22 Sep 2023 10:32:27 +0100
+From:   Simon Horman <horms@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        David Laight <David.Laight@aculab.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 05/11] iov_iter: Convert iterate*() to inline funcs
+Message-ID: <20230922093227.GV224399@kernel.org>
+References: <20230920222231.686275-1-dhowells@redhat.com>
+ <20230920222231.686275-6-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230921182012.3965572-1-saranyamohan@google.com>
+In-Reply-To: <20230920222231.686275-6-dhowells@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 11:20:12AM -0700, Saranya Muruganandam wrote:
-> From: Ming Lei <ming.lei@redhat.com>
-> 
-> commit d36a9ea5e7766961e753ee38d4c331bbe6ef659b upstream.
-> 
-> For blk-mq, queue release handler is usually called after
-> blk_mq_freeze_queue_wait() returns. However, the
-> q_usage_counter->release() handler may not be run yet at that time, so
-> this can cause a use-after-free.
-> 
-> Fix the issue by moving percpu_ref_exit() into blk_free_queue_rcu().
-> Since ->release() is called with rcu read lock held, it is agreed that
-> the race should be covered in caller per discussion from the two links.
-> 
-> Backport-notes: Not a clean cherry-pick since a lot has changed,
-> however essentially the same fix.
-> 
-> Reported-by: Zhang Wensheng <zhangwensheng@huaweicloud.com>
-> Reported-by: Zhong Jinghua <zhongjinghua@huawei.com>
-> Link: https://lore.kernel.org/linux-block/Y5prfOjyyjQKUrtH@T590/T/#u
-> Link: https://lore.kernel.org/lkml/Y4%2FmzMd4evRg9yDi@fedora/
-> Cc: Hillf Danton <hdanton@sina.com>
-> Cc: Yu Kuai <yukuai3@huawei.com>
-> Cc: Dennis Zhou <dennis@kernel.org>
-> Fixes: 2b0d3d3e4fcf ("percpu_ref: reduce memory footprint of percpu_ref in fast path")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> Link: https://lore.kernel.org/r/20221215021629.74870-1-ming.lei@redhat.com
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Saranya Muruganandam <saranyamohan@google.com>
-> ---
->  block/blk-core.c  | 2 --
->  block/blk-sysfs.c | 2 ++
->  2 files changed, 2 insertions(+), 2 deletions(-)
+On Wed, Sep 20, 2023 at 11:22:25PM +0100, David Howells wrote:
 
-What stable kernel(s) are you expecting this backport to be applied to?
+...
 
-thanks,
+> @@ -312,23 +192,29 @@ size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
+>  		return 0;
+>  	if (user_backed_iter(i))
+>  		might_fault();
+> -	iterate_and_advance(i, bytes, base, len, off,
+> -		copyout(base, addr + off, len),
+> -		memcpy(base, addr + off, len)
+> -	)
+> -
+> -	return bytes;
+> +	return iterate_and_advance(i, bytes, (void *)addr,
+> +				   copy_to_user_iter, memcpy_to_iter);
+>  }
+>  EXPORT_SYMBOL(_copy_to_iter);
+>  
+>  #ifdef CONFIG_ARCH_HAS_COPY_MC
+> -static int copyout_mc(void __user *to, const void *from, size_t n)
+> -{
+> -	if (access_ok(to, n)) {
+> -		instrument_copy_to_user(to, from, n);
+> -		n = copy_mc_to_user((__force void *) to, from, n);
+> +static __always_inline
+> +size_t copy_to_user_iter_mc(void __user *iter_to, size_t progress,
+> +			    size_t len, void *from, void *priv2)
+> +{
+> +	if (access_ok(iter_to, len)) {
+> +		from += progress;
+> +		instrument_copy_to_user(iter_to, from, len);
+> +		len = copy_mc_to_user(iter_to, from, len);
 
-greg "not a mind reader" k-h
+Hi David,
+
+Sparse complains a bit about the line above, perhaps the '(__force void *)'
+should be retained from the old code?
+
+ lib/iov_iter.c:208:39: warning: incorrect type in argument 1 (different address spaces)
+ lib/iov_iter.c:208:39:    expected void *to
+ lib/iov_iter.c:208:39:    got void [noderef] __user *iter_to
+
+>  	}
+> -	return n;
+> +	return len;
+> +}
+> +
+> +static __always_inline
+> +size_t memcpy_to_iter_mc(void *iter_to, size_t progress,
+> +			 size_t len, void *from, void *priv2)
+> +{
+> +	return copy_mc_to_kernel(iter_to, from + progress, len);
+>  }
+>  
+>  /**
+
+...
