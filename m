@@ -2,273 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA06CE7A81
-	for <linux-block@archiver.kernel.org>; Sat, 23 Sep 2023 02:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20114CE7A8C
+	for <linux-block@archiver.kernel.org>; Sat, 23 Sep 2023 07:00:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229647AbjIWCwM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Sep 2023 22:52:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40082 "EHLO
+        id S229888AbjIWHAM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Sep 2023 03:00:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjIWCwK (ORCPT
+        with ESMTP id S229808AbjIWHAL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2023 22:52:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50C691A8
-        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2023 19:51:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695437479;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kT8GIG427J9mZQ0uHHyz0MBykYS8I3x47mOxf+E+Qfc=;
-        b=ijV9nrxo2tyJ27+XaJVL202+5rHVhSgfQszCpNp7NSHqTqS8T8EX5nVluwoCeETRjGvLPQ
-        VDSt+jPFcqwqhFglM+8Kw2FIQZmaxD5ZbRsVRkQt2e9pJ8u4hIdpW4AEiUQiClAi3VHlvs
-        MlNfGS4q8scuBvuzJkwVQaTcokghUjA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-610-AEZYoKXZPzm-D_gSTP2ONg-1; Fri, 22 Sep 2023 22:51:15 -0400
-X-MC-Unique: AEZYoKXZPzm-D_gSTP2ONg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6573B185A79B;
-        Sat, 23 Sep 2023 02:51:15 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.5])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7768110F1BE7;
-        Sat, 23 Sep 2023 02:51:14 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     Gabriel Krisman Bertazi <krisman@suse.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 2/2] io_uring: cancelable uring_cmd
-Date:   Sat, 23 Sep 2023 10:50:03 +0800
-Message-ID: <20230923025006.2830689-3-ming.lei@redhat.com>
-In-Reply-To: <20230923025006.2830689-1-ming.lei@redhat.com>
-References: <20230923025006.2830689-1-ming.lei@redhat.com>
+        Sat, 23 Sep 2023 03:00:11 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90FDD199;
+        Sat, 23 Sep 2023 00:00:03 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-774105e8c81so176108885a.3;
+        Sat, 23 Sep 2023 00:00:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695452402; x=1696057202; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FcnYbvS5MK6GuTtXypuDsEXHQd3nYjUtnq+MVVoDLKA=;
+        b=GJNAHCnb6x2Um5FVft6CRxSZusS0gEHiA1ktiho+VkWGLMVXPNA3PhDDLoUAH9nSnz
+         DUR5xj9vLRPIGVji/grhQycf8HjdpShDrag28c5BaZkGQX8Cd3tUG8V7p2BgYPdE50ty
+         zMNa/nRdoNr1uq5dxQ60jxWMBxkAWbCwhzo0PW1weYqGz5G1QXvqx5oKW7rV8lbPivds
+         Ka6+VY1gCX6tsXZfOECpOy/vKTAWhJi2YCNYUXfPXvE06JTgQcgFKdm/oquBZt3qPzYq
+         VnWKQpe31lDoltTwfUe2zvYWMjNf8fUGU63PO8e1ArPzSTJMjoMyYF7Jv5lAsbWDm40o
+         55Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695452402; x=1696057202;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FcnYbvS5MK6GuTtXypuDsEXHQd3nYjUtnq+MVVoDLKA=;
+        b=nN2oAeVTULLabF1e8628FJU/1pH6s7qSAE1nkvCAwmykwj05Z5bCWRECuGHQZMVd7n
+         ri0vzpJ5eLdnWjG3+DD4z3dDxc5UJp4Vf+HudLa9mob+GpX/gSRth9qV9v6IKlY2vv4R
+         Kiz/67mgRhbljQdWrV3tqSOvHTwlCH95xyKNC2PFxNgW1uvilYsGBTlnIIq2SZT0ee5J
+         BYS/FZXhi12BY7HQPhVzyQZn25vgTffSbWGZKl9Zj+fmYf/yGkXgqmSFj0oLzFtiOvak
+         50yV9w0jPuJGCPGPdbauxLvWd83wpF3RmAY9ulGyMFAOfVKj1wsO1UM/MIhmLt/LA0tE
+         k0Jg==
+X-Gm-Message-State: AOJu0Yw82/3LTVXinVlOrfJ0bFW+/3th6SgVwJsnQ1Ok4x0aAxTb+aym
+        fGtg9LfaBhM3uTBqQ/UJ8hhNPsYp3DtZ7n32rLw=
+X-Google-Smtp-Source: AGHT+IFMxTVXVKT+nznCbj1bmQxWY2DbB+LZ7TuCR7qcNktIseQwd/89E9HbXm65hYtHy2dHcCCUdURKinwtHDaGpS8=
+X-Received: by 2002:a05:620a:4487:b0:774:165a:6990 with SMTP id
+ x7-20020a05620a448700b00774165a6990mr1758934qkp.20.1695452402627; Sat, 23 Sep
+ 2023 00:00:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+References: <20230920222231.686275-1-dhowells@redhat.com> <591a70bf016b4317add2d936696abc0f@AcuMS.aculab.com>
+ <1173637.1695384067@warthog.procyon.org.uk>
+In-Reply-To: <1173637.1695384067@warthog.procyon.org.uk>
+From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date:   Sat, 23 Sep 2023 08:59:25 +0200
+Message-ID: <CAF=yD-L3aXM17=hsJBoauWJ6Dqq16ykcnv8sg-Fn_Td_FsOafA@mail.gmail.com>
+Subject: Re: [PATCH v5 00/11] iov_iter: Convert the iterator macros into
+ inline funcs
+To:     David Howells <dhowells@redhat.com>
+Cc:     David Laight <David.Laight@aculab.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-uring_cmd may never complete, such as ublk, in which uring cmd isn't
-completed until one new block request is coming from ublk block device.
+On Fri, Sep 22, 2023 at 2:01=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> David Laight <David.Laight@ACULAB.COM> wrote:
+>
+> > >  (8) Move the copy-and-csum code to net/ where it can be in proximity=
+ with
+> > >      the code that uses it.  This eliminates the code if CONFIG_NET=
+=3Dn and
+> > >      allows for the slim possibility of it being inlined.
+> > >
+> > >  (9) Fold memcpy_and_csum() in to its two users.
+> > >
+> > > (10) Move csum_and_copy_from_iter_full() out of line and merge in
+> > >      csum_and_copy_from_iter() since the former is the only caller of=
+ the
+> > >      latter.
+> >
+> > I thought that the real idea behind these was to do the checksum
+> > at the same time as the copy to avoid loading the data into the L1
+> > data-cache twice - especially for long buffers.
+> > I wonder how often there are multiple iov[] that actually make
+> > it better than just check summing the linear buffer?
+>
+> It also reduces the overhead for finding the data to checksum in the case=
+ the
+> packet gets split since we're doing the checksumming as we copy - but wit=
+h a
+> linear buffer, that's negligible.
+>
+> > I had a feeling that check summing of udp data was done during
+> > copy_to/from_user, but the code can't be the copy-and-csum here
+> > for that because it is missing support form odd-length buffers.
+>
+> Is there a bug there?
+>
+> > Intel x86 desktop chips can easily checksum at 8 bytes/clock
+> > (But probably not with the current code!).
+> > (I've got ~12 bytes/clock using adox and adcx but that loop
+> > is entirely horrid and it would need run-time patching.
+> > Especially since I think some AMD cpu execute them very slowly.)
+> >
+> > OTOH 'rep movs[bq]' copy will copy 16 bytes/clock (32 if the
+> > destination is 32 byte aligned - it pretty much won't be).
+> >
+> > So you'd need a csum-and-copy loop that did 16 bytes every
+> > three clocks to get the same throughput for long buffers.
+> > In principle splitting the 'adc memory' into two instructions
+> > is the same number of u-ops - but I'm sure I've tried to do
+> > that and failed and the extra memory write can happen in
+> > parallel with everything else.
+> > So I don't think you'll get 16 bytes in two clocks - but you
+> > might get it is three.
+> >
+> > OTOH for a cpu where memcpy is code loop summing the data in
+> > the copy loop is likely to be a gain.
+> >
+> > But I suspect doing the checksum and copy at the same time
+> > got 'all to complicated' to actually implement fully.
+> > With most modern ethernet chips checksumming receive pacakets
+> > does it really get used enough for the additional complexity?
+>
+> You may be right.  That's more a question for the networking folks than f=
+or
+> me.  It's entirely possible that the checksumming code is just not used o=
+n
+> modern systems these days.
+>
+> Maybe Willem can comment since he's the UDP maintainer?
 
-Add cancelable uring_cmd to provide mechanism to driver for cancelling
-pending commands in its own way.
-
-Add API of io_uring_cmd_mark_cancelable() for driver to mark one command as
-cancelable, then io_uring will cancel this command in
-io_uring_cancel_generic(). ->uring_cmd() callback is reused for canceling
-command in driver's way, then driver gets notified with the cancelling
-from io_uring.
-
-Add API of io_uring_cmd_get_task() to help driver cancel handler
-deal with the canceling.
-
-Cc: Gabriel Krisman Bertazi <krisman@suse.de>
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/io_uring.h       | 16 +++++++++++
- include/linux/io_uring_types.h |  6 +++++
- io_uring/io_uring.c            | 36 +++++++++++++++++++++++++
- io_uring/uring_cmd.c           | 49 ++++++++++++++++++++++++++++++++++
- 4 files changed, 107 insertions(+)
-
-diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-index ae08d6f66e62..a0307289bdc7 100644
---- a/include/linux/io_uring.h
-+++ b/include/linux/io_uring.h
-@@ -20,9 +20,13 @@ enum io_uring_cmd_flags {
- 	IO_URING_F_SQE128		= (1 << 8),
- 	IO_URING_F_CQE32		= (1 << 9),
- 	IO_URING_F_IOPOLL		= (1 << 10),
-+
-+	/* set when uring wants to cancel one issued command */
-+	IO_URING_F_CANCEL		= (1 << 11),
- };
- 
- /* only top 8 bits of sqe->uring_cmd_flags for kernel internal use */
-+#define IORING_URING_CMD_CANCELABLE	(1U << 30)
- #define IORING_URING_CMD_POLLED		(1U << 31)
- 
- struct io_uring_cmd {
-@@ -85,6 +89,9 @@ static inline void io_uring_free(struct task_struct *tsk)
- 		__io_uring_free(tsk);
- }
- int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags);
-+int io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-+		unsigned int issue_flags);
-+struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd);
- #else
- static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
- 			      struct iov_iter *iter, void *ioucmd)
-@@ -125,6 +132,15 @@ static inline int io_uring_cmd_sock(struct io_uring_cmd *cmd,
- {
- 	return -EOPNOTSUPP;
- }
-+static inline int io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-+		unsigned int issue_flags)
-+{
-+	return -EOPNOTSUPP;
-+}
-+static inline struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd)
-+{
-+	return NULL;
-+}
- #endif
- 
- #endif
-diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
-index 13d19b9be9f4..1571db76bec1 100644
---- a/include/linux/io_uring_types.h
-+++ b/include/linux/io_uring_types.h
-@@ -265,6 +265,12 @@ struct io_ring_ctx {
- 		 */
- 		struct io_wq_work_list	iopoll_list;
- 		bool			poll_multi_queue;
-+
-+		/*
-+		 * Any cancelable uring_cmd is added to this list in
-+		 * ->uring_cmd() by io_uring_cmd_insert_cancelable()
-+		 */
-+		struct hlist_head	cancelable_uring_cmd;
- 	} ____cacheline_aligned_in_smp;
- 
- 	struct {
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index 9aedb7202403..9c90cad39059 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -350,6 +350,7 @@ static __cold struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
- 	INIT_WQ_LIST(&ctx->locked_free_list);
- 	INIT_DELAYED_WORK(&ctx->fallback_work, io_fallback_req_func);
- 	INIT_WQ_LIST(&ctx->submit_state.compl_reqs);
-+	INIT_HLIST_HEAD(&ctx->cancelable_uring_cmd);
- 	return ctx;
- err:
- 	kfree(ctx->cancel_table.hbs);
-@@ -3256,6 +3257,40 @@ static __cold bool io_uring_try_cancel_iowq(struct io_ring_ctx *ctx)
- 	return ret;
- }
- 
-+static bool io_uring_try_cancel_uring_cmd(struct io_ring_ctx *ctx,
-+		struct task_struct *task, bool cancel_all)
-+{
-+	struct hlist_node *tmp;
-+	struct io_kiocb *req;
-+	bool ret = false;
-+
-+	lockdep_assert_held(&ctx->uring_lock);
-+
-+	hlist_for_each_entry_safe(req, tmp, &ctx->cancelable_uring_cmd,
-+			hash_node) {
-+		struct io_uring_cmd *cmd = io_kiocb_to_cmd(req,
-+				struct io_uring_cmd);
-+		struct file *file = req->file;
-+
-+		if (WARN_ON_ONCE(!file->f_op->uring_cmd))
-+			continue;
-+
-+		if (!cancel_all && req->task != task)
-+			continue;
-+
-+		if (cmd->flags & IORING_URING_CMD_CANCELABLE) {
-+			/* ->sqe isn't available if no async data */
-+			if (!req_has_async_data(req))
-+				cmd->sqe = NULL;
-+			file->f_op->uring_cmd(cmd, IO_URING_F_CANCEL);
-+			ret = true;
-+		}
-+	}
-+	io_submit_flush_completions(ctx);
-+
-+	return ret;
-+}
-+
- static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
- 						struct task_struct *task,
- 						bool cancel_all)
-@@ -3303,6 +3338,7 @@ static __cold bool io_uring_try_cancel_requests(struct io_ring_ctx *ctx,
- 	ret |= io_cancel_defer_files(ctx, task, cancel_all);
- 	mutex_lock(&ctx->uring_lock);
- 	ret |= io_poll_remove_all(ctx, task, cancel_all);
-+	ret |= io_uring_try_cancel_uring_cmd(ctx, task, cancel_all);
- 	mutex_unlock(&ctx->uring_lock);
- 	ret |= io_kill_timeouts(ctx, task, cancel_all);
- 	if (task)
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index a0b0ec5473bf..f2cbfa7f1f7f 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -13,6 +13,53 @@
- #include "rsrc.h"
- #include "uring_cmd.h"
- 
-+static void io_uring_cmd_del_cancelable(struct io_uring_cmd *cmd,
-+		unsigned int issue_flags)
-+{
-+	struct io_kiocb *req = cmd_to_io_kiocb(cmd);
-+	struct io_ring_ctx *ctx = req->ctx;
-+
-+	if (!(cmd->flags & IORING_URING_CMD_CANCELABLE))
-+		return;
-+
-+	cmd->flags &= ~IORING_URING_CMD_CANCELABLE;
-+	io_ring_submit_lock(ctx, issue_flags);
-+	hlist_del(&req->hash_node);
-+	io_ring_submit_unlock(ctx, issue_flags);
-+}
-+
-+/*
-+ * Mark this command as concelable, then io_uring_try_cancel_uring_cmd()
-+ * will try to cancel this issued command by sending ->uring_cmd() with
-+ * issue_flags of IO_URING_F_CANCEL.
-+ *
-+ * The command is guaranteed to not be done when calling ->uring_cmd()
-+ * with IO_URING_F_CANCEL, but it is driver's responsibility to deal
-+ * with race between io_uring canceling and normal completion.
-+ */
-+int io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-+		unsigned int issue_flags)
-+{
-+	struct io_kiocb *req = cmd_to_io_kiocb(cmd);
-+	struct io_ring_ctx *ctx = req->ctx;
-+
-+	if (!(cmd->flags & IORING_URING_CMD_CANCELABLE)) {
-+		cmd->flags |= IORING_URING_CMD_CANCELABLE;
-+		io_ring_submit_lock(ctx, issue_flags);
-+		hlist_add_head(&req->hash_node, &ctx->cancelable_uring_cmd);
-+		io_ring_submit_unlock(ctx, issue_flags);
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(io_uring_cmd_mark_cancelable);
-+
-+struct task_struct *io_uring_cmd_get_task(struct io_uring_cmd *cmd)
-+{
-+	return cmd_to_io_kiocb(cmd)->task;
-+}
-+EXPORT_SYMBOL_GPL(io_uring_cmd_get_task);
-+
- static void io_uring_cmd_work(struct io_kiocb *req, struct io_tw_state *ts)
- {
- 	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
-@@ -56,6 +103,8 @@ void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2,
- {
- 	struct io_kiocb *req = cmd_to_io_kiocb(ioucmd);
- 
-+	io_uring_cmd_del_cancelable(ioucmd, issue_flags);
-+
- 	if (ret < 0)
- 		req_set_fail(req);
- 
--- 
-2.41.0
-
+Perhaps these days it is more relevant to embedded systems than high
+end servers.
