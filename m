@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53640CE7A81
-	for <linux-block@archiver.kernel.org>; Mon, 25 Sep 2023 12:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB7FCE7A81
+	for <linux-block@archiver.kernel.org>; Mon, 25 Sep 2023 12:05:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230470AbjIYMEw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Sep 2023 08:04:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38548 "EHLO
+        id S231627AbjIYMFd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Sep 2023 08:05:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbjIYMEv (ORCPT
+        with ESMTP id S231604AbjIYMFK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Sep 2023 08:04:51 -0400
+        Mon, 25 Sep 2023 08:05:10 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124FA107
-        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 05:03:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF16E115
+        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 05:03:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695643410;
+        s=mimecast20190719; t=1695643416;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7BA8QLNemiJIXUC+XXC0PAivfRO0j2uaFr7AQHg4nPM=;
-        b=f+BzWF5imyFjr5mYr2vn0K7UtVAZH2km70CkpYI4hePs1WOv1INdh5oem9PosYELhW6Zkh
-        1pIHjw1GDFDUlCnfAgUr3KDl99Atq1DV/tdasa5AoytsijMIwDYk3857uomIOtisCiwzYM
-        BS+9rZgxC2f4jCNUK3W0Ik8jcuX9e6w=
+        bh=oQjxv/qWpzFGTlwOWGQlwUCcgnofDI2I99l4qJgz63Y=;
+        b=NFECnYnBcdDFPi9RcpMSDg5CoC76PDdwIiOnjHbgiqFCjqY2O72cBSaMnkp2lHaNZlutzB
+        ixAUZZcLQvfsIDDYPIAAM/U0jl7IA33PVCocMstLefEriSwao3vHRIIyYeIeOH1k6I+E7Q
+        9cz1yVVfj/lkgdW8DwxSH6vOLVu3qYQ=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-443-3j0u1djBOj-K7pheSFVopw-1; Mon, 25 Sep 2023 08:03:26 -0400
-X-MC-Unique: 3j0u1djBOj-K7pheSFVopw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-269-DNPjLMOqM3-blp0lhNFq-g-1; Mon, 25 Sep 2023 08:03:31 -0400
+X-MC-Unique: DNPjLMOqM3-blp0lhNFq-g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0B212811E88;
-        Mon, 25 Sep 2023 12:03:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB143101AA42;
+        Mon, 25 Sep 2023 12:03:30 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7101940C2064;
-        Mon, 25 Sep 2023 12:03:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4D914711293;
+        Mon, 25 Sep 2023 12:03:29 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -50,59 +50,55 @@ Cc:     David Howells <dhowells@redhat.com>,
         Jeff Layton <jlayton@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.de>,
-        Oswald Buddenhagen <oswald.buddenhagen@gmx.de>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
-        alsa-devel@alsa-project.org
-Subject: [PATCH v7 03/12] sound: Fix snd_pcm_readv()/writev() to use iov access functions
-Date:   Mon, 25 Sep 2023 13:03:00 +0100
-Message-ID: <20230925120309.1731676-4-dhowells@redhat.com>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v7 05/12] iov_iter: Renumber ITER_* constants
+Date:   Mon, 25 Sep 2023 13:03:02 +0100
+Message-ID: <20230925120309.1731676-6-dhowells@redhat.com>
 In-Reply-To: <20230925120309.1731676-1-dhowells@redhat.com>
 References: <20230925120309.1731676-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix snd_pcm_readv()/writev() to use iov access functions rather than poking
-at the iov_iter internals directly.
+Renumber the ITER_* iterator-type constants to put things in the same order
+as in the iteration functions and to group user-backed iterators at the
+bottom.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jaroslav Kysela <perex@perex.cz>
-Reviewed-by: Takashi Iwai <tiwai@suse.de>
-cc: Oswald Buddenhagen <oswald.buddenhagen@gmx.de>
+cc: Alexander Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Suren Baghdasaryan <surenb@google.com>
-cc: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
-cc: alsa-devel@alsa-project.org
+cc: Christoph Hellwig <hch@lst.de>
+cc: Christian Brauner <christian@brauner.io>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: David Laight <David.Laight@ACULAB.COM>
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
 ---
- sound/core/pcm_native.c | 4 ++--
+ include/linux/uio.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/sound/core/pcm_native.c b/sound/core/pcm_native.c
-index bd9ddf412b46..9a69236fa207 100644
---- a/sound/core/pcm_native.c
-+++ b/sound/core/pcm_native.c
-@@ -3527,7 +3527,7 @@ static ssize_t snd_pcm_readv(struct kiocb *iocb, struct iov_iter *to)
- 	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
- 	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
- 		return -EBADFD;
--	if (!to->user_backed)
-+	if (!user_backed_iter(to))
- 		return -EINVAL;
- 	if (to->nr_segs > 1024 || to->nr_segs != runtime->channels)
- 		return -EINVAL;
-@@ -3567,7 +3567,7 @@ static ssize_t snd_pcm_writev(struct kiocb *iocb, struct iov_iter *from)
- 	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
- 	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
- 		return -EBADFD;
--	if (!from->user_backed)
-+	if (!user_backed_iter(from))
- 		return -EINVAL;
- 	if (from->nr_segs > 128 || from->nr_segs != runtime->channels ||
- 	    !frame_aligned(runtime, iov->iov_len))
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 2000e42a6586..bef8e56aa45c 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -21,12 +21,12 @@ struct kvec {
+ 
+ enum iter_type {
+ 	/* iter types */
++	ITER_UBUF,
+ 	ITER_IOVEC,
+-	ITER_KVEC,
+ 	ITER_BVEC,
++	ITER_KVEC,
+ 	ITER_XARRAY,
+ 	ITER_DISCARD,
+-	ITER_UBUF,
+ };
+ 
+ #define ITER_SOURCE	1	// == WRITE
 
