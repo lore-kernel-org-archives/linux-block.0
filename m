@@ -2,110 +2,124 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAE1CE7A94
-	for <linux-block@archiver.kernel.org>; Mon, 25 Sep 2023 12:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BA9CCE7A81
+	for <linux-block@archiver.kernel.org>; Mon, 25 Sep 2023 13:49:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbjIYMe0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Sep 2023 08:34:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40284 "EHLO
+        id S231804AbjIYNtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Sep 2023 09:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjIYMe0 (ORCPT
+        with ESMTP id S230263AbjIYNtX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Sep 2023 08:34:26 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A34B2C0;
-        Mon, 25 Sep 2023 05:34:19 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77CF1C433C8;
-        Mon, 25 Sep 2023 12:34:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695645259;
-        bh=J10rv6bwcTutOdorIcDRobiFGuFoRoy6Xp7WZz1xess=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PKodcEXRYh+o0SNKQyZ8FgXZg9GWdMnNBb5H+KR/sefu8wF/OfnPLqKkM6kKbrF5e
-         PZv8/KIqipItoRw0jjQTZpRaAPb+DdI6aBLCfYBXi0KGLaXLx3NTzLT0sIV7UNkX2u
-         Ami8N9SDcJJdsoaTIam7bpnyZrb28ez1auYVMvOSj0mAjNCLPY85quBxR3ZRe9xUlG
-         HbguRxmRI7pYysI4BWAOxV1uOCsLJjf1Q89UPysZaKfa/UztP4qwgyn0R6ybCm7QCZ
-         MBxP/nY/03OnvzS4VinL5Q5YZu2CPEl39TZwqB9HOqifDYJOhWq0FzpR92vRRogL3f
-         xZhpvqllQ9Udg==
-From:   Christian Brauner <brauner@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        David Laight <David.Laight@ACULAB.COM>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v7 00/12] iov_iter: Convert the iterator macros into inline funcs
-Date:   Mon, 25 Sep 2023 14:34:05 +0200
-Message-Id: <20230925-zugetan-abhaken-8edd66ed06a7@brauner>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230925120309.1731676-1-dhowells@redhat.com>
-References: <20230925120309.1731676-1-dhowells@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2706; i=brauner@kernel.org; h=from:subject:message-id; bh=J10rv6bwcTutOdorIcDRobiFGuFoRoy6Xp7WZz1xess=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQK1hmHvPzoGPKx7qV/gLKL5G1Xu5nvRaWuGPHOjJ94O+PO 2m+nOkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACZym53hf/yXFaacTd13BbbPcXgjKf DuyJ0T0RVNa64c/i/7J1xty15Ghnnaub/z18qWMW+/u85tLlPsFZ3v+brXoz93TOfc9v+DBycA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+        Mon, 25 Sep 2023 09:49:23 -0400
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02olkn2053.outbound.protection.outlook.com [40.92.48.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4731E8;
+        Mon, 25 Sep 2023 06:49:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BfYa8WauShdUdEvulzlwYDnvrS1O54NjxlQd7zZwzcwBk4oDgfVgqlsQG+wRXYlEFkkuHeHXlX29YMCht5/gHOYEsZbui4zkGffaItacsRGg/ahfhRE5EY20suua/K3KUC7AiqNfPw3hgmNiuEzWkXdfCgF0PVzF4RS6RgUT9pOCqLgqphjfPkC8OFcoOoRxcbDgjA3Hob45TwIijm8fA/2suIAtXeRFv9tJXWdgCpfN5LYvcaUUPcQnnL4ypTCb2kCetZJ+wGIzYl+2YxHvnQJ5uwWdlURsncrhT0fKCU8Nl+Dmb4z/tOwpKiQcN8J3ywiSbQBa1/NlKoqM/OuIEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vuqiSa766LRRK8Mhw7oz0wQ7NCzjhOgJY1nFgKBOevY=;
+ b=W3p3+JENHHmmFvFja5G0Wglu0xfOzyzUUnSMl0z426yB6OMOx4An+4y+W0eHx1kjs9P2zYoxwhi2RfEdhMnVRVzO2rvfiFIkMCOK+eIm44K2APIEsrM1PMtHF8mNhgAPe/tGGbJyEqXtrEZRork+uxPka3XTpDnjorgE8cfell/I0YBME5+DwS14JEj52HyRdpQNVUiAtirrDpf2/5CLHJmQbx1jvgPy5zT4rGwHWSMF8G63SOo978M/29CTpTH5KOJmJ3u24Y7gH3xH7UiCEj7coXG86n9Gg8eWKKSUcF8P/nmIOGJrF2v5/4PCpXLUWHUmPmO9Pgid6wk3aGFbrg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vuqiSa766LRRK8Mhw7oz0wQ7NCzjhOgJY1nFgKBOevY=;
+ b=dMjEWmm9qJ8JhkkH7Viv5EKi2Et1RMKi5bPYemFnN6hr2oBRfW5Gru11aQfp8TpLP8dwtxJrfNKJknrWp2Tf1CidJvsJYSxZpQrm6rJeRKyCoyArfrksC/O1yzJmCvJd43fiJemeWLkSRKCYXxO270Q5AIv/XxjeKntrhfvNXdiAJQ4ie6iuQZ4FwZTG1jfOadpmtyNHIRHHur36XRcvCF5+wyByE8ZMRloS5WHrgXzxlevAa6VOkTaYplTznz+8cmrTPeY0a8atB2fgnahFXcYicBpb1EWwlyMAlh+zYz4b4bRD4S2SZnS+GKdR7B8YhIqTELx1dVPzGHMjBzhAww==
+Received: from PAXP192MB1278.EURP192.PROD.OUTLOOK.COM (2603:10a6:102:1a0::14)
+ by DB9P192MB1324.EURP192.PROD.OUTLOOK.COM (2603:10a6:10:26a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Mon, 25 Sep
+ 2023 13:49:14 +0000
+Received: from PAXP192MB1278.EURP192.PROD.OUTLOOK.COM
+ ([fe80::96b5:b07f:1856:4593]) by PAXP192MB1278.EURP192.PROD.OUTLOOK.COM
+ ([fe80::96b5:b07f:1856:4593%4]) with mapi id 15.20.6813.027; Mon, 25 Sep 2023
+ 13:49:14 +0000
+From:   Yuran Pereira <yuran.pereira@hotmail.com>
+To:     axboe@kernel.dk
+Cc:     Yuran Pereira <yuran.pereira@hotmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH] drivers/block: Updates loop_set_size comment
+Date:   Mon, 25 Sep 2023 19:18:39 +0530
+Message-ID: <PAXP192MB1278B70E2258023496F97F2FE8FCA@PAXP192MB1278.EURP192.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.25.1
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [K2lhH7PZIeGMuu0qlv0zWDZS7JfOpoNC]
+X-ClientProxiedBy: JNAP275CA0061.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4f::19)
+ To PAXP192MB1278.EURP192.PROD.OUTLOOK.COM (2603:10a6:102:1a0::14)
+X-Microsoft-Original-Message-ID: <20230925134839.1132789-1-yuran.pereira@hotmail.com>
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXP192MB1278:EE_|DB9P192MB1324:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6c13824-73b9-4bf1-6f66-08dbbdce344e
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: v/qZWrrj6qAZ567v5ujX7DiFecEPECd0gxK8zcngi657ab4o3k2DlX0RM4dYZTfAAwrfvhWnOGwTSNOPnvCcC11Ab7dMHiG0ePHUmwOxgDCuA4g5QdbA0CDnMAGdOayKdUZIUVhoYs21XdSpnCiWQVL1MdjNGsAhvPW3CGsZ3pHdyLb8w+EpRjXcl2JWMbzy0+qYpMLobhVU5na1dkWrKRLlKIZ+oWIdLs1zBijB8r/sKPa2zQYhCCVFiRpFH40qP6ikc1yP3yQ/2vaIIQguK0hPz8ysLy0uWnN8C9ZghJMNN1YLMyAEW1krgXylPP24cP1Pue82fA21xqviV+4JMek+JqrAXPBD7201Al5TTWdFg90gRpgHGyUfU0cno1rm6bvziEN23cpQgUOcak9gDppoEq++2B8Spof9HiSAT/uvuTt5g9PODOsMvMyT2avSXXN1ZDS41U3D6UutmJjdLPRbIc4gmN/JmyzS5GVfALQuyk0oW5QsJKt5UpM2pekMiu7HfL20eqnwJlBP+2hQDX1HxzFRa+CVwFHTl4xCDY0ktGGqx/TKRxMqywq9drAkoXnmS0BCj8xYnWRRNQvVcJvsdGpoHnvo1pYZBfTM+cU=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6dgAg5bVsIpO7pJoASBRT4Keh55Mb7m6AhxymsoUOJC19EzZi3vRD1llNBji?=
+ =?us-ascii?Q?QSilpVraS3PJoXCVIqQ7KtJC4SlWD84BVLmTs94OMm7XUiYlQG1j9sylywe4?=
+ =?us-ascii?Q?uiVQhUwXKYmun0Ze9hluOkHh8XmedHVkqXs6Qie5qYLYs2a2oqFOox4cyegb?=
+ =?us-ascii?Q?aILpPQvA6kQWhrQSLCYJcef8HwBJ8ePsAVN7tk2MX4QOndZ7grUokRcAIfrr?=
+ =?us-ascii?Q?H4FbjnTe3wMS9RjR+DimCvy6aGp7KPA4pFeLybhnySPKfkE72gSj/svxs3fY?=
+ =?us-ascii?Q?9/a+4/de85OEzjXme5sgya2dGJIo+GA0M6KmxAiMgDm5IjuE4oaqrX991Dab?=
+ =?us-ascii?Q?88BJRyxJxidLXHMuMmzB5LZd71bzwmnwA2Zra8wSBfysAsvSvfc3Vu7nOSt4?=
+ =?us-ascii?Q?Fgm/Fm9PZ+adNcESkblzp46DWtrX51bIfCFfoW/0Baf7ihEftQEtA/9yLvIN?=
+ =?us-ascii?Q?sQy7PhUuTTIQvIrFalKYwDwqIIedN6slVCOql+TGn5z/mNx5ZZuiH39dCVhL?=
+ =?us-ascii?Q?Ov9ikI9jl34WzQjdyvADf/aXZwvlx6Ivh08ZRHcOclFBbH9fSsgbqZLmLff6?=
+ =?us-ascii?Q?AUgBouKFZN7hKWrUG31lSPvIJJvopGe7F+dxJssu0qS7iQPJdHprvj+K4cc3?=
+ =?us-ascii?Q?W5BYdh/kJQke1IS0iHRUibrBbCyTlqU+V7ahzaUCue5VCOF0UjQ3gTsme1cv?=
+ =?us-ascii?Q?FvK/nWNUihrsBj6GZEsrSCOqmrwIkxO3/Ofwoyi66eESXON8QxiOfNwOZbnw?=
+ =?us-ascii?Q?yjFd0MsSvbq7FiaaXDNkWR6rTDp/q6dqgpWNUkwFYrgy0+aWE00GcbKqr/5U?=
+ =?us-ascii?Q?jAvzadp7fWdLNfrUimHYbr/o3VHCeDHuYfcwt/jXjtmy2M7nAG/qrwrxblqd?=
+ =?us-ascii?Q?K3RYaaUzsfk9tXR93xxxhcp/oGX0QNUrc7aL5rw5/3LAU+EIddKwJhRl5QtT?=
+ =?us-ascii?Q?ruqrvGBe9ueo0eH0IUdiZhAHGY76mkfda4VuZFXdV4h/PmkUqJ8CyIhrOaYL?=
+ =?us-ascii?Q?D5ml8M7yz6qcwloipKaaVfAtXaSutrt0pFLmbDi2XY/bbbDMLjfa8WWeDm9m?=
+ =?us-ascii?Q?SzL7hNNIJOuqWdMpxs+ao2xBIIjRbQw0B1uEncfOFYoj7PmfmDWFHv7zuwYW?=
+ =?us-ascii?Q?/fBGz6PmPlxYl76VQYrANknD9QFWNUgiSWFkxEgingzL8Jd4jVYA8+KsCozG?=
+ =?us-ascii?Q?gxBZUsbqcKJDS7/0xx3Iov99VAGkk0IISCLsvwrhMGKyypwu3v7+qkNwmOQ?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-fb43a.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6c13824-73b9-4bf1-6f66-08dbbdce344e
+X-MS-Exchange-CrossTenant-AuthSource: PAXP192MB1278.EURP192.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 13:49:14.7116
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9P192MB1324
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 25 Sep 2023 13:02:57 +0100, David Howells wrote:
-> Could you take these patches into the block tree or the fs tree?  The
-> patches convert the iov_iter iteration macros to be inline functions.
-> 
->  (1) Remove last_offset from iov_iter as it was only used by ITER_PIPE.
-> 
->  (2) Add a __user tag on copy_mc_to_user()'s dst argument on x86 to match
->      that on powerpc and get rid of a sparse warning.
-> 
-> [...]
+Since loop_validate_size() has been removed, there is no longer a need
+to validate the size passed to loop_set_size(). This patch removes
+the comment from loop_set_size() that states otherwise.
 
-I'm giving you vfs.iov_iter as a stable (no rebases) branch so you can
-put fixes on top. Please let me know if someone else needs to take this.
-
+Signed-off-by: Yuran Pereira <yuran.pereira@hotmail.com>
 ---
+ drivers/block/loop.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Applied to the vfs.iov_iter branch of the vfs/vfs.git tree.
-Patches in the vfs.iov_iter branch should appear in linux-next soon.
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 9f2d412fc560..68b8684ca16f 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -228,9 +228,6 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+  * loop_set_size() - sets device size and notifies userspace
+  * @lo: struct loop_device to set the size for
+  * @size: new size of the loop device
+- *
+- * Callers must validate that the size passed into this function fits into
+- * a sector_t, eg using loop_validate_size()
+  */
+ static void loop_set_size(struct loop_device *lo, loff_t size)
+ {
+-- 
+2.25.1
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
-
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.iov_iter
-
-[01/12] iov_iter: Remove last_offset from iov_iter as it was for ITER_PIPE
-        https://git.kernel.org/vfs/vfs/c/581beb4fe37d
-[02/12] iov_iter, x86: Be consistent about the __user tag on copy_mc_to_user()
-        https://git.kernel.org/vfs/vfs/c/066baf92bed9
-[03/12] sound: Fix snd_pcm_readv()/writev() to use iov access functions
-        https://git.kernel.org/vfs/vfs/c/1fcb71282e73
-[04/12] infiniband: Use user_backed_iter() to see if iterator is UBUF/IOVEC
-        https://git.kernel.org/vfs/vfs/c/7ebc540b3524
-[05/12] iov_iter: Renumber ITER_* constants
-        https://git.kernel.org/vfs/vfs/c/7d9e44a6ad8a
-[06/12] iov_iter: Derive user-backedness from the iterator type
-        https://git.kernel.org/vfs/vfs/c/f1b4cb650b9a
-[07/12] iov_iter: Convert iterate*() to inline funcs
-        https://git.kernel.org/vfs/vfs/c/f1982740f5e7
-[08/12] iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()
-        https://git.kernel.org/vfs/vfs/c/51edcc92222f
-[09/12] iov_iter, net: Move csum_and_copy_to/from_iter() to net/
-        https://git.kernel.org/vfs/vfs/c/ef6fdd780dd4
-[10/12] iov_iter, net: Fold in csum_and_memcpy()
-        https://git.kernel.org/vfs/vfs/c/0837c6c20a4c
-[11/12] iov_iter, net: Merge csum_and_copy_from_iter{,_full}() together
-        https://git.kernel.org/vfs/vfs/c/921203282d82
-[12/12] iov_iter, net: Move hash_and_copy_to_iter() to net/
-        https://git.kernel.org/vfs/vfs/c/d7a22f309096
