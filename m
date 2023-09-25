@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6683DCE7A81
-	for <linux-block@archiver.kernel.org>; Mon, 25 Sep 2023 12:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC658CE7A95
+	for <linux-block@archiver.kernel.org>; Mon, 25 Sep 2023 12:06:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231504AbjIYMGF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Sep 2023 08:06:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46722 "EHLO
+        id S231829AbjIYMGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Sep 2023 08:06:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231409AbjIYMFl (ORCPT
+        with ESMTP id S231676AbjIYMFl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 25 Sep 2023 08:05:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5F7192
-        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 05:03:48 -0700 (PDT)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 235391B2
+        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 05:03:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695643427;
+        s=mimecast20190719; t=1695643432;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=i+29vAFZrXF9naWng0ipN/2z31gEil+IMifE0VymLF4=;
-        b=ACGs1bqKGj7uT9u8nlD6FU0cofceVLtzVFJlHimUXy26gY4N2jXS0HdNzjuI1YkoZ5wjPV
-        OKiPWyh2BRti2zhxKs/+3nQvb9QDgv9jGoQXS6zlmME+YUKFlmDfjzio2+tgu9W506qKnE
-        wrAbCQVuBM0TYTaY2013WAoJOd5RX9c=
+        bh=OEnm3txfdKWMLGG8rrdFEcQBV2WWgkp8Kq4P7DhBB1I=;
+        b=TByuJslYEDsGB5FzsNRGGTJo8cH1kZCU2ypiUb1ZGEaSXwbN1miu9eiYCsmjkeMYlyDrAJ
+        vVn1FOG7vKb2ectuLenL50fTNKC6FItXN+YQKmA0GXbFDNsZ1ndZKzyMVuy8wD4csD4SwE
+        QTSYCHDq0qAXy3/xmCBrQlZtQHaVcqQ=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-47-rBgXHwEcPtC09KsWTkJlvw-1; Mon, 25 Sep 2023 08:03:44 -0400
-X-MC-Unique: rBgXHwEcPtC09KsWTkJlvw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-436-X-q17QG2OBu5zjjUIF3oyA-1; Mon, 25 Sep 2023 08:03:47 -0400
+X-MC-Unique: X-q17QG2OBu5zjjUIF3oyA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7DCE3800045;
-        Mon, 25 Sep 2023 12:03:43 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3C1CD811E93;
+        Mon, 25 Sep 2023 12:03:46 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 770E5C15BB8;
-        Mon, 25 Sep 2023 12:03:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 337AD40C6EA8;
+        Mon, 25 Sep 2023 12:03:44 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -55,19 +55,20 @@ Cc:     David Howells <dhowells@redhat.com>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v7 10/12] iov_iter, net: Fold in csum_and_memcpy()
-Date:   Mon, 25 Sep 2023 13:03:07 +0100
-Message-ID: <20230925120309.1731676-11-dhowells@redhat.com>
+Subject: [PATCH v7 11/12] iov_iter, net: Merge csum_and_copy_from_iter{,_full}() together
+Date:   Mon, 25 Sep 2023 13:03:08 +0100
+Message-ID: <20230925120309.1731676-12-dhowells@redhat.com>
 In-Reply-To: <20230925120309.1731676-1-dhowells@redhat.com>
 References: <20230925120309.1731676-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fold csum_and_memcpy() in to its callers.
+Move csum_and_copy_from_iter_full() out of line and then merge
+csum_and_copy_from_iter() into its only caller.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Alexander Viro <viro@zeniv.linux.org.uk>
@@ -86,57 +87,86 @@ cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 cc: netdev@vger.kernel.org
 ---
- include/linux/skbuff.h | 7 -------
- net/core/datagram.c    | 3 ++-
- net/core/skbuff.c      | 3 ++-
- 3 files changed, 4 insertions(+), 9 deletions(-)
+ include/linux/skbuff.h | 19 ++-----------------
+ net/core/datagram.c    |  5 +++++
+ net/core/skbuff.c      | 20 +++++++++++++-------
+ 3 files changed, 20 insertions(+), 24 deletions(-)
 
 diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index d0656cc11c16..c81ef5d76953 100644
+index c81ef5d76953..be402f55f6d6 100644
 --- a/include/linux/skbuff.h
 +++ b/include/linux/skbuff.h
-@@ -3679,13 +3679,6 @@ static inline int __must_check skb_put_padto(struct sk_buff *skb, unsigned int l
+@@ -3679,23 +3679,8 @@ static inline int __must_check skb_put_padto(struct sk_buff *skb, unsigned int l
  	return __skb_put_padto(skb, len, true);
  }
  
--static inline __wsum csum_and_memcpy(void *to, const void *from, size_t len,
--				     __wsum sum, size_t off)
--{
--	__wsum next = csum_partial_copy_nocheck(from, to, len);
--	return csum_block_add(sum, next, off);
--}
+-struct csum_state {
+-	__wsum csum;
+-	size_t off;
+-};
 -
- struct csum_state {
- 	__wsum csum;
- 	size_t off;
+-size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum, struct iov_iter *i);
+-
+-static __always_inline __must_check
+-bool csum_and_copy_from_iter_full(void *addr, size_t bytes,
+-				  __wsum *csum, struct iov_iter *i)
+-{
+-	size_t copied = csum_and_copy_from_iter(addr, bytes, csum, i);
+-	if (likely(copied == bytes))
+-		return true;
+-	iov_iter_revert(i, copied);
+-	return false;
+-}
++bool csum_and_copy_from_iter_full(void *addr, size_t bytes, __wsum *csum, struct iov_iter *i)
++	__must_check;
+ 
+ static inline int skb_add_data(struct sk_buff *skb,
+ 			       struct iov_iter *from, int copy)
 diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 37c89d0933b7..452620dd41e4 100644
+index 452620dd41e4..722311eeee18 100644
 --- a/net/core/datagram.c
 +++ b/net/core/datagram.c
-@@ -732,8 +732,9 @@ size_t memcpy_to_iter_csum(void *iter_to, size_t progress,
- 			   size_t len, void *from, void *priv2)
- {
- 	__wsum *csum = priv2;
-+	__wsum next = csum_partial_copy_nocheck(from, iter_to, len);
- 
--	*csum = csum_and_memcpy(iter_to, from + progress, len, *csum, progress);
-+	*csum = csum_block_add(*csum, next, progress);
+@@ -738,6 +738,11 @@ size_t memcpy_to_iter_csum(void *iter_to, size_t progress,
  	return 0;
  }
  
++struct csum_state {
++	__wsum csum;
++	size_t off;
++};
++
+ static size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *_csstate,
+ 				    struct iov_iter *i)
+ {
 diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 5dbdfce2d05f..3efed86321db 100644
+index 3efed86321db..2bfa6a7ba244 100644
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
-@@ -6938,8 +6938,9 @@ size_t memcpy_from_iter_csum(void *iter_from, size_t progress,
- 			     size_t len, void *to, void *priv2)
- {
- 	__wsum *csum = priv2;
-+	__wsum next = csum_partial_copy_nocheck(iter_from, to + progress, len);
- 
--	*csum = csum_and_memcpy(to + progress, iter_from, len, *csum, progress);
-+	*csum = csum_block_add(*csum, next, progress);
- 	return 0;
+@@ -6955,13 +6955,19 @@ size_t copy_from_user_iter_csum(void __user *iter_from, size_t progress,
+ 	return next ? 0 : len;
  }
  
+-size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum,
+-			       struct iov_iter *i)
++bool csum_and_copy_from_iter_full(void *addr, size_t bytes,
++				  __wsum *csum, struct iov_iter *i)
+ {
++	size_t copied;
++
+ 	if (WARN_ON_ONCE(!i->data_source))
+-		return 0;
+-	return iterate_and_advance2(i, bytes, addr, csum,
+-				    copy_from_user_iter_csum,
+-				    memcpy_from_iter_csum);
++		return false;
++	copied = iterate_and_advance2(i, bytes, addr, csum,
++				      copy_from_user_iter_csum,
++				      memcpy_from_iter_csum);
++	if (likely(copied == bytes))
++		return true;
++	iov_iter_revert(i, copied);
++	return false;
+ }
+-EXPORT_SYMBOL(csum_and_copy_from_iter);
++EXPORT_SYMBOL(csum_and_copy_from_iter_full);
 
