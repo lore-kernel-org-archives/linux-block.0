@@ -2,73 +2,173 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F64E6FE31
-	for <linux-block@archiver.kernel.org>; Tue, 26 Sep 2023 00:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814F6E8180D
+	for <linux-block@archiver.kernel.org>; Tue, 26 Sep 2023 01:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231225AbjIZAwl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Sep 2023 20:52:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42668 "EHLO
+        id S232893AbjIZB3W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Sep 2023 21:29:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjIZAwl (ORCPT
+        with ESMTP id S231747AbjIZB3W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Sep 2023 20:52:41 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C124DB3;
-        Mon, 25 Sep 2023 17:52:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=u1nU5JLGvirz2IB1v8ZoAM3OrG2Ec5+6zeDs75GvXlo=; b=n+uSFqIe00KUc/NH7EKJ6RAJCB
-        trpwtKivX/CEPUqw7AcIJ2FtwgHP1JE9hD5nKie9TWqiPD1gofUOxumZ3VWerVrbj3gJHK/iMzb5N
-        UTYHDXSVWN5tj7D1CRfPtHV+2c7VF3MLiuQ33XwbR6ELgLb17BN6jvng6jD28Sumf+7JnzPrTFyQp
-        cTqFFiuKheQDyVB40ARB2afa8fD2nVqos13HRJZAdv/3ukBEq33mIQIMp5rrSZOKFOJjru8DwYfYw
-        2cznmEf1yJv6wpqJqH9sL6kHkkhQvLbgghHp3Swa7erE0prMcOIwnGPxGA3d4JMt+6ZeT95RkwjZh
-        F0B99HoA==;
-Received: from [50.53.46.231] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qkwJV-00FJe6-0U;
-        Tue, 26 Sep 2023 00:52:33 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        kernel test robot <lkp@intel.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: [PATCH] block: fix kernel-doc for disk_force_media_change()
-Date:   Mon, 25 Sep 2023 17:52:32 -0700
-Message-ID: <20230926005232.23666-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.42.0
+        Mon, 25 Sep 2023 21:29:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E801210C
+        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 18:28:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695691710;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6OhGiNLvBNZEMFqnuOuRobxprn9JRSs+NH5J7h+1BKk=;
+        b=Segq1lLAb14kM9Z6dGmW19ApGhyxNdN0+zohEfE/HYZFE2B4DMT/EYrMusFVLTeAH55wb4
+        hUPmtsQF37V/gKvSg91IcRXrMhJZM2XT3vga/jg2MFpu2ruOcSik570oYVmJFhE3Cr0g+h
+        XWZrFsNHgAxtddqezNueNddNHuHjsCk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-335-OlB2hctWPDSKeJr00OCXww-1; Mon, 25 Sep 2023 21:28:26 -0400
+X-MC-Unique: OlB2hctWPDSKeJr00OCXww-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4B0DD800962;
+        Tue, 26 Sep 2023 01:28:26 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1596B1678B;
+        Tue, 26 Sep 2023 01:28:19 +0000 (UTC)
+Date:   Tue, 26 Sep 2023 09:28:15 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        virtualization@lists.linux-foundation.org, mst@redhat.com,
+        ming.lei@redhat.com
+Subject: Re: [PATCH V3] io_uring: fix IO hang in io_wq_put_and_exit from
+ do_exit()
+Message-ID: <ZRIzr6C8tHM2N4Ng@fedora>
+References: <20230908093009.540763-1-ming.lei@redhat.com>
+ <58227846-6b73-46ef-957f-d9b1e0451899@kernel.dk>
+ <ZPsxCYFgZjIIeaBk@fedora>
+ <0f85a6b5-3ba6-4b77-bb7d-79f365dbb44c@kernel.dk>
+ <ZPs81IAYfB8J78Pv@fedora>
+ <CACGkMEvP=f1mB=01CDOhHaDLNL9espKPrUffgHEdBVkW4fo=pw@mail.gmail.com>
+ <20230925211710.GH323580@fedora>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230925211710.GH323580@fedora>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Drop one function parameter's kernel-doc comment since the parameter
-was removed. This prevents a kernel-doc warning:
+On Mon, Sep 25, 2023 at 05:17:10PM -0400, Stefan Hajnoczi wrote:
+> On Fri, Sep 15, 2023 at 03:04:05PM +0800, Jason Wang wrote:
+> > On Fri, Sep 8, 2023 at 11:25 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > >
+> > > On Fri, Sep 08, 2023 at 08:44:45AM -0600, Jens Axboe wrote:
+> > > > On 9/8/23 8:34 AM, Ming Lei wrote:
+> > > > > On Fri, Sep 08, 2023 at 07:49:53AM -0600, Jens Axboe wrote:
+> > > > >> On 9/8/23 3:30 AM, Ming Lei wrote:
+> > > > >>> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> > > > >>> index ad636954abae..95a3d31a1ef1 100644
+> > > > >>> --- a/io_uring/io_uring.c
+> > > > >>> +++ b/io_uring/io_uring.c
+> > > > >>> @@ -1930,6 +1930,10 @@ void io_wq_submit_work(struct io_wq_work *work)
+> > > > >>>           }
+> > > > >>>   }
+> > > > >>>
+> > > > >>> + /* It is fragile to block POLLED IO, so switch to NON_BLOCK */
+> > > > >>> + if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_queue)
+> > > > >>> +         issue_flags |= IO_URING_F_NONBLOCK;
+> > > > >>> +
+> > > > >>
+> > > > >> I think this comment deserves to be more descriptive. Normally we
+> > > > >> absolutely cannot block for polled IO, it's only OK here because io-wq
+> > > > >
+> > > > > Yeah, we don't do that until commit 2bc057692599 ("block: don't make REQ_POLLED
+> > > > > imply REQ_NOWAIT") which actually push the responsibility/risk up to
+> > > > > io_uring.
+> > > > >
+> > > > >> is the issuer and not necessarily the poller of it. That generally falls
+> > > > >> upon the original issuer to poll these requests.
+> > > > >>
+> > > > >> I think this should be a separate commit, coming before the main fix
+> > > > >> which is below.
+> > > > >
+> > > > > Looks fine, actually IO_URING_F_NONBLOCK change isn't a must, and the
+> > > > > approach in V2 doesn't need this change.
+> > > > >
+> > > > >>
+> > > > >>> @@ -3363,6 +3367,12 @@ __cold void io_uring_cancel_generic(bool cancel_all, struct io_sq_data *sqd)
+> > > > >>>           finish_wait(&tctx->wait, &wait);
+> > > > >>>   } while (1);
+> > > > >>>
+> > > > >>> + /*
+> > > > >>> +  * Reap events from each ctx, otherwise these requests may take
+> > > > >>> +  * resources and prevent other contexts from being moved on.
+> > > > >>> +  */
+> > > > >>> + xa_for_each(&tctx->xa, index, node)
+> > > > >>> +         io_iopoll_try_reap_events(node->ctx);
+> > > > >>
+> > > > >> The main issue here is that if someone isn't polling for them, then we
+> > > > >
+> > > > > That is actually what this patch is addressing, :-)
+> > > >
+> > > > Right, that part is obvious :)
+> > > >
+> > > > >> get to wait for a timeout before they complete. This can delay exit, for
+> > > > >> example, as we're now just waiting 30 seconds (or whatever the timeout
+> > > > >> is on the underlying device) for them to get timed out before exit can
+> > > > >> finish.
+> > > > >
+> > > > > For the issue on null_blk, device timeout handler provides
+> > > > > forward-progress, such as requests are released, so new IO can be
+> > > > > handled.
+> > > > >
+> > > > > However, not all devices support timeout, such as virtio device.
+> > > >
+> > > > That's a bug in the driver, you cannot sanely support polled IO and not
+> > > > be able to deal with timeouts. Someone HAS to reap the requests and
+> > > > there are only two things that can do that - the application doing the
+> > > > polled IO, or if that doesn't happen, a timeout.
+> > >
+> > > OK, then device driver timeout handler has new responsibility of covering
+> > > userspace accident, :-)
+> 
+> Sorry, I don't have enough context so this is probably a silly question:
+> 
+> When an application doesn't reap a polled request, why doesn't the block
+> layer take care of this in a generic way? I don't see anything
+> driver-specific about this.
 
-block/disk-events.c:300: warning: Excess function parameter 'events' description in 'disk_force_media_change'
+block layer doesn't have knowledge to handle that, io_uring knows the
+application is exiting, and can help to reap the events.
 
-Fixes: ab6860f62bfe ("block: simplify the disk_force_media_change interface")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: lore.kernel.org/r/202309060957.vfl0mUur-lkp@intel.com
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
----
- block/disk-events.c |    1 -
- 1 file changed, 1 deletion(-)
+But the big question is that if there is really IO timeout for virtio-blk.
+If there is, the reap done in io_uring may never return and cause other
+issue, so if it is done in io_uring, that can be just thought as sort of
+improvement.
 
-diff -- a/block/disk-events.c b/block/disk-events.c
---- a/block/disk-events.c
-+++ b/block/disk-events.c
-@@ -290,7 +290,6 @@ EXPORT_SYMBOL(disk_check_media_change);
- /**
-  * disk_force_media_change - force a media change event
-  * @disk: the disk which will raise the event
-- * @events: the events to raise
-  *
-  * Should be called when the media changes for @disk.  Generates a uevent
-  * and attempts to free all dentries and inodes and invalidates all block
+The real bug fix is still in device driver, usually only the driver timeout
+handler can provide forward progress guarantee.
+
+> 
+> Driver-specific behavior would be sending an abort/cancel upon timeout.
+> virtio-blk cannot do that because there is no such command in the device
+> specification at the moment. So simply waiting for the polled request to
+> complete is the only thing that can be done (aside from resetting the
+> device), and it's generic behavior.
+
+Then looks not safe to support IO polling for virtio-blk, maybe disable it
+at default now until the virtio-blk spec starts to support IO abort?
+
+Thanks,
+Ming
+
