@@ -2,108 +2,196 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE52EE3F2A
-	for <linux-block@archiver.kernel.org>; Tue, 26 Sep 2023 06:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B4EFE7D27D
+	for <linux-block@archiver.kernel.org>; Tue, 26 Sep 2023 10:58:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229620AbjIZGpG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Sep 2023 02:45:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53350 "EHLO
+        id S234488AbjIZK6r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Sep 2023 06:58:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230132AbjIZGpF (ORCPT
+        with ESMTP id S229725AbjIZK6q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2023 02:45:05 -0400
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9187B116
-        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 23:44:57 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-405d70d19bcso3860595e9.0
-        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 23:44:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695710696; x=1696315496; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vy+8WASYGTBS1mWxTg8Np7QtelHMw3rWndRVIOTdjBE=;
-        b=Z0pcZJhu6E5SCTrt1iatL9NocivU+4cdMrsH2fIcGXo9rcRaNkcnHIJYzLupgWKKiq
-         c3qg6aLY7dqimnDT0SHP+oQVO/PsHCs1ZgcgpVWUF/D9iIc7OuVowjF5Ypf49CMQlS57
-         3Ual701q+RGhGn/AjzoiwtrZxjUlTpiMXm26aOfJb6SBDImBNg8J9VhsGYQJM2MI54qD
-         gYC39n/NcoaXwb0V1vQimZdAMzPupHI5zIOi6f8xyhB429aHTemX1UEpZWuWLt2qooSJ
-         4M62LbBwA4HN1t8MP8j2vMA1WYyYcoNBERH5m2dd8ryCgC3PtpLBLzhX3htsY+QW5907
-         dy5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695710696; x=1696315496;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vy+8WASYGTBS1mWxTg8Np7QtelHMw3rWndRVIOTdjBE=;
-        b=KCfC59WL3KVFAUnaUfSkhOzL7cQyIwRXQPVZv8AtDkT2nP8yAu1pZB5oDO/m5wuj6H
-         gOktTIr2P9ZbhfrLT2/M0otIgi95Abg9/OKVtswzJI6oXybeE3Qz9vUqeOq4/2ARBXlz
-         1bdXqvYFPJhzguo+wjQD5NZkfdpsJ1DP+swlxle9UFz3b72qT2hO/tSqJ9qtVt0NH0ZF
-         HelCyK8b1KnIhWn8jDnJNYCmCEmZyxJmJMsU5WN70o+zurrGWS5Nmkc3B3cPBKuCJKJr
-         +rlA3FwtGimOSRGDKm2Ueq6US8ap6qe6VLjsTZ5eAqqoAPLKj93rl9ydpa4jNc8HH6WS
-         Nyjw==
-X-Gm-Message-State: AOJu0YxOT8hE+/0Ucd6JbvdVE81CVRZpeeMRgHSYs6AnIHBQGzflQ3RR
-        71UfpoeMx0iLu5jgh4oOho5XNQ==
-X-Google-Smtp-Source: AGHT+IH9l76dfcSqxOnW7BCusuZLco1ls+8gcRWVia87WNg/ADhYwhN0gbWksHNTHTDBt6adAkwcMA==
-X-Received: by 2002:a05:600c:4f50:b0:405:39bb:38a8 with SMTP id m16-20020a05600c4f5000b0040539bb38a8mr7418100wmq.2.1695710695345;
-        Mon, 25 Sep 2023 23:44:55 -0700 (PDT)
-Received: from [127.0.0.1] ([45.147.210.162])
-        by smtp.gmail.com with ESMTPSA id 8-20020a05600c230800b004042dbb8925sm1127571wmo.38.2023.09.25.23.44.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 23:44:54 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
-        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Geliang Tang <geliang.tang@suse.com>,
-        Hannes Reinecke <hare@suse.de>, NeilBrown <neilb@suse.de>,
-        Richard Fan <richard.fan@suse.com>,
-        Vishal L Verma <vishal.l.verma@intel.com>,
-        Wols Lists <antlists@youngman.org.uk>, Xiao Ni <xni@redhat.com>
-In-Reply-To: <20230811170513.2300-1-colyli@suse.de>
-References: <20230811170513.2300-1-colyli@suse.de>
-Subject: Re: [PATCH v7 0/6] badblocks improvement for multiple bad block
- ranges
-Message-Id: <169571069404.578063.8660956212739660767.b4-ty@kernel.dk>
-Date:   Tue, 26 Sep 2023 00:44:54 -0600
+        Tue, 26 Sep 2023 06:58:46 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8C7E5
+        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2023 03:58:38 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230926105834epoutp01a4f81150b0234ddc94ea83f068d7df11~IbbwKmxZB3010930109epoutp01X
+        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2023 10:58:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230926105834epoutp01a4f81150b0234ddc94ea83f068d7df11~IbbwKmxZB3010930109epoutp01X
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1695725914;
+        bh=baHEKm/JhwHxKUMAHa2f809vp0ZdVYLW1aHpggC6chk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=H2TTfIRZsc+b2dflGjm3seBo1Tq8V35px32Q2Rm38YURo3VAxYyvWTQ843p9+v8oJ
+         kO7a783NEYLDE9Xfo69VAMP6kHAGjRTm/F9NqAdKjGUSa7MhwpT0J/vnZmLA00F0On
+         hAEv+o4l7OLIZkfiLJf35n3ceILMDWyG0hdDOzns=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20230926105833epcas5p39c4d5952102ceb27176b612d9882d254~Ibbvg8Iu21175911759epcas5p3X;
+        Tue, 26 Sep 2023 10:58:33 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.175]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4RvxYg4YLfz4x9Pp; Tue, 26 Sep
+        2023 10:58:31 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        EC.4A.09023.759B2156; Tue, 26 Sep 2023 19:58:31 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230926101329epcas5p2008e3144f177f1c88aeb2302a22488e8~Ia0Y6vcOg1077010770epcas5p2Y;
+        Tue, 26 Sep 2023 10:13:29 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230926101329epsmtrp25d97cb68c034b365e2834f3b78c445c2~Ia0Y5ebse0140601406epsmtrp2x;
+        Tue, 26 Sep 2023 10:13:29 +0000 (GMT)
+X-AuditID: b6c32a44-c7ffa7000000233f-4e-6512b957578e
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        7C.7E.18916.8CEA2156; Tue, 26 Sep 2023 19:13:28 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230926101325epsmtip2cfcf64a0696d90208e1d465522eeae77~Ia0VrCoTp2661926619epsmtip2q;
+        Tue, 26 Sep 2023 10:13:25 +0000 (GMT)
+Date:   Tue, 26 Sep 2023 15:37:18 +0530
+From:   Nitesh Jagadeesh Shetty <nj.shetty@samsung.com>
+To:     Jinyoung Choi <j-young.choi@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "nitheshshetty@gmail.com" <nitheshshetty@gmail.com>,
+        "anuj1072538@gmail.com" <anuj1072538@gmail.com>,
+        SSDR Gost Dev <gost.dev@samsung.com>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        Vincent Kang Fu <vincent.fu@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v16 04/12] block: add emulation for copy
+Message-ID: <20230926100718.wcptispc2zhfi5eh@green245>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
+In-Reply-To: <20230922130815epcms2p631fc5fc5ebe634cc948fef1992f83a38@epcms2p6>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf0xTVxTHvX2P18JWffJjXH5sNCUmw43SOlouBKYbiG9KGJuZJssWeNIX
+        SiiltEVk2SaUMX4NC4iIZRswfglO0CqGH5YREFGcA0P41YwtSqkGIiBCTEDYWgrG/z7nm+85
+        555z7+Vgzga2JydRoWFUClrOJ5zwG31+7/of73BmhHmjPqh18DaGnq2s4UhbvI6hS1M6As31
+        LQFk7skFyDhf6YAmezpYqOlSPwsV6doIVNo7BtDMqJ6FjKb3UM2PdTi6abyLo5HOnwlU1TDD
+        RoXj7QRqHNhgoYniGYDazVkAtcwt4OiOyQtNF+YBNLQ+4HDAg+rQT7GpoX+u4tTI/TTK0JxP
+        UNfqTlNdk5kEVXvmrANVlD1PUM9mTDi10D1KUGeuNwPqueEdymB+yorhfpkUKmNoKaPiMYr4
+        FGmiIiGMf+RobHisWCIU+YuCURCfp6CTmTB+RFSMf2Si3LoEPu8kLU+zSjG0Ws0P+DBUlZKm
+        YXiyFLUmjM8opXJloFKgppPVaYoEgYLRhIiEwn1iqzEuSfbkfBemnN916uG5HnYmWH2zADhy
+        IBkIH/3WiBcAJ44z2QXg3GMLYQ+WADw/u8p+FSzeXgDbKTOdVVuuDgC1SyNbgQXA6juTbJsL
+        J/fA5db/cBsTpBh2Xc22MofjSr4Pc5p9bX6MrObA7vHLm1V3kPuhYdCw6XchQ2Gb7ibb5ueS
+        Eph1y8Umc8nd8O4F86bFkYyGL2uLCBu7kd6won4Fs9WE5F+O0PTn5a2TRsDSyUmWnV3g7MB1
+        tp094fN5I2HndNhUdpGwJ/8AoH5cv5W8H+YM6jAbY6QMDuZpcbv+Njw32MKy6zth0Zp5qwEX
+        tv+6zb7w99bqrQYecOxFFmEbBpIUzL7ytX1ZLwBsWKwAxYCnf204/Wvt7BwC8xe1Dnb2gdlt
+        lZjeWgojvWDjBseOfrC1M6AaEM3Ag1GqkxOYeLFSpGDSX72E+JRkA9j8PHsj2sFE1YagF7A4
+        oBdADsZ35a5adjLOXCmd8Q2jSolVpckZdS8QW++wBPN0i0+x/j6FJlYUGCwMlEgkgcEfSER8
+        d+5czi9SZzKB1jBJDKNkVNt5LI6jZybLYjpUl1p6xPuCJFdOJziZSm598tgpIH1p2OfQk28/
+        DqYulrP27DTum1+WZXlMxVe6X5nr1ZoeYILhlZVOJmhAW3bYuHsy5DB6OEa/LAGP1u753+uv
+        r9Hsarj/hv5f43dnJZ7XnAbzYhOjDNEwKLTz0/b6qMVUS7NefkITzv+sKtK84C70WZeqvhju
+        T8gUYHGuT9mp47N9otMnE3O+51EbuqaDVMGJsgcDx8SkpU9mKTwA3JZrjFVffS7THfP33dES
+        R9JN/WErSx7mGMn6jQz3Cqib/kMQzB9am/b7W8nxrT0e/ZE0OfxUt69Xfu5PR2MmMiLdyrve
+        Chvz1rS0NZTzcbWMFu3FVGr6f5m9k7TFBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNIsWRmVeSWpSXmKPExsWy7bCSvO6JdUKpBj3PrCzWnzrGbPHx628W
+        i6YJf5ktVt/tZ7N4ffgTo8WTA+2MFnvfzWa1uHlgJ5PFytVHmSx6+7eyWUw6dI3R4unVWUwW
+        e29pWyxsW8JisWfvSRaLy7vmsFnMX/aU3aL7+g42i+XH/zFZ3JjwlNFix5NGRot1r9+zWJy4
+        JW3xuLuD0eL83+OsDpIeO2fdZfc4f28ji8fls6Uem1Z1snlsXlLvsftmA5vH4r7JrB69ze/Y
+        PD4+vcXi8X7fVTaPvi2rGD0+b5Lz2PTkLVMAbxSXTUpqTmZZapG+XQJXxpLDF5kK/vNU/Js1
+        h6mBcQVXFyMnh4SAicTTXfPZuhi5OIQEtjNKzHvUxgaRkJRY9vcIM4QtLLHy33N2iKInjBJn
+        /lxkBEmwCKhKfFn/nwXEZhMwldi9sRnI5uAQEdCRaF2lDFLPLLCCQ2Lhoh9gNQwC9hKbTm0C
+        s4UFbCS29u9hB6nnFTCTaDwiDDH/O6NEz8IlYDW8AoISJ2c+AbOZgWrmbX7IDFLPLCAtsfwf
+        B0RYXqJ562ywOzkF/CT+LO4Fu19UQEZixtKvzBMYhWchmTQLyaRZCJNmIZm0gJFlFaNoakFx
+        bnpucoGhXnFibnFpXrpecn7uJkZw+tAK2sG4bP1fvUOMTByMhxglOJiVRHh/PeNLFeJNSays
+        Si3Kjy8qzUktPsQozcGiJM6rnNOZIiSQnliSmp2aWpBaBJNl4uCUamByOCGwwpBBocPW5HPP
+        rjkiNfdviSx9vG158ucZaxwihD45Vhq6FMWntsiHxxrPYP6dZ/lJwvm0qXSuZEm9x0Opji+f
+        PrLUcoXv/nPi6/PibbWv4r1XvPy89M9WRb+JFV5PeasLqsNvvj2lzn7GaPrjfA/BZ9p23Bqc
+        FjM1Xew9zQPUDpifu//8WcrHDQGn5FLqlKy3nWKffaK1TtXhlG+2T7Ditkbpn7kVSVOeFwnG
+        P5q8xLUo0dD27YNQJ/mQ0723v85tO8HL5r84Yw1PYvUWRutlUkW6OoEr81aej+/mVwwI5biw
+        tY7haqqjSf3HGW/Uj/1OaC+Y+d7kQx3jxD/2WrcuZ3CUrfqlus2FSYmlOCPRUIu5qDgRAGGm
+        ZFGOAwAA
+X-CMS-MailID: 20230926101329epcas5p2008e3144f177f1c88aeb2302a22488e8
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----LAXCzQHOdZ.PJY8ISgkP8Kui-li3V03FA_f8OYW0UVQARYhI=_21324_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230920081458epcas5p3a3e12d8b5661b5d6f4420316630b02e1
+References: <20230920080756.11919-5-nj.shetty@samsung.com>
+        <20230920080756.11919-1-nj.shetty@samsung.com>
+        <CGME20230920081458epcas5p3a3e12d8b5661b5d6f4420316630b02e1@epcms2p6>
+        <20230922130815epcms2p631fc5fc5ebe634cc948fef1992f83a38@epcms2p6>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+------LAXCzQHOdZ.PJY8ISgkP8Kui-li3V03FA_f8OYW0UVQARYhI=_21324_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
 
-On Sat, 12 Aug 2023 01:05:06 +0800, Coly Li wrote:
-> This is the v7 version of the badblocks improvement series, which makes
-> badblocks APIs to handle multiple ranges in bad block table.
-> 
-> The change comparing to previous v6 version is the modifications
-> enlightened by the code review comments from Xiao Ni,
-> - Typo fixes in code comments and commit logs.
-> - Tiny but useful optimzation in prev_badblocks(), front_overwrite(),
->   _badblocks_clear().
-> 
-> [...]
+>> +                write_bio->bi_iter.bi_size = chunk;
+>> +                ret = submit_bio_wait(write_bio);
+>> +                kfree(write_bio);
+>
+>blk_mq_map_bio_put(write_bio) ?
+>or bio_uninit(write_bio); kfree(write_bio)?
+>
+>hmm...
+>It continuously allocates and releases memory for bio,
+>Why don't you just allocate and reuse bio outside the loop?
+>
 
-Applied, thanks!
+Agree, we will update this in next version.
 
-[1/6] badblocks: add more helper structure and routines in badblocks.h
-      commit: e850d9a52f4cd31521c80a7ea9718b69129af4d5
-[2/6] badblocks: add helper routines for badblock ranges handling
-      commit: c3c6a86e9efc5da5964260c322fe07feca6df782
-[3/6] badblocks: improve badblocks_set() for multiple ranges handling
-      commit: 1726c774678331b4af5e78db87e10ff5da448456
-[4/6] badblocks: improve badblocks_clear() for multiple ranges handling
-      commit: db448eb6862979aad2468ecf957a20ef98b82f29
-[5/6] badblocks: improve badblocks_check() for multiple ranges handling
-      commit: 3ea3354cb9f03e34ee3fab98f127ab8da4131eee
-[6/6] badblocks: switch to the improved badblock handling code
-      commit: aa511ff8218b3fb328181fbaac48aa5e9c5c6d93
+>> +                if (ret)
+>> +                        break;
+>> +
+>> +                pos_in += chunk;
+>> +                pos_out += chunk;
+>> +        }
+>> +        cio->status = ret;
+>> +        kvfree(emulation_io->buf);
+>> +        kfree(emulation_io);
+>
+>I have not usually seen an implementation that releases memory for
+>itself while performing a worker. ( I don't know what's right. :) )
+>
+The worker is already executing at this point.
+We think releasing the reference after it starts executing should not
+be an issue, and it didn't come-up in any of our testing too.
 
-Best regards,
--- 
-Jens Axboe
+>Since blkdev_copy_emulation() allocates memory for the emulation
+>and waits for it to be completed, wouldn't it be better to proceed
+>with the memory release for it in the same context?
+>
+>That is, IMO, wouldn't it be better to free the memory related to
+>emulation in blkdev_copy_wait_io_completion()?
+>
+
+Above mentioned design works for synchronous IOs. But for asynchronous
+IOs emulation job is punted to worker and submitter task returns.
+Submitter doesn't wait for emulation to complete and memory is freed
+later by worker.
+
+Thank you,
+Nitesh Shetty
+
+------LAXCzQHOdZ.PJY8ISgkP8Kui-li3V03FA_f8OYW0UVQARYhI=_21324_
+Content-Type: text/plain; charset="utf-8"
 
 
-
+------LAXCzQHOdZ.PJY8ISgkP8Kui-li3V03FA_f8OYW0UVQARYhI=_21324_--
