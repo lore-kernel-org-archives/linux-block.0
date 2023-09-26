@@ -2,196 +2,282 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B4EFE7D27D
-	for <linux-block@archiver.kernel.org>; Tue, 26 Sep 2023 10:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5ACE7E64A
+	for <linux-block@archiver.kernel.org>; Tue, 26 Sep 2023 16:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234488AbjIZK6r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Sep 2023 06:58:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32890 "EHLO
+        id S235183AbjIZQPH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Sep 2023 12:15:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229725AbjIZK6q (ORCPT
+        with ESMTP id S235194AbjIZQPG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2023 06:58:46 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8C7E5
-        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2023 03:58:38 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230926105834epoutp01a4f81150b0234ddc94ea83f068d7df11~IbbwKmxZB3010930109epoutp01X
-        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2023 10:58:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230926105834epoutp01a4f81150b0234ddc94ea83f068d7df11~IbbwKmxZB3010930109epoutp01X
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1695725914;
-        bh=baHEKm/JhwHxKUMAHa2f809vp0ZdVYLW1aHpggC6chk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=H2TTfIRZsc+b2dflGjm3seBo1Tq8V35px32Q2Rm38YURo3VAxYyvWTQ843p9+v8oJ
-         kO7a783NEYLDE9Xfo69VAMP6kHAGjRTm/F9NqAdKjGUSa7MhwpT0J/vnZmLA00F0On
-         hAEv+o4l7OLIZkfiLJf35n3ceILMDWyG0hdDOzns=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20230926105833epcas5p39c4d5952102ceb27176b612d9882d254~Ibbvg8Iu21175911759epcas5p3X;
-        Tue, 26 Sep 2023 10:58:33 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.175]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4RvxYg4YLfz4x9Pp; Tue, 26 Sep
-        2023 10:58:31 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        EC.4A.09023.759B2156; Tue, 26 Sep 2023 19:58:31 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230926101329epcas5p2008e3144f177f1c88aeb2302a22488e8~Ia0Y6vcOg1077010770epcas5p2Y;
-        Tue, 26 Sep 2023 10:13:29 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230926101329epsmtrp25d97cb68c034b365e2834f3b78c445c2~Ia0Y5ebse0140601406epsmtrp2x;
-        Tue, 26 Sep 2023 10:13:29 +0000 (GMT)
-X-AuditID: b6c32a44-c7ffa7000000233f-4e-6512b957578e
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        7C.7E.18916.8CEA2156; Tue, 26 Sep 2023 19:13:28 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230926101325epsmtip2cfcf64a0696d90208e1d465522eeae77~Ia0VrCoTp2661926619epsmtip2q;
-        Tue, 26 Sep 2023 10:13:25 +0000 (GMT)
-Date:   Tue, 26 Sep 2023 15:37:18 +0530
-From:   Nitesh Jagadeesh Shetty <nj.shetty@samsung.com>
-To:     Jinyoung Choi <j-young.choi@samsung.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "nitheshshetty@gmail.com" <nitheshshetty@gmail.com>,
-        "anuj1072538@gmail.com" <anuj1072538@gmail.com>,
-        SSDR Gost Dev <gost.dev@samsung.com>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        Vincent Kang Fu <vincent.fu@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH v16 04/12] block: add emulation for copy
-Message-ID: <20230926100718.wcptispc2zhfi5eh@green245>
+        Tue, 26 Sep 2023 12:15:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9476AF
+        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2023 09:14:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695744851;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Expj9KdGU5UQzWCnX5PAuSPH6Fbb8WCnKutwu5N8eHI=;
+        b=WE1TIbicEDL6G32ipDAikLsrPwBj1PqbhaOCb701vwwTwPTphi2uMwh7JGUKWRtFtDfLxK
+        sgzjU7mwe/O2XoZA1vo0zgongFYEfpUV4xvaMeF6RzScL3m1U97U2oHu3vZzQFu1onYh4o
+        ApyILd3WWZypEKMYP7jw21D7q6yVxL8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-641-cUN4MP7ZMueIJqqFxc4B6A-1; Tue, 26 Sep 2023 12:14:08 -0400
+X-MC-Unique: cUN4MP7ZMueIJqqFxc4B6A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7363F801779;
+        Tue, 26 Sep 2023 16:14:07 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.81])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9F5C540C2064;
+        Tue, 26 Sep 2023 16:14:06 +0000 (UTC)
+Date:   Tue, 26 Sep 2023 10:55:26 -0400
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>, Suwan Kim <suwan.kim027@gmail.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chengming Zhou <zhouchengming@bytedance.com>,
+        virtualization@lists.linux-foundation.org, mst@redhat.com
+Subject: Re: [PATCH V3] io_uring: fix IO hang in io_wq_put_and_exit from
+ do_exit()
+Message-ID: <20230926145526.GA387951@fedora>
+References: <20230908093009.540763-1-ming.lei@redhat.com>
+ <58227846-6b73-46ef-957f-d9b1e0451899@kernel.dk>
+ <ZPsxCYFgZjIIeaBk@fedora>
+ <0f85a6b5-3ba6-4b77-bb7d-79f365dbb44c@kernel.dk>
+ <ZPs81IAYfB8J78Pv@fedora>
+ <CACGkMEvP=f1mB=01CDOhHaDLNL9espKPrUffgHEdBVkW4fo=pw@mail.gmail.com>
+ <20230925211710.GH323580@fedora>
+ <ZRIzr6C8tHM2N4Ng@fedora>
 MIME-Version: 1.0
-In-Reply-To: <20230922130815epcms2p631fc5fc5ebe634cc948fef1992f83a38@epcms2p6>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf0xTVxTHvX2P18JWffJjXH5sNCUmw43SOlouBKYbiG9KGJuZJssWeNIX
-        SiiltEVk2SaUMX4NC4iIZRswfglO0CqGH5YREFGcA0P41YwtSqkGIiBCTEDYWgrG/z7nm+85
-        555z7+Vgzga2JydRoWFUClrOJ5zwG31+7/of73BmhHmjPqh18DaGnq2s4UhbvI6hS1M6As31
-        LQFk7skFyDhf6YAmezpYqOlSPwsV6doIVNo7BtDMqJ6FjKb3UM2PdTi6abyLo5HOnwlU1TDD
-        RoXj7QRqHNhgoYniGYDazVkAtcwt4OiOyQtNF+YBNLQ+4HDAg+rQT7GpoX+u4tTI/TTK0JxP
-        UNfqTlNdk5kEVXvmrANVlD1PUM9mTDi10D1KUGeuNwPqueEdymB+yorhfpkUKmNoKaPiMYr4
-        FGmiIiGMf+RobHisWCIU+YuCURCfp6CTmTB+RFSMf2Si3LoEPu8kLU+zSjG0Ws0P+DBUlZKm
-        YXiyFLUmjM8opXJloFKgppPVaYoEgYLRhIiEwn1iqzEuSfbkfBemnN916uG5HnYmWH2zADhy
-        IBkIH/3WiBcAJ44z2QXg3GMLYQ+WADw/u8p+FSzeXgDbKTOdVVuuDgC1SyNbgQXA6juTbJsL
-        J/fA5db/cBsTpBh2Xc22MofjSr4Pc5p9bX6MrObA7vHLm1V3kPuhYdCw6XchQ2Gb7ibb5ueS
-        Eph1y8Umc8nd8O4F86bFkYyGL2uLCBu7kd6won4Fs9WE5F+O0PTn5a2TRsDSyUmWnV3g7MB1
-        tp094fN5I2HndNhUdpGwJ/8AoH5cv5W8H+YM6jAbY6QMDuZpcbv+Njw32MKy6zth0Zp5qwEX
-        tv+6zb7w99bqrQYecOxFFmEbBpIUzL7ytX1ZLwBsWKwAxYCnf204/Wvt7BwC8xe1Dnb2gdlt
-        lZjeWgojvWDjBseOfrC1M6AaEM3Ag1GqkxOYeLFSpGDSX72E+JRkA9j8PHsj2sFE1YagF7A4
-        oBdADsZ35a5adjLOXCmd8Q2jSolVpckZdS8QW++wBPN0i0+x/j6FJlYUGCwMlEgkgcEfSER8
-        d+5czi9SZzKB1jBJDKNkVNt5LI6jZybLYjpUl1p6xPuCJFdOJziZSm598tgpIH1p2OfQk28/
-        DqYulrP27DTum1+WZXlMxVe6X5nr1ZoeYILhlZVOJmhAW3bYuHsy5DB6OEa/LAGP1u753+uv
-        r9Hsarj/hv5f43dnJZ7XnAbzYhOjDNEwKLTz0/b6qMVUS7NefkITzv+sKtK84C70WZeqvhju
-        T8gUYHGuT9mp47N9otMnE3O+51EbuqaDVMGJsgcDx8SkpU9mKTwA3JZrjFVffS7THfP33dES
-        R9JN/WErSx7mGMn6jQz3Cqib/kMQzB9am/b7W8nxrT0e/ZE0OfxUt69Xfu5PR2MmMiLdyrve
-        Chvz1rS0NZTzcbWMFu3FVGr6f5m9k7TFBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNIsWRmVeSWpSXmKPExsWy7bCSvO6JdUKpBj3PrCzWnzrGbPHx628W
-        i6YJf5ktVt/tZ7N4ffgTo8WTA+2MFnvfzWa1uHlgJ5PFytVHmSx6+7eyWUw6dI3R4unVWUwW
-        e29pWyxsW8JisWfvSRaLy7vmsFnMX/aU3aL7+g42i+XH/zFZ3JjwlNFix5NGRot1r9+zWJy4
-        JW3xuLuD0eL83+OsDpIeO2fdZfc4f28ji8fls6Uem1Z1snlsXlLvsftmA5vH4r7JrB69ze/Y
-        PD4+vcXi8X7fVTaPvi2rGD0+b5Lz2PTkLVMAbxSXTUpqTmZZapG+XQJXxpLDF5kK/vNU/Js1
-        h6mBcQVXFyMnh4SAicTTXfPZuhi5OIQEtjNKzHvUxgaRkJRY9vcIM4QtLLHy33N2iKInjBJn
-        /lxkBEmwCKhKfFn/nwXEZhMwldi9sRnI5uAQEdCRaF2lDFLPLLCCQ2Lhoh9gNQwC9hKbTm0C
-        s4UFbCS29u9hB6nnFTCTaDwiDDH/O6NEz8IlYDW8AoISJ2c+AbOZgWrmbX7IDFLPLCAtsfwf
-        B0RYXqJ562ywOzkF/CT+LO4Fu19UQEZixtKvzBMYhWchmTQLyaRZCJNmIZm0gJFlFaNoakFx
-        bnpucoGhXnFibnFpXrpecn7uJkZw+tAK2sG4bP1fvUOMTByMhxglOJiVRHh/PeNLFeJNSays
-        Si3Kjy8qzUktPsQozcGiJM6rnNOZIiSQnliSmp2aWpBaBJNl4uCUamByOCGwwpBBocPW5HPP
-        rjkiNfdviSx9vG158ucZaxwihD45Vhq6FMWntsiHxxrPYP6dZ/lJwvm0qXSuZEm9x0Opji+f
-        PrLUcoXv/nPi6/PibbWv4r1XvPy89M9WRb+JFV5PeasLqsNvvj2lzn7GaPrjfA/BZ9p23Bqc
-        FjM1Xew9zQPUDpifu//8WcrHDQGn5FLqlKy3nWKffaK1TtXhlG+2T7Ditkbpn7kVSVOeFwnG
-        P5q8xLUo0dD27YNQJ/mQ0723v85tO8HL5r84Yw1PYvUWRutlUkW6OoEr81aej+/mVwwI5biw
-        tY7haqqjSf3HGW/Uj/1OaC+Y+d7kQx3jxD/2WrcuZ3CUrfqlus2FSYmlOCPRUIu5qDgRAGGm
-        ZFGOAwAA
-X-CMS-MailID: 20230926101329epcas5p2008e3144f177f1c88aeb2302a22488e8
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----LAXCzQHOdZ.PJY8ISgkP8Kui-li3V03FA_f8OYW0UVQARYhI=_21324_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230920081458epcas5p3a3e12d8b5661b5d6f4420316630b02e1
-References: <20230920080756.11919-5-nj.shetty@samsung.com>
-        <20230920080756.11919-1-nj.shetty@samsung.com>
-        <CGME20230920081458epcas5p3a3e12d8b5661b5d6f4420316630b02e1@epcms2p6>
-        <20230922130815epcms2p631fc5fc5ebe634cc948fef1992f83a38@epcms2p6>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="rd/ih7ZpJJDBDoHt"
+Content-Disposition: inline
+In-Reply-To: <ZRIzr6C8tHM2N4Ng@fedora>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------LAXCzQHOdZ.PJY8ISgkP8Kui-li3V03FA_f8OYW0UVQARYhI=_21324_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
+
+--rd/ih7ZpJJDBDoHt
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> +                write_bio->bi_iter.bi_size = chunk;
->> +                ret = submit_bio_wait(write_bio);
->> +                kfree(write_bio);
->
->blk_mq_map_bio_put(write_bio) ?
->or bio_uninit(write_bio); kfree(write_bio)?
->
->hmm...
->It continuously allocates and releases memory for bio,
->Why don't you just allocate and reuse bio outside the loop?
->
+On Tue, Sep 26, 2023 at 09:28:15AM +0800, Ming Lei wrote:
+> On Mon, Sep 25, 2023 at 05:17:10PM -0400, Stefan Hajnoczi wrote:
+> > On Fri, Sep 15, 2023 at 03:04:05PM +0800, Jason Wang wrote:
+> > > On Fri, Sep 8, 2023 at 11:25=E2=80=AFPM Ming Lei <ming.lei@redhat.com=
+> wrote:
+> > > >
+> > > > On Fri, Sep 08, 2023 at 08:44:45AM -0600, Jens Axboe wrote:
+> > > > > On 9/8/23 8:34 AM, Ming Lei wrote:
+> > > > > > On Fri, Sep 08, 2023 at 07:49:53AM -0600, Jens Axboe wrote:
+> > > > > >> On 9/8/23 3:30 AM, Ming Lei wrote:
+> > > > > >>> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> > > > > >>> index ad636954abae..95a3d31a1ef1 100644
+> > > > > >>> --- a/io_uring/io_uring.c
+> > > > > >>> +++ b/io_uring/io_uring.c
+> > > > > >>> @@ -1930,6 +1930,10 @@ void io_wq_submit_work(struct io_wq_wo=
+rk *work)
+> > > > > >>>           }
+> > > > > >>>   }
+> > > > > >>>
+> > > > > >>> + /* It is fragile to block POLLED IO, so switch to NON_BLOCK=
+ */
+> > > > > >>> + if ((req->ctx->flags & IORING_SETUP_IOPOLL) && def->iopoll_=
+queue)
+> > > > > >>> +         issue_flags |=3D IO_URING_F_NONBLOCK;
+> > > > > >>> +
+> > > > > >>
+> > > > > >> I think this comment deserves to be more descriptive. Normally=
+ we
+> > > > > >> absolutely cannot block for polled IO, it's only OK here becau=
+se io-wq
+> > > > > >
+> > > > > > Yeah, we don't do that until commit 2bc057692599 ("block: don't=
+ make REQ_POLLED
+> > > > > > imply REQ_NOWAIT") which actually push the responsibility/risk =
+up to
+> > > > > > io_uring.
+> > > > > >
+> > > > > >> is the issuer and not necessarily the poller of it. That gener=
+ally falls
+> > > > > >> upon the original issuer to poll these requests.
+> > > > > >>
+> > > > > >> I think this should be a separate commit, coming before the ma=
+in fix
+> > > > > >> which is below.
+> > > > > >
+> > > > > > Looks fine, actually IO_URING_F_NONBLOCK change isn't a must, a=
+nd the
+> > > > > > approach in V2 doesn't need this change.
+> > > > > >
+> > > > > >>
+> > > > > >>> @@ -3363,6 +3367,12 @@ __cold void io_uring_cancel_generic(bo=
+ol cancel_all, struct io_sq_data *sqd)
+> > > > > >>>           finish_wait(&tctx->wait, &wait);
+> > > > > >>>   } while (1);
+> > > > > >>>
+> > > > > >>> + /*
+> > > > > >>> +  * Reap events from each ctx, otherwise these requests may =
+take
+> > > > > >>> +  * resources and prevent other contexts from being moved on.
+> > > > > >>> +  */
+> > > > > >>> + xa_for_each(&tctx->xa, index, node)
+> > > > > >>> +         io_iopoll_try_reap_events(node->ctx);
+> > > > > >>
+> > > > > >> The main issue here is that if someone isn't polling for them,=
+ then we
+> > > > > >
+> > > > > > That is actually what this patch is addressing, :-)
+> > > > >
+> > > > > Right, that part is obvious :)
+> > > > >
+> > > > > >> get to wait for a timeout before they complete. This can delay=
+ exit, for
+> > > > > >> example, as we're now just waiting 30 seconds (or whatever the=
+ timeout
+> > > > > >> is on the underlying device) for them to get timed out before =
+exit can
+> > > > > >> finish.
+> > > > > >
+> > > > > > For the issue on null_blk, device timeout handler provides
+> > > > > > forward-progress, such as requests are released, so new IO can =
+be
+> > > > > > handled.
+> > > > > >
+> > > > > > However, not all devices support timeout, such as virtio device.
+> > > > >
+> > > > > That's a bug in the driver, you cannot sanely support polled IO a=
+nd not
+> > > > > be able to deal with timeouts. Someone HAS to reap the requests a=
+nd
+> > > > > there are only two things that can do that - the application doin=
+g the
+> > > > > polled IO, or if that doesn't happen, a timeout.
+> > > >
+> > > > OK, then device driver timeout handler has new responsibility of co=
+vering
+> > > > userspace accident, :-)
+> >=20
+> > Sorry, I don't have enough context so this is probably a silly question:
+> >=20
+> > When an application doesn't reap a polled request, why doesn't the block
+> > layer take care of this in a generic way? I don't see anything
+> > driver-specific about this.
+>=20
+> block layer doesn't have knowledge to handle that, io_uring knows the
+> application is exiting, and can help to reap the events.
 
-Agree, we will update this in next version.
+I thought the discussion was about I/O timeouts in general but here
+you're only mentioning application exit. Are we talking about I/O
+timeouts or purely about cleaning up I/O requests when an application
+exits?
 
->> +                if (ret)
->> +                        break;
->> +
->> +                pos_in += chunk;
->> +                pos_out += chunk;
->> +        }
->> +        cio->status = ret;
->> +        kvfree(emulation_io->buf);
->> +        kfree(emulation_io);
->
->I have not usually seen an implementation that releases memory for
->itself while performing a worker. ( I don't know what's right. :) )
->
-The worker is already executing at this point.
-We think releasing the reference after it starts executing should not
-be an issue, and it didn't come-up in any of our testing too.
+>=20
+> But the big question is that if there is really IO timeout for virtio-blk.
+> If there is, the reap done in io_uring may never return and cause other
+> issue, so if it is done in io_uring, that can be just thought as sort of
+> improvement.
 
->Since blkdev_copy_emulation() allocates memory for the emulation
->and waits for it to be completed, wouldn't it be better to proceed
->with the memory release for it in the same context?
->
->That is, IMO, wouldn't it be better to free the memory related to
->emulation in blkdev_copy_wait_io_completion()?
->
+virtio-blk drivers have no way of specifying timeouts on the device or
+aborting/canceling requests.
 
-Above mentioned design works for synchronous IOs. But for asynchronous
-IOs emulation job is punted to worker and submitter task returns.
-Submitter doesn't wait for emulation to complete and memory is freed
-later by worker.
+virtio-blk devices may fail requests if they implement an internal
+timeout mechanism (e.g. the host kernel fails requests after a host
+timeout), but this is not controlled by the driver and there is no
+guarantee that the device has an internal timeout. The driver will not
+treat these timed out requests in a special way - the application will
+see EIO errors.
 
-Thank you,
-Nitesh Shetty
+>=20
+> The real bug fix is still in device driver, usually only the driver timeo=
+ut
+> handler can provide forward progress guarantee.
 
-------LAXCzQHOdZ.PJY8ISgkP8Kui-li3V03FA_f8OYW0UVQARYhI=_21324_
-Content-Type: text/plain; charset="utf-8"
+The only recourse for hung I/O on a virtio-blk device is device reset,
+but that is often implemented as a synchronous operation and is likely
+to block until in-flight I/O finishes.
 
+An admin virtqueue could be added to virtio-blk along with an abort
+command, but existing devices will not support the new hardware
+interface.
 
-------LAXCzQHOdZ.PJY8ISgkP8Kui-li3V03FA_f8OYW0UVQARYhI=_21324_--
+However, I'm not sure a new abort command would solve the problem.
+virtio-blk devices are often implemented as userspace processes and are
+limited by the availability of I/O cancellation APIs. Maybe my
+understanding is outdated, but I believe userspace processes cannot
+force I/O to abort. For example, the man page says the following for
+IORING_OP_ASYNC_CANCEL:
+
+  In general, requests that are interruptible (like socket IO) will get
+  canceled, while disk IO requests cannot be canceled if already
+  started.
+
+Even if an abort command is added to virtio-blk, won't we just end up in
+this situation:
+1. The guest kernel invokes ->timeout() on virtio_blk.ko.
+2. virtio_blk.ko sends an abort command to the device and resets the
+   timeout.
+3. The device submits IORING_OP_ASYNC_CANCEL but it cannot cancel an
+   in-flight disk I/O request.
+4. ...time passes...
+5. The guest kernel invokes ->timeout() again and virtio_blk.ko decides
+   abort was ineffective. The entire device must be reset.
+?
+
+(I based this on the ->timeout() logic in the nvme driver.)
+
+If we're effectively just going to wait for twice the timeout duration
+and then reset the device, then why go through the trouble of sending
+the abort command? I'm hoping you'll tell me that IORING_OP_ASYNC_CANCEL
+is in fact able to cancel disk I/O nowadays :).
+
+>=20
+> >=20
+> > Driver-specific behavior would be sending an abort/cancel upon timeout.
+> > virtio-blk cannot do that because there is no such command in the device
+> > specification at the moment. So simply waiting for the polled request to
+> > complete is the only thing that can be done (aside from resetting the
+> > device), and it's generic behavior.
+>=20
+> Then looks not safe to support IO polling for virtio-blk, maybe disable it
+> at default now until the virtio-blk spec starts to support IO abort?
+
+The virtio_blk.ko poll_queues module parameter is already set to 0 by
+default. Poll queues are only available when the user has explicitly set
+the module parameter.
+
+I have added Suwan Kim to the email thread. Suwan Kim added poll queue
+support to the virtio-blk driver and may have a preference for how to
+proceed.
+
+Stefan
+
+--rd/ih7ZpJJDBDoHt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmUS8N4ACgkQnKSrs4Gr
+c8hWmgf/fD3DZcd+L6dOVkhoxLktiDsXa1YuXrbUUX/SxuNNEBqs13rtQqt7ZsK2
+Q6JuURAdhVOwnq/yNZ7m8OAFEW9chwJU6XexG9ZCuRdrH+weEOFsHZYT0sp07vCb
+C2GmsIkoEIaTPplPKJ//2TCh+Ag1N3FFHgZQ34IDJS/+9In+uDHt23JPS7Pp34OL
+z7AZVp8lOmSapW4HpoextIwBF+l0BzsEmW5VNsWWqr6kM2dnzvC3pbqTffGcWs09
+2AsgcTL/zKJNw77UzddLHVxssPd3KHYaY5YYdJKvwujkzr/m4iqj4z5VWJGWCSqi
+8WOa0LVA2GGcDVmkQ8OnbpItjoWh2w==
+=WLJs
+-----END PGP SIGNATURE-----
+
+--rd/ih7ZpJJDBDoHt--
+
