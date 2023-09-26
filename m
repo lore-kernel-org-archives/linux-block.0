@@ -2,63 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F11EE3F2A
-	for <linux-block@archiver.kernel.org>; Tue, 26 Sep 2023 06:43:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE52EE3F2A
+	for <linux-block@archiver.kernel.org>; Tue, 26 Sep 2023 06:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229585AbjIZGn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Sep 2023 02:43:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50372 "EHLO
+        id S229620AbjIZGpG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Sep 2023 02:45:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbjIZGnz (ORCPT
+        with ESMTP id S230132AbjIZGpF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2023 02:43:55 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20082E9
-        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 23:43:49 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-3175e1bb38cso1447248f8f.1
-        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 23:43:49 -0700 (PDT)
+        Tue, 26 Sep 2023 02:45:05 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9187B116
+        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 23:44:57 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-405d70d19bcso3860595e9.0
+        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2023 23:44:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695710627; x=1696315427; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695710696; x=1696315496; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dU0wg62lr2xNjaScPCD+4bLIPZbMjKJ/swUkKHzUNCg=;
-        b=sGrWUYCBiJQXmND1bAGvoN10uLNOTnG11fEoheFBpk27R0lxWcpSQNdTlIlXVuA14U
-         j/L3o/m8qZpvMybFzIi9laK32dHgcJkrKALWQ2EsXorFZi9fh6Ky57J18JTY3saEk2Pu
-         Btn/+vtGoGc3mz8/wdghRydCI5VJ1F35fZjz7czh0ktRxrOYkiQj+vzX9xRriUtLChLU
-         CwFU7z4zoiIH7Qp4a1UKKCXo1GKTVYzKX72lfLkuUTre2YFro9MjcxggtOzajsoaxElH
-         6Nr5/vcno6qXT/WXHJZRtzWcKozd+Yk/9wnwsfRjVfHC+CeWv8gRs4UjID3sUIEMP+0t
-         tofg==
+        bh=Vy+8WASYGTBS1mWxTg8Np7QtelHMw3rWndRVIOTdjBE=;
+        b=Z0pcZJhu6E5SCTrt1iatL9NocivU+4cdMrsH2fIcGXo9rcRaNkcnHIJYzLupgWKKiq
+         c3qg6aLY7dqimnDT0SHP+oQVO/PsHCs1ZgcgpVWUF/D9iIc7OuVowjF5Ypf49CMQlS57
+         3Ual701q+RGhGn/AjzoiwtrZxjUlTpiMXm26aOfJb6SBDImBNg8J9VhsGYQJM2MI54qD
+         gYC39n/NcoaXwb0V1vQimZdAMzPupHI5zIOi6f8xyhB429aHTemX1UEpZWuWLt2qooSJ
+         4M62LbBwA4HN1t8MP8j2vMA1WYyYcoNBERH5m2dd8ryCgC3PtpLBLzhX3htsY+QW5907
+         dy5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695710627; x=1696315427;
+        d=1e100.net; s=20230601; t=1695710696; x=1696315496;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dU0wg62lr2xNjaScPCD+4bLIPZbMjKJ/swUkKHzUNCg=;
-        b=qF1YZ2d1afPJSiUdYVvpTw0D2yHP7wZ2ROaqCc1LpissGntU4VyZ/fByBPnPPr4Tza
-         4NdqY8w6DMRwuOVLJdOdl/hE9esYAmpmC0lZlVzavf9CwHAJdF+MW0vrV6EsipeIxAfR
-         pHLQdXSGiiJ5ecu5SnZ89j4ak130hnWiiON/AIZwSANmVahgLCXz1q7aor0bfCnEQRUP
-         61E1t8QYKr05k4a7fDQYvlBnVODE2INYfcFeu2iIfoTsohq3jVpQdMnfYEzR0wiHtGVW
-         R1tpSgBJcBjApk4FXSM6BYvD2m/5QLfPOG/9vwFiudRZRUreAru4m4wL5DJzSMMyabuL
-         dIaw==
-X-Gm-Message-State: AOJu0YwVt2o2dEE23tduH3BbvT7EV6USg/ezFZxXo4+VU/TmtprMAfjw
-        jmU9kwVQhadZ7pHMfGx9Uy8NSA==
-X-Google-Smtp-Source: AGHT+IGDVncgjlr1M8g8f5L3NQijHmN4vBIf89YmGQkfQudDtKc3xid0isSrBgZT9hJ0XdBtdMlXPA==
-X-Received: by 2002:adf:fc89:0:b0:317:7238:336a with SMTP id g9-20020adffc89000000b003177238336amr6910141wrr.5.1695710627495;
-        Mon, 25 Sep 2023 23:43:47 -0700 (PDT)
+        bh=Vy+8WASYGTBS1mWxTg8Np7QtelHMw3rWndRVIOTdjBE=;
+        b=KCfC59WL3KVFAUnaUfSkhOzL7cQyIwRXQPVZv8AtDkT2nP8yAu1pZB5oDO/m5wuj6H
+         gOktTIr2P9ZbhfrLT2/M0otIgi95Abg9/OKVtswzJI6oXybeE3Qz9vUqeOq4/2ARBXlz
+         1bdXqvYFPJhzguo+wjQD5NZkfdpsJ1DP+swlxle9UFz3b72qT2hO/tSqJ9qtVt0NH0ZF
+         HelCyK8b1KnIhWn8jDnJNYCmCEmZyxJmJMsU5WN70o+zurrGWS5Nmkc3B3cPBKuCJKJr
+         +rlA3FwtGimOSRGDKm2Ueq6US8ap6qe6VLjsTZ5eAqqoAPLKj93rl9ydpa4jNc8HH6WS
+         Nyjw==
+X-Gm-Message-State: AOJu0YxOT8hE+/0Ucd6JbvdVE81CVRZpeeMRgHSYs6AnIHBQGzflQ3RR
+        71UfpoeMx0iLu5jgh4oOho5XNQ==
+X-Google-Smtp-Source: AGHT+IH9l76dfcSqxOnW7BCusuZLco1ls+8gcRWVia87WNg/ADhYwhN0gbWksHNTHTDBt6adAkwcMA==
+X-Received: by 2002:a05:600c:4f50:b0:405:39bb:38a8 with SMTP id m16-20020a05600c4f5000b0040539bb38a8mr7418100wmq.2.1695710695345;
+        Mon, 25 Sep 2023 23:44:55 -0700 (PDT)
 Received: from [127.0.0.1] ([45.147.210.162])
-        by smtp.gmail.com with ESMTPSA id j3-20020a5d5643000000b0032167e49619sm13758109wrw.5.2023.09.25.23.43.46
+        by smtp.gmail.com with ESMTPSA id 8-20020a05600c230800b004042dbb8925sm1127571wmo.38.2023.09.25.23.44.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 23:43:46 -0700 (PDT)
+        Mon, 25 Sep 2023 23:44:54 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc:     kernel test robot <lkp@intel.com>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org
-In-Reply-To: <20230926005232.23666-1-rdunlap@infradead.org>
-References: <20230926005232.23666-1-rdunlap@infradead.org>
-Subject: Re: [PATCH] block: fix kernel-doc for disk_force_media_change()
-Message-Id: <169571062634.577707.15764939880513654865.b4-ty@kernel.dk>
-Date:   Tue, 26 Sep 2023 00:43:46 -0600
+To:     linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Geliang Tang <geliang.tang@suse.com>,
+        Hannes Reinecke <hare@suse.de>, NeilBrown <neilb@suse.de>,
+        Richard Fan <richard.fan@suse.com>,
+        Vishal L Verma <vishal.l.verma@intel.com>,
+        Wols Lists <antlists@youngman.org.uk>, Xiao Ni <xni@redhat.com>
+In-Reply-To: <20230811170513.2300-1-colyli@suse.de>
+References: <20230811170513.2300-1-colyli@suse.de>
+Subject: Re: [PATCH v7 0/6] badblocks improvement for multiple bad block
+ ranges
+Message-Id: <169571069404.578063.8660956212739660767.b4-ty@kernel.dk>
+Date:   Tue, 26 Sep 2023 00:44:54 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -68,18 +74,32 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Mon, 25 Sep 2023 17:52:32 -0700, Randy Dunlap wrote:
-> Drop one function parameter's kernel-doc comment since the parameter
-> was removed. This prevents a kernel-doc warning:
+On Sat, 12 Aug 2023 01:05:06 +0800, Coly Li wrote:
+> This is the v7 version of the badblocks improvement series, which makes
+> badblocks APIs to handle multiple ranges in bad block table.
 > 
-> block/disk-events.c:300: warning: Excess function parameter 'events' description in 'disk_force_media_change'
+> The change comparing to previous v6 version is the modifications
+> enlightened by the code review comments from Xiao Ni,
+> - Typo fixes in code comments and commit logs.
+> - Tiny but useful optimzation in prev_badblocks(), front_overwrite(),
+>   _badblocks_clear().
 > 
-> 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: fix kernel-doc for disk_force_media_change()
-      commit: a578a25339aca38e23bb5af6e3fc6c2c51f0215c
+[1/6] badblocks: add more helper structure and routines in badblocks.h
+      commit: e850d9a52f4cd31521c80a7ea9718b69129af4d5
+[2/6] badblocks: add helper routines for badblock ranges handling
+      commit: c3c6a86e9efc5da5964260c322fe07feca6df782
+[3/6] badblocks: improve badblocks_set() for multiple ranges handling
+      commit: 1726c774678331b4af5e78db87e10ff5da448456
+[4/6] badblocks: improve badblocks_clear() for multiple ranges handling
+      commit: db448eb6862979aad2468ecf957a20ef98b82f29
+[5/6] badblocks: improve badblocks_check() for multiple ranges handling
+      commit: 3ea3354cb9f03e34ee3fab98f127ab8da4131eee
+[6/6] badblocks: switch to the improved badblock handling code
+      commit: aa511ff8218b3fb328181fbaac48aa5e9c5c6d93
 
 Best regards,
 -- 
