@@ -2,131 +2,160 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD35CE82CD9
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 20:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93919E82CC0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 21:44:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229561AbjI0Uto (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 16:49:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36896 "EHLO
+        id S229959AbjI0VoH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 17:44:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjI0Utn (ORCPT
+        with ESMTP id S229458AbjI0VoG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2023 16:49:43 -0400
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F28CD6;
-        Wed, 27 Sep 2023 13:49:42 -0700 (PDT)
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-573912a7b14so6082659eaf.1;
-        Wed, 27 Sep 2023 13:49:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695847781; x=1696452581;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UmyEGkXri5KPsLJOTpq3bUt+vQ7L9qwnm2OL7z9no/o=;
-        b=hsbcXMJs3O+bel0C8TtVsigJ/csYrHcwlyNOI/H94wBJHe3ZsVTiYwnnwZOGkj/qSs
-         wVEO15T7wiyNtpwZmw11RqJwDV9jrVbdC12IxtYo/PeLMCmr4AchQI8pYvUDuE4R67PS
-         BYmjtkxS8CamxCG4SLBefQ7rQFYj6FPLvx55WUPctsO4tLkjescBk7h5oiYHz+vkWubM
-         mztTHoq24wz/MkKRvD3xytTzT0O86u2xA0VBOu/zQqd4si3bGKGEW6MbCF1F0zyerN0u
-         nUKgHDbABljPm1D+ZKq4BLLoHNbo/EWISlgGQ4Jb3gsW0E3/gPozFcMWvVu+tpkCZa/R
-         JoHg==
-X-Gm-Message-State: AOJu0YyXhAba4ZfdqYjtW7EK+jwpbKRXO0mBmEVrH6ri5yWZ7VeVo0O4
-        6NrMFkGUfJGaeTtWN8Mnhxw=
-X-Google-Smtp-Source: AGHT+IHCwOWWNCAmANznYdzvBGWpetjIhbyOwNgWCWOWXFVixgBXrieU8G1Svoezl04Px/snxncgLQ==
-X-Received: by 2002:a05:6358:7e84:b0:135:47e8:76e2 with SMTP id o4-20020a0563587e8400b0013547e876e2mr2957543rwn.4.1695847780999;
-        Wed, 27 Sep 2023 13:49:40 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:8f39:a76e:2f15:c958? ([2620:15c:211:201:8f39:a76e:2f15:c958])
-        by smtp.gmail.com with ESMTPSA id v13-20020a63b64d000000b0057783b0f102sm10285198pgt.40.2023.09.27.13.49.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Sep 2023 13:49:40 -0700 (PDT)
-Message-ID: <be30c422-f84a-43b8-b176-3516ff5180cb@acm.org>
-Date:   Wed, 27 Sep 2023 13:49:39 -0700
+        Wed, 27 Sep 2023 17:44:06 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C37D6;
+        Wed, 27 Sep 2023 14:44:05 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38RLeDM2017419;
+        Wed, 27 Sep 2023 21:43:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=se51p/MqpkArSngnFBRzkX1YJmLtShBmb9EktIdtgGQ=;
+ b=lO4HT8Cb21mPyqZt3jz2LLeIik8zu5m6yqZbdnXK6v7jFwOQjtbEcoDRkkKlMRZ8eBL0
+ AH8xSoSsUI+zswjTl0ZbILpHw/F+nK9/c0WsuBCqYpmdNWQ6ST3JSD6cC3AC7WSrqcod
+ dpwTaeATgUNEcbJA+o1IMm/CFlpf3GqxhylK/4ggzV3dCyZmLklEk9JXgut4mh55ifWG
+ NB2tcUHsomqzv/VjBBSfPEKjAs3giQ8itRJWaaD6nnO4frsCX3vBaHMHWiBz/BoWSIiX
+ 1j94rJb+IOWpbBrhOwYXXguRLrjosW5JzPrPQPPYKN6ztEy8/D02FmiwBHULP5rFMQoM EA== 
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcrsde2tx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Sep 2023 21:43:49 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38RKVuIr008143;
+        Wed, 27 Sep 2023 21:43:48 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3taaqyq4ug-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Sep 2023 21:43:48 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38RLhjqM43450858
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Sep 2023 21:43:45 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5662A2004D;
+        Wed, 27 Sep 2023 21:43:45 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A45F32004F;
+        Wed, 27 Sep 2023 21:43:44 +0000 (GMT)
+Received: from [9.171.37.160] (unknown [9.171.37.160])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Sep 2023 21:43:44 +0000 (GMT)
+Message-ID: <51e1e42a-2ed8-a664-f26f-bc5bc1762884@linux.ibm.com>
+Date:   Wed, 27 Sep 2023 23:43:44 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/13] Pass data temperature information to zoned UFS
- devices
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 14/29] s390/dasd: Convert to bdev_open_by_path()
 Content-Language: en-US
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-References: <20230920191442.3701673-1-bvanassche@acm.org>
- <yq1o7hnzbsy.fsf@ca-mkp.ca.oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <yq1o7hnzbsy.fsf@ca-mkp.ca.oracle.com>
+To:     Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        linux-s390@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>
+References: <20230818123232.2269-1-jack@suse.cz>
+ <20230823104857.11437-14-jack@suse.cz>
+From:   Stefan Haberland <sth@linux.ibm.com>
+In-Reply-To: <20230823104857.11437-14-jack@suse.cz>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gNioCTpAK6quqH6t38vjfE2eIeyhywLj
+X-Proofpoint-ORIG-GUID: gNioCTpAK6quqH6t38vjfE2eIeyhywLj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-27_15,2023-09-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
+ phishscore=0 clxscore=1011 impostorscore=0 adultscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309270185
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/27/23 12:14, Martin K. Petersen wrote:
-> I don't have any particular problems with your implementation, 
-> although I'm still trying to wrap my head around how to make this 
-> coexist with my I/O hinting series. But I guess there's probably not
-> going to be a big overlap between devices that support both 
-> features.
+Am 23.08.23 um 12:48 schrieb Jan Kara:
+> Convert dasd to use bdev_open_by_path() and pass the handle around.
+>
+> CC: linux-s390@vger.kernel.org
+> CC: Christian Borntraeger <borntraeger@linux.ibm.com>
+> CC: Sven Schnelle <svens@linux.ibm.com>
+> Acked-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
 
-Hi Martin,
+The DASD part does not compile. please see below.
 
-This patch series should make it easier to implement I/O hint support
-since some of the code added by this patch series is also needed to
-implement I/O hint support.
+Beside of this the patch looks OK to me.
 
-> However, it still pains me greatly to see the SBC proposal being 
-> intertwined with the travesty that is streams. Why not define 
-> everything in the IO advice hints group descriptor? I/O hints already
-> use GROUP NUMBER as an index. Why not just define a few permanent
-> hint descriptors? What's the point of the additional level of
-> indirection to tie this new feature into streams? RSCS basically says
-> "ignore the streams-specific bits and bobs and do this other stuff
-> instead". What does the streams infrastructure provide that can't be
-> solved trivially in the IO advise mode page alone?
+with the error fixed:
+Acked-by: Stefan Haberland <sth@linux.ibm.com>
 
-Hmm ... isn't that exactly what T10 did, define everything in the IO
-advice hints group descriptor by introducing the new ST_ENBLE bit in
-that descriptor?
+>   drivers/s390/block/dasd.c       | 12 +++++----
+>   drivers/s390/block/dasd_genhd.c | 45 ++++++++++++++++-----------------
+>   drivers/s390/block/dasd_int.h   |  2 +-
+>   drivers/s390/block/dasd_ioctl.c |  2 +-
+>   4 files changed, 31 insertions(+), 30 deletions(-)
+>
+> diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+> index 215597f73be4..16a2d631a169 100644
+> --- a/drivers/s390/block/dasd.c
+> +++ b/drivers/s390/block/dasd.c
+> @@ -412,7 +412,8 @@ dasd_state_ready_to_online(struct dasd_device * device)
+>   					KOBJ_CHANGE);
+>   			return 0;
+>   		}
+> -		disk_uevent(device->block->bdev->bd_disk, KOBJ_CHANGE);
+> +		disk_uevent(device->block->bdev_handle->bdev->bd_disk,
+> +			    KOBJ_CHANGE);
+>   	}
+>   	return 0;
+>   }
+> @@ -432,7 +433,8 @@ static int dasd_state_online_to_ready(struct dasd_device *device)
+>   
+>   	device->state = DASD_STATE_READY;
+>   	if (device->block && !(device->features & DASD_FEATURE_USERAW))
+> -		disk_uevent(device->block->bdev->bd_disk, KOBJ_CHANGE);
+> +		disk_uevent(device->block->bdev_handle->bdev->bd_disk,
+> +			    KOBJ_CHANGE);
+>   	return 0;
+>   }
+>   
+> @@ -3590,7 +3592,7 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
+>   	 * in the other openers.
+>   	 */
+>   	if (device->block) {
+> -		max_count = device->block->bdev ? 0 : -1;
+> +		max_count = device->block->bdev_handle ? 0 : -1;
+>   		open_count = atomic_read(&device->block->open_count);
+>   		if (open_count > max_count) {
+>   			if (open_count > 0)
+> @@ -3636,8 +3638,8 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
+>   		 * so sync bdev first and then wait for our queues to become
+>   		 * empty
+>   		 */
+> -		if (device->block)
+> -			bdev_mark_dead(device->block->bdev, false);
+> +		if (device->block && device->block->bdev_handle) {
 
-This patch series relies on the constrained streams mechanism. A
-constrained stream is permanently open. The new ST_ENBLE bit in the IO
-advice hints group descriptor indicates whether or not an IO advice
-hints group represents a permanent stream.
+the brace is not needed here and there is no matching right brace.
 
-The new ST_ENBLE bit in the IO advice hints group descriptor allows SCSI
-devices to interpret the index of the descriptor as a data lifetime.
- From the approved T10 proposal:
+> +			bdev_mark_dead(device->block->bdev_handle->bdev, false);
+>   		dasd_schedule_device_bh(device);
+>   		rc = wait_event_interruptible(shutdown_waitq,
+>   					      _wait_for_empty_queues(device));
+>
 
-Table x1 – RELATIVE LIFETIME field
-..............................................
-Code        Relative lifetime
-..............................................
-00h         no relative lifetime is applicable
-01h         shortest relative lifetime
-02h         second shortest relative lifetime
-03h to 3Dh  intermediate relative lifetimes
-3Eh         second longest relative lifetime
-3Fh         longest relative lifetime
-..............................................
-
-> For existing UFS devices which predate RSCS and streams but which 
-> support getting data temperature from GROUP NUMBER, what is the 
-> mechanism for detecting and enabling the feature?
-
-We plan to ask UFS device vendors to modify the UFS device firmware and
-to add support for the VPD and mode pages this patch series relies on.
-My understanding is that this can be done easily in UFS device firmware.
-
-Although it is technically possible to update the firmware of UFS
-devices in smartphones, most smartphones do not support this because
-this is considered risky. Hence, only new smartphones will benefit from
-this patch series.
-
-I do not want to add support in the Linux kernel for how conventional
-UFS devices use the GROUP NUMBER field today. Conventional UFS devices
-interpret the GROUP NUMBER field as a "ContextID". The ContextID
-mechanism has a state, just like the SCSI stream mechanism. UFS contexts
-need to be opened explicitly and are closed upon reset. From the UFS 4.0
-specification: "No ContextID shall be open after power cycle."
-
-Please let me know if you need more information.
-
-Bart.
