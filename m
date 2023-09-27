@@ -2,171 +2,243 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAEBCE810C3
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A00CEE810BA
+	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:35:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231239AbjI0JfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 05:35:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44668 "EHLO
+        id S230500AbjI0JfS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 05:35:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231163AbjI0JfA (ORCPT
+        with ESMTP id S231167AbjI0JfB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2023 05:35:00 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C51B9193;
+        Wed, 27 Sep 2023 05:35:01 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8700F199;
         Wed, 27 Sep 2023 02:34:49 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E878B1FD6B;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5D15D1FD67;
         Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1695807284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KOnyti5KClOK/DZ+r1V0hcJlW7O4gjBtUgUcqKUTL18=;
-        b=yNLN2znpPx6VmCHUZP4KTq07gSLjhc3gN+54DiugulyavDeRbC7iOb7AEf+SWIMfqYCVyR
-        XOjgaE6/WC/ORuonX4TG5roAJsOPqo0jEGiItLInbA3LfOAOfFgVGkjQ3vzQK6fCGUJmQO
-        HfNPT4w+FILO8ChJJKGLrmX0jN6CsR0=
+        bh=HGo/Xq8dFzoPwHSosGXMbKjBfEsi3qnA9TbO9PgxH+A=;
+        b=0jfiCN9Ss/zEWjO3Uz7Xxyr/uusA+ODC+6C8wy+Gsot4f+CtYzJyZFkcIDwn7OsXowIwc/
+        lTxlcG4DXCatyv6iGJmNNTQhWvuopAHh1c4PO3gibAIdph4d8p0PBHL7fbAeIohJZtUm1e
+        jxQaoeqR5H6LxcR35DHeWE4ExNxB6WQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1695807284;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KOnyti5KClOK/DZ+r1V0hcJlW7O4gjBtUgUcqKUTL18=;
-        b=vkt3UFd/lQ/W9S7x1bMlwQkpmO/bS1/wHMb2BlnIjl5L5T0Q7KajN0Cp+NmDlUEdVJuSK3
-        mJlPW78fNBV5qvBQ==
+        bh=HGo/Xq8dFzoPwHSosGXMbKjBfEsi3qnA9TbO9PgxH+A=;
+        b=lrqZh9bmOwrSKtF9MM4lXxbaOHik1cdQoiB/IpznvfdkB6GTRpNeB8v8aaNqG8WqwkL0Uk
+        yTzbXH+Fam4EVkBw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C738413A74;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 404AA13A74;
         Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id H2eiMDT3E2UxEwAAMHmgww
+        id I0GmDzT3E2UfEwAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 27 Sep 2023 09:34:44 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 85278A07CB; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
+        id 4DAB5A07E3; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-        linux-erofs@lists.ozlabs.org, Christoph Hellwig <hch@lst.de>,
-        Gao Xiang <hsiangkao@linux.alibaba.com>
-Subject: [PATCH 21/29] erofs: Convert to use bdev_open_by_path()
-Date:   Wed, 27 Sep 2023 11:34:27 +0200
-Message-Id: <20230927093442.25915-21-jack@suse.cz>
+        linux-s390@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 14/29] s390/dasd: Convert to bdev_open_by_path()
+Date:   Wed, 27 Sep 2023 11:34:20 +0200
+Message-Id: <20230927093442.25915-14-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3442; i=jack@suse.cz; h=from:subject; bh=tSNAUT0uFbcm9oHwALUFKHxE0ETO4bF9IMenCC0F+F0=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cjo+HbOx0LsjyNvizl8EI9YCHUrtEejlIYkdX2 jBM7EHyJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3IwAKCRCcnaoHP2RA2UIjB/ 4we2a/ke+Y1w3SDvCVhUCYfQxjQ7yd/lH2XBmVVcS7BRGvzdxSCoLUlJu71xFNN9J3srkid05buJAP zPoefvZ1agttMkroPNJp9RRGlqzaRlp0UKQdF+AcNFphngjIaj+JKjjUH1udxtBm+3LchiWCE84/ff nmUz919TGIQ0J4NPA93Qg2awChYidR63Awk1zGr54gPZw022wP6uwpAGAxQ/g4V0cRx7zOPrLoDs47 Zm40Je2jTX4pTAvNP/BUg4BiJXndKl/RrL63syWFsJNZkYkaDGARQ6a7ZoJYEblNxvzs1ZCPJ+nciA rPz4ZtNyQh3PgjN5J6rf8FipV7Z9nu
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6267; i=jack@suse.cz; h=from:subject; bh=eF9knwTfYejhPzvKMsCrLPavANvwOJ7CsSrEpPUTdz4=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cd5GR94VDq1NxHlNaHPVCA1xSXhbvs50sJL2R6 3JywsL6JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3HQAKCRCcnaoHP2RA2fY/B/ 9Spv9aycQ/FEPs2otEHRgni79oo39Dg6NdSWrGMRiGOTDZfTl/0lqnz8eEtPsLQ6bd8VLn1tQXHQWr qoOJgGnACdamDZDI2XzydPRfNk4J8RUnjwDrtV/hI0bDe588YRrlxbua3pXUqK4JbCxrcS9M27l2RE e9ptxTdEYZV8oMp5ZJbJ+U3oLs92GWvJOGRR1FaUBtEePEtzs4haRYtlXkygaLv7Ur7+ZVje7fDThW qd3th454IapTaeWMg0I1MUAkFAMAFoVoSf5/4iRgdz4kepyVIPh78mAZfUo9zJqx3ubg23z5p38cli wtD9pSM7no+oVcuPm69MzLnIJLHc6K
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert erofs to use bdev_open_by_path() and pass the handle around.
+Convert dasd to use bdev_open_by_path() and pass the handle around.
 
-CC: Gao Xiang <xiang@kernel.org>
-CC: Chao Yu <chao@kernel.org>
-CC: linux-erofs@lists.ozlabs.org
+CC: linux-s390@vger.kernel.org
+CC: Christian Borntraeger <borntraeger@linux.ibm.com>
+CC: Sven Schnelle <svens@linux.ibm.com>
 Acked-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Gao Xiang <hsiangkao@linux.alibaba.com>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+Acked-by: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/erofs/data.c     |  4 ++--
- fs/erofs/internal.h |  2 +-
- fs/erofs/super.c    | 20 ++++++++++----------
- 3 files changed, 13 insertions(+), 13 deletions(-)
+ drivers/s390/block/dasd.c       | 12 +++++----
+ drivers/s390/block/dasd_genhd.c | 45 ++++++++++++++++-----------------
+ drivers/s390/block/dasd_int.h   |  2 +-
+ drivers/s390/block/dasd_ioctl.c |  2 +-
+ 4 files changed, 31 insertions(+), 30 deletions(-)
 
-diff --git a/fs/erofs/data.c b/fs/erofs/data.c
-index 0c2c99c58b5e..f6a0a1748521 100644
---- a/fs/erofs/data.c
-+++ b/fs/erofs/data.c
-@@ -222,7 +222,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
- 			up_read(&devs->rwsem);
+diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+index 215597f73be4..16a2d631a169 100644
+--- a/drivers/s390/block/dasd.c
++++ b/drivers/s390/block/dasd.c
+@@ -412,7 +412,8 @@ dasd_state_ready_to_online(struct dasd_device * device)
+ 					KOBJ_CHANGE);
  			return 0;
  		}
--		map->m_bdev = dif->bdev;
-+		map->m_bdev = dif->bdev_handle->bdev;
- 		map->m_daxdev = dif->dax_dev;
- 		map->m_dax_part_off = dif->dax_part_off;
- 		map->m_fscache = dif->fscache;
-@@ -240,7 +240,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
- 			if (map->m_pa >= startoff &&
- 			    map->m_pa < startoff + length) {
- 				map->m_pa -= startoff;
--				map->m_bdev = dif->bdev;
-+				map->m_bdev = dif->bdev_handle->bdev;
- 				map->m_daxdev = dif->dax_dev;
- 				map->m_dax_part_off = dif->dax_part_off;
- 				map->m_fscache = dif->fscache;
-diff --git a/fs/erofs/internal.h b/fs/erofs/internal.h
-index 4ff88d0dd980..cf04e21bfda2 100644
---- a/fs/erofs/internal.h
-+++ b/fs/erofs/internal.h
-@@ -47,7 +47,7 @@ typedef u32 erofs_blk_t;
- struct erofs_device_info {
- 	char *path;
- 	struct erofs_fscache *fscache;
+-		disk_uevent(device->block->bdev->bd_disk, KOBJ_CHANGE);
++		disk_uevent(device->block->bdev_handle->bdev->bd_disk,
++			    KOBJ_CHANGE);
+ 	}
+ 	return 0;
+ }
+@@ -432,7 +433,8 @@ static int dasd_state_online_to_ready(struct dasd_device *device)
+ 
+ 	device->state = DASD_STATE_READY;
+ 	if (device->block && !(device->features & DASD_FEATURE_USERAW))
+-		disk_uevent(device->block->bdev->bd_disk, KOBJ_CHANGE);
++		disk_uevent(device->block->bdev_handle->bdev->bd_disk,
++			    KOBJ_CHANGE);
+ 	return 0;
+ }
+ 
+@@ -3590,7 +3592,7 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
+ 	 * in the other openers.
+ 	 */
+ 	if (device->block) {
+-		max_count = device->block->bdev ? 0 : -1;
++		max_count = device->block->bdev_handle ? 0 : -1;
+ 		open_count = atomic_read(&device->block->open_count);
+ 		if (open_count > max_count) {
+ 			if (open_count > 0)
+@@ -3636,8 +3638,8 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
+ 		 * so sync bdev first and then wait for our queues to become
+ 		 * empty
+ 		 */
+-		if (device->block)
+-			bdev_mark_dead(device->block->bdev, false);
++		if (device->block && device->block->bdev_handle) {
++			bdev_mark_dead(device->block->bdev_handle->bdev, false);
+ 		dasd_schedule_device_bh(device);
+ 		rc = wait_event_interruptible(shutdown_waitq,
+ 					      _wait_for_empty_queues(device));
+diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
+index fe5108a1b332..55e3abe94cde 100644
+--- a/drivers/s390/block/dasd_genhd.c
++++ b/drivers/s390/block/dasd_genhd.c
+@@ -127,15 +127,15 @@ void dasd_gendisk_free(struct dasd_block *block)
+  */
+ int dasd_scan_partitions(struct dasd_block *block)
+ {
 -	struct block_device *bdev;
 +	struct bdev_handle *bdev_handle;
- 	struct dax_device *dax_dev;
- 	u64 dax_part_off;
+ 	int rc;
  
-diff --git a/fs/erofs/super.c b/fs/erofs/super.c
-index 44a24d573f1f..2bf6dac83025 100644
---- a/fs/erofs/super.c
-+++ b/fs/erofs/super.c
-@@ -227,7 +227,7 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
- 	struct erofs_sb_info *sbi = EROFS_SB(sb);
- 	struct erofs_fscache *fscache;
- 	struct erofs_deviceslot *dis;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	void *ptr;
- 
- 	ptr = erofs_read_metabuf(buf, sb, erofs_blknr(sb, *pos), EROFS_KMAP);
-@@ -251,13 +251,13 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
- 			return PTR_ERR(fscache);
- 		dif->fscache = fscache;
- 	} else if (!sbi->devs->flatdev) {
--		bdev = blkdev_get_by_path(dif->path, BLK_OPEN_READ, sb->s_type,
--					  NULL);
--		if (IS_ERR(bdev))
--			return PTR_ERR(bdev);
--		dif->bdev = bdev;
--		dif->dax_dev = fs_dax_get_by_bdev(bdev, &dif->dax_part_off,
--						  NULL, NULL);
-+		bdev_handle = bdev_open_by_path(dif->path, BLK_OPEN_READ,
-+						sb->s_type, NULL);
-+		if (IS_ERR(bdev_handle))
-+			return PTR_ERR(bdev_handle);
-+		dif->bdev_handle = bdev_handle;
-+		dif->dax_dev = fs_dax_get_by_bdev(bdev_handle->bdev,
-+				&dif->dax_part_off, NULL, NULL);
+-	bdev = blkdev_get_by_dev(disk_devt(block->gdp), BLK_OPEN_READ, NULL,
+-				 NULL);
+-	if (IS_ERR(bdev)) {
++	bdev_handle = bdev_open_by_dev(disk_devt(block->gdp), BLK_OPEN_READ,
++				       NULL, NULL);
++	if (IS_ERR(bdev_handle)) {
+ 		DBF_DEV_EVENT(DBF_ERR, block->base,
+ 			      "scan partitions error, blkdev_get returned %ld",
+-			      PTR_ERR(bdev));
++			      PTR_ERR(bdev_handle));
+ 		return -ENODEV;
  	}
  
- 	dif->blocks = le32_to_cpu(dis->blocks);
-@@ -806,8 +806,8 @@ static int erofs_release_device_info(int id, void *ptr, void *data)
- 	struct erofs_device_info *dif = ptr;
+@@ -147,16 +147,15 @@ int dasd_scan_partitions(struct dasd_block *block)
+ 				"scan partitions error, rc %d", rc);
  
- 	fs_put_dax(dif->dax_dev, NULL);
--	if (dif->bdev)
--		blkdev_put(dif->bdev, &erofs_fs_type);
-+	if (dif->bdev_handle)
-+		bdev_release(dif->bdev_handle);
- 	erofs_fscache_unregister_cookie(dif->fscache);
- 	dif->fscache = NULL;
- 	kfree(dif->path);
+ 	/*
+-	 * Since the matching blkdev_put call to the blkdev_get in
+-	 * this function is not called before dasd_destroy_partitions
+-	 * the offline open_count limit needs to be increased from
+-	 * 0 to 1. This is done by setting device->bdev (see
+-	 * dasd_generic_set_offline). As long as the partition
+-	 * detection is running no offline should be allowed. That
+-	 * is why the assignment to device->bdev is done AFTER
+-	 * the BLKRRPART ioctl.
++	 * Since the matching bdev_release() call to the
++	 * bdev_open_by_path() in this function is not called before
++	 * dasd_destroy_partitions the offline open_count limit needs to be
++	 * increased from 0 to 1. This is done by setting device->bdev_handle
++	 * (see dasd_generic_set_offline). As long as the partition detection
++	 * is running no offline should be allowed. That is why the assignment
++	 * to block->bdev_handle is done AFTER the BLKRRPART ioctl.
+ 	 */
+-	block->bdev = bdev;
++	block->bdev_handle = bdev_handle;
+ 	return 0;
+ }
+ 
+@@ -166,21 +165,21 @@ int dasd_scan_partitions(struct dasd_block *block)
+  */
+ void dasd_destroy_partitions(struct dasd_block *block)
+ {
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 
+ 	/*
+-	 * Get the bdev pointer from the device structure and clear
+-	 * device->bdev to lower the offline open_count limit again.
++	 * Get the bdev_handle pointer from the device structure and clear
++	 * device->bdev_handle to lower the offline open_count limit again.
+ 	 */
+-	bdev = block->bdev;
+-	block->bdev = NULL;
++	bdev_handle = block->bdev_handle;
++	block->bdev_handle = NULL;
+ 
+-	mutex_lock(&bdev->bd_disk->open_mutex);
+-	bdev_disk_changed(bdev->bd_disk, true);
+-	mutex_unlock(&bdev->bd_disk->open_mutex);
++	mutex_lock(&bdev_handle->bdev->bd_disk->open_mutex);
++	bdev_disk_changed(bdev_handle->bdev->bd_disk, true);
++	mutex_unlock(&bdev_handle->bdev->bd_disk->open_mutex);
+ 
+ 	/* Matching blkdev_put to the blkdev_get in dasd_scan_partitions. */
+-	blkdev_put(bdev, NULL);
++	bdev_release(bdev_handle);
+ }
+ 
+ int dasd_gendisk_init(void)
+diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
+index 8a4dbe9d7741..2e663131adaf 100644
+--- a/drivers/s390/block/dasd_int.h
++++ b/drivers/s390/block/dasd_int.h
+@@ -650,7 +650,7 @@ struct dasd_block {
+ 	struct gendisk *gdp;
+ 	spinlock_t request_queue_lock;
+ 	struct blk_mq_tag_set tag_set;
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	atomic_t open_count;
+ 
+ 	unsigned long blocks;	   /* size of volume in blocks */
+diff --git a/drivers/s390/block/dasd_ioctl.c b/drivers/s390/block/dasd_ioctl.c
+index d55862605b82..61b9675e2a67 100644
+--- a/drivers/s390/block/dasd_ioctl.c
++++ b/drivers/s390/block/dasd_ioctl.c
+@@ -537,7 +537,7 @@ static int __dasd_ioctl_information(struct dasd_block *block,
+ 	 * This must be hidden from user-space.
+ 	 */
+ 	dasd_info->open_count = atomic_read(&block->open_count);
+-	if (!block->bdev)
++	if (!block->bdev_handle)
+ 		dasd_info->open_count++;
+ 
+ 	/*
 -- 
 2.35.3
 
