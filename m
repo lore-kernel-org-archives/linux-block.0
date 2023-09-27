@@ -2,361 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87EA5E810B1
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD59E80AAD
+	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 14:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230448AbjI0Jfo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 05:35:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44672 "EHLO
+        id S232165AbjI0OUZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 10:20:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231168AbjI0JfB (ORCPT
+        with ESMTP id S232227AbjI0OTq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2023 05:35:01 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C682519A;
-        Wed, 27 Sep 2023 02:34:49 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id F2BAA1FD6C;
-        Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1695807285; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0ureXPVypBtPxlZhl3+g20W/OKPlFCMOeOub7CiKcuo=;
-        b=iFSliLpVrXcSLuPExiWmDGZa/B0OwAUZU1rtXbAZqMLx8nNL64BxY8wc5smrCfAdcmJBQ3
-        VqNEgV8R6ClPU6K0jFxnNuYW2f3guJ4vmxZZtwywJLs5KYUJbbrvEvDJbo/88NGRa4dmkP
-        enUperpHGU2JMPCSZWQG4vvlSJI9csM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1695807285;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0ureXPVypBtPxlZhl3+g20W/OKPlFCMOeOub7CiKcuo=;
-        b=O2qb5Y4tRkgfY8bJ6TKcYHnhHGJ5RzU1lR0cNg+2aMiF2zSZ5eFA3QDzeWN7WptSliqXuv
-        UTY+zvZxlCGrjiAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E3AA013ADA;
-        Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id mHWTNzT3E2U3EwAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 27 Sep 2023 09:34:44 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id AB772A07D0; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
-From:   Jan Kara <jack@suse.cz>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        ocfs2-devel@oss.oracle.com, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 26/29] ocfs2: Convert to use bdev_open_by_dev()
-Date:   Wed, 27 Sep 2023 11:34:32 +0200
-Message-Id: <20230927093442.25915-26-jack@suse.cz>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
-References: <20230818123232.2269-1-jack@suse.cz>
+        Wed, 27 Sep 2023 10:19:46 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3FC6CD8
+        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2023 07:19:40 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2bfe9447645so40486451fa.0
+        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2023 07:19:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695824379; x=1696429179; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Wwk46okUDVQfnnelgDDAXJI2PyNHcNwKe3ka13udWbU=;
+        b=DeI+ndmzygXiV26g14+sM5/i8LsgL9CgDy9VB19Br8mLYRZAuIXT5fRRQQG6dlR8uL
+         ZHHEpTz9ZokFgwqp34n75yS1PY5jIPS2kExh12XhknOQ2eKCYOv28dsCXeJAXJsi1HEl
+         F2Zx2jmfkSiekVnLkJ+WFP/RjHCF0P4hSSv/TEmiFoZUevCIhKJiTrNv3PuTvlSLSujz
+         Wf0VyalzJuC9m/i5NNQ2Jq1nDpP2QrA8a1dJThFB6+d4PeMeHZ2KUcdfKMEpuuI5ak06
+         ZG9/SXQPZ7P5UXbdQF7zqfmdxHWvYx4R5uZ/etWrlX8CR5WPQ2foeStaY5DOJOnP6vcl
+         LLCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695824379; x=1696429179;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wwk46okUDVQfnnelgDDAXJI2PyNHcNwKe3ka13udWbU=;
+        b=mSrw3bqhVcJzLKe04SpiOSKcM5xU0ml8BugExI16OCKsvaHvl7B+Y+kzslStCnVBfL
+         nrnSlFy84dtQo7kljOQZh3C14uZOcsCdKoZ5CESt7aW2oNXS6viJX3S1pmUC72OLot/t
+         Owo+RYgnWpfKlpcgawrT9gvVXp4ENUsHHG/1twrSeze1XDgLwCEIq8K44MuJwNZO9Ktl
+         9Lw+4YZbjuG0i9eL5wgkH+BrHCKrcoKgkDznNUW0VE7cpS5hU2lGbRXBPgGBZs+ncDz/
+         /1Qmq7+BlKtzp69aISw6AdVq/knInUcax6zpmjNjghq3p0jVNYQAGdNoRfMbOiyMmOmx
+         O1nQ==
+X-Gm-Message-State: AOJu0YxugvM6tFDPDCgpFBYghhL+fQr0YbYwpzat5A6hYAfEuyOVIoXb
+        yNR3MhLgE2TUgC79cL5hGxcZXg==
+X-Google-Smtp-Source: AGHT+IExVCqrFIxKzo43T8FMa/9T5rz6/xdccYRyI4cqxFk27k3RqgKqbk6x0v1Y5TMyg8NtKFdEkg==
+X-Received: by 2002:a05:651c:3cf:b0:2b6:cd7f:5ea8 with SMTP id f15-20020a05651c03cf00b002b6cd7f5ea8mr1801740ljp.1.1695824378667;
+        Wed, 27 Sep 2023 07:19:38 -0700 (PDT)
+Received: from [172.20.13.88] ([45.147.210.162])
+        by smtp.gmail.com with ESMTPSA id mh2-20020a170906eb8200b00992b2c55c67sm9370253ejb.156.2023.09.27.07.19.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Sep 2023 07:19:37 -0700 (PDT)
+Message-ID: <9cc59d88-4b77-4e56-ae54-737baca1d435@kernel.dk>
+Date:   Wed, 27 Sep 2023 08:19:36 -0600
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10876; i=jack@suse.cz; h=from:subject; bh=90P2zBbnQwy1aA0C9jwiIz+L8VHmpI+86AhLoGZ9oK4=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/coSqY/0G1RJJg7CInbnh3lniJFl3w409fL1YUd uF/+vkqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3KAAKCRCcnaoHP2RA2Sj6B/ 0UbYkjIW2+rIgV91qO6zpfLbzky7VsVC9Z4/RgTx5p9QKJPQFITbQkitG2l1KtP+GRG+FURXi2DdAA bCiDK1RmEeoyv7omuTlwAL21wJomKNR3yLK3P3z49QCna5kQNdysNiqZPUP/480UPYy+irZ2uIVACw +d2nArExIOoqhWsB3uqOMQcplqOi0UYEgwVuYrOHGHpAJ839pKLdYaWEr6pXIfLfscM01PYtTL4q7h ixTNVSpfa0C269XkoBBvfFkoQ/SBaaGGvNCrNFUSZKR/GgMW4E/V3flRSGKH5NF6CNqp1VYAGi+1uh U9/l0XT1CbWHsZ6Vsqxp7szsop4giY
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v4 0/29] block: Make blkdev_get_by_*() return handle
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Alasdair Kergon <agk@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anna Schumaker <anna@kernel.org>, Chao Yu <chao@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com, Gao Xiang <xiang@kernel.org>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        jfs-discussion@lists.sourceforge.net,
+        Joern Engel <joern@lazybastard.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-xfs@vger.kernel.org,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Minchan Kim <minchan@kernel.org>, ocfs2-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Song Liu <song@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        target-devel@vger.kernel.org, Ted Tso <tytso@mit.edu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        xen-devel@lists.xenproject.org
+References: <20230818123232.2269-1-jack@suse.cz>
+Content-Language: en-US
+In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert ocfs2 heartbeat code to use bdev_open_by_dev() and pass the
-handle around.
+On Wed, Sep 27, 2023 at 3:34?AM Jan Kara <jack@suse.cz> wrote:
+>
+> Hello,
+>
+> this is a v3 of the patch series which implements the idea of blkdev_get_by_*()
 
-CC: Joseph Qi <joseph.qi@linux.alibaba.com>
-CC: ocfs2-devel@oss.oracle.com
-Acked-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/ocfs2/cluster/heartbeat.c | 81 ++++++++++++++++++++----------------
- 1 file changed, 45 insertions(+), 36 deletions(-)
+v4?
 
-diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
-index 21472e3ed182..4d7efefa98c5 100644
---- a/fs/ocfs2/cluster/heartbeat.c
-+++ b/fs/ocfs2/cluster/heartbeat.c
-@@ -213,7 +213,7 @@ struct o2hb_region {
- 	unsigned int		hr_num_pages;
- 
- 	struct page             **hr_slot_data;
--	struct block_device	*hr_bdev;
-+	struct bdev_handle	*hr_bdev_handle;
- 	struct o2hb_disk_slot	*hr_slots;
- 
- 	/* live node map of this region */
-@@ -261,6 +261,11 @@ struct o2hb_region {
- 	int			hr_last_hb_status;
- };
- 
-+static inline struct block_device *reg_bdev(struct o2hb_region *reg)
-+{
-+	return reg->hr_bdev_handle ? reg->hr_bdev_handle->bdev : NULL;
-+}
-+
- struct o2hb_bio_wait_ctxt {
- 	atomic_t          wc_num_reqs;
- 	struct completion wc_io_complete;
-@@ -286,7 +291,7 @@ static void o2hb_write_timeout(struct work_struct *work)
- 			     hr_write_timeout_work.work);
- 
- 	mlog(ML_ERROR, "Heartbeat write timeout to device %pg after %u "
--	     "milliseconds\n", reg->hr_bdev,
-+	     "milliseconds\n", reg_bdev(reg),
- 	     jiffies_to_msecs(jiffies - reg->hr_last_timeout_start));
- 
- 	if (o2hb_global_heartbeat_active()) {
-@@ -383,7 +388,7 @@ static void o2hb_nego_timeout(struct work_struct *work)
- 		if (!test_bit(master_node, reg->hr_nego_node_bitmap)) {
- 			printk(KERN_NOTICE "o2hb: node %d hb write hung for %ds on region %s (%pg).\n",
- 				o2nm_this_node(), O2HB_NEGO_TIMEOUT_MS/1000,
--				config_item_name(&reg->hr_item), reg->hr_bdev);
-+				config_item_name(&reg->hr_item), reg_bdev(reg));
- 			set_bit(master_node, reg->hr_nego_node_bitmap);
- 		}
- 		if (!bitmap_equal(reg->hr_nego_node_bitmap, live_node_bitmap,
-@@ -398,7 +403,8 @@ static void o2hb_nego_timeout(struct work_struct *work)
- 		}
- 
- 		printk(KERN_NOTICE "o2hb: all nodes hb write hung, maybe region %s (%pg) is down.\n",
--			config_item_name(&reg->hr_item), reg->hr_bdev);
-+			config_item_name(&reg->hr_item),
-+			reg_bdev(reg));
- 		/* approve negotiate timeout request. */
- 		o2hb_arm_timeout(reg);
- 
-@@ -419,7 +425,7 @@ static void o2hb_nego_timeout(struct work_struct *work)
- 		/* negotiate timeout with master node. */
- 		printk(KERN_NOTICE "o2hb: node %d hb write hung for %ds on region %s (%pg), negotiate timeout with node %d.\n",
- 			o2nm_this_node(), O2HB_NEGO_TIMEOUT_MS/1000, config_item_name(&reg->hr_item),
--			reg->hr_bdev, master_node);
-+			reg_bdev(reg), master_node);
- 		ret = o2hb_send_nego_msg(reg->hr_key, O2HB_NEGO_TIMEOUT_MSG,
- 				master_node);
- 		if (ret)
-@@ -436,7 +442,8 @@ static int o2hb_nego_timeout_handler(struct o2net_msg *msg, u32 len, void *data,
- 
- 	nego_msg = (struct o2hb_nego_msg *)msg->buf;
- 	printk(KERN_NOTICE "o2hb: receive negotiate timeout message from node %d on region %s (%pg).\n",
--		nego_msg->node_num, config_item_name(&reg->hr_item), reg->hr_bdev);
-+		nego_msg->node_num, config_item_name(&reg->hr_item),
-+		reg_bdev(reg));
- 	if (nego_msg->node_num < O2NM_MAX_NODES)
- 		set_bit(nego_msg->node_num, reg->hr_nego_node_bitmap);
- 	else
-@@ -451,7 +458,7 @@ static int o2hb_nego_approve_handler(struct o2net_msg *msg, u32 len, void *data,
- 	struct o2hb_region *reg = data;
- 
- 	printk(KERN_NOTICE "o2hb: negotiate timeout approved by master node on region %s (%pg).\n",
--		config_item_name(&reg->hr_item), reg->hr_bdev);
-+		config_item_name(&reg->hr_item), reg_bdev(reg));
- 	o2hb_arm_timeout(reg);
- 	return 0;
- }
-@@ -515,7 +522,7 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
- 	 * GFP_KERNEL that the local node can get fenced. It would be
- 	 * nicest if we could pre-allocate these bios and avoid this
- 	 * all together. */
--	bio = bio_alloc(reg->hr_bdev, 16, opf, GFP_ATOMIC);
-+	bio = bio_alloc(reg_bdev(reg), 16, opf, GFP_ATOMIC);
- 	if (!bio) {
- 		mlog(ML_ERROR, "Could not alloc slots BIO!\n");
- 		bio = ERR_PTR(-ENOMEM);
-@@ -687,7 +694,7 @@ static int o2hb_check_own_slot(struct o2hb_region *reg)
- 		errstr = ERRSTR3;
- 
- 	mlog(ML_ERROR, "%s (%pg): expected(%u:0x%llx, 0x%llx), "
--	     "ondisk(%u:0x%llx, 0x%llx)\n", errstr, reg->hr_bdev,
-+	     "ondisk(%u:0x%llx, 0x%llx)\n", errstr, reg_bdev(reg),
- 	     slot->ds_node_num, (unsigned long long)slot->ds_last_generation,
- 	     (unsigned long long)slot->ds_last_time, hb_block->hb_node,
- 	     (unsigned long long)le64_to_cpu(hb_block->hb_generation),
-@@ -861,7 +868,7 @@ static void o2hb_set_quorum_device(struct o2hb_region *reg)
- 		goto unlock;
- 
- 	printk(KERN_NOTICE "o2hb: Region %s (%pg) is now a quorum device\n",
--	       config_item_name(&reg->hr_item), reg->hr_bdev);
-+	       config_item_name(&reg->hr_item), reg_bdev(reg));
- 
- 	set_bit(reg->hr_region_num, o2hb_quorum_region_bitmap);
- 
-@@ -920,7 +927,7 @@ static int o2hb_check_slot(struct o2hb_region *reg,
- 		 * consider it a transient miss but don't populate any
- 		 * other values as they may be junk. */
- 		mlog(ML_ERROR, "Node %d has written a bad crc to %pg\n",
--		     slot->ds_node_num, reg->hr_bdev);
-+		     slot->ds_node_num, reg_bdev(reg));
- 		o2hb_dump_slot(hb_block);
- 
- 		slot->ds_equal_samples++;
-@@ -1003,8 +1010,8 @@ static int o2hb_check_slot(struct o2hb_region *reg,
- 			     "of %u ms, but our count is %u ms.\n"
- 			     "Please double check your configuration values "
- 			     "for 'O2CB_HEARTBEAT_THRESHOLD'\n",
--			     slot->ds_node_num, reg->hr_bdev, slot_dead_ms,
--			     dead_ms);
-+			     slot->ds_node_num, reg_bdev(reg),
-+			     slot_dead_ms, dead_ms);
- 		}
- 		goto out;
- 	}
-@@ -1143,7 +1150,7 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
- 		 * can't be sure that the new block ever made it to
- 		 * disk */
- 		mlog(ML_ERROR, "Write error %d on device \"%pg\"\n",
--		     write_wc.wc_error, reg->hr_bdev);
-+		     write_wc.wc_error, reg_bdev(reg));
- 		ret = write_wc.wc_error;
- 		goto bail;
- 	}
-@@ -1169,7 +1176,7 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
- 			printk(KERN_NOTICE "o2hb: Unable to stabilize "
- 			       "heartbeat on region %s (%pg)\n",
- 			       config_item_name(&reg->hr_item),
--			       reg->hr_bdev);
-+			       reg_bdev(reg));
- 			atomic_set(&reg->hr_steady_iterations, 0);
- 			reg->hr_aborted_start = 1;
- 			wake_up(&o2hb_steady_queue);
-@@ -1489,7 +1496,7 @@ static void o2hb_region_release(struct config_item *item)
- 	struct page *page;
- 	struct o2hb_region *reg = to_o2hb_region(item);
- 
--	mlog(ML_HEARTBEAT, "hb region release (%pg)\n", reg->hr_bdev);
-+	mlog(ML_HEARTBEAT, "hb region release (%pg)\n", reg_bdev(reg));
- 
- 	kfree(reg->hr_tmp_block);
- 
-@@ -1502,8 +1509,8 @@ static void o2hb_region_release(struct config_item *item)
- 		kfree(reg->hr_slot_data);
- 	}
- 
--	if (reg->hr_bdev)
--		blkdev_put(reg->hr_bdev, NULL);
-+	if (reg->hr_bdev_handle)
-+		bdev_release(reg->hr_bdev_handle);
- 
- 	kfree(reg->hr_slots);
- 
-@@ -1562,7 +1569,7 @@ static ssize_t o2hb_region_block_bytes_store(struct config_item *item,
- 	unsigned long block_bytes;
- 	unsigned int block_bits;
- 
--	if (reg->hr_bdev)
-+	if (reg->hr_bdev_handle)
- 		return -EINVAL;
- 
- 	status = o2hb_read_block_input(reg, page, &block_bytes,
-@@ -1591,7 +1598,7 @@ static ssize_t o2hb_region_start_block_store(struct config_item *item,
- 	char *p = (char *)page;
- 	ssize_t ret;
- 
--	if (reg->hr_bdev)
-+	if (reg->hr_bdev_handle)
- 		return -EINVAL;
- 
- 	ret = kstrtoull(p, 0, &tmp);
-@@ -1616,7 +1623,7 @@ static ssize_t o2hb_region_blocks_store(struct config_item *item,
- 	unsigned long tmp;
- 	char *p = (char *)page;
- 
--	if (reg->hr_bdev)
-+	if (reg->hr_bdev_handle)
- 		return -EINVAL;
- 
- 	tmp = simple_strtoul(p, &p, 0);
-@@ -1635,8 +1642,8 @@ static ssize_t o2hb_region_dev_show(struct config_item *item, char *page)
- {
- 	unsigned int ret = 0;
- 
--	if (to_o2hb_region(item)->hr_bdev)
--		ret = sprintf(page, "%pg\n", to_o2hb_region(item)->hr_bdev);
-+	if (to_o2hb_region(item)->hr_bdev_handle)
-+		ret = sprintf(page, "%pg\n", reg_bdev(to_o2hb_region(item)));
- 
- 	return ret;
- }
-@@ -1745,7 +1752,10 @@ static int o2hb_populate_slot_data(struct o2hb_region *reg)
- 	return ret;
- }
- 
--/* this is acting as commit; we set up all of hr_bdev and hr_task or nothing */
-+/*
-+ * this is acting as commit; we set up all of hr_bdev_handle and hr_task or
-+ * nothing
-+ */
- static ssize_t o2hb_region_dev_store(struct config_item *item,
- 				     const char *page,
- 				     size_t count)
-@@ -1759,7 +1769,7 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
- 	ssize_t ret = -EINVAL;
- 	int live_threshold;
- 
--	if (reg->hr_bdev)
-+	if (reg->hr_bdev_handle)
- 		goto out;
- 
- 	/* We can't heartbeat without having had our node number
-@@ -1785,16 +1795,15 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
- 	if (!S_ISBLK(f.file->f_mapping->host->i_mode))
- 		goto out2;
- 
--	reg->hr_bdev = blkdev_get_by_dev(f.file->f_mapping->host->i_rdev,
--					 BLK_OPEN_WRITE | BLK_OPEN_READ, NULL,
--					 NULL);
--	if (IS_ERR(reg->hr_bdev)) {
--		ret = PTR_ERR(reg->hr_bdev);
--		reg->hr_bdev = NULL;
-+	reg->hr_bdev_handle = bdev_open_by_dev(f.file->f_mapping->host->i_rdev,
-+			BLK_OPEN_WRITE | BLK_OPEN_READ, NULL, NULL);
-+	if (IS_ERR(reg->hr_bdev_handle)) {
-+		ret = PTR_ERR(reg->hr_bdev_handle);
-+		reg->hr_bdev_handle = NULL;
- 		goto out2;
- 	}
- 
--	sectsize = bdev_logical_block_size(reg->hr_bdev);
-+	sectsize = bdev_logical_block_size(reg_bdev(reg));
- 	if (sectsize != reg->hr_block_bytes) {
- 		mlog(ML_ERROR,
- 		     "blocksize %u incorrect for device, expected %d",
-@@ -1890,12 +1899,12 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
- 
- 	if (hb_task && o2hb_global_heartbeat_active())
- 		printk(KERN_NOTICE "o2hb: Heartbeat started on region %s (%pg)\n",
--		       config_item_name(&reg->hr_item), reg->hr_bdev);
-+		       config_item_name(&reg->hr_item), reg_bdev(reg));
- 
- out3:
- 	if (ret < 0) {
--		blkdev_put(reg->hr_bdev, NULL);
--		reg->hr_bdev = NULL;
-+		bdev_release(reg->hr_bdev_handle);
-+		reg->hr_bdev_handle = NULL;
- 	}
- out2:
- 	fdput(f);
-@@ -2085,7 +2094,7 @@ static void o2hb_heartbeat_group_drop_item(struct config_group *group,
- 		printk(KERN_NOTICE "o2hb: Heartbeat %s on region %s (%pg)\n",
- 		       ((atomic_read(&reg->hr_steady_iterations) == 0) ?
- 			"stopped" : "start aborted"), config_item_name(item),
--		       reg->hr_bdev);
-+		       reg_bdev(reg));
- 	}
- 
- 	/*
+> calls returning bdev_handle which is then passed to blkdev_put() [1]. This
+> makes the get and put calls for bdevs more obviously matching and allows us to
+> propagate context from get to put without having to modify all the users
+> (again!). In particular I need to propagate used open flags to blkdev_put() to
+> be able count writeable opens and add support for blocking writes to mounted
+> block devices. I'll send that series separately.
+>
+> The series is based on Btrfs tree's for-next branch [2] as of today as the
+> series depends on Christoph's changes to btrfs device handling.  Patches have
+> passed some reasonable testing - I've tested block changes, md, dm, bcache,
+> xfs, btrfs, ext4, swap. More testing or review is always welcome. Thanks! I've
+> pushed out the full branch to:
+>
+> git://git.kernel.org/pub/scm/linux/kernel/git/jack/linux-fs.git bdev_handle
+>
+> to ease review / testing. Christian, can you pull the patches to your tree
+> to get some exposure in linux-next as well? Thanks!
+
+For the block bits:
+
+Acked-by: Jens Axboe <axboe@kernel.dk>
+
 -- 
-2.35.3
+Jens Axboe
 
