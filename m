@@ -2,231 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB44E810CC
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAEBCE810C3
+	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:35:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbjI0JfP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 05:35:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44654 "EHLO
+        id S231239AbjI0JfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 05:35:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231160AbjI0JfA (ORCPT
+        with ESMTP id S231163AbjI0JfA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 27 Sep 2023 05:35:00 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 986D7E6;
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C51B9193;
         Wed, 27 Sep 2023 02:34:49 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B9D4E1FD6A;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E878B1FD6B;
         Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1695807284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CZcBKgFhDz6Zlcy4gzpBIWscbD+3OVMhK5a7eMfa0eo=;
-        b=vWhj3QU91xwl+5mvoWoWg8EXlHdfc7eUJ/3eRQeuqk9TKLf7k04wzgH5qOy8h+u8k6vTWg
-        CnjLfl1oWLr7KnklmF4T+DnJ+JNmHpJWLJyvqc4HBKelhInP1WSNAr4OSyTT/fRod068+j
-        +42d9qqGl11K37V2Ez1Y5Z5XTOPCozU=
+        bh=KOnyti5KClOK/DZ+r1V0hcJlW7O4gjBtUgUcqKUTL18=;
+        b=yNLN2znpPx6VmCHUZP4KTq07gSLjhc3gN+54DiugulyavDeRbC7iOb7AEf+SWIMfqYCVyR
+        XOjgaE6/WC/ORuonX4TG5roAJsOPqo0jEGiItLInbA3LfOAOfFgVGkjQ3vzQK6fCGUJmQO
+        HfNPT4w+FILO8ChJJKGLrmX0jN6CsR0=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1695807284;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CZcBKgFhDz6Zlcy4gzpBIWscbD+3OVMhK5a7eMfa0eo=;
-        b=3US4qTh1bJnafaHoEW5Qq8jSFB13Nt9J5HRhitEqczGnx0ZU/4Hx2yw4/4gofGFM9wb7F6
-        JY2809Z6IhznYjDA==
+        bh=KOnyti5KClOK/DZ+r1V0hcJlW7O4gjBtUgUcqKUTL18=;
+        b=vkt3UFd/lQ/W9S7x1bMlwQkpmO/bS1/wHMb2BlnIjl5L5T0Q7KajN0Cp+NmDlUEdVJuSK3
+        mJlPW78fNBV5qvBQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A657D13AD9;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C738413A74;
         Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 5AeaKDT3E2UqEwAAMHmgww
+        id H2eiMDT3E2UxEwAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 27 Sep 2023 09:34:44 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 55963A07E5; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
+        id 85278A07CB; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        target-devel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 15/29] scsi: target: Convert to bdev_open_by_path()
-Date:   Wed, 27 Sep 2023 11:34:21 +0200
-Message-Id: <20230927093442.25915-15-jack@suse.cz>
+        Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+        linux-erofs@lists.ozlabs.org, Christoph Hellwig <hch@lst.de>,
+        Gao Xiang <hsiangkao@linux.alibaba.com>
+Subject: [PATCH 21/29] erofs: Convert to use bdev_open_by_path()
+Date:   Wed, 27 Sep 2023 11:34:27 +0200
+Message-Id: <20230927093442.25915-21-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5469; i=jack@suse.cz; h=from:subject; bh=ibO7h/+DEH1VvG/YxXH9GJR9Seqh+17DKgac2b74+OQ=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/ceQnF7uT1MIkoDAvLOo0kUkps+OUf4vFppFPKj XzJ3jNmJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3HgAKCRCcnaoHP2RA2WPPCA CTFIOOexK9NkfKzOvDWOZtf6xw/0bGNdxT1hJN/lTCx/I4jDRJRlYqk4h8VLAZN+ZgspdfKSyQv20M gBBwnvCr9oXQHaVVehuclXceYkIcrhh/PdQgpac8oRe4gXplINNX8hyncyC+rxkQqkj8c56gfp3zc/ 5a7AiEptMivd/JbFMf0Ju1s7MSuu+Mg21zx6+WsEhTBEVwgsgKxd2/pPD7/RZd8poPzrqdar3+Juxl 4dfHHZ/Gpc75B14zD7N515M5P9ErnpVHlO1WmWDy+I6q5PpD8YiJuE6ZmT1RX5JIMJFF/hFIzhbd/H Sbqa6fOWi0VaS9+ySSSCGEjPHRaagZ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3442; i=jack@suse.cz; h=from:subject; bh=tSNAUT0uFbcm9oHwALUFKHxE0ETO4bF9IMenCC0F+F0=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cjo+HbOx0LsjyNvizl8EI9YCHUrtEejlIYkdX2 jBM7EHyJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3IwAKCRCcnaoHP2RA2UIjB/ 4we2a/ke+Y1w3SDvCVhUCYfQxjQ7yd/lH2XBmVVcS7BRGvzdxSCoLUlJu71xFNN9J3srkid05buJAP zPoefvZ1agttMkroPNJp9RRGlqzaRlp0UKQdF+AcNFphngjIaj+JKjjUH1udxtBm+3LchiWCE84/ff nmUz919TGIQ0J4NPA93Qg2awChYidR63Awk1zGr54gPZw022wP6uwpAGAxQ/g4V0cRx7zOPrLoDs47 Zm40Je2jTX4pTAvNP/BUg4BiJXndKl/RrL63syWFsJNZkYkaDGARQ6a7ZoJYEblNxvzs1ZCPJ+nciA rPz4ZtNyQh3PgjN5J6rf8FipV7Z9nu
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert iblock and pscsi drivers to use bdev_open_by_path() and pass the
-handle around.
+Convert erofs to use bdev_open_by_path() and pass the handle around.
 
-CC: target-devel@vger.kernel.org
-CC: linux-scsi@vger.kernel.org
+CC: Gao Xiang <xiang@kernel.org>
+CC: Chao Yu <chao@kernel.org>
+CC: linux-erofs@lists.ozlabs.org
 Acked-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Christian Brauner <brauner@kernel.org>
+Acked-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+Reviewed-by: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/target/target_core_iblock.c | 19 +++++++++++--------
- drivers/target/target_core_iblock.h |  1 +
- drivers/target/target_core_pscsi.c  | 26 +++++++++++++-------------
- drivers/target/target_core_pscsi.h  |  2 +-
- 4 files changed, 26 insertions(+), 22 deletions(-)
+ fs/erofs/data.c     |  4 ++--
+ fs/erofs/internal.h |  2 +-
+ fs/erofs/super.c    | 20 ++++++++++----------
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index a6a06a5f7483..8eb9eb7ce5df 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -91,7 +91,8 @@ static int iblock_configure_device(struct se_device *dev)
- {
- 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
- 	struct request_queue *q;
--	struct block_device *bd = NULL;
-+	struct bdev_handle *bdev_handle;
-+	struct block_device *bd;
- 	struct blk_integrity *bi;
- 	blk_mode_t mode = BLK_OPEN_READ;
- 	unsigned int max_write_zeroes_sectors;
-@@ -116,12 +117,14 @@ static int iblock_configure_device(struct se_device *dev)
- 	else
- 		dev->dev_flags |= DF_READ_ONLY;
- 
--	bd = blkdev_get_by_path(ib_dev->ibd_udev_path, mode, ib_dev, NULL);
--	if (IS_ERR(bd)) {
--		ret = PTR_ERR(bd);
-+	bdev_handle = bdev_open_by_path(ib_dev->ibd_udev_path, mode, ib_dev,
-+					NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		ret = PTR_ERR(bdev_handle);
- 		goto out_free_bioset;
- 	}
--	ib_dev->ibd_bd = bd;
-+	ib_dev->ibd_bdev_handle = bdev_handle;
-+	ib_dev->ibd_bd = bd = bdev_handle->bdev;
- 
- 	q = bdev_get_queue(bd);
- 
-@@ -177,7 +180,7 @@ static int iblock_configure_device(struct se_device *dev)
- 	return 0;
- 
- out_blkdev_put:
--	blkdev_put(ib_dev->ibd_bd, ib_dev);
-+	bdev_release(ib_dev->ibd_bdev_handle);
- out_free_bioset:
- 	bioset_exit(&ib_dev->ibd_bio_set);
- out:
-@@ -202,8 +205,8 @@ static void iblock_destroy_device(struct se_device *dev)
- {
- 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
- 
--	if (ib_dev->ibd_bd != NULL)
--		blkdev_put(ib_dev->ibd_bd, ib_dev);
-+	if (ib_dev->ibd_bdev_handle)
-+		bdev_release(ib_dev->ibd_bdev_handle);
- 	bioset_exit(&ib_dev->ibd_bio_set);
- }
- 
-diff --git a/drivers/target/target_core_iblock.h b/drivers/target/target_core_iblock.h
-index 8c55375d2f75..683f9a55945b 100644
---- a/drivers/target/target_core_iblock.h
-+++ b/drivers/target/target_core_iblock.h
-@@ -32,6 +32,7 @@ struct iblock_dev {
- 	u32	ibd_flags;
- 	struct bio_set	ibd_bio_set;
- 	struct block_device *ibd_bd;
-+	struct bdev_handle *ibd_bdev_handle;
- 	bool ibd_readonly;
- 	struct iblock_dev_plug *ibd_plug;
- } ____cacheline_aligned;
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index 0d4f09693ef4..41b7489d37ce 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -352,7 +352,7 @@ static int pscsi_create_type_disk(struct se_device *dev, struct scsi_device *sd)
- 	struct pscsi_hba_virt *phv = dev->se_hba->hba_ptr;
- 	struct pscsi_dev_virt *pdv = PSCSI_DEV(dev);
- 	struct Scsi_Host *sh = sd->host;
--	struct block_device *bd;
-+	struct bdev_handle *bdev_handle;
- 	int ret;
- 
- 	if (scsi_device_get(sd)) {
-@@ -366,18 +366,18 @@ static int pscsi_create_type_disk(struct se_device *dev, struct scsi_device *sd)
- 	 * Claim exclusive struct block_device access to struct scsi_device
- 	 * for TYPE_DISK and TYPE_ZBC using supplied udev_path
- 	 */
--	bd = blkdev_get_by_path(dev->udev_path, BLK_OPEN_WRITE | BLK_OPEN_READ,
--				pdv, NULL);
--	if (IS_ERR(bd)) {
--		pr_err("pSCSI: blkdev_get_by_path() failed\n");
-+	bdev_handle = bdev_open_by_path(dev->udev_path,
-+				BLK_OPEN_WRITE | BLK_OPEN_READ, pdv, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		pr_err("pSCSI: bdev_open_by_path() failed\n");
- 		scsi_device_put(sd);
--		return PTR_ERR(bd);
-+		return PTR_ERR(bdev_handle);
- 	}
--	pdv->pdv_bd = bd;
-+	pdv->pdv_bdev_handle = bdev_handle;
- 
- 	ret = pscsi_add_device_to_list(dev, sd);
- 	if (ret) {
--		blkdev_put(pdv->pdv_bd, pdv);
-+		bdev_release(bdev_handle);
- 		scsi_device_put(sd);
- 		return ret;
- 	}
-@@ -564,9 +564,9 @@ static void pscsi_destroy_device(struct se_device *dev)
- 		 * from pscsi_create_type_disk()
- 		 */
- 		if ((sd->type == TYPE_DISK || sd->type == TYPE_ZBC) &&
--		    pdv->pdv_bd) {
--			blkdev_put(pdv->pdv_bd, pdv);
--			pdv->pdv_bd = NULL;
-+		    pdv->pdv_bdev_handle) {
-+			bdev_release(pdv->pdv_bdev_handle);
-+			pdv->pdv_bdev_handle = NULL;
+diff --git a/fs/erofs/data.c b/fs/erofs/data.c
+index 0c2c99c58b5e..f6a0a1748521 100644
+--- a/fs/erofs/data.c
++++ b/fs/erofs/data.c
+@@ -222,7 +222,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
+ 			up_read(&devs->rwsem);
+ 			return 0;
  		}
- 		/*
- 		 * For HBA mode PHV_LLD_SCSI_HOST_NO, release the reference
-@@ -994,8 +994,8 @@ static sector_t pscsi_get_blocks(struct se_device *dev)
- {
- 	struct pscsi_dev_virt *pdv = PSCSI_DEV(dev);
+-		map->m_bdev = dif->bdev;
++		map->m_bdev = dif->bdev_handle->bdev;
+ 		map->m_daxdev = dif->dax_dev;
+ 		map->m_dax_part_off = dif->dax_part_off;
+ 		map->m_fscache = dif->fscache;
+@@ -240,7 +240,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
+ 			if (map->m_pa >= startoff &&
+ 			    map->m_pa < startoff + length) {
+ 				map->m_pa -= startoff;
+-				map->m_bdev = dif->bdev;
++				map->m_bdev = dif->bdev_handle->bdev;
+ 				map->m_daxdev = dif->dax_dev;
+ 				map->m_dax_part_off = dif->dax_part_off;
+ 				map->m_fscache = dif->fscache;
+diff --git a/fs/erofs/internal.h b/fs/erofs/internal.h
+index 4ff88d0dd980..cf04e21bfda2 100644
+--- a/fs/erofs/internal.h
++++ b/fs/erofs/internal.h
+@@ -47,7 +47,7 @@ typedef u32 erofs_blk_t;
+ struct erofs_device_info {
+ 	char *path;
+ 	struct erofs_fscache *fscache;
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	struct dax_device *dax_dev;
+ 	u64 dax_part_off;
  
--	if (pdv->pdv_bd)
--		return bdev_nr_sectors(pdv->pdv_bd);
-+	if (pdv->pdv_bdev_handle)
-+		return bdev_nr_sectors(pdv->pdv_bdev_handle->bdev);
- 	return 0;
- }
+diff --git a/fs/erofs/super.c b/fs/erofs/super.c
+index 44a24d573f1f..2bf6dac83025 100644
+--- a/fs/erofs/super.c
++++ b/fs/erofs/super.c
+@@ -227,7 +227,7 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
+ 	struct erofs_sb_info *sbi = EROFS_SB(sb);
+ 	struct erofs_fscache *fscache;
+ 	struct erofs_deviceslot *dis;
+-	struct block_device *bdev;
++	struct bdev_handle *bdev_handle;
+ 	void *ptr;
  
-diff --git a/drivers/target/target_core_pscsi.h b/drivers/target/target_core_pscsi.h
-index 23d9a6e340d4..b0a3ef136592 100644
---- a/drivers/target/target_core_pscsi.h
-+++ b/drivers/target/target_core_pscsi.h
-@@ -37,7 +37,7 @@ struct pscsi_dev_virt {
- 	int	pdv_channel_id;
- 	int	pdv_target_id;
- 	int	pdv_lun_id;
--	struct block_device *pdv_bd;
-+	struct bdev_handle *pdv_bdev_handle;
- 	struct scsi_device *pdv_sd;
- 	struct Scsi_Host *pdv_lld_host;
- } ____cacheline_aligned;
+ 	ptr = erofs_read_metabuf(buf, sb, erofs_blknr(sb, *pos), EROFS_KMAP);
+@@ -251,13 +251,13 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
+ 			return PTR_ERR(fscache);
+ 		dif->fscache = fscache;
+ 	} else if (!sbi->devs->flatdev) {
+-		bdev = blkdev_get_by_path(dif->path, BLK_OPEN_READ, sb->s_type,
+-					  NULL);
+-		if (IS_ERR(bdev))
+-			return PTR_ERR(bdev);
+-		dif->bdev = bdev;
+-		dif->dax_dev = fs_dax_get_by_bdev(bdev, &dif->dax_part_off,
+-						  NULL, NULL);
++		bdev_handle = bdev_open_by_path(dif->path, BLK_OPEN_READ,
++						sb->s_type, NULL);
++		if (IS_ERR(bdev_handle))
++			return PTR_ERR(bdev_handle);
++		dif->bdev_handle = bdev_handle;
++		dif->dax_dev = fs_dax_get_by_bdev(bdev_handle->bdev,
++				&dif->dax_part_off, NULL, NULL);
+ 	}
+ 
+ 	dif->blocks = le32_to_cpu(dis->blocks);
+@@ -806,8 +806,8 @@ static int erofs_release_device_info(int id, void *ptr, void *data)
+ 	struct erofs_device_info *dif = ptr;
+ 
+ 	fs_put_dax(dif->dax_dev, NULL);
+-	if (dif->bdev)
+-		blkdev_put(dif->bdev, &erofs_fs_type);
++	if (dif->bdev_handle)
++		bdev_release(dif->bdev_handle);
+ 	erofs_fscache_unregister_cookie(dif->fscache);
+ 	dif->fscache = NULL;
+ 	kfree(dif->path);
 -- 
 2.35.3
 
