@@ -2,190 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F70E810B1
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECCDE810B3
+	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:34:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbjI0Jer (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S230440AbjI0Jer (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 27 Sep 2023 05:34:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32840 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbjI0Jeq (ORCPT
+        with ESMTP id S229499AbjI0Jeq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 27 Sep 2023 05:34:46 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC969C0;
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179B6E6;
         Wed, 27 Sep 2023 02:34:44 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 7E2311F8BF;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8BDB71F8CC;
         Wed, 27 Sep 2023 09:34:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1695807283; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yvuKb46iatxm+O8PdgcZjlt7qiboGT1NiUAmYUfo6D8=;
-        b=tJxZXhUZ3Hv7Y4HzH9ypTOKEFVSvxcwyRyFcbq14aMp3pmUvg075RUX2m8NxpBYQZzGFxM
-        KKnXhLBgA6M1Vtf/Hkdj+HURoGA9f5+VGAIg+pCLEFxUq4XUGGWU4bXnpn0FerE1Dnskps
-        vA+oVlG/AX1cNQlWItcbAvCW3VMTTMg=
+        bh=GenKmRdtrJZ/dkgyf1SakCEi/SRSx5kiH9YWEpsHADE=;
+        b=G8uEc4HSjlgFcZbZA8qicXeMH1/SkYiiLwWD6wd/aEK2o/BmgjeLfo13qo+RgJRFKf4vb5
+        EgPIQ9y2FpeECbR1g7lW8k//Q1KWagtnOCOG7XYREcRXWlu26vN62Yi3QT9xPDmek79Sxd
+        ki62QuCpS0djuK/86PveCTZYi7wnJ40=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1695807283;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yvuKb46iatxm+O8PdgcZjlt7qiboGT1NiUAmYUfo6D8=;
-        b=GUI+cgC2TVwnhFqev/LVYIFESf/2rZrdeGZST1vr5p6NxYDS/s0osYOZ0JnqUndHanBh/P
-        L91wr+EoEbobPcCA==
+        bh=GenKmRdtrJZ/dkgyf1SakCEi/SRSx5kiH9YWEpsHADE=;
+        b=GUQiaXnlTZ5RJ/tp+H4T5IXQJD2hRrL7pyPrrx1YhM9A/GPPYEo4fBBUcD4OucPmHGzT5E
+        U2cf4Ms/K4G1smAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6E6C11338F;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7D3D413AC6;
         Wed, 27 Sep 2023 09:34:43 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id RivqGjP3E2X6EgAAMHmgww
+        id Z2/VHjP3E2UAEwAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 27 Sep 2023 09:34:43 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id DFF95A05BC; Wed, 27 Sep 2023 11:34:42 +0200 (CEST)
+        id ED264A07CF; Wed, 27 Sep 2023 11:34:42 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 01/29] block: Provide bdev_open_* functions
-Date:   Wed, 27 Sep 2023 11:34:07 +0200
-Message-Id: <20230927093442.25915-1-jack@suse.cz>
+Subject: [PATCH 03/29] block: Use bdev_open_by_dev() in disk_scan_partitions() and blkdev_bszset()
+Date:   Wed, 27 Sep 2023 11:34:09 +0200
+Message-Id: <20230927093442.25915-3-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4009; i=jack@suse.cz; h=from:subject; bh=ftxebZb0mN+mmlqK0XS39fDig1WohJDebKnx2ATIZ/8=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cRk3fqxwXaJ3HPrCVtpIaBtaqyPMA2OSma/nzF yN4uJeeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3EQAKCRCcnaoHP2RA2WA0B/ 9JZk+NzrYpD98P7nTbzVzNxuoiZ/EQs/5XFT920cETLbVLeuqvzKrL3RzMiROq+AgEUTPAZlV3CHOU lFg2UqUtpnTHOMyJoDfAIc1iBKO1xmCt46ChllAj1whKmuj1+gC4vtJThEokV0zDtS+Gw7j+JW3KEu Dk+/jJ40FJPwK5FssbHoLwkjfyyAVxoHnrDD5NmRQCZkFX84lKTGcO7fulLLtvbfrArKr+C6jJFT5r Wg+qCgb6JQf584VEZ4uiK/lafWv/irAD7lfHi6YRC1ILq724D6TZHZrw9Rn8Zt+bksGxfCwnJojO5B g49B1OH5iEnxOUSfn5qsQ1GGf4fkND
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2087; i=jack@suse.cz; h=from:subject; bh=CZqRkTZac/cdxSBd3sqHqdAgK9+gCQBXgUh0lF/6kCc=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cTj6zStLYP1Cv12vC6i3kdvX1Pp1wjrmeubh/W bwd2hIyJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3EwAKCRCcnaoHP2RA2VefB/ 9JvRJMQ+0hGIuUydFyXJXewx4/OZtSVc00PRWLeFj8hRELvZNtrtUU//CXmgrb1Qdqi2cEcsA6pWJ7 o5QNvkCEkQvr47qb8Bob64A0MSITSfGk7kuR8VNdEcpxjmtkY5hic+89OGcV3J8tE5ZCqXAkaUoMTe FzhtZONOGkny6LldLIZTgyhUO1Dgtho6rqtFkdgkfZXtxhi3SH+O141mUWDneu2CWxgjuQ6FmbufGI QNwGNDiz8HYKMczIQcJBeMdun7qvR6d3M2mYA7101Us1+rq6xzWZjmNco3VI70khoEyfRTopKivvHT HXs3ksPtMJGQt7ud5uWJd+WM9qjPcu
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Create struct bdev_handle that contains all parameters that need to be
-passed to blkdev_put() and provide bdev_open_* functions that return
-this structure instead of plain bdev pointer. This will eventually allow
-us to pass one more argument to blkdev_put() (renamed to bdev_release())
-without too much hassle.
+Convert disk_scan_partitions() and blkdev_bszset() to use
+bdev_open_by_dev().
 
 Acked-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/bdev.c           | 48 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h | 10 +++++++++
- 2 files changed, 58 insertions(+)
+ block/genhd.c | 12 ++++++------
+ block/ioctl.c |  6 ++++--
+ 2 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index f3b13aa1b7d4..bdc7d739882b 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -829,6 +829,25 @@ struct block_device *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
- }
- EXPORT_SYMBOL(blkdev_get_by_dev);
+diff --git a/block/genhd.c b/block/genhd.c
+index cc32a0c704eb..4a16a424f57d 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -342,7 +342,7 @@ EXPORT_SYMBOL_GPL(disk_uevent);
  
-+struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
-+				     const struct blk_holder_ops *hops)
-+{
-+	struct bdev_handle *handle = kmalloc(sizeof(*handle), GFP_KERNEL);
-+	struct block_device *bdev;
-+
-+	if (!handle)
-+		return ERR_PTR(-ENOMEM);
-+	bdev = blkdev_get_by_dev(dev, mode, holder, hops);
-+	if (IS_ERR(bdev)) {
-+		kfree(handle);
-+		return ERR_CAST(bdev);
-+	}
-+	handle->bdev = bdev;
-+	handle->holder = holder;
-+	return handle;
-+}
-+EXPORT_SYMBOL(bdev_open_by_dev);
-+
- /**
-  * blkdev_get_by_path - open a block device by name
-  * @path: path to the block device to open
-@@ -867,6 +886,28 @@ struct block_device *blkdev_get_by_path(const char *path, blk_mode_t mode,
- }
- EXPORT_SYMBOL(blkdev_get_by_path);
- 
-+struct bdev_handle *bdev_open_by_path(const char *path, blk_mode_t mode,
-+		void *holder, const struct blk_holder_ops *hops)
-+{
-+	struct bdev_handle *handle;
-+	dev_t dev;
-+	int error;
-+
-+	error = lookup_bdev(path, &dev);
-+	if (error)
-+		return ERR_PTR(error);
-+
-+	handle = bdev_open_by_dev(dev, mode, holder, hops);
-+	if (!IS_ERR(handle) && (mode & BLK_OPEN_WRITE) &&
-+	    bdev_read_only(handle->bdev)) {
-+		bdev_release(handle);
-+		return ERR_PTR(-EACCES);
-+	}
-+
-+	return handle;
-+}
-+EXPORT_SYMBOL(bdev_open_by_path);
-+
- void blkdev_put(struct block_device *bdev, void *holder)
+ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
  {
- 	struct gendisk *disk = bdev->bd_disk;
-@@ -903,6 +944,13 @@ void blkdev_put(struct block_device *bdev, void *holder)
+-	struct block_device *bdev;
++	struct bdev_handle *handle;
+ 	int ret = 0;
+ 
+ 	if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
+@@ -366,12 +366,12 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+ 	}
+ 
+ 	set_bit(GD_NEED_PART_SCAN, &disk->state);
+-	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~BLK_OPEN_EXCL, NULL,
+-				 NULL);
+-	if (IS_ERR(bdev))
+-		ret =  PTR_ERR(bdev);
++	handle = bdev_open_by_dev(disk_devt(disk), mode & ~BLK_OPEN_EXCL, NULL,
++				  NULL);
++	if (IS_ERR(handle))
++		ret = PTR_ERR(handle);
+ 	else
+-		blkdev_put(bdev, NULL);
++		bdev_release(handle);
+ 
+ 	/*
+ 	 * If blkdev_get_by_dev() failed early, GD_NEED_PART_SCAN is still set,
+diff --git a/block/ioctl.c b/block/ioctl.c
+index d5f5cd61efd7..5d356c964352 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -467,6 +467,7 @@ static int blkdev_bszset(struct block_device *bdev, blk_mode_t mode,
+ 		int __user *argp)
+ {
+ 	int ret, n;
++	struct bdev_handle *handle;
+ 
+ 	if (!capable(CAP_SYS_ADMIN))
+ 		return -EACCES;
+@@ -478,10 +479,11 @@ static int blkdev_bszset(struct block_device *bdev, blk_mode_t mode,
+ 	if (mode & BLK_OPEN_EXCL)
+ 		return set_blocksize(bdev, n);
+ 
+-	if (IS_ERR(blkdev_get_by_dev(bdev->bd_dev, mode, &bdev, NULL)))
++	handle = bdev_open_by_dev(bdev->bd_dev, mode, &bdev, NULL);
++	if (IS_ERR(handle))
+ 		return -EBUSY;
+ 	ret = set_blocksize(bdev, n);
+-	blkdev_put(bdev, &bdev);
++	bdev_release(handle);
+ 
+ 	return ret;
  }
- EXPORT_SYMBOL(blkdev_put);
- 
-+void bdev_release(struct bdev_handle *handle)
-+{
-+	blkdev_put(handle->bdev, handle->holder);
-+	kfree(handle);
-+}
-+EXPORT_SYMBOL(bdev_release);
-+
- /**
-  * lookup_bdev() - Look up a struct block_device by name.
-  * @pathname: Name of the block device in the filesystem.
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index eef450f25982..03d3adc3ff34 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1479,14 +1479,24 @@ extern const struct blk_holder_ops fs_holder_ops;
- #define sb_open_mode(flags) \
- 	(BLK_OPEN_READ | (((flags) & SB_RDONLY) ? 0 : BLK_OPEN_WRITE))
- 
-+struct bdev_handle {
-+	struct block_device *bdev;
-+	void *holder;
-+};
-+
- struct block_device *blkdev_get_by_dev(dev_t dev, blk_mode_t mode, void *holder,
- 		const struct blk_holder_ops *hops);
- struct block_device *blkdev_get_by_path(const char *path, blk_mode_t mode,
- 		void *holder, const struct blk_holder_ops *hops);
-+struct bdev_handle *bdev_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
-+		const struct blk_holder_ops *hops);
-+struct bdev_handle *bdev_open_by_path(const char *path, blk_mode_t mode,
-+		void *holder, const struct blk_holder_ops *hops);
- int bd_prepare_to_claim(struct block_device *bdev, void *holder,
- 		const struct blk_holder_ops *hops);
- void bd_abort_claiming(struct block_device *bdev, void *holder);
- void blkdev_put(struct block_device *bdev, void *holder);
-+void bdev_release(struct bdev_handle *handle);
- 
- /* just for blk-cgroup, don't use elsewhere */
- struct block_device *blkdev_get_no_open(dev_t dev);
 -- 
 2.35.3
 
