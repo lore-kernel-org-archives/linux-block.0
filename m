@@ -2,240 +2,199 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4852BE810BA
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F290E810BF
+	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:34:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230498AbjI0Jeu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 05:34:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32880 "EHLO
+        id S230503AbjI0Jev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 05:34:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230437AbjI0Jer (ORCPT
+        with ESMTP id S230430AbjI0Jer (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 27 Sep 2023 05:34:47 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18EA5EB;
-        Wed, 27 Sep 2023 02:34:44 -0700 (PDT)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8441013A;
+        Wed, 27 Sep 2023 02:34:45 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 961561F8D7;
-        Wed, 27 Sep 2023 09:34:43 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 209222195D;
+        Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1695807283; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1695807284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QgpIQnjDmNXXTfavf15cac4MJ+WybBbUuZeOxK5ajkw=;
-        b=U2PqreetOnT3j/f5rjV7qKgeTqCuWsixJaxaGcSTaced0tCEJh7RPZBbZbt54kNw4+/d/B
-        S/8JbDIEUJ2cWmTzyWi31jLA0mt6HCd6FQBcaBOo+8YD3xm9ePFZ8vSVHZ/51HfoUvQQdS
-        PphjUCX1rgXog7mD3C1fuKkTe1xTwsE=
+        bh=nYrEpPlW04XPHY9SSKFn1gjS6jGaIlC5VTJcApbM8Qo=;
+        b=U8J+ZjV6DpBgIpbQgI3eO1ar4SEFD/TB8v27msstPsdBXhPLcxYbGLhowAjHYTQ2RwLvWd
+        VcgQGWr8QSAbgIrbpmxvpr5/9z5RXiW3lpu74KqW6B7BlFHWY3svarWFPzc9yzocwQXAbw
+        JGrXwvxki3lDobR1AdIGIYUc/2W79U4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1695807283;
+        s=susede2_ed25519; t=1695807284;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QgpIQnjDmNXXTfavf15cac4MJ+WybBbUuZeOxK5ajkw=;
-        b=Wdab9lgHzRmyJtM85frXJgBVrgGZsHhXZ1W6W8r+VcZHLrAa1yWH53mNl55q/PiWs/aRRw
-        4BTVfuOlK/N6u1BQ==
+        bh=nYrEpPlW04XPHY9SSKFn1gjS6jGaIlC5VTJcApbM8Qo=;
+        b=aMOgRVP/+DQLkxciu6unK2YASvl+uOZFID6u+T43QoB/Xwx5NRkeK3RfYzoD5k6AF25n5w
+        jhsebuPcrPQA0GCA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8150013AD9;
-        Wed, 27 Sep 2023 09:34:43 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0BDD513AC6;
+        Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id v2QiHzP3E2UBEwAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 27 Sep 2023 09:34:43 +0000
+        id Q6XzAjT3E2UQEwAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 27 Sep 2023 09:34:44 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id F3807A07D0; Wed, 27 Sep 2023 11:34:42 +0200 (CEST)
+        id 1DEC1A07D8; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        drbd-dev@lists.linbit.com, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 04/29] drdb: Convert to use bdev_open_by_path()
-Date:   Wed, 27 Sep 2023 11:34:10 +0200
-Message-Id: <20230927093442.25915-4-jack@suse.cz>
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 08/29] zram: Convert to use bdev_open_by_dev()
+Date:   Wed, 27 Sep 2023 11:34:14 +0200
+Message-Id: <20230927093442.25915-8-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6072; i=jack@suse.cz; h=from:subject; bh=gnl3Ub57L77QVOFb0BLPTCxgH1FTQqMd1qtaB+Q5WHU=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cUbkwPHxD2sqvKqMISxkVgj5H+oP0WetrFCMYm iVehma6JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3FAAKCRCcnaoHP2RA2dBoCA CyC5zlBxdMUKtvhcGYwclIRxatRH5EJ+O5QenpvqG6H0+DDn5Xcaqe9RDSOO5++S++mGGjF1mWlaOV Wycrp9zX+pkGmCpBPdlXlJ9l2H++eM/FdinBfACIUHu/Fu/gxy6FaEx85qnoio0bGzNDMnXXB6WN/e CowvfUjd9WkgP0gZ9Se+AeOh8B4aZnyVWnkdaBnvdmTu7xnAh14zoRFuzDBGRdGEL8I6IBq1WVsGHz qCY1S0NmnWeo9RCCDBkODCYRApq+kMiN5Rs0w4ldv5gVO1V4nubf0xMXWyL1kvKeEsWz+TGe1nMJdd 3QgWrKFFeLgjalKE2zpYCfc+viBjXq
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4069; i=jack@suse.cz; h=from:subject; bh=EdXIA2UybD5ESwRXdE8bPlWXf7+M0vz1Znp/57/M720=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cYRYs/0b4bY6/8Ruci1xNxAvv1kUzOGpumDtJH ZUs0wXmJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3GAAKCRCcnaoHP2RA2VJAB/ 4pyDkPssoX/nVZOy4e4IwzVWtAxG3EuqQ/HUA7UwFVPJXHJAuiWUWoh+lA+dQqEkXxQMRA48G92CWw e1Xq9WJBlQ6yrqQ/PkMbc+R0BdrDuFj2CTHpKvJ/jpyiyM75veDDmCeYFb2i7E5gbGJcjivSxky2YC iYy+p/n2tV+kG+TduriAIjb0KKigpAWrLN35VRNiT1CLW+bH2KlOHnH9W2jVhVS2RFhBFNBixW9+mA 3BCrm8RN0AfP55lTnrxUR7gvQfoC7FoOUj3TlGAcrXDgJDYLihvvHP70r/VAn31ioaxiXrxeLVn74u xtkQgXqqOIhMYN1z/7oAi/E7zeaTBQ
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert drdb to use bdev_open_by_path().
+Convert zram to use bdev_open_by_dev() and pass the handle around.
 
-CC: drbd-dev@lists.linbit.com
+CC: Minchan Kim <minchan@kernel.org>
+CC: Sergey Senozhatsky <senozhatsky@chromium.org>
 Acked-by: Christoph Hellwig <hch@lst.de>
 Acked-by: Christian Brauner <brauner@kernel.org>
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/drbd/drbd_int.h |  2 ++
- drivers/block/drbd/drbd_nl.c  | 65 +++++++++++++++++------------------
- 2 files changed, 34 insertions(+), 33 deletions(-)
+ drivers/block/zram/zram_drv.c | 31 ++++++++++++++-----------------
+ drivers/block/zram/zram_drv.h |  2 +-
+ 2 files changed, 15 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index a30a5ed811be..f017e917612b 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -524,7 +524,9 @@ struct drbd_md {
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 06673c6ca255..d77d3664ca08 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -414,17 +414,14 @@ static ssize_t writeback_limit_show(struct device *dev,
  
- struct drbd_backing_dev {
- 	struct block_device *backing_bdev;
-+	struct bdev_handle *backing_bdev_handle;
- 	struct block_device *md_bdev;
-+	struct bdev_handle *md_bdev_handle;
- 	struct drbd_md md;
- 	struct disk_conf *disk_conf; /* RCU, for updates: resource->conf_update */
- 	sector_t known_size; /* last known size of that backing device */
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index d3538bd83fb3..43747a1aae43 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -82,7 +82,7 @@ static atomic_t notify_genl_seq = ATOMIC_INIT(2); /* two. */
- 
- DEFINE_MUTEX(notification_mutex);
- 
--/* used blkdev_get_by_path, to claim our meta data device(s) */
-+/* used bdev_open_by_path, to claim our meta data device(s) */
- static char *drbd_m_holder = "Hands off! this is DRBD's meta data device.";
- 
- static void drbd_adm_send_reply(struct sk_buff *skb, struct genl_info *info)
-@@ -1635,43 +1635,45 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
- 	return 0;
- }
- 
--static struct block_device *open_backing_dev(struct drbd_device *device,
-+static struct bdev_handle *open_backing_dev(struct drbd_device *device,
- 		const char *bdev_path, void *claim_ptr, bool do_bd_link)
+ static void reset_bdev(struct zram *zram)
  {
 -	struct block_device *bdev;
-+	struct bdev_handle *handle;
- 	int err = 0;
+-
+ 	if (!zram->backing_dev)
+ 		return;
  
--	bdev = blkdev_get_by_path(bdev_path, BLK_OPEN_READ | BLK_OPEN_WRITE,
--				  claim_ptr, NULL);
+-	bdev = zram->bdev;
+-	blkdev_put(bdev, zram);
++	bdev_release(zram->bdev_handle);
+ 	/* hope filp_close flush all of IO */
+ 	filp_close(zram->backing_dev, NULL);
+ 	zram->backing_dev = NULL;
+-	zram->bdev = NULL;
++	zram->bdev_handle = NULL;
+ 	zram->disk->fops = &zram_devops;
+ 	kvfree(zram->bitmap);
+ 	zram->bitmap = NULL;
+@@ -470,7 +467,7 @@ static ssize_t backing_dev_store(struct device *dev,
+ 	struct address_space *mapping;
+ 	unsigned int bitmap_sz;
+ 	unsigned long nr_pages, *bitmap = NULL;
+-	struct block_device *bdev = NULL;
++	struct bdev_handle *bdev_handle = NULL;
+ 	int err;
+ 	struct zram *zram = dev_to_zram(dev);
+ 
+@@ -507,11 +504,11 @@ static ssize_t backing_dev_store(struct device *dev,
+ 		goto out;
+ 	}
+ 
+-	bdev = blkdev_get_by_dev(inode->i_rdev, BLK_OPEN_READ | BLK_OPEN_WRITE,
+-				 zram, NULL);
 -	if (IS_ERR(bdev)) {
-+	handle = bdev_open_by_path(bdev_path, BLK_OPEN_READ | BLK_OPEN_WRITE,
-+				   claim_ptr, NULL);
-+	if (IS_ERR(handle)) {
- 		drbd_err(device, "open(\"%s\") failed with %ld\n",
--				bdev_path, PTR_ERR(bdev));
--		return bdev;
-+				bdev_path, PTR_ERR(handle));
-+		return handle;
+-		err = PTR_ERR(bdev);
+-		bdev = NULL;
++	bdev_handle = bdev_open_by_dev(inode->i_rdev,
++				BLK_OPEN_READ | BLK_OPEN_WRITE, zram, NULL);
++	if (IS_ERR(bdev_handle)) {
++		err = PTR_ERR(bdev_handle);
++		bdev_handle = NULL;
+ 		goto out;
  	}
  
- 	if (!do_bd_link)
--		return bdev;
-+		return handle;
+@@ -525,7 +522,7 @@ static ssize_t backing_dev_store(struct device *dev,
  
--	err = bd_link_disk_holder(bdev, device->vdisk);
-+	err = bd_link_disk_holder(handle->bdev, device->vdisk);
- 	if (err) {
--		blkdev_put(bdev, claim_ptr);
-+		bdev_release(handle);
- 		drbd_err(device, "bd_link_disk_holder(\"%s\", ...) failed with %d\n",
- 				bdev_path, err);
--		bdev = ERR_PTR(err);
-+		handle = ERR_PTR(err);
- 	}
--	return bdev;
-+	return handle;
- }
+ 	reset_bdev(zram);
  
- static int open_backing_devices(struct drbd_device *device,
- 		struct disk_conf *new_disk_conf,
- 		struct drbd_backing_dev *nbc)
+-	zram->bdev = bdev;
++	zram->bdev_handle = bdev_handle;
+ 	zram->backing_dev = backing_dev;
+ 	zram->bitmap = bitmap;
+ 	zram->nr_pages = nr_pages;
+@@ -538,8 +535,8 @@ static ssize_t backing_dev_store(struct device *dev,
+ out:
+ 	kvfree(bitmap);
+ 
+-	if (bdev)
+-		blkdev_put(bdev, zram);
++	if (bdev_handle)
++		bdev_release(bdev_handle);
+ 
+ 	if (backing_dev)
+ 		filp_close(backing_dev, NULL);
+@@ -581,7 +578,7 @@ static void read_from_bdev_async(struct zram *zram, struct page *page,
  {
+ 	struct bio *bio;
+ 
+-	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
++	bio = bio_alloc(zram->bdev_handle->bdev, 1, parent->bi_opf, GFP_NOIO);
+ 	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
+ 	__bio_add_page(bio, page, PAGE_SIZE, 0);
+ 	bio_chain(bio, parent);
+@@ -697,7 +694,7 @@ static ssize_t writeback_store(struct device *dev,
+ 			continue;
+ 		}
+ 
+-		bio_init(&bio, zram->bdev, &bio_vec, 1,
++		bio_init(&bio, zram->bdev_handle->bdev, &bio_vec, 1,
+ 			 REQ_OP_WRITE | REQ_SYNC);
+ 		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
+ 		__bio_add_page(&bio, page, PAGE_SIZE, 0);
+@@ -779,7 +776,7 @@ static void zram_sync_read(struct work_struct *work)
+ 	struct bio_vec bv;
+ 	struct bio bio;
+ 
+-	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
++	bio_init(&bio, zw->zram->bdev_handle->bdev, &bv, 1, REQ_OP_READ);
+ 	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
+ 	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
+ 	zw->error = submit_bio_wait(&bio);
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index ca7a15bd4845..d090753f97be 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -132,7 +132,7 @@ struct zram {
+ 	spinlock_t wb_limit_lock;
+ 	bool wb_limit_enable;
+ 	u64 bd_wb_limit;
 -	struct block_device *bdev;
-+	struct bdev_handle *handle;
- 
--	bdev = open_backing_dev(device, new_disk_conf->backing_dev, device, true);
--	if (IS_ERR(bdev))
-+	handle = open_backing_dev(device, new_disk_conf->backing_dev, device,
-+				  true);
-+	if (IS_ERR(handle))
- 		return ERR_OPEN_DISK;
--	nbc->backing_bdev = bdev;
-+	nbc->backing_bdev = handle->bdev;
-+	nbc->backing_bdev_handle = handle;
- 
- 	/*
- 	 * meta_dev_idx >= 0: external fixed size, possibly multiple
-@@ -1681,7 +1683,7 @@ static int open_backing_devices(struct drbd_device *device,
- 	 * should check it for you already; but if you don't, or
- 	 * someone fooled it, we need to double check here)
- 	 */
--	bdev = open_backing_dev(device, new_disk_conf->meta_dev,
-+	handle = open_backing_dev(device, new_disk_conf->meta_dev,
- 		/* claim ptr: device, if claimed exclusively; shared drbd_m_holder,
- 		 * if potentially shared with other drbd minors */
- 			(new_disk_conf->meta_dev_idx < 0) ? (void*)device : (void*)drbd_m_holder,
-@@ -1689,20 +1691,21 @@ static int open_backing_devices(struct drbd_device *device,
- 		 * as would happen with internal metadata. */
- 			(new_disk_conf->meta_dev_idx != DRBD_MD_INDEX_FLEX_INT &&
- 			 new_disk_conf->meta_dev_idx != DRBD_MD_INDEX_INTERNAL));
--	if (IS_ERR(bdev))
-+	if (IS_ERR(handle))
- 		return ERR_OPEN_MD_DISK;
--	nbc->md_bdev = bdev;
-+	nbc->md_bdev = handle->bdev;
-+	nbc->md_bdev_handle = handle;
- 	return NO_ERROR;
- }
- 
--static void close_backing_dev(struct drbd_device *device, struct block_device *bdev,
--		void *claim_ptr, bool do_bd_unlink)
-+static void close_backing_dev(struct drbd_device *device,
-+		struct bdev_handle *handle, bool do_bd_unlink)
- {
--	if (!bdev)
-+	if (!handle)
- 		return;
- 	if (do_bd_unlink)
--		bd_unlink_disk_holder(bdev, device->vdisk);
--	blkdev_put(bdev, claim_ptr);
-+		bd_unlink_disk_holder(handle->bdev, device->vdisk);
-+	bdev_release(handle);
- }
- 
- void drbd_backing_dev_free(struct drbd_device *device, struct drbd_backing_dev *ldev)
-@@ -1710,11 +1713,9 @@ void drbd_backing_dev_free(struct drbd_device *device, struct drbd_backing_dev *
- 	if (ldev == NULL)
- 		return;
- 
--	close_backing_dev(device, ldev->md_bdev,
--			  ldev->md.meta_dev_idx < 0 ?
--				(void *)device : (void *)drbd_m_holder,
-+	close_backing_dev(device, ldev->md_bdev_handle,
- 			  ldev->md_bdev != ldev->backing_bdev);
--	close_backing_dev(device, ldev->backing_bdev, device, true);
-+	close_backing_dev(device, ldev->backing_bdev_handle, true);
- 
- 	kfree(ldev->disk_conf);
- 	kfree(ldev);
-@@ -2130,11 +2131,9 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
-  fail:
- 	conn_reconfig_done(connection);
- 	if (nbc) {
--		close_backing_dev(device, nbc->md_bdev,
--			  nbc->disk_conf->meta_dev_idx < 0 ?
--				(void *)device : (void *)drbd_m_holder,
-+		close_backing_dev(device, nbc->md_bdev_handle,
- 			  nbc->md_bdev != nbc->backing_bdev);
--		close_backing_dev(device, nbc->backing_bdev, device, true);
-+		close_backing_dev(device, nbc->backing_bdev_handle, true);
- 		kfree(nbc);
- 	}
- 	kfree(new_disk_conf);
++	struct bdev_handle *bdev_handle;
+ 	unsigned long *bitmap;
+ 	unsigned long nr_pages;
+ #endif
 -- 
 2.35.3
 
