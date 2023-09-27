@@ -2,199 +2,180 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F290E810BF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69463E810C0
 	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:34:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230503AbjI0Jev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 05:34:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32886 "EHLO
+        id S230508AbjI0Jew (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 05:34:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230430AbjI0Jer (ORCPT
+        with ESMTP id S230454AbjI0Jes (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2023 05:34:47 -0400
+        Wed, 27 Sep 2023 05:34:48 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8441013A;
-        Wed, 27 Sep 2023 02:34:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A79F199;
+        Wed, 27 Sep 2023 02:34:46 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 209222195D;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id BCFD921961;
         Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1695807284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nYrEpPlW04XPHY9SSKFn1gjS6jGaIlC5VTJcApbM8Qo=;
-        b=U8J+ZjV6DpBgIpbQgI3eO1ar4SEFD/TB8v27msstPsdBXhPLcxYbGLhowAjHYTQ2RwLvWd
-        VcgQGWr8QSAbgIrbpmxvpr5/9z5RXiW3lpu74KqW6B7BlFHWY3svarWFPzc9yzocwQXAbw
-        JGrXwvxki3lDobR1AdIGIYUc/2W79U4=
+        bh=eRHWCibybWkIg5ki+pUqPhxpNyg9u7525lDUpb07x64=;
+        b=BY09KzFYH9xQXtYPRjNOcJqQKtM+cfftrXANuvO2BdoOoWk552NCfB3tzYVbmHlhrmUNIX
+        esr4VkrIsTAwsGgGDiShK24vBI7FzgNsq/7AkuJ3lQkVOrPtVE72K7xfvLs8Iij989rf6r
+        xFvdB1jUiYAB/CwnSImhYAMKz9cUaWY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1695807284;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nYrEpPlW04XPHY9SSKFn1gjS6jGaIlC5VTJcApbM8Qo=;
-        b=aMOgRVP/+DQLkxciu6unK2YASvl+uOZFID6u+T43QoB/Xwx5NRkeK3RfYzoD5k6AF25n5w
-        jhsebuPcrPQA0GCA==
+        bh=eRHWCibybWkIg5ki+pUqPhxpNyg9u7525lDUpb07x64=;
+        b=fv4qF3qxUQkSooQztUvT0/zCTOQZKwkqM4xu8EXk7ILFQsClWfFz3ygTfe3bLN4i8Tqqfj
+        fNZeWaQOPzbBupAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0BDD513AC6;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B0F3613A74;
         Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id Q6XzAjT3E2UQEwAAMHmgww
+        id D70vKzT3E2UsEwAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 27 Sep 2023 09:34:44 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 1DEC1A07D8; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
+        id 74953A07EF; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 08/29] zram: Convert to use bdev_open_by_dev()
-Date:   Wed, 27 Sep 2023 11:34:14 +0200
-Message-Id: <20230927093442.25915-8-jack@suse.cz>
+Subject: [PATCH 19/29] fs: Convert to bdev_open_by_dev()
+Date:   Wed, 27 Sep 2023 11:34:25 +0200
+Message-Id: <20230927093442.25915-19-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4069; i=jack@suse.cz; h=from:subject; bh=EdXIA2UybD5ESwRXdE8bPlWXf7+M0vz1Znp/57/M720=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cYRYs/0b4bY6/8Ruci1xNxAvv1kUzOGpumDtJH ZUs0wXmJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3GAAKCRCcnaoHP2RA2VJAB/ 4pyDkPssoX/nVZOy4e4IwzVWtAxG3EuqQ/HUA7UwFVPJXHJAuiWUWoh+lA+dQqEkXxQMRA48G92CWw e1Xq9WJBlQ6yrqQ/PkMbc+R0BdrDuFj2CTHpKvJ/jpyiyM75veDDmCeYFb2i7E5gbGJcjivSxky2YC iYy+p/n2tV+kG+TduriAIjb0KKigpAWrLN35VRNiT1CLW+bH2KlOHnH9W2jVhVS2RFhBFNBixW9+mA 3BCrm8RN0AfP55lTnrxUR7gvQfoC7FoOUj3TlGAcrXDgJDYLihvvHP70r/VAn31ioaxiXrxeLVn74u xtkQgXqqOIhMYN1z/7oAi/E7zeaTBQ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3473; i=jack@suse.cz; h=from:subject; bh=/B5ycnHIT9iiHq8/x4Mxmum8OrcobdkPBudKWxkCGyY=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/chXz63JpgIejm59p0Nw041HcbEfTRqUgdmtnZw a5MsMN6JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3IQAKCRCcnaoHP2RA2WQfB/ 9DzlS+YbAGBcLj5jLT5zbxLGcLe0yfjg6/gBB96KhvFHpUFiQyE1vIjojOstRUQPWInEbB0IYxa2YR pfil9Q64ziyrugZAJCQcaUuhGWEeLnl7AAslQjMyAciJqGbz79gojwZkmJ6ETC816GYkjuLDZIaLYk FElf01KtZwUdVylejBXrOpy/4HPKzOiKElsZ6Gq7S/+i30mjgfr1RNt/+LoJNqzYzk1Mm4TTMbjR2r hebm5uckXdu8d7J6X/FgDS5Dh8sU6pcO72sk0WZIt2bZp6JDuwK3g8BiDRNvg4uyEiI7O2ofkkCqJ2 N3PnPJA8gMh8qU7SQ8MXcjStdiN9+k
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert zram to use bdev_open_by_dev() and pass the handle around.
+Convert mount code to use bdev_open_by_dev() and propagate the handle
+around to bdev_release().
 
-CC: Minchan Kim <minchan@kernel.org>
-CC: Sergey Senozhatsky <senozhatsky@chromium.org>
 Acked-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Christian Brauner <brauner@kernel.org>
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Reviewed-by: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/zram/zram_drv.c | 31 ++++++++++++++-----------------
- drivers/block/zram/zram_drv.h |  2 +-
- 2 files changed, 15 insertions(+), 18 deletions(-)
+ fs/cramfs/inode.c  |  2 +-
+ fs/romfs/super.c   |  2 +-
+ fs/super.c         | 15 +++++++++------
+ include/linux/fs.h |  1 +
+ 4 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 06673c6ca255..d77d3664ca08 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -414,17 +414,14 @@ static ssize_t writeback_limit_show(struct device *dev,
- 
- static void reset_bdev(struct zram *zram)
- {
--	struct block_device *bdev;
--
- 	if (!zram->backing_dev)
- 		return;
- 
--	bdev = zram->bdev;
--	blkdev_put(bdev, zram);
-+	bdev_release(zram->bdev_handle);
- 	/* hope filp_close flush all of IO */
- 	filp_close(zram->backing_dev, NULL);
- 	zram->backing_dev = NULL;
--	zram->bdev = NULL;
-+	zram->bdev_handle = NULL;
- 	zram->disk->fops = &zram_devops;
- 	kvfree(zram->bitmap);
- 	zram->bitmap = NULL;
-@@ -470,7 +467,7 @@ static ssize_t backing_dev_store(struct device *dev,
- 	struct address_space *mapping;
- 	unsigned int bitmap_sz;
- 	unsigned long nr_pages, *bitmap = NULL;
--	struct block_device *bdev = NULL;
-+	struct bdev_handle *bdev_handle = NULL;
- 	int err;
- 	struct zram *zram = dev_to_zram(dev);
- 
-@@ -507,11 +504,11 @@ static ssize_t backing_dev_store(struct device *dev,
- 		goto out;
+diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
+index 5ee7d7bbb361..2fbf97077ce9 100644
+--- a/fs/cramfs/inode.c
++++ b/fs/cramfs/inode.c
+@@ -495,7 +495,7 @@ static void cramfs_kill_sb(struct super_block *sb)
+ 		sb->s_mtd = NULL;
+ 	} else if (IS_ENABLED(CONFIG_CRAMFS_BLOCKDEV) && sb->s_bdev) {
+ 		sync_blockdev(sb->s_bdev);
+-		blkdev_put(sb->s_bdev, sb);
++		bdev_release(sb->s_bdev_handle);
  	}
- 
--	bdev = blkdev_get_by_dev(inode->i_rdev, BLK_OPEN_READ | BLK_OPEN_WRITE,
--				 zram, NULL);
--	if (IS_ERR(bdev)) {
--		err = PTR_ERR(bdev);
--		bdev = NULL;
-+	bdev_handle = bdev_open_by_dev(inode->i_rdev,
-+				BLK_OPEN_READ | BLK_OPEN_WRITE, zram, NULL);
-+	if (IS_ERR(bdev_handle)) {
-+		err = PTR_ERR(bdev_handle);
-+		bdev_handle = NULL;
- 		goto out;
+ 	kfree(sbi);
+ }
+diff --git a/fs/romfs/super.c b/fs/romfs/super.c
+index 5c35f6c76037..b1bdfbc211c3 100644
+--- a/fs/romfs/super.c
++++ b/fs/romfs/super.c
+@@ -593,7 +593,7 @@ static void romfs_kill_sb(struct super_block *sb)
+ #ifdef CONFIG_ROMFS_ON_BLOCK
+ 	if (sb->s_bdev) {
+ 		sync_blockdev(sb->s_bdev);
+-		blkdev_put(sb->s_bdev, sb);
++		bdev_release(sb->s_bdev_handle);
  	}
- 
-@@ -525,7 +522,7 @@ static ssize_t backing_dev_store(struct device *dev,
- 
- 	reset_bdev(zram);
- 
--	zram->bdev = bdev;
-+	zram->bdev_handle = bdev_handle;
- 	zram->backing_dev = backing_dev;
- 	zram->bitmap = bitmap;
- 	zram->nr_pages = nr_pages;
-@@ -538,8 +535,8 @@ static ssize_t backing_dev_store(struct device *dev,
- out:
- 	kvfree(bitmap);
- 
--	if (bdev)
--		blkdev_put(bdev, zram);
-+	if (bdev_handle)
-+		bdev_release(bdev_handle);
- 
- 	if (backing_dev)
- 		filp_close(backing_dev, NULL);
-@@ -581,7 +578,7 @@ static void read_from_bdev_async(struct zram *zram, struct page *page,
- {
- 	struct bio *bio;
- 
--	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
-+	bio = bio_alloc(zram->bdev_handle->bdev, 1, parent->bi_opf, GFP_NOIO);
- 	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
- 	__bio_add_page(bio, page, PAGE_SIZE, 0);
- 	bio_chain(bio, parent);
-@@ -697,7 +694,7 @@ static ssize_t writeback_store(struct device *dev,
- 			continue;
- 		}
- 
--		bio_init(&bio, zram->bdev, &bio_vec, 1,
-+		bio_init(&bio, zram->bdev_handle->bdev, &bio_vec, 1,
- 			 REQ_OP_WRITE | REQ_SYNC);
- 		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
- 		__bio_add_page(&bio, page, PAGE_SIZE, 0);
-@@ -779,7 +776,7 @@ static void zram_sync_read(struct work_struct *work)
- 	struct bio_vec bv;
- 	struct bio bio;
- 
--	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
-+	bio_init(&bio, zw->zram->bdev_handle->bdev, &bv, 1, REQ_OP_READ);
- 	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
- 	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
- 	zw->error = submit_bio_wait(&bio);
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index ca7a15bd4845..d090753f97be 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -132,7 +132,7 @@ struct zram {
- 	spinlock_t wb_limit_lock;
- 	bool wb_limit_enable;
- 	u64 bd_wb_limit;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	unsigned long *bitmap;
- 	unsigned long nr_pages;
  #endif
+ }
+diff --git a/fs/super.c b/fs/super.c
+index 2d762ce67f6e..26b96191e9b3 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1479,14 +1479,16 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
+ 		struct fs_context *fc)
+ {
+ 	blk_mode_t mode = sb_open_mode(sb_flags);
++	struct bdev_handle *bdev_handle;
+ 	struct block_device *bdev;
+ 
+-	bdev = blkdev_get_by_dev(sb->s_dev, mode, sb, &fs_holder_ops);
+-	if (IS_ERR(bdev)) {
++	bdev_handle = bdev_open_by_dev(sb->s_dev, mode, sb, &fs_holder_ops);
++	if (IS_ERR(bdev_handle)) {
+ 		if (fc)
+ 			errorf(fc, "%s: Can't open blockdev", fc->source);
+-		return PTR_ERR(bdev);
++		return PTR_ERR(bdev_handle);
+ 	}
++	bdev = bdev_handle->bdev;
+ 
+ 	/*
+ 	 * This really should be in blkdev_get_by_dev, but right now can't due
+@@ -1494,7 +1496,7 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
+ 	 * writable from userspace even for a read-only block device.
+ 	 */
+ 	if ((mode & BLK_OPEN_WRITE) && bdev_read_only(bdev)) {
+-		blkdev_put(bdev, sb);
++		bdev_release(bdev_handle);
+ 		return -EACCES;
+ 	}
+ 
+@@ -1510,10 +1512,11 @@ int setup_bdev_super(struct super_block *sb, int sb_flags,
+ 		mutex_unlock(&bdev->bd_fsfreeze_mutex);
+ 		if (fc)
+ 			warnf(fc, "%pg: Can't mount, blockdev is frozen", bdev);
+-		blkdev_put(bdev, sb);
++		bdev_release(bdev_handle);
+ 		return -EBUSY;
+ 	}
+ 	spin_lock(&sb_lock);
++	sb->s_bdev_handle = bdev_handle;
+ 	sb->s_bdev = bdev;
+ 	sb->s_bdi = bdi_get(bdev->bd_disk->bdi);
+ 	if (bdev_stable_writes(bdev))
+@@ -1646,7 +1649,7 @@ void kill_block_super(struct super_block *sb)
+ 	generic_shutdown_super(sb);
+ 	if (bdev) {
+ 		sync_blockdev(bdev);
+-		blkdev_put(bdev, sb);
++		bdev_release(sb->s_bdev_handle);
+ 	}
+ }
+ 
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index b528f063e8ff..03afc8b6f2af 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1221,6 +1221,7 @@ struct super_block {
+ 	struct hlist_bl_head	s_roots;	/* alternate root dentries for NFS */
+ 	struct list_head	s_mounts;	/* list of mounts; _not_ for fs use */
+ 	struct block_device	*s_bdev;
++	struct bdev_handle	*s_bdev_handle;
+ 	struct backing_dev_info *s_bdi;
+ 	struct mtd_info		*s_mtd;
+ 	struct hlist_node	s_instances;
 -- 
 2.35.3
 
