@@ -2,557 +2,282 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 427D7E810C1
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EA6E810BE
+	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 09:35:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231181AbjI0JfD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 05:35:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33016 "EHLO
+        id S231199AbjI0JfK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 05:35:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230499AbjI0Jev (ORCPT
+        with ESMTP id S230451AbjI0Je7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2023 05:34:51 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88559EB;
-        Wed, 27 Sep 2023 02:34:48 -0700 (PDT)
+        Wed, 27 Sep 2023 05:34:59 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CEF12A;
+        Wed, 27 Sep 2023 02:34:49 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id CADAB21963;
-        Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0D48221977;
+        Wed, 27 Sep 2023 09:34:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1695807284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1695807285; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aKx7SuW0/p+3nntVNU+/PUJfPPxTTYu9YubftAryyYw=;
-        b=kS33w20+fjsD+VzBH35+WShNzw7GD2YsfQB87qRV1VP9pMTFON/b5KKRKNSxhu/s8WWyj6
-        2K9SNGgPfwwGLFqS9fgETf8/kcUwKDYbAH06qfPwiIL3TYag2AWHFcrQlCcJ2N5ssogjIp
-        VYI6+VzsRr/PCLwKrZGWYanh7LeYzbE=
+        bh=tiK9GOiMzLUeaSX/rkSPBuJ0eSpi7wf4h/8J7c7Pam4=;
+        b=KNBLGTM0pqbZjdV98ejo918JLXFaI77XCKjP+HJL4eFmEpS2pHciVfEpTBSEUoqA+S3xq+
+        gpb9G9Gzesslw3alWZMfyv7pD1sh9ISqG0syUI7V+36KSsqlTFj2NPBF2gANdYW/SUPZKc
+        XOQ90j3MfLuF4+t60W+gVthvrMr3gvc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1695807284;
+        s=susede2_ed25519; t=1695807285;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aKx7SuW0/p+3nntVNU+/PUJfPPxTTYu9YubftAryyYw=;
-        b=IGfEZRhSEZP/Vq3OVD+mh3xzKwlAzXRO6VvDwmzO4b234p+62NUTAG44KhkzxjS4uuhGk3
-        rZMpB14546P2mOAg==
+        bh=tiK9GOiMzLUeaSX/rkSPBuJ0eSpi7wf4h/8J7c7Pam4=;
+        b=dSVD8Uv7PHAZ4yYrBMmn8Bb7EHKQxElTnUKTduWoYYkQhaPDpAZ4IgFPqnrSjnLgrF9foa
+        QuNbYNjVtC8gikDA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B07961338F;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E565F13ADB;
         Wed, 27 Sep 2023 09:34:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id O48SKzT3E2UrEwAAMHmgww
+        id lbr/NzT3E2U6EwAAMHmgww
         (envelope-from <jack@suse.cz>); Wed, 27 Sep 2023 09:34:44 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 7D4ECA07F7; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
+        id BAEDEA0802; Wed, 27 Sep 2023 11:34:43 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 20/29] btrfs: Convert to bdev_open_by_path()
-Date:   Wed, 27 Sep 2023 11:34:26 +0200
-Message-Id: <20230927093442.25915-20-jack@suse.cz>
+        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Dave Chinner <dchinner@redhat.com>
+Subject: [PATCH 28/29] xfs: Convert to bdev_open_by_path()
+Date:   Wed, 27 Sep 2023 11:34:34 +0200
+Message-Id: <20230927093442.25915-28-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230818123232.2269-1-jack@suse.cz>
 References: <20230818123232.2269-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=16732; i=jack@suse.cz; h=from:subject; bh=yzOiFJxwX0cXLySZ2dtD34P5Tsn+XxzNefK/qMEZoqw=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/ciSy2PJeAba8YiOkgSnLtShECBT2uwwZvFBKMR FNzAhVqJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3IgAKCRCcnaoHP2RA2U8mB/ 9FnQj1DAFggYsWyXcFssGFBzQ2t2D1DIW4bnHgHD93fwJYmBhOoJ8ALm8MebV3CLIDWWCjYD/JDRfA 4oSmKZr0QaHgdryqxMdGRviyTSP1rFRIQMS9rnScWe7F9T6QZcipXOIFabehA4h9wOxAWH80YMSyMp sF0xuzOhm/z8GorjGOghBe6ZmnHkMiT48CKoNTwpGRQvCwsHo9TlSpe0PdVunOkckWPLZaVhWiSbiN sV8y7HT1l189eSMrvDW7moBs/nGbafjE2bpM/jp+72EK3KFN6qiZsxCwo3fG3RvxmgIq4GgCsEtxd4 BSuE5kSvmHuZwoC5xBeMswnMc/Tm/t
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6519; i=jack@suse.cz; h=from:subject; bh=WDaEwTDODmFKMQvrjOP8veQZmRQ3yPNnv3n4KO7nNFY=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBlE/cprC2u/lY9+ZxE4XFun8Ie5x50uzz/O9TCC3KQ R+LEAHiJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCZRP3KQAKCRCcnaoHP2RA2UOGB/ 9f5AdBp9W5BFlrCClDnEihV+eaDq/Ye3KvMC/gIsMvodi/WO2oXsE06GRqt+UWHPhFtklCR18kuXpi HiSXBh952rk2o+mHX4GXfj9y9q462y4iPr1t9aV5D9cu+XMEPtwKzu13fGi05ukksVmm74+m1Fgr0d XMKZU9WaJLmgZJyQNxgWll2gRi9jzAL7lUSbgy62tvq09pAc5zizDNFUJaG6/njp9r2oT4w0pl3cDq 5z3RKvzY5PSjMCo35QkHad11ayq3pcVRIRJU/djzvxSXVdXiQP8rk2WqHhvCq2DQofGLE88BqQ9eZg cgAEfI3Jkb9xVyw+FKvLZmOIp0MptS
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert btrfs to use bdev_open_by_path() and pass the handle around.  We
-also drop the holder from struct btrfs_device as it is now not needed
-anymore.
+Convert xfs to use bdev_open_by_path() and pass the handle around.
 
-CC: David Sterba <dsterba@suse.com>
-CC: linux-btrfs@vger.kernel.org
+CC: "Darrick J. Wong" <djwong@kernel.org>
+CC: linux-xfs@vger.kernel.org
 Acked-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Dave Chinner <dchinner@redhat.com>
 Reviewed-by: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/btrfs/dev-replace.c |  14 +++---
- fs/btrfs/ioctl.c       |  18 +++----
- fs/btrfs/volumes.c     | 107 +++++++++++++++++++++--------------------
- fs/btrfs/volumes.h     |   6 +--
- 4 files changed, 73 insertions(+), 72 deletions(-)
+ fs/xfs/xfs_buf.c   | 22 ++++++++++------------
+ fs/xfs/xfs_buf.h   |  3 ++-
+ fs/xfs/xfs_super.c | 42 ++++++++++++++++++++++++------------------
+ 3 files changed, 36 insertions(+), 31 deletions(-)
 
-diff --git a/fs/btrfs/dev-replace.c b/fs/btrfs/dev-replace.c
-index d3998cad62c2..f9544fda38e9 100644
---- a/fs/btrfs/dev-replace.c
-+++ b/fs/btrfs/dev-replace.c
-@@ -246,6 +246,7 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index c1ece4a08ff4..003e157241da 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -1945,8 +1945,6 @@ void
+ xfs_free_buftarg(
+ 	struct xfs_buftarg	*btp)
  {
- 	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
- 	struct btrfs_device *device;
-+	struct bdev_handle *bdev_handle;
- 	struct block_device *bdev;
- 	u64 devid = BTRFS_DEV_REPLACE_DEVID;
- 	int ret = 0;
-@@ -256,12 +257,13 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- 		return -EINVAL;
- 	}
- 
--	bdev = blkdev_get_by_path(device_path, BLK_OPEN_WRITE,
--				  fs_info->bdev_holder, NULL);
--	if (IS_ERR(bdev)) {
-+	bdev_handle = bdev_open_by_path(device_path, BLK_OPEN_WRITE,
-+					fs_info->bdev_holder, NULL);
-+	if (IS_ERR(bdev_handle)) {
- 		btrfs_err(fs_info, "target device %s is invalid!", device_path);
--		return PTR_ERR(bdev);
-+		return PTR_ERR(bdev_handle);
- 	}
-+	bdev = bdev_handle->bdev;
- 
- 	if (!btrfs_check_device_zone_type(fs_info, bdev)) {
- 		btrfs_err(fs_info,
-@@ -312,9 +314,9 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- 	device->commit_bytes_used = device->bytes_used;
- 	device->fs_info = fs_info;
- 	device->bdev = bdev;
-+	device->bdev_handle = bdev_handle;
- 	set_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state);
- 	set_bit(BTRFS_DEV_STATE_REPLACE_TGT, &device->dev_state);
--	device->holder = fs_info->bdev_holder;
- 	device->dev_stats_valid = 1;
- 	set_blocksize(device->bdev, BTRFS_BDEV_BLOCKSIZE);
- 	device->fs_devices = fs_devices;
-@@ -333,7 +335,7 @@ static int btrfs_init_dev_replace_tgtdev(struct btrfs_fs_info *fs_info,
- 	return 0;
- 
- error:
--	blkdev_put(bdev, fs_info->bdev_holder);
-+	bdev_release(bdev_handle);
- 	return ret;
- }
- 
-diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
-index 9c05216de36a..59edbf47dbb2 100644
---- a/fs/btrfs/ioctl.c
-+++ b/fs/btrfs/ioctl.c
-@@ -2676,8 +2676,7 @@ static long btrfs_ioctl_rm_dev_v2(struct file *file, void __user *arg)
- 	struct inode *inode = file_inode(file);
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
- 	struct btrfs_ioctl_vol_args_v2 *vol_args;
--	struct block_device *bdev = NULL;
--	void *holder;
-+	struct bdev_handle *bdev_handle = NULL;
- 	int ret;
- 	bool cancel = false;
- 
-@@ -2720,7 +2719,7 @@ static long btrfs_ioctl_rm_dev_v2(struct file *file, void __user *arg)
- 		goto err_drop;
- 
- 	/* Exclusive operation is now claimed */
--	ret = btrfs_rm_device(fs_info, &args, &bdev, &holder);
-+	ret = btrfs_rm_device(fs_info, &args, &bdev_handle);
- 
- 	btrfs_exclop_finish(fs_info);
- 
-@@ -2734,8 +2733,8 @@ static long btrfs_ioctl_rm_dev_v2(struct file *file, void __user *arg)
- 	}
- err_drop:
- 	mnt_drop_write_file(file);
--	if (bdev)
--		blkdev_put(bdev, holder);
-+	if (bdev_handle)
-+		bdev_release(bdev_handle);
- out:
- 	btrfs_put_dev_args_from_path(&args);
- 	kfree(vol_args);
-@@ -2748,8 +2747,7 @@ static long btrfs_ioctl_rm_dev(struct file *file, void __user *arg)
- 	struct inode *inode = file_inode(file);
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
- 	struct btrfs_ioctl_vol_args *vol_args;
--	struct block_device *bdev = NULL;
--	void *holder;
-+	struct bdev_handle *bdev_handle = NULL;
- 	int ret;
- 	bool cancel = false;
- 
-@@ -2782,15 +2780,15 @@ static long btrfs_ioctl_rm_dev(struct file *file, void __user *arg)
- 	ret = exclop_start_or_cancel_reloc(fs_info, BTRFS_EXCLOP_DEV_REMOVE,
- 					   cancel);
- 	if (ret == 0) {
--		ret = btrfs_rm_device(fs_info, &args, &bdev, &holder);
-+		ret = btrfs_rm_device(fs_info, &args, &bdev_handle);
- 		if (!ret)
- 			btrfs_info(fs_info, "disk deleted %s", vol_args->name);
- 		btrfs_exclop_finish(fs_info);
- 	}
- 
- 	mnt_drop_write_file(file);
--	if (bdev)
--		blkdev_put(bdev, holder);
-+	if (bdev_handle)
-+		bdev_release(bdev_handle);
- out:
- 	btrfs_put_dev_args_from_path(&args);
- 	kfree(vol_args);
-diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-index ae64c9885851..d98caa86df4c 100644
---- a/fs/btrfs/volumes.c
-+++ b/fs/btrfs/volumes.c
-@@ -458,37 +458,39 @@ static noinline struct btrfs_fs_devices *find_fsid(
- 
- static int
- btrfs_get_bdev_and_sb(const char *device_path, blk_mode_t flags, void *holder,
--		      int flush, struct block_device **bdev,
-+		      int flush, struct bdev_handle **bdev_handle,
- 		      struct btrfs_super_block **disk_super)
- {
-+	struct block_device *bdev;
- 	int ret;
- 
--	*bdev = blkdev_get_by_path(device_path, flags, holder, NULL);
-+	*bdev_handle = bdev_open_by_path(device_path, flags, holder, NULL);
- 
--	if (IS_ERR(*bdev)) {
--		ret = PTR_ERR(*bdev);
-+	if (IS_ERR(*bdev_handle)) {
-+		ret = PTR_ERR(*bdev_handle);
- 		goto error;
- 	}
-+	bdev = (*bdev_handle)->bdev;
- 
- 	if (flush)
--		sync_blockdev(*bdev);
--	ret = set_blocksize(*bdev, BTRFS_BDEV_BLOCKSIZE);
-+		sync_blockdev(bdev);
-+	ret = set_blocksize(bdev, BTRFS_BDEV_BLOCKSIZE);
- 	if (ret) {
--		blkdev_put(*bdev, holder);
-+		bdev_release(*bdev_handle);
- 		goto error;
- 	}
--	invalidate_bdev(*bdev);
--	*disk_super = btrfs_read_dev_super(*bdev);
-+	invalidate_bdev(bdev);
-+	*disk_super = btrfs_read_dev_super(bdev);
- 	if (IS_ERR(*disk_super)) {
- 		ret = PTR_ERR(*disk_super);
--		blkdev_put(*bdev, holder);
-+		bdev_release(*bdev_handle);
- 		goto error;
- 	}
- 
- 	return 0;
- 
- error:
--	*bdev = NULL;
-+	*bdev_handle = NULL;
- 	return ret;
- }
- 
-@@ -563,7 +565,7 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
- 			struct btrfs_device *device, blk_mode_t flags,
- 			void *holder)
- {
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	struct btrfs_super_block *disk_super;
- 	u64 devid;
- 	int ret;
-@@ -574,7 +576,7 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
- 		return -EINVAL;
- 
- 	ret = btrfs_get_bdev_and_sb(device->name->str, flags, holder, 1,
--				    &bdev, &disk_super);
-+				    &bdev_handle, &disk_super);
- 	if (ret)
- 		return ret;
- 
-@@ -598,21 +600,21 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
- 		clear_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state);
- 		fs_devices->seeding = true;
- 	} else {
--		if (bdev_read_only(bdev))
-+		if (bdev_read_only(bdev_handle->bdev))
- 			clear_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state);
- 		else
- 			set_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state);
- 	}
- 
--	if (!bdev_nonrot(bdev))
-+	if (!bdev_nonrot(bdev_handle->bdev))
- 		fs_devices->rotating = true;
- 
--	if (bdev_max_discard_sectors(bdev))
-+	if (bdev_max_discard_sectors(bdev_handle->bdev))
- 		fs_devices->discardable = true;
- 
--	device->bdev = bdev;
-+	device->bdev_handle = bdev_handle;
-+	device->bdev = bdev_handle->bdev;
- 	clear_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state);
--	device->holder = holder;
- 
- 	fs_devices->open_devices++;
- 	if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state) &&
-@@ -626,7 +628,7 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
- 
- error_free_page:
- 	btrfs_release_disk_super(disk_super);
--	blkdev_put(bdev, holder);
-+	bdev_release(bdev_handle);
- 
- 	return -EINVAL;
- }
-@@ -970,9 +972,10 @@ static void __btrfs_free_extra_devids(struct btrfs_fs_devices *fs_devices,
- 		if (device->devid == BTRFS_DEV_REPLACE_DEVID)
- 			continue;
- 
--		if (device->bdev) {
--			blkdev_put(device->bdev, device->holder);
-+		if (device->bdev_handle) {
-+			bdev_release(device->bdev_handle);
- 			device->bdev = NULL;
-+			device->bdev_handle = NULL;
- 			fs_devices->open_devices--;
- 		}
- 		if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state)) {
-@@ -1017,7 +1020,7 @@ static void btrfs_close_bdev(struct btrfs_device *device)
- 		invalidate_bdev(device->bdev);
- 	}
- 
--	blkdev_put(device->bdev, device->holder);
-+	bdev_release(device->bdev_handle);
- }
- 
- static void btrfs_close_one_device(struct btrfs_device *device)
-@@ -1267,7 +1270,7 @@ struct btrfs_device *btrfs_scan_one_device(const char *path,
- 	struct btrfs_super_block *disk_super;
- 	bool new_device_added = false;
- 	struct btrfs_device *device = NULL;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	u64 bytenr, bytenr_orig;
- 	int ret;
- 
-@@ -1290,18 +1293,19 @@ struct btrfs_device *btrfs_scan_one_device(const char *path,
- 	 * values temporarily, as the device paths of the fsid are the only
- 	 * required information for assembling the volume.
- 	 */
--	bdev = blkdev_get_by_path(path, BLK_OPEN_READ, NULL, NULL);
--	if (IS_ERR(bdev))
--		return ERR_CAST(bdev);
-+	bdev_handle = bdev_open_by_path(path, BLK_OPEN_READ, NULL, NULL);
-+	if (IS_ERR(bdev_handle))
-+		return ERR_CAST(bdev_handle);
- 
- 	bytenr_orig = btrfs_sb_offset(0);
--	ret = btrfs_sb_log_location_bdev(bdev, 0, READ, &bytenr);
-+	ret = btrfs_sb_log_location_bdev(bdev_handle->bdev, 0, READ, &bytenr);
- 	if (ret) {
- 		device = ERR_PTR(ret);
- 		goto error_bdev_put;
- 	}
- 
--	disk_super = btrfs_read_disk_super(bdev, bytenr, bytenr_orig);
-+	disk_super = btrfs_read_disk_super(bdev_handle->bdev, bytenr,
-+					   bytenr_orig);
- 	if (IS_ERR(disk_super)) {
- 		device = ERR_CAST(disk_super);
- 		goto error_bdev_put;
-@@ -1331,7 +1335,7 @@ struct btrfs_device *btrfs_scan_one_device(const char *path,
- 	btrfs_release_disk_super(disk_super);
- 
- error_bdev_put:
--	blkdev_put(bdev, NULL);
-+	bdev_release(bdev_handle);
- 
- 	return device;
- }
-@@ -2008,7 +2012,7 @@ void btrfs_scratch_superblocks(struct btrfs_fs_info *fs_info,
- 
- int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 		    struct btrfs_dev_lookup_args *args,
--		    struct block_device **bdev, void **holder)
-+		    struct bdev_handle **bdev_handle)
- {
- 	struct btrfs_trans_handle *trans;
- 	struct btrfs_device *device;
-@@ -2117,7 +2121,7 @@ int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 
- 	btrfs_assign_next_active_device(device, NULL);
- 
--	if (device->bdev) {
-+	if (device->bdev_handle) {
- 		cur_devices->open_devices--;
- 		/* remove sysfs entry */
- 		btrfs_sysfs_remove_device(device);
-@@ -2133,9 +2137,9 @@ int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 	 * free the device.
- 	 *
- 	 * We cannot call btrfs_close_bdev() here because we're holding the sb
--	 * write lock, and blkdev_put() will pull in the ->open_mutex on the
--	 * block device and it's dependencies.  Instead just flush the device
--	 * and let the caller do the final blkdev_put.
-+	 * write lock, and bdev_release() will pull in the ->open_mutex on
-+	 * the block device and it's dependencies.  Instead just flush the
-+	 * device and let the caller do the final bdev_release.
- 	 */
- 	if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state)) {
- 		btrfs_scratch_superblocks(fs_info, device->bdev,
-@@ -2146,8 +2150,7 @@ int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 		}
- 	}
- 
--	*bdev = device->bdev;
--	*holder = device->holder;
-+	*bdev_handle = device->bdev_handle;
- 	synchronize_rcu();
- 	btrfs_free_device(device);
- 
-@@ -2285,7 +2288,7 @@ int btrfs_get_dev_args_from_path(struct btrfs_fs_info *fs_info,
- 				 const char *path)
- {
- 	struct btrfs_super_block *disk_super;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	int ret;
- 
- 	if (!path || !path[0])
-@@ -2303,7 +2306,7 @@ int btrfs_get_dev_args_from_path(struct btrfs_fs_info *fs_info,
- 	}
- 
- 	ret = btrfs_get_bdev_and_sb(path, BLK_OPEN_READ, NULL, 0,
--				    &bdev, &disk_super);
-+				    &bdev_handle, &disk_super);
- 	if (ret) {
- 		btrfs_put_dev_args_from_path(args);
- 		return ret;
-@@ -2322,7 +2325,7 @@ int btrfs_get_dev_args_from_path(struct btrfs_fs_info *fs_info,
- 	else
- 		memcpy(args->fsid, disk_super->fsid, BTRFS_FSID_SIZE);
- 	btrfs_release_disk_super(disk_super);
--	blkdev_put(bdev, NULL);
-+	bdev_release(bdev_handle);
- 	return 0;
- }
- 
-@@ -2543,7 +2546,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 	struct btrfs_root *root = fs_info->dev_root;
- 	struct btrfs_trans_handle *trans;
- 	struct btrfs_device *device;
--	struct block_device *bdev;
-+	struct bdev_handle *bdev_handle;
- 	struct super_block *sb = fs_info->sb;
- 	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
- 	struct btrfs_fs_devices *seed_devices = NULL;
-@@ -2556,12 +2559,12 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 	if (sb_rdonly(sb) && !fs_devices->seeding)
- 		return -EROFS;
- 
--	bdev = blkdev_get_by_path(device_path, BLK_OPEN_WRITE,
--				  fs_info->bdev_holder, NULL);
--	if (IS_ERR(bdev))
--		return PTR_ERR(bdev);
-+	bdev_handle = bdev_open_by_path(device_path, BLK_OPEN_WRITE,
-+					fs_info->bdev_holder, NULL);
-+	if (IS_ERR(bdev_handle))
-+		return PTR_ERR(bdev_handle);
- 
--	if (!btrfs_check_device_zone_type(fs_info, bdev)) {
-+	if (!btrfs_check_device_zone_type(fs_info, bdev_handle->bdev)) {
- 		ret = -EINVAL;
- 		goto error;
- 	}
-@@ -2573,11 +2576,11 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 		locked = true;
- 	}
- 
--	sync_blockdev(bdev);
-+	sync_blockdev(bdev_handle->bdev);
- 
- 	rcu_read_lock();
- 	list_for_each_entry_rcu(device, &fs_devices->devices, dev_list) {
--		if (device->bdev == bdev) {
-+		if (device->bdev == bdev_handle->bdev) {
- 			ret = -EEXIST;
- 			rcu_read_unlock();
- 			goto error;
-@@ -2593,7 +2596,8 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 	}
- 
- 	device->fs_info = fs_info;
--	device->bdev = bdev;
-+	device->bdev_handle = bdev_handle;
-+	device->bdev = bdev_handle->bdev;
- 	ret = lookup_bdev(device_path, &device->devt);
- 	if (ret)
- 		goto error_free_device;
-@@ -2614,12 +2618,11 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 	device->io_align = fs_info->sectorsize;
- 	device->sector_size = fs_info->sectorsize;
- 	device->total_bytes =
--		round_down(bdev_nr_bytes(bdev), fs_info->sectorsize);
-+		round_down(bdev_nr_bytes(device->bdev), fs_info->sectorsize);
- 	device->disk_total_bytes = device->total_bytes;
- 	device->commit_total_bytes = device->total_bytes;
- 	set_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state);
- 	clear_bit(BTRFS_DEV_STATE_REPLACE_TGT, &device->dev_state);
--	device->holder = fs_info->bdev_holder;
- 	device->dev_stats_valid = 1;
- 	set_blocksize(device->bdev, BTRFS_BDEV_BLOCKSIZE);
- 
-@@ -2655,7 +2658,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- 
- 	atomic64_add(device->total_bytes, &fs_info->free_chunk_space);
- 
--	if (!bdev_nonrot(bdev))
-+	if (!bdev_nonrot(device->bdev))
- 		fs_devices->rotating = true;
- 
- 	orig_super_total_bytes = btrfs_super_total_bytes(fs_info->super_copy);
-@@ -2777,7 +2780,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
- error_free_device:
- 	btrfs_free_device(device);
- error:
--	blkdev_put(bdev, fs_info->bdev_holder);
-+	bdev_release(bdev_handle);
- 	if (locked) {
- 		mutex_unlock(&uuid_mutex);
- 		up_write(&sb->s_umount);
-diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
-index b5d0586c82af..cb42376ad7b5 100644
---- a/fs/btrfs/volumes.h
-+++ b/fs/btrfs/volumes.h
-@@ -90,13 +90,11 @@ struct btrfs_device {
- 
- 	u64 generation;
- 
-+	struct bdev_handle *bdev_handle;
- 	struct block_device *bdev;
- 
- 	struct btrfs_zoned_device_info *zone_info;
- 
--	/* block device holder for blkdev_get/put */
--	void *holder;
+-	struct block_device	*bdev = btp->bt_bdev;
 -
+ 	unregister_shrinker(&btp->bt_shrinker);
+ 	ASSERT(percpu_counter_sum(&btp->bt_io_count) == 0);
+ 	percpu_counter_destroy(&btp->bt_io_count);
+@@ -1954,8 +1952,8 @@ xfs_free_buftarg(
+ 
+ 	fs_put_dax(btp->bt_daxdev, btp->bt_mount);
+ 	/* the main block device is closed by kill_block_super */
+-	if (bdev != btp->bt_mount->m_super->s_bdev)
+-		blkdev_put(bdev, btp->bt_mount->m_super);
++	if (btp->bt_bdev != btp->bt_mount->m_super->s_bdev)
++		bdev_release(btp->bt_bdev_handle);
+ 
+ 	kmem_free(btp);
+ }
+@@ -1990,16 +1988,15 @@ xfs_setsize_buftarg(
+  */
+ STATIC int
+ xfs_setsize_buftarg_early(
+-	xfs_buftarg_t		*btp,
+-	struct block_device	*bdev)
++	xfs_buftarg_t		*btp)
+ {
+-	return xfs_setsize_buftarg(btp, bdev_logical_block_size(bdev));
++	return xfs_setsize_buftarg(btp, bdev_logical_block_size(btp->bt_bdev));
+ }
+ 
+ struct xfs_buftarg *
+ xfs_alloc_buftarg(
+ 	struct xfs_mount	*mp,
+-	struct block_device	*bdev)
++	struct bdev_handle	*bdev_handle)
+ {
+ 	xfs_buftarg_t		*btp;
+ 	const struct dax_holder_operations *ops = NULL;
+@@ -2010,9 +2007,10 @@ xfs_alloc_buftarg(
+ 	btp = kmem_zalloc(sizeof(*btp), KM_NOFS);
+ 
+ 	btp->bt_mount = mp;
+-	btp->bt_dev =  bdev->bd_dev;
+-	btp->bt_bdev = bdev;
+-	btp->bt_daxdev = fs_dax_get_by_bdev(bdev, &btp->bt_dax_part_off,
++	btp->bt_bdev_handle = bdev_handle;
++	btp->bt_dev = bdev_handle->bdev->bd_dev;
++	btp->bt_bdev = bdev_handle->bdev;
++	btp->bt_daxdev = fs_dax_get_by_bdev(btp->bt_bdev, &btp->bt_dax_part_off,
+ 					    mp, ops);
+ 
  	/*
- 	 * Device's major-minor number. Must be set even if the device is not
- 	 * opened (bdev == NULL), unless the device is missing.
-@@ -649,7 +647,7 @@ struct btrfs_device *btrfs_alloc_device(struct btrfs_fs_info *fs_info,
- void btrfs_put_dev_args_from_path(struct btrfs_dev_lookup_args *args);
- int btrfs_rm_device(struct btrfs_fs_info *fs_info,
- 		    struct btrfs_dev_lookup_args *args,
--		    struct block_device **bdev, void **holder);
-+		    struct bdev_handle **bdev_handle);
- void __exit btrfs_cleanup_fs_uuids(void);
- int btrfs_num_copies(struct btrfs_fs_info *fs_info, u64 logical, u64 len);
- int btrfs_grow_device(struct btrfs_trans_handle *trans,
+@@ -2022,7 +2020,7 @@ xfs_alloc_buftarg(
+ 	ratelimit_state_init(&btp->bt_ioerror_rl, 30 * HZ,
+ 			     DEFAULT_RATELIMIT_BURST);
+ 
+-	if (xfs_setsize_buftarg_early(btp, bdev))
++	if (xfs_setsize_buftarg_early(btp))
+ 		goto error_free;
+ 
+ 	if (list_lru_init(&btp->bt_lru))
+diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
+index df8f47953bb4..ada9d310b7d3 100644
+--- a/fs/xfs/xfs_buf.h
++++ b/fs/xfs/xfs_buf.h
+@@ -98,6 +98,7 @@ typedef unsigned int xfs_buf_flags_t;
+  */
+ typedef struct xfs_buftarg {
+ 	dev_t			bt_dev;
++	struct bdev_handle	*bt_bdev_handle;
+ 	struct block_device	*bt_bdev;
+ 	struct dax_device	*bt_daxdev;
+ 	u64			bt_dax_part_off;
+@@ -364,7 +365,7 @@ xfs_buf_update_cksum(struct xfs_buf *bp, unsigned long cksum_offset)
+  *	Handling of buftargs.
+  */
+ struct xfs_buftarg *xfs_alloc_buftarg(struct xfs_mount *mp,
+-		struct block_device *bdev);
++		struct bdev_handle *bdev_handle);
+ extern void xfs_free_buftarg(struct xfs_buftarg *);
+ extern void xfs_buftarg_wait(struct xfs_buftarg *);
+ extern void xfs_buftarg_drain(struct xfs_buftarg *);
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index 819a3568b28f..f0ae07828153 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -361,14 +361,15 @@ STATIC int
+ xfs_blkdev_get(
+ 	xfs_mount_t		*mp,
+ 	const char		*name,
+-	struct block_device	**bdevp)
++	struct bdev_handle	**handlep)
+ {
+ 	int			error = 0;
+ 
+-	*bdevp = blkdev_get_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
+-				    mp->m_super, &fs_holder_ops);
+-	if (IS_ERR(*bdevp)) {
+-		error = PTR_ERR(*bdevp);
++	*handlep = bdev_open_by_path(name, BLK_OPEN_READ | BLK_OPEN_WRITE,
++				     mp->m_super, &fs_holder_ops);
++	if (IS_ERR(*handlep)) {
++		error = PTR_ERR(*handlep);
++		*handlep = NULL;
+ 		xfs_warn(mp, "Invalid device [%s], error=%d", name, error);
+ 	}
+ 
+@@ -433,7 +434,7 @@ xfs_open_devices(
+ {
+ 	struct super_block	*sb = mp->m_super;
+ 	struct block_device	*ddev = sb->s_bdev;
+-	struct block_device	*logdev = NULL, *rtdev = NULL;
++	struct bdev_handle	*logdev_handle = NULL, *rtdev_handle = NULL;
+ 	int			error;
+ 
+ 	/*
+@@ -446,17 +447,19 @@ xfs_open_devices(
+ 	 * Open real time and log devices - order is important.
+ 	 */
+ 	if (mp->m_logname) {
+-		error = xfs_blkdev_get(mp, mp->m_logname, &logdev);
++		error = xfs_blkdev_get(mp, mp->m_logname, &logdev_handle);
+ 		if (error)
+ 			goto out_relock;
+ 	}
+ 
+ 	if (mp->m_rtname) {
+-		error = xfs_blkdev_get(mp, mp->m_rtname, &rtdev);
++		error = xfs_blkdev_get(mp, mp->m_rtname, &rtdev_handle);
+ 		if (error)
+ 			goto out_close_logdev;
+ 
+-		if (rtdev == ddev || rtdev == logdev) {
++		if (rtdev_handle->bdev == ddev ||
++		    (logdev_handle &&
++		     rtdev_handle->bdev == logdev_handle->bdev)) {
+ 			xfs_warn(mp,
+ 	"Cannot mount filesystem with identical rtdev and ddev/logdev.");
+ 			error = -EINVAL;
+@@ -468,22 +471,25 @@ xfs_open_devices(
+ 	 * Setup xfs_mount buffer target pointers
+ 	 */
+ 	error = -ENOMEM;
+-	mp->m_ddev_targp = xfs_alloc_buftarg(mp, ddev);
++	mp->m_ddev_targp = xfs_alloc_buftarg(mp, sb->s_bdev_handle);
+ 	if (!mp->m_ddev_targp)
+ 		goto out_close_rtdev;
+ 
+-	if (rtdev) {
+-		mp->m_rtdev_targp = xfs_alloc_buftarg(mp, rtdev);
++	if (rtdev_handle) {
++		mp->m_rtdev_targp = xfs_alloc_buftarg(mp, rtdev_handle);
+ 		if (!mp->m_rtdev_targp)
+ 			goto out_free_ddev_targ;
+ 	}
+ 
+-	if (logdev && logdev != ddev) {
+-		mp->m_logdev_targp = xfs_alloc_buftarg(mp, logdev);
++	if (logdev_handle && logdev_handle->bdev != ddev) {
++		mp->m_logdev_targp = xfs_alloc_buftarg(mp, logdev_handle);
+ 		if (!mp->m_logdev_targp)
+ 			goto out_free_rtdev_targ;
+ 	} else {
+ 		mp->m_logdev_targp = mp->m_ddev_targp;
++		/* Handle won't be used, drop it */
++		if (logdev_handle)
++			bdev_release(logdev_handle);
+ 	}
+ 
+ 	error = 0;
+@@ -497,11 +503,11 @@ xfs_open_devices(
+  out_free_ddev_targ:
+ 	xfs_free_buftarg(mp->m_ddev_targp);
+  out_close_rtdev:
+-	 if (rtdev)
+-		 blkdev_put(rtdev, sb);
++	 if (rtdev_handle)
++		bdev_release(rtdev_handle);
+  out_close_logdev:
+-	if (logdev && logdev != ddev)
+-		blkdev_put(logdev, sb);
++	if (logdev_handle)
++		bdev_release(logdev_handle);
+ 	goto out_relock;
+ }
+ 
 -- 
 2.35.3
 
