@@ -2,209 +2,131 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F32A1E82CD5
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 20:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD35CE82CD9
+	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 20:49:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbjI0UbH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 16:31:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39204 "EHLO
+        id S229561AbjI0Uto (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 16:49:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjI0UbG (ORCPT
+        with ESMTP id S229460AbjI0Utn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2023 16:31:06 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31BCC11D
-        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2023 13:31:04 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-323ef9a8b59so2537726f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2023 13:31:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695846662; x=1696451462; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1bPQ4W+m4k6grk2QsqsO+u/OMm6oUavQe8VAaeMpNSM=;
-        b=BW6f9FnOowNXdemqNGSr9DVrx4990m1nUH2aWiyV2yZVmxNMyg/IXjg3rMvCOW+Qgh
-         scfMaWZuPPs+dwYHXD0oJYlLdmtB8+ltLCf4VZhNI1XFXuNajppg2oKNhvosn7JmKl3T
-         EU9dE2LKyj5r5MBo9uZJmwxkts8hSm+2Ga0WebP4qO0fTiS4miKG1WDy8WpyjLlGNJs6
-         DoI/lp/gnjnbeAXxAbu9qKvybTT30hp69fdy7jGCB4I23xT8i5taj7EA1zJWFq4yVJ7P
-         wzxY41RUbOvLvzYq7zsqB/hMPpidev2PkJR9RtALN+EbEegsVuZFb1+6JSFsgJ61pBBn
-         whaw==
+        Wed, 27 Sep 2023 16:49:43 -0400
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F28CD6;
+        Wed, 27 Sep 2023 13:49:42 -0700 (PDT)
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-573912a7b14so6082659eaf.1;
+        Wed, 27 Sep 2023 13:49:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695846662; x=1696451462;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1bPQ4W+m4k6grk2QsqsO+u/OMm6oUavQe8VAaeMpNSM=;
-        b=gklEYpJmCtjf3TPVz7ypceL5oZA5avW4BS9ZmFkPhngHQWdyTyCoRQCWH3FYu+BUao
-         ibVCbAzSfnzIE0ixkbUuRQCCOGGEj83YndpIWCxwpnRMNaMN3e53JT4Y9cARYEoTx40v
-         uA/th2E4uXQ2N66lejna7nfxc9fJCl0y51le5YJQL/H4tU/UcY+FMSRrs+LZiLBLJP9M
-         LViQodgwjsNLt9XyOOH4PT1ly7DkArsF0BPhIOhfieAsYfs+ofVnAfqyBby4RB1kr8y5
-         vpWxeHiTqxppAwJQ8jHrxhgdAXG1BOLy24YHVIm/FdLvM590Z4qm9J/HauGI35aud6V9
-         XzMQ==
-X-Gm-Message-State: AOJu0YwY5aX71xfAt4Ba0/ia5HDcKJUf92UZGJtPSRlZCV6i1KfJk8vj
-        FBjnAkO0ZmA6dZyUucIbTF+FPw4F796UfhFZiLqe5FO3JSTVCkojlSI=
-X-Google-Smtp-Source: AGHT+IGHhim/72mDyUSht5r5coAg+DnoIeszZ0PMJICln5voUh7kOaTJ+BemafS1Ina7CW/UDOHZ0LdSqDwwnM/oVG8=
-X-Received: by 2002:adf:ee4b:0:b0:31a:e972:3601 with SMTP id
- w11-20020adfee4b000000b0031ae9723601mr2637429wro.54.1695846662401; Wed, 27
- Sep 2023 13:31:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695847781; x=1696452581;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UmyEGkXri5KPsLJOTpq3bUt+vQ7L9qwnm2OL7z9no/o=;
+        b=hsbcXMJs3O+bel0C8TtVsigJ/csYrHcwlyNOI/H94wBJHe3ZsVTiYwnnwZOGkj/qSs
+         wVEO15T7wiyNtpwZmw11RqJwDV9jrVbdC12IxtYo/PeLMCmr4AchQI8pYvUDuE4R67PS
+         BYmjtkxS8CamxCG4SLBefQ7rQFYj6FPLvx55WUPctsO4tLkjescBk7h5oiYHz+vkWubM
+         mztTHoq24wz/MkKRvD3xytTzT0O86u2xA0VBOu/zQqd4si3bGKGEW6MbCF1F0zyerN0u
+         nUKgHDbABljPm1D+ZKq4BLLoHNbo/EWISlgGQ4Jb3gsW0E3/gPozFcMWvVu+tpkCZa/R
+         JoHg==
+X-Gm-Message-State: AOJu0YyXhAba4ZfdqYjtW7EK+jwpbKRXO0mBmEVrH6ri5yWZ7VeVo0O4
+        6NrMFkGUfJGaeTtWN8Mnhxw=
+X-Google-Smtp-Source: AGHT+IHCwOWWNCAmANznYdzvBGWpetjIhbyOwNgWCWOWXFVixgBXrieU8G1Svoezl04Px/snxncgLQ==
+X-Received: by 2002:a05:6358:7e84:b0:135:47e8:76e2 with SMTP id o4-20020a0563587e8400b0013547e876e2mr2957543rwn.4.1695847780999;
+        Wed, 27 Sep 2023 13:49:40 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:8f39:a76e:2f15:c958? ([2620:15c:211:201:8f39:a76e:2f15:c958])
+        by smtp.gmail.com with ESMTPSA id v13-20020a63b64d000000b0057783b0f102sm10285198pgt.40.2023.09.27.13.49.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Sep 2023 13:49:40 -0700 (PDT)
+Message-ID: <be30c422-f84a-43b8-b176-3516ff5180cb@acm.org>
+Date:   Wed, 27 Sep 2023 13:49:39 -0700
 MIME-Version: 1.0
-References: <20230908153056.3503975-1-gjoyce@linux.vnet.ibm.com>
- <20230908153056.3503975-2-gjoyce@linux.vnet.ibm.com> <20230913165612.GA2213586@dev-arch.thelio-3990X>
- <CAKwvOdnbKA-DiWRorWMR93JPFX-OjUjO=SQXSRf4=DpwzvZ=pQ@mail.gmail.com> <d07b66c55e957c78aff8ab9a6170747832cbc8c5.camel@linux.vnet.ibm.com>
-In-Reply-To: <d07b66c55e957c78aff8ab9a6170747832cbc8c5.camel@linux.vnet.ibm.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Wed, 27 Sep 2023 13:30:47 -0700
-Message-ID: <CAKwvOd=K_xNK71DpivVsyKOKWPo1XG78zGsAdZTWvj=tHmh2ZQ@mail.gmail.com>
-Subject: Re: [PATCH v7 1/3 RESEND] block:sed-opal: SED Opal keystore
-To:     gjoyce@linux.vnet.ibm.com
-Cc:     Nathan Chancellor <nathan@kernel.org>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, jarkko@kernel.org, linuxppc-dev@lists.ozlabs.org,
-        jonathan.derrick@linux.dev, brking@linux.vnet.ibm.com,
-        msuchanek@suse.de, mpe@ellerman.id.au, nayna@linux.ibm.com,
-        akpm@linux-foundation.org, keyrings@vger.kernel.org,
-        llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/13] Pass data temperature information to zoned UFS
+ devices
+Content-Language: en-US
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+References: <20230920191442.3701673-1-bvanassche@acm.org>
+ <yq1o7hnzbsy.fsf@ca-mkp.ca.oracle.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <yq1o7hnzbsy.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 27, 2023 at 1:26=E2=80=AFPM Greg Joyce <gjoyce@linux.vnet.ibm.c=
-om> wrote:
->
-> On Wed, 2023-09-13 at 13:49 -0700, Nick Desaulniers wrote:
-> > On Wed, Sep 13, 2023 at 9:56=E2=80=AFAM Nathan Chancellor <nathan@kerne=
-l.org>
-> > wrote:
-> > > Hi Greg,
-> > >
-> > > On Fri, Sep 08, 2023 at 10:30:54AM -0500, gjoyce@linux.vnet.ibm.com
-> > >  wrote:
-> > > > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > > >
-> > > > Add read and write functions that allow SED Opal keys to stored
-> > > > in a permanent keystore.
-> > > >
-> > > > Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > > > Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
-> > > > ---
-> > > >  block/Makefile               |  2 +-
-> > > >  block/sed-opal-key.c         | 24 ++++++++++++++++++++++++
-> > > >  include/linux/sed-opal-key.h | 15 +++++++++++++++
-> > > >  3 files changed, 40 insertions(+), 1 deletion(-)
-> > > >  create mode 100644 block/sed-opal-key.c
-> > > >  create mode 100644 include/linux/sed-opal-key.h
-> > > >
-> > > > diff --git a/block/Makefile b/block/Makefile
-> > > > index 46ada9dc8bbf..ea07d80402a6 100644
-> > > > --- a/block/Makefile
-> > > > +++ b/block/Makefile
-> > > > @@ -34,7 +34,7 @@ obj-$(CONFIG_BLK_DEV_ZONED) +=3D blk-zoned.o
-> > > >  obj-$(CONFIG_BLK_WBT)                +=3D blk-wbt.o
-> > > >  obj-$(CONFIG_BLK_DEBUG_FS)   +=3D blk-mq-debugfs.o
-> > > >  obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+=3D blk-mq-debugfs-zoned.o
-> > > > -obj-$(CONFIG_BLK_SED_OPAL)   +=3D sed-opal.o
-> > > > +obj-$(CONFIG_BLK_SED_OPAL)   +=3D sed-opal.o sed-opal-key.o
-> > > >  obj-$(CONFIG_BLK_PM)         +=3D blk-pm.o
-> > > >  obj-$(CONFIG_BLK_INLINE_ENCRYPTION)  +=3D blk-crypto.o blk-crypto-
-> > > > profile.o \
-> > > >                                          blk-crypto-sysfs.o
-> > > > diff --git a/block/sed-opal-key.c b/block/sed-opal-key.c
-> > > > new file mode 100644
-> > > > index 000000000000..16f380164c44
-> > > > --- /dev/null
-> > > > +++ b/block/sed-opal-key.c
-> > > > @@ -0,0 +1,24 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > > +/*
-> > > > + * SED key operations.
-> > > > + *
-> > > > + * Copyright (C) 2022 IBM Corporation
-> > > > + *
-> > > > + * These are the accessor functions (read/write) for SED Opal
-> > > > + * keys. Specific keystores can provide overrides.
-> > > > + *
-> > > > + */
-> > > > +
-> > > > +#include <linux/kernel.h>
-> > > > +#include <linux/errno.h>
-> > > > +#include <linux/sed-opal-key.h>
-> > > > +
-> > > > +int __weak sed_read_key(char *keyname, char *key, u_int *keylen)
-> > > > +{
-> > > > +     return -EOPNOTSUPP;
-> > > > +}
-> > > > +
-> > > > +int __weak sed_write_key(char *keyname, char *key, u_int keylen)
-> > > > +{
-> > > > +     return -EOPNOTSUPP;
-> > > > +}
-> > >
-> > > This change causes a build failure for certain clang configurations
-> > > due
-> > > to an unfortunate issue [1] with recordmcount, clang's integrated
-> > > assembler, and object files that contain a section with only weak
-> > > functions/symbols (in this case, the .text section in sed-opal-
-> > > key.c),
-> > > resulting in
-> > >
-> > >   Cannot find symbol for section 2: .text.
-> > >   block/sed-opal-key.o: failed
-> > >
-> > > when building this file.
-> >
-> > The definitions in
-> > block/sed-opal-key.c
-> > should be deleted. Instead, in
-> > include/linux/sed-opal-key.h
-> > CONFIG_PSERIES_PLPKS_SED should be used to define static inline
-> > versions when CONFIG_PSERIES_PLPKS_SED is not defined.
-> >
-> > #ifdef CONFIG_PSERIES_PLPKS_SED
-> > int sed_read_key(char *keyname, char *key, u_int *keylen);
-> > int sed_write_key(char *keyname, char *key, u_int keylen);
-> > #else
-> > static inline
-> > int sed_read_key(char *keyname, char *key, u_int *keylen) {
-> >   return -EOPNOTSUPP;
-> > }
-> > static inline
-> > int sed_write_key(char *keyname, char *key, u_int keylen);
-> >   return -EOPNOTSUPP;
-> > }
-> > #endif
->
-> This change will certainly work for pseries. The intent of the weak
-> functions was to allow a different unknown permanent keystore to be the
-> source for seeding SED Opal keys. It also kept platform specific code
-> out of the block directory.
->
-> I'm happy to switch to the approach above, if losing those two goals
-> isn't a concern.
+On 9/27/23 12:14, Martin K. Petersen wrote:
+> I don't have any particular problems with your implementation, 
+> although I'm still trying to wrap my head around how to make this 
+> coexist with my I/O hinting series. But I guess there's probably not
+> going to be a big overlap between devices that support both 
+> features.
 
-Assuming those would have mutually exclusive KConfigs, then the
-pattern I describe would be preferred.
+Hi Martin,
 
->
-> >
-> > > Is there any real reason to have a separate translation unit for
-> > > these
-> > > two functions versus just having them living in sed-opal.c? Those
-> > > two
-> > > object files share the same Kconfig dependency. I am happy to send
-> > > a
-> > > patch if that is an acceptable approach.
-> > >
-> > > [1]: https://github.com/ClangBuiltLinux/linux/issues/981
-> > >
-> > > Cheers,
-> > > Nathan
-> > >
-> >
-> >
->
+This patch series should make it easier to implement I/O hint support
+since some of the code added by this patch series is also needed to
+implement I/O hint support.
 
+> However, it still pains me greatly to see the SBC proposal being 
+> intertwined with the travesty that is streams. Why not define 
+> everything in the IO advice hints group descriptor? I/O hints already
+> use GROUP NUMBER as an index. Why not just define a few permanent
+> hint descriptors? What's the point of the additional level of
+> indirection to tie this new feature into streams? RSCS basically says
+> "ignore the streams-specific bits and bobs and do this other stuff
+> instead". What does the streams infrastructure provide that can't be
+> solved trivially in the IO advise mode page alone?
 
---=20
-Thanks,
-~Nick Desaulniers
+Hmm ... isn't that exactly what T10 did, define everything in the IO
+advice hints group descriptor by introducing the new ST_ENBLE bit in
+that descriptor?
+
+This patch series relies on the constrained streams mechanism. A
+constrained stream is permanently open. The new ST_ENBLE bit in the IO
+advice hints group descriptor indicates whether or not an IO advice
+hints group represents a permanent stream.
+
+The new ST_ENBLE bit in the IO advice hints group descriptor allows SCSI
+devices to interpret the index of the descriptor as a data lifetime.
+ From the approved T10 proposal:
+
+Table x1 – RELATIVE LIFETIME field
+..............................................
+Code        Relative lifetime
+..............................................
+00h         no relative lifetime is applicable
+01h         shortest relative lifetime
+02h         second shortest relative lifetime
+03h to 3Dh  intermediate relative lifetimes
+3Eh         second longest relative lifetime
+3Fh         longest relative lifetime
+..............................................
+
+> For existing UFS devices which predate RSCS and streams but which 
+> support getting data temperature from GROUP NUMBER, what is the 
+> mechanism for detecting and enabling the feature?
+
+We plan to ask UFS device vendors to modify the UFS device firmware and
+to add support for the VPD and mode pages this patch series relies on.
+My understanding is that this can be done easily in UFS device firmware.
+
+Although it is technically possible to update the firmware of UFS
+devices in smartphones, most smartphones do not support this because
+this is considered risky. Hence, only new smartphones will benefit from
+this patch series.
+
+I do not want to add support in the Linux kernel for how conventional
+UFS devices use the GROUP NUMBER field today. Conventional UFS devices
+interpret the GROUP NUMBER field as a "ContextID". The ContextID
+mechanism has a state, just like the SCSI stream mechanism. UFS contexts
+need to be opened explicitly and are closed upon reset. From the UFS 4.0
+specification: "No ContextID shall be open after power cycle."
+
+Please let me know if you need more information.
+
+Bart.
