@@ -2,204 +2,184 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFAFCE7B12
-	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 09:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D768FCE7B10
+	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 09:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231817AbjI1Jjn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Sep 2023 05:39:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57070 "EHLO
+        id S231752AbjI1JlM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Sep 2023 05:41:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231909AbjI1JjV (ORCPT
+        with ESMTP id S231853AbjI1JlA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2023 05:39:21 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB1871B6
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 02:39:02 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-32336a30d18so4738219f8f.2
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 02:39:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1695893941; x=1696498741; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DjqSRzwtcmbZCSdKBG680ING+E16TFEDXl3yu9hsx/4=;
-        b=C8M0DdeXPslPvE2nDGk1T6oVddJq0OD10kcrqDGNu7AEzn3VKwgw/N2JL8t2Oazj60
-         DYz0MAh1+2PoNkVNK3IuowcCZ3+nAUi9jvLlVQM0r7zsOb5CqxRcaJTjKYEADq37DNeS
-         lf0ly9rWlXyHxvqRiUuVAW0mPvwoRLSqc6nuYDYk8qBPBqWDTVft0e2Xsz0+1K1MllFq
-         8wtJlqyoC6+mcjhHiKx7Dc4DDEsTMPdMgxR/nEmVEzO+LCpOtCWFkx84vtgnHBlSHV+x
-         w9lGMMf57GBh5lVof3OxqQqyQJQqERyhZxelnkSB/HZWZcnGSzCizQABp/wjTVrVdh6G
-         nsKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695893941; x=1696498741;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DjqSRzwtcmbZCSdKBG680ING+E16TFEDXl3yu9hsx/4=;
-        b=RV2OOapJeKoYGA7OXeznn4HThpR849iSdIK0zhOyyE28pA/GaPHzBUxLdvoLIoCxrh
-         8I0/prrCVi7CEjnDzMOD3k8Dbi92KB85GnhP2vx+aH/gFqs0yGyvWDlgw0xJWwJTUZ26
-         Exd3vb/9pNDiWis5pYiWxRmspDgEdQboNojlkI4J43jIhWZov2z3vrvpBoqG+cx7ucpY
-         KzRqoD88BavmDquu2+kSBimLnHO3FmxsQASpuoMGrgVyxt1uH3mE5/rmh1eScYvMF7U9
-         bvYyH2/vZGNVALsmaU4ScHdEe1mlNjFCTd/qjcN/SPmWlQMVw7LPm1WKcjzUQQHGrIN1
-         x76Q==
-X-Gm-Message-State: AOJu0YwfKOARbZtOKnoZYsiDNZinSKg3wG+8Ki0XNuSjiXA7R2pxzzaI
-        5idFpmkfCpo6IpK0OoLYvfL+2Q==
-X-Google-Smtp-Source: AGHT+IGdEtds9yfynzz07vsuk4Ka5Y1yzotz4oFQqFgtVM7Pp6z4PO00hby8WHdz4jdco6WcaLK5Aw==
-X-Received: by 2002:adf:dc90:0:b0:319:7134:a3cf with SMTP id r16-20020adfdc90000000b003197134a3cfmr617107wrj.31.1695893941024;
-        Thu, 28 Sep 2023 02:39:01 -0700 (PDT)
-Received: from localhost.localdomain (213-225-13-130.nat.highway.a1.net. [213.225.13.130])
-        by smtp.gmail.com with ESMTPSA id f4-20020a5d50c4000000b0031fa870d4b3sm18931449wrt.60.2023.09.28.02.38.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 02:39:00 -0700 (PDT)
-From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars@linbit.com>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Joel Colledge <joel.colledge@linbit.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-Subject: [PATCH 2/5] drbd: Add new per-resource "worker" thread
-Date:   Thu, 28 Sep 2023 11:38:49 +0200
-Message-ID: <20230928093852.676786-3-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230928093852.676786-1-christoph.boehmwalder@linbit.com>
-References: <20230928093852.676786-1-christoph.boehmwalder@linbit.com>
+        Thu, 28 Sep 2023 05:41:00 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE61C1722;
+        Thu, 28 Sep 2023 02:40:47 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Rx7ky5G7Wz4f3nTP;
+        Thu, 28 Sep 2023 17:40:42 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgB3BdUbShVlGaViBg--.11343S3;
+        Thu, 28 Sep 2023 17:40:44 +0800 (CST)
+Subject: Re: [PATCH] nbd: pass nbd_sock to nbd_read_reply() instead of index
+To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linan666@huaweicloud.com, josef@toxicpanda.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, linan122@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230911023308.3467802-1-linan666@huaweicloud.com>
+ <ZRT7cVFcE6QMHfie@fedora>
+ <47669fb6-3700-e327-11af-93a92b0984a0@huaweicloud.com>
+ <ZRUt/vAQNGNp6Ugx@fedora>
+ <41161d21-299c-3657-6020-0a3a9cf109ec@huaweicloud.com>
+ <ZRU/7Bx1ZJSX3Qg3@fedora>
+ <60f9a88b-b750-3579-bdfd-5421f2040406@huaweicloud.com>
+ <ZRVGWkCzKAVVL9bV@fedora>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <bbadaad4-172e-af7b-2a47-52f7e7c83423@huaweicloud.com>
+Date:   Thu, 28 Sep 2023 17:40:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <ZRVGWkCzKAVVL9bV@fedora>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgB3BdUbShVlGaViBg--.11343S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxZr1UXr1UZF4DuFyrKrW7urg_yoWrJF43pF
+        4UJF1UCr4UJr1aywsYqw4xWr1Yqw17Kw13Ww1UG347Aryqvr13Ar47GFyF9F9rtr1UXr1j
+        qr4UWFy3A348Jr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9I14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
+        Zr1UMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJb
+        IYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Out-of-tree fixes folded in:
-- drbd: allow to dequeue batches of work at a time (partial backport)
-- drbd: Keep "worker" alive while resource exists
-- Flush the work queue before stopping the worker thread
+Hi,
 
-Originally-from: Andreas Gruenbacher <agruen@linbit.com>
-Reviewed-by: Joel Colledge <joel.colledge@linbit.com>
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
----
- drivers/block/drbd/drbd_int.h    |  4 +++
- drivers/block/drbd/drbd_main.c   |  5 ++++
- drivers/block/drbd/drbd_nl.c     |  2 +-
- drivers/block/drbd/drbd_sender.c | 46 ++++++++++++++++++++++++++++++++
- 4 files changed, 56 insertions(+), 1 deletion(-)
+在 2023/09/28 17:24, Ming Lei 写道:
+> On Thu, Sep 28, 2023 at 05:06:40PM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2023/09/28 16:57, Ming Lei 写道:
+>>> On Thu, Sep 28, 2023 at 04:55:03PM +0800, Yu Kuai wrote:
+>>>> Hi,
+>>>>
+>>>> 在 2023/09/28 15:40, Ming Lei 写道:
+>>>>> On Thu, Sep 28, 2023 at 02:03:28PM +0800, Yu Kuai wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> 在 2023/09/28 12:05, Ming Lei 写道:
+>>>>>>> On Mon, Sep 11, 2023 at 10:33:08AM +0800, linan666@huaweicloud.com wrote:
+>>>>>>>> From: Li Nan <linan122@huawei.com>
+>>>>>>>>
+>>>>>>>> If a socket is processing ioctl 'NBD_SET_SOCK', config->socks might be
+>>>>>>>> krealloc in nbd_add_socket(), and a garbage request is received now, a UAF
+>>>>>>>> may occurs.
+>>>>>>>>
+>>>>>>>>       T1
+>>>>>>>>       nbd_ioctl
+>>>>>>>>        __nbd_ioctl
+>>>>>>>>         nbd_add_socket
+>>>>>>>>          blk_mq_freeze_queue
+>>>>>>>> 				T2
+>>>>>>>>       				recv_work
+>>>>>>>>       				 nbd_read_reply
+>>>>>>>>       				  sock_xmit
+>>>>>>>>          krealloc config->socks
+>>>>>>>> 				   def config->socks
+>>>>>>>>
+>>>>>>>> Pass nbd_sock to nbd_read_reply(). And introduce a new function
+>>>>>>>> sock_xmit_recv(), which differs from sock_xmit only in the way it get
+>>>>>>>> socket.
+>>>>>>>>
+>>>>>>>
+>>>>>>> I am wondering why not grab queue usage counter before calling nbd_read_reply()
+>>>>>>> for avoiding such issue, something like the following change:
+>>>>>>>
+>>>>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>>>>>> index df1cd0f718b8..09215b605b12 100644
+>>>>>>> --- a/drivers/block/nbd.c
+>>>>>>> +++ b/drivers/block/nbd.c
+>>>>>>> @@ -837,9 +837,6 @@ static void recv_work(struct work_struct *work)
+>>>>>>>      	while (1) {
+>>>>>>>      		struct nbd_reply reply;
+>>>>>>> -		if (nbd_read_reply(nbd, args->index, &reply))
+>>>>>>> -			break;
+>>>>>>> -
+>>>>>>>      		/*
+>>>>>>>      		 * Grab .q_usage_counter so request pool won't go away, then no
+>>>>>>>      		 * request use-after-free is possible during nbd_handle_reply().
+>>>>>>> @@ -852,6 +849,9 @@ static void recv_work(struct work_struct *work)
+>>>>>>>      			break;
+>>>>>>>      		}
+>>>>>>
+>>>>>> This break how nbd works, if there is no reply yet, recv_work() will
+>>>>>> wait for reply in:
+>>>>>>
+>>>>>> nbd_read_reply
+>>>>>>     sock_xmit
+>>>>>>      sock_recvmsg
+>>>>>>
+>>>>>> After this change, recv_work() will just return if there is no io.
+>>>>>
+>>>>> OK, got it, thanks for the input.
+>>>>>
+>>>>> But I feel it isn't necessary & fragile to store one extra reference of nsock in
+>>>>> `recv_thread_args`.
+>>>>>
+>>>>> Just run a quick look, the only potential UAF on config->socks should be recv_work(),
+>>>>> so you can retrieve the `nsock` reference at the entry of recv_work(),
+>>>>
+>>>> I don't understand what you mean retrieve the 'nsock', is following what
+>>>> you expected?
+>>>>
+>>>> blk_queue_enter() -> prevent concurrent with nbd_add_socket
+>>>> nsock = config->socks[args->index]
+>>>> blk_queue_exit()
+>>>
+>>> Yeah, turns out you do understand, :-)
+>>
+>> Ok, I was not sure about this blk_queue_enter(). By the way, this
+> 
+> blk_queue_enter() isn't exported, but you can grab ->config_lock
+> for getting the `nsock`.
+> 
+>> remind me of what you did to fix uaf of access queue->mq_hctx[] by
+>> convert the array to xarray.
+>>
+>>
+>> Maybe it's better to covert config->socks[] to xarray to fix this uaf as
+>> well?
+> 
+> ->socks[idx] is needed in nbd fast path, so xarray may not be one good idea
+> since xarray_load() introduces extra load, especially ->socks[] uaf
+> should exist in recv_work() very likely. For other cases, the active
+> block request holds queue usage counter.
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index a53e63af23f1..fe7e93a4dfa6 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -603,6 +603,9 @@ struct drbd_resource {
- 	enum write_ordering_e write_ordering;
- 
- 	cpumask_var_t cpu_mask;
-+
-+	struct drbd_work_queue work;
-+	struct drbd_thread worker;
- };
- 
- struct drbd_thread_timing_details
-@@ -1428,6 +1431,7 @@ extern void drbd_md_endio(struct bio *bio);
- extern void drbd_peer_request_endio(struct bio *bio);
- extern void drbd_request_endio(struct bio *bio);
- extern int drbd_sender(struct drbd_thread *thi);
-+extern int drbd_worker(struct drbd_thread *thi);
- enum drbd_ret_code drbd_resync_after_valid(struct drbd_device *device, int o_minor);
- void drbd_resync_after_changed(struct drbd_device *device);
- extern void drbd_start_resync(struct drbd_device *device, enum drbd_conns side);
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index a14c1e9ee327..bb5de1e1ca9f 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -2329,6 +2329,8 @@ void drbd_free_resource(struct drbd_resource *resource)
- {
- 	struct drbd_connection *connection, *tmp;
- 
-+	drbd_flush_workqueue(&resource->work);
-+	drbd_thread_stop(&resource->worker);
- 	for_each_connection_safe(connection, tmp, resource) {
- 		list_del(&connection->connections);
- 		drbd_debugfs_connection_cleanup(connection);
-@@ -2564,6 +2566,9 @@ struct drbd_resource *drbd_create_resource(const char *name)
- 	mutex_init(&resource->conf_update);
- 	mutex_init(&resource->adm_mutex);
- 	spin_lock_init(&resource->req_lock);
-+	drbd_init_workqueue(&resource->work);
-+	drbd_thread_init(resource, &resource->worker, drbd_worker, "worker");
-+	drbd_thread_start(&resource->worker);
- 	drbd_debugfs_resource_add(resource);
- 	return resource;
- 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index a5844819d1c3..9d9ced46f968 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -1900,7 +1900,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
- 	 */
- 	wait_event(device->misc_wait, !atomic_read(&device->ap_pending_cnt) || drbd_suspended(device));
- 	/* and for any other previously queued work */
--	drbd_flush_workqueue(&connection->sender_work);
-+	drbd_flush_workqueue(&device->resource->work);
- 
- 	rv = _drbd_request_state(device, NS(disk, D_ATTACHING), CS_VERBOSE);
- 	retcode = (enum drbd_ret_code)rv;
-diff --git a/drivers/block/drbd/drbd_sender.c b/drivers/block/drbd/drbd_sender.c
-index fcc8a43efdca..0c482d45a52a 100644
---- a/drivers/block/drbd/drbd_sender.c
-+++ b/drivers/block/drbd/drbd_sender.c
-@@ -2239,3 +2239,49 @@ int drbd_sender(struct drbd_thread *thi)
- 
- 	return 0;
- }
-+
-+int drbd_worker(struct drbd_thread *thi)
-+{
-+	LIST_HEAD(work_list);
-+	struct drbd_resource *resource = thi->resource;
-+	struct drbd_work *w;
-+
-+	while (get_t_state(thi) == RUNNING) {
-+		drbd_thread_current_set_cpu(thi);
-+
-+		if (list_empty(&work_list)) {
-+			wait_event_interruptible(resource->work.q_wait,
-+				dequeue_work_batch(&resource->work, &work_list));
-+		}
-+
-+		if (signal_pending(current)) {
-+			flush_signals(current);
-+			if (get_t_state(thi) == RUNNING) {
-+				drbd_warn(resource, "Worker got an unexpected signal\n");
-+				continue;
-+			}
-+			break;
-+		}
-+
-+		if (get_t_state(thi) != RUNNING)
-+			break;
-+
-+
-+		while (!list_empty(&work_list)) {
-+			w = list_first_entry(&work_list, struct drbd_work, list);
-+			list_del_init(&w->list);
-+			w->cb(w, 0);
-+		}
-+	}
-+
-+	do {
-+		while (!list_empty(&work_list)) {
-+			w = list_first_entry(&work_list, struct drbd_work, list);
-+			list_del_init(&w->list);
-+			w->cb(w, 1);
-+		}
-+		dequeue_work_batch(&resource->work, &work_list);
-+	} while (!list_empty(&work_list));
-+
-+	return 0;
-+}
--- 
-2.41.0
+Thanks for the explanation, grab 'config_lock' to get 'nsock' in the
+begining sounds good to me.
+
+Kuai
+
+> 
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
 
