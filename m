@@ -2,139 +2,203 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 253E5CE7AF8
-	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 06:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB7ACE7AFF
+	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 06:28:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230220AbjI1GH3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Sep 2023 02:07:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55918 "EHLO
+        id S230284AbjI1G2Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Sep 2023 02:28:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229758AbjI1GH2 (ORCPT
+        with ESMTP id S229445AbjI1G2X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2023 02:07:28 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36E8A99;
-        Wed, 27 Sep 2023 23:07:27 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Rx30l4rw6z4f3jMv;
-        Thu, 28 Sep 2023 14:07:19 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgB3Dt4bGBVlViRWBg--.10756S3;
-        Thu, 28 Sep 2023 14:07:24 +0800 (CST)
-Subject: Re: [PATCH -next 3/3] nbd: fix null-ptr-dereference while accessing
- 'nbd->config'
-To:     Zhong Jinghua <zhongjinghua@huaweicloud.com>, josef@toxicpanda.com,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230707031536.666482-1-zhongjinghua@huaweicloud.com>
- <20230707031536.666482-4-zhongjinghua@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <1a59b683-38e0-82ee-6122-4bd1613a2269@huaweicloud.com>
-Date:   Thu, 28 Sep 2023 14:07:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 28 Sep 2023 02:28:23 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22B3699
+        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2023 23:28:21 -0700 (PDT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230928062818epoutp01fe80af4250f5bdd477c7af9ef6585b7d~I-CWyEr3z2333323333epoutp016
+        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 06:28:18 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230928062818epoutp01fe80af4250f5bdd477c7af9ef6585b7d~I-CWyEr3z2333323333epoutp016
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1695882498;
+        bh=np1wCyyTF5m5+8Zyeo7ik3GwizYUYFnqjB6m0xeAUEM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ZXkkvTIfdZcMqm4jDpwndmwXbzyT1Ux+/7YkAcdXFqB7DbjlNSYaaOxBEaBb33Ihc
+         mULP990slGl+R/oDZQmbztFORJnAvTP/kDzRucxJH/pFt4lu6ioIHOPX3tb4AE2vxs
+         qTMEtk5N9zQp1WRJ76bZ517SuyAcVOLQZmaTipFA=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20230928062818epcas5p48c9e782c3fec36d361d952bece68fd60~I-CWhkY6g1625216252epcas5p4D;
+        Thu, 28 Sep 2023 06:28:18 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.176]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4Rx3Sw2x2Pz4x9Pr; Thu, 28 Sep
+        2023 06:28:16 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        2E.B0.09638.00D15156; Thu, 28 Sep 2023 15:28:16 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230928061733epcas5p1837b43637213341fb9674e99efa62a94~I_4_F9kju1720117201epcas5p1u;
+        Thu, 28 Sep 2023 06:17:33 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230928061733epsmtrp26779921415ce6637ee9ce1aef8af9dc4~I_4_FX2QK0908609086epsmtrp2K;
+        Thu, 28 Sep 2023 06:17:33 +0000 (GMT)
+X-AuditID: b6c32a4a-92df9700000025a6-64-65151d00ad88
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4E.C1.08788.D7A15156; Thu, 28 Sep 2023 15:17:33 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230928061732epsmtip26264bd26e97aba7d1dddecc5fc551468~I_49PwP5p0377403774epsmtip2y;
+        Thu, 28 Sep 2023 06:17:32 +0000 (GMT)
+Date:   Thu, 28 Sep 2023 11:41:25 +0530
+From:   Anuj Gupta <anuj20.g@samsung.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@suse.de>
+Subject: Re: [PATCH V4 1/2] io_uring: retain top 8bits of uring_cmd flags
+ for kernel internal use
+Message-ID: <20230928061125.hm2dxmms7db2xk5x@green245>
 MIME-Version: 1.0
-In-Reply-To: <20230707031536.666482-4-zhongjinghua@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgB3Dt4bGBVlViRWBg--.10756S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFWxWryxKry3Cr47Kr4DArb_yoW8KFW8pF
-        4UAF47C34UGFW3GFWDC34xWry5Jwn2yryxGry7G3s5Zr97CrySkr1kK343WF1UAr9xJF45
-        JFWrWas2ka48GrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1YFAJUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+In-Reply-To: <20230923025006.2830689-2-ming.lei@redhat.com>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupik+LIzCtJLcpLzFFi42LZdlhTXZdBVjTV4NIPQYvVd/vZLN61nmOx
+        2H5mKbPF3lvaFocmNzM5sHpcPlvq8X7fVTaPzaerPT5vkgtgicq2yUhNTEktUkjNS85PycxL
+        t1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAFaqqRQlphTChQKSCwuVtK3synKLy1J
+        VcjILy6xVUotSMkpMCnQK07MLS7NS9fLSy2xMjQwMDIFKkzIzli47BhzwSexinMH7zM3MK4U
+        7mLk5JAQMJH4vPcZSxcjF4eQwG5GiYVX1rFDOJ8YJQ7828cIUiUk8I1RovOWGEzHiktHoDr2
+        AsUPPGaGKHrGKPFxCVgDi4CqxNZFC9hBbDYBdYkjz1vB4iICShJ3764G28As0MIocWHtKbCE
+        sECyxO/9EM28AmYS//+cYYewBSVOznzCAmJzClhLHNh8EiwuKiAjMWPpV2aQQRICt9gljn78
+        xwpxnovEm0MnmSBsYYlXx7ewQ9hSEp/f7WWDsNMlflx+ClVTINF8DOJNCQF7idZT/WDfMAtk
+        SBz51ApVLysx9dQ6Jog4n0Tv7ydQvbwSO+bB2EoS7SvnQNkSEnvPNUDZHhKth2czQYJrP6PE
+        7OdbWCYwys9C8twsJPsgbCuJzg9NrLMYOYBsaYnl/zggTE2J9bv0FzCyrmKUTC0ozk1PLTYt
+        MMpLLYfHeHJ+7iZGcKLU8trB+PDBB71DjEwcjIcYJTiYlUR4H94WShXiTUmsrEotyo8vKs1J
+        LT7EaAqMrYnMUqLJ+cBUnVcSb2hiaWBiZmZmYmlsZqgkzvu6dW6KkEB6YklqdmpqQWoRTB8T
+        B6dUA9OsLd3TdjX36ZoLphz7yV5QPv/ZI489515s7Cz359D6cfbN68BfFVO1xOTcqn6tu3ll
+        0lE5fq/Hs8tV1ZxlGedszjIp+1aXs9j9xgT1uP9OK1V3vZ+zYt8J3blmXVcrPkQY+a+6sV/n
+        /utjt9lf67LL8tk0hTu8XeLQyaE5mfVj0Ber4ODbnyY8XlQnXh0hGSxzOdHq0abK+c3//LnE
+        xSv7En9ncL2z13c7NONzZOcOcYMZjRPnpP6KeXaAv6RFzsFN8rjDltvrQ8tcuTd232PlfvBt
+        sXKmsGZ64OUqlcqg5hkF89OU2eUcPP4smnTUqahV8Hxd2ZPjEedrZEz5GdTm2AlNvt4Rcv6d
+        7xYeTiWW4oxEQy3mouJEAJ26aUgdBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJLMWRmVeSWpSXmKPExsWy7bCSvG6tlGiqwfH1Mhar7/azWbxrPcdi
+        sf3MUmaLvbe0LQ5NbmZyYPW4fLbU4/2+q2wem09Xe3zeJBfAEsVlk5Kak1mWWqRvl8CV0dIX
+        WrBEpGLG3ZQGxq8CXYycHBICJhIrLh1hAbGFBHYzSqw9oQMRl5A49XIZI4QtLLHy33P2LkYu
+        oJonjBKvly1gBkmwCKhKbF20gB3EZhNQlzjyvBWsQURASeLu3dVgDcwCbYwS3372gzUICyRL
+        /Pg2BWwbr4CZxP8/Z9ghNmdL9C49wAQRF5Q4OfMJWA0zUM28zQ+BejmAbGmJ5f84QMKcAtYS
+        BzafBGsVFZCRmLH0K/MERsFZSLpnIemehdC9gJF5FaNkakFxbnpusWGBUV5quV5xYm5xaV66
+        XnJ+7iZGcGhrae1g3LPqg94hRiYOxkOMEhzMSiK8D28LpQrxpiRWVqUW5ccXleakFh9ilOZg
+        URLn/fa6N0VIID2xJDU7NbUgtQgmy8TBKdXApC2kPuv1tPkqa1SVz7jeSP6xP/JvjdJV5WKj
+        K9u7d6614ONXNTdN4P8s1/Rg3be1RbP8WnKFm2OqUtUfuNprbqnrDXkv2yeV+8+H4QmP+OwX
+        Z6QLbKZ4Fp9VPBp/qapzfZ7jmzqe7Osrttwvdt/mtYPZKzy3JeeeFeeLzCLmTd95WxUfX7s7
+        7/RCP0nxqs+aiRfdKt1sjvypXLXc/VmNWuss1ySBE7vu6/HbnHsgLXl6U1C6wGX9kF5Pk7cC
+        F/387a7GbdqTGLrscZjXxgPqEd/al/85LnV4k2psfcfdsMUzv/8IWzM7SFhzYnehisnlBxr+
+        Dyz7upWOvNzyQp79dYGggY1s6wur+QcvbfqvxFKckWioxVxUnAgAgVtaUNwCAAA=
+X-CMS-MailID: 20230928061733epcas5p1837b43637213341fb9674e99efa62a94
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----IKYw8rt4xsi0beZH_Imxy96mvZbFJ64oQ.XZqp2ZTk-1zWLz=_2a65e_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
 X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230928061733epcas5p1837b43637213341fb9674e99efa62a94
+References: <20230923025006.2830689-1-ming.lei@redhat.com>
+        <20230923025006.2830689-2-ming.lei@redhat.com>
+        <CGME20230928061733epcas5p1837b43637213341fb9674e99efa62a94@epcas5p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2023/07/07 11:15, Zhong Jinghua Ð´µÀ:
-> From: Zhong Jinghua <zhongjinghua@huawei.com>
-> 
-> nbd->config = config and refcount_set(&nbd->config_refs, 1) in
-> nbd_genl_connect may be out of order, causing config_refs to be set to 1
-> first, and then nbd_open accessing nbd->config reports a null pointer
-> reference.
->     T1                      T2
-> vfs_open
->    do_dentry_open
->      blkdev_open
->        blkdev_get
->          __blkdev_get
->            nbd_open
->             nbd_get_config_unlocked
->                          genl_rcv_msg
->                            genl_family_rcv_msg
->                              genl_family_rcv_msg_doit
->                                nbd_genl_connect
->                                  nbd_alloc_and_init_config
->                                    // out of order execution
->                                    refcount_set(&nbd->config_refs, 1); // 2
->               nbd->config
->               // null point
->                                    nbd->config = config; // 1
-> 
-> Fix it by adding a cpu memory barrier to guarantee sequential execution.
-> 
-LGTM
+------IKYw8rt4xsi0beZH_Imxy96mvZbFJ64oQ.XZqp2ZTk-1zWLz=_2a65e_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+On 23/09/23 10:50AM, Ming Lei wrote:
+>Retain top 8bits of uring_cmd flags for kernel internal use, so that we
+>can move IORING_URING_CMD_POLLED out of uapi header.
+>
 
-> Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
-> ---
->   drivers/block/nbd.c | 18 +++++++++++++++++-
->   1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 7186a9a49445..c410cf29fb0c 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -395,8 +395,16 @@ static u32 req_to_nbd_cmd_type(struct request *req)
->   
->   static struct nbd_config *nbd_get_config_unlocked(struct nbd_device *nbd)
->   {
-> -	if (refcount_inc_not_zero(&nbd->config_refs))
-> +	if (refcount_inc_not_zero(&nbd->config_refs)) {
-> +		/*
-> +		 * Add smp_mb__after_atomic to ensure that reading nbd->config_refs
-> +		 * and reading nbd->config is ordered. The pair is the barrier in
-> +		 * nbd_alloc_and_init_config(), avoid nbd->config_refs is set
-> +		 * before nbd->config.
-> +		 */
-> +		smp_mb__after_atomic();
->   		return nbd->config;
-> +	}
->   
->   	return NULL;
->   }
-> @@ -1555,7 +1563,15 @@ static int nbd_alloc_and_init_config(struct nbd_device *nbd)
->   	init_waitqueue_head(&config->conn_wait);
->   	config->blksize_bits = NBD_DEF_BLKSIZE_BITS;
->   	atomic_set(&config->live_connections, 0);
-> +
->   	nbd->config = config;
-> +	/*
-> +	 * Order refcount_set(&nbd->config_refs, 1) and nbd->config assignment,
-> +	 * its pair is the barrier in nbd_get_config_unlocked().
-> +	 * So nbd_get_config_unlocked() won't see nbd->config as null after
-> +	 * refcount_inc_not_zero() succeed.
-> +	 */
-> +	smp_mb__before_atomic();
->   	refcount_set(&nbd->config_refs, 1);
->   
->   	return 0;
-> 
+Looks good.
 
+Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+
+>Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>---
+> include/linux/io_uring.h      | 3 +++
+> include/uapi/linux/io_uring.h | 5 ++---
+> io_uring/io_uring.c           | 3 +++
+> io_uring/uring_cmd.c          | 2 +-
+> 4 files changed, 9 insertions(+), 4 deletions(-)
+>
+>diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+>index 106cdc55ff3b..ae08d6f66e62 100644
+>--- a/include/linux/io_uring.h
+>+++ b/include/linux/io_uring.h
+>@@ -22,6 +22,9 @@ enum io_uring_cmd_flags {
+> 	IO_URING_F_IOPOLL		= (1 << 10),
+> };
+>
+>+/* only top 8 bits of sqe->uring_cmd_flags for kernel internal use */
+>+#define IORING_URING_CMD_POLLED		(1U << 31)
+>+
+> struct io_uring_cmd {
+> 	struct file	*file;
+> 	const struct io_uring_sqe *sqe;
+>diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+>index 8e61f8b7c2ce..de77ad08b123 100644
+>--- a/include/uapi/linux/io_uring.h
+>+++ b/include/uapi/linux/io_uring.h
+>@@ -246,13 +246,12 @@ enum io_uring_op {
+> };
+>
+> /*
+>- * sqe->uring_cmd_flags
+>+ * sqe->uring_cmd_flags		top 8bits aren't available for userspace
+>  * IORING_URING_CMD_FIXED	use registered buffer; pass this flag
+>  *				along with setting sqe->buf_index.
+>- * IORING_URING_CMD_POLLED	driver use only
+>  */
+> #define IORING_URING_CMD_FIXED	(1U << 0)
+>-#define IORING_URING_CMD_POLLED	(1U << 31)
+>+#define IORING_URING_CMD_MASK	IORING_URING_CMD_FIXED
+>
+>
+> /*
+>diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+>index 783ed0fff71b..9aedb7202403 100644
+>--- a/io_uring/io_uring.c
+>+++ b/io_uring/io_uring.c
+>@@ -4666,6 +4666,9 @@ static int __init io_uring_init(void)
+>
+> 	BUILD_BUG_ON(sizeof(atomic_t) != sizeof(u32));
+>
+>+	/* top 8bits are for internal use */
+>+	BUILD_BUG_ON((IORING_URING_CMD_MASK & 0xff000000) != 0);
+>+
+> 	io_uring_optable_init();
+>
+> 	/*
+>diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+>index 537795fddc87..a0b0ec5473bf 100644
+>--- a/io_uring/uring_cmd.c
+>+++ b/io_uring/uring_cmd.c
+>@@ -91,7 +91,7 @@ int io_uring_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+> 		return -EINVAL;
+>
+> 	ioucmd->flags = READ_ONCE(sqe->uring_cmd_flags);
+>-	if (ioucmd->flags & ~IORING_URING_CMD_FIXED)
+>+	if (ioucmd->flags & ~IORING_URING_CMD_MASK)
+> 		return -EINVAL;
+>
+> 	if (ioucmd->flags & IORING_URING_CMD_FIXED) {
+>-- 
+>2.41.0
+>
+
+------IKYw8rt4xsi0beZH_Imxy96mvZbFJ64oQ.XZqp2ZTk-1zWLz=_2a65e_
+Content-Type: text/plain; charset="utf-8"
+
+
+------IKYw8rt4xsi0beZH_Imxy96mvZbFJ64oQ.XZqp2ZTk-1zWLz=_2a65e_--
