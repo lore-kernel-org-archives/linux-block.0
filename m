@@ -2,132 +2,155 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62415CE7B0C
-	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 08:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98290CE7B0C
+	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 08:55:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230258AbjI1Iik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Sep 2023 04:38:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46254 "EHLO
+        id S231397AbjI1IzM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Sep 2023 04:55:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbjI1Iii (ORCPT
+        with ESMTP id S231343AbjI1IzK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2023 04:38:38 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F4EB7
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 01:38:36 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-523029050d0so2876902a12.0
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 01:38:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695890314; x=1696495114; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wuYxot8Q91wdZ8ud9VYjbykM6rJR3TDzyBn5TR9Ntpk=;
-        b=WkQrBe9fCwE32iO+/k4MhqCMkiOXBVM+LYFQ6RFNw4YgZkhlW4nYWj4Ir0zp58ArSl
-         aaMyr3gYtKNOYZcIvjr8xfunsGUom8bMwcW1iTkJvFy5HzLoT+aqUaczm6XLkQzIcF4k
-         LgUmBaDDEtkL78zzHHgdpLF6tZoLf1aiQR47cKZJRPt+7n9L8/yNugU6EChvgZf4+h0d
-         jEFfQpvC9x/fFCeDVhojhVpt4xcUPmi4r5r4zL0rHSVZntwy+AEAniKYsmhYp19oT6ot
-         DLUwP7emL/IC3Vj7kNZORzqEVVgT5gA3Ur8hgN0eBFP8L5iffAhChh6oc1RiKhcKYw2A
-         SKZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695890314; x=1696495114;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wuYxot8Q91wdZ8ud9VYjbykM6rJR3TDzyBn5TR9Ntpk=;
-        b=hlddy2uyqCzMFs5UuMAWlSZyfqbnKVIs41AvsPvYMkrUG+vgHj6VfleRKZbjnsWob7
-         +aXG2zti25woViV3UPdZvwDG7WK45m6COSF7MP8uU/XgIibynD+8GsZet9ffo7xJ606d
-         EKEUUEFaRajSy91x+gs+Dpq2rpHOsYLBE0S8cyutcbbfMjqaDPvXd+NE7WAhYOoZTsWL
-         D/bmzN/EJLc85gHhopbrw7qsBer65aBgoZva22sHTSUrWH9BYmlTFr7foMYWpDTQleL8
-         XWGbsQsajHhex5DAm7XcLXbgNzZYKQ/xtfaM+rwv0MEdNZ3WbvUvb2kh5MLGC1v9j/mM
-         3a6w==
-X-Gm-Message-State: AOJu0YzXPEUxt+gEvcp96sFOOdAf9UNCIuYnEE6wXoEfi6g9RE11zNpQ
-        sCdPdMIqOgPnyEL72GUfyK7n06aIpoaJOWBqHgUTf1g2
-X-Google-Smtp-Source: AGHT+IFU7Pu/SQr5RMBMykXCBrA3nYMjr/Id6q5BU6eCMZpnrzzT8v2mhrxgPMYMqhs1nYLMiqpyqw==
-X-Received: by 2002:a17:906:19b:b0:9ad:e1e2:3595 with SMTP id 27-20020a170906019b00b009ade1e23595mr585205ejb.7.1695890314316;
-        Thu, 28 Sep 2023 01:38:34 -0700 (PDT)
-Received: from [172.20.13.88] ([45.147.210.162])
-        by smtp.gmail.com with ESMTPSA id i13-20020a1709061ccd00b00989828a42e8sm10521652ejh.154.2023.09.28.01.38.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Sep 2023 01:38:33 -0700 (PDT)
-Message-ID: <c4598c93-fe5d-49d3-b737-e78b7abcea77@kernel.dk>
-Date:   Thu, 28 Sep 2023 02:38:32 -0600
+        Thu, 28 Sep 2023 04:55:10 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE853AC;
+        Thu, 28 Sep 2023 01:55:08 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Rx6kJ5PGTz4f3kkN;
+        Thu, 28 Sep 2023 16:55:04 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAnt9ZnPxVlpvdfBg--.53473S3;
+        Thu, 28 Sep 2023 16:55:05 +0800 (CST)
+Subject: Re: [PATCH] nbd: pass nbd_sock to nbd_read_reply() instead of index
+To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linan666@huaweicloud.com, josef@toxicpanda.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, linan122@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230911023308.3467802-1-linan666@huaweicloud.com>
+ <ZRT7cVFcE6QMHfie@fedora>
+ <47669fb6-3700-e327-11af-93a92b0984a0@huaweicloud.com>
+ <ZRUt/vAQNGNp6Ugx@fedora>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <41161d21-299c-3657-6020-0a3a9cf109ec@huaweicloud.com>
+Date:   Thu, 28 Sep 2023 16:55:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 2/2] io_uring: cancelable uring_cmd
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     Gabriel Krisman Bertazi <krisman@suse.de>
-References: <20230923025006.2830689-1-ming.lei@redhat.com>
- <20230923025006.2830689-3-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230923025006.2830689-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <ZRUt/vAQNGNp6Ugx@fedora>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAnt9ZnPxVlpvdfBg--.53473S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAFWUGw4xZF15tF4fCFW8tFb_yoW5Gr13pF
+        WFyF1xCF4UJFySvwsYqw47WryFq34xK3yfu3yrA342yr909FZakr4xtFyFgF90vr17Xw40
+        vr4YgFyfAa48JrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYx
+        BIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/22/23 8:50 PM, Ming Lei wrote:
-> diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-> index ae08d6f66e62..a0307289bdc7 100644
-> --- a/include/linux/io_uring.h
-> +++ b/include/linux/io_uring.h
-> @@ -20,9 +20,13 @@ enum io_uring_cmd_flags {
->  	IO_URING_F_SQE128		= (1 << 8),
->  	IO_URING_F_CQE32		= (1 << 9),
->  	IO_URING_F_IOPOLL		= (1 << 10),
-> +
-> +	/* set when uring wants to cancel one issued command */
-> +	IO_URING_F_CANCEL		= (1 << 11),
->  };
+Hi,
 
-I'd make that comment:
+在 2023/09/28 15:40, Ming Lei 写道:
+> On Thu, Sep 28, 2023 at 02:03:28PM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2023/09/28 12:05, Ming Lei 写道:
+>>> On Mon, Sep 11, 2023 at 10:33:08AM +0800, linan666@huaweicloud.com wrote:
+>>>> From: Li Nan <linan122@huawei.com>
+>>>>
+>>>> If a socket is processing ioctl 'NBD_SET_SOCK', config->socks might be
+>>>> krealloc in nbd_add_socket(), and a garbage request is received now, a UAF
+>>>> may occurs.
+>>>>
+>>>>     T1
+>>>>     nbd_ioctl
+>>>>      __nbd_ioctl
+>>>>       nbd_add_socket
+>>>>        blk_mq_freeze_queue
+>>>> 				T2
+>>>>     				recv_work
+>>>>     				 nbd_read_reply
+>>>>     				  sock_xmit
+>>>>        krealloc config->socks
+>>>> 				   def config->socks
+>>>>
+>>>> Pass nbd_sock to nbd_read_reply(). And introduce a new function
+>>>> sock_xmit_recv(), which differs from sock_xmit only in the way it get
+>>>> socket.
+>>>>
+>>>
+>>> I am wondering why not grab queue usage counter before calling nbd_read_reply()
+>>> for avoiding such issue, something like the following change:
+>>>
+>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>>> index df1cd0f718b8..09215b605b12 100644
+>>> --- a/drivers/block/nbd.c
+>>> +++ b/drivers/block/nbd.c
+>>> @@ -837,9 +837,6 @@ static void recv_work(struct work_struct *work)
+>>>    	while (1) {
+>>>    		struct nbd_reply reply;
+>>> -		if (nbd_read_reply(nbd, args->index, &reply))
+>>> -			break;
+>>> -
+>>>    		/*
+>>>    		 * Grab .q_usage_counter so request pool won't go away, then no
+>>>    		 * request use-after-free is possible during nbd_handle_reply().
+>>> @@ -852,6 +849,9 @@ static void recv_work(struct work_struct *work)
+>>>    			break;
+>>>    		}
+>>
+>> This break how nbd works, if there is no reply yet, recv_work() will
+>> wait for reply in:
+>>
+>> nbd_read_reply
+>>   sock_xmit
+>>    sock_recvmsg
+>>
+>> After this change, recv_work() will just return if there is no io.
+> 
+> OK, got it, thanks for the input.
+> 
+> But I feel it isn't necessary & fragile to store one extra reference of nsock in
+> `recv_thread_args`.
+> 
+> Just run a quick look, the only potential UAF on config->socks should be recv_work(),
+> so you can retrieve the `nsock` reference at the entry of recv_work(),
 
-/* set when uring wants to cancel a previously issued command */
+I don't understand what you mean retrieve the 'nsock', is following what
+you expected?
 
-> @@ -125,6 +132,15 @@ static inline int io_uring_cmd_sock(struct io_uring_cmd *cmd,
->  {
->  	return -EOPNOTSUPP;
->  }
-> +static inline int io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-> +		unsigned int issue_flags)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
+blk_queue_enter() -> prevent concurrent with nbd_add_socket
+nsock = config->socks[args->index]
+blk_queue_exit()
 
-Do we need this to return an error? Presumably this will never get
-called if IO_URING isn't defined, but if it does, it obviously doesn't
-need to do anything anyway. Seems like it should just be a void, and
-ditto for the enabled version which can't return an error anyway.
+while (1) {
+	...
+	// pass nsock to nbd_read_reply() and nbd_handle_reply()
+}
 
->  	return ret;
->  }
->  
-> +static bool io_uring_try_cancel_uring_cmd(struct io_ring_ctx *ctx,
-> +		struct task_struct *task, bool cancel_all)
-> +{
-> +	struct hlist_node *tmp;
-> +	struct io_kiocb *req;
-> +	bool ret = false;
-> +
-> +	lockdep_assert_held(&ctx->uring_lock);
-> +
-> +	hlist_for_each_entry_safe(req, tmp, &ctx->cancelable_uring_cmd,
-> +			hash_node) {
-> +		struct io_uring_cmd *cmd = io_kiocb_to_cmd(req,
-> +				struct io_uring_cmd);
-> +		struct file *file = req->file;
-> +
-> +		if (WARN_ON_ONCE(!file->f_op->uring_cmd))
-> +			continue;
-
-That check belongs in the function that marks it cancelable and adds it
-to the list.
-
-Outside of those minor nits, looks fine to me, and patch 1 does too.
-
--- 
-Jens Axboe
+> and just pass it(local variable) to nbd_read_reply() and nbd_handle_reply()
+> since `nsock` won't be freed.
+> 
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
 
