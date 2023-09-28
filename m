@@ -2,203 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB7ACE7AFF
-	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 06:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1728CE7B08
+	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 07:41:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230284AbjI1G2Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Sep 2023 02:28:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41518 "EHLO
+        id S230441AbjI1Hl6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Sep 2023 03:41:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjI1G2X (ORCPT
+        with ESMTP id S230497AbjI1Hl5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2023 02:28:23 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22B3699
-        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2023 23:28:21 -0700 (PDT)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230928062818epoutp01fe80af4250f5bdd477c7af9ef6585b7d~I-CWyEr3z2333323333epoutp016
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 06:28:18 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230928062818epoutp01fe80af4250f5bdd477c7af9ef6585b7d~I-CWyEr3z2333323333epoutp016
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1695882498;
-        bh=np1wCyyTF5m5+8Zyeo7ik3GwizYUYFnqjB6m0xeAUEM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ZXkkvTIfdZcMqm4jDpwndmwXbzyT1Ux+/7YkAcdXFqB7DbjlNSYaaOxBEaBb33Ihc
-         mULP990slGl+R/oDZQmbztFORJnAvTP/kDzRucxJH/pFt4lu6ioIHOPX3tb4AE2vxs
-         qTMEtk5N9zQp1WRJ76bZ517SuyAcVOLQZmaTipFA=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20230928062818epcas5p48c9e782c3fec36d361d952bece68fd60~I-CWhkY6g1625216252epcas5p4D;
-        Thu, 28 Sep 2023 06:28:18 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.176]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4Rx3Sw2x2Pz4x9Pr; Thu, 28 Sep
-        2023 06:28:16 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        2E.B0.09638.00D15156; Thu, 28 Sep 2023 15:28:16 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20230928061733epcas5p1837b43637213341fb9674e99efa62a94~I_4_F9kju1720117201epcas5p1u;
-        Thu, 28 Sep 2023 06:17:33 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230928061733epsmtrp26779921415ce6637ee9ce1aef8af9dc4~I_4_FX2QK0908609086epsmtrp2K;
-        Thu, 28 Sep 2023 06:17:33 +0000 (GMT)
-X-AuditID: b6c32a4a-92df9700000025a6-64-65151d00ad88
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4E.C1.08788.D7A15156; Thu, 28 Sep 2023 15:17:33 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230928061732epsmtip26264bd26e97aba7d1dddecc5fc551468~I_49PwP5p0377403774epsmtip2y;
-        Thu, 28 Sep 2023 06:17:32 +0000 (GMT)
-Date:   Thu, 28 Sep 2023 11:41:25 +0530
-From:   Anuj Gupta <anuj20.g@samsung.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@suse.de>
-Subject: Re: [PATCH V4 1/2] io_uring: retain top 8bits of uring_cmd flags
- for kernel internal use
-Message-ID: <20230928061125.hm2dxmms7db2xk5x@green245>
+        Thu, 28 Sep 2023 03:41:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0512B92
+        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 00:41:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695886869;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ik4NJ/TGlJZz+KHb//NIC0FfeN79I9S7Nn+XpOdL4hI=;
+        b=XMAOgoyj+Rl75dSN4YnxEtaS10klDiwUWjEjzTWAY4g5bsSK9rdG3do3bSnzmQXpGfBqAz
+        Xt4E+aSPDGh+G0mhtqFmLE8xK6WL2pEf0W3Is5AFOoNeM7gz54KglNQ1kxTofkwjHA3hGc
+        gSNpQo4btLFqhGli8k7Rd4Sol/lVRg0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-251-PUt-YSMNMSWUFoSPp6bpuQ-1; Thu, 28 Sep 2023 03:41:00 -0400
+X-MC-Unique: PUt-YSMNMSWUFoSPp6bpuQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 337CF185A79B;
+        Thu, 28 Sep 2023 07:41:00 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 62923C15BB8;
+        Thu, 28 Sep 2023 07:40:51 +0000 (UTC)
+Date:   Thu, 28 Sep 2023 15:40:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linan666@huaweicloud.com, josef@toxicpanda.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, linan122@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>, ming.lei@redhat.com
+Subject: Re: [PATCH] nbd: pass nbd_sock to nbd_read_reply() instead of index
+Message-ID: <ZRUt/vAQNGNp6Ugx@fedora>
+References: <20230911023308.3467802-1-linan666@huaweicloud.com>
+ <ZRT7cVFcE6QMHfie@fedora>
+ <47669fb6-3700-e327-11af-93a92b0984a0@huaweicloud.com>
 MIME-Version: 1.0
-In-Reply-To: <20230923025006.2830689-2-ming.lei@redhat.com>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupik+LIzCtJLcpLzFFi42LZdlhTXZdBVjTV4NIPQYvVd/vZLN61nmOx
-        2H5mKbPF3lvaFocmNzM5sHpcPlvq8X7fVTaPzaerPT5vkgtgicq2yUhNTEktUkjNS85PycxL
-        t1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAFaqqRQlphTChQKSCwuVtK3synKLy1J
-        VcjILy6xVUotSMkpMCnQK07MLS7NS9fLSy2xMjQwMDIFKkzIzli47BhzwSexinMH7zM3MK4U
-        7mLk5JAQMJH4vPcZSxcjF4eQwG5GiYVX1rFDOJ8YJQ7828cIUiUk8I1RovOWGEzHiktHoDr2
-        AsUPPGaGKHrGKPFxCVgDi4CqxNZFC9hBbDYBdYkjz1vB4iICShJ3764G28As0MIocWHtKbCE
-        sECyxO/9EM28AmYS//+cYYewBSVOznzCAmJzClhLHNh8EiwuKiAjMWPpV2aQQRICt9gljn78
-        xwpxnovEm0MnmSBsYYlXx7ewQ9hSEp/f7WWDsNMlflx+ClVTINF8DOJNCQF7idZT/WDfMAtk
-        SBz51ApVLysx9dQ6Jog4n0Tv7ydQvbwSO+bB2EoS7SvnQNkSEnvPNUDZHhKth2czQYJrP6PE
-        7OdbWCYwys9C8twsJPsgbCuJzg9NrLMYOYBsaYnl/zggTE2J9bv0FzCyrmKUTC0ozk1PLTYt
-        MMpLLYfHeHJ+7iZGcKLU8trB+PDBB71DjEwcjIcYJTiYlUR4H94WShXiTUmsrEotyo8vKs1J
-        LT7EaAqMrYnMUqLJ+cBUnVcSb2hiaWBiZmZmYmlsZqgkzvu6dW6KkEB6YklqdmpqQWoRTB8T
-        B6dUA9OsLd3TdjX36ZoLphz7yV5QPv/ZI489515s7Cz359D6cfbN68BfFVO1xOTcqn6tu3ll
-        0lE5fq/Hs8tV1ZxlGedszjIp+1aXs9j9xgT1uP9OK1V3vZ+zYt8J3blmXVcrPkQY+a+6sV/n
-        /utjt9lf67LL8tk0hTu8XeLQyaE5mfVj0Ber4ODbnyY8XlQnXh0hGSxzOdHq0abK+c3//LnE
-        xSv7En9ncL2z13c7NONzZOcOcYMZjRPnpP6KeXaAv6RFzsFN8rjDltvrQ8tcuTd232PlfvBt
-        sXKmsGZ64OUqlcqg5hkF89OU2eUcPP4smnTUqahV8Hxd2ZPjEedrZEz5GdTm2AlNvt4Rcv6d
-        7xYeTiWW4oxEQy3mouJEAJ26aUgdBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJLMWRmVeSWpSXmKPExsWy7bCSvG6tlGiqwfH1Mhar7/azWbxrPcdi
-        sf3MUmaLvbe0LQ5NbmZyYPW4fLbU4/2+q2wem09Xe3zeJBfAEsVlk5Kak1mWWqRvl8CV0dIX
-        WrBEpGLG3ZQGxq8CXYycHBICJhIrLh1hAbGFBHYzSqw9oQMRl5A49XIZI4QtLLHy33P2LkYu
-        oJonjBKvly1gBkmwCKhKbF20gB3EZhNQlzjyvBWsQURASeLu3dVgDcwCbYwS3372gzUICyRL
-        /Pg2BWwbr4CZxP8/Z9ghNmdL9C49wAQRF5Q4OfMJWA0zUM28zQ+BejmAbGmJ5f84QMKcAtYS
-        BzafBGsVFZCRmLH0K/MERsFZSLpnIemehdC9gJF5FaNkakFxbnpusWGBUV5quV5xYm5xaV66
-        XnJ+7iZGcGhrae1g3LPqg94hRiYOxkOMEhzMSiK8D28LpQrxpiRWVqUW5ccXleakFh9ilOZg
-        URLn/fa6N0VIID2xJDU7NbUgtQgmy8TBKdXApC2kPuv1tPkqa1SVz7jeSP6xP/JvjdJV5WKj
-        K9u7d6614ONXNTdN4P8s1/Rg3be1RbP8WnKFm2OqUtUfuNprbqnrDXkv2yeV+8+H4QmP+OwX
-        Z6QLbKZ4Fp9VPBp/qapzfZ7jmzqe7Osrttwvdt/mtYPZKzy3JeeeFeeLzCLmTd95WxUfX7s7
-        7/RCP0nxqs+aiRfdKt1sjvypXLXc/VmNWuss1ySBE7vu6/HbnHsgLXl6U1C6wGX9kF5Pk7cC
-        F/387a7GbdqTGLrscZjXxgPqEd/al/85LnV4k2psfcfdsMUzv/8IWzM7SFhzYnehisnlBxr+
-        Dyz7upWOvNzyQp79dYGggY1s6wur+QcvbfqvxFKckWioxVxUnAgAgVtaUNwCAAA=
-X-CMS-MailID: 20230928061733epcas5p1837b43637213341fb9674e99efa62a94
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----IKYw8rt4xsi0beZH_Imxy96mvZbFJ64oQ.XZqp2ZTk-1zWLz=_2a65e_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230928061733epcas5p1837b43637213341fb9674e99efa62a94
-References: <20230923025006.2830689-1-ming.lei@redhat.com>
-        <20230923025006.2830689-2-ming.lei@redhat.com>
-        <CGME20230928061733epcas5p1837b43637213341fb9674e99efa62a94@epcas5p1.samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <47669fb6-3700-e327-11af-93a92b0984a0@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------IKYw8rt4xsi0beZH_Imxy96mvZbFJ64oQ.XZqp2ZTk-1zWLz=_2a65e_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On Thu, Sep 28, 2023 at 02:03:28PM +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2023/09/28 12:05, Ming Lei 写道:
+> > On Mon, Sep 11, 2023 at 10:33:08AM +0800, linan666@huaweicloud.com wrote:
+> > > From: Li Nan <linan122@huawei.com>
+> > > 
+> > > If a socket is processing ioctl 'NBD_SET_SOCK', config->socks might be
+> > > krealloc in nbd_add_socket(), and a garbage request is received now, a UAF
+> > > may occurs.
+> > > 
+> > >    T1
+> > >    nbd_ioctl
+> > >     __nbd_ioctl
+> > >      nbd_add_socket
+> > >       blk_mq_freeze_queue
+> > > 				T2
+> > >    				recv_work
+> > >    				 nbd_read_reply
+> > >    				  sock_xmit
+> > >       krealloc config->socks
+> > > 				   def config->socks
+> > > 
+> > > Pass nbd_sock to nbd_read_reply(). And introduce a new function
+> > > sock_xmit_recv(), which differs from sock_xmit only in the way it get
+> > > socket.
+> > > 
+> > 
+> > I am wondering why not grab queue usage counter before calling nbd_read_reply()
+> > for avoiding such issue, something like the following change:
+> > 
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > index df1cd0f718b8..09215b605b12 100644
+> > --- a/drivers/block/nbd.c
+> > +++ b/drivers/block/nbd.c
+> > @@ -837,9 +837,6 @@ static void recv_work(struct work_struct *work)
+> >   	while (1) {
+> >   		struct nbd_reply reply;
+> > -		if (nbd_read_reply(nbd, args->index, &reply))
+> > -			break;
+> > -
+> >   		/*
+> >   		 * Grab .q_usage_counter so request pool won't go away, then no
+> >   		 * request use-after-free is possible during nbd_handle_reply().
+> > @@ -852,6 +849,9 @@ static void recv_work(struct work_struct *work)
+> >   			break;
+> >   		}
+> 
+> This break how nbd works, if there is no reply yet, recv_work() will
+> wait for reply in:
+> 
+> nbd_read_reply
+>  sock_xmit
+>   sock_recvmsg
+> 
+> After this change, recv_work() will just return if there is no io.
 
-On 23/09/23 10:50AM, Ming Lei wrote:
->Retain top 8bits of uring_cmd flags for kernel internal use, so that we
->can move IORING_URING_CMD_POLLED out of uapi header.
->
+OK, got it, thanks for the input.
 
-Looks good.
+But I feel it isn't necessary & fragile to store one extra reference of nsock in
+`recv_thread_args`.
 
-Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
-
->Signed-off-by: Ming Lei <ming.lei@redhat.com>
->---
-> include/linux/io_uring.h      | 3 +++
-> include/uapi/linux/io_uring.h | 5 ++---
-> io_uring/io_uring.c           | 3 +++
-> io_uring/uring_cmd.c          | 2 +-
-> 4 files changed, 9 insertions(+), 4 deletions(-)
->
->diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
->index 106cdc55ff3b..ae08d6f66e62 100644
->--- a/include/linux/io_uring.h
->+++ b/include/linux/io_uring.h
->@@ -22,6 +22,9 @@ enum io_uring_cmd_flags {
-> 	IO_URING_F_IOPOLL		= (1 << 10),
-> };
->
->+/* only top 8 bits of sqe->uring_cmd_flags for kernel internal use */
->+#define IORING_URING_CMD_POLLED		(1U << 31)
->+
-> struct io_uring_cmd {
-> 	struct file	*file;
-> 	const struct io_uring_sqe *sqe;
->diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
->index 8e61f8b7c2ce..de77ad08b123 100644
->--- a/include/uapi/linux/io_uring.h
->+++ b/include/uapi/linux/io_uring.h
->@@ -246,13 +246,12 @@ enum io_uring_op {
-> };
->
-> /*
->- * sqe->uring_cmd_flags
->+ * sqe->uring_cmd_flags		top 8bits aren't available for userspace
->  * IORING_URING_CMD_FIXED	use registered buffer; pass this flag
->  *				along with setting sqe->buf_index.
->- * IORING_URING_CMD_POLLED	driver use only
->  */
-> #define IORING_URING_CMD_FIXED	(1U << 0)
->-#define IORING_URING_CMD_POLLED	(1U << 31)
->+#define IORING_URING_CMD_MASK	IORING_URING_CMD_FIXED
->
->
-> /*
->diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
->index 783ed0fff71b..9aedb7202403 100644
->--- a/io_uring/io_uring.c
->+++ b/io_uring/io_uring.c
->@@ -4666,6 +4666,9 @@ static int __init io_uring_init(void)
->
-> 	BUILD_BUG_ON(sizeof(atomic_t) != sizeof(u32));
->
->+	/* top 8bits are for internal use */
->+	BUILD_BUG_ON((IORING_URING_CMD_MASK & 0xff000000) != 0);
->+
-> 	io_uring_optable_init();
->
-> 	/*
->diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
->index 537795fddc87..a0b0ec5473bf 100644
->--- a/io_uring/uring_cmd.c
->+++ b/io_uring/uring_cmd.c
->@@ -91,7 +91,7 @@ int io_uring_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
-> 		return -EINVAL;
->
-> 	ioucmd->flags = READ_ONCE(sqe->uring_cmd_flags);
->-	if (ioucmd->flags & ~IORING_URING_CMD_FIXED)
->+	if (ioucmd->flags & ~IORING_URING_CMD_MASK)
-> 		return -EINVAL;
->
-> 	if (ioucmd->flags & IORING_URING_CMD_FIXED) {
->-- 
->2.41.0
->
-
-------IKYw8rt4xsi0beZH_Imxy96mvZbFJ64oQ.XZqp2ZTk-1zWLz=_2a65e_
-Content-Type: text/plain; charset="utf-8"
+Just run a quick look, the only potential UAF on config->socks should be recv_work(),
+so you can retrieve the `nsock` reference at the entry of recv_work(),
+and just pass it(local variable) to nbd_read_reply() and nbd_handle_reply()
+since `nsock` won't be freed.
 
 
-------IKYw8rt4xsi0beZH_Imxy96mvZbFJ64oQ.XZqp2ZTk-1zWLz=_2a65e_--
+Thanks,
+Ming
+
