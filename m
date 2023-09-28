@@ -2,160 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93919E82CC0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Sep 2023 21:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FC1E80A8A
+	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 02:05:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229959AbjI0VoH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Sep 2023 17:44:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43516 "EHLO
+        id S229719AbjI1CFT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Sep 2023 22:05:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjI0VoG (ORCPT
+        with ESMTP id S229437AbjI1CFS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2023 17:44:06 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32C37D6;
-        Wed, 27 Sep 2023 14:44:05 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38RLeDM2017419;
-        Wed, 27 Sep 2023 21:43:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=se51p/MqpkArSngnFBRzkX1YJmLtShBmb9EktIdtgGQ=;
- b=lO4HT8Cb21mPyqZt3jz2LLeIik8zu5m6yqZbdnXK6v7jFwOQjtbEcoDRkkKlMRZ8eBL0
- AH8xSoSsUI+zswjTl0ZbILpHw/F+nK9/c0WsuBCqYpmdNWQ6ST3JSD6cC3AC7WSrqcod
- dpwTaeATgUNEcbJA+o1IMm/CFlpf3GqxhylK/4ggzV3dCyZmLklEk9JXgut4mh55ifWG
- NB2tcUHsomqzv/VjBBSfPEKjAs3giQ8itRJWaaD6nnO4frsCX3vBaHMHWiBz/BoWSIiX
- 1j94rJb+IOWpbBrhOwYXXguRLrjosW5JzPrPQPPYKN6ztEy8/D02FmiwBHULP5rFMQoM EA== 
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcrsde2tx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Sep 2023 21:43:49 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38RKVuIr008143;
-        Wed, 27 Sep 2023 21:43:48 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3taaqyq4ug-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Sep 2023 21:43:48 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38RLhjqM43450858
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Sep 2023 21:43:45 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5662A2004D;
-        Wed, 27 Sep 2023 21:43:45 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A45F32004F;
-        Wed, 27 Sep 2023 21:43:44 +0000 (GMT)
-Received: from [9.171.37.160] (unknown [9.171.37.160])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Sep 2023 21:43:44 +0000 (GMT)
-Message-ID: <51e1e42a-2ed8-a664-f26f-bc5bc1762884@linux.ibm.com>
-Date:   Wed, 27 Sep 2023 23:43:44 +0200
+        Wed, 27 Sep 2023 22:05:18 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162C5AC;
+        Wed, 27 Sep 2023 19:05:16 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RwxdH31Wpz4f3kGD;
+        Thu, 28 Sep 2023 10:05:07 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgB3BdVU3xRlbOxHBg--.51493S4;
+        Thu, 28 Sep 2023 10:05:09 +0800 (CST)
+From:   linan666@huaweicloud.com
+To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        yukuai3@huawei.com
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linan122@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com
+Subject: [PATCH] blk-throttle: Calculate allowed value only when the throttle is enabled
+Date:   Thu, 28 Sep 2023 09:58:58 +0800
+Message-Id: <20230928015858.1809934-1-linan666@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 14/29] s390/dasd: Convert to bdev_open_by_path()
-Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>
-References: <20230818123232.2269-1-jack@suse.cz>
- <20230823104857.11437-14-jack@suse.cz>
-From:   Stefan Haberland <sth@linux.ibm.com>
-In-Reply-To: <20230823104857.11437-14-jack@suse.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gNioCTpAK6quqH6t38vjfE2eIeyhywLj
-X-Proofpoint-ORIG-GUID: gNioCTpAK6quqH6t38vjfE2eIeyhywLj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-27_15,2023-09-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- phishscore=0 clxscore=1011 impostorscore=0 adultscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2309270185
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgB3BdVU3xRlbOxHBg--.51493S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4DJr45Jw1DuFWUurW8Crg_yoW8uryDpF
+        WfGr17Gr4aqF93KF43JasIvF15JrZ7Cr98J398X3sYyFWYk348Krn7ur40qFy2vF97Zayr
+        J34jqr95AF42kaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Fb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487
+        Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aV
+        AFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF
+        7I0E8cxan2IY04v7M4kE6xkIj40Ew7xC0wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7IU1kpnJUUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Am 23.08.23 um 12:48 schrieb Jan Kara:
-> Convert dasd to use bdev_open_by_path() and pass the handle around.
->
-> CC: linux-s390@vger.kernel.org
-> CC: Christian Borntraeger <borntraeger@linux.ibm.com>
-> CC: Sven Schnelle <svens@linux.ibm.com>
-> Acked-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
+From: Li Nan <linan122@huawei.com>
 
-The DASD part does not compile. please see below.
+When the throttle of bps is not enabled, tg_bps_limit() returns U64_MAX,
+which is be used in calculate_bytes_allowed(), and divide 0 error will
+happen.
 
-Beside of this the patch looks OK to me.
+To fix it, only calculate allowed value when the throttle of bps/iops is
+enabled and the value will be used.
 
-with the error fixed:
-Acked-by: Stefan Haberland <sth@linux.ibm.com>
+Fixes: e8368b57c006 ("blk-throttle: use calculate_io/bytes_allowed() for throtl_trim_slice()")
+Reported-by: Changhui Zhong <czhong@redhat.com>
+Closes: https://lore.kernel.org/all/CAGVVp+Vt6idZtxfU9jF=VSbu145Wi-d-WnAZx_hEfOL8yLZgBA@mail.gmail.com
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ block/blk-throttle.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
->   drivers/s390/block/dasd.c       | 12 +++++----
->   drivers/s390/block/dasd_genhd.c | 45 ++++++++++++++++-----------------
->   drivers/s390/block/dasd_int.h   |  2 +-
->   drivers/s390/block/dasd_ioctl.c |  2 +-
->   4 files changed, 31 insertions(+), 30 deletions(-)
->
-> diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
-> index 215597f73be4..16a2d631a169 100644
-> --- a/drivers/s390/block/dasd.c
-> +++ b/drivers/s390/block/dasd.c
-> @@ -412,7 +412,8 @@ dasd_state_ready_to_online(struct dasd_device * device)
->   					KOBJ_CHANGE);
->   			return 0;
->   		}
-> -		disk_uevent(device->block->bdev->bd_disk, KOBJ_CHANGE);
-> +		disk_uevent(device->block->bdev_handle->bdev->bd_disk,
-> +			    KOBJ_CHANGE);
->   	}
->   	return 0;
->   }
-> @@ -432,7 +433,8 @@ static int dasd_state_online_to_ready(struct dasd_device *device)
->   
->   	device->state = DASD_STATE_READY;
->   	if (device->block && !(device->features & DASD_FEATURE_USERAW))
-> -		disk_uevent(device->block->bdev->bd_disk, KOBJ_CHANGE);
-> +		disk_uevent(device->block->bdev_handle->bdev->bd_disk,
-> +			    KOBJ_CHANGE);
->   	return 0;
->   }
->   
-> @@ -3590,7 +3592,7 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
->   	 * in the other openers.
->   	 */
->   	if (device->block) {
-> -		max_count = device->block->bdev ? 0 : -1;
-> +		max_count = device->block->bdev_handle ? 0 : -1;
->   		open_count = atomic_read(&device->block->open_count);
->   		if (open_count > max_count) {
->   			if (open_count > 0)
-> @@ -3636,8 +3638,8 @@ int dasd_generic_set_offline(struct ccw_device *cdev)
->   		 * so sync bdev first and then wait for our queues to become
->   		 * empty
->   		 */
-> -		if (device->block)
-> -			bdev_mark_dead(device->block->bdev, false);
-> +		if (device->block && device->block->bdev_handle) {
-
-the brace is not needed here and there is no matching right brace.
-
-> +			bdev_mark_dead(device->block->bdev_handle->bdev, false);
->   		dasd_schedule_device_bh(device);
->   		rc = wait_event_interruptible(shutdown_waitq,
->   					      _wait_for_empty_queues(device));
->
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 38a881cf97d0..3c9a74ab9f0e 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -730,8 +730,10 @@ static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
+ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ {
+ 	unsigned long time_elapsed;
+-	long long bytes_trim;
+-	int io_trim;
++	long long bytes_trim = 0;
++	int io_trim = 0;
++	u64 bps_limit;
++	u32 iops_limit;
+ 
+ 	BUG_ON(time_before(tg->slice_end[rw], tg->slice_start[rw]));
+ 
+@@ -758,11 +760,14 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 	if (!time_elapsed)
+ 		return;
+ 
+-	bytes_trim = calculate_bytes_allowed(tg_bps_limit(tg, rw),
+-					     time_elapsed) +
+-		     tg->carryover_bytes[rw];
+-	io_trim = calculate_io_allowed(tg_iops_limit(tg, rw), time_elapsed) +
+-		  tg->carryover_ios[rw];
++	bps_limit = tg_bps_limit(tg, rw);
++	iops_limit = tg_iops_limit(tg, rw);
++	if (tg->bytes_disp[rw] > 0 && bps_limit != U64_MAX)
++		bytes_trim = calculate_bytes_allowed(bps_limit,
++			     time_elapsed) + tg->carryover_bytes[rw];
++	if (tg->io_disp[rw] > 0 && iops_limit != UINT_MAX)
++		io_trim = calculate_io_allowed(iops_limit, time_elapsed) +
++			  tg->carryover_ios[rw];
+ 	if (bytes_trim <= 0 && io_trim <= 0)
+ 		return;
+ 
+-- 
+2.39.2
 
