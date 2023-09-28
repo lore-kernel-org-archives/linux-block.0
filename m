@@ -2,129 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E86CE7B0E
-	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 08:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6305DCE7B0C
+	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 08:58:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231623AbjI1I5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Sep 2023 04:57:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49276 "EHLO
+        id S231426AbjI1I6a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Sep 2023 04:58:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231624AbjI1I4u (ORCPT
+        with ESMTP id S231377AbjI1I62 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2023 04:56:50 -0400
+        Thu, 28 Sep 2023 04:58:28 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 989921B3
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 01:56:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89D6CD3
+        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 01:57:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695891362;
+        s=mimecast20190719; t=1695891454;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YXyf93SGNji8Nitj6XE+tI3+Pd3NN3XDXLxTEgunQ8A=;
-        b=OeqG9KbHtA6Ci1NMkL1fiF0u2narto7Z1e84nJF0vLm1X4UXkTzBZYxHvpuVUgvg8bOGvO
-        vJjpZS1phMgB5Q3vcxnkQIn2kEuUwGrIHrVC1vzBAOCTHN7Rp99+dW8YXkrAD4QQrbyAGs
-        e9GPK67xQ2vjnNR0uGH05HndnNKncns=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-360--waToYCTOSmmEpPy-SPqAw-1; Thu, 28 Sep 2023 04:55:59 -0400
-X-MC-Unique: -waToYCTOSmmEpPy-SPqAw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        bh=1w2p4pUjtxxoV1R5cJrguGHA5IKS39OopmDiYZUaHe4=;
+        b=JNYjvza2HrKbZQXZ33ZN68lCdV3F3z6EpqxGQp1YZ01UaOwuye5Yomk6Mo4IJIf+KXSyI0
+        1MVWkaHMsrf/jdnZAbVZSKEO8fsStFN2u0061tuXvJF4zUbQ+4pteIub6uYcRG6qPDf7M6
+        5ttFeNxGQ5Z8Ex7SNZUI/krPJ/zmo4I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-196-tFs_Zc5kPXmsCExnX1VLSg-1; Thu, 28 Sep 2023 04:57:28 -0400
+X-MC-Unique: tFs_Zc5kPXmsCExnX1VLSg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 18C453814599;
-        Thu, 28 Sep 2023 08:55:58 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7E42811E8D;
+        Thu, 28 Sep 2023 08:57:27 +0000 (UTC)
 Received: from fedora (unknown [10.72.120.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 107CB10005D2;
-        Thu, 28 Sep 2023 08:55:54 +0000 (UTC)
-Date:   Thu, 28 Sep 2023 16:55:50 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F27028FE;
+        Thu, 28 Sep 2023 08:57:20 +0000 (UTC)
+Date:   Thu, 28 Sep 2023 16:57:16 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@suse.de>
-Subject: Re: [PATCH V4 2/2] io_uring: cancelable uring_cmd
-Message-ID: <ZRU/lkGwzxVeRes7@fedora>
-References: <20230923025006.2830689-1-ming.lei@redhat.com>
- <20230923025006.2830689-3-ming.lei@redhat.com>
- <c4598c93-fe5d-49d3-b737-e78b7abcea77@kernel.dk>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linan666@huaweicloud.com, josef@toxicpanda.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, linan122@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] nbd: pass nbd_sock to nbd_read_reply() instead of index
+Message-ID: <ZRU/7Bx1ZJSX3Qg3@fedora>
+References: <20230911023308.3467802-1-linan666@huaweicloud.com>
+ <ZRT7cVFcE6QMHfie@fedora>
+ <47669fb6-3700-e327-11af-93a92b0984a0@huaweicloud.com>
+ <ZRUt/vAQNGNp6Ugx@fedora>
+ <41161d21-299c-3657-6020-0a3a9cf109ec@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c4598c93-fe5d-49d3-b737-e78b7abcea77@kernel.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <41161d21-299c-3657-6020-0a3a9cf109ec@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 28, 2023 at 02:38:32AM -0600, Jens Axboe wrote:
-> On 9/22/23 8:50 PM, Ming Lei wrote:
-> > diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-> > index ae08d6f66e62..a0307289bdc7 100644
-> > --- a/include/linux/io_uring.h
-> > +++ b/include/linux/io_uring.h
-> > @@ -20,9 +20,13 @@ enum io_uring_cmd_flags {
-> >  	IO_URING_F_SQE128		= (1 << 8),
-> >  	IO_URING_F_CQE32		= (1 << 9),
-> >  	IO_URING_F_IOPOLL		= (1 << 10),
-> > +
-> > +	/* set when uring wants to cancel one issued command */
-> > +	IO_URING_F_CANCEL		= (1 << 11),
-> >  };
+On Thu, Sep 28, 2023 at 04:55:03PM +0800, Yu Kuai wrote:
+> Hi,
 > 
-> I'd make that comment:
+> 在 2023/09/28 15:40, Ming Lei 写道:
+> > On Thu, Sep 28, 2023 at 02:03:28PM +0800, Yu Kuai wrote:
+> > > Hi,
+> > > 
+> > > 在 2023/09/28 12:05, Ming Lei 写道:
+> > > > On Mon, Sep 11, 2023 at 10:33:08AM +0800, linan666@huaweicloud.com wrote:
+> > > > > From: Li Nan <linan122@huawei.com>
+> > > > > 
+> > > > > If a socket is processing ioctl 'NBD_SET_SOCK', config->socks might be
+> > > > > krealloc in nbd_add_socket(), and a garbage request is received now, a UAF
+> > > > > may occurs.
+> > > > > 
+> > > > >     T1
+> > > > >     nbd_ioctl
+> > > > >      __nbd_ioctl
+> > > > >       nbd_add_socket
+> > > > >        blk_mq_freeze_queue
+> > > > > 				T2
+> > > > >     				recv_work
+> > > > >     				 nbd_read_reply
+> > > > >     				  sock_xmit
+> > > > >        krealloc config->socks
+> > > > > 				   def config->socks
+> > > > > 
+> > > > > Pass nbd_sock to nbd_read_reply(). And introduce a new function
+> > > > > sock_xmit_recv(), which differs from sock_xmit only in the way it get
+> > > > > socket.
+> > > > > 
+> > > > 
+> > > > I am wondering why not grab queue usage counter before calling nbd_read_reply()
+> > > > for avoiding such issue, something like the following change:
+> > > > 
+> > > > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > > > index df1cd0f718b8..09215b605b12 100644
+> > > > --- a/drivers/block/nbd.c
+> > > > +++ b/drivers/block/nbd.c
+> > > > @@ -837,9 +837,6 @@ static void recv_work(struct work_struct *work)
+> > > >    	while (1) {
+> > > >    		struct nbd_reply reply;
+> > > > -		if (nbd_read_reply(nbd, args->index, &reply))
+> > > > -			break;
+> > > > -
+> > > >    		/*
+> > > >    		 * Grab .q_usage_counter so request pool won't go away, then no
+> > > >    		 * request use-after-free is possible during nbd_handle_reply().
+> > > > @@ -852,6 +849,9 @@ static void recv_work(struct work_struct *work)
+> > > >    			break;
+> > > >    		}
+> > > 
+> > > This break how nbd works, if there is no reply yet, recv_work() will
+> > > wait for reply in:
+> > > 
+> > > nbd_read_reply
+> > >   sock_xmit
+> > >    sock_recvmsg
+> > > 
+> > > After this change, recv_work() will just return if there is no io.
+> > 
+> > OK, got it, thanks for the input.
+> > 
+> > But I feel it isn't necessary & fragile to store one extra reference of nsock in
+> > `recv_thread_args`.
+> > 
+> > Just run a quick look, the only potential UAF on config->socks should be recv_work(),
+> > so you can retrieve the `nsock` reference at the entry of recv_work(),
 > 
-> /* set when uring wants to cancel a previously issued command */
-
-OK.
-
+> I don't understand what you mean retrieve the 'nsock', is following what
+> you expected?
 > 
-> > @@ -125,6 +132,15 @@ static inline int io_uring_cmd_sock(struct io_uring_cmd *cmd,
-> >  {
-> >  	return -EOPNOTSUPP;
-> >  }
-> > +static inline int io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-> > +		unsigned int issue_flags)
-> > +{
-> > +	return -EOPNOTSUPP;
-> > +}
-> 
-> Do we need this to return an error? Presumably this will never get
-> called if IO_URING isn't defined, but if it does, it obviously doesn't
-> need to do anything anyway. Seems like it should just be a void, and
-> ditto for the enabled version which can't return an error anyway.
+> blk_queue_enter() -> prevent concurrent with nbd_add_socket
+> nsock = config->socks[args->index]
+> blk_queue_exit()
 
-Indeed, 'void' is better.
+Yeah, turns out you do understand, :-)
 
-> 
-> >  	return ret;
-> >  }
-> >  
-> > +static bool io_uring_try_cancel_uring_cmd(struct io_ring_ctx *ctx,
-> > +		struct task_struct *task, bool cancel_all)
-> > +{
-> > +	struct hlist_node *tmp;
-> > +	struct io_kiocb *req;
-> > +	bool ret = false;
-> > +
-> > +	lockdep_assert_held(&ctx->uring_lock);
-> > +
-> > +	hlist_for_each_entry_safe(req, tmp, &ctx->cancelable_uring_cmd,
-> > +			hash_node) {
-> > +		struct io_uring_cmd *cmd = io_kiocb_to_cmd(req,
-> > +				struct io_uring_cmd);
-> > +		struct file *file = req->file;
-> > +
-> > +		if (WARN_ON_ONCE(!file->f_op->uring_cmd))
-> > +			continue;
-> 
-> That check belongs in the function that marks it cancelable and adds it
-> to the list.
-
-io_uring_cmd_mark_cancelable() is actually called from ->uring_cmd(), so
-the check isn't necessary.
-
-
-
-thanks,
+Thanks,
 Ming
 
