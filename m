@@ -2,83 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A73E732D9
-	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 13:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA69BE732DE
+	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 14:47:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232215AbjI1Nnn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Sep 2023 09:43:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59380 "EHLO
+        id S230376AbjI1OrV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Sep 2023 10:47:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231966AbjI1Nnm (ORCPT
+        with ESMTP id S230306AbjI1OrR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2023 09:43:42 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0DB7194
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 06:43:40 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-533c71c5f37so2499573a12.0
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 06:43:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695908619; x=1696513419; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2V6UMsz3keE8Oc0msyB57V0fmGycw/8zbKI2stLuJgg=;
-        b=sStF/aG6Ih8bRLwenR4sAKiFJAMDgRTnvkYiSRp9RuNC2C1vUXYvHeWiUqBmZ3PKkU
-         PeXchaMBjR+BSzCm1lFFFs7UuJauTOMGauKWerUfh7pNu9chGg5v64DH9R+/pB6A2coe
-         YTg+up83Yj1IJ4b8p+PORJmxnQmYoVHZJaDlMaaW78tRXKm4Y3avNHrlC1t18xpLCtp7
-         znMTpdzzE4FYRjy01YR7nhizfVjI8Jv2mBSvSDD0QewaMartdiAeMv2AGOZzbPLq+YZp
-         xkB/9S6xcZiHKXDFUV1rTaivY4JMtHKtAXXRZCtqtykDn6J2bFs2GzI/75dlZV2p3FwQ
-         BT1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695908619; x=1696513419;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2V6UMsz3keE8Oc0msyB57V0fmGycw/8zbKI2stLuJgg=;
-        b=vqTiFmlQjLoFGZ9AbGk3xkWZW3bSgoyUkY6JzOPW8tIbxan3vbdm1SKWa27O7z/SJs
-         jNe4eUKXqsZXkNMnOXj+9lzVl4M6sFIU5qrhV4pt5U/DA5ynLrMN51rFanQBkqCA0lXk
-         W6Rq33cv3AM9AYAEjc2i8Dvh5lDy80U4GRI8IVOzktPMoafN8Keuejj5vSsd+jhjYb6h
-         S5ks5oX//coNsrvNXTz40jG7JUoU6arMcRbbwkQ6A1Jy54uVOHw0XCVABvDlKnfL+QSc
-         lRDjaP+MxaAgecY4pZrbC9+1ztxnfs51syuzmdXJU2h14u4UeKk2jlxQiceXpWPan9l5
-         owRg==
-X-Gm-Message-State: AOJu0Yyv+O1OZ47UkpGjEOye0LiiN07gLNUTUAv/LHJl1KU6Olgvm4qx
-        HKUhv9KWncvJjfvokDFx4z+e3g==
-X-Google-Smtp-Source: AGHT+IEe0HVRjv7+vBRClK2A8/+5EMfjUlX3w0JUU3/0ND5kAuorq6ON/gHKKymaLh6pZnnn7oYP1g==
-X-Received: by 2002:a05:6402:5243:b0:51d:cfeb:fc3b with SMTP id t3-20020a056402524300b0051dcfebfc3bmr1094319edd.1.1695908619132;
-        Thu, 28 Sep 2023 06:43:39 -0700 (PDT)
-Received: from [172.20.13.88] ([45.147.210.162])
-        by smtp.gmail.com with ESMTPSA id q19-20020a056402041300b005330e1e7da0sm9587296edv.92.2023.09.28.06.43.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Sep 2023 06:43:38 -0700 (PDT)
-Message-ID: <d4d952cb-b045-46b6-ba45-e78cd257dd6e@kernel.dk>
-Date:   Thu, 28 Sep 2023 07:43:36 -0600
+        Thu, 28 Sep 2023 10:47:17 -0400
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA53180;
+        Thu, 28 Sep 2023 07:47:13 -0700 (PDT)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 1CF7E40E0198;
+        Thu, 28 Sep 2023 14:47:08 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id N5pJ5cn_zyMK; Thu, 28 Sep 2023 14:47:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1695912422; bh=tPU8iyjpgSIBCOSk7Wcxg0E9kh+miOLhLUIx3QkgCHU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ll1gXe5e3fpQ+szMHmOHc//PTgpilvT7S57e0IhATDq6tDehQ1o2EgoeCSI3zAsOv
+         qLVwdxpZ+qYC/b7BX0RvHDqR/ZJh9mBvjVSE2WZv0pIlr84uYoOdc67yRLc+Eo+hE1
+         v2Pg11lRg/BSvQU3bFmybtXtMo0YECtYBA5cpNRoVipS9y1xGTtLH9BZr2Fi4ONlMb
+         uGYzpt3Yd+6AnMrLawD9QtPwfC8B0eRUH3Tpy50UTZZ8oFios1DjxXwX+3aeNWQku0
+         A10Gxc28sw7EpIUasKSPCHEj2tyXssapZOMiyrYxvAcxlDTGoD4imkyj0SWvJBtXjU
+         39xT6FcjXg2qgoS/js4We3RiaJNc6r+iQbhDT7RWlnU43MNPbtHmBHoY6I3YITtohr
+         VckEzdycdx+VfDUprobZdo3u3ga7ikM0rxh/prcT9/gqYvNnJbxVESsVIS8V/1lU2T
+         Q9WYW0nN+FHfenvuPDPLDmqaDZc2aDwRyUGhNMSRHdkIyfLEVzsgTxPl63Q1F73s7e
+         PDU3q6FHB8dJkwgh8Cp+rCpGcmtUdWoetVfw2wrus17tp0nL6mHg8Ei7V7KtFQrsFi
+         VV0DsvItSODlgmWqQajBBVIxGbjMw43m0FrOGyXk9cWLoO+8AGwt8PnhXmwH2QTvEQ
+         rI6+ntonm/tg4EWbBwe1M3T4=
+Received: from nazgul.tnic (unknown [88.128.88.93])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D96CC40E00B3;
+        Thu, 28 Sep 2023 14:46:41 +0000 (UTC)
+Date:   Thu, 28 Sep 2023 16:47:07 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        David Laight <David.Laight@aculab.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Subject: Re: [PATCH v7 02/12] iov_iter, x86: Be consistent about the __user
+ tag on copy_mc_to_user()
+Message-ID: <20230928144707.GBZRWR693kYmj8Z0NX@fat_crate.local>
+References: <20230925120309.1731676-1-dhowells@redhat.com>
+ <20230925120309.1731676-3-dhowells@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 0/2] io_uring: cancelable uring_cmd
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     Gabriel Krisman Bertazi <krisman@suse.de>,
-        Anuj Gupta <anuj20.g@samsung.com>
-References: <20230928124327.135679-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230928124327.135679-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230925120309.1731676-3-dhowells@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/28/23 6:43 AM, Ming Lei wrote:
-> Hello,
+On Mon, Sep 25, 2023 at 01:02:59PM +0100, David Howells wrote:
+> copy_mc_to_user() has the destination marked __user on powerpc, but not on
+> x86; the latter results in a sparse warning in lib/iov_iter.c.
 > 
-> Patch 1 retains top 8bits of  uring_cmd flags for kernel internal use.
+> Fix this by applying the tag on x86 too.
 > 
-> Patch 2 implements cancelable uring_cmd.
+> Fixes: ec6347bb4339 ("x86, powerpc: Rename memcpy_mcsafe() to copy_mc_to_{user, kernel}()")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Dan Williams <dan.j.williams@intel.com>
+> cc: Thomas Gleixner <tglx@linutronix.de>
+> cc: Ingo Molnar <mingo@redhat.com>
+> cc: Borislav Petkov <bp@alien8.de>
+> cc: Dave Hansen <dave.hansen@linux.intel.com>
+> cc: "H. Peter Anvin" <hpa@zytor.com>
+> cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Christian Brauner <christian@brauner.io>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Linus Torvalds <torvalds@linux-foundation.org>
+> cc: David Laight <David.Laight@ACULAB.COM>
+> cc: x86@kernel.org
+> cc: linux-block@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>  arch/x86/include/asm/uaccess.h | 2 +-
+>  arch/x86/lib/copy_mc.c         | 8 ++++----
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 
-Applied, thanks. Had to hand apply as it doesn't apply to
-for-6.7/io_uring due to the waitid addition, but trivial stuff.
+Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
 
 -- 
-Jens Axboe
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
