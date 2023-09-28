@@ -2,169 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D353CE7B10
-	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 09:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4220CE7B10
+	for <linux-block@archiver.kernel.org>; Thu, 28 Sep 2023 09:39:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231681AbjI1J0r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Sep 2023 05:26:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52746 "EHLO
+        id S231796AbjI1Jjb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Sep 2023 05:39:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231697AbjI1JZx (ORCPT
+        with ESMTP id S231891AbjI1JjT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2023 05:25:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85DFFCDF
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 02:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695893098;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q5AsP2pL02lMfUlKbi7xvy8gtw8AsWZMtdlUjlJ+cT8=;
-        b=dEIYywa6pjTWh88WP3TIn/fQDX4SdO9URpjPzAHl8Ru1xDRXcIxYUA8/J4dL749eqr9KHW
-        ODN+O4k3+/zoOrc7WM7HR/0KnSO0AC/nzyTdxHNvvl9TX5ZtvMj9JhZLOp05G2HhbMgCfh
-        Uvj5idCrVdrf/IZh78072ct460ud4CU=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-315-iFy5JBxcOli0N8dLBbKI5A-1; Thu, 28 Sep 2023 05:24:54 -0400
-X-MC-Unique: iFy5JBxcOli0N8dLBbKI5A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1F34D1C00BA9;
-        Thu, 28 Sep 2023 09:24:54 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E2E6E40C2064;
-        Thu, 28 Sep 2023 09:24:47 +0000 (UTC)
-Date:   Thu, 28 Sep 2023 17:24:42 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     linan666@huaweicloud.com, josef@toxicpanda.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, linan122@huawei.com,
-        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH] nbd: pass nbd_sock to nbd_read_reply() instead of index
-Message-ID: <ZRVGWkCzKAVVL9bV@fedora>
-References: <20230911023308.3467802-1-linan666@huaweicloud.com>
- <ZRT7cVFcE6QMHfie@fedora>
- <47669fb6-3700-e327-11af-93a92b0984a0@huaweicloud.com>
- <ZRUt/vAQNGNp6Ugx@fedora>
- <41161d21-299c-3657-6020-0a3a9cf109ec@huaweicloud.com>
- <ZRU/7Bx1ZJSX3Qg3@fedora>
- <60f9a88b-b750-3579-bdfd-5421f2040406@huaweicloud.com>
+        Thu, 28 Sep 2023 05:39:19 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00742180
+        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 02:38:59 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40535597f01so128189545e9.3
+        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 02:38:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1695893938; x=1696498738; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9DgaQdL1mkt6AjgMQAIJbcwnwZB2QgHQP1PAcp2gZrY=;
+        b=Al2ZTuBpmCd0Jaq48qpIzRb37H2hz0AxyMzIATjaa8+jqb2oxsi+JfGdSTPsLE4BTJ
+         e1kDXgjQXCPS9WzHBu2d33MkbqBZTtp2Gmp52lOGPk9tCfd3mUsguqZXBlwqI5MIvdca
+         FATkG1y2lixypu+HHlzF07oFOOqy/ObrZKeF/L0BuHMYf0dwQr62gpCeDFp927LrSQsE
+         7vLIn8yKBkWztoiUV2Ccj7qNYCnwvjkAPGViTFw9opuhujcE5flwmZg9Znp5p2utFO6P
+         2wnAKLOdSgK4uph2NHtwb3ZixYUT/dt11oJkiyPsxMRUz77UWH/ykTzP34jAif81q/FB
+         EfvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695893938; x=1696498738;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9DgaQdL1mkt6AjgMQAIJbcwnwZB2QgHQP1PAcp2gZrY=;
+        b=BMdVvglAKfXlG67db8E+4xdabqITf0VfPACRa74b2VTeC6zZqzJXxQk3jP6AwFVzlq
+         Zvz8kVsUjXd59oTmyLWHIDpOXPXQ0Tbar1AVVsfsIKEdDBLd70L1D+ypoYbygPvR0fMD
+         6NDO825cfOxM2Qj5ka7j4o69cuwFvTTuuMlXMIeIaJpC+aAIuYZvK8HZq3jsEglJuMrJ
+         tp8x8go41TSWRrr6dNWVS3o54kOYXYzO70k2O9vgoQurRSRk6OcspZLLxqohNi0K+xQc
+         U3ZixeCP4Su99hvkXpTYUClHG7khB8NoZJH8pHU5mr1YFe9tnXKVEEz2ogkb1ozbmeS8
+         YmvQ==
+X-Gm-Message-State: AOJu0YycWF0bML+dBgDIhDsl70h4PztecF2G7e+jSvEwxN5SOY3X1kSE
+        XM2xIv7TqguTaxFfkR70D87Mhg==
+X-Google-Smtp-Source: AGHT+IFoFu//qWf+2YKVQsH9YQI2JLonYDwjIcCmCaPKPhTJZjW9JQmcHydqb1bvOIeqR+dHCuqbtQ==
+X-Received: by 2002:adf:e78d:0:b0:317:ef76:b778 with SMTP id n13-20020adfe78d000000b00317ef76b778mr801971wrm.63.1695893938243;
+        Thu, 28 Sep 2023 02:38:58 -0700 (PDT)
+Received: from localhost.localdomain (213-225-13-130.nat.highway.a1.net. [213.225.13.130])
+        by smtp.gmail.com with ESMTPSA id f4-20020a5d50c4000000b0031fa870d4b3sm18931449wrt.60.2023.09.28.02.38.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Sep 2023 02:38:57 -0700 (PDT)
+From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars@linbit.com>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Joel Colledge <joel.colledge@linbit.com>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Subject: [PATCH 0/5] drbd: rename worker to sender
+Date:   Thu, 28 Sep 2023 11:38:47 +0200
+Message-ID: <20230928093852.676786-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <60f9a88b-b750-3579-bdfd-5421f2040406@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 28, 2023 at 05:06:40PM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2023/09/28 16:57, Ming Lei 写道:
-> > On Thu, Sep 28, 2023 at 04:55:03PM +0800, Yu Kuai wrote:
-> > > Hi,
-> > > 
-> > > 在 2023/09/28 15:40, Ming Lei 写道:
-> > > > On Thu, Sep 28, 2023 at 02:03:28PM +0800, Yu Kuai wrote:
-> > > > > Hi,
-> > > > > 
-> > > > > 在 2023/09/28 12:05, Ming Lei 写道:
-> > > > > > On Mon, Sep 11, 2023 at 10:33:08AM +0800, linan666@huaweicloud.com wrote:
-> > > > > > > From: Li Nan <linan122@huawei.com>
-> > > > > > > 
-> > > > > > > If a socket is processing ioctl 'NBD_SET_SOCK', config->socks might be
-> > > > > > > krealloc in nbd_add_socket(), and a garbage request is received now, a UAF
-> > > > > > > may occurs.
-> > > > > > > 
-> > > > > > >      T1
-> > > > > > >      nbd_ioctl
-> > > > > > >       __nbd_ioctl
-> > > > > > >        nbd_add_socket
-> > > > > > >         blk_mq_freeze_queue
-> > > > > > > 				T2
-> > > > > > >      				recv_work
-> > > > > > >      				 nbd_read_reply
-> > > > > > >      				  sock_xmit
-> > > > > > >         krealloc config->socks
-> > > > > > > 				   def config->socks
-> > > > > > > 
-> > > > > > > Pass nbd_sock to nbd_read_reply(). And introduce a new function
-> > > > > > > sock_xmit_recv(), which differs from sock_xmit only in the way it get
-> > > > > > > socket.
-> > > > > > > 
-> > > > > > 
-> > > > > > I am wondering why not grab queue usage counter before calling nbd_read_reply()
-> > > > > > for avoiding such issue, something like the following change:
-> > > > > > 
-> > > > > > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > > > > > index df1cd0f718b8..09215b605b12 100644
-> > > > > > --- a/drivers/block/nbd.c
-> > > > > > +++ b/drivers/block/nbd.c
-> > > > > > @@ -837,9 +837,6 @@ static void recv_work(struct work_struct *work)
-> > > > > >     	while (1) {
-> > > > > >     		struct nbd_reply reply;
-> > > > > > -		if (nbd_read_reply(nbd, args->index, &reply))
-> > > > > > -			break;
-> > > > > > -
-> > > > > >     		/*
-> > > > > >     		 * Grab .q_usage_counter so request pool won't go away, then no
-> > > > > >     		 * request use-after-free is possible during nbd_handle_reply().
-> > > > > > @@ -852,6 +849,9 @@ static void recv_work(struct work_struct *work)
-> > > > > >     			break;
-> > > > > >     		}
-> > > > > 
-> > > > > This break how nbd works, if there is no reply yet, recv_work() will
-> > > > > wait for reply in:
-> > > > > 
-> > > > > nbd_read_reply
-> > > > >    sock_xmit
-> > > > >     sock_recvmsg
-> > > > > 
-> > > > > After this change, recv_work() will just return if there is no io.
-> > > > 
-> > > > OK, got it, thanks for the input.
-> > > > 
-> > > > But I feel it isn't necessary & fragile to store one extra reference of nsock in
-> > > > `recv_thread_args`.
-> > > > 
-> > > > Just run a quick look, the only potential UAF on config->socks should be recv_work(),
-> > > > so you can retrieve the `nsock` reference at the entry of recv_work(),
-> > > 
-> > > I don't understand what you mean retrieve the 'nsock', is following what
-> > > you expected?
-> > > 
-> > > blk_queue_enter() -> prevent concurrent with nbd_add_socket
-> > > nsock = config->socks[args->index]
-> > > blk_queue_exit()
-> > 
-> > Yeah, turns out you do understand, :-)
-> 
-> Ok, I was not sure about this blk_queue_enter(). By the way, this
+Some more refactoring commits from out-of-tree drbd.
+Intended for 6.7.
 
-blk_queue_enter() isn't exported, but you can grab ->config_lock
-for getting the `nsock`.
+Christoph Böhmwalder (5):
+  drbd: Rename per-connection "worker" thread to "sender"
+  drbd: Add new per-resource "worker" thread
+  drbd: Move connection independent work from "sender" to "worker"
+  drbd: Keep connection threads running while connection is up only
+  drbd: Get rid of conn_reconfig_start() and conn_reconfig_done()
 
-> remind me of what you did to fix uaf of access queue->mq_hctx[] by
-> convert the array to xarray.
-> 
-> 
-> Maybe it's better to covert config->socks[] to xarray to fix this uaf as
-> well?
-
-->socks[idx] is needed in nbd fast path, so xarray may not be one good idea
-since xarray_load() introduces extra load, especially ->socks[] uaf
-should exist in recv_work() very likely. For other cases, the active
-block request holds queue usage counter.
+ drivers/block/drbd/Makefile                   |  2 +-
+ drivers/block/drbd/drbd_int.h                 | 12 ++--
+ drivers/block/drbd/drbd_main.c                | 21 +++---
+ drivers/block/drbd/drbd_nl.c                  | 48 +++-----------
+ drivers/block/drbd/drbd_receiver.c            |  2 +-
+ drivers/block/drbd/drbd_req.c                 |  7 +-
+ .../drbd/{drbd_worker.c => drbd_sender.c}     | 64 ++++++++++++++++---
+ drivers/block/drbd/drbd_state.c               | 31 ++-------
+ drivers/block/drbd/drbd_state.h               |  1 -
+ 9 files changed, 95 insertions(+), 93 deletions(-)
+ rename drivers/block/drbd/{drbd_worker.c => drbd_sender.c} (97%)
 
 
-Thanks,
-Ming
+base-commit: aa511ff8218b3fb328181fbaac48aa5e9c5c6d93
+-- 
+2.41.0
 
