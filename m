@@ -2,123 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E5AE743D5
-	for <linux-block@archiver.kernel.org>; Fri, 29 Sep 2023 01:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E01E743EC
+	for <linux-block@archiver.kernel.org>; Fri, 29 Sep 2023 06:06:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230246AbjI2BQp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Sep 2023 21:16:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59928 "EHLO
+        id S232651AbjI2GGT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Sep 2023 02:06:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbjI2BQo (ORCPT
+        with ESMTP id S231894AbjI2GGS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2023 21:16:44 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98310B4
-        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 18:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1695950202; x=1727486202;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=whBOzBz+yGWkg3THf0EQZbZgwka0BFqnT8nloooG0dw=;
-  b=jPU2ZAR5PxQH9lPFxAtvLq6IplTyRzbwSxUY+3qF2R6J4JJOqdKuMCEf
-   Rf04zjrFwRcMAs4tvE/39VGjBa2UTKCu74K6LDVrA2q+J8rrFZrZDrkuE
-   uAmziDnaKqmE5n3giKgPGcVt82jMjesd2Cgn8DY84lZ9wPllXtBfEZpNO
-   vk4AKGFRdYWUF7RWKSQ7WZI6hYaXy0YWhhWJKPQuVtcF38QVe5iEsRGLv
-   mUmPHwyMolQcfCZCTob+J1Ln2/IKeKrNmrlKpok4SStDc14sALesNG0R+
-   ss/lwwoaOQxOiqrPvI3B0GLReJl4Ujx9lECLW5teTiFqerYTgY8rvmAe2
-   g==;
-X-CSE-ConnectionGUID: 2/d1LTNQSDqyoNGZmohaCw==
-X-CSE-MsgGUID: zredFBEtQVKGw66rAPmmrg==
-X-IronPort-AV: E=Sophos;i="6.03,185,1694707200"; 
-   d="scan'208";a="357351485"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Sep 2023 09:16:42 +0800
-IronPort-SDR: P0WlGT1SqMwYlQavsEjAj+hsw4tAMPcE7NXRNlTOxzbsT2a+wFeP5ju5hMeVTFwQJONmIEVL2k
- L86jE/KpoSXLQx/PhacfWO7J7nXCIwZjbIkW5oXuwIenMg9yJ1vCJxfpOqKz+tSMTp/woN4yJH
- 0jZHy0/VHv3gvabcTCs0Bkt+m/kGM7G//X7M27GKO5y87RAwPFD1pDEeJm2gIpko0k7/Iojx1e
- GPlOnUmGCsiErtzhvJ3U4QoT6zK+509EEvEzutAdZ5nV6MrtdNebi3yXackihwdg3bkZeuEftB
- 0FI=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Sep 2023 17:29:06 -0700
-IronPort-SDR: MYAlexYW2EJXMX0lItD8gNt8QO+AbU6KOuZU5j9qdL3vOCAsBhdtVA8AmH+5XaH7dEX0Fl8MFx
- mRg34mgSjkwTrilKc08WqssGG82Oe8r6ZFYB5TGt3ocxz2cQC7fCe/Yuh7BiMDv7MPdvB6vJrv
- Et2hqnul1LMpEulte+SwrhL6ltf+k4wG3tdl6GUwr7LnijGLcZsQJC28QdyNbfjGaIAGz4bvrO
- WEcWmW1xExIsEi3foXGrPw7ldqAIXBImJP/d9QZ5VWHs2buN3144HuZZFMiFyQow1z6FfOG3PA
- SAo=
-WDCIronportException: Internal
-Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
-  by uls-op-cesaip01.wdc.com with ESMTP; 28 Sep 2023 18:16:41 -0700
-From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     Sun Ke <sunke32@huawei.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests] nbd/004: avoid left connection
-Date:   Fri, 29 Sep 2023 10:16:40 +0900
-Message-ID: <20230929011640.3847109-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.41.0
+        Fri, 29 Sep 2023 02:06:18 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A014C92
+        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 23:06:16 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-405e48d8e72so16251225e9.0
+        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2023 23:06:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1695967575; x=1696572375; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T0ltJX6gGj0F+1CjAFpDF8jUjdmC2nVajuWt/R1eJec=;
+        b=HU58OliDuGRE0asasm61EVZ6jgbDxY9SNvYInaHO6tbwk1ggSJ8GQBJCFcmU9UGTUn
+         npcMIoG8LlnIybw11jmel3PI4ev0BW5tzYW5VA+/NrCDkg+i/36xaAQ4AC9Q/LbyJC1a
+         v190leypP6JgYHorLTNyqcFQZmJZ1Req4jM3yofUi6XxNGZeQovlemeGLxQoWPoJmfeo
+         Cd7f8ZhcfZuTADO6F+eLZrso6Jh0fS/q2CR4vxazx/p1KGs3LukPH9SgihTrt6uJN5Kb
+         x/kHI4CbE2PcPFm5jUsXM/0U1+y7L53vINxcTKEd6ofNYONYPbOlf55e6yhTkguLdsb5
+         3o6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695967575; x=1696572375;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=T0ltJX6gGj0F+1CjAFpDF8jUjdmC2nVajuWt/R1eJec=;
+        b=FMpPYhIJ0PXJ5/jvNMsqoHFg+MashmzOZt2E0K8qe32/zTEeR7DD8fHBJXZK5SgRVG
+         c2ATL0G5/tsmz8M0VZHx7sKWwJ97HfBDUgMir5ihqhNLEbhIYuIEtSKaOuzjN8laV2iW
+         LIGyUH31tjU5lv78KiDfLnqKvt1UdpB7UWcgmQq3Ya8SDQ6FHkeSHhg/85wwFTH4epL/
+         dNScfPZOTTLvFcmsj7CqG8kcmxr+eipVDMx8bGEbjjprodZWenS+pjTnD4O6bAWOfNWI
+         2dx6BWQYdU66I7mz3BZ5XxHe/cvJp14jn+UcQxikI5SWKYiXhNG/lOW47FaIHphD70TL
+         KkBg==
+X-Gm-Message-State: AOJu0Yyn5uqM4j+iI4l4aa7piBTvB4/yGTIEhieoADhFWiMM1kcMRY00
+        VHFrpc52tPHpDpcD8jd5QFDhm62wLl1QfwK30Ik1Lk5u
+X-Google-Smtp-Source: AGHT+IFwgbh//atUA3rG2IQxEaqbC49rLySFNY1U4rPIPlENcgzCPgBEA4g5w/MK2qupQ2oH3EjxvA==
+X-Received: by 2002:a05:600c:1c9d:b0:404:74bf:fb3e with SMTP id k29-20020a05600c1c9d00b0040474bffb3emr3026779wms.2.1695967574906;
+        Thu, 28 Sep 2023 23:06:14 -0700 (PDT)
+Received: from [192.168.50.224] (ucpctl-mut-vip.hotspot.hub-one.net. [94.199.126.32])
+        by smtp.gmail.com with ESMTPSA id b15-20020adfde0f000000b0031c6cc74882sm20900372wrm.107.2023.09.28.23.06.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Sep 2023 23:06:14 -0700 (PDT)
+Message-ID: <4d46a68a-8810-442a-8f6e-249ba8283c98@kernel.dk>
+Date:   Fri, 29 Sep 2023 00:06:13 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.6-rc4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The test case nbd/004 disconnects /dev/nbd0 in most cases, but sometimes
-leaves it in connected status. The test case stops the nbd server then
-/dev/nbd0 does not work even when it is in connected status. This makes
-"udevadm settle" command to wait for nbd udev events infinitely and
-causes failures of following test cases.
+Hi Linus,
 
-There are two causes of the left connection. The first cause is left
-nbd-client process. The test case waits for completion of its child
-process connect_and_disconnect. However, it does not wait for completion
-of nbd-client process that connect_and_disconnect spawns. After the test
-case end, the left nbd-client process establishes the connection of
-/dev/nbd0. The second cause is missing disconnect operation. The
-connect_and_disconnect process repeats _netlink_connect and
-_netlink_disconnect. When this process is killed after _netlink_connect
-and before _netlink_disconnect, the connected status is left.
+Just two minor comment / documentation fixes for the block side. Please
+pull!
 
-To avoid the left connection, wait for nbd-client process completion
-and call _netlink_disconnect at the test case end.
+The following changes since commit c266ae774effb858266e64b0dfd7018e58278523:
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- tests/nbd/004 | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+  Merge tag 'nvme-6.6-2023-09-14' of git://git.infradead.org/nvme into block-6.6 (2023-09-14 16:20:31 -0600)
 
-diff --git a/tests/nbd/004 b/tests/nbd/004
-index deb9673..1758859 100755
---- a/tests/nbd/004
-+++ b/tests/nbd/004
-@@ -31,6 +31,8 @@ connect_and_disconnect() {
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-+	local pid1 pid2 i=0
-+
- 	_start_nbd_server_netlink
- 
- 	module_load_and_unload &
-@@ -53,6 +55,18 @@ test() {
- 			echo "Fail"
- 	fi
- 
-+	# Ensure nbd-client completion and clean up left connection
-+	# shellcheck disable=SC2009
-+	while ps | grep -qe nbd-client; do
-+		sleep .5
-+		if ((i == 10)); then
-+			echo "nbd-client process is left"
-+			break
-+		fi
-+		i=$((i + 1))
-+	done
-+	_netlink_disconnect
-+
- 	echo "Test complete"
- }
- 
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.6-2023-09-28
+
+for you to fetch changes up to a578a25339aca38e23bb5af6e3fc6c2c51f0215c:
+
+  block: fix kernel-doc for disk_force_media_change() (2023-09-26 00:43:34 -0600)
+
+----------------------------------------------------------------
+block-6.6-2023-09-28
+
+----------------------------------------------------------------
+Kemeng Shi (1):
+      block: correct stale comment in rq_qos_wait
+
+Randy Dunlap (1):
+      block: fix kernel-doc for disk_force_media_change()
+
+ block/blk-rq-qos.c  | 2 +-
+ block/disk-events.c | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
 -- 
-2.41.0
+Jens Axboe
 
