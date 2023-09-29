@@ -2,63 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCEF0E728F3
-	for <linux-block@archiver.kernel.org>; Fri, 29 Sep 2023 20:48:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D68E7734D
+	for <linux-block@archiver.kernel.org>; Fri, 29 Sep 2023 22:49:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233838AbjI2UsN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Sep 2023 16:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40814 "EHLO
+        id S233862AbjI2Wt1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Sep 2023 18:49:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233820AbjI2UsM (ORCPT
+        with ESMTP id S229508AbjI2Wt0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Sep 2023 16:48:12 -0400
+        Fri, 29 Sep 2023 18:49:26 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D981BB
-        for <linux-block@vger.kernel.org>; Fri, 29 Sep 2023 13:48:10 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4599BC433C7;
-        Fri, 29 Sep 2023 20:48:10 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 807ECDD;
+        Fri, 29 Sep 2023 15:49:24 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B57E9C433C8;
+        Fri, 29 Sep 2023 22:49:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696020490;
-        bh=LNwqZ729V+pR1zOeLVnqNoyd1BZoCY9+C4tk9ejhwGE=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=H55al57ndF4MC0gnpQHG3vRuOCuiAXDLZjgTRLEvTMdYz/sf/FnzG13/mviT8Arye
-         hfBvpj4xrcSHfOyAVmYXvMkxP+7jbQx/FZJ59LpLK1j7JtEAL3J/FwBGCi08Z8jw3F
-         d4lzOd4uj8hqbO9YrkABaRBEKVtLtEGj9nXTsi4P93qbU+uBOoxQXd1D6REAgj85Kw
-         AWkTpev8KM0+Uq/qb3kSES4j/Zfu7o9XXYtgqCgR1qvoddjdjWAC3VgLbBeQ2wygCQ
-         PnPpurQ/P2wHQhYqompOAJ9TFflTdB+oFkiXWvz13UcIs2v4s9cNGZq381v1U2wtYk
-         EMDkWw6n5Di+A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 32C33C395C5;
-        Fri, 29 Sep 2023 20:48:10 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.6-rc4
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <4d46a68a-8810-442a-8f6e-249ba8283c98@kernel.dk>
-References: <4d46a68a-8810-442a-8f6e-249ba8283c98@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <4d46a68a-8810-442a-8f6e-249ba8283c98@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.6-2023-09-28
-X-PR-Tracked-Commit-Id: a578a25339aca38e23bb5af6e3fc6c2c51f0215c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: eafdc5071351314702175a3cd083cf6f7eef6488
-Message-Id: <169602049019.6106.13456194621414403023.pr-tracker-bot@kernel.org>
-Date:   Fri, 29 Sep 2023 20:48:10 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        s=k20201202; t=1696027764;
+        bh=Ufhqxo3yas1XlwZ8/C+WysTlrYXwdeYXTChlz66gL/0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RqmEBvELKiKJrPdmj27E6wWm3wbgoGhbztCnJy3K8fbCsufv51Lo9qUuXj8sTFb4C
+         zU3wRai4oALXDco5xkF66XgYStzG6E7Va5LNHKv2nVFCtNMduKicVQ7BzAu6Gg3pLo
+         DyVc3WaIDXXS3CqCCT0fschckPSyFzmlt/dbLDBIpO+CvPw8eAtrVBCEpTUG6UJ+bE
+         sM6pS/HdnnAFfJXBhYTF3VU7HubdFFtuXEKr8TIhEZZpMR0qJOHhOjaM14WcTCkW8u
+         3/kp7PQcfopDGxKohL2jgFUOHFzUYt/CpLGVJQYxOo+j5L/uayzxWPWpO76hsI2ut3
+         Ym9Y7/TXMwICw==
+Date:   Fri, 29 Sep 2023 22:49:22 +0000
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     John Garry <john.g.garry@oracle.com>
+Cc:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
+        viro@zeniv.linux.org.uk, brauner@kernel.org,
+        chandan.babu@oracle.com, dchinner@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+        linux-api@vger.kernel.org,
+        Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Subject: Re: [PATCH 03/21] fs/bdev: Add atomic write support info to statx
+Message-ID: <20230929224922.GB11839@google.com>
+References: <20230929102726.2985188-1-john.g.garry@oracle.com>
+ <20230929102726.2985188-4-john.g.garry@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230929102726.2985188-4-john.g.garry@oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 29 Sep 2023 00:06:13 -0600:
+On Fri, Sep 29, 2023 at 10:27:08AM +0000, John Garry wrote:
+> diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
+> index 7cab2c65d3d7..c99d7cac2aa6 100644
+> --- a/include/uapi/linux/stat.h
+> +++ b/include/uapi/linux/stat.h
+> @@ -127,7 +127,10 @@ struct statx {
+>  	__u32	stx_dio_mem_align;	/* Memory buffer alignment for direct I/O */
+>  	__u32	stx_dio_offset_align;	/* File offset alignment for direct I/O */
+>  	/* 0xa0 */
+> -	__u64	__spare3[12];	/* Spare space for future expansion */
+> +	__u32	stx_atomic_write_unit_max;
+> +	__u32	stx_atomic_write_unit_min;
 
-> git://git.kernel.dk/linux.git tags/block-6.6-2023-09-28
+Maybe min first and then max?  That seems a bit more natural, and a lot of the
+code you've written handle them in that order.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/eafdc5071351314702175a3cd083cf6f7eef6488
+> +#define STATX_ATTR_WRITE_ATOMIC		0x00400000 /* File supports atomic write operations */
 
-Thank you!
+How would this differ from stx_atomic_write_unit_min != 0?
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+- Eric
