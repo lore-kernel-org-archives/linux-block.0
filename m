@@ -2,25 +2,25 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BE0E732D6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01464E743DC
 	for <linux-block@archiver.kernel.org>; Sat, 30 Sep 2023 19:25:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234735AbjI3TZX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Sep 2023 15:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51698 "EHLO
+        id S233050AbjI3TZY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 Sep 2023 15:25:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233050AbjI3TZX (ORCPT
+        with ESMTP id S231603AbjI3TZX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 30 Sep 2023 15:25:23 -0400
 X-Greylist: delayed 591 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 30 Sep 2023 12:25:21 PDT
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1CD31C6;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1CE33CF;
         Sat, 30 Sep 2023 12:25:21 -0700 (PDT)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 59A087A03B4;
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 03CF57A01C5;
         Sat, 30 Sep 2023 21:15:28 +0200 (CEST)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
@@ -30,9 +30,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
         linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/4] pata_parport: add custom version of wait_after_reset
-Date:   Sat, 30 Sep 2023 21:15:10 +0200
-Message-Id: <20230930191511.24994-4-linux@zary.sk>
+Subject: [PATCH 2/4] pata_parport: implement set_devctl
+Date:   Sat, 30 Sep 2023 21:15:09 +0200
+Message-Id: <20230930191511.24994-3-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230930191511.24994-1-linux@zary.sk>
 References: <20230930191511.24994-1-linux@zary.sk>
@@ -42,104 +42,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some parallel adapters (e.g. EXP Computer MC-1285B EPP Cable) return
-bogus values when there's no master device present. This can cause
-reset to fail, preventing the lone slave device (such as EXP Computer
-CD-865) from working.
-
-Add custom version of wait_after_reset that ignores master failure when
-a slave device is present. The custom version is also needed because
-the generic ata_sff_wait_after_reset uses direct port I/O for slave
-device detection.
+Add missing ops->sff_set_devctl implementation.
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/pata_parport.c | 65 ++++++++++++++++++++++++-
- 1 file changed, 64 insertions(+), 1 deletion(-)
+ drivers/ata/pata_parport/pata_parport.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
-index cf87bbb52f1f..b3db953e615a 100644
+index 258d189f42e5..cf87bbb52f1f 100644
 --- a/drivers/ata/pata_parport/pata_parport.c
 +++ b/drivers/ata/pata_parport/pata_parport.c
-@@ -80,6 +80,69 @@ static bool pata_parport_devchk(struct ata_port *ap, unsigned int device)
- 	return (nsect == 0x55) && (lbal == 0xaa);
+@@ -51,6 +51,13 @@ static void pata_parport_dev_select(struct ata_port *ap, unsigned int device)
+ 	ata_sff_pause(ap);
  }
  
-+static int pata_parport_wait_after_reset(struct ata_link *link,
-+					 unsigned int devmask,
-+					 unsigned long deadline)
++static void pata_parport_set_devctl(struct ata_port *ap, u8 ctl)
 +{
-+	struct ata_port *ap = link->ap;
 +	struct pi_adapter *pi = ap->host->private_data;
-+	unsigned int dev0 = devmask & (1 << 0);
-+	unsigned int dev1 = devmask & (1 << 1);
-+	int rc, ret = 0;
 +
-+	ata_msleep(ap, ATA_WAIT_AFTER_RESET);
-+
-+	/* always check readiness of the master device */
-+	rc = ata_sff_wait_ready(link, deadline);
-+	/* some adapters return bogus values if master device is not present,
-+	 * so don't abort now if a slave device is present
-+	 */
-+	if (rc) {
-+		if (!dev1)
-+			return rc;
-+		ret = -ENODEV;
-+	}
-+
-+	/* if device 1 was found in ata_devchk, wait for register
-+	 * access briefly, then wait for BSY to clear.
-+	 */
-+	if (dev1) {
-+		int i;
-+
-+		pata_parport_dev_select(ap, 1);
-+
-+		/* Wait for register access.  Some ATAPI devices fail
-+		 * to set nsect/lbal after reset, so don't waste too
-+		 * much time on it.  We're gonna wait for !BSY anyway.
-+		 */
-+		for (i = 0; i < 2; i++) {
-+			u8 nsect, lbal;
-+
-+			nsect = pi->proto->read_regr(pi, 0, ATA_REG_NSECT);
-+			lbal = pi->proto->read_regr(pi, 0, ATA_REG_LBAL);
-+			if ((nsect == 1) && (lbal == 1))
-+				break;
-+			ata_msleep(ap, 50);	/* give drive a breather */
-+		}
-+
-+		rc = ata_sff_wait_ready(link, deadline);
-+		if (rc) {
-+			if (rc != -ENODEV)
-+				return rc;
-+			ret = rc;
-+		}
-+	}
-+
-+	/* is all this really necessary? */
-+	pata_parport_dev_select(ap, 0);
-+	if (dev1)
-+		pata_parport_dev_select(ap, 1);
-+	if (dev0)
-+		pata_parport_dev_select(ap, 0);
-+
-+	return ret;
++	pi->proto->write_regr(pi, 1, 6, ctl);
 +}
 +
- static int pata_parport_bus_softreset(struct ata_port *ap, unsigned int devmask,
- 				      unsigned long deadline)
+ static bool pata_parport_devchk(struct ata_port *ap, unsigned int device)
  {
-@@ -94,7 +157,7 @@ static int pata_parport_bus_softreset(struct ata_port *ap, unsigned int devmask,
- 	ap->last_ctl = ap->ctl;
+ 	struct pi_adapter *pi = ap->host->private_data;
+@@ -252,6 +259,7 @@ static struct ata_port_operations pata_parport_port_ops = {
+ 	.hardreset		= NULL,
  
- 	/* wait the port to become ready */
--	return ata_sff_wait_after_reset(&ap->link, devmask, deadline);
-+	return pata_parport_wait_after_reset(&ap->link, devmask, deadline);
- }
- 
- static int pata_parport_softreset(struct ata_link *link, unsigned int *classes,
+ 	.sff_dev_select		= pata_parport_dev_select,
++	.sff_set_devctl		= pata_parport_set_devctl,
+ 	.sff_check_status	= pata_parport_check_status,
+ 	.sff_check_altstatus	= pata_parport_check_altstatus,
+ 	.sff_tf_load		= pata_parport_tf_load,
 -- 
 Ondrej Zary
 
