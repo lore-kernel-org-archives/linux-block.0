@@ -2,95 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 217ABE748F5
-	for <linux-block@archiver.kernel.org>; Sun,  1 Oct 2023 13:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CEFE748F3
+	for <linux-block@archiver.kernel.org>; Sun,  1 Oct 2023 17:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234996AbjJANXj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 1 Oct 2023 09:23:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46052 "EHLO
+        id S235249AbjJARvK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 1 Oct 2023 13:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234979AbjJANXi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Oct 2023 09:23:38 -0400
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70CAE8E;
-        Sun,  1 Oct 2023 06:23:36 -0700 (PDT)
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3af609c4dfeso2944548b6e.1;
-        Sun, 01 Oct 2023 06:23:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696166615; x=1696771415;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xVJSYZtpL0YLa+wcSpHtc+qG+rdtMGRB99f0WwrMd40=;
-        b=l8gK/xLbmU3VcpswqtVQ4osnKA3PiOgCmngkGdgGvW42lc3FPAoee0wkwEUE/i9hR3
-         9a9Fj0T9jBo1x9YS3TJ/62OSIqjzO9Z617M0bHZw21IUwRAuTp5qty0WKg1zgxz8+u04
-         eUV5mdQc3Tn/HrZzM7p1qYk38OeI1Lcqmwrfc2QJzy1Y0hVXjoT7GfR1wG9JpQTga1cH
-         nfpzAcj7gk7kWmRMLiF8Fr2Vd5EQUSt6W/3RSJ8VggbtOtZL7aa+1RKwmJeX3r+qFALy
-         OIZa1enx/FJueIi4Arsdy7hTPBm2grlt3kIqwQpFYVy5Z20RisCoEDM/hrodMBmd8WtU
-         YmzA==
-X-Gm-Message-State: AOJu0YwlZR5/xURFcSL7Sps60/xL7XfhhisCqbdIr+UnD22ISDmGGjHV
-        UAbFcBBFdrd+UxnV+7EYGgY=
-X-Google-Smtp-Source: AGHT+IG5r59Stw18eP45GGvts3KKKs7AnR8jZu7o46ucmeUjXt+CrOjIYIY866yaw9ZKQjAGZmJ61Q==
-X-Received: by 2002:aca:220e:0:b0:3a1:bfda:c6d2 with SMTP id b14-20020aca220e000000b003a1bfdac6d2mr9142795oic.11.1696166615513;
-        Sun, 01 Oct 2023 06:23:35 -0700 (PDT)
-Received: from ?IPV6:2601:647:4d7e:54f3:667:4981:ffa1:7be1? ([2601:647:4d7e:54f3:667:4981:ffa1:7be1])
-        by smtp.gmail.com with ESMTPSA id d4-20020a170903230400b001c20c608373sm20148814plh.296.2023.10.01.06.23.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 01 Oct 2023 06:23:34 -0700 (PDT)
-Message-ID: <b9c266d2-d5d6-4294-9a95-764641e295b4@acm.org>
-Date:   Sun, 1 Oct 2023 06:23:31 -0700
+        with ESMTP id S233932AbjJARvJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Oct 2023 13:51:09 -0400
+X-Greylist: delayed 2374 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 01 Oct 2023 10:51:04 PDT
+Received: from lounge.grep.be (lounge.grep.be [IPv6:2a01:4f8:200:91e8::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04007DA;
+        Sun,  1 Oct 2023 10:51:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=uter.be;
+        s=2021.lounge; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=N1C8OuXGq/Bdvr1xe7dP3su2WBfI6fQiXd6UfybheFE=; b=bSGFLGPJKNt5kRJKMGm/90sESH
+        DMZEixE+Cund10XKRDJ8kZjhG9SJfku+c0pPyP9a8SvRp7s5laXYIIUs6vCP8ISDb1JRTK7eQZi+u
+        FZhyyCStjYgdW0gxgPf6oVGPJvQQf0xT6sbQj5penqJAgXw88iemrZeqxH0gAlZxTeQ1hvc+G2B7V
+        G2oVofVAaOjElA/771b9qCecBsQNOJjvOodJTs0Q70kSXGyNB302BVVbkm3YdmrDyjxREX2yXzIMn
+        AdRb/K4OjWQELyk7/5Zxmq6ELmicipBUYTkFa3pm26ozLNrh3dB6JVomx3OFbJGbbL7l2tqcVCF30
+        WQnnmWxQ==;
+Received: from [102.39.158.142] (helo=pc220518)
+        by lounge.grep.be with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.96)
+        (envelope-from <w@uter.be>)
+        id 1qmzyK-008WyJ-2V;
+        Sun, 01 Oct 2023 19:11:12 +0200
+Received: from wouter by pc220518 with local (Exim 4.97-RC0)
+        (envelope-from <w@uter.be>)
+        id 1qmzy1-00000001YPq-0d7j;
+        Sun, 01 Oct 2023 19:10:53 +0200
+Date:   Sun, 1 Oct 2023 19:10:53 +0200
+From:   Wouter Verhelst <w@uter.be>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Samuel Holland <samuel.holland@sifive.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Denis Efremov <efremov@linux.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-s390@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH 07/17] nbd: call blk_mark_disk_dead in
+ nbd_clear_sock_ioctl
+Message-ID: <ZRmoHaSojk6ra5OU@pc220518.home.grep.be>
+References: <20230811100828.1897174-1-hch@lst.de>
+ <20230811100828.1897174-8-hch@lst.de>
+ <79af9398-167f-440e-a493-390dc4ccbd85@sifive.com>
+ <20230925074838.GA28522@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/21] fs/bdev: Add atomic write support info to statx
-Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>,
-        John Garry <john.g.garry@oracle.com>
-Cc:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org,
-        chandan.babu@oracle.com, dchinner@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-api@vger.kernel.org,
-        Prasad Singamsetty <prasad.singamsetty@oracle.com>
-References: <20230929102726.2985188-1-john.g.garry@oracle.com>
- <20230929102726.2985188-4-john.g.garry@oracle.com>
- <20230929224922.GB11839@google.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230929224922.GB11839@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230925074838.GA28522@lst.de>
+X-Speed: Gates' Law: Every 18 months, the speed of software halves.
+Organization: none
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/29/23 15:49, Eric Biggers wrote:
-> On Fri, Sep 29, 2023 at 10:27:08AM +0000, John Garry wrote:
->> diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
->> index 7cab2c65d3d7..c99d7cac2aa6 100644
->> --- a/include/uapi/linux/stat.h
->> +++ b/include/uapi/linux/stat.h
->> @@ -127,7 +127,10 @@ struct statx {
->>   	__u32	stx_dio_mem_align;	/* Memory buffer alignment for direct I/O */
->>   	__u32	stx_dio_offset_align;	/* File offset alignment for direct I/O */
->>   	/* 0xa0 */
->> -	__u64	__spare3[12];	/* Spare space for future expansion */
->> +	__u32	stx_atomic_write_unit_max;
->> +	__u32	stx_atomic_write_unit_min;
+On Mon, Sep 25, 2023 at 09:48:38AM +0200, Christoph Hellwig wrote:
+> On Wed, Sep 20, 2023 at 03:41:11PM -0500, Samuel Holland wrote:
+> > [   14.619101] Buffer I/O error on dev nbd0, logical block 0, async page read
+> > 
+> > [   14.630490]  nbd0: unable to read partition table
+> > 
+> > I wonder if disk_force_media_change() is the right thing to call here instead.
 > 
-> Maybe min first and then max?  That seems a bit more natural, and a lot of the
-> code you've written handle them in that order.
+> So what are the semantics of clearing the socket?
 > 
->> +#define STATX_ATTR_WRITE_ATOMIC		0x00400000 /* File supports atomic write operations */
-> 
-> How would this differ from stx_atomic_write_unit_min != 0?
+> The <= 6.5 behavior of invalidating fs caches, but not actually marking
+> the fs shutdown is pretty broken, especially if this expects to resurrect
+> the device and thus the file system later on.
 
-Is it even possible that stx_atomic_write_unit_min == 0? My understanding
-is that all Linux filesystems rely on the assumption that writing a single
-logical block either succeeds or does not happen, even if a power failure
-occurs between writing and reading a logical block.
+nbd-client -d calls
 
-Thanks,
+ioctl(nbd, NBD_DISCONNECT);
+ioctl(nbd, NBD_CLEAR_SOCK);
 
-Bart.
+(error handling removed for clarity)
+
+where "nbd" is the file handle to the nbd device. This expects that the
+device is cleared and that then the device can be reused for a different
+connection, much like "losetup -d". Expecting that the next connection
+would talk to the same file system is wrong.
+
+In netlink mode, it obviously doesn't use the ioctl()s, but instead
+sends an NBD_CMD_DISCONNECT command, without any NBD_CLEAR_SOCK, for
+which no equivalent message exists. At this point, obviously the same
+result is expected in userspace, i.e., the device should now be
+available for the next connection that may or may not be the same one.
+
+nbd-client also has "-persist" option that used to work. This does
+expect to resurrect the device and file system. It depends on semantics
+where the kernel would block IO to the device until the nbd-client
+process that initiated the connection exits, thus allowing it to
+re-establish the connection if possible. When doing this, we don't issue
+a DISCONNECT or CLEAR_SOCK message and obviously the client is expected
+to re-establish a connection to the same device, thus some state should
+be retained.
+
+These semantics have however been broken at some point over the past decade
+or so, but I didn't notice that at the time, so I didn't complain, and
+it's therefore probably not relevant anymore. We should perhaps rethink
+whether this is still a good idea given the way the netlink mode does
+not have a client waiting for a return of the ioctl() call, and if so
+how to implement a replacement.
+
+Kind regards,
+
+-- 
+     w@uter.{be,co.za}
+wouter@{grep.be,fosdem.org,debian.org}
+
+I will have a Tin-Actinium-Potassium mixture, thanks.
