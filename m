@@ -2,97 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F04FAE74914
-	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 18:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 381C4E74911
+	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 18:43:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238796AbjJBSjN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Oct 2023 14:39:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36900 "EHLO
+        id S238774AbjJBSnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Oct 2023 14:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbjJBSjM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 14:39:12 -0400
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3813DC;
-        Mon,  2 Oct 2023 11:39:05 -0700 (PDT)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-59f4f80d084so1163257b3.1;
-        Mon, 02 Oct 2023 11:39:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696271945; x=1696876745;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gc60tErHmFLa/ojhrllX+rIN4q7yH7L/FhjXgxWfjlA=;
-        b=mMjFzSpYzwwHQFuni+3y7KwwVF9g8Ug9ala3LCcVo395Doop45T1R0ThNnxCvQQTIp
-         fGaiH9G8ZPgA+kew6QfgxfRU5wKttiwT/YBLtc122oS72PCuv3W0FZQMd40pgKygu5Yj
-         oxXWn+irwMT0vus+qlh8vckzi9w9dy8QL1ER2eoV1LKOjhnqSU72NskpN1scawKaNolO
-         vq6EA5+28nYnVSw29+sXePEFSS8WafHjxVRi3h7BI1FrjKeL9O4jkV3KS7Bt67eI04aK
-         YhUknHFRWHwJEh766Vdl4kBCszvHgd98xkxkvkMfC+IfYDgOXTYcaBmyxpW+VVj1cmSA
-         mPRQ==
-X-Gm-Message-State: AOJu0YzjkkRvKGjUYJWhwrqx6zEkOFXM3F/7NEU4IburZkELBZYT9gQ9
-        AxUaK8p98JTvvoVv0JK+2QQ=
-X-Google-Smtp-Source: AGHT+IESVNBLm8WCa7rBouLG5qA3ZmN61xUw/sb/SYnK4ixQ5LUHtH5fDdM+JtbnGYgfpHa7GLtSKA==
-X-Received: by 2002:a25:c748:0:b0:ced:6134:7606 with SMTP id w69-20020a25c748000000b00ced61347606mr10978974ybe.30.1696271944617;
-        Mon, 02 Oct 2023 11:39:04 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:6ad7:f663:5f97:db57? ([2620:15c:211:201:6ad7:f663:5f97:db57])
-        by smtp.gmail.com with ESMTPSA id o9-20020a639a09000000b0056c2f1a2f6bsm19484421pge.41.2023.10.02.11.39.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Oct 2023 11:39:03 -0700 (PDT)
-Message-ID: <2c929105-7c7f-43c5-a105-42d1813d0e29@acm.org>
-Date:   Mon, 2 Oct 2023 11:39:00 -0700
+        with ESMTP id S232711AbjJBSnS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 14:43:18 -0400
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B416EAB;
+        Mon,  2 Oct 2023 11:43:14 -0700 (PDT)
+Received: from [192.168.1.103] (178.176.75.5) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Mon, 2 Oct 2023
+ 21:43:10 +0300
+Subject: Re: [PATCH 1/4] pata_parport: fix pata_parport_devchk
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
+        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230930191511.24994-1-linux@zary.sk>
+ <20230930191511.24994-2-linux@zary.sk>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <d040b3f7-4222-a027-34d0-5cf62aa63605@omp.ru>
+Date:   Mon, 2 Oct 2023 21:43:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/21] fs/bdev: Add atomic write support info to statx
+In-Reply-To: <20230930191511.24994-2-linux@zary.sk>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To:     John Garry <john.g.garry@oracle.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org,
-        chandan.babu@oracle.com, dchinner@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-api@vger.kernel.org,
-        Prasad Singamsetty <prasad.singamsetty@oracle.com>
-References: <20230929102726.2985188-1-john.g.garry@oracle.com>
- <20230929102726.2985188-4-john.g.garry@oracle.com>
- <20230929224922.GB11839@google.com>
- <b9c266d2-d5d6-4294-9a95-764641e295b4@acm.org>
- <d3a8b9b0-b24c-a002-e77d-56380ee785a5@oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <d3a8b9b0-b24c-a002-e77d-56380ee785a5@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.75.5]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 10/02/2023 18:24:27
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 180294 [Oct 02 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.5 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: {rdns complete}
+X-KSE-AntiSpam-Info: {fromrtbl complete}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.5
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=none header.from=omp.ru;spf=none
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/02/2023 18:30:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 10/2/2023 5:26:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/2/23 02:51, John Garry wrote:
-> On 01/10/2023 14:23, Bart Van Assche wrote:
->> Is it even possible that stx_atomic_write_unit_min == 0? My 
->> understanding is that all Linux filesystems rely on the assumption 
->> that writing a single logical block either succeeds or does not 
->> happen, even if a power failure occurs between writing and reading 
->> a logical block.
+Hello!
+
+On 9/30/23 10:15 PM, Ondrej Zary wrote:
+
+> There's a 'x' missing in 0x55 in pata_parport_devchk(), causing the
+> detection to always fail. Fix it.
 > 
-> Maybe they do rely on this, but is it particularly interesting?
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
+
+   I think we need a Fixes: tag here...
+
+> ---
+>  drivers/ata/pata_parport/pata_parport.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> BTW, I would not like to provide assurances that every storage media 
-> produced writes logical blocks atomically.
+> diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
+> index 1af64d435d3c..258d189f42e5 100644
+> --- a/drivers/ata/pata_parport/pata_parport.c
+> +++ b/drivers/ata/pata_parport/pata_parport.c
+> @@ -64,7 +64,7 @@ static bool pata_parport_devchk(struct ata_port *ap, unsigned int device)
+>  	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 0xaa);
+>  	pi->proto->write_regr(pi, 0, ATA_REG_LBAL, 0x55);
+>  
+> -	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 055);
+> +	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 0x55);
 
-Neither the SCSI SBC standard nor the NVMe standard defines a "minimum
-atomic write unit". So why to introduce something in the Linux kernel
-that is not defined in common storage standards?
+   Oh, Gawd! How did this ever work?! :-/
+   This bug seems to predate the Big PARIDE move...
 
-I propose to leave out stx_atomic_write_unit_min from
-struct statx and also to leave out atomic_write_unit_min_sectors from
-struct queue_limits. My opinion is that we should not support block
-devices in the Linux kernel that do not write logical blocks atomically.
-Block devices that do not write logical blocks atomically are not
-compatible with Linux kernel journaling filesystems. Additionally, I'm
-not sure it's even possible to write a journaling filesystem for such 
-block devices.
+>  	pi->proto->write_regr(pi, 0, ATA_REG_LBAL, 0xaa);
+>  
+>  	nsect = pi->proto->read_regr(pi, 0, ATA_REG_NSECT);
+> 
 
-Thanks,
-
-Bart.
+MBR, Sergey
