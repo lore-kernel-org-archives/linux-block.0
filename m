@@ -2,200 +2,165 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F09E784AE
-	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 07:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 886CCE784AF
+	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 09:26:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235768AbjJBH5j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Oct 2023 03:57:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42866 "EHLO
+        id S236054AbjJBJ0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Oct 2023 05:26:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbjJBH5h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 03:57:37 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E755BC;
-        Mon,  2 Oct 2023 00:57:34 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id AB8121F459;
-        Mon,  2 Oct 2023 07:57:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1696233452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        with ESMTP id S236033AbjJBJ0s (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 05:26:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C990894
+        for <linux-block@vger.kernel.org>; Mon,  2 Oct 2023 02:25:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696238759;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HRtvvsbDRmaIGA2qlEwuFNnN4SG9to1RwhMyTnDS1Ek=;
-        b=AelUG9FSlQyUcQTA9I9qRJmPzMA6mvk2OLx4Qv2PacqmgU2FkeI54uQfwuwk8GDISDrHf1
-        K6okkr5Yua+jK8r2TTOukY7745vay4e4z1caiTsHAigkH18O5VWdMY9s+0PKMe8/Ta1ITc
-        H4lySULw9TgNQsjwAFd513U/tj8Iifc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1696233452;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HRtvvsbDRmaIGA2qlEwuFNnN4SG9to1RwhMyTnDS1Ek=;
-        b=4yX5F6ZD5YaXQ1SgLuHClpbWfxc1xKg7esoSW59wSh/oO7HSeTROmd590v4TgEevJu81R5
-        RAceDQWhH8NjA0AQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=u0PdD95eQa7pRzI20cGWxgLJ0k+Wv+3imJtntajjlHo=;
+        b=IoehaNhrnsl3TIo+8K4+10v4FBafcscP1fRTjQkAYstSPZyFalvxrgCSMOMGnf1bMmk8ON
+        mrpEIN/RTmGyvgsbrc/IyjU9vrzi6PWJcFDUbNsKrXOTedJDQxGgmP4RQZFMr1tolTNNZe
+        /dXdR0LpSnOtgMOAAcou+9go3G2Qfec=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-329-PQBTnD6gOOy2ZO4-BcF33g-1; Mon, 02 Oct 2023 05:25:55 -0400
+X-MC-Unique: PQBTnD6gOOy2ZO4-BcF33g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 83FA513434;
-        Mon,  2 Oct 2023 07:57:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id JLsgIOx3GmUuEgAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 02 Oct 2023 07:57:32 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 27D44A07C9; Mon,  2 Oct 2023 09:57:32 +0200 (CEST)
-Date:   Mon, 2 Oct 2023 09:57:32 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anna Schumaker <anna@kernel.org>, Chao Yu <chao@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, Gao Xiang <xiang@kernel.org>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        jfs-discussion@lists.sourceforge.net,
-        Joern Engel <joern@lazybastard.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        linux-bcache@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-xfs@vger.kernel.org,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Minchan Kim <minchan@kernel.org>, ocfs2-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Song Liu <song@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        target-devel@vger.kernel.org, Ted Tso <tytso@mit.edu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v4 0/29] block: Make blkdev_get_by_*() return handle
-Message-ID: <20231002075732.4c5oslpabrmw3niz@quack3>
-References: <20230818123232.2269-1-jack@suse.cz>
- <20230927-prahlen-reintreten-93706074e58d@brauner>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2035D811E7D;
+        Mon,  2 Oct 2023 09:25:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.226])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 638B951E3;
+        Mon,  2 Oct 2023 09:25:52 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230925120309.1731676-9-dhowells@redhat.com>
+References: <20230925120309.1731676-9-dhowells@redhat.com> <20230925120309.1731676-1-dhowells@redhat.com>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        David Laight <David.Laight@ACULAB.COM>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 08/12] iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230927-prahlen-reintreten-93706074e58d@brauner>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1809397.1696238751.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 02 Oct 2023 10:25:51 +0100
+Message-ID: <1809398.1696238751@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 27-09-23 18:21:19, Christian Brauner wrote:
-> On Wed, 27 Sep 2023 11:34:07 +0200, Jan Kara wrote:
-> > Create struct bdev_handle that contains all parameters that need to be
-> > passed to blkdev_put() and provide bdev_open_* functions that return
-> > this structure instead of plain bdev pointer. This will eventually allow
-> > us to pass one more argument to blkdev_put() (renamed to bdev_release())
-> > without too much hassle.
-> > 
-> > 
-> > [...]
-> 
-> > to ease review / testing. Christian, can you pull the patches to your tree
-> > to get some exposure in linux-next as well? Thanks!
-> 
-> Yep. So I did it slighly differently. I pulled in the btrfs prereqs and
-> then applied your series on top of it so we get all the Link: tags right.
-> I'm running tests right now. Please double-check.
+David Howells <dhowells@redhat.com> wrote:
 
-Thanks for picking patches up! I've checked the branch and it looks good to
-me. 
+> +static size_t __copy_from_iter_mc(void *addr, size_t bytes, struct iov_=
+iter *i)
+>  {
+> -	struct iov_iter *iter =3D priv2;
+> +	size_t progress;
+>  =
 
-								Honza
+> -	if (iov_iter_is_copy_mc(iter))
+> -		return copy_mc_to_kernel(to + progress, iter_from, len);
+> -	return memcpy_from_iter(iter_from, progress, len, to, priv2);
+> +	if (unlikely(i->count < bytes))
+> +		bytes =3D i->count;
+> +	if (unlikely(!bytes))
+> +		return 0;
+> +	progress =3D iterate_bvec(i, bytes, addr, NULL, memcpy_from_iter_mc);
+> +	i->count -=3D progress;
 
-> 
-> ---
-> 
-> Applied to the vfs.super branch of the vfs/vfs.git tree.
-> Patches in the vfs.super branch should appear in linux-next soon.
-> 
-> Please report any outstanding bugs that were missed during review in a
-> new review to the original patch series allowing us to drop it.
-> 
-> It's encouraged to provide Acked-bys and Reviewed-bys even though the
-> patch has now been applied. If possible patch trailers will be updated.
-> 
-> Note that commit hashes shown below are subject to change due to rebase,
-> trailer updates or similar. If in doubt, please check the listed branch.
-> 
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-> branch: vfs.super
-> 
-> [01/29] block: Provide bdev_open_* functions
->        https://git.kernel.org/vfs/vfs/c/b7c828aa0b3c
-> [02/29] block: Use bdev_open_by_dev() in blkdev_open()
->         https://git.kernel.org/vfs/vfs/c/d4e36f27b45a
-> [03/29] block: Use bdev_open_by_dev() in disk_scan_partitions() and blkdev_bszset()
->         https://git.kernel.org/vfs/vfs/c/5f9bd6764c7a
-> [04/29] drdb: Convert to use bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/0220ca8e443d
-> [05/29] pktcdvd: Convert to bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/7af10b889789
-> [06/29] rnbd-srv: Convert to use bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/3d27892a4be7
-> [07/29] xen/blkback: Convert to bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/26afb0ed10b3
-> [08/29] zram: Convert to use bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/efc8e3f4c6dc
-> [09/29] bcache: Convert to bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/dc893f51d24a
-> [10/29] dm: Convert to bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/80c2267c6d07
-> [11/29] md: Convert to bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/15db36126ca6
-> [12/29] mtd: block2mtd: Convert to bdev_open_by_dev/path()
->         https://git.kernel.org/vfs/vfs/c/4c27234bf3ce
-> [13/29] nvmet: Convert to bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/70cffddcc300
-> [14/29] s390/dasd: Convert to bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/5581d03457f8
-> [15/29] scsi: target: Convert to bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/43de7d844d47
-> [16/29] PM: hibernate: Convert to bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/105ea4a2fd18
-> [17/29] PM: hibernate: Drop unused snapshot_test argument
->         https://git.kernel.org/vfs/vfs/c/b589a66e3688
-> [18/29] mm/swap: Convert to use bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/615af8e29233
-> [19/29] fs: Convert to bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/5173192bcfe6
-> [20/29] btrfs: Convert to bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/8cf64782764f
-> [21/29] erofs: Convert to use bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/4d41880bf249
-> [22/29] ext4: Convert to bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/f7507612395e
-> [23/29] f2fs: Convert to bdev_open_by_dev/path()
->         https://git.kernel.org/vfs/vfs/c/d9ff8e3b6498
-> [24/29] jfs: Convert to bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/459dc6376338
-> [25/29] nfs/blocklayout: Convert to use bdev_open_by_dev/path()
->         https://git.kernel.org/vfs/vfs/c/5b1df9a40929
-> [26/29] ocfs2: Convert to use bdev_open_by_dev()
->         https://git.kernel.org/vfs/vfs/c/b6b95acbd943
-> [27/29] reiserfs: Convert to bdev_open_by_dev/path()
->         https://git.kernel.org/vfs/vfs/c/7e3615ff6119
-> [28/29] xfs: Convert to bdev_open_by_path()
->         https://git.kernel.org/vfs/vfs/c/176ccb99e207
-> [29/29] block: Remove blkdev_get_by_*() functions
->         https://git.kernel.org/vfs/vfs/c/953863a5a2ff
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+i->count shouldn't be decreased here as iterate_bvec() now does that.
+
+This causes the LTP abort01 test to log a warning under KASAN (see below).
+I'll remove the line and repush the patches.
+
+David
+
+    LTP: starting abort01
+    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+    BUG: KASAN: stack-out-of-bounds in __copy_from_iter_mc+0x2e6/0x480
+    Read of size 4 at addr ffffc90004777594 by task abort01/708
+
+    CPU: 4 PID: 708 Comm: abort01 Not tainted 99.6.0-rc3-ged6251886a1d #46
+    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009)/Incus, BIOS unknown=
+ 2/2/2022
+    Call Trace:
+     <TASK>
+     dump_stack_lvl+0x3d/0x70
+     print_report+0xce/0x650
+     ? lock_acquire+0x1b1/0x330
+     kasan_report+0xda/0x110
+     ? __copy_from_iter_mc+0x2e6/0x480
+     ? __copy_from_iter_mc+0x2e6/0x480
+     __copy_from_iter_mc+0x2e6/0x480
+     copy_page_from_iter_atomic+0x517/0x1350
+     ? __pfx_copy_page_from_iter_atomic+0x10/0x10
+     ? __filemap_get_folio+0x281/0x6c0
+     ? folio_wait_writeback+0x53/0x1e0
+     ? prepare_pages.constprop.0+0x40b/0x6c0
+     btrfs_copy_from_user+0xc6/0x290
+     btrfs_buffered_write+0x8c9/0x1190
+     ? __pfx_btrfs_buffered_write+0x10/0x10
+     ? _raw_spin_unlock+0x2d/0x50
+     ? btrfs_file_llseek+0x100/0xf00
+     ? follow_page_mask+0x69f/0x1e10
+     btrfs_do_write_iter+0x859/0xff0
+     ? __pfx_btrfs_file_llseek+0x10/0x10
+     ? find_held_lock+0x2d/0x110
+     ? __pfx_btrfs_do_write_iter+0x10/0x10
+     ? __up_read+0x211/0x790
+     ? __pfx___get_user_pages+0x10/0x10
+     ? __pfx___up_read+0x10/0x10
+     ? __kernel_write_iter+0x3be/0x6d0
+     __kernel_write_iter+0x226/0x6d0
+     ? __pfx___kernel_write_iter+0x10/0x10
+     dump_user_range+0x25d/0x650
+     ? __pfx_dump_user_range+0x10/0x10
+     ? __pfx_writenote+0x10/0x10
+     elf_core_dump+0x231f/0x2e90
+     ? __pfx_elf_core_dump+0x10/0x10
+     ? do_coredump+0x12a9/0x38c0
+     ? kasan_set_track+0x25/0x30
+     ? __kasan_kmalloc+0xaa/0xb0
+     ? __kmalloc_node+0x6c/0x1b0
+     ? do_coredump+0x12a9/0x38c0
+     ? get_signal+0x1e7d/0x20f0
+     ? 0xffffffffff600000
+     ? mas_next_slot+0x328/0x1dd0
+     ? lock_acquire+0x162/0x330
+     ? do_coredump+0x2537/0x38c0
+     do_coredump+0x2537/0x38c0
+     ? __pfx_do_coredump+0x10/0x10
+     ? kmem_cache_free+0x114/0x520
+     ? find_held_lock+0x2d/0x110
+     get_signal+0x1e7d/0x20f0
+     ? __pfx_get_signal+0x10/0x10
+     ? do_send_specific+0xf1/0x1c0
+     ? __pfx_do_send_specific+0x10/0x10
+     arch_do_signal_or_restart+0x8b/0x4b0
+     ? __pfx_arch_do_signal_or_restart+0x10/0x10
+     exit_to_user_mode_prepare+0xde/0x210
+     syscall_exit_to_user_mode+0x16/0x50
+     do_syscall_64+0x53/0x90
+     entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+
