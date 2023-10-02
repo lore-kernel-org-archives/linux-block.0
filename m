@@ -2,100 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF5D3E7490C
-	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 19:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E5BBE7491F
+	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 19:52:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238552AbjJBTVz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Oct 2023 15:21:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38676 "EHLO
+        id S229702AbjJBTwj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Oct 2023 15:52:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238588AbjJBTVz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 15:21:55 -0400
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 800C7B8;
-        Mon,  2 Oct 2023 12:21:52 -0700 (PDT)
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-692c70bc440so95996b3a.3;
-        Mon, 02 Oct 2023 12:21:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696274512; x=1696879312;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F/ve4+0hI3kPGfr74V3fRnzywfGyjXPBIyqNnDnwTuY=;
-        b=ASbk9QYdkJdNH3dtF4kQxAFsa1WIsFZRCmEaGeONCcDrOLUA/l3FYCyKw+jCc/l4Lp
-         URXEmUyjTNfoFYhTaboe92+s7mCrUOIVAOQNo7OInFKLSaaU4MQNVpTrj/sDrS/6DeeC
-         +opqrkEnDfP0HpV0WoqiNvrET5+jyMu7PgwfAhuyV9L8ecpIJ0cSoQBlYcw6D/+oJ1r3
-         s42eclPXZE7oBYjDzhDlpytJE2W2JM2eOVZxf5NeDeSgsVCXAVzK4OG1qDq9tK5VqfMZ
-         h9grhLsPMwTuAyv9mHhfnNUyx6Ym90CUjWcQ6z5449W3OoSjr6jQMqfdLYNOcXTZo0mT
-         dnMA==
-X-Gm-Message-State: AOJu0YxwOStOFqwEYS4mNMb4un+Em2+f+aOYqo7HHNVxq1/NIfLSArFa
-        a1C0cxuf65JPiMj37Itu/N8=
-X-Google-Smtp-Source: AGHT+IHdmSkxcMU9Q3KlwXLUK3XdwSehxi52wiuutteyt+WOowhzgK0t39kMn9Z+tSskapiavysFsA==
-X-Received: by 2002:a05:6a21:35c4:b0:136:ea0e:d23 with SMTP id ba4-20020a056a2135c400b00136ea0e0d23mr9301982pzc.11.1696274511618;
-        Mon, 02 Oct 2023 12:21:51 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:6ad7:f663:5f97:db57? ([2620:15c:211:201:6ad7:f663:5f97:db57])
-        by smtp.gmail.com with ESMTPSA id o5-20020a170902d4c500b001b896d0eb3dsm10650573plg.8.2023.10.02.12.21.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Oct 2023 12:21:51 -0700 (PDT)
-Message-ID: <6a41f73c-d2ac-405f-9ecd-96dd938c9a1f@acm.org>
-Date:   Mon, 2 Oct 2023 12:21:48 -0700
+        with ESMTP id S229497AbjJBTwj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 15:52:39 -0400
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40CB3B3;
+        Mon,  2 Oct 2023 12:52:35 -0700 (PDT)
+Received: from [192.168.1.103] (178.176.75.5) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Mon, 2 Oct 2023
+ 22:52:31 +0300
+Subject: Re: [PATCH 2/4] pata_parport: implement set_devctl
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
+        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230930191511.24994-1-linux@zary.sk>
+ <20230930191511.24994-3-linux@zary.sk>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <ecef0b03-b0a5-82c7-1274-c4d7a1b82308@omp.ru>
+Date:   Mon, 2 Oct 2023 22:52:30 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 19/21] scsi: sd: Add WRITE_ATOMIC_16 support
+In-Reply-To: <20230930191511.24994-3-linux@zary.sk>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To:     John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org,
-        chandan.babu@oracle.com, dchinner@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-api@vger.kernel.org
-References: <20230929102726.2985188-1-john.g.garry@oracle.com>
- <20230929102726.2985188-20-john.g.garry@oracle.com>
- <2abb1fb8-88c6-401d-b65f-b7001b2203ec@acm.org>
- <a6041625-a203-04b3-fa42-ed023e868060@oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <a6041625-a203-04b3-fa42-ed023e868060@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.75.5]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 10/02/2023 19:37:23
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 180294 [Oct 02 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.5 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.75.5:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: {rdns complete}
+X-KSE-AntiSpam-Info: {fromrtbl complete}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.5
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=none header.from=omp.ru;spf=none
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/02/2023 19:41:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 10/2/2023 5:26:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/2/23 04:36, John Garry wrote:
-> On 29/09/2023 18:59, Bart Van Assche wrote:
->> On 9/29/23 03:27, John Garry wrote:
->>> +static blk_status_t sd_setup_atomic_cmnd(struct scsi_cmnd *cmd,
->>> +                    sector_t lba, unsigned int nr_blocks,
->>> +                    unsigned char flags)
->>> +{
->>> +    cmd->cmd_len  = 16;
->>> +    cmd->cmnd[0]  = WRITE_ATOMIC_16;
->>> +    cmd->cmnd[1]  = flags;
->>> +    put_unaligned_be64(lba, &cmd->cmnd[2]);
->>> +    cmd->cmnd[10] = 0;
->>> +    cmd->cmnd[11] = 0;
->>> +    put_unaligned_be16(nr_blocks, &cmd->cmnd[12]);
->>> +    cmd->cmnd[14] = 0;
->>> +    cmd->cmnd[15] = 0;
->>> +
->>> +    return BLK_STS_OK;
->>> +}
->>
->> Please store the 'dld' value in the GROUP NUMBER field. See e.g.
->> sd_setup_rw16_cmnd().
-> 
-> Are you sure that WRITE ATOMIC (16) supports dld?
+On 9/30/23 10:15 PM, Ondrej Zary wrote:
 
-Hi John,
+> Add missing ops->sff_set_devctl implementation.
 
-I was assuming that DLD would be supported by the WRITE ATOMIC(16) 
-command. After having taken another look at the latest SBC-5 draft
-I see that the DLD2/DLD1/DLD0 bits are not present in the WRITE 
-ATOMIC(16) command. So please ignore my comment above.
+   This is also a bug fix, right?
 
-Thanks,
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
 
-Bart.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Fixes: 246a1c4c6b7f ("ata: pata_parport: add driver (PARIDE replacement)")
+
+[...]
+
+MBR, Sergey
