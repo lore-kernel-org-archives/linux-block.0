@@ -2,117 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D45EE74914
-	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 19:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9434EE74913
+	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 19:15:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238548AbjJBTM4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Oct 2023 15:12:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48564 "EHLO
+        id S238519AbjJBTPn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Oct 2023 15:15:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238519AbjJBTM4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 15:12:56 -0400
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A2FC9;
-        Mon,  2 Oct 2023 12:12:52 -0700 (PDT)
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3af603da0f0so69170b6e.3;
-        Mon, 02 Oct 2023 12:12:52 -0700 (PDT)
+        with ESMTP id S229536AbjJBTPm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 15:15:42 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C48C6
+        for <linux-block@vger.kernel.org>; Mon,  2 Oct 2023 12:15:38 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-3526c9c401aso6106715ab.1
+        for <linux-block@vger.kernel.org>; Mon, 02 Oct 2023 12:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1696274138; x=1696878938; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wfpu0g7eWR/bD6NFg1Hw3uuA6aj8ndONfL3cIV4EkSU=;
+        b=LD0D5C1hAgd9cfGzjB0woiGA7f3wRstHNDJpX0bwrw2c3u9EVsmqdm0tv5Re980i/c
+         Vsbd6JZ3PZcukzNx/mTB5KSLFOc1pnGBtrszLr31CzPiB6ggWixhRbX9ayte+CzTEsS0
+         H9y0OhJ8ZMW2x5QRXfVanglwbIxUO5d70UtQJbeRbFjqRvE07xx5Iulfd56FUNWXS81/
+         N8GQ3nh89nPUbMDU/ipiXqkLvyKpr4YcbBINy7nfTGRyxwKLe/BT/E7GGdxllXXgtx/y
+         GuafTq3EThpbNs8kmBfMPKWmx/NPgUDjGo0yzkqeoDLrCT2dKSpkifkeP/GxsEtfYyGa
+         +rJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696273972; x=1696878772;
+        d=1e100.net; s=20230601; t=1696274138; x=1696878938;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QUdRRJDEOEUkLfFy9sPy2x/dfu57//lkDWppt3CgCr0=;
-        b=POUAI3nH/ATN8nxSyfkeanTklP+0FQKReRaRF4qD8X4PoZ6eKRfV/KZMLAup1P3yTl
-         gGqaI0w8luGRdM4k8tIMxufzgreqRPchnetFqn5qooNVYGQUKvVJ2yBH0Yf0a3Ro/jPs
-         aIbryfGYXyA29WOBG1mObNAr3whIyLVdVXYsj1yJeRCOmQJeEtRbm3cizVtQGxF029YB
-         +v7a7O7d9UFQ3fm1t+PQoHBnABzj68IuYHfVlMkrNXJPL8Hy0LBsDvPibm30k16zUf6D
-         KozoWv41MOJ2pRNi20gLhPMoqpSOHlHK3vz5xAfhZZ/jaPXgGateCmIs6PCGzBOlIWyP
-         WnSw==
-X-Gm-Message-State: AOJu0Yz1kdLOTGYCxBYu2M1+r2WMOXK/Zc39uMwnQsgKZ0vr7nBkBZCE
-        7lS8byRfes8Vms2Fx4HaS68=
-X-Google-Smtp-Source: AGHT+IH0PK11dn6H63Mr8RpWcPoILY0OrFw4a9OhWFOW8KKCEwPGNLXzRWfSUSCL5bhxshAKSBIzhQ==
-X-Received: by 2002:aca:1911:0:b0:3a7:aabc:738f with SMTP id l17-20020aca1911000000b003a7aabc738fmr11881935oii.39.1696273971928;
-        Mon, 02 Oct 2023 12:12:51 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:6ad7:f663:5f97:db57? ([2620:15c:211:201:6ad7:f663:5f97:db57])
-        by smtp.gmail.com with ESMTPSA id p4-20020a637f44000000b005637030d00csm19436115pgn.30.2023.10.02.12.12.50
+        bh=Wfpu0g7eWR/bD6NFg1Hw3uuA6aj8ndONfL3cIV4EkSU=;
+        b=TNpUYZyWHEXS2yfEct9gHxxkMeQiYLO3k8tJMZEubcjY06PIh+/0KCTkP0ybtCnxqC
+         Xik9yHR8BtHV3uJI29sG35ZDGVcsu7SSmD3Su0egnvhq99Izv8luUuhI58B7xmWPB8fu
+         hFjG2Fqc9M2z03g4dqhPtPTm2uGIsONdxOBPV2gLrXgphF7c4ci4M81214A+yUmMFVw+
+         Y6bkjC4TLbHRcPnP3RWxFsx1ppyF/Qu7FWZ68f2t8KojPMhFr8vBbysTr4V8L6F352kX
+         9K/gEtCYPOBdVKlNpffhkfSa0tfKtuAHwOczS4y34jlXE41wSsz85y7W/Q0nwjRxQcxc
+         oWIA==
+X-Gm-Message-State: AOJu0YyL9bVq2Lho3FtMKsvjmO5dWYelps92HTzKGSMcwvtyR/Q8eXf6
+        RXwRTWEME/zrtzy+6CmrW4GruaWFYQ86voFK+WHQai1W
+X-Google-Smtp-Source: AGHT+IHuLrLT0lmZmHDMHS0OHH96XERxHL7pJTE9KoIBXxmJHQADQKTERwsFpskdzZvEU4f1iF1V2A==
+X-Received: by 2002:a05:6e02:1d93:b0:351:2053:f4a with SMTP id h19-20020a056e021d9300b0035120530f4amr485145ila.3.1696274138264;
+        Mon, 02 Oct 2023 12:15:38 -0700 (PDT)
+Received: from ?IPV6:2605:a601:adae:4500:71c9:1cd3:823e:b180? ([2605:a601:adae:4500:71c9:1cd3:823e:b180])
+        by smtp.gmail.com with ESMTPSA id w5-20020a056638030500b0043a1fe337b9sm7192769jap.170.2023.10.02.12.15.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Oct 2023 12:12:51 -0700 (PDT)
-Message-ID: <b7a6f380-c6fa-45e0-b727-ba804c6684e4@acm.org>
-Date:   Mon, 2 Oct 2023 12:12:49 -0700
+        Mon, 02 Oct 2023 12:15:37 -0700 (PDT)
+Message-ID: <3a5e1f6e-5fa9-46ea-8828-ca4679bf0c77@sifive.com>
+Date:   Mon, 2 Oct 2023 14:15:36 -0500
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/21] block: Add fops atomic write support
+Subject: Re: [PATCH 07/17] nbd: call blk_mark_disk_dead in
+ nbd_clear_sock_ioctl
 Content-Language: en-US
-To:     John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org,
-        chandan.babu@oracle.com, dchinner@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-api@vger.kernel.org
-References: <20230929102726.2985188-1-john.g.garry@oracle.com>
- <20230929102726.2985188-11-john.g.garry@oracle.com>
- <17ee1669-5830-4ead-888d-a6a4624b638a@acm.org>
- <5d26fa3b-ec34-bc39-ecfe-4616a04977ca@oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <5d26fa3b-ec34-bc39-ecfe-4616a04977ca@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To:     Christoph Hellwig <hch@lst.de>, Wouter Verhelst <w@uter.be>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Denis Efremov <efremov@linux.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        "Darrick J . Wong" <djwong@kernel.org>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-s390@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20230811100828.1897174-1-hch@lst.de>
+ <20230811100828.1897174-8-hch@lst.de>
+ <79af9398-167f-440e-a493-390dc4ccbd85@sifive.com>
+ <20230925074838.GA28522@lst.de> <ZRmoHaSojk6ra5OU@pc220518.home.grep.be>
+ <20231002062159.GB1140@lst.de>
+From:   Samuel Holland <samuel.holland@sifive.com>
+In-Reply-To: <20231002062159.GB1140@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/2/23 03:10, John Garry wrote:
-> On 29/09/2023 18:51, Bart Van Assche wrote:
->> On 9/29/23 03:27, John Garry wrote:
->  > +    if (pos % atomic_write_unit_min_bytes)
->  > +        return false;
+On 2023-10-02 1:21 AM, Christoph Hellwig wrote:
+> On Sun, Oct 01, 2023 at 07:10:53PM +0200, Wouter Verhelst wrote:
+>>> So what are the semantics of clearing the socket?
+>>>
+>>> The <= 6.5 behavior of invalidating fs caches, but not actually marking
+>>> the fs shutdown is pretty broken, especially if this expects to resurrect
+>>> the device and thus the file system later on.
+>>
+>> nbd-client -d calls
+>>
+>> ioctl(nbd, NBD_DISCONNECT);
+>> ioctl(nbd, NBD_CLEAR_SOCK);
+>>
+>> (error handling removed for clarity)
+>>
+>> where "nbd" is the file handle to the nbd device. This expects that the
+>> device is cleared and that then the device can be reused for a different
+>> connection, much like "losetup -d". Expecting that the next connection
+>> would talk to the same file system is wrong.
 > 
-> See later rules.
+> So a fs shutdown seems like a the right thing.  So I'm a little confused
+> on what actualy broke here.
 
-Is atomic_write_unit_min_bytes always equal to the logical block size?
-If so, can the above test be left out?
+I'm not too familiar with the block subsystem, but my understanding is that
+blk_mark_disk_dead(nbd->disk) is permanent -- there is no way to un-mark a disk
+as dead. So this makes the device (e.g. /dev/nbd0) permanently unusable after
+the call to ioctl(nbd, NBD_CLEAR_SOCK).
 
->  > +    if (iov_iter_count(iter) % atomic_write_unit_min_bytes)
->  > +        return false;
-> 
-> For SCSI, there is an atomic write granularity, which dictates 
-> atomic_write_unit_min_bytes. So here we need to ensure that the length 
-> is a multiple of this value.
+Like Wouter said, the semantics should be similar to a loop device, where the
+same block device can be reused after being disconnected. That was why I
+suggested disk_force_media_change() as called from __loop_clr_fd(). The loop
+driver doesn't call blk_mark_disk_dead() anywhere.
 
-Are there any SCSI devices that we care about that report an ATOMIC 
-TRANSFER LENGTH GRANULARITY that is larger than a single logical block?
-I'm wondering whether we really have to support such devices.
-
->  > +    if (!is_power_of_2(iov_iter_count(iter)))
->  > +        return false;
-> 
-> This rule comes from FS block alignment and NVMe atomic boundary.
-> 
-> FSes (XFS) have discontiguous extents. We need to ensure that an atomic 
-> write does not cross discontiguous extents. To do this we ensure extent 
-> length and alignment and limit atomic_write_unit_max_bytes to that.
-> 
-> For NVMe, an atomic write boundary is a boundary in LBA space which an 
-> atomic write should not cross. We limit atomic_write_unit_max_bytes such 
-> that it is evenly divisible into this atomic write boundary.
-> 
-> To ensure that the write does not cross these alignment boundaries we 
-> say that it must be naturally aligned and a power-of-2 in length.
-> 
-> We may be able to relax this rule but I am not sure it buys us anything 
-> - typically we want to be writing a 64KB block aligned to 64KB, for 
-> example.
-
-It seems to me that the requirement is_power_of_2(iov_iter_count(iter))
-is necessary for some filesystems but not for all filesystems. 
-Restrictions that are specific to a single filesystem (XFS) should not 
-occur in code that is intended to be used by all filesystems 
-(blkdev_atomic_write_valid()).
-
-Thanks,
-
-Bart.
+Regards,
+Samuel
 
