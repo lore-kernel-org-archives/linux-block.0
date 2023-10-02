@@ -2,83 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F8BE74901
-	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 17:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE67EE74902
+	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 17:42:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238720AbjJBRUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Oct 2023 13:20:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41738 "EHLO
+        id S235798AbjJBRm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Oct 2023 13:42:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238730AbjJBRUh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 13:20:37 -0400
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BFCC4;
-        Mon,  2 Oct 2023 10:20:34 -0700 (PDT)
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-690bd59322dso348b3a.3;
-        Mon, 02 Oct 2023 10:20:34 -0700 (PDT)
+        with ESMTP id S232711AbjJBRm6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 13:42:58 -0400
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4062290;
+        Mon,  2 Oct 2023 10:42:56 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1c760b34d25so444455ad.3;
+        Mon, 02 Oct 2023 10:42:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696267234; x=1696872034;
+        d=1e100.net; s=20230601; t=1696268576; x=1696873376;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oj8WCr3mnx49WEqp+D1QiL7KtQ7PeD9Y7BHxze9CSdM=;
-        b=ScZMi4E2lLxlDer0N0TFsDjYcSV3dLZDmM3hMSmOfyrLRcGdJP1cHckqDpLEEDdu5c
-         A3mTWn6+1Ab69NdqwF6ZsvVlest2Y0ivBy5WO8GnuYb9lyGWTbbyM0rJFxWk0/k18L2B
-         nooi0ya1vkhbReTADuChZNNNDMvctwM9nbkvRLyxO41x0tgMN3tH+8ZtPilQ9e7x2cvh
-         mnZdbAevPKwV/rfIMUBv84+SRy1Hk08pAmJeBFooqvpYsyhqN0eU9BmfAhtZq6XBjXug
-         QQ8x7+ft3PSQIywRcUSwis3FCbSZic3RcCzzrNBmsd2M83Nzv1vGXefJN/n9FDbpkR7V
-         Qang==
-X-Gm-Message-State: AOJu0YwROcdGE/VT5Cgvl4sYjP5g1DQCHI5EdMuszEblu1EteX188dSF
-        jOzmQpYoUb7BIC2Bc8Af/E0=
-X-Google-Smtp-Source: AGHT+IEjzOa04+2Ufwx7GQqTs8I92CbDPQtHf7WsBybxCpOZvqdgOeg/9SHQiW6+6cz8p8MM8yAf+Q==
-X-Received: by 2002:a05:6a00:2d1b:b0:690:41a1:9b67 with SMTP id fa27-20020a056a002d1b00b0069041a19b67mr11561705pfb.9.1696267233570;
-        Mon, 02 Oct 2023 10:20:33 -0700 (PDT)
+        bh=uzfoNyI7EtAoSUXJSkLswvCWk9zxuBz7mX5SZWqHLNk=;
+        b=bN3P0Mvn366ZZvlest09e4DPb2iJMhAv30aQacK2KmfSONzb4uZbnrSJ9rl9p65+Fe
+         FT5lNKVP9Reuy5DgULAqJ6rRlWfMbiLZvV+lO4Ue5wXh6sy+WsjQx2P0pxQtKbWvsYw+
+         KkcybewKnGtyZ4EuWaS299IXD26S0iBxepRzxYD6tp68GpnSvo/t0yeSArLy5iwY6OKZ
+         lg1+GpHdhFFLQYwAoT4tvjFYCsvcHqS5jkUj4hcMU3R5VUt5/Ga3cgsGQqXGbQc9XW6A
+         1qGyhf6Ti8MgnVcBQereDBovzhDX5KytL0jtqBoPhPAwg5+nZS3hnIjBUbG0poZk16KM
+         sm9w==
+X-Gm-Message-State: AOJu0YzR6ZbSBZIK5zddYKVuN5xxGFIvAxsKccXupuLfz29paGeg8RGa
+        P4YFGwqUF4OHGW/ODYhOiOE=
+X-Google-Smtp-Source: AGHT+IEPQSNHWLKb6e5RVZ4Bu2+fMqMDXD5b9ZwPXm+S7oNcAusoPb4P+LN1k8uh46Fuo0SUOqvb7Q==
+X-Received: by 2002:a17:902:6806:b0:1c3:64f9:45ad with SMTP id h6-20020a170902680600b001c364f945admr9650084plk.48.1696268575546;
+        Mon, 02 Oct 2023 10:42:55 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:6ad7:f663:5f97:db57? ([2620:15c:211:201:6ad7:f663:5f97:db57])
-        by smtp.gmail.com with ESMTPSA id j7-20020aa783c7000000b0068ffd56f705sm12815755pfn.118.2023.10.02.10.20.32
+        by smtp.gmail.com with ESMTPSA id b12-20020a170903228c00b001bdd7579b5dsm22227499plh.240.2023.10.02.10.42.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Oct 2023 10:20:33 -0700 (PDT)
-Message-ID: <2af482c9-aad8-4b77-8969-10fe53ee8c5b@acm.org>
-Date:   Mon, 2 Oct 2023 10:20:31 -0700
+        Mon, 02 Oct 2023 10:42:55 -0700 (PDT)
+Message-ID: <1b89c38e-55dc-484a-9bf3-b9d69d960ebe@acm.org>
+Date:   Mon, 2 Oct 2023 10:42:53 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/13] Pass data temperature information to zoned UFS
- devices
+Subject: Re: [PATCH 07/13] sd: Translate data lifetime information
 Content-Language: en-US
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+To:     Avri Altman <Avri.Altman@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>
+        Damien Le Moal <dlemoal@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
 References: <20230920191442.3701673-1-bvanassche@acm.org>
- <yq1o7hnzbsy.fsf@ca-mkp.ca.oracle.com> <ZRqrl7+oopXnn8r5@x1-carbon>
+ <20230920191442.3701673-8-bvanassche@acm.org>
+ <DM6PR04MB6575B74B6F5526C9860A56F1FCC5A@DM6PR04MB6575.namprd04.prod.outlook.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ZRqrl7+oopXnn8r5@x1-carbon>
+In-Reply-To: <DM6PR04MB6575B74B6F5526C9860A56F1FCC5A@DM6PR04MB6575.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/2/23 04:38, Niklas Cassel wrote:
-> So there should probably be a good argument why we would want to 
-> introduce yet another API for providing I/O hints, instead of 
-> extending the I/O hint API that we already have in the kernel right 
-> now. (Especially since it seems fairly easy to modify your patches
-> to reuse the existing API.)
+On 10/2/23 06:11, Avri Altman wrote:
+>> sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
+>>                  ret = sd_setup_rw16_cmnd(cmd, write, lba, nr_blocks,
+>>                                           protect | fua, dld);
+>>          } else if ((nr_blocks > 0xff) || (lba > 0x1fffff) ||
+>> -                  sdp->use_10_for_rw || protect) {
+>> +                  sdp->use_10_for_rw || protect ||
+>> +                  rq->write_hint != WRITE_LIFE_NOT_SET) {
+>
+> Is this a typo?
 
-Here is a strong argument: there is user space software that is using
-the F_SET_FILE_RW_HINT API, e.g. Samba. I don't think that the above
-arguments are strong enough to tell all developers of user space
-software to switch from F_SET_FILE_RW_HINT to another API. This would
-force user space developers to check the kernel version before they
-can decide which user space API to use. If the new user space API would
-get backported to distro kernels then that would cause a real nightmare
-for user space developers who want to use F_SET_FILE_RW_HINT or its
-equivalent.
+I don't see a typo? Am I perhaps overlooking something?
+
+>> +static void sd_read_io_hints(struct scsi_disk *sdkp, unsigned char *buffer)
+>> +{
+>> +       struct scsi_device *sdp = sdkp->device;
+>> +       const struct scsi_io_group_descriptor *desc, *start, *end;
+>> +       struct scsi_sense_hdr sshdr;
+>> +       struct scsi_mode_data data;
+>> +       int res;
+>> +
+>> +       res = scsi_mode_sense(sdp, /*dbd=*/0x8, /*modepage=*/0x0a,
+>> +                             /*subpage=*/0x05, buffer, SD_BUF_SIZE,
+>> +                             SD_TIMEOUT, sdkp->max_retries, &data, &sshdr);
+>> +       if (res < 0)
+>> +               return;
+>> +       start = (void *)buffer + data.header_length + 16;
+>> +       end = (void *)buffer + ((data.header_length + data.length)
+>> +                               & ~(sizeof(*end) - 1));
+>> +       /*
+>> +        * From "SBC-5 Constrained Streams with Data Lifetimes": Device severs
+>> +        * should assign the lowest numbered stream identifiers to permanent
+>> +        * streams.
+>> +        */
+>> +       for (desc = start; desc < end; desc++)
+>> +               if (!desc->st_enble)
+>> +                       break;
+> I don't see how you can conclude that the stream is permanent,
+> without reading the perm bit from the stream status descriptor.
+
+I will add code that retrieves the stream status and that checks the 
+PERM bit.
+
+>> diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
+>> index 84685168b6e0..1863de5ebae4 100644
+>> --- a/drivers/scsi/sd.h
+>> +++ b/drivers/scsi/sd.h
+>> @@ -125,6 +125,7 @@ struct scsi_disk {
+>>          unsigned int    physical_block_size;
+>>          unsigned int    max_medium_access_timeouts;
+>>          unsigned int    medium_access_timed_out;
+>> +       u16             permanent_stream_count; /* maximum number of streams
+>> */
+>
+> This comment is a bit misleading:
+> The Block Limits Extension VPD page has a "maximum number of streams" field.
+> Maybe avoid the unnecessary confusion?
+
+I will change that comment or leave it out.
 
 Thanks,
 
 Bart.
+
