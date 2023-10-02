@@ -2,194 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44BDBE78480
-	for <linux-block@archiver.kernel.org>; Sun,  1 Oct 2023 18:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBF2E784A6
+	for <linux-block@archiver.kernel.org>; Mon,  2 Oct 2023 01:59:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235299AbjJASzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 1 Oct 2023 14:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49460 "EHLO
+        id S234967AbjJBB7W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 1 Oct 2023 21:59:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjJASzT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Oct 2023 14:55:19 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865E0E3
-        for <linux-block@vger.kernel.org>; Sun,  1 Oct 2023 11:55:14 -0700 (PDT)
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3912icmb015517;
-        Sun, 1 Oct 2023 18:55:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references :
- content-transfer-encoding : content-type : mime-version;
- s=corp-2023-03-30; bh=GwJG6NHRsSD8Qkl6TGJnRA2qWKES0des3OCGoTN5XpA=;
- b=p1CQgolxM0/gJc5Rb4Ck7iQQOw9jmbk2QoeRTniVuLwehySxHaLtcZ4+jN06b2vUstzQ
- c9AriG6MMkdlsIIcycIw61n8hMdFOsCWjR4i9amjwRQvH2Q8s/umVzfkLmjje0nWxYMy
- nknk3A3ZJqiBpNqvFkFHTvwIjrcaQqn3OmR+EF7iFTE7ouv3oOxlTLM4OUGFl+REGvee
- I0e5qQ73KogQVeac+sMZf8OoWZ3mxs2iKcBovadTqBf+wRwNstf7kh34k/pvQY9eZE+R
- M5M028x41Y2KUMsj6Bxbd1+csRF2XHA7CwS9eBWA3ZQZtN7wcn/ZqXkNlyQ4iOScOMSg wg== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3teakc9fgc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 01 Oct 2023 18:55:03 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 391EhsvL000731;
-        Sun, 1 Oct 2023 18:54:56 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2173.outbound.protection.outlook.com [104.47.57.173])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3tea43t3wb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 01 Oct 2023 18:54:56 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QzkmChP9c5gyBMUksSrsrSzrQtzKo9FAM/9i3mHCXW5RM3NjeEfRNM0j2EryYnsiKhnRoRo0ca+Dgi9gbe8NXOE6hFRIUov/6mcqDR1xGwt7KBOD80f5hz/g9LEyemBXzogky8vPRDG97iw/nxkHlklqEy265iIzW9WWda1Z9exwiR+zA1CL5kWRNOmNryHqVcs2I4XyGF/yLhxfZ0dtfXQVWB3tEb8MaNbd5mOghFwgRG1EznSsy5VrfDHmhS7c7oSSSebgAFvWNSQIpHToQrDAhZeXth0oYuL9NVVmAaXgxqMCNDM7PD/Ge5YBQo8VvGGikdxvLx7HhhSXcVa6Zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GwJG6NHRsSD8Qkl6TGJnRA2qWKES0des3OCGoTN5XpA=;
- b=N4CP9CVcfSTcSnWQLMw0k4+vqUUnqJEMeZeoOEwoD21muZBIbTFxZ4bpmUIUTSPhdNv1xuFaZGSMjM07faXrFh4lKX+v61lt1bXvWrE/oAHauqrb0yzuthvSmJn0q7izP18I/utlUPPYT5scs4kGq9hz5zWFcIkYpAB3Z+Z/ITwk0Azvt+dHILlokT0cGdTGrGLSMg6qq/18Mu2pdYQvSDWbkMMts7ijiBlFiObxVqgkKEbFXHZGGT9Yb4RHpV3ic2hF44xrBZENx9SnSYe6qNtBLdUelON2Kw0xicD6+sjr/ql1y8v/Xh9XttqT/5NaO3C3RbFAVHSl4HwtSaS7Jw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GwJG6NHRsSD8Qkl6TGJnRA2qWKES0des3OCGoTN5XpA=;
- b=Db/Gxca6nxqqDqnA8aWD+cFNAfKGFYkLsxo11XxBFKIQylEyEpKlpEXgC3ZHt/3CCx2JqQtAO2lxAbrANCD7TET/5268qYWbFsa4TvBSoD8yNC9CFWaZwieW+XkejNjvLtq4ozwWwam/qW+IqfLPF85r2CIon+d/hphL1GDdxNc=
-Received: from CY8PR10MB7243.namprd10.prod.outlook.com (2603:10b6:930:7c::10)
- by PH0PR10MB5404.namprd10.prod.outlook.com (2603:10b6:510:eb::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.29; Sun, 1 Oct
- 2023 18:54:54 +0000
-Received: from CY8PR10MB7243.namprd10.prod.outlook.com
- ([fe80::37c3:3be:d433:74e8]) by CY8PR10MB7243.namprd10.prod.outlook.com
- ([fe80::37c3:3be:d433:74e8%7]) with mapi id 15.20.6838.028; Sun, 1 Oct 2023
- 18:54:54 +0000
-From:   Mike Christie <michael.christie@oracle.com>
-To:     linux-block@vger.kernel.org, ming.lei@redhat.com, axboe@kernel.dk
-Cc:     Mike Christie <michael.christie@oracle.com>
-Subject: [PATCH 2/2] ublk: Make ublks_max configurable
-Date:   Sun,  1 Oct 2023 13:54:48 -0500
-Message-Id: <20231001185448.48893-3-michael.christie@oracle.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231001185448.48893-1-michael.christie@oracle.com>
-References: <20231001185448.48893-1-michael.christie@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: DS7PR03CA0058.namprd03.prod.outlook.com
- (2603:10b6:5:3b5::33) To CY8PR10MB7243.namprd10.prod.outlook.com
- (2603:10b6:930:7c::10)
+        with ESMTP id S234505AbjJBB7W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 1 Oct 2023 21:59:22 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD2B5C9;
+        Sun,  1 Oct 2023 18:59:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696211959; x=1727747959;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=W88JVX1gXyO0U29l0jTJHljfHkuQ/YgOQ/ZzLImDnS0=;
+  b=BdQe1xE4OIO0bvOUh3nbyB2rPtnNMViptKIOqnE8BDK18dFxQ8zcOfUy
+   1ROS9nk/l1phxusmkbcS7GZMja13uK6LSI7hnSq8EPnTnJ/D+ee3Rx1lJ
+   lFKlvuaai0M81VwJakdinXNyC9IFTPW+9I7UYOI/kz/KTqdpClmBubr75
+   54BPhKPcy6QFaDpE5O58v6kjzneBGEu1aJQm4yLWjuMtiHdgD67n3LjbX
+   73p6KeZDLFeFqXrQJw5v1AdgfK6/PnkAR/dsvP2a/4ouQfh5ZZjn6MZD3
+   kNTc8fzjSCflL5UtbwIkanh4ThxApc02dLA25jtg/wFjBAEb5PBlOX45v
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10850"; a="372920002"
+X-IronPort-AV: E=Sophos;i="6.03,193,1694761200"; 
+   d="scan'208";a="372920002"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2023 18:59:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10850"; a="840862065"
+X-IronPort-AV: E=Sophos;i="6.03,193,1694761200"; 
+   d="scan'208";a="840862065"
+Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Oct 2023 18:59:13 -0700
+Received: from kbuild by c3b01524d57c with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qn8DG-0005fl-1j;
+        Mon, 02 Oct 2023 01:59:10 +0000
+Date:   Mon, 2 Oct 2023 09:58:33 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>
+Cc:     oe-kbuild-all@lists.linux.dev, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org, nitheshshetty@gmail.com,
+        anuj1072538@gmail.com, gost.dev@samsung.com, mcgrof@kernel.org,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v16 08/12] nvmet: add copy command support for bdev and
+ file ns
+Message-ID: <202310020910.TaSOIepO-lkp@intel.com>
+References: <20230920080756.11919-9-nj.shetty@samsung.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR10MB7243:EE_|PH0PR10MB5404:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9656cb99-3e1c-49b1-e128-08dbc2afe621
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: U3zgC3/6Zat5sVpHr6y3e+XN6OTOEHfj/+VJQxi4bAnBiKJqvv5yKmuQT5H+mFN9F9/22Xo64XN//f4+4V8Km0JPYaO4F/kNpZugu/r+d8dwT1WxKcsfwMvB6Tx/bV3/aTY2YnKBx8yHpkPxbFn25MIE/f2ePexSVDLQpLruI1bwaGc9UK0S1nvpdLECVJyayxA2fcsV5sdbooKpyvS4kmmEp9J2LDU3ctUMAgYKBxbQpAoETVr8+kpwm9ynpW+LDR50Co+pIZ5Ot2pQ1V98hTTKnRTWhyg5ni3TDXhD7qUqpCIcYR3L1LKL7MHQIbGduDW+5KNK+UNbhRqaL0sSKgNDV0hPsP4lYEdWGg0PNzcby8gFyD8Bad2ZmQRJ0onU2GxUZ6zgOXoGjrWdBv9jBLVfb7yZQVWrTgC9Z2jKv2GqcZ2LUYYDyueCsQg8uQClb0EKDkavvfsS2XemHY2J/vph78jC2xAY83n+5lwGPYxLS4Gwd/KmzEdPdc5asMQ9+6XvmHzMc+rp5CMbNjalJxArnqQPwpxYcfcVxbNXd5KncnkYc2FsQQmcDLd+4IFF
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR10MB7243.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(396003)(346002)(376002)(136003)(230922051799003)(64100799003)(1800799009)(451199024)(186009)(6486002)(478600001)(36756003)(5660300002)(6506007)(2906002)(66476007)(8936002)(8676002)(4326008)(316002)(41300700001)(66556008)(66946007)(6666004)(6512007)(107886003)(1076003)(2616005)(86362001)(26005)(83380400001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tTDTLMZbaXB+Q903NCQOJmBvMG0WSOzhC87aRcjqg0AkXgG2DUoESuYTufuU?=
- =?us-ascii?Q?hUNqZ+ic6SyCry3qJbb0iKD5OBNUtM1+FtaG//op2+SLil8uk3vAZ6KDqZOz?=
- =?us-ascii?Q?2HJnLCFM5AmnT9zsS0x951n83nQKC26/MOtV92L5Oj4lNLgLNzZ6VpsQ+gHa?=
- =?us-ascii?Q?0zBCzWng/AdnzG0Wrq5qi9yD9oCqxzI+PB1zFWYseD2fe3/GbEbH4tC4dM3m?=
- =?us-ascii?Q?avlYBK58rKR1BEyNVASXgWx897O0lt56iFtr08E6BNCUd4uJu3t1ZKXD+4fq?=
- =?us-ascii?Q?l2TnJ5fsQfRgcil0ng4L5s9Fu7CZdSQr6HxaMT+wlPhmbUDklIATrBPF3dCj?=
- =?us-ascii?Q?mG8/v9vt3w875Ufv93Wl/evpLfJeEN7Q5DVIlo8v8SYzQ6S8b0c2hs1mMfv/?=
- =?us-ascii?Q?gvD27wXi96bxQK9VSW3RVUoy16Je9BbAZOaMWNkFPazIDzFC0whkHpWW3cYu?=
- =?us-ascii?Q?p4EouojpE+5ihdDEWLhIZyR9mhr0moXXiurMIIFZx0S4g2da86bQJRztbpnd?=
- =?us-ascii?Q?Jb/Of5cXaoUFEOYFhH/20CtSw8wNabVkEMJdKOMhQ0gxMpkYccRtPCijF5qc?=
- =?us-ascii?Q?kVwhinOWDp9IQh+YC+zWUqxBdKdLhm3Jt5sQpOPJIAWpIESBraCZJ7pYpG6C?=
- =?us-ascii?Q?4xVnNtz8xAwYaK/LNdRR9he2PQ55qWyF1Fx3f/bjT9xWwsYCL7UpDhWs2/bV?=
- =?us-ascii?Q?ycnoIVersLFwGpjQyTJRrN1nX2755lZV4pYMkzO4V0p1+/eHJprnL3vA/PRX?=
- =?us-ascii?Q?1rSOcBB8wu5djMFJlFTEPpEQhn/eXluFDezQid+Z3ZJ09XjBvqrBfY33mkdU?=
- =?us-ascii?Q?k39zqX4KYJr4AnTsy53/WnahRjb6jRBVmJALvWKcD8IZ+Ngezuugf9lGFeHp?=
- =?us-ascii?Q?OfBEa+e/Q7Z4obL7m5lCZAyPA7pZ2buhBqhQseHou3OJrf4vPlUakvhDLAxs?=
- =?us-ascii?Q?45UBFOtJ1Bu6qP11GWPgpuyOg1Wt8hp0guFHvmG4bEguedv6ZWkaZCGmFpBX?=
- =?us-ascii?Q?/t29Gb6ZqSUqVM8mzGw0/Y5mopjvLRCmljXnyIADNQfu9R/OM3d4pApuIX5W?=
- =?us-ascii?Q?Z0ehM7qUBNeh9LMZ9q63CVrGGA7PqF3yLn7LjlxLQXNxbqniYDW4Mukpm7AH?=
- =?us-ascii?Q?rbjSyvzdOYU1TFeHhoz5lyKrotU2DWj3EFr98j3IeUWqHXJ35w0xJI6zkt/v?=
- =?us-ascii?Q?Wq1YaqY6eArzIz2Ud8QcmtKzqKr/q45Z4xlZ0CYH/10GvPBDV/sTMes3vIbm?=
- =?us-ascii?Q?LNLQiKuFUTLc812ubnvnzwNMHLykItSrfm4t37tcolP4hqVuVRuejOP/5GZL?=
- =?us-ascii?Q?Q1L6qDYVdQx/Kbe3SI/q3Dn3o66pKH6NKD69NGQJ8ZqEAvRAI8bZ9bgKueYL?=
- =?us-ascii?Q?ZXYklfFqKgMkNnaQCiVcFL+sFT++iOrNgJK+ewFj/f2VTvbjKPixDaYWSXm3?=
- =?us-ascii?Q?BQl7qbqucv4W1bAzayQk3AaR2oSHjH7ng55Zuey4cGNvdFO2CGtv2+NAcnnH?=
- =?us-ascii?Q?t4SkU/wVQgW11zbGtJzzR/OGD/iO6ePmN3pRu3MSeiWcmhxtQkSzUeRC5+V4?=
- =?us-ascii?Q?8TX81fe4YYIpjVKao6oLv48fRKrcTieihasIgOyO2VsuO0qOWVhWWXWt4eFW?=
- =?us-ascii?Q?YA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: JCmLA4ogPNqXCRKMLjxGr5kgUxQ+XFskWuIVIgFa8hJleT5/i+/0+8WhqQTcvi+rydJSbGR++VVPpIjmoK/pN/evXHYVrbSL4oOi5fB/8z0LI1epJjqZhH/3QScISza7cR9AZ6qy/vayS6Ds2yvEclmPRzCPy2aH5GWoKdqZU0U8HH/Elsua1EtLKUbbRnzzzuvfKrR1EKFWzW/ISrBloleT2cxqDjZYZeYj94FzeQnr4TkiN4wEOBoed9Ryfg1CXj2Hx3z3A2IE55k6chO9xb23YUuCeZ1t0bowLEtYUKK/VY30Gkrb357Md7FUPld3rDXnuq9Oceu7G5615uxoIq7jqWn1FM+tNrOw63WwVnWhspUM0LmRY4rzRkU/YTKdsTM4UzalKejV5eMIJvxzC4c4fxGEcw221WdIRIzas+AduaL19L2fOZOruuefMjkvq2FGK0tRcVZabxzP2s9hx16PjzhAi7HpZuFGxxwqvW3mJMQD91Af7YhCK9mPVmCQys0YPF3NA5T/u1rK9ghdB5DoHPd+2zPg3keCF3JDtgCOxjpjxu8+rV++hPrtrL5NJ5cW3rePCzMxalFD+RQgN/t+kkbZJn5JN+Hr1DxuME3I/v7beBvtY1Q3QCPINAGKz3GYZ2Twakqrl1Fi/lpt1aDg4eMUzfY8A2u6MlVEOxqpHInEHh0uaZD1C55lUs0SsjzCkq8Bg6LUDjy+54n+uQroxPH56SOEc8jlq+oNawgpc4u0SFHKiUBNgqIxc24tOMDGzcgLBZlaYJd5o8QAYbQI8b+NvUMDZB1rBAICzshqXw2ZtbIDEYPiUIpsHDeR
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9656cb99-3e1c-49b1-e128-08dbc2afe621
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR10MB7243.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2023 18:54:53.9966
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H2wYLC9L/L8cZ9DAGL5q/6c5D9T7ML77r48qULERLtSkbs1Ag8t9zmkjdxkHqnYajj9sf9yL9ucQhOGurF2fjq8fBE95EoSx5i7Xr2IYxug=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5404
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-01_16,2023-09-28_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
- adultscore=0 mlxlogscore=999 phishscore=0 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310010151
-X-Proofpoint-GUID: LksWn3GDgmSXh-8yv9GkPtOKfcAW_EES
-X-Proofpoint-ORIG-GUID: LksWn3GDgmSXh-8yv9GkPtOKfcAW_EES
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230920080756.11919-9-nj.shetty@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We are converting tcmu applications to ublk, but have systems with up
-to 1k devices. This patch allows us to configure the ublks_max from
-userspace with the ublks_max modparam.
+Hi Nitesh,
 
-Signed-off-by: Mike Christie <michael.christie@oracle.com>
----
- drivers/block/ublk_drv.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 18e352f8cd6d..2833a81e05c0 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -2940,7 +2940,36 @@ static void __exit ublk_exit(void)
- module_init(ublk_init);
- module_exit(ublk_exit);
- 
--module_param(ublks_max, int, 0444);
-+static int ublk_set_max_ublks(const char *buf, const struct kernel_param *kp)
-+{
-+	unsigned int max;
-+	int ret;
-+
-+	ret = kstrtouint(buf, 10, &max);
-+	if (ret)
-+		return ret;
-+
-+	if (max > UBLK_MAX_UBLKS) {
-+		pr_warn("Invalid ublks_max. Max supported is %d\n",
-+			UBLK_MAX_UBLKS);
-+		return -EINVAL;
-+	}
-+
-+	ublks_max = max;
-+	return ret;
-+}
-+
-+static int ublk_get_max_ublks(char *buf, const struct kernel_param *kp)
-+{
-+	return sysfs_emit(buf, "%d\n", ublks_max);
-+}
-+
-+static const struct kernel_param_ops ublk_max_ublks_ops = {
-+	.set = ublk_set_max_ublks,
-+	.get = ublk_get_max_ublks,
-+};
-+
-+module_param_cb(ublks_max, &ublk_max_ublks_ops, NULL, 0644);
- MODULE_PARM_DESC(ublks_max, "max number of ublk devices allowed to add(default: 64)");
- 
- MODULE_AUTHOR("Ming Lei <ming.lei@redhat.com>");
+[auto build test WARNING on 7fc7222d9680366edeecc219c21ca96310bdbc10]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Introduce-queue-limits-and-sysfs-for-copy-offload-support/20230920-170132
+base:   7fc7222d9680366edeecc219c21ca96310bdbc10
+patch link:    https://lore.kernel.org/r/20230920080756.11919-9-nj.shetty%40samsung.com
+patch subject: [PATCH v16 08/12] nvmet: add copy command support for bdev and file ns
+config: i386-randconfig-061-20231002 (https://download.01.org/0day-ci/archive/20231002/202310020910.TaSOIepO-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231002/202310020910.TaSOIepO-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310020910.TaSOIepO-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/nvme/target/io-cmd-bdev.c:498:30: sparse: sparse: restricted __le16 degrades to integer
+>> drivers/nvme/target/io-cmd-bdev.c:514:41: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted blk_status_t [usertype] blk_sts @@     got int [assigned] [usertype] ret @@
+   drivers/nvme/target/io-cmd-bdev.c:514:41: sparse:     expected restricted blk_status_t [usertype] blk_sts
+   drivers/nvme/target/io-cmd-bdev.c:514:41: sparse:     got int [assigned] [usertype] ret
+
+vim +498 drivers/nvme/target/io-cmd-bdev.c
+
+   478	
+   479	/*
+   480	 * At present we handle only one range entry, since copy offload is aligned with
+   481	 * copy_file_range, only one entry is passed from block layer.
+   482	 */
+   483	static void nvmet_bdev_execute_copy(struct nvmet_req *rq)
+   484	{
+   485		struct nvme_copy_range range;
+   486		struct nvme_command *cmd = rq->cmd;
+   487		ssize_t ret;
+   488		off_t dst, src;
+   489	
+   490		u16 status;
+   491	
+   492		status = nvmet_copy_from_sgl(rq, 0, &range, sizeof(range));
+   493		if (status)
+   494			goto err_rq_complete;
+   495	
+   496		dst = le64_to_cpu(cmd->copy.sdlba) << rq->ns->blksize_shift;
+   497		src = le64_to_cpu(range.slba) << rq->ns->blksize_shift;
+ > 498		rq->copy_len = (range.nlb + 1) << rq->ns->blksize_shift;
+   499	
+   500		if (bdev_max_copy_sectors(rq->ns->bdev)) {
+   501			ret = blkdev_copy_offload(rq->ns->bdev, dst, src, rq->copy_len,
+   502						  nvmet_bdev_copy_endio,
+   503						  (void *)rq, GFP_KERNEL);
+   504		} else {
+   505			ret = blkdev_copy_emulation(rq->ns->bdev, dst,
+   506						    rq->ns->bdev, src, rq->copy_len,
+   507						    nvmet_bdev_copy_endio,
+   508						    (void *)rq, GFP_KERNEL);
+   509		}
+   510		if (ret == -EIOCBQUEUED)
+   511			return;
+   512	
+   513		rq->cqe->result.u32 = cpu_to_le32(0);
+ > 514		status = blk_to_nvme_status(rq, ret);
+   515	err_rq_complete:
+   516		nvmet_req_complete(rq, status);
+   517	}
+   518	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
