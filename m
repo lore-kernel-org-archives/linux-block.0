@@ -2,82 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F80E7AD6E
-	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 15:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 488EFE7AD6E
+	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 15:37:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231817AbjJCPbU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Oct 2023 11:31:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45504 "EHLO
+        id S231521AbjJCPh5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Oct 2023 11:37:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231443AbjJCPbT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2023 11:31:19 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C084283
-        for <linux-block@vger.kernel.org>; Tue,  3 Oct 2023 08:31:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=/LG92AyoogL6wVS5Dlap2fK3Op49TorhbTYoOe3dNAA=; b=slbbNCPrrLxDFfP2ymPbcu2gXs
-        U3GdfNwNDXKx0Xq+jgIZP2vRY0QDKNAEbJDJ9fQiz5vqg+lK8KZo+/o0xEGSdP2TtGPxx2Iz5M6uX
-        hPmCKdRUivDjet12aOaKizZaSh2FTrRtWEYUhUe6n+4rsGYfBa1ErwcISg3cicRPd+YRjv+m4uPzc
-        b9cYT2pgV80O/KVcbW0nhObUMMqsBvMPC7usHIX3Ak9/KHzs5bT4PDFuQnUNDet0NCSiwZGxGqwb0
-        F3KISXUgEr0qgJXbX4YBL0jXtwQLoJcJtOpt9RbAVdTPXfk2KVkCgQuxtKE1IztsK0md/l+WXbof8
-        qmHhCfMA==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qnhMc-00Esl6-1k;
-        Tue, 03 Oct 2023 15:31:11 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     w@uter.be, linux-block@vger.kernel.org, nbd@other.debian.org,
-        Samuel Holland <samuel.holland@sifive.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH] nbd: don't call blk_mark_disk_dead nbd_clear_sock_ioctl
-Date:   Tue,  3 Oct 2023 17:31:06 +0200
-Message-Id: <20231003153106.1331363-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S231443AbjJCPh4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2023 11:37:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E0E83
+        for <linux-block@vger.kernel.org>; Tue,  3 Oct 2023 08:37:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696347429;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vV6tJbaxavpVva0WB2mOArL8TJIEb5iZUFF3Dln6v6c=;
+        b=ToVJmmMd6W6xNKHw2cuRQhR7F4tJLEXmPI+yaUyG5ZTYOZFZEYDZGtoXsk0ksiQofrSFn4
+        GDw7N4qaTMXfIEwcE5X/4rwM4M2rcrzMvBl89q2mWoTpR/wXkTUkA29rmM+PnZWIzD/UG8
+        DDiQI+FDDOA/sLCzTVc1gaqYKd1q4o0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-609-4LFhOI3QOESJ_QOR2pOwdg-1; Tue, 03 Oct 2023 11:37:08 -0400
+X-MC-Unique: 4LFhOI3QOESJ_QOR2pOwdg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 57030185A79B;
+        Tue,  3 Oct 2023 15:37:07 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CF1FDC15BB8;
+        Tue,  3 Oct 2023 15:37:03 +0000 (UTC)
+Date:   Tue, 3 Oct 2023 23:36:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Christie <michael.christie@oracle.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        Hannes Reinecke <hare@suse.de>, ming.lei@redhat.com
+Subject: Re: [PATCH 1/2] ublk: Limit dev_id/ub_number values
+Message-ID: <ZRw1GvSwh+49SmL/@fedora>
+References: <20231001185448.48893-1-michael.christie@oracle.com>
+ <20231001185448.48893-2-michael.christie@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20231001185448.48893-2-michael.christie@oracle.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mark_disk_dead is the proper interface to shut down a block
-device, but it also makes the disk unusable forever.
+On Sun, Oct 01, 2023 at 01:54:47PM -0500, Mike Christie wrote:
+> The dev_id/ub_number is used for the ublk dev's char device's minor
+> number so it has to fit into MINORMASK. This patch adds checks to prevent
+> userspace from passing a number that's too large and limits what can be
+> allocated by the ublk_index_idr for the case where userspace has the
+> kernel allocate the dev_id/ub_number.
+> 
+> Signed-off-by: Mike Christie <michael.christie@oracle.com>
+> ---
+>  drivers/block/ublk_drv.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 630ddfe6657b..18e352f8cd6d 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -470,6 +470,7 @@ static DEFINE_MUTEX(ublk_ctl_mutex);
+>   * It can be extended to one per-user limit in future or even controlled
+>   * by cgroup.
+>   */
+> +#define UBLK_MAX_UBLKS (UBLK_MINORS - 1)
+>  static unsigned int ublks_max = 64;
+>  static unsigned int ublks_added;	/* protected by ublk_ctl_mutex */
+>  
+> @@ -2026,7 +2027,8 @@ static int ublk_alloc_dev_number(struct ublk_device *ub, int idx)
+>  		if (err == -ENOSPC)
+>  			err = -EEXIST;
+>  	} else {
+> -		err = idr_alloc(&ublk_index_idr, ub, 0, 0, GFP_NOWAIT);
+> +		err = idr_alloc(&ublk_index_idr, ub, 0, UBLK_MAX_UBLKS,
 
-nbd_clear_sock_ioctl on the other hand wants to shut down the file
-system, but allow the block device to be used again when when connected
-to another socket.  Switch nbd to use disk_force_media_change and
-nbd_bdev_reset to go back to a behavior of the old __invalidate_device
-call, with the added benefit of incrementing the device generation
-as there is no guarantee the old content comes back when the device
-is reconnected.
+'end' parameter of idr_alloc() is exclusive, so I think UBLK_MAX_UBLKS should
+be defined as UBLK_MINORS?
 
-Reported-by: Samuel Holland <samuel.holland@sifive.com>
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Fixes: 0c1c9a27ce90 ("nbd: call blk_mark_disk_dead in nbd_clear_sock_ioctl")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/nbd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> +				GFP_NOWAIT);
+>  	}
+>  	spin_unlock(&ublk_idr_lock);
+>  
+> @@ -2305,6 +2307,12 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+>  		return -EINVAL;
+>  	}
+>  
+> +	if (header->dev_id != U32_MAX && header->dev_id > UBLK_MAX_UBLKS) {
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index df1cd0f718b81c..800f131222fc8f 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1436,8 +1436,9 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd)
- 
- static void nbd_clear_sock_ioctl(struct nbd_device *nbd)
- {
--	blk_mark_disk_dead(nbd->disk);
- 	nbd_clear_sock(nbd);
-+	disk_force_media_change(nbd->disk);
-+	nbd_bdev_reset(nbd);
- 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
- 		nbd_config_put(nbd);
--- 
-2.39.2
+I guess 'if (header->dev_id >= UBLK_MAX_UBLKS)' should be enough.
+
+Otherwise, this patch looks fine.
+
+
+On Mon, Oct 2, 2023 at 2:08 PM Hannes Reinecke <hare@suse.de> wrote:
+...
+> Why don't you do away with ublks_max and switch to dynamic minors once
+> UBLK_MAX_UBLKS is reached?
+
+The current approach follows nvme cdev(see nvme_cdev_add()), and I don't
+see any benefit with dynamic minors, especially MINORBITS is 20, and max
+minors is 1M, which should be big enough for any use cases.
+
+BTW, looks nvme_cdev_add() needs similar fix too.
+
+Thanks,
+Ming
 
