@@ -2,120 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 488EFE7AD6E
-	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 15:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92023E7AD74
+	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 15:46:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231521AbjJCPh5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Oct 2023 11:37:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47054 "EHLO
+        id S231464AbjJCPqs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Oct 2023 11:46:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231443AbjJCPh4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2023 11:37:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E0E83
-        for <linux-block@vger.kernel.org>; Tue,  3 Oct 2023 08:37:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696347429;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vV6tJbaxavpVva0WB2mOArL8TJIEb5iZUFF3Dln6v6c=;
-        b=ToVJmmMd6W6xNKHw2cuRQhR7F4tJLEXmPI+yaUyG5ZTYOZFZEYDZGtoXsk0ksiQofrSFn4
-        GDw7N4qaTMXfIEwcE5X/4rwM4M2rcrzMvBl89q2mWoTpR/wXkTUkA29rmM+PnZWIzD/UG8
-        DDiQI+FDDOA/sLCzTVc1gaqYKd1q4o0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-609-4LFhOI3QOESJ_QOR2pOwdg-1; Tue, 03 Oct 2023 11:37:08 -0400
-X-MC-Unique: 4LFhOI3QOESJ_QOR2pOwdg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 57030185A79B;
-        Tue,  3 Oct 2023 15:37:07 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CF1FDC15BB8;
-        Tue,  3 Oct 2023 15:37:03 +0000 (UTC)
-Date:   Tue, 3 Oct 2023 23:36:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Christie <michael.christie@oracle.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        Hannes Reinecke <hare@suse.de>, ming.lei@redhat.com
-Subject: Re: [PATCH 1/2] ublk: Limit dev_id/ub_number values
-Message-ID: <ZRw1GvSwh+49SmL/@fedora>
-References: <20231001185448.48893-1-michael.christie@oracle.com>
- <20231001185448.48893-2-michael.christie@oracle.com>
+        with ESMTP id S231206AbjJCPqs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2023 11:46:48 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D214495;
+        Tue,  3 Oct 2023 08:46:44 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 396FEC433C7;
+        Tue,  3 Oct 2023 15:46:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696348004;
+        bh=9Om6q6hLGFKck5uVF88QEHxSQb3JRjlgYRDBBS8Ko7Y=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nvLUqefqqq+UfAdun974USJG2lGVA+E9uzE1UmyR4zGMlCLE4mRvEFMdzdc7hoAnG
+         rEY0Eycqxt/vs6xdrLqoRzb6PRqlFf4sdE7hVvkIt80+IyRidbf2YfPE2ttuUMvSvA
+         wGyqJj6zJZgrRJ7+K9HmtHjLbkIe996KM31TOS1HCWkIwN1ibxDwJsFZ+XKbdjq7Gf
+         x+siscIZha/yq4GLNOjX8Ys3f92sZXEZ1awqfIEj8SSvvCe025wnVtJ6OdCOQGG/ug
+         wn+jbc5oS203t6qqRwD7fBPtH44umNhO6qZnMQEbRDSrKJ8QsW4ocrDBFJBHX4kRAa
+         zbmiuqRPqVV4w==
+Date:   Tue, 3 Oct 2023 08:46:43 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     John Garry <john.g.garry@oracle.com>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Eric Biggers <ebiggers@kernel.org>, axboe@kernel.dk,
+        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        viro@zeniv.linux.org.uk, brauner@kernel.org,
+        chandan.babu@oracle.com, dchinner@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+        linux-api@vger.kernel.org,
+        Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Subject: Re: [PATCH 03/21] fs/bdev: Add atomic write support info to statx
+Message-ID: <20231003154643.GF21298@frogsfrogsfrogs>
+References: <20230929102726.2985188-1-john.g.garry@oracle.com>
+ <20230929102726.2985188-4-john.g.garry@oracle.com>
+ <20230929224922.GB11839@google.com>
+ <b9c266d2-d5d6-4294-9a95-764641e295b4@acm.org>
+ <d3a8b9b0-b24c-a002-e77d-56380ee785a5@oracle.com>
+ <ZRtztUQvaWV8FgXW@dread.disaster.area>
+ <20231003025703.GD21298@frogsfrogsfrogs>
+ <da12e81d-cf29-6dd3-b01e-2319aa9487d5@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231001185448.48893-2-michael.christie@oracle.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <da12e81d-cf29-6dd3-b01e-2319aa9487d5@oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Oct 01, 2023 at 01:54:47PM -0500, Mike Christie wrote:
-> The dev_id/ub_number is used for the ublk dev's char device's minor
-> number so it has to fit into MINORMASK. This patch adds checks to prevent
-> userspace from passing a number that's too large and limits what can be
-> allocated by the ublk_index_idr for the case where userspace has the
-> kernel allocate the dev_id/ub_number.
+On Tue, Oct 03, 2023 at 08:23:26AM +0100, John Garry wrote:
+> On 03/10/2023 03:57, Darrick J. Wong wrote:
+> > > > > > +#define STATX_ATTR_WRITE_ATOMIC        0x00400000 /* File
+> > > > > > supports atomic write operations */
+> > > > > How would this differ from stx_atomic_write_unit_min != 0?
+> > > Yeah, I suppose that we can just not set this for the case of
+> > > stx_atomic_write_unit_min == 0.
+> > Please use the STATX_ATTR_WRITE_ATOMIC flag to indicate that the
+> > filesystem, file and underlying device support atomic writes when
+> > the values are non-zero. The whole point of the attribute mask is
+> > that the caller can check the mask for supported functionality
+> > without having to read every field in the statx structure to
+> > determine if the functionality it wants is present.
 > 
-> Signed-off-by: Mike Christie <michael.christie@oracle.com>
-> ---
->  drivers/block/ublk_drv.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+> Sure, but again that would be just checking atomic_write_unit_min_bytes or
+> another atomic write block setting as that is the only way to tell from the
+> block layer (if atomic writes are supported), so it will be something like:
 > 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 630ddfe6657b..18e352f8cd6d 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -470,6 +470,7 @@ static DEFINE_MUTEX(ublk_ctl_mutex);
->   * It can be extended to one per-user limit in future or even controlled
->   * by cgroup.
->   */
-> +#define UBLK_MAX_UBLKS (UBLK_MINORS - 1)
->  static unsigned int ublks_max = 64;
->  static unsigned int ublks_added;	/* protected by ublk_ctl_mutex */
->  
-> @@ -2026,7 +2027,8 @@ static int ublk_alloc_dev_number(struct ublk_device *ub, int idx)
->  		if (err == -ENOSPC)
->  			err = -EEXIST;
->  	} else {
-> -		err = idr_alloc(&ublk_index_idr, ub, 0, 0, GFP_NOWAIT);
-> +		err = idr_alloc(&ublk_index_idr, ub, 0, UBLK_MAX_UBLKS,
+> if (request_mask & STATX_WRITE_ATOMIC &&
+> queue_atomic_write_unit_min_bytes(bdev->bd_queue)) {
+>     stat->atomic_write_unit_min =
+>       queue_atomic_write_unit_min_bytes(bdev->bd_queue);
+>     stat->atomic_write_unit_max =
+>       queue_atomic_write_unit_max_bytes(bdev->bd_queue);
+>     stat->attributes |= STATX_ATTR_WRITE_ATOMIC;
+>     stat->attributes_mask |= STATX_ATTR_WRITE_ATOMIC;
+>     stat->result_mask |= STATX_WRITE_ATOMIC;
 
-'end' parameter of idr_alloc() is exclusive, so I think UBLK_MAX_UBLKS should
-be defined as UBLK_MINORS?
+The result_mask (which becomes the statx stx_mask) needs to have
+STATX_WRITE_ATOMIC set any time a filesystem responds to
+STATX_WRITE_ATOMIC being set in the request_mask, even if the response
+is "not supported".
 
-> +				GFP_NOWAIT);
->  	}
->  	spin_unlock(&ublk_idr_lock);
->  
-> @@ -2305,6 +2307,12 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
->  		return -EINVAL;
->  	}
->  
-> +	if (header->dev_id != U32_MAX && header->dev_id > UBLK_MAX_UBLKS) {
+The attributes_mask also needs to have STATX_ATTR_WRITE_ATOMIC set if
+the filesystem+file can support the flag, even if it's not currently set
+for that file.  This should get turned into a generic vfs helper for the
+next fs that wants to support atomic write units:
 
-I guess 'if (header->dev_id >= UBLK_MAX_UBLKS)' should be enough.
+static void generic_fill_statx_atomic_writes(struct kstat *stat,
+		struct block_device *bdev)
+{
+	u64 min_bytes;
 
-Otherwise, this patch looks fine.
+	/* Confirm that the fs driver knows about this statx request */
+	stat->result_mask |= STATX_WRITE_ATOMIC;
+
+	/* Confirm that the file attribute is known to the fs. */
+	stat->attributes_mask |= STATX_ATTR_WRITE_ATOMIC;
+
+	/* Fill out the rest of the atomic write fields if supported */
+	min_bytes = queue_atomic_write_unit_min_bytes(bdev->bd_queue);
+	if (min_bytes == 0)
+		return;
+
+	stat->atomic_write_unit_min = min_bytes;
+	stat->atomic_write_unit_max =
+			queue_atomic_write_unit_max_bytes(bdev->bd_queue);
+
+	/* Atomic writes actually supported on this file. */
+	stat->attributes |= STATX_ATTR_WRITE_ATOMIC;
+}
+
+and then:
+
+	if (request_mask & STATX_WRITE_ATOMIC)
+		generic_fill_statx_atomic_writes(stat, bdev);
 
 
-On Mon, Oct 2, 2023 at 2:08â€¯PM Hannes Reinecke <hare@suse.de> wrote:
-...
-> Why don't you do away with ublks_max and switch to dynamic minors once
-> UBLK_MAX_UBLKS is reached?
-
-The current approach follows nvme cdev(see nvme_cdev_add()), and I don't
-see any benefit with dynamic minors, especially MINORBITS is 20, and max
-minors is 1M, which should be big enough for any use cases.
-
-BTW, looks nvme_cdev_add() needs similar fix too.
-
-Thanks,
-Ming
-
+> }
+> 
+> Thanks,
+> John
