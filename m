@@ -2,83 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B3EE8FDB3
-	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 19:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CCBE8FDB1
+	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 20:11:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241001AbjJCTwb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Oct 2023 15:52:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42978 "EHLO
+        id S241035AbjJCULi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Oct 2023 16:11:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241039AbjJCTwa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2023 15:52:30 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9DBE93;
-        Tue,  3 Oct 2023 12:52:27 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-327b7e08456so1368704f8f.2;
-        Tue, 03 Oct 2023 12:52:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696362746; x=1696967546; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uGvbcU4evdPhE8iD+CAmE+ISh81ZLVdJetADKqCwGtI=;
-        b=PbytnJl5mtAyvS14O54oCwDtqsSFIllnGzOamC9GsDxySE1ECpLUGNcwslgnHpOQqU
-         Em3yyIQUYPjoLyoKFF5RP22ufcPcZmm/yiHbRLJ8KdYqrTRVcRMgTNNmdYCZyS1VQPPT
-         1yOhqCxelDXsXWTN6yuCDKG9rOj/EKk43WNtCfJphyjcvgUU7IgMl5lQbn6sIqQ8/KuB
-         zwUVflkhms1AC1EZxuztcfB5tZD/5xz3ygZkvcF5UmPoCb+3jR0RgXBMfeV1sQQODM9g
-         0N1HsOqSHzR2lpFI/tzm24ENhg1acKGBa2pfzqbep9S7Gc4Kp326a979COMpU9IF16zc
-         agJQ==
+        with ESMTP id S241029AbjJCULh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2023 16:11:37 -0400
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBA99A7
+        for <linux-block@vger.kernel.org>; Tue,  3 Oct 2023 13:11:32 -0700 (PDT)
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6c638c29c8eso1547579a34.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2023 13:11:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696362746; x=1696967546;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1696363892; x=1696968692;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uGvbcU4evdPhE8iD+CAmE+ISh81ZLVdJetADKqCwGtI=;
-        b=UoKEcN6je4SaRXxa+Z9q1xOHWXMTZtcNqJqfAvVhlegJUkXFB75NZsAB23v8Eymb9n
-         KAmBHLOpE1DLoxmUR1S2HnmAifIgpu27XBAb58MqICwJeilhp2MbH9HGX0goPeiQ9BoG
-         4sFgL+XAbyoBh7UhwJPIkdMnVTMshQEJqaAU8p9W3YdNWPhfzS2EsYPi1TGjAUDSSX3h
-         hT23teqitZnsCaAT1CjIm69kqRfma6fw19DKwgctV9wIymGUpKUD9F+PG7Q7u64ntXRk
-         uRGSKvC/ZKl0PLYA7M0AEcgKkz3c4f3BYeBAZXx52Odu/CQgZqDQzAm5ybIYPk9c2fBm
-         0Z5g==
-X-Gm-Message-State: AOJu0Yzg9NL2mzvSIvdUP8IYh55aya3rrve9PqaL+Of8tsM/C+ItEP5c
-        FKXXd09Kf+04e+wqPiy7ziQ=
-X-Google-Smtp-Source: AGHT+IFc5DKAVdvvnMKAbV3yTqkpBKWzgGin1SS+L3YArAnuoHR5ECozV6H8lJD+nMwjfYyf0gJ4DA==
-X-Received: by 2002:adf:ed52:0:b0:31f:fa1a:83fb with SMTP id u18-20020adfed52000000b0031ffa1a83fbmr243934wro.7.1696362746060;
-        Tue, 03 Oct 2023 12:52:26 -0700 (PDT)
-Received: from ?IPV6:2003:c5:8703:581b:e3c:8ca8:1005:8d8e? (p200300c58703581b0e3c8ca810058d8e.dip0.t-ipconnect.de. [2003:c5:8703:581b:e3c:8ca8:1005:8d8e])
-        by smtp.gmail.com with ESMTPSA id k13-20020a5d628d000000b0031f34a395e7sm2267975wru.45.2023.10.03.12.52.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Oct 2023 12:52:25 -0700 (PDT)
-Message-ID: <0c4b2871-2240-d2ab-1d69-4180910c8f1d@gmail.com>
-Date:   Tue, 3 Oct 2023 21:52:24 +0200
+        bh=/ajmCqeB2BnMNxS0zpiFZGL2PM4lR7Y0JKiiYH6sw94=;
+        b=pNLNvjgeSrl5M1nJurzwELHGgYwfVH3Gt/e5GzIEWnIANocPPBhbRsNJa7pvDmGHYy
+         0cWjq5KLJNTLGkatLuRdbU7YPRZdW5QCo4SC4olfst1V7UmVoq/T4g0OHkaxWXKJe2h9
+         FWYkrpWlvoXJ0/2BpnuiBArJPFFNXiehvB1rzkOZsNttPCexYcEdTdxJDtCKCf0l7uzb
+         yRdeP9s7xhiqO+jAEI0UV2tUhiw9IYH+yPlmVPNUpWYTD79awaoduS9TEH9PPmQADhtO
+         GE1Fj+jMn8u2MFbJToYuem8shOmQLaTqLCazqWPkGXrcwbXFal5idO/HlJ5mgcHSsaA0
+         TyFQ==
+X-Gm-Message-State: AOJu0YxAzlOKyG4F/Y1M8hKJHN+xIi9lnAiJL2eHzjdpOydHH7lxNHWJ
+        gIlbJoMSc3d6lGmYJwgJaYcqkry0u2QBeGFLp+mG4xWmG4ml
+X-Google-Smtp-Source: AGHT+IEfWZ0ebEBLw/JhSV7+cQIKaqZwWpmJ3XvCYvUTR2PbG7CW66InXrWydWpHiDXh5vLOGZu5MLBsND8rab2i9TSxKLyepv9J
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 04/13] block: Restore write hint support
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>
-References: <20230920191442.3701673-1-bvanassche@acm.org>
- <20230920191442.3701673-5-bvanassche@acm.org>
-From:   Bean Huo <huobean@gmail.com>
-In-Reply-To: <20230920191442.3701673-5-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a9d:6656:0:b0:6bc:e2b0:7446 with SMTP id
+ q22-20020a9d6656000000b006bce2b07446mr66820otm.1.1696363892265; Tue, 03 Oct
+ 2023 13:11:32 -0700 (PDT)
+Date:   Tue, 03 Oct 2023 13:11:32 -0700
+In-Reply-To: <0000000000002709ae05e5b6474c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000035587d0606d57fec@google.com>
+Subject: Re: [syzbot] [block] INFO: task hung in __filemap_get_folio
+From:   syzbot <syzbot+0e9dc403e57033a74b1d@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, leon@kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org, sagi@grimberg.me,
+        saravanan.vajravel@broadcom.com, selvin.xavier@broadcom.com,
+        syzkaller-bugs@googlegroups.com, willy@infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20.09.23 9:14 PM, Bart Van Assche wrote:
-> Cc: Christoph Hellwig<hch@lst.de>
-> Signed-off-by: Bart Van Assche<bvanassche@acm.org>
+syzbot suspects this issue was fixed by commit:
 
-Reviewed-by: Bean Huo <beanhuo@micron.com>
+commit 699826f4e30ab76a62c238c86fbef7e826639c8d
+Author: Saravanan Vajravel <saravanan.vajravel@broadcom.com>
+Date:   Tue Jun 6 10:25:31 2023 +0000
 
+    IB/isert: Fix incorrect release of isert connection
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=144a99be680000
+start commit:   105a36f3694e Merge tag 'kbuild-fixes-v6.0-3' of git://git...
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=122d7bd4fc8e0ecb
+dashboard link: https://syzkaller.appspot.com/bug?extid=0e9dc403e57033a74b1d
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10174404880000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=169f552f080000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: IB/isert: Fix incorrect release of isert connection
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
