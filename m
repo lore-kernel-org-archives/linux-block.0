@@ -2,73 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CCBE8FDB1
-	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 20:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF71E8FDB4
+	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 20:40:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241035AbjJCULi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 Oct 2023 16:11:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49918 "EHLO
+        id S231789AbjJCUkQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 Oct 2023 16:40:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241029AbjJCULh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2023 16:11:37 -0400
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBA99A7
-        for <linux-block@vger.kernel.org>; Tue,  3 Oct 2023 13:11:32 -0700 (PDT)
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6c638c29c8eso1547579a34.1
-        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2023 13:11:32 -0700 (PDT)
+        with ESMTP id S231701AbjJCUkP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2023 16:40:15 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A8D7AC
+        for <linux-block@vger.kernel.org>; Tue,  3 Oct 2023 13:40:12 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id af79cd13be357-7743448d88eso97806985a.2
+        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2023 13:40:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1696365611; x=1696970411; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5Nxvc1lxZifVSA6lTiXigXFomqQxRhSDegObkyWLMxc=;
+        b=Hbat7SsOta2DuorgZVddggc4g7jtFQ07eoaudBQF9xj88MBY0T7+yOjMakoGwzzVhK
+         Kg3jZ+LlgJ9gQf4QWINY8dyIJjRq3YvSKAeseH2CdHHfdmkeRd72fc8Qejgda/v3puU8
+         k6UfmVh+Juc7IDurB38pNO11qyK/itSAeHim0gqJpSwcfJcfzlY6m1OYSqbZyNwY3lRV
+         qkIMNmRnwxYAnSScCQ0YuVvvx2KWotGJWLk3tuzJIhQW8rAiS8q8ezMAde3H5utH6QoG
+         w5nj1+T07KzHJc8GmgY9bk9EAHxoGPv5toFf8oGeiAFzZOAlZUEAbRluJUmhHs9rxRnD
+         TtGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696363892; x=1696968692;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1696365611; x=1696970411;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/ajmCqeB2BnMNxS0zpiFZGL2PM4lR7Y0JKiiYH6sw94=;
-        b=pNLNvjgeSrl5M1nJurzwELHGgYwfVH3Gt/e5GzIEWnIANocPPBhbRsNJa7pvDmGHYy
-         0cWjq5KLJNTLGkatLuRdbU7YPRZdW5QCo4SC4olfst1V7UmVoq/T4g0OHkaxWXKJe2h9
-         FWYkrpWlvoXJ0/2BpnuiBArJPFFNXiehvB1rzkOZsNttPCexYcEdTdxJDtCKCf0l7uzb
-         yRdeP9s7xhiqO+jAEI0UV2tUhiw9IYH+yPlmVPNUpWYTD79awaoduS9TEH9PPmQADhtO
-         GE1Fj+jMn8u2MFbJToYuem8shOmQLaTqLCazqWPkGXrcwbXFal5idO/HlJ5mgcHSsaA0
-         TyFQ==
-X-Gm-Message-State: AOJu0YxAzlOKyG4F/Y1M8hKJHN+xIi9lnAiJL2eHzjdpOydHH7lxNHWJ
-        gIlbJoMSc3d6lGmYJwgJaYcqkry0u2QBeGFLp+mG4xWmG4ml
-X-Google-Smtp-Source: AGHT+IEfWZ0ebEBLw/JhSV7+cQIKaqZwWpmJ3XvCYvUTR2PbG7CW66InXrWydWpHiDXh5vLOGZu5MLBsND8rab2i9TSxKLyepv9J
+        bh=5Nxvc1lxZifVSA6lTiXigXFomqQxRhSDegObkyWLMxc=;
+        b=qrl40yKsg0vBChxuuuCavGoOyKb320akVWPA5U69MWsQa1MNezUs5of7GvMo88de5G
+         d8wNgml/otno4guWfD9URhQ7hC5ojNWo4uWdNSS1EAW55e/tStBgaU/UgBjlDUpBWsPs
+         sHhpwnr2n8lhfClXTwjS0vNpooGmcL7TvJc8CwjqsfV0I0BfMHvUYQkH3SazwsGsfSJi
+         DS+qnDKXhMSYS8XMPRmEjYwzJL3Nn1pAeWUG6MIhbq7NUE5C4EFaXdtrOxRl6utpEkrL
+         tiVzvTbpyNSs0gNC1dV0ORibh05A4NFAyqXionJss3Dp47kUcsb+uMbYi/Rik/nvkMKv
+         ZiAQ==
+X-Gm-Message-State: AOJu0Yz7Xrif4q2jSUSA7IiQnt0aeKyptVkEiXEIMqkZ+ufd3tKb7ifT
+        9YXOK6dP+HCNSo5CQrexY7HfHg==
+X-Google-Smtp-Source: AGHT+IERa23rjiYbZGQ+VUfAQarw40/LaUs9xATjvyAOXV8DcAZ8vcJgSFIsCAlJosNJWZgZwYsztg==
+X-Received: by 2002:ae9:f401:0:b0:76c:9ac2:3f22 with SMTP id y1-20020ae9f401000000b0076c9ac23f22mr678434qkl.68.1696365611293;
+        Tue, 03 Oct 2023 13:40:11 -0700 (PDT)
+Received: from ?IPV6:2600:1700:2000:b002:6022:6438:e898:6c27? ([2600:1700:2000:b002:6022:6438:e898:6c27])
+        by smtp.gmail.com with ESMTPSA id g4-20020ae9e104000000b007743360b3fasm753508qkm.34.2023.10.03.13.40.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Oct 2023 13:40:10 -0700 (PDT)
+Message-ID: <1ded0a2d-3fc7-4268-870c-a315ba3b6232@sifive.com>
+Date:   Tue, 3 Oct 2023 15:40:10 -0500
 MIME-Version: 1.0
-X-Received: by 2002:a9d:6656:0:b0:6bc:e2b0:7446 with SMTP id
- q22-20020a9d6656000000b006bce2b07446mr66820otm.1.1696363892265; Tue, 03 Oct
- 2023 13:11:32 -0700 (PDT)
-Date:   Tue, 03 Oct 2023 13:11:32 -0700
-In-Reply-To: <0000000000002709ae05e5b6474c@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000035587d0606d57fec@google.com>
-Subject: Re: [syzbot] [block] INFO: task hung in __filemap_get_folio
-From:   syzbot <syzbot+0e9dc403e57033a74b1d@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, leon@kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org, sagi@grimberg.me,
-        saravanan.vajravel@broadcom.com, selvin.xavier@broadcom.com,
-        syzkaller-bugs@googlegroups.com, willy@infradead.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nbd: don't call blk_mark_disk_dead nbd_clear_sock_ioctl
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, josef@toxicpanda.com,
+        axboe@kernel.dk
+Cc:     w@uter.be, linux-block@vger.kernel.org, nbd@other.debian.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20231003153106.1331363-1-hch@lst.de>
+From:   Samuel Holland <samuel.holland@sifive.com>
+In-Reply-To: <20231003153106.1331363-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+On 2023-10-03 10:31 AM, Christoph Hellwig wrote:
+> blk_mark_disk_dead is the proper interface to shut down a block
+> device, but it also makes the disk unusable forever.
+> 
+> nbd_clear_sock_ioctl on the other hand wants to shut down the file
+> system, but allow the block device to be used again when when connected
+> to another socket.  Switch nbd to use disk_force_media_change and
+> nbd_bdev_reset to go back to a behavior of the old __invalidate_device
+> call, with the added benefit of incrementing the device generation
+> as there is no guarantee the old content comes back when the device
+> is reconnected.
+> 
+> Reported-by: Samuel Holland <samuel.holland@sifive.com>
+> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Fixes: 0c1c9a27ce90 ("nbd: call blk_mark_disk_dead in nbd_clear_sock_ioctl")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/nbd.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-commit 699826f4e30ab76a62c238c86fbef7e826639c8d
-Author: Saravanan Vajravel <saravanan.vajravel@broadcom.com>
-Date:   Tue Jun 6 10:25:31 2023 +0000
+Tested-by: Samuel Holland <samuel.holland@sifive.com>
 
-    IB/isert: Fix incorrect release of isert connection
+Thanks for the fix!
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=144a99be680000
-start commit:   105a36f3694e Merge tag 'kbuild-fixes-v6.0-3' of git://git...
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=122d7bd4fc8e0ecb
-dashboard link: https://syzkaller.appspot.com/bug?extid=0e9dc403e57033a74b1d
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10174404880000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=169f552f080000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: IB/isert: Fix incorrect release of isert connection
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
