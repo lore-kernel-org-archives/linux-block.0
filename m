@@ -2,90 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1813BE776F2
-	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 02:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 266CFE776F5
+	for <linux-block@archiver.kernel.org>; Tue,  3 Oct 2023 02:57:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238985AbjJCCFn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 Oct 2023 22:05:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39076 "EHLO
+        id S230054AbjJCC5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 Oct 2023 22:57:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238959AbjJCCFm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 22:05:42 -0400
-Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E40179B
-        for <linux-block@vger.kernel.org>; Mon,  2 Oct 2023 19:05:39 -0700 (PDT)
-Received: by mail-oo1-xc2b.google.com with SMTP id 006d021491bc7-57c0775d4fcso76034eaf.0
-        for <linux-block@vger.kernel.org>; Mon, 02 Oct 2023 19:05:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1696298739; x=1696903539; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QFaHdQHyS9i21JqtHeL8In3GwblPP2TqR46MnH+YE2Q=;
-        b=CzYtxqGOxbC3yrYeHL/BGsFRa02cU/sysfbHC2MJqgaAhPpCUOUUZQpp+CqWfTZ8Ya
-         xtOCK/3zjkmtEJ4N4XzIEr7sJBhOeHWonu9s6ZSPl5e+J3SoSNrQlUNpHMg2kalC8Mx8
-         fNog8GMfy0wDGOqGISZzn+mjP1g44H6hh0PgaNGzudwBFa9LKRc5UmDQF7m5Dy9IAEis
-         1elC1fkk0Tl81Zdu3gSIlAlg+KMi4TS+TtZSwGTb5B+FU4/LhpJsi/7crAPs2zxoRAzv
-         wtRzvfn+uqOBOzFGAJWu7r23EZhNHhXidTbb7k13u0/VNFllhUWS+iKOTdEro8YGu7Xh
-         HRKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696298739; x=1696903539;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QFaHdQHyS9i21JqtHeL8In3GwblPP2TqR46MnH+YE2Q=;
-        b=DVYaw2VeJ2AIgz7ay0IAFcbiRpKSMwyUkC9ugRYIFNaXhjmeklgjkMGQo2UJ9PQb8k
-         sUKtEGLWKVjgmrN6iRKfXDNvLrrTavyDXXtC2T+H9dX4oTjtVdvcxxvmXOM5ixWoOY1h
-         iBXQIktHBNt0w2iGWz1RISRAdThLhDDr8E5KzOi4hrxih1dGpilfqQdToYlMbkvaz37a
-         Alhen1iwP6VrMuyYmk2B8Hp0Z2fjem0xu7A1pAh6nmb1caAu8t6Y2lmlSHtBYwgzN0sU
-         w/7CTKqjWBLlmxOe8YNspDNlYBzpMarrKAE6OL8S0AfujxufXBuYaduuidModOPUau8+
-         WRpw==
-X-Gm-Message-State: AOJu0Ywjuyg8++/UkM4azwMlcXPGoXC98z6Cp0m2Y9V3/GcFkLYzGqQB
-        Zz61XKk6hVwb4eD26wXXzcow2lE155TZIw1CAWE=
-X-Google-Smtp-Source: AGHT+IFWzFusbf8uVJyMXuY0Biftw/J5lCDah7fr/KwXx12HnkzKwYkxXx+YRhTuY1BE3ZWhxvKDxQ==
-X-Received: by 2002:a05:6359:214:b0:14a:cca4:5601 with SMTP id ej20-20020a056359021400b0014acca45601mr9005905rwb.3.1696298739072;
-        Mon, 02 Oct 2023 19:05:39 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id q28-20020a638c5c000000b005742092c211sm160428pgn.64.2023.10.02.19.05.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 19:05:37 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Phillip Potter <phil@philpotter.co.uk>
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20231002220203.15637-1-phil@philpotter.co.uk>
-References: <20231002220203.15637-1-phil@philpotter.co.uk>
-Subject: Re: [PATCH 0/1] cdrom: patch for inclusion
-Message-Id: <169629873742.1745606.9169168579232131161.b4-ty@kernel.dk>
-Date:   Mon, 02 Oct 2023 20:05:37 -0600
+        with ESMTP id S229464AbjJCC5H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2023 22:57:07 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 835AAA1;
+        Mon,  2 Oct 2023 19:57:04 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A19CC433C7;
+        Tue,  3 Oct 2023 02:57:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696301824;
+        bh=VaFWFM5fxDWGkb8H1vk6Bq8dR22TjRNx4fMlMFNeYbA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Fcq3zcCoO8Cw3fSu03I/MN7v4SZVVerKmQLt2XdPAdd7oRhQuf/3qGM718GYYKXHr
+         XYLU3kV10AQEcShXicFobffOpIo33qy2nJhifxPjZROX1vPVEEt0c8Pz3JkK/8jbIT
+         6LVV4LblD5xEPcQDCvNh7+FXEWbywSAq5R7Arlb9QueR6vapcefnZ2kHNvdW/OyJP/
+         9eY+eZ0+4caJ2Nx2QB6+hdzRq61ZL115VvKrna6IYqrqH1D680fWp8IxG+bAtUNo7O
+         ZG4OuNPJzfpH1L6gTDg2BwvvXSB5MDg3XIwWbOQa7fnSrhQeGW/0/YK4SrYySgvCkB
+         zS58IZ7Vc1rzw==
+Date:   Mon, 2 Oct 2023 19:57:03 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     John Garry <john.g.garry@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Eric Biggers <ebiggers@kernel.org>, axboe@kernel.dk,
+        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        viro@zeniv.linux.org.uk, brauner@kernel.org,
+        chandan.babu@oracle.com, dchinner@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+        linux-api@vger.kernel.org,
+        Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Subject: Re: [PATCH 03/21] fs/bdev: Add atomic write support info to statx
+Message-ID: <20231003025703.GD21298@frogsfrogsfrogs>
+References: <20230929102726.2985188-1-john.g.garry@oracle.com>
+ <20230929102726.2985188-4-john.g.garry@oracle.com>
+ <20230929224922.GB11839@google.com>
+ <b9c266d2-d5d6-4294-9a95-764641e295b4@acm.org>
+ <d3a8b9b0-b24c-a002-e77d-56380ee785a5@oracle.com>
+ <ZRtztUQvaWV8FgXW@dread.disaster.area>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZRtztUQvaWV8FgXW@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Mon, 02 Oct 2023 23:02:02 +0100, Phillip Potter wrote:
-> Please include Joel's patch below, reviewed and signed off by myself.
-> Many thanks.
+On Tue, Oct 03, 2023 at 12:51:49PM +1100, Dave Chinner wrote:
+> On Mon, Oct 02, 2023 at 10:51:36AM +0100, John Garry wrote:
+> > On 01/10/2023 14:23, Bart Van Assche wrote:
+> > > On 9/29/23 15:49, Eric Biggers wrote:
+> > > > On Fri, Sep 29, 2023 at 10:27:08AM +0000, John Garry wrote:
+> > > > > diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
+> > > > > index 7cab2c65d3d7..c99d7cac2aa6 100644
+> > > > > --- a/include/uapi/linux/stat.h
+> > > > > +++ b/include/uapi/linux/stat.h
+> > > > > @@ -127,7 +127,10 @@ struct statx {
+> > > > >       __u32    stx_dio_mem_align;    /* Memory buffer alignment
+> > > > > for direct I/O */
+> > > > >       __u32    stx_dio_offset_align;    /* File offset alignment
+> > > > > for direct I/O */
+> > > > >       /* 0xa0 */
+> > > > > -    __u64    __spare3[12];    /* Spare space for future expansion */
+> > > > > +    __u32    stx_atomic_write_unit_max;
+> > > > > +    __u32    stx_atomic_write_unit_min;
+> > > > 
+> > > > Maybe min first and then max?  That seems a bit more natural, and a
+> > > > lot of the
+> > > > code you've written handle them in that order.
+> > 
+> > ok, I think it's fine to reorder
+> > 
+> > > > 
+> > > > > +#define STATX_ATTR_WRITE_ATOMIC        0x00400000 /* File
+> > > > > supports atomic write operations */
+> > > > 
+> > > > How would this differ from stx_atomic_write_unit_min != 0?
+> > 
+> > Yeah, I suppose that we can just not set this for the case of
+> > stx_atomic_write_unit_min == 0.
 > 
-> Regards,
-> Phil
-> 
-> Joel Granados (1):
->   cdrom: Remove now superfluous sentinel element from ctl_table array
-> 
-> [...]
+> Please use the STATX_ATTR_WRITE_ATOMIC flag to indicate that the
+> filesystem, file and underlying device support atomic writes when
+> the values are non-zero. The whole point of the attribute mask is
+> that the caller can check the mask for supported functionality
+> without having to read every field in the statx structure to
+> determine if the functionality it wants is present.
 
-Applied, thanks!
+^^ Seconding what Dave said.
 
-[1/1] cdrom: Remove now superfluous sentinel element from ctl_table array
-      commit: 114b0ff62a6510eb218660cb4925b4c4a01cdd84
+--D
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+> -Dave.
+> -- 
+> Dave Chinner
+> david@fromorbit.com
