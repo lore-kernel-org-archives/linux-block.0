@@ -2,78 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C505AE7C4E9
-	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 18:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6B0E7C4F0
+	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 19:31:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244553AbjJDSxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Oct 2023 14:53:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40644 "EHLO
+        id S244240AbjJDTb6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Oct 2023 15:31:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244290AbjJDSws (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 14:52:48 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3011BC0
-        for <linux-block@vger.kernel.org>; Wed,  4 Oct 2023 11:52:44 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id e9e14a558f8ab-351610727adso41245ab.0
-        for <linux-block@vger.kernel.org>; Wed, 04 Oct 2023 11:52:44 -0700 (PDT)
+        with ESMTP id S244749AbjJDTbo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 15:31:44 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 599CF90;
+        Wed,  4 Oct 2023 12:31:41 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c60a514f3aso972225ad.3;
+        Wed, 04 Oct 2023 12:31:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1696445563; x=1697050363; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=E+P1BMC6p7KesZ1QLneyQfNbStvb0j46CXO1yZ2rY9k=;
-        b=OmCA0zH5hxz0KNLhV2y45fdtmnHIEkqhcpq3kvBfJllnNipxEubTY4JDcpv99ymcjX
-         qT37VXm/Qxrq4/2OIizbFKbKGzNzqUJ92O1OCq8HGLeVVm3uFgOAH7bBP/yGTnsEZxEU
-         O5admmZ7ICG3K6P5GlUTAVF8qeUqAQCEY3SSSk1424/jP/W+l8O1UXPpITKzIz7HoSEr
-         u2jTeYwOGsDAIOD8AcmbwJtnUY2QdacMu8dGfi9S8ZzDaykZeGf93aogjjbtQrsymwE5
-         CPkjsXWtn5cvVX3H3i8Yr++RQ33sbN1sbM00to5bh1vYpG4tpwL2Kh/G82KePZjBuUYM
-         2HKg==
+        d=gmail.com; s=20230601; t=1696447901; x=1697052701; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W5HfVM4fCCGY68ob5MM+ty4dyWUo6GBaDagauhTzLa4=;
+        b=Oa4MzZ0JEIgnoPl4BhpcvNMRm+cW1j9ZmGBxLQ04OuZTUIumiSBxsMI+kZ732pMQxo
+         ROAWWtOF9hCO4+tXRrpEuQdwWbcbnAfitkThEjtqtpzF3lDxFqGIa53Lh/Oef7Gm9A7o
+         6ayfbiL99VoEOReq4xUvUG1/2703xw9ZawpExyMeWVX0r0o+Vdp/kEhRS+UPmqAbv69L
+         BJC33+qhGI8XP7/wFEYatGuzWHFiPyOroAiHLe/OJrXoVZFmaiJPCiWAFdwmV/5Sgd56
+         T8qmOwNY1Z31JoLpYhbhYPqIxihmiNFH7wfo3Uzbb7qVorkaIeTuVvDI6zTFluqY7WSD
+         H1QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696445563; x=1697050363;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E+P1BMC6p7KesZ1QLneyQfNbStvb0j46CXO1yZ2rY9k=;
-        b=f5ot8Hw8XoVVUZFqrL7oHwlLRvUr65y23GpgXORiMhT2recsPiAPv+iCGAtX9GS9m5
-         wFQX2WRzOvfACrhxIPUlMTSiehJTBVrj0cewM+hIkG30P3jEG6Ztjk0dy5bM3Lq1r0cL
-         2hOO6RsVZVGsxHQF7WOKqHP1GSHpFTBD5E2OYfJpm/+7XyIMH4D16mWfkeGtzophXQvw
-         HGiZDYBN4NihvB78SiqucqwC+3R1vdWQ0FUw7py7t8AS78dLxdJN5IGJu26RdgM3cmrx
-         1sD6IYuJ998a218kLrqCwSi0N4Crx47URdUnRVp+J9BweRULnCqi3qkbrwN82+4QIuWX
-         i3ZQ==
-X-Gm-Message-State: AOJu0Yz2WJH9Fw2GFqmvvgCQK3Y9HXLM6FQEcSJPiEKoiyMCClueB7AQ
-        eULKjzX7Ye7r3JOvfZZbmWypVbkxbFgvM+ecsjQ=
-X-Google-Smtp-Source: AGHT+IETEG6pRPM9aDjlY3zLGtVT0VvyuqBH+JiMSjf/3mZu4Ua5GRk2AksYWgXqvA4Eu5+m/g9bzw==
-X-Received: by 2002:a05:6602:2a44:b0:792:9b50:3c3d with SMTP id k4-20020a0566022a4400b007929b503c3dmr3746676iov.1.1696445563303;
-        Wed, 04 Oct 2023 11:52:43 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id gs10-20020a0566382d8a00b004290f6c15bfsm1138633jab.145.2023.10.04.11.52.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Oct 2023 11:52:42 -0700 (PDT)
-Message-ID: <f5d66783-b8ca-4f81-9d24-faaf00961dc7@kernel.dk>
-Date:   Wed, 4 Oct 2023 12:52:41 -0600
+        d=1e100.net; s=20230601; t=1696447901; x=1697052701;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W5HfVM4fCCGY68ob5MM+ty4dyWUo6GBaDagauhTzLa4=;
+        b=A8qR6aTvNELXhIE4NdlAwbyFhz9ma4FUNYa2S5OLzu6VqyzSphUaYd8cNVw0Tw+8Ba
+         8lf7fpdBLR+Bt9Pn/Jqrlzsu258YBoPX8dHj7280FZpPQ1rnMzm9506XujNFtSsGEnye
+         +JGrdKa9RcQy5b8DBFMaTjkiQmxpcWoNn1E5AtGxCCJPx9Vkignv6ESZfxu777SYqyuh
+         qd17qP1IkCd+ASkZ4F3HcyEfPEKj+FY2lbt8tj3tZ6PNsvMy14bbwbAI6uRfIY+9R9oC
+         Ammqpz4LVnYq9A4JTXlowpK+Wc2YnUDQprVJ8RXUBO6spYAle3nWMLTcig3JIExXEMxQ
+         fwxg==
+X-Gm-Message-State: AOJu0YxJUQzZLvsyTgNgjCleZ4DwmT0YGQ2gf+SFvZTTETfnm6nFVNGi
+        31vw9crrhFXqr9X7j2HYkpk=
+X-Google-Smtp-Source: AGHT+IGZVPAbnXzw1VU0d3EYLakJJsXUlO6LA/FUAriMf/+lkcNF8C6IYLBjMpnG89KJvtciD7X+lQ==
+X-Received: by 2002:a17:902:6946:b0:1bf:27a2:b52b with SMTP id k6-20020a170902694600b001bf27a2b52bmr3238653plt.58.1696447900827;
+        Wed, 04 Oct 2023 12:31:40 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::4:cef])
+        by smtp.gmail.com with ESMTPSA id a7-20020a170902ecc700b001bc6e6069a6sm4079064plh.122.2023.10.04.12.31.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Oct 2023 12:31:40 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 4 Oct 2023 09:31:38 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     linan666@huaweicloud.com
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, yukuai3@huawei.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linan122@huawei.com,
+        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
+ throttle is enabled
+Message-ID: <ZR29mvoQMxcZcppw@slm.duckdns.org>
+References: <20230928015858.1809934-1-linan666@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [block?] WARNING in __floppy_read_block_0 (3)
-Content-Language: en-US
-To:     syzbot <syzbot+06ecd359d1a53c832788@syzkaller.appspotmail.com>,
-        efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <0000000000003b14000606e7f15b@google.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <0000000000003b14000606e7f15b@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230928015858.1809934-1-linan666@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I'll keep saying this:
+Hello,
 
-https://lore.kernel.org/all/7df3e30a-aa31-495c-9d59-cb6080364f61@kernel.dk/
+On Thu, Sep 28, 2023 at 09:58:58AM +0800, linan666@huaweicloud.com wrote:
+> From: Li Nan <linan122@huawei.com>
+> 
+> When the throttle of bps is not enabled, tg_bps_limit() returns U64_MAX,
+> which is be used in calculate_bytes_allowed(), and divide 0 error will
+> happen.
 
-but apparently nobody is listening.
+calculate_bytes_allowed() is just
+
+  return mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed, (u64)HZ); 
+
+The only division is by HZ. How does divide by 0 happen?
+
+Thanks.
 
 -- 
-Jens Axboe
-
-
+tejun
