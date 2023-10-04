@@ -2,87 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BCA8E936E1
-	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 20:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 530FFE936E1
+	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 20:31:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233900AbjJDU25 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Oct 2023 16:28:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55332 "EHLO
+        id S233332AbjJDUbL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Oct 2023 16:31:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233861AbjJDU24 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 16:28:56 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DA7DAD
-        for <linux-block@vger.kernel.org>; Wed,  4 Oct 2023 13:28:53 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id ca18e2360f4ac-7748ca56133so3158439f.0
-        for <linux-block@vger.kernel.org>; Wed, 04 Oct 2023 13:28:53 -0700 (PDT)
+        with ESMTP id S244973AbjJDUbK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 16:31:10 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45389AD
+        for <linux-block@vger.kernel.org>; Wed,  4 Oct 2023 13:31:02 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-41812c94eb5so1330961cf.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Oct 2023 13:31:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1696451333; x=1697056133; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=21cBEUSjF4TZhsDOLZLhdwXsG9t3AJsN/zN+Wwuijrc=;
-        b=iNQChHV5T/CHEshLWavEPjwVYgN7joApUKBQw5QjJXJwv2cbQiZzV7JeTrpSQLDtWr
-         xotZRQ61F8iIVJZAiIZwQTpi1sM7fG8wPE/jG6cFrCnsyb0irH7eFrB2YyE5Zuhy8ekN
-         zI5te5lSEW++ea7So7iMd2bALval9dd1M6SVLIWB+H9V0WKsqagFRkjEd0qGElKnBsoh
-         Y62SOQD7DVeAvof9TYGd+hs9i9W6bK9MiWjk7C5/JVVT2nRsxV9Q7me7lPAG7WZGASDy
-         7sxTb5IdLovYckPnBxCDY14UE/CoGD+q6jntvXKENwDjffqXU71qhqz6rce7Qtr/d1ew
-         98ZA==
+        d=chromium.org; s=google; t=1696451461; x=1697056261; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lXYkNNwyK1dpfEtHp9sOFR0NjxTumXuiYxFY0CQML8E=;
+        b=Yb/yLZ/lSKqCcNTFd0++jfe7LwtA1e2a8fxeowPvo/ZqVvAxCu+eFjSfwtxq4GwSp0
+         qQ1jy/fxuFb1yaqaYa/1Bi1CvsCNRFEaFo7kHIcJu1+M/U+xfJ3IqjFmPw1VhpAoPDfp
+         Nfd1qFtaYZ1veD5XH8E6d/9JxtzEc4pQAwljQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696451333; x=1697056133;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=21cBEUSjF4TZhsDOLZLhdwXsG9t3AJsN/zN+Wwuijrc=;
-        b=c3lO8qIjmSMkMbyoHezb+n+fxrgCxSdUogjFqvyCux5kE4s5bU05HWaRt+FewvWkBN
-         4ndMQtKuBPsF/j5oU9Cfaa+H23hluPb3D0/kqR4yziSfB/aCp7eCXkyQuuCUWMiHyR6q
-         dACcFzz1xLTyem5h2Ax+m7m9bhd8TBPuT1MeDsTpkRWrwhWngUINJQeBk96YaPWLvyPF
-         xYBq42gvJicvKYIYvbdwMWbj1LwBFM0M747T+/yrqCkrwvunxAINlq3mjBuAr/vDZTKK
-         fX99FKe1N41+EGxW6zTFyL3b5Os2mWZ2VwzMGSUaoPQOhaPUS+t9N8hUChG8Ev9Ta51W
-         oiTA==
-X-Gm-Message-State: AOJu0YwQtpgmKZEiegKc8oYn1mAukPJ0FwrLXfKWB/+TUyYW7QUKOLi9
-        j/akQ4UWtDZ8uOhjD6Ys8zqImA==
-X-Google-Smtp-Source: AGHT+IGnED8kVpBtGrfQrHoqH87z4y55vamJMb4nxM1//BpBi7Lotw0mZly67kx58aeD6ggT+yLUgg==
-X-Received: by 2002:a05:6602:3a05:b0:792:6be4:3dcb with SMTP id by5-20020a0566023a0500b007926be43dcbmr3319534iob.2.1696451332812;
-        Wed, 04 Oct 2023 13:28:52 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id j29-20020a02cb1d000000b00439fa6ff6a9sm13989jap.70.2023.10.04.13.28.51
+        d=1e100.net; s=20230601; t=1696451461; x=1697056261;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lXYkNNwyK1dpfEtHp9sOFR0NjxTumXuiYxFY0CQML8E=;
+        b=vPElGA+8Daq8kb0tboFumUKI4Xl9EuYaO1QELW4V+d8Wxx3ZYwFVTlZ8UhyGZj1Ucp
+         AWj53TL+quLQbhRzDpW6uYukcpEbuBsQXMJQ0kAZiMdmJH/CqmZpy0m11dxGaTJdeLGq
+         CD/66W1tEDjM2i5OdWEoJkmzx+9/hu4zAglufh1W8mNw6kOMOor+TOowIxcsZFHUnjj7
+         dEAnukWV+CzEI9jzuoFV93OXvLmQGRVI4pEebbmr5ZmtXGTBSq6s3XUnoirR5RaKAEL+
+         rXVR5bO4Dp5CC/2y4DUWtIFN47xs/csGlcmmRhM8agKAVtiDDTxOLQUOX9d4OgYSDaT8
+         Qv5A==
+X-Gm-Message-State: AOJu0YxzxTPhNK8KTk3A9IJwwMY8o8llGu/I9ot7WkfawT24rOVrHG4t
+        uSJRabKwrYnKp/Yr6OqPv+s5SEXY1SmHQxgrHzE=
+X-Google-Smtp-Source: AGHT+IEiH4wwwivtm03EYHk+qsFjMoj4wUCbpITTaJVN4q5Fih8h5XGoPPzAkDQiVMgLuN/4e0dCzQ==
+X-Received: by 2002:a05:622a:11d0:b0:417:b746:8dec with SMTP id n16-20020a05622a11d000b00417b7468decmr3874943qtk.58.1696451461037;
+        Wed, 04 Oct 2023 13:31:01 -0700 (PDT)
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com. [209.85.160.175])
+        by smtp.gmail.com with ESMTPSA id kr19-20020ac861d3000000b004197d4a4335sm385qtb.22.2023.10.04.13.30.59
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Oct 2023 13:28:52 -0700 (PDT)
-Message-ID: <43b1a228-9a60-40ef-936b-c8a062d7eb21@kernel.dk>
-Date:   Wed, 4 Oct 2023 14:28:51 -0600
+        Wed, 04 Oct 2023 13:30:59 -0700 (PDT)
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-419886c7474so15011cf.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Oct 2023 13:30:59 -0700 (PDT)
+X-Received: by 2002:a05:622a:1a92:b0:419:6cf4:244f with SMTP id
+ s18-20020a05622a1a9200b004196cf4244fmr64519qtc.20.1696451458698; Wed, 04 Oct
+ 2023 13:30:58 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix regression in sed-opal for a saved key.
-Content-Language: en-US
-To:     Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org
-Cc:     gjoyce@linux.vnet.ibm.com, jonathan.derrick@linux.dev,
-        linux-kernel@vger.kernel.org, Ondrej Kozina <okozina@redhat.com>
-References: <20231003100209.380037-1-gmazyland@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231003100209.380037-1-gmazyland@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230928015858.1809934-1-linan666@huaweicloud.com> <ZR29mvoQMxcZcppw@slm.duckdns.org>
+In-Reply-To: <ZR29mvoQMxcZcppw@slm.duckdns.org>
+From:   Khazhy Kumykov <khazhy@chromium.org>
+Date:   Wed, 4 Oct 2023 13:30:44 -0700
+X-Gmail-Original-Message-ID: <CACGdZYLFkNs7uOuq+ftSE7oMGNbB19nm40E86xiagCFfLZ1P0w@mail.gmail.com>
+Message-ID: <CACGdZYLFkNs7uOuq+ftSE7oMGNbB19nm40E86xiagCFfLZ1P0w@mail.gmail.com>
+Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
+ throttle is enabled
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linan666@huaweicloud.com, josef@toxicpanda.com, axboe@kernel.dk,
+        yukuai3@huawei.com, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linan122@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
+        yangerkun@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/3/23 4:02 AM, Milan Broz wrote:
-> The commit 3bfeb61256643281ac4be5b8a57e9d9da3db4335
-> introduced the use of keyring for sed-opal.
-> 
-> Unfortunately, there is also a possibility to save
-> the Opal key used in opal_lock_unlock().
-> 
-> This patch switches the order of operation, so the cached
-> key is used instead of failure for opal_get_key.
-> 
-> The problem was found by the cryptsetup Opal test recently
-> added to the cryptsetup tree.
+On Wed, Oct 4, 2023 at 12:32=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote:
+>
+> Hello,
+>
+> On Thu, Sep 28, 2023 at 09:58:58AM +0800, linan666@huaweicloud.com wrote:
+> > From: Li Nan <linan122@huawei.com>
+> >
+> > When the throttle of bps is not enabled, tg_bps_limit() returns U64_MAX=
+,
+> > which is be used in calculate_bytes_allowed(), and divide 0 error will
+> > happen.
+>
+> calculate_bytes_allowed() is just
+>
+>   return mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed, (u64)HZ);
+>
+> The only division is by HZ. How does divide by 0 happen?
 
-Greg, please review this.
+We've also noticed this - haven't looked too deeply but I don't think
+it's a divide by zero, but an overflow (bps_limit * jiffy_elapsed / HZ
+will overflow for jiffies > HZ). mul_u64_u64_div_u64 does say it will
+throw DE if the mul overflows
 
--- 
-Jens Axboe
-
-
+>
+> Thanks.
+>
+> --
+> tejun
