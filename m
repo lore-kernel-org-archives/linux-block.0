@@ -2,135 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E15E936E7
-	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 20:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 312FCE936E6
+	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 21:01:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233557AbjJDUyT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Oct 2023 16:54:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50584 "EHLO
+        id S233681AbjJDVBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Oct 2023 17:01:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233286AbjJDUyS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 16:54:18 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE6890;
-        Wed,  4 Oct 2023 13:54:15 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 394KluRs000693;
-        Wed, 4 Oct 2023 20:54:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=4wXsC4kQ2MjcLpSQnJhDuNbJAFFxhtX/zbBwQY744jc=;
- b=am1AIUMY4KQwVRb7EUCDCVWHrZyh8f3ndXQ564z07qo2U7bGREnGllNdIIXdHaAX6lLU
- AgkU8D+re9aQNe/5s3pJl2/7YHvjSyDo+Qlw4YMiTKzpwqhweFOk1PgpBvfZelgnFZ4T
- tD1SAp1IKB1QbwtOoU/XHZxlp0S+9Bw8/QbBgSG8smb9d/HaJsizwJAGbP03sXGtYPhZ
- heNO4uhesMOaB/9qmFZwvVPiXxLsv87nhAtooZna9ILPKdab332kgIrW6yXIdsL0oJBf
- eQWaiKjqHc/yPk60wEmyj62g7xzShnC4RoM3hVUY8Ck7bgXMwgw3PLF02HPA+C2QHjeX 5w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3thfd28474-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Oct 2023 20:54:11 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 394Kpe0q011935;
-        Wed, 4 Oct 2023 20:54:11 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3thfd2846t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Oct 2023 20:54:11 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 394KNhr8010870;
-        Wed, 4 Oct 2023 20:54:10 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tf0q23g2n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Oct 2023 20:54:10 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-        by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 394Ks9oP32375542
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 Oct 2023 20:54:10 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DEBD95805C;
-        Wed,  4 Oct 2023 20:54:09 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 88D2B58058;
-        Wed,  4 Oct 2023 20:54:09 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.61.54.52])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  4 Oct 2023 20:54:09 +0000 (GMT)
-Message-ID: <5c4fbafb1daa45f2faf60c7d587cd23c53d9393c.camel@linux.vnet.ibm.com>
-Subject: Re: [PATCH] block: Fix regression in sed-opal for a saved key.
-From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reply-To: gjoyce@linux.vnet.ibm.com
-To:     Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org
-Cc:     jonathan.derrick@linux.dev, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, Ondrej Kozina <okozina@redhat.com>
-Date:   Wed, 04 Oct 2023 15:54:09 -0500
-In-Reply-To: <20231003100209.380037-1-gmazyland@gmail.com>
-References: <20231003100209.380037-1-gmazyland@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
-Mime-Version: 1.0
+        with ESMTP id S233577AbjJDVBE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 17:01:04 -0400
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BAD89E;
+        Wed,  4 Oct 2023 14:01:01 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-69101d33315so204680b3a.3;
+        Wed, 04 Oct 2023 14:01:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696453261; x=1697058061;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MqWCjpGoPtGeBxPj6NXaJjfTI+0jdvkGwu/+8Rx4Pz4=;
+        b=LCtAqZbXV5EEBnFNAca0GPoeTLEa2hsqHrwR7Pls/FiUK7wc98ledPW4TKRH0pXfqH
+         uT8SIsiC2ayCfIGuiDpPeOtnoh/bVV6ig6sryt17Mrzyc9w6T+EKGQFAkSkIeyXKbmSP
+         RyxJM/kArK9xkwaZwjGwLym7OfguHOsGRMPDBhTpKtrZuQyU2U22kbO5KFQNaE7dA9HB
+         gOwS8YEK8/9/XD50PMCB86wqvtyBRLNZ1iT0mGNF4do0QPqGLqkmkEFTlI9VZkrCV6qS
+         D7SgUM9srYhxtWYfXDOIg+lG3y/rKt2Gk3JqJ3rJCDr/ZAJOdZW0E3UKSLsQMxKvibv4
+         HIfg==
+X-Gm-Message-State: AOJu0YxiLL41GZnvhwRwoh7lUo0woL0sDiAaOgWg1HdQV2S6PRkoCI/O
+        zzs61cbnOApW1NQbPUlT3rM=
+X-Google-Smtp-Source: AGHT+IEuGjzH8Kj7y4GInNBPROGHOmz2jLurje3529a8epyygBEeFbbe5C5V5No2qUQIED/PIYh8gA==
+X-Received: by 2002:a05:6a00:b84:b0:68f:ccea:8e14 with SMTP id g4-20020a056a000b8400b0068fccea8e14mr4137143pfj.32.1696453260897;
+        Wed, 04 Oct 2023 14:01:00 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:969d:167a:787c:a6c7? ([2620:15c:211:201:969d:167a:787c:a6c7])
+        by smtp.gmail.com with ESMTPSA id a24-20020aa78658000000b006934e7ceb79sm3657241pfo.32.2023.10.04.14.00.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Oct 2023 14:01:00 -0700 (PDT)
+Message-ID: <45bc1c01-09c7-4c54-b305-f349d0d0e19b@acm.org>
+Date:   Wed, 4 Oct 2023 14:00:58 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/21] block: Add atomic write operations to request_queue
+ limits
+Content-Language: en-US
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
+        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, chandan.babu@oracle.com, dchinner@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+        linux-api@vger.kernel.org,
+        Himanshu Madhani <himanshu.madhani@oracle.com>
+References: <20230929102726.2985188-1-john.g.garry@oracle.com>
+ <20230929102726.2985188-2-john.g.garry@oracle.com>
+ <7f031c7a-1830-4331-86f9-4d5fbca94b8a@acm.org>
+ <yq1bkdfrt8l.fsf@ca-mkp.ca.oracle.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <yq1bkdfrt8l.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: j_OwV0zcFa8P948osUz78Jb7a7YCNLoE
-X-Proofpoint-ORIG-GUID: DMzlJaRQlf7xew3OpV9Kpc86CTQTBvLP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-04_11,2023-10-02_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- bulkscore=0 spamscore=0 impostorscore=0 mlxlogscore=999 clxscore=1011
- priorityscore=1501 malwarescore=0 lowpriorityscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310040153
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2023-10-03 at 12:02 +0200, Milan Broz wrote:
-> The commit 3bfeb61256643281ac4be5b8a57e9d9da3db4335
-> introduced the use of keyring for sed-opal.
+On 10/3/23 20:00, Martin K. Petersen wrote:
 > 
-> Unfortunately, there is also a possibility to save
-> the Opal key used in opal_lock_unlock().
+> Bart,
 > 
-> This patch switches the order of operation, so the cached
-> key is used instead of failure for opal_get_key.
+>>    also that there are no guarantees that the data written by an atomic
+>>    write will survive a power failure. See also the difference between
+>>    the NVMe parameters AWUN and AWUPF.
 > 
-> The problem was found by the cryptsetup Opal test recently
-> added to the cryptsetup tree.
-> 
-> Fixes: 3bfeb6125664 ("block: sed-opal: keyring support for SED keys")
-> Tested-by: Ondrej Kozina <okozina@redhat.com>
-> Signed-off-by: Milan Broz <gmazyland@gmail.com>
-> ---
->  block/sed-opal.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index 6d7f25d1711b..04f38a3f5d95 100644
-> --- a/block/sed-opal.c
-> +++ b/block/sed-opal.c
-> @@ -2888,12 +2888,11 @@ static int opal_lock_unlock(struct opal_dev
-> *dev,
->  	if (lk_unlk->session.who > OPAL_USER9)
->  		return -EINVAL;
-> 
-> -	ret = opal_get_key(dev, &lk_unlk->session.opal_key);
-> -	if (ret)
-> -		return ret;
->  	mutex_lock(&dev->dev_lock);
->  	opal_lock_check_for_saved_key(dev, lk_unlk);
-> -	ret = __opal_lock_unlock(dev, lk_unlk);
-> +	ret = opal_get_key(dev, &lk_unlk->session.opal_key);
-> +	if (!ret)
-> +		ret = __opal_lock_unlock(dev, lk_unlk);
+> We only care about *PF. The *N variants were cut from the same cloth as
+> TRIM and UNMAP.
 
-This is relying on opal_get_key() returning 0 to decide if
-__opal_lock_unlock() is called. Is this really what you want? It seems
-that you would want to unlock if the key is a LUKS key, even if
-opal_get_key() returns non-zero.
+Hi Martin,
 
->  	mutex_unlock(&dev->dev_lock);
-> 
->  	return ret;
+Has the following approach been considered? RWF_ATOMIC only guarantees 
+atomicity. Persistence is not guaranteed without fsync() / fdatasync().
+
+I think this would be more friendly towards battery-powered devices
+(smartphones). On these devices it can be safe to skip fsync() / 
+fdatasync() if the battery level is high enough.
+
+Thanks,
+
+Bart.
+
+
 
