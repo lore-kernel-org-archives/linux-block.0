@@ -2,110 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5729E7C4E7
-	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 17:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AABE7C4E9
+	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 18:12:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243434AbjJDReV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Oct 2023 13:34:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48526 "EHLO
+        id S243927AbjJDSMI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Oct 2023 14:12:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233721AbjJDReU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 13:34:20 -0400
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA171A6;
-        Wed,  4 Oct 2023 10:34:16 -0700 (PDT)
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1c63164a2b6so9710405ad.0;
-        Wed, 04 Oct 2023 10:34:16 -0700 (PDT)
+        with ESMTP id S243957AbjJDSMH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 14:12:07 -0400
+Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 441BEEA
+        for <linux-block@vger.kernel.org>; Wed,  4 Oct 2023 11:11:55 -0700 (PDT)
+Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-6be515ec5d2so148891a34.3
+        for <linux-block@vger.kernel.org>; Wed, 04 Oct 2023 11:11:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696440856; x=1697045656;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A+/9fMvIMylBk0tUbkGNvHwmLNtY7jK7qI7VPa1SYvo=;
-        b=kO0PWT5No7NlODxM63GhW7VUuyO89xEdHizAXlK+4KHh880crBurt3wcMndUKeqRTg
-         cwFuIZum5VQ11J9iIRMGoyE7VBadrFVYbGHI5HFJ5jRwjg/1PSjuFVitxe6osjG424ES
-         O1wo3WRSAr+hs0BGeakrA9EG/MOGp130rEEE7eraLidDqKBVK9PdZVBUlAPffJdtbwz3
-         r8W1MvCZ/XEZSdtBpRftKhaV7eMuW+IljlUYu4YWTuy+osXc1QhEuDD7Tvex9VoT6Tb/
-         yQj8TQlNY0w4eorwcS52ln4z57slUSuCM9yLZPKaaTUlMZCZrtBn515PscBtOgT2/ygR
-         etvQ==
-X-Gm-Message-State: AOJu0YxPlAE8R6YCYS2Nczjmk9A+QQz3ns7qdgRqyhu+NbRBnyrrljz7
-        r4PAv4lK056Xh8yhOi1shRQ=
-X-Google-Smtp-Source: AGHT+IG8R+DlyiiEVWC+68KptejH+cGLh+ypDyuFaNYiG/lvbHPG9T3lVvSCSBbHEXdRAJ132q1v4Q==
-X-Received: by 2002:a17:902:d4c4:b0:1c5:e207:836e with SMTP id o4-20020a170902d4c400b001c5e207836emr444422plg.26.1696440856149;
-        Wed, 04 Oct 2023 10:34:16 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:969d:167a:787c:a6c7? ([2620:15c:211:201:969d:167a:787c:a6c7])
-        by smtp.gmail.com with ESMTPSA id i1-20020a17090332c100b001bbb25dd3a7sm3978166plr.187.2023.10.04.10.34.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Oct 2023 10:34:15 -0700 (PDT)
-Message-ID: <e6c7b33c-38ba-402b-abdc-b783d4402402@acm.org>
-Date:   Wed, 4 Oct 2023 10:34:13 -0700
+        d=1e100.net; s=20230601; t=1696443114; x=1697047914;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ugeGKcnKwIUFCxqvMbCBwAW5NtIGRkA7+AjNrkDnb4o=;
+        b=JXRLmwAIuVXNy30VpTrdZ337aO47Cg3LSjyUXFMhqAZUnpaWFpwH5/8+pUTHIDCLfo
+         w6mA9GDoyzanYnHUgZyU99XGTSonuKLVQn7HbjAZcNn2psqYrpXAPa4bSdjjPKRtYGUX
+         +yrGG4Pd2r6jPCn15zwgFf0kMZAo+A6+F91w1OmruxWdMZdBaX7j09icCIl6qqm1624E
+         kQPlYqO5Qvwo37j6R9VD2A28yxHFgemFhw32KWkJ5a2Wek7O/5m4IuiTKw+4Tzsj+KpX
+         mTk9KDc6S+CLgHRIuhXxrODVMyJRx7GRcbOPBcp3nZXJQltb7g70AzanPdhOqUdHP3HD
+         Zj7g==
+X-Gm-Message-State: AOJu0Yw4WrVaEG0sUkOj6LR74csmhqgnc8/ytsLM9plOJKiQy/qRCsmq
+        vpY22dMxDB4lASIMxvGj89Eb/6VRl2P4QJF5Iytz7dQfiNXP
+X-Google-Smtp-Source: AGHT+IEr+Fk7UaQn8hvT4rWIDrCEyNFoKf9Tcd8cUZtM9rFaCK5UWwyKcWjRSw8YP5bRsrgKDmaC8MPRFsT/T+g6IgRj9jrkNxL2
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/21] block: Add fops atomic write support
-Content-Language: en-US
-To:     John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org,
-        chandan.babu@oracle.com, dchinner@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-api@vger.kernel.org
-References: <20230929102726.2985188-1-john.g.garry@oracle.com>
- <20230929102726.2985188-11-john.g.garry@oracle.com>
- <17ee1669-5830-4ead-888d-a6a4624b638a@acm.org>
- <5d26fa3b-ec34-bc39-ecfe-4616a04977ca@oracle.com>
- <b7a6f380-c6fa-45e0-b727-ba804c6684e4@acm.org>
- <1adeff8e-e2fe-7dc3-283e-4979f9bd6adc@oracle.com>
- <8e2f4aeb-e00e-453a-9658-b1c4ae352084@acm.org>
- <d981dea1-9851-6511-d101-22ea8d7fd31e@oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <d981dea1-9851-6511-d101-22ea8d7fd31e@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6830:612:b0:6c0:e336:7b81 with SMTP id
+ w18-20020a056830061200b006c0e3367b81mr890215oti.4.1696443114651; Wed, 04 Oct
+ 2023 11:11:54 -0700 (PDT)
+Date:   Wed, 04 Oct 2023 11:11:54 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003b14000606e7f15b@google.com>
+Subject: [syzbot] [block?] WARNING in __floppy_read_block_0 (3)
+From:   syzbot <syzbot+06ecd359d1a53c832788@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/4/23 02:14, John Garry wrote:
-> On 03/10/2023 17:45, Bart Van Assche wrote:
->> On 10/3/23 01:37, John Garry wrote:
->>> I don't think that is_power_of_2(write length) is specific to XFS.
->>
->> I think this is specific to XFS. Can you show me the F2FS code that 
->> restricts the length of an atomic write to a power of two? I haven't 
->> found it. The only power-of-two check that I found in F2FS is the 
->> following (maybe I overlooked something):
->>
->> $ git grep -nH is_power fs/f2fs
->> fs/f2fs/super.c:3914:    if (!is_power_of_2(zone_sectors)) {
-> 
-> Any usecases which we know of requires a power-of-2 block size.
-> 
-> Do you know of a requirement for other sizes? Or are you concerned that 
-> it is unnecessarily restrictive?
-> 
-> We have to deal with HW features like atomic write boundary and FS 
-> restrictions like extent and stripe alignment transparent, which are 
-> almost always powers-of-2, so naturally we would want to work with 
-> powers-of-2 for atomic write sizes.
-> 
-> The power-of-2 stuff could be dropped if that is what people want. 
-> However we still want to provide a set of rules to the user to make 
-> those HW and FS features mentioned transparent to the user.
+Hello,
 
-Hi John,
+syzbot found the following issue on:
 
-My concern is that the power-of-2 requirements are only needed for
-traditional filesystems and not for log-structured filesystems (BTRFS,
-F2FS, BCACHEFS).
+HEAD commit:    9f3ebbef746f Merge tag '6.6-rc3-ksmbd-server-fixes' of git..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10791e92680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8d7d7928f78936aa
+dashboard link: https://syzkaller.appspot.com/bug?extid=06ecd359d1a53c832788
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-What I'd like to see is that each filesystem declares its atomic write
-requirements (in struct address_space_operations?) and that
-blkdev_atomic_write_valid() checks the filesystem-specific atomic write
-requirements.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Thanks,
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-9f3ebbef.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8528a3384270/vmlinux-9f3ebbef.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c33152bfb49a/bzImage-9f3ebbef.xz
 
-Bart.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+06ecd359d1a53c832788@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 3 PID: 11841 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
+WARNING: CPU: 3 PID: 11841 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
+WARNING: CPU: 3 PID: 11841 at drivers/block/floppy.c:999 __floppy_read_block_0.isra.0+0x2c2/0x360 drivers/block/floppy.c:4161
+Modules linked in:
+
+CPU: 3 PID: 11841 Comm: syz-executor.1 Not tainted 6.6.0-rc3-syzkaller-00146-g9f3ebbef746f #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
+RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
+RIP: 0010:__floppy_read_block_0.isra.0+0x2c2/0x360 drivers/block/floppy.c:4161
+Code: c0 01 00 00 65 48 2b 04 25 28 00 00 00 0f 85 a1 00 00 00 48 81 c4 c8 01 00 00 5b 5d 41 5c 41 5d 41 5e 41 5f c3 e8 8e 34 49 fc <0f> 0b e9 58 ff ff ff e8 c2 23 9e fc e9 88 fe ff ff e8 78 34 49 fc
+RSP: 0018:ffffc9000d64fa60 EFLAGS: 00010293
+
+RAX: 0000000000000000 RBX: 1ffff92001ac9f4d RCX: 0000000000000000
+RDX: ffff88801b9f9600 RSI: ffffffff853d9082 RDI: 0000000000000001
+RBP: ffffea0000b21480 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
+R13: 000000000000000c R14: ffffc9000d64fab8 R15: dffffc0000000000
+FS:  00007f9a7f9576c0(0000) GS:ffff88806b900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9a7ed980c0 CR3: 000000004b01c000 CR4: 0000000000350ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ floppy_revalidate.isra.0+0x886/0xca0 drivers/block/floppy.c:4207
+ invalidate_drive+0xe8/0x110 drivers/block/floppy.c:3219
+ fd_locked_ioctl+0xb9b/0x1a10 drivers/block/floppy.c:3508
+ fd_ioctl+0x38/0x50 drivers/block/floppy.c:3576
+ blkdev_ioctl+0x2f9/0x770 block/ioctl.c:630
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:871 [inline]
+ __se_sys_ioctl fs/ioctl.c:857 [inline]
+ __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f9a7ec7cae9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f9a7f9570c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f9a7ed9bf80 RCX: 00007f9a7ec7cae9
+RDX: 0000000000000000 RSI: 000000000000024b RDI: 0000000000000003
+RBP: 00007f9a7ecc847a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f9a7ed9bf80 R15: 00007fffc2236268
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
