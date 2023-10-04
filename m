@@ -2,150 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9DC0E936E3
-	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 20:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E15E936E7
+	for <linux-block@archiver.kernel.org>; Wed,  4 Oct 2023 20:54:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233626AbjJDUon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 Oct 2023 16:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56926 "EHLO
+        id S233557AbjJDUyT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 Oct 2023 16:54:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233557AbjJDUom (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 16:44:42 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66331B8
-        for <linux-block@vger.kernel.org>; Wed,  4 Oct 2023 13:44:39 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-7740aa4b545so15346485a.3
-        for <linux-block@vger.kernel.org>; Wed, 04 Oct 2023 13:44:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696452278; x=1697057078; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OsTHf1RxRwyrCT7iXJgHTlu9ULLERBCmiy3t5RYublw=;
-        b=jbO9SFz0GDPdCkv7KXlTzoxlH6CJ17RGQi4XWf5P15eIsDJobGsA/jCN2oeHjpMa+1
-         2cB604GObaSaBZ2TdbX7xFWSqa9vRiHCQDpjVTaZDVbSA8UaI8g2yZfgkkpi/1tHLDTJ
-         cmr8AnhilmFmEsgu06GHA50KIK9utdcjY3lP0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696452278; x=1697057078;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OsTHf1RxRwyrCT7iXJgHTlu9ULLERBCmiy3t5RYublw=;
-        b=czlRUZw3yo393sAv6dHs97UKzlDQCHDEm9yE6jkCasPIDE6d1FFNAlw3lhTxlJbtR8
-         CEezQ7gqLmaITrttd9MHPEXNWQnFekI/S1UdVyaTLwJkZIeYVGDaOjLK/1FtrMKC4seW
-         GUURD77zmnegOuNw5nHU1RI43YY+MogfZsRhPEYxQWFSBzjU/nx7fQbpDQtJYx5dMdQ/
-         Nr1Cedx8qirnRTbBozxtK4C8CFTwx46DmUzwgBqON2DEUTPhfu77BBOvrZgR8gJquPsZ
-         fv55n+SnDbQLWawYJLCWKOwtwHz3AHF9GjUVCOj9JIi02SBh4dRAMygTniily7yAZSyJ
-         3aaQ==
-X-Gm-Message-State: AOJu0YxgQqIWLDUnDs8Oh4XLoyPmnaV/bvKmhVBaLHY5+JRALRnJdJAa
-        Sb5ekAjuu/81UzGNKAnraC4Ap3+FFW+keOmrU+r9pA==
-X-Google-Smtp-Source: AGHT+IGcox/ZxjTGNNzqFMaFxCFhpVibNEfPa/iAzjXif3VykBKzZM+ixUGia6RKbdD2YwwfbaPI4A==
-X-Received: by 2002:a05:620a:4251:b0:76f:167a:cc4a with SMTP id w17-20020a05620a425100b0076f167acc4amr3799492qko.47.1696452278296;
-        Wed, 04 Oct 2023 13:44:38 -0700 (PDT)
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com. [209.85.160.173])
-        by smtp.gmail.com with ESMTPSA id v13-20020ae9e30d000000b0076ceb5eb309sm1517536qkf.74.2023.10.04.13.44.37
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Oct 2023 13:44:37 -0700 (PDT)
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-419768e69dfso100161cf.0
-        for <linux-block@vger.kernel.org>; Wed, 04 Oct 2023 13:44:37 -0700 (PDT)
-X-Received: by 2002:a05:622a:100e:b0:417:5a8c:a104 with SMTP id
- d14-20020a05622a100e00b004175a8ca104mr69912qte.26.1696452277267; Wed, 04 Oct
- 2023 13:44:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230928015858.1809934-1-linan666@huaweicloud.com>
-In-Reply-To: <20230928015858.1809934-1-linan666@huaweicloud.com>
-From:   Khazhy Kumykov <khazhy@chromium.org>
-Date:   Wed, 4 Oct 2023 13:44:26 -0700
-X-Gmail-Original-Message-ID: <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
-Message-ID: <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
-Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
- throttle is enabled
-To:     linan666@huaweicloud.com
-Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai3@huawei.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linan122@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
-        yangerkun@huawei.com
+        with ESMTP id S233286AbjJDUyS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2023 16:54:18 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE6890;
+        Wed,  4 Oct 2023 13:54:15 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 394KluRs000693;
+        Wed, 4 Oct 2023 20:54:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=4wXsC4kQ2MjcLpSQnJhDuNbJAFFxhtX/zbBwQY744jc=;
+ b=am1AIUMY4KQwVRb7EUCDCVWHrZyh8f3ndXQ564z07qo2U7bGREnGllNdIIXdHaAX6lLU
+ AgkU8D+re9aQNe/5s3pJl2/7YHvjSyDo+Qlw4YMiTKzpwqhweFOk1PgpBvfZelgnFZ4T
+ tD1SAp1IKB1QbwtOoU/XHZxlp0S+9Bw8/QbBgSG8smb9d/HaJsizwJAGbP03sXGtYPhZ
+ heNO4uhesMOaB/9qmFZwvVPiXxLsv87nhAtooZna9ILPKdab332kgIrW6yXIdsL0oJBf
+ eQWaiKjqHc/yPk60wEmyj62g7xzShnC4RoM3hVUY8Ck7bgXMwgw3PLF02HPA+C2QHjeX 5w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3thfd28474-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Oct 2023 20:54:11 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 394Kpe0q011935;
+        Wed, 4 Oct 2023 20:54:11 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3thfd2846t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Oct 2023 20:54:11 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 394KNhr8010870;
+        Wed, 4 Oct 2023 20:54:10 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tf0q23g2n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Oct 2023 20:54:10 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+        by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 394Ks9oP32375542
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 4 Oct 2023 20:54:10 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DEBD95805C;
+        Wed,  4 Oct 2023 20:54:09 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 88D2B58058;
+        Wed,  4 Oct 2023 20:54:09 +0000 (GMT)
+Received: from rhel-laptop.ibm.com (unknown [9.61.54.52])
+        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  4 Oct 2023 20:54:09 +0000 (GMT)
+Message-ID: <5c4fbafb1daa45f2faf60c7d587cd23c53d9393c.camel@linux.vnet.ibm.com>
+Subject: Re: [PATCH] block: Fix regression in sed-opal for a saved key.
+From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reply-To: gjoyce@linux.vnet.ibm.com
+To:     Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org
+Cc:     jonathan.derrick@linux.dev, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, Ondrej Kozina <okozina@redhat.com>
+Date:   Wed, 04 Oct 2023 15:54:09 -0500
+In-Reply-To: <20231003100209.380037-1-gmazyland@gmail.com>
+References: <20231003100209.380037-1-gmazyland@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: j_OwV0zcFa8P948osUz78Jb7a7YCNLoE
+X-Proofpoint-ORIG-GUID: DMzlJaRQlf7xew3OpV9Kpc86CTQTBvLP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-04_11,2023-10-02_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ bulkscore=0 spamscore=0 impostorscore=0 mlxlogscore=999 clxscore=1011
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310040153
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 27, 2023 at 7:05=E2=80=AFPM <linan666@huaweicloud.com> wrote:
->
-> From: Li Nan <linan122@huawei.com>
->
-> When the throttle of bps is not enabled, tg_bps_limit() returns U64_MAX,
-> which is be used in calculate_bytes_allowed(), and divide 0 error will
-> happen.
->
-> To fix it, only calculate allowed value when the throttle of bps/iops is
-> enabled and the value will be used.
->
-> Fixes: e8368b57c006 ("blk-throttle: use calculate_io/bytes_allowed() for =
-throtl_trim_slice()")
-> Reported-by: Changhui Zhong <czhong@redhat.com>
-> Closes: https://lore.kernel.org/all/CAGVVp+Vt6idZtxfU9jF=3DVSbu145Wi-d-Wn=
-AZx_hEfOL8yLZgBA@mail.gmail.com
-> Signed-off-by: Li Nan <linan122@huawei.com>
+On Tue, 2023-10-03 at 12:02 +0200, Milan Broz wrote:
+> The commit 3bfeb61256643281ac4be5b8a57e9d9da3db4335
+> introduced the use of keyring for sed-opal.
+> 
+> Unfortunately, there is also a possibility to save
+> the Opal key used in opal_lock_unlock().
+> 
+> This patch switches the order of operation, so the cached
+> key is used instead of failure for opal_get_key.
+> 
+> The problem was found by the cryptsetup Opal test recently
+> added to the cryptsetup tree.
+> 
+> Fixes: 3bfeb6125664 ("block: sed-opal: keyring support for SED keys")
+> Tested-by: Ondrej Kozina <okozina@redhat.com>
+> Signed-off-by: Milan Broz <gmazyland@gmail.com>
 > ---
->  block/blk-throttle.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
->
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 38a881cf97d0..3c9a74ab9f0e 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -730,8 +730,10 @@ static u64 calculate_bytes_allowed(u64 bps_limit, un=
-signed long jiffy_elapsed)
->  static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
->  {
->         unsigned long time_elapsed;
-> -       long long bytes_trim;
-> -       int io_trim;
-> +       long long bytes_trim =3D 0;
-> +       int io_trim =3D 0;
-> +       u64 bps_limit;
-> +       u32 iops_limit;
->
->         BUG_ON(time_before(tg->slice_end[rw], tg->slice_start[rw]));
->
-> @@ -758,11 +760,14 @@ static inline void throtl_trim_slice(struct throtl_=
-grp *tg, bool rw)
->         if (!time_elapsed)
->                 return;
->
-> -       bytes_trim =3D calculate_bytes_allowed(tg_bps_limit(tg, rw),
-> -                                            time_elapsed) +
-> -                    tg->carryover_bytes[rw];
-> -       io_trim =3D calculate_io_allowed(tg_iops_limit(tg, rw), time_elap=
-sed) +
-> -                 tg->carryover_ios[rw];
-> +       bps_limit =3D tg_bps_limit(tg, rw);
-> +       iops_limit =3D tg_iops_limit(tg, rw);
-> +       if (tg->bytes_disp[rw] > 0 && bps_limit !=3D U64_MAX)
-I don't think this change is sufficient to prevent kernel crash, as a
-"clever" user could still set the bps_limit to U64_MAX - 1 (or another
-large value), which probably would still result in the same crash. The
-comment in mul_u64_u64_div_u64 suggests there's something we can do to
-better handle the overflow case, but I'm not sure what it's referring
-to. ("Will generate an #DE when the result doesn't fit u64, could fix
-with an __ex_table[] entry when it becomes an issue.") Otherwise, we
-probably need to remove the mul_u64_u64_div_u64 and check for
-overflow/potential overflow ourselves?
+>  block/sed-opal.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/sed-opal.c b/block/sed-opal.c
+> index 6d7f25d1711b..04f38a3f5d95 100644
+> --- a/block/sed-opal.c
+> +++ b/block/sed-opal.c
+> @@ -2888,12 +2888,11 @@ static int opal_lock_unlock(struct opal_dev
+> *dev,
+>  	if (lk_unlk->session.who > OPAL_USER9)
+>  		return -EINVAL;
+> 
+> -	ret = opal_get_key(dev, &lk_unlk->session.opal_key);
+> -	if (ret)
+> -		return ret;
+>  	mutex_lock(&dev->dev_lock);
+>  	opal_lock_check_for_saved_key(dev, lk_unlk);
+> -	ret = __opal_lock_unlock(dev, lk_unlk);
+> +	ret = opal_get_key(dev, &lk_unlk->session.opal_key);
+> +	if (!ret)
+> +		ret = __opal_lock_unlock(dev, lk_unlk);
 
-Khazhy
-> +               bytes_trim =3D calculate_bytes_allowed(bps_limit,
-> +                            time_elapsed) + tg->carryover_bytes[rw];
-> +       if (tg->io_disp[rw] > 0 && iops_limit !=3D UINT_MAX)
-> +               io_trim =3D calculate_io_allowed(iops_limit, time_elapsed=
-) +
-> +                         tg->carryover_ios[rw];
->         if (bytes_trim <=3D 0 && io_trim <=3D 0)
->                 return;
->
-> --
-> 2.39.2
->
+This is relying on opal_get_key() returning 0 to decide if
+__opal_lock_unlock() is called. Is this really what you want? It seems
+that you would want to unlock if the key is a LUKS key, even if
+opal_get_key() returns non-zero.
+
+>  	mutex_unlock(&dev->dev_lock);
+> 
+>  	return ret;
+
