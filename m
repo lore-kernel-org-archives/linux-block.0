@@ -2,95 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AA8E92719
-	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 17:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD862E92719
+	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 17:21:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbjJERSg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Oct 2023 13:18:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46090 "EHLO
+        id S230304AbjJERVu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Oct 2023 13:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbjJERRt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 13:17:49 -0400
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D8F271F;
-        Thu,  5 Oct 2023 10:10:48 -0700 (PDT)
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-694f3444f94so1023701b3a.2;
-        Thu, 05 Oct 2023 10:10:48 -0700 (PDT)
+        with ESMTP id S232148AbjJERVM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 13:21:12 -0400
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF442724
+        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 10:15:22 -0700 (PDT)
+Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-4181bd07f25so7631191cf.1
+        for <linux-block@vger.kernel.org>; Thu, 05 Oct 2023 10:15:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1696526121; x=1697130921; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5kZZ+LzTQhw7SnaWxRb1LSoI3AuNMSpArazM0mZwyHk=;
+        b=jFAzAjhe//Btj9YfCdZ4387UR49Vd+7ggJwFZ13BjOPQeN9j1s9FpTpO7aM6nNp5id
+         Aml1Yeu6QV4t0/jbppFGa7n+Tk4BjXgFOBrN/i7+u9WF+c5E+6aVZl4CB+vULu3W3e0d
+         Xkrj8WwscBRlLoSsRLAaMU+fMV+qsyidhpe64=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696525848; x=1697130648;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mau3Ytqwy7TZu9wwYpopAHbH4XlNKRL4d1UxE9xBpfw=;
-        b=an0tRdeZR8L82BbTIXPQpuym7qXuraJsgB6jec+r9avljTJrywnf5bxAvKZvN+RaFL
-         1IOxRUHqDNqO0HjCx8a4Cn++qr6f8C47fM+zlrpwQOwxDXF7LKKrlLmYLBLruad+e/4w
-         yChHYbMonF+VPwbrN8Fv7OzbrOyrdKowNaG5ln++F0oPOg9UHpD6YMyt5v2N+DPFyLCx
-         ToR0Fo7Of7qWsS8yxefsnzvb7UWu/QF/KCAywDdJ6t+PbUE5qIil+SyKPbpF4rLLXop7
-         ye/Cp4TBjuTt/V45gJb5nC4VcYuA2olgH2xnew0UphcDHDla+vzsqyLddhGPRo/QZ75n
-         9tBg==
-X-Gm-Message-State: AOJu0YzA3AHjB+UzjywzPsjodr4qGObGPpdsdruSfWx05rf+rt4gxe+g
-        fGX9KWE9PC4KgtOK8CNnEvA=
-X-Google-Smtp-Source: AGHT+IGnVdp8oICK4V8pUUfksO9nmUjiTQt7WLAzT5URUjUrgm7Kl0ihNxBLzaBBJ2yggv4nt+XNYg==
-X-Received: by 2002:a05:6a00:1410:b0:68b:eb3d:8030 with SMTP id l16-20020a056a00141000b0068beb3d8030mr6024179pfu.1.1696525847811;
-        Thu, 05 Oct 2023 10:10:47 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:ca3e:70ef:bad:2f? ([2620:15c:211:201:ca3e:70ef:bad:2f])
-        by smtp.gmail.com with ESMTPSA id t16-20020a63b250000000b00565eb4fa8d1sm1641495pgo.16.2023.10.05.10.10.46
+        d=1e100.net; s=20230601; t=1696526121; x=1697130921;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5kZZ+LzTQhw7SnaWxRb1LSoI3AuNMSpArazM0mZwyHk=;
+        b=UbG1zaugRwkese4ilSBzf6KPcsvalDJVy5iQ9N3I+k4elkjDYIZtOyYP1/4JwbZBcK
+         cGSc10eryVUtnIXSPqMkyU96z0pddN+jHCPf0U565jZkcvymmdcOIaJzZERWBhCaCaRc
+         8Fcuqc2PSuvaVQFfDRL8R6XdaP3HGeBp76YcGHDEeCNXtaKoSDb+RoJulEyovg0ALfIx
+         ITz5cCGIndAwagsPC3wyyIO/YnxxsXC1rFVdqbCkTEG91N+UkytIPPjBmUpxjoX1IO+2
+         EGk2UZMO8ONWfR/zps/1RdsqgUbG9/whur3Q3myu4Hpx9uCv1NaYxNeXSc97dgHAWm9l
+         VC1Q==
+X-Gm-Message-State: AOJu0YzGPp+/4Zm6/rn4cwK72WqUOqvrg1SjsnRdcMuE4r8tJv13wLjj
+        kdrjj9RQUxx7rFHC7YoGvEO8XUKI4JAwcM9fpbs=
+X-Google-Smtp-Source: AGHT+IElQ5jUIptXmiLMH+2g3NReNhTI/GgAEhyvtVjNhhnk4AgWmzzfhTtIH8yJ+v7lDKdFXH2h0Q==
+X-Received: by 2002:a05:622a:1001:b0:417:922b:f05f with SMTP id d1-20020a05622a100100b00417922bf05fmr5901515qte.57.1696526121455;
+        Thu, 05 Oct 2023 10:15:21 -0700 (PDT)
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com. [209.85.160.173])
+        by smtp.gmail.com with ESMTPSA id ku15-20020a05622a0a8f00b00419732075b4sm613949qtb.84.2023.10.05.10.15.20
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Oct 2023 10:10:47 -0700 (PDT)
-Message-ID: <a2077ddf-9a8f-4101-aeb9-605d6dee3c6e@acm.org>
-Date:   Thu, 5 Oct 2023 10:10:45 -0700
+        Thu, 05 Oct 2023 10:15:21 -0700 (PDT)
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-419768e69dfso22371cf.0
+        for <linux-block@vger.kernel.org>; Thu, 05 Oct 2023 10:15:20 -0700 (PDT)
+X-Received: by 2002:ac8:5786:0:b0:419:79c0:ef9a with SMTP id
+ v6-20020ac85786000000b0041979c0ef9amr180288qta.6.1696526120141; Thu, 05 Oct
+ 2023 10:15:20 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/21] block: Add fops atomic write support
-Content-Language: en-US
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
-        brauner@kernel.org, chandan.babu@oracle.com, dchinner@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-api@vger.kernel.org
-References: <20230929102726.2985188-1-john.g.garry@oracle.com>
- <20230929102726.2985188-11-john.g.garry@oracle.com>
- <17ee1669-5830-4ead-888d-a6a4624b638a@acm.org>
- <5d26fa3b-ec34-bc39-ecfe-4616a04977ca@oracle.com>
- <b7a6f380-c6fa-45e0-b727-ba804c6684e4@acm.org>
- <yq1lecktuoo.fsf@ca-mkp.ca.oracle.com>
- <db6a950b-1308-4ca1-9f75-6275118bdcf5@acm.org>
- <yq1h6n7rume.fsf@ca-mkp.ca.oracle.com>
- <34c08488-a288-45f9-a28f-a514a408541d@acm.org>
- <yq1ttr6qoqp.fsf@ca-mkp.ca.oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <yq1ttr6qoqp.fsf@ca-mkp.ca.oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230928015858.1809934-1-linan666@huaweicloud.com>
+ <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
+ <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com> <20231005170413.GB32420@redhat.com>
+In-Reply-To: <20231005170413.GB32420@redhat.com>
+From:   Khazhy Kumykov <khazhy@chromium.org>
+Date:   Thu, 5 Oct 2023 10:15:06 -0700
+X-Gmail-Original-Message-ID: <CACGdZYJm312U70ysC_vpv=Pat063R=mRRVQGBiLocKc+QCkjnQ@mail.gmail.com>
+Message-ID: <CACGdZYJm312U70ysC_vpv=Pat063R=mRRVQGBiLocKc+QCkjnQ@mail.gmail.com>
+Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
+ throttle is enabled
+To:     Oleg Nesterov <oleg@redhat.com>
+Cc:     Li Nan <linan666@huaweicloud.com>, tj@kernel.org,
+        josef@toxicpanda.com, axboe@kernel.dk, yukuai3@huawei.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        houtao1@huawei.com, yangerkun@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/4/23 11:17, Martin K. Petersen wrote:
-> 
-> Hi Bart!
-> 
->> In other words, also for the above example it is guaranteed that 
->> writes of a single logical block (512 bytes) are atomic, no matter
->> what value is reported as the ATOMIC TRANSFER LENGTH GRANULARITY.
-> 
-> There is no formal guarantee that a disk drive sector 
-> read-modify-write operation results in a readable sector after a 
-> power failure. We have definitely seen blocks being mangled in the 
-> field.
-
-Aren't block devices expected to use a capacitor that provides enough
-power to handle power failures cleanly?
-
-How about blacklisting block devices that mangle blocks if a power
-failure occurs? I think such block devices are not compatible with
-journaling filesystems nor with log-structured filesystems.
-
-Thanks,
-
-Bart.
-
+On Thu, Oct 5, 2023 at 10:05=E2=80=AFAM Oleg Nesterov <oleg@redhat.com> wro=
+te:
+>
+> sorry, didn't notice this part before.
+>
+> I am not a asm expert (to say at least;) but
+>
+> On 10/05, Li Nan wrote:
+> >
+> > When (a * mul) overflows, a divide 0 error occurs in
+> > mul_u64_u64_div_u64().
+>
+> Just in case... No, iirc it is divq which triggers #DE when the
+> result of division doesn't fit u64.
+Yeah, sorry for my incorrect wording here - but we're probably seeing
+exactly that the final result doesn't fit in u64. (I wasn't familiar
+with the intermediary registers here, thanks for explaining)
+>
+> (a * mul) can't overflow, the result is 128-bit rax:rdx number.
+>
+> Oleg.
+>
