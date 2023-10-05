@@ -2,98 +2,167 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD862E92719
-	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 17:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F063DE92720
+	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 17:58:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230304AbjJERVu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Oct 2023 13:21:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39572 "EHLO
+        id S230168AbjJER63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Oct 2023 13:58:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232148AbjJERVM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 13:21:12 -0400
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF442724
-        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 10:15:22 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-4181bd07f25so7631191cf.1
-        for <linux-block@vger.kernel.org>; Thu, 05 Oct 2023 10:15:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696526121; x=1697130921; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5kZZ+LzTQhw7SnaWxRb1LSoI3AuNMSpArazM0mZwyHk=;
-        b=jFAzAjhe//Btj9YfCdZ4387UR49Vd+7ggJwFZ13BjOPQeN9j1s9FpTpO7aM6nNp5id
-         Aml1Yeu6QV4t0/jbppFGa7n+Tk4BjXgFOBrN/i7+u9WF+c5E+6aVZl4CB+vULu3W3e0d
-         Xkrj8WwscBRlLoSsRLAaMU+fMV+qsyidhpe64=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696526121; x=1697130921;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5kZZ+LzTQhw7SnaWxRb1LSoI3AuNMSpArazM0mZwyHk=;
-        b=UbG1zaugRwkese4ilSBzf6KPcsvalDJVy5iQ9N3I+k4elkjDYIZtOyYP1/4JwbZBcK
-         cGSc10eryVUtnIXSPqMkyU96z0pddN+jHCPf0U565jZkcvymmdcOIaJzZERWBhCaCaRc
-         8Fcuqc2PSuvaVQFfDRL8R6XdaP3HGeBp76YcGHDEeCNXtaKoSDb+RoJulEyovg0ALfIx
-         ITz5cCGIndAwagsPC3wyyIO/YnxxsXC1rFVdqbCkTEG91N+UkytIPPjBmUpxjoX1IO+2
-         EGk2UZMO8ONWfR/zps/1RdsqgUbG9/whur3Q3myu4Hpx9uCv1NaYxNeXSc97dgHAWm9l
-         VC1Q==
-X-Gm-Message-State: AOJu0YzGPp+/4Zm6/rn4cwK72WqUOqvrg1SjsnRdcMuE4r8tJv13wLjj
-        kdrjj9RQUxx7rFHC7YoGvEO8XUKI4JAwcM9fpbs=
-X-Google-Smtp-Source: AGHT+IElQ5jUIptXmiLMH+2g3NReNhTI/GgAEhyvtVjNhhnk4AgWmzzfhTtIH8yJ+v7lDKdFXH2h0Q==
-X-Received: by 2002:a05:622a:1001:b0:417:922b:f05f with SMTP id d1-20020a05622a100100b00417922bf05fmr5901515qte.57.1696526121455;
-        Thu, 05 Oct 2023 10:15:21 -0700 (PDT)
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com. [209.85.160.173])
-        by smtp.gmail.com with ESMTPSA id ku15-20020a05622a0a8f00b00419732075b4sm613949qtb.84.2023.10.05.10.15.20
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Oct 2023 10:15:21 -0700 (PDT)
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-419768e69dfso22371cf.0
-        for <linux-block@vger.kernel.org>; Thu, 05 Oct 2023 10:15:20 -0700 (PDT)
-X-Received: by 2002:ac8:5786:0:b0:419:79c0:ef9a with SMTP id
- v6-20020ac85786000000b0041979c0ef9amr180288qta.6.1696526120141; Thu, 05 Oct
- 2023 10:15:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230928015858.1809934-1-linan666@huaweicloud.com>
- <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
- <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com> <20231005170413.GB32420@redhat.com>
-In-Reply-To: <20231005170413.GB32420@redhat.com>
-From:   Khazhy Kumykov <khazhy@chromium.org>
-Date:   Thu, 5 Oct 2023 10:15:06 -0700
-X-Gmail-Original-Message-ID: <CACGdZYJm312U70ysC_vpv=Pat063R=mRRVQGBiLocKc+QCkjnQ@mail.gmail.com>
-Message-ID: <CACGdZYJm312U70ysC_vpv=Pat063R=mRRVQGBiLocKc+QCkjnQ@mail.gmail.com>
-Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
- throttle is enabled
-To:     Oleg Nesterov <oleg@redhat.com>
-Cc:     Li Nan <linan666@huaweicloud.com>, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk, yukuai3@huawei.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        houtao1@huawei.com, yangerkun@huawei.com
+        with ESMTP id S229889AbjJER6T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 13:58:19 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC3F89E;
+        Thu,  5 Oct 2023 10:58:17 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 395HkZG9021848;
+        Thu, 5 Oct 2023 17:58:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=ASEJAjxy3u7tD8sitmRDsvClbC0Hi0/48ZyBhDlZwsA=;
+ b=Wa0xEtIUW96WZKzYrGMOomwW/JKt/u/ozaDosxtKucXEjNakiX2JqjdBgd7LgTTT+aEw
+ pmjhOC0q2esGtlH2HgZTL/LlMSuU//3HqYgRNOUxaxfmUbYPRhD1wRqjX487N53kte1O
+ bmk47z48We/UO3tlmrJ8fV59bz97BSwhED1s+azKnK+X+2sb+RZLtiIs/P9P7bZFVYXr
+ Idpn1orA2f6Xy9oMk5j5hs/kYFJdCgjobAHZzW5gBaLY6n2e7zqpHbUj05BEJtqXwEAl
+ rQFIEzSfaFXVGVpwfdUMgl8k/9jrsMb9XkusZJ7uwurkTcAqPXX1jOPbE1/SAL+jJ8jq hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tj1ue0d4r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Oct 2023 17:58:04 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 395HuO27014845;
+        Thu, 5 Oct 2023 17:58:04 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tj1ue0d3x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Oct 2023 17:58:04 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 395HWu8C017644;
+        Thu, 5 Oct 2023 17:58:03 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tey0p0041-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Oct 2023 17:58:03 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 395Hw2mt3473978
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 5 Oct 2023 17:58:02 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9904958052;
+        Thu,  5 Oct 2023 17:58:02 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 300AB58050;
+        Thu,  5 Oct 2023 17:58:02 +0000 (GMT)
+Received: from rhel-laptop.austin.ibm.com (unknown [9.41.250.135])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  5 Oct 2023 17:58:02 +0000 (GMT)
+Message-ID: <53755a0fbd6318d4783078259f2d2f8ab5f2f0b7.camel@linux.vnet.ibm.com>
+Subject: Re: [PATCH] block: Fix regression in sed-opal for a saved key.
+From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reply-To: gjoyce@linux.vnet.ibm.com
+To:     Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org
+Cc:     jonathan.derrick@linux.dev, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, Ondrej Kozina <okozina@redhat.com>
+Date:   Thu, 05 Oct 2023 12:58:01 -0500
+In-Reply-To: <59535b4b-9f07-44c5-a7da-e6b2fc1c67bb@gmail.com>
+References: <20231003100209.380037-1-gmazyland@gmail.com>
+         <5c4fbafb1daa45f2faf60c7d587cd23c53d9393c.camel@linux.vnet.ibm.com>
+         <59535b4b-9f07-44c5-a7da-e6b2fc1c67bb@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: CM-NZeh0zeKWgvg_P7fJpDaPts_btYuJ
+X-Proofpoint-GUID: gp0FVayYExu0W28rkxxq9L4mMuzyZu0c
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-05_12,2023-10-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 clxscore=1015
+ spamscore=0 malwarescore=0 lowpriorityscore=0 phishscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310050136
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 5, 2023 at 10:05=E2=80=AFAM Oleg Nesterov <oleg@redhat.com> wro=
-te:
->
-> sorry, didn't notice this part before.
->
-> I am not a asm expert (to say at least;) but
->
-> On 10/05, Li Nan wrote:
-> >
-> > When (a * mul) overflows, a divide 0 error occurs in
-> > mul_u64_u64_div_u64().
->
-> Just in case... No, iirc it is divq which triggers #DE when the
-> result of division doesn't fit u64.
-Yeah, sorry for my incorrect wording here - but we're probably seeing
-exactly that the final result doesn't fit in u64. (I wasn't familiar
-with the intermediary registers here, thanks for explaining)
->
-> (a * mul) can't overflow, the result is 128-bit rax:rdx number.
->
-> Oleg.
->
+On Thu, 2023-10-05 at 08:58 +0200, Milan Broz wrote:
+> On 10/4/23 22:54, Greg Joyce wrote:
+> > On Tue, 2023-10-03 at 12:02 +0200, Milan Broz wrote:
+> > > The commit 3bfeb61256643281ac4be5b8a57e9d9da3db4335
+> > > introduced the use of keyring for sed-opal.
+> > > 
+> > > Unfortunately, there is also a possibility to save
+> > > the Opal key used in opal_lock_unlock().
+> > > 
+> > > This patch switches the order of operation, so the cached
+> > > key is used instead of failure for opal_get_key.
+> > > 
+> > > The problem was found by the cryptsetup Opal test recently
+> > > added to the cryptsetup tree.
+> > > 
+> > > Fixes: 3bfeb6125664 ("block: sed-opal: keyring support for SED
+> > > keys")
+> > > Tested-by: Ondrej Kozina <okozina@redhat.com>
+> > > Signed-off-by: Milan Broz <gmazyland@gmail.com>
+> > > ---
+> > >   block/sed-opal.c | 7 +++----
+> > >   1 file changed, 3 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/block/sed-opal.c b/block/sed-opal.c
+> > > index 6d7f25d1711b..04f38a3f5d95 100644
+> > > --- a/block/sed-opal.c
+> > > +++ b/block/sed-opal.c
+> > > @@ -2888,12 +2888,11 @@ static int opal_lock_unlock(struct
+> > > opal_dev
+> > > *dev,
+> > >   	if (lk_unlk->session.who > OPAL_USER9)
+> > >   		return -EINVAL;
+> > > 
+> > > -	ret = opal_get_key(dev, &lk_unlk->session.opal_key);
+> > > -	if (ret)
+> > > -		return ret;
+> > >   	mutex_lock(&dev->dev_lock);
+> > >   	opal_lock_check_for_saved_key(dev, lk_unlk);
+> > > -	ret = __opal_lock_unlock(dev, lk_unlk);
+> > > +	ret = opal_get_key(dev, &lk_unlk->session.opal_key);
+> > > +	if (!ret)
+> > > +		ret = __opal_lock_unlock(dev, lk_unlk);
+> > 
+> > This is relying on opal_get_key() returning 0 to decide if
+> > __opal_lock_unlock() is called. Is this really what you want? It
+> > seems
+> > that you would want to unlock if the key is a LUKS key, even if
+> > opal_get_key() returns non-zero.
+> 
+> I think it is ok. That was logic introduced in your keyring patch
+> anyway.
+> 
+> I just fixed that if key is cached (stored in OPAL struct), that key
+> is used
+> and subsequent opal_get_key() does nothing, returning 0.
+> 
+> The story is here that both OPAL lock and unlock need key, while LUKS
+> logic never required key for lock (deactivation), so we rely on the
+> cached
+> OPAL key here. We do not need any key stored for unlocking (that is
+> always
+> decrypted from a keyslot)
+> (I think requiring key for locking range is a design mistake in OPAL
+> but
+> that's not relevant for now :-)
+
+Okay, if the key is such that opal_get_key() always returns 0, then I
+agree there isn't an issue.
+
+Greg
+
+> 
+> Milan
+> 
+> > >   	mutex_unlock(&dev->dev_lock);
+> > > 
+> > >   	return ret;
+
