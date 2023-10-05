@@ -2,109 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02036E92709
-	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 14:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA671E92706
+	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 15:16:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236081AbjJEOsi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Oct 2023 10:48:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40456 "EHLO
+        id S231403AbjJEPQa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Oct 2023 11:16:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237375AbjJEOqD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 10:46:03 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73580B3D13
-        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 07:28:40 -0700 (PDT)
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20231005115954epoutp045190e2ed309e9ec725cfbf1ce7f0fe77~LNE4k99iG1915819158epoutp04V
-        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 11:59:54 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20231005115954epoutp045190e2ed309e9ec725cfbf1ce7f0fe77~LNE4k99iG1915819158epoutp04V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1696507194;
-        bh=+6P7kYwTsI/syAFJr/vDIbvAx6N2NJbpxlsh+84U80k=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=vKIW8RQPfUqKoXpVuSDHBOrPUrvbMG9r/dYmVKw7EyFFkkJpZ2bIym20TWhr+33A7
-         8G3D8CYxpAiEyO6OXWNUwHwfnGeumO6IXnWTSZVhrjkzxsBiTZIV6Eqovdax+NfLbK
-         DyZxyhSaBosfJnuIlcIdu31/75OGV7GMqMk7NoXk=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-        20231005115954epcas2p1966c150d583b0cb3aac3078561fc2d4b~LNE3-nC_62742227422epcas2p13;
-        Thu,  5 Oct 2023 11:59:54 +0000 (GMT)
-Received: from epsmges2p3.samsung.com (unknown [182.195.36.101]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4S1VVK50JBz4x9Pv; Thu,  5 Oct
-        2023 11:59:53 +0000 (GMT)
-X-AuditID: b6c32a47-d5dfa700000025bc-12-651ea539b059
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        13.90.09660.935AE156; Thu,  5 Oct 2023 20:59:53 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE: [PATCH 05/13] scsi: core: Query the Block Limits Extension VPD
- page
-Reply-To: daejun7.park@samsung.com
-Sender: Daejun Park <daejun7.park@samsung.com>
-From:   Daejun Park <daejun7.park@samsung.com>
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Daejun Park <daejun7.park@samsung.com>,
-        Jorn Lee <lunar.lee@samsung.com>,
-        Seokhwan Kim <sukka.kim@samsung.com>,
-        Yonggil Song <yonggil.song@samsung.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20230920191442.3701673-6-bvanassche@acm.org>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20231005115852epcms2p3a3338e2696b91342acee7bc332428965@epcms2p3>
-Date:   Thu, 05 Oct 2023 20:58:52 +0900
-X-CMS-MailID: 20231005115852epcms2p3a3338e2696b91342acee7bc332428965
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrJJsWRmVeSWpSXmKPExsWy7bCmua7lUrlUg23fVCxW3+1ns5j24Sez
-        xctDmharHoRbrFx9lMli0Y1tTBZ7b2lb7Nl7ksWi+/oONouTK16wWCw//o/JYlXHXEaLqeeP
-        MDnwely+4u1x+Wypx4RFBxg9dt9sYPP4+PQWi0ffllWMHp83yQWwR2XbZKQmpqQWKaTmJeen
-        ZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE6Lpl5gBdqqRQlphTChQKSCwuVtK3synK
-        Ly1JVcjILy6xVUotSMkpMC/QK07MLS7NS9fLSy2xMjQwMDIFKkzIztj9eTdzwXfWivZja1ka
-        GB+zdjFyckgImEgc7e0Csrk4hAR2MErM7nnC1sXIwcErICjxd4cwSI2wQJDEp3m32UBsIQEl
-        ifUXZ7FDxPUkbj1cwwhiswnoSEw/cR8sLiLgJtFwdRcbyExmgYfMEuvPd7BDLOOVmNH+lAXC
-        lpbYvnwrWDOngJXEs/WL2CDiGhI/lvUyQ9iiEjdXv2WHsd8fm88IYYtItN47C1UjKPHg526o
-        uKTE7bmboOrzJf5fWQ5l10hsOzAPytaXuNaxEewGXgFfib0tG8DiLAKqEj/6+6BqXCR2L3kD
-        NpNZQFti2cLXzKAwYRbQlFi/Sx/ElBBQljhyiwWigk+i4/BfuA8bNv7Gyt4x7wkThK0mse7n
-        eqYJjMqzEAE9C8muWQi7FjAyr2IUSy0ozk1PLTYqMIbHbXJ+7iZGcJrVct/BOOPtB71DjEwc
-        jIcYJTiYlUR40xtkUoV4UxIrq1KL8uOLSnNSiw8xmgJ9OZFZSjQ5H5jo80riDU0sDUzMzAzN
-        jUwNzJXEee+1zk0REkhPLEnNTk0tSC2C6WPi4JRqYJrx5dbFnkMrg+/M2zV/5tL7Ssvd4vVK
-        NvJqZNRd43A/9Oda+y7r0K1npp9r+rZZc9lkbvnPk6Zcu+t4p2r6wutTBFLePf7yTcc6OzxJ
-        7PNvGe7nEs9YDilvtzJZcsjZZmJL6dyzZ9t+KpxX+bog9JN6V/abUxki1ZPqS7RKpPdu2l66
-        JFfFX2BCRT537xlG97c6Vy8WcGxb+ij0FEPw5bX3n55KzM5zXB+tFPPEXzdtvZrHgnjxa13u
-        MrfuH1lyTTRHuNVZ+mvtmyCthWktnv9enXzc8rLmTWN9W+Jf7c3XWVpuXC56t0A6gi265e/D
-        Gy/uvi475JWkdlj8p2Wz/j2Xdwnt2x2FlS3dM8/EpnkosRRnJBpqMRcVJwIAXcz+KDwEAAA=
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230920191816epcas2p1b30d19aa41e51ffaf7c95f9100ee6311
-References: <20230920191442.3701673-6-bvanassche@acm.org>
-        <20230920191442.3701673-1-bvanassche@acm.org>
-        <CGME20230920191816epcas2p1b30d19aa41e51ffaf7c95f9100ee6311@epcms2p3>
+        with ESMTP id S233665AbjJEPPZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 11:15:25 -0400
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81131992
+        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 07:43:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1696517017; x=1728053017;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XcAujXW4ucxGpO1rPRNmHohcn1w2B4X6WE50bbphgns=;
+  b=Lu4UXDYqLfEtLuHEZHU/G0DwD5U3jQK4RWhWCSSmDIGTajALZT6YEH7q
+   uHUYR4VAr2RpaBSRRzVgvpocSvUVirQVEu47lyrBBlVe+9p2gDIgeyAml
+   1HHE5IdRrz1aTKvn2Hy21FAuW6MOZJv17IivRuSLFxbJHmtVRCiQF69oU
+   /k0lLAMGQX6zaTlgxz7M9lgS9OQMLnyALPJ+MUgddFSqOn2BC7AGhOsvE
+   ZM+HCSLx8x6cZy1F+CDZjlRZc54jGDNkJ6BFkZH7rGj8zCgsnYHu4kBy+
+   ISLapHe56ldJE5ff7hND4I4wf7rZXxCNqSZv/jV8l7vr/MfqU9cajm45k
+   A==;
+X-CSE-ConnectionGUID: t3hwZhTHTxq5z8MyvzxCUA==
+X-CSE-MsgGUID: m2RgssLqTq6o51JxGZZEDw==
+X-IronPort-AV: E=Sophos;i="6.03,202,1694707200"; 
+   d="scan'208";a="246053129"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Oct 2023 16:02:45 +0800
+IronPort-SDR: i15wHvW37fZxDGWjrAIDmHhyJ106gUWneWkmu9+OTezxKX2ZL34bDqZ5RzkTy0I17UbZzgdxOe
+ +j8t8H5HAVTjqztcPuWsAE0dbgSfrNIB3RgP5XC6a2cQbujDUz2svkd090TSmpl+UhF07RaMK2
+ AEwUhBcXSnlyXSKe1UsPHadZR+Ci0dbGhg51fy2CNB2G6rjJl6vtWuD8O7itnVlATk33RK/T6J
+ eNKGO5tsSp7K3xVCMnIzFWw3XdYkQMa5keRCgVXVfBTvPZud52dXpafPnjvtJ/QuyNddeXgQjB
+ GGg=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Oct 2023 00:09:20 -0700
+IronPort-SDR: L5Cfa9o8BtXKZQ7ZfdIK2DRNEX+z3k+hfnJPVo8DBI6bwvm77IF0gigEbOrJij8Gl2TUpePJ84
+ +LefZDSBBatn95fmkqZcGQ2BuIeMp/QmukxiTuEbHe41KvJOZVSHS7onC+HXPjk77Ui96lYdVj
+ OP0LZ+T4DHkd1Sf0L1+YPi+ktXIWKBNoQuJfRbpy+g9g4tWkghI32Akk3x0V4+8zMPG1Yb5sZ0
+ Uv2LgGYbBHtnsqSQgxqwLKE7VGRXXFJ8LtYKGZSL5XDsGNFDXslmnBsqqeaa6gMFxUFSnu5lZY
+ AxY=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
+  by uls-op-cesaip01.wdc.com with ESMTP; 05 Oct 2023 01:02:44 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] nvme/rc: fix rdma driver check
+Date:   Thu,  5 Oct 2023 17:02:42 +0900
+Message-ID: <20231005080242.292291-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-=C2=A0=0D=0A>=20Parse=20the=20Reduced=20Stream=20Control=20Supported=20(RSC=
-S)=20bit=20from=20the=20block=0D=0A>=20limits=20extension=20VPD=20page.=20T=
-he=20RSCS=20bit=20is=20defined=20in=20T10=20document=0D=0A>=20=22SBC-5=20Co=
-nstrained=20Streams=20with=20Data=20Lifetimes=22=0D=0A>=20(https://protect2=
-.fireeye.com/v1/url?k=3D046aff72-65e1ea35-046b743d-000babff99aa-a76aa64ec2a=
-10777&q=3D1&e=3D39d8e8ca-6f96-4283-86e4-54310bfa56e1&u=3Dhttps%3A%2F%2Fwww.=
-t10.org%2Fcgi-bin%2Fac.pl%3Ft%3Dd%26f%3D23-024r3.pdf).=0D=0A>=C2=A0=0D=0A>=
-=20Cc:=20Martin=20K.=20Petersen=20<martin.petersen=40oracle.com>=0D=0A>=20S=
-igned-off-by:=20Bart=20Van=20Assche=20<bvanassche=40acm.org>=0D=0A=0D=0ARev=
-iewed-by:=20Daejun=20Park=20<daejun7.park=40samsung.com>
+Since the commit 4824ac3f5c4a ("Skip tests based on SKIP_REASON, not
+return value"), blktests no longer checks return values of _have_foo
+helpers. Instead, it checks if _have_foo helpers set SKIP_REASON, which
+was renamed to SKIP_REASONS later, to judge test case skip. If two
+_have_foo helpers are chained with ||, the skip check does not work as
+expected since one of the helper may set SKIP_REASONS even when the
+other does not set. Such chain with || is done in _nvme_requires() to
+check rdma drivers.
+
+To fix the check, do not chain the helper functions with || operator.
+Instead, refer $use_rxe to call only the required function.
+
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ tests/nvme/rc | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 1ec9eb6..bac2db7 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -44,7 +44,11 @@ _nvme_requires() {
+ 		_have_driver nvmet-rdma
+ 		_have_configfs
+ 		_have_program rdma
+-		_have_driver rdma_rxe || _have_driver siw
++		if [ -n "$use_rxe" ]; then
++			_have_driver rdma_rxe
++		else
++			_have_driver siw
++		fi
+ 		;;
+ 	fc)
+ 		_have_driver nvme-fc
+-- 
+2.41.0
+
