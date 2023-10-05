@@ -2,246 +2,151 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA5FE92735
-	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 19:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29EECE92FCE
+	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 22:36:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231515AbjJETm6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Oct 2023 15:42:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43430 "EHLO
+        id S230458AbjJEWga (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Oct 2023 18:36:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231878AbjJETmd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 15:42:33 -0400
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AED0139;
-        Thu,  5 Oct 2023 12:42:23 -0700 (PDT)
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1c737d61a00so10875405ad.3;
-        Thu, 05 Oct 2023 12:42:23 -0700 (PDT)
+        with ESMTP id S229865AbjJEWga (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 18:36:30 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A9FD9
+        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 15:36:28 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-573e67cc6eeso1059995a12.2
+        for <linux-block@vger.kernel.org>; Thu, 05 Oct 2023 15:36:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1696545387; x=1697150187; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b2tQ3RBiSUcSSCDIGm1AqxO9GDksjubSbZBBLyz+/c8=;
+        b=REhiCFVhABsJ2q1jPxHObTX6y84Tz2iTSR6iSkdrBM8Hsi+tc+MX6HtHS+ktP+h56f
+         CvWqHZsqOaXtYLJ1QqEDS2JjQrJ7seEe4+D9rYAvbq5mcoBtjcnc1i/Q3k+IWcDgbAMh
+         92TFvO2l/kNKi566QIqjeD+fdcKq7MHxuhbrstbYcm+q/Qq7ifN955l5YyUQkDv+QUlk
+         N8A/gM1KmbpnupgOVyklj9vtP5OqW9RSxFLf3uN06GXn4aWhf6OVjziy55LbjINGimYD
+         TSInO6f0KTTlV8D6BMo9rgT2MOUGrFtGNxTTfGQCKEVh0q0oum7k5oADeCJWQEos65bH
+         ySwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696534943; x=1697139743;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UCPfzQ6gGXtCtFoEWf6GEkmetjqJd0PL6BZnUtAtOy0=;
-        b=FeMk68a6KoD30wY19O/zAApag5WrqMwjJ7Bm+/TMsPwP0WqAUK4qS/P9V69odzIjes
-         Q3/CdHuyBRbXn1XvoGgFKHDxpTtREl27dU7yZxzJs4PPWajfGdW2UGDSubSX8pOw7xj5
-         k6ITqtr4zxoFDMP1a83qfAXCCoNANOtz7+0iRi0QdRuviBYu3rvYmvf4x1pMSPGOgvnD
-         7oh2q3aNR56rQySn7r5a3UCyCvdMejJc+gyzlY04cJ/wYHGYposX5ZmlDLITCS/vX+cr
-         RZpOTHu32E2nwHU70+MBnLvcX3KP7jVe8X0/Xf//DBx0oheUIMNf3qPP9t3GKdD9JXCj
-         I0EQ==
-X-Gm-Message-State: AOJu0YwsVV/PzNLZGqW7ZXJD/gRNBW9nRIKxxUCL7tmn4i3KseacbIFJ
-        153pLu++0XYPlIAyeFKh9XQ=
-X-Google-Smtp-Source: AGHT+IGnAAVwyGAaDxIWJX2fbZmIBdZ8vM1z6YvMtCghUlQQQ0C75V8akECk/hgM4hd3NVeIi51Jag==
-X-Received: by 2002:a17:903:230a:b0:1c7:7e00:8075 with SMTP id d10-20020a170903230a00b001c77e008075mr7809758plh.66.1696534942662;
-        Thu, 05 Oct 2023 12:42:22 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:ca3e:70ef:bad:2f])
-        by smtp.gmail.com with ESMTPSA id u4-20020a170902e5c400b001a9b29b6759sm2129596plf.183.2023.10.05.12.42.21
+        d=1e100.net; s=20230601; t=1696545387; x=1697150187;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b2tQ3RBiSUcSSCDIGm1AqxO9GDksjubSbZBBLyz+/c8=;
+        b=oGCc+wJVq+6rNAiODFltEasK70mdt0ErRIIlOwH9/oIgTww8k6yFR07I53yN5AOuM/
+         1IRte41atCTqHNCPzKv1s/gin30jCK/EWHNPdNUHhQ+s0JSQvSCEG7n6KpXG9AcNPn9V
+         SJ9rXMmMDpPAeiGAArs7grVYHfAiE3IlSt/5yfk89ZhqHSwbJzxIVS4H+hzo9MrJE6iQ
+         ZMu/oqFUiOyCWvrYLvSz/KzlpRkV180993UFcjd9KSVILzUzBLDD1yMqD1oXkNc3+6SX
+         NoE+DIhXUz6DgE4JOTV779SCz61QeOHrToPwBFel9fq/96q3hKwu9zdxNGq5mLlFXcS+
+         17NA==
+X-Gm-Message-State: AOJu0YwBE21QDbdmbjILdmyuXFpktHYKfljfQzgOXHzcPev6Gk1dkKtD
+        QEUPyTUIZ80CbMLVqimpgogs/g==
+X-Google-Smtp-Source: AGHT+IHkj05WtFRnB1/6TCdC5uNJ+qJuxlAMKS08tzhEQ93tj2n+6Zd7zWsUmCjHAtuzu3cQRcYWSg==
+X-Received: by 2002:a17:90a:2cc4:b0:271:7cd6:165d with SMTP id n62-20020a17090a2cc400b002717cd6165dmr6401433pjd.26.1696545387428;
+        Thu, 05 Oct 2023 15:36:27 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
+        by smtp.gmail.com with ESMTPSA id 30-20020a17090a005e00b002776350b50dsm4406336pjb.29.2023.10.05.15.36.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 12:42:22 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Avri Altman <Avri.Altman@wdc.com>,
-        Bean Huo <huobean@gmail.com>,
-        Daejun Park <daejun7.park@samsung.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: [PATCH v2 15/15] scsi_debug: Maintain write statistics per group number
-Date:   Thu,  5 Oct 2023 12:41:01 -0700
-Message-ID: <20231005194129.1882245-16-bvanassche@acm.org>
-X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
-In-Reply-To: <20231005194129.1882245-1-bvanassche@acm.org>
-References: <20231005194129.1882245-1-bvanassche@acm.org>
+        Thu, 05 Oct 2023 15:36:26 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qoWxD-009xqX-3D;
+        Fri, 06 Oct 2023 09:36:24 +1100
+Date:   Fri, 6 Oct 2023 09:36:23 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
+        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, chandan.babu@oracle.com, dchinner@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+        linux-api@vger.kernel.org
+Subject: Re: [PATCH 10/21] block: Add fops atomic write support
+Message-ID: <ZR86Z1OcO52a4BtH@dread.disaster.area>
+References: <20230929102726.2985188-11-john.g.garry@oracle.com>
+ <17ee1669-5830-4ead-888d-a6a4624b638a@acm.org>
+ <5d26fa3b-ec34-bc39-ecfe-4616a04977ca@oracle.com>
+ <b7a6f380-c6fa-45e0-b727-ba804c6684e4@acm.org>
+ <yq1lecktuoo.fsf@ca-mkp.ca.oracle.com>
+ <db6a950b-1308-4ca1-9f75-6275118bdcf5@acm.org>
+ <yq1h6n7rume.fsf@ca-mkp.ca.oracle.com>
+ <34c08488-a288-45f9-a28f-a514a408541d@acm.org>
+ <yq1ttr6qoqp.fsf@ca-mkp.ca.oracle.com>
+ <a2077ddf-9a8f-4101-aeb9-605d6dee3c6e@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a2077ddf-9a8f-4101-aeb9-605d6dee3c6e@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Track per GROUP NUMBER how many write commands have been processed. Make
-this information available in sysfs. Reset these statistics if any data
-is written into the sysfs attribute.
+On Thu, Oct 05, 2023 at 10:10:45AM -0700, Bart Van Assche wrote:
+> On 10/4/23 11:17, Martin K. Petersen wrote:
+> > 
+> > Hi Bart!
+> > 
+> > > In other words, also for the above example it is guaranteed that
+> > > writes of a single logical block (512 bytes) are atomic, no matter
+> > > what value is reported as the ATOMIC TRANSFER LENGTH GRANULARITY.
+> > 
+> > There is no formal guarantee that a disk drive sector read-modify-write
+> > operation results in a readable sector after a power failure. We have
+> > definitely seen blocks being mangled in the field.
+> 
+> Aren't block devices expected to use a capacitor that provides enough
+> power to handle power failures cleanly?
 
-Note: SCSI devices should only interpret the information in the GROUP
-NUMBER field as a stream identifier if the ST_ENBLE bit has been set to
-one. This patch follows a simpler approach: count the number of writes
-per GROUP NUMBER whether or not the group number represents a stream
-identifier.
+Nope.
 
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Douglas Gilbert <dgilbert@interlog.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/scsi/scsi_debug.c | 51 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 47 insertions(+), 4 deletions(-)
+Any block device that says it operates in writeback cache mode (i.e.
+almost every single consumer SATA and NVMe drive ever made) has a
+volatile write back cache and so does not provide any power fail
+data integrity guarantees. Simple to check, my less-than-1-yr-old
+workstation tells me:
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 801448570960..c2102c0046ad 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -846,6 +846,8 @@ static int sdeb_zbc_nr_conv = DEF_ZBC_NR_CONV_ZONES;
- static int submit_queues = DEF_SUBMIT_QUEUES;  /* > 1 for multi-queue (mq) */
- static int poll_queues; /* iouring iopoll interface.*/
- 
-+static atomic_long_t writes_by_group_number[64];
-+
- static char sdebug_proc_name[] = MY_NAME;
- static const char *my_name = MY_NAME;
- 
-@@ -3040,7 +3042,8 @@ static inline struct sdeb_store_info *devip2sip(struct sdebug_dev_info *devip,
- 
- /* Returns number of bytes copied or -1 if error. */
- static int do_device_access(struct sdeb_store_info *sip, struct scsi_cmnd *scp,
--			    u32 sg_skip, u64 lba, u32 num, bool do_write)
-+			    u32 sg_skip, u64 lba, u32 num, bool do_write,
-+			    u8 group_number)
- {
- 	int ret;
- 	u64 block, rest = 0;
-@@ -3059,6 +3062,10 @@ static int do_device_access(struct sdeb_store_info *sip, struct scsi_cmnd *scp,
- 		return 0;
- 	if (scp->sc_data_direction != dir)
- 		return -1;
-+
-+	if (do_write && group_number < ARRAY_SIZE(writes_by_group_number))
-+		atomic_long_inc(&writes_by_group_number[group_number]);
-+
- 	fsp = sip->storep;
- 
- 	block = do_div(lba, sdebug_store_sectors);
-@@ -3432,7 +3439,7 @@ static int resp_read_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		}
- 	}
- 
--	ret = do_device_access(sip, scp, 0, lba, num, false);
-+	ret = do_device_access(sip, scp, 0, lba, num, false, 0);
- 	sdeb_read_unlock(sip);
- 	if (unlikely(ret == -1))
- 		return DID_ERROR << 16;
-@@ -3617,6 +3624,7 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- {
- 	bool check_prot;
- 	u32 num;
-+	u8 group = 0;
- 	u32 ei_lba;
- 	int ret;
- 	u64 lba;
-@@ -3628,11 +3636,13 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		ei_lba = 0;
- 		lba = get_unaligned_be64(cmd + 2);
- 		num = get_unaligned_be32(cmd + 10);
-+		group = cmd[14] & 0x3f;
- 		check_prot = true;
- 		break;
- 	case WRITE_10:
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
-+		group = cmd[6] & 0x3f;
- 		num = get_unaligned_be16(cmd + 7);
- 		check_prot = true;
- 		break;
-@@ -3647,15 +3657,18 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
- 		num = get_unaligned_be32(cmd + 6);
-+		group = cmd[6] & 0x3f;
- 		check_prot = true;
- 		break;
- 	case 0x53:	/* XDWRITEREAD(10) */
- 		ei_lba = 0;
- 		lba = get_unaligned_be32(cmd + 2);
-+		group = cmd[6] & 0x1f;
- 		num = get_unaligned_be16(cmd + 7);
- 		check_prot = false;
- 		break;
- 	default:	/* assume WRITE(32) */
-+		group = cmd[6] & 0x3f;
- 		lba = get_unaligned_be64(cmd + 12);
- 		ei_lba = get_unaligned_be32(cmd + 20);
- 		num = get_unaligned_be32(cmd + 28);
-@@ -3710,7 +3723,7 @@ static int resp_write_dt0(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 		}
- 	}
- 
--	ret = do_device_access(sip, scp, 0, lba, num, true);
-+	ret = do_device_access(sip, scp, 0, lba, num, true, group);
- 	if (unlikely(scsi_debug_lbp()))
- 		map_region(sip, lba, num);
- 	/* If ZBC zone then bump its write pointer */
-@@ -3762,12 +3775,14 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 	u32 lb_size = sdebug_sector_size;
- 	u32 ei_lba;
- 	u64 lba;
-+	u8 group;
- 	int ret, res;
- 	bool is_16;
- 	static const u32 lrd_size = 32; /* + parameter list header size */
- 
- 	if (cmd[0] == VARIABLE_LENGTH_CMD) {
- 		is_16 = false;
-+		group = cmd[6] & 0x3f;
- 		wrprotect = (cmd[10] >> 5) & 0x7;
- 		lbdof = get_unaligned_be16(cmd + 12);
- 		num_lrd = get_unaligned_be16(cmd + 16);
-@@ -3778,6 +3793,7 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 		lbdof = get_unaligned_be16(cmd + 4);
- 		num_lrd = get_unaligned_be16(cmd + 8);
- 		bt_len = get_unaligned_be32(cmd + 10);
-+		group = cmd[14] & 0x3f;
- 		if (unlikely(have_dif_prot)) {
- 			if (sdebug_dif == T10_PI_TYPE2_PROTECTION &&
- 			    wrprotect) {
-@@ -3866,7 +3882,8 @@ static int resp_write_scat(struct scsi_cmnd *scp,
- 			}
- 		}
- 
--		ret = do_device_access(sip, scp, sg_off, lba, num, true);
-+		ret = do_device_access(sip, scp, sg_off, lba, num, true,
-+				       group);
- 		/* If ZBC zone then bump its write pointer */
- 		if (sdebug_dev_is_zoned(devip))
- 			zbc_inc_wp(devip, lba, num);
-@@ -6828,6 +6845,31 @@ static ssize_t tur_ms_to_ready_show(struct device_driver *ddp, char *buf)
- }
- static DRIVER_ATTR_RO(tur_ms_to_ready);
- 
-+static ssize_t group_number_stats_show(struct device_driver *ddp, char *buf)
-+{
-+	char *p = buf, *end = buf + PAGE_SIZE;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(writes_by_group_number); i++)
-+		p += scnprintf(p, end - p, "%d %ld\n", i,
-+			       atomic_long_read(&writes_by_group_number[i]));
-+
-+	return p - buf;
-+}
-+
-+static ssize_t group_number_stats_store(struct device_driver *ddp,
-+					const char *buf,
-+				  size_t count)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(writes_by_group_number); i++)
-+		atomic_long_set(&writes_by_group_number[i], 0);
-+
-+	return 0;
-+}
-+static DRIVER_ATTR_RW(group_number_stats);
-+
- /* Note: The following array creates attribute files in the
-    /sys/bus/pseudo/drivers/scsi_debug directory. The advantage of these
-    files (over those found in the /sys/module/scsi_debug/parameters
-@@ -6874,6 +6916,7 @@ static struct attribute *sdebug_drv_attrs[] = {
- 	&driver_attr_cdb_len.attr,
- 	&driver_attr_tur_ms_to_ready.attr,
- 	&driver_attr_zbc.attr,
-+	&driver_attr_group_number_stats.attr,
- 	NULL,
- };
- ATTRIBUTE_GROUPS(sdebug_drv);
+$ lspci |grep -i nvme
+03:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller SM981/PM981/PM983
+06:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller SM981/PM981/PM983
+$ cat /sys/block/nvme*n1/queue/write_cache
+write back
+write back
+$
+
+That they have volatile writeback caches....
+
+> How about blacklisting block devices that mangle blocks if a power
+> failure occurs? I think such block devices are not compatible with
+> journaling filesystems nor with log-structured filesystems.
+
+Statements like this from people working on storage hardware really
+worry me. It demonstrates a lack of understanding of how filesystems
+actually work, not to mention the fact that this architectural
+problem (i.e. handling volatile device write caches correctly) was
+solved in the Linux IO stack a couple of decades ago. This isn't
+even 'state of the art' knowledge - this is foundational knowlege
+that everyone working on storage should know.
+
+The tl;dr summary is that filesystems will issue a cache flush
+request (REQ_PREFLUSH) and/or write-through to stable storage
+semantics (REQ_FUA) for any data, metadata or journal IO that has
+data integrity and/or ordering requirements associated with it. The
+block layer will then do the most optimal correct thing with that
+request (e.g. ignore them for IO being directed at WC disabled
+devices), but it guarantees the flush/fua semantics for those IOs
+will be provided by all layers in the stack right down to the
+persistent storage media itself. Hence all the filesystem has to do
+is get it's IO and cache flush ordering correct, and everything
+just works regardless of the underlying storage capabilities.
+
+And, yes, any storage device with volatile caches that doesn't
+implement cache flushes correctly is considered broken and will get
+black listed....
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
