@@ -2,92 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01448E92723
-	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 18:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE66E92734
+	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 19:41:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229654AbjJESCd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Oct 2023 14:02:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52936 "EHLO
+        id S229786AbjJETli (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Oct 2023 15:41:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231995AbjJESC1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 14:02:27 -0400
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BFE090
-        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 11:02:26 -0700 (PDT)
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-577fb90bb76so739655a12.2
-        for <linux-block@vger.kernel.org>; Thu, 05 Oct 2023 11:02:26 -0700 (PDT)
+        with ESMTP id S229601AbjJETlh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 15:41:37 -0400
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63E8ECE;
+        Thu,  5 Oct 2023 12:41:36 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1c88b467ef8so4866195ad.0;
+        Thu, 05 Oct 2023 12:41:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696528945; x=1697133745;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=76a8YQ0hLV5bUIBYfne2+TIqNG1r6p78CzGnl00LQkI=;
-        b=nAqDacVGDssoYoYwpUTRbLdwey9KO/8KUrQ85/IlPOBLCdOZ7SySO0n8TUUBfEbwN9
-         EgKwESkUDzuczUTKtBqDdwv2UYFsQqX8c5fASqkTuoPnqPSzaOrsMeIJ48mkvomhh2W+
-         2ZgrW/dbQJcKG987KmPi3RB+bVkhxClWmRc5j9WAZO+vRXdUJGBgJlN5aemgUbjzP1yP
-         YJXaf/uJqmmaZaF55tbNNXqPtnlKRAjnCfooDHVxpRPuKEHU1TrBgzUrM2Fy4gaNsajY
-         iTKBydOvIalpVpZx9UfAN5NmfDWLCsl31G0PLGwx7hVxbp1IJt9jpkougHeCgOUbfuGq
-         QVYw==
-X-Gm-Message-State: AOJu0YyM785Tnw+JVRl0giFMWqz2Njlj3zCwJzE/rVdRlig0Z9w3DJUw
-        yuS45zNjOlgpboNGa4KJaZ4KN3db4wI=
-X-Google-Smtp-Source: AGHT+IEtxhx8Df6oc23r6vTVfpi0GCljdCBIuAHJXI9tx/vfH9rfZ3EhYCygbBmPeUDVC2fu0Q7kog==
-X-Received: by 2002:a17:90a:9d82:b0:269:621e:a673 with SMTP id k2-20020a17090a9d8200b00269621ea673mr5809723pjp.1.1696528945326;
-        Thu, 05 Oct 2023 11:02:25 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:ca3e:70ef:bad:2f? ([2620:15c:211:201:ca3e:70ef:bad:2f])
-        by smtp.gmail.com with ESMTPSA id mp3-20020a17090b190300b00267d9f4d340sm3897773pjb.44.2023.10.05.11.02.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Oct 2023 11:02:24 -0700 (PDT)
-Message-ID: <6b267348-7548-4cb5-a62a-284c6750aeae@acm.org>
-Date:   Thu, 5 Oct 2023 11:02:23 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] nvme/rc: fix rdma driver check
-Content-Language: en-US
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <20231005080242.292291-1-shinichiro.kawasaki@wdc.com>
+        d=1e100.net; s=20230601; t=1696534896; x=1697139696;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8PNVxsJWMiXLmTm8xBAOWRN8wkjHwA+8htAHskM1reQ=;
+        b=VAortn4XPNJZt1SsLlZJdzHzSVQMg4GrCJ3IOhc1zJAQhBsYDoNbKfdfa2oqm38toc
+         /0TL5oHCgPMKaJTFFRqp+4IB8B+XCDbI0TOIlaldwHq30UF/ehuJd1zvZRAIlz3LKiye
+         sjN+juGWf9Cy8GrJQai7/nL0s7+1D41RD6OgsOInKFz1XTosstcrl9gF1yXF7Ugvo2i5
+         rlbRquPc0oPGlh2Ppma7s1Sn00Hk/k8rozpslg5eEimWV81zrz8Xjfo3rErRwgy+VEJi
+         +8z+E0fFNjtbl9ghfTbgKoJXnTK36pf/omdGtQwsCDb/93b8jDR0+rT1us/XMt85QqLG
+         wy5Q==
+X-Gm-Message-State: AOJu0YyDiTqhwAaBEDGMBicHnd/lNcRuDcW3X7uoHv4iHnLgpmEI8nzV
+        RdP8zAyAHG4Y0tK9e9ZdDbU=
+X-Google-Smtp-Source: AGHT+IHYz2XdRKL3PBxgEAHlFeFWptqRewEQT3gWgB/hHliMo32MW2iVB1fnzBG+5n+CZQqJ4ZUcTQ==
+X-Received: by 2002:a17:902:e54a:b0:1c6:2d13:5b74 with SMTP id n10-20020a170902e54a00b001c62d135b74mr7264965plf.55.1696534895572;
+        Thu, 05 Oct 2023 12:41:35 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:ca3e:70ef:bad:2f])
+        by smtp.gmail.com with ESMTPSA id u4-20020a170902e5c400b001a9b29b6759sm2129596plf.183.2023.10.05.12.41.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 12:41:34 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231005080242.292291-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v2 00/15] Pass data temperature information to UFS devices
+Date:   Thu,  5 Oct 2023 12:40:46 -0700
+Message-ID: <20231005194129.1882245-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/5/23 01:02, Shin'ichiro Kawasaki wrote:
-> Since the commit 4824ac3f5c4a ("Skip tests based on SKIP_REASON, not
-> return value"), blktests no longer checks return values of _have_foo
-> helpers. Instead, it checks if _have_foo helpers set SKIP_REASON, which
-> was renamed to SKIP_REASONS later, to judge test case skip. If two
-> _have_foo helpers are chained with ||, the skip check does not work as
-> expected since one of the helper may set SKIP_REASONS even when the
-> other does not set. Such chain with || is done in _nvme_requires() to
-> check rdma drivers.
-> 
-> To fix the check, do not chain the helper functions with || operator.
-> Instead, refer $use_rxe to call only the required function.
-> 
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
->   tests/nvme/rc | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/nvme/rc b/tests/nvme/rc
-> index 1ec9eb6..bac2db7 100644
-> --- a/tests/nvme/rc
-> +++ b/tests/nvme/rc
-> @@ -44,7 +44,11 @@ _nvme_requires() {
->   		_have_driver nvmet-rdma
->   		_have_configfs
->   		_have_program rdma
-> -		_have_driver rdma_rxe || _have_driver siw
-> +		if [ -n "$use_rxe" ]; then
-> +			_have_driver rdma_rxe
-> +		else
-> +			_have_driver siw
-> +		fi
->   		;;
->   	fc)
->   		_have_driver nvme-fc
+Hi Jens,
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+UFS vendors need the data lifetime information to achieve good performance.
+Without this information there is significantly higher write amplification due
+to garbage collection. Hence this patch series that add support in F2FS and
+also in the block layer for data lifetime information. The SCSI disk (sd)
+driver is modified such that it passes write hint information to SCSI devices
+via the GROUP NUMBER field.
+
+Please consider this patch series for the next merge window.
+
+Thanks,
+
+Bart.
+
+Changes compared to v1:
+- Use six bits from the ioprio field for data lifetime information. The
+  bio->bi_write_hint / req->write_hint / iocb->ki_hint members that were
+  introduced in v1 have been removed again.
+- The F_GET_FILE_RW_HINT and F_SET_FILE_RW_HINT fcntls have been removed.
+- In the SCSI disk (sd) driver, query the stream status and check the PERM bit.
+- The GET STREAM STATUS command has been implemented in the scsi_debug driver.
+
+Bart Van Assche (15):
+  block: Make bio_set_ioprio() modify fewer bio->bi_ioprio bits
+  blk-ioprio: Modify fewer bio->bi_ioprio bits
+  block: Support data lifetime in the I/O priority bitfield
+  fs: Restore write hint support
+  fs/f2fs: Restore the whint_mode mount option
+  scsi: core: Query the Block Limits Extension VPD page
+  scsi_proto: Add structures and constants related to I/O groups and
+    streams
+  sd: Translate data lifetime information
+  scsi_debug: Reduce code duplication
+  scsi_debug: Support the block limits extension VPD page
+  scsi_debug: Rework page code error handling
+  scsi_debug: Rework subpage code error handling
+  scsi_debug: Implement the IO Advice Hints Grouping mode page
+  scsi_debug: Implement GET STREAM STATUS
+  scsi_debug: Maintain write statistics per group number
+
+ Documentation/filesystems/f2fs.rst |  70 ++++++++
+ block/blk-ioprio.c                 |   9 +-
+ block/blk-mq.c                     |   3 +-
+ drivers/scsi/scsi.c                |   2 +
+ drivers/scsi/scsi_debug.c          | 247 +++++++++++++++++++++--------
+ drivers/scsi/scsi_sysfs.c          |  10 ++
+ drivers/scsi/sd.c                  | 112 ++++++++++++-
+ drivers/scsi/sd.h                  |   3 +
+ fs/f2fs/data.c                     |   3 +
+ fs/f2fs/f2fs.h                     |   9 ++
+ fs/f2fs/segment.c                  |  95 +++++++++++
+ fs/f2fs/super.c                    |  32 +++-
+ fs/iomap/buffered-io.c             |   3 +
+ fs/mpage.c                         |   2 +
+ include/linux/fs-lifetime.h        |  20 +++
+ include/linux/ioprio.h             |  10 ++
+ include/scsi/scsi_device.h         |   1 +
+ include/scsi/scsi_proto.h          |  75 +++++++++
+ include/uapi/linux/ioprio.h        |   8 +-
+ 19 files changed, 639 insertions(+), 75 deletions(-)
+ create mode 100644 include/linux/fs-lifetime.h
+
