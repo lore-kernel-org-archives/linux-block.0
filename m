@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2AD3E92720
-	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 16:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46110E9271B
+	for <linux-block@archiver.kernel.org>; Thu,  5 Oct 2023 17:15:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233467AbjJEQnU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 Oct 2023 12:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53000 "EHLO
+        id S231908AbjJERPY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 Oct 2023 13:15:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232571AbjJEQls (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 12:41:48 -0400
+        with ESMTP id S231205AbjJEROx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2023 13:14:53 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26CBE55A7
-        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 09:25:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5332724
+        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 10:05:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696523125;
+        s=mimecast20190719; t=1696525526;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=kcIHJd8zrYki+Wg0RoULYhP1Y/OyxEQ+26ogj6n5WEc=;
-        b=jATmNpUnd0t325wXDVbPdGM3cMRGlv3M4utbfUZ02A/voTuZCfYqP3I5LgR6sBMUe9wzS6
-        LW51x9+veKNotT55afc9YgI1INbhdO45f8chPWHrOTrCvl/lp6OdjFYF8FIqGngXqKYxyi
-        5vDA5JxkOOBqPYfUznae21AvSty3QxE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-470-R_aqFmEYMeisHvtuHQG8fQ-1; Thu, 05 Oct 2023 12:25:20 -0400
-X-MC-Unique: R_aqFmEYMeisHvtuHQG8fQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        bh=KKcKcbN0G6E1ZA/muCY4Z4QSr4fIlnQTBllEL5N75xE=;
+        b=Tqg713ATy/MOrREUtJikjb1g0g5Xa3uKoF4YwEUStwwe4NmsIcCrDhjt3WvHaSxI7fMnpQ
+        igTpwqX6qUR3CL5EgLaxW9ViXGqyjSqx43+R+Xc/H83CyP8+KbVLMGLM5plsfRLxo/aZ4w
+        xc+55wSh7OF9AThniz0oy7GhBFQClMs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-296-XZ12uclKPy6PIwXfFzFfYw-1; Thu, 05 Oct 2023 13:05:16 -0400
+X-MC-Unique: XZ12uclKPy6PIwXfFzFfYw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F1AA85A5A8;
-        Thu,  5 Oct 2023 16:25:19 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 12A563C0F670;
+        Thu,  5 Oct 2023 17:05:16 +0000 (UTC)
 Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.224.69])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 6A7E02156711;
-        Thu,  5 Oct 2023 16:25:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with SMTP id 36232492B05;
+        Thu,  5 Oct 2023 17:05:12 +0000 (UTC)
 Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-        oleg@redhat.com; Thu,  5 Oct 2023 18:24:21 +0200 (CEST)
-Date:   Thu, 5 Oct 2023 18:24:17 +0200
+        oleg@redhat.com; Thu,  5 Oct 2023 19:04:17 +0200 (CEST)
+Date:   Thu, 5 Oct 2023 19:04:14 +0200
 From:   Oleg Nesterov <oleg@redhat.com>
 To:     Li Nan <linan666@huaweicloud.com>
 Cc:     Khazhy Kumykov <khazhy@chromium.org>, tj@kernel.org,
@@ -48,7 +48,7 @@ Cc:     Khazhy Kumykov <khazhy@chromium.org>, tj@kernel.org,
         houtao1@huawei.com, yangerkun@huawei.com
 Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
  throttle is enabled
-Message-ID: <20231005162417.GA32420@redhat.com>
+Message-ID: <20231005170413.GB32420@redhat.com>
 References: <20230928015858.1809934-1-linan666@huaweicloud.com>
  <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
  <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com>
@@ -57,56 +57,24 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Li,
+sorry, didn't notice this part before.
+
+I am not a asm expert (to say at least;) but
 
 On 10/05, Li Nan wrote:
 >
-> >I don't think this change is sufficient to prevent kernel crash, as a
-> >"clever" user could still set the bps_limit to U64_MAX - 1 (or another
-> >large value), which probably would still result in the same crash. The
-> >comment in mul_u64_u64_div_u64 suggests there's something we can do to
-> >better handle the overflow case, but I'm not sure what it's referring
-> >to. ("Will generate an #DE when the result doesn't fit u64, could fix
-> >with an __ex_table[] entry when it becomes an issue.") Otherwise, we
->
 > When (a * mul) overflows, a divide 0 error occurs in
-> mul_u64_u64_div_u64(). Commit 3dc167ba5729 ("sched/cputime: Improve
-> cputime_adjust()") changed func and said: "Will generate an #DE when the
-> result doesn't fit u64, could fix with an __ex_table[] entry when it
-> becomes an issue." But we are unsure of how to fix it. Could you please
-> explain how to fix this issue.
+> mul_u64_u64_div_u64().
 
-Not sure I understand the question...
+Just in case... No, iirc it is divq which triggers #DE when the
+result of division doesn't fit u64.
 
-OK, we can change mul_u64_u64_div_u64() to trap the exception, say,
-
-	static inline u64 mul_u64_u64_div_u64(u64 a, u64 mul, u64 div)
-	{
-		u64 q;
-
-		asm ("mulq %2; 1: divq %3; 2:\n"
-		     _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_DEFAULT|EX_FLAG_CLEAR_AX)
-					: "=a" (q)
-					: "a" (a), "rm" (mul), "rm" (div)
-					: "rdx");
-
-		return q;
-	}
-
-should (iiuc) return 0 if the result doesn't fit u64 or div == 0.
-
-But even if we forget that this is x86-specific, how can this help?
-What should calculate_bytes_allowed() do/return in this case?
-
-> >probably need to remove the mul_u64_u64_div_u64 and check for
-> >overflow/potential overflow ourselves?
-
-probably yes...
+(a * mul) can't overflow, the result is 128-bit rax:rdx number.
 
 Oleg.
 
