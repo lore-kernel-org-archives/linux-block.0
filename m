@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A31FE81DF2
-	for <linux-block@archiver.kernel.org>; Fri,  6 Oct 2023 12:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D45DE81DF7
+	for <linux-block@archiver.kernel.org>; Fri,  6 Oct 2023 12:55:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232288AbjJFMzJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Oct 2023 08:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43996 "EHLO
+        id S232286AbjJFMzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Oct 2023 08:55:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232272AbjJFMzC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2023 08:55:02 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70665D6;
-        Fri,  6 Oct 2023 05:55:00 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9b64b98656bso364999366b.0;
-        Fri, 06 Oct 2023 05:55:00 -0700 (PDT)
+        with ESMTP id S232278AbjJFMzD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2023 08:55:03 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14163EA;
+        Fri,  6 Oct 2023 05:54:58 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9adb9fa7200so468121466b.0;
+        Fri, 06 Oct 2023 05:54:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696596899; x=1697201699; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696596897; x=1697201697; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JvlLVhV61yey8O8YpbEqG2hEVjESCumTPs4mXO+vIE0=;
-        b=Q+JD/vVv6FQnbQ+Ayo7EBpkxEgAkFpuHB7d2F1/Q17TYXxiTvlAXXqM4FuvRnM4vfE
-         wvRP1oRjiN12I0CljIwfSkwktd1Wb3rw5ms3mzCgm25bloDe1WrVObPRmP58EQ+srj6f
-         zzdqYbEYlbDwBDUyKjl2BZG45WhnVc5OUHSnSOD9GnuzSn9eiX7I+tBcFcdSInW6jYXN
-         uSjlvMdCOy9Il3dePctAlolXzuirMbNQQchds0somXlTp/bc+8ituIOjoTdY5CMnOYrg
-         iSuzCB4Jlmyg+1/VfwFbvrgGzB+fG0thWfzLVhdlyPXx1bm13mD/qh29jAWL5tcBrIWE
-         2xTg==
+        bh=WkJhAB2yyx4/iH5CKVtjye33dMpHhtPi+8GMajEKlxw=;
+        b=ZSH79vWn7Eo6aUYnrpB1VHpw0wFF7TBvIagxIDpW8iMFqJNeozlftOfOsOPG+Cb8Ma
+         qOxhS6Zm9DLVhhtj96f1+pyAlsjlMAUFp9/+E0XR4Xw1Pnk7DjRtgpIIvQglYkD+Dcq8
+         Sfm/lbLSwMQswWYk4hMHJXW1E2ZN+vgeQY/bhg8pfwRASM/0xVrYFTKhkAz49cH303Es
+         nAkVsArVvv6JSM3EVl6ShAeStFNYiq+KzH6+yADh0mzSG9+HVMmP8OrUm+rQdK/siVXR
+         fRBm6ZAeqx0juZsitKxuDv9ZvE4biMMFj8TBBVJDdHb/xpRIhztUCEpFqYMt3F3h+16F
+         2LpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696596899; x=1697201699;
+        d=1e100.net; s=20230601; t=1696596897; x=1697201697;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JvlLVhV61yey8O8YpbEqG2hEVjESCumTPs4mXO+vIE0=;
-        b=vXGYYomkiS+q4jT6NaUzGo80Va0bksd3AzudQA6K+lkjA7wkuTmqNyKpb3Lwu2LI0n
-         l0n3nDnoJKeUuEuKeY5makUsh+yoPUAX6V8lMntaoFNYdn6SqBqHxNjYVIfXXu+GAWm0
-         b64Wnvdse3jdSe6ltAsVvmyFh+4Uo6lOYbw3eHPTas71FePHaSmMr+vzWVYzsSV4XELq
-         UNRA2dNnPC50ulv8dUPeRwQfT0Ca1N/bvk6m1XKha2nf6+BadhYtIFTwPS8dGVI43kAb
-         oOrUckW5/w2hNZETjfTn78x/I9Nc3o+vBSKyLCIJglowmFe72Nmld4tEbH+oLoQ8jQoS
-         TLnA==
-X-Gm-Message-State: AOJu0Ywn7VaM42NYDq7xZGuzjPWTCSj3uRFmL6UnSFejPlanb+vr+eqF
-        XjWzaT5jMPL2ouhXzYKDnXCeGe+l4RVCrg==
-X-Google-Smtp-Source: AGHT+IG2DczT846X90UrkoQRLIR8aD+eEYxqRpvEe0St1vVFd5QVZDc6TeKn/2cRHHcxpBsoSArQOQ==
-X-Received: by 2002:a17:906:5349:b0:9b2:8b14:7a20 with SMTP id j9-20020a170906534900b009b28b147a20mr7520029ejo.45.1696596898716;
-        Fri, 06 Oct 2023 05:54:58 -0700 (PDT)
+        bh=WkJhAB2yyx4/iH5CKVtjye33dMpHhtPi+8GMajEKlxw=;
+        b=CXp6RVWU9BkRO2Tgd3af5xTngrKRTKXYPvqNq21/6D9ffQlwn7Ie2kS2nMu9Oa4kYB
+         /rE/pjplSBIwM3sYaknGmJ2lud5HWYR4ktrPczPCRHUrw93ttW4myctfd7Br7J8QSwed
+         oRbz48B8IAOmCITmzGQ0qwg+rznGCLJ4uEfX9rFlQeIFuRAGIRDSDnVaZllbhcgtPK1W
+         B1HmbeVkeX7YuDOpwh735UlFu8OJ9wWul3kcK7X24Ts/m2NDXeGVeX6GtF/0nMh+S3rE
+         5BYFZsz6/518Kw+Pf1qgmoj1lIydmbxc/JfH8i2mZw7HOkdq18ISIIRcCkQ2945duF2T
+         jFpw==
+X-Gm-Message-State: AOJu0YxGxA08lXABWIJgb2CSn3/eAc2nVg1c2usaSxpFOUE585DM/tJV
+        X789+lSV+jqLicdaXPr0iP3eRxT1L92B0Q==
+X-Google-Smtp-Source: AGHT+IGiuupZohH4zO/6GZ4LcEqf3PlRb+zDkvgDQ/6lZeXN28SuZojk5PGwd8T4TMSZr7VGRzyvqw==
+X-Received: by 2002:a17:906:6a28:b0:9ad:cbc0:9f47 with SMTP id qw40-20020a1709066a2800b009adcbc09f47mr3914024ejc.12.1696596897128;
+        Fri, 06 Oct 2023 05:54:57 -0700 (PDT)
 Received: from sauvignon.fi.muni.cz (laomedon.fi.muni.cz. [147.251.42.107])
-        by smtp.gmail.com with ESMTPSA id p26-20020a1709060dda00b0099bc08862b6sm2894660eji.171.2023.10.06.05.54.58
+        by smtp.gmail.com with ESMTPSA id p26-20020a1709060dda00b0099bc08862b6sm2894660eji.171.2023.10.06.05.54.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 05:54:58 -0700 (PDT)
+        Fri, 06 Oct 2023 05:54:56 -0700 (PDT)
 From:   Milan Broz <gmazyland@gmail.com>
 To:     linux-usb@vger.kernel.org
 Cc:     usb-storage@lists.one-eyed-alien.net, linux-scsi@vger.kernel.org,
         linux-block@vger.kernel.org, stern@rowland.harvard.edu,
         oneukum@suse.com, jonathan.derrick@linux.dev,
         Milan Broz <gmazyland@gmail.com>
-Subject: [RFC PATCH 5/6] usb-storage,uas,scsi: allow to pass through security commands (OPAL)
-Date:   Fri,  6 Oct 2023 14:54:44 +0200
-Message-ID: <20231006125445.122380-6-gmazyland@gmail.com>
+Subject: [RFC PATCH 3/6] usb-storage: use fflags index only in usb-storage driver
+Date:   Fri,  6 Oct 2023 14:54:42 +0200
+Message-ID: <20231006125445.122380-4-gmazyland@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231006125445.122380-1-gmazyland@gmail.com>
 References: <20231006125445.122380-1-gmazyland@gmail.com>
@@ -67,170 +67,263 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch enables pass-through OPAL command for USB-attached storage
-(which does not support UAS or SCSI security commands).
-All common USB/SATA or USB/NVMe adapters I tested need this patch.
+This patch adds a parameter to use driver_info translation function
+(which will be defined in the following patch).
 
-USB mass storage devices that do not support SECURITY IN/OUT SCSI
-commands can support ATA12 pass-thru command.
-
-Internal kernel implementation for OPAL interface currently supports
-only SCSI SECURITY IN/OUT wrapper.
-USB mass storage also turns off SCSI command enumeration, so SECURITY
-IN/OUT in the SCSI layer will be disabled.
-
-Note: sedutils and some other OPAL tools already use ATA-12 pass-thru.
-
-This patch
- - enables SCSI security flag for USB mass storage and UAS device by default.
-
- - adds an optional wrapper to the SCSI layer for the ATA-12 pass-thru
-   command as an alternative if SECURITY IN/OUT is unavailable.
-
-In short, the patch runs these steps:
-  1) USB drives (mass-storage, UAS) enables security driver flag by default
-     if not disabled by quirk
-  2) SCSI device enumerates SECURITY IN/OUT support. If detected,
-     SECURITY ON/OUT wrapper is used (as in the current code).
-     If not, new ATA12 pass-thru wrapper is used instead.
-  3) SED OPAL code tries OPAL discovery command for device. If it receives
-     correct reply, OPAL is enabled for the device.
-
-With the changes above, the TCG OPAL support works with USB adapters
-that support the ATA-12 command. As kernel OPAL code runs discover
-commands on initialization, on devices that do not support pass-through,
-OPAL remains disabled.
-
-The patch also adds a quirk flag to disable security commands for particular
-devices if firmware is buggy.
+Only USB storage driver will use it, as other drivers do not need
+more than 32-bit quirk flags.
 
 Signed-off-by: Milan Broz <gmazyland@gmail.com>
 ---
- drivers/scsi/sd.c              | 33 +++++++++++++++++++++++++++++++--
- drivers/usb/storage/scsiglue.c |  4 ++++
- drivers/usb/storage/uas.c      |  5 +++++
- drivers/usb/storage/usb.c      |  5 ++++-
- include/linux/usb_usual.h      |  2 ++
- 5 files changed, 46 insertions(+), 3 deletions(-)
+ drivers/usb/storage/alauda.c        |  2 +-
+ drivers/usb/storage/cypress_atacb.c |  2 +-
+ drivers/usb/storage/datafab.c       |  2 +-
+ drivers/usb/storage/ene_ub6250.c    |  2 +-
+ drivers/usb/storage/freecom.c       |  2 +-
+ drivers/usb/storage/isd200.c        |  2 +-
+ drivers/usb/storage/jumpshot.c      |  2 +-
+ drivers/usb/storage/karma.c         |  2 +-
+ drivers/usb/storage/onetouch.c      |  2 +-
+ drivers/usb/storage/realtek_cr.c    |  2 +-
+ drivers/usb/storage/sddr09.c        |  2 +-
+ drivers/usb/storage/sddr55.c        |  2 +-
+ drivers/usb/storage/shuttle_usbat.c |  2 +-
+ drivers/usb/storage/usb.c           | 10 ++++++----
+ drivers/usb/storage/usb.h           |  3 ++-
+ 15 files changed, 21 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 83b6a3f3863b..3782556cb461 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -686,6 +686,32 @@ static int sd_sec_submit(void *data, u16 spsp, u8 secp, void *buffer,
- 			       &exec_args);
- 	return ret <= 0 ? ret : -EIO;
- }
-+
-+static int sd_ata12_submit(void *data, u16 spsp, u8 secp, void *buffer,
-+		size_t len, bool send)
-+{
-+	struct scsi_disk *sdkp = data;
-+	struct scsi_device *sdev = sdkp->device;
-+	u8 cdb[12] = { 0, };
-+	const struct scsi_exec_args exec_args = {
-+		.req_flags = BLK_MQ_REQ_PM,
-+	};
-+	int ret;
-+
-+	cdb[0] = ATA_12;
-+	cdb[1] = (send ? 5 /* ATA_PROTOCOL_PIO_DATA_IN */ : 4 /* ATA_PROTOCOL_PIO_DATA_OUT */) << 1;
-+	cdb[2] = 2 /* t_length */ | (1 << 2) /* byt_blok */ | ((send ?  0 : 1) << 3) /* t_dir */;
-+	cdb[3] = secp;
-+	put_unaligned_le16(len / 512, &cdb[4]);
-+	put_unaligned_le16(spsp, &cdb[6]);
-+	cdb[9] = send ? 0x5e /* ATA_CMD_TRUSTED_SND */: 0x5c /* ATA_CMD_TRUSTED_RCV */;
-+
-+	ret = scsi_execute_cmd(sdev, cdb, send ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
-+			       buffer, len, SD_TIMEOUT, sdkp->max_retries,
-+			       &exec_args);
-+	return ret <= 0 ? ret : -EIO;
-+}
-+
- #endif /* CONFIG_BLK_SED_OPAL */
+diff --git a/drivers/usb/storage/alauda.c b/drivers/usb/storage/alauda.c
+index 115f05a6201a..74e293981ab1 100644
+--- a/drivers/usb/storage/alauda.c
++++ b/drivers/usb/storage/alauda.c
+@@ -1241,7 +1241,7 @@ static int alauda_probe(struct usb_interface *intf,
  
- /*
-@@ -3699,8 +3725,11 @@ static int sd_probe(struct device *dev)
- 		goto out;
- 	}
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - alauda_usb_ids) + alauda_unusual_dev_list,
+-			&alauda_host_template);
++			&alauda_host_template, 0);
+ 	if (result)
+ 		return result;
  
--	if (sdkp->security) {
--		sdkp->opal_dev = init_opal_dev(sdkp, &sd_sec_submit);
-+	if (sdp->security_supported) {
-+		if (sdkp->security)
-+		    sdkp->opal_dev = init_opal_dev(sdkp, &sd_sec_submit);
-+		else
-+		    sdkp->opal_dev = init_opal_dev(sdkp, &sd_ata12_submit);
- 		if (sdkp->opal_dev)
- 			sd_printk(KERN_NOTICE, sdkp, "supports TCG Opal\n");
- 	}
-diff --git a/drivers/usb/storage/scsiglue.c b/drivers/usb/storage/scsiglue.c
-index c54e9805da53..ef93813a2049 100644
---- a/drivers/usb/storage/scsiglue.c
-+++ b/drivers/usb/storage/scsiglue.c
-@@ -209,6 +209,10 @@ static int slave_configure(struct scsi_device *sdev)
- 		/* Do not attempt to use WRITE SAME */
- 		sdev->no_write_same = 1;
+diff --git a/drivers/usb/storage/cypress_atacb.c b/drivers/usb/storage/cypress_atacb.c
+index 98b3ec352a13..2fc939f709b0 100644
+--- a/drivers/usb/storage/cypress_atacb.c
++++ b/drivers/usb/storage/cypress_atacb.c
+@@ -246,7 +246,7 @@ static int cypress_probe(struct usb_interface *intf,
  
-+		/* Allow security commands (OPAL) passthrough */
-+		if (!(us->fflags & US_FL_IGNORE_OPAL))
-+			sdev->security_supported = 1;
-+
- 		/*
- 		 * Some disks return the total number of blocks in response
- 		 * to READ CAPACITY rather than the highest block number.
-diff --git a/drivers/usb/storage/uas.c b/drivers/usb/storage/uas.c
-index f6e293daabf4..9dfe8ea20134 100644
---- a/drivers/usb/storage/uas.c
-+++ b/drivers/usb/storage/uas.c
-@@ -865,6 +865,11 @@ static int uas_slave_configure(struct scsi_device *sdev)
- 	/* Some disks cannot handle WRITE_SAME */
- 	if (devinfo->flags & US_FL_NO_SAME)
- 		sdev->no_write_same = 1;
-+
-+	/* Allow security commands (OPAL) passthrough */
-+	if (!(devinfo->flags & US_FL_IGNORE_OPAL))
-+		sdev->security_supported = 1;
-+
- 	/*
- 	 * Some disks return the total number of blocks in response
- 	 * to READ CAPACITY rather than the highest block number.
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - cypress_usb_ids) + cypress_unusual_dev_list,
+-			&cypress_host_template);
++			&cypress_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/datafab.c b/drivers/usb/storage/datafab.c
+index bcc4a2fad863..fad9eca3cad9 100644
+--- a/drivers/usb/storage/datafab.c
++++ b/drivers/usb/storage/datafab.c
+@@ -727,7 +727,7 @@ static int datafab_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - datafab_usb_ids) + datafab_unusual_dev_list,
+-			&datafab_host_template);
++			&datafab_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/ene_ub6250.c b/drivers/usb/storage/ene_ub6250.c
+index 97c66c0d91f4..6985d3419b3c 100644
+--- a/drivers/usb/storage/ene_ub6250.c
++++ b/drivers/usb/storage/ene_ub6250.c
+@@ -2331,7 +2331,7 @@ static int ene_ub6250_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 		   (id - ene_ub6250_usb_ids) + ene_ub6250_unusual_dev_list,
+-		   &ene_ub6250_host_template);
++		   &ene_ub6250_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/freecom.c b/drivers/usb/storage/freecom.c
+index 2b098b55c4cb..6d971bd711d8 100644
+--- a/drivers/usb/storage/freecom.c
++++ b/drivers/usb/storage/freecom.c
+@@ -548,7 +548,7 @@ static int freecom_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - freecom_usb_ids) + freecom_unusual_dev_list,
+-			&freecom_host_template);
++			&freecom_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/isd200.c b/drivers/usb/storage/isd200.c
+index 4e0eef1440b7..ecdc494756a2 100644
+--- a/drivers/usb/storage/isd200.c
++++ b/drivers/usb/storage/isd200.c
+@@ -1545,7 +1545,7 @@ static int isd200_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - isd200_usb_ids) + isd200_unusual_dev_list,
+-			&isd200_host_template);
++			&isd200_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/jumpshot.c b/drivers/usb/storage/jumpshot.c
+index 229bf0c1afc9..1ade1e45c81d 100644
+--- a/drivers/usb/storage/jumpshot.c
++++ b/drivers/usb/storage/jumpshot.c
+@@ -653,7 +653,7 @@ static int jumpshot_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - jumpshot_usb_ids) + jumpshot_unusual_dev_list,
+-			&jumpshot_host_template);
++			&jumpshot_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/karma.c b/drivers/usb/storage/karma.c
+index 38ddfedef629..60868be0e38c 100644
+--- a/drivers/usb/storage/karma.c
++++ b/drivers/usb/storage/karma.c
+@@ -205,7 +205,7 @@ static int karma_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - karma_usb_ids) + karma_unusual_dev_list,
+-			&karma_host_template);
++			&karma_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/onetouch.c b/drivers/usb/storage/onetouch.c
+index 01f3c2779ccf..fe34f20cce03 100644
+--- a/drivers/usb/storage/onetouch.c
++++ b/drivers/usb/storage/onetouch.c
+@@ -280,7 +280,7 @@ static int onetouch_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - onetouch_usb_ids) + onetouch_unusual_dev_list,
+-			&onetouch_host_template);
++			&onetouch_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/realtek_cr.c b/drivers/usb/storage/realtek_cr.c
+index 0c423916d7bf..892b26714b5f 100644
+--- a/drivers/usb/storage/realtek_cr.c
++++ b/drivers/usb/storage/realtek_cr.c
+@@ -1041,7 +1041,7 @@ static int realtek_cr_probe(struct usb_interface *intf,
+ 	result = usb_stor_probe1(&us, intf, id,
+ 				 (id - realtek_cr_ids) +
+ 				 realtek_cr_unusual_dev_list,
+-				 &realtek_cr_host_template);
++				 &realtek_cr_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/sddr09.c b/drivers/usb/storage/sddr09.c
+index 51bcd4a43690..107eeb7fda04 100644
+--- a/drivers/usb/storage/sddr09.c
++++ b/drivers/usb/storage/sddr09.c
+@@ -1753,7 +1753,7 @@ static int sddr09_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - sddr09_usb_ids) + sddr09_unusual_dev_list,
+-			&sddr09_host_template);
++			&sddr09_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/sddr55.c b/drivers/usb/storage/sddr55.c
+index 15dc25801cdc..c64b72de453f 100644
+--- a/drivers/usb/storage/sddr55.c
++++ b/drivers/usb/storage/sddr55.c
+@@ -985,7 +985,7 @@ static int sddr55_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - sddr55_usb_ids) + sddr55_unusual_dev_list,
+-			&sddr55_host_template);
++			&sddr55_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/shuttle_usbat.c b/drivers/usb/storage/shuttle_usbat.c
+index f0d0ca37163d..3ac82f49401c 100644
+--- a/drivers/usb/storage/shuttle_usbat.c
++++ b/drivers/usb/storage/shuttle_usbat.c
+@@ -1838,7 +1838,7 @@ static int usbat_probe(struct usb_interface *intf,
+ 
+ 	result = usb_stor_probe1(&us, intf, id,
+ 			(id - usbat_usb_ids) + usbat_unusual_dev_list,
+-			&usbat_host_template);
++			&usbat_host_template, 0);
+ 	if (result)
+ 		return result;
+ 
 diff --git a/drivers/usb/storage/usb.c b/drivers/usb/storage/usb.c
-index f3a53c3eeb45..04211ac803e4 100644
+index d1ad6a2509ab..72b48b94aa5f 100644
 --- a/drivers/usb/storage/usb.c
 +++ b/drivers/usb/storage/usb.c
-@@ -478,7 +478,7 @@ void usb_stor_adjust_quirks(struct usb_device *udev, u64 *fflags)
- 			US_FL_INITIAL_READ10 | US_FL_WRITE_CACHE |
- 			US_FL_NO_ATA_1X | US_FL_NO_REPORT_OPCODES |
- 			US_FL_MAX_SECTORS_240 | US_FL_NO_REPORT_LUNS |
--			US_FL_ALWAYS_SYNC);
-+			US_FL_ALWAYS_SYNC | US_FL_IGNORE_OPAL);
+@@ -574,7 +574,7 @@ EXPORT_SYMBOL_GPL(usb_stor_adjust_quirks);
  
- 	p = quirks;
- 	while (*p) {
-@@ -567,6 +567,9 @@ void usb_stor_adjust_quirks(struct usb_device *udev, u64 *fflags)
- 		case 'y':
- 			f |= US_FL_ALWAYS_SYNC;
- 			break;
-+		case 'z':
-+			f |= US_FL_IGNORE_OPAL;
-+			break;
- 		/* Ignore unrecognized flag characters */
- 		}
+ /* Get the unusual_devs entries and the string descriptors */
+ static int get_device_info(struct us_data *us, const struct usb_device_id *id,
+-		const struct us_unusual_dev *unusual_dev)
++		const struct us_unusual_dev *unusual_dev, int fflags_use_index)
+ {
+ 	struct usb_device *dev = us->pusb_dev;
+ 	struct usb_interface_descriptor *idesc =
+@@ -590,6 +590,7 @@ static int get_device_info(struct us_data *us, const struct usb_device_id *id,
+ 			idesc->bInterfaceProtocol :
+ 			unusual_dev->useTransport;
+ 	us->fflags = id->driver_info;
++
+ 	usb_stor_adjust_quirks(us->pusb_dev, &us->fflags);
+ 
+ 	if (us->fflags & US_FL_IGNORE_DEVICE) {
+@@ -925,7 +926,8 @@ int usb_stor_probe1(struct us_data **pus,
+ 		struct usb_interface *intf,
+ 		const struct usb_device_id *id,
+ 		const struct us_unusual_dev *unusual_dev,
+-		const struct scsi_host_template *sht)
++		const struct scsi_host_template *sht,
++		int fflags_use_index)
+ {
+ 	struct Scsi_Host *host;
+ 	struct us_data *us;
+@@ -962,7 +964,7 @@ int usb_stor_probe1(struct us_data **pus,
+ 		goto BadDevice;
+ 
+ 	/* Get the unusual_devs entries and the descriptors */
+-	result = get_device_info(us, id, unusual_dev);
++	result = get_device_info(us, id, unusual_dev, fflags_use_index);
+ 	if (result)
+ 		goto BadDevice;
+ 
+@@ -1120,7 +1122,7 @@ static int storage_probe(struct usb_interface *intf,
  	}
-diff --git a/include/linux/usb_usual.h b/include/linux/usb_usual.h
-index 712363c7a2e8..0181c94d7d91 100644
---- a/include/linux/usb_usual.h
-+++ b/include/linux/usb_usual.h
-@@ -88,6 +88,8 @@
- 		/* Cannot handle WRITE_SAME */			\
- 	US_FLAG(SENSE_AFTER_SYNC, 0x80000000)			\
- 		/* Do REQUEST_SENSE after SYNCHRONIZE_CACHE */	\
-+	US_FLAG(IGNORE_OPAL, 0x100000000)			\
-+		/* Security commands (OPAL) are broken */	\
  
- #define US_FLAG(name, value)	US_FL_##name = value ,
- enum { US_DO_ALL_FLAGS };
+ 	result = usb_stor_probe1(&us, intf, id, unusual_dev,
+-				 &usb_stor_host_template);
++				 &usb_stor_host_template, 1);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/drivers/usb/storage/usb.h b/drivers/usb/storage/usb.h
+index 97c6196d639b..975c47efcce7 100644
+--- a/drivers/usb/storage/usb.h
++++ b/drivers/usb/storage/usb.h
+@@ -187,7 +187,8 @@ extern int usb_stor_probe1(struct us_data **pus,
+ 		struct usb_interface *intf,
+ 		const struct usb_device_id *id,
+ 		const struct us_unusual_dev *unusual_dev,
+-		const struct scsi_host_template *sht);
++		const struct scsi_host_template *sht,
++		int fflags_use_index);
+ extern int usb_stor_probe2(struct us_data *us);
+ extern void usb_stor_disconnect(struct usb_interface *intf);
+ 
 -- 
 2.42.0
 
