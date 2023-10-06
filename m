@@ -2,146 +2,136 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63BA4E92FE3
-	for <linux-block@archiver.kernel.org>; Fri,  6 Oct 2023 04:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06829E92FE9
+	for <linux-block@archiver.kernel.org>; Fri,  6 Oct 2023 06:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbjJFEcK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Oct 2023 00:32:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35886 "EHLO
+        id S230179AbjJFGem (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Oct 2023 02:34:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229918AbjJFEbo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2023 00:31:44 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7016D126
-        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 21:31:09 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-58907163519so1247047a12.1
-        for <linux-block@vger.kernel.org>; Thu, 05 Oct 2023 21:31:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1696566669; x=1697171469; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ix+sRq4XQRGJaHRfH6WXpO9zrY7MmqagNFx/9Jnm3Cw=;
-        b=1PXrH8VZnOblzuDC7aK/UG4BmUJT3RX2BSU2ovDIkmCEzmSbK9W2unlSLAt7RVfROA
-         uk+A/E6ugLaxfW9A2XIFg3J2HEDzr8n6c2Aa17kn39z2vmedi082//EAkpShgfYAUSJl
-         CydbxSDIB30+eGO0Da0ibs7g3KHtjrVZ8dQlY6dePodntI+1kNfJzL8U+iwhniC76fiX
-         nwLztdRyyquTTwympjC0U8E4NJzkL/eB4XgzU43c6iiM3jtyBdZbOtRnfFmSAALGh7Sl
-         aHvsMcP1x2wCPpxJ2lCLWZJ+qCTipRNUe8kEQnftAMToDeSR9VUp2Pqq89J2n5vMqJCC
-         fDuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696566669; x=1697171469;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ix+sRq4XQRGJaHRfH6WXpO9zrY7MmqagNFx/9Jnm3Cw=;
-        b=GtoAQF7UzULI2HK/dD6jscesN+ptGx3l8cQ4hoKbbm+r+WNjoMKIebU9Z8vXy08WEw
-         iDbIQWpRywxOwwN65mHqXuYuHCjHDb54cvuAxpcrLOd3emIGK+5kkbz1eby6lTVpMOaZ
-         CUAaDyQabjTZGbSrY3ApYobvHtD0o/2vdKpeTrr1OWk75h7fA0o3G4o5ybWkxkedx6Sd
-         6wt8dN7t7uFbE2IEWinusrg5b55GGm2RnC73QjWwi1/3j0wzid8XG945Ldkoxzv2SQza
-         tYYxXxazTaZTngL6lYnAb3T73rTLlFDKFjVpmp0DOyQYP6YMcXr8/yNISWtCsK0Pp8dO
-         LBbA==
-X-Gm-Message-State: AOJu0Yw5Nk8Zc+A4hbuCHec34jrFEsOu4+fPAE7KxmktNLgNHHioW8n/
-        j7bGfopRpwYbGFvX5JA25KAArg==
-X-Google-Smtp-Source: AGHT+IHgkUMxgn1iEBVFJVYZt/afT8PIq1pP/h8RwAD8SFXjlpezcSfR4j9zUmA+wytXxYHwxrQQQg==
-X-Received: by 2002:a05:6a20:1447:b0:14e:3daf:fdb9 with SMTP id a7-20020a056a20144700b0014e3daffdb9mr8351717pzi.22.1696566668815;
-        Thu, 05 Oct 2023 21:31:08 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
-        by smtp.gmail.com with ESMTPSA id v9-20020a62a509000000b0069029a3196dsm427960pfm.184.2023.10.05.21.31.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 21:31:08 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qocUT-00A4Ul-1m;
-        Fri, 06 Oct 2023 15:31:05 +1100
-Date:   Fri, 6 Oct 2023 15:31:05 +1100
-From:   Dave Chinner <david@fromorbit.com>
+        with ESMTP id S230150AbjJFGel (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2023 02:34:41 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EB8FE4
+        for <linux-block@vger.kernel.org>; Thu,  5 Oct 2023 23:34:38 -0700 (PDT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20231006063435epoutp02760320ac76af3530e76a001c0122f5dc~LcSH9nDvN1193111931epoutp02Y
+        for <linux-block@vger.kernel.org>; Fri,  6 Oct 2023 06:34:35 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20231006063435epoutp02760320ac76af3530e76a001c0122f5dc~LcSH9nDvN1193111931epoutp02Y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1696574075;
+        bh=9oSZ7fmA4mqWaKJ8Rdiwiyeth7cOhSmwwcOUHquZxKk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KTdgoy4W1H8S1AnPNqlN8gegua9pmKaK+3+mNWK0kYtUgSRQuvlpYoNzS80b/cp3S
+         jkSIyNfRydOlZbiUjTxMagk2aGlnklLTogKp3oKw5GfL7FsBPyPFuFlrMkvfxjbcQn
+         54kLWfyN28P4aDwkTG/VttCFFDJPlWKeUBbsHz2I=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20231006063434epcas5p298987cdcd8dabcd0b52dfa490888723e~LcSHYkQpm0821308213epcas5p23;
+        Fri,  6 Oct 2023 06:34:34 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.179]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4S1zDT0Mkvz4x9Q9; Fri,  6 Oct
+        2023 06:34:33 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        C3.FF.09635.87AAF156; Fri,  6 Oct 2023 15:34:32 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20231006063432epcas5p45ddbf3a433cab79ab3e4ccb10d4e64c1~LcSFTYsnu2828128281epcas5p4i;
+        Fri,  6 Oct 2023 06:34:32 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20231006063432epsmtrp2758b86b73f11723113f7137fa4c53068~LcSFQs-IW1168411684epsmtrp23;
+        Fri,  6 Oct 2023 06:34:32 +0000 (GMT)
+X-AuditID: b6c32a4b-2f5ff700000025a3-23-651faa788ee4
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        C9.FA.08742.87AAF156; Fri,  6 Oct 2023 15:34:32 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20231006063430epsmtip102ac448f24463d34ee1dc91ba5d948aa~LcSDgu4433249532495epsmtip1f;
+        Fri,  6 Oct 2023 06:34:30 +0000 (GMT)
+Date:   Fri, 6 Oct 2023 11:58:23 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
 To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
-        brauner@kernel.org, chandan.babu@oracle.com, dchinner@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
-        linux-api@vger.kernel.org
-Subject: Re: [PATCH 10/21] block: Add fops atomic write support
-Message-ID: <ZR+NiYIuKzEilkW3@dread.disaster.area>
-References: <5d26fa3b-ec34-bc39-ecfe-4616a04977ca@oracle.com>
- <b7a6f380-c6fa-45e0-b727-ba804c6684e4@acm.org>
- <yq1lecktuoo.fsf@ca-mkp.ca.oracle.com>
- <db6a950b-1308-4ca1-9f75-6275118bdcf5@acm.org>
- <yq1h6n7rume.fsf@ca-mkp.ca.oracle.com>
- <34c08488-a288-45f9-a28f-a514a408541d@acm.org>
- <yq1ttr6qoqp.fsf@ca-mkp.ca.oracle.com>
- <a2077ddf-9a8f-4101-aeb9-605d6dee3c6e@acm.org>
- <ZR86Z1OcO52a4BtH@dread.disaster.area>
- <d976868a-d32c-43d1-b5da-ebbc4c8de468@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>,
+        Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH v2 01/15] block: Make bio_set_ioprio() modify fewer
+ bio->bi_ioprio bits
+Message-ID: <20231006062813.GA3862@green245>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d976868a-d32c-43d1-b5da-ebbc4c8de468@acm.org>
+In-Reply-To: <20231005194129.1882245-2-bvanassche@acm.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrGJsWRmVeSWpSXmKPExsWy7bCmpm7FKvlUg6bv1hYvf15ls1h9t5/N
+        YtqHn8wWqx6EWzzYb2+xcvVRJos5ZxuYLPbe0rbYs/cki0X39R1sFsuP/2OyePDnMbsDj8fl
+        K94eO2fdZfe4fLbUY9OqTjaP3Tcb2Dw+Pr3F4tG3ZRWjx+dNch7tB7qZAjijsm0yUhNTUosU
+        UvOS81My89JtlbyD453jTc0MDHUNLS3MlRTyEnNTbZVcfAJ03TJzgM5VUihLzCkFCgUkFhcr
+        6dvZFOWXlqQqZOQXl9gqpRak5BSYFOgVJ+YWl+al6+WlllgZGhgYmQIVJmRnTHs9gblgE2vF
+        s6X7mRsYb7B0MXJySAiYSPw/2c7UxcjFISSwm1Fi8YPtbCAJIYFPjBKbp7pCJL4xSjyf94wN
+        pmNuzzRWiMReRoldK9axQDjPGCW2/LrHBFLFIqAicf7rB/YuRg4ONgFNiQuTS0HCIgIaEt8e
+        LAerZxboZpZ4OXkjWL2wQKzEwo9z2EFsXgEdia6lG1kgbEGJkzOfgNmcAlYSR/btZgSxRQWU
+        JQ5sOw52t4TADg6Jt+d3gi2TEHCRWLhZHeJSYYlXx7ewQ9hSEp/f7YX6IFni0sxzTBB2icTj
+        PQehbHuJ1lP9zCA2s0CGxLYjP5kgbD6J3t9PmCDG80p0tAlBlCtK3Jv0lBXCFpd4OGMJlO0h
+        sf3GQRZ4AD1Yd49lAqPcLCTvzEKyAsK2kuj80MQ6C2gFs4C0xPJ/HBCmpsT6XfoLGFlXMUqm
+        FhTnpqcWmxYY56WWw+M4OT93EyM4AWt572B89OCD3iFGJg7GQ4wSHMxKIrzpDTKpQrwpiZVV
+        qUX58UWlOanFhxhNgdEzkVlKNDkfmAPySuINTSwNTMzMzEwsjc0MlcR5X7fOTRESSE8sSc1O
+        TS1ILYLpY+LglGpg2n35fcRkjxNzbbSOy/7fw9jwTdHlwRt1mU6FXX8PVzxhPZ4+UfjawU/f
+        JqewX6gK0H5qmrsopOXWutKKuOv2LrzrX4bKWLk6t1h/DEx9UxfnIWzJ+K5x2cK5u948eGJ7
+        T/yE3av8Zvtdrc1l55s+McuvFe/bmnV4x367qyfvanXu+nI645XHvFVPFZxv988/oWyt2Nt5
+        8va286UHdl2pfjaxLsj9yqTtR7vuSC5fv4T/Aedj2c9lWm0tn3iEX7Jevvlq1W//jAQJpr3a
+        t0N+3L35wGMCz6o9LvG5P/fb2Hf5fdx89ZAt97XY6F3i6za1hJbLX252D2X74FrCO8euseK+
+        1pTu08HF2y7u2v7oebASS3FGoqEWc1FxIgC1RNUWSQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpjkeLIzCtJLcpLzFFi42LZdlhJTrdilXyqweIH0hYvf15ls1h9t5/N
+        YtqHn8wWqx6EWzzYb2+xcvVRJos5ZxuYLPbe0rbYs/cki0X39R1sFsuP/2OyePDnMbsDj8fl
+        K94eO2fdZfe4fLbUY9OqTjaP3Tcb2Dw+Pr3F4tG3ZRWjx+dNch7tB7qZAjijuGxSUnMyy1KL
+        9O0SuDI2zTjIUvCEqWLvpj2sDYxLmLoYOTkkBEwk5vZMY+1i5OIQEtjNKHHz42xGiIS4RPO1
+        H+wQtrDEyn/P2SGKnjBKtG74DpZgEVCROP/1A5DNwcEmoClxYXIpSFhEQEPi24PlLCD1zAL9
+        zBLtL4+DbRMWiJVY+HEOWC+vgI5E19KNLBBD9zJKTPszhxkiIShxcuYTFhCbWcBMYt7mh8wg
+        C5gFpCWW/+MACXMKWEkc2bcb7FBRAWWJA9uOM01gFJyFpHsWku5ZCN0LGJlXMUqmFhTnpucW
+        GxYY5qWW6xUn5haX5qXrJefnbmIER5WW5g7G7as+6B1iZOJgPMQowcGsJMKb3iCTKsSbklhZ
+        lVqUH19UmpNafIhRmoNFSZxX/EVvipBAemJJanZqakFqEUyWiYNTChiZbRUf84N+/ddmK/+9
+        7l3qCt+fChwCqz16je9YM74MfsafZjZzimV6du1Zb+mtL/WF/JLXxASUByU0yzj+NvNam8cn
+        cmmLbu8trWgF9nz/JsYf1+/cmWVcGLA5ZZf6mcXfXx8sa5TxiRdxWvdIrXCBrCjvAtbN+ZHX
+        opMiS1L2np3/ji3IN0Shm6uGV+HXois31x4VWpvekW59pbP5g9LjJi61oOdS9Rv5XAz7mS/Z
+        WO96dPN5xCfjy5XH6uwWe94zfM7xkF0p/V3c5u3BhkG//IVlWVY33ZObkRSYErB3qtNfqYaC
+        G60b3/JdZHg16+HE17LGH49Z2fYdfGb/XuoFx0adjmNPm9XtBP64K7EUZyQaajEXFScCABDk
+        1PcZAwAA
+X-CMS-MailID: 20231006063432epcas5p45ddbf3a433cab79ab3e4ccb10d4e64c1
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----Q05VG59npZNIcC9SezYoqUiUcYZ5r-Xh01bG8k0yiPfvookF=_470d8_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231005194156epcas5p14c65d7fbecc60f97624a9ef968bebf2e
+References: <20231005194129.1882245-1-bvanassche@acm.org>
+        <CGME20231005194156epcas5p14c65d7fbecc60f97624a9ef968bebf2e@epcas5p1.samsung.com>
+        <20231005194129.1882245-2-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 05, 2023 at 03:58:38PM -0700, Bart Van Assche wrote:
-> On 10/5/23 15:36, Dave Chinner wrote:
-> > $ lspci |grep -i nvme
-> > 03:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller SM981/PM981/PM983
-> > 06:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller SM981/PM981/PM983
-> > $ cat /sys/block/nvme*n1/queue/write_cache
-> > write back
-> > write back
-> > $
-> > 
-> > That they have volatile writeback caches....
-> 
-> It seems like what I wrote has been misunderstood completely. With
-> "handling a power failure cleanly" I meant that power cycling a block device
-> does not result in read errors nor in reading data that has never been written.
+------Q05VG59npZNIcC9SezYoqUiUcYZ5r-Xh01bG8k0yiPfvookF=_470d8_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Then I don't see what your concern is. 
+On Thu, Oct 05, 2023 at 12:40:47PM -0700, Bart Van Assche wrote:
+>A later patch will store the data lifetime in the bio->bi_ioprio member
+>before bio_set_ioprio() is called. Make sure that bio_set_ioprio()
+>doesn't clear more bits than necessary.
 
-Single sector writes are guaranteed atomic and have been for as long
-as I've worked in this game. OTOH, multi-sector writes are not
-guaranteed to be atomic - they can get torn on sector boundaries,
-but the individual sectors within that write are guaranteed to be
-all-or-nothing. 
+Only lifetime bits need to be retained, but the patch retains the CDL
+bits too. Is that intentional?
 
-Any hardware device that does not guarantee single sector write
-atomicity (i.e. tears in the middle of a sector) is, by definition,
-broken. And we all know that broken hardware means nothing in the
-storage stack works as it should, so I just don't see what point you
-are trying to make...
+------Q05VG59npZNIcC9SezYoqUiUcYZ5r-Xh01bG8k0yiPfvookF=_470d8_
+Content-Type: text/plain; charset="utf-8"
 
-> Although it is hard to find information about this topic, here is what I found
-> online:
-> * About certain SSDs with power loss protection:
->   https://us.transcend-info.com/embedded/technology/power-loss-protection-plp
-> * About another class of SSDs with power loss protection:
->   https://www.kingston.com/en/blog/servers-and-data-centers/ssd-power-loss-protection
-> * About yet another class of SSDs with power loss protection:
->   https://phisonblog.com/avoiding-ssd-data-loss-with-phisons-power-loss-protection-2/
 
-Yup, devices that behave as if they have non-volatile write caches.
-Such devices have been around for more than 30 years, they operate
-the same as devices without caches at all.
-
-> So far I haven't found any information about hard disks and power failure
-> handling. What I found is that most current hard disks protect data with ECC.
-> The ECC mechanism should provide good protection against reading data that
-> has never been written.  If a power failure occurs while a hard disk is writing
-> a physical block, can this result in a read error after power is restored? If
-> so, is this behavior allowed by storage standards?
-
-If a power fail results in read errors from the storage media being
-reported to the OS instead of the data that was present in the
-sector before the power failure, then the device is broken. If there
-is no data in the region being read because it has never been
-written, then it should return zeros (no data) rather than stale
-data or a media read error.
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+------Q05VG59npZNIcC9SezYoqUiUcYZ5r-Xh01bG8k0yiPfvookF=_470d8_--
