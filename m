@@ -2,128 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA510E81E1B
-	for <linux-block@archiver.kernel.org>; Fri,  6 Oct 2023 17:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F9D6E81E1F
+	for <linux-block@archiver.kernel.org>; Fri,  6 Oct 2023 17:22:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232891AbjJFRQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 Oct 2023 13:16:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46310 "EHLO
+        id S233005AbjJFRWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 Oct 2023 13:22:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232476AbjJFRQv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2023 13:16:51 -0400
-Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
-        by lindbergh.monkeyblade.net (Postfix) with SMTP id 50544C6
-        for <linux-block@vger.kernel.org>; Fri,  6 Oct 2023 10:16:45 -0700 (PDT)
-Received: (qmail 51731 invoked by uid 1000); 6 Oct 2023 13:16:43 -0400
-Date:   Fri, 6 Oct 2023 13:16:43 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        oneukum@suse.com, jonathan.derrick@linux.dev
-Subject: Re: [RFC PATCH 1/6] usb-storage: remove UNUSUAL_VENDOR_INTF macro
-Message-ID: <691010ef-d388-4ce0-b6a0-427bf77bea95@rowland.harvard.edu>
-References: <20231006125445.122380-1-gmazyland@gmail.com>
- <20231006125445.122380-2-gmazyland@gmail.com>
+        with ESMTP id S233011AbjJFRWO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2023 13:22:14 -0400
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D321DFB;
+        Fri,  6 Oct 2023 10:22:12 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-68bed2c786eso2040948b3a.0;
+        Fri, 06 Oct 2023 10:22:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696612932; x=1697217732;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UEjTiQOqZq/tiyoM37CeUZKubVviy0Hfhp5dRvbPE0c=;
+        b=YsNctJ0/shhjWo097m9U0+Axz93l4J8ST/Kf8XoiTiRB3dg1Vnna5RVXyySMpcjyfx
+         mGN2Ml1p9qPflgFDEDeH9sAqTyFp4+AzWGhl4kUGC3L9icHYEYQB7WnYRnBLNXR0FOnm
+         W5nIa6bVRuHecrHmavjx9azWy8TXSA75mJ7FwVrINtW0GfEz6IVVzXsRYgihvLITmm+m
+         8YyuamQcLUngN8XoG7XlSAwruJC8xwx3PDZtdYMaQ91sAgm0WZ6syqlya61aWiqw7e+5
+         9Y/95fbENTwSRe9geoSPOXhq7prhwKuzts7xYofCYgBvhQNw51uRXeLsGDXmqL7QIauq
+         NC0w==
+X-Gm-Message-State: AOJu0YwwhP/Ngd9CyNIYC7TI1+B4xEx+vhpH4t29MdZ8I2DEzYe888J6
+        6iHb6CT6kZq0p4Vu+4CvSko=
+X-Google-Smtp-Source: AGHT+IERDatMvRwiT/bQ534S3NzSEl+A3niSuO3D+OTniQoBISPNSqc1StabEZo+erszyh/gqRzPcg==
+X-Received: by 2002:a05:6a20:12d6:b0:153:4ea6:d127 with SMTP id v22-20020a056a2012d600b001534ea6d127mr10425406pzg.18.1696612931891;
+        Fri, 06 Oct 2023 10:22:11 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:ebdb:ae30:148c:2f33? ([2620:15c:211:201:ebdb:ae30:148c:2f33])
+        by smtp.gmail.com with ESMTPSA id q17-20020a62e111000000b0069327d0b491sm1719291pfh.195.2023.10.06.10.22.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Oct 2023 10:22:10 -0700 (PDT)
+Message-ID: <2bb2a4d0-4f1f-45f1-9196-f5d0d8ee1878@acm.org>
+Date:   Fri, 6 Oct 2023 10:22:08 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231006125445.122380-2-gmazyland@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 10/21] block: Add fops atomic write support
+Content-Language: en-US
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
+        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, djwong@kernel.org, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, chandan.babu@oracle.com, dchinner@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, tytso@mit.edu, jbongio@google.com,
+        linux-api@vger.kernel.org
+References: <5d26fa3b-ec34-bc39-ecfe-4616a04977ca@oracle.com>
+ <b7a6f380-c6fa-45e0-b727-ba804c6684e4@acm.org>
+ <yq1lecktuoo.fsf@ca-mkp.ca.oracle.com>
+ <db6a950b-1308-4ca1-9f75-6275118bdcf5@acm.org>
+ <yq1h6n7rume.fsf@ca-mkp.ca.oracle.com>
+ <34c08488-a288-45f9-a28f-a514a408541d@acm.org>
+ <yq1ttr6qoqp.fsf@ca-mkp.ca.oracle.com>
+ <a2077ddf-9a8f-4101-aeb9-605d6dee3c6e@acm.org>
+ <ZR86Z1OcO52a4BtH@dread.disaster.area>
+ <d976868a-d32c-43d1-b5da-ebbc4c8de468@acm.org>
+ <ZR+NiYIuKzEilkW3@dread.disaster.area>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ZR+NiYIuKzEilkW3@dread.disaster.area>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 06, 2023 at 02:54:40PM +0200, Milan Broz wrote:
-> This patch removes macro that was used only
-> by commit that was reverted in
->  commit ab4b71644a26d1ab92b987b2fd30e17c25e89f85
->  USB: storage: fix Huawei mode switching regression
-
-The standard format for referring to commits in patch descriptions is 
-like this:
-
-commit ab4b71644a26 ("USB: storage: fix Huawei mode switching regression")
-
-That is, the commit hash is abbreviated to its first 12 hex digits and 
-is followed by the commit title enclosed in parentheses and quotation 
-marks.
-
-Apart from that minor issue,
-
-Reviewed-by: Alan Stern <stern@rowland.harvard.edu>
-
-Alan Stern
-
+On 10/5/23 21:31, Dave Chinner wrote:
+> Then I don't see what your concern is.
 > 
-> Signed-off-by: Milan Broz <gmazyland@gmail.com>
-> ---
->  drivers/usb/storage/usb.c          | 12 ------------
->  drivers/usb/storage/usual-tables.c | 15 ---------------
->  2 files changed, 27 deletions(-)
+> Single sector writes are guaranteed atomic and have been for as long 
+> as I've worked in this game. OTOH, multi-sector writes are not 
+> guaranteed to be atomic - they can get torn on sector boundaries, but
+> the individual sectors within that write are guaranteed to be 
+> all-or-nothing.
 > 
-> diff --git a/drivers/usb/storage/usb.c b/drivers/usb/storage/usb.c
-> index 7b36a3334fb3..bb1fbeddc5aa 100644
-> --- a/drivers/usb/storage/usb.c
-> +++ b/drivers/usb/storage/usb.c
-> @@ -110,17 +110,6 @@ MODULE_PARM_DESC(quirks, "supplemental list of device IDs and their quirks");
->  	.useTransport = use_transport,	\
->  }
->  
-> -#define UNUSUAL_VENDOR_INTF(idVendor, cl, sc, pr, \
-> -		vendor_name, product_name, use_protocol, use_transport, \
-> -		init_function, Flags) \
-> -{ \
-> -	.vendorName = vendor_name,	\
-> -	.productName = product_name,	\
-> -	.useProtocol = use_protocol,	\
-> -	.useTransport = use_transport,	\
-> -	.initFunction = init_function,	\
-> -}
-> -
->  static const struct us_unusual_dev us_unusual_dev_list[] = {
->  #	include "unusual_devs.h"
->  	{ }		/* Terminating entry */
-> @@ -132,7 +121,6 @@ static const struct us_unusual_dev for_dynamic_ids =
->  #undef UNUSUAL_DEV
->  #undef COMPLIANT_DEV
->  #undef USUAL_DEV
-> -#undef UNUSUAL_VENDOR_INTF
->  
->  #ifdef CONFIG_LOCKDEP
->  
-> diff --git a/drivers/usb/storage/usual-tables.c b/drivers/usb/storage/usual-tables.c
-> index 529512827d8f..b3c3ea04c11c 100644
-> --- a/drivers/usb/storage/usual-tables.c
-> +++ b/drivers/usb/storage/usual-tables.c
-> @@ -26,20 +26,6 @@
->  #define USUAL_DEV(useProto, useTrans) \
->  { USB_INTERFACE_INFO(USB_CLASS_MASS_STORAGE, useProto, useTrans) }
->  
-> -/* Define the device is matched with Vendor ID and interface descriptors */
-> -#define UNUSUAL_VENDOR_INTF(id_vendor, cl, sc, pr, \
-> -			vendorName, productName, useProtocol, useTransport, \
-> -			initFunction, flags) \
-> -{ \
-> -	.match_flags = USB_DEVICE_ID_MATCH_INT_INFO \
-> -				| USB_DEVICE_ID_MATCH_VENDOR, \
-> -	.idVendor    = (id_vendor), \
-> -	.bInterfaceClass = (cl), \
-> -	.bInterfaceSubClass = (sc), \
-> -	.bInterfaceProtocol = (pr), \
-> -	.driver_info = (flags) \
-> -}
-> -
->  const struct usb_device_id usb_storage_usb_ids[] = {
->  #	include "unusual_devs.h"
->  	{ }		/* Terminating entry */
-> @@ -49,7 +35,6 @@ MODULE_DEVICE_TABLE(usb, usb_storage_usb_ids);
->  #undef UNUSUAL_DEV
->  #undef COMPLIANT_DEV
->  #undef USUAL_DEV
-> -#undef UNUSUAL_VENDOR_INTF
->  
->  /*
->   * The table of devices to ignore
-> -- 
-> 2.42.0
-> 
+> Any hardware device that does not guarantee single sector write 
+> atomicity (i.e. tears in the middle of a sector) is, by definition, 
+> broken. And we all know that broken hardware means nothing in the 
+> storage stack works as it should, so I just don't see what point you 
+> are trying to make...
+
+Do you agree that the above implies that it is not useful in patch 01/21
+of this series to track atomic_write_unit_min_bytes in the block layer
+nor to export this information to user space? The above implies that
+this parameter will always be equal to the logical block size. Writes to
+a single physical block happen atomically. If there are multiple logical
+blocks per physical block, the block device must serialize 
+read/modify/write cycles internally.
+
+Thanks,
+
+Bart.
