@@ -2,101 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DAFE936FB
-	for <linux-block@archiver.kernel.org>; Sat,  7 Oct 2023 07:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 334D5E9371B
+	for <linux-block@archiver.kernel.org>; Sat,  7 Oct 2023 07:30:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343578AbjJGHGJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Oct 2023 03:06:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53194 "EHLO
+        id S1343721AbjJGHaN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 Oct 2023 03:30:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343618AbjJGHGI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Oct 2023 03:06:08 -0400
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC1DABF;
-        Sat,  7 Oct 2023 00:06:03 -0700 (PDT)
-X-UUID: f6f2e95264df11eea33bb35ae8d461a2-20231007
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=Le2uEJkChO2HUGa5K2hUsEoIn2/h+RuIAwUyZABd/Fg=;
-        b=WVvFhP66Bn09GC4ehoj3v7McO/7dAlm7FQtEoYyJGpz57+kyy9HntBI3tFKbr9fnXXhC1UXvcRpauw3fk464H9v2p/QJFmM8Dxl/x0bxWCdg0ITbuKVXbJHJePBNUML7jWG5UHG4IdQFhdcrph3qE7k7wvireaH3EL6hWmeQ4uE=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.32,REQID:9a829602-2bb3-4276-9fbe-0017bbb17f19,IP:0,U
-        RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-        :release,TS:-5
-X-CID-META: VersionHash:5f78ec9,CLOUDID:cd89c814-4929-4845-9571-38c601e9c3c9,B
-        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-        RL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,
-        DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: f6f2e95264df11eea33bb35ae8d461a2-20231007
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
-        (envelope-from <mark-pk.tsai@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 1482502868; Sat, 07 Oct 2023 15:05:57 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Sat, 7 Oct 2023 15:05:56 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Sat, 7 Oct 2023 15:05:56 +0800
-From:   Mark-PK Tsai <mark-pk.tsai@mediatek.com>
-To:     Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        with ESMTP id S1343709AbjJGHaM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Oct 2023 03:30:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D265DE9
+        for <linux-block@vger.kernel.org>; Sat,  7 Oct 2023 00:29:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696663764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=P2XYj63JutQ2NopEHr3614ehw4VQD2DCO6wPQwn2C2A=;
+        b=fF2gTVqKhCMw8tn+VTfkd4YlXFFKXVkHJhpoyX4w+9zV3eL/T9m4l+hVod/d6XsGHvs4DU
+        actVjiwvkMJy0GI5h80j8Mf8MDJ+8ZqpdZUyoo6wORMMVF4mEgwtp94c6825T7mNC0ta6N
+        4hThjnpMCKYKZ8NIGiSJeAX/zZ9s/rc=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-649-Id4xzfQGNO-7JeT9k6sb-w-1; Sat, 07 Oct 2023 03:29:18 -0400
+X-MC-Unique: Id4xzfQGNO-7JeT9k6sb-w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A24B8380200F;
+        Sat,  7 Oct 2023 07:29:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.226])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D59FCC15BB8;
+        Sat,  7 Oct 2023 07:29:14 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <356ef449-44bf-539f-76c0-7fe9c6e713bb@google.com>
+References: <356ef449-44bf-539f-76c0-7fe9c6e713bb@google.com> <20230925120309.1731676-9-dhowells@redhat.com> <20230925120309.1731676-1-dhowells@redhat.com> <1809398.1696238751@warthog.procyon.org.uk>
+To:     Hugh Dickins <hughd@google.com>
+Cc:     dhowells@redhat.com, Christian Brauner <brauner@kernel.org>,
         Jens Axboe <axboe@kernel.dk>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno 
-        <angelogioacchino.delregno@collabora.com>
-CC:     <yj.chiang@mediatek.com>, Mark-PK Tsai <mark-pk.tsai@mediatek.com>,
-        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>
-Subject: [PATCH] zram: use copy_page for full page copy
-Date:   Sat, 7 Oct 2023 15:05:53 +0800
-Message-ID: <20231007070554.8657-1-mark-pk.tsai@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        David Laight <David.Laight@aculab.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH next] iov_iter: fix copy_page_from_iter_atomic()
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--5.565200-8.000000
-X-TMASE-MatchedRID: 7599MfAx46VCTeJ8Ii+TOrhzZI/dfrdOQl/FdRYkUZLfUZT83lbkECpJ
-        3T68EJKPEwte8QHPZve6/wFvLeWXhqYpNU5HIIOKngIgpj8eDcBpkajQR5gb3savT21DsLD/UEh
-        Wy9W70AEgBwKKRHe+r7RUJtZc0bvVaYlP96BGyA9Gf+arKp5f1G0XrKRZbupyMWoRxFL7SRo=
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--5.565200-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: C9F30F95FEA5B0A71375788D323ADC74DC144382AC8BD65FBB276596CD102A452000:8
-X-MTK:  N
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <231154.1696663754.1@warthog.procyon.org.uk>
+Date:   Sat, 07 Oct 2023 08:29:14 +0100
+Message-ID: <231155.1696663754@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some architectures, such as arm, have implemented
-optimized copy_page for full page copying.
+Hugh Dickins <hughd@google.com> wrote:
 
-Replace the full page memcpy with copy_page to
-take advantage of the optimization.
+> -		__copy_from_iter(p, n, i);
+> +		n = __copy_from_iter(p, n, i);
 
-Signed-off-by: Mark-PK Tsai <mark-pk.tsai@mediatek.com>
----
- drivers/block/zram/zram_drv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yeah, that looks right.  Can you fold it in, Christian?
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index d77d3664ca08..58700dd73d1d 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1338,7 +1338,7 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
- 	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
- 	if (size == PAGE_SIZE) {
- 		dst = kmap_atomic(page);
--		memcpy(dst, src, PAGE_SIZE);
-+		copy_page(dst, src);
- 		kunmap_atomic(dst);
- 		ret = 0;
- 	} else {
--- 
-2.18.0
+David
 
