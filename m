@@ -2,98 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE19E95A61
-	for <linux-block@archiver.kernel.org>; Sat,  7 Oct 2023 15:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BB5E95A69
+	for <linux-block@archiver.kernel.org>; Sat,  7 Oct 2023 18:12:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343986AbjJGPSK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Oct 2023 11:18:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48700 "EHLO
+        id S234194AbjJGSMg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 Oct 2023 14:12:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343960AbjJGPSJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Oct 2023 11:18:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28BCFBA
-        for <linux-block@vger.kernel.org>; Sat,  7 Oct 2023 08:17:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696691841;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PPtQSncuXiGIg7RBOh+ShvADCBAgeQPrkAF7VWeTPLA=;
-        b=GT6dStVzZdvzg2Om4Y1MSThfyvc9HpOqd4XH3TZvFucM16WiJoGU0FLZd/M4oGlibdG5PN
-        jfmVFGOFGV7ojyxcfiN6hcsD+QwVrGD2zbRnNnWoBQ9eVhliVHsryiqimP31LfQNwILz9z
-        QbSKXV+0druArXujbr0nry2hvAVoKgw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-677-fko8I_r8MS2GPNjMFFWdRg-1; Sat, 07 Oct 2023 11:17:10 -0400
-X-MC-Unique: fko8I_r8MS2GPNjMFFWdRg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1FCE885A5A8;
-        Sat,  7 Oct 2023 15:17:10 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.224.9])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 1BA47215670B;
-        Sat,  7 Oct 2023 15:17:06 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-        oleg@redhat.com; Sat,  7 Oct 2023 17:16:11 +0200 (CEST)
-Date:   Sat, 7 Oct 2023 17:16:08 +0200
-From:   Oleg Nesterov <oleg@redhat.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Li Nan <linan666@huaweicloud.com>,
-        Khazhy Kumykov <khazhy@chromium.org>, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
- throttle is enabled
-Message-ID: <20231007151607.GA24726@redhat.com>
-References: <20230928015858.1809934-1-linan666@huaweicloud.com>
- <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
- <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com>
- <20231005162417.GA32420@redhat.com>
- <0a8f34aa-ced9-e613-3e5f-b5e53a3ef3d9@huaweicloud.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0a8f34aa-ced9-e613-3e5f-b5e53a3ef3d9@huaweicloud.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+        with ESMTP id S229742AbjJGSMf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Oct 2023 14:12:35 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DD55AB
+        for <linux-block@vger.kernel.org>; Sat,  7 Oct 2023 11:12:33 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B2416C433C8;
+        Sat,  7 Oct 2023 18:12:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696702352;
+        bh=UwWURvoxkhcwhFDXkCPwTaae8vAWeEt856ynk1fFU/Q=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=Hy94FVC/WdKnIEhSn6KbEEggxxAXCL1VyGbalKkQrNu1AeD0fgNxRVpOir+9IoDD0
+         Eqy9j9cGOX83KFw+PZsGsZuai/NzFLUj+nWK1+2n1q0bS05hv4rbVHzWARjOwpfngc
+         a0cvXISlMBIJkqOyCzvd5yaWJekGGv6GES0wghrhSkoUhAZibAjWhAhvPa9rjr3FDA
+         KWoPzyQsa0fZYyF+E36Gv0+n4IoIjrOXXVBdQAvp/CcXF+MiqYeJDW0y+fYIzjL9J0
+         zH3ba0yV3jTFX8qpHqWTPbtSoYT6ZBv2yORQogP+vnv4sXO72Y/yEY1Jm91B4jJ3R6
+         LkgCLEUsCNv9Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 942F3C41671;
+        Sat,  7 Oct 2023 18:12:32 +0000 (UTC)
+Subject: Re: [dm-devel] [git pull] device mapper fixes for 6.6-rc5
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <ZSCVUa3D4BAKGsLL@redhat.com>
+References: <ZSCVUa3D4BAKGsLL@redhat.com>
+X-PR-Tracked-List-Id: device-mapper development <dm-devel.redhat.com>
+X-PR-Tracked-Message-Id: <ZSCVUa3D4BAKGsLL@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.6/dm-fixes-2
+X-PR-Tracked-Commit-Id: 3da5d2de92387a8322965c7fb1365f7cae690e5a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4aef108a4d60bb52bf4e8e2ed9444afe2cdfe6a9
+Message-Id: <169670235249.17141.917993586452703729.pr-tracker-bot@kernel.org>
+Date:   Sat, 07 Oct 2023 18:12:32 +0000
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Alasdair G Kergon <agk@redhat.com>,
+        Fedor Pchelkin <pchelkin@ispras.ru>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/07, Yu Kuai wrote:
->
-> >>>probably need to remove the mul_u64_u64_div_u64 and check for
-> >>>overflow/potential overflow ourselves?
-> >
-> >probably yes...
->
-> How about this?
->
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 1101fb6f6cc8..5482c316a103 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -723,6 +723,10 @@ static unsigned int calculate_io_allowed(u32
-> iops_limit,
->
->  static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long
-> jiffy_elapsed)
->  {
-> +       if (jiffy_elapsed > HZ &&
-> +           bps_limit > mul_u64_u64_div_u64(U64_MAX, (u64)HZ,
-> (u64)jiffy_elapsed);
-> +               return U64_MAX;
-> +
+The pull request you sent on Fri, 6 Oct 2023 19:16:33 -0400:
 
-I can't suggest anything better...
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.6/dm-fixes-2
 
-but I do not know if it is possible that HZ > jiffy_elapsed. If yes, then
-mul_u64_u64_div_u64() above is not safe too.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4aef108a4d60bb52bf4e8e2ed9444afe2cdfe6a9
 
-Oleg.
+Thank you!
 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
