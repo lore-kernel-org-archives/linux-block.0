@@ -2,90 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F843E95A82
-	for <linux-block@archiver.kernel.org>; Sun,  8 Oct 2023 11:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 355FBE95A82
+	for <linux-block@archiver.kernel.org>; Sun,  8 Oct 2023 13:15:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344735AbjJHLiE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Oct 2023 07:38:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38110 "EHLO
+        id S1344799AbjJHNPc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Oct 2023 09:15:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344729AbjJHLiD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Oct 2023 07:38:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF8939D
-        for <linux-block@vger.kernel.org>; Sun,  8 Oct 2023 04:37:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696765041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dd6ivPkoy5OU8m6zrjUxdg/2ojaw9JTGsy7cUreFIZk=;
-        b=iYRvBHBItu9soFKu3KZm/pxTZpTC9osjXTfNL0edz6bwHBVwRoT8sDBTvHEUG7UmfgdJHn
-        jaMlsqftugZSO3S0v+BItw9QfaERgj2ebRcE1BHVBcA6M/OhC9Vray9ZjGeJvbIO7o8BNm
-        Czm1CTG0gXpLzjadom811dY3eVPlukA=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-100-_NdAhrgfP9K3XOElsbPEvw-1; Sun, 08 Oct 2023 07:37:06 -0400
-X-MC-Unique: _NdAhrgfP9K3XOElsbPEvw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C0BE93804522;
-        Sun,  8 Oct 2023 11:37:05 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.224.9])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 625B61054FC0;
-        Sun,  8 Oct 2023 11:37:02 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-        oleg@redhat.com; Sun,  8 Oct 2023 13:36:07 +0200 (CEST)
-Date:   Sun, 8 Oct 2023 13:36:03 +0200
-From:   Oleg Nesterov <oleg@redhat.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Li Nan <linan666@huaweicloud.com>,
-        Khazhy Kumykov <khazhy@chromium.org>, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
- throttle is enabled
-Message-ID: <20231008113602.GB24726@redhat.com>
-References: <20230928015858.1809934-1-linan666@huaweicloud.com>
- <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
- <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com>
- <20231005162417.GA32420@redhat.com>
- <0a8f34aa-ced9-e613-3e5f-b5e53a3ef3d9@huaweicloud.com>
- <20231007151607.GA24726@redhat.com>
- <21843836-7265-f903-a7d5-e77b07dd5a71@huaweicloud.com>
+        with ESMTP id S1344784AbjJHNPb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Oct 2023 09:15:31 -0400
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+        by lindbergh.monkeyblade.net (Postfix) with SMTP id CE16AB9
+        for <linux-block@vger.kernel.org>; Sun,  8 Oct 2023 06:15:28 -0700 (PDT)
+Received: (qmail 109736 invoked by uid 1000); 8 Oct 2023 09:15:27 -0400
+Date:   Sun, 8 Oct 2023 09:15:27 -0400
+From:   Alan Stern <stern@rowland.harvard.edu>
+To:     Milan Broz <gmazyland@gmail.com>
+Cc:     linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        oneukum@suse.com, jonathan.derrick@linux.dev
+Subject: Re: [RFC PATCH 4/6] usb-storage,uas: use host helper to generate
+ driver info
+Message-ID: <a80f9bde-5969-498e-8dcf-9af9848d9c2a@rowland.harvard.edu>
+References: <20231006125445.122380-1-gmazyland@gmail.com>
+ <20231006125445.122380-5-gmazyland@gmail.com>
+ <65bd429f-6740-4aa6-af00-e72d27074115@rowland.harvard.edu>
+ <e71d958f-8954-465e-a296-c09763d0e3a1@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <21843836-7265-f903-a7d5-e77b07dd5a71@huaweicloud.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+In-Reply-To: <e71d958f-8954-465e-a296-c09763d0e3a1@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/08, Yu Kuai wrote:
->
-> >>  static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long
-> >>jiffy_elapsed)
-> >>  {
-> >>+       if (jiffy_elapsed > HZ &&
-> >>+           bps_limit > mul_u64_u64_div_u64(U64_MAX, (u64)HZ,
-> >>(u64)jiffy_elapsed);
-> >>+               return U64_MAX;
-> >>+
-> >
-> >I can't suggest anything better...
-> >
-> >but I do not know if it is possible that HZ > jiffy_elapsed. If yes, then
-> >mul_u64_u64_div_u64() above is not safe too.
->
-> Well, 'jiffy_elapsed > HZ' is judged before mul_u64_u64_div_u64().
+On Sun, Oct 08, 2023 at 12:41:42PM +0200, Milan Broz wrote:
+> On 10/6/23 20:44, Alan Stern wrote:
+> > Okay, this one is a bit of a mess.  Unavoidably so, I'm afraid.
+> 
+> yes. What I need to know if it is acceptable approach (I spent quite
+> a lot of time on it and still have no better idea...  At least with
+> a patch that is not too invasive).
 
-Yes, sorry, somehow I didn't notice this check.
+Yes, the basic idea is acceptable (subject to the comments in my 
+earlier email).  In fact, it's probably the best we can do, given the 
+constraints we face.
 
-Oleg.
+> Here I compared generated tables with old pre-processor generated
+> and it looks the same. (Also I keep it on kernel.org branch, so
+> 0-day bot reports obvious mistakes.)
+> 
+> ...
+> 
+> > > This translation is unnecessary for a 64-bit system, but I keep it
+> > > in place for simplicity.
+> > > (Also, I did not find a reliable way a host-compiled program can detect
+> > > that the target platform has 32-bit unsigned long (usual macros do not
+> > > work here!).
+> > 
+> > How about testing CONFIG_64BIT?  Would that not do what you want?
+> 
+> Yes, that was my last idea too, but I am not sure if it correct (and I have
+> no longer access to more exotic platforms to check it).
 
+I'm reasonably sure that it's the right thing to check.
+
+> Also using kernel config defines in host-compiled code is tricky, but
+> it should be possible.
+
+Yeah; I'm not certain about how to do it.  One possibility is simply to 
+parse the .config file directly at runtime, if the Kbuild system doesn't 
+provide the CONFIG_* macros when compiling a host program.
+
+> I will try to ask my former colleagues, though.
+> 
+> > However, I agree that it's better to keep things simple by using the
+> > same code base for 32-bit and 64-bit kernels.
+> 
+> Yes, that was my plan for now. So you want to keep it as it is?
+> 
+> We can add optimization for 64-bit with additional patch later, it should be
+> pretty easy once I know how to detect that target platform really has
+> 64-bit unsigned long so no translation is needed.
+
+Yes, I agree that this is the approach we should take.
+
+Alan Stern
