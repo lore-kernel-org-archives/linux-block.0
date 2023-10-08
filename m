@@ -2,64 +2,159 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BB5E95A69
-	for <linux-block@archiver.kernel.org>; Sat,  7 Oct 2023 18:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A4BAE95A67
+	for <linux-block@archiver.kernel.org>; Sun,  8 Oct 2023 00:49:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234194AbjJGSMg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 Oct 2023 14:12:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43094 "EHLO
+        id S234245AbjJHAtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 Oct 2023 20:49:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbjJGSMf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Oct 2023 14:12:35 -0400
+        with ESMTP id S234199AbjJHAt3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Oct 2023 20:49:29 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DD55AB
-        for <linux-block@vger.kernel.org>; Sat,  7 Oct 2023 11:12:33 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B2416C433C8;
-        Sat,  7 Oct 2023 18:12:32 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 257E4F0;
+        Sat,  7 Oct 2023 17:49:17 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6E20C433CB;
+        Sun,  8 Oct 2023 00:49:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696702352;
-        bh=UwWURvoxkhcwhFDXkCPwTaae8vAWeEt856ynk1fFU/Q=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Hy94FVC/WdKnIEhSn6KbEEggxxAXCL1VyGbalKkQrNu1AeD0fgNxRVpOir+9IoDD0
-         Eqy9j9cGOX83KFw+PZsGsZuai/NzFLUj+nWK1+2n1q0bS05hv4rbVHzWARjOwpfngc
-         a0cvXISlMBIJkqOyCzvd5yaWJekGGv6GES0wghrhSkoUhAZibAjWhAhvPa9rjr3FDA
-         KWoPzyQsa0fZYyF+E36Gv0+n4IoIjrOXXVBdQAvp/CcXF+MiqYeJDW0y+fYIzjL9J0
-         zH3ba0yV3jTFX8qpHqWTPbtSoYT6ZBv2yORQogP+vnv4sXO72Y/yEY1Jm91B4jJ3R6
-         LkgCLEUsCNv9Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 942F3C41671;
-        Sat,  7 Oct 2023 18:12:32 +0000 (UTC)
-Subject: Re: [dm-devel] [git pull] device mapper fixes for 6.6-rc5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <ZSCVUa3D4BAKGsLL@redhat.com>
-References: <ZSCVUa3D4BAKGsLL@redhat.com>
-X-PR-Tracked-List-Id: device-mapper development <dm-devel.redhat.com>
-X-PR-Tracked-Message-Id: <ZSCVUa3D4BAKGsLL@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.6/dm-fixes-2
-X-PR-Tracked-Commit-Id: 3da5d2de92387a8322965c7fb1365f7cae690e5a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 4aef108a4d60bb52bf4e8e2ed9444afe2cdfe6a9
-Message-Id: <169670235249.17141.917993586452703729.pr-tracker-bot@kernel.org>
-Date:   Sat, 07 Oct 2023 18:12:32 +0000
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Alasdair G Kergon <agk@redhat.com>,
-        Fedor Pchelkin <pchelkin@ispras.ru>
+        s=k20201202; t=1696726153;
+        bh=+QOhD3hqe/bQqo3/H0Mj9CkYa35+QgRqGZU7TWkD8c8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=EBY9rpWS76YjtVtxYSuh1R2rd5WIS56yLG2sPL3WXE/HevsEHqFUPAhXaNSh55a1O
+         n6nFaK658XCKwCpZDkRmPnmpKH53JM7u8Lt5KgXk6onp4b7ZqgyBMbDhzhPqpb+c5L
+         NZXcjb6C4J8y2Txfb9tuqFI4IcPVBtY/05D3zozIB9aSn72gd7h7ENIWKpzt3jV8RO
+         aPWgy4XzvGqdioJhSoL0vd2wHbJ2iEKeR86cGa+FEpzdZNfF5uxVD+i6v/r+7f7qEg
+         eYib6IZscoxFXxd8lSe0CI+iNmXuIv9Z9FeNLH66RLyNA0TZZkqd4ZV5LemsMaZyj9
+         8DgO52H7xtiUQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Sasha Levin <sashal@kernel.org>, axboe@kernel.dk,
+        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.5 11/18] rbd: move rbd_dev_refresh() definition
+Date:   Sat,  7 Oct 2023 20:48:45 -0400
+Message-Id: <20231008004853.3767621-11-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231008004853.3767621-1-sashal@kernel.org>
+References: <20231008004853.3767621-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.5.6
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 6 Oct 2023 19:16:33 -0400:
+From: Ilya Dryomov <idryomov@gmail.com>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.6/dm-fixes-2
+[ Upstream commit 0b035401c57021fc6c300272cbb1c5a889d4fe45 ]
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/4aef108a4d60bb52bf4e8e2ed9444afe2cdfe6a9
+Move rbd_dev_refresh() definition further down to avoid having to
+move struct parent_image_info definition in the next commit.  This
+spares some forward declarations too.
 
-Thank you!
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+Reviewed-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/rbd.c | 68 ++++++++++++++++++++++-----------------------
+ 1 file changed, 33 insertions(+), 35 deletions(-)
 
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 2328cc05be36e..91e9c709b8716 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -633,8 +633,6 @@ static void rbd_dev_remove_parent(struct rbd_device *rbd_dev);
+ 
+ static int rbd_dev_refresh(struct rbd_device *rbd_dev);
+ static int rbd_dev_v2_header_onetime(struct rbd_device *rbd_dev);
+-static int rbd_dev_header_info(struct rbd_device *rbd_dev);
+-static int rbd_dev_v2_parent_info(struct rbd_device *rbd_dev);
+ static const char *rbd_dev_v2_snap_name(struct rbd_device *rbd_dev,
+ 					u64 snap_id);
+ static int _rbd_dev_v2_snap_size(struct rbd_device *rbd_dev, u64 snap_id,
+@@ -4931,39 +4929,6 @@ static void rbd_dev_update_size(struct rbd_device *rbd_dev)
+ 	}
+ }
+ 
+-static int rbd_dev_refresh(struct rbd_device *rbd_dev)
+-{
+-	u64 mapping_size;
+-	int ret;
+-
+-	down_write(&rbd_dev->header_rwsem);
+-	mapping_size = rbd_dev->mapping.size;
+-
+-	ret = rbd_dev_header_info(rbd_dev);
+-	if (ret)
+-		goto out;
+-
+-	/*
+-	 * If there is a parent, see if it has disappeared due to the
+-	 * mapped image getting flattened.
+-	 */
+-	if (rbd_dev->parent) {
+-		ret = rbd_dev_v2_parent_info(rbd_dev);
+-		if (ret)
+-			goto out;
+-	}
+-
+-	rbd_assert(!rbd_is_snap(rbd_dev));
+-	rbd_dev->mapping.size = rbd_dev->header.image_size;
+-
+-out:
+-	up_write(&rbd_dev->header_rwsem);
+-	if (!ret && mapping_size != rbd_dev->mapping.size)
+-		rbd_dev_update_size(rbd_dev);
+-
+-	return ret;
+-}
+-
+ static const struct blk_mq_ops rbd_mq_ops = {
+ 	.queue_rq	= rbd_queue_rq,
+ };
+@@ -7043,6 +7008,39 @@ static int rbd_dev_image_probe(struct rbd_device *rbd_dev, int depth)
+ 	return ret;
+ }
+ 
++static int rbd_dev_refresh(struct rbd_device *rbd_dev)
++{
++	u64 mapping_size;
++	int ret;
++
++	down_write(&rbd_dev->header_rwsem);
++	mapping_size = rbd_dev->mapping.size;
++
++	ret = rbd_dev_header_info(rbd_dev);
++	if (ret)
++		goto out;
++
++	/*
++	 * If there is a parent, see if it has disappeared due to the
++	 * mapped image getting flattened.
++	 */
++	if (rbd_dev->parent) {
++		ret = rbd_dev_v2_parent_info(rbd_dev);
++		if (ret)
++			goto out;
++	}
++
++	rbd_assert(!rbd_is_snap(rbd_dev));
++	rbd_dev->mapping.size = rbd_dev->header.image_size;
++
++out:
++	up_write(&rbd_dev->header_rwsem);
++	if (!ret && mapping_size != rbd_dev->mapping.size)
++		rbd_dev_update_size(rbd_dev);
++
++	return ret;
++}
++
+ static ssize_t do_rbd_add(const char *buf, size_t count)
+ {
+ 	struct rbd_device *rbd_dev = NULL;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.40.1
+
