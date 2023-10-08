@@ -2,89 +2,124 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 355FBE95A82
-	for <linux-block@archiver.kernel.org>; Sun,  8 Oct 2023 13:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5EBE95A92
+	for <linux-block@archiver.kernel.org>; Sun,  8 Oct 2023 23:27:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344799AbjJHNPc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 8 Oct 2023 09:15:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40106 "EHLO
+        id S1344975AbjJHX1g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 8 Oct 2023 19:27:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344784AbjJHNPb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Oct 2023 09:15:31 -0400
-Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
-        by lindbergh.monkeyblade.net (Postfix) with SMTP id CE16AB9
-        for <linux-block@vger.kernel.org>; Sun,  8 Oct 2023 06:15:28 -0700 (PDT)
-Received: (qmail 109736 invoked by uid 1000); 8 Oct 2023 09:15:27 -0400
-Date:   Sun, 8 Oct 2023 09:15:27 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        oneukum@suse.com, jonathan.derrick@linux.dev
-Subject: Re: [RFC PATCH 4/6] usb-storage,uas: use host helper to generate
- driver info
-Message-ID: <a80f9bde-5969-498e-8dcf-9af9848d9c2a@rowland.harvard.edu>
-References: <20231006125445.122380-1-gmazyland@gmail.com>
- <20231006125445.122380-5-gmazyland@gmail.com>
- <65bd429f-6740-4aa6-af00-e72d27074115@rowland.harvard.edu>
- <e71d958f-8954-465e-a296-c09763d0e3a1@gmail.com>
+        with ESMTP id S1344965AbjJHX1f (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Oct 2023 19:27:35 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9BFEB3
+        for <linux-block@vger.kernel.org>; Sun,  8 Oct 2023 16:27:32 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-27b22de9b5bso1973821a91.3
+        for <linux-block@vger.kernel.org>; Sun, 08 Oct 2023 16:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1696807652; x=1697412452; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aS5wnORfWJ02Ic4UlNgXgG7erca/6rPk7A+dIWgu1xE=;
+        b=ar+F8kCJJYhocpH7678ttAXERmoI3yDavLymH+R8n+35dyDP58p8hJzK8gVAcQnWwh
+         RirkN49+Qt+O1zUgU1OfDzkBhTeE7796uHFvZHa0gFv1zP8QKIuNAFcbsljod+Gb60La
+         MiIgpSGI49duQ1w0jRtwOZUBq8c/h1RdDsSXqtVptZrGgUVqObEK4jKbEN+3G+hlm0ml
+         ePJVD+GKPlQoTH1agTEdIi2/BnJZj1h1L0HyVx2nEp9mWs0vsmmgb5Sk3UHSkc6v7D73
+         BYJ099PQo8RtsN0oxQog8POX7NVf/yv46dlGYNpDNeCGi8L0E4fi7PhSIhNw4HyeN8f9
+         AY/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696807652; x=1697412452;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aS5wnORfWJ02Ic4UlNgXgG7erca/6rPk7A+dIWgu1xE=;
+        b=KqcTShGQGYsZIQH0E/gKxxjjMdfucX2pc2l8t6UhTwr9F1WqZf50qR7kJrVOnvKIDF
+         /KBh7RMdK7sZpZMmD/GcHPjoc1IrM9pV3CpQTqzzt/klq2I9D9cqnYrx61yrtDIajgbZ
+         7+MvsyNFj8FUR+P3p3JtzBdEYNX7uZZq5/BQn/6WDtM5aeb8XHYxqbPWCvXhtzh2H6zQ
+         a+3gabMkabyaqsusl7D13EQRjakUA17Xox4wcu3vuTFuStCRUpIxF3HdEwX4XiDoEHLo
+         95q+9HWsV5m4w4GPOpwlrWzxZGfeq0KJ9qZlYLi7IQ2WH3BECRqx+Nd0egYvPEFK3did
+         fACw==
+X-Gm-Message-State: AOJu0YwRN/WAmenKfY9Khp8MFN5a/d7pDjg1RD+AB6LgZCPrNXGhP/Fp
+        +Lu08GCH4r6ECBuk9cMBXE/OEA==
+X-Google-Smtp-Source: AGHT+IGc6rajtNnnrMTfh5c1WN82wupHs7ltG+HbFIhM8I8+f4cQIL9QXxrn5Dk/ibag1JxJfP4QTg==
+X-Received: by 2002:a17:90b:4b06:b0:273:e689:8dfc with SMTP id lx6-20020a17090b4b0600b00273e6898dfcmr11740281pjb.32.1696807652373;
+        Sun, 08 Oct 2023 16:27:32 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
+        by smtp.gmail.com with ESMTPSA id az12-20020a17090b028c00b0026d4100e0e8sm6954450pjb.10.2023.10.08.16.27.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Oct 2023 16:27:31 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qpdBI-00BHvI-0p;
+        Mon, 09 Oct 2023 10:27:28 +1100
+Date:   Mon, 9 Oct 2023 10:27:28 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        "Darrick J. Wong" <djwong@kernel.org>
+Subject: Re: [PATCH v8 5/5] block: Pass unshare intent via REQ_OP_PROVISION
+Message-ID: <ZSM64EOTVyKNkc/X@dread.disaster.area>
+References: <20231007012817.3052558-1-sarthakkukreti@chromium.org>
+ <20231007012817.3052558-6-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e71d958f-8954-465e-a296-c09763d0e3a1@gmail.com>
+In-Reply-To: <20231007012817.3052558-6-sarthakkukreti@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Oct 08, 2023 at 12:41:42PM +0200, Milan Broz wrote:
-> On 10/6/23 20:44, Alan Stern wrote:
-> > Okay, this one is a bit of a mess.  Unavoidably so, I'm afraid.
+On Fri, Oct 06, 2023 at 06:28:17PM -0700, Sarthak Kukreti wrote:
+> Allow REQ_OP_PROVISION to pass in an extra REQ_UNSHARE bit to
+> annotate unshare requests to underlying layers. Layers that support
+> FALLOC_FL_UNSHARE will be able to use this as an indicator of which
+> fallocate() mode to use.
 > 
-> yes. What I need to know if it is acceptable approach (I spent quite
-> a lot of time on it and still have no better idea...  At least with
-> a patch that is not too invasive).
+> Suggested-by: Darrick J. Wong <djwong@kernel.org>
+> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> ---
+>  block/blk-lib.c           |  6 +++++-
+>  block/fops.c              |  6 ++++--
+>  drivers/block/loop.c      | 35 +++++++++++++++++++++++++++++------
+>  include/linux/blk_types.h |  3 +++
+>  include/linux/blkdev.h    |  3 ++-
+>  5 files changed, 43 insertions(+), 10 deletions(-)
 
-Yes, the basic idea is acceptable (subject to the comments in my 
-earlier email).  In fact, it's probably the best we can do, given the 
-constraints we face.
+I have no idea how filesystems (or even userspace applications, for
+that matter) are supposed to use this - they have no idea if the
+underlying block device has shared blocks for LBA ranges it already
+has allocated and provisioned. IOWs, I don't know waht the semantics
+of this function is, it is not documented anywhere, and there is no
+use case present that tells me how it might get used.
 
-> Here I compared generated tables with old pre-processor generated
-> and it looks the same. (Also I keep it on kernel.org branch, so
-> 0-day bot reports obvious mistakes.)
-> 
-> ...
-> 
-> > > This translation is unnecessary for a 64-bit system, but I keep it
-> > > in place for simplicity.
-> > > (Also, I did not find a reliable way a host-compiled program can detect
-> > > that the target platform has 32-bit unsigned long (usual macros do not
-> > > work here!).
-> > 
-> > How about testing CONFIG_64BIT?  Would that not do what you want?
-> 
-> Yes, that was my last idea too, but I am not sure if it correct (and I have
-> no longer access to more exotic platforms to check it).
+Yes, unshare at the file level means the filesystem tries to break
+internal data extent sharing, but if the block layers or backing
+devices are doing deduplication and sharing unknown to the
+application or filesystem, how do they ever know that this operation
+might need to be performed? In what cases do we need to be able to
+unshare block device ranges, and how is that different to the
+guarantees that REQ_PROVISION is already supposed to give for
+provisioned ranges that are then subsequently shared by the block
+device (e.g. by snapshots)?
 
-I'm reasonably sure that it's the right thing to check.
+Also, from an API perspective, this is an "unshare" data operation,
+not a "provision" operation. Hence I'd suggest that the API should
+be blkdev_issue_unshare() rather than optional behaviour to
+_provision() which - before this patch - had clear and well defined
+meaning....
 
-> Also using kernel config defines in host-compiled code is tricky, but
-> it should be possible.
+Cheers,
 
-Yeah; I'm not certain about how to do it.  One possibility is simply to 
-parse the .config file directly at runtime, if the Kbuild system doesn't 
-provide the CONFIG_* macros when compiling a host program.
-
-> I will try to ask my former colleagues, though.
-> 
-> > However, I agree that it's better to keep things simple by using the
-> > same code base for 32-bit and 64-bit kernels.
-> 
-> Yes, that was my plan for now. So you want to keep it as it is?
-> 
-> We can add optimization for 64-bit with additional patch later, it should be
-> pretty easy once I know how to detect that target platform really has
-> 64-bit unsigned long so no translation is needed.
-
-Yes, I agree that this is the approach we should take.
-
-Alan Stern
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
