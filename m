@@ -2,126 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93812CD613A
-	for <linux-block@archiver.kernel.org>; Mon,  9 Oct 2023 20:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B5AFE81E16
+	for <linux-block@archiver.kernel.org>; Mon,  9 Oct 2023 22:03:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378611AbjJIUUc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Oct 2023 16:20:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56408 "EHLO
+        id S1378754AbjJIWC6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Oct 2023 18:02:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378623AbjJIUU3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2023 16:20:29 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4DE1E4
-        for <linux-block@vger.kernel.org>; Mon,  9 Oct 2023 13:20:26 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2c00df105f8so62210171fa.2
-        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2023 13:20:26 -0700 (PDT)
+        with ESMTP id S1378738AbjJIWC6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2023 18:02:58 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A00BA3
+        for <linux-block@vger.kernel.org>; Mon,  9 Oct 2023 15:02:56 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-692eed30152so3678946b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2023 15:02:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1696882824; x=1697487624; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y+Vz1bOKclq9QVOuzcbH1aPgn89tmrsRZHycaiZatEw=;
-        b=ZXApSf+xs3DWZi9glvHF1ftND6nJHcuKyZNMhSXqRfpzyjpe56h3jtGPbf0ReTYeIR
-         RoqIRMnNlo5c4iYjSTI3QLMoSrSL3Rs4N1wpJYkT7wNvk55NM8Kj09YWfoihk3uwDV0N
-         j3DLQGPgNtVUZ1Xe3iQddIydsZZGVwfsNomkvREBIGMDV5eJ9Swc92sSWIp/4FFJLqSW
-         cxpBEqBDyMXZseJ7uDuknWrKTq/l6vorjNDBaNeMsX/00U5lU9RwVZ4B+UfgR9Phi2Nn
-         Kmrm7CQdyUv/4Oz1E2zyTUl+ziSyCKtPfjZ+tJ8buhGvk4n7GbHom+dqb86i8kTuCv48
-         ctcQ==
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1696888976; x=1697493776; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FbRz1UHmb7XUmCqoAt2aiODWlREyMNkavGrCa5bn36A=;
+        b=MZMZEj7zdsBoJQlEqyQ7v1u73ywMatHnYxtzMTLOIChOW5Fj5hbsue8BCDnwZxtqcQ
+         Kg+DivpcL9YfAptxhH8yBJ1QRQvqUx0k4LOax7iqK/dELisMRFbtBkUqtrtY47lZ+ofy
+         DGm8KhkoYBL5jytjoP/T80KHYkA5DyDw0wbhfOBiZ74IUgR7mwfVq35XMRjYwhfdJeTb
+         O0MlsmOH5kEpAoBcmicazdkPWXfIlXgrE+3XEi02pKf0KPAfCQ7//DufBBPsRP1ceV4x
+         h9xi5Hslq6LovCeR5XflppE5Ctm7zCmejNMN3aBsgvGKiAd9KCHi9Q0hwBn+IFLL63fB
+         Rr7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696882824; x=1697487624;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y+Vz1bOKclq9QVOuzcbH1aPgn89tmrsRZHycaiZatEw=;
-        b=CKsCORtLnlI2vGBO82Taf27qAxEgB61bDuHl+LsRFEyD8f9S/86G3RMVU1IU9GrjuR
-         VxiPSHAgwz1B2R8QZ2eMRZC9vmldXucjfiJ5dqtQ5bnKTs5GOa8YE9luMisr6x2wMUsM
-         UFMgTVkWgR76XW8NGKt7xlXAc7JrgBXrX54KOOscXm8pYDUqPE0+tfd3AQodey78n+8u
-         WhcooOGfbkKXFH9x+WT+UZpQS2DifYFuG8agCRpdxffXfIfqX4AuKi1u2TqrTa40Bk4P
-         5oEjQxkDyVC/sFJSMQilHmf8bsI16WpDqu7SOpalqH/IvE/iymKuvdUEoBcni2P9mISY
-         D8aw==
-X-Gm-Message-State: AOJu0Yy965Gbz/bIpq2XiHJMPZs4gHvy/P8T25OmvJRShCpxc1thQekY
-        Uv9q4yHZONUL7ijNpMBcMsmHQTwkHAOCuo4Zv09wrQ==
-X-Google-Smtp-Source: AGHT+IEX6TNoPqier59OSFRvkXjcha7x9rPtvBMuDMX6o39QQshLcsk0zSX1nZ378MTMsNUvnOr8e/pohr3AIc4q14M=
-X-Received: by 2002:a05:651c:120e:b0:2bf:fbe7:67dd with SMTP id
- i14-20020a05651c120e00b002bffbe767ddmr14845991lja.28.1696882824611; Mon, 09
- Oct 2023 13:20:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20231009165741.746184-1-max.kellermann@ionos.com>
- <20231009165741.746184-6-max.kellermann@ionos.com> <2023100921-that-jasmine-2240@gregkh>
-In-Reply-To: <2023100921-that-jasmine-2240@gregkh>
-From:   Max Kellermann <max.kellermann@ionos.com>
-Date:   Mon, 9 Oct 2023 22:20:13 +0200
-Message-ID: <CAKPOu+9=WBabTBExH1GQxhXrNH9xWciceavi6QF1nbfn9cXcig@mail.gmail.com>
-Subject: Re: [PATCH 6/7] fs/sysfs/group: make attribute_group pointers const
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Tony Luck <tony.luck@intel.com>,
-        James Morse <james.morse@arm.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Robert Richter <rric@kernel.org>,
-        Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mike Leach <mike.leach@linaro.org>,
-        James Clark <james.clark@arm.com>,
-        Leo Yan <leo.yan@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        d=1e100.net; s=20230601; t=1696888976; x=1697493776;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FbRz1UHmb7XUmCqoAt2aiODWlREyMNkavGrCa5bn36A=;
+        b=XI9uTw7az5BJW+WICcyd8t6VdQILX/BbVEoDguFstLU07aAkqYVSTrF26yfvvbyvDj
+         earQ0ohG8oGwXFwNupF7LNTLSZiMDyrVOcHqqp9KhbeHRR1aaukjzCnRWSZ588ExjOP/
+         +sAXdVa99CsrzZ70akKPOFPTnfExaoajf6nPivPe+U1NPetsWYpQDiJYE72WZ/Oe8aNx
+         gIUyNGNWZ0fHhpx1vg7qUPsBDX9dmB0qscTOBXmcDFclJeUapgmFtz4gPEX3Np1mJB+9
+         AtiOeoLX6p6hm9YfMTKwXhhWiy4ih8ezqYMRXMd1MpIxWVZh6ZvjUwdulYyKEMvbV+37
+         bxWg==
+X-Gm-Message-State: AOJu0YyRQT+xvmRjX/NW1kWnwskrDlnc/8NIBizyJbI6tOpVFkGy9lV2
+        hBA+Jx3cIaHhksG7zEytG8yQjg==
+X-Google-Smtp-Source: AGHT+IEpkt3G98AV4FGoCDMDB+5clUh7WiyyCdUTYHTZBvPKYhyU/1ce58WV9ik5NuXYhsQyrBkPyg==
+X-Received: by 2002:a05:6a20:734b:b0:166:6582:a7d5 with SMTP id v11-20020a056a20734b00b001666582a7d5mr16692295pzc.3.1696888976074;
+        Mon, 09 Oct 2023 15:02:56 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
+        by smtp.gmail.com with ESMTPSA id h21-20020a62b415000000b00682868714fdsm7023146pfn.95.2023.10.09.15.02.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 15:02:55 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qpyKz-00BhaC-06;
+        Tue, 10 Oct 2023 09:02:53 +1100
+Date:   Tue, 10 Oct 2023 09:02:53 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jeremy Bongio <jbongio@google.com>
+Cc:     John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
+        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
+        viro@zeniv.linux.org.uk, brauner@kernel.org,
+        chandan.babu@oracle.com, dchinner@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-        nvdimm@lists.linux.dev, linux-nvme@lists.infradead.org,
-        linux-rtc@vger.kernel.org, linux-serial@vger.kernel.org,
-        coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
-        linux-leds@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, tytso@mit.edu,
+        linux-api@vger.kernel.org,
+        Prasad Singamsetty <prasad.singamsetty@oracle.com>
+Subject: Re: [PATCH 04/21] fs: Add RWF_ATOMIC and IOCB_ATOMIC flags for
+ atomic write support
+Message-ID: <ZSR4jeSKlppLWjQy@dread.disaster.area>
+References: <20230929102726.2985188-1-john.g.garry@oracle.com>
+ <20230929102726.2985188-5-john.g.garry@oracle.com>
+ <CAOvQCn6zeHGiyfC_PH_Edop-JsMh1gUD8WL84R9oPanxOaxrsA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOvQCn6zeHGiyfC_PH_Edop-JsMh1gUD8WL84R9oPanxOaxrsA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 9, 2023 at 7:26=E2=80=AFPM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> "*const*groups"?   That's a parsing nightmare, really hard for humans to
-> read and understand.  Doesn't checkpatch complain about this?
+On Fri, Oct 06, 2023 at 11:15:11AM -0700, Jeremy Bongio wrote:
+> What is the advantage of using write flags instead of using an atomic
+> open flag (O_ATOMIC)? With an open flag, write, writev, pwritev would
+> all be supported for atomic writes. And this would potentially require
+> less application changes to take advantage of atomic writes.
 
-No, checkpatch does not implement a check/warning for this style (see
-my other email). There's no rule for this in coding-style.rst. Should
-there be one?
+Atomic writes are not a property of the file or even the inode
+itself, they are an attribute of the specific IO being issued by
+the application.
+
+Most applications that want atomic writes are using it as a
+performance optimisation. They are likely already using DIO with
+either AIO, pwritev2 or io_uring and so are already using the
+interfaces that support per-IO attributes. Not every IO to every
+file needs to be atomic, so a per-IO attribute makes a lot of sense
+for these applications.
+
+Add to that that implementing atomic IO semantics in the generic IO
+paths (e.g. for buffered writes) is much more difficult. It's
+not an unsolvable problem (especially now with high-order folio
+support in the page cache), it's just way outside the scope of this
+patchset.
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
