@@ -2,57 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B15E95A8E
-	for <linux-block@archiver.kernel.org>; Mon,  9 Oct 2023 07:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD78CE95A96
+	for <linux-block@archiver.kernel.org>; Mon,  9 Oct 2023 09:25:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345429AbjJIHhd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Oct 2023 03:37:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56050 "EHLO
+        id S1345758AbjJIJZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Oct 2023 05:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345392AbjJIHhc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2023 03:37:32 -0400
-X-Greylist: delayed 597 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 09 Oct 2023 00:37:31 PDT
-Received: from ci74p00im-qukt09081701.me.com (ci74p00im-qukt09081701.me.com [17.57.156.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8AC94
-        for <linux-block@vger.kernel.org>; Mon,  9 Oct 2023 00:37:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-        s=1a1hai; t=1696836454;
-        bh=LfdDfP7afHg0+pYNUoi66ix3pNWQ0ihFFSxg9Z9gNQs=;
-        h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To;
-        b=SUMhIKjOGKNXbvWN1mQjfdBmgh2ZpUr9QkSd7sABAwBDaDUt5f1BLSU8zIb6qxDx5
-         vMYDYboIcXBNnLnffVB0y3VR0zZFBCtBOoOr1IlrnWpSbfTlnEIN9wC3hDK41PDjHZ
-         U2sR6zaerhlFDIAPBbqmKKQthuFfIP/HA3oZIHGjcv/l2xKDKTroS2t76c1ERIzaON
-         SZAsSYrwyxhwun+S1BKtBM2zUORqNon80PvT6FeIDT9OmvN6rHSDz4sFcJaGlyHoVc
-         UNHfAKfPne5yTNm1uIcgoqjXuXZY2fK1bHejaXAHihRaHjZceEQI6r0x8zo/5F5jbB
-         2hxzY3b6WWyIA==
-Received: from smtpclient.apple (ci77p00im-dlb-asmtp-mailmevip.me.com [17.57.156.26])
-        by ci74p00im-qukt09081701.me.com (Postfix) with ESMTPSA id 225A346C00E4;
-        Mon,  9 Oct 2023 07:27:33 +0000 (UTC)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Corey Anderson <coreyanderson31@icloud.com>
-Mime-Version: 1.0 (1.0)
-Date:   Mon, 9 Oct 2023 02:27:31 -0500
-Subject: Re: [PATCHSET v5] io_uring IO interface
-Message-Id: <BC6926F8-2944-4D5A-B01B-6E3DD487CC41@icloud.com>
-Cc:     avi@scylladb.com, hch@lst.de, jmoyer@redhat.com,
-        linux-aio@kvack.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-To:     axboe@kernel.dk
-X-Mailer: iPhone Mail (21B5056e)
-X-Proofpoint-ORIG-GUID: wcdW0sr3olguiOG2LgzMqOkly4wbBMeA
-X-Proofpoint-GUID: wcdW0sr3olguiOG2LgzMqOkly4wbBMeA
-X-Proofpoint-Virus-Version: =?UTF-8?Q?vendor=3Dfsecure_engine=3D1.1.170-22c6f66c430a71ce266a39bfe25bc?=
- =?UTF-8?Q?2903e8d5c8f:6.0.138,18.0.572,17.0.605.474.0000000_definitions?=
- =?UTF-8?Q?=3D2020-02-14=5F11:2020-02-14=5F02,2020-02-14=5F11,2020-01-23?=
- =?UTF-8?Q?=5F02_signatures=3D0?=
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 clxscore=1011
- spamscore=0 bulkscore=0 mlxlogscore=344 suspectscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2310090062
+        with ESMTP id S1346034AbjJIJYz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2023 05:24:55 -0400
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E286310D0
+        for <linux-block@vger.kernel.org>; Mon,  9 Oct 2023 02:23:54 -0700 (PDT)
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-1dd053fb4f0so6754734fac.2
+        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2023 02:23:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696843432; x=1697448232;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+CyAJnxOWQ6GiGTDmLcfZR8Xv/l2XyLipls4WBkmObE=;
+        b=fAmjBn27wT7KPUz6qdmgvm+6/T7bdmRioJVaGBGkegK7i94RRrrHybUomPl3YQcN2n
+         WBZ0xmlx2sf1SJmL377TTYq6i7Kuw6chAiGJ8L6RJk5BTD/APecTdSAxQGy3v8Y7zJnv
+         YvHx7Ult/GF9p6DlsTjh275ChNCXIRjkHd9EFu/pebmNnO2FoPyHapYBWN5ahxdFev4g
+         1rAHLB+8VUXFUtE6CaLD0wWWQon15xb0KN0BYI7cdMoJmvCKsoJRKto9CXw9LRcg2M3Z
+         wZ2OswD86pwlMHKvikXI7iwSQpP6Zub8m6jFNtQ06bZph4V+3mqXqaQ6ieaIyIeUKvn9
+         MK6w==
+X-Gm-Message-State: AOJu0YwYJ2vQ4s4SAxxqERM4i4CXzCs4ld8zAldrOsCdTO+x8j/I3t4R
+        W0sV7x7fdMaF82lQ8Mji5EBz7vokgjnQFqvoI/Q1ehXVfNE3yKU=
+X-Google-Smtp-Source: AGHT+IHuVHWpi0LD46vyGjLgmHjMkFy4wVINux+71e3FEiWqtqbUjWLC2xNMo0Ups3Q9WvAyyrhPMJMtwBaIpH47G5oNxzr6gfkS
+MIME-Version: 1.0
+X-Received: by 2002:a05:6870:5a9a:b0:1e1:82c6:33f9 with SMTP id
+ dt26-20020a0568705a9a00b001e182c633f9mr6675734oab.6.1696843432671; Mon, 09
+ Oct 2023 02:23:52 -0700 (PDT)
+Date:   Mon, 09 Oct 2023 02:23:52 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000b40b406074526eb@google.com>
+Subject: [syzbot] Monthly block report (Oct 2023)
+From:   syzbot <syzbot+list688244bb9b6f6399051d@syzkaller.appspotmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello block maintainers/developers,
 
-Sent from Corey Anderson=E2=80=99s cell phone=20=
+This is a 31-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
+
+During the period, 3 new issues were detected and 2 were fixed.
+In total, 29 issues are still open and 87 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  868     Yes   WARNING in blk_rq_map_user_iov
+                   https://syzkaller.appspot.com/bug?extid=a532b03fdfee2c137666
+<2>  427     Yes   INFO: task hung in blkdev_put (4)
+                   https://syzkaller.appspot.com/bug?extid=9a29d5e745bd7523c851
+<3>  101     Yes   INFO: task hung in blkdev_fallocate
+                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
+<4>  38      Yes   KASAN: use-after-free Read in __dev_queue_xmit (5)
+                   https://syzkaller.appspot.com/bug?extid=b7be9429f37d15205470
+<5>  34      Yes   INFO: task hung in nbd_add_socket (2)
+                   https://syzkaller.appspot.com/bug?extid=cbb4b1ebc70d0c5a8c29
+<6>  30      Yes   INFO: task hung in blkdev_get_by_dev (5)
+                   https://syzkaller.appspot.com/bug?extid=6229476844294775319e
+<7>  24      Yes   WARNING in blk_register_tracepoints
+                   https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
+<8>  19      Yes   WARNING in wait_til_done (2)
+                   https://syzkaller.appspot.com/bug?extid=9bc4da690ee5334f5d15
+<9>  13      No    WARNING in process_fd_request
+                   https://syzkaller.appspot.com/bug?extid=1d4201dfe9f2386fdc0b
+<10> 12      Yes   general protection fault in start_motor (3)
+                   https://syzkaller.appspot.com/bug?extid=1fad709a9a55674f0e0b
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
