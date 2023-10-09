@@ -2,66 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8079E95A8E
-	for <linux-block@archiver.kernel.org>; Mon,  9 Oct 2023 07:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B15E95A8E
+	for <linux-block@archiver.kernel.org>; Mon,  9 Oct 2023 07:37:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345409AbjJIHgw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Oct 2023 03:36:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40034 "EHLO
+        id S1345429AbjJIHhd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 Oct 2023 03:37:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345404AbjJIHgv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2023 03:36:51 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA58594;
-        Mon,  9 Oct 2023 00:36:50 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16153C433C8;
-        Mon,  9 Oct 2023 07:36:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696837010;
-        bh=cyOr9wKSZbKTmoYhGi29W/BehcsluNpyqFhmV/79LkU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cuorHarbeq5vdYq06nmPq8nGX2pDzlhYY2aIguVOKLx86qrspW9qfoRixSiD2oG1N
-         BX1bPZiKVWe177iMU3qJ145/6+2QVdLkcYwZxGa8AO5oMtIqJfoIk3nVEGqVXjIFOK
-         veC1rvqC5QOFNQ1rskp5a1QGWowZeU/MLKC+k7IX27yaqQPwaC/2E0+1aTIIPnF7Zi
-         jRQ0blTp93aKHoihZBYvcrr6adET4DoQoSOx+8sYbZ4o9kQCrjGdrCzmS/dXLNJkwz
-         3hZTLiNv/d324k7T+CNsBKZE4Ai4/PYv3wZJOz/fGp/BoLGTd6qJlk9ik3kuHHAfUA
-         f5I0X9VQZ9jOA==
-Date:   Mon, 9 Oct 2023 09:36:43 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Hugh Dickins <hughd@google.com>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>,
-        Christian Brauner <christian@brauner.io>,
-        David Laight <David.Laight@aculab.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH next] iov_iter: fix copy_page_from_iter_atomic()
-Message-ID: <20231009-bannen-hochwasser-3f0268372b80@brauner>
-References: <356ef449-44bf-539f-76c0-7fe9c6e713bb@google.com>
- <20230925120309.1731676-9-dhowells@redhat.com>
- <20230925120309.1731676-1-dhowells@redhat.com>
- <1809398.1696238751@warthog.procyon.org.uk>
- <231155.1696663754@warthog.procyon.org.uk>
-MIME-Version: 1.0
+        with ESMTP id S1345392AbjJIHhc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2023 03:37:32 -0400
+X-Greylist: delayed 597 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 09 Oct 2023 00:37:31 PDT
+Received: from ci74p00im-qukt09081701.me.com (ci74p00im-qukt09081701.me.com [17.57.156.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8AC94
+        for <linux-block@vger.kernel.org>; Mon,  9 Oct 2023 00:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+        s=1a1hai; t=1696836454;
+        bh=LfdDfP7afHg0+pYNUoi66ix3pNWQ0ihFFSxg9Z9gNQs=;
+        h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To;
+        b=SUMhIKjOGKNXbvWN1mQjfdBmgh2ZpUr9QkSd7sABAwBDaDUt5f1BLSU8zIb6qxDx5
+         vMYDYboIcXBNnLnffVB0y3VR0zZFBCtBOoOr1IlrnWpSbfTlnEIN9wC3hDK41PDjHZ
+         U2sR6zaerhlFDIAPBbqmKKQthuFfIP/HA3oZIHGjcv/l2xKDKTroS2t76c1ERIzaON
+         SZAsSYrwyxhwun+S1BKtBM2zUORqNon80PvT6FeIDT9OmvN6rHSDz4sFcJaGlyHoVc
+         UNHfAKfPne5yTNm1uIcgoqjXuXZY2fK1bHejaXAHihRaHjZceEQI6r0x8zo/5F5jbB
+         2hxzY3b6WWyIA==
+Received: from smtpclient.apple (ci77p00im-dlb-asmtp-mailmevip.me.com [17.57.156.26])
+        by ci74p00im-qukt09081701.me.com (Postfix) with ESMTPSA id 225A346C00E4;
+        Mon,  9 Oct 2023 07:27:33 +0000 (UTC)
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <231155.1696663754@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+From:   Corey Anderson <coreyanderson31@icloud.com>
+Mime-Version: 1.0 (1.0)
+Date:   Mon, 9 Oct 2023 02:27:31 -0500
+Subject: Re: [PATCHSET v5] io_uring IO interface
+Message-Id: <BC6926F8-2944-4D5A-B01B-6E3DD487CC41@icloud.com>
+Cc:     avi@scylladb.com, hch@lst.de, jmoyer@redhat.com,
+        linux-aio@kvack.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+To:     axboe@kernel.dk
+X-Mailer: iPhone Mail (21B5056e)
+X-Proofpoint-ORIG-GUID: wcdW0sr3olguiOG2LgzMqOkly4wbBMeA
+X-Proofpoint-GUID: wcdW0sr3olguiOG2LgzMqOkly4wbBMeA
+X-Proofpoint-Virus-Version: =?UTF-8?Q?vendor=3Dfsecure_engine=3D1.1.170-22c6f66c430a71ce266a39bfe25bc?=
+ =?UTF-8?Q?2903e8d5c8f:6.0.138,18.0.572,17.0.605.474.0000000_definitions?=
+ =?UTF-8?Q?=3D2020-02-14=5F11:2020-02-14=5F02,2020-02-14=5F11,2020-01-23?=
+ =?UTF-8?Q?=5F02_signatures=3D0?=
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 clxscore=1011
+ spamscore=0 bulkscore=0 mlxlogscore=344 suspectscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2310090062
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Oct 07, 2023 at 08:29:14AM +0100, David Howells wrote:
-> Hugh Dickins <hughd@google.com> wrote:
-> 
-> > -		__copy_from_iter(p, n, i);
-> > +		n = __copy_from_iter(p, n, i);
-> 
-> Yeah, that looks right.  Can you fold it in, Christian?
 
-Of course. Folded into
-c9eec08bac96 ("iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()")
-on vfs.iov_iter.
+Sent from Corey Anderson=E2=80=99s cell phone=20=
