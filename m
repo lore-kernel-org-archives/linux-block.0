@@ -2,107 +2,172 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B5AFE81E16
-	for <linux-block@archiver.kernel.org>; Mon,  9 Oct 2023 22:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 803C7CD68F1
+	for <linux-block@archiver.kernel.org>; Tue, 10 Oct 2023 05:22:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378754AbjJIWC6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 Oct 2023 18:02:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60894 "EHLO
+        id S234630AbjJJFWq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Oct 2023 01:22:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378738AbjJIWC6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2023 18:02:58 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A00BA3
-        for <linux-block@vger.kernel.org>; Mon,  9 Oct 2023 15:02:56 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-692eed30152so3678946b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2023 15:02:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1696888976; x=1697493776; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FbRz1UHmb7XUmCqoAt2aiODWlREyMNkavGrCa5bn36A=;
-        b=MZMZEj7zdsBoJQlEqyQ7v1u73ywMatHnYxtzMTLOIChOW5Fj5hbsue8BCDnwZxtqcQ
-         Kg+DivpcL9YfAptxhH8yBJ1QRQvqUx0k4LOax7iqK/dELisMRFbtBkUqtrtY47lZ+ofy
-         DGm8KhkoYBL5jytjoP/T80KHYkA5DyDw0wbhfOBiZ74IUgR7mwfVq35XMRjYwhfdJeTb
-         O0MlsmOH5kEpAoBcmicazdkPWXfIlXgrE+3XEi02pKf0KPAfCQ7//DufBBPsRP1ceV4x
-         h9xi5Hslq6LovCeR5XflppE5Ctm7zCmejNMN3aBsgvGKiAd9KCHi9Q0hwBn+IFLL63fB
-         Rr7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696888976; x=1697493776;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FbRz1UHmb7XUmCqoAt2aiODWlREyMNkavGrCa5bn36A=;
-        b=XI9uTw7az5BJW+WICcyd8t6VdQILX/BbVEoDguFstLU07aAkqYVSTrF26yfvvbyvDj
-         earQ0ohG8oGwXFwNupF7LNTLSZiMDyrVOcHqqp9KhbeHRR1aaukjzCnRWSZ588ExjOP/
-         +sAXdVa99CsrzZ70akKPOFPTnfExaoajf6nPivPe+U1NPetsWYpQDiJYE72WZ/Oe8aNx
-         gIUyNGNWZ0fHhpx1vg7qUPsBDX9dmB0qscTOBXmcDFclJeUapgmFtz4gPEX3Np1mJB+9
-         AtiOeoLX6p6hm9YfMTKwXhhWiy4ih8ezqYMRXMd1MpIxWVZh6ZvjUwdulYyKEMvbV+37
-         bxWg==
-X-Gm-Message-State: AOJu0YyRQT+xvmRjX/NW1kWnwskrDlnc/8NIBizyJbI6tOpVFkGy9lV2
-        hBA+Jx3cIaHhksG7zEytG8yQjg==
-X-Google-Smtp-Source: AGHT+IEpkt3G98AV4FGoCDMDB+5clUh7WiyyCdUTYHTZBvPKYhyU/1ce58WV9ik5NuXYhsQyrBkPyg==
-X-Received: by 2002:a05:6a20:734b:b0:166:6582:a7d5 with SMTP id v11-20020a056a20734b00b001666582a7d5mr16692295pzc.3.1696888976074;
-        Mon, 09 Oct 2023 15:02:56 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
-        by smtp.gmail.com with ESMTPSA id h21-20020a62b415000000b00682868714fdsm7023146pfn.95.2023.10.09.15.02.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 15:02:55 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qpyKz-00BhaC-06;
-        Tue, 10 Oct 2023 09:02:53 +1100
-Date:   Tue, 10 Oct 2023 09:02:53 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jeremy Bongio <jbongio@google.com>
-Cc:     John Garry <john.g.garry@oracle.com>, axboe@kernel.dk,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org,
-        chandan.babu@oracle.com, dchinner@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, tytso@mit.edu,
-        linux-api@vger.kernel.org,
-        Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Subject: Re: [PATCH 04/21] fs: Add RWF_ATOMIC and IOCB_ATOMIC flags for
- atomic write support
-Message-ID: <ZSR4jeSKlppLWjQy@dread.disaster.area>
-References: <20230929102726.2985188-1-john.g.garry@oracle.com>
- <20230929102726.2985188-5-john.g.garry@oracle.com>
- <CAOvQCn6zeHGiyfC_PH_Edop-JsMh1gUD8WL84R9oPanxOaxrsA@mail.gmail.com>
+        with ESMTP id S229625AbjJJFWp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Oct 2023 01:22:45 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5D2A4
+        for <linux-block@vger.kernel.org>; Mon,  9 Oct 2023 22:22:41 -0700 (PDT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20231010052238epoutp040f74e28ac24a745c60e191547a8c8fb6~Mp4cZaS803102031020epoutp04g
+        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 05:22:38 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20231010052238epoutp040f74e28ac24a745c60e191547a8c8fb6~Mp4cZaS803102031020epoutp04g
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1696915358;
+        bh=jOUVYTTmGfCy0WayWeEEgsbpCLdznKQKZ/VUIJ4/w18=;
+        h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+        b=EcrLRhBQnpJ/1Qkdm6ZXZhSZhjtKnevU15rRDbaKO9ikk0IxtlWKNid1ADYZS6cwU
+         DKNl/h/MR/5weKtwjdsOUkVBGe4uUk/HLFUADeLIwdsWxTCfFSaGAznE+WgOUapYz4
+         40RlNDWEiqPH8z914yM5iGlOD5s3hvowBPfL5/j4=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20231010052234epcas5p1cd90af22a0fdc1143638d0bbd4b851ad~Mp4Yban2_0987609876epcas5p19;
+        Tue, 10 Oct 2023 05:22:34 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.177]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4S4PRX2ZXdz4x9Pv; Tue, 10 Oct
+        2023 05:22:32 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F8.02.09023.89FD4256; Tue, 10 Oct 2023 14:22:32 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20231010052231epcas5p157317b63e880270707701e38a311455c~Mp4We0mFV0987109871epcas5p12;
+        Tue, 10 Oct 2023 05:22:31 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20231010052231epsmtrp1d11fa017961b17185c5533cb20b1ddf1~Mp4WeHzJq0684706847epsmtrp1N;
+        Tue, 10 Oct 2023 05:22:31 +0000 (GMT)
+X-AuditID: b6c32a44-c7ffa7000000233f-ce-6524df98ce34
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        2D.A6.18916.79FD4256; Tue, 10 Oct 2023 14:22:31 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20231010052230epsmtip2895bced299be5640f880dc12491a7ebd~Mp4UtWKV02473924739epsmtip2r;
+        Tue, 10 Oct 2023 05:22:29 +0000 (GMT)
+Message-ID: <28f21f46-60f1-1651-e6a9-938fd2340ff5@samsung.com>
+Date:   Tue, 10 Oct 2023 10:52:13 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOvQCn6zeHGiyfC_PH_Edop-JsMh1gUD8WL84R9oPanxOaxrsA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+        Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v2 01/15] block: Make bio_set_ioprio() modify fewer
+ bio->bi_ioprio bits
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>,
+        Damien Le Moal <dlemoal@kernel.org>
+From:   Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20231005194129.1882245-2-bvanassche@acm.org>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEJsWRmVeSWpSXmKPExsWy7bCmuu6M+yqpBi9P8lu8/HmVzWL13X42
+        i2kffjJbrHoQbvFgv73FytVHmSzmnG1gsth7S9tiz96TLBbd13ewWSw//o/J4sGfx+wOPB6X
+        r3h77Jx1l93j8tlSj02rOtk8dt9sYPP4+PQWi0ffllWMHp83yXm0H+hmCuCMyrbJSE1MSS1S
+        SM1Lzk/JzEu3VfIOjneONzUzMNQ1tLQwV1LIS8xNtVVy8QnQdcvMATpXSaEsMacUKBSQWFys
+        pG9nU5RfWpKqkJFfXGKrlFqQklNgUqBXnJhbXJqXrpeXWmJlaGBgZApUmJCdcXhdH2vBWv6K
+        VVPvMjYw7uTpYuTkkBAwkbh1oI25i5GLQ0hgN6PEqrOHGCGcT4wSZy99Z4Nz1jVNYoVpmb+0
+        lwnEFhLYySix8nI4RNFbRonuryfZQBK8AnYSt7fPYAexWQRUJQ6//8gMEReUODnzCQuILSqQ
+        JPHr6hxGEFtYIFZi4cc5YPXMAuISt57MB1sgIuAm0XB1F9gVzAJvmSQebjkAdAUHB5uApsSF
+        yaUgNZwCVhJH9u1mhOiVl9j+dg7YPxICRzgkVv3ewAhSLyHgIvF5EwfEA8ISr45vYYewpSRe
+        9rdB2ckSl2aeY4KwSyQe7zkIZdtLtJ7qZwYZwwy0dv0ufYhVfBK9v58wQUznlehoE4KoVpS4
+        N+kpNKjEJR7OWAJle0hsv3GQBRJUexklHqy7xzKBUWEWUqjMQvL9LCTfzELYvICRZRWjZGpB
+        cW56arJpgWFeajk8vpPzczcxghOzlssOxhvz/+kdYmTiYDzEKMHBrCTC+yhTJVWINyWxsiq1
+        KD++qDQntfgQoykweiYyS4km5wNzQ15JvKGJpYGJmZmZiaWxmaGSOO/r1rkpQgLpiSWp2amp
+        BalFMH1MHJxSDUzLT4iFhLv9i72t1H1eQ9VocXDUHy77dwoSnyQ7dwhPeL6Z7UXOw5Tnmj0L
+        GMLeFLz7ULeTTc1Z1fodt9rp+itFelXy4j+WS1RcetC3f83+oORfRpv2R7rEz5dM0rsh6br6
+        dOfP/zwOeRfXu96o4zlU/kzpadbma51HwmVsGXSYxAP/epWESfpf4Pq1bx/PrOSfO0/0n77J
+        LdrQuXYR85NZh9M3JC5PKbvZMU9FwpfF4f9rvWUnNhy+58KYNWnT2u1zN12aJKfJln5Nf9un
+        F0UfC2/asskb7e7ckPJB3FFgWVKsZ7HUcmXXUgGBiolHV92trRSfs7Vti1PN569/z/IFhHT5
+        tIscMlWPuXspv0aJpTgj0VCLuag4EQAjYzV2VQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDIsWRmVeSWpSXmKPExsWy7bCSvO70+yqpBs8WmVq8/HmVzWL13X42
+        i2kffjJbrHoQbvFgv73FytVHmSzmnG1gsth7S9tiz96TLBbd13ewWSw//o/J4sGfx+wOPB6X
+        r3h77Jx1l93j8tlSj02rOtk8dt9sYPP4+PQWi0ffllWMHp83yXm0H+hmCuCM4rJJSc3JLEst
+        0rdL4Mo4vK6PtWAtf8WqqXcZGxh38nQxcnJICJhIzF/ay9TFyMUhJLCdUeLy81PMEAlxieZr
+        P9ghbGGJlf+es0MUvWaU2Ly1nQUkwStgJ3F7+wywIhYBVYnD7z8yQ8QFJU7OfAJWIyqQJLHn
+        fiMTiC0sECux8OMcsHpmoAW3nswHi4sIuEk0XN3FBrKAWeAtk8SElstQJ+1llJj2Zw7QVA4O
+        NgFNiQuTS0EaOAWsJI7s280IMchMomtrF5QtL7H97RzmCYxCs5DcMQvJvllIWmYhaVnAyLKK
+        UTS1oDg3PTe5wFCvODG3uDQvXS85P3cTIzgCtYJ2MC5b/1fvECMTB+MhRgkOZiUR3keZKqlC
+        vCmJlVWpRfnxRaU5qcWHGKU5WJTEeZVzOlOEBNITS1KzU1MLUotgskwcnFINTItNC1nqPln+
+        tUx2Nz2h9r/DdNObuWkbUhIfWhvENLB/nO3LYW0x/1jT14bo5aK7uq7+jOu8EXH9bp7T0Zlz
+        W0KlNr6bMOP87+Y9LSlaHSdOa7vJfwyqL/93n/HpqocXDsvUf3HefO2GEYsyyy+21qNit6oD
+        eqds8PomcFTeQ2xFULDETasrc078WLnivuSv1zcmam6/e2aqQ8GOgg3XqsM8dIrcJ9za6z7T
+        e8+DGe88RM65Fa9ZZHiy2bVm3tFnV3XNLu05/frBzc9ct4uWT4id0J3vHZfXOjPu8zTuF/9P
+        au7aX2WR+nGdhlWvi+DpD9On7de643JK8G1zyR92q6hTqlteJsh9rOHo4ue2qn2oxFKckWio
+        xVxUnAgALeD+6S8DAAA=
+X-CMS-MailID: 20231010052231epcas5p157317b63e880270707701e38a311455c
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231005194156epcas5p14c65d7fbecc60f97624a9ef968bebf2e
+References: <20231005194129.1882245-1-bvanassche@acm.org>
+        <CGME20231005194156epcas5p14c65d7fbecc60f97624a9ef968bebf2e@epcas5p1.samsung.com>
+        <20231005194129.1882245-2-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 06, 2023 at 11:15:11AM -0700, Jeremy Bongio wrote:
-> What is the advantage of using write flags instead of using an atomic
-> open flag (O_ATOMIC)? With an open flag, write, writev, pwritev would
-> all be supported for atomic writes. And this would potentially require
-> less application changes to take advantage of atomic writes.
+On 10/6/2023 1:10 AM, Bart Van Assche wrote:
+> A later patch will store the data lifetime in the bio->bi_ioprio member
+> before bio_set_ioprio() is called. Make sure that bio_set_ioprio()
+> doesn't clear more bits than necessary.
+> 
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   block/blk-mq.c         |  3 ++-
+>   include/linux/ioprio.h | 10 ++++++++++
+>   2 files changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e2d11183f62e..bc086660ffd3 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2926,7 +2926,8 @@ static void bio_set_ioprio(struct bio *bio)
+>   {
+>   	/* Nobody set ioprio so far? Initialize it based on task's nice value */
+>   	if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) == IOPRIO_CLASS_NONE)
+> -		bio->bi_ioprio = get_current_ioprio();
+> +		ioprio_set_class_and_level(&bio->bi_ioprio,
+> +					   get_current_ioprio());
+>   	blkcg_set_ioprio(bio);
+>   }
+>   
+> diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+> index 7578d4f6a969..f2e768ab4b35 100644
+> --- a/include/linux/ioprio.h
+> +++ b/include/linux/ioprio.h
+> @@ -71,4 +71,14 @@ static inline int ioprio_check_cap(int ioprio)
+>   }
+>   #endif /* CONFIG_BLOCK */
+>   
+> +#define IOPRIO_CLASS_LEVEL_MASK ((IOPRIO_CLASS_MASK << IOPRIO_CLASS_SHIFT) | \
+> +				 (IOPRIO_LEVEL_MASK << 0))
+> +
+> +static inline void ioprio_set_class_and_level(u16 *prio, u16 class_level)
+> +{
+> +	WARN_ON_ONCE(class_level & ~IOPRIO_CLASS_LEVEL_MASK);
+> +	*prio &= ~IOPRIO_CLASS_LEVEL_MASK;
+> +	*prio |= class_level;
 
-Atomic writes are not a property of the file or even the inode
-itself, they are an attribute of the specific IO being issued by
-the application.
+Return of get_current_ioprio() will touch all 16 bits here. So 
+user-defined value can alter whatever was set in bio by F2FS (patch 4 in 
+this series). Is that not an issue?
 
-Most applications that want atomic writes are using it as a
-performance optimisation. They are likely already using DIO with
-either AIO, pwritev2 or io_uring and so are already using the
-interfaces that support per-IO attributes. Not every IO to every
-file needs to be atomic, so a per-IO attribute makes a lot of sense
-for these applications.
-
-Add to that that implementing atomic IO semantics in the generic IO
-paths (e.g. for buffered writes) is much more difficult. It's
-not an unsolvable problem (especially now with high-order folio
-support in the page cache), it's just way outside the scope of this
-patchset.
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+And what is the user interface you have in mind. Is it ioprio based, or 
+write-hint based or mix of both?
