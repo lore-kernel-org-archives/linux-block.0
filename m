@@ -2,167 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C68E3CD98CC
-	for <linux-block@archiver.kernel.org>; Tue, 10 Oct 2023 23:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61805CD98D9
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 00:05:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229504AbjJJX7u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Oct 2023 19:59:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45370 "EHLO
+        id S229484AbjJKAFJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Oct 2023 20:05:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjJJX7t (ORCPT
+        with ESMTP id S229445AbjJKAFI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Oct 2023 19:59:49 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F02C8F
-        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 16:59:48 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-690bccb0d8aso4899985b3a.0
-        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 16:59:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1696982387; x=1697587187; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vuBhbcRCY14Ehqi0PTSDL9AEIBFyvO42CHNfxwJX88M=;
-        b=BruM3DZNS7ZwvtNBAEFkyeZZhxE3DpEpWC5sgAyG2IPC5wbLxGs2LMI8xfToh0inuj
-         LzKU/5lszTGZoXyMWTDlymXPDdUmQOnXxxGNFbt9xRgbxCqxI7LN3jLENsi5GoV/rsCb
-         knyUT+6SkLaBFAJxAgAxTaBqZSU2DxDhszgWA1nfmR+/clUa+YVxjuxCxd94S1KdzrPq
-         lf7aylN+jV97Wn9H2SDQDV25gsKkSJzVJezZLXBZ51634uKrGy82kv+az37blcFpit9l
-         SL6P0to3t1/QAoiwbEj9QLqa0L6u65QIrHjZp4CsZO5CNjBLZZ6tI79slGLKpX6Nwrmz
-         CDLQ==
+        Tue, 10 Oct 2023 20:05:08 -0400
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BE528F;
+        Tue, 10 Oct 2023 17:05:07 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-565334377d0so5012055a12.2;
+        Tue, 10 Oct 2023 17:05:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696982387; x=1697587187;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1696982706; x=1697587506;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vuBhbcRCY14Ehqi0PTSDL9AEIBFyvO42CHNfxwJX88M=;
-        b=dDBCnH0T6NV35ZwRXzzi1XAm3pjpsH5FTKbuHiRvKvCVSPM+vRbI0mVHJM8iuxWuHz
-         IfNg7mjUon0KPc1ajdT7irnWpGNLDHKWOPqUrEGOSZMx7rFfvQWyWO0JAMhi15iZJ4gL
-         X0EsQqmx9mvd1bl4RO61iVuauDV3TYi6uHoEEII4N0IhVttweLVARctUOu/aI5X0r1MR
-         3ddbcQhDDdVuWI7gd+ukxtYQ/KsTdCO+eTgeElJFVlWUFL9QxkHu3VqutT2xJ2ddjnj5
-         D6DvJFVirczc3bZH+6TEAhyjKzXeuDHrCB1/PKKPvodVX6oLGU0gnd1r4OTo+6yjxsAt
-         Un/Q==
-X-Gm-Message-State: AOJu0YyTKyRS8OrNFUPIla4CtydFKbQUhDDYVDZFj2HlxlWX1IFTQCr0
-        x/BaR4pSrbHWZO8GIWTUqh8qow==
-X-Google-Smtp-Source: AGHT+IFpjvyQUUCRBkdDh5nJwuhEhTd0rb4+c3As4mtWp5MPb97dXj/O7IfeEAEjzA3aYXTJpB6kTA==
-X-Received: by 2002:a05:6a21:329c:b0:15c:b7b9:fc21 with SMTP id yt28-20020a056a21329c00b0015cb7b9fc21mr19831702pzb.14.1696982387504;
-        Tue, 10 Oct 2023 16:59:47 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
-        by smtp.gmail.com with ESMTPSA id y17-20020a056a001c9100b0068fcc7f6b00sm2559718pfw.74.2023.10.10.16.59.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 16:59:46 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qqMdc-00CAvp-1A;
-        Wed, 11 Oct 2023 10:59:44 +1100
-Date:   Wed, 11 Oct 2023 10:59:44 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Subject: Re: [PATCH v8 3/5] loop: Add support for provision requests
-Message-ID: <ZSXlcM2sUeFkHOnb@dread.disaster.area>
-References: <20231007012817.3052558-1-sarthakkukreti@chromium.org>
- <20231007012817.3052558-4-sarthakkukreti@chromium.org>
- <ZSM9UDMFNs0050pr@dread.disaster.area>
- <CAG9=OMNPK2s4vsun4B=xQ9nt3qR_fevNP1zSkYq9YG5QPPTsfQ@mail.gmail.com>
+        bh=aAjMvZW79vccJfUDZIzN9hyHUALf36JDC62fnVe1DfI=;
+        b=fe0hZLTcGptmijr6eXFBeL2Ouf9mTmEdNYC+GqQI9kO7g2x4Q4btnW+AjHlNJp5Bgc
+         Pgyikw+F60DFgONcvV4m3HWSlphF+4jwE3V+vOEs6Hix0J15zazoy3xJLvbnuoCCaWrK
+         PvoDxIgRjMfyCXJ7qi2WWB0mLu3dW5J9tlNLRXqdXaPVweuCsXT9sOo50IEquSIr9gka
+         6LebclBTdvgPCW/UT0zmHByE0HzBVlNxF0XbC1u8+zI/DLk0+nBw/Ez7NimMEIlodgqy
+         mS9OI9JD9G0omF7EoRxanEE7u7EzFbdibBnUnLAwHUtBHb/ag+95k06g6wzU0AGbrfQ0
+         CeSw==
+X-Gm-Message-State: AOJu0YztaZcF24HECIkl1hZV3TcBYKMGXYpzTfhtmwPW1g2CaeaSpdlZ
+        aIW4GTczICUlUwKuH0vonag=
+X-Google-Smtp-Source: AGHT+IE9R4JMP+o7XHMi3pIy1xuDrmXmEiJOUAlVOuMathk1en8QYKGWrtdWExuoY0uzJOxmnqrMaw==
+X-Received: by 2002:a17:903:234d:b0:1c9:ca45:f86 with SMTP id c13-20020a170903234d00b001c9ca450f86mr717052plh.18.1696982706365;
+        Tue, 10 Oct 2023 17:05:06 -0700 (PDT)
+Received: from ?IPV6:2601:647:4d7e:54f3:667:4981:ffa1:7be1? ([2601:647:4d7e:54f3:667:4981:ffa1:7be1])
+        by smtp.gmail.com with ESMTPSA id y13-20020a17090322cd00b001c61e628e98sm12413378plg.175.2023.10.10.17.05.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Oct 2023 17:05:06 -0700 (PDT)
+Message-ID: <cf850508-498b-4748-955c-382906eff676@acm.org>
+Date:   Tue, 10 Oct 2023 17:05:04 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG9=OMNPK2s4vsun4B=xQ9nt3qR_fevNP1zSkYq9YG5QPPTsfQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] doc: blk-ioprio: Standardize a few names
+Content-Language: en-US
+To:     yizhou.tang@shopee.com, houtao1@huawei.com, jack@suse.cz,
+        kch@nvidia.com
+Cc:     axboe@kernel.dk, tj@kernel.org, corbet@lwn.net,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yingfu.zhou@shopee.com,
+        chunguang.xu@shopee.com
+References: <20231009100349.52884-1-yizhou.tang@shopee.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20231009100349.52884-1-yizhou.tang@shopee.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 03:43:10PM -0700, Sarthak Kukreti wrote:
-> On Sun, Oct 8, 2023 at 4:37 PM Dave Chinner <david@fromorbit.com> wrote:
-> >
-> > On Fri, Oct 06, 2023 at 06:28:15PM -0700, Sarthak Kukreti wrote:
-> > > Add support for provision requests to loopback devices.
-> > > Loop devices will configure provision support based on
-> > > whether the underlying block device/file can support
-> > > the provision request and upon receiving a provision bio,
-> > > will map it to the backing device/storage. For loop devices
-> > > over files, a REQ_OP_PROVISION request will translate to
-> > > an fallocate mode 0 call on the backing file.
-> > >
-> > > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > > Signed-off-by: Mike Snitzer <snitzer@kernel.org>
-> >
-> >
-> > Hmmmm.
-> >
-> > This doesn't actually implement the required semantics of
-> > REQ_PROVISION. Yes, it passes the command to the filesystem
-> > fallocate() implementation, but fallocate() at the filesystem level
-> > does not have the same semantics as REQ_PROVISION.
-> >
-> > i.e. at the filesystem level, fallocate() only guarantees the next
-> > write to the provisioned range will succeed without ENOSPC, it does
-> > not guarantee *every* write to the range will succeed without
-> > ENOSPC. If someone clones the loop file while it is in use (i.e.
-> > snapshots it via cp --reflink) then all guarantees that the next
-> > write to a provisioned LBA range will succeed without ENOSPC are
-> > voided.
-> >
-> > So while this will work for basic testing that the filesystem is
-> > issuing REQ_PROVISION based IO correctly, it can't actually be used
-> > for hosting production filesystems that need full REQ_PROVISION
-> > guarantees when the loop device backing file is independently
-> > shapshotted via FICLONE....
-> >
-> > At minimuim, this set of implementation constraints needs tobe
-> > documented somewhere...
-> >
-> Fair point. I wanted to have a separate fallocate() mode
-> (FALLOC_FL_PROVISION) in the earlier series of the patchset so that we
-> can distinguish between a provision request and a regular fallocate()
-> call; I dropped it from the series after feedback that the default
-> case should suffice. But this might be one of the cases where we need
-> an explicit intent that we want to provision space.
+On 10/9/23 03:03, yizhou.tang@shopee.com wrote:
+> From: Tang Yizhou <yizhou.tang@shopee.com>
 
-ISTR that I commented that filesystems like XFS can't implement
-REQ_PROVISION semantics for extents without on-disk format
-changes. Hence that needs to happen before we expose a new API to
-userspace....
+The title of this patch is misleading. The title suggests that the
+user interface is changed, which is not the case. What this patch does
+is to bring the documentation in sync with the implementation.
 
-> Given a separate FALLOC_FL_PROVISION mode in the scenario you
-> mentioned, the filesystem could copy previously 'provisioned' blocks
-> to new blocks (which implicitly provisions them) or reserve blocks for
-> use (and passing through REQ_OP_PROVISION below). That also means that
-> the filesystem should track 'provisioned' blocks and take appropriate
-> actions to ensure the provisioning guarantees.
+Otherwise this patch looks fine to me.
 
-Yes, tracking provisioned ranges persistently and the reservations
-they require needs on-disk filesytem format changes compared to just
-preallocating space.  None of this functionality currently exists in
-any filesystem that supports shared extents, and it's a fairly
-significant chunk of development work to support it.
+Thanks,
 
-Nobody has planned to do this sort of complex surgery to XFS at
-this point in time. I doubt that anyone on the btrfs side of
-things is really even following this discussion because this is
-largely for block device thinp and snapshot support
-and btrfs just doesn't care about that.
-
-> For filesystems without copy-on-write semantics (eg. ext4),
-> REQ_OP_PROVISION should still be equivalent to mode == 0.
-
-Well, yes. This is the same situation as "for non-sparse block
-devices, REQ_PROVISION can just be ignored." This is not an
-interesting use case, nor a use case that the functionality or APIs
-should be designed around.
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Bart.
