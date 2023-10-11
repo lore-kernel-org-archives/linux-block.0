@@ -2,109 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE369CD98C5
-	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 03:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8114DCD98EB
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 03:49:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344935AbjJKDea (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Oct 2023 23:34:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48918 "EHLO
+        id S229457AbjJKDto (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Oct 2023 23:49:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344777AbjJKDe3 (ORCPT
+        with ESMTP id S229549AbjJKDto (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Oct 2023 23:34:29 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EAB592;
-        Tue, 10 Oct 2023 20:34:28 -0700 (PDT)
-Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S4yvn6RM6zLpxZ;
-        Wed, 11 Oct 2023 11:30:29 +0800 (CST)
-Received: from [10.174.176.117] (10.174.176.117) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 11 Oct 2023 11:34:25 +0800
-Subject: Re: [PATCH] doc: blk-ioprio: Standardize a few names
-To:     <yizhou.tang@shopee.com>, <jack@suse.cz>, <bvanassche@acm.org>,
-        <kch@nvidia.com>
-CC:     <axboe@kernel.dk>, <tj@kernel.org>, <corbet@lwn.net>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yingfu.zhou@shopee.com>,
-        <chunguang.xu@shopee.com>
-References: <20231009100349.52884-1-yizhou.tang@shopee.com>
-From:   Hou Tao <houtao1@huawei.com>
-Message-ID: <42882d2b-e076-74df-e0bc-2b6c79986d3a@huawei.com>
-Date:   Wed, 11 Oct 2023 11:34:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        Tue, 10 Oct 2023 23:49:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201CCB8
+        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 20:48:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696996134;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OUcO01oq8Dz2vL4ouhdS+Rz1zWEgeQosfyjDbjfrOVg=;
+        b=eh3O6PVoVOKZ53ytGNZhSMg1qwf18XePedbVLqpVy/Rdxbaj/rODmWcRGuwe5L6gzn0gmX
+        onx02gLjO++wt7swDEvdQXoX/fP2HZeoAJl6DkaL1+vRxgGkL88LC9fJ2+kVgR5/YhdhHm
+        fe3ZIfp+DPvQIHWtyOhCyS2iIKWNalU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-275-9U0R4WDXPZ2Zz9eT8IPl4w-1; Tue, 10 Oct 2023 23:48:48 -0400
+X-MC-Unique: 9U0R4WDXPZ2Zz9eT8IPl4w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 401D3101A58B;
+        Wed, 11 Oct 2023 03:48:48 +0000 (UTC)
+Received: from fedora34.. (unknown [10.66.146.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AD61B1BA2;
+        Wed, 11 Oct 2023 03:48:46 +0000 (UTC)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     linux-block@vger.kernel.org
+Cc:     shinichiro.kawasaki@wdc.com, dwagner@suse.de
+Subject: [PATCH blktests] check: define TMPDIR before running the test
+Date:   Wed, 11 Oct 2023 11:48:32 +0800
+Message-Id: <20231011034832.1650797-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20231009100349.52884-1-yizhou.tang@shopee.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.176.117]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500025.china.huawei.com (7.185.36.35)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The TMPDIR was defined in _call_test before running test_func, but it
+was used in nvme/rc which has not yet defined, so move the definiation
+before runng the test to fix it.
 
+Fixes: b6356f6 ("nvme/rc: Add common file_path name define")
+Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+---
+ check | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-On 10/9/2023 6:03 PM, yizhou.tang@shopee.com wrote:
-> From: Tang Yizhou <yizhou.tang@shopee.com>
->
-> Our system administrator have noted that the names 'rt-to-be' and
-> 'all-to-idle' in the I/O priority policies table appeared without
-> explanations, leading to confusion. Let's standardize these names in
-> line with the naming in the 'attribute' section.
->
-> Additionally,
-> 1. Correct the interface name to 'io.prio.class'.
-> 2. Add a table entry of 'promote-to-rt' for consistency.
-> 3. Fix a typo of 'priority'.
->
-> Suggested-by: Yingfu Zhou <yingfu.zhou@shopee.com>
-> Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
-
-Reviewed-by: Hou Tao <houtao1@huawei.com>
-> ---
->  Documentation/admin-guide/cgroup-v2.rst | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-> index 4ef890191196..10461c73c9a3 100644
-> --- a/Documentation/admin-guide/cgroup-v2.rst
-> +++ b/Documentation/admin-guide/cgroup-v2.rst
-> @@ -2023,7 +2023,7 @@ IO Priority
->  ~~~~~~~~~~~
->  
->  A single attribute controls the behavior of the I/O priority cgroup policy,
-> -namely the blkio.prio.class attribute. The following values are accepted for
-> +namely the io.prio.class attribute. The following values are accepted for
->  that attribute:
->  
->    no-change
-> @@ -2052,9 +2052,11 @@ The following numerical values are associated with the I/O priority policies:
->  +----------------+---+
->  | no-change      | 0 |
->  +----------------+---+
-> -| rt-to-be       | 2 |
-> +| promote-to-rt  | 1 |
->  +----------------+---+
-> -| all-to-idle    | 3 |
-> +| restrict-to-be | 2 |
-> ++----------------+---+
-> +| idle           | 3 |
->  +----------------+---+
->  
->  The numerical value that corresponds to each I/O priority class is as follows:
-> @@ -2074,7 +2076,7 @@ The algorithm to set the I/O priority class for a request is as follows:
->  - If I/O priority class policy is promote-to-rt, change the request I/O
->    priority class to IOPRIO_CLASS_RT and change the request I/O priority
->    level to 4.
-> -- If I/O priorityt class is not promote-to-rt, translate the I/O priority
-> +- If I/O priority class policy is not promote-to-rt, translate the I/O priority
->    class policy into a number, then change the request I/O priority class
->    into the maximum of the I/O priority class policy number and the numerical
->    I/O priority class.
+diff --git a/check b/check
+index 55871b0..d25b56b 100755
+--- a/check
++++ b/check
+@@ -364,9 +364,6 @@ _call_test() {
+ 
+ 		unset TEST_CLEANUP
+ 		trap _cleanup EXIT
+-		if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
+-			return
+-		fi
+ 
+ 		TIMEFORMAT="%Rs"
+ 		pushd . >/dev/null || return
+@@ -478,6 +475,10 @@ _run_test() {
+ 	# runs to suppress job status output.
+ 	set +m
+ 
++	if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
++		return
++	fi
++
+ 	# shellcheck disable=SC1090
+ 	. "tests/${TEST_NAME}"
+ 
+-- 
+2.34.3
 
