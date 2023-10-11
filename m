@@ -2,89 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E91AC41513
-	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 20:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06232C41513
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 20:51:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233424AbjJKUUu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Oct 2023 16:20:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32846 "EHLO
+        id S233452AbjJKUvG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Oct 2023 16:51:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233490AbjJKUUt (ORCPT
+        with ESMTP id S231226AbjJKUvF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2023 16:20:49 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B69AF
-        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2023 13:20:47 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id ca18e2360f4ac-79fab2caf70so788239f.1
-        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2023 13:20:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697055647; x=1697660447; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lB/j2LtNeMz/W1YQQ732duppdg4xiLJo45Q+RSgVAQo=;
-        b=xtMLL3AujsI8XG2mXYhKUB/spGXSmJKab1wO/UvQS/pPVYZARPmE+q8H5VdoRMh/IG
-         2/ie0e4WfoJrxn7MwIUU1jey8Kz0OCtZ6Gx8F5yZ3p+Cql8E56xlX9sAnutWbqSzV7Kq
-         Ml+SaWHjAa0ntgCwGDvYPs9VgVRqAlZxhKrgkyoCR/TmVHC41Waj0OVMNozcOCKhkZMi
-         JkfvejHYT6yyKfAPLzUKORCZDE3qQxLDY+k0S0EbX2kS7B1G8gOsiw85/hYi4hp//0Al
-         v8FQb1gOjr0mablPKIPxrSRweSLmtdr3J5joUQZASyPdGibvXxtduZF+i5hnEySIM4Ol
-         v+hQ==
+        Wed, 11 Oct 2023 16:51:05 -0400
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CACF9A9;
+        Wed, 11 Oct 2023 13:51:03 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-27d1f57bda7so36941a91.0;
+        Wed, 11 Oct 2023 13:51:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697055647; x=1697660447;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1697057463; x=1697662263;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lB/j2LtNeMz/W1YQQ732duppdg4xiLJo45Q+RSgVAQo=;
-        b=FNMFsmjegnVnS6gyWVQw7Hs7AZ5ZFEK+KMjPfeSQbo/hrpWsJ9nRp4OAXxebesM8ed
-         6ZiRvKff8peaYR7/OLUgNhjn6Hm+z+cuByUis3MF0SPj4U/FNnFIGYMUJJWb2fQ45rTA
-         +Om+Uwsl6l8JzhDn+V7CefwivP5LgWhpVk8P+NyvvB8/mLCqKldwnaDhY6VWChePRnCT
-         dHNioZBLZ/BVIqy8oyV+DV0mWeKqvN3tvdpSr9XasHy/8mHNHGiqAbwGl4mpK+RnbrIY
-         bFGStTQ65kfDirFxnsWOnC4+nUun+NVxCAmxhV3RFltbB6OGB7jOkh2pBzB+IQMJyIt9
-         HYOg==
-X-Gm-Message-State: AOJu0YzJnwRm8GzO1PAh7O3qdXBPeGXMhr0pmi7boFHSZ94VcsB0geYc
-        eKRJJ45ISuIa1oiqTw2PJqaRDw==
-X-Google-Smtp-Source: AGHT+IEruZKhD7bxlTjyy47l5LeM/sL4l3VP9Zm6qvwYHSSSMgVJNz0+ACbD8gaUX5jTiNivN3JKDQ==
-X-Received: by 2002:a92:db4f:0:b0:350:f353:4017 with SMTP id w15-20020a92db4f000000b00350f3534017mr20611565ilq.0.1697055647337;
-        Wed, 11 Oct 2023 13:20:47 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id r13-20020a92ce8d000000b003513de0eae9sm177591ilo.24.2023.10.11.13.20.46
+        bh=nE+u+F1XkNDY5suKWhgfSDeZXY6238ysQJ12xui8faI=;
+        b=PodpIlA6kc9rcD3lUSetKU+2XcImBSaTEYr+ZZsVQ4mVBMNYLx3gVusdMM4u7JZqGK
+         6LTu48/SFjAu2kf44EapchCYl/Vz5QgMTzoyxrwZewNu2hC4js/vCs0dYwvv6yAgK8X0
+         aDr7wf/DE+XFS+NQT6B9qTJngiq04pi4bJoeAFzarLPnRuQ6jTS67qrGny6JgihUWjbh
+         6zm7S2V9YZkNOVTsNcNrgOmQLf1BSpw/leu6C3ak/IQaiG90HEzXYBDqzhoJjhvjFg3L
+         1V2v/OABqr9hwfWk5/x4tMnWxIV1OugUx+x6kdV7Qb0ZoAYT2SXHjtV3SPxGdzDoNBe5
+         90Hg==
+X-Gm-Message-State: AOJu0Yy7MfkbVfsd5n+2MYEjHvQw+XrXq7opvYV4ebX9/I87baametpX
+        2xvHf6wk72iK5AsNLnZMApc=
+X-Google-Smtp-Source: AGHT+IEQsrUikkl+B3X3A6GHGMJk0zCkNQCIcFx/RiY+mEqPpKHqXHGQJ3jBlTWnhgrGIBsfb7aJqA==
+X-Received: by 2002:a17:90a:b008:b0:273:cb91:c74f with SMTP id x8-20020a17090ab00800b00273cb91c74fmr22557041pjq.8.1697057462903;
+        Wed, 11 Oct 2023 13:51:02 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:19de:6b54:16fe:c022? ([2620:15c:211:201:19de:6b54:16fe:c022])
+        by smtp.gmail.com with ESMTPSA id sm6-20020a17090b2e4600b00273fc850342sm352450pjb.20.2023.10.11.13.51.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Oct 2023 13:20:46 -0700 (PDT)
-Message-ID: <b068c2ef-5de3-44fb-a55d-2cbe5a7f1158@kernel.dk>
-Date:   Wed, 11 Oct 2023 14:20:45 -0600
+        Wed, 11 Oct 2023 13:51:02 -0700 (PDT)
+Message-ID: <b0b015bf-0a27-4e89-950a-597b9fed20fb@acm.org>
+Date:   Wed, 11 Oct 2023 13:51:00 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Don't invalidate pagecache for invalid falloc
- modes
+Subject: Re: [PATCH v2 03/15] block: Support data lifetime in the I/O priority
+ bitfield
 Content-Language: en-US
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        stable@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>,
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@kernel.org>
-References: <20231011201230.750105-1-sarthakkukreti@chromium.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231011201230.750105-1-sarthakkukreti@chromium.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>,
+        Hannes Reinecke <hare@suse.de>
+References: <20231005194129.1882245-1-bvanassche@acm.org>
+ <20231005194129.1882245-4-bvanassche@acm.org>
+ <8aec03bb-4cef-9423-0ce4-c10d060afce4@kernel.org>
+ <46c17c1b-29be-41a3-b799-79163851f972@acm.org>
+In-Reply-To: <46c17c1b-29be-41a3-b799-79163851f972@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/11/23 2:12 PM, Sarthak Kukreti wrote:
-> Only call truncate_bdev_range() if the fallocate mode is
-> supported. This fixes a bug where data in the pagecache
-> could be invalidated if the fallocate() was called on the
-> block device with an invalid mode.
+On 10/6/23 11:07, Bart Van Assche wrote:
+> On 10/6/23 01:19, Damien Le Moal wrote:
+>> Your change seem to assume that it makes sense to be able to combine 
+>> CDL with
+>> lifetime hints. But does it really ? CDL is of dubious value for solid 
+>> state
+>> media and as far as I know, UFS world has not expressed interest. 
+>> Conversely,
+>> data lifetime hints do not make much sense for spin rust media where 
+>> CDL is
+>> important. So I would say that the combination of CDL and lifetime 
+>> hints is of
+>> dubious value.
+>>
+>> Given this, why not simply define the 64 possible lifetime values as 
+>> plain hint
+>> values (8 to 71, following 1 to 7 for CDL) ?
+>>
+>> The other question here if you really want to keep the bit separation 
+>> approach
+>> is: do we really need up to 64 different lifetime hints ? While the scsi
+>> standard allows that much, does this many different lifetime make 
+>> sense in
+>> practice ? Can we ever think of a usecase that needs more than say 8 
+>> different
+>> liftimes (3 bits) ? If you limit the number of possible lifetime hints 
+>> to 8,
+>> then we can keep 4 bits unused in the hint field for future features.
+> 
+> Hi Damien,
+> 
+> Not supporting CDL for solid state media and supporting eight different
+> lifetime values sounds good to me. Is this perhaps what you had in mind?
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> --- a/include/uapi/linux/ioprio.h
+> +++ b/include/uapi/linux/ioprio.h
+> @@ -100,6 +100,14 @@ enum {
+>          IOPRIO_HINT_DEV_DURATION_LIMIT_5 = 5,
+>          IOPRIO_HINT_DEV_DURATION_LIMIT_6 = 6,
+>          IOPRIO_HINT_DEV_DURATION_LIMIT_7 = 7,
+> +       IOPRIO_HINT_DATA_LIFE_TIME_0 = 8,
+> +       IOPRIO_HINT_DATA_LIFE_TIME_1 = 9,
+> +       IOPRIO_HINT_DATA_LIFE_TIME_2 = 10,
+> +       IOPRIO_HINT_DATA_LIFE_TIME_3 = 11,
+> +       IOPRIO_HINT_DATA_LIFE_TIME_4 = 12,
+> +       IOPRIO_HINT_DATA_LIFE_TIME_5 = 13,
+> +       IOPRIO_HINT_DATA_LIFE_TIME_6 = 14,
+> +       IOPRIO_HINT_DATA_LIFE_TIME_7 = 15,
+>   };
 
-Fix looks fine, but would be nicer if we didn't have to duplicate the
-truncate_bdev_range() in each switch clause. Can we check this upfront
-instead?
+(replying to my own e-mail)
 
-Also, please wrap commit messages at 72-74 chars.
+Hi Damien,
 
--- 
-Jens Axboe
+Does the above look good to you?
+
+Thanks,
+
+Bart.
 
