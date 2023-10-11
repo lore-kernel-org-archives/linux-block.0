@@ -2,93 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8798CD98F3
-	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 06:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECE4CD98F6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 07:26:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229621AbjJKGxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Oct 2023 02:53:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39322 "EHLO
+        id S1344424AbjJKH0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Oct 2023 03:26:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbjJKGxL (ORCPT
+        with ESMTP id S1344701AbjJKH0j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2023 02:53:11 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEEFF4
-        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 23:53:00 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 11 Oct 2023 03:26:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A969D
+        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2023 00:25:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697009152;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dSXw5lcK0e0ofOaHtrsjR9yCe5tbBhDZ30IPdaDC3ME=;
+        b=BcOugZB7SNK5oEky0h3QqEIsFr33hmtEdse36z+O/7+ZDcZ5IVU9GRZvvPi/pJJZrhAc0x
+        +9FY84e+Tb8g86uGGUCvd36l/7PGFFt7nf5LXM2f4YppvdcyEKc37dvDjmjBi1ABC6vCok
+        jg7vcfUjR/N5CH19v8WN55ScmFMe17g=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-534-hkJ0qGzONqC1iZtWfbMHOQ-1; Wed, 11 Oct 2023 03:25:49 -0400
+X-MC-Unique: hkJ0qGzONqC1iZtWfbMHOQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9E58D2185D;
-        Wed, 11 Oct 2023 06:52:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1697007178; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GO7BBqCZuJ0eghg5dsje8lMExWOqMRk95hSKX0GobG8=;
-        b=Tt96JQY6IPnK6559AwgvA0b37EX8o+qStLgtsWUpqRDWl0eU2cIarQhG1JfxIshJzU2raQ
-        11rEfuE5jzNm6Cw1bYcjv9V7hrAwJw0DK99nUv/l6PQUUpplOHW5VQ7Hxagd3Q6zzTFnLZ
-        Wa0Eq/AOmNi9ixHHyf8o2IFfPryL8O4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1697007178;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GO7BBqCZuJ0eghg5dsje8lMExWOqMRk95hSKX0GobG8=;
-        b=d2jW4Di7Kphan6yotDJk/F+MmZkOK+mnrLWdavwuW96tk0Q/L7XwO7gZk9BOu3db0mHYDr
-        oS+kNzAeY1QePBBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 90AA8134F5;
-        Wed, 11 Oct 2023 06:52:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id sCFII0pGJmUnbgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 11 Oct 2023 06:52:58 +0000
-Date:   Wed, 11 Oct 2023 08:54:09 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com
-Subject: Re: [PATCH blktests] check: define TMPDIR before running the test
-Message-ID: <xhh4o6xisfaybzozsia5owr5mzs4eyqn2yvrxogw5u55ht2lgd@hp3k4jb5mwsd>
-References: <20231011034832.1650797-1-yi.zhang@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E4072825E9E;
+        Wed, 11 Oct 2023 07:25:49 +0000 (UTC)
+Received: from fedora34.. (unknown [10.66.146.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CB7021B94;
+        Wed, 11 Oct 2023 07:25:47 +0000 (UTC)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     linux-block@vger.kernel.org
+Cc:     shinichiro.kawasaki@wdc.com, dwagner@suse.de
+Subject: [PATCH blktests V2] check: define TMPDIR earlier in _run_group
+Date:   Wed, 11 Oct 2023 15:25:30 +0800
+Message-Id: <20231011072530.1659810-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011034832.1650797-1-yi.zhang@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+The TMPDIR was defined in _call_test before running test_func, but it
+was used in nvme/rc which has not yet defined, so move the definiation
+before calling tests/${group}/rc in _run_group.
 
-On Wed, Oct 11, 2023 at 11:48:32AM +0800, Yi Zhang wrote:
-> @@ -478,6 +475,10 @@ _run_test() {
->  	# runs to suppress job status output.
->  	set +m
->  
-> +	if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
-> +		return
-> +	fi
-> +
->  	# shellcheck disable=SC1090
->  	. "tests/${TEST_NAME}"
+Fixes: b6356f6 ("nvme/rc: Add common file_path name define")
+Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+---
+ check | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Are you sure about the placement here? I went through the call chain
-and I figured that the TMPDIR should be set in _run_group before
-we call the 'rc' files.
+diff --git a/check b/check
+index 55871b0..99d8a69 100755
+--- a/check
++++ b/check
+@@ -364,9 +364,6 @@ _call_test() {
+ 
+ 		unset TEST_CLEANUP
+ 		trap _cleanup EXIT
+-		if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
+-			return
+-		fi
+ 
+ 		TIMEFORMAT="%Rs"
+ 		pushd . >/dev/null || return
+@@ -559,6 +556,10 @@ _run_group() {
+ 	local tests=("$@")
+ 	local group="${tests["0"]%/*}"
+ 
++	if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
++		return
++	fi
++
+ 	# shellcheck disable=SC1090
+ 	. "tests/${group}/rc"
+ 
+-- 
+2.34.3
 
-Currently it is:
-
-_check
-  _run_group
-    tests/${group}/rc
-    _run_test
-      _call_test
-        TMPDIR=...
-        $test_func
-
-Thanks,
-Daniel
