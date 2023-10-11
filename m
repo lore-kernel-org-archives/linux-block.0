@@ -2,89 +2,61 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8114DCD98EB
-	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 03:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DF8CD98F6
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 06:00:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229457AbjJKDto (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Oct 2023 23:49:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41116 "EHLO
+        id S1343792AbjJKGAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Oct 2023 02:00:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbjJKDto (ORCPT
+        with ESMTP id S1343606AbjJKGAA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Oct 2023 23:49:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201CCB8
-        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 20:48:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696996134;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=OUcO01oq8Dz2vL4ouhdS+Rz1zWEgeQosfyjDbjfrOVg=;
-        b=eh3O6PVoVOKZ53ytGNZhSMg1qwf18XePedbVLqpVy/Rdxbaj/rODmWcRGuwe5L6gzn0gmX
-        onx02gLjO++wt7swDEvdQXoX/fP2HZeoAJl6DkaL1+vRxgGkL88LC9fJ2+kVgR5/YhdhHm
-        fe3ZIfp+DPvQIHWtyOhCyS2iIKWNalU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-275-9U0R4WDXPZ2Zz9eT8IPl4w-1; Tue, 10 Oct 2023 23:48:48 -0400
-X-MC-Unique: 9U0R4WDXPZ2Zz9eT8IPl4w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 401D3101A58B;
-        Wed, 11 Oct 2023 03:48:48 +0000 (UTC)
-Received: from fedora34.. (unknown [10.66.146.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD61B1BA2;
-        Wed, 11 Oct 2023 03:48:46 +0000 (UTC)
-From:   Yi Zhang <yi.zhang@redhat.com>
-To:     linux-block@vger.kernel.org
-Cc:     shinichiro.kawasaki@wdc.com, dwagner@suse.de
-Subject: [PATCH blktests] check: define TMPDIR before running the test
-Date:   Wed, 11 Oct 2023 11:48:32 +0800
-Message-Id: <20231011034832.1650797-1-yi.zhang@redhat.com>
+        Wed, 11 Oct 2023 02:00:00 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB108E;
+        Tue, 10 Oct 2023 22:59:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=GET8ZhrTYl5TQ5W/uohHOuZFq1oFNF3XGk5OnQ/7puI=; b=mnrb6hzVzIp/WZZib0NAq5mVGe
+        6XVenHEA6rDOCyd+n5PmWNyyio69CHDyfQ19t3ZM6n/lEZBjyOACBbrl8strboMQoVicWpTvZNBnm
+        s3/G2RLn6HIDhAbGCXqLKfL1ueboJOTjZw+d4aiDTjwgH1DLb6PFmf5TxinChgP/up5hEa6VrK7R/
+        aAFAxgHIrzhvSmAiqXBl0eKPQJkLtkmsgftKrKWMtId5iYdHF+XEgY5Qvnpl15CZ2JlPmXsdQD+Ye
+        T6pa4vPuR9KpsqqiQ2cxoIm9c5NbmCZ5Ey5sl1olCTyzCyuEI/FGZvZF9KvVgQ+GgaLcUj93XYEA9
+        NqgJjjYg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qqSGB-00EsqK-13;
+        Wed, 11 Oct 2023 05:59:55 +0000
+Date:   Tue, 10 Oct 2023 22:59:55 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Chinner <david@fromorbit.com>, stable@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v8 1/5] block: Don't invalidate pagecache for invalid
+ falloc modes
+Message-ID: <ZSY526AePuS4jZX8@infradead.org>
+References: <20231007012817.3052558-1-sarthakkukreti@chromium.org>
+ <20231007012817.3052558-2-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231007012817.3052558-2-sarthakkukreti@chromium.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The TMPDIR was defined in _call_test before running test_func, but it
-was used in nvme/rc which has not yet defined, so move the definiation
-before runng the test to fix it.
-
-Fixes: b6356f6 ("nvme/rc: Add common file_path name define")
-Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
----
- check | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/check b/check
-index 55871b0..d25b56b 100755
---- a/check
-+++ b/check
-@@ -364,9 +364,6 @@ _call_test() {
- 
- 		unset TEST_CLEANUP
- 		trap _cleanup EXIT
--		if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
--			return
--		fi
- 
- 		TIMEFORMAT="%Rs"
- 		pushd . >/dev/null || return
-@@ -478,6 +475,10 @@ _run_test() {
- 	# runs to suppress job status output.
- 	set +m
- 
-+	if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
-+		return
-+	fi
-+
- 	# shellcheck disable=SC1090
- 	. "tests/${TEST_NAME}"
- 
--- 
-2.34.3
+Can yu please send this as a separate fix?
 
