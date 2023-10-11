@@ -2,95 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7599CDB468
-	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 16:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE9BCDB480
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 19:10:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232217AbjJKQ4V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Oct 2023 12:56:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41242 "EHLO
+        id S233159AbjJKTK2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Oct 2023 15:10:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232146AbjJKQ4V (ORCPT
+        with ESMTP id S232224AbjJKTK1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2023 12:56:21 -0400
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50ACD98;
-        Wed, 11 Oct 2023 09:56:19 -0700 (PDT)
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1bf55a81eeaso270835ad.0;
-        Wed, 11 Oct 2023 09:56:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697043379; x=1697648179;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M/Cv7Nd9TpaBHaZP+kl37itMKz+kx+gxJ8bgWLYJbKw=;
-        b=I8xYUf0Fx+0BKw/Nd/+VZ4kZNye2fO0atjLkP5AodzoUZaDSk/pes63aNOhCtqOuGs
-         ZTO9QfGw9Waos+xoEBzAAS8LwhhMoVB5pZtB+6tztcReYFIRYNjeD6EhZANAi/Mj/vGO
-         judvHsRh0j4ltj5HGsRtRaeDgB+6dfEUvqX84LCbHl8w4D2erri9JhQTgS0v6JPS1fSB
-         YYXmfbIaTSpoksT8ngGWIkd8X5fIrPFKJYlz+Fxli8nKadHPRzW1KUVmjQJOnO+Oey4/
-         8zd0wH4BxdHrF6it8twpkJ4hwNPjlQNDI19ruEApsON46F+MSsshU6mENippkcuyN9LK
-         FUgg==
-X-Gm-Message-State: AOJu0Yy2Q4+GvnVn4JgqUa3ksMzL2Jo6a9MnIkmsXYZ4Hhvbtfi+qeN3
-        koyKeYbSHMr6xyBVkHakCjQ=
-X-Google-Smtp-Source: AGHT+IGfkszq35vECGxayqgD7G6bdJGRz3vHBpurE3uPcz6M2u5ehswy8SX8d5eeW/m0lW5nKvthuA==
-X-Received: by 2002:a17:902:ed93:b0:1c6:25b2:b720 with SMTP id e19-20020a170902ed9300b001c625b2b720mr17025371plj.44.1697043378230;
-        Wed, 11 Oct 2023 09:56:18 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:19de:6b54:16fe:c022? ([2620:15c:211:201:19de:6b54:16fe:c022])
-        by smtp.gmail.com with ESMTPSA id jc5-20020a17090325c500b001bf8779e051sm48696plb.289.2023.10.11.09.56.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Oct 2023 09:56:17 -0700 (PDT)
-Message-ID: <75fbd722-1bd5-453a-8b39-c988654d3bab@acm.org>
-Date:   Wed, 11 Oct 2023 09:56:16 -0700
+        Wed, 11 Oct 2023 15:10:27 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D74BB91;
+        Wed, 11 Oct 2023 12:10:26 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59FB0C433C8;
+        Wed, 11 Oct 2023 19:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697051426;
+        bh=HhHPFkq4XUkEVYYA0d+VT2rvcvftna4sTAnQN7nnFJc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bS3R5tpJCHoxovxT4peBWdUh5wPu/bF0S7e66ISztNH+Hk6JxyQGEIx/9e6/z1DAm
+         Fq/b5BRUD5v8nPBJG2lqtQ5mDnJ2V2kznV7xti0GzK6FCBSv4Z278ix1KN9IzJOy3e
+         Q+ayV7+fKxyMGgDjxGGgXqGZ9QRZVLyRsBQpW+Dv5Lee/1c/PHA/t3duQZY9DOo70p
+         XSVVRLEaYSjWstU8FuNcXzWgb9EGHiHEDnO0TWqXhHX5jE0+E2jszv0Yapiz4iT2cg
+         STlSUPW7+MbPgLsgGiwKN0295wTU2EbXlTUEU+RsLinn7/vBb2cTEpn5OSAZvsYiro
+         gaHsimEA6Lijw==
+Date:   Wed, 11 Oct 2023 12:10:25 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     zlang@redhat.com, linux-xfs@vger.kernel.org,
+        fstests@vger.kernel.org, guan@eryu.me, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 1/3] xfs/178: don't fail when SCRATCH_DEV contains random
+ xfs superblocks
+Message-ID: <20231011191025.GX21298@frogsfrogsfrogs>
+References: <169687550821.3948976.6892161616008393594.stgit@frogsfrogsfrogs>
+ <169687551395.3948976.8425812597156927952.stgit@frogsfrogsfrogs>
+ <ZST2zRvtMrU0KlkN@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/15] fs: Restore write hint support
-Content-Language: en-US
-To:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Avri Altman <Avri.Altman@wdc.com>,
-        Bean Huo <huobean@gmail.com>,
-        Daejun Park <daejun7.park@samsung.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-References: <20231005194129.1882245-1-bvanassche@acm.org>
- <CGME20231005194217epcas5p1538a3730290bbb38adca08f8c80f328e@epcas5p1.samsung.com>
- <20231005194129.1882245-5-bvanassche@acm.org>
- <d25ae351-5131-1b3e-4ae8-bacb674008de@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <d25ae351-5131-1b3e-4ae8-bacb674008de@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZST2zRvtMrU0KlkN@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/9/23 22:42, Kanchan Joshi wrote:
-> On 10/6/2023 1:10 AM, Bart Van Assche wrote:
->> +static inline enum rw_hint bio_get_data_lifetime(struct bio *bio)
->> +{
->> +	/* +1 to map 0 onto WRITE_LIFE_NONE. */
->> +	return IOPRIO_PRIO_LIFETIME(bio->bi_ioprio) + 1;
->> +}
->> +
->> +static inline void bio_set_data_lifetime(struct bio *bio, enum rw_hint lifetime)
->> +{
->> +	/* -1 to map WRITE_LIFE_NONE onto 0. */
->> +	if (lifetime != 0)
->> +		lifetime--;
+On Tue, Oct 10, 2023 at 12:01:33AM -0700, Christoph Hellwig wrote:
+> On Mon, Oct 09, 2023 at 11:18:33AM -0700, Darrick J. Wong wrote:
+> > The storage advertises SCSI UNMAP support, but it is of the variety
+> > where the UNMAP command returns immediately but takes its time to unmap
+> > in the background.  Subsequent rereads are allowed to return stale
+> > contents, per DISCARD semantics.
+> > 
+> > When the fstests cloud is not busy, the old contents disappear in a few
+> > seconds.  However, at peak utilization, there are ~75 VMs running, and
+> > the storage backend can take several minutes to commit these background
+> > requests.
 > 
-> How the driver can figure when lifetime is not set, and when it is set
-> to WRITE_LIFE_NONE? If it uses IOPRIO_PRIO_LIFETIME (as patch 8 does),
-> it will see 0 in both cases.
-> F2FS fs-based whint_mode seems to expect distinct streams for
-> WRITE_LIFE_NOT_SET and WRITE_LIFE_NONE.
+> Umm, that is not valid behavior fo SCSI UNMAP or any other command
+> that Linux discard maps to.  All of them can do one of the two options
+> on a per-block basis:
+> 
+>  - return the unmap pattern (usually but not always 0) for any read
+>    following the unmap/trim/discard
+>  - always return the previous pattern until it is overwritten or
+>    discarded again
+> 
+> Changing the pattern some time after unmap is a grave bug, and we need
+> to blacklist the device.
 
-I will remove the -1 / +1 from the above code.
+Ok, I'll go pester them about fixing that, if they haven't already.
+Apparently discard support is somewhat new.
 
-Thanks,
+I'm pretty sure I've seen some NVME SSDs where you can issue devicewide
+DISCARDs and slowly watch the namespace utilization go down over tens of
+minutes; and reads will only eventually start returning zeroes.
 
-Bart.
+(Note that *writes* during the slow-discard period are persisted
+correctly.)
+
+However, that's orthogonal to this patch -- if the device doesn't
+support discard, _scratch_mkfs won't zero the entire disk to remove old
+dead superblocks that might have been written by previous tests.  After
+we shatter the primary super, the xfs_repair scanning code can still
+trip over those old supers and break the golden output.
+
+--D
