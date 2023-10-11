@@ -2,132 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06232C41513
-	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 20:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E409C41513
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 20:51:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233452AbjJKUvG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Oct 2023 16:51:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56964 "EHLO
+        id S233569AbjJKUvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Oct 2023 16:51:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231226AbjJKUvF (ORCPT
+        with ESMTP id S235178AbjJKUvU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2023 16:51:05 -0400
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CACF9A9;
-        Wed, 11 Oct 2023 13:51:03 -0700 (PDT)
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-27d1f57bda7so36941a91.0;
-        Wed, 11 Oct 2023 13:51:03 -0700 (PDT)
+        Wed, 11 Oct 2023 16:51:20 -0400
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE17C90
+        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2023 13:50:31 -0700 (PDT)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-66d12b3b479so929626d6.1
+        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2023 13:50:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697057463; x=1697662263;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nE+u+F1XkNDY5suKWhgfSDeZXY6238ysQJ12xui8faI=;
-        b=PodpIlA6kc9rcD3lUSetKU+2XcImBSaTEYr+ZZsVQ4mVBMNYLx3gVusdMM4u7JZqGK
-         6LTu48/SFjAu2kf44EapchCYl/Vz5QgMTzoyxrwZewNu2hC4js/vCs0dYwvv6yAgK8X0
-         aDr7wf/DE+XFS+NQT6B9qTJngiq04pi4bJoeAFzarLPnRuQ6jTS67qrGny6JgihUWjbh
-         6zm7S2V9YZkNOVTsNcNrgOmQLf1BSpw/leu6C3ak/IQaiG90HEzXYBDqzhoJjhvjFg3L
-         1V2v/OABqr9hwfWk5/x4tMnWxIV1OugUx+x6kdV7Qb0ZoAYT2SXHjtV3SPxGdzDoNBe5
-         90Hg==
-X-Gm-Message-State: AOJu0Yy7MfkbVfsd5n+2MYEjHvQw+XrXq7opvYV4ebX9/I87baametpX
-        2xvHf6wk72iK5AsNLnZMApc=
-X-Google-Smtp-Source: AGHT+IEQsrUikkl+B3X3A6GHGMJk0zCkNQCIcFx/RiY+mEqPpKHqXHGQJ3jBlTWnhgrGIBsfb7aJqA==
-X-Received: by 2002:a17:90a:b008:b0:273:cb91:c74f with SMTP id x8-20020a17090ab00800b00273cb91c74fmr22557041pjq.8.1697057462903;
-        Wed, 11 Oct 2023 13:51:02 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:19de:6b54:16fe:c022? ([2620:15c:211:201:19de:6b54:16fe:c022])
-        by smtp.gmail.com with ESMTPSA id sm6-20020a17090b2e4600b00273fc850342sm352450pjb.20.2023.10.11.13.51.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Oct 2023 13:51:02 -0700 (PDT)
-Message-ID: <b0b015bf-0a27-4e89-950a-597b9fed20fb@acm.org>
-Date:   Wed, 11 Oct 2023 13:51:00 -0700
+        d=1e100.net; s=20230601; t=1697057431; x=1697662231;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PxitJBHCJQdxtXEDgm6njCHvQtKMi09+y/v+pbWOwa8=;
+        b=NeeE3bmqN7XH7FM8GDomawgr21zYnCEk8zZhO7xW2JjN5UvFD1IHARKndtsn++1TNm
+         0buj9nwD/9ox5YZsWTFdm7dZCtGoUNI14qrQvWZEu6nRtYsYL3sz+8/GLkJw44Y3Ky2s
+         89zzywgX+e3Hg4kVER6IPdgKBk2QWYaJsf3z6LjNOvHHgBFKVD2G7Ta9sD7foZio2mT+
+         kDpX3R2nwCWzM0y7NwMcdF8PAGQ4dzheb8oGqTsWDNtP77/wduIZ0EqbPX8eFWCibzrj
+         QTM07z8R8eoO5IlyQ2esbX/g9Q0Sm68OtUd7h4/rviQXjr+m11LrbCUrMgiHCFGEEK2H
+         UWuA==
+X-Gm-Message-State: AOJu0YyRz0R1oV3szLnXRYRHk1606sAwVw2rCMcyJ9QebKpbTDBfBtZk
+        t93SO1KSGN8wJiwd1SGx2Cei8hBS3qPnu0yAIw==
+X-Google-Smtp-Source: AGHT+IEPs1rkK6QoPv6JwQx1Izxget+/aeE937zAia+e+WpczjixBU7iH+92tXrTfK7ySbtA2Cgb4A==
+X-Received: by 2002:a05:6214:43ca:b0:64f:5261:55e9 with SMTP id oi10-20020a05621443ca00b0064f526155e9mr26910718qvb.41.1697057430888;
+        Wed, 11 Oct 2023 13:50:30 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id 24-20020a05620a06d800b00774830b40d4sm5474922qky.47.2023.10.11.13.50.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 13:50:30 -0700 (PDT)
+Date:   Wed, 11 Oct 2023 16:50:29 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        stable@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: block: Don't invalidate pagecache for invalid falloc modes
+Message-ID: <ZScKlejOlxIXYmWI@redhat.com>
+References: <20231011201230.750105-1-sarthakkukreti@chromium.org>
+ <b068c2ef-5de3-44fb-a55d-2cbe5a7f1158@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/15] block: Support data lifetime in the I/O priority
- bitfield
-Content-Language: en-US
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Avri Altman <Avri.Altman@wdc.com>,
-        Bean Huo <huobean@gmail.com>,
-        Daejun Park <daejun7.park@samsung.com>,
-        Hannes Reinecke <hare@suse.de>
-References: <20231005194129.1882245-1-bvanassche@acm.org>
- <20231005194129.1882245-4-bvanassche@acm.org>
- <8aec03bb-4cef-9423-0ce4-c10d060afce4@kernel.org>
- <46c17c1b-29be-41a3-b799-79163851f972@acm.org>
-In-Reply-To: <46c17c1b-29be-41a3-b799-79163851f972@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b068c2ef-5de3-44fb-a55d-2cbe5a7f1158@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/6/23 11:07, Bart Van Assche wrote:
-> On 10/6/23 01:19, Damien Le Moal wrote:
->> Your change seem to assume that it makes sense to be able to combine 
->> CDL with
->> lifetime hints. But does it really ? CDL is of dubious value for solid 
->> state
->> media and as far as I know, UFS world has not expressed interest. 
->> Conversely,
->> data lifetime hints do not make much sense for spin rust media where 
->> CDL is
->> important. So I would say that the combination of CDL and lifetime 
->> hints is of
->> dubious value.
->>
->> Given this, why not simply define the 64 possible lifetime values as 
->> plain hint
->> values (8 to 71, following 1 to 7 for CDL) ?
->>
->> The other question here if you really want to keep the bit separation 
->> approach
->> is: do we really need up to 64 different lifetime hints ? While the scsi
->> standard allows that much, does this many different lifetime make 
->> sense in
->> practice ? Can we ever think of a usecase that needs more than say 8 
->> different
->> liftimes (3 bits) ? If you limit the number of possible lifetime hints 
->> to 8,
->> then we can keep 4 bits unused in the hint field for future features.
+On Wed, Oct 11 2023 at  4:20P -0400,
+Jens Axboe <axboe@kernel.dk> wrote:
+
+> On 10/11/23 2:12 PM, Sarthak Kukreti wrote:
+> > Only call truncate_bdev_range() if the fallocate mode is
+> > supported. This fixes a bug where data in the pagecache
+> > could be invalidated if the fallocate() was called on the
+> > block device with an invalid mode.
 > 
-> Hi Damien,
-> 
-> Not supporting CDL for solid state media and supporting eight different
-> lifetime values sounds good to me. Is this perhaps what you had in mind?
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> --- a/include/uapi/linux/ioprio.h
-> +++ b/include/uapi/linux/ioprio.h
-> @@ -100,6 +100,14 @@ enum {
->          IOPRIO_HINT_DEV_DURATION_LIMIT_5 = 5,
->          IOPRIO_HINT_DEV_DURATION_LIMIT_6 = 6,
->          IOPRIO_HINT_DEV_DURATION_LIMIT_7 = 7,
-> +       IOPRIO_HINT_DATA_LIFE_TIME_0 = 8,
-> +       IOPRIO_HINT_DATA_LIFE_TIME_1 = 9,
-> +       IOPRIO_HINT_DATA_LIFE_TIME_2 = 10,
-> +       IOPRIO_HINT_DATA_LIFE_TIME_3 = 11,
-> +       IOPRIO_HINT_DATA_LIFE_TIME_4 = 12,
-> +       IOPRIO_HINT_DATA_LIFE_TIME_5 = 13,
-> +       IOPRIO_HINT_DATA_LIFE_TIME_6 = 14,
-> +       IOPRIO_HINT_DATA_LIFE_TIME_7 = 15,
->   };
+> Fix looks fine, but would be nicer if we didn't have to duplicate the
+> truncate_bdev_range() in each switch clause. Can we check this upfront
+> instead?
 
-(replying to my own e-mail)
+No, if you look at the function (rather than just the patch in
+isolation) we need to make the call for each case rather than collapse
+to a single call at the front (that's the reason for this fix, because
+otherwise the default: error case will invalidate the page cache too).
 
-Hi Damien,
+Just so you're aware, I also had this feedback that shaped the patch a
+bit back in April:
+https://listman.redhat.com/archives/dm-devel/2023-April/053986.html
 
-Does the above look good to you?
+> Also, please wrap commit messages at 72-74 chars.
 
-Thanks,
+Not seeing where the header should be wrapped.  You referring to the
+Fixes: line?  I've never seen those wrapped.
 
-Bart.
-
+Mike
