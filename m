@@ -2,61 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DF8CD98F6
-	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 06:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8798CD98F3
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 06:53:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343792AbjJKGAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Oct 2023 02:00:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60566 "EHLO
+        id S229621AbjJKGxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Oct 2023 02:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343606AbjJKGAA (ORCPT
+        with ESMTP id S229497AbjJKGxL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2023 02:00:00 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB108E;
-        Tue, 10 Oct 2023 22:59:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GET8ZhrTYl5TQ5W/uohHOuZFq1oFNF3XGk5OnQ/7puI=; b=mnrb6hzVzIp/WZZib0NAq5mVGe
-        6XVenHEA6rDOCyd+n5PmWNyyio69CHDyfQ19t3ZM6n/lEZBjyOACBbrl8strboMQoVicWpTvZNBnm
-        s3/G2RLn6HIDhAbGCXqLKfL1ueboJOTjZw+d4aiDTjwgH1DLb6PFmf5TxinChgP/up5hEa6VrK7R/
-        aAFAxgHIrzhvSmAiqXBl0eKPQJkLtkmsgftKrKWMtId5iYdHF+XEgY5Qvnpl15CZ2JlPmXsdQD+Ye
-        T6pa4vPuR9KpsqqiQ2cxoIm9c5NbmCZ5Ey5sl1olCTyzCyuEI/FGZvZF9KvVgQ+GgaLcUj93XYEA9
-        NqgJjjYg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qqSGB-00EsqK-13;
-        Wed, 11 Oct 2023 05:59:55 +0000
-Date:   Tue, 10 Oct 2023 22:59:55 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Chinner <david@fromorbit.com>, stable@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v8 1/5] block: Don't invalidate pagecache for invalid
- falloc modes
-Message-ID: <ZSY526AePuS4jZX8@infradead.org>
-References: <20231007012817.3052558-1-sarthakkukreti@chromium.org>
- <20231007012817.3052558-2-sarthakkukreti@chromium.org>
+        Wed, 11 Oct 2023 02:53:11 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEEFF4
+        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 23:53:00 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 9E58D2185D;
+        Wed, 11 Oct 2023 06:52:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1697007178; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GO7BBqCZuJ0eghg5dsje8lMExWOqMRk95hSKX0GobG8=;
+        b=Tt96JQY6IPnK6559AwgvA0b37EX8o+qStLgtsWUpqRDWl0eU2cIarQhG1JfxIshJzU2raQ
+        11rEfuE5jzNm6Cw1bYcjv9V7hrAwJw0DK99nUv/l6PQUUpplOHW5VQ7Hxagd3Q6zzTFnLZ
+        Wa0Eq/AOmNi9ixHHyf8o2IFfPryL8O4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1697007178;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GO7BBqCZuJ0eghg5dsje8lMExWOqMRk95hSKX0GobG8=;
+        b=d2jW4Di7Kphan6yotDJk/F+MmZkOK+mnrLWdavwuW96tk0Q/L7XwO7gZk9BOu3db0mHYDr
+        oS+kNzAeY1QePBBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 90AA8134F5;
+        Wed, 11 Oct 2023 06:52:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id sCFII0pGJmUnbgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 11 Oct 2023 06:52:58 +0000
+Date:   Wed, 11 Oct 2023 08:54:09 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com
+Subject: Re: [PATCH blktests] check: define TMPDIR before running the test
+Message-ID: <xhh4o6xisfaybzozsia5owr5mzs4eyqn2yvrxogw5u55ht2lgd@hp3k4jb5mwsd>
+References: <20231011034832.1650797-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231007012817.3052558-2-sarthakkukreti@chromium.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20231011034832.1650797-1-yi.zhang@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Can yu please send this as a separate fix?
+Hi,
 
+On Wed, Oct 11, 2023 at 11:48:32AM +0800, Yi Zhang wrote:
+> @@ -478,6 +475,10 @@ _run_test() {
+>  	# runs to suppress job status output.
+>  	set +m
+>  
+> +	if ! TMPDIR="$(mktemp --tmpdir -p "$OUTPUT" -d "tmpdir.${TEST_NAME//\//.}.XXX")"; then
+> +		return
+> +	fi
+> +
+>  	# shellcheck disable=SC1090
+>  	. "tests/${TEST_NAME}"
+
+Are you sure about the placement here? I went through the call chain
+and I figured that the TMPDIR should be set in _run_group before
+we call the 'rc' files.
+
+Currently it is:
+
+_check
+  _run_group
+    tests/${group}/rc
+    _run_test
+      _call_test
+        TMPDIR=...
+        $test_func
+
+Thanks,
+Daniel
