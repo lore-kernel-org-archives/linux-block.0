@@ -2,137 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F690CD98D9
-	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 00:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1E2CD98D9
+	for <linux-block@archiver.kernel.org>; Wed, 11 Oct 2023 00:40:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344228AbjJKANX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 Oct 2023 20:13:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52764 "EHLO
+        id S1344414AbjJKAkS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 Oct 2023 20:40:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344204AbjJKANW (ORCPT
+        with ESMTP id S1344327AbjJKAkS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Oct 2023 20:13:22 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B5F699
-        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 17:13:21 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-69101022969so5559732b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 17:13:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1696983201; x=1697588001; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bXYSMoj+4mDjgRP2mTt2Aa1GtDE1UTVBqHkHte3xwzo=;
-        b=THVAZbLHDOGUMC2GecjPMvtCxzk3eiP3aTrvbwVAmZidEWVOrPAXo2r+UHpS7wvTnx
-         PtNgVjzST+8AvmbSJzItwpVaMU9pgKBbr3474Gz19CJ+hfC+bKHy9niI6V90QIGw76ue
-         0UfiHkTWDez1BRdMrRMN9Fm9KrpVtjGHQyYZRN/x0sUX1Wi75EaJ43K7DffpMCHU7ygz
-         dGSg+tvidNXUEc3tcXW/gWJnMtGmyrYyRPsBM6y3eSrlOyRPbe+42vNSDGr8krIWLVt2
-         vURLIec4QX8A+NQL4+r/J7pPvH6TaiqPH4fFOmRGyoOG2gx0+RV1NcaUZlqUyGPFD6eH
-         giew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696983201; x=1697588001;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bXYSMoj+4mDjgRP2mTt2Aa1GtDE1UTVBqHkHte3xwzo=;
-        b=q3WxqLnLIEgnLgHR+UpnojF1fNH8sA+4p/mKw8zbcw4yUjjJj4JvQ/tVpDUdenI64c
-         Hvz8xLKV3GiyHZ5DQnJjnKLvBD3FjJgh9jedRVP1LWL4Uv3e3noeImmSV8YUjaJ+Xa72
-         WJk8KpHCbUx9smPEdDqFv48F82EQAj9udZS9zR7gX1aA0s9EqY9gpnt5J1sCQGqhGT2s
-         Bt2J41wKaNiwPll7Z2eroDOLJZkrvPb4U+Wo1VJ3F596647yEueIb3NiGnUAV+VSv5eH
-         9WB0rm7PDLkh5I8ve3P4JnEdiqG+EbtkQ0iwJvDFrMi4xt1CBZR7x3kBGQZSQgU4LQPc
-         wt+A==
-X-Gm-Message-State: AOJu0YwFRdYwcr8Z/03Q0WgtCb90QEOx9Z7v8cX3U4KVH1ecgVmu4+nS
-        KbHrR8n3bpVsqO6ync+Y3z84Sw==
-X-Google-Smtp-Source: AGHT+IEhIWc+rwqEXOm79XKP02Vs6tvtegdLCI6fFlAq/EvagoUmMI4WFKDIe3c26N4RyxgWNDKTzA==
-X-Received: by 2002:a05:6a20:9385:b0:161:3120:e840 with SMTP id x5-20020a056a20938500b001613120e840mr24937687pzh.2.1696983200909;
-        Tue, 10 Oct 2023 17:13:20 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-20-59.pa.nsw.optusnet.com.au. [49.180.20.59])
-        by smtp.gmail.com with ESMTPSA id p10-20020a170902eaca00b001b8a85489a3sm12443132pld.262.2023.10.10.17.13.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 17:13:20 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qqMqk-00CB5y-0c;
-        Wed, 11 Oct 2023 11:13:18 +1100
-Date:   Wed, 11 Oct 2023 11:13:18 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Subject: Re: [PATCH v8 0/5] Introduce provisioning primitives
-Message-ID: <ZSXono3GkXhgrZ1T@dread.disaster.area>
-References: <20231007012817.3052558-1-sarthakkukreti@chromium.org>
- <ZSNANlreccIVXuo+@dread.disaster.area>
- <CAG9=OMMM3S373Y6UEeXxnOyvMvA9wmAVd4Jrdjt3gzkz9d2yUg@mail.gmail.com>
+        Tue, 10 Oct 2023 20:40:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 817998F
+        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2023 17:39:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696984770;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Fg8S2ybDrfMwqKipB/ZC4g70QBQJPgN1wyoLIe+e5WY=;
+        b=beg44sDbFb5aY+nU4nxsCO/G2lt53VGoOFrbnsQVl7/hHaqi5wMLtIjnMoja3qxGcFO1EZ
+        QT/cGO0R2KrxnI6Ro50ezcaB31scBaJlLaMCZ8fxMty92cRRltDys/C3Hxi0dhB8jYio92
+        QIx0kG+egTiVKNqtNQO5oiJCv7IagY8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-601-x1ArTAfuNyO6mavzfsztEw-1; Tue, 10 Oct 2023 20:39:17 -0400
+X-MC-Unique: x1ArTAfuNyO6mavzfsztEw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10896101A550;
+        Wed, 11 Oct 2023 00:39:17 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CC0462029296;
+        Wed, 11 Oct 2023 00:39:10 +0000 (UTC)
+Date:   Wed, 11 Oct 2023 08:39:05 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Juri Lelli <juri.lelli@redhat.com>,
+        Andrew Theurer <atheurer@redhat.com>,
+        Joe Mario <jmario@redhat.com>,
+        Sebastian Jug <sejug@redhat.com>,
+        Frederic Weisbecker <frederic@kernel.org>, ming.lei@redhat.com
+Subject: Re: [PATCH] blk-mq: add module parameter to not run block kworker on
+ isolated CPUs
+Message-ID: <ZSXuqZNsyjJk1FGX@fedora>
+References: <20231010142216.1114752-1-ming.lei@redhat.com>
+ <ZSWb2DNV9cIPYv5H@slm.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG9=OMMM3S373Y6UEeXxnOyvMvA9wmAVd4Jrdjt3gzkz9d2yUg@mail.gmail.com>
+In-Reply-To: <ZSWb2DNV9cIPYv5H@slm.duckdns.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 03:42:53PM -0700, Sarthak Kukreti wrote:
-> On Sun, Oct 8, 2023 at 4:50 PM Dave Chinner <david@fromorbit.com> wrote:
-> >
-> > On Fri, Oct 06, 2023 at 06:28:12PM -0700, Sarthak Kukreti wrote:
-> > > Hi,
-> > >
-> > > This patch series is version 8 of the patch series to introduce
-> > > block-level provisioning mechanism (original [1]), which is useful for provisioning
-> > > space across thinly provisioned storage architectures (loop devices
-> > > backed by sparse files, dm-thin devices, virtio-blk). This series has
-> > > minimal changes over v7[2].
-> > >
-> > > This patch series is rebased from the linux-dm/dm-6.5-provision-support [1] on to
-> > > (cac405a3bfa2 Merge tag 'for-6.6-rc3-tag'). In addition, there's an
-> > > additional patch to allow passing through an unshare intent via REQ_OP_PROVISION
-> > > (suggested by Darrick in [4]).
-> >
-> > The XFS patches I just posted were smoke tested a while back against
-> > loop devices and then forward ported to this patchset. Good for
-> > testing that userspace driven file preallocation gets propagated by
-> > the filesystem down to the backing device correctly and that
-> > subsequent IO to the file then does the right thing (e.g. fio
-> > testing using fallocate() to set up the files being written to)....
-> >
+Hello,
+
+On Tue, Oct 10, 2023 at 08:45:44AM -1000, Tejun Heo wrote:
+> (cc'ing Frederic)
 > 
-> Thanks! I've been testing with a WIP patch for ext4, I'll give your
-> patches a try. Once we are closer to submitting the filesystem
-> support, we can formalize the test into an xfstest (sparse file + loop
-> + filesystem, fallocate() file, check the size of the underlying
-> sparse file).
+> On Tue, Oct 10, 2023 at 10:22:16PM +0800, Ming Lei wrote:
+> > Kernel parameter of `isolcpus=` is used for isolating CPUs for specific
+> > task, and user often won't want block IO to disturb these CPUs, also long
+> > IO latency may be caused if blk-mq kworker is scheduled on these isolated
+> > CPUs.
+> > 
+> > Kernel workqueue only respects this limit for WQ_UNBOUND, for bound wq,
+> > the responsibility should be on wq user.
+> > 
+> > Add one block layer parameter for not running block kworker on isolated
+> > CPUs.
+> > 
+> > Cc: Juri Lelli <juri.lelli@redhat.com>
+> > Cc: Andrew Theurer <atheurer@redhat.com>
+> > Cc: Joe Mario <jmario@redhat.com>
+> > Cc: Sebastian Jug <sejug@redhat.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-mq.c | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index ec922c6bccbe..c53b5b522053 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -29,6 +29,7 @@
+> >  #include <linux/prefetch.h>
+> >  #include <linux/blk-crypto.h>
+> >  #include <linux/part_stat.h>
+> > +#include <linux/sched/isolation.h>
+> >  
+> >  #include <trace/events/block.h>
+> >  
+> > @@ -42,6 +43,13 @@
+> >  #include "blk-rq-qos.h"
+> >  #include "blk-ioprio.h"
+> >  
+> > +static bool respect_cpu_isolation;
+> > +module_param(respect_cpu_isolation, bool, 0444);
+> > +MODULE_PARM_DESC(respect_cpu_isolation,
+> > +		"Don't schedule blk-mq worker on isolated CPUs passed in "
+> > +		"isolcpus= or nohz_full=. User need to guarantee to not run "
+> > +		"block IO on isolated CPUs (default: false)");
+> 
+> Any chance we can centralize these? It's no fun to try to hunt down module
+> params to opt in different subsystems and the housekeeping interface does
+> have some provisions for selecting different parts. I'd much prefer to see
+> these settings to be collected into a central place.
 
-That's not really a valid test - there are so many optional filesystem
-behaviours that can change the layout of the backing file for the
-same upper filesystem operations.
+I guess it is hard to solve in a central place, such as workqueue.
 
-What we actually need to test is the ENOSPC guarantees, not that
-fallocate has been called by the loop device. i.e. that ENOSPC is
-propagated from the underlying filesystem though the loop device to
-the application running on the upper filesystem appropriately.  e.g.
-when the lower filesystem is at ENOSPC, the writes into provisioned
-space in the loop device backing file continue to succeed without
-ENOSPC being reported to the upper filesystem.
+Follows the workqueue API:
 
-i.e. this needs to be tested from the perspective of the API
-presented to the upper filesystem, not by running an upper fs
-operation and then trying to infer correct behaviour by peering at
-the state of the lower filesystem...
+/**
+   * queue_work_on - queue work on specific cpu
+   * @cpu: CPU number to execute work on
+   * @wq: workqueue to use
+   * @work: work to queue
+   *
+   * We queue the work to a specific CPU, the caller must ensure it
+   * can't go away.  Callers that fail to ensure that the specified
+   * CPU cannot go away will execute on a randomly chosen CPU.
+   * But note well that callers specifying a CPU that never has been
+   * online will get a splat.
+   *
+   * Return: %false if @work was already on a queue, %true otherwise.
+   */
+  bool queue_work_on(int cpu, struct workqueue_struct *wq,
+                     struct work_struct *work)
 
-Cheers,
+The caller specifies one cpu to queue work, what can queue_work_on()
+do if the specified CPU is isolated? If the API is changed by dealing
+with isolated CPU, the caller has to modify for adapting with the API
+change.
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Secondly isolated CPUs still can be override by 'taskset -C
+$isolated_cpus', that is why I add one blk-mq module parameter,
+but the module parameter can be removed, just with two extra effects
+if block IOs are submitted from isolated CPUs:
+
+- driver's ->queue_rq() can be queued on other CPU or UNBOUND CPU,
+which looks fine
+
+- IO timeout may be triggered during cpu hotplug, but this way had
+been long time, maybe not one big deal too.
+
+I appreciate that any specific suggestions about dealing with isolated CPUs
+generically for bound WQ can be shared.
+
+Thanks,
+Ming
+
