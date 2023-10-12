@@ -2,85 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E80CDB47E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4842C41513
 	for <linux-block@archiver.kernel.org>; Thu, 12 Oct 2023 02:12:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233929AbjJLCMF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 Oct 2023 22:12:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
+        id S231898AbjJLCMG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 Oct 2023 22:12:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231898AbjJLCME (ORCPT
+        with ESMTP id S233983AbjJLCME (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 11 Oct 2023 22:12:04 -0400
 Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0139398
-        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2023 19:11:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B47B6
+        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2023 19:12:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1697076719; x=1728612719;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=td9WBejDDKjR4Ddy0J5rCXN1ounSZS54zWqmKYVAHHA=;
-  b=gPhf75DTrArfrolPySb+pTjmpBi97ob2oyRdI8S9m9GsRhSEw/TRkOAN
-   cO8UZiPK6GQlJDeq/m/C2EfJxhWq/Dq9pi6zW/gkark6FPzZLLMwOODog
-   HjiSccRTcedWGso+IrQxqBVlSiXbDcpvUSHECWtNuaKdn+VBgZHbWSd8t
-   fduU+TA5qFuecSLRWJ7IfVdxV4qIibIfAGnfSnN/HryMigAy064iuq+hO
-   pd3ibhu8zFod8gyCp1VzuVAxqykJVEV+m7M7hlTdBNvttH5rAxDCbhV8y
-   6gjP0OtyXOb3WKNSCPQQi5n2CGvwPF2f6tKMtAuP9HHYdRQEQNSF+k/wX
-   g==;
-X-CSE-ConnectionGUID: lXTI4VUPQVK01oNCr1tOqg==
-X-CSE-MsgGUID: B4doRqDDR9aBYnnkz8naeA==
+  t=1697076722; x=1728612722;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=W2EAhHNi2XIUk7YopdZRhwdUiav0UH6yaUvRGqcZzWg=;
+  b=OjHkY2/hyzF/FhSjWapf10l6z/MphwsvL2QS+AXvdUbWqYEeQ444xI6h
+   5ARUQmVSlT2NvL9KUCJefhdiL9nO5lqBbGEsWVSuBhZDyQpFmCx1jlYR1
+   gXI3mxBAJBQTZLAUKVw7HhTQxj1Op0YmAM4eJPB5bFI2bishmN9rSBdNz
+   ZBHmTJukBKzvZExXOvZBNMFzXYq7NG44boLnV8jAwseifvqFXZqTplFCh
+   YHZ4Ui9OtgnXfYGdFoqB5B3Kp5OxNHkUMqhSdOPz/GDh1cmZx2Ezx3JTD
+   5kT2vx3hdNIo5wH37rRSUiEtyxYeliKmCgXelTDZVdi2GImZxkXAQxEnW
+   w==;
+X-CSE-ConnectionGUID: mUleecLbTaGUNI3rOm7n6Q==
+X-CSE-MsgGUID: LxL/lkqkSx+5+/YeQ1sxGg==
 X-IronPort-AV: E=Sophos;i="6.03,217,1694707200"; 
-   d="scan'208";a="250798257"
+   d="scan'208";a="250798293"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Oct 2023 10:11:55 +0800
-IronPort-SDR: NhbgxNh6d7d50rX2KQcfRiYInOUqJYJYZ7Hx/RjeaaZGsrgOoHPvaMwaecy1p6JQpE62xNZFdq
- w85kM6yrJ74ln9iS5YBWPBCjFPzuzkJJCKYeLkpj2ZkNQoDEC4wzprugvE+C9Xz16eXis4IDos
- a07r6hd69krwKQtan1MYvffTE1ZZPHWCyFRxBI27IpFUaxKqS1WuGuETav/BTdLSHvatj4wz+0
- IXp99fClf09SEXbcsPQRlGQ80hX0BliisAGd4pM4pGJJUbdN6xU1ONXpKhxk2uTlZEOgWvlPdc
- c+M=
+  by ob1.hgst.iphmx.com with ESMTP; 12 Oct 2023 10:11:57 +0800
+IronPort-SDR: 4clBepSOZWXHJcZM9RxGhrPmiBTS+XzikxucmRXBI9rBSFerwLmtUEk+lCs3YFO24hLupirt5s
+ xiLko1l1ydvRl7iyQPPoIKjqDGvJ5kKdNl9vbIQRnZoDRKk9pxY6t6xHcW5K00kknlRHOSvIS0
+ T51ouJGtSIrmroc9BFpAqO+Usc5ZLPJiqdgkVOBI6KRf8+blonJlvTEE4nniLHxq5iGXCsssyz
+ 4ihuHZ/DzUj5qkPYNqd87w9Xf/Jp7Ixtqy8xGDq3/QuIg+AdxiwNgsKLlHxGOYacNpJkxaGtu1
+ 8xA=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Oct 2023 18:24:02 -0700
-IronPort-SDR: D+Wiz3jkuL7Uxc4NQmshYdBT8t97UCyQ5YHO0h7HWCREFkkE3LBOZ52SwFSprmimarabc36u+B
- w8LvcmZflDgELOo6OWs2gBqB8eiOdptlsnZGGK8yxDF0u0t0Fc6xyjLbTVgF+M0yl5q3ClYv8n
- 4zxJVvKG+/YsJieKWp6dggbD6ql04ShBjOq0twinUQgEaYxi+YOtEc9wgEiiOhhJCAuk8t7S5t
- WQ6Rtou+cez4ZizN6AZsYvN0bTiuC01HXARZFd3PwN7XeVZw0flwL+J3IRKPtCuh+csAEKKPth
- KlQ=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Oct 2023 18:24:04 -0700
+IronPort-SDR: LIkYx0AwSZY4Wom+Sc5DqIZ85XTJb/TUaclNdO8bUyD7+qq2VLe7JMV2uvs8zoFl9pD2K6rulF
+ 8JlmdwZjnEfi62zrTi50AQSHPDM7E0feRHh06ry+hjXL7H/P2m+UrWkU3r2iOKsvtB3auZBqN9
+ mZK4thA2B3kbRAG7G3nHqnruGUvKh1Na3sDwG/nD982KIMngjzFAXLwvTUBxpPKEC7mmnzzDOY
+ vRYXDsUhMCWBdanpTPy8i0/74T0U7y8crAmEmnOrP/Q/ZzXGKJVtyXEiByv3RuHqMySuAlEAgI
+ 8lE=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
-  by uls-op-cesaip01.wdc.com with ESMTP; 11 Oct 2023 19:11:54 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 11 Oct 2023 19:11:56 -0700
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Yi Zhang <yi.zhang@redhat.com>, Daniel Wagner <dwagner@suse.de>,
         Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 0/2] TMPDIR fixes
-Date:   Thu, 12 Oct 2023 11:11:50 +0900
-Message-ID: <20231012021152.832553-1-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 2/2] block/002: fix TMPDIR path
+Date:   Thu, 12 Oct 2023 11:11:52 +0900
+Message-ID: <20231012021152.832553-3-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231012021152.832553-1-shinichiro.kawasaki@wdc.com>
+References: <20231012021152.832553-1-shinichiro.kawasaki@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Yi Zhang reported that the reference to TMPDIR in nvme/rc causes an issue
-because the reference happens out of test() or test_device() context [1][2].
-The first patch addresses this issue. The second patch fixes another TMPDIR
-bug found during this work.
+There has been a typo of TMPDIR variable. This resulted in blktrace
+files created at unexpected place. Fix the typo.
 
-[1] https://lore.kernel.org/linux-block/20231011034832.1650797-1-yi.zhang@redhat.com/
-[2] https://lore.kernel.org/linux-block/20231011072530.1659810-1-yi.zhang@redhat.com/
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ tests/block/002 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Shin'ichiro Kawasaki (2):
-  nvme/{rc,017,031}: replace def_file_path with _nvme_def_file_path()
-  block/002: fix TMPDIR path
-
- tests/block/002 |  2 +-
- tests/nvme/017  |  9 +++++----
- tests/nvme/031  |  6 +++---
- tests/nvme/rc   | 17 +++++++++++------
- 4 files changed, 20 insertions(+), 14 deletions(-)
-
+diff --git a/tests/block/002 b/tests/block/002
+index ee8b0bc..65b0fbd 100755
+--- a/tests/block/002
++++ b/tests/block/002
+@@ -23,7 +23,7 @@ test() {
+ 		return 1
+ 	fi
+ 
+-	blktrace -D "$TMP_DIR" "/dev/${SCSI_DEBUG_DEVICES[0]}" >"$FULL" 2>&1 &
++	blktrace -D "$TMPDIR" "/dev/${SCSI_DEBUG_DEVICES[0]}" >"$FULL" 2>&1 &
+ 	sleep 0.5
+ 	echo 1 > "/sys/block/${SCSI_DEBUG_DEVICES[0]}/device/delete"
+ 	{ kill $!; wait; } >/dev/null 2>/dev/null
 -- 
 2.41.0
 
