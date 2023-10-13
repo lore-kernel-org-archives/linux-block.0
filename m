@@ -2,92 +2,63 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 923FAC41513
-	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 14:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D64CDB47E
+	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 14:38:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232119AbjJMORQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Oct 2023 10:17:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47872 "EHLO
+        id S232194AbjJMOiV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Oct 2023 10:38:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232072AbjJMORP (ORCPT
+        with ESMTP id S232144AbjJMOiU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2023 10:17:15 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53783BE
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2023 07:17:13 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-7748ca56133so24942039f.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2023 07:17:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697206632; x=1697811432; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1lb0SFgyj6zGJaRNFKO8Je487qWXLpWh8PHdGLC7mEg=;
-        b=rU54gqVEzYsQZ7f6VJPxHh7iNpzjdOpdnTAa21/nEuGR1zJtX4M54Vglev3lFy5vDf
-         ztz090y0fkMw6xq2hqfo1fVIocvrAe3ki7TNWk69hbFr/z070KePQqPuqSwdTpqIhArk
-         3PL0FLtDrWufqMa1Yf7HKmdWaHZpHmvp0aQXi0INB+sNQrBnLvU98l88Swd9m3brAldk
-         +VqgY/L7DjiLiwGpkAlg9XltcTFw6xU671ZXmTZHfR38wqQUOsY+A9x8ZBYEtKIFkMhc
-         ZPrmwOFy3tHz9tUiUrCHdIggH9TtlsXj4MPD+mXznBGkAXtEGD974jjoYE0v6VW4tLrM
-         lNcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697206632; x=1697811432;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1lb0SFgyj6zGJaRNFKO8Je487qWXLpWh8PHdGLC7mEg=;
-        b=WDOLdP1DZxU/qWUORqIDOKm7bLZjCa5ulIUorzVX2IRBQXMc7StSqkivIKF+ZM3SVH
-         z3OsAeMWIwwqf/ocdn4hFSPpGYi2UTrK3D+23K4Zppi4wrdH6wsi/o9ncoAm8/QI32/r
-         rZKC8y/hu3DA4ZxG5idO+WoMwbCyzvgnL3MsNYljPyl9OtGlrc1ViMyseeqhZdYuYJEy
-         RJlqKslAaoqeEAMtstRLNhdzgmwq9VRSmy8XSI5rDsOrAl81S6ywmeEgMbQTUVS5dlck
-         ywKYXBM668367zLHQgztCl81nsm5xq7TMbfJTwHerMvk3zD4EsdOcYdUB+lycMJZj8VJ
-         s7ew==
-X-Gm-Message-State: AOJu0Yz7uMP/n/5UWd3KxQs/SJizxrkSTbjTYR9NFDMlD+DfP2iE+ZOM
-        i/p9gbu5e4XB66KPXwOEbLWDUQ==
-X-Google-Smtp-Source: AGHT+IEydHkg/2e8895o6lSJMDIQXRgt9993c9M2+hVQE0mcpprgcN8ai280jQg9eHXky6Ub5tyYkw==
-X-Received: by 2002:a05:6602:2a44:b0:792:9b50:3c3d with SMTP id k4-20020a0566022a4400b007929b503c3dmr33052533iov.1.1697206632640;
-        Fri, 13 Oct 2023 07:17:12 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id r29-20020a056638045d00b0043a1b134b10sm4479225jap.114.2023.10.13.07.17.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Oct 2023 07:17:12 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, Milan Broz <gmazyland@gmail.com>
-Cc:     gjoyce@linux.vnet.ibm.com, jonathan.derrick@linux.dev,
-        linux-kernel@vger.kernel.org, Ondrej Kozina <okozina@redhat.com>
-In-Reply-To: <20231003100209.380037-1-gmazyland@gmail.com>
-References: <20231003100209.380037-1-gmazyland@gmail.com>
-Subject: Re: [PATCH] block: Fix regression in sed-opal for a saved key.
-Message-Id: <169720663183.1920390.9547818439734957498.b4-ty@kernel.dk>
-Date:   Fri, 13 Oct 2023 08:17:11 -0600
+        Fri, 13 Oct 2023 10:38:20 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D684C0;
+        Fri, 13 Oct 2023 07:38:16 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1qrJIs-00068P-Ls; Fri, 13 Oct 2023 16:38:14 +0200
+Message-ID: <2519b67c-58d3-4f87-9513-5321b1722b60@leemhuis.info>
+Date:   Fri, 13 Oct 2023 16:38:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Fix regression in sed-opal for a saved key.
+Content-Language: en-US, de-DE
+To:     regressions@lists.linux.dev
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20231003100209.380037-1-gmazyland@gmail.com>
+ <5c4fbafb1daa45f2faf60c7d587cd23c53d9393c.camel@linux.vnet.ibm.com>
+ <59535b4b-9f07-44c5-a7da-e6b2fc1c67bb@gmail.com>
+ <53755a0fbd6318d4783078259f2d2f8ab5f2f0b7.camel@linux.vnet.ibm.com>
+ <acf5d5b5-b3d9-403d-ad57-a865774b260f@gmail.com>
+ <10b46003-2a75-49a7-8c74-cd8e3d4915c3@kernel.dk>
+From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <10b46003-2a75-49a7-8c74-cd8e3d4915c3@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-034f2
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1697207896;d6569067;
+X-HE-SMSGID: 1qrJIs-00068P-Ls
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+[TLDR: This mail in primarily relevant for Linux kernel regression
+tracking. See link in footer if these mails annoy you.]
 
-On Tue, 03 Oct 2023 12:02:09 +0200, Milan Broz wrote:
-> The commit 3bfeb61256643281ac4be5b8a57e9d9da3db4335
-> introduced the use of keyring for sed-opal.
-> 
-> Unfortunately, there is also a possibility to save
-> the Opal key used in opal_lock_unlock().
-> 
-> This patch switches the order of operation, so the cached
-> key is used instead of failure for opal_get_key.
-> 
-> [...]
+On 13.10.23 16:17, Jens Axboe wrote:
 
-Applied, thanks!
+> Was waiting on Greg to ack/review it, which it looks like he kind of
+> has. But would've been nice with a formal ack on it. I've queued it up
+> now.
 
-[1/1] block: Fix regression in sed-opal for a saved key.
-      commit: 4eaf0932c69bdc56d2c2af30404f9c918b1f6295
+#regzbot fix: block: Fix regression in sed-opal for a saved key.
+#regzbot ignore-activity
 
-Best regards,
--- 
-Jens Axboe
-
-
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
 
