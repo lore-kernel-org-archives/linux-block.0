@@ -2,169 +2,162 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7308CDB47E
-	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 12:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A6ECDB47E
+	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 14:17:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230421AbjJMMtB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Oct 2023 08:49:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56636 "EHLO
+        id S232031AbjJMORG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Oct 2023 10:17:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230197AbjJMMs7 (ORCPT
+        with ESMTP id S231194AbjJMORG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2023 08:48:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC783BF
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2023 05:48:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697201292;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=h78T/7NPGQz52SHwxHI3clyF7jiR025tvOcU1xIze+A=;
-        b=geD2vOZLuP1aE0k20ZTcjENI7/0YyqudC03r/BpUx87YCAKaSE3xSJcCZNHC953YFdsfMS
-        gM2L9cZE/a8PT+qTdgfdHqXGcakwfXPx+3RVaWBTpUpTJ8ZAXWzP5jKOUD90kBzecJX9oQ
-        4z7mM3SJ4+Z2vWSznLjZSp/5aslenNU=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-589-0i1UD0zaOym2JiTld1dkKQ-1; Fri, 13 Oct 2023 08:48:08 -0400
-X-MC-Unique: 0i1UD0zaOym2JiTld1dkKQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 921211C00D21;
-        Fri, 13 Oct 2023 12:48:07 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FA2D492BFA;
-        Fri, 13 Oct 2023 12:48:06 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Andrew Theurer <atheurer@redhat.com>,
-        Joe Mario <jmario@redhat.com>,
-        Sebastian Jug <sejug@redhat.com>,
-        Frederic Weisbecker <frederic@kernel.org>
-Subject: [PATCH V2] blk-mq: don't schedule block kworker on isolated CPUs
-Date:   Fri, 13 Oct 2023 20:47:58 +0800
-Message-ID: <20231013124758.1492796-1-ming.lei@redhat.com>
+        Fri, 13 Oct 2023 10:17:06 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 377A2BB
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2023 07:17:04 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id ca18e2360f4ac-7a24c86aae3so29631239f.0
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2023 07:17:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697206623; x=1697811423; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TAkJl/NimI1IXG4Vjt+jprIyWorUGASB1mFX1Wsw9IA=;
+        b=cOu2R24eSkB+U9U/MNg2fAtEOk90iDFD+WYcnthSIESb6KQ23mxZxEGrygytlMNNbK
+         sHzRoC5L5mL/JlQ3E/ZaNo9EEaBgAugVpJW/T+0CfgAkbtHt3nglu0ulXXwAyIhS2ndB
+         9HhlOf2KUOqXRLIsjwbIacEZF/yXcc3GBACy46Rt8DccR9W+J2AvkxQzGfA+I0E65j+E
+         nmZ4S+iZsBo8ki6aRrFZv+YBpF/OlRXvRq0ij2InhtDiv6VEkWo8GynoFBvT/JJY1j5J
+         ifF/ZEifwVHU9JSo/tCfVGAXad0NUt3rUDVtEyAd3OdEgIF1IOHFoFle6VTua64s68pr
+         PBBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697206623; x=1697811423;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TAkJl/NimI1IXG4Vjt+jprIyWorUGASB1mFX1Wsw9IA=;
+        b=epwVN7qKLq5LfL+WTE36UMarH5S9HVwhk9pAltYzmXSSxYhIk8qK5Wg0ZzIlleK1zZ
+         slVIPeoTgkmdGiezR4tH9H16FBMdnyS5ICWh1oED2qbSi6/u9GgNhQUpo6WbFAlq4rj1
+         cR+E0X5TmyrtQeX6GoMPHwYtpkjKSrF23OsX4aOpvMWJkZARRLelXHzNn0fSWZOuaM4F
+         9ViTnsa9I9oy9GA3UWIiKLsGetJCubmNm4svgA8aQ0K59EEF1M5gORRL+rO07lpaisaH
+         qRA6GJdQCpELiDHTFjiTfTCx10kKGclth7MABf3FJbXF16rKYGrSh0/EBgyH0ElY5BIU
+         zeUQ==
+X-Gm-Message-State: AOJu0Yy0LeuGRqjcTlDdbTAjPY57PQz58uTny1JDX+34Z0v4ekHV4gJv
+        AZ0rvz08B+fRIpJcAL/7b4U0Vw==
+X-Google-Smtp-Source: AGHT+IExduVJXS5oXPHa5V2p1APicswlROuu98vGbtIWQofhNpEVl17Rxj/MuXP1QE1gD4chsCrL/w==
+X-Received: by 2002:a05:6602:3a11:b0:79f:922b:3809 with SMTP id by17-20020a0566023a1100b0079f922b3809mr28827419iob.1.1697206623481;
+        Fri, 13 Oct 2023 07:17:03 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id q25-20020a6bf219000000b007836a9ca101sm4754686ioh.22.2023.10.13.07.17.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Oct 2023 07:17:02 -0700 (PDT)
+Message-ID: <10b46003-2a75-49a7-8c74-cd8e3d4915c3@kernel.dk>
+Date:   Fri, 13 Oct 2023 08:17:01 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Fix regression in sed-opal for a saved key.
+Content-Language: en-US
+To:     Milan Broz <gmazyland@gmail.com>
+Cc:     jonathan.derrick@linux.dev, linux-kernel@vger.kernel.org,
+        Ondrej Kozina <okozina@redhat.com>,
+        regressions@lists.linux.dev, gjoyce@linux.vnet.ibm.com,
+        linux-block@vger.kernel.org
+References: <20231003100209.380037-1-gmazyland@gmail.com>
+ <5c4fbafb1daa45f2faf60c7d587cd23c53d9393c.camel@linux.vnet.ibm.com>
+ <59535b4b-9f07-44c5-a7da-e6b2fc1c67bb@gmail.com>
+ <53755a0fbd6318d4783078259f2d2f8ab5f2f0b7.camel@linux.vnet.ibm.com>
+ <acf5d5b5-b3d9-403d-ad57-a865774b260f@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <acf5d5b5-b3d9-403d-ad57-a865774b260f@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Kernel parameter of `isolcpus=` or 'nohz_full=' are used for isolating CPUs
-for specific task, and user often won't want block IO to disturb these CPUs,
-also long IO latency may be caused if blk-mq kworker is scheduled on these
-isolated CPUs.
+On 10/11/23 2:30 AM, Milan Broz wrote:
+> On 10/5/23 19:58, Greg Joyce wrote:
+>> On Thu, 2023-10-05 at 08:58 +0200, Milan Broz wrote:
+>>> On 10/4/23 22:54, Greg Joyce wrote:
+>>>> On Tue, 2023-10-03 at 12:02 +0200, Milan Broz wrote:
+>>>>> The commit 3bfeb61256643281ac4be5b8a57e9d9da3db4335
+>>>>> introduced the use of keyring for sed-opal.
+>>>>>
+>>>>> Unfortunately, there is also a possibility to save
+>>>>> the Opal key used in opal_lock_unlock().
+>>>>>
+>>>>> This patch switches the order of operation, so the cached
+>>>>> key is used instead of failure for opal_get_key.
+>>>>>
+>>>>> The problem was found by the cryptsetup Opal test recently
+>>>>> added to the cryptsetup tree.
+>>>>>
+>>>>> Fixes: 3bfeb6125664 ("block: sed-opal: keyring support for SED
+>>>>> keys")
+>>>>> Tested-by: Ondrej Kozina <okozina@redhat.com>
+>>>>> Signed-off-by: Milan Broz <gmazyland@gmail.com>
+>>>>> ---
+>>>>>    block/sed-opal.c | 7 +++----
+>>>>>    1 file changed, 3 insertions(+), 4 deletions(-)
+>>>>>
+>>>>> diff --git a/block/sed-opal.c b/block/sed-opal.c
+>>>>> index 6d7f25d1711b..04f38a3f5d95 100644
+>>>>> --- a/block/sed-opal.c
+>>>>> +++ b/block/sed-opal.c
+>>>>> @@ -2888,12 +2888,11 @@ static int opal_lock_unlock(struct
+>>>>> opal_dev
+>>>>> *dev,
+>>>>>        if (lk_unlk->session.who > OPAL_USER9)
+>>>>>            return -EINVAL;
+>>>>>
+>>>>> -    ret = opal_get_key(dev, &lk_unlk->session.opal_key);
+>>>>> -    if (ret)
+>>>>> -        return ret;
+>>>>>        mutex_lock(&dev->dev_lock);
+>>>>>        opal_lock_check_for_saved_key(dev, lk_unlk);
+>>>>> -    ret = __opal_lock_unlock(dev, lk_unlk);
+>>>>> +    ret = opal_get_key(dev, &lk_unlk->session.opal_key);
+>>>>> +    if (!ret)
+>>>>> +        ret = __opal_lock_unlock(dev, lk_unlk);
+>>>>
+>>>> This is relying on opal_get_key() returning 0 to decide if
+>>>> __opal_lock_unlock() is called. Is this really what you want? It
+>>>> seems
+>>>> that you would want to unlock if the key is a LUKS key, even if
+>>>> opal_get_key() returns non-zero.
+>>>
+>>> I think it is ok. That was logic introduced in your keyring patch
+>>> anyway.
+>>>
+>>> I just fixed that if key is cached (stored in OPAL struct), that key
+>>> is used
+>>> and subsequent opal_get_key() does nothing, returning 0.
+>>>
+>>> The story is here that both OPAL lock and unlock need key, while LUKS
+>>> logic never required key for lock (deactivation), so we rely on the
+>>> cached
+>>> OPAL key here. We do not need any key stored for unlocking (that is
+>>> always
+>>> decrypted from a keyslot)
+>>> (I think requiring key for locking range is a design mistake in OPAL
+>>> but
+>>> that's not relevant for now :-)
+>>
+>> Okay, if the key is such that opal_get_key() always returns 0, then I
+>> agree there isn't an issue.
+> 
+> 
+> Jens, what's the status of this patch?
+> 
+> It is clear regression in 6.6 (I forgot to add regression list, fixed now.)
+> 
+> For reference, the original report and patch is here
+> #regzbot link: https://lore.kernel.org/linux-block/20231003100209.380037-1-gmazyland@gmail.com/
+> #regzbot ^introduced 3bfeb6125664
 
-Kernel workqueue only respects this limit for WQ_UNBOUND, for bound wq,
-the responsibility should be on wq user.
+Was waiting on Greg to ack/review it, which it looks like he kind of
+has. But would've been nice with a formal ack on it. I've queued it up
+now.
 
-So don't not run block kworker on isolated CPUs by ruling out isolated CPUs
-from hctx->cpumask. Meantime in cpuhp handler, use queue map to check if
-all CPUs in this hw queue are offline, this way can avoid any cost in fast
-IO code path.
-
-Cc: Juri Lelli <juri.lelli@redhat.com>
-Cc: Andrew Theurer <atheurer@redhat.com>
-Cc: Joe Mario <jmario@redhat.com>
-Cc: Sebastian Jug <sejug@redhat.com>
-Cc: Frederic Weisbecker <frederic@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- remove module parameter, meantime use queue map to check if
-	all cpus in one hctx are offline
-
- block/blk-mq.c | 42 +++++++++++++++++++++++++++++++++---------
- 1 file changed, 33 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ec922c6bccbe..91055bdc4426 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -29,6 +29,7 @@
- #include <linux/prefetch.h>
- #include <linux/blk-crypto.h>
- #include <linux/part_stat.h>
-+#include <linux/sched/isolation.h>
- 
- #include <trace/events/block.h>
- 
-@@ -3476,14 +3477,27 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
- 	return data.has_rq;
- }
- 
--static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
--		struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx)
- {
--	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) != cpu)
--		return false;
--	if (cpumask_next_and(cpu, hctx->cpumask, cpu_online_mask) < nr_cpu_ids)
--		return false;
--	return true;
-+	struct blk_mq_tag_set *tag_set = hctx->queue->tag_set;
-+	int cpu;
-+
-+	/*
-+	 * hctx->cpumask has rule out isolated CPUs, but userspace still
-+	 * might submit IOs on these isolated CPUs, so use queue map to
-+	 * check if all CPUs mapped to this hctx are offline
-+	 */
-+	for_each_possible_cpu(cpu) {
-+		unsigned idx = tag_set->map[hctx->type].mq_map[cpu];
-+
-+		if (idx != hctx->queue_num)
-+			continue;
-+
-+		if (cpu_online(cpu))
-+			return true;
-+	}
-+
-+	return false;
- }
- 
- static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
-@@ -3491,8 +3505,7 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- 	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
- 			struct blk_mq_hw_ctx, cpuhp_online);
- 
--	if (!cpumask_test_cpu(cpu, hctx->cpumask) ||
--	    !blk_mq_last_cpu_in_hctx(cpu, hctx))
-+	if (blk_mq_hctx_has_online_cpu(hctx))
- 		return 0;
- 
- 	/*
-@@ -3900,6 +3913,8 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 	}
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
-+		int cpu;
-+
- 		/*
- 		 * If no software queues are mapped to this hardware queue,
- 		 * disable it and free the request entries.
-@@ -3926,6 +3941,15 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 		 */
- 		sbitmap_resize(&hctx->ctx_map, hctx->nr_ctx);
- 
-+		/*
-+		 * rule out isolated CPUs from hctx->cpumask for avoiding to
-+		 * run wq worker on isolated CPU
-+		 */
-+		for_each_cpu(cpu, hctx->cpumask) {
-+			if (cpu_is_isolated(cpu))
-+				cpumask_clear_cpu(cpu, hctx->cpumask);
-+		}
-+
- 		/*
- 		 * Initialize batch roundrobin counts
- 		 */
 -- 
-2.41.0
+Jens Axboe
 
