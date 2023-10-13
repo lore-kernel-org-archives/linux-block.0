@@ -2,91 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCDACDB47E
-	for <linux-block@archiver.kernel.org>; Thu, 12 Oct 2023 19:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B5C9CDB474
+	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 00:19:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442559AbjJLT4A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 Oct 2023 15:56:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59594 "EHLO
+        id S233813AbjJMATj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 Oct 2023 20:19:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442549AbjJLTz7 (ORCPT
+        with ESMTP id S229840AbjJMATi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Oct 2023 15:55:59 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 734A7BB;
-        Thu, 12 Oct 2023 12:55:57 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-694ed847889so1172793b3a.2;
-        Thu, 12 Oct 2023 12:55:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697140557; x=1697745357; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HaXzfbWU3i0lFXzPNJ6yDNrmxF0PjC7ivMbZMx14cp8=;
-        b=gqg7Z+DzQ9F/PGlBVjxOnuTlSfMe1LJsH6/vIqOF+ID18kAdB3301WA6V85EEjSs+Z
-         MzFAf188TB0aPO7ERbdvIkcJ8WUKnhBof2jNZRhb5/CFQipdVf4vyq7PtSfS8R6m5FSk
-         BLKxxLeuN5okQcyApR9vFmw/aZI2iTRoXxowVgcOm+da4H6lWJ4QOB4nFFOozjhXJCN0
-         PJ2StuOx2lTLW0GggcVfIjrybUjjggG8+ZnRFEZ2j5AWjHt89oTU2Yq67+kGc5IpADYC
-         5Es7hio1+qlosaECtSMzweOAm8cOzyBIQnoSXV1ytIfZ55Xl26a0Z9dgE36Egf5el3wo
-         qN2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697140557; x=1697745357;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HaXzfbWU3i0lFXzPNJ6yDNrmxF0PjC7ivMbZMx14cp8=;
-        b=H0zVBlaRC7a+4T8yu11eMuGpIAnNX+6CdhgdjwTD3Hsnulj2MXayYbO9fweLqnbKhQ
-         8F18PipxBBLwbqCqIdyHIVVIFYmbT1ovAKqIZO1Pqjgjn3gGyWzVLsyGzke093/y0B0Y
-         C882zLMLveS7elelbjJh8vw7kUwUBRVv+YazbPHDZZAGmzTmZj9gzHnn67vU/KbG3FN7
-         vRq4G8A4ZwG7G3D3qeuanDqklqzqpkFxNPQtGfC0Hf03Upypy9DhD8pCearuCAexEieW
-         9fCt7cKW1+zSChte4r0T+SLm45u7Sk8S/+vXSJm3rm1z4iv/zuOrl2YIbmIUI7Kbsq+7
-         +Zug==
-X-Gm-Message-State: AOJu0Yw12d/mKV+2iqUxpH9p0GD20njKjr3Ni7x6v+WET2D8Br6orWFw
-        8dIRgD3Dme9GRex92QoPql0=
-X-Google-Smtp-Source: AGHT+IFIF+ce4T/COXsxWRK2KNuzL4fVcLJw8q/kp9HKKm+JujcfAT3D1IwTuETLD41GqcEjk+SoLQ==
-X-Received: by 2002:a05:6a20:6a28:b0:15e:5e8c:e45c with SMTP id p40-20020a056a206a2800b0015e5e8ce45cmr25423385pzk.30.1697140556879;
-        Thu, 12 Oct 2023 12:55:56 -0700 (PDT)
-Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
-        by smtp.gmail.com with ESMTPSA id z125-20020a633383000000b0058a381de499sm2075450pgz.77.2023.10.12.12.55.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 12:55:56 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 12 Oct 2023 09:55:55 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Juri Lelli <juri.lelli@redhat.com>,
-        Andrew Theurer <atheurer@redhat.com>,
-        Joe Mario <jmario@redhat.com>,
-        Sebastian Jug <sejug@redhat.com>,
-        Frederic Weisbecker <frederic@kernel.org>
-Subject: Re: [PATCH] blk-mq: add module parameter to not run block kworker on
- isolated CPUs
-Message-ID: <ZShPS46jgVsaBGHY@slm.duckdns.org>
-References: <20231010142216.1114752-1-ming.lei@redhat.com>
- <ZSWb2DNV9cIPYv5H@slm.duckdns.org>
- <ZSXuqZNsyjJk1FGX@fedora>
+        Thu, 12 Oct 2023 20:19:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53689B7
+        for <linux-block@vger.kernel.org>; Thu, 12 Oct 2023 17:18:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697156329;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cEIdnl1qOAHdz+0J8aPaQSeQnaYrHrYOx65OArdfMZE=;
+        b=SaXRK8b5oiAmpuwFfPgmjy+4lN6kJ6dH5v6CLkPGHZ5wxCAtgAxxop4tG5KbidPKs0bqOs
+        J8ihCeknBEUHXM6HfqOmswWUz+vASd3OZOCPoAYQw+gAnH3gFqew6UMr78uqW+ZRVDyKHi
+        YBKujSXZwFE8od08wauJ71bU+PcvuqA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-562-SBtnOMKvMSua-vuju3gHCw-1; Thu, 12 Oct 2023 20:18:36 -0400
+X-MC-Unique: SBtnOMKvMSua-vuju3gHCw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8DE50801E62;
+        Fri, 13 Oct 2023 00:18:35 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DD2446403C;
+        Fri, 13 Oct 2023 00:18:32 +0000 (UTC)
+Date:   Fri, 13 Oct 2023 08:18:27 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Christie <michael.christie@oracle.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v2 1/2] ublk: Limit dev_id/ub_number values
+Message-ID: <ZSiM04fMHOndfvYq@fedora>
+References: <20231012150600.6198-1-michael.christie@oracle.com>
+ <20231012150600.6198-2-michael.christie@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZSXuqZNsyjJk1FGX@fedora>
+In-Reply-To: <20231012150600.6198-2-michael.christie@oracle.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Thu, Oct 12, 2023 at 10:05:59AM -0500, Mike Christie wrote:
+> The dev_id/ub_number is used for the ublk dev's char device's minor
+> number so it has to fit into MINORMASK. This patch adds checks to prevent
+> userspace from passing a number that's too large and limits what can be
+> allocated by the ublk_index_idr for the case where userspace has the
+> kernel allocate the dev_id/ub_number.
+> 
+> Signed-off-by: Mike Christie <michael.christie@oracle.com>
 
-On Wed, Oct 11, 2023 at 08:39:05AM +0800, Ming Lei wrote:
-> I appreciate that any specific suggestions about dealing with isolated CPUs
-> generically for bound WQ can be shared.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Oh, all I meant was whether we can at least collect this into or at least
-adjacent to the existing housekeeping / isolcpu parameters. Let's say
-there's someone who really wants to isolated some CPUs, how would they find
-out the different parameters if they're scattered across different
-subsystems?
+Thanks,
+Ming
 
-Thanks.
-
--- 
-tejun
