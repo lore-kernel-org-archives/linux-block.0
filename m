@@ -2,85 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58503CDB47E
-	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 20:21:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BAC0CDB47E
+	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 21:13:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231814AbjJMUVU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Oct 2023 16:21:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39334 "EHLO
+        id S232105AbjJMVNM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Oct 2023 17:13:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230469AbjJMUVT (ORCPT
+        with ESMTP id S232035AbjJMVNM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2023 16:21:19 -0400
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70BC5B7;
-        Fri, 13 Oct 2023 13:21:18 -0700 (PDT)
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1c9e06f058bso16034995ad.0;
-        Fri, 13 Oct 2023 13:21:18 -0700 (PDT)
+        Fri, 13 Oct 2023 17:13:12 -0400
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E949AB7;
+        Fri, 13 Oct 2023 14:13:10 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1c9b70b9656so18666705ad.1;
+        Fri, 13 Oct 2023 14:13:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697228478; x=1697833278;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1697231590; x=1697836390;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ForsDPB0jZ2ImnQnOXHUTEo6P3ZZphz8F61hZrwbJRA=;
-        b=Syg5dJ5nOsicTEJ3KSBeUkqacIW+Lrs4kxcgjmp8ho0pLZoD5wWL3bIdCgn+umh8T9
-         bLkLuz1FBsT0JG44/c0jJDpGqMGnxXG2tQxzcRFwQAyEb4zcQxHz2xY6qk8sdSiENdrm
-         5TPpL6VoSjfFPvW1SB8QuBydrsz7fNnSTSH0V2UjQTwpPZ5/mkr9gkIaqWj5VgtWhHo3
-         Eud6/9lTFnbQaPERaozEpXLf6wybYrTCUQTgRsYGF26ytBs2lrxQJU9DLvIh2eyV0G0v
-         GRj78eDIBIvoA0pRPGcfWY1/95VJVIRyxz+KXXPeNXer9OMsimmXDrn+dy1zRnSknKtu
-         mwHA==
-X-Gm-Message-State: AOJu0YwZZbq13pLIyix9EgR93mcW/1RiFENUfhNemFnNhYz4BG+tnhYL
-        K2Dl67rnbuLN0kR0sNW/v88=
-X-Google-Smtp-Source: AGHT+IHK6Vdj3neWysihmjr6VT1kW5IXWWGbJ0lQ9gb9c+jVMTQ/Rh06taVZ8L/Iz6CXpCcTy5jQHw==
-X-Received: by 2002:a17:902:ea02:b0:1c1:fc5c:b31b with SMTP id s2-20020a170902ea0200b001c1fc5cb31bmr1705325plg.9.1697228477673;
-        Fri, 13 Oct 2023 13:21:17 -0700 (PDT)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id ik26-20020a170902ab1a00b001bdc3768ca5sm4363921plb.254.2023.10.13.13.21.16
+        bh=PFfUBfp0ylGGMlfj6k7w0PNxEF/kGtQC5wyiNRvjhTE=;
+        b=N9D5LhZtHleJGbANPwZQ2m9I9zq9MdgC/t2CxAWflBJLdwWH5R2L8SFE2VDG1UxqJB
+         y0QkAPHGisIEGonc0Iiy4IO8bE6WEKMxhQOML0TCW+q1/iFyoGLdjYRbpzE/FtQYsS2d
+         SH9iSRtbYeAGINHxXeD4aBt4lGUuw4W2brwIaaj/FEfi5Wq8DGVMTls11kRw2G3fiA+A
+         GCimIOpzJhMFI0ZZogwhlzL+AAY5S07OTOkdSh7nV1JydHtjni5dmtrQRYs7XALLhLYZ
+         1jsckniLIQjDr9x/WLAl5S7NyQKPnYnpo9S2C+DtPkPrP/bU1yvG0vUyBqYCHgJ+d9G0
+         9dCA==
+X-Gm-Message-State: AOJu0Yw4MUhr6iQLi+2sb1BrqyVq+eWkiPl0fx586vHePWyvyZYv/f+F
+        KXlIj8lrj5UfBNS4aEaQl+Q=
+X-Google-Smtp-Source: AGHT+IHMkZ5ZWeGP68xaGNnRabOnrq6JWUtxcf+pufkOCiZaywjZHVef1xnlHoXlAffUIyZ6SqWtGQ==
+X-Received: by 2002:a17:902:e809:b0:1c7:1fbc:ba02 with SMTP id u9-20020a170902e80900b001c71fbcba02mr31279327plg.47.1697231590270;
+        Fri, 13 Oct 2023 14:13:10 -0700 (PDT)
+Received: from ?IPV6:2601:647:4d7e:54f3:667:4981:ffa1:7be1? ([2601:647:4d7e:54f3:667:4981:ffa1:7be1])
+        by smtp.gmail.com with ESMTPSA id z6-20020a170902ee0600b001bba7aab822sm4344531plb.5.2023.10.13.14.13.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Oct 2023 13:21:17 -0700 (PDT)
-Message-ID: <2f4eb591-b275-42fd-900e-292d0f87dd9e@acm.org>
-Date:   Fri, 13 Oct 2023 13:21:15 -0700
+        Fri, 13 Oct 2023 14:13:09 -0700 (PDT)
+Message-ID: <35e3e173-8018-42d8-a6e8-7ba994ff6b17@acm.org>
+Date:   Fri, 13 Oct 2023 14:13:08 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] doc: blk-ioprio: Bring the doc in line with the
- implementation
+Subject: Re: [PATCH V2] Consider inflight IO in io accounting for high latency
+ devices
 Content-Language: en-US
-To:     Tang Yizhou <yizhou.tang@shopee.com>, houtao1@huawei.com,
-        jack@suse.cz, kch@nvidia.com
-Cc:     axboe@kernel.dk, tj@kernel.org, corbet@lwn.net,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yingfu.zhou@shopee.com,
-        chunguang.xu@shopee.com
-References: <20231012024228.2161283-1-yizhou.tang@shopee.com>
+To:     Gulam Mohamed <gulam.mohamed@oracle.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231013195559.1306345-1-gulam.mohamed@oracle.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231012024228.2161283-1-yizhou.tang@shopee.com>
+In-Reply-To: <20231013195559.1306345-1-gulam.mohamed@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/11/23 19:42, Tang Yizhou wrote:
-> From: Tang Yizhou <yizhou.tang@shopee.com>
-> 
-> Our system administrator have noted that the names 'rt-to-be' and
-> 'all-to-idle' in the I/O priority policies table appeared without
-> explanations, leading to confusion. Let's bring these names in line
-> with the naming in the 'attribute' section.
-> 
-> Additionally,
-> 1. Correct the interface name to 'io.prio.class'.
-> 2. Add a table entry of 'promote-to-rt' for consistency.
-> 3. Fix a typo of 'priority'.
-> 
-> Suggested-by: Yingfu Zhou <yingfu.zhou@shopee.com>
-> Reviewed-by: Hou Tao <houtao1@huawei.com>
-> Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
-> ---
-> v2:
-> Accept Bart's suggestion and rename the title of the patch.
-> Pick up Tao's Reviewed-by tag.
+On 10/13/23 12:55, Gulam Mohamed wrote:
+> @@ -1015,7 +1018,13 @@ static inline void blk_account_io_start(struct request *req)
+>   			req->part = req->q->disk->part0;
+>   
+>   		part_stat_lock();
+> -		update_io_ticks(req->part, jiffies, false);
+> +
+> +		if (req->q->nr_hw_queues == 1) {
+> +			hctx = xa_load(&req->q->hctx_table, 0);
+> +			inflight = blk_mq_hctx_has_tags(hctx);
+> +		}
+> +
+> +		update_io_ticks(req->part, jiffies, inflight);
+>   		part_stat_unlock();
+>   	}
+>   }
 
-Thank you for having changed the patch subject.
+blk_account_io_start() is called by blk_mq_bio_to_request(). So if I/O
+statistics are enabled and if there is only a single hardware queue,
+blk_mq_hctx_has_tags() will be called every time a bio is submitted?
+The blk_mq_hctx_has_tags() function iterates over all tags. I would be
+surprised if anyone would consider the overhead of this approach
+acceptable.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Thanks,
+
+Bart.
