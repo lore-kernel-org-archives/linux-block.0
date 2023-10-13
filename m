@@ -2,84 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BAC0CDB47E
-	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 21:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A14ECDB483
+	for <linux-block@archiver.kernel.org>; Fri, 13 Oct 2023 21:20:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232105AbjJMVNM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 Oct 2023 17:13:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
+        id S231922AbjJMVU2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 Oct 2023 17:20:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232035AbjJMVNM (ORCPT
+        with ESMTP id S229958AbjJMVU1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2023 17:13:12 -0400
+        Fri, 13 Oct 2023 17:20:27 -0400
 Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E949AB7;
-        Fri, 13 Oct 2023 14:13:10 -0700 (PDT)
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1c9b70b9656so18666705ad.1;
-        Fri, 13 Oct 2023 14:13:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D736595;
+        Fri, 13 Oct 2023 14:20:25 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1c9b1e3a809so19513475ad.2;
+        Fri, 13 Oct 2023 14:20:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697231590; x=1697836390;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1697232025; x=1697836825;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PFfUBfp0ylGGMlfj6k7w0PNxEF/kGtQC5wyiNRvjhTE=;
-        b=N9D5LhZtHleJGbANPwZQ2m9I9zq9MdgC/t2CxAWflBJLdwWH5R2L8SFE2VDG1UxqJB
-         y0QkAPHGisIEGonc0Iiy4IO8bE6WEKMxhQOML0TCW+q1/iFyoGLdjYRbpzE/FtQYsS2d
-         SH9iSRtbYeAGINHxXeD4aBt4lGUuw4W2brwIaaj/FEfi5Wq8DGVMTls11kRw2G3fiA+A
-         GCimIOpzJhMFI0ZZogwhlzL+AAY5S07OTOkdSh7nV1JydHtjni5dmtrQRYs7XALLhLYZ
-         1jsckniLIQjDr9x/WLAl5S7NyQKPnYnpo9S2C+DtPkPrP/bU1yvG0vUyBqYCHgJ+d9G0
-         9dCA==
-X-Gm-Message-State: AOJu0Yw4MUhr6iQLi+2sb1BrqyVq+eWkiPl0fx586vHePWyvyZYv/f+F
-        KXlIj8lrj5UfBNS4aEaQl+Q=
-X-Google-Smtp-Source: AGHT+IHMkZ5ZWeGP68xaGNnRabOnrq6JWUtxcf+pufkOCiZaywjZHVef1xnlHoXlAffUIyZ6SqWtGQ==
-X-Received: by 2002:a17:902:e809:b0:1c7:1fbc:ba02 with SMTP id u9-20020a170902e80900b001c71fbcba02mr31279327plg.47.1697231590270;
-        Fri, 13 Oct 2023 14:13:10 -0700 (PDT)
+        bh=oVUFHAu/2sYouE1MxKgJ7Ed5BvhxAi40Dur2aHaRFxo=;
+        b=OruRU4Ex0fSwyHNSI/LDbobXFQklHAltlctNI6AJ8bk/9HlTNAp529+3t5gCV2byTu
+         1IDsbpMp2+evTLaw60gepJuIzI44BR755XKea8cg0qtD9vGh9JLvJJNdmGU4DMgGhw5Y
+         B8dvQSWwyvflRbukz58VoasmwpqFgEYYs4He1ZVIngYlweY1q4n6QDcAOrecXisSk3af
+         +riIDqdAFd6NJ0Jy4gceFBVyH6kf++j8bbBz/N4L6f01CSnHzJ2olR2RNyVlfvvg/+RS
+         PMkSl9y/xzApELhsbFe3P86DDhE3ATJur3rSkQRBnfvk19rv/7oFLOYJWYffXxPA9zsL
+         qfSw==
+X-Gm-Message-State: AOJu0YwK8rw6oSXDWnZUFgDwQNgyoltn8b7S8uPH4AT2rCfwi2aDUqNf
+        HqkCKEZz7/NL06XIdlxoSsE=
+X-Google-Smtp-Source: AGHT+IGMaA51IPk0x7pCW8F4JdKMyqzT3Q+dPbD1hFblj4gUedpX4Qp42cPYMap9ZuK83w6URwX6Ww==
+X-Received: by 2002:a17:902:e74b:b0:1bb:6875:5a73 with SMTP id p11-20020a170902e74b00b001bb68755a73mr32624279plf.2.1697232025201;
+        Fri, 13 Oct 2023 14:20:25 -0700 (PDT)
 Received: from ?IPV6:2601:647:4d7e:54f3:667:4981:ffa1:7be1? ([2601:647:4d7e:54f3:667:4981:ffa1:7be1])
-        by smtp.gmail.com with ESMTPSA id z6-20020a170902ee0600b001bba7aab822sm4344531plb.5.2023.10.13.14.13.09
+        by smtp.gmail.com with ESMTPSA id e11-20020a170902b78b00b001c5b8087fe5sm4308085pls.94.2023.10.13.14.20.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Oct 2023 14:13:09 -0700 (PDT)
-Message-ID: <35e3e173-8018-42d8-a6e8-7ba994ff6b17@acm.org>
-Date:   Fri, 13 Oct 2023 14:13:08 -0700
+        Fri, 13 Oct 2023 14:20:24 -0700 (PDT)
+Message-ID: <2f092612-eed0-4c4b-940f-48793b97b068@acm.org>
+Date:   Fri, 13 Oct 2023 14:20:23 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] Consider inflight IO in io accounting for high latency
- devices
+Subject: Re: [PATCH v2 03/15] block: Support data lifetime in the I/O priority
+ bitfield
 Content-Language: en-US
-To:     Gulam Mohamed <gulam.mohamed@oracle.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231013195559.1306345-1-gulam.mohamed@oracle.com>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>,
+        Hannes Reinecke <hare@suse.de>
+References: <20231005194129.1882245-1-bvanassche@acm.org>
+ <20231005194129.1882245-4-bvanassche@acm.org>
+ <8aec03bb-4cef-9423-0ce4-c10d060afce4@kernel.org>
+ <46c17c1b-29be-41a3-b799-79163851f972@acm.org>
+ <b0b015bf-0a27-4e89-950a-597b9fed20fb@acm.org>
+ <447f3095-66cb-417b-b48c-90005d37b5d3@kernel.org>
+ <4fee2c56-7631-45d2-b709-2dadea057f52@acm.org>
+ <2fa9ea51-c343-4cc2-b755-a5de024bb32f@kernel.org>
+ <ZSkO8J9pD+IVaGPf@x1-carbon>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231013195559.1306345-1-gulam.mohamed@oracle.com>
+In-Reply-To: <ZSkO8J9pD+IVaGPf@x1-carbon>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/13/23 12:55, Gulam Mohamed wrote:
-> @@ -1015,7 +1018,13 @@ static inline void blk_account_io_start(struct request *req)
->   			req->part = req->q->disk->part0;
->   
->   		part_stat_lock();
-> -		update_io_ticks(req->part, jiffies, false);
-> +
-> +		if (req->q->nr_hw_queues == 1) {
-> +			hctx = xa_load(&req->q->hctx_table, 0);
-> +			inflight = blk_mq_hctx_has_tags(hctx);
-> +		}
-> +
-> +		update_io_ticks(req->part, jiffies, inflight);
->   		part_stat_unlock();
->   	}
->   }
+On 10/13/23 02:33, Niklas Cassel wrote:
+> In commit c75e707fe1aa ("block: remove the per-bio/request write hint")
+> this line from fs/direct-io.c was removed:
+> -       bio->bi_write_hint = dio->iocb->ki_hint;
+> 
+> I'm not sure why this series does not readd a similar line to set the
+> lifetime (using bio_set_data_lifetime()) also for fs/direct-io.c.
 
-blk_account_io_start() is called by blk_mq_bio_to_request(). So if I/O
-statistics are enabled and if there is only a single hardware queue,
-blk_mq_hctx_has_tags() will be called every time a bio is submitted?
-The blk_mq_hctx_has_tags() function iterates over all tags. I would be
-surprised if anyone would consider the overhead of this approach
-acceptable.
+It depends on how we want the user to specify the data lifetime for
+direct I/O. This assignment is not modified by this patch series and
+copies the data lifetime information from the ioprio bitfield from user
+space into the bio:
+
+		bio->bi_ioprio = dio->iocb->ki_ioprio;
+
+> I still don't understand what happens if one uses io_uring to write
+> to a file on a f2fs filesystem using buffered-io, with both
+> inode->i_write_hint set using fcntl F_SET_RW_HINT, and bits belonging
+> to life time hints set in the io_uring SQE (sqe->ioprio).
+
+Is the documentation of the whint_mode mount option in patch 5/15 of this
+series sufficient to answer the above question?
 
 Thanks,
 
 Bart.
+
