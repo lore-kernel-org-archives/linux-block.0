@@ -2,109 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B6BCDB465
-	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 21:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA3CCC41513
+	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 21:11:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229848AbjJPVHR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Oct 2023 17:07:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40212 "EHLO
+        id S229848AbjJPVL6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Oct 2023 17:11:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233399AbjJPVHR (ORCPT
+        with ESMTP id S229666AbjJPVL6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Oct 2023 17:07:17 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D4F2F2
-        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:07:12 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40666aa674fso49184415e9.0
-        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:07:12 -0700 (PDT)
+        Mon, 16 Oct 2023 17:11:58 -0400
+Received: from mail-oo1-xc2f.google.com (mail-oo1-xc2f.google.com [IPv6:2607:f8b0:4864:20::c2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FD7A2
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:11:56 -0700 (PDT)
+Received: by mail-oo1-xc2f.google.com with SMTP id 006d021491bc7-57f137dffa5so750457eaf.1
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:11:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20230601.gappssmtp.com; s=20230601; t=1697490431; x=1698095231; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CDXNDAXEYDerEydfkLSexbTOlmVWmitFF6lrfBCh1Bk=;
-        b=hnBYzKwLntn6mx2dBBno8ySDZk0U/xqoNuB59vZm5RY05ngfRbUDMvg5F8M4hk1zJS
-         HP2sfsDQGtTw/mWuUh4nlq2ahLjkRY1v0sD8ZF2HLNVIvjn3CmxgSKkiqoiaqPS8SHW2
-         FFy3aj+YhmP87zIdsIXzkkFVDw79KnlE4iNJYVQzlimDTyV6kbkkSg0GettZI+ulNhfO
-         /uSvBFC+EPuu9CxbaJVmO2dCrI4dAItR/v5pt1o/3q3qXZs7kFIEBs20+CCRFjqSJYXZ
-         agyGynh9TQ48eELv/kso8Cfb2pkT/b+oIqP92Yvm2rbiICOftUO9Eoa9uPdpw5ryqmPa
-         m/zQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697490715; x=1698095515; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6BRwuGLjLQCMOd5XxHaQqQETzEG0/pm9dc6qnNSBr58=;
+        b=cD2SuoFgHrlnzeWPq73b3qJqNPJE4ZryuIuE5IB6aUU17hvtoCuzVNDLJTD8XXTXur
+         qspN0f6GQH1WKkEJYSpUQfhpZjlDO4GBzkaWiN8yQ3XxYrI6XWpZWfLvZRcm4GY5GQcQ
+         pgdcVeOkZp5rAiyr6PnNeqv+qVEQVNsNNBMAV3tw0neOdq62rame13/vmon0p5ul0Bw4
+         YBi/xZJ+QSIEAbc7ws9COcc8jdzHNnML9wKhDNj8E8P75ujSenKLzDSRc70oHeHmKZaY
+         Hk7SVv16x8VTTcCB0o0mGuBQ0Fu+CXazJNRe98sG5YfUgAjFddMwGQCL1MDGrptFwl6o
+         GrZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697490431; x=1698095231;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CDXNDAXEYDerEydfkLSexbTOlmVWmitFF6lrfBCh1Bk=;
-        b=e477yacQNXIGzl8YiI7n0LY8UuG1QAh9PjxYsn1mo2v+dDBdYqO00GTonsucPC3fcP
-         uZtsz3b7hEwWkW7sAgXndqrXXLeW3RhzHJpBCQJiG4PaZDLf9FJPlFuqIDfEEZiCbwsL
-         DiWAhGlAxDqkvxYYRWS7rw8GBMZYUjXnFk9wClOfcaKcyvSF4M3P8docPMsdKF2lIoTr
-         jrk2ag/5E9jdA7ISbXYQD4eiEksAoUhkotoOVyiYq7VbZjKekTLkUwn3hVUpYWnrD/NE
-         l/rqrk8XrRRnnYoUz+3Dvjq4iGNFSG36Qhb/6wi1RTU1A5hzfgCashP7gN2ChOcZjqrR
-         a3tA==
-X-Gm-Message-State: AOJu0YyWe7ITyiKMr8Fje9KEBCVYkqGQCpSvSDbA3+wJ5CL1P1NeEx3F
-        KyrrNNq3CDH3351orXierJLacZlJbH/3FCYmXXwE0Q==
-X-Google-Smtp-Source: AGHT+IFsEVZb5/oJi8Szdpyz9UI2xIfNB5TEvS5Zp5Hz7N3qHFUdtQiRkbdpl+JTMgPwpIk8y95fgw==
-X-Received: by 2002:a05:600c:4f0d:b0:405:3885:490a with SMTP id l13-20020a05600c4f0d00b004053885490amr260413wmq.0.1697490430860;
-        Mon, 16 Oct 2023 14:07:10 -0700 (PDT)
-Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
-        by smtp.gmail.com with ESMTPSA id d9-20020a05600c34c900b004063cced50bsm113720wmq.23.2023.10.16.14.07.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 14:07:10 -0700 (PDT)
-Date:   Mon, 16 Oct 2023 22:07:09 +0100
-From:   Phillip Potter <phil@philpotter.co.uk>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
+        d=1e100.net; s=20230601; t=1697490715; x=1698095515;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6BRwuGLjLQCMOd5XxHaQqQETzEG0/pm9dc6qnNSBr58=;
+        b=a3/2jn0K5kKxiMC/GDiLOrRE+2yprKKhVhsZO97ZZ6HwyIJCHVOGPvR8ZxdkiDy90w
+         Dg1t7gtqUoGSgAAO4ac3Cl5fiuPdqYCwWkviDjykoIVo1DdEDr19fzl1kpC7rpnKCpvU
+         vmbaWdeGxJVkOlSapndNtAHazxS31z/6LWQ3j0qOQBtryJYkaP6JWVGA1OaqtrKZL2ec
+         UPgRK+NmYY0WlGvJu951/vVMY/0yfLXL7iHjGb48BXu+fXYYCNnAIVfE6d4mrlcveNnN
+         GwjYZuiCKxTElQy0yEmUUTJkr+YX6nrqsHCU5lkShm+2zSPyHQ5s8sKEuWUVpmzLuVy4
+         O+nA==
+X-Gm-Message-State: AOJu0YzVycHcZmVy6PLM32r5vbWLXWOvM1f3AaXnnIGtIA2D0Y8Mg0It
+        RV0OLr86bmznvZJvlR3FT+iruGkuxiPXwCa+/EAH1Q==
+X-Google-Smtp-Source: AGHT+IEVsCPmZyGaaPY3tXBJ/DpyKL2KmozDoKJe2ntgMvGpD7yWUVp7uBkIQOvsd8ucbqnvSDwavA==
+X-Received: by 2002:a05:6359:1b8f:b0:166:d9b8:4de6 with SMTP id ur15-20020a0563591b8f00b00166d9b84de6mr390148rwb.1.1697490715159;
+        Mon, 16 Oct 2023 14:11:55 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id z123-20020a626581000000b00687fcb1e609sm16008pfb.116.2023.10.16.14.11.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Oct 2023 14:11:54 -0700 (PDT)
+Message-ID: <df197ee9-9a06-42c8-9633-896685b56328@kernel.dk>
+Date:   Mon, 16 Oct 2023 15:11:53 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/1] cdrom: Add missing blank lines after declarations
-Message-ID: <ZS2l/R2cBqhdVNkR@equinox>
+Content-Language: en-US
+To:     Phillip Potter <phil@philpotter.co.uk>
+Cc:     linux-block@vger.kernel.org
 References: <20231016204741.1014-1-phil@philpotter.co.uk>
  <20231016204741.1014-2-phil@philpotter.co.uk>
- <68a2a403-ab2c-4932-a12f-1751ff6ccd77@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <68a2a403-ab2c-4932-a12f-1751ff6ccd77@kernel.dk>
+ <68a2a403-ab2c-4932-a12f-1751ff6ccd77@kernel.dk> <ZS2l/R2cBqhdVNkR@equinox>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZS2l/R2cBqhdVNkR@equinox>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 02:53:06PM -0600, Jens Axboe wrote:
-> On 10/16/23 2:47 PM, Phillip Potter wrote:
-> > From: Edson Juliano Drosdeck <edson.drosdeck@gmail.com>
-> > 
-> > Add missing blank lines after declarations to fix warning found by
-> > checkpatch.pl script.
+On 10/16/23 3:07 PM, Phillip Potter wrote:
+> On Mon, Oct 16, 2023 at 02:53:06PM -0600, Jens Axboe wrote:
+>> On 10/16/23 2:47 PM, Phillip Potter wrote:
+>>> From: Edson Juliano Drosdeck <edson.drosdeck@gmail.com>
+>>>
+>>> Add missing blank lines after declarations to fix warning found by
+>>> checkpatch.pl script.
+>>
+>> Let's please not do this. It's fine to run checkpatch on new patches to
+>> ensure that you don't make mistakes, but this is just useless churn.
+>> Even worse:
+>>
+> Hi Jens,
 > 
-> Let's please not do this. It's fine to run checkpatch on new patches to
-> ensure that you don't make mistakes, but this is just useless churn.
-> Even worse:
-> 
-Hi Jens,
+> So to be clear, I should not accept patches that do cleanup like this
+> in future unless there are other substantive changes? I also build
+> tested the patch as per normal.
 
-So to be clear, I should not accept patches that do cleanup like this
-in future unless there are other substantive changes? I also build
-tested the patch as per normal.
+Right. May be fine if actual fixes are being made, then do it as a prep
+patch or something. That sometimes happens, you fix something and notice
+that some styling is off and then fix that too.
 
-> > @@ -1202,6 +1204,7 @@ static int check_for_audio_disc(struct cdrom_device_info *cdi,
-> >  {
-> >          int ret;
-> >  	tracktype tracks;
-> > +
-> >  	cd_dbg(CD_OPEN, "entering check_for_audio_disc\n");
-> >  	if (!(cdi->options & CDO_CHECK_TYPE))
-> >  		return 0;
+>>> @@ -1202,6 +1204,7 @@ static int check_for_audio_disc(struct cdrom_device_info *cdi,
+>>>  {
+>>>          int ret;
+>>>  	tracktype tracks;
+>>> +
+>>>  	cd_dbg(CD_OPEN, "entering check_for_audio_disc\n");
+>>>  	if (!(cdi->options & CDO_CHECK_TYPE))
+>>>  		return 0;
+>>
+>> This int ret is using spaces and not a tab, why even make a newline
+>> change and not sort that out too?
+>>
 > 
-> This int ret is using spaces and not a tab, why even make a newline
-> change and not sort that out too?
-> 
+> Yes, good point. Given the patch only consisted of new lines though, I
+> didn't think it a bad one. If this is the policy though, I will be
+> stricter in future of course.
 
-Yes, good point. Given the patch only consisted of new lines though, I
-didn't think it a bad one. If this is the policy though, I will be
-stricter in future of course.
+It's just pointless churn, which is the objection. Now granted for cdrom
+the risk of conflict isn't that large, as it doesn't really see any
+changes. But in general this is the kind of stuff that prevents stable
+backports from just applying automatically. I view it similarly to
+spelling fixes, and that kind of stuff. Is the style wrong? It is. But
+it's not worth fixing seperately.
 
-> But it's all mostly moot as we should not be doing patches like this.
-> 
-> -- 
-> Jens Axboe
-> 
+-- 
+Jens Axboe
 
-Regards,
-Phil
