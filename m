@@ -2,110 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E59D2CDB482
-	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 01:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 020D1C46CA1
+	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 06:11:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbjJPBrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 Oct 2023 21:47:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55226 "EHLO
+        id S231276AbjJPGLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Oct 2023 02:11:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjJPBrH (ORCPT
+        with ESMTP id S229834AbjJPGLA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Oct 2023 21:47:07 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94601A9;
-        Sun, 15 Oct 2023 18:47:05 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4S80Mz6W1Gz4f3kp1;
-        Mon, 16 Oct 2023 09:46:55 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgD3jd0TlixlP1JPDA--.33169S3;
-        Mon, 16 Oct 2023 09:47:01 +0800 (CST)
-Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
- throttle is enabled
-To:     Khazhy Kumykov <khazhy@chromium.org>,
-        Oleg Nesterov <oleg@redhat.com>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Li Nan <linan666@huaweicloud.com>, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        Mon, 16 Oct 2023 02:11:00 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1CF5E1
+        for <linux-block@vger.kernel.org>; Sun, 15 Oct 2023 23:10:52 -0700 (PDT)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20231016061048epoutp028bb40f2168ba77cfa8fe4592efd03e1a~OgaN0897G1841718417epoutp02N
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 06:10:48 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20231016061048epoutp028bb40f2168ba77cfa8fe4592efd03e1a~OgaN0897G1841718417epoutp02N
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1697436648;
+        bh=FgxNYSSeGvlU+AaHBZbNV92eyyDkZgy9stIj+3PKOsE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=X4whoqlaABfCS9waM7H/+vSMVzeChK4xY5Qjk1/fUELc3vIsL8JQVrCI4zTOaPMla
+         YNm2jvJnMsi7sQhntH6INg5cu898iSSqp46Y08R/QjBo1rwfa8M0HcwAGf3xz2twZP
+         JUN6ZD0SkgLbGfm2GP7mfdDgBjUtpRBj+n+eLy98=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20231016061048epcas5p1d6c33706134827eed6e1e1284c6153f0~OgaNbFJGQ2961229612epcas5p1T;
+        Mon, 16 Oct 2023 06:10:48 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.179]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4S86DQ6mjYz4x9Q2; Mon, 16 Oct
+        2023 06:10:46 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        82.A9.09672.5E3DC256; Mon, 16 Oct 2023 15:10:45 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20231016060514epcas5p2ab38287c243a9539736453b4cb34e447~OgVWhTVjQ1821118211epcas5p21;
+        Mon, 16 Oct 2023 06:05:14 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20231016060514epsmtrp1f7b32ea1f5bc7a03f359f8575fcc9222~OgVWgjHMm1604916049epsmtrp1W;
+        Mon, 16 Oct 2023 06:05:14 +0000 (GMT)
+X-AuditID: b6c32a4b-39fff700000025c8-fb-652cd3e5dec7
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        9D.6C.08755.A92DC256; Mon, 16 Oct 2023 15:05:14 +0900 (KST)
+Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20231016060513epsmtip2096c73e8a0eba6304e4f7bff8f2f8e56~OgVVTnw5k1727517275epsmtip2g;
+        Mon, 16 Oct 2023 06:05:12 +0000 (GMT)
+From:   Min Li <min15.li@samsung.com>
+To:     axboe@kernel.dk, hch@lst.de, dlemoal@kernel.org
+Cc:     gregkh@linuxfoundation.org, kch@nvidia.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230928015858.1809934-1-linan666@huaweicloud.com>
- <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
- <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com>
- <20231005162417.GA32420@redhat.com>
- <0a8f34aa-ced9-e613-3e5f-b5e53a3ef3d9@huaweicloud.com>
- <20231007151607.GA24726@redhat.com>
- <21843836-7265-f903-a7d5-e77b07dd5a71@huaweicloud.com>
- <20231008113602.GB24726@redhat.com>
- <CACGdZY+OOr4Q5ajM0za2babr34YztE7zjRyPXHgh_A64zvoBOw@mail.gmail.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <e9165cd0-9c9d-1d1a-1c5b-402556a1a31f@huaweicloud.com>
-Date:   Mon, 16 Oct 2023 09:46:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        min15.li@samsung.com, stable@vger.kernel.org, willy@infradead.org
+Subject: Re: [PATCH v5] block: add check that partition length needs to be
+ aligned with block size
+Date:   Mon, 16 Oct 2023 14:03:11 +0000
+Message-Id: <20231016140311.32367-1-min15.li@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230629073322.GB19464@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <CACGdZY+OOr4Q5ajM0za2babr34YztE7zjRyPXHgh_A64zvoBOw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3jd0TlixlP1JPDA--.33169S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Wr4xAFWkWr1DZF17tF48Xrb_yoW8JrWxpF
-        WIgw12vrs0qas7JF1Iyw1jvF1UZFZrGFy5J3yDC34qvas5G3s7GF17CrZ0yr47X348Wa1r
-        JwnIyF9rArnFqaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-        JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
-        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHJsWRmVeSWpSXmKPExsWy7bCmuu7TyzqpBg9Oa1usvtvPZvFgv71F
+        8+L1bBZzX19isVi5+iiTxdOrs5gs9t7Stri8aw6bxfJVHUwWZyd8YLVYsPERo8XvH3PYHHg8
+        Nq/Q8rh8ttRj06pONo/9c9ewe+y+2cDm0dv8js2jb8sqRo/Pm+QCOKKybTJSE1NSixRS85Lz
+        UzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTdMnOATlVSKEvMKQUKBSQWFyvp29kU
+        5ZeWpCpk5BeX2CqlFqTkFJgU6BUn5haX5qXr5aWWWBkaGBiZAhUmZGdcP2ZbIFTRss+ngZG7
+        i5GTQ0LARGLp3U3sXYxcHEICuxklzr9/wAzhfGKUOPt6IxuE841R4sHc1cwwLddu/oOq2sso
+        senAMqj+54wSk24+BcpwcLAJKEtsW+oD0iAiYCzx/+0kVpAaZoENjBLz7vxnAkkIC6RIXP76
+        lRXEZhFQlWj7/4kRxOYVsJSYte8nI8Q2eYn9B8+CbeYU0JHo+X+PDaJGUOLkzCcsIDYzUE3z
+        1tlQ183kkDgzRxnCdpHYcvkfK4QtLPHq+BZ2CFtK4mV/GzvInRICxRIvf4RBhGskdn+7zQRh
+        W0tsW7+OCaSEWUBTYv0ufYiwrMTUU+uYILbySfT+fgJVziuxYx6MrSTx98I5qOslJBbvfwh1
+        gYfExf5esIuFBOol1v5oY5zAqDALyTOzkDwzC2HzAkbmVYySqQXFuempxaYFxnmp5fD4Tc7P
+        3cQITrha3jsYHz34oHeIkYmD8RCjBAezkghverBOqhBvSmJlVWpRfnxRaU5q8SFGU2BoT2SW
+        Ek3OB6b8vJJ4QxNLAxMzMzMTS2MzQyVx3tetc1OEBNITS1KzU1MLUotg+pg4OKUamPrN78zt
+        ubXjwQTWIpHdCfqbd8ndPmP7K+rjOYdrLP+5DFZHPQk3ef6nMuyB1tuJKccXsFb68Cbm+WiL
+        FG/cVHTr+MKDfO1/nHhO69syzWgrz/K/rXC9fE7hjMIz//ekandcMJ260WTb+jklxWzP9Er1
+        NTfcYG6tsprQ4nnoRMP1w2qOxz7k3Fp8MnHK9kvVEnxvLPX/fNM+wfJuj8aTR/NuMXOu7K34
+        0Py8esNZpzTr04fSfZ+vMVN/9Y+nJmQJh++k667W0yv37bzZ+83R37TibBznw7OvNQuWfGEx
+        4E9oW9b9K+971PXgv0ZJyhEV6Ql3ZnK8U9RoTT0fXy3Z4iW+XH3u502p66KKi5dwdSmxFGck
+        GmoxFxUnAgBYKN0fQQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrOLMWRmVeSWpSXmKPExsWy7bCSvO6sSzqpBkve81msvtvPZvFgv71F
+        8+L1bBZzX19isVi5+iiTxdOrs5gs9t7Stri8aw6bxfJVHUwWZyd8YLVYsPERo8XvH3PYHHg8
+        Nq/Q8rh8ttRj06pONo/9c9ewe+y+2cDm0dv8js2jb8sqRo/Pm+QCOKK4bFJSczLLUov07RK4
+        Mq4fsy0QqmjZ59PAyN3FyMkhIWAice3mP+YuRi4OIYHdjBLfPk1khEhISJyf94sNwhaWWPnv
+        OTtE0VNGiYd/JzB1MXJwsAkoS2xb6gNSIyJgLnFl121GkBpmgR2MEm/WbWEBSQgLJEnM+dkK
+        NohFQFWi7f8nsAW8ApYSs/b9hFomL7H/4FlmEJtTQEei5/89sHohAW2J1/O7WSDqBSVOznwC
+        ZjMD1Tdvnc08gVFgFpLULCSpBYxMqxglUwuKc9Nziw0LDPNSy/WKE3OLS/PS9ZLzczcxguNC
+        S3MH4/ZVH/QOMTJxMB5ilOBgVhLhTQ/WSRXiTUmsrEotyo8vKs1JLT7EKM3BoiTOK/6iN0VI
+        ID2xJDU7NbUgtQgmy8TBKdXA5Jo59TTnI8kJE5Q5RTaIRM48r57fnLS8ksVospoOj25I+4qI
+        h9pLdljtnLb5y1pN8T/ODipqx57nX+01Snr89E3G1dP6N23FmBmnx6w0uj3p5QwTZvXnom03
+        ubLfP3Ke5h+rcmj69G0XNv0XPlgl4RjP2ac+de7WRabPo8/JHJ8m7Ri4bv+KmMx/3N9/d3zz
+        kHohlNbtsP/SvkkFKQb7Z+wrfKKm9n3PzpLpPbcXHI5Y0PJSkkN5y2W5Za8erPWKDtxd4RHg
+        k29wpGzWbf6YEsZD0TNMMtiSXU2u7n0cv3/u/wMdydElSl/K+pdan5+Szdi08VdGXt2sZ19v
+        3EwwfFL83mnjH7endUtka8IZFZVYijMSDbWYi4oTAfyIjkP6AgAA
+X-CMS-MailID: 20231016060514epcas5p2ab38287c243a9539736453b4cb34e447
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
 X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231016060514epcas5p2ab38287c243a9539736453b4cb34e447
+References: <20230629073322.GB19464@lst.de>
+        <CGME20231016060514epcas5p2ab38287c243a9539736453b4cb34e447@epcas5p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Thanks
 
-在 2023/10/14 5:51, Khazhy Kumykov 写道:
-> Looking at the generic mul_u64_u64_div_u64 impl, it doesn't handle
-> overflow of the final result either, as far as I can tell. So while on
-> x86 we get a DE, on non-x86 we just get the wrong result.
-> 
-> (Aside: after 8d6bbaada2e0 ("blk-throttle: prevent overflow while
-> calculating wait time"), setting a very-high bps_limit would probably
-> also cause this crash, no?)
-> 
-> Would it be possible to have a "check_mul_u64_u64_div_u64_overflow()",
-> where if the result doesn't fit in u64, we indicate (and let the
-> caller choose what to do? Here we should just return U64_MAX)?
-> 
-> Absent that, maybe we can take inspiration from the generic
-> mul_u64_u64_div_u64? (Forgive the paste)
-> 
->   static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
->   {
-> +       /* Final result probably won't fit in u64 */
-> +       if (ilog2(bps_limit) + ilog2(jiffy_elapsed) - ilog2(HZ) > 62)
-
-I'm not sure, but this condition looks necessary, but doesn't look
-sufficient, for example, jiffy_elapsed cound be greater than HZ, while
-ilog2(jiffy_elapsed) is equal to ilog2(HZ).
-
-Thanks,
-Kuai
-
-> +               return U64_MAX;
->          return mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed, (u64)HZ);
->   }
-> 
-> .
-> 
-
+Min li
