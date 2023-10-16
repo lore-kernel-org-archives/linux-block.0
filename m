@@ -2,90 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 381C1CDB465
-	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 15:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A21CDB465
+	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 15:37:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232261AbjJPPft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Oct 2023 11:35:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49548 "EHLO
+        id S232660AbjJPPhz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Oct 2023 11:37:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233675AbjJPPfr (ORCPT
+        with ESMTP id S232375AbjJPPhy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Oct 2023 11:35:47 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EEEBB4;
-        Mon, 16 Oct 2023 08:35:45 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 89E581FEBE;
-        Mon, 16 Oct 2023 15:35:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1697470543; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XCrhq6NWcgUDM/zqlpSfD75/KbtlS3V+BBod9U8uBVw=;
-        b=jAE2csj0S/Xd6xfR0jmmP0Aw14hqDojYN2pHsYIOLsdDe5QRY2c96sToR7UAZDfLLlQoL+
-        5Te74dMfevciii9r33lePHm5cfkgUNqnSBVMvfx17NGGOizDVhjoFeEauaUFKtwaI+/hmc
-        jEnwU9GCUknZatEmmESJgDSsJyH4fx0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1697470543;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XCrhq6NWcgUDM/zqlpSfD75/KbtlS3V+BBod9U8uBVw=;
-        b=hqosW9OoDyyIfHv+VI/d0rfVsDvQKuqf47B7lS2/JVoOC8tsL6hCwlqyI/89+CWvutp8Yf
-        vHxoMao09NDH1nBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7ADC1138EF;
-        Mon, 16 Oct 2023 15:35:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id sGT3HU9YLWWmBwAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 16 Oct 2023 15:35:43 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id EC974A0657; Mon, 16 Oct 2023 17:35:42 +0200 (CEST)
-Date:   Mon, 16 Oct 2023 17:35:42 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] block: simplify bdev_del_partition()
-Message-ID: <20231016153542.ptqv6mw5z4bgqhuf@quack3>
-References: <20231016-fototermin-umriss-59f1ea6c1fe6@brauner>
+        Mon, 16 Oct 2023 11:37:54 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D840AC
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 08:37:51 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-27d21168d26so679289a91.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 08:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697470671; x=1698075471; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oaOTKWkhj+Ncly5skMVpADRKfvKmkl49ZSj9OUlLEMI=;
+        b=SIZIxrgjuqqRbx5QzX+VurzqQtOYf8EfJRR5dW5eWIYKtTG41ECwyRhiVWmt1kLJRt
+         L8LdMxRgovwn0yC1EOO6If0cIoQ0B6gnPO5KqbQS/MDXzjep8NLQry04c226hopvcekz
+         xSKoDwY7r1suEMaGNKLjzt7KSy7V9Ta7meatoHPbgHntB1oYrEj5QfJDcLjiQjdBUeCx
+         C45GmF7IZMWVsMUeMqf5q3zeBXqYizqrpUUpFmaQ/L8nfk9/jIO5mmgps/iASk7IDQNX
+         29XvpZEC99Q3TPeeu+WpsCLFIxFom3z52jmrPmGhp+n/nGLZHnxYTZCYe2jB/D4qxECC
+         NHhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697470671; x=1698075471;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oaOTKWkhj+Ncly5skMVpADRKfvKmkl49ZSj9OUlLEMI=;
+        b=V2JRZpVzQyUCNT392/1eExU8a/dIUGQS7RYZVDeADcZkduGUacbNGTk37PTE14QTEX
+         Qt/HKCHKJtDlNBYqYc/u79/FD+QS3QTooB3/5hAhm5WRc6jJDwhG3fbkt94SXcs5pplP
+         CozNeHS/5wBt/tYbM7i/HbyuSEvNIN5jDA8HZFbz+mIbUBmp432mpHnaQoHlSqfgBFzu
+         G7GekJlpRNzHDNafJ1dm/GX1fvw+8X5XS0WGLElnzR7UtMB1Vmtbn065/tKCTvtQIMJt
+         UIG34Ym9azEBFGFN88HxvpaAPZsgFxl3tHh0hR5SgTSisG/tEbW/XtdonvqeMNE591s0
+         zQcQ==
+X-Gm-Message-State: AOJu0YxT+THlAAunK+Cq7EijSvf0ZOrqy+DAmuo6NLa//seSYHzV8vlN
+        vvFZCIhDT/wFKYqe1po8XtqS4A==
+X-Google-Smtp-Source: AGHT+IEt6IQopXt79C7UVRKDQuxG88LVLlKv2JonJNh16F7MbNICzKRuaf6/mNKWk4b5FhoAjcCwTA==
+X-Received: by 2002:a17:90a:4ca4:b0:274:99ed:a80c with SMTP id k33-20020a17090a4ca400b0027499eda80cmr31810476pjh.3.1697470670913;
+        Mon, 16 Oct 2023 08:37:50 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id on6-20020a17090b1d0600b0027d0adf653bsm4886462pjb.7.2023.10.16.08.37.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Oct 2023 08:37:50 -0700 (PDT)
+Message-ID: <40652eee-1cea-4888-86e2-e65a23475182@kernel.dk>
+Date:   Mon, 16 Oct 2023 09:37:48 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: simplify bdev_del_partition()
+Content-Language: en-US
+To:     Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20231016-fototermin-umriss-59f1ea6c1fe6@brauner>
+From:   Jens Axboe <axboe@kernel.dk>
 In-Reply-To: <20231016-fototermin-umriss-59f1ea6c1fe6@brauner>
-Authentication-Results: smtp-out2.suse.de;
-        none
-X-Spamd-Result: default: False [0.82 / 50.00];
-         ARC_NA(0.00)[];
-         RCVD_VIA_SMTP_AUTH(0.00)[];
-         FROM_HAS_DN(0.00)[];
-         TO_DN_SOME(0.00)[];
-         TO_MATCH_ENVRCPT_ALL(0.00)[];
-         NEURAL_SPAM_SHORT(0.31)[0.155];
-         MIME_GOOD(-0.10)[text/plain];
-         RCPT_COUNT_FIVE(0.00)[6];
-         DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-         NEURAL_SPAM_LONG(3.00)[1.000];
-         FROM_EQ_ENVFROM(0.00)[];
-         MIME_TRACE(0.00)[0:+];
-         MID_RHS_NOT_FQDN(0.50)[];
-         RCVD_COUNT_TWO(0.00)[2];
-         RCVD_TLS_ALL(0.00)[];
-         BAYES_HAM(-2.89)[99.54%]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 16-10-23 17:27:18, Christian Brauner wrote:
+On 10/16/23 9:27 AM, Christian Brauner wrote:
 > BLKPG_DEL_PARTITION refuses to delete partitions that still have
 > openers, i.e., that has an elevated @bdev->bd_openers count. If a device
 > is claimed by setting @bdev->bd_holder and @bdev->bd_holder_ops
@@ -104,61 +87,10 @@ On Mon 16-10-23 17:27:18, Christian Brauner wrote:
 > 
 > So simply open-code what we need to do. This gets rid of one more
 > instance where we acquire s_umount under @disk->open_mutex.
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-Looks good to me. Feel free to add:
+Reviwed-by: Jens Axboe <axboe@kernel.dk>
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-BTW, now when there's only one delete_partition() caller, we could just
-opencode it in its callsite...
-
-								Honza
-
-> ---
-> Hey Jens,
-> 
-> This came out of an ongoing locking design discussion and is related
-> to what we currently have in vfs.super. So if everyone still agrees my
-> reasoning is right and you don't have big objections I'd take it through
-> there.
-> 
-> As usual, thanks to Jan and Christoph for good discussions here.
-> 
-> Thanks!
-> Christian
-> ---
->  block/partitions/core.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index e137a87f4db0..b0585536b407 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -485,7 +485,18 @@ int bdev_del_partition(struct gendisk *disk, int partno)
->  	if (atomic_read(&part->bd_openers))
->  		goto out_unlock;
->  
-> -	delete_partition(part);
-> +	/*
-> +	 * We verified that @part->bd_openers is zero above and so
-> +	 * @part->bd_holder{_ops} can't be set. And since we hold
-> +	 * @disk->open_mutex the device can't be claimed by anyone.
-> +	 *
-> +	 * So no need to call @part->bd_holder_ops->mark_dead() here.
-> +	 * Just delete the partition and invalidate it.
-> +	 */
-> +
-> +	remove_inode_hash(part->bd_inode);
-> +	invalidate_bdev(part);
-> +	drop_partition(part);
->  	ret = 0;
->  out_unlock:
->  	mutex_unlock(&disk->open_mutex);
-> -- 
-> 2.34.1
-> 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
