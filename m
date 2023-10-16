@@ -2,76 +2,166 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C65CECDB474
-	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 21:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE31C46CA1
+	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 21:48:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233461AbjJPVQQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Oct 2023 17:16:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40282 "EHLO
+        id S233952AbjJPVsk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Oct 2023 17:48:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233282AbjJPVQP (ORCPT
+        with ESMTP id S232896AbjJPVsj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Oct 2023 17:16:15 -0400
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7EBFAC;
-        Mon, 16 Oct 2023 14:16:13 -0700 (PDT)
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1c9e95aa02dso30812745ad.0;
-        Mon, 16 Oct 2023 14:16:13 -0700 (PDT)
+        Mon, 16 Oct 2023 17:48:39 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C3A3A2
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:48:37 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-41b813f0a29so38161cf.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:48:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697492916; x=1698097716; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xfFjEje4km9uIXvuE8PYathzHXnXmVT18oPTg3UYxdQ=;
+        b=g4gA3/di0hw1P8BBe6LmoYzNRuZh7Qbyv43KSK4aD56rG1f2XhUktoEQQd62WkTz9X
+         fpL2tE4aATJqETsVcCrpELD6Swegr1vOog84Hbg9OHzO4mC5BfcVqQfKMVDYDH74fQZg
+         y9M8X0wtpIgOHbSGa6lqnih1mKUuHfuoVTywIxWd2QZvsV19jYH5sfplI4VKcnUYQpGd
+         itzs4f07WD5iy1199zWSb1pjN53tunszF4g91l/+Ad24emx1TDG6ENsETxerCZCnQKaO
+         DeRvs/WSqilCquhHAUFsmJtvPmqAO26Qhw00zFn5QxXMKA1PhM3ymzH9RR3m8L4vaD18
+         rqYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697490973; x=1698095773;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lEhcuHiu2scOZP08dw+rF+hfx+bVpPniCecMP/FEFVg=;
-        b=hIucgWl1ZWBatpFSMsBOWUeX7V1J+m9rJIJ7VoPvbZkkuXB05WJ4j7Ojnk1P6ENMId
-         LUVjIF6vF20mHyjMlxfBHwENRORyF9v+8VojZPHi8/Imaw5qWFcnP11oJWgjkLO9OJt0
-         D8W2jHjvNyWiHTg19m1mfFDtFMtc8ZaejMGr1PyMqKNIeddfSGEdJl0nfrEOHRJM/sX0
-         FD8A1SsTe+ee89uTVXjmYAtZojWn+LQMZQQNmT6PZUqfv2hEAbUm2quEHFNhBo2Tvq51
-         mXUU/HA7D5McOFz2QyuunlSvH/cONbQ7MHhby6gGgBGbqnH4C8xBDDU/l1meaz7HMgWy
-         8x6g==
-X-Gm-Message-State: AOJu0Yz7xSmB3ZvWk2NFaEAdJ02JpqckH2ctA4cutWclP5LC5b0U81KD
-        vp4oCtSeFHNqjwuA2eGQGlE=
-X-Google-Smtp-Source: AGHT+IGbhJJgcRO7Al1j9Lh8J9XP+Tac9kCgzi0rM8m7eBBfpIMCgeyQD/JVdVjpxfvf0xnEldYi3Q==
-X-Received: by 2002:a17:902:c711:b0:1c3:e2eb:f79d with SMTP id p17-20020a170902c71100b001c3e2ebf79dmr10770547plp.8.1697490973207;
-        Mon, 16 Oct 2023 14:16:13 -0700 (PDT)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net. [73.231.117.72])
-        by smtp.gmail.com with ESMTPSA id bb11-20020a170902bc8b00b001c5d09e9437sm76976plb.25.2023.10.16.14.16.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 14:16:12 -0700 (PDT)
-Message-ID: <d10c329b-85c9-4bc2-be00-f156c48639e5@acm.org>
-Date:   Mon, 16 Oct 2023 14:16:09 -0700
+        d=1e100.net; s=20230601; t=1697492916; x=1698097716;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xfFjEje4km9uIXvuE8PYathzHXnXmVT18oPTg3UYxdQ=;
+        b=qct/bDuq4F/4+vxDTHn0mZq93VCK6fQqZw+ARPBZcTcMzckEs21hqTYoPOUpZR2B2M
+         ka8lYF3gT7HCeD+MpRtc1llOAElQrJ+NC0eJh2IfRUdy0UuxwGgygZ7JUTTY6dTE1we6
+         N0ACWDGqUtEBFJBWjWlCwu3P34gXnIExQtLQ8yMQY2/IcpYaEGdE4YaH8qdqcz2wCczN
+         SdmCOT49JOzM+KoewRJVwq0Ce/MOvCN4R1Q0eGbZYVGBN9FBZYObUT160FQYfli5+ovE
+         rVzUsA8eTB4giErMqQenCBh4wVOSL60eOGAH0pudFPlLUIb+2tXd8ZEJBieK5oKdWQki
+         qf1A==
+X-Gm-Message-State: AOJu0YxBZg5/cNDhZNkyAnuss6Xy/8w3zgmFWH0/4fttLYHfA+EBHKVp
+        qFQDU/VdyvTASSSGILEic72WMAfVexB9eKfq3rSNdQ==
+X-Google-Smtp-Source: AGHT+IG7r4JQkTY7QRBqLIn53rtDCeNYj8B29ETeTJVhjbNYJE0uNpHoKKYpN+DZJ7cFbu2Bj/lanINP3ELdKlEixiU=
+X-Received: by 2002:a05:622a:478e:b0:418:1878:5b8c with SMTP id
+ do14-20020a05622a478e00b0041818785b8cmr24567qtb.25.1697492916193; Mon, 16 Oct
+ 2023 14:48:36 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] Consider inflight IO in io accounting for high latency
- devices
-Content-Language: en-US
-To:     Gulam Mohamed <gulam.mohamed@oracle.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20231013195559.1306345-1-gulam.mohamed@oracle.com>
- <35e3e173-8018-42d8-a6e8-7ba994ff6b17@acm.org>
- <CO1PR10MB4563B1B650C89FA32B60AE1298D7A@CO1PR10MB4563.namprd10.prod.outlook.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CO1PR10MB4563B1B650C89FA32B60AE1298D7A@CO1PR10MB4563.namprd10.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230928015858.1809934-1-linan666@huaweicloud.com>
+ <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
+ <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com> <20231005162417.GA32420@redhat.com>
+ <0a8f34aa-ced9-e613-3e5f-b5e53a3ef3d9@huaweicloud.com> <20231007151607.GA24726@redhat.com>
+ <21843836-7265-f903-a7d5-e77b07dd5a71@huaweicloud.com> <20231008113602.GB24726@redhat.com>
+ <CACGdZY+OOr4Q5ajM0za2babr34YztE7zjRyPXHgh_A64zvoBOw@mail.gmail.com>
+ <e9165cd0-9c9d-1d1a-1c5b-402556a1a31f@huaweicloud.com> <CACGdZYLxnL91S4RxfvLmN8j3rcvbsqdkouj4Lgc05mnCo2fZSw@mail.gmail.com>
+In-Reply-To: <CACGdZYLxnL91S4RxfvLmN8j3rcvbsqdkouj4Lgc05mnCo2fZSw@mail.gmail.com>
+From:   Khazhy Kumykov <khazhy@google.com>
+Date:   Mon, 16 Oct 2023 14:48:22 -0700
+Message-ID: <CACGdZY+nmtRLeXi48z8J2QD5wFSVCuhFVRbzD9ktK5tXXrbxBw@mail.gmail.com>
+Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
+ throttle is enabled
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Oleg Nesterov <oleg@redhat.com>, Li Nan <linan666@huaweicloud.com>,
+        tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        houtao1@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="0000000000004e49890607dc5eec"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/16/23 13:01, Gulam Mohamed wrote:
-> [GULAM]: Yes, it will be called for every submitted bio but for the
-> high latency devices it will not have much impact. This is indicated
-> by the latency figures I provided in the review mail, with and
-> without our patch.
+--0000000000004e49890607dc5eec
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Calling tag iteration code from the hot path is wrong.
+On Mon, Oct 16, 2023 at 1:06=E2=80=AFPM Khazhy Kumykov <khazhy@chromium.org=
+> wrote:
+>
+> I mostly just want us to pick /something/, since 6.6-rc and the LTSs
+> with the patch in question are busted currently. :)
+>
+And just to make it explicit: I believe Kaui's proposal is correct.
 
-There are more devices than only hard disks that have a single hardware
-queue, e.g. certain SSDs. I'm pretty sure that this patch will have a
-significant negative performance impact for such devices.
+Khazhy
 
-Thanks,
+--0000000000004e49890607dc5eec
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Bart.
+MIIPmwYJKoZIhvcNAQcCoIIPjDCCD4gCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ggz1MIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
+IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
+dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
+6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
+c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
+I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
+AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
+BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
+CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
+AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
+MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
+My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
+LmNybDBMBgNVHSAERTBDMEEGCSsGAQQBoDIBKDA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5n
+bG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzANBgkqhkiG9w0BAQsFAAOCAQEANyYcO+9JZYyqQt41
+TMwvFWAw3vLoLOQIfIn48/yea/ekOcParTb0mbhsvVSZ6sGn+txYAZb33wIb1f4wK4xQ7+RUYBfI
+TuTPL7olF9hDpojC2F6Eu8nuEf1XD9qNI8zFd4kfjg4rb+AME0L81WaCL/WhP2kDCnRU4jm6TryB
+CHhZqtxkIvXGPGHjwJJazJBnX5NayIce4fGuUEJ7HkuCthVZ3Rws0UyHSAXesT/0tXATND4mNr1X
+El6adiSQy619ybVERnRi5aDe1PTwE+qNiotEEaeujz1a/+yYaaTY+k+qJcVxi7tbyQ0hi0UB3myM
+A/z2HmGEwO8hx7hDjKmKbDCCA18wggJHoAMCAQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUA
+MEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9vdCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWdu
+MRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEg
+MB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENBIC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzAR
+BgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4
+Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0EXyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuu
+l9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+JJ5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJ
+pij2aTv2y8gokeWdimFXN6x0FNx04Druci8unPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh
+6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTvriBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti
++w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8E
+BTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5NUPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEA
+S0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigHM8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9u
+bG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmUY/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaM
+ld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88
+q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcya5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/f
+hO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/XzCCBNQwggO8oAMCAQICEAGy8e6bI55p/yISlXXG
+SrAwDQYJKoZIhvcNAQELBQAwVDELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYt
+c2ExKjAoBgNVBAMTIUdsb2JhbFNpZ24gQXRsYXMgUjMgU01JTUUgQ0EgMjAyMDAeFw0yMzA3MTYw
+NzQ1MTRaFw0yNDAxMTIwNzQ1MTRaMCIxIDAeBgkqhkiG9w0BCQEWEWtoYXpoeUBnb29nbGUuY29t
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA84UGa4X1/brS7/2vQRLnjHc/oa9+4lri
+stpvdNGyJgDZNvJouUxTihNXyW4exVS4rkaD+DjMOTcoxFy+KEAzrIzotas1NbZt4P7DTJ9Dp6/1
+20YUAt9rnWmZNHmuzZNGlRYhzAAOaDkGhKFnULS1bItsuRmuPA1st6vd7GiVA00TiflQ7IYni7ZN
+fd1TDheOc7OGHW6PcHPW0P0HGTzzvTpgTKQi4ojKre0fW/Yb0lZEVpBiadSj9MeDn5/f0yUpeFYD
+fll7rnq2bPGOfS3JjwLalgVSl5Ho6txXv9vlJVYxgnAoNZsZJ2EHvsT7eUQYNHg5an0nClXZYIF7
+p2YQGQIDAQABo4IB0jCCAc4wHAYDVR0RBBUwE4ERa2hhemh5QGdvb2dsZS5jb20wDgYDVR0PAQH/
+BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMEBggrBgEFBQcDAjAdBgNVHQ4EFgQUKmFDbOAVaL0O
+2d1HymA53tUP1hUwTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
+Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wDAYDVR0TAQH/BAIwADCBmgYIKwYBBQUH
+AQEEgY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2NhL2dzYXRs
+YXNyM3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29t
+L2NhY2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgwFoAUfMwKaNei6x4schvR
+zV2Vb4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9jYS9n
+c2F0bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEBADeZduKRV5+J7StRkfoY
+hBDfCkyRbFphFmeJ+0A1fPxECLLkrXR2izyctzMAGZH2ceScAlECO1r3aEQcyx9n7/YlMc24ZF0I
+++9b72/wv6J6POICeIj6MgschmHIUz4Rw4H5IdBLo62N0jBBzv2T9ASRAl7Yryl6tHUN5X5228Tt
+3LJe5Gtb1cm22DdXBM3xnD7Kd59ls9j/tz5I+yEsLIK7zQk7hBt87a31T55CTVgMQZ4lTavG5vdz
+vEb7YC0jFAT8SmYmtSOr+4aZJRIwVjXlI04Mfr3jcbqDnzfv0VgVp5UlzQK4aApofbSsSDeXsDR+
+t30gEkeMNUvUqd6PaxYxggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9i
+YWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjAC
+EAGy8e6bI55p/yISlXXGSrAwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIH6FAl/o
+G2xTs+JUWQR85UDBxTjresTY9hsN2+MB9kWqMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
+KoZIhvcNAQkFMQ8XDTIzMTAxNjIxNDgzNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASow
+CwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZI
+hvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDS4jCrF3CHWhODe649p60aQK6V
+ElOaGWCQtGndJeL8N8Ea/6RvIRPK7oRoTcrv3dY45jLXpIfZqDo9t9vTxV1o0BxdIVAWA1iCT9fV
+DQDlFetPoCnRDCjldW3gs5F88v74y/2Qzr+TvD6WU+3u1GCom+hYTvPH/C53PYojt1tM/PNbH+is
+P9U3NkMKJsD0IWfruS+8+UmHr/IvvUi9YnjY7wpDZlATgG/vzID8uI026Z5BkHPCjYBKcv2Uh11w
+yZOgqKIRteTKeMWP6kUe+vCpsS7G4j2DhSDV/YlbbgLoCuenx2s01J87nwyzy0583iPw2xKT/fyp
+ocHaNoAkeQPw
+--0000000000004e49890607dc5eec--
