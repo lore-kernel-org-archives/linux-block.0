@@ -2,80 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F8ECDB474
-	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 20:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F396ACDB474
+	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 20:53:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231221AbjJPUrs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Oct 2023 16:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38248 "EHLO
+        id S231955AbjJPUxL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Oct 2023 16:53:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231955AbjJPUrr (ORCPT
+        with ESMTP id S229848AbjJPUxK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Oct 2023 16:47:47 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53245A7
-        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 13:47:44 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-325e9cd483eso4826320f8f.2
-        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 13:47:44 -0700 (PDT)
+        Mon, 16 Oct 2023 16:53:10 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C32E1A2
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 13:53:08 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-51f64817809so734590a12.1
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 13:53:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20230601.gappssmtp.com; s=20230601; t=1697489262; x=1698094062; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XO8iW+Aewu5dyhHhxqYtvkVfM0D0owqLsE+KQIP1q7k=;
-        b=yCbnmADcIviPaFt/1DSKt6mgS78EhpYj8U9r+gF2fQBhcsNJCCmg0kemuDNR8+h/Dl
-         HxnCGQB0Xh2N787uUldsM1qCzkm/2JKrTBw071Yl0OfuZqhSAQkI9QqK+TDOOJwjRgC1
-         V8rBgBiVAfBZI0F9jKQ2AoRCJmSeqp8LZYoUz2n8NKcQHp1MlZOXdAwYvfYeBmd2vJ2b
-         pQefJVy3s7BcUBemr8g8T22JuyeIBC9ink5h5OPF+HD2I3dUACLmMype9faXkTZ8Vh88
-         77ahAYWomi0H5oYZetXOH2xiXhRr3SmVIcFsCpUmqrzs4NP+VR1Evz8JxPC/LCkSZ68b
-         VqNQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697489588; x=1698094388; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ttpKw53SYn1T0nC1SsgOvVGo93COVcsvekGY8gxBBTU=;
+        b=xGrjW9wRNrXg3z4MgI4cUb7HIKSlY+G1AO+TsO+7Ng+NHajcXPqU9eUJMYblE1buQ6
+         3IeTu4d0J7Vd85PgEDjlHrDQpk0NjQMJFN3ThL8BFgCQOcMjdx0iAkynm2MFGo98meyJ
+         kWwxaxdp/TSO2d3yiShLc0eG2WnhUiLg8Ee0o7cEa57oOBkp4pycDiU10IRDE7015R/P
+         0KaXxdWr3RgitOxhdXBXBwZqzEwN9ZOvJRBqw2HcOYUit55HeDa0P2BnedCd2sAVpyGc
+         f+xNL6jU+jYHyBRskUsDGLwwzd+EkoL3KS45quAbFZBBSOoRWX7/v5As3xJDcwiuGRJn
+         NYlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697489262; x=1698094062;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XO8iW+Aewu5dyhHhxqYtvkVfM0D0owqLsE+KQIP1q7k=;
-        b=fGwa9iYsaUliXWK0W3X2YELk+p5dRH2b6UFLcNeTCPvBb6TMocs4ycUKp3ZrPLM/3H
-         djVf0uFEmH4Hwhu/32pfUIHJ9QOsPkeFO7Q/94cH00wf1E5YokuGkK4Eerf1Uu+TrLaA
-         75hACf4XVM+hXEtzHhVvQXxaGOO1Ya9VlIufPNdMxgiCOB3Tf2GzrBip74eTIdAJBx+b
-         tkezCXTHa57Rq8nMUeP5pK267q7bdoYq/ZMUQAICxPmH0aSLqlUDZqqyeD61iUzK9KOh
-         EhPSxXeqOTDYhrACBg5xuOv/uD/AxhA/9llG/7SS0z3raZlGTZRoGG7zw3fQbH1liprU
-         YqIw==
-X-Gm-Message-State: AOJu0YzTuk00ZaH788h11fKlSIMSaPltlmW0Twm9dNJZe1HvFn5NlzBc
-        S1DCVX2OuL9oKHsb+UCliCL3tEwypsbvzfvz34s=
-X-Google-Smtp-Source: AGHT+IFGAp4thw4ojnPO4RJifl4w8aPC0pdev10N6Hc2N9uBar6BYqoneUbKjBD9Z/WeBYY6SqwTow==
-X-Received: by 2002:adf:f608:0:b0:32d:b2dd:ee1c with SMTP id t8-20020adff608000000b0032db2ddee1cmr438603wrp.5.1697489262403;
-        Mon, 16 Oct 2023 13:47:42 -0700 (PDT)
-Received: from localhost.localdomain (3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.1.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:df16::3])
-        by smtp.gmail.com with ESMTPSA id g15-20020adfe40f000000b003217cbab88bsm124441wrm.16.2023.10.16.13.47.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 13:47:42 -0700 (PDT)
-From:   Phillip Potter <phil@philpotter.co.uk>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 0/1] cdrom: cleanup patch for inclusion
-Date:   Mon, 16 Oct 2023 21:47:40 +0100
-Message-ID: <20231016204741.1014-1-phil@philpotter.co.uk>
-X-Mailer: git-send-email 2.41.0
+        d=1e100.net; s=20230601; t=1697489588; x=1698094388;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ttpKw53SYn1T0nC1SsgOvVGo93COVcsvekGY8gxBBTU=;
+        b=iKWc2EDk+gynoeTsodvKTLgvec65/JzISSqm/RHsq+u+ipBEkWRLwIvKDWww67xjlW
+         lr69LMuRo1MpJFJAs28YTSRCyGecrrxyFFLGRMD/sj4ZWKPFEfanRFMYTzf4cY6oYBIg
+         arXRlxc2TC2EoZ+lehhKdiMEcmsrDr8esk4AdBy+InIXlNYch7QtN6N8WlCAOXXF1nIa
+         FQjgB446PkKnLCz1ZvYYZbuK+UzT9GmEJZkBdxdfdogptnZE2JzqjefWnutAJX902u2I
+         1zjBv9/E45MCxjexw1LfhB12u3ap2pTBSGBJpo5MjHfksO20gI8SpKWWsohjmnDNLk4u
+         ogig==
+X-Gm-Message-State: AOJu0YyoUWo4vu/QLeFhHFPuZGQM0mxD3Jzvn+cWBLgHJH92BgxdK7oq
+        U8TdPTEcFhN72G1VZ2txOH1s4A==
+X-Google-Smtp-Source: AGHT+IG2BsHvA2gsoyJSgYeMt11ibLp5258T1Lr9+dav83jgNPjimvcMo2MQU1W3TTl0vPFhpIUhuQ==
+X-Received: by 2002:a05:6a20:54a6:b0:163:d382:ba99 with SMTP id i38-20020a056a2054a600b00163d382ba99mr154190pzk.5.1697489588192;
+        Mon, 16 Oct 2023 13:53:08 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id u12-20020a170902e80c00b001b8b2a6c4a4sm53931plg.172.2023.10.16.13.53.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Oct 2023 13:53:07 -0700 (PDT)
+Message-ID: <68a2a403-ab2c-4932-a12f-1751ff6ccd77@kernel.dk>
+Date:   Mon, 16 Oct 2023 14:53:06 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] cdrom: Add missing blank lines after declarations
+Content-Language: en-US
+To:     Phillip Potter <phil@philpotter.co.uk>
+Cc:     linux-block@vger.kernel.org
+References: <20231016204741.1014-1-phil@philpotter.co.uk>
+ <20231016204741.1014-2-phil@philpotter.co.uk>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20231016204741.1014-2-phil@philpotter.co.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On 10/16/23 2:47 PM, Phillip Potter wrote:
+> From: Edson Juliano Drosdeck <edson.drosdeck@gmail.com>
+> 
+> Add missing blank lines after declarations to fix warning found by
+> checkpatch.pl script.
 
-Please include Edson's cleanup patch below, reviewed and signed off by
-myself. Many thanks.
+Let's please not do this. It's fine to run checkpatch on new patches to
+ensure that you don't make mistakes, but this is just useless churn.
+Even worse:
 
-Regards,
-Phil
+> @@ -1202,6 +1204,7 @@ static int check_for_audio_disc(struct cdrom_device_info *cdi,
+>  {
+>          int ret;
+>  	tracktype tracks;
+> +
+>  	cd_dbg(CD_OPEN, "entering check_for_audio_disc\n");
+>  	if (!(cdi->options & CDO_CHECK_TYPE))
+>  		return 0;
 
-Edson Juliano Drosdeck (1):
-  cdrom: Add missing blank lines after declarations
+This int ret is using spaces and not a tab, why even make a newline
+change and not sort that out too?
 
- drivers/cdrom/cdrom.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+But it's all mostly moot as we should not be doing patches like this.
 
 -- 
-2.41.0
+Jens Axboe
 
