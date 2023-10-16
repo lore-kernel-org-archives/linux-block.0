@@ -2,116 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 020D1C46CA1
-	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 06:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E274CDB465
+	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 06:17:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231276AbjJPGLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Oct 2023 02:11:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38188 "EHLO
+        id S230525AbjJPGRn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Oct 2023 02:17:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbjJPGLA (ORCPT
+        with ESMTP id S229574AbjJPGRn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Oct 2023 02:11:00 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1CF5E1
-        for <linux-block@vger.kernel.org>; Sun, 15 Oct 2023 23:10:52 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20231016061048epoutp028bb40f2168ba77cfa8fe4592efd03e1a~OgaN0897G1841718417epoutp02N
-        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 06:10:48 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20231016061048epoutp028bb40f2168ba77cfa8fe4592efd03e1a~OgaN0897G1841718417epoutp02N
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1697436648;
-        bh=FgxNYSSeGvlU+AaHBZbNV92eyyDkZgy9stIj+3PKOsE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=X4whoqlaABfCS9waM7H/+vSMVzeChK4xY5Qjk1/fUELc3vIsL8JQVrCI4zTOaPMla
-         YNm2jvJnMsi7sQhntH6INg5cu898iSSqp46Y08R/QjBo1rwfa8M0HcwAGf3xz2twZP
-         JUN6ZD0SkgLbGfm2GP7mfdDgBjUtpRBj+n+eLy98=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20231016061048epcas5p1d6c33706134827eed6e1e1284c6153f0~OgaNbFJGQ2961229612epcas5p1T;
-        Mon, 16 Oct 2023 06:10:48 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.179]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4S86DQ6mjYz4x9Q2; Mon, 16 Oct
-        2023 06:10:46 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        82.A9.09672.5E3DC256; Mon, 16 Oct 2023 15:10:45 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20231016060514epcas5p2ab38287c243a9539736453b4cb34e447~OgVWhTVjQ1821118211epcas5p21;
-        Mon, 16 Oct 2023 06:05:14 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20231016060514epsmtrp1f7b32ea1f5bc7a03f359f8575fcc9222~OgVWgjHMm1604916049epsmtrp1W;
-        Mon, 16 Oct 2023 06:05:14 +0000 (GMT)
-X-AuditID: b6c32a4b-39fff700000025c8-fb-652cd3e5dec7
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        9D.6C.08755.A92DC256; Mon, 16 Oct 2023 15:05:14 +0900 (KST)
-Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20231016060513epsmtip2096c73e8a0eba6304e4f7bff8f2f8e56~OgVVTnw5k1727517275epsmtip2g;
-        Mon, 16 Oct 2023 06:05:12 +0000 (GMT)
-From:   Min Li <min15.li@samsung.com>
-To:     axboe@kernel.dk, hch@lst.de, dlemoal@kernel.org
-Cc:     gregkh@linuxfoundation.org, kch@nvidia.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        min15.li@samsung.com, stable@vger.kernel.org, willy@infradead.org
-Subject: Re: [PATCH v5] block: add check that partition length needs to be
- aligned with block size
-Date:   Mon, 16 Oct 2023 14:03:11 +0000
-Message-Id: <20231016140311.32367-1-min15.li@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230629073322.GB19464@lst.de>
+        Mon, 16 Oct 2023 02:17:43 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71204DC;
+        Sun, 15 Oct 2023 23:17:41 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 834726732A; Mon, 16 Oct 2023 08:17:37 +0200 (CEST)
+Date:   Mon, 16 Oct 2023 08:17:37 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Damien Le Moal <dlemoal@kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v2 03/15] block: Support data lifetime in the I/O
+ priority bitfield
+Message-ID: <20231016061737.GA26670@lst.de>
+References: <20231005194129.1882245-1-bvanassche@acm.org> <20231005194129.1882245-4-bvanassche@acm.org> <8aec03bb-4cef-9423-0ce4-c10d060afce4@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHJsWRmVeSWpSXmKPExsWy7bCmuu7TyzqpBg9Oa1usvtvPZvFgv71F
-        8+L1bBZzX19isVi5+iiTxdOrs5gs9t7Stri8aw6bxfJVHUwWZyd8YLVYsPERo8XvH3PYHHg8
-        Nq/Q8rh8ttRj06pONo/9c9ewe+y+2cDm0dv8js2jb8sqRo/Pm+QCOKKybTJSE1NSixRS85Lz
-        UzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTdMnOATlVSKEvMKQUKBSQWFyvp29kU
-        5ZeWpCpk5BeX2CqlFqTkFJgU6BUn5haX5qXr5aWWWBkaGBiZAhUmZGdcP2ZbIFTRss+ngZG7
-        i5GTQ0LARGLp3U3sXYxcHEICuxklzr9/wAzhfGKUOPt6IxuE841R4sHc1cwwLddu/oOq2sso
-        senAMqj+54wSk24+BcpwcLAJKEtsW+oD0iAiYCzx/+0kVpAaZoENjBLz7vxnAkkIC6RIXP76
-        lRXEZhFQlWj7/4kRxOYVsJSYte8nI8Q2eYn9B8+CbeYU0JHo+X+PDaJGUOLkzCcsIDYzUE3z
-        1tlQ183kkDgzRxnCdpHYcvkfK4QtLPHq+BZ2CFtK4mV/GzvInRICxRIvf4RBhGskdn+7zQRh
-        W0tsW7+OCaSEWUBTYv0ufYiwrMTUU+uYILbySfT+fgJVziuxYx6MrSTx98I5qOslJBbvfwh1
-        gYfExf5esIuFBOol1v5oY5zAqDALyTOzkDwzC2HzAkbmVYySqQXFuempxaYFxnmp5fD4Tc7P
-        3cQITrha3jsYHz34oHeIkYmD8RCjBAezkghverBOqhBvSmJlVWpRfnxRaU5q8SFGU2BoT2SW
-        Ek3OB6b8vJJ4QxNLAxMzMzMTS2MzQyVx3tetc1OEBNITS1KzU1MLUotg+pg4OKUamPrN78zt
-        ubXjwQTWIpHdCfqbd8ndPmP7K+rjOYdrLP+5DFZHPQk3ef6nMuyB1tuJKccXsFb68Cbm+WiL
-        FG/cVHTr+MKDfO1/nHhO69syzWgrz/K/rXC9fE7hjMIz//ekandcMJ260WTb+jklxWzP9Er1
-        NTfcYG6tsprQ4nnoRMP1w2qOxz7k3Fp8MnHK9kvVEnxvLPX/fNM+wfJuj8aTR/NuMXOu7K34
-        0Py8esNZpzTr04fSfZ+vMVN/9Y+nJmQJh++k667W0yv37bzZ+83R37TibBznw7OvNQuWfGEx
-        4E9oW9b9K+971PXgv0ZJyhEV6Ql3ZnK8U9RoTT0fXy3Z4iW+XH3u502p66KKi5dwdSmxFGck
-        GmoxFxUnAgBYKN0fQQQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrOLMWRmVeSWpSXmKPExsWy7bCSvO6sSzqpBkve81msvtvPZvFgv71F
-        8+L1bBZzX19isVi5+iiTxdOrs5gs9t7Stri8aw6bxfJVHUwWZyd8YLVYsPERo8XvH3PYHHg8
-        Nq/Q8rh8ttRj06pONo/9c9ewe+y+2cDm0dv8js2jb8sqRo/Pm+QCOKK4bFJSczLLUov07RK4
-        Mq4fsy0QqmjZ59PAyN3FyMkhIWAice3mP+YuRi4OIYHdjBLfPk1khEhISJyf94sNwhaWWPnv
-        OTtE0VNGiYd/JzB1MXJwsAkoS2xb6gNSIyJgLnFl121GkBpmgR2MEm/WbWEBSQgLJEnM+dkK
-        NohFQFWi7f8nsAW8ApYSs/b9hFomL7H/4FlmEJtTQEei5/89sHohAW2J1/O7WSDqBSVOznwC
-        ZjMD1Tdvnc08gVFgFpLULCSpBYxMqxglUwuKc9Nziw0LDPNSy/WKE3OLS/PS9ZLzczcxguNC
-        S3MH4/ZVH/QOMTJxMB5ilOBgVhLhTQ/WSRXiTUmsrEotyo8vKs1JLT7EKM3BoiTOK/6iN0VI
-        ID2xJDU7NbUgtQgmy8TBKdXA5Jo59TTnI8kJE5Q5RTaIRM48r57fnLS8ksVospoOj25I+4qI
-        h9pLdljtnLb5y1pN8T/ODipqx57nX+01Snr89E3G1dP6N23FmBmnx6w0uj3p5QwTZvXnom03
-        ubLfP3Ke5h+rcmj69G0XNv0XPlgl4RjP2ac+de7WRabPo8/JHJ8m7Ri4bv+KmMx/3N9/d3zz
-        kHohlNbtsP/SvkkFKQb7Z+wrfKKm9n3PzpLpPbcXHI5Y0PJSkkN5y2W5Za8erPWKDtxd4RHg
-        k29wpGzWbf6YEsZD0TNMMtiSXU2u7n0cv3/u/wMdydElSl/K+pdan5+Szdi08VdGXt2sZ19v
-        3EwwfFL83mnjH7endUtka8IZFZVYijMSDbWYi4oTAfyIjkP6AgAA
-X-CMS-MailID: 20231016060514epcas5p2ab38287c243a9539736453b4cb34e447
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231016060514epcas5p2ab38287c243a9539736453b4cb34e447
-References: <20230629073322.GB19464@lst.de>
-        <CGME20231016060514epcas5p2ab38287c243a9539736453b4cb34e447@epcas5p2.samsung.com>
+In-Reply-To: <8aec03bb-4cef-9423-0ce4-c10d060afce4@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks
+On Fri, Oct 06, 2023 at 05:19:52PM +0900, Damien Le Moal wrote:
+> Your change seem to assume that it makes sense to be able to combine CDL with
+> lifetime hints. But does it really ? 
 
-Min li
+Yes, it does.
+
+
+> CDL is of dubious value for solid state
+> media and as far as I know,
+
+No, it's pretty useful and I'd bet my 2 cents that it will eventually
+show up in relevant standards and devices.
+
+Even if it wasn't making our user interfaces exclusive would be a
+massive pain.
+
+> The other question here if you really want to keep the bit separation approach
+> is: do we really need up to 64 different lifetime hints ? While the scsi
+> standard allows that much, does this many different lifetime make sense in
+> practice ? Can we ever think of a usecase that needs more than say 8 different
+> liftimes (3 bits) ? If you limit the number of possible lifetime hints to 8,
+> then we can keep 4 bits unused in the hint field for future features.
+
+Yes, I think this is the smoking gun.  We should be fine with a much
+more limited number of lifetime hints, i.e. the user interface only
+exposes 5 hints, and supporting more in the in-kernel interfaces seems
+of rather doubtfuŀ use.
