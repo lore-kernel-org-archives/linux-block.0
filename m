@@ -2,166 +2,246 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE31C46CA1
-	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 21:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F30A6CDB482
+	for <linux-block@archiver.kernel.org>; Mon, 16 Oct 2023 21:55:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233952AbjJPVsk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 Oct 2023 17:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47500 "EHLO
+        id S234226AbjJPVzy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 Oct 2023 17:55:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232896AbjJPVsj (ORCPT
+        with ESMTP id S232845AbjJPVzx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Oct 2023 17:48:39 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C3A3A2
-        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:48:37 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-41b813f0a29so38161cf.0
-        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:48:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697492916; x=1698097716; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xfFjEje4km9uIXvuE8PYathzHXnXmVT18oPTg3UYxdQ=;
-        b=g4gA3/di0hw1P8BBe6LmoYzNRuZh7Qbyv43KSK4aD56rG1f2XhUktoEQQd62WkTz9X
-         fpL2tE4aATJqETsVcCrpELD6Swegr1vOog84Hbg9OHzO4mC5BfcVqQfKMVDYDH74fQZg
-         y9M8X0wtpIgOHbSGa6lqnih1mKUuHfuoVTywIxWd2QZvsV19jYH5sfplI4VKcnUYQpGd
-         itzs4f07WD5iy1199zWSb1pjN53tunszF4g91l/+Ad24emx1TDG6ENsETxerCZCnQKaO
-         DeRvs/WSqilCquhHAUFsmJtvPmqAO26Qhw00zFn5QxXMKA1PhM3ymzH9RR3m8L4vaD18
-         rqYw==
+        Mon, 16 Oct 2023 17:55:53 -0400
+Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34329D9
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:55:50 -0700 (PDT)
+Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-1dd886536f2so7014377fac.3
+        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2023 14:55:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697492916; x=1698097716;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xfFjEje4km9uIXvuE8PYathzHXnXmVT18oPTg3UYxdQ=;
-        b=qct/bDuq4F/4+vxDTHn0mZq93VCK6fQqZw+ARPBZcTcMzckEs21hqTYoPOUpZR2B2M
-         ka8lYF3gT7HCeD+MpRtc1llOAElQrJ+NC0eJh2IfRUdy0UuxwGgygZ7JUTTY6dTE1we6
-         N0ACWDGqUtEBFJBWjWlCwu3P34gXnIExQtLQ8yMQY2/IcpYaEGdE4YaH8qdqcz2wCczN
-         SdmCOT49JOzM+KoewRJVwq0Ce/MOvCN4R1Q0eGbZYVGBN9FBZYObUT160FQYfli5+ovE
-         rVzUsA8eTB4giErMqQenCBh4wVOSL60eOGAH0pudFPlLUIb+2tXd8ZEJBieK5oKdWQki
-         qf1A==
-X-Gm-Message-State: AOJu0YxBZg5/cNDhZNkyAnuss6Xy/8w3zgmFWH0/4fttLYHfA+EBHKVp
-        qFQDU/VdyvTASSSGILEic72WMAfVexB9eKfq3rSNdQ==
-X-Google-Smtp-Source: AGHT+IG7r4JQkTY7QRBqLIn53rtDCeNYj8B29ETeTJVhjbNYJE0uNpHoKKYpN+DZJ7cFbu2Bj/lanINP3ELdKlEixiU=
-X-Received: by 2002:a05:622a:478e:b0:418:1878:5b8c with SMTP id
- do14-20020a05622a478e00b0041818785b8cmr24567qtb.25.1697492916193; Mon, 16 Oct
- 2023 14:48:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697493349; x=1698098149;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nN/DKyXNfV9UOZtfCJ4t2w1Lgc+Hy86uW31kjn5dY3o=;
+        b=Qik/oeWArmmBPQi1tVtz58xUJhdf8FETS2AlkFz4F2IdUjMkgGeQ7SuQtMuoMDnweZ
+         ulOEGR90NQJc47JzSRtgxk2cQxURdgHxo3uXBPI7DRqMhlv2ktFG5A10SEFjSWSGKiUL
+         Gj3XNWt6OVxRHCVa3PIxd3ssoZcjH767ORbXwbqwRPjcF5GML+IO00gyx1Y5kmT/GQCR
+         KUK+j7cjc0ksoA75Vs2v8UmERGo6gSagq+ybPXOM13l2aSddJzWAxw+J+kWYwZuePBEn
+         Evun+gAUgJqf8wFCkx6DwnKvuOWJQC2ToWV3Wu5V7z1QYnz291YZ1lzorIIHvM6OEpX8
+         p4Mw==
+X-Gm-Message-State: AOJu0YwtzGfT3MibrWkirsYggX4cgDBm+yS65j2aJgKRo9OCxq4/SC+w
+        rLPT2wQMhOmRJyf1Glg7NneNYyvSXV5JMYENljgYC9Csz0T1
+X-Google-Smtp-Source: AGHT+IEViz9fGeFW0Hnjg2Bp6JP0Ewzt3j6QpH0gG+qVBvd5NNPQHpCF5RpwhTAdQY5MiVLlpFlEVb0X/Pcjbbmpd7ntfVim6++9
 MIME-Version: 1.0
-References: <20230928015858.1809934-1-linan666@huaweicloud.com>
- <CACGdZY+JV+PdiC_cspQiScm=SJ0kijdufeTrc8wkrQC3ZJx3qQ@mail.gmail.com>
- <4ace01e8-6815-29d0-70ce-4632818ca701@huaweicloud.com> <20231005162417.GA32420@redhat.com>
- <0a8f34aa-ced9-e613-3e5f-b5e53a3ef3d9@huaweicloud.com> <20231007151607.GA24726@redhat.com>
- <21843836-7265-f903-a7d5-e77b07dd5a71@huaweicloud.com> <20231008113602.GB24726@redhat.com>
- <CACGdZY+OOr4Q5ajM0za2babr34YztE7zjRyPXHgh_A64zvoBOw@mail.gmail.com>
- <e9165cd0-9c9d-1d1a-1c5b-402556a1a31f@huaweicloud.com> <CACGdZYLxnL91S4RxfvLmN8j3rcvbsqdkouj4Lgc05mnCo2fZSw@mail.gmail.com>
-In-Reply-To: <CACGdZYLxnL91S4RxfvLmN8j3rcvbsqdkouj4Lgc05mnCo2fZSw@mail.gmail.com>
-From:   Khazhy Kumykov <khazhy@google.com>
-Date:   Mon, 16 Oct 2023 14:48:22 -0700
-Message-ID: <CACGdZY+nmtRLeXi48z8J2QD5wFSVCuhFVRbzD9ktK5tXXrbxBw@mail.gmail.com>
-Subject: Re: [PATCH] blk-throttle: Calculate allowed value only when the
- throttle is enabled
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Oleg Nesterov <oleg@redhat.com>, Li Nan <linan666@huaweicloud.com>,
-        tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        houtao1@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="0000000000004e49890607dc5eec"
+X-Received: by 2002:a05:6870:158d:b0:1e9:9e47:9555 with SMTP id
+ j13-20020a056870158d00b001e99e479555mr152232oab.11.1697493349610; Mon, 16 Oct
+ 2023 14:55:49 -0700 (PDT)
+Date:   Mon, 16 Oct 2023 14:55:49 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001cb8910607dc78da@google.com>
+Subject: [syzbot] [block?] possible deadlock in blkdev_put (4)
+From:   syzbot <syzbot+0c538bd7f64c3c6e9a3c@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---0000000000004e49890607dc5eec
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On Mon, Oct 16, 2023 at 1:06=E2=80=AFPM Khazhy Kumykov <khazhy@chromium.org=
-> wrote:
->
-> I mostly just want us to pick /something/, since 6.6-rc and the LTSs
-> with the patch in question are busted currently. :)
->
-And just to make it explicit: I believe Kaui's proposal is correct.
+syzbot found the following issue on:
 
-Khazhy
+HEAD commit:    401644852d0b Merge tag 'fs_for_v6.6-rc6' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1516d9c1680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1531f6ad09decf37
+dashboard link: https://syzkaller.appspot.com/bug?extid=0c538bd7f64c3c6e9a3c
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
---0000000000004e49890607dc5eec
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Unfortunately, I don't have any reproducer for this issue yet.
 
-MIIPmwYJKoZIhvcNAQcCoIIPjDCCD4gCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-ggz1MIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
-IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
-dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
-6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
-c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
-I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
-AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
-BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
-CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
-AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
-MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
-My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
-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
-2d1HymA53tUP1hUwTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
-Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wDAYDVR0TAQH/BAIwADCBmgYIKwYBBQUH
-AQEEgY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2NhL2dzYXRs
-YXNyM3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29t
-L2NhY2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgwFoAUfMwKaNei6x4schvR
-zV2Vb4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9jYS9n
-c2F0bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEBADeZduKRV5+J7StRkfoY
-hBDfCkyRbFphFmeJ+0A1fPxECLLkrXR2izyctzMAGZH2ceScAlECO1r3aEQcyx9n7/YlMc24ZF0I
-++9b72/wv6J6POICeIj6MgschmHIUz4Rw4H5IdBLo62N0jBBzv2T9ASRAl7Yryl6tHUN5X5228Tt
-3LJe5Gtb1cm22DdXBM3xnD7Kd59ls9j/tz5I+yEsLIK7zQk7hBt87a31T55CTVgMQZ4lTavG5vdz
-vEb7YC0jFAT8SmYmtSOr+4aZJRIwVjXlI04Mfr3jcbqDnzfv0VgVp5UlzQK4aApofbSsSDeXsDR+
-t30gEkeMNUvUqd6PaxYxggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9i
-YWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjAC
-EAGy8e6bI55p/yISlXXGSrAwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIH6FAl/o
-G2xTs+JUWQR85UDBxTjresTY9hsN2+MB9kWqMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
-KoZIhvcNAQkFMQ8XDTIzMTAxNjIxNDgzNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASow
-CwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZI
-hvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDS4jCrF3CHWhODe649p60aQK6V
-ElOaGWCQtGndJeL8N8Ea/6RvIRPK7oRoTcrv3dY45jLXpIfZqDo9t9vTxV1o0BxdIVAWA1iCT9fV
-DQDlFetPoCnRDCjldW3gs5F88v74y/2Qzr+TvD6WU+3u1GCom+hYTvPH/C53PYojt1tM/PNbH+is
-P9U3NkMKJsD0IWfruS+8+UmHr/IvvUi9YnjY7wpDZlATgG/vzID8uI026Z5BkHPCjYBKcv2Uh11w
-yZOgqKIRteTKeMWP6kUe+vCpsS7G4j2DhSDV/YlbbgLoCuenx2s01J87nwyzy0583iPw2xKT/fyp
-ocHaNoAkeQPw
---0000000000004e49890607dc5eec--
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f214cbf53142/disk-40164485.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c07186eb3504/vmlinux-40164485.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3b8af11497b6/bzImage-40164485.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0c538bd7f64c3c6e9a3c@syzkaller.appspotmail.com
+
+EXT4-fs (loop4): external journal device major/minor numbers have changed
+EXT4-fs (loop4): external journal has bad superblock
+======================================================
+WARNING: possible circular locking dependency detected
+6.6.0-rc5-syzkaller-00072-g401644852d0b #0 Not tainted
+------------------------------------------------------
+syz-executor.4/13442 is trying to acquire lock:
+ffff88801c9eb4c8 (&disk->open_mutex){+.+.}-{3:3}, at: blkdev_put+0xb0/0x8e0 block/bdev.c:884
+
+but task is already holding lock:
+ffff88807adce0e0 (&type->s_umount_key#32){++++}-{3:3}, at: ext4_get_journal_blkdev fs/ext4/super.c:5861 [inline]
+ffff88807adce0e0 (&type->s_umount_key#32){++++}-{3:3}, at: ext4_open_dev_journal fs/ext4/super.c:5933 [inline]
+ffff88807adce0e0 (&type->s_umount_key#32){++++}-{3:3}, at: ext4_load_journal fs/ext4/super.c:5996 [inline]
+ffff88807adce0e0 (&type->s_umount_key#32){++++}-{3:3}, at: ext4_load_and_init_journal+0x949/0x28f0 fs/ext4/super.c:4906
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&type->s_umount_key#32){++++}-{3:3}:
+       down_read+0x9c/0x470 kernel/locking/rwsem.c:1520
+       __super_lock fs/super.c:58 [inline]
+       super_lock+0x23c/0x380 fs/super.c:117
+       super_lock_shared fs/super.c:146 [inline]
+       super_lock_shared_active fs/super.c:1431 [inline]
+       fs_bdev_sync+0x94/0x1b0 fs/super.c:1466
+       blkdev_flushbuf block/ioctl.c:372 [inline]
+       blkdev_common_ioctl+0x1550/0x1ce0 block/ioctl.c:502
+       blkdev_ioctl+0x249/0x770 block/ioctl.c:624
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:871 [inline]
+       __se_sys_ioctl fs/ioctl.c:857 [inline]
+       __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
+       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+       do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+-> #1 (&bdev->bd_holder_lock){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+       __mutex_lock+0x181/0x1340 kernel/locking/mutex.c:747
+       bdev_mark_dead+0x25/0x230 block/bdev.c:961
+       disk_force_media_change+0x51/0x80 block/disk-events.c:302
+       __loop_clr_fd+0x3ab/0x8f0 drivers/block/loop.c:1174
+       lo_release+0x188/0x1c0 drivers/block/loop.c:1743
+       blkdev_put_whole+0xa5/0xe0 block/bdev.c:663
+       blkdev_put+0x40f/0x8e0 block/bdev.c:898
+       kill_block_super+0x58/0x70 fs/super.c:1649
+       exfat_kill_sb+0x3b/0xb0 fs/exfat/super.c:771
+       deactivate_locked_super+0x9a/0x170 fs/super.c:481
+       deactivate_super+0xde/0x100 fs/super.c:514
+       cleanup_mnt+0x222/0x3d0 fs/namespace.c:1254
+       task_work_run+0x14d/0x240 kernel/task_work.c:180
+       resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
+       exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
+       exit_to_user_mode_prepare+0x215/0x240 kernel/entry/common.c:204
+       __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+       syscall_exit_to_user_mode+0x1d/0x60 kernel/entry/common.c:296
+       do_syscall_64+0x44/0xb0 arch/x86/entry/common.c:86
+       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+-> #0 (&disk->open_mutex){+.+.}-{3:3}:
+       check_prev_add kernel/locking/lockdep.c:3134 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+       validate_chain kernel/locking/lockdep.c:3868 [inline]
+       __lock_acquire+0x2e3d/0x5de0 kernel/locking/lockdep.c:5136
+       lock_acquire kernel/locking/lockdep.c:5753 [inline]
+       lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5718
+       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+       __mutex_lock+0x181/0x1340 kernel/locking/mutex.c:747
+       blkdev_put+0xb0/0x8e0 block/bdev.c:884
+       ext4_get_journal_blkdev fs/ext4/super.c:5920 [inline]
+       ext4_open_dev_journal fs/ext4/super.c:5933 [inline]
+       ext4_load_journal fs/ext4/super.c:5996 [inline]
+       ext4_load_and_init_journal+0x1deb/0x28f0 fs/ext4/super.c:4906
+       __ext4_fill_super fs/ext4/super.c:5374 [inline]
+       ext4_fill_super+0x8c4b/0xad30 fs/ext4/super.c:5703
+       get_tree_bdev+0x3b5/0x650 fs/super.c:1577
+       vfs_get_tree+0x8c/0x370 fs/super.c:1750
+       do_new_mount fs/namespace.c:3335 [inline]
+       path_mount+0x1492/0x1ed0 fs/namespace.c:3662
+       do_mount fs/namespace.c:3675 [inline]
+       __do_sys_mount fs/namespace.c:3884 [inline]
+       __se_sys_mount fs/namespace.c:3861 [inline]
+       __x64_sys_mount+0x293/0x310 fs/namespace.c:3861
+       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+       do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+other info that might help us debug this:
+
+Chain exists of:
+  &disk->open_mutex --> &bdev->bd_holder_lock --> &type->s_umount_key#32
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&type->s_umount_key#32);
+                               lock(&bdev->bd_holder_lock);
+                               lock(&type->s_umount_key#32);
+  lock(&disk->open_mutex);
+
+ *** DEADLOCK ***
+
+1 lock held by syz-executor.4/13442:
+ #0: ffff88807adce0e0 (&type->s_umount_key#32){++++}-{3:3}, at: ext4_get_journal_blkdev fs/ext4/super.c:5861 [inline]
+ #0: ffff88807adce0e0 (&type->s_umount_key#32){++++}-{3:3}, at: ext4_open_dev_journal fs/ext4/super.c:5933 [inline]
+ #0: ffff88807adce0e0 (&type->s_umount_key#32){++++}-{3:3}, at: ext4_load_journal fs/ext4/super.c:5996 [inline]
+ #0: ffff88807adce0e0 (&type->s_umount_key#32){++++}-{3:3}, at: ext4_load_and_init_journal+0x949/0x28f0 fs/ext4/super.c:4906
+
+stack backtrace:
+CPU: 0 PID: 13442 Comm: syz-executor.4 Not tainted 6.6.0-rc5-syzkaller-00072-g401644852d0b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ check_noncircular+0x311/0x3f0 kernel/locking/lockdep.c:2187
+ check_prev_add kernel/locking/lockdep.c:3134 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain kernel/locking/lockdep.c:3868 [inline]
+ __lock_acquire+0x2e3d/0x5de0 kernel/locking/lockdep.c:5136
+ lock_acquire kernel/locking/lockdep.c:5753 [inline]
+ lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5718
+ __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+ __mutex_lock+0x181/0x1340 kernel/locking/mutex.c:747
+ blkdev_put+0xb0/0x8e0 block/bdev.c:884
+ ext4_get_journal_blkdev fs/ext4/super.c:5920 [inline]
+ ext4_open_dev_journal fs/ext4/super.c:5933 [inline]
+ ext4_load_journal fs/ext4/super.c:5996 [inline]
+ ext4_load_and_init_journal+0x1deb/0x28f0 fs/ext4/super.c:4906
+ __ext4_fill_super fs/ext4/super.c:5374 [inline]
+ ext4_fill_super+0x8c4b/0xad30 fs/ext4/super.c:5703
+ get_tree_bdev+0x3b5/0x650 fs/super.c:1577
+ vfs_get_tree+0x8c/0x370 fs/super.c:1750
+ do_new_mount fs/namespace.c:3335 [inline]
+ path_mount+0x1492/0x1ed0 fs/namespace.c:3662
+ do_mount fs/namespace.c:3675 [inline]
+ __do_sys_mount fs/namespace.c:3884 [inline]
+ __se_sys_mount fs/namespace.c:3861 [inline]
+ __x64_sys_mount+0x293/0x310 fs/namespace.c:3861
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fba0307e1ea
+Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb a6 e8 de 09 00 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fba03d12ee8 EFLAGS: 00000202 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 00007fba03d12f80 RCX: 00007fba0307e1ea
+RDX: 0000000020000000 RSI: 0000000020000500 RDI: 00007fba03d12f40
+RBP: 0000000020000000 R08: 00007fba03d12f80 R09: 0000000000004503
+R10: 0000000000004503 R11: 0000000000000202 R12: 0000000020000500
+R13: 00007fba03d12f40 R14: 00000000000004c1 R15: 000000000000002c
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
