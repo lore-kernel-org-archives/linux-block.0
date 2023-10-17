@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E12DDCDB485
-	for <linux-block@archiver.kernel.org>; Tue, 17 Oct 2023 20:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B92CDB474
+	for <linux-block@archiver.kernel.org>; Tue, 17 Oct 2023 20:48:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344254AbjJQUsg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Oct 2023 16:48:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45814 "EHLO
+        id S235073AbjJQUsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Oct 2023 16:48:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344190AbjJQUsa (ORCPT
+        with ESMTP id S1344186AbjJQUsd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Oct 2023 16:48:30 -0400
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97AA6FA;
-        Tue, 17 Oct 2023 13:48:26 -0700 (PDT)
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6b2018a11efso4280935b3a.0;
-        Tue, 17 Oct 2023 13:48:26 -0700 (PDT)
+        Tue, 17 Oct 2023 16:48:33 -0400
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 459A592;
+        Tue, 17 Oct 2023 13:48:31 -0700 (PDT)
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-57b68556d6dso3417587eaf.1;
+        Tue, 17 Oct 2023 13:48:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697575706; x=1698180506;
+        d=1e100.net; s=20230601; t=1697575710; x=1698180510;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T4k+JDqEcQkKs3J5VRs0ivCwgTJsm0PTpYm6Nj592ys=;
-        b=RgkIRboai4lX0Xy1ylkKgXRKV77aYnylQsHi7S/6cqY7+KFBFp/Y4/O4leOYn5tEOY
-         5Sco1MCoVi8H6yw8EYNRMWahoQ7d7eHqTjtQjxI6hiTwBn405uLuMbZpm4dNKbR2DkhZ
-         N6dZDvtO8Es0QLRsE5F41BC79q7dxN5cEF2C4pordmLtEKuFags5A56GlvzoVORWvRCf
-         e1c8K60qUXsjprpxegBoULzGUdF9Bz0ke8pws3eU+9HwLQhOzGeCJwYr/EH2xoDNrtvD
-         1JCZsmPyQCjEa1MzQiwHK/yieQJmXVD9AVjfWOGx00pH8+PmtlaIhQzD1Sd/MMmuoGPN
-         FC1Q==
-X-Gm-Message-State: AOJu0Yw/hmceKiDU81ZAMFE8/HQyfSh+rDz0kfUctcDaGZavEM8xhFx6
-        6/PIn7QU884ZRFPSh6PsRtUTDJXOCJo=
-X-Google-Smtp-Source: AGHT+IE9JmC7mnpFAERJjbxXj8433DA2LiY59WlVX6Lr+DI/sHn29bu/4VP2IM+dMqjwkD0A6kKnow==
-X-Received: by 2002:aa7:88ce:0:b0:6b1:c1c4:ae98 with SMTP id k14-20020aa788ce000000b006b1c1c4ae98mr3811496pff.18.1697575705851;
-        Tue, 17 Oct 2023 13:48:25 -0700 (PDT)
+        bh=105xJtXU3kMI2hh6/g7PSS5FLkiZJWAuMxIKylxsIMA=;
+        b=e1EOyN+kQM8p1yAG3aLBBb6Y5abK6836jHXVGh+QEoc90djBXR6cXqLNMjaxbqlVjq
+         RPOU59K7vyow+dNk7rSbZ5TAzl9HOE/kCZ6Rw6yXbi2I77F5EBkQbyVka37e8Flq84Pf
+         sQZu7zwsOVUkrEKUTM1PJSn6sJVE6y/LiB2PNONB7kKB09hsAXbQ9HW+mn49AADOLMi+
+         8EjFvKkHKVwaYps8MbB4YbX6Q6Vac/sNfxVGOsMIrv85i+w25gtP4KQ3hV3phm+oKcva
+         m6pacgglbcB8/CvWDMvk3J9BUezLGl8EA59wlLJGx2EmN7VAmctYhpBN2DUBm4KQNqtF
+         47hw==
+X-Gm-Message-State: AOJu0YxEPE3WGCRTbtQMXl6YV061MjOZnKnM5g9X3+OKrtoOOjY4ZRQ6
+        wRjnQk+U1rSeiOE/lpbwxD0=
+X-Google-Smtp-Source: AGHT+IGKpwnJVusLdCOnbH4TMWpBVokmUp5EtTJw1dIbjz3QvVxicCOEifeVNO4gmLHRTIznDv/kXw==
+X-Received: by 2002:a05:6359:29c2:b0:13e:d853:cc22 with SMTP id qf2-20020a05635929c200b0013ed853cc22mr3093749rwb.4.1697575710260;
+        Tue, 17 Oct 2023 13:48:30 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:8f02:2919:9600:ac09])
-        by smtp.gmail.com with ESMTPSA id fa36-20020a056a002d2400b006b2e07a6235sm1874704pfb.136.2023.10.17.13.48.24
+        by smtp.gmail.com with ESMTPSA id fa36-20020a056a002d2400b006b2e07a6235sm1874704pfb.136.2023.10.17.13.48.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 13:48:25 -0700 (PDT)
+        Tue, 17 Oct 2023 13:48:29 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
@@ -49,10 +49,11 @@ Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         Bean Huo <huobean@gmail.com>,
         Daejun Park <daejun7.park@samsung.com>,
         Bart Van Assche <bvanassche@acm.org>,
+        Douglas Gilbert <dgilbert@interlog.com>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>
-Subject: [PATCH v3 06/14] scsi_proto: Add structures and constants related to I/O groups and streams
-Date:   Tue, 17 Oct 2023 13:47:14 -0700
-Message-ID: <20231017204739.3409052-7-bvanassche@acm.org>
+Subject: [PATCH v3 09/14] scsi_debug: Support the block limits extension VPD page
+Date:   Tue, 17 Oct 2023 13:47:17 -0700
+Message-ID: <20231017204739.3409052-10-bvanassche@acm.org>
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
 In-Reply-To: <20231017204739.3409052-1-bvanassche@acm.org>
 References: <20231017204739.3409052-1-bvanassche@acm.org>
@@ -62,112 +63,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Prepare for adding code that will query the I/O advice hints group
-descriptors and for adding code that will retrieve the stream status.
+From SBC-5 r05:
+
+"Reduced stream control:
+a) reduces the maximum number of streams that the device server supports;
+   and
+b) increases the number of write commands that are able to specify a stream
+   to be written in any write command that contains the GROUP NUMBER field
+   in its CDB.
+
+If the RSCS bit (see 6.6.5) is set to one, then the device server shall:
+a) support per group stream identifier usage as described in 4.32.2;
+b) support the IO Advice Hints Grouping mode page (see 6.5.7); and
+c) set the MAXIMUM NUMBER OF STREAMS field (see 6.6.5) to a value that is
+   less than 64.
+
+Device servers that set the RSCS bit to one may support other features
+(e.g., permanent streams (see 4.32.4)).
+
+4.32.4 Permanent streams
+
+A permanent stream is a stream for which the device server does not allow
+closing or otherwise modifying the configuration of that stream. The PERM
+bit (see 5.9.2.3) indicates whether a stream is a permanent stream. If a
+STREAM CONTROL command (see 5.32) specifies the closing of a permanent
+stream, the device server terminates that command with CHECK CONDITION
+status instead of closing the specified stream. A permanent stream is always
+an open stream. Device severs should assign the lowest numbered stream
+identifiers to permanent streams."
+
+Report that reduced stream control is supported.
 
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Douglas Gilbert <dgilbert@interlog.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- include/scsi/scsi_proto.h | 75 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ drivers/scsi/scsi_debug.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
-index 07d65c1f59db..9ee4983c23b4 100644
---- a/include/scsi/scsi_proto.h
-+++ b/include/scsi/scsi_proto.h
-@@ -10,6 +10,7 @@
- #ifndef _SCSI_PROTO_H_
- #define _SCSI_PROTO_H_
- 
-+#include <linux/build_bug.h>
- #include <linux/types.h>
- 
- /*
-@@ -126,6 +127,7 @@
- #define	SAI_READ_CAPACITY_16  0x10
- #define SAI_GET_LBA_STATUS    0x12
- #define SAI_REPORT_REFERRALS  0x13
-+#define SAI_GET_STREAM_STATUS 0x16
- /* values for maintenance in */
- #define MI_REPORT_IDENTIFYING_INFORMATION 0x05
- #define MI_REPORT_TARGET_PGS  0x0a
-@@ -275,6 +277,79 @@ struct scsi_lun {
- 	__u8 scsi_lun[8];
- };
- 
-+/* SBC-5 IO advice hints group descriptor */
-+struct scsi_io_group_descriptor {
-+#if defined(__BIG_ENDIAN)
-+	u8 io_advice_hints_mode: 2;
-+	u8 reserved1: 3;
-+	u8 st_enble: 1;
-+	u8 cs_enble: 1;
-+	u8 ic_enable: 1;
-+#elif defined(__LITTLE_ENDIAN)
-+	u8 ic_enable: 1;
-+	u8 cs_enble: 1;
-+	u8 st_enble: 1;
-+	u8 reserved1: 3;
-+	u8 io_advice_hints_mode: 2;
-+#else
-+#error
-+#endif
-+	u8 reserved2[3];
-+	/* Logical block markup descriptor */
-+#if defined(__BIG_ENDIAN)
-+	u8 acdlu: 1;
-+	u8 reserved3: 1;
-+	u8 rlbsr: 2;
-+	u8 lbm_descriptor_type: 4;
-+#elif defined(__LITTLE_ENDIAN)
-+	u8 lbm_descriptor_type: 4;
-+	u8 rlbsr: 2;
-+	u8 reserved3: 1;
-+	u8 acdlu: 1;
-+#else
-+#error
-+#endif
-+	u8 params[2];
-+	u8 reserved4;
-+	u8 reserved5[8];
-+};
-+
-+static_assert(sizeof(struct scsi_io_group_descriptor) == 16);
-+
-+struct scsi_stream_status {
-+#if defined(__BIG_ENDIAN)
-+	u16 perm: 1;
-+	u16 reserved1: 15;
-+#elif defined(__LITTLE_ENDIAN)
-+	u16 reserved1: 15;
-+	u16 perm: 1;
-+#else
-+#error
-+#endif
-+	__be16 stream_identifier;
-+#if defined(__BIG_ENDIAN)
-+	u8 reserved2: 2;
-+	u8 rel_lifetime: 6;
-+#elif defined(__LITTLE_ENDIAN)
-+	u8 rel_lifetime: 6;
-+	u8 reserved2: 2;
-+#else
-+#error
-+#endif
-+	u8 reserved3[3];
-+};
-+
-+static_assert(sizeof(struct scsi_stream_status) == 8);
-+
-+struct scsi_stream_status_header {
-+	__be32 len;	/* length in bytes of stream_status[] array. */
-+	u16 reserved;
-+	u16 number_of_open_streams;
-+	DECLARE_FLEX_ARRAY(struct scsi_stream_status, stream_status);
-+};
-+
-+static_assert(sizeof(struct scsi_stream_status_header) == 8);
-+
- /* SPC asymmetric access states */
- #define SCSI_ACCESS_STATE_OPTIMAL     0x00
- #define SCSI_ACCESS_STATE_ACTIVE      0x01
+diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+index 46eaa2f9e63b..88cba9374166 100644
+--- a/drivers/scsi/scsi_debug.c
++++ b/drivers/scsi/scsi_debug.c
+@@ -1627,6 +1627,7 @@ static int resp_inquiry(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
+ 					arr[n++] = 0xb2;  /* LB Provisioning */
+ 				if (is_zbc)
+ 					arr[n++] = 0xb6;  /* ZB dev. char. */
++				arr[n++] = 0xb7;  /* Block limits extension */
+ 			}
+ 			arr[3] = n - 4;	  /* number of supported VPD pages */
+ 		} else if (0x80 == cmd[2]) { /* unit serial number */
+@@ -1669,6 +1670,9 @@ static int resp_inquiry(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
+ 			arr[3] = inquiry_vpd_b2(&arr[4]);
+ 		} else if (is_zbc && cmd[2] == 0xb6) { /* ZB dev. charact. */
+ 			arr[3] = inquiry_vpd_b6(devip, &arr[4]);
++		} else if (cmd[2] == 0xb7) { /* block limits extension page */
++			arr[3] = 2; /* page length */
++			arr[5] = 1; /* Reduced stream control support (RSCS) */
+ 		} else {
+ 			mk_sense_invalid_fld(scp, SDEB_IN_CDB, 2, -1);
+ 			kfree(arr);
