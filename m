@@ -2,99 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DEDCDB474
-	for <linux-block@archiver.kernel.org>; Tue, 17 Oct 2023 15:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C41CDB482
+	for <linux-block@archiver.kernel.org>; Tue, 17 Oct 2023 18:48:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344333AbjJQPYp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 Oct 2023 11:24:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42646 "EHLO
+        id S232763AbjJQSsf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 Oct 2023 14:48:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344336AbjJQPYo (ORCPT
+        with ESMTP id S229459AbjJQSsf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Oct 2023 11:24:44 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42B3BB0
-        for <linux-block@vger.kernel.org>; Tue, 17 Oct 2023 08:24:43 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-7a2874d2820so72783039f.1
-        for <linux-block@vger.kernel.org>; Tue, 17 Oct 2023 08:24:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697556282; x=1698161082; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yFftDA/PClYULtpgugCLARTSXADqSLXzM0MPRZe4YDw=;
-        b=IzQwHaTv3/cMVRdKyCg0GmKAEsLgWS8TPd50xI0++W6AGT2fVZIRx6lvHsgSmWWzxU
-         cyjnRAJF4OOE4XV4saq9EXRBNliPiw043b/lPspWo/nqmYSRLcvS7aiWSv7Ct9bACY5v
-         qt5kOUiWJzC6WwO7dtuEa7uqDtjJlQggxP0lQZGhEwBHZMap4d48MWFhLkPPfacYRw1l
-         KZgivb3gImyY0uNfxAPgDY2FUKsJ0eh+hWPJY4DiksE8o+YGM4fiNgbU/SmH2J1snAwI
-         FEV59fniliSA1TtjYnpYxE9y74y43I3uimIMzDMW7LgFf/j7ZyxZ0OaRrTxUYhrUe+/l
-         Yqew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697556282; x=1698161082;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yFftDA/PClYULtpgugCLARTSXADqSLXzM0MPRZe4YDw=;
-        b=CRzedOr+wyssgkimyiURX9ieZrMyebjz3FAkGyQAAKUq91SxF+jkkqiVF2yODW+V/8
-         gT7B+FkHg27Hg0DEsLvX2mGmfXuQCOZjplJHxKoQ8NF00Ik7logu4EQc3/iJa1tfrloa
-         0a8w2A1cllm+STFWTGm2RdNcyYfomrJlV3JPJoAoI1vJ553dY0+D+SldaaY986gz+IE4
-         NpFSg6iIY6/eZQkWqRZzKBA+aDtzARbypUTWF03zLduiijAm8n7kGNdEyt4sPVnVfagm
-         CBMk6rpoAAPq8Ay+jn0zmeGZLKv1eX/eQsQ6Z6m4E01jVpAWuv7xNp8HW+TXJkAkvkED
-         rmXQ==
-X-Gm-Message-State: AOJu0Ywb7sfoeJpoIFvjD0axKf63/gxiD9+I2Zuzfn44BxXoLuirQQLv
-        HpxVFMMUx3RWieUtvA7EXNnNRs8JVXlx9MRKGLR2rQ==
-X-Google-Smtp-Source: AGHT+IGqBvcX191cb5ydEBlPiyHzQBCO3yoc5cODSSSY5HWvi4n3qf9AgqtcQgec9s2vfbGSW3Wn/A==
-X-Received: by 2002:a05:6602:340f:b0:790:958e:a667 with SMTP id n15-20020a056602340f00b00790958ea667mr3377419ioz.2.1697556282564;
-        Tue, 17 Oct 2023 08:24:42 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 10-20020a5d9c0a000000b0079199e52035sm481347ioe.52.2023.10.17.08.24.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 08:24:41 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, gjoyce@linux.vnet.ibm.com
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        nayna@linux.ibm.com, akpm@linux-foundation.org,
-        ndesaulniers@google.com, nathan@kernel.org, jarkko@kernel.org,
-        okozina@redhat.com
-In-Reply-To: <20231004201957.1451669-1-gjoyce@linux.vnet.ibm.com>
-References: <20231004201957.1451669-1-gjoyce@linux.vnet.ibm.com>
-Subject: Re: [PATCH v8 0/3] generic and PowerPC SED Opal keystore
-Message-Id: <169755628159.2220568.17278716462071055905.b4-ty@kernel.dk>
-Date:   Tue, 17 Oct 2023 09:24:41 -0600
+        Tue, 17 Oct 2023 14:48:35 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36FE890;
+        Tue, 17 Oct 2023 11:48:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=QmBB7UCJvM+8yHBnQ7IH5164AJuOIh1lyxiriNf+nz8=; b=2qn8C3xxVDrnY0ucy44K3DH+jf
+        48imZX/ufyAIbXT7dgrG0eQyCM7FTXmhDA+lDs20K2qQrvJhKsdO3qBcBJTwOp9h41MXnNBxm/i95
+        tXHgJduOPy4pxm+n/WegsDH0R6fzsabcjMx1nZHC0iFHuZZjHn+r3sPX7AS869zQYA0Qk20tYfYoC
+        ip0xT3Ocn3+kZMbM5he0ZMNsgrwMXJmUmIh/gWWHOdzq7kmB3HuNCcYzhvT8KznuK2VOi0ZJktwis
+        nEaJ5VvdFVL7oiLTc33SE1q5Aj+k3dsC0f5KLNcJLT/2IEYvuvQ+Vru1zgPNV6F2k3BNnJDqxqbLE
+        SYLOfOUg==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qsp7D-00D0K4-0x;
+        Tue, 17 Oct 2023 18:48:27 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Christian Brauner <brauner@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>
+Cc:     Jan Kara <jack@suse.cz>, Denis Efremov <efremov@linux.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: don't take s_umount under open_mutex
+Date:   Tue, 17 Oct 2023 20:48:18 +0200
+Message-Id: <20231017184823.1383356-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-26615
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi all,
 
-On Wed, 04 Oct 2023 15:19:54 -0500, gjoyce@linux.vnet.ibm.com wrote:
-> This patchset has gone through numerous rounds of review and
-> all comments/suggetions have been addressed. The reviews have
-> covered all relevant areas including reviews by block and keyring
-> developers as well as the SED Opal maintainer.
-> 
-> TCG SED Opal is a specification from The Trusted Computing Group
-> that allows self encrypting storage devices (SED) to be locked at
-> power on and require an authentication key to unlock the drive.
-> 
-> [...]
+Christian has been pestering Jan and me a bit about finally fixing
+all the pre-existing mostly theoretical cases of s_umount taken under
+open_mutex.  This series, which is mostly from him with some help from
+me should get us to that goal by replacing bdev_mark_dead calls that
+can't ever reach a file system holder to call into with simple bdev
+page invalidation.
 
-Applied, thanks!
+Expect future version to come from Christian again, I'm just helping
+out while he is trouble shooting his mail setup.
 
-[1/3] block:sed-opal: SED Opal keystore
-      commit: 96ff37ceb203426b1bcebbae42399686110b0130
-[2/3] block: sed-opal: keystore access for SED Opal keys
-      commit: 5dd339722f5f612f349b068e8da6d6710fd0e460
-[3/3] powerpc/pseries: PLPKS SED Opal keystore support
-      commit: ec8cf230ceccfcc2bd29990c2902be168a92dee4
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Diffstat:
+ block/disk-events.c     |   18 +++++++-----------
+ block/genhd.c           |    7 +++++++
+ block/partitions/core.c |   43 +++++++++++++++++++++++++++++--------------
+ drivers/block/ataflop.c |    4 +++-
+ drivers/block/floppy.c  |    4 +++-
+ fs/super.c              |    2 ++
+ 6 files changed, 51 insertions(+), 27 deletions(-)
