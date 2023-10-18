@@ -2,111 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19921CDB482
-	for <linux-block@archiver.kernel.org>; Wed, 18 Oct 2023 06:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59401CDB483
+	for <linux-block@archiver.kernel.org>; Wed, 18 Oct 2023 09:16:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229737AbjJRG7D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Oct 2023 02:59:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57084 "EHLO
+        id S229568AbjJRJQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Oct 2023 05:16:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbjJRG7D (ORCPT
+        with ESMTP id S229615AbjJRJQi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Oct 2023 02:59:03 -0400
+        Wed, 18 Oct 2023 05:16:38 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC40BEA
-        for <linux-block@vger.kernel.org>; Tue, 17 Oct 2023 23:58:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26472111
+        for <linux-block@vger.kernel.org>; Wed, 18 Oct 2023 02:15:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697612296;
+        s=mimecast20190719; t=1697620551;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=QceAaGz8QFib7qs3wWJh0gmuzZcVhllRWYFNw//CH5U=;
-        b=elQ18Oehek2dSg4qBZZcdcvPthmicZaZMcMX/GPZm/+D2HmvNT0+HMJhaX1wOy4nV3euGL
-        vOuI8pvcyAk4OnDFiKseDaaWL+TiJQWcgTlFFU3KYO7jB+TmGPex2n3SLg7ilVvRfmLnKZ
-        ubNyP9fWQ+dndKXNcJ+HKP2yp8BECD8=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-567-z9n3-P8kP3G5q0IGM8s7pA-1; Wed, 18 Oct 2023 02:58:05 -0400
-X-MC-Unique: z9n3-P8kP3G5q0IGM8s7pA-1
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1c8c1f34aadso8881711fac.3
-        for <linux-block@vger.kernel.org>; Tue, 17 Oct 2023 23:58:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697612284; x=1698217084;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QceAaGz8QFib7qs3wWJh0gmuzZcVhllRWYFNw//CH5U=;
-        b=f4p2+bOG6sfF3NSMrGEey6jneA1ZtysuPMoM7F8Z8zSy19MlXAgqEe8UVsCD8ptxit
-         dqStswQOiGf5BgkLVoW7MT18evXWdZRrRWT+q4yvJSJf8X1w8W5z+SvFyfvrE4Jo4Fgg
-         K3Al6OE0huFRStGMlPqlLhRv5byVOcG+LOk0Zpqx4cT4N+J35tg24CUbM80Ts2aUVoAz
-         ZaycGSYvn+LIjOp2cACr3VRXIauGqIqcdR82fmkvQpAtIoUF9LTDUK7ejmlu3F6bdIL9
-         sCv/54YnsGn8Ff/bGdJlJQOi/9NVVgTrm1y2URk2xztlMLpohtA67TuYAs/9MCvZPKqf
-         PKaA==
-X-Gm-Message-State: AOJu0YzVUCP1AIZqbftnKa8iVR63nJs37+oL44sUiKW9fBb1fHBrHnHC
-        c0y93n9DoZDrOse7OafwqovCunwjSJ/AcjloH2uKKYKu8ebCr9RnS/91rv3DFUnBOQnEY5VZ4jx
-        Dwdv/hBcu07NvLbgIJz67tA1V+2RlUWTIEKJtODSju58/NHasVLN/0xs=
-X-Received: by 2002:a05:6870:1b1a:b0:1e9:c59b:a9af with SMTP id hl26-20020a0568701b1a00b001e9c59ba9afmr4499541oab.15.1697612284212;
-        Tue, 17 Oct 2023 23:58:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZQwuZ9AVf4q6Nr0ZrOE5VZqFMDyTMT1rLOJZLSbGUmbyXFPDYSjWqhEgKsOmu0skCI4Mul01uDaCEJ3n6c24=
-X-Received: by 2002:a05:6870:1b1a:b0:1e9:c59b:a9af with SMTP id
- hl26-20020a0568701b1a00b001e9c59ba9afmr4499534oab.15.1697612284009; Tue, 17
- Oct 2023 23:58:04 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=g/qWmMyaSoOmFzIVwgqNv8CarT9NCUVK0T0yzdu7ukI=;
+        b=i+kn0dpcXPPdtUhxxS4w3YK6DvQt17OicdNB10/HM+ZH6OugL9ikFLodBWvKcRlpx5O/Mk
+        5fmCZEZbg8Xs5C0Hup3VHVCPc5AGBl12vL6Tke/Uss6q7ko50n6GKnleatYpBPHERlsgot
+        MGiKiCDekaTmF3yLmo4pwumilEZeQCs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-695-34SCTa7HMEO5n_1ihoTmaQ-1; Wed, 18 Oct 2023 05:15:47 -0400
+X-MC-Unique: 34SCTa7HMEO5n_1ihoTmaQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 01A282825E8D;
+        Wed, 18 Oct 2023 09:15:47 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C41182166B26;
+        Wed, 18 Oct 2023 09:15:41 +0000 (UTC)
+Date:   Wed, 18 Oct 2023 17:15:36 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Denis Efremov <efremov@linux.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 3/5] block: move bdev_mark_dead out of
+ disk_check_media_change
+Message-ID: <ZS+iOA//0ShbY7Fk@fedora>
+References: <20231017184823.1383356-1-hch@lst.de>
+ <20231017184823.1383356-4-hch@lst.de>
+ <ZS9ODABLaRVcI5iy@fedora>
+ <20231018064646.GA18710@lst.de>
 MIME-Version: 1.0
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Wed, 18 Oct 2023 14:57:52 +0800
-Message-ID: <CAHj4cs8yZ4-BXqTK4W0UsPpmc2ctCD=_mYiwuAuvcmgS3+KJ8g@mail.gmail.com>
-Subject: [bug report] nvme authentication setup failed observed during
- blktests nvme/041 nvme/042 nvme/043
-To:     linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231018064646.GA18710@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello
-Just found the blktests nvme/041 nvme/042 nvme/043[2] failed on the
-latest linux-block/for-next[1],
-from the log I can see it was due to authentication setup failed,
-please help check it, thanks.
+On Wed, Oct 18, 2023 at 08:46:46AM +0200, Christoph Hellwig wrote:
+> On Wed, Oct 18, 2023 at 11:16:28AM +0800, Ming Lei wrote:
+> > On Tue, Oct 17, 2023 at 08:48:21PM +0200, Christoph Hellwig wrote:
+> > > disk_check_media_change is mostly called from ->open where it makes
+> > > little sense to mark the file system on the device as dead, as we
+> > > are just opening it.  So instead of calling bdev_mark_dead from
+> > > disk_check_media_change move it into the few callers that are not
+> > > in an open instance.  This avoid calling into bdev_mark_dead and
+> > > thus taking s_umount with open_mutex held.
+> > 
+> > ->open() is called when opening bdev every times, and there can be
+> > existed openers, so not sure if it makes little sense here.
+> 
+> Yes. It has to be a non-exclusive open, though, and how is that going
+> to help us with any general use case?  If we really want to make the
+> media change notifications any useful we'd better just do the work
+> straight from the workqueue that polls for it.
 
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-next
-e3db512c4ab6 (HEAD -> for-next, origin/for-next) Merge branch
-'for-6.7/block' into for-next
+Given ->mark_dead() is added recently, userspace shouldn't depend on
+this behavior, so this patch looks fine:
 
-[2]
-# ./check nvme/041
-nvme/041 (Create authenticated connections)                  [failed]
-    runtime  3.274s  ...  3.980s
-    --- tests/nvme/041.out      2023-10-17 08:02:17.046653814 -0400
-    +++ /root/blktests/results/nodev/nvme/041.out.bad   2023-10-18
-02:50:03.496539083 -0400
-    @@ -2,5 +2,5 @@
-     Test unauthenticated connection (should fail)
-     NQN:blktests-subsystem-1 disconnected 0 controller(s)
-     Test authenticated connection
-    -NQN:blktests-subsystem-1 disconnected 1 controller(s)
-    +NQN:blktests-subsystem-1 disconnected 0 controller(s)
-     Test complete
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-# dmesg
-[ 2701.636964] loop: module loaded
-[ 2702.074262] run blktests nvme/041 at 2023-10-18 02:49:59
-[ 2702.302067] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-[ 2702.447496] nvmet: creating nvm controller 1 for subsystem
-blktests-subsystem-1 for NQN
-nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
-with DH-HMAC-CHAP.
-[ 2702.447707] nvme nvme0: qid 0: authentication setup failed
-[ 2704.099618] nvmet: creating nvm controller 1 for subsystem
-blktests-subsystem-1 for NQN
-nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
-with DH-HMAC-CHAP.
-[ 2704.099688] nvme nvme0: qid 0: authentication setup failed
-
-
--- 
-Best Regards,
-  Yi Zhang
+Thanks,
+Ming
 
