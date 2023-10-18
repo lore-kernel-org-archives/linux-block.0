@@ -2,164 +2,171 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFCFCDB484
-	for <linux-block@archiver.kernel.org>; Wed, 18 Oct 2023 17:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3434CCDB484
+	for <linux-block@archiver.kernel.org>; Wed, 18 Oct 2023 18:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232819AbjJRR6U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 Oct 2023 13:58:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43706 "EHLO
+        id S232032AbjJRSBU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 Oct 2023 14:01:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232875AbjJRR6C (ORCPT
+        with ESMTP id S235161AbjJRSBL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Oct 2023 13:58:02 -0400
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA5CD4B;
-        Wed, 18 Oct 2023 10:57:58 -0700 (PDT)
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6b1ef786b7fso5233458b3a.3;
-        Wed, 18 Oct 2023 10:57:58 -0700 (PDT)
+        Wed, 18 Oct 2023 14:01:11 -0400
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 848C4124
+        for <linux-block@vger.kernel.org>; Wed, 18 Oct 2023 11:01:08 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6be840283ceso1662724b3a.3
+        for <linux-block@vger.kernel.org>; Wed, 18 Oct 2023 11:01:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697651878; x=1698256678;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BUqdMkk9eHE4OExeCBttL2effDTy7rv0XrVt/f4A/lc=;
-        b=dSs09uy3M4sjDEx/UCDmTO0RV56W4qdPFewu/wUZHus6qNrT6cE/oC4jEP5FqP9ypU
-         ZmpJag2jTonE+sJi8+KF0b8aUIN6Xnjf6DQxRFYRerPLnopisgvR0YeYkcr+Vs+yg2Ox
-         RDoarSKzv5dend5PtSbPoRYToootocYypXMESr6beM2w092lAtFI9/vdSjpDvLwnoJty
-         8sg08UhInZMZhWmRF16rB3NEy0k/vqw7sIywMqwQDc8eYkWhVZI4V5+F/cFIr7jxWCsN
-         iF7UhMz17G4DpUogCX17iyBLoKYKv7Sj5nxVl7jk6tABzS1+qbv6f1JgqOjOzRTn4Dj4
-         R38g==
-X-Gm-Message-State: AOJu0YwHgA8ISFPOJvXSvH4bfDey/oqDASZylkB/krzKySZ0eSpKgavM
-        4xEoWg7tn78w2qAG4kagalk=
-X-Google-Smtp-Source: AGHT+IHoo9hDh1Ld+Voh0eiiyRtsWXSc8vXxrWBFuJ2vjiYo5wptm2ZFae1U0GOo6GffyxKAM422LA==
-X-Received: by 2002:a05:6a00:18a3:b0:6b8:a6d6:f51a with SMTP id x35-20020a056a0018a300b006b8a6d6f51amr6167914pfh.31.1697651877530;
-        Wed, 18 Oct 2023 10:57:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697652068; x=1698256868;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jRaL2PKynQQ41b+XasnGZIvmBGl1jMeCoUNljfhbZ/g=;
+        b=sW/tBQj1WzKRB9gDkOyxIq53eefJXRcVTorKWyB09pDkG+iZt80HESdE8z2tHG+zCy
+         mX/wquZIX5cGeNlvhYYkC2Zpo4WJoYC3Z2uS38LhOIwHMTAl3EOlqYMFlhJEesInjdo4
+         pegBWbF/qQg7aehghE098K9NEWjDE39G17rU2hmpXyJfHCARQTqSU30OUW9DUMI5AAIx
+         HTLLJJP4gmT8eD0FKG2lkeCUcSSK4ngr86E9QQlbtY+kGSdmXpXhyYQImMRVtoqihggc
+         B6579333O+ixNDlFQPS1G6JqPbaV4i7wMoDJfWFZmA8QgkXDn4CboQyLNw3SgNB6jcLE
+         XJiA==
+X-Gm-Message-State: AOJu0YwCV/f1PzYtxPuw6YQljvo8Cg8j4M88Y+iL8e2U3HLoawAe8R3i
+        Xh/sK0sjBZL3OiFA5Lj/Tjw=
+X-Google-Smtp-Source: AGHT+IHf7LiqNK/cq7NpOYJHnU3xlTkWVtS8ROdYsEXTRB0+VrCLDBMVia/w6uNNOiHc9r7dxbj/fw==
+X-Received: by 2002:a05:6a00:1a50:b0:68f:dd50:aef8 with SMTP id h16-20020a056a001a5000b0068fdd50aef8mr6268140pfv.4.1697652067679;
+        Wed, 18 Oct 2023 11:01:07 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:66c1:dd00:1e1e:add3])
-        by smtp.gmail.com with ESMTPSA id p15-20020aa7860f000000b00690cd981652sm3628612pfn.61.2023.10.18.10.57.56
+        by smtp.gmail.com with ESMTPSA id x20-20020aa79414000000b0068fc48fcaa8sm3624698pfo.155.2023.10.18.11.01.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 10:57:57 -0700 (PDT)
+        Wed, 18 Oct 2023 11:01:07 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
         Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Bao D . Nguyen" <quic_nguyenb@quicinc.com>,
-        Can Guo <quic_cang@quicinc.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Bean Huo <beanhuo@micron.com>,
-        Asutosh Das <quic_asutoshd@quicinc.com>,
-        Arthur Simchaev <Arthur.Simchaev@wdc.com>
-Subject: [PATCH v13 18/18] scsi: ufs: Inform the block layer about write ordering
-Date:   Wed, 18 Oct 2023 10:54:40 -0700
-Message-ID: <20231018175602.2148415-19-bvanassche@acm.org>
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Yu Kuai <yukuai1@huaweicloud.com>,
+        Ed Tsai <ed.tsai@mediatek.com>
+Subject: [PATCH] block: Improve shared tag set performance
+Date:   Wed, 18 Oct 2023 11:00:56 -0700
+Message-ID: <20231018180056.2151711-1-bvanassche@acm.org>
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-In-Reply-To: <20231018175602.2148415-1-bvanassche@acm.org>
-References: <20231018175602.2148415-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
-"The host controller always process transfer requests in-order according
-to the order submitted to the list. In case of multiple commands with
-single doorbell register ringing (batch mode), The dispatch order for
-these transfer requests by host controller will base on their index in
-the List. A transfer request with lower index value will be executed
-before a transfer request with higher index value."
+Remove the code for fair tag sharing because it significantly hurts
+performance for UFS devices. Removing this code is safe because the
+legacy block layer worked fine without any equivalent fairness
+algorithm.
 
-From the UFSHCI 4.0 specification, about the MCQ mode:
-"Command Submission
-1. Host SW writes an Entry to SQ
-2. Host SW updates SQ doorbell tail pointer
+This algorithm hurts performance for UFS devices because UFS devices
+have multiple logical units. One of these logical units (WLUN) is used
+to submit control commands, e.g. START STOP UNIT. If any request is
+submitted to the WLUN, the queue depth is reduced from 31 to 15 or
+lower for data LUNs.
 
-Command Processing
-3. After fetching the Entry, Host Controller updates SQ doorbell head
-   pointer
-4. Host controller sends COMMAND UPIU to UFS device"
+See also https://lore.kernel.org/linux-scsi/20221229030645.11558-1-ed.tsai@mediatek.com/
 
-In other words, for both legacy and MCQ mode, UFS controllers are
-required to forward commands to the UFS device in the order these
-commands have been received from the host.
+Note: it has been attempted to rework this algorithm. See also "[PATCH
+RFC 0/7] blk-mq: improve tag fair sharing"
+(https://lore.kernel.org/linux-block/20230618160738.54385-1-yukuai1@huaweicloud.com/).
+Given the complexity of that patch series, I do not expect that patch
+series to be merged.
 
-Notes:
-- For legacy mode this is only correct if the host submits one
-  command at a time. The UFS driver does this.
-- Also in legacy mode, the command order is not preserved if
-  auto-hibernation is enabled in the UFS controller. Hence, enable
-  zone write locking if auto-hibernation is enabled.
-
-This patch improves performance as follows on my test setup:
-- With the mq-deadline scheduler: 2.5x more IOPS for small writes.
-- When not using an I/O scheduler compared to using mq-deadline with
-  zone locking: 4x more IOPS for small writes.
-
-Reviewed-by: Bao D. Nguyen <quic_nguyenb@quicinc.com>
-Reviewed-by: Can Guo <quic_cang@quicinc.com>
+Cc: Christoph Hellwig <hch@lst.de>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Avri Altman <avri.altman@wdc.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Ed Tsai <ed.tsai@mediatek.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/ufs/core/ufshcd.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ block/blk-mq-tag.c |  4 ----
+ block/blk-mq.c     |  3 ---
+ block/blk-mq.h     | 39 ---------------------------------------
+ 3 files changed, 46 deletions(-)
 
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index 0a21ea9d7576..b1bed617e8a2 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -4325,6 +4325,20 @@ static int ufshcd_update_preserves_write_order(struct ufs_hba *hba,
- 				return -EPERM;
- 		}
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index cc57e2dd9a0b..25334bfcabf8 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -105,10 +105,6 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 			    struct sbitmap_queue *bt)
+ {
+-	if (!data->q->elevator && !(data->flags & BLK_MQ_REQ_RESERVED) &&
+-			!hctx_may_queue(data->hctx, bt))
+-		return BLK_MQ_NO_TAG;
+-
+ 	if (data->shallow_depth)
+ 		return sbitmap_queue_get_shallow(bt, data->shallow_depth);
+ 	else
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e2d11183f62e..502dafa76716 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1760,9 +1760,6 @@ bool __blk_mq_alloc_driver_tag(struct request *rq)
+ 	if (blk_mq_tag_is_reserved(rq->mq_hctx->sched_tags, rq->internal_tag)) {
+ 		bt = &rq->mq_hctx->tags->breserved_tags;
+ 		tag_offset = 0;
+-	} else {
+-		if (!hctx_may_queue(rq->mq_hctx, bt))
+-			return false;
  	}
-+	shost_for_each_device(sdev, hba->host)
-+		blk_freeze_queue_start(sdev->request_queue);
-+	shost_for_each_device(sdev, hba->host) {
-+		struct request_queue *q = sdev->request_queue;
-+
-+		blk_mq_freeze_queue_wait(q);
-+		q->limits.driver_preserves_write_order = preserves_write_order;
-+		blk_queue_required_elevator_features(q,
-+			!preserves_write_order && blk_queue_is_zoned(q) ?
-+			ELEVATOR_F_ZBD_SEQ_WRITE : 0);
-+		if (q->disk)
-+			disk_set_zoned(q->disk, q->limits.zoned);
-+		blk_mq_unfreeze_queue(q);
-+	}
  
- 	return 0;
+ 	tag = __sbitmap_queue_get(bt);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index f75a9ecfebde..14a22f6d3fdf 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -407,45 +407,6 @@ static inline void blk_mq_free_requests(struct list_head *list)
+ 	}
  }
-@@ -4367,7 +4381,8 @@ int ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
  
- 	if (!is_mcq_enabled(hba) && !prev_state && new_state) {
- 		/*
--		 * Auto-hibernation will be enabled for legacy UFSHCI mode.
-+		 * Auto-hibernation will be enabled for legacy UFSHCI mode. Tell
-+		 * the block layer that write requests may be reordered.
- 		 */
- 		ret = ufshcd_update_preserves_write_order(hba, false);
- 		if (ret)
-@@ -4383,7 +4398,8 @@ int ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit)
- 	}
- 	if (!is_mcq_enabled(hba) && prev_state && !new_state) {
- 		/*
--		 * Auto-hibernation has been disabled.
-+		 * Auto-hibernation has been disabled. Tell the block layer that
-+		 * the order of write requests is preserved.
- 		 */
- 		ret = ufshcd_update_preserves_write_order(hba, true);
- 		WARN_ON_ONCE(ret);
-@@ -5151,6 +5167,10 @@ static int ufshcd_slave_configure(struct scsi_device *sdev)
- 	struct ufs_hba *hba = shost_priv(sdev->host);
- 	struct request_queue *q = sdev->request_queue;
- 
-+	q->limits.driver_preserves_write_order =
-+		!ufshcd_is_auto_hibern8_supported(hba) ||
-+		FIELD_GET(UFSHCI_AHIBERN8_TIMER_MASK, hba->ahit) == 0;
-+
- 	blk_queue_update_dma_pad(q, PRDT_DATA_BYTE_COUNT_PAD - 1);
- 	if (hba->quirks & UFSHCD_QUIRK_4KB_DMA_ALIGNMENT)
- 		blk_queue_update_dma_alignment(q, SZ_4K - 1);
+-/*
+- * For shared tag users, we track the number of currently active users
+- * and attempt to provide a fair share of the tag depth for each of them.
+- */
+-static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+-				  struct sbitmap_queue *bt)
+-{
+-	unsigned int depth, users;
+-
+-	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+-		return true;
+-
+-	/*
+-	 * Don't try dividing an ant
+-	 */
+-	if (bt->sb.depth == 1)
+-		return true;
+-
+-	if (blk_mq_is_shared_tags(hctx->flags)) {
+-		struct request_queue *q = hctx->queue;
+-
+-		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+-			return true;
+-	} else {
+-		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+-			return true;
+-	}
+-
+-	users = READ_ONCE(hctx->tags->active_queues);
+-	if (!users)
+-		return true;
+-
+-	/*
+-	 * Allow at least some tags
+-	 */
+-	depth = max((bt->sb.depth + users - 1) / users, 4U);
+-	return __blk_mq_active_requests(hctx) < depth;
+-}
+-
+ /* run the code block in @dispatch_ops with rcu/srcu read lock held */
+ #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
+ do {								\
