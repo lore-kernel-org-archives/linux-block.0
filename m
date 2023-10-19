@@ -2,142 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 242E9CDB482
-	for <linux-block@archiver.kernel.org>; Thu, 19 Oct 2023 09:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA751C41513
+	for <linux-block@archiver.kernel.org>; Thu, 19 Oct 2023 09:36:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345056AbjJSJRP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Oct 2023 05:17:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36368 "EHLO
+        id S233040AbjJSJgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Oct 2023 05:36:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232976AbjJSJRO (ORCPT
+        with ESMTP id S233034AbjJSJgH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Oct 2023 05:17:14 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC4AB8
-        for <linux-block@vger.kernel.org>; Thu, 19 Oct 2023 02:17:11 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53f98cbcd76so4706a12.1
-        for <linux-block@vger.kernel.org>; Thu, 19 Oct 2023 02:17:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697707030; x=1698311830; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CEyDbtqB+udvOtvaRFHUtqkxP21cSIdHZt9QvgU76Yo=;
-        b=gUJNtTYMrP5DGqoqxGj9WuqZk22rfp9lcd62KUldL91ausAgz/MBXtVh9xH3wIyciJ
-         n0j5YQ91PA60pk+gW3M1D2a4rvwRchL3gFD5qlGrLxNYMevMZZX51yQu9vRRUIMC5dzx
-         7yb9s+qTdgXD/XusbB0f8zHj0ZuVBTaEfbxgZz3su1xeGfg2TUKfqnOLa2CxO45TOVB4
-         TCY5i4NhjEa6euMXefLFjM167qtiXoQdybBq4/xyC3lCZt2gmFZq+kl2s4kslU13KBMk
-         pZZmwzols+DXQM3+sjj+cBKLmr2l7Nlteu2hI6Bba6jzF81StfMv4MCtOBt9TPHrdf71
-         aAag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697707030; x=1698311830;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CEyDbtqB+udvOtvaRFHUtqkxP21cSIdHZt9QvgU76Yo=;
-        b=oNp6xFYzK12xHzjHDebJjoStrLGugWdXNJefH5ryFY2oNwaKBiwQiTqsKqvUufUN52
-         FP7R4Q4RYN2XN+jq05ZYWGWDza5NXQrlhgDgX4YlEh8MgeXRA3ZCUIIgVOJ+AXwDUn9H
-         3hNpwvXYaxTGWCnRfJWC2jchRiQx2kvkWzqtbo4oWakRXjtIITgFpuyabUwQnrBD9rZY
-         qgi4AwfC5kR0lD92aXrn2T36OV7/aA4zLsINk5DHkSYR17AyD8UvXQmNgCsgKrzD8/sZ
-         hAXSs29yhH8L2EooDpVl6v66h/t9FQGgp/rmVGE0YlpDs/KcQ5deV4M8NJuWqu/zX5vR
-         aFYg==
-X-Gm-Message-State: AOJu0Yw9M5R5GSbxpA1sznoZXs6JRXVQljSx8Ow/7BRK8PZjmtITCIJl
-        Sr3l4Hx1vgziq3mqk7d2ZB8nLQ0R46yI4hRwja2oqw==
-X-Google-Smtp-Source: AGHT+IFEEOs06c4WLSibf/51HO7uvqmnfpk/QYoWjbqqV6cbgP/iEpuh1W4eTm4WVvsBFqs3xdA3t1pCVl57WxJ/c9c=
-X-Received: by 2002:a50:a45a:0:b0:53d:b53c:946b with SMTP id
- v26-20020a50a45a000000b0053db53c946bmr92741edb.2.1697707030233; Thu, 19 Oct
- 2023 02:17:10 -0700 (PDT)
+        Thu, 19 Oct 2023 05:36:07 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0E80106
+        for <linux-block@vger.kernel.org>; Thu, 19 Oct 2023 02:36:05 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9CFFC433C8;
+        Thu, 19 Oct 2023 09:36:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697708165;
+        bh=hJZR4W2zZc1CrGsCWcAic1HmEejzXatx0UDZBAvsyjM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=IhZY85mWeObaIuqnAGTv3w41NuyOJlimTHFvXXypwg+TGlQ2DNmeeIH6jfDKW2nyU
+         RirgfhrmRelue2d20q3oj1VzmDBf4JwGI1gASTDNI/2+PYfDJVojdWZTuMChi2bttU
+         PrJlOcQb/xfmG65GleKUaapsZgHh+RnkTxNvmIgAWkMCr+81d4UhdtzDt1zBsexcum
+         eeXKA4/Q3BnXvs7RvgIolpk0ljvGL8vruG4ONGpdVNUqWuIPOs9bx+sKWvaA2A4cl2
+         SRBvt2iCpqSE9HDZ0TxuqAPbJgBVGMXF+VOA6mmvZrqeHGj9pgwU8AGerMenaYcA9+
+         pLzjduwxNaBuA==
+From:   Christian Brauner <brauner@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Denis Efremov <efremov@linux.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: don't take s_umount under open_mutex
+Date:   Thu, 19 Oct 2023 11:35:54 +0200
+Message-Id: <20231019-gebangt-inhalieren-b0466ff3e1c2@brauner>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231017184823.1383356-1-hch@lst.de>
+References: <20231017184823.1383356-1-hch@lst.de>
 MIME-Version: 1.0
-References: <20230704122727.17096-1-jack@suse.cz> <20230704125702.23180-1-jack@suse.cz>
- <20230822053523.GA8949@sol.localdomain> <20230822101154.7udsf4tdwtns2prj@quack3>
-In-Reply-To: <20230822101154.7udsf4tdwtns2prj@quack3>
-From:   Aleksandr Nogikh <nogikh@google.com>
-Date:   Thu, 19 Oct 2023 11:16:55 +0200
-Message-ID: <CANp29Y6uBuSzLXuCMGzVNZjT+xFqV4dtWKWb7GR7Opx__Diuzg@mail.gmail.com>
-Subject: Re: [PATCH 1/6] block: Add config option to not allow writing to
- mounted devices
-To:     Jan Kara <jack@suse.cz>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@google.com>,
-        Ted Tso <tytso@mit.edu>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Dmitry Vyukov <dvyukov@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1789; i=brauner@kernel.org; h=from:subject:message-id; bh=hJZR4W2zZc1CrGsCWcAic1HmEejzXatx0UDZBAvsyjM=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQa/ChImW+UIbbFw3rSw5yNM/qlLa3E8qZM3Wf864DmtnlT Zcw3dpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAExk90yG/wX9q+vfKi6M6S2tds/axc vIdWr9hOaVCSteht0J/vj28HeGPxwSPt94rts8NaiYO3+icqNv1jH35wtOil6bb2530r1OgBcA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jan,
+On Tue, 17 Oct 2023 20:48:18 +0200, Christoph Hellwig wrote:
+> Christian has been pestering Jan and me a bit about finally fixing
+> all the pre-existing mostly theoretical cases of s_umount taken under
+> open_mutex.  This series, which is mostly from him with some help from
+> me should get us to that goal by replacing bdev_mark_dead calls that
+> can't ever reach a file system holder to call into with simple bdev
+> page invalidation.
+> 
+> [...]
 
-Thank you for the series!
+I've applied this so it ends up in -next now.
+@Jens, let me know if you have objections.
 
-Have you already had a chance to push an updated version of it?
-I tried to search LKML, but didn't find anything.
+---
 
-Or did you decide to put it off until later?
+Applied to the vfs.super branch of the vfs/vfs.git tree.
+Patches in the vfs.super branch should appear in linux-next soon.
 
---=20
-Aleksandr
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-On Tue, Aug 22, 2023 at 12:12=E2=80=AFPM Jan Kara <jack@suse.cz> wrote:
->
-> Hi Eric!
->
-> On Mon 21-08-23 22:35:23, Eric Biggers wrote:
-> > On Tue, Jul 04, 2023 at 02:56:49PM +0200, Jan Kara wrote:
-> > > Writing to mounted devices is dangerous and can lead to filesystem
-> > > corruption as well as crashes. Furthermore syzbot comes with more and
-> > > more involved examples how to corrupt block device under a mounted
-> > > filesystem leading to kernel crashes and reports we can do nothing
-> > > about. Add tracking of writers to each block device and a kernel cmdl=
-ine
-> > > argument which controls whether writes to block devices open with
-> > > BLK_OPEN_BLOCK_WRITES flag are allowed. We will make filesystems use
-> > > this flag for used devices.
-> > >
-> > > Syzbot can use this cmdline argument option to avoid uninteresting
-> > > crashes. Also users whose userspace setup does not need writing to
-> > > mounted block devices can set this option for hardening.
-> > >
-> > > Link: https://lore.kernel.org/all/60788e5d-5c7c-1142-e554-c21d709acfd=
-9@linaro.org
-> > > Signed-off-by: Jan Kara <jack@suse.cz>
-> >
-> > Can you make it clear that the important thing this patch prevents is
-> > writes to the block device's buffer cache, not writes to the underlying
-> > storage?  It's super important not to confuse the two cases.
->
-> Right, I've already updated the description of the help text in the kconf=
-ig
-> to explicitely explain that this does not prevent underlying device conte=
-nt
-> from being modified, it just prevents writes the the block device itself.
-> But I guess I can also explain this (with a bit more technical details) i=
-n
-> the changelog. Good idea.
->
-> > Related to this topic, I wonder if there is any value in providing an o=
-ption
-> > that would allow O_DIRECT writes but forbid buffered writes?  Would tha=
-t be
-> > useful for any of the known use cases for writing to mounted block devi=
-ces?
->
-> I'm not sure how useful that would be but it would be certainly rather
-> difficult to implement. The problem is we can currently fallback from
-> direct to buffered IO as we see fit, also we need to invalidate page cach=
-e
-> while doing direct IO which can fail etc. So it will be a rather nasty ca=
-n
-> of worms to open...
->
->                                                                 Honza
-> --
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
->
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.super
+
+[1/5] block: simplify bdev_del_partition()
+      https://git.kernel.org/vfs/vfs/c/b0df741ed69d
+[2/5] block: WARN_ON_ONCE() when we remove active partitions
+      https://git.kernel.org/vfs/vfs/c/2ff3adfb95a3
+[3/5] block: move bdev_mark_dead out of disk_check_media_change
+      https://git.kernel.org/vfs/vfs/c/6d4367bc04fd
+[4/5] block: assert that we're not holding open_mutex over blk_report_disk_dead
+      https://git.kernel.org/vfs/vfs/c/7addcb222703
+[5/5] fs: assert that open_mutex isn't held over holder ops
+      https://git.kernel.org/vfs/vfs/c/43ab05549df4
