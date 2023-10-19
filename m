@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 257E5CDB482
-	for <linux-block@archiver.kernel.org>; Thu, 19 Oct 2023 08:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B10D5CDB465
+	for <linux-block@archiver.kernel.org>; Thu, 19 Oct 2023 08:44:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235339AbjJSIoF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Oct 2023 04:44:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51630 "EHLO
+        id S235389AbjJSIo2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Oct 2023 04:44:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235361AbjJSInt (ORCPT
+        with ESMTP id S235353AbjJSIoH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Oct 2023 04:43:49 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 689061AC;
-        Thu, 19 Oct 2023 01:43:16 -0700 (PDT)
+        Thu, 19 Oct 2023 04:44:07 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 590DB1BCA;
+        Thu, 19 Oct 2023 01:43:40 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 16CA91F459;
-        Thu, 19 Oct 2023 08:43:14 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 03F8B1FD8C;
+        Thu, 19 Oct 2023 08:43:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1697704994; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1697705019; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Hivdllsfd82vo1yNLypptwul3AXaOhBN38DCUSjUqus=;
-        b=ghRDccvzVbLd0yNn455XPptLPG291EBoHoZFXsAPaPa3crt15h6HWGM5zqqsZ1OgT32PRa
-        fObN7taiRd+NCxk+/01TheSPBViIAw8kPQiEBw55c0RJRIF63pJzjXWvffOeDQrPhpoK9e
-        9912FGxV6ZmgCcoadosgmhBzCVFfCws=
+        bh=cYET0BJw7ocS3OlFzKj/k4LkNiu6Z0iSBZYVxMidfVw=;
+        b=T6yWSTbLeqFDDITYvRVkOtphzBo+NYyQiEpiduILNwk8u3sfcE9vtHNiuLChqlYot8ha6t
+        cTldsHYzFX5k50r9otD84EKG/qsYidbQ7E6CLdOqMpMdCFcd8IIMB58VcdAmbY36LLhOBh
+        grSPKAVhL1jkpqztTBUe8SwNF2le104=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1697704994;
+        s=susede2_ed25519; t=1697705019;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Hivdllsfd82vo1yNLypptwul3AXaOhBN38DCUSjUqus=;
-        b=IOwwhfPZj4RXQ7suUqoqj0FVWtSZe3iVP+mcLObjHyO7GNItY0aqZP46/AQDteFOgGShBW
-        2RvZQHbtCheJbDCg==
+        bh=cYET0BJw7ocS3OlFzKj/k4LkNiu6Z0iSBZYVxMidfVw=;
+        b=xF7rD5RnrQUerfjluvjdEUSNbaBeOKdZu/v3JpN/DFDnFjexRQOj+8RPLrEaMC8Q6zCBho
+        L6wPXB/2A9c49rDA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 08DFE1357F;
-        Thu, 19 Oct 2023 08:43:14 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E85181357F;
+        Thu, 19 Oct 2023 08:43:38 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id jz4gAiLsMGUGQwAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 19 Oct 2023 08:43:14 +0000
+        id RGa1ODrsMGUyQwAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 19 Oct 2023 08:43:38 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 8B970A06B0; Thu, 19 Oct 2023 10:43:13 +0200 (CEST)
-Date:   Thu, 19 Oct 2023 10:43:13 +0200
+        id 94D1FA06B0; Thu, 19 Oct 2023 10:43:38 +0200 (CEST)
+Date:   Thu, 19 Oct 2023 10:43:38 +0200
 From:   Jan Kara <jack@suse.cz>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Christian Brauner <brauner@kernel.org>,
@@ -57,18 +57,17 @@ Cc:     Christian Brauner <brauner@kernel.org>,
         Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
         Denis Efremov <efremov@linux.com>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 4/5] block: assert that we're not holding open_mutex over
- blk_report_disk_dead
-Message-ID: <20231019084313.36wko73lyxwq3asi@quack3>
+Subject: Re: [PATCH 5/5] fs: assert that open_mutex isn't held over holder ops
+Message-ID: <20231019084338.xu4ppzz3nx24saj4@quack3>
 References: <20231017184823.1383356-1-hch@lst.de>
- <20231017184823.1383356-5-hch@lst.de>
+ <20231017184823.1383356-6-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231017184823.1383356-5-hch@lst.de>
+In-Reply-To: <20231017184823.1383356-6-hch@lst.de>
 Authentication-Results: smtp-out2.suse.de;
         none
-X-Spamd-Result: default: False [-4.12 / 50.00];
+X-Spamd-Result: default: False [-6.60 / 50.00];
          ARC_NA(0.00)[];
          RCVD_VIA_SMTP_AUTH(0.00)[];
          FROM_HAS_DN(0.00)[];
@@ -84,66 +83,51 @@ X-Spamd-Result: default: False [-4.12 / 50.00];
          MID_RHS_NOT_FQDN(0.50)[];
          RCVD_COUNT_TWO(0.00)[2];
          RCVD_TLS_ALL(0.00)[];
-         BAYES_HAM(-0.52)[80.32%]
+         BAYES_HAM(-3.00)[99.99%]
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 17-10-23 20:48:22, Christoph Hellwig wrote:
+On Tue 17-10-23 20:48:23, Christoph Hellwig wrote:
 > From: Christian Brauner <brauner@kernel.org>
 > 
-> blk_report_disk_dead() has the following major callers:
-> 
-> (1) del_gendisk()
-> (2) blk_mark_disk_dead()
-> 
-> Since del_gendisk() acquires disk->open_mutex it's clear that all
-> callers are assumed to be called without disk->open_mutex held.
-> In turn, blk_report_disk_dead() is called without disk->open_mutex held
-> in del_gendisk().
-> 
-> All callers of blk_mark_disk_dead() call it without disk->open_mutex as
-> well.
-> 
-> Ensure that it is clear that blk_report_disk_dead() is called without
-> disk->open_mutex on purpose by asserting it and a comment in the code.
+> With recent block level changes we should never be in a situation where
+> we hold disk->open_mutex when calling into these helpers. So assert that
+> in the code.
 > 
 > Signed-off-by: Christian Brauner <brauner@kernel.org>
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Sure. Feel free to add:
+Looks good to me. Feel free to add:
 
 Reviewed-by: Jan Kara <jack@suse.cz>
-
-BTW, checking the callers I suspect that we might eventually hit some
-locking issues with NVME and its ctrl->namespace_sem which is held while
-calling blk_mark_disk_dead(). But I guess we'll deal with that once we see
-the problem is real.
 
 								Honza
 
 > ---
->  block/genhd.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  fs/super.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 4a16a424f57d4f..c9d06f72c587e8 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -559,6 +559,13 @@ static void blk_report_disk_dead(struct gendisk *disk, bool surprise)
->  	struct block_device *bdev;
->  	unsigned long idx;
+> diff --git a/fs/super.c b/fs/super.c
+> index 26b96191e9b3ca..ce54cfcecaa156 100644
+> --- a/fs/super.c
+> +++ b/fs/super.c
+> @@ -1443,6 +1443,7 @@ static void fs_bdev_mark_dead(struct block_device *bdev, bool surprise)
 >  
-> +	/*
-> +	 * On surprise disk removal, bdev_mark_dead() may call into file
-> +	 * systems below. Make it clear that we're expecting to not hold
-> +	 * disk->open_mutex.
-> +	 */
-> +	lockdep_assert_not_held(&disk->open_mutex);
-> +
->  	rcu_read_lock();
->  	xa_for_each(&disk->part_tbl, idx, bdev) {
->  		if (!kobject_get_unless_zero(&bdev->bd_device.kobj))
+>  	/* bd_holder_lock ensures that the sb isn't freed */
+>  	lockdep_assert_held(&bdev->bd_holder_lock);
+> +	lockdep_assert_not_held(&bdev->bd_disk->open_mutex);
+>  
+>  	if (!super_lock_shared_active(sb))
+>  		return;
+> @@ -1462,6 +1463,7 @@ static void fs_bdev_sync(struct block_device *bdev)
+>  	struct super_block *sb = bdev->bd_holder;
+>  
+>  	lockdep_assert_held(&bdev->bd_holder_lock);
+> +	lockdep_assert_not_held(&bdev->bd_disk->open_mutex);
+>  
+>  	if (!super_lock_shared_active(sb))
+>  		return;
 > -- 
 > 2.39.2
 > 
