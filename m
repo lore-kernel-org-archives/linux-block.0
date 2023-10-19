@@ -2,95 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6915ACDB483
-	for <linux-block@archiver.kernel.org>; Thu, 19 Oct 2023 19:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B193C004C0
+	for <linux-block@archiver.kernel.org>; Thu, 19 Oct 2023 22:40:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbjJSTun (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Oct 2023 15:50:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48942 "EHLO
+        id S235549AbjJSWkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Oct 2023 18:40:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbjJSTum (ORCPT
+        with ESMTP id S233286AbjJSWku (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Oct 2023 15:50:42 -0400
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0451CCA;
-        Thu, 19 Oct 2023 12:50:41 -0700 (PDT)
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1ca82f015e4so244575ad.1;
-        Thu, 19 Oct 2023 12:50:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697745040; x=1698349840;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Gzq/gzso30UiG3pCarLGRQ/H1gh08CnkHPjn+a7Vcs=;
-        b=VimFSXloXRMhMfVMAmYClbmfWQrn+75mes/ZsjobvKe9jn4D6/c3sN/uNup9q+YKUJ
-         +Q0tfL9z2oeh9aprRk8T8a/k0Mrx144VCSdlXWcvxPfyVFgxWeQz3R6NrYvjT03rVi7n
-         N1Qv1nwrjetKVq/Zwx56un4tOxfjR4KvL32GlxJgXjbnWSsMwzpV2tLRZaWZZXSGQuHj
-         mnoXzSOtydQpDe+6i1PHo0vMO63DPCq9NfB1skL55TLtwnUyHESmZsTltS6cUQM70suF
-         bOMWMFwkf1FPmGfP1Hqe2a3bx+0fO/C44ZLjviLmYMK06oTluZtw65xDQIQI7zqt+mxb
-         9cTQ==
-X-Gm-Message-State: AOJu0YxyW3JKdyjXKP7EheXun6PkKR8Z9NgfTPODu0myxin6TWHQtyyQ
-        OgLXcU9NTGxc4qoHWS5FJ9o=
-X-Google-Smtp-Source: AGHT+IEGq4ylOKbMXm3HQeZJdlDYfnTjsFKDDOdK2kSQqQZ0d1MqTZdDuFWCKi2l+149xVejwZBS4w==
-X-Received: by 2002:a17:902:e214:b0:1ca:4681:eb37 with SMTP id u20-20020a170902e21400b001ca4681eb37mr2806194plb.14.1697745040301;
-        Thu, 19 Oct 2023 12:50:40 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:3306:3a7f:54e8:2149? ([2620:15c:211:201:3306:3a7f:54e8:2149])
-        by smtp.gmail.com with ESMTPSA id d4-20020a170902cec400b001c60d0a6d84sm83388plg.127.2023.10.19.12.50.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 12:50:39 -0700 (PDT)
-Message-ID: <1e9f919e-ae05-4b15-bf3c-01849d122a5d@acm.org>
-Date:   Thu, 19 Oct 2023 12:50:38 -0700
+        Thu, 19 Oct 2023 18:40:50 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F42124;
+        Thu, 19 Oct 2023 15:40:48 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB89CC433C8;
+        Thu, 19 Oct 2023 22:40:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697755248;
+        bh=QfTE4cUL4mwaaLPvxL0PL45XS44NzfljHt3kH5CTJGE=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=RMBzEXjRTclL7lVdSbp6YvoCjsj6TKlg0HvBQToQMPw1OAml4ShpUAykVfRVIlT98
+         CY20I8kMpqqfMU/9ytXrWTDCA2DKR2WLz3mW74uyNTQE5ODGgrxFRvgkXULr8hzYeX
+         WTHFUcBASkfJu11+JcXLl1U8l5kUdz+p4Sf8NtMiWz9xfYDegyATWthXdEMkdLyG/s
+         9gop+/tOFikgY5iXAfChufK4Q6CXBj5g5sHSqjKX13zCnA106xxRQxlc73auxbuq/Z
+         koXoMrUbF/HTyna0jFukE6gPLvTlXimvDDARM50ekKvUSHCdeMZVIfSZ3RW7nw4IIP
+         ImlgpIM1FAb8Q==
+Message-ID: <58ec6750-5582-4775-a38f-7d56d761136c@kernel.org>
+Date:   Fri, 20 Oct 2023 07:40:44 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 05/18] scsi: core: Introduce a mechanism for
- reordering requests in the error handler
-Content-Language: en-US
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v3 00/14] Pass data temperature information to SCSI disk
+ devices
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20231018175602.2148415-1-bvanassche@acm.org>
- <20231018175602.2148415-6-bvanassche@acm.org>
- <9ee7edc0-5edb-4e17-abae-bb7ffcf0f147@kernel.org>
- <47a5508c-cb80-4398-aa9c-e905be06ad1d@acm.org>
-In-Reply-To: <47a5508c-cb80-4398-aa9c-e905be06ad1d@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>
+References: <20231017204739.3409052-1-bvanassche@acm.org>
+ <3f3c2289-3185-4895-92cb-0692e3ca9ebc@kernel.dk>
+ <e8b49fac-77ce-4b61-ac4d-e4ace58d8319@acm.org>
+ <e2e56cdf-0cfe-4c5b-991f-ea6a80452891@kernel.org>
+ <7908138a-3ae5-4ff5-9bda-4f41e81f2ef1@acm.org>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <7908138a-3ae5-4ff5-9bda-4f41e81f2ef1@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/19/23 10:53, Bart Van Assche wrote:
-> 
-> On 10/18/23 17:24, Damien Le Moal wrote:
->> On 10/19/23 02:54, Bart Van Assche wrote:
->>> +void scsi_call_prepare_resubmit(struct list_head *done_q)
->>> +{
->>> +    struct scsi_cmnd *scmd, *next;
->>> +
->>> +    if (!scsi_needs_preparation(done_q))
->>> +        return;
+On 10/20/23 01:48, Bart Van Assche wrote:
+> On 10/18/23 17:33, Damien Le Moal wrote:
+>> On 10/19/23 04:34, Bart Van Assche wrote:
+>  >> On 10/18/23 12:09, Jens Axboe wrote:
+>>>> I'm also really against growing struct bio just for this. Why is patch 2
+>>>> not just using the ioprio field at least?
+>>>
+>>> Hmm ... shouldn't the bits in the ioprio field in struct bio have the
+>>> same meaning as in the ioprio fields used in interfaces between user
+>>> space and the kernel? Damien Le Moal asked me not to use any of the
+>>> ioprio bits passing data lifetime information from user space to the kernel.
 >>
->> This function will always go through the list of commands in done_q. 
->> That could
->> hurt performance for scsi hosts that do not need this prepare 
->> resubmit, which I
->> think is UFS only for now. So can't we just add a flag or something to 
->> avoid that ?
->
-> The SCSI error handler is only invoked after an RCU grace period has 
-> expired. The time spent in scsi_needs_preparation() is negligible
-> compared to an RCU grace period, especially if the
-> .eh_needs_prepare_resubmit pointers are NULL.
+>> I said so in the context that if lifetime is a per-inode property, then ioprio
+>> is the wrong interface since the ioprio API is per process or per IO. There is a
+>> mismatch.
+>>
+>> One version of your patch series used fnctl() to set the lifetime per inode,
+>> which is fine, and then used the BIO ioprio to pass the lifetime down to the
+>> device driver. That is in theory a nice trick, but that creates conflicts with
+>> the userspace ioprio API if the user uses that at the same time.
+>>
+>> So may be we should change bio ioprio from int to u16 and use the freedup u16
+>> for lifetime. With that, things are cleanly separated without growing struct bio.
+> 
+> Hmm ... I think that bi_ioprio has been 16 bits wide since the 
+> introduction of that data structure member in 2016?
 
-(replying to my own e-mail)
+My bad. struct bio->bi_ioprio is an unsigned short. I got confused with the user
+API and kernel functions using an int in many places. We really should change
+the kernel functions to use unsigned short for ioprio everywhere.
 
-Do you perhaps want me to drop the eh_needs_prepare_resubmit function
-pointer and introduce a flag instead? That sounds good to me.
+>>> Is it clear that the size of struct bio has not been changed because the
+>>> new bi_lifetime member fills a hole in struct bio?
+>>
+>> When the struct is randomized, holes move or disappear. Don't count on that...
+> 
+> We should aim to maximize performance for users who do not use data 
+> structure layout randomization.
+> 
+> Additionally, I doubt that anyone is using full structure layout 
+> randomization for SCSI devices. No SCSI driver has any 
+> __no_randomize_layout / __randomize_layout annotations although I'm sure 
+> there are plenty of data structures in SCSI drivers for which the layout 
+> matters.
 
-Thanks,
+Well, if Jens is OK with adding another "unsigned short bi_lifetime" in a hole
+in struct bio, that's fine with me. Otherwise, we are back to discussing how to
+pack bi_ioprio in a sensible manner so that we do not create a mess between the
+use cases and APIs:
+1) inode based lifetime with FS setting up the bi_ioprio field
+2) Direct IOs to files of an FS with lifetime set by user per IO (e.g.
+aio/io_uring/ioprio_set()) and/or fcntl()
+3) Direct IOs to raw block devices with lifetime set by user per IO (e.g.
+aio/io_uring/ioprio_set())
 
-Bart.
+Any of the above case should also allow using ioprio class/level and CDL hint.
+
+I think the most problematic part is (2) when lifetime are set with both fcntl()
+and per IO: which lifetime is the valid one ? The one set with fcntl() or the
+one specified for the IO ? I think the former is the one we want here.
+
+If we can clarify that, then I guess using 3 or 4 bits from the 10 bits ioprio
+hint should be OK. That would  give you 7 or 15 lifetime values. Enough no ?
+
+-- 
+Damien Le Moal
+Western Digital Research
 
