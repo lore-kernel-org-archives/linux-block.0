@@ -2,72 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3D9C001DF
-	for <linux-block@archiver.kernel.org>; Fri, 20 Oct 2023 19:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F392CC004C0
+	for <linux-block@archiver.kernel.org>; Fri, 20 Oct 2023 20:46:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbjJTThh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Oct 2023 15:37:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46828 "EHLO
+        id S233175AbjJTUqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Oct 2023 16:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229812AbjJTThg (ORCPT
+        with ESMTP id S232791AbjJTUpu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Oct 2023 15:37:36 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2608D52;
-        Fri, 20 Oct 2023 12:37:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=OqG2k9lr6dVMFkOpECp/c1ub/4t138Vh/alrnSJkgp4=; b=mVT7G4PTZUpU2DyGmj0CTOhr66
-        V3a0KA+XFiAsKOjtW3YWc1GG4+UGNx4oNZKhcB8204smplJBgUZRziMTJ+0ah3C7FfMbSIdDjeKh9
-        ZjWGt/dX8LeFDomzR/GHIrOZT2fXGV/XNtRAtQILp9z4qnuQGDwd9u6Ohktfw1DW7S/LHp3GGGob3
-        qmzpPgJZvBGh+m8kJ+WTrtDeupYm/e7d1FOvK2EuUwutN2YDe40VLJER++094CoFGBlRnzWlF2P2g
-        wEYcqvsn8fhfdRxc3mGUHVyn90pCx50KM4h959pwKldfH2vi+boj7KgsLhe6xBbIxuCIdelvd+FGl
-        b71tTnxA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qtvJG-00EuML-1x; Fri, 20 Oct 2023 19:37:26 +0000
-Date:   Fri, 20 Oct 2023 20:37:26 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 04/18] fs/buffer.c: use accessor function to translate
- page index to sectors
-Message-ID: <ZTLW9jOJ0Crt/ZD3@casper.infradead.org>
-References: <20230918110510.66470-1-hare@suse.de>
- <20230918110510.66470-5-hare@suse.de>
+        Fri, 20 Oct 2023 16:45:50 -0400
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA9B172E;
+        Fri, 20 Oct 2023 13:45:42 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5a9bc2ec556so897590a12.0;
+        Fri, 20 Oct 2023 13:45:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697834742; x=1698439542;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vutrsb5JnCQsKaXFvh73rRJHAgEusiSsuInphwVkJa4=;
+        b=SNnyYSdeoWe+upBQ1AdNgtA3pwSinRXfR8V8pEp8pDbXL36MLAMY0b9XqgJS9ISRmw
+         XyTG+JqeC7tbbaI14RmDWpVVGJaY+xXrXWcCL+YaG/dp/6we4U+LphH6q64qGREDKXxS
+         Igo7CBHqFr4GiYe6isfxay0smdXP4+kKwh69RtQ7JSCntchpKLxgnMxUyVeOGSDpcE1v
+         y4AIz9vmxfTzAhDlQEWdtFRWgebSp3DCF3llV/yrm2f6916cssjzP28Ds1X3VAkrTHOt
+         3G7v/xEMfz3x5EKfa/DK2EBqPDEQ4tPBS8STLuwIQZhRSovWZKLfGZh0oNTtUkqCcFtH
+         /u9Q==
+X-Gm-Message-State: AOJu0YwYg0jRqvJ/o1LvVuabSH4gFv6GaXDDXIHlMDeMdYfM6B6flY1W
+        wI31kquLHLnFTgXsH0iqtCo=
+X-Google-Smtp-Source: AGHT+IHcoxyaOXOn8IwRdHquaMtX3ArdAIWiXujrLn6NFN7C5QoFgHXgr8GegShqNs5oO3F0PpFnDw==
+X-Received: by 2002:a05:6a20:7d96:b0:13a:e955:d958 with SMTP id v22-20020a056a207d9600b0013ae955d958mr3258701pzj.7.1697834742070;
+        Fri, 20 Oct 2023 13:45:42 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:72ba:c99b:d191:901c? ([2620:15c:211:201:72ba:c99b:d191:901c])
+        by smtp.gmail.com with ESMTPSA id a6-20020aa78e86000000b0068fd026b496sm1968205pfr.46.2023.10.20.13.45.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Oct 2023 13:45:41 -0700 (PDT)
+Message-ID: <42639844-8758-4396-bb2c-ffcc8593d205@acm.org>
+Date:   Fri, 20 Oct 2023 13:45:40 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230918110510.66470-5-hare@suse.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/14] Pass data temperature information to SCSI disk
+ devices
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Avri Altman <Avri.Altman@wdc.com>,
+        Bean Huo <huobean@gmail.com>,
+        Daejun Park <daejun7.park@samsung.com>
+References: <20231017204739.3409052-1-bvanassche@acm.org>
+ <3f3c2289-3185-4895-92cb-0692e3ca9ebc@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <3f3c2289-3185-4895-92cb-0692e3ca9ebc@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 01:04:56PM +0200, Hannes Reinecke wrote:
-> Use accessor functions block_index_to_sector() and block_sector_to_index()
-> to translate the page index into the block sector and vice versa.
+On 10/18/23 12:09, Jens Axboe wrote:
+> I'm also really against growing struct bio just for this. Why is patch 2
+> not just using the ioprio field at least?
 
-You missed two in grow_dev_page() (which I just happened upon):
+Hi Jens,
 
-        bh = folio_buffers(folio);
-        if (bh) {
-                if (bh->b_size == size) {
-                        end_block = folio_init_buffers(folio, bdev,
-                                        (sector_t)index << sizebits, size);
-                        goto done;
-                }
-...
-        spin_lock(&inode->i_mapping->private_lock);
-        link_dev_buffers(folio, bh);
-        end_block = folio_init_buffers(folio, bdev,
-                        (sector_t)index << sizebits, size);
+Can you please clarify whether your concern is about the size of struct 
+bio only or also about the runtime impact of the comparisons that have 
+been added in attempt_merge() and blk_rq_merge_ok()? It may be possible 
+to eliminate the overhead of the new comparisons as follows:
+* Introduce a union of struct { I/O priority; data lifetime; } and u32.
+* Use that union in struct bio instead of bi_ioprio and bi_lifetime.
+* Use that union in struct request instead of the ioprio and lifetime
+   members.
+* In attempt_merge() and blk_rq_merge_ok(), compare the u32 union member
+   instead of comparing the I/O priority and data lifetime separately.
 
-Can UBSAN be of help here?  It should catch shifting by a negative
-amount.  That sizebits is calculated in grow_buffers:
+Thanks,
 
-        sizebits = PAGE_SHIFT - __ffs(size);
-
+Bart.
