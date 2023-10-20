@@ -2,85 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F392CC004C0
-	for <linux-block@archiver.kernel.org>; Fri, 20 Oct 2023 20:46:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A09D9C0032E
+	for <linux-block@archiver.kernel.org>; Fri, 20 Oct 2023 22:37:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233175AbjJTUqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Oct 2023 16:46:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56754 "EHLO
+        id S229473AbjJTWh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Oct 2023 18:37:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232791AbjJTUpu (ORCPT
+        with ESMTP id S230188AbjJTWh5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Oct 2023 16:45:50 -0400
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA9B172E;
-        Fri, 20 Oct 2023 13:45:42 -0700 (PDT)
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5a9bc2ec556so897590a12.0;
-        Fri, 20 Oct 2023 13:45:42 -0700 (PDT)
+        Fri, 20 Oct 2023 18:37:57 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BF3D75
+        for <linux-block@vger.kernel.org>; Fri, 20 Oct 2023 15:37:50 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-584a761b301so959406a12.3
+        for <linux-block@vger.kernel.org>; Fri, 20 Oct 2023 15:37:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1697841470; x=1698446270; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pp7b71HPUhZRYWiCA2ecvkahN2T6L1Zohh0DcisfMqo=;
+        b=mpghkfyzOutQ8CeN0RTsOB/0AWJ4MqMMREcBV150vT/rU4NoA0CTQBI09Id5QZgKu6
+         zsDGGBYpFyLGzg/FOj8u29B6DTgrQLkbAV7OQJmfl29HFC57Ux4CvgUWCFQvQMNMXN04
+         gBLuVmp0DsoLj8I6TEB4/RGOu0MfMJ9eNFUnc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697834742; x=1698439542;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vutrsb5JnCQsKaXFvh73rRJHAgEusiSsuInphwVkJa4=;
-        b=SNnyYSdeoWe+upBQ1AdNgtA3pwSinRXfR8V8pEp8pDbXL36MLAMY0b9XqgJS9ISRmw
-         XyTG+JqeC7tbbaI14RmDWpVVGJaY+xXrXWcCL+YaG/dp/6we4U+LphH6q64qGREDKXxS
-         Igo7CBHqFr4GiYe6isfxay0smdXP4+kKwh69RtQ7JSCntchpKLxgnMxUyVeOGSDpcE1v
-         y4AIz9vmxfTzAhDlQEWdtFRWgebSp3DCF3llV/yrm2f6916cssjzP28Ds1X3VAkrTHOt
-         3G7v/xEMfz3x5EKfa/DK2EBqPDEQ4tPBS8STLuwIQZhRSovWZKLfGZh0oNTtUkqCcFtH
-         /u9Q==
-X-Gm-Message-State: AOJu0YwYg0jRqvJ/o1LvVuabSH4gFv6GaXDDXIHlMDeMdYfM6B6flY1W
-        wI31kquLHLnFTgXsH0iqtCo=
-X-Google-Smtp-Source: AGHT+IHcoxyaOXOn8IwRdHquaMtX3ArdAIWiXujrLn6NFN7C5QoFgHXgr8GegShqNs5oO3F0PpFnDw==
-X-Received: by 2002:a05:6a20:7d96:b0:13a:e955:d958 with SMTP id v22-20020a056a207d9600b0013ae955d958mr3258701pzj.7.1697834742070;
-        Fri, 20 Oct 2023 13:45:42 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:72ba:c99b:d191:901c? ([2620:15c:211:201:72ba:c99b:d191:901c])
-        by smtp.gmail.com with ESMTPSA id a6-20020aa78e86000000b0068fd026b496sm1968205pfr.46.2023.10.20.13.45.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Oct 2023 13:45:41 -0700 (PDT)
-Message-ID: <42639844-8758-4396-bb2c-ffcc8593d205@acm.org>
-Date:   Fri, 20 Oct 2023 13:45:40 -0700
+        d=1e100.net; s=20230601; t=1697841470; x=1698446270;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Pp7b71HPUhZRYWiCA2ecvkahN2T6L1Zohh0DcisfMqo=;
+        b=Mcsj15M1PhL9pkIJ8QwZyZBYCznJRoU8HAEIM6ZQ0WgG2BDaoPokJOIK7UJtAldZDb
+         YX9JMstjcqiYHMK7YtL3kptxrEIK9gLl6A5PNdNRhya4yII92ow5aWGdyMWBBiItqrUb
+         bP/AcqQC++EoFB614a+kK9OumPksstAfy94ZTsP5bd5ytt0S+eHwi8BWoOBSDoQ9054c
+         K8mO0Pa1m9b/UTosANrcM4796x2hnY0fz/JUEi5ssQkOVn7Llj4hsDfHjvbsZGUD27s0
+         aQH6WEWTx8tauAD5zKbDHMRbq8YLlCtnCV0NqWP3ERQB4GZBGPOerjzXkOxklI9JV+8y
+         6OYw==
+X-Gm-Message-State: AOJu0Yz/9+Qi6h0+v2+ArOl+WZauFYNQ/W/AbpTgIYdEp9a0r9vaviNX
+        SI6SSZeah6MBFcf6sKHYg8V+pA==
+X-Google-Smtp-Source: AGHT+IFTI62df7sLkxercIq20RisYKYexu5tSVNibXFRfdyyl/NCUMISJDc3unFPOyM3yu6AVX3h4w==
+X-Received: by 2002:a17:903:610:b0:1c4:387a:3259 with SMTP id kg16-20020a170903061000b001c4387a3259mr3542740plb.46.1697841470337;
+        Fri, 20 Oct 2023 15:37:50 -0700 (PDT)
+Received: from khazhy-linux.svl.corp.google.com ([2620:15c:2a3:200:8e83:71b3:7861:9c5])
+        by smtp.gmail.com with ESMTPSA id g12-20020a170902c38c00b001bbd1562e75sm2013392plg.55.2023.10.20.15.37.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 15:37:50 -0700 (PDT)
+From:   Khazhismel Kumykov <khazhy@chromium.org>
+X-Google-Original-From: Khazhismel Kumykov <khazhy@google.com>
+To:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai3@huawei.com>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, oleg@redhat.com, linan122@huawei.com,
+        Khazhismel Kumykov <khazhy@google.com>
+Subject: [PATCH] blk-throttle: check for overflow in calculate_bytes_allowed
+Date:   Fri, 20 Oct 2023 15:36:17 -0700
+Message-ID: <20231020223617.2739774-1-khazhy@google.com>
+X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/14] Pass data temperature information to SCSI disk
- devices
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Avri Altman <Avri.Altman@wdc.com>,
-        Bean Huo <huobean@gmail.com>,
-        Daejun Park <daejun7.park@samsung.com>
-References: <20231017204739.3409052-1-bvanassche@acm.org>
- <3f3c2289-3185-4895-92cb-0692e3ca9ebc@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <3f3c2289-3185-4895-92cb-0692e3ca9ebc@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/18/23 12:09, Jens Axboe wrote:
-> I'm also really against growing struct bio just for this. Why is patch 2
-> not just using the ioprio field at least?
+Inexact, we may reject some not-overflowing values incorrectly, but
+they'll be on the order of exabytes allowed anyways.
 
-Hi Jens,
+This fixes divide error crash on x86 if bps_limit is not configured or
+is set too high in the rare case that jiffy_elapsed is greater than HZ.
 
-Can you please clarify whether your concern is about the size of struct 
-bio only or also about the runtime impact of the comparisons that have 
-been added in attempt_merge() and blk_rq_merge_ok()? It may be possible 
-to eliminate the overhead of the new comparisons as follows:
-* Introduce a union of struct { I/O priority; data lifetime; } and u32.
-* Use that union in struct bio instead of bi_ioprio and bi_lifetime.
-* Use that union in struct request instead of the ioprio and lifetime
-   members.
-* In attempt_merge() and blk_rq_merge_ok(), compare the u32 union member
-   instead of comparing the I/O priority and data lifetime separately.
+Fixes: e8368b57c006 ("blk-throttle: use calculate_io/bytes_allowed() for throtl_trim_slice()")
+Fixes: 8d6bbaada2e0 ("blk-throttle: prevent overflow while calculating wait time")
+Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+---
+ block/blk-throttle.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Thanks,
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 38a881cf97d0..13e4377a8b28 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -723,6 +723,12 @@ static unsigned int calculate_io_allowed(u32 iops_limit,
+ 
+ static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
+ {
++	/*
++	 * Can result be wider than 64 bits?
++	 * We check against 62, not 64, due to ilog2 truncation.
++	 */
++	if (ilog2(bps_limit) + ilog2(jiffy_elapsed) - ilog2(HZ) > 62)
++		return U64_MAX;
+ 	return mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed, (u64)HZ);
+ }
+ 
+-- 
+2.42.0.655.g421f12c284-goog
 
-Bart.
