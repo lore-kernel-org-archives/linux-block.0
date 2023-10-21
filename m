@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 531CEC25B42
-	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 07:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63960C25B43
+	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 07:52:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbjJUHw3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Oct 2023 03:52:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33148 "EHLO
+        id S230442AbjJUHwc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Oct 2023 03:52:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbjJUHw2 (ORCPT
+        with ESMTP id S230008AbjJUHw3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Oct 2023 03:52:28 -0400
+        Sat, 21 Oct 2023 03:52:29 -0400
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B649D67;
-        Sat, 21 Oct 2023 00:52:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EC79D70;
+        Sat, 21 Oct 2023 00:52:27 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SCDFG2Fjvz4f3mHf;
-        Sat, 21 Oct 2023 15:52:18 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SCDFJ1rXJz4f3mJR;
+        Sat, 21 Oct 2023 15:52:20 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgAXrt0ygzNl84cpDg--.7754S5;
-        Sat, 21 Oct 2023 15:52:21 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgAXrt0ygzNl84cpDg--.7754S9;
+        Sat, 21 Oct 2023 15:52:23 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     bvanassche@acm.org, hch@lst.de, kbusch@kernel.org,
         ming.lei@redhat.com, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
         yangerkun@huawei.com
-Subject: [PATCH RFC v2 1/8] blk-mq: factor out a structure from blk_mq_tags
-Date:   Sat, 21 Oct 2023 23:47:59 +0800
-Message-Id: <20231021154806.4019417-2-yukuai1@huaweicloud.com>
+Subject: [PATCH RFC v2 5/8] blk-mq: precalculate available tags for hctx_may_queue()
+Date:   Sat, 21 Oct 2023 23:48:03 +0800
+Message-Id: <20231021154806.4019417-6-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
 References: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAXrt0ygzNl84cpDg--.7754S5
-X-Coremail-Antispam: 1UD129KBjvJXoWxGF4xGF4DJr43uw1ktr43Wrg_yoW5uF4Dpa
-        yDGa17Cw1fJr1UXFWvq3yUZF1Sganxtr17Jwn3W34YyF1UCw1fZr1v9rW0vr48ZrsayFsr
-        Grs8trW8tF1UW37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUmGb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M280x2IEY4vEnII2IxkI6r1a6r45M2
-        8IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK
-        0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
-        x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
-        84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
-        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
-        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zV
-        CS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s02
-        6xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr
-        I_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v2
-        6r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj4
-        0_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8
-        JrUvcSsGvfC2KfnxnUUI43ZEXa7sRNvtAUUUUUU==
+X-CM-TRANSID: gCh0CgAXrt0ygzNl84cpDg--.7754S9
+X-Coremail-Antispam: 1UD129KBjvJXoW3JryUGw1xtr4xAF1ruw48WFg_yoWxWrWrpF
+        W5ta13K3yaqrnruFZrJ3y7uF1SgrWkKr1xGrn3J3yFywnFkr4xW3W8Gry8Zry8Ar4kAayS
+        yr4DtryUGF1UGrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUmv14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
+        0E87I2jVAFwI0_JF0E3s1l82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0
+        rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6x
+        IIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xv
+        wVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFc
+        xC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_
+        Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2
+        IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE
+        7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI
+        8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8
+        JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJV
+        WUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUv
+        cSsGvfC2KfnxnUUI43ZEXa7sRiVbyDUUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -61,108 +61,194 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Currently tags are fairly shared. The new structure contains only one
-field active_queues for now.
+Currently, hctx_mq_queue() only need to get how many queues is sharing
+tags, then calculate how many tags is available for each queue by fair
+sharing.
 
-There are no functional changes and this patch prepares for refactoring
-tag sharing.
+Add a new field 'available_tags' for struct shared_tag_info to store
+how many tags is available directly from slow path, so that
+hctx_mq_queue() doesn't need to do calculation.
+
+Currently tags are still fair shared, and now that calculation is in the
+slow path, it's okay to refactor tag sharing with more complicated
+algorithm, which is implemented in following patches.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-mq-debugfs.c |  2 +-
- block/blk-mq-tag.c     |  8 ++++----
- block/blk-mq.h         |  2 +-
- include/linux/blk-mq.h | 10 ++++++++--
- 4 files changed, 14 insertions(+), 8 deletions(-)
+ block/blk-mq-debugfs.c |  3 ++-
+ block/blk-mq-tag.c     | 35 ++++++++++++++++++++++++++++++++++-
+ block/blk-mq.c         |  4 ++--
+ block/blk-mq.h         | 19 ++++++++-----------
+ include/linux/blkdev.h |  1 +
+ 5 files changed, 47 insertions(+), 15 deletions(-)
 
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 5cbeb9344f2f..f6b77289bc1f 100644
+index d6ebd8d9d3bb..1d460119f5b3 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -400,7 +400,7 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
- 	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
- 	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
- 	seq_printf(m, "active_queues=%d\n",
--		   READ_ONCE(tags->active_queues));
-+		   READ_ONCE(tags->ctl.active_queues));
+@@ -158,7 +158,8 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
+ static void shared_tag_info_show(struct shared_tag_info *info,
+ 				 struct seq_file *m)
+ {
+-	seq_printf(m, "%d\n", atomic_read(&info->active_tags));
++	seq_printf(m, "active tags %d\n", atomic_read(&info->active_tags));
++	seq_printf(m, "available tags %u\n", READ_ONCE(info->available_tags));
+ }
  
- 	seq_puts(m, "\nbitmap_tags:\n");
- 	sbitmap_queue_show(&tags->bitmap_tags, m);
+ static int queue_shared_tag_info_show(void *data, struct seq_file *m)
 diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index cc57e2dd9a0b..fe41a0d34fc0 100644
+index 07d9b513990b..261769251282 100644
 --- a/block/blk-mq-tag.c
 +++ b/block/blk-mq-tag.c
-@@ -57,8 +57,8 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- 	}
+@@ -14,6 +14,8 @@
+ #include "blk-mq.h"
+ #include "blk-mq-sched.h"
  
- 	spin_lock_irq(&tags->lock);
--	users = tags->active_queues + 1;
--	WRITE_ONCE(tags->active_queues, users);
-+	users = tags->ctl.active_queues + 1;
-+	WRITE_ONCE(tags->ctl.active_queues, users);
- 	blk_mq_update_wake_batch(tags, users);
- 	spin_unlock_irq(&tags->lock);
- }
-@@ -94,8 +94,8 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 	}
- 
- 	spin_lock_irq(&tags->lock);
--	users = tags->active_queues - 1;
--	WRITE_ONCE(tags->active_queues, users);
-+	users = tags->ctl.active_queues - 1;
-+	WRITE_ONCE(tags->ctl.active_queues, users);
- 	blk_mq_update_wake_batch(tags, users);
- 	spin_unlock_irq(&tags->lock);
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index f75a9ecfebde..363c8f6e13dd 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -435,7 +435,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
- 			return true;
- 	}
- 
--	users = READ_ONCE(hctx->tags->active_queues);
-+	users = READ_ONCE(hctx->tags->ctl.active_queues);
- 	if (!users)
- 		return true;
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 1ab3081c82ed..5a08527c53b9 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -727,13 +727,16 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 		blk_opf_t opf, blk_mq_req_flags_t flags,
- 		unsigned int hctx_idx);
- 
-+struct tag_sharing_ctl {
-+	unsigned int active_queues;
-+};
++#define shared_tags(tags, users) max((tags->nr_tags + users - 1) / users, 4U)
 +
  /*
-  * Tag address space map.
+  * Recalculate wakeup batch when tag is shared by hctx.
   */
- struct blk_mq_tags {
- 	unsigned int nr_tags;
- 	unsigned int nr_reserved_tags;
--	unsigned int active_queues;
+@@ -29,10 +31,39 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+ 			users);
+ }
  
- 	struct sbitmap_queue bitmap_tags;
- 	struct sbitmap_queue breserved_tags;
-@@ -744,9 +747,12 @@ struct blk_mq_tags {
- 
- 	/*
- 	 * used to clear request reference in rqs[] before freeing one
--	 * request pool
-+	 * request pool, and to protect tag_sharing_ctl.
- 	 */
- 	spinlock_t lock;
+-void blk_mq_init_shared_tag_info(struct shared_tag_info *info)
++void blk_mq_init_shared_tag_info(struct shared_tag_info *info,
++				 unsigned int nr_tags)
+ {
+ 	atomic_set(&info->active_tags, 0);
+ 	INIT_LIST_HEAD(&info->node);
++	info->available_tags = nr_tags;
++}
 +
-+	/* used when tags is shared for multiple request_queue or hctx. */
-+	struct tag_sharing_ctl ctl;
++static void blk_mq_update_available_driver_tags(struct blk_mq_tags *tags,
++						struct shared_tag_info *info,
++						unsigned int users)
++{
++	unsigned int old = tags->ctl.active_queues;
++	int nr_tags;
++	struct shared_tag_info *iter;
++
++	if (!old || !users)
++		return;
++
++	nr_tags = (int)shared_tags(tags, users);
++	if (old < users)
++		WRITE_ONCE(info->available_tags, nr_tags);
++	else
++		WRITE_ONCE(info->available_tags, tags->nr_tags);
++
++	nr_tags -= (int)shared_tags(tags, old);
++	list_for_each_entry(iter, &tags->ctl.head, node) {
++		if (iter == info)
++			continue;
++
++		WRITE_ONCE(iter->available_tags,
++			   (unsigned int)((int)iter->available_tags + nr_tags));
++	}
+ }
+ 
+ /*
+@@ -70,6 +101,7 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ 	spin_lock_irq(&tags->lock);
+ 	list_add(&info->node, &tags->ctl.head);
+ 	users = tags->ctl.active_queues + 1;
++	blk_mq_update_available_driver_tags(tags, info, users);
+ 	WRITE_ONCE(tags->ctl.active_queues, users);
+ 	blk_mq_update_wake_batch(tags, users);
+ 	spin_unlock_irq(&tags->lock);
+@@ -121,6 +153,7 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ 
+ 	list_del_init(&info->node);
+ 	users = tags->ctl.active_queues - 1;
++	blk_mq_update_available_driver_tags(tags, info, users);
+ 	WRITE_ONCE(tags->ctl.active_queues, users);
+ 	blk_mq_update_wake_batch(tags, users);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index de5859dd9f52..8775616bc85c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3652,7 +3652,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	if (xa_insert(&q->hctx_table, hctx_idx, hctx, GFP_KERNEL))
+ 		goto exit_flush_rq;
+ 
+-	blk_mq_init_shared_tag_info(&hctx->shared_tag_info);
++	blk_mq_init_shared_tag_info(&hctx->shared_tag_info, set->queue_depth);
+ 	return 0;
+ 
+  exit_flush_rq:
+@@ -4227,7 +4227,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	if (blk_mq_alloc_ctxs(q))
+ 		goto err_exit;
+ 
+-	blk_mq_init_shared_tag_info(&q->shared_tag_info);
++	blk_mq_init_shared_tag_info(&q->shared_tag_info, set->queue_depth);
+ 	/* init q->mq_kobj and sw queues' kobjects */
+ 	blk_mq_sysfs_init(q);
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index ac58f2e22f20..5c0d19562848 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -63,7 +63,8 @@ struct blk_mq_tags *blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+ void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
+ 			     struct blk_mq_tags *tags,
+ 			     unsigned int hctx_idx);
+-void blk_mq_init_shared_tag_info(struct shared_tag_info *info);
++void blk_mq_init_shared_tag_info(struct shared_tag_info *info,
++				 unsigned int nr_tags);
+ 
+ /*
+  * CPU -> queue mappings
+@@ -416,7 +417,7 @@ static inline void blk_mq_free_requests(struct list_head *list)
+ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 				  struct sbitmap_queue *bt)
+ {
+-	unsigned int depth, users;
++	struct shared_tag_info *info;
+ 
+ 	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+ 		return true;
+@@ -432,20 +433,16 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 
+ 		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+ 			return true;
++
++		info = &q->shared_tag_info;
+ 	} else {
+ 		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 			return true;
+-	}
+ 
+-	users = READ_ONCE(hctx->tags->ctl.active_queues);
+-	if (!users)
+-		return true;
++		info = &hctx->shared_tag_info;
++	}
+ 
+-	/*
+-	 * Allow at least some tags
+-	 */
+-	depth = max((bt->sb.depth + users - 1) / users, 4U);
+-	return __blk_mq_active_requests(hctx) < depth;
++	return atomic_read(&info->active_tags) < READ_ONCE(info->available_tags);
+ }
+ 
+ /* run the code block in @dispatch_ops with rcu/srcu read lock held */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f97bc2c7acc9..b364d65fe4e5 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -377,6 +377,7 @@ struct blk_independent_access_ranges {
+ 
+ struct shared_tag_info {
+ 	atomic_t		active_tags;
++	unsigned int		available_tags;
+ 	struct list_head	node;
  };
  
- static inline struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags,
 -- 
 2.39.2
 
