@@ -2,54 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A92C001E0
-	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 07:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44185C25B41
+	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 07:52:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229623AbjJUHw2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Oct 2023 03:52:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33128 "EHLO
+        id S229472AbjJUHwa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Oct 2023 03:52:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbjJUHw1 (ORCPT
+        with ESMTP id S229686AbjJUHw2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Oct 2023 03:52:27 -0400
+        Sat, 21 Oct 2023 03:52:28 -0400
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D31D66;
-        Sat, 21 Oct 2023 00:52:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E87D68;
+        Sat, 21 Oct 2023 00:52:26 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SCDFF5wBtz4f3mHR;
-        Sat, 21 Oct 2023 15:52:17 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgAXrt0ygzNl84cpDg--.7754S4;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SCDFJ43yFz4f3kpG;
         Sat, 21 Oct 2023 15:52:20 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgAXrt0ygzNl84cpDg--.7754S7;
+        Sat, 21 Oct 2023 15:52:22 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     bvanassche@acm.org, hch@lst.de, kbusch@kernel.org,
         ming.lei@redhat.com, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
         yangerkun@huawei.com
-Subject: [PATCH RFC v2 0/8] blk-mq: improve tag fair sharing
-Date:   Sat, 21 Oct 2023 23:47:58 +0800
-Message-Id: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
+Subject: [PATCH RFC v2 3/8] blk-mq: add a helper to initialize shared_tag_info
+Date:   Sat, 21 Oct 2023 23:48:01 +0800
+Message-Id: <20231021154806.4019417-4-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
+References: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAXrt0ygzNl84cpDg--.7754S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aryxur4rAw48ArWktF48Crg_yoW8tFy8pF
-        W3Ka1fGw4xtrW2qr43Z3y0qa4Fqw4kCF45Krn3X345Ar1Ykrs2q3Wvqr4rZFyxJrs3AFsr
-        XF4jyr98CFWUJ37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9q14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
-        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
-        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r
-        1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAq
-        YI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4I
-        kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-        WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-        0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWr
-        Jr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r
-        4UJbIYCTnIWIevJa73UjIFyTuYvjTRNgAwUUUUU
+X-CM-TRANSID: gCh0CgAXrt0ygzNl84cpDg--.7754S7
+X-Coremail-Antispam: 1UD129KBjvJXoWxWF45Kw1kGFyDJFyxWr4DArb_yoW5CFW5pF
+        W5ta15C3ySqrnruFW8ta13Xw15Kw4kKr17GwsIgrWYv342kr1xuF48XryUZrW0yrs3AFZ3
+        uF4ktry8JF1kG37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUmI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
+        0E87I2jVAFwI0_JrWl82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2
+        F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjx
+        v20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2
+        z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0V
+        AKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1l
+        Ox8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErc
+        IFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+        bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
+        AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI
+        42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMI
+        IF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnI
+        WIevJa73UjIFyTuYvjTRNzVbUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -58,74 +61,92 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Current implementation:
- - a counter active_queues record how many queue/hctx is sharing tags,
- and it's updated while issue new IO, and cleared in
- blk_mq_timeout_work().
- - if active_queues is more than 1, then tags is fair shared to each
- node;
+shared_tag_info is used for both request_queue and hctx, and follow up
+patches will add more fields into the structure, add a helper to avoid
+redundant code.
 
-New implementation:
- - a new field 'available_tags' is added to each node, and it's
- calculate in slow path, hence fast path won't be affected, patch 5;
- - a new counter 'busy_queues' is added to blk_mq_tags, and it's updated
- while fail to get driver tag, and it's also cleared in
- blk_mq_timeout_work(), and tag sharing will based on 'busy_queues'
- instead of 'active_queues', patch 6,7;
- - a new counter 'busy_count' is added to each node to record how many
- times a node failed to get driver tag, and it's used to judge if a node
- is busy and need more tags, patch 8;
- - a new timer is added to blk_mq_tags, it will start if any node failed
- to get driver tag, and timer function will be used to borrow tags and
- return borrowed tags, patch 8;
+Also move initialization for request_queue from blk_alloc_queue() to
+blk_mq_init_allocated_queue(), because shared_tag_info won't be used for
+bio-based device. And move initialization for hctx from
+blk_mq_alloc_hctx() to blk_mq_init_hctx(), because hctx can be reused.
 
-A simple test, 32 tags with two shared node:
-[global]
-ioengine=libaio
-iodepth=2
-bs=4k
-direct=1
-rw=randrw
-group_reporting
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-core.c   | 2 --
+ block/blk-mq-tag.c | 5 +++++
+ block/blk-mq.c     | 3 ++-
+ block/blk-mq.h     | 1 +
+ 4 files changed, 8 insertions(+), 3 deletions(-)
 
-[sda]
-numjobs=32
-filename=/dev/sda
-
-[sdb]
-numjobs=1
-filename=/dev/sdb
-
-Test result(monitor new debugfs entry):
-
-time    active          available
-        sda     sdb     sda     sdb
-0       0       0       32      32
-1       16      2       16      16      -> start fair sharing
-2       19      2       20      16
-3       24      2       24      16
-4       26      2       28      16      -> borrow 32/8=4 tags each round
-5       28      2       28      16      -> save at lease 4 tags for sdb
-
-Yu Kuai (8):
-  blk-mq: factor out a structure from blk_mq_tags
-  blk-mq: factor out a structure to store information for tag sharing
-  blk-mq: add a helper to initialize shared_tag_info
-  blk-mq: support to track active queues from blk_mq_tags
-  blk-mq: precalculate available tags for hctx_may_queue()
-  blk-mq: add new helpers blk_mq_driver_tag_busy/idle()
-  blk-mq-tag: delay tag sharing until fail to get driver tag
-  blk-mq-tag: allow shared queue/hctx to get more driver tags
-
- block/blk-core.c       |   2 -
- block/blk-mq-debugfs.c |  30 +++++-
- block/blk-mq-tag.c     | 226 +++++++++++++++++++++++++++++++++++++++--
- block/blk-mq.c         |  12 ++-
- block/blk-mq.h         |  64 +++++++-----
- include/linux/blk-mq.h |  36 +++++--
- include/linux/blkdev.h |  11 +-
- 7 files changed, 328 insertions(+), 53 deletions(-)
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index c028b047f5d5..756ca1109f6c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -414,8 +414,6 @@ struct request_queue *blk_alloc_queue(int node_id)
+ 
+ 	q->node = node_id;
+ 
+-	atomic_set(&q->shared_tag_info.active_tags, 0);
+-
+ 	timer_setup(&q->timeout, blk_rq_timed_out_timer, 0);
+ 	INIT_WORK(&q->timeout_work, blk_timeout_work);
+ 	INIT_LIST_HEAD(&q->icq_list);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index fe41a0d34fc0..2f91a7605d7a 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -29,6 +29,11 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+ 			users);
+ }
+ 
++void blk_mq_init_shared_tag_info(struct shared_tag_info *info)
++{
++	atomic_set(&info->active_tags, 0);
++}
++
+ /*
+  * If a previously inactive queue goes active, bump the active user count.
+  * We need to do this before try to allocate driver tag, then even if fail
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d85b9ad816d0..de5859dd9f52 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3652,6 +3652,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	if (xa_insert(&q->hctx_table, hctx_idx, hctx, GFP_KERNEL))
+ 		goto exit_flush_rq;
+ 
++	blk_mq_init_shared_tag_info(&hctx->shared_tag_info);
+ 	return 0;
+ 
+  exit_flush_rq:
+@@ -3679,7 +3680,6 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
+ 	if (!zalloc_cpumask_var_node(&hctx->cpumask, gfp, node))
+ 		goto free_hctx;
+ 
+-	atomic_set(&hctx->shared_tag_info.active_tags, 0);
+ 	if (node == NUMA_NO_NODE)
+ 		node = set->numa_node;
+ 	hctx->numa_node = node;
+@@ -4227,6 +4227,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	if (blk_mq_alloc_ctxs(q))
+ 		goto err_exit;
+ 
++	blk_mq_init_shared_tag_info(&q->shared_tag_info);
+ 	/* init q->mq_kobj and sw queues' kobjects */
+ 	blk_mq_sysfs_init(q);
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 6f332dc122ff..ac58f2e22f20 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -63,6 +63,7 @@ struct blk_mq_tags *blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+ void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
+ 			     struct blk_mq_tags *tags,
+ 			     unsigned int hctx_idx);
++void blk_mq_init_shared_tag_info(struct shared_tag_info *info);
+ 
+ /*
+  * CPU -> queue mappings
 -- 
 2.39.2
 
