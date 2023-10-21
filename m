@@ -2,272 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4ED8C004C0
-	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 04:14:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A66CC004C0
+	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 05:08:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbjJUEO5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Oct 2023 00:14:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40304 "EHLO
+        id S229500AbjJUFIx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Oct 2023 01:08:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjJUEO4 (ORCPT
+        with ESMTP id S229472AbjJUFIw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Oct 2023 00:14:56 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 699D2C1;
-        Fri, 20 Oct 2023 21:14:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697861691; x=1729397691;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yGJG+6qAzzVRzGGWJgcbiHpYkynrB6R5ZiQ88Hw8RPc=;
-  b=G9N20z3S5qbFgUMmDlo3BBfDLDOu4oqV+gNnUP2dnvIoFieCNR8XozSb
-   EBpRxo9LbnRPx4VmWxnqIwTgLNoUn2ft9Ojye3m7hVPxMmRIWAb+ANY9f
-   fhShuA+Rvi6X2doHqtj5kh2NNxTrVulEg7vZkztlaIDNyRJzDlzJle3Mj
-   3JQuvfBfFEFqermz0Ch+Tf8otH0ucq87XB4suXFA0HTyt0QrgFQu6u7g0
-   jWckpdtqObWLyVRHmyZn69LqSiACTgWTu7rFpJQTJRPR5DygQ1ZD6dXhq
-   YcaBUdVCiRWA67Ar3HUqFxq9wTWGcWzGFD9ot+dM9Bio9emHEz8dkUTYS
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="385499906"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="385499906"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 21:14:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="823453372"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="823453372"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 20 Oct 2023 21:14:48 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qu3Nt-0004Ov-2D;
-        Sat, 21 Oct 2023 04:14:45 +0000
-Date:   Sat, 21 Oct 2023 12:13:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        axboe@kernel.dk, hch@lst.de, joshi.k@samsung.com,
-        martin.petersen@oracle.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 1/4] block: bio-integrity: add support for user buffers
-Message-ID: <202310211209.gA0mAZaz-lkp@intel.com>
-References: <20231018151843.3542335-2-kbusch@meta.com>
+        Sat, 21 Oct 2023 01:08:52 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED231BF;
+        Fri, 20 Oct 2023 22:08:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=z8f9uaKwD9ppL0C1CqjKBJdH1gJN+2UHJiY2wGmwdxA=; b=Vy9fRtEKCTjI8FDUW5pt/h3hbe
+        NhaaVm6bQmr6DXy+p81klmEehmrI35qJ7hxpaIt5/jEHYZ6b1pXPBZ/bsp2h6VvyVr861ZOV3ePas
+        B1zk1Ho42Kue7H7KhuAkoNKrHZcQXTOrmpa0z+9hLsu2LaDUYmwMqBGWItieLEvVKLJ7DOj+yvx78
+        LiPoXYyuw83dGgyxDZXnMGQW4Aj0Y1hT2KflGs7MPM4RXDAkoIboGQ2G81yttk3KhIQF+4iMe3Dp3
+        BE/mmXWZyoOeRHiCuUnTjmxg9Tx+Tj7uf0+uvW80odS6yZ+dZ86ylW83eWDM+bjAtQXhM+u9UUxpH
+        K9utjqJg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qu4E1-00HIF4-NU; Sat, 21 Oct 2023 05:08:37 +0000
+Date:   Sat, 21 Oct 2023 06:08:37 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 04/18] fs/buffer.c: use accessor function to translate
+ page index to sectors
+Message-ID: <ZTNc1SIMOkU+CCvX@casper.infradead.org>
+References: <20230918110510.66470-1-hare@suse.de>
+ <20230918110510.66470-5-hare@suse.de>
+ <ZTLW9jOJ0Crt/ZD3@casper.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231018151843.3542335-2-kbusch@meta.com>
+In-Reply-To: <ZTLW9jOJ0Crt/ZD3@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Keith,
+On Fri, Oct 20, 2023 at 08:37:26PM +0100, Matthew Wilcox wrote:
+> On Mon, Sep 18, 2023 at 01:04:56PM +0200, Hannes Reinecke wrote:
+> > Use accessor functions block_index_to_sector() and block_sector_to_index()
+> > to translate the page index into the block sector and vice versa.
+> 
+> You missed two in grow_dev_page() (which I just happened upon):
 
-kernel test robot noticed the following build errors:
+I have fixes here.  The key part of the first patch is:
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.6-rc6 next-20231020]
-[cannot apply to axboe-block/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+ static sector_t folio_init_buffers(struct folio *folio,
+-               struct block_device *bdev, sector_t block, int size)
++               struct block_device *bdev, int size)
+ {
+        struct buffer_head *head = folio_buffers(folio);
+        struct buffer_head *bh = head;
+        bool uptodate = folio_test_uptodate(folio);
++       sector_t block = folio_pos(folio) / size;
+        sector_t end_block = blkdev_max_block(bdev, size);
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/block-bio-integrity-add-support-for-user-buffers/20231018-232704
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20231018151843.3542335-2-kbusch%40meta.com
-patch subject: [PATCH 1/4] block: bio-integrity: add support for user buffers
-config: um-allnoconfig (https://download.01.org/0day-ci/archive/20231021/202310211209.gA0mAZaz-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231021/202310211209.gA0mAZaz-lkp@intel.com/reproduce)
+(and then there's the cruft of removing the arguments from
+folio_init_buffers)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310211209.gA0mAZaz-lkp@intel.com/
+The second patch is:
 
-All errors (new ones prefixed by >>):
+ static bool grow_buffers(struct block_device *bdev, sector_t block,
+                unsigned size, gfp_t gfp)
+ {
+-       pgoff_t index;
+-       int sizebits;
+-
+-       sizebits = PAGE_SHIFT - __ffs(size);
+-       index = block >> sizebits;
++       loff_t pos;
+[...]
+-       if (unlikely(index != block >> sizebits)) {
++       if (check_mul_overflow(block, size, &pos) || pos > MAX_LFS_FILESIZE) {
 
-   In file included from init/main.c:21:
-   In file included from include/linux/syscalls.h:90:
-   In file included from include/trace/syscall.h:7:
-   In file included from include/linux/trace_events.h:9:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from init/main.c:21:
-   In file included from include/linux/syscalls.h:90:
-   In file included from include/trace/syscall.h:7:
-   In file included from include/linux/trace_events.h:9:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from init/main.c:21:
-   In file included from include/linux/syscalls.h:90:
-   In file included from include/trace/syscall.h:7:
-   In file included from include/linux/trace_events.h:9:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   In file included from init/main.c:85:
-   In file included from include/linux/blkdev.h:17:
->> include/linux/bio.h:797:16: error: expected ';' after return statement
-     797 |         return -EINVAL
-         |                       ^
-         |                       ;
-   12 warnings and 1 error generated.
---
-   In file included from mm/swapfile.c:9:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from mm/swapfile.c:9:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from mm/swapfile.c:9:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   In file included from mm/swapfile.c:9:
-   In file included from include/linux/blkdev.h:17:
->> include/linux/bio.h:797:16: error: expected ';' after return statement
-     797 |         return -EINVAL
-         |                       ^
-         |                       ;
-   In file included from mm/swapfile.c:14:
-   include/linux/mman.h:158:9: warning: division by zero is undefined [-Wdivision-by-zero]
-     158 |                _calc_vm_trans(flags, MAP_SYNC,       VM_SYNC      ) |
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/mman.h:136:21: note: expanded from macro '_calc_vm_trans'
-     136 |    : ((x) & (bit1)) / ((bit1) / (bit2))))
-         |                     ^ ~~~~~~~~~~~~~~~~~
-   13 warnings and 1 error generated.
-
-
-vim +797 include/linux/bio.h
-
-   793	
-   794	static inline int bio_integrity_map_user(struct bio *bio, void __user *ubuf,
-   795						 unsigned int len, u32 seed, u32 maxvecs)
-   796	{
- > 797		return -EINVAL
-   798	}
-   799	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I'll send a proper patch series tomorrow once the fstests are done
+running.
