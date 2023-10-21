@@ -2,249 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63BF9C25B45
-	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 07:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D739C001E0
+	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 16:13:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231138AbjJUHwd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Oct 2023 03:52:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33198 "EHLO
+        id S231372AbjJUQNq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Oct 2023 12:13:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230200AbjJUHwb (ORCPT
+        with ESMTP id S229633AbjJUQNp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Oct 2023 03:52:31 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5F95D63;
-        Sat, 21 Oct 2023 00:52:28 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SCDFG4cKkz4f3kpQ;
-        Sat, 21 Oct 2023 15:52:18 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgAXrt0ygzNl84cpDg--.7754S11;
-        Sat, 21 Oct 2023 15:52:24 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     bvanassche@acm.org, hch@lst.de, kbusch@kernel.org,
-        ming.lei@redhat.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH RFC v2 7/8] blk-mq-tag: delay tag sharing until fail to get driver tag
-Date:   Sat, 21 Oct 2023 23:48:05 +0800
-Message-Id: <20231021154806.4019417-8-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
-References: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
+        Sat, 21 Oct 2023 12:13:45 -0400
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39A551A4
+        for <linux-block@vger.kernel.org>; Sat, 21 Oct 2023 09:13:43 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-27d8e2ac2b1so1244668a91.2
+        for <linux-block@vger.kernel.org>; Sat, 21 Oct 2023 09:13:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697904822; x=1698509622;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AWdVxYXF1zU7nc2tu2ZPDpyYNlqzpnocsCqhm3dBt9w=;
+        b=rNalInkP/wURaBDo4ptQRBkW5hBtlDsjtxmb3ZgFFESqSolTDStmjOB0aEeu5PzNi5
+         1bWFTEghA+oyW2SBG7BbDvzO4aHlYTZ5YyH9z31LP7a2vFzOzTMuSvwu5wk9cOsuspv+
+         go1AsEIdG4g8sHyubX8Ph/39l0DJDTD1iu48/CNqhBIcm5uo4ie440fiBa/jIWhSQ0gL
+         0coLzWIt5Gt+BsO56MrennAV+TOvWdBoP73LuOhEhy5+HYCFCohLSuwJohuES86p5dEl
+         s0sLq3QM2Sg/+drLjF+MfVSkcKasd1BSxmDpOr5QOaI/4uy3xhdUppTWTQyCpvRd0+wH
+         +Fhg==
+X-Gm-Message-State: AOJu0YyxNP8sEe89QEe5DONh3uSQiOeNL6rDdF7mb/o0lhaqQzfhCzaH
+        W38rF2C+0LkF9mOtr9BevJU=
+X-Google-Smtp-Source: AGHT+IHKWpSipMoeKyOJy1VJOHlJi8Y38MUTykX+3yLfexKNIudi23r2ERIMsNF17fccnZErwlheIA==
+X-Received: by 2002:a17:90b:2d8d:b0:27d:4ab9:fccb with SMTP id sj13-20020a17090b2d8d00b0027d4ab9fccbmr4426810pjb.5.1697904822520;
+        Sat, 21 Oct 2023 09:13:42 -0700 (PDT)
+Received: from [192.168.197.167] (236.sub-174-194-192.myvzw.com. [174.194.192.236])
+        by smtp.gmail.com with ESMTPSA id iw22-20020a170903045600b001bc930d4517sm3371117plb.42.2023.10.21.09.13.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Oct 2023 09:13:41 -0700 (PDT)
+Message-ID: <c768b829-8c86-4574-a1ec-fcc0bf60e270@acm.org>
+Date:   Sat, 21 Oct 2023 09:13:38 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAXrt0ygzNl84cpDg--.7754S11
-X-Coremail-Antispam: 1UD129KBjvJXoW3ArWrJrWfZw1kXFWrWF17Jrb_yoWxJFW5pF
-        W3Ka1ak3yrXrsrWFWUKrZF93WI9rs7Kr4UGFnaqa45Zw1Y9r4rur40kr9Yvr48JFWkAw4a
-        yrW5trW0yF4DJrUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUmv14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
-        0E87I2jVAFwI0_JF0E3s1l82xGYIkIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0
-        rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6x
-        IIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xv
-        wVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFc
-        xC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_
-        Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2
-        IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE
-        7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI
-        8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8
-        JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJV
-        WUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUv
-        cSsGvfC2KfnxnUUI43ZEXa7sRiVbyDUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Improve shared tag set performance
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Yu Kuai <yukuai1@huaweicloud.com>,
+        Ed Tsai <ed.tsai@mediatek.com>
+References: <20231018180056.2151711-1-bvanassche@acm.org>
+ <20231020044159.GB11984@lst.de>
+ <0d2dce2a-8e01-45d6-b61b-f76493d55863@acm.org> <ZTKqAzSPNcBp4db0@kbusch-mbp>
+ <f2728de6-ff3c-4693-b51f-58c3d46d0fbf@acm.org> <ZTK0NcqB4lIQ_zHQ@kbusch-mbp>
+ <dbdc6dbe-5e2a-4414-bea6-1d2160ffdfdd@acm.org> <ZTMp3zwaKKQPKmqS@fedora>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ZTMp3zwaKKQPKmqS@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On 10/20/23 18:31, Ming Lei wrote:
+> If two LUNs are attached to same host, one is slow, and another is fast,
+> and the slow LUN can slow down the fast LUN easily without this fairness
+> algorithm.
+> 
+> Your motivation is that "One of these logical units (WLUN) is used
+> to submit control commands, e.g. START STOP UNIT. If any request is
+> submitted to the WLUN, the queue depth is reduced from 31 to 15 or
+> lower for data LUNs." I guess one simple fix is to not account queues
+> of this non-IO LUN as active queues?
 
-Before this patch, tags will be shared when shared node start to handle
-IO, however, this will waste tags if some node doen't need all the fair
-shared tags and such tags can't be used for other node, even if other
-node might want more than fair shared tags.
+Hi Ming,
 
-Prevent such problem by delaying tag sharing from issue io until fail
-to get driver tag. Note that such problem still exist if all the tags
-are exhausted, and the next patch will implement a algorithm to allow
-busy node to borrow tags from idle node.
+For fast storage devices (e.g. UFS) any time spent in an algorithm for
+fair sharing will reduce IOPS. If there are big differences in the
+request processing latency between different request queues then fair
+sharing is beneficial. Whether or not the fair sharing algorithm is
+improved, how about making it easy to disable fair sharing, e.g. with
+something like the untested patch below? I think that will work better
+than ignoring fair sharing per LUN. UFS devices support multiple logical
+units and with the current fair sharing approach it takes long until
+tags are taken away from an inactive LUN (request queue timeout).
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-mq-tag.c | 67 ++++++++++++++++++++++++++--------------------
- 1 file changed, 38 insertions(+), 29 deletions(-)
+Thanks,
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index cd13d8e512f7..a98b25c8d594 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -43,7 +43,7 @@ static void blk_mq_update_available_driver_tags(struct blk_mq_tags *tags,
- 						struct shared_tag_info *info,
- 						unsigned int users)
- {
--	unsigned int old = tags->ctl.active_queues;
-+	unsigned int old = tags->ctl.busy_queues;
- 	int nr_tags;
- 	struct shared_tag_info *iter;
- 
-@@ -74,9 +74,7 @@ static void blk_mq_update_available_driver_tags(struct blk_mq_tags *tags,
-  */
- void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
--	unsigned int users;
- 	struct blk_mq_tags *tags = hctx->tags;
--	struct shared_tag_info *info;
- 
- 	/*
- 	 * calling test_bit() prior to test_and_set_bit() is intentional,
-@@ -88,22 +86,14 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- 		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
- 		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
- 			return;
--
--		info = &q->shared_tag_info;
- 	} else {
- 		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
- 		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
- 			return;
--
--		info = &hctx->shared_tag_info;
- 	}
- 
- 	spin_lock_irq(&tags->lock);
--	list_add(&info->node, &tags->ctl.head);
--	users = tags->ctl.active_queues + 1;
--	blk_mq_update_available_driver_tags(tags, info, users);
--	WRITE_ONCE(tags->ctl.active_queues, users);
--	blk_mq_update_wake_batch(tags, users);
-+	WRITE_ONCE(tags->ctl.active_queues, tags->ctl.active_queues + 1);
- 	spin_unlock_irq(&tags->lock);
- }
- 
-@@ -123,9 +113,7 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
-  */
- void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- {
--	unsigned int users;
- 	struct blk_mq_tags *tags = hctx->tags;
--	struct shared_tag_info *info;
- 
- 	if (blk_mq_is_shared_tags(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
-@@ -137,8 +125,6 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 			spin_unlock_irq(&tags->lock);
- 			return;
- 		}
--
--		info = &q->shared_tag_info;
- 	} else {
- 		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
- 			return;
-@@ -147,28 +133,21 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 			spin_unlock_irq(&tags->lock);
- 			return;
- 		}
--
--		info = &hctx->shared_tag_info;
- 	}
- 
--	list_del_init(&info->node);
--	users = tags->ctl.active_queues - 1;
--	blk_mq_update_available_driver_tags(tags, info, users);
--	WRITE_ONCE(tags->ctl.active_queues, users);
--	blk_mq_update_wake_batch(tags, users);
--
-+	WRITE_ONCE(tags->ctl.active_queues, tags->ctl.active_queues - 1);
- 	if (blk_mq_is_shared_tags(hctx->flags))
- 		clear_bit(QUEUE_FLAG_HCTX_ACTIVE, &hctx->queue->queue_flags);
- 	else
- 		clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state);
- 	spin_unlock_irq(&tags->lock);
--	blk_mq_tag_wakeup_all(tags, false);
- }
- 
- void __blk_mq_driver_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
- 	unsigned int users;
- 	struct blk_mq_tags *tags = hctx->tags;
-+	struct shared_tag_info *info;
- 
- 	if (blk_mq_is_shared_tags(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
-@@ -176,14 +155,21 @@ void __blk_mq_driver_tag_busy(struct blk_mq_hw_ctx *hctx)
- 		if (test_bit(QUEUE_FLAG_HCTX_BUSY, &q->queue_flags) ||
- 		    test_and_set_bit(QUEUE_FLAG_HCTX_BUSY, &q->queue_flags))
- 			return;
-+
-+		info = &q->shared_tag_info;
- 	} else {
- 		if (test_bit(BLK_MQ_S_DTAG_BUSY, &hctx->state) ||
- 		    test_and_set_bit(BLK_MQ_S_DTAG_BUSY, &hctx->state))
- 			return;
-+
-+		info = &hctx->shared_tag_info;
- 	}
- 
- 	spin_lock_irq(&tags->lock);
-+	list_add(&info->node, &tags->ctl.head);
- 	users = tags->ctl.busy_queues + 1;
-+	blk_mq_update_available_driver_tags(tags, info, users);
-+	blk_mq_update_wake_batch(tags, users);
- 	WRITE_ONCE(tags->ctl.busy_queues, users);
- 	spin_unlock_irq(&tags->lock);
- }
-@@ -192,22 +178,45 @@ void __blk_mq_driver_tag_idle(struct blk_mq_hw_ctx *hctx)
- {
- 	unsigned int users;
- 	struct blk_mq_tags *tags = hctx->tags;
-+	struct shared_tag_info *info;
- 
- 	if (blk_mq_is_shared_tags(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
- 
--		if (!test_and_clear_bit(QUEUE_FLAG_HCTX_BUSY,
--					&q->queue_flags))
-+		if (!test_bit(QUEUE_FLAG_HCTX_BUSY, &q->queue_flags))
- 			return;
-+
-+		spin_lock_irq(&tags->lock);
-+		if (!test_bit(QUEUE_FLAG_HCTX_BUSY, &q->queue_flags)) {
-+			spin_unlock_irq(&tags->lock);
-+			return;
-+		}
-+		info = &q->shared_tag_info;
- 	} else {
--		if (!test_and_clear_bit(BLK_MQ_S_DTAG_BUSY, &hctx->state))
-+		if (!test_bit(BLK_MQ_S_DTAG_BUSY, &hctx->state))
- 			return;
-+
-+		spin_lock_irq(&tags->lock);
-+		if (!test_bit(BLK_MQ_S_DTAG_BUSY, &hctx->state)) {
-+			spin_unlock_irq(&tags->lock);
-+			return;
-+		}
-+		info = &hctx->shared_tag_info;
- 	}
- 
--	spin_lock_irq(&tags->lock);
-+	list_del_init(&info->node);
- 	users = tags->ctl.busy_queues - 1;
-+	blk_mq_update_available_driver_tags(tags, info, users);
-+	blk_mq_update_wake_batch(tags, users);
- 	WRITE_ONCE(tags->ctl.busy_queues, users);
-+
-+	if (blk_mq_is_shared_tags(hctx->flags))
-+		clear_bit(QUEUE_FLAG_HCTX_BUSY, &hctx->queue->queue_flags);
-+	else
-+		clear_bit(BLK_MQ_S_DTAG_BUSY, &hctx->state);
-+
- 	spin_unlock_irq(&tags->lock);
-+	blk_mq_tag_wakeup_all(tags, false);
- }
- 
- static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
--- 
-2.39.2
+Bart.
+
+
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index f75a9ecfebde..b06b161d06de 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -416,7 +416,8 @@ static inline bool hctx_may_queue(struct 
+blk_mq_hw_ctx *hctx,
+  {
+  	unsigned int depth, users;
+
+-	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
++	if (!hctx || !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) ||
++	    hctx->queue->disable_fair_sharing)
+  		return true;
+
+  	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index eef450f25982..63b04cf65887 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -523,6 +523,7 @@ struct request_queue {
+  	struct mutex		debugfs_mutex;
+
+  	bool			mq_sysfs_init_done;
++	bool			disable_fair_sharing;
+  };
+
+  /* Keep blk_queue_flag_name[] in sync with the definitions below */
 
