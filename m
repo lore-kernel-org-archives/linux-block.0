@@ -2,142 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E4BCDB474
-	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 01:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72305C004C0
+	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 03:53:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbjJUBcZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Oct 2023 21:32:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47436 "EHLO
+        id S229588AbjJUDx4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Oct 2023 23:53:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjJUBcZ (ORCPT
+        with ESMTP id S229500AbjJUDxz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Oct 2023 21:32:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1AB5D6A
-        for <linux-block@vger.kernel.org>; Fri, 20 Oct 2023 18:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697851891;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JLVu9mgjvRz557D9Uh4mFZu/4k8hdbSG3nb+8fCv+bI=;
-        b=QSsiBcqWtGeSurXBSAYB4wjExv/QqbuEEKS+BlbwQDeb9mI4E/yrJj0CABMTU9Qh0GOMch
-        3WP32uOLgxbmTctjcMDEffPeOEc4i44uDFNVrCy+0h2sdgoc5ps5kqTcHq3D0fmV/YC4KF
-        2XqshQBky24ge4sPJPvFySkEgln3724=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-658-ZnaX_knBN0-nT7eoVKQHtQ-1; Fri, 20 Oct 2023 21:31:22 -0400
-X-MC-Unique: ZnaX_knBN0-nT7eoVKQHtQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 397DB38116F5;
-        Sat, 21 Oct 2023 01:31:22 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC8FF40C6F7B;
-        Sat, 21 Oct 2023 01:31:16 +0000 (UTC)
-Date:   Sat, 21 Oct 2023 09:31:11 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        Ed Tsai <ed.tsai@mediatek.com>
-Subject: Re: [PATCH] block: Improve shared tag set performance
-Message-ID: <ZTMp3zwaKKQPKmqS@fedora>
-References: <20231018180056.2151711-1-bvanassche@acm.org>
- <20231020044159.GB11984@lst.de>
- <0d2dce2a-8e01-45d6-b61b-f76493d55863@acm.org>
- <ZTKqAzSPNcBp4db0@kbusch-mbp>
- <f2728de6-ff3c-4693-b51f-58c3d46d0fbf@acm.org>
- <ZTK0NcqB4lIQ_zHQ@kbusch-mbp>
- <dbdc6dbe-5e2a-4414-bea6-1d2160ffdfdd@acm.org>
+        Fri, 20 Oct 2023 23:53:55 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF552D71;
+        Fri, 20 Oct 2023 20:53:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697860429; x=1729396429;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KSNO7vOH2xYOL/+j22XGMf283vnlJoT1CRb7A5owLFQ=;
+  b=g4N7ttHdXeJzMTO2I0rqfYK/WksxOBq5PF4/KIEjvIo4JnZweZXGYUiA
+   4XJMPGpFIYqe2YgXyVnqwbkQ9BkWF4tbb4jqETN4v8tD+RGzpuHg6fUob
+   szkeiAXsH885xp/t0P4GVhi7lhvS+jCdU7tixSURCEOwDlAjfgr4lfb0P
+   T/27u9vRpR4AJsZsNjKC/iuhWzJSnB+oAZu8rcAc8P0x3vRiXrC9pxo3k
+   Lu1cMGZNwF4eNUDXbyNDO1NGUY+gAEnaamxUOt9hC4ALpbdP63oLnKhgf
+   /8A5bxAMmdCZ/RROYGdQAnhQAhAICDDZEviirpsLNtTYwQpAfqQ58lMMH
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="366836728"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="366836728"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 20:53:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="823451798"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="823451798"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 20 Oct 2023 20:53:47 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qu33Y-0004Na-2Z;
+        Sat, 21 Oct 2023 03:53:44 +0000
+Date:   Sat, 21 Oct 2023 11:53:01 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, axboe@kernel.dk, hch@lst.de,
+        joshi.k@samsung.com, martin.petersen@oracle.com,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 1/4] block: bio-integrity: add support for user buffers
+Message-ID: <202310211117.qmDPOVfI-lkp@intel.com>
+References: <20231018151843.3542335-2-kbusch@meta.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dbdc6dbe-5e2a-4414-bea6-1d2160ffdfdd@acm.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+In-Reply-To: <20231018151843.3542335-2-kbusch@meta.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 20, 2023 at 10:54:59AM -0700, Bart Van Assche wrote:
-> 
-> On 10/20/23 10:09, Keith Busch wrote:
-> > On Fri, Oct 20, 2023 at 09:45:53AM -0700, Bart Van Assche wrote:
-> > > 
-> > > On 10/20/23 09:25, Keith Busch wrote:
-> > > > The legacy block request layer didn't have a tag resource shared among
-> > > > multiple request queues. Each queue had their own mempool for allocating
-> > > > requests. The mempool, I think, would always guarantee everyone could
-> > > > get at least one request.
-> > > 
-> > > I think that the above is irrelevant in this context. As an example, SCSI
-> > > devices have always shared a pool of tags across multiple logical
-> > > units. This behavior has not been changed by the conversion of the
-> > > SCSI core from the legacy block layer to blk-mq.
-> > > 
-> > > For other (hardware) block devices it didn't matter either that there
-> > > was no upper limit to the number of requests the legacy block layer
-> > > could allocate. All hardware block devices I know support fixed size
-> > > queues for queuing requests to the block device.
-> > 
-> > I am not sure I understand your point. Those lower layers always were
-> > able to get at least one request per request_queue. They can do whatever
-> > they want with it after that. This change removes that guarantee for
-> > blk-mq in some cases, right? I just don't think you can readily conclude
-> > that is "safe" by appealing to the legacy behavior, that's all.
-> 
-> Hi Keith,
-> 
-> How requests were allocated in the legacy block layer is irrelevant in
-> this context. The patch I posted affects the tag allocation strategy.
-> Tag allocation happened in the legacy block layer by calling
-> blk_queue_start_tag(). From Linux kernel v4.20:
-> 
-> /**
->  * blk_queue_start_tag - find a free tag and assign it
->  * @q:  the request queue for the device
->  * @rq:  the block request that needs tagging
->  * [ ... ]
->  **/
-> 
-> That function supports sharing tags between request queues but did not
-> attempt to be fair at all. This is how the SCSI core in Linux kernel v4.20
-> sets up tag sharing between request queues (from drivers/scsi/scsi_scan.c):
-> 
-> 	if (!shost_use_blk_mq(sdev->host)) {
-> 		blk_queue_init_tags(sdev->request_queue,
-> 				    sdev->host->cmd_per_lun, shost->bqt,
-> 				    shost->hostt->tag_alloc_policy);
-> 	}
-> 
-> blk-mq has always had a fairness algorithm in case a tag set is shared
-> across request queues. If a tag set is shared across request queues, the
-> number of tags per request queue is restricted to the total number of
-> tags divided by the number of users (ignoring rounding). From
-> block/blk-mq.c in the latest kernel:
-> 
-> 	depth = max((bt->sb.depth + users - 1) / users, 4U);
-> 
-> What my patch does is to remove this fairness guarantee. There was no
-> equivalent of this fairness guarantee in the legacy block layer.
+Hi Keith,
 
-If two LUNs are attached to same host, one is slow, and another is fast,
-and the slow LUN can slow down the fast LUN easily without this fairness
-algorithm.
+kernel test robot noticed the following build errors:
 
-Your motivation is that "One of these logical units (WLUN) is used
-to submit control commands, e.g. START STOP UNIT. If any request is
-submitted to the WLUN, the queue depth is reduced from 31 to 15 or
-lower for data LUNs." I guess one simple fix is to not account queues
-of this non-IO LUN as active queues?
+[auto build test ERROR on linus/master]
+[also build test ERROR on v6.6-rc6 next-20231020]
+[cannot apply to axboe-block/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/block-bio-integrity-add-support-for-user-buffers/20231018-232704
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20231018151843.3542335-2-kbusch%40meta.com
+patch subject: [PATCH 1/4] block: bio-integrity: add support for user buffers
+config: um-i386_defconfig (https://download.01.org/0day-ci/archive/20231021/202310211117.qmDPOVfI-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231021/202310211117.qmDPOVfI-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310211117.qmDPOVfI-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/linux/blkdev.h:17:0,
+                    from init/main.c:85:
+   include/linux/bio.h: In function 'bio_integrity_map_user':
+>> include/linux/bio.h:798:1: error: expected ';' before '}' token
+    }
+    ^
+--
+   In file included from include/linux/blkdev.h:17:0,
+                    from lib/vsprintf.c:47:
+   include/linux/bio.h: In function 'bio_integrity_map_user':
+>> include/linux/bio.h:798:1: error: expected ';' before '}' token
+    }
+    ^
+   lib/vsprintf.c: In function 'va_format':
+   lib/vsprintf.c:1682:2: warning: function 'va_format' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+     buf += vsnprintf(buf, end > buf ? end - buf : 0, va_fmt->fmt, va);
+     ^~~
 
 
+vim +798 include/linux/bio.h
 
-Thanks, 
-Ming
+   793	
+   794	static inline int bio_integrity_map_user(struct bio *bio, void __user *ubuf,
+   795						 unsigned int len, u32 seed, u32 maxvecs)
+   796	{
+   797		return -EINVAL
+ > 798	}
+   799	
 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
