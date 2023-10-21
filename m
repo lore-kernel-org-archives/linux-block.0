@@ -2,94 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE630C001DF
-	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 00:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E4BCDB474
+	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 01:32:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232194AbjJUAit (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Oct 2023 20:38:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38042 "EHLO
+        id S229518AbjJUBcZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Oct 2023 21:32:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230251AbjJUAis (ORCPT
+        with ESMTP id S229500AbjJUBcZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Oct 2023 20:38:48 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFD3DD6F
-        for <linux-block@vger.kernel.org>; Fri, 20 Oct 2023 17:38:45 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6c7a4735a30so249217a34.1
-        for <linux-block@vger.kernel.org>; Fri, 20 Oct 2023 17:38:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697848725; x=1698453525; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=423X7bf3mKdV2TfpiLpGt3onIWyjL6GRNCUQJNzFbJY=;
-        b=GCPt+Mr41cq8TzswR0amE3zshzM9Nlas9+I4pUIA+1qBSHqfuoyG8qdeSePaM70SK+
-         ga/J4yau0grKFwXeCIfUfUpRnAcJ3AKKgxJIoFgbuWbyOGKOUm4/kwOO9h1s4fIsRsDz
-         ajY3TGF7x4n64DypEAndW86jd3361xl12mf9uXaUxbaNXaxsbztkOkbHA7XvoWh8L8V7
-         oF8wv35OlpUcoQemrvBfBEOxhMLX/csUHhXXKYQj2pFgHwAPEkQ8Vb1OVVE4hR+AfJrm
-         JSU8EgTs9ZLSTnDBkFtsG5DwOp+RyUrXZDAQ2fZ89xp3hfinEkuSJxTr+63XAEVS9cD4
-         CMzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697848725; x=1698453525;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=423X7bf3mKdV2TfpiLpGt3onIWyjL6GRNCUQJNzFbJY=;
-        b=txc+ONNUjUYm1a3gE/ypXHCk4bsoZQg822sj5dJc/Q+zT9kpbfkVePmEVzxUqiPOXs
-         fMxWjk12l1dvBP1QgJLYakyQz1Eih7fSNhmUZDHD+LU/6WAwTNrpbPJhzxNwYehK5rpr
-         /xMB2DmgO/voRxaXF4Psxog5jtsybxU9rd2CHuZtnV9R1b0Jfj+s5MxCTVvN33hSrYmE
-         /WVxrctb2Fxt8Gma5H7Huk19KTANeBLbViTYEHhg/2Ovm04X4Lz2Id62pLgOLqNdwJUt
-         fP93/mjy/A2al5OG2WOGU0RDlq5yaUZ+m7eiuqFWpiK89tQYqysWJMOZEXh5nawvDfjz
-         Gk3w==
-X-Gm-Message-State: AOJu0YxLbEfgMSCRxULvBRgtDRIoRPdbX/w8KB60n5WkInpe8QGi+xT0
-        4FC1Gnyzdq5yMTVnfw8Irte6nA==
-X-Google-Smtp-Source: AGHT+IGdv9UkTnlXLx/5ijBTQR2xHsaXZ87/AXJ/nw5vxj4PW5/dpIBr4LcagbwlUR9FnNBJNYtfhg==
-X-Received: by 2002:a9d:51d2:0:b0:6bf:500f:b570 with SMTP id d18-20020a9d51d2000000b006bf500fb570mr3774295oth.3.1697848725192;
-        Fri, 20 Oct 2023 17:38:45 -0700 (PDT)
-Received: from [127.0.0.1] ([2600:380:984c:2fe2:e7f8:bd24:713c:c8fb])
-        by smtp.gmail.com with ESMTPSA id h6-20020a9d61c6000000b006cd33d6fd5csm520636otk.11.2023.10.20.17.38.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 17:38:44 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Khazhismel Kumykov <khazhy@chromium.org>
-Cc:     Yu Kuai <yukuai3@huawei.com>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        oleg@redhat.com, linan122@huawei.com,
-        Khazhismel Kumykov <khazhy@google.com>
-In-Reply-To: <20231020223617.2739774-1-khazhy@google.com>
-References: <20231020223617.2739774-1-khazhy@google.com>
-Subject: Re: [PATCH] blk-throttle: check for overflow in
- calculate_bytes_allowed
-Message-Id: <169784872374.3020638.17698696801548218359.b4-ty@kernel.dk>
-Date:   Fri, 20 Oct 2023 18:38:43 -0600
+        Fri, 20 Oct 2023 21:32:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1AB5D6A
+        for <linux-block@vger.kernel.org>; Fri, 20 Oct 2023 18:31:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697851891;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JLVu9mgjvRz557D9Uh4mFZu/4k8hdbSG3nb+8fCv+bI=;
+        b=QSsiBcqWtGeSurXBSAYB4wjExv/QqbuEEKS+BlbwQDeb9mI4E/yrJj0CABMTU9Qh0GOMch
+        3WP32uOLgxbmTctjcMDEffPeOEc4i44uDFNVrCy+0h2sdgoc5ps5kqTcHq3D0fmV/YC4KF
+        2XqshQBky24ge4sPJPvFySkEgln3724=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-658-ZnaX_knBN0-nT7eoVKQHtQ-1; Fri, 20 Oct 2023 21:31:22 -0400
+X-MC-Unique: ZnaX_knBN0-nT7eoVKQHtQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 397DB38116F5;
+        Sat, 21 Oct 2023 01:31:22 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC8FF40C6F7B;
+        Sat, 21 Oct 2023 01:31:16 +0000 (UTC)
+Date:   Sat, 21 Oct 2023 09:31:11 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Yu Kuai <yukuai1@huaweicloud.com>,
+        Ed Tsai <ed.tsai@mediatek.com>
+Subject: Re: [PATCH] block: Improve shared tag set performance
+Message-ID: <ZTMp3zwaKKQPKmqS@fedora>
+References: <20231018180056.2151711-1-bvanassche@acm.org>
+ <20231020044159.GB11984@lst.de>
+ <0d2dce2a-8e01-45d6-b61b-f76493d55863@acm.org>
+ <ZTKqAzSPNcBp4db0@kbusch-mbp>
+ <f2728de6-ff3c-4693-b51f-58c3d46d0fbf@acm.org>
+ <ZTK0NcqB4lIQ_zHQ@kbusch-mbp>
+ <dbdc6dbe-5e2a-4414-bea6-1d2160ffdfdd@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-26615
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbdc6dbe-5e2a-4414-bea6-1d2160ffdfdd@acm.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Fri, 20 Oct 2023 15:36:17 -0700, Khazhismel Kumykov wrote:
-> Inexact, we may reject some not-overflowing values incorrectly, but
-> they'll be on the order of exabytes allowed anyways.
+On Fri, Oct 20, 2023 at 10:54:59AM -0700, Bart Van Assche wrote:
 > 
-> This fixes divide error crash on x86 if bps_limit is not configured or
-> is set too high in the rare case that jiffy_elapsed is greater than HZ.
+> On 10/20/23 10:09, Keith Busch wrote:
+> > On Fri, Oct 20, 2023 at 09:45:53AM -0700, Bart Van Assche wrote:
+> > > 
+> > > On 10/20/23 09:25, Keith Busch wrote:
+> > > > The legacy block request layer didn't have a tag resource shared among
+> > > > multiple request queues. Each queue had their own mempool for allocating
+> > > > requests. The mempool, I think, would always guarantee everyone could
+> > > > get at least one request.
+> > > 
+> > > I think that the above is irrelevant in this context. As an example, SCSI
+> > > devices have always shared a pool of tags across multiple logical
+> > > units. This behavior has not been changed by the conversion of the
+> > > SCSI core from the legacy block layer to blk-mq.
+> > > 
+> > > For other (hardware) block devices it didn't matter either that there
+> > > was no upper limit to the number of requests the legacy block layer
+> > > could allocate. All hardware block devices I know support fixed size
+> > > queues for queuing requests to the block device.
+> > 
+> > I am not sure I understand your point. Those lower layers always were
+> > able to get at least one request per request_queue. They can do whatever
+> > they want with it after that. This change removes that guarantee for
+> > blk-mq in some cases, right? I just don't think you can readily conclude
+> > that is "safe" by appealing to the legacy behavior, that's all.
 > 
+> Hi Keith,
 > 
-> [...]
+> How requests were allocated in the legacy block layer is irrelevant in
+> this context. The patch I posted affects the tag allocation strategy.
+> Tag allocation happened in the legacy block layer by calling
+> blk_queue_start_tag(). From Linux kernel v4.20:
+> 
+> /**
+>  * blk_queue_start_tag - find a free tag and assign it
+>  * @q:  the request queue for the device
+>  * @rq:  the block request that needs tagging
+>  * [ ... ]
+>  **/
+> 
+> That function supports sharing tags between request queues but did not
+> attempt to be fair at all. This is how the SCSI core in Linux kernel v4.20
+> sets up tag sharing between request queues (from drivers/scsi/scsi_scan.c):
+> 
+> 	if (!shost_use_blk_mq(sdev->host)) {
+> 		blk_queue_init_tags(sdev->request_queue,
+> 				    sdev->host->cmd_per_lun, shost->bqt,
+> 				    shost->hostt->tag_alloc_policy);
+> 	}
+> 
+> blk-mq has always had a fairness algorithm in case a tag set is shared
+> across request queues. If a tag set is shared across request queues, the
+> number of tags per request queue is restricted to the total number of
+> tags divided by the number of users (ignoring rounding). From
+> block/blk-mq.c in the latest kernel:
+> 
+> 	depth = max((bt->sb.depth + users - 1) / users, 4U);
+> 
+> What my patch does is to remove this fairness guarantee. There was no
+> equivalent of this fairness guarantee in the legacy block layer.
 
-Applied, thanks!
+If two LUNs are attached to same host, one is slow, and another is fast,
+and the slow LUN can slow down the fast LUN easily without this fairness
+algorithm.
 
-[1/1] blk-throttle: check for overflow in calculate_bytes_allowed
-      commit: 2dd710d476f2f1f6eaca884f625f69ef4389ed40
+Your motivation is that "One of these logical units (WLUN) is used
+to submit control commands, e.g. START STOP UNIT. If any request is
+submitted to the WLUN, the queue depth is reduced from 31 to 15 or
+lower for data LUNs." I guess one simple fix is to not account queues
+of this non-IO LUN as active queues?
 
-Best regards,
--- 
-Jens Axboe
 
 
+Thanks, 
+Ming
 
