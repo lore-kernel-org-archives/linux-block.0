@@ -2,124 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCA4C004C0
-	for <linux-block@archiver.kernel.org>; Sat, 21 Oct 2023 16:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2D8C25B41
+	for <linux-block@archiver.kernel.org>; Sun, 22 Oct 2023 11:52:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231760AbjJUQVN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Oct 2023 12:21:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46908 "EHLO
+        id S229588AbjJVLwE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Oct 2023 07:52:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231782AbjJUQVM (ORCPT
+        with ESMTP id S229472AbjJVLwE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Oct 2023 12:21:12 -0400
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7814F1A8
-        for <linux-block@vger.kernel.org>; Sat, 21 Oct 2023 09:21:07 -0700 (PDT)
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-57de6e502fcso1156597eaf.3
-        for <linux-block@vger.kernel.org>; Sat, 21 Oct 2023 09:21:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697905267; x=1698510067;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wnyRv3obejbZsVeNe7gX5j+PPYvawtVE9GwYcTWW9RE=;
-        b=v/9CxKaHwb74CU8ViLnuFAyxzrf4Bcysx1w8/KOYrT9f+P1FAaV+70BZFE6BIWGf8B
-         vnzPzwYBdaULS+ylSHD/xtxkJMjWJNBA+QX8LeX4XnOsHciPNHiMKoqKrt2tRFheEpY+
-         AMHV1dzXVIF7QON0I1/mHNPyQv2fDs9t27JhqNEtNtp/SL2OOi2pt5LCLiWqbzcZhtcT
-         HnRA+xaSJBd59ClNS2ZVAgqadzhbL0+KQVvO5w8Iw/iDXgfsd/dqBpoWs8p/cE8DBDR/
-         f+PvDRLpqH1Bidw5ppSOItPJ0VUaJUBlyg7A3WGIiRrZyXhYlUwoRPOrLT5ge6pdTNVA
-         iIuA==
-X-Gm-Message-State: AOJu0YwipdltRXs3LTDdIWSYIcP5uJXs8f2tva6cGPL+JCQ3dAeScwR/
-        PVpftsb0efGUVBbcAqeYmz4=
-X-Google-Smtp-Source: AGHT+IFXCVBZXxaNVnUT2+zTwIMvjW4I+TsJPUeBVQp6uB3DUroe1l44bP2LCw55vENdacBrHj3hZw==
-X-Received: by 2002:a05:6358:1c2:b0:143:8084:e625 with SMTP id e2-20020a05635801c200b001438084e625mr6149533rwa.11.1697905266382;
-        Sat, 21 Oct 2023 09:21:06 -0700 (PDT)
-Received: from [192.168.197.167] (79.sub-174-194-200.myvzw.com. [174.194.200.79])
-        by smtp.gmail.com with ESMTPSA id j6-20020a63ec06000000b0059b782e8541sm3289333pgh.28.2023.10.21.09.21.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Oct 2023 09:21:05 -0700 (PDT)
-Message-ID: <b3325fe5-4208-432b-97a9-d40f5cdda4b0@acm.org>
-Date:   Sat, 21 Oct 2023 09:21:01 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Improve shared tag set performance
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
+        Sun, 22 Oct 2023 07:52:04 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05234F3;
+        Sun, 22 Oct 2023 04:52:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697975522; x=1729511522;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BdVZ+C8tN+qekt7Hl3QUHfu9nPna5/5VggjFolJCjy8=;
+  b=kMFSKVfIqRCQVBQXgkiQHG6THnJLYEi9RDT8vqb8kmPvk1pPdB1nLzlP
+   orKtFe152yfL/A6morEMIJV1KJSIdV2L+ZIN8p6w09fI/OCdLkyU7vfHz
+   qX/860Y/Oa+VCnU1JhNQn0g8gWeCAm43Dyt9tGS3PO8uvhOr+O7zLwYp5
+   jX7XCRqfzK0sVFQ3xl7GeSDAoH2xYjU4f+6v4kfdT5j3IDizNWqodIth3
+   uqYSBUAUyVKDoKPp0W8zqlSsyU/7mxS8QmAzNdHGWHqhmLEuWwdJ86VsI
+   mOsSdALT1ImP1E9cNaFm9YnJ+1Urg3UMrLH8DK+6z5GC1FGBWCO9CuNka
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10870"; a="385578979"
+X-IronPort-AV: E=Sophos;i="6.03,242,1694761200"; 
+   d="scan'208";a="385578979"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2023 04:52:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10870"; a="792851290"
+X-IronPort-AV: E=Sophos;i="6.03,242,1694761200"; 
+   d="scan'208";a="792851290"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 22 Oct 2023 04:51:54 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1quWzo-0005vq-0d;
+        Sun, 22 Oct 2023 11:51:52 +0000
+Date:   Sun, 22 Oct 2023 19:51:16 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
         Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ed Tsai <ed.tsai@mediatek.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20231018180056.2151711-1-bvanassche@acm.org>
- <31ca731b-7ffb-185a-fdbc-9e4821e2b46f@huaweicloud.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <31ca731b-7ffb-185a-fdbc-9e4821e2b46f@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>
+Cc:     oe-kbuild-all@lists.linux.dev, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org, nitheshshetty@gmail.com,
+        anuj1072538@gmail.com, gost.dev@samsung.com, mcgrof@kernel.org,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v17 08/12] nvmet: add copy command support for bdev and
+ file ns
+Message-ID: <202310221915.PYH9XadG-lkp@intel.com>
+References: <20231019110147.31672-9-nj.shetty@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231019110147.31672-9-nj.shetty@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Nitesh,
 
-On 10/21/23 00:32, Yu Kuai wrote:
-> Sorry for such huge delay, I was struggled on implementing a smoothly
-> algorithm to borrow tags and return borrowed tags, and later I put this
-> on ice and focus on other stuff.
-> 
-> I had an idea to implement a state machine, however, the amount of code
-> was aggressive and I gave up. And later, I implemented a simple version,
-> and I tested it in your case, 32 tags and 2 shared node, result looks
-> good(see below), however, I'm not confident this can work well general.
-> 
-> Anyway, I'll send a new RFC verion for this, and please let me know if
-> you still think this approch is unacceptable.
-> 
-> Thanks,
-> Kuai
-> 
-> Test script:
-> 
-> [global]
-> ioengine=libaio
-> iodepth=2
-> bs=4k
-> direct=1
-> rw=randrw
-> group_reporting
-> 
-> [sda]
-> numjobs=32
-> filename=/dev/sda
-> 
-> [sdb]
-> numjobs=1
-> filename=/dev/sdb
-> 
-> Test result, by monitor new debugfs entry shared_tag_info:
-> time    active        available
->      sda     sdb    sda    sdb
-> 0    0    0    32    32
-> 1    16    2    16    16    -> start fair sharing
-> 2    19    2    20    16
-> 3    24    2    24    16
-> 4    26    2    28    16     -> borrow 32/8=4 tags each round
-> 5    28    2    28    16    -> save at lease 4 tags for sdb
+kernel test robot noticed the following build warnings:
 
-Hi Yu,
+[auto build test WARNING on 213f891525c222e8ed145ce1ce7ae1f47921cb9c]
 
-Thank you for having shared these results. What is the unit of the
-numbers in the time column?
+url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Introduce-queue-limits-and-sysfs-for-copy-offload-support/20231019-200658
+base:   213f891525c222e8ed145ce1ce7ae1f47921cb9c
+patch link:    https://lore.kernel.org/r/20231019110147.31672-9-nj.shetty%40samsung.com
+patch subject: [PATCH v17 08/12] nvmet: add copy command support for bdev and file ns
+config: i386-randconfig-062-20231022 (https://download.01.org/0day-ci/archive/20231022/202310221915.PYH9XadG-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231022/202310221915.PYH9XadG-lkp@intel.com/reproduce)
 
-In the above I see that more tags are assigned to sda than to sdb
-although I/O is being submitted to both LUNs. I think the current
-algoritm defines fairness as dividing tags in a fair way across active
-LUNs. Do the above results show that tags are divided per active job
-instead of per active LUN? If so, I'm not sure that everyone will agree
-that this is a fair way to distribute tags ...
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310221915.PYH9XadG-lkp@intel.com/
 
-Thanks,
+sparse warnings: (new ones prefixed by >>)
+>> drivers/nvme/target/io-cmd-bdev.c:498:30: sparse: sparse: restricted __le16 degrades to integer
 
-Bart.
+vim +498 drivers/nvme/target/io-cmd-bdev.c
 
+   478	
+   479	/*
+   480	 * At present we handle only one range entry, since copy offload is aligned with
+   481	 * copy_file_range, only one entry is passed from block layer.
+   482	 */
+   483	static void nvmet_bdev_execute_copy(struct nvmet_req *rq)
+   484	{
+   485		struct nvme_copy_range range;
+   486		struct nvme_command *cmd = rq->cmd;
+   487		ssize_t ret;
+   488		off_t dst, src;
+   489	
+   490		u16 status;
+   491	
+   492		status = nvmet_copy_from_sgl(rq, 0, &range, sizeof(range));
+   493		if (status)
+   494			goto err_rq_complete;
+   495	
+   496		dst = le64_to_cpu(cmd->copy.sdlba) << rq->ns->blksize_shift;
+   497		src = le64_to_cpu(range.slba) << rq->ns->blksize_shift;
+ > 498		rq->copy_len = (range.nlb + 1) << rq->ns->blksize_shift;
+   499	
+   500		if (bdev_max_copy_sectors(rq->ns->bdev)) {
+   501			ret = blkdev_copy_offload(rq->ns->bdev, dst, src, rq->copy_len,
+   502						  nvmet_bdev_copy_endio,
+   503						  (void *)rq, GFP_KERNEL);
+   504		} else {
+   505			ret = blkdev_copy_emulation(rq->ns->bdev, dst,
+   506						    rq->ns->bdev, src, rq->copy_len,
+   507						    nvmet_bdev_copy_endio,
+   508						    (void *)rq, GFP_KERNEL);
+   509		}
+   510		if (ret == -EIOCBQUEUED)
+   511			return;
+   512	
+   513		rq->cqe->result.u32 = cpu_to_le32(0);
+   514		status = errno_to_nvme_status(rq, ret);
+   515	err_rq_complete:
+   516		nvmet_req_complete(rq, status);
+   517	}
+   518	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
