@@ -2,110 +2,163 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47DF2CDB474
-	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 14:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0872C001E0
+	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 15:35:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230231AbjJWOI3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Oct 2023 10:08:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47494 "EHLO
+        id S229657AbjJWPfe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Oct 2023 11:35:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231219AbjJWOI2 (ORCPT
+        with ESMTP id S229613AbjJWPfd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2023 10:08:28 -0400
+        Mon, 23 Oct 2023 11:35:33 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 793A7DF
-        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2023 07:08:26 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAA1EC433C8;
-        Mon, 23 Oct 2023 14:08:24 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463A4FF
+        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2023 08:35:30 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06A0CC433C7;
+        Mon, 23 Oct 2023 15:35:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698070106;
-        bh=3gWo7tjBRuYZBJ9f+7lIbsNH/KkmhwnNlWXy4mRvp9s=;
+        s=k20201202; t=1698075329;
+        bh=fH4SCucmRm0Dpealhrq8QQXyN3HUPdOvQLvE5BNX+GY=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Szg7Da0f3wnwQL27SHYE6vRppiIKmUoLGjknTMmg7hDaRzs2YVNgeA4Y5mqLIeLec
-         Iq23GC2pziIxZM42pnEFcfX3FH2QH1XdVunea72/GcIiQgask8oqzHmHnPsVR9sjwp
-         1nBF0v+6eOkI/36t8eY98NwOROQlDtWUL6mBTgCpiqWOCJzy27sdflFLICCCk/+O2q
-         qykaoUPQDZ/0e9RTMvCywZ3bbPAzC+9XGNFwdVQIWGw/PM1Ir6TEIKtunPOpyzsurE
-         OcuS73wE+CXF5mMWfAF3T2GGDXSdwkSyiFUhmiguvMV1o1RUNGKtpRIi3XWue27tTc
-         4PE5EcHFdTESg==
-Date:   Mon, 23 Oct 2023 16:08:21 +0200
+        b=nmoWdPdH1GBf7OK6yvOXyb9F6yB6WlV9/NY8YICFqsTOR+LThQIgWFUId/LgdQA/g
+         7knnUoh5n44tGOhcUzzvdSmpbWirwO2mOGybJyxSq4MDOy0SYbPeRy4dwjULLjm2O7
+         fNgtfXAE/oRQw80h5fIAnS1/4ulZEmyJkGokMtXsX12LTdEofnrpL6GKbPw0adS0No
+         kkGzN9aLxLm995DZQ15wbQxfuv6LedIi84+RnEipUQnYoDA+inUZw+LcBe3sdFRSL1
+         ZtnJ0UReyKzWHd0WMJzWf7R7+8UP/k6Ns0FYAmL2nxfqaf3sH2ntHHFYUakqmVD5Nh
+         of6ypakXy+PYg==
+Date:   Mon, 23 Oct 2023 17:35:25 +0200
 From:   Christian Brauner <brauner@kernel.org>
 To:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: LOOP_CONFIGURE uevents
-Message-ID: <20231023-biberbau-spatzen-282ccea0825a@brauner>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: loop change deprecation bdev->bd_holder_lock
+Message-ID: <20231023-fungieren-erbschaft-0486c1eab011@brauner>
 References: <20231018152924.3858-1-jack@suse.cz>
  <20231019-galopp-zeltdach-b14b7727f269@brauner>
  <ZTExy7YTFtToAOOx@infradead.org>
  <20231020-enthusiasmus-vielsagend-463a7c821bf3@brauner>
  <20231020120436.jgxdlawibpfuprnz@quack3>
+ <20231023-ausgraben-berichten-d747aa50d876@brauner>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231020120436.jgxdlawibpfuprnz@quack3>
+In-Reply-To: <20231023-ausgraben-berichten-d747aa50d876@brauner>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > And one final question:
-> > 
-> > dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
-> > disk_force_media_change(lo->lo_disk);
-> > /* more stuff */
-> > dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
-> > 
-> > What exactly does that achieve? Does it just delay the delivery of the
-> > uevent after the disk sequence number was changed in
-> > disk_force_media_change()? Because it doesn't seem to actually prevent
-> > uevent generation.
+On Mon, Oct 23, 2023 at 09:40:44AM +0200, Christian Brauner wrote:
+> > I agree that it breaks the original usecase for LOOP_CHANGE_FD. I'd say it
+> > also shows nobody is likely using LOOP_CHANGE_FD anymore. Maybe time to try
+> > deprecating it?
 > 
-> Well, if you grep for dev_get_uevent_suppress() you'll notice there is
-> exactly *one* place looking at it - the generation of ADD event when adding
-> a partition bdev. I'm not sure what's the rationale behind this
-> functionality.
+> Yeah, why don't we try that. In it's current form the concept isn't very
+> useful and arguably is broken which no one has really noticed for years.
+> 
+> * codesearch.debian.net has zero users
+> * codesearch on github has zero users
+> * cs.android.com has zero users
+> 
+> Only definitions, strace, ltp, and stress-ng that sort of test this
+> functionality. I say we try to deprecate this.
 
-I looked at dev_set_uevent_suppress() before and what it does is that it
-fully prevents the generation of uevents for the kobject. It doesn't
-just hold them back like the comments "uncork" in loop_change_fd() and
-loop_configure() suggest:
+I just realized that if we're able to deprecate LOOP_CHANGE_FD we remove
+one of the most problematic/weird cases for partitions and filesystems.
 
-static inline void dev_set_uevent_suppress(struct device *dev, int val)
-{
-        dev->kobj.uevent_suppress = val;
-}
+So right now, we can attach a filesystem image to a loop device and then
+have partitions be claimed by different filesystems:
 
-and then
+* create an image with two partitions
+* format first partition as xfs, second as ext4
 
-int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
-                       char *envp_ext[])
-{
+sudo losetup -f --show --read-only -P img1
+sudo mount /dev/loop0p1 /mnt1
+sudo mount /dev/loop0p2 /mnt2
 
-        [...]
+What happens here is all very wrong afaict. When we issue, e.g., a
+change fd event on the first partition:
+
+sudo ./loop_change_fd /dev/loop0p1 img2
+
+we call disk_force_media_change() but that only works on disk->part0
+which means that we don't even cleanly shutdown the filesystem on the
+partition we're trying to mess around with.
+
+Later on we then completely fall on our faces when we fail to remove the
+partitions because they're still in active use.
+
+So I guess, ideally, we'd really force removal of the partitions and
+shut down the filesystem but we can't easily do that because of locking
+requirements where we can't acquire s_umount beneath open_mutex. Plus,
+this wouldn't fit with the original semantics.
+
+There's probably ways around this but I don't think that's actually
+worth it for LOOP_CHANGE_FD. The places where forced removal of
+partitions really matters is del_gendisk(). And there we've got it
+working correctly and are able to actually remove partitions that still
+have active users.
+
+For now, we should give up any pretense that disk_force_media_change()
+does anything useful for loop change fd and simply remove it completely.
+It's either useless, or it breaks the original semantics of loop change
+fd although I don't think anyone's ever used it the way I described
+above.
+
+So?
+
+From 0d9b5c4963791f0c3ba8529ca56233be87122c59 Mon Sep 17 00:00:00 2001
+From: Christian Brauner <brauner@kernel.org>
+Date: Mon, 23 Oct 2023 17:24:56 +0200
+Subject: [PATCH] loop: drop disk_force_media_change()
+
+The disk_force_media_change() call is currently only useful for
+filesystems and in that case it's not very useful. Consider attaching a
+filesystem image to a loop device and then have partitions be claimed by
+different filesystems:
+
+* create an image with two partitions
+* format first partition as xfs, second as ext4
+
+sudo losetup -f --show --read-only -P img1
+sudo mount /dev/loop0p1 /mnt1
+sudo mount /dev/loop0p2 /mnt2
+
+When we issue e.g., a loop change fd event on the first partition:
+
+sudo ./loop_change_fd /dev/loop0p1 img2
+
+we call disk_force_media_change() but that only works on disk->part0
+which means that we don't even cleanly shutdown the filesystem on the
+partition we're trying to mess around with.
+
+Later on we then completely fall on our faces when we fail to remove the
+partitions because they're still in active use.
+
+Give up any pretense that disk_force_media_change() does anything useful
+for loop change fd and simply remove it completely. It's either useless,
+or it's meaningless for the original semantics of loop change fd. Anyone
+who uses this is on their own anyway.
+
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+ drivers/block/loop.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 9f2d412fc560..87c98e35abac 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -603,7 +603,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 		goto out_err;
  
-        /* skip the event, if uevent_suppress is set*/
-        if (kobj->uevent_suppress) {
-                pr_debug("kobject: '%s' (%p): %s: uevent_suppress "
-                                 "caused the event to drop!\n",
-                                 kobject_name(kobj), kobj, __func__);
-                return 0;
-        }
+ 	/* and ... switch */
+-	disk_force_media_change(lo->lo_disk);
++	invalidate_bdev(lo->lo_disk->part0);
++	set_bit(GD_NEED_PART_SCAN, &lo->lo_disk->state);
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
+ 	lo->lo_backing_file = file;
+-- 
+2.34.1
 
-So commit 498ef5c777d9 ("loop: suppress uevents while reconfiguring the device")
-tried to fix a problem where uevents were generated for LOOP_SET_FD
-before LOOP_SET_STATUS* was called.
-
-That broke LOOP_CONFIGURE because LOOP_CONFIGURE is supposed to be
-LOOP_SET_FD + LOOP_SET_STATUS in one shot.
-
-Then commit bb430b694226 ("loop: LOOP_CONFIGURE: send uevents for partitions")
-fixed that by moving loop_reread_partitions() out of the uevent
-suppression.
-
-No you get uevents if you trigger a partition rescan but only if there
-are actually partitions. What you never get however is a media change
-event even though we do increment the disk sequence number and attach an
-image to the loop device.
-
-This seems problematic because we leave userspace unable to listen for
-attaching images to a loop device. Shouldn't we regenerate the media
-change event after we're done setting up the device and before the
-partition rescan for LOOP_CONFIGURE?
