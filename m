@@ -2,117 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A002CDB474
-	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 07:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47DF2CDB474
+	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 14:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233436AbjJWH0y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Oct 2023 03:26:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35810 "EHLO
+        id S230231AbjJWOI3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Oct 2023 10:08:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjJWH0x (ORCPT
+        with ESMTP id S231219AbjJWOI2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2023 03:26:53 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB739D6;
-        Mon, 23 Oct 2023 00:26:50 -0700 (PDT)
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SDRZm4TV8z4f3kGC;
-        Mon, 23 Oct 2023 15:26:40 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-        by mail.maildlp.com (Postfix) with ESMTP id 5DA941A0171;
-        Mon, 23 Oct 2023 15:26:46 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBn+dg0IDZlt0TeDg--.38637S3;
-        Mon, 23 Oct 2023 15:26:46 +0800 (CST)
-Subject: Re: [PATCH RFC v2 0/8] blk-mq: improve tag fair sharing
-To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     bvanassche@acm.org, hch@lst.de, kbusch@kernel.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
- <ZTX4q7QBerKbjzQA@fedora>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <40652bee-4086-1b32-b840-1f9a3adfe358@huaweicloud.com>
-Date:   Mon, 23 Oct 2023 15:26:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 23 Oct 2023 10:08:28 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 793A7DF
+        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2023 07:08:26 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAA1EC433C8;
+        Mon, 23 Oct 2023 14:08:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698070106;
+        bh=3gWo7tjBRuYZBJ9f+7lIbsNH/KkmhwnNlWXy4mRvp9s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Szg7Da0f3wnwQL27SHYE6vRppiIKmUoLGjknTMmg7hDaRzs2YVNgeA4Y5mqLIeLec
+         Iq23GC2pziIxZM42pnEFcfX3FH2QH1XdVunea72/GcIiQgask8oqzHmHnPsVR9sjwp
+         1nBF0v+6eOkI/36t8eY98NwOROQlDtWUL6mBTgCpiqWOCJzy27sdflFLICCCk/+O2q
+         qykaoUPQDZ/0e9RTMvCywZ3bbPAzC+9XGNFwdVQIWGw/PM1Ir6TEIKtunPOpyzsurE
+         OcuS73wE+CXF5mMWfAF3T2GGDXSdwkSyiFUhmiguvMV1o1RUNGKtpRIi3XWue27tTc
+         4PE5EcHFdTESg==
+Date:   Mon, 23 Oct 2023 16:08:21 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: LOOP_CONFIGURE uevents
+Message-ID: <20231023-biberbau-spatzen-282ccea0825a@brauner>
+References: <20231018152924.3858-1-jack@suse.cz>
+ <20231019-galopp-zeltdach-b14b7727f269@brauner>
+ <ZTExy7YTFtToAOOx@infradead.org>
+ <20231020-enthusiasmus-vielsagend-463a7c821bf3@brauner>
+ <20231020120436.jgxdlawibpfuprnz@quack3>
 MIME-Version: 1.0
-In-Reply-To: <ZTX4q7QBerKbjzQA@fedora>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBn+dg0IDZlt0TeDg--.38637S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7CrW5Cw1rXFWUWw47KFWfXwb_yoW8WF47pF
-        WSqF47tws2vw42kFWDX39xGFyfKr4kGry5Kr97G347Zws8urnagr4xtr45uFZ7AF1DGrWU
-        urWq9rZ8CFyDX3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231020120436.jgxdlawibpfuprnz@quack3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-ÔÚ 2023/10/23 12:38, Ming Lei Ð´µÀ:
-> Hello Yu Kuai,
+> > And one final question:
+> > 
+> > dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
+> > disk_force_media_change(lo->lo_disk);
+> > /* more stuff */
+> > dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+> > 
+> > What exactly does that achieve? Does it just delay the delivery of the
+> > uevent after the disk sequence number was changed in
+> > disk_force_media_change()? Because it doesn't seem to actually prevent
+> > uevent generation.
 > 
-> On Sat, Oct 21, 2023 at 11:47:58PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Current implementation:
->>   - a counter active_queues record how many queue/hctx is sharing tags,
->>   and it's updated while issue new IO, and cleared in
->>   blk_mq_timeout_work().
->>   - if active_queues is more than 1, then tags is fair shared to each
->>   node;
-> 
-> Can you explain a bit what the problem is in current tag sharing?
-> And what is your basic approach for this problem?
-> 
-> Just mentioning the implementation is not too helpful for initial
-> review, cause the problem and approach(correctness) need to be
-> understood first.
+> Well, if you grep for dev_get_uevent_suppress() you'll notice there is
+> exactly *one* place looking at it - the generation of ADD event when adding
+> a partition bdev. I'm not sure what's the rationale behind this
+> functionality.
 
-Of course, I'll add following if there will be a v3;
+I looked at dev_set_uevent_suppress() before and what it does is that it
+fully prevents the generation of uevents for the kobject. It doesn't
+just hold them back like the comments "uncork" in loop_change_fd() and
+loop_configure() suggest:
 
-Current problems:
+static inline void dev_set_uevent_suppress(struct device *dev, int val)
+{
+        dev->kobj.uevent_suppress = val;
+}
 
-If there are multiple active_queues, then tag is fair shared to each
-queue, and if one queue is not busy(for example, only issue one IO once
-for a while), then shared tags for this queue is wasted and can't be
-used for other queues.
+and then
 
-Depends on the hardware, this might casue performance problems in some
-user case. For example, as reported by [1], UFS devices
-have multiple logical units. One of these logical units (WLUN) is used
-to submit control commands, e.g. START STOP UNIT. If any request is
-submitted to the WLUN, the queue depth is reduced from 31 to 15 or
-lower for data LUNs.
+int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
+                       char *envp_ext[])
+{
 
-This patchset first delay tag sharing from issue IO to failed to get
-driver tag; then add a counter to record how many times shared queue
-failed to get driver tag to indicate if the queue is busy; finially,
-allow busy queue to borrow more tags from idle queue.
+        [...]
+ 
+        /* skip the event, if uevent_suppress is set*/
+        if (kobj->uevent_suppress) {
+                pr_debug("kobject: '%s' (%p): %s: uevent_suppress "
+                                 "caused the event to drop!\n",
+                                 kobject_name(kobj), kobj, __func__);
+                return 0;
+        }
 
-Thanks,
-Kuai
+So commit 498ef5c777d9 ("loop: suppress uevents while reconfiguring the device")
+tried to fix a problem where uevents were generated for LOOP_SET_FD
+before LOOP_SET_STATUS* was called.
 
-> 
-> Thanks,
-> Ming
-> 
-> .
-> 
+That broke LOOP_CONFIGURE because LOOP_CONFIGURE is supposed to be
+LOOP_SET_FD + LOOP_SET_STATUS in one shot.
 
+Then commit bb430b694226 ("loop: LOOP_CONFIGURE: send uevents for partitions")
+fixed that by moving loop_reread_partitions() out of the uevent
+suppression.
+
+No you get uevents if you trigger a partition rescan but only if there
+are actually partitions. What you never get however is a media change
+event even though we do increment the disk sequence number and attach an
+image to the loop device.
+
+This seems problematic because we leave userspace unable to listen for
+attaching images to a loop device. Shouldn't we regenerate the media
+change event after we're done setting up the device and before the
+partition rescan for LOOP_CONFIGURE?
