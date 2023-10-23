@@ -2,75 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82113C00A8F
-	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 23:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0712AC00A8F
+	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 23:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230032AbjJWXn0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Oct 2023 19:43:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50884 "EHLO
+        id S231518AbjJWXqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Oct 2023 19:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbjJWXnZ (ORCPT
+        with ESMTP id S231336AbjJWXqK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2023 19:43:25 -0400
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D2892;
-        Mon, 23 Oct 2023 16:43:24 -0700 (PDT)
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5ac88d2cfaaso3051181a12.2;
-        Mon, 23 Oct 2023 16:43:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698104603; x=1698709403;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XoxPFkvwF1gGCb4SskDRp9+XUyFIjvmDkssfl+Vpa5g=;
-        b=bY4B7IUZezHBLixh9lHiPJqFr08+xG5hFVBFrnDuLQ5kop7OeEUAiXvzOhvAN+eHk5
-         XLa3xdHkxnIPTZuBHz275UIa4xf941BgajdM1RDeTsQLV2GuiEz3YuPrc93XghNdtaqt
-         WiJQ6OfK7Rc8zBiYMegWz/soJxVznN6qAxe/oAZ4U/Y2NGot6nWy5e2COTT3pH82iDoj
-         5UwxgV8Nh5TCqoMA3UismfKHwceWor1Vl26D5u7AvUExOOUDxnW6WQNIGGtITb8ONqnb
-         En8rYGjT61YsCrwIczQdoLdmnNcDCkk6xlFnXnI+aBhqjsEkGKreDdvfnvptJAOO61a3
-         xr+g==
-X-Gm-Message-State: AOJu0Yz0nlaTAlEj1ZXnWQXALDLjSh5FFpzGVLsU1GFhHs/AMK7/m5nv
-        U6ZuavJ2HWOraZFxHumaKsY=
-X-Google-Smtp-Source: AGHT+IHs+Th71GT5S/3HopfGomFpPWz3knSxkodk8eFCZZJGbVbwmbY9oU+jLkxPzxOEmeDI8nhKPA==
-X-Received: by 2002:a05:6a20:440b:b0:159:f884:4d6e with SMTP id ce11-20020a056a20440b00b00159f8844d6emr1359915pzb.40.1698104603310;
-        Mon, 23 Oct 2023 16:43:23 -0700 (PDT)
-Received: from ?IPV6:2601:642:4c01:5668:fce6:4ab1:fda4:1303? ([2601:642:4c01:5668:fce6:4ab1:fda4:1303])
-        by smtp.gmail.com with ESMTPSA id g29-20020aa79ddd000000b0068be4ce33easm5925993pfq.96.2023.10.23.16.43.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Oct 2023 16:43:22 -0700 (PDT)
-Message-ID: <de1c1829-d23d-4628-85b0-a778489ebd7f@acm.org>
-Date:   Mon, 23 Oct 2023 16:43:20 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 00/19] Improve write performance for zoned UFS devices
-Content-Language: en-US
+        Mon, 23 Oct 2023 19:46:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06D5BDD
+        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2023 16:45:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698104724;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8108ZK/uYMS29R+GboAUTn6c5bPK/gI994W5VC5oVsw=;
+        b=ZnmlNig1HjZnk9FxIit3rN3yud5pyiD7/PRY3sOE1+GApaGnQ7nCf/oBIvUgiTECVu7fPY
+        EgGsBYeTwMvEYJnnhJ0UgN7nqaIhNCgNi/Ozz3CrS218Qw9i0J+xyJCbBPFrbMS3ZMrg0+
+        J4vgOSkhTA3cqQH7Kcqs+9+QHt5u4EU=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-695-PQtrGROaMdOCysOffZFoLg-1; Mon,
+ 23 Oct 2023 19:45:20 -0400
+X-MC-Unique: PQtrGROaMdOCysOffZFoLg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 887093811F2C;
+        Mon, 23 Oct 2023 23:45:20 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BB8B492BD9;
+        Mon, 23 Oct 2023 23:45:14 +0000 (UTC)
+Date:   Tue, 24 Oct 2023 07:45:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>
-References: <20231023215638.3405959-1-bvanassche@acm.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20231023215638.3405959-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Cc:     linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>,
+        linux-kernel@vger.kernel.org, Juri Lelli <juri.lelli@redhat.com>,
+        Andrew Theurer <atheurer@redhat.com>,
+        Joe Mario <jmario@redhat.com>,
+        Sebastian Jug <sejug@redhat.com>,
+        Frederic Weisbecker <frederic@kernel.org>, ming.lei@redhat.com
+Subject: Re: [PATCH V2] blk-mq: don't schedule block kworker on isolated CPUs
+Message-ID: <ZTcFhmdAPL0LQD7J@fedora>
+References: <20231013124758.1492796-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231013124758.1492796-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/23/23 14:53, Bart Van Assche wrote:
-> This patch series improves small write IOPS by a factor of four (+300%) for
-> zoned UFS devices on my test setup with an UFSHCI 3.0 controller. Please
-> consider the block layer patches of this series for the next merge window.
+On Fri, Oct 13, 2023 at 08:47:58PM +0800, Ming Lei wrote:
+> Kernel parameter of `isolcpus=` or 'nohz_full=' are used for isolating CPUs
+> for specific task, and user often won't want block IO to disturb these CPUs,
+> also long IO latency may be caused if blk-mq kworker is scheduled on these
+> isolated CPUs.
+> 
+> Kernel workqueue only respects this limit for WQ_UNBOUND, for bound wq,
+> the responsibility should be on wq user.
+> 
+> So don't not run block kworker on isolated CPUs by ruling out isolated CPUs
+> from hctx->cpumask. Meantime in cpuhp handler, use queue map to check if
+> all CPUs in this hw queue are offline, this way can avoid any cost in fast
+> IO code path.
+> 
+> Cc: Juri Lelli <juri.lelli@redhat.com>
+> Cc: Andrew Theurer <atheurer@redhat.com>
+> Cc: Joe Mario <jmario@redhat.com>
+> Cc: Sebastian Jug <sejug@redhat.com>
+> Cc: Frederic Weisbecker <frederic@kernel.org>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+> 	- remove module parameter, meantime use queue map to check if
+> 	all cpus in one hctx are offline
 
-(replying to my own email)
+Hello Guys,
 
-Hi Jens,
+Ping...
 
-Are you OK with queuing the first four patches of this series for the
-upcoming merge window (one week from now)? If so, I can send the
-remaining patches to Martin after the merge window has closed.
+
 
 Thanks,
+Ming
 
-Bart.
