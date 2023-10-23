@@ -2,77 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08348CDB474
-	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 06:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A002CDB474
+	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 07:26:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233360AbjJWGcS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Oct 2023 02:32:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49698 "EHLO
+        id S233436AbjJWH0y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Oct 2023 03:26:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbjJWGcS (ORCPT
+        with ESMTP id S229450AbjJWH0x (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2023 02:32:18 -0400
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D17DB;
-        Sun, 22 Oct 2023 23:32:13 -0700 (PDT)
-X-UUID: 21920e6397694984822899e3834b1105-20231023
-X-CID-O-RULE: Release_Ham
-X-CID-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.32,REQID:dc5d4585-ad3a-4482-9932-278215af4edb,IP:20,
-        URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,AC
-        TION:release,TS:25
-X-CID-INFO: VERSION:1.1.32,REQID:dc5d4585-ad3a-4482-9932-278215af4edb,IP:20,UR
-        L:0,TC:0,Content:-5,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-        ON:release,TS:25
-X-CID-META: VersionHash:5f78ec9,CLOUDID:7de1087d-ccd9-4df5-91ce-9df5fea3ae01,B
-        ulkID:231023142837SMUKN4XO,BulkQuantity:1,Recheck:0,SF:17|19|44|66|38|24|1
-        02,TC:nil,Content:0,EDM:5,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,COL:
-        0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 21920e6397694984822899e3834b1105-20231023
-X-User: chentao@kylinos.cn
-Received: from vt.. [(116.128.244.171)] by mailgw
-        (envelope-from <chentao@kylinos.cn>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 373002410; Mon, 23 Oct 2023 14:31:58 +0800
-From:   Kunwu Chan <chentao@kylinos.cn>
-To:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, axboe@kernel.dk
-Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kunwu.chan@hotmail.com,
-        Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH] drbd: Spelling fix in comment
-Date:   Mon, 23 Oct 2023 14:31:55 +0800
-Message-Id: <20231023063155.719469-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.34.1
+        Mon, 23 Oct 2023 03:26:53 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB739D6;
+        Mon, 23 Oct 2023 00:26:50 -0700 (PDT)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4SDRZm4TV8z4f3kGC;
+        Mon, 23 Oct 2023 15:26:40 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+        by mail.maildlp.com (Postfix) with ESMTP id 5DA941A0171;
+        Mon, 23 Oct 2023 15:26:46 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgBn+dg0IDZlt0TeDg--.38637S3;
+        Mon, 23 Oct 2023 15:26:46 +0800 (CST)
+Subject: Re: [PATCH RFC v2 0/8] blk-mq: improve tag fair sharing
+To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     bvanassche@acm.org, hch@lst.de, kbusch@kernel.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
+ <ZTX4q7QBerKbjzQA@fedora>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <40652bee-4086-1b32-b840-1f9a3adfe358@huaweicloud.com>
+Date:   Mon, 23 Oct 2023 15:26:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <ZTX4q7QBerKbjzQA@fedora>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBn+dg0IDZlt0TeDg--.38637S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7CrW5Cw1rXFWUWw47KFWfXwb_yoW8WF47pF
+        WSqF47tws2vw42kFWDX39xGFyfKr4kGry5Kr97G347Zws8urnagr4xtr45uFZ7AF1DGrWU
+        urWq9rZ8CFyDX3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-protocoll -> protocol
+Hi,
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
----
- drivers/block/drbd/drbd_req.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ÔÚ 2023/10/23 12:38, Ming Lei Ð´µÀ:
+> Hello Yu Kuai,
+> 
+> On Sat, Oct 21, 2023 at 11:47:58PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Current implementation:
+>>   - a counter active_queues record how many queue/hctx is sharing tags,
+>>   and it's updated while issue new IO, and cleared in
+>>   blk_mq_timeout_work().
+>>   - if active_queues is more than 1, then tags is fair shared to each
+>>   node;
+> 
+> Can you explain a bit what the problem is in current tag sharing?
+> And what is your basic approach for this problem?
+> 
+> Just mentioning the implementation is not too helpful for initial
+> review, cause the problem and approach(correctness) need to be
+> understood first.
 
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index 380e6584a4ee..60e6e016829e 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -1745,7 +1745,7 @@ void request_timer_fn(struct timer_list *t)
- 	 * but which is still waiting for an ACK. */
- 	req_peer = connection->req_ack_pending;
- 
--	/* if we don't have such request (e.g. protocoll A)
-+	/* if we don't have such request (e.g. protocol A)
- 	 * check the oldest requests which is still waiting on its epoch
- 	 * closing barrier ack. */
- 	if (!req_peer)
--- 
-2.34.1
+Of course, I'll add following if there will be a v3;
+
+Current problems:
+
+If there are multiple active_queues, then tag is fair shared to each
+queue, and if one queue is not busy(for example, only issue one IO once
+for a while), then shared tags for this queue is wasted and can't be
+used for other queues.
+
+Depends on the hardware, this might casue performance problems in some
+user case. For example, as reported by [1], UFS devices
+have multiple logical units. One of these logical units (WLUN) is used
+to submit control commands, e.g. START STOP UNIT. If any request is
+submitted to the WLUN, the queue depth is reduced from 31 to 15 or
+lower for data LUNs.
+
+This patchset first delay tag sharing from issue IO to failed to get
+driver tag; then add a counter to record how many times shared queue
+failed to get driver tag to indicate if the queue is busy; finially,
+allow busy queue to borrow more tags from idle queue.
+
+Thanks,
+Kuai
+
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
 
