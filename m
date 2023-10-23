@@ -2,99 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A58C25B46
-	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 20:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D62C25B45
+	for <linux-block@archiver.kernel.org>; Mon, 23 Oct 2023 20:47:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230059AbjJWUhF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Oct 2023 16:37:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42448 "EHLO
+        id S229544AbjJWUrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Oct 2023 16:47:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231172AbjJWUhD (ORCPT
+        with ESMTP id S229529AbjJWUrA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2023 16:37:03 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E70D5D7F;
-        Mon, 23 Oct 2023 13:37:00 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6bb4abb8100so3041320b3a.2;
-        Mon, 23 Oct 2023 13:37:00 -0700 (PDT)
+        Mon, 23 Oct 2023 16:47:00 -0400
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A2DBC;
+        Mon, 23 Oct 2023 13:46:58 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1c9e06f058bso35039685ad.0;
+        Mon, 23 Oct 2023 13:46:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698093420; x=1698698220;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AMnsyk1g8r/3tKoyiKaNRWtn6PBqRflWAg/7J6/KnIY=;
-        b=V/bF7KEPCf4ZVdyJNX231IE7z9gyj4gspeSFSKELybd6EbxYwda47dCs66Nyn/Zg6A
-         EJE+BkkVbbXvYIDhDLm++glwRWcPzvPloqDQxDd6wPYc7EKiMEVnC2Vk10nDONInhG3T
-         n8GyFRI7e5hDzLzGYfprvNfHxwR+b5tdBIKOpGpJZUpbUszsAixOhDaXxm+Ns6xg+T1r
-         5DMDSp9d4sdclMyKRy85MjYoN/YHCTfZf2FsGQE/b2kJYo6VZuYupi+jvnslL4sytbOS
-         82wFz8vKgK49d4hkKM0VOt8+96kmi3J/tdNxrqTULCsK4dGlMa5OLRQsPEPnPxOKrhM+
-         4hCg==
-X-Gm-Message-State: AOJu0YwqtpcCMYGQEn+ZcvfWWvRA4tkDt4FreiapJaqlNOnBLweHXVzG
-        WQEoPP/vlbSjQvIeHHkTah5aTgFsOf4=
-X-Google-Smtp-Source: AGHT+IFpLVY+L0n1w4PTLQloDCUpQcBgfWyDbIutAs9c/T9RzALjy2COti+bZOeDSl3+yYazHs5lzA==
-X-Received: by 2002:a05:6a21:360c:b0:17b:4f43:afd1 with SMTP id yg12-20020a056a21360c00b0017b4f43afd1mr567295pzb.58.1698093420246;
-        Mon, 23 Oct 2023 13:37:00 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:14f9:170e:9304:1c4e])
-        by smtp.gmail.com with ESMTPSA id g29-20020aa79ddd000000b0068be4ce33easm5776025pfq.96.2023.10.23.13.36.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 13:36:59 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        Ed Tsai <ed.tsai@mediatek.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        Can Guo <quic_cang@quicinc.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Asutosh Das <quic_asutoshd@quicinc.com>,
-        Bean Huo <beanhuo@micron.com>,
-        "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
-        Arthur Simchaev <Arthur.Simchaev@wdc.com>
-Subject: [PATCH v4 3/3] scsi: ufs: Disable fair tag sharing
-Date:   Mon, 23 Oct 2023 13:36:35 -0700
-Message-ID: <20231023203643.3209592-4-bvanassche@acm.org>
-X-Mailer: git-send-email 2.42.0.758.gaed0368e0e-goog
-In-Reply-To: <20231023203643.3209592-1-bvanassche@acm.org>
-References: <20231023203643.3209592-1-bvanassche@acm.org>
+        d=1e100.net; s=20230601; t=1698094018; x=1698698818;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GrX5rfIviWZ3MV5YYguySJMRct/o0TPbHAjKwB4P258=;
+        b=YZ1R5emjRFSj4vkSQvDvhwNs1TDS2+de3huXOo6mt8juubRv8Im62NLGZjplN6eFMm
+         W609OWTOELyq5Aykkyaegvva42N70RutfXDOaHgCMBXqIpDHANsSfMPX/6RT67GMntjB
+         cHHgybbR6NnpP5fqp3JZRMASYJcNnh5owtUYRBsLS2Mth/lCM1zp0y23f/HDr7dMPPIn
+         VBbox4n7QzA069IFZzfRMpAs7/v8+CNHeH3d+f865lveKSaX5kfdsLa+JpFFz3MdnPhp
+         1XKzTIX83u52tIzCyFBnm5Y+nmDPbRdOmXhzWPonulEmzFPfX7v7nn4F51LKQKGL8wH4
+         rBvA==
+X-Gm-Message-State: AOJu0YzJOSeWM0Neack/37ZQC+zLb03kAVL/bDXQiA+ZTc+nWW6XBTyO
+        3MlclIF1RZ6oo5BUlh6rOhs=
+X-Google-Smtp-Source: AGHT+IEGyNmPgn+1seQ+b4IjU4nfs2gp2xs00S0dIBo0hrLMQ/8SZczxdMFBCPg0uRGXq7DkgYgzGw==
+X-Received: by 2002:a17:902:facf:b0:1c5:d8a3:8783 with SMTP id ld15-20020a170902facf00b001c5d8a38783mr11972847plb.11.1698094018130;
+        Mon, 23 Oct 2023 13:46:58 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:14f9:170e:9304:1c4e? ([2620:15c:211:201:14f9:170e:9304:1c4e])
+        by smtp.gmail.com with ESMTPSA id 18-20020a170902c21200b001c5f7e06256sm6322466pll.152.2023.10.23.13.46.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Oct 2023 13:46:57 -0700 (PDT)
+Message-ID: <d8b5db3c-cd0a-4e88-ae08-e17b97bdfc55@acm.org>
+Date:   Mon, 23 Oct 2023 13:46:55 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v2 8/8] blk-mq-tag: allow shared queue/hctx to get
+ more driver tags
+Content-Language: en-US
+To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, kbusch@kernel.org,
+        ming.lei@redhat.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+References: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
+ <20231021154806.4019417-9-yukuai1@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20231021154806.4019417-9-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Disable the block layer fair tag sharing algorithm because it
-significantly reduces performance of UFS devices with a maximum queue
-depth of 32.
+On 10/21/23 08:48, Yu Kuai wrote:
+> +	if (!busy) {
+> +		ctl->timer_running = false;
+> +	} else {
+> +		ctl->timer.expires = jiffies + HZ;
+> +		add_timer(&ctl->timer);
+> +	}
+> +	spin_unlock_irq(&tags->lock);
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Ed Tsai <ed.tsai@mediatek.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/ufs/core/ufshcd.c | 1 +
- 1 file changed, 1 insertion(+)
+[ ... ]
 
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index c2df07545f96..ed04d1263e02 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -8866,6 +8866,7 @@ static const struct scsi_host_template ufshcd_driver_template = {
- 	.max_host_blocked	= 1,
- 	.track_queue_depth	= 1,
- 	.skip_settle_delay	= 1,
-+	.disable_fair_tag_sharing = 1,
- 	.sdev_groups		= ufshcd_driver_groups,
- 	.rpm_autosuspend_delay	= RPM_AUTOSUSPEND_DELAY_MS,
- };
+> +inc_busy:
+> +	atomic_inc(&info->busy_count);
+> +	if (!tags->ctl.timer_running &&
+> +	    try_cmpxchg_relaxed(&tags->ctl.timer_running, &timer_running, true)) {
+> +		tags->ctl.timer.expires = jiffies + HZ;
+> +		add_timer(&tags->ctl.timer);
+> +	}
+>   }
+
+So the choice has been made to let the timer expire after one second? I
+think the choice of the timer value is important enough to mention it in
+the patch description.
+
+Thanks,
+
+Bart.
+
