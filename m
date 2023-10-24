@@ -2,145 +2,496 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66DBEC25B6C
-	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 02:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C075C07545
+	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 03:52:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232530AbjJXC7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Oct 2023 22:59:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37208 "EHLO
+        id S232054AbjJXDw2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Oct 2023 23:52:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232435AbjJXC7e (ORCPT
+        with ESMTP id S231982AbjJXDw1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2023 22:59:34 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFFA710F7;
-        Mon, 23 Oct 2023 19:59:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1698116366; x=1729652366;
-  h=from:to:cc:subject:date:message-id:content-id:
-   content-transfer-encoding:mime-version;
-  bh=fsgcp1jpMPWsZMs25Q/J+X6y3sKQviriOIYFQ088Vto=;
-  b=OD1y37bcsCbgCUI4rj8ofiYfutmc7/FMMn7onOI5zxeg8w8heHddHQnG
-   pif7mwUKn6IpxXP6DPV/YysIf+vu1jzZpLJEMZuWWVuGwwlfNfj4ny7Jd
-   46m6Qx79uYJds0AmkD13FLMdM7yiYbgVjFOlVJM9nEwH7Jt77YP0O9drs
-   /AQ57F0zlTPfq/01dsOMZZ07M1DZhyj8Z3YLUiHy5/jUVS5YYf0X5K18q
-   zhdCKyjIk3mOmSNhfaWpsHSdbaDWCqumEpbbvvus/rlKVg7wtduKClL6O
-   aQHjY6dTRXoZIhBNjtINHe9AFAlkjTR0zTFrLirQ0x1P/DRqFQ9/J+Zch
-   A==;
-X-CSE-ConnectionGUID: XhEl0Kp2QCaniQaQ76mMIQ==
-X-CSE-MsgGUID: DZ7kiG4bRfGPFPokBcF6RQ==
-X-IronPort-AV: E=Sophos;i="6.03,246,1694707200"; 
-   d="scan'208";a="456624"
-Received: from mail-sn1nam02lp2041.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.57.41])
-  by ob1.hgst.iphmx.com with ESMTP; 24 Oct 2023 10:59:24 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CYYvVfa0pL/nsota73MWXIbGHWiw2pGoai7/7feL48JalsyOVNFQDfAr2pLeY6Nea4j2bImHr+Gyi1v5WznT9PfP75Sp0Ws8CgTlCex8zSAgB9mNs20w5FqoeWWCpskjedkLxFvxU3c1Cd6OLCqiQEUR6dtsJ72tFeTvFQYvGOzboYr+Phepm13iJAHhwRbvTJ5/OyfV/bMo82WmM+dSOo0beMCq+4ZrAT7IPp+JdEBRIRpC7XwIe8ZGCaXxQePWsePbYTvhG/EOdppPE38ZXG+U5JUO1dnh1v6U8zkC6XvC1w7PJ+5zOvsfr9+i1aTNWRu1iOjDN0VDKT4hhrDvTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fsgcp1jpMPWsZMs25Q/J+X6y3sKQviriOIYFQ088Vto=;
- b=GE4AncX3tFmfOh69zeo2RNpP7DFbibigXOrfOzTk3valf0CIfZGvwhMHBclnwmuAydp60itLBBto9BWV/TaGgM16qA02ZQuisMl0RgiUmyvDYsCnqwqcDNgV5FRWpQTHq/YM4+EPXjTrVvFKw6bUMsumHT3JsCJnF+018fGaAKK6QG8cqNP296IL3nEd+H2t+Xu4et6+aIryfpedN9/R1HgcoHpEwtTXurhoo0jAVvZ5tJ7FF9lyaa/4HVOqtH9UzC6v4fEeXg231hb3IZxALotDYIhp/8+dBtWWmTORvn/2HdrrzGWLdouU0QpPp5fh1Xg1yq67K0WLYvfQP8amVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Mon, 23 Oct 2023 23:52:27 -0400
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E25EE
+        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2023 20:52:23 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-7788db95652so281586985a.2
+        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2023 20:52:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fsgcp1jpMPWsZMs25Q/J+X6y3sKQviriOIYFQ088Vto=;
- b=wuqbO5XRobM1Grig9lmREltl99tpYeO2FBVdvutoa/lIeEcgj/R5lbl00KLshAHec/+WE0lvM9Oj80E2rI2IMgm/9Cg32Kz0Pq28MVf8/jpROKkfOWeUymoigKYChQw7Wx01+KWXpK0LLL7ROEBnrn4djuPH+6LgzC7hwYgMpwE=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SJ0PR04MB8565.namprd04.prod.outlook.com (2603:10b6:a03:4e4::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Tue, 24 Oct
- 2023 02:59:22 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::2256:4ad2:cd2b:dc9e]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::2256:4ad2:cd2b:dc9e%3]) with mapi id 15.20.6907.032; Tue, 24 Oct 2023
- 02:59:22 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-CC:     Daniel Wagner <dwagner@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: blktests: running nvme and srp tests with real RDMA hardware
-Thread-Topic: blktests: running nvme and srp tests with real RDMA hardware
-Thread-Index: AQHaBiYWTin4xWkZxkKsvv5vKBqfkQ==
-Date:   Tue, 24 Oct 2023 02:59:21 +0000
-Message-ID: <vaijnbobhxyz4nkk2csv3nfhnpeupbudakcn3qgmo7o6vii4x5@rfnfdll6iloo>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB8565:EE_
-x-ms-office365-filtering-correlation-id: b982d38f-af24-48db-65a3-08dbd43d3920
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QISyWRXGoySjYLxSmG4eswaf/Pvr0OT8AhKwDnx282lLhNP+GfJQO9YI6Idwu4ir6tnrXliVOtKVEiePdttll7lVwMKFU7LK2kS9Zmi/kAbPTqOH50uFizIjSIRuDcVag31NDCJc5c/2LUMdKgpOSg8e8j1D/bU1kwGnF03iZTnuhk++RPToiDiD47LFwD8qwHMJcL3r6DQeHAJze9sNqHk3p2bYMYKdJFJWHJRMwhlavBR4fE5COQ38tnrhjyXk67mVzvYwD4rdse92vPD9xmQU+yvcnZw5szg2plMzvNsVJ3UGJUumh3uq57E7sRmPdnZoep53PSransb+spcg31FiTgrnRmzY2R5z4qThnt1ZnyBvgu0V9VbB4nII1CJxqnigkvDww9QWq50asAn0D2HYeU4uWnUD9c6yhRAJ6dmcvwQbDn6wPpan43kuA4JWMBSoTNDe7tnv/vVydNp2H7Vid3ucf64Sm5fKtmmsB31BxzN9nMr535ZDXkeMKcKBxU8JZCqbEY9U4a8hGJWAkbhPerwHY6TOi33ZyzjEBPupH8kNmWL0BEO9rOapjscLH4VFV6cUCJKmsU/ougUdCLDnruoVTeVX6opYcFb29rA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(376002)(396003)(136003)(39860400002)(346002)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(83380400001)(6506007)(9686003)(6512007)(478600001)(64756008)(26005)(6486002)(966005)(110136005)(91956017)(66446008)(54906003)(66946007)(76116006)(316002)(66556008)(66476007)(86362001)(71200400001)(38100700002)(82960400001)(122000001)(8676002)(4326008)(8936002)(41300700001)(44832011)(2906002)(4744005)(38070700009)(5660300002)(33716001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?r0BqcVA6v9INyDhph5w14Pa7VkRhoxjsl6kgZOOHxOhm9h8MQ/mdE4MMPSNJ?=
- =?us-ascii?Q?gTycWSjGrTjyH/DiKdKWNc6n7fnr6/U4qUuzDWNTRL1/nfEZkAaAch7E/wtl?=
- =?us-ascii?Q?Vl8XDHFKgn3F18SbClQ17oNPYby2S1G4vrpQZZr0uwENH+1zJRPxT2hiuccG?=
- =?us-ascii?Q?y4kJdOnZj6WODFlvFNcGL8doLtZ02a1pZOzXWS4aURBjQ5CxfNw0f5ipnEiU?=
- =?us-ascii?Q?FiPM5ycjFV2J7v7Az//38BP/5w+166JPXDPBL4KTpzozcEnlFgcnZ2UGtFWy?=
- =?us-ascii?Q?bKBM/duWgccaLqTCUB9U//Cbi5pKx3JO7u9XH/yN3673TY6GZOerMMHjQabx?=
- =?us-ascii?Q?ksQ29+mQaFrzXrimSfMte7bmcKZoxbwPnx7uAQ3gD30vJU1VDB6Ajaz/K9HY?=
- =?us-ascii?Q?EFdwHLHmCh3wOH1WJrQA8WjzSrHc2UNOgbHZiGrbyO70ZKvTF1uGDuGgrjcx?=
- =?us-ascii?Q?AjaWSxzuPbEkV7k6cypEITZzSnem0LklA+4KzrTL5E2mP5NLYbA50H3HZoLj?=
- =?us-ascii?Q?2DrBS03PymjPETg2ixnUGjAwXnP11gfBtmcpfyZUePune3SzSXoNFgacF7Dg?=
- =?us-ascii?Q?hl2boysYDO6nuw8j0yYqLNYzazQfqpxaqYRWCCLYFxRscOmtW739e+Y1gIKL?=
- =?us-ascii?Q?siAQcaj/Sa10JllgjcuCvk4yi5pYoW0cK1Vm8/nXgKjKzffsTnTe4vHf8YHp?=
- =?us-ascii?Q?lkyCXBD5F6QmeORAbwjQ18U3f5mcW1rum7RMoReAvIpuDWLns7iWPMkZ7ISX?=
- =?us-ascii?Q?/m7MF1D4ad8pJMS4wj3+zM4KxizSJU8w2rzrC5qqBeTKpxFrM0QOfbdETIwv?=
- =?us-ascii?Q?0k+OGRYCApbAWs1ohCyOokTLv+Cg8NqjkPKDvtFHRwwVUYXmWPJvBFO9riov?=
- =?us-ascii?Q?ifGhh1yDKlN83DgNbo4K85+DCD71SQ8ase4OijIv0merD0O5dElv+bn+YnDO?=
- =?us-ascii?Q?L/yXLkSQifUXhOjVicnKX6F11xmuA2SFYBGmyM5FpXFuM9f0Ahtcglbtzwoy?=
- =?us-ascii?Q?ZCsUV9oDKNDQwsMD9i42so3q7DkXs3a83GE1cRAh/7jPYluwmbVj9GlT7dZ+?=
- =?us-ascii?Q?XL7Vh/WYiz59UuJk0Ep4lh2kC+Wt2GHbSCrp9s9i+XrVgOGJCKjV+tpdw4nx?=
- =?us-ascii?Q?xKOumNPDYDz6YEKxBS/8tzl6apheVPReVrPsyri7Sc+xMwvpbHX0hhe+J6GP?=
- =?us-ascii?Q?23f46/iY3En1Bz/Iy4UpTkF9rzX6w3cpqOUiE507fq9c2wECl8ka4GwKAA1D?=
- =?us-ascii?Q?B43ozbfmrhaHqtyYEdxHXqyoWodIBg5lqrZcY44iz6r2HEZ/HMeBX7cC3lGA?=
- =?us-ascii?Q?Fiaj9PWrHwqCDRtq/NIcJOA+X3WRfloWXDGkjIL8cw61ayOeT08027McThp1?=
- =?us-ascii?Q?tBXOepGs+mZVUaTRZBH5+5XIi5PzGRjZnKNgZrA9DwoZHHOIMORJ6W74G8Lb?=
- =?us-ascii?Q?T6i00egy6g1q/AXD2JWAgpk0xAwmpVAJSPv+heUBJD0DbBRseeWf1PmOZYt7?=
- =?us-ascii?Q?gM+wrjcX/NhhPuORDcyjYtJNs7Tx6j8aW9ak7cVHhGkKZh+lLloqHpuuSNEa?=
- =?us-ascii?Q?Del1r5XC2bLtvhqSaoX6j+Pcp7+mcfhk/iwCt173xT780zvYD5Z6rvfGA7JO?=
- =?us-ascii?Q?Kpz+rjBLlZg6YpmMZ3ls5yU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E8D2660223806C408064B118A3016F47@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: GC/H2fLyY66ikMT3sLwN1g9WU4kmLCXq3sikFUM3TS3gi4GTHZm/qVCgqtjc4ARNrIZQYY1kRI7GW5Om6IJ9DWuEUY98lHUjTzZ/sQB03c08YAbIQHJ9SGCyLRGWVsPV8c9wHIF7LBBaAqLCJmaU0uKM9RjJbzfNofC8kqwaOYGtSf5AU9fQt6xX8afUq3eiztNoOURFR7A+lheE6LlFIdLWDR77wj5aIms1UuyuFowq0uWg1q4RunUYYqdjJpYXwHmVLv4nX/8NDoIlK2hFXXozrwRZ6zM1/xvKfSji455sRoQNP91pCc5eA3unM+WHalyWuTL1HScwYp20elYkBFXfgDN72I6zuTdllJQT5PYNUjC8+w8oTNMs3BLoQeYQKO3bWhihEzsBkEbMf4vzOw7kZnXLkquTigEzc800wnq+VqwWVNeoiXs0aE8ZBVpo/DPF7YN/giSZcgAp9sDViSZVQMyVOulQpzC7lSnXvmkdbKzijznBkC04J6szOw1wGL4Ku61CoOHN3dayZm/3dbWw62ddE5boE9eW6lQirkRkvObfo4jpAM6S3HuS5E/zdgHwVCdW7DlNMBi1APExPLrnFRi3VrFjpp9O9QbLNE0EiiMcEPyJr1Fa+uw11rBY3iVfAakwcPSJt4jICVConyofXA3NyrCktJ+bPQxqsu4uh/tTHcI1SpmTDbIzQpalKme6eodNWAuJoM6Ni15nvg34r9ggyt9KwMJOiaJbvUwsQOUSBKmajNje7AtP1LgZQZhDZ3zda4wWgYAvum9fbz2K4heDgiynwsFk41l8woFY9fGMzMHQRLgdnGO/58uuqA1G6+rNdCM+SvbsCmjWeMz1v6cpU0o1TgcidtCnpzMpFTY1+OokSF6x1pOxZtZYacZLnFXHmu3HTWeR6Y49cvJOlZ/eMG6NBUr6hSuhCtM=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b982d38f-af24-48db-65a3-08dbd43d3920
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2023 02:59:21.9036
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jl45FI3BZTI8XPHFuWwpzk3wgU3j54uXcrYgmb4vDiwSizjUzCAgSpJXcNOOjX6otMNu9JOGYPAmlnPciwLO7CDa1+rZnsVi/zr/uax+iUU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB8565
+        d=paul-moore.com; s=google; t=1698119543; x=1698724343; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=PYQStjjr2Q8HKTHbB20ou4WiXIqkha1Xi9gNGY1VyVs=;
+        b=WAHBHXtjHEsNLoriS8vOtzrxgPI6/NMjDrdW5rIviWtRjDjfsUKxfuTOekd8pKSCyk
+         D1j8V4OyAzgJh5iLtBrkUgqGbWOPoj3VTOZC9JcpciWz4cfj+rKZxhmRF+aEX4hl+T//
+         nYVBex5k/D3yPgZa64W8kV4L66lKiEm323MlPTmkYLspb6+hojACf8PyxQeG/Yi1/2Fd
+         +OW/2kBtN4yHRtVJALJYvZoAKP6yTODb8TTIJABeqk/QHJmguWtEAWhvnIO3uRtSFoP6
+         Z31sTINDDOu0o0B9lHst/GL//IKm5o/Qqk6Ny3uJV1kKyC3Zjd7UiZcqkB+qzb9Ja7sv
+         JeXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698119543; x=1698724343;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PYQStjjr2Q8HKTHbB20ou4WiXIqkha1Xi9gNGY1VyVs=;
+        b=HGoxYjogkt0kcj5Vfoq7Gn2kEmEvvh7oWceTIyJ34hJW382MW+dG678l83ovL7pqb+
+         btIezsDSTZmBfN9iW4QMPRQZ8SrJNWC25HjQbXAn1kNChVhPmb6sDcp4zHKe1DA8zCES
+         Bze6gqtlf/gFHhtz55pKwd7gsQmDZcntz77bwc51BngWIIJZs2rnpfvKlMASB68d18OK
+         6jz4bcLFpQ4IzMVnASiJUzoHUK2hqcC5NVLn0/b6n9qTnU2U6yBEE3rBfOJ/q/Yl5Z/G
+         wRZjT4wsTI5ptlJ/e9fU89yDnhvkTLtBlVieLwSt2kTC8Y1St1OkIIPk1jhI+4rSoz/e
+         Xr/g==
+X-Gm-Message-State: AOJu0YyTUBJblPXnLULGlCMtafv8Z5cOL88jZt9MUcb37ODrkBMim1ut
+        7bXqrAnPrdWVXu2FyKokQbDn
+X-Google-Smtp-Source: AGHT+IHfXLDpTQH23RQCgDD0EvaJ8t5ssD/FP1FN3NpOgQNJgnc6N7o0sQ0agZuP/Pbj2axyoTKe+g==
+X-Received: by 2002:a05:620a:1a25:b0:772:6419:89ab with SMTP id bk37-20020a05620a1a2500b00772641989abmr13610179qkb.55.1698119542757;
+        Mon, 23 Oct 2023 20:52:22 -0700 (PDT)
+Received: from localhost ([70.22.175.108])
+        by smtp.gmail.com with ESMTPSA id bi12-20020a05620a318c00b00772662b7804sm3164703qkb.100.2023.10.23.20.52.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 20:52:22 -0700 (PDT)
+Date:   Mon, 23 Oct 2023 23:52:21 -0400
+Message-ID: <7c8c2a158c628a642078f746e5c42f2f.paul@paul-moore.com>
+From:   Paul Moore <paul@paul-moore.com>
+To:     Fan Wu <wufan@linux.microsoft.com>, corbet@lwn.net,
+        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
+        agk@redhat.com, snitzer@kernel.org, eparis@redhat.com
+Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        Fan Wu <wufan@linux.microsoft.com>
+Subject: Re: [PATCH RFC v11 2/19] ipe: add policy parser
+References: <1696457386-3010-3-git-send-email-wufan@linux.microsoft.com>
+In-Reply-To: <1696457386-3010-3-git-send-email-wufan@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello blktests users,
+On Oct  4, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+> 
+> IPE's interpretation of the what the user trusts is accomplished through
+> its policy. IPE's design is to not provide support for a single trust
+> provider, but to support multiple providers to enable the end-user to
+> choose the best one to seek their needs.
+> 
+> This requires the policy to be rather flexible and modular so that
+> integrity providers, like fs-verity, dm-verity, dm-integrity, or
+> some other system, can plug into the policy with minimal code changes.
+> 
+> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> ---
+> v2:
+>   + Split evaluation loop, access control hooks,
+>     and evaluation loop from policy parser and userspace
+>     interface to pass mailing list character limit
+> 
+> v3:
+>   + Move policy load and activation audit event to 03/12
+>   + Fix a potential panic when a policy failed to load.
+>   + use pr_warn for a failure to parse instead of an
+>     audit record
+>   + Remove comments from headers
+>   + Add lockdep assertions to ipe_update_active_policy and
+>     ipe_activate_policy
+>   + Fix up warnings with checkpatch --strict
+>   + Use file_ns_capable for CAP_MAC_ADMIN for securityfs
+>     nodes.
+>   + Use memdup_user instead of kzalloc+simple_write_to_buffer.
+>   + Remove strict_parse command line parameter, as it is added
+>     by the sysctl command line.
+>   + Prefix extern variables with ipe_
+> 
+> v4:
+>   + Remove securityfs to reverse-dependency
+>   + Add SHA1 reverse dependency.
+>   + Add versioning scheme for IPE properties, and associated
+>     interface to query the versioning scheme.
+>   + Cause a parser to always return an error on unknown syntax.
+>   + Remove strict_parse option
+>   + Change active_policy interface from sysctl, to securityfs,
+>     and change scheme.
+> 
+> v5:
+>   + Cause an error if a default action is not defined for each
+>     operation.
+>   + Minor function renames
+> 
+> v6:
+>   + No changes
+> 
+> v7:
+>   + Further split parser and userspace interface into two
+>     separate commits, for easier review.
+>   + Refactor policy parser to make code cleaner via introducing a
+>     more modular design, for easier extension of policy, and
+>     easier review.
+> 
+> v8:
+>   + remove unnecessary pr_info emission on parser loading
+>   + add explicit newline to the pr_err emitted when a parser
+>     fails to load.
+> 
+> v9:
+>   + switch to match table to parse policy
+>   + remove quote syntax and KERNEL_READ operation
+> 
+> v10:
+>   + Fix memory leaks in parser
+>   + Fix typos and change code styles
+> 
+> v11:
+>   + Fix code style issues
+> ---
+>  security/ipe/Makefile        |   2 +
+>  security/ipe/policy.c        | 101 ++++++++
+>  security/ipe/policy.h        |  83 ++++++
+>  security/ipe/policy_parser.c | 487 +++++++++++++++++++++++++++++++++++
+>  security/ipe/policy_parser.h |  11 +
+>  5 files changed, 684 insertions(+)
+>  create mode 100644 security/ipe/policy.c
+>  create mode 100644 security/ipe/policy.h
+>  create mode 100644 security/ipe/policy_parser.c
+>  create mode 100644 security/ipe/policy_parser.h
 
-As of today, software RDMA driver "siw" or "rdma_rxe" is used to run "nvme"
-group with nvme_trtype=3Drdma or "srp" (scsi rdma protocol) group. Now it i=
-s
-suggested to run the test groups with real RDMA hardware to run tests in
-more realistic conditions. A GitHub pull request is under review to support
-it [1]. If you are interested in, please take a look and comment.
+...
 
-[1] https://github.com/osandov/blktests/pull/86=
+> diff --git a/security/ipe/policy.c b/security/ipe/policy.c
+> new file mode 100644
+> index 000000000000..3a529c7950a1
+> --- /dev/null
+> +++ b/security/ipe/policy.c
+> @@ -0,0 +1,101 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) Microsoft Corporation. All rights reserved.
+> + */
+
+...
+
+> +static int set_pkcs7_data(void *ctx, const void *data, size_t len,
+> +			  size_t asn1hdrlen)
+> +{
+> +	struct ipe_policy *p = ctx;
+> +
+> +	p->text = (const char *)data;
+> +	p->textlen = len;
+> +
+> +	return 0;
+> +}
+
+The @asn1hdrlen parameter isn't used in this function, at least at this
+point in the patchset, so you really should remove it.  If it is needed
+later in the patchset you can always update the function.
+
+> diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
+> new file mode 100644
+> index 000000000000..c09458bd348d
+> --- /dev/null
+> +++ b/security/ipe/policy_parser.c
+> @@ -0,0 +1,487 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) Microsoft Corporation. All rights reserved.
+> + */
+
+...
+
+> +/**
+> + * remove_trailing_spaces - Truncate all trailing spaces in a string.
+> + *
+> + * @line: Supplies a poilcy line string for preprocessing.
+> + *
+> + * Return: The length of truncated string.
+> + */
+> +static size_t remove_trailing_spaces(char *line)
+> +{
+> +	size_t i = 0;
+> +
+> +	for (i = strlen(line); i > 0 && (line[i - 1] == ' ' || line[i - 1] == '\t'); --i)
+> +		;
+
+Maybe I've asked this before, I can't remember: could you use the
+isspace() macro here instead of explicitly checking for ' ' and '\t'?
+
+  i = strlen(line);
+  while (i > 0 && isspace(line[i - 1]))
+    i--;
+  line[i] = '\0';
+
+> +	line[i] = '\0';
+> +
+> +	return i;
+> +}
+> +
+> +/**
+> + * parse_version - Parse policy version.
+> + * @ver: Supplies a version string to be parsed.
+> + * @p: Supplies the partial parsed policy.
+> + *
+> + * Return:
+> + * * 0	- OK
+> + * * !0	- Standard errno
+> + */
+> +static int parse_version(char *ver, struct ipe_parsed_policy *p)
+> +{
+> +	int rc = 0;
+> +	size_t sep_count = 0;
+> +	char *token;
+> +	u16 *const cv[] = { &p->version.major, &p->version.minor, &p->version.rev };
+> +
+> +	while ((token = strsep(&ver, ".")) != NULL) {
+> +		/* prevent overflow */
+> +		if (sep_count >= ARRAY_SIZE(cv))
+> +			return -EBADMSG;
+> +
+> +		rc = kstrtou16(token, 10, cv[sep_count]);
+> +		if (rc)
+> +			return rc;
+> +
+> +		++sep_count;
+> +	}
+> +
+> +	/* prevent underflow */
+> +	if (sep_count != ARRAY_SIZE(cv))
+> +		rc = -EBADMSG;
+
+You could always just 'return -EBADMSG' here and 'return 0' below to
+simplify things a little.
+
+> +	return rc;
+> +}
+> +
+> +enum header_opt {
+> +	IPE_HEADER_POLICY_NAME = 0,
+> +	IPE_HEADER_POLICY_VERSION,
+> +	__IPE_HEADER_MAX
+> +};
+> +
+> +static const match_table_t header_tokens = {
+> +	{IPE_HEADER_POLICY_NAME,	"policy_name=%s"},
+> +	{IPE_HEADER_POLICY_VERSION,	"policy_version=%s"},
+> +	{__IPE_HEADER_MAX,		NULL}
+> +};
+> +
+> +/**
+> + * parse_header - Parse policy header information.
+> + * @line: Supplies header line to be parsed.
+> + * @p: Supplies the partial parsed policy.
+> + *
+> + * Return:
+> + * * 0	- OK
+> + * * !0	- Standard errno
+> + */
+> +static int parse_header(char *line, struct ipe_parsed_policy *p)
+> +{
+> +	int rc = 0;
+> +	char *t, *ver = NULL;
+> +	substring_t args[MAX_OPT_ARGS];
+> +	size_t idx = 0;
+> +
+> +	while ((t = strsep(&line, IPE_POLICY_DELIM)) != NULL) {
+> +		int token;
+> +
+> +		if (*t == '\0')
+> +			continue;
+> +		if (idx >= __IPE_HEADER_MAX) {
+> +			rc = -EBADMSG;
+> +			goto out;
+> +		}
+> +
+> +		token = match_token(t, header_tokens, args);
+> +		if (token != idx) {
+> +			rc = -EBADMSG;
+> +			goto out;
+> +		}
+> +
+> +		switch (token) {
+> +		case IPE_HEADER_POLICY_NAME:
+> +			p->name = match_strdup(&args[0]);
+> +			if (!p->name)
+> +				rc = -ENOMEM;
+> +			break;
+> +		case IPE_HEADER_POLICY_VERSION:
+> +			ver = match_strdup(&args[0]);
+> +			if (!ver) {
+> +				rc = -ENOMEM;
+> +				break;
+> +			}
+> +			rc = parse_version(ver, p);
+> +			break;
+> +		default:
+> +			rc = -EBADMSG;
+> +		}
+> +		if (rc)
+> +			goto out;
+> +		++idx;
+> +	}
+> +
+> +	if (idx != __IPE_HEADER_MAX) {
+> +		rc = -EBADMSG;
+> +		goto out;
+
+You probably don't need to 'goto out' here.
+
+> +	}
+> +
+> +out:
+> +	kfree(ver);
+> +	return rc;
+> +}
+
+...
+
+> +/**
+> + * parse_rule - parse a policy rule line.
+> + * @line: Supplies rule line to be parsed.
+> + * @p: Supplies the partial parsed policy.
+> + *
+> + * Return:
+> + * * !IS_ERR	- OK
+> + * * -ENOMEM	- Out of memory
+> + * * -EBADMSG	- Policy syntax error
+> + */
+> +static int parse_rule(char *line, struct ipe_parsed_policy *p)
+> +{
+> +	int rc = 0;
+> +	bool first_token = true, is_default_rule = false;
+> +	bool op_parsed = false;
+> +	enum ipe_op_type op = IPE_OP_INVALID;
+> +	enum ipe_action_type action = IPE_ACTION_INVALID;
+> +	struct ipe_rule *r = NULL;
+> +	char *t;
+> +
+> +	r = kzalloc(sizeof(*r), GFP_KERNEL);
+> +	if (!r)
+> +		return -ENOMEM;
+> +
+> +	INIT_LIST_HEAD(&r->next);
+> +	INIT_LIST_HEAD(&r->props);
+> +
+> +	while (t = strsep(&line, IPE_POLICY_DELIM), line) {
+> +		if (*t == '\0')
+> +			continue;
+> +		if (first_token && token_default(t)) {
+> +			is_default_rule = true;
+> +		} else {
+> +			if (!op_parsed) {
+> +				op = parse_operation(t);
+> +				if (op == IPE_OP_INVALID)
+> +					rc = -EBADMSG;
+> +				else
+> +					op_parsed = true;
+> +			} else {
+> +				rc = parse_property(t, r);
+> +			}
+> +		}
+> +
+> +		if (rc)
+> +			goto err;
+> +		first_token = false;
+> +	}
+> +
+> +	action = parse_action(t);
+> +	if (action == IPE_ACTION_INVALID) {
+> +		rc = -EBADMSG;
+> +		goto err;
+> +	}
+> +
+> +	if (is_default_rule) {
+> +		if (!list_empty(&r->props)) {
+> +			rc = -EBADMSG;
+> +		} else if (op == IPE_OP_INVALID) {
+> +			if (p->global_default_action != IPE_ACTION_INVALID)
+> +				rc = -EBADMSG;
+> +			else
+> +				p->global_default_action = action;
+> +		} else {
+> +			if (p->rules[op].default_action != IPE_ACTION_INVALID)
+> +				rc = -EBADMSG;
+> +			else
+> +				p->rules[op].default_action = action;
+> +		}
+> +	} else if (op != IPE_OP_INVALID && action != IPE_ACTION_INVALID) {
+> +		r->op = op;
+> +		r->action = action;
+> +	} else {
+> +		rc = -EBADMSG;
+> +	}
+
+I might be missing something important in the policy syntac, but could
+this function, and perhaps the ipe_parsed_policy struct, be simplified
+if the default action was an explicit rule?
+
+ "op=DEFAULT action=ALLOW"
+
+> +	if (rc)
+> +		goto err;
+> +	if (!is_default_rule)
+> +		list_add_tail(&r->next, &p->rules[op].rules);
+> +	else
+> +		free_rule(r);
+> +
+> +	return rc;
+> +err:
+> +	free_rule(r);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * free_parsed_policy - free a parsed policy structure.
+> + * @p: Supplies the parsed policy.
+> + */
+> +void free_parsed_policy(struct ipe_parsed_policy *p)
+> +{
+> +	size_t i = 0;
+> +	struct ipe_rule *pp, *t;
+> +
+> +	if (IS_ERR_OR_NULL(p))
+> +		return;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(p->rules); ++i)
+> +		list_for_each_entry_safe(pp, t, &p->rules[i].rules, next) {
+> +			list_del(&pp->next);
+> +			free_rule(pp);
+> +		}
+> +
+> +	kfree(p->name);
+> +	kfree(p);
+> +}
+> +
+> +/**
+> + * validate_policy - validate a parsed policy.
+> + * @p: Supplies the fully parsed policy.
+> + *
+> + * Given a policy structure that was just parsed, validate that all
+> + * necessary fields are present, initialized correctly.
+> + *
+> + * A parsed policy can be in an invalid state for use (a default was
+> + * undefined) by just parsing the policy.
+> + *
+> + * Return:
+> + * * 0		- OK
+> + * * -EBADMSG	- Policy is invalid
+> + */
+> +static int validate_policy(const struct ipe_parsed_policy *p)
+> +{
+> +	size_t i = 0;
+> +
+> +	if (p->global_default_action != IPE_ACTION_INVALID)
+> +		return 0;
+
+Should the if conditional above be "==" and not "!="?
+
+> +	for (i = 0; i < ARRAY_SIZE(p->rules); ++i) {
+> +		if (p->rules[i].default_action == IPE_ACTION_INVALID)
+> +			return -EBADMSG;
+> +	}
+> +
+> +	return 0;
+> +}
+
+--
+paul-moore.com
