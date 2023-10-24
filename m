@@ -2,127 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D803C00A8F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 00:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B453C00A8F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 01:07:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbjJXAOB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Oct 2023 20:14:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41372 "EHLO
+        id S231349AbjJXBH4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Oct 2023 21:07:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbjJXAOB (ORCPT
+        with ESMTP id S231215AbjJXBHz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2023 20:14:01 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D19D10C;
-        Mon, 23 Oct 2023 17:13:59 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D91E0C433C8;
-        Tue, 24 Oct 2023 00:13:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698106439;
-        bh=ATPML55R7+fiiOOFxhRtqd0G4bkZYOEyzEHjP0fnRuI=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=LX00oD6Ogif2k+OO7cnFuIbQGVKoZx/tdTJmevwNOgKml4fuJqSEvlugmzb60+fT5
-         QchB9SMRjkpJpHPpq1Po+KBDy1QMuJHyyFH1vZ56Je5vddSKSuNpG0dXPLboyU+gat
-         QSi7FxHEdQBt3iNPFcz35nHKU38Q0YX3vxuYCSIJ2JOYKxl7d4QZXAEA26uCbWVAfk
-         8xYGdcd18CWrRnXAtsNctLkR9R+3hIO8skNSL874/sS1PZzpWhF7utVIiHcAfsLWpQ
-         dMYVYomFZBH/dT/kie+dgEE07kcpopetT3n8VMLC5eNRvw1AE/RkvAxb5qEzzWcvYe
-         kcZvDWDXHkWaw==
-Message-ID: <b65486b6-c1de-43e3-ba45-d9a4034c48d5@kernel.org>
-Date:   Tue, 24 Oct 2023 09:13:57 +0900
+        Mon, 23 Oct 2023 21:07:55 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44AB8E8;
+        Mon, 23 Oct 2023 18:07:53 -0700 (PDT)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SDv762jysz4f3nTp;
+        Tue, 24 Oct 2023 09:07:46 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+        by mail.maildlp.com (Postfix) with ESMTP id 8DF721A016E;
+        Tue, 24 Oct 2023 09:07:49 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgB3BdXjGDdlJFchDw--.42414S3;
+        Tue, 24 Oct 2023 09:07:49 +0800 (CST)
+Subject: Re: [PATCH RFC v2 8/8] blk-mq-tag: allow shared queue/hctx to get
+ more driver tags
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de,
+        kbusch@kernel.org, ming.lei@redhat.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
+ <20231021154806.4019417-9-yukuai1@huaweicloud.com>
+ <d8b5db3c-cd0a-4e88-ae08-e17b97bdfc55@acm.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <c8fb8f4e-2982-0fce-e226-7fe9be91e211@huaweicloud.com>
+Date:   Tue, 24 Oct 2023 09:07:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 12/19] scsi: scsi_debug: Add the preserves_write_order
- module parameter
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-References: <20231023215638.3405959-1-bvanassche@acm.org>
- <20231023215638.3405959-13-bvanassche@acm.org>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20231023215638.3405959-13-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <d8b5db3c-cd0a-4e88-ae08-e17b97bdfc55@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgB3BdXjGDdlJFchDw--.42414S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrKFWUXFyfuw4ruw1DCF17Jrb_yoWkGwb_uw
+        4jgF1DXr13JayUKr1DK34DZ3y7JF1jvw1kJr45Ary7AFy5GFnYyr43Xws3u3W5Cr47JFn8
+        Ar45Was3tFyUXjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/24/23 06:54, Bart Van Assche wrote:
-> Zone write locking is not used for zoned devices if the block driver
-> reports that it preserves the order of write commands. Make it easier to
-> test not using zone write locking by adding support for setting the
-> driver_preserves_write_order flag.
+Hi,
+
+在 2023/10/24 4:46, Bart Van Assche 写道:
+> On 10/21/23 08:48, Yu Kuai wrote:
+>> +    if (!busy) {
+>> +        ctl->timer_running = false;
+>> +    } else {
+>> +        ctl->timer.expires = jiffies + HZ;
+>> +        add_timer(&ctl->timer);
+>> +    }
+>> +    spin_unlock_irq(&tags->lock);
 > 
-> Acked-by: Douglas Gilbert <dgilbert@interlog.com>
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  drivers/scsi/scsi_debug.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> [ ... ]
 > 
-> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-> index 9c0af50501f9..1ea4925d2c2f 100644
-> --- a/drivers/scsi/scsi_debug.c
-> +++ b/drivers/scsi/scsi_debug.c
-> @@ -832,6 +832,7 @@ static int dix_reads;
->  static int dif_errors;
->  
->  /* ZBC global data */
-> +static bool sdeb_preserves_write_order;
->  static bool sdeb_zbc_in_use;	/* true for host-aware and host-managed disks */
->  static int sdeb_zbc_zone_cap_mb;
->  static int sdeb_zbc_zone_size_mb;
-> @@ -5138,9 +5139,13 @@ static struct sdebug_dev_info *find_build_dev_info(struct scsi_device *sdev)
->  
->  static int scsi_debug_slave_alloc(struct scsi_device *sdp)
->  {
-> +	struct request_queue *q = sdp->request_queue;
-> +
->  	if (sdebug_verbose)
->  		pr_info("slave_alloc <%u %u %u %llu>\n",
->  		       sdp->host->host_no, sdp->channel, sdp->id, sdp->lun);
-> +	if (sdeb_preserves_write_order)
-> +		q->limits.driver_preserves_write_order = true;
+>> +inc_busy:
+>> +    atomic_inc(&info->busy_count);
+>> +    if (!tags->ctl.timer_running &&
+>> +        try_cmpxchg_relaxed(&tags->ctl.timer_running, &timer_running, 
+>> true)) {
+>> +        tags->ctl.timer.expires = jiffies + HZ;
+>> +        add_timer(&tags->ctl.timer);
+>> +    }
+>>   }
+> 
+> So the choice has been made to let the timer expire after one second? I
+> think the choice of the timer value is important enough to mention it in
+> the patch description.
 
-Nit: this could simply be:
+Yes, I agree, I admit that I was not that cautious while choose 1 HZ in
+this version, I'm not quite sure is this approch will be accepted yet,
+while this is the best(simple and workable) way that I can think of.
 
-	q->limits.driver_preserves_write_order = sdeb_preserves_write_order;
+Thanks,
+Kuai
 
->  	return 0;
->  }
->  
-> @@ -5755,6 +5760,8 @@ module_param_named(statistics, sdebug_statistics, bool, S_IRUGO | S_IWUSR);
->  module_param_named(strict, sdebug_strict, bool, S_IRUGO | S_IWUSR);
->  module_param_named(submit_queues, submit_queues, int, S_IRUGO);
->  module_param_named(poll_queues, poll_queues, int, S_IRUGO);
-> +module_param_named(preserves_write_order, sdeb_preserves_write_order, bool,
-> +		   S_IRUGO);
->  module_param_named(tur_ms_to_ready, sdeb_tur_ms_to_ready, int, S_IRUGO);
->  module_param_named(unmap_alignment, sdebug_unmap_alignment, int, S_IRUGO);
->  module_param_named(unmap_granularity, sdebug_unmap_granularity, int, S_IRUGO);
-> @@ -5812,6 +5819,8 @@ MODULE_PARM_DESC(ndelay, "response delay in nanoseconds (def=0 -> ignore)");
->  MODULE_PARM_DESC(no_lun_0, "no LU number 0 (def=0 -> have lun 0)");
->  MODULE_PARM_DESC(no_rwlock, "don't protect user data reads+writes (def=0)");
->  MODULE_PARM_DESC(no_uld, "stop ULD (e.g. sd driver) attaching (def=0))");
-> +MODULE_PARM_DESC(preserves_write_order,
-> +		 "Whether or not to inform the block layer that this driver preserves the order of WRITE commands (def=0)");
->  MODULE_PARM_DESC(num_parts, "number of partitions(def=0)");
->  MODULE_PARM_DESC(num_tgts, "number of targets per host to simulate(def=1)");
->  MODULE_PARM_DESC(opt_blks, "optimal transfer length in blocks (def=1024)");
-
-Otherwise, looks OK to me.
-
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-
--- 
-Damien Le Moal
-Western Digital Research
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> 
+> .
+> 
 
