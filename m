@@ -2,340 +2,183 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6350C07545
-	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 17:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26CD0C25B47
+	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 18:26:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234671AbjJXR7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Oct 2023 13:59:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47656 "EHLO
+        id S234842AbjJXS0b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Oct 2023 14:26:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234315AbjJXR7F (ORCPT
+        with ESMTP id S231553AbjJXS0a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Oct 2023 13:59:05 -0400
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F0310CF
-        for <linux-block@vger.kernel.org>; Tue, 24 Oct 2023 10:58:17 -0700 (PDT)
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-777754138bdso311798585a.1
-        for <linux-block@vger.kernel.org>; Tue, 24 Oct 2023 10:58:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698170296; x=1698775096;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YEf1gFY5aytx0xmstNtZsbKn4KNYEI+ZYRsJn96q1hc=;
-        b=Mg7ozsrS8dHxZQDUBR88Yiog6AtYA9pQfVptxYdJQCUb1oLDVTgRnFHgVjrUcH1e/k
-         XM0Y8t84D+AozXdcYvk4fld5Wpr/3TVdQt+wDQxm2tf3cwf4NV7p+o08Y4i3CJ2mnSFG
-         NjSO9E40iJXsuGExhLatG2qiwoPk1gg219rg1TPGz6mFGdRDmPQWeZDobeI6/dR6Qv99
-         oSi9c+5hDWtcq4JDzhGAmz7stzeZepuAZCx327c2ZXA6ME7aH96eY5TFj6NAVxhi8A23
-         rBkNvzlD/+Fyw3VDAKbcbXq+eSuU1kIcGszwg4pWEINhEDWCzWlkAo7GM6uiNEFxOPwH
-         evxQ==
-X-Gm-Message-State: AOJu0YwZ6ILpuHhJtKi52dBgD4ISvCjmiX+5aGsdTY0BppWKw4aPzlKp
-        yvQpcqFgN1hARkkSVJoIkOrlsAM5lkzEnXXxtQ==
-X-Google-Smtp-Source: AGHT+IFHC3NUWgx8NpRoKuJzI/1v309PZuCivL2zFuvUPQombRsxn6IC6PkhWIEQOdClWfKgd4hQvw==
-X-Received: by 2002:a05:620a:4484:b0:779:da55:b327 with SMTP id x4-20020a05620a448400b00779da55b327mr7788676qkp.11.1698170296302;
-        Tue, 24 Oct 2023 10:58:16 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id bi12-20020a05620a318c00b00772662b7804sm3591614qkb.100.2023.10.24.10.58.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 10:58:15 -0700 (PDT)
-Date:   Tue, 24 Oct 2023 13:58:14 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Mikulas Patocka <mpatocka@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Subject: Re: dm: Respect REQ_NOWAIT bios
-Message-ID: <ZTgFtseG3m3WPWn/@redhat.com>
-References: <15ca26cc-174a-d4e8-9780-d09f8e5a6ea5@redhat.com>
+        Tue, 24 Oct 2023 14:26:30 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB99FA2;
+        Tue, 24 Oct 2023 11:26:28 -0700 (PDT)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39OHdjrA011171;
+        Tue, 24 Oct 2023 18:21:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=3eRRc4vVzFqm8a0MjnppOiv+Iu8cruIRXlJ0qJI3wpg=;
+ b=TOIPqmGj2W/LqjZr8AXIu4HU1XTnL+b9B+om82Hb164JbU33tJF6g2uMlRF19BcWvvFA
+ raetRQ2U8t9hzo7elXXSuBTUHB790ccpAl4DtEs7qqPd8MmMP1X49or7UR8Ljf3limYw
+ 3PT76pS8ox3dUOKSh0cF5r613Cs60NyTZtdNRByUQ7o38ucN8gyW9UbbF0XiwiUoh6FG
+ Y5oshi5qlimXjTwZ5R0zgm1Jb9+VRkL5dMfhSeUADLX9kGsJCXmKQ8RbNurJ+V4WlCrU
+ 7pcNFErEd0qT01/gXiRP9WBbF0t9aq0Uv+W6Gyrst1Es029ZBE+ZJhIEzA5VKP2E5nVb Hg== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tv581p4xx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Oct 2023 18:21:06 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39OHJ089019132;
+        Tue, 24 Oct 2023 18:21:04 GMT
+Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2041.outbound.protection.outlook.com [104.47.56.41])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tv535v8ny-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Oct 2023 18:21:04 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KtXmEYOiVLmfmBHQ1hzv8XhIf3TbesxDlb/Y4cnquwSoLQMEMpJ7ppfQ9doh535B2931V11Xl/1jesVsClGm3ye27fNS8pRF/nFSl5yXhind1WDuXnnL6xxQYu3MC0ltFYxdVL9M4C1INixb40hCkabRgzWpk/Kvx0IorvkHyoth0s1JUUKo/bcPZ2uwRunPdfa7+j8+OB2qRbnwT/wMC7KN0Pyw2jpTKB1I7k/B/ZhsJq1X0fXLKLVm/uGAQyyYx0t5atuCSqsHnx8UxMK1a7PIk5aGnsxmBS/tOQtp7Ablm7pfmefGAXFTzPwNIf5l0HcS17y1eNm++L+P3fu4Bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3eRRc4vVzFqm8a0MjnppOiv+Iu8cruIRXlJ0qJI3wpg=;
+ b=DTXNogkKGKWCAjgISmLjhHZO8NPJ8evJgy/3L7VTl2YTzSt0Gn71RQcddUM/vq4Vb7BQcOImwAb4+Bw508P5+Z2inFhCUb3Ni+OzzdhvAI4mZ2PhekfcMVMWIVSg5+c0q1Df4K/qGaEl+SwGgINA1q1sKPUbPoB1E0Nq7tWyPplRkwJ2zdixEXAnAmA0hObXBrwOWcZ27CuFVOoUYFOZoqDnOcNwEa/tfAKpsrMPV4EuCketojyBoClnL1by9WIGLvwn8B4bFiipE81SQFOMSDYBLxGqaYXhehSAVjnXKEcAkQptpQGYouOAk+aOhGJLNM+xoFcT32aE5tkwViFgkg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3eRRc4vVzFqm8a0MjnppOiv+Iu8cruIRXlJ0qJI3wpg=;
+ b=KNte51ixg3KVd13IrwVXZJFY3tOSI5E5cF4aJhl/d6p0fF2iaqTiLG2ZOKQPBlctHEP1noZn/TxxFKZS8A3zAy27x2S8fNPonima5Hk7I46iXr+aJQjnndzj274YHTr118OvZLeDDMdx4P4IkxGghaJUagwir7MqgqWFJNwOk4E=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by MW4PR10MB6417.namprd10.prod.outlook.com (2603:10b6:303:1e9::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Tue, 24 Oct
+ 2023 18:21:02 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::2c06:9358:c246:b366]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::2c06:9358:c246:b366%2]) with mapi id 15.20.6907.032; Tue, 24 Oct 2023
+ 18:21:02 +0000
+Message-ID: <5782212f-e5fc-d482-cd18-a43d5d4955b7@oracle.com>
+Date:   Tue, 24 Oct 2023 19:20:58 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v14 05/19] scsi: Add an argument to scsi_eh_flush_done_q()
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Jason Yan <yanaijie@huawei.com>,
+        Wenchao Hao <haowenchao2@huawei.com>
+References: <20231023215638.3405959-1-bvanassche@acm.org>
+ <20231023215638.3405959-6-bvanassche@acm.org>
+ <dcd4019f-93ae-5843-b10d-af912013b3fd@oracle.com>
+ <26ddfc1b-5290-4558-ae95-85fe01575c91@acm.org>
+Content-Language: en-US
+From:   John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <26ddfc1b-5290-4558-ae95-85fe01575c91@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO0P265CA0015.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:355::6) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15ca26cc-174a-d4e8-9780-d09f8e5a6ea5@redhat.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|MW4PR10MB6417:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe15fbf0-6dea-4ef3-ad4d-08dbd4bdfa8b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gVV0TNTHrDHHueJed71M/y0NKWlktCbEVxpEp3HupTmkpDg9vGMmnHp6p+IhQpSS4n4ehGC2929cTjC8ZM/6ZsCrV/sRbxyY5Usl4hg8JndOKmGBvXxW/FsPlwc4FDLMkwFPVwOF9fZ6BWI7HibHMciV4Rb5axIBfviLAxgkCru5mfVZ1DPtanlTeALbf4fTtqNgaGj36x4Mo3xuqn1xgbQx7OVuhp6WWdhN3U7f+UnR0brj+ZgN/6xjKhwOFykt49Wv8b5TMsTFX2sUdaez1Sj78srVn0wQwLn9HfRoIi7LN53FslAvld53WtmlBuHvMgs41rR1h80juWWuo4FGB1TyQ2Gspts/XLrW2B56dz28SvoNyRWEpjwvaZt3+zL7wHCeqXvtx3xEIZCC/hCHupoELNnf6d0SKy0IiFREcFy6zU3Hh0WZUpmL0bKSyyzou1Y+bgHftd0FonIXG0dqkycokIogn6UKNIOs9CnqYnqLojJdZdW3JdO6ven2a1nUL04yxZXi4fT0sng4RYxxEotyl5h+nOkYQLIy2TQYfc0S1ikNtZdJUa/aa9NFdUPit0NnyyLfBcx/hql1pqdMk4PC6w2eQA3oAf0wOWmrGKGF9J7Si6S69zd6AgnYoVZx688bJ/0dYYuxDRAATd/aWQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(136003)(396003)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(36756003)(41300700001)(8676002)(5660300002)(8936002)(31696002)(2906002)(4744005)(86362001)(4326008)(36916002)(53546011)(6506007)(6486002)(6512007)(2616005)(478600001)(316002)(38100700002)(31686004)(26005)(6666004)(54906003)(66556008)(66476007)(66946007)(110136005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OGY2clA2N3dCb29kSkszSVZ0bFlDN1lWUjRtcWZ2NU95VW5sbjhHYTVsbmFK?=
+ =?utf-8?B?aXkvRklERkMrYk1KZm8xOUV5Tml2TklDakd4RVltbEQ3SmdRaDQwTXo1SlZP?=
+ =?utf-8?B?WDA5UExVSW9hTEVQc2VoRVFOeis4dGh1MnV3MUpmOHg5bDVWR3dBaWZjTm9m?=
+ =?utf-8?B?Q1BKOFFqSGt3OHIyeVpkbUJVQ2dxTTlEY0UzYU1NN3Q5ejlTUTU0Y2t6YVQy?=
+ =?utf-8?B?MTByRzB6QWE0QkE4Nyt5N1FaT1NPNk9XcHN0QVhGbkdNZGNEc3RqQWhQZTZN?=
+ =?utf-8?B?RDB6UmFkUlJSNWxGak1sc0V2VGdMK250NG9uMUlyWjE5MW93Q0NKLzUyd2R4?=
+ =?utf-8?B?RlFDaHMrdE1XYzBJbi9rNUFEekNISFl3aTU3RU1DbW5oL1hqdll1bHBtZnBZ?=
+ =?utf-8?B?bzNSbmRaeUdpb0JwY29EZjgxc1JxZlFNZlNYdEo2ZGRkUFZMMlZHUE9aKy9J?=
+ =?utf-8?B?U2RpOC93emFuQ2hUOGkxVHY3dElQZkdpRkxBTFh4ZVk5bjZqSGdDMkJrVTFL?=
+ =?utf-8?B?dm8wTWlnY2RocFRyck1KM3F1Zldab3RKSEFoV2JwYlA0MVhIS1RWcklnU2Q3?=
+ =?utf-8?B?blFEUGcrd2l3STNPdGRVamVBQXZ0THNNNXZuV0J3NFdESG1ESW1qVDhYemM4?=
+ =?utf-8?B?Nlh4bk8zMDBvWkt2K0grQk5XdS9rWjhCa05ic0lZZFpYM004ZUp1TXJpRXlE?=
+ =?utf-8?B?QlgzNENtUzVoWVBzNmp3VmxqcWNESDBHa0liclZPMkJ5VDhxcWFoNEdjWVoy?=
+ =?utf-8?B?Smp6QXhJWTU4L2RoM1E0ZzY2TmtPbkhHeWwxQ3ZDRC9rMVQrWk84YzArTHkr?=
+ =?utf-8?B?STBINmwyUWF3QmpJanBVbjcwVDFmd2gvL1FIdEEvKzJXa1FlRmptbmlycHY5?=
+ =?utf-8?B?eExvdkV5cTdXOWZ0MFhUWWx5QWxrdzR6aE1Ta1RtNENYVnlMcDBrNE1Tdk1Q?=
+ =?utf-8?B?eTk2NXowcTJjTnc4L0R5K0dtOHNKeUM1VExxWkUvK21rYWhlcjFaQVM2cXJp?=
+ =?utf-8?B?d2JpeGRLdlVkL3ZNR254UDd2TGg1Vkp4WXFyZkl5dEtsaGUvK1FvWlJTNDFu?=
+ =?utf-8?B?ZmlpRFNDdjU3KzlWOFpOYU5zK2Z2dE1lOWFZWFV5anlVSHBuSVJBdXpKa3pp?=
+ =?utf-8?B?QTZjeTNiQ094aThrb0JST2hONnZhbW1ZRlhoWVcvZlFZWFBGa01yeXg0Rms4?=
+ =?utf-8?B?bVhSQ1R3bktkNEhDUmFZdEVRL3l2dy9UUDdDd2RGUEZDbU5jR0huMUZ5ZWZT?=
+ =?utf-8?B?YnhNNW03L2dwaFpPanFDOS9ncUdMODZTQUE2WlR2cGsycTE0UE1LcDJYMUYz?=
+ =?utf-8?B?K2ZtVFJVWjA2VkxoT3JSUW44NllNaEtQbEJnWlF5WUF6b2dEMnZHVk1LeTAy?=
+ =?utf-8?B?OVVDZlUvcXQrMEdKdHJITHpDR2JFZ1ZQOFQ1TFRkRERYbUNwUVRBSzh6RkhI?=
+ =?utf-8?B?Nm9UNHY0N2RvTnBzeW9UWFplNTBaeDhpcE16bFJrVUZYNE1BWXo1Ym8vb2pL?=
+ =?utf-8?B?WDYrVzhOVUJTU1d3UXFSc3dEWExOeDlvMjhaNm0ydDJQaGMwbGJkRzJnOFBw?=
+ =?utf-8?B?R0VrcUY0Tk52M2Iya0ppaDI5L2R0RlU4ZitUOVl0RlVOd09tbkFHWDNDVVcy?=
+ =?utf-8?B?Ykw1L1lOQU4wUTh0V1BUT3FmR3RCRUpSdmFIS3ljVm5DalExbit1em1DSHJJ?=
+ =?utf-8?B?SUg2dVJ5dXYzMjFVaDV6UnJEcE0wK3NpSWp1QzBtR3ptYUVLSHR0VDZzSjNV?=
+ =?utf-8?B?TEUrbk1uMXh6Q3B6bnFjS0hTcUp6eUZDeHZJcmlOM05sM0pOUlZRazArUm1a?=
+ =?utf-8?B?NXRsdVV2Wk5yQkV1clJpWlBuMWpwenZ6aEtwWUg2M01yUCsyTHJXR2wrYlpn?=
+ =?utf-8?B?UGUzdkpZdEJyR3UyL1hmdHBnM0VWQTg3NlRoZk5lMUllb1dkZi9vRGFRMVJS?=
+ =?utf-8?B?Ym12UVJHQzROS3FsNEZZMkRJL2l6cnIxTURyZENjVXhDWVBVdkE3UjQvYVJT?=
+ =?utf-8?B?Y1dINjhjem8wSkpBWEI4NU1WY096eXJKaGpLa3NxK1JEdzBjQUxlMEZ4NGox?=
+ =?utf-8?B?alBGZGF0dUN2bjE1eURaTGp5QmNoU1hLdUVrYmU2UWdsNkdEcTVBWlJVNmky?=
+ =?utf-8?Q?xPnQfoP5ArT3sQTQ7yJvShrxE?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 1w8eiR0P/jNUpKABp3+uljZW5aGE8qchHCM1XRAgM0n3ED8XIP8f+poXs7IjZkwrCH2e9A+vAzU53lkkuXoyBhzqhMlXGlInBxMJAzA3HvH2k3PRyp188mj2LEhg+NqB0iKlojSDd+PdbTL8s0/5RBaDsQIfpM6gwvtbRkRjwuL5ZZxGWlmOGSblAaVOaytzsuxj/hDfDBttxCeRlRve1a4wIGT0Yp/XKTqv58/4vYFZkK7YONtROiWdMyanK0iGxQG9eCkLM7KSqi3l4qq7KataQEp/B30Yv9jI9Ha9SyScdpj63cYzTaZG6J8bb3o5FV1NK+az650wmz2mxe8AQfJ0ImcK3oOubbSs+M0N/SPcpWvX1qAh6clQtKOvY2T0yakSgWzHkPWE3UumjzrmewkvThveRgFOKze0FIRXgMhvOiAv/qEz6ehGX4XIrbB1qtUTG+VzBdF5THpq62iJwyuEUVLOKlyVdLX2fZLMoGlyrJA6+MgxenJwlS3llR/BQDXshVCPsLvACuInUjjHx4EGLcvzttalp0hlB86CK48nCX2c0AJaKxzpAIFdquZUAxG9thNOkkY8bHcBIW18QAEzYhnjINja9eXxUaDgLf35ynwYZyg3i+pivRyACJL52E/MhkZg2DV1K6QtHSO8d3q26onlAqNa+b7XlzR4tx5M8Rtx/edcpQL+XOdaOBd6NgxylLO8uG7FpJH94ZrY1YhlEOItDJN3jhhKClZYS40L5DQZnF0RYDYxTM7Xe9c/MHM3IWevhqtQHQ229wmnaXHD5ijSJ1pWeFmfm0UILqUOaiWZJMzJStVwsN7N8De0Ktrl+8WfpM4CPSpEZu7Wg/40dwLYK9lkgJxu9YPCjRz7P1XPem9pk55CAl0piaOwRkDDji/ggSdhMdAnJP7PenRs8M26bLGMTKvKlXXuIwQ=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe15fbf0-6dea-4ef3-ad4d-08dbd4bdfa8b
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 18:21:02.2847
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7RGU5NgsqBgMrjuW0tXJ6+psae9RK95XZR3ZD3LEP0ElvL/LIUq9aqxQl/iOFGdz6FSToGrE5Sr8OYD3Lb6ClQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR10MB6417
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-24_18,2023-10-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 bulkscore=0
+ mlxscore=0 suspectscore=0 phishscore=0 adultscore=0 mlxlogscore=790
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310170001
+ definitions=main-2310240157
+X-Proofpoint-GUID: a9nGw4fGZLpp4x_6CtUEd0UZQpQERjul
+X-Proofpoint-ORIG-GUID: a9nGw4fGZLpp4x_6CtUEd0UZQpQERjul
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For the benefit of others, since this patch was posted to the old
-dm-devel list, here is the original patch proposal:
-https://patchwork.kernel.org/project/dm-devel/patch/15ca26cc-174a-d4e8-9780-d09f8e5a6ea5@redhat.com/
-
-On Tue, Oct 03 2023 at 11:30P -0400,
-Mikulas Patocka <mpatocka@redhat.com> wrote:
-
-> Hi
+On 24/10/2023 18:17, Bart Van Assche wrote:
 > 
-> Here I'm sending that patch for REQ_NOWAIT for review.
-> 
-> It is not tested, except for some trivial tests that involve logical 
-> volume activation.
+> The linux-scsi mailing list has been Cc-ed. I assume that you are
+> subscribed to that mailing list.
 
-At a minimum we need to test with the simple test code Jens provided
-in commit a9ce385344f9 ("dm: don't attempt to queue IO under RCU protection")
-
-> I found out that it seems easier to propagate the error using bits in 
-> clone_info rather than changing return codes for each affected function.
-
-Yes, the various DM core code that allocates multiple bios, etc
-certianly benefits from not having to worry about tracking
-fine-grained return codes.  So I've kept the flag in clone_info.
+I am subscribed. However I have a rule set up which filters anything 
+linux-scsi to a dedicated subfolder unless I am explicitly included in 
+the mail "to" or "cc" list. I guess that many contributors do something 
+similar. So this means that for this series patches end up in different 
+folders and it becomes a bit harder to track.
 
 > 
-> Mikulas
-> 
-> 
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> BTW, I'm using "scripts/get_maintainer.pl" to build a Cc-list. 
+> Unfortunately git send-email does not make it easy to combine the
+> cc-lists of individual patches into one cc-list for all patches 🙁
 
-Please don't add Signed-off-by to anything you don't want to see going
-upstream (yet), especially something you haven't tested.
+I just normally run scripts/get_maintainer.pl on *.patch and use that 
+result as the git send-email address list and never bother with "Cc:" in 
+any individual patch.
 
-Even going so far as adding 'Not-Signed-off-by' is appropriate.
-
-More comments inline below, and then at the end I'm attaching an
-incremental patch that should get us closer to something that works
-(but I haven't tested yet either).  I've also messaged Ming Lei to
-check with him on the FIXME I added before the call to dm_io_rewind()
--- hopefully Ming will reply to this email.
-
-> ---
->  drivers/md/dm.c |   51 +++++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 45 insertions(+), 6 deletions(-)
-> 
-> Index: linux-2.6/drivers/md/dm.c
-> ===================================================================
-> --- linux-2.6.orig/drivers/md/dm.c
-> +++ linux-2.6/drivers/md/dm.c
-> @@ -87,6 +87,8 @@ struct clone_info {
->  	unsigned int sector_count;
->  	bool is_abnormal_io:1;
->  	bool submit_as_polled:1;
-> +	bool is_nowait:1;
-> +	bool nowait_failed:1;
->  };
->  
->  static inline struct dm_target_io *clone_to_tio(struct bio *clone)
-> @@ -570,13 +572,21 @@ static void dm_end_io_acct(struct dm_io
->  	dm_io_acct(io, true);
->  }
->  
-> -static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio)
-> +static struct dm_io *alloc_io(struct clone_info *ci, struct mapped_device *md, struct bio *bio)
->  {
->  	struct dm_io *io;
->  	struct dm_target_io *tio;
->  	struct bio *clone;
->  
-> -	clone = bio_alloc_clone(NULL, bio, GFP_NOIO, &md->mempools->io_bs);
-> +	if (unlikely(ci->is_nowait)) {
-> +		clone = bio_alloc_clone(NULL, bio, GFP_NOWAIT, &md->mempools->io_bs);
-> +		if (!clone) {
-> +			ci->nowait_failed = true;
-> +			return NULL;
-> +		}
-> +	} else {
-> +		clone = bio_alloc_clone(NULL, bio, GFP_NOIO, &md->mempools->io_bs);
-> +	}
->  	tio = clone_to_tio(clone);
->  	tio->flags = 0;
->  	dm_tio_set_flag(tio, DM_TIO_INSIDE_DM_IO);
-
-The above is bogus because if the clone cannot be allocated then the
-returned NULL dm_io struct will cause NULL pointer dereference during
-error handling at the end of dm_split_and_process_bio() -- my patch
-attached below addresses this.
-
-> @@ -1503,6 +1513,11 @@ static void alloc_multiple_bios(struct b
->  
->  		while ((bio = bio_list_pop(blist)))
->  			free_tio(bio);
-> +
-> +		if (ci->is_nowait) {
-> +			ci->nowait_failed = true;
-> +			return;
-> +		}
->  	}
->  }
->  
-> @@ -1519,7 +1534,15 @@ static unsigned int __send_duplicate_bio
->  	case 1:
->  		if (len)
->  			setup_split_accounting(ci, *len);
-> -		clone = alloc_tio(ci, ti, 0, len, GFP_NOIO);
-> +		if (unlikely(ci->is_nowait)) {
-> +			clone = alloc_tio(ci, ti, 0, len, GFP_NOWAIT);
-> +			if (!clone) {
-> +				ci->nowait_failed = true;
-> +				return 0;
-> +			}
-> +		} else {
-> +			clone = alloc_tio(ci, ti, 0, len, GFP_NOIO);
-> +		}
->  		__map_bio(clone);
->  		ret = 1;
->  		break;
-> @@ -1656,7 +1679,7 @@ static blk_status_t __process_abnormal_i
->  
->  	__send_changing_extent_only(ci, ti, num_bios,
->  				    max_granularity, max_sectors);
-> -	return BLK_STS_OK;
-> +	return likely(!ci->nowait_failed) ? BLK_STS_OK : BLK_STS_AGAIN;
->  }
->  
->  /*
-> @@ -1729,7 +1752,15 @@ static blk_status_t __split_and_process_
->  
->  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
->  	setup_split_accounting(ci, len);
-> -	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
-> +	if (unlikely(ci->is_nowait)) {
-> +		clone = alloc_tio(ci, ti, 0, &len, GFP_NOWAIT);
-> +		if (unlikely(!clone)) {
-> +			ci->nowait_failed = true;
-> +			return BLK_STS_AGAIN;
-> +		}
-> +	} else {
-> +		clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
-> +	}
->  	__map_bio(clone);
->  
->  	ci->sector += len;
-> @@ -1741,8 +1772,10 @@ static blk_status_t __split_and_process_
->  static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
->  			    struct dm_table *map, struct bio *bio, bool is_abnormal)
->  {
-> +	ci->is_nowait = !!(bio->bi_opf & REQ_NOWAIT);
-> +	ci->nowait_failed = false;
->  	ci->map = map;
-> -	ci->io = alloc_io(md, bio);
-> +	ci->io = alloc_io(ci, md, bio);
->  	ci->bio = bio;
->  	ci->is_abnormal_io = is_abnormal;
->  	ci->submit_as_polled = false;
-> @@ -1778,10 +1811,16 @@ static void dm_split_and_process_bio(str
->  	}
->  
->  	init_clone_info(&ci, md, map, bio, is_abnormal);
-> +	if (unlikely(ci.nowait_failed)) {
-> +		error = BLK_STS_AGAIN;
-> +		goto out;
-> +	}
->  	io = ci.io;
->  
->  	if (bio->bi_opf & REQ_PREFLUSH) {
->  		__send_empty_flush(&ci);
-> +		if (unlikely(ci.nowait_failed))
-> +			error = BLK_STS_AGAIN;
->  		/* dm_io_complete submits any data associated with flush */
->  		goto out;
->  	}
-> 
-
-Below you'll see I insulated dm_split_and_process_bio() from ever
-checking ci.nowait_failed -- prefer methods like __send_empty_flush
-that are called from dm_split_and_process_bio() return blk_status_t
-(like __process_abnormal_io and __split_and_process_bio do).
-
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index d6fbbaa7600b..2a9ff269c28b 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -572,18 +572,16 @@ static void dm_end_io_acct(struct dm_io *io)
- 	dm_io_acct(io, true);
- }
- 
--static struct dm_io *alloc_io(struct clone_info *ci, struct mapped_device *md, struct bio *bio)
-+static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio)
- {
- 	struct dm_io *io;
- 	struct dm_target_io *tio;
- 	struct bio *clone;
- 
--	if (unlikely(ci->is_nowait)) {
-+	if (unlikely(bio->bi_opf & REQ_NOWAIT)) {
- 		clone = bio_alloc_clone(NULL, bio, GFP_NOWAIT, &md->mempools->io_bs);
--		if (!clone) {
--			ci->nowait_failed = true;
--			return NULL;
--		}
-+		if (!clone)
-+			return PTR_ERR(-EAGAIN);
- 	} else {
- 		clone = bio_alloc_clone(NULL, bio, GFP_NOIO, &md->mempools->io_bs);
- 	}
-@@ -1001,6 +999,8 @@ static void dm_wq_requeue_work(struct work_struct *work)
- 	while (io) {
- 		struct dm_io *next = io->next;
- 
-+		// FIXME: if io->orig_bio has REQ_NOWAIT set should GFP_NOWAIT be used?
-+		// requeue performed from completion path so REQ_NOWAIT can be safely dropped?
- 		dm_io_rewind(io, &md->disk->bio_split);
- 
- 		io->next = NULL;
-@@ -1565,7 +1565,7 @@ static unsigned int __send_duplicate_bios(struct clone_info *ci, struct dm_targe
- 	return ret;
- }
- 
--static void __send_empty_flush(struct clone_info *ci)
-+static blk_status_t __send_empty_flush(struct clone_info *ci)
- {
- 	struct dm_table *t = ci->map;
- 	struct bio flush_bio;
-@@ -1598,6 +1598,8 @@ static void __send_empty_flush(struct clone_info *ci)
- 	atomic_sub(1, &ci->io->io_count);
- 
- 	bio_uninit(ci->bio);
-+
-+	return likely(!ci->nowait_failed) ? BLK_STS_OK : BLK_STS_AGAIN;
- }
- 
- static void __send_changing_extent_only(struct clone_info *ci, struct dm_target *ti,
-@@ -1758,7 +1760,7 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
- 	if (unlikely(ci->is_nowait)) {
- 		clone = alloc_tio(ci, ti, 0, &len, GFP_NOWAIT);
- 		if (unlikely(!clone)) {
--			ci->nowait_failed = true;
-+			ci->nowait_failed = true; /* unchecked, set for consistency */
- 			return BLK_STS_AGAIN;
- 		}
- 	} else {
-@@ -1772,13 +1774,13 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
- 	return BLK_STS_OK;
- }
- 
--static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
-+static void init_clone_info(struct clone_info *ci, struct dm_io *io,
- 			    struct dm_table *map, struct bio *bio, bool is_abnormal)
- {
- 	ci->is_nowait = !!(bio->bi_opf & REQ_NOWAIT);
- 	ci->nowait_failed = false;
- 	ci->map = map;
--	ci->io = alloc_io(ci, md, bio);
-+	ci->io = io;
- 	ci->bio = bio;
- 	ci->is_abnormal_io = is_abnormal;
- 	ci->submit_as_polled = false;
-@@ -1813,17 +1815,17 @@ static void dm_split_and_process_bio(struct mapped_device *md,
- 			return;
- 	}
- 
--	init_clone_info(&ci, md, map, bio, is_abnormal);
--	if (unlikely(ci.nowait_failed)) {
--		error = BLK_STS_AGAIN;
--		goto out;
-+	io = alloc_io(md, bio);
-+	if (unlikely(IS_ERR(io) && ERR_PTR(io) == -EAGAIN)) {
-+		/* Unable to do anything without dm_io. */
-+		bio_wouldblock_error(bio);
-+		return;
- 	}
--	io = ci.io;
-+
-+	init_clone_info(&ci, io, map, bio, is_abnormal);
- 
- 	if (bio->bi_opf & REQ_PREFLUSH) {
--		__send_empty_flush(&ci);
--		if (unlikely(ci.nowait_failed))
--			error = BLK_STS_AGAIN;
-+		error = __send_empty_flush(&ci);
- 		/* dm_io_complete submits any data associated with flush */
- 		goto out;
- 	}
+Thanks,
+John
