@@ -2,111 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B453C00A8F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 01:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA2D5C00A8F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 02:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231349AbjJXBH4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Oct 2023 21:07:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43060 "EHLO
+        id S229582AbjJXC3q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Oct 2023 22:29:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231215AbjJXBHz (ORCPT
+        with ESMTP id S229510AbjJXC3p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2023 21:07:55 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44AB8E8;
-        Mon, 23 Oct 2023 18:07:53 -0700 (PDT)
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SDv762jysz4f3nTp;
-        Tue, 24 Oct 2023 09:07:46 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-        by mail.maildlp.com (Postfix) with ESMTP id 8DF721A016E;
-        Tue, 24 Oct 2023 09:07:49 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgB3BdXjGDdlJFchDw--.42414S3;
-        Tue, 24 Oct 2023 09:07:49 +0800 (CST)
-Subject: Re: [PATCH RFC v2 8/8] blk-mq-tag: allow shared queue/hctx to get
- more driver tags
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de,
-        kbusch@kernel.org, ming.lei@redhat.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20231021154806.4019417-1-yukuai1@huaweicloud.com>
- <20231021154806.4019417-9-yukuai1@huaweicloud.com>
- <d8b5db3c-cd0a-4e88-ae08-e17b97bdfc55@acm.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c8fb8f4e-2982-0fce-e226-7fe9be91e211@huaweicloud.com>
-Date:   Tue, 24 Oct 2023 09:07:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 23 Oct 2023 22:29:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D14E5
+        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2023 19:29:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698114544;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ljunzYankt+Y8DsOwYK9IuDt9vyB/XfCBQ409TGpc7Q=;
+        b=KY6yY2whRReXF71zLI60SnkMIFl0xIAR/OakfQpd9sjiYvaie0hQ2bcsU7nRSgNq6bu2/8
+        v50ArGozyM7aIcANl8caNZqasj7nuoiMgGfv91oh4BEvUoM+0jmg+sHTWsjoaNNrdIbMup
+        q7JSmZmhtzH949CuyXMV96nqELlsHoI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-209-nOcrXpvNNY2jYihqGF8djg-1; Mon, 23 Oct 2023 22:28:54 -0400
+X-MC-Unique: nOcrXpvNNY2jYihqGF8djg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 53E5E101A52D;
+        Tue, 24 Oct 2023 02:28:53 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 446F6492BD9;
+        Tue, 24 Oct 2023 02:28:48 +0000 (UTC)
+Date:   Tue, 24 Oct 2023 10:28:44 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, ming.lei@redhat.com
+Subject: Re: [PATCH v4 0/3] Support disabling fair tag sharing
+Message-ID: <ZTcr3AHr9l4sHRO2@fedora>
+References: <20231023203643.3209592-1-bvanassche@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <d8b5db3c-cd0a-4e88-ae08-e17b97bdfc55@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgB3BdXjGDdlJFchDw--.42414S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKFWUXFyfuw4ruw1DCF17Jrb_yoWkGwb_uw
-        4jgF1DXr13JayUKr1DK34DZ3y7JF1jvw1kJr45Ary7AFy5GFnYyr43Xws3u3W5Cr47JFn8
-        Ar45Was3tFyUXjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231023203643.3209592-1-bvanassche@acm.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi Bart,
 
-在 2023/10/24 4:46, Bart Van Assche 写道:
-> On 10/21/23 08:48, Yu Kuai wrote:
->> +    if (!busy) {
->> +        ctl->timer_running = false;
->> +    } else {
->> +        ctl->timer.expires = jiffies + HZ;
->> +        add_timer(&ctl->timer);
->> +    }
->> +    spin_unlock_irq(&tags->lock);
+On Mon, Oct 23, 2023 at 01:36:32PM -0700, Bart Van Assche wrote:
+> Hi Jens,
 > 
-> [ ... ]
+> Performance of UFS devices is reduced significantly by the fair tag sharing
+> algorithm. This is because UFS devices have multiple logical units and a
+> limited queue depth (32 for UFS 3.1 devices) and also because it takes time to
+> give tags back after activity on a request queue has stopped. This patch series
+> addresses this issue by introducing a flag that allows block drivers to
+> disable fair sharing.
 > 
->> +inc_busy:
->> +    atomic_inc(&info->busy_count);
->> +    if (!tags->ctl.timer_running &&
->> +        try_cmpxchg_relaxed(&tags->ctl.timer_running, &timer_running, 
->> true)) {
->> +        tags->ctl.timer.expires = jiffies + HZ;
->> +        add_timer(&tags->ctl.timer);
->> +    }
->>   }
-> 
-> So the choice has been made to let the timer expire after one second? I
-> think the choice of the timer value is important enough to mention it in
-> the patch description.
+> Please consider this patch series for the next merge window.
 
-Yes, I agree, I admit that I was not that cautious while choose 1 HZ in
-this version, I'm not quite sure is this approch will be accepted yet,
-while this is the best(simple and workable) way that I can think of.
+In previous post[1], you mentioned that the issue is caused by non-IO
+queue of WLUN, but in this version, looks there isn't such story any more.
+
+IMO, it isn't reasonable to account non-IO LUN for tag fairness, so
+solution could be to not take non-IO queue into account for fair tag
+sharing. But disabling fair tag sharing for this whole tagset could be
+too over-kill.
+
+And if you mean normal IO LUNs, can you share more details about the
+performance drop? such as the test case, how many IO LUNs, and how to
+observe performance drop, cause it isn't simple any more since multiple
+LUN's perf has to be considered.
+
+
+[1] https://lore.kernel.org/linux-block/20231018180056.2151711-1-bvanassche@acm.org/
 
 Thanks,
-Kuai
-
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> .
-> 
+Ming
 
