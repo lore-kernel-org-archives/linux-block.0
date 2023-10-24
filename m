@@ -2,119 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D11C00A8F
-	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 06:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3115C07545
+	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 06:51:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232658AbjJXGob (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Oct 2023 02:44:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47802 "EHLO
+        id S232657AbjJXGvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Oct 2023 02:51:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232589AbjJXGob (ORCPT
+        with ESMTP id S232627AbjJXGvu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Oct 2023 02:44:31 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F59F9;
-        Mon, 23 Oct 2023 23:44:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=NA1ivap7QBb2ywFQh6pxpUiR9qrIreFL3p9thcCX5KE=; b=WXv3G4pj+cmxjDwS9VwZasOwnp
-        1hLehJhbtZnmElQUJCmR+P3FjyKhS/nTjVKLpsB6P0jWSCnAB4BON2xeSMI/+B5cnR2VEHbkxlgX0
-        DZ0i5zFldcuKMtoGSbOPBxZTNmHdw2VyhvTFFAa2V+J4oUmvxqP0qUU0/q371gD2YUV73Bls8pvch
-        n70IWoUvyxzJRBlwzSLrJd9/b20nb3ruLdqVgImeTgKfnVeasyKxgylLKGqVEXulotOKls22J6QRQ
-        2JA4QylhiyKiC/bPSAowPFWjBsVjaRvEJiebLXd75fbwCsaAtCFqEHaGe9rrvR9KQyjA+tzjNZM48
-        RTlesNng==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qvB9Q-0090Se-0H;
-        Tue, 24 Oct 2023 06:44:28 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>
-Cc:     Ilya Dryomov <idryomov@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 3/3] xfs: respect the stable writes flag on the RT device
-Date:   Tue, 24 Oct 2023 08:44:16 +0200
-Message-Id: <20231024064416.897956-4-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231024064416.897956-1-hch@lst.de>
-References: <20231024064416.897956-1-hch@lst.de>
+        Tue, 24 Oct 2023 02:51:50 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A19399;
+        Mon, 23 Oct 2023 23:51:46 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id F21091FE62;
+        Tue, 24 Oct 2023 06:51:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1698130304; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pau3+0/NlGfzN9CKQqjt2HZnTXnCBU9sg9VtB1cLmgk=;
+        b=IzyLFtugKO/iNGNt92HdpOTQnrsAC8YBcdKV4hr55PD+vm5QPZg9y2bDyqnTwxNdmMRcWV
+        mf0ku1vBhTHWShPn8AOZ1jswFDaaklt9Ibhvv1ODz7zflIZuMIF3gEdLCfVwB0xI/TPbox
+        PAz9U3PywIZ9LKBjv+MnVSGwSjWC3I0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1698130304;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pau3+0/NlGfzN9CKQqjt2HZnTXnCBU9sg9VtB1cLmgk=;
+        b=FoIPCbxl1AfgJMZUJD6LHheQsYUwgsaWl1S1VWp6B3+jtXHcCqYhLJ50MxJjIAk8yF4VCE
+        uBgcwPIFSItmkJBg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BC4BE1391C;
+        Tue, 24 Oct 2023 06:51:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id PEnWLH9pN2UvLwAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 24 Oct 2023 06:51:43 +0000
+Message-ID: <bc532b70-e286-4fa0-848b-bd837abc73a5@suse.de>
+Date:   Tue, 24 Oct 2023 08:51:43 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: blktests: running nvme and srp tests with real RDMA hardware
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Cc:     Daniel Wagner <dwagner@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <vaijnbobhxyz4nkk2csv3nfhnpeupbudakcn3qgmo7o6vii4x5@rfnfdll6iloo>
+ <ce187671-ea90-4d97-b323-70f275c09649@suse.de>
+ <4bdf4031-5f14-4cb1-92d3-7ae106a4a73f@nvidia.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <4bdf4031-5f14-4cb1-92d3-7ae106a4a73f@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Authentication-Results: smtp-out2.suse.de;
+        none
+X-Spamd-Result: default: False [-7.09 / 50.00];
+         ARC_NA(0.00)[];
+         TO_DN_EQ_ADDR_SOME(0.00)[];
+         XM_UA_NO_VERSION(0.01)[];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         BAYES_HAM(-3.00)[100.00%];
+         MIME_GOOD(-0.10)[text/plain];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         NEURAL_HAM_LONG(-3.00)[-1.000];
+         DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+         NEURAL_HAM_SHORT(-1.00)[-1.000];
+         RCPT_COUNT_SEVEN(0.00)[8];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         RCVD_COUNT_TWO(0.00)[2];
+         RCVD_TLS_ALL(0.00)[];
+         MID_RHS_MATCH_FROM(0.00)[]
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Update the per-folio stable writes flag dependening on which device an
-inode resides on.
+On 10/24/23 07:55, Chaitanya Kulkarni wrote:
+> On 10/23/23 22:43, Hannes Reinecke wrote:
+>> On 10/24/23 04:59, Shinichiro Kawasaki wrote:
+>>> Hello blktests users,
+>>>
+>>> As of today, software RDMA driver "siw" or "rdma_rxe" is used to run
+>>> "nvme"
+>>> group with nvme_trtype=rdma or "srp" (scsi rdma protocol) group. Now
+>>> it is
+>>> suggested to run the test groups with real RDMA hardware to run tests in
+>>> more realistic conditions. A GitHub pull request is under review to
+>>> support
+>>> it [1]. If you are interested in, please take a look and comment.
+>>>
+>>> [1] https://github.com/osandov/blktests/pull/86
+>>
+>> Just commented on it. What we really need is the functionality to run
+>> against pre-configured controllers (ie specify the controller NQN and
+>> NSID and do not call into nvmetcli); when running on real HW we
+>> typically cannot control the target, so we need to be able to specify
+>> a preconfigured namespace.
+>>
+>> Cheers,
+>>
+>> Hannes
+> 
+> What format you think use to accept the pre configured namespace ?
+> thinking out loudly Can relay and we use nvmetcli config file somehow
+> for local loop back setup ?
+> 
+Ideally I would hide it behind the call to '_setup_nvmet' / 
+'_nvmet_target_setup' / '_nvmet_target_cleanup'.
+We already have 'def_subsysnqn', which should be set to the
+pre-provisioned NQN. We clearly need a 'def_nsid', but that
+should be easily done.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_inode.h | 8 ++++++++
- fs/xfs/xfs_ioctl.c | 9 +++++++++
- fs/xfs/xfs_iops.c  | 7 +++++++
- 3 files changed, 24 insertions(+)
+Biggest problem here will be the 'out' files. Most of them record the
+default NQN, so if we allow to change that the tests will break.
+How can we abstract away from that?
 
-diff --git a/fs/xfs/xfs_inode.h b/fs/xfs/xfs_inode.h
-index 0c5bdb91152e1c..682959c8f78cb0 100644
---- a/fs/xfs/xfs_inode.h
-+++ b/fs/xfs/xfs_inode.h
-@@ -561,6 +561,14 @@ extern void xfs_setup_inode(struct xfs_inode *ip);
- extern void xfs_setup_iops(struct xfs_inode *ip);
- extern void xfs_diflags_to_iflags(struct xfs_inode *ip, bool init);
- 
-+static inline void xfs_update_stable_writes(struct xfs_inode *ip)
-+{
-+	if (bdev_stable_writes(xfs_inode_buftarg(ip)->bt_bdev))
-+		mapping_set_stable_writes(VFS_I(ip)->i_mapping);
-+	else
-+		mapping_clear_stable_writes(VFS_I(ip)->i_mapping);
-+}
-+
- /*
-  * When setting up a newly allocated inode, we need to call
-  * xfs_finish_inode_setup() once the inode is fully instantiated at
-diff --git a/fs/xfs/xfs_ioctl.c b/fs/xfs/xfs_ioctl.c
-index 55bb01173cde8c..67bf613b3c86bc 100644
---- a/fs/xfs/xfs_ioctl.c
-+++ b/fs/xfs/xfs_ioctl.c
-@@ -1147,6 +1147,15 @@ xfs_ioctl_setattr_xflags(
- 	ip->i_diflags2 = i_flags2;
- 
- 	xfs_diflags_to_iflags(ip, false);
-+
-+	/*
-+	 * Make the stable writes flag match that of the device the inode
-+	 * resides on when flipping the RT flag.
-+	 */
-+	if (S_ISREG(VFS_I(ip)->i_mode) &&
-+	    XFS_IS_REALTIME_INODE(ip) != (fa->fsx_xflags & FS_XFLAG_REALTIME))
-+		xfs_update_stable_writes(ip);
-+
- 	xfs_trans_ichgtime(tp, ip, XFS_ICHGTIME_CHG);
- 	xfs_trans_log_inode(tp, ip, XFS_ILOG_CORE);
- 	XFS_STATS_INC(mp, xs_ig_attrchg);
-diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
-index 2b3b05c28e9e48..b8ec045708c318 100644
---- a/fs/xfs/xfs_iops.c
-+++ b/fs/xfs/xfs_iops.c
-@@ -1298,6 +1298,13 @@ xfs_setup_inode(
- 	gfp_mask = mapping_gfp_mask(inode->i_mapping);
- 	mapping_set_gfp_mask(inode->i_mapping, (gfp_mask & ~(__GFP_FS)));
- 
-+	/*
-+	 * For real-time inodes update the stable write flags to that of the RT
-+	 * device instead of the data device.
-+	 */
-+	if (S_ISREG(inode->i_mode) && XFS_IS_REALTIME_INODE(ip))
-+		xfs_update_stable_writes(ip);
-+
- 	/*
- 	 * If there is no attribute fork no ACL can exist on this inode,
- 	 * and it can't have any file capabilities attached to it either.
+Maybe it's a good exercise even with the current codebase; just
+set 'def_subsysnqn' to something else and watch what breaks ...
+
+Cheers,
+
+Hannes
 -- 
-2.39.2
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
