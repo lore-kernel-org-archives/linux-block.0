@@ -2,85 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F67C25B48
-	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 13:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7280AC07545
+	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 15:00:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234576AbjJXN6R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Oct 2023 09:58:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58598 "EHLO
+        id S234634AbjJXPA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Oct 2023 11:00:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234899AbjJXN6J (ORCPT
+        with ESMTP id S234650AbjJXPA4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Oct 2023 09:58:09 -0400
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E894170A;
-        Tue, 24 Oct 2023 06:57:54 -0700 (PDT)
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6ba172c5f3dso3740580b3a.0;
-        Tue, 24 Oct 2023 06:57:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698155873; x=1698760673;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qHLUl2rviwOEYzkUoWMIc0UMrw0kyEP+QEE0nMFVMXY=;
-        b=D23svdP9Ltx6TLLf0VP9RFdZKbfwpd8SdTZ/wHVttGghuE5v6fqZzLRUpo6B8SpuIa
-         opjxnshJFzGM9JE4r2tMbCE8gJy/oo8sbmeBUXf+xI7ba5/XAk4izGjBU1WA3mUyok3D
-         u+LraRzq/NWbPrf2TJOD5xtPCtrPYsmy/UPhbzr6Mgvy4KBm8N1pu28d5mGeQPqXMPzP
-         Zt9AfGw5RX+92q3pWlj8l4xfF9N2AO2vwBWd5cb5NpmjJvYQ0lvjjTc3pMBiHphp8oHR
-         0uS9+b1UOXwvHNO+fOrTEScvK7JToj23Qk+a4b3s49d5/IfyTXzZF8bc+5l5QBBbNXLd
-         LTgQ==
-X-Gm-Message-State: AOJu0Yw8LFACtYPdwI/2c72tF2I7uatQfJlp3OgoB6FxI4pNCeeZ3cco
-        d9IbNBEQiGJPlDh3k1pHljk=
-X-Google-Smtp-Source: AGHT+IE5qx6HN3EzbKUIwvWTv+TC582ScGTYgsPVwjueuwXYih+yxExY/typ39RJ86V4tTyBd6Kg8w==
-X-Received: by 2002:a05:6a20:bf19:b0:17b:cd83:6555 with SMTP id gc25-20020a056a20bf1900b0017bcd836555mr2103715pzb.23.1698155873483;
-        Tue, 24 Oct 2023 06:57:53 -0700 (PDT)
-Received: from ?IPV6:2601:642:4c01:f978:8cc6:940d:123f:6f04? ([2601:642:4c01:f978:8cc6:940d:123f:6f04])
-        by smtp.gmail.com with ESMTPSA id 23-20020a630f57000000b0059cc2f1b7basm7070593pgp.11.2023.10.24.06.57.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 06:57:53 -0700 (PDT)
-Message-ID: <aa259295-1ec9-41e1-9527-409f3799e8df@acm.org>
-Date:   Tue, 24 Oct 2023 06:57:51 -0700
+        Tue, 24 Oct 2023 11:00:56 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 321ED10C9;
+        Tue, 24 Oct 2023 08:00:54 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7F6BC433C8;
+        Tue, 24 Oct 2023 15:00:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698159653;
+        bh=1er9HDGuyZurPRrSEMxddQ3gFQVJxN7X/63TVQfVyDM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gCgiTpzW+N0zqUe1030TfPCtTzFbG2nIDdcPEgBtxnHx3Q4IcfKswjDuxXnOO/iLX
+         CpreOOIL3IF/282EdX3MV7RK3en1zf9Qx0KLe1qfjZaE9dHZgcA8bI2InlExVuP/Y8
+         LossIoICrvSkNYgqxTxj57G00NyG6zRFwn+nAqSzPWqonzLutkbcFaFQcTkwwTp7Wr
+         YTCz5/kNWXt0O7B7K63Lu1HqdMovwrvZ7bZjhs0jcOO8NAxdQubQVIXt8qXzYE6aEf
+         yrSnMPWRyyJl65YpTF39U90ePMG9hSQ+ljD6CZ+ZnIQCpPgqpMqD0its6wU319jJWT
+         Ei9hGlPoFSvZQ==
+Date:   Tue, 24 Oct 2023 08:00:53 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 1/3] filemap: add a per-mapping stable writes flag
+Message-ID: <20231024150053.GY3195650@frogsfrogsfrogs>
+References: <20231024064416.897956-1-hch@lst.de>
+ <20231024064416.897956-2-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: blktests: running nvme and srp tests with real RDMA hardware
-Content-Language: en-US
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Cc:     Daniel Wagner <dwagner@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>
-References: <vaijnbobhxyz4nkk2csv3nfhnpeupbudakcn3qgmo7o6vii4x5@rfnfdll6iloo>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <vaijnbobhxyz4nkk2csv3nfhnpeupbudakcn3qgmo7o6vii4x5@rfnfdll6iloo>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231024064416.897956-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/23/23 19:59, Shinichiro Kawasaki wrote:
-> Hello blktests users,
+On Tue, Oct 24, 2023 at 08:44:14AM +0200, Christoph Hellwig wrote:
+> folio_wait_stable waits for writeback to finish before modifying the
+> contents of a folio again, e.g. to support check summing of the data
+> in the block integrity code.
 > 
-> As of today, software RDMA driver "siw" or "rdma_rxe" is used to run "nvme"
-> group with nvme_trtype=rdma or "srp" (scsi rdma protocol) group. Now it is
-> suggested to run the test groups with real RDMA hardware to run tests in
-> more realistic conditions. A GitHub pull request is under review to support
-> it [1]. If you are interested in, please take a look and comment.
+> Currently this behavior is controlled by the SB_I_STABLE_WRITES flag
+> on the super_block, which means it is uniform for the entire file system.
+> This is wrong for the block device pseudofs which is shared by all
+> block devices, or file systems that can use multiple devices like XFS
+> witht the RT subvolume or btrfs (although btrfs currently reimplements
+> folio_wait_stable anyway).
 > 
-> [1] https://github.com/osandov/blktests/pull/86
+> Add a per-address_space AS_STABLE_WRITES flag to control the behavior
+> in a more fine grained way.  The existing SB_I_STABLE_WRITES is kept
+> to initialize AS_STABLE_WRITES to the existing default which covers
+> most cases.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/inode.c              |  2 ++
+>  include/linux/pagemap.h | 17 +++++++++++++++++
+>  mm/page-writeback.c     |  2 +-
 
-When I wrote the SRP tests, my goal was to test the SRP initiator
-driver, SRP target driver and dm-multipath drivers and also to allow
-users who do not have RDMA hardware to run these tests. Running these
-tests against a real RDMA adapter tests other functionality than block
-layer code. I see this as a use case that falls outside the original
-scope of the blktests test suite. Running NVMe tests against a real
-storage array also falls outside the scope of testing block driver
-functionality. I'm fine with adding this functionality but I hope that
-it does not become a burden for blktests contributors who are not
-interested in maintaining functionality that falls outside the original
-scope of blktests.
+For a hot second I wondered if we could get rid of SB_I_STABLE_WRITES
+too, but then had an AHA moment when I saw that NFS also sets it.
 
-Bart.
+This looks reasonable,
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
+--D
+
+>  3 files changed, 20 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/inode.c b/fs/inode.c
+> index 84bc3c76e5ccb5..ae1a6410b53d7e 100644
+> --- a/fs/inode.c
+> +++ b/fs/inode.c
+> @@ -215,6 +215,8 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
+>  	lockdep_set_class_and_name(&mapping->invalidate_lock,
+>  				   &sb->s_type->invalidate_lock_key,
+>  				   "mapping.invalidate_lock");
+> +	if (sb->s_iflags & SB_I_STABLE_WRITES)
+> +		mapping_set_stable_writes(mapping);
+>  	inode->i_private = NULL;
+>  	inode->i_mapping = mapping;
+>  	INIT_HLIST_HEAD(&inode->i_dentry);	/* buggered by rcu freeing */
+> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+> index 351c3b7f93a14e..8c9608b217b000 100644
+> --- a/include/linux/pagemap.h
+> +++ b/include/linux/pagemap.h
+> @@ -204,6 +204,8 @@ enum mapping_flags {
+>  	AS_NO_WRITEBACK_TAGS = 5,
+>  	AS_LARGE_FOLIO_SUPPORT = 6,
+>  	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
+> +	AS_STABLE_WRITES,	/* must wait for writeback before modifying
+> +				   folio contents */
+>  };
+>  
+>  /**
+> @@ -289,6 +291,21 @@ static inline void mapping_clear_release_always(struct address_space *mapping)
+>  	clear_bit(AS_RELEASE_ALWAYS, &mapping->flags);
+>  }
+>  
+> +static inline bool mapping_stable_writes(const struct address_space *mapping)
+> +{
+> +	return test_bit(AS_STABLE_WRITES, &mapping->flags);
+> +}
+> +
+> +static inline void mapping_set_stable_writes(struct address_space *mapping)
+> +{
+> +	set_bit(AS_STABLE_WRITES, &mapping->flags);
+> +}
+> +
+> +static inline void mapping_clear_stable_writes(struct address_space *mapping)
+> +{
+> +	clear_bit(AS_STABLE_WRITES, &mapping->flags);
+> +}
+> +
+>  static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
+>  {
+>  	return mapping->gfp_mask;
+> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> index b8d3d7040a506a..4656534b8f5cc6 100644
+> --- a/mm/page-writeback.c
+> +++ b/mm/page-writeback.c
+> @@ -3110,7 +3110,7 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable);
+>   */
+>  void folio_wait_stable(struct folio *folio)
+>  {
+> -	if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
+> +	if (mapping_stable_writes(folio_mapping(folio)))
+>  		folio_wait_writeback(folio);
+>  }
+>  EXPORT_SYMBOL_GPL(folio_wait_stable);
+> -- 
+> 2.39.2
+> 
