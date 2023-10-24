@@ -2,148 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3115C07545
-	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 06:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62692C07545
+	for <linux-block@archiver.kernel.org>; Tue, 24 Oct 2023 07:03:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232657AbjJXGvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Oct 2023 02:51:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53034 "EHLO
+        id S232428AbjJXHDa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Oct 2023 03:03:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232627AbjJXGvu (ORCPT
+        with ESMTP id S232391AbjJXHD3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Oct 2023 02:51:50 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A19399;
-        Mon, 23 Oct 2023 23:51:46 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id F21091FE62;
-        Tue, 24 Oct 2023 06:51:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1698130304; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pau3+0/NlGfzN9CKQqjt2HZnTXnCBU9sg9VtB1cLmgk=;
-        b=IzyLFtugKO/iNGNt92HdpOTQnrsAC8YBcdKV4hr55PD+vm5QPZg9y2bDyqnTwxNdmMRcWV
-        mf0ku1vBhTHWShPn8AOZ1jswFDaaklt9Ibhvv1ODz7zflIZuMIF3gEdLCfVwB0xI/TPbox
-        PAz9U3PywIZ9LKBjv+MnVSGwSjWC3I0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1698130304;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pau3+0/NlGfzN9CKQqjt2HZnTXnCBU9sg9VtB1cLmgk=;
-        b=FoIPCbxl1AfgJMZUJD6LHheQsYUwgsaWl1S1VWp6B3+jtXHcCqYhLJ50MxJjIAk8yF4VCE
-        uBgcwPIFSItmkJBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BC4BE1391C;
-        Tue, 24 Oct 2023 06:51:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id PEnWLH9pN2UvLwAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 24 Oct 2023 06:51:43 +0000
-Message-ID: <bc532b70-e286-4fa0-848b-bd837abc73a5@suse.de>
-Date:   Tue, 24 Oct 2023 08:51:43 +0200
+        Tue, 24 Oct 2023 03:03:29 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE557110;
+        Tue, 24 Oct 2023 00:03:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=LvOiTdTTHzhafayusvQwyLj5RJk0YCkV1tYeNqzUJuA=; b=DBECAPPXtQCD21PnNHQh3yfaL6
+        TdF09ZOYxd7dp6Wksmz/aojmJhxz1llsjzkw+EcE8OULKL+wOtoC9yVJiDEfdKxDn/YAAWbu/ixmt
+        xENYe2qSpgtHYwKWMzTT9xVYzb4OLp0Hyt5Cgcdus+t1wv0IC1fqWzXWO2FvVuehaCtm/4gBD9y2r
+        4SBeLNP9LAdIKJJzmGQ4dXW69Tq/jF9M4MX6TFn/4EbKyDCZd6VkNhwLjmJMxSVONT3bBrDn/itI/
+        UAB/XFm/oXEzy2t5c2pFbOzz3NviAXglGgFl/can+s6T7ZNCDHPmyHROOIjW1mCRvSPHDGySq34Qz
+        7VEJ0Lnw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qvBRl-0091xP-0F;
+        Tue, 24 Oct 2023 07:03:25 +0000
+Date:   Tue, 24 Oct 2023 00:03:25 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: loop change deprecation bdev->bd_holder_lock
+Message-ID: <ZTdsPUgCA5TK1hfj@infradead.org>
+References: <20231018152924.3858-1-jack@suse.cz>
+ <20231019-galopp-zeltdach-b14b7727f269@brauner>
+ <ZTExy7YTFtToAOOx@infradead.org>
+ <20231020-enthusiasmus-vielsagend-463a7c821bf3@brauner>
+ <20231020120436.jgxdlawibpfuprnz@quack3>
+ <20231023-ausgraben-berichten-d747aa50d876@brauner>
+ <20231023-fungieren-erbschaft-0486c1eab011@brauner>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: blktests: running nvme and srp tests with real RDMA hardware
-Content-Language: en-US
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Cc:     Daniel Wagner <dwagner@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <vaijnbobhxyz4nkk2csv3nfhnpeupbudakcn3qgmo7o6vii4x5@rfnfdll6iloo>
- <ce187671-ea90-4d97-b323-70f275c09649@suse.de>
- <4bdf4031-5f14-4cb1-92d3-7ae106a4a73f@nvidia.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <4bdf4031-5f14-4cb1-92d3-7ae106a4a73f@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-        none
-X-Spamd-Result: default: False [-7.09 / 50.00];
-         ARC_NA(0.00)[];
-         TO_DN_EQ_ADDR_SOME(0.00)[];
-         XM_UA_NO_VERSION(0.01)[];
-         FROM_HAS_DN(0.00)[];
-         TO_DN_SOME(0.00)[];
-         TO_MATCH_ENVRCPT_ALL(0.00)[];
-         BAYES_HAM(-3.00)[100.00%];
-         MIME_GOOD(-0.10)[text/plain];
-         RCVD_VIA_SMTP_AUTH(0.00)[];
-         NEURAL_HAM_LONG(-3.00)[-1.000];
-         DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-         NEURAL_HAM_SHORT(-1.00)[-1.000];
-         RCPT_COUNT_SEVEN(0.00)[8];
-         FROM_EQ_ENVFROM(0.00)[];
-         MIME_TRACE(0.00)[0:+];
-         RCVD_COUNT_TWO(0.00)[2];
-         RCVD_TLS_ALL(0.00)[];
-         MID_RHS_MATCH_FROM(0.00)[]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231023-fungieren-erbschaft-0486c1eab011@brauner>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/24/23 07:55, Chaitanya Kulkarni wrote:
-> On 10/23/23 22:43, Hannes Reinecke wrote:
->> On 10/24/23 04:59, Shinichiro Kawasaki wrote:
->>> Hello blktests users,
->>>
->>> As of today, software RDMA driver "siw" or "rdma_rxe" is used to run
->>> "nvme"
->>> group with nvme_trtype=rdma or "srp" (scsi rdma protocol) group. Now
->>> it is
->>> suggested to run the test groups with real RDMA hardware to run tests in
->>> more realistic conditions. A GitHub pull request is under review to
->>> support
->>> it [1]. If you are interested in, please take a look and comment.
->>>
->>> [1] https://github.com/osandov/blktests/pull/86
->>
->> Just commented on it. What we really need is the functionality to run
->> against pre-configured controllers (ie specify the controller NQN and
->> NSID and do not call into nvmetcli); when running on real HW we
->> typically cannot control the target, so we need to be able to specify
->> a preconfigured namespace.
->>
->> Cheers,
->>
->> Hannes
+On Mon, Oct 23, 2023 at 05:35:25PM +0200, Christian Brauner wrote:
+> I just realized that if we're able to deprecate LOOP_CHANGE_FD we remove
+> one of the most problematic/weird cases for partitions and filesystems.
+
+> change fd event on the first partition:
 > 
-> What format you think use to accept the pre configured namespace ?
-> thinking out loudly Can relay and we use nvmetcli config file somehow
-> for local loop back setup ?
+> sudo ./loop_change_fd /dev/loop0p1 img2
 > 
-Ideally I would hide it behind the call to '_setup_nvmet' / 
-'_nvmet_target_setup' / '_nvmet_target_cleanup'.
-We already have 'def_subsysnqn', which should be set to the
-pre-provisioned NQN. We clearly need a 'def_nsid', but that
-should be easily done.
+> we call disk_force_media_change() but that only works on disk->part0
+> which means that we don't even cleanly shutdown the filesystem on the
+> partition we're trying to mess around with.
 
-Biggest problem here will be the 'out' files. Most of them record the
-default NQN, so if we allow to change that the tests will break.
-How can we abstract away from that?
+Yes, disk_force_media_change has that general problem back from the
+early Linux days (it had a different name back then, though).  I think
+it is because traditionally removable media in Linux never had
+partitions, e.g. the CDROM drivers typically only allocated a single
+minor number so they could not be scanned.  But that has changed because
+the interfaces got used for different use cases, and we also had
+dynamic majors for a long time that now allow partitions.  And there
+are real use cases even for traditional removable media, e.g. MacOS
+CDROMs traditionally did have partitions.
 
-Maybe it's a good exercise even with the current codebase; just
-set 'def_subsysnqn' to something else and watch what breaks ...
+> For now, we should give up any pretense that disk_force_media_change()
+> does anything useful for loop change fd and simply remove it completely.
+> It's either useless, or it breaks the original semantics of loop change
+> fd although I don't think anyone's ever used it the way I described
+> above.
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+Maybe we can just drop the CHANGE_FD ioctl and see if anyone screams?
 
