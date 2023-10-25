@@ -2,88 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8854CC25B47
-	for <linux-block@archiver.kernel.org>; Wed, 25 Oct 2023 08:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACFC0C25B47
+	for <linux-block@archiver.kernel.org>; Wed, 25 Oct 2023 09:23:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231794AbjJYIlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Oct 2023 04:41:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36594 "EHLO
+        id S232428AbjJYJXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Oct 2023 05:23:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230217AbjJYIlr (ORCPT
+        with ESMTP id S234241AbjJYJXa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Oct 2023 04:41:47 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 192C39C;
-        Wed, 25 Oct 2023 01:41:45 -0700 (PDT)
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SFj8N0lhxz4f3prr;
-        Wed, 25 Oct 2023 16:41:40 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-        by mail.maildlp.com (Postfix) with ESMTP id 06C941A016E;
-        Wed, 25 Oct 2023 16:41:42 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgDHXd3E1DhlVE+YDw--.27079S4;
-        Wed, 25 Oct 2023 16:41:41 +0800 (CST)
-From:   Zhong Jinghua <zhongjinghua@huaweicloud.com>
-To:     axboe@kernel.dk, penguin-kernel@i-love.sakura.ne.jp
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhongjinghua@huawei.com, yi.zhang@huawei.com, yukuai3@huawei.com
-Subject: [PATCH] block: Fix minor range check in device_add_disk()
-Date:   Wed, 25 Oct 2023 16:46:21 +0800
-Message-Id: <20231025084621.2338604-1-zhongjinghua@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+        Wed, 25 Oct 2023 05:23:30 -0400
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A570C8F;
+        Wed, 25 Oct 2023 02:23:26 -0700 (PDT)
+X-UUID: 2365d7e2731811eea33bb35ae8d461a2-20231025
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=GD07mFMHD4ZCgjq6WI7FIX+ZSbE7ZY0N7D7XCgHgxDs=;
+        b=DSL30w6qIjB8sRl+shY6Eu/derXnAgpR2r8Wg4fmAqtrl9Ke6lZvLHb5tSpSYioor4pOdka7aP+7X85+74MdoYIqBDHjkYHzi9TLgba2ur/xrp0HW5v2FIulUtPc03iKitVhmyrBOBNrAnSPlEiEeVlop1VSq4ahm+v3BziZkm0=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.32,REQID:6108b7c4-b02b-4440-82b1-487b849a3e5d,IP:0,U
+        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+        release,TS:0
+X-CID-META: VersionHash:5f78ec9,CLOUDID:9d454dd7-04a0-4e50-8742-3543eab8cb8e,B
+        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+        RL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,
+        DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 2365d7e2731811eea33bb35ae8d461a2-20231025
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw01.mediatek.com
+        (envelope-from <ed.tsai@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 776131182; Wed, 25 Oct 2023 17:23:20 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 25 Oct 2023 17:23:19 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 25 Oct 2023 17:23:19 +0800
+From:   <ed.tsai@mediatek.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+CC:     <wsd_upstream@mediatek.com>, <stanley.chu@mediatek.com>,
+        <peter.wang@mediatek.com>, <alice.chao@mediatek.com>,
+        <powen.kao@mediatek.com>, <naomi.chu@mediatek.com>,
+        <will.shiu@mediatek.com>, <chun-hung.wu@mediatek.com>,
+        <casper.li@mediatek.com>, Ed Tsai <ed.tsai@mediatek.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>
+Subject: [PATCH 1/1] block: Check the queue limit before bio submitting
+Date:   Wed, 25 Oct 2023 17:22:52 +0800
+Message-ID: <20231025092255.27930-1-ed.tsai@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDHXd3E1DhlVE+YDw--.27079S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrur4rKF4kJw1rCF4rtFW3Awb_yoWDCFX_Gr
-        y5Xr95Wr1rWr1rCrn8urnFyry0yr95Way8CFy0vFZxXayxCF9Fq34DKr1FgF1DWFyjkFW5
-        ur1UZrn8tr4IkjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbr8YFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
-        z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
-        AF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4l
-        IxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WF
-        yUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIY
-        CTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
-X-CM-SenderInfo: x2kr0wpmlqwxtxd6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--13.727700-8.000000
+X-TMASE-MatchedRID: BmApTv+lLq0waD7CCdj96ei9l247YAX3lFphfRKYquoUtdRZTmEaIS3u
+        UJEx/mLPreNj5HHxl21nGN5KPPuDsG31PKYofPF/XTwa0AqaSsKLB4sTRpOnCdCb26mGD2jLFXo
+        +i3C0P4mvLLwTZdNynSvcqxXFsTtBue4A1S8vO3qM29hkek7XdwRryDXHx6oX2m/9xxi5QYn0Vn
+        grMLma4CACA5ub2VruHVVF1Gr4vCs9d1nHWxkekOKXavbHY/C1uCESrx7wlnI4FRAn4eAUA31Qr
+        wyU0uRkPdC7NjHVzscy2ii2lrm+Dx8TzIzimOwPC24oEZ6SpSk6XEE7Yhw4FgRTi3vHGzbgVIN/
+        lHwV0gMDutLgGfA+guP9LE9sG2stVbTvIYsYMpM=
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--13.727700-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: 7092A3517B8EBB70E790EACEFA197BBBB6340BDF01AC26F8DD7E4A6F9D08CF272000:8
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhong Jinghua <zhongjinghua@huawei.com>
+From: Ed Tsai <ed.tsai@mediatek.com>
 
-Checks added in patch:
-commit e338924bd05d ("block: check minor range in device_add_disk()")
-ignore the problem of first_minore < 0 and disk->minors < 0.
+Referring to commit 07173c3ec276 ("block: enable multipage bvecs"),
+each bio_vec now holds more than one page, potentially exceeding
+1MB in size and causing alignment issues with the queue limit.
 
-Fix it by adding first_minore < 0 and disk->minors < 0 check.
+In a sequential read/write scenario, the file system maximizes the
+bio's capacity before submitting. However, misalignment with the
+queue limit can result in the bio being split into smaller I/O
+operations.
 
-Fixes: e338924bd05d ("block: check minor range in device_add_disk()")
-Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+For instance, assuming the maximum I/O size is set to 512KB and the
+memory is highly fragmented, resulting in each bio containing only
+one 2-pages bio_vec (i.e., bi_size = 1028KB). This would cause the
+bio to be split into two 512KB portions and one 4KB portion. As a
+result, the originally expected continuous large I/O operations are
+interspersed with many small I/O operations.
+
+To address this issue, this patch adds a check for the max_sectors
+before submitting the bio. This allows the upper layers to proactively
+detect and handle alignment issues.
+
+I performed the Antutu V10 Storage Test on a UFS 4.0 device, which
+resulted in a significant improvement in the Sequential test:
+
+Sequential Read (average of 5 rounds):
+Original: 3033.7 MB/sec
+Patched: 3520.9 MB/sec
+
+Sequential Write (average of 5 rounds):
+Original: 2225.4 MB/sec
+Patched: 2800.3 MB/sec
+
+Signed-off-by: Ed Tsai <ed.tsai@mediatek.com>
 ---
- block/genhd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block/bio.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 736215e9ddc3..8292a1e265cf 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -432,7 +432,9 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 				DISK_MAX_PARTS);
- 			disk->minors = DISK_MAX_PARTS;
- 		}
--		if (disk->first_minor + disk->minors > MINORMASK + 1)
-+		if (disk->first_minor > MINORMASK ||
-+			disk->minors > (1U << MINORBITS) ||
-+			disk->first_minor + disk->minors > MINORMASK + 1)
- 			goto out_exit_elevator;
- 	} else {
- 		if (WARN_ON(disk->minors))
+diff --git a/block/bio.c b/block/bio.c
+index 816d412c06e9..a4a1f775b9ea 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1227,6 +1227,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	iov_iter_extraction_t extraction_flags = 0;
+ 	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
+ 	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
++	struct queue_limits *lim = &bdev_get_queue(bio->bi_bdev)->limits;
+ 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages = (struct page **)bv;
+ 	ssize_t size, left;
+@@ -1275,6 +1276,11 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 		struct page *page = pages[i];
+ 
+ 		len = min_t(size_t, PAGE_SIZE - offset, left);
++		if (bio->bi_iter.bi_size + len >
++		    lim->max_sectors << SECTOR_SHIFT) {
++			ret = left;
++			break;
++		}
+ 		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
+ 			ret = bio_iov_add_zone_append_page(bio, page, len,
+ 					offset);
 -- 
-2.31.1
+2.18.0
 
