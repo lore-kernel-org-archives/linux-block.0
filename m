@@ -2,281 +2,459 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF5AC0032E
-	for <linux-block@archiver.kernel.org>; Wed, 25 Oct 2023 19:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A60FAC25B6E
+	for <linux-block@archiver.kernel.org>; Wed, 25 Oct 2023 22:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjJYTz7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Oct 2023 15:55:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37512 "EHLO
+        id S230212AbjJYWq3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Oct 2023 18:46:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbjJYTz6 (ORCPT
+        with ESMTP id S229723AbjJYWq2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Oct 2023 15:55:58 -0400
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97D8E93
-        for <linux-block@vger.kernel.org>; Wed, 25 Oct 2023 12:55:10 -0700 (PDT)
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7789a4c01easo12197185a.0
-        for <linux-block@vger.kernel.org>; Wed, 25 Oct 2023 12:55:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698263709; x=1698868509;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ekPau7DZNUdzR+f7zD17FyTym1sI9YNJQ3q9QYnQIM=;
-        b=EH2JwL1nwR7QHwxods8Q9bQVjpqy/aZ84/rf1tnZOjUts/5Ssc55q065+yr/j7/Xm5
-         lT41uy8LWbVmLnyjoZz5Ik/8PzKZwskvV61nOafuL66pRwQVh+gX3d1UkJBJY01+f6Xa
-         pFuUDUzMd2EAcK0r44wf3nGoko5qkWZfRhyL2BEq3qfnObABvol6IIn8O6mdFBBqEPGL
-         GeGr8FvQLfR6ziuawY1UfAbL80RntC6xSPQzcSGSqXeNoAvPzR9RDLXW2KoGEPNSuqK5
-         BBgogjr6Ug4o5+wPf6CdXh+DseFLTb4X01l54QpvZMK2/2k2TJr+vdGBhg+HSW+Bjzy3
-         xalg==
-X-Gm-Message-State: AOJu0YyQs1IyQfVt2EQYcZeCgd5LPmvINYsmfKrXOnOAdXcVydwt+gUA
-        kfCN7EF53buXLgggw0sIvZvm
-X-Google-Smtp-Source: AGHT+IEkASxtyJZ8inRHyoVuE+e18cb050FhVzmJbHpRVoEA6mwD77zUMN5FoX/TnBj6qvuOHfqZbw==
-X-Received: by 2002:a05:620a:2910:b0:779:9b67:811 with SMTP id m16-20020a05620a291000b007799b670811mr13729243qkp.52.1698263709581;
-        Wed, 25 Oct 2023 12:55:09 -0700 (PDT)
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id s23-20020a05620a16b700b0077891d2d12dsm4445370qkj.43.2023.10.25.12.55.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 12:55:09 -0700 (PDT)
-Date:   Wed, 25 Oct 2023 15:55:07 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v2] dm: respect REQ_NOWAIT flag in bios issued to DM
-Message-ID: <ZTlym/9lyUZmApSY@redhat.com>
-References: <15ca26cc-174a-d4e8-9780-d09f8e5a6ea5@redhat.com>
- <ZTgFtseG3m3WPWn/@redhat.com>
- <e796de8-bac1-8f7a-c6eb-74d39aad8a2b@redhat.com>
- <ZTgb3lkNmEUIYpsl@redhat.com>
- <ZTlt0HPbVZf0gYcI@redhat.com>
+        Wed, 25 Oct 2023 18:46:28 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DDE5E116;
+        Wed, 25 Oct 2023 15:46:24 -0700 (PDT)
+Received: from [10.137.106.151] (unknown [131.107.159.23])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 02F9D20B74C0;
+        Wed, 25 Oct 2023 15:46:24 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 02F9D20B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1698273984;
+        bh=dm0CpobQbsS7czPRbypssTTQ8Y+D288bv9BFBEkdSMg=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=VmAw5akzIQiz/kj0sGLX3UeCAxwTCCby0Z4dr5chbT8LOZuTjrV6zzf6eX6rdeTB2
+         HgzjasdJ8l9JQAN+hrSjlG6Pw2BbPf+Nau7CHPLo9dsnkAMZbhogCk09Psu6AyXNRZ
+         T0Rg2cw/n2Sjeqk/kQGKNahzQPmB22jPvN4zyRHc=
+Message-ID: <594923f6-6942-4b4b-8ca1-b9dcf74c9c1c@linux.microsoft.com>
+Date:   Wed, 25 Oct 2023 15:45:37 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTlt0HPbVZf0gYcI@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v11 2/19] ipe: add policy parser
+To:     Paul Moore <paul@paul-moore.com>, corbet@lwn.net,
+        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
+        agk@redhat.com, snitzer@kernel.org, eparis@redhat.com
+Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1696457386-3010-3-git-send-email-wufan@linux.microsoft.com>
+ <7c8c2a158c628a642078f746e5c42f2f.paul@paul-moore.com>
+Content-Language: en-US
+From:   Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <7c8c2a158c628a642078f746e5c42f2f.paul@paul-moore.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 25 2023 at  3:34P -0400,
-Mike Snitzer <snitzer@kernel.org> wrote:
 
-> From: Mikulas Patocka <mpatocka@redhat.com>
+
+On 10/23/2023 8:52 PM, Paul Moore wrote:
+> On Oct  4, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+>>
+>> IPE's interpretation of the what the user trusts is accomplished through
+>> its policy. IPE's design is to not provide support for a single trust
+>> provider, but to support multiple providers to enable the end-user to
+>> choose the best one to seek their needs.
+>>
+>> This requires the policy to be rather flexible and modular so that
+>> integrity providers, like fs-verity, dm-verity, dm-integrity, or
+>> some other system, can plug into the policy with minimal code changes.
+>>
+>> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+...
+>> ---
+>>   security/ipe/Makefile        |   2 +
+>>   security/ipe/policy.c        | 101 ++++++++
+>>   security/ipe/policy.h        |  83 ++++++
+>>   security/ipe/policy_parser.c | 487 +++++++++++++++++++++++++++++++++++
+>>   security/ipe/policy_parser.h |  11 +
+>>   5 files changed, 684 insertions(+)
+>>   create mode 100644 security/ipe/policy.c
+>>   create mode 100644 security/ipe/policy.h
+>>   create mode 100644 security/ipe/policy_parser.c
+>>   create mode 100644 security/ipe/policy_parser.h
 > 
-> Update DM core's IO submission to allocate required memory using
-> GFP_NOWAIT if REQ_NOWAIT is set.  Lone exception is in the error path
-> where DM's requeue support needs to allocate a clone bio in
-> dm_io_rewind() to allow the IO to be resubmitted: GFP_NOWAIT is used
-> first but if it fails GFP_NOIO is used as a last resort.
+> ...
 > 
-> Tested with simple test provided in commit a9ce385344f916 ("dm: don't
-> attempt to queue IO under RCU protection") that was enhanced to check
-> error codes.  Also tested using fio's pvsync2 with nowait=1.
+>> diff --git a/security/ipe/policy.c b/security/ipe/policy.c
+>> new file mode 100644
+>> index 000000000000..3a529c7950a1
+>> --- /dev/null
+>> +++ b/security/ipe/policy.c
+>> @@ -0,0 +1,101 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) Microsoft Corporation. All rights reserved.
+>> + */
 > 
-> But testing with induced GFP_NOWAIT allocation failures wasn't
-> performed.
+> ...
 > 
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> Co-developed-by: Mike Snitzer <snitzer@kernel.org>
-> Signed-off-by: Mike Snitzer <snitzer@kernel.org>
-> ---
->  drivers/md/dm-io-rewind.c | 13 ++++++--
->  drivers/md/dm.c           | 66 ++++++++++++++++++++++++++++++++-------
->  2 files changed, 65 insertions(+), 14 deletions(-)
-
-Backfilling some comments on this v2:
-
-1) I'm not completely clear if REQ_NOWAIT not ever sleeping (waiting
-   on IO) is a hint vs a hard requirement
-   -- so the dm_io_rewind() change to try GFP_NOWAIT and failback to
-      GFP_NOIO might be bogus...
-
-2) What is a good way to reliably simulate low memory allocations such
-   that mempool backed GFP_NOWAIT allocations fail?
-
-Thanks for any review/feedback.
-
-Mike
-
+>> +static int set_pkcs7_data(void *ctx, const void *data, size_t len,
+>> +			  size_t asn1hdrlen)
+>> +{
+>> +	struct ipe_policy *p = ctx;
+>> +
+>> +	p->text = (const char *)data;
+>> +	p->textlen = len;
+>> +
+>> +	return 0;
+>> +}
 > 
-> diff --git a/drivers/md/dm-io-rewind.c b/drivers/md/dm-io-rewind.c
-> index 6155b0117c9d..bde5a53e2d88 100644
-> --- a/drivers/md/dm-io-rewind.c
-> +++ b/drivers/md/dm-io-rewind.c
-> @@ -143,8 +143,17 @@ static void dm_bio_rewind(struct bio *bio, unsigned int bytes)
->  void dm_io_rewind(struct dm_io *io, struct bio_set *bs)
->  {
->  	struct bio *orig = io->orig_bio;
-> -	struct bio *new_orig = bio_alloc_clone(orig->bi_bdev, orig,
-> -					       GFP_NOIO, bs);
-> +	struct bio *new_orig;
-> +
-> +	new_orig = bio_alloc_clone(orig->bi_bdev, orig, GFP_NOWAIT, bs);
-> +	if (unlikely(!new_orig)) {
-> +		/*
-> +		 * Returning early and failing rewind isn't an option, even
-> +		 * if orig has REQ_NOWAIT set, so retry alloc with GFP_NOIO.
-> +		 */
-> +		new_orig = bio_alloc_clone(orig->bi_bdev, orig, GFP_NOIO, bs);
-> +	}
-> +
->  	/*
->  	 * dm_bio_rewind can restore to previous position since the
->  	 * end sector is fixed for original bio, but we still need
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 1113a8da3c47..b0e1425af475 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -87,6 +87,8 @@ struct clone_info {
->  	unsigned int sector_count;
->  	bool is_abnormal_io:1;
->  	bool submit_as_polled:1;
-> +	bool is_nowait:1;
-> +	bool nowait_failed:1;
->  };
->  
->  static inline struct dm_target_io *clone_to_tio(struct bio *clone)
-> @@ -576,7 +578,13 @@ static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio)
->  	struct dm_target_io *tio;
->  	struct bio *clone;
->  
-> -	clone = bio_alloc_clone(NULL, bio, GFP_NOIO, &md->mempools->io_bs);
-> +	if (unlikely(bio->bi_opf & REQ_NOWAIT)) {
-> +		clone = bio_alloc_clone(NULL, bio, GFP_NOWAIT, &md->mempools->io_bs);
-> +		if (!clone)
-> +			return NULL;
-> +	} else {
-> +		clone = bio_alloc_clone(NULL, bio, GFP_NOIO, &md->mempools->io_bs);
-> +	}
->  	tio = clone_to_tio(clone);
->  	tio->flags = 0;
->  	dm_tio_set_flag(tio, DM_TIO_INSIDE_DM_IO);
-> @@ -1500,9 +1508,17 @@ static void alloc_multiple_bios(struct bio_list *blist, struct clone_info *ci,
->  			mutex_unlock(&ci->io->md->table_devices_lock);
->  		if (bio_nr == num_bios)
->  			return;
-> -
-> +		/*
-> +		 * Failed to allocate all bios, all or nothing, so rewind partial
-> +		 * allocations and short-circuit retry with GFP_NOIO if 'is_nowait'
-> +		 */
->  		while ((bio = bio_list_pop(blist)))
->  			free_tio(bio);
-> +
-> +		if (ci->is_nowait) {
-> +			ci->nowait_failed = true;
-> +			return;
-> +		}
->  	}
->  }
->  
-> @@ -1519,7 +1535,15 @@ static unsigned int __send_duplicate_bios(struct clone_info *ci, struct dm_targe
->  	case 1:
->  		if (len)
->  			setup_split_accounting(ci, *len);
-> -		clone = alloc_tio(ci, ti, 0, len, GFP_NOIO);
-> +		if (unlikely(ci->is_nowait)) {
-> +			clone = alloc_tio(ci, ti, 0, len, GFP_NOWAIT);
-> +			if (!clone) {
-> +				ci->nowait_failed = true;
-> +				return 0;
-> +			}
-> +		} else {
-> +			clone = alloc_tio(ci, ti, 0, len, GFP_NOIO);
-> +		}
->  		__map_bio(clone);
->  		ret = 1;
->  		break;
-> @@ -1539,7 +1563,7 @@ static unsigned int __send_duplicate_bios(struct clone_info *ci, struct dm_targe
->  	return ret;
->  }
->  
-> -static void __send_empty_flush(struct clone_info *ci)
-> +static blk_status_t __send_empty_flush(struct clone_info *ci)
->  {
->  	struct dm_table *t = ci->map;
->  	struct bio flush_bio;
-> @@ -1572,6 +1596,8 @@ static void __send_empty_flush(struct clone_info *ci)
->  	atomic_sub(1, &ci->io->io_count);
->  
->  	bio_uninit(ci->bio);
-> +
-> +	return likely(!ci->nowait_failed) ? BLK_STS_OK : BLK_STS_AGAIN;
->  }
->  
->  static void __send_changing_extent_only(struct clone_info *ci, struct dm_target *ti,
-> @@ -1656,7 +1682,7 @@ static blk_status_t __process_abnormal_io(struct clone_info *ci,
->  
->  	__send_changing_extent_only(ci, ti, num_bios,
->  				    max_granularity, max_sectors);
-> -	return BLK_STS_OK;
-> +	return likely(!ci->nowait_failed) ? BLK_STS_OK : BLK_STS_AGAIN;
->  }
->  
->  /*
-> @@ -1714,7 +1740,7 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
->  	if (unlikely(!ti))
->  		return BLK_STS_IOERR;
->  
-> -	if (unlikely((ci->bio->bi_opf & REQ_NOWAIT) != 0) &&
-> +	if (unlikely(ci->is_nowait) &&
->  	    unlikely(!dm_target_supports_nowait(ti->type)))
->  		return BLK_STS_NOTSUPP;
->  
-> @@ -1729,7 +1755,15 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
->  
->  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
->  	setup_split_accounting(ci, len);
-> -	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
-> +	if (unlikely(ci->is_nowait)) {
-> +		clone = alloc_tio(ci, ti, 0, &len, GFP_NOWAIT);
-> +		if (unlikely(!clone)) {
-> +			ci->nowait_failed = true; /* unchecked, set for consistency */
-> +			return BLK_STS_AGAIN;
-> +		}
-> +	} else {
-> +		clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
-> +	}
->  	__map_bio(clone);
->  
->  	ci->sector += len;
-> @@ -1738,11 +1772,13 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
->  	return BLK_STS_OK;
->  }
->  
-> -static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
-> +static void init_clone_info(struct clone_info *ci, struct dm_io *io,
->  			    struct dm_table *map, struct bio *bio, bool is_abnormal)
->  {
-> +	ci->is_nowait = !!(bio->bi_opf & REQ_NOWAIT);
-> +	ci->nowait_failed = false;
->  	ci->map = map;
-> -	ci->io = alloc_io(md, bio);
-> +	ci->io = io;
->  	ci->bio = bio;
->  	ci->is_abnormal_io = is_abnormal;
->  	ci->submit_as_polled = false;
-> @@ -1777,11 +1813,17 @@ static void dm_split_and_process_bio(struct mapped_device *md,
->  			return;
->  	}
->  
-> -	init_clone_info(&ci, md, map, bio, is_abnormal);
-> -	io = ci.io;
-> +	io = alloc_io(md, bio);
-> +	if (!io) {
-> +		/* Unable to do anything without dm_io. */
-> +		bio_wouldblock_error(bio);
-> +		return;
-> +	}
-> +
-> +	init_clone_info(&ci, io, map, bio, is_abnormal);
->  
->  	if (bio->bi_opf & REQ_PREFLUSH) {
-> -		__send_empty_flush(&ci);
-> +		error = __send_empty_flush(&ci);
->  		/* dm_io_complete submits any data associated with flush */
->  		goto out;
->  	}
-> -- 
-> 2.40.0
+> The @asn1hdrlen parameter isn't used in this function, at least at this
+> point in the patchset, so you really should remove it.  If it is needed
+> later in the patchset you can always update the function.
+>
+Although the @asn1hdrlen is not used, it's a required parameter for the 
+pkcs7 callback. I guess adding a __always_unused might be the right 
+solution?
+
+>> diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
+>> new file mode 100644
+>> index 000000000000..c09458bd348d
+>> --- /dev/null
+>> +++ b/security/ipe/policy_parser.c
+>> @@ -0,0 +1,487 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) Microsoft Corporation. All rights reserved.
+>> + */
 > 
+> ...
+> 
+>> +/**
+>> + * remove_trailing_spaces - Truncate all trailing spaces in a string.
+>> + *
+>> + * @line: Supplies a poilcy line string for preprocessing.
+>> + *
+>> + * Return: The length of truncated string.
+>> + */
+>> +static size_t remove_trailing_spaces(char *line)
+>> +{
+>> +	size_t i = 0;
+>> +
+>> +	for (i = strlen(line); i > 0 && (line[i - 1] == ' ' || line[i - 1] == '\t'); --i)
+>> +		;
+> 
+> Maybe I've asked this before, I can't remember: could you use the
+> isspace() macro here instead of explicitly checking for ' ' and '\t'?
+> Yes, isspace() works here. I will update this part.
+
+>    i = strlen(line);
+>    while (i > 0 && isspace(line[i - 1]))
+>      i--;
+>    line[i] = '\0';
+> 
+>> +	line[i] = '\0';
+>> +
+>> +	return i;
+>> +}
+>> +
+>> +/**
+>> + * parse_version - Parse policy version.
+>> + * @ver: Supplies a version string to be parsed.
+>> + * @p: Supplies the partial parsed policy.
+>> + *
+>> + * Return:
+>> + * * 0	- OK
+>> + * * !0	- Standard errno
+>> + */
+>> +static int parse_version(char *ver, struct ipe_parsed_policy *p)
+>> +{
+>> +	int rc = 0;
+>> +	size_t sep_count = 0;
+>> +	char *token;
+>> +	u16 *const cv[] = { &p->version.major, &p->version.minor, &p->version.rev };
+>> +
+>> +	while ((token = strsep(&ver, ".")) != NULL) {
+>> +		/* prevent overflow */
+>> +		if (sep_count >= ARRAY_SIZE(cv))
+>> +			return -EBADMSG;
+>> +
+>> +		rc = kstrtou16(token, 10, cv[sep_count]);
+>> +		if (rc)
+>> +			return rc;
+>> +
+>> +		++sep_count;
+>> +	}
+>> +
+>> +	/* prevent underflow */
+>> +	if (sep_count != ARRAY_SIZE(cv))
+>> +		rc = -EBADMSG;
+> 
+> You could always just 'return -EBADMSG' here and 'return 0' below to
+> simplify things a little.
+> 
+I agree, this part is kind of unnecessary. I will update accordingly.
+
+>> +	return rc;
+>> +}
+>> +
+>> +enum header_opt {
+>> +	IPE_HEADER_POLICY_NAME = 0,
+>> +	IPE_HEADER_POLICY_VERSION,
+>> +	__IPE_HEADER_MAX
+>> +};
+>> +
+>> +static const match_table_t header_tokens = {
+>> +	{IPE_HEADER_POLICY_NAME,	"policy_name=%s"},
+>> +	{IPE_HEADER_POLICY_VERSION,	"policy_version=%s"},
+>> +	{__IPE_HEADER_MAX,		NULL}
+>> +};
+>> +
+>> +/**
+>> + * parse_header - Parse policy header information.
+>> + * @line: Supplies header line to be parsed.
+>> + * @p: Supplies the partial parsed policy.
+>> + *
+>> + * Return:
+>> + * * 0	- OK
+>> + * * !0	- Standard errno
+>> + */
+>> +static int parse_header(char *line, struct ipe_parsed_policy *p)
+>> +{
+>> +	int rc = 0;
+>> +	char *t, *ver = NULL;
+>> +	substring_t args[MAX_OPT_ARGS];
+>> +	size_t idx = 0;
+>> +
+>> +	while ((t = strsep(&line, IPE_POLICY_DELIM)) != NULL) {
+>> +		int token;
+>> +
+>> +		if (*t == '\0')
+>> +			continue;
+>> +		if (idx >= __IPE_HEADER_MAX) {
+>> +			rc = -EBADMSG;
+>> +			goto out;
+>> +		}
+>> +
+>> +		token = match_token(t, header_tokens, args);
+>> +		if (token != idx) {
+>> +			rc = -EBADMSG;
+>> +			goto out;
+>> +		}
+>> +
+>> +		switch (token) {
+>> +		case IPE_HEADER_POLICY_NAME:
+>> +			p->name = match_strdup(&args[0]);
+>> +			if (!p->name)
+>> +				rc = -ENOMEM;
+>> +			break;
+>> +		case IPE_HEADER_POLICY_VERSION:
+>> +			ver = match_strdup(&args[0]);
+>> +			if (!ver) {
+>> +				rc = -ENOMEM;
+>> +				break;
+>> +			}
+>> +			rc = parse_version(ver, p);
+>> +			break;
+>> +		default:
+>> +			rc = -EBADMSG;
+>> +		}
+>> +		if (rc)
+>> +			goto out;
+>> +		++idx;
+>> +	}
+>> +
+>> +	if (idx != __IPE_HEADER_MAX) {
+>> +		rc = -EBADMSG;
+>> +		goto out;
+> 
+> You probably don't need to 'goto out' here.
+>
+Yes it's unnecessary, thanks for pointing that out.
+
+>> +	}
+>> +
+>> +out:
+>> +	kfree(ver);
+>> +	return rc;
+>> +}
+> 
+> ...
+> 
+>> +/**
+>> + * parse_rule - parse a policy rule line.
+>> + * @line: Supplies rule line to be parsed.
+>> + * @p: Supplies the partial parsed policy.
+>> + *
+>> + * Return:
+>> + * * !IS_ERR	- OK
+>> + * * -ENOMEM	- Out of memory
+>> + * * -EBADMSG	- Policy syntax error
+>> + */
+>> +static int parse_rule(char *line, struct ipe_parsed_policy *p)
+>> +{
+>> +	int rc = 0;
+>> +	bool first_token = true, is_default_rule = false;
+>> +	bool op_parsed = false;
+>> +	enum ipe_op_type op = IPE_OP_INVALID;
+>> +	enum ipe_action_type action = IPE_ACTION_INVALID;
+>> +	struct ipe_rule *r = NULL;
+>> +	char *t;
+>> +
+>> +	r = kzalloc(sizeof(*r), GFP_KERNEL);
+>> +	if (!r)
+>> +		return -ENOMEM;
+>> +
+>> +	INIT_LIST_HEAD(&r->next);
+>> +	INIT_LIST_HEAD(&r->props);
+>> +
+>> +	while (t = strsep(&line, IPE_POLICY_DELIM), line) {
+>> +		if (*t == '\0')
+>> +			continue;
+>> +		if (first_token && token_default(t)) {
+>> +			is_default_rule = true;
+>> +		} else {
+>> +			if (!op_parsed) {
+>> +				op = parse_operation(t);
+>> +				if (op == IPE_OP_INVALID)
+>> +					rc = -EBADMSG;
+>> +				else
+>> +					op_parsed = true;
+>> +			} else {
+>> +				rc = parse_property(t, r);
+>> +			}
+>> +		}
+>> +
+>> +		if (rc)
+>> +			goto err;
+>> +		first_token = false;
+>> +	}
+>> +
+>> +	action = parse_action(t);
+>> +	if (action == IPE_ACTION_INVALID) {
+>> +		rc = -EBADMSG;
+>> +		goto err;
+>> +	}
+>> +
+>> +	if (is_default_rule) {
+>> +		if (!list_empty(&r->props)) {
+>> +			rc = -EBADMSG;
+>> +		} else if (op == IPE_OP_INVALID) {
+>> +			if (p->global_default_action != IPE_ACTION_INVALID)
+>> +				rc = -EBADMSG;
+>> +			else
+>> +				p->global_default_action = action;
+>> +		} else {
+>> +			if (p->rules[op].default_action != IPE_ACTION_INVALID)
+>> +				rc = -EBADMSG;
+>> +			else
+>> +				p->rules[op].default_action = action;
+>> +		}
+>> +	} else if (op != IPE_OP_INVALID && action != IPE_ACTION_INVALID) {
+>> +		r->op = op;
+>> +		r->action = action;
+>> +	} else {
+>> +		rc = -EBADMSG;
+>> +	}
+> 
+> I might be missing something important in the policy syntac, but could
+> this function, and perhaps the ipe_parsed_policy struct, be simplified
+> if the default action was an explicit rule?
+> 
+>   "op=DEFAULT action=ALLOW"
+>
+The complexity here arises from our need for two types of default rules: 
+one for global settings and another for operation-specific settings.
+
+To illustrate the flexibility of operation-specific default rules, users 
+can set their policy to have a default rule of 'DENY' for execution, 
+meaning all execution actions are prohibited by default. This let users 
+to create an allow-list for execution. At the same time, the default 
+rule for read can be set to 'ALLOW'.  This let users to create an 
+deny-list for read.
+
+Adding explicit default rules can simplify ipe_parsed_policy struct, but 
+that impose a burden on users that requires users always add the default 
+rules the end of the policy. In contrast, our current design allows 
+users to place the default rule anywhere in the policy. In practice, we 
+often position the default rule at the beginning of the policy, which 
+makes it more convenient for users to add new rules.
+
+>> +	if (rc)
+>> +		goto err;
+>> +	if (!is_default_rule)
+>> +		list_add_tail(&r->next, &p->rules[op].rules);
+>> +	else
+>> +		free_rule(r);
+>> +
+>> +	return rc;
+>> +err:
+>> +	free_rule(r);
+>> +	return rc;
+>> +}
+>> +
+>> +/**
+>> + * free_parsed_policy - free a parsed policy structure.
+>> + * @p: Supplies the parsed policy.
+>> + */
+>> +void free_parsed_policy(struct ipe_parsed_policy *p)
+>> +{
+>> +	size_t i = 0;
+>> +	struct ipe_rule *pp, *t;
+>> +
+>> +	if (IS_ERR_OR_NULL(p))
+>> +		return;
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(p->rules); ++i)
+>> +		list_for_each_entry_safe(pp, t, &p->rules[i].rules, next) {
+>> +			list_del(&pp->next);
+>> +			free_rule(pp);
+>> +		}
+>> +
+>> +	kfree(p->name);
+>> +	kfree(p);
+>> +}
+>> +
+>> +/**
+>> + * validate_policy - validate a parsed policy.
+>> + * @p: Supplies the fully parsed policy.
+>> + *
+>> + * Given a policy structure that was just parsed, validate that all
+>> + * necessary fields are present, initialized correctly.
+>> + *
+>> + * A parsed policy can be in an invalid state for use (a default was
+>> + * undefined) by just parsing the policy.
+>> + *
+>> + * Return:
+>> + * * 0		- OK
+>> + * * -EBADMSG	- Policy is invalid
+>> + */
+>> +static int validate_policy(const struct ipe_parsed_policy *p)
+>> +{
+>> +	size_t i = 0;
+>> +
+>> +	if (p->global_default_action != IPE_ACTION_INVALID)
+>> +		return 0;
+> 
+> Should the if conditional above be "==" and not "!="?
+>No, "!=" is the correct one.
+
+The purpose of validation is to ensure that we have enough default rules 
+to cover all cases. If the global default action not invalid, it means 
+we have a global default rule in the policy to cover all cases, thus we 
+simply return 0.
+
+However, if there is no global default rule, then we need to ensure that 
+for each operation, there is a operation specific default rule, this is 
+validated in the for loop below.
+
+-Fan
+
+>> +	for (i = 0; i < ARRAY_SIZE(p->rules); ++i) {
+>> +		if (p->rules[i].default_action == IPE_ACTION_INVALID)
+>> +			return -EBADMSG;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+> 
+> --
+> paul-moore.com
