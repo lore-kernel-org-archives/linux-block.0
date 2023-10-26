@@ -2,71 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 787D7C25B48
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 08:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA028C25B6B
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 16:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229658AbjJZIwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 04:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54140 "EHLO
+        id S230330AbjJZQ3I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 12:29:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbjJZIwy (ORCPT
+        with ESMTP id S229815AbjJZQ3H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Oct 2023 04:52:54 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A29A128;
-        Thu, 26 Oct 2023 01:52:52 -0700 (PDT)
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SGKLk4Kfnz4f3k6R;
-        Thu, 26 Oct 2023 16:52:46 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-        by mail.maildlp.com (Postfix) with ESMTP id 88D1B1A016E;
-        Thu, 26 Oct 2023 16:52:48 +0800 (CST)
-Received: from [10.174.178.159] (unknown [10.174.178.159])
-        by APP4 (Coremail) with SMTP id gCh0CgCHHt7fKDplmvz0Dw--.39203S3;
-        Thu, 26 Oct 2023 16:52:48 +0800 (CST)
-Message-ID: <26bafe93-345d-2696-8ee7-7d1baa0e7eb7@huaweicloud.com>
-Date:   Thu, 26 Oct 2023 16:52:47 +0800
+        Thu, 26 Oct 2023 12:29:07 -0400
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 480DF183;
+        Thu, 26 Oct 2023 09:29:06 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1caa7597af9so8624105ad.1;
+        Thu, 26 Oct 2023 09:29:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698337746; x=1698942546;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lly9OjyG1WuwJev02hSJMW7JdqQD0L2vXqMu6PleNA0=;
+        b=PhRxdCn6HmGQSpOWusHoJcq8KlJz5QYiAqunPPBje3Hz1SC4NPl56ch/vGiTgelY8X
+         KldYz/YULbMv8Z0qRmO5Y5+Eb0/iXQjXKCv40QdAP5V+GLJLp7iJgc+xYi7uCYVPacYy
+         QwrzwtHKvY036CrWf6BvGqmZicvVvkg+XavSAZV+fcWUXh7tGU2D2k9XYxciyQBFe2vi
+         lO6nyfZORiql02eEW8acEaE3aXtL/W/yL9r48UENl04X/eKRdMac7AIHS/arCgxow70o
+         gui4oIYIpriZJoF2+WqAxwwCJX8s11gIAHjWnrU7Nlyg4LHifrydmRspcpAgEBOA9DEi
+         lRpQ==
+X-Gm-Message-State: AOJu0YyHzhjoj3daJa/tWG0sSo6tbwi0R/mdEy/9mJ7rfqL6admLC/sX
+        KL2jtkMU0Otlb8Sh+00tmJs=
+X-Google-Smtp-Source: AGHT+IHVqWMDZ3Mm9hErO84KSp5efXY6apySMlcwBTmyLWa5ZpGeEpGqSZyL6vojKBaM2ftWF626NQ==
+X-Received: by 2002:a17:902:c153:b0:1c9:fb8e:2c33 with SMTP id 19-20020a170902c15300b001c9fb8e2c33mr3712plj.7.1698337745550;
+        Thu, 26 Oct 2023 09:29:05 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:4dcf:e974:e319:6ce8? ([2620:15c:211:201:4dcf:e974:e319:6ce8])
+        by smtp.gmail.com with ESMTPSA id h17-20020a170902f7d100b001c0bf60ba5csm11299874plw.272.2023.10.26.09.29.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Oct 2023 09:29:04 -0700 (PDT)
+Message-ID: <1e53e562-bec2-4261-a704-88d2a64111d3@acm.org>
+Date:   Thu, 26 Oct 2023 09:29:03 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH] block: Fix minor range check in device_add_disk()
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhongjinghua@huawei.com, yi.zhang@huawei.com, yukuai3@huawei.com
-References: <20231025084621.2338604-1-zhongjinghua@huaweicloud.com>
- <119b7314-10a9-4d62-b40f-19462dc68009@I-love.SAKURA.ne.jp>
-From:   zhongjinghua <zhongjinghua@huaweicloud.com>
-In-Reply-To: <119b7314-10a9-4d62-b40f-19462dc68009@I-love.SAKURA.ne.jp>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/3] Support disabling fair tag sharing
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20231023203643.3209592-1-bvanassche@acm.org>
+ <ZTcr3AHr9l4sHRO2@fedora> <5d37f5ed-130a-4e75-b9a7-f77aeb4c7c89@acm.org>
+ <ZThwdPaeAFmhp58L@fedora> <faf6f9e4-e1fe-4934-8fdf-84383f51e740@acm.org>
+ <ZTmm0kNdN2Eka6V6@fedora>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ZTmm0kNdN2Eka6V6@fedora>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCHHt7fKDplmvz0Dw--.39203S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUU5R7kC6x804xWl14x267AKxVW8JVW5JwAF
-        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
-        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
-        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26r
-        4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vI
-        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jUeOJUUU
-        UU=
-X-CM-SenderInfo: x2kr0wpmlqwxtxd6x35dzhxuhorxvhhfrp/
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 10/25/23 16:37, Ming Lei wrote:
+> You are talking about multi-lun case, and your change does affect 
+> multi-lun code path, but your test result doesn't cover multi-lun, is
+> it enough?
+I think that the results I shared are sufficient because these show the
+worst possible performance impact of fair tag sharing. If there are two
+active logical units and much more I/O is sent to one logical unit than
+to the other, then the aggregate performance will be very close to what
+I shared in a previous email.
 
-在 2023/10/25 18:06, Tetsuo Handa 写道:
-> On 2023/10/25 17:46, Zhong Jinghua wrote:
->> Checks added in patch:
->> commit e338924bd05d ("block: check minor range in device_add_disk()")
->> ignore the problem of first_minore < 0 and disk->minors < 0.
-> What is the problem of first_minor < 0 or disk->minors < 0 ?
-> Are negative values legal/illegal ?
+> At least your patch shouldn't cause performance regression on
+> multi-lun IO workloads, right?
+If blk_mq_get_tag() can't allocate a tag, and if multiple threads are
+waiting for a tag, the thread that called blk_mq_get_tag() first is
+granted the first tag that is released. I think this guarantees fairness
+if all requests have a similar latency. There will be some unfairness if
+there are significant differences in latency per logical unit, e.g.
+because all requests sent to one logical unit are small and because all
+requests sent to another logical unit are large. Whether or not this
+matters depends on the use case.
 
-These two values are used as the secondary device number and the maximum number of partitions, which is illegal if negative. Then first_minore and disk->minors are signed numbers, and the sum may be less than MINORMASK to bypass the check.
+Thanks,
+
+Bart.
+
 
