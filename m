@@ -2,72 +2,63 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCA0C27C5A
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A55AC27C59
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344919AbjJZVoi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 17:44:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41554 "EHLO
+        id S1344913AbjJZVoh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 17:44:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234999AbjJZVoZ (ORCPT
+        with ESMTP id S234902AbjJZVoY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Oct 2023 17:44:25 -0400
+        Thu, 26 Oct 2023 17:44:24 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D0BCD64
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78199D58
+        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698356512;
+        s=mimecast20190719; t=1698356506;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ODsaMcZaEAFO6RAAaXSuPnSjHR9sZbR/Lf5H+MmiMO0=;
-        b=X+e9ni5/MdQQ3p0vaXv4/VT7WUTH1nz7Jnf4xBQWO2nIs5DXqm+bkYoFHhnzeCU+yTkjwd
-        py/pYz5gxkOc6PWeoKj1CxTuVpToFcngsVFk/krMTAKG0Zp7z/fxwubq6LJM5rT/txTGkz
-        IzGzmaDv7cGaaYNEm0zSK+2SOzhj2ZM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-6-YEtb8nb6Me6fkgyjl2WJWw-1; Thu,
- 26 Oct 2023 17:41:41 -0400
-X-MC-Unique: YEtb8nb6Me6fkgyjl2WJWw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        bh=BbJB2yij4eneO6j8G/VsGLsB8aznACfTOUh/fqF9zq8=;
+        b=FWEYlQiqBOYAsnjqmU3+eJGbM67KW5kRNoPMoEwbXZ1H1s2xaLi2AEKluReBaIr41hfcuo
+        NfKVShT8uuk7q2e66FVyKuTnWLV8WKoZ9+xvDCwm+ebaXfWx+drXms5Byp3gYI7y6EL2dv
+        e99/fSdIdNoLQwcX9cRbekJkrvoNFNY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-228-w6a2Z7dyOUS1poTitKVI_A-1; Thu, 26 Oct 2023 17:41:43 -0400
+X-MC-Unique: w6a2Z7dyOUS1poTitKVI_A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 993F53C02765;
-        Thu, 26 Oct 2023 21:41:40 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D960E80F922;
+        Thu, 26 Oct 2023 21:41:42 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 80CC940C6F79;
-        Thu, 26 Oct 2023 21:41:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C54402949;
+        Thu, 26 Oct 2023 21:41:42 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id 37C083003D; Thu, 26 Oct 2023 17:41:40 -0400 (EDT)
+        id 850933003B; Thu, 26 Oct 2023 17:41:42 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 20/39] dm vdo: add flush support
-Date:   Thu, 26 Oct 2023 17:41:17 -0400
-Message-Id: <20231026214136.1067410-21-msakai@redhat.com>
+Subject: [PATCH v4 33/39] dm vdo: add the primary vdo structure
+Date:   Thu, 26 Oct 2023 17:41:30 -0400
+Message-Id: <20231026214136.1067410-34-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds support for handling incoming flush and/or FUA bios. Each
-such bio is assigned to a struct vdo_flush. These are allocated as needed,
-but there is always one kept in reserve in case allocations fail. In the
-event of an allocation failure, bios may need to wait for an outstanding
-flush to complete.
-
-The logical address space is partitioned into logical zones, each handled
-by its own thread. Each zone keeps a list of all data_vios handling write
-requests for logical addresses in that zone. When a flush bio is processed,
-each logical zone is informed of the flush. When all of the writes which
-are in progress at the time of the notification have completed in all
-zones, the flush bio is then allowed to complete.
+Add the data and methods that manage the dm-vdo target itself. This
+includes the overall state of the target and its threads, the state of
+the logical volumes, startup, shutdown, and statistics.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
@@ -77,1112 +68,2250 @@ Co-developed-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/flush.c        | 563 +++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/flush.h        |  44 +++
- drivers/md/dm-vdo/logical-zone.c | 378 +++++++++++++++++++++
- drivers/md/dm-vdo/logical-zone.h |  87 +++++
- 4 files changed, 1072 insertions(+)
- create mode 100644 drivers/md/dm-vdo/flush.c
- create mode 100644 drivers/md/dm-vdo/flush.h
- create mode 100644 drivers/md/dm-vdo/logical-zone.c
- create mode 100644 drivers/md/dm-vdo/logical-zone.h
+ drivers/md/dm-vdo/vdo.c | 1845 +++++++++++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/vdo.h |  381 ++++++++
+ 2 files changed, 2226 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/vdo.c
+ create mode 100644 drivers/md/dm-vdo/vdo.h
 
-diff --git a/drivers/md/dm-vdo/flush.c b/drivers/md/dm-vdo/flush.c
+diff --git a/drivers/md/dm-vdo/vdo.c b/drivers/md/dm-vdo/vdo.c
 new file mode 100644
-index 000000000000..8c77337e5262
+index 000000000000..72cbe6921893
 --- /dev/null
-+++ b/drivers/md/dm-vdo/flush.c
-@@ -0,0 +1,563 @@
++++ b/drivers/md/dm-vdo/vdo.c
+@@ -0,0 +1,1845 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#include "flush.h"
++/*
++ * This file contains the main entry points for normal operations on a vdo as well as functions for
++ * constructing and destroying vdo instances (in memory).
++ */
 +
-+#include <linux/mempool.h>
-+#include <linux/spinlock.h>
++/**
++ * DOC:
++ *
++ * A read_only_notifier has a single completion which is used to perform read-only notifications,
++ * however, vdo_enter_read_only_mode() may be called from any thread. A pair of fields, protected
++ * by a spinlock, are used to control the read-only mode entry process. The first field holds the
++ * read-only error. The second is the state field, which may hold any of the four special values
++ * enumerated here.
++ *
++ * When vdo_enter_read_only_mode() is called from some vdo thread, if the read_only_error field
++ * already contains an error (i.e. its value is not VDO_SUCCESS), then some other error has already
++ * initiated the read-only process, and nothing more is done. Otherwise, the new error is stored in
++ * the read_only_error field, and the state field is consulted. If the state is MAY_NOTIFY, it is
++ * set to NOTIFYING, and the notification process begins. If the state is MAY_NOT_NOTIFY, then
++ * notifications are currently disallowed, generally due to the vdo being suspended. In this case,
++ * the nothing more will be done until the vdo is resumed, at which point the notification will be
++ * performed. In any other case, the vdo is already read-only, and there is nothing more to do.
++ */
 +
-+#include "logger.h"
-+#include "memory-alloc.h"
-+#include "permassert.h"
-+
-+#include "admin-state.h"
-+#include "completion.h"
-+#include "io-submitter.h"
-+#include "logical-zone.h"
-+#include "slab-depot.h"
-+#include "types.h"
 +#include "vdo.h"
 +
-+struct flusher {
-+	struct vdo_completion completion;
-+	/** The vdo to which this flusher belongs */
-+	struct vdo *vdo;
-+	/** The administrative state of the flusher */
-+	struct admin_state state;
-+	/** The current flush generation of the vdo */
-+	sequence_number_t flush_generation;
-+	/** The first unacknowledged flush generation */
-+	sequence_number_t first_unacknowledged_generation;
-+	/** The queue of flush requests waiting to notify other threads */
-+	struct wait_queue notifiers;
-+	/** The queue of flush requests waiting for VIOs to complete */
-+	struct wait_queue pending_flushes;
-+	/** The flush generation for which notifications are being sent */
-+	sequence_number_t notify_generation;
-+	/** The logical zone to notify next */
-+	struct logical_zone *logical_zone_to_notify;
-+	/** The ID of the thread on which flush requests should be made */
-+	thread_id_t thread_id;
-+	/** The pool of flush requests */
-+	mempool_t *flush_pool;
-+	/** Bios waiting for a flush request to become available */
-+	struct bio_list waiting_flush_bios;
-+	/** The lock to protect the previous fields */
-+	spinlock_t lock;
-+	/** The rotor for selecting the bio queue for submitting flush bios */
-+	zone_count_t bio_queue_rotor;
-+	/** The number of flushes submitted to the current bio queue */
-+	int flush_count;
-+};
-+
-+/**
-+ * assert_on_flusher_thread() - Check that we are on the flusher thread.
-+ * @flusher: The flusher.
-+ * @caller: The function which is asserting.
-+ */
-+static inline void assert_on_flusher_thread(struct flusher *flusher, const char *caller)
-+{
-+	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() == flusher->thread_id),
-+			"%s() called from flusher thread",
-+			caller);
-+}
-+
-+/**
-+ * as_flusher() - Convert a generic vdo_completion to a flusher.
-+ * @completion: The completion to convert.
-+ *
-+ * Return: The completion as a flusher.
-+ */
-+static struct flusher *as_flusher(struct vdo_completion *completion)
-+{
-+	vdo_assert_completion_type(completion, VDO_FLUSH_NOTIFICATION_COMPLETION);
-+	return container_of(completion, struct flusher, completion);
-+}
-+
-+/**
-+ * completion_as_vdo_flush() - Convert a generic vdo_completion to a vdo_flush.
-+ * @completion: The completion to convert.
-+ *
-+ * Return: The completion as a vdo_flush.
-+ */
-+static inline struct vdo_flush *completion_as_vdo_flush(struct vdo_completion *completion)
-+{
-+	vdo_assert_completion_type(completion, VDO_FLUSH_COMPLETION);
-+	return container_of(completion, struct vdo_flush, completion);
-+}
-+
-+/**
-+ * waiter_as_flush() - Convert a vdo_flush's generic wait queue entry back to the vdo_flush.
-+ * @waiter: The wait queue entry to convert.
-+ *
-+ * Return: The wait queue entry as a vdo_flush.
-+ */
-+static struct vdo_flush *waiter_as_flush(struct waiter *waiter)
-+{
-+	return container_of(waiter, struct vdo_flush, waiter);
-+}
-+
-+static void *allocate_flush(gfp_t gfp_mask, void *pool_data)
-+{
-+	struct vdo_flush *flush;
-+
-+	if ((gfp_mask & GFP_NOWAIT) == GFP_NOWAIT) {
-+		flush = UDS_ALLOCATE_NOWAIT(struct vdo_flush, __func__);
-+	} else {
-+		int result = UDS_ALLOCATE(1, struct vdo_flush, __func__, &flush);
-+
-+		if (result != VDO_SUCCESS)
-+			uds_log_error_strerror(result, "failed to allocate spare flush");
-+	}
-+
-+	if (flush != NULL) {
-+		struct flusher *flusher = pool_data;
-+
-+		vdo_initialize_completion(&flush->completion, flusher->vdo, VDO_FLUSH_COMPLETION);
-+	}
-+
-+	return flush;
-+}
-+
-+static void free_flush(void *element, void *pool_data __always_unused)
-+{
-+	UDS_FREE(element);
-+}
-+
-+/**
-+ * vdo_make_flusher() - Make a flusher for a vdo.
-+ * @vdo: The vdo which owns the flusher.
-+ *
-+ * Return: VDO_SUCCESS or an error.
-+ */
-+int vdo_make_flusher(struct vdo *vdo)
-+{
-+	int result = UDS_ALLOCATE(1, struct flusher, __func__, &vdo->flusher);
-+
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	vdo->flusher->vdo = vdo;
-+	vdo->flusher->thread_id = vdo->thread_config.packer_thread;
-+	vdo_set_admin_state_code(&vdo->flusher->state, VDO_ADMIN_STATE_NORMAL_OPERATION);
-+	vdo_initialize_completion(&vdo->flusher->completion, vdo,
-+				  VDO_FLUSH_NOTIFICATION_COMPLETION);
-+
-+	spin_lock_init(&vdo->flusher->lock);
-+	bio_list_init(&vdo->flusher->waiting_flush_bios);
-+	vdo->flusher->flush_pool = mempool_create(1, allocate_flush, free_flush, vdo->flusher);
-+	return ((vdo->flusher->flush_pool == NULL) ? -ENOMEM : VDO_SUCCESS);
-+}
-+
-+/**
-+ * vdo_free_flusher() - Free a flusher.
-+ * @flusher: The flusher to free.
-+ */
-+void vdo_free_flusher(struct flusher *flusher)
-+{
-+	if (flusher == NULL)
-+		return;
-+
-+	if (flusher->flush_pool != NULL)
-+		mempool_destroy(UDS_FORGET(flusher->flush_pool));
-+	UDS_FREE(flusher);
-+}
-+
-+/**
-+ * vdo_get_flusher_thread_id() - Get the ID of the thread on which flusher functions should be
-+ *                               called.
-+ * @flusher: The flusher to query.
-+ *
-+ * Return: The ID of the thread which handles the flusher.
-+ */
-+thread_id_t vdo_get_flusher_thread_id(struct flusher *flusher)
-+{
-+	return flusher->thread_id;
-+}
-+
-+static void notify_flush(struct flusher *flusher);
-+static void vdo_complete_flush(struct vdo_flush *flush);
-+
-+/**
-+ * finish_notification() - Finish the notification process.
-+ * @completion: The flusher completion.
-+ *
-+ * Finishes the notification process by checking if any flushes have completed and then starting
-+ * the notification of the next flush request if one came in while the current notification was in
-+ * progress. This callback is registered in flush_packer_callback().
-+ */
-+static void finish_notification(struct vdo_completion *completion)
-+{
-+	struct flusher *flusher = as_flusher(completion);
-+
-+	assert_on_flusher_thread(flusher, __func__);
-+
-+	vdo_enqueue_waiter(&flusher->pending_flushes,
-+			   vdo_dequeue_next_waiter(&flusher->notifiers));
-+	vdo_complete_flushes(flusher);
-+	if (vdo_has_waiters(&flusher->notifiers))
-+		notify_flush(flusher);
-+}
-+
-+/**
-+ * flush_packer_callback() - Flush the packer.
-+ * @completion: The flusher completion.
-+ *
-+ * Flushes the packer now that all of the logical and physical zones have been notified of the new
-+ * flush request. This callback is registered in increment_generation().
-+ */
-+static void flush_packer_callback(struct vdo_completion *completion)
-+{
-+	struct flusher *flusher = as_flusher(completion);
-+
-+	vdo_increment_packer_flush_generation(flusher->vdo->packer);
-+	vdo_launch_completion_callback(completion, finish_notification, flusher->thread_id);
-+}
-+
-+/**
-+ * increment_generation() - Increment the flush generation in a logical zone.
-+ * @completion: The flusher as a completion.
-+ *
-+ * If there are more logical zones, go on to the next one, otherwise, prepare the physical zones.
-+ * This callback is registered both in notify_flush() and in itself.
-+ */
-+static void increment_generation(struct vdo_completion *completion)
-+{
-+	struct flusher *flusher = as_flusher(completion);
-+	struct logical_zone *zone = flusher->logical_zone_to_notify;
-+
-+	vdo_increment_logical_zone_flush_generation(zone, flusher->notify_generation);
-+	if (zone->next == NULL) {
-+		vdo_launch_completion_callback(completion,
-+					       flush_packer_callback,
-+					       flusher->thread_id);
-+		return;
-+	}
-+
-+	flusher->logical_zone_to_notify = zone->next;
-+	vdo_launch_completion_callback(completion,
-+				       increment_generation,
-+				       flusher->logical_zone_to_notify->thread_id);
-+}
-+
-+/**
-+ * notify_flush() - Launch a flush notification.
-+ * @flusher: The flusher doing the notification.
-+ */
-+static void notify_flush(struct flusher *flusher)
-+{
-+	struct vdo_flush *flush = waiter_as_flush(vdo_get_first_waiter(&flusher->notifiers));
-+
-+	flusher->notify_generation = flush->flush_generation;
-+	flusher->logical_zone_to_notify = &flusher->vdo->logical_zones->zones[0];
-+	flusher->completion.requeue = true;
-+	vdo_launch_completion_callback(&flusher->completion,
-+				       increment_generation,
-+				       flusher->logical_zone_to_notify->thread_id);
-+}
-+
-+/**
-+ * flush_vdo() - Start processing a flush request.
-+ * @completion: A flush request (as a vdo_completion)
-+ *
-+ * This callback is registered in launch_flush().
-+ */
-+static void flush_vdo(struct vdo_completion *completion)
-+{
-+	struct vdo_flush *flush = completion_as_vdo_flush(completion);
-+	struct flusher *flusher = completion->vdo->flusher;
-+	bool may_notify;
-+	int result;
-+
-+	assert_on_flusher_thread(flusher, __func__);
-+	result = ASSERT(vdo_is_state_normal(&flusher->state), "flusher is in normal operation");
-+	if (result != VDO_SUCCESS) {
-+		vdo_enter_read_only_mode(flusher->vdo, result);
-+		vdo_complete_flush(flush);
-+		return;
-+	}
-+
-+	flush->flush_generation = flusher->flush_generation++;
-+	may_notify = !vdo_has_waiters(&flusher->notifiers);
-+	vdo_enqueue_waiter(&flusher->notifiers, &flush->waiter);
-+	if (may_notify)
-+		notify_flush(flusher);
-+}
-+
-+/**
-+ * check_for_drain_complete() - Check whether the flusher has drained.
-+ * @flusher: The flusher.
-+ */
-+static void check_for_drain_complete(struct flusher *flusher)
-+{
-+	bool drained;
-+
-+	if (!vdo_is_state_draining(&flusher->state) || vdo_has_waiters(&flusher->pending_flushes))
-+		return;
-+
-+	spin_lock(&flusher->lock);
-+	drained = bio_list_empty(&flusher->waiting_flush_bios);
-+	spin_unlock(&flusher->lock);
-+
-+	if (drained)
-+		vdo_finish_draining(&flusher->state);
-+}
-+
-+/**
-+ * vdo_complete_flushes() - Attempt to complete any flushes which might have finished.
-+ * @flusher: The flusher.
-+ */
-+void vdo_complete_flushes(struct flusher *flusher)
-+{
-+	sequence_number_t oldest_active_generation = U64_MAX;
-+	struct logical_zone *zone;
-+
-+	assert_on_flusher_thread(flusher, __func__);
-+
-+	for (zone = &flusher->vdo->logical_zones->zones[0]; zone != NULL; zone = zone->next)
-+		oldest_active_generation =
-+			min(oldest_active_generation, READ_ONCE(zone->oldest_active_generation));
-+
-+	while (vdo_has_waiters(&flusher->pending_flushes)) {
-+		struct vdo_flush *flush =
-+			waiter_as_flush(vdo_get_first_waiter(&flusher->pending_flushes));
-+
-+		if (flush->flush_generation >= oldest_active_generation)
-+			return;
-+
-+		ASSERT_LOG_ONLY((flush->flush_generation ==
-+				 flusher->first_unacknowledged_generation),
-+				"acknowledged next expected flush, %llu, was: %llu",
-+				(unsigned long long) flusher->first_unacknowledged_generation,
-+				(unsigned long long) flush->flush_generation);
-+		vdo_dequeue_next_waiter(&flusher->pending_flushes);
-+		vdo_complete_flush(flush);
-+		flusher->first_unacknowledged_generation++;
-+	}
-+
-+	check_for_drain_complete(flusher);
-+}
-+
-+/**
-+ * vdo_dump_flusher() - Dump the flusher, in a thread-unsafe fashion.
-+ * @flusher: The flusher.
-+ */
-+void vdo_dump_flusher(const struct flusher *flusher)
-+{
-+	uds_log_info("struct flusher");
-+	uds_log_info("  flush_generation=%llu first_unacknowledged_generation=%llu",
-+		     (unsigned long long) flusher->flush_generation,
-+		     (unsigned long long) flusher->first_unacknowledged_generation);
-+	uds_log_info("  notifiers queue is %s; pending_flushes queue is %s",
-+		     (vdo_has_waiters(&flusher->notifiers) ? "not empty" : "empty"),
-+		     (vdo_has_waiters(&flusher->pending_flushes) ? "not empty" : "empty"));
-+}
-+
-+/**
-+ * initialize_flush() - Initialize a vdo_flush structure.
-+ * @flush: The flush to initialize.
-+ * @vdo: The vdo being flushed.
-+ *
-+ * Initializes a vdo_flush structure, transferring all the bios in the flusher's waiting_flush_bios
-+ * list to it. The caller MUST already hold the lock.
-+ */
-+static void initialize_flush(struct vdo_flush *flush, struct vdo *vdo)
-+{
-+	bio_list_init(&flush->bios);
-+	bio_list_merge(&flush->bios, &vdo->flusher->waiting_flush_bios);
-+	bio_list_init(&vdo->flusher->waiting_flush_bios);
-+}
-+
-+static void launch_flush(struct vdo_flush *flush)
-+{
-+	struct vdo_completion *completion = &flush->completion;
-+
-+	vdo_prepare_completion(completion,
-+			       flush_vdo,
-+			       flush_vdo,
-+			       completion->vdo->thread_config.packer_thread,
-+			       NULL);
-+	vdo_enqueue_completion(completion, VDO_DEFAULT_Q_FLUSH_PRIORITY);
-+}
-+
-+/**
-+ * vdo_launch_flush() - Function called to start processing a flush request.
-+ * @vdo: The vdo.
-+ * @bio: The bio containing an empty flush request.
-+ *
-+ * This is called when we receive an empty flush bio from the block layer, and before acknowledging
-+ * a non-empty bio with the FUA flag set.
-+ */
-+void vdo_launch_flush(struct vdo *vdo, struct bio *bio)
-+{
-+	/*
-+	 * Try to allocate a vdo_flush to represent the flush request. If the allocation fails,
-+	 * we'll deal with it later.
-+	 */
-+	struct vdo_flush *flush = mempool_alloc(vdo->flusher->flush_pool, GFP_NOWAIT);
-+	struct flusher *flusher = vdo->flusher;
-+	const struct admin_state_code *code = vdo_get_admin_state_code(&flusher->state);
-+
-+	ASSERT_LOG_ONLY(!code->quiescent, "Flushing not allowed in state %s", code->name);
-+
-+	spin_lock(&flusher->lock);
-+
-+	/* We have a new bio to start. Add it to the list. */
-+	bio_list_add(&flusher->waiting_flush_bios, bio);
-+
-+	if (flush == NULL) {
-+		spin_unlock(&flusher->lock);
-+		return;
-+	}
-+
-+	/* We have flushes to start. Capture them in the vdo_flush structure. */
-+	initialize_flush(flush, vdo);
-+	spin_unlock(&flusher->lock);
-+
-+	/* Finish launching the flushes. */
-+	launch_flush(flush);
-+}
-+
-+/**
-+ * release_flush() - Release a vdo_flush structure that has completed its work.
-+ * @flush: The completed flush structure to re-use or free.
-+ *
-+ * If there are any pending flush requests whose vdo_flush allocation failed, they will be launched
-+ * by immediately re-using the released vdo_flush. If there is no spare vdo_flush, the released
-+ * structure will become the spare. Otherwise, the vdo_flush will be freed.
-+ */
-+static void release_flush(struct vdo_flush *flush)
-+{
-+	bool relaunch_flush;
-+	struct flusher *flusher = flush->completion.vdo->flusher;
-+
-+	spin_lock(&flusher->lock);
-+	if (bio_list_empty(&flusher->waiting_flush_bios)) {
-+		relaunch_flush = false;
-+	} else {
-+		/* We have flushes to start. Capture them in a flush request. */
-+		initialize_flush(flush, flusher->vdo);
-+		relaunch_flush = true;
-+	}
-+	spin_unlock(&flusher->lock);
-+
-+	if (relaunch_flush) {
-+		/* Finish launching the flushes. */
-+		launch_flush(flush);
-+		return;
-+	}
-+
-+	mempool_free(flush, flusher->flush_pool);
-+}
-+
-+/**
-+ * vdo_complete_flush_callback() - Function called to complete and free a flush request, registered
-+ *                                 in vdo_complete_flush().
-+ * @completion: The flush request.
-+ */
-+static void vdo_complete_flush_callback(struct vdo_completion *completion)
-+{
-+	struct vdo_flush *flush = completion_as_vdo_flush(completion);
-+	struct vdo *vdo = completion->vdo;
-+	struct bio *bio;
-+
-+	while ((bio = bio_list_pop(&flush->bios)) != NULL) {
-+		/*
-+		 * We're not acknowledging this bio now, but we'll never touch it again, so this is
-+		 * the last chance to account for it.
-+		 */
-+		vdo_count_bios(&vdo->stats.bios_acknowledged, bio);
-+
-+		/* Update the device, and send it on down... */
-+		bio_set_dev(bio, vdo_get_backing_device(vdo));
-+		atomic64_inc(&vdo->stats.flush_out);
-+		submit_bio_noacct(bio);
-+	}
-+
-+
-+	/*
-+	 * Release the flush structure, freeing it, re-using it as the spare, or using it to launch
-+	 * any flushes that had to wait when allocations failed.
-+	 */
-+	release_flush(flush);
-+}
-+
-+/**
-+ * select_bio_queue() - Select the bio queue on which to finish a flush request.
-+ * @flusher: The flusher finishing the request.
-+ */
-+static thread_id_t select_bio_queue(struct flusher *flusher)
-+{
-+	struct vdo *vdo = flusher->vdo;
-+	zone_count_t bio_threads = flusher->vdo->thread_config.bio_thread_count;
-+	int interval;
-+
-+	if (bio_threads == 1)
-+		return vdo->thread_config.bio_threads[0];
-+
-+	interval = vdo->device_config->thread_counts.bio_rotation_interval;
-+	if (flusher->flush_count == interval) {
-+		flusher->flush_count = 1;
-+		flusher->bio_queue_rotor = ((flusher->bio_queue_rotor + 1) % bio_threads);
-+	} else {
-+		flusher->flush_count++;
-+	}
-+
-+	return vdo->thread_config.bio_threads[flusher->bio_queue_rotor];
-+}
-+
-+/**
-+ * vdo_complete_flush() - Complete and free a vdo flush request.
-+ * @flush: The flush request.
-+ */
-+static void vdo_complete_flush(struct vdo_flush *flush)
-+{
-+	struct vdo_completion *completion = &flush->completion;
-+
-+	vdo_prepare_completion(completion,
-+			       vdo_complete_flush_callback,
-+			       vdo_complete_flush_callback,
-+			       select_bio_queue(completion->vdo->flusher),
-+			       NULL);
-+	vdo_enqueue_completion(completion, BIO_Q_FLUSH_PRIORITY);
-+}
-+
-+/**
-+ * initiate_drain() - Initiate a drain.
-+ *
-+ * Implements vdo_admin_initiator.
-+ */
-+static void initiate_drain(struct admin_state *state)
-+{
-+	check_for_drain_complete(container_of(state, struct flusher, state));
-+}
-+
-+/**
-+ * vdo_drain_flusher() - Drain the flusher.
-+ * @flusher: The flusher to drain.
-+ * @completion: The completion to finish when the flusher has drained.
-+ *
-+ * Drains the flusher by preventing any more VIOs from entering the flusher and then flushing. The
-+ * flusher will be left in the suspended state.
-+ */
-+void vdo_drain_flusher(struct flusher *flusher, struct vdo_completion *completion)
-+{
-+	assert_on_flusher_thread(flusher, __func__);
-+	vdo_start_draining(&flusher->state,
-+			   VDO_ADMIN_STATE_SUSPENDING,
-+			   completion,
-+			   initiate_drain);
-+}
-+
-+/**
-+ * vdo_resume_flusher() - Resume a flusher which has been suspended.
-+ * @flusher: The flusher to resume.
-+ * @parent: The completion to finish when the flusher has resumed.
-+ */
-+void vdo_resume_flusher(struct flusher *flusher, struct vdo_completion *parent)
-+{
-+	assert_on_flusher_thread(flusher, __func__);
-+	vdo_continue_completion(parent, vdo_resume_if_quiescent(&flusher->state));
-+}
-diff --git a/drivers/md/dm-vdo/flush.h b/drivers/md/dm-vdo/flush.h
-new file mode 100644
-index 000000000000..f36231c493c5
---- /dev/null
-+++ b/drivers/md/dm-vdo/flush.h
-@@ -0,0 +1,44 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#ifndef VDO_FLUSH_H
-+#define VDO_FLUSH_H
-+
-+#include "types.h"
-+#include "vio.h"
-+#include "wait-queue.h"
-+#include "work-queue.h"
-+
-+/* A marker for tracking which journal entries are affected by a flush request. */
-+struct vdo_flush {
-+	/* The completion for enqueueing this flush request. */
-+	struct vdo_completion completion;
-+	/* The flush bios covered by this request */
-+	struct bio_list bios;
-+	/* The wait queue entry for this flush */
-+	struct waiter waiter;
-+	/* Which flush this struct represents */
-+	sequence_number_t flush_generation;
-+};
-+
-+struct flusher;
-+
-+int __must_check vdo_make_flusher(struct vdo *vdo);
-+
-+void vdo_free_flusher(struct flusher *flusher);
-+
-+thread_id_t __must_check vdo_get_flusher_thread_id(struct flusher *flusher);
-+
-+void vdo_complete_flushes(struct flusher *flusher);
-+
-+void vdo_dump_flusher(const struct flusher *flusher);
-+
-+void vdo_launch_flush(struct vdo *vdo, struct bio *bio);
-+
-+void vdo_drain_flusher(struct flusher *flusher, struct vdo_completion *completion);
-+
-+void vdo_resume_flusher(struct flusher *flusher, struct vdo_completion *parent);
-+
-+#endif /* VDO_FLUSH_H */
-diff --git a/drivers/md/dm-vdo/logical-zone.c b/drivers/md/dm-vdo/logical-zone.c
-new file mode 100644
-index 000000000000..1cb2b39c64ed
---- /dev/null
-+++ b/drivers/md/dm-vdo/logical-zone.c
-@@ -0,0 +1,378 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#include "logical-zone.h"
++#include <linux/completion.h>
++#include <linux/device-mapper.h>
++#include <linux/kernel.h>
++#include <linux/lz4.h>
++#include <linux/module.h>
++#include <linux/mutex.h>
++#include <linux/spinlock.h>
++#include <linux/types.h>
 +
 +#include "logger.h"
 +#include "memory-alloc.h"
 +#include "permassert.h"
 +#include "string-utils.h"
 +
-+#include "action-manager.h"
-+#include "admin-state.h"
 +#include "block-map.h"
 +#include "completion.h"
-+#include "constants.h"
 +#include "data-vio.h"
-+#include "flush.h"
-+#include "int-map.h"
++#include "dedupe.h"
++#include "encodings.h"
++#include "io-submitter.h"
++#include "logical-zone.h"
++#include "packer.h"
 +#include "physical-zone.h"
-+#include "vdo.h"
++#include "pool-sysfs.h"
++#include "recovery-journal.h"
++#include "slab-depot.h"
++#include "statistics.h"
++#include "status-codes.h"
++#include "vio.h"
++#include "work-queue.h"
 +
-+enum {
-+	ALLOCATIONS_PER_ZONE = 128,
++
++enum { PARANOID_THREAD_CONSISTENCY_CHECKS = 0 };
++
++struct sync_completion {
++	struct vdo_completion vdo_completion;
++	struct completion completion;
 +};
 +
++/*
++ * We don't expect this set to ever get really large, so a linked list is adequate. We can use a
++ * pointer_map if we need to later.
++ */
++struct device_registry {
++	struct list_head links;
++	/* TODO: Convert to rcu per kernel recommendation. */
++	rwlock_t lock;
++};
++
++static struct device_registry registry;
++
 +/**
-+ * as_logical_zone() - Convert a generic vdo_completion to a logical_zone.
-+ * @completion: The completion to convert.
++ * vdo_initialize_device_registry_once() - Initialize the necessary structures for the device
++ *                                         registry.
++ */
++void vdo_initialize_device_registry_once(void)
++{
++	INIT_LIST_HEAD(&registry.links);
++	rwlock_init(&registry.lock);
++}
++
++/** vdo_is_equal() - Implements vdo_filter_t. */
++static bool vdo_is_equal(struct vdo *vdo, const void *context)
++{
++	return ((void *) vdo == context);
++}
++
++/**
++ * filter_vdos_locked() - Find a vdo in the registry if it exists there.
++ * @filter: The filter function to apply to devices.
++ * @context: A bit of context to provide the filter.
 + *
-+ * Return: The completion as a logical_zone.
-+ */
-+static struct logical_zone *as_logical_zone(struct vdo_completion *completion)
-+{
-+	vdo_assert_completion_type(completion, VDO_GENERATION_FLUSHED_COMPLETION);
-+	return container_of(completion, struct logical_zone, completion);
-+}
-+
-+/* get_thread_id_for_zone() - Implements vdo_zone_thread_getter. */
-+static thread_id_t get_thread_id_for_zone(void *context, zone_count_t zone_number)
-+{
-+	struct logical_zones *zones = context;
-+
-+	return zones->zones[zone_number].thread_id;
-+}
-+
-+/**
-+ * initialize_zone() - Initialize a logical zone.
-+ * @zones: The logical_zones to which this zone belongs.
-+ * @zone_number: The logical_zone's index.
-+ */
-+static int initialize_zone(struct logical_zones *zones, zone_count_t zone_number)
-+{
-+	int result;
-+	struct vdo *vdo = zones->vdo;
-+	struct logical_zone *zone = &zones->zones[zone_number];
-+	zone_count_t allocation_zone_number;
-+
-+	result = vdo_make_int_map(VDO_LOCK_MAP_CAPACITY, 0, &zone->lbn_operations);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	if (zone_number < vdo->thread_config.logical_zone_count - 1)
-+		zone->next = &zones->zones[zone_number + 1];
-+
-+	vdo_initialize_completion(&zone->completion, vdo, VDO_GENERATION_FLUSHED_COMPLETION);
-+	zone->zones = zones;
-+	zone->zone_number = zone_number;
-+	zone->thread_id = vdo->thread_config.logical_threads[zone_number];
-+	zone->block_map_zone = &vdo->block_map->zones[zone_number];
-+	INIT_LIST_HEAD(&zone->write_vios);
-+	vdo_set_admin_state_code(&zone->state, VDO_ADMIN_STATE_NORMAL_OPERATION);
-+
-+	allocation_zone_number = zone->thread_id % vdo->thread_config.physical_zone_count;
-+	zone->allocation_zone = &vdo->physical_zones->zones[allocation_zone_number];
-+
-+	return vdo_make_default_thread(vdo, zone->thread_id);
-+}
-+
-+/**
-+ * vdo_make_logical_zones() - Create a set of logical zones.
-+ * @vdo: The vdo to which the zones will belong.
-+ * @zones_ptr: A pointer to hold the new zones.
++ * Context: Must be called holding the lock.
 + *
-+ * Return: VDO_SUCCESS or an error code.
++ * Return: the vdo object found, if any.
 + */
-+int vdo_make_logical_zones(struct vdo *vdo, struct logical_zones **zones_ptr)
++static struct vdo * __must_check filter_vdos_locked(vdo_filter_t *filter, const void *context)
 +{
-+	struct logical_zones *zones;
-+	int result;
++	struct vdo *vdo;
++
++	list_for_each_entry(vdo, &registry.links, registration)
++		if (filter(vdo, context))
++			return vdo;
++
++	return NULL;
++}
++
++/**
++ * vdo_find_matching() - Find and return the first (if any) vdo matching a given filter function.
++ * @filter: The filter function to apply to vdos.
++ * @context: A bit of context to provide the filter.
++ */
++struct vdo *vdo_find_matching(vdo_filter_t *filter, const void *context)
++{
++	struct vdo *vdo;
++
++	read_lock(&registry.lock);
++	vdo = filter_vdos_locked(filter, context);
++	read_unlock(&registry.lock);
++	return vdo;
++}
++
++static void start_vdo_request_queue(void *ptr)
++{
++	struct vdo_thread *thread = vdo_get_work_queue_owner(vdo_get_current_work_queue());
++
++	uds_register_allocating_thread(&thread->allocating_thread,
++				       &thread->vdo->allocations_allowed);
++}
++
++static void finish_vdo_request_queue(void *ptr)
++{
++	uds_unregister_allocating_thread();
++}
++
++#ifdef MODULE
++#define MODULE_NAME THIS_MODULE->name
++#else
++#define MODULE_NAME "dm-vdo"
++#endif  /* MODULE */
++
++static const struct vdo_work_queue_type default_queue_type = {
++	.start = start_vdo_request_queue,
++	.finish = finish_vdo_request_queue,
++	.max_priority = VDO_DEFAULT_Q_MAX_PRIORITY,
++	.default_priority = VDO_DEFAULT_Q_COMPLETION_PRIORITY,
++};
++
++static const struct vdo_work_queue_type bio_ack_q_type = {
++	.start = NULL,
++	.finish = NULL,
++	.max_priority = BIO_ACK_Q_MAX_PRIORITY,
++	.default_priority = BIO_ACK_Q_ACK_PRIORITY,
++};
++
++static const struct vdo_work_queue_type cpu_q_type = {
++	.start = NULL,
++	.finish = NULL,
++	.max_priority = CPU_Q_MAX_PRIORITY,
++	.default_priority = CPU_Q_MAX_PRIORITY,
++};
++
++static void uninitialize_thread_config(struct thread_config *config)
++{
++	UDS_FREE(UDS_FORGET(config->logical_threads));
++	UDS_FREE(UDS_FORGET(config->physical_threads));
++	UDS_FREE(UDS_FORGET(config->hash_zone_threads));
++	UDS_FREE(UDS_FORGET(config->bio_threads));
++	memset(config, 0, sizeof(struct thread_config));
++}
++
++static void
++assign_thread_ids(struct thread_config *config, thread_id_t thread_ids[], zone_count_t count)
++{
 +	zone_count_t zone;
-+	zone_count_t zone_count = vdo->thread_config.logical_zone_count;
 +
-+	if (zone_count == 0)
-+		return VDO_SUCCESS;
++	for (zone = 0; zone < count; zone++)
++		thread_ids[zone] = config->thread_count++;
++}
 +
-+	result = UDS_ALLOCATE_EXTENDED(struct logical_zones, zone_count,
-+				       struct logical_zone, __func__, &zones);
-+	if (result != VDO_SUCCESS)
-+		return result;
++/**
++ * initialize_thread_config() - Initialize the thread mapping
++ *
++ * If the logical, physical, and hash zone counts are all 0, a single thread will be shared by all
++ * three plus the packer and recovery journal. Otherwise, there must be at least one of each type,
++ * and each will have its own thread, as will the packer and recovery journal.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++static int __must_check
++initialize_thread_config(struct thread_count_config counts, struct thread_config *config)
++{
++	int result;
++	bool single = ((counts.logical_zones + counts.physical_zones + counts.hash_zones) == 0);
 +
-+	zones->vdo = vdo;
-+	zones->zone_count = zone_count;
-+	for (zone = 0; zone < zone_count; zone++) {
-+		result = initialize_zone(zones, zone);
-+		if (result != VDO_SUCCESS) {
-+			vdo_free_logical_zones(zones);
-+			return result;
-+		}
++	config->bio_thread_count = counts.bio_threads;
++	if (single) {
++		config->logical_zone_count = 1;
++		config->physical_zone_count = 1;
++		config->hash_zone_count = 1;
++	} else {
++		config->logical_zone_count = counts.logical_zones;
++		config->physical_zone_count = counts.physical_zones;
++		config->hash_zone_count = counts.hash_zones;
 +	}
 +
-+	result = vdo_make_action_manager(zones->zone_count,
-+					 get_thread_id_for_zone,
-+					 vdo->thread_config.admin_thread,
-+					 zones,
-+					 NULL,
-+					 vdo,
-+					 &zones->manager);
++	result = UDS_ALLOCATE(config->logical_zone_count,
++			      thread_id_t,
++			      "logical thread array",
++			      &config->logical_threads);
 +	if (result != VDO_SUCCESS) {
-+		vdo_free_logical_zones(zones);
++		uninitialize_thread_config(config);
 +		return result;
 +	}
 +
-+	*zones_ptr = zones;
++	result = UDS_ALLOCATE(config->physical_zone_count,
++			      thread_id_t,
++			      "physical thread array",
++			      &config->physical_threads);
++	if (result != VDO_SUCCESS) {
++		uninitialize_thread_config(config);
++		return result;
++	}
++
++	result = UDS_ALLOCATE(config->hash_zone_count,
++			      thread_id_t,
++			      "hash thread array",
++			      &config->hash_zone_threads);
++	if (result != VDO_SUCCESS) {
++		uninitialize_thread_config(config);
++		return result;
++	}
++
++	result = UDS_ALLOCATE(config->bio_thread_count,
++			      thread_id_t,
++			      "bio thread array",
++			      &config->bio_threads);
++	if (result != VDO_SUCCESS) {
++		uninitialize_thread_config(config);
++		return result;
++	}
++
++	if (single) {
++		config->logical_threads[0] = config->thread_count;
++		config->physical_threads[0] = config->thread_count;
++		config->hash_zone_threads[0] = config->thread_count++;
++	} else {
++		config->admin_thread = config->thread_count;
++		config->journal_thread = config->thread_count++;
++		config->packer_thread = config->thread_count++;
++		assign_thread_ids(config, config->logical_threads, counts.logical_zones);
++		assign_thread_ids(config, config->physical_threads, counts.physical_zones);
++		assign_thread_ids(config, config->hash_zone_threads, counts.hash_zones);
++	}
++
++	config->dedupe_thread = config->thread_count++;
++	config->bio_ack_thread =
++		((counts.bio_ack_threads > 0) ? config->thread_count++ : VDO_INVALID_THREAD_ID);
++	config->cpu_thread = config->thread_count++;
++	assign_thread_ids(config, config->bio_threads, counts.bio_threads);
 +	return VDO_SUCCESS;
 +}
 +
 +/**
-+ * vdo_free_logical_zones() - Free a set of logical zones.
-+ * @zones: The set of zones to free.
-+ */
-+void vdo_free_logical_zones(struct logical_zones *zones)
-+{
-+	zone_count_t index;
-+
-+	if (zones == NULL)
-+		return;
-+
-+	UDS_FREE(UDS_FORGET(zones->manager));
-+
-+	for (index = 0; index < zones->zone_count; index++)
-+		vdo_free_int_map(UDS_FORGET(zones->zones[index].lbn_operations));
-+
-+	UDS_FREE(zones);
-+}
-+
-+static inline void assert_on_zone_thread(struct logical_zone *zone, const char *what)
-+{
-+	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() == zone->thread_id),
-+			"%s() called on correct thread", what);
-+}
-+
-+/**
-+ * check_for_drain_complete() - Check whether this zone has drained.
-+ * @zone: The zone to check.
-+ */
-+static void check_for_drain_complete(struct logical_zone *zone)
-+{
-+	if (!vdo_is_state_draining(&zone->state) || zone->notifying ||
-+	    !list_empty(&zone->write_vios))
-+		return;
-+
-+	vdo_finish_draining(&zone->state);
-+}
-+
-+/**
-+ * initiate_drain() - Initiate a drain.
++ * vdo_read_geometry_block() - Synchronously read the geometry block from a vdo's underlying block
++ *                             device.
++ * @vdo: The vdo whose geometry is to be read.
 + *
-+ * Implements vdo_admin_initiator.
++ * Return: VDO_SUCCESS or an error code.
 + */
-+static void initiate_drain(struct admin_state *state)
++static int __must_check read_geometry_block(struct vdo *vdo)
 +{
-+	check_for_drain_complete(container_of(state, struct logical_zone, state));
++	struct vio *vio;
++	char *block;
++	int result;
++
++	result = UDS_ALLOCATE(VDO_BLOCK_SIZE, u8, __func__, &block);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	result = create_metadata_vio(vdo, VIO_TYPE_GEOMETRY, VIO_PRIORITY_HIGH, NULL, block, &vio);
++	if (result != VDO_SUCCESS) {
++		UDS_FREE(block);
++		return result;
++	}
++
++	/*
++	 * This is only safe because, having not already loaded the geometry, the vdo's geometry's
++	 * bio_offset field is 0, so the fact that vio_reset_bio() will subtract that offset from
++	 * the supplied pbn is not a problem.
++	 */
++	result = vio_reset_bio(vio, block, NULL, REQ_OP_READ, VDO_GEOMETRY_BLOCK_LOCATION);
++	if (result != VDO_SUCCESS) {
++		free_vio(UDS_FORGET(vio));
++		UDS_FREE(block);
++		return result;
++	}
++
++	bio_set_dev(vio->bio, vdo_get_backing_device(vdo));
++	submit_bio_wait(vio->bio);
++	result = blk_status_to_errno(vio->bio->bi_status);
++	free_vio(UDS_FORGET(vio));
++	if (result != 0) {
++		uds_log_error_strerror(result, "synchronous read failed");
++		UDS_FREE(block);
++		return -EIO;
++	}
++
++	result = vdo_parse_geometry_block((u8 *) block, &vdo->geometry);
++	UDS_FREE(block);
++	return result;
++}
++
++static bool get_zone_thread_name(const thread_id_t thread_ids[],
++				 zone_count_t count,
++				 thread_id_t id,
++				 const char *prefix,
++				 char *buffer,
++				 size_t buffer_length)
++{
++	if (id >= thread_ids[0]) {
++		thread_id_t index = id - thread_ids[0];
++
++		if (index < count) {
++			snprintf(buffer, buffer_length, "%s%d", prefix, index);
++			return true;
++		}
++	}
++	return false;
 +}
 +
 +/**
-+ * drain_logical_zone() - Drain a logical zone.
++ * get_thread_name() - Format the name of the worker thread desired to support a given work queue.
++ * @thread_config: The thread configuration.
++ * @thread_id: The thread id.
++ * @buffer: Where to put the formatted name.
++ * @buffer_length: Size of the output buffer.
 + *
-+ * Implements vdo_zone_action.
++ * The physical layer may add a prefix identifying the product; the output from this function
++ * should just identify the thread.
 + */
 +static void
-+drain_logical_zone(void *context, zone_count_t zone_number, struct vdo_completion *parent)
++get_thread_name(const struct thread_config *thread_config,
++		thread_id_t thread_id,
++		char *buffer,
++		size_t buffer_length)
 +{
-+	struct logical_zones *zones = context;
++	if (thread_id == thread_config->journal_thread) {
++		if (thread_config->packer_thread == thread_id) {
++			/*
++			 * This is the "single thread" config where one thread is used for the
++			 * journal, packer, logical, physical, and hash zones. In that case, it is
++			 * known as the "request queue."
++			 */
++			snprintf(buffer, buffer_length, "reqQ");
++			return;
++		}
 +
-+	vdo_start_draining(&zones->zones[zone_number].state,
-+			   vdo_get_current_manager_operation(zones->manager),
-+			   parent,
-+			   initiate_drain);
-+}
-+
-+void vdo_drain_logical_zones(struct logical_zones *zones,
-+			     const struct admin_state_code *operation,
-+			     struct vdo_completion *parent)
-+{
-+	vdo_schedule_operation(zones->manager, operation, NULL, drain_logical_zone, NULL, parent);
-+}
-+
-+/**
-+ * resume_logical_zone() - Resume a logical zone.
-+ *
-+ * Implements vdo_zone_action.
-+ */
-+static void
-+resume_logical_zone(void *context, zone_count_t zone_number, struct vdo_completion *parent)
-+{
-+	struct logical_zone *zone = &(((struct logical_zones *) context)->zones[zone_number]);
-+
-+	vdo_fail_completion(parent, vdo_resume_if_quiescent(&zone->state));
-+}
-+
-+/**
-+ * vdo_resume_logical_zones() - Resume a set of logical zones.
-+ * @zones: The logical zones to resume.
-+ * @parent: The object to notify when the zones have resumed.
-+ */
-+void vdo_resume_logical_zones(struct logical_zones *zones, struct vdo_completion *parent)
-+{
-+	vdo_schedule_operation(zones->manager, VDO_ADMIN_STATE_RESUMING, NULL,
-+			       resume_logical_zone, NULL, parent);
-+}
-+
-+/**
-+ * update_oldest_active_generation() - Update the oldest active generation.
-+ * @zone: The zone.
-+ *
-+ * Return: true if the oldest active generation has changed.
-+ */
-+static bool update_oldest_active_generation(struct logical_zone *zone)
-+{
-+	struct data_vio *data_vio =
-+		list_first_entry_or_null(&zone->write_vios, struct data_vio, write_entry);
-+	sequence_number_t oldest =
-+		(data_vio == NULL) ? zone->flush_generation : data_vio->flush_generation;
-+
-+	if (oldest == zone->oldest_active_generation)
-+		return false;
-+
-+	WRITE_ONCE(zone->oldest_active_generation, oldest);
-+	return true;
-+}
-+
-+/**
-+ * vdo_increment_logical_zone_flush_generation() - Increment the flush generation in a logical
-+ *                                                 zone.
-+ * @zone: The logical zone.
-+ * @expected_generation: The expected value of the flush generation before the increment.
-+ */
-+void vdo_increment_logical_zone_flush_generation(struct logical_zone *zone,
-+						 sequence_number_t expected_generation)
-+{
-+	assert_on_zone_thread(zone, __func__);
-+	ASSERT_LOG_ONLY((zone->flush_generation == expected_generation),
-+			"logical zone %u flush generation %llu should be %llu before increment",
-+			zone->zone_number,
-+			(unsigned long long) zone->flush_generation,
-+			(unsigned long long) expected_generation);
-+
-+	zone->flush_generation++;
-+	zone->ios_in_flush_generation = 0;
-+	update_oldest_active_generation(zone);
-+}
-+
-+/**
-+ * vdo_acquire_flush_generation_lock() - Acquire the shared lock on a flush generation by a write
-+ *                                       data_vio.
-+ * @data_vio: The data_vio.
-+ */
-+void vdo_acquire_flush_generation_lock(struct data_vio *data_vio)
-+{
-+	struct logical_zone *zone = data_vio->logical.zone;
-+
-+	assert_on_zone_thread(zone, __func__);
-+	ASSERT_LOG_ONLY(vdo_is_state_normal(&zone->state), "vdo state is normal");
-+
-+	data_vio->flush_generation = zone->flush_generation;
-+	list_add_tail(&data_vio->write_entry, &zone->write_vios);
-+	zone->ios_in_flush_generation++;
-+}
-+
-+static void attempt_generation_complete_notification(struct vdo_completion *completion);
-+
-+/**
-+ * notify_flusher() - Notify the flush that at least one generation no longer has active VIOs.
-+ * @completion: The zone completion.
-+ *
-+ * This callback is registered in attempt_generation_complete_notification().
-+ */
-+static void notify_flusher(struct vdo_completion *completion)
-+{
-+	struct logical_zone *zone = as_logical_zone(completion);
-+
-+	vdo_complete_flushes(zone->zones->vdo->flusher);
-+	vdo_launch_completion_callback(completion,
-+				       attempt_generation_complete_notification,
-+				       zone->thread_id);
-+}
-+
-+/**
-+ * void attempt_generation_complete_notification() - Notify the flusher if some generation no
-+ *                                                   longer has active VIOs.
-+ * @completion: The zone completion.
-+ */
-+static void attempt_generation_complete_notification(struct vdo_completion *completion)
-+{
-+	struct logical_zone *zone = as_logical_zone(completion);
-+
-+	assert_on_zone_thread(zone, __func__);
-+	if (zone->oldest_active_generation <= zone->notification_generation) {
-+		zone->notifying = false;
-+		check_for_drain_complete(zone);
++		snprintf(buffer, buffer_length, "journalQ");
++		return;
++	} else if (thread_id == thread_config->admin_thread) {
++		/* Theoretically this could be different from the journal thread. */
++		snprintf(buffer, buffer_length, "adminQ");
++		return;
++	} else if (thread_id == thread_config->packer_thread) {
++		snprintf(buffer, buffer_length, "packerQ");
++		return;
++	} else if (thread_id == thread_config->dedupe_thread) {
++		snprintf(buffer, buffer_length, "dedupeQ");
++		return;
++	} else if (thread_id == thread_config->bio_ack_thread) {
++		snprintf(buffer, buffer_length, "ackQ");
++		return;
++	} else if (thread_id == thread_config->cpu_thread) {
++		snprintf(buffer, buffer_length, "cpuQ");
 +		return;
 +	}
 +
-+	zone->notifying = true;
-+	zone->notification_generation = zone->oldest_active_generation;
-+	vdo_launch_completion_callback(&zone->completion, notify_flusher,
-+				       vdo_get_flusher_thread_id(zone->zones->vdo->flusher));
++	if (get_zone_thread_name(thread_config->logical_threads,
++				 thread_config->logical_zone_count,
++				 thread_id,
++				 "logQ",
++				 buffer,
++				 buffer_length))
++		return;
++
++	if (get_zone_thread_name(thread_config->physical_threads,
++				 thread_config->physical_zone_count,
++				 thread_id,
++				 "physQ",
++				 buffer,
++				 buffer_length))
++		return;
++
++	if (get_zone_thread_name(thread_config->hash_zone_threads,
++				 thread_config->hash_zone_count,
++				 thread_id,
++				 "hashQ",
++				 buffer,
++				 buffer_length))
++		return;
++
++	if (get_zone_thread_name(thread_config->bio_threads,
++				 thread_config->bio_thread_count,
++				 thread_id,
++				 "bioQ",
++				 buffer,
++				 buffer_length))
++		return;
++
++	/* Some sort of misconfiguration? */
++	snprintf(buffer, buffer_length, "reqQ%d", thread_id);
 +}
 +
 +/**
-+ * vdo_release_flush_generation_lock() - Release the shared lock on a flush generation held by a
-+ *                                       write data_vio.
-+ * @data_vio: The data_vio whose lock is to be released.
++ * vdo_make_thread() - Construct a single vdo work_queue and its associated thread (or threads for
++ *                     round-robin queues).
++ * @vdo: The vdo which owns the thread.
++ * @thread_id: The id of the thread to create (as determined by the thread_config).
++ * @type: The description of the work queue for this thread.
++ * @queue_count: The number of actual threads/queues contained in the "thread".
++ * @contexts: An array of queue_count contexts, one for each individual queue; may be NULL.
 + *
-+ * If there are pending flushes, and this data_vio completes the oldest generation active in this
-+ * zone, an attempt will be made to finish any flushes which may now be complete.
++ * Each "thread" constructed by this method is represented by a unique thread id in the thread
++ * config, and completions can be enqueued to the queue and run on the threads comprising this
++ * entity.
++ *
++ * Return: VDO_SUCCESS or an error.
 + */
-+void vdo_release_flush_generation_lock(struct data_vio *data_vio)
++int vdo_make_thread(struct vdo *vdo,
++		    thread_id_t thread_id,
++		    const struct vdo_work_queue_type *type,
++		    unsigned int queue_count,
++		    void *contexts[])
 +{
-+	struct logical_zone *zone = data_vio->logical.zone;
++	struct vdo_thread *thread = &vdo->threads[thread_id];
++	char queue_name[MAX_VDO_WORK_QUEUE_NAME_LEN];
 +
-+	assert_on_zone_thread(zone, __func__);
++	if (type == NULL)
++		type = &default_queue_type;
 +
-+	if (!data_vio_has_flush_generation_lock(data_vio))
-+		return;
++	if (thread->queue != NULL)
++		return ASSERT(vdo_work_queue_type_is(thread->queue, type),
++			      "already constructed vdo thread %u is of the correct type",
++			      thread_id);
 +
-+	list_del_init(&data_vio->write_entry);
-+	ASSERT_LOG_ONLY((zone->oldest_active_generation <= data_vio->flush_generation),
-+			"data_vio releasing lock on generation %llu is not older than oldest active generation %llu",
-+			(unsigned long long) data_vio->flush_generation,
-+			(unsigned long long) zone->oldest_active_generation);
-+
-+	if (!update_oldest_active_generation(zone) || zone->notifying)
-+		return;
-+
-+	attempt_generation_complete_notification(&zone->completion);
++	thread->vdo = vdo;
++	thread->thread_id = thread_id;
++	get_thread_name(&vdo->thread_config, thread_id, queue_name, sizeof(queue_name));
++	return vdo_make_work_queue(vdo->thread_name_prefix,
++				   queue_name,
++				   thread,
++				   type,
++				   queue_count,
++				   contexts,
++				   &thread->queue);
 +}
 +
-+struct physical_zone *vdo_get_next_allocation_zone(struct logical_zone *zone)
++/**
++ * register_vdo() - Register a VDO; it must not already be registered.
++ * @vdo: The vdo to register.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++static int register_vdo(struct vdo *vdo)
 +{
-+	if (zone->allocation_count == ALLOCATIONS_PER_ZONE) {
-+		zone->allocation_count = 0;
-+		zone->allocation_zone = zone->allocation_zone->next;
++	int result;
++
++	write_lock(&registry.lock);
++	result = ASSERT(filter_vdos_locked(vdo_is_equal, vdo) == NULL,
++			"VDO not already registered");
++	if (result == VDO_SUCCESS) {
++		INIT_LIST_HEAD(&vdo->registration);
++		list_add_tail(&vdo->registration, &registry.links);
++	}
++	write_unlock(&registry.lock);
++
++	return result;
++}
++
++/**
++ * initialize_vdo() - Do the portion of initializing a vdo which will clean up after itself on
++ *                    error.
++ * @vdo: The vdo being initialized
++ * @config: The configuration of the vdo
++ * @instance: The instance number of the vdo
++ * @reason: The buffer to hold the failure reason on error
++ */
++static int
++initialize_vdo(struct vdo *vdo, struct device_config *config, unsigned int instance, char **reason)
++{
++	int result;
++	zone_count_t i;
++
++	vdo->device_config = config;
++	vdo->starting_sector_offset = config->owning_target->begin;
++	vdo->instance = instance;
++	vdo->allocations_allowed = true;
++	vdo_set_admin_state_code(&vdo->admin.state, VDO_ADMIN_STATE_NEW);
++	INIT_LIST_HEAD(&vdo->device_config_list);
++	vdo_initialize_completion(&vdo->admin.completion, vdo, VDO_ADMIN_COMPLETION);
++	init_completion(&vdo->admin.callback_sync);
++	mutex_init(&vdo->stats_mutex);
++	result = read_geometry_block(vdo);
++	if (result != VDO_SUCCESS) {
++		*reason = "Could not load geometry block";
++		return result;
 +	}
 +
-+	zone->allocation_count++;
-+	return zone->allocation_zone;
++	result = initialize_thread_config(config->thread_counts, &vdo->thread_config);
++	if (result != VDO_SUCCESS) {
++		*reason = "Cannot create thread configuration";
++		return result;
++	}
++
++	uds_log_info("zones: %d logical, %d physical, %d hash; total threads: %d",
++		     config->thread_counts.logical_zones,
++		     config->thread_counts.physical_zones,
++		     config->thread_counts.hash_zones,
++		     vdo->thread_config.thread_count);
++
++	/* Compression context storage */
++	result = UDS_ALLOCATE(config->thread_counts.cpu_threads,
++			      char *,
++			      "LZ4 context",
++			      &vdo->compression_context);
++	if (result != VDO_SUCCESS) {
++		*reason = "cannot allocate LZ4 context";
++		return result;
++	}
++
++	for (i = 0; i < config->thread_counts.cpu_threads; i++) {
++		result = UDS_ALLOCATE(LZ4_MEM_COMPRESS,
++				      char,
++				      "LZ4 context",
++				      &vdo->compression_context[i]);
++		if (result != VDO_SUCCESS) {
++			*reason = "cannot allocate LZ4 context";
++			return result;
++		}
++	}
++
++	result = register_vdo(vdo);
++	if (result != VDO_SUCCESS) {
++		*reason = "Cannot add VDO to device registry";
++		return result;
++	}
++
++	vdo_set_admin_state_code(&vdo->admin.state, VDO_ADMIN_STATE_INITIALIZED);
++	return result;
 +}
 +
 +/**
-+ * vdo_dump_logical_zone() - Dump information about a logical zone to the log for debugging.
-+ * @zone: The zone to dump
++ * vdo_make() - Allocate and initialize a vdo.
++ * @instance: Device instantiation counter.
++ * @config: The device configuration.
++ * @reason: The reason for any failure during this call.
++ * @vdo_ptr: A pointer to hold the created vdo.
 + *
-+ * Context: the information is dumped in a thread-unsafe fashion.
-+ *
++ * Return: VDO_SUCCESS or an error.
 + */
-+void vdo_dump_logical_zone(const struct logical_zone *zone)
++int vdo_make(unsigned int instance,
++	     struct device_config *config,
++	     char **reason,
++	     struct vdo **vdo_ptr)
 +{
-+	uds_log_info("logical_zone %u", zone->zone_number);
-+	uds_log_info("  flush_generation=%llu oldest_active_generation=%llu notification_generation=%llu notifying=%s ios_in_flush_generation=%llu",
-+		     (unsigned long long) READ_ONCE(zone->flush_generation),
-+		     (unsigned long long) READ_ONCE(zone->oldest_active_generation),
-+		     (unsigned long long) READ_ONCE(zone->notification_generation),
-+		     uds_bool_to_string(READ_ONCE(zone->notifying)),
-+		     (unsigned long long) READ_ONCE(zone->ios_in_flush_generation));
++	int result;
++	struct vdo *vdo;
++
++	/* VDO-3769 - Set a generic reason so we don't ever return garbage. */
++	*reason = "Unspecified error";
++
++	result = UDS_ALLOCATE(1, struct vdo, __func__, &vdo);
++	if (result != UDS_SUCCESS) {
++		*reason = "Cannot allocate VDO";
++		return result;
++	}
++
++	result = initialize_vdo(vdo, config, instance, reason);
++	if (result != VDO_SUCCESS) {
++		vdo_destroy(vdo);
++		return result;
++	}
++
++	/* From here on, the caller will clean up if there is an error. */
++	*vdo_ptr = vdo;
++
++	snprintf(vdo->thread_name_prefix,
++		 sizeof(vdo->thread_name_prefix),
++		 "%s%u",
++		 MODULE_NAME,
++		 instance);
++	BUG_ON(vdo->thread_name_prefix[0] == '\0');
++	result = UDS_ALLOCATE(vdo->thread_config.thread_count,
++			      struct vdo_thread,
++			      __func__,
++			      &vdo->threads);
++	if (result != VDO_SUCCESS) {
++		*reason = "Cannot allocate thread structures";
++		return result;
++	}
++
++	result = vdo_make_thread(vdo,
++				 vdo->thread_config.admin_thread,
++				 &default_queue_type,
++				 1,
++				 NULL);
++	if (result != VDO_SUCCESS) {
++		*reason = "Cannot make admin thread";
++		return result;
++	}
++
++	result = vdo_make_flusher(vdo);
++	if (result != VDO_SUCCESS) {
++		*reason = "Cannot make flusher zones";
++		return result;
++	}
++
++	result = vdo_make_packer(vdo, DEFAULT_PACKER_BINS, &vdo->packer);
++	if (result != VDO_SUCCESS) {
++		*reason = "Cannot make packer zones";
++		return result;
++	}
++
++	BUG_ON(vdo->device_config->logical_block_size <= 0);
++	BUG_ON(vdo->device_config->owned_device == NULL);
++	result = make_data_vio_pool(vdo,
++				    MAXIMUM_VDO_USER_VIOS,
++				    MAXIMUM_VDO_USER_VIOS * 3 / 4,
++				    &vdo->data_vio_pool);
++	if (result != VDO_SUCCESS) {
++		*reason = "Cannot allocate data_vio pool";
++		return result;
++	}
++
++	result = vdo_make_io_submitter(config->thread_counts.bio_threads,
++				       config->thread_counts.bio_rotation_interval,
++				       get_data_vio_pool_request_limit(vdo->data_vio_pool),
++				       vdo,
++				       &vdo->io_submitter);
++	if (result != VDO_SUCCESS) {
++		*reason = "bio submission initialization failed";
++		return result;
++	}
++
++	if (vdo_uses_bio_ack_queue(vdo)) {
++		result = vdo_make_thread(vdo,
++					 vdo->thread_config.bio_ack_thread,
++					 &bio_ack_q_type,
++					 config->thread_counts.bio_ack_threads,
++					 NULL);
++		if (result != VDO_SUCCESS) {
++			*reason = "bio ack queue initialization failed";
++			return result;
++		}
++	}
++
++	result = vdo_make_thread(vdo,
++				 vdo->thread_config.cpu_thread,
++				 &cpu_q_type,
++				 config->thread_counts.cpu_threads,
++				 (void **) vdo->compression_context);
++	if (result != VDO_SUCCESS) {
++		*reason = "CPU queue initialization failed";
++		return result;
++	}
++
++	return VDO_SUCCESS;
 +}
-diff --git a/drivers/md/dm-vdo/logical-zone.h b/drivers/md/dm-vdo/logical-zone.h
++
++static void finish_vdo(struct vdo *vdo)
++{
++	int i;
++
++	if (vdo->threads == NULL)
++		return;
++
++	vdo_cleanup_io_submitter(vdo->io_submitter);
++	vdo_finish_dedupe_index(vdo->hash_zones);
++
++	for (i = 0; i < vdo->thread_config.thread_count; i++)
++		vdo_finish_work_queue(vdo->threads[i].queue);
++}
++
++/**
++ * free_listeners() - Free the list of read-only listeners associated with a thread.
++ * @thread_data: The thread holding the list to free.
++ */
++static void free_listeners(struct vdo_thread *thread)
++{
++	struct read_only_listener *listener, *next;
++
++	for (listener = UDS_FORGET(thread->listeners); listener != NULL; listener = next) {
++		next = UDS_FORGET(listener->next);
++		UDS_FREE(listener);
++	}
++}
++
++static void uninitialize_super_block(struct vdo_super_block *super_block)
++{
++	free_vio_components(&super_block->vio);
++	UDS_FREE(super_block->buffer);
++}
++
++/**
++ * unregister_vdo() - Remove a vdo from the device registry.
++ * @vdo: The vdo to remove.
++ */
++static void unregister_vdo(struct vdo *vdo)
++{
++	write_lock(&registry.lock);
++	if (filter_vdos_locked(vdo_is_equal, vdo) == vdo)
++		list_del_init(&vdo->registration);
++
++	write_unlock(&registry.lock);
++}
++
++/**
++ * vdo_destroy() - Destroy a vdo instance.
++ * @vdo: The vdo to destroy (may be NULL).
++ */
++void vdo_destroy(struct vdo *vdo)
++{
++	unsigned int i;
++
++	if (vdo == NULL)
++		return;
++
++	/* A running VDO should never be destroyed without suspending first. */
++	BUG_ON(vdo_get_admin_state(vdo)->normal);
++
++	vdo->allocations_allowed = true;
++
++	/* Stop services that need to gather VDO statistics from the worker threads. */
++	if (vdo->sysfs_added) {
++		init_completion(&vdo->stats_shutdown);
++		kobject_put(&vdo->stats_directory);
++		wait_for_completion(&vdo->stats_shutdown);
++	}
++
++	finish_vdo(vdo);
++	unregister_vdo(vdo);
++	free_data_vio_pool(vdo->data_vio_pool);
++	vdo_free_io_submitter(UDS_FORGET(vdo->io_submitter));
++	vdo_free_flusher(UDS_FORGET(vdo->flusher));
++	vdo_free_packer(UDS_FORGET(vdo->packer));
++	vdo_free_recovery_journal(UDS_FORGET(vdo->recovery_journal));
++	vdo_free_slab_depot(UDS_FORGET(vdo->depot));
++	vdo_uninitialize_layout(&vdo->layout);
++	vdo_uninitialize_layout(&vdo->next_layout);
++	if (vdo->partition_copier)
++		dm_kcopyd_client_destroy(UDS_FORGET(vdo->partition_copier));
++	uninitialize_super_block(&vdo->super_block);
++	vdo_free_block_map(UDS_FORGET(vdo->block_map));
++	vdo_free_hash_zones(UDS_FORGET(vdo->hash_zones));
++	vdo_free_physical_zones(UDS_FORGET(vdo->physical_zones));
++	vdo_free_logical_zones(UDS_FORGET(vdo->logical_zones));
++
++	if (vdo->threads != NULL) {
++		for (i = 0; i < vdo->thread_config.thread_count; i++) {
++			free_listeners(&vdo->threads[i]);
++			vdo_free_work_queue(UDS_FORGET(vdo->threads[i].queue));
++		}
++		UDS_FREE(UDS_FORGET(vdo->threads));
++	}
++
++	uninitialize_thread_config(&vdo->thread_config);
++
++	if (vdo->compression_context != NULL) {
++		for (i = 0; i < vdo->device_config->thread_counts.cpu_threads; i++)
++			UDS_FREE(UDS_FORGET(vdo->compression_context[i]));
++
++		UDS_FREE(UDS_FORGET(vdo->compression_context));
++	}
++
++	/*
++	 * The call to kobject_put on the kobj sysfs node will decrement its reference count; when
++	 * the count goes to zero the VDO object will be freed as a side effect.
++	 */
++	if (!vdo->sysfs_added)
++		UDS_FREE(vdo);
++	else
++		kobject_put(&vdo->vdo_directory);
++}
++
++static int initialize_super_block(struct vdo *vdo, struct vdo_super_block *super_block)
++{
++	int result;
++
++	result = UDS_ALLOCATE(VDO_BLOCK_SIZE,
++			      char,
++			      "encoded super block",
++			      (char **) &vdo->super_block.buffer);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	return allocate_vio_components(vdo,
++				       VIO_TYPE_SUPER_BLOCK,
++				       VIO_PRIORITY_METADATA,
++				       NULL,
++				       1,
++				       (char *) super_block->buffer,
++				       &vdo->super_block.vio);
++}
++
++/**
++ * finish_reading_super_block() - Continue after loading the super block.
++ * @completion: The super block vio.
++ *
++ * This callback is registered in vdo_load_super_block().
++ */
++static void finish_reading_super_block(struct vdo_completion *completion)
++{
++	struct vdo_super_block *super_block =
++		container_of(as_vio(completion), struct vdo_super_block, vio);
++
++	vdo_continue_completion(UDS_FORGET(completion->parent),
++				vdo_decode_super_block(super_block->buffer));
++}
++
++/**
++ * handle_super_block_read_error() - Handle an error reading the super block.
++ * @completion: The super block vio.
++ *
++ * This error handler is registered in vdo_load_super_block().
++ */
++static void handle_super_block_read_error(struct vdo_completion *completion)
++{
++	vio_record_metadata_io_error(as_vio(completion));
++	finish_reading_super_block(completion);
++}
++
++static void read_super_block_endio(struct bio *bio)
++{
++	struct vio *vio = bio->bi_private;
++	struct vdo_completion *parent = vio->completion.parent;
++
++	continue_vio_after_io(vio, finish_reading_super_block, parent->callback_thread_id);
++}
++
++/**
++ * vdo_load_super_block() - Allocate a super block and read its contents from storage.
++ * @vdo: The vdo containing the super block on disk.
++ * @parent: The completion to notify after loading the super block.
++ */
++void vdo_load_super_block(struct vdo *vdo, struct vdo_completion *parent)
++{
++	int result;
++
++	result = initialize_super_block(vdo, &vdo->super_block);
++	if (result != VDO_SUCCESS) {
++		vdo_continue_completion(parent, result);
++		return;
++	}
++
++	vdo->super_block.vio.completion.parent = parent;
++	submit_metadata_vio(&vdo->super_block.vio,
++			    vdo_get_data_region_start(vdo->geometry),
++			    read_super_block_endio,
++			    handle_super_block_read_error,
++			    REQ_OP_READ);
++}
++
++/**
++ * pool_stats_release() - Signal that sysfs stats have been shut down.
++ * @directory: The vdo stats directory.
++ */
++static void pool_stats_release(struct kobject *directory)
++{
++	struct vdo *vdo = container_of(directory, struct vdo, stats_directory);
++
++	complete(&vdo->stats_shutdown);
++}
++
++ATTRIBUTE_GROUPS(vdo_pool_stats);
++static const struct kobj_type stats_directory_type = {
++	.release = pool_stats_release,
++	.sysfs_ops = &vdo_pool_stats_sysfs_ops,
++	.default_groups = vdo_pool_stats_groups,
++};
++
++/**
++ * vdo_add_sysfs_stats_dir() - Add the stats directory to the vdo sysfs directory.
++ * @vdo: The vdo.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++int vdo_add_sysfs_stats_dir(struct vdo *vdo)
++{
++	int result;
++
++	kobject_init(&vdo->stats_directory, &stats_directory_type);
++	result = kobject_add(&vdo->stats_directory, &vdo->vdo_directory, "statistics");
++	if (result != 0)
++		return VDO_CANT_ADD_SYSFS_NODE;
++
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_get_backing_device() - Get the block device object underlying a vdo.
++ * @vdo: The vdo.
++ *
++ * Return: The vdo's current block device.
++ */
++struct block_device *vdo_get_backing_device(const struct vdo *vdo)
++{
++	return vdo->device_config->owned_device->bdev;
++}
++
++/**
++ * vdo_get_device_name() - Get the device name associated with the vdo target.
++ * @target: The target device interface.
++ *
++ * Return: The block device name.
++ */
++const char *vdo_get_device_name(const struct dm_target *target)
++{
++	return dm_device_name(dm_table_get_md(target->table));
++}
++
++/**
++ * vdo_synchronous_flush() - Issue a flush request and wait for it to complete.
++ * @vdo: The vdo.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++int vdo_synchronous_flush(struct vdo *vdo)
++{
++	int result;
++	struct bio bio;
++
++	bio_init(&bio, vdo_get_backing_device(vdo), 0, 0,
++		 REQ_OP_WRITE | REQ_PREFLUSH);
++	submit_bio_wait(&bio);
++	result = blk_status_to_errno(bio.bi_status);
++
++	atomic64_inc(&vdo->stats.flush_out);
++	if (result != 0) {
++		uds_log_error_strerror(result, "synchronous flush failed");
++		result = -EIO;
++	}
++
++	bio_uninit(&bio);
++	return result;
++}
++
++/**
++ * vdo_get_state() - Get the current state of the vdo.
++ * @vdo: The vdo.
++
++ * Context: This method may be called from any thread.
++ *
++ * Return: The current state of the vdo.
++ */
++enum vdo_state vdo_get_state(const struct vdo *vdo)
++{
++	enum vdo_state state = atomic_read(&vdo->state);
++
++	/* pairs with barriers where state field is changed */
++	smp_rmb();
++	return state;
++}
++
++/**
++ * vdo_set_state() - Set the current state of the vdo.
++ * @vdo: The vdo whose state is to be set.
++ * @state: The new state of the vdo.
++ *
++ * Context: This method may be called from any thread.
++ */
++void vdo_set_state(struct vdo *vdo, enum vdo_state state)
++{
++	/* pairs with barrier in vdo_get_state */
++	smp_wmb();
++	atomic_set(&vdo->state, state);
++}
++
++/**
++ * vdo_get_admin_state() - Get the admin state of the vdo.
++ * @vdo: The vdo.
++ *
++ * Return: The code for the vdo's current admin state.
++ */
++const struct admin_state_code *vdo_get_admin_state(const struct vdo *vdo)
++{
++	return vdo_get_admin_state_code(&vdo->admin.state);
++}
++
++/**
++ * record_vdo() - Record the state of the VDO for encoding in the super block.
++ */
++static void record_vdo(struct vdo *vdo)
++{
++	/* This is for backwards compatibility. */
++	vdo->states.unused = vdo->geometry.unused;
++	vdo->states.vdo.state = vdo_get_state(vdo);
++	vdo->states.block_map = vdo_record_block_map(vdo->block_map);
++	vdo->states.recovery_journal = vdo_record_recovery_journal(vdo->recovery_journal);
++	vdo->states.slab_depot = vdo_record_slab_depot(vdo->depot);
++	vdo->states.layout = vdo->layout;
++}
++
++/**
++ * continue_super_block_parent() - Continue the parent of a super block save operation.
++ * @completion: The super block vio.
++ *
++ * This callback is registered in vdo_save_components().
++ */
++static void continue_super_block_parent(struct vdo_completion *completion)
++{
++	vdo_continue_completion(UDS_FORGET(completion->parent), completion->result);
++}
++
++/**
++ * handle_save_error() - Log a super block save error.
++ * @completion: The super block vio.
++ *
++ * This error handler is registered in vdo_save_components().
++ */
++static void handle_save_error(struct vdo_completion *completion)
++{
++	struct vdo_super_block *super_block =
++		container_of(as_vio(completion), struct vdo_super_block, vio);
++
++	vio_record_metadata_io_error(&super_block->vio);
++	uds_log_error_strerror(completion->result, "super block save failed");
++	/*
++	 * Mark the super block as unwritable so that we won't attempt to write it again. This
++	 * avoids the case where a growth attempt fails writing the super block with the new size,
++	 * but the subsequent attempt to write out the read-only state succeeds. In this case,
++	 * writes which happened just before the suspend would not be visible if the VDO is
++	 * restarted without rebuilding, but, after a read-only rebuild, the effects of those
++	 * writes would reappear.
++	 */
++	super_block->unwritable = true;
++	completion->callback(completion);
++}
++
++static void super_block_write_endio(struct bio *bio)
++{
++	struct vio *vio = bio->bi_private;
++	struct vdo_completion *parent = vio->completion.parent;
++
++	continue_vio_after_io(vio, continue_super_block_parent, parent->callback_thread_id);
++}
++
++/**
++ * vdo_save_components() - Encode the vdo and save the super block asynchronously.
++ * @vdo: The vdo whose state is being saved.
++ * @parent: The completion to notify when the save is complete.
++ */
++void vdo_save_components(struct vdo *vdo, struct vdo_completion *parent)
++{
++	struct vdo_super_block *super_block = &vdo->super_block;
++
++	if (super_block->unwritable) {
++		vdo_continue_completion(parent, VDO_READ_ONLY);
++		return;
++	}
++
++	if (super_block->vio.completion.parent != NULL) {
++		vdo_continue_completion(parent, VDO_COMPONENT_BUSY);
++		return;
++	}
++
++	record_vdo(vdo);
++
++	vdo_encode_super_block(super_block->buffer, &vdo->states);
++	super_block->vio.completion.parent = parent;
++	super_block->vio.completion.callback_thread_id = parent->callback_thread_id;
++	submit_metadata_vio(&super_block->vio,
++			    vdo_get_data_region_start(vdo->geometry),
++			    super_block_write_endio,
++			    handle_save_error,
++			    REQ_OP_WRITE | REQ_PREFLUSH | REQ_FUA);
++}
++
++/**
++ * vdo_register_read_only_listener() - Register a listener to be notified when the VDO goes
++ *                                     read-only.
++ * @vdo: The vdo to register with.
++ * @listener: The object to notify.
++ * @notification: The function to call to send the notification.
++ * @thread_id: The id of the thread on which to send the notification.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++int vdo_register_read_only_listener(struct vdo *vdo,
++				    void *listener,
++				    vdo_read_only_notification *notification,
++				    thread_id_t thread_id)
++{
++	struct vdo_thread *thread = &vdo->threads[thread_id];
++	struct read_only_listener *read_only_listener;
++	int result;
++
++	result = ASSERT(thread_id != vdo->thread_config.dedupe_thread,
++			"read only listener not registered on dedupe thread");
++	if (result != VDO_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(1, struct read_only_listener, __func__, &read_only_listener);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	*read_only_listener = (struct read_only_listener) {
++		.listener = listener,
++		.notify = notification,
++		.next = thread->listeners,
++	};
++
++	thread->listeners = read_only_listener;
++	return VDO_SUCCESS;
++}
++
++/**
++ * notify_vdo_of_read_only_mode() - Notify a vdo that it is going read-only.
++ * @listener: The vdo.
++ * @parent: The completion to notify in order to acknowledge the notification.
++ *
++ * This will save the read-only state to the super block.
++ *
++ * Implements vdo_read_only_notification.
++ */
++static void notify_vdo_of_read_only_mode(void *listener, struct vdo_completion *parent)
++{
++	struct vdo *vdo = listener;
++
++	if (vdo_in_read_only_mode(vdo))
++		vdo_finish_completion(parent);
++
++	vdo_set_state(vdo, VDO_READ_ONLY_MODE);
++	vdo_save_components(vdo, parent);
++}
++
++/**
++ * vdo_enable_read_only_entry() - Enable a vdo to enter read-only mode on errors.
++ * @vdo: The vdo to enable.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++int vdo_enable_read_only_entry(struct vdo *vdo)
++{
++	thread_id_t id;
++	bool is_read_only = vdo_in_read_only_mode(vdo);
++	struct read_only_notifier *notifier = &vdo->read_only_notifier;
++
++	if (is_read_only) {
++		notifier->read_only_error = VDO_READ_ONLY;
++		notifier->state = NOTIFIED;
++	} else {
++		notifier->state = MAY_NOT_NOTIFY;
++	}
++
++	spin_lock_init(&notifier->lock);
++	vdo_initialize_completion(&notifier->completion, vdo, VDO_READ_ONLY_MODE_COMPLETION);
++
++	for (id = 0; id < vdo->thread_config.thread_count; id++)
++		vdo->threads[id].is_read_only = is_read_only;
++
++	return vdo_register_read_only_listener(vdo,
++					       vdo,
++					       notify_vdo_of_read_only_mode,
++					       vdo->thread_config.admin_thread);
++}
++
++/**
++ * vdo_wait_until_not_entering_read_only_mode() - Wait until no read-only notifications are in
++ *                                                progress and prevent any subsequent
++ *                                                notifications.
++ * @parent: The completion to notify when no threads are entering read-only mode.
++ *
++ * Notifications may be re-enabled by calling vdo_allow_read_only_mode_entry().
++ */
++void vdo_wait_until_not_entering_read_only_mode(struct vdo_completion *parent)
++{
++	struct vdo *vdo = parent->vdo;
++	struct read_only_notifier *notifier = &vdo->read_only_notifier;
++
++	vdo_assert_on_admin_thread(vdo, __func__);
++
++	if (notifier->waiter != NULL) {
++		vdo_continue_completion(parent, VDO_COMPONENT_BUSY);
++		return;
++	}
++
++	spin_lock(&notifier->lock);
++	if (notifier->state == NOTIFYING)
++		notifier->waiter = parent;
++	else if (notifier->state == MAY_NOTIFY)
++		notifier->state = MAY_NOT_NOTIFY;
++	spin_unlock(&notifier->lock);
++
++	if (notifier->waiter == NULL) {
++		/*
++		 * A notification was not in progress, and now they are
++		 * disallowed.
++		 */
++		vdo_launch_completion(parent);
++		return;
++	}
++}
++
++/**
++ * as_notifier() - Convert a generic vdo_completion to a read_only_notifier.
++ * @completion: The completion to convert.
++ *
++ * Return: The completion as a read_only_notifier.
++ */
++static inline struct read_only_notifier *as_notifier(struct vdo_completion *completion)
++{
++	vdo_assert_completion_type(completion, VDO_READ_ONLY_MODE_COMPLETION);
++	return container_of(completion, struct read_only_notifier, completion);
++}
++
++/**
++ * finish_entering_read_only_mode() - Complete the process of entering read only mode.
++ * @completion: The read-only mode completion.
++ */
++static void finish_entering_read_only_mode(struct vdo_completion *completion)
++{
++	struct read_only_notifier *notifier = as_notifier(completion);
++
++	vdo_assert_on_admin_thread(completion->vdo, __func__);
++
++	spin_lock(&notifier->lock);
++	notifier->state = NOTIFIED;
++	spin_unlock(&notifier->lock);
++
++	if (notifier->waiter != NULL)
++		vdo_continue_completion(UDS_FORGET(notifier->waiter), completion->result);
++}
++
++/**
++ * make_thread_read_only() - Inform each thread that the VDO is in read-only mode.
++ * @completion: The read-only mode completion.
++ */
++static void make_thread_read_only(struct vdo_completion *completion)
++{
++	struct vdo *vdo = completion->vdo;
++	thread_id_t thread_id = completion->callback_thread_id;
++	struct read_only_notifier *notifier = as_notifier(completion);
++	struct read_only_listener *listener = completion->parent;
++
++	if (listener == NULL) {
++		/* This is the first call on this thread */
++		struct vdo_thread *thread = &vdo->threads[thread_id];
++
++		thread->is_read_only = true;
++		listener = thread->listeners;
++		if (thread_id == 0)
++			uds_log_error_strerror(READ_ONCE(notifier->read_only_error),
++					       "Unrecoverable error, entering read-only mode");
++	} else {
++		/* We've just finished notifying a listener */
++		listener = listener->next;
++	}
++
++	if (listener != NULL) {
++		/* We have a listener to notify */
++		vdo_prepare_completion(completion,
++				       make_thread_read_only,
++				       make_thread_read_only,
++				       thread_id,
++				       listener);
++		listener->notify(listener->listener, completion);
++		return;
++	}
++
++	/* We're done with this thread */
++	if (++thread_id == vdo->thread_config.dedupe_thread)
++		/*
++		 * We don't want to notify the dedupe thread since it may be
++		 * blocked rebuilding the index.
++		 */
++		++thread_id;
++
++	if (thread_id >= vdo->thread_config.thread_count)
++		/* There are no more threads */
++		vdo_prepare_completion(completion,
++				       finish_entering_read_only_mode,
++				       finish_entering_read_only_mode,
++				       vdo->thread_config.admin_thread,
++				       NULL);
++	else
++		vdo_prepare_completion(completion,
++				       make_thread_read_only,
++				       make_thread_read_only,
++				       thread_id,
++				       NULL);
++
++	vdo_launch_completion(completion);
++}
++
++/**
++ * vdo_allow_read_only_mode_entry() - Allow the notifier to put the VDO into read-only mode,
++ *                                    reversing the effects of
++ *                                    vdo_wait_until_not_entering_read_only_mode().
++ * @parent: The object to notify once the operation is complete.
++ *
++ * If some thread tried to put the vdo into read-only mode while notifications were disallowed, it
++ * will be done when this method is called. If that happens, the parent will not be notified until
++ * the vdo has actually entered read-only mode and attempted to save the super block.
++ *
++ * Context: This method may only be called from the admin thread.
++ */
++void vdo_allow_read_only_mode_entry(struct vdo_completion *parent)
++{
++	struct vdo *vdo = parent->vdo;
++	struct read_only_notifier *notifier = &vdo->read_only_notifier;
++
++	vdo_assert_on_admin_thread(vdo, __func__);
++
++	if (notifier->waiter != NULL) {
++		vdo_continue_completion(parent, VDO_COMPONENT_BUSY);
++		return;
++	}
++
++	spin_lock(&notifier->lock);
++	if (notifier->state == MAY_NOT_NOTIFY) {
++		if (notifier->read_only_error == VDO_SUCCESS) {
++			notifier->state = MAY_NOTIFY;
++		} else {
++			notifier->state = NOTIFYING;
++			notifier->waiter = parent;
++		}
++	}
++	spin_unlock(&notifier->lock);
++
++	if (notifier->waiter == NULL) {
++		/* We're done */
++		vdo_launch_completion(parent);
++		return;
++	}
++
++	/* Do the pending notification. */
++	make_thread_read_only(&notifier->completion);
++}
++
++/**
++ * vdo_enter_read_only_mode() - Put a VDO into read-only mode and save the read-only state in the
++ *                              super block.
++ * @vdo: The vdo.
++ * @error_code: The error which caused the VDO to enter read-only mode.
++ *
++ * This method is a no-op if the VDO is already read-only.
++ */
++void vdo_enter_read_only_mode(struct vdo *vdo, int error_code)
++{
++	bool notify = false;
++	thread_id_t thread_id = vdo_get_callback_thread_id();
++	struct read_only_notifier *notifier = &vdo->read_only_notifier;
++	struct vdo_thread *thread;
++
++	if (thread_id != VDO_INVALID_THREAD_ID) {
++		thread = &vdo->threads[thread_id];
++		if (thread->is_read_only)
++			/* This thread has already gone read-only. */
++			return;
++
++		/* Record for this thread that the VDO is read-only. */
++		thread->is_read_only = true;
++	}
++
++	spin_lock(&notifier->lock);
++	if (notifier->read_only_error == VDO_SUCCESS) {
++		WRITE_ONCE(notifier->read_only_error, error_code);
++		if (notifier->state == MAY_NOTIFY) {
++			notifier->state = NOTIFYING;
++			notify = true;
++		}
++	}
++	spin_unlock(&notifier->lock);
++
++	if (!notify)
++		/* The notifier is already aware of a read-only error */
++		return;
++
++	/* Initiate a notification starting on the lowest numbered thread. */
++	vdo_launch_completion_callback(&notifier->completion, make_thread_read_only, 0);
++}
++
++/**
++ * vdo_is_read_only() - Check whether the VDO is read-only.
++ * @vdo: The vdo.
++ *
++ * Return: true if the vdo is read-only.
++ *
++ * This method may be called from any thread, as opposed to examining the VDO's state field which
++ * is only safe to check from the admin thread.
++ */
++bool vdo_is_read_only(struct vdo *vdo)
++{
++	return vdo->threads[vdo_get_callback_thread_id()].is_read_only;
++}
++
++/**
++ * vdo_in_read_only_mode() - Check whether a vdo is in read-only mode.
++ * @vdo: The vdo to query.
++ *
++ * Return: true if the vdo is in read-only mode.
++ */
++bool vdo_in_read_only_mode(const struct vdo *vdo)
++{
++	return (vdo_get_state(vdo) == VDO_READ_ONLY_MODE);
++}
++
++/**
++ * vdo_in_recovery_mode() - Check whether the vdo is in recovery mode.
++ * @vdo: The vdo to query.
++ *
++ * Return: true if the vdo is in recovery mode.
++ */
++bool vdo_in_recovery_mode(const struct vdo *vdo)
++{
++	return (vdo_get_state(vdo) == VDO_RECOVERING);
++}
++
++/**
++ * vdo_enter_recovery_mode() - Put the vdo into recovery mode.
++ * @vdo: The vdo.
++ */
++void vdo_enter_recovery_mode(struct vdo *vdo)
++{
++	vdo_assert_on_admin_thread(vdo, __func__);
++
++	if (vdo_in_read_only_mode(vdo))
++		return;
++
++	uds_log_info("Entering recovery mode");
++	vdo_set_state(vdo, VDO_RECOVERING);
++}
++
++/**
++ * complete_synchronous_action() - Signal the waiting thread that a synchronous action is complete.
++ * @completion: The sync completion.
++ */
++static void complete_synchronous_action(struct vdo_completion *completion)
++{
++	vdo_assert_completion_type(completion, VDO_SYNC_COMPLETION);
++	complete(&(container_of(completion, struct sync_completion, vdo_completion)->completion));
++}
++
++/**
++ * perform_synchronous_action() - Launch an action on a VDO thread and wait for it to complete.
++ * @vdo: The vdo.
++ * @action: The callback to launch.
++ * @thread_id: The thread on which to run the action.
++ * @parent: The parent of the sync completion (may be NULL).
++ */
++static int perform_synchronous_action(struct vdo *vdo,
++				      vdo_action *action,
++				      thread_id_t thread_id,
++				      void *parent)
++{
++	struct sync_completion sync;
++
++	vdo_initialize_completion(&sync.vdo_completion, vdo, VDO_SYNC_COMPLETION);
++	init_completion(&sync.completion);
++	sync.vdo_completion.parent = parent;
++	vdo_launch_completion_callback(&sync.vdo_completion, action, thread_id);
++	wait_for_completion(&sync.completion);
++	return sync.vdo_completion.result;
++}
++
++/**
++ * set_compression_callback() - Callback to turn compression on or off.
++ * @completion: The completion.
++ */
++static void set_compression_callback(struct vdo_completion *completion)
++{
++	struct vdo *vdo = completion->vdo;
++	bool *enable = completion->parent;
++	bool was_enabled = vdo_get_compressing(vdo);
++
++	if (*enable != was_enabled) {
++		WRITE_ONCE(vdo->compressing, *enable);
++		if (was_enabled)
++			/* Signal the packer to flush since compression has been disabled. */
++			vdo_flush_packer(vdo->packer);
++	}
++
++	uds_log_info("compression is %s", (*enable ? "enabled" : "disabled"));
++	*enable = was_enabled;
++	complete_synchronous_action(completion);
++}
++
++/**
++ * vdo_set_compressing() - Turn compression on or off.
++ * @vdo: The vdo.
++ * @enable: Whether to enable or disable compression.
++ *
++ * Return: Whether compression was previously on or off.
++ */
++bool vdo_set_compressing(struct vdo *vdo, bool enable)
++{
++	perform_synchronous_action(vdo,
++				   set_compression_callback,
++				   vdo->thread_config.packer_thread,
++				   &enable);
++	return enable;
++}
++
++/**
++ * vdo_get_compressing() - Get whether compression is enabled in a vdo.
++ * @vdo: The vdo.
++ *
++ * Return: State of compression.
++ */
++bool vdo_get_compressing(struct vdo *vdo)
++{
++	return READ_ONCE(vdo->compressing);
++}
++
++static size_t get_block_map_cache_size(const struct vdo *vdo)
++{
++	return ((size_t) vdo->device_config->cache_size) * VDO_BLOCK_SIZE;
++}
++
++static struct error_statistics __must_check get_vdo_error_statistics(const struct vdo *vdo)
++{
++	/*
++	 * The error counts can be incremented from arbitrary threads and so must be incremented
++	 * atomically, but they are just statistics with no semantics that could rely on memory
++	 * order, so unfenced reads are sufficient.
++	 */
++	const struct atomic_statistics *atoms = &vdo->stats;
++
++	return (struct error_statistics) {
++		.invalid_advice_pbn_count = atomic64_read(&atoms->invalid_advice_pbn_count),
++		.no_space_error_count = atomic64_read(&atoms->no_space_error_count),
++		.read_only_error_count = atomic64_read(&atoms->read_only_error_count),
++	};
++}
++
++static void copy_bio_stat(struct bio_stats *b, const struct atomic_bio_stats *a)
++{
++	b->read = atomic64_read(&a->read);
++	b->write = atomic64_read(&a->write);
++	b->discard = atomic64_read(&a->discard);
++	b->flush = atomic64_read(&a->flush);
++	b->empty_flush = atomic64_read(&a->empty_flush);
++	b->fua = atomic64_read(&a->fua);
++}
++
++static struct bio_stats subtract_bio_stats(struct bio_stats minuend, struct bio_stats subtrahend)
++{
++	return (struct bio_stats) {
++		.read = minuend.read - subtrahend.read,
++		.write = minuend.write - subtrahend.write,
++		.discard = minuend.discard - subtrahend.discard,
++		.flush = minuend.flush - subtrahend.flush,
++		.empty_flush = minuend.empty_flush - subtrahend.empty_flush,
++		.fua = minuend.fua - subtrahend.fua,
++	};
++}
++
++/**
++ * vdo_get_physical_blocks_allocated() - Get the number of physical blocks in use by user data.
++ * @vdo: The vdo.
++ *
++ * Return: The number of blocks allocated for user data.
++ */
++static block_count_t __must_check vdo_get_physical_blocks_allocated(const struct vdo *vdo)
++{
++	return (vdo_get_slab_depot_allocated_blocks(vdo->depot) -
++		vdo_get_journal_block_map_data_blocks_used(vdo->recovery_journal));
++}
++
++/**
++ * vdo_get_physical_blocks_overhead() - Get the number of physical blocks used by vdo metadata.
++ * @vdo: The vdo.
++ *
++ * Return: The number of overhead blocks.
++ */
++static block_count_t __must_check vdo_get_physical_blocks_overhead(const struct vdo *vdo)
++{
++	/*
++	 * config.physical_blocks is mutated during resize and is in a packed structure,
++	 * but resize runs on admin thread.
++	 * TODO: Verify that this is always safe.
++	 */
++	return (vdo->states.vdo.config.physical_blocks -
++		vdo_get_slab_depot_data_blocks(vdo->depot) +
++		vdo_get_journal_block_map_data_blocks_used(vdo->recovery_journal));
++}
++
++static const char *vdo_describe_state(enum vdo_state state)
++{
++	/* These strings should all fit in the 15 chars of VDOStatistics.mode. */
++	switch (state) {
++	case VDO_RECOVERING:
++		return "recovering";
++
++	case VDO_READ_ONLY_MODE:
++		return "read-only";
++
++	default:
++		return "normal";
++	}
++}
++
++/**
++ * get_vdo_statistics() - Populate a vdo_statistics structure on the admin thread.
++ * @vdo: The vdo.
++ * @stats: The statistics structure to populate.
++ */
++static void get_vdo_statistics(const struct vdo *vdo, struct vdo_statistics *stats)
++{
++	struct recovery_journal *journal = vdo->recovery_journal;
++	enum vdo_state state = vdo_get_state(vdo);
++
++	vdo_assert_on_admin_thread(vdo, __func__);
++
++	/* start with a clean slate */
++	memset(stats, 0, sizeof(struct vdo_statistics));
++
++	/*
++	 * These are immutable properties of the vdo object, so it is safe to query them from any
++	 * thread.
++	 */
++	stats->version = STATISTICS_VERSION;
++	stats->logical_blocks = vdo->states.vdo.config.logical_blocks;
++	/*
++	 * config.physical_blocks is mutated during resize and is in a packed structure, but resize
++	 * runs on the admin thread.
++	 * TODO: verify that this is always safe
++	 */
++	stats->physical_blocks = vdo->states.vdo.config.physical_blocks;
++	stats->block_size = VDO_BLOCK_SIZE;
++	stats->complete_recoveries = vdo->states.vdo.complete_recoveries;
++	stats->read_only_recoveries = vdo->states.vdo.read_only_recoveries;
++	stats->block_map_cache_size = get_block_map_cache_size(vdo);
++
++	/* The callees are responsible for thread-safety. */
++	stats->data_blocks_used = vdo_get_physical_blocks_allocated(vdo);
++	stats->overhead_blocks_used = vdo_get_physical_blocks_overhead(vdo);
++	stats->logical_blocks_used = vdo_get_recovery_journal_logical_blocks_used(journal);
++	vdo_get_slab_depot_statistics(vdo->depot, stats);
++	stats->journal = vdo_get_recovery_journal_statistics(journal);
++	stats->packer = vdo_get_packer_statistics(vdo->packer);
++	stats->block_map = vdo_get_block_map_statistics(vdo->block_map);
++	vdo_get_dedupe_statistics(vdo->hash_zones, stats);
++	stats->errors = get_vdo_error_statistics(vdo);
++	stats->in_recovery_mode = (state == VDO_RECOVERING);
++	snprintf(stats->mode, sizeof(stats->mode), "%s", vdo_describe_state(state));
++
++	stats->instance = vdo->instance;
++	stats->current_vios_in_progress = get_data_vio_pool_active_requests(vdo->data_vio_pool);
++	stats->max_vios = get_data_vio_pool_maximum_requests(vdo->data_vio_pool);
++
++	stats->flush_out = atomic64_read(&vdo->stats.flush_out);
++	stats->logical_block_size = vdo->device_config->logical_block_size;
++	copy_bio_stat(&stats->bios_in, &vdo->stats.bios_in);
++	copy_bio_stat(&stats->bios_in_partial, &vdo->stats.bios_in_partial);
++	copy_bio_stat(&stats->bios_out, &vdo->stats.bios_out);
++	copy_bio_stat(&stats->bios_meta, &vdo->stats.bios_meta);
++	copy_bio_stat(&stats->bios_journal, &vdo->stats.bios_journal);
++	copy_bio_stat(&stats->bios_page_cache, &vdo->stats.bios_page_cache);
++	copy_bio_stat(&stats->bios_out_completed, &vdo->stats.bios_out_completed);
++	copy_bio_stat(&stats->bios_meta_completed, &vdo->stats.bios_meta_completed);
++	copy_bio_stat(&stats->bios_journal_completed, &vdo->stats.bios_journal_completed);
++	copy_bio_stat(&stats->bios_page_cache_completed, &vdo->stats.bios_page_cache_completed);
++	copy_bio_stat(&stats->bios_acknowledged, &vdo->stats.bios_acknowledged);
++	copy_bio_stat(&stats->bios_acknowledged_partial, &vdo->stats.bios_acknowledged_partial);
++	stats->bios_in_progress = subtract_bio_stats(stats->bios_in, stats->bios_acknowledged);
++	uds_get_memory_stats(&stats->memory_usage.bytes_used,
++			     &stats->memory_usage.peak_bytes_used);
++}
++
++/**
++ * vdo_fetch_statistics_callback() - Action to populate a vdo_statistics
++ *                                   structure on the admin thread.
++ * @completion: The completion.
++ *
++ * This callback is registered in vdo_fetch_statistics().
++ */
++static void vdo_fetch_statistics_callback(struct vdo_completion *completion)
++{
++	get_vdo_statistics(completion->vdo, completion->parent);
++	complete_synchronous_action(completion);
++}
++
++/**
++ * vdo_fetch_statistics() - Fetch statistics on the correct thread.
++ * @vdo: The vdo.
++ * @stats: The vdo statistics are returned here.
++ */
++void vdo_fetch_statistics(struct vdo *vdo, struct vdo_statistics *stats)
++{
++	perform_synchronous_action(vdo,
++				   vdo_fetch_statistics_callback,
++				   vdo->thread_config.admin_thread,
++				   stats);
++}
++
++/**
++ * vdo_get_callback_thread_id() - Get the id of the callback thread on which a completion is
++ *                                currently running.
++ *
++ * Return: The current thread ID, or -1 if no such thread.
++ */
++thread_id_t vdo_get_callback_thread_id(void)
++{
++	struct vdo_work_queue *queue = vdo_get_current_work_queue();
++	struct vdo_thread *thread;
++	thread_id_t thread_id;
++
++	if (queue == NULL)
++		return VDO_INVALID_THREAD_ID;
++
++	thread = vdo_get_work_queue_owner(queue);
++	thread_id = thread->thread_id;
++
++	if (PARANOID_THREAD_CONSISTENCY_CHECKS) {
++		BUG_ON(thread_id >= thread->vdo->thread_config.thread_count);
++		BUG_ON(thread != &thread->vdo->threads[thread_id]);
++	}
++
++	return thread_id;
++}
++
++/**
++ * vdo_dump_status() - Dump status information about a vdo to the log for debugging.
++ * @vdo: The vdo to dump.
++ */
++void vdo_dump_status(const struct vdo *vdo)
++{
++	zone_count_t zone;
++
++	vdo_dump_flusher(vdo->flusher);
++	vdo_dump_recovery_journal_statistics(vdo->recovery_journal);
++	vdo_dump_packer(vdo->packer);
++	vdo_dump_slab_depot(vdo->depot);
++
++	for (zone = 0; zone < vdo->thread_config.logical_zone_count; zone++)
++		vdo_dump_logical_zone(&vdo->logical_zones->zones[zone]);
++
++	for (zone = 0; zone < vdo->thread_config.physical_zone_count; zone++)
++		vdo_dump_physical_zone(&vdo->physical_zones->zones[zone]);
++
++	vdo_dump_hash_zones(vdo->hash_zones);
++}
++
++/**
++ * vdo_assert_on_admin_thread() - Assert that we are running on the admin thread.
++ * @vdo: The vdo.
++ * @name: The name of the function which should be running on the admin thread (for logging).
++ */
++void vdo_assert_on_admin_thread(const struct vdo *vdo, const char *name)
++{
++	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() == vdo->thread_config.admin_thread),
++			"%s called on admin thread",
++			name);
++}
++
++/**
++ * vdo_assert_on_logical_zone_thread() - Assert that this function was called on the specified
++ *                                       logical zone thread.
++ * @vdo: The vdo.
++ * @logical_zone: The number of the logical zone.
++ * @name: The name of the calling function.
++ */
++void vdo_assert_on_logical_zone_thread(const struct vdo *vdo,
++				       zone_count_t logical_zone,
++				       const char *name)
++{
++	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() ==
++			 vdo->thread_config.logical_threads[logical_zone]),
++			"%s called on logical thread",
++			name);
++}
++
++/**
++ * vdo_assert_on_physical_zone_thread() - Assert that this function was called on the specified
++ *                                        physical zone thread.
++ * @vdo: The vdo.
++ * @physical_zone: The number of the physical zone.
++ * @name: The name of the calling function.
++ */
++void vdo_assert_on_physical_zone_thread(const struct vdo *vdo,
++					zone_count_t physical_zone,
++					const char *name)
++{
++	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() ==
++			 vdo->thread_config.physical_threads[physical_zone]),
++			"%s called on physical thread",
++			name);
++}
++
++/**
++ * vdo_get_physical_zone() - Get the physical zone responsible for a given physical block number.
++ * @vdo: The vdo containing the physical zones.
++ * @pbn: The PBN of the data block.
++ * @zone_ptr: A pointer to return the physical zone.
++ *
++ * Gets the physical zone responsible for a given physical block number of a data block in this vdo
++ * instance, or of the zero block (for which a NULL zone is returned). For any other block number
++ * that is not in the range of valid data block numbers in any slab, an error will be returned.
++ * This function is safe to call on invalid block numbers; it will not put the vdo into read-only
++ * mode.
++ *
++ * Return: VDO_SUCCESS or VDO_OUT_OF_RANGE if the block number is invalid or an error code for any
++ *         other failure.
++ */
++int vdo_get_physical_zone(const struct vdo *vdo,
++			  physical_block_number_t pbn,
++			  struct physical_zone **zone_ptr)
++{
++	struct vdo_slab *slab;
++	int result;
++
++	if (pbn == VDO_ZERO_BLOCK) {
++		*zone_ptr = NULL;
++		return VDO_SUCCESS;
++	}
++
++	/*
++	 * Used because it does a more restrictive bounds check than vdo_get_slab(), and done first
++	 * because it won't trigger read-only mode on an invalid PBN.
++	 */
++	if (!vdo_is_physical_data_block(vdo->depot, pbn))
++		return VDO_OUT_OF_RANGE;
++
++	/* With the PBN already checked, we should always succeed in finding a slab. */
++	slab = vdo_get_slab(vdo->depot, pbn);
++	result = ASSERT(slab != NULL, "vdo_get_slab must succeed on all valid PBNs");
++	if (result != VDO_SUCCESS)
++		return result;
++
++	*zone_ptr = &vdo->physical_zones->zones[slab->allocator->zone_number];
++	return VDO_SUCCESS;
++}
+diff --git a/drivers/md/dm-vdo/vdo.h b/drivers/md/dm-vdo/vdo.h
 new file mode 100644
-index 000000000000..82afe4cc661e
+index 000000000000..a2caf54221c8
 --- /dev/null
-+++ b/drivers/md/dm-vdo/logical-zone.h
-@@ -0,0 +1,87 @@
++++ b/drivers/md/dm-vdo/vdo.h
+@@ -0,0 +1,381 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef VDO_LOGICAL_ZONE_H
-+#define VDO_LOGICAL_ZONE_H
++#ifndef VDO_H
++#define VDO_H
 +
++#include <linux/atomic.h>
++#include <linux/blk_types.h>
++#include <linux/completion.h>
++#include <linux/dm-kcopyd.h>
++#include <linux/kobject.h>
 +#include <linux/list.h>
++#include <linux/spinlock.h>
 +
 +#include "admin-state.h"
-+#include "int-map.h"
++#include "encodings.h"
++#include "packer.h"
++#include "physical-zone.h"
++#include "statistics.h"
++#include "thread-registry.h"
 +#include "types.h"
++#include "uds.h"
++#include "work-queue.h"
 +
-+struct physical_zone;
-+
-+struct logical_zone {
-+	/* The completion for flush notifications */
-+	struct vdo_completion completion;
-+	/* The owner of this zone */
-+	struct logical_zones *zones;
-+	/* Which logical zone this is */
-+	zone_count_t zone_number;
-+	/* The thread id for this zone */
-+	thread_id_t thread_id;
-+	/* In progress operations keyed by LBN */
-+	struct int_map *lbn_operations;
-+	/* The logical to physical map */
-+	struct block_map_zone *block_map_zone;
-+	/* The current flush generation */
-+	sequence_number_t flush_generation;
-+	/*
-+	 * The oldest active generation in this zone. This is mutated only on the logical zone
-+	 * thread but is queried from the flusher thread.
-+	 */
-+	sequence_number_t oldest_active_generation;
-+	/* The number of IOs in the current flush generation */
-+	block_count_t ios_in_flush_generation;
-+	/* The youngest generation of the current notification */
-+	sequence_number_t notification_generation;
-+	/* Whether a notification is in progress */
-+	bool notifying;
-+	/* The queue of active data write VIOs */
-+	struct list_head write_vios;
-+	/* The administrative state of the zone */
-+	struct admin_state state;
-+	/* The physical zone from which to allocate */
-+	struct physical_zone *allocation_zone;
-+	/* The number of allocations done from the current allocation_zone */
-+	block_count_t allocation_count;
-+	/* The next zone */
-+	struct logical_zone *next;
++enum notifier_state {
++	/** Notifications are allowed but not in progress */
++	MAY_NOTIFY,
++	/** A notification is in progress */
++	NOTIFYING,
++	/** Notifications are not allowed */
++	MAY_NOT_NOTIFY,
++	/** A notification has completed */
++	NOTIFIED,
 +};
 +
-+struct logical_zones {
-+	/* The vdo whose zones these are */
++/**
++ * typedef vdo_read_only_notification - A function to notify a listener that the VDO has gone
++ *                                      read-only.
++ * @listener: The object to notify.
++ * @parent: The completion to notify in order to acknowledge the notification.
++ */
++typedef void vdo_read_only_notification(void *listener, struct vdo_completion *parent);
++
++/*
++ * An object to be notified when the VDO enters read-only mode
++ */
++struct read_only_listener {
++	/* The listener */
++	void *listener;
++	/* The method to call to notify the listener */
++	vdo_read_only_notification *notify;
++	/* A pointer to the next listener */
++	struct read_only_listener *next;
++};
++
++struct vdo_thread {
 +	struct vdo *vdo;
-+	/* The manager for administrative actions */
-+	struct action_manager *manager;
-+	/* The number of zones */
-+	zone_count_t zone_count;
-+	/* The logical zones themselves */
-+	struct logical_zone zones[];
++	thread_id_t thread_id;
++	struct vdo_work_queue *queue;
++	/*
++	 * Each thread maintains its own notion of whether the VDO is read-only so that the
++	 * read-only state can be checked from any base thread without worrying about
++	 * synchronization or thread safety. This does mean that knowledge of the VDO going
++	 * read-only does not occur simultaneously across the VDO's threads, but that does not seem
++	 * to cause any problems.
++	 */
++	bool is_read_only;
++	/*
++	 * A list of objects waiting to be notified on this thread that the VDO has entered
++	 * read-only mode.
++	 */
++	struct read_only_listener *listeners;
++	struct registered_thread allocating_thread;
 +};
 +
-+int __must_check vdo_make_logical_zones(struct vdo *vdo, struct logical_zones **zones_ptr);
++/* Keep struct bio statistics atomically */
++struct atomic_bio_stats {
++	atomic64_t read; /* Number of not REQ_WRITE bios */
++	atomic64_t write; /* Number of REQ_WRITE bios */
++	atomic64_t discard; /* Number of REQ_DISCARD bios */
++	atomic64_t flush; /* Number of REQ_FLUSH bios */
++	atomic64_t empty_flush; /* Number of REQ_PREFLUSH bios without data */
++	atomic64_t fua; /* Number of REQ_FUA bios */
++};
 +
-+void vdo_free_logical_zones(struct logical_zones *zones);
++/* Counters are atomic since updates can arrive concurrently from arbitrary threads. */
++struct atomic_statistics {
++	atomic64_t bios_submitted;
++	atomic64_t bios_completed;
++	atomic64_t flush_out;
++	atomic64_t invalid_advice_pbn_count;
++	atomic64_t no_space_error_count;
++	atomic64_t read_only_error_count;
++	struct atomic_bio_stats bios_in;
++	struct atomic_bio_stats bios_in_partial;
++	struct atomic_bio_stats bios_out;
++	struct atomic_bio_stats bios_out_completed;
++	struct atomic_bio_stats bios_acknowledged;
++	struct atomic_bio_stats bios_acknowledged_partial;
++	struct atomic_bio_stats bios_meta;
++	struct atomic_bio_stats bios_meta_completed;
++	struct atomic_bio_stats bios_journal;
++	struct atomic_bio_stats bios_journal_completed;
++	struct atomic_bio_stats bios_page_cache;
++	struct atomic_bio_stats bios_page_cache_completed;
++};
 +
-+void vdo_drain_logical_zones(struct logical_zones *zones,
-+			     const struct admin_state_code *operation,
-+			     struct vdo_completion *completion);
++struct read_only_notifier {
++	/* The completion for entering read-only mode */
++	struct vdo_completion completion;
++	/* A completion waiting for notifications to be drained or enabled */
++	struct vdo_completion *waiter;
++	/* Lock to protect the next two fields */
++	spinlock_t lock;
++	/* The code of the error which put the VDO into read-only mode */
++	int read_only_error;
++	/* The current state of the notifier (values described above) */
++	enum notifier_state state;
++};
 +
-+void vdo_resume_logical_zones(struct logical_zones *zones, struct vdo_completion *parent);
++/*
++ * The thread ID returned when the current thread is not a vdo thread, or can not be determined
++ * (usually due to being at interrupt context).
++ */
++#define VDO_INVALID_THREAD_ID ((thread_id_t) -1)
 +
-+void vdo_increment_logical_zone_flush_generation(struct logical_zone *zone,
-+						 sequence_number_t expected_generation);
++struct thread_config {
++	zone_count_t logical_zone_count;
++	zone_count_t physical_zone_count;
++	zone_count_t hash_zone_count;
++	thread_count_t bio_thread_count;
++	thread_count_t thread_count;
++	thread_id_t admin_thread;
++	thread_id_t journal_thread;
++	thread_id_t packer_thread;
++	thread_id_t dedupe_thread;
++	thread_id_t bio_ack_thread;
++	thread_id_t cpu_thread;
++	thread_id_t *logical_threads;
++	thread_id_t *physical_threads;
++	thread_id_t *hash_zone_threads;
++	thread_id_t *bio_threads;
++};
 +
-+void vdo_acquire_flush_generation_lock(struct data_vio *data_vio);
++struct thread_count_config;
 +
-+void vdo_release_flush_generation_lock(struct data_vio *data_vio);
++struct vdo_super_block {
++	/* The vio for reading and writing the super block to disk */
++	struct vio vio;
++	/* A buffer to hold the super block */
++	u8 *buffer;
++	/* Whether this super block may not be written */
++	bool unwritable;
++};
 +
-+struct physical_zone * __must_check vdo_get_next_allocation_zone(struct logical_zone *zone);
++struct data_vio_pool;
 +
-+void vdo_dump_logical_zone(const struct logical_zone *zone);
++struct vdo_administrator {
++	struct vdo_completion completion;
++	struct admin_state state;
++	atomic_t busy;
++	u32 phase;
++	struct completion callback_sync;
++};
 +
-+#endif /* VDO_LOGICAL_ZONE_H */
++struct vdo {
++	char thread_name_prefix[MAX_VDO_WORK_QUEUE_NAME_LEN];
++	struct vdo_thread *threads;
++	vdo_action *action;
++	struct vdo_completion *completion;
++	struct vio_tracer *vio_tracer;
++
++	/* The atomic version of the state of this vdo */
++	atomic_t state;
++	/* The full state of all components */
++	struct vdo_component_states states;
++	/*
++	 * A counter value to attach to thread names and log messages to identify the individual
++	 * device.
++	 */
++	unsigned int instance;
++	/* The read-only notifier */
++	struct read_only_notifier read_only_notifier;
++	/* The load-time configuration of this vdo */
++	struct device_config *device_config;
++	/* The thread mapping */
++	struct thread_config thread_config;
++
++	/* The super block */
++	struct vdo_super_block super_block;
++
++	/* The partitioning of the underlying storage */
++	struct layout layout;
++	struct layout next_layout;
++	struct dm_kcopyd_client *partition_copier;
++
++	/* The block map */
++	struct block_map *block_map;
++
++	/* The journal for block map recovery */
++	struct recovery_journal *recovery_journal;
++
++	/* The slab depot */
++	struct slab_depot *depot;
++
++	/* The compressed-block packer */
++	struct packer *packer;
++	/* Whether incoming data should be compressed */
++	bool compressing;
++
++	/* The handler for flush requests */
++	struct flusher *flusher;
++
++	/* The state the vdo was in when loaded (primarily for unit tests) */
++	enum vdo_state load_state;
++
++	/* The logical zones of this vdo */
++	struct logical_zones *logical_zones;
++
++	/* The physical zones of this vdo */
++	struct physical_zones *physical_zones;
++
++	/* The hash lock zones of this vdo */
++	struct hash_zones *hash_zones;
++
++	/* Bio submission manager used for sending bios to the storage device. */
++	struct io_submitter *io_submitter;
++
++	/* The pool of data_vios for servicing incoming bios */
++	struct data_vio_pool *data_vio_pool;
++
++	/* The manager for administrative operations */
++	struct vdo_administrator admin;
++
++	/* Flags controlling administrative operations */
++	const struct admin_state_code *suspend_type;
++	bool allocations_allowed;
++	bool dump_on_shutdown;
++	atomic_t processing_message;
++
++	/*
++	 * Statistics
++	 * Atomic stats counters
++	 */
++	struct atomic_statistics stats;
++	/* Used to gather statistics without allocating memory */
++	struct vdo_statistics stats_buffer;
++	/* Protects the stats_buffer */
++	struct mutex stats_mutex;
++	/* true if sysfs directory is set up */
++	bool sysfs_added;
++	/* Used when shutting down the sysfs statistics */
++	struct completion stats_shutdown;
++
++
++	/* A list of all device_configs referencing this vdo */
++	struct list_head device_config_list;
++
++	/* This VDO's list entry for the device registry */
++	struct list_head registration;
++
++	/* Underlying block device info. */
++	u64 starting_sector_offset;
++	struct volume_geometry geometry;
++
++	/* For sysfs */
++	struct kobject vdo_directory;
++	struct kobject stats_directory;
++
++	/* N blobs of context data for LZ4 code, one per CPU thread. */
++	char **compression_context;
++};
++
++
++/**
++ * vdo_uses_bio_ack_queue() - Indicate whether the vdo is configured to use a separate work queue
++ *                            for acknowledging received and processed bios.
++ * @vdo: The vdo.
++ *
++ * Note that this directly controls the handling of write operations, but the compile-time flag
++ * VDO_USE_BIO_ACK_QUEUE_FOR_READ is also checked for read operations.
++ *
++ * Return: Whether a bio-acknowledgement work queue is in use.
++ */
++static inline bool vdo_uses_bio_ack_queue(struct vdo *vdo)
++{
++	return vdo->device_config->thread_counts.bio_ack_threads > 0;
++}
++
++/**
++ * typedef vdo_filter_t - Method type for vdo matching methods.
++ *
++ * A filter function returns false if the vdo doesn't match.
++ */
++typedef bool vdo_filter_t(struct vdo *vdo, const void *context);
++
++void vdo_initialize_device_registry_once(void);
++struct vdo * __must_check vdo_find_matching(vdo_filter_t *filter, const void *context);
++
++int __must_check vdo_make_thread(struct vdo *vdo,
++				 thread_id_t thread_id,
++				 const struct vdo_work_queue_type *type,
++				 unsigned int queue_count,
++				 void *contexts[]);
++
++static inline int __must_check vdo_make_default_thread(struct vdo *vdo, thread_id_t thread_id)
++{
++	return vdo_make_thread(vdo, thread_id, NULL, 1, NULL);
++}
++
++int __must_check
++vdo_make(unsigned int instance, struct device_config *config, char **reason, struct vdo **vdo_ptr);
++
++void vdo_destroy(struct vdo *vdo);
++
++void vdo_load_super_block(struct vdo *vdo, struct vdo_completion *parent);
++
++int __must_check vdo_add_sysfs_stats_dir(struct vdo *vdo);
++
++struct block_device * __must_check vdo_get_backing_device(const struct vdo *vdo);
++
++const char * __must_check vdo_get_device_name(const struct dm_target *target);
++
++int __must_check vdo_synchronous_flush(struct vdo *vdo);
++
++const struct admin_state_code * __must_check vdo_get_admin_state(const struct vdo *vdo);
++
++bool vdo_set_compressing(struct vdo *vdo, bool enable);
++
++bool vdo_get_compressing(struct vdo *vdo);
++
++void vdo_fetch_statistics(struct vdo *vdo, struct vdo_statistics *stats);
++
++thread_id_t vdo_get_callback_thread_id(void);
++
++enum vdo_state __must_check vdo_get_state(const struct vdo *vdo);
++
++void vdo_set_state(struct vdo *vdo, enum vdo_state state);
++
++void vdo_save_components(struct vdo *vdo, struct vdo_completion *parent);
++
++int vdo_register_read_only_listener(struct vdo *vdo,
++				    void *listener,
++				    vdo_read_only_notification *notification,
++				    thread_id_t thread_id);
++
++int vdo_enable_read_only_entry(struct vdo *vdo);
++
++void vdo_wait_until_not_entering_read_only_mode(struct vdo_completion *parent);
++
++void vdo_allow_read_only_mode_entry(struct vdo_completion *parent);
++
++void vdo_enter_read_only_mode(struct vdo *vdo, int error_code);
++
++bool __must_check vdo_is_read_only(struct vdo *vdo);
++
++bool __must_check vdo_in_read_only_mode(const struct vdo *vdo);
++
++bool __must_check vdo_in_recovery_mode(const struct vdo *vdo);
++
++void vdo_enter_recovery_mode(struct vdo *vdo);
++
++void vdo_assert_on_admin_thread(const struct vdo *vdo, const char *name);
++
++void vdo_assert_on_logical_zone_thread(const struct vdo *vdo,
++				       zone_count_t logical_zone,
++				       const char *name);
++
++void vdo_assert_on_physical_zone_thread(const struct vdo *vdo,
++					zone_count_t physical_zone,
++					const char *name);
++
++int __must_check vdo_get_physical_zone(const struct vdo *vdo,
++				       physical_block_number_t pbn,
++				       struct physical_zone **zone_ptr);
++
++void vdo_dump_status(const struct vdo *vdo);
++
++#endif /* VDO_H */
 -- 
 2.40.0
 
