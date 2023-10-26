@@ -2,194 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A2AC25B6B
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 00:15:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 787D7C25B48
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 08:52:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbjJZAP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Oct 2023 20:15:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53974 "EHLO
+        id S229658AbjJZIwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 04:52:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229583AbjJZAP2 (ORCPT
+        with ESMTP id S229642AbjJZIwy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Oct 2023 20:15:28 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AE5F410E;
-        Wed, 25 Oct 2023 17:15:26 -0700 (PDT)
-Received: from [10.137.106.151] (unknown [131.107.159.23])
-        by linux.microsoft.com (Postfix) with ESMTPSA id DC7A120B74C0;
-        Wed, 25 Oct 2023 17:15:25 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DC7A120B74C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1698279326;
-        bh=Ayg5mamt8HCVNY+t4GHPswTJfJb2ciVUg3Q8qdqL6WE=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=ovNPjhYAJE3PiwQsqnWOT8BVxfey4Ku6txfhhlOv+IbofSxRoW2I/UfuChbVmptfZ
-         OoqUvAEgfqDQMX460M6f1L4bM/7ro6HymGSEFoD4BIoEM+SpVEJLLY/mlmG8bdt1Cy
-         XGfyJLNcmoePkK24YClYdoBvr20aQVIi2uz0YWJo=
-Message-ID: <84f25e00-3a3a-419f-baea-50d64a1d5575@linux.microsoft.com>
-Date:   Wed, 25 Oct 2023 17:15:25 -0700
+        Thu, 26 Oct 2023 04:52:54 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A29A128;
+        Thu, 26 Oct 2023 01:52:52 -0700 (PDT)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SGKLk4Kfnz4f3k6R;
+        Thu, 26 Oct 2023 16:52:46 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+        by mail.maildlp.com (Postfix) with ESMTP id 88D1B1A016E;
+        Thu, 26 Oct 2023 16:52:48 +0800 (CST)
+Received: from [10.174.178.159] (unknown [10.174.178.159])
+        by APP4 (Coremail) with SMTP id gCh0CgCHHt7fKDplmvz0Dw--.39203S3;
+        Thu, 26 Oct 2023 16:52:48 +0800 (CST)
+Message-ID: <26bafe93-345d-2696-8ee7-7d1baa0e7eb7@huaweicloud.com>
+Date:   Thu, 26 Oct 2023 16:52:47 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v11 3/19] ipe: add evaluation loop
-Content-Language: en-US
-To:     Paul Moore <paul@paul-moore.com>, corbet@lwn.net,
-        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
-        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
-        agk@redhat.com, snitzer@kernel.org, eparis@redhat.com
-Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, audit@vger.kernel.org,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-References: <1696457386-3010-4-git-send-email-wufan@linux.microsoft.com>
- <aa226bdcba26d74304f6c10c290db840.paul@paul-moore.com>
-From:   Fan Wu <wufan@linux.microsoft.com>
-In-Reply-To: <aa226bdcba26d74304f6c10c290db840.paul@paul-moore.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH] block: Fix minor range check in device_add_disk()
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhongjinghua@huawei.com, yi.zhang@huawei.com, yukuai3@huawei.com
+References: <20231025084621.2338604-1-zhongjinghua@huaweicloud.com>
+ <119b7314-10a9-4d62-b40f-19462dc68009@I-love.SAKURA.ne.jp>
+From:   zhongjinghua <zhongjinghua@huaweicloud.com>
+In-Reply-To: <119b7314-10a9-4d62-b40f-19462dc68009@I-love.SAKURA.ne.jp>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCHHt7fKDplmvz0Dw--.39203S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUU5R7kC6x804xWl14x267AKxVW8JVW5JwAF
+        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
+        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
+        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
+        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
+        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26r
+        4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jUeOJUUU
+        UU=
+X-CM-SenderInfo: x2kr0wpmlqwxtxd6x35dzhxuhorxvhhfrp/
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+在 2023/10/25 18:06, Tetsuo Handa 写道:
+> On 2023/10/25 17:46, Zhong Jinghua wrote:
+>> Checks added in patch:
+>> commit e338924bd05d ("block: check minor range in device_add_disk()")
+>> ignore the problem of first_minore < 0 and disk->minors < 0.
+> What is the problem of first_minor < 0 or disk->minors < 0 ?
+> Are negative values legal/illegal ?
 
-On 10/23/2023 8:52 PM, Paul Moore wrote:
-> On Oct  4, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
->>
->> IPE must have a centralized function to evaluate incoming callers
->> against IPE's policy. This iteration of the policy for against the rules
->> for that specific caller is known as the evaluation loop.
->>
->> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
->> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-...
->> ---
->>   security/ipe/Makefile |  1 +
->>   security/ipe/eval.c   | 96 +++++++++++++++++++++++++++++++++++++++++++
->>   security/ipe/eval.h   | 24 +++++++++++
->>   3 files changed, 121 insertions(+)
->>   create mode 100644 security/ipe/eval.c
->>   create mode 100644 security/ipe/eval.h
-> 
-> ...
-> 
->> diff --git a/security/ipe/eval.c b/security/ipe/eval.c
->> new file mode 100644
->> index 000000000000..5533c359bbeb
->> --- /dev/null
->> +++ b/security/ipe/eval.c
->> @@ -0,0 +1,96 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Copyright (C) Microsoft Corporation. All rights reserved.
->> + */
->> +
->> +#include <linux/fs.h>
->> +#include <linux/types.h>
->> +#include <linux/slab.h>
->> +#include <linux/file.h>
->> +#include <linux/sched.h>
->> +#include <linux/rcupdate.h>
->> +
->> +#include "ipe.h"
->> +#include "eval.h"
->> +#include "policy.h"
->> +
->> +struct ipe_policy __rcu *ipe_active_policy;
->> +
->> +/**
->> + * evaluate_property - Analyze @ctx against a property.
->> + * @ctx: Supplies a pointer to the context to be evaluated.
->> + * @p: Supplies a pointer to the property to be evaluated.
->> + *
->> + * Return:
->> + * * true	- The current @ctx match the @p
->> + * * false	- The current @ctx doesn't match the @p
->> + */
->> +static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
->> +			      struct ipe_prop *p)
->> +{
->> +	return false;
->> +}
->> +
->> +/**
->> + * ipe_evaluate_event - Analyze @ctx against the current active policy.
->> + * @ctx: Supplies a pointer to the context to be evaluated.
->> + *
->> + * This is the loop where all policy evaluation happens against IPE policy.
->> + *
->> + * Return:
->> + * * 0		- OK
->> + * * -EACCES	- @ctx did not pass evaluation.
->> + * * !0		- Error
->> + */
->> +int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
->> +{
->> +	bool match = false;
->> +	enum ipe_action_type action;
->> +	struct ipe_policy *pol = NULL;
->> +	const struct ipe_rule *rule = NULL;
->> +	const struct ipe_op_table *rules = NULL;
->> +	struct ipe_prop *prop = NULL;
->> +
->> +	rcu_read_lock();
->> +
->> +	pol = rcu_dereference(ipe_active_policy);
->> +	if (!pol) {
->> +		rcu_read_unlock();
->> +		return 0;
->> +	}
->> +
->> +	if (ctx->op == IPE_OP_INVALID) {
->> +		rcu_read_unlock();
->> +		if (pol->parsed->global_default_action == IPE_ACTION_DENY)
->> +			return -EACCES;
-> 
-> Assuming that the RCU lock protects @pol, shouldn't it be held until
-> after the global_default_action comparison?
-> 
-Yes for this part the unlock should be moved after the comparison. 
-Thanks for spotting this.
+These two values are used as the secondary device number and the maximum number of partitions, which is illegal if negative. Then first_minore and disk->minors are signed numbers, and the sum may be less than MINORMASK to bypass the check.
 
->> +		return 0;
->> +	}
->> +
->> +	rules = &pol->parsed->rules[ctx->op];
->> +
->> +	list_for_each_entry(rule, &rules->rules, next) {
->> +		match = true;
->> +
->> +		list_for_each_entry(prop, &rule->props, next) {
->> +			match = match && evaluate_property(ctx, prop);
-> 
-> The @match variable will always be true on the right side above, or am
-> I missing something?
-> 
-Yes the "match &&" are completely unnecessary. I will remove them.
-
--Fan
->> +			if (!match)
->> +				break;
->> +		}
->> +
->> +		if (match)
->> +			break;
->> +	}
->> +
->> +	if (match)
->> +		action = rule->action;
->> +	else if (rules->default_action != IPE_ACTION_INVALID)
->> +		action = rules->default_action;
->> +	else
->> +		action = pol->parsed->global_default_action;
->> +
->> +	rcu_read_unlock();
->> +	if (action == IPE_ACTION_DENY)
->> +		return -EACCES;
->> +
->> +	return 0;
->> +}
-> 
-> --
-> paul-moore.com
