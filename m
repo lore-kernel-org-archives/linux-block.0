@@ -2,49 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AEDC25B6B
-	for <linux-block@archiver.kernel.org>; Wed, 25 Oct 2023 23:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09577C25B47
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 00:13:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjJYXp1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Oct 2023 19:45:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47006 "EHLO
+        id S229583AbjJZANB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Oct 2023 20:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbjJYXp0 (ORCPT
+        with ESMTP id S230021AbjJZAM7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Oct 2023 19:45:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC6892
-        for <linux-block@vger.kernel.org>; Wed, 25 Oct 2023 16:44:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698277478;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fRRiWcvSu7O2wHI18XO/8e5fxTg1mwMcO9kFULNLUJ8=;
-        b=SC4DcMPLCCKLR6OwuaGNDv0JaLOomuJIXj5sOdQ3cLQ2EkRjD2zu1SgkQws9Cq67n0BuLR
-        BmC8pjjDMJ/b+JliXHWbCbi/np/nv9Oc96G5IMo1vkWY5n6HRw88yawxJWfaKaQL65hj7S
-        moTuLSQg/K4yVNPtlDLMQSLz8oW7oRA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-298-anuM-sPDOlKNamihA20Ijg-1; Wed, 25 Oct 2023 19:44:35 -0400
-X-MC-Unique: anuM-sPDOlKNamihA20Ijg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D36B4185A782;
-        Wed, 25 Oct 2023 23:44:34 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F06AD2166B26;
-        Wed, 25 Oct 2023 23:44:30 +0000 (UTC)
-Date:   Thu, 26 Oct 2023 07:44:26 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org, axboe@kernel.dk, ming.lei@redhat.com
-Subject: Re: [PATCH v2] dm: respect REQ_NOWAIT flag in bios issued to DM
-Message-ID: <ZTmoWiulrM8Jx1Tc@fedora>
+        Wed, 25 Oct 2023 20:12:59 -0400
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09443111
+        for <linux-block@vger.kernel.org>; Wed, 25 Oct 2023 17:12:09 -0700 (PDT)
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-65af7d102b3so2212026d6.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Oct 2023 17:12:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698279127; x=1698883927;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wM1CuLYSLgK5vRspdwUuj4+qi4lx2wTNFAv8LpnsP6U=;
+        b=rjL2WUdVIcD+vKghc4AEINaX5fCGpHNxrslE6KNx04h+kQKnMqcheo11tVx/zIPVPs
+         E7oNo6LAy3iH1OKAL6uBHKfl3DNSeF8TADEMqz7eu5PcB5ThLT2lgexST3ofwIHZZbRY
+         s39lVtPT23NK/98R7SYOmXDp8A329QrlRsApTwYYGF0tkO3cwhd0gyyS3CKC7tcs1bmU
+         gJ3ByNPcnS5uLI3D/cyZY/rlNMfFyUV+t3nXh/InBeGJexFk7ghGrpC8xzDhv9EICH5Q
+         wAW9/R1ZNQvr3PaOfS7oABmoOJUBP3X1IDeS/tFV3eT52V/+CPzt84XI7ttdPvnrHEn0
+         YRwQ==
+X-Gm-Message-State: AOJu0YyqQfzLctYTQYgnMNDmyxHtReHnqFrzvsDQov4KfVO06lZInoZj
+        zJe7t0Ar/4hrd1SwdtG3a1jH
+X-Google-Smtp-Source: AGHT+IGpaNv543+vA9hjg88Wqz6YHfzDYTdd3puDcDZzuQGAnhETLGe5B/WQ21YpUSjN+oUDl4MQpQ==
+X-Received: by 2002:a05:6214:21a5:b0:66d:173a:aca7 with SMTP id t5-20020a05621421a500b0066d173aaca7mr17010829qvc.55.1698279127195;
+        Wed, 25 Oct 2023 17:12:07 -0700 (PDT)
+Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
+        by smtp.gmail.com with ESMTPSA id f7-20020ad45587000000b0066d1b4ce863sm4795191qvx.31.2023.10.25.17.12.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Oct 2023 17:12:06 -0700 (PDT)
+Date:   Wed, 25 Oct 2023 20:12:05 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: [PATCH v3] dm: respect REQ_NOWAIT flag in normal bios issued to DM
+Message-ID: <ZTmu1T5mf3Xgf0tR@redhat.com>
 References: <15ca26cc-174a-d4e8-9780-d09f8e5a6ea5@redhat.com>
  <ZTgFtseG3m3WPWn/@redhat.com>
  <e796de8-bac1-8f7a-c6eb-74d39aad8a2b@redhat.com>
@@ -54,61 +54,137 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <ZTlt0HPbVZf0gYcI@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 03:34:40PM -0400, Mike Snitzer wrote:
-> From: Mikulas Patocka <mpatocka@redhat.com>
-> 
-> Update DM core's IO submission to allocate required memory using
-> GFP_NOWAIT if REQ_NOWAIT is set.  Lone exception is in the error path
-> where DM's requeue support needs to allocate a clone bio in
-> dm_io_rewind() to allow the IO to be resubmitted: GFP_NOWAIT is used
-> first but if it fails GFP_NOIO is used as a last resort.
-> 
-> Tested with simple test provided in commit a9ce385344f916 ("dm: don't
-> attempt to queue IO under RCU protection") that was enhanced to check
-> error codes.  Also tested using fio's pvsync2 with nowait=1.
-> 
-> But testing with induced GFP_NOWAIT allocation failures wasn't
-> performed.
-> 
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> Co-developed-by: Mike Snitzer <snitzer@kernel.org>
-> Signed-off-by: Mike Snitzer <snitzer@kernel.org>
-> ---
->  drivers/md/dm-io-rewind.c | 13 ++++++--
->  drivers/md/dm.c           | 66 ++++++++++++++++++++++++++++++++-------
->  2 files changed, 65 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/md/dm-io-rewind.c b/drivers/md/dm-io-rewind.c
-> index 6155b0117c9d..bde5a53e2d88 100644
-> --- a/drivers/md/dm-io-rewind.c
-> +++ b/drivers/md/dm-io-rewind.c
-> @@ -143,8 +143,17 @@ static void dm_bio_rewind(struct bio *bio, unsigned int bytes)
->  void dm_io_rewind(struct dm_io *io, struct bio_set *bs)
->  {
->  	struct bio *orig = io->orig_bio;
-> -	struct bio *new_orig = bio_alloc_clone(orig->bi_bdev, orig,
-> -					       GFP_NOIO, bs);
-> +	struct bio *new_orig;
-> +
-> +	new_orig = bio_alloc_clone(orig->bi_bdev, orig, GFP_NOWAIT, bs);
-> +	if (unlikely(!new_orig)) {
-> +		/*
-> +		 * Returning early and failing rewind isn't an option, even
-> +		 * if orig has REQ_NOWAIT set, so retry alloc with GFP_NOIO.
-> +		 */
-> +		new_orig = bio_alloc_clone(orig->bi_bdev, orig, GFP_NOIO, bs);
-> +	}
+Update DM core's normal IO submission to allocate required memory
+using GFP_NOWAIT if REQ_NOWAIT is set.
 
-dm_bio_rewind() is only called in requeue work fn, so there shouldn't
-be issue with NOWAIT, cause upper IO submission code path won't be blocked
-by requeue.
+Tested with simple test provided in commit a9ce385344f916 ("dm: don't
+attempt to queue IO under RCU protection") that was enhanced to check
+error codes.  Also tested using fio's pvsync2 with nowait=1.
 
+But testing with induced GFP_NOWAIT allocation failures wasn't
+performed (yet).
 
-Thanks, 
-Ming
+Signed-off-by: Mike Snitzer <snitzer@kernel.org>
+---
+ drivers/md/dm.c | 50 ++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 37 insertions(+), 13 deletions(-)
+
+v3:
+- followed Mikulas's suggestion of only supporting NOWAIT for normal IO
+- changed attribution to me since basically all the code was rewritten
+- removed dm_io_rewind() changes thanks to Ming's reminder that DM's
+  requeue won't block IO submission because it is called from worker
+  (so it using GFP_NOIO is fine).
+
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 1113a8da3c47..609c68287158 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -570,13 +570,15 @@ static void dm_end_io_acct(struct dm_io *io)
+ 	dm_io_acct(io, true);
+ }
+ 
+-static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio)
++static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio, gfp_t gfp_mask)
+ {
+ 	struct dm_io *io;
+ 	struct dm_target_io *tio;
+ 	struct bio *clone;
+ 
+-	clone = bio_alloc_clone(NULL, bio, GFP_NOIO, &md->mempools->io_bs);
++	clone = bio_alloc_clone(NULL, bio, gfp_mask, &md->mempools->io_bs);
++	if (unlikely(!clone))
++		return NULL;
+ 	tio = clone_to_tio(clone);
+ 	tio->flags = 0;
+ 	dm_tio_set_flag(tio, DM_TIO_INSIDE_DM_IO);
+@@ -1714,10 +1716,6 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
+ 	if (unlikely(!ti))
+ 		return BLK_STS_IOERR;
+ 
+-	if (unlikely((ci->bio->bi_opf & REQ_NOWAIT) != 0) &&
+-	    unlikely(!dm_target_supports_nowait(ti->type)))
+-		return BLK_STS_NOTSUPP;
+-
+ 	if (unlikely(ci->is_abnormal_io))
+ 		return __process_abnormal_io(ci, ti);
+ 
+@@ -1729,7 +1727,17 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
+ 
+ 	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
+ 	setup_split_accounting(ci, len);
+-	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
++
++	if (unlikely(ci->bio->bi_opf & REQ_NOWAIT)) {
++		if (unlikely(!dm_target_supports_nowait(ti->type)))
++			return BLK_STS_NOTSUPP;
++
++		clone = alloc_tio(ci, ti, 0, &len, GFP_NOWAIT);
++		if (unlikely(!clone))
++			return BLK_STS_AGAIN;
++	} else {
++		clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
++	}
+ 	__map_bio(clone);
+ 
+ 	ci->sector += len;
+@@ -1738,11 +1746,11 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
+ 	return BLK_STS_OK;
+ }
+ 
+-static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
++static void init_clone_info(struct clone_info *ci, struct dm_io *io,
+ 			    struct dm_table *map, struct bio *bio, bool is_abnormal)
+ {
+ 	ci->map = map;
+-	ci->io = alloc_io(md, bio);
++	ci->io = io;
+ 	ci->bio = bio;
+ 	ci->is_abnormal_io = is_abnormal;
+ 	ci->submit_as_polled = false;
+@@ -1764,7 +1772,7 @@ static void dm_split_and_process_bio(struct mapped_device *md,
+ 	struct clone_info ci;
+ 	struct dm_io *io;
+ 	blk_status_t error = BLK_STS_OK;
+-	bool is_abnormal;
++	bool is_abnormal, is_preflush = !!(bio->bi_opf & REQ_PREFLUSH);
+ 
+ 	is_abnormal = is_abnormal_io(bio);
+ 	if (unlikely(is_abnormal)) {
+@@ -1777,10 +1785,26 @@ static void dm_split_and_process_bio(struct mapped_device *md,
+ 			return;
+ 	}
+ 
+-	init_clone_info(&ci, md, map, bio, is_abnormal);
+-	io = ci.io;
++	if (unlikely(bio->bi_opf & REQ_NOWAIT)) {
++		/* Only support nowait for normal IO */
++		if (unlikely(is_preflush || is_abnormal)) {
++			bio->bi_status = BLK_STS_NOTSUPP;
++			bio_endio(bio);
++			return;
++		}
+ 
+-	if (bio->bi_opf & REQ_PREFLUSH) {
++		io = alloc_io(md, bio, GFP_NOWAIT);
++		if (unlikely(!io)) {
++			/* Unable to do anything without dm_io. */
++			bio_wouldblock_error(bio);
++			return;
++		}
++	} else {
++		io = alloc_io(md, bio, GFP_NOIO);
++	}
++	init_clone_info(&ci, io, map, bio, is_abnormal);
++
++	if (is_preflush) {
+ 		__send_empty_flush(&ci);
+ 		/* dm_io_complete submits any data associated with flush */
+ 		goto out;
+-- 
+2.40.0
 
