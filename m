@@ -2,1602 +2,1475 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D536C27C4D
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED32C25B48
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344732AbjJZVob (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 17:44:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41014 "EHLO
+        id S1344943AbjJZVo3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 17:44:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344852AbjJZVoQ (ORCPT
+        with ESMTP id S1344898AbjJZVoQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 26 Oct 2023 17:44:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90CC0D50
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:46 -0700 (PDT)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF871B8
+        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698356505;
+        s=mimecast20190719; t=1698356502;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/0dcr44mbPyxQkR2N69CxYlN9/0nB+mfST+rvNkSC14=;
-        b=UKgOXuYAOsu5jY35kwHrk5gAD1QKwbfg79xJY1flP7zMd/QOxopg1VbLMSwrGSrW9NS3Cq
-        VlPhjcJkVnkU8wKRRI2lIYMG2aRASik5DAzgifS+UjOSMOCAIaiscBwVXflTQpfJ8xAEW+
-        Quo+qhmrG99kLWQaUOxr3NuxV9pEnG4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-345-lKpZFmbyPpSevIYSdXjWqw-1; Thu,
- 26 Oct 2023 17:41:43 -0400
-X-MC-Unique: lKpZFmbyPpSevIYSdXjWqw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        bh=6uwQsAPUU2XlcaXzxiM4B9xYonnTjsTiD+XSVq65RMI=;
+        b=KWANbUQEovZa5XPbJsMQhsrG89VaMSMHY/ciA5NQtwgrhINtEmExess3Del0pHtPmd3Wek
+        8JrLm+imgmC0uCiOcX52CgqmW47vwERaN1kGEOZpQ6O83lD4bHCzxQhXMGtZLSXNChBlSh
+        +RPCIu6uBPiSU7tqUvwReoBIxbtL9Ew=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-488-KbOqpmT6PP29tb8GzaZCag-1; Thu, 26 Oct 2023 17:41:40 -0400
+X-MC-Unique: KbOqpmT6PP29tb8GzaZCag-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 491323C0276C;
-        Thu, 26 Oct 2023 21:41:43 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E6C5088D186;
+        Thu, 26 Oct 2023 21:41:39 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 314AE2026D4C;
-        Thu, 26 Oct 2023 21:41:43 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CEA5E40C6F79;
+        Thu, 26 Oct 2023 21:41:39 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id D975D3003B; Thu, 26 Oct 2023 17:41:42 -0400 (EDT)
+        id 846A13003D; Thu, 26 Oct 2023 17:41:39 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 35/39] dm vdo: add statistics reporting
-Date:   Thu, 26 Oct 2023 17:41:32 -0400
-Message-Id: <20231026214136.1067410-36-msakai@redhat.com>
+Subject: [PATCH v4 16/39] dm vdo: implement external deduplication index interface
+Date:   Thu, 26 Oct 2023 17:41:13 -0400
+Message-Id: <20231026214136.1067410-17-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add data and methods to report statisics.
+The deduplication index interface for index clients includes the
+deduplication request and index session structures. This is the interface
+that the rest of the vdo target uses to make requests, receive responses,
+and collect statistics.
+
+This patch also adds sysfs nodes for inspecting various index properties at
+runtime.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Co-developed-by: Michael Sclafani <vdo-devel@redhat.com>
 Signed-off-by: Michael Sclafani <vdo-devel@redhat.com>
-Co-developed-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Co-developed-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
+Signed-off-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
+Co-developed-by: John Wiele <jwiele@redhat.com>
+Signed-off-by: John Wiele <jwiele@redhat.com>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/message-stats.c | 1215 +++++++++++++++++++++++++++++
- drivers/md/dm-vdo/message-stats.h |   13 +
- drivers/md/dm-vdo/statistics.h    |  278 +++++++
- 3 files changed, 1506 insertions(+)
- create mode 100644 drivers/md/dm-vdo/message-stats.c
- create mode 100644 drivers/md/dm-vdo/message-stats.h
- create mode 100644 drivers/md/dm-vdo/statistics.h
+ drivers/md/dm-vdo/index-session.c | 746 ++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/index-session.h |  84 ++++
+ drivers/md/dm-vdo/uds-sysfs.c     | 185 ++++++++
+ drivers/md/dm-vdo/uds-sysfs.h     |  12 +
+ drivers/md/dm-vdo/uds.h           | 328 +++++++++++++
+ 5 files changed, 1355 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/index-session.c
+ create mode 100644 drivers/md/dm-vdo/index-session.h
+ create mode 100644 drivers/md/dm-vdo/uds-sysfs.c
+ create mode 100644 drivers/md/dm-vdo/uds-sysfs.h
+ create mode 100644 drivers/md/dm-vdo/uds.h
 
-diff --git a/drivers/md/dm-vdo/message-stats.c b/drivers/md/dm-vdo/message-stats.c
+diff --git a/drivers/md/dm-vdo/index-session.c b/drivers/md/dm-vdo/index-session.c
 new file mode 100644
-index 000000000000..b91a841043eb
+index 000000000000..052ba093fbf1
 --- /dev/null
-+++ b/drivers/md/dm-vdo/message-stats.c
-@@ -0,0 +1,1215 @@
++++ b/drivers/md/dm-vdo/index-session.c
+@@ -0,0 +1,746 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#include "dedupe.h"
++#include "index-session.h"
++
++#include <linux/atomic.h>
++
++#include "index.h"
++#include "index-layout.h"
 +#include "logger.h"
 +#include "memory-alloc.h"
-+#include "message-stats.h"
-+#include "statistics.h"
-+#include "thread-device.h"
-+#include "vdo.h"
++#include "request-queue.h"
++#include "time-utils.h"
 +
-+static int write_u64(char *prefix,
-+		     u64 value,
-+		     char *suffix,
-+		     char **buf,
-+		     unsigned int *maxlen)
++/*
++ * The index session contains a lock (the request_mutex) which ensures that only one thread can
++ * change the state of its index at a time. The state field indicates the current state of the
++ * index through a set of descriptive flags. The request_mutex must be notified whenever a
++ * non-transient state flag is cleared. The request_mutex is also used to count the number of
++ * requests currently in progress so that they can be drained when suspending or closing the index.
++ *
++ * If the index session is suspended shortly after opening an index, it may have to suspend during
++ * a rebuild. Depending on the size of the index, a rebuild may take a significant amount of time,
++ * so UDS allows the rebuild to be paused in order to suspend the session in a timely manner. When
++ * the index session is resumed, the rebuild can continue from where it left off. If the index
++ * session is shut down with a suspended rebuild, the rebuild progress is abandoned and the rebuild
++ * will start from the beginning the next time the index is loaded. The mutex and status fields in
++ * the index_load_context are used to record the state of any interrupted rebuild.
++ */
++
++enum index_session_flag_bit {
++	IS_FLAG_BIT_START = 8,
++	/* The session has started loading an index but not completed it. */
++	IS_FLAG_BIT_LOADING = IS_FLAG_BIT_START,
++	/* The session has loaded an index, which can handle requests. */
++	IS_FLAG_BIT_LOADED,
++	/* The session's index has been permanently disabled. */
++	IS_FLAG_BIT_DISABLED,
++	/* The session's index is suspended. */
++	IS_FLAG_BIT_SUSPENDED,
++	/* The session is handling some index state change. */
++	IS_FLAG_BIT_WAITING,
++	/* The session's index is closing and draining requests. */
++	IS_FLAG_BIT_CLOSING,
++	/* The session is being destroyed and is draining requests. */
++	IS_FLAG_BIT_DESTROYING,
++};
++
++enum index_session_flag {
++	IS_FLAG_LOADED = (1 << IS_FLAG_BIT_LOADED),
++	IS_FLAG_LOADING = (1 << IS_FLAG_BIT_LOADING),
++	IS_FLAG_DISABLED = (1 << IS_FLAG_BIT_DISABLED),
++	IS_FLAG_SUSPENDED = (1 << IS_FLAG_BIT_SUSPENDED),
++	IS_FLAG_WAITING = (1 << IS_FLAG_BIT_WAITING),
++	IS_FLAG_CLOSING = (1 << IS_FLAG_BIT_CLOSING),
++	IS_FLAG_DESTROYING = (1 << IS_FLAG_BIT_DESTROYING),
++};
++
++/* Release a reference to an index session. */
++static void release_index_session(struct uds_index_session *index_session)
 +{
-+	int count = scnprintf(*buf, *maxlen, "%s%llu%s",
-+			      prefix == NULL ? "" : prefix,
-+			      value,
-+			      suffix == NULL ? "" : suffix);
-+	*buf += count;
-+	*maxlen -= count;
-+	if (count >= *maxlen)
-+		return VDO_UNEXPECTED_EOF;
-+	return VDO_SUCCESS;
++	uds_lock_mutex(&index_session->request_mutex);
++	if (--index_session->request_count == 0)
++		uds_broadcast_cond(&index_session->request_cond);
++	uds_unlock_mutex(&index_session->request_mutex);
 +}
 +
-+static int write_u32(char *prefix,
-+		     u32 value,
-+		     char *suffix,
-+		     char **buf,
-+		     unsigned int *maxlen)
++/*
++ * Acquire a reference to the index session for an asynchronous index request. The reference must
++ * eventually be released with a corresponding call to release_index_session().
++ */
++static int get_index_session(struct uds_index_session *index_session)
 +{
-+	int count = scnprintf(*buf, *maxlen, "%s%u%s",
-+			      prefix == NULL ? "" : prefix,
-+			      value,
-+			      suffix == NULL ? "" : suffix);
-+	*buf += count;
-+	*maxlen -= count;
-+	if (count >= *maxlen)
-+		return VDO_UNEXPECTED_EOF;
-+	return VDO_SUCCESS;
-+}
++	unsigned int state;
++	int result = UDS_SUCCESS;
 +
-+static int write_block_count_t(char *prefix,
-+			       block_count_t value,
-+			       char *suffix,
-+			       char **buf,
-+			       unsigned int *maxlen)
-+{
-+	int count = scnprintf(*buf, *maxlen, "%s%llu%s",
-+			      prefix == NULL ? "" : prefix,
-+			      value,
-+			      suffix == NULL ? "" : suffix);
-+	*buf += count;
-+	*maxlen -= count;
-+	if (count >= *maxlen)
-+		return VDO_UNEXPECTED_EOF;
-+	return VDO_SUCCESS;
-+}
++	uds_lock_mutex(&index_session->request_mutex);
++	index_session->request_count++;
++	state = index_session->state;
++	uds_unlock_mutex(&index_session->request_mutex);
 +
-+static int write_string(char *prefix,
-+			char *value,
-+			char *suffix,
-+			char **buf,
-+			unsigned int *maxlen)
-+{
-+	int count = scnprintf(*buf, *maxlen, "%s%s%s",
-+			      prefix == NULL ? "" : prefix,
-+			      value,
-+			      suffix == NULL ? "" : suffix);
-+	*buf += count;
-+	*maxlen -= count;
-+	if (count >= *maxlen)
-+		return VDO_UNEXPECTED_EOF;
-+	return VDO_SUCCESS;
-+}
++	if (state == IS_FLAG_LOADED) {
++		return UDS_SUCCESS;
++	} else if (state & IS_FLAG_DISABLED) {
++		result = UDS_DISABLED;
++	} else if ((state & IS_FLAG_LOADING) ||
++		   (state & IS_FLAG_SUSPENDED) ||
++		   (state & IS_FLAG_WAITING)) {
++		result = -EBUSY;
++	} else {
++		result = UDS_NO_INDEX;
++	}
 +
-+static int write_bool(char *prefix,
-+		      bool value,
-+		      char *suffix,
-+		      char **buf,
-+		      unsigned int *maxlen)
-+{
-+	int count = scnprintf(*buf, *maxlen, "%s%d%s",
-+			      prefix == NULL ? "" : prefix,
-+			      value,
-+			      suffix == NULL ? "" : suffix);
-+	*buf += count;
-+	*maxlen -= count;
-+	if (count >= *maxlen)
-+		return VDO_UNEXPECTED_EOF;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_u8(char *prefix,
-+		    u8 value,
-+		    char *suffix,
-+		    char **buf,
-+		    unsigned int *maxlen)
-+{
-+	int count = scnprintf(*buf, *maxlen, "%s%u%s",
-+			      prefix == NULL ? "" : prefix,
-+			      value,
-+			      suffix == NULL ? "" : suffix);
-+	*buf += count;
-+	*maxlen -= count;
-+	if (count >= *maxlen)
-+		return VDO_UNEXPECTED_EOF;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_block_allocator_statistics(char *prefix,
-+					    struct block_allocator_statistics *stats,
-+					    char *suffix,
-+					    char **buf,
-+					    unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The total number of slabs from which blocks may be allocated */
-+	result = write_u64("slabCount : ",
-+			   stats->slab_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The total number of slabs from which blocks have ever been allocated */
-+	result = write_u64("slabsOpened : ",
-+			   stats->slabs_opened,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The number of times since loading that a slab has been re-opened */
-+	result = write_u64("slabsReopened : ",
-+			   stats->slabs_reopened,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_commit_statistics(char *prefix,
-+				   struct commit_statistics *stats,
-+				   char *suffix,
-+				   char **buf,
-+				   unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The total number of items on which processing has started */
-+	result = write_u64("started : ",
-+			   stats->started,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The total number of items for which a write operation has been issued */
-+	result = write_u64("written : ",
-+			   stats->written,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The total number of items for which a write operation has completed */
-+	result = write_u64("committed : ",
-+			   stats->committed,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_recovery_journal_statistics(char *prefix,
-+					     struct recovery_journal_statistics *stats,
-+					     char *suffix,
-+					     char **buf,
-+					     unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times the on-disk journal was full */
-+	result = write_u64("diskFull : ",
-+			   stats->disk_full,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times the recovery journal requested slab journal commits. */
-+	result = write_u64("slabJournalCommitsRequested : ",
-+			   stats->slab_journal_commits_requested,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Write/Commit totals for individual journal entries */
-+	result = write_commit_statistics("entries : ",
-+					 &stats->entries,
-+					 ", ",
-+					 buf,
-+					 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Write/Commit totals for journal blocks */
-+	result = write_commit_statistics("blocks : ",
-+					 &stats->blocks,
-+					 ", ",
-+					 buf,
-+					 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_packer_statistics(char *prefix,
-+				   struct packer_statistics *stats,
-+				   char *suffix,
-+				   char **buf,
-+				   unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of compressed data items written since startup */
-+	result = write_u64("compressedFragmentsWritten : ",
-+			   stats->compressed_fragments_written,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of blocks containing compressed items written since startup */
-+	result = write_u64("compressedBlocksWritten : ",
-+			   stats->compressed_blocks_written,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of VIOs that are pending in the packer */
-+	result = write_u64("compressedFragmentsInPacker : ",
-+			   stats->compressed_fragments_in_packer,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_slab_journal_statistics(char *prefix,
-+					 struct slab_journal_statistics *stats,
-+					 char *suffix,
-+					 char **buf,
-+					 unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times the on-disk journal was full */
-+	result = write_u64("diskFullCount : ",
-+			   stats->disk_full_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times an entry was added over the flush threshold */
-+	result = write_u64("flushCount : ",
-+			   stats->flush_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times an entry was added over the block threshold */
-+	result = write_u64("blockedCount : ",
-+			   stats->blocked_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times a tail block was written */
-+	result = write_u64("blocksWritten : ",
-+			   stats->blocks_written,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times we had to wait for the tail to write */
-+	result = write_u64("tailBusyCount : ",
-+			   stats->tail_busy_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_slab_summary_statistics(char *prefix,
-+					 struct slab_summary_statistics *stats,
-+					 char *suffix,
-+					 char **buf,
-+					 unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of blocks written */
-+	result = write_u64("blocksWritten : ",
-+			   stats->blocks_written,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_ref_counts_statistics(char *prefix,
-+				       struct ref_counts_statistics *stats,
-+				       char *suffix,
-+				       char **buf,
-+				       unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of reference blocks written */
-+	result = write_u64("blocksWritten : ",
-+			   stats->blocks_written,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_block_map_statistics(char *prefix,
-+				      struct block_map_statistics *stats,
-+				      char *suffix,
-+				      char **buf,
-+				      unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of dirty (resident) pages */
-+	result = write_u32("dirtyPages : ",
-+			   stats->dirty_pages,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of clean (resident) pages */
-+	result = write_u32("cleanPages : ",
-+			   stats->clean_pages,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of free pages */
-+	result = write_u32("freePages : ",
-+			   stats->free_pages,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of pages in failed state */
-+	result = write_u32("failedPages : ",
-+			   stats->failed_pages,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of pages incoming */
-+	result = write_u32("incomingPages : ",
-+			   stats->incoming_pages,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of pages outgoing */
-+	result = write_u32("outgoingPages : ",
-+			   stats->outgoing_pages,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* how many times free page not avail */
-+	result = write_u32("cachePressure : ",
-+			   stats->cache_pressure,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of get_vdo_page() calls for read */
-+	result = write_u64("readCount : ",
-+			   stats->read_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of get_vdo_page() calls for write */
-+	result = write_u64("writeCount : ",
-+			   stats->write_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of times pages failed to read */
-+	result = write_u64("failedReads : ",
-+			   stats->failed_reads,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of times pages failed to write */
-+	result = write_u64("failedWrites : ",
-+			   stats->failed_writes,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of gets that are reclaimed */
-+	result = write_u64("reclaimed : ",
-+			   stats->reclaimed,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of gets for outgoing pages */
-+	result = write_u64("readOutgoing : ",
-+			   stats->read_outgoing,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of gets that were already there */
-+	result = write_u64("foundInCache : ",
-+			   stats->found_in_cache,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of gets requiring discard */
-+	result = write_u64("discardRequired : ",
-+			   stats->discard_required,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of gets enqueued for their page */
-+	result = write_u64("waitForPage : ",
-+			   stats->wait_for_page,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of gets that have to fetch */
-+	result = write_u64("fetchRequired : ",
-+			   stats->fetch_required,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of page fetches */
-+	result = write_u64("pagesLoaded : ",
-+			   stats->pages_loaded,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of page saves */
-+	result = write_u64("pagesSaved : ",
-+			   stats->pages_saved,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* the number of flushes issued */
-+	result = write_u64("flushCount : ",
-+			   stats->flush_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_hash_lock_statistics(char *prefix,
-+				      struct hash_lock_statistics *stats,
-+				      char *suffix,
-+				      char **buf,
-+				      unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times the UDS advice proved correct */
-+	result = write_u64("dedupeAdviceValid : ",
-+			   stats->dedupe_advice_valid,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times the UDS advice proved incorrect */
-+	result = write_u64("dedupeAdviceStale : ",
-+			   stats->dedupe_advice_stale,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of writes with the same data as another in-flight write */
-+	result = write_u64("concurrentDataMatches : ",
-+			   stats->concurrent_data_matches,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of writes whose hash collided with an in-flight write */
-+	result = write_u64("concurrentHashCollisions : ",
-+			   stats->concurrent_hash_collisions,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Current number of dedupe queries that are in flight */
-+	result = write_u32("currDedupeQueries : ",
-+			   stats->curr_dedupe_queries,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_error_statistics(char *prefix,
-+				  struct error_statistics *stats,
-+				  char *suffix,
-+				  char **buf,
-+				  unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of times VDO got an invalid dedupe advice PBN from UDS */
-+	result = write_u64("invalidAdvicePBNCount : ",
-+			   stats->invalid_advice_pbn_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of times a VIO completed with a VDO_NO_SPACE error */
-+	result = write_u64("noSpaceErrorCount : ",
-+			   stats->no_space_error_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of times a VIO completed with a VDO_READ_ONLY error */
-+	result = write_u64("readOnlyErrorCount : ",
-+			   stats->read_only_error_count,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_bio_stats(char *prefix,
-+			   struct bio_stats *stats,
-+			   char *suffix,
-+			   char **buf,
-+			   unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of REQ_OP_READ bios */
-+	result = write_u64("read : ",
-+			   stats->read,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of REQ_OP_WRITE bios with data */
-+	result = write_u64("write : ",
-+			   stats->write,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of bios tagged with REQ_PREFLUSH and containing no data */
-+	result = write_u64("emptyFlush : ",
-+			   stats->empty_flush,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of REQ_OP_DISCARD bios */
-+	result = write_u64("discard : ",
-+			   stats->discard,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of bios tagged with REQ_PREFLUSH */
-+	result = write_u64("flush : ",
-+			   stats->flush,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of bios tagged with REQ_FUA */
-+	result = write_u64("fua : ",
-+			   stats->fua,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_memory_usage(char *prefix,
-+			      struct memory_usage *stats,
-+			      char *suffix,
-+			      char **buf,
-+			      unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Tracked bytes currently allocated. */
-+	result = write_u64("bytesUsed : ",
-+			   stats->bytes_used,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Maximum tracked bytes allocated. */
-+	result = write_u64("peakBytesUsed : ",
-+			   stats->peak_bytes_used,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_index_statistics(char *prefix,
-+				  struct index_statistics *stats,
-+				  char *suffix,
-+				  char **buf,
-+				  unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of records stored in the index */
-+	result = write_u64("entriesIndexed : ",
-+			   stats->entries_indexed,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of post calls that found an existing entry */
-+	result = write_u64("postsFound : ",
-+			   stats->posts_found,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of post calls that added a new entry */
-+	result = write_u64("postsNotFound : ",
-+			   stats->posts_not_found,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of query calls that found an existing entry */
-+	result = write_u64("queriesFound : ",
-+			   stats->queries_found,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of query calls that added a new entry */
-+	result = write_u64("queriesNotFound : ",
-+			   stats->queries_not_found,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of update calls that found an existing entry */
-+	result = write_u64("updatesFound : ",
-+			   stats->updates_found,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of update calls that added a new entry */
-+	result = write_u64("updatesNotFound : ",
-+			   stats->updates_not_found,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of entries discarded */
-+	result = write_u64("entriesDiscarded : ",
-+			   stats->entries_discarded,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+static int write_vdo_statistics(char *prefix,
-+				struct vdo_statistics *stats,
-+				char *suffix,
-+				char **buf,
-+				unsigned int *maxlen)
-+{
-+	int result;
-+
-+	result = write_string(prefix, "{ ", NULL, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_u32("version : ",
-+			   stats->version,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of blocks used for data */
-+	result = write_u64("dataBlocksUsed : ",
-+			   stats->data_blocks_used,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of blocks used for VDO metadata */
-+	result = write_u64("overheadBlocksUsed : ",
-+			   stats->overhead_blocks_used,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of logical blocks that are currently mapped to physical blocks */
-+	result = write_u64("logicalBlocksUsed : ",
-+			   stats->logical_blocks_used,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of physical blocks */
-+	result = write_block_count_t("physicalBlocks : ",
-+				     stats->physical_blocks,
-+				     ", ",
-+				     buf,
-+				     maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* number of logical blocks */
-+	result = write_block_count_t("logicalBlocks : ",
-+				     stats->logical_blocks,
-+				     ", ",
-+				     buf,
-+				     maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Size of the block map page cache, in bytes */
-+	result = write_u64("blockMapCacheSize : ",
-+			   stats->block_map_cache_size,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The physical block size */
-+	result = write_u64("blockSize : ",
-+			   stats->block_size,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times the VDO has successfully recovered */
-+	result = write_u64("completeRecoveries : ",
-+			   stats->complete_recoveries,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times the VDO has recovered from read-only mode */
-+	result = write_u64("readOnlyRecoveries : ",
-+			   stats->read_only_recoveries,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* String describing the operating mode of the VDO */
-+	result = write_string("mode : ",
-+			      stats->mode,
-+			      ", ",
-+			      buf,
-+			      maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Whether the VDO is in recovery mode */
-+	result = write_bool("inRecoveryMode : ",
-+			    stats->in_recovery_mode,
-+			    ", ",
-+			    buf,
-+			    maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* What percentage of recovery mode work has been completed */
-+	result = write_u8("recoveryPercentage : ",
-+			  stats->recovery_percentage,
-+			  ", ",
-+			  buf,
-+			  maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The statistics for the compressed block packer */
-+	result = write_packer_statistics("packer : ",
-+					 &stats->packer,
-+					 ", ",
-+					 buf,
-+					 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Counters for events in the block allocator */
-+	result = write_block_allocator_statistics("allocator : ",
-+						  &stats->allocator,
-+						  ", ",
-+						  buf,
-+						  maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Counters for events in the recovery journal */
-+	result = write_recovery_journal_statistics("journal : ",
-+						   &stats->journal,
-+						   ", ",
-+						   buf,
-+						   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The statistics for the slab journals */
-+	result = write_slab_journal_statistics("slabJournal : ",
-+					       &stats->slab_journal,
-+					       ", ",
-+					       buf,
-+					       maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The statistics for the slab summary */
-+	result = write_slab_summary_statistics("slabSummary : ",
-+					       &stats->slab_summary,
-+					       ", ",
-+					       buf,
-+					       maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The statistics for the reference counts */
-+	result = write_ref_counts_statistics("refCounts : ",
-+					     &stats->ref_counts,
-+					     ", ",
-+					     buf,
-+					     maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The statistics for the block map */
-+	result = write_block_map_statistics("blockMap : ",
-+					    &stats->block_map,
-+					    ", ",
-+					    buf,
-+					    maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The dedupe statistics from hash locks */
-+	result = write_hash_lock_statistics("hashLock : ",
-+					    &stats->hash_lock,
-+					    ", ",
-+					    buf,
-+					    maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Counts of error conditions */
-+	result = write_error_statistics("errors : ",
-+					&stats->errors,
-+					", ",
-+					buf,
-+					maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The VDO instance */
-+	result = write_u32("instance : ",
-+			   stats->instance,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Current number of active VIOs */
-+	result = write_u32("currentVIOsInProgress : ",
-+			   stats->current_vios_in_progress,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Maximum number of active VIOs */
-+	result = write_u32("maxVIOs : ",
-+			   stats->max_vios,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of times the UDS index was too slow in responding */
-+	result = write_u64("dedupeAdviceTimeouts : ",
-+			   stats->dedupe_advice_timeouts,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Number of flush requests submitted to the storage device */
-+	result = write_u64("flushOut : ",
-+			   stats->flush_out,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Logical block size */
-+	result = write_u64("logicalBlockSize : ",
-+			   stats->logical_block_size,
-+			   ", ",
-+			   buf,
-+			   maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Bios submitted into VDO from above */
-+	result = write_bio_stats("biosIn : ",
-+				 &stats->bios_in,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosInPartial : ",
-+				 &stats->bios_in_partial,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Bios submitted onward for user data */
-+	result = write_bio_stats("biosOut : ",
-+				 &stats->bios_out,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Bios submitted onward for metadata */
-+	result = write_bio_stats("biosMeta : ",
-+				 &stats->bios_meta,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosJournal : ",
-+				 &stats->bios_journal,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosPageCache : ",
-+				 &stats->bios_page_cache,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosOutCompleted : ",
-+				 &stats->bios_out_completed,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosMetaCompleted : ",
-+				 &stats->bios_meta_completed,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosJournalCompleted : ",
-+				 &stats->bios_journal_completed,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosPageCacheCompleted : ",
-+				 &stats->bios_page_cache_completed,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosAcknowledged : ",
-+				 &stats->bios_acknowledged,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_bio_stats("biosAcknowledgedPartial : ",
-+				 &stats->bios_acknowledged_partial,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Current number of bios in progress */
-+	result = write_bio_stats("biosInProgress : ",
-+				 &stats->bios_in_progress,
-+				 ", ",
-+				 buf,
-+				 maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* Memory usage stats. */
-+	result = write_memory_usage("memoryUsage : ",
-+				    &stats->memory_usage,
-+				    ", ",
-+				    buf,
-+				    maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	/* The statistics for the UDS index */
-+	result = write_index_statistics("index : ",
-+					&stats->index,
-+					", ",
-+					buf,
-+					maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	result = write_string(NULL, "}", suffix, buf, maxlen);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+	return VDO_SUCCESS;
-+}
-+
-+int vdo_write_stats(struct vdo *vdo,
-+		    char *buf,
-+		    unsigned int maxlen)
-+{
-+	struct vdo_statistics *stats;
-+	int result;
-+
-+	result = UDS_ALLOCATE(1, struct vdo_statistics, __func__, &stats);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	vdo_fetch_statistics(vdo, stats);
-+	result = write_vdo_statistics(NULL, stats, NULL, &buf, &maxlen);
-+	UDS_FREE(stats);
++	release_index_session(index_session);
 +	return result;
 +}
-diff --git a/drivers/md/dm-vdo/message-stats.h b/drivers/md/dm-vdo/message-stats.h
++
++int uds_launch_request(struct uds_request *request)
++{
++	size_t internal_size;
++	int result;
++
++	if (request->callback == NULL) {
++		uds_log_error("missing required callback");
++		return -EINVAL;
++	}
++
++	switch (request->type) {
++	case UDS_DELETE:
++	case UDS_POST:
++	case UDS_QUERY:
++	case UDS_QUERY_NO_UPDATE:
++	case UDS_UPDATE:
++		break;
++	default:
++		uds_log_error("received invalid callback type");
++		return -EINVAL;
++	}
++
++	/* Reset all internal fields before processing. */
++	internal_size = sizeof(struct uds_request) - offsetof(struct uds_request, zone_number);
++	// FIXME should be using struct_group for this instead
++	memset((char *) request + sizeof(*request) - internal_size, 0, internal_size);
++
++	result = get_index_session(request->session);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	request->found = false;
++	request->unbatched = false;
++	request->index = request->session->index;
++
++	uds_enqueue_request(request, STAGE_TRIAGE);
++	return UDS_SUCCESS;
++}
++
++static void enter_callback_stage(struct uds_request *request)
++{
++	if (request->status != UDS_SUCCESS) {
++		/* All request errors are considered unrecoverable */
++		uds_lock_mutex(&request->session->request_mutex);
++		request->session->state |= IS_FLAG_DISABLED;
++		uds_unlock_mutex(&request->session->request_mutex);
++	}
++
++	uds_request_queue_enqueue(request->session->callback_queue, request);
++}
++
++static inline void count_once(u64 *count_ptr)
++{
++	WRITE_ONCE(*count_ptr, READ_ONCE(*count_ptr) + 1);
++}
++
++static void update_session_stats(struct uds_request *request)
++{
++	struct session_stats *session_stats = &request->session->stats;
++
++	count_once(&session_stats->requests);
++
++	switch (request->type) {
++	case UDS_POST:
++		if (request->found)
++			count_once(&session_stats->posts_found);
++		else
++			count_once(&session_stats->posts_not_found);
++
++		if (request->location == UDS_LOCATION_IN_OPEN_CHAPTER)
++			count_once(&session_stats->posts_found_open_chapter);
++		else if (request->location == UDS_LOCATION_IN_DENSE)
++			count_once(&session_stats->posts_found_dense);
++		else if (request->location == UDS_LOCATION_IN_SPARSE)
++			count_once(&session_stats->posts_found_sparse);
++		break;
++
++	case UDS_UPDATE:
++		if (request->found)
++			count_once(&session_stats->updates_found);
++		else
++			count_once(&session_stats->updates_not_found);
++		break;
++
++	case UDS_DELETE:
++		if (request->found)
++			count_once(&session_stats->deletions_found);
++		else
++			count_once(&session_stats->deletions_not_found);
++		break;
++
++	case UDS_QUERY:
++	case UDS_QUERY_NO_UPDATE:
++		if (request->found)
++			count_once(&session_stats->queries_found);
++		else
++			count_once(&session_stats->queries_not_found);
++		break;
++
++	default:
++		request->status = ASSERT(false, "unknown request type: %d", request->type);
++	}
++}
++
++static void handle_callbacks(struct uds_request *request)
++{
++	struct uds_index_session *index_session = request->session;
++
++	if (request->status == UDS_SUCCESS)
++		update_session_stats(request);
++
++	request->status = uds_map_to_system_error(request->status);
++	request->callback(request);
++	release_index_session(index_session);
++}
++
++static int __must_check make_empty_index_session(struct uds_index_session **index_session_ptr)
++{
++	int result;
++	struct uds_index_session *session;
++
++	result = UDS_ALLOCATE(1, struct uds_index_session, __func__, &session);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_init_mutex(&session->request_mutex);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(session);
++		return result;
++	}
++
++	result = uds_init_cond(&session->request_cond);
++	if (result != UDS_SUCCESS) {
++		uds_destroy_mutex(&session->request_mutex);
++		UDS_FREE(session);
++		return result;
++	}
++
++	result = uds_init_mutex(&session->load_context.mutex);
++	if (result != UDS_SUCCESS) {
++		uds_destroy_cond(&session->request_cond);
++		uds_destroy_mutex(&session->request_mutex);
++		UDS_FREE(session);
++		return result;
++	}
++
++	result = uds_init_cond(&session->load_context.cond);
++	if (result != UDS_SUCCESS) {
++		uds_destroy_mutex(&session->load_context.mutex);
++		uds_destroy_cond(&session->request_cond);
++		uds_destroy_mutex(&session->request_mutex);
++		UDS_FREE(session);
++		return result;
++	}
++
++	result = uds_make_request_queue("callbackW", &handle_callbacks, &session->callback_queue);
++	if (result != UDS_SUCCESS) {
++		uds_destroy_cond(&session->load_context.cond);
++		uds_destroy_mutex(&session->load_context.mutex);
++		uds_destroy_cond(&session->request_cond);
++		uds_destroy_mutex(&session->request_mutex);
++		UDS_FREE(session);
++		return result;
++	}
++
++	*index_session_ptr = session;
++	return UDS_SUCCESS;
++}
++
++int uds_create_index_session(struct uds_index_session **session)
++{
++	if (session == NULL) {
++		uds_log_error("missing session pointer");
++		return -EINVAL;
++	}
++
++	return uds_map_to_system_error(make_empty_index_session(session));
++}
++
++static int __must_check start_loading_index_session(struct uds_index_session *index_session)
++{
++	int result;
++
++	uds_lock_mutex(&index_session->request_mutex);
++	if (index_session->state & IS_FLAG_SUSPENDED) {
++		uds_log_info("Index session is suspended");
++		result = -EBUSY;
++	} else if (index_session->state != 0) {
++		uds_log_info("Index is already loaded");
++		result = -EBUSY;
++	} else {
++		index_session->state |= IS_FLAG_LOADING;
++		result = UDS_SUCCESS;
++	}
++	uds_unlock_mutex(&index_session->request_mutex);
++	return result;
++}
++
++static void finish_loading_index_session(struct uds_index_session *index_session, int result)
++{
++	uds_lock_mutex(&index_session->request_mutex);
++	index_session->state &= ~IS_FLAG_LOADING;
++	if (result == UDS_SUCCESS)
++		index_session->state |= IS_FLAG_LOADED;
++
++	uds_broadcast_cond(&index_session->request_cond);
++	uds_unlock_mutex(&index_session->request_mutex);
++}
++
++static int initialize_index_session(struct uds_index_session *index_session,
++				    enum uds_open_index_type open_type)
++{
++	int result;
++	struct configuration *config;
++
++	result = uds_make_configuration(&index_session->parameters, &config);
++	if (result != UDS_SUCCESS) {
++		uds_log_error_strerror(result, "Failed to allocate config");
++		return result;
++	}
++
++	memset(&index_session->stats, 0, sizeof(index_session->stats));
++	result = uds_make_index(config,
++				open_type,
++				&index_session->load_context,
++				enter_callback_stage,
++				&index_session->index);
++	if (result != UDS_SUCCESS)
++		uds_log_error_strerror(result, "Failed to make index");
++	else
++		uds_log_configuration(config);
++
++	uds_free_configuration(config);
++	return result;
++}
++
++static const char *get_open_type_string(enum uds_open_index_type open_type)
++{
++	switch (open_type) {
++	case UDS_CREATE:
++		return "creating index";
++	case UDS_LOAD:
++		return "loading or rebuilding index";
++	case UDS_NO_REBUILD:
++		return "loading index";
++	default:
++		return "unknown open method";
++	}
++}
++
++/*
++ * Open an index under the given session. This operation will fail if the
++ * index session is suspended, or if there is already an open index.
++ */
++int uds_open_index(enum uds_open_index_type open_type,
++		   const struct uds_parameters *parameters,
++		   struct uds_index_session *session)
++{
++	int result;
++	char name[BDEVNAME_SIZE];
++
++	if (parameters == NULL) {
++		uds_log_error("missing required parameters");
++		return -EINVAL;
++	}
++	if (parameters->bdev == NULL) {
++		uds_log_error("missing required block device");
++		return -EINVAL;
++	}
++	if (session == NULL) {
++		uds_log_error("missing required session pointer");
++		return -EINVAL;
++	}
++
++	result = start_loading_index_session(session);
++	if (result != UDS_SUCCESS)
++		return uds_map_to_system_error(result);
++
++	session->parameters = *parameters;
++	format_dev_t(name, parameters->bdev->bd_dev);
++	uds_log_notice("%s: %s", get_open_type_string(open_type), name);
++
++	result = initialize_index_session(session, open_type);
++	if (result != UDS_SUCCESS)
++		uds_log_error_strerror(result, "Failed %s", get_open_type_string(open_type));
++
++	finish_loading_index_session(session, result);
++	return uds_map_to_system_error(result);
++}
++
++static void wait_for_no_requests_in_progress(struct uds_index_session *index_session)
++{
++	uds_lock_mutex(&index_session->request_mutex);
++	while (index_session->request_count > 0)
++		uds_wait_cond(&index_session->request_cond, &index_session->request_mutex);
++	uds_unlock_mutex(&index_session->request_mutex);
++}
++
++static int __must_check save_index(struct uds_index_session *index_session)
++{
++	wait_for_no_requests_in_progress(index_session);
++	return uds_save_index(index_session->index);
++}
++
++static void suspend_rebuild(struct uds_index_session *session)
++{
++	uds_lock_mutex(&session->load_context.mutex);
++	switch (session->load_context.status) {
++	case INDEX_OPENING:
++		session->load_context.status = INDEX_SUSPENDING;
++
++		/* Wait until the index indicates that it is not replaying. */
++		while ((session->load_context.status != INDEX_SUSPENDED) &&
++		       (session->load_context.status != INDEX_READY))
++			uds_wait_cond(&session->load_context.cond,
++				      &session->load_context.mutex);
++		break;
++
++	case INDEX_READY:
++		/* Index load does not need to be suspended. */
++		break;
++
++	case INDEX_SUSPENDED:
++	case INDEX_SUSPENDING:
++	case INDEX_FREEING:
++	default:
++		/* These cases should not happen. */
++		ASSERT_LOG_ONLY(false, "Bad load context state %u", session->load_context.status);
++		break;
++	}
++	uds_unlock_mutex(&session->load_context.mutex);
++}
++
++/*
++ * Suspend index operation, draining all current index requests and preventing new index requests
++ * from starting. Optionally saves all index data before returning.
++ */
++int uds_suspend_index_session(struct uds_index_session *session, bool save)
++{
++	int result = UDS_SUCCESS;
++	bool no_work = false;
++	bool rebuilding = false;
++
++	/* Wait for any current index state change to complete. */
++	uds_lock_mutex(&session->request_mutex);
++	while (session->state & IS_FLAG_CLOSING)
++		uds_wait_cond(&session->request_cond, &session->request_mutex);
++
++	if ((session->state & IS_FLAG_WAITING) || (session->state & IS_FLAG_DESTROYING)) {
++		no_work = true;
++		uds_log_info("Index session is already changing state");
++		result = -EBUSY;
++	} else if (session->state & IS_FLAG_SUSPENDED) {
++		no_work = true;
++	} else if (session->state & IS_FLAG_LOADING) {
++		session->state |= IS_FLAG_WAITING;
++		rebuilding = true;
++	} else if (session->state & IS_FLAG_LOADED) {
++		session->state |= IS_FLAG_WAITING;
++	} else {
++		no_work = true;
++		session->state |= IS_FLAG_SUSPENDED;
++		uds_broadcast_cond(&session->request_cond);
++	}
++	uds_unlock_mutex(&session->request_mutex);
++
++	if (no_work)
++		return uds_map_to_system_error(result);
++
++	if (rebuilding)
++		suspend_rebuild(session);
++	else if (save)
++		result = save_index(session);
++	else
++		result = uds_flush_index_session(session);
++
++	uds_lock_mutex(&session->request_mutex);
++	session->state &= ~IS_FLAG_WAITING;
++	session->state |= IS_FLAG_SUSPENDED;
++	uds_broadcast_cond(&session->request_cond);
++	uds_unlock_mutex(&session->request_mutex);
++	return uds_map_to_system_error(result);
++}
++
++static int replace_device(struct uds_index_session *session, struct block_device *bdev)
++{
++	int result;
++
++	result = uds_replace_index_storage(session->index, bdev);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	session->parameters.bdev = bdev;
++	return UDS_SUCCESS;
++}
++
++/*
++ * Resume index operation after being suspended. If the index is suspended and the supplied block
++ * device differs from the current backing store, the index will start using the new backing store.
++ */
++int uds_resume_index_session(struct uds_index_session *session, struct block_device *bdev)
++{
++	int result = UDS_SUCCESS;
++	bool no_work = false;
++	bool resume_replay = false;
++
++	uds_lock_mutex(&session->request_mutex);
++	if (session->state & IS_FLAG_WAITING) {
++		uds_log_info("Index session is already changing state");
++		no_work = true;
++		result = -EBUSY;
++	} else if (!(session->state & IS_FLAG_SUSPENDED)) {
++		/* If not suspended, just succeed. */
++		no_work = true;
++		result = UDS_SUCCESS;
++	} else {
++		session->state |= IS_FLAG_WAITING;
++		if (session->state & IS_FLAG_LOADING)
++			resume_replay = true;
++	}
++	uds_unlock_mutex(&session->request_mutex);
++
++	if (no_work)
++		return result;
++
++	if ((session->index != NULL) && (bdev != session->parameters.bdev)) {
++		result = replace_device(session, bdev);
++		if (result != UDS_SUCCESS) {
++			uds_lock_mutex(&session->request_mutex);
++			session->state &= ~IS_FLAG_WAITING;
++			uds_broadcast_cond(&session->request_cond);
++			uds_unlock_mutex(&session->request_mutex);
++			return uds_map_to_system_error(result);
++		}
++	}
++
++	if (resume_replay) {
++		uds_lock_mutex(&session->load_context.mutex);
++		switch (session->load_context.status) {
++		case INDEX_SUSPENDED:
++			session->load_context.status = INDEX_OPENING;
++			/* Notify the index to start replaying again. */
++			uds_broadcast_cond(&session->load_context.cond);
++			break;
++
++		case INDEX_READY:
++			/* There is no index rebuild to resume. */
++			break;
++
++		case INDEX_OPENING:
++		case INDEX_SUSPENDING:
++		case INDEX_FREEING:
++		default:
++			/* These cases should not happen; do nothing. */
++			ASSERT_LOG_ONLY(false,
++					"Bad load context state %u",
++					session->load_context.status);
++			break;
++		}
++		uds_unlock_mutex(&session->load_context.mutex);
++	}
++
++	uds_lock_mutex(&session->request_mutex);
++	session->state &= ~IS_FLAG_WAITING;
++	session->state &= ~IS_FLAG_SUSPENDED;
++	uds_broadcast_cond(&session->request_cond);
++	uds_unlock_mutex(&session->request_mutex);
++	return UDS_SUCCESS;
++}
++
++static int save_and_free_index(struct uds_index_session *index_session)
++{
++	int result = UDS_SUCCESS;
++	bool suspended;
++	struct uds_index *index = index_session->index;
++
++	if (index == NULL)
++		return UDS_SUCCESS;
++
++	uds_lock_mutex(&index_session->request_mutex);
++	suspended = (index_session->state & IS_FLAG_SUSPENDED);
++	uds_unlock_mutex(&index_session->request_mutex);
++
++	if (!suspended) {
++		result = uds_save_index(index);
++		if (result != UDS_SUCCESS)
++			uds_log_warning_strerror(result, "ignoring error from save_index");
++	}
++	uds_free_index(index);
++	index_session->index = NULL;
++
++	/*
++	 * Reset all index state that happens to be in the index
++	 * session, so it doesn't affect any future index.
++	 */
++	uds_lock_mutex(&index_session->load_context.mutex);
++	index_session->load_context.status = INDEX_OPENING;
++	uds_unlock_mutex(&index_session->load_context.mutex);
++
++	uds_lock_mutex(&index_session->request_mutex);
++	/* Only the suspend bit will remain relevant. */
++	index_session->state &= IS_FLAG_SUSPENDED;
++	uds_unlock_mutex(&index_session->request_mutex);
++
++	return result;
++}
++
++/* Save and close the current index. */
++int uds_close_index(struct uds_index_session *index_session)
++{
++	int result = UDS_SUCCESS;
++
++	/* Wait for any current index state change to complete. */
++	uds_lock_mutex(&index_session->request_mutex);
++	while ((index_session->state & IS_FLAG_WAITING) ||
++	       (index_session->state & IS_FLAG_CLOSING))
++		uds_wait_cond(&index_session->request_cond, &index_session->request_mutex);
++
++	if (index_session->state & IS_FLAG_SUSPENDED) {
++		uds_log_info("Index session is suspended");
++		result = -EBUSY;
++	} else if ((index_session->state & IS_FLAG_DESTROYING) ||
++		   !(index_session->state & IS_FLAG_LOADED)) {
++		/* The index doesn't exist, hasn't finished loading, or is being destroyed. */
++		result = UDS_NO_INDEX;
++	} else {
++		index_session->state |= IS_FLAG_CLOSING;
++	}
++	uds_unlock_mutex(&index_session->request_mutex);
++	if (result != UDS_SUCCESS)
++		return uds_map_to_system_error(result);
++
++	uds_log_debug("Closing index");
++	wait_for_no_requests_in_progress(index_session);
++	result = save_and_free_index(index_session);
++	uds_log_debug("Closed index");
++
++	uds_lock_mutex(&index_session->request_mutex);
++	index_session->state &= ~IS_FLAG_CLOSING;
++	uds_broadcast_cond(&index_session->request_cond);
++	uds_unlock_mutex(&index_session->request_mutex);
++	return uds_map_to_system_error(result);
++}
++
++/* This will save and close an open index before destroying the session. */
++int uds_destroy_index_session(struct uds_index_session *index_session)
++{
++	int result;
++	bool load_pending = false;
++
++	uds_log_debug("Destroying index session");
++
++	/* Wait for any current index state change to complete. */
++	uds_lock_mutex(&index_session->request_mutex);
++	while ((index_session->state & IS_FLAG_WAITING) ||
++	       (index_session->state & IS_FLAG_CLOSING))
++		uds_wait_cond(&index_session->request_cond, &index_session->request_mutex);
++
++	if (index_session->state & IS_FLAG_DESTROYING) {
++		uds_unlock_mutex(&index_session->request_mutex);
++		uds_log_info("Index session is already closing");
++		return -EBUSY;
++	}
++
++	index_session->state |= IS_FLAG_DESTROYING;
++	load_pending = ((index_session->state & IS_FLAG_LOADING) &&
++			(index_session->state & IS_FLAG_SUSPENDED));
++	uds_unlock_mutex(&index_session->request_mutex);
++
++	if (load_pending) {
++		/* Tell the index to terminate the rebuild. */
++		uds_lock_mutex(&index_session->load_context.mutex);
++		if (index_session->load_context.status == INDEX_SUSPENDED) {
++			index_session->load_context.status = INDEX_FREEING;
++			uds_broadcast_cond(&index_session->load_context.cond);
++		}
++		uds_unlock_mutex(&index_session->load_context.mutex);
++
++		/* Wait until the load exits before proceeding. */
++		uds_lock_mutex(&index_session->request_mutex);
++		while (index_session->state & IS_FLAG_LOADING)
++			uds_wait_cond(&index_session->request_cond, &index_session->request_mutex);
++		uds_unlock_mutex(&index_session->request_mutex);
++	}
++
++	wait_for_no_requests_in_progress(index_session);
++	result = save_and_free_index(index_session);
++	uds_request_queue_finish(index_session->callback_queue);
++	index_session->callback_queue = NULL;
++	uds_destroy_cond(&index_session->load_context.cond);
++	uds_destroy_mutex(&index_session->load_context.mutex);
++	uds_destroy_cond(&index_session->request_cond);
++	uds_destroy_mutex(&index_session->request_mutex);
++	uds_log_debug("Destroyed index session");
++	UDS_FREE(index_session);
++	return uds_map_to_system_error(result);
++}
++
++/* Wait until all callbacks for index operations are complete. */
++int uds_flush_index_session(struct uds_index_session *index_session)
++{
++	wait_for_no_requests_in_progress(index_session);
++	uds_wait_for_idle_index(index_session->index);
++	return UDS_SUCCESS;
++}
++
++/* Statistics collection is intended to be thread-safe. */
++static void
++collect_stats(const struct uds_index_session *index_session, struct uds_index_stats *stats)
++{
++	const struct session_stats *session_stats = &index_session->stats;
++
++	stats->current_time = ktime_to_seconds(current_time_ns(CLOCK_REALTIME));
++	stats->posts_found = READ_ONCE(session_stats->posts_found);
++	stats->in_memory_posts_found = READ_ONCE(session_stats->posts_found_open_chapter);
++	stats->dense_posts_found = READ_ONCE(session_stats->posts_found_dense);
++	stats->sparse_posts_found = READ_ONCE(session_stats->posts_found_sparse);
++	stats->posts_not_found = READ_ONCE(session_stats->posts_not_found);
++	stats->updates_found = READ_ONCE(session_stats->updates_found);
++	stats->updates_not_found = READ_ONCE(session_stats->updates_not_found);
++	stats->deletions_found = READ_ONCE(session_stats->deletions_found);
++	stats->deletions_not_found = READ_ONCE(session_stats->deletions_not_found);
++	stats->queries_found = READ_ONCE(session_stats->queries_found);
++	stats->queries_not_found = READ_ONCE(session_stats->queries_not_found);
++	stats->requests = READ_ONCE(session_stats->requests);
++}
++
++int uds_get_index_session_stats(struct uds_index_session *index_session,
++				struct uds_index_stats *stats)
++{
++	if (stats == NULL) {
++		uds_log_error("received a NULL index stats pointer");
++		return -EINVAL;
++	}
++
++	collect_stats(index_session, stats);
++	if (index_session->index != NULL) {
++		uds_get_index_stats(index_session->index, stats);
++	} else {
++		stats->entries_indexed = 0;
++		stats->memory_used = 0;
++		stats->collisions = 0;
++		stats->entries_discarded = 0;
++	}
++
++	return UDS_SUCCESS;
++}
+diff --git a/drivers/md/dm-vdo/index-session.h b/drivers/md/dm-vdo/index-session.h
 new file mode 100644
-index 000000000000..f7fceca9acab
+index 000000000000..c77ee021d510
 --- /dev/null
-+++ b/drivers/md/dm-vdo/message-stats.h
-@@ -0,0 +1,13 @@
++++ b/drivers/md/dm-vdo/index-session.h
+@@ -0,0 +1,84 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef VDO_MESSAGE_STATS_H
-+#define VDO_MESSAGE_STATS_H
++#ifndef UDS_INDEX_SESSION_H
++#define UDS_INDEX_SESSION_H
 +
-+#include "types.h"
++#include <linux/atomic.h>
++#include <linux/cache.h>
 +
-+int vdo_write_stats(struct vdo *vdo, char *buf, unsigned int maxlen);
++#include "config.h"
++#include "uds-threads.h"
++#include "uds.h"
 +
-+#endif /* VDO_MESSAGE_STATS_H */
-diff --git a/drivers/md/dm-vdo/statistics.h b/drivers/md/dm-vdo/statistics.h
++/*
++ * The index session mediates all interactions with a UDS index. Once the index session is created,
++ * it can be used to open, close, suspend, or recreate an index. It implements the majority of the
++ * functions in the top-level UDS API.
++ *
++ * If any deduplication request fails due to an internal error, the index is marked disabled. It
++ * will not accept any further requests and can only be closed. Closing the index will clear the
++ * disabled flag, and the index can then be reopened and recovered using the same index session.
++ */
++
++struct __aligned(L1_CACHE_BYTES) session_stats {
++	/* Post requests that found an entry */
++	u64 posts_found;
++	/* Post requests found in the open chapter */
++	u64 posts_found_open_chapter;
++	/* Post requests found in the dense index */
++	u64 posts_found_dense;
++	/* Post requests found in the sparse index */
++	u64 posts_found_sparse;
++	/* Post requests that did not find an entry */
++	u64 posts_not_found;
++	/* Update requests that found an entry */
++	u64 updates_found;
++	/* Update requests that did not find an entry */
++	u64 updates_not_found;
++	/* Delete requests that found an entry */
++	u64 deletions_found;
++	/* Delete requests that did not find an entry */
++	u64 deletions_not_found;
++	/* Query requests that found an entry */
++	u64 queries_found;
++	/* Query requests that did not find an entry */
++	u64 queries_not_found;
++	/* Total number of requests */
++	u64 requests;
++};
++
++enum index_suspend_status {
++	/* An index load has started but the index is not ready for use. */
++	INDEX_OPENING = 0,
++	/* The index is able to handle requests. */
++	INDEX_READY,
++	/* The index is attempting to suspend a rebuild. */
++	INDEX_SUSPENDING,
++	/* An index rebuild has been suspended. */
++	INDEX_SUSPENDED,
++	/* An index rebuild is being stopped in order to shut down. */
++	INDEX_FREEING,
++};
++
++struct index_load_context {
++	struct mutex mutex;
++	struct cond_var cond;
++	enum index_suspend_status status;
++};
++
++struct uds_index_session {
++	unsigned int state;
++	struct uds_index *index;
++	struct uds_request_queue *callback_queue;
++	struct uds_parameters parameters;
++	struct index_load_context load_context;
++	struct mutex request_mutex;
++	struct cond_var request_cond;
++	int request_count;
++	struct session_stats stats;
++};
++
++#endif /* UDS_INDEX_SESSION_H */
+diff --git a/drivers/md/dm-vdo/uds-sysfs.c b/drivers/md/dm-vdo/uds-sysfs.c
 new file mode 100644
-index 000000000000..da8b6a7fe24f
+index 000000000000..8700a028a11c
 --- /dev/null
-+++ b/drivers/md/dm-vdo/statistics.h
-@@ -0,0 +1,278 @@
++++ b/drivers/md/dm-vdo/uds-sysfs.c
+@@ -0,0 +1,185 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright 2023 Red Hat
++ */
++
++#include "uds-sysfs.h"
++
++#include <linux/kobject.h>
++#include <linux/module.h>
++#include <linux/slab.h>
++
++#include "logger.h"
++#include "memory-alloc.h"
++#include "string-utils.h"
++#include "uds.h"
++
++#define UDS_SYSFS_NAME "uds"
++
++static struct {
++	/* /sys/uds */
++	struct kobject kobj;
++	/* /sys/uds/parameter */
++	struct kobject parameter_kobj;
++
++	/* These flags are used to ensure a clean shutdown */
++
++	/* /sys/uds flag */
++	bool flag;
++	/* /sys/uds/parameter flag */
++	bool parameter_flag;
++} object_root;
++
++static char *buffer_to_string(const char *buf, size_t length)
++{
++	char *string;
++
++	if (UDS_ALLOCATE(length + 1, char, __func__, &string) != UDS_SUCCESS)
++		return NULL;
++
++	memcpy(string, buf, length);
++	string[length] = '\0';
++	if (string[length - 1] == '\n')
++		string[length - 1] = '\0';
++
++	return string;
++}
++
++/*
++ * This is the code for any directory in the /sys/<module_name> tree that contains no regular files
++ * (only subdirectories).
++ */
++
++static void empty_release(struct kobject *kobj)
++{
++}
++
++static ssize_t empty_show(struct kobject *kobj, struct attribute *attr, char *buf)
++{
++	return 0;
++}
++
++static ssize_t
++empty_store(struct kobject *kobj, struct attribute *attr, const char *buf, size_t length)
++{
++	return length;
++}
++
++static const struct sysfs_ops empty_ops = {
++	.show = empty_show,
++	.store = empty_store,
++};
++
++static struct attribute *empty_attrs[] = {
++	NULL,
++};
++ATTRIBUTE_GROUPS(empty);
++
++static const struct kobj_type empty_object_type = {
++	.release = empty_release,
++	.sysfs_ops = &empty_ops,
++	.default_groups = empty_groups,
++};
++
++/*
++ * This is the code for the /sys/<module_name>/parameter directory.
++ * <dir>/log_level                 UDS_LOG_LEVEL
++ */
++
++struct parameter_attribute {
++	struct attribute attr;
++	const char *(*show_string)(void);
++	void (*store_string)(const char *string);
++};
++
++static ssize_t parameter_show(struct kobject *kobj, struct attribute *attr, char *buf)
++{
++	struct parameter_attribute *pa;
++
++	pa = container_of(attr, struct parameter_attribute, attr);
++	if (pa->show_string != NULL)
++		return sprintf(buf, "%s\n", pa->show_string());
++	else
++		return -EINVAL;
++}
++
++static ssize_t
++parameter_store(struct kobject *kobj, struct attribute *attr, const char *buf, size_t length)
++{
++	char *string;
++	struct parameter_attribute *pa;
++
++	pa = container_of(attr, struct parameter_attribute, attr);
++	if (pa->store_string == NULL)
++		return -EINVAL;
++	string = buffer_to_string(buf, length);
++	if (string == NULL)
++		return -ENOMEM;
++
++	pa->store_string(string);
++	UDS_FREE(string);
++	return length;
++}
++
++static const char *parameter_show_log_level(void)
++{
++	return uds_log_priority_to_string(uds_get_log_level());
++}
++
++static void parameter_store_log_level(const char *string)
++{
++	uds_set_log_level(uds_log_string_to_priority(string));
++}
++
++static struct parameter_attribute log_level_attr = {
++	.attr = { .name = "log_level", .mode = 0600 },
++	.show_string = parameter_show_log_level,
++	.store_string = parameter_store_log_level,
++};
++
++static struct attribute *parameter_attrs[] = {
++	&log_level_attr.attr,
++	NULL,
++};
++ATTRIBUTE_GROUPS(parameter);
++
++static const struct sysfs_ops parameter_ops = {
++	.show = parameter_show,
++	.store = parameter_store,
++};
++
++static const struct kobj_type parameter_object_type = {
++	.release = empty_release,
++	.sysfs_ops = &parameter_ops,
++	.default_groups = parameter_groups,
++};
++
++int uds_init_sysfs(void)
++{
++	int result;
++
++	memset(&object_root, 0, sizeof(object_root));
++	kobject_init(&object_root.kobj, &empty_object_type);
++	result = kobject_add(&object_root.kobj, NULL, UDS_SYSFS_NAME);
++	if (result == 0) {
++		object_root.flag = true;
++		kobject_init(&object_root.parameter_kobj, &parameter_object_type);
++		result = kobject_add(&object_root.parameter_kobj, &object_root.kobj, "parameter");
++		if (result == 0)
++			object_root.parameter_flag = true;
++	}
++
++	if (result != 0)
++		uds_put_sysfs();
++
++	return result;
++}
++
++void uds_put_sysfs(void)
++{
++	if (object_root.parameter_flag)
++		kobject_put(&object_root.parameter_kobj);
++
++	if (object_root.flag)
++		kobject_put(&object_root.kobj);
++}
+diff --git a/drivers/md/dm-vdo/uds-sysfs.h b/drivers/md/dm-vdo/uds-sysfs.h
+new file mode 100644
+index 000000000000..c3d00a7187bd
+--- /dev/null
++++ b/drivers/md/dm-vdo/uds-sysfs.h
+@@ -0,0 +1,12 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef STATISTICS_H
-+#define STATISTICS_H
++#ifndef UDS_SYSFS_H
++#define UDS_SYSFS_H
 +
-+#include "types.h"
++int uds_init_sysfs(void);
++void uds_put_sysfs(void);
++
++#endif  /* UDS_SYSFS_H */
+diff --git a/drivers/md/dm-vdo/uds.h b/drivers/md/dm-vdo/uds.h
+new file mode 100644
+index 000000000000..a02350165ab6
+--- /dev/null
++++ b/drivers/md/dm-vdo/uds.h
+@@ -0,0 +1,328 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright 2023 Red Hat
++ */
++
++#ifndef UDS_H
++#define UDS_H
++
++#include <linux/types.h>
++
++#include "funnel-queue.h"
++
++/*
++ * UDS public API
++ *
++ * The Universal Deduplication System (UDS) is an efficient name-value store. When used for
++ * deduplicating storage, the names are generally hashes of data blocks and the associated data is
++ * where that block is located on the underlying storage medium. The stored names are expected to
++ * be randomly distributed among the space of possible names. If this assumption is violated, the
++ * UDS index will store fewer names than normal but will otherwise continue to work. The data
++ * associated with each name can be any 16-byte value.
++ *
++ * A client must first create an index session to interact with an index. Once created, the session
++ * can be shared among multiple threads or users. When a session is destroyed, it will also close
++ * and save any associated index.
++ *
++ * To make a request, a client must allocate a uds_request structure and set the required fields
++ * before launching it. UDS will invoke the provided callback to complete the request. After the
++ * callback has been called, the uds_request structure can be freed or reused for a new request.
++ * There are five types of requests:
++ *
++ * A UDS_UPDATE request will associate the provided name with the provided data. Any previous data
++ * associated with that name will be discarded.
++ *
++ * A UDS_QUERY request will return the data associated with the provided name, if any. The entry
++ * for the name will also be marked as most recent, as if the data had been updated.
++ *
++ * A UDS_POST request is a combination of UDS_QUERY and UDS_UPDATE. If there is already data
++ * associated with the provided name, that data is returned. If there is no existing association,
++ * the name is associated with the newly provided data. This request is equivalent to a UDS_QUERY
++ * request followed by a UDS_UPDATE request if no data is found, but it is much more efficient.
++ *
++ * A UDS_QUERY_NO_UPDATE request will return the data associated with the provided name, but will
++ * not change the recency of the entry for the name. This request is primarily useful for testing,
++ * to determine whether an entry exists without changing the internal state of the index.
++ *
++ * A UDS_DELETE request removes any data associated with the provided name. This operation is
++ * generally not necessary, because the index will automatically discard its oldest entries once it
++ * becomes full.
++ */
++
++/* General UDS constants and structures */
++
++enum uds_request_type {
++	/* Create or update the mapping for a name, and make the name most recent. */
++	UDS_UPDATE,
++
++	/* Return any mapped data for a name, and make the name most recent. */
++	UDS_QUERY,
++
++	/*
++	 * Return any mapped data for a name, or map the provided data to the name if there is no
++	 * current data, and make the name most recent.
++	 */
++	UDS_POST,
++
++	/* Return any mapped data for a name without updating its recency. */
++	UDS_QUERY_NO_UPDATE,
++
++	/* Remove any mapping for a name. */
++	UDS_DELETE,
++
++};
++
++enum uds_open_index_type {
++	/* Create a new index. */
++	UDS_CREATE,
++
++	/* Load an existing index and try to recover if necessary. */
++	UDS_LOAD,
++
++	/* Load an existing index, but only if it was saved cleanly. */
++	UDS_NO_REBUILD,
++};
 +
 +enum {
-+	STATISTICS_VERSION = 36,
++	/* The record name size in bytes */
++	UDS_RECORD_NAME_SIZE = 16,
++	/* The maximum record data size in bytes */
++	UDS_RECORD_DATA_SIZE = 16,
 +};
 +
-+struct block_allocator_statistics {
-+	/** The total number of slabs from which blocks may be allocated */
-+	u64 slab_count;
-+	/** The total number of slabs from which blocks have ever been allocated */
-+	u64 slabs_opened;
-+	/** The number of times since loading that a slab has been re-opened */
-+	u64 slabs_reopened;
-+};
-+
-+/**
-+ * Counters for tracking the number of items written (blocks, requests, etc.)
-+ * that keep track of totals at steps in the write pipeline. Three counters
-+ * allow the number of buffered, in-memory items and the number of in-flight,
-+ * unacknowledged writes to be derived, while still tracking totals for
-+ * reporting purposes
++/*
++ * A type representing a UDS memory configuration which is either a positive integer number of
++ * gigabytes or one of the six special constants for configurations smaller than one gigabyte.
 + */
-+struct commit_statistics {
-+	/** The total number of items on which processing has started */
-+	u64 started;
-+	/** The total number of items for which a write operation has been issued */
-+	u64 written;
-+	/** The total number of items for which a write operation has completed */
-+	u64 committed;
++typedef int uds_memory_config_size_t;
++
++enum {
++	/* The maximum configurable amount of memory */
++	UDS_MEMORY_CONFIG_MAX = 1024,
++	/* Flag indicating that the index has one less chapter than usual */
++	UDS_MEMORY_CONFIG_REDUCED = 0x1000,
++	UDS_MEMORY_CONFIG_REDUCED_MAX = 1024 + UDS_MEMORY_CONFIG_REDUCED,
++	/* Special values indicating sizes less than 1 GB */
++	UDS_MEMORY_CONFIG_256MB = -256,
++	UDS_MEMORY_CONFIG_512MB = -512,
++	UDS_MEMORY_CONFIG_768MB = -768,
++	UDS_MEMORY_CONFIG_REDUCED_256MB = -1280,
++	UDS_MEMORY_CONFIG_REDUCED_512MB = -1536,
++	UDS_MEMORY_CONFIG_REDUCED_768MB = -1792,
 +};
 +
-+/** Counters for events in the recovery journal */
-+struct recovery_journal_statistics {
-+	/** Number of times the on-disk journal was full */
-+	u64 disk_full;
-+	/** Number of times the recovery journal requested slab journal commits. */
-+	u64 slab_journal_commits_requested;
-+	/** Write/Commit totals for individual journal entries */
-+	struct commit_statistics entries;
-+	/** Write/Commit totals for journal blocks */
-+	struct commit_statistics blocks;
++struct uds_record_name {
++	unsigned char name[UDS_RECORD_NAME_SIZE];
 +};
 +
-+/** The statistics for the compressed block packer. */
-+struct packer_statistics {
-+	/** Number of compressed data items written since startup */
-+	u64 compressed_fragments_written;
-+	/** Number of blocks containing compressed items written since startup */
-+	u64 compressed_blocks_written;
-+	/** Number of VIOs that are pending in the packer */
-+	u64 compressed_fragments_in_packer;
++struct uds_record_data {
++	unsigned char data[UDS_RECORD_DATA_SIZE];
 +};
 +
-+/** The statistics for the slab journals. */
-+struct slab_journal_statistics {
-+	/** Number of times the on-disk journal was full */
-+	u64 disk_full_count;
-+	/** Number of times an entry was added over the flush threshold */
-+	u64 flush_count;
-+	/** Number of times an entry was added over the block threshold */
-+	u64 blocked_count;
-+	/** Number of times a tail block was written */
-+	u64 blocks_written;
-+	/** Number of times we had to wait for the tail to write */
-+	u64 tail_busy_count;
++struct uds_volume_record {
++	struct uds_record_name name;
++	struct uds_record_data data;
 +};
 +
-+/** The statistics for the slab summary. */
-+struct slab_summary_statistics {
-+	/** Number of blocks written */
-+	u64 blocks_written;
++struct uds_parameters {
++	/* The block_device used for storage */
++	struct block_device *bdev;
++	/* The maximum allowable size of the index on storage */
++	size_t size;
++	/* The offset where the index should start */
++	off_t offset;
++	/* The maximum memory allocation, in GB */
++	uds_memory_config_size_t memory_size;
++	/* Whether the index should include sparse chapters */
++	bool sparse;
++	/* A 64-bit nonce to validate the index */
++	u64 nonce;
++	/* The number of threads used to process index requests */
++	unsigned int zone_count;
++	/* The number of threads used to read volume pages */
++	unsigned int read_threads;
 +};
 +
-+/** The statistics for the reference counts. */
-+struct ref_counts_statistics {
-+	/** Number of reference blocks written */
-+	u64 blocks_written;
-+};
-+
-+/** The statistics for the block map. */
-+struct block_map_statistics {
-+	/** number of dirty (resident) pages */
-+	u32 dirty_pages;
-+	/** number of clean (resident) pages */
-+	u32 clean_pages;
-+	/** number of free pages */
-+	u32 free_pages;
-+	/** number of pages in failed state */
-+	u32 failed_pages;
-+	/** number of pages incoming */
-+	u32 incoming_pages;
-+	/** number of pages outgoing */
-+	u32 outgoing_pages;
-+	/** how many times free page not avail */
-+	u32 cache_pressure;
-+	/** number of get_vdo_page() calls for read */
-+	u64 read_count;
-+	/** number of get_vdo_page() calls for write */
-+	u64 write_count;
-+	/** number of times pages failed to read */
-+	u64 failed_reads;
-+	/** number of times pages failed to write */
-+	u64 failed_writes;
-+	/** number of gets that are reclaimed */
-+	u64 reclaimed;
-+	/** number of gets for outgoing pages */
-+	u64 read_outgoing;
-+	/** number of gets that were already there */
-+	u64 found_in_cache;
-+	/** number of gets requiring discard */
-+	u64 discard_required;
-+	/** number of gets enqueued for their page */
-+	u64 wait_for_page;
-+	/** number of gets that have to fetch */
-+	u64 fetch_required;
-+	/** number of page fetches */
-+	u64 pages_loaded;
-+	/** number of page saves */
-+	u64 pages_saved;
-+	/** the number of flushes issued */
-+	u64 flush_count;
-+};
-+
-+/** The dedupe statistics from hash locks */
-+struct hash_lock_statistics {
-+	/** Number of times the UDS advice proved correct */
-+	u64 dedupe_advice_valid;
-+	/** Number of times the UDS advice proved incorrect */
-+	u64 dedupe_advice_stale;
-+	/** Number of writes with the same data as another in-flight write */
-+	u64 concurrent_data_matches;
-+	/** Number of writes whose hash collided with an in-flight write */
-+	u64 concurrent_hash_collisions;
-+	/** Current number of dedupe queries that are in flight */
-+	u32 curr_dedupe_queries;
-+};
-+
-+/** Counts of error conditions in VDO. */
-+struct error_statistics {
-+	/** number of times VDO got an invalid dedupe advice PBN from UDS */
-+	u64 invalid_advice_pbn_count;
-+	/** number of times a VIO completed with a VDO_NO_SPACE error */
-+	u64 no_space_error_count;
-+	/** number of times a VIO completed with a VDO_READ_ONLY error */
-+	u64 read_only_error_count;
-+};
-+
-+struct bio_stats {
-+	/** Number of REQ_OP_READ bios */
-+	u64 read;
-+	/** Number of REQ_OP_WRITE bios with data */
-+	u64 write;
-+	/** Number of bios tagged with REQ_PREFLUSH and containing no data */
-+	u64 empty_flush;
-+	/** Number of REQ_OP_DISCARD bios */
-+	u64 discard;
-+	/** Number of bios tagged with REQ_PREFLUSH */
-+	u64 flush;
-+	/** Number of bios tagged with REQ_FUA */
-+	u64 fua;
-+};
-+
-+struct memory_usage {
-+	/** Tracked bytes currently allocated. */
-+	u64 bytes_used;
-+	/** Maximum tracked bytes allocated. */
-+	u64 peak_bytes_used;
-+};
-+
-+/** UDS index statistics */
-+struct index_statistics {
-+	/** Number of records stored in the index */
++/*
++ * These statistics capture characteristics of the current index, including resource usage and
++ * requests processed since the index was opened.
++ */
++struct uds_index_stats {
++	/* The total number of records stored in the index */
 +	u64 entries_indexed;
-+	/** Number of post calls that found an existing entry */
-+	u64 posts_found;
-+	/** Number of post calls that added a new entry */
-+	u64 posts_not_found;
-+	/** Number of query calls that found an existing entry */
-+	u64 queries_found;
-+	/** Number of query calls that added a new entry */
-+	u64 queries_not_found;
-+	/** Number of update calls that found an existing entry */
-+	u64 updates_found;
-+	/** Number of update calls that added a new entry */
-+	u64 updates_not_found;
-+	/** Number of entries discarded */
++	/* An estimate of the index's memory usage, in bytes */
++	u64 memory_used;
++	/* The number of collisions recorded in the volume index */
++	u64 collisions;
++	/* The number of entries discarded from the index since startup */
 +	u64 entries_discarded;
++	/* The time at which these statistics were fetched */
++	s64 current_time;
++	/* The number of post calls that found an existing entry */
++	u64 posts_found;
++	/* The number of post calls that added an entry */
++	u64 posts_not_found;
++	/*
++	 * The number of post calls that found an existing entry that is current enough to only
++	 * exist in memory and not have been committed to disk yet
++	 */
++	u64 in_memory_posts_found;
++	/*
++	 * The number of post calls that found an existing entry in the dense portion of the index
++	 */
++	u64 dense_posts_found;
++	/*
++	 * The number of post calls that found an existing entry in the sparse portion of the index
++	 */
++	u64 sparse_posts_found;
++	/* The number of update calls that updated an existing entry */
++	u64 updates_found;
++	/* The number of update calls that added a new entry */
++	u64 updates_not_found;
++	/* The number of delete requests that deleted an existing entry */
++	u64 deletions_found;
++	/* The number of delete requests that did nothing */
++	u64 deletions_not_found;
++	/* The number of query calls that found existing entry */
++	u64 queries_found;
++	/* The number of query calls that did not find an entry */
++	u64 queries_not_found;
++	/* The total number of requests processed */
++	u64 requests;
 +};
 +
-+/** The statistics of the vdo service. */
-+struct vdo_statistics {
-+	u32 version;
-+	/** Number of blocks used for data */
-+	u64 data_blocks_used;
-+	/** Number of blocks used for VDO metadata */
-+	u64 overhead_blocks_used;
-+	/** Number of logical blocks that are currently mapped to physical blocks */
-+	u64 logical_blocks_used;
-+	/** number of physical blocks */
-+	block_count_t physical_blocks;
-+	/** number of logical blocks */
-+	block_count_t logical_blocks;
-+	/** Size of the block map page cache, in bytes */
-+	u64 block_map_cache_size;
-+	/** The physical block size */
-+	u64 block_size;
-+	/** Number of times the VDO has successfully recovered */
-+	u64 complete_recoveries;
-+	/** Number of times the VDO has recovered from read-only mode */
-+	u64 read_only_recoveries;
-+	/** String describing the operating mode of the VDO */
-+	char mode[15];
-+	/** Whether the VDO is in recovery mode */
-+	bool in_recovery_mode;
-+	/** What percentage of recovery mode work has been completed */
-+	u8 recovery_percentage;
-+	/** The statistics for the compressed block packer */
-+	struct packer_statistics packer;
-+	/** Counters for events in the block allocator */
-+	struct block_allocator_statistics allocator;
-+	/** Counters for events in the recovery journal */
-+	struct recovery_journal_statistics journal;
-+	/** The statistics for the slab journals */
-+	struct slab_journal_statistics slab_journal;
-+	/** The statistics for the slab summary */
-+	struct slab_summary_statistics slab_summary;
-+	/** The statistics for the reference counts */
-+	struct ref_counts_statistics ref_counts;
-+	/** The statistics for the block map */
-+	struct block_map_statistics block_map;
-+	/** The dedupe statistics from hash locks */
-+	struct hash_lock_statistics hash_lock;
-+	/** Counts of error conditions */
-+	struct error_statistics errors;
-+	/** The VDO instance */
-+	u32 instance;
-+	/** Current number of active VIOs */
-+	u32 current_vios_in_progress;
-+	/** Maximum number of active VIOs */
-+	u32 max_vios;
-+	/** Number of times the UDS index was too slow in responding */
-+	u64 dedupe_advice_timeouts;
-+	/** Number of flush requests submitted to the storage device */
-+	u64 flush_out;
-+	/** Logical block size */
-+	u64 logical_block_size;
-+	/** Bios submitted into VDO from above */
-+	struct bio_stats bios_in;
-+	struct bio_stats bios_in_partial;
-+	/** Bios submitted onward for user data */
-+	struct bio_stats bios_out;
-+	/** Bios submitted onward for metadata */
-+	struct bio_stats bios_meta;
-+	struct bio_stats bios_journal;
-+	struct bio_stats bios_page_cache;
-+	struct bio_stats bios_out_completed;
-+	struct bio_stats bios_meta_completed;
-+	struct bio_stats bios_journal_completed;
-+	struct bio_stats bios_page_cache_completed;
-+	struct bio_stats bios_acknowledged;
-+	struct bio_stats bios_acknowledged_partial;
-+	/** Current number of bios in progress */
-+	struct bio_stats bios_in_progress;
-+	/** Memory usage stats. */
-+	struct memory_usage memory_usage;
-+	/** The statistics for the UDS index */
-+	struct index_statistics index;
++enum uds_index_region {
++	/* No location information has been determined */
++	UDS_LOCATION_UNKNOWN = 0,
++	/* The index page entry has been found */
++	UDS_LOCATION_INDEX_PAGE_LOOKUP,
++	/* The record page entry has been found */
++	UDS_LOCATION_RECORD_PAGE_LOOKUP,
++	/* The record is not in the index */
++	UDS_LOCATION_UNAVAILABLE,
++	/* The record was found in the open chapter */
++	UDS_LOCATION_IN_OPEN_CHAPTER,
++	/* The record was found in the dense part of the index */
++	UDS_LOCATION_IN_DENSE,
++	/* The record was found in the sparse part of the index */
++	UDS_LOCATION_IN_SPARSE,
++} __packed;
++
++/* Zone message requests are used to communicate between index zones. */
++enum uds_zone_message_type {
++	/* A standard request with no message */
++	UDS_MESSAGE_NONE = 0,
++	/* Add a chapter to the sparse chapter index cache */
++	UDS_MESSAGE_SPARSE_CACHE_BARRIER,
++	/* Close a chapter to keep the zone from falling behind */
++	UDS_MESSAGE_ANNOUNCE_CHAPTER_CLOSED,
++} __packed;
++
++struct uds_zone_message {
++	/* The type of message, determining how it will be processed */
++	enum uds_zone_message_type type;
++	/* The virtual chapter number to which the message applies */
++	u64 virtual_chapter;
 +};
 +
-+#endif /* not STATISTICS_H */
++struct uds_index_session;
++struct uds_index;
++struct uds_request;
++
++/* Once this callback has been invoked, the uds_request structure can be reused or freed. */
++typedef void uds_request_callback_t(struct uds_request *request);
++
++struct uds_request {
++	/* These input fields must be set before launching a request. */
++
++	/* The name of the record to look up or create */
++	struct uds_record_name record_name;
++	/* New data to associate with the record name, if applicable */
++	struct uds_record_data new_metadata;
++	/* A callback to invoke when the request is complete */
++	uds_request_callback_t *callback;
++	/* The index session that will manage this request */
++	struct uds_index_session *session;
++	/* The type of operation to perform, as describe above */
++	enum uds_request_type type;
++
++	/* These output fields are set when a request is complete. */
++
++	/* The existing data associated with the request name, if any */
++	struct uds_record_data old_metadata;
++	/* Either UDS_SUCCESS or an error code for the request */
++	int status;
++	/* True if the record name had an existing entry in the index */
++	bool found;
++
++	/*
++	 * The remaining fields are used internally and should not be altered by clients. The index
++	 * relies on zone_number being the first field in this section.
++	 */
++
++	/* The number of the zone which will process this request*/
++	unsigned int zone_number;
++	/* A link for adding a request to a lock-free queue */
++	struct funnel_queue_entry queue_link;
++	/* A link for adding a request to a standard linked list */
++	struct uds_request *next_request;
++	/* A pointer to the index processing this request */
++	struct uds_index *index;
++	/* Control message for coordinating between zones */
++	struct uds_zone_message zone_message;
++	/* If true, process request immediately by waking the worker thread */
++	bool unbatched;
++	/* If true, continue this request before processing newer requests */
++	bool requeued;
++	/* The virtual chapter containing the record name, if known */
++	u64 virtual_chapter;
++	/* The region of the index containing the record name */
++	enum uds_index_region location;
++};
++
++/* Compute the number of bytes needed to store an index. */
++int __must_check uds_compute_index_size(const struct uds_parameters *parameters, u64 *index_size);
++
++/* A session is required for most index operations. */
++int __must_check uds_create_index_session(struct uds_index_session **session);
++
++/* Destroying an index session also closes and saves the associated index. */
++int uds_destroy_index_session(struct uds_index_session *session);
++
++/*
++ * Create or open an index with an existing session. This operation fails if the index session is
++ * suspended, or if there is already an open index.
++ */
++int __must_check uds_open_index(enum uds_open_index_type open_type,
++				const struct uds_parameters *parameters,
++				struct uds_index_session *session);
++
++/*
++ * Wait until all callbacks for index operations are complete, and prevent new index operations
++ * from starting. New index operations will fail with EBUSY until the session is resumed. Also
++ * optionally saves the index.
++ */
++int __must_check uds_suspend_index_session(struct uds_index_session *session, bool save);
++
++/*
++ * Allow new index operations for an index, whether it was suspended or not. If the index is
++ * suspended and the supplied block device differs from the current backing store, the index will
++ * start using the new backing store instead.
++ */
++int __must_check uds_resume_index_session(struct uds_index_session *session,
++					  struct block_device *bdev);
++
++/* Wait until all outstanding index operations are complete. */
++int __must_check uds_flush_index_session(struct uds_index_session *session);
++
++/* Close an index. This operation fails if the index session is suspended. */
++int __must_check uds_close_index(struct uds_index_session *session);
++
++/* Get index statistics since the last time the index was opened. */
++int __must_check
++uds_get_index_session_stats(struct uds_index_session *session, struct uds_index_stats *stats);
++
++/* This function will fail if any required field of the request is not set. */
++int __must_check uds_launch_request(struct uds_request *request);
++
++#endif /* UDS_H */
 -- 
 2.40.0
 
