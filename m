@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C93C25B48
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D91A6C25B6B
 	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:43:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232210AbjJZVnO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S231977AbjJZVnO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 26 Oct 2023 17:43:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40942 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231977AbjJZVnO (ORCPT
+        with ESMTP id S232027AbjJZVnO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 26 Oct 2023 17:43:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 856241B3
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:42 -0700 (PDT)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201BED47
+        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698356501;
+        s=mimecast20190719; t=1698356504;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OqIYtQ0iP76N1W9+W/qFYkGNuS2V5HGCOukSmrRjIq4=;
-        b=GUomIhVux4Q5d7gdOBviLRy3bW+a0TGf9mIrUb3qbCgcQLRMPARjg1r6HlQcE8lObhI/wd
-        LwnbHRT6K8p3KoqEtkKqfyYuXCnAM5YcMoorgawi+/UA1eXbCnMQZsLe5agM3Di2fNA6vk
-        GccYR1hpvditZgs4Kz6q57Ls14GphsE=
+        bh=ZMxVCYoLfbc+fV0heDgTWWxLG3arUYk2eoet8M+OQ4k=;
+        b=C4eHPbeuEbvpWxbbaUPcTzV+S0REyfFd3U3OGp3qGbcp/ij32Cl4tCIJFoq0bcWgFohdYf
+        7o7tghp74VpZB9pSy4dvffYA6LW++GBs7gMyb2ICU6p7j2tm5hoJccT5ciBRf2bMZhzOry
+        fGpb2O1I+ARMBYCQoDbUa2afiWB7Fqk=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-524-X_IwkbL-OI24j1bPK9aH0g-1; Thu, 26 Oct 2023 17:41:38 -0400
-X-MC-Unique: X_IwkbL-OI24j1bPK9aH0g-1
+ us-mta-625-i8IqB_xOO8--74czHundhg-1; Thu, 26 Oct 2023 17:41:39 -0400
+X-MC-Unique: i8IqB_xOO8--74czHundhg-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB5A9185A783;
-        Thu, 26 Oct 2023 21:41:37 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA3ED811E8F;
+        Thu, 26 Oct 2023 21:41:39 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C02D6492BFA;
-        Thu, 26 Oct 2023 21:41:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 51710492BFA;
+        Thu, 26 Oct 2023 21:41:39 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id 762513003C; Thu, 26 Oct 2023 17:41:37 -0400 (EDT)
+        id 0604A3003E; Thu, 26 Oct 2023 17:41:38 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 04/39] dm vdo: add basic logging and support utilities
-Date:   Thu, 26 Oct 2023 17:41:01 -0400
-Message-Id: <20231026214136.1067410-5-msakai@redhat.com>
+Subject: [PATCH v4 13/39] dm vdo: implement the open chapter and chapter indexes
+Date:   Thu, 26 Oct 2023 17:41:10 -0400
+Message-Id: <20231026214136.1067410-14-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
@@ -56,9 +56,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add various support utilities for the vdo target and deduplication index,
-including logging utilities, string and time management, and index-specific
-error codes.
+Deduplication records are stored in groups called chapters. New records are
+collected in a structure called the open chapter, which is optimized for
+adding, removing, and sorting records.
+
+When a chapter fills, it is packed into a read-only structure called a
+closed chapter, which is optimized for searching and reading. The closed
+chapter includes a delta index, called the chapter index, which maps each
+record name to the record page containing the record and allows the index
+to read at most one record page when looking up a record.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
@@ -66,1078 +72,924 @@ Co-developed-by: Michael Sclafani <vdo-devel@redhat.com>
 Signed-off-by: Michael Sclafani <vdo-devel@redhat.com>
 Co-developed-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
 Signed-off-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
-Co-developed-by: Ken Raeburn <raeburn@redhat.com>
-Signed-off-by: Ken Raeburn <raeburn@redhat.com>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/errors.c       | 316 +++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/errors.h       |  83 ++++++++
- drivers/md/dm-vdo/logger.c       | 304 +++++++++++++++++++++++++++++
- drivers/md/dm-vdo/logger.h       | 112 +++++++++++
- drivers/md/dm-vdo/permassert.c   |  35 ++++
- drivers/md/dm-vdo/permassert.h   |  65 +++++++
- drivers/md/dm-vdo/string-utils.c |  28 +++
- drivers/md/dm-vdo/string-utils.h |  23 +++
- drivers/md/dm-vdo/time-utils.h   |  28 +++
- 9 files changed, 994 insertions(+)
- create mode 100644 drivers/md/dm-vdo/errors.c
- create mode 100644 drivers/md/dm-vdo/errors.h
- create mode 100644 drivers/md/dm-vdo/logger.c
- create mode 100644 drivers/md/dm-vdo/logger.h
- create mode 100644 drivers/md/dm-vdo/permassert.c
- create mode 100644 drivers/md/dm-vdo/permassert.h
- create mode 100644 drivers/md/dm-vdo/string-utils.c
- create mode 100644 drivers/md/dm-vdo/string-utils.h
- create mode 100644 drivers/md/dm-vdo/time-utils.h
+ drivers/md/dm-vdo/chapter-index.c | 304 +++++++++++++++++++++
+ drivers/md/dm-vdo/chapter-index.h |  66 +++++
+ drivers/md/dm-vdo/open-chapter.c  | 433 ++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/open-chapter.h  |  79 ++++++
+ 4 files changed, 882 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/chapter-index.c
+ create mode 100644 drivers/md/dm-vdo/chapter-index.h
+ create mode 100644 drivers/md/dm-vdo/open-chapter.c
+ create mode 100644 drivers/md/dm-vdo/open-chapter.h
 
-diff --git a/drivers/md/dm-vdo/errors.c b/drivers/md/dm-vdo/errors.c
+diff --git a/drivers/md/dm-vdo/chapter-index.c b/drivers/md/dm-vdo/chapter-index.c
 new file mode 100644
-index 000000000000..223eca020ff4
+index 000000000000..29eb7fb8b4fe
 --- /dev/null
-+++ b/drivers/md/dm-vdo/errors.c
-@@ -0,0 +1,316 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#include "errors.h"
-+
-+#include <linux/compiler.h>
-+#include <linux/errno.h>
-+
-+#include "logger.h"
-+#include "permassert.h"
-+#include "string-utils.h"
-+
-+static const struct error_info successful = { "UDS_SUCCESS", "Success" };
-+
-+static const char *const message_table[] = {
-+	[EPERM] = "Operation not permitted",
-+	[ENOENT] = "No such file or directory",
-+	[ESRCH] = "No such process",
-+	[EINTR] = "Interrupted system call",
-+	[EIO] = "Input/output error",
-+	[ENXIO] = "No such device or address",
-+	[E2BIG] = "Argument list too long",
-+	[ENOEXEC] = "Exec format error",
-+	[EBADF] = "Bad file descriptor",
-+	[ECHILD] = "No child processes",
-+	[EAGAIN] = "Resource temporarily unavailable",
-+	[ENOMEM] = "Cannot allocate memory",
-+	[EACCES] = "Permission denied",
-+	[EFAULT] = "Bad address",
-+	[ENOTBLK] = "Block device required",
-+	[EBUSY] = "Device or resource busy",
-+	[EEXIST] = "File exists",
-+	[EXDEV] = "Invalid cross-device link",
-+	[ENODEV] = "No such device",
-+	[ENOTDIR] = "Not a directory",
-+	[EISDIR] = "Is a directory",
-+	[EINVAL] = "Invalid argument",
-+	[ENFILE] = "Too many open files in system",
-+	[EMFILE] = "Too many open files",
-+	[ENOTTY] = "Inappropriate ioctl for device",
-+	[ETXTBSY] = "Text file busy",
-+	[EFBIG] = "File too large",
-+	[ENOSPC] = "No space left on device",
-+	[ESPIPE] = "Illegal seek",
-+	[EROFS] = "Read-only file system",
-+	[EMLINK] = "Too many links",
-+	[EPIPE] = "Broken pipe",
-+	[EDOM] = "Numerical argument out of domain",
-+	[ERANGE] = "Numerical result out of range"
-+};
-+
-+static const struct error_info error_list[] = {
-+	{ "UDS_OVERFLOW", "Index overflow" },
-+	{ "UDS_INVALID_ARGUMENT", "Invalid argument passed to internal routine" },
-+	{ "UDS_BAD_STATE", "UDS data structures are in an invalid state" },
-+	{ "UDS_DUPLICATE_NAME", "Attempt to enter the same name into a delta index twice" },
-+	{ "UDS_ASSERTION_FAILED", "Assertion failed" },
-+	{ "UDS_QUEUED", "Request queued" },
-+	{ "UDS_BUFFER_ERROR", "Buffer error" },
-+	{ "UDS_NO_DIRECTORY", "Expected directory is missing" },
-+	{ "UDS_ALREADY_REGISTERED", "Error range already registered" },
-+	{ "UDS_OUT_OF_RANGE", "Cannot access data outside specified limits" },
-+	{ "UDS_EMODULE_LOAD", "Could not load modules" },
-+	{ "UDS_DISABLED", "UDS library context is disabled" },
-+	{ "UDS_UNKNOWN_ERROR", "Unknown error" },
-+	{ "UDS_UNSUPPORTED_VERSION", "Unsupported version" },
-+	{ "UDS_CORRUPT_DATA", "Some index structure is corrupt" },
-+	{ "UDS_NO_INDEX", "No index found" },
-+	{ "UDS_INDEX_NOT_SAVED_CLEANLY", "Index not saved cleanly" },
-+};
-+
-+struct error_block {
-+	const char *name;
-+	int base;
-+	int last;
-+	int max;
-+	const struct error_info *infos;
-+};
-+
-+enum {
-+	MAX_ERROR_BLOCKS = 6,
-+};
-+
-+static struct {
-+	int allocated;
-+	int count;
-+	struct error_block blocks[MAX_ERROR_BLOCKS];
-+} registered_errors = {
-+	.allocated = MAX_ERROR_BLOCKS,
-+	.count = 1,
-+	.blocks = { {
-+			.name = "UDS Error",
-+			.base = UDS_ERROR_CODE_BASE,
-+			.last = UDS_ERROR_CODE_LAST,
-+			.max = UDS_ERROR_CODE_BLOCK_END,
-+			.infos = error_list,
-+		  } },
-+};
-+
-+/* Get the error info for an error number. Also returns the name of the error block, if known. */
-+static const char *get_error_info(int errnum, const struct error_info **info_ptr)
-+{
-+	struct error_block *block;
-+
-+	if (errnum == UDS_SUCCESS) {
-+		*info_ptr = &successful;
-+		return NULL;
-+	}
-+
-+	for (block = registered_errors.blocks;
-+	     block < registered_errors.blocks + registered_errors.count;
-+	     ++block) {
-+		if ((errnum >= block->base) && (errnum < block->last)) {
-+			*info_ptr = block->infos + (errnum - block->base);
-+			return block->name;
-+		} else if ((errnum >= block->last) && (errnum < block->max)) {
-+			*info_ptr = NULL;
-+			return block->name;
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+/* Return a string describing a system error message. */
-+static const char *system_string_error(int errnum, char *buf, size_t buflen)
-+{
-+	size_t len;
-+	const char *error_string = NULL;
-+
-+	if ((errnum > 0) && (errnum < ARRAY_SIZE(message_table)))
-+		error_string = message_table[errnum];
-+
-+	len = ((error_string == NULL) ?
-+		 snprintf(buf, buflen, "Unknown error %d", errnum) :
-+		 snprintf(buf, buflen, "%s", error_string));
-+	if (len < buflen)
-+		return buf;
-+
-+	buf[0] = '\0';
-+	return "System error";
-+}
-+
-+/* Convert an error code to a descriptive string. */
-+const char *uds_string_error(int errnum, char *buf, size_t buflen)
-+{
-+	char *buffer = buf;
-+	char *buf_end = buf + buflen;
-+	const struct error_info *info = NULL;
-+	const char *block_name;
-+
-+	if (buf == NULL)
-+		return NULL;
-+
-+	if (errnum < 0)
-+		errnum = -errnum;
-+
-+	block_name = get_error_info(errnum, &info);
-+	if (block_name != NULL) {
-+		if (info != NULL)
-+			buffer = uds_append_to_buffer(buffer,
-+						      buf_end,
-+						      "%s: %s",
-+						      block_name,
-+						      info->message);
-+		else
-+			buffer = uds_append_to_buffer(buffer,
-+						      buf_end,
-+						      "Unknown %s %d",
-+						      block_name,
-+						      errnum);
-+	} else if (info != NULL) {
-+		buffer = uds_append_to_buffer(buffer, buf_end, "%s", info->message);
-+	} else {
-+		const char *tmp = system_string_error(errnum, buffer, buf_end - buffer);
-+
-+		if (tmp != buffer)
-+			buffer = uds_append_to_buffer(buffer, buf_end, "%s", tmp);
-+		else
-+			buffer += strlen(tmp);
-+	}
-+	return buf;
-+}
-+
-+/* Convert an error code to its name. */
-+const char *uds_string_error_name(int errnum, char *buf, size_t buflen)
-+{
-+	char *buffer = buf;
-+	char *buf_end = buf + buflen;
-+	const struct error_info *info = NULL;
-+	const char *block_name;
-+
-+	if (errnum < 0)
-+		errnum = -errnum;
-+
-+	block_name = get_error_info(errnum, &info);
-+	if (block_name != NULL) {
-+		if (info != NULL)
-+			buffer = uds_append_to_buffer(buffer, buf_end, "%s", info->name);
-+		else
-+			buffer = uds_append_to_buffer(buffer,
-+						      buf_end,
-+						      "%s %d",
-+						      block_name,
-+						      errnum);
-+	} else if (info != NULL) {
-+		buffer = uds_append_to_buffer(buffer, buf_end, "%s", info->name);
-+	} else {
-+		const char *tmp;
-+
-+		tmp = system_string_error(errnum, buffer, buf_end - buffer);
-+		if (tmp != buffer)
-+			buffer = uds_append_to_buffer(buffer, buf_end, "%s", tmp);
-+		else
-+			buffer += strlen(tmp);
-+	}
-+	return buf;
-+}
-+
-+/*
-+ * Translate an error code into a value acceptable to the kernel. The input error code may be a
-+ * system-generated value (such as -EIO), or an internal UDS status code. The result will be a
-+ * negative errno value.
-+ */
-+int uds_map_to_system_error(int error)
-+{
-+	char error_name[UDS_MAX_ERROR_NAME_SIZE];
-+	char error_message[UDS_MAX_ERROR_MESSAGE_SIZE];
-+
-+	/* 0 is success, and negative values are already system error codes. */
-+	if (likely(error <= 0))
-+		return error;
-+
-+	if (error < 1024)
-+		/* This is probably an errno from userspace. */
-+		return -error;
-+
-+	/* Internal UDS errors */
-+	switch (error) {
-+	case UDS_NO_INDEX:
-+	case UDS_CORRUPT_DATA:
-+		/* The index doesn't exist or can't be recovered. */
-+		return -ENOENT;
-+
-+	case UDS_INDEX_NOT_SAVED_CLEANLY:
-+	case UDS_UNSUPPORTED_VERSION:
-+		/*
-+		 * The index exists, but can't be loaded. Tell the client it exists so they don't
-+		 * destroy it inadvertently.
-+		 */
-+		return -EEXIST;
-+
-+	case UDS_DISABLED:
-+		/* The session is unusable; only returned by requests. */
-+		return -EIO;
-+
-+	default:
-+		/* Translate an unexpected error into something generic. */
-+		uds_log_info("%s: mapping status code %d (%s: %s) to -EIO",
-+			     __func__,
-+			     error,
-+			     uds_string_error_name(error, error_name, sizeof(error_name)),
-+			     uds_string_error(error, error_message, sizeof(error_message)));
-+		return -EIO;
-+	}
-+}
-+
-+/*
-+ * Register a block of error codes.
-+ *
-+ * @block_name: the name of the block of error codes
-+ * @first_error: the first error code in the block
-+ * @next_free_error: one past the highest possible error in the block
-+ * @infos: a pointer to the error info array for the block
-+ * @info_size: the size of the error info array
-+ */
-+int uds_register_error_block(const char *block_name,
-+			     int first_error,
-+			     int next_free_error,
-+			     const struct error_info *infos,
-+			     size_t info_size)
-+{
-+	int result;
-+	struct error_block *block;
-+	struct error_block new_block = {
-+		.name = block_name,
-+		.base = first_error,
-+		.last = first_error + (info_size / sizeof(struct error_info)),
-+		.max = next_free_error,
-+		.infos = infos,
-+	};
-+
-+	result = ASSERT(first_error < next_free_error, "well-defined error block range");
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	if (registered_errors.count == registered_errors.allocated)
-+		/* This should never happen. */
-+		return UDS_OVERFLOW;
-+
-+	for (block = registered_errors.blocks;
-+	     block < registered_errors.blocks + registered_errors.count;
-+	     ++block) {
-+		if (strcmp(block_name, block->name) == 0)
-+			return UDS_DUPLICATE_NAME;
-+
-+		/* Ensure error ranges do not overlap. */
-+		if ((first_error < block->max) && (next_free_error > block->base))
-+			return UDS_ALREADY_REGISTERED;
-+	}
-+
-+	registered_errors.blocks[registered_errors.count++] = new_block;
-+	return UDS_SUCCESS;
-+}
-diff --git a/drivers/md/dm-vdo/errors.h b/drivers/md/dm-vdo/errors.h
-new file mode 100644
-index 000000000000..43e0c33bec65
---- /dev/null
-+++ b/drivers/md/dm-vdo/errors.h
-@@ -0,0 +1,83 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#ifndef UDS_ERRORS_H
-+#define UDS_ERRORS_H
-+
-+#include <linux/compiler.h>
-+#include <linux/types.h>
-+
-+/* Custom error codes and error-related utilities for UDS */
-+
-+/* Valid status codes for internal UDS functions. */
-+enum uds_status_codes {
-+	/* Successful return */
-+	UDS_SUCCESS = 0,
-+
-+	/* Used as a base value for reporting internal errors */
-+	UDS_ERROR_CODE_BASE = 1024,
-+	/* Index overflow */
-+	UDS_OVERFLOW = UDS_ERROR_CODE_BASE + 0,
-+	/* Invalid argument passed to internal routine */
-+	UDS_INVALID_ARGUMENT = UDS_ERROR_CODE_BASE + 1,
-+	/* UDS data structures are in an invalid state */
-+	UDS_BAD_STATE = UDS_ERROR_CODE_BASE + 2,
-+	/* Attempt to enter the same name into an internal structure twice */
-+	UDS_DUPLICATE_NAME = UDS_ERROR_CODE_BASE + 3,
-+	/* An assertion failed */
-+	UDS_ASSERTION_FAILED = UDS_ERROR_CODE_BASE + 4,
-+	/* A request has been queued for later processing (not an error) */
-+	UDS_QUEUED = UDS_ERROR_CODE_BASE + 5,
-+	/* A problem has occurred with a buffer */
-+	UDS_BUFFER_ERROR = UDS_ERROR_CODE_BASE + 6,
-+	/* No directory was found where one was expected */
-+	UDS_NO_DIRECTORY = UDS_ERROR_CODE_BASE + 7,
-+	/* This error range has already been registered */
-+	UDS_ALREADY_REGISTERED = UDS_ERROR_CODE_BASE + 8,
-+	/* Attempt to read or write data outside the valid range */
-+	UDS_OUT_OF_RANGE = UDS_ERROR_CODE_BASE + 9,
-+	/* Could not load modules */
-+	UDS_EMODULE_LOAD = UDS_ERROR_CODE_BASE + 10,
-+	/* The index session is disabled */
-+	UDS_DISABLED = UDS_ERROR_CODE_BASE + 11,
-+	/* Unknown error */
-+	UDS_UNKNOWN_ERROR = UDS_ERROR_CODE_BASE + 12,
-+	/* The index configuration or volume format is no longer supported */
-+	UDS_UNSUPPORTED_VERSION = UDS_ERROR_CODE_BASE + 13,
-+	/* Some index structure is corrupt */
-+	UDS_CORRUPT_DATA = UDS_ERROR_CODE_BASE + 14,
-+	/* No index state found */
-+	UDS_NO_INDEX = UDS_ERROR_CODE_BASE + 15,
-+	/* Attempt to access incomplete index save data */
-+	UDS_INDEX_NOT_SAVED_CLEANLY = UDS_ERROR_CODE_BASE + 16,
-+	/* One more than the last UDS_INTERNAL error code */
-+	UDS_ERROR_CODE_LAST,
-+	/* One more than the last error this block will ever use */
-+	UDS_ERROR_CODE_BLOCK_END = UDS_ERROR_CODE_BASE + 440,
-+};
-+
-+enum {
-+	UDS_MAX_ERROR_NAME_SIZE = 80,
-+	UDS_MAX_ERROR_MESSAGE_SIZE = 128,
-+};
-+
-+struct error_info {
-+	const char *name;
-+	const char *message;
-+};
-+
-+const char * __must_check uds_string_error(int errnum, char *buf, size_t buflen);
-+
-+const char *uds_string_error_name(int errnum, char *buf, size_t buflen);
-+
-+int uds_map_to_system_error(int error);
-+
-+int uds_register_error_block(const char *block_name,
-+			     int first_error,
-+			     int last_reserved_error,
-+			     const struct error_info *infos,
-+			     size_t info_size);
-+
-+#endif /* UDS_ERRORS_H */
-diff --git a/drivers/md/dm-vdo/logger.c b/drivers/md/dm-vdo/logger.c
-new file mode 100644
-index 000000000000..00acac8affbd
---- /dev/null
-+++ b/drivers/md/dm-vdo/logger.c
++++ b/drivers/md/dm-vdo/chapter-index.c
 @@ -0,0 +1,304 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#include "logger.h"
-+
-+#include <linux/delay.h>
-+#include <linux/hardirq.h>
-+#include <linux/module.h>
-+#include <linux/printk.h>
-+#include <linux/sched.h>
-+
-+#include "thread-device.h"
-+#include "uds-threads.h"
-+
-+struct priority_name {
-+	const char *name;
-+	const int priority;
-+};
-+
-+static const struct priority_name PRIORITIES[] = {
-+	{ "ALERT", UDS_LOG_ALERT },
-+	{ "CRITICAL", UDS_LOG_CRIT },
-+	{ "CRIT", UDS_LOG_CRIT },
-+	{ "DEBUG", UDS_LOG_DEBUG },
-+	{ "EMERGENCY", UDS_LOG_EMERG },
-+	{ "EMERG", UDS_LOG_EMERG },
-+	{ "ERROR", UDS_LOG_ERR },
-+	{ "ERR", UDS_LOG_ERR },
-+	{ "INFO", UDS_LOG_INFO },
-+	{ "NOTICE", UDS_LOG_NOTICE },
-+	{ "PANIC", UDS_LOG_EMERG },
-+	{ "WARN", UDS_LOG_WARNING },
-+	{ "WARNING", UDS_LOG_WARNING },
-+	{ NULL, -1 },
-+};
-+
-+static const char *const PRIORITY_STRINGS[] = {
-+	"EMERGENCY",
-+	"ALERT",
-+	"CRITICAL",
-+	"ERROR",
-+	"WARN",
-+	"NOTICE",
-+	"INFO",
-+	"DEBUG",
-+};
-+
-+static int log_level = UDS_LOG_INFO;
-+
-+int uds_get_log_level(void)
-+{
-+	return log_level;
-+}
-+
-+void uds_set_log_level(int new_log_level)
-+{
-+	log_level = new_log_level;
-+}
-+
-+int uds_log_string_to_priority(const char *string)
-+{
-+	int i;
-+
-+	for (i = 0; PRIORITIES[i].name != NULL; i++)
-+		if (strcasecmp(string, PRIORITIES[i].name) == 0)
-+			return PRIORITIES[i].priority;
-+	return UDS_LOG_INFO;
-+}
-+
-+const char *uds_log_priority_to_string(int priority)
-+{
-+	if ((priority < 0) || (priority >= (int) ARRAY_SIZE(PRIORITY_STRINGS)))
-+		return "unknown";
-+	return PRIORITY_STRINGS[priority];
-+}
-+
-+static const char *get_current_interrupt_type(void)
-+{
-+	if (in_nmi())
-+		return "NMI";
-+	if (in_irq())
-+		return "HI";
-+	if (in_softirq())
-+		return "SI";
-+	return "INTR";
-+}
-+
-+/**
-+ * emit_log_message_to_kernel() - Emit a log message to the kernel at the specified priority.
-+ *
-+ * @priority: The priority at which to log the message
-+ * @fmt: The format string of the message
-+ */
-+static void emit_log_message_to_kernel(int priority, const char *fmt, ...)
-+{
-+	va_list args;
-+	struct va_format vaf;
-+
-+	if (priority > uds_get_log_level())
-+		return;
-+
-+	va_start(args, fmt);
-+	vaf.fmt = fmt;
-+	vaf.va = &args;
-+
-+	switch (priority) {
-+	case UDS_LOG_EMERG:
-+	case UDS_LOG_ALERT:
-+	case UDS_LOG_CRIT:
-+		printk(KERN_CRIT "%pV", &vaf);
-+		break;
-+	case UDS_LOG_ERR:
-+		printk(KERN_ERR "%pV", &vaf);
-+		break;
-+	case UDS_LOG_WARNING:
-+		printk(KERN_WARNING "%pV", &vaf);
-+		break;
-+	case UDS_LOG_NOTICE:
-+		printk(KERN_NOTICE "%pV", &vaf);
-+		break;
-+	case UDS_LOG_INFO:
-+		printk(KERN_INFO "%pV", &vaf);
-+		break;
-+	case UDS_LOG_DEBUG:
-+		printk(KERN_DEBUG "%pV", &vaf);
-+		break;
-+	default:
-+		printk(KERN_DEFAULT "%pV", &vaf);
-+		break;
-+	}
-+
-+	va_end(args);
-+}
-+
-+/**
-+ * emit_log_message() - Emit a log message to the kernel log in a format suited to the current
-+ *                      thread context.
-+ *
-+ * Context info formats:
-+ *
-+ * interrupt:           uds[NMI]: blah
-+ * kvdo thread:         kvdo12:foobarQ: blah
-+ * thread w/device id:  kvdo12:myprog: blah
-+ * other thread:        uds: myprog: blah
-+ *
-+ * Fields: module name, interrupt level, process name, device ID.
-+ *
-+ * @priority: the priority at which to log the message
-+ * @module: The name of the module doing the logging
-+ * @prefix: The prefix of the log message
-+ * @vaf1: The first message format descriptor
-+ * @vaf2: The second message format descriptor
-+ */
-+static void emit_log_message(int priority,
-+			     const char *module,
-+			     const char *prefix,
-+			     const struct va_format *vaf1,
-+			     const struct va_format *vaf2)
-+{
-+	int device_instance;
-+
-+	/*
-+	 * In interrupt context, identify the interrupt type and module. Ignore the process/thread
-+	 * since it could be anything.
-+	 */
-+	if (in_interrupt()) {
-+		const char *type = get_current_interrupt_type();
-+
-+		emit_log_message_to_kernel(priority,
-+					   "%s[%s]: %s%pV%pV\n",
-+					   module, type, prefix, vaf1, vaf2);
-+		return;
-+	}
-+
-+	/* Not at interrupt level; we have a process we can look at, and might have a device ID. */
-+	device_instance = uds_get_thread_device_id();
-+	if (device_instance >= 0) {
-+		emit_log_message_to_kernel(priority,
-+					   "%s%u:%s: %s%pV%pV\n",
-+					   module, device_instance,
-+					   current->comm, prefix, vaf1, vaf2);
-+		return;
-+	}
-+
-+	/*
-+	 * If it's a kernel thread and the module name is a prefix of its name, assume it is ours
-+	 * and only identify the thread.
-+	 */
-+	if (((current->flags & PF_KTHREAD) != 0) &&
-+	    (strncmp(module, current->comm, strlen(module)) == 0)) {
-+		emit_log_message_to_kernel(priority,
-+					   "%s: %s%pV%pV\n",
-+					   current->comm, prefix, vaf1, vaf2);
-+		return;
-+	}
-+
-+	/* Identify the module and the process. */
-+	emit_log_message_to_kernel(priority,
-+				   "%s: %s: %s%pV%pV\n",
-+				   module, current->comm, prefix, vaf1, vaf2);
-+}
-+
-+/*
-+ * uds_log_embedded_message() - Log a message embedded within another message.
-+ * @priority: the priority at which to log the message
-+ * @module: the name of the module doing the logging
-+ * @prefix: optional string prefix to message, may be NULL
-+ * @fmt1: format of message first part (required)
-+ * @args1: arguments for message first part (required)
-+ * @fmt2: format of message second part
-+ */
-+void uds_log_embedded_message(int priority,
-+			      const char *module,
-+			      const char *prefix,
-+			      const char *fmt1,
-+			      va_list args1,
-+			      const char *fmt2,
-+			      ...)
-+{
-+	va_list args1_copy;
-+	va_list args2;
-+	struct va_format vaf1, vaf2;
-+
-+	va_start(args2, fmt2);
-+
-+	if (module == NULL)
-+		module = UDS_LOGGING_MODULE_NAME;
-+	if (prefix == NULL)
-+		prefix = "";
-+
-+	/*
-+	 * It is implementation dependent whether va_list is defined as an array type that decays
-+	 * to a pointer when passed as an argument. Copy args1 and args2 with va_copy so that vaf1
-+	 * and vaf2 get proper va_list pointers irrespective of how va_list is defined.
-+	 */
-+	va_copy(args1_copy, args1);
-+	vaf1.fmt = fmt1;
-+	vaf1.va = &args1_copy;
-+
-+	vaf2.fmt = fmt2;
-+	vaf2.va = &args2;
-+
-+	emit_log_message(priority, module, prefix, &vaf1, &vaf2);
-+
-+	va_end(args1_copy);
-+	va_end(args2);
-+}
-+
-+int uds_vlog_strerror(int priority,
-+		      int errnum,
-+		      const char *module,
-+		      const char *format,
-+		      va_list args)
-+{
-+	char errbuf[UDS_MAX_ERROR_MESSAGE_SIZE];
-+	const char *message = uds_string_error(errnum, errbuf, sizeof(errbuf));
-+
-+	uds_log_embedded_message(priority,
-+				 module,
-+				 NULL,
-+				 format,
-+				 args,
-+				 ": %s (%d)",
-+				 message,
-+				 errnum);
-+	return errnum;
-+}
-+
-+int __uds_log_strerror(int priority, int errnum, const char *module, const char *format, ...)
-+{
-+	va_list args;
-+
-+	va_start(args, format);
-+	uds_vlog_strerror(priority, errnum, module, format, args);
-+	va_end(args);
-+	return errnum;
-+}
-+
-+void uds_log_backtrace(int priority)
-+{
-+	if (priority > uds_get_log_level())
-+		return;
-+	dump_stack();
-+}
-+
-+void __uds_log_message(int priority, const char *module, const char *format, ...)
-+{
-+	va_list args;
-+
-+	va_start(args, format);
-+	uds_log_embedded_message(priority, module, NULL, format, args, "%s", "");
-+	va_end(args);
-+}
-+
-+/*
-+ * Sleep or delay a few milliseconds in an attempt to allow the log buffers to be flushed lest they
-+ * be overrun.
-+ */
-+void uds_pause_for_logger(void)
-+{
-+	fsleep(4000);
-+}
-diff --git a/drivers/md/dm-vdo/logger.h b/drivers/md/dm-vdo/logger.h
-new file mode 100644
-index 000000000000..7a0ee3ca85ec
---- /dev/null
-+++ b/drivers/md/dm-vdo/logger.h
-@@ -0,0 +1,112 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#ifndef UDS_LOGGER_H
-+#define UDS_LOGGER_H
-+
-+#include <linux/module.h>
-+#include <linux/ratelimit.h>
-+
-+/* Custom logging utilities for UDS */
-+
-+#define UDS_LOG_EMERG 0
-+#define UDS_LOG_ALERT 1
-+#define UDS_LOG_CRIT 2
-+#define UDS_LOG_ERR 3
-+#define UDS_LOG_WARNING 4
-+#define UDS_LOG_NOTICE 5
-+#define UDS_LOG_INFO 6
-+#define UDS_LOG_DEBUG 7
-+
-+#if defined(MODULE)
-+#define UDS_LOGGING_MODULE_NAME THIS_MODULE->name
-+#else /* compiled into the kernel */
-+#define UDS_LOGGING_MODULE_NAME "vdo"
-+#endif
-+
-+/* Apply a rate limiter to a log method call. */
-+#define uds_log_ratelimit(log_fn, ...)                                    \
-+	do {                                                              \
-+		static DEFINE_RATELIMIT_STATE(_rs,                        \
-+					      DEFAULT_RATELIMIT_INTERVAL, \
-+					      DEFAULT_RATELIMIT_BURST);   \
-+		if (__ratelimit(&_rs)) {                                  \
-+			log_fn(__VA_ARGS__);                              \
-+		}                                                         \
-+	} while (0)
-+
-+int uds_get_log_level(void);
-+
-+void uds_set_log_level(int new_log_level);
-+
-+int uds_log_string_to_priority(const char *string);
-+
-+const char *uds_log_priority_to_string(int priority);
-+
-+void uds_log_embedded_message(int priority,
-+			      const char *module,
-+			      const char *prefix,
-+			      const char *fmt1,
-+			      va_list args1,
-+			      const char *fmt2,
-+			      ...)
-+	__printf(4, 0) __printf(6, 7);
-+
-+void uds_log_backtrace(int priority);
-+
-+/* All log functions will preserve the caller's value of errno. */
-+
-+#define uds_log_strerror(priority, errnum, ...) \
-+	__uds_log_strerror(priority, errnum, UDS_LOGGING_MODULE_NAME, __VA_ARGS__)
-+
-+int __uds_log_strerror(int priority, int errnum, const char *module, const char *format, ...)
-+	__printf(4, 5);
-+
-+int uds_vlog_strerror(int priority,
-+		      int errnum,
-+		      const char *module,
-+		      const char *format,
-+		      va_list args)
-+	__printf(4, 0);
-+
-+/* Log an error prefixed with the string associated with the errnum. */
-+#define uds_log_error_strerror(errnum, ...) \
-+	uds_log_strerror(UDS_LOG_ERR, errnum, __VA_ARGS__)
-+
-+#define uds_log_debug_strerror(errnum, ...) \
-+	uds_log_strerror(UDS_LOG_DEBUG, errnum, __VA_ARGS__)
-+
-+#define uds_log_info_strerror(errnum, ...) \
-+	uds_log_strerror(UDS_LOG_INFO, errnum, __VA_ARGS__)
-+
-+#define uds_log_notice_strerror(errnum, ...) \
-+	uds_log_strerror(UDS_LOG_NOTICE, errnum, __VA_ARGS__)
-+
-+#define uds_log_warning_strerror(errnum, ...) \
-+	uds_log_strerror(UDS_LOG_WARNING, errnum, __VA_ARGS__)
-+
-+#define uds_log_fatal_strerror(errnum, ...) \
-+	uds_log_strerror(UDS_LOG_CRIT, errnum, __VA_ARGS__)
-+
-+#define uds_log_message(priority, ...) \
-+	__uds_log_message(priority, UDS_LOGGING_MODULE_NAME, __VA_ARGS__)
-+
-+void __uds_log_message(int priority, const char *module, const char *format, ...)
-+	__printf(3, 4);
-+
-+#define uds_log_debug(...) uds_log_message(UDS_LOG_DEBUG, __VA_ARGS__)
-+
-+#define uds_log_info(...) uds_log_message(UDS_LOG_INFO, __VA_ARGS__)
-+
-+#define uds_log_notice(...) uds_log_message(UDS_LOG_NOTICE, __VA_ARGS__)
-+
-+#define uds_log_warning(...) uds_log_message(UDS_LOG_WARNING, __VA_ARGS__)
-+
-+#define uds_log_error(...) uds_log_message(UDS_LOG_ERR, __VA_ARGS__)
-+
-+#define uds_log_fatal(...) uds_log_message(UDS_LOG_CRIT, __VA_ARGS__)
-+
-+void uds_pause_for_logger(void);
-+#endif /* UDS_LOGGER_H */
-diff --git a/drivers/md/dm-vdo/permassert.c b/drivers/md/dm-vdo/permassert.c
-new file mode 100644
-index 000000000000..94ab785c8a0a
---- /dev/null
-+++ b/drivers/md/dm-vdo/permassert.c
-@@ -0,0 +1,35 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#include "permassert.h"
++#include "chapter-index.h"
 +
 +#include "errors.h"
-+#include "logger.h"
-+
-+int uds_assertion_failed(const char *expression_string,
-+			 const char *file_name,
-+			 int line_number,
-+			 const char *format,
-+			 ...)
-+{
-+	va_list args;
-+
-+	va_start(args, format);
-+
-+	uds_log_embedded_message(UDS_LOG_ERR,
-+				 UDS_LOGGING_MODULE_NAME,
-+				 "assertion \"",
-+				 format,
-+				 args,
-+				 "\" (%s) failed at %s:%d",
-+				 expression_string,
-+				 file_name,
-+				 line_number);
-+	uds_log_backtrace(UDS_LOG_ERR);
-+
-+	va_end(args);
-+
-+	return UDS_ASSERTION_FAILED;
-+}
-diff --git a/drivers/md/dm-vdo/permassert.h b/drivers/md/dm-vdo/permassert.h
-new file mode 100644
-index 000000000000..bc0db0b187b6
---- /dev/null
-+++ b/drivers/md/dm-vdo/permassert.h
-@@ -0,0 +1,65 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#ifndef PERMASSERT_H
-+#define PERMASSERT_H
-+
-+#include <linux/compiler.h>
-+
-+#include "errors.h"
-+
-+/* Utilities for asserting that certain conditions are met */
-+
-+#define STRINGIFY(X) #X
-+#define STRINGIFY_VALUE(X) STRINGIFY(X)
-+
-+/*
-+ * A hack to apply the "warn if unused" attribute to an integral expression.
-+ *
-+ * Since GCC doesn't propagate the warn_unused_result attribute to conditional expressions
-+ * incorporating calls to functions with that attribute, this function can be used to wrap such an
-+ * expression. With optimization enabled, this function contributes no additional instructions, but
-+ * the warn_unused_result attribute still applies to the code calling it.
-+ */
-+static inline int __must_check uds_must_use(int value)
-+{
-+	return value;
-+}
-+
-+/* Assert that an expression is true and return an error if it is not. */
-+#define ASSERT(expr, ...) uds_must_use(__UDS_ASSERT(expr, __VA_ARGS__))
-+
-+/* Log a message if the expression is not true. */
-+#define ASSERT_LOG_ONLY(expr, ...) __UDS_ASSERT(expr, __VA_ARGS__)
-+
-+#define __UDS_ASSERT(expr, ...)				      \
-+	(likely(expr) ? UDS_SUCCESS			      \
-+		      : uds_assertion_failed(STRINGIFY(expr), __FILE__, __LINE__, __VA_ARGS__))
-+
-+/* Log an assertion failure message. */
-+int uds_assertion_failed(const char *expression_string,
-+			 const char *file_name,
-+			 int line_number,
-+			 const char *format,
-+			 ...)
-+	__printf(4, 5);
-+
-+#define STATIC_ASSERT(expr)	     \
-+	do {			     \
-+		switch (0) {	     \
-+		case 0:		     \
-+			;	     \
-+			fallthrough; \
-+		case expr:	     \
-+			;	     \
-+			fallthrough; \
-+		default:	     \
-+			break;	     \
-+		}		     \
-+	} while (0)
-+
-+#define STATIC_ASSERT_SIZEOF(type, expected_size) STATIC_ASSERT(sizeof(type) == (expected_size))
-+
-+#endif /* PERMASSERT_H */
-diff --git a/drivers/md/dm-vdo/string-utils.c b/drivers/md/dm-vdo/string-utils.c
-new file mode 100644
-index 000000000000..a584b37bb70c
---- /dev/null
-+++ b/drivers/md/dm-vdo/string-utils.c
-@@ -0,0 +1,28 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#include "string-utils.h"
-+
-+#include "errors.h"
++#include "hash-utils.h"
 +#include "logger.h"
 +#include "memory-alloc.h"
 +#include "permassert.h"
 +#include "uds.h"
 +
-+char *uds_append_to_buffer(char *buffer, char *buf_end, const char *fmt, ...)
++int uds_make_open_chapter_index(struct open_chapter_index **chapter_index,
++				const struct geometry *geometry,
++				u64 volume_nonce)
 +{
-+	va_list args;
-+	size_t n;
++	int result;
++	size_t memory_size;
++	struct open_chapter_index *index;
 +
-+	va_start(args, fmt);
-+	n = vsnprintf(buffer, buf_end - buffer, fmt, args);
-+	if (n >= (size_t) (buf_end - buffer))
-+		buffer = buf_end;
++	result = UDS_ALLOCATE(1, struct open_chapter_index, "open chapter index", &index);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	/*
++	 * The delta index will rebalance delta lists when memory gets tight,
++	 * so give the chapter index one extra page.
++	 */
++	memory_size = ((geometry->index_pages_per_chapter + 1) * geometry->bytes_per_page);
++	index->geometry = geometry;
++	index->volume_nonce = volume_nonce;
++	result = uds_initialize_delta_index(&index->delta_index,
++					    1,
++					    geometry->delta_lists_per_chapter,
++					    geometry->chapter_mean_delta,
++					    geometry->chapter_payload_bits,
++					    memory_size,
++					    'm');
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(index);
++		return result;
++	}
++
++	index->memory_size = index->delta_index.memory_size + sizeof(struct open_chapter_index);
++	*chapter_index = index;
++	return UDS_SUCCESS;
++}
++
++void uds_free_open_chapter_index(struct open_chapter_index *chapter_index)
++{
++	if (chapter_index == NULL)
++		return;
++
++	uds_uninitialize_delta_index(&chapter_index->delta_index);
++	UDS_FREE(chapter_index);
++}
++
++/* Re-initialize an open chapter index for a new chapter. */
++void uds_empty_open_chapter_index(struct open_chapter_index *chapter_index,
++				  u64 virtual_chapter_number)
++{
++	uds_reset_delta_index(&chapter_index->delta_index);
++	chapter_index->virtual_chapter_number = virtual_chapter_number;
++}
++
++static inline bool was_entry_found(const struct delta_index_entry *entry, u32 address)
++{
++	return (!entry->at_end) && (entry->key == address);
++}
++
++/* Associate a record name with the record page containing its metadata. */
++int uds_put_open_chapter_index_record(struct open_chapter_index *chapter_index,
++				      const struct uds_record_name *name,
++				      u32 page_number)
++{
++	int result;
++	struct delta_index_entry entry;
++	u32 address;
++	u32 list_number;
++	const u8 *found_name;
++	bool found;
++	const struct geometry *geometry = chapter_index->geometry;
++	u64 chapter_number = chapter_index->virtual_chapter_number;
++	u32 record_pages = geometry->record_pages_per_chapter;
++
++	result = ASSERT(page_number < record_pages,
++			"Page number within chapter (%u) exceeds the maximum value %u",
++			page_number,
++			record_pages);
++	if (result != UDS_SUCCESS)
++		return UDS_INVALID_ARGUMENT;
++
++	address = uds_hash_to_chapter_delta_address(name, geometry);
++	list_number = uds_hash_to_chapter_delta_list(name, geometry);
++	result = uds_get_delta_index_entry(&chapter_index->delta_index,
++					   list_number,
++					   address,
++					   name->name,
++					   &entry);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	found = was_entry_found(&entry, address);
++	result = ASSERT(!(found && entry.is_collision),
++			"Chunk appears more than once in chapter %llu",
++			(unsigned long long) chapter_number);
++	if (result != UDS_SUCCESS)
++		return UDS_BAD_STATE;
++
++	found_name = (found ? name->name : NULL);
++	return uds_put_delta_index_entry(&entry, address, page_number, found_name);
++}
++
++/*
++ * Pack a section of an open chapter index into a chapter index page. A range of delta lists
++ * (starting with a specified list index) is copied from the open chapter index into a memory page.
++ * The number of lists copied onto the page is returned to the caller on success.
++ *
++ * @chapter_index: The open chapter index
++ * @memory: The memory page to use
++ * @first_list: The first delta list number to be copied
++ * @last_page: If true, this is the last page of the chapter index and all the remaining lists must
++ *             be packed onto this page
++ * @lists_packed: The number of delta lists that were packed onto this page
++ */
++int uds_pack_open_chapter_index_page(struct open_chapter_index *chapter_index,
++				     u8 *memory,
++				     u32 first_list,
++				     bool last_page,
++				     u32 *lists_packed)
++{
++	int result;
++	struct delta_index *delta_index = &chapter_index->delta_index;
++	struct delta_index_stats stats;
++	u64 nonce = chapter_index->volume_nonce;
++	u64 chapter_number = chapter_index->virtual_chapter_number;
++	const struct geometry *geometry = chapter_index->geometry;
++	u32 list_count = geometry->delta_lists_per_chapter;
++	unsigned int removals = 0;
++	struct delta_index_entry entry;
++	u32 next_list;
++	s32 list_number;
++
++	for (;;) {
++		result = uds_pack_delta_index_page(delta_index,
++						   nonce,
++						   memory,
++						   geometry->bytes_per_page,
++						   chapter_number,
++						   first_list,
++						   lists_packed);
++		if (result != UDS_SUCCESS)
++			return result;
++		if ((first_list + *lists_packed) == list_count)
++			/* All lists are packed. */
++			break;
++		else if (*lists_packed == 0) {
++			/*
++			 * The next delta list does not fit on a page. This delta list will be
++			 * removed.
++			 */
++		} else if (last_page) {
++			/*
++			 * This is the last page and there are lists left unpacked, but all of the
++			 * remaining lists must fit on the page. Find a list that contains entries
++			 * and remove the entire list. Try the first list that does not fit. If it
++			 * is empty, we will select the last list that already fits and has any
++			 * entries.
++			 */
++		} else {
++			/* This page is done. */
++			break;
++		}
++
++		if (removals == 0) {
++			uds_get_delta_index_stats(delta_index, &stats);
++			uds_log_warning("The chapter index for chapter %llu contains %llu entries with %llu collisions",
++					(unsigned long long) chapter_number,
++					(unsigned long long) stats.record_count,
++					(unsigned long long) stats.collision_count);
++		}
++
++		list_number = *lists_packed;
++		do {
++			if (list_number < 0)
++				return UDS_OVERFLOW;
++
++			next_list = first_list + list_number--,
++			result = uds_start_delta_index_search(delta_index, next_list, 0, &entry);
++			if (result != UDS_SUCCESS)
++				return result;
++
++			result = uds_next_delta_index_entry(&entry);
++			if (result != UDS_SUCCESS)
++				return result;
++		} while (entry.at_end);
++
++		do {
++			result = uds_remove_delta_index_entry(&entry);
++			if (result != UDS_SUCCESS)
++				return result;
++			removals++;
++		} while (!entry.at_end);
++	}
++
++	if (removals > 0)
++		uds_log_warning("To avoid chapter index page overflow in chapter %llu, %u entries were removed from the chapter index",
++				(unsigned long long) chapter_number,
++				removals);
++
++	return UDS_SUCCESS;
++}
++
++/* Make a new chapter index page, initializing it with the data from a given index_page buffer. */
++int uds_initialize_chapter_index_page(struct delta_index_page *index_page,
++				      const struct geometry *geometry,
++				      u8 *page_buffer,
++				      u64 volume_nonce)
++{
++	return uds_initialize_delta_index_page(index_page,
++					       volume_nonce,
++					       geometry->chapter_mean_delta,
++					       geometry->chapter_payload_bits,
++					       page_buffer,
++					       geometry->bytes_per_page);
++}
++
++/* Validate a chapter index page read during rebuild. */
++int uds_validate_chapter_index_page(const struct delta_index_page *index_page,
++				    const struct geometry *geometry)
++{
++	int result;
++	const struct delta_index *delta_index = &index_page->delta_index;
++	u32 first = index_page->lowest_list_number;
++	u32 last = index_page->highest_list_number;
++	u32 list_number;
++
++	/* We walk every delta list from start to finish. */
++	for (list_number = first; list_number <= last; list_number++) {
++		struct delta_index_entry entry;
++
++		result = uds_start_delta_index_search(delta_index, list_number - first, 0, &entry);
++		if (result != UDS_SUCCESS)
++			return result;
++
++		for (;;) {
++			result = uds_next_delta_index_entry(&entry);
++			if (result != UDS_SUCCESS)
++				/*
++				 * A random bit stream is highly likely to arrive here when we go
++				 * past the end of the delta list.
++				 */
++				return result;
++
++			if (entry.at_end)
++				break;
++
++			/* Also make sure that the record page field contains a plausible value. */
++			if (uds_get_delta_entry_value(&entry) >=
++			    geometry->record_pages_per_chapter)
++				/*
++				 * Do not log this as an error. It happens in normal operation when
++				 * we are doing a rebuild but haven't written the entire volume
++				 * once.
++				 */
++				return UDS_CORRUPT_DATA;
++		}
++	}
++	return UDS_SUCCESS;
++}
++
++/*
++ * Search a chapter index page for a record name, returning the record page number that may contain
++ * the name.
++ */
++int uds_search_chapter_index_page(struct delta_index_page *index_page,
++				  const struct geometry *geometry,
++				  const struct uds_record_name *name,
++				  u16 *record_page_ptr)
++{
++	int result;
++	struct delta_index *delta_index = &index_page->delta_index;
++	u32 address = uds_hash_to_chapter_delta_address(name, geometry);
++	u32 delta_list_number = uds_hash_to_chapter_delta_list(name, geometry);
++	u32 sub_list_number = delta_list_number - index_page->lowest_list_number;
++	struct delta_index_entry entry;
++
++	result = uds_get_delta_index_entry(delta_index,
++					   sub_list_number,
++					   address,
++					   name->name,
++					   &entry);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	if (was_entry_found(&entry, address))
++		*record_page_ptr = uds_get_delta_entry_value(&entry);
 +	else
-+		buffer += n;
-+	va_end(args);
++		*record_page_ptr = NO_CHAPTER_INDEX_ENTRY;
 +
-+	return buffer;
++	return UDS_SUCCESS;
 +}
-diff --git a/drivers/md/dm-vdo/string-utils.h b/drivers/md/dm-vdo/string-utils.h
+diff --git a/drivers/md/dm-vdo/chapter-index.h b/drivers/md/dm-vdo/chapter-index.h
 new file mode 100644
-index 000000000000..8275af582cf7
+index 000000000000..0a9992e5e347
 --- /dev/null
-+++ b/drivers/md/dm-vdo/string-utils.h
-@@ -0,0 +1,23 @@
++++ b/drivers/md/dm-vdo/chapter-index.h
+@@ -0,0 +1,66 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef UDS_STRING_UTILS_H
-+#define UDS_STRING_UTILS_H
++#ifndef UDS_CHAPTER_INDEX_H
++#define UDS_CHAPTER_INDEX_H
 +
-+#include <linux/kernel.h>
-+#include <linux/string.h>
++#include <linux/limits.h>
 +
-+/* Utilities related to string manipulation */
++#include "delta-index.h"
++#include "geometry.h"
 +
-+static inline const char *uds_bool_to_string(bool value)
++/*
++ * A chapter index for an open chapter is a mutable structure that tracks all the records that have
++ * been added to the chapter. A chapter index for a closed chapter is similar except that it is
++ * immutable because the contents of a closed chapter can never change, and the immutable structure
++ * is more efficient. Both types of chapter index are implemented with a delta index.
++ */
++
++enum {
++	/* The value returned when no entry is found in the chapter index. */
++	NO_CHAPTER_INDEX_ENTRY = U16_MAX,
++};
++
++struct open_chapter_index {
++	const struct geometry *geometry;
++	struct delta_index delta_index;
++	u64 virtual_chapter_number;
++	u64 volume_nonce;
++	size_t memory_size;
++};
++
++int __must_check uds_make_open_chapter_index(struct open_chapter_index **chapter_index,
++					     const struct geometry *geometry,
++					     u64 volume_nonce);
++
++void uds_free_open_chapter_index(struct open_chapter_index *chapter_index);
++
++void uds_empty_open_chapter_index(struct open_chapter_index *chapter_index,
++				  u64 virtual_chapter_number);
++
++int __must_check uds_put_open_chapter_index_record(struct open_chapter_index *chapter_index,
++						   const struct uds_record_name *name,
++						   u32 page_number);
++
++int __must_check uds_pack_open_chapter_index_page(struct open_chapter_index *chapter_index,
++						  u8 *memory,
++						  u32 first_list,
++						  bool last_page,
++						  u32 *lists_packed);
++
++int __must_check uds_initialize_chapter_index_page(struct delta_index_page *index_page,
++						   const struct geometry *geometry,
++						   u8 *page_buffer,
++						   u64 volume_nonce);
++
++int __must_check uds_validate_chapter_index_page(const struct delta_index_page *index_page,
++						 const struct geometry *geometry);
++
++int __must_check uds_search_chapter_index_page(struct delta_index_page *index_page,
++					       const struct geometry *geometry,
++					       const struct uds_record_name *name,
++					       u16 *record_page_ptr);
++
++#endif /* UDS_CHAPTER_INDEX_H */
+diff --git a/drivers/md/dm-vdo/open-chapter.c b/drivers/md/dm-vdo/open-chapter.c
+new file mode 100644
+index 000000000000..d54c8fb6f118
+--- /dev/null
++++ b/drivers/md/dm-vdo/open-chapter.c
+@@ -0,0 +1,433 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright 2023 Red Hat
++ */
++
++#include "open-chapter.h"
++
++#include <linux/log2.h>
++
++#include "config.h"
++#include "hash-utils.h"
++#include "logger.h"
++#include "memory-alloc.h"
++#include "numeric.h"
++#include "permassert.h"
++
++/*
++ * Each index zone has a dedicated open chapter zone structure which gets an equal share of the
++ * open chapter space. Records are assigned to zones based on their record name. Within each zone,
++ * records are stored in an array in the order they arrive. Additionally, a reference to each
++ * record is stored in a hash table to help determine if a new record duplicates an existing one.
++ * If new metadata for an existing name arrives, the record is altered in place. The array of
++ * records is 1-based so that record number 0 can be used to indicate an unused hash slot.
++ *
++ * Deleted records are marked with a flag rather than actually removed to simplify hash table
++ * management. The array of deleted flags overlays the array of hash slots, but the flags are
++ * indexed by record number instead of by record name. The number of hash slots will always be a
++ * power of two that is greater than the number of records to be indexed, guaranteeing that hash
++ * insertion cannot fail, and that there are sufficient flags for all records.
++ *
++ * Once any open chapter zone fills its available space, the chapter is closed. The records from
++ * each zone are interleaved to attempt to preserve temporal locality and assigned to record pages.
++ * Empty or deleted records are replaced by copies of a valid record so that the record pages only
++ * contain valid records. The chapter then constructs a delta index which maps each record name to
++ * the record page on which that record can be found, which is split into index pages. These
++ * structures are then passed to the volume to be recorded on storage.
++ *
++ * When the index is saved, the open chapter records are saved in a single array, once again
++ * interleaved to attempt to preserve temporal locality. When the index is reloaded, there may be a
++ * different number of zones than previously, so the records must be parcelled out to their new
++ * zones. In addition, depending on the distribution of record names, a new zone may have more
++ * records than it has space. In this case, the latest records for that zone will be discarded.
++ */
++
++static const u8 OPEN_CHAPTER_MAGIC[] = "ALBOC";
++static const u8 OPEN_CHAPTER_VERSION[] = "02.00";
++
++enum {
++	OPEN_CHAPTER_MAGIC_LENGTH = sizeof(OPEN_CHAPTER_MAGIC) - 1,
++	OPEN_CHAPTER_VERSION_LENGTH = sizeof(OPEN_CHAPTER_VERSION) - 1,
++	LOAD_RATIO = 2,
++};
++
++static inline size_t records_size(const struct open_chapter_zone *open_chapter)
 +{
-+	return value ? "true" : "false";
++	return sizeof(struct uds_volume_record) * (1 + open_chapter->capacity);
 +}
 +
-+/* Append a formatted string to the end of a buffer. */
-+char *uds_append_to_buffer(char *buffer, char *buf_end, const char *fmt, ...)
-+	__printf(3, 4);
++static inline size_t slots_size(size_t slot_count)
++{
++	return sizeof(struct open_chapter_zone_slot) * slot_count;
++}
 +
-+#endif /* UDS_STRING_UTILS_H */
-diff --git a/drivers/md/dm-vdo/time-utils.h b/drivers/md/dm-vdo/time-utils.h
++int uds_make_open_chapter(const struct geometry *geometry,
++			  unsigned int zone_count,
++			  struct open_chapter_zone **open_chapter_ptr)
++{
++	int result;
++	struct open_chapter_zone *open_chapter;
++	size_t capacity = geometry->records_per_chapter / zone_count;
++	size_t slot_count = (1 << bits_per(capacity * LOAD_RATIO));
++
++	result = UDS_ALLOCATE_EXTENDED(struct open_chapter_zone,
++				       slot_count,
++				       struct open_chapter_zone_slot,
++				       "open chapter",
++				       &open_chapter);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	open_chapter->slot_count = slot_count;
++	open_chapter->capacity = capacity;
++	result = uds_allocate_cache_aligned(records_size(open_chapter),
++					    "record pages",
++					    &open_chapter->records);
++	if (result != UDS_SUCCESS) {
++		uds_free_open_chapter(open_chapter);
++		return result;
++	}
++
++	*open_chapter_ptr = open_chapter;
++	return UDS_SUCCESS;
++}
++
++void uds_reset_open_chapter(struct open_chapter_zone *open_chapter)
++{
++	open_chapter->size = 0;
++	open_chapter->deletions = 0;
++
++	memset(open_chapter->records, 0, records_size(open_chapter));
++	memset(open_chapter->slots, 0, slots_size(open_chapter->slot_count));
++}
++
++static unsigned int
++probe_chapter_slots(struct open_chapter_zone *open_chapter, const struct uds_record_name *name)
++{
++	struct uds_volume_record *record;
++	unsigned int slot_count = open_chapter->slot_count;
++	unsigned int slot = uds_name_to_hash_slot(name, slot_count);
++	unsigned int record_number;
++	unsigned int attempts = 1;
++
++	while (true) {
++		record_number = open_chapter->slots[slot].record_number;
++
++		/*
++		 * If the hash slot is empty, we've reached the end of a chain without finding the
++		 * record and should terminate the search.
++		 */
++		if (record_number == 0)
++			return slot;
++
++		/*
++		 * If the name of the record referenced by the slot matches and has not been
++		 * deleted, then we've found the requested name.
++		 */
++		record = &open_chapter->records[record_number];
++		if ((memcmp(&record->name, name, UDS_RECORD_NAME_SIZE) == 0) &&
++		    !open_chapter->slots[record_number].deleted)
++			return slot;
++
++		/*
++		 * Quadratic probing: advance the probe by 1, 2, 3, etc. and try again. This
++		 * performs better than linear probing and works best for 2^N slots.
++		 */
++		slot = (slot + attempts++) % slot_count;
++	}
++}
++
++void uds_search_open_chapter(struct open_chapter_zone *open_chapter,
++			     const struct uds_record_name *name,
++			     struct uds_record_data *metadata,
++			     bool *found)
++{
++	unsigned int slot;
++	unsigned int record_number;
++
++	slot = probe_chapter_slots(open_chapter, name);
++	record_number = open_chapter->slots[slot].record_number;
++	if (record_number == 0) {
++		*found = false;
++	} else {
++		*found = true;
++		*metadata = open_chapter->records[record_number].data;
++	}
++}
++
++/* Add a record to the open chapter zone and return the remaining space. */
++int uds_put_open_chapter(struct open_chapter_zone *open_chapter,
++			 const struct uds_record_name *name,
++			 const struct uds_record_data *metadata)
++{
++	unsigned int slot;
++	unsigned int record_number;
++	struct uds_volume_record *record;
++
++	if (open_chapter->size >= open_chapter->capacity)
++		return 0;
++
++	slot = probe_chapter_slots(open_chapter, name);
++	record_number = open_chapter->slots[slot].record_number;
++
++	if (record_number == 0) {
++		record_number = ++open_chapter->size;
++		open_chapter->slots[slot].record_number = record_number;
++	}
++
++	record = &open_chapter->records[record_number];
++	record->name = *name;
++	record->data = *metadata;
++
++	return open_chapter->capacity - open_chapter->size;
++}
++
++void uds_remove_from_open_chapter(struct open_chapter_zone *open_chapter,
++				  const struct uds_record_name *name)
++{
++	unsigned int slot;
++	unsigned int record_number;
++
++	slot = probe_chapter_slots(open_chapter, name);
++	record_number = open_chapter->slots[slot].record_number;
++
++	if (record_number > 0) {
++		open_chapter->slots[record_number].deleted = true;
++		open_chapter->deletions += 1;
++	}
++}
++
++void uds_free_open_chapter(struct open_chapter_zone *open_chapter)
++{
++	if (open_chapter != NULL) {
++		UDS_FREE(open_chapter->records);
++		UDS_FREE(open_chapter);
++	}
++}
++
++/* Map each record name to its record page number in the delta chapter index. */
++static int fill_delta_chapter_index(struct open_chapter_zone **chapter_zones,
++				    unsigned int zone_count,
++				    struct open_chapter_index *index,
++				    struct uds_volume_record *collated_records)
++{
++	int result;
++	unsigned int records_per_chapter;
++	unsigned int records_per_page;
++	unsigned int record_index;
++	unsigned int records = 0;
++	u32 page_number;
++	unsigned int z;
++	int overflow_count = 0;
++	struct uds_volume_record *fill_record = NULL;
++
++	/*
++	 * The record pages should not have any empty space, so find a record with which to fill
++	 * the chapter zone if it was closed early, and also to replace any deleted records. The
++	 * last record in any filled zone is guaranteed to not have been deleted, so use one of
++	 * those.
++	 */
++	for (z = 0; z < zone_count; z++) {
++		struct open_chapter_zone *zone = chapter_zones[z];
++
++		if (zone->size == zone->capacity) {
++			fill_record = &zone->records[zone->size];
++			break;
++		}
++	}
++
++	records_per_chapter = index->geometry->records_per_chapter;
++	records_per_page = index->geometry->records_per_page;
++
++	for (records = 0; records < records_per_chapter; records++) {
++		struct uds_volume_record *record = &collated_records[records];
++		struct open_chapter_zone *open_chapter;
++
++		/* The record arrays in the zones are 1-based. */
++		record_index = 1 + (records / zone_count);
++		page_number = records / records_per_page;
++		open_chapter = chapter_zones[records % zone_count];
++
++		/* Use the fill record in place of an unused record. */
++		if (record_index > open_chapter->size ||
++		    open_chapter->slots[record_index].deleted) {
++			*record = *fill_record;
++			continue;
++		}
++
++		*record = open_chapter->records[record_index];
++		result = uds_put_open_chapter_index_record(index, &record->name, page_number);
++		switch (result) {
++		case UDS_SUCCESS:
++			break;
++		case UDS_OVERFLOW:
++			overflow_count++;
++			break;
++		default:
++			uds_log_error_strerror(result, "failed to build open chapter index");
++			return result;
++		}
++	}
++
++	if (overflow_count > 0)
++		uds_log_warning("Failed to add %d entries to chapter index", overflow_count);
++
++	return UDS_SUCCESS;
++}
++
++int uds_close_open_chapter(struct open_chapter_zone **chapter_zones,
++			   unsigned int zone_count,
++			   struct volume *volume,
++			   struct open_chapter_index *chapter_index,
++			   struct uds_volume_record *collated_records,
++			   u64 virtual_chapter_number)
++{
++	int result;
++
++	uds_empty_open_chapter_index(chapter_index, virtual_chapter_number);
++	result = fill_delta_chapter_index(chapter_zones,
++					  zone_count,
++					  chapter_index,
++					  collated_records);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return uds_write_chapter(volume, chapter_index, collated_records);
++}
++
++int uds_save_open_chapter(struct uds_index *index, struct buffered_writer *writer)
++{
++	int result;
++	struct open_chapter_zone *open_chapter;
++	struct uds_volume_record *record;
++	u8 record_count_data[sizeof(u32)];
++	u32 record_count = 0;
++	unsigned int record_index;
++	unsigned int z;
++
++	result = uds_write_to_buffered_writer(writer,
++					      OPEN_CHAPTER_MAGIC,
++					      OPEN_CHAPTER_MAGIC_LENGTH);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_write_to_buffered_writer(writer,
++					      OPEN_CHAPTER_VERSION,
++					      OPEN_CHAPTER_VERSION_LENGTH);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	for (z = 0; z < index->zone_count; z++) {
++		open_chapter = index->zones[z]->open_chapter;
++		record_count += open_chapter->size - open_chapter->deletions;
++	}
++
++	put_unaligned_le32(record_count, record_count_data);
++	result = uds_write_to_buffered_writer(writer,
++					      record_count_data,
++					      sizeof(record_count_data));
++	if (result != UDS_SUCCESS)
++		return result;
++
++	record_index = 1;
++	while (record_count > 0) {
++		for (z = 0; z < index->zone_count; z++) {
++			open_chapter = index->zones[z]->open_chapter;
++			if (record_index > open_chapter->size)
++				continue;
++
++			if (open_chapter->slots[record_index].deleted)
++				continue;
++
++			record = &open_chapter->records[record_index];
++			result = uds_write_to_buffered_writer(writer,
++							      (u8 *) record,
++							      sizeof(*record));
++			if (result != UDS_SUCCESS)
++				return result;
++
++			record_count--;
++		}
++
++		record_index++;
++	}
++
++	return uds_flush_buffered_writer(writer);
++}
++
++u64 uds_compute_saved_open_chapter_size(struct geometry *geometry)
++{
++	unsigned int records_per_chapter = geometry->records_per_chapter;
++
++	return OPEN_CHAPTER_MAGIC_LENGTH + OPEN_CHAPTER_VERSION_LENGTH + sizeof(u32) +
++		records_per_chapter * sizeof(struct uds_volume_record);
++}
++
++static int load_version20(struct uds_index *index, struct buffered_reader *reader)
++{
++	int result;
++	u32 record_count;
++	u8 record_count_data[sizeof(u32)];
++	struct uds_volume_record record;
++
++	/*
++	 * Track which zones cannot accept any more records. If the open chapter had a different
++	 * number of zones previously, some new zones may have more records than they have space
++	 * for. These overflow records will be discarded.
++	 */
++	bool full_flags[MAX_ZONES] = {
++		false,
++	};
++
++	result = uds_read_from_buffered_reader(reader,
++					       (u8 *) &record_count_data,
++					       sizeof(record_count_data));
++	if (result != UDS_SUCCESS)
++		return result;
++
++	record_count = get_unaligned_le32(record_count_data);
++	while (record_count-- > 0) {
++		unsigned int zone = 0;
++
++		result = uds_read_from_buffered_reader(reader, (u8 *) &record, sizeof(record));
++		if (result != UDS_SUCCESS)
++			return result;
++
++		if (index->zone_count > 1)
++			zone = uds_get_volume_index_zone(index->volume_index, &record.name);
++
++		if (!full_flags[zone]) {
++			struct open_chapter_zone *open_chapter;
++			unsigned int remaining;
++
++			open_chapter = index->zones[zone]->open_chapter;
++			remaining = uds_put_open_chapter(open_chapter, &record.name, &record.data);
++			/* Do not allow any zone to fill completely. */
++			full_flags[zone] = (remaining <= 1);
++		}
++	}
++
++	return UDS_SUCCESS;
++}
++
++int uds_load_open_chapter(struct uds_index *index, struct buffered_reader *reader)
++{
++	u8 version[OPEN_CHAPTER_VERSION_LENGTH];
++	int result;
++
++	result = uds_verify_buffered_data(reader, OPEN_CHAPTER_MAGIC, OPEN_CHAPTER_MAGIC_LENGTH);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_read_from_buffered_reader(reader, version, sizeof(version));
++	if (result != UDS_SUCCESS)
++		return result;
++
++	if (memcmp(OPEN_CHAPTER_VERSION, version, sizeof(version)) != 0)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "Invalid open chapter version: %.*s",
++					      (int) sizeof(version),
++					      version);
++
++	return load_version20(index, reader);
++}
+diff --git a/drivers/md/dm-vdo/open-chapter.h b/drivers/md/dm-vdo/open-chapter.h
 new file mode 100644
-index 000000000000..5f1e850fd826
+index 000000000000..1fc575d2789a
 --- /dev/null
-+++ b/drivers/md/dm-vdo/time-utils.h
-@@ -0,0 +1,28 @@
++++ b/drivers/md/dm-vdo/open-chapter.h
+@@ -0,0 +1,79 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef UDS_TIME_UTILS_H
-+#define UDS_TIME_UTILS_H
++#ifndef UDS_OPEN_CHAPTER_H
++#define UDS_OPEN_CHAPTER_H
 +
-+#include <linux/ktime.h>
-+#include <linux/time.h>
-+#include <linux/types.h>
++#include "chapter-index.h"
++#include "geometry.h"
++#include "index.h"
++#include "volume.h"
 +
-+static inline s64 ktime_to_seconds(ktime_t reltime)
-+{
-+	return reltime / NSEC_PER_SEC;
-+}
++/*
++ * The open chapter tracks the newest records in memory. Like the index as a whole, each open
++ * chapter is divided into a number of independent zones which are interleaved when the chapter is
++ * committed to the volume.
++ */
 +
-+static inline ktime_t current_time_ns(clockid_t clock)
-+{
-+	return clock == CLOCK_MONOTONIC ? ktime_get_ns() : ktime_get_real_ns();
-+}
++enum {
++	OPEN_CHAPTER_RECORD_NUMBER_BITS = 23,
++};
 +
-+static inline ktime_t current_time_us(void)
-+{
-+	return current_time_ns(CLOCK_REALTIME) / NSEC_PER_USEC;
-+}
++struct open_chapter_zone_slot {
++	/* If non-zero, the record number addressed by this hash slot */
++	unsigned int record_number : OPEN_CHAPTER_RECORD_NUMBER_BITS;
++	/* If true, the record at the index of this hash slot was deleted */
++	bool deleted : 1;
++} __packed;
 +
-+#endif /* UDS_TIME_UTILS_H */
++struct open_chapter_zone {
++	/* The maximum number of records that can be stored */
++	unsigned int capacity;
++	/* The number of records stored */
++	unsigned int size;
++	/* The number of deleted records */
++	unsigned int deletions;
++	/* Array of chunk records, 1-based */
++	struct uds_volume_record *records;
++	/* The number of slots in the hash table */
++	unsigned int slot_count;
++	/* The hash table slots, referencing virtual record numbers */
++	struct open_chapter_zone_slot slots[];
++};
++
++int __must_check uds_make_open_chapter(const struct geometry *geometry,
++				       unsigned int zone_count,
++				       struct open_chapter_zone **open_chapter_ptr);
++
++void uds_reset_open_chapter(struct open_chapter_zone *open_chapter);
++
++void uds_search_open_chapter(struct open_chapter_zone *open_chapter,
++			     const struct uds_record_name *name,
++			     struct uds_record_data *metadata,
++			     bool *found);
++
++int __must_check uds_put_open_chapter(struct open_chapter_zone *open_chapter,
++				      const struct uds_record_name *name,
++				      const struct uds_record_data *metadata);
++
++void uds_remove_from_open_chapter(struct open_chapter_zone *open_chapter,
++				  const struct uds_record_name *name);
++
++void uds_free_open_chapter(struct open_chapter_zone *open_chapter);
++
++int __must_check uds_close_open_chapter(struct open_chapter_zone **chapter_zones,
++					unsigned int zone_count,
++					struct volume *volume,
++					struct open_chapter_index *chapter_index,
++					struct uds_volume_record *collated_records,
++					u64 virtual_chapter_number);
++
++int __must_check uds_save_open_chapter(struct uds_index *index, struct buffered_writer *writer);
++
++int __must_check uds_load_open_chapter(struct uds_index *index, struct buffered_reader *reader);
++
++u64 uds_compute_saved_open_chapter_size(struct geometry *geometry);
++
++#endif /* UDS_OPEN_CHAPTER_H */
 -- 
 2.40.0
 
