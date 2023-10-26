@@ -2,56 +2,161 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D656C25B48
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA537C25B48
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:33:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbjJZVOo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 17:14:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39194 "EHLO
+        id S232171AbjJZVdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 17:33:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjJZVOo (ORCPT
+        with ESMTP id S230271AbjJZVdt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Oct 2023 17:14:44 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A954A10E;
-        Thu, 26 Oct 2023 14:14:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=STBT4USV80X7xjDyPQBrhAt8zpR20Z1FI+DoegQb6k0=; b=hi92sel8fx6a1xWS0qj0ZTLs/C
-        aBvXQcKQ5GoQ5MvYk1e7qacr3FeQXgWQK63i1ubM4FgoNQlD17p7gmdLEtJ4/YE8q4tv7UU8xvLyS
-        CUyB/qwwB6tcIYmvkc4s7TuS0yfKgaJOaF2tiTLw6PHrxCoGabYCD5BGbhJkHQHHQwtTm5mY/hmVL
-        ZDkSBZphBgFjFVDpGGFoQEQjNy1VJHGMyGdfLiKiGwIW1Y7gMwWwLLiP/K9vW8+nU2eccdpNv6XZt
-        3CjL14h0Oda8aQA6e4Zt7gCu5CKzSvd4eqmSnzkhoDF1QAjfpdzkft9JkoLqCx6pgNtO5Ac6nihTW
-        z4xJgRJA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qw7gZ-00FA7v-32;
-        Thu, 26 Oct 2023 21:14:35 +0000
-Date:   Thu, 26 Oct 2023 14:14:35 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Zhong Jinghua <zhongjinghua@huaweicloud.com>
-Cc:     axboe@kernel.dk, hare@suse.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zhongjinghua@huawei.com,
-        yi.zhang@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH] block: Set memalloc_noio to false in the error path
-Message-ID: <ZTrWu2v6Qp0QVCYw@bombadil.infradead.org>
-References: <20231025075436.2212468-1-zhongjinghua@huaweicloud.com>
+        Thu, 26 Oct 2023 17:33:49 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4BE03129;
+        Thu, 26 Oct 2023 14:33:47 -0700 (PDT)
+Received: from [10.137.106.151] (unknown [131.107.159.23])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 81AF920B74C0;
+        Thu, 26 Oct 2023 14:33:46 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 81AF920B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1698356026;
+        bh=4XTXNRGs6EFGxu4uzbSZ7r9fKh4mK0LSSScI1Qs6AQY=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=lkHsle7iI2VQ1AX+NaZr+9OMmFu99wmEtzfgnr6EJZqK4JVp9txEyJ3iZLIi3Yqiu
+         atrmGJ/tt2zKVKq49LWpN05TsSkmG4Wfj5PgbwOkVV+gYOnVpzAz7Pyi+j5RPLfU0o
+         BiQVRpCRe8GC+EKvTHzEo1DAKQ4XP+Zkut822rHM=
+Message-ID: <616a6fd7-47b1-4b46-af23-46f9b1a3eedf@linux.microsoft.com>
+Date:   Thu, 26 Oct 2023 14:33:46 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231025075436.2212468-1-zhongjinghua@huaweicloud.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v11 5/19] ipe: introduce 'boot_verified' as a trust
+ provider
+To:     Paul Moore <paul@paul-moore.com>, corbet@lwn.net,
+        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
+        agk@redhat.com, snitzer@kernel.org, eparis@redhat.com
+Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, audit@vger.kernel.org,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+References: <1696457386-3010-6-git-send-email-wufan@linux.microsoft.com>
+ <c53599e9d278fc55be30e3bac9411328.paul@paul-moore.com>
+Content-Language: en-US
+From:   Fan Wu <wufan@linux.microsoft.com>
+In-Reply-To: <c53599e9d278fc55be30e3bac9411328.paul@paul-moore.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 03:54:36PM +0800, Zhong Jinghua wrote:
-> From: Zhong Jinghua <zhongjinghua@huawei.com>
+
+
+On 10/23/2023 8:52 PM, Paul Moore wrote:
+> On Oct  4, 2023 Fan Wu <wufan@linux.microsoft.com> wrote:
+>>
+>> IPE is designed to provide system level trust guarantees, this usually
+>> implies that trust starts from bootup with a hardware root of trust,
+>> which validates the bootloader. After this, the bootloader verifies the
+>> kernel and the initramfs.
+>>
+>> As there's no currently supported integrity method for initramfs, and
+>> it's typically already verified by the bootloader, introduce a property
+>> that causes the first superblock to have an execution to be "pinned",
+>> which is typically initramfs.
+>>
+>> When the "pinned" device is unmounted, it will be "unpinned" and
+>> `boot_verified` property will always evaluate to false afterward.
+>>
+>> We use a pointer with a spin_lock to "pin" the device instead of rcu
+>> because rcu synchronization may sleep, which is not allowed when
+>> unmounting a device.
+>>
+>> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+>> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+...
+>> ---
+>>   security/ipe/eval.c          | 72 +++++++++++++++++++++++++++++++++++-
+>>   security/ipe/eval.h          |  2 +
+>>   security/ipe/hooks.c         | 12 ++++++
+>>   security/ipe/hooks.h         |  2 +
+>>   security/ipe/ipe.c           |  1 +
+>>   security/ipe/policy.h        |  2 +
+>>   security/ipe/policy_parser.c | 35 +++++++++++++++++-
+>>   7 files changed, 124 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+>> index 8a8bcc5c7d7f..bdac4abc0ddb 100644
+>> --- a/security/ipe/eval.c
+>> +++ b/security/ipe/eval.c
+>> @@ -9,6 +9,7 @@
+>>   #include <linux/file.h>
+>>   #include <linux/sched.h>
+>>   #include <linux/rcupdate.h>
+>> +#include <linux/spinlock.h>
+>>   
+>>   #include "ipe.h"
+>>   #include "eval.h"
+>> @@ -16,6 +17,44 @@
+>>   
+>>   struct ipe_policy __rcu *ipe_active_policy;
+>>   
+>> +static const struct super_block *pinned_sb;
+>> +static DEFINE_SPINLOCK(pin_lock);
+>> +#define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
+>> +
+>> +/**
+>> + * pin_sb - Pin the underlying superblock of @f, marking it as trusted.
+>> + * @sb: Supplies a super_block structure to be pinned.
+>> + */
+>> +static void pin_sb(const struct super_block *sb)
+>> +{
+>> +	if (!sb)
+>> +		return;
+>> +	spin_lock(&pin_lock);
+>> +	if (!pinned_sb)
+>> +		pinned_sb = sb;
+>> +	spin_unlock(&pin_lock);
+>> +}
+>> +
+>> +/**
+>> + * from_pinned - Determine whether @sb is the pinned super_block.
+>> + * @sb: Supplies a super_block to check against the pinned super_block.
+>> + *
+>> + * Return:
+>> + * * true	- @sb is the pinned super_block
+>> + * * false	- @sb is not the pinned super_block
+>> + */
+>> +static bool from_pinned(const struct super_block *sb)
+>> +{
+>> +	bool rv;
+>> +
+>> +	if (!sb)
+>> +		return false;
+>> +	spin_lock(&pin_lock);
+>> +	rv = !IS_ERR_OR_NULL(pinned_sb) && pinned_sb == sb;
+>> +	spin_unlock(&pin_lock);
 > 
-> In del_gendisk, memalloc_noio is set to false, so it would be better to do
-> the same thing in the error path.
+> It's okay for an initial version, but I still think you need to get
+> away from this spinlock in from_pinned() as quickly as possible.
+> Maybe I'm wrong, but this looks like a major source of lock contention.
+> 
+> I understand the issue around RCU and the potential for matching on
+> a reused buffer/address, but if you modified IPE to have its own LSM
+> security blob in super_block::security you could mark the superblock
+> when it was mounted and do a lockless lookup here in from_pinned().
+> 
+Thank you for the suggestion. After some testing, I discovered that 
+switching to RCU to pin the super block and using a security blob to 
+mark a pinned super block works. This approach do avoid many spinlock 
+operations. I'll incorporate these changes in the next version of the patch.
 
-The commit does not mention what happens if this is not done.
-
-  Luis
+-Fan
+>> +	return rv;
+>> +}
+> 
+> --
+> paul-moore.com
