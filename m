@@ -2,1475 +2,1322 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED32C25B48
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2698EC25B6E
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344943AbjJZVo3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 17:44:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40942 "EHLO
+        id S1344901AbjJZVoa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 17:44:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344898AbjJZVoQ (ORCPT
+        with ESMTP id S1344896AbjJZVoQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 26 Oct 2023 17:44:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF871B8
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:43 -0700 (PDT)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E051D48
+        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698356502;
+        s=mimecast20190719; t=1698356504;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6uwQsAPUU2XlcaXzxiM4B9xYonnTjsTiD+XSVq65RMI=;
-        b=KWANbUQEovZa5XPbJsMQhsrG89VaMSMHY/ciA5NQtwgrhINtEmExess3Del0pHtPmd3Wek
-        8JrLm+imgmC0uCiOcX52CgqmW47vwERaN1kGEOZpQ6O83lD4bHCzxQhXMGtZLSXNChBlSh
-        +RPCIu6uBPiSU7tqUvwReoBIxbtL9Ew=
+        bh=4ojwaNJQWqHBpOxOjCr2b/F6Gy0NjzxULvzU5h3SImM=;
+        b=TYh08Q1tdXhumkNiRB2437ahFJfpTANJDgl/PgIS/eYSi7mHsuCRZYsVruGHB36nWAkRWm
+        bKhzla+16XLSADL4GX7M1BZf/Pbl12Q9OQCiYj3qFe1k70uRSUobS9u5AN0Ac1ORzzoZG+
+        5U7RwbuL/QLeju9VUxcGsJE+i7TjqHI=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-488-KbOqpmT6PP29tb8GzaZCag-1; Thu, 26 Oct 2023 17:41:40 -0400
-X-MC-Unique: KbOqpmT6PP29tb8GzaZCag-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-625-nrttTHMnOKug6PkFa-JExA-1; Thu, 26 Oct 2023 17:41:40 -0400
+X-MC-Unique: nrttTHMnOKug6PkFa-JExA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E6C5088D186;
-        Thu, 26 Oct 2023 21:41:39 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E1F1185A780;
+        Thu, 26 Oct 2023 21:41:40 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CEA5E40C6F79;
-        Thu, 26 Oct 2023 21:41:39 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 04BFD2026D4C;
+        Thu, 26 Oct 2023 21:41:40 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id 846A13003D; Thu, 26 Oct 2023 17:41:39 -0400 (EDT)
+        id ADEA53003B; Thu, 26 Oct 2023 17:41:39 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 16/39] dm vdo: implement external deduplication index interface
-Date:   Thu, 26 Oct 2023 17:41:13 -0400
-Message-Id: <20231026214136.1067410-17-msakai@redhat.com>
+Subject: [PATCH v4 17/39] dm vdo: add administrative state and action manager
+Date:   Thu, 26 Oct 2023 17:41:14 -0400
+Message-Id: <20231026214136.1067410-18-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The deduplication index interface for index clients includes the
-deduplication request and index session structures. This is the interface
-that the rest of the vdo target uses to make requests, receive responses,
-and collect statistics.
-
-This patch also adds sysfs nodes for inspecting various index properties at
-runtime.
+This patch adds the admin_state structures which are used to track the
+states of individual vdo components for handling of operations like suspend
+and resume. It also adds the action manager which is used to schedule and
+manage cross-thread administrative and internal operations.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
-Co-developed-by: Michael Sclafani <vdo-devel@redhat.com>
-Signed-off-by: Michael Sclafani <vdo-devel@redhat.com>
-Co-developed-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
-Signed-off-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
-Co-developed-by: John Wiele <jwiele@redhat.com>
-Signed-off-by: John Wiele <jwiele@redhat.com>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/index-session.c | 746 ++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/index-session.h |  84 ++++
- drivers/md/dm-vdo/uds-sysfs.c     | 185 ++++++++
- drivers/md/dm-vdo/uds-sysfs.h     |  12 +
- drivers/md/dm-vdo/uds.h           | 328 +++++++++++++
- 5 files changed, 1355 insertions(+)
- create mode 100644 drivers/md/dm-vdo/index-session.c
- create mode 100644 drivers/md/dm-vdo/index-session.h
- create mode 100644 drivers/md/dm-vdo/uds-sysfs.c
- create mode 100644 drivers/md/dm-vdo/uds-sysfs.h
- create mode 100644 drivers/md/dm-vdo/uds.h
+ drivers/md/dm-vdo/action-manager.c | 410 +++++++++++++++++++++++
+ drivers/md/dm-vdo/action-manager.h | 117 +++++++
+ drivers/md/dm-vdo/admin-state.c    | 512 +++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/admin-state.h    | 180 ++++++++++
+ 4 files changed, 1219 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/action-manager.c
+ create mode 100644 drivers/md/dm-vdo/action-manager.h
+ create mode 100644 drivers/md/dm-vdo/admin-state.c
+ create mode 100644 drivers/md/dm-vdo/admin-state.h
 
-diff --git a/drivers/md/dm-vdo/index-session.c b/drivers/md/dm-vdo/index-session.c
+diff --git a/drivers/md/dm-vdo/action-manager.c b/drivers/md/dm-vdo/action-manager.c
 new file mode 100644
-index 000000000000..052ba093fbf1
+index 000000000000..fb3586a4140c
 --- /dev/null
-+++ b/drivers/md/dm-vdo/index-session.c
-@@ -0,0 +1,746 @@
++++ b/drivers/md/dm-vdo/action-manager.c
+@@ -0,0 +1,410 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#include "index-session.h"
++#include "action-manager.h"
 +
-+#include <linux/atomic.h>
-+
-+#include "index.h"
-+#include "index-layout.h"
-+#include "logger.h"
 +#include "memory-alloc.h"
-+#include "request-queue.h"
-+#include "time-utils.h"
++#include "permassert.h"
 +
-+/*
-+ * The index session contains a lock (the request_mutex) which ensures that only one thread can
-+ * change the state of its index at a time. The state field indicates the current state of the
-+ * index through a set of descriptive flags. The request_mutex must be notified whenever a
-+ * non-transient state flag is cleared. The request_mutex is also used to count the number of
-+ * requests currently in progress so that they can be drained when suspending or closing the index.
++#include "admin-state.h"
++#include "completion.h"
++#include "status-codes.h"
++#include "types.h"
++#include "vdo.h"
++
++/**
++ * struct action - An action to be performed in each of a set of zones.
++ * @in_use: Whether this structure is in use.
++ * @operation: The admin operation associated with this action.
++ * @preamble: The method to run on the initiator thread before the action is applied to each zone.
++ * @zone_action: The action to be performed in each zone.
++ * @conclusion: The method to run on the initiator thread after the action is applied to each zone.
++ * @parent: The object to notify when the action is complete.
++ * @context: The action specific context.
++ * @next: The action to perform after this one.
++ */
++struct action {
++	bool in_use;
++	const struct admin_state_code *operation;
++	vdo_action_preamble *preamble;
++	vdo_zone_action *zone_action;
++	vdo_action_conclusion *conclusion;
++	struct vdo_completion *parent;
++	void *context;
++	struct action *next;
++};
++
++/**
++ * struct action_manager - Definition of an action manager.
++ * @completion: The completion for performing actions.
++ * @state: The state of this action manager.
++ * @actions: The two action slots.
++ * @current_action: The current action slot.
++ * @zones: The number of zones in which an action is to be applied.
++ * @Scheduler: A function to schedule a default next action.
++ * @get_zone_thread_id: A function to get the id of the thread on which to apply an action to a
++ *                      zone.
++ * @initiator_thread_id: The ID of the thread on which actions may be initiated.
++ * @context: Opaque data associated with this action manager.
++ * @acting_zone: The zone currently being acted upon.
++ */
++struct action_manager {
++	struct vdo_completion completion;
++	struct admin_state state;
++	struct action actions[2];
++	struct action *current_action;
++	zone_count_t zones;
++	vdo_action_scheduler *scheduler;
++	vdo_zone_thread_getter *get_zone_thread_id;
++	thread_id_t initiator_thread_id;
++	void *context;
++	zone_count_t acting_zone;
++};
++
++static inline struct action_manager *as_action_manager(struct vdo_completion *completion)
++{
++	vdo_assert_completion_type(completion, VDO_ACTION_COMPLETION);
++	return container_of(completion, struct action_manager, completion);
++}
++
++/* Implements vdo_action_scheduler. */
++static bool no_default_action(void *context __always_unused)
++{
++	return false;
++}
++
++/* Implements vdo_action_preamble. */
++static void no_preamble(void *context __always_unused,
++			struct vdo_completion *completion)
++{
++	vdo_finish_completion(completion);
++}
++
++/* Implements vdo_action_conclusion. */
++static int no_conclusion(void *context __always_unused)
++{
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_make_action_manager() - Make an action manager.
++ * @zones: The number of zones to which actions will be applied.
++ * @get_zone_thread_id: A function to get the thread id associated with a zone.
++ * @initiator_thread_id: The thread on which actions may initiated.
++ * @context: The object which holds the per-zone context for the action.
++ * @scheduler: A function to schedule a next action after an action concludes if there is no
++ *             pending action (may be NULL).
++ * @vdo: The vdo used to initialize completions.
++ * @manager_ptr: A pointer to hold the new action manager.
 + *
-+ * If the index session is suspended shortly after opening an index, it may have to suspend during
-+ * a rebuild. Depending on the size of the index, a rebuild may take a significant amount of time,
-+ * so UDS allows the rebuild to be paused in order to suspend the session in a timely manner. When
-+ * the index session is resumed, the rebuild can continue from where it left off. If the index
-+ * session is shut down with a suspended rebuild, the rebuild progress is abandoned and the rebuild
-+ * will start from the beginning the next time the index is loaded. The mutex and status fields in
-+ * the index_load_context are used to record the state of any interrupted rebuild.
++ * Return: VDO_SUCCESS or an error code.
 + */
-+
-+enum index_session_flag_bit {
-+	IS_FLAG_BIT_START = 8,
-+	/* The session has started loading an index but not completed it. */
-+	IS_FLAG_BIT_LOADING = IS_FLAG_BIT_START,
-+	/* The session has loaded an index, which can handle requests. */
-+	IS_FLAG_BIT_LOADED,
-+	/* The session's index has been permanently disabled. */
-+	IS_FLAG_BIT_DISABLED,
-+	/* The session's index is suspended. */
-+	IS_FLAG_BIT_SUSPENDED,
-+	/* The session is handling some index state change. */
-+	IS_FLAG_BIT_WAITING,
-+	/* The session's index is closing and draining requests. */
-+	IS_FLAG_BIT_CLOSING,
-+	/* The session is being destroyed and is draining requests. */
-+	IS_FLAG_BIT_DESTROYING,
-+};
-+
-+enum index_session_flag {
-+	IS_FLAG_LOADED = (1 << IS_FLAG_BIT_LOADED),
-+	IS_FLAG_LOADING = (1 << IS_FLAG_BIT_LOADING),
-+	IS_FLAG_DISABLED = (1 << IS_FLAG_BIT_DISABLED),
-+	IS_FLAG_SUSPENDED = (1 << IS_FLAG_BIT_SUSPENDED),
-+	IS_FLAG_WAITING = (1 << IS_FLAG_BIT_WAITING),
-+	IS_FLAG_CLOSING = (1 << IS_FLAG_BIT_CLOSING),
-+	IS_FLAG_DESTROYING = (1 << IS_FLAG_BIT_DESTROYING),
-+};
-+
-+/* Release a reference to an index session. */
-+static void release_index_session(struct uds_index_session *index_session)
++int vdo_make_action_manager(zone_count_t zones,
++			    vdo_zone_thread_getter *get_zone_thread_id,
++			    thread_id_t initiator_thread_id,
++			    void *context,
++			    vdo_action_scheduler *scheduler,
++			    struct vdo *vdo,
++			    struct action_manager **manager_ptr)
 +{
-+	uds_lock_mutex(&index_session->request_mutex);
-+	if (--index_session->request_count == 0)
-+		uds_broadcast_cond(&index_session->request_cond);
-+	uds_unlock_mutex(&index_session->request_mutex);
-+}
++	struct action_manager *manager;
++	int result = UDS_ALLOCATE(1, struct action_manager, __func__, &manager);
 +
-+/*
-+ * Acquire a reference to the index session for an asynchronous index request. The reference must
-+ * eventually be released with a corresponding call to release_index_session().
-+ */
-+static int get_index_session(struct uds_index_session *index_session)
-+{
-+	unsigned int state;
-+	int result = UDS_SUCCESS;
-+
-+	uds_lock_mutex(&index_session->request_mutex);
-+	index_session->request_count++;
-+	state = index_session->state;
-+	uds_unlock_mutex(&index_session->request_mutex);
-+
-+	if (state == IS_FLAG_LOADED) {
-+		return UDS_SUCCESS;
-+	} else if (state & IS_FLAG_DISABLED) {
-+		result = UDS_DISABLED;
-+	} else if ((state & IS_FLAG_LOADING) ||
-+		   (state & IS_FLAG_SUSPENDED) ||
-+		   (state & IS_FLAG_WAITING)) {
-+		result = -EBUSY;
-+	} else {
-+		result = UDS_NO_INDEX;
-+	}
-+
-+	release_index_session(index_session);
-+	return result;
-+}
-+
-+int uds_launch_request(struct uds_request *request)
-+{
-+	size_t internal_size;
-+	int result;
-+
-+	if (request->callback == NULL) {
-+		uds_log_error("missing required callback");
-+		return -EINVAL;
-+	}
-+
-+	switch (request->type) {
-+	case UDS_DELETE:
-+	case UDS_POST:
-+	case UDS_QUERY:
-+	case UDS_QUERY_NO_UPDATE:
-+	case UDS_UPDATE:
-+		break;
-+	default:
-+		uds_log_error("received invalid callback type");
-+		return -EINVAL;
-+	}
-+
-+	/* Reset all internal fields before processing. */
-+	internal_size = sizeof(struct uds_request) - offsetof(struct uds_request, zone_number);
-+	// FIXME should be using struct_group for this instead
-+	memset((char *) request + sizeof(*request) - internal_size, 0, internal_size);
-+
-+	result = get_index_session(request->session);
-+	if (result != UDS_SUCCESS)
++	if (result != VDO_SUCCESS)
 +		return result;
 +
-+	request->found = false;
-+	request->unbatched = false;
-+	request->index = request->session->index;
++	*manager = (struct action_manager) {
++		.zones = zones,
++		.scheduler =
++			((scheduler == NULL) ? no_default_action : scheduler),
++		.get_zone_thread_id = get_zone_thread_id,
++		.initiator_thread_id = initiator_thread_id,
++		.context = context,
++	};
 +
-+	uds_enqueue_request(request, STAGE_TRIAGE);
-+	return UDS_SUCCESS;
++	manager->actions[0].next = &manager->actions[1];
++	manager->current_action = manager->actions[1].next =
++		&manager->actions[0];
++	vdo_set_admin_state_code(&manager->state,
++				 VDO_ADMIN_STATE_NORMAL_OPERATION);
++	vdo_initialize_completion(&manager->completion, vdo,
++				  VDO_ACTION_COMPLETION);
++	*manager_ptr = manager;
++	return VDO_SUCCESS;
 +}
 +
-+static void enter_callback_stage(struct uds_request *request)
++const struct admin_state_code *vdo_get_current_manager_operation(struct action_manager *manager)
 +{
-+	if (request->status != UDS_SUCCESS) {
-+		/* All request errors are considered unrecoverable */
-+		uds_lock_mutex(&request->session->request_mutex);
-+		request->session->state |= IS_FLAG_DISABLED;
-+		uds_unlock_mutex(&request->session->request_mutex);
-+	}
-+
-+	uds_request_queue_enqueue(request->session->callback_queue, request);
++	return vdo_get_admin_state_code(&manager->state);
 +}
 +
-+static inline void count_once(u64 *count_ptr)
++void *vdo_get_current_action_context(struct action_manager *manager)
 +{
-+	WRITE_ONCE(*count_ptr, READ_ONCE(*count_ptr) + 1);
++	return manager->current_action->in_use ? manager->current_action->context : NULL;
 +}
 +
-+static void update_session_stats(struct uds_request *request)
++static void finish_action_callback(struct vdo_completion *completion);
++static void apply_to_zone(struct vdo_completion *completion);
++
++static thread_id_t get_acting_zone_thread_id(struct action_manager *manager)
 +{
-+	struct session_stats *session_stats = &request->session->stats;
-+
-+	count_once(&session_stats->requests);
-+
-+	switch (request->type) {
-+	case UDS_POST:
-+		if (request->found)
-+			count_once(&session_stats->posts_found);
-+		else
-+			count_once(&session_stats->posts_not_found);
-+
-+		if (request->location == UDS_LOCATION_IN_OPEN_CHAPTER)
-+			count_once(&session_stats->posts_found_open_chapter);
-+		else if (request->location == UDS_LOCATION_IN_DENSE)
-+			count_once(&session_stats->posts_found_dense);
-+		else if (request->location == UDS_LOCATION_IN_SPARSE)
-+			count_once(&session_stats->posts_found_sparse);
-+		break;
-+
-+	case UDS_UPDATE:
-+		if (request->found)
-+			count_once(&session_stats->updates_found);
-+		else
-+			count_once(&session_stats->updates_not_found);
-+		break;
-+
-+	case UDS_DELETE:
-+		if (request->found)
-+			count_once(&session_stats->deletions_found);
-+		else
-+			count_once(&session_stats->deletions_not_found);
-+		break;
-+
-+	case UDS_QUERY:
-+	case UDS_QUERY_NO_UPDATE:
-+		if (request->found)
-+			count_once(&session_stats->queries_found);
-+		else
-+			count_once(&session_stats->queries_not_found);
-+		break;
-+
-+	default:
-+		request->status = ASSERT(false, "unknown request type: %d", request->type);
-+	}
++	return manager->get_zone_thread_id(manager->context, manager->acting_zone);
 +}
 +
-+static void handle_callbacks(struct uds_request *request)
++static void preserve_error(struct vdo_completion *completion)
 +{
-+	struct uds_index_session *index_session = request->session;
++	if (completion->parent != NULL)
++		vdo_set_completion_result(completion->parent, completion->result);
 +
-+	if (request->status == UDS_SUCCESS)
-+		update_session_stats(request);
-+
-+	request->status = uds_map_to_system_error(request->status);
-+	request->callback(request);
-+	release_index_session(index_session);
++	vdo_reset_completion(completion);
++	vdo_run_completion(completion);
 +}
 +
-+static int __must_check make_empty_index_session(struct uds_index_session **index_session_ptr)
++static void prepare_for_next_zone(struct action_manager *manager)
 +{
-+	int result;
-+	struct uds_index_session *session;
-+
-+	result = UDS_ALLOCATE(1, struct uds_index_session, __func__, &session);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = uds_init_mutex(&session->request_mutex);
-+	if (result != UDS_SUCCESS) {
-+		UDS_FREE(session);
-+		return result;
-+	}
-+
-+	result = uds_init_cond(&session->request_cond);
-+	if (result != UDS_SUCCESS) {
-+		uds_destroy_mutex(&session->request_mutex);
-+		UDS_FREE(session);
-+		return result;
-+	}
-+
-+	result = uds_init_mutex(&session->load_context.mutex);
-+	if (result != UDS_SUCCESS) {
-+		uds_destroy_cond(&session->request_cond);
-+		uds_destroy_mutex(&session->request_mutex);
-+		UDS_FREE(session);
-+		return result;
-+	}
-+
-+	result = uds_init_cond(&session->load_context.cond);
-+	if (result != UDS_SUCCESS) {
-+		uds_destroy_mutex(&session->load_context.mutex);
-+		uds_destroy_cond(&session->request_cond);
-+		uds_destroy_mutex(&session->request_mutex);
-+		UDS_FREE(session);
-+		return result;
-+	}
-+
-+	result = uds_make_request_queue("callbackW", &handle_callbacks, &session->callback_queue);
-+	if (result != UDS_SUCCESS) {
-+		uds_destroy_cond(&session->load_context.cond);
-+		uds_destroy_mutex(&session->load_context.mutex);
-+		uds_destroy_cond(&session->request_cond);
-+		uds_destroy_mutex(&session->request_mutex);
-+		UDS_FREE(session);
-+		return result;
-+	}
-+
-+	*index_session_ptr = session;
-+	return UDS_SUCCESS;
++	vdo_prepare_completion_for_requeue(&manager->completion,
++					   apply_to_zone,
++					   preserve_error,
++					   get_acting_zone_thread_id(manager),
++					   manager->current_action->parent);
 +}
 +
-+int uds_create_index_session(struct uds_index_session **session)
++static void prepare_for_conclusion(struct action_manager *manager)
 +{
-+	if (session == NULL) {
-+		uds_log_error("missing session pointer");
-+		return -EINVAL;
-+	}
-+
-+	return uds_map_to_system_error(make_empty_index_session(session));
++	vdo_prepare_completion_for_requeue(&manager->completion,
++					   finish_action_callback,
++					   preserve_error,
++					   manager->initiator_thread_id,
++					   manager->current_action->parent);
 +}
 +
-+static int __must_check start_loading_index_session(struct uds_index_session *index_session)
++static void apply_to_zone(struct vdo_completion *completion)
 +{
-+	int result;
++	zone_count_t zone;
++	struct action_manager *manager = as_action_manager(completion);
 +
-+	uds_lock_mutex(&index_session->request_mutex);
-+	if (index_session->state & IS_FLAG_SUSPENDED) {
-+		uds_log_info("Index session is suspended");
-+		result = -EBUSY;
-+	} else if (index_session->state != 0) {
-+		uds_log_info("Index is already loaded");
-+		result = -EBUSY;
-+	} else {
-+		index_session->state |= IS_FLAG_LOADING;
-+		result = UDS_SUCCESS;
-+	}
-+	uds_unlock_mutex(&index_session->request_mutex);
-+	return result;
-+}
++	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() == get_acting_zone_thread_id(manager)),
++			"%s() called on acting zones's thread",
++			__func__);
 +
-+static void finish_loading_index_session(struct uds_index_session *index_session, int result)
-+{
-+	uds_lock_mutex(&index_session->request_mutex);
-+	index_session->state &= ~IS_FLAG_LOADING;
-+	if (result == UDS_SUCCESS)
-+		index_session->state |= IS_FLAG_LOADED;
-+
-+	uds_broadcast_cond(&index_session->request_cond);
-+	uds_unlock_mutex(&index_session->request_mutex);
-+}
-+
-+static int initialize_index_session(struct uds_index_session *index_session,
-+				    enum uds_open_index_type open_type)
-+{
-+	int result;
-+	struct configuration *config;
-+
-+	result = uds_make_configuration(&index_session->parameters, &config);
-+	if (result != UDS_SUCCESS) {
-+		uds_log_error_strerror(result, "Failed to allocate config");
-+		return result;
-+	}
-+
-+	memset(&index_session->stats, 0, sizeof(index_session->stats));
-+	result = uds_make_index(config,
-+				open_type,
-+				&index_session->load_context,
-+				enter_callback_stage,
-+				&index_session->index);
-+	if (result != UDS_SUCCESS)
-+		uds_log_error_strerror(result, "Failed to make index");
++	zone = manager->acting_zone++;
++	if (manager->acting_zone == manager->zones)
++		/*
++		 * We are about to apply to the last zone. Once that is finished, we're done, so go
++		 * back to the initiator thread and finish up.
++		 */
++		prepare_for_conclusion(manager);
 +	else
-+		uds_log_configuration(config);
++		/* Prepare to come back on the next zone */
++		prepare_for_next_zone(manager);
 +
-+	uds_free_configuration(config);
-+	return result;
++	manager->current_action->zone_action(manager->context, zone, completion);
 +}
 +
-+static const char *get_open_type_string(enum uds_open_index_type open_type)
++static void handle_preamble_error(struct vdo_completion *completion)
 +{
-+	switch (open_type) {
-+	case UDS_CREATE:
-+		return "creating index";
-+	case UDS_LOAD:
-+		return "loading or rebuilding index";
-+	case UDS_NO_REBUILD:
-+		return "loading index";
-+	default:
-+		return "unknown open method";
-+	}
++	/* Skip the zone actions since the preamble failed. */
++	completion->callback = finish_action_callback;
++	preserve_error(completion);
 +}
 +
-+/*
-+ * Open an index under the given session. This operation will fail if the
-+ * index session is suspended, or if there is already an open index.
-+ */
-+int uds_open_index(enum uds_open_index_type open_type,
-+		   const struct uds_parameters *parameters,
-+		   struct uds_index_session *session)
++static void launch_current_action(struct action_manager *manager)
 +{
-+	int result;
-+	char name[BDEVNAME_SIZE];
++	struct action *action = manager->current_action;
++	int result = vdo_start_operation(&manager->state, action->operation);
 +
-+	if (parameters == NULL) {
-+		uds_log_error("missing required parameters");
-+		return -EINVAL;
-+	}
-+	if (parameters->bdev == NULL) {
-+		uds_log_error("missing required block device");
-+		return -EINVAL;
-+	}
-+	if (session == NULL) {
-+		uds_log_error("missing required session pointer");
-+		return -EINVAL;
++	if (result != VDO_SUCCESS) {
++		if (action->parent != NULL)
++			vdo_set_completion_result(action->parent, result);
++
++		/* We aren't going to run the preamble, so don't run the conclusion */
++		action->conclusion = no_conclusion;
++		finish_action_callback(&manager->completion);
++		return;
 +	}
 +
-+	result = start_loading_index_session(session);
-+	if (result != UDS_SUCCESS)
-+		return uds_map_to_system_error(result);
-+
-+	session->parameters = *parameters;
-+	format_dev_t(name, parameters->bdev->bd_dev);
-+	uds_log_notice("%s: %s", get_open_type_string(open_type), name);
-+
-+	result = initialize_index_session(session, open_type);
-+	if (result != UDS_SUCCESS)
-+		uds_log_error_strerror(result, "Failed %s", get_open_type_string(open_type));
-+
-+	finish_loading_index_session(session, result);
-+	return uds_map_to_system_error(result);
-+}
-+
-+static void wait_for_no_requests_in_progress(struct uds_index_session *index_session)
-+{
-+	uds_lock_mutex(&index_session->request_mutex);
-+	while (index_session->request_count > 0)
-+		uds_wait_cond(&index_session->request_cond, &index_session->request_mutex);
-+	uds_unlock_mutex(&index_session->request_mutex);
-+}
-+
-+static int __must_check save_index(struct uds_index_session *index_session)
-+{
-+	wait_for_no_requests_in_progress(index_session);
-+	return uds_save_index(index_session->index);
-+}
-+
-+static void suspend_rebuild(struct uds_index_session *session)
-+{
-+	uds_lock_mutex(&session->load_context.mutex);
-+	switch (session->load_context.status) {
-+	case INDEX_OPENING:
-+		session->load_context.status = INDEX_SUSPENDING;
-+
-+		/* Wait until the index indicates that it is not replaying. */
-+		while ((session->load_context.status != INDEX_SUSPENDED) &&
-+		       (session->load_context.status != INDEX_READY))
-+			uds_wait_cond(&session->load_context.cond,
-+				      &session->load_context.mutex);
-+		break;
-+
-+	case INDEX_READY:
-+		/* Index load does not need to be suspended. */
-+		break;
-+
-+	case INDEX_SUSPENDED:
-+	case INDEX_SUSPENDING:
-+	case INDEX_FREEING:
-+	default:
-+		/* These cases should not happen. */
-+		ASSERT_LOG_ONLY(false, "Bad load context state %u", session->load_context.status);
-+		break;
-+	}
-+	uds_unlock_mutex(&session->load_context.mutex);
-+}
-+
-+/*
-+ * Suspend index operation, draining all current index requests and preventing new index requests
-+ * from starting. Optionally saves all index data before returning.
-+ */
-+int uds_suspend_index_session(struct uds_index_session *session, bool save)
-+{
-+	int result = UDS_SUCCESS;
-+	bool no_work = false;
-+	bool rebuilding = false;
-+
-+	/* Wait for any current index state change to complete. */
-+	uds_lock_mutex(&session->request_mutex);
-+	while (session->state & IS_FLAG_CLOSING)
-+		uds_wait_cond(&session->request_cond, &session->request_mutex);
-+
-+	if ((session->state & IS_FLAG_WAITING) || (session->state & IS_FLAG_DESTROYING)) {
-+		no_work = true;
-+		uds_log_info("Index session is already changing state");
-+		result = -EBUSY;
-+	} else if (session->state & IS_FLAG_SUSPENDED) {
-+		no_work = true;
-+	} else if (session->state & IS_FLAG_LOADING) {
-+		session->state |= IS_FLAG_WAITING;
-+		rebuilding = true;
-+	} else if (session->state & IS_FLAG_LOADED) {
-+		session->state |= IS_FLAG_WAITING;
++	if (action->zone_action == NULL) {
++		prepare_for_conclusion(manager);
 +	} else {
-+		no_work = true;
-+		session->state |= IS_FLAG_SUSPENDED;
-+		uds_broadcast_cond(&session->request_cond);
++		manager->acting_zone = 0;
++		vdo_prepare_completion_for_requeue(&manager->completion,
++						   apply_to_zone,
++						   handle_preamble_error,
++						   get_acting_zone_thread_id(manager),
++						   manager->current_action->parent);
 +	}
-+	uds_unlock_mutex(&session->request_mutex);
 +
-+	if (no_work)
-+		return uds_map_to_system_error(result);
-+
-+	if (rebuilding)
-+		suspend_rebuild(session);
-+	else if (save)
-+		result = save_index(session);
-+	else
-+		result = uds_flush_index_session(session);
-+
-+	uds_lock_mutex(&session->request_mutex);
-+	session->state &= ~IS_FLAG_WAITING;
-+	session->state |= IS_FLAG_SUSPENDED;
-+	uds_broadcast_cond(&session->request_cond);
-+	uds_unlock_mutex(&session->request_mutex);
-+	return uds_map_to_system_error(result);
++	action->preamble(manager->context, &manager->completion);
 +}
 +
-+static int replace_device(struct uds_index_session *session, struct block_device *bdev)
-+{
-+	int result;
-+
-+	result = uds_replace_index_storage(session->index, bdev);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	session->parameters.bdev = bdev;
-+	return UDS_SUCCESS;
-+}
-+
-+/*
-+ * Resume index operation after being suspended. If the index is suspended and the supplied block
-+ * device differs from the current backing store, the index will start using the new backing store.
++/**
++ * vdo_schedule_default_action() - Attempt to schedule the default action.
++ * @manager: The action manager.
++ *
++ * If the manager is not operating normally, the action will not be scheduled.
++ *
++ * Return: true if an action was scheduled.
 + */
-+int uds_resume_index_session(struct uds_index_session *session, struct block_device *bdev)
++bool vdo_schedule_default_action(struct action_manager *manager)
 +{
-+	int result = UDS_SUCCESS;
-+	bool no_work = false;
-+	bool resume_replay = false;
++	/* Don't schedule a default action if we are operating or not in normal operation. */
++	const struct admin_state_code *code = vdo_get_current_manager_operation(manager);
 +
-+	uds_lock_mutex(&session->request_mutex);
-+	if (session->state & IS_FLAG_WAITING) {
-+		uds_log_info("Index session is already changing state");
-+		no_work = true;
-+		result = -EBUSY;
-+	} else if (!(session->state & IS_FLAG_SUSPENDED)) {
-+		/* If not suspended, just succeed. */
-+		no_work = true;
-+		result = UDS_SUCCESS;
-+	} else {
-+		session->state |= IS_FLAG_WAITING;
-+		if (session->state & IS_FLAG_LOADING)
-+			resume_replay = true;
-+	}
-+	uds_unlock_mutex(&session->request_mutex);
-+
-+	if (no_work)
-+		return result;
-+
-+	if ((session->index != NULL) && (bdev != session->parameters.bdev)) {
-+		result = replace_device(session, bdev);
-+		if (result != UDS_SUCCESS) {
-+			uds_lock_mutex(&session->request_mutex);
-+			session->state &= ~IS_FLAG_WAITING;
-+			uds_broadcast_cond(&session->request_cond);
-+			uds_unlock_mutex(&session->request_mutex);
-+			return uds_map_to_system_error(result);
-+		}
-+	}
-+
-+	if (resume_replay) {
-+		uds_lock_mutex(&session->load_context.mutex);
-+		switch (session->load_context.status) {
-+		case INDEX_SUSPENDED:
-+			session->load_context.status = INDEX_OPENING;
-+			/* Notify the index to start replaying again. */
-+			uds_broadcast_cond(&session->load_context.cond);
-+			break;
-+
-+		case INDEX_READY:
-+			/* There is no index rebuild to resume. */
-+			break;
-+
-+		case INDEX_OPENING:
-+		case INDEX_SUSPENDING:
-+		case INDEX_FREEING:
-+		default:
-+			/* These cases should not happen; do nothing. */
-+			ASSERT_LOG_ONLY(false,
-+					"Bad load context state %u",
-+					session->load_context.status);
-+			break;
-+		}
-+		uds_unlock_mutex(&session->load_context.mutex);
-+	}
-+
-+	uds_lock_mutex(&session->request_mutex);
-+	session->state &= ~IS_FLAG_WAITING;
-+	session->state &= ~IS_FLAG_SUSPENDED;
-+	uds_broadcast_cond(&session->request_cond);
-+	uds_unlock_mutex(&session->request_mutex);
-+	return UDS_SUCCESS;
++	return ((code == VDO_ADMIN_STATE_NORMAL_OPERATION) &&
++		manager->scheduler(manager->context));
 +}
 +
-+static int save_and_free_index(struct uds_index_session *index_session)
++static void finish_action_callback(struct vdo_completion *completion)
 +{
-+	int result = UDS_SUCCESS;
-+	bool suspended;
-+	struct uds_index *index = index_session->index;
++	bool has_next_action;
++	int result;
++	struct action_manager *manager = as_action_manager(completion);
++	struct action action = *(manager->current_action);
 +
-+	if (index == NULL)
-+		return UDS_SUCCESS;
-+
-+	uds_lock_mutex(&index_session->request_mutex);
-+	suspended = (index_session->state & IS_FLAG_SUSPENDED);
-+	uds_unlock_mutex(&index_session->request_mutex);
-+
-+	if (!suspended) {
-+		result = uds_save_index(index);
-+		if (result != UDS_SUCCESS)
-+			uds_log_warning_strerror(result, "ignoring error from save_index");
-+	}
-+	uds_free_index(index);
-+	index_session->index = NULL;
++	manager->current_action->in_use = false;
++	manager->current_action = manager->current_action->next;
 +
 +	/*
-+	 * Reset all index state that happens to be in the index
-+	 * session, so it doesn't affect any future index.
++	 * We need to check this now to avoid use-after-free issues if running the conclusion or
++	 * notifying the parent results in the manager being freed.
 +	 */
-+	uds_lock_mutex(&index_session->load_context.mutex);
-+	index_session->load_context.status = INDEX_OPENING;
-+	uds_unlock_mutex(&index_session->load_context.mutex);
++	has_next_action =
++		(manager->current_action->in_use || vdo_schedule_default_action(manager));
++	result = action.conclusion(manager->context);
++	vdo_finish_operation(&manager->state, VDO_SUCCESS);
++	if (action.parent != NULL)
++		vdo_continue_completion(action.parent, result);
 +
-+	uds_lock_mutex(&index_session->request_mutex);
-+	/* Only the suspend bit will remain relevant. */
-+	index_session->state &= IS_FLAG_SUSPENDED;
-+	uds_unlock_mutex(&index_session->request_mutex);
-+
-+	return result;
++	if (has_next_action)
++		launch_current_action(manager);
 +}
 +
-+/* Save and close the current index. */
-+int uds_close_index(struct uds_index_session *index_session)
++/**
++ * vdo_schedule_action() - Schedule an action to be applied to all zones.
++ * @manager: The action manager to schedule the action on.
++ * @preamble: A method to be invoked on the initiator thread once this action is started but before
++ *            applying to each zone; may be NULL.
++ * @action: The action to apply to each zone; may be NULL.
++ * @conclusion: A method to be invoked back on the initiator thread once the action has been
++ *              applied to all zones; may be NULL.
++ * @parent: The object to notify once the action is complete or if the action can not be scheduled;
++ *          may be NULL.
++ *
++ * The action will be launched immediately if there is no current action, or as soon as the current
++ * action completes. If there is already a pending action, this action will not be scheduled, and,
++ * if it has a parent, that parent will be notified. At least one of the preamble, action, or
++ * conclusion must not be NULL.
++ *
++ * Return: true if the action was scheduled.
++ */
++bool vdo_schedule_action(struct action_manager *manager,
++			 vdo_action_preamble *preamble,
++			 vdo_zone_action *action,
++			 vdo_action_conclusion *conclusion,
++			 struct vdo_completion *parent)
 +{
-+	int result = UDS_SUCCESS;
++	return vdo_schedule_operation(manager,
++				      VDO_ADMIN_STATE_OPERATING,
++				      preamble,
++				      action,
++				      conclusion,
++				      parent);
++}
 +
-+	/* Wait for any current index state change to complete. */
-+	uds_lock_mutex(&index_session->request_mutex);
-+	while ((index_session->state & IS_FLAG_WAITING) ||
-+	       (index_session->state & IS_FLAG_CLOSING))
-+		uds_wait_cond(&index_session->request_cond, &index_session->request_mutex);
++/**
++ * vdo_schedule_operation() - Schedule an operation to be applied to all zones.
++ * @manager: The action manager to schedule the action on.
++ * @operation: The operation this action will perform
++ * @preamble: A method to be invoked on the initiator thread once this action is started but before
++ *            applying to each zone; may be NULL.
++ * @action: The action to apply to each zone; may be NULL.
++ * @conclusion: A method to be invoked back on the initiator thread once the action has been
++ *              applied to all zones; may be NULL.
++ * @parent: The object to notify once the action is complete or if the action can not be scheduled;
++ *          may be NULL.
++ *
++ * The operation's action will be launched immediately if there is no current action, or as soon as
++ * the current action completes. If there is already a pending action, this operation will not be
++ * scheduled, and, if it has a parent, that parent will be notified. At least one of the preamble,
++ * action, or conclusion must not be NULL.
++ *
++ * Return: true if the action was scheduled.
++ */
++bool vdo_schedule_operation(struct action_manager *manager,
++			    const struct admin_state_code *operation,
++			    vdo_action_preamble *preamble,
++			    vdo_zone_action *action,
++			    vdo_action_conclusion *conclusion,
++			    struct vdo_completion *parent)
++{
++	return vdo_schedule_operation_with_context(manager,
++						   operation,
++						   preamble,
++						   action,
++						   conclusion,
++						   NULL,
++						   parent);
++}
 +
-+	if (index_session->state & IS_FLAG_SUSPENDED) {
-+		uds_log_info("Index session is suspended");
-+		result = -EBUSY;
-+	} else if ((index_session->state & IS_FLAG_DESTROYING) ||
-+		   !(index_session->state & IS_FLAG_LOADED)) {
-+		/* The index doesn't exist, hasn't finished loading, or is being destroyed. */
-+		result = UDS_NO_INDEX;
++/**
++ * vdo_schedule_operation_with_context() - Schedule an operation on all zones.
++ * @manager: The action manager to schedule the action on.
++ * @operation: The operation this action will perform.
++ * @preamble: A method to be invoked on the initiator thread once this action is started but before
++ *            applying to each zone; may be NULL.
++ * @action: The action to apply to each zone; may be NULL.
++ * @conclusion: A method to be invoked back on the initiator thread once the action has been
++ *              applied to all zones; may be NULL.
++ * @context: An action-specific context which may be retrieved via
++ *           vdo_get_current_action_context(); may be NULL.
++ * @parent: The object to notify once the action is complete or if the action can not be scheduled;
++ *          may be NULL.
++ *
++ * The operation's action will be launched immediately if there is no current action, or as soon as
++ * the current action completes. If there is already a pending action, this operation will not be
++ * scheduled, and, if it has a parent, that parent will be notified. At least one of the preamble,
++ * action, or conclusion must not be NULL.
++ *
++ * Return: true if the action was scheduled
++ */
++bool vdo_schedule_operation_with_context(struct action_manager *manager,
++					 const struct admin_state_code *operation,
++					 vdo_action_preamble *preamble,
++					 vdo_zone_action *action,
++					 vdo_action_conclusion *conclusion,
++					 void *context,
++					 struct vdo_completion *parent)
++{
++	struct action *current_action;
++
++	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() == manager->initiator_thread_id),
++			"action initiated from correct thread");
++	if (!manager->current_action->in_use) {
++		current_action = manager->current_action;
++	} else if (!manager->current_action->next->in_use) {
++		current_action = manager->current_action->next;
 +	} else {
-+		index_session->state |= IS_FLAG_CLOSING;
-+	}
-+	uds_unlock_mutex(&index_session->request_mutex);
-+	if (result != UDS_SUCCESS)
-+		return uds_map_to_system_error(result);
++		if (parent != NULL)
++			vdo_continue_completion(parent, VDO_COMPONENT_BUSY);
 +
-+	uds_log_debug("Closing index");
-+	wait_for_no_requests_in_progress(index_session);
-+	result = save_and_free_index(index_session);
-+	uds_log_debug("Closed index");
-+
-+	uds_lock_mutex(&index_session->request_mutex);
-+	index_session->state &= ~IS_FLAG_CLOSING;
-+	uds_broadcast_cond(&index_session->request_cond);
-+	uds_unlock_mutex(&index_session->request_mutex);
-+	return uds_map_to_system_error(result);
-+}
-+
-+/* This will save and close an open index before destroying the session. */
-+int uds_destroy_index_session(struct uds_index_session *index_session)
-+{
-+	int result;
-+	bool load_pending = false;
-+
-+	uds_log_debug("Destroying index session");
-+
-+	/* Wait for any current index state change to complete. */
-+	uds_lock_mutex(&index_session->request_mutex);
-+	while ((index_session->state & IS_FLAG_WAITING) ||
-+	       (index_session->state & IS_FLAG_CLOSING))
-+		uds_wait_cond(&index_session->request_cond, &index_session->request_mutex);
-+
-+	if (index_session->state & IS_FLAG_DESTROYING) {
-+		uds_unlock_mutex(&index_session->request_mutex);
-+		uds_log_info("Index session is already closing");
-+		return -EBUSY;
++		return false;
 +	}
 +
-+	index_session->state |= IS_FLAG_DESTROYING;
-+	load_pending = ((index_session->state & IS_FLAG_LOADING) &&
-+			(index_session->state & IS_FLAG_SUSPENDED));
-+	uds_unlock_mutex(&index_session->request_mutex);
++	*current_action = (struct action) {
++		.in_use = true,
++		.operation = operation,
++		.preamble = (preamble == NULL) ? no_preamble : preamble,
++		.zone_action = action,
++		.conclusion = (conclusion == NULL) ? no_conclusion : conclusion,
++		.context = context,
++		.parent = parent,
++		.next = current_action->next,
++	};
 +
-+	if (load_pending) {
-+		/* Tell the index to terminate the rebuild. */
-+		uds_lock_mutex(&index_session->load_context.mutex);
-+		if (index_session->load_context.status == INDEX_SUSPENDED) {
-+			index_session->load_context.status = INDEX_FREEING;
-+			uds_broadcast_cond(&index_session->load_context.cond);
-+		}
-+		uds_unlock_mutex(&index_session->load_context.mutex);
++	if (current_action == manager->current_action)
++		launch_current_action(manager);
 +
-+		/* Wait until the load exits before proceeding. */
-+		uds_lock_mutex(&index_session->request_mutex);
-+		while (index_session->state & IS_FLAG_LOADING)
-+			uds_wait_cond(&index_session->request_cond, &index_session->request_mutex);
-+		uds_unlock_mutex(&index_session->request_mutex);
-+	}
-+
-+	wait_for_no_requests_in_progress(index_session);
-+	result = save_and_free_index(index_session);
-+	uds_request_queue_finish(index_session->callback_queue);
-+	index_session->callback_queue = NULL;
-+	uds_destroy_cond(&index_session->load_context.cond);
-+	uds_destroy_mutex(&index_session->load_context.mutex);
-+	uds_destroy_cond(&index_session->request_cond);
-+	uds_destroy_mutex(&index_session->request_mutex);
-+	uds_log_debug("Destroyed index session");
-+	UDS_FREE(index_session);
-+	return uds_map_to_system_error(result);
++	return true;
 +}
-+
-+/* Wait until all callbacks for index operations are complete. */
-+int uds_flush_index_session(struct uds_index_session *index_session)
-+{
-+	wait_for_no_requests_in_progress(index_session);
-+	uds_wait_for_idle_index(index_session->index);
-+	return UDS_SUCCESS;
-+}
-+
-+/* Statistics collection is intended to be thread-safe. */
-+static void
-+collect_stats(const struct uds_index_session *index_session, struct uds_index_stats *stats)
-+{
-+	const struct session_stats *session_stats = &index_session->stats;
-+
-+	stats->current_time = ktime_to_seconds(current_time_ns(CLOCK_REALTIME));
-+	stats->posts_found = READ_ONCE(session_stats->posts_found);
-+	stats->in_memory_posts_found = READ_ONCE(session_stats->posts_found_open_chapter);
-+	stats->dense_posts_found = READ_ONCE(session_stats->posts_found_dense);
-+	stats->sparse_posts_found = READ_ONCE(session_stats->posts_found_sparse);
-+	stats->posts_not_found = READ_ONCE(session_stats->posts_not_found);
-+	stats->updates_found = READ_ONCE(session_stats->updates_found);
-+	stats->updates_not_found = READ_ONCE(session_stats->updates_not_found);
-+	stats->deletions_found = READ_ONCE(session_stats->deletions_found);
-+	stats->deletions_not_found = READ_ONCE(session_stats->deletions_not_found);
-+	stats->queries_found = READ_ONCE(session_stats->queries_found);
-+	stats->queries_not_found = READ_ONCE(session_stats->queries_not_found);
-+	stats->requests = READ_ONCE(session_stats->requests);
-+}
-+
-+int uds_get_index_session_stats(struct uds_index_session *index_session,
-+				struct uds_index_stats *stats)
-+{
-+	if (stats == NULL) {
-+		uds_log_error("received a NULL index stats pointer");
-+		return -EINVAL;
-+	}
-+
-+	collect_stats(index_session, stats);
-+	if (index_session->index != NULL) {
-+		uds_get_index_stats(index_session->index, stats);
-+	} else {
-+		stats->entries_indexed = 0;
-+		stats->memory_used = 0;
-+		stats->collisions = 0;
-+		stats->entries_discarded = 0;
-+	}
-+
-+	return UDS_SUCCESS;
-+}
-diff --git a/drivers/md/dm-vdo/index-session.h b/drivers/md/dm-vdo/index-session.h
+diff --git a/drivers/md/dm-vdo/action-manager.h b/drivers/md/dm-vdo/action-manager.h
 new file mode 100644
-index 000000000000..c77ee021d510
+index 000000000000..b97bb2eec145
 --- /dev/null
-+++ b/drivers/md/dm-vdo/index-session.h
-@@ -0,0 +1,84 @@
++++ b/drivers/md/dm-vdo/action-manager.h
+@@ -0,0 +1,117 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef UDS_INDEX_SESSION_H
-+#define UDS_INDEX_SESSION_H
++#ifndef VDO_ACTION_MANAGER_H
++#define VDO_ACTION_MANAGER_H
 +
-+#include <linux/atomic.h>
-+#include <linux/cache.h>
-+
-+#include "config.h"
-+#include "uds-threads.h"
-+#include "uds.h"
++#include "admin-state.h"
++#include "types.h"
 +
 +/*
-+ * The index session mediates all interactions with a UDS index. Once the index session is created,
-+ * it can be used to open, close, suspend, or recreate an index. It implements the majority of the
-+ * functions in the top-level UDS API.
++ * An action_manager provides a generic mechanism for applying actions to multi-zone entities (such
++ * as the block map or slab depot). Each action manager is tied to a specific context for which it
++ * manages actions. The manager ensures that only one action is active on that context at a time,
++ * and supports at most one pending action. Calls to schedule an action when there is already a
++ * pending action will result in VDO_COMPONENT_BUSY errors. Actions may only be submitted to the
++ * action manager from a single thread (which thread is determined when the action manager is
++ * constructed).
 + *
-+ * If any deduplication request fails due to an internal error, the index is marked disabled. It
-+ * will not accept any further requests and can only be closed. Closing the index will clear the
-+ * disabled flag, and the index can then be reopened and recovered using the same index session.
++ * A scheduled action consists of four components:
++ *
++ *   preamble
++ *     an optional method to be run on the initiator thread before applying the action to all zones
++ *   zone_action
++ *     an optional method to be applied to each of the zones
++ *   conclusion
++ *     an optional method to be run on the initiator thread once the per-zone method has been
++ *     applied to all zones
++ *   parent
++ *     an optional completion to be finished once the conclusion is done
++ *
++ * At least one of the three methods must be provided.
 + */
 +
-+struct __aligned(L1_CACHE_BYTES) session_stats {
-+	/* Post requests that found an entry */
-+	u64 posts_found;
-+	/* Post requests found in the open chapter */
-+	u64 posts_found_open_chapter;
-+	/* Post requests found in the dense index */
-+	u64 posts_found_dense;
-+	/* Post requests found in the sparse index */
-+	u64 posts_found_sparse;
-+	/* Post requests that did not find an entry */
-+	u64 posts_not_found;
-+	/* Update requests that found an entry */
-+	u64 updates_found;
-+	/* Update requests that did not find an entry */
-+	u64 updates_not_found;
-+	/* Delete requests that found an entry */
-+	u64 deletions_found;
-+	/* Delete requests that did not find an entry */
-+	u64 deletions_not_found;
-+	/* Query requests that found an entry */
-+	u64 queries_found;
-+	/* Query requests that did not find an entry */
-+	u64 queries_not_found;
-+	/* Total number of requests */
-+	u64 requests;
-+};
++/*
++ * A function which is to be applied asynchronously to a set of zones.
++ * @context: The object which holds the per-zone context for the action
++ * @zone_number: The number of zone to which the action is being applied
++ * @parent: The object to notify when the action is complete
++ */
++typedef void vdo_zone_action(void *context,
++			     zone_count_t zone_number,
++			     struct vdo_completion *parent);
 +
-+enum index_suspend_status {
-+	/* An index load has started but the index is not ready for use. */
-+	INDEX_OPENING = 0,
-+	/* The index is able to handle requests. */
-+	INDEX_READY,
-+	/* The index is attempting to suspend a rebuild. */
-+	INDEX_SUSPENDING,
-+	/* An index rebuild has been suspended. */
-+	INDEX_SUSPENDED,
-+	/* An index rebuild is being stopped in order to shut down. */
-+	INDEX_FREEING,
-+};
++/*
++ * A function which is to be applied asynchronously on an action manager's initiator thread as the
++ * preamble of an action.
++ * @context: The object which holds the per-zone context for the action
++ * @parent: The object to notify when the action is complete
++ */
++typedef void vdo_action_preamble(void *context, struct vdo_completion *parent);
 +
-+struct index_load_context {
-+	struct mutex mutex;
-+	struct cond_var cond;
-+	enum index_suspend_status status;
-+};
++/*
++ * A function which will run on the action manager's initiator thread as the conclusion of an
++ * action.
++ * @context: The object which holds the per-zone context for the action
++ *
++ * Return: VDO_SUCCESS or an error
++ */
++typedef int vdo_action_conclusion(void *context);
 +
-+struct uds_index_session {
-+	unsigned int state;
-+	struct uds_index *index;
-+	struct uds_request_queue *callback_queue;
-+	struct uds_parameters parameters;
-+	struct index_load_context load_context;
-+	struct mutex request_mutex;
-+	struct cond_var request_cond;
-+	int request_count;
-+	struct session_stats stats;
-+};
++/*
++ * A function to schedule an action.
++ * @context: The object which holds the per-zone context for the action
++ *
++ * Return: true if an action was scheduled
++ */
++typedef bool vdo_action_scheduler(void *context);
 +
-+#endif /* UDS_INDEX_SESSION_H */
-diff --git a/drivers/md/dm-vdo/uds-sysfs.c b/drivers/md/dm-vdo/uds-sysfs.c
++/*
++ * A function to get the id of the thread associated with a given zone.
++ * @context: The action context
++ * @zone_number: The number of the zone for which the thread ID is desired
++ */
++typedef thread_id_t vdo_zone_thread_getter(void *context, zone_count_t zone_number);
++
++struct action_manager;
++
++int __must_check
++vdo_make_action_manager(zone_count_t zones,
++			vdo_zone_thread_getter *get_zone_thread_id,
++			thread_id_t initiator_thread_id,
++			void *context,
++			vdo_action_scheduler *scheduler,
++			struct vdo *vdo,
++			struct action_manager **manager_ptr);
++
++const struct admin_state_code *__must_check
++vdo_get_current_manager_operation(struct action_manager *manager);
++
++void * __must_check vdo_get_current_action_context(struct action_manager *manager);
++
++bool vdo_schedule_default_action(struct action_manager *manager);
++
++bool vdo_schedule_action(struct action_manager *manager,
++			 vdo_action_preamble *preamble,
++			 vdo_zone_action *action,
++			 vdo_action_conclusion *conclusion,
++			 struct vdo_completion *parent);
++
++bool vdo_schedule_operation(struct action_manager *manager,
++			    const struct admin_state_code *operation,
++			    vdo_action_preamble *preamble,
++			    vdo_zone_action *action,
++			    vdo_action_conclusion *conclusion,
++			    struct vdo_completion *parent);
++
++bool vdo_schedule_operation_with_context(struct action_manager *manager,
++					 const struct admin_state_code *operation,
++					 vdo_action_preamble *preamble,
++					 vdo_zone_action *action,
++					 vdo_action_conclusion *conclusion,
++					 void *context,
++					 struct vdo_completion *parent);
++
++#endif /* VDO_ACTION_MANAGER_H */
+diff --git a/drivers/md/dm-vdo/admin-state.c b/drivers/md/dm-vdo/admin-state.c
 new file mode 100644
-index 000000000000..8700a028a11c
+index 000000000000..e2ba354508b2
 --- /dev/null
-+++ b/drivers/md/dm-vdo/uds-sysfs.c
-@@ -0,0 +1,185 @@
++++ b/drivers/md/dm-vdo/admin-state.c
+@@ -0,0 +1,512 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#include "uds-sysfs.h"
-+
-+#include <linux/kobject.h>
-+#include <linux/module.h>
-+#include <linux/slab.h>
++#include "admin-state.h"
 +
 +#include "logger.h"
 +#include "memory-alloc.h"
-+#include "string-utils.h"
-+#include "uds.h"
++#include "permassert.h"
 +
-+#define UDS_SYSFS_NAME "uds"
++#include "completion.h"
++#include "types.h"
 +
-+static struct {
-+	/* /sys/uds */
-+	struct kobject kobj;
-+	/* /sys/uds/parameter */
-+	struct kobject parameter_kobj;
++static const struct admin_state_code VDO_CODE_NORMAL_OPERATION = {
++	.name = "VDO_ADMIN_STATE_NORMAL_OPERATION",
++	.normal = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_NORMAL_OPERATION = &VDO_CODE_NORMAL_OPERATION;
++static const struct admin_state_code VDO_CODE_OPERATING = {
++	.name = "VDO_ADMIN_STATE_OPERATING",
++	.normal = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_OPERATING = &VDO_CODE_OPERATING;
++static const struct admin_state_code VDO_CODE_FORMATTING = {
++	.name = "VDO_ADMIN_STATE_FORMATTING",
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_FORMATTING = &VDO_CODE_FORMATTING;
++static const struct admin_state_code VDO_CODE_PRE_LOADING = {
++	.name = "VDO_ADMIN_STATE_PRE_LOADING",
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_PRE_LOADING = &VDO_CODE_PRE_LOADING;
++static const struct admin_state_code VDO_CODE_PRE_LOADED = {
++	.name = "VDO_ADMIN_STATE_PRE_LOADED",
++};
++const struct admin_state_code *VDO_ADMIN_STATE_PRE_LOADED = &VDO_CODE_PRE_LOADED;
++static const struct admin_state_code VDO_CODE_LOADING = {
++	.name = "VDO_ADMIN_STATE_LOADING",
++	.normal = true,
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_LOADING = &VDO_CODE_LOADING;
++static const struct admin_state_code VDO_CODE_LOADING_FOR_RECOVERY = {
++	.name = "VDO_ADMIN_STATE_LOADING_FOR_RECOVERY",
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_LOADING_FOR_RECOVERY =
++	&VDO_CODE_LOADING_FOR_RECOVERY;
++static const struct admin_state_code VDO_CODE_LOADING_FOR_REBUILD = {
++	.name = "VDO_ADMIN_STATE_LOADING_FOR_REBUILD",
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_LOADING_FOR_REBUILD = &VDO_CODE_LOADING_FOR_REBUILD;
++static const struct admin_state_code VDO_CODE_WAITING_FOR_RECOVERY = {
++	.name = "VDO_ADMIN_STATE_WAITING_FOR_RECOVERY",
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_WAITING_FOR_RECOVERY =
++	&VDO_CODE_WAITING_FOR_RECOVERY;
++static const struct admin_state_code VDO_CODE_NEW = {
++	.name = "VDO_ADMIN_STATE_NEW",
++	.quiescent = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_NEW = &VDO_CODE_NEW;
++static const struct admin_state_code VDO_CODE_INITIALIZED = {
++	.name = "VDO_ADMIN_STATE_INITIALIZED",
++};
++const struct admin_state_code *VDO_ADMIN_STATE_INITIALIZED = &VDO_CODE_INITIALIZED;
++static const struct admin_state_code VDO_CODE_RECOVERING = {
++	.name = "VDO_ADMIN_STATE_RECOVERING",
++	.draining = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_RECOVERING = &VDO_CODE_RECOVERING;
++static const struct admin_state_code VDO_CODE_REBUILDING = {
++	.name = "VDO_ADMIN_STATE_REBUILDING",
++	.draining = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_REBUILDING = &VDO_CODE_REBUILDING;
++static const struct admin_state_code VDO_CODE_SAVING = {
++	.name = "VDO_ADMIN_STATE_SAVING",
++	.draining = true,
++	.quiescing = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SAVING = &VDO_CODE_SAVING;
++static const struct admin_state_code VDO_CODE_SAVED = {
++	.name = "VDO_ADMIN_STATE_SAVED",
++	.quiescent = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SAVED = &VDO_CODE_SAVED;
++static const struct admin_state_code VDO_CODE_SCRUBBING = {
++	.name = "VDO_ADMIN_STATE_SCRUBBING",
++	.draining = true,
++	.loading = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SCRUBBING = &VDO_CODE_SCRUBBING;
++static const struct admin_state_code VDO_CODE_SAVE_FOR_SCRUBBING = {
++	.name = "VDO_ADMIN_STATE_SAVE_FOR_SCRUBBING",
++	.draining = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SAVE_FOR_SCRUBBING = &VDO_CODE_SAVE_FOR_SCRUBBING;
++static const struct admin_state_code VDO_CODE_STOPPING = {
++	.name = "VDO_ADMIN_STATE_STOPPING",
++	.draining = true,
++	.quiescing = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_STOPPING = &VDO_CODE_STOPPING;
++static const struct admin_state_code VDO_CODE_STOPPED = {
++	.name = "VDO_ADMIN_STATE_STOPPED",
++	.quiescent = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_STOPPED = &VDO_CODE_STOPPED;
++static const struct admin_state_code VDO_CODE_SUSPENDING = {
++	.name = "VDO_ADMIN_STATE_SUSPENDING",
++	.draining = true,
++	.quiescing = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDING = &VDO_CODE_SUSPENDING;
++static const struct admin_state_code VDO_CODE_SUSPENDED = {
++	.name = "VDO_ADMIN_STATE_SUSPENDED",
++	.quiescent = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDED = &VDO_CODE_SUSPENDED;
++static const struct admin_state_code VDO_CODE_SUSPENDED_OPERATION = {
++	.name = "VDO_ADMIN_STATE_SUSPENDED_OPERATION",
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDED_OPERATION = &VDO_CODE_SUSPENDED_OPERATION;
++static const struct admin_state_code VDO_CODE_RESUMING = {
++	.name = "VDO_ADMIN_STATE_RESUMING",
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_RESUMING = &VDO_CODE_RESUMING;
 +
-+	/* These flags are used to ensure a clean shutdown */
-+
-+	/* /sys/uds flag */
-+	bool flag;
-+	/* /sys/uds/parameter flag */
-+	bool parameter_flag;
-+} object_root;
-+
-+static char *buffer_to_string(const char *buf, size_t length)
++/**
++ * get_next_state() - Determine the state which should be set after a given operation completes
++ *                    based on the operation and the current state.
++ * @operation The operation to be started.
++ *
++ * Return: The state to set when the operation completes or NULL if the operation can not be
++ *         started in the current state.
++ */
++static const struct admin_state_code *
++get_next_state(const struct admin_state *state, const struct admin_state_code *operation)
 +{
-+	char *string;
++	const struct admin_state_code *code = vdo_get_admin_state_code(state);
 +
-+	if (UDS_ALLOCATE(length + 1, char, __func__, &string) != UDS_SUCCESS)
++	if (code->operating)
 +		return NULL;
 +
-+	memcpy(string, buf, length);
-+	string[length] = '\0';
-+	if (string[length - 1] == '\n')
-+		string[length - 1] = '\0';
++	if (operation == VDO_ADMIN_STATE_SAVING)
++		return (code == VDO_ADMIN_STATE_NORMAL_OPERATION ? VDO_ADMIN_STATE_SAVED : NULL);
 +
-+	return string;
++	if (operation == VDO_ADMIN_STATE_SUSPENDING)
++		return (code == VDO_ADMIN_STATE_NORMAL_OPERATION
++			? VDO_ADMIN_STATE_SUSPENDED
++			: NULL);
++
++	if (operation == VDO_ADMIN_STATE_STOPPING)
++		return (code == VDO_ADMIN_STATE_NORMAL_OPERATION ? VDO_ADMIN_STATE_STOPPED : NULL);
++
++	if (operation == VDO_ADMIN_STATE_PRE_LOADING)
++		return (code == VDO_ADMIN_STATE_INITIALIZED ? VDO_ADMIN_STATE_PRE_LOADED : NULL);
++
++	if (operation == VDO_ADMIN_STATE_SUSPENDED_OPERATION)
++		return (((code == VDO_ADMIN_STATE_SUSPENDED) ||
++			 (code == VDO_ADMIN_STATE_SAVED)) ? code : NULL);
++
++	return VDO_ADMIN_STATE_NORMAL_OPERATION;
 +}
 +
-+/*
-+ * This is the code for any directory in the /sys/<module_name> tree that contains no regular files
-+ * (only subdirectories).
++/**
++ * vdo_finish_operation() - Finish the current operation.
++ *
++ * Will notify the operation waiter if there is one. This method should be used for operations
++ * started with vdo_start_operation(). For operations which were started with vdo_start_draining(),
++ * use vdo_finish_draining() instead.
++ *
++ * Return: true if there was an operation to finish.
 + */
-+
-+static void empty_release(struct kobject *kobj)
++bool vdo_finish_operation(struct admin_state *state, int result)
 +{
-+}
++	if (!vdo_get_admin_state_code(state)->operating)
++		return false;
 +
-+static ssize_t empty_show(struct kobject *kobj, struct attribute *attr, char *buf)
-+{
-+	return 0;
-+}
++	state->complete = state->starting;
++	if (state->waiter != NULL)
++		vdo_set_completion_result(state->waiter, result);
 +
-+static ssize_t
-+empty_store(struct kobject *kobj, struct attribute *attr, const char *buf, size_t length)
-+{
-+	return length;
-+}
-+
-+static const struct sysfs_ops empty_ops = {
-+	.show = empty_show,
-+	.store = empty_store,
-+};
-+
-+static struct attribute *empty_attrs[] = {
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(empty);
-+
-+static const struct kobj_type empty_object_type = {
-+	.release = empty_release,
-+	.sysfs_ops = &empty_ops,
-+	.default_groups = empty_groups,
-+};
-+
-+/*
-+ * This is the code for the /sys/<module_name>/parameter directory.
-+ * <dir>/log_level                 UDS_LOG_LEVEL
-+ */
-+
-+struct parameter_attribute {
-+	struct attribute attr;
-+	const char *(*show_string)(void);
-+	void (*store_string)(const char *string);
-+};
-+
-+static ssize_t parameter_show(struct kobject *kobj, struct attribute *attr, char *buf)
-+{
-+	struct parameter_attribute *pa;
-+
-+	pa = container_of(attr, struct parameter_attribute, attr);
-+	if (pa->show_string != NULL)
-+		return sprintf(buf, "%s\n", pa->show_string());
-+	else
-+		return -EINVAL;
-+}
-+
-+static ssize_t
-+parameter_store(struct kobject *kobj, struct attribute *attr, const char *buf, size_t length)
-+{
-+	char *string;
-+	struct parameter_attribute *pa;
-+
-+	pa = container_of(attr, struct parameter_attribute, attr);
-+	if (pa->store_string == NULL)
-+		return -EINVAL;
-+	string = buffer_to_string(buf, length);
-+	if (string == NULL)
-+		return -ENOMEM;
-+
-+	pa->store_string(string);
-+	UDS_FREE(string);
-+	return length;
-+}
-+
-+static const char *parameter_show_log_level(void)
-+{
-+	return uds_log_priority_to_string(uds_get_log_level());
-+}
-+
-+static void parameter_store_log_level(const char *string)
-+{
-+	uds_set_log_level(uds_log_string_to_priority(string));
-+}
-+
-+static struct parameter_attribute log_level_attr = {
-+	.attr = { .name = "log_level", .mode = 0600 },
-+	.show_string = parameter_show_log_level,
-+	.store_string = parameter_store_log_level,
-+};
-+
-+static struct attribute *parameter_attrs[] = {
-+	&log_level_attr.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(parameter);
-+
-+static const struct sysfs_ops parameter_ops = {
-+	.show = parameter_show,
-+	.store = parameter_store,
-+};
-+
-+static const struct kobj_type parameter_object_type = {
-+	.release = empty_release,
-+	.sysfs_ops = &parameter_ops,
-+	.default_groups = parameter_groups,
-+};
-+
-+int uds_init_sysfs(void)
-+{
-+	int result;
-+
-+	memset(&object_root, 0, sizeof(object_root));
-+	kobject_init(&object_root.kobj, &empty_object_type);
-+	result = kobject_add(&object_root.kobj, NULL, UDS_SYSFS_NAME);
-+	if (result == 0) {
-+		object_root.flag = true;
-+		kobject_init(&object_root.parameter_kobj, &parameter_object_type);
-+		result = kobject_add(&object_root.parameter_kobj, &object_root.kobj, "parameter");
-+		if (result == 0)
-+			object_root.parameter_flag = true;
++	if (!state->starting) {
++		vdo_set_admin_state_code(state, state->next_state);
++		if (state->waiter != NULL)
++			vdo_launch_completion(UDS_FORGET(state->waiter));
 +	}
 +
-+	if (result != 0)
-+		uds_put_sysfs();
++	return true;
++}
++
++/**
++ * begin_operation() - Begin an operation if it may be started given the current state.
++ * @waiter A completion to notify when the operation is complete; may be NULL.
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++static int __must_check begin_operation(struct admin_state *state,
++					const struct admin_state_code *operation,
++					struct vdo_completion *waiter,
++					vdo_admin_initiator *initiator)
++{
++	int result;
++	const struct admin_state_code *next_state = get_next_state(state, operation);
++
++	if (next_state == NULL) {
++		result = uds_log_error_strerror(VDO_INVALID_ADMIN_STATE,
++						"Can't start %s from %s",
++						operation->name,
++						vdo_get_admin_state_code(state)->name);
++	} else if (state->waiter != NULL) {
++		result = uds_log_error_strerror(VDO_COMPONENT_BUSY,
++						"Can't start %s with extant waiter",
++						operation->name);
++	} else {
++		state->waiter = waiter;
++		state->next_state = next_state;
++		vdo_set_admin_state_code(state, operation);
++		if (initiator != NULL) {
++			state->starting = true;
++			initiator(state);
++			state->starting = false;
++			if (state->complete)
++				vdo_finish_operation(state, VDO_SUCCESS);
++		}
++
++		return VDO_SUCCESS;
++	}
++
++	if (waiter != NULL)
++		vdo_continue_completion(waiter, result);
 +
 +	return result;
 +}
 +
-+void uds_put_sysfs(void)
++/**
++ * start_operation() - Start an operation if it may be started given the current state.
++ * @waiter     A completion to notify when the operation is complete.
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: true if the operation was started.
++ */
++static inline bool __must_check start_operation(struct admin_state *state,
++						const struct admin_state_code *operation,
++						struct vdo_completion *waiter,
++						vdo_admin_initiator *initiator)
 +{
-+	if (object_root.parameter_flag)
-+		kobject_put(&object_root.parameter_kobj);
-+
-+	if (object_root.flag)
-+		kobject_put(&object_root.kobj);
++	return (begin_operation(state, operation, waiter, initiator) == VDO_SUCCESS);
 +}
-diff --git a/drivers/md/dm-vdo/uds-sysfs.h b/drivers/md/dm-vdo/uds-sysfs.h
++
++/**
++ * check_code() - Check the result of a state validation.
++ * @valid true if the code is of an appropriate type.
++ * @code The code which failed to be of the correct type.
++ * @what What the code failed to be, for logging.
++ * @waiter The completion to notify of the error; may be NULL.
++ *
++ * If the result failed, log an invalid state error and, if there is a waiter, notify it.
++ *
++ * Return: The result of the check.
++ */
++static bool check_code(bool valid,
++		       const struct admin_state_code *code,
++		       const char *what,
++		       struct vdo_completion *waiter)
++{
++	int result;
++
++	if (valid)
++		return true;
++
++	result = uds_log_error_strerror(VDO_INVALID_ADMIN_STATE,
++					"%s is not a %s", code->name, what);
++	if (waiter != NULL)
++		vdo_continue_completion(waiter, result);
++
++	return false;
++}
++
++/**
++ * vdo_drain_operation() - Check that an operation is a drain.
++ * @waiter The completion to finish with an error if the operation is not a drain.
++ *
++ * Return: true if the specified operation is a drain.
++ */
++static bool __must_check
++assert_vdo_drain_operation(const struct admin_state_code *operation, struct vdo_completion *waiter)
++{
++	return check_code(operation->draining, operation, "drain operation", waiter);
++}
++
++/**
++ * vdo_start_draining() - Initiate a drain operation if the current state permits it.
++ * @operation The type of drain to initiate.
++ * @waiter The completion to notify when the drain is complete.
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: true if the drain was initiated, if not the waiter will be notified.
++ */
++bool vdo_start_draining(struct admin_state *state,
++			const struct admin_state_code *operation,
++			struct vdo_completion *waiter,
++			vdo_admin_initiator *initiator)
++{
++	const struct admin_state_code *code = vdo_get_admin_state_code(state);
++
++	if (!assert_vdo_drain_operation(operation, waiter))
++		return false;
++
++	if (code->quiescent) {
++		vdo_launch_completion(waiter);
++		return false;
++	}
++
++	if (!code->normal) {
++		uds_log_error_strerror(VDO_INVALID_ADMIN_STATE,
++				       "can't start %s from %s",
++				       operation->name,
++				       code->name);
++		vdo_continue_completion(waiter, VDO_INVALID_ADMIN_STATE);
++		return false;
++	}
++
++	return start_operation(state, operation, waiter, initiator);
++}
++
++/**
++ * vdo_finish_draining() - Finish a drain operation if one was in progress.
++ *
++ * Return: true if the state was draining; will notify the waiter if so.
++ */
++bool vdo_finish_draining(struct admin_state *state)
++{
++	return vdo_finish_draining_with_result(state, VDO_SUCCESS);
++}
++
++/**
++ * vdo_finish_draining_with_result() - Finish a drain operation with a status code.
++ *
++ * Return: true if the state was draining; will notify the waiter if so.
++ */
++bool vdo_finish_draining_with_result(struct admin_state *state, int result)
++{
++	return (vdo_is_state_draining(state) && vdo_finish_operation(state, result));
++}
++
++/**
++ * vdo_assert_load_operation() - Check that an operation is a load.
++ * @waiter The completion to finish with an error if the operation is not a load.
++ *
++ * Return: true if the specified operation is a load.
++ */
++bool vdo_assert_load_operation(const struct admin_state_code *operation,
++			       struct vdo_completion *waiter)
++{
++	return check_code(operation->loading, operation, "load operation", waiter);
++}
++
++/**
++ * vdo_start_loading() - Initiate a load operation if the current state permits it.
++ * @operation The type of load to initiate.
++ * @waiter The completion to notify when the load is complete (may be NULL).
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: true if the load was initiated, if not the waiter will be notified.
++ */
++bool vdo_start_loading(struct admin_state *state,
++		       const struct admin_state_code *operation,
++		       struct vdo_completion *waiter,
++		       vdo_admin_initiator *initiator)
++{
++	return (vdo_assert_load_operation(operation, waiter) &&
++		start_operation(state, operation, waiter, initiator));
++}
++
++/**
++ * vdo_finish_loading() - Finish a load operation if one was in progress.
++ *
++ * Return: true if the state was loading; will notify the waiter if so.
++ */
++bool vdo_finish_loading(struct admin_state *state)
++{
++	return vdo_finish_loading_with_result(state, VDO_SUCCESS);
++}
++
++/**
++ * vdo_finish_loading_with_result() - Finish a load operation with a status code.
++ * @result The result of the load operation.
++ *
++ * Return: true if the state was loading; will notify the waiter if so.
++ */
++bool vdo_finish_loading_with_result(struct admin_state *state, int result)
++{
++	return (vdo_is_state_loading(state) && vdo_finish_operation(state, result));
++}
++
++/**
++ * assert_vdo_resume_operation() - Check whether an admin_state_code is a resume operation.
++ * @waiter The completion to notify if the operation is not a resume operation; may be NULL.
++ *
++ * Return: true if the code is a resume operation.
++ */
++static bool __must_check assert_vdo_resume_operation(const struct admin_state_code *operation,
++						     struct vdo_completion *waiter)
++{
++	return check_code(operation == VDO_ADMIN_STATE_RESUMING,
++			  operation,
++			  "resume operation",
++			  waiter);
++}
++
++/**
++ * vdo_start_resuming() - Initiate a resume operation if the current state permits it.
++ * @operation The type of resume to start.
++ * @waiter The completion to notify when the resume is complete (may be NULL).
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: true if the resume was initiated, if not the waiter will be notified.
++ */
++bool vdo_start_resuming(struct admin_state *state,
++			const struct admin_state_code *operation,
++			struct vdo_completion *waiter,
++			vdo_admin_initiator *initiator)
++{
++	return (assert_vdo_resume_operation(operation, waiter) &&
++		start_operation(state, operation, waiter, initiator));
++}
++
++/**
++ * vdo_finish_resuming() - Finish a resume operation if one was in progress.
++ *
++ * Return: true if the state was resuming; will notify the waiter if so.
++ */
++bool vdo_finish_resuming(struct admin_state *state)
++{
++	return vdo_finish_resuming_with_result(state, VDO_SUCCESS);
++}
++
++/**
++ * vdo_finish_resuming_with_result() - Finish a resume operation with a status code.
++ * @result The result of the resume operation.
++ *
++ * Return: true if the state was resuming; will notify the waiter if so.
++ */
++bool vdo_finish_resuming_with_result(struct admin_state *state, int result)
++{
++	return (vdo_is_state_resuming(state) && vdo_finish_operation(state, result));
++}
++
++/**
++ * vdo_resume_if_quiescent() - Change the state to normal operation if the current state is
++ *                             quiescent.
++ *
++ * Return: VDO_SUCCESS if the state resumed, VDO_INVALID_ADMIN_STATE otherwise.
++ */
++int vdo_resume_if_quiescent(struct admin_state *state)
++{
++	if (!vdo_is_state_quiescent(state))
++		return VDO_INVALID_ADMIN_STATE;
++
++	vdo_set_admin_state_code(state, VDO_ADMIN_STATE_NORMAL_OPERATION);
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_start_operation() - Attempt to start an operation.
++ *
++ * Return: VDO_SUCCESS if the operation was started, VDO_INVALID_ADMIN_STATE if not
++ */
++int vdo_start_operation(struct admin_state *state, const struct admin_state_code *operation)
++{
++	return vdo_start_operation_with_waiter(state, operation, NULL, NULL);
++}
++
++/**
++ * vdo_start_operation_with_waiter() - Attempt to start an operation.
++ * @waiter the completion to notify when the operation completes or fails to start; may be NULL.
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: VDO_SUCCESS if the operation was started, VDO_INVALID_ADMIN_STATE if not
++ */
++int vdo_start_operation_with_waiter(struct admin_state *state,
++				    const struct admin_state_code *operation,
++				    struct vdo_completion *waiter,
++				    vdo_admin_initiator *initiator)
++{
++	return (check_code(operation->operating, operation, "operation", waiter) ?
++		begin_operation(state, operation, waiter, initiator) :
++		VDO_INVALID_ADMIN_STATE);
++}
+diff --git a/drivers/md/dm-vdo/admin-state.h b/drivers/md/dm-vdo/admin-state.h
 new file mode 100644
-index 000000000000..c3d00a7187bd
+index 000000000000..550e9084662d
 --- /dev/null
-+++ b/drivers/md/dm-vdo/uds-sysfs.h
-@@ -0,0 +1,12 @@
++++ b/drivers/md/dm-vdo/admin-state.h
+@@ -0,0 +1,180 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef UDS_SYSFS_H
-+#define UDS_SYSFS_H
++#ifndef VDO_ADMIN_STATE_H
++#define VDO_ADMIN_STATE_H
 +
-+int uds_init_sysfs(void);
-+void uds_put_sysfs(void);
++#include "completion.h"
++#include "types.h"
 +
-+#endif  /* UDS_SYSFS_H */
-diff --git a/drivers/md/dm-vdo/uds.h b/drivers/md/dm-vdo/uds.h
-new file mode 100644
-index 000000000000..a02350165ab6
---- /dev/null
-+++ b/drivers/md/dm-vdo/uds.h
-@@ -0,0 +1,328 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright 2023 Red Hat
++struct admin_state_code {
++	const char *name;
++	/* Normal operation, data_vios may be active */
++	bool normal;
++	/* I/O is draining, new requests should not start */
++	bool draining;
++	/* This is a startup time operation */
++	bool loading;
++	/* The next state will be quiescent */
++	bool quiescing;
++	/* The VDO is quiescent, there should be no I/O */
++	bool quiescent;
++	/* Whether an operation is in progress and so no other operation may be started */
++	bool operating;
++};
++
++extern const struct admin_state_code *VDO_ADMIN_STATE_NORMAL_OPERATION;
++extern const struct admin_state_code *VDO_ADMIN_STATE_OPERATING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_FORMATTING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_PRE_LOADING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_PRE_LOADED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_LOADING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_LOADING_FOR_RECOVERY;
++extern const struct admin_state_code *VDO_ADMIN_STATE_LOADING_FOR_REBUILD;
++extern const struct admin_state_code *VDO_ADMIN_STATE_WAITING_FOR_RECOVERY;
++extern const struct admin_state_code *VDO_ADMIN_STATE_NEW;
++extern const struct admin_state_code *VDO_ADMIN_STATE_INITIALIZED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_RECOVERING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_REBUILDING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SAVING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SAVED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SCRUBBING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SAVE_FOR_SCRUBBING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_STOPPING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_STOPPED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDED_OPERATION;
++extern const struct admin_state_code *VDO_ADMIN_STATE_RESUMING;
++
++struct admin_state {
++	const struct admin_state_code *current_state;
++	/* The next administrative state (when the current operation finishes) */
++	const struct admin_state_code *next_state;
++	/* A completion waiting on a state change */
++	struct vdo_completion *waiter;
++	/* Whether an operation is being initiated */
++	bool starting;
++	/* Whether an operation has completed in the initiator */
++	bool complete;
++};
++
++/**
++ * typedef vdo_admin_initiator - A method to be called once an admin operation may be initiated.
 + */
++typedef void vdo_admin_initiator(struct admin_state *state);
 +
-+#ifndef UDS_H
-+#define UDS_H
++static inline const struct admin_state_code * __must_check
++vdo_get_admin_state_code(const struct admin_state *state)
++{
++	return READ_ONCE(state->current_state);
++}
 +
-+#include <linux/types.h>
-+
-+#include "funnel-queue.h"
-+
-+/*
-+ * UDS public API
++/**
++ * vdo_set_admin_state_code() - Set the current admin state code.
 + *
-+ * The Universal Deduplication System (UDS) is an efficient name-value store. When used for
-+ * deduplicating storage, the names are generally hashes of data blocks and the associated data is
-+ * where that block is located on the underlying storage medium. The stored names are expected to
-+ * be randomly distributed among the space of possible names. If this assumption is violated, the
-+ * UDS index will store fewer names than normal but will otherwise continue to work. The data
-+ * associated with each name can be any 16-byte value.
-+ *
-+ * A client must first create an index session to interact with an index. Once created, the session
-+ * can be shared among multiple threads or users. When a session is destroyed, it will also close
-+ * and save any associated index.
-+ *
-+ * To make a request, a client must allocate a uds_request structure and set the required fields
-+ * before launching it. UDS will invoke the provided callback to complete the request. After the
-+ * callback has been called, the uds_request structure can be freed or reused for a new request.
-+ * There are five types of requests:
-+ *
-+ * A UDS_UPDATE request will associate the provided name with the provided data. Any previous data
-+ * associated with that name will be discarded.
-+ *
-+ * A UDS_QUERY request will return the data associated with the provided name, if any. The entry
-+ * for the name will also be marked as most recent, as if the data had been updated.
-+ *
-+ * A UDS_POST request is a combination of UDS_QUERY and UDS_UPDATE. If there is already data
-+ * associated with the provided name, that data is returned. If there is no existing association,
-+ * the name is associated with the newly provided data. This request is equivalent to a UDS_QUERY
-+ * request followed by a UDS_UPDATE request if no data is found, but it is much more efficient.
-+ *
-+ * A UDS_QUERY_NO_UPDATE request will return the data associated with the provided name, but will
-+ * not change the recency of the entry for the name. This request is primarily useful for testing,
-+ * to determine whether an entry exists without changing the internal state of the index.
-+ *
-+ * A UDS_DELETE request removes any data associated with the provided name. This operation is
-+ * generally not necessary, because the index will automatically discard its oldest entries once it
-+ * becomes full.
++ * This function should be used primarily for initialization and by adminState internals. Most uses
++ * should go through the operation interfaces.
 + */
++static inline void
++vdo_set_admin_state_code(struct admin_state *state, const struct admin_state_code *code)
++{
++	WRITE_ONCE(state->current_state, code);
++}
 +
-+/* General UDS constants and structures */
++static inline bool __must_check vdo_is_state_normal(const struct admin_state *state)
++{
++	return vdo_get_admin_state_code(state)->normal;
++}
 +
-+enum uds_request_type {
-+	/* Create or update the mapping for a name, and make the name most recent. */
-+	UDS_UPDATE,
++static inline bool __must_check vdo_is_state_suspending(const struct admin_state *state)
++{
++	return (vdo_get_admin_state_code(state) == VDO_ADMIN_STATE_SUSPENDING);
++}
 +
-+	/* Return any mapped data for a name, and make the name most recent. */
-+	UDS_QUERY,
++static inline bool __must_check vdo_is_state_saving(const struct admin_state *state)
++{
++	return (vdo_get_admin_state_code(state) == VDO_ADMIN_STATE_SAVING);
++}
 +
-+	/*
-+	 * Return any mapped data for a name, or map the provided data to the name if there is no
-+	 * current data, and make the name most recent.
-+	 */
-+	UDS_POST,
++static inline bool __must_check vdo_is_state_saved(const struct admin_state *state)
++{
++	return (vdo_get_admin_state_code(state) == VDO_ADMIN_STATE_SAVED);
++}
 +
-+	/* Return any mapped data for a name without updating its recency. */
-+	UDS_QUERY_NO_UPDATE,
++static inline bool __must_check vdo_is_state_draining(const struct admin_state *state)
++{
++	return vdo_get_admin_state_code(state)->draining;
++}
 +
-+	/* Remove any mapping for a name. */
-+	UDS_DELETE,
++static inline bool __must_check vdo_is_state_loading(const struct admin_state *state)
++{
++	return vdo_get_admin_state_code(state)->loading;
++}
 +
-+};
++static inline bool __must_check vdo_is_state_resuming(const struct admin_state *state)
++{
++	return (vdo_get_admin_state_code(state) == VDO_ADMIN_STATE_RESUMING);
++}
 +
-+enum uds_open_index_type {
-+	/* Create a new index. */
-+	UDS_CREATE,
++static inline bool __must_check vdo_is_state_clean_load(const struct admin_state *state)
++{
++	const struct admin_state_code *code = vdo_get_admin_state_code(state);
 +
-+	/* Load an existing index and try to recover if necessary. */
-+	UDS_LOAD,
++	return ((code == VDO_ADMIN_STATE_FORMATTING) || (code == VDO_ADMIN_STATE_LOADING));
++}
 +
-+	/* Load an existing index, but only if it was saved cleanly. */
-+	UDS_NO_REBUILD,
-+};
++static inline bool __must_check vdo_is_state_quiescing(const struct admin_state *state)
++{
++	return vdo_get_admin_state_code(state)->quiescing;
++}
 +
-+enum {
-+	/* The record name size in bytes */
-+	UDS_RECORD_NAME_SIZE = 16,
-+	/* The maximum record data size in bytes */
-+	UDS_RECORD_DATA_SIZE = 16,
-+};
++static inline bool __must_check vdo_is_state_quiescent(const struct admin_state *state)
++{
++	return vdo_get_admin_state_code(state)->quiescent;
++}
 +
-+/*
-+ * A type representing a UDS memory configuration which is either a positive integer number of
-+ * gigabytes or one of the six special constants for configurations smaller than one gigabyte.
-+ */
-+typedef int uds_memory_config_size_t;
++bool __must_check
++vdo_assert_load_operation(const struct admin_state_code *operation, struct vdo_completion *waiter);
 +
-+enum {
-+	/* The maximum configurable amount of memory */
-+	UDS_MEMORY_CONFIG_MAX = 1024,
-+	/* Flag indicating that the index has one less chapter than usual */
-+	UDS_MEMORY_CONFIG_REDUCED = 0x1000,
-+	UDS_MEMORY_CONFIG_REDUCED_MAX = 1024 + UDS_MEMORY_CONFIG_REDUCED,
-+	/* Special values indicating sizes less than 1 GB */
-+	UDS_MEMORY_CONFIG_256MB = -256,
-+	UDS_MEMORY_CONFIG_512MB = -512,
-+	UDS_MEMORY_CONFIG_768MB = -768,
-+	UDS_MEMORY_CONFIG_REDUCED_256MB = -1280,
-+	UDS_MEMORY_CONFIG_REDUCED_512MB = -1536,
-+	UDS_MEMORY_CONFIG_REDUCED_768MB = -1792,
-+};
++bool vdo_start_loading(struct admin_state *state,
++		       const struct admin_state_code *operation,
++		       struct vdo_completion *waiter,
++		       vdo_admin_initiator *initiator);
 +
-+struct uds_record_name {
-+	unsigned char name[UDS_RECORD_NAME_SIZE];
-+};
++bool vdo_finish_loading(struct admin_state *state);
 +
-+struct uds_record_data {
-+	unsigned char data[UDS_RECORD_DATA_SIZE];
-+};
++bool vdo_finish_loading_with_result(struct admin_state *state, int result);
 +
-+struct uds_volume_record {
-+	struct uds_record_name name;
-+	struct uds_record_data data;
-+};
++bool vdo_start_resuming(struct admin_state *state,
++			const struct admin_state_code *operation,
++			struct vdo_completion *waiter,
++			vdo_admin_initiator *initiator);
 +
-+struct uds_parameters {
-+	/* The block_device used for storage */
-+	struct block_device *bdev;
-+	/* The maximum allowable size of the index on storage */
-+	size_t size;
-+	/* The offset where the index should start */
-+	off_t offset;
-+	/* The maximum memory allocation, in GB */
-+	uds_memory_config_size_t memory_size;
-+	/* Whether the index should include sparse chapters */
-+	bool sparse;
-+	/* A 64-bit nonce to validate the index */
-+	u64 nonce;
-+	/* The number of threads used to process index requests */
-+	unsigned int zone_count;
-+	/* The number of threads used to read volume pages */
-+	unsigned int read_threads;
-+};
++bool vdo_finish_resuming(struct admin_state *state);
 +
-+/*
-+ * These statistics capture characteristics of the current index, including resource usage and
-+ * requests processed since the index was opened.
-+ */
-+struct uds_index_stats {
-+	/* The total number of records stored in the index */
-+	u64 entries_indexed;
-+	/* An estimate of the index's memory usage, in bytes */
-+	u64 memory_used;
-+	/* The number of collisions recorded in the volume index */
-+	u64 collisions;
-+	/* The number of entries discarded from the index since startup */
-+	u64 entries_discarded;
-+	/* The time at which these statistics were fetched */
-+	s64 current_time;
-+	/* The number of post calls that found an existing entry */
-+	u64 posts_found;
-+	/* The number of post calls that added an entry */
-+	u64 posts_not_found;
-+	/*
-+	 * The number of post calls that found an existing entry that is current enough to only
-+	 * exist in memory and not have been committed to disk yet
-+	 */
-+	u64 in_memory_posts_found;
-+	/*
-+	 * The number of post calls that found an existing entry in the dense portion of the index
-+	 */
-+	u64 dense_posts_found;
-+	/*
-+	 * The number of post calls that found an existing entry in the sparse portion of the index
-+	 */
-+	u64 sparse_posts_found;
-+	/* The number of update calls that updated an existing entry */
-+	u64 updates_found;
-+	/* The number of update calls that added a new entry */
-+	u64 updates_not_found;
-+	/* The number of delete requests that deleted an existing entry */
-+	u64 deletions_found;
-+	/* The number of delete requests that did nothing */
-+	u64 deletions_not_found;
-+	/* The number of query calls that found existing entry */
-+	u64 queries_found;
-+	/* The number of query calls that did not find an entry */
-+	u64 queries_not_found;
-+	/* The total number of requests processed */
-+	u64 requests;
-+};
++bool vdo_finish_resuming_with_result(struct admin_state *state, int result);
 +
-+enum uds_index_region {
-+	/* No location information has been determined */
-+	UDS_LOCATION_UNKNOWN = 0,
-+	/* The index page entry has been found */
-+	UDS_LOCATION_INDEX_PAGE_LOOKUP,
-+	/* The record page entry has been found */
-+	UDS_LOCATION_RECORD_PAGE_LOOKUP,
-+	/* The record is not in the index */
-+	UDS_LOCATION_UNAVAILABLE,
-+	/* The record was found in the open chapter */
-+	UDS_LOCATION_IN_OPEN_CHAPTER,
-+	/* The record was found in the dense part of the index */
-+	UDS_LOCATION_IN_DENSE,
-+	/* The record was found in the sparse part of the index */
-+	UDS_LOCATION_IN_SPARSE,
-+} __packed;
++int vdo_resume_if_quiescent(struct admin_state *state);
 +
-+/* Zone message requests are used to communicate between index zones. */
-+enum uds_zone_message_type {
-+	/* A standard request with no message */
-+	UDS_MESSAGE_NONE = 0,
-+	/* Add a chapter to the sparse chapter index cache */
-+	UDS_MESSAGE_SPARSE_CACHE_BARRIER,
-+	/* Close a chapter to keep the zone from falling behind */
-+	UDS_MESSAGE_ANNOUNCE_CHAPTER_CLOSED,
-+} __packed;
++bool vdo_start_draining(struct admin_state *state,
++			const struct admin_state_code *operation,
++			struct vdo_completion *waiter,
++			vdo_admin_initiator *initiator);
 +
-+struct uds_zone_message {
-+	/* The type of message, determining how it will be processed */
-+	enum uds_zone_message_type type;
-+	/* The virtual chapter number to which the message applies */
-+	u64 virtual_chapter;
-+};
++bool vdo_finish_draining(struct admin_state *state);
 +
-+struct uds_index_session;
-+struct uds_index;
-+struct uds_request;
++bool vdo_finish_draining_with_result(struct admin_state *state, int result);
 +
-+/* Once this callback has been invoked, the uds_request structure can be reused or freed. */
-+typedef void uds_request_callback_t(struct uds_request *request);
++int vdo_start_operation(struct admin_state *state, const struct admin_state_code *operation);
 +
-+struct uds_request {
-+	/* These input fields must be set before launching a request. */
++int vdo_start_operation_with_waiter(struct admin_state *state,
++				    const struct admin_state_code *operation,
++				    struct vdo_completion *waiter,
++				    vdo_admin_initiator *initiator);
 +
-+	/* The name of the record to look up or create */
-+	struct uds_record_name record_name;
-+	/* New data to associate with the record name, if applicable */
-+	struct uds_record_data new_metadata;
-+	/* A callback to invoke when the request is complete */
-+	uds_request_callback_t *callback;
-+	/* The index session that will manage this request */
-+	struct uds_index_session *session;
-+	/* The type of operation to perform, as describe above */
-+	enum uds_request_type type;
++bool vdo_finish_operation(struct admin_state *state, int result);
 +
-+	/* These output fields are set when a request is complete. */
-+
-+	/* The existing data associated with the request name, if any */
-+	struct uds_record_data old_metadata;
-+	/* Either UDS_SUCCESS or an error code for the request */
-+	int status;
-+	/* True if the record name had an existing entry in the index */
-+	bool found;
-+
-+	/*
-+	 * The remaining fields are used internally and should not be altered by clients. The index
-+	 * relies on zone_number being the first field in this section.
-+	 */
-+
-+	/* The number of the zone which will process this request*/
-+	unsigned int zone_number;
-+	/* A link for adding a request to a lock-free queue */
-+	struct funnel_queue_entry queue_link;
-+	/* A link for adding a request to a standard linked list */
-+	struct uds_request *next_request;
-+	/* A pointer to the index processing this request */
-+	struct uds_index *index;
-+	/* Control message for coordinating between zones */
-+	struct uds_zone_message zone_message;
-+	/* If true, process request immediately by waking the worker thread */
-+	bool unbatched;
-+	/* If true, continue this request before processing newer requests */
-+	bool requeued;
-+	/* The virtual chapter containing the record name, if known */
-+	u64 virtual_chapter;
-+	/* The region of the index containing the record name */
-+	enum uds_index_region location;
-+};
-+
-+/* Compute the number of bytes needed to store an index. */
-+int __must_check uds_compute_index_size(const struct uds_parameters *parameters, u64 *index_size);
-+
-+/* A session is required for most index operations. */
-+int __must_check uds_create_index_session(struct uds_index_session **session);
-+
-+/* Destroying an index session also closes and saves the associated index. */
-+int uds_destroy_index_session(struct uds_index_session *session);
-+
-+/*
-+ * Create or open an index with an existing session. This operation fails if the index session is
-+ * suspended, or if there is already an open index.
-+ */
-+int __must_check uds_open_index(enum uds_open_index_type open_type,
-+				const struct uds_parameters *parameters,
-+				struct uds_index_session *session);
-+
-+/*
-+ * Wait until all callbacks for index operations are complete, and prevent new index operations
-+ * from starting. New index operations will fail with EBUSY until the session is resumed. Also
-+ * optionally saves the index.
-+ */
-+int __must_check uds_suspend_index_session(struct uds_index_session *session, bool save);
-+
-+/*
-+ * Allow new index operations for an index, whether it was suspended or not. If the index is
-+ * suspended and the supplied block device differs from the current backing store, the index will
-+ * start using the new backing store instead.
-+ */
-+int __must_check uds_resume_index_session(struct uds_index_session *session,
-+					  struct block_device *bdev);
-+
-+/* Wait until all outstanding index operations are complete. */
-+int __must_check uds_flush_index_session(struct uds_index_session *session);
-+
-+/* Close an index. This operation fails if the index session is suspended. */
-+int __must_check uds_close_index(struct uds_index_session *session);
-+
-+/* Get index statistics since the last time the index was opened. */
-+int __must_check
-+uds_get_index_session_stats(struct uds_index_session *session, struct uds_index_stats *stats);
-+
-+/* This function will fail if any required field of the request is not set. */
-+int __must_check uds_launch_request(struct uds_request *request);
-+
-+#endif /* UDS_H */
++#endif /* VDO_ADMIN_STATE_H */
 -- 
 2.40.0
 
