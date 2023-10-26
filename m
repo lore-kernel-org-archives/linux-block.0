@@ -2,2246 +2,1811 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF2DC25B6E
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 107EAC27C47
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:43:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344870AbjJZVnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 17:43:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41000 "EHLO
+        id S233035AbjJZVnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 17:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232027AbjJZVnP (ORCPT
+        with ESMTP id S232235AbjJZVnS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Oct 2023 17:43:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3EB1B5
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:42 -0700 (PDT)
+        Thu, 26 Oct 2023 17:43:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54534128
+        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698356502;
+        s=mimecast20190719; t=1698356500;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TtgQkQLH9r9KRy/YlnSEmRWxtT9bMdPOjAKm9E7/2sk=;
-        b=KOeWMH+DU8lY1tYq/39UZZ7uhnNrjImSnmRlz0S5SLSBCc3y269f3dAYNMd5j8mZ6yV8Ot
-        G2YugDq8HRqbGW9B8SoC4Y7b9kcvuUaXQx1YSdC8LdL73BSB9jwTM0ii6Dw0yvCg3xtefG
-        gYBWmuJ+aqGLGv7V1LV6j46DnBrPdSE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-584-dj-EVN06MiKJYWvUDZ6KGw-1; Thu, 26 Oct 2023 17:41:39 -0400
-X-MC-Unique: dj-EVN06MiKJYWvUDZ6KGw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        bh=qTVr2bEL2nhED7bKq6qyOh8riwxZ6zyxIqcZ+ZdPwu0=;
+        b=PcsG3+DPeetc2oxZo3umUQCrwK5Acpy9mUD7EPG9aUjV61uCQWFxli4IYdcNE5CTWbKmrC
+        /BWOAXKnnp1Md15HiD0Bc0nfuUnWnom4ez/epgdb8PJT+dwBV/JfSesB9jXkpzUtWWgsdT
+        /F+Qsh4y827KQoJlIbiaRB/+t8HYM4Y=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-689-mjMNYASXM2WtAoI9povrpg-1; Thu,
+ 26 Oct 2023 17:41:38 -0400
+X-MC-Unique: mjMNYASXM2WtAoI9povrpg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AAB6E8021B1;
-        Thu, 26 Oct 2023 21:41:39 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 64BEF1C04B41;
+        Thu, 26 Oct 2023 21:41:38 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A9132949;
-        Thu, 26 Oct 2023 21:41:39 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 49E7DC15984;
+        Thu, 26 Oct 2023 21:41:38 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id 5B42D3003B; Thu, 26 Oct 2023 17:41:39 -0400 (EDT)
+        id 00BF93003E; Thu, 26 Oct 2023 17:41:37 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 15/39] dm vdo: implement top-level deduplication index
-Date:   Thu, 26 Oct 2023 17:41:12 -0400
-Message-Id: <20231026214136.1067410-16-msakai@redhat.com>
+Subject: [PATCH v4 07/39] dm vdo: add specialized request queueing functionality
+Date:   Thu, 26 Oct 2023 17:41:04 -0400
+Message-Id: <20231026214136.1067410-8-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The top-level deduplication index brings all the earlier components
-together. The top-level index creates the separate zone structures that
-enable the index to handle several requests in parallel, handles
-dispatching requests to the right zones and components, and coordinates
-metadata to ensure that it remain consistent. It also coordinates recovery
-in the event of an unexpected index failure.
-
-If sparse caching is enabled, the top-level index also handles the
-coordination required by the sparse chapter index cache, which (unlike most
-index structures) is shared among all zones.
+This patch adds funnel_queue, a mostly lock-free multi-producer,
+single-consumer queue. It also adds the request queue used by the dm-vdo
+deduplication index, and the work_queue used by the dm-vdo data store. Both
+of these are built on top of funnel queue and are intended to support the
+dispatching of many short-running tasks. The work_queue also supports
+priorities. Finally, this patch adds vdo_completion, the structure which is
+enqueued on work_queues.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Co-developed-by: Michael Sclafani <vdo-devel@redhat.com>
 Signed-off-by: Michael Sclafani <vdo-devel@redhat.com>
-Co-developed-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
-Signed-off-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
-Co-developed-by: Bruce Johnston <bjohnsto@redhat.com>
-Signed-off-by: Bruce Johnston <bjohnsto@redhat.com>
+Co-developed-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Co-developed-by: Ken Raeburn <raeburn@redhat.com>
+Signed-off-by: Ken Raeburn <raeburn@redhat.com>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/index.c        | 1403 ++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/index.h        |   84 ++
- drivers/md/dm-vdo/sparse-cache.c |  595 +++++++++++++
- drivers/md/dm-vdo/sparse-cache.h |   49 ++
- 4 files changed, 2131 insertions(+)
- create mode 100644 drivers/md/dm-vdo/index.c
- create mode 100644 drivers/md/dm-vdo/index.h
- create mode 100644 drivers/md/dm-vdo/sparse-cache.c
- create mode 100644 drivers/md/dm-vdo/sparse-cache.h
+ drivers/md/dm-vdo/completion.c    | 141 +++++++
+ drivers/md/dm-vdo/completion.h    | 155 +++++++
+ drivers/md/dm-vdo/cpu.h           |  58 +++
+ drivers/md/dm-vdo/funnel-queue.c  | 169 ++++++++
+ drivers/md/dm-vdo/funnel-queue.h  | 110 +++++
+ drivers/md/dm-vdo/request-queue.c | 284 +++++++++++++
+ drivers/md/dm-vdo/request-queue.h |  30 ++
+ drivers/md/dm-vdo/work-queue.c    | 659 ++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/work-queue.h    |  53 +++
+ 9 files changed, 1659 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/completion.c
+ create mode 100644 drivers/md/dm-vdo/completion.h
+ create mode 100644 drivers/md/dm-vdo/cpu.h
+ create mode 100644 drivers/md/dm-vdo/funnel-queue.c
+ create mode 100644 drivers/md/dm-vdo/funnel-queue.h
+ create mode 100644 drivers/md/dm-vdo/request-queue.c
+ create mode 100644 drivers/md/dm-vdo/request-queue.h
+ create mode 100644 drivers/md/dm-vdo/work-queue.c
+ create mode 100644 drivers/md/dm-vdo/work-queue.h
 
-diff --git a/drivers/md/dm-vdo/index.c b/drivers/md/dm-vdo/index.c
+diff --git a/drivers/md/dm-vdo/completion.c b/drivers/md/dm-vdo/completion.c
 new file mode 100644
-index 000000000000..e8859cee2b93
+index 000000000000..e4b6ff74d098
 --- /dev/null
-+++ b/drivers/md/dm-vdo/index.c
-@@ -0,0 +1,1403 @@
++++ b/drivers/md/dm-vdo/completion.c
+@@ -0,0 +1,141 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
++#include "completion.h"
 +
-+#include "index.h"
++#include <linux/kernel.h>
 +
-+#include "hash-utils.h"
 +#include "logger.h"
-+#include "memory-alloc.h"
-+#include "request-queue.h"
-+#include "sparse-cache.h"
++#include "permassert.h"
 +
-+static const u64 NO_LAST_SAVE = U64_MAX;
++#include "status-codes.h"
++#include "types.h"
++#include "vio.h"
++#include "vdo.h"
 +
-+/*
-+ * When searching for deduplication records, the index first searches the volume index, and then
-+ * searches the chapter index for the relevant chapter. If the chapter has been fully committed to
-+ * storage, the chapter pages are loaded into the page cache. If the chapter has not yet been
-+ * committed (either the open chapter or a recently closed one), the index searches the in-memory
-+ * representation of the chapter. Finally, if the volume index does not find a record and the index
-+ * is sparse, the index will search the sparse cache.
++/**
++ * DOC: vdo completions.
 + *
-+ * The index send two kinds of messages to coordinate between zones: chapter close messages for the
-+ * chapter writer, and sparse cache barrier messages for the sparse cache.
++ * Most of vdo's data structures are lock free, each either belonging to a single "zone," or
++ * divided into a number of zones whose accesses to the structure do not overlap. During normal
++ * operation, at most one thread will be operating in any given zone. Each zone has a
++ * vdo_work_queue which holds vdo_completions that are to be run in that zone. A completion may
++ * only be enqueued on one queue or operating in a single zone at a time.
 + *
-+ * The chapter writer is responsible for committing chapters of records to storage. Since zones can
-+ * get different numbers of records, some zones may fall behind others. Each time a zone fills up
-+ * its available space in a chapter, it informs the chapter writer that the chapter is complete,
-+ * and also informs all other zones that it has closed the chapter. Each other zone will then close
-+ * the chapter immediately, regardless of how full it is, in order to minimize skew between zones.
-+ * Once every zone has closed the chapter, the chapter writer will commit that chapter to storage.
++ * At each step of a multi-threaded operation, the completion performing the operation is given a
++ * callback, error handler, and thread id for the next step. A completion is "run" when it is
++ * operating on the correct thread (as specified by its callback_thread_id). If the value of its
++ * "result" field is an error (i.e. not VDO_SUCCESS), the function in its "error_handler" will be
++ * invoked. If the error_handler is NULL, or there is no error, the function set as its "callback"
++ * will be invoked. Generally, a completion will not be run directly, but rather will be
++ * "launched." In this case, it will check whether it is operating on the correct thread. If it is,
++ * it will run immediately. Otherwise, it will be enqueue on the vdo_work_queue associated with the
++ * completion's "callback_thread_id". When it is dequeued, it will be on the correct thread, and
++ * will get run. In some cases, the completion should get queued instead of running immediately,
++ * even if it is being launched from the correct thread. This is usually in cases where there is a
++ * long chain of callbacks, all on the same thread, which could overflow the stack. In such cases,
++ * the completion's "requeue" field should be set to true. Doing so will skip the current thread
++ * check and simply enqueue the completion.
 + *
-+ * The last zone to close the chapter also removes the oldest chapter from the volume index.
-+ * Although that chapter is invalid for zones that have moved on, the existence of the open chapter
-+ * means that those zones will never ask the volume index about it. No zone is allowed to get more
-+ * than one chapter ahead of any other. If a zone is so far ahead that it tries to close another
-+ * chapter before the previous one has been closed by all zones, it is forced to wait.
++ * A completion may be "finished," in which case its "complete" field will be set to true before it
++ * is next run. It is a bug to attempt to set the result or re-finish a finished completion.
++ * Because a completion's fields are not safe to examine from any thread other than the one on
++ * which the completion is currently operating, this field is used only to aid in detecting
++ * programming errors. It can not be used for cross-thread checking on the status of an operation.
++ * A completion must be "reset" before it can be reused after it has been finished. Resetting will
++ * also clear any error from the result field.
++ **/
++
++void vdo_initialize_completion(struct vdo_completion *completion,
++			       struct vdo *vdo,
++			       enum vdo_completion_type type)
++{
++	memset(completion, 0, sizeof(*completion));
++	completion->vdo = vdo;
++	completion->type = type;
++	vdo_reset_completion(completion);
++}
++
++static inline void assert_incomplete(struct vdo_completion *completion)
++{
++	ASSERT_LOG_ONLY(!completion->complete, "completion is not complete");
++}
++
++/**
++ * vdo_set_completion_result() - Set the result of a completion.
 + *
-+ * The sparse cache relies on having the same set of chapter indexes available to all zones. When a
-+ * request wants to add a chapter to the sparse cache, it sends a barrier message to each zone
-+ * during the triage stage that acts as a rendezvous. Once every zone has reached the barrier and
-+ * paused its operations, the cache membership is changed and each zone is then informed that it
-+ * can proceed. More details can be found in the sparse cache documentation.
-+ *
-+ * If a sparse cache has only one zone, it will not create a triage queue, but it still needs the
-+ * barrier message to change the sparse cache membership, so the index simulates the message by
-+ * invoking the handler directly.
++ * Older errors will not be masked.
 + */
-+
-+struct chapter_writer {
-+	/* The index to which we belong */
-+	struct uds_index *index;
-+	/* The thread to do the writing */
-+	struct thread *thread;
-+	/* The lock protecting the following fields */
-+	struct mutex mutex;
-+	/* The condition signalled on state changes */
-+	struct cond_var cond;
-+	/* Set to true to stop the thread */
-+	bool stop;
-+	/* The result from the most recent write */
-+	int result;
-+	/* The number of bytes allocated by the chapter writer */
-+	size_t memory_size;
-+	/* The number of zones which have submitted a chapter for writing */
-+	unsigned int zones_to_write;
-+	/* Open chapter index used by uds_close_open_chapter() */
-+	struct open_chapter_index *open_chapter_index;
-+	/* Collated records used by uds_close_open_chapter() */
-+	struct uds_volume_record *collated_records;
-+	/* The chapters to write (one per zone) */
-+	struct open_chapter_zone *chapters[];
-+};
-+
-+static bool is_zone_chapter_sparse(const struct index_zone *zone, u64 virtual_chapter)
++void vdo_set_completion_result(struct vdo_completion *completion, int result)
 +{
-+	return uds_is_chapter_sparse(zone->index->volume->geometry,
-+				     zone->oldest_virtual_chapter,
-+				     zone->newest_virtual_chapter,
-+				     virtual_chapter);
++	assert_incomplete(completion);
++	if (completion->result == VDO_SUCCESS)
++		completion->result = result;
 +}
 +
-+static int
-+launch_zone_message(struct uds_zone_message message, unsigned int zone, struct uds_index *index)
-+{
-+	int result;
-+	struct uds_request *request;
-+
-+	result = UDS_ALLOCATE(1, struct uds_request, __func__, &request);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	request->index = index;
-+	request->unbatched = true;
-+	request->zone_number = zone;
-+	request->zone_message = message;
-+
-+	uds_enqueue_request(request, STAGE_MESSAGE);
-+	return UDS_SUCCESS;
-+}
-+
-+static void enqueue_barrier_messages(struct uds_index *index, u64 virtual_chapter)
-+{
-+	struct uds_zone_message message = {
-+		.type = UDS_MESSAGE_SPARSE_CACHE_BARRIER,
-+		.virtual_chapter = virtual_chapter,
-+	};
-+	unsigned int zone;
-+
-+	for (zone = 0; zone < index->zone_count; zone++) {
-+		int result = launch_zone_message(message, zone, index);
-+
-+		ASSERT_LOG_ONLY((result == UDS_SUCCESS), "barrier message allocation");
-+	}
-+}
-+
-+/*
-+ * Determine whether this request should trigger a sparse cache barrier message to change the
-+ * membership of the sparse cache. If a change in membership is desired, the function returns the
-+ * chapter number to add.
++/**
++ * vdo_launch_completion_with_priority() - Run or enqueue a completion.
++ * @priority: The priority at which to enqueue the completion.
++ *
++ * If called on the correct thread (i.e. the one specified in the completion's callback_thread_id
++ * field) and not marked for requeue, the completion will be run immediately. Otherwise, the
++ * completion will be enqueued on the specified thread.
 + */
-+static u64 triage_index_request(struct uds_index *index, struct uds_request *request)
++void vdo_launch_completion_with_priority(struct vdo_completion *completion,
++					 enum vdo_completion_priority priority)
 +{
-+	u64 virtual_chapter;
-+	struct index_zone *zone;
++	thread_id_t callback_thread = completion->callback_thread_id;
 +
-+	virtual_chapter = uds_lookup_volume_index_name(index->volume_index, &request->record_name);
-+	if (virtual_chapter == NO_CHAPTER)
-+		return NO_CHAPTER;
-+
-+	zone = index->zones[request->zone_number];
-+	if (!is_zone_chapter_sparse(zone, virtual_chapter))
-+		return NO_CHAPTER;
-+
-+	/*
-+	 * FIXME: Optimize for a common case by remembering the chapter from the most recent
-+	 * barrier message and skipping this chapter if is it the same.
-+	 */
-+
-+	return virtual_chapter;
-+}
-+
-+/*
-+ * Simulate a message to change the sparse cache membership for a single-zone sparse index. This
-+ * allows us to forgo the complicated locking required by a multi-zone sparse index. Any other kind
-+ * of index does nothing here.
-+ */
-+static int
-+simulate_index_zone_barrier_message(struct index_zone *zone, struct uds_request *request)
-+{
-+	u64 sparse_virtual_chapter;
-+
-+	if ((zone->index->zone_count > 1) ||
-+	    !uds_is_sparse_geometry(zone->index->volume->geometry))
-+		return UDS_SUCCESS;
-+
-+	sparse_virtual_chapter = triage_index_request(zone->index, request);
-+	if (sparse_virtual_chapter == NO_CHAPTER)
-+		return UDS_SUCCESS;
-+
-+	return uds_update_sparse_cache(zone, sparse_virtual_chapter);
-+}
-+
-+/* This is the request processing function for the triage queue. */
-+static void triage_request(struct uds_request *request)
-+{
-+	struct uds_index *index = request->index;
-+	u64 sparse_virtual_chapter = triage_index_request(index, request);
-+
-+	if (sparse_virtual_chapter != NO_CHAPTER)
-+		enqueue_barrier_messages(index, sparse_virtual_chapter);
-+
-+	uds_enqueue_request(request, STAGE_INDEX);
-+}
-+
-+static int finish_previous_chapter(struct uds_index *index, u64 current_chapter_number)
-+{
-+	int result;
-+	struct chapter_writer *writer = index->chapter_writer;
-+
-+	uds_lock_mutex(&writer->mutex);
-+	while (index->newest_virtual_chapter < current_chapter_number)
-+		uds_wait_cond(&writer->cond, &writer->mutex);
-+	result = writer->result;
-+	uds_unlock_mutex(&writer->mutex);
-+
-+	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result, "Writing of previous open chapter failed");
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int swap_open_chapter(struct index_zone *zone)
-+{
-+	int result;
-+	struct open_chapter_zone *temporary_chapter;
-+
-+	result = finish_previous_chapter(zone->index, zone->newest_virtual_chapter);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	temporary_chapter = zone->open_chapter;
-+	zone->open_chapter = zone->writing_chapter;
-+	zone->writing_chapter = temporary_chapter;
-+	return UDS_SUCCESS;
-+}
-+
-+/*
-+ * Inform the chapter writer that this zone is done with this chapter. The chapter won't start
-+ * writing until all zones have closed it.
-+ */
-+static unsigned int start_closing_chapter(struct uds_index *index,
-+					  unsigned int zone_number,
-+					  struct open_chapter_zone *chapter)
-+{
-+	unsigned int finished_zones;
-+	struct chapter_writer *writer = index->chapter_writer;
-+
-+	uds_lock_mutex(&writer->mutex);
-+	finished_zones = ++writer->zones_to_write;
-+	writer->chapters[zone_number] = chapter;
-+	uds_broadcast_cond(&writer->cond);
-+	uds_unlock_mutex(&writer->mutex);
-+
-+	return finished_zones;
-+}
-+
-+static int announce_chapter_closed(struct index_zone *zone, u64 closed_chapter)
-+{
-+	int result;
-+	unsigned int i;
-+	struct uds_zone_message zone_message = {
-+		.type = UDS_MESSAGE_ANNOUNCE_CHAPTER_CLOSED,
-+		.virtual_chapter = closed_chapter,
-+	};
-+
-+	for (i = 0; i < zone->index->zone_count; i++) {
-+		if (zone->id == i)
-+			continue;
-+
-+		result = launch_zone_message(zone_message, i, zone->index);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+	}
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int open_next_chapter(struct index_zone *zone)
-+{
-+	int result;
-+	u64 closed_chapter;
-+	u64 expiring;
-+	unsigned int finished_zones;
-+	u32 expire_chapters;
-+
-+	uds_log_debug("closing chapter %llu of zone %u after %u entries (%u short)",
-+		      (unsigned long long) zone->newest_virtual_chapter,
-+		      zone->id,
-+		      zone->open_chapter->size,
-+		      zone->open_chapter->capacity - zone->open_chapter->size);
-+
-+	result = swap_open_chapter(zone);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	closed_chapter = zone->newest_virtual_chapter++;
-+	uds_set_volume_index_zone_open_chapter(zone->index->volume_index,
-+					       zone->id,
-+					       zone->newest_virtual_chapter);
-+	uds_reset_open_chapter(zone->open_chapter);
-+
-+	finished_zones = start_closing_chapter(zone->index, zone->id, zone->writing_chapter);
-+	if ((finished_zones == 1) && (zone->index->zone_count > 1)) {
-+		result = announce_chapter_closed(zone, closed_chapter);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+	}
-+
-+	expiring = zone->oldest_virtual_chapter;
-+	expire_chapters = uds_chapters_to_expire(zone->index->volume->geometry,
-+						 zone->newest_virtual_chapter);
-+	zone->oldest_virtual_chapter += expire_chapters;
-+
-+	if (finished_zones < zone->index->zone_count)
-+		return UDS_SUCCESS;
-+
-+	while (expire_chapters-- > 0)
-+		uds_forget_chapter(zone->index->volume, expiring++);
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int handle_chapter_closed(struct index_zone *zone, u64 virtual_chapter)
-+{
-+	if (zone->newest_virtual_chapter == virtual_chapter)
-+		return open_next_chapter(zone);
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int dispatch_index_zone_control_request(struct uds_request *request)
-+{
-+	struct uds_zone_message *message = &request->zone_message;
-+	struct index_zone *zone = request->index->zones[request->zone_number];
-+
-+	switch (message->type) {
-+	case UDS_MESSAGE_SPARSE_CACHE_BARRIER:
-+		return uds_update_sparse_cache(zone, message->virtual_chapter);
-+
-+	case UDS_MESSAGE_ANNOUNCE_CHAPTER_CLOSED:
-+		return handle_chapter_closed(zone, message->virtual_chapter);
-+
-+	default:
-+		uds_log_error("invalid message type: %d", message->type);
-+		return UDS_INVALID_ARGUMENT;
-+	}
-+}
-+
-+static void set_request_location(struct uds_request *request, enum uds_index_region new_location)
-+{
-+	request->location = new_location;
-+	request->found = ((new_location == UDS_LOCATION_IN_OPEN_CHAPTER) ||
-+			  (new_location == UDS_LOCATION_IN_DENSE) ||
-+			  (new_location == UDS_LOCATION_IN_SPARSE));
-+}
-+
-+static void set_chapter_location(struct uds_request *request,
-+				 const struct index_zone *zone,
-+				 u64 virtual_chapter)
-+{
-+	request->found = true;
-+	if (virtual_chapter == zone->newest_virtual_chapter)
-+		request->location = UDS_LOCATION_IN_OPEN_CHAPTER;
-+	else if (is_zone_chapter_sparse(zone, virtual_chapter))
-+		request->location = UDS_LOCATION_IN_SPARSE;
-+	else
-+		request->location = UDS_LOCATION_IN_DENSE;
-+}
-+
-+static int search_sparse_cache_in_zone(struct index_zone *zone,
-+				       struct uds_request *request,
-+				       u64 virtual_chapter,
-+				       bool *found)
-+{
-+	int result;
-+	struct volume *volume;
-+	u16 record_page_number;
-+	u32 chapter;
-+
-+	result = uds_search_sparse_cache(zone,
-+					 &request->record_name,
-+					 &virtual_chapter,
-+					 &record_page_number);
-+	if ((result != UDS_SUCCESS) || (virtual_chapter == NO_CHAPTER))
-+		return result;
-+
-+	request->virtual_chapter = virtual_chapter;
-+	volume = zone->index->volume;
-+	chapter = uds_map_to_physical_chapter(volume->geometry, virtual_chapter);
-+	return uds_search_cached_record_page(volume, request, chapter, record_page_number, found);
-+}
-+
-+static int get_record_from_zone(struct index_zone *zone, struct uds_request *request, bool *found)
-+{
-+	struct volume *volume;
-+
-+	if (request->location == UDS_LOCATION_RECORD_PAGE_LOOKUP) {
-+		*found = true;
-+		return UDS_SUCCESS;
-+	} else if (request->location == UDS_LOCATION_UNAVAILABLE) {
-+		*found = false;
-+		return UDS_SUCCESS;
-+	}
-+
-+	if (request->virtual_chapter == zone->newest_virtual_chapter) {
-+		uds_search_open_chapter(zone->open_chapter,
-+					&request->record_name,
-+					&request->old_metadata,
-+					found);
-+		return UDS_SUCCESS;
-+	}
-+
-+	if ((zone->newest_virtual_chapter > 0) &&
-+	    (request->virtual_chapter == (zone->newest_virtual_chapter - 1)) &&
-+	    (zone->writing_chapter->size > 0)) {
-+		uds_search_open_chapter(zone->writing_chapter,
-+					&request->record_name,
-+					&request->old_metadata,
-+					found);
-+		return UDS_SUCCESS;
-+	}
-+
-+	volume = zone->index->volume;
-+	if (is_zone_chapter_sparse(zone, request->virtual_chapter) &&
-+	    uds_sparse_cache_contains(volume->sparse_cache,
-+				      request->virtual_chapter,
-+				      request->zone_number))
-+		return search_sparse_cache_in_zone(zone, request, request->virtual_chapter, found);
-+
-+	return uds_search_volume_page_cache(volume, request, found);
-+}
-+
-+static int put_record_in_zone(struct index_zone *zone,
-+			      struct uds_request *request,
-+			      const struct uds_record_data *metadata)
-+{
-+	unsigned int remaining;
-+
-+	remaining = uds_put_open_chapter(zone->open_chapter, &request->record_name, metadata);
-+	if (remaining == 0)
-+		return open_next_chapter(zone);
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int search_index_zone(struct index_zone *zone, struct uds_request *request)
-+{
-+	int result;
-+	struct volume_index_record record;
-+	bool overflow_record, found = false;
-+	struct uds_record_data *metadata;
-+	u64 chapter;
-+
-+	result = uds_get_volume_index_record(zone->index->volume_index,
-+					     &request->record_name,
-+					     &record);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	if (record.is_found) {
-+		if (request->requeued && request->virtual_chapter != record.virtual_chapter)
-+			set_request_location(request, UDS_LOCATION_UNKNOWN);
-+
-+		request->virtual_chapter = record.virtual_chapter;
-+		result = get_record_from_zone(zone, request, &found);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+	}
-+
-+	if (found)
-+		set_chapter_location(request, zone, record.virtual_chapter);
-+
-+	/*
-+	 * If a record has overflowed a chapter index in more than one chapter (or overflowed in
-+	 * one chapter and collided with an existing record), it will exist as a collision record
-+	 * in the volume index, but we won't find it in the volume. This case needs special
-+	 * handling.
-+	 */
-+	overflow_record = (record.is_found && record.is_collision && !found);
-+	chapter = zone->newest_virtual_chapter;
-+	if (found || overflow_record) {
-+		if ((request->type == UDS_QUERY_NO_UPDATE) ||
-+		    ((request->type == UDS_QUERY) && overflow_record))
-+			/* There is nothing left to do. */
-+			return UDS_SUCCESS;
-+
-+		if (record.virtual_chapter != chapter)
-+			/*
-+			 * Update the volume index to reference the new chapter for the block. If
-+			 * the record had been deleted or dropped from the chapter index, it will
-+			 * be back.
-+			 */
-+			result = uds_set_volume_index_record_chapter(&record, chapter);
-+		else if (request->type != UDS_UPDATE)
-+			/* The record is already in the open chapter. */
-+			return UDS_SUCCESS;
-+	} else {
-+		/*
-+		 * The record wasn't in the volume index, so check whether the
-+		 * name is in a cached sparse chapter. If we found the name on
-+		 * a previous search, use that result instead.
-+		 */
-+		if (request->location == UDS_LOCATION_RECORD_PAGE_LOOKUP) {
-+			found = true;
-+		} else if (request->location == UDS_LOCATION_UNAVAILABLE) {
-+			found = false;
-+		} else if (uds_is_sparse_geometry(zone->index->volume->geometry) &&
-+			   !uds_is_volume_index_sample(zone->index->volume_index,
-+						       &request->record_name)) {
-+			result = search_sparse_cache_in_zone(zone, request, NO_CHAPTER, &found);
-+			if (result != UDS_SUCCESS)
-+				return result;
-+		}
-+
-+		if (found)
-+			set_request_location(request, UDS_LOCATION_IN_SPARSE);
-+
-+		if ((request->type == UDS_QUERY_NO_UPDATE) ||
-+		    ((request->type == UDS_QUERY) && !found))
-+			/* There is nothing left to do. */
-+			return UDS_SUCCESS;
-+
-+		/*
-+		 * Add a new entry to the volume index referencing the open chapter. This needs to
-+		 * be done both for new records, and for records from cached sparse chapters.
-+		 */
-+		result = uds_put_volume_index_record(&record, chapter);
-+	}
-+
-+	if (result == UDS_OVERFLOW)
-+		/*
-+		 * The volume index encountered a delta list overflow. The condition was already
-+		 * logged. We will go on without adding the record to the open chapter.
-+		 */
-+		return UDS_SUCCESS;
-+
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	if (!found || (request->type == UDS_UPDATE))
-+		/* This is a new record or we're updating an existing record. */
-+		metadata = &request->new_metadata;
-+	else
-+		/* Move the existing record to the open chapter. */
-+		metadata = &request->old_metadata;
-+
-+	return put_record_in_zone(zone, request, metadata);
-+}
-+
-+static int remove_from_index_zone(struct index_zone *zone, struct uds_request *request)
-+{
-+	int result;
-+	struct volume_index_record record;
-+
-+	result = uds_get_volume_index_record(zone->index->volume_index,
-+					     &request->record_name,
-+					     &record);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	if (!record.is_found)
-+		return UDS_SUCCESS;
-+
-+	/* If the request was requeued, check whether the saved state is still valid. */
-+
-+	if (record.is_collision) {
-+		set_chapter_location(request, zone, record.virtual_chapter);
-+	} else {
-+		/* Non-collision records are hints, so resolve the name in the chapter. */
-+		bool found;
-+
-+		if (request->requeued && request->virtual_chapter != record.virtual_chapter)
-+			set_request_location(request, UDS_LOCATION_UNKNOWN);
-+
-+		request->virtual_chapter = record.virtual_chapter;
-+		result = get_record_from_zone(zone, request, &found);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+
-+		if (!found)
-+			/* There is no record to remove. */
-+			return UDS_SUCCESS;
-+	}
-+
-+	set_chapter_location(request, zone, record.virtual_chapter);
-+
-+	/*
-+	 * Delete the volume index entry for the named record only. Note that a later search might
-+	 * later return stale advice if there is a colliding name in the same chapter, but it's a
-+	 * very rare case (1 in 2^21).
-+	 */
-+	result = uds_remove_volume_index_record(&record);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	/*
-+	 * If the record is in the open chapter, we must remove it or mark it deleted to avoid
-+	 * trouble if the record is added again later.
-+	 */
-+	if (request->location == UDS_LOCATION_IN_OPEN_CHAPTER)
-+		uds_remove_from_open_chapter(zone->open_chapter, &request->record_name);
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int dispatch_index_request(struct uds_index *index, struct uds_request *request)
-+{
-+	int result;
-+	struct index_zone *zone = index->zones[request->zone_number];
-+
-+	if (!request->requeued) {
-+		result = simulate_index_zone_barrier_message(zone, request);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+	}
-+
-+	switch (request->type) {
-+	case UDS_POST:
-+	case UDS_UPDATE:
-+	case UDS_QUERY:
-+	case UDS_QUERY_NO_UPDATE:
-+		result = search_index_zone(zone, request);
-+		break;
-+
-+	case UDS_DELETE:
-+		result = remove_from_index_zone(zone, request);
-+		break;
-+
-+	default:
-+		result = uds_log_warning_strerror(UDS_INVALID_ARGUMENT,
-+						  "invalid request type: %d",
-+						  request->type);
-+		break;
-+	}
-+
-+	return result;
-+}
-+
-+/* This is the request processing function invoked by each zone's thread. */
-+static void execute_zone_request(struct uds_request *request)
-+{
-+	int result;
-+	struct uds_index *index = request->index;
-+
-+	if (request->zone_message.type != UDS_MESSAGE_NONE) {
-+		result = dispatch_index_zone_control_request(request);
-+		if (result != UDS_SUCCESS)
-+			uds_log_error_strerror(result,
-+					       "error executing message: %d",
-+					       request->zone_message.type);
-+
-+		/* Once the message is processed it can be freed. */
-+		UDS_FREE(UDS_FORGET(request));
++	if (completion->requeue || (callback_thread != vdo_get_callback_thread_id())) {
++		vdo_enqueue_completion(completion, priority);
 +		return;
 +	}
 +
-+	index->need_to_save = true;
-+	if (request->requeued && (request->status != UDS_SUCCESS)) {
-+		set_request_location(request, UDS_LOCATION_UNAVAILABLE);
-+		index->callback(request);
-+		return;
-+	}
-+
-+	result = dispatch_index_request(index, request);
-+	if (result == UDS_QUEUED)
-+		/* The request has been requeued so don't let it complete. */
-+		return;
-+
-+	if (!request->found)
-+		set_request_location(request, UDS_LOCATION_UNAVAILABLE);
-+
-+	request->status = result;
-+	index->callback(request);
++	vdo_run_completion(completion);
 +}
 +
-+static int initialize_index_queues(struct uds_index *index, const struct geometry *geometry)
++/** vdo_finish_completion() - Mark a completion as complete and then launch it. */
++void vdo_finish_completion(struct vdo_completion *completion)
 +{
-+	int result;
-+	unsigned int i;
-+
-+	for (i = 0; i < index->zone_count; i++) {
-+		result = uds_make_request_queue("indexW",
-+						&execute_zone_request,
-+						&index->zone_queues[i]);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+	}
-+
-+	/* The triage queue is only needed for sparse multi-zone indexes. */
-+	if ((index->zone_count > 1) && uds_is_sparse_geometry(geometry)) {
-+		result = uds_make_request_queue("triageW", &triage_request, &index->triage_queue);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+	}
-+
-+	return UDS_SUCCESS;
++	assert_incomplete(completion);
++	completion->complete = true;
++	if (completion->callback != NULL)
++		vdo_launch_completion(completion);
 +}
 +
-+/* This is the driver function for the chapter writer thread. */
-+static void close_chapters(void *arg)
++void vdo_enqueue_completion(struct vdo_completion *completion,
++			    enum vdo_completion_priority priority)
 +{
-+	int result;
-+	struct chapter_writer *writer = arg;
-+	struct uds_index *index = writer->index;
++	struct vdo *vdo = completion->vdo;
++	thread_id_t thread_id = completion->callback_thread_id;
 +
-+	uds_log_debug("chapter writer starting");
-+	uds_lock_mutex(&writer->mutex);
-+	for (;;) {
-+		while (writer->zones_to_write < index->zone_count) {
-+			if (writer->stop && (writer->zones_to_write == 0)) {
-+				/*
-+				 * We've been told to stop, and all of the zones are in the same
-+				 * open chapter, so we can exit now.
-+				 */
-+				uds_unlock_mutex(&writer->mutex);
-+				uds_log_debug("chapter writer stopping");
-+				return;
-+			}
-+			uds_wait_cond(&writer->cond, &writer->mutex);
-+		}
++	if (ASSERT(thread_id < vdo->thread_config.thread_count,
++		   "thread_id %u (completion type %d) is less than thread count %u",
++		   thread_id,
++		   completion->type,
++		   vdo->thread_config.thread_count) != UDS_SUCCESS)
++		BUG();
 +
-+		/*
-+		 * Release the lock while closing a chapter. We probably don't need to do this, but
-+		 * it seems safer in principle. It's OK to access the chapter and chapter_number
-+		 * fields without the lock since those aren't allowed to change until we're done.
-+		 */
-+		uds_unlock_mutex(&writer->mutex);
-+
-+		if (index->has_saved_open_chapter) {
-+			/*
-+			 * Remove the saved open chapter the first time we close an open chapter
-+			 * after loading from a clean shutdown, or after doing a clean save. The
-+			 * lack of the saved open chapter will indicate that a recovery is
-+			 * necessary.
-+			 */
-+			index->has_saved_open_chapter = false;
-+			result = uds_discard_open_chapter(index->layout);
-+			if (result == UDS_SUCCESS)
-+				uds_log_debug("Discarding saved open chapter");
-+		}
-+
-+		result = uds_close_open_chapter(writer->chapters,
-+						index->zone_count,
-+						index->volume,
-+						writer->open_chapter_index,
-+						writer->collated_records,
-+						index->newest_virtual_chapter);
-+
-+		uds_lock_mutex(&writer->mutex);
-+		index->newest_virtual_chapter++;
-+		index->oldest_virtual_chapter +=
-+			uds_chapters_to_expire(index->volume->geometry,
-+					       index->newest_virtual_chapter);
-+		writer->result = result;
-+		writer->zones_to_write = 0;
-+		uds_broadcast_cond(&writer->cond);
-+	}
++	completion->requeue = false;
++	completion->priority = priority;
++	completion->my_queue = NULL;
++	vdo_enqueue_work_queue(vdo->threads[thread_id].queue, completion);
 +}
 +
-+static void stop_chapter_writer(struct chapter_writer *writer)
++/**
++ * vdo_requeue_completion_if_needed() - Requeue a completion if not called on the specified thread.
++ *
++ * Return: True if the completion was requeued; callers may not access the completion in this case.
++ */
++bool vdo_requeue_completion_if_needed(struct vdo_completion *completion,
++				      thread_id_t callback_thread_id)
 +{
-+	struct thread *writer_thread = 0;
-+
-+	uds_lock_mutex(&writer->mutex);
-+	if (writer->thread != 0) {
-+		writer_thread = writer->thread;
-+		writer->thread = 0;
-+		writer->stop = true;
-+		uds_broadcast_cond(&writer->cond);
-+	}
-+	uds_unlock_mutex(&writer->mutex);
-+
-+	if (writer_thread != 0)
-+		uds_join_threads(writer_thread);
-+}
-+
-+static void free_chapter_writer(struct chapter_writer *writer)
-+{
-+	if (writer == NULL)
-+		return;
-+
-+	stop_chapter_writer(writer);
-+	uds_destroy_mutex(&writer->mutex);
-+	uds_destroy_cond(&writer->cond);
-+	uds_free_open_chapter_index(writer->open_chapter_index);
-+	UDS_FREE(writer->collated_records);
-+	UDS_FREE(writer);
-+}
-+
-+static int make_chapter_writer(struct uds_index *index, struct chapter_writer **writer_ptr)
-+{
-+	int result;
-+	struct chapter_writer *writer;
-+	size_t collated_records_size =
-+		(sizeof(struct uds_volume_record) * index->volume->geometry->records_per_chapter);
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct chapter_writer,
-+				       index->zone_count,
-+				       struct open_chapter_zone *,
-+				       "Chapter Writer",
-+				       &writer);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	writer->index = index;
-+	result = uds_init_mutex(&writer->mutex);
-+	if (result != UDS_SUCCESS) {
-+		UDS_FREE(writer);
-+		return result;
-+	}
-+
-+	result = uds_init_cond(&writer->cond);
-+	if (result != UDS_SUCCESS) {
-+		uds_destroy_mutex(&writer->mutex);
-+		UDS_FREE(writer);
-+		return result;
-+	}
-+
-+	result = uds_allocate_cache_aligned(collated_records_size,
-+					    "collated records",
-+					    &writer->collated_records);
-+	if (result != UDS_SUCCESS) {
-+		free_chapter_writer(writer);
-+		return result;
-+	}
-+
-+	result = uds_make_open_chapter_index(&writer->open_chapter_index,
-+					     index->volume->geometry,
-+					     index->volume->nonce);
-+	if (result != UDS_SUCCESS) {
-+		free_chapter_writer(writer);
-+		return result;
-+	}
-+
-+	writer->memory_size = (sizeof(struct chapter_writer) +
-+			       index->zone_count * sizeof(struct open_chapter_zone *) +
-+			       collated_records_size +
-+			       writer->open_chapter_index->memory_size);
-+
-+	result = uds_create_thread(close_chapters, writer, "writer", &writer->thread);
-+	if (result != UDS_SUCCESS) {
-+		free_chapter_writer(writer);
-+		return result;
-+	}
-+
-+	*writer_ptr = writer;
-+	return UDS_SUCCESS;
-+}
-+
-+static int load_index(struct uds_index *index)
-+{
-+	int result;
-+	u64 last_save_chapter;
-+
-+	result = uds_load_index_state(index->layout, index);
-+	if (result != UDS_SUCCESS)
-+		return UDS_INDEX_NOT_SAVED_CLEANLY;
-+
-+	last_save_chapter = ((index->last_save != NO_LAST_SAVE) ? index->last_save : 0);
-+
-+	uds_log_info("loaded index from chapter %llu through chapter %llu",
-+		     (unsigned long long) index->oldest_virtual_chapter,
-+		     (unsigned long long) last_save_chapter);
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int rebuild_index_page_map(struct uds_index *index, u64 vcn)
-+{
-+	int result;
-+	struct delta_index_page *chapter_index_page;
-+	struct geometry *geometry = index->volume->geometry;
-+	u32 chapter = uds_map_to_physical_chapter(geometry, vcn);
-+	u32 expected_list_number = 0;
-+	u32 index_page_number;
-+	u32 lowest_delta_list;
-+	u32 highest_delta_list;
-+
-+	for (index_page_number = 0;
-+	     index_page_number < geometry->index_pages_per_chapter;
-+	     index_page_number++) {
-+		result = uds_get_volume_index_page(index->volume,
-+						   chapter,
-+						   index_page_number,
-+						   &chapter_index_page);
-+		if (result != UDS_SUCCESS)
-+			return uds_log_error_strerror(result,
-+						      "failed to read index page %u in chapter %u",
-+						      index_page_number,
-+						      chapter);
-+
-+		lowest_delta_list = chapter_index_page->lowest_list_number;
-+		highest_delta_list = chapter_index_page->highest_list_number;
-+		if (lowest_delta_list != expected_list_number)
-+			return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+						      "chapter %u index page %u is corrupt",
-+						      chapter,
-+						      index_page_number);
-+
-+		uds_update_index_page_map(index->volume->index_page_map,
-+					  vcn,
-+					  chapter,
-+					  index_page_number,
-+					  highest_delta_list);
-+		expected_list_number = highest_delta_list + 1;
-+	}
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int replay_record(struct uds_index *index,
-+			 const struct uds_record_name *name,
-+			 u64 virtual_chapter,
-+			 bool will_be_sparse_chapter)
-+{
-+	int result;
-+	struct volume_index_record record;
-+	bool update_record;
-+
-+	if (will_be_sparse_chapter && !uds_is_volume_index_sample(index->volume_index, name))
-+		/*
-+		 * This entry will be in a sparse chapter after the rebuild completes, and it is
-+		 * not a sample, so just skip over it.
-+		 */
-+		return UDS_SUCCESS;
-+
-+	result = uds_get_volume_index_record(index->volume_index, name, &record);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	if (record.is_found) {
-+		if (record.is_collision) {
-+			if (record.virtual_chapter == virtual_chapter)
-+				/* The record is already correct. */
-+				return UDS_SUCCESS;
-+
-+			update_record = true;
-+		} else if (record.virtual_chapter == virtual_chapter) {
-+			/*
-+			 * There is a volume index entry pointing to the current chapter, but we
-+			 * don't know if it is for the same name as the one we are currently
-+			 * working on or not. For now, we're just going to assume that it isn't.
-+			 * This will create one extra collision record if there was a deleted
-+			 * record in the current chapter.
-+			 */
-+			update_record = false;
-+		} else {
-+			/*
-+			 * If we're rebuilding, we don't normally want to go to disk to see if the
-+			 * record exists, since we will likely have just read the record from disk
-+			 * (i.e. we know it's there). The exception to this is when we find an
-+			 * entry in the volume index that has a different chapter. In this case, we
-+			 * need to search that chapter to determine if the volume index entry was
-+			 * for the same record or a different one.
-+			 */
-+			result = uds_search_volume_page_cache_for_rebuild(index->volume,
-+									  name,
-+									  record.virtual_chapter,
-+									  &update_record);
-+			if (result != UDS_SUCCESS)
-+				return result;
-+			}
-+	} else {
-+		update_record = false;
-+	}
-+
-+	if (update_record)
-+		/*
-+		 * Update the volume index to reference the new chapter for the block. If the
-+		 * record had been deleted or dropped from the chapter index, it will be back.
-+		 */
-+		result = uds_set_volume_index_record_chapter(&record, virtual_chapter);
-+	else
-+		/*
-+		 * Add a new entry to the volume index referencing the open chapter. This should be
-+		 * done regardless of whether we are a brand new record or a sparse record, i.e.
-+		 * one that doesn't exist in the index but does on disk, since for a sparse record,
-+		 * we would want to un-sparsify if it did exist.
-+		 */
-+		result = uds_put_volume_index_record(&record, virtual_chapter);
-+
-+	if ((result == UDS_DUPLICATE_NAME) || (result == UDS_OVERFLOW))
-+		/* The rebuilt index will lose these records. */
-+		return UDS_SUCCESS;
-+
-+	return result;
-+}
-+
-+static bool check_for_suspend(struct uds_index *index)
-+{
-+	bool closing;
-+
-+	if (index->load_context == NULL)
++	if (vdo_get_callback_thread_id() == callback_thread_id)
 +		return false;
 +
-+	uds_lock_mutex(&index->load_context->mutex);
-+	if (index->load_context->status != INDEX_SUSPENDING) {
-+		uds_unlock_mutex(&index->load_context->mutex);
-+		return false;
-+	}
-+
-+	/* Notify that we are suspended and wait for the resume. */
-+	index->load_context->status = INDEX_SUSPENDED;
-+	uds_broadcast_cond(&index->load_context->cond);
-+
-+	while ((index->load_context->status != INDEX_OPENING) &&
-+	       (index->load_context->status != INDEX_FREEING))
-+		uds_wait_cond(&index->load_context->cond, &index->load_context->mutex);
-+
-+	closing = (index->load_context->status == INDEX_FREEING);
-+	uds_unlock_mutex(&index->load_context->mutex);
-+	return closing;
++	completion->callback_thread_id = callback_thread_id;
++	vdo_enqueue_completion(completion, VDO_WORK_Q_DEFAULT_PRIORITY);
++	return true;
 +}
-+
-+static int replay_chapter(struct uds_index *index, u64 virtual, bool sparse)
-+{
-+	int result;
-+	u32 i;
-+	u32 j;
-+	const struct geometry *geometry;
-+	u32 physical_chapter;
-+
-+	if (check_for_suspend(index)) {
-+		uds_log_info("Replay interrupted by index shutdown at chapter %llu",
-+			     (unsigned long long) virtual);
-+		return -EBUSY;
-+	}
-+
-+	geometry = index->volume->geometry;
-+	physical_chapter = uds_map_to_physical_chapter(geometry, virtual);
-+	uds_prefetch_volume_chapter(index->volume, physical_chapter);
-+	uds_set_volume_index_open_chapter(index->volume_index, virtual);
-+
-+	result = rebuild_index_page_map(index, virtual);
-+	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result,
-+					      "could not rebuild index page map for chapter %u",
-+					      physical_chapter);
-+
-+	for (i = 0; i < geometry->record_pages_per_chapter; i++) {
-+		u8 *record_page;
-+		u32 record_page_number;
-+
-+		record_page_number = geometry->index_pages_per_chapter + i;
-+		result = uds_get_volume_record_page(index->volume,
-+						    physical_chapter,
-+						    record_page_number,
-+						    &record_page);
-+		if (result != UDS_SUCCESS)
-+			return uds_log_error_strerror(result,
-+						      "could not get page %d",
-+						      record_page_number);
-+
-+		for (j = 0; j < geometry->records_per_page; j++) {
-+			const u8 *name_bytes;
-+			struct uds_record_name name;
-+
-+			name_bytes = record_page + (j * BYTES_PER_RECORD);
-+			memcpy(&name.name, name_bytes, UDS_RECORD_NAME_SIZE);
-+			result = replay_record(index, &name, virtual, sparse);
-+			if (result != UDS_SUCCESS)
-+				return result;
-+		}
-+	}
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int replay_volume(struct uds_index *index)
-+{
-+	int result;
-+	u64 old_map_update;
-+	u64 new_map_update;
-+	u64 virtual;
-+	u64 from_virtual = index->oldest_virtual_chapter;
-+	u64 upto_virtual = index->newest_virtual_chapter;
-+	bool will_be_sparse;
-+
-+	uds_log_info("Replaying volume from chapter %llu through chapter %llu",
-+		     (unsigned long long) from_virtual,
-+		     (unsigned long long) upto_virtual);
-+
-+	/*
-+	 * The index failed to load, so the volume index is empty. Add records to the volume index
-+	 * in order, skipping non-hooks in chapters which will be sparse to save time.
-+	 *
-+	 * Go through each record page of each chapter and add the records back to the volume
-+	 * index. This should not cause anything to be written to either the open chapter or the
-+	 * on-disk volume. Also skip the on-disk chapter corresponding to upto_virtual, as this
-+	 * would have already been purged from the volume index when the chapter was opened.
-+	 *
-+	 * Also, go through each index page for each chapter and rebuild the index page map.
-+	 */
-+	old_map_update = index->volume->index_page_map->last_update;
-+	for (virtual = from_virtual; virtual < upto_virtual; ++virtual) {
-+		will_be_sparse = uds_is_chapter_sparse(index->volume->geometry,
-+						       from_virtual,
-+						       upto_virtual,
-+						       virtual);
-+		result = replay_chapter(index, virtual, will_be_sparse);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+	}
-+
-+	/* Also reap the chapter being replaced by the open chapter. */
-+	uds_set_volume_index_open_chapter(index->volume_index, upto_virtual);
-+
-+	new_map_update = index->volume->index_page_map->last_update;
-+	if (new_map_update != old_map_update)
-+		uds_log_info("replay changed index page map update from %llu to %llu",
-+			     (unsigned long long) old_map_update,
-+			     (unsigned long long) new_map_update);
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int rebuild_index(struct uds_index *index)
-+{
-+	int result;
-+	u64 lowest;
-+	u64 highest;
-+	bool is_empty = false;
-+	u32 chapters_per_volume = index->volume->geometry->chapters_per_volume;
-+
-+	index->volume->lookup_mode = LOOKUP_FOR_REBUILD;
-+	result = uds_find_volume_chapter_boundaries(index->volume, &lowest, &highest, &is_empty);
-+	if (result != UDS_SUCCESS)
-+		return uds_log_fatal_strerror(result,
-+					      "cannot rebuild index: unknown volume chapter boundaries");
-+
-+	if (is_empty) {
-+		index->newest_virtual_chapter = 0;
-+		index->oldest_virtual_chapter = 0;
-+		index->volume->lookup_mode = LOOKUP_NORMAL;
-+		return UDS_SUCCESS;
-+	}
-+
-+	index->newest_virtual_chapter = highest + 1;
-+	index->oldest_virtual_chapter = lowest;
-+	if (index->newest_virtual_chapter == (index->oldest_virtual_chapter + chapters_per_volume))
-+		/* Skip the chapter shadowed by the open chapter. */
-+		index->oldest_virtual_chapter++;
-+
-+	result = replay_volume(index);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	index->volume->lookup_mode = LOOKUP_NORMAL;
-+	return UDS_SUCCESS;
-+}
-+
-+static void free_index_zone(struct index_zone *zone)
-+{
-+	if (zone == NULL)
-+		return;
-+
-+	uds_free_open_chapter(zone->open_chapter);
-+	uds_free_open_chapter(zone->writing_chapter);
-+	UDS_FREE(zone);
-+}
-+
-+static int make_index_zone(struct uds_index *index, unsigned int zone_number)
-+{
-+	int result;
-+	struct index_zone *zone;
-+
-+	result = UDS_ALLOCATE(1, struct index_zone, "index zone", &zone);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = uds_make_open_chapter(index->volume->geometry,
-+				       index->zone_count,
-+				       &zone->open_chapter);
-+	if (result != UDS_SUCCESS) {
-+		free_index_zone(zone);
-+		return result;
-+	}
-+
-+	result = uds_make_open_chapter(index->volume->geometry,
-+				       index->zone_count,
-+				       &zone->writing_chapter);
-+	if (result != UDS_SUCCESS) {
-+		free_index_zone(zone);
-+		return result;
-+	}
-+
-+	zone->index = index;
-+	zone->id = zone_number;
-+	index->zones[zone_number] = zone;
-+
-+	return UDS_SUCCESS;
-+}
-+
-+int uds_make_index(struct configuration *config,
-+		   enum uds_open_index_type open_type,
-+		   struct index_load_context *load_context,
-+		   index_callback_t callback,
-+		   struct uds_index **new_index)
-+{
-+	int result;
-+	bool loaded = false;
-+	bool new = (open_type == UDS_CREATE);
-+	struct uds_index *index = NULL;
-+	struct index_zone *zone;
-+	u64 nonce;
-+	unsigned int z;
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct uds_index,
-+				       config->zone_count,
-+				       struct uds_request_queue *,
-+				       "index",
-+				       &index);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	index->zone_count = config->zone_count;
-+
-+	result = uds_make_index_layout(config, new, &index->layout);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index(index);
-+		return result;
-+	}
-+
-+	result = UDS_ALLOCATE(index->zone_count, struct index_zone *, "zones", &index->zones);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index(index);
-+		return result;
-+	}
-+
-+	result = uds_make_volume(config, index->layout, &index->volume);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index(index);
-+		return result;
-+	}
-+
-+	index->volume->lookup_mode = LOOKUP_NORMAL;
-+	for (z = 0; z < index->zone_count; z++) {
-+		result = make_index_zone(index, z);
-+		if (result != UDS_SUCCESS) {
-+			uds_free_index(index);
-+			return uds_log_error_strerror(result, "Could not create index zone");
-+		}
-+	}
-+
-+	nonce = uds_get_volume_nonce(index->layout);
-+	result = uds_make_volume_index(config, nonce, &index->volume_index);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index(index);
-+		return uds_log_error_strerror(result, "could not make volume index");
-+	}
-+
-+	index->load_context = load_context;
-+	index->callback = callback;
-+
-+	result = initialize_index_queues(index, config->geometry);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index(index);
-+		return result;
-+	}
-+
-+	result = make_chapter_writer(index, &index->chapter_writer);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index(index);
-+		return result;
-+	}
-+
-+	if (!new) {
-+		result = load_index(index);
-+		switch (result) {
-+		case UDS_SUCCESS:
-+			loaded = true;
-+			break;
-+		case -ENOMEM:
-+			/* We should not try a rebuild for this error. */
-+			uds_log_error_strerror(result, "index could not be loaded");
-+			break;
-+		default:
-+			uds_log_error_strerror(result, "index could not be loaded");
-+			if (open_type == UDS_LOAD) {
-+				result = rebuild_index(index);
-+				if (result != UDS_SUCCESS)
-+					uds_log_error_strerror(result,
-+							       "index could not be rebuilt");
-+			}
-+			break;
-+		}
-+	}
-+
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index(index);
-+		return uds_log_error_strerror(result, "fatal error in %s()", __func__);
-+	}
-+
-+	for (z = 0; z < index->zone_count; z++) {
-+		zone = index->zones[z];
-+		zone->oldest_virtual_chapter = index->oldest_virtual_chapter;
-+		zone->newest_virtual_chapter = index->newest_virtual_chapter;
-+	}
-+
-+	if (index->load_context != NULL) {
-+		uds_lock_mutex(&index->load_context->mutex);
-+		index->load_context->status = INDEX_READY;
-+		/*
-+		 * If we get here, suspend is meaningless, but notify any thread trying to suspend
-+		 * us so it doesn't hang.
-+		 */
-+		uds_broadcast_cond(&index->load_context->cond);
-+		uds_unlock_mutex(&index->load_context->mutex);
-+	}
-+
-+	index->has_saved_open_chapter = loaded;
-+	index->need_to_save = !loaded;
-+	*new_index = index;
-+	return UDS_SUCCESS;
-+}
-+
-+void uds_free_index(struct uds_index *index)
-+{
-+	unsigned int i;
-+
-+	if (index == NULL)
-+		return;
-+
-+	uds_request_queue_finish(index->triage_queue);
-+	for (i = 0; i < index->zone_count; i++)
-+		uds_request_queue_finish(index->zone_queues[i]);
-+
-+	free_chapter_writer(index->chapter_writer);
-+
-+	uds_free_volume_index(index->volume_index);
-+	if (index->zones != NULL) {
-+		for (i = 0; i < index->zone_count; i++)
-+			free_index_zone(index->zones[i]);
-+		UDS_FREE(index->zones);
-+	}
-+
-+	uds_free_volume(index->volume);
-+	uds_free_index_layout(UDS_FORGET(index->layout));
-+	UDS_FREE(index);
-+}
-+
-+/* Wait for the chapter writer to complete any outstanding writes. */
-+void uds_wait_for_idle_index(struct uds_index *index)
-+{
-+	struct chapter_writer *writer = index->chapter_writer;
-+
-+	uds_lock_mutex(&writer->mutex);
-+	while (writer->zones_to_write > 0)
-+		uds_wait_cond(&writer->cond, &writer->mutex);
-+	uds_unlock_mutex(&writer->mutex);
-+}
-+
-+/* This function assumes that all requests have been drained. */
-+int uds_save_index(struct uds_index *index)
-+{
-+	int result;
-+
-+	if (!index->need_to_save)
-+		return UDS_SUCCESS;
-+
-+	uds_wait_for_idle_index(index);
-+	index->prev_save = index->last_save;
-+	index->last_save = ((index->newest_virtual_chapter == 0) ?
-+			    NO_LAST_SAVE :
-+			    index->newest_virtual_chapter - 1);
-+	uds_log_info("beginning save (vcn %llu)", (unsigned long long) index->last_save);
-+
-+	result = uds_save_index_state(index->layout, index);
-+	if (result != UDS_SUCCESS) {
-+		uds_log_info("save index failed");
-+		index->last_save = index->prev_save;
-+	} else {
-+		index->has_saved_open_chapter = true;
-+		index->need_to_save = false;
-+		uds_log_info("finished save (vcn %llu)", (unsigned long long) index->last_save);
-+	}
-+
-+	return result;
-+}
-+
-+int uds_replace_index_storage(struct uds_index *index, struct block_device *bdev)
-+{
-+	return uds_replace_volume_storage(index->volume, index->layout, bdev);
-+}
-+
-+/* Accessing statistics should be safe from any thread. */
-+void uds_get_index_stats(struct uds_index *index, struct uds_index_stats *counters)
-+{
-+	struct volume_index_stats stats;
-+
-+	uds_get_volume_index_stats(index->volume_index, &stats);
-+	counters->entries_indexed = stats.record_count;
-+	counters->collisions = stats.collision_count;
-+	counters->entries_discarded = stats.discard_count;
-+
-+	counters->memory_used = (index->volume_index->memory_size +
-+				 index->volume->cache_size +
-+				 index->chapter_writer->memory_size);
-+}
-+
-+void uds_enqueue_request(struct uds_request *request, enum request_stage stage)
-+{
-+	struct uds_index *index = request->index;
-+	struct uds_request_queue *queue;
-+
-+	switch (stage) {
-+	case STAGE_TRIAGE:
-+		if (index->triage_queue != NULL) {
-+			queue = index->triage_queue;
-+			break;
-+		}
-+
-+		fallthrough;
-+
-+	case STAGE_INDEX:
-+		request->zone_number =
-+			uds_get_volume_index_zone(index->volume_index, &request->record_name);
-+		fallthrough;
-+
-+	case STAGE_MESSAGE:
-+		queue = index->zone_queues[request->zone_number];
-+		break;
-+
-+	default:
-+		ASSERT_LOG_ONLY(false, "invalid index stage: %d", stage);
-+		return;
-+	}
-+
-+	uds_request_queue_enqueue(queue, request);
-+}
-diff --git a/drivers/md/dm-vdo/index.h b/drivers/md/dm-vdo/index.h
+diff --git a/drivers/md/dm-vdo/completion.h b/drivers/md/dm-vdo/completion.h
 new file mode 100644
-index 000000000000..aca61cabc433
+index 000000000000..b81322aea253
 --- /dev/null
-+++ b/drivers/md/dm-vdo/index.h
-@@ -0,0 +1,84 @@
++++ b/drivers/md/dm-vdo/completion.h
+@@ -0,0 +1,155 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef UDS_INDEX_H
-+#define UDS_INDEX_H
++#ifndef VDO_COMPLETION_H
++#define VDO_COMPLETION_H
 +
-+#include "index-layout.h"
-+#include "index-session.h"
-+#include "open-chapter.h"
-+#include "volume.h"
-+#include "volume-index.h"
++#include "permassert.h"
 +
-+/*
-+ * The index is a high-level structure which represents the totality of the UDS index. It manages
-+ * the queues for incoming requests and dispatches them to the appropriate sub-components like the
-+ * volume or the volume index. It also manages administrative tasks such as saving and loading the
-+ * index.
++#include "status-codes.h"
++#include "types.h"
++
++/**
++ * vdo_run_completion() - Run a completion's callback or error handler on the current thread.
 + *
-+ * The index is divided into a number of independent zones and assigns each request to a zone based
-+ * on its name. Most sub-components are similarly divided into zones as well so that requests in
-+ * each zone usually operate without interference or coordination between zones.
++ * Context: This function must be called from the correct callback thread.
++ */
++static inline void vdo_run_completion(struct vdo_completion *completion)
++{
++	if ((completion->result != VDO_SUCCESS) && (completion->error_handler != NULL)) {
++		completion->error_handler(completion);
++		return;
++	}
++
++	completion->callback(completion);
++}
++
++void vdo_set_completion_result(struct vdo_completion *completion, int result);
++
++void vdo_initialize_completion(struct vdo_completion *completion,
++			       struct vdo *vdo,
++			       enum vdo_completion_type type);
++
++/**
++ * vdo_reset_completion() - Reset a completion to a clean state, while keeping the type, vdo and
++ *                          parent information.
++ */
++static inline void vdo_reset_completion(struct vdo_completion *completion)
++{
++	completion->result = VDO_SUCCESS;
++	completion->complete = false;
++}
++
++void vdo_launch_completion_with_priority(struct vdo_completion *completion,
++					 enum vdo_completion_priority priority);
++
++/**
++ * vdo_launch_completion() - Launch a completion with default priority.
++ */
++static inline void vdo_launch_completion(struct vdo_completion *completion)
++{
++	vdo_launch_completion_with_priority(completion, VDO_WORK_Q_DEFAULT_PRIORITY);
++}
++
++/**
++ * vdo_continue_completion() - Continue processing a completion.
++ * @result: The current result (will not mask older errors).
++ *
++ * Continue processing a completion by setting the current result and calling
++ * vdo_launch_completion().
++ */
++static inline void vdo_continue_completion(struct vdo_completion *completion, int result)
++{
++	vdo_set_completion_result(completion, result);
++	vdo_launch_completion(completion);
++}
++
++void vdo_finish_completion(struct vdo_completion *completion);
++
++/**
++ * vdo_fail_completion() - Set the result of a completion if it does not already have an error,
++ *                         then finish it.
++ */
++static inline void vdo_fail_completion(struct vdo_completion *completion, int result)
++{
++	vdo_set_completion_result(completion, result);
++	vdo_finish_completion(completion);
++}
++
++/**
++ * vdo_assert_completion_type() - Assert that a completion is of the correct type.
++ *
++ * Return: VDO_SUCCESS or an error
++ */
++static inline int
++vdo_assert_completion_type(struct vdo_completion *completion, enum vdo_completion_type expected)
++{
++	return ASSERT(expected == completion->type,
++		      "completion type should be %u, not %u",
++		      expected,
++		      completion->type);
++}
++
++static inline void vdo_set_completion_callback(struct vdo_completion *completion,
++					       vdo_action *callback,
++					       thread_id_t callback_thread_id)
++{
++	completion->callback = callback;
++	completion->callback_thread_id = callback_thread_id;
++}
++
++/**
++ * vdo_launch_completion_callback() - Set the callback for a completion and launch it immediately.
++ */
++static inline void vdo_launch_completion_callback(struct vdo_completion *completion,
++						  vdo_action *callback,
++						  thread_id_t callback_thread_id)
++{
++	vdo_set_completion_callback(completion, callback, callback_thread_id);
++	vdo_launch_completion(completion);
++}
++
++/**
++ * vdo_prepare_completion() - Prepare a completion for launch.
++ *
++ * Resets the completion, and then sets its callback, error handler, callback thread, and parent.
++ */
++static inline void vdo_prepare_completion(struct vdo_completion *completion,
++					  vdo_action *callback,
++					  vdo_action *error_handler,
++					  thread_id_t callback_thread_id,
++					  void *parent)
++{
++	vdo_reset_completion(completion);
++	vdo_set_completion_callback(completion, callback, callback_thread_id);
++	completion->error_handler = error_handler;
++	completion->parent = parent;
++}
++
++/**
++ * vdo_prepare_completion_for_requeue() - Prepare a completion for launch ensuring that it will
++ *                                        always be requeued.
++ *
++ * Resets the completion, and then sets its callback, error handler, callback thread, and parent.
++ */
++static inline void
++vdo_prepare_completion_for_requeue(struct vdo_completion *completion,
++				   vdo_action *callback,
++				   vdo_action *error_handler,
++				   thread_id_t callback_thread_id,
++				   void *parent)
++{
++	vdo_prepare_completion(completion, callback, error_handler, callback_thread_id, parent);
++	completion->requeue = true;
++}
++
++void vdo_enqueue_completion(struct vdo_completion *completion,
++			    enum vdo_completion_priority priority);
++
++
++bool vdo_requeue_completion_if_needed(struct vdo_completion *completion,
++				      thread_id_t callback_thread_id);
++
++#endif /* VDO_COMPLETION_H */
+diff --git a/drivers/md/dm-vdo/cpu.h b/drivers/md/dm-vdo/cpu.h
+new file mode 100644
+index 000000000000..a538a4934e4b
+--- /dev/null
++++ b/drivers/md/dm-vdo/cpu.h
+@@ -0,0 +1,58 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright 2023 Red Hat
 + */
 +
-+typedef void (*index_callback_t)(struct uds_request *request);
++#ifndef UDS_CPU_H
++#define UDS_CPU_H
 +
-+struct index_zone {
-+	struct uds_index *index;
-+	struct open_chapter_zone *open_chapter;
-+	struct open_chapter_zone *writing_chapter;
-+	u64 oldest_virtual_chapter;
-+	u64 newest_virtual_chapter;
-+	unsigned int id;
-+};
++#include <linux/cache.h>
 +
-+struct uds_index {
-+	bool has_saved_open_chapter;
-+	bool need_to_save;
-+	struct index_load_context *load_context;
-+	struct index_layout *layout;
-+	struct volume_index *volume_index;
-+	struct volume *volume;
-+	unsigned int zone_count;
-+	struct index_zone **zones;
++/**
++ * uds_prefetch_address() - Minimize cache-miss latency by attempting to move data into a CPU cache
++ *                          before it is accessed.
++ *
++ * @address: the address to fetch (may be invalid)
++ * @for_write: must be constant at compile time--false if for reading, true if for writing
++ */
++static inline void uds_prefetch_address(const void *address, bool for_write)
++{
++	/*
++	 * for_write won't be a constant if we are compiled with optimization turned off, in which
++	 * case prefetching really doesn't matter. clang can't figure out that if for_write is a
++	 * constant, it can be passed as the second, mandatorily constant argument to prefetch(),
++	 * at least currently on llvm 12.
++	 */
++	if (__builtin_constant_p(for_write)) {
++		if (for_write)
++			__builtin_prefetch(address, true);
++		else
++			__builtin_prefetch(address, false);
++	}
++}
 +
-+	u64 oldest_virtual_chapter;
-+	u64 newest_virtual_chapter;
++/**
++ * uds_prefetch_range() - Minimize cache-miss latency by attempting to move a range of addresses
++ *                        into a CPU cache before they are accessed.
++ *
++ * @start: the starting address to fetch (may be invalid)
++ * @size: the number of bytes in the address range
++ * @for_write: must be constant at compile time--false if for reading, true if for writing
++ */
++static inline void uds_prefetch_range(const void *start, unsigned int size, bool for_write)
++{
++	/*
++	 * Count the number of cache lines to fetch, allowing for the address range to span an
++	 * extra cache line boundary due to address alignment.
++	 */
++	const char *address = (const char *) start;
++	unsigned int offset = ((uintptr_t) address % L1_CACHE_BYTES);
++	unsigned int cache_lines = (1 + ((size + offset) / L1_CACHE_BYTES));
 +
-+	u64 last_save;
-+	u64 prev_save;
-+	struct chapter_writer *chapter_writer;
++	while (cache_lines-- > 0) {
++		uds_prefetch_address(address, for_write);
++		address += L1_CACHE_BYTES;
++	}
++}
 +
-+	index_callback_t callback;
-+	struct uds_request_queue *triage_queue;
-+	struct uds_request_queue *zone_queues[];
-+};
-+
-+enum request_stage {
-+	STAGE_TRIAGE,
-+	STAGE_INDEX,
-+	STAGE_MESSAGE,
-+};
-+
-+int __must_check uds_make_index(struct configuration *config,
-+				enum uds_open_index_type open_type,
-+				struct index_load_context *load_context,
-+				index_callback_t callback,
-+				struct uds_index **new_index);
-+
-+int __must_check uds_save_index(struct uds_index *index);
-+
-+void uds_free_index(struct uds_index *index);
-+
-+int __must_check uds_replace_index_storage(struct uds_index *index,
-+					   struct block_device *bdev);
-+
-+void uds_get_index_stats(struct uds_index *index, struct uds_index_stats *counters);
-+
-+void uds_enqueue_request(struct uds_request *request, enum request_stage stage);
-+
-+void uds_wait_for_idle_index(struct uds_index *index);
-+
-+#endif /* UDS_INDEX_H */
-diff --git a/drivers/md/dm-vdo/sparse-cache.c b/drivers/md/dm-vdo/sparse-cache.c
++#endif /* UDS_CPU_H */
+diff --git a/drivers/md/dm-vdo/funnel-queue.c b/drivers/md/dm-vdo/funnel-queue.c
 new file mode 100644
-index 000000000000..b13aaa61e3f6
+index 000000000000..bf7f0d8bc04d
 --- /dev/null
-+++ b/drivers/md/dm-vdo/sparse-cache.c
-@@ -0,0 +1,595 @@
++++ b/drivers/md/dm-vdo/funnel-queue.c
+@@ -0,0 +1,169 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#include "sparse-cache.h"
++#include "funnel-queue.h"
 +
-+#include <linux/cache.h>
-+#include <linux/dm-bufio.h>
-+
-+#include "chapter-index.h"
-+#include "config.h"
-+#include "index.h"
-+#include "logger.h"
++#include "cpu.h"
 +#include "memory-alloc.h"
 +#include "permassert.h"
++#include "uds.h"
++
++int uds_make_funnel_queue(struct funnel_queue **queue_ptr)
++{
++	int result;
++	struct funnel_queue *queue;
++
++	result = UDS_ALLOCATE(1, struct funnel_queue, "funnel queue", &queue);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	/*
++	 * Initialize the stub entry and put it in the queue, establishing the invariant that
++	 * queue->newest and queue->oldest are never null.
++	 */
++	queue->stub.next = NULL;
++	queue->newest = &queue->stub;
++	queue->oldest = &queue->stub;
++
++	*queue_ptr = queue;
++	return UDS_SUCCESS;
++}
++
++void uds_free_funnel_queue(struct funnel_queue *queue)
++{
++	UDS_FREE(queue);
++}
++
++static struct funnel_queue_entry *get_oldest(struct funnel_queue *queue)
++{
++	/*
++	 * Barrier requirements: We need a read barrier between reading a "next" field pointer
++	 * value and reading anything it points to. There's an accompanying barrier in
++	 * uds_funnel_queue_put() between its caller setting up the entry and making it visible.
++	 */
++	struct funnel_queue_entry *oldest = queue->oldest;
++	struct funnel_queue_entry *next = READ_ONCE(oldest->next);
++
++	if (oldest == &queue->stub) {
++		/*
++		 * When the oldest entry is the stub and it has no successor, the queue is
++		 * logically empty.
++		 */
++		if (next == NULL)
++			return NULL;
++		/*
++		 * The stub entry has a successor, so the stub can be dequeued and ignored without
++		 * breaking the queue invariants.
++		 */
++		oldest = next;
++		queue->oldest = oldest;
++		next = READ_ONCE(oldest->next);
++	}
++
++	/*
++	 * We have a non-stub candidate to dequeue. If it lacks a successor, we'll need to put the
++	 * stub entry back on the queue first.
++	 */
++	if (next == NULL) {
++		struct funnel_queue_entry *newest = READ_ONCE(queue->newest);
++
++		if (oldest != newest)
++			/*
++			 * Another thread has already swung queue->newest atomically, but not yet
++			 * assigned previous->next. The queue is really still empty.
++			 */
++			return NULL;
++
++		/*
++		 * Put the stub entry back on the queue, ensuring a successor will eventually be
++		 * seen.
++		 */
++		uds_funnel_queue_put(queue, &queue->stub);
++
++		/* Check again for a successor. */
++		next = READ_ONCE(oldest->next);
++		if (next == NULL)
++			/*
++			 * We lost a race with a producer who swapped queue->newest before we did,
++			 * but who hasn't yet updated previous->next. Try again later.
++			 */
++			return NULL;
++	}
++
++	return oldest;
++}
++
++/*
++ * Poll a queue, removing the oldest entry if the queue is not empty. This function must only be
++ * called from a single consumer thread.
++ */
++struct funnel_queue_entry *uds_funnel_queue_poll(struct funnel_queue *queue)
++{
++	struct funnel_queue_entry *oldest = get_oldest(queue);
++
++	if (oldest == NULL)
++		return oldest;
++
++	/*
++	 * Dequeue the oldest entry and return it. Only one consumer thread may call this function,
++	 * so no locking, atomic operations, or fences are needed; queue->oldest is owned by the
++	 * consumer and oldest->next is never used by a producer thread after it is swung from NULL
++	 * to non-NULL.
++	 */
++	queue->oldest = READ_ONCE(oldest->next);
++	/*
++	 * Make sure the caller sees the proper stored data for this entry. Since we've already
++	 * fetched the entry pointer we stored in "queue->oldest", this also ensures that on entry
++	 * to the next call we'll properly see the dependent data.
++	 */
++	smp_rmb();
++	/*
++	 * If "oldest" is a very light-weight work item, we'll be looking for the next one very
++	 * soon, so prefetch it now.
++	 */
++	uds_prefetch_address(queue->oldest, true);
++	WRITE_ONCE(oldest->next, NULL);
++	return oldest;
++}
++
++/*
++ * Check whether the funnel queue is empty or not. If the queue is in a transition state with one
++ * or more entries being added such that the list view is incomplete, this function will report the
++ * queue as empty.
++ */
++bool uds_is_funnel_queue_empty(struct funnel_queue *queue)
++{
++	return get_oldest(queue) == NULL;
++}
++
++/*
++ * Check whether the funnel queue is idle or not. If the queue has entries available to be
++ * retrieved, it is not idle. If the queue is in a transition state with one or more entries being
++ * added such that the list view is incomplete, it may not be possible to retrieve an entry with
++ * the uds_funnel_queue_poll() function, but the queue will not be considered idle.
++ */
++bool uds_is_funnel_queue_idle(struct funnel_queue *queue)
++{
++	/*
++	 * Oldest is not the stub, so there's another entry, though if next is NULL we can't
++	 * retrieve it yet.
++	 */
++	if (queue->oldest != &queue->stub)
++		return false;
++
++	/*
++	 * Oldest is the stub, but newest has been updated by _put(); either there's another,
++	 * retrievable entry in the list, or the list is officially empty but in the intermediate
++	 * state of having an entry added.
++	 *
++	 * Whether anything is retrievable depends on whether stub.next has been updated and become
++	 * visible to us, but for idleness we don't care. And due to memory ordering in _put(), the
++	 * update to newest would be visible to us at the same time or sooner.
++	 */
++	if (READ_ONCE(queue->newest) != &queue->stub)
++		return false;
++
++	return true;
++}
+diff --git a/drivers/md/dm-vdo/funnel-queue.h b/drivers/md/dm-vdo/funnel-queue.h
+new file mode 100644
+index 000000000000..275dd4ac29a4
+--- /dev/null
++++ b/drivers/md/dm-vdo/funnel-queue.h
+@@ -0,0 +1,110 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright 2023 Red Hat
++ */
++
++#ifndef UDS_FUNNEL_QUEUE_H
++#define UDS_FUNNEL_QUEUE_H
++
++#include <linux/atomic.h>
++#include <linux/cache.h>
++
++/*
++ * A funnel queue is a simple (almost) lock-free queue that accepts entries from multiple threads
++ * (multi-producer) and delivers them to a single thread (single-consumer). "Funnel" is an attempt
++ * to evoke the image of requests from more than one producer being "funneled down" to a single
++ * consumer.
++ *
++ * This is an unsynchronized but thread-safe data structure when used as intended. There is no
++ * mechanism to ensure that only one thread is consuming from the queue. If more than one thread
++ * attempts to consume from the queue, the resulting behavior is undefined. Clients must not
++ * directly access or manipulate the internals of the queue, which are only exposed for the purpose
++ * of allowing the very simple enqueue operation to be inlined.
++ *
++ * The implementation requires that a funnel_queue_entry structure (a link pointer) is embedded in
++ * the queue entries, and pointers to those structures are used exclusively by the queue. No macros
++ * are defined to template the queue, so the offset of the funnel_queue_entry in the records placed
++ * in the queue must all be the same so the client can derive their structure pointer from the
++ * entry pointer returned by uds_funnel_queue_poll().
++ *
++ * Callers are wholly responsible for allocating and freeing the entries. Entries may be freed as
++ * soon as they are returned since this queue is not susceptible to the "ABA problem" present in
++ * many lock-free data structures. The queue is dynamically allocated to ensure cache-line
++ * alignment, but no other dynamic allocation is used.
++ *
++ * The algorithm is not actually 100% lock-free. There is a single point in uds_funnel_queue_put()
++ * at which a preempted producer will prevent the consumers from seeing items added to the queue by
++ * later producers, and only if the queue is short enough or the consumer fast enough for it to
++ * reach what was the end of the queue at the time of the preemption.
++ *
++ * The consumer function, uds_funnel_queue_poll(), will return NULL when the queue is empty. To
++ * wait for data to consume, spin (if safe) or combine the queue with a struct event_count to
++ * signal the presence of new entries.
++ */
++
++/* This queue link structure must be embedded in client entries. */
++struct funnel_queue_entry {
++	/* The next (newer) entry in the queue. */
++	struct funnel_queue_entry *next;
++};
++
++/*
++ * The dynamically allocated queue structure, which is allocated on a cache line boundary so the
++ * producer and consumer fields in the structure will land on separate cache lines. This should be
++ * consider opaque but it is exposed here so uds_funnel_queue_put() can be inlined.
++ */
++struct __aligned(L1_CACHE_BYTES) funnel_queue {
++	/*
++	 * The producers' end of the queue, an atomically exchanged pointer that will never be
++	 * NULL.
++	 */
++	struct funnel_queue_entry *newest;
++
++	/* The consumer's end of the queue, which is owned by the consumer and never NULL. */
++	struct funnel_queue_entry *oldest __aligned(L1_CACHE_BYTES);
++
++	/* A dummy entry used to provide the non-NULL invariants above. */
++	struct funnel_queue_entry stub;
++};
++
++int __must_check uds_make_funnel_queue(struct funnel_queue **queue_ptr);
++
++void uds_free_funnel_queue(struct funnel_queue *queue);
++
++/*
++ * Put an entry on the end of the queue.
++ *
++ * The entry pointer must be to the struct funnel_queue_entry embedded in the caller's data
++ * structure. The caller must be able to derive the address of the start of their data structure
++ * from the pointer that passed in here, so every entry in the queue must have the struct
++ * funnel_queue_entry at the same offset within the client's structure.
++ */
++static inline void
++uds_funnel_queue_put(struct funnel_queue *queue, struct funnel_queue_entry *entry)
++{
++	struct funnel_queue_entry *previous;
++
++	/*
++	 * Barrier requirements: All stores relating to the entry ("next" pointer, containing data
++	 * structure fields) must happen before the previous->next store making it visible to the
++	 * consumer. Also, the entry's "next" field initialization to NULL must happen before any
++	 * other producer threads can see the entry (the xchg) and try to update the "next" field.
++	 *
++	 * xchg implements a full barrier.
++	 */
++	WRITE_ONCE(entry->next, NULL);
++	previous = xchg(&queue->newest, entry);
++	/*
++	 * Preemptions between these two statements hide the rest of the queue from the consumer,
++	 * preventing consumption until the following assignment runs.
++	 */
++	WRITE_ONCE(previous->next, entry);
++}
++
++struct funnel_queue_entry *__must_check uds_funnel_queue_poll(struct funnel_queue *queue);
++
++bool __must_check uds_is_funnel_queue_empty(struct funnel_queue *queue);
++
++bool __must_check uds_is_funnel_queue_idle(struct funnel_queue *queue);
++
++#endif /* UDS_FUNNEL_QUEUE_H */
+diff --git a/drivers/md/dm-vdo/request-queue.c b/drivers/md/dm-vdo/request-queue.c
+new file mode 100644
+index 000000000000..1c60b09027a8
+--- /dev/null
++++ b/drivers/md/dm-vdo/request-queue.c
+@@ -0,0 +1,284 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright 2023 Red Hat
++ */
++
++#include "request-queue.h"
++
++#include <linux/atomic.h>
++#include <linux/compiler.h>
++#include <linux/wait.h>
++
++#include "funnel-queue.h"
++#include "logger.h"
++#include "memory-alloc.h"
 +#include "uds-threads.h"
 +
 +/*
-+ * Since the cache is small, it is implemented as a simple array of cache entries. Searching for a
-+ * specific virtual chapter is implemented as a linear search. The cache replacement policy is
-+ * least-recently-used (LRU). Again, the small size of the cache allows the LRU order to be
-+ * maintained by shifting entries in an array list.
++ * This queue will attempt to handle requests in reasonably sized batches instead of reacting
++ * immediately to each new request. The wait time between batches is dynamically adjusted up or
++ * down to try to balance responsiveness against wasted thread run time.
 + *
-+ * Changing the contents of the cache requires the coordinated participation of all zone threads
-+ * via the careful use of barrier messages sent to all the index zones by the triage queue worker
-+ * thread. The critical invariant for coordination is that the cache membership must not change
-+ * between updates, so that all calls to uds_sparse_cache_contains() from the zone threads must all
-+ * receive the same results for every virtual chapter number. To ensure that critical invariant,
-+ * state changes such as "that virtual chapter is no longer in the volume" and "skip searching that
-+ * chapter because it has had too many cache misses" are represented separately from the cache
-+ * membership information (the virtual chapter number).
++ * If the wait time becomes long enough, the queue will become dormant and must be explicitly
++ * awoken when a new request is enqueued. The enqueue operation updates "newest" in the funnel
++ * queue via xchg (which is a memory barrier), and later checks "dormant" to decide whether to do a
++ * wakeup of the worker thread.
 + *
-+ * As a result of this invariant, we have the guarantee that every zone thread will call
-+ * uds_update_sparse_cache() once and exactly once to request a chapter that is not in the cache,
-+ * and the serialization of the barrier requests from the triage queue ensures they will all
-+ * request the same chapter number. This means the only synchronization we need can be provided by
-+ * a pair of thread barriers used only in the uds_update_sparse_cache() call, providing a critical
-+ * section where a single zone thread can drive the cache update while all the other zone threads
-+ * are known to be blocked, waiting in the second barrier. Outside that critical section, all the
-+ * zone threads implicitly hold a shared lock. Inside it, the thread for zone zero holds an
-+ * exclusive lock. No other threads may access or modify the cache entries.
++ * When deciding to go to sleep, the worker thread sets "dormant" and then examines "newest" to
++ * decide if the funnel queue is idle. In dormant mode, the last examination of "newest" before
++ * going to sleep is done inside the wait_event_interruptible() macro, after a point where one or
++ * more memory barriers have been issued. (Preparing to sleep uses spin locks.) Even if the funnel
++ * queue's "next" field update isn't visible yet to make the entry accessible, its existence will
++ * kick the worker thread out of dormant mode and back into timer-based mode.
 + *
-+ * Chapter statistics must only be modified by a single thread, which is also the zone zero thread.
-+ * All fields that might be frequently updated by that thread are kept in separate cache-aligned
-+ * structures so they will not cause cache contention via "false sharing" with the fields that are
-+ * frequently accessed by all of the zone threads.
-+ *
-+ * The LRU order is managed independently by each zone thread, and each zone uses its own list for
-+ * searching and cache membership queries. The zone zero list is used to decide which chapter to
-+ * evict when the cache is updated, and its search list is copied to the other threads at that
-+ * time.
-+ *
-+ * The virtual chapter number field of the cache entry is the single field indicating whether a
-+ * chapter is a member of the cache or not. The value NO_CHAPTER is used to represent a null or
-+ * undefined chapter number. When present in the virtual chapter number field of a
-+ * cached_chapter_index, it indicates that the cache entry is dead, and all the other fields of
-+ * that entry (other than immutable pointers to cache memory) are undefined and irrelevant. Any
-+ * cache entry that is not marked as dead is fully defined and a member of the cache, and
-+ * uds_sparse_cache_contains() will always return true for any virtual chapter number that appears
-+ * in any of the cache entries.
-+ *
-+ * A chapter index that is a member of the cache may be excluded from searches between calls to
-+ * uds_update_sparse_cache() in two different ways. First, when a chapter falls off the end of the
-+ * volume, its virtual chapter number will be less that the oldest virtual chapter number. Since
-+ * that chapter is no longer part of the volume, there's no point in continuing to search that
-+ * chapter index. Once invalidated, that virtual chapter will still be considered a member of the
-+ * cache, but it will no longer be searched for matching names.
-+ *
-+ * The second mechanism is a heuristic based on keeping track of the number of consecutive search
-+ * misses in a given chapter index. Once that count exceeds a threshold, the skip_search flag will
-+ * be set to true, causing the chapter to be skipped when searching the entire cache, but still
-+ * allowing it to be found when searching for a hook in that specific chapter. Finding a hook will
-+ * clear the skip_search flag, once again allowing the non-hook searches to use that cache entry.
-+ * Again, regardless of the state of the skip_search flag, the virtual chapter must still
-+ * considered to be a member of the cache for uds_sparse_cache_contains().
++ * Unbatched requests are used to communicate between different zone threads and will also cause
++ * the queue to awaken immediately.
 + */
 +
 +enum {
-+	SKIP_SEARCH_THRESHOLD = 20000,
-+	ZONE_ZERO = 0,
++	NANOSECOND = 1,
++	MICROSECOND = 1000 * NANOSECOND,
++	MILLISECOND = 1000 * MICROSECOND,
++	DEFAULT_WAIT_TIME = 20 * MICROSECOND,
++	MINIMUM_WAIT_TIME = DEFAULT_WAIT_TIME / 2,
++	MAXIMUM_WAIT_TIME = MILLISECOND,
++	MINIMUM_BATCH = 32,
++	MAXIMUM_BATCH = 64,
 +};
 +
-+/*
-+ * These counters are essentially fields of the struct cached_chapter_index, but are segregated
-+ * into this structure because they are frequently modified. They are grouped and aligned to keep
-+ * them on different cache lines from the chapter fields that are accessed far more often than they
-+ * are updated.
-+ */
-+struct __aligned(L1_CACHE_BYTES) cached_index_counters {
-+	u64 consecutive_misses;
++struct uds_request_queue {
++	/* Wait queue for synchronizing producers and consumer */
++	struct wait_queue_head wait_head;
++	/* Function to process a request */
++	uds_request_queue_processor_t *processor;
++	/* Queue of new incoming requests */
++	struct funnel_queue *main_queue;
++	/* Queue of old requests to retry */
++	struct funnel_queue *retry_queue;
++	/* The thread id of the worker thread */
++	struct thread *thread;
++	/* True if the worker was started */
++	bool started;
++	/* When true, requests can be enqueued */
++	bool running;
++	/* A flag set when the worker is waiting without a timeout */
++	atomic_t dormant;
 +};
 +
-+struct __aligned(L1_CACHE_BYTES) cached_chapter_index {
-+	/*
-+	 * The virtual chapter number of the cached chapter index. NO_CHAPTER means this cache
-+	 * entry is unused. This field must only be modified in the critical section in
-+	 * uds_update_sparse_cache().
-+	 */
-+	u64 virtual_chapter;
-+
-+	u32 index_pages_count;
-+
-+	/*
-+	 * These pointers are immutable during the life of the cache. The contents of the arrays
-+	 * change when the cache entry is replaced.
-+	 */
-+	struct delta_index_page *index_pages;
-+	struct dm_buffer **page_buffers;
-+
-+	/*
-+	 * If set, skip the chapter when searching the entire cache. This flag is just a
-+	 * performance optimization. This flag is mutable between cache updates, but it rarely
-+	 * changes and is frequently accessed, so it groups with the immutable fields.
-+	 */
-+	bool skip_search;
-+
-+	/*
-+	 * The cache-aligned counters change often and are placed at the end of the structure to
-+	 * prevent false sharing with the more stable fields above.
-+	 */
-+	struct cached_index_counters counters;
-+};
-+
-+/*
-+ * A search_list represents an ordering of the sparse chapter index cache entry array, from most
-+ * recently accessed to least recently accessed, which is the order in which the indexes should be
-+ * searched and the reverse order in which they should be evicted from the cache.
-+ *
-+ * Cache entries that are dead or empty are kept at the end of the list, avoiding the need to even
-+ * iterate over them to search, and ensuring that dead entries are replaced before any live entries
-+ * are evicted.
-+ *
-+ * The search list is instantiated for each zone thread, avoiding any need for synchronization. The
-+ * structure is allocated on a cache boundary to avoid false sharing of memory cache lines between
-+ * zone threads.
-+ */
-+struct search_list {
-+	u8 capacity;
-+	u8 first_dead_entry;
-+	struct cached_chapter_index *entries[];
-+};
-+
-+struct sparse_cache {
-+	const struct geometry *geometry;
-+	unsigned int capacity;
-+	unsigned int zone_count;
-+
-+	unsigned int skip_threshold;
-+	struct search_list *search_lists[MAX_ZONES];
-+	struct cached_chapter_index **scratch_entries;
-+
-+	struct barrier begin_update_barrier;
-+	struct barrier end_update_barrier;
-+
-+	struct cached_chapter_index chapters[];
-+};
-+
-+static int __must_check
-+initialize_cached_chapter_index(struct cached_chapter_index *chapter,
-+				const struct geometry *geometry)
++static inline struct uds_request *poll_queues(struct uds_request_queue *queue)
 +{
-+	int result;
++	struct funnel_queue_entry *entry;
 +
-+	chapter->virtual_chapter = NO_CHAPTER;
-+	chapter->index_pages_count = geometry->index_pages_per_chapter;
++	entry = uds_funnel_queue_poll(queue->retry_queue);
++	if (entry != NULL)
++		return container_of(entry, struct uds_request, queue_link);
 +
-+	result = UDS_ALLOCATE(chapter->index_pages_count,
-+			      struct delta_index_page,
-+			      __func__,
-+			      &chapter->index_pages);
-+	if (result != UDS_SUCCESS)
-+		return result;
++	entry = uds_funnel_queue_poll(queue->main_queue);
++	if (entry != NULL)
++		return container_of(entry, struct uds_request, queue_link);
 +
-+	return UDS_ALLOCATE(chapter->index_pages_count,
-+			    struct dm_buffer *,
-+			    "sparse index volume pages",
-+			    &chapter->page_buffers);
++	return NULL;
 +}
 +
-+static int __must_check make_search_list(struct sparse_cache *cache, struct search_list **list_ptr)
++static inline bool are_queues_idle(struct uds_request_queue *queue)
 +{
-+	struct search_list *list;
-+	unsigned int bytes;
-+	u8 i;
-+	int result;
-+
-+	bytes = (sizeof(struct search_list) +
-+		 (cache->capacity * sizeof(struct cached_chapter_index *)));
-+	result = uds_allocate_cache_aligned(bytes, "search list", &list);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	list->capacity = cache->capacity;
-+	list->first_dead_entry = 0;
-+
-+	for (i = 0; i < list->capacity; i++)
-+		list->entries[i] = &cache->chapters[i];
-+
-+	*list_ptr = list;
-+	return UDS_SUCCESS;
-+}
-+
-+int uds_make_sparse_cache(const struct geometry *geometry,
-+			  unsigned int capacity,
-+			  unsigned int zone_count,
-+			  struct sparse_cache **cache_ptr)
-+{
-+	int result;
-+	unsigned int i;
-+	struct sparse_cache *cache;
-+	unsigned int bytes;
-+
-+	bytes = (sizeof(struct sparse_cache) + (capacity * sizeof(struct cached_chapter_index)));
-+	result = uds_allocate_cache_aligned(bytes, "sparse cache", &cache);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	cache->geometry = geometry;
-+	cache->capacity = capacity;
-+	cache->zone_count = zone_count;
-+
-+	/*
-+	 * Scale down the skip threshold since the cache only counts cache misses in zone zero, but
-+	 * requests are being handled in all zones.
-+	 */
-+	cache->skip_threshold = (SKIP_SEARCH_THRESHOLD / zone_count);
-+
-+	result = uds_initialize_barrier(&cache->begin_update_barrier, zone_count);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_sparse_cache(cache);
-+		return result;
-+	}
-+
-+	result = uds_initialize_barrier(&cache->end_update_barrier, zone_count);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_sparse_cache(cache);
-+		return result;
-+	}
-+
-+	for (i = 0; i < capacity; i++) {
-+		result = initialize_cached_chapter_index(&cache->chapters[i], geometry);
-+		if (result != UDS_SUCCESS) {
-+			uds_free_sparse_cache(cache);
-+			return result;
-+		}
-+	}
-+
-+	for (i = 0; i < zone_count; i++) {
-+		result = make_search_list(cache, &cache->search_lists[i]);
-+		if (result != UDS_SUCCESS) {
-+			uds_free_sparse_cache(cache);
-+			return result;
-+		}
-+	}
-+
-+	/* purge_search_list() needs some temporary lists for sorting. */
-+	result = UDS_ALLOCATE(capacity * 2,
-+			      struct cached_chapter_index *,
-+			      "scratch entries",
-+			      &cache->scratch_entries);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_sparse_cache(cache);
-+		return result;
-+	}
-+
-+	*cache_ptr = cache;
-+	return UDS_SUCCESS;
-+}
-+
-+static inline void set_skip_search(struct cached_chapter_index *chapter, bool skip_search)
-+{
-+	/* Check before setting to reduce cache line contention. */
-+	if (READ_ONCE(chapter->skip_search) != skip_search)
-+		WRITE_ONCE(chapter->skip_search, skip_search);
-+}
-+
-+static void score_search_hit(struct cached_chapter_index *chapter)
-+{
-+	chapter->counters.consecutive_misses = 0;
-+	set_skip_search(chapter, false);
-+}
-+
-+static void score_search_miss(struct sparse_cache *cache, struct cached_chapter_index *chapter)
-+{
-+	chapter->counters.consecutive_misses++;
-+	if (chapter->counters.consecutive_misses > cache->skip_threshold)
-+		set_skip_search(chapter, true);
-+}
-+
-+static void release_cached_chapter_index(struct cached_chapter_index *chapter)
-+{
-+	unsigned int i;
-+
-+	chapter->virtual_chapter = NO_CHAPTER;
-+	if (chapter->page_buffers == NULL)
-+		return;
-+
-+	for (i = 0; i < chapter->index_pages_count; i++)
-+		if (chapter->page_buffers[i] != NULL)
-+			dm_bufio_release(UDS_FORGET(chapter->page_buffers[i]));
-+}
-+
-+void uds_free_sparse_cache(struct sparse_cache *cache)
-+{
-+	unsigned int i;
-+
-+	if (cache == NULL)
-+		return;
-+
-+	UDS_FREE(cache->scratch_entries);
-+
-+	for (i = 0; i < cache->zone_count; i++)
-+		UDS_FREE(cache->search_lists[i]);
-+
-+	for (i = 0; i < cache->capacity; i++) {
-+		release_cached_chapter_index(&cache->chapters[i]);
-+		UDS_FREE(cache->chapters[i].index_pages);
-+		UDS_FREE(cache->chapters[i].page_buffers);
-+	}
-+
-+	uds_destroy_barrier(&cache->begin_update_barrier);
-+	uds_destroy_barrier(&cache->end_update_barrier);
-+	UDS_FREE(cache);
++	return uds_is_funnel_queue_idle(queue->retry_queue) &&
++	       uds_is_funnel_queue_idle(queue->main_queue);
 +}
 +
 +/*
-+ * Take the indicated element of the search list and move it to the start, pushing the pointers
-+ * previously before it back down the list.
++ * Determine if there is a next request to process, and return it if there is. Also return flags
++ * indicating whether the worker thread can sleep (for the use of wait_event() macros) and whether
++ * the thread did sleep before returning a new request.
 + */
-+static inline void set_newest_entry(struct search_list *search_list, u8 index)
++static inline bool dequeue_request(struct uds_request_queue *queue,
++				   struct uds_request **request_ptr,
++				   bool *waited_ptr)
 +{
-+	struct cached_chapter_index *newest;
++	struct uds_request *request = poll_queues(queue);
 +
-+	if (index > 0) {
-+		newest = search_list->entries[index];
-+		memmove(&search_list->entries[1],
-+			&search_list->entries[0],
-+			index * sizeof(struct cached_chapter_index *));
-+		search_list->entries[0] = newest;
++	if (request != NULL) {
++		*request_ptr = request;
++		return true;
 +	}
 +
-+	/*
-+	 * This function may have moved a dead chapter to the front of the list for reuse, in which
-+	 * case the set of dead chapters becomes smaller.
-+	 */
-+	if (search_list->first_dead_entry <= index)
-+		search_list->first_dead_entry++;
-+}
-+
-+bool uds_sparse_cache_contains(struct sparse_cache *cache,
-+			       u64 virtual_chapter,
-+			       unsigned int zone_number)
-+{
-+	struct search_list *search_list;
-+	struct cached_chapter_index *chapter;
-+	u8 i;
-+
-+	/*
-+	 * The correctness of the barriers depends on the invariant that between calls to
-+	 * uds_update_sparse_cache(), the answers this function returns must never vary: the result
-+	 * for a given chapter must be identical across zones. That invariant must be maintained
-+	 * even if the chapter falls off the end of the volume, or if searching it is disabled
-+	 * because of too many search misses.
-+	 */
-+	search_list = cache->search_lists[zone_number];
-+	for (i = 0; i < search_list->first_dead_entry; i++) {
-+		chapter = search_list->entries[i];
-+
-+		if (virtual_chapter == chapter->virtual_chapter) {
-+			if (zone_number == ZONE_ZERO)
-+				score_search_hit(chapter);
-+
-+			set_newest_entry(search_list, i);
-+			return true;
-+		}
++	if (!READ_ONCE(queue->running)) {
++		/* Wake the worker thread so it can exit. */
++		*request_ptr = NULL;
++		return true;
 +	}
 +
++	*request_ptr = NULL;
++	*waited_ptr = true;
 +	return false;
 +}
 +
-+/*
-+ * Re-sort cache entries into three sets (active, skippable, and dead) while maintaining the LRU
-+ * ordering that already existed. This operation must only be called during the critical section in
-+ * uds_update_sparse_cache().
-+ */
-+static void purge_search_list(struct search_list *search_list,
-+			      struct sparse_cache *cache,
-+			      u64 oldest_virtual_chapter)
++static void wait_for_request(struct uds_request_queue *queue,
++			     bool dormant,
++			     unsigned long timeout,
++			     struct uds_request **request,
++			     bool *waited)
 +{
-+	struct cached_chapter_index **entries;
-+	struct cached_chapter_index **skipped;
-+	struct cached_chapter_index **dead;
-+	struct cached_chapter_index *chapter;
-+	unsigned int next_alive = 0;
-+	unsigned int next_skipped = 0;
-+	unsigned int next_dead = 0;
-+	unsigned int i;
-+
-+	entries = &search_list->entries[0];
-+	skipped = &cache->scratch_entries[0];
-+	dead = &cache->scratch_entries[search_list->capacity];
-+
-+	for (i = 0; i < search_list->first_dead_entry; i++) {
-+		chapter = search_list->entries[i];
-+		if ((chapter->virtual_chapter < oldest_virtual_chapter) ||
-+		    (chapter->virtual_chapter == NO_CHAPTER))
-+			dead[next_dead++] = chapter;
-+		else if (chapter->skip_search)
-+			skipped[next_skipped++] = chapter;
-+		else
-+			entries[next_alive++] = chapter;
++	if (dormant) {
++		wait_event_interruptible(queue->wait_head,
++					 (dequeue_request(queue, request, waited) ||
++					  !are_queues_idle(queue)));
++		return;
 +	}
 +
-+	memcpy(&entries[next_alive],
-+	       skipped,
-+	       next_skipped * sizeof(struct cached_chapter_index *));
-+	memcpy(&entries[next_alive + next_skipped],
-+	       dead,
-+	       next_dead * sizeof(struct cached_chapter_index *));
-+	search_list->first_dead_entry = next_alive + next_skipped;
++	wait_event_interruptible_hrtimeout(queue->wait_head,
++					   dequeue_request(queue, request, waited),
++					   ns_to_ktime(timeout));
 +}
 +
-+static int __must_check cache_chapter_index(struct cached_chapter_index *chapter,
-+					    u64 virtual_chapter,
-+					    const struct volume *volume)
++static void request_queue_worker(void *arg)
++{
++	struct uds_request_queue *queue = (struct uds_request_queue *) arg;
++	struct uds_request *request = NULL;
++	unsigned long time_batch = DEFAULT_WAIT_TIME;
++	bool dormant = atomic_read(&queue->dormant);
++	bool waited = false;
++	long current_batch = 0;
++
++	for (;;) {
++		wait_for_request(queue, dormant, time_batch, &request, &waited);
++		if (likely(request != NULL)) {
++			current_batch++;
++			queue->processor(request);
++		} else if (!READ_ONCE(queue->running)) {
++			break;
++		}
++
++		if (dormant) {
++			/*
++			 * The queue has been roused from dormancy. Clear the flag so enqueuers can
++			 * stop broadcasting. No fence is needed for this transition.
++			 */
++			atomic_set(&queue->dormant, false);
++			dormant = false;
++			time_batch = DEFAULT_WAIT_TIME;
++		} else if (waited) {
++			/*
++			 * We waited for this request to show up. Adjust the wait time to smooth
++			 * out the batch size.
++			 */
++			if (current_batch < MINIMUM_BATCH) {
++				/*
++				 * If the last batch of requests was too small, increase the wait
++				 * time.
++				 */
++				time_batch += time_batch / 4;
++				if (time_batch >= MAXIMUM_WAIT_TIME) {
++					atomic_set(&queue->dormant, true);
++					dormant = true;
++				}
++			} else if (current_batch > MAXIMUM_BATCH) {
++				/*
++				 * If the last batch of requests was too large, decrease the wait
++				 * time.
++				 */
++				time_batch -= time_batch / 4;
++				if (time_batch < MINIMUM_WAIT_TIME)
++					time_batch = MINIMUM_WAIT_TIME;
++			}
++			current_batch = 0;
++		}
++	}
++
++	/*
++	 * Ensure that we process any remaining requests that were enqueued before trying to shut
++	 * down. The corresponding write barrier is in uds_request_queue_finish().
++	 */
++	smp_rmb();
++	while ((request = poll_queues(queue)) != NULL)
++		queue->processor(request);
++}
++
++int uds_make_request_queue(const char *queue_name,
++			   uds_request_queue_processor_t *processor,
++			   struct uds_request_queue **queue_ptr)
 +{
 +	int result;
++	struct uds_request_queue *queue;
 +
-+	release_cached_chapter_index(chapter);
-+
-+	result = uds_read_chapter_index_from_volume(volume,
-+						    virtual_chapter,
-+						    chapter->page_buffers,
-+						    chapter->index_pages);
++	result = UDS_ALLOCATE(1, struct uds_request_queue, __func__, &queue);
 +	if (result != UDS_SUCCESS)
 +		return result;
 +
-+	chapter->counters.consecutive_misses = 0;
-+	chapter->virtual_chapter = virtual_chapter;
-+	chapter->skip_search = false;
++	queue->processor = processor;
++	queue->running = true;
++	atomic_set(&queue->dormant, false);
++	init_waitqueue_head(&queue->wait_head);
 +
++	result = uds_make_funnel_queue(&queue->main_queue);
++	if (result != UDS_SUCCESS) {
++		uds_request_queue_finish(queue);
++		return result;
++	}
++
++	result = uds_make_funnel_queue(&queue->retry_queue);
++	if (result != UDS_SUCCESS) {
++		uds_request_queue_finish(queue);
++		return result;
++	}
++
++	result = uds_create_thread(request_queue_worker, queue, queue_name, &queue->thread);
++	if (result != UDS_SUCCESS) {
++		uds_request_queue_finish(queue);
++		return result;
++	}
++
++	queue->started = true;
++	*queue_ptr = queue;
 +	return UDS_SUCCESS;
 +}
 +
-+static inline void copy_search_list(const struct search_list *source, struct search_list *target)
++static inline void wake_up_worker(struct uds_request_queue *queue)
 +{
-+	*target = *source;
-+	memcpy(target->entries,
-+	       source->entries,
-+	       source->capacity * sizeof(struct cached_chapter_index *));
++	if (wq_has_sleeper(&queue->wait_head))
++		wake_up(&queue->wait_head);
 +}
 +
-+/*
-+ * Update the sparse cache to contain a chapter index. This function must be called by all the zone
-+ * threads with the same chapter number to correctly enter the thread barriers used to synchronize
-+ * the cache updates.
-+ */
-+int uds_update_sparse_cache(struct index_zone *zone, u64 virtual_chapter)
++void uds_request_queue_enqueue(struct uds_request_queue *queue, struct uds_request *request)
 +{
-+	int result = UDS_SUCCESS;
-+	const struct uds_index *index = zone->index;
-+	struct sparse_cache *cache = index->volume->sparse_cache;
++	struct funnel_queue *sub_queue;
++	bool unbatched = request->unbatched;
 +
-+	if (uds_sparse_cache_contains(cache, virtual_chapter, zone->id))
-+		return UDS_SUCCESS;
++	sub_queue = request->requeued ? queue->retry_queue : queue->main_queue;
++	uds_funnel_queue_put(sub_queue, &request->queue_link);
 +
 +	/*
-+	 * Wait for every zone thread to reach its corresponding barrier request and invoke this
-+	 * function before starting to modify the cache.
++	 * We must wake the worker thread when it is dormant. A read fence isn't needed here since
++	 * we know the queue operation acts as one.
 +	 */
-+	uds_enter_barrier(&cache->begin_update_barrier);
-+
-+	/*
-+	 * This is the start of the critical section: the zone zero thread is captain, effectively
-+	 * holding an exclusive lock on the sparse cache. All the other zone threads must do
-+	 * nothing between the two barriers. They will wait at the end_update_barrier again for the
-+	 * captain to finish the update.
-+	 */
-+
-+	if (zone->id == ZONE_ZERO) {
-+		unsigned int z;
-+		struct search_list *list = cache->search_lists[ZONE_ZERO];
-+
-+		purge_search_list(list, cache, zone->oldest_virtual_chapter);
-+
-+		if (virtual_chapter >= index->oldest_virtual_chapter) {
-+			set_newest_entry(list, list->capacity - 1);
-+			result = cache_chapter_index(list->entries[0],
-+						     virtual_chapter,
-+						     index->volume);
-+		}
-+
-+		for (z = 1; z < cache->zone_count; z++)
-+			copy_search_list(list, cache->search_lists[z]);
-+	}
-+
-+	/*
-+	 * This is the end of the critical section. All cache invariants must have been restored.
-+	 */
-+	uds_enter_barrier(&cache->end_update_barrier);
-+	return result;
++	if (atomic_read(&queue->dormant) || unbatched)
++		wake_up_worker(queue);
 +}
 +
-+void uds_invalidate_sparse_cache(struct sparse_cache *cache)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < cache->capacity; i++)
-+		release_cached_chapter_index(&cache->chapters[i]);
-+}
-+
-+static inline bool should_skip_chapter(struct cached_chapter_index *chapter,
-+				       u64 oldest_chapter,
-+				       u64 requested_chapter)
-+{
-+	if ((chapter->virtual_chapter == NO_CHAPTER) ||
-+	    (chapter->virtual_chapter < oldest_chapter))
-+		return true;
-+
-+	if (requested_chapter != NO_CHAPTER)
-+		return requested_chapter != chapter->virtual_chapter;
-+	else
-+		return READ_ONCE(chapter->skip_search);
-+}
-+
-+static int __must_check
-+search_cached_chapter_index(struct cached_chapter_index *chapter,
-+			    const struct geometry *geometry,
-+			    const struct index_page_map *index_page_map,
-+			    const struct uds_record_name *name,
-+			    u16 *record_page_ptr)
-+{
-+	u32 physical_chapter = uds_map_to_physical_chapter(geometry, chapter->virtual_chapter);
-+	u32 index_page_number = uds_find_index_page_number(index_page_map, name, physical_chapter);
-+	struct delta_index_page *index_page = &chapter->index_pages[index_page_number];
-+
-+	return uds_search_chapter_index_page(index_page, geometry, name, record_page_ptr);
-+}
-+
-+int uds_search_sparse_cache(struct index_zone *zone,
-+			    const struct uds_record_name *name,
-+			    u64 *virtual_chapter_ptr,
-+			    u16 *record_page_ptr)
++void uds_request_queue_finish(struct uds_request_queue *queue)
 +{
 +	int result;
-+	struct volume *volume = zone->index->volume;
-+	struct sparse_cache *cache = volume->sparse_cache;
-+	struct cached_chapter_index *chapter;
-+	struct search_list *search_list;
-+	u8 i;
-+	/* Search the entire cache unless a specific chapter was requested. */
-+	bool search_one = (*virtual_chapter_ptr != NO_CHAPTER);
 +
-+	*record_page_ptr = NO_CHAPTER_INDEX_ENTRY;
-+	search_list = cache->search_lists[zone->id];
-+	for (i = 0; i < search_list->first_dead_entry; i++) {
-+		chapter = search_list->entries[i];
++	if (queue == NULL)
++		return;
 +
-+		if (should_skip_chapter(chapter,
-+					zone->oldest_virtual_chapter,
-+					*virtual_chapter_ptr))
-+			continue;
++	/*
++	 * This memory barrier ensures that any requests we queued will be seen. The point is that
++	 * when dequeue_request() sees the following update to the running flag, it will also be
++	 * able to see any change we made to a next field in the funnel queue entry. The
++	 * corresponding read barrier is in request_queue_worker().
++	 */
++	smp_wmb();
++	WRITE_ONCE(queue->running, false);
 +
-+		result = search_cached_chapter_index(chapter,
-+						     cache->geometry,
-+						     volume->index_page_map,
-+						     name,
-+						     record_page_ptr);
++	if (queue->started) {
++		wake_up_worker(queue);
++		result = uds_join_threads(queue->thread);
 +		if (result != UDS_SUCCESS)
-+			return result;
-+
-+		if (*record_page_ptr != NO_CHAPTER_INDEX_ENTRY) {
-+			/*
-+			 * In theory, this might be a false match while a true match exists in
-+			 * another chapter, but that's a very rare case and not worth the extra
-+			 * search complexity.
-+			 */
-+			set_newest_entry(search_list, i);
-+			if (zone->id == ZONE_ZERO)
-+				score_search_hit(chapter);
-+
-+			*virtual_chapter_ptr = chapter->virtual_chapter;
-+			return UDS_SUCCESS;
-+		}
-+
-+		if (zone->id == ZONE_ZERO)
-+			score_search_miss(cache, chapter);
-+
-+		if (search_one)
-+			break;
++			uds_log_warning_strerror(result, "Failed to join worker thread");
 +	}
 +
-+	return UDS_SUCCESS;
++	uds_free_funnel_queue(queue->main_queue);
++	uds_free_funnel_queue(queue->retry_queue);
++	UDS_FREE(queue);
 +}
-diff --git a/drivers/md/dm-vdo/sparse-cache.h b/drivers/md/dm-vdo/sparse-cache.h
+diff --git a/drivers/md/dm-vdo/request-queue.h b/drivers/md/dm-vdo/request-queue.h
 new file mode 100644
-index 000000000000..891175de762c
+index 000000000000..818cb14135fd
 --- /dev/null
-+++ b/drivers/md/dm-vdo/sparse-cache.h
-@@ -0,0 +1,49 @@
++++ b/drivers/md/dm-vdo/request-queue.h
+@@ -0,0 +1,30 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright 2023 Red Hat
 + */
 +
-+#ifndef UDS_SPARSE_CACHE_H
-+#define UDS_SPARSE_CACHE_H
++#ifndef UDS_REQUEST_QUEUE_H
++#define UDS_REQUEST_QUEUE_H
 +
-+#include "geometry.h"
 +#include "uds.h"
 +
 +/*
-+ * The sparse cache is a cache of entire chapter indexes from sparse chapters used for searching
-+ * for names after all other search paths have failed. It contains only complete chapter indexes;
-+ * record pages from sparse chapters and single index pages used for resolving hooks are kept in
-+ * the regular page cache in the volume.
-+ *
-+ * The most important property of this cache is the absence of synchronization for read operations.
-+ * Safe concurrent access to the cache by the zone threads is controlled by the triage queue and
-+ * the barrier requests it issues to the zone queues. The set of cached chapters does not and must
-+ * not change between the carefully coordinated calls to uds_update_sparse_cache() from the zone
-+ * threads. Outside of updates, every zone will get the same result when calling
-+ * uds_sparse_cache_contains() as every other zone.
++ * A simple request queue which will handle new requests in the order in which they are received,
++ * and will attempt to handle requeued requests before new ones. However, the nature of the
++ * implementation means that it cannot guarantee this ordering; the prioritization is merely a
++ * hint.
 + */
 +
-+struct index_zone;
-+struct sparse_cache;
++struct uds_request_queue;
 +
-+int __must_check uds_make_sparse_cache(const struct geometry *geometry,
-+				       unsigned int capacity,
-+				       unsigned int zone_count,
-+				       struct sparse_cache **cache_ptr);
++typedef void uds_request_queue_processor_t(struct uds_request *);
 +
-+void uds_free_sparse_cache(struct sparse_cache *cache);
++int __must_check uds_make_request_queue(const char *queue_name,
++					uds_request_queue_processor_t *processor,
++					struct uds_request_queue **queue_ptr);
 +
-+bool uds_sparse_cache_contains(struct sparse_cache *cache,
-+			       u64 virtual_chapter,
-+			       unsigned int zone_number);
++void uds_request_queue_enqueue(struct uds_request_queue *queue, struct uds_request *request);
 +
-+int __must_check uds_update_sparse_cache(struct index_zone *zone, u64 virtual_chapter);
++void uds_request_queue_finish(struct uds_request_queue *queue);
 +
-+void uds_invalidate_sparse_cache(struct sparse_cache *cache);
++#endif /* UDS_REQUEST_QUEUE_H */
+diff --git a/drivers/md/dm-vdo/work-queue.c b/drivers/md/dm-vdo/work-queue.c
+new file mode 100644
+index 000000000000..6adf07fc74e1
+--- /dev/null
++++ b/drivers/md/dm-vdo/work-queue.c
+@@ -0,0 +1,659 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright 2023 Red Hat
++ */
 +
-+int __must_check uds_search_sparse_cache(struct index_zone *zone,
-+					 const struct uds_record_name *name,
-+					 u64 *virtual_chapter_ptr,
-+					 u16 *record_page_ptr);
++#include "work-queue.h"
 +
-+#endif /* UDS_SPARSE_CACHE_H */
++#include <linux/atomic.h>
++#include <linux/cache.h>
++#include <linux/completion.h>
++#include <linux/err.h>
++#include <linux/kthread.h>
++#include <linux/percpu.h>
++
++#include "funnel-queue.h"
++#include "logger.h"
++#include "memory-alloc.h"
++#include "numeric.h"
++#include "permassert.h"
++#include "string-utils.h"
++
++#include "completion.h"
++#include "status-codes.h"
++
++static DEFINE_PER_CPU(unsigned int, service_queue_rotor);
++
++/**
++ * DOC: Work queue definition.
++ *
++ * There are two types of work queues: simple, with one worker thread, and round-robin, which uses
++ * a group of the former to do the work, and assigns work to them in round-robin fashion (roughly).
++ * Externally, both are represented via the same common sub-structure, though there's actually not
++ * a great deal of overlap between the two types internally.
++ */
++struct vdo_work_queue {
++	/* Name of just the work queue (e.g., "cpuQ12") */
++	char *name;
++	bool round_robin_mode;
++	struct vdo_thread *owner;
++	/* Life cycle functions, etc */
++	const struct vdo_work_queue_type *type;
++};
++
++struct simple_work_queue {
++	struct vdo_work_queue common;
++	struct funnel_queue *priority_lists[VDO_WORK_Q_MAX_PRIORITY + 1];
++	void *private;
++
++	/*
++	 * The fields above are unchanged after setup but often read, and are good candidates for
++	 * caching -- and if the max priority is 2, just fit in one x86-64 cache line if aligned.
++	 * The fields below are often modified as we sleep and wake, so we want a separate cache
++	 * line for performance.
++	 */
++
++	/* Any (0 or 1) worker threads waiting for new work to do */
++	wait_queue_head_t waiting_worker_threads ____cacheline_aligned;
++	/* Hack to reduce wakeup calls if the worker thread is running */
++	atomic_t idle;
++
++	/* These are infrequently used so in terms of performance we don't care where they land. */
++	struct task_struct *thread;
++	/* Notify creator once worker has initialized */
++	struct completion *started;
++};
++
++struct round_robin_work_queue {
++	struct vdo_work_queue common;
++	struct simple_work_queue **service_queues;
++	unsigned int num_service_queues;
++};
++
++static inline struct simple_work_queue *as_simple_work_queue(struct vdo_work_queue *queue)
++{
++	return ((queue == NULL) ? NULL : container_of(queue, struct simple_work_queue, common));
++}
++
++static inline struct round_robin_work_queue *
++as_round_robin_work_queue(struct vdo_work_queue *queue)
++{
++	return ((queue == NULL) ?
++		 NULL :
++		 container_of(queue, struct round_robin_work_queue, common));
++}
++
++/* Processing normal completions. */
++
++/*
++ * Dequeue and return the next waiting completion, if any.
++ *
++ * We scan the funnel queues from highest priority to lowest, once; there is therefore a race
++ * condition where a high-priority completion can be enqueued followed by a lower-priority one, and
++ * we'll grab the latter (but we'll catch the high-priority item on the next call). If strict
++ * enforcement of priorities becomes necessary, this function will need fixing.
++ */
++static struct vdo_completion *poll_for_completion(struct simple_work_queue *queue)
++{
++	int i;
++
++	for (i = queue->common.type->max_priority; i >= 0; i--) {
++		struct funnel_queue_entry *link = uds_funnel_queue_poll(queue->priority_lists[i]);
++
++		if (link != NULL)
++			return container_of(link, struct vdo_completion, work_queue_entry_link);
++	}
++
++	return NULL;
++}
++
++static void
++enqueue_work_queue_completion(struct simple_work_queue *queue, struct vdo_completion *completion)
++{
++	ASSERT_LOG_ONLY(completion->my_queue == NULL,
++			"completion %px (fn %px) to enqueue (%px) is not already queued (%px)",
++			completion,
++			completion->callback,
++			queue,
++			completion->my_queue);
++	if (completion->priority == VDO_WORK_Q_DEFAULT_PRIORITY)
++		completion->priority = queue->common.type->default_priority;
++
++	if (ASSERT(completion->priority <= queue->common.type->max_priority,
++		   "priority is in range for queue") != VDO_SUCCESS)
++		completion->priority = 0;
++
++	completion->my_queue = &queue->common;
++
++	/* Funnel queue handles the synchronization for the put. */
++	uds_funnel_queue_put(queue->priority_lists[completion->priority],
++			     &completion->work_queue_entry_link);
++
++	/*
++	 * Due to how funnel queue synchronization is handled (just atomic operations), the
++	 * simplest safe implementation here would be to wake-up any waiting threads after
++	 * enqueueing each item. Even if the funnel queue is not empty at the time of adding an
++	 * item to the queue, the consumer thread may not see this since it is not guaranteed to
++	 * have the same view of the queue as a producer thread.
++	 *
++	 * However, the above is wasteful so instead we attempt to minimize the number of thread
++	 * wakeups. Using an idle flag, and careful ordering using memory barriers, we should be
++	 * able to determine when the worker thread might be asleep or going to sleep. We use
++	 * cmpxchg to try to take ownership (vs other producer threads) of the responsibility for
++	 * waking the worker thread, so multiple wakeups aren't tried at once.
++	 *
++	 * This was tuned for some x86 boxes that were handy; it's untested whether doing the read
++	 * first is any better or worse for other platforms, even other x86 configurations.
++	 */
++	smp_mb();
++	if ((atomic_read(&queue->idle) != 1) || (atomic_cmpxchg(&queue->idle, 1, 0) != 1))
++		return;
++
++	/* There's a maximum of one thread in this list. */
++	wake_up(&queue->waiting_worker_threads);
++}
++
++static void run_start_hook(struct simple_work_queue *queue)
++{
++	if (queue->common.type->start != NULL)
++		queue->common.type->start(queue->private);
++}
++
++static void run_finish_hook(struct simple_work_queue *queue)
++{
++	if (queue->common.type->finish != NULL)
++		queue->common.type->finish(queue->private);
++}
++
++/*
++ * Wait for the next completion to process, or until kthread_should_stop indicates that it's time
++ * for us to shut down.
++ *
++ * If kthread_should_stop says it's time to stop but we have pending completions return a
++ * completion.
++ *
++ * Also update statistics relating to scheduler interactions.
++ */
++static struct vdo_completion *wait_for_next_completion(struct simple_work_queue *queue)
++{
++	struct vdo_completion *completion;
++	DEFINE_WAIT(wait);
++
++	while (true) {
++		prepare_to_wait(&queue->waiting_worker_threads, &wait, TASK_INTERRUPTIBLE);
++		/*
++		 * Don't set the idle flag until a wakeup will not be lost.
++		 *
++		 * Force synchronization between setting the idle flag and checking the funnel
++		 * queue; the producer side will do them in the reverse order. (There's still a
++		 * race condition we've chosen to allow, because we've got a timeout below that
++		 * unwedges us if we hit it, but this may narrow the window a little.)
++		 */
++		atomic_set(&queue->idle, 1);
++		smp_mb(); /* store-load barrier between "idle" and funnel queue */
++
++		completion = poll_for_completion(queue);
++		if (completion != NULL)
++			break;
++
++		/*
++		 * We need to check for thread-stop after setting TASK_INTERRUPTIBLE state up
++		 * above. Otherwise, schedule() will put the thread to sleep and might miss a
++		 * wakeup from kthread_stop() call in vdo_finish_work_queue().
++		 */
++		if (kthread_should_stop())
++			break;
++
++		schedule();
++
++		/*
++		 * Most of the time when we wake, it should be because there's work to do. If it
++		 * was a spurious wakeup, continue looping.
++		 */
++		completion = poll_for_completion(queue);
++		if (completion != NULL)
++			break;
++	}
++
++	finish_wait(&queue->waiting_worker_threads, &wait);
++	atomic_set(&queue->idle, 0);
++
++	return completion;
++}
++
++static void process_completion(struct simple_work_queue *queue, struct vdo_completion *completion)
++{
++	if (ASSERT(completion->my_queue == &queue->common,
++		   "completion %px from queue %px marked as being in this queue (%px)",
++		   completion,
++		   queue,
++		   completion->my_queue) == UDS_SUCCESS)
++		completion->my_queue = NULL;
++
++	vdo_run_completion(completion);
++}
++
++static void service_work_queue(struct simple_work_queue *queue)
++{
++	run_start_hook(queue);
++
++	while (true) {
++		struct vdo_completion *completion = poll_for_completion(queue);
++
++		if (completion == NULL)
++			completion = wait_for_next_completion(queue);
++
++		if (completion == NULL)
++			/* No completions but kthread_should_stop() was triggered. */
++			break;
++
++		process_completion(queue, completion);
++
++		/*
++		 * Be friendly to a CPU that has other work to do, if the kernel has told us to.
++		 * This speeds up some performance tests; that "other work" might include other VDO
++		 * threads.
++		 */
++		if (need_resched())
++			cond_resched();
++	}
++
++	run_finish_hook(queue);
++}
++
++static int work_queue_runner(void *ptr)
++{
++	struct simple_work_queue *queue = ptr;
++
++	complete(queue->started);
++	service_work_queue(queue);
++	return 0;
++}
++
++/* Creation & teardown */
++
++static void free_simple_work_queue(struct simple_work_queue *queue)
++{
++	unsigned int i;
++
++	for (i = 0; i <= VDO_WORK_Q_MAX_PRIORITY; i++)
++		uds_free_funnel_queue(queue->priority_lists[i]);
++	UDS_FREE(queue->common.name);
++	UDS_FREE(queue);
++}
++
++static void free_round_robin_work_queue(struct round_robin_work_queue *queue)
++{
++	struct simple_work_queue **queue_table = queue->service_queues;
++	unsigned int count = queue->num_service_queues;
++	unsigned int i;
++
++	queue->service_queues = NULL;
++
++	for (i = 0; i < count; i++)
++		free_simple_work_queue(queue_table[i]);
++	UDS_FREE(queue_table);
++	UDS_FREE(queue->common.name);
++	UDS_FREE(queue);
++}
++
++void vdo_free_work_queue(struct vdo_work_queue *queue)
++{
++	if (queue == NULL)
++		return;
++
++	vdo_finish_work_queue(queue);
++
++	if (queue->round_robin_mode)
++		free_round_robin_work_queue(as_round_robin_work_queue(queue));
++	else
++		free_simple_work_queue(as_simple_work_queue(queue));
++}
++
++static int make_simple_work_queue(const char *thread_name_prefix,
++				  const char *name,
++				  struct vdo_thread *owner,
++				  void *private,
++				  const struct vdo_work_queue_type *type,
++				  struct simple_work_queue **queue_ptr)
++{
++	DECLARE_COMPLETION_ONSTACK(started);
++	struct simple_work_queue *queue;
++	int i;
++	struct task_struct *thread = NULL;
++	int result;
++
++	ASSERT_LOG_ONLY((type->max_priority <= VDO_WORK_Q_MAX_PRIORITY),
++			"queue priority count %u within limit %u",
++			type->max_priority,
++			VDO_WORK_Q_MAX_PRIORITY);
++
++	result = UDS_ALLOCATE(1, struct simple_work_queue, "simple work queue", &queue);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	queue->private = private;
++	queue->started = &started;
++	queue->common.type = type;
++	queue->common.owner = owner;
++	init_waitqueue_head(&queue->waiting_worker_threads);
++
++	result = uds_duplicate_string(name, "queue name", &queue->common.name);
++	if (result != VDO_SUCCESS) {
++		UDS_FREE(queue);
++		return -ENOMEM;
++	}
++
++	for (i = 0; i <= type->max_priority; i++) {
++		result = uds_make_funnel_queue(&queue->priority_lists[i]);
++		if (result != UDS_SUCCESS) {
++			free_simple_work_queue(queue);
++			return result;
++		}
++	}
++
++	thread = kthread_run(work_queue_runner,
++			     queue,
++			     "%s:%s",
++			     thread_name_prefix,
++			     queue->common.name);
++	if (IS_ERR(thread)) {
++		free_simple_work_queue(queue);
++		return (int) PTR_ERR(thread);
++	}
++
++	queue->thread = thread;
++
++	/*
++	 * If we don't wait to ensure the thread is running VDO code, a quick kthread_stop (due to
++	 * errors elsewhere) could cause it to never get as far as running VDO, skipping the
++	 * cleanup code.
++	 *
++	 * Eventually we should just make that path safe too, and then we won't need this
++	 * synchronization.
++	 */
++	wait_for_completion(&started);
++
++	*queue_ptr = queue;
++	return UDS_SUCCESS;
++}
++
++/**
++ * vdo_make_work_queue() - Create a work queue; if multiple threads are requested, completions will
++ *                         be distributed to them in round-robin fashion.
++ *
++ * Each queue is associated with a struct vdo_thread which has a single vdo thread id. Regardless
++ * of the actual number of queues and threads allocated here, code outside of the queue
++ * implementation will treat this as a single zone.
++ */
++int vdo_make_work_queue(const char *thread_name_prefix,
++			const char *name,
++			struct vdo_thread *owner,
++			const struct vdo_work_queue_type *type,
++			unsigned int thread_count,
++			void *thread_privates[],
++			struct vdo_work_queue **queue_ptr)
++{
++	struct round_robin_work_queue *queue;
++	int result;
++	char thread_name[TASK_COMM_LEN];
++	unsigned int i;
++
++	if (thread_count == 1) {
++		struct simple_work_queue *simple_queue;
++		void *context = ((thread_privates != NULL) ? thread_privates[0] : NULL);
++
++		result = make_simple_work_queue(thread_name_prefix,
++						name,
++						owner,
++						context,
++						type,
++						&simple_queue);
++		if (result == VDO_SUCCESS)
++			*queue_ptr = &simple_queue->common;
++		return result;
++	}
++
++	result = UDS_ALLOCATE(1, struct round_robin_work_queue, "round-robin work queue", &queue);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(thread_count,
++			      struct simple_work_queue *,
++			      "subordinate work queues",
++			      &queue->service_queues);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(queue);
++		return result;
++	}
++
++	queue->num_service_queues = thread_count;
++	queue->common.round_robin_mode = true;
++	queue->common.owner = owner;
++
++	result = uds_duplicate_string(name, "queue name", &queue->common.name);
++	if (result != VDO_SUCCESS) {
++		UDS_FREE(queue->service_queues);
++		UDS_FREE(queue);
++		return -ENOMEM;
++	}
++
++	*queue_ptr = &queue->common;
++
++	for (i = 0; i < thread_count; i++) {
++		void *context = ((thread_privates != NULL) ? thread_privates[i] : NULL);
++
++		snprintf(thread_name, sizeof(thread_name), "%s%u", name, i);
++		result = make_simple_work_queue(thread_name_prefix,
++						thread_name,
++						owner,
++						context,
++						type,
++						&queue->service_queues[i]);
++		if (result != VDO_SUCCESS) {
++			queue->num_service_queues = i;
++			/* Destroy previously created subordinates. */
++			vdo_free_work_queue(UDS_FORGET(*queue_ptr));
++			return result;
++		}
++	}
++
++	return VDO_SUCCESS;
++}
++
++static void finish_simple_work_queue(struct simple_work_queue *queue)
++{
++	if (queue->thread == NULL)
++		return;
++
++	/* Tells the worker thread to shut down and waits for it to exit. */
++	kthread_stop(queue->thread);
++	queue->thread = NULL;
++}
++
++static void finish_round_robin_work_queue(struct round_robin_work_queue *queue)
++{
++	struct simple_work_queue **queue_table = queue->service_queues;
++	unsigned int count = queue->num_service_queues;
++	unsigned int i;
++
++	for (i = 0; i < count; i++)
++		finish_simple_work_queue(queue_table[i]);
++}
++
++/* No enqueueing of completions should be done once this function is called. */
++void vdo_finish_work_queue(struct vdo_work_queue *queue)
++{
++	if (queue == NULL)
++		return;
++
++	if (queue->round_robin_mode)
++		finish_round_robin_work_queue(as_round_robin_work_queue(queue));
++	else
++		finish_simple_work_queue(as_simple_work_queue(queue));
++}
++
++/* Debugging dumps */
++
++static void dump_simple_work_queue(struct simple_work_queue *queue)
++{
++	const char *thread_status = "no threads";
++	char task_state_report = '-';
++
++	if (queue->thread != NULL) {
++		task_state_report = task_state_to_char(queue->thread);
++		thread_status = atomic_read(&queue->idle) ? "idle" : "running";
++	}
++
++	uds_log_info("workQ %px (%s) %s (%c)",
++		     &queue->common,
++		     queue->common.name,
++		     thread_status,
++		     task_state_report);
++
++	/* ->waiting_worker_threads wait queue status? anyone waiting? */
++}
++
++/*
++ * Write to the buffer some info about the completion, for logging. Since the common use case is
++ * dumping info about a lot of completions to syslog all at once, the format favors brevity over
++ * readability.
++ */
++void vdo_dump_work_queue(struct vdo_work_queue *queue)
++{
++	if (queue->round_robin_mode) {
++		struct round_robin_work_queue *round_robin = as_round_robin_work_queue(queue);
++		unsigned int i;
++
++		for (i = 0; i < round_robin->num_service_queues; i++)
++			dump_simple_work_queue(round_robin->service_queues[i]);
++	} else {
++		dump_simple_work_queue(as_simple_work_queue(queue));
++	}
++}
++
++static void get_function_name(void *pointer, char *buffer, size_t buffer_length)
++{
++	if (pointer == NULL) {
++		/*
++		 * Format "%ps" logs a null pointer as "(null)" with a bunch of leading spaces. We
++		 * sometimes use this when logging lots of data; don't be so verbose.
++		 */
++		strscpy(buffer, "-", buffer_length);
++	} else {
++		/*
++		 * Use a pragma to defeat gcc's format checking, which doesn't understand that
++		 * "%ps" actually does support a precision spec in Linux kernel code.
++		 */
++		char *space;
++
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat"
++		snprintf(buffer, buffer_length, "%.*ps", buffer_length - 1, pointer);
++#pragma GCC diagnostic pop
++
++		space = strchr(buffer, ' ');
++		if (space != NULL)
++			*space = '\0';
++	}
++}
++
++void vdo_dump_completion_to_buffer(struct vdo_completion *completion, char *buffer, size_t length)
++{
++	size_t current_length =
++		scnprintf(buffer,
++			  length,
++			  "%.*s/",
++			  TASK_COMM_LEN,
++			  (completion->my_queue == NULL ? "-" : completion->my_queue->name));
++
++	if (current_length < length - 1)
++		get_function_name((void *) completion->callback,
++				  buffer + current_length,
++				  length - current_length);
++}
++
++/* Completion submission */
++/*
++ * If the completion has a timeout that has already passed, the timeout handler function may be
++ * invoked by this function.
++ */
++void vdo_enqueue_work_queue(struct vdo_work_queue *queue, struct vdo_completion *completion)
++{
++	/*
++	 * Convert the provided generic vdo_work_queue to the simple_work_queue to actually queue
++	 * on.
++	 */
++	struct simple_work_queue *simple_queue = NULL;
++
++	if (!queue->round_robin_mode) {
++		simple_queue = as_simple_work_queue(queue);
++	} else {
++		struct round_robin_work_queue *round_robin = as_round_robin_work_queue(queue);
++
++		/*
++		 * It shouldn't be a big deal if the same rotor gets used for multiple work queues.
++		 * Any patterns that might develop are likely to be disrupted by random ordering of
++		 * multiple completions and migration between cores, unless the load is so light as
++		 * to be regular in ordering of tasks and the threads are confined to individual
++		 * cores; with a load that light we won't care.
++		 */
++		unsigned int rotor = this_cpu_inc_return(service_queue_rotor);
++		unsigned int index = rotor % round_robin->num_service_queues;
++
++		simple_queue = round_robin->service_queues[index];
++	}
++
++	enqueue_work_queue_completion(simple_queue, completion);
++}
++
++/* Misc */
++
++/*
++ * Return the work queue pointer recorded at initialization time in the work-queue stack handle
++ * initialized on the stack of the current thread, if any.
++ */
++static struct simple_work_queue *get_current_thread_work_queue(void)
++{
++	/*
++	 * In interrupt context, if a vdo thread is what got interrupted, the calls below will find
++	 * the queue for the thread which was interrupted. However, the interrupted thread may have
++	 * been processing a completion, in which case starting to process another would violate
++	 * our concurrency assumptions.
++	 */
++	if (in_interrupt())
++		return NULL;
++	if (kthread_func(current) != work_queue_runner)
++		/* Not a VDO work queue thread. */
++		return NULL;
++	return kthread_data(current);
++}
++
++struct vdo_work_queue *vdo_get_current_work_queue(void)
++{
++	struct simple_work_queue *queue = get_current_thread_work_queue();
++
++	return (queue == NULL) ? NULL : &queue->common;
++}
++
++struct vdo_thread *vdo_get_work_queue_owner(struct vdo_work_queue *queue)
++{
++	return queue->owner;
++}
++
++/**
++ * vdo_get_work_queue_private_data() - Returns the private data for the current thread's work
++ *                                     queue, or NULL if none or if the current thread is not a
++ *                                     work queue thread.
++ */
++void *vdo_get_work_queue_private_data(void)
++{
++	struct simple_work_queue *queue = get_current_thread_work_queue();
++
++	return (queue != NULL) ? queue->private : NULL;
++}
++
++bool vdo_work_queue_type_is(struct vdo_work_queue *queue, const struct vdo_work_queue_type *type)
++{
++	return (queue->type == type);
++}
+diff --git a/drivers/md/dm-vdo/work-queue.h b/drivers/md/dm-vdo/work-queue.h
+new file mode 100644
+index 000000000000..1d5aa9878b16
+--- /dev/null
++++ b/drivers/md/dm-vdo/work-queue.h
+@@ -0,0 +1,53 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright 2023 Red Hat
++ */
++
++#ifndef VDO_WORK_QUEUE_H
++#define VDO_WORK_QUEUE_H
++
++#include <linux/sched.h> /* for TASK_COMM_LEN */
++
++#include "types.h"
++
++enum {
++	MAX_VDO_WORK_QUEUE_NAME_LEN = TASK_COMM_LEN,
++};
++
++struct vdo_work_queue_type {
++	void (*start)(void *context);
++	void (*finish)(void *context);
++	enum vdo_completion_priority max_priority;
++	enum vdo_completion_priority default_priority;
++};
++
++struct vdo_completion;
++struct vdo_thread;
++struct vdo_work_queue;
++
++int vdo_make_work_queue(const char *thread_name_prefix,
++			const char *name,
++			struct vdo_thread *owner,
++			const struct vdo_work_queue_type *type,
++			unsigned int thread_count,
++			void *thread_privates[],
++			struct vdo_work_queue **queue_ptr);
++
++void vdo_enqueue_work_queue(struct vdo_work_queue *queue, struct vdo_completion *completion);
++
++void vdo_finish_work_queue(struct vdo_work_queue *queue);
++
++void vdo_free_work_queue(struct vdo_work_queue *queue);
++
++void vdo_dump_work_queue(struct vdo_work_queue *queue);
++
++void vdo_dump_completion_to_buffer(struct vdo_completion *completion, char *buffer, size_t length);
++
++void *vdo_get_work_queue_private_data(void);
++struct vdo_work_queue *vdo_get_current_work_queue(void);
++struct vdo_thread *vdo_get_work_queue_owner(struct vdo_work_queue *queue);
++
++bool __must_check
++vdo_work_queue_type_is(struct vdo_work_queue *queue, const struct vdo_work_queue_type *type);
++
++#endif /* VDO_WORK_QUEUE_H */
 -- 
 2.40.0
 
