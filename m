@@ -2,18 +2,18 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9781EC25B48
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FB5C25B6E
 	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:44:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234917AbjJZVoZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S234963AbjJZVoZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 26 Oct 2023 17:44:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52830 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234958AbjJZVoP (ORCPT
+        with ESMTP id S235021AbjJZVoP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 26 Oct 2023 17:44:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C9DD56
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D15E9D55
         for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1698356505;
@@ -21,43 +21,52 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=68nlWM8XoFhIwjUDUKH9YTjj7LNflBOSRKo06es11gQ=;
-        b=AxASDbykwhYqD6LkNM8ooCE9WJK0yWFbNVKZMosnQrAFbDumIZCxpc4qb57qnM/rL+TBSV
-        FT4w9RsIrzqQQCvXy4bQzlXYUdk7S8MxGwwXQHk0MCOjejjnUkEa9H0Aoct85DywpULslX
-        4RA16OoTfxdAYYW4ZHF5xMhdnNlJRJk=
+        bh=FLdkNZeDzBDZw0g7S19QfUjJntZEmFaL/AX3V9UwJCc=;
+        b=bm9QMHhUF8ylqrKVJHMGgQaDBkzHLKZE6MPi9BGE0bZK0msDASAyRJ2Ns8J8GOA92wJQ6a
+        hMLo9PZbNhXb+wg0i1wwGf+COHu42LoBXo5mom05ir8/i84xO7ctwBhHBXzSN8ZoK/b5U/
+        sZ3wxrpBPXH5soOL2CgEkH1m5Sl+UT8=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-121-rBlQp-1NOoOG97wiAfuZDg-1; Thu,
- 26 Oct 2023 17:41:41 -0400
-X-MC-Unique: rBlQp-1NOoOG97wiAfuZDg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-634-Y1-fw5DLPLa5XLFmMF7Bxw-1; Thu,
+ 26 Oct 2023 17:41:42 -0400
+X-MC-Unique: Y1-fw5DLPLa5XLFmMF7Bxw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B09561C04B50;
-        Thu, 26 Oct 2023 21:41:40 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AF09638143BF;
+        Thu, 26 Oct 2023 21:41:41 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A17812949;
-        Thu, 26 Oct 2023 21:41:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9AE9E40C6F79;
+        Thu, 26 Oct 2023 21:41:41 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id 615F03003B; Thu, 26 Oct 2023 17:41:40 -0400 (EDT)
+        id 517613003D; Thu, 26 Oct 2023 17:41:41 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 21/39] dm vdo: add the vdo io_submitter
-Date:   Thu, 26 Oct 2023 17:41:18 -0400
-Message-Id: <20231026214136.1067410-22-msakai@redhat.com>
+Subject: [PATCH v4 26/39] dm vdo: add the slab summary
+Date:   Thu, 26 Oct 2023 17:41:23 -0400
+Message-Id: <20231026214136.1067410-27-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The io_submitter handles bio submission from vdo data store to the storage
-below. It will merge bios when possible.
+The slab depot maintains an additional small data structure, the "slab
+summary," which is used to reduce the amount of work needed to come back
+online after a crash. The slab summary maintains an entry for each slab
+indicating whether or not the slab has ever been used, whether it is clean
+(i.e. all of its reference count updates have been persisted to storage),
+and approximately how full it is. During recovery, each physical zone will
+attempt to recover at least one slab, stopping whenever it has recovered a
+slab which has some free blocks. Once each zone has some space (or has
+determined that none is available), the target can resume normal operation
+in a degraded mode. Read and write requests can be serviced, perhaps with
+degraded performance, while the remainder of the dirty slabs are recovered.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
@@ -65,565 +74,445 @@ Co-developed-by: Michael Sclafani <vdo-devel@redhat.com>
 Signed-off-by: Michael Sclafani <vdo-devel@redhat.com>
 Co-developed-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-Co-developed-by: Bruce Johnston <bjohnsto@redhat.com>
-Signed-off-by: Bruce Johnston <bjohnsto@redhat.com>
-Co-developed-by: Ken Raeburn <raeburn@redhat.com>
-Signed-off-by: Ken Raeburn <raeburn@redhat.com>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/io-submitter.c | 483 +++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/io-submitter.h |  52 ++++
- 2 files changed, 535 insertions(+)
- create mode 100644 drivers/md/dm-vdo/io-submitter.c
- create mode 100644 drivers/md/dm-vdo/io-submitter.h
+ drivers/md/dm-vdo/slab-depot.c | 326 +++++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/slab-depot.h |  74 ++++++++
+ 2 files changed, 400 insertions(+)
 
-diff --git a/drivers/md/dm-vdo/io-submitter.c b/drivers/md/dm-vdo/io-submitter.c
-new file mode 100644
-index 000000000000..995c8c7c908d
---- /dev/null
-+++ b/drivers/md/dm-vdo/io-submitter.c
-@@ -0,0 +1,483 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#include "io-submitter.h"
-+
-+#include <linux/bio.h>
-+#include <linux/kernel.h>
-+#include <linux/mutex.h>
-+
-+#include "memory-alloc.h"
-+#include "permassert.h"
-+
-+#include "data-vio.h"
-+#include "logger.h"
-+#include "types.h"
-+#include "vdo.h"
-+#include "vio.h"
-+
-+/*
-+ * Submission of bio operations to the underlying storage device will go through a separate work
-+ * queue thread (or more than one) to prevent blocking in other threads if the storage device has a
-+ * full queue. The plug structure allows that thread to do better batching of requests to make the
-+ * I/O more efficient.
-+ *
-+ * When multiple worker threads are used, a thread is chosen for a I/O operation submission based
-+ * on the PBN, so a given PBN will consistently wind up on the same thread. Flush operations are
-+ * assigned round-robin.
-+ *
-+ * The map (protected by the mutex) collects pending I/O operations so that the worker thread can
-+ * reorder them to try to encourage I/O request merging in the request queue underneath.
-+ */
-+struct bio_queue_data {
-+	struct vdo_work_queue *queue;
-+	struct blk_plug plug;
-+	struct int_map *map;
-+	struct mutex lock;
-+	unsigned int queue_number;
-+};
-+
-+struct io_submitter {
-+	unsigned int num_bio_queues_used;
-+	unsigned int bio_queue_rotation_interval;
-+	struct bio_queue_data bio_queue_data[];
-+};
-+
-+static void start_bio_queue(void *ptr)
-+{
-+	struct bio_queue_data *bio_queue_data = (struct bio_queue_data *) ptr;
-+
-+	blk_start_plug(&bio_queue_data->plug);
-+}
-+
-+static void finish_bio_queue(void *ptr)
-+{
-+	struct bio_queue_data *bio_queue_data = (struct bio_queue_data *) ptr;
-+
-+	blk_finish_plug(&bio_queue_data->plug);
-+}
-+
-+static const struct vdo_work_queue_type bio_queue_type = {
-+	.start = start_bio_queue,
-+	.finish = finish_bio_queue,
-+	.max_priority = BIO_Q_MAX_PRIORITY,
-+	.default_priority = BIO_Q_DATA_PRIORITY,
-+};
+diff --git a/drivers/md/dm-vdo/slab-depot.c b/drivers/md/dm-vdo/slab-depot.c
+index 48adf297a394..e2270319513a 100644
+--- a/drivers/md/dm-vdo/slab-depot.c
++++ b/drivers/md/dm-vdo/slab-depot.c
+@@ -190,6 +190,201 @@ static void check_if_slab_drained(struct vdo_slab *slab)
+ 	vdo_finish_draining_with_result(&slab->state, (read_only ? VDO_READ_ONLY : VDO_SUCCESS));
+ }
+ 
++/* FULLNESS HINT COMPUTATION */
 +
 +/**
-+ * count_all_bios() - Determine which bio counter to use.
-+ * @vio: The vio associated with the bio.
-+ * @bio: The bio to count.
++ * compute_fullness_hint() - Translate a slab's free block count into a 'fullness hint' that can be
++ *                           stored in a slab_summary_entry's 7 bits that are dedicated to its free
++ *                           count.
++ * @depot: The depot whose summary being updated.
++ * @free_blocks: The number of free blocks.
++ *
++ * Note: the number of free blocks must be strictly less than 2^23 blocks, even though
++ * theoretically slabs could contain precisely 2^23 blocks; there is an assumption that at least
++ * one block is used by metadata. This assumption is necessary; otherwise, the fullness hint might
++ * overflow. The fullness hint formula is roughly (fullness >> 16) & 0x7f, but (2^23 >> 16) & 0x7f
++ * is 0, which would make it impossible to distinguish completely full from completely empty.
++ *
++ * Return: A fullness hint, which can be stored in 7 bits.
 + */
-+static void count_all_bios(struct vio *vio, struct bio *bio)
++static u8 __must_check compute_fullness_hint(struct slab_depot *depot, block_count_t free_blocks)
 +{
-+	struct atomic_statistics *stats = &vio->completion.vdo->stats;
++	block_count_t hint;
 +
-+	if (is_data_vio(vio)) {
-+		vdo_count_bios(&stats->bios_out, bio);
++	ASSERT_LOG_ONLY((free_blocks < (1 << 23)), "free blocks must be less than 2^23");
++
++	if (free_blocks == 0)
++		return 0;
++
++	hint = free_blocks >> depot->hint_shift;
++	return ((hint == 0) ? 1 : hint);
++}
++
++/**
++ * check_summary_drain_complete() - Check whether an allocators summary has finished draining.
++ */
++static void check_summary_drain_complete(struct block_allocator *allocator)
++{
++	struct vdo *vdo = allocator->depot->vdo;
++
++	if (!vdo_is_state_draining(&allocator->summary_state) ||
++	    (allocator->summary_write_count > 0))
++		return;
++
++	vdo_finish_operation(&allocator->summary_state,
++			     (vdo_is_read_only(vdo) ? VDO_READ_ONLY : VDO_SUCCESS));
++}
++
++/**
++ * notify_summary_waiters() - Wake all the waiters in a given queue.
++ * @allocator: The block allocator summary which owns the queue.
++ * @queue: The queue to notify.
++ */
++static void notify_summary_waiters(struct block_allocator *allocator, struct wait_queue *queue)
++{
++	int result = (vdo_is_read_only(allocator->depot->vdo) ? VDO_READ_ONLY : VDO_SUCCESS);
++
++	vdo_notify_all_waiters(queue, NULL, &result);
++}
++
++static void launch_write(struct slab_summary_block *summary_block);
++
++/**
++ * finish_updating_slab_summary_block() - Finish processing a block which attempted to write,
++ *                                        whether or not the attempt succeeded.
++ * @block: The block.
++ */
++static void finish_updating_slab_summary_block(struct slab_summary_block *block)
++{
++	notify_summary_waiters(block->allocator, &block->current_update_waiters);
++	block->writing = false;
++	block->allocator->summary_write_count--;
++	if (vdo_has_waiters(&block->next_update_waiters))
++		launch_write(block);
++	else
++		check_summary_drain_complete(block->allocator);
++}
++
++/**
++ * finish_update() - This is the callback for a successful summary block write.
++ * @completion: The write vio.
++ */
++static void finish_update(struct vdo_completion *completion)
++{
++	struct slab_summary_block *block =
++		container_of(as_vio(completion), struct slab_summary_block, vio);
++
++	atomic64_inc(&block->allocator->depot->summary_statistics.blocks_written);
++	finish_updating_slab_summary_block(block);
++}
++
++/**
++ * handle_write_error() - Handle an error writing a slab summary block.
++ * @completion: The write VIO.
++ */
++static void handle_write_error(struct vdo_completion *completion)
++{
++	struct slab_summary_block *block =
++		container_of(as_vio(completion), struct slab_summary_block, vio);
++
++	vio_record_metadata_io_error(as_vio(completion));
++	vdo_enter_read_only_mode(completion->vdo, completion->result);
++	finish_updating_slab_summary_block(block);
++}
++
++static void write_slab_summary_endio(struct bio *bio)
++{
++	struct vio *vio = bio->bi_private;
++	struct slab_summary_block *block = container_of(vio, struct slab_summary_block, vio);
++
++	continue_vio_after_io(vio, finish_update, block->allocator->thread_id);
++}
++
++/**
++ * launch_write() - Write a slab summary block unless it is currently out for writing.
++ * @block: The block that needs to be committed.
++ */
++static void launch_write(struct slab_summary_block *block)
++{
++	struct block_allocator *allocator = block->allocator;
++	struct slab_depot *depot = allocator->depot;
++	physical_block_number_t pbn;
++
++	if (block->writing)
++		return;
++
++	allocator->summary_write_count++;
++	vdo_transfer_all_waiters(&block->next_update_waiters, &block->current_update_waiters);
++	block->writing = true;
++
++	if (vdo_is_read_only(depot->vdo)) {
++		finish_updating_slab_summary_block(block);
 +		return;
 +	}
 +
-+	vdo_count_bios(&stats->bios_meta, bio);
-+	if (vio->type == VIO_TYPE_RECOVERY_JOURNAL)
-+		vdo_count_bios(&stats->bios_journal, bio);
-+	else if (vio->type == VIO_TYPE_BLOCK_MAP)
-+		vdo_count_bios(&stats->bios_page_cache, bio);
++	memcpy(block->outgoing_entries, block->entries, VDO_BLOCK_SIZE);
++
++	/*
++	 * Flush before writing to ensure that the slab journal tail blocks and reference updates
++	 * covered by this summary update are stable (VDO-2332).
++	 */
++	pbn = (depot->summary_origin +
++	       (VDO_SLAB_SUMMARY_BLOCKS_PER_ZONE * allocator->zone_number) +
++	       block->index);
++	submit_metadata_vio(&block->vio,
++			    pbn,
++			    write_slab_summary_endio,
++			    handle_write_error,
++			    REQ_OP_WRITE | REQ_PREFLUSH);
 +}
 +
 +/**
-+ * assert_in_bio_zone() - Assert that a vio is in the correct bio zone and not in interrupt
-+ *                        context.
-+ * @vio: The vio to check.
++ * update_slab_summary_entry() - Update the entry for a slab.
++ * @slab: The slab whose entry is to be updated
++ * @waiter: The waiter that is updating the summary.
++ * @tail_block_offset: The offset of the slab journal's tail block.
++ * @load_ref_counts: Whether the reference counts must be loaded from disk on the vdo load.
++ * @is_clean: Whether the slab is clean.
++ * @free_blocks: The number of free blocks.
 + */
-+static void assert_in_bio_zone(struct vio *vio)
++static void
++update_slab_summary_entry(struct vdo_slab *slab,
++			  struct waiter *waiter,
++			  tail_block_offset_t tail_block_offset,
++			  bool load_ref_counts,
++			  bool is_clean,
++			  block_count_t free_blocks)
 +{
-+	ASSERT_LOG_ONLY(!in_interrupt(), "not in interrupt context");
-+	assert_vio_in_bio_zone(vio);
++	u8 index = slab->slab_number / VDO_SLAB_SUMMARY_ENTRIES_PER_BLOCK;
++	struct block_allocator *allocator = slab->allocator;
++	struct slab_summary_block *block = &allocator->summary_blocks[index];
++	int result;
++	struct slab_summary_entry *entry;
++
++	if (vdo_is_read_only(block->vio.completion.vdo)) {
++		result = VDO_READ_ONLY;
++		waiter->callback(waiter, &result);
++		return;
++	}
++
++	if (vdo_is_state_draining(&allocator->summary_state) ||
++	    vdo_is_state_quiescent(&allocator->summary_state)) {
++		result = VDO_INVALID_ADMIN_STATE;
++		waiter->callback(waiter, &result);
++		return;
++	}
++
++	entry = &allocator->summary_entries[slab->slab_number];
++	*entry = (struct slab_summary_entry) {
++		.tail_block_offset = tail_block_offset,
++		.load_ref_counts = (entry->load_ref_counts || load_ref_counts),
++		.is_dirty = !is_clean,
++		.fullness_hint = compute_fullness_hint(allocator->depot, free_blocks),
++	};
++	vdo_enqueue_waiter(&block->next_update_waiters, waiter);
++	launch_write(block);
 +}
 +
+ /**
+  * finish_reaping() - Actually advance the head of the journal now that any necessary flushes are
+  *                    complete.
+@@ -2458,3 +2653,134 @@ make_slab(physical_block_number_t slab_origin,
+ 	*slab_ptr = slab;
+ 	return VDO_SUCCESS;
+ }
++
 +/**
-+ * send_bio_to_device() - Update stats and tracing info, then submit the supplied bio to the OS for
-+ *                        processing.
-+ * @vio: The vio associated with the bio.
-+ * @bio: The bio to submit to the OS.
++ * finish_combining_zones() - Clean up after saving out the combined slab summary.
++ * @completion: The vio which was used to write the summary data.
 + */
-+static void send_bio_to_device(struct vio *vio, struct bio *bio)
++static void finish_combining_zones(struct vdo_completion *completion)
 +{
++	int result = completion->result;
++	struct vdo_completion *parent = completion->parent;
++
++	free_vio(as_vio(UDS_FORGET(completion)));
++	vdo_fail_completion(parent, result);
++}
++
++static void handle_combining_error(struct vdo_completion *completion)
++{
++	vio_record_metadata_io_error(as_vio(completion));
++	finish_combining_zones(completion);
++}
++
++static void write_summary_endio(struct bio *bio)
++{
++	struct vio *vio = bio->bi_private;
 +	struct vdo *vdo = vio->completion.vdo;
 +
-+	assert_in_bio_zone(vio);
-+	atomic64_inc(&vdo->stats.bios_submitted);
-+	count_all_bios(vio, bio);
-+	bio_set_dev(bio, vdo_get_backing_device(vdo));
-+	submit_bio_noacct(bio);
-+}
-+
-+static sector_t get_bio_sector(struct bio *bio)
-+{
-+	return bio->bi_iter.bi_sector;
++	continue_vio_after_io(vio, finish_combining_zones, vdo->thread_config.admin_thread);
 +}
 +
 +/**
-+ * process_vio_io() - Submits a vio's bio to the underlying block device. May block if the device
-+ *                    is busy. This callback should be used by vios which did not attempt to merge.
++ * combine_summaries() - Treating the current entries buffer as the on-disk value of all zones,
++ *                       update every zone to the correct values for every slab.
++ * @depot: The depot whose summary entries should be combined.
 + */
-+void process_vio_io(struct vdo_completion *completion)
-+{
-+	struct vio *vio = as_vio(completion);
-+
-+	send_bio_to_device(vio, vio->bio);
-+}
-+
-+/**
-+ * get_bio_list() - Extract the list of bios to submit from a vio.
-+ * @vio: The vio submitting I/O.
-+ *
-+ * The list will always contain at least one entry (the bio for the vio on which it is called), but
-+ * other bios may have been merged with it as well.
-+ *
-+ * Return: bio  The head of the bio list to submit.
-+ */
-+static struct bio *get_bio_list(struct vio *vio)
-+{
-+	struct bio *bio;
-+	struct io_submitter *submitter = vio->completion.vdo->io_submitter;
-+	struct bio_queue_data *bio_queue_data = &(submitter->bio_queue_data[vio->bio_zone]);
-+
-+	assert_in_bio_zone(vio);
-+
-+	mutex_lock(&bio_queue_data->lock);
-+	vdo_int_map_remove(bio_queue_data->map, get_bio_sector(vio->bios_merged.head));
-+	vdo_int_map_remove(bio_queue_data->map, get_bio_sector(vio->bios_merged.tail));
-+	bio = vio->bios_merged.head;
-+	bio_list_init(&vio->bios_merged);
-+	mutex_unlock(&bio_queue_data->lock);
-+
-+	return bio;
-+}
-+
-+/**
-+ * process_data_vio_io() - Submit a data_vio's bio to the storage below along with any bios that
-+ *                         have been merged with it.
-+ *
-+ * Context: This call may block and so should only be called from a bio thread.
-+ */
-+static void process_data_vio_io(struct vdo_completion *completion)
-+{
-+	struct bio *bio, *next;
-+	struct vio *vio = as_vio(completion);
-+
-+	assert_in_bio_zone(vio);
-+	for (bio = get_bio_list(vio); bio != NULL; bio = next) {
-+		next = bio->bi_next;
-+		bio->bi_next = NULL;
-+		send_bio_to_device((struct vio *) bio->bi_private, bio);
-+	}
-+}
-+
-+/**
-+ * get_mergeable_locked() - Attempt to find an already queued bio that the current bio can be
-+ *                          merged with.
-+ * @map: The bio map to use for merging.
-+ * @vio: The vio we want to merge.
-+ * @back_merge: Set to true for a back merge, false for a front merge.
-+ *
-+ * There are two types of merging possible, forward and backward, which are distinguished by a flag
-+ * that uses kernel elevator terminology.
-+ *
-+ * Return: the vio to merge to, NULL if no merging is possible.
-+ */
-+static struct vio *get_mergeable_locked(struct int_map *map, struct vio *vio, bool back_merge)
-+{
-+	struct bio *bio = vio->bio;
-+	sector_t merge_sector = get_bio_sector(bio);
-+	struct vio *vio_merge;
-+
-+	if (back_merge)
-+		merge_sector -= VDO_SECTORS_PER_BLOCK;
-+	else
-+		merge_sector += VDO_SECTORS_PER_BLOCK;
-+
-+	vio_merge = vdo_int_map_get(map, merge_sector);
-+
-+	if (vio_merge == NULL)
-+		return NULL;
-+
-+	if (vio->completion.priority != vio_merge->completion.priority)
-+		return NULL;
-+
-+	if (bio_data_dir(bio) != bio_data_dir(vio_merge->bio))
-+		return NULL;
-+
-+	if (bio_list_empty(&vio_merge->bios_merged))
-+		return NULL;
-+
-+	if (back_merge)
-+		return ((get_bio_sector(vio_merge->bios_merged.tail) == merge_sector) ?
-+			vio_merge :
-+			NULL);
-+
-+	return ((get_bio_sector(vio_merge->bios_merged.head) == merge_sector) ? vio_merge : NULL);
-+}
-+
-+static int map_merged_vio(struct int_map *bio_map, struct vio *vio)
-+{
-+	int result;
-+
-+	result = vdo_int_map_put(bio_map, get_bio_sector(vio->bios_merged.head), vio, true, NULL);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	return vdo_int_map_put(bio_map, get_bio_sector(vio->bios_merged.tail), vio, true, NULL);
-+}
-+
-+static int merge_to_prev_tail(struct int_map *bio_map, struct vio *vio, struct vio *prev_vio)
-+{
-+	vdo_int_map_remove(bio_map, get_bio_sector(prev_vio->bios_merged.tail));
-+	bio_list_merge(&prev_vio->bios_merged, &vio->bios_merged);
-+	return map_merged_vio(bio_map, prev_vio);
-+}
-+
-+static int merge_to_next_head(struct int_map *bio_map, struct vio *vio, struct vio *next_vio)
++static void combine_summaries(struct slab_depot *depot)
 +{
 +	/*
-+	 * Handle "next merge" and "gap fill" cases the same way so as to reorder bios in a way
-+	 * that's compatible with using funnel queues in work queues. This avoids removing an
-+	 * existing completion.
++	 * Combine all the old summary data into the portion of the buffer corresponding to the
++	 * first zone.
 +	 */
-+	vdo_int_map_remove(bio_map, get_bio_sector(next_vio->bios_merged.head));
-+	bio_list_merge_head(&next_vio->bios_merged, &vio->bios_merged);
-+	return map_merged_vio(bio_map, next_vio);
++	zone_count_t zone = 0;
++	struct slab_summary_entry *entries = depot->summary_entries;
++
++	if (depot->old_zone_count > 1) {
++		slab_count_t entry_number;
++
++		for (entry_number = 0; entry_number < MAX_VDO_SLABS; entry_number++) {
++			if (zone != 0)
++				memcpy(entries + entry_number,
++				       entries + (zone * MAX_VDO_SLABS) + entry_number,
++				       sizeof(struct slab_summary_entry));
++			zone++;
++			if (zone == depot->old_zone_count)
++				zone = 0;
++		}
++	}
++
++	/* Copy the combined data to each zones's region of the buffer. */
++	for (zone = 1; zone < MAX_VDO_PHYSICAL_ZONES; zone++)
++		memcpy(entries + (zone * MAX_VDO_SLABS),
++		       entries,
++		       MAX_VDO_SLABS * sizeof(struct slab_summary_entry));
 +}
 +
 +/**
-+ * try_bio_map_merge() - Attempt to merge a vio's bio with other pending I/Os.
-+ * @vio: The vio to merge.
++ * finish_loading_summary() - Finish loading slab summary data.
++ * @completion: The vio which was used to read the summary data.
 + *
-+ * Currently this is only used for data_vios, but is broken out for future use with metadata vios.
-+ *
-+ * Return: whether or not the vio was merged.
++ * Combines the slab summary data from all the previously written zones and copies the combined
++ * summary to each partition's data region. Then writes the combined summary back out to disk. This
++ * callback is registered in load_summary_endio().
 + */
-+static bool try_bio_map_merge(struct vio *vio)
++static void finish_loading_summary(struct vdo_completion *completion)
 +{
-+	int result;
-+	bool merged = true;
-+	struct bio *bio = vio->bio;
-+	struct vio *prev_vio, *next_vio;
++	struct slab_depot *depot = completion->vdo->depot;
++
++	/* Combine the summary from each zone so each zone is correct for all slabs. */
++	combine_summaries(depot);
++
++	/* Write the combined summary back out. */
++	submit_metadata_vio(as_vio(completion),
++			    depot->summary_origin,
++			    write_summary_endio,
++			    handle_combining_error,
++			    REQ_OP_WRITE);
++}
++
++static void load_summary_endio(struct bio *bio)
++{
++	struct vio *vio = bio->bi_private;
 +	struct vdo *vdo = vio->completion.vdo;
-+	struct bio_queue_data *bio_queue_data = &vdo->io_submitter->bio_queue_data[vio->bio_zone];
 +
-+	bio->bi_next = NULL;
-+	bio_list_init(&vio->bios_merged);
-+	bio_list_add(&vio->bios_merged, bio);
-+
-+	mutex_lock(&bio_queue_data->lock);
-+	prev_vio = get_mergeable_locked(bio_queue_data->map, vio, true);
-+	next_vio = get_mergeable_locked(bio_queue_data->map, vio, false);
-+	if (prev_vio == next_vio)
-+		next_vio = NULL;
-+
-+	if ((prev_vio == NULL) && (next_vio == NULL)) {
-+		/* no merge. just add to bio_queue */
-+		merged = false;
-+		result = vdo_int_map_put(bio_queue_data->map,
-+					 get_bio_sector(bio),
-+					 vio,
-+					 true,
-+					 NULL);
-+	} else if (next_vio == NULL) {
-+		/* Only prev. merge to prev's tail */
-+		result = merge_to_prev_tail(bio_queue_data->map, vio, prev_vio);
-+	} else {
-+		/* Only next. merge to next's head */
-+		result = merge_to_next_head(bio_queue_data->map, vio, next_vio);
-+	}
-+
-+	mutex_unlock(&bio_queue_data->lock);
-+
-+	/* We don't care about failure of int_map_put in this case. */
-+	ASSERT_LOG_ONLY(result == UDS_SUCCESS, "bio map insertion succeeds");
-+	return merged;
++	continue_vio_after_io(vio, finish_loading_summary, vdo->thread_config.admin_thread);
 +}
 +
 +/**
-+ * submit_data_vio_io() - Submit I/O for a data_vio.
-+ * @data_vio: the data_vio for which to issue I/O.
++ * load_slab_summary() - The preamble of a load operation.
 + *
-+ * If possible, this I/O will be merged other pending I/Os. Otherwise, the data_vio will be sent to
-+ * the appropriate bio zone directly.
++ * Implements vdo_action_preamble.
 + */
-+void submit_data_vio_io(struct data_vio *data_vio)
++static void load_slab_summary(void *context, struct vdo_completion *parent)
 +{
-+	if (try_bio_map_merge(&data_vio->vio))
-+		return;
-+
-+	launch_data_vio_bio_zone_callback(data_vio, process_data_vio_io);
-+}
-+
-+/**
-+ * vdo_submit_metadata_io() - Submit I/O for a metadata vio.
-+ * @vio: the vio for which to issue I/O
-+ * @physical: the physical block number to read or write
-+ * @callback: the bio endio function which will be called after the I/O completes
-+ * @error_handler: the handler for submission or I/O errors (may be NULL)
-+ * @operation: the type of I/O to perform
-+ * @data: the buffer to read or write (may be NULL)
-+ *
-+ * The vio is enqueued on a vdo bio queue so that bio submission (which may block) does not block
-+ * other vdo threads.
-+ *
-+ * That the error handler will run on the correct thread is only true so long as the thread calling
-+ * this function, and the thread set in the endio callback are the same, as well as the fact that
-+ * no error can occur on the bio queue. Currently this is true for all callers, but additional care
-+ * will be needed if this ever changes.
-+ */
-+void vdo_submit_metadata_io(struct vio *vio,
-+			    physical_block_number_t physical,
-+			    bio_end_io_t callback,
-+			    vdo_action *error_handler,
-+			    unsigned int operation,
-+			    char *data)
-+{
-+	struct vdo_completion *completion = &vio->completion;
 +	int result;
-+	const struct admin_state_code *code = vdo_get_admin_state(completion->vdo);
++	struct vio *vio;
++	struct slab_depot *depot = context;
++	const struct admin_state_code *operation =
++		vdo_get_current_manager_operation(depot->action_manager);
 +
-+
-+	ASSERT_LOG_ONLY(!code->quiescent, "I/O not allowed in state %s", code->name);
-+	ASSERT_LOG_ONLY(vio->bio->bi_next == NULL, "metadata bio has no next bio");
-+
-+	vdo_reset_completion(completion);
-+	completion->error_handler = error_handler;
-+	result = vio_reset_bio(vio, data, callback, operation | REQ_META, physical);
++	result = create_multi_block_metadata_vio(depot->vdo,
++						 VIO_TYPE_SLAB_SUMMARY,
++						 VIO_PRIORITY_METADATA,
++						 parent,
++						 VDO_SLAB_SUMMARY_BLOCKS,
++						 (char *) depot->summary_entries,
++						 &vio);
 +	if (result != VDO_SUCCESS) {
-+		continue_vio(vio, result);
++		vdo_fail_completion(parent, result);
 +		return;
 +	}
 +
-+	vdo_set_completion_callback(completion, process_vio_io, get_vio_bio_zone_thread_id(vio));
-+	vdo_launch_completion_with_priority(completion, get_metadata_priority(vio));
-+}
-+
-+/**
-+ * vdo_make_io_submitter() - Create an io_submitter structure.
-+ * @thread_count: Number of bio-submission threads to set up.
-+ * @rotation_interval: Interval to use when rotating between bio-submission threads when enqueuing
-+ *                     completions.
-+ * @max_requests_active: Number of bios for merge tracking.
-+ * @vdo: The vdo which will use this submitter.
-+ * @io_submitter: pointer to the new data structure.
-+ *
-+ * Return: VDO_SUCCESS or an error.
-+ */
-+int vdo_make_io_submitter(unsigned int thread_count,
-+			  unsigned int rotation_interval,
-+			  unsigned int max_requests_active,
-+			  struct vdo *vdo,
-+			  struct io_submitter **io_submitter_ptr)
-+{
-+	unsigned int i;
-+	struct io_submitter *io_submitter;
-+	int result;
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct io_submitter,
-+				       thread_count,
-+				       struct bio_queue_data,
-+				       "bio submission data",
-+				       &io_submitter);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	io_submitter->bio_queue_rotation_interval = rotation_interval;
-+
-+	/* Setup for each bio-submission work queue */
-+	for (i = 0; i < thread_count; i++) {
-+		struct bio_queue_data *bio_queue_data = &io_submitter->bio_queue_data[i];
-+
-+		mutex_init(&bio_queue_data->lock);
-+		/*
-+		 * One I/O operation per request, but both first & last sector numbers.
-+		 *
-+		 * If requests are assigned to threads round-robin, they should be distributed
-+		 * quite evenly. But if they're assigned based on PBN, things can sometimes be very
-+		 * uneven. So for now, we'll assume that all requests *may* wind up on one thread,
-+		 * and thus all in the same map.
-+		 */
-+		result = vdo_make_int_map(max_requests_active * 2, 0, &bio_queue_data->map);
-+		if (result != 0) {
-+			/*
-+			 * Clean up the partially initialized bio-queue entirely and indicate that
-+			 * initialization failed.
-+			 */
-+			uds_log_error("bio map initialization failed %d", result);
-+			vdo_cleanup_io_submitter(io_submitter);
-+			vdo_free_io_submitter(io_submitter);
-+			return result;
-+		}
-+
-+		bio_queue_data->queue_number = i;
-+		result = vdo_make_thread(vdo,
-+					 vdo->thread_config.bio_threads[i],
-+					 &bio_queue_type,
-+					 1,
-+					 (void **) &bio_queue_data);
-+		if (result != VDO_SUCCESS) {
-+			/*
-+			 * Clean up the partially initialized bio-queue entirely and indicate that
-+			 * initialization failed.
-+			 */
-+			vdo_free_int_map(UDS_FORGET(bio_queue_data->map));
-+			uds_log_error("bio queue initialization failed %d", result);
-+			vdo_cleanup_io_submitter(io_submitter);
-+			vdo_free_io_submitter(io_submitter);
-+			return result;
-+		}
-+
-+		bio_queue_data->queue = vdo->threads[vdo->thread_config.bio_threads[i]].queue;
-+		io_submitter->num_bio_queues_used++;
++	if ((operation == VDO_ADMIN_STATE_FORMATTING) ||
++	    (operation == VDO_ADMIN_STATE_LOADING_FOR_REBUILD)) {
++		finish_loading_summary(&vio->completion);
++		return;
 +	}
 +
-+	*io_submitter_ptr = io_submitter;
-+
-+	return VDO_SUCCESS;
++	submit_metadata_vio(vio,
++			    depot->summary_origin,
++			    load_summary_endio,
++			    handle_combining_error,
++			    REQ_OP_READ);
 +}
-+
-+/**
-+ * vdo_cleanup_io_submitter() - Tear down the io_submitter fields as needed for a physical layer.
-+ * @io_submitter: The I/O submitter data to tear down (may be NULL).
-+ */
-+void vdo_cleanup_io_submitter(struct io_submitter *io_submitter)
-+{
-+	int i;
-+
-+	if (io_submitter == NULL)
-+		return;
-+
-+	for (i = io_submitter->num_bio_queues_used - 1; i >= 0; i--)
-+		vdo_finish_work_queue(io_submitter->bio_queue_data[i].queue);
-+}
-+
-+/**
-+ * vdo_free_io_submitter() - Free the io_submitter fields and structure as needed.
-+ * @io_submitter: The I/O submitter data to destroy.
-+ *
-+ * This must be called after vdo_cleanup_io_submitter(). It is used to release resources late in
-+ * the shutdown process to avoid or reduce the chance of race conditions.
-+ */
-+void vdo_free_io_submitter(struct io_submitter *io_submitter)
-+{
-+	int i;
-+
-+	if (io_submitter == NULL)
-+		return;
-+
-+	for (i = io_submitter->num_bio_queues_used - 1; i >= 0; i--) {
-+		io_submitter->num_bio_queues_used--;
-+		/* vdo_destroy() will free the work queue, so just give up our reference to it. */
-+		UDS_FORGET(io_submitter->bio_queue_data[i].queue);
-+		vdo_free_int_map(UDS_FORGET(io_submitter->bio_queue_data[i].map));
-+	}
-+	UDS_FREE(io_submitter);
-+}
-diff --git a/drivers/md/dm-vdo/io-submitter.h b/drivers/md/dm-vdo/io-submitter.h
-new file mode 100644
-index 000000000000..f21ae2630ff8
---- /dev/null
-+++ b/drivers/md/dm-vdo/io-submitter.h
-@@ -0,0 +1,52 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
+diff --git a/drivers/md/dm-vdo/slab-depot.h b/drivers/md/dm-vdo/slab-depot.h
+index 12086d475d1a..5e06746c7e71 100644
+--- a/drivers/md/dm-vdo/slab-depot.h
++++ b/drivers/md/dm-vdo/slab-depot.h
+@@ -24,6 +24,23 @@
+ #include "vio.h"
+ #include "wait-queue.h"
+ 
 +/*
-+ * Copyright 2023 Red Hat
++ * A slab_depot is responsible for managing all of the slabs and block allocators of a VDO. It has
++ * a single array of slabs in order to eliminate the need for additional math in order to compute
++ * which physical zone a PBN is in. It also has a block_allocator per zone.
++ *
++ * Load operations are required to be performed on a single thread. Normal operations are assumed
++ * to be performed in the appropriate zone. Allocations and reference count updates must be done
++ * from the thread of their physical zone. Requests to commit slab journal tail blocks from the
++ * recovery journal must be done on the journal zone thread. Save operations are required to be
++ * launched from the same thread as the original load operation.
 + */
 +
-+#ifndef VDO_IO_SUBMITTER_H
-+#define VDO_IO_SUBMITTER_H
++enum {
++	/* The number of vios in the vio pool is proportional to the throughput of the VDO. */
++	BLOCK_ALLOCATOR_VIO_POOL_SIZE = 128,
++};
 +
-+#include <linux/bio.h>
+ /*
+  * Represents the possible status of a block.
+  */
+@@ -240,6 +257,63 @@ struct vdo_slab {
+ 	struct reference_block *reference_blocks;
+ };
+ 
++/*
++ * The slab_summary provides hints during load and recovery about the state of the slabs in order
++ * to avoid the need to read the slab journals in their entirety before a VDO can come online.
++ *
++ * The information in the summary for each slab includes the rough number of free blocks (which is
++ * used to prioritize scrubbing), the cleanliness of a slab (so that clean slabs containing free
++ * space will be used on restart), and the location of the tail block of the slab's journal.
++ *
++ * The slab_summary has its own partition at the end of the volume which is sized to allow for a
++ * complete copy of the summary for each of up to 16 physical zones.
++ *
++ * During resize, the slab_summary moves its backing partition and is saved once moved; the
++ * slab_summary is not permitted to overwrite the previous recovery journal space.
++ *
++ * The slab_summary does not have its own version information, but relies on the VDO volume version
++ * number.
++ */
 +
-+#include "types.h"
++/*
++ * A slab status is a very small structure for use in determining the ordering of slabs in the
++ * scrubbing process.
++ */
++struct slab_status {
++	slab_count_t slab_number;
++	bool is_clean;
++	u8 emptiness;
++};
 +
-+struct io_submitter;
++struct slab_summary_block {
++	/* The block_allocator to which this block belongs */
++	struct block_allocator *allocator;
++	/* The index of this block in its zone's summary */
++	block_count_t index;
++	/* Whether this block has a write outstanding */
++	bool writing;
++	/* Ring of updates waiting on the outstanding write */
++	struct wait_queue current_update_waiters;
++	/* Ring of updates waiting on the next write */
++	struct wait_queue next_update_waiters;
++	/* The active slab_summary_entry array for this block */
++	struct slab_summary_entry *entries;
++	/* The vio used to write this block */
++	struct vio vio;
++	/* The packed entries, one block long, backing the vio */
++	char *outgoing_entries;
++};
 +
-+int vdo_make_io_submitter(unsigned int thread_count,
-+			  unsigned int rotation_interval,
-+			  unsigned int max_requests_active,
-+			  struct vdo *vdo,
-+			  struct io_submitter **io_submitter);
++/*
++ * The statistics for all the slab summary zones owned by this slab summary. These fields are all
++ * mutated only by their physical zone threads, but are read by other threads when gathering
++ * statistics for the entire depot.
++ */
++struct atomic_slab_summary_statistics {
++	/* Number of blocks written */
++	atomic64_t blocks_written;
++};
 +
-+void vdo_cleanup_io_submitter(struct io_submitter *io_submitter);
-+
-+void vdo_free_io_submitter(struct io_submitter *io_submitter);
-+
-+void process_vio_io(struct vdo_completion *completion);
-+
-+void submit_data_vio_io(struct data_vio *data_vio);
-+
-+void vdo_submit_metadata_io(struct vio *vio,
-+			    physical_block_number_t physical,
-+			    bio_end_io_t callback,
-+			    vdo_action *error_handler,
-+			    unsigned int operation,
-+			    char *data);
-+
-+static inline void submit_metadata_vio(struct vio *vio,
-+				       physical_block_number_t physical,
-+				       bio_end_io_t callback,
-+				       vdo_action *error_handler,
-+				       unsigned int operation)
-+{
-+	vdo_submit_metadata_io(vio, physical, callback, error_handler, operation, vio->data);
-+}
-+
-+static inline void
-+submit_flush_vio(struct vio *vio, bio_end_io_t callback, vdo_action *error_handler)
-+{
-+	/* FIXME: Can we just use REQ_OP_FLUSH? */
-+	vdo_submit_metadata_io(vio, 0, callback, error_handler, REQ_OP_WRITE | REQ_PREFLUSH, NULL);
-+}
-+
-+#endif /* VDO_IO_SUBMITTER_H */
+ bool __must_check
+ vdo_attempt_replay_into_slab(struct vdo_slab *slab,
+ 			     physical_block_number_t pbn,
 -- 
 2.40.0
 
