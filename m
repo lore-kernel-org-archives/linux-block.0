@@ -2,1919 +2,1234 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E58E2C27C46
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC60C27C48
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:43:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232027AbjJZVnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 17:43:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41026 "EHLO
+        id S232306AbjJZVnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 17:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344860AbjJZVnQ (ORCPT
+        with ESMTP id S1344852AbjJZVnQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 26 Oct 2023 17:43:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AEC81B2
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:42 -0700 (PDT)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84B49D45
+        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698356501;
+        s=mimecast20190719; t=1698356503;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=c0H5QOMw94uQO3n3nqp8DQ4ZCrgXNFUXky23E0yZu/E=;
-        b=i1VqXTTfu56UJN2btEkIWvvnXIG9tgCA4z6aUHfDlrIjKW4LREB1pRF2CG6FSEOY+m10r4
-        aS6s4HC9YPB45963CkePQ5Z+Hez+Bu6yJpK+MsW0Qe+dIVv74i8CtYkR9tvMcElpq2Dt+e
-        5OCudfinsV7BsZuPBDVQz8OKdGRQmoo=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-568-Ucm5F-kWP0SR8VA0UcZUKA-1; Thu,
- 26 Oct 2023 17:41:38 -0400
-X-MC-Unique: Ucm5F-kWP0SR8VA0UcZUKA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        bh=/iMXLHNntDucEEZtd8E1eBTpqdAdPA/fcEkpzCJcGeA=;
+        b=ao/3trVDnikCjwJt4XMn3rJmQBm73ZzHBTv9dH7Sugb1qisTqJLW+VcsyJir+RSdRLTLS6
+        Oze1wtQG41Zx1CdEULeK/spMScsX41/lkpYHBQRF9RLGqY0Ro9zQUjBagAGNuuIzEZ4u7/
+        szDO0zqIDL6XSjicMY5tDdxXHDKHBUk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-205-xrRbsqJvNFOZgZLD6KSZ4w-1; Thu, 26 Oct 2023 17:41:42 -0400
+X-MC-Unique: xrRbsqJvNFOZgZLD6KSZ4w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9467E3C02768;
-        Thu, 26 Oct 2023 21:41:38 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1116880F923;
+        Thu, 26 Oct 2023 21:41:42 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 731C040C6F79;
-        Thu, 26 Oct 2023 21:41:38 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ECE1C2949;
+        Thu, 26 Oct 2023 21:41:41 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id 293DD3003C; Thu, 26 Oct 2023 17:41:38 -0400 (EDT)
+        id A22003003C; Thu, 26 Oct 2023 17:41:41 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 08/39] dm vdo: add basic hash map data structures
-Date:   Thu, 26 Oct 2023 17:41:05 -0400
-Message-Id: <20231026214136.1067410-9-msakai@redhat.com>
+Subject: [PATCH v4 28/39] dm vdo: add the slab depot
+Date:   Thu, 26 Oct 2023 17:41:25 -0400
+Message-Id: <20231026214136.1067410-29-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds two hash maps, one keyed by integers, the other by
-pointers, and also a priority heap. The integer map is used for locking of
-logical and physical addresses. The pointer map is used for managing
-concurrent writes of the same data, ensuring that those writes are
-deduplicated. The priority heap is used to minimize the search time for
-free blocks.
+Add the data and methods that implement the slab_depot that manages
+the allocation of slabs of blocks added by the preceding patches.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Co-developed-by: Michael Sclafani <vdo-devel@redhat.com>
 Signed-off-by: Michael Sclafani <vdo-devel@redhat.com>
+Co-developed-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/int-map.c        | 710 +++++++++++++++++++++++++++++
- drivers/md/dm-vdo/int-map.h        |  40 ++
- drivers/md/dm-vdo/pointer-map.c    | 691 ++++++++++++++++++++++++++++
- drivers/md/dm-vdo/pointer-map.h    |  81 ++++
- drivers/md/dm-vdo/priority-table.c | 226 +++++++++
- drivers/md/dm-vdo/priority-table.h |  48 ++
- 6 files changed, 1796 insertions(+)
- create mode 100644 drivers/md/dm-vdo/int-map.c
- create mode 100644 drivers/md/dm-vdo/int-map.h
- create mode 100644 drivers/md/dm-vdo/pointer-map.c
- create mode 100644 drivers/md/dm-vdo/pointer-map.h
- create mode 100644 drivers/md/dm-vdo/priority-table.c
- create mode 100644 drivers/md/dm-vdo/priority-table.h
+ drivers/md/dm-vdo/slab-depot.c | 965 +++++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/slab-depot.h | 121 +++++
+ 2 files changed, 1086 insertions(+)
 
-diff --git a/drivers/md/dm-vdo/int-map.c b/drivers/md/dm-vdo/int-map.c
-new file mode 100644
-index 000000000000..76431ea64f63
---- /dev/null
-+++ b/drivers/md/dm-vdo/int-map.c
-@@ -0,0 +1,710 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
+diff --git a/drivers/md/dm-vdo/slab-depot.c b/drivers/md/dm-vdo/slab-depot.c
+index dbed9c3c8a62..ba9cdb720506 100644
+--- a/drivers/md/dm-vdo/slab-depot.c
++++ b/drivers/md/dm-vdo/slab-depot.c
+@@ -3070,6 +3070,32 @@ static void register_slab_with_allocator(struct block_allocator *allocator, stru
+ 	allocator->last_slab = slab->slab_number;
+ }
+ 
 +/**
-+ * DOC:
++ * get_depot_slab_iterator() - Return a slab_iterator over the slabs in a slab_depot.
++ * @depot: The depot over which to iterate.
++ * @start: The number of the slab to start iterating from.
++ * @end: The number of the last slab which may be returned.
++ * @stride: The difference in slab number between successive slabs.
 + *
-+ * Hash table implementation of a map from integers to pointers, implemented using the Hopscotch
-+ * Hashing algorithm by Herlihy, Shavit, and Tzafrir (see
-+ * http://en.wikipedia.org/wiki/Hopscotch_hashing). This implementation does not contain any of the
-+ * locking/concurrency features of the algorithm, just the collision resolution scheme.
++ * Iteration always occurs from higher to lower numbered slabs.
 + *
-+ * Hopscotch Hashing is based on hashing with open addressing and linear probing. All the entries
-+ * are stored in a fixed array of buckets, with no dynamic allocation for collisions. Unlike linear
-+ * probing, all the entries that hash to a given bucket are stored within a fixed neighborhood
-+ * starting at that bucket. Chaining is effectively represented as a bit vector relative to each
-+ * bucket instead of as pointers or explicit offsets.
-+ *
-+ * When an empty bucket cannot be found within a given neighborhood, subsequent neighborhoods are
-+ * searched, and one or more entries will "hop" into those neighborhoods. When this process works,
-+ * an empty bucket will move into the desired neighborhood, allowing the entry to be added. When
-+ * that process fails (typically when the buckets are around 90% full), the table must be resized
-+ * and the all entries rehashed and added to the expanded table.
-+ *
-+ * Unlike linear probing, the number of buckets that must be searched in the worst case has a fixed
-+ * upper bound (the size of the neighborhood). Those entries occupy a small number of memory cache
-+ * lines, leading to improved use of the cache (fewer misses on both successful and unsuccessful
-+ * searches). Hopscotch hashing outperforms linear probing at much higher load factors, so even
-+ * with the increased memory burden for maintaining the hop vectors, less memory is needed to
-+ * achieve that performance. Hopscotch is also immune to "contamination" from deleting entries
-+ * since entries are genuinely removed instead of being replaced by a placeholder.
-+ *
-+ * The published description of the algorithm used a bit vector, but the paper alludes to an offset
-+ * scheme which is used by this implementation. Since the entries in the neighborhood are within N
-+ * entries of the hash bucket at the start of the neighborhood, a pair of small offset fields each
-+ * log2(N) bits wide is all that's needed to maintain the hops as a linked list. In order to encode
-+ * "no next hop" (i.e. NULL) as the natural initial value of zero, the offsets are biased by one
-+ * (i.e. 0 => NULL, 1 => offset=0, 2 => offset=1, etc.) We can represent neighborhoods of up to 255
-+ * entries with just 8+8=16 bits per entry. The hop list is sorted by hop offset so the first entry
-+ * in the list is always the bucket closest to the start of the neighborhood.
-+ *
-+ * While individual accesses tend to be very fast, the table resize operations are very, very
-+ * expensive. If an upper bound on the latency of adding an entry to the table is needed, we either
-+ * need to ensure the table is pre-sized to be large enough so no resize is ever needed, or we'll
-+ * need to develop an approach to incrementally resize the table.
++ * Return: An initialized iterator structure.
 + */
-+
-+#include "int-map.h"
-+
-+#include <linux/minmax.h>
-+
-+#include "errors.h"
-+#include "logger.h"
-+#include "memory-alloc.h"
-+#include "numeric.h"
-+#include "permassert.h"
-+
-+enum {
-+	DEFAULT_CAPACITY = 16, /* the number of neighborhoods in a new table */
-+	NEIGHBORHOOD = 255,    /* the number of buckets in each neighborhood */
-+	MAX_PROBES = 1024,     /* limit on the number of probes for a free bucket */
-+	NULL_HOP_OFFSET = 0,   /* the hop offset value terminating the hop list */
-+	DEFAULT_LOAD = 75      /* a compromise between memory use and performance */
-+};
-+
-+/**
-+ * struct bucket - hash bucket
-+ *
-+ * Buckets are packed together to reduce memory usage and improve cache efficiency. It would be
-+ * tempting to encode the hop offsets separately and maintain alignment of key/value pairs, but
-+ * it's crucial to keep the hop fields near the buckets that they use them so they'll tend to share
-+ * cache lines.
-+ */
-+struct __packed bucket {
-+	/**
-+	 * @first_hop: The biased offset of the first entry in the hop list of the neighborhood
-+	 *             that hashes to this bucket.
-+	 */
-+	u8 first_hop;
-+	/** @next_hop: The biased offset of the next bucket in the hop list. */
-+	u8 next_hop;
-+	/** @key: The key stored in this bucket. */
-+	u64 key;
-+	/** @value: The value stored in this bucket (NULL if empty). */
-+	void *value;
-+};
-+
-+/**
-+ * struct int_map - The concrete definition of the opaque int_map type.
-+ *
-+ * To avoid having to wrap the neighborhoods of the last entries back around to the start of the
-+ * bucket array, we allocate a few more buckets at the end of the array instead, which is why
-+ * capacity and bucket_count are different.
-+ */
-+struct int_map {
-+	/** @size: The number of entries stored in the map. */
-+	size_t size;
-+	/** @capacity: The number of neighborhoods in the map. */
-+	size_t capacity;
-+	/* @bucket_count: The number of buckets in the bucket array. */
-+	size_t bucket_count;
-+	/** @buckets: The array of hash buckets. */
-+	struct bucket *buckets;
-+};
-+
-+/**
-+ * mix() - The Google CityHash 16-byte hash mixing function.
-+ * @input1: The first input value.
-+ * @input2: The second input value.
-+ *
-+ * Return: A hash of the two inputs.
-+ */
-+static u64 mix(u64 input1, u64 input2)
++static struct slab_iterator get_depot_slab_iterator(struct slab_depot *depot,
++						    slab_count_t start,
++						    slab_count_t end,
++						    slab_count_t stride)
 +{
-+	static const u64 CITY_MULTIPLIER = 0x9ddfea08eb382d69ULL;
-+	u64 hash = (input1 ^ input2);
++	struct vdo_slab **slabs = depot->slabs;
 +
-+	hash *= CITY_MULTIPLIER;
-+	hash ^= (hash >> 47);
-+	hash ^= input2;
-+	hash *= CITY_MULTIPLIER;
-+	hash ^= (hash >> 47);
-+	hash *= CITY_MULTIPLIER;
-+	return hash;
++	return (struct slab_iterator) {
++		.slabs = slabs,
++		.next = (((slabs == NULL) || (start < end)) ? NULL : slabs[start]),
++		.end = end,
++		.stride = stride,
++	};
 +}
 +
+ static struct slab_iterator get_slab_iterator(const struct block_allocator *allocator)
+ {
+ 	return get_depot_slab_iterator(allocator->depot,
+@@ -3806,6 +3832,171 @@ make_slab(physical_block_number_t slab_origin,
+ 	return VDO_SUCCESS;
+ }
+ 
 +/**
-+ * hash_key() - Calculate a 64-bit non-cryptographic hash value for the provided 64-bit integer
-+ *              key.
-+ * @key: The mapping key.
++ * allocate_slabs() - Allocate a new slab pointer array.
++ * @depot: The depot.
++ * @slab_count: The number of slabs the depot should have in the new array.
 + *
-+ * The implementation is based on Google's CityHash, only handling the specific case of an 8-byte
-+ * input.
-+ *
-+ * Return: The hash of the mapping key.
-+ */
-+static u64 hash_key(u64 key)
-+{
-+	/*
-+	 * Aliasing restrictions forbid us from casting pointer types, so use a union to convert a
-+	 * single u64 to two u32 values.
-+	 */
-+	union {
-+		u64 u64;
-+		u32 u32[2];
-+	} pun = {.u64 = key};
-+
-+	return mix(sizeof(key) + (((u64) pun.u32[0]) << 3), pun.u32[1]);
-+}
-+
-+/**
-+ * allocate_buckets() - Initialize an int_map.
-+ * @map: The map to initialize.
-+ * @capacity: The initial capacity of the map.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+static int allocate_buckets(struct int_map *map, size_t capacity)
-+{
-+	map->size = 0;
-+	map->capacity = capacity;
-+
-+	/*
-+	 * Allocate NEIGHBORHOOD - 1 extra buckets so the last bucket can have a full neighborhood
-+	 * without have to wrap back around to element zero.
-+	 */
-+	map->bucket_count = capacity + (NEIGHBORHOOD - 1);
-+	return UDS_ALLOCATE(map->bucket_count, struct bucket,
-+			    "struct int_map buckets", &map->buckets);
-+}
-+
-+/**
-+ * vdo_make_int_map() - Allocate and initialize an int_map.
-+ * @initial_capacity: The number of entries the map should initially be capable of holding (zero
-+ *                    tells the map to use its own small default).
-+ * @initial_load: The load factor of the map, expressed as an integer percentage (typically in the
-+ *                range 50 to 90, with zero telling the map to use its own default).
-+ * @map_ptr: Output, a pointer to hold the new int_map.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+int vdo_make_int_map(size_t initial_capacity, unsigned int initial_load, struct int_map **map_ptr)
-+{
-+	struct int_map *map;
-+	int result;
-+	size_t capacity;
-+
-+	/* Use the default initial load if the caller did not specify one. */
-+	if (initial_load == 0)
-+		initial_load = DEFAULT_LOAD;
-+	if (initial_load > 100)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	result = UDS_ALLOCATE(1, struct int_map, "struct int_map", &map);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	/* Use the default capacity if the caller did not specify one. */
-+	capacity = (initial_capacity > 0) ? initial_capacity : DEFAULT_CAPACITY;
-+
-+	/*
-+	 * Scale up the capacity by the specified initial load factor. (i.e to hold 1000 entries at
-+	 * 80% load we need a capacity of 1250)
-+	 */
-+	capacity = capacity * 100 / initial_load;
-+
-+	result = allocate_buckets(map, capacity);
-+	if (result != UDS_SUCCESS) {
-+		vdo_free_int_map(UDS_FORGET(map));
-+		return result;
-+	}
-+
-+	*map_ptr = map;
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * vdo_free_int_map() - Free an int_map.
-+ * @map: The int_map to free.
-+ *
-+ * NOTE: The map does not own the pointer values stored in the map and they are not freed by this
-+ * call.
-+ */
-+void vdo_free_int_map(struct int_map *map)
-+{
-+	if (map == NULL)
-+		return;
-+
-+	UDS_FREE(UDS_FORGET(map->buckets));
-+	UDS_FREE(UDS_FORGET(map));
-+}
-+
-+/**
-+ * vdo_int_map_size() - Get the number of entries stored in an int_map.
-+ * @map: The int_map to query.
-+ *
-+ * Return: The number of entries in the map.
-+ */
-+size_t vdo_int_map_size(const struct int_map *map)
-+{
-+	return map->size;
-+}
-+
-+/**
-+ * dereference_hop() - Convert a biased hop offset within a neighborhood to a pointer to the bucket
-+ *                     it references.
-+ * @neighborhood: The first bucket in the neighborhood.
-+ * @hop_offset: The biased hop offset to the desired bucket.
-+ *
-+ * Return: NULL if hop_offset is zero, otherwise a pointer to the bucket in the neighborhood at
-+ *         hop_offset - 1.
-+ */
-+static struct bucket *dereference_hop(struct bucket *neighborhood, unsigned int hop_offset)
-+{
-+	if (hop_offset == NULL_HOP_OFFSET)
-+		return NULL;
-+
-+	STATIC_ASSERT(NULL_HOP_OFFSET == 0);
-+	return &neighborhood[hop_offset - 1];
-+}
-+
-+/**
-+ * insert_in_hop_list() - Add a bucket into the hop list for the neighborhood.
-+ * @neighborhood: The first bucket in the neighborhood.
-+ * @new_bucket: The bucket to add to the hop list.
-+ *
-+ * The bucket is inserted it into the list so the hop list remains sorted by hop offset.
-+ */
-+static void insert_in_hop_list(struct bucket *neighborhood, struct bucket *new_bucket)
-+{
-+	/* Zero indicates a NULL hop offset, so bias the hop offset by one. */
-+	int hop_offset = 1 + (new_bucket - neighborhood);
-+
-+	/* Handle the special case of adding a bucket at the start of the list. */
-+	int next_hop = neighborhood->first_hop;
-+
-+	if ((next_hop == NULL_HOP_OFFSET) || (next_hop > hop_offset)) {
-+		new_bucket->next_hop = next_hop;
-+		neighborhood->first_hop = hop_offset;
-+		return;
-+	}
-+
-+	/* Search the hop list for the insertion point that maintains the sort order. */
-+	for (;;) {
-+		struct bucket *bucket = dereference_hop(neighborhood, next_hop);
-+
-+		next_hop = bucket->next_hop;
-+
-+		if ((next_hop == NULL_HOP_OFFSET) || (next_hop > hop_offset)) {
-+			new_bucket->next_hop = next_hop;
-+			bucket->next_hop = hop_offset;
-+			return;
-+		}
-+	}
-+}
-+
-+/**
-+ * select_bucket() - Select and return the hash bucket for a given search key.
-+ * @map: The map to search.
-+ * @key: The mapping key.
-+ */
-+static struct bucket *select_bucket(const struct int_map *map, u64 key)
-+{
-+	/*
-+	 * Calculate a good hash value for the provided key. We want exactly 32 bits, so mask the
-+	 * result.
-+	 */
-+	u64 hash = hash_key(key) & 0xFFFFFFFF;
-+
-+	/*
-+	 * Scale the 32-bit hash to a bucket index by treating it as a binary fraction and
-+	 * multiplying that by the capacity. If the hash is uniformly distributed over [0 ..
-+	 * 2^32-1], then (hash * capacity / 2^32) should be uniformly distributed over [0 ..
-+	 * capacity-1]. The multiply and shift is much faster than a divide (modulus) on X86 CPUs.
-+	 */
-+	return &map->buckets[(hash * map->capacity) >> 32];
-+}
-+
-+/**
-+ * search_hop_list() - Search the hop list associated with given hash bucket for a given search
-+ *                     key.
-+ * @map: The map being searched.
-+ * @bucket: The map bucket to search for the key.
-+ * @key: The mapping key.
-+ * @previous_ptr: Output. if not NULL, a pointer in which to store the bucket in the list preceding
-+ *                the one that had the matching key
-+ *
-+ * If the key is found, returns a pointer to the entry (bucket or collision), otherwise returns
-+ * NULL.
-+ *
-+ * Return: An entry that matches the key, or NULL if not found.
-+ */
-+static struct bucket *search_hop_list(struct int_map *map __always_unused,
-+				      struct bucket *bucket,
-+				      u64 key,
-+				      struct bucket **previous_ptr)
-+{
-+	struct bucket *previous = NULL;
-+	unsigned int next_hop = bucket->first_hop;
-+
-+	while (next_hop != NULL_HOP_OFFSET) {
-+		/*
-+		 * Check the neighboring bucket indexed by the offset for the
-+		 * desired key.
-+		 */
-+		struct bucket *entry = dereference_hop(bucket, next_hop);
-+
-+		if ((key == entry->key) && (entry->value != NULL)) {
-+			if (previous_ptr != NULL)
-+				*previous_ptr = previous;
-+			return entry;
-+		}
-+		next_hop = entry->next_hop;
-+		previous = entry;
-+	}
-+	return NULL;
-+}
-+
-+/**
-+ * vdo_int_map_get() - Retrieve the value associated with a given key from the int_map.
-+ * @map: The int_map to query.
-+ * @key: The key to look up.
-+ *
-+ * Return: The value associated with the given key, or NULL if the key is not mapped to any value.
-+ */
-+void *vdo_int_map_get(struct int_map *map, u64 key)
-+{
-+	struct bucket *match = search_hop_list(map, select_bucket(map, key), key, NULL);
-+
-+	return ((match != NULL) ? match->value : NULL);
-+}
-+
-+/**
-+ * resize_buckets() - Increase the number of hash buckets.
-+ * @map: The map to resize.
-+ *
-+ * Resizes and rehashes all the existing entries, storing them in the new buckets.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+static int resize_buckets(struct int_map *map)
-+{
-+	int result;
-+	size_t i;
-+
-+	/* Copy the top-level map data to the stack. */
-+	struct int_map old_map = *map;
-+
-+	/* Re-initialize the map to be empty and 50% larger. */
-+	size_t new_capacity = map->capacity / 2 * 3;
-+
-+	uds_log_info("%s: attempting resize from %zu to %zu, current size=%zu",
-+		     __func__, map->capacity, new_capacity, map->size);
-+	result = allocate_buckets(map, new_capacity);
-+	if (result != UDS_SUCCESS) {
-+		*map = old_map;
-+		return result;
-+	}
-+
-+	/* Populate the new hash table from the entries in the old bucket array. */
-+	for (i = 0; i < old_map.bucket_count; i++) {
-+		struct bucket *entry = &old_map.buckets[i];
-+
-+		if (entry->value == NULL)
-+			continue;
-+
-+		result = vdo_int_map_put(map, entry->key, entry->value, true, NULL);
-+		if (result != UDS_SUCCESS) {
-+			/* Destroy the new partial map and restore the map from the stack. */
-+			UDS_FREE(UDS_FORGET(map->buckets));
-+			*map = old_map;
-+			return result;
-+		}
-+	}
-+
-+	/* Destroy the old bucket array. */
-+	UDS_FREE(UDS_FORGET(old_map.buckets));
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * find_empty_bucket() - Probe the bucket array starting at the given bucket for the next empty
-+ *                       bucket, returning a pointer to it.
-+ * @map: The map containing the buckets to search.
-+ * @bucket: The bucket at which to start probing.
-+ * @max_probes: The maximum number of buckets to search.
-+ *
-+ * NULL will be returned if the search reaches the end of the bucket array or if the number of
-+ * linear probes exceeds a specified limit.
-+ *
-+ * Return: The next empty bucket, or NULL if the search failed.
-+ */
-+static struct bucket *
-+find_empty_bucket(struct int_map *map, struct bucket *bucket, unsigned int max_probes)
-+{
-+	/*
-+	 * Limit the search to either the nearer of the end of the bucket array or a fixed distance
-+	 * beyond the initial bucket.
-+	 */
-+	ptrdiff_t remaining = &map->buckets[map->bucket_count] - bucket;
-+	struct bucket *sentinel = &bucket[min_t(ptrdiff_t, remaining, max_probes)];
-+	struct bucket *entry;
-+
-+	for (entry = bucket; entry < sentinel; entry++)
-+		if (entry->value == NULL)
-+			return entry;
-+	return NULL;
-+}
-+
-+/**
-+ * move_empty_bucket() - Move an empty bucket closer to the start of the bucket array.
-+ * @map: The map containing the bucket.
-+ * @hole: The empty bucket to fill with an entry that precedes it in one of its enclosing
-+ *        neighborhoods.
-+ *
-+ * This searches the neighborhoods that contain the empty bucket for a non-empty bucket closer to
-+ * the start of the array. If such a bucket is found, this swaps the two buckets by moving the
-+ * entry to the empty bucket.
-+ *
-+ * Return: The bucket that was vacated by moving its entry to the provided hole, or NULL if no
-+ *         entry could be moved.
-+ */
-+static struct bucket *move_empty_bucket(struct int_map *map __always_unused, struct bucket *hole)
-+{
-+	/*
-+	 * Examine every neighborhood that the empty bucket is part of, starting with the one in
-+	 * which it is the last bucket. No boundary check is needed for the negative array
-+	 * arithmetic since this function is only called when hole is at least NEIGHBORHOOD cells
-+	 * deeper into the array than a valid bucket.
-+	 */
-+	struct bucket *bucket;
-+
-+	for (bucket = &hole[1 - NEIGHBORHOOD]; bucket < hole; bucket++) {
-+		/*
-+		 * Find the entry that is nearest to the bucket, which means it will be nearest to
-+		 * the hash bucket whose neighborhood is full.
-+		 */
-+		struct bucket *new_hole = dereference_hop(bucket, bucket->first_hop);
-+
-+		if (new_hole == NULL)
-+			/*
-+			 * There are no buckets in this neighborhood that are in use by this one
-+			 * (they must all be owned by overlapping neighborhoods).
-+			 */
-+			continue;
-+
-+		/*
-+		 * Skip this bucket if its first entry is actually further away than the hole that
-+		 * we're already trying to fill.
-+		 */
-+		if (hole < new_hole)
-+			continue;
-+
-+		/*
-+		 * We've found an entry in this neighborhood that we can "hop" further away, moving
-+		 * the hole closer to the hash bucket, if not all the way into its neighborhood.
-+		 */
-+
-+		/*
-+		 * The entry that will be the new hole is the first bucket in the list, so setting
-+		 * first_hop is all that's needed remove it from the list.
-+		 */
-+		bucket->first_hop = new_hole->next_hop;
-+		new_hole->next_hop = NULL_HOP_OFFSET;
-+
-+		/* Move the entry into the original hole. */
-+		hole->key = new_hole->key;
-+		hole->value = new_hole->value;
-+		new_hole->value = NULL;
-+
-+		/* Insert the filled hole into the hop list for the neighborhood. */
-+		insert_in_hop_list(bucket, hole);
-+		return new_hole;
-+	}
-+
-+	/* We couldn't find an entry to relocate to the hole. */
-+	return NULL;
-+}
-+
-+/**
-+ * update_mapping() - Find and update any existing mapping for a given key, returning the value
-+ *                    associated with the key in the provided pointer.
-+ * @map: The int_map to attempt to modify.
-+ * @neighborhood: The first bucket in the neighborhood that would contain the search key
-+ * @key: The key with which to associate the new value.
-+ * @new_value: The value to be associated with the key.
-+ * @update: Whether to overwrite an existing value.
-+ * @old_value_ptr: a pointer in which to store the old value (unmodified if no mapping was found)
-+ *
-+ * Return: true if the map contains a mapping for the key, false if it does not.
-+ */
-+static bool update_mapping(struct int_map *map,
-+			   struct bucket *neighborhood,
-+			   u64 key,
-+			   void *new_value,
-+			   bool update,
-+			   void **old_value_ptr)
-+{
-+	struct bucket *bucket = search_hop_list(map, neighborhood, key, NULL);
-+
-+	if (bucket == NULL)
-+		/* There is no bucket containing the key in the neighborhood. */
-+		return false;
-+
-+	/*
-+	 * Return the value of the current mapping (if desired) and update the mapping with the new
-+	 * value (if desired).
-+	 */
-+	if (old_value_ptr != NULL)
-+		*old_value_ptr = bucket->value;
-+	if (update)
-+		bucket->value = new_value;
-+	return true;
-+}
-+
-+/**
-+ * find_or_make_vacancy() - Find an empty bucket.
-+ * @map: The int_map to search or modify.
-+ * @neighborhood: The first bucket in the neighborhood in which an empty bucket is needed for a new
-+ *                mapping.
-+ *
-+ * Find an empty bucket in a specified neighborhood for a new mapping or attempt to re-arrange
-+ * mappings so there is such a bucket. This operation may fail (returning NULL) if an empty bucket
-+ * is not available or could not be relocated to the neighborhood.
-+ *
-+ * Return: a pointer to an empty bucket in the desired neighborhood, or NULL if a vacancy could not
-+ *         be found or arranged.
-+ */
-+static struct bucket *find_or_make_vacancy(struct int_map *map, struct bucket *neighborhood)
-+{
-+	/* Probe within and beyond the neighborhood for the first empty bucket. */
-+	struct bucket *hole = find_empty_bucket(map, neighborhood, MAX_PROBES);
-+
-+	/*
-+	 * Keep trying until the empty bucket is in the bucket's neighborhood or we are unable to
-+	 * move it any closer by swapping it with a filled bucket.
-+	 */
-+	while (hole != NULL) {
-+		int distance = hole - neighborhood;
-+
-+		if (distance < NEIGHBORHOOD)
-+			/*
-+			 * We've found or relocated an empty bucket close enough to the initial
-+			 * hash bucket to be referenced by its hop vector.
-+			 */
-+			return hole;
-+
-+		/*
-+		 * The nearest empty bucket isn't within the neighborhood that must contain the new
-+		 * entry, so try to swap it with bucket that is closer.
-+		 */
-+		hole = move_empty_bucket(map, hole);
-+	}
-+
-+	return NULL;
-+}
-+
-+/**
-+ * vdo_int_map_put() - Try to associate a value with an integer.
-+ * @map: The int_map to attempt to modify.
-+ * @key: The key with which to associate the new value.
-+ * @new_value: The value to be associated with the key.
-+ * @update: Whether to overwrite an existing value.
-+ * @old_value_ptr: A pointer in which to store either the old value (if the key was already mapped)
-+ *                 or NULL if the map did not contain the key; NULL may be provided if the caller
-+ *                 does not need to know the old value
-+ *
-+ * Try to associate a value (a pointer) with an integer in an int_map. If the map already contains
-+ * a mapping for the provided key, the old value is only replaced with the specified value if
-+ * update is true. In either case the old value is returned. If the map does not already contain a
-+ * value for the specified key, the new value is added regardless of the value of update.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+int vdo_int_map_put(struct int_map *map, u64 key, void *new_value, bool update, void **old_value_ptr)
-+{
-+	struct bucket *neighborhood, *bucket;
-+
-+	if (new_value == NULL)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	/*
-+	 * Select the bucket at the start of the neighborhood that must contain any entry for the
-+	 * provided key.
-+	 */
-+	neighborhood = select_bucket(map, key);
-+
-+	/*
-+	 * Check whether the neighborhood already contains an entry for the key, in which case we
-+	 * optionally update it, returning the old value.
-+	 */
-+	if (update_mapping(map, neighborhood, key, new_value, update, old_value_ptr))
-+		return UDS_SUCCESS;
-+
-+	/*
-+	 * Find an empty bucket in the desired neighborhood for the new entry or re-arrange entries
-+	 * in the map so there is such a bucket. This operation will usually succeed; the loop body
-+	 * will only be executed on the rare occasions that we have to resize the map.
-+	 */
-+	while ((bucket = find_or_make_vacancy(map, neighborhood)) == NULL) {
-+		int result;
-+
-+		/*
-+		 * There is no empty bucket in which to put the new entry in the current map, so
-+		 * we're forced to allocate a new bucket array with a larger capacity, re-hash all
-+		 * the entries into those buckets, and try again (a very expensive operation for
-+		 * large maps).
-+		 */
-+		result = resize_buckets(map);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+
-+		/*
-+		 * Resizing the map invalidates all pointers to buckets, so recalculate the
-+		 * neighborhood pointer.
-+		 */
-+		neighborhood = select_bucket(map, key);
-+	}
-+
-+	/* Put the new entry in the empty bucket, adding it to the neighborhood. */
-+	bucket->key = key;
-+	bucket->value = new_value;
-+	insert_in_hop_list(neighborhood, bucket);
-+	map->size += 1;
-+
-+	/* There was no existing entry, so there was no old value to be returned. */
-+	if (old_value_ptr != NULL)
-+		*old_value_ptr = NULL;
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * vdo_int_map_remove() - Remove the mapping for a given key from the int_map.
-+ * @map: The int_map from which to remove the mapping.
-+ * @key: The key whose mapping is to be removed.
-+ *
-+ * Return: the value that was associated with the key, or NULL if it was not mapped.
-+ */
-+void *vdo_int_map_remove(struct int_map *map, u64 key)
-+{
-+	void *value;
-+
-+	/* Select the bucket to search and search it for an existing entry. */
-+	struct bucket *bucket = select_bucket(map, key);
-+	struct bucket *previous;
-+	struct bucket *victim = search_hop_list(map, bucket, key, &previous);
-+
-+	if (victim == NULL)
-+		/* There is no matching entry to remove. */
-+		return NULL;
-+
-+	/*
-+	 * We found an entry to remove. Save the mapped value to return later and empty the bucket.
-+	 */
-+	map->size -= 1;
-+	value = victim->value;
-+	victim->value = NULL;
-+	victim->key = 0;
-+
-+	/* The victim bucket is now empty, but it still needs to be spliced out of the hop list. */
-+	if (previous == NULL)
-+		/* The victim is the head of the list, so swing first_hop. */
-+		bucket->first_hop = victim->next_hop;
-+	else
-+		previous->next_hop = victim->next_hop;
-+	victim->next_hop = NULL_HOP_OFFSET;
-+
-+	return value;
-+}
-diff --git a/drivers/md/dm-vdo/int-map.h b/drivers/md/dm-vdo/int-map.h
-new file mode 100644
-index 000000000000..e85f12b30edc
---- /dev/null
-+++ b/drivers/md/dm-vdo/int-map.h
-@@ -0,0 +1,40 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#ifndef VDO_INT_MAP_H
-+#define VDO_INT_MAP_H
-+
-+#include <linux/compiler.h>
-+#include <linux/types.h>
-+
-+/**
-+ * DOC: int_map
-+ *
-+ * An int_map associates pointers (void *) with integer keys (u64). NULL pointer values are
-+ * not supported.
-+ *
-+ * The map is implemented as hash table, which should provide constant-time insert, query, and
-+ * remove operations, although the insert may occasionally grow the table, which is linear in the
-+ * number of entries in the map. The table will grow as needed to hold new entries, but will not
-+ * shrink as entries are removed.
-+ */
-+
-+struct int_map;
-+
-+int __must_check
-+vdo_make_int_map(size_t initial_capacity, unsigned int initial_load, struct int_map **map_ptr);
-+
-+void vdo_free_int_map(struct int_map *map);
-+
-+size_t vdo_int_map_size(const struct int_map *map);
-+
-+void *vdo_int_map_get(struct int_map *map, u64 key);
-+
-+int __must_check
-+vdo_int_map_put(struct int_map *map, u64 key, void *new_value, bool update, void **old_value_ptr);
-+
-+void *vdo_int_map_remove(struct int_map *map, u64 key);
-+
-+#endif /* VDO_INT_MAP_H */
-diff --git a/drivers/md/dm-vdo/pointer-map.c b/drivers/md/dm-vdo/pointer-map.c
-new file mode 100644
-index 000000000000..21ccb40c73d2
---- /dev/null
-+++ b/drivers/md/dm-vdo/pointer-map.c
-@@ -0,0 +1,691 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+/**
-+ * DOC:
-+ *
-+ * Hash table implementation of a map from integers to pointers, implemented using the Hopscotch
-+ * Hashing algorithm by Herlihy, Shavit, and Tzafrir (see
-+ * http://en.wikipedia.org/wiki/Hopscotch_hashing). This implementation does not contain any of the
-+ * locking/concurrency features of the algorithm, just the collision resolution scheme.
-+ *
-+ * Hopscotch Hashing is based on hashing with open addressing and linear probing. All the entries
-+ * are stored in a fixed array of buckets, with no dynamic allocation for collisions. Unlike linear
-+ * probing, all the entries that hash to a given bucket are stored within a fixed neighborhood
-+ * starting at that bucket. Chaining is effectively represented as a bit vector relative to each
-+ * bucket instead of as pointers or explicit offsets.
-+ *
-+ * When an empty bucket cannot be found within a given neighborhood, subsequent neighborhoods are
-+ * searched, and one or more entries will "hop" into those neighborhoods. When this process works,
-+ * an empty bucket will move into the desired neighborhood, allowing the entry to be added. When
-+ * that process fails (typically when the buckets are around 90% full), the table must be resized
-+ * and the all entries rehashed and added to the expanded table.
-+ *
-+ * Unlike linear probing, the number of buckets that must be searched in the worst case has a fixed
-+ * upper bound (the size of the neighborhood). Those entries occupy a small number of memory cache
-+ * lines, leading to improved use of the cache (fewer misses on both successful and unsuccessful
-+ * searches). Hopscotch hashing outperforms linear probing at much higher load factors, so even
-+ * with the increased memory burden for maintaining the hop vectors, less memory is needed to
-+ * achieve that performance. Hopscotch is also immune to "contamination" from deleting entries
-+ * since entries are genuinely removed instead of being replaced by a placeholder.
-+ *
-+ * The published description of the algorithm used a bit vector, but the paper alludes to an offset
-+ * scheme which is used by this implementation. Since the entries in the neighborhood are within N
-+ * entries of the hash bucket at the start of the neighborhood, a pair of small offset fields each
-+ * log2(N) bits wide is all that's needed to maintain the hops as a linked list. In order to encode
-+ * "no next hop" (i.e. NULL) as the natural initial value of zero, the offsets are biased by one
-+ * (i.e. 0 => NULL, 1 => offset=0, 2 => offset=1, etc.) We can represent neighborhoods of up to 255
-+ * entries with just 8+8=16 bits per entry. The hop list is sorted by hop offset so the first entry
-+ * in the list is always the bucket closest to the start of the neighborhood.
-+ *
-+ * While individual accesses tend to be very fast, the table resize operations are very, very
-+ * expensive. If an upper bound on the latency of adding an entry to the table is needed, we either
-+ * need to ensure the table is pre-sized to be large enough so no resize is ever needed, or we'll
-+ * need to develop an approach to incrementally resize the table.
-+ */
-+
-+#include "pointer-map.h"
-+
-+#include <linux/minmax.h>
-+
-+#include "errors.h"
-+#include "logger.h"
-+#include "memory-alloc.h"
-+#include "numeric.h"
-+#include "permassert.h"
-+
-+enum {
-+	DEFAULT_CAPACITY = 16, /* the number of neighborhoods in a new table */
-+	NEIGHBORHOOD = 255, /* the number of buckets in each neighborhood */
-+	MAX_PROBES = 1024, /* limit on the number of probes for a free bucket */
-+	NULL_HOP_OFFSET = 0, /* the hop offset value terminating the hop list */
-+	DEFAULT_LOAD = 75 /* a compromise between memory use and performance */
-+};
-+
-+/**
-+ * struct bucket - Hash buckets.
-+ *
-+ * Buckets are packed together to reduce memory usage and improve cache efficiency. It would be
-+ * tempting to encode the hop offsets separately and maintain alignment of key/value pairs, but
-+ * it's crucial to keep the hop fields near the buckets that they use them so they'll tend to share
-+ * cache lines.
-+ */
-+struct __packed bucket {
-+	/**
-+	 * @first_hop: The biased offset of the first entry in the hop list of the neighborhood
-+	 * that hashes to this bucket.
-+	 */
-+	u8 first_hop;
-+	/** @next_hop: the biased offset of the next bucket in the hop list. */
-+	u8 next_hop;
-+	/** @key: The key stored in this bucket. */
-+	const void *key;
-+	/** @value: The value stored in this bucket (NULL if empty). */
-+	void *value;
-+};
-+
-+/**
-+ * struct pointer_map - The concrete definition of the opaque pointer_map type.
-+ *
-+ * To avoid having to wrap the neighborhoods of the last entries back around to the start of the
-+ * bucket array, we allocate a few more buckets at the end of the array instead, which is why
-+ * capacity and bucket_count are different.
-+ */
-+struct pointer_map {
-+	/** @size: The number of entries stored in the map. */
-+	size_t size;
-+	/** @capacity: The number of neighborhoods in the map. */
-+	size_t capacity;
-+	/** @bucket_count: The number of buckets in the bucket array. */
-+	size_t bucket_count;
-+	/** @buckets: The array of hash buckets. */
-+	struct bucket *buckets;
-+	/** @comparator: The function for comparing keys for equality. */
-+	pointer_key_comparator *comparator;
-+	/** @hasher: The function for getting a hash code from a key. */
-+	pointer_key_hasher *hasher;
-+};
-+
-+/**
-+ * allocate_buckets() - Initialize a pointer_map.
-+ * @map: The map to initialize.
-+ * @capacity: The initial capacity of the map.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+static int allocate_buckets(struct pointer_map *map, size_t capacity)
-+{
-+	map->size = 0;
-+	map->capacity = capacity;
-+
-+	/*
-+	 * Allocate NEIGHBORHOOD - 1 extra buckets so the last bucket can have a full neighborhood
-+	 * without have to wrap back around to element zero.
-+	 */
-+	map->bucket_count = capacity + (NEIGHBORHOOD - 1);
-+	return UDS_ALLOCATE(map->bucket_count,
-+			    struct bucket,
-+			    "pointer_map buckets",
-+			    &map->buckets);
-+}
-+
-+/**
-+ * vdo_make_pointer_map() - Allocate and initialize a pointer_map.
-+ * @initial_capacity: The number of entries the map should initially be capable of holding (zero
-+ *                    tells the map to use its own small default).
-+ * @initial_load: The load factor of the map, expressed as an integer percentage (typically in the
-+ * range 50 to 90, with zero telling the map to use its own default).
-+ * @comparator: The function to use to compare the referents of two pointer keys for equality.
-+ * @hasher: The function to use obtain the hash code associated with each pointer key
-+ * @map_ptr: A pointer to hold the new pointer_map.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+int vdo_make_pointer_map(size_t initial_capacity,
-+			 unsigned int initial_load,
-+			 pointer_key_comparator comparator,
-+			 pointer_key_hasher hasher,
-+			 struct pointer_map **map_ptr)
-+{
-+	int result;
-+	struct pointer_map *map;
-+	size_t capacity;
-+
-+	/* Use the default initial load if the caller did not specify one. */
-+	if (initial_load == 0)
-+		initial_load = DEFAULT_LOAD;
-+	if (initial_load > 100)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	result = UDS_ALLOCATE(1, struct pointer_map, "pointer_map", &map);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	map->hasher = hasher;
-+	map->comparator = comparator;
-+
-+	/* Use the default capacity if the caller did not specify one. */
-+	capacity = (initial_capacity > 0) ? initial_capacity : DEFAULT_CAPACITY;
-+
-+	/*
-+	 * Scale up the capacity by the specified initial load factor. (i.e to hold 1000 entries at
-+	 * 80% load we need a capacity of 1250)
-+	 */
-+	capacity = capacity * 100 / initial_load;
-+
-+	result = allocate_buckets(map, capacity);
-+	if (result != UDS_SUCCESS) {
-+		vdo_free_pointer_map(UDS_FORGET(map));
-+		return result;
-+	}
-+
-+	*map_ptr = map;
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * vdo_free_pointer_map() - Free a pointer_map.
-+ * @map: The pointer_map to free.
-+ *
-+ * The map does not own the pointer keys and values stored in the map and they are not freed by
-+ * this call.
-+ */
-+void vdo_free_pointer_map(struct pointer_map *map)
-+{
-+	if (map == NULL)
-+		return;
-+
-+	UDS_FREE(UDS_FORGET(map->buckets));
-+	UDS_FREE(UDS_FORGET(map));
-+}
-+
-+/**
-+ * vdo_pointer_map_size() - Get the number of entries stored in a pointer_map.
-+ * @map: The pointer_map to query.
-+ *
-+ * Return: The number of entries in the map.
-+ */
-+size_t vdo_pointer_map_size(const struct pointer_map *map)
-+{
-+	return map->size;
-+}
-+
-+/**
-+ * dereference_hop() - Convert a biased hop offset within a neighborhood to a pointer to the bucket
-+ *                     it references.
-+ * @neighborhood: The first bucket in the neighborhood.
-+ * @hop_offset: The biased hop offset to the desired bucket.
-+ *
-+ * Return: NULL if hop_offset is zero, otherwise a pointer to the bucket in the neighborhood at
-+ *         hop_offset - 1.
-+ */
-+static struct bucket *dereference_hop(struct bucket *neighborhood, unsigned int hop_offset)
-+{
-+	if (hop_offset == NULL_HOP_OFFSET)
-+		return NULL;
-+
-+	STATIC_ASSERT(NULL_HOP_OFFSET == 0);
-+	return &neighborhood[hop_offset - 1];
-+}
-+
-+/**
-+ * insert_in_hop_list() - Add a bucket into the hop list for the neighborhood, inserting it into
-+ *                        the list so the hop list remains sorted by hop offset.
-+ * @neighborhood: The first bucket in the neighborhood.
-+ * @new_bucket: The bucket to add to the hop list.
-+ */
-+static void insert_in_hop_list(struct bucket *neighborhood, struct bucket *new_bucket)
-+{
-+	/* Zero indicates a NULL hop offset, so bias the hop offset by one. */
-+	int hop_offset = 1 + (new_bucket - neighborhood);
-+
-+	/* Handle the special case of adding a bucket at the start of the list. */
-+	int next_hop = neighborhood->first_hop;
-+
-+	if ((next_hop == NULL_HOP_OFFSET) || (next_hop > hop_offset)) {
-+		new_bucket->next_hop = next_hop;
-+		neighborhood->first_hop = hop_offset;
-+		return;
-+	}
-+
-+	/* Search the hop list for the insertion point that maintains the sort order. */
-+	for (;;) {
-+		struct bucket *bucket = dereference_hop(neighborhood, next_hop);
-+
-+		next_hop = bucket->next_hop;
-+
-+		if ((next_hop == NULL_HOP_OFFSET) || (next_hop > hop_offset)) {
-+			new_bucket->next_hop = next_hop;
-+			bucket->next_hop = hop_offset;
-+			return;
-+		}
-+	}
-+}
-+
-+/**
-+ * select_bucket() - Select and return the hash bucket for a given search key.
-+ * @map: The map to search.
-+ * @key: The mapping key.
-+ */
-+static struct bucket *select_bucket(const struct pointer_map *map, const void *key)
-+{
-+	/*
-+	 * Scale the 32-bit hash to a bucket index by treating it as a binary fraction and
-+	 * multiplying that by the capacity. If the hash is uniformly distributed over [0 ..
-+	 * 2^32-1], then (hash * capacity / 2^32) should be uniformly distributed over [0 ..
-+	 * capacity-1]. The multiply and shift is much faster than a divide (modulus) on X86 CPUs.
-+	 */
-+	u64 hash = map->hasher(key);
-+
-+	return &map->buckets[(hash * map->capacity) >> 32];
-+}
-+
-+/**
-+ * search_hop_list() - Search the hop list.
-+ * @map: The map being searched.
-+ * @bucket: The map bucket to search for the key.
-+ * @key: The mapping key.
-+ * @previous_ptr: if not NULL, a pointer in which to store the bucket in the list preceding the one
-+ *                that had the matching key.
-+ *
-+ * Searches the hop list associated with given hash bucket for a given search key. If the key is
-+ * found, returns a pointer to the entry (bucket or collision), otherwise returns NULL.
-+ *
-+ * Return: an entry that matches the key, or NULL if not found.
-+ */
-+static struct bucket *search_hop_list(struct pointer_map *map,
-+				      struct bucket *bucket,
-+				      const void *key,
-+				      struct bucket **previous_ptr)
-+{
-+	struct bucket *previous = NULL;
-+	unsigned int next_hop = bucket->first_hop;
-+
-+	while (next_hop != NULL_HOP_OFFSET) {
-+		/* Check the neighboring bucket indexed by the offset for the desired key. */
-+		struct bucket *entry = dereference_hop(bucket, next_hop);
-+
-+		if ((entry->value != NULL) && map->comparator(key, entry->key)) {
-+			if (previous_ptr != NULL)
-+				*previous_ptr = previous;
-+			return entry;
-+		}
-+		next_hop = entry->next_hop;
-+		previous = entry;
-+	}
-+	return NULL;
-+}
-+
-+/**
-+ * vdo_pointer_map_get() - Retrieve the value associated with a given key from the pointer_map.
-+ * @map: The pointer_map to query.
-+ * @key: The key to look up (may be NULL if the comparator and hasher functions support it).
-+ *
-+ * Return: the value associated with the given key, or NULL if the key is not mapped to any value.
-+ */
-+void *vdo_pointer_map_get(struct pointer_map *map, const void *key)
-+{
-+	struct bucket *match = search_hop_list(map, select_bucket(map, key), key, NULL);
-+
-+	return ((match != NULL) ? match->value : NULL);
-+}
-+
-+/**
-+ * resize_buckets() - Increase the number of hash buckets and rehash all the existing entries,
-+ *                    storing them in the new buckets.
-+ * @map: The map to resize.
-+ */
-+static int resize_buckets(struct pointer_map *map)
-+{
-+	int result;
-+	size_t i;
-+
-+	/* Copy the top-level map data to the stack. */
-+	struct pointer_map old_map = *map;
-+
-+	/* Re-initialize the map to be empty and 50% larger. */
-+	size_t new_capacity = map->capacity / 2 * 3;
-+
-+	uds_log_info("%s: attempting resize from %zu to %zu, current size=%zu",
-+		     __func__,
-+		     map->capacity,
-+		     new_capacity,
-+		     map->size);
-+	result = allocate_buckets(map, new_capacity);
-+	if (result != UDS_SUCCESS) {
-+		*map = old_map;
-+		return result;
-+	}
-+
-+	/* Populate the new hash table from the entries in the old bucket array. */
-+	for (i = 0; i < old_map.bucket_count; i++) {
-+		struct bucket *entry = &old_map.buckets[i];
-+
-+		if (entry->value == NULL)
-+			continue;
-+
-+		result = vdo_pointer_map_put(map, entry->key, entry->value, true, NULL);
-+		if (result != UDS_SUCCESS) {
-+			/* Destroy the new partial map and restore the map from the stack. */
-+			UDS_FREE(UDS_FORGET(map->buckets));
-+			*map = old_map;
-+			return result;
-+		}
-+	}
-+
-+	/* Destroy the old bucket array. */
-+	UDS_FREE(UDS_FORGET(old_map.buckets));
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * find_empty_bucket() - Probe the bucket array starting at the given bucket for the next empty
-+ *                       bucket, returning a pointer to it.
-+ * @map: The map containing the buckets to search.
-+ * @bucket: The bucket at which to start probing.
-+ * @max_probes: The maximum number of buckets to search.
-+ *
-+ * NULL will be returned if the search reaches the end of the bucket array or if the number of
-+ * linear probes exceeds a specified limit.
-+ *
-+ * Return: The next empty bucket, or NULL if the search failed.
-+ */
-+static struct bucket *
-+find_empty_bucket(struct pointer_map *map, struct bucket *bucket, unsigned int max_probes)
-+{
-+	/*
-+	 * Limit the search to either the nearer of the end of the bucket array or a fixed distance
-+	 * beyond the initial bucket.
-+	 */
-+	ptrdiff_t remaining = &map->buckets[map->bucket_count] - bucket;
-+	struct bucket *sentinel = &bucket[min_t(ptrdiff_t, remaining, max_probes)];
-+	struct bucket *entry;
-+
-+	for (entry = bucket; entry < sentinel; entry++)
-+		if (entry->value == NULL)
-+			return entry;
-+	return NULL;
-+}
-+
-+/**
-+ * move_empty_bucket() - Move an empty bucket closer to the start of the bucket array.
-+ * @map: The map containing the bucket.
-+
-+ * @hole: The empty bucket to fill with an entry that precedes it in one of its enclosing
-+ *        neighborhoods.
-+ *
-+ * This searches the neighborhoods that contain the empty bucket for a non-empty bucket closer to
-+ * the start of the array. If such a bucket is found, this swaps the two buckets by moving the
-+ * entry to the empty bucket.
-+ *
-+ * Return: The bucket that was vacated by moving its entry to the provided hole, or NULL if no
-+ *         entry could be moved.
-+ */
-+static struct bucket *
-+move_empty_bucket(struct pointer_map *map __always_unused, struct bucket *hole)
-+{
-+	/*
-+	 * Examine every neighborhood that the empty bucket is part of, starting with the one in
-+	 * which it is the last bucket. No boundary check is needed for the negative array
-+	 * arithmetic since this function is only called when hole is at least NEIGHBORHOOD cells
-+	 * deeper into the array than a valid bucket.
-+	 */
-+	struct bucket *bucket;
-+
-+	for (bucket = &hole[1 - NEIGHBORHOOD]; bucket < hole; bucket++) {
-+		/*
-+		 * Find the entry that is nearest to the bucket, which means it will be nearest to
-+		 * the hash bucket whose neighborhood is full.
-+		 */
-+		struct bucket *new_hole = dereference_hop(bucket, bucket->first_hop);
-+
-+		if (new_hole == NULL)
-+			/*
-+			 * There are no buckets in this neighborhood that are in use by this one
-+			 * (they must all be owned by overlapping neighborhoods).
-+			 */
-+			continue;
-+
-+		/*
-+		 * Skip this bucket if its first entry is actually further away than the hole that
-+		 * we're already trying to fill.
-+		 */
-+		if (hole < new_hole)
-+			continue;
-+
-+		/*
-+		 * We've found an entry in this neighborhood that we can "hop" further away, moving
-+		 * the hole closer to the hash bucket, if not all the way into its neighborhood.
-+		 */
-+
-+		/*
-+		 * The entry that will be the new hole is the first bucket in the list, so setting
-+		 * first_hop is all that's needed remove it from the list.
-+		 */
-+		bucket->first_hop = new_hole->next_hop;
-+		new_hole->next_hop = NULL_HOP_OFFSET;
-+
-+		/* Move the entry into the original hole. */
-+		hole->key = new_hole->key;
-+		hole->value = new_hole->value;
-+		new_hole->value = NULL;
-+
-+		/* Insert the filled hole into the hop list for the neighborhood. */
-+		insert_in_hop_list(bucket, hole);
-+		return new_hole;
-+	}
-+
-+	/* We couldn't find an entry to relocate to the hole. */
-+	return NULL;
-+}
-+
-+/**
-+ * update_mapping() - Find and update any existing mapping for a given key, returning the value
-+ *                    associated with the key in the provided pointer.
-+ * @map: The pointer_map to attempt to modify.
-+ * @neighborhood: The first bucket in the neighborhood that would contain the search key.
-+ * @key: The key with which to associate the new value.
-+ * @new_value: The value to be associated with the key.
-+ * @update: Whether to overwrite an existing value.
-+ * @old_value_ptr: A pointer in which to store the old value (unmodified if no mapping was found).
-+ *
-+ * Return: true if the map contains a mapping for the key, false if it does not.
-+ */
-+static bool update_mapping(struct pointer_map *map,
-+			   struct bucket *neighborhood,
-+			   const void *key,
-+			   void *new_value,
-+			   bool update,
-+			   void **old_value_ptr)
-+{
-+	struct bucket *bucket = search_hop_list(map, neighborhood, key, NULL);
-+
-+	if (bucket == NULL)
-+		/* There is no bucket containing the key in the neighborhood. */
-+		return false;
-+
-+	/*
-+	 * Return the value of the current mapping (if desired) and update the mapping with the new
-+	 * value (if desired).
-+	 */
-+	if (old_value_ptr != NULL)
-+		*old_value_ptr = bucket->value;
-+	if (update) {
-+		/*
-+		 * We're dropping the old key pointer on the floor here, assuming it's a property
-+		 * of the value or that it's otherwise safe to just forget.
-+		 */
-+		bucket->key = key;
-+		bucket->value = new_value;
-+	}
-+	return true;
-+}
-+
-+/**
-+ * find_or_make_vacancy() - Find an empty bucket in a specified neighborhood for a new mapping or
-+ *                          attempt to re-arrange mappings so there is such a bucket.
-+ * @map: The pointer_map to search or modify.
-+ * @neighborhood: The first bucket in the neighborhood in which an empty bucket is needed for a new
-+ *                mapping.
-+ *
-+ * This operation may fail (returning NULL) if an empty bucket is not available or could not be
-+ * relocated to the neighborhood.
-+ *
-+ * Return: A pointer to an empty bucket in the desired neighborhood, or NULL if a vacancy could not
-+ *         be found or arranged.
-+ */
-+static struct bucket *find_or_make_vacancy(struct pointer_map *map, struct bucket *neighborhood)
-+{
-+	/* Probe within and beyond the neighborhood for the first empty bucket. */
-+	struct bucket *hole = find_empty_bucket(map, neighborhood, MAX_PROBES);
-+
-+	/*
-+	 * Keep trying until the empty bucket is in the bucket's neighborhood or we are unable to
-+	 * move it any closer by swapping it with a filled bucket.
-+	 */
-+	while (hole != NULL) {
-+		int distance = hole - neighborhood;
-+
-+		if (distance < NEIGHBORHOOD)
-+			/*
-+			 * We've found or relocated an empty bucket close enough to the initial
-+			 * hash bucket to be referenced by its hop vector.
-+			 */
-+			return hole;
-+
-+		/*
-+		 * The nearest empty bucket isn't within the neighborhood that must contain the new
-+		 * entry, so try to swap it with bucket that is closer.
-+		 */
-+		hole = move_empty_bucket(map, hole);
-+	}
-+
-+	return NULL;
-+}
-+
-+/**
-+ * vdo_pointer_map_put() - Try to associate a value (a pointer) with an integer in a pointer_map.
-+ * @map: The pointer_map to attempt to modify.
-+ * @key: The key with which to associate the new value (may be NULL if the comparator and hasher
-+ *       functions support it).
-+ * @new_value: The value to be associated with the key.
-+ * @update: Whether to overwrite an existing value.
-+ * @old_value_ptr: A pointer in which to store either the old value (if the key was already mapped)
-+ *                 or NULL if the map did not contain the key; NULL may be provided if the caller
-+ *                 does not need to know the old value.
-+ *
-+ * If the map already contains a mapping for the provided key, the old value is only replaced with
-+ * the specified value if update is true. In either case the old value is returned. If the map does
-+ * not already contain a value for the specified key, the new value is added regardless of the
-+ * value of update.
-+ *
-+ * If the value stored in the map is updated, then the key stored in the map will also be updated
-+ * with the key provided by this call. The old key will not be returned due to the memory
-+ * management assumptions described in the interface header comment.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+int vdo_pointer_map_put(struct pointer_map *map,
-+			const void *key,
-+			void *new_value,
-+			bool update,
-+			void **old_value_ptr)
-+{
-+	struct bucket *neighborhood, *bucket;
-+
-+	if (new_value == NULL)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	/*
-+	 * Select the bucket at the start of the neighborhood that must contain any entry for the
-+	 * provided key.
-+	 */
-+	neighborhood = select_bucket(map, key);
-+
-+	/*
-+	 * Check whether the neighborhood already contains an entry for the key, in which case we
-+	 * optionally update it, returning the old value.
-+	 */
-+	if (update_mapping(map, neighborhood, key, new_value, update, old_value_ptr))
-+		return UDS_SUCCESS;
-+
-+	/*
-+	 * Find an empty bucket in the desired neighborhood for the new entry or re-arrange entries
-+	 * in the map so there is such a bucket. This operation will usually succeed; the loop body
-+	 * will only be executed on the rare occasions that we have to resize the map.
-+	 */
-+	while ((bucket = find_or_make_vacancy(map, neighborhood)) == NULL) {
-+		/*
-+		 * There is no empty bucket in which to put the new entry in the current map, so
-+		 * we're forced to allocate a new bucket array with a larger capacity, re-hash all
-+		 * the entries into those buckets, and try again (a very expensive operation for
-+		 * large maps).
-+		 */
-+		int result = resize_buckets(map);
-+
-+		if (result != UDS_SUCCESS)
-+			return result;
-+
-+		/*
-+		 * Resizing the map invalidates all pointers to buckets, so
-+		 * recalculate the neighborhood pointer.
-+		 */
-+		neighborhood = select_bucket(map, key);
-+	}
-+
-+	/* Put the new entry in the empty bucket, adding it to the neighborhood. */
-+	bucket->key = key;
-+	bucket->value = new_value;
-+	insert_in_hop_list(neighborhood, bucket);
-+	map->size += 1;
-+
-+	/*
-+	 * There was no existing entry, so there was no old value to be
-+	 * returned.
-+	 */
-+	if (old_value_ptr != NULL)
-+		*old_value_ptr = NULL;
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * vdo_pointer_map_remove() - Remove the mapping for a given key from the pointer_map.
-+ * @map: The pointer_map from which to remove the mapping.
-+ * @key: The key whose mapping is to be removed (may be NULL if the comparator and hasher functions
-+ *       support it).
-+ *
-+ * Return: the value that was associated with the key, or NULL if it was not mapped.
-+ */
-+void *vdo_pointer_map_remove(struct pointer_map *map, const void *key)
-+{
-+	void *value;
-+
-+	/* Select the bucket to search and search it for an existing entry. */
-+	struct bucket *bucket = select_bucket(map, key);
-+	struct bucket *previous;
-+	struct bucket *victim = search_hop_list(map, bucket, key, &previous);
-+
-+	if (victim == NULL)
-+		/* There is no matching entry to remove. */
-+		return NULL;
-+
-+	/*
-+	 * We found an entry to remove. Save the mapped value to return later and empty the bucket.
-+	 */
-+	map->size -= 1;
-+	value = victim->value;
-+	victim->value = NULL;
-+	victim->key = 0;
-+
-+	/* The victim bucket is now empty, but it still needs to be spliced out of the hop list. */
-+	if (previous == NULL)
-+		/* The victim is the head of the list, so swing first_hop. */
-+		bucket->first_hop = victim->next_hop;
-+	else
-+		previous->next_hop = victim->next_hop;
-+	victim->next_hop = NULL_HOP_OFFSET;
-+
-+	return value;
-+}
-diff --git a/drivers/md/dm-vdo/pointer-map.h b/drivers/md/dm-vdo/pointer-map.h
-new file mode 100644
-index 000000000000..83465d01bfa7
---- /dev/null
-+++ b/drivers/md/dm-vdo/pointer-map.h
-@@ -0,0 +1,81 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#ifndef VDO_POINTER_MAP_H
-+#define VDO_POINTER_MAP_H
-+
-+#include <linux/compiler.h>
-+#include <linux/types.h>
-+
-+/*
-+ * A pointer_map associates pointer values (<code>void *</code>) with the data referenced by
-+ * pointer keys (<code>void *</code>). <code>NULL</code> pointer values are not supported. A
-+ * <code>NULL</code> key value is supported when the instance's key comparator and hasher functions
-+ * support it.
-+ *
-+ * The map is implemented as hash table, which should provide constant-time insert, query, and
-+ * remove operations, although the insert may occasionally grow the table, which is linear in the
-+ * number of entries in the map. The table will grow as needed to hold new entries, but will not
-+ * shrink as entries are removed.
-+ *
-+ * The key and value pointers passed to the map are retained and used by the map, but are not owned
-+ * by the map. Freeing the map does not attempt to free the pointers. The client is entirely
-+ * responsible for the memory management of the keys and values. The current interface and
-+ * implementation assume that keys will be properties of the values, or that keys will not be
-+ * memory managed, or that keys will not need to be freed as a result of being replaced when a key
-+ * is re-mapped.
-+ */
-+
-+struct pointer_map;
-+
-+/**
-+ * typedef pointer_key_comparator - The prototype of functions that compare the referents of two
-+ *                                  pointer keys for equality.
-+ * @this_key: The first element to compare.
-+ * @that_key: The second element to compare.
-+ *
-+ * If two keys are equal, then both keys must have the same the hash code associated with them by
-+ * the hasher function defined below.
-+ *
-+ * Return: true if and only if the referents of the two key pointers are to be treated as the same
-+ *         key by the map.
-+ */
-+typedef bool pointer_key_comparator(const void *this_key, const void *that_key);
-+
-+/**
-+ * typedef pointer_key_hasher - The prototype of functions that get or calculate a hash code
-+ *                              associated with the referent of pointer key.
-+ * @key: The pointer key to hash.
-+ *
-+ * The hash code must be uniformly distributed over all u32 values. The hash code associated
-+ * with a given key must not change while the key is in the map. If the comparator function says
-+ * two keys are equal, then this function must return the same hash code for both keys. This
-+ * function may be called many times for a key while an entry is stored for it in the map.
-+ *
-+ * Return: The hash code for the key.
-+ */
-+typedef u32 pointer_key_hasher(const void *key);
-+
-+int __must_check vdo_make_pointer_map(size_t initial_capacity,
-+				      unsigned int initial_load,
-+				      pointer_key_comparator comparator,
-+				      pointer_key_hasher hasher,
-+				      struct pointer_map **map_ptr);
-+
-+void vdo_free_pointer_map(struct pointer_map *map);
-+
-+size_t vdo_pointer_map_size(const struct pointer_map *map);
-+
-+void *vdo_pointer_map_get(struct pointer_map *map, const void *key);
-+
-+int __must_check vdo_pointer_map_put(struct pointer_map *map,
-+				     const void *key,
-+				     void *new_value,
-+				     bool update,
-+				     void **old_value_ptr);
-+
-+void *vdo_pointer_map_remove(struct pointer_map *map, const void *key);
-+
-+#endif /* VDO_POINTER_MAP_H */
-diff --git a/drivers/md/dm-vdo/priority-table.c b/drivers/md/dm-vdo/priority-table.c
-new file mode 100644
-index 000000000000..f8b81d6410c7
---- /dev/null
-+++ b/drivers/md/dm-vdo/priority-table.c
-@@ -0,0 +1,226 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2023 Red Hat
-+ */
-+
-+#include "priority-table.h"
-+
-+#include <linux/log2.h>
-+
-+#include "errors.h"
-+#include "memory-alloc.h"
-+#include "permassert.h"
-+
-+#include "status-codes.h"
-+
-+/* We use a single 64-bit search vector, so the maximum priority is 63 */
-+enum {
-+	MAX_PRIORITY = 63
-+};
-+
-+/*
-+ * All the entries with the same priority are queued in a circular list in a bucket for that
-+ * priority. The table is essentially an array of buckets.
-+ */
-+struct bucket {
-+	/*
-+	 * The head of a queue of table entries, all having the same priority
-+	 */
-+	struct list_head queue;
-+	/* The priority of all the entries in this bucket */
-+	unsigned int priority;
-+};
-+
-+/*
-+ * A priority table is an array of buckets, indexed by priority. New entries are added to the end
-+ * of the queue in the appropriate bucket. The dequeue operation finds the highest-priority
-+ * non-empty bucket by searching a bit vector represented as a single 8-byte word, which is very
-+ * fast with compiler and CPU support.
-+ */
-+struct priority_table {
-+	/* The maximum priority of entries that may be stored in this table */
-+	unsigned int max_priority;
-+	/* A bit vector flagging all buckets that are currently non-empty */
-+	u64 search_vector;
-+	/* The array of all buckets, indexed by priority */
-+	struct bucket buckets[];
-+};
-+
-+/**
-+ * vdo_make_priority_table() - Allocate and initialize a new priority_table.
-+ * @max_priority: The maximum priority value for table entries.
-+ * @table_ptr: A pointer to hold the new table.
++ * Any existing slab pointers will be copied into the new array, and slabs will be allocated as
++ * needed. The newly allocated slabs will not be distributed for use by the block allocators.
 + *
 + * Return: VDO_SUCCESS or an error code.
 + */
-+int vdo_make_priority_table(unsigned int max_priority, struct priority_table **table_ptr)
++static int allocate_slabs(struct slab_depot *depot, slab_count_t slab_count)
 +{
-+	struct priority_table *table;
++	block_count_t slab_size;
++	bool resizing = false;
++	physical_block_number_t slab_origin;
 +	int result;
-+	unsigned int priority;
 +
-+	if (max_priority > MAX_PRIORITY)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct priority_table, max_priority + 1,
-+				       struct bucket, __func__, &table);
++	result = UDS_ALLOCATE(slab_count,
++			      struct vdo_slab *,
++			      "slab pointer array",
++			      &depot->new_slabs);
 +	if (result != VDO_SUCCESS)
 +		return result;
 +
-+	for (priority = 0; priority <= max_priority; priority++) {
-+		struct bucket *bucket = &table->buckets[priority];
-+
-+		bucket->priority = priority;
-+		INIT_LIST_HEAD(&bucket->queue);
++	if (depot->slabs != NULL) {
++		memcpy(depot->new_slabs,
++		       depot->slabs,
++		       depot->slab_count * sizeof(struct vdo_slab *));
++		resizing = true;
 +	}
 +
-+	table->max_priority = max_priority;
-+	table->search_vector = 0;
++	slab_size = depot->slab_config.slab_blocks;
++	slab_origin = depot->first_block + (depot->slab_count * slab_size);
 +
-+	*table_ptr = table;
++	for (depot->new_slab_count = depot->slab_count;
++	     depot->new_slab_count < slab_count;
++	     depot->new_slab_count++, slab_origin += slab_size) {
++		struct block_allocator *allocator =
++			&depot->allocators[depot->new_slab_count % depot->zone_count];
++		struct vdo_slab **slab_ptr = &depot->new_slabs[depot->new_slab_count];
++
++		result = make_slab(slab_origin,
++				   allocator,
++				   depot->new_slab_count,
++				   resizing,
++				   slab_ptr);
++		if (result != VDO_SUCCESS)
++			return result;
++	}
++
 +	return VDO_SUCCESS;
 +}
 +
 +/**
-+ * vdo_free_priority_table() - Free a priority_table.
-+ * @table: The table to free.
-+ *
-+ * The table does not own the entries stored in it and they are not freed by this call.
++ * vdo_abandon_new_slabs() - Abandon any new slabs in this depot, freeing them as needed.
++ * @depot: The depot.
 + */
-+void vdo_free_priority_table(struct priority_table *table)
++void vdo_abandon_new_slabs(struct slab_depot *depot)
 +{
-+	if (table == NULL)
++	slab_count_t i;
++
++	if (depot->new_slabs == NULL)
 +		return;
 +
++	for (i = depot->slab_count; i < depot->new_slab_count; i++)
++		free_slab(UDS_FORGET(depot->new_slabs[i]));
++	depot->new_slab_count = 0;
++	depot->new_size = 0;
++	UDS_FREE(UDS_FORGET(depot->new_slabs));
++}
++
++/**
++ * get_allocator_thread_id() - Get the ID of the thread on which a given allocator operates.
++ *
++ * Implements vdo_zone_thread_getter.
++ */
++static thread_id_t get_allocator_thread_id(void *context, zone_count_t zone_number)
++{
++	return ((struct slab_depot *) context)->allocators[zone_number].thread_id;
++}
++
++/**
++ * release_recovery_journal_lock() - Request the slab journal to release the recovery journal lock
++ *                                   it may hold on a specified recovery journal block.
++ * @journal: The slab journal.
++ * @recovery_lock: The sequence number of the recovery journal block whose locks should be
++ *                 released.
++ *
++ * Return: true if the journal does hold a lock on the specified block (which it will release).
++ */
++static bool __must_check
++release_recovery_journal_lock(struct slab_journal *journal, sequence_number_t recovery_lock)
++{
++	if (recovery_lock > journal->recovery_lock) {
++		ASSERT_LOG_ONLY((recovery_lock < journal->recovery_lock),
++				"slab journal recovery lock is not older than the recovery journal head");
++		return false;
++	}
++
++	if ((recovery_lock < journal->recovery_lock) ||
++	    vdo_is_read_only(journal->slab->allocator->depot->vdo))
++		return false;
++
++	/* All locks are held by the block which is in progress; write it. */
++	commit_tail(journal);
++	return true;
++}
++
++/*
++ * Request a commit of all dirty tail blocks which are locking the recovery journal block the depot
++ * is seeking to release.
++ *
++ * Implements vdo_zone_action.
++ */
++static void release_tail_block_locks(void *context,
++				     zone_count_t zone_number,
++				     struct vdo_completion *parent)
++{
++	struct slab_journal *journal, *tmp;
++	struct slab_depot *depot = context;
++	struct list_head *list = &depot->allocators[zone_number].dirty_slab_journals;
++
++	list_for_each_entry_safe(journal, tmp, list, dirty_entry) {
++		if (!release_recovery_journal_lock(journal, depot->active_release_request))
++			break;
++	}
++
++	vdo_finish_completion(parent);
++}
++
++/**
++ * prepare_for_tail_block_commit() - Prepare to commit oldest tail blocks.
++ *
++ * Implements vdo_action_preamble.
++ */
++static void prepare_for_tail_block_commit(void *context, struct vdo_completion *parent)
++{
++	struct slab_depot *depot = context;
++
++	depot->active_release_request = depot->new_release_request;
++	vdo_finish_completion(parent);
++}
++
++/**
++ * schedule_tail_block_commit() - Schedule a tail block commit if necessary.
++ *
++ * This method should not be called directly. Rather, call vdo_schedule_default_action() on the
++ * depot's action manager.
++ *
++ * Implements vdo_action_scheduler.
++ */
++static bool schedule_tail_block_commit(void *context)
++{
++	struct slab_depot *depot = context;
++
++	if (depot->new_release_request == depot->active_release_request)
++		return false;
++
++	return vdo_schedule_action(depot->action_manager,
++				   prepare_for_tail_block_commit,
++				   release_tail_block_locks,
++				   NULL,
++				   NULL);
++}
++
+ /**
+  * initialize_slab_scrubber() - Initialize an allocator's slab scrubber.
+  * @allocator: The allocator being initialized
+@@ -3954,6 +4145,151 @@ static int __must_check initialize_block_allocator(struct slab_depot *depot, zon
+ 	return VDO_SUCCESS;
+ }
+ 
++static int allocate_components(struct slab_depot *depot,
++			       struct partition *summary_partition)
++{
++	int result;
++	zone_count_t zone;
++	slab_count_t slab_count;
++	u8 hint;
++	u32 i;
++	const struct thread_config *thread_config = &depot->vdo->thread_config;
++
++	result = vdo_make_action_manager(depot->zone_count,
++					 get_allocator_thread_id,
++					 thread_config->journal_thread,
++					 depot,
++					 schedule_tail_block_commit,
++					 depot->vdo,
++					 &depot->action_manager);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	depot->origin = depot->first_block;
++
++	/* block size must be a multiple of entry size */
++	STATIC_ASSERT((VDO_BLOCK_SIZE % sizeof(struct slab_summary_entry)) == 0);
++
++	depot->summary_origin = summary_partition->offset;
++	depot->hint_shift = vdo_get_slab_summary_hint_shift(depot->slab_size_shift);
++	result = UDS_ALLOCATE(MAXIMUM_VDO_SLAB_SUMMARY_ENTRIES,
++			      struct slab_summary_entry,
++			      __func__,
++			      &depot->summary_entries);
++	if (result != VDO_SUCCESS)
++		return result;
++
++
++	/* Initialize all the entries. */
++	hint = compute_fullness_hint(depot, depot->slab_config.data_blocks);
++	for (i = 0; i < MAXIMUM_VDO_SLAB_SUMMARY_ENTRIES; i++) {
++		/*
++		 * This default tail block offset must be reflected in
++		 * slabJournal.c::read_slab_journal_tail().
++		 */
++		depot->summary_entries[i] = (struct slab_summary_entry) {
++			.tail_block_offset = 0,
++			.fullness_hint = hint,
++			.load_ref_counts = false,
++			.is_dirty = false,
++		};
++	}
++
++	if (result != VDO_SUCCESS)
++		return result;
++
++	slab_count = vdo_compute_slab_count(depot->first_block,
++					    depot->last_block,
++					    depot->slab_size_shift);
++	if (thread_config->physical_zone_count > slab_count)
++		return uds_log_error_strerror(VDO_BAD_CONFIGURATION,
++					      "%u physical zones exceeds slab count %u",
++					      thread_config->physical_zone_count,
++					      slab_count);
++
++	/* Initialize the block allocators. */
++	for (zone = 0; zone < depot->zone_count; zone++) {
++		result = initialize_block_allocator(depot, zone);
++		if (result != VDO_SUCCESS)
++			return result;
++	}
++
++	/* Allocate slabs. */
++	result = allocate_slabs(depot, slab_count);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	/* Use the new slabs. */
++	for (i = depot->slab_count; i < depot->new_slab_count; i++) {
++		struct vdo_slab *slab = depot->new_slabs[i];
++
++		register_slab_with_allocator(slab->allocator, slab);
++		WRITE_ONCE(depot->slab_count, depot->slab_count + 1);
++	}
++
++	depot->slabs = depot->new_slabs;
++	depot->new_slabs = NULL;
++	depot->new_slab_count = 0;
++
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_decode_slab_depot() - Make a slab depot and configure it with the state read from the super
++ *                           block.
++ * @state: The slab depot state from the super block.
++ * @vdo: The VDO which will own the depot.
++ * @summary_partition: The partition which holds the slab summary.
++ * @depot_ptr: A pointer to hold the depot.
++ *
++ * Return: A success or error code.
++ */
++int vdo_decode_slab_depot(struct slab_depot_state_2_0 state,
++			  struct vdo *vdo,
++			  struct partition *summary_partition,
++			  struct slab_depot **depot_ptr)
++{
++	unsigned int slab_size_shift;
++	struct slab_depot *depot;
++	int result;
++
 +	/*
-+	 * Unlink the buckets from any entries still in the table so the entries won't be left with
-+	 * dangling pointers to freed memory.
++	 * Calculate the bit shift for efficiently mapping block numbers to slabs. Using a shift
++	 * requires that the slab size be a power of two.
 +	 */
-+	vdo_reset_priority_table(table);
++	block_count_t slab_size = state.slab_config.slab_blocks;
 +
-+	UDS_FREE(table);
++	if (!is_power_of_2(slab_size))
++		return uds_log_error_strerror(UDS_INVALID_ARGUMENT,
++					      "slab size must be a power of two");
++	slab_size_shift = ilog2(slab_size);
++
++	result = UDS_ALLOCATE_EXTENDED(struct slab_depot,
++				       vdo->thread_config.physical_zone_count,
++				       struct block_allocator,
++				       __func__,
++				       &depot);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	depot->vdo = vdo;
++	depot->old_zone_count = state.zone_count;
++	depot->zone_count = vdo->thread_config.physical_zone_count;
++	depot->slab_config = state.slab_config;
++	depot->first_block = state.first_block;
++	depot->last_block = state.last_block;
++	depot->slab_size_shift = slab_size_shift;
++
++	result = allocate_components(depot, summary_partition);
++	if (result != VDO_SUCCESS) {
++		vdo_free_slab_depot(depot);
++		return result;
++	}
++
++	*depot_ptr = depot;
++	return VDO_SUCCESS;
++}
++
+ static void uninitialize_allocator_summary(struct block_allocator *allocator)
+ {
+ 	block_count_t i;
+@@ -3969,6 +4305,229 @@ static void uninitialize_allocator_summary(struct block_allocator *allocator)
+ 	UDS_FREE(UDS_FORGET(allocator->summary_blocks));
+ }
+ 
++/**
++ * vdo_free_slab_depot() - Destroy a slab depot.
++ * @depot: The depot to destroy.
++ */
++void vdo_free_slab_depot(struct slab_depot *depot)
++{
++	zone_count_t zone = 0;
++
++	if (depot == NULL)
++		return;
++
++	vdo_abandon_new_slabs(depot);
++
++	for (zone = 0; zone < depot->zone_count; zone++) {
++		struct block_allocator *allocator = &depot->allocators[zone];
++
++		if (allocator->eraser != NULL)
++			dm_kcopyd_client_destroy(UDS_FORGET(allocator->eraser));
++
++		uninitialize_allocator_summary(allocator);
++		uninitialize_scrubber_vio(&allocator->scrubber);
++		free_vio_pool(UDS_FORGET(allocator->vio_pool));
++		vdo_free_priority_table(UDS_FORGET(allocator->prioritized_slabs));
++	}
++
++	if (depot->slabs != NULL) {
++		slab_count_t i;
++
++		for (i = 0; i < depot->slab_count; i++)
++			free_slab(UDS_FORGET(depot->slabs[i]));
++	}
++
++	UDS_FREE(UDS_FORGET(depot->slabs));
++	UDS_FREE(UDS_FORGET(depot->action_manager));
++	UDS_FREE(UDS_FORGET(depot->summary_entries));
++	UDS_FREE(depot);
 +}
 +
 +/**
-+ * vdo_reset_priority_table() - Reset a priority table, leaving it in the same empty state as when
-+ *                          newly constructed.
-+ * @table: The table to reset.
++ * vdo_record_slab_depot() - Record the state of a slab depot for encoding into the super block.
++ * @depot: The depot to encode.
 + *
-+ * The table does not own the entries stored in it and they are not freed (or even unlinked from
-+ * each other) by this call.
++ * Return: The depot state.
 + */
-+void vdo_reset_priority_table(struct priority_table *table)
++struct slab_depot_state_2_0 vdo_record_slab_depot(const struct slab_depot *depot)
 +{
-+	unsigned int priority;
++	/*
++	 * If this depot is currently using 0 zones, it must have been synchronously loaded by a
++	 * tool and is now being saved. We did not load and combine the slab summary, so we still
++	 * need to do that next time we load with the old zone count rather than 0.
++	 */
++	struct slab_depot_state_2_0 state;
++	zone_count_t zones_to_record = depot->zone_count;
 +
-+	table->search_vector = 0;
-+	for (priority = 0; priority <= table->max_priority; priority++)
-+		list_del_init(&table->buckets[priority].queue);
++	if (depot->zone_count == 0)
++		zones_to_record = depot->old_zone_count;
++
++	state = (struct slab_depot_state_2_0) {
++		.slab_config = depot->slab_config,
++		.first_block = depot->first_block,
++		.last_block = depot->last_block,
++		.zone_count = zones_to_record,
++	};
++
++	return state;
 +}
 +
 +/**
-+ * vdo_priority_table_enqueue() - Add a new entry to the priority table, appending it to the queue
-+ *                                for entries with the specified priority.
-+ * @table: The table in which to store the entry.
-+ * @priority: The priority of the entry.
-+ * @entry: The list_head embedded in the entry to store in the table (the caller must have
-+ *         initialized it).
++ * vdo_allocate_reference_counters() - Allocate the reference counters for all slabs in the depot.
++ *
++ * Context: This method may be called only before entering normal operation from the load thread.
++ *
++ * Return: VDO_SUCCESS or an error.
 + */
-+void vdo_priority_table_enqueue(struct priority_table *table,
-+				unsigned int priority,
-+				struct list_head *entry)
++int vdo_allocate_reference_counters(struct slab_depot *depot)
 +{
-+	ASSERT_LOG_ONLY((priority <= table->max_priority),
-+			"entry priority must be valid for the table");
++	struct slab_iterator iterator =
++		get_depot_slab_iterator(depot, depot->slab_count - 1, 0, 1);
 +
-+	/* Append the entry to the queue in the specified bucket. */
-+	list_move_tail(entry, &table->buckets[priority].queue);
++	while (iterator.next != NULL) {
++		int result = allocate_slab_counters(next_slab(&iterator));
 +
-+	/* Flag the bucket in the search vector since it must be non-empty. */
-+	table->search_vector |= (1ULL << priority);
-+}
++		if (result != VDO_SUCCESS)
++			return result;
++	}
 +
-+static inline void mark_bucket_empty(struct priority_table *table, struct bucket *bucket)
-+{
-+	table->search_vector &= ~(1ULL << bucket->priority);
++	return VDO_SUCCESS;
 +}
 +
 +/**
-+ * vdo_priority_table_dequeue() - Find the highest-priority entry in the table, remove it from the
-+ *                                table, and return it.
-+ * @table: The priority table from which to remove an entry.
++ * get_slab_number() - Get the number of the slab that contains a specified block.
++ * @depot: The slab depot.
++ * @pbn: The physical block number.
++ * @slab_number_ptr: A pointer to hold the slab number.
 + *
-+ * If there are multiple entries with the same priority, the one that has been in the table with
-+ * that priority the longest will be returned.
-+ *
-+ * Return: The dequeued entry, or NULL if the table is currently empty.
++ * Return: VDO_SUCCESS or an error.
 + */
-+struct list_head *vdo_priority_table_dequeue(struct priority_table *table)
++static int __must_check get_slab_number(const struct slab_depot *depot,
++					physical_block_number_t pbn,
++					slab_count_t *slab_number_ptr)
 +{
-+	struct bucket *bucket;
-+	struct list_head *entry;
-+	int top_priority;
++	slab_count_t slab_number;
 +
-+	if (table->search_vector == 0)
-+		/* All buckets are empty. */
++	if (pbn < depot->first_block)
++		return VDO_OUT_OF_RANGE;
++
++	slab_number = (pbn - depot->first_block) >> depot->slab_size_shift;
++	if (slab_number >= depot->slab_count)
++		return VDO_OUT_OF_RANGE;
++
++	*slab_number_ptr = slab_number;
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_get_slab() - Get the slab object for the slab that contains a specified block.
++ * @depot: The slab depot.
++ * @pbn: The physical block number.
++ *
++ * Will put the VDO in read-only mode if the PBN is not a valid data block nor the zero block.
++ *
++ * Return: The slab containing the block, or NULL if the block number is the zero block or
++ * otherwise out of range.
++ */
++struct vdo_slab *vdo_get_slab(const struct slab_depot *depot, physical_block_number_t pbn)
++{
++	slab_count_t slab_number;
++	int result;
++
++	if (pbn == VDO_ZERO_BLOCK)
 +		return NULL;
 +
-+	/*
-+	 * Find the highest priority non-empty bucket by finding the highest-order non-zero bit in
-+	 * the search vector.
-+	 */
-+	top_priority = ilog2(table->search_vector);
++	result = get_slab_number(depot, pbn, &slab_number);
++	if (result != VDO_SUCCESS) {
++		vdo_enter_read_only_mode(depot->vdo, result);
++		return NULL;
++	}
 +
-+	/* Dequeue the first entry in the bucket. */
-+	bucket = &table->buckets[top_priority];
-+	entry = bucket->queue.next;
-+	list_del_init(entry);
-+
-+	/* Clear the bit in the search vector if the bucket has been emptied. */
-+	if (list_empty(&bucket->queue))
-+		mark_bucket_empty(table, bucket);
-+
-+	return entry;
++	return depot->slabs[slab_number];
 +}
 +
 +/**
-+ * vdo_priority_table_remove() - Remove a specified entry from its priority table.
-+ * @table: The table from which to remove the entry.
-+ * @entry: The entry to remove from the table.
++ * vdo_get_increment_limit() - Determine how many new references a block can acquire.
++ * @depot: The slab depot.
++ * @pbn: The physical block number that is being queried.
++ *
++ * Context: This method must be called from the physical zone thread of the PBN.
++ *
++ * Return: The number of available references.
 + */
-+void vdo_priority_table_remove(struct priority_table *table, struct list_head *entry)
++u8 vdo_get_increment_limit(struct slab_depot *depot, physical_block_number_t pbn)
 +{
-+	struct list_head *next_entry;
++	struct vdo_slab *slab = vdo_get_slab(depot, pbn);
++	vdo_refcount_t *counter_ptr = NULL;
++	int result;
 +
-+	/*
-+	 * We can't guard against calls where the entry is on a list for a different table, but
-+	 * it's easy to deal with an entry not in any table or list.
-+	 */
-+	if (list_empty(entry))
++	if ((slab == NULL) || (slab->status != VDO_SLAB_REBUILT))
++		return 0;
++
++	result = get_reference_counter(slab, pbn, &counter_ptr);
++	if (result != VDO_SUCCESS)
++		return 0;
++
++	if (*counter_ptr == PROVISIONAL_REFERENCE_COUNT)
++		return (MAXIMUM_REFERENCE_COUNT - 1);
++
++	return (MAXIMUM_REFERENCE_COUNT - *counter_ptr);
++}
++
++/**
++ * vdo_is_physical_data_block() - Determine whether the given PBN refers to a data block.
++ * @depot: The depot.
++ * @pbn: The physical block number to ask about.
++ *
++ * Return: True if the PBN corresponds to a data block.
++ */
++bool vdo_is_physical_data_block(const struct slab_depot *depot, physical_block_number_t pbn)
++{
++	slab_count_t slab_number;
++	slab_block_number sbn;
++
++	return ((pbn == VDO_ZERO_BLOCK) ||
++		((get_slab_number(depot, pbn, &slab_number) == VDO_SUCCESS) &&
++		 (slab_block_number_from_pbn(depot->slabs[slab_number], pbn, &sbn) ==
++		  VDO_SUCCESS)));
++}
++
++/**
++ * vdo_get_slab_depot_allocated_blocks() - Get the total number of data blocks allocated across all
++ * the slabs in the depot.
++ * @depot: The slab depot.
++ *
++ * This is the total number of blocks with a non-zero reference count.
++ *
++ * Context: This may be called from any thread.
++ *
++ * Return: The total number of blocks with a non-zero reference count.
++ */
++block_count_t vdo_get_slab_depot_allocated_blocks(const struct slab_depot *depot)
++{
++	block_count_t total = 0;
++	zone_count_t zone;
++
++	for (zone = 0; zone < depot->zone_count; zone++)
++		/* The allocators are responsible for thread safety. */
++		total += READ_ONCE(depot->allocators[zone].allocated_blocks);
++	return total;
++}
++
++/**
++ * vdo_get_slab_depot_data_blocks() - Get the total number of data blocks in all the slabs in the
++ *                                    depot.
++ * @depot: The slab depot.
++ *
++ * Context: This may be called from any thread.
++ *
++ * Return: The total number of data blocks in all slabs.
++ */
++block_count_t vdo_get_slab_depot_data_blocks(const struct slab_depot *depot)
++{
++	return (READ_ONCE(depot->slab_count) * depot->slab_config.data_blocks);
++}
++
+ /**
+  * finish_combining_zones() - Clean up after saving out the combined slab summary.
+  * @completion: The vio which was used to write the summary data.
+@@ -4100,6 +4659,193 @@ static void load_slab_summary(void *context, struct vdo_completion *parent)
+ 			    REQ_OP_READ);
+ }
+ 
++/* Implements vdo_zone_action. */
++static void load_allocator(void *context, zone_count_t zone_number, struct vdo_completion *parent)
++{
++	struct slab_depot *depot = context;
++
++	vdo_start_loading(&depot->allocators[zone_number].state,
++			  vdo_get_current_manager_operation(depot->action_manager),
++			  parent,
++			  initiate_load);
++}
++
++/**
++ * vdo_load_slab_depot() - Asynchronously load any slab depot state that isn't included in the
++ *                         super_block component.
++ * @depot: The depot to load.
++ * @operation: The type of load to perform.
++ * @parent: The completion to notify when the load is complete.
++ * @context: Additional context for the load operation; may be NULL.
++ *
++ * This method may be called only before entering normal operation from the load thread.
++ */
++void vdo_load_slab_depot(struct slab_depot *depot,
++			 const struct admin_state_code *operation,
++			 struct vdo_completion *parent,
++			 void *context)
++{
++	if (vdo_assert_load_operation(operation, parent))
++		vdo_schedule_operation_with_context(depot->action_manager,
++						    operation,
++						    load_slab_summary,
++						    load_allocator,
++						    NULL,
++						    context,
++						    parent);
++}
++
++/* Implements vdo_zone_action. */
++static void prepare_to_allocate(void *context,
++				zone_count_t zone_number,
++				struct vdo_completion *parent)
++{
++	struct slab_depot *depot = context;
++	struct block_allocator *allocator = &depot->allocators[zone_number];
++	int result;
++
++	result = vdo_prepare_slabs_for_allocation(allocator);
++	if (result != VDO_SUCCESS) {
++		vdo_fail_completion(parent, result);
++		return;
++	}
++
++	scrub_slabs(allocator, parent);
++}
++
++/**
++ * vdo_prepare_slab_depot_to_allocate() - Prepare the slab depot to come online and start
++ *                                        allocating blocks.
++ * @depot: The depot to prepare.
++ * @load_type: The load type.
++ * @parent: The completion to notify when the operation is complete.
++ *
++ * This method may be called only before entering normal operation from the load thread. It must be
++ * called before allocation may proceed.
++ */
++void vdo_prepare_slab_depot_to_allocate(struct slab_depot *depot,
++					enum slab_depot_load_type load_type,
++					struct vdo_completion *parent)
++{
++	depot->load_type = load_type;
++	atomic_set(&depot->zones_to_scrub, depot->zone_count);
++	vdo_schedule_action(depot->action_manager, NULL, prepare_to_allocate, NULL, parent);
++}
++
++/**
++ * vdo_update_slab_depot_size() - Update the slab depot to reflect its new size in memory.
++ * @depot: The depot to update.
++ *
++ * This size is saved to disk as part of the super block.
++ */
++void vdo_update_slab_depot_size(struct slab_depot *depot)
++{
++	depot->last_block = depot->new_last_block;
++}
++
++/**
++ * vdo_prepare_to_grow_slab_depot() - Allocate new memory needed for a resize of a slab depot to
++ *                                    the given size.
++ * @depot: The depot to prepare to resize.
++ * @partition: The new depot partition
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++int vdo_prepare_to_grow_slab_depot(struct slab_depot *depot, const struct partition *partition)
++{
++	struct slab_depot_state_2_0 new_state;
++	int result;
++	slab_count_t new_slab_count;
++
++	if ((partition->count >> depot->slab_size_shift) <= depot->slab_count)
++		return VDO_INCREMENT_TOO_SMALL;
++
++	/* Generate the depot configuration for the new block count. */
++	ASSERT_LOG_ONLY(depot->first_block == partition->offset,
++			"New slab depot partition doesn't change origin");
++	result = vdo_configure_slab_depot(partition,
++					  depot->slab_config,
++					  depot->zone_count,
++					  &new_state);
++	if (result != VDO_SUCCESS)
++		return result;
++
++	new_slab_count = vdo_compute_slab_count(depot->first_block,
++						new_state.last_block,
++						depot->slab_size_shift);
++	if (new_slab_count <= depot->slab_count)
++		return uds_log_error_strerror(VDO_INCREMENT_TOO_SMALL, "Depot can only grow");
++	if (new_slab_count == depot->new_slab_count)
++		/* Check it out, we've already got all the new slabs allocated! */
++		return VDO_SUCCESS;
++
++	vdo_abandon_new_slabs(depot);
++	result = allocate_slabs(depot, new_slab_count);
++	if (result != VDO_SUCCESS) {
++		vdo_abandon_new_slabs(depot);
++		return result;
++	}
++
++	depot->new_size = partition->count;
++	depot->old_last_block = depot->last_block;
++	depot->new_last_block = new_state.last_block;
++
++	return VDO_SUCCESS;
++}
++
++/**
++ * finish_registration() - Finish registering new slabs now that all of the allocators have
++ *                         received their new slabs.
++ *
++ * Implements vdo_action_conclusion.
++ */
++static int finish_registration(void *context)
++{
++	struct slab_depot *depot = context;
++
++	WRITE_ONCE(depot->slab_count, depot->new_slab_count);
++	UDS_FREE(depot->slabs);
++	depot->slabs = depot->new_slabs;
++	depot->new_slabs = NULL;
++	depot->new_slab_count = 0;
++	return VDO_SUCCESS;
++}
++
++/* Implements vdo_zone_action. */
++static void register_new_slabs(void *context,
++			       zone_count_t zone_number,
++			       struct vdo_completion *parent)
++{
++	struct slab_depot *depot = context;
++	struct block_allocator *allocator = &depot->allocators[zone_number];
++	slab_count_t i;
++
++	for (i = depot->slab_count; i < depot->new_slab_count; i++) {
++		struct vdo_slab *slab = depot->new_slabs[i];
++
++		if (slab->allocator == allocator)
++			register_slab_with_allocator(allocator, slab);
++	}
++
++	vdo_finish_completion(parent);
++}
++
++/**
++ * vdo_use_new_slabs() - Use the new slabs allocated for resize.
++ * @depot: The depot.
++ * @parent: The object to notify when complete.
++ */
++void vdo_use_new_slabs(struct slab_depot *depot, struct vdo_completion *parent)
++{
++	ASSERT_LOG_ONLY(depot->new_slabs != NULL, "Must have new slabs to use");
++	vdo_schedule_operation(depot->action_manager,
++			       VDO_ADMIN_STATE_SUSPENDED_OPERATION,
++			       NULL,
++			       register_new_slabs,
++			       finish_registration,
++			       parent);
++}
++
+ /**
+  * stop_scrubbing() - Tell the scrubber to stop scrubbing after it finishes the slab it is
+  *                    currently working on.
+@@ -4169,6 +4915,43 @@ static void initiate_drain(struct admin_state *state)
+ 	do_drain_step(&allocator->completion);
+ }
+ 
++/*
++ * Drain all allocator I/O. Depending upon the type of drain, some or all dirty metadata may be
++ * written to disk. The type of drain will be determined from the state of the allocator's depot.
++ *
++ * Implements vdo_zone_action.
++ */
++static void drain_allocator(void *context, zone_count_t zone_number, struct vdo_completion *parent)
++{
++	struct slab_depot *depot = context;
++
++	vdo_start_draining(&depot->allocators[zone_number].state,
++			   vdo_get_current_manager_operation(depot->action_manager),
++			   parent,
++			   initiate_drain);
++}
++
++/**
++ * vdo_drain_slab_depot() - Drain all slab depot I/O.
++ * @depot: The depot to drain.
++ * @operation: The drain operation (flush, rebuild, suspend, or save).
++ * @parent: The completion to finish when the drain is complete.
++ *
++ * If saving, or flushing, all dirty depot metadata will be written out. If saving or suspending,
++ * the depot will be left in a suspended state.
++ */
++void vdo_drain_slab_depot(struct slab_depot *depot,
++			  const struct admin_state_code *operation,
++			  struct vdo_completion *parent)
++{
++	vdo_schedule_operation(depot->action_manager,
++			       operation,
++			       NULL,
++			       drain_allocator,
++			       NULL,
++			       parent);
++}
++
+ /**
+  * resume_scrubbing() - Tell the scrubber to resume scrubbing if it has been stopped.
+  * @allocator: The allocator being resumed.
+@@ -4246,3 +5029,185 @@ static void resume_allocator(void *context,
+ 			   parent,
+ 			   initiate_resume);
+ }
++
++/**
++ * vdo_resume_slab_depot() - Resume a suspended slab depot.
++ * @depot: The depot to resume.
++ * @parent: The completion to finish when the depot has resumed.
++ */
++void vdo_resume_slab_depot(struct slab_depot *depot, struct vdo_completion *parent)
++{
++	if (vdo_is_read_only(depot->vdo)) {
++		vdo_continue_completion(parent, VDO_READ_ONLY);
++		return;
++	}
++
++	vdo_schedule_operation(depot->action_manager,
++			       VDO_ADMIN_STATE_RESUMING,
++			       NULL,
++			       resume_allocator,
++			       NULL,
++			       parent);
++}
++
++/**
++ * vdo_commit_oldest_slab_journal_tail_blocks() - Commit all dirty tail blocks which are locking a
++ *                                                given recovery journal block.
++ * @depot: The depot.
++ * @recovery_block_number: The sequence number of the recovery journal block whose locks should be
++ *                         released.
++ *
++ * Context: This method must be called from the journal zone thread.
++ */
++void vdo_commit_oldest_slab_journal_tail_blocks(struct slab_depot *depot,
++						sequence_number_t recovery_block_number)
++{
++	if (depot == NULL)
 +		return;
 +
-+	/*
-+	 * Remove the entry from the bucket list, remembering a pointer to another entry in the
-+	 * ring.
-+	 */
-+	next_entry = entry->next;
-+	list_del_init(entry);
++	depot->new_release_request = recovery_block_number;
++	vdo_schedule_default_action(depot->action_manager);
++}
 +
-+	/*
-+	 * If the rest of the list is now empty, the next node must be the list head in the bucket
-+	 * and we can use it to update the search vector.
-+	 */
-+	if (list_empty(next_entry))
-+		mark_bucket_empty(table, list_entry(next_entry, struct bucket, queue));
++/* Implements vdo_zone_action. */
++static void scrub_all_unrecovered_slabs(void *context,
++					zone_count_t zone_number,
++					struct vdo_completion *parent)
++{
++	struct slab_depot *depot = context;
++
++	scrub_slabs(&depot->allocators[zone_number], NULL);
++	vdo_launch_completion(parent);
 +}
 +
 +/**
-+ * vdo_is_priority_table_empty() - Return whether the priority table is empty.
-+ * @table: The table to check.
-+ *
-+ * Return: true if the table is empty.
++ * vdo_scrub_all_unrecovered_slabs() - Scrub all unrecovered slabs.
++ * @depot: The depot to scrub.
++ * @parent: The object to notify when scrubbing has been launched for all zones.
 + */
-+bool vdo_is_priority_table_empty(struct priority_table *table)
++void vdo_scrub_all_unrecovered_slabs(struct slab_depot *depot, struct vdo_completion *parent)
 +{
-+	return (table->search_vector == 0);
++	vdo_schedule_action(depot->action_manager,
++			    NULL,
++			    scrub_all_unrecovered_slabs,
++			    NULL,
++			    parent);
 +}
-diff --git a/drivers/md/dm-vdo/priority-table.h b/drivers/md/dm-vdo/priority-table.h
-new file mode 100644
-index 000000000000..f56460ba0f09
---- /dev/null
-+++ b/drivers/md/dm-vdo/priority-table.h
-@@ -0,0 +1,48 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright 2023 Red Hat
-+ */
 +
-+#ifndef VDO_PRIORITY_TABLE_H
-+#define VDO_PRIORITY_TABLE_H
-+
-+#include <linux/list.h>
-+
-+/*
-+ * A priority_table is a simple implementation of a priority queue for entries with priorities that
-+ * are small non-negative integer values. It implements the obvious priority queue operations of
-+ * enqueuing an entry and dequeuing an entry with the maximum priority. It also supports removing
-+ * an arbitrary entry. The priority of an entry already in the table can be changed by removing it
-+ * and re-enqueuing it with a different priority. All operations have O(1) complexity.
++/**
++ * get_block_allocator_statistics() - Get the total of the statistics from all the block allocators
++ *                                    in the depot.
++ * @depot: The slab depot.
 + *
-+ * The links for the table entries must be embedded in the entries themselves. Lists are used to
-+ * link entries in the table and no wrapper type is declared, so an existing list entry in an
-+ * object can also be used to queue it in a priority_table, assuming the field is not used for
-+ * anything else while so queued.
-+ *
-+ * The table is implemented as an array of queues (circular lists) indexed by priority, along with
-+ * a hint for which queues are non-empty. Steven Skiena calls a very similar structure a "bounded
-+ * height priority queue", but given the resemblance to a hash table, "priority table" seems both
-+ * shorter and more apt, if somewhat novel.
++ * Return: The statistics from all block allocators in the depot.
 + */
++static struct block_allocator_statistics __must_check
++get_block_allocator_statistics(const struct slab_depot *depot)
++{
++	struct block_allocator_statistics totals;
++	zone_count_t zone;
 +
-+struct priority_table;
++	memset(&totals, 0, sizeof(totals));
++
++	for (zone = 0; zone < depot->zone_count; zone++) {
++		const struct block_allocator *allocator = &depot->allocators[zone];
++		const struct block_allocator_statistics *stats = &allocator->statistics;
++
++		totals.slab_count += allocator->slab_count;
++		totals.slabs_opened += READ_ONCE(stats->slabs_opened);
++		totals.slabs_reopened += READ_ONCE(stats->slabs_reopened);
++	}
++
++	return totals;
++}
++
++/**
++ * get_ref_counts_statistics() - Get the cumulative ref_counts statistics for the depot.
++ * @depot: The slab depot.
++ *
++ * Return: The cumulative statistics for all ref_counts in the depot.
++ */
++static struct ref_counts_statistics __must_check
++get_ref_counts_statistics(const struct slab_depot *depot)
++{
++	struct ref_counts_statistics totals;
++	zone_count_t zone;
++
++	memset(&totals, 0, sizeof(totals));
++
++	for (zone = 0; zone < depot->zone_count; zone++) {
++		totals.blocks_written +=
++			READ_ONCE(depot->allocators[zone].ref_counts_statistics.blocks_written);
++	}
++
++	return totals;
++}
++
++/**
++ * get_depot_slab_journal_statistics() - Get the aggregated slab journal statistics for the depot.
++ * @depot: The slab depot.
++ *
++ * Return: The aggregated statistics for all slab journals in the depot.
++ */
++static struct slab_journal_statistics __must_check
++get_slab_journal_statistics(const struct slab_depot *depot)
++{
++	struct slab_journal_statistics totals;
++	zone_count_t zone;
++
++	memset(&totals, 0, sizeof(totals));
++
++	for (zone = 0; zone < depot->zone_count; zone++) {
++		const struct slab_journal_statistics *stats =
++			&depot->allocators[zone].slab_journal_statistics;
++
++		totals.disk_full_count += READ_ONCE(stats->disk_full_count);
++		totals.flush_count += READ_ONCE(stats->flush_count);
++		totals.blocked_count += READ_ONCE(stats->blocked_count);
++		totals.blocks_written += READ_ONCE(stats->blocks_written);
++		totals.tail_busy_count += READ_ONCE(stats->tail_busy_count);
++	}
++
++	return totals;
++}
++
++/**
++ * vdo_get_slab_depot_statistics() - Get all the vdo_statistics fields that are properties of the
++ *                                   slab depot.
++ * @depot: The slab depot.
++ * @stats: The vdo statistics structure to partially fill.
++ */
++void vdo_get_slab_depot_statistics(const struct slab_depot *depot, struct vdo_statistics *stats)
++{
++	slab_count_t slab_count = READ_ONCE(depot->slab_count);
++	slab_count_t unrecovered = 0;
++	zone_count_t zone;
++
++	for (zone = 0; zone < depot->zone_count; zone++) {
++		/* The allocators are responsible for thread safety. */
++		unrecovered += READ_ONCE(depot->allocators[zone].scrubber.slab_count);
++	}
++
++	stats->recovery_percentage = (slab_count - unrecovered) * 100 / slab_count;
++	stats->allocator = get_block_allocator_statistics(depot);
++	stats->ref_counts = get_ref_counts_statistics(depot);
++	stats->slab_journal = get_slab_journal_statistics(depot);
++	stats->slab_summary = (struct slab_summary_statistics) {
++		.blocks_written = atomic64_read(&depot->summary_statistics.blocks_written),
++	};
++}
++
++/**
++ * vdo_dump_slab_depot() - Dump the slab depot, in a thread-unsafe fashion.
++ * @depot: The slab depot.
++ */
++void vdo_dump_slab_depot(const struct slab_depot *depot)
++{
++	uds_log_info("vdo slab depot");
++	uds_log_info("  zone_count=%u old_zone_count=%u slabCount=%u active_release_request=%llu new_release_request=%llu",
++		     (unsigned int) depot->zone_count,
++		     (unsigned int) depot->old_zone_count,
++		     READ_ONCE(depot->slab_count),
++		     (unsigned long long) depot->active_release_request,
++		     (unsigned long long) depot->new_release_request);
++}
+diff --git a/drivers/md/dm-vdo/slab-depot.h b/drivers/md/dm-vdo/slab-depot.h
+index 6ec4be7b5822..44655d697fa0 100644
+--- a/drivers/md/dm-vdo/slab-depot.h
++++ b/drivers/md/dm-vdo/slab-depot.h
+@@ -435,6 +435,66 @@ struct block_allocator {
+ 	struct slab_summary_block *summary_blocks;
+ };
+ 
++enum slab_depot_load_type {
++	VDO_SLAB_DEPOT_NORMAL_LOAD,
++	VDO_SLAB_DEPOT_RECOVERY_LOAD,
++	VDO_SLAB_DEPOT_REBUILD_LOAD
++};
++
++struct slab_depot {
++	zone_count_t zone_count;
++	zone_count_t old_zone_count;
++	struct vdo *vdo;
++	struct slab_config slab_config;
++	struct action_manager *action_manager;
++
++	physical_block_number_t first_block;
++	physical_block_number_t last_block;
++	physical_block_number_t origin;
++
++	/* slab_size == (1 << slab_size_shift) */
++	unsigned int slab_size_shift;
++
++	/* Determines how slabs should be queued during load */
++	enum slab_depot_load_type load_type;
++
++	/* The state for notifying slab journals to release recovery journal */
++	sequence_number_t active_release_request;
++	sequence_number_t new_release_request;
++
++	/* State variables for scrubbing complete handling */
++	atomic_t zones_to_scrub;
++
++	/* Array of pointers to individually allocated slabs */
++	struct vdo_slab **slabs;
++	/* The number of slabs currently allocated and stored in 'slabs' */
++	slab_count_t slab_count;
++
++	/* Array of pointers to a larger set of slabs (used during resize) */
++	struct vdo_slab **new_slabs;
++	/* The number of slabs currently allocated and stored in 'new_slabs' */
++	slab_count_t new_slab_count;
++	/* The size that 'new_slabs' was allocated for */
++	block_count_t new_size;
++
++	/* The last block before resize, for rollback */
++	physical_block_number_t old_last_block;
++	/* The last block after resize, for resize */
++	physical_block_number_t new_last_block;
++
++	/* The statistics for the slab summary */
++	struct atomic_slab_summary_statistics summary_statistics;
++	/* The start of the slab summary partition */
++	physical_block_number_t summary_origin;
++	/* The number of bits to shift to get a 7-bit fullness hint */
++	unsigned int hint_shift;
++	/* The slab summary entries for all of the zones the partition can hold */
++	struct slab_summary_entry *summary_entries;
++
++	/* The block allocators for this depot */
++	struct block_allocator allocators[];
++};
++
+ struct reference_updater;
+ 
+ bool __must_check
+@@ -445,6 +505,11 @@ vdo_attempt_replay_into_slab(struct vdo_slab *slab,
+ 			     struct journal_point *recovery_point,
+ 			     struct vdo_completion *parent);
+ 
++int __must_check
++vdo_adjust_reference_count_for_rebuild(struct slab_depot *depot,
++				       physical_block_number_t pbn,
++				       enum journal_operation operation);
++
+ static inline struct block_allocator *vdo_as_block_allocator(struct vdo_completion *completion)
+ {
+ 	vdo_assert_completion_type(completion, VDO_BLOCK_ALLOCATOR_COMPLETION);
+@@ -470,4 +535,60 @@ void vdo_notify_slab_journals_are_recovered(struct vdo_completion *completion);
+ 
+ void vdo_dump_block_allocator(const struct block_allocator *allocator);
+ 
++int __must_check vdo_decode_slab_depot(struct slab_depot_state_2_0 state,
++				       struct vdo *vdo,
++				       struct partition *summary_partition,
++				       struct slab_depot **depot_ptr);
++
++void vdo_free_slab_depot(struct slab_depot *depot);
++
++struct slab_depot_state_2_0 __must_check vdo_record_slab_depot(const struct slab_depot *depot);
++
++int __must_check vdo_allocate_reference_counters(struct slab_depot *depot);
++
++struct vdo_slab * __must_check
++vdo_get_slab(const struct slab_depot *depot, physical_block_number_t pbn);
++
++u8 __must_check vdo_get_increment_limit(struct slab_depot *depot, physical_block_number_t pbn);
++
++bool __must_check
++vdo_is_physical_data_block(const struct slab_depot *depot, physical_block_number_t pbn);
++
++block_count_t __must_check vdo_get_slab_depot_allocated_blocks(const struct slab_depot *depot);
++
++block_count_t __must_check vdo_get_slab_depot_data_blocks(const struct slab_depot *depot);
++
++void vdo_get_slab_depot_statistics(const struct slab_depot *depot, struct vdo_statistics *stats);
++
++void vdo_load_slab_depot(struct slab_depot *depot,
++			 const struct admin_state_code *operation,
++			 struct vdo_completion *parent,
++			 void *context);
++
++void vdo_prepare_slab_depot_to_allocate(struct slab_depot *depot,
++					enum slab_depot_load_type load_type,
++					struct vdo_completion *parent);
++
++void vdo_update_slab_depot_size(struct slab_depot *depot);
 +
 +int __must_check
-+vdo_make_priority_table(unsigned int max_priority, struct priority_table **table_ptr);
++vdo_prepare_to_grow_slab_depot(struct slab_depot *depot, const struct partition *partition);
 +
-+void vdo_free_priority_table(struct priority_table *table);
++void vdo_use_new_slabs(struct slab_depot *depot, struct vdo_completion *parent);
 +
-+void vdo_priority_table_enqueue(struct priority_table *table,
-+				unsigned int priority,
-+				struct list_head *entry);
++void vdo_abandon_new_slabs(struct slab_depot *depot);
 +
-+void vdo_reset_priority_table(struct priority_table *table);
++void vdo_drain_slab_depot(struct slab_depot *depot,
++			  const struct admin_state_code *operation,
++			  struct vdo_completion *parent);
 +
-+struct list_head * __must_check vdo_priority_table_dequeue(struct priority_table *table);
++void vdo_resume_slab_depot(struct slab_depot *depot, struct vdo_completion *parent);
 +
-+void vdo_priority_table_remove(struct priority_table *table, struct list_head *entry);
++void vdo_commit_oldest_slab_journal_tail_blocks(struct slab_depot *depot,
++						sequence_number_t recovery_block_number);
 +
-+bool __must_check vdo_is_priority_table_empty(struct priority_table *table);
++void vdo_scrub_all_unrecovered_slabs(struct slab_depot *depot, struct vdo_completion *parent);
 +
-+#endif /* VDO_PRIORITY_TABLE_H */
++void vdo_dump_slab_depot(const struct slab_depot *depot);
++
+ #endif /* VDO_SLAB_DEPOT_H */
 -- 
 2.40.0
 
