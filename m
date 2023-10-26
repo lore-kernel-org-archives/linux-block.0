@@ -2,78 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA211C25B67
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 17:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D656C25B48
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:14:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230152AbjJZRd7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 13:33:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41806 "EHLO
+        id S229501AbjJZVOo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 17:14:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229668AbjJZRd7 (ORCPT
+        with ESMTP id S229680AbjJZVOo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Oct 2023 13:33:59 -0400
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7348DC1;
-        Thu, 26 Oct 2023 10:33:56 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:281:8300:73::646])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 05FAD735;
-        Thu, 26 Oct 2023 17:33:55 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 05FAD735
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1698341636; bh=x58EWngCurg6BZuzfeiK9njHyHbP6dkg4xxTox6g3GQ=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=WjlT0kprjMdxOpD6IYawOkrnRKrDgKM+jKnE9/K2bI4rn5GSNGIbv6P/cSTiOyrWL
-         wwrOIf9WRnjLwG++XlBwleUpx1jUwsFzW418Ow+nX1X3bZETJWuTlnfCYc38S4BG3L
-         QhEtW22Pra5bRsTel0GAUQvcbn3D9g4RxhbGUsrb0hJqIyyewUP/breSOhDXLdN7iN
-         A95OSzvreDaAou1gmrCKjFuAEhKfmBmDrCPPDXJTIa2fMztc3964aDe8sYXtZ4vAHI
-         HD3fiYB84yqX3FqNjbc7/TWPTanGLKpeO2kEPjlx0BlEd6C6cxsYF7bbfz3Z0kmRS5
-         Lovh4dHr+ijuw==
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Tang Yizhou <yizhou.tang@shopee.com>, houtao1@huawei.com,
-        jack@suse.cz, bvanassche@acm.org, kch@nvidia.com
-Cc:     axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yingfu.zhou@shopee.com, yizhou.tang@shopee.com,
-        chunguang.xu@shopee.com
-Subject: Re: [PATCH v2] doc: blk-ioprio: Bring the doc in line with the
- implementation
-In-Reply-To: <20231012024228.2161283-1-yizhou.tang@shopee.com>
-References: <20231012024228.2161283-1-yizhou.tang@shopee.com>
-Date:   Thu, 26 Oct 2023 11:33:55 -0600
-Message-ID: <87jzr970fw.fsf@meer.lwn.net>
+        Thu, 26 Oct 2023 17:14:44 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A954A10E;
+        Thu, 26 Oct 2023 14:14:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=STBT4USV80X7xjDyPQBrhAt8zpR20Z1FI+DoegQb6k0=; b=hi92sel8fx6a1xWS0qj0ZTLs/C
+        aBvXQcKQ5GoQ5MvYk1e7qacr3FeQXgWQK63i1ubM4FgoNQlD17p7gmdLEtJ4/YE8q4tv7UU8xvLyS
+        CUyB/qwwB6tcIYmvkc4s7TuS0yfKgaJOaF2tiTLw6PHrxCoGabYCD5BGbhJkHQHHQwtTm5mY/hmVL
+        ZDkSBZphBgFjFVDpGGFoQEQjNy1VJHGMyGdfLiKiGwIW1Y7gMwWwLLiP/K9vW8+nU2eccdpNv6XZt
+        3CjL14h0Oda8aQA6e4Zt7gCu5CKzSvd4eqmSnzkhoDF1QAjfpdzkft9JkoLqCx6pgNtO5Ac6nihTW
+        z4xJgRJA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qw7gZ-00FA7v-32;
+        Thu, 26 Oct 2023 21:14:35 +0000
+Date:   Thu, 26 Oct 2023 14:14:35 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Zhong Jinghua <zhongjinghua@huaweicloud.com>
+Cc:     axboe@kernel.dk, hare@suse.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhongjinghua@huawei.com,
+        yi.zhang@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH] block: Set memalloc_noio to false in the error path
+Message-ID: <ZTrWu2v6Qp0QVCYw@bombadil.infradead.org>
+References: <20231025075436.2212468-1-zhongjinghua@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231025075436.2212468-1-zhongjinghua@huaweicloud.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Tang Yizhou <yizhou.tang@shopee.com> writes:
+On Wed, Oct 25, 2023 at 03:54:36PM +0800, Zhong Jinghua wrote:
+> From: Zhong Jinghua <zhongjinghua@huawei.com>
+> 
+> In del_gendisk, memalloc_noio is set to false, so it would be better to do
+> the same thing in the error path.
 
-> From: Tang Yizhou <yizhou.tang@shopee.com>
->
-> Our system administrator have noted that the names 'rt-to-be' and
-> 'all-to-idle' in the I/O priority policies table appeared without
-> explanations, leading to confusion. Let's bring these names in line
-> with the naming in the 'attribute' section.
->
-> Additionally,
-> 1. Correct the interface name to 'io.prio.class'.
-> 2. Add a table entry of 'promote-to-rt' for consistency.
-> 3. Fix a typo of 'priority'.
->
-> Suggested-by: Yingfu Zhou <yingfu.zhou@shopee.com>
-> Reviewed-by: Hou Tao <houtao1@huawei.com>
-> Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
-> ---
-> v2:
-> Accept Bart's suggestion and rename the title of the patch.
-> Pick up Tao's Reviewed-by tag.
->
->  Documentation/admin-guide/cgroup-v2.rst | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+The commit does not mention what happens if this is not done.
 
-I've applied this, thanks.
-
-jon
+  Luis
