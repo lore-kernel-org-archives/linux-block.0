@@ -2,1234 +2,2508 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC60C27C48
-	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 742CDC25B48
+	for <linux-block@archiver.kernel.org>; Thu, 26 Oct 2023 21:43:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232306AbjJZVnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Oct 2023 17:43:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41014 "EHLO
+        id S234789AbjJZVnX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Oct 2023 17:43:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344852AbjJZVnQ (ORCPT
+        with ESMTP id S233234AbjJZVnW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Oct 2023 17:43:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84B49D45
-        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:44 -0700 (PDT)
+        Thu, 26 Oct 2023 17:43:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19E1DD44
+        for <linux-block@vger.kernel.org>; Thu, 26 Oct 2023 14:41:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1698356503;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/iMXLHNntDucEEZtd8E1eBTpqdAdPA/fcEkpzCJcGeA=;
-        b=ao/3trVDnikCjwJt4XMn3rJmQBm73ZzHBTv9dH7Sugb1qisTqJLW+VcsyJir+RSdRLTLS6
-        Oze1wtQG41Zx1CdEULeK/spMScsX41/lkpYHBQRF9RLGqY0Ro9zQUjBagAGNuuIzEZ4u7/
-        szDO0zqIDL6XSjicMY5tDdxXHDKHBUk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-205-xrRbsqJvNFOZgZLD6KSZ4w-1; Thu, 26 Oct 2023 17:41:42 -0400
-X-MC-Unique: xrRbsqJvNFOZgZLD6KSZ4w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        bh=BmpRSjH1g7zodzS9Ws3arMDh+IQrJeyBVaODHyRihpw=;
+        b=HKmDdbO8lPqGYXx6xhIu3cdKpumXHLdw/eDC9KWgChMpe+YxiEVfq2ZGs9koPzieq/b7nB
+        SunMGGKlzNjPD0N8a0yFerqGy3YW/fgBr0eDIKqsQwCnQbmp00yUl20lO1W636MzBiISMa
+        r1KJyHvdblMjnaqijmQARMhoq+e36j0=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-674-PdL2nNq5NhKn7_z-CPsGOA-1; Thu,
+ 26 Oct 2023 17:41:39 -0400
+X-MC-Unique: PdL2nNq5NhKn7_z-CPsGOA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1116880F923;
-        Thu, 26 Oct 2023 21:41:42 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4BDD28237C3;
+        Thu, 26 Oct 2023 21:41:38 +0000 (UTC)
 Received: from pbitcolo-build-10.permabit.com (pbitcolo-build-10.permabit.lab.eng.bos.redhat.com [10.19.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ECE1C2949;
-        Thu, 26 Oct 2023 21:41:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C6D7B2166B26;
+        Thu, 26 Oct 2023 21:41:38 +0000 (UTC)
 Received: by pbitcolo-build-10.permabit.com (Postfix, from userid 1138)
-        id A22003003C; Thu, 26 Oct 2023 17:41:41 -0400 (EDT)
+        id 7D0B83003D; Thu, 26 Oct 2023 17:41:38 -0400 (EDT)
 From:   Matthew Sakai <msakai@redhat.com>
 To:     dm-devel@lists.linux.dev, linux-block@vger.kernel.org
 Cc:     Matthew Sakai <msakai@redhat.com>
-Subject: [PATCH v4 28/39] dm vdo: add the slab depot
-Date:   Thu, 26 Oct 2023 17:41:25 -0400
-Message-Id: <20231026214136.1067410-29-msakai@redhat.com>
+Subject: [PATCH v4 10/39] dm vdo: add deduplication index storage interface
+Date:   Thu, 26 Oct 2023 17:41:07 -0400
+Message-Id: <20231026214136.1067410-11-msakai@redhat.com>
 In-Reply-To: <20231026214136.1067410-1-msakai@redhat.com>
 References: <20231026214136.1067410-1-msakai@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add the data and methods that implement the slab_depot that manages
-the allocation of slabs of blocks added by the preceding patches.
+This patch adds infrastructure for managing reads and writes to the
+underlying storage layer for the deduplication index. The deduplication
+index uses dm-bufio for all of its reads and writes, so part of this
+infrastructure is managing the various dm-bufio clients required. It also
+adds the buffered reader and buffered writer abstractions, which simplify
+reading and writing metadata structures that span several blocks.
+
+This patch also includes structures and utilities for encoding and decoding
+all of the deduplication index metadata, collectively called the index
+layout.
 
 Co-developed-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Signed-off-by: J. corwin Coburn <corwin@hurlbutnet.net>
 Co-developed-by: Michael Sclafani <vdo-devel@redhat.com>
 Signed-off-by: Michael Sclafani <vdo-devel@redhat.com>
-Co-developed-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Co-developed-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
+Signed-off-by: Thomas Jaskiewicz <tom@jaskiewicz.us>
+Co-developed-by: John Wiele <jwiele@redhat.com>
+Signed-off-by: John Wiele <jwiele@redhat.com>
 Signed-off-by: Matthew Sakai <msakai@redhat.com>
 ---
- drivers/md/dm-vdo/slab-depot.c | 965 +++++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/slab-depot.h | 121 +++++
- 2 files changed, 1086 insertions(+)
+ drivers/md/dm-vdo/index-layout.c | 1775 ++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/index-layout.h |   43 +
+ drivers/md/dm-vdo/io-factory.c   |  423 +++++++
+ drivers/md/dm-vdo/io-factory.h   |   66 ++
+ drivers/md/dm-vdo/numeric.h      |   78 ++
+ 5 files changed, 2385 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/index-layout.c
+ create mode 100644 drivers/md/dm-vdo/index-layout.h
+ create mode 100644 drivers/md/dm-vdo/io-factory.c
+ create mode 100644 drivers/md/dm-vdo/io-factory.h
+ create mode 100644 drivers/md/dm-vdo/numeric.h
 
-diff --git a/drivers/md/dm-vdo/slab-depot.c b/drivers/md/dm-vdo/slab-depot.c
-index dbed9c3c8a62..ba9cdb720506 100644
---- a/drivers/md/dm-vdo/slab-depot.c
-+++ b/drivers/md/dm-vdo/slab-depot.c
-@@ -3070,6 +3070,32 @@ static void register_slab_with_allocator(struct block_allocator *allocator, stru
- 	allocator->last_slab = slab->slab_number;
- }
- 
-+/**
-+ * get_depot_slab_iterator() - Return a slab_iterator over the slabs in a slab_depot.
-+ * @depot: The depot over which to iterate.
-+ * @start: The number of the slab to start iterating from.
-+ * @end: The number of the last slab which may be returned.
-+ * @stride: The difference in slab number between successive slabs.
-+ *
-+ * Iteration always occurs from higher to lower numbered slabs.
-+ *
-+ * Return: An initialized iterator structure.
+diff --git a/drivers/md/dm-vdo/index-layout.c b/drivers/md/dm-vdo/index-layout.c
+new file mode 100644
+index 000000000000..a3bd56e3ef2d
+--- /dev/null
++++ b/drivers/md/dm-vdo/index-layout.c
+@@ -0,0 +1,1775 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright 2023 Red Hat
 + */
-+static struct slab_iterator get_depot_slab_iterator(struct slab_depot *depot,
-+						    slab_count_t start,
-+						    slab_count_t end,
-+						    slab_count_t stride)
-+{
-+	struct vdo_slab **slabs = depot->slabs;
 +
-+	return (struct slab_iterator) {
-+		.slabs = slabs,
-+		.next = (((slabs == NULL) || (start < end)) ? NULL : slabs[start]),
-+		.end = end,
-+		.stride = stride,
-+	};
++#include "index-layout.h"
++
++#include <linux/random.h>
++
++#include "config.h"
++#include "logger.h"
++#include "memory-alloc.h"
++#include "murmurhash3.h"
++#include "numeric.h"
++#include "open-chapter.h"
++#include "time-utils.h"
++#include "volume-index.h"
++
++/*
++ * The UDS layout on storage media is divided into a number of fixed-size regions, the sizes of
++ * which are computed when the index is created. Every header and region begins on 4K block
++ * boundary. Save regions are further sub-divided into regions of their own.
++ *
++ * Each region has a kind and an instance number. Some kinds only have one instance and therefore
++ * use RL_SOLE_INSTANCE (-1) as the instance number. The RL_KIND_INDEX used to use instances to
++ * represent sub-indices; now, however there is only ever one sub-index and therefore one instance.
++ * The RL_KIND_VOLUME_INDEX uses instances to record which zone is being saved.
++ *
++ * Every region header has a type and version.
++ *
++ *     +-+-+---------+--------+--------+-+
++ *     | | |   I N D E X  0   101, 0   | |
++ *     |H|C+---------+--------+--------+S|
++ *     |D|f| Volume  | Save   | Save   |e|
++ *     |R|g| Region  | Region | Region |a|
++ *     | | | 201, -1 | 202, 0 | 202, 1 |l|
++ *     +-+-+--------+---------+--------+-+
++ *
++ * The header contains the encoded region layout table as well as some index configuration data.
++ * The sub-index region and its subdivisions are maintained in the same table.
++ *
++ * There are two save regions to preserve the old state in case saving the new state is incomplete.
++ * They are used in alternation. Each save region is further divided into sub-regions.
++ *
++ *     +-+-----+------+------+-----+-----+
++ *     |H| IPM | MI   | MI   |     | OC  |
++ *     |D|     | zone | zone | ... |     |
++ *     |R| 301 | 302  | 302  |     | 303 |
++ *     | | -1  |  0   |  1   |     | -1  |
++ *     +-+-----+------+------+-----+-----+
++ *
++ * The header contains the encoded region layout table as well as index state data for that save.
++ * Each save also has a unique nonce.
++ */
++
++enum {
++	MAGIC_SIZE = 32,
++	NONCE_INFO_SIZE = 32,
++	MAX_SAVES = 2,
++};
++
++enum region_kind {
++	RL_KIND_EMPTY = 0,
++	RL_KIND_HEADER = 1,
++	RL_KIND_CONFIG = 100,
++	RL_KIND_INDEX = 101,
++	RL_KIND_SEAL = 102,
++	RL_KIND_VOLUME = 201,
++	RL_KIND_SAVE = 202,
++	RL_KIND_INDEX_PAGE_MAP = 301,
++	RL_KIND_VOLUME_INDEX = 302,
++	RL_KIND_OPEN_CHAPTER = 303,
++};
++
++/* Some region types are historical and are no longer used. */
++enum region_type {
++	RH_TYPE_FREE = 0, /* unused */
++	RH_TYPE_SUPER = 1,
++	RH_TYPE_SAVE = 2,
++	RH_TYPE_CHECKPOINT = 3, /* unused */
++	RH_TYPE_UNSAVED = 4,
++};
++
++enum {
++	RL_SOLE_INSTANCE = 65535,
++};
++
++/*
++ * Super block version 2 is the first released version.
++ *
++ * Super block version 3 is the normal version used from RHEL 8.2 onwards.
++ *
++ * Super block versions 4 through 6 were incremental development versions and
++ * are not supported.
++ *
++ * Super block version 7 is used for volumes which have been reduced in size by one chapter in
++ * order to make room to prepend LVM metadata to a volume originally created without lvm. This
++ * allows the index to retain most its deduplication records.
++ */
++enum {
++	SUPER_VERSION_MINIMUM = 3,
++	SUPER_VERSION_CURRENT = 3,
++	SUPER_VERSION_MAXIMUM = 7,
++};
++
++static const u8 LAYOUT_MAGIC[MAGIC_SIZE] = "*ALBIREO*SINGLE*FILE*LAYOUT*001*";
++static const u64 REGION_MAGIC = 0x416c6252676e3031; /* 'AlbRgn01' */
++
++struct region_header {
++	u64 magic;
++	u64 region_blocks;
++	u16 type;
++	/* Currently always version 1 */
++	u16 version;
++	u16 region_count;
++	u16 payload;
++};
++
++struct layout_region {
++	u64 start_block;
++	u64 block_count;
++	u32 __unused;
++	u16 kind;
++	u16 instance;
++};
++
++struct region_table {
++	size_t encoded_size;
++	struct region_header header;
++	struct layout_region regions[];
++};
++
++struct index_save_data {
++	u64 timestamp;
++	u64 nonce;
++	/* Currently always version 1 */
++	u32 version;
++	u32 unused__;
++};
++
++struct index_state_version {
++	s32 signature;
++	s32 version_id;
++};
++
++static const struct index_state_version INDEX_STATE_VERSION_301 = {
++	.signature  = -1,
++	.version_id = 301,
++};
++
++struct index_state_data301 {
++	struct index_state_version version;
++	u64 newest_chapter;
++	u64 oldest_chapter;
++	u64 last_save;
++	u32 unused;
++	u32 padding;
++};
++
++struct index_save_layout {
++	unsigned int zone_count;
++	struct layout_region index_save;
++	struct layout_region header;
++	struct layout_region index_page_map;
++	struct layout_region free_space;
++	struct layout_region volume_index_zones[MAX_ZONES];
++	struct layout_region open_chapter;
++	struct index_save_data save_data;
++	struct index_state_data301 state_data;
++};
++
++struct sub_index_layout {
++	u64 nonce;
++	struct layout_region sub_index;
++	struct layout_region volume;
++	struct index_save_layout *saves;
++};
++
++struct super_block_data {
++	u8 magic_label[MAGIC_SIZE];
++	u8 nonce_info[NONCE_INFO_SIZE];
++	u64 nonce;
++	u32 version;
++	u32 block_size;
++	u16 index_count;
++	u16 max_saves;
++	/* Padding reflects a blank field on permanent storage */
++	u8 padding[4];
++	u64 open_chapter_blocks;
++	u64 page_map_blocks;
++	u64 volume_offset;
++	u64 start_offset;
++};
++
++struct index_layout {
++	struct io_factory *factory;
++	size_t factory_size;
++	off_t offset;
++	struct super_block_data super;
++	struct layout_region header;
++	struct layout_region config;
++	struct sub_index_layout index;
++	struct layout_region seal;
++	u64 total_blocks;
++};
++
++struct save_layout_sizes {
++	unsigned int save_count;
++	size_t block_size;
++	u64 volume_blocks;
++	u64 volume_index_blocks;
++	u64 page_map_blocks;
++	u64 open_chapter_blocks;
++	u64 save_blocks;
++	u64 sub_index_blocks;
++	u64 total_blocks;
++	size_t total_size;
++};
++
++static inline bool is_converted_super_block(struct super_block_data *super)
++{
++	return super->version == 7;
 +}
 +
- static struct slab_iterator get_slab_iterator(const struct block_allocator *allocator)
- {
- 	return get_depot_slab_iterator(allocator->depot,
-@@ -3806,6 +3832,171 @@ make_slab(physical_block_number_t slab_origin,
- 	return VDO_SUCCESS;
- }
- 
-+/**
-+ * allocate_slabs() - Allocate a new slab pointer array.
-+ * @depot: The depot.
-+ * @slab_count: The number of slabs the depot should have in the new array.
-+ *
-+ * Any existing slab pointers will be copied into the new array, and slabs will be allocated as
-+ * needed. The newly allocated slabs will not be distributed for use by the block allocators.
-+ *
-+ * Return: VDO_SUCCESS or an error code.
-+ */
-+static int allocate_slabs(struct slab_depot *depot, slab_count_t slab_count)
++static int __must_check compute_sizes(const struct configuration *config,
++				      struct save_layout_sizes *sls)
 +{
-+	block_count_t slab_size;
-+	bool resizing = false;
-+	physical_block_number_t slab_origin;
 +	int result;
++	struct geometry *geometry = config->geometry;
 +
-+	result = UDS_ALLOCATE(slab_count,
-+			      struct vdo_slab *,
-+			      "slab pointer array",
-+			      &depot->new_slabs);
-+	if (result != VDO_SUCCESS)
-+		return result;
++	memset(sls, 0, sizeof(*sls));
++	sls->save_count = MAX_SAVES;
++	sls->block_size = UDS_BLOCK_SIZE;
++	sls->volume_blocks = geometry->bytes_per_volume / sls->block_size;
 +
-+	if (depot->slabs != NULL) {
-+		memcpy(depot->new_slabs,
-+		       depot->slabs,
-+		       depot->slab_count * sizeof(struct vdo_slab *));
-+		resizing = true;
-+	}
++	result = uds_compute_volume_index_save_blocks(config,
++						      sls->block_size,
++						      &sls->volume_index_blocks);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "cannot compute index save size");
 +
-+	slab_size = depot->slab_config.slab_blocks;
-+	slab_origin = depot->first_block + (depot->slab_count * slab_size);
++	sls->page_map_blocks =
++		DIV_ROUND_UP(uds_compute_index_page_map_save_size(geometry), sls->block_size);
++	sls->open_chapter_blocks =
++		DIV_ROUND_UP(uds_compute_saved_open_chapter_size(geometry), sls->block_size);
++	sls->save_blocks =
++		1 + (sls->volume_index_blocks + sls->page_map_blocks + sls->open_chapter_blocks);
++	sls->sub_index_blocks = sls->volume_blocks + (sls->save_count * sls->save_blocks);
++	sls->total_blocks = 3 + sls->sub_index_blocks;
++	sls->total_size = sls->total_blocks * sls->block_size;
 +
-+	for (depot->new_slab_count = depot->slab_count;
-+	     depot->new_slab_count < slab_count;
-+	     depot->new_slab_count++, slab_origin += slab_size) {
-+		struct block_allocator *allocator =
-+			&depot->allocators[depot->new_slab_count % depot->zone_count];
-+		struct vdo_slab **slab_ptr = &depot->new_slabs[depot->new_slab_count];
-+
-+		result = make_slab(slab_origin,
-+				   allocator,
-+				   depot->new_slab_count,
-+				   resizing,
-+				   slab_ptr);
-+		if (result != VDO_SUCCESS)
-+			return result;
-+	}
-+
-+	return VDO_SUCCESS;
++	return UDS_SUCCESS;
 +}
 +
-+/**
-+ * vdo_abandon_new_slabs() - Abandon any new slabs in this depot, freeing them as needed.
-+ * @depot: The depot.
-+ */
-+void vdo_abandon_new_slabs(struct slab_depot *depot)
++int uds_compute_index_size(const struct uds_parameters *parameters, u64 *index_size)
 +{
-+	slab_count_t i;
++	int result;
++	struct configuration *index_config;
++	struct save_layout_sizes sizes;
 +
-+	if (depot->new_slabs == NULL)
-+		return;
-+
-+	for (i = depot->slab_count; i < depot->new_slab_count; i++)
-+		free_slab(UDS_FORGET(depot->new_slabs[i]));
-+	depot->new_slab_count = 0;
-+	depot->new_size = 0;
-+	UDS_FREE(UDS_FORGET(depot->new_slabs));
-+}
-+
-+/**
-+ * get_allocator_thread_id() - Get the ID of the thread on which a given allocator operates.
-+ *
-+ * Implements vdo_zone_thread_getter.
-+ */
-+static thread_id_t get_allocator_thread_id(void *context, zone_count_t zone_number)
-+{
-+	return ((struct slab_depot *) context)->allocators[zone_number].thread_id;
-+}
-+
-+/**
-+ * release_recovery_journal_lock() - Request the slab journal to release the recovery journal lock
-+ *                                   it may hold on a specified recovery journal block.
-+ * @journal: The slab journal.
-+ * @recovery_lock: The sequence number of the recovery journal block whose locks should be
-+ *                 released.
-+ *
-+ * Return: true if the journal does hold a lock on the specified block (which it will release).
-+ */
-+static bool __must_check
-+release_recovery_journal_lock(struct slab_journal *journal, sequence_number_t recovery_lock)
-+{
-+	if (recovery_lock > journal->recovery_lock) {
-+		ASSERT_LOG_ONLY((recovery_lock < journal->recovery_lock),
-+				"slab journal recovery lock is not older than the recovery journal head");
-+		return false;
++	if (index_size == NULL) {
++		uds_log_error("Missing output size pointer");
++		return -EINVAL;
 +	}
 +
-+	if ((recovery_lock < journal->recovery_lock) ||
-+	    vdo_is_read_only(journal->slab->allocator->depot->vdo))
-+		return false;
++	result = uds_make_configuration(parameters, &index_config);
++	if (result != UDS_SUCCESS) {
++		uds_log_error_strerror(result, "cannot compute index size");
++		return uds_map_to_system_error(result);
++	}
 +
-+	/* All locks are held by the block which is in progress; write it. */
-+	commit_tail(journal);
-+	return true;
++	result = compute_sizes(index_config, &sizes);
++	uds_free_configuration(index_config);
++	if (result != UDS_SUCCESS)
++		return uds_map_to_system_error(result);
++
++	*index_size = sizes.total_size;
++	return UDS_SUCCESS;
++}
++
++/* Create unique data using the current time and a pseudorandom number. */
++static void create_unique_nonce_data(u8 *buffer)
++{
++	ktime_t now = current_time_ns(CLOCK_REALTIME);
++	u32 rand;
++	size_t offset = 0;
++
++	get_random_bytes(&rand, sizeof(u32));
++	memcpy(buffer + offset, &now, sizeof(now));
++	offset += sizeof(now);
++	memcpy(buffer + offset, &rand, sizeof(rand));
++	offset += sizeof(rand);
++	while (offset < NONCE_INFO_SIZE) {
++		size_t len = min(NONCE_INFO_SIZE - offset, offset);
++
++		memcpy(buffer + offset, buffer, len);
++		offset += len;
++	}
++}
++
++static u64 hash_stuff(u64 start, const void *data, size_t len)
++{
++	u32 seed = start ^ (start >> 27);
++	u8 hash_buffer[16];
++
++	murmurhash3_128(data, len, seed, hash_buffer);
++	return get_unaligned_le64(hash_buffer + 4);
++}
++
++/* Generate a primary nonce from the provided data. */
++static u64 generate_primary_nonce(const void *data, size_t len)
++{
++	return hash_stuff(0xa1b1e0fc, data, len);
 +}
 +
 +/*
-+ * Request a commit of all dirty tail blocks which are locking the recovery journal block the depot
-+ * is seeking to release.
-+ *
-+ * Implements vdo_zone_action.
++ * Deterministically generate a secondary nonce from an existing nonce and some arbitrary data by
++ * hashing the original nonce and the data to produce a new nonce.
 + */
-+static void release_tail_block_locks(void *context,
-+				     zone_count_t zone_number,
-+				     struct vdo_completion *parent)
++static u64 generate_secondary_nonce(u64 nonce, const void *data, size_t len)
 +{
-+	struct slab_journal *journal, *tmp;
-+	struct slab_depot *depot = context;
-+	struct list_head *list = &depot->allocators[zone_number].dirty_slab_journals;
++	return hash_stuff(nonce + 1, data, len);
++}
 +
-+	list_for_each_entry_safe(journal, tmp, list, dirty_entry) {
-+		if (!release_recovery_journal_lock(journal, depot->active_release_request))
-+			break;
++static int __must_check open_layout_reader(struct index_layout *layout,
++					   struct layout_region *lr,
++					   off_t offset,
++					   struct buffered_reader **reader_ptr)
++{
++	return uds_make_buffered_reader(layout->factory,
++					lr->start_block + offset,
++					lr->block_count,
++					reader_ptr);
++}
++
++static int open_region_reader(struct index_layout *layout,
++			      struct layout_region *region,
++			      struct buffered_reader **reader_ptr)
++{
++	return open_layout_reader(layout, region, -layout->super.start_offset, reader_ptr);
++}
++
++static int __must_check open_layout_writer(struct index_layout *layout,
++					   struct layout_region *lr,
++					   off_t offset,
++					   struct buffered_writer **writer_ptr)
++{
++	return uds_make_buffered_writer(layout->factory,
++					lr->start_block + offset,
++					lr->block_count,
++					writer_ptr);
++}
++
++static int open_region_writer(struct index_layout *layout,
++			      struct layout_region *region,
++			      struct buffered_writer **writer_ptr)
++{
++	return open_layout_writer(layout, region, -layout->super.start_offset, writer_ptr);
++}
++
++static void
++generate_super_block_data(struct save_layout_sizes *sls, struct super_block_data *super)
++{
++	memset(super, 0, sizeof(*super));
++	memcpy(super->magic_label, LAYOUT_MAGIC, MAGIC_SIZE);
++	create_unique_nonce_data(super->nonce_info);
++
++	super->nonce = generate_primary_nonce(super->nonce_info, sizeof(super->nonce_info));
++	super->version = SUPER_VERSION_CURRENT;
++	super->block_size = sls->block_size;
++	super->index_count = 1;
++	super->max_saves = sls->save_count;
++	super->open_chapter_blocks = sls->open_chapter_blocks;
++	super->page_map_blocks = sls->page_map_blocks;
++	super->volume_offset = 0;
++	super->start_offset = 0;
++}
++
++static void define_sub_index_nonce(struct index_layout *layout)
++{
++	struct sub_index_nonce_data {
++		u64 offset;
++		u16 index_id;
++	};
++	struct sub_index_layout *sil = &layout->index;
++	u64 primary_nonce = layout->super.nonce;
++	u8 buffer[sizeof(struct sub_index_nonce_data)] = { 0 };
++	size_t offset = 0;
++
++	encode_u64_le(buffer, &offset, sil->sub_index.start_block);
++	encode_u16_le(buffer, &offset, 0);
++	sil->nonce = generate_secondary_nonce(primary_nonce, buffer, sizeof(buffer));
++	if (sil->nonce == 0)
++		sil->nonce = generate_secondary_nonce(~primary_nonce + 1, buffer, sizeof(buffer));
++}
++
++static void
++setup_sub_index(struct index_layout *layout, u64 start_block, struct save_layout_sizes *sls)
++{
++	struct sub_index_layout *sil = &layout->index;
++	u64 next_block = start_block;
++	unsigned int i;
++
++	sil->sub_index = (struct layout_region) {
++		.start_block = start_block,
++		.block_count = sls->sub_index_blocks,
++		.kind = RL_KIND_INDEX,
++		.instance = 0,
++	};
++
++	sil->volume = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = sls->volume_blocks,
++		.kind = RL_KIND_VOLUME,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	next_block += sls->volume_blocks;
++
++	for (i = 0; i < sls->save_count; i++) {
++		sil->saves[i].index_save = (struct layout_region) {
++			.start_block = next_block,
++			.block_count = sls->save_blocks,
++			.kind = RL_KIND_SAVE,
++			.instance = i,
++		};
++
++		next_block += sls->save_blocks;
 +	}
 +
-+	vdo_finish_completion(parent);
++	define_sub_index_nonce(layout);
 +}
 +
-+/**
-+ * prepare_for_tail_block_commit() - Prepare to commit oldest tail blocks.
-+ *
-+ * Implements vdo_action_preamble.
-+ */
-+static void prepare_for_tail_block_commit(void *context, struct vdo_completion *parent)
++static void initialize_layout(struct index_layout *layout, struct save_layout_sizes *sls)
 +{
-+	struct slab_depot *depot = context;
++	u64 next_block = layout->offset / sls->block_size;
 +
-+	depot->active_release_request = depot->new_release_request;
-+	vdo_finish_completion(parent);
++	layout->total_blocks = sls->total_blocks;
++	generate_super_block_data(sls, &layout->super);
++	layout->header = (struct layout_region) {
++		.start_block = next_block++,
++		.block_count = 1,
++		.kind = RL_KIND_HEADER,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	layout->config = (struct layout_region) {
++		.start_block = next_block++,
++		.block_count = 1,
++		.kind = RL_KIND_CONFIG,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	setup_sub_index(layout, next_block, sls);
++	next_block += sls->sub_index_blocks;
++
++	layout->seal = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = 1,
++		.kind = RL_KIND_SEAL,
++		.instance = RL_SOLE_INSTANCE,
++	};
 +}
 +
-+/**
-+ * schedule_tail_block_commit() - Schedule a tail block commit if necessary.
-+ *
-+ * This method should not be called directly. Rather, call vdo_schedule_default_action() on the
-+ * depot's action manager.
-+ *
-+ * Implements vdo_action_scheduler.
-+ */
-+static bool schedule_tail_block_commit(void *context)
-+{
-+	struct slab_depot *depot = context;
-+
-+	if (depot->new_release_request == depot->active_release_request)
-+		return false;
-+
-+	return vdo_schedule_action(depot->action_manager,
-+				   prepare_for_tail_block_commit,
-+				   release_tail_block_locks,
-+				   NULL,
-+				   NULL);
-+}
-+
- /**
-  * initialize_slab_scrubber() - Initialize an allocator's slab scrubber.
-  * @allocator: The allocator being initialized
-@@ -3954,6 +4145,151 @@ static int __must_check initialize_block_allocator(struct slab_depot *depot, zon
- 	return VDO_SUCCESS;
- }
- 
-+static int allocate_components(struct slab_depot *depot,
-+			       struct partition *summary_partition)
++static int __must_check
++make_index_save_region_table(struct index_save_layout *isl, struct region_table **table_ptr)
 +{
 +	int result;
-+	zone_count_t zone;
-+	slab_count_t slab_count;
-+	u8 hint;
-+	u32 i;
-+	const struct thread_config *thread_config = &depot->vdo->thread_config;
++	unsigned int z;
++	struct region_table *table;
++	struct layout_region *lr;
++	u16 region_count;
++	size_t payload;
++	size_t type;
 +
-+	result = vdo_make_action_manager(depot->zone_count,
-+					 get_allocator_thread_id,
-+					 thread_config->journal_thread,
-+					 depot,
-+					 schedule_tail_block_commit,
-+					 depot->vdo,
-+					 &depot->action_manager);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	depot->origin = depot->first_block;
-+
-+	/* block size must be a multiple of entry size */
-+	STATIC_ASSERT((VDO_BLOCK_SIZE % sizeof(struct slab_summary_entry)) == 0);
-+
-+	depot->summary_origin = summary_partition->offset;
-+	depot->hint_shift = vdo_get_slab_summary_hint_shift(depot->slab_size_shift);
-+	result = UDS_ALLOCATE(MAXIMUM_VDO_SLAB_SUMMARY_ENTRIES,
-+			      struct slab_summary_entry,
-+			      __func__,
-+			      &depot->summary_entries);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+
-+	/* Initialize all the entries. */
-+	hint = compute_fullness_hint(depot, depot->slab_config.data_blocks);
-+	for (i = 0; i < MAXIMUM_VDO_SLAB_SUMMARY_ENTRIES; i++) {
++	if (isl->zone_count > 0) {
 +		/*
-+		 * This default tail block offset must be reflected in
-+		 * slabJournal.c::read_slab_journal_tail().
++		 * Normal save regions: header, page map, volume index zones,
++		 * open chapter, and possibly free space.
 +		 */
-+		depot->summary_entries[i] = (struct slab_summary_entry) {
-+			.tail_block_offset = 0,
-+			.fullness_hint = hint,
-+			.load_ref_counts = false,
-+			.is_dirty = false,
++		region_count = 3 + isl->zone_count;
++		if (isl->free_space.block_count > 0)
++			region_count++;
++
++		payload = sizeof(isl->save_data) + sizeof(isl->state_data);
++		type = RH_TYPE_SAVE;
++	} else {
++		/* Empty save regions: header, page map, free space. */
++		region_count = 3;
++		payload = sizeof(isl->save_data);
++		type = RH_TYPE_UNSAVED;
++	}
++
++	result = UDS_ALLOCATE_EXTENDED(struct region_table,
++				       region_count,
++				       struct layout_region,
++				       "layout region table for ISL",
++				       &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	lr = &table->regions[0];
++	*lr++ = isl->header;
++	*lr++ = isl->index_page_map;
++	for (z = 0; z < isl->zone_count; z++)
++		*lr++ = isl->volume_index_zones[z];
++
++	if (isl->zone_count > 0)
++		*lr++ = isl->open_chapter;
++
++	if (isl->free_space.block_count > 0)
++		*lr++ = isl->free_space;
++
++	table->header = (struct region_header) {
++		.magic = REGION_MAGIC,
++		.region_blocks = isl->index_save.block_count,
++		.type = type,
++		.version = 1,
++		.region_count = region_count,
++		.payload = payload,
++	};
++
++	table->encoded_size = (sizeof(struct region_header) + payload +
++			       region_count * sizeof(struct layout_region));
++	*table_ptr = table;
++	return UDS_SUCCESS;
++}
++
++static void encode_region_table(u8 *buffer, size_t *offset, struct region_table *table)
++{
++	unsigned int i;
++
++	encode_u64_le(buffer, offset, REGION_MAGIC);
++	encode_u64_le(buffer, offset, table->header.region_blocks);
++	encode_u16_le(buffer, offset, table->header.type);
++	encode_u16_le(buffer, offset, table->header.version);
++	encode_u16_le(buffer, offset, table->header.region_count);
++	encode_u16_le(buffer, offset, table->header.payload);
++
++	for (i = 0; i < table->header.region_count; i++) {
++		encode_u64_le(buffer, offset, table->regions[i].start_block);
++		encode_u64_le(buffer, offset, table->regions[i].block_count);
++		encode_u32_le(buffer, offset, 0);
++		encode_u16_le(buffer, offset, table->regions[i].kind);
++		encode_u16_le(buffer, offset, table->regions[i].instance);
++	}
++}
++
++static int __must_check write_index_save_header(struct index_save_layout *isl,
++						struct region_table *table,
++						struct buffered_writer *writer)
++{
++	int result;
++	u8 *buffer;
++	size_t offset = 0;
++
++	result = UDS_ALLOCATE(table->encoded_size, u8, "index save data", &buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	encode_region_table(buffer, &offset, table);
++	encode_u64_le(buffer, &offset, isl->save_data.timestamp);
++	encode_u64_le(buffer, &offset, isl->save_data.nonce);
++	encode_u32_le(buffer, &offset, isl->save_data.version);
++	encode_u32_le(buffer, &offset, 0);
++	if (isl->zone_count > 0) {
++		encode_u32_le(buffer, &offset, INDEX_STATE_VERSION_301.signature);
++		encode_u32_le(buffer, &offset, INDEX_STATE_VERSION_301.version_id);
++		encode_u64_le(buffer, &offset, isl->state_data.newest_chapter);
++		encode_u64_le(buffer, &offset, isl->state_data.oldest_chapter);
++		encode_u64_le(buffer, &offset, isl->state_data.last_save);
++		encode_u64_le(buffer, &offset, 0);
++	}
++
++	result = uds_write_to_buffered_writer(writer, buffer, offset);
++	UDS_FREE(buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return uds_flush_buffered_writer(writer);
++}
++
++static int write_index_save_layout(struct index_layout *layout, struct index_save_layout *isl)
++{
++	int result;
++	struct region_table *table;
++	struct buffered_writer *writer;
++
++	result = make_index_save_region_table(isl, &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = open_region_writer(layout, &isl->header, &writer);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(table);
++		return result;
++	}
++
++	result = write_index_save_header(isl, table, writer);
++	UDS_FREE(table);
++	uds_free_buffered_writer(writer);
++
++	return result;
++}
++
++static void reset_index_save_layout(struct index_save_layout *isl, u64 page_map_blocks)
++{
++	u64 free_blocks;
++	u64 next_block = isl->index_save.start_block;
++
++	isl->zone_count = 0;
++	memset(&isl->save_data, 0, sizeof(isl->save_data));
++
++	isl->header = (struct layout_region) {
++		.start_block = next_block++,
++		.block_count = 1,
++		.kind = RL_KIND_HEADER,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	isl->index_page_map = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = page_map_blocks,
++		.kind = RL_KIND_INDEX_PAGE_MAP,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	next_block += page_map_blocks;
++
++	free_blocks = isl->index_save.block_count - page_map_blocks - 1;
++	isl->free_space = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = free_blocks,
++		.kind = RL_KIND_EMPTY,
++		.instance = RL_SOLE_INSTANCE,
++	};
++}
++
++static int __must_check
++invalidate_old_save(struct index_layout *layout, struct index_save_layout *isl)
++{
++	reset_index_save_layout(isl, layout->super.page_map_blocks);
++	return write_index_save_layout(layout, isl);
++}
++
++static int discard_index_state_data(struct index_layout *layout)
++{
++	int result;
++	int saved_result = UDS_SUCCESS;
++	unsigned int i;
++
++	for (i = 0; i < layout->super.max_saves; i++) {
++		result = invalidate_old_save(layout, &layout->index.saves[i]);
++		if (result != UDS_SUCCESS)
++			saved_result = result;
++	}
++
++	if (saved_result != UDS_SUCCESS)
++		return uds_log_error_strerror(result,
++					      "%s: cannot destroy all index saves",
++					      __func__);
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++make_layout_region_table(struct index_layout *layout, struct region_table **table_ptr)
++{
++	int result;
++	unsigned int i;
++	/* Regions: header, config, index, volume, saves, seal */
++	u16 region_count = 5 + layout->super.max_saves;
++	u16 payload;
++	struct region_table *table;
++	struct layout_region *lr;
++
++	result = UDS_ALLOCATE_EXTENDED(struct region_table,
++				       region_count,
++				       struct layout_region,
++				       "layout region table",
++				       &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	lr = &table->regions[0];
++	*lr++ = layout->header;
++	*lr++ = layout->config;
++	*lr++ = layout->index.sub_index;
++	*lr++ = layout->index.volume;
++
++	for (i = 0; i < layout->super.max_saves; i++)
++		*lr++ = layout->index.saves[i].index_save;
++
++	*lr++ = layout->seal;
++
++	if (is_converted_super_block(&layout->super))
++		payload = sizeof(struct super_block_data);
++	else
++		payload = (sizeof(struct super_block_data) -
++			   sizeof(layout->super.volume_offset) -
++			   sizeof(layout->super.start_offset));
++
++	table->header = (struct region_header) {
++		.magic = REGION_MAGIC,
++		.region_blocks = layout->total_blocks,
++		.type = RH_TYPE_SUPER,
++		.version = 1,
++		.region_count = region_count,
++		.payload = payload,
++	};
++
++	table->encoded_size = (sizeof(struct region_header) + payload +
++			       region_count * sizeof(struct layout_region));
++	*table_ptr = table;
++	return UDS_SUCCESS;
++}
++
++static int __must_check write_layout_header(struct index_layout *layout,
++					    struct region_table *table,
++					    struct buffered_writer *writer)
++{
++	int result;
++	u8 *buffer;
++	size_t offset = 0;
++
++	result = UDS_ALLOCATE(table->encoded_size, u8, "layout data", &buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	encode_region_table(buffer, &offset, table);
++	memcpy(buffer + offset, &layout->super.magic_label, MAGIC_SIZE);
++	offset += MAGIC_SIZE;
++	memcpy(buffer + offset, &layout->super.nonce_info, NONCE_INFO_SIZE);
++	offset += NONCE_INFO_SIZE;
++	encode_u64_le(buffer, &offset, layout->super.nonce);
++	encode_u32_le(buffer, &offset, layout->super.version);
++	encode_u32_le(buffer, &offset, layout->super.block_size);
++	encode_u16_le(buffer, &offset, layout->super.index_count);
++	encode_u16_le(buffer, &offset, layout->super.max_saves);
++	encode_u32_le(buffer, &offset, 0);
++	encode_u64_le(buffer, &offset, layout->super.open_chapter_blocks);
++	encode_u64_le(buffer, &offset, layout->super.page_map_blocks);
++
++	if (is_converted_super_block(&layout->super)) {
++		encode_u64_le(buffer, &offset, layout->super.volume_offset);
++		encode_u64_le(buffer, &offset, layout->super.start_offset);
++	}
++
++	result = uds_write_to_buffered_writer(writer, buffer, offset);
++	UDS_FREE(buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return uds_flush_buffered_writer(writer);
++}
++
++static int __must_check write_uds_index_config(struct index_layout *layout,
++					       struct configuration *config,
++					       off_t offset)
++{
++	int result;
++	struct buffered_writer *writer = NULL;
++
++	result = open_layout_writer(layout, &layout->config, offset, &writer);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "failed to open config region");
++
++	result = uds_write_config_contents(writer, config, layout->super.version);
++	if (result != UDS_SUCCESS) {
++		uds_free_buffered_writer(writer);
++		return uds_log_error_strerror(result, "failed to write config region");
++	}
++
++	result = uds_flush_buffered_writer(writer);
++	if (result != UDS_SUCCESS) {
++		uds_free_buffered_writer(writer);
++		return uds_log_error_strerror(result, "cannot flush config writer");
++	}
++
++	uds_free_buffered_writer(writer);
++	return UDS_SUCCESS;
++}
++
++static int __must_check save_layout(struct index_layout *layout, off_t offset)
++{
++	int result;
++	struct buffered_writer *writer = NULL;
++	struct region_table *table;
++
++	result = make_layout_region_table(layout, &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = open_layout_writer(layout, &layout->header, offset, &writer);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(table);
++		return result;
++	}
++
++	result = write_layout_header(layout, table, writer);
++	UDS_FREE(table);
++	uds_free_buffered_writer(writer);
++
++	return result;
++}
++
++static int create_index_layout(struct index_layout *layout, struct configuration *config)
++{
++	int result;
++	struct save_layout_sizes sizes;
++
++	result = compute_sizes(config, &sizes);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(sizes.save_count,
++			      struct index_save_layout,
++			      __func__,
++			      &layout->index.saves);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	initialize_layout(layout, &sizes);
++
++	result = discard_index_state_data(layout);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = write_uds_index_config(layout, config, 0);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return save_layout(layout, 0);
++}
++
++static u64 generate_index_save_nonce(u64 volume_nonce, struct index_save_layout *isl)
++{
++	struct save_nonce_data {
++		struct index_save_data data;
++		u64 offset;
++	} nonce_data;
++	u8 buffer[sizeof(nonce_data)];
++	size_t offset = 0;
++
++	encode_u64_le(buffer, &offset, isl->save_data.timestamp);
++	encode_u64_le(buffer, &offset, 0);
++	encode_u32_le(buffer, &offset, isl->save_data.version);
++	encode_u32_le(buffer, &offset, 0U);
++	encode_u64_le(buffer, &offset, isl->index_save.start_block);
++	ASSERT_LOG_ONLY(offset == sizeof(nonce_data),
++			"%zu bytes encoded of %zu expected",
++			offset,
++			sizeof(nonce_data));
++	return generate_secondary_nonce(volume_nonce, buffer, sizeof(buffer));
++}
++
++static u64 validate_index_save_layout(struct index_save_layout *isl, u64 volume_nonce)
++{
++	if ((isl->zone_count == 0) || (isl->save_data.timestamp == 0))
++		return 0;
++
++	if (isl->save_data.nonce != generate_index_save_nonce(volume_nonce, isl))
++		return 0;
++
++	return isl->save_data.timestamp;
++}
++
++static int
++find_latest_uds_index_save_slot(struct index_layout *layout, struct index_save_layout **isl_ptr)
++{
++	struct index_save_layout *latest = NULL;
++	struct index_save_layout *isl;
++	unsigned int i;
++	u64 save_time = 0;
++	u64 latest_time = 0;
++
++	for (i = 0; i < layout->super.max_saves; i++) {
++		isl = &layout->index.saves[i];
++		save_time = validate_index_save_layout(isl, layout->index.nonce);
++		if (save_time > latest_time) {
++			latest = isl;
++			latest_time = save_time;
++		}
++	}
++
++	if (latest == NULL) {
++		uds_log_error("No valid index save found");
++		return UDS_INDEX_NOT_SAVED_CLEANLY;
++	}
++
++	*isl_ptr = latest;
++	return UDS_SUCCESS;
++}
++
++int uds_discard_open_chapter(struct index_layout *layout)
++{
++	int result;
++	struct index_save_layout *isl;
++	struct buffered_writer *writer;
++
++	result = find_latest_uds_index_save_slot(layout, &isl);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = open_region_writer(layout, &isl->open_chapter, &writer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_write_to_buffered_writer(writer, NULL, UDS_BLOCK_SIZE);
++	if (result != UDS_SUCCESS) {
++		uds_free_buffered_writer(writer);
++		return result;
++	}
++
++	result = uds_flush_buffered_writer(writer);
++	uds_free_buffered_writer(writer);
++	return result;
++}
++
++int uds_load_index_state(struct index_layout *layout, struct uds_index *index)
++{
++	int result;
++	unsigned int zone;
++	struct index_save_layout *isl;
++	struct buffered_reader *readers[MAX_ZONES];
++
++	result = find_latest_uds_index_save_slot(layout, &isl);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	index->newest_virtual_chapter = isl->state_data.newest_chapter;
++	index->oldest_virtual_chapter = isl->state_data.oldest_chapter;
++	index->last_save = isl->state_data.last_save;
++
++	result = open_region_reader(layout, &isl->open_chapter, &readers[0]);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_load_open_chapter(index, readers[0]);
++	uds_free_buffered_reader(readers[0]);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	for (zone = 0; zone < isl->zone_count; zone++) {
++		result = open_region_reader(layout,
++					    &isl->volume_index_zones[zone],
++					    &readers[zone]);
++		if (result != UDS_SUCCESS) {
++			for (; zone > 0; zone--)
++				uds_free_buffered_reader(readers[zone - 1]);
++
++			return result;
++		}
++	}
++
++	result = uds_load_volume_index(index->volume_index, readers, isl->zone_count);
++	for (zone = 0; zone < isl->zone_count; zone++)
++		uds_free_buffered_reader(readers[zone]);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = open_region_reader(layout, &isl->index_page_map, &readers[0]);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_read_index_page_map(index->volume->index_page_map, readers[0]);
++	uds_free_buffered_reader(readers[0]);
++
++	return result;
++}
++
++static struct index_save_layout *select_oldest_index_save_layout(struct index_layout *layout)
++{
++	struct index_save_layout *oldest = NULL;
++	struct index_save_layout *isl;
++	unsigned int i;
++	u64 save_time = 0;
++	u64 oldest_time = 0;
++
++	for (i = 0; i < layout->super.max_saves; i++) {
++		isl = &layout->index.saves[i];
++		save_time = validate_index_save_layout(isl, layout->index.nonce);
++		if (oldest == NULL || save_time < oldest_time) {
++			oldest = isl;
++			oldest_time = save_time;
++		}
++	}
++
++	return oldest;
++}
++
++static void instantiate_index_save_layout(struct index_save_layout *isl,
++					  struct super_block_data *super,
++					  u64 volume_nonce,
++					  unsigned int zone_count)
++{
++	unsigned int z;
++	u64 next_block;
++	u64 free_blocks;
++	u64 volume_index_blocks;
++
++	isl->zone_count = zone_count;
++	memset(&isl->save_data, 0, sizeof(isl->save_data));
++	isl->save_data.timestamp = ktime_to_ms(current_time_ns(CLOCK_REALTIME));
++	isl->save_data.version = 1;
++	isl->save_data.nonce = generate_index_save_nonce(volume_nonce, isl);
++
++	next_block = isl->index_save.start_block;
++	isl->header = (struct layout_region) {
++		.start_block = next_block++,
++		.block_count = 1,
++		.kind = RL_KIND_HEADER,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	isl->index_page_map = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = super->page_map_blocks,
++		.kind = RL_KIND_INDEX_PAGE_MAP,
++		.instance = RL_SOLE_INSTANCE,
++	};
++	next_block += super->page_map_blocks;
++
++	free_blocks = (isl->index_save.block_count - 1 -
++		       super->page_map_blocks -
++		       super->open_chapter_blocks);
++	volume_index_blocks = free_blocks / isl->zone_count;
++	for (z = 0; z < isl->zone_count; z++) {
++		isl->volume_index_zones[z] = (struct layout_region) {
++			.start_block = next_block,
++			.block_count = volume_index_blocks,
++			.kind = RL_KIND_VOLUME_INDEX,
++			.instance = z,
++		};
++
++		next_block += volume_index_blocks;
++		free_blocks -= volume_index_blocks;
++	}
++
++	isl->open_chapter = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = super->open_chapter_blocks,
++		.kind = RL_KIND_OPEN_CHAPTER,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	next_block += super->open_chapter_blocks;
++
++	isl->free_space = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = free_blocks,
++		.kind = RL_KIND_EMPTY,
++		.instance = RL_SOLE_INSTANCE,
++	};
++}
++
++static int setup_uds_index_save_slot(struct index_layout *layout,
++				     unsigned int zone_count,
++				     struct index_save_layout **isl_ptr)
++{
++	int result;
++	struct index_save_layout *isl;
++
++	isl = select_oldest_index_save_layout(layout);
++	result = invalidate_old_save(layout, isl);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	instantiate_index_save_layout(isl, &layout->super, layout->index.nonce, zone_count);
++
++	*isl_ptr = isl;
++	return UDS_SUCCESS;
++}
++
++static void cancel_uds_index_save(struct index_save_layout *isl)
++{
++	memset(&isl->save_data, 0, sizeof(isl->save_data));
++	memset(&isl->state_data, 0, sizeof(isl->state_data));
++	isl->zone_count = 0;
++}
++
++int uds_save_index_state(struct index_layout *layout, struct uds_index *index)
++{
++	int result;
++	unsigned int zone;
++	struct index_save_layout *isl;
++	struct buffered_writer *writers[MAX_ZONES];
++
++	result = setup_uds_index_save_slot(layout, index->zone_count, &isl);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	isl->state_data	= (struct index_state_data301) {
++		.newest_chapter = index->newest_virtual_chapter,
++		.oldest_chapter = index->oldest_virtual_chapter,
++		.last_save = index->last_save,
++	};
++
++	result = open_region_writer(layout, &isl->open_chapter, &writers[0]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	result = uds_save_open_chapter(index, writers[0]);
++	uds_free_buffered_writer(writers[0]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	for (zone = 0; zone < index->zone_count; zone++) {
++		result = open_region_writer(layout,
++					    &isl->volume_index_zones[zone],
++					    &writers[zone]);
++		if (result != UDS_SUCCESS) {
++			for (; zone > 0; zone--)
++				uds_free_buffered_writer(writers[zone - 1]);
++
++			cancel_uds_index_save(isl);
++			return result;
++		}
++	}
++
++	result = uds_save_volume_index(index->volume_index, writers, index->zone_count);
++	for (zone = 0; zone < index->zone_count; zone++)
++		uds_free_buffered_writer(writers[zone]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	result = open_region_writer(layout, &isl->index_page_map, &writers[0]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	result = uds_write_index_page_map(index->volume->index_page_map, writers[0]);
++	uds_free_buffered_writer(writers[0]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	return write_index_save_layout(layout, isl);
++}
++
++static int __must_check
++load_region_table(struct buffered_reader *reader, struct region_table **table_ptr)
++{
++	int result;
++	unsigned int i;
++	struct region_header header;
++	struct region_table *table;
++	u8 buffer[sizeof(struct region_header)];
++	size_t offset = 0;
++
++	result = uds_read_from_buffered_reader(reader, buffer, sizeof(buffer));
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "cannot read region table header");
++
++	decode_u64_le(buffer, &offset, &header.magic);
++	decode_u64_le(buffer, &offset, &header.region_blocks);
++	decode_u16_le(buffer, &offset, &header.type);
++	decode_u16_le(buffer, &offset, &header.version);
++	decode_u16_le(buffer, &offset, &header.region_count);
++	decode_u16_le(buffer, &offset, &header.payload);
++
++	if (header.magic != REGION_MAGIC)
++		return UDS_NO_INDEX;
++
++	if (header.version != 1)
++		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
++					      "unknown region table version %hu",
++					      header.version);
++
++	result = UDS_ALLOCATE_EXTENDED(struct region_table,
++				       header.region_count,
++				       struct layout_region,
++				       "single file layout region table",
++				       &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	table->header = header;
++	for (i = 0; i < header.region_count; i++) {
++		u8 region_buffer[sizeof(struct layout_region)];
++
++		offset = 0;
++		result = uds_read_from_buffered_reader(reader,
++						       region_buffer,
++						       sizeof(region_buffer));
++		if (result != UDS_SUCCESS) {
++			UDS_FREE(table);
++			return uds_log_error_strerror(UDS_CORRUPT_DATA,
++						      "cannot read region table layouts");
++		}
++
++		decode_u64_le(region_buffer, &offset, &table->regions[i].start_block);
++		decode_u64_le(region_buffer, &offset, &table->regions[i].block_count);
++		offset += sizeof(u32);
++		decode_u16_le(region_buffer, &offset, &table->regions[i].kind);
++		decode_u16_le(region_buffer, &offset, &table->regions[i].instance);
++	}
++
++	*table_ptr = table;
++	return UDS_SUCCESS;
++}
++
++static int __must_check read_super_block_data(struct buffered_reader *reader,
++					      struct index_layout *layout,
++					      size_t saved_size)
++{
++	int result;
++	struct super_block_data *super = &layout->super;
++	u8 *buffer;
++	size_t offset = 0;
++
++	result = UDS_ALLOCATE(saved_size, u8, "super block data", &buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_read_from_buffered_reader(reader, buffer, saved_size);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(buffer);
++		return uds_log_error_strerror(result, "cannot read region table header");
++	}
++
++	memcpy(&super->magic_label, buffer, MAGIC_SIZE);
++	offset += MAGIC_SIZE;
++	memcpy(&super->nonce_info, buffer + offset, NONCE_INFO_SIZE);
++	offset += NONCE_INFO_SIZE;
++	decode_u64_le(buffer, &offset, &super->nonce);
++	decode_u32_le(buffer, &offset, &super->version);
++	decode_u32_le(buffer, &offset, &super->block_size);
++	decode_u16_le(buffer, &offset, &super->index_count);
++	decode_u16_le(buffer, &offset, &super->max_saves);
++	offset += sizeof(u32);
++	decode_u64_le(buffer, &offset, &super->open_chapter_blocks);
++	decode_u64_le(buffer, &offset, &super->page_map_blocks);
++
++	if (is_converted_super_block(super)) {
++		decode_u64_le(buffer, &offset, &super->volume_offset);
++		decode_u64_le(buffer, &offset, &super->start_offset);
++	} else {
++		super->volume_offset = 0;
++		super->start_offset = 0;
++	}
++
++	UDS_FREE(buffer);
++
++	if (memcmp(super->magic_label, LAYOUT_MAGIC, MAGIC_SIZE) != 0)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA, "unknown superblock magic label");
++
++	if ((super->version < SUPER_VERSION_MINIMUM) ||
++	    (super->version == 4) ||
++	    (super->version == 5) ||
++	    (super->version == 6) ||
++	    (super->version > SUPER_VERSION_MAXIMUM))
++		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
++					      "unknown superblock version number %u",
++					      super->version);
++
++	if (super->volume_offset < super->start_offset)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "inconsistent offsets (start %llu, volume %llu)",
++					      (unsigned long long) super->start_offset,
++					      (unsigned long long) super->volume_offset);
++
++	/* Sub-indexes are no longer used but the layout retains this field. */
++	if (super->index_count != 1)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "invalid subindex count %u",
++					      super->index_count);
++
++	if (generate_primary_nonce(super->nonce_info, sizeof(super->nonce_info)) != super->nonce)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "inconsistent superblock nonce");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check verify_region(struct layout_region *lr,
++				      u64 start_block,
++				      enum region_kind kind,
++				      unsigned int instance)
++{
++	if (lr->start_block != start_block)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA, "incorrect layout region offset");
++
++	if (lr->kind != kind)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA, "incorrect layout region kind");
++
++	if (lr->instance != instance)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "incorrect layout region instance");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++verify_sub_index(struct index_layout *layout, u64 start_block, struct region_table *table)
++{
++	int result;
++	unsigned int i;
++	struct sub_index_layout *sil = &layout->index;
++	u64 next_block = start_block;
++
++	sil->sub_index = table->regions[2];
++	result = verify_region(&sil->sub_index, next_block, RL_KIND_INDEX, 0);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	define_sub_index_nonce(layout);
++
++	sil->volume = table->regions[3];
++	result = verify_region(&sil->volume, next_block, RL_KIND_VOLUME, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	next_block += sil->volume.block_count + layout->super.volume_offset;
++
++	for (i = 0; i < layout->super.max_saves; i++) {
++		sil->saves[i].index_save = table->regions[i + 4];
++		result = verify_region(&sil->saves[i].index_save, next_block, RL_KIND_SAVE, i);
++		if (result != UDS_SUCCESS)
++			return result;
++
++		next_block += sil->saves[i].index_save.block_count;
++	}
++
++	next_block -= layout->super.volume_offset;
++	if (next_block != start_block + sil->sub_index.block_count)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "sub index region does not span all saves");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++reconstitute_layout(struct index_layout *layout, struct region_table *table, u64 first_block)
++{
++	int result;
++	u64 next_block = first_block;
++
++	result = UDS_ALLOCATE(layout->super.max_saves,
++			      struct index_save_layout,
++			      __func__,
++			      &layout->index.saves);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	layout->total_blocks = table->header.region_blocks;
++
++	layout->header = table->regions[0];
++	result = verify_region(&layout->header, next_block++, RL_KIND_HEADER, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	layout->config = table->regions[1];
++	result = verify_region(&layout->config, next_block++, RL_KIND_CONFIG, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = verify_sub_index(layout, next_block, table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	next_block += layout->index.sub_index.block_count;
++
++	layout->seal = table->regions[table->header.region_count - 1];
++	result = verify_region(&layout->seal,
++			       next_block + layout->super.volume_offset,
++			       RL_KIND_SEAL,
++			       RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	if (++next_block != (first_block + layout->total_blocks))
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "layout table does not span total blocks");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check load_super_block(struct index_layout *layout,
++					 size_t block_size,
++					 u64 first_block,
++					 struct buffered_reader *reader)
++{
++	int result;
++	struct region_table *table = NULL;
++	struct super_block_data *super = &layout->super;
++
++	result = load_region_table(reader, &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	if (table->header.type != RH_TYPE_SUPER) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(UDS_CORRUPT_DATA, "not a superblock region table");
++	}
++
++	result = read_super_block_data(reader, layout, table->header.payload);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(result, "unknown superblock format");
++	}
++
++	if (super->block_size != block_size) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "superblock saved block_size %u differs from supplied block_size %zu",
++					      super->block_size,
++					      block_size);
++	}
++
++	first_block -= (super->volume_offset - super->start_offset);
++	result = reconstitute_layout(layout, table, first_block);
++	UDS_FREE(table);
++	return result;
++}
++
++static int __must_check read_index_save_data(struct buffered_reader *reader,
++					     struct index_save_layout *isl,
++					     size_t saved_size)
++{
++	int result;
++	struct index_state_version file_version;
++	u8 buffer[sizeof(struct index_save_data) + sizeof(struct index_state_data301)];
++	size_t offset = 0;
++
++	if (saved_size != sizeof(buffer))
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "unexpected index save data size %zu",
++					      saved_size);
++
++	result = uds_read_from_buffered_reader(reader, buffer, sizeof(buffer));
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "cannot read index save data");
++
++	decode_u64_le(buffer, &offset, &isl->save_data.timestamp);
++	decode_u64_le(buffer, &offset, &isl->save_data.nonce);
++	decode_u32_le(buffer, &offset, &isl->save_data.version);
++	offset += sizeof(u32);
++
++	if (isl->save_data.version > 1)
++		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
++					      "unknown index save version number %u",
++					      isl->save_data.version);
++
++	decode_s32_le(buffer, &offset, &file_version.signature);
++	decode_s32_le(buffer, &offset, &file_version.version_id);
++
++	if ((file_version.signature != INDEX_STATE_VERSION_301.signature) ||
++	    (file_version.version_id != INDEX_STATE_VERSION_301.version_id))
++		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
++					      "index state version %d,%d is unsupported",
++					      file_version.signature,
++					      file_version.version_id);
++
++	decode_u64_le(buffer, &offset, &isl->state_data.newest_chapter);
++	decode_u64_le(buffer, &offset, &isl->state_data.oldest_chapter);
++	decode_u64_le(buffer, &offset, &isl->state_data.last_save);
++	/* Skip past some historical fields that are now unused */
++	offset += sizeof(u32) + sizeof(u32);
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++reconstruct_index_save(struct index_save_layout *isl, struct region_table *table)
++{
++	int result;
++	unsigned int z;
++	struct layout_region *last_region;
++	u64 next_block = isl->index_save.start_block;
++	u64 last_block = next_block + isl->index_save.block_count;
++
++	isl->zone_count = table->header.region_count - 3;
++
++	last_region = &table->regions[table->header.region_count - 1];
++	if (last_region->kind == RL_KIND_EMPTY) {
++		isl->free_space = *last_region;
++		isl->zone_count--;
++	} else {
++		isl->free_space = (struct layout_region) {
++			.start_block = last_block,
++			.block_count = 0,
++			.kind = RL_KIND_EMPTY,
++			.instance = RL_SOLE_INSTANCE,
 +		};
 +	}
 +
-+	if (result != VDO_SUCCESS)
++	isl->header = table->regions[0];
++	result = verify_region(&isl->header, next_block++, RL_KIND_HEADER, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
 +		return result;
 +
-+	slab_count = vdo_compute_slab_count(depot->first_block,
-+					    depot->last_block,
-+					    depot->slab_size_shift);
-+	if (thread_config->physical_zone_count > slab_count)
-+		return uds_log_error_strerror(VDO_BAD_CONFIGURATION,
-+					      "%u physical zones exceeds slab count %u",
-+					      thread_config->physical_zone_count,
-+					      slab_count);
++	isl->index_page_map = table->regions[1];
++	result = verify_region(&isl->index_page_map,
++			       next_block,
++			       RL_KIND_INDEX_PAGE_MAP,
++			       RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
 +
-+	/* Initialize the block allocators. */
-+	for (zone = 0; zone < depot->zone_count; zone++) {
-+		result = initialize_block_allocator(depot, zone);
-+		if (result != VDO_SUCCESS)
++	next_block += isl->index_page_map.block_count;
++
++	for (z = 0; z < isl->zone_count; z++) {
++		isl->volume_index_zones[z] = table->regions[z + 2];
++		result = verify_region(&isl->volume_index_zones[z],
++				       next_block,
++				       RL_KIND_VOLUME_INDEX,
++				       z);
++		if (result != UDS_SUCCESS)
 +			return result;
++
++		next_block += isl->volume_index_zones[z].block_count;
 +	}
 +
-+	/* Allocate slabs. */
-+	result = allocate_slabs(depot, slab_count);
-+	if (result != VDO_SUCCESS)
++	isl->open_chapter = table->regions[isl->zone_count + 2];
++	result = verify_region(&isl->open_chapter,
++			       next_block,
++			       RL_KIND_OPEN_CHAPTER,
++			       RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
 +		return result;
 +
-+	/* Use the new slabs. */
-+	for (i = depot->slab_count; i < depot->new_slab_count; i++) {
-+		struct vdo_slab *slab = depot->new_slabs[i];
++	next_block += isl->open_chapter.block_count;
 +
-+		register_slab_with_allocator(slab->allocator, slab);
-+		WRITE_ONCE(depot->slab_count, depot->slab_count + 1);
-+	}
++	result = verify_region(&isl->free_space, next_block, RL_KIND_EMPTY, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
 +
-+	depot->slabs = depot->new_slabs;
-+	depot->new_slabs = NULL;
-+	depot->new_slab_count = 0;
++	next_block += isl->free_space.block_count;
++	if (next_block != last_block)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "index save layout table incomplete");
 +
-+	return VDO_SUCCESS;
++	return UDS_SUCCESS;
 +}
 +
-+/**
-+ * vdo_decode_slab_depot() - Make a slab depot and configure it with the state read from the super
-+ *                           block.
-+ * @state: The slab depot state from the super block.
-+ * @vdo: The VDO which will own the depot.
-+ * @summary_partition: The partition which holds the slab summary.
-+ * @depot_ptr: A pointer to hold the depot.
-+ *
-+ * Return: A success or error code.
-+ */
-+int vdo_decode_slab_depot(struct slab_depot_state_2_0 state,
-+			  struct vdo *vdo,
-+			  struct partition *summary_partition,
-+			  struct slab_depot **depot_ptr)
++static int __must_check load_index_save(struct index_save_layout *isl,
++					struct buffered_reader *reader,
++					unsigned int instance)
 +{
-+	unsigned int slab_size_shift;
-+	struct slab_depot *depot;
 +	int result;
++	struct region_table *table = NULL;
 +
-+	/*
-+	 * Calculate the bit shift for efficiently mapping block numbers to slabs. Using a shift
-+	 * requires that the slab size be a power of two.
-+	 */
-+	block_count_t slab_size = state.slab_config.slab_blocks;
++	result = load_region_table(reader, &table);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result,
++					      "cannot read index save %u header",
++					      instance);
 +
-+	if (!is_power_of_2(slab_size))
-+		return uds_log_error_strerror(UDS_INVALID_ARGUMENT,
-+					      "slab size must be a power of two");
-+	slab_size_shift = ilog2(slab_size);
++	if (table->header.region_blocks != isl->index_save.block_count) {
++		u64 region_blocks = table->header.region_blocks;
 +
-+	result = UDS_ALLOCATE_EXTENDED(struct slab_depot,
-+				       vdo->thread_config.physical_zone_count,
-+				       struct block_allocator,
-+				       __func__,
-+				       &depot);
-+	if (result != VDO_SUCCESS)
++		UDS_FREE(table);
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "unexpected index save %u region block count %llu",
++					      instance,
++					      (unsigned long long) region_blocks);
++	}
++
++	if (table->header.type == RH_TYPE_UNSAVED) {
++		UDS_FREE(table);
++		reset_index_save_layout(isl, 0);
++		return UDS_SUCCESS;
++	}
++
++
++	if (table->header.type != RH_TYPE_SAVE) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "unexpected index save %u header type %u",
++					      instance,
++					      table->header.type);
++	}
++
++	result = read_index_save_data(reader, isl, table->header.payload);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(result,
++					      "unknown index save %u data format",
++					      instance);
++	}
++
++	result = reconstruct_index_save(isl, table);
++	UDS_FREE(table);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result,
++					      "cannot reconstruct index save %u",
++					      instance);
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check load_sub_index_regions(struct index_layout *layout)
++{
++	int result;
++	unsigned int j;
++	struct index_save_layout *isl;
++	struct buffered_reader *reader;
++
++	for (j = 0; j < layout->super.max_saves; ++j) {
++		isl = &layout->index.saves[j];
++		result = open_region_reader(layout, &isl->index_save, &reader);
++
++		if (result != UDS_SUCCESS) {
++			uds_log_error_strerror(result, "cannot get reader for index 0 save %u", j);
++			return result;
++		}
++
++		result = load_index_save(isl, reader, j);
++		uds_free_buffered_reader(reader);
++		if (result != UDS_SUCCESS) {
++			/* Another save slot might be valid. */
++			reset_index_save_layout(isl, 0);
++			continue;
++		}
++	}
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++verify_uds_index_config(struct index_layout *layout, struct configuration *config)
++{
++	int result;
++	struct buffered_reader *reader = NULL;
++	u64 offset;
++
++	offset = layout->super.volume_offset - layout->super.start_offset;
++	result = open_layout_reader(layout, &layout->config, offset, &reader);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "failed to open config reader");
++
++	result = uds_validate_config_contents(reader, config);
++	if (result != UDS_SUCCESS) {
++		uds_free_buffered_reader(reader);
++		return uds_log_error_strerror(result, "failed to read config region");
++	}
++
++	uds_free_buffered_reader(reader);
++	return UDS_SUCCESS;
++}
++
++static int load_index_layout(struct index_layout *layout, struct configuration *config)
++{
++	int result;
++	struct buffered_reader *reader;
++
++	result = uds_make_buffered_reader(layout->factory,
++					  layout->offset / UDS_BLOCK_SIZE,
++					  1,
++					  &reader);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "unable to read superblock");
++
++	result = load_super_block(layout, UDS_BLOCK_SIZE, layout->offset / UDS_BLOCK_SIZE, reader);
++	uds_free_buffered_reader(reader);
++	if (result != UDS_SUCCESS)
 +		return result;
 +
-+	depot->vdo = vdo;
-+	depot->old_zone_count = state.zone_count;
-+	depot->zone_count = vdo->thread_config.physical_zone_count;
-+	depot->slab_config = state.slab_config;
-+	depot->first_block = state.first_block;
-+	depot->last_block = state.last_block;
-+	depot->slab_size_shift = slab_size_shift;
++	result = verify_uds_index_config(layout, config);
++	if (result != UDS_SUCCESS)
++		return result;
 +
-+	result = allocate_components(depot, summary_partition);
-+	if (result != VDO_SUCCESS) {
-+		vdo_free_slab_depot(depot);
++	return load_sub_index_regions(layout);
++}
++
++static int create_layout_factory(struct index_layout *layout, const struct configuration *config)
++{
++	int result;
++	size_t writable_size;
++	struct io_factory *factory = NULL;
++
++	result = uds_make_io_factory(config->bdev, &factory);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	writable_size = uds_get_writable_size(factory) & -UDS_BLOCK_SIZE;
++	if (writable_size < config->size + config->offset) {
++		uds_put_io_factory(factory);
++		uds_log_error("index storage (%zu) is smaller than the requested size %zu",
++			      writable_size,
++			      config->size + config->offset);
++		return -ENOSPC;
++	}
++
++	layout->factory = factory;
++	layout->factory_size = (config->size > 0) ? config->size : writable_size;
++	layout->offset = config->offset;
++	return UDS_SUCCESS;
++}
++
++int uds_make_index_layout(struct configuration *config,
++			  bool new_layout,
++			  struct index_layout **layout_ptr)
++{
++	int result;
++	struct index_layout *layout = NULL;
++	struct save_layout_sizes sizes;
++
++	result = compute_sizes(config, &sizes);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(1, struct index_layout, __func__, &layout);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = create_layout_factory(layout, config);
++	if (result != UDS_SUCCESS) {
++		uds_free_index_layout(layout);
 +		return result;
 +	}
 +
-+	*depot_ptr = depot;
-+	return VDO_SUCCESS;
++	if (layout->factory_size < sizes.total_size) {
++		uds_log_error("index storage (%zu) is smaller than the required size %llu",
++			      layout->factory_size,
++			      (unsigned long long) sizes.total_size);
++		uds_free_index_layout(layout);
++		return -ENOSPC;
++	}
++
++	if (new_layout)
++		result = create_index_layout(layout, config);
++	else
++		result = load_index_layout(layout, config);
++	if (result != UDS_SUCCESS) {
++		uds_free_index_layout(layout);
++		return result;
++	}
++
++	*layout_ptr = layout;
++	return UDS_SUCCESS;
 +}
 +
- static void uninitialize_allocator_summary(struct block_allocator *allocator)
- {
- 	block_count_t i;
-@@ -3969,6 +4305,229 @@ static void uninitialize_allocator_summary(struct block_allocator *allocator)
- 	UDS_FREE(UDS_FORGET(allocator->summary_blocks));
- }
- 
-+/**
-+ * vdo_free_slab_depot() - Destroy a slab depot.
-+ * @depot: The depot to destroy.
-+ */
-+void vdo_free_slab_depot(struct slab_depot *depot)
++void uds_free_index_layout(struct index_layout *layout)
 +{
-+	zone_count_t zone = 0;
-+
-+	if (depot == NULL)
++	if (layout == NULL)
 +		return;
 +
-+	vdo_abandon_new_slabs(depot);
++	UDS_FREE(layout->index.saves);
++	if (layout->factory != NULL)
++		uds_put_io_factory(layout->factory);
 +
-+	for (zone = 0; zone < depot->zone_count; zone++) {
-+		struct block_allocator *allocator = &depot->allocators[zone];
-+
-+		if (allocator->eraser != NULL)
-+			dm_kcopyd_client_destroy(UDS_FORGET(allocator->eraser));
-+
-+		uninitialize_allocator_summary(allocator);
-+		uninitialize_scrubber_vio(&allocator->scrubber);
-+		free_vio_pool(UDS_FORGET(allocator->vio_pool));
-+		vdo_free_priority_table(UDS_FORGET(allocator->prioritized_slabs));
-+	}
-+
-+	if (depot->slabs != NULL) {
-+		slab_count_t i;
-+
-+		for (i = 0; i < depot->slab_count; i++)
-+			free_slab(UDS_FORGET(depot->slabs[i]));
-+	}
-+
-+	UDS_FREE(UDS_FORGET(depot->slabs));
-+	UDS_FREE(UDS_FORGET(depot->action_manager));
-+	UDS_FREE(UDS_FORGET(depot->summary_entries));
-+	UDS_FREE(depot);
++	UDS_FREE(layout);
 +}
 +
-+/**
-+ * vdo_record_slab_depot() - Record the state of a slab depot for encoding into the super block.
-+ * @depot: The depot to encode.
-+ *
-+ * Return: The depot state.
-+ */
-+struct slab_depot_state_2_0 vdo_record_slab_depot(const struct slab_depot *depot)
++int uds_replace_index_layout_storage(struct index_layout *layout, struct block_device *bdev)
 +{
-+	/*
-+	 * If this depot is currently using 0 zones, it must have been synchronously loaded by a
-+	 * tool and is now being saved. We did not load and combine the slab summary, so we still
-+	 * need to do that next time we load with the old zone count rather than 0.
-+	 */
-+	struct slab_depot_state_2_0 state;
-+	zone_count_t zones_to_record = depot->zone_count;
-+
-+	if (depot->zone_count == 0)
-+		zones_to_record = depot->old_zone_count;
-+
-+	state = (struct slab_depot_state_2_0) {
-+		.slab_config = depot->slab_config,
-+		.first_block = depot->first_block,
-+		.last_block = depot->last_block,
-+		.zone_count = zones_to_record,
-+	};
-+
-+	return state;
++	return uds_replace_storage(layout->factory, bdev);
 +}
 +
-+/**
-+ * vdo_allocate_reference_counters() - Allocate the reference counters for all slabs in the depot.
-+ *
-+ * Context: This method may be called only before entering normal operation from the load thread.
-+ *
-+ * Return: VDO_SUCCESS or an error.
-+ */
-+int vdo_allocate_reference_counters(struct slab_depot *depot)
++/* Obtain a dm_bufio_client for the volume region. */
++int uds_open_volume_bufio(struct index_layout *layout,
++			  size_t block_size,
++			  unsigned int reserved_buffers,
++			  struct dm_bufio_client **client_ptr)
 +{
-+	struct slab_iterator iterator =
-+		get_depot_slab_iterator(depot, depot->slab_count - 1, 0, 1);
++	off_t offset = (layout->index.volume.start_block +
++			layout->super.volume_offset -
++			layout->super.start_offset);
 +
-+	while (iterator.next != NULL) {
-+		int result = allocate_slab_counters(next_slab(&iterator));
-+
-+		if (result != VDO_SUCCESS)
-+			return result;
-+	}
-+
-+	return VDO_SUCCESS;
++	return uds_make_bufio(layout->factory, offset, block_size, reserved_buffers, client_ptr);
 +}
 +
-+/**
-+ * get_slab_number() - Get the number of the slab that contains a specified block.
-+ * @depot: The slab depot.
-+ * @pbn: The physical block number.
-+ * @slab_number_ptr: A pointer to hold the slab number.
-+ *
-+ * Return: VDO_SUCCESS or an error.
-+ */
-+static int __must_check get_slab_number(const struct slab_depot *depot,
-+					physical_block_number_t pbn,
-+					slab_count_t *slab_number_ptr)
++u64 uds_get_volume_nonce(struct index_layout *layout)
 +{
-+	slab_count_t slab_number;
-+
-+	if (pbn < depot->first_block)
-+		return VDO_OUT_OF_RANGE;
-+
-+	slab_number = (pbn - depot->first_block) >> depot->slab_size_shift;
-+	if (slab_number >= depot->slab_count)
-+		return VDO_OUT_OF_RANGE;
-+
-+	*slab_number_ptr = slab_number;
-+	return VDO_SUCCESS;
++	return layout->index.nonce;
 +}
-+
-+/**
-+ * vdo_get_slab() - Get the slab object for the slab that contains a specified block.
-+ * @depot: The slab depot.
-+ * @pbn: The physical block number.
-+ *
-+ * Will put the VDO in read-only mode if the PBN is not a valid data block nor the zero block.
-+ *
-+ * Return: The slab containing the block, or NULL if the block number is the zero block or
-+ * otherwise out of range.
-+ */
-+struct vdo_slab *vdo_get_slab(const struct slab_depot *depot, physical_block_number_t pbn)
-+{
-+	slab_count_t slab_number;
-+	int result;
-+
-+	if (pbn == VDO_ZERO_BLOCK)
-+		return NULL;
-+
-+	result = get_slab_number(depot, pbn, &slab_number);
-+	if (result != VDO_SUCCESS) {
-+		vdo_enter_read_only_mode(depot->vdo, result);
-+		return NULL;
-+	}
-+
-+	return depot->slabs[slab_number];
-+}
-+
-+/**
-+ * vdo_get_increment_limit() - Determine how many new references a block can acquire.
-+ * @depot: The slab depot.
-+ * @pbn: The physical block number that is being queried.
-+ *
-+ * Context: This method must be called from the physical zone thread of the PBN.
-+ *
-+ * Return: The number of available references.
-+ */
-+u8 vdo_get_increment_limit(struct slab_depot *depot, physical_block_number_t pbn)
-+{
-+	struct vdo_slab *slab = vdo_get_slab(depot, pbn);
-+	vdo_refcount_t *counter_ptr = NULL;
-+	int result;
-+
-+	if ((slab == NULL) || (slab->status != VDO_SLAB_REBUILT))
-+		return 0;
-+
-+	result = get_reference_counter(slab, pbn, &counter_ptr);
-+	if (result != VDO_SUCCESS)
-+		return 0;
-+
-+	if (*counter_ptr == PROVISIONAL_REFERENCE_COUNT)
-+		return (MAXIMUM_REFERENCE_COUNT - 1);
-+
-+	return (MAXIMUM_REFERENCE_COUNT - *counter_ptr);
-+}
-+
-+/**
-+ * vdo_is_physical_data_block() - Determine whether the given PBN refers to a data block.
-+ * @depot: The depot.
-+ * @pbn: The physical block number to ask about.
-+ *
-+ * Return: True if the PBN corresponds to a data block.
-+ */
-+bool vdo_is_physical_data_block(const struct slab_depot *depot, physical_block_number_t pbn)
-+{
-+	slab_count_t slab_number;
-+	slab_block_number sbn;
-+
-+	return ((pbn == VDO_ZERO_BLOCK) ||
-+		((get_slab_number(depot, pbn, &slab_number) == VDO_SUCCESS) &&
-+		 (slab_block_number_from_pbn(depot->slabs[slab_number], pbn, &sbn) ==
-+		  VDO_SUCCESS)));
-+}
-+
-+/**
-+ * vdo_get_slab_depot_allocated_blocks() - Get the total number of data blocks allocated across all
-+ * the slabs in the depot.
-+ * @depot: The slab depot.
-+ *
-+ * This is the total number of blocks with a non-zero reference count.
-+ *
-+ * Context: This may be called from any thread.
-+ *
-+ * Return: The total number of blocks with a non-zero reference count.
-+ */
-+block_count_t vdo_get_slab_depot_allocated_blocks(const struct slab_depot *depot)
-+{
-+	block_count_t total = 0;
-+	zone_count_t zone;
-+
-+	for (zone = 0; zone < depot->zone_count; zone++)
-+		/* The allocators are responsible for thread safety. */
-+		total += READ_ONCE(depot->allocators[zone].allocated_blocks);
-+	return total;
-+}
-+
-+/**
-+ * vdo_get_slab_depot_data_blocks() - Get the total number of data blocks in all the slabs in the
-+ *                                    depot.
-+ * @depot: The slab depot.
-+ *
-+ * Context: This may be called from any thread.
-+ *
-+ * Return: The total number of data blocks in all slabs.
-+ */
-+block_count_t vdo_get_slab_depot_data_blocks(const struct slab_depot *depot)
-+{
-+	return (READ_ONCE(depot->slab_count) * depot->slab_config.data_blocks);
-+}
-+
- /**
-  * finish_combining_zones() - Clean up after saving out the combined slab summary.
-  * @completion: The vio which was used to write the summary data.
-@@ -4100,6 +4659,193 @@ static void load_slab_summary(void *context, struct vdo_completion *parent)
- 			    REQ_OP_READ);
- }
- 
-+/* Implements vdo_zone_action. */
-+static void load_allocator(void *context, zone_count_t zone_number, struct vdo_completion *parent)
-+{
-+	struct slab_depot *depot = context;
-+
-+	vdo_start_loading(&depot->allocators[zone_number].state,
-+			  vdo_get_current_manager_operation(depot->action_manager),
-+			  parent,
-+			  initiate_load);
-+}
-+
-+/**
-+ * vdo_load_slab_depot() - Asynchronously load any slab depot state that isn't included in the
-+ *                         super_block component.
-+ * @depot: The depot to load.
-+ * @operation: The type of load to perform.
-+ * @parent: The completion to notify when the load is complete.
-+ * @context: Additional context for the load operation; may be NULL.
-+ *
-+ * This method may be called only before entering normal operation from the load thread.
-+ */
-+void vdo_load_slab_depot(struct slab_depot *depot,
-+			 const struct admin_state_code *operation,
-+			 struct vdo_completion *parent,
-+			 void *context)
-+{
-+	if (vdo_assert_load_operation(operation, parent))
-+		vdo_schedule_operation_with_context(depot->action_manager,
-+						    operation,
-+						    load_slab_summary,
-+						    load_allocator,
-+						    NULL,
-+						    context,
-+						    parent);
-+}
-+
-+/* Implements vdo_zone_action. */
-+static void prepare_to_allocate(void *context,
-+				zone_count_t zone_number,
-+				struct vdo_completion *parent)
-+{
-+	struct slab_depot *depot = context;
-+	struct block_allocator *allocator = &depot->allocators[zone_number];
-+	int result;
-+
-+	result = vdo_prepare_slabs_for_allocation(allocator);
-+	if (result != VDO_SUCCESS) {
-+		vdo_fail_completion(parent, result);
-+		return;
-+	}
-+
-+	scrub_slabs(allocator, parent);
-+}
-+
-+/**
-+ * vdo_prepare_slab_depot_to_allocate() - Prepare the slab depot to come online and start
-+ *                                        allocating blocks.
-+ * @depot: The depot to prepare.
-+ * @load_type: The load type.
-+ * @parent: The completion to notify when the operation is complete.
-+ *
-+ * This method may be called only before entering normal operation from the load thread. It must be
-+ * called before allocation may proceed.
-+ */
-+void vdo_prepare_slab_depot_to_allocate(struct slab_depot *depot,
-+					enum slab_depot_load_type load_type,
-+					struct vdo_completion *parent)
-+{
-+	depot->load_type = load_type;
-+	atomic_set(&depot->zones_to_scrub, depot->zone_count);
-+	vdo_schedule_action(depot->action_manager, NULL, prepare_to_allocate, NULL, parent);
-+}
-+
-+/**
-+ * vdo_update_slab_depot_size() - Update the slab depot to reflect its new size in memory.
-+ * @depot: The depot to update.
-+ *
-+ * This size is saved to disk as part of the super block.
-+ */
-+void vdo_update_slab_depot_size(struct slab_depot *depot)
-+{
-+	depot->last_block = depot->new_last_block;
-+}
-+
-+/**
-+ * vdo_prepare_to_grow_slab_depot() - Allocate new memory needed for a resize of a slab depot to
-+ *                                    the given size.
-+ * @depot: The depot to prepare to resize.
-+ * @partition: The new depot partition
-+ *
-+ * Return: VDO_SUCCESS or an error.
-+ */
-+int vdo_prepare_to_grow_slab_depot(struct slab_depot *depot, const struct partition *partition)
-+{
-+	struct slab_depot_state_2_0 new_state;
-+	int result;
-+	slab_count_t new_slab_count;
-+
-+	if ((partition->count >> depot->slab_size_shift) <= depot->slab_count)
-+		return VDO_INCREMENT_TOO_SMALL;
-+
-+	/* Generate the depot configuration for the new block count. */
-+	ASSERT_LOG_ONLY(depot->first_block == partition->offset,
-+			"New slab depot partition doesn't change origin");
-+	result = vdo_configure_slab_depot(partition,
-+					  depot->slab_config,
-+					  depot->zone_count,
-+					  &new_state);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	new_slab_count = vdo_compute_slab_count(depot->first_block,
-+						new_state.last_block,
-+						depot->slab_size_shift);
-+	if (new_slab_count <= depot->slab_count)
-+		return uds_log_error_strerror(VDO_INCREMENT_TOO_SMALL, "Depot can only grow");
-+	if (new_slab_count == depot->new_slab_count)
-+		/* Check it out, we've already got all the new slabs allocated! */
-+		return VDO_SUCCESS;
-+
-+	vdo_abandon_new_slabs(depot);
-+	result = allocate_slabs(depot, new_slab_count);
-+	if (result != VDO_SUCCESS) {
-+		vdo_abandon_new_slabs(depot);
-+		return result;
-+	}
-+
-+	depot->new_size = partition->count;
-+	depot->old_last_block = depot->last_block;
-+	depot->new_last_block = new_state.last_block;
-+
-+	return VDO_SUCCESS;
-+}
-+
-+/**
-+ * finish_registration() - Finish registering new slabs now that all of the allocators have
-+ *                         received their new slabs.
-+ *
-+ * Implements vdo_action_conclusion.
-+ */
-+static int finish_registration(void *context)
-+{
-+	struct slab_depot *depot = context;
-+
-+	WRITE_ONCE(depot->slab_count, depot->new_slab_count);
-+	UDS_FREE(depot->slabs);
-+	depot->slabs = depot->new_slabs;
-+	depot->new_slabs = NULL;
-+	depot->new_slab_count = 0;
-+	return VDO_SUCCESS;
-+}
-+
-+/* Implements vdo_zone_action. */
-+static void register_new_slabs(void *context,
-+			       zone_count_t zone_number,
-+			       struct vdo_completion *parent)
-+{
-+	struct slab_depot *depot = context;
-+	struct block_allocator *allocator = &depot->allocators[zone_number];
-+	slab_count_t i;
-+
-+	for (i = depot->slab_count; i < depot->new_slab_count; i++) {
-+		struct vdo_slab *slab = depot->new_slabs[i];
-+
-+		if (slab->allocator == allocator)
-+			register_slab_with_allocator(allocator, slab);
-+	}
-+
-+	vdo_finish_completion(parent);
-+}
-+
-+/**
-+ * vdo_use_new_slabs() - Use the new slabs allocated for resize.
-+ * @depot: The depot.
-+ * @parent: The object to notify when complete.
-+ */
-+void vdo_use_new_slabs(struct slab_depot *depot, struct vdo_completion *parent)
-+{
-+	ASSERT_LOG_ONLY(depot->new_slabs != NULL, "Must have new slabs to use");
-+	vdo_schedule_operation(depot->action_manager,
-+			       VDO_ADMIN_STATE_SUSPENDED_OPERATION,
-+			       NULL,
-+			       register_new_slabs,
-+			       finish_registration,
-+			       parent);
-+}
-+
- /**
-  * stop_scrubbing() - Tell the scrubber to stop scrubbing after it finishes the slab it is
-  *                    currently working on.
-@@ -4169,6 +4915,43 @@ static void initiate_drain(struct admin_state *state)
- 	do_drain_step(&allocator->completion);
- }
- 
+diff --git a/drivers/md/dm-vdo/index-layout.h b/drivers/md/dm-vdo/index-layout.h
+new file mode 100644
+index 000000000000..2a32c0bcb00b
+--- /dev/null
++++ b/drivers/md/dm-vdo/index-layout.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * Drain all allocator I/O. Depending upon the type of drain, some or all dirty metadata may be
-+ * written to disk. The type of drain will be determined from the state of the allocator's depot.
-+ *
-+ * Implements vdo_zone_action.
++ * Copyright 2023 Red Hat
 + */
-+static void drain_allocator(void *context, zone_count_t zone_number, struct vdo_completion *parent)
-+{
-+	struct slab_depot *depot = context;
 +
-+	vdo_start_draining(&depot->allocators[zone_number].state,
-+			   vdo_get_current_manager_operation(depot->action_manager),
-+			   parent,
-+			   initiate_drain);
++#ifndef UDS_INDEX_LAYOUT_H
++#define UDS_INDEX_LAYOUT_H
++
++#include "config.h"
++#include "io-factory.h"
++#include "uds.h"
++
++/*
++ * The index layout describes the format of the index on the underlying storage, and is responsible
++ * for creating those structures when the index is first created. It also validates the index data
++ * when loading a saved index, and updates it when saving the index.
++ */
++
++struct index_layout;
++
++int __must_check uds_make_index_layout(struct configuration *config,
++				       bool new_layout,
++				       struct index_layout **layout_ptr);
++
++void uds_free_index_layout(struct index_layout *layout);
++
++int __must_check uds_replace_index_layout_storage(struct index_layout *layout,
++						  struct block_device *bdev);
++
++int __must_check uds_load_index_state(struct index_layout *layout, struct uds_index *index);
++
++int __must_check uds_save_index_state(struct index_layout *layout, struct uds_index *index);
++
++int __must_check uds_discard_open_chapter(struct index_layout *layout);
++
++u64 __must_check uds_get_volume_nonce(struct index_layout *layout);
++
++int __must_check uds_open_volume_bufio(struct index_layout *layout,
++				       size_t block_size,
++				       unsigned int reserved_buffers,
++				       struct dm_bufio_client **client_ptr);
++
++#endif /* UDS_INDEX_LAYOUT_H */
+diff --git a/drivers/md/dm-vdo/io-factory.c b/drivers/md/dm-vdo/io-factory.c
+new file mode 100644
+index 000000000000..9e99d0043fd8
+--- /dev/null
++++ b/drivers/md/dm-vdo/io-factory.c
+@@ -0,0 +1,423 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright 2023 Red Hat
++ */
++
++#include "io-factory.h"
++
++#include <linux/atomic.h>
++#include <linux/blkdev.h>
++#include <linux/err.h>
++#include <linux/mount.h>
++
++#include "logger.h"
++#include "memory-alloc.h"
++#include "numeric.h"
++
++/*
++ * The I/O factory object manages access to index storage, which is a contiguous range of blocks on
++ * a block device.
++ *
++ * The factory holds the open device and is responsible for closing it. The factory has methods to
++ * make helper structures that can be used to access sections of the index.
++ */
++struct io_factory {
++	struct block_device *bdev;
++	atomic_t ref_count;
++};
++
++/* The buffered reader allows efficient I/O by reading page-sized segments into a buffer. */
++struct buffered_reader {
++	struct io_factory *factory;
++	struct dm_bufio_client *client;
++	struct dm_buffer *buffer;
++	sector_t limit;
++	sector_t block_number;
++	u8 *start;
++	u8 *end;
++};
++
++enum { MAX_READ_AHEAD_BLOCKS = 4 };
++
++/*
++ * The buffered writer allows efficient I/O by buffering writes and committing page-sized segments
++ * to storage.
++ */
++struct buffered_writer {
++	struct io_factory *factory;
++	struct dm_bufio_client *client;
++	struct dm_buffer *buffer;
++	sector_t limit;
++	sector_t block_number;
++	u8 *start;
++	u8 *end;
++	int error;
++};
++
++static void uds_get_io_factory(struct io_factory *factory)
++{
++	atomic_inc(&factory->ref_count);
 +}
 +
-+/**
-+ * vdo_drain_slab_depot() - Drain all slab depot I/O.
-+ * @depot: The depot to drain.
-+ * @operation: The drain operation (flush, rebuild, suspend, or save).
-+ * @parent: The completion to finish when the drain is complete.
-+ *
-+ * If saving, or flushing, all dirty depot metadata will be written out. If saving or suspending,
-+ * the depot will be left in a suspended state.
-+ */
-+void vdo_drain_slab_depot(struct slab_depot *depot,
-+			  const struct admin_state_code *operation,
-+			  struct vdo_completion *parent)
++int uds_make_io_factory(struct block_device *bdev, struct io_factory **factory_ptr)
 +{
-+	vdo_schedule_operation(depot->action_manager,
-+			       operation,
-+			       NULL,
-+			       drain_allocator,
-+			       NULL,
-+			       parent);
++	int result;
++	struct io_factory *factory;
++
++	result = UDS_ALLOCATE(1, struct io_factory, __func__, &factory);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	factory->bdev = bdev;
++	atomic_set_release(&factory->ref_count, 1);
++
++	*factory_ptr = factory;
++	return UDS_SUCCESS;
 +}
 +
- /**
-  * resume_scrubbing() - Tell the scrubber to resume scrubbing if it has been stopped.
-  * @allocator: The allocator being resumed.
-@@ -4246,3 +5029,185 @@ static void resume_allocator(void *context,
- 			   parent,
- 			   initiate_resume);
- }
-+
-+/**
-+ * vdo_resume_slab_depot() - Resume a suspended slab depot.
-+ * @depot: The depot to resume.
-+ * @parent: The completion to finish when the depot has resumed.
-+ */
-+void vdo_resume_slab_depot(struct slab_depot *depot, struct vdo_completion *parent)
++int uds_replace_storage(struct io_factory *factory, struct block_device *bdev)
 +{
-+	if (vdo_is_read_only(depot->vdo)) {
-+		vdo_continue_completion(parent, VDO_READ_ONLY);
++	factory->bdev = bdev;
++	return UDS_SUCCESS;
++}
++
++/* Free an I/O factory once all references have been released. */
++void uds_put_io_factory(struct io_factory *factory)
++{
++	if (atomic_add_return(-1, &factory->ref_count) <= 0)
++		UDS_FREE(factory);
++}
++
++size_t uds_get_writable_size(struct io_factory *factory)
++{
++	return i_size_read(factory->bdev->bd_inode);
++}
++
++/* Create a struct dm_bufio_client for an index region starting at offset. */
++int uds_make_bufio(struct io_factory *factory,
++		   off_t block_offset,
++		   size_t block_size,
++		   unsigned int reserved_buffers,
++		   struct dm_bufio_client **client_ptr)
++{
++	struct dm_bufio_client *client;
++
++	client = dm_bufio_client_create(factory->bdev,
++					block_size,
++					reserved_buffers,
++					0,
++					NULL,
++					NULL,
++					0);
++	if (IS_ERR(client))
++		return -PTR_ERR(client);
++
++	dm_bufio_set_sector_offset(client, block_offset * SECTORS_PER_BLOCK);
++	*client_ptr = client;
++	return UDS_SUCCESS;
++}
++
++static void read_ahead(struct buffered_reader *reader, sector_t block_number)
++{
++	if (block_number < reader->limit) {
++		sector_t read_ahead =
++			min((sector_t) MAX_READ_AHEAD_BLOCKS, reader->limit - block_number);
++
++		dm_bufio_prefetch(reader->client, block_number, read_ahead);
++	}
++}
++
++void uds_free_buffered_reader(struct buffered_reader *reader)
++{
++	if (reader == NULL)
 +		return;
++
++	if (reader->buffer != NULL)
++		dm_bufio_release(reader->buffer);
++
++	dm_bufio_client_destroy(reader->client);
++	uds_put_io_factory(reader->factory);
++	UDS_FREE(reader);
++}
++
++/* Create a buffered reader for an index region starting at offset. */
++int uds_make_buffered_reader(struct io_factory *factory,
++			     off_t offset,
++			     u64 block_count,
++			     struct buffered_reader **reader_ptr)
++{
++	int result;
++	struct dm_bufio_client *client = NULL;
++	struct buffered_reader *reader = NULL;
++
++	result = uds_make_bufio(factory, offset, UDS_BLOCK_SIZE, 1, &client);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(1, struct buffered_reader, "buffered reader", &reader);
++	if (result != UDS_SUCCESS) {
++		dm_bufio_client_destroy(client);
++		return result;
 +	}
 +
-+	vdo_schedule_operation(depot->action_manager,
-+			       VDO_ADMIN_STATE_RESUMING,
-+			       NULL,
-+			       resume_allocator,
-+			       NULL,
-+			       parent);
-+}
-+
-+/**
-+ * vdo_commit_oldest_slab_journal_tail_blocks() - Commit all dirty tail blocks which are locking a
-+ *                                                given recovery journal block.
-+ * @depot: The depot.
-+ * @recovery_block_number: The sequence number of the recovery journal block whose locks should be
-+ *                         released.
-+ *
-+ * Context: This method must be called from the journal zone thread.
-+ */
-+void vdo_commit_oldest_slab_journal_tail_blocks(struct slab_depot *depot,
-+						sequence_number_t recovery_block_number)
-+{
-+	if (depot == NULL)
-+		return;
-+
-+	depot->new_release_request = recovery_block_number;
-+	vdo_schedule_default_action(depot->action_manager);
-+}
-+
-+/* Implements vdo_zone_action. */
-+static void scrub_all_unrecovered_slabs(void *context,
-+					zone_count_t zone_number,
-+					struct vdo_completion *parent)
-+{
-+	struct slab_depot *depot = context;
-+
-+	scrub_slabs(&depot->allocators[zone_number], NULL);
-+	vdo_launch_completion(parent);
-+}
-+
-+/**
-+ * vdo_scrub_all_unrecovered_slabs() - Scrub all unrecovered slabs.
-+ * @depot: The depot to scrub.
-+ * @parent: The object to notify when scrubbing has been launched for all zones.
-+ */
-+void vdo_scrub_all_unrecovered_slabs(struct slab_depot *depot, struct vdo_completion *parent)
-+{
-+	vdo_schedule_action(depot->action_manager,
-+			    NULL,
-+			    scrub_all_unrecovered_slabs,
-+			    NULL,
-+			    parent);
-+}
-+
-+/**
-+ * get_block_allocator_statistics() - Get the total of the statistics from all the block allocators
-+ *                                    in the depot.
-+ * @depot: The slab depot.
-+ *
-+ * Return: The statistics from all block allocators in the depot.
-+ */
-+static struct block_allocator_statistics __must_check
-+get_block_allocator_statistics(const struct slab_depot *depot)
-+{
-+	struct block_allocator_statistics totals;
-+	zone_count_t zone;
-+
-+	memset(&totals, 0, sizeof(totals));
-+
-+	for (zone = 0; zone < depot->zone_count; zone++) {
-+		const struct block_allocator *allocator = &depot->allocators[zone];
-+		const struct block_allocator_statistics *stats = &allocator->statistics;
-+
-+		totals.slab_count += allocator->slab_count;
-+		totals.slabs_opened += READ_ONCE(stats->slabs_opened);
-+		totals.slabs_reopened += READ_ONCE(stats->slabs_reopened);
-+	}
-+
-+	return totals;
-+}
-+
-+/**
-+ * get_ref_counts_statistics() - Get the cumulative ref_counts statistics for the depot.
-+ * @depot: The slab depot.
-+ *
-+ * Return: The cumulative statistics for all ref_counts in the depot.
-+ */
-+static struct ref_counts_statistics __must_check
-+get_ref_counts_statistics(const struct slab_depot *depot)
-+{
-+	struct ref_counts_statistics totals;
-+	zone_count_t zone;
-+
-+	memset(&totals, 0, sizeof(totals));
-+
-+	for (zone = 0; zone < depot->zone_count; zone++) {
-+		totals.blocks_written +=
-+			READ_ONCE(depot->allocators[zone].ref_counts_statistics.blocks_written);
-+	}
-+
-+	return totals;
-+}
-+
-+/**
-+ * get_depot_slab_journal_statistics() - Get the aggregated slab journal statistics for the depot.
-+ * @depot: The slab depot.
-+ *
-+ * Return: The aggregated statistics for all slab journals in the depot.
-+ */
-+static struct slab_journal_statistics __must_check
-+get_slab_journal_statistics(const struct slab_depot *depot)
-+{
-+	struct slab_journal_statistics totals;
-+	zone_count_t zone;
-+
-+	memset(&totals, 0, sizeof(totals));
-+
-+	for (zone = 0; zone < depot->zone_count; zone++) {
-+		const struct slab_journal_statistics *stats =
-+			&depot->allocators[zone].slab_journal_statistics;
-+
-+		totals.disk_full_count += READ_ONCE(stats->disk_full_count);
-+		totals.flush_count += READ_ONCE(stats->flush_count);
-+		totals.blocked_count += READ_ONCE(stats->blocked_count);
-+		totals.blocks_written += READ_ONCE(stats->blocks_written);
-+		totals.tail_busy_count += READ_ONCE(stats->tail_busy_count);
-+	}
-+
-+	return totals;
-+}
-+
-+/**
-+ * vdo_get_slab_depot_statistics() - Get all the vdo_statistics fields that are properties of the
-+ *                                   slab depot.
-+ * @depot: The slab depot.
-+ * @stats: The vdo statistics structure to partially fill.
-+ */
-+void vdo_get_slab_depot_statistics(const struct slab_depot *depot, struct vdo_statistics *stats)
-+{
-+	slab_count_t slab_count = READ_ONCE(depot->slab_count);
-+	slab_count_t unrecovered = 0;
-+	zone_count_t zone;
-+
-+	for (zone = 0; zone < depot->zone_count; zone++) {
-+		/* The allocators are responsible for thread safety. */
-+		unrecovered += READ_ONCE(depot->allocators[zone].scrubber.slab_count);
-+	}
-+
-+	stats->recovery_percentage = (slab_count - unrecovered) * 100 / slab_count;
-+	stats->allocator = get_block_allocator_statistics(depot);
-+	stats->ref_counts = get_ref_counts_statistics(depot);
-+	stats->slab_journal = get_slab_journal_statistics(depot);
-+	stats->slab_summary = (struct slab_summary_statistics) {
-+		.blocks_written = atomic64_read(&depot->summary_statistics.blocks_written),
++	*reader = (struct buffered_reader) {
++		.factory = factory,
++		.client = client,
++		.buffer = NULL,
++		.limit = block_count,
++		.block_number = 0,
++		.start = NULL,
++		.end = NULL,
 +	};
++
++	read_ahead(reader, 0);
++	uds_get_io_factory(factory);
++	*reader_ptr = reader;
++	return UDS_SUCCESS;
 +}
 +
-+/**
-+ * vdo_dump_slab_depot() - Dump the slab depot, in a thread-unsafe fashion.
-+ * @depot: The slab depot.
-+ */
-+void vdo_dump_slab_depot(const struct slab_depot *depot)
++static int position_reader(struct buffered_reader *reader, sector_t block_number, off_t offset)
 +{
-+	uds_log_info("vdo slab depot");
-+	uds_log_info("  zone_count=%u old_zone_count=%u slabCount=%u active_release_request=%llu new_release_request=%llu",
-+		     (unsigned int) depot->zone_count,
-+		     (unsigned int) depot->old_zone_count,
-+		     READ_ONCE(depot->slab_count),
-+		     (unsigned long long) depot->active_release_request,
-+		     (unsigned long long) depot->new_release_request);
++	struct dm_buffer *buffer = NULL;
++	void *data;
++
++	if ((reader->end == NULL) || (block_number != reader->block_number)) {
++		if (block_number >= reader->limit)
++			return UDS_OUT_OF_RANGE;
++
++		if (reader->buffer != NULL)
++			dm_bufio_release(UDS_FORGET(reader->buffer));
++
++		data = dm_bufio_read(reader->client, block_number, &buffer);
++		if (IS_ERR(data))
++			return -PTR_ERR(data);
++
++		reader->buffer = buffer;
++		reader->start = data;
++		if (block_number == reader->block_number + 1)
++			read_ahead(reader, block_number + 1);
++	}
++
++	reader->block_number = block_number;
++	reader->end = reader->start + offset;
++	return UDS_SUCCESS;
 +}
-diff --git a/drivers/md/dm-vdo/slab-depot.h b/drivers/md/dm-vdo/slab-depot.h
-index 6ec4be7b5822..44655d697fa0 100644
---- a/drivers/md/dm-vdo/slab-depot.h
-+++ b/drivers/md/dm-vdo/slab-depot.h
-@@ -435,6 +435,66 @@ struct block_allocator {
- 	struct slab_summary_block *summary_blocks;
- };
- 
-+enum slab_depot_load_type {
-+	VDO_SLAB_DEPOT_NORMAL_LOAD,
-+	VDO_SLAB_DEPOT_RECOVERY_LOAD,
-+	VDO_SLAB_DEPOT_REBUILD_LOAD
++
++static size_t bytes_remaining_in_read_buffer(struct buffered_reader *reader)
++{
++	return (reader->end == NULL) ? 0 : reader->start + UDS_BLOCK_SIZE - reader->end;
++}
++
++static int reset_reader(struct buffered_reader *reader)
++{
++	sector_t block_number;
++
++	if (bytes_remaining_in_read_buffer(reader) > 0)
++		return UDS_SUCCESS;
++
++	block_number = reader->block_number;
++	if (reader->end != NULL)
++		++block_number;
++
++	return position_reader(reader, block_number, 0);
++}
++
++int uds_read_from_buffered_reader(struct buffered_reader *reader, u8 *data, size_t length)
++{
++	int result = UDS_SUCCESS;
++	size_t chunk_size;
++
++	while (length > 0) {
++		result = reset_reader(reader);
++		if (result != UDS_SUCCESS)
++			return result;
++
++		chunk_size = min(length, bytes_remaining_in_read_buffer(reader));
++		memcpy(data, reader->end, chunk_size);
++		length -= chunk_size;
++		data += chunk_size;
++		reader->end += chunk_size;
++	}
++
++	return UDS_SUCCESS;
++}
++
++/*
++ * Verify that the next data on the reader matches the required value. If the value matches, the
++ * matching contents are consumed. If the value does not match, the reader state is unchanged.
++ */
++int uds_verify_buffered_data(struct buffered_reader *reader, const u8 *value, size_t length)
++{
++	int result = UDS_SUCCESS;
++	size_t chunk_size;
++	sector_t start_block_number = reader->block_number;
++	int start_offset = reader->end - reader->start;
++
++	while (length > 0) {
++		result = reset_reader(reader);
++		if (result != UDS_SUCCESS) {
++			result = UDS_CORRUPT_DATA;
++			break;
++		}
++
++		chunk_size = min(length, bytes_remaining_in_read_buffer(reader));
++		if (memcmp(value, reader->end, chunk_size) != 0) {
++			result = UDS_CORRUPT_DATA;
++			break;
++		}
++
++		length -= chunk_size;
++		value += chunk_size;
++		reader->end += chunk_size;
++	}
++
++	if (result != UDS_SUCCESS)
++		position_reader(reader, start_block_number, start_offset);
++
++	return result;
++}
++
++/* Create a buffered writer for an index region starting at offset. */
++int uds_make_buffered_writer(struct io_factory *factory,
++			     off_t offset,
++			     u64 block_count,
++			     struct buffered_writer **writer_ptr)
++{
++	int result;
++	struct dm_bufio_client *client = NULL;
++	struct buffered_writer *writer;
++
++	result = uds_make_bufio(factory, offset, UDS_BLOCK_SIZE, 1, &client);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(1, struct buffered_writer, "buffered writer", &writer);
++	if (result != UDS_SUCCESS) {
++		dm_bufio_client_destroy(client);
++		return result;
++	}
++
++	*writer = (struct buffered_writer) {
++		.factory = factory,
++		.client = client,
++		.buffer = NULL,
++		.limit = block_count,
++		.start = NULL,
++		.end = NULL,
++		.block_number = 0,
++		.error = UDS_SUCCESS,
++	};
++
++	uds_get_io_factory(factory);
++	*writer_ptr = writer;
++	return UDS_SUCCESS;
++}
++
++static size_t get_remaining_write_space(struct buffered_writer *writer)
++{
++	return writer->start + UDS_BLOCK_SIZE - writer->end;
++}
++
++static int __must_check prepare_next_buffer(struct buffered_writer *writer)
++{
++	struct dm_buffer *buffer = NULL;
++	void *data;
++
++	if (writer->block_number >= writer->limit) {
++		writer->error = UDS_OUT_OF_RANGE;
++		return UDS_OUT_OF_RANGE;
++	}
++
++	data = dm_bufio_new(writer->client, writer->block_number, &buffer);
++	if (IS_ERR(data)) {
++		writer->error = -PTR_ERR(data);
++		return writer->error;
++	}
++
++	writer->buffer = buffer;
++	writer->start = data;
++	writer->end = data;
++	return UDS_SUCCESS;
++}
++
++static int flush_previous_buffer(struct buffered_writer *writer)
++{
++	size_t available;
++
++	if (writer->buffer == NULL)
++		return writer->error;
++
++	if (writer->error == UDS_SUCCESS) {
++		available = get_remaining_write_space(writer);
++
++		if (available > 0)
++			memset(writer->end, 0, available);
++
++		dm_bufio_mark_buffer_dirty(writer->buffer);
++	}
++
++	dm_bufio_release(writer->buffer);
++	writer->buffer = NULL;
++	writer->start = NULL;
++	writer->end = NULL;
++	writer->block_number++;
++	return writer->error;
++}
++
++void uds_free_buffered_writer(struct buffered_writer *writer)
++{
++	int result;
++
++	if (writer == NULL)
++		return;
++
++	flush_previous_buffer(writer);
++	result = -dm_bufio_write_dirty_buffers(writer->client);
++	if (result != UDS_SUCCESS)
++		uds_log_warning_strerror(result, "%s: failed to sync storage", __func__);
++
++	dm_bufio_client_destroy(writer->client);
++	uds_put_io_factory(writer->factory);
++	UDS_FREE(writer);
++}
++
++/*
++ * Append data to the buffer, writing as needed. If no data is provided, zeros are written instead.
++ * If a write error occurs, it is recorded and returned on every subsequent write attempt.
++ */
++int uds_write_to_buffered_writer(struct buffered_writer *writer, const u8 *data, size_t length)
++{
++	int result = writer->error;
++	size_t chunk_size;
++
++	while ((length > 0) && (result == UDS_SUCCESS)) {
++		if (writer->buffer == NULL) {
++			result = prepare_next_buffer(writer);
++			continue;
++		}
++
++		chunk_size = min(length, get_remaining_write_space(writer));
++		if (data == NULL) {
++			memset(writer->end, 0, chunk_size);
++		} else {
++			memcpy(writer->end, data, chunk_size);
++			data += chunk_size;
++		}
++
++		length -= chunk_size;
++		writer->end += chunk_size;
++
++		if (get_remaining_write_space(writer) == 0)
++			result = uds_flush_buffered_writer(writer);
++	}
++
++	return result;
++}
++
++int uds_flush_buffered_writer(struct buffered_writer *writer)
++{
++	if (writer->error != UDS_SUCCESS)
++		return writer->error;
++
++	return flush_previous_buffer(writer);
++}
+diff --git a/drivers/md/dm-vdo/io-factory.h b/drivers/md/dm-vdo/io-factory.h
+new file mode 100644
+index 000000000000..ad6482978159
+--- /dev/null
++++ b/drivers/md/dm-vdo/io-factory.h
+@@ -0,0 +1,66 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright 2023 Red Hat
++ */
++
++#ifndef UDS_IO_FACTORY_H
++#define UDS_IO_FACTORY_H
++
++#include <linux/dm-bufio.h>
++
++/*
++ * The I/O factory manages all low-level I/O operations to the underlying storage device. Its main
++ * clients are the index layout and the volume. The buffered reader and buffered writer interfaces
++ * are helpers for accessing data in a contiguous range of storage blocks.
++ */
++
++struct buffered_reader;
++struct buffered_writer;
++
++struct io_factory;
++
++enum {
++	UDS_BLOCK_SIZE = 4096,
++	SECTORS_PER_BLOCK = UDS_BLOCK_SIZE >> SECTOR_SHIFT,
 +};
 +
-+struct slab_depot {
-+	zone_count_t zone_count;
-+	zone_count_t old_zone_count;
-+	struct vdo *vdo;
-+	struct slab_config slab_config;
-+	struct action_manager *action_manager;
++int __must_check uds_make_io_factory(struct block_device *bdev, struct io_factory **factory_ptr);
 +
-+	physical_block_number_t first_block;
-+	physical_block_number_t last_block;
-+	physical_block_number_t origin;
++int __must_check uds_replace_storage(struct io_factory *factory, struct block_device *bdev);
 +
-+	/* slab_size == (1 << slab_size_shift) */
-+	unsigned int slab_size_shift;
++void uds_put_io_factory(struct io_factory *factory);
 +
-+	/* Determines how slabs should be queued during load */
-+	enum slab_depot_load_type load_type;
++size_t __must_check uds_get_writable_size(struct io_factory *factory);
 +
-+	/* The state for notifying slab journals to release recovery journal */
-+	sequence_number_t active_release_request;
-+	sequence_number_t new_release_request;
++int __must_check uds_make_bufio(struct io_factory *factory,
++				off_t block_offset,
++				size_t block_size,
++				unsigned int reserved_buffers,
++				struct dm_bufio_client **client_ptr);
 +
-+	/* State variables for scrubbing complete handling */
-+	atomic_t zones_to_scrub;
++int __must_check uds_make_buffered_reader(struct io_factory *factory,
++					  off_t offset,
++					  u64 block_count,
++					  struct buffered_reader **reader_ptr);
 +
-+	/* Array of pointers to individually allocated slabs */
-+	struct vdo_slab **slabs;
-+	/* The number of slabs currently allocated and stored in 'slabs' */
-+	slab_count_t slab_count;
-+
-+	/* Array of pointers to a larger set of slabs (used during resize) */
-+	struct vdo_slab **new_slabs;
-+	/* The number of slabs currently allocated and stored in 'new_slabs' */
-+	slab_count_t new_slab_count;
-+	/* The size that 'new_slabs' was allocated for */
-+	block_count_t new_size;
-+
-+	/* The last block before resize, for rollback */
-+	physical_block_number_t old_last_block;
-+	/* The last block after resize, for resize */
-+	physical_block_number_t new_last_block;
-+
-+	/* The statistics for the slab summary */
-+	struct atomic_slab_summary_statistics summary_statistics;
-+	/* The start of the slab summary partition */
-+	physical_block_number_t summary_origin;
-+	/* The number of bits to shift to get a 7-bit fullness hint */
-+	unsigned int hint_shift;
-+	/* The slab summary entries for all of the zones the partition can hold */
-+	struct slab_summary_entry *summary_entries;
-+
-+	/* The block allocators for this depot */
-+	struct block_allocator allocators[];
-+};
-+
- struct reference_updater;
- 
- bool __must_check
-@@ -445,6 +505,11 @@ vdo_attempt_replay_into_slab(struct vdo_slab *slab,
- 			     struct journal_point *recovery_point,
- 			     struct vdo_completion *parent);
- 
-+int __must_check
-+vdo_adjust_reference_count_for_rebuild(struct slab_depot *depot,
-+				       physical_block_number_t pbn,
-+				       enum journal_operation operation);
-+
- static inline struct block_allocator *vdo_as_block_allocator(struct vdo_completion *completion)
- {
- 	vdo_assert_completion_type(completion, VDO_BLOCK_ALLOCATOR_COMPLETION);
-@@ -470,4 +535,60 @@ void vdo_notify_slab_journals_are_recovered(struct vdo_completion *completion);
- 
- void vdo_dump_block_allocator(const struct block_allocator *allocator);
- 
-+int __must_check vdo_decode_slab_depot(struct slab_depot_state_2_0 state,
-+				       struct vdo *vdo,
-+				       struct partition *summary_partition,
-+				       struct slab_depot **depot_ptr);
-+
-+void vdo_free_slab_depot(struct slab_depot *depot);
-+
-+struct slab_depot_state_2_0 __must_check vdo_record_slab_depot(const struct slab_depot *depot);
-+
-+int __must_check vdo_allocate_reference_counters(struct slab_depot *depot);
-+
-+struct vdo_slab * __must_check
-+vdo_get_slab(const struct slab_depot *depot, physical_block_number_t pbn);
-+
-+u8 __must_check vdo_get_increment_limit(struct slab_depot *depot, physical_block_number_t pbn);
-+
-+bool __must_check
-+vdo_is_physical_data_block(const struct slab_depot *depot, physical_block_number_t pbn);
-+
-+block_count_t __must_check vdo_get_slab_depot_allocated_blocks(const struct slab_depot *depot);
-+
-+block_count_t __must_check vdo_get_slab_depot_data_blocks(const struct slab_depot *depot);
-+
-+void vdo_get_slab_depot_statistics(const struct slab_depot *depot, struct vdo_statistics *stats);
-+
-+void vdo_load_slab_depot(struct slab_depot *depot,
-+			 const struct admin_state_code *operation,
-+			 struct vdo_completion *parent,
-+			 void *context);
-+
-+void vdo_prepare_slab_depot_to_allocate(struct slab_depot *depot,
-+					enum slab_depot_load_type load_type,
-+					struct vdo_completion *parent);
-+
-+void vdo_update_slab_depot_size(struct slab_depot *depot);
++void uds_free_buffered_reader(struct buffered_reader *reader);
 +
 +int __must_check
-+vdo_prepare_to_grow_slab_depot(struct slab_depot *depot, const struct partition *partition);
++uds_read_from_buffered_reader(struct buffered_reader *reader, u8 *data, size_t length);
 +
-+void vdo_use_new_slabs(struct slab_depot *depot, struct vdo_completion *parent);
++int __must_check
++uds_verify_buffered_data(struct buffered_reader *reader, const u8 *value, size_t length);
 +
-+void vdo_abandon_new_slabs(struct slab_depot *depot);
++int __must_check uds_make_buffered_writer(struct io_factory *factory,
++					  off_t offset,
++					  u64 block_count,
++					  struct buffered_writer **writer_ptr);
 +
-+void vdo_drain_slab_depot(struct slab_depot *depot,
-+			  const struct admin_state_code *operation,
-+			  struct vdo_completion *parent);
++void uds_free_buffered_writer(struct buffered_writer *buffer);
 +
-+void vdo_resume_slab_depot(struct slab_depot *depot, struct vdo_completion *parent);
++int __must_check
++uds_write_to_buffered_writer(struct buffered_writer *writer, const u8 *data, size_t length);
 +
-+void vdo_commit_oldest_slab_journal_tail_blocks(struct slab_depot *depot,
-+						sequence_number_t recovery_block_number);
++int __must_check uds_flush_buffered_writer(struct buffered_writer *writer);
 +
-+void vdo_scrub_all_unrecovered_slabs(struct slab_depot *depot, struct vdo_completion *parent);
++#endif /* UDS_IO_FACTORY_H */
+diff --git a/drivers/md/dm-vdo/numeric.h b/drivers/md/dm-vdo/numeric.h
+new file mode 100644
+index 000000000000..dc8c400b21d2
+--- /dev/null
++++ b/drivers/md/dm-vdo/numeric.h
+@@ -0,0 +1,78 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright 2023 Red Hat
++ */
 +
-+void vdo_dump_slab_depot(const struct slab_depot *depot);
++#ifndef UDS_NUMERIC_H
++#define UDS_NUMERIC_H
 +
- #endif /* VDO_SLAB_DEPOT_H */
++#include <asm/unaligned.h>
++#include <linux/kernel.h>
++#include <linux/types.h>
++
++/*
++ * These utilities encode or decode a number from an offset in a larger data buffer and then
++ * advance the offset pointer to the next field in the buffer.
++ */
++
++static inline void decode_s64_le(const u8 *buffer, size_t *offset, s64 *decoded)
++{
++	*decoded = get_unaligned_le64(buffer + *offset);
++	*offset += sizeof(s64);
++}
++
++static inline void encode_s64_le(u8 *data, size_t *offset, s64 to_encode)
++{
++	put_unaligned_le64(to_encode, data + *offset);
++	*offset += sizeof(s64);
++}
++
++static inline void decode_u64_le(const u8 *buffer, size_t *offset, u64 *decoded)
++{
++	*decoded = get_unaligned_le64(buffer + *offset);
++	*offset += sizeof(u64);
++}
++
++static inline void encode_u64_le(u8 *data, size_t *offset, u64 to_encode)
++{
++	put_unaligned_le64(to_encode, data + *offset);
++	*offset += sizeof(u64);
++}
++
++static inline void decode_s32_le(const u8 *buffer, size_t *offset, s32 *decoded)
++{
++	*decoded = get_unaligned_le32(buffer + *offset);
++	*offset += sizeof(s32);
++}
++
++static inline void encode_s32_le(u8 *data, size_t *offset, s32 to_encode)
++{
++	put_unaligned_le32(to_encode, data + *offset);
++	*offset += sizeof(s32);
++}
++
++static inline void decode_u32_le(const u8 *buffer, size_t *offset, u32 *decoded)
++{
++	*decoded = get_unaligned_le32(buffer + *offset);
++	*offset += sizeof(u32);
++}
++
++static inline void encode_u32_le(u8 *data, size_t *offset, u32 to_encode)
++{
++	put_unaligned_le32(to_encode, data + *offset);
++	*offset += sizeof(u32);
++}
++
++static inline void decode_u16_le(const u8 *buffer, size_t *offset, u16 *decoded)
++{
++	*decoded = get_unaligned_le16(buffer + *offset);
++	*offset += sizeof(u16);
++}
++
++static inline void encode_u16_le(u8 *data, size_t *offset, u16 to_encode)
++{
++	put_unaligned_le16(to_encode, data + *offset);
++	*offset += sizeof(u16);
++}
++
++#endif /* UDS_NUMERIC_H */
 -- 
 2.40.0
 
